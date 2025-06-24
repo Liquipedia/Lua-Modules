@@ -58,21 +58,21 @@ local LOAN = 'Loan'
 
 local POSITION_ICON_DATA = Lua.requireIfExists('Module:PositionIcon/data', {loadData = true})
 
--- todo: decide what to do with those ...
+-- todo at a later date: move into standardized role data where reasonable or kick
 local NOT_YET_IN_ROLES_DATA = {
-	['coach/analyst'] = {display = 'Coach/Analyst', children = {'C./A.'}},
-	['coach and analyst'] = {display = 'Coach/Analyst', children = {'C./A.'}},
-	['overall coach'] = {display = 'Overall Coach', children = {'OC.'}},
-	['manager and analyst'] = {display = 'Manager/Analyst', children = {'M./A.'}},
-	['manager/analyst'] = {display = 'Manager/Analyst', children = {'M./A.'}},
-	['general manager'] = {display = 'General Manager', children = {'GM.'}},
-	['assistant general manager'] = {display = 'Assistant General Manager', children = {'AGM.'}},
-	['team manager'] = {display = 'Team Manager', children = {'TM.'}},
-	['assistant team manager'] = {display = 'Assistant Team Manager', children = {'ATM.'}},
-	substitute = {display = 'Substitute', children = {'Sub.'}},
-	inactive = {display = 'Inactive', children = {'Ia.'}},
-	['training advisor'] = {display = 'Training Advisor', children = {'TA.'}},
-	['founder & training director'] = {display = 'Founder & Training Director', children = {'F. & TD.'}},
+	['coach/analyst'] = {display = 'Coach/Analyst', abbreviation = 'C./A.'},
+	['coach and analyst'] = {display = 'Coach/Analyst', abbreviation = 'C./A.'},
+	['overall coach'] = {display = 'Overall Coach', abbreviation = 'OC.'},
+	['manager and analyst'] = {display = 'Manager/Analyst', abbreviation = 'M./A.'},
+	['manager/analyst'] = {display = 'Manager/Analyst', abbreviation = 'M./A.'},
+	['general manager'] = {display = 'General Manager', abbreviation = 'GM.'},
+	['assistant general manager'] = {display = 'Assistant General Manager', abbreviation = 'AGM.'},
+	['team manager'] = {display = 'Team Manager', abbreviation = 'TM.'},
+	['assistant team manager'] = {display = 'Assistant Team Manager', abbreviation = 'ATM.'},
+	substitute = {display = 'Substitute', abbreviation = 'Sub.'},
+	inactive = {display = 'Inactive', abbreviation = 'Ia.'},
+	['training advisor'] = {display = 'Training Advisor', abbreviation = 'TA.'},
+	['founder & training director'] = {display = 'Founder & Training Director', abbreviation = 'F. & TD.'},
 }
 
 ---@class TeamHistoryAuto
@@ -226,7 +226,9 @@ function TeamHistoryAuto:_row(transfer)
 	local role = Logic.nilIfEmpty(transfer.role)
 	if role then
 		local splitRole = Array.parseCommaSeparatedString(role --[[@as string]], ' ')
-		local roleData = Roles.All[transfer.role:lower()] or Roles.All[splitRole[#splitRole]:lower()] or {}
+		local lastSplitRole = splitRole[#splitRole]:lower()
+		local roleData = Roles.All[transfer.role:lower()] or Roles.All[lastSplitRole]
+			or NOT_YET_IN_ROLES_DATA[transfer.role:lower()] or NOT_YET_IN_ROLES_DATA[lastSplitRole] or {}
 		if roleData.doNotShowInHistory then
 			role = nil
 		elseif roleData.abbreviation then
@@ -240,7 +242,7 @@ function TeamHistoryAuto:_row(transfer)
 	local teamDisplay = teamText
 	if role then
 		teamDisplay = Span{
-			css = {['padding-left'] = '3px', ['font-style'] = 'italic'},
+			css = {['padding-left'] = '3px', ['font-style'] = 'itali'},
 			children = {
 				'(',
 				role,
