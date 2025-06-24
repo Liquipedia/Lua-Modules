@@ -22,6 +22,7 @@ local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 local CustomMatchGroupInput = {}
+---@class Dota2MatchParser: MatchParserInterface
 local MatchFunctions = {}
 local MapFunctions = {}
 
@@ -38,11 +39,11 @@ MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 ---@field getMap fun(mapInput: table): table
 ---@field getLength fun(map: table): string?
 ---@field getSide fun(map: table, opponentIndex: integer): string?
----@field getObjectives fun(map: table, opponentIndex: integer): string?
+---@field getObjectives fun(map: table, opponentIndex: integer): table<string, integer>?
 ---@field getHeroPicks fun(map: table, opponentIndex: integer): string[]?
 ---@field getHeroBans fun(map: table, opponentIndex: integer): string[]?
 ---@field getParticipants fun(map: table, opponentIndex: integer): table[]?
----@field getVetoPhase fun(map: table): table?
+---@field getVetoPhase fun(map: table): table[]?
 
 ---@param match table
 ---@param options? {isMatchPage: boolean?}
@@ -66,7 +67,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 	end
 
-	return CustomMatchGroupInput.processMatchWithoutStandalone(MapParser, match)
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
 end
 
 ---@param MapParser Dota2MapParserInterface
