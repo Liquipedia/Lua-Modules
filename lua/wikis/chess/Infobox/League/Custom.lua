@@ -50,6 +50,11 @@ local RESTRICTIONS = {
 		link = 'Senior Tournaments',
 		data = 'senior',
 	},
+	engine = {
+		name = 'Chess Engines Only',
+		link = 'Computer Chess Tournaments',
+		data = 'engine',
+	},
 }
 
 ---@param frame Frame
