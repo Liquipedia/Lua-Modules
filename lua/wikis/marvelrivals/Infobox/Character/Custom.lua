@@ -99,7 +99,7 @@ function CustomHero:_getRole(roleInput)
 	if type(roleInput) ~= 'string' then
 		return nil
 	end
-    return ROLE_LOOKUP[roleInput:lower()]
+	return ROLE_LOOKUP[roleInput:lower()]
 end
 
 ---@param args table
