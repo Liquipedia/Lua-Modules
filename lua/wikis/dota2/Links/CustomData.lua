@@ -15,7 +15,7 @@ return {
 		},
 		blasttv = {
 			'https://blast.tv/dota/',
-			match = 'https://blast.tv/dota/'
+			match = 'https://blast.tv/dota/match'
 		}
 	}
 }
