@@ -70,12 +70,12 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'role' then
-		return WidgetUtil.collect(
+		return {
 			Cell{
 				name = 'Role',
-				children = self.caller:_getRole(args) or DEFAULT_ROLE
+				children = {self.caller:_getRole(args) or DEFAULT_ROLE}
 			}
-		)
+		}
 	elseif id == 'custom' then
 		Array.appendWith(
 			widgets,
