@@ -23,6 +23,19 @@ local Center = Widgets.Center
 local Title = Widgets.Title
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local CREATURE_ICON = {
+	siegegiant = 'Siege Giant Icon.png',
+	gravegolem = 'Siege Giant Icon.png',
+	knight = 'Siege Giant Icon.png',
+}
+CREATURE_ICON.knights = CREATURE_ICON.knight
+CREATURE_ICON.siegegiants = CREATURE_ICON.siegegiant
+CREATURE_ICON['siege giants'] = CREATURE_ICON.siegegiant
+CREATURE_ICON['siege giant'] = CREATURE_ICON.siegegiant
+CREATURE_ICON.gravegolems = CREATURE_ICON.gravegolem
+CREATURE_ICON['grave golems'] = CREATURE_ICON.gravegolem
+CREATURE_ICON['grave golem'] = CREATURE_ICON.gravegolem
+
 ---@class HeroesMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
 ---@class HeroesMapInfoboxWidgetInjector: WidgetInjector
@@ -51,6 +64,7 @@ function CustomInjector:parse(id, widgets)
 				mw.getCurrentFrame(), 'Faction icon', {args.universe}) or nil}},
 			caller:_objectives(),
 			caller:_creatures(),
+			Cell{name = 'Creatures', children = caller:getAllArgsForBase(args, 'creature')},
 			Title{children = {'Map Data'}},
 			Cell{name = 'Lanes', children = {args.lanes}},
 			Cell{name = 'Mercenary camps', children = {args.mercenarycamps}},
@@ -76,19 +90,6 @@ function CustomMap:_objectives()
 	return {
 		Title{children = {'Main Objectives'}},
 		Center{children = Array.interleave(objectives, '&nbsp;')}
-	}
-end
-
----@return Widget[]?
-function CustomMap:_creatures()
-	local creatures = self:getAllArgsForBase(self.args, 'creature')
-	if Logic.isEmpty(creatures) then return end
-	creatures = Array.map(creatures, function(creature)
-		return Template.safeExpand(mw.getCurrentFrame(), 'CreatureIcon', {creature})
-	end)
-	return {
-		Title{children = {'Creatures'}},
-		Center{children = Array.interleave(creatures, '&nbsp;')}
 	}
 end
 
