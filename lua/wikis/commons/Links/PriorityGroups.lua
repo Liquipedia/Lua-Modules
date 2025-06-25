@@ -20,6 +20,7 @@ return {
 		'battlefy',
 		'b5csgo',
 		'blasttv',
+		'blasttvdota',
 		'cfs',
 		'challengermode',
 		'challonge',

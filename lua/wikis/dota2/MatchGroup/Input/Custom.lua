@@ -110,10 +110,16 @@ function MatchFunctions.getLinks(match, games)
 	links.stratz = {}
 	links.dotabuff = {}
 	links.datdota = {}
+	links.blasttvdota = {}
 
 	Array.forEach(
 		Array.filter(games, function(map) return map.matchid ~= nil end),
 		function(map, mapIndex)
+			-- only 1 matchId is needed for blasttv
+			-- blast.tv/dota/match/{matchid} redirects to series page with all matches
+			if mapIndex == 1 then
+				links.blasttvdota[mapIndex] = 'https://www.blast.tv/dota/match/' .. map.matchid
+			end
 			links.stratz[mapIndex] = 'https://stratz.com/match/' .. map.matchid
 			links.dotabuff[mapIndex] = 'https://www.dotabuff.com/matches/' .. map.matchid
 			links.datdota[mapIndex] = 'https://www.datdota.com/matches/' .. map.matchid

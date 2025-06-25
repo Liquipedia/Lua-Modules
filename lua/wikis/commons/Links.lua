@@ -56,6 +56,9 @@ local PREFIXES = {
 		'https://blast.tv/',
 		match = 'https://blast.tv/',
 	},
+	blasttvdota = {
+		'https://blast.tv/dota/',
+	},
 	bluesky = {'https://bsky.app/profile/'},
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
@@ -368,6 +371,7 @@ local ICON_KEYS_TO_RENAME = {
 	['bilibili-stream'] = 'bilibili',
 	daumcafe = 'cafe-daum',
 	blasttv = 'blast',
+	blasttvdota = 'blast',
 	['esea-d'] = 'esea-league',
 	['faceit-c'] = 'faceit',
 	['faceit-c2'] = 'faceit',
