@@ -270,7 +270,10 @@ function MatchGroupInputUtil.mergeRecordWithOpponent(record, opponent, substitut
 				flag = player.flag,
 				name = player.pageName,
 				team = player.team,
-				extradata = player.faction and {faction = player.faction}
+				extradata = Logic.nilIfEmpty({
+					faction = player.faction,
+					publisherId = (player.extradata or {}).publisherId
+				})
 			}
 		end)
 	end
@@ -420,7 +423,7 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 	local players = {}
 	local playersIndex = 0
 
-	---@param player {pageName: string, displayName: string?, flag: string?, faction: string?}
+	---@param player {pageName: string, displayName: string?, flag: string?, faction: string?, publisherId: string?}
 	local insertIntoPlayers = function(player)
 		if type(player) ~= 'table' or Logic.isEmpty(player) or Logic.isEmpty(player.pageName) then
 			return
@@ -438,6 +441,11 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 			faction = player.faction and Faction.read(player.faction) or nil,
 			index = playersIndex,
 		})
+		if player.publisherId then
+			players[normalizedPageName].extradata = Table.merge(players[normalizedPageName].extradata or {}, {
+				publisherId = player.publisherId
+			})
+		end
 	end
 
 	---@param varPrefix string
@@ -476,6 +484,8 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 				displayName = globalVars:get(varPrefix .. 'dn'),
 				flag = globalVars:get(varPrefix .. 'flag'),
 				faction = globalVars:get(varPrefix .. 'faction'),
+				-- Used on dota2 for ingame IDs
+				publisherId = globalVars:get(varPrefix .. 'id'),
 			}
 		end
 		playerIndex = playerIndex + 1
