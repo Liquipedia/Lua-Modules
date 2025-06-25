@@ -51,7 +51,7 @@ function CustomInjector:parse(id, widgets)
 		return {}
 	elseif id == 'custom' then
 		local makeBreakdownCell = function(name, value)
-			return '<b>' .. name .. '</b><br/>' .. (value or '')
+			return '<b>' .. name .. '</b><br/>' .. tostring(value or '')
 		end
 		Array.appendWith(widgets,
 			Breakdown{classes = {'infobox-center'}, children = {
