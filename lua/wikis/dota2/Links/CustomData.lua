@@ -13,5 +13,9 @@ return {
 			player = 'https://www.faceit.com/en/players/',
 			match = 'https://www.faceit.com/en/dota2/room/',
 		},
+		blasttv = {
+			'https://blast.tv/dota/',
+			match = 'https://blast.tv/dota/'
+		}
 	}
 }
