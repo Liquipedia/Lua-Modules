@@ -18,8 +18,6 @@ local Cell = Widgets.Cell
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
 
-local WidgetUtil = Lua.import('Module:Widget/Util')
-
 ---@class MarvelRivalsHeroInfobox: CharacterInfobox
 local CustomHero = Class.new(Character)
 local CustomInjector = Class.new(Injector)
@@ -70,12 +68,12 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'role' then
-		return WidgetUtil.collect(
+		return {
 			Cell{
 				name = 'Role',
-				children = self.caller:_getRole(args) or DEFAULT_ROLE
+				children = {self.caller:_getRole(args) or DEFAULT_ROLE}
 			}
-		)
+		}
 	elseif id == 'custom' then
 		Array.appendWith(
 			widgets,
@@ -99,7 +97,7 @@ function CustomHero:_getRole(roleInput)
 	if type(roleInput) ~= 'string' then
 		return nil
 	end
-    return ROLE_LOOKUP[roleInput:lower()]
+	return ROLE_LOOKUP[roleInput:lower()]
 end
 
 ---@param args table
