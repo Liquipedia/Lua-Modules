@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Infobox/Extension/UniverseIcon
+-- page=Module:Widget/UniverseIcon
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
