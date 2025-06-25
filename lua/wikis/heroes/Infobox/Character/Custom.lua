@@ -18,7 +18,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Breakdown = Widgets.Breakdown
 local Table = Widgets.Table
-local UniverseIcon = Lua.import('Module:Infobox/Extension/UniverseIcon')
+local UniverseIcon = Lua.import('Module:Widget/UniverseIcon')
 
 ---@class HeroesCharacterInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)

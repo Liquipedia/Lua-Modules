@@ -20,7 +20,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
-local UniverseIcon = Lua.import('Module:Infobox/Extension/UniverseIcon')
+local UniverseIcon = Lua.import('Module:Widget/UniverseIcon')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class HeroesMapInfobox: MapInfobox
