@@ -16,7 +16,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Image = require('Module:Widget/Image/Icon/Image')
+local Image = Lua.import('Module:Widget/Image/Icon/Image')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
