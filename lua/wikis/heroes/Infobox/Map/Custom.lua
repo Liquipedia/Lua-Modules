@@ -23,19 +23,6 @@ local Center = Widgets.Center
 local Title = Widgets.Title
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local CREATURE_ICON = {
-	siegegiant = 'Siege Giant Icon.png',
-	gravegolem = 'Siege Giant Icon.png',
-	knight = 'Siege Giant Icon.png',
-}
-CREATURE_ICON.knights = CREATURE_ICON.knight
-CREATURE_ICON.siegegiants = CREATURE_ICON.siegegiant
-CREATURE_ICON['siege giants'] = CREATURE_ICON.siegegiant
-CREATURE_ICON['siege giant'] = CREATURE_ICON.siegegiant
-CREATURE_ICON.gravegolems = CREATURE_ICON.gravegolem
-CREATURE_ICON['grave golems'] = CREATURE_ICON.gravegolem
-CREATURE_ICON['grave golem'] = CREATURE_ICON.gravegolem
-
 ---@class HeroesMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
 ---@class HeroesMapInfoboxWidgetInjector: WidgetInjector
@@ -63,7 +50,6 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Universe', children = {args.universe and Template.safeExpand(
 				mw.getCurrentFrame(), 'Faction icon', {args.universe}) or nil}},
 			caller:_objectives(),
-			caller:_creatures(),
 			Cell{name = 'Creatures', children = caller:getAllArgsForBase(args, 'creature')},
 			Title{children = {'Map Data'}},
 			Cell{name = 'Lanes', children = {args.lanes}},
