@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
-local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
@@ -21,6 +20,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
+local UniverseIcon = Lua.import('Module:Infobox/Extension/UniverseIcon')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class HeroesMapInfobox: MapInfobox
@@ -47,8 +47,7 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 	if id == 'custom' then
 		return WidgetUtil.collect(
-			Cell{name = 'Universe', children = {args.universe and Template.safeExpand(
-				mw.getCurrentFrame(), 'Faction icon', {args.universe}) or nil}},
+			Cell{name = 'Universe', children = {UniverseIcon{universe = args.universe}}},
 			caller:_objectives(),
 			Cell{name = 'Creatures', children = caller:getAllArgsForBase(args, 'creature')},
 			Title{children = {'Map Data'}},
