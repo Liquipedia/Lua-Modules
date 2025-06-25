@@ -18,8 +18,6 @@ local Cell = Widgets.Cell
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
 
-local WidgetUtil = Lua.import('Module:Widget/Util')
-
 ---@class MarvelRivalsHeroInfobox: CharacterInfobox
 local CustomHero = Class.new(Character)
 local CustomInjector = Class.new(Injector)
