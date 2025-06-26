@@ -27,6 +27,8 @@ local MODES = {
 	classical = 'Classical',
 	blitz = 'Blitz',
 	rapid = 'Rapid',
+	bullet = 'Bullet',
+	hyperbullet = 'Hyperbullet',
 }
 
 local RESTRICTIONS = {
