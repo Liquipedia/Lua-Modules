@@ -24,6 +24,19 @@ return {
 				lightMode = 'Brawl Stars Default allmode.png',
 			},
 		},
+		chinesebrawlstars = {
+			abbreviation = 'CN BS',
+			name = 'Chinese Brawl Stars',
+			link = 'Chinese Brawl Stars',
+			logo = {
+				darkMode = 'Brawl Stars Default allmode.png',
+				lightMode = 'Brawl Stars Default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Brawl Stars Default allmode.png',
+				lightMode = 'Brawl Stars Default allmode.png',
+			},
+		},
 	},
 	config = {
 		squads = {
@@ -33,7 +46,7 @@ return {
 		},
 		match2 = {
 			status = 2,
-			matchWidth = 150,
+			matchWidth = 200,
 		},
 		teamRosterNavbox = {
 			links = {
