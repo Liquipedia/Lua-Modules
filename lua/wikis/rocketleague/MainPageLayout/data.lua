@@ -133,7 +133,7 @@ return {
 			},
 		},
 		{
-			file = '',
+			file = 'Flakes casual photo.jpg',
 			title = 'Help',
 			link = 'Help:Contents',
 		},
