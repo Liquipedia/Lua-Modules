@@ -126,6 +126,10 @@ function CustomLeague:getWikiCategories(args)
 		table.insert(categories, Game.name{game = args.game} .. ' Competitions')
 	end
 
+	if Logic.readBool(args.marginalized_gender) then
+		table.insert(categories, 'Marginalized Gender Tournaments')
+	end
+
 	return categories
 end
 
