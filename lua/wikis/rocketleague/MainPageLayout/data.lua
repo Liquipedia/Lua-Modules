@@ -110,7 +110,7 @@ return {
 			},
 		},
 		{
-			file = '',
+			file = 'RLCS Season 8 Trophy.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
