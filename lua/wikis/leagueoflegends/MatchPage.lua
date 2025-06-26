@@ -409,17 +409,17 @@ function MatchPage:_renderTeamStats(game)
 							team2Value = game.teams[2].objectives.inhibitors
 						},
 						{
+							icon = IconImage{imageLight = 'Lol stat icon dragon.png', link = ''},
+							name = 'Dragons',
+							team1Value = game.teams[1].objectives.dragons,
+							team2Value = game.teams[2].objectives.dragons
+						},
+						{
 							icon = IconImage{imageLight = 'Lol stat icon baron.png', link = ''},
 							name = 'Barons',
 							team1Value = game.teams[1].objectives.barons,
 							team2Value = game.teams[2].objectives.barons
 						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon dragon.png', link = ''},
-							name = 'Dragons',
-							team1Value = game.teams[1].objectives.dragons,
-							team2Value = game.teams[2].objectives.dragons
-						}
 					}
 				}
 			}
