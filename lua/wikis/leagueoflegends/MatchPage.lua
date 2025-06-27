@@ -29,6 +29,9 @@ local VetoItem = Lua.import('Module:Widget/Match/Page/VetoItem')
 local VetoRow = Lua.import('Module:Widget/Match/Page/VetoRow')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local VOID_GRUB_START_TIME = 1704913200 -- Jan 10 2024; Patch 14.1
+local ATAKHAN_START_TIME = 1736276400 -- Jan 07 2025; Patch 25.S1.1
+
 ---@class LoLMatchPageGame: MatchPageGame
 ---@field vetoGroups {type: 'ban'|'pick', team: integer, character: string, vetoNumber: integer}[][][]
 
@@ -377,7 +380,7 @@ function MatchPage:_renderTeamStats(game)
 				},
 				StatsList{
 					finished = game.finished,
-					data = {
+					data = Array.append({},
 						{
 							icon = KDA_ICON,
 							name = 'KDA',
@@ -410,24 +413,24 @@ function MatchPage:_renderTeamStats(game)
 							team1Value = game.teams[1].objectives.inhibitors,
 							team2Value = game.teams[2].objectives.inhibitors
 						},
-						{
+						self.matchData.timestamp >= VOID_GRUB_START_TIME and {
 							icon = IconImage{imageLight = 'Lol stat icon grub.png', link = ''},
 							name = 'Void Grubs',
 							team1Value = game.teams[1].objectives.grubs,
 							team2Value = game.teams[2].objectives.grubs
-						},
+						} or nil,
 						{
 							icon = IconImage{imageLight = 'Lol stat icon herald.png', link = ''},
 							name = 'Rift Heralds',
 							team1Value = game.teams[1].objectives.heralds,
 							team2Value = game.teams[2].objectives.heralds
 						},
-						{
+						self.matchData.timestamp >= ATAKHAN_START_TIME and {
 							icon = IconImage{imageLight = 'Lol stat icon atakhan.png', link = ''},
 							name = 'Atakhan',
 							team1Value = game.teams[1].objectives.atakhans,
 							team2Value = game.teams[2].objectives.atakhans
-						},
+						} or nil,
 						{
 							icon = IconImage{imageLight = 'Lol stat icon dragon.png', link = ''},
 							name = 'Dragons',
@@ -439,8 +442,8 @@ function MatchPage:_renderTeamStats(game)
 							name = 'Barons',
 							team1Value = game.teams[1].objectives.barons,
 							team2Value = game.teams[2].objectives.barons
-						},
-					}
+						}
+					)
 				}
 			}
 		}
