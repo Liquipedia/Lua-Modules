@@ -49,6 +49,11 @@ return {
 			matchWidth = 180,
 			sortCasters = true,
 		},
+		infoboxPlayer = {
+			automatedHistory = {
+				mode = 'automatic',
+			},
+		},
 	},
 	defaultRoundPrecision = 0,
 }

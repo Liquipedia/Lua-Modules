@@ -17,7 +17,6 @@ local Region = require('Module:Region')
 local SignaturePlayerAgents = require('Module:SignaturePlayerAgents')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
@@ -39,12 +38,6 @@ function CustomPlayer.run(frame)
 	local args = player.args
 	player:setWidgetInjector(CustomInjector(player))
 
-	args.history = TeamHistoryAuto.results{
-		convertrole = true,
-		addlpdbdata = true,
-		specialRoles = args.historySpecialRoles
-	}
-	args.autoTeam = true
 	args.agents = SignaturePlayerAgents.get{player = player.pagename, top = 3}
 
 	local builtInfobox = player:createInfobox()

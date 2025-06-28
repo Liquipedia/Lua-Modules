@@ -45,6 +45,12 @@ return {
 				display = 'VALORANT Champions Tour Global Contract Database'
 			},
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'automatic',
+			},
+		},
 		teamRosterNavbox = {
 			links = {
 				playedMatches = 'Matches',

@@ -62,6 +62,12 @@ return {
 			matchWidthMobile = 110,
 			matchWidth = 150,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'manualPrio',
+			},
+		},
 		teamRosterNavbox = {
 			links = {
 				playedMatches = 'Matches',
