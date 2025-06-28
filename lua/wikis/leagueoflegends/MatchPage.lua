@@ -409,6 +409,24 @@ function MatchPage:_renderTeamStats(game)
 							team2Value = game.teams[2].objectives.inhibitors
 						},
 						{
+							icon = IconImage{imageLight = 'Lol stat icon grub.png', link = ''},
+							name = 'Void Grubs',
+							team1Value = game.teams[1].objectives.grubs,
+							team2Value = game.teams[2].objectives.grubs
+						},
+						{
+							icon = IconImage{imageLight = 'Lol stat icon herald.png', link = ''},
+							name = 'Rift Heralds',
+							team1Value = game.teams[1].objectives.heralds,
+							team2Value = game.teams[2].objectives.heralds
+						},
+						{
+							icon = IconImage{imageLight = 'Lol stat icon atakhan.png', link = ''},
+							name = 'Atakhan',
+							team1Value = game.teams[1].objectives.atakhans,
+							team2Value = game.teams[2].objectives.atakhans
+						},
+						{
 							icon = IconImage{imageLight = 'Lol stat icon dragon.png', link = ''},
 							name = 'Dragons',
 							team1Value = game.teams[1].objectives.dragons,
