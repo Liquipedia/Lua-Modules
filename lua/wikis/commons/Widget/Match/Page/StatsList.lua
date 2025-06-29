@@ -36,9 +36,14 @@ function MatchPageStatsList:render()
 	if Logic.isEmpty(self.props.data) then return end
 	return Div{
 		classes = {'match-bm-team-stats-list'},
-		children = Array.map(self.props.data, function (dataElement)
-			return self:_renderStat(dataElement)
-		end)
+		children = Array.map(
+			Array.filter(self.props.data, function (element)
+				return Logic.isNotEmpty(element.team1Value) and Logic.isNotEmpty(element.team2Value)
+			end),
+			function (dataElement)
+				return self:_renderStat(dataElement)
+			end
+		)
 	}
 end
 
