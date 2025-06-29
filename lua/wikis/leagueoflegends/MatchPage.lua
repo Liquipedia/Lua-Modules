@@ -439,7 +439,7 @@ function MatchPage:_renderTeamStats(game)
 							name = 'Barons',
 							team1Value = game.teams[1].objectives.barons,
 							team2Value = game.teams[2].objectives.barons
-						}
+						},
 					}
 				}
 			}
