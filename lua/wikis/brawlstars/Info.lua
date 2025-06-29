@@ -29,8 +29,8 @@ return {
 			name = '荒野乱斗',
 			link = '荒野乱斗',
 			logo = {
-				darkMode = 'Brawl Stars Default allmode.png',
-				lightMode = 'Brawl Stars Default allmode.png',
+				darkMode = '荒野乱斗 Default logo allmode.png',
+				lightMode = '荒野乱斗 Default logo allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Brawl Stars Default allmode.png',
