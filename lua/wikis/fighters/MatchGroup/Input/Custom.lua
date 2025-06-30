@@ -28,6 +28,7 @@ CustomMatchGroupInput.DATE_FALLBACKS = {
 	'tournament_startdate',
 }
 
+CustomMatchGroupInput.getBestOf = MatchGroupInputUtil.getBestOf
 
 -- called from Module:MatchGroup
 ---@param match table
@@ -42,12 +43,6 @@ end
 ---@return table[]
 function CustomMatchGroupInput.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
-end
-
----@param bestofInput string
----@return integer?
-function CustomMatchGroupInput.getBestOf(bestofInput)
-	return tonumber(bestofInput)
 end
 
 ---@param maps table[]
