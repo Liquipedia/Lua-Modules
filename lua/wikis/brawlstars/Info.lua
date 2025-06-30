@@ -24,7 +24,7 @@ return {
 				lightMode = 'Brawl Stars Default allmode.png',
 			},
 		},
-		chinesebs = {
+		cnbrawlstars = {
 			abbreviation = 'CN BS',
 			name = '荒野乱斗',
 			link = '荒野乱斗',
