@@ -30,7 +30,10 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{limit = 10},
+		body = TransfersList{
+			limit = 10,
+			transferPage = 'Player Transfers/' .. os.date('%Y'),
+		},
 		boxid = 1509,
 	},
 	thisDay = {
