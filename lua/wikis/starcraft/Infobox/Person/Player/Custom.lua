@@ -519,7 +519,7 @@ function CustomPlayer:getWikiCategories(categories)
 	end
 
 	for _, faction in pairs(Faction.readMultiFaction(args.race, {alias = false})) do
-		table.insert(categories, faction .. ' Players')
+		table.insert(categories, Faction.toName(faction) .. ' Players')
 	end
 
 	local botCategoryKeys = {
