@@ -14,10 +14,10 @@ local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local PlayerExt = Lua.import('Module:Player/Ext')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-
-local PlayerExt = Lua.import('Module:Player/Ext')
 
 local globalVars = PlayerExt.globalVars
 
@@ -188,7 +188,7 @@ function StarcraftPlayerExt.TemplateStorePlayerLink(frame)
 
 	StarcraftPlayerExt.saveToPageVars({
 		displayName = displayName,
-		pageName = args.link or pageName or displayName,
+		pageName = Page.applyUnderScoresIfEnforced(args.link or pageName or displayName),
 		flag = String.nilIfEmpty(Flags.CountryName{flag = args.flag}),
 		faction = Faction.read(args.faction or args.race) or Faction.defaultFaction,
 	}, {overwritePageVars = true})
