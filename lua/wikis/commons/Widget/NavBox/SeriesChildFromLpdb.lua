@@ -29,6 +29,7 @@ local Widget = Lua.import('Module:Widget')
 ---@field limit integer?
 ---@field offset integer?
 ---@field newestFirst boolean?
+---@field prependManualChildren boolean?
 ---@field series string[]|string
 ---@field resolve boolean?
 ---@field tier string?
@@ -57,7 +58,7 @@ function SeriesChildFromLpdb:render()
 	---@return integer?
 	local getSeriesNumber = function(tournament)
 		return tonumber((tournament.extradata or {}).seriesnumber)
-			or tonumber((tournament.pageName:gsub('.*/(%d+)$', '%1')))
+			or tonumber((tournament.pageName:gsub('.*/([%d%.]+)$', '%1')))
 	end
 
 	---@param tournament StandardTournament
@@ -78,12 +79,21 @@ function SeriesChildFromLpdb:render()
 	local tournaments = Tournament.getAllTournaments(self:_makeConditions(), filterbyLimitAndOffSet)
 
 	local elements = Array.map(tournaments, function(tournament)
+		local seriesNumber = getSeriesNumber(tournament)
+		local display = seriesNumber and ('#' .. seriesNumber) or (tournament.displayName)
 		-- can not use `Link` Widget due to `Json.stringify` below
-		return Page.makeInternalLink('#' .. getSeriesNumber(tournament), tournament.pageName)
+		return Page.makeInternalLink(display, tournament.pageName)
 	end)
 
 	if Logic.readBool(props.newestFirst) then
 		elements = Array.reverse(elements)
+	end
+
+	local manualElements = Array.mapIndexes(function(index) return props[index] end)
+	if Logic.readBool(props.prependManualChildren) then
+		elements = Array.extend(manualElements, elements)
+	else
+		Array.extendWith(elements, manualElements)
 	end
 
 	return Json.stringify(Table.merge(props, elements))
@@ -101,9 +111,11 @@ function SeriesChildFromLpdb:_makeConditions()
 
 	assert(Logic.isNotEmpty(serieses), 'No series specified')
 
-	if Logic.readBoolOrNil(props.resolve) then
-		serieses = Array.map(serieses, Page.pageifyLink)
+	local prepPageName = Logic.nilOr(Logic.readBoolOrNil(props.resolve), true) and Page.pageifyLink or function(pageName)
+		return (pageName:gsub(' ', '_'))
 	end
+
+	serieses = Array.map(serieses, prepPageName)
 
 	---@param key string
 	---@param items string[]
