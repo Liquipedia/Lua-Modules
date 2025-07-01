@@ -57,7 +57,8 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Cell{name = 'Teams', content = {args.team_number}})
 	elseif id == 'gamesettings' then
 		Array.appendWith(widgets,
-			Cell{name = 'Game', content = {Game.text{game = self.caller.data.game}}})
+			Cell{name = 'Game', content = {Game.text{game = self.caller.data.game}}}
+		)
 	elseif id == 'organizers' then
 		local organizers = self.caller:_createOrganizers()
 		local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
