@@ -7,11 +7,11 @@
 
 ---@type PersonRoleData[]
 local inGameRoles = {
-	['top'] = {category = 'Top Lane players', display = 'Top'},
-	['support'] = {category = 'Support players', display = 'Support'},
-	['jungle'] = {category = 'Jungle players', display = 'Jungle'},
-	['mid'] = {category = 'Mid Lane players', display = 'Mid'},
-	['bottom'] = {category = 'Bot Lane players', display = 'Bot'},
+	['top'] = {category = 'Top Lane players', display = 'Top', doNotShowInHistory = true},
+	['support'] = {category = 'Support players', display = 'Support', doNotShowInHistory = true},
+	['jungle'] = {category = 'Jungle players', display = 'Jungle', doNotShowInHistory = true},
+	['mid'] = {category = 'Mid Lane players', display = 'Mid', doNotShowInHistory = true},
+	['bottom'] = {category = 'Bot Lane players', display = 'Bot', doNotShowInHistory = true},
 }
 
 inGameRoles['jgl'] = inGameRoles.jungle

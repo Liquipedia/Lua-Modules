@@ -108,6 +108,12 @@ return {
 			status = 2,
 			matchWidthMobile = 110,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'cleanup',
+			},
+		},
 		teamRosterNavbox = {
 			links = {
 				playedMatches = 'Matches',

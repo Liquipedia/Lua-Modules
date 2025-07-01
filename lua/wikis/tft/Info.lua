@@ -48,6 +48,9 @@ return {
 			status = 1,
 			sortCasters = true,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+		},
 		teamRosterNavbox = {
 			hidePlayedMatches = true,
 		},
