@@ -86,6 +86,7 @@ function Wrapper._processOpponent(args)
 		if not teamPage then
 			return
 		end
+		teamPage = mw.text.trim(teamPage)
 		return {type = Opponent.team, template = teamPage:lower()}
 	end
 
