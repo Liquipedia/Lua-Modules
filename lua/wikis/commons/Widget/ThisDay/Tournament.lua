@@ -95,7 +95,7 @@ function ThisDayTournament._displayWins(yearData)
 				link = placement.pagename,
 				date = placement.date,
 				series = placement.series,
-				name = placement.shortnae,
+				name = placement.shortname,
 			},
 			' ',
 			Link{ link = placement.pagename, children = displayName },
