@@ -52,7 +52,6 @@ Config.categories = {
 		property = 'game',
 		expandable = true,
 		items = { 'Honor of Kings', 'Arena of Valor'},
-		defaultItem = {'Honor of Kings', 'Arena of Valor'},
 		itemToPropertyValues = function(game)
 			-- Input is a specific version
 			if VERSION_TO_GAME[game] then
