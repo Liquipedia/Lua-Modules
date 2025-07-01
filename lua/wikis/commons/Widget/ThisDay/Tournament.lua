@@ -105,7 +105,7 @@ function ThisDayTournament._displayWins(yearData)
 		local opponent = Opponent.fromLpdbStruct(placement)
 
 		if not opponent then
-			mw.logObject(placement)
+			mw.logObject(placement, "Missing opponent in placement")
 		end
 		return Array.append(row, OpponentDisplay.InlineOpponent{opponent = opponent})
 	end)
