@@ -70,7 +70,7 @@ Config.categories = {
 		end,
 		transform = function(game)
 			local baseGame = VERSION_TO_GAME[game] or game
-			local icon = require('Module:Game').icon({ game = baseGame, noSpan = true, noLink = true, size = '20x20px' })
+			local icon = Lua.import('Module:Game').icon({ game = baseGame, noSpan = true, noLink = true, size = '20x20px' })
 			return icon .. '&nbsp;' .. baseGame
 		end
 	},
