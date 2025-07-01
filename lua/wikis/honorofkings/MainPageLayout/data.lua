@@ -13,7 +13,6 @@ local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local Headlines = Lua.import('Module:Widget/MainPage/Headlines')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
@@ -88,8 +87,8 @@ return {
 		lightmode = 'HoK_AoV_allmode.png',
 		darkmode = 'HoK_AoV_allmode.png',
 	},
-	metadesc = 'Comprehensive Honor of Kings & Arena of Valor wiki with articles covering everything from heroes, to strategies, '..
-		'to tournaments, to competitive players and teams.',
+	metadesc = 'Comprehensive Honor of Kings & Arena of Valor wiki with articles covering everything from heroes, '..
+		'to strategies, to tournaments, to competitive players and teams.',
 	title = 'Honor of Kings',
 	navigation = {
 		{
