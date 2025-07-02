@@ -88,6 +88,11 @@ return {
 			matchWidth = 180,
 			gameScoresIfBo1 = true,
 		},
+		thisDay = {
+			tiers = {1, 2},
+			excludeTierTypes = {'Qualifier'},
+			showPatches = true,
+		},
 	},
 	defaultRoundPrecision = 0,
 }

@@ -69,6 +69,12 @@ return {
 			},
 			hideOrg = true,
 		},
+		thisDay = {
+			hideEmptyBirthdayList = true,
+			tiers = {1, 2},
+			excludeTierTypes = {'Qualifier', 'Charity'},
+			showPatches = true,
+		},
 	},
 	opponentLibrary = 'Opponent/Starcraft', --to be removed after cleanup of non git modules
 	opponentDisplayLibrary = 'OpponentDisplay/Starcraft', --to be removed after cleanup of non git modules

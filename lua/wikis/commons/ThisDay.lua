@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Template = Lua.import('Module:Template')
@@ -26,7 +27,8 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field tiers integer[]
 ---@field excludeTierTypes string[]
 
-local Config = Lua.import('Module:ThisDay/config', {loadData = true})
+---@type ThisDayConfig
+local Config = Info.config.thisDay or {}
 
 ---@class ThisDayParameters
 ---@field date string?
@@ -41,7 +43,7 @@ function ThisDay.run(args)
 	local tournaments = ThisDay.tournament(args)
 	local birthdays = ThisDay.birthday(args)
 	local patches = ThisDay.patch(args)
-	local trivia = Config.showTrivia and ThisDay.trivia(args) or nil
+	local trivia = Logic.readBool(Config.showTrivia) and ThisDay.trivia(args) or nil
 	return HtmlWidgets.Fragment{
 		children = WidgetUtil.collect(tournaments, birthdays, patches, trivia)
 	}
@@ -56,7 +58,7 @@ function ThisDay.birthday(args)
 	return ThisDayBirthday{
 		month = month,
 		day = day,
-		hideIfEmpty = Config.hideEmptyBirthdayList,
+		hideIfEmpty = Logic.readBool(Config.hideEmptyBirthdayList),
 		noTwitter = args.noTwitter
 	}
 end
@@ -65,13 +67,13 @@ end
 ---@param args ThisDayParameters
 ---@return Widget?
 function ThisDay.patch(args)
-	if not Config.showPatches then return end
+	if not Logic.readBool(Config.showPatches) then return end
 	local month, day = ThisDay._readDate(args)
 
 	return ThisDayPatch{
 		month = month,
 		day = day,
-		hideIfEmpty = not Config.showEmptyPatchList
+		hideIfEmpty = not Logic.readBool(Config.showEmptyPatchList)
 	}
 end
 
