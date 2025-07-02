@@ -17,7 +17,7 @@ local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 ---@class MatchPageButton: Widget
 ---@operator call(table): MatchPageButton
 local MatchPageButton = Class.new(Widget)
-MatchPageButton.defaultProps {
+MatchPageButton.defaultProps = {
 	short = true, -- Temporary until all components have been redesign with bigger buttons spaces
 }
 
