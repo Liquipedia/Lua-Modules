@@ -66,6 +66,11 @@ return {
 		transfers = {
 			showTeamName = true,
 		},
+		thisDay = {
+			tiers = {1, 2},
+			excludeTierTypes = {'Qualifier'},
+			showPatches = true,
+		},
 	},
 	defaultRoundPrecision = 0,
 }

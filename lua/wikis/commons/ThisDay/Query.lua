@@ -8,6 +8,8 @@
 local Lua = require('Module:Lua')
 
 local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info', {loadData = true})
+local Logic = Lua.import('Module:Logic')
 local Patch = Lua.import('Module:Patch')
 
 local Condition = Lua.import('Module:Condition')
@@ -18,7 +20,8 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local Config = Lua.import('Module:ThisDay/config', {loadData = true})
+---@type ThisDayConfig
+local Config = Info.config.thisDay or {}
 
 ---Query operations for this day module
 local ThisDayQuery = {}
@@ -80,11 +83,11 @@ function ThisDayQuery.tournament(month, day)
 		}
 	conditions:add(ConditionUtil.anyOf(
 		ColumnName('liquipediatier'),
-		Config.tiers
+		Logic.nilOr(Config.tiers, {1, 2}) --[[ @as integer[] ]]
 	))
 	conditions:add(ConditionUtil.noneOf(
 		ColumnName('liquipediatiertype'),
-		Config.excludeTierTypes
+		Logic.nilOr(Config.excludeTierTypes, {'Qualifier'}) --[[ @as string[] ]]
 	))
 
 	return mw.ext.LiquipediaDB.lpdb('placement', {
