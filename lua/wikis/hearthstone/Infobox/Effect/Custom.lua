@@ -14,9 +14,6 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Widgets = require('Module:Widget/All')
 local Title = Widgets.Title
 local Cell = Widgets.Cell
-local Center = Widgets.Center
-local Builder = Widgets.Builder
-local Customizable = Widgets.Customizable
 
 ---@class HearthstoneEffectInfobox: EffectInfobox
 local CustomEffect = Class.new(Effect)
