@@ -133,6 +133,7 @@ function GameTable:gameRow(match, game)
 		:node(self:_displayTournament(match))
 		:node(self:displayGame(match, game))
 		:node(self:_displayGameVod(game.vod))
+		:node(self:_displayMatchPage(match))
 end
 
 ---@param match GameTableMatch

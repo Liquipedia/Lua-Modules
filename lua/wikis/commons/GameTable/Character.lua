@@ -429,6 +429,7 @@ function CharacterGameTable:gameRow(match, game)
 		:node(self:displayGame(match, game))
 		:node(self:_displayLength(game))
 		:node(self:_displayGameVod(game.vod))
+		:node(self:_displayMatchPage(match))
 end
 
 ---@param frame Frame
