@@ -111,6 +111,7 @@ function ThisDay._readDate(args)
 	local date = Logic.emptyOr(args.date, os.date('%Y-%m-%d')) --[[@as string]]
 	local dateArray = mw.text.split(date, '-', true)
 
+	-- Supported formats: YYYY-MM-DD, MM-DD
 	return tonumber(args.month or dateArray[#dateArray - 1]) --[[@as integer]],
 		tonumber(args.day or dateArray[#dateArray]) --[[@as integer]]
 end
