@@ -23,6 +23,9 @@ local ColumnName = Condition.ColumnName
 ---@type ThisDayConfig
 local Config = Info.config.thisDay or {}
 
+local DEFAULT_TIERS = {1, 2}
+local DEFAULT_EXCLUDED_TIER_TYPES = {'Qualifier'}
+
 ---Query operations for this day module
 local ThisDayQuery = {}
 
@@ -83,11 +86,11 @@ function ThisDayQuery.tournament(month, day)
 		}
 	conditions:add(ConditionUtil.anyOf(
 		ColumnName('liquipediatier'),
-		Logic.nilOr(Config.tiers, {1, 2}) --[[ @as integer[] ]]
+		Logic.nilOr(Config.tiers, DEFAULT_TIERS) --[[ @as integer[] ]]
 	))
 	conditions:add(ConditionUtil.noneOf(
 		ColumnName('liquipediatiertype'),
-		Logic.nilOr(Config.excludeTierTypes, {'Qualifier'}) --[[ @as string[] ]]
+		Logic.nilOr(Config.excludeTierTypes, DEFAULT_EXCLUDED_TIER_TYPES) --[[ @as string[] ]]
 	))
 
 	return mw.ext.LiquipediaDB.lpdb('placement', {
