@@ -24,7 +24,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field showEmptyPatchList boolean?
 ---@field showTrivia boolean?
 ---@field tiers integer[]
----@field tierTypes string[]
+---@field excludeTierTypes string[]
 
 local Config = Lua.import('Module:ThisDay/config', {loadData = true})
 

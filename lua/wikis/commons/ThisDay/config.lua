@@ -9,7 +9,7 @@
 return {
 	hideEmptyBirthdayList = false,
 	tiers = {1, 2},
-	tierTypes = {'!Qualifier'},
+	excludeTierTypes = {'Qualifier'},
 	showPatches = false,
 	showEmptyPatchList = false,
 	showTrivia = false,

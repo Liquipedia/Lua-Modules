@@ -8,6 +8,6 @@
 ---@type ThisDayConfig
 return {
 	tiers = {1, 2},
-	tierTypes = {'!Qualifier'},
+	excludeTierTypes = {'Qualifier'},
 	showPatches = true,
 }

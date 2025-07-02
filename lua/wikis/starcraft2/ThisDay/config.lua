@@ -9,6 +9,6 @@
 return {
 	hideEmptyBirthdayList = true,
 	tiers = {1, 2},
-	tierTypes = {'!Qualifier', '!Charity'},
+	excludeTierTypes = {'Qualifier', 'Charity'},
 	showPatches = true,
 }
