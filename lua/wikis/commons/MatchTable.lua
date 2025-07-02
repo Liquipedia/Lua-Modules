@@ -312,8 +312,8 @@ function MatchTable:query()
 	Lpdb.executeMassQuery('match2', {
 		conditions = self:buildConditions(),
 		order = 'date desc',
-		query = 'match2opponents, match2games, date, dateexact, icon, icondark, liquipediatier, game, type, '
-			.. 'liquipediatiertype, tournament, pagename, tickername, vod, winner, bracketdata, extradata, bestof',
+		query = 'match2id, match2opponents, match2games, date, dateexact, icon, icondark, liquipediatier, game, type,'
+			.. 'liquipediatiertype, tournament, pagename, tickername, vod, winner, match2bracketdata, extradata, bestof',
 		limit = 50,
 	}, function(match)
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
@@ -441,8 +441,8 @@ function MatchTable:matchFromRecord(record)
 		game = record.game,
 		date = record.date,
 		bestof = tonumber(record.bestof) or 0,
-		hasMatchPage = Logic.isNotEmpty(record.bracketData.matchPage),
-		matchId = record.matchId,
+		hasMatchPage = Logic.isNotEmpty(record.match2bracketdata.matchpage),
+		matchId = record.match2id,
 	}
 end
 

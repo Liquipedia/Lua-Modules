@@ -309,7 +309,8 @@ function CharacterGameTable:headerRow()
 
 	nodes = Array.append(nodes,
 		config.showLength and makeHeaderCell('Length') or nil,
-		config.showVod and makeHeaderCell('VOD', '60px') or nil
+		config.showVod and makeHeaderCell('VOD', '60px') or nil,
+		config.showMatchPage and makeHeaderCell('') or nil
 	)
 
 	local header = mw.html.create('tr')
