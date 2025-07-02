@@ -135,7 +135,7 @@ return {
 		{
 			file = 'Honor of Kings Heroes banner.jpeg',
 			title = 'Heroes',
-			link = 'Heroes',
+			link = 'Portal:Heroes',
 		},
 	},
 	layouts = {
