@@ -8,5 +8,5 @@
 ---@type ThisDayConfig
 return {
 	tiers = {1, 2, 3},
-	tierTypes = {'!Qualifier'},
+	excludeTierTypes = {'Qualifier'},
 }
