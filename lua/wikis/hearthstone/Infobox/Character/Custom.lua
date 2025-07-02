@@ -68,6 +68,7 @@ end
 
 ---@param lpdbData table
 ---@param args table
+---@return table
 function CustomCharacter:addToLpdb(lpdbData, args)
 	lpdbData.extradata.hero = args.hero or ''
 	lpdbData.extradata.power = args.power or ''
