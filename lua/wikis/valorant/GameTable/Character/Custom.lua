@@ -91,7 +91,8 @@ function CustomCharacterGameTable:headerRow()
 		config.showResult and makeHeaderCell(nil, '80px') or nil,
 		config.showResult and makeHeaderCell('vs. Picks'):addClass('unsortable') or nil,
 		config.showLength and makeHeaderCell('Length') or nil,
-		config.showVod and makeHeaderCell('VOD', '60px') or nil
+		config.showVod and makeHeaderCell('VOD', '60px') or nil,
+		config.showMatchPage and makeHeaderCell('') or nil
 	)
 
 	local header = mw.html.create('tr')
