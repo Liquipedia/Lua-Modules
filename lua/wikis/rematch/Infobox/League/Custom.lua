@@ -22,7 +22,7 @@ local CustomInjector = Class.new(Injector)
 -- Platform: Platform that the tournament is on
 local PLATFORMS = {
 	ps = 'PlayStation',
-	xbox = 'XBOX',
+	xbox = 'Xbox',
 	steam = 'Steam',
 	cross = 'Cross-Platform',
 }
