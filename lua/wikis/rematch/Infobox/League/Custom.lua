@@ -23,7 +23,7 @@ local CustomInjector = Class.new(Injector)
 local PLATFORMS = {
 	playstation = 'PlayStation',
 	xbox = 'Xbox',
-	steam = 'Steam',
+	pc = 'PC',
 	cross = 'Cross-Platform',
 }
 
@@ -33,9 +33,12 @@ function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
 
-	league.args.platform = PLATFORMS[(league.args.platform or 'steam'):lower():gsub(' ', '')]
-
 	return league:createInfobox()
+end
+
+---@param args table
+function CustomLeague:customParseArguments(args)
+	self.data.platform = PLATFORMS[(self.args.platform or ''):lower():gsub(' ', '')] or PLATFORMS.pc
 end
 
 ---@param id string
@@ -43,11 +46,11 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
-	local args = caller.args
 
 	if id == 'custom' then
-		Array.appendWith(widgets,
-			Cell{name = 'Platform', content = {args.platform}}
+		Array.appendWith(
+			widgets,
+			Cell{name = 'Platform', content = {caller.data.platform}}
 		)
 	end
 
