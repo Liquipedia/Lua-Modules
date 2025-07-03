@@ -36,6 +36,7 @@ local staffRoles = {
 	['streamer'] = {category = 'Streamers', display = 'Streamer'},
 	['talent'] = {category = 'Talents', display = 'Talent'},
 	['organizer'] = {category = 'Tournament Organizer', display = 'Tournament Organizer'},
+	['staff'] = {category = 'Staff', display = 'Staff'},
 }
 
 staffRoles['commentator'] = staffRoles['caster']
