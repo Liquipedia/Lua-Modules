@@ -13,11 +13,10 @@ local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
-local DEFAULT_BESTOF = 3
-
 local CustomMatchGroupInput = {}
 local MatchFunctions = {
 	DEFAULT_MODE = 'team',
+	getBestOf = MatchGroupInputUtil.getBestOf,
 }
 local MapFunctions = {}
 local FfaMatchFunctions = {
@@ -54,14 +53,6 @@ function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-end
-
----@param bestofInput string|integer?
----@return integer?
-function MatchFunctions.getBestOf(bestofInput)
-	local bestof = tonumber(Logic.emptyOr(bestofInput, Variables.varDefault('bestof')))
-	Variables.varDefine('bestof', bestof)
-	return bestof or DEFAULT_BESTOF
 end
 
 ---@param match table
