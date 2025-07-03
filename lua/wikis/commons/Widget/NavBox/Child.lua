@@ -48,8 +48,8 @@ local EMPTY_CHILD_ERROR = 'Empty child found'
 ---@field imageleftsize string?
 ---@field imagelink string?
 ---@field imagedarklink string?
----@field imageHideOnMobile boolean? # from wiki input string?
----@field imageleftHideOnMobile boolean? # from wiki input string?
+---@field imageShowOnMobile boolean? # from wiki input string?
+---@field imageleftShowOnMobile boolean? # from wiki input string?
 ---@field child1 string|NavBoxChildProps?
 ---@field child2 string|NavBoxChildProps?
 ---@field child3 string|NavBoxChildProps? # childX for X >=4 is supported too
@@ -168,7 +168,7 @@ function NavBoxChild:_makeImage(childIndex, isLeft)
 	local lightMode = props[prefix]
 	local darkMode = props[prefix .. 'dark']
 	local padding = isLeft and '0 2px 0 0' or '0 0 0 2px'
-	local hideOnMobile = Logic.readBool(props[prefix .. 'HideOnMobile'])
+	local hideOnMobile = not Logic.readBool(props[prefix .. 'ShowOnMobile'])
 
 	if childIndex ~= 1 or not (lightMode or darkMode) then
 		return
