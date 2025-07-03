@@ -113,7 +113,9 @@ function CustomMatchGroupInputMatchPage.getObjectives(map, opponentIndex)
 		inhibitors = team.inhibitorKills,
 		barons = team.baronKills,
 		dragons = team.dragonKills,
-		heralds = team.heraldKills,
+		heralds = team.riftHeraldKills,
+		grubs = team.grubKills,
+		atakhans = team.atakhanKills,
 	}
 end
 

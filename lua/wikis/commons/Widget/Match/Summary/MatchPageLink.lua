@@ -5,8 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
 local MatchSummaryRow = Lua.import('Module:Widget/Match/Summary/Row')
@@ -30,6 +31,8 @@ function MatchSummaryMatchPageLink:render()
 			MatchPageButton{
 				matchId = self.props.matchId,
 				hasMatchPage = self.props.hasMatchPage,
+				short = false,
+				buttonType = 'primary',
 			},
 		}
 	}}

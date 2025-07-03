@@ -5,21 +5,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
+
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
-local PlayerDisplay = require('Module:Player/Display')
+local PlayerDisplay = Lua.import('Module:Player/Display')
 
 local CustomMatchSummary = {}
 
@@ -122,7 +123,7 @@ end
 ---@param displayPlayerNames boolean?
 ---@return Html
 function CustomMatchSummary._createCharacterDisplay(players, game, reverse, displayPlayerNames)
-	local CharacterIcons = mw.loadData('Module:CharacterIcons/' .. (game or ''))
+	local CharacterIcons = Lua.import('Module:CharacterIcons/' .. (game or ''), {loadData = true})
 	local wrapper = mw.html.create('div'):css('flex-basis', '40%')
 
 	if Logic.isDeepEmpty(players) then

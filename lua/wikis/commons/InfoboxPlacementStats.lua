@@ -5,14 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Medals = require('Module:Medals')
-local Team = require('Module:Team')
-local Tier = require('Module:Tier/Custom')
+local Lua = require('Module:Lua')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Medals = Lua.import('Module:Medals')
+local Team = Lua.import('Module:Team')
+local Tier = Lua.import('Module:Tier/Custom')
+
+local OpponentLibrary = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
 local DEFAULT_TIERS = {'1', '2', '3'}

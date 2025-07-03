@@ -5,25 +5,26 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Countdown = require('Module:Countdown')
-local DateExt = require('Module:Date/Ext')
-local Game = require('Module:Game')
-local Info = require('Module:Info')
-local LeagueIcon = require('Module:LeagueIcon')
-local Logic = require('Module:Logic')
-local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local Math = require('Module:MathUtil')
-local Operator = require('Module:Operator')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Timezone = require('Module:Timezone')
-local Team = require('Module:Team')
-local Tier = require('Module:Tier/Custom')
-local VodLink = require('Module:VodLink')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Countdown = Lua.import('Module:Countdown')
+local DateExt = Lua.import('Module:Date/Ext')
+local Game = Lua.import('Module:Game')
+local Info = Lua.import('Module:Info')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Math = Lua.import('Module:MathUtil')
+local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Timezone = Lua.import('Module:Timezone')
+local Team = Lua.import('Module:Team')
+local Tier = Lua.import('Module:Tier/Custom')
+local VodLink = Lua.import('Module:VodLink')
 
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
@@ -31,7 +32,9 @@ local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local Condition = require('Module:Condition')
+local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
+
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -61,6 +64,7 @@ local SECONDS_ONE_DAY = 3600 * 24
 ---@field showTier boolean
 ---@field showIcon boolean
 ---@field showVod boolean
+---@field showMatchPage boolean
 ---@field showStats boolean
 ---@field showOnlyGameStats boolean
 ---@field showRoundStats boolean
@@ -89,6 +93,8 @@ local SECONDS_ONE_DAY = 3600 * 24
 ---@field game string?
 ---@field date string
 ---@field bestof number?
+---@field matchId string?
+---@field hasMatchPage boolean?
 
 ---@class MatchTableMatchResult
 ---@field opponent match2opponent
@@ -167,7 +173,8 @@ function MatchTable:_readDefaultConfig()
 		showYearHeaders = Logic.readBool(args.showYearHeaders),
 		useTickerName = Logic.readBool(args.useTickerName),
 		teamStyle = String.nilIfEmpty(args.teamStyle) or 'short',
-		linkSubPage = Logic.readBool(args.linkSubPage)
+		linkSubPage = Logic.readBool(args.linkSubPage),
+		showMatchPage = Info.config.match2.matchPage,
 	}
 end
 
@@ -305,8 +312,8 @@ function MatchTable:query()
 	Lpdb.executeMassQuery('match2', {
 		conditions = self:buildConditions(),
 		order = 'date desc',
-		query = 'match2opponents, match2games, date, dateexact, icon, icondark, liquipediatier, game, type, '
-			.. 'liquipediatiertype, tournament, pagename, tickername, vod, winner, extradata, bestof',
+		query = 'match2id, match2opponents, match2games, date, dateexact, icon, icondark, liquipediatier, game, type,'
+			.. 'liquipediatiertype, tournament, pagename, tickername, vod, winner, match2bracketdata, extradata, bestof',
 		limit = 50,
 	}, function(match)
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
@@ -434,6 +441,8 @@ function MatchTable:matchFromRecord(record)
 		game = record.game,
 		date = record.date,
 		bestof = tonumber(record.bestof) or 0,
+		hasMatchPage = Logic.isNotEmpty(record.match2bracketdata.matchpage),
+		matchId = record.match2id,
 	}
 end
 
@@ -648,6 +657,7 @@ function MatchTable:headerRow()
 		:node(config.showResult and makeHeaderCell('Score', '68px'):addClass('unsortable') or nil)
 		:node(config.showResult and makeHeaderCell('vs. Opponent', '120px') or nil)
 		:node(config.showVod and makeHeaderCell('VOD(s)', '80px'):addClass('unsortable') or nil)
+		:node(config.showMatchPage and makeHeaderCell(''):addClass('unsortable') or nil)
 end
 
 ---@param match MatchTableMatch
@@ -663,6 +673,7 @@ function MatchTable:matchRow(match)
 		:node(self:_displayTournament(match))
 		:node(self:_displayMatch(match))
 		:node(self:_displayVods(match))
+		:node(self:_displayMatchPage(match))
 end
 
 ---@param match MatchTableMatch
@@ -853,6 +864,19 @@ function MatchTable:_displayVods(match)
 	end)
 
 	return vodsNode
+end
+
+---@param match MatchTableMatch
+---@return Html?
+function MatchTable:_displayMatchPage(match)
+	if not self.config.showMatchPage then return end
+
+	return mw.html.create('td')
+		:node(MatchPageButton{
+			matchId = match.matchId,
+			hasMatchPage = match.hasMatchPage,
+			short = false,
+		})
 end
 
 ---@param winner any

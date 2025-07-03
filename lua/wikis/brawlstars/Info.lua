@@ -24,6 +24,19 @@ return {
 				lightMode = 'Brawl Stars Default allmode.png',
 			},
 		},
+		cnbrawlstars = {
+			abbreviation = 'CN BS',
+			name = '荒野乱斗',
+			link = '荒野乱斗',
+			logo = {
+				darkMode = '荒野乱斗 Default logo allmode.png',
+				lightMode = '荒野乱斗 Default logo allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Brawl Stars Default allmode.png',
+				lightMode = 'Brawl Stars Default allmode.png',
+			},
+		},
 	},
 	config = {
 		squads = {
@@ -33,7 +46,7 @@ return {
 		},
 		match2 = {
 			status = 2,
-			matchWidth = 150,
+			matchWidth = 200,
 		},
 		teamRosterNavbox = {
 			links = {

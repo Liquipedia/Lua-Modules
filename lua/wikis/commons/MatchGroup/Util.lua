@@ -5,18 +5,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Date = require('Module:Date/Ext')
-local Faction = require('Module:Faction')
-local FnUtil = require('Module:FnUtil')
-local Info = require('Module:Info')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Date = Lua.import('Module:Date/Ext')
+local Faction = Lua.import('Module:Faction')
+local FnUtil = Lua.import('Module:FnUtil')
+local Info = Lua.import('Module:Info')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TypeUtil = Lua.import('Module:TypeUtil')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
@@ -206,6 +207,7 @@ MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed
 ---@field mapDisplayName string?
 ---@field mode string?
 ---@field opponents {players: table[], score: number?, status: string?}[]
+---@field patch string?
 ---@field scores number[]
 ---@field subgroup number?
 ---@field type string?
@@ -222,6 +224,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 	map = 'string?',
 	mapDisplayName = 'string?',
 	mode = 'string?',
+	patch = 'string?',
 	scores = TypeUtil.array('number'),
 	subgroup = 'number?',
 	type = 'string?',
@@ -248,7 +251,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field tournament string?
 ---@field type string?
 ---@field vod string?
----@field winner string?
+---@field winner number?
 ---@field extradata table?
 ---@field timestamp number
 ---@field bestof number?
@@ -496,7 +499,7 @@ end
 ---
 ---This is the implementation used on wikis by default. Wikis may specify a different conversion by setting
 ---WikiSpecific.matchFromRecord. Refer to the starcraft2 wiki as an example.
----@param record table
+---@param record match2
 ---@return MatchGroupUtilMatch
 function MatchGroupUtil.matchFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
@@ -673,7 +676,7 @@ function MatchGroupUtil.playerFromRecord(record)
 	}
 end
 
----@param record table
+---@param record match2game
 ---@param opponentCount integer?
 ---@return MatchGroupUtilGame
 function MatchGroupUtil.gameFromRecord(record, opponentCount)
@@ -691,6 +694,7 @@ function MatchGroupUtil.gameFromRecord(record, opponentCount)
 		mapDisplayName = nilIfEmpty(Table.extract(extradata, 'displayname')),
 		mode = nilIfEmpty(record.mode),
 		opponents = record.opponents,
+		patch = record.patch,
 		resultType = nilIfEmpty(record.resulttype),
 		status = nilIfEmpty(record.status),
 		scores = Json.parseIfString(record.scores) or {},

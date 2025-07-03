@@ -5,23 +5,24 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local ChampionNames = mw.loadData('Module:ChampionNames')
-local CharacterIcon = require('Module:CharacterIcon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local PlayerIntroduction = require('Module:PlayerIntroduction/Custom')
-local String = require('Module:StringUtils')
-local Team = require('Module:Team')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Template = require('Module:Template')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local ChampionNames = Lua.import('Module:ChampionNames', {loadData = true})
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
+local String = Lua.import('Module:StringUtils')
+local Team = Lua.import('Module:Team')
+local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
+local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local SIZE_CHAMPION = '25x25px'

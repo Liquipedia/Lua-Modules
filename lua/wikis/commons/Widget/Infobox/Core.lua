@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
-local WarningBox = require('Module:WarningBox')
+
+local Class = Lua.import('Module:Class')
+local Variables = Lua.import('Module:Variables')
+local WarningBox = Lua.import('Module:WarningBox')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')

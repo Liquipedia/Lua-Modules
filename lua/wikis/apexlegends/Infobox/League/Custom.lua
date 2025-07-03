@@ -23,7 +23,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local GAME_MODE = mw.loadData('Module:GameMode')
+local GAME_MODE = Lua.import('Module:GameMode', {loadData = true})
 local EA_ICON = '&nbsp;[[File:EA icon.png|x15px|middle|link=Electronic Arts|'
 	.. 'Tournament sponsored by Electronirc Arts & Respawn.]]'
 
