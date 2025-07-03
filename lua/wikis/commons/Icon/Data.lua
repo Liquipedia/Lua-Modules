@@ -11,7 +11,7 @@ return {
 	loss = 'fas fa-times',
 
 	-- Usage: Other Match detail pop up icons
-	matchpagelink = 'fas fa-external-link', -- Should we really use external for this?
+	matchpagelink = 'far fa-swords',
 	matchpopup = 'fas fa-info-circle',
 	timeout = 'far fa-clock',
 	veto = 'fas fa-times',
