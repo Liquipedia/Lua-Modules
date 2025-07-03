@@ -12,7 +12,7 @@ local Lua = require('Module:Lua')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
----@class GoalsMatch2CopyPaste: Match2CopyPasteBase
+---@class RematchMatch2CopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
 
 local INDENT = WikiCopyPaste.Indent
