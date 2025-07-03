@@ -10,6 +10,9 @@ local Logic = require('Module:Logic')
 local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 
+local VOID_GRUB_START_TIME = 1704913200 -- Jan 10 2024; Patch 14.1
+local ATAKHAN_START_TIME = 1736276400 -- Jan 07 2025; Patch 25.S1.1
+
 local CustomMatchGroupInputMatchPage = {}
 
 local ROLE_ORDER = Table.map({
@@ -108,15 +111,20 @@ end
 function CustomMatchGroupInputMatchPage.getObjectives(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
 	if not team then return end
-	return {
+	local objectives = {
 		towers = team.towerKills,
 		inhibitors = team.inhibitorKills,
 		barons = team.baronKills,
 		dragons = team.dragonKills,
 		heralds = team.riftHeraldKills,
-		grubs = team.grubKills,
-		atakhans = team.atakhanKills,
 	}
+	if map.timestamp >= VOID_GRUB_START_TIME then
+		objectives.grubs = team.grubKills
+	end
+	if map.timestamp >= ATAKHAN_START_TIME then
+		objectives.atakhans = team.atakhanKills
+	end
+	return objectives
 end
 
 return CustomMatchGroupInputMatchPage
