@@ -5,19 +5,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Game = require('Module:Game')
-local Namespace = require('Module:Namespace')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TextSanitizer = require('Module:TextSanitizer')
-local Tier = require('Module:Tier/Custom')
-local Variables = require('Module:Variables')
-local WarningBox = require('Module:WarningBox')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Game = Lua.import('Module:Game')
+local Namespace = Lua.import('Module:Namespace')
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TextSanitizer = Lua.import('Module:TextSanitizer')
+local Tier = Lua.import('Module:Tier/Custom')
+local Variables = Lua.import('Module:Variables')
+local WarningBox = Lua.import('Module:WarningBox')
 
 local HiddenDataBox = {}
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '

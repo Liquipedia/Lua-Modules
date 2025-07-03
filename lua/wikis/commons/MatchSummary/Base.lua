@@ -5,16 +5,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local VodLink = require('Module:VodLink')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local VodLink = Lua.import('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -23,7 +24,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
@@ -129,7 +130,7 @@ end
 ---@operator call: MatchSummaryFooter
 ---@field root Html
 ---@field inner Html
----@field elements (Html|string|number)[]
+---@field elements (Widget|Html|string|number)[]
 local Footer = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
@@ -140,7 +141,7 @@ local Footer = Class.new(
 	end
 )
 
----@param element Html|string|number|nil
+---@param element Widget|Html|string|number|nil
 ---@return MatchSummaryFooter
 function Footer:addElement(element)
 	table.insert(self.elements, element)
@@ -220,6 +221,7 @@ end
 ---@field bodyElement Widget|Html?
 ---@field commentElement Widget?
 ---@field footerElement Html?
+---@field buttonElement Widget?
 local Match = Class.new(
 	function(self)
 		self.root = mw.html.create()
@@ -254,6 +256,13 @@ function Match:footer(footer)
 	return self
 end
 
+---@param button Widget
+---@return MatchSummaryMatch
+function Match:button(button)
+	self.buttonElement = button
+	return self
+end
+
 ---@return Html
 function Match:create()
 	self.root
@@ -264,6 +273,8 @@ function Match:create()
 		:node(self.commentElement)
 		:node(MatchSummaryWidgets.Break{})
 		:node(self.footerElement)
+		:node(MatchSummaryWidgets.Break{})
+		:node(self.buttonElement)
 
 	return self.root
 end
@@ -382,14 +393,15 @@ function MatchSummary.addVodsToFooter(match, footer)
 		})
 	end
 
-	for gameIndex, game in ipairs(match.games) do
-		if game.vod then
-			footer:addElement(VodLink.display{
-				gamenum = gameIndex,
-				vod = game.vod,
-			})
+	Array.forEach(match.games, function(game, gameIndex)
+		if not game.vod then
+			return
 		end
-	end
+		footer:addElement(VodLink.display{
+			gamenum = gameIndex,
+			vod = game.vod,
+		})
+	end)
 
 	return footer
 end
@@ -428,6 +440,14 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 
 	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.createDefaultFooter
 	match:footer(createFooter(matchData, MatchSummary.Footer()))
+
+	-- Original Match Id must be used to link match page if it exists.
+	-- It can be different from the matchId when shortened brackets are used.
+	local matchId = matchData.extradata.originalmatchid or matchData.matchId
+	match:button(MatchSummaryWidgets.MatchPageLink{
+		matchId = matchId,
+		hasMatchPage = Logic.isNotEmpty(matchData.bracketData.matchPage),
+	})
 
 	return match
 end

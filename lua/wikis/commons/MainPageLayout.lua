@@ -5,12 +5,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Image = require('Module:Image')
-local LpdbCounter = require('Module:LPDB entity count')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Image = Lua.import('Module:Image')
+local LpdbCounter = Lua.import('Module:LPDB entity count')
+local String = Lua.import('Module:StringUtils')
 
 local WikiData = Lua.import('Module:MainPageLayout/data')
 local GridWidgets = Lua.import('Module:Widget/Grid')

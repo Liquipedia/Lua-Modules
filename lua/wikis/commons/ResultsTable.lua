@@ -5,20 +5,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Class = require('Module:Class')
-local Currency = require('Module:Currency')
-local DateExt = require('Module:Date/Ext')
-local Game = require('Module:Game')
-local LeagueIcon = require('Module:LeagueIcon')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local Placement = require('Module:Placement')
-local Table = require('Module:Table')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Class = Lua.import('Module:Class')
+local Currency = Lua.import('Module:Currency')
+local DateExt = Lua.import('Module:Date/Ext')
+local Game = Lua.import('Module:Game')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Page = Lua.import('Module:Page')
+local Placement = Lua.import('Module:Placement')
+local Table = Lua.import('Module:Table')
 
 local BaseResultsTable = Lua.import('Module:ResultsTable/Base')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
+local OpponentLibrary = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
 --- @class ResultsTable: BaseResultsTable

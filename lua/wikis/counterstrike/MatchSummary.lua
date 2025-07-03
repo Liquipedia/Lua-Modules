@@ -5,13 +5,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local VodLink = require('Module:VodLink')
+
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local VodLink = Lua.import('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -147,7 +148,7 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 	end
 
 	--- Platforms is used to keep the order of the links in footer
-	local platforms = mw.loadData('Module:MatchExternalLinks')
+	local platforms = Lua.import('Module:MatchExternalLinks', {loadData = true})
 	local links = match.links
 
 	local insertDotNext = false

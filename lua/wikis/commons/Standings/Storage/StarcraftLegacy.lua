@@ -5,14 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent')
 local StandingsStorage = Lua.import('Module:Standings/Storage')
@@ -85,6 +86,7 @@ function Wrapper._processOpponent(args)
 		if not teamPage then
 			return
 		end
+		teamPage = mw.text.trim(teamPage)
 		return {type = Opponent.team, template = teamPage:lower()}
 	end
 

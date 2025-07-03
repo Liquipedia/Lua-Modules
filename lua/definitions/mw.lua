@@ -1004,6 +1004,19 @@ function mw.uri.encode(str, enctype) end
 ---@return string
 function mw.uri.decode(str, enctype) end
 
+---Encodes a table as a URI query string.
+---@param query table<string, string|number|any[]|false>
+---@return string
+function mw.uri.buildQueryString(query) end
+
+---Decodes the query string `s` to a table. Optional arguments `i` and `j` may be used to specify
+---the substring of `s` to be parsed.
+---@param s string
+---@param i integer? the position of first character of the substring to be parsed; defaults to 1
+---@param j integer? the position of last character of the substring to be parsed; defaults to the length of `s`
+---@return table
+function mw.uri.parseQueryString(s, i, j) end
+
 ---Validates the specified table (or URI object).
 ---@param arg table|URI
 ---@return boolean result whether the argument was valid

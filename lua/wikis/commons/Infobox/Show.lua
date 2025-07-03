@@ -5,16 +5,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Links = require('Module:Links')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local Links = Lua.import('Module:Links')
+local Namespace = Lua.import('Module:Namespace')
+local Table = Lua.import('Module:Table')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Flags = Lua.import('Module:Flags')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -50,9 +51,12 @@ function Show:createInfobox()
 		Cell{name = 'Format', content = {args.format}},
 		Cell{name = 'Airs', content = {args.airs}},
 		Cell{name = 'Location', content = {
-				self:_createLocation(args.country, args.city),
-				self:_createLocation(args.country2, args.city2)
-			}},
+			self:_createLocation(args.country, args.city),
+			self:_createLocation(args.country2, args.city2)
+		}},
+		Cell{name = 'Status', content = {args.status}},
+		Cell{name = 'Start', content = {args.sdate}},
+		Cell{name = 'End', content = {args.edate}},
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()

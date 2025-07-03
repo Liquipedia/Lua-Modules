@@ -5,24 +5,26 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
-local Game = require('Module:Game')
-local Logic = require('Module:Logic')
-local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Team = require('Module:Team')
-local Tier = require('Module:Tier/Utils')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
+local Game = Lua.import('Module:Game')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
+local Team = Lua.import('Module:Team')
+local Tier = Lua.import('Module:Tier/Utils')
+
+local OpponentLibrary = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 local MatchUtil = Lua.import('Module:Match/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Tournament = Lua.import('Module:Tournament')
 
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -421,7 +423,7 @@ function MatchTicker:expandGamesOfMatch(match)
 		return {match}
 	end
 
-	return Array.map(match.match2games, function(game, gameIndex)
+	local expandedGames = Array.map(match.match2games, function(game, gameIndex)
 		if config.recent and Logic.isEmpty(game.winner) then
 			return
 		end
@@ -441,7 +443,7 @@ function MatchTicker:expandGamesOfMatch(match)
 		local gameMatch = Table.copy(match)
 		gameMatch.match2games = nil
 		gameMatch.asGame = true
-		gameMatch.asGameIdx = gameIndex
+		gameMatch.asGameIndexes = {gameIndex}
 
 		gameMatch.winner = game.winner
 		gameMatch.date = game.date
@@ -451,6 +453,15 @@ function MatchTicker:expandGamesOfMatch(match)
 			return MatchUtil.enrichGameOpponentFromMatchOpponent(opponent, game.opponents[opponentIndex])
 		end)
 		return gameMatch
+	end)
+
+	return Array.map(Array.groupAdjacentBy(expandedGames, Operator.property('date')), function (gameGroup)
+		if #gameGroup > 1 then
+			local lastIndexes = gameGroup[#gameGroup].asGameIndexes
+			table.insert(gameGroup[1].asGameIndexes, lastIndexes[#lastIndexes])
+		end
+
+		return gameGroup[1]
 	end)
 end
 
@@ -469,7 +480,7 @@ function MatchTicker:sortMatches(matches)
 		if a.match2id ~= b.match2id then
 			return a.match2id < b.match2id
 		end
-		return (a.asGameIdx or 0) < (b.asGameIdx or 0)
+		return ((a.asGameIndexes or {})[1] or 0) < ((b.asGameIndexes or {})[1] or 0)
 	end)
 end
 
