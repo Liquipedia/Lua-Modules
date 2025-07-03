@@ -69,7 +69,7 @@ end
 function WikiCopyPaste.getFfaMatchCode(bestof, mode, index, opponents, args)
 	local lines = Array.extend(
 		'{{Match|finished=',
-		INDENT .. '|p_kill=1 |p1=12 |p2=9 |p3=7 |p4=5 |p5=4 |p6=3 |p7=3 |p8=2 |p9=2 |p10=2 |p11=1 |p12=1 |p13=1 |p14=1 |p15=1' ..
+		INDENT .. '|p_kill=1 |p1=12 |p2=9 |p3=7 |p4=5 |p5=4 |p6=3 |p7=3 |p8=2 |p9=2 |p10=2 ' ..
 		INDENT .. '|twitch=|youtube=',
 		Array.map(Array.range(1, bestof), function(mapIndex)
 			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|date=|finished=|vod=}}'
