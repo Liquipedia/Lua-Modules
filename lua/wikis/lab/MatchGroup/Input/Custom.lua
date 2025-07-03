@@ -39,30 +39,12 @@ function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
----@param games table[]
----@return table[]
-function MatchFunctions.removeUnsetMaps(games)
-	return Array.filter(games, function(map)
-		return map.map ~= nil
-	end)
-end
-
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-end
-
----@param match table
----@param games table[]
----@param opponents table[]
----@return table
-function MatchFunctions.getExtraData(match, games, opponents)
-	return {
-		mvp = MatchGroupInputUtil.readMvp(match, opponents),
-	}
 end
 
 --- FFA Match
