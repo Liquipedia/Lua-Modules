@@ -21,7 +21,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Rematch darkmode.png',
-				lightMode = 'Rematch  lightmode.png',
+				lightMode = 'Rematch lightmode.png',
 			},
 		},
 	},
@@ -32,7 +32,7 @@ return {
 			allowManual = false,
 		},
 		match2 = {
-			status = 2,
+			status = 0,
 			matchWidth = 180,
 		},
 	},
