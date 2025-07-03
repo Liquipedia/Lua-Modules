@@ -447,8 +447,6 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	match:button(MatchSummaryWidgets.MatchPageLink{
 		matchId = matchId,
 		hasMatchPage = Logic.isNotEmpty(matchData.bracketData.matchPage),
-		short = false,
-		buttonType = 'primary',
 	})
 
 	return match
