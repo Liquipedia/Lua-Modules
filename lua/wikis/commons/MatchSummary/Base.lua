@@ -130,7 +130,7 @@ end
 ---@operator call: MatchSummaryFooter
 ---@field root Html
 ---@field inner Html
----@field elements (Html|string|number)[]
+---@field elements (Widget|Html|string|number)[]
 local Footer = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
@@ -141,7 +141,7 @@ local Footer = Class.new(
 	end
 )
 
----@param element Html|string|number|nil
+---@param element Widget|Html|string|number|nil
 ---@return MatchSummaryFooter
 function Footer:addElement(element)
 	table.insert(self.elements, element)
@@ -221,6 +221,7 @@ end
 ---@field bodyElement Widget|Html?
 ---@field commentElement Widget?
 ---@field footerElement Html?
+---@field buttonElement Widget?
 local Match = Class.new(
 	function(self)
 		self.root = mw.html.create()
@@ -255,6 +256,13 @@ function Match:footer(footer)
 	return self
 end
 
+---@param button Widget
+---@return MatchSummaryMatch
+function Match:button(button)
+	self.buttonElement = button
+	return self
+end
+
 ---@return Html
 function Match:create()
 	self.root
@@ -265,6 +273,8 @@ function Match:create()
 		:node(self.commentElement)
 		:node(MatchSummaryWidgets.Break{})
 		:node(self.footerElement)
+		:node(MatchSummaryWidgets.Break{})
+		:node(self.buttonElement)
 
 	return self.root
 end
@@ -383,14 +393,15 @@ function MatchSummary.addVodsToFooter(match, footer)
 		})
 	end
 
-	for gameIndex, game in ipairs(match.games) do
-		if game.vod then
-			footer:addElement(VodLink.display{
-				gamenum = gameIndex,
-				vod = game.vod,
-			})
+	Array.forEach(match.games, function(game, gameIndex)
+		if not game.vod then
+			return
 		end
-	end
+		footer:addElement(VodLink.display{
+			gamenum = gameIndex,
+			vod = game.vod,
+		})
+	end)
 
 	return footer
 end
@@ -429,6 +440,16 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 
 	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.createDefaultFooter
 	match:footer(createFooter(matchData, MatchSummary.Footer()))
+
+	-- Original Match Id must be used to link match page if it exists.
+	-- It can be different from the matchId when shortened brackets are used.
+	local matchId = matchData.extradata.originalmatchid or matchData.matchId
+	match:button(MatchSummaryWidgets.MatchPageLink{
+		matchId = matchId,
+		hasMatchPage = Logic.isNotEmpty(matchData.bracketData.matchPage),
+		short = false,
+		buttonType = 'primary',
+	})
 
 	return match
 end
