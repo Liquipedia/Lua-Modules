@@ -35,7 +35,7 @@ local EMPTY_CHILD_ERROR = 'Empty child found'
 ---@field name string?
 ---@field mobileName string?
 ---@field title string?
----@field mobileTitle string?<
+---@field mobileTitle string?
 ---@field titleLink string?
 ---@field collapsed boolean? # from wiki input string?
 ---@field center boolean? # from wiki input string?
