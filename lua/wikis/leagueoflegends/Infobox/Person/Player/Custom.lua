@@ -5,21 +5,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchTicker = require('Module:MatchTicker/Custom')
-local Page = require('Module:Page')
-local PlayerIntroduction = require('Module:PlayerIntroduction/Custom')
-local String = require('Module:StringUtils')
-local Team = require('Module:Team')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Template = require('Module:Template')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
+local Page = Lua.import('Module:Page')
+local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
+local String = Lua.import('Module:StringUtils')
+local Team = Lua.import('Module:Team')
+local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
+local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')

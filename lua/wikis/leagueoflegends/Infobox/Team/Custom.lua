@@ -5,11 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local RoleOf = require('Module:RoleOf')
-local String = require('Module:StringUtils')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local RoleOf = Lua.import('Module:RoleOf')
+local String = Lua.import('Module:StringUtils')
 
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
@@ -19,7 +20,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Region = Lua.import('Module:Region')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
