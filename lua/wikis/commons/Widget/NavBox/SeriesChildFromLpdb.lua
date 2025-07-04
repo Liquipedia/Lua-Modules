@@ -132,15 +132,15 @@ function SeriesChildFromLpdb:_makeConditions()
 
 	local year = tonumber(props.year)
 
-	return ConditionTree(BooleanOperator.all):add{
+	return ConditionTree(BooleanOperator.all):add(Array.append({},
 		multiValueCondition('seriespage', serieses),
 		multiValueCondition('liquipediatier', Json.parseIfTable(props.tier) or {props.tier}),
 		multiValueCondition('liquipediatiertype', Json.parseIfTable(props.tierType) or {props.tierType}),
 		multiValueCondition('mode', Json.parseIfTable(props.mode) or {props.mode}),
 		year and ConditionNode(ColumnName('enddate_year'), Comparator.eq, year) or nil,
 		props.edate and ConditionNode(ColumnName('enddate'), Comparator.le, props.edate) or nil,
-		props.sdate and ConditionNode(ColumnName('startdate'), Comparator.ge, props.sdate) or nil,
-	}
+		props.sdate and ConditionNode(ColumnName('startdate'), Comparator.ge, props.sdate) or nil
+	))
 end
 
 return SeriesChildFromLpdb
