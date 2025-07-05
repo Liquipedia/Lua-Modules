@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Expansion = Lua.import('Module:Infobox/Expansion')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -39,14 +40,17 @@ end
 function CustomInjector:parse(id, widgets)
 	local args  = self.caller.args
 	if id == 'custom' then
+		-- hack around mw butchering the display (factually the next 2 lines are a non op)
+		local maps = Array.parseCommaSeparatedString(args.maps)
+		maps = Array.interleave(maps, ', ')
 		return Array.append({},
 			Cell{name = 'Case', children = {args.case}},
 			Cell{name = 'Campaigns', children = {args.campaigns}},
 			Cell{name = 'Source', children = {args.source}},
 			args.collections and Title{children = {'Collections'}} or nil,
 			Center{children = {args.collections}},
-			args.maps and Title{children = {'Maps'}} or nil,
-			Center{children = {args.maps}}
+			Logic.isNotEmpty(maps) and Title{children = {'Maps'}} or nil,
+			Center{children = maps}
 		)
 	end
 
