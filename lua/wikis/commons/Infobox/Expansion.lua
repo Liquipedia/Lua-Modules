@@ -50,7 +50,7 @@ function Expansion:createInfobox()
 		Customizable{
 			id = 'type',
 			children = {
-				Cell{name = 'Type', content = args.informationType or 'Expansion'},
+				Cell{name = 'Type', content = args.type},
 			},
 		},
 		Customizable{
