@@ -54,6 +54,12 @@ function Expansion:createInfobox()
 			},
 		},
 		Customizable{
+			id = 'version',
+			children = {
+				Cell{name = 'Version', content = args.version},
+			},
+		},
+		Customizable{
 			id = 'developer',
 			children = {
 				Builder{
@@ -83,6 +89,12 @@ function Expansion:createInfobox()
 						}
 					end
 				}
+			}
+		},
+		Customizable{
+			id = 'platform',
+			children = {
+				Cell{name = 'Platforms published', content = self:getAllArgsForBase(args, 'platform')},
 			}
 		},
 		Builder{
