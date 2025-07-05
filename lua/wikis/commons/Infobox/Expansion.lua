@@ -27,13 +27,6 @@ local Chronology = Widgets.Chronology
 ---@class ExpansionInfobox: BasicInfobox
 local Expansion = Class.new(BasicInfobox)
 
----@param frame Frame
----@return Html
-function Expansion.run(frame)
-	local expansion = Expansion(frame)
-	return expansion:createInfobox()
-end
-
 ---@return string
 function Expansion:createInfobox()
 	local args = self.args
