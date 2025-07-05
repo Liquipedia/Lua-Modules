@@ -44,26 +44,14 @@ function Expansion:createInfobox()
 		Customizable{
 			id = 'basegame',
 			children = {
-				Builder{
-					builder = function()
-						return {
-							Cell{name = 'Base game', content = args.game},
-						}
-					end
-				}
-			}
+				Cell{name = 'Base game', content = args.game},
+			},
 		},
 		Customizable{
 			id = 'type',
 			children = {
-				Builder{
-					builder = function()
-						return {
-							Cell{name = 'Type', content = args.informationType or 'Expansion'},
-						}
-					end
-				}
-			}
+				Cell{name = 'Type', content = args.informationType or 'Expansion'},
+			},
 		},
 		Customizable{
 			id = 'developer',
@@ -97,7 +85,28 @@ function Expansion:createInfobox()
 				}
 			}
 		},
-		Cell{name = 'Release Date(s)', content = self:getAllArgsForBase(args, 'releasedate')},
+		Builder{
+			builder = function()
+				local releaseDates = self:getAllArgsForBase(args, 'releasedate')
+				return {
+					Cell{
+						name = #releaseDates > 1 and 'Release Dates' or 'Release Date',
+						content = releaseDates,
+					}
+				}
+			end
+		},
+		Builder{
+			builder = function()
+				local completionDates = self:getAllArgsForBase(args, 'completiondate')
+				return {
+					Cell{
+						name = #completionDates > 1 and 'Completion Dates' or 'Completion Date',
+						content = completionDates,
+					}
+				}
+			end
+		},
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
@@ -117,7 +126,7 @@ function Expansion:createInfobox()
 							return
 						end
 						return {
-							Title{children = 'Chronology'},
+							Title{children = self:chronologyTitle()},
 							Chronology{
 								links = Table.filterByKey(args, function(key)
 									return type(key) == 'string' and (key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
@@ -148,6 +157,11 @@ end
 ---@return boolean
 function Expansion:hasChronology(args)
 	return Logic.isNotEmpty(args.previous) and Logic.isNotEmpty(args.next)
+end
+
+---@return string
+function Expansion:chronologyTitle()
+	return 'Chronology'
 end
 
 return Expansion
