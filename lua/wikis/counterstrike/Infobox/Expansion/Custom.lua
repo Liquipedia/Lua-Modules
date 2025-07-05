@@ -52,6 +52,8 @@ function CustomInjector:parse(id, widgets)
 			Logic.isNotEmpty(maps) and Title{children = {'Maps'}} or nil,
 			Center{children = maps}
 		)
+	elseif id == 'type' then
+		return {}
 	end
 
 	return widgets

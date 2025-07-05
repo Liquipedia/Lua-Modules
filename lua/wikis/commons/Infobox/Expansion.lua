@@ -44,19 +44,19 @@ function Expansion:createInfobox()
 		Customizable{
 			id = 'basegame',
 			children = {
-				Cell{name = 'Base game', content = args.game},
+				Cell{name = 'Base game', children = {args.game}},
 			},
 		},
 		Customizable{
 			id = 'type',
 			children = {
-				Cell{name = 'Type', content = args.type},
+				Cell{name = 'Type', children = {args.informationType or 'Expansion'}},
 			},
 		},
 		Customizable{
 			id = 'version',
 			children = {
-				Cell{name = 'Version', content = args.version},
+				Cell{name = 'Version', children = {args.version}},
 			},
 		},
 		Customizable{
@@ -68,7 +68,7 @@ function Expansion:createInfobox()
 						return {
 							Cell{
 								name = #developers > 1 and 'Developers' or 'Developer',
-								content = developers,
+								children = developers,
 							}
 						}
 					end
@@ -84,7 +84,7 @@ function Expansion:createInfobox()
 						return {
 							Cell{
 								name = #publishers > 1 and 'Publishers' or 'Publisher',
-								content = publishers,
+								children = publishers,
 							}
 						}
 					end
@@ -94,7 +94,7 @@ function Expansion:createInfobox()
 		Customizable{
 			id = 'platform',
 			children = {
-				Cell{name = 'Platforms published', content = self:getAllArgsForBase(args, 'platform')},
+				Cell{name = 'Platforms published', children = self:getAllArgsForBase(args, 'platform')},
 			}
 		},
 		Builder{
@@ -103,7 +103,7 @@ function Expansion:createInfobox()
 				return {
 					Cell{
 						name = #releaseDates > 1 and 'Release Dates' or 'Release Date',
-						content = releaseDates,
+						children = releaseDates,
 					}
 				}
 			end
@@ -114,7 +114,7 @@ function Expansion:createInfobox()
 				return {
 					Cell{
 						name = #completionDates > 1 and 'Completion Dates' or 'Completion Date',
-						content = completionDates,
+						children = completionDates,
 					}
 				}
 			end
