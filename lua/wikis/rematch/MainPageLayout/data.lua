@@ -14,6 +14,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
+local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 local CONTENT = {
@@ -28,6 +29,14 @@ local CONTENT = {
 		body = WantToHelp{},
 		padding = true,
 		boxid = 1504,
+	},
+	transfers = {
+		heading = 'Transfers',
+		body = TransfersList{
+			limits = 10,
+			transferPage = 'Player Transfers/' .. os.date('%Y')
+		},
+		boxid = 1509,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
@@ -69,7 +78,7 @@ return {
 		lightmode = 'Rematch defafult lightmode.svg',
 		darkmode = 'Rematch default darkmode.svg',
 	},
-	metadesc = 'The Rematch esports wiki covering everything from players and teams, ' ..
+	metadesc = 'The Rematch esports wiki covering everything from players, teams and transfers, ' ..
 		'to tournaments and results.',
 	title = 'Rematch',
 	navigation = {
@@ -101,6 +110,15 @@ return {
 			},
 		},
 		{
+			file = 'Rematch banner transfers.webp',
+			title = 'Transfers',
+			link = 'Portal:Transfers',
+			count = {
+				method = 'LPDB',
+				table = 'transfer',
+			},
+		},
+		{
 			file = 'Rematch banner statistics.webp',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
@@ -114,6 +132,10 @@ return {
 					{
 						mobileOrder = 4,
 						content = CONTENT.thisDay,
+					},
+					{
+						mobileOrder = 2,
+						content = CONTENT.transfers,
 					},
 					{
 						mobileOrder = 5,
