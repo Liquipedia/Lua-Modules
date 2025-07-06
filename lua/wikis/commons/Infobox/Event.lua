@@ -87,9 +87,7 @@ function Event:createInfobox()
 		},
 		Customizable{
 			id = 'organizers',
-			children = {
-				Organizers{args = args}
-			},
+			children = {Organizers{args = args}},
 		},
 		Customizable{
 			id = 'sponsors',

@@ -34,6 +34,7 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
+local Organizers = Widgets.Organizers
 
 ---@class SeriesInfobox: BasicInfobox
 local Series = Class.new(BasicInfobox)
@@ -75,19 +76,7 @@ function Series:createInfobox()
 		},
 		Center{children = {args.caption}},
 		Title{children = 'Series Information'},
-		Builder{
-			builder = function()
-				local organizers = self:_createOrganizers(args)
-				local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
-
-				return {
-					Cell{
-						name = title,
-						content = organizers
-					}
-				}
-			end
-		},
+		Organizers{args = args},
 		Cell{
 			name = 'Sponsor(s)',
 			content = self:getAllArgsForBase(args, 'sponsor')
@@ -354,18 +343,6 @@ function Series:_createLink(id, name, link, desc)
 	end
 
 	return output
-end
-
----@param args table
----@return string[]
-function Series:_createOrganizers(args)
-	local organizers = {}
-
-	for prefix, organizer in Table.iter.pairsByPrefix(args, 'organizer', {requireIndex = false}) do
-		table.insert(organizers, self:_createLink(organizer, args[prefix .. '-name'], args[prefix .. '-link']))
-	end
-
-	return organizers
 end
 
 ---@param args table

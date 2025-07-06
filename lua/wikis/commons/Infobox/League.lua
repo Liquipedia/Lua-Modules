@@ -46,6 +46,7 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 local Chronology = Widgets.Chronology
+local Organizers = Widgets.Organizers
 local Button = Lua.import('Module:Widget/Basic/Button')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
@@ -93,21 +94,7 @@ function League:createInfobox()
 		},
 		Customizable{
 			id = 'organizers',
-			children = {
-				Builder{
-					builder = function()
-						local organizers = self:_createOrganizers(args)
-						local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
-
-						return {
-							Cell{
-								name = title,
-								content = organizers
-							}
-						}
-					end
-				},
-			},
+			children = {Organizers{args = args}},
 		},
 		Customizable{
 			id = 'sponsors',
@@ -813,18 +800,6 @@ function League:createLink(id, name, link, desc)
 	end
 
 	return output
-end
-
----@param args table
----@return string[]
-function League:_createOrganizers(args)
-	local organizers = {}
-
-	for prefix, organizer in Table.iter.pairsByPrefix(args, 'organizer', {requireIndex = false}) do
-		table.insert(organizers, self:createLink(organizer, args[prefix .. '-name'], args[prefix .. '-link']))
-	end
-
-	return organizers
 end
 
 ---@param date string?
