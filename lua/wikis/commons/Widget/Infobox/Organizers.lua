@@ -21,12 +21,10 @@ local Cell = Widgets.Cell
 
 ---@class InfoboxOrganizersWidget: Widget
 ---@operator call(table):InfoboxOrganizersWidget
----@field classes string[]
----@field contentClasses table<integer, string[]> --can have gaps in the outer table
+---@field args table<string, string>
 local Organizers = Class.new(Widget)
 Organizers.defaultProps = {
-	classes = {},
-	contentClasses = {},
+	args = {},
 }
 
 ---@return Widget?

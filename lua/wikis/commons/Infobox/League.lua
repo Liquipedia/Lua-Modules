@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
-local Info = Lua.import('Module:Info')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
@@ -35,8 +34,6 @@ local TextSanitizer = Lua.import('Module:TextSanitizer')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 local VENUE_DESCRIPTION = '<br><small><small>(${desc})</small></small>'
-local STAY22_LINK = 'https://www.stay22.com/allez/roam?aid=liquipedia&campaign=${wiki}_${page}'..
-	'&address=${address}&checkin=${checkin}&checkout=${checkout}'
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
@@ -47,8 +44,7 @@ local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 local Chronology = Widgets.Chronology
 local Organizers = Widgets.Organizers
-local Button = Lua.import('Module:Widget/Basic/Button')
-local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Accommodation = Widgets.Accommodation
 
 ---@class InfoboxLeague: BasicInfobox
 local League = Class.new(BasicInfobox)
@@ -208,96 +204,7 @@ function League:createInfobox()
 				}
 			}
 		},
-		Builder{
-			builder = function()
-				local startDate, endDate = self.data.startDate, self.data.endDate
-				if not startDate or not endDate then
-					return
-				end
-				local onlineOrOffline = tostring(args.type or ''):lower()
-				if not onlineOrOffline:match('offline') then
-					return
-				end
-				local locations = Locale.formatLocations(args)
-				-- If more than one city, don't show the accommodation section, as it is unclear which one the link is for
-				if locations.city2 then
-					return
-				end
-				-- Must have a venue or a city to show the accommodation section
-				if not locations.venue1 and not locations.city1 then
-					return
-				end
-
-				local function invalidLocation(location)
-					-- Not allowed to contain HTML Tags
-					return (location or ''):lower():match('<')
-				end
-				if invalidLocation(locations.venue1) or invalidLocation(locations.city1) then
-					return
-				end
-
-				-- if the event is finished do not show the button
-				local osdateCutoff = DateExt.parseIsoDate(endDate)
-				osdateCutoff.day = osdateCutoff.day + 1
-				if os.difftime(os.time(), os.time(osdateCutoff)) > 0 then
-					return
-				end
-
-				local addressParts = {}
-				-- Only add the venue if there is exactly one venue, otherwise we'll only use the city + country
-				table.insert(addressParts, not locations.venue2 and locations.venue1 or nil)
-				table.insert(addressParts, locations.city1)
-				table.insert(addressParts, Flags.CountryName{flag = locations.country1 or locations.region1})
-
-				-- Start date for the accommodation should be the day before the event, but at most 4 days before the event
-				-- End date for the accommodation should be 1 day after the event
-				local osdateEnd = DateExt.parseIsoDate(endDate)
-				osdateEnd.day = osdateEnd.day + 1
-				local osdateFictiveStart = DateExt.parseIsoDate(endDate)
-				osdateFictiveStart.day = osdateFictiveStart.day - 4
-				local osdateRealStart = DateExt.parseIsoDate(startDate)
-				osdateRealStart.day = osdateRealStart.day - 1
-
-				local osdateStart
-				if os.difftime(os.time(osdateFictiveStart), os.time(osdateRealStart)) > 0 then
-					osdateStart = osdateFictiveStart
-				else
-					osdateStart = osdateRealStart
-				end
-
-				local function buildStay22Link(address, checkin, checkout)
-					return String.interpolate(STAY22_LINK, {
-						wiki = Info.wikiName,
-						page = self.data.name,
-						address = address,
-						checkin = checkin,
-						checkout = checkout,
-					})
-				end
-
-				return {
-					Title{children = 'Accommodation'},
-					Center{children = {
-						Button{
-							linktype = 'external',
-							variant = 'primary',
-							size = 'md',
-							link = buildStay22Link(
-								table.concat(addressParts, ', '),
-								DateExt.toYmdInUtc(osdateStart),
-								DateExt.toYmdInUtc(osdateEnd)
-							),
-							children = {
-								IconFa{iconName = 'accommodation'},
-								' ',
-								'Find My Accommodation',
-							}
-						},
-						Center{children = 'Bookings earn Liquipedia a small commission.'}
-					}}
-				}
-			end
-		}
+		Accommodation{},
 	}
 
 	self.name = TextSanitizer.stripHTML(self.name)
