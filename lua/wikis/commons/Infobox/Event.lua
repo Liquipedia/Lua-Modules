@@ -237,53 +237,50 @@ end
 ---@param args table
 ---@param links table
 function Event:_setLpdbData(args, links)
-	--todo: adjust to datapoint, kick irrelevant stuff
 	local lpdbData = {
+		type = 'event',
 		name = self.name,
-		banner = args.image,
-		bannerdark = args.imagedark or args.imagedarkmode,
-		icon = self.data.icon,
-		icondark = self.data.iconDark,
-		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
-		seriespage = Page.pageifyLink(args.series),
-		serieslist = {
-			Page.pageifyLink(args.series),
-			Page.pageifyLink(args.series2),
-		},
-		previous = self:_getPageNameFromChronology(args.previous),
-		previous2 = self:_getPageNameFromChronology(args.previous2),
-		next = self:_getPageNameFromChronology(args.next),
-		next2 = self:_getPageNameFromChronology(args.next2),
-		game = self.data.game,
-		organizers = Table.mapValues(
-			Event:_getNamedTableofAllArgsForBase(args, 'organizer'),
-			mw.ext.TeamLiquidIntegration.resolve_redirect
-		),
-		startdate = self.data.startDate or self.data.endDate or DateExt.defaultDate,
-		enddate = self.data.endDate or DateExt.defaultDate,
-		sortdate = self.data.endDate or DateExt.defaultDate,
-		location = mw.text.decode(Locale.formatLocation({city = args.city or args.location, country = args.country})),
-		location2 = mw.text.decode(Locale.formatLocation({city = args.city2 or args.location2, country = args.country2})),
-		venue = args.venue,
-		locations = Locale.formatLocations(args),
-		status = self.data.status,
-		format = TextSanitizer.stripHTML(args.format),
-		sponsors = Event:_getNamedTableofAllArgsForBase(args, 'sponsor'),
-		links = Links.makeFullLinksForTableItems(links or {}),
+		image = self.data.icon,
+		imagedark = self.data.iconDark,
+		date = self.data.endDate or DateExt.defaultDate,
 		extradata = {
+			series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
 			series2 = args.series2 and mw.ext.TeamLiquidIntegration.resolve_redirect(args.series2) or nil,
-		},
+			seriespage = Page.pageifyLink(args.series),
+			serieslist = {
+				Page.pageifyLink(args.series),
+				Page.pageifyLink(args.series2),
+			},
+			previous = self:_getPageNameFromChronology(args.previous),
+			previous2 = self:_getPageNameFromChronology(args.previous2),
+			next = self:_getPageNameFromChronology(args.next),
+			next2 = self:_getPageNameFromChronology(args.next2),
+			game = self.data.game,
+			organizers = Table.mapValues(
+				Event:_getNamedTableofAllArgsForBase(args, 'organizer'),
+				mw.ext.TeamLiquidIntegration.resolve_redirect
+			),
+			startdate = self.data.startDate or self.data.endDate or DateExt.defaultDate,
+			enddate = self.data.endDate or DateExt.defaultDate,
+			sortdate = self.data.endDate or DateExt.defaultDate,
+			location = mw.text.decode(Locale.formatLocation({city = args.city or args.location, country = args.country})),
+			location2 = mw.text.decode(Locale.formatLocation({city = args.city2 or args.location2, country = args.country2})),
+			venue = args.venue,
+			locations = Locale.formatLocations(args),
+			status = self.data.status,
+			format = TextSanitizer.stripHTML(args.format),
+			links = Links.makeFullLinksForTableItems(links or {}),
+		}
 	}
 
 	lpdbData = self:addToLpdb(lpdbData, args)
-	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, Json.stringifySubTables(lpdbData))
+	mw.ext.LiquipediaDB.lpdb_datapoint('event_' .. self.name, Json.stringifySubTables(lpdbData))
 end
 
 ---@param args table
 ---@param base string
 ---@return table
 function Event:_getNamedTableofAllArgsForBase(args, base)
-	-- todo: check if needed after storage rework
 	local basedArgs = self:getAllArgsForBase(args, base)
 	local namedArgs = {}
 	for key, item in pairs(basedArgs) do
