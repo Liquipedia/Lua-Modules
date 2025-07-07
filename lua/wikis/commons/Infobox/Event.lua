@@ -33,7 +33,6 @@ local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
-local VENUE_DESCRIPTION = '<br><small><small>(${desc})</small></small>'
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
@@ -45,6 +44,7 @@ local Builder = Widgets.Builder
 local Chronology = Widgets.Chronology
 local Organizers = Widgets.Organizers
 local Accommodation = Widgets.Accommodation
+local Venue = Widgets.Venue
 
 ---@class InfoboxEvent: BasicInfobox
 local Event = Class.new(BasicInfobox)
@@ -133,18 +133,7 @@ function Event:createInfobox()
 				self:_createLocation(args)
 			}
 		}}},
-		Builder{
-			builder = function()
-				local venues = Array.map(Event._parseVenues(args), function(venue)
-					return self:createLink(venue.id, venue.name, venue.link, venue.description)
-				end)
-
-				return {Cell{
-					name = 'Venue',
-					content = venues
-				}}
-			end
-		},
+		Venue{args = args},
 		Cell{name = 'Format', content = {args.format}},
 		Customizable{id = 'prizepool', children = {
 				Cell{
@@ -218,23 +207,6 @@ function Event:createInfobox()
 	return mw.html.create()
 		:node(self:build(widgets))
 		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
-end
-
----@param args table
----@return {id: string?, name: string?, link: string?, description: string?}[]
-function Event._parseVenues(args)
-	local venues = {}
-	for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue', {requireIndex = false}) do
-		local name = args[prefix .. 'name']
-		local link = args[prefix .. 'link']
-		local description
-		if String.isNotEmpty(args[prefix .. 'desc']) then
-			description = String.interpolate(VENUE_DESCRIPTION, {desc = args[prefix .. 'desc']})
-		end
-
-		table.insert(venues, {id = venueName, name = name, link = link, description = description})
-	end
-	return venues
 end
 
 function Event:_parseArgs()
@@ -664,47 +636,6 @@ function Event:_createSeriesIcon(iconArgs)
 	}
 
 	return output == EventIcon.display{} and '' or output
-end
-
----@param id string?
----@param name string?
----@param link string?
----@param desc string?
----@return string?
-function Event:createLink(id, name, link, desc)
-	if String.isEmpty(id) then
-		return nil
-	end
-	---@cast id -nil
-
-	local output
-
-	if Page.exists(id) or id:find('^[Ww]ikipedia:') then
-		output = '[[' .. id .. '|'
-		if String.isEmpty(name) then
-			output = output .. id .. ']]'
-		else
-			output = output .. name .. ']]'
-		end
-
-	elseif not String.isEmpty(link) then
-		if String.isEmpty(name) then
-			output = '[' .. link .. ' ' .. id .. ']'
-		else
-			output = '[' .. link .. ' ' .. name .. ']'
-
-		end
-	elseif String.isEmpty(name) then
-		output = id
-	else
-		output = name
-	end
-
-	if not String.isEmpty(desc) then
-		output = output .. desc
-	end
-
-	return output
 end
 
 ---@param date string?

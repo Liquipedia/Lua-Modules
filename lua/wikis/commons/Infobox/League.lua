@@ -33,7 +33,6 @@ local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
-local VENUE_DESCRIPTION = '<br><small><small>(${desc})</small></small>'
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
@@ -45,6 +44,7 @@ local Builder = Widgets.Builder
 local Chronology = Widgets.Chronology
 local Organizers = Widgets.Organizers
 local Accommodation = Widgets.Accommodation
+local Venue = Widgets.Venue
 
 ---@class InfoboxLeague: BasicInfobox
 local League = Class.new(BasicInfobox)
@@ -140,18 +140,7 @@ function League:createInfobox()
 				self:_createLocation(args)
 			}
 		}}},
-		Builder{
-			builder = function()
-				local venues = Array.map(League._parseVenues(args), function(venue)
-					return self:createLink(venue.id, venue.name, venue.link, venue.description)
-				end)
-
-				return {Cell{
-					name = 'Venue',
-					content = venues
-				}}
-			end
-		},
+		Venue{args = args},
 		Cell{name = 'Format', content = {args.format}},
 		Customizable{id = 'prizepool', children = {
 				Cell{
@@ -225,23 +214,6 @@ function League:createInfobox()
 	return mw.html.create()
 		:node(self:build(widgets))
 		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
-end
-
----@param args table
----@return {id: string?, name: string?, link: string?, description: string?}[]
-function League._parseVenues(args)
-	local venues = {}
-	for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue', {requireIndex = false}) do
-		local name = args[prefix .. 'name']
-		local link = args[prefix .. 'link']
-		local description
-		if String.isNotEmpty(args[prefix .. 'desc']) then
-			description = String.interpolate(VENUE_DESCRIPTION, {desc = args[prefix .. 'desc']})
-		end
-
-		table.insert(venues, {id = venueName, name = name, link = link, description = description})
-	end
-	return venues
 end
 
 function League:_parseArgs()
@@ -673,6 +645,7 @@ function League:_createSeriesIcon(iconArgs)
 	return output == LeagueIcon.display{} and '' or output
 end
 
+--- used in brawlstars, chess, counterstrike customs
 ---@param id string?
 ---@param name string?
 ---@param link string?
