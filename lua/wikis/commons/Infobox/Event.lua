@@ -197,7 +197,12 @@ function Event:createInfobox()
 				}
 			}
 		},
-		Accommodation{},
+		Accommodation{
+			args = args,
+			startDate = self.data.startDate,
+			endDate = self.data.endDate,
+			name = self.data.name,
+		},
 	}
 
 	self.name = TextSanitizer.stripHTML(self.name)
@@ -212,7 +217,7 @@ function Event:createInfobox()
 
 	return mw.html.create()
 		:node(self:build(widgets))
-		:node(Logic.readBool(args.autointro) and ('br>' .. self:seoText(args)) or nil)
+		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
 end
 
 ---@param args table

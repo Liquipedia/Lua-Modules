@@ -28,19 +28,20 @@ local STAY22_LINK = 'https://www.stay22.com/allez/roam?aid=liquipedia&campaign=$
 ---@class InfoboxAccommodationWidget: Widget
 ---@operator call(table):InfoboxAccommodationWidget
 ---@field args table<string, string>
----@field data table<string, any>
+---@field startDate string?
+---@field endDate string?
+---@field name string?
 local Accommodation = Class.new(Widget)
 Accommodation.defaultProps = {
 	args = {},
-	data = {},
 }
 
 ---@return Widget?
 function Accommodation:render()
-	local data = self.props.data
-	local args = self.props.args
+	local props = self.props
+	local args = props.args
 
-	local startDate, endDate = data.startDate, data.endDate
+	local startDate, endDate = props.startDate, props.endDate
 	if not startDate or not endDate then
 		return
 	end
@@ -98,7 +99,7 @@ function Accommodation:render()
 	local function buildStay22Link(address, checkin, checkout)
 		return String.interpolate(STAY22_LINK, {
 			wiki = Info.wikiName,
-			page = data.name,
+			page = props.name,
 			address = address,
 			checkin = checkin,
 			checkout = checkout,
