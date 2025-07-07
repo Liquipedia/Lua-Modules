@@ -17,22 +17,14 @@ local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Template = Lua.import('Module:Template')
-local Tier = Lua.import('Module:Tier/Custom')
 local Variables = Lua.import('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
-local Flags = Lua.import('Module:Flags')
-local HighlightConditions = Lua.import('Module:HighlightConditions')
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
 local EventIcon = Lua.import('Module:EventIcon')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
-local MetadataGenerator = Lua.import('Module:MetadataGenerator')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
-
-local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
@@ -54,8 +46,6 @@ local Event = Class.new(BasicInfobox)
 function Event:createInfobox()
 	local args = self.args
 	self:_parseArgs()
-
-	self:_definePageVariables(args)
 
 	local widgets = {
 		Header{
@@ -98,49 +88,12 @@ function Event:createInfobox()
 				Cell{name = 'Server', content = {args.server}}
 			}
 		},
-		Customizable{id = 'type', children = {
-				Builder{
-					builder = function()
-						local value = tostring(args.type):lower()
-						if self:shouldStore(args) then
-							if value == 'offline' then
-								self:categories('Offline Tournaments')
-							elseif value == 'online' then
-								self:categories('Online Tournaments')
-							elseif value:match('online') and value:match('offline') then
-								self:categories('Online/Offline Tournaments')
-							else
-								self:categories('Unknown Type Tournaments')
-							end
-						end
-
-						if not String.isEmpty(args.type) then
-							return {
-								Cell{
-									name = 'Type',
-									content = {
-										mw.language.getContentLanguage():ucfirst(args.type)
-									}
-								}
-							}
-						end
-					end
-				}
-			}
-		},
 		Location{
 			args = args,
 			infoboxType = 'Events',
 		},
 		Venue{args = args},
 		Cell{name = 'Format', content = {args.format}},
-		Customizable{id = 'prizepool', children = {
-				Cell{
-					name = 'Prize Pool',
-					content = {self.prizepoolDisplay},
-				},
-			},
-		},
 		Customizable{id = 'dates', children = {
 				Cell{name = 'Date', content = {args.date}},
 				Cell{name = 'Start Date', content = {args.sdate}},
@@ -148,14 +101,6 @@ function Event:createInfobox()
 			},
 		},
 		Customizable{id = 'custom', children = {}},
-		Customizable{id = 'liquipediatier', children = {
-				Cell{
-					name = 'Liquipedia Tier',
-					content = {self:createLiquipediaTierDisplay(args)},
-					classes = {self:liquipediaTierHighlighted(args) and 'valvepremier-highlighted' or ''},
-				},
-			},
-		},
 		Builder{
 			builder = function()
 				if Table.isNotEmpty(self.links) then
@@ -200,12 +145,10 @@ function Event:createInfobox()
 	if self:shouldStore(args) then
 		self:categories(unpack(self:_getCategories(args)))
 		self:_setLpdbData(args, self.links)
-		self:_setSeoTags(args)
 	end
 
 	return mw.html.create()
 		:node(self:build(widgets))
-		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
 end
 
 function Event:_parseArgs()
@@ -243,17 +186,9 @@ function Event:_parseArgs()
 		startDate = self:_cleanDate(args.sdate) or self:_cleanDate(args.date),
 		endDate = self:_cleanDate(args.edate) or self:_cleanDate(args.date),
 		mode = args.mode,
-		patch = args.patch,
-		endPatch = args.endpatch or args.epatch or args.patch,
-		publishertier = Logic.readBool(args.highlighted),
 	}
 
-	data.liquipediatier, data.liquipediatiertype =
-		Tier.toValue(args.liquipediatier, args.liquipediatiertype)
-
 	self.data = data
-
-	self.prizepoolDisplay, self.data.prizepoolUsd, self.data.localCurrency = self:_parsePrizePool(args, data.endDate)
 
 	data.icon, data.iconDark, self.iconDisplay = self:getIcons{
 		displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
@@ -269,37 +204,6 @@ function Event:_parseArgs()
 end
 
 ---@param args table
----@param endDate string?
----@return number|string?, number?, string?
-function Event:_parsePrizePool(args, endDate)
-	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
-		return
-	end
-
-	--need to get the display here since it sets variables we want/need to get the clean values
-	--overwritable since sometimes display is supposed to look a bit different
-	return self:displayPrizePool(args, endDate),
-		tonumber(Variables.varDefault('tournament_prizepoolusd')) or 0,
-		Variables.varDefault('tournament_currency', args.localcurrency)
-end
-
----@param args table
----@param endDate string?
----@return number|string?
-function Event:displayPrizePool(args, endDate)
-	return InfoboxPrizePool.display{
-		prizepool = args.prizepool,
-		prizepoolusd = args.prizepoolusd,
-		currency = args.localcurrency,
-		rate = args.currency_rate,
-		date = Logic.emptyOr(args.currency_date, endDate),
-		setvariables = args.setvariables,
-		displayRoundPrecision = args.currencyDispPrecision,
-		varRoundPrecision = args.currencyVarPrecision
-	}
-end
-
----@param args table
 function Event:customParseArguments(args)
 end
 
@@ -310,49 +214,8 @@ function Event:_getCategories(args)
 	if String.isEmpty(args.country) then
 		table.insert(categories, 'Tournaments without location')
 	end
-	Array.extendWith(categories, self:addParticipantTypeCategory(args))
-	Array.extendWith(categories, self:addTierCategories(args))
 
 	return Array.extend(categories, self:getWikiCategories(args))
-end
-
----@param args table
----@return string[]
-function Event:addParticipantTypeCategory(args)
-	local categories = {}
-	if not String.isEmpty(args.team_number) then
-		table.insert(categories, 'Team Tournaments')
-	end
-	if String.isNotEmpty(args.player_number) or String.isNotEmpty(args.individual) then
-		table.insert(categories, 'Individual Tournaments')
-	end
-
-	return categories
-end
-
----@param args table
----@return string[]
-function Event:addTierCategories(args)
-	local categories = {}
-	local tier = args.liquipediatier
-	local tierType = args.liquipediatiertype
-
-	local tierCategory, tierTypeCategory = Tier.toCategory(tier, tierType)
-	local isValidTierTuple = Tier.isValid(tier, tierType)
-	table.insert(categories, tierCategory)
-	table.insert(categories, tierTypeCategory)
-
-	if not isValidTierTuple and not tierCategory and Logic.isNotEmpty(tier) then
-		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
-		table.insert(categories, 'Pages with invalid Tier')
-	end
-	if not isValidTierTuple and not tierTypeCategory and String.isNotEmpty(tierType) then
-		table.insert(self.warnings,
-			String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
-		table.insert(categories, 'Pages with invalid Tiertype')
-	end
-
-	return categories
 end
 
 --- Allows for overriding this functionality
@@ -364,92 +227,11 @@ function Event:shouldStore(args)
 end
 
 --- Allows for overriding this functionality
----@param args table
-function Event:defineCustomPageVariables(args)
-end
-
---- Allows for overriding this functionality
 ---@param lpdbData table
 ---@param args table
 ---@return table
 function Event:addToLpdb(lpdbData, args)
 	return lpdbData
-end
-
---- Allows for overriding this functionality
----@param args table
----@return string
-function Event:seoText(args)
-	return MetadataGenerator.tournament(args)
-end
-
---- Allows for overriding this functionality
----@param args table
----@return boolean
-function Event:liquipediaTierHighlighted(args)
-	return HighlightConditions.tournament(self.data)
-end
-
---- Allows for overriding this functionality
----@param args table
----@return string
-function Event:appendLiquipediatierDisplay(args)
-	return ''
-end
-
----@param args table
----@return string?
-function Event:createLiquipediaTierDisplay(args)
-	local tierDisplay = Tier.display(args.liquipediatier, args.liquipediatiertype, {link = true})
-
-	if String.isEmpty(tierDisplay) then
-		return
-	end
-
-	return tierDisplay .. self:appendLiquipediatierDisplay(args)
-end
-
----@param args table
-function Event:_definePageVariables(args)
-	Variables.varDefine('tournament_name', self.data.name)
-	Variables.varDefine('tournament_shortname', self.data.shortName)
-	Variables.varDefine('tournament_tickername', self.data.tickerName)
-	Variables.varDefine('tournament_series', self.data.series)
-
-	Variables.varDefine('tournament_icon', self.data.icon)
-	Variables.varDefine('tournament_icondark', self.data.iconDark)
-
-	Variables.varDefine('tournament_liquipediatier', self.data.liquipediatier)
-	Variables.varDefine('tournament_liquipediatiertype', self.data.liquipediatiertype)
-	Variables.varDefine('tournament_publishertier', tostring(self.data.publishertier or ''))
-
-	Variables.varDefine('tournament_type', args.type)
-	Variables.varDefine('tournament_mode', self.data.mode)
-	Variables.varDefine('tournament_status', self.data.status)
-
-	Variables.varDefine('tournament_region', args.region)
-	Variables.varDefine('tournament_country', args.country)
-	Variables.varDefine('tournament_location', args.location or args.city)
-	Variables.varDefine('tournament_location2', args.location2 or args.city2)
-	Variables.varDefine('tournament_venue', args.venue)
-
-	Variables.varDefine('tournament_game', self.data.game)
-
-	Variables.varDefine('tournament_parent', self.data.parent)
-	Variables.varDefine('tournament_parentname', args.parentname)
-	Variables.varDefine('tournament_subpage', args.subpage)
-
-	Variables.varDefine('tournament_startdate', self.data.startDate)
-	Variables.varDefine('tournament_enddate', self.data.endDate)
-
-	Variables.varDefine('tournament_patch', self.data.patch)
-	Variables.varDefine('tournament_endpatch ', self.data.endPatch)
-
-	Variables.varDefine('tournament_currency', self.data.localCurrency or '')
-
-	Variables.varDefine('tournament_summary', self:seoText(args))
-
-	self:defineCustomPageVariables(args)
 end
 
 ---@param args table
@@ -475,9 +257,6 @@ function Event:_setLpdbData(args, links)
 		next2 = self:_getPageNameFromChronology(args.next2),
 		game = self.data.game,
 		mode = self.data.mode,
-		patch = self.data.patch,
-		endpatch = self.data.endPatch,
-		type = args.type,
 		organizers = Table.mapValues(
 			Event:_getNamedTableofAllArgsForBase(args, 'organizer'),
 			mw.ext.TeamLiquidIntegration.resolve_redirect
@@ -489,19 +268,10 @@ function Event:_setLpdbData(args, links)
 		location2 = mw.text.decode(Locale.formatLocation({city = args.city2 or args.location2, country = args.country2})),
 		venue = args.venue,
 		locations = Locale.formatLocations(args),
-		prizepool = self.data.prizepoolUsd,
-		liquipediatier = self.data.liquipediatier,
-		liquipediatiertype = self.data.liquipediatiertype,
-		publishertier = tostring(self.data.publishertier or ''),
-		participantsnumber = tonumber(args.participants_number)
-			or tonumber(args.team_number)
-			or tonumber(args.player_number)
-			or -1,
 		status = self.data.status,
 		format = TextSanitizer.stripHTML(args.format),
 		sponsors = Event:_getNamedTableofAllArgsForBase(args, 'sponsor'),
 		links = Links.makeFullLinksForTableItems(links or {}),
-		summary = self:seoText(args),
 		extradata = {
 			series2 = args.series2 and mw.ext.TeamLiquidIntegration.resolve_redirect(args.series2) or nil,
 		},
@@ -509,14 +279,6 @@ function Event:_setLpdbData(args, links)
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, Json.stringifySubTables(lpdbData))
-end
-
----@param args table
-function Event:_setSeoTags(args)
-	local desc = self:seoText(args)
-	if desc then
-		mw.ext.SearchEngineOptimization.metadescl(desc)
-	end
 end
 
 ---@param args table
