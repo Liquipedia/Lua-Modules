@@ -77,7 +77,7 @@ function CustomInjector:parse(id, widgets)
 		end
 		return Array.append(
 			{
-				Cell{name = 'Civilizations', children = {args.civilizations}},
+				Cell{name = 'Civilizations', children = {civilizations}},
 				Cell{name = ageTitle, children = ageDisplay(args.age), options = {separator = ' '}},
 			},
 			widgets
