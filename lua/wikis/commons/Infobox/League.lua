@@ -45,6 +45,7 @@ local Chronology = Widgets.Chronology
 local Organizers = Widgets.Organizers
 local Accommodation = Widgets.Accommodation
 local Venue = Widgets.Venue
+local Location = Widgets.Location
 
 ---@class InfoboxLeague: BasicInfobox
 local League = Class.new(BasicInfobox)
@@ -134,12 +135,7 @@ function League:createInfobox()
 				}
 			}
 		},
-		Customizable{id = 'location', children = {Cell{
-			name = 'Location',
-			content = {
-				self:_createLocation(args)
-			}
-		}}},
+		Location{args = args},
 		Venue{args = args},
 		Cell{name = 'Format', content = {args.format}},
 		Customizable{id = 'prizepool', children = {
@@ -537,46 +533,6 @@ function League:_getNamedTableofAllArgsForBase(args, base)
 		namedArgs[base .. key] = item
 	end
 	return namedArgs
-end
-
----
--- Format:
--- {
---	region: Region or continent
---	country: the country
---	location: the city or place
--- }
----@param args table
----@return string
-function League:_createLocation(args)
-	if String.isEmpty(args.country) then
-		return Template.safeExpand(mw.getCurrentFrame(), 'Abbr/TBD')
-	end
-
-	local display = {}
-	args.city1 = args.city1 or args.location1 or args.city or args.location
-
-	for _, country, index in Table.iter.pairsByPrefix(args, 'country', {requireIndex = false}) do
-		local nationality = Flags.getLocalisation(country)
-
-		if String.isEmpty(nationality) then
-			self:categories('Unrecognised Country')
-
-		else
-			local location = args['city' .. index] or args['location' .. index]
-			local countryName = Flags.CountryName{flag = country}
-			local displayText = location or countryName
-			if String.isEmpty(displayText) then
-				displayText = country
-			end
-
-			if self:shouldStore(args) then
-				self:categories(nationality .. ' Tournaments')
-			end
-			table.insert(display, Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' .. displayText .. '<br>')
-		end
-	end
-	return table.concat(display)
 end
 
 ---@param seriesArgs {displayManualIcons:boolean, series:string?, abbreviation:string?, icon:string?, iconDark:string?}

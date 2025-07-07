@@ -36,6 +36,7 @@ local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 local Organizers = Widgets.Organizers
 local Venue = Widgets.Venue
+local Location = Widgets.Location
 
 ---@class SeriesInfobox: BasicInfobox
 local Series = Class.new(BasicInfobox)
@@ -86,11 +87,11 @@ function Series:createInfobox()
 		Customizable{
 			id = 'location',
 			children = {
-				Cell{
-					name = 'Location',
-					content = {
-						self:_createLocation(args.country, args.city)
-					}
+				Location{
+					args = args,
+					infoboxType = 'Series',
+					shouldSetCategory = false,
+					showTbdOnEmpty = false,
 				},
 			}
 		},
@@ -278,17 +279,6 @@ function Series:_getIconFromLeagueIconSmall(lpdbData)
 	lpdbData.icondark = iconDark
 
 	return lpdbData
-end
-
----@param country string?
----@param city string?
----@return string
-function Series:_createLocation(country, city)
-	if country == nil or country == '' then
-		return ''
-	end
-
-	return Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' .. (city or country)
 end
 
 ---@param id string?
