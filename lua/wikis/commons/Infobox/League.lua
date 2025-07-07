@@ -205,22 +205,12 @@ function League:createInfobox()
 		Customizable{id = 'customcontent', children = {}},
 		Center{children = {args.footnotes}},
 		Customizable{id = 'chronology', children = {
-				Builder{
-					builder = function()
-						if self:_isChronologySet(args.previous, args.next) then
-							return {
-								Title{children = 'Chronology'},
-								Chronology{
-									links = Table.filterByKey(args, function(key)
-										return type(key) == 'string' and (key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
-									end)
-								}
-							}
-						end
-					end
-				}
+			Chronology{
+				inks = Table.filterByKey(args, function(key)
+					return type(key) == 'string' and (key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
+				end)
 			}
-		},
+		}},
 		Builder{
 			builder = function()
 				local startDate, endDate = self.data.startDate, self.data.endDate
@@ -840,15 +830,6 @@ end
 ---@return boolean
 function League:_isUnknownDate(date)
 	return date == nil or string.lower(date) == 'tba' or string.lower(date) == 'tbd'
-end
-
----@param previous string?
----@param next string?
----@return boolean
-function League:_isChronologySet(previous, next)
-	-- We only need to check the first of these params, since it makes no sense
-	-- to set next2 and not next, etc.
-	return not (String.isEmpty(previous) and String.isEmpty(next))
 end
 
 -- Given the format `pagename|displayname`, returns pagename or the parameter, otherwise

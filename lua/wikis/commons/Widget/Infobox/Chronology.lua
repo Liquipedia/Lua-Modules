@@ -17,11 +17,17 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local InlineIconAndText = Lua.import('Module:Widget/Misc/InlineIconAndText')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Title = Lua.import('Module:Widget/Infobox/Title')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ChronologyWidget: Widget
 ---@operator call(table): ChronologyWidget
 ---@field links table<string, string|number|nil>
 local Chronology = Class.new(Widget)
+Chronology.defaultProps = {
+	title = 'Chronology',
+	showTitle = true,
+}
 
 ---@return string?
 function Chronology:render()
@@ -30,13 +36,16 @@ function Chronology:render()
 	end
 
 	return HtmlWidgets.Fragment{
-		children = Array.mapIndexes(function(index)
-			local prevKey, nextKey = 'previous' .. index, 'next' .. index
-			if index == 1 then
-				prevKey, nextKey = 'previous', 'next'
-			end
-			return self:_createChronologyRow(self.props.links[prevKey], self.props.links[nextKey])
-		end)
+		children = WidgetUtil.collect(
+			self.props.showTitle and Title{children = self.props.title} or nil,
+			Array.mapIndexes(function(index)
+				local prevKey, nextKey = 'previous' .. index, 'next' .. index
+				if index == 1 then
+					prevKey, nextKey = 'previous', 'next'
+				end
+				return self:_createChronologyRow(self.props.links[prevKey], self.props.links[nextKey])
+			end)
+		)
 	}
 end
 

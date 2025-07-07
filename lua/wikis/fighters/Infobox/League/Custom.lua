@@ -325,7 +325,7 @@ function CustomLeague:_createCircuitInformation(widgets, circuitIndex)
 		Cell{name = 'Circuit Tier', content = {circuitArgs.tier}},
 		Cell{name = 'Tournament Region', content = {circuitArgs.region}},
 		Cell{name = 'Points', content = {circuitArgs.points}},
-		Chronology{links = {next = circuitArgs.next, previous = circuitArgs.previous}}
+		Chronology{links = {next = circuitArgs.next, previous = circuitArgs.previous}, showTitle = false}
 	)
 end
 

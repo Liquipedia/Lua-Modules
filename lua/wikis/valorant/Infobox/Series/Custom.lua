@@ -53,17 +53,14 @@ function CustomInjector:parse(id, widgets)
 		end
 		return { Cell{name = 'Location', content = locations} }
 	elseif id == 'customcontent' then
-		if String.isNotEmpty(args.previous) or String.isNotEmpty(args.next) then
-			return {
-				Title{children = 'Chronology'},
-				Chronology{
-					links = {
-						previous = args.previous,
-						next = args.next,
-					}
+		return {
+			Chronology{
+				links = {
+					previous = args.previous,
+					next = args.next,
 				}
 			}
-		end
+		}
 	end
 	return widgets
 end
