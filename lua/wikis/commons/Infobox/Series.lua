@@ -28,15 +28,15 @@ local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 
 local Widgets = Lua.import('Module:Widget/All')
+local Builder = Widgets.Builder
 local Cell = Widgets.Cell
-local Header = Widgets.Header
-local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
-local Builder = Widgets.Builder
-local Organizers = Widgets.Organizers
-local Venue = Widgets.Venue
+local Header = Widgets.Header
 local Location = Widgets.Location
+local Organizers = Widgets.Organizers
+local Title = Widgets.Title
+local Venue = Widgets.Venue
 
 ---@class SeriesInfobox: BasicInfobox
 local Series = Class.new(BasicInfobox)

@@ -27,19 +27,19 @@ local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
 
 local Widgets = Lua.import('Module:Widget/All')
-local Cell = Widgets.Cell
-local Header = Widgets.Header
-local Title = Widgets.Title
-local Center = Widgets.Center
-local Customizable = Widgets.Customizable
-local Builder = Widgets.Builder
-local Chronology = Widgets.Chronology
-local Organizers = Widgets.Organizers
 local Accommodation = Widgets.Accommodation
-local Venue = Widgets.Venue
+local Builder = Widgets.Builder
+local Cell = Widgets.Cell
+local Center = Widgets.Center
+local Chronology = Widgets.Chronology
+local Customizable = Widgets.Customizable
+local Header = Widgets.Header
 local Location = Widgets.Location
-local SeriesIcon = Widgets.SeriesIcon
+local Organizers = Widgets.Organizers
 local SeriesDisplay = Widgets.SeriesDisplay
+local SeriesIcon = Widgets.SeriesIcon
+local Title = Widgets.Title
+local Venue = Widgets.Venue
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class InfoboxEvent: BasicInfobox
