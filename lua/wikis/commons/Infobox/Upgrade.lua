@@ -60,13 +60,13 @@ function Upgrade:createInfobox()
 			},
 		},
 		Cell{name = 'Required', children = {args.required}},
+		Cell{name = 'Required for', children = self:getAllArgsForBase(args, 'requiredfor'), options = {makeLink = true}},
 		Customizable{
 			id = 'effect',
 			children = {
 				Cell{name = 'Effect', children = {args.effect}},
 			},
 		},
-		Cell{name = 'Required for', children = self:getAllArgsForBase(args, 'requirefor'), options = {makeLink = true}},
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
