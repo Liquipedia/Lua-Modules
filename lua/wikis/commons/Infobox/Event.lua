@@ -86,10 +86,16 @@ function Event:createInfobox()
 		Customizable{
 			id = 'gamesettings',
 			children = {
-				Cell{name = 'Game', content = {Link{
-					link = Game.link{game = self.data.game, useDefault = false},
-					children = {Game.name{game = self.data.game, useDefault = false}}
-				}}},
+				Builder{
+					builder = function()
+						local gameLink = Game.link{game = self.data.game, useDefault = false}
+						if not gameLink then return end
+						return Cell{name = 'Game', content = {Link{
+							link = gameLink,
+							children = {Game.name{game = self.data.game, useDefault = false}}
+						}}}
+					end
+				},
 			}
 		},
 		Location{
