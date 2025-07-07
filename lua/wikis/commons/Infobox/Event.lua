@@ -20,7 +20,7 @@ local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
-local EventIcon = Lua.import('Module:EventIcon')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
@@ -85,12 +85,13 @@ function Event:createInfobox()
 		Customizable{
 			id = 'gamesettings',
 			children = {
-				Cell{name = 'Server', content = {args.server}}
+				Cell{name = 'Game', content = {Game.name{game = self.data.game, useDefault = false}}},
 			}
 		},
 		Location{
 			args = args,
 			infoboxType = 'Events',
+			shouldSetCategory = self:shouldStore(args),
 		},
 		Venue{args = args},
 		Cell{name = 'Format', content = {args.format}},
@@ -175,17 +176,12 @@ function Event:_parseArgs()
 
 	local data = {
 		name = TextSanitizer.stripHTML(args.name),
-		shortName = TextSanitizer.stripHTML(args.shortname or args.abbreviation),
-		tickerName = TextSanitizer.stripHTML(args.tickername),
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
 		--might be set before infobox
 		status = args.status or Variables.varDefault('tournament_status'),
-		game = Game.toIdentifier{game = args.game},
-		-- If no parent is available, set pagename instead to ease querying
-		parent = (args.parent or mw.title.getCurrentTitle().prefixedText):gsub(' ', '_'),
+		game = Game.toIdentifier{game = args.game, useDefault = false},
 		startDate = self:_cleanDate(args.sdate) or self:_cleanDate(args.date),
 		endDate = self:_cleanDate(args.edate) or self:_cleanDate(args.date),
-		mode = args.mode,
 	}
 
 	self.data = data
@@ -210,9 +206,9 @@ end
 ---@param args table
 ---@return string[]
 function Event:_getCategories(args)
-	local categories = {'Tournaments'}
+	local categories = {'Events'}
 	if String.isEmpty(args.country) then
-		table.insert(categories, 'Tournaments without location')
+		table.insert(categories, 'Events without location')
 	end
 
 	return Array.extend(categories, self:getWikiCategories(args))
@@ -237,10 +233,9 @@ end
 ---@param args table
 ---@param links table
 function Event:_setLpdbData(args, links)
+	--todo: adjust to datapoint, kick irrelevant stuff
 	local lpdbData = {
 		name = self.name,
-		tickername = self.data.tickerName,
-		shortname = self.data.shortName,
 		banner = args.image,
 		bannerdark = args.imagedark or args.imagedarkmode,
 		icon = self.data.icon,
@@ -256,7 +251,6 @@ function Event:_setLpdbData(args, links)
 		next = self:_getPageNameFromChronology(args.next),
 		next2 = self:_getPageNameFromChronology(args.next2),
 		game = self.data.game,
-		mode = self.data.mode,
 		organizers = Table.mapValues(
 			Event:_getNamedTableofAllArgsForBase(args, 'organizer'),
 			mw.ext.TeamLiquidIntegration.resolve_redirect
@@ -285,6 +279,7 @@ end
 ---@param base string
 ---@return table
 function Event:_getNamedTableofAllArgsForBase(args, base)
+	-- todo: check if needed after storage rework
 	local basedArgs = self:getAllArgsForBase(args, base)
 	local namedArgs = {}
 	for key, item in pairs(basedArgs) do
@@ -297,6 +292,7 @@ end
 ---@param iconDisplay string?
 ---@return string?
 function Event:createSeriesDisplay(seriesArgs, iconDisplay)
+	-- todo: check if extract is usefull
 	if String.isEmpty(seriesArgs.series) then
 		return nil
 	end
@@ -325,7 +321,7 @@ function Event:getIcons(iconArgs)
 		return iconArgs.icon, iconArgs.iconDark, nil
 	end
 
-	local icon, iconDark, trackingCategory = EventIcon.getIconFromTemplate{
+	local icon, iconDark, trackingCategory = LeagueIcon.getIconFromTemplate{
 		icon = iconArgs.icon,
 		iconDark = iconArgs.iconDark,
 		stringOfExpandedTemplate = display
@@ -347,7 +343,7 @@ function Event:_createSeriesIcon(iconArgs)
 	local series = iconArgs.series
 	---@cast series -nil
 
-	local output = EventIcon.display{
+	local output = LeagueIcon.display{
 		icon = iconArgs.displayManualIcons and iconArgs.icon or nil,
 		iconDark = iconArgs.displayManualIcons and iconArgs.iconDark or nil,
 		series = series,
@@ -356,7 +352,7 @@ function Event:_createSeriesIcon(iconArgs)
 		options = {noLink = not Page.exists(series)}
 	}
 
-	return output == EventIcon.display{} and '' or output
+	return output == LeagueIcon.display{} and '' or output
 end
 
 ---@param date string?

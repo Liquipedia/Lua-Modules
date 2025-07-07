@@ -135,7 +135,10 @@ function League:createInfobox()
 				}
 			}
 		},
-		Location{args = args},
+		Location{
+			args = args,
+			shouldSetCategory = self:shouldStore(args),
+		},
 		Venue{args = args},
 		Cell{name = 'Format', content = {args.format}},
 		Customizable{id = 'prizepool', children = {
