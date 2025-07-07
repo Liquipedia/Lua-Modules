@@ -38,6 +38,7 @@ local Organizers = Widgets.Organizers
 local Accommodation = Widgets.Accommodation
 local Venue = Widgets.Venue
 local Location = Widgets.Location
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class InfoboxEvent: BasicInfobox
 local Event = Class.new(BasicInfobox)
@@ -85,7 +86,10 @@ function Event:createInfobox()
 		Customizable{
 			id = 'gamesettings',
 			children = {
-				Cell{name = 'Game', content = {Game.name{game = self.data.game, useDefault = false}}},
+				Cell{name = 'Game', content = {Link{
+					link = Game.link{game = self.data.game, useDefault = false},
+					children = {Game.name{game = self.data.game, useDefault = false}}
+				}}},
 			}
 		},
 		Location{
