@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
@@ -17,7 +18,7 @@ local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local RoundSelector = Lua.import('Module:Widget/Standings/RoundSelector')
 local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local STATUS_TO_DISPLAY = {

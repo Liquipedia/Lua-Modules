@@ -5,21 +5,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local CharacterIcon = require('Module:CharacterIcon')
-local CharacterNames = mw.loadData('Module:CharacterNames')
-local GameAppearances = require('Module:GetGameAppearances')
 local Lua = require('Module:Lua')
-local MatchTicker = require('Module:MatchTicker/Custom')
-local String = require('Module:StringUtils')
-local Team = require('Module:Team')
-local Template = require('Module:Template')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local CharacterNames = Lua.import('Module:CharacterNames', {loadData = true})
+local GameAppearances = Lua.import('Module:GetGameAppearances')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
+local String = Lua.import('Module:StringUtils')
+local Team = Lua.import('Module:Team')
+local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 

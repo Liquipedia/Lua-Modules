@@ -323,7 +323,7 @@ end
 function TournamentStructure._mergeGroupEntriesIntoGroup(entries, group)
 	local transformedGroup = {}
 	for _, entry in ipairs(entries) do
-		local opponent = require('Module:OpponentLibraries').Opponent.fromLpdbStruct(entry)
+		local opponent = Lua.import('Module:OpponentLibraries').Opponent.fromLpdbStruct(entry)
 		local finished = group.extradata.finished or group.extradata.groupfinished
 		local extradata = {
 			placeRange = entry.extradata.placerange,

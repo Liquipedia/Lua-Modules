@@ -5,12 +5,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')

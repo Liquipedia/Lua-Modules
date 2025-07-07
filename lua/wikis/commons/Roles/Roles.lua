@@ -6,6 +6,7 @@
 --
 
 local Lua = require('Module:Lua')
+
 local Table = require('Module:Table')
 
 local ContractRoles = Lua.import('Module:ContractRoles', {loadData = true})

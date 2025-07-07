@@ -5,13 +5,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Lpdb = require('Module:Lpdb')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Tier = require('Module:Tier/Utils')
+
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local Lpdb = Lua.import('Module:Lpdb')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+local Tier = Lua.import('Module:Tier/Utils')
 
 local Tournament = {}
 
@@ -38,6 +39,7 @@ local TOURNAMENT_PHASE = {
 ---@field iconDark string?
 ---@field abbreviation string?
 ---@field series string?
+---@field extradata table
 
 ---@param conditions ConditionTree?
 ---@param filterTournament fun(tournament: StandardTournament): boolean
@@ -107,7 +109,8 @@ function Tournament.tournamentFromRecord(record)
 		iconDark = record.icondark,
 		abbreviation = record.abbreviation,
 		series = record.series,
-		game = record.game
+		game = record.game,
+		extradata = extradata,
 	}
 
 	-- Some properties are derived from other properies and we can calculate them when accessed.

@@ -5,33 +5,36 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Countdown = require('Module:Countdown')
-local DateExt = require('Module:Date/Ext')
-local HiddenSort = require('Module:HiddenSort')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Countdown = Lua.import('Module:Countdown')
+local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info')
+local HiddenSort = Lua.import('Module:HiddenSort')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local UTC = ' <abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
+
 local WINNER_LEFT = 1
 local WINNER_RIGHT = 2
-local SCORE_STATUS = 'S'
 local DO_FLIP = true
 local NO_FLIP = false
 local LEFT_SIDE_OPPONENT = 'Left'
@@ -69,7 +72,7 @@ function MatchesTable:init(args)
 		showRound = not Logic.readBool(args.hideround),
 		sortRound = Logic.readBool(args.sortround),
 		showCountdown = Logic.readBool(args.countdown),
-		showMatchPage = Logic.readBool(args.matchpage),
+		showMatchPage = Info.config.match2.matchPage,
 		onlyShowExactDates = Logic.readBool(args.dateexact),
 		shortenRoundNames = Logic.readBool(args.shortedroundnames),
 		pages = Array.map(Array.extractValues(
@@ -167,14 +170,14 @@ function MatchesTable:header()
 		:node(self.config.showMatchPage and mw.html.create('th'):addClass('divCell') or nil)
 end
 
----@param match table
+---@param match MatchGroupUtilMatch
 ---@return Html
 function MatchesTable:dateDisplay(match)
 	local dateCell = mw.html.create('td')
 		:addClass('Date')
 		:node(HiddenSort.run(match.date))
 
-	if Logic.readBool(match.dateexact) then
+	if Logic.readBool(match.dateIsExact) then
 		local countdownArgs = {}
 		if self.config.showCountdown and not Logic.readBool(match.finished) then
 			countdownArgs = match.stream or {}
@@ -182,7 +185,7 @@ function MatchesTable:dateDisplay(match)
 		else
 			countdownArgs.rawdatetime = true
 		end
-		countdownArgs.date = match.date .. UTC
+		countdownArgs.timestamp = match.timestamp
 		return dateCell:wikitext(Countdown._create(countdownArgs))
 	elseif self.config.onlyShowExactDates then
 		return dateCell
@@ -194,10 +197,12 @@ function MatchesTable:dateDisplay(match)
 	return dateCell:wikitext(mw.getContentLanguage():formatDate('F j, Y', match.date))
 end
 
----@param match table
+---@param record match2
 ---@return Html
-function MatchesTable:row(match)
-	local matchHeader = self:determineMatchHeader(match)
+function MatchesTable:row(record)
+	local matchHeader = self:determineMatchHeader(record)
+
+	local match = MatchGroupUtil.matchFromRecord(record)
 
 	local row = mw.html.create('tr')
 		:addClass('Match')
@@ -208,13 +213,13 @@ function MatchesTable:row(match)
 	end
 
 	return row
-		:node(MatchesTable._buildOpponent(match.match2opponents[1], DO_FLIP, LEFT_SIDE_OPPONENT))
+		:node(MatchesTable._buildOpponent(match.opponents[1], DO_FLIP, LEFT_SIDE_OPPONENT))
 		:node(MatchesTable.score(match))
-		:node(MatchesTable._buildOpponent(match.match2opponents[2], NO_FLIP, RIGHT_SIDE_OPPONENT))
+		:node(MatchesTable._buildOpponent(match.opponents[2], NO_FLIP, RIGHT_SIDE_OPPONENT))
 		:node(self.config.showMatchPage and MatchesTable.matchPageLinkDisplay(match) or nil)
 end
 
----@param match table
+---@param match match2
 ---@return string
 function MatchesTable:determineMatchHeader(match)
 	local matchHeader = Logic.emptyOr(
@@ -259,14 +264,12 @@ function MatchesTable._applyCustomAbbreviations(matchHeader)
 	return matchHeader
 end
 
----@param opponent table
+---@param opponent standardOpponent
 ---@param flip boolean
 ---@param side string
 ---@return Html
 function MatchesTable._buildOpponent(opponent, flip, side)
 	local opponentCell = mw.html.create('td'):addClass('Team' .. side)
-
-	opponent = Opponent.fromMatch2Record(opponent) --[[@as standardOpponent]]
 
 	if Opponent.isTbd(opponent) or Opponent.isEmpty(opponent) then
 		opponent = Opponent.tbd(Opponent.literal)
@@ -280,15 +283,15 @@ function MatchesTable._buildOpponent(opponent, flip, side)
 	})
 end
 
----@param match table
+---@param match MatchGroupUtilMatch
 ---@return Html
 function MatchesTable.score(match)
 	local scoreCell = mw.html.create('td')
 		:addClass('Score')
 
-	local scoreDisplay = (Logic.readBool(match.finished) or (
-		Logic.readBool(match.dateexact) and
-		os.time() >= MatchesTable._parseDateTime(match.date)
+	local scoreDisplay = (match.finished or (
+		match.dateIsExact and
+		DateExt.getCurrentTimestamp() >= match.timestamp
 	)) and MatchesTable.scoreDisplay(match) or 'vs'
 
 	if (tonumber(match.bestof) or 0) <= 0 then
@@ -306,47 +309,34 @@ function MatchesTable.score(match)
 			:done()
 end
 
----@param match table
+---@param match MatchGroupUtilMatch
 ---@return string
 function MatchesTable.scoreDisplay(match)
 	return MatchesTable.getOpponentScore(
-		match.match2opponents[1],
+		match.opponents[1],
 		match.winner == WINNER_LEFT
 	) .. ':' .. MatchesTable.getOpponentScore(
-		match.match2opponents[2],
+		match.opponents[2],
 		match.winner == WINNER_RIGHT
 	)
 end
 
----@param match table
+---@param match MatchGroupUtilMatch
 ---@return Html
 function MatchesTable.matchPageLinkDisplay(match)
 	return mw.html.create('td'):addClass('MatchPage')
-		:wikitext('[[Match:ID_' .. match.match2id .. '|')
-		:tag('span')
-			:addClass('fa-stack')
-			:tag('i')
-				:addClass('fad fa-file fa-stack-2x')
-				:done()
-			:tag('i')
-				:addClass('fas fa-info fa-stack-1x')
-				:done()
-			:done()
-		:wikitext('Match Page')
-		:wikitext(']]')
+		:node(MatchPageButton{
+			matchId = match.matchId,
+			hasMatchPage = Logic.isNotEmpty(match.bracketData.matchPage),
+			short = false,
+		})
 end
 
----@param opponent match2opponent
+---@param opponent standardOpponent
 ---@param isWinner boolean
----@return string|number?
+---@return string
 function MatchesTable.getOpponentScore(opponent, isWinner)
-	local score
-	if opponent.status == SCORE_STATUS then
-		score = tonumber(opponent.score)
-		score = score == -1 and 0 or score
-	else
-		score = opponent.status or ''
-	end
+	local score = OpponentDisplay.InlineScore(opponent)
 	if isWinner then
 		return '<b>' .. score .. '</b>'
 	end
@@ -354,31 +344,13 @@ function MatchesTable.getOpponentScore(opponent, isWinner)
 	return score
 end
 
----@param str string
----@return integer
-function MatchesTable._parseDateTime(str)
-	local year, month, day, hour, minutes, seconds
-		= str:match('(%d%d%d%d)-?(%d?%d?)-?(%d?%d?) (%d?%d?):(%d?%d?):(%d?%d?)$')
-
-	-- Adjust time based on server timezone offset from UTC
-	local offset = os.time(os.date("*t") --[[@as osdateparam]]) - os.time(os.date("!*t") --[[@as osdateparam]])
-	-- create time - this will take our UTC timestamp and put it into localtime without converting
-	local localTime = os.time{
-		year = year,
-		month = month,
-		day = day,
-		hour = hour,
-		min = minutes,
-		sec = seconds
-	}
-
-	return localTime + offset -- "Convert" back to UTC
-end
-
 ---@param value string|number
----@return string
+---@return Widget
 function MatchesTable._bestof(value)
-	return Abbreviation.make{text = 'Bo' .. value, title = 'Best of ' .. value} --[[@as string]]
+	return HtmlWidgets.Abbr{
+		title = 'Best of ' .. value,
+		children = 'Bo' .. value
+	}
 end
 
 return MatchesTable

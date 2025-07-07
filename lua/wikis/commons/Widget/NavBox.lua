@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
@@ -26,8 +27,17 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local NavBoxChild = Lua.import('Module:Widget/NavBox/Child')
 
+---- technically from wiki input they will be all string representations
+---@class NavBoxProps: NavBoxChildProps
+---@field isChild boolean? # from wiki input string?
+---@field child1 string|NavBoxChildProps
+---@field title string
+---@field hideonmobile boolean? # from wiki input string?
+---@field template string?
+
 ---@class NavBox: Widget
 ---@operator call(table): NavBox
+---@field props NavBoxProps
 local NavBox = Class.new(Widget)
 
 ---@return Widget
@@ -106,7 +116,8 @@ function NavBox:_determineCollapsedState(collapsedInput)
 		return true
 	end
 
-	return NavBox._getNumberOfChildren(self.props) > 4
+	return (Namespace.isMain() or Namespace.isUser())
+		and NavBox._getNumberOfChildren(self.props) > 4
 end
 
 ---@private
