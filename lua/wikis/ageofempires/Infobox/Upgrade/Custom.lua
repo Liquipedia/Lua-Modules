@@ -39,6 +39,7 @@ local CustomInjector = Class.new(Injector)
 ---@return Html
 function CustomUpgrade.run(frame)
 	local upgrade = CustomUpgrade(frame)
+	upgrade.args.informationType = 'Tech'
 	upgrade:setWidgetInjector(CustomInjector(upgrade))
 	return upgrade:createInfobox()
 end
@@ -56,11 +57,11 @@ function CustomInjector:parse(id, widgets)
 			local icon = Template.safeExpand(mw.getCurrentFrame(), 'ExpnIcon', {introduced})
 			return {
 				icon,
-				HtmlWidgets.B{children = {Link{link = introduced}}},
+				HtmlWidgets.I{children = {Link{link = introduced}}},
 			}
 		end
 		return {
-			Cell{name = 'First introduced', children = {introducedDisplay(args.introduced)}, options = {separator = ' '}},
+			Cell{name = 'First introduced', children = introducedDisplay(args.introduced), options = {separator = ' '}},
 		}
 	elseif id == 'research' then
 		local civilizations = args.civilizations or args.civs
@@ -75,7 +76,7 @@ function CustomInjector:parse(id, widgets)
 				Link{link = age .. ' Age'},
 			}
 		end
-		return Array.append(
+		return Array.extend(
 			{
 				Cell{name = 'Civilizations', children = {civilizations}},
 				Cell{name = ageTitle, children = ageDisplay(args.age), options = {separator = ' '}},
@@ -96,15 +97,15 @@ function CustomInjector:parse(id, widgets)
 		local makeDescription = function(text, subTitle)
 			if not text then return end
 			return {
-				Title{children = {HtmlWidgets.Fragment{
+				Title{children = {
 					'Effect',
-					HtmlWidgets.Br{},
+					' ',
 					HtmlWidgets.Small{children = {
 						'(',
 						subTitle,
 						')'
 					}}
-				}}},
+				}},
 				Center{children = {text}}
 			}
 		end
