@@ -44,6 +44,8 @@ local Organizers = Widgets.Organizers
 local Accommodation = Widgets.Accommodation
 local Venue = Widgets.Venue
 local Location = Widgets.Location
+local SeriesIcon = Widgets.SeriesIcon
+local SeriesDisplay = Widgets.SeriesDisplay
 
 ---@class InfoboxLeague: BasicInfobox
 local League = Class.new(BasicInfobox)
@@ -74,14 +76,15 @@ function League:createInfobox()
 		Cell{
 			name = 'Series',
 			content = {
-				self:createSeriesDisplay({
+				SeriesDisplay{
 					displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
 					series = args.series,
 					abbreviation = args.abbreviation,
 					icon = args.icon,
 					iconDark = args.icondark or args.icondarkmode,
-				}, self.iconDisplay),
-				self:createSeriesDisplay{
+					iconDisplay = self.iconDisplay
+				},
+				SeriesDisplay{
 					series = args.series2,
 					abbreviation = args.abbreviation2,
 				},
@@ -536,42 +539,21 @@ function League:_getNamedTableofAllArgsForBase(args, base)
 	return namedArgs
 end
 
----@param seriesArgs {displayManualIcons:boolean, series:string?, abbreviation:string?, icon:string?, iconDark:string?}
----@param iconDisplay string?
----@return string?
-function League:createSeriesDisplay(seriesArgs, iconDisplay)
-	if String.isEmpty(seriesArgs.series) then
-		return nil
-	end
-
-	iconDisplay = iconDisplay or self:_createSeriesIcon(seriesArgs)
-
-	if String.isNotEmpty(iconDisplay) then
-		iconDisplay = iconDisplay .. ' '
-	end
-
-	local abbreviation = Logic.emptyOr(seriesArgs.abbreviation, seriesArgs.series)
-	local pageDisplay = Page.makeInternalLink({onlyIfExists = true}, abbreviation, seriesArgs.series)
-		or abbreviation
-
-	return iconDisplay .. pageDisplay
-end
-
 ---@param iconArgs {displayManualIcons:boolean, series:string?, abbreviation:string?, icon:string?, iconDark:string?}
 ---@return string?
 ---@return string?
 ---@return string?
 function League:getIcons(iconArgs)
-	local display = self:_createSeriesIcon(iconArgs)
+	local display = tostring(SeriesIcon(iconArgs))
 
-	if not display then
+	if Logic.isEmpty(display) then
 		return iconArgs.icon, iconArgs.iconDark, nil
 	end
 
 	local icon, iconDark, trackingCategory = LeagueIcon.getIconFromTemplate{
 		icon = iconArgs.icon,
 		iconDark = iconArgs.iconDark,
-		stringOfExpandedTemplate = display
+		stringOfExpandedTemplate = display,
 	}
 
 	if String.isNotEmpty(trackingCategory) then
@@ -579,27 +561,6 @@ function League:getIcons(iconArgs)
 	end
 
 	return icon, iconDark, display
-end
-
----@param iconArgs {displayManualIcons:boolean, series:string?, abbreviation:string?, icon:string?, iconDark:string?}
----@return string?
-function League:_createSeriesIcon(iconArgs)
-	if String.isEmpty(iconArgs.series) then
-		return ''
-	end
-	local series = iconArgs.series
-	---@cast series -nil
-
-	local output = LeagueIcon.display{
-		icon = iconArgs.displayManualIcons and iconArgs.icon or nil,
-		iconDark = iconArgs.displayManualIcons and iconArgs.iconDark or nil,
-		series = series,
-		abbreviation = iconArgs.abbreviation,
-		date = self.data.endDate,
-		options = {noLink = not Page.exists(series)}
-	}
-
-	return output == LeagueIcon.display{} and '' or output
 end
 
 --- used in brawlstars, chess, counterstrike customs
