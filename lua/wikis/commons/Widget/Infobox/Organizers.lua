@@ -14,9 +14,8 @@ local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
 
+local Cell = Lua.import('Module:Widget/Infobox/Cell')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local Widgets = Lua.import('Module:Widget/All')
-local Cell = Widgets.Cell
 
 ---@class InfoboxOrganizersWidget: Widget
 ---@operator call(table):InfoboxOrganizersWidget

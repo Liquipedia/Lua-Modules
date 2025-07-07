@@ -16,11 +16,10 @@ local String = Lua.import('Module:StringUtils')
 
 local Widget = Lua.import('Module:Widget')
 
-local Widgets = Lua.import('Module:Widget/All')
-local Center = Widgets.Center
-local Title = Widgets.Title
 local Button = Lua.import('Module:Widget/Basic/Button')
+local Center = Lua.import('Module:Widget/Infobox/Center')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Title = Lua.import('Module:Widget/Infobox/Title')
 
 local STAY22_LINK = 'https://www.stay22.com/allez/roam?aid=liquipedia&campaign=${wiki}_${page}'..
 	'&address=${address}&checkin=${checkin}&checkout=${checkout}'
