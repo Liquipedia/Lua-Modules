@@ -9,7 +9,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
@@ -17,7 +16,6 @@ local Unit = Lua.import('Module:Infobox/Unit')
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Chronology = Widgets.Chronology
-local Title = Widgets.Title
 
 ---@class Formula1CarInfobox: UnitInfobox
 local CustomUnit = Class.new(Unit)
