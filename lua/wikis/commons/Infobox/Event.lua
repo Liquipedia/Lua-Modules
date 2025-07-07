@@ -293,7 +293,6 @@ end
 ---@param iconDisplay string?
 ---@return string?
 function Event:createSeriesDisplay(seriesArgs, iconDisplay)
-	-- todo: check if extract is usefull
 	if String.isEmpty(seriesArgs.series) then
 		return nil
 	end
