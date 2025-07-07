@@ -155,13 +155,6 @@ end
 function Expansion:setLpdbData(args)
 end
 
---- Allows for overriding this functionality
----@param args table
----@return boolean
-function Expansion:hasChronology(args)
-	return Logic.isNotEmpty(args.previous) or Logic.isNotEmpty(args.next)
-end
-
 ---@return string
 function Expansion:chronologyTitle()
 	return 'Chronology'
