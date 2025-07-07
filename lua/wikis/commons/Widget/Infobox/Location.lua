@@ -16,7 +16,6 @@ local Widget = Lua.import('Module:Widget')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class InfoboxLocationWidget: Widget
