@@ -116,7 +116,7 @@ end
 ---@param args table
 ---@return boolean
 function Upgrade:hasChronology(args)
-	return Logic.isNotEmpty(args.previous) and Logic.isNotEmpty(args.next)
+	return Logic.isNotEmpty(args.previous) or Logic.isNotEmpty(args.next)
 end
 
 ---@return string
