@@ -47,7 +47,7 @@ function Location:_getLocations()
 	local props = self.props
 	local args = props.args
 	if Logic.isEmpty(args.country) and props.showTbdOnEmpty then
-		return HtmlWidgets.Abbr{title = 'To be determined (or to be decided)', children = 'TBD'}
+		return {HtmlWidgets.Abbr{title = 'To be determined (or to be decided)', children = {'TBD'}}}
 	end
 
 	local locations = {}
