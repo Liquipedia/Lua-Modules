@@ -33,7 +33,7 @@ local CONTENT = {
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			limits = 10,
+			limit = 5,
 			transferPage = 'Player Transfers/' .. os.date('%Y')
 		},
 		boxid = 1509,
