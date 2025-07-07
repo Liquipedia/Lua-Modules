@@ -106,7 +106,7 @@ function NavBox:_determineCollapsedState(collapsedInput)
 		return true
 	end
 
-	return NavBox._getNumberOfChildren(self.props) > 3
+	return NavBox._getNumberOfChildren(self.props) > 4
 end
 
 ---@private
@@ -118,7 +118,7 @@ function NavBox._getNumberOfChildren(props)
 		numberOfChildren = numberOfChildren + 1
 	end
 	-- if there are > 4 items in the list it will likely wrap as 2 lines on mobile, hence consider it as 2 lines
-	if props[4] then
+	if props[6] then
 		numberOfChildren = numberOfChildren + 1
 	end
 
