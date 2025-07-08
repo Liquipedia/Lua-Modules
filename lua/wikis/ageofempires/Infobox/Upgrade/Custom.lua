@@ -18,6 +18,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
+local AgeIcon = require('Module:Widget/Infobox/AoeAgeIcon')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
@@ -70,9 +71,8 @@ function CustomInjector:parse(id, widgets)
 		local ageTitle = AGE_TITLE[(args.name or ''):lower():gsub(' ', '')] or AGE_TITLE.default
 		local ageDisplay = function(age)
 			if not age then return end
-			local icon = Template.safeExpand(mw.getCurrentFrame(), 'AgeIcon', {age})
 			return {
-				icon,
+				AgeIcon{age = age},
 				Link{link = age .. ' Age'},
 			}
 		end
