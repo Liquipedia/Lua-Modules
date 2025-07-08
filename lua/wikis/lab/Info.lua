@@ -11,7 +11,7 @@ return {
 	name = 'Lab',
 	defaultGame = 'lab',
 	games = {
-		rematch = {
+		lab = {
 			abbreviation = 'Lab',
 			name = 'Lab',
 			link = 'Lab',
