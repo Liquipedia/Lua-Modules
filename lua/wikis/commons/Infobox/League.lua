@@ -206,7 +206,7 @@ function League:createInfobox()
 		Center{children = {args.footnotes}},
 		Customizable{id = 'chronology', children = {
 			Chronology{
-				inks = Table.filterByKey(args, function(key)
+				links = Table.filterByKey(args, function(key)
 					return type(key) == 'string' and (key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
 				end)
 			}
