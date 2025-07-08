@@ -20,6 +20,8 @@ local Cell = Widgets.Cell
 ---@class RematchInfoboxPlayer: Person
 ---@field basePageName string
 local CustomPlayer = Class.new(Player)
+---@class RematchInfoboxPlayerWidgetInjector: WidgetInjector
+---@field caller RematchInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
