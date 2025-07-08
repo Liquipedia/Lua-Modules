@@ -85,29 +85,14 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 
 	if String.isNotEmpty(args.positions) then
 		local positions = Array.parseCommaSeparatedString(args.positions, ',')
-		local validPositions = Array.filter(positions, function(pos)
-			return String.isNotEmpty(pos)
-		end)
+		local validPositions = Array.map(positions, String.nilIfEmpty)
 		Array.forEach(validPositions, function(pos)
 			local category = String.upperCaseFirst(pos) .. 's'
 			table.insert(categories, category)
-			Array.forEach(self:getLocations(), function(country)
-				local demonym = Flags.getLocalisation(country)
-				if demonym then
-					table.insert(categories, demonym .. ' ' .. category)
-				end
-			end)
 		end)
 	end
 
 	return categories
-end
-
----@return string[]
-function CustomPlayer:getLocations()
-	return Array.map(self:getAllArgsForBase(self.args, 'country'), function(country)
-		return Flags.CountryName{flag = country}
-	end)
 end
 
 return CustomPlayer
