@@ -18,7 +18,6 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class RematchInfoboxPlayer: Person
----@field basePageName string
 local CustomPlayer = Class.new(Player)
 ---@class RematchInfoboxPlayerWidgetInjector: WidgetInjector
 ---@field caller RematchInfoboxPlayer
