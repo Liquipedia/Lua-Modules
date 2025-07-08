@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Template = Lua.import('Module:Template')
 
 local Upgrade = Lua.import('Module:Infobox/Upgrade')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -18,7 +17,8 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
-local AgeIcon = require('Module:Widget/Infobox/AoeAgeIcon')
+local AgeIcon = require('Module:Widget/Infobox/AgeIcon')
+local ExpansionIcon = require('Module:Widget/Infobox/ExpansionIcon')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
@@ -55,9 +55,8 @@ function CustomInjector:parse(id, widgets)
 		---@return (string|Widget)[]?
 		local introducedDisplay = function(introduced)
 			if not introduced then return end
-			local icon = Template.safeExpand(mw.getCurrentFrame(), 'ExpnIcon', {introduced})
 			return {
-				icon,
+				ExpansionIcon{expansion = introduced},
 				HtmlWidgets.I{children = {Link{link = introduced}}},
 			}
 		end
