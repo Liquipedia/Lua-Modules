@@ -18,7 +18,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
-local HtmlWidgets = require('Module:Widget/Html/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 local AGE_TITLE = {
