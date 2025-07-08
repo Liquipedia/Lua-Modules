@@ -44,12 +44,12 @@ function CustomInjector:parse(id, widgets)
 			local positions = Array.parseCommaSeparatedString(args.positions, ',')
 			local validPositions = Array.map(positions, String.nilIfEmpty)
 			if #validPositions > 0 then
-				local display = table.concat(Array.map(validPositions, function(pos)
+				local positionsDisplay = Array.map(validPositions, function(pos)
 					local capitalizedPos = String.upperCaseFirst(pos)
 					return '[[:Category:' .. capitalizedPos .. 's|' .. capitalizedPos .. ']]'
-				end), '<br>')
+				end)
 				local label = #validPositions > 1 and 'Positions' or 'Position'
-				table.insert(cells, Cell{name = label, content = {display}})
+				table.insert(cells, Cell{name = label, content = positionsDisplay})
 			end
 		end
 		return cells
