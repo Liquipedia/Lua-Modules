@@ -22,6 +22,7 @@ local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
+local Tier = Lua.import('Module:Tier/Utils')
 local Variables = Lua.import('Module:Variables')
 
 local Condition = Lua.import('Module:Condition')
@@ -122,18 +123,14 @@ function TournamentsSummaryTable._parseArgsToSettings(args)
 
 	TournamentsSummaryTable.completedOffset = tonumber(args.completedOffset) or TournamentsSummaryTable.completedOffset
 
-	local parseTier = function(tier)
-		return tonumber(tier) or tier
-	end
-
 	TournamentsSummaryTable.tiers = args.tiers
-		and Array.map(Array.parseCommaSeparatedString(args.tiers), parseTier)
+		and Array.map(Array.parseCommaSeparatedString(args.tiers), Tier.toIdentifier)
 		or TournamentsSummaryTable.tiers
 
 	TournamentsSummaryTable.disableLIS = Logic.readBool(args.disableLIS) or TournamentsSummaryTable.disableLIS
 
 	TournamentsSummaryTable.tierTypeExcluded = args.tierTypeExcluded
-		and Array.map(Array.parseCommaSeparatedString(args.tierTypeExcluded), parseTier)
+		and Array.map(Array.parseCommaSeparatedString(args.tierTypeExcluded), Tier.toIdentifier)
 		or TournamentsSummaryTable.tierTypeExcluded
 end
 
