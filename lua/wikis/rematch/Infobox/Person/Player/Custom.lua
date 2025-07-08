@@ -42,9 +42,7 @@ function CustomInjector:parse(id, widgets)
 		local cells = {}
 		if String.isNotEmpty(args.positions) then
 			local positions = Array.parseCommaSeparatedString(args.positions, ',')
-			local validPositions = Array.filter(positions, function(pos)
-				return String.isNotEmpty(pos)
-			end)
+			local validPositions = Array.map(positions, String.nilIfEmpty)
 			if #validPositions > 0 then
 				local display = table.concat(Array.map(validPositions, function(pos)
 					local capitalizedPos = String.upperCaseFirst(pos)
