@@ -29,7 +29,6 @@ local CustomInjector = Class.new(Injector)
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
-	player.basePageName = mw.title.getCurrentTitle().baseText
 	return player:createInfobox()
 end
 
