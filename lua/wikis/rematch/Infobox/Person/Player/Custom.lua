@@ -39,20 +39,15 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'status' then
-		local cells = {}
-		if String.isNotEmpty(args.positions) then
-			local positions = Array.parseCommaSeparatedString(args.positions, ',')
-			local validPositions = Array.map(positions, String.nilIfEmpty)
-			if #validPositions > 0 then
-				local positionsDisplay = Array.map(validPositions, function(pos)
-					local capitalizedPos = String.upperCaseFirst(pos)
-					return '[[:Category:' .. capitalizedPos .. 's|' .. capitalizedPos .. ']]'
-				end)
-				local label = #validPositions > 1 and 'Positions' or 'Position'
-				table.insert(cells, Cell{name = label, content = positionsDisplay})
-			end
-		end
-		return cells
+		local positions = Array.parseCommaSeparatedString(args.positions, ',')
+		local validPositions = Array.map(positions, String.nilIfEmpty)
+		local label = #validPositions > 1 and 'Positions' or 'Position'
+		return {
+			Cell{name = label, content = Array.map(validPositions, function(pos)
+				local capitalizedPos = String.upperCaseFirst(pos)
+				return '[[:Category:' .. capitalizedPos .. 's|' .. capitalizedPos .. ']]'
+			end)}
+		}
 	end
 	return widgets
 end
