@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Infobox/AoeAgeIcon
+-- page=Module:Widget/Infobox/AgeIcon
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = require('Module:Widget/Html/All')
@@ -15,23 +16,23 @@ local Image = require('Module:Widget/Image/Icon/Image')
 
 ---@class AoeAgeIconWidget: Widget
 ---@operator call(table): AoeAgeIconWidget
----@field links table<string, string|number|nil>
+---@field props {age: string?, checkGame: boolean, game: string?}
 local AoeAgeIcon = Class.new(Widget)
 AoeAgeIcon.defaultProps = {
-	title = 'AoeAgeIcon',
-	showTitle = true,
+	checkGame = false,
 }
 
 ---@return Widget
 function AoeAgeIcon:render()
-	if self.props.checkGame and self.props.game ~= 'Age of Empires II' then
+	local age = self.props.age
+	if self.props.checkGame and self.props.game ~= 'Age of Empires II' or Logic.isEmpty(age) then
 		return HtmlWidgets.Fragment{}
 	end
 
 	return Image{
-		imageLight = self.props.age .. ' Age AoE2 logo.png',
+		imageLight = age .. ' Age AoE2 logo.png',
 		size = '18',
-		link = self.props.age .. ' Age'
+		link = age .. ' Age'
 	}
 end
 
