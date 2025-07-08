@@ -29,7 +29,7 @@ Chronology.defaultProps = {
 	showTitle = true,
 }
 
----@return string?
+---@return Widget?
 function Chronology:render()
 	if Table.isEmpty(self.props.links) then
 		return
