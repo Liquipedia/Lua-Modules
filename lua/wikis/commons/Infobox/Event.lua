@@ -88,18 +88,18 @@ function Event:createInfobox()
 		},
 		Customizable{
 			id = 'gamesettings',
-			children = {
-				Builder{
-					builder = function()
-						local gameLink = Game.link{game = self.data.game, useDefault = false}
-						if not gameLink then return end
-						return Cell{name = 'Game', content = {Link{
+			children = {Builder{
+				builder = function()
+					local games = Array.map(self.data.games, function(game)
+						local gameLink = Game.link{game = game, useDefault = false}
+						return Link{
 							link = gameLink,
-							children = {Game.name{game = self.data.game, useDefault = false}}
-						}}}
-					end
-				},
-			}
+							children = {Game.name{game = game, useDefault = false}}
+						}
+					end)
+					return Cell{name = 'Game' .. (#games > 1 and 's' or ''), content = games}
+				end
+			}}
 		},
 		Location{
 			args = args,
@@ -182,7 +182,9 @@ function Event:_parseArgs()
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
 		--might be set before infobox
 		status = args.status or Variables.varDefault('tournament_status'),
-		game = Game.toIdentifier{game = args.game, useDefault = false},
+		games = Array.map(self:getAllArgsForBase(args, 'game'),function(game)
+			return Game.toIdentifier{game = args.game, useDefault = false}
+		end),
 		startDate = self:_cleanDate(args.sdate) or self:_cleanDate(args.date),
 		endDate = self:_cleanDate(args.edate) or self:_cleanDate(args.date),
 	}
@@ -254,7 +256,7 @@ function Event:_setLpdbData(args, links)
 			previous2 = self:_getPageNameFromChronology(args.previous2),
 			next = self:_getPageNameFromChronology(args.next),
 			next2 = self:_getPageNameFromChronology(args.next2),
-			game = self.data.game,
+			games = self.data.games,
 			organizers = Table.mapValues(
 				Event:_getNamedTableofAllArgsForBase(args, 'organizer'),
 				mw.ext.TeamLiquidIntegration.resolve_redirect
