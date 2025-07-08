@@ -5,25 +5,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Flags = require('Module:Flags')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Flags = Lua.import('Module:Flags')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
-
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
-local function capitalize(str)
-	if not str or str == '' then return str end
-	return str:sub(1, 1):upper() .. str:sub(2):lower()
-end
-
----@class CustomInfoboxPlayer: Person
+---@class RematchInfoboxPlayer: Person
 ---@field basePageName string
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
@@ -47,16 +41,13 @@ function CustomInjector:parse(id, widgets)
 	if id == 'status' then
 		local cells = {}
 		if String.isNotEmpty(args.positions) then
-			local positions = Array.map(
-				String.split(args.positions, ','),
-				function(pos) return String.trim(pos) end
-			)
+			local positions = Array.parseCommaSeparatedString(args.positions, ',')
 			local validPositions = Array.filter(positions, function(pos)
 				return String.isNotEmpty(pos)
 			end)
 			if #validPositions > 0 then
 				local display = table.concat(Array.map(validPositions, function(pos)
-					local capitalizedPos = capitalize(pos)
+					local capitalizedPos = String.upperCaseFirst(pos)
 					return '[[:Category:' .. capitalizedPos .. 's|' .. capitalizedPos .. ']]'
 				end), '<br>')
 				local label = #validPositions > 1 and 'Positions' or 'Position'
@@ -77,10 +68,7 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 	if not Namespace.isMain() then return {} end
 
 	local categories = {}
-	local roles = String.isNotEmpty(args.roles) and Array.map(
-		String.split(args.roles, ','),
-		function(role) return String.trim(role) end
-	) or {}
+	local roles = String.isNotEmpty(args.roles) and Array.parseCommaSeparatedString(args.roles, ',') or {}
 
 	Array.forEach(roles, function(role)
 		local roleCategory = role .. 's'
@@ -98,15 +86,12 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 	end)
 
 	if String.isNotEmpty(args.positions) then
-		local positions = Array.map(
-			String.split(args.positions, ','),
-			function(pos) return String.trim(pos) end
-		)
+		local positions = Array.parseCommaSeparatedString(args.positions, ',')
 		local validPositions = Array.filter(positions, function(pos)
 			return String.isNotEmpty(pos)
 		end)
 		Array.forEach(validPositions, function(pos)
-			local category = capitalize(pos) .. 's'
+			local category = String.upperCaseFirst(pos) .. 's'
 			table.insert(categories, category)
 			Array.forEach(self:getLocations(), function(country)
 				local demonym = Flags.getLocalisation(country)
