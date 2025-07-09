@@ -31,8 +31,6 @@ local NavigationCard = Class.new(Widget)
 function NavigationCard:render()
 	local count = self.props.count
 
-	-- Determine which type of content to show
-	local hasIcon = self.props.iconClasses ~= nil and self.props.iconClasses ~= ''
 	local contentDiv
 
 	if Logic.isNotEmpty(self.props.iconClasses) then
