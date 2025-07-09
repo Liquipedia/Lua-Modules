@@ -17,6 +17,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class NavigationCardParameters
 ---@field file string?
+---@field iconClasses string?
 ---@field link string?
 ---@field title string?
 ---@field count integer?
@@ -33,8 +34,12 @@ function NavigationCard:render()
 		classes = {'navigation-card'},
 		children = WidgetUtil.collect(
 			HtmlWidgets.Div{
-				classes = {'navigation-card__image'},
-				children = Image.display(self.props.file, nil, {size = 240, link = ''}),
+				classes = {self.props.iconClasses and 'navigation-card__icon' or 'navigation-card__image'},
+				children = self.props.iconClasses and
+					HtmlWidgets.I{
+						classes = self:processIconClasses(self.props.iconClasses),
+					} or
+					Image.display(self.props.file, nil, {size = 240, link = ''}),
 			},
 			HtmlWidgets.Span{
 				classes = {'navigation-card__title'},
@@ -46,6 +51,16 @@ function NavigationCard:render()
 			} or nil
 		)
 	}
+end
+
+---@param classesString string
+---@return string[]
+function NavigationCard:processIconClasses(classesString)
+	local classes = {}
+	for class in string.gmatch(classesString, "%S+") do
+		table.insert(classes, class)
+	end
+	return classes
 end
 
 return NavigationCard
