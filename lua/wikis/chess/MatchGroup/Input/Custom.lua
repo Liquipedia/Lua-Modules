@@ -93,6 +93,7 @@ function MapFunctions.extendMapOpponent(map, opponentIndex)
 	}
 end
 
+
 ---@param map table
 ---@return fun(opponentIndex: integer): integer?
 function MapFunctions.calculateMapScore(map)
@@ -101,7 +102,7 @@ function MapFunctions.calculateMapScore(map)
 		if not winner and not map.finished then
 			return
 		end
-		return winner == opponentIndex and 1 or 0
+		return winner == opponentIndex and 1 or winner == 0 and 0.5 or 0
 	end
 end
 
