@@ -127,7 +127,7 @@ function MainPageLayout._makeNavigationCard(navigationData)
 
 	return NavigationCard{
 		file = navigationData.file,
-		iconclasses = navigationData.iconClasses,
+		iconClasses = navigationData.iconClasses,
 		link = navigationData.link,
 		title = navigationData.title,
 		count = count
