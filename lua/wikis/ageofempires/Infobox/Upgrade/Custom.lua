@@ -17,8 +17,8 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
-local AgeIcon = require('Module:Widget/Infobox/AgeIcon')
-local ExpansionIcon = require('Module:Widget/Infobox/ExpansionIcon')
+local AgeIcon = Lua.import('Module:Widget/Infobox/AgeIcon')
+local ExpansionIcon = Lua.import('Module:Widget/Infobox/ExpansionIcon')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
