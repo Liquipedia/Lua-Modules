@@ -67,8 +67,6 @@ function CustomExpansion:getMaps()
 	local maps = Array.mapIndexes(function(mapIndex)
 		local prefix = 'map' .. mapIndex
 		local map = mapInput[prefix]
-		local mapMode = mapInput[prefix .. 'mode'] == 'cs' and {mode = 'Hostage', abbr = '(H)'}
-			or {mode = 'Defuse', abbr = '(D)'}
 		if not map then return end
 		return HtmlWidgets.Fragment{children = {
 			Link{link = map},
