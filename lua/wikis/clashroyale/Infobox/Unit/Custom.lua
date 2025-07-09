@@ -17,21 +17,9 @@ local Unit = Lua.import('Module:Infobox/Unit')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
-local Center = Widgets.Center
-local Title = Widgets.Title
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local TYPE_TO_COST_TYPE = {
-	consumable = 'gold',
-	weapon = 'gold',
-	armor = 'gold',
-	accessory = 'gold',
-	deed = 'gold',
-	item = 'gold',
-	default = 'mana',
-}
 
 ---@class ClashroyaleUnitInfobox: UnitInfobox
 local CustomUnit = Class.new(Unit)
