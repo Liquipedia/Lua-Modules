@@ -36,7 +36,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		INDENT .. '|date= |finished=',
 		streams and (INDENT .. '|twitch=|vod=') or nil,
 		Array.map(Array.range(1, bestof), function(mapIndex)
-			return INDENT .. '|map' .. mapIndex .. '={{Map|score1=|score2=|finished=}}'
+			return INDENT .. '|map' .. mapIndex .. '={{Map|score1=|score2= |otlength= |finished=}}'
 		end),
 		'}}'
 	)
