@@ -17,7 +17,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class NavigationCardParameters
 ---@field file string?
----@field iconClasses string?
+---@field iconClasses string[]?
 ---@field link string?
 ---@field title string?
 ---@field count integer?
