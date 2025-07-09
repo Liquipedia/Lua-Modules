@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 
 local Expansion = Lua.import('Module:Infobox/Expansion')
@@ -18,6 +19,8 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class CounterstrikeExpansionInfobox: ExpansionInfobox
 local CustomExpansion = Class.new(Expansion)
@@ -38,11 +41,11 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args  = self.caller.args
+	local caller  = self.caller
+	local args  = caller.args
 	if id == 'custom' then
 		-- hack around mw butchering the display (factually the next 2 lines are a non op)
-		local maps = Array.parseCommaSeparatedString(args.maps)
-		maps = Array.interleave(maps, ', ')
+		local maps = caller:getMaps()
 		return Array.append({},
 			Cell{name = 'Case', children = {args.case}},
 			Cell{name = 'Campaigns', children = {args.campaigns}},
@@ -57,6 +60,26 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	return widgets
+end
+
+---@return (Widget|string)[]
+function CustomExpansion:getMaps()
+	local mapInput = Json.parseIfTable(self.args.maps) or {}
+	local maps = Array.mapIndexes(function(mapIndex)
+		local prefix = 'map' .. mapIndex
+		local map = mapInput[prefix]
+		local mapMode = mapInput[prefix .. 'mode'] == 'cs' and {mode = 'Hostage', abbr = '(H)'}
+			or {mode = 'Defuse', abbr = '(D)'}
+		if not map then return end
+		return HtmlWidgets.Fragment{children = {
+			Link{link = map},
+			' ',
+			mapInput[prefix .. 'mode'] == 'cs' and HtmlWidgets.Abbr{title = 'Hostage', children = {'(H)'}}
+				or HtmlWidgets.Abbr{title = 'Defuse', children = {'(D)'}},
+		}}
+	end)
+
+	return Array.interleave(maps, ', ')
 end
 
 return CustomExpansion
