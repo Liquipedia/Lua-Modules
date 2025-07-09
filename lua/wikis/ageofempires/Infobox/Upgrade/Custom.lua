@@ -67,8 +67,6 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'research' then
 		local civilizations = args.civilizations or args.civs
 
-		-- args.name usage is correct (copied from template code!)
-		local ageTitle = AGE_TITLE[(args.name or ''):lower():gsub(' ', '')] or AGE_TITLE.default
 		local ageDisplay = function(age)
 			if not age then return end
 			return {
@@ -76,10 +74,11 @@ function CustomInjector:parse(id, widgets)
 				Link{link = age .. ' Age'},
 			}
 		end
+
 		return Array.extend(
 			{
 				Cell{name = 'Civilizations', children = {civilizations}},
-				Cell{name = ageTitle, children = ageDisplay(args.age), options = {separator = ' '}},
+				Cell{name = 'Available in', children = ageDisplay(args.age), options = {separator = ' '}},
 			},
 			widgets
 		)
