@@ -170,4 +170,11 @@ return {
 	-- Usage: Chess
 	chesskingoutline = 'far fa-chess-king',
 	chesskingfull = 'fas fa-chess-king',
+
+	--Usage: NavigationCards
+	nav_card_upload = 'far fa-upload',
+	nav_card_support_hub = 'far fa-hand-holding-heart',
+	nav_card_copyright = 'far fa-copyright',
+	nav_card_getting_started = 'far fa-seedling',
+	nav_card_file_standards_guide = 'far fa-file-check',
 }

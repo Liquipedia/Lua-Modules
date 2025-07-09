@@ -10,6 +10,8 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local Image = Lua.import('Module:Image')
 local Logic = Lua.import('Module:Logic')
+local IconData = Lua.import('Module:Icon/Data')
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -18,7 +20,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class NavigationCardParameters
 ---@field file string?
----@field iconClasses string[]?
+---@field iconName string[]?
 ---@field link string?
 ---@field title string?
 ---@field count integer?
@@ -34,12 +36,12 @@ function NavigationCard:render()
 
 	local contentDiv
 
-	if Logic.isNotEmpty(self.props.iconClasses) then
+	if Logic.isNotEmpty(IconData[self.props.iconName]) then
 		-- Icon rendering
 		contentDiv = HtmlWidgets.Div{
 			classes = {'navigation-card__icon'},
 			children = HtmlWidgets.I{
-				classes = self.props.iconClasses,
+				classes = IconData[self.props.iconName]
 			}
 		}
 	else
