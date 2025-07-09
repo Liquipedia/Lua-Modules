@@ -34,7 +34,6 @@ function NavigationCard:render()
 	-- Determine which type of content to show
 	local hasIcon = self.props.iconClasses ~= nil and self.props.iconClasses ~= ''
 	local contentDiv
-	mw.log('hasicon', hasIcon);
 
 	if hasIcon then
 		-- Icon rendering
