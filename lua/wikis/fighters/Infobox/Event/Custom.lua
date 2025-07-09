@@ -14,7 +14,7 @@ local Game = Lua.import('Module:Game')
 local Event = Lua.import('Module:Infobox/Event')
 local Injector = Lua.import('Module:Widget/Injector')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class FightersEventInfobox: InfoboxEvent
