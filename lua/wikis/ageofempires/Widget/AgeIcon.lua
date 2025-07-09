@@ -11,8 +11,8 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = require('Module:Widget/Html/All')
-local Image = require('Module:Widget/Image/Icon/Image')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Image = Lua.import('Module:Widget/Image/Icon/Image')
 
 ---@class AoeAgeIconWidget: Widget
 ---@operator call(table): AoeAgeIconWidget
