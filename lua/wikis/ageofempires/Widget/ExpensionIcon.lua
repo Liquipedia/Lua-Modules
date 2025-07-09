@@ -10,8 +10,8 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = require('Module:Widget/Html/All')
-local Image = require('Module:Widget/Image/Icon/Image')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Image = Lua.import('Module:Widget/Image/Icon/Image')
 
 local EXPANSIONS = {
 	kin = 'The Age of Kings',
