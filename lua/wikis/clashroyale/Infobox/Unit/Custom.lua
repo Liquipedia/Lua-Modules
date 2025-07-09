@@ -69,13 +69,13 @@ function CustomInjector:parse(id, widgets)
 		end
 		return {
 			Cell{name = 'Ability', children = {args.ability}},
-			Cell{name = 'Ability Elixir Cost', children = {args['ability elixir cost']}},
-			Cell{name = 'Game Mode', children = {args['game mode']}},
+			Cell{name = 'Ability Elixir Cost', children = {args.abilityelixircost}},
+			Cell{name = 'Game Mode', children = {args.gamemode}},
 			Cell{name = 'Rarity', children = {args.rarity}},
 			Cell{name = 'Cycles', children = {args.cycles}},
 			Cell{name = 'Arena', children = {args.arena}, options = {makeLink = true}},
-			Cell{name = 'Release Date', children = {args['release date']}},
-			Cell{name = 'Deletion Date', children = {args['deletion date']}},
+			Cell{name = 'Release Date', children = {args.releasedate}},
+			Cell{name = 'Deletion Date', children = {args.deletiondate}},
 			Cell{name = 'Set', children = {args.set}, options = {makeLink = true}},
 			Cell{name = 'Summoned by', children = {args.summonedby}, options = {makeLink = true}},
 			Cell{name = 'Introduced', children = {makePatch(args.startversion)}},
@@ -103,7 +103,7 @@ function CustomUnit:getWikiCategories(args)
 		args.type and (args.type .. postfix) or nil,
 		args.ability and (args.ability .. '-Cards') or nil,
 		args.elixir and (args.elixir .. '-Elixir' .. postfix) or nil,
-		args['game mode'] and (args['game mode'] .. postfix) or nil
+		args.gamemode and (args.gamemode .. postfix) or nil
 	)
 end
 
@@ -113,7 +113,7 @@ function CustomUnit:setLpdbData(args)
 		name = self.name,
 		type = 'card',
 		image = args.image,
-		date = args['release date'],
+		date = args.releasedate,
 		extradata = {
 			color = args.color,
 			cost = args.elixir,
