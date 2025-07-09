@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 local Effect = Lua.import('Module:Infobox/Effect')
 local Injector = Lua.import('Module:Widget/Injector')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Title = Widgets.Title
 local Cell = Widgets.Cell
 
