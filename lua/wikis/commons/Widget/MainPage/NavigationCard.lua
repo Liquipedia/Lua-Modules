@@ -30,25 +30,40 @@ local NavigationCard = Class.new(Widget)
 ---@return Widget
 function NavigationCard:render()
 	local count = self.props.count
+
+	-- Determine which type of content to show
+	local hasIcon = self.props.iconClasses ~= nil and self.props.iconClasses ~= ''
+	local contentDiv
+	mw.log('has icon: ' .. mw.dumpObject(processedClasses))
+
+	if hasIcon then
+		-- Icon rendering
+		contentDiv = HtmlWidgets.Div{
+			classes = {'navigation-card__icon'},
+			children = HtmlWidgets.I{
+				classes = self:processIconClasses(self.props.iconClasses),
+			}
+		}
+	else
+		-- Image rendering
+		contentDiv = HtmlWidgets.Div{
+			classes = {'navigation-card__image'},
+			children = Image.display(self.props.file, nil, {size = 240, link = ''})
+		}
+	end
+
 	return HtmlWidgets.Div{
 		classes = {'navigation-card'},
 		children = WidgetUtil.collect(
-			HtmlWidgets.Div{
-				classes = {self.props.iconClasses and 'navigation-card__icon' or 'navigation-card__image'},
-				children = self.props.iconClasses and
-					HtmlWidgets.I{
-						classes = self:processIconClasses(self.props.iconClasses),
-					} or
-					Image.display(self.props.file, nil, {size = 240, link = ''}),
-			},
-			HtmlWidgets.Span{
-				classes = {'navigation-card__title'},
-				children = Link{link = self.props.link, children = self.props.title}
-			},
-			count and HtmlWidgets.Span{
-				classes = {'navigation-card__subtitle'},
-				children = mw.getContentLanguage():formatNum(tonumber(count) --[[@as integer]]),
-			} or nil
+				contentDiv,
+				HtmlWidgets.Span{
+					classes = {'navigation-card__title'},
+					children = Link{link = self.props.link, children = self.props.title}
+				},
+				count and HtmlWidgets.Span{
+					classes = {'navigation-card__subtitle'},
+					children = mw.getContentLanguage():formatNum(tonumber(count) --[[@as integer]]),
+				} or nil
 		)
 	}
 end
