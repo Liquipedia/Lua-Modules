@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
@@ -62,10 +63,8 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	if id == 'custom' then
-		local isMonk = args.type == MONK
-		local typeLinkPostFix = isMonk and '' or ' units'
 		local types = Array.map(caller:getAllArgsForBase(args, 'type'), function(unitType)
-			return Link{link = typeLinkPostFix .. unitType, children = {unitType}}
+			return Link{link = (args.type == MONK and '' or ' units') .. unitType, children = {unitType}}
 		end)
 
 		local hasUpgradeSection = Logic.isNotEmpty(args['up food'])
@@ -77,8 +76,8 @@ function CustomInjector:parse(id, widgets)
 		return WidgetUtil.collect(
 			Title{children = {mw.text.listToText(types, ', ', ' and ')}},
 			Cell{name = 'Range', children = {args.range}},
-			Cell{name = 'Restore time', children = {isMonk and args.rest or nil}},
-			Cell{name = 'Conversion time', children = {isMonk and args.convtime or nil}},
+			Cell{name = 'Restore time', children = {args.rest}},
+			Cell{name = 'Conversion time', children = {args.convtime}},
 			Cell{name = 'Minimum range', children = {args['min range']}},
 			Cell{
 				name = HtmlWidgets.Abbr{
@@ -139,7 +138,7 @@ function CustomInjector:parse(id, widgets)
 				HtmlWidgets.I{children = {Link{link = args.introduced}}},
 			}, options = {separator = ' '}},
 			Cell{name = 'Civilizations', children = {args.civilizations or args.civs}},
-			Cell{name = 'Starting age', children = {
+			Cell{name = 'Available in', children = {
 				AgeIcon{age = args.age},
 				Link{link = args.age},
 				args.age2,
@@ -184,9 +183,10 @@ function CustomInjector:parse(id, widgets)
 				args['pierce armor'] and (args['pierce armor'] .. ' pierce') or nil
 			)},
 			Cell{
-				name = '[[Armor class]]es:<br><small>(besides [[Pierce armor (armor class)|Pierce armor]], '
+				name = '[[Armor class|Armor classes]]:<br><small>(besides [[Pierce armor (armor class)|Pierce armor]], '
 					.. '[[Melee armor (armor class)|Melee armor]], [[Anti-Leitis (armor class)|Anti-Leitis]])</small>',
 				children = {args['armor classes']},
+				options = {suppressColon = true},
 			},
 		}
 	end
@@ -197,7 +197,7 @@ end
 ---@param args table
 ---@return string[]
 function CustomUnit:getWikiCategories(args)
-	return {'Units (Age of Empires II)'}
+	return {'Units (' .. Game.name{game = args.game} .. ')' }
 end
 
 return CustomUnit
