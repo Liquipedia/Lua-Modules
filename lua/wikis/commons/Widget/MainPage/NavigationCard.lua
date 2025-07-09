@@ -38,7 +38,7 @@ function NavigationCard:render()
 		contentDiv = HtmlWidgets.Div{
 			classes = {'navigation-card__icon'},
 			children = HtmlWidgets.I{
-				classes = self:processIconClasses(self.props.iconClasses),
+				classes = self.props.iconClasses,
 			}
 		}
 	else
