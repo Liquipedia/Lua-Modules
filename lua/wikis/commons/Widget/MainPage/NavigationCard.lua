@@ -35,7 +35,7 @@ function NavigationCard:render()
 	local hasIcon = self.props.iconClasses ~= nil and self.props.iconClasses ~= ''
 	local contentDiv
 
-	if hasIcon then
+	if Logic.isNotEmpty(self.props.iconClasses) then
 		-- Icon rendering
 		contentDiv = HtmlWidgets.Div{
 			classes = {'navigation-card__icon'},
