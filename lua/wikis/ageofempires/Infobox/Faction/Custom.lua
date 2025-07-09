@@ -5,21 +5,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local Page = Lua.import('Module:Page')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local FactionInfobox = Lua.import('Module:Infobox/Faction')
 
-local Widgets = require('Module:Widget/All')
-local WidgetsHtml = require('Module:Widget/Html/All')
+local Widgets = Lua.import('Module:Widget/All')
+local WidgetsHtml = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 local Fragment = WidgetsHtml.Fragment
-local AgeIcon = require('Module:Widget/Infobox/AoeAgeIcon')
-local Image = require('Module:Widget/Image/Icon/Image')
+local AgeIcon = Lua.import('Module:Widget/Infobox/AoeAgeIcon')
+local Image = Lua.import('Module:Widget/Image/Icon/Image')
 
 ---@class AoECustomFactionInfobox: FactionInfobox
 ---@field game string
