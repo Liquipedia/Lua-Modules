@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
 
 local Upgrade = Lua.import('Module:Infobox/Upgrade')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -125,8 +126,7 @@ end
 ---@param args table
 ---@return string[]
 function CustomUpgrade:getWikiCategories(args)
-	-- mirroring current infobox here ...
-	return {'Technologies (Age of Empires II)'}
+	return {'Technologies (' .. Game.name{game = args.game} .. ')'}
 end
 
 return CustomUpgrade
