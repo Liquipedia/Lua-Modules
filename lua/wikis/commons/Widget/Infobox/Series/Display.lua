@@ -12,7 +12,7 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 
-local HtmlWidgets = require('Module:Widget/Html/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Widget = Lua.import('Module:Widget')
 local SeriesIcon = Lua.import('Module:Widget/Infobox/Series/Icon')
 
