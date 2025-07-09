@@ -16,7 +16,7 @@ local Table = Lua.import('Module:Table')
 local Widget = Lua.import('Module:Widget')
 
 local Cell = Lua.import('Module:Widget/Infobox/Cell')
-local HtmlWidgets = require('Module:Widget/Html/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class InfoboxVenueWidget: Widget
