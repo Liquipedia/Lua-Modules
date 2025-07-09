@@ -171,10 +171,10 @@ return {
 	chesskingoutline = 'far fa-chess-king',
 	chesskingfull = 'fas fa-chess-king',
 
-	--Usage: NavigationCards
-	nav_card_upload = 'far fa-upload',
-	nav_card_support_hub = 'liquipedia-custom-icon liquipedia-custom-icon-support-hub',
-	nav_card_copyright = 'far fa-copyright',
-	nav_card_getting_started = 'far fa-seedling',
-	nav_card_file_standards_guide = 'far fa-file-check',
+	-- Usage: For NavigationCards related actions and links
+	upload = 'far fa-upload',
+	support_hub = 'liquipedia-custom-icon liquipedia-custom-icon-support-hub',
+	copyright = 'far fa-copyright',
+	getting_started = 'far fa-seedling',
+	file_standards_guide = 'far fa-file-check',
 }
