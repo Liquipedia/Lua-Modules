@@ -70,7 +70,7 @@ function CustomExpansion:getMaps()
 		if not map then return end
 		return HtmlWidgets.Fragment{children = {
 			Link{link = map},
-			' ',
+			'&nbsp;',
 			mapInput[prefix .. 'mode'] == 'cs' and HtmlWidgets.Abbr{title = 'Hostage', children = {'(H)'}}
 				or HtmlWidgets.Abbr{title = 'Defuse', children = {'(D)'}},
 		}}
