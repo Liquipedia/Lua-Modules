@@ -44,7 +44,6 @@ function CustomInjector:parse(id, widgets)
 	local caller  = self.caller
 	local args  = caller.args
 	if id == 'custom' then
-		-- hack around mw butchering the display (factually the next 2 lines are a non op)
 		local maps = caller:getMaps()
 		return Array.append({},
 			Cell{name = 'Case', children = {args.case}},
