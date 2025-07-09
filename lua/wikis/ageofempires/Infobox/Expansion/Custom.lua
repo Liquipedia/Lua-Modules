@@ -37,7 +37,7 @@ function CustomInjector:parse(id, widgets)
 	local args  = self.caller.args
 	if id == 'custom' then
 		return {
-			Cell{name = 'Compilatons', children = {args.compilatons}},
+			Cell{name = 'Compilations', children = {args.compilations}},
 		}
 	end
 
