@@ -64,7 +64,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		local types = Array.map(caller:getAllArgsForBase(args, 'type'), function(unitType)
-			return Link{link = (args.type == MONK and '' or ' units') .. unitType, children = {unitType}}
+			return Link{link = unitType}
 		end)
 
 		local hasUpgradeSection = Logic.isNotEmpty(args['up food'])
