@@ -31,7 +31,11 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			DisplayHelper.MapScore(game.opponents[1], game.status),
-			MatchSummaryWidgets.GameCenter{children = ('Game ' .. gameIndex)},
+			MatchSummaryWidgets.GameCenter{children = WidgetUtil.collect(
+				'Game ' .. gameIndex,
+				game.extradata.hasot and ' - OT' or nil,
+				game.extradata.otlength and (' (' .. game.extradata.otlength .. ')') or nil
+			)},
 			DisplayHelper.MapScore(game.opponents[2], game.status),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.GameComment{children = game.comment}
