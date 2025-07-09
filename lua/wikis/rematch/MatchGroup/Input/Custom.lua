@@ -6,6 +6,7 @@
 --
 
 local Lua = require('Module:Lua')
+local Logic = require('Module:Logic')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
@@ -38,6 +39,17 @@ function CustomMatchGroupInput.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
+---@return table
+function MapFunctions.getExtraData(match, map, opponents)
+	return {
+		otlength = map.otlength,
+		hasot = Logic.isNotEmpty(map.otlength) or Logic.readBool(map.overtime),
+	}
 end
 
 return CustomMatchGroupInput
