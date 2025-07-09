@@ -14,6 +14,9 @@ local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
+
+local PlayerAchievements = Lua.import('Module:Infobox/Extension/Achievements')
+
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
@@ -28,6 +31,10 @@ local CustomInjector = Class.new(Injector)
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
+
+	player.args.autoTeam = true
+	player.args.achievements = PlayerAchievements.player{}
+
 	return player:createInfobox()
 end
 
