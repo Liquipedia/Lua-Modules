@@ -65,14 +65,4 @@ function NavigationCard:render()
 	}
 end
 
----@param classesString string
----@return string[]
-function NavigationCard:processIconClasses(classesString)
-	local classes = {}
-	for class in string.gmatch(classesString, "%S+") do
-		table.insert(classes, class)
-	end
-	return classes
-end
-
 return NavigationCard
