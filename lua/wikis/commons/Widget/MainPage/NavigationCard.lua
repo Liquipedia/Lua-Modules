@@ -9,8 +9,6 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Image = Lua.import('Module:Image')
-local Logic = Lua.import('Module:Logic')
-local IconData = Lua.import('Module:Icon/Data')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 local Widget = Lua.import('Module:Widget')
