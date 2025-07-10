@@ -14,7 +14,6 @@ local League = Lua.import('Module:Infobox/League')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
-local Center = Widgets.Center
 
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
