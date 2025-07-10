@@ -110,7 +110,7 @@ function CustomInjector:parse(id, widgets)
 				children = WidgetUtil.collect(
 					makeAttribute('Mana_Cost_hs.png', 'Mana', args.cost),
 					makeAttribute(string.lower(args.type or '') == 'weapon' and 'Weapon.png' or 'AttackIcon.png',
-						'Attack', args.atk),
+						'Attack', args.attack),
 					args.hp and makeAttribute('HitPointIcon.png', 'Hit Points', args.hp)
 						or makeAttribute('Shield.png', 'Durability', args.durability)
 				),
