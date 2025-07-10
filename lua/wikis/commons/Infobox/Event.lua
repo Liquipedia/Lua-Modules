@@ -168,8 +168,8 @@ function Event:_parseArgs()
 		games = Array.map(self:getAllArgsForBase(args, 'game'),function(game)
 			return Game.toIdentifier{game = args.game, useDefault = false}
 		end),
-		startDate = self:_cleanDate(args.sdate) or self:_cleanDate(args.date),
-		endDate = self:_cleanDate(args.edate) or self:_cleanDate(args.date),
+		startDate = ReferenceCleaner.cleanDateIfKnown(args.sdate) or ReferenceCleaner.cleanDateIfKnown(args.date),
+		endDate = ReferenceCleaner.cleanDateIfKnown(args.edate) or ReferenceCleaner.cleanDateIfKnown(args.date),
 	}
 
 	self.data = data
@@ -279,21 +279,6 @@ function Event:getIcons(iconArgs)
 	end
 
 	return icon, iconDark, display
-end
-
----@param date string?
----@return string?
-function Event:_cleanDate(date)
-	if self:_isUnknownDate(date) then
-		return nil
-	end
-	return ReferenceCleaner.clean{input = date}
-end
-
----@param date string?
----@return boolean
-function Event:_isUnknownDate(date)
-	return date == nil or string.lower(date) == 'tba' or string.lower(date) == 'tbd'
 end
 
 -- Given a series, query its abbreviation if abbreviation is not set manually

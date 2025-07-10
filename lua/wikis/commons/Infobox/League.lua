@@ -248,8 +248,8 @@ function League:_parseArgs()
 		game = Game.toIdentifier{game = args.game},
 		-- If no parent is available, set pagename instead to ease querying
 		parent = (args.parent or mw.title.getCurrentTitle().prefixedText):gsub(' ', '_'),
-		startDate = self:_cleanDate(args.sdate) or self:_cleanDate(args.date),
-		endDate = self:_cleanDate(args.edate) or self:_cleanDate(args.date),
+		startDate = ReferenceCleaner.cleanDateIfKnown(args.sdate) or ReferenceCleaner.cleanDateIfKnown(args.date),
+		endDate = ReferenceCleaner.cleanDateIfKnown(args.edate) or ReferenceCleaner.cleanDateIfKnown(args.date),
 		mode = args.mode,
 		patch = args.patch,
 		endPatch = args.endpatch or args.epatch or args.patch,
@@ -603,21 +603,6 @@ function League:createLink(id, name, link, desc)
 	end
 
 	return output
-end
-
----@param date string?
----@return string?
-function League:_cleanDate(date)
-	if self:_isUnknownDate(date) then
-		return nil
-	end
-	return ReferenceCleaner.clean{input = date}
-end
-
----@param date string?
----@return boolean
-function League:_isUnknownDate(date)
-	return date == nil or string.lower(date) == 'tba' or string.lower(date) == 'tbd'
 end
 
 ---@param previous string?
