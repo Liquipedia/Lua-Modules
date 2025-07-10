@@ -42,6 +42,9 @@
  * Properties:
  * The switch button can be easily accessed and manipulated by other components using the getSwitchGroup method.
  *
+ * Usage Methods:
+ * - setCountdownVisibility(isVisible): Controls the visibility of the countdown toggle (true to show, false to hide).
+ *
  * SwitchGroup object contains the following properties:
  * - type: The type of the switch group (toggle or pill).
  * - name: The name of the switch group.
@@ -75,6 +78,17 @@ liquipedia.switchButtons = {
 				this.attachEventListener( switchGroup, activeClassName );
 			}
 		} );
+	},
+
+	setCountdownVisibility: function(isVisible) {
+		const switchGroup = this.switchGroups['countdown'];
+
+		if (switchGroup && switchGroup.nodes.length > 0) {
+			const container = switchGroup.nodes[0].closest('.switch-toggle-container');
+			if (container) {
+				container.classList[isVisible ? 'remove' : 'add']('d-none');
+			}
+		}
 	},
 
 	getOrCreateSwitchGroup: function ( type, groupName, element, activeClassName ) {
@@ -144,6 +158,10 @@ liquipedia.switchButtons = {
 
 	attachEventListener: function ( switchGroup, activeClassName ) {
 		switchGroup.nodes.forEach( ( node ) => {
+			if ( switchGroup.name === 'matchFiler' && switchGroup.value === 'completed' ) {
+				this.setCountdownVisibility(false);
+			}
+
 			node.addEventListener( 'click', () => {
 				const newValue = this.getNewValue( node, switchGroup.type, activeClassName );
 
@@ -155,6 +173,11 @@ liquipedia.switchButtons = {
 					}
 					this.updateDOM( switchGroup, newValue );
 					this.triggerCustomEvent( node, switchGroup );
+
+					// Handle countdown toggle visibility when matchFiler group changes
+					if (switchGroup.name === 'matchFiler') {
+						this.setCountdownVisibility(newValue !== 'completed');
+					}
 				}
 			} );
 		} );
