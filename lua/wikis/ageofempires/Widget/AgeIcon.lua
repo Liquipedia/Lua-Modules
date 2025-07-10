@@ -10,13 +10,12 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 
 ---@class AoeAgeIconWidget: Widget
 ---@operator call(table): AoeAgeIconWidget
 ---@field props {age: string?, checkGame: boolean, game: string?}
-local AoeAgeIcon = Class.new(Widget)
+local AoeAgeIcon = Class.new(Image)
 AoeAgeIcon.defaultProps = {
 	checkGame = false,
 }

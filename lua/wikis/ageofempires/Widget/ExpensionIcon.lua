@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 
-local Widget = Lua.import('Module:Widget')
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 
 local EXPANSIONS = {
@@ -37,7 +36,7 @@ EXPANSIONS['definitive edition'] = EXPANSIONS.las
 ---@class AoeExpansionIconWidget: Widget
 ---@operator call(table): AoeExpansionIconWidget
 ---@field props {expansion: string?}
-local AoeExpansionIcon = Class.new(Widget)
+local AoeExpansionIcon = Class.new(Image)
 
 ---@return Widget?
 function AoeExpansionIcon:render()
