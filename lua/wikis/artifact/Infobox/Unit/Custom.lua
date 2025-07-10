@@ -46,10 +46,10 @@ function CustomUnit.run(frame)
 	unit.args.informationType = 'Card'
 	unit:setWidgetInjector(CustomInjector(unit))
 
-	return HtmlWidgets.Fragment{
+	return HtmlWidgets.Fragment{children = {
 		unit:createInfobox(),
-		CustomUnit._buildDescription(unit.args),
-	}
+		unit:_buildDescription(unit.args),
+	}}
 end
 
 ---@param id string

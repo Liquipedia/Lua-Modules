@@ -73,6 +73,7 @@ function CustomInjector:parse(id, widgets)
 		---@param value string?
 		---@return Widget
 		local makeAttribute = function(image, link, value)
+			if not value then return HtmlWidgets.Fragment{} end
 			return HtmlWidgets.Fragment{children = {
 				Image{size = 'x32px', alignment = 'text-top', link = link, imageLight = image},
 				HtmlWidgets.Br{},
@@ -117,9 +118,7 @@ function CustomInjector:parse(id, widgets)
 				classes = {'infobox-center'}
 			} or nil,
 			args.effect and Title{children = {'Effect'}},
-			args.effect and Center{children = {args.effect}},
-			args.description and Title{children = {'Description'}},
-			args.description and Center{children = {args.description}}
+			args.effect and Center{children = {args.effect}}
 		)
 	elseif id == 'cost' or id == 'attack' then return {}
 	elseif id == 'type' then

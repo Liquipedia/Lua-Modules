@@ -61,10 +61,6 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	if id == 'custom' then
-		local types = Array.map(caller:getAllArgsForBase(args, 'type'), function(unitType)
-			return Link{link = unitType}
-		end)
-
 		local hasUpgradeSection = Logic.isNotEmpty(args['up food'])
 			or Logic.isNotEmpty(args['up wood'])
 			or Logic.isNotEmpty(args['up gold'])
@@ -72,7 +68,6 @@ function CustomInjector:parse(id, widgets)
 			or Logic.isNotEmpty(args['up time'])
 
 		return WidgetUtil.collect(
-			Title{children = {mw.text.listToText(types, ', ', ' and ')}},
 			Cell{name = 'Range', children = {args.range}},
 			Cell{name = 'Restore time', children = {args.rest}},
 			Cell{name = 'Conversion time', children = {args.convtime}},
@@ -138,7 +133,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Civilizations', children = {args.civilizations or args.civs}},
 			Cell{name = 'Available in', children = {
 				AgeIcon{age = args.age},
-				Link{link = args.age},
+				Link{link = args.age and (args.age .. ' Age') or nil},
 				args.age2,
 			}, options = {separator = ' '}},
 			Cell{
@@ -156,7 +151,12 @@ function CustomInjector:parse(id, widgets)
 		)}}
 	elseif id == 'type' then return {}
 	elseif id == 'attack' then
+		local types = Array.map(caller:getAllArgsForBase(args, 'type'), function(unitType)
+			return tostring(Link{link = unitType})
+		end)
+
 		return {
+			Title{children = {mw.text.listToText(types, ', ', ' and ') .. ' unit'}},
 			Cell{name = 'Attack damage', children = {args.attack}},
 			Cell{name = 'Attack type', children = {args['attack type']}},
 			Cell{
