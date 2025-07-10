@@ -17,7 +17,10 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
+---@class RematchLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
+---@class RematchLeagueInfoboxWidgetInjector: WidgetInjector
+---@field caller RematchLeagueInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
