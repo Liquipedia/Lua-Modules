@@ -169,8 +169,10 @@ function Event:_parseArgs()
 		games = Array.map(self:getAllArgsForBase(args, 'game'),function(game)
 			return Game.toIdentifier{game = args.game, useDefault = false}
 		end),
-		startDate = ReferenceCleaner.cleanDateIfKnown(args.sdate) or ReferenceCleaner.cleanDateIfKnown(args.date),
-		endDate = ReferenceCleaner.cleanDateIfKnown(args.edate) or ReferenceCleaner.cleanDateIfKnown(args.date),
+		startDate = ReferenceCleaner.cleanDateIfKnown{date = args.sdate}
+			or ReferenceCleaner.cleanDateIfKnown{date = args.date},
+		endDate = ReferenceCleaner.cleanDateIfKnown{date = args.edate}
+			or ReferenceCleaner.cleanDateIfKnown{date = args.date},
 	}
 
 	self.data = data
@@ -184,7 +186,6 @@ function Event:_parseArgs()
 	}
 
 	self.links = Links.transform(args)
-
 	self:customParseArguments(args)
 end
 

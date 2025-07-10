@@ -249,8 +249,10 @@ function League:_parseArgs()
 		game = Game.toIdentifier{game = args.game},
 		-- If no parent is available, set pagename instead to ease querying
 		parent = (args.parent or mw.title.getCurrentTitle().prefixedText):gsub(' ', '_'),
-		startDate = ReferenceCleaner.cleanDateIfKnown(args.sdate) or ReferenceCleaner.cleanDateIfKnown(args.date),
-		endDate = ReferenceCleaner.cleanDateIfKnown(args.edate) or ReferenceCleaner.cleanDateIfKnown(args.date),
+		startDate = ReferenceCleaner.cleanDateIfKnown{date = args.sdate}
+			or ReferenceCleaner.cleanDateIfKnown{date = args.date},
+		endDate = ReferenceCleaner.cleanDateIfKnown{date = args.edate}
+			or ReferenceCleaner.cleanDateIfKnown{date = args.date},
 		mode = args.mode,
 		patch = args.patch,
 		endPatch = args.endpatch or args.epatch or args.patch,

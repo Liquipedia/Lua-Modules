@@ -104,8 +104,11 @@ function CustomLeague.run(frame)
 		args.doublesprizepoolusd = args.doublesprizepoolusd or args.doublesprizepool
 		args.doublesprizepool = nil
 	elseif args.doublesprizepool and args.localcurrency then
-		args.doublesprizepoolusd = CustomLeague:_currencyConversion(CustomLeague._cleanNumericInput(args.doublesprizepool),
-			args.localcurrency, ReferenceCleaner.cleanDateIfKnown(args.edate) or ReferenceCleaner.cleanDateIfKnown(args.date))
+		args.doublesprizepoolusd = CustomLeague:_currencyConversion(
+			CustomLeague._cleanNumericInput(args.doublesprizepool),
+			args.localcurrency,
+			ReferenceCleaner.cleanDateIfKnown{date = args.edate} or ReferenceCleaner.cleanDateIfKnown{date = args.date}
+		)
 	end
 
 	-- Currency rounding options
