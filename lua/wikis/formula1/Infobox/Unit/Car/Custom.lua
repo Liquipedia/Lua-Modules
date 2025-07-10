@@ -53,7 +53,7 @@ function CustomInjector:parse(id, widgets)
 		)
 	elseif id == 'customcontent' then
 		return {
-			Chronology{links = {previous = args.previous, next = args.next}}
+			Chronology{args = args}
 		}
 	end
 	return widgets

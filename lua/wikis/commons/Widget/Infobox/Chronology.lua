@@ -22,7 +22,10 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ChronologyWidget: Widget
 ---@operator call(table): ChronologyWidget
----@field links table<string, string|number|nil>
+---@field links table<string, string|number|nil>?
+---@field title string
+---@field showTitle boolean
+---@field args table?
 local Chronology = Class.new(Widget)
 Chronology.defaultProps = {
 	title = 'Chronology',
@@ -31,7 +34,8 @@ Chronology.defaultProps = {
 
 ---@return Widget?
 function Chronology:render()
-	if Table.isEmpty(self.props.links) then
+	local links = self.props.links or Chronology._getChronologyData(self.props.args or {})
+	if Table.isEmpty(links) then
 		return
 	end
 
@@ -43,10 +47,18 @@ function Chronology:render()
 				if index == 1 then
 					prevKey, nextKey = 'previous', 'next'
 				end
-				return self:_createChronologyRow(self.props.links[prevKey], self.props.links[nextKey])
+				return self:_createChronologyRow(links[prevKey], links[nextKey])
 			end)
 		)
 	}
+end
+
+---@param args table
+---@return table
+function Chronology._getChronologyData(args)
+	return Table.filterByKey(args, function(key)
+		return type(key) == 'string' and (key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
+	end)
 end
 
 ---@param previous string|number|nil

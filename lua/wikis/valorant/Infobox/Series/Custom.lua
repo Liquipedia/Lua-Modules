@@ -53,12 +53,7 @@ function CustomInjector:parse(id, widgets)
 		return { Cell{name = 'Location', content = locations} }
 	elseif id == 'customcontent' then
 		return {
-			Chronology{
-				links = {
-					previous = args.previous,
-					next = args.next,
-				}
-			}
+			Chronology{args = args}
 		}
 	end
 	return widgets
