@@ -235,10 +235,6 @@ function Event:_setLpdbData(args, links)
 				Page.pageifyLink(args.series),
 				Page.pageifyLink(args.series2),
 			},
-			previous = self:_getPageNameFromChronology(args.previous),
-			previous2 = self:_getPageNameFromChronology(args.previous2),
-			next = self:_getPageNameFromChronology(args.next),
-			next2 = self:_getPageNameFromChronology(args.next2),
 			games = self.data.games,
 			organizers = Table.mapValues(
 				Event:_getNamedTableofAllArgsForBase(args, 'organizer'),
@@ -310,15 +306,6 @@ end
 ---@return boolean
 function Event:_isUnknownDate(date)
 	return date == nil or string.lower(date) == 'tba' or string.lower(date) == 'tbd'
-end
-
--- Given the format `pagename|displayname`, returns pagename or the parameter, otherwise
----@param item string?
----@return string?
-function Event:_getPageNameFromChronology(item)
-	if item == nil then return end
-
-	return mw.ext.TeamLiquidIntegration.resolve_redirect(mw.text.split(item, '|')[1])
 end
 
 -- Given a series, query its abbreviation if abbreviation is not set manually
