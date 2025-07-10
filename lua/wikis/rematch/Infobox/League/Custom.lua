@@ -42,12 +42,12 @@ function CustomInjector:parse(id, widgets)
 		if String.isNotEmpty(args.team_number) then
 			Array.appendWith(widgets,
 				Title{children = 'Teams'},
-				Cell{name = 'Number of teams', content = {args.team_number}
+				Cell{name = 'Number of teams', content = {args.team_number}}
 			)
 		elseif String.isNotEmpty(args.player_number) then
 			Array.appendWith(widgets,
 				Title{children = 'Players'},
-				Cell{name = 'Number of players', content = {args.player_number}
+				Cell{name = 'Number of players', content = {args.player_number}}
 			)
 		end
 	end
