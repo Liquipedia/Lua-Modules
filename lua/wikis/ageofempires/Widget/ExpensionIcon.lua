@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 
 local EXPANSIONS = {
@@ -40,11 +39,11 @@ EXPANSIONS['definitive edition'] = EXPANSIONS.las
 ---@field props {expansion: string?}
 local AoeExpansionIcon = Class.new(Widget)
 
----@return Widget
+---@return Widget?
 function AoeExpansionIcon:render()
 	local exp = EXPANSIONS[(self.props.expansion or ''):lower()]
 	if not exp then
-		return HtmlWidgets.Fragment{}
+		return
 	end
 
 	return Image{

@@ -11,7 +11,6 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 
 ---@class AoeAgeIconWidget: Widget
@@ -22,11 +21,11 @@ AoeAgeIcon.defaultProps = {
 	checkGame = false,
 }
 
----@return Widget
+---@return Widget?
 function AoeAgeIcon:render()
 	local age = self.props.age
 	if self.props.checkGame and self.props.game ~= 'Age of Empires II' or Logic.isEmpty(age) then
-		return HtmlWidgets.Fragment{}
+		return
 	end
 
 	return Image{

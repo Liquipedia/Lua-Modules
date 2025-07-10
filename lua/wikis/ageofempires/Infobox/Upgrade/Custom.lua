@@ -23,13 +23,6 @@ local ExpansionIcon = Lua.import('Module:Widget/Infobox/ExpansionIcon')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
-local AGE_TITLE = {
-	['feudalage'] = 'Researched at age',
-	default = 'Starting age',
-}
-AGE_TITLE.castleage = AGE_TITLE.feudalage
-AGE_TITLE.imperialage = AGE_TITLE.feudalage
-
 ---@class AoeUpgradeInfobox: UpgradeInfobox
 local CustomUpgrade = Class.new(Upgrade)
 
