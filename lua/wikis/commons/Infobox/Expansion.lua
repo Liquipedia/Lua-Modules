@@ -131,12 +131,7 @@ function Expansion:createInfobox()
 		},
 		Center{children = {args.footnotes}},
 		Customizable{id = 'chronology', children = {
-				Chronology{
-					title = self:chronologyTitle(),
-					links = Table.filterByKey(args, function(key)
-						return type(key) == 'string' and (key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
-					end)
-				}
+				Chronology{args = args, title = self:chronologyTitle()}
 			}
 		},
 	}
