@@ -159,7 +159,7 @@ end
 function Event:_parseArgs()
 	local args = self.args
 
-	args.abbreviation = SeriesAbbreviation{series = args.series, abbreviation = args.abbreviation}
+	args.abbreviation = SeriesAbbreviation.fetch{series = args.series, abbreviation = args.abbreviation}
 
 	local data = {
 		name = TextSanitizer.stripHTML(args.name),

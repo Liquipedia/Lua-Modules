@@ -220,7 +220,7 @@ end
 function League:_parseArgs()
 	local args = self.args
 
-	args.abbreviation = SeriesAbbreviation{series = args.series, abbreviation = args.abbreviation}
+	args.abbreviation = SeriesAbbreviation.fetch{series = args.series, abbreviation = args.abbreviation}
 
 	-- Split venue from legacy format to new format.
 	-- Legacy format is a wiki-code string that can include an external link
