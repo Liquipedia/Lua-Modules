@@ -160,23 +160,6 @@ function Event:_parseArgs()
 
 	args.abbreviation = self:_fetchAbbreviation()
 
-	-- Split venue from legacy format to new format.
-	-- Legacy format is a wiki-code string that can include an external link
-	-- New format has |venue=, |venuename= and |venuelink= as different parameters.
-	-- This should be removed once there's been a bot run to change this.
-	if not args.venuename and args.venue and args.venue:sub(1, 2) == '[[' then
-		-- Remove [[]] and split on `|`
-		local splitVenue = mw.text.split(args.venue:gsub('%[%[', ''):gsub('%]%]', ''), '|')
-		args.venue = splitVenue[1]
-		args.venuename = splitVenue[2]
-	elseif not args.venuelink and args.venue and args.venue:sub(1, 1) == '[' then
-		-- Remove [] and split on space
-		local splitVenue = mw.text.split(args.venue:gsub('%[', ''):gsub('%]', ''), ' ')
-		args.venuelink = splitVenue[1]
-		table.remove(splitVenue, 1)
-		args.venue = table.concat(splitVenue, ' ')
-	end
-
 	local data = {
 		name = TextSanitizer.stripHTML(args.name),
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
