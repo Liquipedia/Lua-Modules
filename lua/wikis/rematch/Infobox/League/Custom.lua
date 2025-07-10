@@ -1,0 +1,55 @@
+---
+-- @Liquipedia
+-- page=Module:Infobox/League/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Injector = Lua.import('Module:Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
+
+local Widgets = Lua.import('Module:Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
+
+local CustomLeague = Class.new(League)
+local CustomInjector = Class.new(Injector)
+
+---@param frame Frame
+---@return Html
+function CustomLeague.run(frame)
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
+
+	return league:createInfobox()
+end
+
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
+	if id == 'customcontent' then
+		if not String.isEmpty(args.team_number) then
+			table.insert(widgets, Title{children = 'Teams'})
+			table.insert(widgets, Cell{
+				name = 'Number of teams',
+				content = {args.team_number}
+			})
+		elseif not String.isEmpty(args.player_number) then
+			table.insert(widgets, Title{children = 'Players'})
+			table.insert(widgets, Cell{
+				name = 'Number of players',
+				content = {args.player_number}
+			})
+		end
+	end
+	return widgets
+end
+
+return CustomLeague
