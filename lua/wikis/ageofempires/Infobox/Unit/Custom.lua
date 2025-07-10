@@ -117,12 +117,7 @@ function CustomInjector:parse(id, widgets)
 			)},
 			Cell{name = 'Research time', children = {args['up time']}},
 			Cell{name = 'Required', children = {args.required}, options = {makeLink = true}},
-			Chronology{
-				title = 'Connected Units',
-				links = Table.filterByKey(args, function(key)
-					return type(key) == 'string' and (key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
-				end)
-			}
+			Chronology{title = 'Connected Units'}
 		)
 	elseif id == 'builtfrom' then
 		return {
