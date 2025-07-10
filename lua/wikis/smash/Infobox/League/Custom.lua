@@ -5,15 +5,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Currency = require('Module:Currency')
-local Game = require('Module:Game')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Currency = Lua.import('Module:Currency')
+local Game = Lua.import('Module:Game')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
@@ -23,6 +25,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Chronology = Widgets.Chronology
 local Center = Widgets.Center
+local SeriesDisplay = Widgets.SeriesDisplay
 
 local BASE_CURRENCY = 'USD'
 local CURRENCY_DISPLAY_PRECISION = 0
@@ -102,7 +105,7 @@ function CustomLeague.run(frame)
 		args.doublesprizepool = nil
 	elseif args.doublesprizepool and args.localcurrency then
 		args.doublesprizepoolusd = CustomLeague:_currencyConversion(CustomLeague._cleanNumericInput(args.doublesprizepool),
-			args.localcurrency, League:_cleanDate(args.edate) or League:_cleanDate(args.date))
+			args.localcurrency, ReferenceCleaner.cleanDateIfKnown(args.edate) or ReferenceCleaner.cleanDateIfKnown(args.date))
 	end
 
 	-- Currency rounding options
@@ -411,11 +414,12 @@ end
 function CustomLeague:_createCircuitLink(circuitIndex)
 	local args = self.args
 
-	return self:createSeriesDisplay({
+	return SeriesDisplay{
 		displayManualIcons = true,
 		series = args['circuit' .. circuitIndex],
 		abbreviation = args['circuit' .. circuitIndex .. 'abbr'],
-	}, self.data['circuitIconDisplay' .. circuitIndex])
+		iconDisplay = self.data['circuitIconDisplay' .. circuitIndex],
+	}
 end
 
 ---@param date string
