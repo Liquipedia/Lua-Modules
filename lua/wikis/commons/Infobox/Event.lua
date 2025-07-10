@@ -237,13 +237,13 @@ function Event:_setLpdbData(args, links)
 			},
 			games = self.data.games,
 			organizers = Table.mapValues(
-				Event:_getNamedTableofAllArgsForBase(args, 'organizer'),
+				self:getAllArgsForBase(args, 'organizer'),
 				mw.ext.TeamLiquidIntegration.resolve_redirect
 			),
 			startdate = self.data.startDate or self.data.endDate or DateExt.defaultDate,
 			enddate = self.data.endDate or DateExt.defaultDate,
 			sortdate = self.data.endDate or DateExt.defaultDate,
-			location = mw.text.decode(Locale.formatLocation({city = args.city or args.location, country = args.country})),
+			location = mw.text.decode(Locale.formatLocation({city = args.city or args.location, country = args.ountry})),
 			location2 = mw.text.decode(Locale.formatLocation({city = args.city2 or args.location2, country = args.country2})),
 			venue = args.venue,
 			locations = Locale.formatLocations(args),
@@ -255,18 +255,6 @@ function Event:_setLpdbData(args, links)
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 	mw.ext.LiquipediaDB.lpdb_datapoint('event_' .. self.name, Json.stringifySubTables(lpdbData))
-end
-
----@param args table
----@param base string
----@return table
-function Event:_getNamedTableofAllArgsForBase(args, base)
-	local basedArgs = self:getAllArgsForBase(args, base)
-	local namedArgs = {}
-	for key, item in pairs(basedArgs) do
-		namedArgs[base .. key] = item
-	end
-	return namedArgs
 end
 
 ---@param iconArgs {displayManualIcons:boolean, series:string?, abbreviation:string?, icon:string?, iconDark:string?}
