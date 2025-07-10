@@ -26,8 +26,6 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local MONK = 'Monk'
-
 ---@class AgeOfEmpiresUnitInfobox: UnitInfobox
 local CustomUnit = Class.new(Unit)
 ---@class AgeOfEmpiresUnitInfoboxWidgetInjector: WidgetInjector
