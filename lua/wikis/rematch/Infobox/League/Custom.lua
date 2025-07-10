@@ -6,8 +6,10 @@
 --
 
 local Lua = require('Module:Lua')
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local String = Lua.import('Module:StringUtils')
+
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
