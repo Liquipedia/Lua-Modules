@@ -69,19 +69,7 @@ function Patch:createInfobox()
 				end
 			end
 		},
-		Builder{
-			builder = function()
-				local chronologyData = self:getChronologyData(args)
-				if not Table.isEmpty(chronologyData) then
-					return {
-						Title{children = 'Chronology'},
-						Chronology{
-							links = chronologyData
-						}
-					}
-				end
-			end
-		},
+		Chronology{links = self:getChronologyData(args)},
 		Customizable{id = 'customcontent', children = {}},
 		Center{children = {args.footnotes}},
 	}
