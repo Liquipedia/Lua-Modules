@@ -11,24 +11,25 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
 local Json = Lua.import('Module:Json')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Links = Lua.import('Module:Links')
+local Locale = Lua.import('Module:Locale')
 local Logic = Lua.import('Module:Logic')
+local MetadataGenerator = Lua.import('Module:MetadataGenerator')
 local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local SeriesAbbreviation = Lua.import('Module:Infobox/Extension/SeriesAbbreviation')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TextSanitizer = Lua.import('Module:TextSanitizer')
 local Tier = Lua.import('Module:Tier/Custom')
 local Variables = Lua.import('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
-local HighlightConditions = Lua.import('Module:HighlightConditions')
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
-local LeagueIcon = Lua.import('Module:LeagueIcon')
-local Links = Lua.import('Module:Links')
-local Locale = Lua.import('Module:Locale')
-local MetadataGenerator = Lua.import('Module:MetadataGenerator')
-local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
-local TextSanitizer = Lua.import('Module:TextSanitizer')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 
@@ -219,7 +220,7 @@ end
 function League:_parseArgs()
 	local args = self.args
 
-	args.abbreviation = self:_fetchAbbreviation()
+	args.abbreviation = SeriesAbbreviation{series = args.series, abbreviation = args.abbreviation}
 
 	-- Split venue from legacy format to new format.
 	-- Legacy format is a wiki-code string that can include an external link
@@ -621,26 +622,6 @@ function League:_getPageNameFromChronology(item)
 	if item == nil then return end
 
 	return mw.ext.TeamLiquidIntegration.resolve_redirect(mw.text.split(item, '|')[1])
-end
-
--- Given a series, query its abbreviation if abbreviation is not set manually
----@return string?
-function League:_fetchAbbreviation()
-	if not String.isEmpty(self.args.abbreviation) then
-		return self.args.abbreviation
-	elseif String.isEmpty(self.args.series) then
-		return nil
-	end
-
-	local series = string.gsub(mw.ext.TeamLiquidIntegration.resolve_redirect(self.args.series), ' ', '_')
-	local seriesData = mw.ext.LiquipediaDB.lpdb('series', {
-			conditions = '[[pagename::' .. series .. ']] AND [[abbreviation::!]]',
-			query = 'abbreviation',
-			limit = 1
-		})
-	if type(seriesData) == 'table' and seriesData[1] then
-		return seriesData[1].abbreviation
-	end
 end
 
 return League

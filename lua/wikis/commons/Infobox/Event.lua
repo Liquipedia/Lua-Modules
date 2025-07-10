@@ -12,19 +12,20 @@ local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
 local Json = Lua.import('Module:Json')
-local Logic = Lua.import('Module:Logic')
-local Namespace = Lua.import('Module:Namespace')
-local Page = Lua.import('Module:Page')
-local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
-local Variables = Lua.import('Module:Variables')
-
-local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local Page = Lua.import('Module:Page')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local SeriesAbbreviation = Lua.import('Module:Infobox/Extension/SeriesAbbreviation')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
+local Variables = Lua.import('Module:Variables')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Accommodation = Widgets.Accommodation
@@ -158,7 +159,7 @@ end
 function Event:_parseArgs()
 	local args = self.args
 
-	args.abbreviation = self:_fetchAbbreviation()
+	args.abbreviation = SeriesAbbreviation{series = args.series, abbreviation = args.abbreviation}
 
 	local data = {
 		name = TextSanitizer.stripHTML(args.name),
@@ -279,26 +280,6 @@ function Event:getIcons(iconArgs)
 	end
 
 	return icon, iconDark, display
-end
-
--- Given a series, query its abbreviation if abbreviation is not set manually
----@return string?
-function Event:_fetchAbbreviation()
-	if not String.isEmpty(self.args.abbreviation) then
-		return self.args.abbreviation
-	elseif String.isEmpty(self.args.series) then
-		return nil
-	end
-
-	local series = string.gsub(mw.ext.TeamLiquidIntegration.resolve_redirect(self.args.series), ' ', '_')
-	local seriesData = mw.ext.LiquipediaDB.lpdb('series', {
-			conditions = '[[pagename::' .. series .. ']] AND [[abbreviation::!]]',
-			query = 'abbreviation',
-			limit = 1
-		})
-	if type(seriesData) == 'table' and seriesData[1] then
-		return seriesData[1].abbreviation
-	end
 end
 
 return Event
