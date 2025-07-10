@@ -39,18 +39,16 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'customcontent' then
-		if not String.isEmpty(args.team_number) then
-			table.insert(widgets, Title{children = 'Teams'})
-			table.insert(widgets, Cell{
-				name = 'Number of teams',
-				content = {args.team_number}
-			})
-		elseif not String.isEmpty(args.player_number) then
-			table.insert(widgets, Title{children = 'Players'})
-			table.insert(widgets, Cell{
-				name = 'Number of players',
-				content = {args.player_number}
-			})
+		if String.isNotEmpty(args.team_number) then
+			Array.appendWith(widgets,
+				Title{children = 'Teams'},
+				Cell{name = 'Number of teams', content = {args.team_number}
+			)
+		elseif String.isNotEmpty(args.player_number) then
+			Array.appendWith(widgets,
+				Title{children = 'Players'},
+				Cell{name = 'Number of players', content = {args.player_number}
+			)
 		end
 	end
 	return widgets
