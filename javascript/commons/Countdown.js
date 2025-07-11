@@ -87,8 +87,10 @@ liquipedia.countdown = {
 			// Find countdown nodes live so we don't run into issues with injected timer nodes
 			const timerObjectNodes = container.querySelectorAll( '.timer-object' );
 			timerObjectNodes.forEach( ( timerObjectNode ) => {
-				timerObjectNode.querySelector( '.timer-object-date' ).classList.toggle( this.timerHiddenClass, isCountdownToggled );
-				timerObjectNode.querySelector( '.timer-object-countdown' ).classList.toggle( this.timerHiddenClass, !isCountdownToggled );
+				timerObjectNode.querySelector( '.timer-object-date' )
+					.classList.toggle( this.timerHiddenClass, isCountdownToggled );
+				timerObjectNode.querySelector( '.timer-object-countdown' )
+					.classList.toggle( this.timerHiddenClass, !isCountdownToggled );
 			} );
 		} );
 	},
@@ -304,13 +306,17 @@ liquipedia.countdown = {
 		[ 'Yekaterinburg Standard Time', 'YEKT' ]
 	] ),
 	getMonthNameFromMonthNumber: function ( newFutureMonth ) {
-		const monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
+		const monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June',
+			'July', 'August', 'September', 'October', 'November', 'December' ];
 		return monthNames[ newFutureMonth ];
 	},
 	getTimeZoneNameLong: function ( dateObject ) {
 		let date;
 		let result;
-		const dateTimeFormat = new Intl.DateTimeFormat( 'en', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, timeZoneName: 'long' } );
+		const dateTimeFormat = new Intl.DateTimeFormat(
+			'en',
+			{ timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, timeZoneName: 'long' }
+		);
 		if ( typeof Intl.DateTimeFormat.prototype.formatToParts === 'function' ) {
 			date = dateTimeFormat.formatToParts( dateObject );
 			date.forEach( ( element ) => {
@@ -368,10 +374,16 @@ liquipedia.countdown = {
 				// -24 Hours because of the day before
 				calculatedOffsetHours = -( userTime.utcHours ) + userTime.localHours - 24;
 			}
-		} else if ( ( userTime.localMonth > userTime.utcMonth && userTime.localYear === userTime.utcYear ) || userTime.localYear > userTime.utcYear ) {
+		} else if (
+			( userTime.localMonth > userTime.utcMonth && userTime.localYear === userTime.utcYear ) ||
+			userTime.localYear > userTime.utcYear
+		) {
 			// +24 Hours because of the next day (in next month or year)
 			calculatedOffsetHours = -( userTime.utcHours ) + userTime.localHours + 24;
-		} else if ( ( userTime.localMonth < userTime.utcMonth && userTime.localYear === userTime.utcYear ) || userTime.localYear < userTime.utcYear ) {
+		} else if (
+			( userTime.localMonth < userTime.utcMonth && userTime.localYear === userTime.utcYear ) ||
+			userTime.localYear < userTime.utcYear
+		) {
 			// -24 Hours because of the day before (in previous month or year)
 			calculatedOffsetHours = -( userTime.utcHours ) + userTime.localHours - 24;
 		}
@@ -405,8 +417,11 @@ liquipedia.countdown = {
 			finalTimeZoneName = userTime.timeZoneName + ' (UTC' + offsetHoursWithSign + offsetMinutesAsString + ')';
 		}
 
-		const strLocalTime1 = ( liquipedia.countdown.getMonthNameFromMonthNumber( userTime.dateObjectMonth ) ) + ' ' + userTime.dateObjectDay + ', ' + userTime.dateObjectYear + ' - ' + ( '0' + userTime.dateObjectHours ).slice( -2 ) + ':' + ( '0' + userTime.dateObjectMinutes ).slice( -2 );
-		const strLocalTime2 = ' <abbr data-tz="' + offsetHoursWithSign + ':' + ( '0' + calculatedOffsetMinutes ).slice( -2 ) + '"';
+		const strLocalTime1 = ( liquipedia.countdown.getMonthNameFromMonthNumber( userTime.dateObjectMonth ) ) + ' ' +
+			userTime.dateObjectDay + ', ' + userTime.dateObjectYear + ' - ' +
+			( '0' + userTime.dateObjectHours ).slice( -2 ) + ':' + ( '0' + userTime.dateObjectMinutes ).slice( -2 );
+		const strLocalTime2 = ' <abbr data-tz="' + offsetHoursWithSign + ':' +
+			( '0' + calculatedOffsetMinutes ).slice( -2 ) + '"';
 		const strLocalTime3 = ' title="' + finalTimeZoneName + '">' + finalTimeZoneAbbr + '</abbr>';
 		const dateObjectString = strLocalTime1 + strLocalTime2 + strLocalTime3;
 		return dateObjectString;
