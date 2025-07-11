@@ -43,7 +43,7 @@
  * The switch button can be easily accessed and manipulated by other components using the getSwitchGroup method.
  *
  * Usage Methods:
- * - setCountdownVisibility(isVisible): Controls the visibility of the countdown toggle (true to show, false to hide).
+ * setCountdownVisibility(isVisible): Controls the visibility of the countdown toggle (true to show, false to hide).
  *
  * SwitchGroup object contains the following properties:
  * - type: The type of the switch group (toggle or pill).
@@ -84,7 +84,7 @@ liquipedia.switchButtons = {
 		const switchGroup = this.switchGroups['countdown'];
 
 		if (switchGroup && switchGroup.nodes.length > 0) {
-			const container = switchGroup.nodes[0].closest('.switch-toggle-container');
+			const container = switchGroup.nodes[0].closest('[data-component="switch-toggle-container"]');
 			if (container) {
 				container.classList[isVisible ? 'remove' : 'add']('d-none');
 			}
