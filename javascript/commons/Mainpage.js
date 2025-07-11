@@ -9,7 +9,10 @@ liquipedia.mainpage = {
 		const day = date.getDate();
 		const month = ( date.getMonth() + 1 );
 		const thisDayDate = document.getElementById( 'this-day-date' );
-		if ( thisDayDate !== null && thisDayDate.innerHTML !== '(' + liquipedia.mainpage.getMonthName( month ) + ' ' + liquipedia.mainpage.getOrdinal( day ) + ')' ) {
+		if ( thisDayDate !== null && thisDayDate.innerHTML !== '(' +
+			liquipedia.mainpage.getMonthName( month ) + ' ' +
+			liquipedia.mainpage.getOrdinal( day ) + ')'
+		) {
 			liquipedia.mainpage.getData( month, day );
 		}
 		/* Birthday link */
@@ -35,8 +38,12 @@ liquipedia.mainpage = {
 	},
 	useData: function( data, month, day ) {
 		if ( typeof data.parse !== 'undefined' ) {
-			document.getElementById( 'this-day-date' ).innerHTML = '(' + liquipedia.mainpage.getMonthName( month ) + ' ' + liquipedia.mainpage.getOrdinal( day ) + ')';
-			document.getElementById( 'this-day-trivialink' ).innerHTML = 'Add trivia about this day <a href="' + mw.util.getUrl( 'Liquipedia:This_day/' + month + '/' + day ) + '" title="Liquipedia:This day/' + month + '/' + day + '">here</a>.';
+			document.getElementById( 'this-day-date' ).innerHTML =
+				'(' + liquipedia.mainpage.getMonthName( month ) + ' ' + liquipedia.mainpage.getOrdinal( day ) + ')';
+			document.getElementById( 'this-day-trivialink' ).innerHTML =
+				'Add trivia about this day <a href="' +
+				mw.util.getUrl( 'Liquipedia:This_day/' + month + '/' + day ) +
+				'" title="Liquipedia:This day/' + month + '/' + day + '">here</a>.';
 			const thisDayFacts = document.getElementById( 'this-day-facts' );
 			thisDayFacts.innerHTML = data.parse.text[ '*' ].replace( '<p><br />\n</p>', '' );
 			// Remove ads from the API data to avoid duplicates
@@ -47,10 +54,12 @@ liquipedia.mainpage = {
 				age.innerHTML = ( new Date() ).getFullYear() - age.dataset.year;
 			} );
 			/* Birthday link */
-			document.getElementById( 'this-day-facts' ).querySelectorAll( '.share-birthday' ).forEach( ( birthdayIcon ) => {
-				birthdayIcon.style.cursor = 'pointer';
-				birthdayIcon.onclick = liquipedia.mainpage.shareBirthday;
-			} );
+			document.getElementById( 'this-day-facts' )
+				.querySelectorAll( '.share-birthday' )
+				.forEach( ( birthdayIcon ) => {
+					birthdayIcon.style.cursor = 'pointer';
+					birthdayIcon.onclick = liquipedia.mainpage.shareBirthday;
+				} );
 		}
 	},
 	getOrdinal: function( number ) {
@@ -84,8 +93,10 @@ liquipedia.mainpage = {
 		event.stopPropagation();
 		const button = this;
 		mw.loader.using( 'mediawiki.util' ).then( () => {
-			const url = mw.config.get( 'wgServer' ) + mw.config.get( 'wgArticlePath' ).replace( '$1', mw.util.wikiUrlencode( button.dataset.page ) );
-			const twitterhandlearr = button.dataset.url.replace( '#!/', '' ).replace( '[', '' ).replace( ']', '' ).split( ' ' )[ 0 ].split( 'twitter.com/' );
+			const url = mw.config.get( 'wgServer' ) + mw.config.get( 'wgArticlePath' )
+				.replace( '$1', mw.util.wikiUrlencode( button.dataset.page ) );
+			const twitterhandlearr = button.dataset.url.replace( '#!/', '' )
+				.replace( '[', '' ).replace( ']', '' ).split( ' ' )[ 0 ].split( 'x.com/' );
 			const twitterhandle = twitterhandlearr[ twitterhandlearr.length - 1 ];
 			const text = 'Happy birthday, @' + twitterhandle + '!';
 			liquipedia.tracker.track( 'Birthdaytweet' );
