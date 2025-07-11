@@ -78,14 +78,6 @@ end
 ---@private
 ---@return Widget
 function ProjectOverview:_generateOverview()
-
-	local timestamp = DateExt.readTimestamp(
-		mw.getCurrentFrame():callParserFunction(
-			'#lastupdated_by_prefix',
-			self.props.ProjectUrl .. '/'
-		)
-	)
-
 	return Grid.Cell{
 		xs = 12,
 		sm = 12,
@@ -119,11 +111,15 @@ function ProjectOverview:_generateOverview()
 			{
 				IconFa{iconName = 'lastupdated', screenReaderHidden = true},
 				' Last Update: ',
-				timestamp and Countdown._create{
-					timestamp = timestamp,
-					date = DateExt.toCountdownArg(timestamp),
+				Countdown._create{
+					date = DateExt.toCountdownArg(
+						mw.getCurrentFrame():callParserFunction(
+							'#lastupdated_by_prefix',
+							self.props.ProjectUrl .. '/'
+						)
+					),
 					rawdatetime = true
-				} or nil,
+				},
 			}
 		)
 	}
