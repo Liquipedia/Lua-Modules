@@ -89,7 +89,7 @@ function MatchTickerContainer:render()
 							HtmlWidgets.Div{
 								classes = {'switch-pill'},
 								attributes = {
-									['data-switch-group'] = 'matchFiler',
+									['data-switch-group'] = 'matchFilter',
 									['data-store-value'] = 'true',
 								},
 								children = {
@@ -117,7 +117,9 @@ function MatchTickerContainer:render()
 			},
 			HtmlWidgets.Div{
 				classes = {'switch-toggle-container'},
-				css = {margin = '1rem 0'},
+				attributes = {
+					['data-component'] = 'switch-toggle-container'
+				},
 				children = {
 					HtmlWidgets.Div{
 						classes = {'switch-toggle'},
