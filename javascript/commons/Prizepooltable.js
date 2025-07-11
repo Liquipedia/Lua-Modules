@@ -30,8 +30,8 @@ liquipedia.prizepooltable = {
 					rowNode.innerHTML = '<td colspan="' + Math.max(
 						prizepooltable.querySelectorAll( 'tr:nth-child(1) th, tr:nth-child(1) td' ).length,
 						prizepooltable.querySelectorAll( 'tr:nth-child(2) th, tr:nth-child(2) td' ).length
-					) + '" class="prizepooltabletoggle"><small class="prizepooltableshow">'
-						+ openText + '</small><small class="prizepooltablehide">' + closeText + '</small></td>';
+					) + '" class="prizepooltabletoggle"><small class="prizepooltableshow">' +
+						openText + '</small><small class="prizepooltablehide">' + closeText + '</small></td>';
 					row.parentNode.insertBefore( rowNode, row );
 				}
 			}
