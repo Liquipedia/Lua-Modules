@@ -9,45 +9,61 @@ liquipedia.collapse = {
 				table.classList.add( 'collapsed' );
 			}
 		} );
-		liquipedia.collapse.setupCollapsibleMapsButtons();
 		liquipedia.collapse.setupCollapsibleButtons();
 		liquipedia.collapse.setupGeneralCollapsibleButtons();
 		liquipedia.collapse.setupToggleGroups();
 		liquipedia.collapse.setupDropdownBox();
 		liquipedia.collapse.setupCollapsibleNavFrameButtons();
 	},
+	textShow: '<i class="fas fa-eye"></i> Show',
+	textHide: '<i class="fas fa-eye-slash"></i> Hide',
+	makeShowButton: function( collapsible ) {
+		return liquipedia.collapse.makeButton(
+			liquipedia.collapse.textShow,
+			'collapseButtonShow',
+			collapsible
+		);
+	},
+	makeHideButton: function( collapsible ) {
+		return liquipedia.collapse.makeButton(
+			liquipedia.collapse.textHide,
+			'collapseButtonHide',
+			collapsible
+		);
+	},
+	makeButton: function( text, wrapperClass, collapsible ) {
+		const buttonWrapper = document.createElement( 'span' );
+		buttonWrapper.classList.add( 'collapseButton' );
+		buttonWrapper.classList.add( wrapperClass );
+		const button = document.createElement( 'button' );
+		button.classList.add( 'btn' );
+		button.classList.add( 'btn-secondary' );
+		button.classList.add( 'btn-xsmall' );
+		button.type = 'button';
+		button.innerHTML = text;
+		button.onclick = function( ev ) {
+			ev.preventDefault();
+			if ( wrapperClass === 'collapseButtonShow' ) {
+				collapsible.classList.remove( 'collapsed' );
+			} else {
+				collapsible.classList.add( 'collapsed' );
+			}
+		};
+		buttonWrapper.appendChild( button );
+		return buttonWrapper;
+	},
 	setupCollapsibleButtons: function() {
 		document.querySelectorAll( '#mw-content-text .collapsible' ).forEach( ( collapsible ) => {
 			const row = collapsible.querySelector( 'tr' );
 			if ( row !== null ) {
-				const collapseShowButton = document.createElement( 'span' );
-				collapseShowButton.classList.add( 'collapseButton' );
-				collapseShowButton.classList.add( 'collapseButtonShow' );
-				collapseShowButton.appendChild( document.createTextNode( '[' ) );
-				const collapseShowLink = document.createElement( 'a' );
-				collapseShowLink.href = '#';
-				collapseShowLink.innerHTML = 'show';
-				collapseShowLink.onclick = function( ev ) {
-					ev.preventDefault();
-					collapsible.classList.remove( 'collapsed' );
-				};
-				collapseShowButton.appendChild( collapseShowLink );
-				collapseShowButton.appendChild( document.createTextNode( ']' ) );
-				row.lastElementChild.insertBefore( collapseShowButton, row.lastElementChild.firstChild );
-				const collapseHideButton = document.createElement( 'span' );
-				collapseHideButton.classList.add( 'collapseButton' );
-				collapseHideButton.classList.add( 'collapseButtonHide' );
-				collapseHideButton.appendChild( document.createTextNode( '[' ) );
-				const collapseHideLink = document.createElement( 'a' );
-				collapseHideLink.href = '#';
-				collapseHideLink.innerHTML = 'hide';
-				collapseHideLink.onclick = function( ev ) {
-					ev.preventDefault();
-					collapsible.classList.add( 'collapsed' );
-				};
-				collapseHideButton.appendChild( collapseHideLink );
-				collapseHideButton.appendChild( document.createTextNode( ']' ) );
-				row.lastElementChild.insertBefore( collapseHideButton, row.lastElementChild.firstChild );
+				row.lastElementChild.insertBefore(
+					liquipedia.collapse.makeShowButton( collapsible ),
+					row.lastElementChild.firstChild
+				);
+				row.lastElementChild.insertBefore(
+					liquipedia.collapse.makeHideButton( collapsible ),
+					row.lastElementChild.firstChild
+				);
 			}
 		} );
 	},
@@ -94,73 +110,18 @@ liquipedia.collapse = {
 			}
 		} );
 	},
-	setupCollapsibleMapsButtons: function() {
-		document.querySelectorAll( '#mw-content-text .collapsible' ).forEach( ( collapsible ) => {
-			const row = collapsible.querySelector( 'tr' );
-			if ( row !== null && collapsible.querySelector( '.maprow' ) !== null ) {
-				const collapseShowButton = document.createElement( 'span' );
-				collapseShowButton.classList.add( 'collapseButton' );
-				collapseShowButton.classList.add( 'collapseButtonMapsShow' );
-				collapseShowButton.appendChild( document.createTextNode( '[' ) );
-				const collapseShowLink = document.createElement( 'a' );
-				collapseShowLink.href = '#';
-				collapseShowLink.innerHTML = '+maps';
-				collapseShowLink.onclick = function( ev ) {
-					ev.preventDefault();
-					collapsible.classList.add( 'uncollapsed-maps' );
-				};
-				collapseShowButton.appendChild( collapseShowLink );
-				collapseShowButton.appendChild( document.createTextNode( ']' ) );
-				row.lastElementChild.insertBefore( collapseShowButton, row.lastElementChild.firstChild );
-				const collapseHideButton = document.createElement( 'span' );
-				collapseHideButton.classList.add( 'collapseButton' );
-				collapseHideButton.classList.add( 'collapseButtonMapsHide' );
-				collapseHideButton.appendChild( document.createTextNode( '[' ) );
-				const collapseHideLink = document.createElement( 'a' );
-				collapseHideLink.href = '#';
-				collapseHideLink.innerHTML = '-maps';
-				collapseHideLink.onclick = function( ev ) {
-					ev.preventDefault();
-					collapsible.classList.remove( 'uncollapsed-maps' );
-				};
-				collapseHideButton.appendChild( collapseHideLink );
-				collapseHideButton.appendChild( document.createTextNode( ']' ) );
-				row.lastElementChild.insertBefore( collapseHideButton, row.lastElementChild.firstChild );
-			}
-		} );
-	},
 	setupCollapsibleNavFrameButtons: function() {
 		document.querySelectorAll( '#mw-content-text .NavFrame' ).forEach( ( navFrame ) => {
 			const head = navFrame.querySelector( '.NavHead' );
 			if ( head !== null ) {
-				const collapseShowButton = document.createElement( 'span' );
-				collapseShowButton.classList.add( 'collapseButton' );
-				collapseShowButton.classList.add( 'collapseButtonShow' );
-				collapseShowButton.appendChild( document.createTextNode( '[' ) );
-				const collapseShowLink = document.createElement( 'a' );
-				collapseShowLink.href = '#';
-				collapseShowLink.innerHTML = 'show';
-				collapseShowLink.onclick = function( ev ) {
-					ev.preventDefault();
-					navFrame.classList.remove( 'collapsed' );
-				};
-				collapseShowButton.appendChild( collapseShowLink );
-				collapseShowButton.appendChild( document.createTextNode( ']' ) );
-				head.insertBefore( collapseShowButton, head.firstChild );
-				const collapseHideButton = document.createElement( 'span' );
-				collapseHideButton.classList.add( 'collapseButton' );
-				collapseHideButton.classList.add( 'collapseButtonHide' );
-				collapseHideButton.appendChild( document.createTextNode( '[' ) );
-				const collapseHideLink = document.createElement( 'a' );
-				collapseHideLink.href = '#';
-				collapseHideLink.innerHTML = 'hide';
-				collapseHideLink.onclick = function( ev ) {
-					ev.preventDefault();
-					navFrame.classList.add( 'collapsed' );
-				};
-				collapseHideButton.appendChild( collapseHideLink );
-				collapseHideButton.appendChild( document.createTextNode( ']' ) );
-				head.insertBefore( collapseHideButton, head.firstChild );
+				head.insertBefore(
+					liquipedia.collapse.makeShowButton( navFrame ),
+					head.firstChild
+				);
+				head.insertBefore(
+					liquipedia.collapse.makeHideButton( navFrame ),
+					head.firstChild
+				);
 			}
 		} );
 	},
