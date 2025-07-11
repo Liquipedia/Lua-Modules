@@ -115,7 +115,10 @@ function ProjectOverview:_generateOverview()
 				' Last Update: ',
 				Countdown._create{
 					timestamp = DateExt.readTimestamp(
-						mw.getCurrentFrame():callParserFunction('#lastupdated_by_prefix', (self.props.ProjectUrl or '') .. '/')
+						mw.getCurrentFrame():callParserFunction(
+							'#lastupdated_by_prefix',
+							(self.props.ProjectUrl or '') .. '/'
+						)
 					),
 					rawdatetime = true
 				},
