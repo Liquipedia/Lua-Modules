@@ -182,6 +182,12 @@ return {
 	chesskingoutline = 'far fa-chess-king',
 	chesskingfull = 'fas fa-chess-king',
 
+	-- Usage: Labs Project overview
+	projecthome = 'fas fa-home',
+	contributors = 'fas fa-people-carry',
+	articles = 'fas fa-newspaper',
+	lastupdated = 'fas fa-clock',
+
 	-- Usage: For support hub related actions and links
 	upload = 'far fa-upload',
 	support_hub = 'liquipedia-custom-icon liquipedia-custom-icon-support-hub',

@@ -21,6 +21,7 @@ local ColumnName = Condition.ColumnName
 
 local Grid = Lua.import('Module:Widget/Grid')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Panel = Lua.import('Module:Widget/Panel')
@@ -82,18 +83,12 @@ function ProjectOverview:_generateOverview()
 		cellContent = WidgetUtil.collect(
 			HtmlWidgets.H5{
 				children = {
-					HtmlWidgets.Span{
-						classes = {'fas fa-home'},
-						attributes = {['aria-hidden'] = 'true'}
-					},
+					IconFa{iconName = 'projecthome', screenReaderHidden = true},
 					Link{link = self.props.ProjectUrl}
 				}
 			},
 			{
-				HtmlWidgets.Span{
-					classes = {'fas fa-people-carry'},
-					attributes = {['aria-hidden'] = 'true'}
-				},
+				IconFa{iconName = 'contributors', screenReaderHidden = true},
 				' Current Contributors: ',
 				mw.ext.LiquipediaDB.lpdb('datapoint', {
 					conditions = tostring(
@@ -106,19 +101,13 @@ function ProjectOverview:_generateOverview()
 			},
 			HtmlWidgets.Br{},
 			{
-				HtmlWidgets.Span{
-					classes = {'fas fa-newspaper'},
-					attributes = {['aria-hidden'] = 'true'}
-				},
+				IconFa{iconName = 'articles', screenReaderHidden = true},
 				' Articles Created: ',
 				mw.getCurrentFrame():callParserFunction('#count_pages_by_prefix', self.props.ProjectUrl),
 			},
 			HtmlWidgets.Br{},
 			{
-				HtmlWidgets.Span{
-					classes = {'fas fa-clock'},
-					attributes = {['aria-hidden'] = 'true'}
-				},
+				IconFa{iconName = 'lastupdated', screenReaderHidden = true},
 				' Last Update: ',
 				Countdown._create{
 					timestamp = DateExt.readTimestamp(
