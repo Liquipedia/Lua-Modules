@@ -38,6 +38,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field props LabProjectOverviewParameters
 local ProjectOverview = Class.new(Widget)
 
+---@return Widget
 function ProjectOverview:render()
 	return Grid.Cell{
 		xs = 12,
