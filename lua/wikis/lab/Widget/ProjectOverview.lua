@@ -67,7 +67,7 @@ function ProjectOverview:_generateImage()
 		md = 6,
 		cellContent = IconImage{
 			imageLight = self.props.ProjectImage,
-			imageDark = Logic.emptyOr(self.props.ProjectImageDark, self.props.ProjectImage),
+			imageDark = Logic.nilIfEmpty(self.props.ProjectImageDark),
 			size = '280x180px',
 			link = self.props.ProjectUrl,
 			alignment = 'center'
