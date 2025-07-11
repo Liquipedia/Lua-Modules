@@ -80,13 +80,13 @@ liquipedia.switchButtons = {
 		} );
 	},
 
-	setCountdownVisibility: function(isVisible) {
-		const switchGroup = this.switchGroups['countdown'];
+	setCountdownVisibility: function( isVisible ) {
+		const switchGroup = this.switchGroups.countdown;
 
-		if (switchGroup && switchGroup.nodes.length > 0) {
-			const container = switchGroup.nodes[0].closest('[data-component="switch-toggle-container"]');
-			if (container) {
-				container.classList[isVisible ? 'remove' : 'add']('d-none');
+		if ( switchGroup && switchGroup.nodes.length > 0 ) {
+			const container = switchGroup.nodes[ 0 ].closest( '[data-component="switch-toggle-container"]' );
+			if ( container ) {
+				container.classList[ isVisible ? 'remove' : 'add' ]( 'd-none' );
 			}
 		}
 	},
@@ -159,7 +159,7 @@ liquipedia.switchButtons = {
 	attachEventListener: function ( switchGroup, activeClassName ) {
 		switchGroup.nodes.forEach( ( node ) => {
 			if ( switchGroup.name === 'matchFiler' && switchGroup.value === 'completed' ) {
-				this.setCountdownVisibility(false);
+				this.setCountdownVisibility( false );
 			}
 
 			node.addEventListener( 'click', () => {
@@ -175,8 +175,8 @@ liquipedia.switchButtons = {
 					this.triggerCustomEvent( node, switchGroup );
 
 					// Handle countdown toggle visibility when matchFiler group changes
-					if (switchGroup.name === 'matchFiler') {
-						this.setCountdownVisibility(newValue !== 'completed');
+					if ( switchGroup.name === 'matchFiler' ) {
+						this.setCountdownVisibility( newValue !== 'completed' );
 					}
 				}
 			} );
