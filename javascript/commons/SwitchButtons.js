@@ -158,7 +158,7 @@ liquipedia.switchButtons = {
 
 	attachEventListener: function ( switchGroup, activeClassName ) {
 		switchGroup.nodes.forEach( ( node ) => {
-			if ( switchGroup.name === 'matchFiler' && switchGroup.value === 'completed' ) {
+			if ( switchGroup.name === 'matchFilter' && switchGroup.value === 'completed' ) {
 				this.setCountdownVisibility( false );
 			}
 
@@ -174,8 +174,8 @@ liquipedia.switchButtons = {
 					this.updateDOM( switchGroup, newValue );
 					this.triggerCustomEvent( node, switchGroup );
 
-					// Handle countdown toggle visibility when matchFiler group changes
-					if ( switchGroup.name === 'matchFiler' ) {
+					// Handle countdown toggle visibility when matchFilter group changes
+					if ( switchGroup.name === 'matchFilter' ) {
 						this.setCountdownVisibility( newValue !== 'completed' );
 					}
 				}

@@ -89,7 +89,7 @@ function MatchTickerContainer:render()
 							HtmlWidgets.Div{
 								classes = {'switch-pill'},
 								attributes = {
-									['data-switch-group'] = 'matchFiler',
+									['data-switch-group'] = 'matchFilter',
 									['data-store-value'] = 'true',
 								},
 								children = {
