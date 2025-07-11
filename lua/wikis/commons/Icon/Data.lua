@@ -170,4 +170,11 @@ return {
 	-- Usage: Chess
 	chesskingoutline = 'far fa-chess-king',
 	chesskingfull = 'fas fa-chess-king',
+
+	-- Usage: For NavigationCards related actions and links
+	upload = 'far fa-upload',
+	support_hub = 'liquipedia-custom-icon liquipedia-custom-icon-support-hub',
+	copyright = 'far fa-copyright',
+	getting_started = 'far fa-seedling',
+	file_standards_guide = 'far fa-file-check',
 }
