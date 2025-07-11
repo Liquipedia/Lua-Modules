@@ -49,8 +49,14 @@ liquipedia.collapse = {
 		document.querySelectorAll( '#mw-content-text .collapsible' ).forEach( ( collapsible ) => {
 			const row = collapsible.querySelector( 'tr' );
 			if ( row !== null ) {
-				row.lastElementChild.insertBefore( this.makeDesignButton( collapsible, true ), row.lastElementChild.firstChild );
-				row.lastElementChild.insertBefore( this.makeDesignButton( collapsible, false ), row.lastElementChild.firstChild );
+				row.lastElementChild.insertBefore(
+					this.makeDesignButton( collapsible, true ),
+					row.lastElementChild.firstChild
+				);
+				row.lastElementChild.insertBefore(
+					this.makeDesignButton( collapsible, false ),
+					row.lastElementChild.firstChild
+				);
 			}
 		} );
 	},
