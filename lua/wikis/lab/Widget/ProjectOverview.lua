@@ -40,6 +40,7 @@ local ProjectOverview = Class.new(Widget)
 
 ---@return Widget
 function ProjectOverview:render()
+	assert(Logic.isNotEmpty(self.props.ProjectUrl), '|ProjectUrl= not specified')
 	return Grid.Cell{
 		xs = 12,
 		md = 6,
@@ -114,7 +115,7 @@ function ProjectOverview:_generateOverview()
 					timestamp = DateExt.readTimestamp(
 						mw.getCurrentFrame():callParserFunction(
 							'#lastupdated_by_prefix',
-							(self.props.ProjectUrl or '') .. '/'
+							self.props.ProjectUrl .. '/'
 						)
 					),
 					rawdatetime = true
