@@ -27,7 +27,14 @@ local Panel = Lua.import('Module:Widget/Panel')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+---@class LabProjectOverviewParameters
+---@field ProjectName string
+---@field ProjectUrl string
+---@field ProjectImage string?
+---@field ProjectImageDark string?
+
 ---@class LabProjectOverview: Widget
+---@field props LabProjectOverviewParameters
 local ProjectOverview = Class.new(Widget)
 
 function ProjectOverview:render()
