@@ -241,7 +241,7 @@ function Event:_setLpdbData(args, links)
 			startdate = self.data.startDate or self.data.endDate or DateExt.defaultDate,
 			enddate = self.data.endDate or DateExt.defaultDate,
 			sortdate = self.data.endDate or DateExt.defaultDate,
-			location = mw.text.decode(Locale.formatLocation({city = args.city or args.location, country = args.ountry})),
+			location = mw.text.decode(Locale.formatLocation({city = args.city or args.location, country = args.country})),
 			location2 = mw.text.decode(Locale.formatLocation({city = args.city2 or args.location2, country = args.country2})),
 			venue = args.venue,
 			locations = Locale.formatLocations(args),
