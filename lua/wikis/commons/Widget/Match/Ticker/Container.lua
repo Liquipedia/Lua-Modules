@@ -120,7 +120,6 @@ function MatchTickerContainer:render()
 				attributes = {
 					['data-component'] = 'switch-toggle-container'
 				},
-				css = {margin = '1rem 0'},
 				children = {
 					HtmlWidgets.Div{
 						classes = {'switch-toggle'},
