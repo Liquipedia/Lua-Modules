@@ -18,7 +18,6 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 local CustomAwardPrizePool = {}
 
 local IS_AWARD = true
-local PRIZE_TYPE_POINTS = 'POINTS'
 
 -- Template entry point
 ---@param frame Frame

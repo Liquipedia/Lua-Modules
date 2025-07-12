@@ -24,7 +24,6 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 local CustomPrizePool = {}
 
 local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
-local PRIZE_TYPE_POINTS = 'POINTS'
 local QUALIFIER = 'Qualifier'
 local TIER_VALUE = {10, 6, 4, 2}
 
