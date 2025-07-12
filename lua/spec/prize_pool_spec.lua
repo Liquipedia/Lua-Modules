@@ -102,7 +102,7 @@ describe('prize pool', function()
 			PrizePool(prizePoolArgs):create():build()
 			assert.stub(LpdbPlacementStub).was.called_with('ranking_abc1_Rathoz', {
 				date = '2022-10-15',
-				extradata = '{"prizepoints":""}',
+				extradata = '{"prizepoints":"","prizepoints2":""}',
 				game = 'commons',
 				icon = 'test.png',
 				icondark = 'test dark.png',
