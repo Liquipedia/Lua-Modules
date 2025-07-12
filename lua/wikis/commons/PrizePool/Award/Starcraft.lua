@@ -25,7 +25,6 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
-local PRIZE_TYPE_POINTS = 'POINTS'
 local IS_AWARD = true
 
 local _series

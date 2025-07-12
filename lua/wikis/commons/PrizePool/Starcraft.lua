@@ -27,7 +27,6 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
-local PRIZE_TYPE_POINTS = 'POINTS'
 local SC2 = 'starcraft2'
 
 local _series

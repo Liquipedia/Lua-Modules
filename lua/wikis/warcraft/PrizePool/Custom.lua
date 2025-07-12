@@ -23,7 +23,6 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
-local PRIZE_TYPE_POINTS = 'POINTS'
 local AUTOMATION_START_DATE = '2023-10-16'
 
 -- Template entry point
