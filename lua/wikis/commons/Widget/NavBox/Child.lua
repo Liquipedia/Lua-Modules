@@ -13,6 +13,7 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Image = Lua.import('Module:Image')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -21,7 +22,8 @@ local Tbl = HtmlWidgets.Table
 local Tr = HtmlWidgets.Tr
 local Th = HtmlWidgets.Th
 local Td = HtmlWidgets.Td
-local Link = Lua.import('Module:Widget/Basic/Link')
+
+local NavBoxTitle = Lua.import('Module:Widget/NavBox/Title')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -33,6 +35,7 @@ local EMPTY_CHILD_ERROR = 'Empty child found'
 ---@field name string?
 ---@field mobileName string?
 ---@field title string?
+---@field mobileTitle string?
 ---@field titleLink string?
 ---@field collapsed boolean? # from wiki input string?
 ---@field center boolean? # from wiki input string?
@@ -45,6 +48,8 @@ local EMPTY_CHILD_ERROR = 'Empty child found'
 ---@field imageleftsize string?
 ---@field imagelink string?
 ---@field imagedarklink string?
+---@field imageShowOnMobile boolean? # from wiki input string?
+---@field imageleftShowOnMobile boolean? # from wiki input string?
 ---@field child1 string|NavBoxChildProps?
 ---@field child2 string|NavBoxChildProps?
 ---@field child3 string|NavBoxChildProps? # childX for X >=4 is supported too
@@ -108,14 +113,7 @@ function NavBoxChild:render()
 			shouldCollapse and 'collapsed' or nil,
 		},
 		children = WidgetUtil.collect(
-			(props.title or shouldCollapse) and Tr{children = {Th{
-				attributes = {colspan = colSpan},
-				classes = {'navbox-title'},
-				children = {
-					props.title and props.titleLink and Link{link = props.titleLink, children = {props.title}} or
-						props.title or 'Click on the "show"/"hide" link on the right to collapse/uncollapse the full list'
-				},
-			}}} or nil,
+			(props.title or shouldCollapse) and NavBoxTitle(Table.merge(props, {colSpan = colSpan})) or nil,
 			Array.map(children, FnUtil.curry(NavBoxChild._toRow, self))
 		)
 	}
@@ -170,6 +168,7 @@ function NavBoxChild:_makeImage(childIndex, isLeft)
 	local lightMode = props[prefix]
 	local darkMode = props[prefix .. 'dark']
 	local padding = isLeft and '0 2px 0 0' or '0 0 0 2px'
+	local hideOnMobile = not Logic.readBool(props[prefix .. 'ShowOnMobile'])
 
 	if childIndex ~= 1 or not (lightMode or darkMode) then
 		return
@@ -177,7 +176,10 @@ function NavBoxChild:_makeImage(childIndex, isLeft)
 
 	return Td{
 		attributes = {rowspan = self.rowSpan},
-		classes = {'navbox-image'},
+		classes = {
+			'navbox-image',
+			hideOnMobile and 'mobile-hide' or nil,
+		},
 		css = {width = '1px', padding = padding},
 		children = Div{children = {
 			Image.display(
