@@ -73,10 +73,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	Table.mergeInto(lpdbData.extradata, {
 		seriesnumber = CustomPrizePool._seriesNumber(),
-
-		-- to be removed once poinst storage is standardized
-		points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1),
-		points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2),
 	})
 
 	lpdbData.tournament = _tournament_name
