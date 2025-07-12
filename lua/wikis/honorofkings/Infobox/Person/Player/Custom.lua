@@ -33,8 +33,6 @@ function CustomPlayer.run(frame)
 	local args = player.args
 	player:setWidgetInjector(CustomInjector(player))
 
-	args.autoTeam = true
-
 	local builtInfobox = player:createInfobox()
 
 	local autoPlayerIntro = ''
@@ -66,7 +64,6 @@ function CustomPlayer.run(frame)
 	return mw.html.create()
 		:node(builtInfobox)
 		:node(autoPlayerIntro)
-
 end
 
 ---@param id string
