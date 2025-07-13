@@ -60,17 +60,25 @@ end
 ---@private
 ---@return Widget?
 function ProjectOverview:_generateImage()
-	if Logic.isEmpty(self.props.ProjectImage) then return end
+	local hasImage = not Logic.isEmpty(self.props.ProjectImage)
+
 	return Grid.Cell{
 		xs = 12,
-		xm = 12,
+		sm = 12,
 		md = 6,
-		cellContent = IconImage{
-			imageLight = self.props.ProjectImage,
-			imageDark = Logic.nilIfEmpty(self.props.ProjectImageDark),
-			size = '280x180px',
-			link = self.props.ProjectUrl,
-			alignment = 'center'
+		cellContent = HtmlWidgets.Div{
+			classes = not hasImage and {'mobile-hide'} or nil,
+			attributes = {
+				style = 'height: 160px; display: flex; align-items: center; justify-content: center;'
+			},
+			children = {
+				IconImage{
+					imageLight = hasImage and self.props.ProjectImage or 'Filler 600px.png',
+					imageDark = hasImage and Logic.emptyOr(self.props.ProjectImageDark, self.props.ProjectImage) or 'Filler 600px.png',
+					size = '260x160px',
+					link = self.props.ProjectUrl
+				}
+			}
 		}
 	}
 end
