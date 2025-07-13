@@ -48,17 +48,17 @@ function ProjectOverview:render()
 			heading = self.props.ProjectName,
 			padding = true,
 			children = Grid.Container{
-				gridCells = WidgetUtil.collect(
+				gridCells = {
 					self:_generateImage(),
 					self:_generateOverview()
-				)
+				}
 			}
 		}
 	}
 end
 
 ---@private
----@return Widget?
+---@return Widget
 function ProjectOverview:_generateImage()
 	local hasImage = not Logic.isEmpty(self.props.ProjectImage)
 
