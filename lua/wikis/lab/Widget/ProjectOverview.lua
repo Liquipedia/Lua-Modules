@@ -60,7 +60,7 @@ end
 ---@private
 ---@return Widget
 function ProjectOverview:_generateImage()
-	local hasImage = not Logic.isEmpty(self.props.ProjectImage)
+	local hasImage = Logic.isNotEmpty(self.props.ProjectImage)
 
 	return Grid.Cell{
 		xs = 12,
