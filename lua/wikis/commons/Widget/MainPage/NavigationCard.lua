@@ -9,10 +9,10 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Image = Lua.import('Module:Image')
-local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
