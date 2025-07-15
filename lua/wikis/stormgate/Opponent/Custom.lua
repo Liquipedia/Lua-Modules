@@ -62,6 +62,28 @@ function CustomOpponent.readOpponentArgs(args)
 	return opponent
 end
 
+---@param type OpponentType?
+---@return StormgateStandardOpponent
+function CustomOpponent.blank(type)
+	local opponent = Opponent.blank(type) --[[@as StormgateStandardOpponent]]
+
+	opponent.extradata = {}
+	opponent.isArchon = false
+
+	return opponent
+end
+
+---@param type OpponentType?
+---@return StormgateStandardOpponent
+function CustomOpponent.tbd(type)
+	local opponent = Opponent.tbd(type) --[[@as StormgateStandardOpponent]]
+
+	opponent.extradata = {}
+	opponent.isArchon = false
+
+	return opponent
+end
+
 ---@param record table
 ---@return StormgateStandardOpponent?
 function CustomOpponent.fromMatch2Record(record)

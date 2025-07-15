@@ -47,6 +47,28 @@ function CustomOpponent.readOpponentArgs(args)
 	return opponent
 end
 
+---@param type OpponentType?
+---@return WarcraftStandardOpponent
+function CustomOpponent.blank(type)
+	local opponent = Opponent.blank(type) --[[@as WarcraftStandardOpponent]]
+
+	opponent.extradata = {}
+	opponent.isArchon = false
+
+	return opponent
+end
+
+---@param type OpponentType?
+---@return WarcraftStandardOpponent
+function CustomOpponent.tbd(type)
+	local opponent = Opponent.tbd(type) --[[@as WarcraftStandardOpponent]]
+
+	opponent.extradata = {}
+	opponent.isArchon = false
+
+	return opponent
+end
+
 ---@param record table
 ---@return WarcraftStandardOpponent?
 function CustomOpponent.fromMatch2Record(record)

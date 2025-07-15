@@ -14,7 +14,7 @@ local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
-local Opponent = Lua.import('Module:Opponent')
+local Opponent = Lua.import('Module:Opponent/Starcraft')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 local StarcraftPlayerDisplay = Lua.import('Module:Player/Display/Starcraft')
 

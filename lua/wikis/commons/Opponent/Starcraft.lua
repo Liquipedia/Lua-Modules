@@ -59,6 +59,28 @@ function StarcraftOpponent.readOpponentArgs(args)
 	return opponent
 end
 
+---@param type OpponentType?
+---@return StarcraftStandardOpponent
+function StarcraftOpponent.blank(type)
+	local opponent = Opponent.blank(type) --[[@as StarcraftStandardOpponent]]
+
+	opponent.extradata = {}
+	opponent.isArchon = false
+
+	return opponent
+end
+
+---@param type OpponentType?
+---@return StarcraftStandardOpponent
+function StarcraftOpponent.tbd(type)
+	local opponent = Opponent.tbd(type) --[[@as StarcraftStandardOpponent]]
+
+	opponent.extradata = {}
+	opponent.isArchon = false
+
+	return opponent
+end
+
 ---@param record table
 ---@return StarcraftStandardOpponent?
 function StarcraftOpponent.fromMatch2Record(record)
@@ -126,7 +148,7 @@ using data stored in page variables if present.
 options.syncPlayer: Whether to fetch player information from variables or LPDB. Disabled by default.
 ]]
 ---@param opponent StarcraftStandardOpponent
----@param date string|number|osdate|nil
+---@param date string|number|nil
 ---@param options {syncPlayer: boolean?, overwritePageVars: boolean?}
 ---@return StarcraftStandardOpponent
 function StarcraftOpponent.resolve(opponent, date, options)
