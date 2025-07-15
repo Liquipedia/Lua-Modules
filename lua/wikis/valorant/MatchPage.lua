@@ -198,7 +198,7 @@ function MatchPage:_renderGameOverview(game)
 
 	if self:isBestOfOne() then
 		return {
-			HtmlWidgets.H3{children = 'Game Overview'},
+			HtmlWidgets.H3{children = {'Game Overview: ', game.map}},
 			overview
 		}
 	end
