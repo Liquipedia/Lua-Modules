@@ -134,7 +134,7 @@ function SeriesChildFromLpdb:_makeConditions()
 
 	local year = tonumber(props.year)
 
-local tierTypes = Json.parseIfTable(props.tierType) or {props.tierType}
+	local tierTypes = Json.parseIfTable(props.tierType) or {props.tierType}
 	if Array.any(tierTypes, function(tierType) return tierType == DEFAULT_TIERTYPE end) then
 		table.insert(tierTypes, '')
 	end
