@@ -28,7 +28,8 @@ CustomOpponentDisplay.BracketOpponentEntry = Class.new(
 	---@param opponent StormgateStandardOpponent
 	---@param options {forceShortName: boolean, showTbd: boolean}
 	function(self, opponent, options)
-		if options.showTbd == false and (Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)) then
+		if opponent.type == Opponent.team and options.showTbd == false and
+				(Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)) then
 			opponent = Opponent.blank() --[[@as StormgateStandardOpponent]]
 		end
 		local showFactionBackground = opponent.type == Opponent.solo or opponent.extradata.hasFactionOrFlag
