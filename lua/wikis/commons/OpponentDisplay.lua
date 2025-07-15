@@ -314,7 +314,7 @@ function OpponentDisplay.BlockTeam(props)
 		imageDark = props.team.imageDark,
 		page = props.team.pageName,
 		legacy = props.team.hasLegacyImage,
-		noLink = not props.showLink,
+		noLink = props.showLink == false,
 	}
 
 	local blockNode = mw.html.create('div'):addClass('block-team')

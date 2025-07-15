@@ -95,7 +95,8 @@ function TeamInlineWidget:render()
 			imageLight = imageLight,
 			imageDark = imageDark,
 			page = teamTemplate.page,
-			legacy = Logic.isEmpty(teamTemplate.image) and Logic.isNotEmpty(teamTemplate.legacyimage)
+			legacy = Logic.isEmpty(teamTemplate.image) and Logic.isNotEmpty(teamTemplate.legacyimage),
+			noLink = teamTemplate.page == 'TBD',
 		},
 		self:_getNameComponent()
 	), ' ')
@@ -114,7 +115,8 @@ function TeamInlineWidget:_getNameComponent()
 			return TeamName{
 				additionalClasses = element[2],
 				displayName = self.teamTemplate[element[1]],
-				page = self.teamTemplate.page
+				page = self.teamTemplate.page,
+				noLink = self.teamTemplate.page == 'TBD',
 			}
 		end)
 	}

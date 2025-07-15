@@ -56,19 +56,21 @@ end
 ---@private
 ---@param image string
 ---@param size string
+---@param link string
 ---@return Widget
-function TeamIcon:_getIcon(image, size)
+function TeamIcon:_getIcon(image, size, link)
 	return WidgetIconImage{
 		imageLight = image,
 		size = size,
 		alignment = 'middle',
-		link = self:_getPageLink()
+		link = link,
 	}
 end
 
 ---@private
 ---@param icon Widget
 ---@param onlyForTheme 'lightmode'|'darkmode'|nil
+---@param isLegacy boolean
 ---@return Widget
 function TeamIcon:_buildSpan(icon, onlyForTheme, isLegacy)
 	return Span{
@@ -83,29 +85,33 @@ function TeamIcon:_buildSpan(icon, onlyForTheme, isLegacy)
 end
 
 ---@private
----@return string?
+---@return string
 function TeamIcon:_getPageLink()
-	return self.props.noLink and '' or self.props.page
+	if self.props.noLink then
+		return ''
+	end
+	return self.props.page or ''
 end
 
 ---@return Widget|Widget[]
 function TeamIcon:render()
 	local size = self.props.size
-	local isLegacy = self.props.legacy
+	local isLegacy = self.props.legacy or false
 	local imageLight = self.props.imageLight
 
 	if imageLight == TBD_FILLER_IMAGE then
 		return self:_buildSpan(self:_getDefaultIcon(), nil, false)
 	end
 
+	local link = self:_getPageLink()
 	local imageDark = self.props.imageDark or imageLight
 	local allmode = imageLight == imageDark
 	if allmode then
-		return self:_buildSpan(self:_getIcon(imageLight, size), nil, isLegacy)
+		return self:_buildSpan(self:_getIcon(imageLight, size, link), nil, isLegacy)
 	end
 	return {
-		self:_buildSpan(self:_getIcon(imageLight, size), 'lightmode', isLegacy),
-		self:_buildSpan(self:_getIcon(imageDark, size), 'darkmode', isLegacy),
+		self:_buildSpan(self:_getIcon(imageLight, size, link), 'lightmode', isLegacy),
+		self:_buildSpan(self:_getIcon(imageDark, size, link), 'darkmode', isLegacy),
 	}
 end
 
