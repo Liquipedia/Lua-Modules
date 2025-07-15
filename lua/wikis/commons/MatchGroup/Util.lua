@@ -289,11 +289,17 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 ---@field displayName string
 ---@field pageName string?
 ---@field shortName string
+---@field imageLight string?
+---@field imageDark string?
+---@field hasLegacyImage boolean
 MatchGroupUtil.types.Team = TypeUtil.struct({
 	bracketName = 'string',
 	displayName = 'string',
 	pageName = 'string?',
 	shortName = 'string',
+	imageLight = 'string?',
+	imageDark = 'string?',
+	hasLegacyImage = 'boolean',
 })
 
 ---@class MatchGroupUtilMatchlist
@@ -832,8 +838,9 @@ function MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
 end
 
 ---Fetches information about a team via mw.ext.TeamTemplate.
+---@deprecated This function is only used on OpponentDisplay and should be removed once team handling is refactored.
 ---@param template string
----@return table?
+---@return standardTeamProps?
 function MatchGroupUtil.fetchTeam(template)
 	--exception for TBD opponents
 	if string.lower(template) == 'tbd' then
@@ -842,6 +849,7 @@ function MatchGroupUtil.fetchTeam(template)
 			displayName = TBD_DISPLAY,
 			pageName = 'TBD',
 			shortName = TBD_DISPLAY,
+			hasLegacyImage = false,
 		}
 	end
 	local rawTeam = mw.ext.TeamTemplate.raw(template)
@@ -854,6 +862,9 @@ function MatchGroupUtil.fetchTeam(template)
 		displayName = rawTeam.name,
 		pageName = rawTeam.page,
 		shortName = rawTeam.shortname,
+		imageLight = Logic.emptyOr(rawTeam.image, rawTeam.legacyimage),
+		imageDark = Logic.emptyOr(rawTeam.imagedark, rawTeam.legacyimagedark),
+		hasLegacyImage = Logic.isEmpty(rawTeam.image) and Logic.isNotEmpty(rawTeam.legacyimage)
 	}
 end
 

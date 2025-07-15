@@ -19,6 +19,7 @@ local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
+local TeamIcon = Lua.import('Module:Widget/Image/Icon/TeamIcon')
 
 local zeroWidthSpace = '&#8203;'
 
@@ -274,14 +275,12 @@ function OpponentDisplay.BlockTeamContainer(props)
 	end
 
 	return OpponentDisplay.BlockTeam(Table.merge(props, {
-		icon = mw.ext.TeamTemplate.teamicon(props.template),
 		team = team,
 	}))
 end
 
 ---@class blockTeamProps
 ---@field flip boolean
----@field icon string
 ---@field overflow OverflowModes?
 ---@field showLink boolean?
 ---@field style teamStyle?
@@ -310,9 +309,13 @@ function OpponentDisplay.BlockTeam(props)
 	local bracketNameNode = createNameNode(props.team.bracketName)
 	local shortNameNode = createNameNode(props.team.shortName)
 
-	local icon = props.showLink
-		and props.icon
-		or DisplayUtil.removeLinkFromWikiLink(props.icon)
+	local icon = TeamIcon{
+		imageLight = props.team.imageLight,
+		imageDark = props.team.imageDark,
+		page = props.team.pageName,
+		legacy = props.team.hasLegacyImage,
+		noLink = not props.showLink,
+	}
 
 	local blockNode = mw.html.create('div'):addClass('block-team')
 		:addClass(props.flip and 'flipped' or nil)
