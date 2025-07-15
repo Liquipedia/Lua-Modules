@@ -6,7 +6,7 @@
 
 return {
 	-- Usage: Team information
-	team_tbd = 'fas fa-users',
+	team_tbd = 'far fa-users',
 
 	-- Usage: Match results
 	winner = 'fas fa-check',
