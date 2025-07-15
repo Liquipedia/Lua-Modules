@@ -8,30 +8,34 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Image = Lua.import('Module:Image')
 local Logic = Lua.import('Module:Logic')
 
-local Image = Lua.import('Module:Widget/Image/Icon/Image')
+local Icon = Lua.import('Module:Widget/Image/Icon')
 
 ---@class AoeAgeIconWidget: Widget
 ---@operator call(table): AoeAgeIconWidget
 ---@field props {age: string?, checkGame: boolean, game: string?}
-local AoeAgeIcon = Class.new(Image)
+local AoeAgeIcon = Class.new(Icon)
 AoeAgeIcon.defaultProps = {
 	checkGame = false,
 }
 
----@return Widget?
+---@return string?
 function AoeAgeIcon:render()
 	local age = self.props.age
 	if self.props.checkGame and self.props.game ~= 'Age of Empires II' or Logic.isEmpty(age) then
 		return
 	end
 
-	return Image{
-		imageLight = age .. ' Age AoE2 logo.png',
-		size = '18',
-		link = age .. ' Age'
-	}
+	return Image.display(
+		age .. ' Age AoE2 logo.png',
+		age .. ' Age AoE2 logo.png',
+		{
+			link = age .. ' Age',
+			size = '18',
+		}
+	)
 end
 
 return AoeAgeIcon

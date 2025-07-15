@@ -8,8 +8,9 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Image = Lua.import('Module:Image')
 
-local Image = Lua.import('Module:Widget/Image/Icon/Image')
+local Icon = Lua.import('Module:Widget/Image/Icon')
 
 local EXPANSIONS = {
 	kin = 'The Age of Kings',
@@ -36,20 +37,23 @@ EXPANSIONS['definitive edition'] = EXPANSIONS.las
 ---@class AoeExpansionIconWidget: Widget
 ---@operator call(table): AoeExpansionIconWidget
 ---@field props {expansion: string?}
-local AoeExpansionIcon = Class.new(Image)
+local AoeExpansionIcon = Class.new(Icon)
 
----@return Widget?
+---@return string?
 function AoeExpansionIcon:render()
 	local exp = EXPANSIONS[(self.props.expansion or ''):lower()]
 	if not exp then
 		return
 	end
 
-	return Image{
-		imageLight = 'Aoe2 ' .. exp .. ' Icon.png',
-		size = '18',
-		link = exp
-	}
+	return Image.display(
+		'Aoe2 ' .. exp .. ' Icon.png',
+		'Aoe2 ' .. exp .. ' Icon.png',
+		{
+			link = exp,
+			size = '18',
+		}
+	)
 end
 
 return AoeExpansionIcon
