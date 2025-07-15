@@ -91,7 +91,7 @@ function TeamInlineWidget:render()
 	end
 	local flip = self.flip
 	local imageLight = Logic.emptyOr(teamTemplate.image, teamTemplate.legacyimage)
-	local imageDark = Logic.emptyOr(self.teamTemplate.imagedark, self.teamTemplate.legacyimagedark)
+	local imageDark = Logic.emptyOr(teamTemplate.imagedark, teamTemplate.legacyimagedark)
 	if imageLight == TBD_FILLER_IMAGE then
 		imageLight, imageDark = nil, nil
 	end
@@ -99,8 +99,8 @@ function TeamInlineWidget:render()
 		TeamIcon{
 			imageLight = imageLight,
 			imageDark = imageDark,
-			page = self.teamTemplate.page,
-			legacy = Logic.isEmpty(self.teamTemplate.image) and Logic.isNotEmpty(self.teamTemplate.legacyimage)
+			page = teamTemplate.page,
+			legacy = Logic.isEmpty(teamTemplate.image) and Logic.isNotEmpty(teamTemplate.legacyimage)
 		},
 		self:_getNameComponent()
 	), ' ')
