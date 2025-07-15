@@ -186,7 +186,7 @@ local CONTENT = {
 		boxid = 1508,
 	},
 	rankings = {
-		heading = 'Top Teams',
+		heading = 'Liquipedia Rankings (Beta)',
 		body = Rankings{
 			teamLimit = 5,
 			progressionLimit = 12,
@@ -234,10 +234,6 @@ local LAYOUT_MAIN = {
 			},
 			{
 				mobileOrder = 3,
-				content = CONTENT.rankings
-			},
-			{
-				mobileOrder = 4,
 				children = {
 					{
 						children = {
@@ -266,6 +262,10 @@ local LAYOUT_MAIN = {
 						},
 					},
 				},
+			},
+			{
+				mobileOrder = 6,
+				content = CONTENT.rankings
 			},
 			{
 				mobileOrder = 7,
@@ -310,10 +310,6 @@ local LAYOUT_ESPORTS = {
 		children = {
 			{
 				mobileOrder = 3,
-				content = CONTENT.rankings
-			},
-			{
-				mobileOrder = 4,
 				children = {
 					{
 						children = {
@@ -345,6 +341,10 @@ local LAYOUT_ESPORTS = {
 			},
 			{
 				mobileOrder = 6,
+				content = CONTENT.rankings
+			},
+			{
+				mobileOrder = 7,
 				content = CONTENT.updates,
 			},
 		},

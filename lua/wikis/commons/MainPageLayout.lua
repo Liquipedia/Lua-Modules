@@ -111,7 +111,7 @@ function MainPageLayout._makeCells(cells)
 	return GridWidgets.Container{ gridCells = output }
 end
 
----@param navigationData {file: string?, link: string?, count: table?, title: string?}
+---@param navigationData {file: string?, iconName: string?, link: string?, count: table?, title: string?}
 ---@return Widget
 function MainPageLayout._makeNavigationCard(navigationData)
 	local count
@@ -127,6 +127,7 @@ function MainPageLayout._makeNavigationCard(navigationData)
 
 	return NavigationCard{
 		file = navigationData.file,
+		iconName = navigationData.iconName,
 		link = navigationData.link,
 		title = navigationData.title,
 		count = count
