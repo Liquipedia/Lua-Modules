@@ -38,8 +38,6 @@ CustomOpponent.types.Opponent = TypeUtil.union(
 
 ---@class StormgateStandardOpponent:standardOpponent
 ---@field players StormgateStandardPlayer[]
----@field isArchon boolean
----@field isSpecialArchon boolean?
 ---@field extradata table
 
 ---@param args table
@@ -68,7 +66,6 @@ function CustomOpponent.blank(type)
 	local opponent = Opponent.blank(type) --[[@as StormgateStandardOpponent]]
 
 	opponent.extradata = {}
-	opponent.isArchon = false
 
 	return opponent
 end
@@ -79,7 +76,6 @@ function CustomOpponent.tbd(type)
 	local opponent = Opponent.tbd(type) --[[@as StormgateStandardOpponent]]
 
 	opponent.extradata = {}
-	opponent.isArchon = false
 
 	return opponent
 end

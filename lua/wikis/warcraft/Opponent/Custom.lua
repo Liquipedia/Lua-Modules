@@ -22,8 +22,6 @@ local CustomOpponent = Table.deepCopy(Opponent)
 
 ---@class WarcraftStandardOpponent:standardOpponent
 ---@field players WarcraftStandardPlayer[]
----@field isArchon boolean
----@field isSpecialArchon boolean?
 ---@field extradata table
 
 ---@param args table
@@ -53,7 +51,6 @@ function CustomOpponent.blank(type)
 	local opponent = Opponent.blank(type) --[[@as WarcraftStandardOpponent]]
 
 	opponent.extradata = {}
-	opponent.isArchon = false
 
 	return opponent
 end
@@ -64,7 +61,6 @@ function CustomOpponent.tbd(type)
 	local opponent = Opponent.tbd(type) --[[@as WarcraftStandardOpponent]]
 
 	opponent.extradata = {}
-	opponent.isArchon = false
 
 	return opponent
 end
