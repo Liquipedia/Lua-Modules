@@ -9,7 +9,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Image = require('Module:Image')
 local Lua = require('Module:Lua')
-local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
@@ -19,6 +18,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Breakdown = Widgets.Breakdown
 local Table = Widgets.Table
+local UniverseIcon = Lua.import('Module:Widget/UniverseIcon')
 
 ---@class HeroesCharacterInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)
@@ -51,11 +51,11 @@ function CustomInjector:parse(id, widgets)
 		return {}
 	elseif id == 'custom' then
 		local makeBreakdownCell = function(name, value)
-			return '<b>' ..name .. '</b><br/>' .. (value or '')
+			return '<b>' .. name .. '</b><br/>' .. tostring(value or '')
 		end
 		Array.appendWith(widgets,
 			Breakdown{classes = {'infobox-center'}, children = {
-				makeBreakdownCell('Universe', Template.safeExpand(mw.getCurrentFrame(), 'Faction icon', {args.universe})),
+				makeBreakdownCell('Universe', UniverseIcon{universe = args.universe}),
 				makeBreakdownCell('Role', getRoleIcon(args.role)),
 				makeBreakdownCell('Attack', table.concat({args.attacktype, args.attacktype2}, ' and ')),
 			}},
@@ -98,6 +98,7 @@ end
 
 ---@param lpdbData table
 ---@param args table
+---@return table
 function CustomCharacter:addToLpdb(lpdbData, args)
 	lpdbData.extradata.role = args.role
 
