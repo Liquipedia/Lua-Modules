@@ -24,8 +24,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field displayType string
 ---@field displayNames table<string, string[]>
 
-local TBD_FILLER_IMAGE = 'Filler 600px.png'
-
 ---@type table<teamStyle, InlineType>
 local TEAM_INLINE_TYPES = {
 	['bracket'] = {
@@ -92,9 +90,6 @@ function TeamInlineWidget:render()
 	local flip = self.flip
 	local imageLight = Logic.emptyOr(teamTemplate.image, teamTemplate.legacyimage)
 	local imageDark = Logic.emptyOr(teamTemplate.imagedark, teamTemplate.legacyimagedark)
-	if imageLight == TBD_FILLER_IMAGE then
-		imageLight, imageDark = nil, nil
-	end
 	local children = Array.interleave(WidgetUtil.collect(
 		TeamIcon{
 			imageLight = imageLight,

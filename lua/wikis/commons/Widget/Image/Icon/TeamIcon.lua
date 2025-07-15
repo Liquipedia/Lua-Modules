@@ -17,7 +17,7 @@ local WidgetIconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local WidgetIconFontawesome = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class TeamIconWidgetParameters
----@field imageLight string?
+---@field imageLight string
 ---@field imageDark string?
 ---@field page string?
 ---@field size string?
@@ -25,7 +25,7 @@ local WidgetIconFontawesome = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 ---@field legacy boolean?
 
 ---@class TeamIconWidgetProps
----@field imageLight string?
+---@field imageLight string
 ---@field imageDark string?
 ---@field page string?
 ---@field size string
@@ -39,6 +39,11 @@ local TeamIcon = Class.new(WidgetIcon)
 TeamIcon.defaultProps = {
 	size = '100x50px',
 }
+
+---This is the TBD Team icon in Team Template. This will be replaced by the Icon for the TBD Team.
+---This is a medium term solution until we have refactored and standardized more of the Team Template.
+---Hopefully in the future we can remove this.
+local TBD_FILLER_IMAGE = 'Filler 600px.png'
 
 ---@private
 ---@return Widget
@@ -89,7 +94,7 @@ function TeamIcon:render()
 	local isLegacy = self.props.legacy
 	local imageLight = self.props.imageLight
 
-	if not imageLight then
+	if imageLight == TBD_FILLER_IMAGE then
 		return self:_buildSpan(self:_getDefaultIcon(), nil, false)
 	end
 
