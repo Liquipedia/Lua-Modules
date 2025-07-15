@@ -7,22 +7,44 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Table = Lua.import('Module:Table')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local ChronologyDisplay = Lua.import('Module:Widget/Infobox/ChronologyDisplay')
 
 ---@class ChronologyWidget: Widget
 ---@operator call(table): ChronologyWidget
----@field props {links: table<string, string|number|nil>?, title: string?, showTitle: boolean?, args: table?}
+---@field props {title: string?, showTitle: boolean?, args: table?}
 local Chronology = Class.new(Widget)
 
 ---@return Widget?
 function Chronology:render()
-	local links = self.props.links or Table.filterByKey(self.props.args or {}, function(key)
-		return type(key) == 'string' and (key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
+	local args = self.props.args or {}
+
+	---@param input string?
+	---@return {link:string, display: string}?
+	local processLinkInput = function(input)
+		if Logic.isEmpty(input) then return end
+		---@cast input -nil
+		local link, text = unpack(mw.text.split(input, '|'))
+		return {
+			link = link,
+			text = text or link,
+		}
+	end
+
+	---@type {previous: {link:string, text: string}?, next: {link:string, text: string}?}[]
+	local links = Array.mapIndexes(function(index)
+		local postFix = index == 1 and '' or index
+
+		return Logic.nilIfEmpty({
+			previous = processLinkInput(args['previous' .. postFix]),
+			next = processLinkInput(args['next' .. postFix]),
+		})
 	end)
+
 	return ChronologyDisplay{
 		links = links,
 		title = self.props.title,
@@ -31,4 +53,3 @@ function Chronology:render()
 end
 
 return Chronology
-
