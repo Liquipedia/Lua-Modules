@@ -37,9 +37,13 @@ OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'br
 OpponentDisplay.BracketOpponentEntry = Class.new(
 	---@param self self
 	---@param opponent standardOpponent
-	---@param options {forceShortName: boolean}
+	---@param options {forceShortName: boolean, showTbd: boolean}
 	function(self, opponent, options)
 		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
+
+		if options.showTbd == false and (Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)) then
+			opponent = Opponent.blank()
+		end
 
 		if opponent.type == Opponent.team then
 			self:createTeam(opponent.template or 'tbd', options)

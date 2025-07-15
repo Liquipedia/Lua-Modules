@@ -38,8 +38,12 @@ local StarcraftOpponentDisplay = Table.copy(OpponentDisplay)
 local BracketOpponentEntry = Class.new(
 	---@param self self
 	---@param opponent StarcraftStandardOpponent
-	---@param options {forceShortName: boolean}
+	---@param options {forceShortName: boolean, showTbd: boolean}
 	function(self, opponent, options)
+		if options.showTbd == false and (Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)) then
+			opponent = Opponent.blank() --[[@as StarcraftStandardOpponent]]
+		end
+
 		local showFactionBackground = opponent.type == Opponent.solo
 			or opponent.extradata.hasFactionOrFlag
 			or opponent.type == Opponent.duo and opponent.isArchon

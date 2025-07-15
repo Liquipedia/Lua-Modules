@@ -26,8 +26,11 @@ local CustomOpponentDisplay = Table.merge(OpponentDisplay, {propTypes = {}, type
 CustomOpponentDisplay.BracketOpponentEntry = Class.new(
 	---@param self self
 	---@param opponent WarcraftStandardOpponent
-	---@param options {forceShortName: boolean}
+	---@param options {forceShortName: boolean, showTbd: boolean}
 	function(self, opponent, options)
+		if options.showTbd == false and (Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)) then
+			opponent = Opponent.blank() --[[@as WarcraftStandardOpponent]]
+		end
 		local showFactionBackground = opponent.type == Opponent.solo or opponent.extradata.hasFactionOrFlag
 
 		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
