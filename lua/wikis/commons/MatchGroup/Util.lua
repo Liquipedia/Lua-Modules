@@ -22,7 +22,6 @@ local Variables = Lua.import('Module:Variables')
 local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
-local TBD_DISPLAY = '<abbr title="To Be Decided">TBD</abbr>'
 local NOW = os.time()
 
 local nilIfEmpty = String.nilIfEmpty
@@ -842,16 +841,6 @@ end
 ---@param template string
 ---@return standardTeamProps?
 function MatchGroupUtil.fetchTeam(template)
-	--exception for TBD opponents
-	if string.lower(template) == 'tbd' then
-		return {
-			bracketName = TBD_DISPLAY,
-			displayName = TBD_DISPLAY,
-			pageName = 'TBD',
-			shortName = TBD_DISPLAY,
-			hasLegacyImage = false,
-		}
-	end
 	local rawTeam = mw.ext.TeamTemplate.raw(template)
 	if not rawTeam then
 		return nil
