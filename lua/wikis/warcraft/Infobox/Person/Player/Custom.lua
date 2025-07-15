@@ -37,7 +37,6 @@ function CustomPlayer.run(frame)
 	args.achievements = Achievements.player{noTemplate = true}
 
 	-- Profiles to links
-	args.esl = args.esl or args.eslprofile
 	args.nwc3l = args.nwc3l or args.nwc3lprofile
 
 	-- Uppercase first letter in status

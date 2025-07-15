@@ -31,7 +31,6 @@ return {
 		'dotabuff',
 		'esea',
 		'esea-d',
-		'esl',
 		'esplay',
 		'esportal',
 		'etf2l',

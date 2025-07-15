@@ -29,14 +29,6 @@ return {
 		max = 2,
 	},
 	{
-		name = 'esl',
-		icon = 'ESL 2019 icon lightmode.png',
-		iconDark = 'ESL 2019 icon darkmode.png',
-		prefixLink = 'https://play.eslgaming.com/match/',
-		label = 'Matchpage and Stats on ESL Play',
-		isMapStats = true
-	},
-	{
 		name = 'esea',
 		icon = 'ESEA icon.png',
 		prefixLink = 'https://play.esea.net/match/',

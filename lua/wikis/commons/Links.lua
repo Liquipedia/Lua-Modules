@@ -113,12 +113,6 @@ local PREFIXES = {
 		match = 'https://play.esea.net/match/',
 	},
 	['esea-d'] = {'https://play.esea.net/league/standings?divisionId='},
-	esl = {
-		'',
-		team = 'https://play.eslgaming.com/team/',
-		player = 'https://play.eslgaming.com/player/',
-		match = 'https://play.eslgaming.com/match/',
-	},
 	esplay = {'https://esplay.com/tournament/'},
 	esportal = {'https://esportal.com/tournament/'},
 	etf2l = {
@@ -352,7 +346,6 @@ SUFFIXES = Table.merge(SUFFIXES, CustomData.suffixes or {})
 local ALIASES = {
 	['ask-fm'] = {'afk.fm', 'askfm'},
 	douyu = {'douyutv'},
-	esl = {'eslgaming'},
 	['facebook-gaming'] = {'fbgg'},
 	home = {'website', 'web', 'site', 'url'},
 	huyatv = {'huya'},
@@ -442,11 +435,6 @@ local MATCH_ICONS = {
 	ebattle = {
 		icon = 'File:Ebattle Series allmode.png',
 		text = 'Match page on ebattle'
-	},
-	esl = {
-		icon = 'File:ESL_2019_icon_lightmode.png',
-		iconDark = 'File:ESL_2019_icon_darkmode.png',
-		text = 'Match page on ESL'
 	},
 	esea = {
 		icon = 'File:ESEA icon allmode.png',
@@ -698,7 +686,7 @@ function Links.makeFullLinksForTableItems(links, variant, fallbackToBase)
 end
 
 --remove appended number
---needed because the link icons Lua.import e.g. 'esl' instead of 'esl2'
+--needed because the link icons require e.g. 'twitch' instead of 'twitch2'
 ---@param key string
 ---@return string
 function Links.removeAppendedNumber(key)

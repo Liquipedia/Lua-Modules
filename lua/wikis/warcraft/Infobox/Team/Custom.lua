@@ -40,11 +40,6 @@ local PROFILES = {
 		link = 'https://nwc3l.com/team/',
 		text = 'NWC3L ${name}\'s profile'
 	},
-	eslprofile = {
-		icon = 'ESL_2019_icon.png',
-		link = 'https://play.eslgaming.com/team/',
-		text = 'ESL ${name}\'s profile'
-	},
 }
 
 ---@param frame Frame
