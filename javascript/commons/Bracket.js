@@ -52,22 +52,15 @@ liquipedia.bracket = {
 					this.classList.remove( 'bracket-hover' );
 				} );
 			} );
-			document.querySelectorAll(
-				'.bracket-team-top, .bracket-team-bottom, .bracket-team-middle, .bracket-team-inner, ' +
-				'.bracket-player-top, .bracket-player-bottom, .bracket-player-middle, .bracket-player-inner, ' +
-				'.matchlistslot, .matchslot, .grouptableslot'
-			).forEach( ( element ) => {
+			document.querySelectorAll( '.bracket-team-top, .bracket-team-bottom, .bracket-team-middle, .bracket-team-inner, .bracket-player-top, .bracket-player-bottom, .bracket-player-middle, .bracket-player-inner, .matchlistslot, .matchslot, .grouptableslot' ).forEach( ( element ) => {
 				element.addEventListener( 'mouseover', () => {
-					if ( !liquipedia.bracket.highlighting.filteredSelectors
-						.includes( element.dataset.highlightingkey )
-					) {
-						liquipedia.bracket.highlighting.hoverCache[ element.dataset.highlightingkey ]
-							.forEach( ( node ) => {
-								node.classList.add( 'bracket-hover' );
-								if ( typeof node.dataset.backgroundColorHover !== 'undefined' ) {
-									node.style.backgroundColor = node.dataset.backgroundColorHover;
-								}
-							} );
+					if ( !liquipedia.bracket.highlighting.filteredSelectors.includes( element.dataset.highlightingkey ) ) {
+						liquipedia.bracket.highlighting.hoverCache[ element.dataset.highlightingkey ].forEach( ( node ) => {
+							node.classList.add( 'bracket-hover' );
+							if ( typeof node.dataset.backgroundColorHover !== 'undefined' ) {
+								node.style.backgroundColor = node.dataset.backgroundColorHover;
+							}
+						} );
 					}
 				} );
 				element.addEventListener( 'mouseleave', () => {
@@ -138,11 +131,7 @@ liquipedia.bracket = {
 		},
 		hoverCache: { },
 		createHoverCache: function() {
-			document.querySelectorAll(
-				'.bracket-team-top, .bracket-team-bottom, .bracket-team-middle, .bracket-team-inner, ' +
-				'.bracket-player-top, .bracket-player-bottom, .bracket-player-middle, ' +
-				'.bracket-player-inner, .matchlistslot, .matchslot, .grouptableslot'
-			).forEach( ( element ) => {
+			document.querySelectorAll( '.bracket-team-top, .bracket-team-bottom, .bracket-team-middle, .bracket-team-inner, .bracket-player-top, .bracket-player-bottom, .bracket-player-middle, .bracket-player-inner, .matchlistslot, .matchslot, .grouptableslot' ).forEach( ( element ) => {
 				const teamicon = element.querySelector( '.team-template-image img' );
 				let selector;
 				if ( teamicon === null ) {
@@ -207,10 +196,7 @@ liquipedia.bracket = {
 				if ( popupwrapper !== null ) {
 					const icon = document.createElement( 'div' );
 					icon.classList.add( 'icon' );
-					icon.style.top =
-						( parseInt(
-							window.getComputedStyle( element.querySelector( ':first-child' ) ).height
-						) - 6 ) + 'px';
+					icon.style.top = ( parseInt( window.getComputedStyle( element.querySelector( ':first-child' ) ).height ) - 6 ) + 'px';
 					const score = element.querySelector( '.bracket-score' );
 					if ( score !== null ) {
 						icon.style.right = ( parseInt( window.getComputedStyle( score ).width ) - 5 ) + 'px';
@@ -218,9 +204,7 @@ liquipedia.bracket = {
 						icon.style.right = '16px';
 					}
 					element.appendChild( icon );
-					element.querySelectorAll(
-						'.bracket-team-top, .bracket-team-bottom, .bracket-player-top, .bracket-player-bottom'
-					).forEach( ( node ) => {
+					element.querySelectorAll( '.bracket-team-top, .bracket-team-bottom, .bracket-player-top, .bracket-player-bottom' ).forEach( ( node ) => {
 						node.style.cursor = 'pointer';
 						node.title = 'Click for further information';
 					} );
@@ -271,8 +255,7 @@ liquipedia.bracket = {
 			document.querySelector( 'html' ).addEventListener( 'click', ( ev ) => {
 				if ( ev.target.closest( '.bracket-popup-wrapper' ) === null ) {
 					if ( liquipedia.bracket.popup.popupBox !== null ) {
-						liquipedia.bracket.popup.popupBox.querySelector( '.bracket-popup-wrapper' )
-							.style.display = 'none';
+						liquipedia.bracket.popup.popupBox.querySelector( '.bracket-popup-wrapper' ).style.display = 'none';
 						liquipedia.tracker.track( 'Bracket popup closed' );
 						liquipedia.bracket.popup.popupBox = null;
 					}
@@ -283,15 +266,11 @@ liquipedia.bracket = {
 					ev.stopPropagation();
 				} );
 			} );
-			document.querySelectorAll(
-				'.bracket-team-top, .bracket-team-bottom, .bracket-team-inner, .bracket-player-top, ' +
-				'.bracket-player-bottom, .bracket-player-inner, .bracket-game .icon'
-			).forEach( ( element ) => {
+			document.querySelectorAll( '.bracket-team-top, .bracket-team-bottom, .bracket-team-inner, .bracket-player-top, .bracket-player-bottom, .bracket-player-inner, .bracket-game .icon' ).forEach( ( element ) => {
 				element.addEventListener( 'click', ( event ) => {
 					const newPopupWrapper = element.closest( '.bracket-game' );
 					if ( liquipedia.bracket.popup.popupBox !== null ) {
-						liquipedia.bracket.popup.popupBox.querySelector( '.bracket-popup-wrapper' )
-							.style.display = 'none';
+						liquipedia.bracket.popup.popupBox.querySelector( '.bracket-popup-wrapper' ).style.display = 'none';
 						liquipedia.tracker.track( 'Bracket popup closed' );
 						if ( newPopupWrapper.isSameNode( liquipedia.bracket.popup.popupBox ) ) {
 							liquipedia.bracket.popup.popupBox = null;
@@ -313,8 +292,7 @@ liquipedia.bracket = {
 				element.addEventListener( 'click', ( event ) => {
 					const newPopupWrapper = element;
 					if ( liquipedia.bracket.popup.popupBox !== null ) {
-						liquipedia.bracket.popup.popupBox.querySelector( '.bracket-popup-wrapper' )
-							.style.display = 'none';
+						liquipedia.bracket.popup.popupBox.querySelector( '.bracket-popup-wrapper' ).style.display = 'none';
 						liquipedia.tracker.track( 'Bracket popup closed' );
 						if ( newPopupWrapper.isSameNode( liquipedia.bracket.popup.popupBox ) ) {
 							liquipedia.bracket.popup.popupBox = null;
@@ -336,8 +314,7 @@ liquipedia.bracket = {
 				element.addEventListener( 'click', ( event ) => {
 					const newPopupWrapper = element;
 					if ( liquipedia.bracket.popup.popupBox !== null ) {
-						liquipedia.bracket.popup.popupBox.querySelector( '.bracket-popup-wrapper' )
-							.style.display = 'none';
+						liquipedia.bracket.popup.popupBox.querySelector( '.bracket-popup-wrapper' ).style.display = 'none';
 						liquipedia.tracker.track( 'Bracket popup closed' );
 						if ( newPopupWrapper.isSameNode( liquipedia.bracket.popup.popupBox ) ) {
 							liquipedia.bracket.popup.popupBox = null;
@@ -356,10 +333,7 @@ liquipedia.bracket = {
 			} );
 		},
 		positionBracketPopup: function() {
-			if (
-				liquipedia.bracket.popup.popupBox !== null &&
-				liquipedia.bracket.popup.popupBox.querySelector( '.icon' ) !== null
-			) {
+			if ( liquipedia.bracket.popup.popupBox !== null && liquipedia.bracket.popup.popupBox.querySelector( '.icon' ) !== null ) {
 				const popupBox = liquipedia.bracket.popup.popupBox;
 				const popup = popupBox.querySelector( '.bracket-popup-wrapper' );
 				const windowWidth = parseInt( window.getComputedStyle( document.querySelector( 'html' ) ).width );
@@ -422,10 +396,7 @@ liquipedia.bracket = {
 			}
 		},
 		positionGroupTablePopup: function() {
-			if (
-				liquipedia.bracket.popup.popupBox !== null &&
-				liquipedia.bracket.popup.popupBox.querySelector( '.match-row-icon' ) !== null
-			) {
+			if ( liquipedia.bracket.popup.popupBox !== null && liquipedia.bracket.popup.popupBox.querySelector( '.match-row-icon' ) !== null ) {
 				const popupBox = liquipedia.bracket.popup.popupBox;
 				const popup = popupBox.querySelector( '.bracket-popup-wrapper' );
 				const windowWidth = parseInt( window.getComputedStyle( document.querySelector( 'html' ) ).width );
@@ -435,11 +406,9 @@ liquipedia.bracket = {
 					const detailsWidth = parseInt( window.getComputedStyle( popup ).width );
 					const popupBoxPosition = popupBox.getBoundingClientRect();
 					// popup.style.top = ( popupBoxPosition.top + popupBoxPosition.height ) + 'px';
-					popup.style.top = document.documentElement.scrollTop +
-						( popupBoxPosition.bottom - mainContentCol.offsetTop ) + 'px';
+					popup.style.top = document.documentElement.scrollTop + ( popupBoxPosition.bottom - mainContentCol.offsetTop ) + 'px';
 					// var left = popupBoxPosition.left + popupBoxPosition.width / 2 - detailsWidth / 2;
-					let left = popupBoxPosition.left - mainContentCol.getBoundingClientRect().left +
-						( popupBoxPosition.width / 2 - detailsWidth / 2 );
+					let left = popupBoxPosition.left - mainContentCol.getBoundingClientRect().left + ( popupBoxPosition.width / 2 - detailsWidth / 2 );
 					if ( left < 10 ) {
 						left = 10;
 					}
@@ -454,9 +423,7 @@ liquipedia.bracket = {
 		createEventListeners: function() {
 			if ( document.querySelector( '.bracket .bracket-popup-wrapper' ) !== null ) {
 				window.addEventListener( 'scroll', liquipedia.bracket.popup.positionBracketPopup );
-				const bruinenBracketScroll = document.querySelector(
-					'body.logged-in .scroll-logged-in, body.logged-out .scroll-logged-out'
-				);
+				const bruinenBracketScroll = document.querySelector( 'body.logged-in .scroll-logged-in, body.logged-out .scroll-logged-out' );
 				if ( bruinenBracketScroll !== null ) {
 					bruinenBracketScroll.addEventListener( 'scroll', liquipedia.bracket.popup.positionBracketPopup );
 				}
@@ -467,9 +434,7 @@ liquipedia.bracket = {
 			}
 			if ( document.querySelector( '.matchlist .bracket-popup-wrapper' ) !== null ) {
 				window.addEventListener( 'scroll', liquipedia.bracket.popup.positionGroupTablePopup );
-				const bruinenGroupScroll = document.querySelector(
-					'body.logged-in .scroll-logged-in, body.logged-out .scroll-logged-out'
-				);
+				const bruinenGroupScroll = document.querySelector( 'body.logged-in .scroll-logged-in, body.logged-out .scroll-logged-out' );
 				if ( bruinenGroupScroll !== null ) {
 					bruinenGroupScroll.addEventListener( 'scroll', liquipedia.bracket.popup.positionGroupTablePopup );
 				}
