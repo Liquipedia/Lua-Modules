@@ -61,7 +61,7 @@ function Chronology._createChronologyRow(links)
 						iconName = mode,
 						link = links[mode].link,
 					},
-					flipped = true,
+					flipped = mode ~= 'previous',
 				}
 			}
 		}
