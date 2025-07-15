@@ -9,11 +9,7 @@ liquipedia.commonsmainpage = {
 	},
 	redirectUpload: function() {
 		window.addEventListener( 'load', () => {
-			if (
-				( mw.config.get( 'wgPageName' ) === 'Special:Upload' ) &&
-				( mw.config.get( 'wgNamespaceNumber' ) === -1 ) &&
-				( typeof mw.user.isAnon === 'function' ) && ( mw.user.isAnon() )
-			) {
+			if ( ( mw.config.get( 'wgPageName' ) === 'Special:Upload' ) && ( mw.config.get( 'wgNamespaceNumber' ) === -1 ) && ( typeof mw.user.isAnon === 'function' ) && ( mw.user.isAnon() ) ) {
 				let url = document.querySelector( '#mw-content-text a' ).href;
 				if ( !url.startsWith( 'http' ) ) {
 					url = mw.config.get( 'wgServer' ) + url;
@@ -55,8 +51,7 @@ liquipedia.commonsmainpage = {
 							const image = imageData.query.pages[ key ];
 							if ( typeof image.imageinfo !== 'undefined' ) {
 								if ( counter++ < 10 ) {
-									output += '<div><a href="' + image.imageinfo[ 0 ].descriptionurl + '"><img src="' +
-										image.imageinfo[ 0 ].thumburl + '"><br><p>' + image.title + '</p></a></div>';
+									output += '<div><a href="' + image.imageinfo[ 0 ].descriptionurl + '"><img src="' + image.imageinfo[ 0 ].thumburl + '"><br><p>' + image.title + '</p></a></div>';
 								}
 							}
 						} );

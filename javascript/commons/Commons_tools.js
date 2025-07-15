@@ -11,21 +11,11 @@ liquipedia.commonstools = {
 	createForms: function() {
 		const checkForPageExistenceForm = document.getElementById( 'checkforpageexistence' );
 		if ( checkForPageExistenceForm !== null ) {
-			checkForPageExistenceForm.innerHTML =
-				'<form id="checkforpageexistenceform">' +
-				'<input id="checkforpageexistenceinput" placeholder="Name of page" class="form-control">' +
-				'<button id="checkforpageexistencebutton" class="btn btn-primary" type="submit">Search</button>' +
-				'</form>' +
-				'<div id="checkforpageexistenceresult"></div>';
+			checkForPageExistenceForm.innerHTML = '<form id="checkforpageexistenceform"><input id="checkforpageexistenceinput" placeholder="Name of page" class="form-control"><button id="checkforpageexistencebutton" class="btn btn-primary" type="submit">Search</button></form><div id="checkforpageexistenceresult"></div>';
 		}
 		const checkPageTextForm = document.getElementById( 'checkpagetext' );
 		if ( checkPageTextForm !== null ) {
-			checkPageTextForm.innerHTML =
-				'<form id="checkpagetextform">' +
-				'<input id="checkpagetextforminputname" placeholder="Name of page" class="form-control">' +
-				'<input id="checkpagetextforminputsource" placeholder="Source wiki" class="form-control">' +
-				'<button id="checkpagetextbutton" class="btn btn-primary" type="submit">Search</button></form>' +
-				'<div id="checkpagetextresult"></div>';
+			checkPageTextForm.innerHTML = '<form id="checkpagetextform"><input id="checkpagetextforminputname" placeholder="Name of page" class="form-control"><input id="checkpagetextforminputsource" placeholder="Source wiki" class="form-control"><button id="checkpagetextbutton" class="btn btn-primary" type="submit">Search</button></form><div id="checkpagetextresult"></div>';
 		}
 	},
 	createCallbacks: function() {
@@ -161,9 +151,7 @@ liquipedia.commonstools = {
 									wikiData = liquipedia.commonstools.wikis[ wiki ];
 									listElement = document.createElement( 'li' );
 									checkPageTextResultList.append( listElement );
-									liquipedia.commonstools.timeoutPageTextApi(
-										i, wiki, wikiData, title, sourceWiki, listElement
-									);
+									liquipedia.commonstools.timeoutPageTextApi( i, wiki, wikiData, title, sourceWiki, listElement );
 									i++;
 								}
 							}
