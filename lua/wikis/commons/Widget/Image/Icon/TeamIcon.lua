@@ -17,7 +17,7 @@ local WidgetIconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local WidgetIconFontawesome = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class TeamIconWidgetParameters
----@field imageLight string
+---@field imageLight string?
 ---@field imageDark string?
 ---@field page string?
 ---@field size string?
@@ -25,7 +25,7 @@ local WidgetIconFontawesome = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 ---@field legacy boolean?
 
 ---@class TeamIconWidgetProps
----@field imageLight string
+---@field imageLight string?
 ---@field imageDark string?
 ---@field page string?
 ---@field size string
@@ -99,7 +99,7 @@ function TeamIcon:render()
 	local isLegacy = self.props.legacy or false
 	local imageLight = self.props.imageLight
 
-	if imageLight == TBD_FILLER_IMAGE then
+	if imageLight == TBD_FILLER_IMAGE or not imageLight then
 		return self:_buildSpan(self:_getDefaultIcon(), nil, false)
 	end
 
