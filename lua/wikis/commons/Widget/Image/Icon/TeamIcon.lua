@@ -9,47 +9,70 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Image = Lua.import('Module:Image')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Span = HtmlWidgets.Span
 local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
-
-local ICON_SIZE = '100x50px'
+local WidgetIconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local WidgetIconFontawesome = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class TeamIconWidgetParameters
----@field imageLight string
+---@field imageLight string?
 ---@field imageDark string?
 ---@field page string?
 ---@field size string?
 ---@field noLink boolean?
 ---@field legacy boolean?
 
+---@class TeamIconWidgetProps
+---@field imageLight string?
+---@field imageDark string?
+---@field page string?
+---@field size string
+---@field noLink boolean?
+---@field legacy boolean?
+
 ---@class TeamIconWidget: IconWidget
 ---@operator call(TeamIconWidgetParameters): TeamIconWidget
----@field props TeamIconWidgetParameters
+---@field props TeamIconWidgetProps
 local TeamIcon = Class.new(WidgetIcon)
 TeamIcon.defaultProps = {
-	size = ICON_SIZE
+	size = '100x50px',
 }
 
 ---@private
----@param image string
----@param theme 'lightmode'|'darkmode'|'allmode'
 ---@return Widget
-function TeamIcon:_buildSpan(image, theme)
-	local size = self.props.size
+function TeamIcon:_getDefaultIcon()
+	return WidgetIconFontawesome{
+		iconName = 'team_tbd',
+	}
+end
+
+---@private
+---@param image string
+---@param size string
+---@return Widget
+function TeamIcon:_getIcon(image, size)
+	return WidgetIconImage{
+		imageLight = image,
+		size = size,
+		alignment = 'middle',
+		link = self:_getPageLink()
+	}
+end
+
+---@private
+---@param icon Widget
+---@param onlyForTheme 'lightmode'|'darkmode'|nil
+---@return Widget
+function TeamIcon:_buildSpan(icon, onlyForTheme, isLegacy)
 	return Span{
 		classes = Array.extend(
-			'team-template-image-' .. (self.props.legacy and 'legacy' or 'icon'),
-			theme ~= 'allmode' and ('team-template-' .. theme) or nil
+			'team-template-image-' .. (isLegacy and 'legacy' or 'icon'),
+			onlyForTheme and ('team-template-' .. onlyForTheme) or nil
 		),
 		children = {
-			Image.display(image, nil, {
-				size = size,
-				alignment = 'middle',
-				link = self:_getPageLink()
-			})
+			icon,
 		}
 	}
 end
@@ -62,16 +85,22 @@ end
 
 ---@return Widget|Widget[]
 function TeamIcon:render()
+	local size = self.props.size
+	local isLegacy = self.props.legacy
 	local imageLight = self.props.imageLight
-	local imageDark = self.props.imageDark or self.props.imageLight
-	local allmode = imageLight == imageDark
 
+	if not imageLight then
+		return self:_buildSpan(self:_getDefaultIcon(), nil, false)
+	end
+
+	local imageDark = self.props.imageDark or imageLight
+	local allmode = imageLight == imageDark
 	if allmode then
-		return self:_buildSpan(imageLight, 'allmode')
+		return self:_buildSpan(self:_getIcon(imageLight, size), nil, isLegacy)
 	end
 	return {
-		self:_buildSpan(imageLight, 'lightmode'),
-		self:_buildSpan(imageDark, 'darkmode')
+		self:_buildSpan(self:_getIcon(imageLight, size), 'lightmode', isLegacy),
+		self:_buildSpan(self:_getIcon(imageDark, size), 'darkmode', isLegacy),
 	}
 end
 
