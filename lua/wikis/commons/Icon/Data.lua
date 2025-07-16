@@ -40,6 +40,8 @@ return {
 	-- Usage: Expanding and collapsing hidden sections
 	expand = 'far fa-chevron-down',
 	collapse = 'far fa-chevron-up',
+	show = 'far fa-eye',
+	hide = 'far fa-eye-slash',
 
 	-- Usage: to indicate a selection of something was either left, right, down or up
 	up = 'fas fa-chevron-circle-up',
