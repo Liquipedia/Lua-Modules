@@ -1409,7 +1409,7 @@ local data = {
 		flag = 'File:HkTw hd.png',
 		localised = 'HKTW',
 		name = 'HKTW',
-	}
+	},
 	['iberia'] = {
 		flag = 'File:EsPt hd.png',
 		localised = 'Iberian',
