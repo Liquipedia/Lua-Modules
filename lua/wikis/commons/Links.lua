@@ -352,6 +352,7 @@ SUFFIXES = Table.merge(SUFFIXES, CustomData.suffixes or {})
 local ALIASES = {
 	['ask-fm'] = {'afk.fm', 'askfm'},
 	douyu = {'douyutv'},
+	esl = {'eslgaming'},
 	['facebook-gaming'] = {'fbgg'},
 	home = {'website', 'web', 'site', 'url'},
 	huyatv = {'huya'},
@@ -441,6 +442,11 @@ local MATCH_ICONS = {
 	ebattle = {
 		icon = 'File:Ebattle Series allmode.png',
 		text = 'Match page on ebattle'
+	},
+	esl = {
+		icon = 'File:ESL_2019_icon_lightmode.png',
+		iconDark = 'File:ESL_2019_icon_darkmode.png',
+		text = 'Match page on ESL'
 	},
 	esea = {
 		icon = 'File:ESEA icon allmode.png',
