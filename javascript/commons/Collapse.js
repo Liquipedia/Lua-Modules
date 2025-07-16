@@ -179,6 +179,8 @@ liquipedia.collapse = {
 				hideAllText = 'Hide all';
 			}
 			const button = document.createElement( 'button' );
+			button.classList.add( 'btn' );
+			button.classList.add( 'btn-secondary' );
 			if ( toggleGroup.classList.contains( 'toggle-state-hide' ) ) {
 				button.innerHTML = hideAllText;
 			} else {

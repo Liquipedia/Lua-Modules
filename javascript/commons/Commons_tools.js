@@ -177,6 +177,8 @@ liquipedia.commonstools = {
 				const page = data.query.pages[ 0 ];
 				const link = document.createElement( 'a' );
 				const postButton = document.createElement( 'button' );
+				postButton.classList.add( 'btn' );
+				postButton.classList.add( 'btn-primary' );
 				const span = document.createElement( 'span' );
 				link.href = '/' + wiki + '/' + page.title;
 				postButton.type = 'button';
