@@ -120,18 +120,17 @@ liquipedia.collapse = {
 				hideAllText = 'Hide all';
 			}
 			const button = document.createElement( 'button' );
-			button.classList.add( 'btn' );
-			button.classList.add( 'btn-secondary' );
+			button.classList.add( 'btn', 'btn-secondary' );
 			if ( toggleGroup.classList.contains( 'toggle-state-hide' ) ) {
 				button.innerHTML = this.makeIcon( false ) + ' ' + hideAllText;
 			} else {
 				button.innerHTML = this.makeIcon( true ) + ' ' + showAllText;
 			}
-			button.onclick = function() {
+			button.onclick = () => {
 				if ( toggleGroup.classList.contains( 'toggle-state-hide' ) ) {
 					toggleGroup.classList.remove( 'toggle-state-hide' );
 					toggleGroup.classList.add( 'toggle-state-show' );
-					this.innerHTML = this.makeIcon( true ) + ' ' + showAllText;
+					button.innerHTML = this.makeIcon( true ) + ' ' + showAllText;
 					toggleGroup.querySelectorAll( '.collapsible, .general-collapsible' ).forEach( ( collapsible ) => {
 						collapsible.classList.add( 'collapsed' );
 					} );
@@ -141,7 +140,7 @@ liquipedia.collapse = {
 				} else {
 					toggleGroup.classList.remove( 'toggle-state-show' );
 					toggleGroup.classList.add( 'toggle-state-hide' );
-					this.innerHTML = this.makeIcon( false ) + ' ' + hideAllText;
+					button.innerHTML = this.makeIcon( false ) + ' ' + hideAllText;
 					toggleGroup.querySelectorAll( '.collapsible, .general-collapsible' ).forEach( ( collapsible ) => {
 						collapsible.classList.remove( 'collapsed' );
 					} );
