@@ -157,7 +157,6 @@ function Details:countdown()
 	local countdownArgs = {
 		date = dateString,
 		finished = match.finished,
-		showCompleted = true,
 	}
 
 	local countdownDisplay = mw.html.create('span')
