@@ -35,6 +35,7 @@ liquipedia.teamcard = {
 			const button = document.createElement( 'button' );
 			button.classList.add( 'btn' );
 			button.classList.add( 'btn-secondary' );
+			button.classList.add( 'btn-small' );
 			button.innerHTML = showplayers;
 			button.addEventListener( 'click', () => {
 				if ( teamcardsopened ) {
