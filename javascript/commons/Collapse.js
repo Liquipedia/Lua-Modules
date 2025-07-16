@@ -24,7 +24,6 @@ liquipedia.collapse = {
 		button.classList.add( 'collapseButton' );
 		button.classList.add( isShow ? 'collapseButtonShow' : 'collapseButtonHide' );
 		button.classList.add( 'btn' );
-		button.classList.add( 'btn-new' );
 		button.classList.add( 'btn-secondary' );
 		button.classList.add( 'btn-extrasmall' );
 		button.setAttribute( 'role', 'button' );
