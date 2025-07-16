@@ -12,9 +12,9 @@ return {
 			player = 'https://challonge.com/users/',
 		},
 		esl = {
-			'https://play.eslgaming.com/warcraft/',
-			team = 'https://play.eslgaming.com/team/',
-			player = 'https://play.eslgaming.com/player/',
+			'https://web.archive.org/web/play.eslgaming.com//warcraft/',
+			team = 'https://web.archive.org/web/play.eslgaming.com//team/',
+			player = 'https://web.archive.org/web/play.eslgaming.com//player/',
 		},
 	},
 }
