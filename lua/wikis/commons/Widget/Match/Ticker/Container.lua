@@ -117,6 +117,7 @@ function MatchTickerContainer:render()
 			},
 			HtmlWidgets.Div{
 				attributes = {
+					['data-switch-group-container'] = 'countdown',
 					['data-toggle-area-content'] = '1',
 					['data-filter-expansion-template'] = buildTemplateExpansionString('upcoming'),
 					['data-filter-groups'] = filterText,

@@ -155,6 +155,7 @@ function Details:countdown()
 	end
 
 	local countdownArgs = {
+		rawdatetime = Logic.readBool(match.finished) or nil,
 		date = dateString,
 		finished = match.finished,
 	}
