@@ -12,43 +12,66 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
-local ChronologyDisplay = Lua.import('Module:Widget/Infobox/ChronologyDisplay')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+local InlineIconAndText = Lua.import('Module:Widget/Misc/InlineIconAndText')
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Title = Lua.import('Module:Widget/Infobox/Title')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class ChronologyWidget: Widget
----@operator call(table): ChronologyWidget
----@field props {title: string?, showTitle: boolean?, args: table?}
+---@class ChronologyDisplayWidget: Widget
+---@operator call(table): ChronologyDisplayWidget
+---@field props {links: {previous: {link:string, text: string}?, next: {link:string, text: string}?}[],
+---title: string, showTitle: boolean}
 local Chronology = Class.new(Widget)
+Chronology.defaultProps = {
+	title = 'Chronology',
+	showTitle = true,
+}
 
 ---@return Widget?
 function Chronology:render()
-	local args = self.props.args or {}
+	local links = self.props.links
+	if Logic.isEmpty(links) then
+		return
+	end
 
-	---@param input string?
-	---@return {link:string, display: string}?
-	local processLinkInput = function(input)
-		if Logic.isEmpty(input) then return end
-		---@cast input -nil
-		local link, text = unpack(mw.text.split(input, '|'))
-		return {
-			link = link,
-			text = text or link,
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(
+			self.props.showTitle ~= false and Title{children = self.props.title} or nil,
+			Array.map(self.props.links, Chronology._createChronologyRow)
+		)
+	}
+end
+
+---@param links {previous: {link:string, text: string}?, next: {link:string, text: string}?}
+---@return Widget?
+function Chronology._createChronologyRow(links)
+	if Logic.isEmpty(links) then return end
+
+	local makeCell = function(mode)
+		if not links[mode] then return end
+		return Div{
+			classes = {'infobox-cell-2', 'infobox-text-' .. (mode == 'previous' and 'left' or 'right')},
+			children = {
+				InlineIconAndText{
+					link = links[mode].link,
+					text = links[mode].text,
+					icon = IconFa{
+						iconName = mode,
+						link = links[mode].link,
+					},
+					flipped = mode ~= 'previous',
+				}
+			}
 		}
 	end
 
-	---@type {previous: {link:string, text: string}?, next: {link:string, text: string}?}[]
-	local links = Array.mapIndexes(function(index)
-		local postFix = index == 1 and '' or index
-
-		return Logic.nilIfEmpty({
-			previous = processLinkInput(args['previous' .. postFix]),
-			next = processLinkInput(args['next' .. postFix]),
-		})
-	end)
-
-	return ChronologyDisplay{
-		links = links,
-		title = self.props.title,
-		showTitle = self.props.showTitle,
+	return Div{
+		children = {
+			makeCell('previous') or Div{classes = {'infobox-cell-2'}},
+			makeCell('next'),
+		}
 	}
 end
 
