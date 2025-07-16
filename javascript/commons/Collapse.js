@@ -21,7 +21,7 @@ liquipedia.collapse = {
 	makeDesignButton: function( collapsible, isShow ) {
 		const title = ( isShow ? 'Show' : 'Hide' );
 		const button = document.createElement( 'button' );
-		button.classList.add( 'collapseButton', 'btn', 'btn-new', 'btn-secondary', 'btn-extrasmall' );
+		button.classList.add( 'collapseButton', 'btn', 'btn-secondary', 'btn-extrasmall' );
 		button.classList.add( isShow ? 'collapseButtonShow' : 'collapseButtonHide' );
 		button.setAttribute( 'role', 'button' );
 		button.setAttribute( 'aria-label', title );
