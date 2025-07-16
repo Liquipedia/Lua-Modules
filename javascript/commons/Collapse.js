@@ -20,7 +20,7 @@ liquipedia.collapse = {
 	},
 	makeDesignButton: function( collapsible, isShow ) {
 		const title = ( isShow ? 'Show' : 'Hide' );
-		const button = document.createElement( 'span' );
+		const button = document.createElement( 'button' );
 		button.classList.add( 'collapseButton' );
 		button.classList.add( isShow ? 'collapseButtonShow' : 'collapseButtonHide' );
 		button.classList.add( 'btn' );
@@ -32,9 +32,7 @@ liquipedia.collapse = {
 		button.setAttribute( 'title', title );
 		button.setAttribute( 'tabindex', '0' );
 		button.innerHTML = this.makeIcon( isShow ) + ' ' + title;
-		const link = document.createElement( 'a' );
-		link.href = '#';
-		link.onclick = function( ev ) {
+		button.onclick = function( ev ) {
 			ev.preventDefault();
 			if ( isShow ) {
 				collapsible.classList.remove( 'collapsed' );
@@ -42,8 +40,7 @@ liquipedia.collapse = {
 				collapsible.classList.add( 'collapsed' );
 			}
 		};
-		link.appendChild( button );
-		return link;
+		return button;
 	},
 	setupCollapsibleButtons: function() {
 		document.querySelectorAll( '#mw-content-text .collapsible' ).forEach( ( collapsible ) => {
