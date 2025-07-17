@@ -49,31 +49,31 @@ return {
 	title = 'Hub',
 	navigation = {
 		{
-			file = 'W7m Champions of BLAST Major Montreal 2024.jpg',
+			iconName = 'getting_started',
 			title = 'Getting Started',
 			link = 'Support/Getting_started',
 			count = {},
 		},
 		{
-			file = 'W7m Champions of BLAST Major Montreal 2024.jpg',
+			iconName = 'upload',
 			title = 'Upload an image',
 			link = 'lpcommons:Special:Upload',
 			count = {},
 		},
 		{
-			file = 'W7m Champions of BLAST Major Montreal 2024.jpg',
+			iconName = 'support_hub',
 			title = 'Support',
 			link = 'Support',
 			count = {},
 		},
 		{
-			file = 'W7m Champions of BLAST Major Montreal 2024.jpg',
+			iconName = 'copyright',
 			title = 'Copyright Guide',
 			link = 'A_Liquipedia_Guide_to_Copyright',
 			count = {},
 		},
 		{
-			file = 'W7m Champions of BLAST Major Montreal 2024.jpg',
+			iconName = 'file_standards_guide',
 			title = 'File Standards Guide',
 			link = 'File Standards Guide',
 			count = {},
