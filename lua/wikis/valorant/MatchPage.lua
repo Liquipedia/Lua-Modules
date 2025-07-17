@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local MathUtil = Lua.import('Module:MathUtil')
+local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
@@ -240,9 +241,12 @@ function MatchPage:_renderPerformanceForTeam(game, teamIndex)
 				classes = {'match-bm-players-team-header'},
 				children = self.opponents[teamIndex].iconDisplay
 			},
-			Array.map(game.teams[teamIndex].players, function (player)
-				return self:_renderPlayerPerformance(game, teamIndex, player)
-			end)
+			Array.map(
+				Array.reverse(Array.sortBy(game.teams[teamIndex].players, Operator.property('acs'))),
+				function (player)
+					return self:_renderPlayerPerformance(game, teamIndex, player)
+				end
+			)
 		)
 	}
 end
