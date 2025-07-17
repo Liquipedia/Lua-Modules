@@ -20,8 +20,8 @@ local Div = HtmlWidgets.Div
 ---@field title string?
 ---@field link string?
 ---@field linktype 'internal'|'external'|nil
----@field variant 'primary'|'secondary'|'ghost'|nil
----@field size 'sm'|'md'|'lg'|nil
+---@field variant 'primary'|'secondary'|'tertiary'|'ghost'|'destructive'|nil
+---@field size 'xs'|'sm'|'md'|'lg'|nil
 
 ---@class ButtonWidget: Widget
 ---@operator call(ButtonWidgetParameters): ButtonWidget

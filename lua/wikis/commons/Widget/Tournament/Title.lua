@@ -10,23 +10,27 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-
 local Link = Lua.import('Module:Widget/Basic/Link')
 
----@class TournamentsTickerTitleWidget: Widget
----@operator call(table): TournamentsTickerTitleWidget
-local TournamentsTickerTitleWidget = Class.new(Widget)
+---@class TournamentTitleWidget: Widget
+---@operator call(table): TournamentTitleWidget
+local TournamentTitleWidget = Class.new(Widget)
 
 ---@return Widget?
-function TournamentsTickerTitleWidget:render()
+function TournamentTitleWidget:render()
 	local tournament = self.props.tournament
 	if not tournament then
 		return
 	end
-	return HtmlWidgets.Fragment{
+
+	local hasStageName = Logic.isNotEmpty(self.props.stageName)
+
+	return Link{
+		link = tournament.pageName,
 		children = {
 			self.props.displayGameIcon and Game.icon{
 				game = tournament.game,
@@ -42,17 +46,17 @@ function TournamentsTickerTitleWidget:render()
 						iconDark = tournament.iconDark,
 						series = tournament.series,
 						abbreviation = tournament.abbreviation,
-						link = tournament.pageName,
-						options = {noTemplate = true},
+						options = {noTemplate = true, noLink = true},
 					}
 				}
 			},
 			HtmlWidgets.Span{
 				classes = {'tournament-name'},
 				children = {
-					Link{
-						link = tournament.pageName,
-						children = tournament.displayName,
+					children = {
+						tournament.displayName,
+						hasStageName and ' - ' or nil,
+						hasStageName and self.props.stageName or nil,
 					},
 				}
 			}
@@ -60,4 +64,4 @@ function TournamentsTickerTitleWidget:render()
 	}
 end
 
-return TournamentsTickerTitleWidget
+return TournamentTitleWidget
