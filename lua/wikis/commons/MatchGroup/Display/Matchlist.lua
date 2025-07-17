@@ -82,6 +82,7 @@ function MatchlistDisplay.Matchlist(props)
 		title = props.matches[1] and props.matches[1].bracketData.title or 'Match List',
 		titleClasses = {'brkts-matchlist-title'},
 		classes = {'brkts-matchlist', config.attached and 'brkts-matchlist-attached' or nil},
+		collapseAreaClasses = {'brkts-matchlist-collapse-area'},
 		attributes = {style = 'width: ' .. config.width .. 'px;'},
 		shouldCollapse = config.collapsed,
 		children = Array.flatMap(props.matches, function(match)

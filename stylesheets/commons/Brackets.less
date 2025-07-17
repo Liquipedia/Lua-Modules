@@ -317,10 +317,13 @@
 
 .brkts-matchlist {
 	border: 1px solid var( --table-border-color, #bbbbbb );
-	display: grid;
 	font-size: 13px;
-	grid-template-columns: ~"[opponent] 4fr [score] minmax(30px, 1fr) [icon] 0px [score] minmax(30px, 1fr) [opponent] 4fr";
 	line-height: 1.48;
+}
+
+.brkts-matchlist-collapse-area {
+	display: grid;
+	grid-template-columns: ~"[opponent] 4fr [score] minmax(30px, 1fr) [icon] 0px [score] minmax(30px, 1fr) [opponent] 4fr";
 }
 
 .brkts-matchlist-attached {

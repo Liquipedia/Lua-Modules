@@ -40,7 +40,10 @@ function DefaultCollapsible:render()
 			},
 			Div{
 				children = props.children,
-				classes = {'should-collapse'},
+				classes = Array.extend({},
+					'should-collapse',
+					props.collapseAreaClasses
+				),
 			},
 		}
 	}
