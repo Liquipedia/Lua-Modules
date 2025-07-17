@@ -50,9 +50,10 @@ function MatchHeader:render()
 					leftTeamWinner and 'match-info-header-winner' or nil
 				),
 				children = {
-					OpponentDisplay.InlineOpponent{
+					OpponentDisplay.BlockOpponent{
 						opponent = match.opponents[1],
 						teamStyle = 'short',
+						overflow = 'ellipsis',
 						flip = true,
 					}
 				}
@@ -101,9 +102,10 @@ function MatchHeader:render()
 					rightTeamWinner and 'match-info-header-winner' or nil
 				),
 				children = {
-					OpponentDisplay.InlineOpponent{
+					OpponentDisplay.BlockOpponent{
 						opponent = match.opponents[2],
 						teamStyle = 'short',
+						overflow = 'ellipsis',
 					}
 				}
 			},
