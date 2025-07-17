@@ -242,7 +242,10 @@ function MatchPage:_renderPerformanceForTeam(game, teamIndex)
 				children = self.opponents[teamIndex].iconDisplay
 			},
 			Array.map(
-				Array.reverse(Array.sortBy(game.teams[teamIndex].players, Operator.property('acs'))),
+				Array.reverse(Array.sortBy(
+					game.teams[teamIndex].players,
+					function (player) return player.acs or 0 end
+				)),
 				function (player)
 					return self:_renderPlayerPerformance(game, teamIndex, player)
 				end
