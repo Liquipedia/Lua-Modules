@@ -78,7 +78,7 @@ function Upgrade:createInfobox()
 			end
 		},
 		Center{children = {args.footnotes}},
-		Chronology{args = args, title = self:chronologyTitle()}
+		Chronology{args = args, title = self:chronologyTitle(), showTitle = true}
 	}
 
 	if Namespace.isMain() then
