@@ -68,11 +68,13 @@ local CONTENT = {
 	supporthub4 = {
 		heading = 'Contact',
 		body = Ul{children = {
-			Li{children = Link{
-				link = 'https://discord.gg/liquipedia',
-				children = 'Join our Discord',
-				linktype = 'external',
-			}},
+			Li{
+				children = HtmlWidgets.B{children = Link{
+					link = 'https://discord.gg/liquipedia',
+					children = 'Join our Discord',
+					linktype = 'external',
+				}},
+			},
 			Li{children = Link{
 				link = 'Support/Using our Discord server',
 				children = 'Using our Discord server',
