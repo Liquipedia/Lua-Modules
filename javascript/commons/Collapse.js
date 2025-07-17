@@ -100,8 +100,8 @@ liquipedia.collapse = {
 		document.querySelectorAll( '#mw-content-text .NavFrame' ).forEach( ( navFrame ) => {
 			const head = navFrame.querySelector( '.NavHead' );
 			if ( head !== null ) {
-				head.insertBefore( this.makeDesignButton( head, true ), head.firstChild );
-				head.insertBefore( this.makeDesignButton( head, false ), head.firstChild );
+				head.insertBefore( this.makeDesignButton( navFrame, true ), head.firstChild );
+				head.insertBefore( this.makeDesignButton( navFrame, false ), head.firstChild );
 			}
 		} );
 	},
