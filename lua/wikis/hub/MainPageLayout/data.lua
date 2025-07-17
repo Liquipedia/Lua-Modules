@@ -7,34 +7,80 @@
 
 local Lua = require('Module:Lua')
 
-local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
-
+local Link = Lua.import('Module:Widget/Basic/Link')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
-local LiquipediaApp = Lua.import('Module:Widget/MainPage/LiquipediaApp')
-local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
-local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
-local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
+local Li = HtmlWidgets.Li
+local Ul = HtmlWidgets.Ul
 
 local CONTENT = {
 	supporthub1 = {
 		heading = 'Want to Contribute?',
-		body = '\n*<b>[[Support/Getting_started|Getting started]]</b>\n*[https://tl.net/mytlnet/register Create an account]\n*[[Support]]\n*[[Special:NewFiles|Latest uploads]]\n',
+		body = Ul{children = {
+			Li{
+				children = HtmlWidgets.B{children = Link{
+					link = 'Support/Getting started',
+					children = 'Getting started'
+				}}
+			},
+			Li{children = Link{
+				link = 'https://tl.net/mytlnet/register',
+				children = 'Create an account',
+				linktype = 'external',
+			}},
+			Li{children = Link{
+				link = 'Support',
+			}},
+			Li{children = Link{
+				link = 'lpcommons:Special:NewFiles',
+				children = 'Latest uploads',
+			}},
+		}},
 		padding = true,
 	},
 	supporthub2 = {
 		heading = 'Liquipedia',
-		body = '\n*[[Support/Liquipedia|Liquipedia]]\n*[[Liquipedia:Alpha Wikis Program|Starting a new wiki]]\n*[[Liquipedia:Policy|Policies]]\n',
+		body = Ul{children = {
+			Li{children = Link{
+				link = 'Support/Liquipedia',
+				children = 'Liquipedia',
+			}},
+			Li{children = Link{
+				link = 'Liquipedia:Alpha Wikis Program',
+				children = 'Starting a new wiki',
+			}},
+			Li{children = Link{
+				link = 'Liquipedia:Policy',
+				children = 'Policies',
+			}},
+		}},
 		padding = true,
 	},
 	supporthub3 = {
 		heading = 'LP Dev',
-		body = '\n*[[Liquipedia:Changelogs|Dev updates]]\n<br>\n\n',
+		body = Ul{children = {
+			Li{children = Link{
+				link = 'Liquipedia:Changelogs',
+				children = 'Dev updates',
+			}},
+		}},
 		padding = true,
 	},
 	supporthub4 = {
 		heading = 'Contact',
-		body = '\n*<b>[https://discord.gg/liquipedia Join our Discord]</b>\n*[[Support/Using_our_Discord_server|Using our Discord]]\n*[[Contact]]\n',
+		body = Ul{children = {
+			Li{children = Link{
+				link = 'https://discord.gg/liquipedia',
+				children = 'Join our Discord',
+				linktype = 'external',
+			}},
+			Li{children = Link{
+				link = 'Support/Using our Discord server',
+				children = 'Using our Discord server',
+			}},
+			Li{children = Link{
+				link = 'Contact',
+			}},
+		}},
 		padding = true,
 	},
 }
