@@ -13,7 +13,7 @@ local Li = HtmlWidgets.Li
 local Ul = HtmlWidgets.Ul
 
 local CONTENT = {
-	supporthub1 = {
+	contribute = {
 		heading = 'Want to Contribute?',
 		body = Ul{children = {
 			Li{
@@ -37,7 +37,7 @@ local CONTENT = {
 		}},
 		padding = true,
 	},
-	supporthub2 = {
+	liquipedia = {
 		heading = 'Liquipedia',
 		body = HtmlWidgets.Fragment{children = {
 			Ul{children = {
@@ -58,7 +58,7 @@ local CONTENT = {
 		}},
 		padding = true,
 	},
-	supporthub3 = {
+	dev = {
 		heading = 'LP Dev',
 		body = HtmlWidgets.Fragment{children = {
 			Ul{children = {
@@ -73,7 +73,7 @@ local CONTENT = {
 		}},
 		padding = true,
 	},
-	supporthub4 = {
+	contact = {
 		heading = 'Contact',
 		body = HtmlWidgets.Fragment{children = {
 			Ul{children = {
@@ -144,7 +144,7 @@ return {
 				children = {
 					{
 						mobileOrder = 1,
-						content = CONTENT.supporthub1,
+						content = CONTENT.contribute,
 					},
 				}
 			},
@@ -153,7 +153,7 @@ return {
 				children = {
 					{
 						mobileOrder = 2,
-						content = CONTENT.supporthub2,
+						content = CONTENT.liquipedia,
 					},
 				}
 			},
@@ -162,7 +162,7 @@ return {
 				children = {
 					{
 						mobileOrder = 3,
-						content = CONTENT.supporthub3,
+						content = CONTENT.dev,
 					},
 				}
 			},
@@ -171,7 +171,7 @@ return {
 				children = {
 					{
 						mobileOrder = 4,
-						content = CONTENT.supporthub4,
+						content = CONTENT.contact,
 					},
 				}
 			},
