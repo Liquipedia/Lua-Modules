@@ -240,9 +240,15 @@ function MatchPage:_renderPerformanceForTeam(game, teamIndex)
 				classes = {'match-bm-players-team-header'},
 				children = self.opponents[teamIndex].iconDisplay
 			},
-			Array.map(game.teams[teamIndex].players, function (player)
-				return self:_renderPlayerPerformance(game, teamIndex, player)
-			end)
+			Array.map(
+				Array.reverse(Array.sortBy(
+					game.teams[teamIndex].players,
+					function (player) return player.acs or 0 end
+				)),
+				function (player)
+					return self:_renderPlayerPerformance(game, teamIndex, player)
+				end
+			)
 		)
 	}
 end
