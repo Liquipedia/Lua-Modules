@@ -39,49 +39,60 @@ local CONTENT = {
 	},
 	supporthub2 = {
 		heading = 'Liquipedia',
-		body = Ul{children = {
-			Li{children = Link{
-				link = 'Support/Liquipedia',
-				children = 'Liquipedia',
+		body = HtmlWidgets.Fragment{children = {
+			Ul{children = {
+				Li{children = Link{
+					link = 'Support/Liquipedia',
+					children = 'Liquipedia',
+				}},
+				Li{children = Link{
+					link = 'Liquipedia:Alpha Wikis Program',
+					children = 'Starting a new wiki',
+				}},
+				Li{children = Link{
+					link = 'Liquipedia:Policy',
+					children = 'Policies',
+				}},
 			}},
-			Li{children = Link{
-				link = 'Liquipedia:Alpha Wikis Program',
-				children = 'Starting a new wiki',
-			}},
-			Li{children = Link{
-				link = 'Liquipedia:Policy',
-				children = 'Policies',
-			}},
+			HtmlWidgets.Br{classes = {'mobile-hide'}},
 		}},
 		padding = true,
 	},
 	supporthub3 = {
 		heading = 'LP Dev',
-		body = Ul{children = {
-			Li{children = Link{
-				link = 'Liquipedia:Changelogs',
-				children = 'Dev updates',
+		body = HtmlWidgets.Fragment{children = {
+			Ul{children = {
+				Li{children = Link{
+					link = 'Liquipedia:Changelogs',
+					children = 'Dev updates',
+				}},
 			}},
+			HtmlWidgets.Br{classes = {'mobile-hide'}},
+			HtmlWidgets.Br{classes = {'mobile-hide'}},
+			HtmlWidgets.Br{classes = {'mobile-hide'}},
 		}},
 		padding = true,
 	},
 	supporthub4 = {
 		heading = 'Contact',
-		body = Ul{children = {
-			Li{
-				children = HtmlWidgets.B{children = Link{
-					link = 'https://discord.gg/liquipedia',
-					children = 'Join our Discord',
-					linktype = 'external',
+		body = HtmlWidgets.Fragment{children = {
+			Ul{children = {
+				Li{
+					children = HtmlWidgets.B{children = Link{
+						link = 'https://discord.gg/liquipedia',
+						children = 'Join our Discord',
+						linktype = 'external',
+					}},
+				},
+				Li{children = Link{
+					link = 'Support/Using our Discord server',
+					children = 'Using our Discord server',
 				}},
-			},
-			Li{children = Link{
-				link = 'Support/Using our Discord server',
-				children = 'Using our Discord server',
+				Li{children = Link{
+					link = 'Contact',
+				}},
 			}},
-			Li{children = Link{
-				link = 'Contact',
-			}},
+			HtmlWidgets.Br{classes = {'mobile-hide'}},
 		}},
 		padding = true,
 	},
