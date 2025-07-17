@@ -131,7 +131,7 @@ function Expansion:createInfobox()
 		},
 		Center{children = {args.footnotes}},
 		Customizable{id = 'chronology', children = {
-				Chronology{args = args, title = self:chronologyTitle()}
+				Chronology{args = args, title = self:chronologyTitle(), showTitle = true}
 			}
 		},
 	}
