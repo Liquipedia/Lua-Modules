@@ -57,7 +57,7 @@ return {
 		{
 			file = 'W7m Champions of BLAST Major Montreal 2024.jpg',
 			title = 'Upload an image',
-			link = 'Special:Upload',
+			link = 'lpcommons:Special:Upload',
 			count = {},
 		},
 		{
