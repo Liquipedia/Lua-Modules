@@ -26,7 +26,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local Chronology = Class.new(Widget)
 Chronology.defaultProps = {
 	title = 'Chronology',
-	showTitle = true,
+	showTitle = false,
 }
 
 ---@return Widget?
@@ -38,7 +38,7 @@ function Chronology:render()
 
 	return HtmlWidgets.Fragment{
 		children = WidgetUtil.collect(
-			self.props.showTitle ~= false and Title{children = self.props.title} or nil,
+			Logic.readBool(self.props.showTitle) and Title{children = self.props.title} or nil,
 			Array.map(self.props.links, Chronology._createChronologyRow)
 		)
 	}
