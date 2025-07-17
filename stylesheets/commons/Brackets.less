@@ -345,25 +345,9 @@
 .brkts-matchlist-title {
 	background-color: var( --table-header-variant-background-color, #eaecf0 );
 	font-weight: bold;
-	grid-column: span 5;
 	padding: 5px;
 	position: relative;
 	text-align: center;
-}
-
-.brkts-matchlist-collapsible > .brkts-matchlist-title {
-	padding: 5px 40px;
-}
-
-.brkts-matchlist-collapse-button {
-	font-weight: normal;
-	position: absolute;
-	right: 10px;
-}
-
-.brkts-matchlist-collapsed > .brkts-matchlist-title > .brkts-matchlist-hide-button,
-:not( .brkts-matchlist-collapsed ) > .brkts-matchlist-title > .brkts-matchlist-show-button {
-	display: none;
 }
 
 .brkts-matchlist-header {
@@ -386,11 +370,6 @@
 		grid-column: span 5;
 		grid-template-columns: ~"[opponent] 4fr [score] minmax(30px, 1fr) [icon] 0px [score] minmax(30px, 1fr) [opponent] 4fr";
 	}
-}
-
-.brkts-matchlist-collapsed > .brkts-matchlist-match,
-.brkts-matchlist-collapsed > .brkts-matchlist-header {
-	display: none;
 }
 
 .brkts-matchlist-cell {
