@@ -119,8 +119,6 @@ function MatchTickerContainer:render()
 				attributes = {
 					['data-switch-group-container'] = 'countdown',
 					['data-toggle-area-content'] = '1',
-					['data-filter-expansion-template'] = buildTemplateExpansionString('upcoming'),
-					['data-filter-groups'] = filterText,
 				},
 				children = {
 					HtmlWidgets.Div{
@@ -140,7 +138,13 @@ function MatchTickerContainer:render()
 							HtmlWidgets.Div{children = 'Show Countdown'},
 						},
 					},
-					callTemplate('upcoming'),
+					HtmlWidgets.Div{
+						attributes = {
+							['data-filter-expansion-template'] = buildTemplateExpansionString('upcoming'),
+							['data-filter-groups'] = filterText,
+						},
+						children = callTemplate('upcoming'),
+					}
 				}
 			},
 			HtmlWidgets.Div{
