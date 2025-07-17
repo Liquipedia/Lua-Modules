@@ -8,38 +8,21 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local Logic = Lua.import('Module:Logic')
 
 local VodLink = {}
 
----@param args {vod: string, source: string?, gamenum: integer?, novod: boolean?, htext: string?}
+---@param args {vod: string, source: string?, gamenum: integer?}
 ---@return Html
 function VodLink.display(args)
 	args = args or {}
+	local gameNumber = tonumber(args.gamenum)
 
-	if Logic.readBool(args.novod) then
-		return mw.html.create('span')
-			:addClass('plainlinks vodlink')
-			:attr('title', 'Help Liquipedia find this VOD')
-			:wikitext('[[File:NoVod.png|32px|link=]]')
-	end
-
-	local title
-	local fileName = 'VOD Icon'
-	if Logic.isNumeric(args.gamenum) then
-		title = 'Watch Game ' .. args.gamenum
-		if tonumber(args.gamenum) <= 11 then
-			fileName = fileName .. args.gamenum
-		end
-	else
-		title = 'Watch VOD'
-	end
-	title = args.htext or title
-	fileName = fileName .. '.png'
-
+	local title = VodLink.getTitle(gameNumber)
+	local fileName = VodLink.getIcon(gameNumber)
 	local link = args.vod or ''
+
 	--question if we actually need the tlpd stuff
-	--atm most wikis have it, but it seems very pointless except for sc/sc2
+	--atm most wikis have it, but it seems very pointless except for sc1
 	if args.source == 'tlpd' or args.source == 'tlpd-kr' then
 		mw.ext.TeamLiquidIntegration.add_category('VodLink using tlpd')
 		link = 'https://www.tl.net/tlpd/sc2-korean/games/' .. link .. '/vod'
@@ -52,6 +35,24 @@ function VodLink.display(args)
 		:addClass('plainlinks vodlink')
 		:attr('title', title)
 		:wikitext('[[File:' .. fileName .. '|32px|link=' .. link .. ']]')
+end
+
+---@param gamenum integer?
+---@return string
+function VodLink.getTitle(gamenum)
+	if gamenum then
+		return 'Watch Game ' .. gamenum
+	end
+	return 'Watch VOD'
+end
+
+---@param gamenum integer?
+---@return string
+function VodLink.getIcon(gamenum)
+	if gamenum and gamenum < 10 then
+		return 'VOD Icon' .. gamenum .. '.png'
+	end
+	return 'VOD Icon.png'
 end
 
 return Class.export(VodLink, {frameOnly = true, exports = {'display'}})

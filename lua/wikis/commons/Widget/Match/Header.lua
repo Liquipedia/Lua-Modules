@@ -37,6 +37,11 @@ function MatchHeader:render()
 		return nil
 	end
 
+	-- TODO: Make work better with 2+ opponents (FFA/BR)
+	if #match.opponents > 2 then
+		return
+	end
+
 	local hasBestof = match.bestof and match.bestof > 0
 	local matchPhase = MatchGroupUtil.computeMatchPhase(match)
 

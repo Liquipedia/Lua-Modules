@@ -23,6 +23,7 @@ local TournamentsTickerLabelWidget = Class.new(Widget)
 
 ---@return Widget?
 function TournamentsTickerLabelWidget:render()
+	---@type StandardTournament
 	local tournament = self.props.tournament
 	if not tournament then
 		return
