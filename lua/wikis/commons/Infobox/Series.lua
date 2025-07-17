@@ -28,12 +28,15 @@ local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 
 local Widgets = Lua.import('Module:Widget/All')
+local Builder = Widgets.Builder
 local Cell = Widgets.Cell
-local Header = Widgets.Header
-local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
-local Builder = Widgets.Builder
+local Header = Widgets.Header
+local Location = Widgets.Location
+local Organizers = Widgets.Organizers
+local Title = Widgets.Title
+local Venue = Widgets.Venue
 
 ---@class SeriesInfobox: BasicInfobox
 local Series = Class.new(BasicInfobox)
@@ -75,19 +78,7 @@ function Series:createInfobox()
 		},
 		Center{children = {args.caption}},
 		Title{children = 'Series Information'},
-		Builder{
-			builder = function()
-				local organizers = self:_createOrganizers(args)
-				local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
-
-				return {
-					Cell{
-						name = title,
-						content = organizers
-					}
-				}
-			end
-		},
+		Organizers{args = args},
 		Cell{
 			name = 'Sponsor(s)',
 			content = self:getAllArgsForBase(args, 'sponsor')
@@ -96,29 +87,15 @@ function Series:createInfobox()
 		Customizable{
 			id = 'location',
 			children = {
-				Cell{
-					name = 'Location',
-					content = {
-						self:_createLocation(args.country, args.city)
-					}
+				Location{
+					args = args,
+					infoboxType = 'Series',
+					shouldSetCategory = false,
+					showTbdOnEmpty = false,
 				},
 			}
 		},
-		Builder{
-			builder = function()
-				local venues = {}
-				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue', {requireIndex = false}) do
-					-- TODO: Description
-					local description = ''
-					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], description))
-				end
-
-				return {Cell{
-					name = 'Venue',
-					content = venues
-				}}
-			end
-		},
+		Venue{args = args},
 		Cell{
 			name = 'Date',
 			content = {
@@ -304,17 +281,6 @@ function Series:_getIconFromLeagueIconSmall(lpdbData)
 	return lpdbData
 end
 
----@param country string?
----@param city string?
----@return string
-function Series:_createLocation(country, city)
-	if country == nil or country == '' then
-		return ''
-	end
-
-	return Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' .. (city or country)
-end
-
 ---@param id string?
 ---@param name string?
 ---@param link string?
@@ -354,18 +320,6 @@ function Series:_createLink(id, name, link, desc)
 	end
 
 	return output
-end
-
----@param args table
----@return string[]
-function Series:_createOrganizers(args)
-	local organizers = {}
-
-	for prefix, organizer in Table.iter.pairsByPrefix(args, 'organizer', {requireIndex = false}) do
-		table.insert(organizers, self:_createLink(organizer, args[prefix .. '-name'], args[prefix .. '-link']))
-	end
-
-	return organizers
 end
 
 ---@param args table
