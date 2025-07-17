@@ -69,7 +69,7 @@ function CustomInjector:parse(id, widgets)
 
 		Array.appendWith(
 			widgets,
-			Chronology{args = args}
+			Chronology{args = args, showTitle = true}
 		)
 	end
 

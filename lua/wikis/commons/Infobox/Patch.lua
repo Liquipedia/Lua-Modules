@@ -69,7 +69,7 @@ function Patch:createInfobox()
 				end
 			end
 		},
-		Chronology{args = self:getChronologyData(args)},
+		Chronology{args = self:getChronologyData(args), showTitle = true},
 		Customizable{id = 'customcontent', children = {}},
 		Center{children = {args.footnotes}},
 	}

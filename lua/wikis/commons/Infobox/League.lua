@@ -205,7 +205,7 @@ function League:createInfobox()
 		Customizable{id = 'customcontent', children = {}},
 		Center{children = {args.footnotes}},
 		Customizable{id = 'chronology', children = {
-			Chronology{args = args},
+			Chronology{args = args, showTitle = true},
 		}},
 		Builder{
 			builder = function()
