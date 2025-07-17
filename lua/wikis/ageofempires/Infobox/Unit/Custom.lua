@@ -116,7 +116,7 @@ function CustomInjector:parse(id, widgets)
 			)},
 			Cell{name = 'Research time', children = {args['up time']}},
 			Cell{name = 'Required', children = {args.required}, options = {makeLink = true}},
-			Chronology{args = args, title = 'Connected Units'}
+			Chronology{args = args, title = 'Connected Units', showTitle = true}
 		)
 	elseif id == 'builtfrom' then
 		return {
