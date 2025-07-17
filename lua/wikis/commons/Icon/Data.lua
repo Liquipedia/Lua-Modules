@@ -9,6 +9,8 @@ return {
 	winner = 'fas fa-check',
 	draw = 'fas fa-minus',
 	loss = 'fas fa-times',
+	winner_left = 'fas fa-caret-left',
+	winner_right = 'fas fa-caret-right',
 
 	-- Usage: Other Match detail pop up icons
 	matchpagelink = 'far fa-swords',

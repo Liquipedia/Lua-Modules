@@ -15,6 +15,7 @@ local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Timezone = Lua.import('Module:Timezone')
 local StreamLinks = Lua.import('Module:Links/Stream')
 local VodLink = Lua.import('Module:VodLink')
@@ -24,71 +25,33 @@ local HighlightConditions = Lua.import('Module:HighlightConditions')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Title = Lua.import('Module:Widget/Tournament/Title')
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
+local MatchHeader = Lua.import('Module:Widget/Match/Header')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
-
-local CURRENT_PAGE = mw.title.getCurrentTitle().text
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 local UTC = Timezone.getTimezoneString{timezone = 'UTC'}
 
 ---Display class for matches shown within a match ticker
 ---@class NewMatchTickerScoreBoard
 ---@operator call(table): NewMatchTickerScoreBoard
----@field root Html
 ---@field match table
+---@field parsedMatch MatchGroupUtilMatch
 local ScoreBoard = Class.new(
 	function(self, match)
-		self.root = mw.html.create('div'):addClass('match-scoreboard')
 		self.match = match
+		self.parsedMatch = MatchGroupUtil.matchFromRecord(match)
 	end
 )
 
----@return Html
+---@return Html|Widget
 function ScoreBoard:create()
 	local match = self.match
-	local winner = tonumber(match.winner)
 
 	if #match.opponents > 2 then
 		--- When "FFA/BR" we don't want to display the opponents, as there are more than 2.
-		return self.root:node(self:versus())
+		return mw.html.create('div'):addClass('match-scoreboard'):node(self:versus())
 	end
 
-	return self.root
-		:node(self:opponent(match.opponents[1], winner == 1, true):addClass('team-left'))
-		:node(self:versus())
-		:node(self:opponent(match.opponents[2], winner == 2):addClass('team-right'))
-end
-
----@param opponent standardOpponent
----@param isWinner boolean
----@param flip boolean?
----@return Html
-function ScoreBoard:opponent(opponent, isWinner, flip)
-	if Opponent.isEmpty(opponent) or Opponent.isTbd(opponent) and opponent.type ~= Opponent.literal then
-		opponent = Opponent.tbd(Opponent.literal)
-	end
-
-	local opponentName = Opponent.toName(opponent)
-	if not opponentName then
-		mw.logObject(opponent, 'Invalid Opponent, Opponent.toName returns nil')
-		opponentName = ''
-	end
-
-	local opponentDisplay = mw.html.create('div')
-		:node(OpponentDisplay.InlineOpponent{
-			opponent = opponent,
-			teamStyle = 'short',
-			flip = flip,
-			showLink = opponentName:gsub('_', ' ') ~= CURRENT_PAGE
-		})
-
-	if isWinner then
-		opponentDisplay:addClass('match-winner')
-	end
-
-	return opponentDisplay
+	return MatchHeader{match = self.parsedMatch}
 end
 
 ---@return Html
@@ -248,7 +211,7 @@ function Match:create()
 	return self.root
 end
 
----@return Html
+---@return Html|Widget
 function Match:standardMatchRow()
 	return ScoreBoard(self.match):create()
 end

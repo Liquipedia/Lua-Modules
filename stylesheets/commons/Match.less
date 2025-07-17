@@ -1,0 +1,53 @@
+.match-info {
+	&-header {
+		display: flex;
+		align-items: center;
+		flex: 1;
+
+		&-opponent {
+			display: flex;
+			flex: 1;
+
+			&-left {
+				justify-content: flex-end;
+			}
+		}
+
+		&-scoreholder {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			flex-basis: 4.5rem;
+
+			&-upper {
+				display: flex;
+				align-items: center;
+			}
+
+			&-lower {
+				font-size: 0.75rem;
+				opacity: 0.7;
+			}
+
+			&-icon,
+			&-score {
+				display: flex;
+				width: 1rem;
+				justify-content: center;
+			}
+		}
+
+		&-winner {
+			font-weight: bold;
+		}
+
+		&-loser {
+			img,
+			i {
+				filter: saturate(0%);
+				opacity: 0.5;
+			}
+		}
+	}
+}
