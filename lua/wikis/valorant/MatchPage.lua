@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local MathUtil = Lua.import('Module:MathUtil')
-local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
