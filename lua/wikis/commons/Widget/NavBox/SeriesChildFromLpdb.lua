@@ -24,6 +24,8 @@ local ColumnName = Condition.ColumnName
 
 local Widget = Lua.import('Module:Widget')
 
+local DEFAULT_TIERTYPE = 'General'
+
 ---- technically from wiki input they will be all string representations
 ---@class SeriesChildFromLpdbProps: NavBoxChildProps
 ---@field limit integer?
@@ -132,15 +134,21 @@ function SeriesChildFromLpdb:_makeConditions()
 
 	local year = tonumber(props.year)
 
-	return ConditionTree(BooleanOperator.all):add{
+	local tierTypes = Json.parseIfTable(props.tierType) or {props.tierType}
+	if Array.any(tierTypes, function(tierType) return tierType == DEFAULT_TIERTYPE end) then
+		table.insert(tierTypes, '')
+	end
+
+
+	return ConditionTree(BooleanOperator.all):add(Array.append({},
 		multiValueCondition('seriespage', serieses),
 		multiValueCondition('liquipediatier', Json.parseIfTable(props.tier) or {props.tier}),
-		multiValueCondition('liquipediatiertype', Json.parseIfTable(props.tierType) or {props.tierType}),
+		multiValueCondition('liquipediatiertype', tierTypes),
 		multiValueCondition('mode', Json.parseIfTable(props.mode) or {props.mode}),
 		year and ConditionNode(ColumnName('enddate_year'), Comparator.eq, year) or nil,
 		props.edate and ConditionNode(ColumnName('enddate'), Comparator.le, props.edate) or nil,
-		props.sdate and ConditionNode(ColumnName('startdate'), Comparator.ge, props.sdate) or nil,
-	}
+		props.sdate and ConditionNode(ColumnName('startdate'), Comparator.ge, props.sdate) or nil
+	))
 end
 
 return SeriesChildFromLpdb
