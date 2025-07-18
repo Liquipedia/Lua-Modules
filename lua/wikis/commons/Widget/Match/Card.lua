@@ -73,6 +73,8 @@ function MatchCard:render()
 			title = VodLink.getTitle(index),
 			variant = 'tertiary',
 			link = vod,
+			size = 'sm',
+			grow = callToAction,
 			children = {
 				ImageIcon{imageLight = VodLink.getIcon(index)},
 				callToAction and ' ' or nil,
