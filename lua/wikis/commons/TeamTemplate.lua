@@ -28,7 +28,6 @@ timezone parts.
 ---@param date string|number?
 ---@return string?
 function TeamTemplate.resolve(template, date)
-	template = template:gsub('_', ' ')
 	local raw = TeamTemplate.getRawOrNil(template, date) or {}
 	return raw.templatename
 end
