@@ -161,6 +161,7 @@ function StreamLinks._processStreamsOfPlatform(streamValues, platformName)
 	return platformStreams
 end
 
+---@deprecated Widget/Match/Stream
 ---@param platform string
 ---@param streamValue string
 ---@return string?
@@ -178,6 +179,7 @@ function StreamLinks.displaySingle(platform, streamValue)
 	return Page.makeInternalLink({}, icon, 'Special:Stream/' .. platform .. '/' .. streamValue)
 end
 
+---@deprecated Widget/Match/StreamsContainer
 ---@param streams {string: string[]}
 ---@return string[]?
 function StreamLinks.buildDisplays(streams)

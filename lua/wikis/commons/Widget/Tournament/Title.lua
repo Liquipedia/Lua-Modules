@@ -22,6 +22,7 @@ local TournamentTitleWidget = Class.new(Widget)
 
 ---@return Widget?
 function TournamentTitleWidget:render()
+	---@type StandardTournamentPartial
 	local tournament = self.props.tournament
 	if not tournament then
 		return
@@ -45,6 +46,7 @@ function TournamentTitleWidget:render()
 						icon = tournament.icon,
 						iconDark = tournament.iconDark,
 						series = tournament.series,
+						---@diagnostic disable-next-line: undefined-field
 						abbreviation = tournament.abbreviation,
 						options = {noTemplate = true, noLink = true},
 					}

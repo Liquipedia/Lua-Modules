@@ -21,14 +21,6 @@ function VodLink.display(args)
 	local fileName = VodLink.getIcon(gameNumber)
 	local link = args.vod or ''
 
-	--question if we actually need the tlpd stuff
-	--atm most wikis have it, but it seems very pointless except for sc1
-	if args.source == 'tlpd' or args.source == 'tlpd-kr' then
-		link = 'https://www.tl.net/tlpd/sc2-korean/games/' .. link .. '/vod'
-	elseif args.source == 'tlpd-int' then
-		link = 'https://www.tl.net/tlpd/sc2-international/games/' .. link .. '/vod'
-	end
-
 	return mw.html.create('span')
 		:addClass('plainlinks vodlink')
 		:attr('title', title)
@@ -47,7 +39,7 @@ end
 ---@param gamenum integer?
 ---@return string
 function VodLink.getIcon(gamenum)
-	if gamenum and gamenum < 10 then
+	if gamenum and gamenum > 0 and gamenum < 10 then
 		return 'VOD Icon' .. gamenum .. '.png'
 	end
 	return 'VOD Icon.png'
