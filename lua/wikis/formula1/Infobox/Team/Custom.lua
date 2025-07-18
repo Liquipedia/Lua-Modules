@@ -67,18 +67,10 @@ function CustomInjector:parse(id, widgets)
 			)
 		end
 
-		if args.previous or args.next then
-			Array.appendWith(
-				widgets,
-				Title{children = 'Chronology'},
-				Chronology{links = {
-					previous = args.previous,
-					previous2 = args.previous2,
-					next = args.next,
-					next2 = args.next2,
-				}}
-			)
-		end
+		Array.appendWith(
+			widgets,
+			Chronology{args = args, showTitle = true}
+		)
 	end
 
 	return widgets
