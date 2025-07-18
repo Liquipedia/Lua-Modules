@@ -9,11 +9,8 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local PlacementStats = require('Module:InfoboxPlacementStats')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
-
-local Widgets = Lua.import('Module:Widget/All')
 local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 ---@class FreeFireInfoboxTeam: InfoboxTeam
