@@ -19,7 +19,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local WidgetsHtml = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 local Fragment = WidgetsHtml.Fragment
-local AgeIcon = Lua.import('Module:Widget/Infobox/AoeAgeIcon')
+local AgeIcon = Lua.import('Module:Widget/Infobox/AgeIcon')
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 
 ---@class AoECustomFactionInfobox: FactionInfobox
