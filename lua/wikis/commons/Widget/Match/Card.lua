@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
@@ -27,6 +28,7 @@ local ImageIcon = Lua.import('Module:Widget/Image/Icon/Image')
 local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
 
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
+local SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE = 2 * 60 * 60 -- 2 hours in seconds
 
 ---@class MatchCard: Widget
 ---@operator call(table): MatchCard
@@ -49,8 +51,8 @@ function MatchCard:render()
 
 	local displayVods = matchPhase == 'finished'
 	local displayStreams = matchPhase == 'ongoing'
-	if matchPhase == 'upcoming' then
-		--- TODO MAKE PROPER: Check if less than 2 hour until start
+	-- Show streams also for the last period before going live
+	if matchPhase == 'upcoming' and os.difftime(match.timestamp, DateExt.getCurrentTimestamp()) < SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE then
 		displayStreams = true
 	end
 
