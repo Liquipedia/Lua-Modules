@@ -53,7 +53,9 @@ function MatchCard:render()
 	local displayVods = matchPhase == 'finished'
 	local displayStreams = matchPhase == 'ongoing'
 	-- Show streams also for the last period before going live
-	if matchPhase == 'upcoming' and os.difftime(match.timestamp, DateExt.getCurrentTimestamp()) < SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE then
+	if matchPhase == 'upcoming' and
+		os.difftime(match.timestamp, DateExt.getCurrentTimestamp()) < SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE then
+
 		displayStreams = true
 	end
 
