@@ -1,4 +1,65 @@
 .match-info {
+	display: flex;
+	width: 23.75rem;
+	padding: 0.75rem 1rem;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+
+	&-countdown {
+		display: flex;
+		justify-content: center;
+		align-self: stretch;
+
+		.timer-object-countdown,
+		.timer-object-date {
+			padding: 0.25rem 0.5rem;
+			border-radius: 0.25rem;
+			font-weight: bold;
+			font-size: 0.6875rem;
+
+			&.timer-object-countdown-live {
+				.theme--light & {
+					color: #ffffff;
+					background-color: #b81414;
+				}
+
+				.theme--dark & {
+					color: #2e0505;
+					background-color: #f5a3a3;
+				}
+			}
+
+			&.timer-object-countdown-completed {
+				.theme--light & {
+					color: #ffffff;
+					background-color: #1d7c1d;
+				}
+
+				.theme--dark & {
+					color: #0a290a;
+					background-color: #adebad;
+				}
+			}
+
+			&:not( .timer-object-countdown-live, .timer-object-countdown-completed ) {
+				color: var( --clr-on-background );
+
+				.theme--light & {
+					background-color: #00000014;
+				}
+
+				.theme--dark & {
+					background-color: #ffffff14;
+				}
+			}
+		}
+
+		.timer-object-separator {
+			display: none;
+		}
+	}
+
 	&-header {
 		display: flex;
 		align-items: center;
@@ -55,6 +116,44 @@
 				filter: saturate( 0% );
 				opacity: 0.5;
 			}
+		}
+	}
+
+	&-tournament {
+		display: flex;
+		padding: 0.5rem 0.75rem;
+		align-items: flex-start;
+		gap: 0.5rem;
+		align-self: stretch;
+		border-radius: 0.5rem;
+		.theme--light & {
+			background-color: #0000000a;
+		}
+
+		.theme--dark & {
+			background-color: #ffffff0a;
+		}
+
+		/**
+			Mostly duplicated from Mainpage.less
+			tournaments-list-name span.icon-small
+			TODO: Rework this!
+		**/
+		span.league-icon-small-image,
+		span.icon-small {
+			min-height: 21px;
+			min-width: 21px;
+		}
+	}
+
+	&-links {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.5rem;
+		align-self: stretch;
+
+		> div {
+			flex: 1;
 		}
 	}
 }
