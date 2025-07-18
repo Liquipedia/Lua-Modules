@@ -469,11 +469,19 @@
  */
 
 .brkts-match-info-popup {
-	border-radius: 2px;
-	border: 1px solid rgba( 0, 0, 0, 0.5 );
-	box-shadow: 0 0 2px rgba( 0, 0, 0, 0.5 );
+	border-radius: 0.5rem;
+	border: 0.0625rem solid;
+	box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
 	position: absolute;
 	z-index: 19;
+
+	.theme--light & {
+		border-color: rgba( 0, 0, 0, 0.08 );
+	}
+
+	.theme--dark & {
+		border-color: rgba( 255, 255, 255, 0.08 );
+	}
 }
 
 @media ( max-width: 768px ) {
@@ -519,10 +527,23 @@
 	flex-direction: column;
 	justify-content: flex-start;
 	max-height: 80vh;
-	//overflow: auto;
 	width: 330px;
 	flex-wrap: unset;
-	font-size: 13px;
+	font-size: 0.6875rem;
+	padding: 0.75rem;
+
+	.theme--light & {
+		background-color: #ffffff;
+	}
+
+	.theme--dark & {
+		background-color: #26292d;
+	}
+
+	@media ( max-width: 768px ) {
+		max-height: 65vh;
+		overflow: auto;
+	}
 }
 
 /* Can remove after purge */
@@ -534,13 +555,6 @@
 
 .brkts-popup:not( .brkts-match-info-popup ) {
 	max-height: unset;
-}
-
-@media ( max-width: 768px ) {
-	.brkts-popup {
-		max-height: 65vh;
-		overflow: auto;
-	}
 }
 
 .brkts-match-popup-wrapper .brkts-match-info-popup {
@@ -644,9 +658,7 @@ div.brkts-popup-body-element-thumbs {
 	justify-content: space-around;
 	flex-wrap: wrap;
 	padding: 4px;
-	border-top: 1px solid var( --table-border-color, #dddddd );
 	flex-basis: 100%;
-	background-color: var( --table-striped-background-color, #f9f9f9 );
 	text-align: center;
 	font-size: 85%;
 }
@@ -728,65 +740,102 @@ div.brkts-popup-body-element-thumbs {
  * Used by rainbowsix and other wikis.
  */
 
-.brkts-popup-mapveto table {
-	width: 100%;
-	margin-top: -2px;
-	margin-bottom: -2px;
-	border-top: 1px solid var( --table-border-color, #dddddd );
-}
+.brkts-popup-mapveto {
+	border-radius: 0.5rem;
+	padding: 0.25rem;
 
-.brkts-popup-mapveto td,
-.brkts-popup-mapveto th {
-	padding: 4px;
-	text-align: center;
-	font-size: 11px;
-}
+	.theme--light & {
+		background-color: rgba( 0, 0, 0, 0.04 );
+		color: var( --clr-secondary-25 );
+	}
 
-.brkts-popup-mapveto tr {
-	border-top: 1px dotted var( --table-border-color, #dddddd );
-	height: 10px;
-}
+	.theme--dark & {
+		background-color: rgba( 255, 255, 255, 0.04 );
+		color: #ffffff;
+	}
 
-.brkts-popup-mapveto tr:first-child {
-	background-color: var( --table-variant-background-color, #eeeeee );
-	color: var( --clr-on-background, #000000 );
-}
+	&__header {
+		&-fill {
+			width: 9.6875rem;
+		}
 
-.brkts-popup-mapveto .brkts-popup-mapveto-vetostart {
-	background-color: var( --table-striped-background-color, #f5f5f5 );
-}
+		&-title {
+			text-align: center;
+		}
+	}
 
-.brkts-popup-mapveto .brkts-popup-mapveto-vetoround {
-	background-color: var( --table-background-color, #ffffff );
-}
+	&__ban-round {
+		// using border-top and bottom to fake padding
+		border-top: 12px solid transparent;
+		border-bottom: 12px solid transparent;
 
-.brkts-popup-mapveto .brkts-popup-mapveto-vetotype {
-	font-weight: bold;
-	color: var( --clr-on-background, #000000 );
-	border: 0;
-	border-radius: 0;
-	letter-spacing: 0.1em;
-	font-family: "Source Code Pro", monospace;
-}
+		&-title {
+			font-size: 0.6875rem;
+			padding: 0 0.5rem;
+		}
 
-.brkts-popup-mapveto .brkts-popup-mapveto-pick {
-	background-color: var( --clr-forestgreen-background-color, #ddf4dd ) !important;
-}
+		&-picks {
+			.brkts-champion-icon {
+				gap: 0.125rem;
+				display: flex;
 
-.brkts-popup-mapveto .brkts-popup-mapveto-ban {
-	background-color: var( --clr-cinnabar-background-color, #fbdfdf ) !important;
-}
+				& img {
+					width: 1.25rem;
+					height: 1.25rem;
+					border-radius: 0.1875rem;
 
-.brkts-popup-mapveto .brkts-popup-mapveto-defaultban {
-	background-color: var( --clr-sapphire-background-color, #c4c5d3 ) !important;
-}
+					@media ( hover: hover ) {
+						&:hover {
+							height: unset;
+							border: 0.0625rem solid var( --clr-background );
+							box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
+						}
+					}
+				}
+			}
+		}
+	}
 
-.brkts-popup-mapveto .brkts-popup-mapveto-decider {
-	background-color: var( --clr-sun-background-color, #f9f0c7 ) !important;
-}
+	table {
+		width: 100%;
+	}
 
-.brkts-popup-mapveto .brkts-popup-mapveto-protect {
-	background-color: var( --clr-vividviolet-background-color, #f1d2fa ) !important;
+	.brkts-popup-mapveto-vetostart {
+		background-color: var( --table-striped-background-color, #f5f5f5 );
+	}
+
+	.brkts-popup-mapveto-vetoround {
+		background-color: var( --table-background-color, #ffffff );
+	}
+
+	.brkts-popup-mapveto-vetotype {
+		font-weight: bold;
+		color: var( --clr-on-background, #000000 );
+		border: 0;
+		border-radius: 0;
+		letter-spacing: 0.1em;
+		font-family: "Source Code Pro", monospace;
+	}
+
+	.brkts-popup-mapveto-pick {
+		background-color: var( --clr-forestgreen-background-color, #ddf4dd ) !important;
+	}
+
+	.brkts-popup-mapveto-ban {
+		background-color: var( --clr-cinnabar-background-color, #fbdfdf ) !important;
+	}
+
+	.brkts-popup-mapveto-defaultban {
+		background-color: var( --clr-sapphire-background-color, #c4c5d3 ) !important;
+	}
+
+	.brkts-popup-mapveto-decider {
+		background-color: var( --clr-sun-background-color, #f9f0c7 ) !important;
+	}
+
+	.brkts-popup-mapveto-protect {
+		background-color: var( --clr-vividviolet-background-color, #f1d2fa ) !important;
+	}
 }
 
 .brkts-popup-mvp {

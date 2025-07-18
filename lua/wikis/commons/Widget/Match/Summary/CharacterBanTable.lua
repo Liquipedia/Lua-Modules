@@ -60,16 +60,17 @@ function MatchSummaryCharacterBanTable:render()
 			return nil
 		end
 		return Tr{
+			classes = {'brkts-popup-mapveto__ban-round'},
 			children = WidgetUtil.collect(
 				Td{
-					css = {float = 'left'},
+					classes = {'brkts-popup-mapveto__ban-round-picks'},
 					children = {Characters{characters = banData[1], flipped = false, date = self.props.date}}
 				},
 				hasStartIndicator and Td{
 					children = {startIndicator(1, banData.start)}
 				} or nil,
 				Td{
-					css = {['font-size'] = '80%'},
+					classes = {'brkts-popup-mapveto__ban-round-title'},
 					children = {Abbr{
 						title = 'Bans in game ' .. gameNumber,
 						children = {'Game ' .. gameNumber},
@@ -79,7 +80,7 @@ function MatchSummaryCharacterBanTable:render()
 					children = {startIndicator(2, banData.start)}
 				} or nil,
 				Td{
-					css = {float = 'right'},
+					classes = {'brkts-popup-mapveto__ban-round-picks'},
 					children = {Characters{characters = banData[2], flipped = true, date = self.props.date}}
 				}
 			),
@@ -88,12 +89,21 @@ function MatchSummaryCharacterBanTable:render()
 
 	return Collapsible{
 		tableClasses = {'wikitable-striped'},
-		header = Tr{children = WidgetUtil.collect(
-			Th{css = {width = hasStartIndicator and '35%' or '40%'}},
-			hasStartIndicator and Th{css = {width = '5%'}} or nil,
-			Th{css = {width = '20%'}, children = {'Bans'}},
-			hasStartIndicator and Th{css = {width = '5%'}} or nil,
-			Th{css = {width = hasStartIndicator and '35%' or '40%'}}
+		header =
+			Tr{
+				children = WidgetUtil.collect(
+				Th{
+					classes = {'brkts-popup-mapveto__header-fill'},
+				},
+				hasStartIndicator and Th{} or nil,
+				Th{
+					classes = {'brkts-popup-mapveto__header-title'},
+					children = {'Bans'}
+				},
+				hasStartIndicator and Th{} or nil,
+				Th{
+					classes = {'brkts-popup-mapveto__header-fill'},
+				}
 		)},
 		children = rows,
 	}
