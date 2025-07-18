@@ -22,8 +22,6 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 ---@class MatchHeader: Widget
 ---@operator call(table): MatchHeader
 local MatchHeader = Class.new(Widget)
-MatchHeader.defaultProps = {
-}
 
 ---@return Widget?
 function MatchHeader:render()
@@ -31,6 +29,11 @@ function MatchHeader:render()
 	local match = self.props.match
 	if not match then
 		return nil
+	end
+
+	-- TODO: Make work better with 2+ opponents (FFA/BR)
+	if #match.opponents > 2 then
+		return
 	end
 
 	local hasBestof = match.bestof and match.bestof > 0

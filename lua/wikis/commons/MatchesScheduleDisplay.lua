@@ -328,7 +328,6 @@ function MatchesTable.matchPageLinkDisplay(match)
 		:node(MatchPageButton{
 			matchId = match.matchId,
 			hasMatchPage = Logic.isNotEmpty(match.bracketData.matchPage),
-			short = false,
 		})
 end
 
