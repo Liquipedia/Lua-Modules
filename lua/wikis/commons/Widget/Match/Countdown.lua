@@ -43,7 +43,7 @@ function MatchCountdown:render()
 	end
 
 	return HtmlWidgets.Span{
-		classes = {'match-countdown'}, -- TODO Update Class
+		classes = {'match-info-countdown'},
 		children = Countdown._create{
 			rawdatetime = match.finished or nil,
 			date = dateString,

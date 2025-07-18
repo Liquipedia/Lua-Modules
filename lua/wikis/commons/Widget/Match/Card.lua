@@ -97,23 +97,12 @@ function MatchCard:render()
 		children = WidgetUtil.collect(
 			MatchCountdown{match = match},
 			MatchHeader{match = match},
-			-- TODO Update structure and classes
 			not self.props.hideTournament and HtmlWidgets.Div{
-				classes = {'match-details'},
-				children = {
-					HtmlWidgets.Div{
-						classes = {'match-links'},
-						children = {
-							HtmlWidgets.Div{
-								classes = {'match-tournament'},
-								children = tournamentLink,
-							}
-						},
-					},
-				},
+				classes = {'match-info-tournament'},
+				children = {tournamentLink},
 			} or nil,
 			HtmlWidgets.Div{
-				classes = {'match-links'}, -- TODO Update Class
+				classes = {'match-info-links'},
 				children = WidgetUtil.collect(
 					matchPageButton,
 					displayStreams and StreamsContainer{
