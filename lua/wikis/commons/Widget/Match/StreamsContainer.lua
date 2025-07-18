@@ -24,7 +24,7 @@ MatchStreamsContainer.defaultProps = {
 
 ---@return Widget?
 function MatchStreamsContainer:render()
-	local streams = self.props.stream
+	local streams = self.props.streams
 	if not streams then
 		return nil
 	end

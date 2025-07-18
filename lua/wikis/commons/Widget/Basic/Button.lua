@@ -22,6 +22,7 @@ local Div = HtmlWidgets.Div
 ---@field linktype 'internal'|'external'|nil
 ---@field variant 'primary'|'secondary'|'tertiary'|'ghost'|'destructive'|nil
 ---@field size 'xs'|'sm'|'md'|'lg'|nil
+---@field grow boolean?
 
 ---@class ButtonWidget: Widget
 ---@operator call(ButtonWidgetParameters): ButtonWidget
@@ -31,6 +32,7 @@ Button.defaultProps = {
 	linktype = 'internal',
 	variant = 'primary',
 	size = 'md',
+	grow = false, -- Whether the button should grow to fill the available space
 }
 
 ---@return Widget
@@ -58,6 +60,7 @@ function Button:render()
 	end
 
 	local button = Div{
+		css = self.props.grow and {width = '100%'} or nil,
 		classes = Array.extend(cssClasses, self.props.classes or {}),
 		attributes = Table.merge({
 			title = self.props.title,
@@ -73,13 +76,16 @@ function Button:render()
 	end
 
 	-- Have to wrap it in an extra div to prevent the mediawiki parser from messing it up
-	return Div{children = {
-		Link{
-			link = self.props.link,
-			linktype = self.props.linktype,
-			children = {button},
+	return Div{
+		css = self.props.grow and {flex = '1'} or nil,
+		children = {
+			Link{
+				link = self.props.link,
+				linktype = self.props.linktype,
+				children = {button},
+			}
 		}
-	}}
+	}
 end
 
 return Button

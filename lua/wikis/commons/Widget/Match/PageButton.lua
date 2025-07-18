@@ -39,6 +39,7 @@ function MatchPageButton:render()
 			variant = self.props.buttonType,
 			size = 'sm',
 			link = link,
+			grow = true,
 			children = {
 				Icon{iconName = 'matchpagelink'},
 				' ',
@@ -53,6 +54,7 @@ function MatchPageButton:render()
 		variant = 'ghost',
 		size = 'sm',
 		link = link,
+		grow = true,
 		children = {
 			'+ Add details',
 		}

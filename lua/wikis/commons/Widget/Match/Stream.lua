@@ -50,6 +50,7 @@ function MatchStream:render()
 	return Button{
 		linktype = linkType,
 		link = link,
+		grow = self.props.callToAction,
 		children = self.props.callToAction and String.interpolate(CTA_TEXT, { icon = icon, platform = platform }) or icon,
 		variant = 'tertiary',
 		size = 'sm',

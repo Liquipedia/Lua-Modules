@@ -12,6 +12,7 @@ local Game = Lua.import('Module:Game')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -30,40 +31,41 @@ function TournamentTitleWidget:render()
 
 	local hasStageName = Logic.isNotEmpty(self.props.stageName)
 
-	return Link{
-		link = tournament.pageName,
-		children = {
-			self.props.displayGameIcon and Game.icon{
-				game = tournament.game,
-				noLink = true,
-				spanClass = 'tournament-game-icon icon-small',
-				size = '50px',
-			} or '',
-			HtmlWidgets.Span{
-				classes = {'tournament-icon'},
-				children = {
-					LeagueIcon.display{
-						icon = tournament.icon,
-						iconDark = tournament.iconDark,
-						series = tournament.series,
-						---@diagnostic disable-next-line: undefined-field
-						abbreviation = tournament.abbreviation,
-						options = {noTemplate = true, noLink = true},
-					}
+	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+		self.props.displayGameIcon and Game.icon{
+			game = tournament.game,
+			noLink = true,
+			spanClass = 'tournament-game-icon icon-small',
+			size = '50px',
+		} or nil,
+		HtmlWidgets.Span{
+			classes = {'tournament-icon'},
+			children = {
+				LeagueIcon.display{
+					icon = tournament.icon,
+					iconDark = tournament.iconDark,
+					series = tournament.series,
+					---@diagnostic disable-next-line: undefined-field
+					abbreviation = tournament.abbreviation,
+					link = tournament.pageName,
+					options = {noTemplate = true},
 				}
-			},
-			HtmlWidgets.Span{
-				classes = {'tournament-name'},
-				children = {
+			}
+		},
+		HtmlWidgets.Span{
+			classes = {'tournament-name'},
+			children = {
+				Link{
+					link = tournament.pageName,
 					children = {
 						tournament.displayName,
 						hasStageName and ' - ' or nil,
 						hasStageName and self.props.stageName or nil,
-					},
-				}
+					}
+				},
 			}
-		},
-	}
+		}
+	)}
 end
 
 return TournamentTitleWidget
