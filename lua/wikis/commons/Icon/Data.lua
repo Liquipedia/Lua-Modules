@@ -5,6 +5,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 
 return {
+	-- Usage: Different ways to see data
+	schedule = 'far fa-table',
+	bracket = 'far fa-sitemap',
+
 	-- Usage: Match results
 	winner = 'fas fa-check',
 	draw = 'fas fa-minus',
