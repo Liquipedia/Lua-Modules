@@ -50,6 +50,7 @@ function MatchCard:render()
 
 	local matchPhase = MatchGroupUtil.computeMatchPhase(match)
 
+	local displayMatchPage = Info.config.match2.matchPage and matchPhase ~= 'upcoming'
 	local displayVods = matchPhase == 'finished'
 	local displayStreams = matchPhase == 'ongoing'
 	-- Show streams also for the last period before going live
@@ -109,12 +110,12 @@ function MatchCard:render()
 			HtmlWidgets.Div{
 				classes = {'match-info-links'},
 				children = WidgetUtil.collect(
-					matchPageButton,
+					displayMatchPage and matchPageButton or nil,
 					displayStreams and StreamsContainer{
 						streams = StreamLinks.filterStreams(match.stream),
-						callToActionLimit = Info.config.match2.matchPage and 0 or 2,
+						callToActionLimit = displayMatchPage and 0 or 2,
 					} or nil,
-					displayVods and makeVodButton(match.vod, nil, not Info.config.match2.matchPage) or nil
+					displayVods and makeVodButton(match.vod, nil, not displayMatchPage) or nil
 				)
 			}
 		)
