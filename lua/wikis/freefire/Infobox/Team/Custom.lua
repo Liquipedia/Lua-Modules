@@ -6,17 +6,14 @@
 --
 
 local Lua = require('Module:Lua')
-
 local Class = Lua.import('Module:Class')
+local PlacementStats = require('Module:InfoboxPlacementStats')
 
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
-
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
 local Widgets = Lua.import('Module:Widget/All')
-local Cell = Widgets.Cell
 local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 ---@class FreeFireInfoboxTeam: InfoboxTeam
@@ -37,6 +34,10 @@ function CustomTeam:createBottomContent()
 	if not self.args.disbanded then
 		return UpcomingTournaments{name = self.pagename}
 	end
+	return tostring(PlacementStats.run{
+		tiers = {'1', '2', '3', '4'},
+		participant = self.name,
+	})
 end
 
 return CustomTeam
