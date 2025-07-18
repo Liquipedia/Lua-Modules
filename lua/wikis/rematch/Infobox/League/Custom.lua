@@ -23,6 +23,14 @@ local CustomLeague = Class.new(League)
 ---@field caller RematchLeagueInfobox
 local CustomInjector = Class.new(Injector)
 
+-- Platform: Platform that the tournament is on
+local PLATFORMS = {
+	playstation = 'PlayStation',
+	xbox = 'Xbox',
+	pc = 'PC',
+	cross = 'Cross-Platform',
+}
+
 ---@param frame Frame
 ---@return Html
 function CustomLeague.run(frame)
@@ -32,13 +40,24 @@ function CustomLeague.run(frame)
 	return league:createInfobox()
 end
 
+---@param args table
+function CustomLeague:customParseArguments(args)
+	self.data.platform = PLATFORMS[(self.args.platform or ''):lower():gsub(' ', '')] or PLATFORMS.pc
+end
+
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
+	local caller = self.caller
+	local args = caller.args
 
-	if id == 'customcontent' then
+	if id == 'custom' then
+		Array.appendWith(
+			widgets,
+			Cell{name = 'Platform', content = {caller.data.platform}}
+		)
+	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.team_number) then
 			Array.appendWith(widgets,
 				Title{children = 'Teams'},

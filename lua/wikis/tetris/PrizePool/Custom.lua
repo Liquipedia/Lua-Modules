@@ -50,6 +50,9 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	Variables.varDefine('ranking' .. lpdbPrefix .. '_' .. (participants:lower()) ..
 		'_pointprize', lpdbData.extradata.prizepoints
 	)
+	Variables.varDefine('ranking' .. lpdbPrefix .. '_' .. (participants:lower()) ..
+		'_pointprize2', lpdbData.extradata.prizepoints2
+	)
 
 	return lpdbData
 end

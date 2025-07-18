@@ -22,8 +22,8 @@ return {
 		},
 		esl = {
 			'',
-			team = 'https://play.eslgaming.com/counterstrike/csgo/team/',
-			player = 'https://play.eslgaming.com/counterstrike/csgo/player/',
+			team = 'https://web.archive.org/web/play.eslgaming.com/counterstrike/csgo/team/',
+			player = 'https://web.archive.org/web/play.eslgaming.com/counterstrike/csgo/player/',
 		}
 	},
 }

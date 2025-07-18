@@ -35,7 +35,7 @@ return {
 		['image'] = 'Soniqs Supr.jpg',
 		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/a/ab/Soniqs_Supr.jpg/320px-Soniqs_Supr.jpg',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/10033345',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/10033345',
 			['faceit'] = 'https&#58;//www.faceit.com/en/players/suprmane',
 			['home'] = 'http&#58;//supr.gg/',
 			['siege-gg'] = 'https&#58;//siege.gg/players/134',
@@ -74,7 +74,7 @@ return {
 		['image'] = 'Yuuk at Six Invitational 2018.jpg',
 		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/5/54/Yuuk_at_Six_Invitational_2018.jpg/400px-Yuuk_at_Six_Invitational_2018.jpg',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/9877455',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/9877455',
 			['facebook'] = 'https&#58;//facebook.com/LucasYuukRodrigues',
 			['instagram'] = 'https&#58;//www.instagram.com/LucasYuuk',
 			['twitch'] = 'https&#58;//www.twitch.tv/tigeryuuk',
@@ -118,7 +118,7 @@ return {
 		['image'] = 'Bullet1 SI20.jpg',
 		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/0/01/Bullet1_SI20.jpg/400px-Bullet1_SI20.jpg',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/9884488',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/9884488',
 			['facebook'] = 'https&#58;//facebook.com/bullet1r6',
 			['instagram'] = 'https&#58;//www.instagram.com/bullet1r6',
 			['siege-gg'] = 'https&#58;//siege.gg/players/98',
@@ -165,7 +165,7 @@ return {
 		['image'] = 'S3xycake DHMTL19.jpg',
 		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/6/6d/S3xycake_DHMTL19.jpg/400px-S3xycake_DHMTL19.jpg',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/10196794',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/10196794',
 			['facebook'] = 'https&#58;//facebook.com/xsexycake',
 			['faceit'] = 'https&#58;//www.faceit.com/en/players/xS3xyCake',
 			['instagram'] = 'https&#58;//www.instagram.com/xsexycake',
@@ -212,7 +212,7 @@ return {
 		['image'] = 'BiBoo Wolves 2022.png',
 		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/c/c0/BiBoo_Wolves_2022.png/222px-BiBoo_Wolves_2022.png',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/7171663',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/7171663',
 			['faceit'] = 'https&#58;//www.faceit.com/en/players/BiBooAF',
 			['siege-gg'] = 'https&#58;//siege.gg/players/19',
 			['twitch'] = 'https&#58;//www.twitch.tv/bibooaf',
@@ -258,7 +258,7 @@ return {
 		['image'] = 'Bosco Six Invitational 2019.jpg',
 		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/f/f2/Bosco_Six_Invitational_2019.jpg/400px-Bosco_Six_Invitational_2019.jpg',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/10083685',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/10083685',
 			['faceit'] = 'https&#58;//www.faceit.com/en/players/Bosco-',
 			['siege-gg'] = 'https&#58;//siege.gg/players/67',
 			['twitch'] = 'https&#58;//www.twitch.tv/Bosco',
@@ -305,7 +305,7 @@ return {
 		['image'] = 'Psycho BR6 2021 S1.jpg',
 		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/a/ac/Psycho_BR6_2021_S1.jpg/400px-Psycho_BR6_2021_S1.jpg',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/9579997',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/9579997',
 			['faceit'] = 'https&#58;//www.faceit.com/en/players/PsychoR6',
 			['instagram'] = 'https&#58;//www.instagram.com/psychor6',
 			['siege-gg'] = 'https&#58;//siege.gg/players/92',
@@ -348,7 +348,7 @@ return {
 		['image'] = 'Pzd Malvinas Gaming 2022.png',
 		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/b/bd/Pzd_Malvinas_Gaming_2022.png/188px-Pzd_Malvinas_Gaming_2022.png',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/8055975',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/8055975',
 			['facebook'] = 'https&#58;//facebook.com/pzddr6',
 			['siege-gg'] = 'https&#58;//siege.gg/players/95',
 			['twitch'] = 'https&#58;//www.twitch.tv/pzddr6',
@@ -391,7 +391,7 @@ return {
 		['image'] = 'wag DH Valencia 2018.jpg',
 		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/c/cf/Wag_DH_Valencia_2018.jpg/400px-Wag_DH_Valencia_2018.jpg',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/8039261',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/8039261',
 			['facebook'] = 'https&#58;//facebook.com/wagaofps',
 			['twitter'] = 'https&#58;//twitter.com/wagaofps',
 			['youtube'] = 'https&#58;//www.youtube.com/wagaofps',
@@ -429,7 +429,7 @@ return {
 		['image'] = '',
 		['imageurl'] = '',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/9819674',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/9819674',
 		},
 		['localizedname'] = '',
 		['name'] = 'Thiago Nicézio',
@@ -465,7 +465,7 @@ return {
 		['image'] = 'SpawNsss at Six Invitational 2018.jpg',
 		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/6/60/SpawNsss_at_Six_Invitational_2018.jpg/400px-SpawNsss_at_Six_Invitational_2018.jpg',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/8377849',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/8377849',
 			['facebook'] = 'https&#58;//facebook.com/1SpawNsss',
 			['instagram'] = 'https&#58;//www.instagram.com/spwnsss',
 			['twitter'] = 'https&#58;//twitter.com/davidbcouto',
@@ -512,7 +512,7 @@ return {
 		['image'] = 'RaFaLe.jpg',
 		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/4/4b/RaFaLe.jpg/314px-RaFaLe.jpg',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/7127557',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/7127557',
 			['siege-gg'] = 'https&#58;//siege.gg/players/18',
 			['twitter'] = 'https&#58;//twitter.com/RaFaLe_R6',
 			['youtube'] = 'https&#58;//www.youtube.com/SEBADRI92',
@@ -552,7 +552,7 @@ return {
 		['image'] = 'zephir dhv19.jpg',
 		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/2/21/Zephir_dhv19.jpg/400px-Zephir_dhv19.jpg',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/7318557',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/7318557',
 			['instagram'] = 'https&#58;//www.instagram.com/zephir6s',
 			['twitch'] = 'https&#58;//www.twitch.tv/ZephiR6S',
 			['twitter'] = 'https&#58;//twitter.com/ZephiR6S',
@@ -591,7 +591,7 @@ return {
 		['image'] = 'Spark 2.jpg',
 		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/0/05/Spark_2.jpg/321px-Spark_2.jpg',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/6871996',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/6871996',
 			['instagram'] = 'https&#58;//www.instagram.com/sparkr6s',
 			['twitch'] = 'https&#58;//www.twitch.tv/sparkr6s',
 			['twitter'] = 'https&#58;//twitter.com/SparkR6S',
@@ -634,7 +634,7 @@ return {
 		['image'] = 'Voy at Six Invitational 2018.jpg',
 		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/3/3d/Voy_at_Six_Invitational_2018.jpg/400px-Voy_at_Six_Invitational_2018.jpg',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/7237814',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/7237814',
 			['faceit'] = 'https&#58;//www.faceit.com/en/players/Voy_',
 			['twitch'] = 'https&#58;//www.twitch.tv/VoyR6S',
 			['twitter'] = 'https&#58;//twitter.com/ValentinCh_',
@@ -671,7 +671,7 @@ return {
 		['image'] = 'gCR at Six Invitational 2018.jpg',
 		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/2/2d/GCR_at_Six_Invitational_2018.jpg/400px-GCR_at_Six_Invitational_2018.jpg',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/10536788',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/10536788',
 			['facebook'] = 'https&#58;//facebook.com/gcrfps',
 			['twitch'] = 'https&#58;//www.twitch.tv/gcr_r6',
 			['twitter'] = 'https&#58;//twitter.com/gcrr6',
@@ -752,7 +752,7 @@ return {
 		['image'] = 'Geoo DH Montreal 2018.jpg',
 		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/1/11/Geoo_DH_Montreal_2018.jpg/400px-Geoo_DH_Montreal_2018.jpg',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/9919890',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/9919890',
 			['faceit'] = 'https&#58;//www.faceit.com/en/players/geoolicious',
 			['instagram'] = 'https&#58;//www.instagram.com/tsm_geometrics',
 			['siege-gg'] = 'https&#58;//siege.gg/players/54',
@@ -795,7 +795,7 @@ return {
 		['image'] = 'Shuttle Astralis.png',
 		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/2/2d/Shuttle_Astralis.png/353px-Shuttle_Astralis.png',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/11332895',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/11332895',
 			['faceit'] = 'https&#58;//www.faceit.com/en/players/shuttle-',
 			['siege-gg'] = 'https&#58;//siege.gg/players/55',
 			['twitch'] = 'https&#58;//www.twitch.tv/shuttle',
@@ -836,7 +836,7 @@ return {
 		['image'] = 'Whiteskark sixcup2017.jpg',
 		['imageurl'] = 'https&#58;//liquipedia.net/commons/images/thumb/6/64/Whiteskark_sixcup2017.jpg/311px-Whiteskark_sixcup2017.jpg',
 		['links'] = {
-			['esl'] = 'https&#58;//play.eslgaming.com/player/10797046',
+			['esl'] = 'https&#58;//web.archive.org/web/play.eslgaming.com/player/10797046',
 			['facebook'] = 'https&#58;//facebook.com/Whiteshark67',
 			['twitch'] = 'https&#58;//www.twitch.tv/whiteshark67',
 			['twitter'] = 'https&#58;//twitter.com/Wshark67',

@@ -35,20 +35,23 @@ Button.defaultProps = {
 
 ---@return Widget
 function Button:render()
-	--- MW Parser does not allowed the <button> tag, so we use a DIV for now instead
-	local cssClasses = {
-		'btn',
-		'btn-new',
-	}
+	--- MW Parser does not allowed the <button> tag, so we use a <div>
+	local cssClasses = {'btn'}
 	if self.props.variant == 'primary' then
 		table.insert(cssClasses, 'btn-primary')
 	elseif self.props.variant == 'secondary' then
 		table.insert(cssClasses, 'btn-secondary')
+	elseif self.props.variant == 'tertiary' then
+		table.insert(cssClasses, 'btn-tertiary')
 	elseif self.props.variant == 'ghost' then
 		table.insert(cssClasses, 'btn-ghost')
+	elseif self.props.variant == 'destructive' then
+		table.insert(cssClasses, 'btn-destructive')
 	end
 
-	if self.props.size == 'sm' then
+	if self.props.size == 'xs' then
+		table.insert(cssClasses, 'btn-extrasmall')
+	elseif self.props.size == 'sm' then
 		table.insert(cssClasses, 'btn-small')
 	elseif self.props.size == 'lg' then
 		table.insert(cssClasses, 'btn-large')
