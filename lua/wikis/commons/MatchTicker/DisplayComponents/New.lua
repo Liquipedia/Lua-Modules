@@ -66,7 +66,7 @@ end
 ---@param flip boolean?
 ---@return Html
 function ScoreBoard:opponent(opponent, isWinner, flip)
-	if Opponent.isEmpty(opponent) or Opponent.isTbd(opponent) and opponent.type ~= Opponent.literal then
+	if Opponent.isEmpty(opponent) then
 		opponent = Opponent.tbd(Opponent.literal)
 	end
 

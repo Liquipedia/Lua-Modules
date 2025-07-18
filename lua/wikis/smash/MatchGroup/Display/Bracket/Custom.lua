@@ -30,10 +30,13 @@ function CustomBracketDisplay.BracketContainer(props)
 	})
 end
 
----@param props {opponent: SmashStandardOpponent, displayType: string, matchWidth: number}
+---@param props {opponent: SmashStandardOpponent, displayType: string, forceShortName: boolean?, height: number}
 ---@return Html
 function CustomBracketDisplay.OpponentEntry(props)
-	local opponentEntry = OpponentDisplay.BracketOpponentEntry(props.opponent)
+	local opponentEntry = OpponentDisplay.BracketOpponentEntry(
+		props.opponent,
+		{forceShortName = props.forceShortName, showTbd = false}
+	)
 	if props.displayType == 'bracket' and props.opponent.type == Opponent.solo then
 		CustomBracketDisplay._addHeads(opponentEntry, props.opponent)
 		if props.opponent.placement == 1 then

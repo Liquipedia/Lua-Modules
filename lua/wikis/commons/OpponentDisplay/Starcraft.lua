@@ -14,7 +14,7 @@ local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
-local Opponent = Lua.import('Module:Opponent')
+local Opponent = Lua.import('Module:Opponent/Starcraft')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 local StarcraftPlayerDisplay = Lua.import('Module:Player/Display/Starcraft')
 
@@ -38,8 +38,13 @@ local StarcraftOpponentDisplay = Table.copy(OpponentDisplay)
 local BracketOpponentEntry = Class.new(
 	---@param self self
 	---@param opponent StarcraftStandardOpponent
-	---@param options {forceShortName: boolean}
+	---@param options {forceShortName: boolean, showTbd: boolean}
 	function(self, opponent, options)
+		if opponent.type == Opponent.team and options.showTbd == false and
+				(Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)) then
+			opponent = Opponent.blank() --[[@as StarcraftStandardOpponent]]
+		end
+
 		local showFactionBackground = opponent.type == Opponent.solo
 			or opponent.extradata.hasFactionOrFlag
 			or opponent.type == Opponent.duo and opponent.isArchon

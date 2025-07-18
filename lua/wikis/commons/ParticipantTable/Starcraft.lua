@@ -123,7 +123,7 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
 		Variables.varDefine(opponentArgs.name .. '_faction', '')
 	end
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
+	local opponent = Opponent.readOpponentArgs(opponentArgs)
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)

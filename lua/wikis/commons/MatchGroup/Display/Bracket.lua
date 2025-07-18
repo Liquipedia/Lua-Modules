@@ -821,7 +821,10 @@ by passing in a different props.OpponentEntry in the Bracket component.
 ---@param props {opponent: standardOpponent, displayType: string, forceShortName: boolean?, height: number}
 ---@return Html
 function BracketDisplay.OpponentEntry(props)
-	local opponentEntry = OpponentDisplay.BracketOpponentEntry(props.opponent, {forceShortName = props.forceShortName})
+	local opponentEntry = OpponentDisplay.BracketOpponentEntry(
+		props.opponent,
+		{forceShortName = props.forceShortName, showTbd = false}
+	)
 	if props.displayType == 'bracket' then
 		opponentEntry:addScores(props.opponent)
 	end
