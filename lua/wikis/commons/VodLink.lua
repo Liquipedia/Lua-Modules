@@ -41,8 +41,10 @@ function VodLink.display(args)
 	--question if we actually need the tlpd stuff
 	--atm most wikis have it, but it seems very pointless except for sc/sc2
 	if args.source == 'tlpd' or args.source == 'tlpd-kr' then
+		mw.ext.TeamLiquidIntegration.add_category('VodLink using tlpd')
 		link = 'https://www.tl.net/tlpd/sc2-korean/games/' .. link .. '/vod'
 	elseif args.source == 'tlpd-int' then
+		mw.ext.TeamLiquidIntegration.add_category('VodLink using tlpd')
 		link = 'https://www.tl.net/tlpd/sc2-international/games/' .. link .. '/vod'
 	end
 
