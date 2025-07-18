@@ -114,7 +114,10 @@ function MatchCard:render()
 				classes = {'match-links'}, -- TODO Update Class
 				children = WidgetUtil.collect(
 					matchPageButton,
-					displayStreams and StreamsContainer{streams = StreamLinks.filterStreams(match.stream)} or nil,
+					displayStreams and StreamsContainer{
+						streams = StreamLinks.filterStreams(match.stream),
+						callToActionLimit = matchPageButton and 0 or 2,
+					} or nil,
 					displayVods and makeVodButton(match.vod, nil, not matchPageButton) or nil
 				)
 			}
