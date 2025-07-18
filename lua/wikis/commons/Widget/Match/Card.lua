@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info')
 local Logic = Lua.import('Module:Logic')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
@@ -109,9 +110,9 @@ function MatchCard:render()
 					matchPageButton,
 					displayStreams and StreamsContainer{
 						streams = StreamLinks.filterStreams(match.stream),
-						callToActionLimit = matchPageButton and 0 or 2,
+						callToActionLimit = Info.config.match2.matchPage and 0 or 2,
 					} or nil,
-					displayVods and makeVodButton(match.vod, nil, not matchPageButton) or nil
+					displayVods and makeVodButton(match.vod, nil, not Info.config.match2.matchPage) or nil
 				)
 			}
 		)
