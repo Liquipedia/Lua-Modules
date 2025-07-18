@@ -28,6 +28,8 @@ function TournamentTitleWidget:render()
 		return
 	end
 
+	local hasStage = self.props.stageName ~= nil
+
 	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
 		self.props.displayGameIcon and Game.icon{
 			game = tournament.game,
@@ -56,8 +58,8 @@ function TournamentTitleWidget:render()
 					link = tournament.pageName,
 					children = {
 						tournament.displayName,
-						self.props.stageName and ' - ' or nil,
-						self.props.stageName,
+						hasStage and ' - ' or nil,
+						hasStage and self.props.stageName or nil,
 					}
 				},
 			}
