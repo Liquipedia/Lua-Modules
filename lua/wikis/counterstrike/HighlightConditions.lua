@@ -18,19 +18,21 @@ local DEFAULT_HIGHLIGHTABLE_VALUES = {
 }
 
 --- Check arguments or queryData if the tournament should be highlighted
----@param data table
+---@param data match2|MatchGroupUtilMatch
 ---@param options table
 ---@return boolean
 function HighlightConditions.tournament(data, options)
 	options = options or {}
 
+	local publishertier = data.publishertier or data.publisherTier
+
 	if options.onlyHighlightOnValue then
-		return data.publishertier == options.onlyHighlightOnValue
+		return publishertier == options.onlyHighlightOnValue
 	elseif options.highlightOnAnyValue then
-		return String.isNotEmpty(data.publishertier)
+		return String.isNotEmpty(publishertier)
 	end
 
-	return String.isNotEmpty(data.publishertier) and Table.includes(DEFAULT_HIGHLIGHTABLE_VALUES, data.publishertier)
+	return String.isNotEmpty(publishertier) and Table.includes(DEFAULT_HIGHLIGHTABLE_VALUES, publishertier)
 end
 
 return HighlightConditions

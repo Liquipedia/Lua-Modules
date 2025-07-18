@@ -12,6 +12,7 @@ local Logic = Lua.import('Module:Logic')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local StreamLinks = Lua.import('Module:Links/Stream')
+local Tournament = Lua.import('Module:Tournament')
 local VodLink = Lua.import('Module:VodLink')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -23,6 +24,7 @@ local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local ImageIcon = Lua.import('Module:Widget/Image/Icon/Image')
+local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
 
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 
@@ -53,12 +55,13 @@ function MatchCard:render()
 	end
 
 	local highlightCondition = HighlightConditions.match or HighlightConditions.tournament
-	-- TODO: We need to matchRecord, not the parsedMatch here...
 	local highlight = highlightCondition(match, {onlyHighlightOnValue = self.props.onlyHighlightOnValue})
 
 	---@param vod string?
 	---@param index integer?
-	local makeVodButton = function(vod, index)
+	---@param callToAction boolean
+	---@return Widget?
+	local makeVodButton = function(vod, index, callToAction)
 		if Logic.isEmpty(vod) then
 			return nil
 		end
@@ -68,26 +71,18 @@ function MatchCard:render()
 			title = VodLink.getTitle(index),
 			variant = 'tertiary',
 			link = vod,
-			children = ImageIcon{imageLight = VodLink.getIcon(index)},
+			children = {
+				ImageIcon{imageLight = VodLink.getIcon(index)},
+				callToAction and ' ' or nil,
+				callToAction and VodLink.getTitle(index) or nil,
+			},
 		}
 	end
 
-	-- TODO: Make work, and add stage
 	local tournamentLink = TournamentTitle{
-		tournament = {
-			pageName = match.parent,
-			displayName = Logic.emptyOr(
-				match.tickername,
-				match.tournament,
-				match.parent:gsub('_', ' ')
-			),
-			tickerName = match.tickername,
-			icon = match.icon,
-			iconDark = match.icondark,
-			series = match.series,
-			game = match.game,
-		},
-		displayGameIcon = self.props.displayGameIcons
+		tournament = Tournament.partialTournamentFromMatch(match),
+		displayGameIcon = self.props.displayGameIcons,
+		stageName = match.section,
 	}
 
 	local matchPageButton = MatchPageButton{
@@ -119,10 +114,10 @@ function MatchCard:render()
 				classes = {'match-links'}, -- TODO Update Class
 				children = WidgetUtil.collect(
 					matchPageButton,
-					displayStreams and StreamLinks.buildDisplays(StreamLinks.filterStreams(match.stream)) or nil,
-					displayVods and makeVodButton(match.vod) or nil -- TODO Make longer text if no matchPageButton
+					displayStreams and StreamsContainer{streams = StreamLinks.filterStreams(match.stream)} or nil,
+					displayVods and makeVodButton(match.vod, nil, not matchPageButton) or nil
 				)
-			},
+			}
 		)
 	}
 end

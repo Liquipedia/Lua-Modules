@@ -8,11 +8,11 @@
 local HighlightConditions = {}
 
 --- Check arguments or queryData if the tournament should be highlighted
----@param data table
+---@param data match2|MatchGroupUtilMatch
 ---@param options table?
 ---@return boolean
 function HighlightConditions.tournament(data, options)
-	return (data.publishertier == 'highlighted')
+	return (data.publishertier or data.publisherTier) == 'highlighted'
 end
 
 return HighlightConditions

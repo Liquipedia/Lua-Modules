@@ -240,10 +240,19 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field finished boolean
 ---@field game string?
 ---@field games MatchGroupUtilGame[]
+---@field icon string?
+---@field iconDark string?
 ---@field links table
+---@field liquipediatier string? # TODO: capitalize
+---@field liquipediatiertype string? # TODO: capitalize
 ---@field matchId string?
 ---@field mode string?
 ---@field opponents standardOpponent[]
+---@field parent string?
+---@field patch string?
+---@field publisherTier string?
+---@field section string?
+---@field series string?
 ---@field status MatchStatus
 ---@field stream table
 ---@field tickername string?
@@ -262,10 +271,19 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	finished = 'boolean',
 	game = 'string?',
 	games = TypeUtil.array(MatchGroupUtil.types.Game),
+	icon = 'string?',
+	iconDark = 'string?',
 	links = 'table',
+	liquipediatier = 'string?',
+	liquipediatiertype = 'string?',
 	matchId = 'string?',
 	mode = 'string',
 	opponents = TypeUtil.array(MatchGroupUtil.types.Opponent),
+	parent = 'string?',
+	patch = 'string?',
+	publisherTier = 'string?',
+	section = 'string?',
+	series = 'string?',
 	status = MatchGroupUtil.types.Status,
 	stream = 'table',
 	tickername = 'string?',
@@ -528,6 +546,8 @@ function MatchGroupUtil.matchFromRecord(record)
 		finished = Logic.readBool(record.finished),
 		game = record.game,
 		games = games,
+		icon = nilIfEmpty(record.icon),
+		iconDark = nilIfEmpty(record.icondark),
 		links = Json.parseIfString(record.links) or {},
 		matchId = record.match2id,
 		liquipediatier = record.liquipediatier,
@@ -536,7 +556,10 @@ function MatchGroupUtil.matchFromRecord(record)
 		opponents = opponents,
 		parent = record.parent,
 		patch = record.patch,
+		publisherTier = nilIfEmpty(record.publishertier),
 		resultType = nilIfEmpty(record.resulttype),
+		section = nilIfEmpty(record.section),
+		series = nilIfEmpty(record.series),
 		status = nilIfEmpty(record.status),
 		stream = Json.parseIfString(record.stream) or {},
 		tickername = record.tickername,
