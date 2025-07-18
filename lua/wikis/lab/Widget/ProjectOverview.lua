@@ -29,10 +29,10 @@ local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LabProjectOverviewParameters
----@field ProjectName string
----@field ProjectUrl string
----@field ProjectImage string?
----@field ProjectImageDark string?
+---@field projectName string
+---@field projectUrl string
+---@field projectImage string?
+---@field projectImageDark string?
 
 ---@class LabProjectOverview: Widget
 ---@field props LabProjectOverviewParameters
@@ -40,12 +40,12 @@ local ProjectOverview = Class.new(Widget)
 
 ---@return Widget
 function ProjectOverview:render()
-	assert(Logic.isNotEmpty(self.props.ProjectUrl), '|ProjectUrl= not specified')
+	assert(Logic.isNotEmpty(self.props.projectUrl), '|projectUrl= not specified')
 	return Grid.Cell{
 		xs = 12,
 		md = 6,
 		cellContent = Panel{
-			heading = self.props.ProjectName,
+			heading = self.props.projectName,
 			padding = true,
 			children = Grid.Container{
 				gridCells = {
@@ -60,7 +60,7 @@ end
 ---@private
 ---@return Widget
 function ProjectOverview:_generateImage()
-	local hasImage = Logic.isNotEmpty(self.props.ProjectImage)
+	local hasImage = Logic.isNotEmpty(self.props.projectImage)
 
 	return Grid.Cell{
 		xs = 12,
@@ -73,10 +73,10 @@ function ProjectOverview:_generateImage()
 			},
 			children = {
 				IconImage{
-					imageLight = hasImage and self.props.ProjectImage or 'Filler 600px.png',
-					imageDark = hasImage and Logic.emptyOr(self.props.ProjectImageDark, self.props.ProjectImage) or 'Filler 600px.png',
+					imageLight = hasImage and self.props.projectImage or 'Filler 600px.png',
+					imageDark = hasImage and Logic.emptyOr(self.props.projectImageDark, self.props.projectImage) or 'Filler 600px.png',
 					size = '260x160px',
-					link = self.props.ProjectUrl
+					link = self.props.projectUrl
 				}
 			}
 		}
@@ -90,7 +90,7 @@ function ProjectOverview:_generateOverview()
 	local timestamp = DateExt.readTimestamp(
 		mw.getCurrentFrame():callParserFunction(
 			'#lastupdated_by_prefix',
-			self.props.ProjectUrl .. '/'
+			self.props.projectUrl .. '/'
 		)
 	)
 
@@ -102,7 +102,7 @@ function ProjectOverview:_generateOverview()
 			HtmlWidgets.H5{
 				children = {
 					IconFa{iconName = 'projecthome', screenReaderHidden = true},
-					Link{link = self.props.ProjectUrl}
+					Link{link = self.props.projectUrl}
 				}
 			},
 			{
@@ -112,7 +112,7 @@ function ProjectOverview:_generateOverview()
 					conditions = tostring(
 						ConditionTree(BooleanOperator.all)
 							:add(ConditionNode(ColumnName('type'), Comparator.eq, 'project contributor'))
-							:add(ConditionNode(ColumnName('name'), Comparator.eq, self.props.ProjectUrl))
+							:add(ConditionNode(ColumnName('name'), Comparator.eq, self.props.projectUrl))
 					),
 					query = 'count::pageid'
 				})[1].count_pageid,
@@ -121,7 +121,7 @@ function ProjectOverview:_generateOverview()
 			{
 				IconFa{iconName = 'articles', screenReaderHidden = true},
 				' Articles Created: ',
-				mw.getCurrentFrame():callParserFunction('#count_pages_by_prefix', self.props.ProjectUrl),
+				mw.getCurrentFrame():callParserFunction('#count_pages_by_prefix', self.props.projectUrl),
 			},
 			HtmlWidgets.Br{},
 			{
