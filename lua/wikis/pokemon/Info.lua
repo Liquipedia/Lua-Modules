@@ -244,5 +244,9 @@ return {
 			matchWidthMobile = 110,
 			matchWidth = 190,
 		},
+		thisDay = {
+			tiers = {1, 2, 3},
+			excludeTierTypes = {'Qualifier'},
+		},
 	},
 }
