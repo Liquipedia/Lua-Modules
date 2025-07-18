@@ -78,6 +78,7 @@ function Button:render()
 	-- Have to wrap it in an extra div to prevent the mediawiki parser from messing it up
 	return Div{
 		css = self.props.grow and {flex = '1'} or nil,
+		classes = self.props.classes or {},
 		children = {
 			Link{
 				link = self.props.link,
