@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
-local Logic = Lua.import('Module:Logic')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
@@ -28,8 +27,6 @@ function TournamentTitleWidget:render()
 	if not tournament then
 		return
 	end
-
-	local hasStageName = Logic.isNotEmpty(self.props.stageName)
 
 	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
 		self.props.displayGameIcon and Game.icon{
@@ -59,8 +56,8 @@ function TournamentTitleWidget:render()
 					link = tournament.pageName,
 					children = {
 						tournament.displayName,
-						hasStageName and ' - ' or nil,
-						hasStageName and self.props.stageName or nil,
+						self.props.stageName and ' - ' or nil,
+						self.props.stageName,
 					}
 				},
 			}
