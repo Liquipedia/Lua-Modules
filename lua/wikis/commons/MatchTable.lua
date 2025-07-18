@@ -875,7 +875,6 @@ function MatchTable:_displayMatchPage(match)
 		:node(MatchPageButton{
 			matchId = match.matchId,
 			hasMatchPage = match.hasMatchPage,
-			short = false,
 		})
 end
 

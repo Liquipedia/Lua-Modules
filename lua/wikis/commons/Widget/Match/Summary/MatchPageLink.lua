@@ -31,7 +31,6 @@ function MatchSummaryMatchPageLink:render()
 			MatchPageButton{
 				matchId = self.props.matchId,
 				hasMatchPage = self.props.hasMatchPage,
-				short = false,
 				buttonType = 'primary',
 			},
 		}
