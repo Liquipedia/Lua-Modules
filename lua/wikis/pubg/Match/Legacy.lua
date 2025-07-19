@@ -7,10 +7,12 @@
 
 local MatchLegacy = {}
 
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
-local Json = require('Module:Json')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local Json = Lua.import('Module:Json')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 
 function MatchLegacy.storeMatch(match2)
