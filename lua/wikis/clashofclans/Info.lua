@@ -34,6 +34,7 @@ return {
 		match2 = {
 			status = 2,
 			matchWidth = 200,
+			gameScoresIfBo1 = true,
 		},
 		transfers = {
 			showTeamName = true,

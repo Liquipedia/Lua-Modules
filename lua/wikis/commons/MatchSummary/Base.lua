@@ -22,109 +22,11 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Links = Lua.import('Module:Links')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local MatchHeader = Lua.import('Module:Widget/Match/Header')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {loadData = true})
 local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
-
----@class MatchSummaryHeader
----@operator call: MatchSummaryHeader
----@field root Html
----@field leftElement string|Html|number|nil
----@field leftScoreElement Html?
----@field rightElement string|Html|number|nil
----@field rightScoreElement Html?
-local Header = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-			:addClass('brkts-popup-header-dev')
-			:css('justify-content', 'center')
-	end
-)
-
----@param content string|Html|number|nil
----@return MatchSummaryHeader
-function Header:leftOpponent(content)
-	self.leftElement = content
-	return self
-end
-
----@param content Html
----@return MatchSummaryHeader
-function Header:leftScore(content)
-	self.leftScoreElement = content:addClass('brkts-popup-header-opponent-score-left')
-	return self
-end
-
----@param content Html
----@return MatchSummaryHeader
-function Header:rightScore(content)
-	self.rightScoreElement = content:addClass('brkts-popup-header-opponent-score-right')
-	return self
-end
-
----@param content string|Html|number|nil
----@return MatchSummaryHeader
-function Header:rightOpponent(content)
-	self.rightElement = content
-	return self
-end
-
----@param opponent standardOpponent
----@param side 'left'|'right'
----@param style teamStyle?
----@return Html
-function Header:createOpponent(opponent, side, style)
-	local showLink = not Opponent.isTbd(opponent) and true or false
-	return OpponentDisplay.BlockOpponent{
-		flip = side == 'left',
-		opponent = opponent,
-		showLink = showLink,
-		overflow = 'ellipsis',
-		teamStyle = style or 'short',
-	}
-end
-
----@param opponent standardOpponent
----@return Html
-function Header:createScore(opponent)
-	local isWinner, scoreText
-	if opponent.placement2 then
-		-- Bracket Reset, show W/L
-		if opponent.placement2 == 1 then
-			isWinner = true
-			scoreText = 'W'
-		else
-			isWinner = false
-			scoreText = 'L'
-		end
-	else
-		isWinner = opponent.placement == 1 or opponent.advances
-		scoreText = OpponentDisplay.InlineScore(opponent)
-	end
-
-	return OpponentDisplay.BlockScore{
-		isWinner = isWinner,
-		scoreText = scoreText,
-	}
-end
-
----@return Html
-function Header:create()
-	return self.root
-		:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
-			:node(self.leftElement)
-			:node(self.leftScoreElement or '')
-			:done()
-		:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-right')
-			:node(self.rightScoreElement or '')
-			:node(self.rightElement)
-			:done()
-end
 
 ---@class MatchSummaryFooter
 ---@operator call: MatchSummaryFooter
@@ -217,8 +119,8 @@ end
 ---@class MatchSummaryMatch
 ---@operator call: MatchSummaryMatch
 ---@field root Html
----@field headerElement Html?
----@field bodyElement Widget|Html?
+---@field headerElement Widget?
+---@field bodyElement Widget?
 ---@field commentElement Widget?
 ---@field footerElement Html?
 ---@field buttonElement Widget?
@@ -228,10 +130,10 @@ local Match = Class.new(
 	end
 )
 
----@param header MatchSummaryHeader
+---@param header Widget
 ---@return MatchSummaryMatch
 function Match:header(header)
-	self.headerElement = header:create()
+	self.headerElement = header
 	return self
 end
 
@@ -281,14 +183,12 @@ end
 
 ---@class MatchSummary
 ---@operator call(string?):MatchSummary
----@field Header MatchSummaryHeader
 ---@field Footer MatchSummaryFooter
 ---@field Match MatchSummaryMatch
 ---@field matches Html[]?
----@field headerElement Html?
+---@field headerElement Widget?
 ---@field root Html?
 local MatchSummary = Class.new()
-MatchSummary.Header = Header
 MatchSummary.Footer = Footer
 MatchSummary.Match = Match
 
@@ -309,10 +209,10 @@ function MatchSummary:addClass(cssClass)
 	return self
 end
 
----@param header MatchSummaryHeader
+---@param header Widget?
 ---@return MatchSummary
 function MatchSummary:header(header)
-	self.headerElement = header:create()
+	self.headerElement = header
 	return self
 end
 
@@ -340,27 +240,18 @@ end
 ---Default header function
 ---@param match table
 ---@param options {teamStyle: teamStyle?, noScore:boolean?}?
----@return MatchSummaryHeader
+---@return Widget
 function MatchSummary.createDefaultHeader(match, options)
 	options = options or {}
-	local teamStyle = options.teamStyle
-	local header = MatchSummary.Header()
-
-	if options.noScore then
-		return header
-			:leftOpponent(header:createOpponent(match.opponents[1], 'left', teamStyle))
-			:rightOpponent(header:createOpponent(match.opponents[2], 'right', teamStyle))
-	end
-
-	return header
-		:leftOpponent(header:createOpponent(match.opponents[1], 'left', teamStyle))
-		:leftScore(header:createScore(match.opponents[1]))
-		:rightScore(header:createScore(match.opponents[2]))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right', teamStyle))
+	return MatchHeader{
+		match = match,
+		teamStyle = options.teamStyle,
+		noScore = options.noScore,
+	}
 end
 
 -- Default body function
----@param match table
+---@param match MatchGroupUtilMatch
 ---@param createGame fun(date: string, game: table, gameIndex: integer): Widget
 ---@return Widget
 function MatchSummary.createDefaultBody(match, createGame)
@@ -407,7 +298,7 @@ function MatchSummary.addVodsToFooter(match, footer)
 end
 
 ---Default createMatch function for usage in Custom MatchSummary
----@param matchData table?
+---@param matchData MatchGroupUtilMatch?
 ---@param CustomMatchSummary table
 ---@param options {teamStyle: teamStyle?, noScore: boolean?}?
 ---@return MatchSummaryMatch?

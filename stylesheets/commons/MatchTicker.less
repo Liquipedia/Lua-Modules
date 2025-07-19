@@ -9,59 +9,10 @@ Author(s): Nadox
 }
 
 .new-match-style {
-	.match-section-header {
-		display: flex;
-		flex-direction: column;
-		padding: 1rem;
-		gap: 0.5em;
-	}
-
 	.match {
 		border-bottom: 1px solid var( --table-border-color, var( --clr-border, #bbbbbb ) );
 		padding: 0.75rem 0;
 		font-size: 0.875rem;
-
-		.match-scoreboard {
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			gap: 2rem;
-			margin-bottom: 0.5rem;
-
-			> div {
-				flex: 1;
-			}
-
-			.team-left {
-				display: flex;
-				justify-content: right;
-			}
-
-			.versus {
-				flex: 0 1 auto;
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				align-items: center;
-
-				.versus-upper {
-					display: flex;
-					gap: 0.25rem;
-					align-items: center;
-					justify-content: center;
-				}
-
-				.versus-lower {
-					font-size: 0.75rem;
-					color: var( --clr-secondary );
-					text-align: center;
-				}
-			}
-
-			.match-winner {
-				font-weight: bold;
-			}
-		}
 
 		.match-details {
 			display: flex;

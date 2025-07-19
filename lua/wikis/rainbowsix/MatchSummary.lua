@@ -99,7 +99,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 			MatchSummaryWidgets.DetailedScore{
 				score = scoreDisplay(1),
 				flipped = false,
-		partialScores = makePartialScores(
+				partialScores = makePartialScores(
 					extradata.t1halfs or {},
 					firstSide,
 					firstSideOt
@@ -109,7 +109,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 			MatchSummaryWidgets.DetailedScore{
 				score = scoreDisplay(2),
 				flipped = true,
-		partialScores = makePartialScores(
+				partialScores = makePartialScores(
 					extradata.t2halfs or {},
 					CustomMatchSummary._getOppositeSide(firstSide),
 					CustomMatchSummary._getOppositeSide(firstSideOt)

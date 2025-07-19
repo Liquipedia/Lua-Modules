@@ -24,30 +24,6 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px'})
 end
 
-function CustomMatchSummary.createHeader(match)
-	local header = MatchSummary.Header()
-
-	local opponentLeft = match.opponents[1]
-	local opponentRight = match.opponents[2]
-
-	-- for Bo1 overwritte opponents scores with game score for matchsummary header display
-	if match.bestof == 1 and match.games and match.games[1] and
-		not match.opponents[1].placement2 and not match.opponents[2].placement2 then
-
-		local scores = Array.map(match.games[1].opponents, Operator.property('score'))
-		opponentLeft = Table.merge(match.opponents[1], {score = scores[1] or 0})
-		opponentRight = Table.merge(match.opponents[2], {score = scores[2] or 0})
-	end
-
-
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-		:leftScore(header:createScore(opponentLeft))
-		:rightScore(header:createScore(opponentRight))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
-
-	return header
-end
-
 function CustomMatchSummary._gameScore(game, opponentIndex)
 	return mw.html.create('div')
 		:css('width', '16px')
