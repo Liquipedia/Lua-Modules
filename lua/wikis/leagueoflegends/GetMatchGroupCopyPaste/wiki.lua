@@ -34,7 +34,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local casters = tonumber(args.casters) or 0
 
 	local lines = Array.extend(
-		'{{Match|patch=',
+		'{{Match',
 		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
@@ -53,6 +53,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Array.map(Array.range(1, bestof), function(mapIndex)
 			return WikiCopyPaste._getMapCode(mapIndex, args)
 		end),
+		INDENT .. '|patch=',
 		'}}'
 	)
 
