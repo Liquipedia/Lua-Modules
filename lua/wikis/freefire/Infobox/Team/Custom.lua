@@ -11,7 +11,10 @@ local PlacementStats = require('Module:InfoboxPlacementStats')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class FreeFireInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
@@ -26,15 +29,15 @@ function CustomTeam.run(frame)
 	return team:createInfobox()
 end
 
----@return string?
+---@return Widget
 function CustomTeam:createBottomContent()
-	if not self.args.disbanded then
-		return UpcomingTournaments{name = self.pagename}
-	end
-	return tostring(PlacementStats.run{
-		tiers = {'1', '2', '3', '4'},
-		participant = self.name,
-	})
+	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+		PlacementStats.run{
+			tiers = {'1', '2', '3', '4'},
+			participant = self.name,
+		},
+		not self.args.disbanded and UpcomingTournaments{name = self.pagename} or nil
+	)}
 end
 
 return CustomTeam
