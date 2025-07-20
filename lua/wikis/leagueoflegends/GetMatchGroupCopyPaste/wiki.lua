@@ -64,7 +64,15 @@ end
 ---@return string
 function WikiCopyPaste._getMapCode(mapIndex, args)
 	if Logic.readBool(args.generateMatchPage) then
-		return INDENT .. '|map' .. mapIndex .. '={{ApiMap|matchid=|reversed=}}'
+		return table.concat(
+			{
+				INDENT .. '|map' .. mapIndex .. '={{ApiMap',
+				INDENT .. INDENT .. '|matchid=',
+				INDENT .. INDENT .. '|reversed=',
+				INDENT .. INDENT .. '|vod=',
+				INDENT .. '}}'
+			}
+		, '\n')
 	end
 	local bans = Logic.readBool(args.bans)
 	return table.concat(Array.extend(
