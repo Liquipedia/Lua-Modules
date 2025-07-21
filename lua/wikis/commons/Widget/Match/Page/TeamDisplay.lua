@@ -67,7 +67,7 @@ function MatchPageTeamDisplay:_buildChildren()
 	local data = self.props.opponent.teamTemplateData
 	assert(data, TeamTemplate.noTeamMessage(opponent.template))
 	return {
-		mw.ext.TeamTemplate.teamicon(data.templatename),
+		opponent.iconDisplay,
 		Div{
 			classes = { 'match-bm-match-header-team-group' },
 			children = {

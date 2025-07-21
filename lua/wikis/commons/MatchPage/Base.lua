@@ -25,6 +25,9 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
+
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local AdditionalSection = Lua.import('Module:Widget/Match/Page/AdditionalSection')
 local MatchPageMapVeto = Lua.import('Module:Widget/Match/Page/MapVeto')
@@ -48,7 +51,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageOpponent: standardOpponent
 ---@field opponentIndex integer
----@field iconDisplay string
+---@field iconDisplay Widget?
 ---@field teamTemplateData teamTemplateData
 ---@field seriesDots string[]
 
@@ -161,7 +164,10 @@ function BaseMatchPage:populateOpponents()
 			return
 		end
 
-		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
+		opponent.iconDisplay = OpponentDisplay.InlineTeamContainer{
+			style = 'icon',
+			template = opponent.template
+		}
 		opponent.teamTemplateData = teamTemplate
 
 		opponent.seriesDots = Array.map(self.games, function(game)
