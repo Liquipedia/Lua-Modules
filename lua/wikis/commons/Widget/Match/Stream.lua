@@ -13,6 +13,7 @@ local StreamLinks = Lua.import('Module:Links/Stream')
 
 local Widget = Lua.import('Module:Widget')
 local Button = Lua.import('Module:Widget/Basic/Button')
+local Icon = Lua.import('Module:Widget/Image/Icon/Image')
 
 local TLNET_STREAM = 'stream'
 local CTA_TEXT = '${icon} Watch on ${platform}'
@@ -32,8 +33,7 @@ function MatchStream:render()
 		return nil
 	end
 
-	-- TODO: Icon/Data when it's being refactored with new icons
-	local icon = '<i class="lp-icon lp-icon-21 lp-' .. platform .. '"></i>'
+	local icon = Icon{iconName = platform}
 
 	local link, linkType
 	if platform == TLNET_STREAM then
