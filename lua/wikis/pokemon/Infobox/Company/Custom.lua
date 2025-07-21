@@ -18,6 +18,7 @@ local Title = Widgets.Title
 
 ---@class PokemonCompanyInfobox: CompanyInfobox
 local CustomCompany = Class.new(Company)
+---@class PokemonCompanyInfoboxInjector: WidgetInjector
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
