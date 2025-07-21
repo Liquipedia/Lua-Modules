@@ -105,7 +105,6 @@ function StandingsFfaWidget:render()
 								classes = {teamBackground},
 								children = OpponentDisplay.BlockOpponent{
 									opponent = slot.opponent,
-									showLink = true,
 									overflow = 'ellipsis',
 									teamStyle = 'hybrid',
 									showPlayerTeam = true,
