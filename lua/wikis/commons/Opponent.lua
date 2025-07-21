@@ -152,8 +152,10 @@ end
 
 ---Checks whether an opponent is TBD
 ---@param opponent standardOpponent
+---@param options {checkLiterals: boolean?}?
 ---@return boolean
-function Opponent.isTbd(opponent)
+function Opponent.isTbd(opponent, options)
+	options = options or {}
 	if opponent.type == Opponent.team then
 		return opponent.template == 'tbd'
 
@@ -162,7 +164,7 @@ function Opponent.isTbd(opponent)
 			or String.isEmpty(opponent.template)
 
 	elseif opponent.type == Opponent.literal then
-		return true
+		return options.checkLiterals ~= true or (opponent.name or ''):lower() == 'tbd'
 
 	else
 		return Array.any(opponent.players, Opponent.playerIsTbd)
