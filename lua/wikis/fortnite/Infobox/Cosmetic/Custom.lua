@@ -5,20 +5,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Cosmetic = Lua.import('Module:Infobox/Cosmetic')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
 ---@class FortniteCosmeticInfobox: CosmeticInfobox
 local CustomCosmetic = Class.new(Cosmetic)
+---@class FortniteCosmeticInfoboxWidgetInjector: WidgetInjector
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -48,13 +50,14 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@return string?
 function CustomCosmetic:_createIntroText()
 	local args = self.args
 	if not Logic.readBool(args['generate description']) then
-		return ''
+		return nil
 	end
 	if not args.rarity then
-		return ''
+		return nil
 	end
 
 	return self.name .. ' is a skin that is available in ' .. args.rarity .. ' rarity.'
