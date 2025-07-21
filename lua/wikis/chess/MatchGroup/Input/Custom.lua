@@ -93,4 +93,17 @@ function MapFunctions.extendMapOpponent(map, opponentIndex)
 	}
 end
 
+
+---@param map table
+---@return fun(opponentIndex: integer): integer?
+function MapFunctions.calculateMapScore(map)
+	local winner = tonumber(map.winner)
+	return function(opponentIndex)
+		if not winner and not map.finished then
+			return
+		end
+		return winner == opponentIndex and 1 or winner == 0 and 0.5 or 0
+	end
+end
+
 return CustomMatchGroupInput
