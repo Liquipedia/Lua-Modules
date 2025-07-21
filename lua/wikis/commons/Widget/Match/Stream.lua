@@ -12,11 +12,12 @@ local String = Lua.import('Module:StringUtils')
 local StreamLinks = Lua.import('Module:Links/Stream')
 
 local Widget = Lua.import('Module:Widget')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Button = Lua.import('Module:Widget/Basic/Button')
-local Icon = Lua.import('Module:Widget/Image/Icon/Image')
+local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 local TLNET_STREAM = 'stream'
-local CTA_TEXT = '${icon} Watch on ${platform}'
+local CTA_TEXT = 'Watch on ${platform}'
 
 ---@class MatchStream: Widget
 ---@operator call(table): MatchStream
@@ -32,8 +33,6 @@ function MatchStream:render()
 	if not platform or not stream then
 		return nil
 	end
-
-	local icon = Icon{iconName = platform}
 
 	local link, linkType
 	if platform == TLNET_STREAM then
@@ -51,7 +50,10 @@ function MatchStream:render()
 		linktype = linkType,
 		link = link,
 		grow = self.props.callToAction,
-		children = self.props.callToAction and String.interpolate(CTA_TEXT, { icon = icon, platform = platform }) or icon,
+		children = HtmlWidgets.Fragment{children = {
+			Icon{iconName = platform},
+			self.props.callToAction and String.interpolate(CTA_TEXT, { platform = platform }) or nil,
+		}},
 		variant = 'tertiary',
 		size = 'sm',
 	}

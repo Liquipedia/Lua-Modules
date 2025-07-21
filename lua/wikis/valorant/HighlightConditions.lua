@@ -8,7 +8,7 @@
 local HighlightConditions = {}
 
 --- Check arguments or queryData if the tournament should be highlighted
----@param data match2|MatchGroupUtilMatch
+---@param data table
 ---@param options table?
 ---@return boolean
 function HighlightConditions.tournament(data, options)
