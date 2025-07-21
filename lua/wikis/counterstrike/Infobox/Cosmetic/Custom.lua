@@ -17,6 +17,8 @@ local Builder = Widgets.Builder
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 local WEAPON_STYLES = {
 	['solid color'] = 'Solid Color',
@@ -47,7 +49,8 @@ local CustomInjector = Class.new(Injector)
 function CustomCosmetic.run(frame)
 	local cosmetic = CustomCosmetic(frame)
 	local args = cosmetic.args
-	args.image = 'Icon inventory ' .. string.lower(args['image-weapon'] or '') .. (cosmetic.name or '') '.png'
+	args.caption = args.caption or args.description
+	args.image = 'Icon inventory ' .. string.lower(args['image-weapon'] or '') .. ' ' .. string.lower(cosmetic.name or '') .. '.png'
 
 	cosmetic:setWidgetInjector(CustomInjector(cosmetic))
 
@@ -69,45 +72,55 @@ function CustomInjector:parse(id, widgets)
 					return {}
 				end
 				if string.lower(worst) == 'varies' then
-					return {Cell{name = 'Wear levels', children = '[[#Wear levels|Varying]]'}}
+					return {Cell{name = 'Wear levels', children = {'[[#Wear levels|Varying]]'}}}
 				end
-				return {Cell{name = 'Wear levels', children = best .. ' - ' .. worst}}
+				return {Cell{name = 'Wear levels', children = {best .. ' - ' .. worst}}}
 			end},
 			Builder{builder = function()
 				local stattrak = args.stattrak
 				if not stattrak then
-					return {Cell{name = 'StatTrak™?', children = 'None'}}
+					return {Cell{name = 'StatTrak™?', children = {'None'}}}
 				end
-				if string.lower(stattrak) == 'yes' or string.lower(stattrak) == 'some' then
-					return {Cell{name = 'StatTrak™?', children = 'Yes, ' .. stattrak}}
+				if string.lower(stattrak) == 'yes' or string.lower(stattrak) == 'all' then
+					return {Cell{name = 'StatTrak™?', children = {'Yes, all'}}}
+				elseif string.lower(stattrak) == 'some' then
+					return {Cell{name = 'StatTrak™?', children = {'Yes, some'}}}
 				end
-				return {Cell{name = 'StatTrak™?', children = 'None'}}
+				return {Cell{name = 'StatTrak™?', children = {'None'}}}
 			end},
 			Builder{builder = function()
 				local souvenir = args.souvenir
 				if not souvenir then
-					return {Cell{name = 'Souvenir?', children = 'None'}}
+					return {Cell{name = 'Souvenir?', children = {'None'}}}
 				end
-				if string.lower(souvenir) == 'yes' or string.lower(souvenir) == 'some' then
-					return {Cell{name = 'Souvenir?', children = 'Yes, ' .. souvenir}}
+				if string.lower(souvenir) == 'yes' or string.lower(souvenir) == 'all' then
+					return {Cell{name = 'Souvenir?', children =  {'Yes, all'}}}
+				elseif string.lower(souvenir) == 'some' then
+					return {Cell{name = 'Souvenir?', children = {'Yes, some'}}}
 				end
-				return {Cell{name = 'Souvenir?', children = 'None'}}
+				return {Cell{name = 'Souvenir?', children = {'None'}}}
 			end},
-			Cell{name = 'Style', children = args.style and WEAPON_STYLES[args.style:lower()] or nil},
-			Cell{name = 'Created by', children = args.created_by or 'Valve'},
-			Center{children = CustomCosmetic:_buyNow()}
+			Cell{name = 'Style', children = {args.style and WEAPON_STYLES[args.style:lower()] or nil}},
+			Cell{name = 'Created by', children = {args.created_by or 'Valve'}},
+			Center{children = {self.caller:_buyNow()}}
 		)
 	end
 
 	return widgets
 end
 
----@return string?
+---@return Widget
 function CustomCosmetic:_buyNow()
 	local name = self.name:gsub(' ', '_')
 	local link = 'http://steamcommunity.com/market/search/?appid=730&q=' .. name
-
-	return '['.. link .. ' <span class="buynow_button buynow_market">Buy Now on Market</span>]'
+	return Link{
+		linktype = 'external',
+		link = link,
+		children = {HtmlWidgets.Span{
+			classes = {'buynow_button', 'buynow_market'},
+			children = {'Buy Now on Market'},
+		}},
+	}
 end
 
 return CustomCosmetic
