@@ -50,7 +50,12 @@ function CustomCosmetic.run(frame)
 	local cosmetic = CustomCosmetic(frame)
 	local args = cosmetic.args
 	args.caption = args.caption or args.description
-	args.image = 'Icon inventory ' .. string.lower(args['image-weapon'] or '') .. ' ' .. string.lower(cosmetic.name or '') .. '.png'
+	args.image =
+		'Icon inventory ' ..
+		string.lower(args['image-weapon'] or '') ..
+		' ' ..
+		string.lower(cosmetic.name or '') ..
+		'.png'
 
 	cosmetic:setWidgetInjector(CustomInjector(cosmetic))
 
