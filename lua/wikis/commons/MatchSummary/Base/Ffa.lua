@@ -278,7 +278,7 @@ local GAME_STANDINGS_COLUMNS = {
 		class = 'cell--team',
 		icon = 'team',
 		header = {
-			value = 'Team',
+			value = 'Participant',
 		},
 		sortVal = {
 			value = function (opponent, idx)
