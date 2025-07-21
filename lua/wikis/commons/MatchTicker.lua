@@ -441,7 +441,7 @@ function MatchTicker:expandGamesOfMatch(match)
 		end
 
 		local gameMatch = Table.copy(match)
-		gameMatch.match2games = nil
+		gameMatch.match2games = {}
 		gameMatch.asGame = true
 		gameMatch.asGameIndexes = {gameIndex}
 
