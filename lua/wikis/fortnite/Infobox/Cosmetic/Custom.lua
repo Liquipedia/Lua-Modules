@@ -27,7 +27,7 @@ local CustomInjector = Class.new(Injector)
 ---@return Html
 function CustomCosmetic.run(frame)
 	local cosmetic = CustomCosmetic(frame)
-	cosmetic.args.image = cosmetic.args.image or ('Fortnite' .. cosmetic.name .. '.png')
+	cosmetic.args.image = cosmetic.args.image or ('Fortnite ' .. cosmetic.name .. '.png')
 	cosmetic:setWidgetInjector(CustomInjector(cosmetic))
 
 	return mw.html.create():node(cosmetic:createInfobox()):node(cosmetic:_createIntroText())
@@ -42,8 +42,8 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		Array.appendWith(widgets,
 			Title{children = 'Skin Information'},
-			Cell{name = 'Type', content = args.type},
-			Cell{name = 'Rarity', content = args.rarity}
+			Cell{name = 'Type', children = {args.type}},
+			Cell{name = 'Rarity', children = {args.rarity}}
 		)
 	end
 
