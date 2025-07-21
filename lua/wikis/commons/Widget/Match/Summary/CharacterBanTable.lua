@@ -88,7 +88,7 @@ function MatchSummaryCharacterBanTable:render()
 	end)
 
 	return Collapsible{
-		tableClasses = {'wikitable-striped'},
+		tableClasses = {},
 		header =
 			Tr{
 				children = WidgetUtil.collect(

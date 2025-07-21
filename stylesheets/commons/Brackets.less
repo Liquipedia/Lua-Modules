@@ -591,11 +591,34 @@ div.brkts-popup-body-element-thumbs {
 
 .brkts-popup-body-element-cr-placeholder {
 	height: 58px;
+
+	@media only screen and ( max-width: 768px ) {
+		height: 50px;
+	}
 }
 
-@media only screen and ( max-width: 768px ) {
-	.brkts-popup-body-element-cr-placeholder {
-		height: 50px;
+.brkts-popup-body-element.brkts-popup-body-game {
+	padding: 0.5rem 0;
+
+	.brkts-champion-icon {
+		gap: 0.125rem;
+		display: flex;
+
+		img {
+			width: 1.5rem;
+			height: 1.5rem;
+			border-radius: 0.25rem;
+
+			&:hover {
+				height: unset;
+				border: 0.0625rem solid #fff;
+				box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
+			}
+		}
+	}
+
+	.brkts-popup-winloss-icon {
+		margin: unset;
 	}
 }
 
@@ -648,6 +671,13 @@ div.brkts-popup-body-element-thumbs {
 	display: contents;
 }
 
+.brkts-popup-footer .vodlink img {
+	width: 1.25rem;
+	height: 1.25rem;
+	max-height: 1.25rem;
+	max-width: 1.25rem;
+}
+
 .brkts-popup-spaced.brkts-popup-spaced-map-skip > a {
 	text-decoration: line-through;
 }
@@ -657,10 +687,9 @@ div.brkts-popup-body-element-thumbs {
 	display: block;
 	justify-content: space-around;
 	flex-wrap: wrap;
-	padding: 4px;
+	padding: 0.25rem 0;
 	flex-basis: 100%;
 	text-align: center;
-	font-size: 85%;
 }
 
 .brkts-popup-footer a img,
@@ -787,7 +816,7 @@ div.brkts-popup-body-element-thumbs {
 					@media ( hover: hover ) {
 						&:hover {
 							height: unset;
-							border: 0.0625rem solid var( --clr-background );
+							border: 0.0625rem solid #fff;
 							box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
 						}
 					}
@@ -798,6 +827,16 @@ div.brkts-popup-body-element-thumbs {
 
 	table {
 		width: 100%;
+
+		tr:nth-child(odd):not(:first-child) {
+			.theme--light & {
+				background-color: rgba(0, 0, 0, 0.04);
+			}
+
+			.theme--dark & {
+				background-color: rgba(255, 255, 255, 0.04);
+			}
+		}
 	}
 
 	.brkts-popup-mapveto-vetostart {

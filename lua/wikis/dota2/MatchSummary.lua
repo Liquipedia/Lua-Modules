@@ -58,12 +58,10 @@ function CustomMatchSummary._createGame(game, gameIndex)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '80%', padding = '4px'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.Characters{
 				flipped = false,
 				characters = characterData[1],
-				bg = 'brkts-popup-side-color-' .. (extradata.team1side or ''),
 			},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			MatchSummaryWidgets.GameCenter{children = Logic.nilIfEmpty(game.length) or ('Game ' .. gameIndex)},
@@ -71,7 +69,6 @@ function CustomMatchSummary._createGame(game, gameIndex)
 			MatchSummaryWidgets.Characters{
 				flipped = true,
 				characters = characterData[2],
-				bg = 'brkts-popup-side-color-' .. (extradata.team2side or ''),
 			},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
