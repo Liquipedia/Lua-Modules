@@ -5,7 +5,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 
 return {
-	-- Usage: Different ways to see data
+	-- Usage: Team information
+	team_tbd = 'far fa-users',
+
+  -- Usage: Different ways to see data
 	schedule = 'far fa-table',
 	bracket = 'far fa-sitemap',
 
@@ -14,7 +17,7 @@ return {
 	draw = 'fas fa-minus',
 	loss = 'fas fa-times',
 
-	-- Usage: Other Match detail pop up icons
+	-- Usage: Other Match information icons
 	matchpagelink = 'far fa-swords',
 	matchpopup = 'fas fa-info-circle',
 	timeout = 'far fa-clock',
@@ -37,7 +40,7 @@ return {
 	--Usage: A match or stream is live
 	live = 'fas fa-circle',
 
-	-- Usage: Previous and Next event in infoboxes
+	-- Usage: Previous and Next navigation
 	previous = 'fas fa-chevron-left',
 	next = 'fas fa-chevron-right',
 
@@ -97,7 +100,7 @@ return {
 	-- Usage: buildtime, duration, cooldown, ...
 	time = 'far fa-clock',
 
-	-- Usage: Squad Table
+	-- Usage: Player Roles
 	captain = 'fas fa-crown',
 	substitute = 'fas fa-people-arrows',
 
@@ -157,7 +160,7 @@ return {
 
 	leagueoflegends_kda = 'fas fa-swords fa-flip-vertical',
 
-	-- Usage: Indicate boolean info in Infobox
+	-- Usage: Boolean info
 	yes = 'fa fa-check',
 	no = 'fa fa-times',
 
@@ -177,7 +180,7 @@ return {
 	chesskingoutline = 'far fa-chess-king',
 	chesskingfull = 'fas fa-chess-king',
 
-	-- Usage: For NavigationCards related actions and links
+	-- Usage: For support hub related actions and links
 	upload = 'far fa-upload',
 	support_hub = 'liquipedia-custom-icon liquipedia-custom-icon-support-hub',
 	copyright = 'far fa-copyright',
