@@ -31,7 +31,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 ---@field props MatchHeaderProps
 local MatchHeader = Class.new(Widget)
 MatchHeader.defaultProps = {
-	teamStyle = 'short', -- Style of the team display
+	teamStyle = 'short',
 }
 
 ---@return Widget?
