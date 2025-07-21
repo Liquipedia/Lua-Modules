@@ -45,13 +45,13 @@ function MatchHeader:render()
 	local leftTeamScore = OpponentDisplay.InlineScore(match.opponents[1])
 	local rightTeamScore = OpponentDisplay.InlineScore(match.opponents[2])
 
+	-- TODO: Investigate if this is still needed
 	local hasBracketResetMatch = Array.any(match.opponents, function (opponent) return opponent.placement2 ~= nil end)
-
 	if hasBracketResetMatch then
 		leftTeamScore = 'W'
 		rightTeamScore = 'L'
-		leftTeamWinner = match.opponents[1].placement2 == 1 or match.opponents[1].placement2 == 0
-		rightTeamWinner = match.opponents[2].placement2 == 1 or match.opponents[2].placement2 == 0
+		leftTeamWinner = match.opponents[1].placement2 == 1
+		rightTeamWinner = match.opponents[2].placement2 == 1
 		hasBestof = false
 	end
 
