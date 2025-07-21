@@ -113,7 +113,6 @@ local MATCH_OVERVIEW_COLUMNS = {
 			value = function (opponent, idx)
 				return OpponentDisplay.BlockOpponent{
 					opponent = opponent,
-					showLink = true,
 					overflow = 'ellipsis',
 					teamStyle = 'hybrid',
 					showPlayerTeam = true,
@@ -290,7 +289,6 @@ local GAME_STANDINGS_COLUMNS = {
 				return OpponentDisplay.BlockOpponent{
 					opponent = opponent,
 					game = opponent.game,
-					showLink = true,
 					overflow = 'ellipsis',
 					teamStyle = 'hybrid',
 					showPlayerTeam = true,
