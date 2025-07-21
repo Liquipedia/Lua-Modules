@@ -70,7 +70,7 @@ function AoEParticipantTable:readEntry(sectionArgs, key, index, config)
 
 	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
+	local opponent = Opponent.readOpponentArgs(opponentArgs)
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)
