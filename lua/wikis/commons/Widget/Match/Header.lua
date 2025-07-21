@@ -15,19 +15,22 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Span = HtmlWidgets.Span
+local Div = HtmlWidgets.Div
 
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
+---@class MatchHeaderProps
+---@field match MatchGroupUtilMatch
+
 ---@class MatchHeader: Widget
 ---@operator call(table): MatchHeader
+---@field props MatchHeaderProps
 local MatchHeader = Class.new(Widget)
-MatchHeader.defaultProps = {
-}
 
 ---@return Widget?
 function MatchHeader:render()
-	---@type MatchGroupUtilMatch
 	local match = self.props.match
 	if not match then
 		return nil
@@ -39,10 +42,10 @@ function MatchHeader:render()
 	local leftTeamWinner = (match.winner == 1 or match.winner == 0)
 	local rightTeamWinner = (match.winner == 2 or match.winner == 0)
 
-	return HtmlWidgets.Div{
+	return Div{
 		classes = {'match-info-header'},
 		children = {
-			HtmlWidgets.Div{
+			Div{
 				classes = WidgetUtil.collect(
 					'match-info-header-opponent',
 					'match-info-header-opponent-left',
@@ -58,17 +61,17 @@ function MatchHeader:render()
 					}
 				}
 			},
-			HtmlWidgets.Div{
+			Div{
 				classes = {'match-info-header-scoreholder'},
 				children = {
-					HtmlWidgets.Span{
+					Span{
 						classes = {hasBestof and 'match-info-header-scoreholder-upper' or nil},
 						children = WidgetUtil.collect(
-							HtmlWidgets.Span{
+							Span{
 								classes = {'match-info-header-scoreholder-icon'},
 								children = leftTeamWinner and Icon{iconName = 'winner_left'} or nil,
 							},
-							matchPhase ~= 'upcoming' and HtmlWidgets.Span{
+							matchPhase ~= 'upcoming' and Span{
 								classes = {
 									'match-info-header-scoreholder-score',
 									leftTeamWinner and 'match-info-header-winner' or nil
@@ -76,26 +79,26 @@ function MatchHeader:render()
 								children = OpponentDisplay.InlineScore(match.opponents[1]),
 							} or nil,
 							matchPhase ~= 'upcoming' and ':' or 'vs',
-							matchPhase ~= 'upcoming' and HtmlWidgets.Span{
+							matchPhase ~= 'upcoming' and Span{
 								classes = {
 									'match-info-header-scoreholder-score',
 									rightTeamWinner and 'match-info-header-winner' or nil
 								},
 								children = OpponentDisplay.InlineScore(match.opponents[2]),
 							} or nil,
-							HtmlWidgets.Span{
+							Span{
 								classes = {'match-info-header-scoreholder-icon'},
 								children = rightTeamWinner and Icon{iconName = 'winner_right'} or nil,
 							}
 						)
 					},
-					hasBestof and HtmlWidgets.Span{
+					hasBestof and Span{
 						classes = {'match-info-header-scoreholder-lower'},
 						children = '(Bo' .. match.bestof ..')'
 					} or nil
 				}
 			},
-			HtmlWidgets.Div{
+			Div{
 				classes = WidgetUtil.collect(
 					'match-info-header-opponent',
 					matchPhase == 'finished' and not rightTeamWinner and 'match-info-header-loser' or nil,
