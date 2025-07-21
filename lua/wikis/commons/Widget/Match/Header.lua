@@ -24,11 +24,15 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 ---@class MatchHeaderProps
 ---@field match MatchGroupUtilMatch
+---@field teamStyle? teamStyle
 
 ---@class MatchHeader: Widget
 ---@operator call(table): MatchHeader
 ---@field props MatchHeaderProps
 local MatchHeader = Class.new(Widget)
+MatchHeader.defaultProps = {
+	teamStyle = 'short',
+}
 
 ---@return Widget?
 function MatchHeader:render()
@@ -68,7 +72,7 @@ function MatchHeader:render()
 				children = {
 					OpponentDisplay.BlockOpponent{
 						opponent = match.opponents[1],
-						teamStyle = 'short',
+						teamStyle = self.props.teamStyle,
 						overflow = 'ellipsis',
 						flip = true,
 					}
@@ -120,7 +124,7 @@ function MatchHeader:render()
 				children = {
 					OpponentDisplay.BlockOpponent{
 						opponent = match.opponents[2],
-						teamStyle = 'short',
+						teamStyle = self.props.teamStyle,
 						overflow = 'ellipsis',
 					}
 				}
