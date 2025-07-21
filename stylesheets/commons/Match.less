@@ -1,0 +1,60 @@
+.match-info {
+	&-header {
+		display: flex;
+		align-items: center;
+		flex: 1;
+		font-size: 0.875rem;
+		line-height: 1.25rem;
+		align-self: stretch;
+
+		&-opponent {
+			display: flex;
+			flex: 1;
+			min-width: 0;
+
+			&-left {
+				justify-content: flex-end;
+			}
+		}
+
+		&-scoreholder {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			flex-basis: 4.5rem;
+
+			&-upper {
+				display: flex;
+				align-items: center;
+			}
+
+			&-lower {
+				font-size: 0.75rem;
+				line-height: 1rem;
+				opacity: 0.7;
+			}
+
+			&-icon,
+			&-score {
+				display: flex;
+				width: 1rem;
+				height: 1rem;
+				justify-content: center;
+				align-items: center;
+			}
+		}
+
+		&-winner {
+			font-weight: bold;
+		}
+
+		&-loser {
+			img,
+			i {
+				filter: saturate( 0% );
+				opacity: 0.5;
+			}
+		}
+	}
+}

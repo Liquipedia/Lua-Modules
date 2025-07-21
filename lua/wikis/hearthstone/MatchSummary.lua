@@ -92,7 +92,7 @@ function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 
 	return HtmlWidgets.Div {
 		css = {margin = 'auto'},
-		children = MatchSummary.createDefaultHeader({opponents = opponents}):create()
+		children = MatchSummary.createDefaultHeader({opponents = opponents})
 	}
 end
 
