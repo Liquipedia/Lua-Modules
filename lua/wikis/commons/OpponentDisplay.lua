@@ -41,7 +41,10 @@ OpponentDisplay.BracketOpponentEntry = Class.new(
 	function(self, opponent, options)
 		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
 
-		if options.showTbd == false and (Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)) then
+		if options.showTbd == false and (
+			Opponent.isEmpty(opponent) or
+			Opponent.isTbd(opponent) and opponent.type ~= Opponent.literal
+		) then
 			opponent = Opponent.blank()
 		end
 
