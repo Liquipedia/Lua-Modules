@@ -41,11 +41,11 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Event Organizer', content = Array.parseCommaSeparatedString(args.organizers)},
 			Cell{name = 'Editors', content = Array.parseCommaSeparatedString(args.editors)},
 			Cell{name = 'Commentators', content = Array.parseCommaSeparatedString(args.commentators)},
-			args.role1 and Cell{name = args.role1, content = Array.parseCommaSeparatedString(args.role1_list)} or nil,
-			args.role2 and Cell{name = args.role2, content = Array.parseCommaSeparatedString(args.role2_list)} or nil,
-			args.role3 and Cell{name = args.role3, content = Array.parseCommaSeparatedString(args.role3_list)} or nil,
-			args.role4 and Cell{name = args.role4, content = Array.parseCommaSeparatedString(args.role4_list)} or nil,
-			args.role5 and Cell{name = args.role5, content = Array.parseCommaSeparatedString(args.role5_list)} or nil,
+			unpack(Array.mapIndexes(function(roleIndex)
+				local prefix = 'role' .. roleIndex
+				if not args[prefix] then return end
+				return Cell{name = args[prefix], content = Array.parseCommaSeparatedString(args[prefix .. '_list'])}
+			end)),
 			Cell{name = 'Members', content = Array.parseCommaSeparatedString(args.members)},
 			Cell{name = 'Former Staff', content = Array.parseCommaSeparatedString(args.former_staff)}
 		)
