@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
@@ -41,6 +42,18 @@ function MatchHeader:render()
 
 	local leftTeamWinner = (match.winner == 1 or match.winner == 0)
 	local rightTeamWinner = (match.winner == 2 or match.winner == 0)
+	local leftTeamScore = OpponentDisplay.InlineScore(match.opponents[1])
+	local rightTeamScore = OpponentDisplay.InlineScore(match.opponents[2])
+
+	local hasBracketResetMatch = Array.any(match.opponents, function (opponent) return opponent.placement2 ~= nil end)
+
+	if hasBracketResetMatch then
+		leftTeamScore = 'W'
+		rightTeamScore = 'L'
+		leftTeamWinner = match.opponents[1].placement2 == 1 or match.opponents[1].placement2 == 0
+		rightTeamWinner = match.opponents[2].placement2 == 1 or match.opponents[2].placement2 == 0
+		hasBestof = false
+	end
 
 	return Div{
 		classes = {'match-info-header'},
@@ -65,7 +78,7 @@ function MatchHeader:render()
 				classes = {'match-info-header-scoreholder'},
 				children = {
 					Span{
-						classes = {hasBestof and 'match-info-header-scoreholder-upper' or nil},
+						classes = {'match-info-header-scoreholder-upper'},
 						children = WidgetUtil.collect(
 							Span{
 								classes = {'match-info-header-scoreholder-icon'},
@@ -76,7 +89,7 @@ function MatchHeader:render()
 									'match-info-header-scoreholder-score',
 									leftTeamWinner and 'match-info-header-winner' or nil
 								},
-								children = OpponentDisplay.InlineScore(match.opponents[1]),
+								children = leftTeamScore,
 							} or nil,
 							matchPhase ~= 'upcoming' and ':' or 'vs',
 							matchPhase ~= 'upcoming' and Span{
@@ -84,7 +97,7 @@ function MatchHeader:render()
 									'match-info-header-scoreholder-score',
 									rightTeamWinner and 'match-info-header-winner' or nil
 								},
-								children = OpponentDisplay.InlineScore(match.opponents[2]),
+								children = rightTeamScore,
 							} or nil,
 							Span{
 								classes = {'match-info-header-scoreholder-icon'},
