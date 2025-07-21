@@ -37,10 +37,9 @@ local function createHubButton(link, displayName, hubIcon)
 	return Button{
 		link = link,
 		title = 'Click here to get to the ' .. displayName:lower(),
-		variant = 'secondary',
+		variant = 'tertiary',
 		children = {
 			IconFa{
-				additionalClasses = { 'wiki-color-dark' },
 				iconName = hubIcon,
 			},
 			' View ' .. displayName
@@ -172,9 +171,6 @@ local CONTENT = {
 		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
-		panelAttributes = {
-			['data-switch-group-container'] = 'countdown',
-		},
 	},
 	tournaments = {
 		heading = 'Tournaments',

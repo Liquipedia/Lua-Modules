@@ -5,11 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local MathUtil = require('Module:MathUtil')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local MathUtil = Lua.import('Module:MathUtil')
+local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 
@@ -239,9 +240,15 @@ function MatchPage:_renderPerformanceForTeam(game, teamIndex)
 				classes = {'match-bm-players-team-header'},
 				children = self.opponents[teamIndex].iconDisplay
 			},
-			Array.map(game.teams[teamIndex].players, function (player)
-				return self:_renderPlayerPerformance(game, teamIndex, player)
-			end)
+			Array.map(
+				Array.reverse(Array.sortBy(
+					game.teams[teamIndex].players,
+					function (player) return player.acs or 0 end
+				)),
+				function (player)
+					return self:_renderPlayerPerformance(game, teamIndex, player)
+				end
+			)
 		)
 	}
 end

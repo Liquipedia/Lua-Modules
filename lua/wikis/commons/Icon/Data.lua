@@ -8,6 +8,10 @@ return {
 	-- Usage: Team information
 	team_tbd = 'far fa-users',
 
+  -- Usage: Different ways to see data
+	schedule = 'far fa-table',
+	bracket = 'far fa-sitemap',
+
 	-- Usage: Match results
 	winner = 'fas fa-check',
 	draw = 'fas fa-minus',
@@ -43,6 +47,8 @@ return {
 	-- Usage: Expanding and collapsing hidden sections
 	expand = 'far fa-chevron-down',
 	collapse = 'far fa-chevron-up',
+	show = 'far fa-eye',
+	hide = 'far fa-eye-slash',
 
 	-- Usage: to indicate a selection of something was either left, right, down or up
 	up = 'fas fa-chevron-circle-up',

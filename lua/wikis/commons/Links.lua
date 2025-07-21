@@ -115,9 +115,9 @@ local PREFIXES = {
 	['esea-d'] = {'https://play.esea.net/league/standings?divisionId='},
 	esl = {
 		'',
-		team = 'https://play.eslgaming.com/team/',
-		player = 'https://play.eslgaming.com/player/',
-		match = 'https://play.eslgaming.com/match/',
+		team = 'https://web.archive.org/web/play.eslgaming.com/team/',
+		player = 'https://web.archive.org/web/play.eslgaming.com/player/',
+		match = 'https://web.archive.org/web/play.eslgaming.com/match/',
 	},
 	esplay = {'https://esplay.com/tournament/'},
 	esportal = {'https://esportal.com/tournament/'},
@@ -698,7 +698,7 @@ function Links.makeFullLinksForTableItems(links, variant, fallbackToBase)
 end
 
 --remove appended number
---needed because the link icons Lua.import e.g. 'esl' instead of 'esl2'
+--needed because the link icons require e.g. 'twitch' instead of 'twitch2'
 ---@param key string
 ---@return string
 function Links.removeAppendedNumber(key)

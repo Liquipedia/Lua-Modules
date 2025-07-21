@@ -5,19 +5,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Flags = require('Module:Flags')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local Flags = Lua.import('Module:Flags')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Series = Lua.import('Module:Infobox/Series')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Chronology = Widgets.Chronology
-local Title = Widgets.Title
 
 ---@class ValorantSeriesInfobox: SeriesInfobox
 local CustomSeries = Class.new(Series)
@@ -53,17 +52,9 @@ function CustomInjector:parse(id, widgets)
 		end
 		return { Cell{name = 'Location', content = locations} }
 	elseif id == 'customcontent' then
-		if String.isNotEmpty(args.previous) or String.isNotEmpty(args.next) then
-			return {
-				Title{children = 'Chronology'},
-				Chronology{
-					links = {
-						previous = args.previous,
-						next = args.next,
-					}
-				}
-			}
-		end
+		return {
+			Chronology{args = args, showTitle = true}
+		}
 	end
 	return widgets
 end

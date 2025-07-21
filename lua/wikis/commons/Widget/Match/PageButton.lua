@@ -36,7 +36,6 @@ function MatchPageButton:render()
 
 	if self.props.hasMatchPage then
 		return Button{
-			classes = { 'btn--match-details' },
 			title = 'View match details',
 			variant = self.props.buttonType,
 			size = 'sm',
@@ -50,7 +49,7 @@ function MatchPageButton:render()
 	end
 
 	return Button{
-		classes = { 'btn--add-match-details', 'show-when-logged-in' },
+		classes = { 'show-when-logged-in' },
 		title = 'Add Match Page',
 		variant = 'ghost',
 		size = 'sm',
