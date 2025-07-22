@@ -49,7 +49,7 @@ function MatchButtonBar:render()
 	local displayVods = matchPhase == 'finished' and self.props.showVods
 	local displayStreams = matchPhase == 'ongoing'
 	-- Show streams also for the last period before going live
-	if matchPhase == 'upcoming' and
+	if matchPhase == 'upcoming' and match.timestamp and
 		os.difftime(match.timestamp, DateExt.getCurrentTimestamp()) < SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE then
 
 		displayStreams = true
