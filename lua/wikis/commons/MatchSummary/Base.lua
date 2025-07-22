@@ -23,6 +23,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchHeader = Lua.import('Module:Widget/Match/Header')
 local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
+local MatchButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {loadData = true})
@@ -257,7 +258,7 @@ function MatchSummary.createDefaultHeader(match, options)
 	}
 end
 
--- Default bdy function
+-- Default body function
 ---@param match MatchGroupUtilMatch
 ---@param createGame fun(date: string, game: table, gameIndex: integer): Widget
 ---@return Widget
@@ -336,13 +337,8 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.createDefaultFooter
 	match:footer(createFooter(matchData, MatchSummary.Footer()))
 
-	-- Original Match Id must be used to link match page if it exists.
-	-- It can be different from the matchId when shortened brackets are used.
-	local matchId = matchData.extradata.originalmatchid or matchData.matchId
-	match:button(MatchSummaryWidgets.MatchPageLink{
-		matchId = matchId,
-		hasMatchPage = Logic.isNotEmpty(matchData.bracketData.matchPage),
-	})
+	--- Vods are currently part of the footer, so we don't need them here
+	match:button(MatchButtonBar{match = match, showVods = false})
 
 	return match
 end

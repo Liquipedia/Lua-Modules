@@ -79,8 +79,11 @@ function MatchButtonBar:render()
 		}
 	end
 
+	-- Original Match Id must be used to link match page if it exists.
+	-- It can be different from the matchId when shortened brackets are used.
+	local matchId = match.extradata.originalmatchid or match.matchId
 	local matchPageButton = MatchPageButton{
-		matchId = match.matchId,
+		matchId = matchId,
 		hasMatchPage = Logic.isNotEmpty(match.bracketData.matchPage),
 	}
 
