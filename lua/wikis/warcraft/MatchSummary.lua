@@ -150,7 +150,6 @@ function CustomMatchSummary.Game(options, game)
 		children = WidgetUtil.collect(
 			game.header and {
 				HtmlWidgets.Div{css = {margin = 'auto'}, children = {game.header}},
-				MatchSummaryWidgets.Break{},
 			} or nil,
 			CustomMatchSummary.DisplayHeroes(game.opponents[1], {hasHeroes = options.hasHeroes}),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},

@@ -49,7 +49,6 @@ function CustomMatchSummary.TeamSubmatch(submatch)
 		children = WidgetUtil.collect(
 			submatch.header and {
 				HtmlWidgets.Div{css = {margin = 'auto', ['font-weight'] = 'bold'}, children = {submatch.header}},
-				MatchSummaryWidgets.Break{},
 			} or nil,
 			CustomMatchSummary.TeamSubMatchOpponnetRow(submatch),
 			hasDetails and Array.map(submatch.games, function(game, gameIndex)

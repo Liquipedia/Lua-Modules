@@ -170,13 +170,9 @@ end
 function Match:create()
 	self.root
 		:node(self.headerElement)
-		:node(MatchSummaryWidgets.Break{})
 		:node(self.bodyElement)
-		:node(MatchSummaryWidgets.Break{})
 		:node(self.commentElement)
-		:node(MatchSummaryWidgets.Break{})
 		:node(self.footerElement)
-		:node(MatchSummaryWidgets.Break{})
 		:node(self.buttonElement)
 
 	return self.root
