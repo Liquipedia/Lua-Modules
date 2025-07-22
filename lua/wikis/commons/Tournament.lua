@@ -23,22 +23,25 @@ local TOURNAMENT_PHASE = {
 	FINISHED = 'FINISHED',
 }
 
----@class StandardTournament
+---@class StandardTournamentPartial
 ---@field displayName string
 ---@field fullName string
 ---@field pageName string
+---@field icon string?
+---@field iconDark string?
+---@field series string?
+---@field liquipediaTier integer|string|nil
+---@field liquipediaTierType integer|string|nil
+---@field game string?
+---@field publisherTier string?
+
+---@class StandardTournament: StandardTournamentPartial
 ---@field startDate {year: integer, month: integer?, day: integer?, timestamp: integer?}?
 ---@field endDate {year: integer, month: integer?, day: integer?, timestamp: integer?}?
----@field liquipediaTier string
----@field liquipediaTierType string
 ---@field region string?
 ---@field featured boolean
 ---@field status string?
 ---@field phase TournamentPhase
----@field icon string?
----@field iconDark string?
----@field abbreviation string?
----@field series string?
 ---@field extradata table
 
 ---@param conditions ConditionTree?
@@ -88,6 +91,23 @@ local TournamentMT = {
 	end
 }
 
+---@param match MatchGroupUtilMatch
+---@return StandardTournamentPartial
+function Tournament.partialTournamentFromMatch(match)
+	---@type StandardTournamentPartial
+	return {
+		displayName = Logic.emptyOr(match.tickername, match.tournament) or (match.parent or ''):gsub('_', ' '),
+		fullName = match.tournament,
+		pageName = match.parent,
+		liquipediaTier = Tier.toIdentifier(match.liquipediatier),
+		liquipediaTierType = Tier.toIdentifier(match.liquipediatiertype),
+		icon = match.icon,
+		iconDark = match.iconDark,
+		series = match.series,
+		game = match.game,
+	}
+end
+
 ---@param record tournament
 ---@return StandardTournament
 function Tournament.tournamentFromRecord(record)
@@ -107,7 +127,6 @@ function Tournament.tournamentFromRecord(record)
 		status = record.status,
 		icon = record.icon,
 		iconDark = record.icondark,
-		abbreviation = record.abbreviation,
 		series = record.series,
 		game = record.game,
 		extradata = extradata,

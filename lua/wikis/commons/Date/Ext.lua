@@ -71,7 +71,7 @@ function DateExt.readTimestampOrNil(dateString)
 end
 
 --- Our runtime measures at most in seconds, and we don't care about that level of precision anyway.
---- Hence we can memoize it for performane, as it's relatively expensive if called a lot.
+--- Hence we can memoize it for performance, as it's relatively expensive if called a lot.
 ---@return number
 DateExt.getCurrentTimestamp = FnUtil.memoize(function()
 	local ts = tonumber(mw.getContentLanguage():formatDate('U'))

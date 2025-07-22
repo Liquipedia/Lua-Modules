@@ -54,6 +54,7 @@ local DEFAULT_QUERY_COLUMNS = {
 	'match2bracketdata',
 	'match2games',
 	'game',
+	'section',
 }
 local NONE = 'none'
 local INFOBOX_DEFAULT_CLASS = 'fo-nttax-infobox panel'
