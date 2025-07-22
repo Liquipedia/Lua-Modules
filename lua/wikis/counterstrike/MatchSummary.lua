@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')

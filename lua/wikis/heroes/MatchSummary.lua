@@ -9,7 +9,6 @@ local CustomMatchSummary = {}
 
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')

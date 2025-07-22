@@ -6,7 +6,6 @@
 --
 
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Game = require('Module:Game')
 local Logic = require('Module:Logic')

@@ -6,7 +6,6 @@
 --
 
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Lua = require('Module:Lua')
 local MapTypeIcon = require('Module:MapType')

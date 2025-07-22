@@ -6,12 +6,10 @@
 --
 
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')

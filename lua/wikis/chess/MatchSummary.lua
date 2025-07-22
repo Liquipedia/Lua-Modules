@@ -10,8 +10,6 @@ local CustomMatchSummary = {}
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local DateExt = Lua.import('Module:Date/Ext')
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Eco = Lua.import('Module:ChessOpenings')
 local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')

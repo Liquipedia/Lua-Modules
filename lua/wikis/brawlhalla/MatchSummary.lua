@@ -6,7 +6,6 @@
 --
 
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 
