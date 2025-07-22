@@ -34,7 +34,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local casters = tonumber(args.casters) or 0
 
 	local lines = Array.extend(
-		'{{Match|patch=',
+		'{{Match',
 		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
@@ -53,6 +53,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Array.map(Array.range(1, bestof), function(mapIndex)
 			return WikiCopyPaste._getMapCode(mapIndex, args)
 		end),
+		INDENT .. '|patch=',
 		'}}'
 	)
 
@@ -64,7 +65,13 @@ end
 ---@return string
 function WikiCopyPaste._getMapCode(mapIndex, args)
 	if Logic.readBool(args.generateMatchPage) then
-		return INDENT .. '|map' .. mapIndex .. '={{ApiMap|matchid=|reversed=}}'
+		return table.concat({
+			INDENT .. '|map' .. mapIndex .. '={{ApiMap',
+			INDENT .. INDENT .. '|matchid=',
+			INDENT .. INDENT .. '|reversed=',
+			INDENT .. INDENT .. '|vod=',
+			INDENT .. '}}'
+		}, '\n')
 	end
 	local bans = Logic.readBool(args.bans)
 	return table.concat(Array.extend(

@@ -37,10 +37,9 @@ local function createHubButton(link, displayName, hubIcon)
 	return Button{
 		link = link,
 		title = 'Click here to get to the ' .. displayName:lower(),
-		variant = 'secondary',
+		variant = 'tertiary',
 		children = {
 			IconFa{
-				additionalClasses = { 'wiki-color-dark' },
 				iconName = hubIcon,
 			},
 			' View ' .. displayName

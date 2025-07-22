@@ -44,7 +44,7 @@ function UnofficialWorldChampion:createInfobox()
 	local args = self.args
 
 	args.currentChampOpponent = Opponent.readOpponentArgs(
-		Json.parseIfString(args['current champion']) or Opponent.tbd()
+		Json.parseIfString(args['current champion'])
 	)
 
 	local widgets = {

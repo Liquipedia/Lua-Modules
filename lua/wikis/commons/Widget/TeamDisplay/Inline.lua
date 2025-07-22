@@ -88,12 +88,15 @@ function TeamInlineWidget:render()
 		}
 	end
 	local flip = self.flip
+	local imageLight = Logic.emptyOr(teamTemplate.image, teamTemplate.legacyimage)
+	local imageDark = Logic.emptyOr(teamTemplate.imagedark, teamTemplate.legacyimagedark)
 	local children = Array.interleave(WidgetUtil.collect(
 		TeamIcon{
-			imageLight = Logic.emptyOr(self.teamTemplate.image, self.teamTemplate.legacyimage),
-			imageDark = Logic.emptyOr(self.teamTemplate.imagedark, self.teamTemplate.legacyimagedark),
-			page = self.teamTemplate.page,
-			legacy = Logic.isEmpty(self.teamTemplate.image) and Logic.isNotEmpty(self.teamTemplate.legacyimage)
+			imageLight = imageLight,
+			imageDark = imageDark,
+			page = teamTemplate.page,
+			legacy = Logic.isEmpty(teamTemplate.image) and Logic.isNotEmpty(teamTemplate.legacyimage),
+			noLink = teamTemplate.page == 'TBD',
 		},
 		self:_getNameComponent()
 	), ' ')
@@ -112,7 +115,8 @@ function TeamInlineWidget:_getNameComponent()
 			return TeamName{
 				additionalClasses = element[2],
 				displayName = self.teamTemplate[element[1]],
-				page = self.teamTemplate.page
+				page = self.teamTemplate.page,
+				noLink = self.teamTemplate.page == 'TBD',
 			}
 		end)
 	}

@@ -19,7 +19,6 @@ local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local MatchPageButton = Class.new(Widget)
 MatchPageButton.defaultProps = {
 	buttonType = 'secondary',
-	short = true, -- Temporary until all components have been redesign with bigger buttons spaces
 }
 
 ---@return Widget?
@@ -40,10 +39,11 @@ function MatchPageButton:render()
 			variant = self.props.buttonType,
 			size = 'sm',
 			link = link,
+			grow = true,
 			children = {
 				Icon{iconName = 'matchpagelink'},
-				'  ',
-				self.props.short and 'Details' or 'View match details',
+				' ',
+				'View match details',
 			}
 		}
 	end
@@ -54,6 +54,7 @@ function MatchPageButton:render()
 		variant = 'ghost',
 		size = 'sm',
 		link = link,
+		grow = true,
 		children = {
 			'+ Add details',
 		}
