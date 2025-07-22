@@ -34,7 +34,6 @@ function TournamentTitleWidget:render()
 	end
 
 	local hasStage = self.props.stageName ~= nil
-	mw.log(hasStage, self.props.stageName)
 
 	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
 		self.props.displayGameIcon and Game.icon{
@@ -50,8 +49,6 @@ function TournamentTitleWidget:render()
 					icon = tournament.icon,
 					iconDark = tournament.iconDark,
 					series = tournament.series,
-					---@diagnostic disable-next-line: undefined-field
-					abbreviation = tournament.abbreviation,
 					link = tournament.pageName,
 					options = {noTemplate = true},
 				}

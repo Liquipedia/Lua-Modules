@@ -42,7 +42,6 @@ local TOURNAMENT_PHASE = {
 ---@field featured boolean
 ---@field status string?
 ---@field phase TournamentPhase
----@field abbreviation string?
 ---@field extradata table
 
 ---@param conditions ConditionTree?
@@ -128,7 +127,6 @@ function Tournament.tournamentFromRecord(record)
 		status = record.status,
 		icon = record.icon,
 		iconDark = record.icondark,
-		abbreviation = record.abbreviation,
 		series = record.series,
 		game = record.game,
 		extradata = extradata,
