@@ -54,7 +54,7 @@ function MatchPageTeamDisplay:render()
 end
 
 ---@private
----@return Widget|(string|Widget)[]?
+---@return Widget|Widget[]?
 function MatchPageTeamDisplay:_buildChildren()
 	local opponent = self.props.opponent
 	if Opponent.isEmpty(opponent) then return
