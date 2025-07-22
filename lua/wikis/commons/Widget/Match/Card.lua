@@ -105,12 +105,12 @@ function MatchCard:render()
 	}
 
 	return HtmlWidgets.Div{
-		classes = {'match-info', highlight and HIGHLIGHT_CLASS or nil},
+		classes = {'match-info'},
 		children = WidgetUtil.collect(
 			MatchCountdown{match = match},
 			MatchHeader{match = match},
 			not self.props.hideTournament and HtmlWidgets.Div{
-				classes = {'match-info-tournament'},
+				classes = {'match-info-tournament', highlight and HIGHLIGHT_CLASS or nil},
 				children = {tournamentLink},
 			} or nil,
 			HtmlWidgets.Div{
