@@ -66,6 +66,7 @@ function MatchPageTeamDisplay:_buildChildren()
 	end
 	local data = self.props.opponent.teamTemplateData
 	assert(data, TeamTemplate.noTeamMessage(opponent.template))
+	local hideLink = Opponent.isTbd(opponent)
 	return {
 		opponent.iconDisplay,
 		Div{
@@ -73,11 +74,11 @@ function MatchPageTeamDisplay:_buildChildren()
 			children = {
 				Div{
 					classes = { 'match-bm-match-header-team-long' },
-					children = { Link{ link = data.page, children = data.name } }
+					children = { hideLink and data.name or Link{ link = data.page, children = data.name } }
 				},
 				Div{
 					classes = { 'match-bm-match-header-team-short' },
-					children = { Link{ link = data.page, children = data.shortname } }
+					children = { hideLink and data.shortname or Link{ link = data.page, children = data.shortname } }
 				},
 				Div{
 					classes = { 'match-bm-match-header-round-results' },
