@@ -338,7 +338,7 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	match:footer(createFooter(matchData, MatchSummary.Footer()))
 
 	--- Vods are currently part of the footer, so we don't need them here
-	match:button(MatchButtonBar{match = match, showVods = false})
+	match:button(MatchButtonBar{match = matchData, showVods = false})
 
 	return match
 end

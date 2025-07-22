@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Match/MatchButtonBar
+-- page=Module:Widget/Match/ButtonBar
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
