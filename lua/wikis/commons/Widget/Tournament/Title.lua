@@ -16,13 +16,18 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
+---@class TournamentTitleProps
+---@field tournament StandardTournamentPartial
+---@field stageName string?
+---@field displayGameIcon boolean?
+
 ---@class TournamentTitleWidget: Widget
----@operator call(table): TournamentTitleWidget
+---@operator call(TournamentTitleProps): TournamentTitleWidget
+---@field props TournamentTitleProps
 local TournamentTitleWidget = Class.new(Widget)
 
 ---@return Widget?
 function TournamentTitleWidget:render()
-	---@type StandardTournamentPartial
 	local tournament = self.props.tournament
 	if not tournament then
 		return

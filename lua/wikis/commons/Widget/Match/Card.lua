@@ -31,8 +31,15 @@ local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 local SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE = 2 * 60 * 60 -- 2 hours in seconds
 
+---@class MatchCardProps
+---@field match MatchGroupUtilMatch
+---@field onlyHighlightOnValue string?
+---@field hideTournament boolean?
+---@field displayGameIcons boolean?
+
 ---@class MatchCard: Widget
----@operator call(table): MatchCard
+---@operator call(MatchCardProps): MatchCard
+---@field props MatchCardProps
 local MatchCard = Class.new(Widget)
 MatchCard.defaultProps = {
 	hideTournament = false, -- Hide the tournament and stage
@@ -42,7 +49,6 @@ MatchCard.defaultProps = {
 
 ---@return Widget?
 function MatchCard:render()
-	---@type MatchGroupUtilMatch
 	local match = self.props.match
 	if not match then
 		return nil

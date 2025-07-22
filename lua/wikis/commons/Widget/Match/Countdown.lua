@@ -17,13 +17,16 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 local UTC = Timezone.getTimezoneString{timezone = 'UTC'}
 
+---@class MatchCountdownProps
+---@field match MatchGroupUtilMatch
+
 ---@class MatchCountdown: Widget
----@operator call(table): MatchCountdown
+---@operator call(MatchCountdownProps): MatchCountdown
+---@field props MatchCountdownProps
 local MatchCountdown = Class.new(Widget)
 
 ---@return Widget?
 function MatchCountdown:render()
-	---@type MatchGroupUtilMatch
 	local match = self.props.match
 	if not match then
 		return nil

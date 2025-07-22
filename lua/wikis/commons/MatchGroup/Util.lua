@@ -243,8 +243,8 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field icon string?
 ---@field iconDark string?
 ---@field links table
----@field liquipediatier string? # TODO: capitalize
----@field liquipediatiertype string? # TODO: capitalize
+---@field liquipediatier string? # TODO: camelCase
+---@field liquipediatiertype string? # TODO: camelCase
 ---@field matchId string?
 ---@field mode string?
 ---@field opponents standardOpponent[]

@@ -26,7 +26,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 ---@field match MatchGroupUtilMatch
 
 ---@class MatchHeader: Widget
----@operator call(table): MatchHeader
+---@operator call(MatchHeaderProps): MatchHeader
 ---@field props MatchHeaderProps
 local MatchHeader = Class.new(Widget)
 
