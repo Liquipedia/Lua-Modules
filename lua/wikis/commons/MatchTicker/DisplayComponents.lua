@@ -294,7 +294,7 @@ function Details:_matchPageIcon()
 	if Logic.isEmpty(matchPage) then return end
 
 	local display = mw.html.create('div')
-		:addClass('btn btn-secondary')
+		:addClass('btn-extrasmall')
 		:wikitext(Icon.makeIcon{iconName = 'matchpopup'})
 
 	return Page.makeInternalLink(tostring(display), matchPage)
