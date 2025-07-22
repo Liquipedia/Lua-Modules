@@ -41,6 +41,8 @@ function CustomPlayer.run(frame)
 			team = args.team,
 			name = Logic.emptyOr(args.romanized_name, args.name),
 			romanizedname = args.romanized_name,
+			firstname = args.first_name,
+			lastname = args.last_name,
 			status = args.status,
 			type = player:getPersonType(args).store,
 			roles = player._getKeysOfRoles(player.roles),
