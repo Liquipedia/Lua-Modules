@@ -23,6 +23,7 @@ local Links = Lua.import('Module:Links')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchHeader = Lua.import('Module:Widget/Match/Header')
+local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {loadData = true})
@@ -239,26 +240,30 @@ end
 
 ---Default header function
 ---@param match table
----@param options {teamStyle: teamStyle?, noScore:boolean?}?
+---@param options {teamStyle: teamStyle?}?
 ---@return Widget
 function MatchSummary.createDefaultHeader(match, options)
 	options = options or {}
-	return MatchHeader{
-		match = match,
-		teamStyle = options.teamStyle,
-		noScore = options.noScore,
+
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(
+			MatchCountdown{
+				match = match,
+			},
+			MatchHeader{
+				match = match,
+				teamStyle = options.teamStyle,
+			}
+		)
 	}
 end
 
--- Default body function
+-- Default bdy function
 ---@param match MatchGroupUtilMatch
 ---@param createGame fun(date: string, game: table, gameIndex: integer): Widget
 ---@return Widget
 function MatchSummary.createDefaultBody(match, createGame)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.games, FnUtil.curry(createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))

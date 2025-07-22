@@ -45,7 +45,6 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
 	local games = Array.map(match.games, function(game)
 		return CustomMatchSummary._createStandardGame(game, {
@@ -56,7 +55,6 @@ function CustomMatchSummary.createBody(match)
 	end)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		games
 	)}
 end

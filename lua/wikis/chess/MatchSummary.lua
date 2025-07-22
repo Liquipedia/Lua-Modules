@@ -63,10 +63,7 @@ end
 ---@param createGame fun(date: string, game: table, gameIndex: integer): Widget
 ---@return Widget
 function CustomMatchSummary.createBody(match, createGame)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.games, createGame),
 		CustomMatchSummary._linksTable(match)
 	)}
