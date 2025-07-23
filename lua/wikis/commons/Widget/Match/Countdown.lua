@@ -29,7 +29,7 @@ function MatchCountdown:render()
 		return nil
 	end
 
-	if not match.timestamp or match.timestamp == DateExt.defaultTimestamp then
+	if not match.timestamp or DateExt.isDefaultTimestamp(match.timestamp) then
 		return nil
 	end
 
