@@ -443,7 +443,7 @@ function MatchTable:matchFromRecord(record)
 		date = record.date,
 		bestof = tonumber(record.bestof) or 0,
 		matchId = record.match2id,
-		bracketData = {matchPage = record.match2bracketdata.matchPage},
+		bracketData = {matchPage = record.match2bracketdata.matchpage},
 		extradata = {originalmatchid = record.extradata.originalmatchid},
 	}
 end
