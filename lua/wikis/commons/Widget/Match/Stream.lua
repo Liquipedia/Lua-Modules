@@ -22,7 +22,6 @@ local TLNET_STREAM = 'stream'
 ---@operator call(table): MatchStream
 local MatchStream = Class.new(Widget)
 MatchStream.defaultProps = {
-	callToAction = false,
 	matchIsLive = true,
 }
 
@@ -47,19 +46,21 @@ function MatchStream:render()
 	end
 
 	local CTA_Text
-	if self.props.callToAction and self.props.matchIsLive then
+	if self.props.matchIsLive then
 		CTA_Text = I18n.translate('matchstream-watch-live')
-	elseif self.props.callToAction then
+	else
 		CTA_Text = I18n.translate('matchstream-watch-upcoming')
 	end
 
 	return Button{
 		linktype = linkType,
 		link = link,
-		grow = self.props.callToAction,
 		children = HtmlWidgets.Fragment{children = {
 			Icon{iconName = platform},
-			CTA_Text,
+			HtmlWidgets.Span{
+				classes = {'match-button-cta-text'},
+				children = CTA_Text,
+			},
 		}},
 		variant = 'tertiary',
 		size = 'sm',

@@ -19,7 +19,6 @@ local MatchStream = Lua.import('Module:Widget/Match/Stream')
 ---@operator call(table): MatchStreamsContainer
 local MatchStreamsContainer = Class.new(Widget)
 MatchStreamsContainer.defaultProps = {
-	callToActionLimit = 0,
 	matchIsLive = true,
 }
 
@@ -41,13 +40,11 @@ function MatchStreamsContainer:render()
 		return nil
 	end
 
-	local useCallToAction = numberOfStreams <= self.props.callToActionLimit
 
 	return Array.map(processedStreams, function(stream)
 		return MatchStream{
 			platform = stream.platform,
 			stream = stream.stream,
-			callToAction = useCallToAction,
 			matchIsLive = self.props.matchIsLive,
 		}
 	end)
