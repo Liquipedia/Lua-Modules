@@ -51,7 +51,7 @@ function MatchPageButton:render()
 
 	if Logic.isNotEmpty(match.bracketData.matchPage) then
 		return Button{
-			classes = { (not showMatchDetails) and 'show-when-logged-in' or nil},
+			classes = { 'match-page-button', (not showMatchDetails) and 'show-when-logged-in' or nil},
 			title = 'View match details',
 			variant = self.props.buttonType,
 			size = 'sm',
@@ -66,7 +66,7 @@ function MatchPageButton:render()
 	end
 
 	return Button{
-		classes = { 'show-when-logged-in' },
+		classes = { 'match-page-button', 'show-when-logged-in' },
 		title = 'Make match page',
 		variant = 'ghost',
 		size = 'sm',
