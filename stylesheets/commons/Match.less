@@ -159,7 +159,11 @@
 		gap: 0.5rem;
 		align-self: stretch;
 
-		&:has(> :last-child:nth-child(3)) .cta-text {
+		&:has(> :last-child:nth-child(3)) .match-button-cta-text {
+			display: none;
+		}
+
+		body.logged-in &:has(.match-page-button) .match-button-cta-text {
 			display: none;
 		}
 	}

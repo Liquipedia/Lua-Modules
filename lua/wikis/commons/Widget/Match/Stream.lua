@@ -55,7 +55,6 @@ function MatchStream:render()
 	return Button{
 		linktype = linkType,
 		link = link,
-		grow = self.props.callToAction,
 		children = HtmlWidgets.Fragment{children = {
 			Icon{iconName = platform},
 			HtmlWidgets.Span{
