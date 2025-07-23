@@ -54,6 +54,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 				margin = 'auto'
 			}
 		},
+		MatchSummaryWidgets.Break{}
 	} or nil
 
 	local comments = WidgetUtil.collect(
@@ -87,6 +88,7 @@ function CustomMatchSummary._timeoutDisplay(timeout)
 	end
 	local timeouts = timeout
 	return {
+		MatchSummaryWidgets.Break{},
 		CustomMatchSummary._iconDisplay(TIMEOUT, Table.includes(timeouts, 1)),
 		MatchSummaryWidgets.GameCenter{children = 'Timeout'},
 		CustomMatchSummary._iconDisplay(TIMEOUT, Table.includes(timeouts, 2)),
