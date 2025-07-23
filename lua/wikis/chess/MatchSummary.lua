@@ -151,6 +151,7 @@ function CustomMatchSummary._getHeader(game)
 				margin = 'auto'
 			}
 		},
+		MatchSummaryWidgets.Break{}
 	} or nil
 end
 
