@@ -45,8 +45,6 @@ function MatchButtonBar:render()
 	local displayVods = match.phase == 'finished' and self.props.showVods
 	local displayStreams = match.phase == 'ongoing'
 
-	mw.log(match.phase)
-
 	-- TODO: This logic is duplicated in PageButton, and should be refactored.
 	-- Show streams also for the last period before going live
 	if match.phase == 'upcoming' and match.timestamp and
