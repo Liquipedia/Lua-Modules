@@ -1,26 +1,36 @@
 ---
 -- @Liquipedia
--- page=Module:Infobox/Unit/Vehicle/Custom
+-- page=Module:Infobox/Unit/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 
-local Widgets = require('Module:Widget/All')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+
+local Unit = Lua.import('Module:Infobox/Unit')
+local Injector = Lua.import('Module:Widget/Injector')
+
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class WarThunderUnitInfobox: UnitInfobox
 local CustomUnit = Class.new(Unit)
+---@class WarThunderUnitInfoboxWidgetInjector: WidgetInjector
+---@field caller WarThunderUnitInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
 ---@return Html
 function CustomUnit.run(frame)
 	local unit = CustomUnit(frame)
-	unit:setWidgetInjector(CustomInjector(unit))
 	unit.args.informationType = 'Vehicle'
+	unit:setWidgetInjector(CustomInjector(unit))
 	return unit:createInfobox()
 end
 
@@ -45,7 +55,7 @@ end
 ---@param args table
 ---@return string[]
 function CustomUnit._getVehicleType(args)
-	if String.isEmpty(args.vehicletype) then
+	if Logic.isEmpty(args.vehicletype) then
 		return {}
 	end
 	local releasedate = args.releasedate
@@ -58,7 +68,7 @@ end
 function CustomUnit:getWikiCategories(args)
 	if not Namespace.isMain() then return {} end
 	return Array.append({'Vehicles'},
-		String.isNotEmpty(args.vehicletype) and (args.vehicletype .. ' Vehicles') or nil
+		Logic.isNotEmpty(args.vehicletype) and (args.vehicletype .. ' Vehicles') or nil
 	)
 end
 
@@ -70,7 +80,7 @@ function CustomUnit:setLpdbData(args)
 		image = args.image,
 		date = args.released,
 		information = 'vehicle',
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
+		extradata = {
 			acquisition = args.acquisition,
 			battlerating = args.br,
 			nation = args.nation,
@@ -79,7 +89,7 @@ function CustomUnit:setLpdbData(args)
 		}
 	}
 
-	mw.ext.LiquipediaDB.lpdb_datapoint('vehicle_' .. (args.name or self.pagename), lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('vehicle_' .. self.name, Json.stringifySubTables(lpdbData))
 end
 
 return CustomUnit
