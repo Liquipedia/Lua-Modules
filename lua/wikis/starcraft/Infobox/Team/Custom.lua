@@ -186,7 +186,7 @@ function CustomTeam:getEarningsAndMedalsData(team)
 		.. 'individualprizemoney, prizemoney, opponentplayers, opponenttype'
 
 	local playerTeamConditions = ConditionTree(BooleanOperator.any)
-	for playerIndex = 1, Info.maximumNumberOfPlayersInPlacements do
+	for playerIndex = 1, Info.config.defaultMaxPlayersPerPlacement do
 		playerTeamConditions:add{
 			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex .. 'team'), Comparator.eq, team),
 		}

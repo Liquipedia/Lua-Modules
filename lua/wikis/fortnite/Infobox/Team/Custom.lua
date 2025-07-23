@@ -5,24 +5,26 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local Math = require('Module:MathUtil')
-local Namespace = require('Module:Namespace')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info', {loadData = true})
+local Lpdb = Lua.import('Module:Lpdb')
+local Math = Lua.import('Module:MathUtil')
+local Namespace = Lua.import('Module:Namespace')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -35,7 +37,7 @@ local TeamAchievements = Lua.import('Module:Infobox/Extension/Achievements')
 local CustomTeam = Class.new(Team)
 
 local PLAYER_EARNINGS_ABBREVIATION = '<abbr title="Earnings of players while on the team">Player earnings</abbr>'
-local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 10
+local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = Info.config.defaultMaxPlayersPerPlacement or 10
 
 local CustomInjector = Class.new(Injector)
 
