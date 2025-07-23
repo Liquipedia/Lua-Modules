@@ -57,11 +57,6 @@ end
 ---@return string[]
 function CustomUnit:getWikiCategories(args)
 	if not Namespace.isMain() then return {} end
-	local categories = {'Vehicles'}
-	if String.isEmpty(args.vehicletype) then
-		return categories
-	end
-	return Array.append(categories, args.vehicletype .. ' Vehicles')
 	return Array.append({'Vehicles'},
 		String.isNotEmpty(args.vehicletype) and (args.vehicletype .. ' Vehicles') or nil
 	)
