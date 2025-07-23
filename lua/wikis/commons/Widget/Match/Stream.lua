@@ -8,7 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local String = Lua.import('Module:StringUtils')
+local I18n = Lua.import('Module:I18n')
 local StreamLinks = Lua.import('Module:Links/Stream')
 
 local Widget = Lua.import('Module:Widget')
@@ -17,13 +17,13 @@ local Button = Lua.import('Module:Widget/Basic/Button')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 local TLNET_STREAM = 'stream'
-local CTA_TEXT = 'Watch on ${platform}'
 
 ---@class MatchStream: Widget
 ---@operator call(table): MatchStream
 local MatchStream = Class.new(Widget)
 MatchStream.defaultProps = {
 	callToAction = false,
+	matchIsLive = true,
 }
 
 ---@return Widget?
@@ -46,13 +46,20 @@ function MatchStream:render()
 		linkType = 'internal'
 	end
 
+	local CTA_Text
+	if self.props.callToAction and self.props.matchIsLive then
+		CTA_Text = I18n.translate('matchstream-watch-live')
+	elseif self.props.callToAction then
+		CTA_Text = I18n.translate('matchstream-watch-upcoming')
+	end
+
 	return Button{
 		linktype = linkType,
 		link = link,
 		grow = self.props.callToAction,
 		children = HtmlWidgets.Fragment{children = {
 			Icon{iconName = platform},
-			self.props.callToAction and String.interpolate(CTA_TEXT, { platform = platform }) or nil,
+			CTA_Text,
 		}},
 		variant = 'tertiary',
 		size = 'sm',
