@@ -464,18 +464,9 @@
 
 .brkts-match-info-popup {
 	border-radius: 0.5rem;
-	border: 0.0625rem solid;
 	box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
 	position: absolute;
 	z-index: 19;
-
-	.theme--light & {
-		border-color: rgba( 0, 0, 0, 0.08 );
-	}
-
-	.theme--dark & {
-		border-color: rgba( 255, 255, 255, 0.08 );
-	}
 
 	@media ( max-width: 768px ) {
 		position: fixed;
@@ -546,6 +537,8 @@
 
 		@media ( max-width: 768px ) {
 			display: inline-flex;
+			justify-content: center;
+			align-items: center;
 			outline: 0;
 			background: transparent;
 			width: 1.5rem;
@@ -1012,10 +1005,6 @@ div.brkts-popup-body-element-thumbs {
 .brkts-popup-side-shade-out-flipped {
 	opacity: 0.5;
 	padding-right: 4px;
-}
-
-.brkts-popup:not( .brkts-match-info-flat ) {
-	border-top: 1px solid var( --table-border-color, #bbbbbb );
 }
 
 /**
