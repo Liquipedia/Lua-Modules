@@ -871,7 +871,7 @@ end
 function MatchTable:_displayMatchPage(match)
 	if not self.config.showMatchPage then return end
 
-	return mw.html.create('td'):node(MatchPageButton{match = match.matchId})
+	return mw.html.create('td'):node(MatchPageButton{match = match})
 end
 
 ---@param winner any
