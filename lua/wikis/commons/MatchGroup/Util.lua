@@ -537,7 +537,7 @@ function MatchGroupUtil.matchFromRecord(record)
 
 	local walkover = nilIfEmpty(record.walkover)
 
-	return {
+	local match = {
 		bestof = tonumber(record.bestof) or 0,
 		bracketData = bracketData,
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
@@ -557,7 +557,6 @@ function MatchGroupUtil.matchFromRecord(record)
 		opponents = opponents,
 		parent = record.parent,
 		patch = record.patch,
-		phase = MatchGroupUtil.computeMatchPhase(record),
 		publisherTier = nilIfEmpty(record.publishertier),
 		resultType = nilIfEmpty(record.resulttype),
 		section = nilIfEmpty(record.section),
@@ -572,6 +571,10 @@ function MatchGroupUtil.matchFromRecord(record)
 		walkover = walkover and walkover:lower() or nil,
 		winner = tonumber(record.winner),
 	}
+
+	match.phase = MatchGroupUtil.computeMatchPhase(match)
+
+	return match
 end
 
 ---@param data table?
