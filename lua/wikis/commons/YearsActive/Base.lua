@@ -27,9 +27,6 @@ local ColumnName = Condition.ColumnName
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
--- overwritable per wiki
-ActiveYears.startYear = Info.startYear
-ActiveYears.defaultNumberOfStoredPlayersPerPlacement = 10
 ActiveYears.additionalConditions = ''
 ActiveYears.noResultsText = 'Player has no results.'
 
@@ -59,7 +56,7 @@ function ActiveYears.display(args)
 
 	local prefix = args.prefix or 'p'
 
-	local playerPositionLimit = tonumber(args.playerPositionLimit) or ActiveYears.defaultNumberOfStoredPlayersPerPlacement
+	local playerPositionLimit = tonumber(args.playerPositionLimit) or Info.config.defaultMaxPlayersPerPlacement or 10
 	if playerPositionLimit <=0 then
 		error('"playerPositionLimit" has to be >= 1')
 	end
@@ -88,7 +85,7 @@ function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLi
 	local conditionTree = ConditionTree(BooleanOperator.all):add({
 		playerConditionTree,
 		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
-		ConditionNode(ColumnName('date_year'), Comparator.ge, ActiveYears.startYear),
+		ConditionNode(ColumnName('date_year'), Comparator.ge, Info.startYear),
 	})
 
 	if String.isNotEmpty(mode) then
