@@ -35,7 +35,7 @@ function MatchPageButton:render()
 		return nil
 	end
 
-	-- TODO: This logic is duplicated in MatchButtonBar.lua, and should be refactored.
+	-- TODO: This logic is duplicated in MatchButtonBar, and should be refactored.
 	local showMatchDetails = match.phase == 'finished' or match.phase == 'ongoing'
 	if match.phase == 'upcoming' and match.timestamp and
 		os.difftime(match.timestamp, DateExt.getCurrentTimestamp()) < SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE then

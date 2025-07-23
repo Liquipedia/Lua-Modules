@@ -47,7 +47,7 @@ function MatchButtonBar:render()
 	local displayVods = match.phase == 'finished' and self.props.showVods
 	local displayStreams = match.phase == 'ongoing'
 
-	-- TODO: This logic is duplicated in MatchButtonBar.lua, and should be refactored.
+	-- TODO: This logic is duplicated in PageButton, and should be refactored.
 	-- Show streams also for the last period before going live
 	if match.phase == 'upcoming' and match.timestamp and
 		os.difftime(match.timestamp, DateExt.getCurrentTimestamp()) < SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE then
