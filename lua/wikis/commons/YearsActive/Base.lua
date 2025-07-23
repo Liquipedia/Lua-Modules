@@ -27,7 +27,6 @@ local ColumnName = Condition.ColumnName
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
-ActiveYears.additionalConditions = ''
 ActiveYears.noResultsText = 'Player has no results.'
 
 ---
@@ -37,6 +36,8 @@ ActiveYears.noResultsText = 'Player has no results.'
 -- @noRedirect - (optional) player redirects get not resolved before query
 -- @prefix - (optional) the prefix under which the players are stored in the placements
 -- @playerPositionLimit - (optional) the number for how many params the query should look in LPDB
+---@param args {player: string, mode: string?, noRedirect: boolean?, prefix: string?, playerPositionLimit: integer?}
+---@return string
 function ActiveYears.display(args)
 	args = args or {}
 	local player = args.player
@@ -67,6 +68,12 @@ function ActiveYears.display(args)
 	return ActiveYears._calculate(conditions)
 end
 
+---@param player string
+---@param playerAsPageName string
+---@param playerPositionLimit integer
+---@param prefix string
+---@param mode string?
+---@return string
 function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLimit, prefix, mode)
 	local playerConditionTree = ConditionTree(BooleanOperator.any)
 	if prefix == 'p' then
@@ -94,9 +101,11 @@ function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLi
 		})
 	end
 
-	return conditionTree:toString() .. ActiveYears.additionalConditions
+	return conditionTree:toString()
 end
 
+---@param conditions string
+---@return string
 function ActiveYears._calculate(conditions)
 	-- Get years
 	local years = ActiveYears._getYears(conditions)
@@ -107,6 +116,8 @@ function ActiveYears._calculate(conditions)
 	return ActiveYears.displayYears(years)
 end
 
+---@param years integer[]
+---@return string
 function ActiveYears.displayYears(years)
 	-- Sort years chronologically
 	table.sort(years)
@@ -118,6 +129,8 @@ function ActiveYears.displayYears(years)
 	return output
 end
 
+---@param conditions string
+---@return integer[]
 function ActiveYears._getYears(conditions)
 	local years = Set{}
 	local checkYear = function(placement)
@@ -135,6 +148,8 @@ function ActiveYears._getYears(conditions)
 	return years:toArray()
 end
 
+---@param sortedYears integer[]
+---@return string[]
 function ActiveYears._groupYears(sortedYears)
 	if Logic.isEmpty(sortedYears) then return {} end
 
@@ -162,6 +177,10 @@ function ActiveYears._groupYears(sortedYears)
 	return yearRanges
 end
 
+---@param startYear integer
+---@param endYear integer
+---@param yearRanges string[]
+---@return string[]
 function ActiveYears._insertYears(startYear, endYear, yearRanges)
 	if startYear == endYear then
 		table.insert(yearRanges, tostring(startYear))
