@@ -43,7 +43,6 @@ function MatchButtonBar:render()
 		return nil
 	end
 
-	local wikiHasMatchPages = Info.config.match2.matchPage
 	local displayVods = match.phase == 'finished' and self.props.showVods
 	local displayStreams = match.phase == 'ongoing'
 
@@ -57,9 +56,8 @@ function MatchButtonBar:render()
 
 	---@param vod string?
 	---@param index integer?
-	---@param callToAction boolean
 	---@return Widget?
-	local makeVodButton = function(vod, index, callToAction)
+	local makeVodButton = function(vod, index)
 		if Logic.isEmpty(vod) then
 			return nil
 		end
@@ -70,12 +68,13 @@ function MatchButtonBar:render()
 			variant = 'tertiary',
 			link = vod,
 			size = 'sm',
-			grow = callToAction,
 			classes = {'vodlink'},
 			children = {
 				ImageIcon{imageLight = VodLink.getIcon(index)},
-				callToAction and ' ' or nil,
-				callToAction and VodLink.getTitle(index) or nil,
+				HtmlWidgets.Span{
+					classes = {'match-button-cta-text'},
+					children = VodLink.getTitle(index),
+				},
 			},
 		}
 	end
@@ -88,10 +87,9 @@ function MatchButtonBar:render()
 			},
 			displayStreams and StreamsContainer{
 				streams = StreamLinks.filterStreams(match.stream),
-				callToActionLimit = wikiHasMatchPages and 0 or 2,
 				matchIsLive = match.phase == 'ongoing',
 			} or nil,
-			displayVods and makeVodButton(match.vod, nil, not wikiHasMatchPages) or nil
+			displayVods and makeVodButton(match.vod) or nil
 		)
 	}
 end

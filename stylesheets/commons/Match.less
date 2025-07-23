@@ -158,5 +158,9 @@
 		display: flex;
 		gap: 0.5rem;
 		align-self: stretch;
+
+		&:has(> :last-child:nth-child(3)) .cta-text {
+			display: none;
+		}
 	}
 }
