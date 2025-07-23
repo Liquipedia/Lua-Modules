@@ -95,6 +95,7 @@ function MatchButtonBar:render()
 			displayStreams and StreamsContainer{
 				streams = StreamLinks.filterStreams(match.stream),
 				callToActionLimit = displayMatchPage and 0 or 2,
+				matchIsLive = matchPhase == 'ongoing',
 			} or nil,
 			displayVods and makeVodButton(match.vod, nil, not displayMatchPage) or nil
 		)
