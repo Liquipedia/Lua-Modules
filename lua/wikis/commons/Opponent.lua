@@ -386,7 +386,7 @@ function Opponent.readOpponentArgs(args)
 		return template and {
 			type = Opponent.team,
 			template = template,
-		}
+		} or Opponent.tbd(Opponent.team)
 
 	elseif partySize == 1 then
 		local player = {

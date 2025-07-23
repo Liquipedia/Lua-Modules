@@ -54,6 +54,7 @@ local DEFAULT_QUERY_COLUMNS = {
 	'match2bracketdata',
 	'match2games',
 	'game',
+	'section',
 }
 local NONE = 'none'
 local INFOBOX_DEFAULT_CLASS = 'fo-nttax-infobox panel'
@@ -441,7 +442,7 @@ function MatchTicker:expandGamesOfMatch(match)
 		end
 
 		local gameMatch = Table.copy(match)
-		gameMatch.match2games = nil
+		gameMatch.match2games = {}
 		gameMatch.asGame = true
 		gameMatch.asGameIndexes = {gameIndex}
 

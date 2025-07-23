@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Infobox/Extensions/PrizePool
+-- page=Module:Infobox/Extension/PrizePool
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

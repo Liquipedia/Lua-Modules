@@ -35,12 +35,10 @@ local TBD = 'TBD'
 local DEFAULT_HERO = 'default'
 
 local CustomMatchSummary = {}
---local StarcraftMatchSummary = CustomMatchSummary
 
 ---@param args {bracketId: string, matchId: string, config: table?}
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	-- later when ffa is enabled need to check for that here
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px'})
 		:addClass('brkts-popup-sc')
 end
@@ -62,7 +60,6 @@ function CustomMatchSummary.createBody(match)
 			css = {['line-height'] = '80%', ['font-weight'] = 'bold'},
 			children = {'Reset match'},
 		} or nil,
-		match.dateIsExact and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.opponents, CustomMatchSummary.advantageOrPenalty),
 		subMatches and Array.map(subMatches, CustomMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(CustomMatchSummary.Game, {hasHeroes = hasHeroes})),
@@ -153,7 +150,6 @@ function CustomMatchSummary.Game(options, game)
 		children = WidgetUtil.collect(
 			game.header and {
 				HtmlWidgets.Div{css = {margin = 'auto'}, children = {game.header}},
-				MatchSummaryWidgets.Break{},
 			} or nil,
 			CustomMatchSummary.DisplayHeroes(game.opponents[1], {hasHeroes = options.hasHeroes}),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},

@@ -7,7 +7,6 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
@@ -32,7 +31,6 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 	local hasSubMatches = Logic.readBool((match.extradata or {}).hassubmatches)
 
 	local games = Array.map(match.games, function(game)
@@ -43,7 +41,6 @@ function CustomMatchSummary.createBody(match)
 	end)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		games
 	)}
 end
