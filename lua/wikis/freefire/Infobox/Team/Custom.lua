@@ -8,7 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local PlacementStats = require('Module:InfoboxPlacementStats')
+local PlacementStats = Lua.import('Module:InfoboxPlacementStats')
 
 local Team = Lua.import('Module:Infobox/Team')
 
