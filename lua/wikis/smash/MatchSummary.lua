@@ -41,9 +41,8 @@ function CustomMatchSummary.isTeam(match)
 end
 
 ---@param match MatchGroupUtilMatch
----@return MatchSummaryBody
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
-
 	local games = Array.map(match.games, function(game)
 		return CustomMatchSummary._createStandardGame(game, {
 			opponents = match.opponents,
@@ -52,9 +51,9 @@ function CustomMatchSummary.createBody(match)
 		})
 	end)
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+	return WidgetUtil.collect(
 		games
-	)}
+	)
 end
 
 ---@param game MatchGroupUtilGame
