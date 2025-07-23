@@ -558,13 +558,13 @@
 }
 
 // Adds backdrop for mobile popup
-.main-container:has(~ .brkts-match-info-popup){
+.main-container:has( ~ .brkts-match-info-popup ) {
 	@media ( max-width: 768px ) {
 		&::before {
-			content: '';
+			content: "";
 			position: fixed;
 			inset: 0;
-			background-color: var(--clr-sapphire-10);
+			background-color: var( --clr-sapphire-10 );
 			opacity: 0.66;
 			z-index: 8;
 		}
