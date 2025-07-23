@@ -20,6 +20,7 @@ local MatchStream = Lua.import('Module:Widget/Match/Stream')
 local MatchStreamsContainer = Class.new(Widget)
 MatchStreamsContainer.defaultProps = {
 	callToActionLimit = 0,
+	matchIsLive = true,
 }
 
 ---@return Widget?
@@ -47,6 +48,7 @@ function MatchStreamsContainer:render()
 			platform = stream.platform,
 			stream = stream.stream,
 			callToAction = useCallToAction,
+			matchIsLive = self.props.matchIsLive,
 		}
 	end)
 end

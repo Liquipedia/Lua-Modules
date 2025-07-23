@@ -11,7 +11,6 @@ local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Info = Lua.import('Module:Info')
 local Logic = Lua.import('Module:Logic')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local StreamLinks = Lua.import('Module:Links/Stream')
 local VodLink = Lua.import('Module:VodLink')
 
@@ -43,13 +42,14 @@ function MatchButtonBar:render()
 	if not match then
 		return nil
 	end
-	local matchPhase = MatchGroupUtil.computeMatchPhase(match)
 
-	local displayMatchPage = matchPhase ~= 'upcoming' and Info.config.match2.matchPage
-	local displayVods = matchPhase == 'finished' and self.props.showVods
-	local displayStreams = matchPhase == 'ongoing'
+	local wikiHasMatchPages = Info.config.match2.matchPage
+	local displayVods = match.phase == 'finished' and self.props.showVods
+	local displayStreams = match.phase == 'ongoing'
+
+	-- TODO: This logic is duplicated in PageButton, and should be refactored.
 	-- Show streams also for the last period before going live
-	if matchPhase == 'upcoming' and match.timestamp and
+	if match.phase == 'upcoming' and match.timestamp and
 		os.difftime(match.timestamp, DateExt.getCurrentTimestamp()) < SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE then
 
 		displayStreams = true
@@ -80,23 +80,18 @@ function MatchButtonBar:render()
 		}
 	end
 
-	-- Original Match Id must be used to link match page if it exists.
-	-- It can be different from the matchId when shortened brackets are used.
-	local matchId = match.extradata.originalmatchid or match.matchId
-	local matchPageButton = MatchPageButton{
-		matchId = matchId,
-		hasMatchPage = Logic.isNotEmpty(match.bracketData.matchPage),
-	}
-
 	return HtmlWidgets.Div{
 		classes = {'match-info-links'},
 		children = WidgetUtil.collect(
-			displayMatchPage and matchPageButton or nil,
+			MatchPageButton{
+				match = match,
+			},
 			displayStreams and StreamsContainer{
 				streams = StreamLinks.filterStreams(match.stream),
-				callToActionLimit = displayMatchPage and 0 or 2,
+				callToActionLimit = wikiHasMatchPages and 0 or 2,
+				matchIsLive = match.phase == 'ongoing',
 			} or nil,
-			displayVods and makeVodButton(match.vod, nil, not displayMatchPage) or nil
+			displayVods and makeVodButton(match.vod, nil, not wikiHasMatchPages) or nil
 		)
 	}
 end

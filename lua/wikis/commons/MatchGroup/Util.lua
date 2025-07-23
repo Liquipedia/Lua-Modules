@@ -250,6 +250,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field opponents standardOpponent[]
 ---@field parent string?
 ---@field patch string?
+---@field phase 'upcoming'|'ongoing'|'finished'
 ---@field publisherTier string?
 ---@field section string?
 ---@field series string?
@@ -556,6 +557,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		opponents = opponents,
 		parent = record.parent,
 		patch = record.patch,
+		phase = MatchGroupUtil.computeMatchPhase(record),
 		publisherTier = nilIfEmpty(record.publishertier),
 		resultType = nilIfEmpty(record.resulttype),
 		section = nilIfEmpty(record.section),

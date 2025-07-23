@@ -7,6 +7,10 @@
 
 return {
 	en = {
+		-- Match Stream
+		['matchstream-watch-live'] = 'Watch now',
+		['matchstream-watch-upcoming'] = 'Watch here',
+
 		-- Tournament Filter
 		['tournament-ticker-no-tournaments'] = 'No tournaments found for your selected filters!',
 
