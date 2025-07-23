@@ -478,13 +478,14 @@
 	}
 
 	@media ( max-width: 768px ) {
-		bottom: unset;
-		left: 1rem !important;
-		max-height: 50vh;
 		position: fixed;
-		right: 1rem;
-		top: 11rem !important;
-		width: auto !important;
+		bottom: unset;
+		left: 50% !important;
+		right: unset;
+		top: 50% !important;
+		max-height: 50vh;
+		width: calc( 100vw - 2rem ) !important;
+		transform: translate( -50%, -50% );
 	}
 }
 
