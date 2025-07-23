@@ -6,7 +6,6 @@
 --
 
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -24,7 +23,6 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 	local characterBansData = Array.map(match.games, function (game)
 		local extradata = game.extradata or {}
 		local bans = extradata.bans or {}
@@ -32,7 +30,6 @@ function CustomMatchSummary.createBody(match)
 	end)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.games, CustomMatchSummary._createMapRow),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}

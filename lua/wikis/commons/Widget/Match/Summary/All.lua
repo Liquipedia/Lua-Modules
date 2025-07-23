@@ -10,7 +10,6 @@ local Widgets = {}
 local Lua = require('Module:Lua')
 
 Widgets.Body = Lua.import('Module:Widget/Match/Summary/Body')
-Widgets.Break = Lua.import('Module:Widget/Match/Summary/Break')
 Widgets.Casters = Lua.import('Module:Widget/Match/Summary/Casters')
 Widgets.CharacterBanTable = Lua.import('Module:Widget/Match/Summary/CharacterBanTable')
 Widgets.Characters = Lua.import('Module:Widget/Match/Summary/Characters')

@@ -10,8 +10,6 @@ local CustomMatchSummary = {}
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local DateExt = Lua.import('Module:Date/Ext')
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Eco = Lua.import('Module:ChessOpenings')
 local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
@@ -63,10 +61,7 @@ end
 ---@param createGame fun(date: string, game: table, gameIndex: integer): Widget
 ---@return Widget
 function CustomMatchSummary.createBody(match, createGame)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.games, createGame),
 		CustomMatchSummary._linksTable(match)
 	)}
@@ -156,7 +151,6 @@ function CustomMatchSummary._getHeader(game)
 				margin = 'auto'
 			}
 		},
-		MatchSummaryWidgets.Break{}
 	} or nil
 end
 

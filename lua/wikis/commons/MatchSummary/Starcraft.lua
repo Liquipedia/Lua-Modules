@@ -58,7 +58,6 @@ function StarcraftMatchSummary.createBody(match)
 			css = {['line-height'] = '80%', ['font-weight'] = 'bold'},
 			children = {'Reset match'},
 		} or nil,
-		match.dateIsExact and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.opponents, StarcraftMatchSummary.advantageOrPenalty),
 		subMatches and Array.map(subMatches, StarcraftMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(StarcraftMatchSummary.Game, {})),
@@ -149,7 +148,6 @@ function StarcraftMatchSummary.Game(options, game)
 		children = WidgetUtil.collect(
 			game.header and {
 				HtmlWidgets.Div{css = {margin = 'auto'}, children = {game.header}},
-				MatchSummaryWidgets.Break{},
 			} or nil,
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			offFactionIcons(1),
@@ -185,7 +183,6 @@ function StarcraftMatchSummary.TeamSubmatch(submatch)
 		children = WidgetUtil.collect(
 			submatch.header and {
 				HtmlWidgets.Div{css = {margin = 'auto', ['font-weight'] = 'bold'}, children = {submatch.header}},
-				MatchSummaryWidgets.Break{},
 			} or nil,
 			StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch),
 			Array.map(submatch.games, function(game)
