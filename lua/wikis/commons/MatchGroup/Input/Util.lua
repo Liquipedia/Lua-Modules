@@ -852,10 +852,9 @@ function MatchGroupInputUtil.matchIsFinished(match, maps, opponents)
 	end
 
 	local bestof = match.bestof
-	if not bestof then
+	if not bestof or bestof == 0 then
 		return false
 	end
-	-- TODO: Investigate if bestof = 0 needs to be handled
 
 	return MatchGroupInputUtil.majorityHasBeenWon(bestof, opponents)
 end
@@ -899,7 +898,7 @@ function MatchGroupInputUtil.majorityHasBeenWon(bestof, opponents)
 		return true
 	end
 	local scoreSum = Array.reduce(opponents, function(sum, opponent) return sum + (opponent.score or 0) end, 0)
-	if bestof > 0 and scoreSum >= bestof then
+	if scoreSum >= bestof then
 		return true
 	end
 	return false
