@@ -163,7 +163,11 @@
 			display: none;
 		}
 
-		body.logged-in &:has(.match-page-button) .match-button-cta-text {
+		body.logged-in &:has(.match-page-button.show-when-logged-in) .match-button-cta-text {
+			display: none;
+		}
+
+		body.logged-in &:has(.match-page-button:not(.show-when-logged-in)) .match-button-cta-text {
 			display: none;
 		}
 	}
