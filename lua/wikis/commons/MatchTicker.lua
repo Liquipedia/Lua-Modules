@@ -453,6 +453,7 @@ function MatchTicker:expandGamesOfMatch(match)
 		gameMatch.opponents = Array.map(match.opponents, function(opponent, opponentIndex)
 			return MatchUtil.enrichGameOpponentFromMatchOpponent(opponent, game.opponents[opponentIndex])
 		end)
+		game.extradata = Table.merge(gameMatch.extradata, game.extradata)
 		return gameMatch
 	end)
 

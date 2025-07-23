@@ -11,6 +11,14 @@
 		justify-content: center;
 		align-self: stretch;
 
+		.timer-object {
+			display: inline-flex;
+			justify-content: center;
+			align-items: center;
+			gap: 0.5rem;
+			align-self: stretch;
+		}
+
 		.timer-object-countdown,
 		.timer-object-date {
 			padding: 0.25rem 0.5rem;
@@ -150,5 +158,17 @@
 		display: flex;
 		gap: 0.5rem;
 		align-self: stretch;
+
+		&:has( > :last-child:nth-child( 3 ) ) .match-button-cta-text {
+			display: none;
+		}
+
+		body.logged-in &:has( .match-page-button.show-when-logged-in ) .match-button-cta-text {
+			display: none;
+		}
+
+		body.logged-in &:has( .match-page-button:not( .show-when-logged-in ) ) .match-button-cta-text {
+			display: none;
+		}
 	}
 }
