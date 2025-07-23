@@ -94,7 +94,8 @@ local SECONDS_ONE_DAY = 3600 * 24
 ---@field date string
 ---@field bestof number?
 ---@field matchId string?
----@field hasMatchPage boolean?
+---@field extradata {originalmatchid?: string}?
+---@field bracketData {matchPage?: string}?
 
 ---@class MatchTableMatchResult
 ---@field opponent match2opponent
@@ -441,9 +442,8 @@ function MatchTable:matchFromRecord(record)
 		game = record.game,
 		date = record.date,
 		bestof = tonumber(record.bestof) or 0,
-		hasMatchPage = Logic.isNotEmpty(record.match2bracketdata.matchpage),
 		matchId = record.match2id,
-		bracketData = record.match2bracketdata,
+		bracketData = {matchPage = record.match2bracketdata.matchPage},
 		extradata = {originalmatchid = record.extradata.originalmatchid},
 	}
 end
