@@ -471,12 +471,12 @@
 	@media ( max-width: 768px ) {
 		position: fixed;
 		bottom: unset;
-		left: 50% !important;
-		right: unset;
+		left: 1rem !important;
+		right: 1rem;
 		top: 50% !important;
 		max-height: 50vh;
-		width: calc( 100vw - 2rem ) !important;
-		transform: translate( -50%, -50% );
+		width: auto !important;
+		transform: translateY( -50% );
 	}
 }
 
@@ -819,6 +819,7 @@ div.brkts-popup-body-element-thumbs {
 		&-title {
 			font-size: 0.6875rem;
 			padding: 0 0.5rem;
+			text-align: center;
 		}
 
 		&-picks {
