@@ -62,6 +62,9 @@ function CustomUnit:getWikiCategories(args)
 		return categories
 	end
 	return Array.append(categories, args.vehicletype .. ' Vehicles')
+	return Array.append({'Vehicles'},
+		String.isNotEmpty(args.vehicletype) and (args.vehicletype .. ' Vehicles') or nil
+	)
 end
 
 ---@param args table
@@ -77,7 +80,7 @@ function CustomUnit:setLpdbData(args)
 			battlerating = args.br,
 			nation = args.nation,
 			role = args.role,
-			type = args.type
+			type = args.vehicletype
 		}
 	}
 
