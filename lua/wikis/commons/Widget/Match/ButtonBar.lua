@@ -86,12 +86,13 @@ function MatchButtonBar:render()
 	local matchPageButton = MatchPageButton{
 		matchId = matchId,
 		hasMatchPage = Logic.isNotEmpty(match.bracketData.matchPage),
+		displayMatchPage = displayMatchPage,
 	}
 
 	return HtmlWidgets.Div{
 		classes = {'match-info-links'},
 		children = WidgetUtil.collect(
-			displayMatchPage and matchPageButton or nil,
+			Info.config.match2.matchPage and matchPageButton or nil,
 			displayStreams and StreamsContainer{
 				streams = StreamLinks.filterStreams(match.stream),
 				callToActionLimit = displayMatchPage and 0 or 2,

@@ -36,6 +36,7 @@ function MatchPageButton:render()
 	if self.props.hasMatchPage then
 		return Button{
 			title = 'View match details',
+			classes = { (not self.props.displayMatchPage) and 'show-when-logged-in' or nil },
 			variant = self.props.buttonType,
 			size = 'sm',
 			link = link,
