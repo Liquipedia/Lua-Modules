@@ -443,6 +443,8 @@ function MatchTable:matchFromRecord(record)
 		bestof = tonumber(record.bestof) or 0,
 		hasMatchPage = Logic.isNotEmpty(record.match2bracketdata.matchpage),
 		matchId = record.match2id,
+		bracketData = record.match2bracketdata,
+		extradata = {originalmatchid = record.extradata.originalmatchid},
 	}
 end
 
