@@ -899,7 +899,7 @@ function MatchGroupInputUtil.majorityHasBeenWon(bestof, opponents)
 		return true
 	end
 	local scoreSum = Array.reduce(opponents, function(sum, opponent) return sum + (opponent.score or 0) end, 0)
-	if scoreSum >= bestof then
+	if bestof > 0 and scoreSum >= bestof then
 		return true
 	end
 	return false
