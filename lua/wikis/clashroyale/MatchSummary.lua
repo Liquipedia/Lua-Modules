@@ -36,7 +36,7 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return MatchSummaryBody
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
 	local isTeamGame = Array.any(match.opponents, function(opponent) return opponent.type == Opponent.team end)
 	local games
@@ -48,10 +48,10 @@ function CustomMatchSummary.createBody(match)
 		end)
 	end
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+	return WidgetUtil.collect(
 		games,
 		MatchSummaryWidgets.Mvp(match.extradata.mvp)
-	)}
+	)
 end
 
 ---@param game MatchGroupUtilGame
