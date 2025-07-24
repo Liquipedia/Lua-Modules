@@ -86,17 +86,7 @@ function Company:createInfobox()
 			end
 		},
 		Center{children = {args.footnotes}},
-		Builder{
-			builder = function()
-				local links = Links.transform(args)
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links}
-					}
-				end
-			end
-		}
+		Widgets.Links{links = Links.transform(args)},
 	}
 
 	mw.ext.LiquipediaDB.lpdb_company('company_' .. self.name, {

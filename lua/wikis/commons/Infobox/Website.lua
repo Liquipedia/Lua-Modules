@@ -50,17 +50,7 @@ function Website:createInfobox()
 		Cell{name = 'Launched', content = {args.date_of_launch}},
 		Cell{name = 'Current Status', content = {args.current_status}},
 		Customizable{id = 'custom', children = {}},
-		Builder{
-			builder = function()
-				local links = Links.transform(args)
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = Links.transform(args)},
 		Center{children = {args.footnotes}},
 	}
 

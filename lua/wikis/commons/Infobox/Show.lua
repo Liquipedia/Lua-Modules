@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Links = Lua.import('Module:Links')
+local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local Table = Lua.import('Module:Table')
 
@@ -22,6 +23,7 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ShowInfobox: BasicInfobox
 local Show = Class.new(BasicInfobox)
@@ -62,17 +64,12 @@ function Show:createInfobox()
 			builder = function()
 				local links = Links.transform(args)
 				local secondaryLinks = Show:_addSecondaryLinkDisplay(args)
-				local returnWidgets = {}
-				if (not Table.isEmpty(links)) or (secondaryLinks ~= '') then
-					table.insert(returnWidgets, Title{children = 'Links'})
-				end
-				if not Table.isEmpty(links) then
-					table.insert(returnWidgets, Widgets.Links{links = links})
-				end
-				if secondaryLinks ~= '' then
-					table.insert(returnWidgets, Center{children = {secondaryLinks}})
-				end
-				return returnWidgets
+				return WidgetUtil.collect(
+					Widgets.Links{links = links},
+					-- we only need the title if secondaryLinks isn't empty AND title is not already set by Links Widget
+					Logic.isEmpty(links) and Logic.isNotEmpty(secondaryLinks) and Title{children = 'Links'} or nil,
+					Logic.isNotEmpty(secondaryLinks) and Center{children = {secondaryLinks}} or nil
+				)
 			end
 		},
 		Customizable{id = 'customcontent', children = {}},

@@ -119,16 +119,7 @@ function Expansion:createInfobox()
 			end
 		},
 		Customizable{id = 'custom', children = {}},
-		Builder{
-			builder = function()
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = links},
 		Center{children = {args.footnotes}},
 		Customizable{id = 'chronology', children = {
 				Chronology{args = args, title = self:chronologyTitle(), showTitle = true}

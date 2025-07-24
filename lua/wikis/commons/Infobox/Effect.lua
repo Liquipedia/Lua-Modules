@@ -38,17 +38,7 @@ function Effect:createInfobox()
 		Title{children = 'Effect Information'},
 		Center{children = {args.effect}},
 		Customizable{id = 'custom', children = {}},
-		Builder{
-			builder = function()
-				local links = Links.transform(args)
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = Links.transform(args)},
 		Center{children = {args.footnotes}},
 	}
 
