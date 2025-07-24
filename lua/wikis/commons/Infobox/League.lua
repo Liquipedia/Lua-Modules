@@ -72,7 +72,7 @@ function League:createInfobox()
 		Title{children = 'League Information'},
 		Cell{
 			name = 'Series',
-			content = {
+			children = {
 				self:createSeriesDisplay({
 					displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
 					series = args.series,
@@ -93,13 +93,13 @@ function League:createInfobox()
 		Customizable{
 			id = 'sponsors',
 			children = {
-				Cell{name = 'Sponsor(s)', content = self:getAllArgsForBase(args, 'sponsor')},
+				Cell{name = 'Sponsor(s)', children = self:getAllArgsForBase(args, 'sponsor')},
 			}
 		},
 		Customizable{
 			id = 'gamesettings',
 			children = {
-				Cell{name = 'Server', content = {args.server}}
+				Cell{name = 'Server', children = {args.server}}
 			}
 		},
 		Customizable{id = 'type', children = {
@@ -122,7 +122,7 @@ function League:createInfobox()
 							return {
 								Cell{
 									name = 'Type',
-									content = {
+									children = {
 										mw.language.getContentLanguage():ucfirst(args.type)
 									}
 								}
@@ -137,25 +137,25 @@ function League:createInfobox()
 			shouldSetCategory = self:shouldStore(args),
 		},
 		Venue{args = args},
-		Cell{name = 'Format', content = {args.format}},
+		Cell{name = 'Format', children = {args.format}},
 		Customizable{id = 'prizepool', children = {
 				Cell{
 					name = 'Prize Pool',
-					content = {self.prizepoolDisplay},
+					children = {self.prizepoolDisplay},
 				},
 			},
 		},
 		Customizable{id = 'dates', children = {
-				Cell{name = 'Date', content = {args.date}},
-				Cell{name = 'Start Date', content = {args.sdate}},
-				Cell{name = 'End Date', content = {args.edate}},
+				Cell{name = 'Date', children = {args.date}},
+				Cell{name = 'Start Date', children = {args.sdate}},
+				Cell{name = 'End Date', children = {args.edate}},
 			},
 		},
 		Customizable{id = 'custom', children = {}},
 		Customizable{id = 'liquipediatier', children = {
 				Cell{
 					name = 'Liquipedia Tier',
-					content = {self:createLiquipediaTierDisplay(args)},
+					children = {self:createLiquipediaTierDisplay(args)},
 					classes = {self:liquipediaTierHighlighted(args) and 'valvepremier-highlighted' or ''},
 				},
 			},
