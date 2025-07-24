@@ -34,9 +34,8 @@ function MatchSummaryCasters:render()
 
 	return HtmlWidgets.Div{
 		classes = {'brkts-popup-comment'},
-		css = {['white-space'] = 'normal', ['font-size'] = '85%'},
 		children = WidgetUtil.collect(
-			#casters > 1 and 'Casters: ' or 'Caster: ',
+			HtmlWidgets.B{children = {#casters > 1 and 'Casters: ' or 'Caster: '}},
 			Array.interleave(casters, ', ')
 		),
 	}
