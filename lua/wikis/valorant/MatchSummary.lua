@@ -25,14 +25,14 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 
-	return WidgetUtil.collect(
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		Array.map(match.games, FnUtil.curry(CustomMatchSummary.createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))
-	)
+	)}
 end
 
 

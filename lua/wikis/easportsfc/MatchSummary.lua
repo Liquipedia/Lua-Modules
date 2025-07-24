@@ -29,7 +29,7 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	local hasSubMatches = Logic.readBool((match.extradata or {}).hassubmatches)
 
@@ -40,9 +40,9 @@ function CustomMatchSummary.createBody(match)
 		return CustomMatchSummary._createGame(game)
 	end)
 
-	return WidgetUtil.collect(
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		games
-	)
+	)}
 end
 
 ---@param game MatchGroupUtilGame

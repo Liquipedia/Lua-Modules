@@ -30,16 +30,16 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
-	return WidgetUtil.collect(
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		Array.map(match.games, FnUtil.curry(CustomMatchSummary._createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {emptyMapDisplay = FP}))
-	)
+	)}
 end
 
 ---@param date string

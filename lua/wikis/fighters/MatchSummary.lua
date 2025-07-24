@@ -48,7 +48,7 @@ function CustomMatchSummary._isSolo(match)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	local games = Array.map(match.games, function(game)
 		return CustomMatchSummary._createStandardGame(game, {
@@ -58,9 +58,9 @@ function CustomMatchSummary.createBody(match)
 		})
 	end)
 
-	return WidgetUtil.collect(
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		games
-	)
+	)}
 end
 
 ---@param game MatchGroupUtilGame

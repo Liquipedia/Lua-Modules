@@ -30,14 +30,14 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
-	return WidgetUtil.collect(
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		Array.map(match.games, CustomMatchSummary._createGame),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	)
+	)}
 end
 
 ---@param players table[]

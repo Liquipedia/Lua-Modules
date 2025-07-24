@@ -53,7 +53,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget[]
+---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	if Logic.isNotEmpty(match.extradata.status) then
 		match.stream = {rawdatetime = true}
@@ -62,11 +62,11 @@ function CustomMatchSummary.createBody(match)
 	if match.extradata.status then
 		matchStatusText = '<b>Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '</b>'
 	end
-	return WidgetUtil.collect(
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		Array.map(match.games, CustomMatchSummary._createMap),
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
 		MatchSummaryWidgets.MatchComment{children = matchStatusText} or nil
-	)
+	)}
 end
 
 ---@param match MatchGroupUtilMatch
