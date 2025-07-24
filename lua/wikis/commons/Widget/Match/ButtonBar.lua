@@ -26,6 +26,7 @@ local SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE = 2 * 60 * 60 -- 2 hours in seconds
 ---@class MatchButtonBarProps
 ---@field match MatchGroupUtilMatch
 ---@field showVods boolean?
+---@field buttonStyle? 'primary' | 'secondary'
 
 ---@class MatchButtonBar: Widget
 ---@operator call(MatchButtonBarProps): MatchButtonBar
@@ -33,6 +34,7 @@ local SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE = 2 * 60 * 60 -- 2 hours in seconds
 local MatchButtonBar = Class.new(Widget)
 MatchButtonBar.defaultProps = {
 	showVods = true,
+	buttonStyle = 'secondary',
 }
 
 ---@return Widget?
@@ -83,6 +85,7 @@ function MatchButtonBar:render()
 		children = WidgetUtil.collect(
 			MatchPageButton{
 				match = match,
+				buttonStyle = self.props.buttonStyle,
 			},
 			displayStreams and StreamsContainer{
 				streams = StreamLinks.filterStreams(match.stream),
