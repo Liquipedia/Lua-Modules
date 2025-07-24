@@ -170,7 +170,9 @@ end
 function Match:create()
 	self.root
 		:node(self.headerElement)
-		:node(MatchSummaryWidgets.Body{children = WidgetUtil.collect(self.bodyElement, self.commentElement, self.footerElement)})
+		:node(
+			MatchSummaryWidgets.Body{children = WidgetUtil.collect(self.bodyElement, self.commentElement, self.footerElement)}
+		)
 		:node(self.buttonElement)
 
 	return self.root
@@ -188,7 +190,7 @@ MatchSummary.Footer = Footer
 MatchSummary.Match = Match
 
 ---@param width string?
----@return MatchSummary
+---@return MatchSummry
 function MatchSummary:init(width)
 	self.matches = {}
 	self.root = mw.html.create('div')
