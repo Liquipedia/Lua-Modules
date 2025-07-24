@@ -53,8 +53,6 @@ local KING_ICONS = {
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
-		:css('overflow', 'auto')
-		:css('max-height', '70vh')
 end
 
 ---@param match table
@@ -84,14 +82,6 @@ function CustomMatchSummary.createGame(game, gameIndex)
 
 			-- Center
 			MatchSummaryWidgets.GameCenter{
-				css = {
-					['text-align'] = 'center',
-					['align-content'] = 'center',
-					['min-height'] = '1.5rem',
-					['font-size'] = '85%',
-					['line-height'] = '0.75rem',
-					['max-width'] = '200px'
-				},
 				children = CustomMatchSummary._getCenterContent(game, gameIndex),
 			},
 
@@ -121,7 +111,6 @@ function CustomMatchSummary._getCenterContent(game, gameIndex)
 			},
 			Span{
 				classes = {'brkts-popup-spaced'},
-				css = {['font-size'] = '85%'},
 				children = {Eco.getName(game.extradata.eco, true)},
 			},
 		},
@@ -133,7 +122,6 @@ end
 function CustomMatchSummary._getSideIcon(gameOpponent)
 	return Div{
 		classes = {'brkts-popup-spaced'},
-		css = {['padding'] = '0px 4px'},
 		children = KING_ICONS[gameOpponent.color],
 	}
 end
@@ -146,7 +134,6 @@ function CustomMatchSummary._getHeader(game)
 			children = game.header,
 			css = {
 				['font-weight'] = 'bold',
-				['font-size'] = '85%',
 				margin = 'auto'
 			}
 		},
