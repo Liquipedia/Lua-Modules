@@ -63,7 +63,7 @@ function Cell:render()
 		return Logic.nilIfEmpty(renderedChild)
 	end)
 
-	if Array.all(mappedChildren, Logic.isEmpty) then
+	if Logic.isNotEmpty(mappedChildren) then
 		return
 	end
 
