@@ -1,10 +1,3 @@
----
--- @Liquipedia
--- page=Module:TestAssets/TeamTemplate/Data
---
--- Please see https://github.com/Liquipedia/Lua-Modules to contribute
---
-
 local aliases = {
 	mousesports = 'mouz',
 	tl = 'team liquid',
