@@ -263,6 +263,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field winner number?
 ---@field extradata table?
 ---@field timestamp number
+---@field timezoneId string?
 ---@field bestof number?
 MatchGroupUtil.types.Match = TypeUtil.struct({
 	bracketData = MatchGroupUtil.types.BracketData,
@@ -565,6 +566,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		stream = Json.parseIfString(record.stream) or {},
 		tickername = record.tickername,
 		timestamp = tonumber(Table.extract(extradata, 'timestamp')),
+		timezoneId = Table.extract(extradata, 'timezoneid'),
 		tournament = record.tournament,
 		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),

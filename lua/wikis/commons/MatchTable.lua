@@ -78,7 +78,6 @@ local SECONDS_ONE_DAY = 3600 * 24
 ---@field linkSubPage boolean
 
 ---@class MatchTableMatch: MatchGroupUtilMatch
----@field timezone string
 ---@field displayName string
 ---@field pageName string
 ---@field vods {index: number, link: string}[]
@@ -414,7 +413,6 @@ function MatchTable:matchFromRecord(record)
 
 	---@type MatchTableMatch
 	local match = Table.merge({
-		timezone = record.extradata.timezoneid or UTC,
 		displayName = String.nilIfEmpty(record.tournament) or record.pagename:gsub('_', ' '),
 		pageName = record.pagename,
 		vods = self:vodsFromRecord(record),
@@ -672,7 +670,7 @@ function MatchTable:_displayDate(match)
 	return cell:node(Countdown._create{
 		timestamp = match.timestamp,
 		finished = true,
-		date = MatchTable._calculateDateTimeString(match.timezone, match.timestamp),
+		date = MatchTable._calculateDateTimeString(match.timezoneId or UTC, match.timestamp),
 		rawdatetime = true,
 	} or nil)
 end
