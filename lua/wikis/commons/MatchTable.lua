@@ -79,7 +79,6 @@ local SECONDS_ONE_DAY = 3600 * 24
 
 ---@class MatchTableMatch: MatchGroupUtilMatch
 ---@field timezone string
----@field timeIsExact boolean
 ---@field displayName string
 ---@field pageName string
 ---@field vods {index: number, link: string}[]
@@ -416,7 +415,6 @@ function MatchTable:matchFromRecord(record)
 	---@type MatchTableMatch
 	local match = Table.merge({
 		timezone = record.extradata.timezoneid or UTC,
-		timeIsExact = Logic.readBool(record.dateexact),
 		displayName = String.nilIfEmpty(record.tournament) or record.pagename:gsub('_', ' '),
 		pageName = record.pagename,
 		vods = self:vodsFromRecord(record),
@@ -667,7 +665,7 @@ function MatchTable:_displayDate(match)
 		return cell
 	end
 
-	if not match.timeIsExact then
+	if not match.dateIsExact then
 		return cell:node(DateExt.formatTimestamp('M d, Y', match.timestamp))
 	end
 
