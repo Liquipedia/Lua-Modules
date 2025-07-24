@@ -38,13 +38,18 @@ local STAY22_LINK = 'https://www.stay22.com/allez/roam?aid=liquipedia&campaign=$
 	'&address=${address}&checkin=${checkin}&checkout=${checkout}'
 
 local Widgets = Lua.import('Module:Widget/All')
-local Cell = Widgets.Cell
-local Header = Widgets.Header
-local Title = Widgets.Title
-local Center = Widgets.Center
-local Customizable = Widgets.Customizable
+local Accommodation = Widgets.Accommodation
 local Builder = Widgets.Builder
+local Cell = Widgets.Cell
+local Center = Widgets.Center
 local Chronology = Widgets.Chronology
+local Customizable = Widgets.Customizable
+local Header = Widgets.Header
+local Location = Widgets.Location
+local Organizers = Widgets.Organizers
+local Title = Widgets.Title
+local Venue = Widgets.Venue
+
 local Button = Lua.import('Module:Widget/Basic/Button')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
@@ -150,12 +155,10 @@ function League:createInfobox()
 				}
 			}
 		},
-		Customizable{id = 'location', children = {Cell{
-			name = 'Location',
-			content = {
-				self:_createLocation(args)
-			}
-		}}},
+		Location{
+			args = args,
+			shouldSetCategory = self:shouldStore(args),
+		},
 		Builder{
 			builder = function()
 				local venues = Array.map(League._parseVenues(args), function(venue)
