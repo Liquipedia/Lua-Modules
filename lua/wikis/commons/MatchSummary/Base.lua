@@ -190,7 +190,7 @@ MatchSummary.Footer = Footer
 MatchSummary.Match = Match
 
 ---@param width string?
----@return MatchSummry
+---@return MatchSummary
 function MatchSummary:init(width)
 	self.matches = {}
 	self.root = mw.html.create('div')
