@@ -126,7 +126,7 @@ end
 ---@return string?
 function CharacterGameTable:getSideClass(extradata, opponentIndex)
 	local side = extradata['team' .. opponentIndex .. 'side']
-	return Logic.isNotEmpty(side) and 'brkts-popup-side-color-' .. side or nil
+	return Logic.isNotEmpty(side) and 'brkts-popup-side-color brkts-popup-side-color--' .. side or nil
 end
 
 ---@return string
