@@ -325,11 +325,7 @@ end
 ---@return Html
 function MatchesTable.matchPageLinkDisplay(match)
 	return mw.html.create('td'):addClass('MatchPage')
-		:node(MatchPageButton{
-			matchId = match.matchId,
-			hasMatchPage = Logic.isNotEmpty(match.bracketData.matchPage),
-			short = false,
-		})
+		:node(MatchPageButton{match = match})
 end
 
 ---@param opponent standardOpponent

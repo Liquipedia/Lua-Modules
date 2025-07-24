@@ -19,7 +19,7 @@ local Variables = Lua.import('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Flags = Lua.import('Module:Flags')
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extension/PrizePool')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')

@@ -52,6 +52,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	Variables.varDefine(redirectedTeam .. '_' .. lpdbPrefix .. 'date', lpdbData.date)
 	Variables.varDefine(lpdbPrefix .. (redirectedTeam:lower()) .. '_prizepoints', lpdbData.extradata.prizepoints)
+	Variables.varDefine(lpdbPrefix .. (redirectedTeam:lower()) .. '_prizepoints2', lpdbData.extradata.prizepoints2)
 
 
 	return lpdbData

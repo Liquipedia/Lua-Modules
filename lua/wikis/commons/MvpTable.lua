@@ -195,7 +195,6 @@ function MvpTable._row(item, args)
 				pageName = item.name,
 				team = item.team and TeamTemplate.resolve(item.team, DateExt.getContextualDateOrNow()) or nil,
 			}}},
-			showLink = true,
 			overflow = 'ellipsis',
 			showPlayerTeam = true,
 		}):done()

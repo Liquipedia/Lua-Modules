@@ -724,8 +724,8 @@ function MatchTable:_displayTier(match)
 
 	if not Tier.isValid(tier, tierType) then
 		return mw.html.create('td')
-			:attr('data-sort-value', INVALID_TIER_DISPLAY)
-			:wikitext(INVALID_TIER_SORT)
+			:attr('data-sort-value', INVALID_TIER_SORT)
+			:wikitext(INVALID_TIER_DISPLAY)
 	end
 
 	return mw.html.create('td')
@@ -871,12 +871,7 @@ end
 function MatchTable:_displayMatchPage(match)
 	if not self.config.showMatchPage then return end
 
-	return mw.html.create('td')
-		:node(MatchPageButton{
-			matchId = match.matchId,
-			hasMatchPage = match.hasMatchPage,
-			short = false,
-		})
+	return mw.html.create('td'):node(MatchPageButton{match = match.matchId})
 end
 
 ---@param winner any

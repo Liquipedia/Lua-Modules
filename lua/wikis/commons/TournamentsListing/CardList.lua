@@ -11,8 +11,10 @@ local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Currency = Lua.import('Module:Currency')
+local DateExt = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
 local Game = Lua.import('Module:Game')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
@@ -29,6 +31,10 @@ local Conditions = Lua.import('Module:TournamentsListing/Conditions')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Tier = Lua.import('Module:Tier/Custom')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+
+local DEFAULT_START_YEAR = Info.startYear
+local DEFAULT_END_YEAR = DateExt.getYearOf()
 local LANG = mw.getContentLanguage()
 local NONBREAKING_SPACE = '&nbsp;'
 local POSTPONED = 'postponed'
@@ -40,6 +46,35 @@ local DEFAULT_LIMIT = 5000
 --- @class BaseTournamentsListing
 --- @operator call(...): BaseTournamentsListing
 local BaseTournamentsListing = Class.new(function(self, ...) self:init(...) end)
+
+---@param args table
+---@return Widget?
+function BaseTournamentsListing.byYear(args)
+	args = args or {}
+
+	args.order = 'enddate desc'
+
+	local subPageName = mw.title.getCurrentTitle().subpageText
+	local fallbackYearData = {}
+	if subPageName:find('%d%-%d') then
+		fallbackYearData = mw.text.split(subPageName, '-')
+	end
+
+	local startYear = tonumber(args.startYear) or tonumber(fallbackYearData[1]) or DEFAULT_START_YEAR
+	local endYear = tonumber(args.endYear) or tonumber(fallbackYearData[2]) or DEFAULT_END_YEAR
+
+	local children = {}
+	Array.forEach(Array.reverse(Array.range(startYear, endYear)), function(year)
+		local tournaments = BaseTournamentsListing(Table.merge(args, {year = year})):create():build()
+		if not tournaments then return end
+		Array.appendWith(children,
+			HtmlWidgets.H3{children = year},
+			tournaments
+		)
+	end)
+
+	return HtmlWidgets.Fragment{children = children}
+end
 
 ---@param args table
 ---@return self

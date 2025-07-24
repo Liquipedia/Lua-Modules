@@ -5,24 +5,25 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchTicker = require('Module:MatchTicker/Custom')
-local PlayerIntroduction = require('Module:PlayerIntroduction/Custom')
-local Region = require('Module:Region')
-local SignaturePlayerAgents = require('Module:SignaturePlayerAgents')
-local String = require('Module:StringUtils')
-local Team = require('Module:Team')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
+local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
+local Region = Lua.import('Module:Region')
+local SignaturePlayerAgents = Lua.import('Module:SignaturePlayerAgents')
+local String = Lua.import('Module:StringUtils')
+local Team = Lua.import('Module:Team')
+local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
@@ -55,8 +56,8 @@ function CustomPlayer.run(frame)
 			player = player.pagename,
 			team = args.team,
 			name = args.romanized_name or args.name,
-			first_name = args.first_name,
-			last_name = args.last_name,
+			firstname = args.first_name,
+			lastname = args.last_name,
 			status = args.status,
 			type = player:getPersonType(args).store,
 			roles = player._getKeysOfRoles(player.roles),

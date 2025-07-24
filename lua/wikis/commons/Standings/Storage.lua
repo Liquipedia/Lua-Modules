@@ -321,7 +321,7 @@ function StandingsStorage.fromTemplateEntry(frame)
 		end
 	end
 
-	data.opponent = Opponent.resolve(Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd(), date)
+	data.opponent = Opponent.resolve(Opponent.readOpponentArgs(opponentArgs), date)
 
 	if (data.placement or ''):lower() == DISQUALIFIED then
 		data.definitestatus = DISQUALIFIED

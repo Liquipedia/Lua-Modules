@@ -5,11 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
+local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -30,11 +30,9 @@ end
 ---@param createGame fun(date: string, game: table, gameIndex: integer): Widget
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match, createGame)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.games, FnUtil.curry(createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}

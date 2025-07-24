@@ -20,13 +20,15 @@ function HighlightConditions.tournament(data, options)
 	data.extradata = data.extradata or {}
 	options = options or {}
 
+	local publishertier = data.publishertier or data.publisherTier
+
 	if options.onlyHighlightOnValue then
-		return data.publishertier == options.onlyHighlightOnValue
+		return publishertier == options.onlyHighlightOnValue
 	end
 
 	return Logic.nilOr(
-		Logic.readBoolOrNil(data.publishertier),
-		String.isNotEmpty(data.publishertier) or nil,
+		Logic.readBoolOrNil(publishertier),
+		String.isNotEmpty(publishertier) or nil,
 		String.isNotEmpty(data.extradata.publisherpremier)
 	)
 end

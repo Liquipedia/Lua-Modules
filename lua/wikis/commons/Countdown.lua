@@ -60,10 +60,6 @@ function Countdown._create(args)
 		wrapper:attr('data-hasstreams', 'true')
 	end
 
-	if Logic.readBool(args.showCompleted) then
-		wrapper:attr('data-show-completed', 'true')
-	end
-
 	if args.text then
 		wrapper:attr('data-countdown-end-text', args.text)
 	end

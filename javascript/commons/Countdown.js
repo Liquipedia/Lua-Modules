@@ -128,13 +128,6 @@ liquipedia.countdown = {
 		countdownElem.innerHTML = html;
 	},
 	getCountdownStringAndClassName: function ( timerObjectNode ) {
-		if ( timerObjectNode.dataset.finished === 'finished' && timerObjectNode.dataset.showCompleted === 'true' ) {
-			return {
-				text: 'COMPLETED',
-				className: 'timer-object-countdown-completed'
-			};
-		}
-
 		const differenceInSeconds =
 			Math.floor( parseInt( timerObjectNode.dataset.timestamp ) - ( Date.now().valueOf() / 1000 ) );
 

@@ -58,7 +58,6 @@ function StarcraftMatchSummary.createBody(match)
 			css = {['line-height'] = '80%', ['font-weight'] = 'bold'},
 			children = {'Reset match'},
 		} or nil,
-		match.dateIsExact and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.opponents, StarcraftMatchSummary.advantageOrPenalty),
 		subMatches and Array.map(subMatches, StarcraftMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(StarcraftMatchSummary.Game, {})),

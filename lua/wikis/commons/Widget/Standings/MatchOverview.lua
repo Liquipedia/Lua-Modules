@@ -45,7 +45,6 @@ function MatchOverviewWidget:render()
 			HtmlWidgets.Span{
 				children = OpponentDisplay.BlockOpponent{
 					opponent = opponent,
-					showLink = true,
 					overflow = 'ellipsis',
 					teamStyle = 'icon',
 				}

@@ -5,16 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Namespace = Lua.import('Module:Namespace')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Chronology = Widgets.Chronology
 local Title = Widgets.Title
@@ -56,10 +56,8 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Piston Stroke', content = {args.stroke}}
 		)
 	elseif id == 'customcontent' then
-		if String.isEmpty(args.previous) and String.isEmpty(args.next) then return widgets end
 		return {
-			Title{children = 'Chronology'},
-			Chronology{links = {previous = args.previous, next = args.next}}
+			Chronology{args = args, showTitle = true}
 		}
 	end
 	return widgets

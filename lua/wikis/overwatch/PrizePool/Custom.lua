@@ -5,14 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
-local Variables = require('Module:Variables')
+
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Variables = Lua.import('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool')
-local OpponentLibrary = require('Module:OpponentLibraries')
+local OpponentLibrary = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
@@ -52,6 +53,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	local participantLower = mw.ustring.lower(lpdbData.participant)
 
 	Variables.varDefine(participantLower .. '_prizepoints', lpdbData.extradata.prizepoints)
+	Variables.varDefine(participantLower .. '_prizepoints2', lpdbData.extradata.prizepoints2)
 	lpdbData.qualified = placement:getPrizeRewardForOpponent(opponent, 'QUALIFIES1') and 1 or 0
 
 	if Opponent.isTbd(opponent.opponentData) then

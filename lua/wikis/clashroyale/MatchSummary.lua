@@ -8,13 +8,11 @@
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
-local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
@@ -40,8 +38,6 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
 	local isTeamGame = Array.any(match.opponents, function(opponent) return opponent.type == Opponent.team end)
 	local games
 	if isTeamGame then
@@ -53,7 +49,6 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		games,
 		MatchSummaryWidgets.Mvp(match.extradata.mvp)
 	)}
