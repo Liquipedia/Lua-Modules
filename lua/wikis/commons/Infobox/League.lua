@@ -207,23 +207,6 @@ function League:createInfobox()
 		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
 end
 
----@param args table
----@return {id: string?, name: string?, link: string?, description: string?}[]
-function League._parseVenues(args)
-	local venues = {}
-	for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue', {requireIndex = false}) do
-		local name = args[prefix .. 'name']
-		local link = args[prefix .. 'link']
-		local description
-		if String.isNotEmpty(args[prefix .. 'desc']) then
-			description = String.interpolate(VENUE_DESCRIPTION, {desc = args[prefix .. 'desc']})
-		end
-
-		table.insert(venues, {id = venueName, name = name, link = link, description = description})
-	end
-	return venues
-end
-
 function League:_parseArgs()
 	local args = self.args
 
@@ -547,46 +530,6 @@ function League:_getNamedTableofAllArgsForBase(args, base)
 	return namedArgs
 end
 
----
--- Format:
--- {
---	region: Region or continent
---	country: the country
---	location: the city or place
--- }
----@param args table
----@return string
-function League:_createLocation(args)
-	if String.isEmpty(args.country) then
-		return Template.safeExpand(mw.getCurrentFrame(), 'Abbr/TBD')
-	end
-
-	local display = {}
-	args.city1 = args.city1 or args.location1 or args.city or args.location
-
-	for _, country, index in Table.iter.pairsByPrefix(args, 'country', {requireIndex = false}) do
-		local nationality = Flags.getLocalisation(country)
-
-		if String.isEmpty(nationality) then
-			self:categories('Unrecognised Country')
-
-		else
-			local location = args['city' .. index] or args['location' .. index]
-			local countryName = Flags.CountryName{flag = country}
-			local displayText = location or countryName
-			if String.isEmpty(displayText) then
-				displayText = country
-			end
-
-			if self:shouldStore(args) then
-				self:categories(nationality .. ' Tournaments')
-			end
-			table.insert(display, Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' .. displayText .. '<br>')
-		end
-	end
-	return table.concat(display)
-end
-
 ---@param seriesArgs {displayManualIcons:boolean, series:string?, abbreviation:string?, icon:string?, iconDark:string?}
 ---@param iconDisplay string?
 ---@return string?
@@ -653,6 +596,7 @@ function League:_createSeriesIcon(iconArgs)
 	return output == LeagueIcon.display{} and '' or output
 end
 
+--- used in brawlstars, chess, counterstrike customs
 ---@param id string?
 ---@param name string?
 ---@param link string?
@@ -692,18 +636,6 @@ function League:createLink(id, name, link, desc)
 	end
 
 	return output
-end
-
----@param args table
----@return string[]
-function League:_createOrganizers(args)
-	local organizers = {}
-
-	for prefix, organizer in Table.iter.pairsByPrefix(args, 'organizer', {requireIndex = false}) do
-		table.insert(organizers, self:createLink(organizer, args[prefix .. '-name'], args[prefix .. '-link']))
-	end
-
-	return organizers
 end
 
 ---@param date string?
