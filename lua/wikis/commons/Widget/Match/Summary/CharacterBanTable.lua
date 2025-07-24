@@ -15,7 +15,7 @@ local Icon = Lua.import('Module:Icon')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Abbr, Tr, Th, Td = HtmlWidgets.Abbr, HtmlWidgets.Tr, HtmlWidgets.Th, HtmlWidgets.Td
+local Tr, Th, Td = HtmlWidgets.Tr, HtmlWidgets.Th, HtmlWidgets.Td
 local Characters = Lua.import('Module:Widget/Match/Summary/Characters')
 local Collapsible = Lua.import('Module:Widget/Match/Summary/Collapsible')
 local WidgetUtil = Lua.import('Module:Widget/Util')
