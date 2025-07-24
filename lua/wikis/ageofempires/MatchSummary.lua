@@ -41,7 +41,7 @@ function CustomMatchSummary._determineWidth(match)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
 	local games = Array.map(match.games, function(game)
 		return CustomMatchSummary._createGame(game, {
@@ -50,9 +50,9 @@ function CustomMatchSummary.createBody(match)
 		})
 	end)
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+	return WidgetUtil.collect(
 		games
-	)}
+	)
 end
 
 ---@param match MatchGroupUtilMatch

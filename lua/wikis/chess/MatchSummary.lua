@@ -59,12 +59,12 @@ end
 
 ---@param match table
 ---@param createGame fun(date: string, game: table, gameIndex: integer): Widget
----@return Widget
+---@return Widget[]
 function CustomMatchSummary.createBody(match, createGame)
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+	return WidgetUtil.collect(
 		Array.map(match.games, createGame),
 		CustomMatchSummary._linksTable(match)
-	)}
+	)
 end
 
 ---@param game MatchGroupUtilGame
