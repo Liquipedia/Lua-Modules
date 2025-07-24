@@ -15,7 +15,7 @@ local Icon = Lua.import('Module:Icon')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Abbr, Tr, Th, Td = HtmlWidgets.Abbr, HtmlWidgets.Tr, HtmlWidgets.Th, HtmlWidgets.Td
+local Tr, Th, Td = HtmlWidgets.Tr, HtmlWidgets.Th, HtmlWidgets.Td
 local Characters = Lua.import('Module:Widget/Match/Summary/Characters')
 local Collapsible = Lua.import('Module:Widget/Match/Summary/Collapsible')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -71,10 +71,7 @@ function MatchSummaryCharacterBanTable:render()
 				} or nil,
 				Td{
 					classes = {'brkts-popup-mapveto__ban-round-title'},
-					children = {Abbr{
-						title = 'Bans in game ' .. gameNumber,
-						children = {'Game ' .. gameNumber},
-					}}
+					children = {'Game&nbsp;' .. gameNumber},
 				},
 				hasStartIndicator and Td{
 					children = {startIndicator(2, banData.start)}
