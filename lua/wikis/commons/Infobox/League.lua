@@ -184,96 +184,12 @@ function League:createInfobox()
 		Customizable{id = 'chronology', children = {
 			Chronology{args = args, showTitle = true},
 		}},
-		Builder{
-			builder = function()
-				local startDate, endDate = self.data.startDate, self.data.endDate
-				if not startDate or not endDate then
-					return
-				end
-				local onlineOrOffline = tostring(args.type or ''):lower()
-				if not onlineOrOffline:match('offline') then
-					return
-				end
-				local locations = Locale.formatLocations(args)
-				-- If more than one city, don't show the accommodation section, as it is unclear which one the link is for
-				if locations.city2 then
-					return
-				end
-				-- Must have a venue or a city to show the accommodation section
-				if not locations.venue1 and not locations.city1 then
-					return
-				end
-
-				local function invalidLocation(location)
-					-- Not allowed to contain HTML Tags
-					return (location or ''):lower():match('<')
-				end
-				if invalidLocation(locations.venue1) or invalidLocation(locations.city1) then
-					return
-				end
-
-				-- if the event is finished do not show the button
-				local osdateCutoff = DateExt.parseIsoDate(endDate)
-				osdateCutoff.day = osdateCutoff.day + 1
-				if os.difftime(os.time(), os.time(osdateCutoff)) > 0 then
-					return
-				end
-
-				local addressParts = {}
-				-- Only add the venue if there is exactly one venue, otherwise we'll only use the city + country
-				table.insert(addressParts, not locations.venue2 and locations.venue1 or nil)
-				table.insert(addressParts, locations.city1)
-				table.insert(addressParts, Flags.CountryName{flag = locations.country1 or locations.region1})
-
-				-- Start date for the accommodation should be the day before the event, but at most 4 days before the event
-				-- End date for the accommodation should be 1 day after the event
-				local osdateEnd = DateExt.parseIsoDate(endDate)
-				osdateEnd.day = osdateEnd.day + 1
-				local osdateFictiveStart = DateExt.parseIsoDate(endDate)
-				osdateFictiveStart.day = osdateFictiveStart.day - 4
-				local osdateRealStart = DateExt.parseIsoDate(startDate)
-				osdateRealStart.day = osdateRealStart.day - 1
-
-				local osdateStart
-				if os.difftime(os.time(osdateFictiveStart), os.time(osdateRealStart)) > 0 then
-					osdateStart = osdateFictiveStart
-				else
-					osdateStart = osdateRealStart
-				end
-
-				local function buildStay22Link(address, checkin, checkout)
-					return String.interpolate(STAY22_LINK, {
-						wiki = Info.wikiName,
-						page = self.data.name,
-						address = address,
-						checkin = checkin,
-						checkout = checkout,
-					})
-				end
-
-				return {
-					Title{children = 'Accommodation'},
-					Center{children = {
-						Button{
-							linktype = 'external',
-							variant = 'primary',
-							size = 'md',
-							link = buildStay22Link(
-								table.concat(addressParts, ', '),
-								DateExt.toYmdInUtc(osdateStart),
-								DateExt.toYmdInUtc(osdateEnd)
-							),
-							children = {
-								IconFa{iconName = 'accommodation'},
-								' ',
-								'Find My Accommodation',
-							}
-						},
-						Center{children = 'Bookings earn Liquipedia a small commission.'}
-					}}
-				}
-			end
-		}
+		Accommodation{
+			args = args,
+			startDate = self.data.startDate,
+			endDate = self.data.endDate,
+			name = self.data.name,
+		},
 	}
 
 	self.name = TextSanitizer.stripHTML(self.name)
