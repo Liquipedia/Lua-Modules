@@ -46,7 +46,10 @@ function Cell:render()
 
 	local options = self.props.options
 
-	local mappedChildren = Array.map(self.props.children, function(child)
+	-- map children to strings so we can add widgets (which potentially render empty) without getting empty cells displayed
+	local children = Array.map(self.props.children, tostring)
+
+	local mappedChildren = Array.map(children, function(child)
 		if options.makeLink then
 			return Link{children = {child}, link = child}
 		else

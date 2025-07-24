@@ -22,6 +22,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 local Chronology = Widgets.Chronology
+local SeriesDisplay = Widgets.SeriesDisplay
 
 local DEFAULT_MODE = 'solo'
 
@@ -168,10 +169,10 @@ end
 function CustomLeague:_createCircuitLink()
 	local args = self.args
 
-	return self:createSeriesDisplay({
+	return SeriesDisplay{
 		displayManualIcons = true,
 		series = args.circuit,
-	})
+	}
 end
 
 return CustomLeague
