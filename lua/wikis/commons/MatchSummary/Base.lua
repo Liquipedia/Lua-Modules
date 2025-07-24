@@ -170,9 +170,7 @@ end
 function Match:create()
 	self.root
 		:node(self.headerElement)
-		:node(self.bodyElement)
-		:node(self.commentElement)
-		:node(self.footerElement)
+		:node(MatchSummaryWidgets.Body{children = {self.bodyElement, self.commentElement, self.footerElement}})
 		:node(self.buttonElement)
 
 	return self.root
@@ -257,13 +255,13 @@ end
 -- Default body function
 ---@param match MatchGroupUtilMatch
 ---@param createGame fun(date: string, game: table, gameIndex: integer): Widget
----@return Widget
+---@return Widget[]
 function MatchSummary.createDefaultBody(match, createGame)
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+	return WidgetUtil.collect(
 		Array.map(match.games, FnUtil.curry(createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))
-	)}
+	)
 end
 
 ---Default footer function
