@@ -62,8 +62,8 @@ function StarcraftMatchSummary.createBody(match)
 		subMatches and Array.map(subMatches, StarcraftMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(StarcraftMatchSummary.Game, {})),
 		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
-			classes = {'brkts-popup-sc-game-header brkts-popup-sc-veto-center'},
-			children = {'Vetoes'},
+			classes = {'brkts-popup-sc-veto-center'},
+			children = {HtmlWidgets.B{children = {'Vetoes'}}},
 		} or nil,
 		Array.map(match.vetoes or {}, StarcraftMatchSummary.Veto) or nil
 	)}

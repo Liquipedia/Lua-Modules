@@ -64,8 +64,8 @@ function CustomMatchSummary.createBody(match)
 		subMatches and Array.map(subMatches, CustomMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(CustomMatchSummary.Game, {hasHeroes = hasHeroes})),
 		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
-			classes = {'brkts-popup-sc-game-header brkts-popup-sc-veto-center'},
-			children = {'Vetoes'},
+			classes = {'brkts-popup-sc-veto-center'},
+			children = {HtmlWidgets.B{children = {'Vetoes'}}},
 		} or nil,
 		Array.map(match.vetoes or {}, CustomMatchSummary.Veto) or nil
 	)}
