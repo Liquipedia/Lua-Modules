@@ -53,8 +53,6 @@ local KING_ICONS = {
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
-		:css('overflow', 'auto')
-		:css('max-height', '70vh')
 end
 
 ---@param match table
