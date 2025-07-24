@@ -26,11 +26,11 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return MatchSummaryBody
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+	return WidgetUtil.collect(
 		CustomMatchSummary._isSolo(match) and Array.map(match.games, CustomMatchSummary._createGame) or nil
-	)}
+	)
 end
 
 ---@param match MatchGroupUtilMatch
