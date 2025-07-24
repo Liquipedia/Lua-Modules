@@ -621,6 +621,11 @@ div.brkts-popup-body-element-thumbs {
 			height: 1.5rem;
 			border-radius: 0.25rem;
 
+			@media ( max-width: 768px ) {
+				width: 1.25rem;
+				height: 1.25rem;
+			}
+
 			&:hover {
 				height: unset;
 				border: 0.0625rem solid #ffffff;
@@ -966,21 +971,9 @@ div.brkts-popup-body-element-thumbs {
 }
 
 .brkts-champion-icon img {
-	height: 24px;
-	width: 24px;
 	object-fit: cover;
 
 	@media ( max-width: 768px ) {
-		height: 20px;
-		width: 20px;
-		object-fit: cover;
-	}
-}
-
-@media only screen and ( max-width: 768px ) {
-	img.brkts-champion-icon {
-		height: 20px;
-		width: 20px;
 		object-fit: cover;
 	}
 }
