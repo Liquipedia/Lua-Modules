@@ -5,7 +5,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
@@ -35,7 +34,7 @@ local CONTENT = {
 		heading = 'Transfers',
 		body = TransfersList{
 			transferQuery = false,
-			transferPage = 'Player Transfers/' .. os.date('%Y') 
+			transferPage = 'Player Transfers/' .. os.date('%Y')
 		},
 		boxid = 1509,
 	},
