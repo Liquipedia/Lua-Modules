@@ -71,10 +71,7 @@ function MatchSummaryCharacterBanTable:render()
 				} or nil,
 				Td{
 					classes = {'brkts-popup-mapveto__ban-round-title'},
-					children = {Abbr{
-						title = 'Bans in game ' .. gameNumber,
-						children = {'Game ' .. gameNumber},
-					}}
+					children = {'Game&nbsp;' .. gameNumber},
 				},
 				hasStartIndicator and Td{
 					children = {startIndicator(2, banData.start)}
