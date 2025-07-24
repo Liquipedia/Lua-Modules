@@ -56,7 +56,7 @@ function CustomMatchSummary._createMapRow(game)
 			MatchSummaryWidgets.Characters{
 				flipped = opponentIndex == 2,
 				characters = characterData,
-				bg = 'brkts-popup-side-color-' .. teamColor,
+				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. teamColor,
 			},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
 			DisplayHelper.MapScore(game.opponents[opponentIndex], game.status)

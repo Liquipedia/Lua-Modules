@@ -275,7 +275,7 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 		local cardDisplays = {}
 		for _, card in ipairs(cardData) do
 			table.insert(cardDisplays, mw.html.create('div')
-				:addClass('brkts-popup-side-color-' .. color)
+				:addClass('brkts-popup-side-color brkts-popup-side-color--' .. color)
 				:addClass('brkts-champion-icon')
 				:node(CharacterIcon.Icon{
 					character = card,
@@ -304,7 +304,7 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 			local towerCardDisplay = mw.html.create('div')
 					:addClass('brkts-popup-body-element-thumbs')
 					:tag('div')
-						:addClass('brkts-popup-side-color-' .. color)
+						:addClass('brkts-popup-side-color brkts-popup-side-color--' .. color)
 						:addClass('brkts-champion-icon')
 						:node(CharacterIcon.Icon{
 							character = cardData.tower,

@@ -200,7 +200,7 @@ function CustomMatchSummary.DisplayHeroes(opponent, options)
 				children = MatchSummaryWidgets.Characters{
 					flipped = options.flipped,
 					characters = heroes,
-					bg = 'brkts-popup-side-color-' .. (options.flipped and 'blue' or 'red'),
+					bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (options.flipped and 'blue' or 'red'),
 				},
 			}
 		end)

@@ -65,7 +65,7 @@ function CustomMatchSummary._createGame(date, game)
 				flipped = false,
 				date = date,
 				characters = characterData[1],
-				bg = 'brkts-popup-side-color-' .. (extradata.team1side or ''),
+				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team1side or ''),
 			},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game), css = {['flex-grow'] = 1}},
@@ -74,7 +74,7 @@ function CustomMatchSummary._createGame(date, game)
 				flipped = true,
 				date = date,
 				characters = characterData[2],
-				bg = 'brkts-popup-side-color-' .. (extradata.team2side or ''),
+				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team2side or ''),
 			},
 			MatchSummaryWidgets.GameComment{children = WidgetUtil.collect(
 				game.comment,

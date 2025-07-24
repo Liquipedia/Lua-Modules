@@ -50,7 +50,7 @@ function CustomMatchSummary._createMapRow(game)
 			MatchSummaryWidgets.Characters{
 				flipped = opponentIndex == 2,
 				characters = Array.map((game.opponents[opponentIndex] or {}).players or {}, Operator.property('striker')),
-				bg = opponentIndex == 1 and 'brkts-popup-side-color-blue' or 'brkts-popup-side-color-red',
+				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (opponentIndex == 1 and 'blue' or 'red')
 			},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
 			DisplayHelper.MapScore(game.opponents[opponentIndex], game.status)

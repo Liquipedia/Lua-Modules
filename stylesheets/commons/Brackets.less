@@ -631,6 +631,7 @@ div.brkts-popup-body-element-thumbs {
 				height: unset;
 				border: 0.0625rem solid #ffffff;
 				box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
+				outline: 0;
 			}
 		}
 	}
@@ -939,34 +940,35 @@ div.brkts-popup-body-element-thumbs {
 	background: var( --table-background-color, #ffffff ) !important;
 }
 
-.brkts-popup-side-color-blue {
-	background-color: #31519c !important;
-	padding: 0.125rem 0.0625rem 0.125rem 0.0625rem;
-}
+.brkts-popup-side-color {
+	img {
+		outline: 0.125rem solid #ffffff;
+		outline-offset: -0.125rem;
+	}
 
-.brkts-popup-side-color-red {
-	background-color: #b12a2a !important;
-	padding: 0.125rem 0.0625rem 0.125rem 0.0625rem;
-}
+	&--blue img {
+		outline-color: #31519c;
+	}
 
-.brkts-popup-side-color-purple {
-	background-color: #7865b7 !important;
-	padding: 0.125rem 0.0625rem 0.125rem 0.0625rem;
-}
+	&--red img {
+		outline-color: #b12a2a;
+	}
 
-.brkts-popup-side-color-orange {
-	background-color: #cf793c !important;
-	padding: 0.125rem 0.0625rem 0.125rem 0.0625rem;
-}
+	&--purple img {
+		outline-color: #7865b7;
+	}
 
-.brkts-popup-side-color-radiant {
-	background-color: #bcd985 !important;
-	padding: 0.125rem 0.0625rem 0.125rem 0.0625rem;
-}
+	&--orange img {
+		outline-color: #cf793c;
+	}
 
-.brkts-popup-side-color-dire {
-	background-color: #e79e7e !important;
-	padding: 0.125rem 0.0625rem 0.125rem 0.0625rem;
+	&--radiant img {
+		outline-color: #bcd985;
+	}
+
+	&--dire img {
+		outline-color: #e79e7e;
+	}
 }
 
 .brkts-champion-icon img {
