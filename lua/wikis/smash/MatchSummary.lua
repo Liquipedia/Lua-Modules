@@ -90,7 +90,6 @@ function CustomMatchSummary._createStandardGame(game, props)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '0.75rem'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1), flipped = true},
 			MatchSummaryWidgets.GameCenter{children = game.map, css = {['flex-basis'] = '100px', ['text-align'] = 'center'}},

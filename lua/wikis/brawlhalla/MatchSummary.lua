@@ -52,7 +52,6 @@ function CustomMatchSummary._createGame(game)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '80%', padding = '4px', ['min-height'] = '24px'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.Characters{characters = team1Characters, flipped = false},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},

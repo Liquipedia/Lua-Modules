@@ -73,7 +73,6 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '90%', padding = '4px'},
 		children = WidgetUtil.collect(
 			CustomMatchSummary._opponentCardsDisplay{
 				data = cardData[1],
