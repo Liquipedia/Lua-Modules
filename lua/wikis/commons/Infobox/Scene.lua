@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local Links = Lua.import('Module:Links')
 local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')

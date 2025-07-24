@@ -11,7 +11,6 @@ local Class = Lua.import('Module:Class')
 local Links = Lua.import('Module:Links')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
-local Table = Lua.import('Module:Table')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Flags = Lua.import('Module:Flags')
