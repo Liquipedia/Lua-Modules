@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Links = Lua.import('Module:Links')
 local Logic = Lua.import('Module:Logic')
@@ -22,6 +23,7 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
+local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ShowInfobox: BasicInfobox
@@ -62,12 +64,9 @@ function Show:createInfobox()
 		Builder{
 			builder = function()
 				local links = Links.transform(args)
-				local secondaryLinks = Show:_addSecondaryLinkDisplay(args)
 				return WidgetUtil.collect(
 					Widgets.Links{links = links},
-					-- we only need the title if secondaryLinks isn't empty AND title is not already set by Links Widget
-					Logic.isEmpty(links) and Logic.isNotEmpty(secondaryLinks) and Title{children = 'Links'} or nil,
-					Logic.isNotEmpty(secondaryLinks) and Center{children = {secondaryLinks}} or nil
+					self:_addSecondaryLinkDisplay(links)
 				)
 			end
 		},
@@ -77,6 +76,9 @@ function Show:createInfobox()
 
 	if Namespace.isMain() then
 		self:categories('Shows')
+		if args.itunes then
+			self:categories('Podcasts')
+		end
 	end
 
 	return self:build(widgets)
@@ -96,24 +98,34 @@ function Show:_createLocation(country, city)
 		'[[:Category:' .. countryDisplay .. '|' .. (city or countryDisplay) .. ']]'
 end
 
----@param args table
----@return string
-function Show:_addSecondaryLinkDisplay(args)
-	local secondaryLinks = {}
-	if args.topicid then
-		secondaryLinks[#secondaryLinks + 1] = '[https://tl.net/forum/viewmessage.php?topic_id='
-			.. args.topicid .. ' TL Thread]'
-	end
-	if args.itunes then
-		secondaryLinks[#secondaryLinks + 1] = '['
-			.. args.itunes .. ' iTunes][[Category:Podcasts]]'
-	end
-	if args.videoarchive then
-		secondaryLinks[#secondaryLinks + 1] = '['
-			.. args.videoarchive .. ' Video Archive]'
-	end
+---@param links table
+---@return (string|Widget)[]?
+function Show:_addSecondaryLinkDisplay(links)
+	local args = self.args
+	local secondaryLinks = WidgetUtil.collect(
+		args.topicid and Link{
+			linktype = 'external',
+			link = 'https://tl.net/forum/viewmessage.php?topic_id=' .. args.topicid,
+			children = 'TL Thread',
+		} or nil,
+		args.itunes and Link{
+			linktype = 'external',
+			link = args.itunes,
+			children = 'iTunes',
+		} or nil,
+		args.videoarchive and Link{
+			linktype = 'external',
+			link = args.videoarchive,
+			children = 'Video Archive',
+		} or nil
+	)
 
-	return table.concat(secondaryLinks, '&nbsp;•&nbsp;')
+	if Logic.isEmpty(secondaryLinks) then return end
+
+	return WidgetUtil.collect(
+		Logic.isEmpty(links) and Title{children = 'Links'} or nil,
+		Array.interleave(secondaryLinks, '&nbsp;•&nbsp;')
+	)
 end
 
 return Show
