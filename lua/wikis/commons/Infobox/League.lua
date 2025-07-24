@@ -11,10 +11,8 @@ local Array = Lua.import('Module:Array')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
-local Flags = Lua.import('Module:Flags')
 local Game = Lua.import('Module:Game')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
-local Info = Lua.import('Module:Info')
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extension/PrizePool')
 local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
@@ -27,15 +25,11 @@ local Page = Lua.import('Module:Page')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Template = Lua.import('Module:Template')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
 local Tier = Lua.import('Module:Tier/Custom')
 local Variables = Lua.import('Module:Variables')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
-local VENUE_DESCRIPTION = '<br><small><small>(${desc})</small></small>'
-local STAY22_LINK = 'https://www.stay22.com/allez/roam?aid=liquipedia&campaign=${wiki}_${page}'..
-	'&address=${address}&checkin=${checkin}&checkout=${checkout}'
 
 local Widgets = Lua.import('Module:Widget/All')
 local Accommodation = Widgets.Accommodation
@@ -49,9 +43,6 @@ local Location = Widgets.Location
 local Organizers = Widgets.Organizers
 local Title = Widgets.Title
 local Venue = Widgets.Venue
-
-local Button = Lua.import('Module:Widget/Basic/Button')
-local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class InfoboxLeague: BasicInfobox
 local League = Class.new(BasicInfobox)
@@ -239,8 +230,10 @@ function League:_parseArgs()
 		game = Game.toIdentifier{game = args.game},
 		-- If no parent is available, set pagename instead to ease querying
 		parent = (args.parent or mw.title.getCurrentTitle().prefixedText):gsub(' ', '_'),
-		startDate = self:_cleanDate(args.sdate) or self:_cleanDate(args.date),
-		endDate = self:_cleanDate(args.edate) or self:_cleanDate(args.date),
+		startDate = ReferenceCleaner.cleanDateIfKnown{date = args.sdate}
+			or ReferenceCleaner.cleanDateIfKnown{date = args.date},
+		endDate = ReferenceCleaner.cleanDateIfKnown{date = args.edate}
+			or ReferenceCleaner.cleanDateIfKnown{date = args.date},
 		mode = args.mode,
 		patch = args.patch,
 		endPatch = args.endpatch or args.epatch or args.patch,
@@ -636,21 +629,6 @@ function League:createLink(id, name, link, desc)
 	end
 
 	return output
-end
-
----@param date string?
----@return string?
-function League:_cleanDate(date)
-	if self:_isUnknownDate(date) then
-		return nil
-	end
-	return ReferenceCleaner.clean{input = date}
-end
-
----@param date string?
----@return boolean
-function League:_isUnknownDate(date)
-	return date == nil or string.lower(date) == 'tba' or string.lower(date) == 'tbd'
 end
 
 -- Given the format `pagename|displayname`, returns pagename or the parameter, otherwise
