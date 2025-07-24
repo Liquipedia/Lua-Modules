@@ -170,7 +170,7 @@ end
 function Match:create()
 	self.root
 		:node(self.headerElement)
-		:node(MatchSummaryWidgets.Body{children = {self.bodyElement, self.commentElement, self.footerElement}})
+		:node(MatchSummaryWidgets.Body{children = WidgetUtil.collect(self.bodyElement, self.commentElement, self.footerElement)})
 		:node(self.buttonElement)
 
 	return self.root
