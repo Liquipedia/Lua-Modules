@@ -28,15 +28,15 @@ end
 
 ---@param match MatchGroupUtilMatch
 ---@param createGame fun(date: string, game: table, gameIndex: integer): Widget
----@return Widget[]
+---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match, createGame)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
-	return WidgetUtil.collect(
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		Array.map(match.games, FnUtil.curry(createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	)
+	)}
 end
 
 ---@param date string

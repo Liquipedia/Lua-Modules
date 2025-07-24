@@ -27,17 +27,17 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match HearthstoneMatchGroupUtilMatch
----@return Widget[]
+---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	local submatches
 	if match.isTeamMatch then
 		submatches = match.submatches or {}
 	end
 
-	return WidgetUtil.collect(
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		submatches and Array.map(submatches, CustomMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(CustomMatchSummary.Game, {isPartOfSubMatch = false}))
-	)
+	)}
 end
 
 ---@param submatch HearthstoneMatchGroupUtilSubmatch
