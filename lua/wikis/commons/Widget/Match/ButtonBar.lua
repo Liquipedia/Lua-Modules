@@ -34,7 +34,7 @@ local SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE = 2 * 60 * 60 -- 2 hours in seconds
 local MatchButtonBar = Class.new(Widget)
 MatchButtonBar.defaultProps = {
 	showVods = true,
-	buttonStyle = 'secondary',
+	buttonType = 'secondary',
 }
 
 ---@return Widget?
@@ -85,7 +85,7 @@ function MatchButtonBar:render()
 		children = WidgetUtil.collect(
 			MatchPageButton{
 				match = match,
-				buttonStyle = self.props.buttonStyle,
+				buttonType = self.props.buttonType,
 			},
 			displayStreams and StreamsContainer{
 				streams = StreamLinks.filterStreams(match.stream),
