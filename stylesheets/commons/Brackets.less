@@ -502,7 +502,6 @@
 }
 
 .brkts-popup {
-	background: var( --table-variant-background-color, #f2f2f2 );
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
@@ -512,18 +511,24 @@
 	font-size: 0.6875rem;
 	padding: 0.5rem;
 	gap: 0.5rem;
+	border: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 
 	.theme--light & {
 		background-color: #ffffff;
 	}
 
 	.theme--dark & {
-		background-color: #26292d;
+		background-color: var( --clr-secondary-16 );
+		border-color: rgba( 255, 255, 255, 0.08 );
 	}
 
 	@media ( max-width: 768px ) {
 		max-height: 65vh;
 		overflow: auto;
+	}
+
+	.timer-object-date {
+		display: block;
 	}
 
 	.brkts-popup-close-button {
@@ -574,16 +579,12 @@
 	display: none;
 }
 
-/* TODO remove */
-.brkts-popup * {
-	flex-shrink: 0;
-}
-
 .brkts-popup-body {
 	display: flex;
 	justify-content: space-evenly;
 	width: 100%;
 	flex-direction: column;
+	gap: 0.5rem;
 }
 
 .brkts-popup-body-element {
@@ -655,8 +656,14 @@ div.brkts-popup-body-element-thumbs {
 	display: flex;
 }
 
-.brkts-popup-body-element:nth-of-type( odd ) {
-	background-color: var( --table-background-color, #f9f9f9 );
+.brkts-popup-body-element:nth-of-type( even ) {
+	.theme--light & {
+		background-color: rgba( 0, 0, 0, 0.04 );
+	}
+
+	.theme--dark & {
+		background-color: rgba( 255, 255, 255, 0.04 );
+	}
 }
 
 .brkts-popup-body-element-vertical-centered {
