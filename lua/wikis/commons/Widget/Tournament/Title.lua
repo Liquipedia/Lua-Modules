@@ -34,7 +34,7 @@ function TournamentTitleWidget:render()
 		return
 	end
 
-	local hasStage = self.props.stageName ~= nil and not String.contains(self.props.stageName, 'Results') ~= nil
+	local hasStage = self.props.stageName ~= nil and not String.contains(self.props.stageName, 'Results')
 
 	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
 		self.props.displayGameIcon and Game.icon{
