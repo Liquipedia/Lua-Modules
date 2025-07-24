@@ -97,21 +97,7 @@ function League:createInfobox()
 		},
 		Customizable{
 			id = 'organizers',
-			children = {
-				Builder{
-					builder = function()
-						local organizers = self:_createOrganizers(args)
-						local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
-
-						return {
-							Cell{
-								name = title,
-								content = organizers
-							}
-						}
-					end
-				},
-			},
+			children = {Organizers{args = args}},
 		},
 		Customizable{
 			id = 'sponsors',
@@ -159,18 +145,7 @@ function League:createInfobox()
 			args = args,
 			shouldSetCategory = self:shouldStore(args),
 		},
-		Builder{
-			builder = function()
-				local venues = Array.map(League._parseVenues(args), function(venue)
-					return self:createLink(venue.id, venue.name, venue.link, venue.description)
-				end)
-
-				return {Cell{
-					name = 'Venue',
-					content = venues
-				}}
-			end
-		},
+		Venue{args = args},
 		Cell{name = 'Format', content = {args.format}},
 		Customizable{id = 'prizepool', children = {
 				Cell{
