@@ -41,7 +41,7 @@ local CONTENT = {
 		body = TransfersList{
 			transferPage = 'Player Transfers/' .. os.date('%Y') .. '/' ..
 				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
-		}
+		},
 		boxid = 1509,
 	},
 	thisDay = {
