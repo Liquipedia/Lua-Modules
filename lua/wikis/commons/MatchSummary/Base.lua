@@ -121,7 +121,7 @@ end
 ---@operator call: MatchSummaryMatch
 ---@field root Html
 ---@field headerElement Widget?
----@field bodyElement Widget?
+---@field bodyElement Widget[]?
 ---@field commentElement Widget?
 ---@field footerElement Html?
 ---@field buttonElement Widget?
@@ -138,7 +138,7 @@ function Match:header(header)
 	return self
 end
 
----@param body Widget
+---@param body Widget[]
 ---@return MatchSummaryMatch
 function Match:body(body)
 	self.bodyElement = body
