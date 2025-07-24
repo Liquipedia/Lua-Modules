@@ -204,7 +204,7 @@ function League:createInfobox()
 
 	return mw.html.create()
 		:node(self:build(widgets))
-		:node(Logic.readBool(args.autointro) and ('br>' .. self:seoText(args)) or nil)
+		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
 end
 
 ---@param args table
