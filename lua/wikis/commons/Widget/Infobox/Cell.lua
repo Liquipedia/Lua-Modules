@@ -53,8 +53,17 @@ function Cell:render()
 			return child
 		end
 	end)
+	mappedChildren = Array.map(mappedChildren, function(child)
+		local renderedChild = child
+		if Class.instanceOf(child, Widget) then
+			---@cast child Widget
+			renderedChild = child:render()
+		end
 
-	if Logic.isEmpty(mappedChildren[1]) then
+		return Logic.nilIfEmpty(renderedChild)
+	end)
+
+	if Array.all(mappedChildren, Logic.isEmpty) then
 		return
 	end
 
