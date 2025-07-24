@@ -81,7 +81,7 @@ function Series:createInfobox()
 		Organizers{args = args},
 		Cell{
 			name = 'Sponsor(s)',
-			content = self:getAllArgsForBase(args, 'sponsor')
+			children = self:getAllArgsForBase(args, 'sponsor')
 		},
 		Customizable{id = 'type', children = {}},
 		Customizable{
@@ -98,19 +98,19 @@ function Series:createInfobox()
 		Venue{args = args},
 		Cell{
 			name = 'Date',
-			content = {
+			children = {
 				args.date
 			}
 		},
 		Cell{
 			name = 'Start Date',
-			content = {
+			children = {
 				args.sdate or args.launched or args.inaugurated
 			}
 		},
 		Cell{
 			name = 'End Date',
-			content = {
+			children = {
 				args.edate or args.defunct
 			}
 		},
@@ -123,7 +123,7 @@ function Series:createInfobox()
 				if self.totalSeriesPrizepool then
 					return {Cell{
 						name = 'Cumulative Prize Pool',
-						content = {InfoboxPrizePool.display{prizepoolusd = self.totalSeriesPrizepool}}
+						children = {InfoboxPrizePool.display{prizepoolusd = self.totalSeriesPrizepool}}
 					}}
 				end
 			end
@@ -133,7 +133,7 @@ function Series:createInfobox()
 			children = {
 				Cell{
 					name = 'Liquipedia Tier',
-					content = {self:createLiquipediaTierDisplay(args)},
+					children = {self:createLiquipediaTierDisplay(args)},
 					classes = {self:liquipediaTierHighlighted(args) and 'valvepremier-highlighted' or ''},
 				},
 			}
