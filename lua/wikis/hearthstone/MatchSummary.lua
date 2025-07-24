@@ -106,7 +106,7 @@ function CustomMatchSummary.Game(options, game, gameIndex)
 
 	return rowWidget{
 		classes = {'brkts-popup-body-game'},
-		css = {width = options.isPartOfSubMatch and '100%' or nil, ['font-size'] = '0.75rem'},
+		css = {width = options.isPartOfSubMatch and '100%' or nil},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameTeamWrapper{children = createOpponentDisplay(1)},
 			MatchSummaryWidgets.GameCenter{css = {flex = '0 0 16%'}, children = 'Game ' .. gameIndex},

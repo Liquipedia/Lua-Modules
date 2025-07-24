@@ -73,7 +73,6 @@ end
 function CustomMatchSummary.createGame(game, gameIndex)
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {padding = '4px'},
 		children = WidgetUtil.collect(
 			-- Header
 			CustomMatchSummary._getHeader(game),

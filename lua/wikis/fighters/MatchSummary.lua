@@ -92,7 +92,6 @@ function CustomMatchSummary._createStandardGame(game, props)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '0.75rem', padding = '4px'},
 		children = WidgetUtil.collect(
 			CustomMatchSummary._createCharacterDisplay(
 				CustomMatchSummary.fetchCharactersOfPlayers(game, props.opponents, 1),

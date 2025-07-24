@@ -50,7 +50,6 @@ end
 function CustomMatchSummary._createGame(game)
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '84%', padding = '4px'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			DisplayHelper.MapScore(game.opponents[1], game.status),
@@ -70,7 +69,6 @@ function CustomMatchSummary._createSubMatch(game, match)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '84%', padding = '4px'},
 		children = WidgetUtil.collect(
 			CustomMatchSummary._players(players[1], 1, game.winner),
 			DisplayHelper.MapScore(game.opponents[1], game.status),

@@ -60,7 +60,6 @@ function CustomMatchSummary._createGame(date, game)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '90%', padding = '4px'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.Characters{
 				flipped = false,
