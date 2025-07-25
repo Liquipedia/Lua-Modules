@@ -88,7 +88,7 @@ return {
 		lightmode = 'League_of_Legends_Wild_Rift_default_allmode.svg',
 		darkmode = 'League_of_Legends_Wild_Rift_default_allmode.svg',
 	},
-	metadesc = 'Comprehensive Wild Rift wiki with articles covering everything from weapons, to strategies, '..
+	metadesc = 'Comprehensive Wild Rift wiki with articles covering everything from champions, to strategies, '..
 		'to tournaments, to competitive players and teams.',
 	title = 'Wild Rift',
 	navigation = {
