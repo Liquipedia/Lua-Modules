@@ -134,7 +134,7 @@ return {
 			link = 'Classes',
 			count = {
 				method = 'CATEGORY',
-				category = 'Classes',
+				category = 'Class',
 			}
 		},
 	},
