@@ -5,14 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext')
+
 local Lua = require('Module:Lua')
 
+local DateExt = Lua.import('Module:Date/Ext')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local LiquipediaApp = Lua.import('Module:Widget/MainPage/LiquipediaApp')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
@@ -20,7 +22,7 @@ local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 local CONTENT = {
 	usefulArticles = {
-		heading = 'Useful Articles',
+		heading = 'The Game',
 		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
 		boxid = 1503,
@@ -31,9 +33,16 @@ local CONTENT = {
 		padding = true,
 		boxid = 1504,
 	},
+	liquipediaApp = {
+		heading = 'Download the Liquipedia App',
+		padding = true,
+		body = LiquipediaApp{},
+		boxid = 1505,
+	},
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
+			rumours = true,
 			transferPage = 'Player Transfers/' .. os.date('%Y') .. '/' ..
 				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 		},
@@ -55,7 +64,7 @@ local CONTENT = {
 		body = Div{
 			css = { width = '100%', ['margin-bottom'] = '8px' },
 			children = { FilterButtonsWidget() }
-		}
+		},
 	},
 	matches = {
 		heading = 'Matches',
@@ -66,12 +75,8 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			upcomingDays = 30,
-			completedDays = 20,
-			modifierTypeQualifier = -2,
-			modifierTier1 = 55,
-			modifierTier2 = 55,
-			modifierTier3 = 10
+			upcomingDays = 60,
+			completedDays = 60
 		},
 		padding = true,
 		boxid = 1508,
@@ -80,15 +85,15 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Hearthstone_full logo.png',
-		darkmode = 'Hearthstone_full logo.png',
+		lightmode = 'League_of_Legends_Wild_Rift_default_allmode.svg',
+		darkmode = 'League_of_Legends_Wild_Rift_default_allmode.svg',
 	},
-	metadesc = 'The Hearthstone esports wiki covering everything from players, teams and transfers, ' ..
-		'to tournaments and results, heroes, and cards.',
-	title = 'Hearthstone',
+	metadesc = 'Comprehensive Wild Rift wiki with articles covering everything from champions, to strategies, '..
+		'to tournaments, to competitive players and teams.',
+	title = 'Wild Rift',
 	navigation = {
 		{
-			file = 'Team Ukraine 2017 Hearthstone Global Games .jpg',
+			file = 'Keyd_Stars_WC_2022.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -97,7 +102,7 @@ return {
 			},
 		},
 		{
-			file = 'Hunterace World Championship 2019.jpg',
+			file = 'BRU Whatthejes ICONS 2022.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -106,7 +111,7 @@ return {
 			},
 		},
 		{
-			file = 'Masters Tour 2020 Arlington Trophy.jpg',
+			file = 'Icons_Trophy.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -115,7 +120,7 @@ return {
 			},
 		},
 		{
-			file = 'Casie and Surrender Grandmasters 2019 Finals.jpg',
+			file = 'NOVA Long ICONS22.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -124,18 +129,9 @@ return {
 			},
 		},
 		{
-			file = 'Masters Tour 2020 Statistics.jpg',
+			file = 'ITzSTU4RT at the TFT Esports World Cup 2024.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
-		},
-		{
-			file = 'Icon_Class_HS_Shaman.png',
-			title = 'Classes',
-			link = 'Classes',
-			count = {
-				method = 'CATEGORY',
-				category = 'Class',
-			}
 		},
 	},
 	layouts = {
@@ -154,6 +150,10 @@ return {
 					{
 						mobileOrder = 6,
 						content = CONTENT.wantToHelp,
+					},
+					{
+						mobileOrder = 8,
+						content = CONTENT.liquipediaApp,
 					},
 				}
 			},
@@ -192,11 +192,11 @@ return {
 						},
 					},
 					{
-						mobileOrder = 5,
+						mobileOrder = 4,
 						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 7,
 						content = CONTENT.usefulArticles,
 					},
 				},

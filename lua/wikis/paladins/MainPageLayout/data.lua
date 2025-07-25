@@ -5,14 +5,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 
-local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
@@ -34,8 +33,8 @@ local CONTENT = {
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferPage = 'Player Transfers/' .. os.date('%Y') .. '/' ..
-				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
+			transferQuery = false,
+			transferPage = 'Player Transfers/' .. os.date('%Y')
 		},
 		boxid = 1509,
 	},
@@ -44,11 +43,6 @@ local CONTENT = {
 		body = ThisDayWidgets.Content(),
 		padding = true,
 		boxid = 1510,
-	},
-	specialEvents = {
-		noPanel = true,
-		body = '{{Liquipedia:Special Event}}',
-		boxid = 1516,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -66,12 +60,8 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			upcomingDays = 30,
-			completedDays = 20,
-			modifierTypeQualifier = -2,
-			modifierTier1 = 55,
-			modifierTier2 = 55,
-			modifierTier3 = 10
+			upcomingDays = 40,
+			completedDays = 40
 		},
 		padding = true,
 		boxid = 1508,
@@ -80,15 +70,15 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Hearthstone_full logo.png',
-		darkmode = 'Hearthstone_full logo.png',
+		lightmode = 'Paladins full lightmode.png',
+		darkmode = 'Paladins full darkmode.png',
 	},
-	metadesc = 'The Hearthstone esports wiki covering everything from players, teams and transfers, ' ..
-		'to tournaments and results, heroes, and cards.',
-	title = 'Hearthstone',
+	metadesc = 'The Paladins esports wiki covering everything from players, teams and transfers, ' ..
+		'to tournaments and results, champions, and maps.',
+	title = 'Paladins',
 	navigation = {
 		{
-			file = 'Team Ukraine 2017 Hearthstone Global Games .jpg',
+			file = 'Torpedo at the Paladins Founders Tournament.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -97,7 +87,7 @@ return {
 			},
 		},
 		{
-			file = 'Hunterace World Championship 2019.jpg',
+			file = 'Shipa at the Founders Tournament 2016.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -106,7 +96,7 @@ return {
 			},
 		},
 		{
-			file = 'Masters Tour 2020 Arlington Trophy.jpg',
+			file = 'Paladins Founders Tournament Trophy 2016.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -115,7 +105,7 @@ return {
 			},
 		},
 		{
-			file = 'Casie and Surrender Grandmasters 2019 Finals.jpg',
+			file = 'SoaR at the Founders Tournament 2016.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -124,18 +114,18 @@ return {
 			},
 		},
 		{
-			file = 'Masters Tour 2020 Statistics.jpg',
+			file = 'Raynday at the Founders Tournament Trophy 2016.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
 		{
-			file = 'Icon_Class_HS_Shaman.png',
-			title = 'Classes',
-			link = 'Classes',
+			file = 'Fish_Market.png',
+			title = 'Maps',
+			link = 'Portal:Maps',
 			count = {
 				method = 'CATEGORY',
-				category = 'Class',
-			}
+				category = 'Maps',
+			},
 		},
 	},
 	layouts = {
@@ -144,15 +134,11 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 1,
-						content = CONTENT.specialEvents,
-					},
-					{
-						mobileOrder = 3,
+						mobileOrder = 2,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 5,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -161,7 +147,7 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 2,
+						mobileOrder = 1,
 						children = {
 							{
 								children = {
@@ -192,11 +178,11 @@ return {
 						},
 					},
 					{
-						mobileOrder = 5,
+						mobileOrder = 4,
 						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 3,
 						content = CONTENT.usefulArticles,
 					},
 				},

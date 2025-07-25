@@ -45,10 +45,10 @@ local CONTENT = {
 		padding = true,
 		boxid = 1510,
 	},
-	specialEvents = {
-		noPanel = true,
-		body = '{{Liquipedia:Special Event}}',
-		boxid = 1516,
+	randomCard = {
+		heading = 'Random Card',
+		body = '<div style="text-align: center;">{{Random_card}}</div>',
+		boxid = 1524,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -80,12 +80,12 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Hearthstone_full logo.png',
-		darkmode = 'Hearthstone_full logo.png',
+		lightmode = 'Legends of Runeterra logo.png',
+		darkmode = 'Legends of Runeterra logo.png',
 	},
-	metadesc = 'The Hearthstone esports wiki covering everything from players, teams and transfers, ' ..
+	metadesc = 'The Runeterra esports wiki covering everything from players, teams and transfers, ' ..
 		'to tournaments and results, heroes, and cards.',
-	title = 'Hearthstone',
+	title = 'Runeterra',
 	navigation = {
 		{
 			file = 'Team Ukraine 2017 Hearthstone Global Games .jpg',
@@ -97,7 +97,7 @@ return {
 			},
 		},
 		{
-			file = 'Hunterace World Championship 2019.jpg',
+			file = 'Alanzq Vegas Open 2023.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -129,12 +129,12 @@ return {
 			link = 'Portal:Statistics',
 		},
 		{
-			file = 'Icon_Class_HS_Shaman.png',
-			title = 'Classes',
-			link = 'Classes',
+			file = 'Runeterra Yeti Yearling.png',
+			title = 'Cards',
+			link = 'Cards',
 			count = {
 				method = 'CATEGORY',
-				category = 'Class',
+				category = 'Cards',
 			}
 		},
 	},
@@ -144,15 +144,11 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 1,
-						content = CONTENT.specialEvents,
-					},
-					{
-						mobileOrder = 3,
+						mobileOrder = 2,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 7,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -161,7 +157,7 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 2,
+						mobileOrder = 1,
 						children = {
 							{
 								children = {
@@ -187,16 +183,20 @@ return {
 										noPanel = true,
 										content = CONTENT.tournaments,
 									},
-								},
+									{
+										mobileOrder = 4,
+										content = CONTENT.randomCard,
+									},
 							},
+								},
 						},
 					},
 					{
-						mobileOrder = 5,
+						mobileOrder = 6,
 						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 5,
 						content = CONTENT.usefulArticles,
 					},
 				},

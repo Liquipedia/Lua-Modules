@@ -198,10 +198,7 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 		})):addClass(props.playerClass)
 	end)
 
-	if #opponent.players == 1 then
-		return playerNodes[1]
-
-	elseif showFaction and opponent.isArchon then
+	if showFaction and opponent.isArchon then
 		local factionIcon = Faction.Icon{size = 'large', faction = opponent.players[1].faction}
 		return StarcraftOpponentDisplay.BlockArchon({
 			flip = props.flip,
