@@ -164,8 +164,8 @@
 		}
 
 		/* Grow and cta when there at most 2 streams, and there's no match page button visible for the user */
-		&:has( > :nth-child( -n + 2 ):last-child ):not(:has( .match-page-button ) ),
-		body:not(.logged-in) &:has( > :nth-child( -n + 3 ):last-child ):has( .match-page-button.show-when-logged-in ) {
+		&:has( > :nth-child( -n + 2 ):last-child ):not( :has( .match-page-button ) ),
+		body:not( .logged-in ) &:has( > :nth-child( -n + 3 ):last-child ):has( .match-page-button.show-when-logged-in ) {
 			& > div {
 				flex: 1;
 			}
