@@ -159,6 +159,15 @@
 		gap: 0.5rem;
 		align-self: stretch;
 
+		/* 2 or less child elements */
+		&:has( > :nth-child( -n + 2 ):last-child ) > div {
+			flex: 1;
+
+			& .btn {
+				width: 100%;
+			}
+		}
+
 		&:has( > :nth-last-child( 3 ) ) .match-button-cta-text {
 			display: none;
 		}
