@@ -473,10 +473,11 @@
 		bottom: unset;
 		left: 1rem !important;
 		right: 1rem;
-		top: calc( ~"50% + ((9.5rem - 3.125rem) / 2)" ) !important; // Add half of the difference between the top and bottom height to make it 'centered' (152px - 50px)
-		max-height: calc( ~"100dvh - (9.5rem + 2rem + 3.125rem)" ); // 14.625rem = 234px (152px ad and nav + 32px spacing + 50px footer)
+		top: calc( ~"50% - 1.4375rem" ) !important; // 1.4375rem = 4.1875rem - 2.75rem
+		max-height: calc( ~"100dvh - (2.75rem + 4.1875rem)" );
 		width: auto !important;
 		transform: translateY( -50% );
+		z-index: 22;
 	}
 }
 
@@ -557,7 +558,7 @@
 			inset: 0;
 			background-color: var( --clr-sapphire-10 );
 			opacity: 0.66;
-			z-index: 8;
+			z-index: 21;
 		}
 	}
 }
