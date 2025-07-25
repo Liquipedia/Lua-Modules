@@ -159,25 +159,24 @@
 		gap: 0.5rem;
 		align-self: stretch;
 
-		/* 2 or less child elements */
-		&:has( > :nth-child( -n + 2 ):last-child ) > div {
-			flex: 1;
+		.match-button-cta-text {
+			display: none;
+		}
+
+		/* Grow and cta when there at most 2 streams, and there's no match page button visible for the user */
+		&:has( > :nth-child( -n + 2 ):last-child ):not(:has( .match-page-button ) ),
+		body:not(.logged-in) &:has( > :nth-child( -n + 3 ):last-child ):has( .match-page-button.show-when-logged-in ) {
+			& > div {
+				flex: 1;
+			}
 
 			& .btn {
 				width: 100%;
 			}
-		}
 
-		&:has( > :nth-last-child( 3 ) ) .match-button-cta-text {
-			display: none;
-		}
-
-		body.logged-in &:has( .match-page-button.show-when-logged-in ) .match-button-cta-text {
-			display: none;
-		}
-
-		body.logged-in &:has( .match-page-button:not( .show-when-logged-in ) ) .match-button-cta-text {
-			display: none;
+			& .match-button-cta-text {
+				display: inline;
+			}
 		}
 	}
 }
