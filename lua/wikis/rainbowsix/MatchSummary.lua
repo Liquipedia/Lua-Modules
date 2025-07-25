@@ -26,7 +26,7 @@ local CustomMatchSummary = {}
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '360px'})
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
 ---@param match MatchGroupUtilMatch
