@@ -192,16 +192,7 @@ function League:createInfobox()
 				},
 			},
 		},
-		Builder{
-			builder = function()
-				if Table.isNotEmpty(self.links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = self.links}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = self.links},
 		Customizable{id = 'customcontent', children = {}},
 		Center{children = {args.footnotes}},
 		Customizable{id = 'chronology', children = {
