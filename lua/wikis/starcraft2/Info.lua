@@ -70,6 +70,4 @@ return {
 			hideOrg = true,
 		},
 	},
-	opponentLibrary = 'Opponent/Starcraft', --to be removed after cleanup of non git modules
-	opponentDisplayLibrary = 'OpponentDisplay/Starcraft', --to be removed after cleanup of non git modules
 }
