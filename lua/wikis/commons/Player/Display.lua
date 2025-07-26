@@ -71,7 +71,7 @@ function PlayerDisplay.BlockPlayer(props)
 	end
 
 	local factionNode
-	if props.showFaction ~= false and player.faction ~= Faction.defaultFaction then
+	if props.showFaction ~= false and Logic.isNotEmpty(player.faction) and player.faction ~= Faction.defaultFaction then
 		factionNode = mw.html.create('span'):addClass('race')
 			:wikitext(Faction.Icon{size = 'small', showLink = false, faction = player.faction})
 	end
@@ -103,7 +103,7 @@ function PlayerDisplay.InlinePlayer(props)
 		and PlayerDisplay.Flag{flag = player.flag}
 		or nil
 
-	local faction = props.showFaction ~= false and player.faction ~= Faction.defaultFaction
+	local faction = props.showFaction ~= false and Logic.isNotEmpty(player.faction) and player.faction ~= Faction.defaultFaction
 		and Faction.Icon{size = 'small', showLink = false, faction = player.faction}
 		or nil
 
