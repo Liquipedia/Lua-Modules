@@ -14,7 +14,7 @@ local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
-local Opponent = Lua.import('Module:Opponent/Custom')
+local Opponent = Lua.import('Module:Opponent')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 
 --Display components for opponents used by the starcraft and starcraft 2 wikis
