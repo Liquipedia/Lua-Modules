@@ -14,8 +14,7 @@ local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Opponent = Lua.import('Module:Opponent')
-local PlayerExt = Lua.import('Module:Player/Ext')
-local StarcraftPlayerExt = Lua.import('Module:Player/Ext/Starcraft')
+local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
 local StarcraftOpponent = Table.deepCopy(Opponent)
 
@@ -160,7 +159,7 @@ function StarcraftOpponent.resolve(opponent, date, options)
 			if options.syncPlayer then
 				local hasFaction = String.isNotEmpty(player.faction)
 				local savePageVar = not Opponent.playerIsTbd(player --[[@as standardPlayer]])
-				StarcraftPlayerExt.syncPlayer(player, {
+				PlayerExt.syncPlayer(player, {
 					savePageVar = savePageVar,
 					date = date,
 					overwritePageVars = options.overwritePageVars,

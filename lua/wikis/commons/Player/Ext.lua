@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
@@ -360,6 +361,22 @@ end
 ---@return string?
 function PlayerExt.populateTeam(pageName, template, options)
 	return PlayerExt.syncTeam(pageName, template, Table.merge(options, {savePageVar = false}))
+end
+
+---@param frame Frame
+function PlayerExt.TemplateStorePlayerLink(frame)
+	local args = Arguments.getArgs(frame)
+
+	if not args[1] then return end
+
+	local pageName, displayName = PlayerExt.extractFromLink(args[1])
+
+	PlayerExt.saveToPageVars({
+		displayName = displayName,
+		pageName = args.link or pageName or displayName,
+		flag = String.nilIfEmpty(Flags.CountryName{flag = args.flag}),
+		faction = Faction.read(args.faction or args.race) or Faction.defaultFaction,
+	}, {overwritePageVars = true})
 end
 
 return PlayerExt

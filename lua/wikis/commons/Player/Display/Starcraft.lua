@@ -16,7 +16,7 @@ local Table = Lua.import('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display')
-local StarcraftPlayerExt = Lua.import('Module:Player/Ext/Starcraft')
+local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
 local TBD_ABBREVIATION = Abbreviation.make{text = 'TBD', title = 'To be determined (or to be decided)'}
 
@@ -98,7 +98,7 @@ function StarcraftPlayerDisplay.TemplatePlayer(frame)
 	local pageName
 	local displayName
 	if not args.noclean then
-		pageName, displayName = StarcraftPlayerExt.extractFromLink(args[1] or '')
+		pageName, displayName = PlayerExt.extractFromLink(args[1] or '')
 		local showLink = Logic.readBoolOrNil(args.link)
 		if showLink == true then
 			pageName = displayName
@@ -118,10 +118,10 @@ function StarcraftPlayerDisplay.TemplatePlayer(frame)
 		pageName = pageName,
 		faction = String.nilIfEmpty(args.race) or String.nilIfEmpty(args.faction) or Faction.defaultFaction,
 	}
-	StarcraftPlayerExt.populatePageName(player)
+	PlayerExt.populatePageName(player)
 
 	if not args.novar then
-		StarcraftPlayerExt.saveToPageVars(player, {overwritePageVars = true})
+		PlayerExt.saveToPageVars(player, {overwritePageVars = true})
 	end
 
 	local hiddenSortNode = args.hs
@@ -170,7 +170,7 @@ variables.
 ---@param props InlinePlayerContainerProps
 ---@return Html
 function StarcraftPlayerDisplay.InlinePlayerContainer(props)
-	StarcraftPlayerExt.syncPlayer(props.player, {
+	PlayerExt.syncPlayer(props.player, {
 		date = props.date,
 		savePageVar = props.savePageVar,
 		overwritePageVars = true,
