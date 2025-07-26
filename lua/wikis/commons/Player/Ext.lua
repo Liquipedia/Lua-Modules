@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
+local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
@@ -62,12 +63,9 @@ function PlayerExt.extractFromLink(name)
 	return nil, String.nilIfEmpty(name)
 end
 
----Asks LPDB for the flag of a player using the player record.
----
----For specific uses only.
 ---@param resolvedPageName string
----@return string?
-PlayerExt.fetchPlayerFlag = FnUtil.memoize(function(resolvedPageName)
+---@return {flag: string?, faction: string?, factionHistory: table[]?}?
+PlayerExt.fetchPlayer = FnUtil.memoize(function(resolvedPageName)
 	local rows = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = '[[pagename::' .. resolvedPageName:gsub(' ', '_') .. ']]',
 		query = 'nationality, extradata',
@@ -75,8 +73,67 @@ PlayerExt.fetchPlayerFlag = FnUtil.memoize(function(resolvedPageName)
 
 	local record = rows[1]
 	if record then
-		return String.nilIfEmpty(Flags.CountryName{flag = record.nationality})
+		local factionHistory = Logic.readBool(record.extradata.factionhistorical)
+			and PlayerExt.fetchFactionHistory(resolvedPageName)
+			or nil
+
+		return {
+			flag = String.nilIfEmpty(Flags.CountryName{flag = record.nationality}),
+			faction = Faction.read(record.extradata.faction),
+			factionHistory = factionHistory,
+		}
 	end
+end)
+
+---@param resolvedPageName string
+---@param date string|number|osdate?
+---@return string?
+function PlayerExt.fetchPlayerFaction(resolvedPageName, date)
+	local lpdbPlayer = PlayerExt.fetchPlayer(resolvedPageName)
+	if lpdbPlayer and lpdbPlayer.factionHistory then
+		local timestamp = DateExt.readTimestamp(date or DateExt.getContextualDateOrNow())
+		---@cast timestamp -nil
+		-- convert date to iso format to match the dates retrieved from the data points
+		-- need the time too so the below check remains the same as before
+		date = DateExt.formatTimestamp('Y-m-d H:i:s', timestamp)
+		local entry = Array.find(lpdbPlayer.factionHistory, function(entry) return date <= entry.endDate end)
+		return entry and Faction.read(entry.faction)
+	else
+		return lpdbPlayer and lpdbPlayer.faction
+	end
+end
+
+---@param resolvedPageName string
+---@return table[]
+function PlayerExt.fetchFactionHistory(resolvedPageName)
+	local conditions = {
+		'[[type::playerrace]]',
+		'[[pagename::' .. resolvedPageName:gsub(' ', '_') .. ']]',
+	}
+	local rows = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		conditions = table.concat(conditions, ' and '),
+		query = 'information, extradata',
+	})
+
+	local factionHistory = Array.map(rows, function(row)
+		return {
+			endDate = row.extradata.enddate,
+			faction = Faction.read(row.information),
+			startDate = row.extradata.startdate,
+		}
+	end)
+	Array.sortInPlaceBy(factionHistory, function(entry) return entry.startDate end)
+	return factionHistory
+end
+
+---Asks LPDB for the flag of a player using the player record.
+---
+---For specific uses only.
+---@param resolvedPageName string
+---@return string?
+PlayerExt.fetchPlayerFlag = FnUtil.memoize(function(resolvedPageName)
+	local lpdbPlayer = PlayerExt.fetchPlayer(resolvedPageName)
+	return lpdbPlayer and String.nilIfEmpty(Flags.CountryName{flag = lpdbPlayer.flag})
 end)
 
 --Asks LPDB for the team a player belonged to on a particular date, using the teamhistory data point.
@@ -118,7 +175,7 @@ end
 ---@return string?
 function PlayerExt.fetchTeamTemplate(resolvedPageName, date)
 	local entry = PlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
-	return entry and TeamTemplate.resolve(entry.template, date) or nil
+	return entry and TeamTemplate.resolve(entry.template, date --[[@as string|number?]]) or nil
 end
 
 --[[
@@ -151,6 +208,11 @@ function PlayerExt.syncPlayer(player, options)
 		or String.nilIfEmpty(Flags.CountryName{flag = globalVars:get(player.displayName .. '_flag')})
 		or options.fetchPlayer ~= false and PlayerExt.fetchPlayerFlag(player.pageName)
 		or nil
+
+	player.faction = player.faction
+		or globalVars:get(player.displayName .. '_faction')
+		or options.fetchPlayer ~= false and PlayerExt.fetchPlayerFaction(player.pageName, options.date)
+		or Faction.defaultFaction
 
 	if options.savePageVar ~= false then
 		PlayerExt.saveToPageVars(player, {overwritePageVars = options.overwritePageVars})
@@ -194,6 +256,10 @@ function PlayerExt.saveToPageVars(player, options)
 	end
 	if PlayerExt.shouldWritePageVar(displayName .. '_flag', player.flag, overwrite) then
 		globalVars:set(displayName .. '_flag', player.flag)
+	end
+	if PlayerExt.shouldWritePageVar(displayName .. '_faction', player.faction, overwrite)
+		and player.faction ~= Faction.defaultFaction then
+			globalVars:set(displayName .. '_faction', player.faction)
 	end
 end
 
@@ -266,7 +332,7 @@ function PlayerExt.syncTeam(pageName, template, options)
 
 	if entry and not entry.isResolved then
 		entry.raw = entry.template
-		entry.template = entry.template and TeamTemplate.resolve(entry.template, options.date)
+		entry.template = entry.template and TeamTemplate.resolve(entry.template, options.date --[[@as string|number?]])
 		entry.isResolved = true
 	end
 
