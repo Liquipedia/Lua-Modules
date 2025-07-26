@@ -25,7 +25,6 @@ local Variables = require('Module:Variables')
 
 ---@class StormgateParticipantTableEntry: ParticipantTableEntry
 ---@field isQualified boolean?
----@field opponent StormgateStandardOpponent
 
 ---@class StormgateParticipantTableSection: ParticipantTableSection
 ---@field entries StormgateParticipantTableEntry[]
