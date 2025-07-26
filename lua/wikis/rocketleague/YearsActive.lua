@@ -20,10 +20,6 @@ local ColumnName = Condition.ColumnName
 
 local CustomActiveYears = Lua.import('Module:YearsActive/Base')
 
--- wiki specific settings
-CustomActiveYears.defaultNumberOfStoredPlayersPerPlacement = 6
-CustomActiveYears.additionalConditions = ''
-
 -- legacy entry point
 function CustomActiveYears.get(input)
 	-- if invoked directly input == args

@@ -49,6 +49,7 @@ return {
 			matchWidth = 180,
 			sortCasters = true,
 		},
+		defaultMaxPlayersPerPlacement = 20,
 	},
 	defaultRoundPrecision = 0,
 }

@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Config = Lua.import('Module:NotabilityChecker/config')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -19,6 +20,7 @@ local NotabilityChecker = {}
 local LANG = mw.getContentLanguage()
 local NOW = os.time()
 local SECONDS_IN_YEAR = 365.2425 * 86400
+local MAX_NUMBER_OF_PARTICIPANTS = Config.MAX_NUMBER_OF_PARTICIPANTS or Info.config.defaultMaxPlayersPerPlacement or 10
 
 NotabilityChecker.LOGGING = true
 
@@ -113,7 +115,7 @@ function NotabilityChecker._calculatePersonNotability(person)
 	local conditions = {}
 	for _, name in pairs({person, (person:gsub(' ', '_'))}) do
 		table.insert(conditions, '[[opponentname::' .. name .. ']]')
-		for i = 1, Config.MAX_NUMBER_OF_PARTICIPANTS do
+		for i = 1, MAX_NUMBER_OF_PARTICIPANTS do
 			table.insert(conditions, '[[opponentplayers_p' .. tostring(i) .. '::' .. name .. ']]')
 		end
 		for i = 1, Config.MAX_NUMBER_OF_COACHES do

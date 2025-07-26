@@ -113,5 +113,6 @@ return {
 				playedMatches = 'Matches',
 			},
 		},
+		defaultMaxPlayersPerPlacement = 15,
 	},
 }

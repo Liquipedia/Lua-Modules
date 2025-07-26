@@ -22,9 +22,6 @@ Config.TIER_TYPE_CHARITY = 'charity'
 -- How many placements should we retrieve from LPDB for a team/player?
 Config.PLACEMENT_LIMIT = 2000
 
--- How many players can be in a team?
-Config.MAX_NUMBER_OF_PARTICIPANTS = 10
-
 -- How many coaches can be in a team?
 Config.MAX_NUMBER_OF_COACHES = 1
 

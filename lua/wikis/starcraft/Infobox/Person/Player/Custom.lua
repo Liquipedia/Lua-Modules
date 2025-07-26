@@ -353,7 +353,7 @@ function CustomPlayer:calculateEarnings(args)
 	local player = self.pagename
 	local playerWithUnderScores = player:gsub(' ', '_')
 	local playerConditions = ConditionTree(BooleanOperator.any)
-	for playerIndex = 1, Info.maximumNumberOfPlayersInPlacements do
+	for playerIndex = 1, Info.config.defaultMaxPlayersPerPlacement do
 		playerConditions:add{
 			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, player),
 			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, playerWithUnderScores),
