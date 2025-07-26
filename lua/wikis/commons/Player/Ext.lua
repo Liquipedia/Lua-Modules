@@ -107,7 +107,7 @@ end
 ---@return table[]
 function PlayerExt.fetchFactionHistory(resolvedPageName)
 	local conditions = {
-		'[[type::playerrace]]',
+		'([[type::playerrace]] OR [[type::playerfaction]])',
 		'[[pagename::' .. resolvedPageName:gsub(' ', '_') .. ']]',
 	}
 	local rows = mw.ext.LiquipediaDB.lpdb('datapoint', {
