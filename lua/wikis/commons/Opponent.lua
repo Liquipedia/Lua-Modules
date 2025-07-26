@@ -240,6 +240,8 @@ end
 function Opponent.coerce(opponent)
 	assert(type(opponent) == 'table')
 
+	opponent.extradata = opponent.extradata or {}
+
 	opponent.type = Opponent.isType(opponent.type) and opponent.type or Opponent.literal
 	if opponent.type == Opponent.literal then
 		opponent.name = type(opponent.name) == 'string' and opponent.name or ''
@@ -402,7 +404,7 @@ function Opponent.readOpponentArgs(args)
 			flag = String.nilIfEmpty(Flags.CountryName{flag = args.flag or args.p1flag}),
 			pageName = args.link or args.p1link,
 			team = args.team or args.p1team,
-			faction = Faction.read(args.faction or args.race or args.p1race),
+			faction = Logic.nilIfEmpty(Faction.read(args.faction or args.race or args.p1race)),
 		}
 		return {type = Opponent.solo, players = {player}, extradata = {}}
 
@@ -414,7 +416,8 @@ function Opponent.readOpponentArgs(args)
 				flag = String.nilIfEmpty(Flags.CountryName{flag = args['p' .. playerIndex .. 'flag']}),
 				pageName = args['p' .. playerIndex .. 'link'],
 				team = playerTeam,
-				faction = Faction.read(args['p' .. playerIndex .. 'faction'] or args['p' .. playerIndex .. 'race']),
+				faction = Logic.nilIfEmpty(Faction.read(args['p' .. playerIndex .. 'faction']
+					or args['p' .. playerIndex .. 'race'])),
 			}
 		end)
 		return {type = args.type, players = players, extradata = {}}
@@ -447,7 +450,7 @@ function Opponent.fromMatch2Record(record)
 					displayName = playerRecord.displayname,
 					flag = String.nilIfEmpty(Flags.CountryName{flag = playerRecord.flag}),
 					pageName = String.nilIfEmpty(playerRecord.name),
-					faction = Faction.read(playerRecord.extradata.faction) or Faction.defaultFaction,
+					faction = Logic.nilIfEmpty(Faction.read(playerRecord.extradata.faction) or Faction.defaultFaction),
 				}
 			end),
 			extradata = {},
@@ -483,7 +486,7 @@ function Opponent.toLpdbStruct(opponent)
 				Opponent.toName({type = Opponent.team, template = player.team, players = {}, extradata = {}}) or
 				nil
 			players[prefix .. 'template'] = player.team
-			players[prefix .. 'faction'] = player.faction
+			players[prefix .. 'faction'] = Logic.nilIfEmpty(player.faction)
 		end
 		storageStruct.opponentplayers = players
 	end
@@ -506,7 +509,7 @@ function Opponent.fromLpdbStruct(storageStruct)
 				flag = Flags.CountryName{flag = players[prefix .. 'flag']},
 				pageName = players[prefix],
 				team = players[prefix .. 'template'] or players[prefix .. 'team'],
-				faction = players[prefix .. 'faction'],
+				faction = Logic.nilIfEmpty(players[prefix .. 'faction']),
 			}
 		end
 		return {
