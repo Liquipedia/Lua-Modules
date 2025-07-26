@@ -22,7 +22,7 @@ local Variables = require('Module:Variables')
 ---@field soloColumnWidth number
 
 ---@class WarcraftParticipantTableEntry: ParticipantTableEntry
----@field opponent WarcraftStandardOpponent
+---@field opponent standardOpponent
 
 ---@class WarcraftParticipantTableSection: ParticipantTableSection
 ---@field entries WarcraftParticipantTableEntry[]
