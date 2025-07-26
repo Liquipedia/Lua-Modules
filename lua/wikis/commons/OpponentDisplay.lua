@@ -230,26 +230,30 @@ end
 ---@param props BlockOpponentProps
 ---@return Html
 function OpponentDisplay.BlockPlayers(props)
+	local playersNode = mw.html.create('div')
+		:addClass('block-players-wrapper')
+	for _, playerNode in ipairs(OpponentDisplay.getBlockPlayerNodes(props)) do
+		playersNode:node(playerNode)
+	end
+
+	return playersNode
+end
+
+---@param props BlockOpponentProps
+---@return Html[]
+function OpponentDisplay.getBlockPlayerNodes(props)
 	local opponent = props.opponent
 
 	--only apply note to first player, hence extract it here
 	local note = Table.extract(props, 'note')
 
-	local playerNodes = Array.map(opponent.players, function(player, playerIndex)
+	return Array.map(opponent.players, function(player, playerIndex)
 		return PlayerDisplay.BlockPlayer(Table.merge(props, {
 			player = player,
 			team = player.team,
 			note = playerIndex == 1 and note or nil,
 		})):addClass(props.playerClass)
 	end)
-
-	local playersNode = mw.html.create('div')
-		:addClass('block-players-wrapper')
-	for _, playerNode in ipairs(playerNodes) do
-		playersNode:node(playerNode)
-	end
-
-	return playersNode
 end
 
 ---Displays a team as an inline element. The team is specified by a template.
