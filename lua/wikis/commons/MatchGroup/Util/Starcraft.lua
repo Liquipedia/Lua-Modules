@@ -17,8 +17,7 @@ local Table = Lua.import('Module:Table')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local SCORE_STATUS = MatchGroupInputUtil.STATUS.SCORE
 

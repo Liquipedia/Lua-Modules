@@ -21,9 +21,8 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local Opponent = Lua.import('Module:OpponentDisplay/Custom')
 
 local ICONS = {
 	veto = Icon.makeIcon{iconName = 'veto', color = 'cinnabar-text', size = '110%'},

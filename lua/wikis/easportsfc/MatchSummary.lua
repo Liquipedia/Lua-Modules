@@ -15,8 +15,7 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibrary.OpponentDisplay
+local Opponent = Lua.import('Module:OpponentDisplay/Custom')
 
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 

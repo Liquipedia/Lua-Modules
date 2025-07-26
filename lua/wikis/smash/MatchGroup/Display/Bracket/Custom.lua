@@ -10,9 +10,8 @@ local Characters = require('Module:Characters')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local Opponent = Lua.import('Module:OpponentDisplay/Custom')
 
 local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')

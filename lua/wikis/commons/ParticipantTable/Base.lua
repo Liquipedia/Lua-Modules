@@ -21,9 +21,8 @@ local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 local Variables = Lua.import('Module:Variables')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local Opponent = Lua.import('Module:OpponentDisplay/Custom')
 
 local Import = Lua.import('Module:ParticipantTable/Import')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')

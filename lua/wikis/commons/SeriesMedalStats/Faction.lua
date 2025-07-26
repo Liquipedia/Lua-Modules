@@ -13,8 +13,7 @@ local Class = Lua.import('Module:Class')
 local Faction = Lua.import('Module:Faction')
 local Table = Lua.import('Module:Table')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local MedalStatsBase = Lua.import('Module:SeriesMedalStats')
 

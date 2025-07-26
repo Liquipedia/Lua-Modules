@@ -13,8 +13,7 @@ local Game = Lua.import('Module:Game')
 local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:OpponentDisplay/Custom')
 
 local MatchUtil = Lua.import('Module:Match/Util')
 
