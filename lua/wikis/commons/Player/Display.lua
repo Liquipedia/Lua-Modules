@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local DisplayUtil = Lua.import('Module:DisplayUtil')
 local Logic = Lua.import('Module:Logic')
+local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
 local Abbreviation = Lua.import('Module:Abbreviation')
 
@@ -33,6 +34,7 @@ local PlayerDisplay = {}
 ---@field dq boolean?
 ---@field note string|number|nil
 ---@field team string?
+---@field showFaction boolean?
 
 ---@class InlinePlayerProps
 ---@field flip boolean?
@@ -40,6 +42,7 @@ local PlayerDisplay = {}
 ---@field showFlag boolean?
 ---@field showLink boolean?
 ---@field dq boolean?
+---@field showFaction boolean?
 
 --Displays a player as a block element. The width of the component is
 --determined by its layout context, and not by the player name.
@@ -67,6 +70,12 @@ function PlayerDisplay.BlockPlayer(props)
 		flagNode = PlayerDisplay.Flag{flag = player.flag}
 	end
 
+	local factionNode
+	if props.showFaction ~= false and player.faction ~= Faction.defaultFaction then
+		factionNode = mw.html.create('span'):addClass('race')
+			:wikitext(Faction.Icon{size = 'small', showLink = false, faction = player.faction})
+	end
+
 	local teamNode
 	if props.showPlayerTeam and player.team and player.team:upper() ~= TBD then
 		teamNode = mw.html.create('span')
@@ -78,6 +87,7 @@ function PlayerDisplay.BlockPlayer(props)
 		:addClass(props.flip and 'flipped' or nil)
 		:addClass(props.showPlayerTeam and 'has-team' or nil)
 		:node(flagNode)
+		:node(factionNode)
 		:node(nameNode)
 		:node(noteNode)
 		:node(teamNode)
@@ -93,6 +103,10 @@ function PlayerDisplay.InlinePlayer(props)
 		and PlayerDisplay.Flag{flag = player.flag}
 		or nil
 
+	local faction = props.showFaction ~= false and player.faction ~= Faction.defaultFaction
+		and Faction.Icon{size = 'small', showLink = false, faction = player.faction}
+		or nil
+
 	local nameAndLink = props.showLink ~= false and player.pageName
 		and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
 		or player.displayName
@@ -103,9 +117,11 @@ function PlayerDisplay.InlinePlayer(props)
 	local text
 	if props.flip then
 		text = nameAndLink
+			.. (faction and '&nbsp;' .. faction or '')
 			.. (flag and ('&nbsp;' .. flag) or '')
 	else
 		text = (flag and (flag .. '&nbsp;') or '')
+			.. (faction and faction .. '&nbsp;' or '')
 			.. nameAndLink
 	end
 

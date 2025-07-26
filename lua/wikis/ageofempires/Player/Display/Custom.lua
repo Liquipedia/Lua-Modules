@@ -74,7 +74,7 @@ function CustomPlayerDisplay.BlockPlayer(props)
 			:node(mw.ext.TeamTemplate.teampart(player.team))
 	end
 
-	return mw.html.create('div'):addClass('block-player starcraft-block-player')
+	return mw.html.create('div'):addClass('block-player')
 		:addClass(props.flip and 'flipped' or nil)
 		:addClass(props.showPlayerTeam and 'has-team' or nil)
 		:node(flagNode)
@@ -114,7 +114,7 @@ function CustomPlayerDisplay.InlinePlayer(props)
 			.. nameAndLink
 	end
 
-	return mw.html.create('span'):addClass('starcraft-inline-player')
+	return mw.html.create('span')
 		:addClass(props.flip and 'flipped' or nil)
 		:wikitext(text)
 end
