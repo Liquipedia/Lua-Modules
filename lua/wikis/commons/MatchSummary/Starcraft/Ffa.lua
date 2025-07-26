@@ -12,7 +12,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Table = Lua.import('Module:Table')
 
-local Opponent = Lua.import('Module:OpponentDisplay/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local BaseMatchSummary = Lua.import('Module:MatchSummary/Base/Ffa')

@@ -12,7 +12,7 @@ local Logic = Lua.import('Module:Logic')
 local RoleOf = Lua.import('Module:RoleOf')
 local String = Lua.import('Module:StringUtils')
 
-local Opponent = Lua.import('Module:OpponentDisplay/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
