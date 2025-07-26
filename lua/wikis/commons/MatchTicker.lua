@@ -18,8 +18,7 @@ local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
 local Tier = Lua.import('Module:Tier/Utils')
 
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 local MatchUtil = Lua.import('Module:Match/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Tournament = Lua.import('Module:Tournament')

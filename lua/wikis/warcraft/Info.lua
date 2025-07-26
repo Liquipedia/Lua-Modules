@@ -63,6 +63,4 @@ return {
 			matchWidth = 150,
 		},
 	},
-	opponentLibrary = 'Opponent/Custom',
-	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

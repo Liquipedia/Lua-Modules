@@ -20,8 +20,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Placement = Lua.import('Module:PrizePool/Placement')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local AUTOMATION_START_DATE = '2023-01-01'
 local GROUPSCORE_DELIMITER = '/'

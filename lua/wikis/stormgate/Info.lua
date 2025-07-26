@@ -38,6 +38,4 @@ return {
 		},
 	},
 	defaultRoundPrecision = 0,
-	opponentLibrary = 'Opponent/Custom',
-	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

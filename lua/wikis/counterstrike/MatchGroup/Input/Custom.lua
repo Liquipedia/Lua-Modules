@@ -16,8 +16,7 @@ local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local FEATURED_TIERS = {1, 2}

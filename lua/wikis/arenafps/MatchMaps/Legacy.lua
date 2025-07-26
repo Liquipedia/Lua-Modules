@@ -18,8 +18,7 @@ local MatchGroupBase = Lua.import('Module:MatchGroup/Base')
 
 local globalVars = PageVariableNamespace()
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local MAX_NUMBER_OF_OPPONENTS = 2
 local MAX_NUM_MAPS = 9

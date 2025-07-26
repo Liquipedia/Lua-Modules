@@ -10,8 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Date = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local RatingsStorageExtension = {}
 

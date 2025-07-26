@@ -13,8 +13,7 @@ local DateExt = Lua.import('Module:Date/Ext')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Page = Lua.import('Module:Page')
 
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local BaseResultsTable = Lua.import('Module:ResultsTable/Base')
 

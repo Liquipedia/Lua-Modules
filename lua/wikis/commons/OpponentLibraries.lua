@@ -5,6 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+--to be removed after cleanup of non git modules
+---@deprecated
+
 local Lua = require('Module:Lua')
 
 local Info = Lua.import('Module:Info')

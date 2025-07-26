@@ -13,8 +13,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local StandingsParseLpdb = {}
 

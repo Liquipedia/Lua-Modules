@@ -11,8 +11,7 @@ local Table = require('Module:Table')
 
 local LegacyPrizePool = Lua.import('Module:PrizePool/Legacy')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l', q = 'q'}
 
