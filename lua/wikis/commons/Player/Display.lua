@@ -103,7 +103,8 @@ function PlayerDisplay.InlinePlayer(props)
 		and PlayerDisplay.Flag{flag = player.flag}
 		or nil
 
-	local faction = props.showFaction ~= false and Logic.isNotEmpty(player.faction) and player.faction ~= Faction.defaultFaction
+	local faction = props.showFaction ~= false and Logic.isNotEmpty(player.faction)
+		and player.faction ~= Faction.defaultFaction
 		and Faction.Icon{size = 'small', showLink = false, faction = player.faction}
 		or nil
 
