@@ -15,7 +15,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
 
-local Opponent = Lua.import('Module:OpponentDisplay/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Characters = Lua.import('Module:Characters')
 

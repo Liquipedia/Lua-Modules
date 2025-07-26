@@ -17,7 +17,7 @@ local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local MatchOverview = Lua.import('Module:Widget/Standings/MatchOverview')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
-local Opponent = Lua.import('Module:OpponentDisplay/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 ---@class StandingsSwissWidget: Widget
 ---@operator call(table): StandingsSwissWidget

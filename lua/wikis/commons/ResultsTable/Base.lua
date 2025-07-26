@@ -20,7 +20,7 @@ local Team = Lua.import('Module:Team')
 local Tier = Lua.import('Module:Tier/Custom')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
-local Opponent = Lua.import('Module:OpponentDisplay/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree

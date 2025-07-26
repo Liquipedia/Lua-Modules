@@ -15,7 +15,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
-local Opponent = Lua.import('Module:OpponentDisplay/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 ---@class MatchPageRoundsOverviewProps
 ---@field rounds ValorantRoundData[]

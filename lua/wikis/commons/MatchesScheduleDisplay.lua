@@ -20,7 +20,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
-local Opponent = Lua.import('Module:OpponentDisplay/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree

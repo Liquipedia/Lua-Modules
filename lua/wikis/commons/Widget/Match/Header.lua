@@ -19,7 +19,7 @@ local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Span = HtmlWidgets.Span
 local Div = HtmlWidgets.Div
 
-local Opponent = Lua.import('Module:OpponentDisplay/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 ---@class MatchHeaderProps
 ---@field match MatchGroupUtilMatch

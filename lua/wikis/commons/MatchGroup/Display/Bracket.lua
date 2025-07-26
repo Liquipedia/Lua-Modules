@@ -20,7 +20,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
-local Opponent = Lua.import('Module:OpponentDisplay/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local NON_BREAKING_SPACE = '&nbsp;'
 local OPPONENT_HEIGHT_PADDING = 4

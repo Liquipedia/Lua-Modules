@@ -15,7 +15,7 @@ local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
-local Opponent = Lua.import('Module:OpponentDisplay/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')

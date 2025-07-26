@@ -10,7 +10,7 @@ local Table = require('Module:Table')
 
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
-local Opponent = Lua.import('Module:OpponentDisplay/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local CustomParticipantTable = {}
 

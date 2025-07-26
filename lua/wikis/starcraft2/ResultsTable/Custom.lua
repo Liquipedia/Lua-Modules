@@ -21,7 +21,7 @@ local ResultsTable = Lua.import('Module:ResultsTable')
 local AwardsTable = Lua.import('Module:ResultsTable/Award')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
-local Opponent = Lua.import('Module:OpponentDisplay/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]'
 local DEFAULT_EVENT_ICON = ''

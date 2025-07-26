@@ -29,7 +29,7 @@ local HighlightConditions = Lua.import('Module:HighlightConditions')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
-local Opponent = Lua.import('Module:OpponentDisplay/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local VS = 'vs'
 local SCORE_STATUS = 'S'

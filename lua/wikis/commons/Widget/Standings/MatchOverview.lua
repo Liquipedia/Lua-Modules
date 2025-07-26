@@ -12,7 +12,7 @@ local Class = Lua.import('Module:Class')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
-local Opponent = Lua.import('Module:OpponentDisplay/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 ---@class MatchOverviewWidget: Widget
 ---@operator call(table): MatchOverviewWidget

@@ -30,7 +30,7 @@ local VodLink = Lua.import('Module:VodLink')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
-local Opponent = Lua.import('Module:OpponentDisplay/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
 
