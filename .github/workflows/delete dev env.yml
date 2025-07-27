@@ -1,0 +1,28 @@
+name: Remove Lua Dev Env Modules
+
+on:
+  workflow_dispatch:
+    inputs:
+      luadevenv:
+        description: 'Lua Dev Enviroment name'
+        required: true
+      includecommons:
+        description: 'Include Commons'
+        type: boolean
+        required: true
+
+jobs:
+  deploy:
+    name: Remove Dev Env
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Remove Lua Dev Env Modules
+        env:
+          WIKI_USER: ${{ secrets.LP_BOTUSER }}
+          WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
+          WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
+          WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+          LUA_DEV_ENV_NAME: "dev/${{ github.event.inputs.luadevenv }}"
+          INCLUDE_COMMONS: ${{ github.event.inputs.includecommons }}
+        run: bash scripts/remove.sh
