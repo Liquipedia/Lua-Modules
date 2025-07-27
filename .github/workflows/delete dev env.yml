@@ -1,0 +1,36 @@
+name: Remove Lua Dev Env Modules
+
+on:
+  workflow_dispatch:
+    inputs:
+      luadevenv:
+        description: 'Lua Dev Enviroment name'
+        required: true
+      includecommons:
+        description: 'Include Commons'
+        type: boolean
+        default: true
+      includesubenvs:
+        description: 'Include sub envs (e.g. hjp includes in hjp2)'
+        type: boolean
+
+jobs:
+  removedev:
+    name: Remove Dev Env
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Remove Lua Dev Env Modules
+        env:
+          WIKI_USER: ${{ secrets.LP_BOTUSER }}
+          WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
+          WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
+          WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+          LUA_DEV_ENV_NAME: "dev/${{ github.event.inputs.luadevenv }}"
+          INCLUDE_COMMONS: ${{ github.event.inputs.includecommons }}
+          INCLUDE_SUB_ENVS: ${{ github.event.inputs.includesubenvs }}
+        run: bash scripts/remove_dev.sh
