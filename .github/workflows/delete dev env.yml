@@ -11,7 +11,7 @@ on:
         type: boolean
         default: true
       includesubenvs:
-        description: 'Include sub envs (e.g. hjp includes in hjp2)'
+        description: 'Include sub envs (e.g. hjp includes hjp2)'
         type: boolean
 
 jobs:
