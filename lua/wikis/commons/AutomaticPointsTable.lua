@@ -1,21 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:AutomaticPointsTable
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Condition = require('Module:Condition')
-local TableDisplay = require('Module:AutomaticPointsTable/Display')
-local MinifiedDisplay = require('Module:AutomaticPointsTable/MinifiedDisplay')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Condition = Lua.import('Module:Condition')
+local TableDisplay = Lua.import('Module:AutomaticPointsTable/Display')
+local MinifiedDisplay = Lua.import('Module:AutomaticPointsTable/MinifiedDisplay')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node

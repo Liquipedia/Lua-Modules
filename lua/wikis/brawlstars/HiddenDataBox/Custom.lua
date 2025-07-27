@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=brawlstars
 -- page=Module:HiddenDataBox/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -38,4 +37,4 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	end
 end
 
-return Class.export(CustomHiddenDataBox)
+return Class.export(CustomHiddenDataBox, {exports = {'run'}})

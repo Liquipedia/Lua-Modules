@@ -1,17 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
-local HeroNames = mw.loadData('Module:ChampionNames')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
+local HeroNames = Lua.import('Module:ChampionNames', {loadData = true})
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
@@ -60,13 +60,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 	end
 
-	return CustomMatchGroupInput.processMatchWithoutStandalone(MapParser, match)
-end
-
----@param MapParser LeagueOfLegendsMapParserInterface
----@param match table
----@return table
-function CustomMatchGroupInput.processMatchWithoutStandalone(MapParser, match)
 	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
 end
 
@@ -108,7 +101,6 @@ end
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
 end
 
@@ -168,8 +160,10 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 			local participant = participantList[playerIndex]
 			return participant and {name = participant.player} or nil
 		end,
-		function(playerIndex)
+		function(playerIndex, playerIdData, playerInputData)
 			local participant = participantList[playerIndex]
+			participant.player = playerIdData.name or playerInputData.link or playerInputData.name
+			participant.displayName = playerIdData.displayname or playerInputData.name
 			participant.character = getCharacterName(participant.character)
 			return participant
 		end

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
 -- page=Module:MatchMaps/Legacy/Store
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

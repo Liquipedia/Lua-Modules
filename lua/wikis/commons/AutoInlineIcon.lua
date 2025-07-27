@@ -1,24 +1,28 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:AutoInlineIcon
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local InlineIconAndText = require('Module:Widget/Misc/InlineIconAndText')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+
+local InlineIconAndText = Lua.import('Module:Widget/Misc/InlineIconAndText')
 local ManualData = Lua.requireIfExists('Module:InlineIcon/ManualData', {loadData = true})
+
+local Character  = Lua.import('Module:Character')
 
 local AutoInlineIcon = {}
 
----@param options {onlyicon: boolean?}
----@param category string
----@param lookup string
----@param extraInfo string?
+---onlyicon default false, link default true
+---@param options {onlyicon: boolean?, link: boolean?, category: string, lookup: string}
 ---@return Widget
-function AutoInlineIcon.display(options, category, lookup, extraInfo)
+function AutoInlineIcon.display(options)
+	local category = options.category
+	local lookup = options.lookup
+	local skipLink = not Logic.readBool(options.link)
 	assert(category, 'Category parameter is required.')
 	assert(lookup, 'Lookup parameter is required.')
 
@@ -34,7 +38,7 @@ function AutoInlineIcon.display(options, category, lookup, extraInfo)
 	return InlineIconAndText{
 		icon = icon,
 		text = data.text,
-		link = data.link,
+		link = skipLink and '' or data.link,
 	}
 end
 
@@ -42,7 +46,7 @@ end
 ---@return fun(name: string): table
 function AutoInlineIcon._getDataRetrevalFunction(category)
 	local categoryMapper = {
-		H = AutoInlineIcon._queryHeroData,
+		H = AutoInlineIcon._queryCharacterData,
 		A = function(name)
 			error('Abilities not yet implemented.')
 		end,
@@ -59,7 +63,7 @@ end
 ---@return IconWidget
 function AutoInlineIcon._iconCreator(data)
 	if data.iconType == 'image' then
-		local IconImage = require('Module:Widget/Image/Icon/Image')
+		local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 		return IconImage{
 			imageLight = data.iconLight,
 			imageDark = data.iconDark,
@@ -67,7 +71,7 @@ function AutoInlineIcon._iconCreator(data)
 			size = Logic.emptyOr(data.size),
 		}
 	elseif data.iconType == 'fa' then
-		local IconFa = require('Module:Widget/Image/Icon/Fontawesome')
+		local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 		return IconFa{
 			iconName = data.icon,
 			link = data.link,
@@ -95,19 +99,17 @@ end
 
 ---@param name string
 ---@return table
-function AutoInlineIcon._queryHeroData(name)
-	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = '[[type::character]] AND [[name::'.. name ..']]',
-	})[1]
-	assert(data, 'Hero not found.')
+function AutoInlineIcon._queryCharacterData(name)
+	local character = Character.getCharacterByName(name)
+	assert(character, 'Character not found.')
 
 	return {
 		iconType = 'image',
-		link = data.pagename,
-		text = data.name,
-		iconLight = data.extradata.icon or data.image,
-		iconDark = data.extradata.icon or data.imagedark,
+		link = character.pageName,
+		text = character.name,
+		iconLight = character.iconLight,
+		iconDark = character.iconDark,
 	}
 end
 
-return Class.export(AutoInlineIcon)
+return Class.export(AutoInlineIcon, {exports = {'display'}})

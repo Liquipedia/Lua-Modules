@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=smash
 -- page=Module:HiddenDataBox/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -88,4 +87,4 @@ function CustomHiddenDataBox._determineMatchSection(page)
 	end
 end
 
-return Class.export(CustomHiddenDataBox)
+return Class.export(CustomHiddenDataBox, {exports = {'run'}})

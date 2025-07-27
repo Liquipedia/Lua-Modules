@@ -1,16 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/Ffa/GameDetails
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
@@ -40,7 +40,7 @@ function MatchSummaryFfaGameDetails:render()
 		},
 		game.map and {
 			icon = IconWidget{iconName = 'map'},
-			content = HtmlWidgets.Span{children = Page.makeInternalLink(game.map)},
+			content = HtmlWidgets.Span{children = Page.makeInternalLink(game.mapDisplayName or game.map, game.map)},
 		} or nil,
 		Logic.isNotEmpty(casters) and {
 			icon = IconWidget{

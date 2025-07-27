@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:FilterButtons/Config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -9,6 +8,7 @@
 local Config = {}
 local Tier = require('Module:Tier/Utils')
 local Game = require('Module:Game')
+local HtmlWidgets = require('Module:Widget/Html/All')
 
 ---@type FilterButtonCategory[]
 Config.categories = {
@@ -21,21 +21,29 @@ Config.categories = {
 				table.insert(category.items, tier.value)
 			end
 		end,
-		defaultItems = {'1', '2', '3'},
 		transform = function(tier)
 			return Tier.toName(tonumber(tier))
 		end,
-		expandKey = "game"
 	},
 	{
 		name = 'game',
 		property = 'game',
-		expandable = true,
 		load = function(category)
-			category.items = Game.listGames({ordered = true})
+			category.items = Game.listGames{ordered = true}
 		end,
 		transform = function(game)
-			return Game.icon({game = game, noSpan = true, noLink = true, size = '20x20px'})
+			return HtmlWidgets.Fragment{
+				children = {
+					Game.icon{game = game, noSpan = true, noLink = true, size = '20x20px'},
+					HtmlWidgets.Span{
+						classes = {'mobile-hide'},
+						children = {
+							'&nbsp;',
+							Game.text{game = game, noLink = true, useAbbreviation = true},
+						}
+					}
+				}
+			}
 		end
 	}
 }

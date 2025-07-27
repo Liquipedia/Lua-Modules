@@ -1,25 +1,25 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:Infobox/Skill/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
-local Faction = require('Module:Faction')
-local Hotkeys = require('Module:Hotkey')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local CostDisplay = Lua.import('Module:Infobox/Extension/CostDisplay')
+local Faction = Lua.import('Module:Faction')
+local Hotkeys = Lua.import('Module:Hotkey')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Skill = Lua.import('Module:Infobox/Skill')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class Starcraft2SkillInfobox: SkillInfobox
@@ -87,7 +87,7 @@ end
 ---@return string?
 function CustomSkill:getResearchHotkey()
 	if String.isNotEmpty(self.args.from) then
-		return Hotkeys.hotkey(self.args.rhotkey)
+		return Hotkeys.hotkey{hotkey = self.args.rhotkey}
 	end
 end
 
@@ -147,9 +147,9 @@ end
 function CustomSkill:getHotkeys()
 	local args = self.args
 	if String.isNotEmpty(args.hotkey) and String.isNotEmpty(args.hotkey2) then
-		return Hotkeys.hotkey2(args.hotkey, args.hotkey2, 'slash')
+		return Hotkeys.hotkey2{hotkey1 = args.hotkey, hotkey2 = args.hotkey2, seperator = 'slash'}
 	elseif String.isNotEmpty(args.hotkey) then
-		return Hotkeys.hotkey(args.hotkey)
+		return Hotkeys.hotkey{hotkey = args.hotkey}
 	end
 end
 

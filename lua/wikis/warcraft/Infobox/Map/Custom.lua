@@ -1,26 +1,27 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class WarcraftMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
-
+---@class WarcraftMapInfoboxWidgetInjector: WidgetInjector
+---@field caller WarcraftMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -44,7 +45,6 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Size', content = {(args.width or '') .. 'x' .. (args.height or '')}},
 			Cell{name = 'Spawn Positions', content = {(args.players or '') .. ' at ' .. (args.positions or '')}},
 			Cell{name = 'Versions', content = {String.convertWikiListToHtmlList(args.versions)}},
-			Cell{name = 'Competition Span', content = {args.span}},
 			Cell{name = 'Leagues Featured', content = {args.leagues}},
 			Cell{name = 'Mercenary Camps', content = {
 				self.caller:_mercenaryCamp(),
@@ -74,12 +74,9 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	lpdbData.extradata = {
-		creator = args.creator,
-		spawns = args.players,
-		height = args.height,
-		width = args.width,
-	}
+	lpdbData.extradata.spawns = args.players
+	lpdbData.extradata.height = args.height
+	lpdbData.extradata.width = args.width
 	return lpdbData
 end
 

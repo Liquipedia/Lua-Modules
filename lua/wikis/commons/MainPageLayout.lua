@@ -1,17 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MainPageLayout
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Image = require('Module:Image')
-local LpdbCounter = require('Module:LPDB entity count')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Image = Lua.import('Module:Image')
+local LpdbCounter = Lua.import('Module:LPDB entity count')
+local String = Lua.import('Module:StringUtils')
 
 local WikiData = Lua.import('Module:MainPageLayout/data')
 local GridWidgets = Lua.import('Module:Widget/Grid')
@@ -41,7 +41,7 @@ function MainPageLayout.make(frame)
 		children = {
 			NO_TABLE_OF_CONTENTS,
 			frame:preprocess(String.interpolate(METADESC, {metadesc = WikiData.metadesc})),
-			frame:preprocess('{{DISPLAYTITLE:' .. WikiData.title .. '}}'),
+			frame:callParserFunction('DISPLAYTITLE', WikiData.title),
 			HtmlWidgets.Div{
 				classes = {'header-banner'},
 				children = {
@@ -58,7 +58,7 @@ function MainPageLayout.make(frame)
 							}
 						},
 					},
-					frame:preprocess('{{#searchbox:}}'),
+					frame:callParserFunction('#searchbox', ''),
 				}
 			},
 			HtmlWidgets.Div{
@@ -111,7 +111,7 @@ function MainPageLayout._makeCells(cells)
 	return GridWidgets.Container{ gridCells = output }
 end
 
----@param navigationData {file: string?, link: string?, count: table?, title: string?}
+---@param navigationData {file: string?, iconName: string?, link: string?, count: table?, title: string?}
 ---@return Widget
 function MainPageLayout._makeNavigationCard(navigationData)
 	local count
@@ -127,6 +127,7 @@ function MainPageLayout._makeNavigationCard(navigationData)
 
 	return NavigationCard{
 		file = navigationData.file,
+		iconName = navigationData.iconName,
 		link = navigationData.link,
 		title = navigationData.title,
 		count = count

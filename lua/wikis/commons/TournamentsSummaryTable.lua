@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:TournamentsSummaryTable
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -14,16 +13,18 @@ Generates the list of upcoming/ongoing/recent tournaments needed for the Tournam
 
 local TournamentsSummaryTable = {}
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Logic = require('Module:Logic')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
-local Variables = require('Module:Variables')
+local Lua = require('Module:Lua')
 
-local Condition = require('Module:Condition')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
+local Variables = Lua.import('Module:Variables')
+
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -374,4 +375,4 @@ function TournamentsSummaryTable.manualUpcomingRow(args)
 	return ''
 end
 
-return Class.export(TournamentsSummaryTable)
+return Class.export(TournamentsSummaryTable, {exports = {'run'}})

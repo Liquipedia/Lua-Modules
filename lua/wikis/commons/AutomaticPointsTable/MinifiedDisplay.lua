@@ -1,13 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:AutomaticPointsTable/MinifiedDisplay
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 
 local PointsDivTable = Class.new(
 	function(self, pointsData, tournaments, positionBackgrounds, limit)

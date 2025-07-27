@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=halo
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -114,6 +113,7 @@ return {
 			status = 2,
 			matchWidthMobile = 110,
 			matchWidth = 180,
+			sortCasters = true,
 		},
 	},
 }

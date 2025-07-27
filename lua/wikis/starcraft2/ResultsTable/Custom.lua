@@ -1,26 +1,26 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:ResultsTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local DivTable = require('Module:DivTable')
-local GeneralCollapsible = require('Module:GeneralCollapsible')
-local Json = require('Module:Json')
-local LeagueIcon = require('Module:LeagueIcon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Arguments = Lua.import('Module:Arguments')
+local DivTable = Lua.import('Module:DivTable')
+local GeneralCollapsible = Lua.import('Module:GeneralCollapsible')
+local Json = Lua.import('Module:Json')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local ResultsTable = Lua.import('Module:ResultsTable')
 local AwardsTable = Lua.import('Module:ResultsTable/Award')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 

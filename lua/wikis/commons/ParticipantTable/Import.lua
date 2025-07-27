@@ -1,17 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:ParticipantTable/Import
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+
+local OpponentLibrary = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
 local TournamentStructure = Lua.import('Module:TournamentStructure')

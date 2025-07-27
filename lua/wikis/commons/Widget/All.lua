@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/All
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -18,7 +17,7 @@ Widgets.Customizable = Lua.import('Module:Widget/Customizable')
 Widgets.Breakdown = Lua.import('Module:Widget/Infobox/Breakdown')
 Widgets.Cell = Lua.import('Module:Widget/Infobox/Cell')
 Widgets.Center = Lua.import('Module:Widget/Infobox/Center')
-Widgets.Chronology = Lua.import('Module:Widget/Infobox/Chronology')
+Widgets.Chronology = Lua.import('Module:Widget/Infobox/ChronologyContainer')
 Widgets.Header = Lua.import('Module:Widget/Infobox/Header')
 Widgets.Highlights = Lua.import('Module:Widget/Infobox/Highlights')
 Widgets.Links = Lua.import('Module:Widget/Infobox/Links')

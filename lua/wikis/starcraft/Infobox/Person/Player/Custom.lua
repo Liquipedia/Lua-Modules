@@ -1,36 +1,36 @@
 ---
 -- @Liquipedia
--- wiki=starcraft
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Faction = require('Module:Faction')
-local Info = require('Module:Info')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
-local Lpdb = require('Module:Lpdb')
-local Math = require('Module:MathUtil')
-local Namespace = require('Module:Namespace')
-local Notability = require('Module:Notability')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Faction = Lua.import('Module:Faction')
+local Info = Lua.import('Module:Info')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Math = Lua.import('Module:MathUtil')
+local Namespace = Lua.import('Module:Namespace')
+local Notability = Lua.import('Module:Notability')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
 local Opponent = Lua.import('Module:Opponent')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -519,7 +519,7 @@ function CustomPlayer:getWikiCategories(categories)
 	end
 
 	for _, faction in pairs(Faction.readMultiFaction(args.race, {alias = false})) do
-		table.insert(categories, faction .. ' Players')
+		table.insert(categories, Faction.toName(faction) .. ' Players')
 	end
 
 	local botCategoryKeys = {

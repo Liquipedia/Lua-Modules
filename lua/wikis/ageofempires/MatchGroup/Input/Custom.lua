@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -32,11 +31,13 @@ local MatchFunctions = {
 }
 local MapFunctions = {
 	BREAK_ON_EMPTY = true,
+	INHERIT_MAP_DATES = true,
 }
 
 local FffMatchFunctions = {
 	OPPONENT_CONFIG = OPPONENT_CONFIG,
 }
+---@type FfaMapParserInterface
 local FfaMapFunctions = {}
 
 ---@param match table
@@ -62,8 +63,7 @@ function MatchFunctions.readOpponent(match, opponentIndex, options)
 		return opponentIndex <= 2 and MatchGroupInputUtil.mergeRecordWithOpponent({}, Opponent.blank()) or nil
 	end
 
-	--- or Opponent.blank() is only needed because readOpponentArg can return nil for team opponents
-	local opponent = Opponent.readOpponentArgs(opponentInput) or Opponent.blank()
+	local opponent = Opponent.readOpponentArgs(opponentInput)
 	if Opponent.isBye(opponent) then
 		local byeOpponent = Opponent.blank()
 		byeOpponent.name = 'BYE'
@@ -174,16 +174,6 @@ function MatchFunctions.calculateMatchScore(maps)
 end
 
 ---@param match table
----@param games table[]
----@param opponents table[]
----@return table
-function MatchFunctions.getExtraData(match, games, opponents)
-	return {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-	}
-end
-
----@param match table
 ---@param opponents table[]
 ---@return string?
 function MatchFunctions.getHeadToHeadLink(match, opponents)
@@ -240,8 +230,14 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local players
 	if opponent.type == Opponent.team then
 		players = Array.parseCommaSeparatedString(map['players' .. opponentIndex])
-	else
+	elseif opponent.type == Opponent.solo then
 		players = Array.map(opponent.match2players, Operator.property('name'))
+	else
+		-- Party of 2 or more players
+		players = Logic.emptyOr(
+			Array.parseCommaSeparatedString(map['players' .. opponentIndex]),
+			Array.map(opponent.match2players, Operator.property('name'))
+		) or {}
 	end
 	local civs = Array.parseCommaSeparatedString(map['civs' .. opponentIndex])
 
@@ -328,6 +324,9 @@ function FffMatchFunctions.getExtraData(match, games, opponents, settings)
 		settings = settings.settings,
 	}
 end
+
+FfaMapFunctions.getMapName = MapFunctions.getMapName
+FfaMapFunctions.getGame = MapFunctions.getGame
 
 ---@param map table
 ---@param opponent table

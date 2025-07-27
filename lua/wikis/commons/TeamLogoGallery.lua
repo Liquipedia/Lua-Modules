@@ -1,20 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:TeamLogoGallery
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Gallery = require('Module:Gallery')
-local Game = require('Module:Game')
-local Logic = require('Module:Logic')
-local Ordinal = require('Module:Ordinal')
-local Table = require('Module:Table')
-local Team = require('Module:Team')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Gallery = Lua.import('Module:Gallery')
+local Game = Lua.import('Module:Game')
+local Logic = Lua.import('Module:Logic')
+local Ordinal = Lua.import('Module:Ordinal')
+local Table = Lua.import('Module:Table')
+local Team = Lua.import('Module:Team')
 
 local TeamLogoGallery = {}
 
@@ -120,4 +121,4 @@ function TeamLogoGallery._makeCaptionAndBelow(imageData, index, finalName)
 	return caption, below
 end
 
-return Class.export(TeamLogoGallery)
+return Class.export(TeamLogoGallery, {exports = {'run'}})

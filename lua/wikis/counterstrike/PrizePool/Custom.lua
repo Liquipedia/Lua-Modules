@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:PrizePool/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -79,6 +78,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	end
 
 	Variables.varDefine('prizepoints_' .. lpdbData.participant, lpdbData.extradata.prizepoints)
+	Variables.varDefine('prizepoints2_' .. lpdbData.participant, lpdbData.extradata.prizepoints2)
 	Variables.varDefine('enddate_' .. lpdbData.participant, lpdbData.date)
 	Variables.varDefine('placement_' .. lpdbData.participant, lpdbData.placement)
 

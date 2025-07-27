@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
 -- page=Module:PrizePool/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -62,6 +61,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	end
 
 	Variables.varDefine(lpdbData.participant:lower() .. '_prizepoints', lpdbData.extradata.prizepoints)
+	Variables.varDefine(lpdbData.participant:lower() .. '_prizepoints2', lpdbData.extradata.prizepoints2)
 
 	return lpdbData
 end

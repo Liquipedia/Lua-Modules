@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:YearsActive
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -90,4 +89,4 @@ function CustomActiveYears._getYearsBroadcast(conditions)
 	return years:toArray()
 end
 
-return Class.export(CustomActiveYears)
+return Class.export(CustomActiveYears, {exports = {'get', 'getTalent', 'display'}})

@@ -1,32 +1,29 @@
 ---
 -- @Liquipedia
--- wiki=splatoon
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local WeaponIcon = require('Module:WeaponIconPlayer')
-local WeaponNames = mw.loadData('Module:WeaponNames')
 local Lua = require('Module:Lua')
-local Region = require('Module:Region')
-local Role = require('Module:Role')
-local String = require('Module:StringUtils')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local WeaponIcon = Lua.import('Module:WeaponIconPlayer')
+local WeaponNames = Lua.import('Module:WeaponNames', {loadData = true})
+local Region = Lua.import('Module:Region')
+local String = Lua.import('Module:StringUtils')
+local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local SIZE_WEAPON = '25x25px'
 
 ---@class SplatoonInfoboxPlayer: Person
----@field role table
----@field role2 table
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -37,9 +34,6 @@ function CustomPlayer.run(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	player.args.history = TeamHistoryAuto.results{convertrole = true}
-
-	player.role = Role.run{role = player.args.role}
-	player.role2 = Role.run{role = player.args.role2}
 
 	return player:createInfobox()
 end
@@ -71,10 +65,6 @@ function CustomInjector:parse(id, widgets)
 			content = {table.concat(weaponIcons, '&nbsp;')}
 		})
 	elseif id == 'region' then return {}
-	elseif id == 'role' then
-		return {
-			Cell{name = caller.role2.display and 'Roles' or 'Role', content = {caller.role.display, caller.role2.display}}
-		}
 	end
 
 	return widgets
@@ -85,10 +75,6 @@ end
 ---@param personType string
 ---@return table
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.isplayer = self.role.isPlayer or 'true'
-	lpdbData.extradata.role = self.role.role
-	lpdbData.extradata.role2 = self.role2.role
-
 	-- store signature weapons with standardized name
 	for weaponIndex, weapon in ipairs(self:getAllArgsForBase(args, 'weapon')) do
 		lpdbData.extradata['signatureWeapon' .. weaponIndex] = WeaponNames[weapon:lower()]

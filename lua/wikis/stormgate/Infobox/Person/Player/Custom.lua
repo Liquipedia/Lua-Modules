@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -21,25 +20,6 @@ local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Player = Lua.import('Module:Infobox/Person')
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
-
-local ROLES = {
-	analyst = {category = 'Analyst', variable = 'Analyst', personType = 'Talent'},
-	observer = {category = 'Observer', variable = 'Observer', personType = 'Talent'},
-	host = {category = 'Host', variable = 'Host', personType = 'Talent'},
-	journalist = {category = 'Journalist', variable = 'Journalist', personType = 'Talent'},
-	expert = {category = 'Expert', variable = 'Expert', personType = 'Talent'},
-	caster = {category = 'Caster', variable = 'Caster', personType = 'Talent'},
-	talent = {category = 'Talent', variable = 'Talent', personType = 'Talent'},
-	streamer = {category = 'Streamer', variable = 'Streamer', personType = 'Talent'},
-	interviewer = {category = 'Interviewer', variable = 'Interviewer', personType = 'Talent'},
-	photographer = {category = 'Photographer', variable = 'Photographer', personType = 'Talent'},
-	organizer = {category = 'Organizer', variable = 'Organizer', personType = 'Staff'},
-	coach = {category = 'Coache', variable = 'Coach', personType = 'Staff'},
-	admin = {category = 'Admin', variable = 'Admin', personType = 'Staff'},
-	manager = {category = 'Manager', variable = 'Manager', personType = 'Staff'},
-	producer = {category = 'Producer', variable = 'Producer', personType = 'Staff'},
-	player = {category = 'Player', variable = 'Player', personType = 'Player'},
-}
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Widgets = Lua.import('Module:Widget/All')
@@ -82,12 +62,12 @@ function CustomInjector:parse(id, widgets)
 				content = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
 			},
 			Cell{
-				name = Abbreviation.make('Years Active', 'Years active as a player'),
+				name = Abbreviation.make{text = 'Years Active', title = 'Years active as a player'},
 				content = {YearsActive.display({player = caller.pagename})
 			}
 			},
 			Cell{
-				name = Abbreviation.make('Years Active (caster)', 'Years active as a caster'),
+				name = Abbreviation.make{text = 'Years Active (caster)', title = 'Years active as a caster'},
 				content = {caller:_getActiveCasterYears()}
 			},
 		}
@@ -197,26 +177,12 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 
 	extradata.faction = factions[1]
 	extradata.faction2 = factions[2]
-	extradata.role = CustomPlayer:_getRoleData(args.role).variable
-	extradata.role2 = args.role2 and CustomPlayer:_getRoleData(args.role2).variable or nil
 
 	if Variables.varDefault('factioncount') then
 		extradata.factionhistorical = true
 	end
 
 	return lpdbData
-end
----@param args table
----@return {store: string, category: string}
-function CustomPlayer:getPersonType(args)
-	local roleData = self:_getRoleData(args.role)
-	return {store = roleData.personType, category = roleData.category}
-end
-
----@param roleInput string?
----@return {category:string, variable: string, personType: string}
-function CustomPlayer:_getRoleData(roleInput)
-	return ROLES[roleInput] or ROLES.player
 end
 
 return CustomPlayer

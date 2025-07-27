@@ -1,25 +1,25 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/UnofficialWorldChampion
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -44,7 +44,7 @@ function UnofficialWorldChampion:createInfobox()
 	local args = self.args
 
 	args.currentChampOpponent = Opponent.readOpponentArgs(
-		Json.parseIfString(args['current champion']) or Opponent.tbd()
+		Json.parseIfString(args['current champion'])
 	)
 
 	local widgets = {

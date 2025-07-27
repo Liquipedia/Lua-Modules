@@ -1,25 +1,25 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Standings
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Condition = require('Module:Condition')
-local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
-local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Condition = Lua.import('Module:Condition')
+local FnUtil = Lua.import('Module:FnUtil')
+local Json = Lua.import('Module:Json')
+local Lpdb = Lua.import('Module:Lpdb')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Tournament = Lua.import('Module:Tournament')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 local Standings = {}
@@ -65,7 +65,7 @@ local Standings = {}
 ---@return StandingsModel?
 function Standings.getStandingsTable(pagename, standingsIndex)
 	local pageNameInCorrectFormat = string.gsub(pagename, ' ', '_')
-	local myPageName = string.gsub(mw.title.getCurrentTitle().text , ' ', '_')
+	local myPageName = string.gsub(mw.title.getCurrentTitle().text, ' ', '_')
 
 	if pageNameInCorrectFormat == myPageName then
 		local varData = Variables.varDefault('standings2_' .. standingsIndex)
@@ -217,7 +217,8 @@ function Standings.makeRounds(standings)
 	---@diagnostic disable-next-line: invisible
 	local standingsEntries = standings.entryRecords
 
-	local roundCount = Array.maxBy(Array.map(standingsEntries, Operator.property('roundindex')), FnUtil.identity)
+	local roundCount = Array.maxBy(Array.map(standingsEntries, function(entry)
+		return tonumber(entry.roundindex) or 1 end), FnUtil.identity)
 
 	return Array.map(Array.range(1, roundCount or 1), function(roundIndex)
 		local roundEntries = Array.filter(standingsEntries, function(entry)

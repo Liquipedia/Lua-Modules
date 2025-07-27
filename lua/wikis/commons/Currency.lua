@@ -1,19 +1,20 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Currency
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Arguments = require('Module:Arguments')
-local CurrencyData = mw.loadData('Module:Currency/Data')
-local Info = mw.loadData('Module:Info')
-local Logic = require('Module:Logic')
-local Math = require('Module:MathUtil')
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
+local Lua = require('Module:Lua')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Arguments = Lua.import('Module:Arguments')
+local CurrencyData = Lua.import('Module:Currency/Data', {loadData = true})
+local Info = Lua.import('Module:Info', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local Math = Lua.import('Module:MathUtil')
+local String = Lua.import('Module:StringUtils')
+local Variables = Lua.import('Module:Variables')
 
 local Currency = {}
 
@@ -115,7 +116,7 @@ function Currency.display(currencyCode, prizeValue, options)
 	end
 	if options.displayCurrencyCode then
 		local currencyCodeDisplay = not options.useHtmlStyling and currencyData.code
-			or Abbreviation.make(currencyData.code, currencyData.name)
+			or Abbreviation.make{text = currencyData.code, title = currencyData.name}
 		prizeDisplay = prizeDisplay .. (String.isNotEmpty(prizeDisplay) and spaceString or '') .. currencyCodeDisplay
 	end
 

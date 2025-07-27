@@ -42,7 +42,7 @@ Author(s): FO-nTTaX
 	display: none;
 }
 
-.timer-object-datetime-only .timer-object-countdown-time,
+.timer-object-datetime-only .timer-object-countdown,
 .timer-object-datetime-only .timer-object-separator {
 	display: none;
 }
@@ -2129,6 +2129,8 @@ Author(s): FO-nTTaX
 	font-size: 18px;
 	margin-bottom: 10px;
 	text-align: center;
+	border-radius: 0.5rem;
+	overflow: hidden;
 }
 
 .sadbox a {
@@ -2797,5 +2799,41 @@ Template(s): HeroIconTable
 	&:hover {
 		transform: scale( 1.05 );
 		cursor: pointer;
+	}
+}
+
+/*******************************************************************************
+Author(s): SlothyMan, Elisa
+Template(s): ChampionIconTable
+	     SummonIconTable
+*******************************************************************************/
+
+.wildcard-chronos-theme {
+	.theme--light & {
+		background-color: #ffc000;
+	}
+
+	.theme--dark & {
+		background-color: #fb8300;
+	}
+}
+
+.wildcard-lubabub-theme {
+	.theme--light & {
+		background-color: #35cd00;
+	}
+
+	.theme--dark & {
+		background-color: #008000;
+	}
+}
+
+.wildcard-malus-theme {
+	.theme--light & {
+		background-color: #e70015;
+	}
+
+	.theme--dark & {
+		background-color: #a90012;
 	}
 }

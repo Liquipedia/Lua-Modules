@@ -1,23 +1,23 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:TransferRow
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Faction = require('Module:Faction')
-local Flags = require('Module:Flags')
-local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Faction = Lua.import('Module:Faction')
+local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local PositionConvert = Lua.requireIfExists('Module:PositionName/data', {loadData = true})
@@ -185,7 +185,7 @@ end
 ---@return string
 function TransferRow:readPlatform()
 	if not HAS_PLATFORM_ICONS then return '' end
-	local Platform = require('Module:Platform')
+	local Platform = Lua.import('Module:Platform')
 	self.args.platform = Platform._getName(self.args.platform) or ''
 	return self.args.platform
 end
@@ -240,7 +240,7 @@ function TransferRow:_convertToTransferStructure(data)
 
 	return Table.merge(self.baseData, {
 		player = player.pageIsResolved and player.pageName or mw.ext.TeamLiquidIntegration.resolve_redirect(player.pageName),
-		nationality = Flags.CountryName(player.flag),
+		nationality = Flags.CountryName{flag = player.flag},
 		role1 = self.baseData.role1 or self.baseData.fromteam and subs[1] and 'Substitute' or nil,
 		role2 = self.baseData.role2 or self.baseData.toteam and subs[2] and 'Substitute' or nil,
 		reference = self.references[data.index] or self.references.all or {reference1 = ''},

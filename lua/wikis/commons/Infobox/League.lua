@@ -1,31 +1,31 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/League
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Game = require('Module:Game')
-local Info = require('Module:Info')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
-local Tier = require('Module:Tier/Custom')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Game = Lua.import('Module:Game')
+local Info = Lua.import('Module:Info')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
+local Tier = Lua.import('Module:Tier/Custom')
+local Variables = Lua.import('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Flags = Lua.import('Module:Flags')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extension/PrizePool')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
@@ -38,7 +38,7 @@ local VENUE_DESCRIPTION = '<br><small><small>(${desc})</small></small>'
 local STAY22_LINK = 'https://www.stay22.com/allez/roam?aid=liquipedia&campaign=${wiki}_${page}'..
 	'&address=${address}&checkin=${checkin}&checkout=${checkout}'
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -205,22 +205,8 @@ function League:createInfobox()
 		Customizable{id = 'customcontent', children = {}},
 		Center{children = {args.footnotes}},
 		Customizable{id = 'chronology', children = {
-				Builder{
-					builder = function()
-						if self:_isChronologySet(args.previous, args.next) then
-							return {
-								Title{children = 'Chronology'},
-								Chronology{
-									links = Table.filterByKey(args, function(key)
-										return type(key) == 'string' and (key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
-									end)
-								}
-							}
-						end
-					end
-				}
-			}
-		},
+			Chronology{args = args, showTitle = true},
+		}},
 		Builder{
 			builder = function()
 				local startDate, endDate = self.data.startDate, self.data.endDate
@@ -260,7 +246,7 @@ function League:createInfobox()
 				-- Only add the venue if there is exactly one venue, otherwise we'll only use the city + country
 				table.insert(addressParts, not locations.venue2 and locations.venue1 or nil)
 				table.insert(addressParts, locations.city1)
-				table.insert(addressParts, Flags.CountryName(locations.country1 or locations.region1))
+				table.insert(addressParts, Flags.CountryName{flag = locations.country1 or locations.region1})
 
 				-- Start date for the accommodation should be the day before the event, but at most 4 days before the event
 				-- End date for the accommodation should be 1 day after the event
@@ -693,7 +679,7 @@ function League:_createLocation(args)
 
 		else
 			local location = args['city' .. index] or args['location' .. index]
-			local countryName = Flags.CountryName(country)
+			local countryName = Flags.CountryName{flag = country}
 			local displayText = location or countryName
 			if String.isEmpty(displayText) then
 				displayText = country
@@ -833,22 +819,13 @@ function League:_cleanDate(date)
 	if self:_isUnknownDate(date) then
 		return nil
 	end
-	return ReferenceCleaner.clean(date)
+	return ReferenceCleaner.clean{input = date}
 end
 
 ---@param date string?
 ---@return boolean
 function League:_isUnknownDate(date)
 	return date == nil or string.lower(date) == 'tba' or string.lower(date) == 'tbd'
-end
-
----@param previous string?
----@param next string?
----@return boolean
-function League:_isChronologySet(previous, next)
-	-- We only need to check the first of these params, since it makes no sense
-	-- to set next2 and not next, etc.
-	return not (String.isEmpty(previous) and String.isEmpty(next))
 end
 
 -- Given the format `pagename|displayname`, returns pagename or the parameter, otherwise

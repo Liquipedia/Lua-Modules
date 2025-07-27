@@ -1,21 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Ratings/List
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Date = require('Module:Date/Ext')
-local Flags = require('Module:Flags')
-local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Date = Lua.import('Module:Date/Ext')
+local Flags = Lua.import('Module:Flags')
+local Icon = Lua.import('Module:Icon')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local Widget = Lua.import('Module:Widget')
@@ -122,7 +122,7 @@ function RatingsList:render()
 			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = team.rating },
 			HtmlWidgets.Td {
 				attributes = { ['data-ranking-table-cell'] = 'region' },
-				children = Flags.Icon(team.region) .. Flags.CountryName(team.region)
+				children = Flags.Icon{flag = team.region} .. Flags.CountryName{flag = team.region}
 			},
 			HtmlWidgets.Td {
 				attributes = { ['data-ranking-table-cell'] = 'streak' },

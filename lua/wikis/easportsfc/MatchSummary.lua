@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=easportsfc
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,7 +7,6 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
@@ -31,9 +29,8 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return MatchSummaryBody
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 	local hasSubMatches = Logic.readBool((match.extradata or {}).hassubmatches)
 
 	local games = Array.map(match.games, function(game)
@@ -43,10 +40,9 @@ function CustomMatchSummary.createBody(match)
 		return CustomMatchSummary._createGame(game)
 	end)
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+	return WidgetUtil.collect(
 		games
-	)}
+	)
 end
 
 ---@param game MatchGroupUtilGame
@@ -54,7 +50,6 @@ end
 function CustomMatchSummary._createGame(game)
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '84%', padding = '4px'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			DisplayHelper.MapScore(game.opponents[1], game.status),
@@ -74,7 +69,6 @@ function CustomMatchSummary._createSubMatch(game, match)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '84%', padding = '4px'},
 		children = WidgetUtil.collect(
 			CustomMatchSummary._players(players[1], 1, game.winner),
 			DisplayHelper.MapScore(game.opponents[1], game.status),
@@ -122,10 +116,10 @@ function CustomMatchSummary._subMatchPenaltyScore(game, opponentIndex)
 
 	if not scores then return NO_CHECK end
 
-	return Abbreviation.make(
-		'(' .. (scores[opponentIndex] or 0) .. ')',
-		'Penalty shoot-out'
-	)--[[@as string]]
+	return Abbreviation.make{
+		text = '(' .. (scores[opponentIndex] or 0) .. ')',
+		title = 'Penalty shoot-out',
+	}
 end
 
 ---@param players table[]

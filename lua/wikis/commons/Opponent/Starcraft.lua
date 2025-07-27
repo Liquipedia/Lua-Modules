@@ -1,17 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Opponent/Starcraft
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate')
+
+local Faction = Lua.import('Module:Faction')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Opponent = Lua.import('Module:Opponent')
 local PlayerExt = Lua.import('Module:Player/Ext')
@@ -55,6 +55,28 @@ function StarcraftOpponent.readOpponentArgs(args)
 			end
 		end
 	end
+
+	return opponent
+end
+
+---@param type OpponentType?
+---@return StarcraftStandardOpponent
+function StarcraftOpponent.blank(type)
+	local opponent = Opponent.blank(type) --[[@as StarcraftStandardOpponent]]
+
+	opponent.extradata = {}
+	opponent.isArchon = false
+
+	return opponent
+end
+
+---@param type OpponentType?
+---@return StarcraftStandardOpponent
+function StarcraftOpponent.tbd(type)
+	local opponent = Opponent.tbd(type) --[[@as StarcraftStandardOpponent]]
+
+	opponent.extradata = {}
+	opponent.isArchon = false
 
 	return opponent
 end
@@ -126,7 +148,7 @@ using data stored in page variables if present.
 options.syncPlayer: Whether to fetch player information from variables or LPDB. Disabled by default.
 ]]
 ---@param opponent StarcraftStandardOpponent
----@param date string|number|osdate|nil
+---@param date string|number|nil
 ---@param options {syncPlayer: boolean?, overwritePageVars: boolean?}
 ---@return StarcraftStandardOpponent
 function StarcraftOpponent.resolve(opponent, date, options)

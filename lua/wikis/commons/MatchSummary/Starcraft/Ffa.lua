@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchSummary/Starcraft/Ffa
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,11 +7,12 @@
 
 local StarcraftMatchSummaryFfa = {}
 
-local Array = require('Module:Array')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local Array = Lua.import('Module:Array')
+local Table = Lua.import('Module:Table')
+
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')

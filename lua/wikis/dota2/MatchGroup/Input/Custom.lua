@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
-local HeroNames = mw.loadData('Module:HeroNames')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
+local HeroNames = Lua.import('Module:HeroNames', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
@@ -66,13 +66,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 	end
 
-	return CustomMatchGroupInput.processMatchWithoutStandalone(MapParser, match)
-end
-
----@param MapParser Dota2MapParserInterface
----@param match table
----@return table
-function CustomMatchGroupInput.processMatchWithoutStandalone(MapParser, match)
 	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
 end
 
@@ -138,10 +131,15 @@ function MatchFunctions.getHeadToHeadLink(match, opponents)
 		return opponent.type == Opponent.team
 	end)
 	if Logic.readBool(Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))) and isTeamGame then
-		local team1, team2 = string.gsub(opponents[1].name, ' ', '_'), string.gsub(opponents[2].name, ' ', '_')
-		return tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
-			'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' .. team1 ..
-			'&Head_to_head_query%5Bopponent%5D=' .. team2 .. '&wpRunQuery=Run+query'
+		return tostring(mw.uri.fullUrl(
+			'Special:RunQuery/Match history',
+			{
+				pfRunQueryFormName = 'Match history',
+				['Head to head query[player]'] = string.gsub(opponents[1].name, ' ', '_'),
+				['Head to head query[opponent]'] = string.gsub(opponents[2].name, ' ', '_'),
+				wpRunQuery = 'Run query'
+			}
+		))
 	end
 end
 
@@ -152,7 +150,6 @@ end
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
 end
 
@@ -182,7 +179,7 @@ function MapFunctions.getExtraData(MapParser, match, map, opponents)
 
 	for opponentIndex = 1, #opponents do
 		local opponentData = {
-			objectives = MapParser.getObjectives(map, opponentIndex),
+			objectives = MapParser.getObjectives(map, opponentIndex) or {},
 			side = MapParser.getSide(map, opponentIndex),
 		}
 		opponentData = Table.merge(opponentData,

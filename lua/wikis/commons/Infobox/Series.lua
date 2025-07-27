@@ -1,25 +1,25 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Series
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Tier = require('Module:Tier/Custom')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Tier = Lua.import('Module:Tier/Custom')
+local Variables = Lua.import('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Flags = Lua.import('Module:Flags')
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extension/PrizePool')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
@@ -27,7 +27,7 @@ local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -207,9 +207,9 @@ function Series:_setLpdbData(args, links)
 		liquipediatier = tier,
 		liquipediatiertype = tierType,
 		publishertier = args.publishertier,
-		launcheddate = ReferenceCleaner.clean(args.launcheddate or args.sdate or args.inaugurated),
-		defunctdate = ReferenceCleaner.clean(args.defunctdate or args.edate),
-		defunctfate = ReferenceCleaner.clean(args.defunctfate),
+		launcheddate = ReferenceCleaner.clean{input = args.launcheddate or args.sdate or args.inaugurated},
+		defunctdate = ReferenceCleaner.clean{input = args.defunctdate or args.edate},
+		defunctfate = ReferenceCleaner.clean{input = args.defunctfate},
 		organizers = mw.ext.LiquipediaDB.lpdb_create_json({
 			organizer1 = args.organizer or args.organizer1,
 			organizer2 = args.organizer2,
@@ -312,7 +312,7 @@ function Series:_createLocation(country, city)
 		return ''
 	end
 
-	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' .. (city or country)
+	return Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' .. (city or country)
 end
 
 ---@param id string?

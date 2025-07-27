@@ -429,7 +429,7 @@ function mw.language:convertGrammar(word, case) end
 ---@param case string
 ---@param word string
 ---@return string
-function mw.language:gammer(case, word) end
+function mw.language:grammar(case, word) end
 
 ---Returns a Unicode arrow character corresponding to direction:
 ---@param direction 'forwards'|'backwards'|'left'|'right'|'up'|'down'
@@ -963,9 +963,77 @@ function mw.ustring.toNFKD(s) return tostring(s) end
 ---@return string
 function mw.ustring.upper(s) return string.upper(s) end
 
+---@class URI
+---@field protocol string?
+---@field user string?
+---@field password string?
+---@field host string?
+---@field port integer?
+---@field path string?
+---@field query table?
+---@field fragment string?
 mw.uri = {}
-function mw.uri.localUrl(s, s2) return '' end
-function mw.uri.fullUrl(s, s2) return 'https://liquipedia.net/' end
+
+---Returns a URI object for the local URL for a page, with optional query string/table
+---@param page string
+---@param query string|table?
+---@return URI
+function mw.uri.localUrl(page, query)
+	return ''
+end
+
+---Returns a URI object for the full URL for a page, with optional query string/table
+---@param page string
+---@param query string|table?
+---@return URI
+function mw.uri.fullUrl(page, query)
+	return 'https://liquipedia.net/'
+end
+
+---@alias UriEncodeType 'QUERY'|'PATH'|'WIKI'
+
+---Percent-encodes a string with the specified encoding type.
+---@param str string
+---@param enctype UriEncodeType?
+---@return string
+function mw.uri.encode(str, enctype) end
+
+---Percent-decodes a string with the specified encoding type.
+---@param str string
+---@param enctype UriEncodeType?
+---@return string
+function mw.uri.decode(str, enctype) end
+
+---Encodes a table as a URI query string.
+---@param query table<string, string|number|any[]|false>
+---@return string
+function mw.uri.buildQueryString(query) end
+
+---Decodes the query string `s` to a table. Optional arguments `i` and `j` may be used to specify
+---the substring of `s` to be parsed.
+---@param s string
+---@param i integer? the position of first character of the substring to be parsed; defaults to 1
+---@param j integer? the position of last character of the substring to be parsed; defaults to the length of `s`
+---@return table
+function mw.uri.parseQueryString(s, i, j) end
+
+---Validates the specified table (or URI object).
+---@param arg table|URI
+---@return boolean result whether the argument was valid
+---@return string? desc explanation of the found problems (if any)
+function mw.uri.validate(arg) end
+
+---Parses a string into this URI object.
+---@param str string
+function mw.uri:parse(str) end
+
+---Creates a copy of this URI object.
+---@return URI
+function mw.uri:clone() end
+
+---Merges the parameters table into the query table of this URI object.
+---@param parameters table
+function mw.uri:extend(parameters) end
 
 mw.ext = {}
 mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
@@ -1188,5 +1256,76 @@ mw.ext.Dota2DB = {}
 ---@param reversed boolean?
 ---@return dota2MatchData
 function mw.ext.Dota2DB.getBigMatch(matchId, reversed) end
+
+mw.ext.valorantdb = {}
+
+---@class valorantMatchApiPlayerStats
+---@field score integer
+---@field rounds_played integer
+---@field kills integer
+---@field deaths integer
+---@field assists integer
+---@field ability_casts {ability_1: integer, ability_2: integer, grenade_casts: integer, ultimate_casts: integer}
+---@field head_shot_percent number
+---@field acs number
+---@field adr number
+---@field kast number
+---@field playtime_millis integer
+
+---@class valorantMatchApiPlayer
+---@field puuid string
+---@field game_name string
+---@field tag_line string
+---@field team_id 'Blue'|'Red'|'Neutral'
+---@field competitive_tier integer
+---@field party_id string
+---@field is_observer boolean
+---@field account_level integer
+---@field stats valorantMatchApiPlayerStats
+---@field character {riot_id: string, name: string, icon_name: string, localized_names: table<string, string>}
+---@field lpdb_player? {page_name: string, publisher_id: string, wiki: string}
+
+---@class valorantMatchApiRound
+---@field round_num integer
+---@field round_result 'Bomb defused'|'Eliminated'|'Bomb detonated'|'Round timer expired'|'Surrendered'
+---@field round_result_code 'Defuse'|'Elimination'|'Detonate'|'Surrendered'|'' #empty string is for 'time expired'
+---@field round_ceremony 'CeremonyDefault'|'CeremonyTeamAce'|'CeremonyFlawless'|'CeremonyCloser'|
+---'CeremonyClutch'|'CeremonyThrifty'|'CeremonyAce'| '';
+---@field winning_team 'Blue'|'Red'
+---@field winning_team_role 'Attacker'|'Defender'
+---@field bomb_planter? string
+---@field bomb_defuser? string
+---@field plant_round_time integer # 0 is no plant
+---@field defuse_round_time integer # 0 is no defuse
+---@field plant_site? 'A'|'B'
+---@field player_stats table[]
+
+---@class valorantMatchApiTeam
+---@field team_id 'Blue'|'Red'
+---@field won boolean
+---@field rounds_played integer
+---@field rounds_won integer
+---@field num_points integer
+
+---@class valorantMatchData
+---@field match_id string
+---@field map_id string
+---@field game_version string
+---@field game_length_millis integer
+---@field region string
+---@field game_start_millis integer
+---@field provisioning_flow_id string
+---@field is_completed boolean
+---@field queue_id string
+---@field is_ranked boolean
+---@field season_id string
+---@field players valorantMatchApiPlayer[]
+---@field teams valorantMatchApiTeam[]
+---@field round_results valorantMatchApiRound[]
+
+---@param matchId string
+---@return valorantMatchData
+function mw.ext.valorantdb.getMatchDetails(matchId) end
+
 
 return mw

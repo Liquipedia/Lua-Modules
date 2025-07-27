@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Error/Display
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

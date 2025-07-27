@@ -1,22 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:CountryRepresentation
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Flags = require('Module:Flags')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MathUtil = require('Module:MathUtil')
-local Page = require('Module:Page')
-local Table = require('Module:Table')
 
-local Condition = require('Module:Condition')
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Flags = Lua.import('Module:Flags')
+local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
+local Page = Lua.import('Module:Page')
+local Table = Lua.import('Module:Table')
+
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -145,7 +145,7 @@ function CountryRepresentation:create()
 		table.insert(rows, Tr{
 			children = {
 				Td{css = {['text-align'] = 'right'}, children = {cache.rank}},
-				Td{children = {Flags.Icon(country), '&nbsp;', country}},
+				Td{children = {Flags.Icon{flag = country}, '&nbsp;', country}},
 				Td{css = {['text-align'] = 'right'}, children = {self:_ratioDisplay(#players)}},
 				Td{children = {table.concat(Array.map(players, function(player)
 					return Page.makeInternalLink({}, player.displayName or player.page, player.page)

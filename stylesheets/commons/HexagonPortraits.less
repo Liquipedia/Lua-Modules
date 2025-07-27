@@ -58,14 +58,17 @@ Author(s): PhiLtheFisH, FO-nTTaX, salle
 	cursor: pointer;
 }
 
-.wiki-heroes .hexagon:not( .show-assassin ) .hexagon-tile-assassin,
-.wiki-heroes .hexagon:not( .show-specialist ) .hexagon-tile-specialist,
+.wiki-heroes .hexagon:not( .show-bruiser ) .hexagon-tile-bruiser,
+.wiki-heroes .hexagon:not( .show-healer ) .hexagon-tile-healer,
 .wiki-heroes .hexagon:not( .show-support ) .hexagon-tile-support,
-.wiki-heroes .hexagon:not( .show-warrior ) .hexagon-tile-warrior,
-.wiki-heroes .hexagon:not( .show-multiclass ) .hexagon-tile-multiclass,
+.wiki-heroes .hexagon:not( .show-tank ) .hexagon-tile-tank,
+.wiki-heroes .hexagon:not( .show-meleeassassin ) .hexagon-tile-meleeassassin,
+.wiki-heroes .hexagon:not( .show-rangedassassin ) .hexagon-tile-rangedassassin,
 .wiki-heroes .hexagon:not( .show-starcraft ) .hexagon-tile-starcraft,
 .wiki-heroes .hexagon:not( .show-warcraft ) .hexagon-tile-warcraft,
 .wiki-heroes .hexagon:not( .show-diablo ) .hexagon-tile-diablo,
+.wiki-heroes .hexagon:not( .show-overwatch ) .hexagon-tile-overwatch,
+.wiki-heroes .hexagon:not( .show-other ) .hexagon-tile-other,
 .wiki-illuvium .hexagon:not( .show-air ) .hexagon-tile-air,
 .wiki-illuvium .hexagon:not( .show-bloom ) .hexagon-tile-bloom,
 .wiki-illuvium .hexagon:not( .show-dust ) .hexagon-tile-dust,
@@ -105,26 +108,27 @@ Author(s): PhiLtheFisH, FO-nTTaX, salle
 .wiki-illuvium .hexagon:not( .show-slayer ) .hexagon-tile-slayer,
 .wiki-illuvium .hexagon:not( .show-templar ) .hexagon-tile-templar,
 .wiki-illuvium .hexagon:not( .show-vanguard ) .hexagon-tile-vanguard,
-.wiki-heroes .hexagon:not( .show-other ) .hexagon-tile-other,
 .wiki-illuvium .hexagon:not( .show-other ) .hexagon-tile-other {
 	opacity: 0.5;
 	transition: 1s;
 }
 
-.wiki-heroes .hexagon:not( .show-assassin ):not( .show-specialist ):not( .show-support ):not( .show-warrior ):not( .show-multiclass ):not( .show-starcraft ):not( .show-warcraft ):not( .show-diablo ):not( .show-other ) .hexagon-tile,
+.wiki-heroes .hexagon:not( .show-bruiser ):not( .show-healer ):not( .show-support ):not( .show-tank ):not( .show-meleeassassin ):not( .show-rangedassassin ):not( .show-starcraft ):not( .show-warcraft ):not( .show-diablo ):not( .show-overwatch ):not( .show-other ) .hexagon-tile,
 .wiki-illuvium .hexagon:not( .show-fire ):not( .show-nature ):not( .show-air ):not( .show-water ):not( .show-earth ):not( .show-fighter ):not( .show-psion ):not( .show-empath ):not( .show-rogue ):not( .show-bulwark ):not( .show-other ) .hexagon-tile {
 	opacity: 1;
 	transition: 1s;
 }
 
-.wiki-heroes .hexagon.show-assassin .hexagon-tile-assassin,
-.wiki-heroes .hexagon.show-specialist .hexagon-tile-specialist,
+.wiki-heroes .hexagon.show-bruiser .hexagon-tile-bruiser,
+.wiki-heroes .hexagon.show-healer .hexagon-tile-healer,
 .wiki-heroes .hexagon.show-support .hexagon-tile-support,
-.wiki-heroes .hexagon.show-warrior .hexagon-tile-warrior,
-.wiki-heroes .hexagon.show-multiclass .hexagon-tile-multiclass,
+.wiki-heroes .hexagon.show-tank .hexagon-tile-tank,
+.wiki-heroes .hexagon.show-meleeassassin .hexagon-tile-meleeassassin,
+.wiki-heroes .hexagon.show-rangedassassin .hexagon-tile-rangedassassin,
 .wiki-heroes .hexagon.show-starcraft .hexagon-tile-starcraft,
 .wiki-heroes .hexagon.show-warcraft .hexagon-tile-warcraft,
 .wiki-heroes .hexagon.show-diablo .hexagon-tile-diablo,
+.wiki-heroes .hexagon.show-other .hexagon-tile-other,
 .wiki-illuvium .hexagon.show-air .hexagon-tile-air,
 .wiki-illuvium .hexagon.show-bloom .hexagon-tile-bloom,
 .wiki-illuvium .hexagon.show-dust .hexagon-tile-dust,
@@ -164,7 +168,6 @@ Author(s): PhiLtheFisH, FO-nTTaX, salle
 .wiki-illuvium .hexagon.show-slayer .hexagon-tile-slayer,
 .wiki-illuvium .hexagon.show-templar .hexagon-tile-templar,
 .wiki-illuvium .hexagon.show-vanguard .hexagon-tile-vanguard,
-.wiki-heroes .hexagon.show-other .hexagon-tile-other,
 .wiki-illuvium .hexagon.show-other .hexagon-tile-other {
 	opacity: 1;
 	transition: 1s;
@@ -176,14 +179,16 @@ Author(s): PhiLtheFisH, FO-nTTaX, salle
 	transition: 1s;
 }
 
-.wiki-heroes .hexagon.show-assassin .hexagon-button[ data-show="assassin" ] img,
-.wiki-heroes .hexagon.show-specialist .hexagon-button[ data-show="specialist" ] img,
+.wiki-heroes .hexagon.show-bruiser .hexagon-button[ data-show="bruiser" ] img,
+.wiki-heroes .hexagon.show-healer .hexagon-button[ data-show="healer" ] img,
 .wiki-heroes .hexagon.show-support .hexagon-button[ data-show="support" ] img,
-.wiki-heroes .hexagon.show-warrior .hexagon-button[ data-show="warrior" ] img,
-.wiki-heroes .hexagon.show-multiclass .hexagon-button[ data-show="multiclass" ] img,
+.wiki-heroes .hexagon.show-tank .hexagon-button[ data-show="tank" ] img,
+.wiki-heroes .hexagon.show-meleeassassin .hexagon-button[ data-show="meleeassassin" ] img,
+.wiki-heroes .hexagon.show-rangedassassin .hexagon-button[ data-show="rangedassassin" ] img,
 .wiki-heroes .hexagon.show-starcraft .hexagon-button[ data-show="starcraft" ] img,
 .wiki-heroes .hexagon.show-warcraft .hexagon-button[ data-show="warcraft" ] img,
 .wiki-heroes .hexagon.show-diablo .hexagon-button[ data-show="diablo" ] img,
+.wiki-heroes .hexagon.show-other .hexagon-button[ data-show="other" ] img,
 .wiki-illuvium .hexagon.show-air .hexagon-button[ data-show="air" ] img,
 .wiki-illuvium .hexagon.show-bloom .hexagon-button[ data-show="bloom" ] img,
 .wiki-illuvium .hexagon.show-dust .hexagon-button[ data-show="dust" ] img,
@@ -223,7 +228,6 @@ Author(s): PhiLtheFisH, FO-nTTaX, salle
 .wiki-illuvium .hexagon.show-slayer .hexagon-button[ data-show="slayer" ] img,
 .wiki-illuvium .hexagon.show-templar .hexagon-button[ data-show="templar" ] img,
 .wiki-illuvium .hexagon.show-vanguard .hexagon-button[ data-show="vanguard" ] img,
-.wiki-heroes .hexagon.show-other .hexagon-button[ data-show="other" ] img,
 .wiki-illuvium .hexagon.show-other .hexagon-button[ data-show="other" ] img {
 	background-color: #cccccc;
 	transition: 1s;

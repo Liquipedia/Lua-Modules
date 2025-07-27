@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:Infobox/Item/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -79,8 +78,6 @@ function CustomInjector:parse(id, widgets)
 			Title{children = 'Tags'},
 			Center{children = {CustomItem._getTagsDisplay(args.tags)}}
 		}
-	elseif Table.includes({'attributes', 'ability', 'maps', 'recipe'}, id) then
-		return {}
 	end
 
 	return widgets

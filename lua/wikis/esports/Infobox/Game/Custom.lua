@@ -1,7 +1,6 @@
 
 ---
 -- @Liquipedia
--- wiki=esports
 -- page=Module:Infobox/Game/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

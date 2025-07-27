@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=smash
 -- page=Module:MatchGroup/Display/Bracket/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,7 +7,6 @@
 
 local Array = require('Module:Array')
 local Characters = require('Module:Characters')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -32,10 +30,13 @@ function CustomBracketDisplay.BracketContainer(props)
 	})
 end
 
----@param props {opponent: SmashStandardOpponent, displayType: string, matchWidth: number}
+---@param props {opponent: SmashStandardOpponent, displayType: string, forceShortName: boolean?, height: number}
 ---@return Html
 function CustomBracketDisplay.OpponentEntry(props)
-	local opponentEntry = OpponentDisplay.BracketOpponentEntry(props.opponent)
+	local opponentEntry = OpponentDisplay.BracketOpponentEntry(
+		props.opponent,
+		{forceShortName = props.forceShortName, showTbd = false}
+	)
 	if props.displayType == 'bracket' and props.opponent.type == Opponent.solo then
 		CustomBracketDisplay._addHeads(opponentEntry, props.opponent)
 		if props.opponent.placement == 1 then
@@ -62,4 +63,4 @@ function CustomBracketDisplay._addHeads(opponentEntry, opponent)
 	opponentEntry.root:node(charactersNode)
 end
 
-return Class.export(CustomBracketDisplay)
+return CustomBracketDisplay

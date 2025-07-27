@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:ResultsTable/Award
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Currency = require('Module:Currency')
-local DateExt = require('Module:Date/Ext')
-local LeagueIcon = require('Module:LeagueIcon')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
+local Class = Lua.import('Module:Class')
+local Currency = Lua.import('Module:Currency')
+local DateExt = Lua.import('Module:Date/Ext')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Page = Lua.import('Module:Page')
+
+local OpponentLibrary = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
 local BaseResultsTable = Lua.import('Module:ResultsTable/Base')

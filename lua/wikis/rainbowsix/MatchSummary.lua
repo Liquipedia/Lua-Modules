@@ -1,18 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local FnUtil = require('Module:FnUtil')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local ROUND_ICONS = {
@@ -30,6 +29,26 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
+---@param match MatchGroupUtilMatch
+---@return Widget[]
+function CustomMatchSummary.createBody(match)
+
+	local characterBansData = Array.map(match.games, function(game)
+		local extradata = game.extradata or {}
+		return {
+			extradata.t1bans,
+			extradata.t2bans,
+		}
+	end)
+
+	return WidgetUtil.collect(
+		Array.map(match.games, FnUtil.curry(CustomMatchSummary.createGame, match.date)),
+		MatchSummaryWidgets.Mvp(match.extradata.mvp),
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
+		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
+	)
+end
+
 ---@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
@@ -44,17 +63,6 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		return DisplayHelper.MapScore(game.opponents[oppIdx], game.status)
 	end
 
-	local function operatorDisplay(operators)
-		return HtmlWidgets.Div{
-			classes = {'brkts-popup-body-operator-bans'},
-			children = Array.map(operators, function(operator)
-				return MatchSummaryWidgets.Character{
-					character = operator,
-					size = '50x50px'
-				}
-			end)
-		}
-	end
 	local function makePartialScores(halves, firstSide, firstSideOt)
 		local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
 		local oppositeSideOt = CustomMatchSummary._getOppositeSide(firstSideOt)
@@ -82,14 +90,12 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game', gameStatusBackground},
-		css = {['font-size'] = '85%'},
 		children = WidgetUtil.collect(
-			operatorDisplay(extradata.t1bans or {}),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			MatchSummaryWidgets.DetailedScore{
 				score = scoreDisplay(1),
 				flipped = false,
-		partialScores = makePartialScores(
+				partialScores = makePartialScores(
 					extradata.t1halfs or {},
 					firstSide,
 					firstSideOt
@@ -99,14 +105,13 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 			MatchSummaryWidgets.DetailedScore{
 				score = scoreDisplay(2),
 				flipped = true,
-		partialScores = makePartialScores(
+				partialScores = makePartialScores(
 					extradata.t2halfs or {},
 					CustomMatchSummary._getOppositeSide(firstSide),
 					CustomMatchSummary._getOppositeSide(firstSideOt)
 				)
 			},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			operatorDisplay(extradata.t2bans or {}),
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
 	}

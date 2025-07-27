@@ -1,31 +1,30 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:PrizePool/Award/Starcraft
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
-local Namespace = require('Module:Namespace')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local AwardPrizePool = Lua.import('Module:PrizePool/Award')
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
+local OpponentLibrary = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
-local PRIZE_TYPE_POINTS = 'POINTS'
 local IS_AWARD = true
 
 local _series
@@ -73,10 +72,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	Table.mergeInto(lpdbData.extradata, {
 		seriesnumber = CustomPrizePool._seriesNumber(),
-
-		-- to be removed once poinst storage is standardized
-		points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1),
-		points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2),
 	})
 
 	lpdbData.tournament = _tournament_name

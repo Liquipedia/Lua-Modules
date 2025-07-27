@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=trackmania
 -- page=Module:OpponentDisplay/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -76,4 +75,4 @@ function OpponentDisplayCustom.InlineScore(opponent, scoreIndex)
 	return score
 end
 
-return Class.export(OpponentDisplayCustom)
+return OpponentDisplayCustom

@@ -1,17 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:Opponent/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate')
-local TypeUtil = require('Module:TypeUtil')
+
+local Faction = Lua.import('Module:Faction')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local TypeUtil = Lua.import('Module:TypeUtil')
 
 local Opponent = Lua.import('Module:Opponent')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
@@ -38,8 +38,6 @@ CustomOpponent.types.Opponent = TypeUtil.union(
 
 ---@class StormgateStandardOpponent:standardOpponent
 ---@field players StormgateStandardPlayer[]
----@field isArchon boolean
----@field isSpecialArchon boolean?
 ---@field extradata table
 
 ---@param args table
@@ -58,6 +56,26 @@ function CustomOpponent.readOpponentArgs(args)
 			player.faction = Faction.read(args['p' .. playerIx .. 'faction'])
 		end
 	end
+
+	return opponent
+end
+
+---@param type OpponentType?
+---@return StormgateStandardOpponent
+function CustomOpponent.blank(type)
+	local opponent = Opponent.blank(type) --[[@as StormgateStandardOpponent]]
+
+	opponent.extradata = {}
+
+	return opponent
+end
+
+---@param type OpponentType?
+---@return StormgateStandardOpponent
+function CustomOpponent.tbd(type)
+	local opponent = Opponent.tbd(type) --[[@as StormgateStandardOpponent]]
+
+	opponent.extradata = {}
 
 	return opponent
 end

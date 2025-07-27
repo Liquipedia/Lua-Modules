@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -35,18 +34,16 @@ local TBD = 'TBD'
 local DEFAULT_HERO = 'default'
 
 local CustomMatchSummary = {}
---local StarcraftMatchSummary = CustomMatchSummary
 
 ---@param args {bracketId: string, matchId: string, config: table?}
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	-- later when ffa is enabled need to check for that here
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px'})
 		:addClass('brkts-popup-sc')
 end
 
 ---@param match table
----@return MatchSummaryBody
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
 	CustomMatchSummary.computeOfffactions(match)
 	local hasHeroes = CustomMatchSummary.hasHeroes(match)
@@ -56,23 +53,21 @@ function CustomMatchSummary.createBody(match)
 		subMatches = match.submatches or {}
 	end
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+	return WidgetUtil.collect(
 		isResetMatch and MatchSummaryWidgets.Row{
 			classes = {'brkts-popup-sc-veto-center'},
 			css = {['line-height'] = '80%', ['font-weight'] = 'bold'},
 			children = {'Reset match'},
 		} or nil,
-		match.dateIsExact and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.opponents, CustomMatchSummary.advantageOrPenalty),
 		subMatches and Array.map(subMatches, CustomMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(CustomMatchSummary.Game, {hasHeroes = hasHeroes})),
 		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
-			classes = {'brkts-popup-sc-game-header brkts-popup-sc-veto-center'},
-			children = {'Vetoes'},
+			classes = {'brkts-popup-sc-veto-center'},
+			children = {HtmlWidgets.B{children = {'Vetoes'}}},
 		} or nil,
-		Array.map(match.vetoes or {}, CustomMatchSummary.Veto) or nil,
-		MatchSummaryWidgets.Casters{casters = match.casters}
-	)}
+		Array.map(match.vetoes or {}, CustomMatchSummary.Veto) or nil
+	)
 end
 
 ---@param match table
@@ -205,7 +200,7 @@ function CustomMatchSummary.DisplayHeroes(opponent, options)
 				children = MatchSummaryWidgets.Characters{
 					flipped = options.flipped,
 					characters = heroes,
-					bg = 'brkts-popup-side-color-' .. (options.flipped and 'blue' or 'red'),
+					bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (options.flipped and 'blue' or 'red'),
 				},
 			}
 		end)

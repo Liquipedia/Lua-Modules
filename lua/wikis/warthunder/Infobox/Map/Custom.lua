@@ -1,16 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=warthunder
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
+
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
 
 local Flags = Lua.import('Module:Flags')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -22,6 +22,8 @@ local Title = Widgets.Title
 
 ---@class WarThunderMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class WarThunderMapInfoboxWidgetInjector: WidgetInjector
+---@field caller WarThunderMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -57,28 +59,17 @@ function CustomInjector:parse(id, widgets)
 				Title{children = 'Other Information'},
 				Cell{name = 'Tank area size', content = {self:_getMapSize(args.tanksize)}},
 				Cell{name = 'Air area size', content = {self:_getMapSize(args.airsize)}},
-				Cell{name = 'Game Modes', content = Logic.nilIfEmpty(self.caller:_getGameMode(args))}
+				Cell{name = 'Game Modes', content = Logic.nilIfEmpty(self.caller:getGameModes(args))}
 			)
 		end
 		return widgets
 	end
 
----@param args table
----@return string[]
-function CustomMap:_getGameMode(args)
-	if String.isEmpty(args.mode) and String.isEmpty(args.mode1) then
-		return {}
-	end
-	return self:getAllArgsForBase(args, 'mode', { makeLink = true })
-end
-
 ---@param lpdbData table
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	lpdbData.extradata = Table.merge(lpdbData.extradata, {
-		location = args.country,
-	})
+	lpdbData.extradata.location = args.country
 	return lpdbData
 end
 

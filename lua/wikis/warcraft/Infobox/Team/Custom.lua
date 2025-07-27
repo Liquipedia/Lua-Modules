@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:Infobox/Team/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -43,7 +42,7 @@ local PROFILES = {
 	},
 	eslprofile = {
 		icon = 'ESL_2019_icon.png',
-		link = 'https://play.eslgaming.com/team/',
+		link = 'https://web.archive.org/web/play.eslgaming.com/team/',
 		text = 'ESL ${name}\'s profile'
 	},
 }

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=formula1
 -- page=Module:Infobox/Team/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -10,7 +9,9 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local TeamTemplates = require('Module:Team')
+
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
@@ -58,7 +59,7 @@ function CustomInjector:parse(id, widgets)
 
 		if args.academy then
 			local academyTeams = Array.map(self.caller:getAllArgsForBase(args, 'academy'), function(team)
-				return TeamTemplates.team(nil, team)
+				return OpponentDisplay.InlineTeamContainer{template = team, displayType = 'standard' }
 			end)
 			Array.extendWith(widgets,
 				{Title{children = 'Academy Team' .. (Table.size(academyTeams) > 1 and 's' or '')}},
@@ -66,18 +67,10 @@ function CustomInjector:parse(id, widgets)
 			)
 		end
 
-		if args.previous or args.next then
-			Array.appendWith(
-				widgets,
-				Title{children = 'Chronology'},
-				Chronology{links = {
-					previous = args.previous,
-					previous2 = args.previous2,
-					next = args.next,
-					next2 = args.next2,
-				}}
-			)
-		end
+		Array.appendWith(
+			widgets,
+			Chronology{args = args, showTitle = true}
+		)
 	end
 
 	return widgets

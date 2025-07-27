@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
 -- page=Module:Infobox/Character/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local CharacterWinLoss = require('Module:CharacterWinLoss')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Math = require('Module:MathUtil')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local CharacterWinLoss = Lua.import('Module:CharacterWinLoss')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Math = Lua.import('Module:MathUtil')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
 
 local Character = Lua.import('Module:Infobox/Character')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -174,16 +174,23 @@ function CustomCharacter:getWikiCategories(args)
 	)
 end
 
+---@param args table
+---@return string[]
+function CustomCharacter:getRoles(args)
+	return {
+		args.primaryrole,
+		args.secondaryrole
+	}
+end
+
 ---@param lpdbData table
 ---@param args table
 ---@return table
 function CustomCharacter:addToLpdb(lpdbData, args)
-	lpdbData.information = args.primaryrole
-	lpdbData.extradata = {
-		region = args.region,
-		costbe = args.costbe,
-		costrp = args.costrp,
-	}
+	lpdbData.extradata.region = args.region
+	lpdbData.extradata.costbe = args.costbe
+	lpdbData.extradata.costrp = args.costrp
+
 	return lpdbData
 end
 

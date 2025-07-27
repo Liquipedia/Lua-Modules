@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:ParticipantTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -69,10 +68,9 @@ function AoEParticipantTable:readEntry(sectionArgs, key, index, config)
 		seed = valueFromArgs('seed'),
 	}
 
-	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
-		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
+	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
+	local opponent = Opponent.readOpponentArgs(opponentArgs)
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)
@@ -156,7 +154,7 @@ function AoEParticipantTable:_createTitle(tabletitle, buttontitle, togglearea, b
 			:css('width', width or self.config.width)
 			:css('vertical-align', 'middle')
 			:tag('span')
-				:addClass('toggle-area-button btn btn-primary')
+				:addClass('toggle-area-button btn btn-small btn-primary')
 				:attr('data-toggle-area-btn', buttonarea)
 				:css('padding-top', '2px')
 				:css('padding-bottom', '2px')

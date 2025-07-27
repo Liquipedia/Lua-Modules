@@ -1,18 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:TournamentsListing/Conditions
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Flags = require('Module:Flags')
-local Logic = require('Module:Logic')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
 
-local Condition = require('Module:Condition')
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local Flags = Lua.import('Module:Flags')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -111,7 +112,7 @@ function TournamentsListingConditions.base(args)
 		input = args.country,
 		lpdbKey = 'locations_country',
 		maxNumber = tonumber(args.numberOfCountries) or 2,
-		normalize = Flags.CountryCode,
+		normalize = function(flag) return Flags.CountryCode{flag = flag} end,
 	})
 
 	TournamentsListingConditions._addConditionsFromCsv(conditions, {

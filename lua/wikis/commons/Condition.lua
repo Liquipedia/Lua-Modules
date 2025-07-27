@@ -1,22 +1,35 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Condition
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Condition = {}
 
 -- Abstract class, node of the conditions tree
 ---@class AbstractConditionNode:BaseClass
 local _ConditionNode = Class.new()
+
+---Returns the string representation of this condition node.
+function _ConditionNode:__tostring()
+	return self:toString()
+end
+
+---Returns the string representation of this condition node.
+---@protected
+---@return string
+function _ConditionNode:toString()
+	error('_ConditionNode:toString() cannot be called directly and must be overridden.')
+end
 
 ---A tree of conditions, specifying the conditions for an LPDB request.
 ---Can be used recursively, as in, a tree of trees.

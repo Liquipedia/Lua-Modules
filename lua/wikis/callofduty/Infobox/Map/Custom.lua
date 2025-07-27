@@ -1,25 +1,27 @@
 ---
 -- @Liquipedia
--- wiki=callofduty
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
+local Table = Lua.import('Module:Table')
+
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = Lua.import('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
 ---@class CallofdutyMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class CallofdutyMapInfoboxWidgetInjector: WidgetInjector
+---@field caller CallofdutyMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -48,7 +50,6 @@ function CustomInjector:parse(widgetId, widgets)
 		return Array.append(
 			widgets,
 			Cell{name = 'Type', content = {args.type}},
-			Cell{name = 'Size', content = {args.size}},
 			Cell{name = #games > 1 and 'Game Versions' or 'Game Version', content = games, options = {makeLink = true}},
 			Cell{name = 'Day/Night Variant', content = {args.daynight}},
 			Cell{name = 'Playlists', content = {args.playlist}}

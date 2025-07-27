@@ -1,13 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Basic/DataTable
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -20,18 +21,22 @@ local DataTable = Class.new(Widget)
 DataTable.defaultProps = {
 	classes = {},
 	wrapperClasses = {},
+	sortable = false,
 }
 
 ---@return Widget
 function DataTable:render()
+	local isSortable = Logic.readBool(self.props.sortable)
 	return Div{
 		children = {
 			Table{
 				children = self.props.children,
-				classes = WidgetUtil.collect('wikitable', unpack(self.props.classes)),
+				classes = WidgetUtil.collect('wikitable', isSortable and 'sortable' or nil, self.props.classes),
+				css = self.props.tableCss,
+				attributes = self.props.tableAttributes,
 			},
 		},
-		classes = WidgetUtil.collect('table-responsive', unpack(self.props.wrapperClasses)),
+		classes = WidgetUtil.collect('table-responsive', self.props.wrapperClasses),
 		attributes = self.props.attributes,
 	}
 end

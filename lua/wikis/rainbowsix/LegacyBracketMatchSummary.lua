@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
 -- page=Module:LegacyBracketMatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -68,4 +67,4 @@ function LegacyBracketMatchSummary.convert(args)
 	return Json.stringify(args)
 end
 
-return Class.export(LegacyBracketMatchSummary)
+return Class.export(LegacyBracketMatchSummary, {exports = {'convert'}})

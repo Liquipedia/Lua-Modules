@@ -1,18 +1,18 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Faction
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TypeUtil = Lua.import('Module:TypeUtil')
 
 local Data = Lua.import('Module:Faction/Data', {loadData = true})
 local IconData = Lua.requireIfExists('Module:Faction/IconData', {loadData = true})
@@ -226,4 +226,4 @@ function Faction.bgClass(faction, options)
 	return factionProps and factionProps.bgClass or nil
 end
 
-return Class.export(Faction)
+return Class.export(Faction, {exports = {'Icon'}})

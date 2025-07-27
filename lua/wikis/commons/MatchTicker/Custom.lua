@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchTicker/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Arguments = Lua.import('Module:Arguments')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local MatchTicker = Lua.import('Module:MatchTicker')
 
@@ -18,7 +18,7 @@ local CURRENT_PAGE = mw.title.getCurrentTitle().text
 local CustomMatchTicker = {}
 
 ---Entry point for display on tournament pages
----@param frame Frame
+---@param frame Frame|table|nil
 ---@return Html
 function CustomMatchTicker.tournament(frame)
 	local args = Arguments.getArgs(frame)
@@ -38,7 +38,7 @@ function CustomMatchTicker.tournament(frame)
 end
 
 ---Entry point for display on the main page
----@param frame Frame?
+---@param frame Frame|table|nil
 ---@return Html
 function CustomMatchTicker.mainPage(frame)
 	local args = Arguments.getArgs(frame)
@@ -46,7 +46,7 @@ function CustomMatchTicker.mainPage(frame)
 end
 
 ---Entry point for display on the main page with the new style
----@param frame Frame?
+---@param frame Frame|table|nil
 ---@return Html?
 function CustomMatchTicker.newMainPage(frame)
 	local args = Arguments.getArgs(frame)
@@ -63,17 +63,14 @@ function CustomMatchTicker.newMainPage(frame)
 	args.games = args['filterbuttons-game']
 
 	if args.type == 'upcoming' then
-		-- Separate calls to be able to use separate limits
-		return mw.html.create()
-			:node(MatchTicker(Table.merge(args, {ongoing = true})):query():create():addClass('new-match-style'))
-			:node(MatchTicker(Table.merge(args, {upcoming = true})):query():create():addClass('new-match-style'))
+		return MatchTicker(Table.merge(args, {ongoing = true, upcoming = true})):query():create():addClass('new-match-style')
 	elseif args.type == 'recent' then
 		return MatchTicker(Table.merge(args, {recent = true})):query():create():addClass('new-match-style')
 	end
 end
 
 ---Entry point for display on player pages
----@param frame Frame?
+---@param frame Frame|table|nil
 ---@return Html
 function CustomMatchTicker.player(frame)
 	local args = Arguments.getArgs(frame)
@@ -84,7 +81,7 @@ function CustomMatchTicker.player(frame)
 end
 
 ---Entry point for display on team pages
----@param frame Frame?
+---@param frame Frame|table|nil
 ---@return Html
 function CustomMatchTicker.team(frame)
 	local args = Arguments.getArgs(frame)

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:PrizePool/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -25,7 +24,6 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 local CustomPrizePool = {}
 
 local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
-local PRIZE_TYPE_POINTS = 'POINTS'
 local QUALIFIER = 'Qualifier'
 local TIER_VALUE = {10, 6, 4, 2}
 
@@ -70,17 +68,8 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	lpdbData.extradata.patch = Variables.varDefault('tournament_patch')
 
-	-- legacy points, to be standardized
-	local points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
-	---for points it can never be boolean
-	---@cast points -boolean
-	lpdbData.extradata.points = points
-	Variables.varDefine(lpdbData.objectName .. '_pointprize', lpdbData.extradata.points)
-	local points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
-	---for points it can never be boolean
-	---@cast points2 -boolean
-	lpdbData.extradata.points2 = points2
-	Variables.varDefine(lpdbData.objectName .. '_pointprize2', lpdbData.extradata.points2)
+	Variables.varDefine(lpdbData.objectName .. '_pointprize', lpdbData.extradata.prizepoints)
+	Variables.varDefine(lpdbData.objectName .. '_pointprize2', lpdbData.extradata.prizepoints2)
 
 	local prizeIsQualifier = function(prize)
 		return prize.type == PRIZE_TYPE_QUALIFIES

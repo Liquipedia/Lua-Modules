@@ -1,22 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Squad/Utils
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Flags = require('Module:Flags')
-local Info = require('Module:Info')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Flags = Lua.import('Module:Flags')
+local Info = Lua.import('Module:Info')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Lpdb = Lua.import('Module:Lpdb')
 local Faction = Lua.import('Module:Faction')
@@ -140,7 +140,7 @@ function SquadUtils.readSquadPersonArgs(args)
 		id = id,
 		link = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or id),
 		name = name,
-		nationality = Flags.CountryName(args.flag),
+		nationality = Flags.CountryName{flag = args.flag},
 
 		position = String.nilIfEmpty(args.position),
 		role = (String.nilIfEmpty(args.role) and mw.getContentLanguage():ucfirst(args.role))
@@ -152,9 +152,9 @@ function SquadUtils.readSquadPersonArgs(args)
 		newteamrole = String.nilIfEmpty(args.newteamrole) or String.nilIfEmpty(args.newrole),
 		newteamtemplate = getTeamInfo(args.newteam, 'templatename'),
 
-		joindate = ReferenceCleaner.clean(args.joindate),
-		leavedate = ReferenceCleaner.clean(args.leavedate),
-		inactivedate = ReferenceCleaner.clean(args.inactivedate),
+		joindate = ReferenceCleaner.clean{input = args.joindate},
+		leavedate = ReferenceCleaner.clean{input = args.leavedate},
+		inactivedate = ReferenceCleaner.clean{input = args.inactivedate},
 
 		status = SquadUtils.SquadStatusToStorageValue[args.status],
 		type = SquadUtils.SquadTypeToStorageValue[args.type],
@@ -162,7 +162,7 @@ function SquadUtils.readSquadPersonArgs(args)
 		extradata = {
 			loanedto = args.team,
 			loanedtorole = args.teamrole,
-			newteamdate = String.nilIfEmpty(ReferenceCleaner.clean(args.newteamdate)),
+			newteamdate = String.nilIfEmpty(ReferenceCleaner.clean{input = args.newteamdate}),
 			faction = Faction.read(args.faction or args.race),
 		},
 	}

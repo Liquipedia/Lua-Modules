@@ -1,27 +1,27 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:PrizePool/Placement
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchPlacement = require('Module:Match/Placement')
-local Ordinal = require('Module:Ordinal')
-local PlacementInfo = require('Module:Placement')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local MatchPlacement = Lua.import('Module:Match/Placement')
+local Ordinal = Lua.import('Module:Ordinal')
+local PlacementInfo = Lua.import('Module:Placement')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 ---@class PrizePoolPlacement: BasePlacement
 ---@field opponents BasePlacementOpponent[]
 local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
+local OpponentLibrary = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
 local DASH = '&#045;'
@@ -49,7 +49,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.dq)
 		end,
 		display = function ()
-			return Abbreviation.make('DQ', 'Disqualified')
+			return Abbreviation.make{text = 'DQ', title = 'Disqualified'}
 		end,
 		lpdb = 'DQ',
 	},
@@ -58,7 +58,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.dnf)
 		end,
 		display = function ()
-			return Abbreviation.make('DNF', 'Did not finish')
+			return Abbreviation.make{text = 'DNF', title = 'Did not finish'}
 		end,
 		lpdb = 'DNF',
 	},
@@ -67,7 +67,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.dnp)
 		end,
 		display = function ()
-			return Abbreviation.make('DNP', 'Did not participate')
+			return Abbreviation.make{text = 'DNP', title = 'Did not participate'}
 		end,
 		lpdb = 'DNP',
 	},
@@ -103,7 +103,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.q)
 		end,
 		display = function ()
-			return Abbreviation.make('Q', 'Qualified Automatically')
+			return Abbreviation.make{text = 'Q', title = 'Qualified Automatically'}
 		end,
 		lpdb = 'Q',
 	},
@@ -243,6 +243,7 @@ function Placement:_getLpdbData(...)
 
 		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_BASE_CURRENCY .. 1)) or 0
 		local pointsReward = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
+		local pointsReward2 = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
 		local lpdbData = {
 			image = image,
 			imagedark = imageDark,
@@ -268,6 +269,7 @@ function Placement:_getLpdbData(...)
 			),
 			extradata = {
 				prizepoints = tostring(pointsReward or ''),
+				prizepoints2 = tostring(pointsReward2 or ''),
 				participantteam = (opponentType == Opponent.solo and players.p1team)
 									and Opponent.toName{template = players.p1team, type = 'team'}
 									or nil,
@@ -331,11 +333,11 @@ end
 function Placement:getBackground()
 	for statusName, status in pairs(Placement.specialStatuses) do
 		if status.active(self.args) then
-			return PlacementInfo.getBgClass(statusName:lower())
+			return PlacementInfo.getBgClass{placement = statusName:lower()}
 		end
 	end
 
-	return PlacementInfo.getBgClass(self.placeStart)
+	return PlacementInfo.getBgClass{placement = self.placeStart}
 end
 
 ---@return string?

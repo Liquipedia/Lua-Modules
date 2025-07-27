@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=pubg
 -- page=Module:HiddenDataBox/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
+
+local Class = Lua.import('Module:Class')
+local Variables = Lua.import('Module:Variables')
 
 local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox')
 
@@ -27,4 +27,4 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
 
-return Class.export(CustomHiddenDataBox)
+return Class.export(CustomHiddenDataBox, {exports = {'run'}})

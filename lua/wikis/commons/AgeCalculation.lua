@@ -1,15 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:AgeCalculation
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local String = require('Module:StringUtils')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local String = Lua.import('Module:StringUtils')
 
 local AgeCalculation = {}
 
@@ -289,4 +290,4 @@ function AgeCalculation._showErrorForDateIfNeeded(date, dateType)
 	end
 end
 
-return Class.export(AgeCalculation)
+return AgeCalculation

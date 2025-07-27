@@ -1,23 +1,23 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Company
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Flags = require('Module:Flags')
-local Links = require('Module:Links')
-local Locale = require('Module:Locale')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local Flags = Lua.import('Module:Flags')
+local Links = Lua.import('Module:Links')
+local Locale = Lua.import('Module:Locale')
+local Logic = Lua.import('Module:Logic')
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local Table = Lua.import('Module:Table')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -107,19 +107,19 @@ function Company:createInfobox()
 		locations = Locale.formatLocations(args),
 		headquarterslocation = args.headquarters,
 		parentcompany = args.parent,
-		foundeddate = ReferenceCleaner.clean(args.foundeddate),
-		defunctdate = ReferenceCleaner.clean(args.defunctdate),
-		numberofemployees = ReferenceCleaner.cleanNumber(args.employees),
+		foundeddate = ReferenceCleaner.clean{input = args.foundeddate},
+		defunctdate = ReferenceCleaner.clean{input = args.defunctdate},
+		numberofemployees = ReferenceCleaner.cleanNumber{input = args.employees},
 		links = mw.ext.LiquipediaDB.lpdb_create_json({
-			discord = Links.makeFullLink('discord', args.discord),
-			facebook = Links.makeFullLink('facebook', args.facebook),
-			instagram = Links.makeFullLink('instagram', args.instagram),
-			twitch = Links.makeFullLink('twitch', args.twitch),
-			twitter = Links.makeFullLink('twitter', args.twitter),
-			website = Links.makeFullLink('website', args.website),
-			weibo = Links.makeFullLink('weibo', args.weibo),
-			vk = Links.makeFullLink('vk', args.vk),
-			youtube = Links.makeFullLink('youtube', args.youtube),
+			discord = Links.makeFullLink{platform = 'discord', id = args.discord},
+			facebook = Links.makeFullLink{platform = 'facebook', id = args.facebook},
+			instagram = Links.makeFullLink{platform = 'instagram', id = args.instagram},
+			twitch = Links.makeFullLink{platform = 'twitch', id = args.twitch},
+			twitter = Links.makeFullLink{platform = 'twitter', id = args.twitter},
+			website = Links.makeFullLink{platform = 'website', id = args.website},
+			weibo = Links.makeFullLink{platform = 'weibo', id = args.weibo},
+			vk = Links.makeFullLink{platform = 'vk', id = args.vk},
+			youtube = Links.makeFullLink{platform = 'youtube', id = args.youtube},
 		})
 	})
 
@@ -135,7 +135,7 @@ function Company:_createLocation(location)
 		return ''
 	end
 
-	return Flags.Icon({flag = location, shouldLink = true}) .. '&nbsp;' ..
+	return Flags.Icon{flag = location, shouldLink = true} .. '&nbsp;' ..
 				'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 

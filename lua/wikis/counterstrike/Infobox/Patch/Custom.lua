@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:Infobox/Patch/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -100,7 +99,7 @@ function CustomPatch:getChronologyData(args)
 		data.previous = (args['previous link'] or args.previous .. ' Patch') .. '|' .. args.previous
 	end
 	if args.next then
-		data.next = (args['next link'] or args.next .. ' Patch') .. '|' .. args.previous
+		data.next = (args['next link'] or args.next .. ' Patch') .. '|' .. args.next
 	end
 	return data
 end

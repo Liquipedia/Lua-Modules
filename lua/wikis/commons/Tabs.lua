@@ -1,17 +1,18 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Tabs
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
-local Operator = require('Module:Operator')
-local Page = require('Module:Page')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
+local Table = Lua.import('Module:Table')
 
 local Tabs = {}
 
@@ -248,4 +249,4 @@ function Tabs._getDisplayNameFromLink(link)
 	return linkParts[#linkParts]
 end
 
-return Class.export(Tabs)
+return Class.export(Tabs, {exports = {'static', 'dynamic'}})

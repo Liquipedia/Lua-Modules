@@ -1,13 +1,11 @@
 ---
 -- @Liquipedia
--- wiki=brawlhalla
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 
@@ -28,14 +26,11 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return MatchSummaryBody
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+	return WidgetUtil.collect(
 		CustomMatchSummary._isSolo(match) and Array.map(match.games, CustomMatchSummary._createGame) or nil
-	)}
+	)
 end
 
 ---@param match MatchGroupUtilMatch
@@ -57,7 +52,6 @@ function CustomMatchSummary._createGame(game)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '80%', padding = '4px', ['min-height'] = '24px'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.Characters{characters = team1Characters, flipped = false},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},

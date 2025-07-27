@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:YearsActive/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,16 +7,18 @@
 
 local ActiveYears = {}
 
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Info = mw.loadData('Module:Info')
-local Logic = require('Module:Logic')
-local Lpdb = require('Module:Lpdb')
-local Set = require('Module:Set')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
 
-local Condition = require('Module:Condition')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Set = Lua.import('Module:Set')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -174,4 +175,4 @@ function ActiveYears._insertYears(startYear, endYear, yearRanges)
 	return yearRanges
 end
 
-return Class.export(ActiveYears)
+return Class.export(ActiveYears, {exports = {'display'}})

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=wildrift
 -- page=Module:Infobox/Item/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -77,6 +76,8 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'attributes' then
 		if not CustomItem._hasAttributes(args) then return {} end
 
+		widgets = {Title{children = 'Attributes'}}
+
 		if not (String.isEmpty(args.str) and String.isEmpty(args.agi) and String.isEmpty(args.int)) then
 			table.insert(widgets, Breakdown{classes = {'infobox-center'}, children = {
 				caller:_attributeIcons('str'),
@@ -130,6 +131,7 @@ function CustomInjector:parse(id, widgets)
 			return {}
 		end
 		Array.appendWith(widgets,
+			Title{children = 'Ability'},
 			Cell{name = 'Use', content = {args.use}},
 			Cell{name = 'Active', content = {args.active}},
 			Cell{name = 'Passive', content = {args.passive, args.passive2}}
@@ -147,12 +149,16 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'maps' then
 		if String.isEmpty(args.wr) and String.isEmpty(args.ha) then return {} end
 		Array.appendWith(widgets,
+			Title{children = 'Maps'},
 			Cell{name = '[[Wild Rift (Map)|Wild Rift]]', content = {args.wr}},
 			Cell{name = '[[Howling Abyss]]', content = {args.ha}}
 		)
 	elseif id == 'recipe' then
 		if String.isEmpty(args.recipe) then return {} end
-		table.insert(widgets, Center{children = {args.recipe}})
+		Array.appendWith(widgets,
+			Title{children = 'Recipe'},
+			Center{children = {args.recipe}}
+		)
 	elseif id == 'info' then return {}
 	end
 

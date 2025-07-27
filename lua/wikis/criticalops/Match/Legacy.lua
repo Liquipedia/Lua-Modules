@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=criticalops
 -- page=Module:Match/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

@@ -1,19 +1,20 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:ExternalMediaLink
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Flags = require('Module:Flags')
-local Logic = require('Module:Logic')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Flags = Lua.import('Module:Flags')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local ExternalMediaLink = {}
 
@@ -137,7 +138,7 @@ function ExternalMediaLink._display(args)
 	end
 
 	if args.language and args.language ~= DEFAULT_LANGUAGE then
-		display:wikitext(Flags.Icon({flag = args.language, shouldLink = false}) .. NON_BREAKING_SPACE)
+		display:wikitext(Flags.Icon{flag = args.language, shouldLink = false} .. NON_BREAKING_SPACE)
 	end
 
 	if args.title then
@@ -206,7 +207,7 @@ end
 ---@return string
 function ExternalMediaLink._displayTranslation(args)
 	local translation = NON_BREAKING_SPACE .. '(trans. '
-		.. Flags.Icon({flag = args.translation, shouldLink = false})
+		.. Flags.Icon{flag = args.translation, shouldLink = false}
 
 	if String.isEmpty(args.translator) then
 		return translation .. ')'
@@ -289,4 +290,4 @@ function ExternalMediaLink._cleanValue(value)
 	return String.nilIfEmpty(mw.text.trim(value))
 end
 
-return Class.export(ExternalMediaLink)
+return Class.export(ExternalMediaLink, {exports = {'run', 'wrapper'}})

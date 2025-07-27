@@ -1,21 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=apexlegends
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local TableCell = Widgets.TableCell
@@ -24,6 +24,8 @@ local WidgetTable = Widgets.TableOld
 
 ---@class ApexMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class ApexMapInfoboxWidgetInjector: WidgetInjector
+---@field caller ApexMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -33,6 +35,12 @@ function CustomMap.run(frame)
 
 	map:setWidgetInjector(CustomInjector(map))
 	return map:createInfobox()
+end
+
+---@param args table
+---@return string[]
+function CustomMap:getGameModes(args)
+	return {args.gamemode}
 end
 
 ---@param id string
@@ -116,8 +124,6 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator or '')
-	lpdbData.extradata.gamemode = args.gamemode
 	lpdbData.extradata.competitive = String.isNotEmpty(args.spanstart) and String.isEmpty(args.spanend)
 	return lpdbData
 end

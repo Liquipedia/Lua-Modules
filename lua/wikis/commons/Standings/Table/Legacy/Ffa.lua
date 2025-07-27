@@ -1,21 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Standings/Table/Legacy/Ffa
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local StandingTable = Lua.import('Module:Standings/Table')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
+local OpponentLibrary = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
 local StandingTableLegacyFfa = {}

@@ -1,22 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Match
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local FeatureFlag = require('Module:FeatureFlag')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
-local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local MatchGroupUtil = require('Module:MatchGroup/Util/Custom')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local FeatureFlag = Lua.import('Module:FeatureFlag')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupConfig = Lua.requireIfExists('Module:MatchGroup/Config', {loadData = true})
 

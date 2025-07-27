@@ -1,24 +1,24 @@
 ---
 -- @Liquipedia
--- wiki=pubg
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class PUBGMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
-
+---@class PUBGMapInfoboxWidgetInjector: WidgetInjector
+---@field caller PUBGMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -37,14 +37,7 @@ function CustomInjector:parse(widgetId, widgets)
 	local args = self.caller.args
 
 	if widgetId == 'custom' then
-		return Array.append(
-			widgets,
-			Cell{name = 'Theme', content = {args.theme}},
-			Cell{name = 'Size', content = {args.size}},
-			Cell{name = 'Competition Span', content = {args.span}},
-			Cell{name = 'Release Date', content = {args.release}},
-			Cell{name = 'Versions', content = {args.versions}}
-		)
+		table.insert(widgets, Cell{name = 'Versions', content = {args.versions}})
 	end
 
 	return widgets

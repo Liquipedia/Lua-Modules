@@ -1,20 +1,20 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Game
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Info = Lua.import('Module:Info')
 
@@ -201,7 +201,8 @@ function Game.text(options)
 	local useAbbreviation = Logic.readBool(options.useAbbreviation)
 	local gameData = Game.raw(options)
 	if Table.isEmpty(gameData) then
-		return Abbreviation.make(useAbbreviation and 'Unkwn.' or 'Unknown Game', 'The specified game input is not recognized')
+		return Abbreviation.make{text = useAbbreviation and 'Unkwn.' or 'Unknown Game',
+			title = 'The specified game input is not recognized'}
 	end
 
 	if Logic.readBool(options.noLink) then
@@ -248,4 +249,12 @@ function Game.isDefaultTeamLogo(options)
 	return Table.includes(defaultLogos, logo)
 end
 
-return Class.export(Game)
+return Class.export(Game, {exports = {
+	'toIdentifier',
+	'abbreviation',
+	'name',
+	'link',
+	'icon',
+	'text',
+	'isDefaultTeamLogo',
+}})

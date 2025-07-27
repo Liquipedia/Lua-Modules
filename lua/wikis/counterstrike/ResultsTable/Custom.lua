@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:ResultsTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -58,4 +57,4 @@ function CustomResultsTable:tierDisplay(placement)
 	return Tier.display(tier, tierType, options), Tier.toSortValue(tier, tierType)
 end
 
-return Class.export(CustomResultsTable)
+return Class.export(CustomResultsTable, {exports = {'results', 'awards'}})

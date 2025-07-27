@@ -1,21 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Count
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
-local Logic = require('Module:Logic')
-local Lpdb = require('Module:Lpdb')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Team = require('Module:Team')
+local Lua = require('Module:Lua')
 
-local Condition = require('Module:Condition')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Team = Lua.import('Module:Team')
+
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -312,4 +313,13 @@ function Count._tierConditions(args, lpdbConditions)
 end
 
 
-return Class.export(Count)
+return Class.export(Count, {exports = {
+	'match2',
+	'match2game',
+	'match2gamesData',
+	'games',
+	'matches',
+	'tournaments',
+	'tournamentsByTier',
+	'placements',
+}})

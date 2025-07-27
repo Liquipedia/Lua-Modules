@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchSummary/Base/Ffa
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
-local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
+local Game = Lua.import('Module:Game')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
+
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local MatchUtil = Lua.import('Module:Match/Util')
@@ -113,7 +113,6 @@ local MATCH_OVERVIEW_COLUMNS = {
 			value = function (opponent, idx)
 				return OpponentDisplay.BlockOpponent{
 					opponent = opponent,
-					showLink = true,
 					overflow = 'ellipsis',
 					teamStyle = 'hybrid',
 					showPlayerTeam = true,
@@ -278,7 +277,7 @@ local GAME_STANDINGS_COLUMNS = {
 		class = 'cell--team',
 		icon = 'team',
 		header = {
-			value = 'Team',
+			value = 'Participant',
 		},
 		sortVal = {
 			value = function (opponent, idx)
@@ -290,7 +289,6 @@ local GAME_STANDINGS_COLUMNS = {
 				return OpponentDisplay.BlockOpponent{
 					opponent = opponent,
 					game = opponent.game,
-					showLink = true,
 					overflow = 'ellipsis',
 					teamStyle = 'hybrid',
 					showPlayerTeam = true,

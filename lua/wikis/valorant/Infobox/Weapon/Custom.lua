@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:Infobox/Weapon/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local AutoInlineIcon = Lua.import('Module:AutoInlineIcon')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -18,7 +18,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local CREDS_ICON = AutoInlineIcon.display({ onlyicon = true }, 'M', 'creds')
+local CREDS_ICON = AutoInlineIcon.display{onlyicon = true, category = 'M', lookup = 'creds'}
 local FIRE_RATE_UNIT = 'rounds/sec'
 
 ---@class ValorantWeaponInfobox: WeaponInfobox

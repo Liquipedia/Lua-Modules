@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=pokemon
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -9,7 +8,6 @@
 local Class = require('Module:Class')
 local GameAppearances = require('Module:GetGameAppearances')
 local Lua = require('Module:Lua')
-local Role = require('Module:Role')
 local Region = require('Module:Region')
 local String = require('Module:StringUtils')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
@@ -22,9 +20,6 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
----@class PokemonInfoboxPlayer: Person
----@field roleData table
----@field roleData2 table
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -33,9 +28,6 @@ local CustomInjector = Class.new(Injector)
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
-
-	player.roleData = Role.run{role = player.args.role}
-	player.roleData2 = Role.run{role = player.args.role2}
 
 	return player:createInfobox()
 end
@@ -67,10 +59,6 @@ function CustomInjector:parse(id, widgets)
 			}
 		end
 	elseif id == 'region' then return {}
-	elseif id == 'role' then
-		return {
-			Cell{name = 'Role(s)', content = {self.caller.roleData.display, self.caller.roleData2.display}}
-		}
 	end
 
 	return widgets
@@ -81,10 +69,6 @@ end
 ---@param personType string
 ---@return table
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.isplayer = self.roleData.isPlayer or 'true'
-	lpdbData.extradata.role = self.roleData.role
-	lpdbData.extradata.role2 = self.roleData2.role
-
 	lpdbData.region = String.nilIfEmpty(Region.name({region = args.region, country = args.country}))
 
 	return lpdbData

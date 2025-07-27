@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Standings/Parse/Lpdb
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Condition = require('Module:Condition')
-local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Condition = Lua.import('Module:Condition')
+local Lpdb = Lua.import('Module:Lpdb')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 local StandingsParseLpdb = {}

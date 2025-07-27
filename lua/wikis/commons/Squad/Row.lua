@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Squad/Row
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
-local OpponentLib = require('Module:OpponentLibraries')
+
+local Class = Lua.import('Module:Class')
+local Icon = Lua.import('Module:Icon')
+local OpponentLib = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLib.Opponent
 local OpponentDisplay = OpponentLib.OpponentDisplay
-local String = require('Module:StringUtils')
-local Template = require('Module:Template')
+local String = Lua.import('Module:StringUtils')
+local Template = Lua.import('Module:Template')
 
 local Widget = Lua.import('Module:Widget/All')
 

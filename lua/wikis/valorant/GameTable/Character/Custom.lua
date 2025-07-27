@@ -1,20 +1,20 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:GameTable/Character/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local MathUtil = require('Module:MathUtil')
-local Page = require('Module:Page')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local Class = Lua.import('Module:Class')
+local MathUtil = Lua.import('Module:MathUtil')
+local Page = Lua.import('Module:Page')
+
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 local CharacterGameTable = Lua.import('Module:GameTable/Character')
@@ -92,7 +92,8 @@ function CustomCharacterGameTable:headerRow()
 		config.showResult and makeHeaderCell(nil, '80px') or nil,
 		config.showResult and makeHeaderCell('vs. Picks'):addClass('unsortable') or nil,
 		config.showLength and makeHeaderCell('Length') or nil,
-		config.showVod and makeHeaderCell('VOD', '60px') or nil
+		config.showVod and makeHeaderCell('VOD', '60px') or nil,
+		config.showMatchPage and makeHeaderCell('') or nil
 	)
 
 	local header = mw.html.create('tr')

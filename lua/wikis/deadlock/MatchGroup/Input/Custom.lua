@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=deadlock
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local FnUtil = require('Module:FnUtil')
-local HeroNames = mw.loadData('Module:HeroNames')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local FnUtil = Lua.import('Module:FnUtil')
+local HeroNames = Lua.import('Module:HeroNames', {loadData = true})
+local Table = Lua.import('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 

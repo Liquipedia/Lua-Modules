@@ -1,15 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Placement
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
-local Ordinal = require('Module:Ordinal')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Ordinal = Lua.import('Module:Ordinal')
+local Table = Lua.import('Module:Table')
 
 local Placement = {}
 
@@ -182,21 +183,20 @@ end
 
 ---Takes string place value and returns prize pool color class.
 ---May return `nil` if no color is registered.
----@param placement string|number
+---@param args {placement: string|number}
 ---@return string?
-function Placement.getBgClass(placement)
-	return prizepoolClasses[placement]
+function Placement.getBgClass(args)
+	return prizepoolClasses[args.placement]
 end
 
 ---Produces wikicode table code for a placement for use in wikitables.
 ---Can optionally take a `customText` input for custom display text.
----@param placement string
----@param customText string?
+---@param args {placement: string, customText: string?}
 ---@return string
-function Placement.get(placement, customText)
-	local raw = Placement.raw(placement)
+function Placement.get(args)
+	local raw = Placement.raw(args.placement)
 	return 'class="text-center ' .. (raw.backgroundClass or '') .. '" data-sort-value="' .. raw.sort .. '"' ..
-		'|<b' .. (raw.blackText and '' or ' class="placement-text"') .. '>' .. (customText or raw.display) .. '</b>'
+		'|<b' .. (raw.blackText and '' or ' class="placement-text"') .. '>' .. (args.customText or raw.display) .. '</b>'
 end
 
-return Class.export(Placement)
+return Class.export(Placement, {exports = {'getBgClass', 'get', 'RangeLabel'}})

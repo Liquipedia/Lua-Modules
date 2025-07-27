@@ -1,24 +1,24 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Player/Display/Starcraft
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local DisplayUtil = require('Module:DisplayUtil')
-local Faction = require('Module:Faction')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local DisplayUtil = Lua.import('Module:DisplayUtil')
+local Faction = Lua.import('Module:Faction')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 local StarcraftPlayerExt = Lua.import('Module:Player/Ext/Starcraft')
 
-local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
+local TBD_ABBREVIATION = Abbreviation.make{text = 'TBD', title = 'To be determined (or to be decided)'}
 
 ---Display components for players used in the starcraft and starcraft2 wikis.
 ---@class StarcraftPlayerDisplay: PlayerDisplay
@@ -63,7 +63,7 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 
 	local flagNode
 	if props.showFlag ~= false and player.flag then
-		flagNode = PlayerDisplay.Flag(player.flag)
+		flagNode = PlayerDisplay.Flag{flag = player.flag}
 	end
 
 	local factionNode
@@ -93,7 +93,7 @@ end
 ---@param frame Frame
 ---@return string
 function StarcraftPlayerDisplay.TemplatePlayer(frame)
-	local args = require('Module:Arguments').getArgs(frame)
+	local args = Lua.import('Module:Arguments').getArgs(frame)
 
 	local pageName
 	local displayName
@@ -141,7 +141,7 @@ end
 ---@param frame Frame
 ---@return Html
 function StarcraftPlayerDisplay.TemplateInlinePlayer(frame)
-	local args = require('Module:Arguments').getArgs(frame)
+	local args = Lua.import('Module:Arguments').getArgs(frame)
 
 	local player = {
 		displayName = args[1],
@@ -186,7 +186,7 @@ function StarcraftPlayerDisplay.InlinePlayer(props)
 	local player = props.player
 
 	local flag = props.showFlag ~= false and player.flag
-		and PlayerDisplay.Flag(player.flag)
+		and PlayerDisplay.Flag{flag = player.flag}
 		or nil
 
 	local faction = props.showFaction ~= false and player.faction ~= Faction.defaultFaction

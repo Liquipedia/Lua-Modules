@@ -1,13 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:TypeUtil
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Table = Lua.import('Module:Table')
 
 local TypeUtil = {}
 
@@ -17,7 +18,7 @@ end
 
 function TypeUtil.optional (typeSpec)
 	if type(typeSpec) == 'string' then
-		return require('Module:StringUtils').endsWith(typeSpec, '?')
+		return Lua.import('Module:StringUtils').endsWith(typeSpec, '?')
 			and typeSpec
 			or typeSpec .. '?'
 	else
@@ -96,7 +97,7 @@ function TypeUtil.valueIsTypeNoTable (value, typeSpec)
 		elseif typeSpec == 'pagename' then
 			-- A pagename is a string, with first letter capitalized and may not contains spaces
 			return type(value) == 'string' and value:find('^%u') and not value:find(' ')
-		elseif require('Module:StringUtils').endsWith(typeSpec, '?') then
+		elseif Lua.import('Module:StringUtils').endsWith(typeSpec, '?') then
 			return value == nil or TypeUtil.valueIsTypeNoTable(value, typeSpec:sub(1, -2))
 		elseif typeSpec == 'any' then
 			return true

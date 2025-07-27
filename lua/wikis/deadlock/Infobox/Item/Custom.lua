@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=deadlock
 -- page=Module:Infobox/Item/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -90,6 +89,7 @@ function CustomInjector:parse(id, widgets)
 			return {}
 		end
 		Array.appendWith(widgets,
+			Title{children = 'Ability'},
 			Cell{name = 'Active', children = {args.active, args.active2, args.active3}},
 			Cell{name = 'Passive', children = {args.passive, args.passive2, args.passive3}}
 		)
@@ -106,7 +106,6 @@ function CustomInjector:parse(id, widgets)
 			Title{children = 'Components'},
 			Center{children = {args.recipe}}
 		}
-	elseif id == 'maps' then return {}
 	elseif id == 'info' then return {}
 	end
 
@@ -129,7 +128,8 @@ end
 ---@return string
 function CustomItem:_getCostDisplay()
 	return tostring(mw.html.create('div')
-		:node(AutoInlineIcon.display({onlyicon = true}, 'M', 'Souls')):wikitext(' '):wikitext(self.args.itemcost))
+		:node(AutoInlineIcon.display{onlyicon = true, category = 'M', lookup = 'Souls'})
+		:wikitext(' '):wikitext(self.args.itemcost))
 end
 
 ---@param text string|number|nil

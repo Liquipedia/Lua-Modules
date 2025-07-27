@@ -1,29 +1,36 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchPage/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Links = require('Module:Links')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Tabs = require('Module:Tabs')
-local TeamTemplate = require('Module:TeamTemplate')
-local VodLink = require('Module:VodLink')
 
+local Array = Lua.import('Module:Array')
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Logic = Lua.import('Module:Logic')
+local Links = Lua.import('Module:Links')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Tabs = Lua.import('Module:Tabs')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local VodLink = Lua.import('Module:VodLink')
+
+local HighlightConditions = Lua.import('Module:HighlightConditions')
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
+
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local AdditionalSection = Lua.import('Module:Widget/Match/Page/AdditionalSection')
+local MatchPageMapVeto = Lua.import('Module:Widget/Match/Page/MapVeto')
 local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local Div = HtmlWidgets.Div
 local Footer = Lua.import('Module:Widget/Match/Page/Footer')
@@ -39,18 +46,17 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageGame: MatchGroupUtilGame
 ---@field finished boolean
----@field winnerName string?
 ---@field teams table[]
 ---@field scoreDisplay string
 
 ---@class MatchPageOpponent: standardOpponent
 ---@field opponentIndex integer
----@field iconDisplay string
+---@field iconDisplay Widget?
 ---@field teamTemplateData teamTemplateData
 ---@field seriesDots string[]
 
 ---@class BaseMatchPage
----@operator call(MatchPageMatch): self
+---@operator call(MatchPageMatch): BaseMatchPage
 ---@field matchData MatchPageMatch
 ---@field games MatchPageGame[]
 ---@field opponents MatchPageOpponent[]
@@ -65,12 +71,7 @@ local BaseMatchPage = Class.new(
 )
 
 BaseMatchPage.NOT_PLAYED = 'notplayed'
-
----@param match table
----@return boolean
-function BaseMatchPage.isEnabledFor(match)
-	error('BaseMatchPage.isEnabledFor() cannot be called directly and must be overridden.')
-end
+BaseMatchPage.NO_CHARACTER = 'default'
 
 ---@param props {match: MatchGroupUtilMatch}
 ---@return Widget
@@ -163,7 +164,10 @@ function BaseMatchPage:populateOpponents()
 			return
 		end
 
-		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
+		opponent.iconDisplay = OpponentDisplay.InlineTeamContainer{
+			style = 'icon',
+			template = opponent.template
+		}
 		opponent.teamTemplateData = teamTemplate
 
 		opponent.seriesDots = Array.map(self.games, function(game)
@@ -173,36 +177,45 @@ function BaseMatchPage:populateOpponents()
 end
 
 ---@protected
+---@param character string?
+---@return string?
 function BaseMatchPage:getCharacterIcon(character)
-	error('BaseMatchPage:getCharacterIcon() cannot be called directly and must be overridden.')
+	return CharacterIcon.Icon{
+		character = character or BaseMatchPage.NO_CHARACTER,
+		date = self.matchData.date
+	}
 end
 
 ---@protected
+---@return string
 function BaseMatchPage:makeDisplayTitle()
 	local team1data = (self.opponents[1] or {}).teamTemplateData
 	local team2data = (self.opponents[2] or {}).teamTemplateData
+	local tournamentName = self.matchData.tickername
 
 	if Logic.isEmpty(team1data) and Logic.isEmpty(team2data) then
-		return table.concat({'Match in', self.matchData.tickername}, ' ')
+		return String.isNotEmpty(tournamentName) and 'Match in ' .. tournamentName or ''
 	end
 
 	local team1name = (team1data or {}).shortname or 'TBD'
 	local team2name = (team2data or {}).shortname or 'TBD'
 
-	local tournamentName = self.matchData.tickername
-	local displayTitle = team1name .. ' vs. ' .. team2name
-	if not tournamentName then
-		return displayTitle
+	local titleParts = {team1name, 'vs.', team2name}
+	if tournamentName then
+		Array.appendWith(titleParts, '@', tournamentName)
 	end
 
-	displayTitle = displayTitle .. ' @ ' .. tournamentName
-
-	mw.getCurrentFrame():preprocess(table.concat{'{{DISPLAYTITLE:', displayTitle, '|noreplace}}'})
+	return table.concat(titleParts, ' ')
 end
 
 ---@return Widget
 function BaseMatchPage:render()
-	self:makeDisplayTitle()
+	local displayTitle = self:makeDisplayTitle()
+	if String.isNotEmpty(displayTitle) then
+		mw.getCurrentFrame():callParserFunction('DISPLAYTITLE', displayTitle, 'noreplace')
+	end
+
+	local tournamentContext = self:_getMatchContext()
 	return Div{
 		children = WidgetUtil.collect(
 			Header {
@@ -214,7 +227,10 @@ function BaseMatchPage:render()
 				parent = self.matchData.parent,
 				phase = MatchGroupUtil.computeMatchPhase(self.matchData),
 				tournamentName = self.matchData.tournament,
+				poweredBy = self.getPoweredBy(),
+				highlighted = HighlightConditions.tournament(tournamentContext),
 			},
+			self:renderMapVeto(),
 			self:renderGames(),
 			self:footer()
 		)
@@ -241,7 +257,12 @@ function BaseMatchPage:renderGames()
 	}
 
 	Array.forEach(games, function(game, idx)
-		tabs['name' .. idx] = 'Game ' .. idx
+		local mapName = self.games[idx].map
+		if Logic.isNotEmpty(mapName) then
+			tabs['name' .. idx] = 'Game ' .. idx .. ': ' .. mapName
+		else
+			tabs['name' .. idx] = 'Game ' .. idx
+		end
 		tabs['content' .. idx] = game
 	end)
 
@@ -253,6 +274,52 @@ end
 ---@return string|Html|Widget
 function BaseMatchPage:renderGame(game)
 	error('BaseMatchPage:renderGame() cannot be called directly and must be overridden.')
+end
+
+---@private
+---@return table
+function BaseMatchPage:_getMatchContext()
+	return MatchGroupInputUtil.getTournamentContext(self.matchData)
+end
+
+---@protected
+---@return Widget[]
+function BaseMatchPage:renderMapVeto()
+	local match = self.matchData
+	if not match.extradata or not match.extradata.mapveto then
+		return {}
+	end
+
+	local mapVetoes = match.extradata.mapveto
+	local firstVeto = tonumber(mapVetoes[1].vetostart)
+
+	if not firstVeto or not (firstVeto == 1 or firstVeto == 2) then
+		return {}
+	end
+
+	local secondVeto = firstVeto == 1 and 2 or 1
+
+	local opponent1 = match.opponents[firstVeto]
+	local opponent2 = match.opponents[secondVeto]
+
+	local mapVetoRounds = Array.flatMap(mapVetoes, function(vetoRound, vetoRoundIdx)
+		local vetoRoundFirst = vetoRoundIdx * 2 - 1
+		local vetoRoundSecond = vetoRoundIdx * 2
+		if vetoRound.type == 'decider' then
+			return {{map = vetoRound.decider, type = vetoRound.type, round = vetoRoundFirst}}
+		end
+		local firstMap = vetoRound['team' .. firstVeto]
+		local secondMap = vetoRound['team' .. secondVeto]
+		return {
+			{map = firstMap, type = vetoRound.type, round = vetoRoundFirst, by = opponent1},
+			{map = secondMap, type = vetoRound.type, round = vetoRoundSecond, by = opponent2},
+		}
+	end)
+
+	return {
+		HtmlWidgets.H3{children = 'Map Veto'},
+		MatchPageMapVeto{vetoRounds = mapVetoRounds},
+	}
 end
 
 ---@protected
@@ -294,8 +361,22 @@ function BaseMatchPage:_getComments()
 		Logic.isNotEmpty(substituteComments) and Comment{
 			children = Array.interleave(substituteComments, HtmlWidgets.Br{})
 		} or nil,
+		self:_getCasterComment(),
 		self:addComments()
 	)
+end
+
+---@private
+---@return MatchPageComment?
+function BaseMatchPage:_getCasterComment()
+	local casters = self.matchData.extradata.casters
+	if Logic.isEmpty(casters) then return end
+	return Comment{
+		children = WidgetUtil.collect(
+			#casters > 1 and 'Casters: ' or 'Caster: ',
+			Array.interleave(DisplayHelper.createCastersDisplay(casters), ', ')
+		)
+	}
 end
 
 ---@protected
@@ -308,6 +389,12 @@ end
 function BaseMatchPage:getPatchLink()
 	if Logic.isEmpty(self.matchData.patch) then return end
 	return Link{ link = 'Patch ' .. self.matchData.patch }
+end
+
+---@protected
+---@return string?
+function BaseMatchPage.getPoweredBy()
+	return nil
 end
 
 return BaseMatchPage

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=honorofkings
 -- page=Module:MatchGroup/Legacy/Default
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

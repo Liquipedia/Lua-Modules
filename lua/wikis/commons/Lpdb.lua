@@ -1,16 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Lpdb
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
-local Table = require('Module:Table')
-local TextSanitizer = require('Module:TextSanitizer')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
+local Table = Lua.import('Module:Table')
+local TextSanitizer = Lua.import('Module:TextSanitizer')
 
 local Lpdb = {}
 
@@ -282,6 +283,18 @@ Lpdb.SquadPlayer = Model('squadplayer', {
 	{name = 'joindate', fieldType = 'string', default = ''},
 	{name = 'leavedate', fieldType = 'string', default = ''},
 	{name = 'inactivedate', fieldType = 'string', default = ''},
+	{name = 'extradata', fieldType = 'struct', default = {}},
+})
+
+---@class DataPoint:Model
+Lpdb.DataPoint = Model('datapoint', {
+	{name = 'objectname', fieldType = 'string'},
+	{name = 'type', fieldType = 'string', default = ''},
+	{name = 'name', fieldType = 'string', default = ''},
+	{name = 'information', fieldType = 'string', default = ''},
+	{name = 'image', fieldType = 'string', default = ''},
+	{name = 'imagedark', fieldType = 'string', default = ''},
+	{name = 'date', fieldType = 'string', default = 0},
 	{name = 'extradata', fieldType = 'struct', default = {}},
 })
 

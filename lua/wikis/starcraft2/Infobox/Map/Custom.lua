@@ -1,27 +1,28 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Template = require('Module:Template')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Template = Lua.import('Module:Template')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class Starcraft2MapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
-
+---@class Starcraft2MapInfoboxWidgetInjector: WidgetInjector
+---@field caller Starcraft2MapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -48,7 +49,6 @@ function CustomInjector:parse(widgetId, widgets)
 		Cell{name = 'Size', content = {self.caller:_getSize(id)}},
 		Cell{name = 'Spawn Positions', content = {self.caller:_getSpawn(id)}},
 		Cell{name = 'Versions', content = {args.versions}},
-		Cell{name = 'Competition Span', content = {args.span}},
 		Cell{name = 'Leagues Featured', content = {args.leagues}},
 		Cell{name = '[[Rush distance]]', content = {self.caller:_getRushDistance()}},
 		Cell{name = '1v1 Ladder', content = {args['1v1history']}},
@@ -76,14 +76,10 @@ end
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.name = self:getNameDisplay(args)
-	lpdbData.extradata = {
-		creator = args.creator and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator) or nil,
-		creator2 = args.creator2 and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator2) or nil,
-		spawns = args.players,
-		height = args.height,
-		width = args.width,
-		rush = Variables.varDefault('rush_distance'),
-	}
+	lpdbData.extradata.spawns = args.players
+	lpdbData.extradata.height = args.height
+	lpdbData.extradata.width = args.width
+	lpdbData.extradata.rush = Variables.varDefault('rush_distance')
 	return lpdbData
 end
 

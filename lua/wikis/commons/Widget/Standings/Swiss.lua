@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Standings/Swiss
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
@@ -16,7 +16,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local MatchOverview = Lua.import('Module:Widget/Standings/MatchOverview')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
@@ -82,7 +82,6 @@ function StandingsSwissWidget:render()
 							classes = {teamBackground},
 							children = OpponentDisplay.BlockOpponent{
 								opponent = slot.opponent,
-								showLink = true,
 								overflow = 'ellipsis',
 								teamStyle = 'hybrid',
 								showPlayerTeam = true,

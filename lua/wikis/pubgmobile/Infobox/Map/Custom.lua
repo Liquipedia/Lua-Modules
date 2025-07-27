@@ -1,24 +1,26 @@
 ---
 -- @Liquipedia
--- wiki=pubgmobile
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class PubgMobileMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class PubgMobileMapInfoboxWidgetInjector: WidgetInjector
+---@field caller PubgMobileMapInfobox
 local CustomInjector = Class.new(Injector)
 
 local MODES = {
@@ -46,24 +48,26 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Span', content = {args.span}},
-			Cell{name = 'Theme', content = {args.theme}},
-			Cell{name = 'Size', content = {args.size}},
 			Cell{name = 'Game Version', content = {Game.text{
 				game = args.game,
 				useDefault = true,
 				useAbbreviation = true,
 			}}},
-			Cell{name = 'Game Mode(s)',content = {self.caller:_getGameMode(args)}}
+			Cell{name = 'Game Mode(s)',content = self.caller:getGameModes(args)}
 		)
 	end
 	return widgets
 end
 
 ---@param args table
----@return string?
-function CustomMap:_getGameMode(args)
-	return MODES[string.lower(args.mode or '')]
+---@return string[]
+function CustomMap:getGameModes(args)
+	return Array.map(
+		self:getAllArgsForBase(args, 'mode'),
+		function (gameMode)
+			return MODES[gameMode:lower()]
+		end
+	)
 end
 
 ---@param lpdbData table
@@ -73,9 +77,7 @@ function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.extradata.theme = args.theme
 	lpdbData.extradata.size = args.sizeabr
 	lpdbData.extradata.span = args.span
-	lpdbData.extradata.mode = string.lower(args.mode or '')
 	lpdbData.extradata.perpective = string.lower(args.perspective or '')
-	lpdbData.extradata.game = Game.toIdentifier{game = args.game, useDefault = true}
 	return lpdbData
 end
 

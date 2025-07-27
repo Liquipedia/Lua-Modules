@@ -1,16 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:Opponent/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate')
+
+local Faction = Lua.import('Module:Faction')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Opponent = Lua.import('Module:Opponent')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
@@ -22,8 +22,6 @@ local CustomOpponent = Table.deepCopy(Opponent)
 
 ---@class WarcraftStandardOpponent:standardOpponent
 ---@field players WarcraftStandardPlayer[]
----@field isArchon boolean
----@field isSpecialArchon boolean?
 ---@field extradata table
 
 ---@param args table
@@ -43,6 +41,26 @@ function CustomOpponent.readOpponentArgs(args)
 			player.faction = Faction.read(args['p' .. playerIx .. 'faction'] or args['p' .. playerIx .. 'race'])
 		end
 	end
+
+	return opponent
+end
+
+---@param type OpponentType?
+---@return WarcraftStandardOpponent
+function CustomOpponent.blank(type)
+	local opponent = Opponent.blank(type) --[[@as WarcraftStandardOpponent]]
+
+	opponent.extradata = {}
+
+	return opponent
+end
+
+---@param type OpponentType?
+---@return WarcraftStandardOpponent
+function CustomOpponent.tbd(type)
+	local opponent = Opponent.tbd(type) --[[@as WarcraftStandardOpponent]]
+
+	opponent.extradata = {}
 
 	return opponent
 end

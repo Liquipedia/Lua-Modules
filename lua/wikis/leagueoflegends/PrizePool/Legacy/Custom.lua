@@ -1,13 +1,12 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
 -- page=Module:PrizePool/Legacy/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
+local Variables = Lua.import('Module:Variables')
 
 local PrizePoolLegacy = Lua.import('Module:PrizePool/Legacy')
 

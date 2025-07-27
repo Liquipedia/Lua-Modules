@@ -1,12 +1,27 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Class
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Arguments = require('Module:Arguments')
+
+---@class ArgumentsOptions
+---@field translate table?
+---@field backtranslate table?
+---@field wrappers string[]?
+---@field frameOnly boolean?
+---@field parentOnly boolean?
+---@field parentFirst boolean?
+---@field valueFunc ?fun(key: string, val: string):string
+---@field removeBlanks boolean?
+---@field trim boolean?
+---@field readOnly boolean?
+---@field noOverwrite boolean?
+
+---@class ClassExportOptions: ArgumentsOptions
+---@field exports string[]
 
 local Class = {}
 
@@ -61,35 +76,42 @@ end
 
 ---@generic T:table
 ---@param class T
----@param options ?table
+---@param options ClassExportOptions
 ---@return T
 function Class.export(class, options)
-	for name, f in pairs(class) do
+	--- nil check needed for non-git usage
+	options = options or {}
+
+	local checkFunction = function(functionName)
+		local f = class[functionName]
 		-- We only want to export functions, and only functions which are public (no underscore)
-		if (
-			type(f) == 'function' and
-				(not string.find(name, Class.PRIVATE_FUNCTION_SPECIFIER))
-		) then
-			class[name] = Class._wrapFunction(class[name], options)
+		if type(f) ~= 'function' or string.find(functionName, Class.PRIVATE_FUNCTION_SPECIFIER) then
+			return
 		end
+		class[functionName] = Class._wrapFunction(f, options)
+	end
+
+	--- need to catch missing `exports` option for non-git usages
+	if type(options.exports) == 'table' and #options.exports > 0 then
+		for _, functionName in ipairs(options.exports) do
+			checkFunction(functionName)
+		end
+		return class
+	end
+	for name in pairs(class) do
+		checkFunction(name)
 	end
 	return class
-end
-
--- Duplicate Table.isNotEmpty() here to avoid circular dependencies with Table
-local function TableIsNotEmpty(tbl)
-	-- luacheck: push ignore (Loop can be executed at most once)
-	for _ in pairs(tbl) do
-		return true
-	end
-	-- luacheck: pop
-	return false
 end
 
 ---
 -- Wrap the given function with an argument parses so that both wikicode and lua
 -- arguments are accepted
 --
+---@generic F:fun(props: table)
+---@param f F
+---@param options table?
+---@return F
 function Class._wrapFunction(f, options)
 	options = options or {}
 	local alwaysRewriteArgs = options.trim
@@ -110,38 +132,12 @@ function Class._wrapFunction(f, options)
 			)
 
 		if shouldRewriteArgs then
-			local namedArgs, indexedArgs = Class._frameToArgs(frame, options)
-			if namedArgs then
-				return f(namedArgs, unpack(indexedArgs))
-			else
-				return f(unpack(indexedArgs))
-			end
+			local args = Arguments.getArgs(frame, options)
+			return f(args)
 		else
 			return f(...)
 		end
 	end
-end
-
---[[
-Translates a frame object into arguments expected by a lua function.
-]]
-function Class._frameToArgs(frame, options)
-	local args = Arguments.getArgs(frame, options)
-
-	-- getArgs adds a metatable to the table. This breaks unpack. So we remove it.
-	-- We also add all named params to a special table, since unpack removes them.
-	local indexedArgs = {}
-	local namedArgs = {}
-	for key, value in pairs(args) do
-		if type(key) == 'number' then
-			indexedArgs[key] = value
-		-- remove args that are needed for the Lua.invoke wrapper
-		elseif key ~= 'module' and key ~= 'fn' and key ~= 'dev' and key ~= 'frameOnly' then
-			namedArgs[key] = value
-		end
-	end
-
-	return (TableIsNotEmpty(namedArgs) and namedArgs or nil), indexedArgs
 end
 
 ---@param instance any

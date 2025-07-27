@@ -1,18 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local EarningsOf = require('Module:Earnings of')
-local Logic = require('Module:Logic')
+
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local EarningsOf = Lua.import('Module:Earnings of')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
@@ -86,7 +87,7 @@ end
 ---@param maps table[]
 ---@return table
 function MatchFunctions.getLinks(match, maps)
-	local platforms = mw.loadData('Module:MatchExternalLinks')
+	local platforms = Lua.import('Module:MatchExternalLinks', {loadData = true})
 	table.insert(platforms, {name = 'vod2', isMapStats = true})
 
 	return Table.map(platforms, function (key, platform)

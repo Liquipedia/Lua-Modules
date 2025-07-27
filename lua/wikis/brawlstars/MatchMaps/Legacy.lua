@@ -1,23 +1,23 @@
 ---
 -- @Liquipedia
--- wiki=brawlstars
 -- page=Module:MatchMaps/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local CharacterIcon = require('Module:CharacterIcon')
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Json = require('Module:Json')
-local MatchGroup = require('Module:MatchGroup')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
 
-local CharacterNames = mw.loadData('Module:BrawlerNames')
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+local Json = Lua.import('Module:Json')
+local MatchGroup = Lua.import('Module:MatchGroup')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
+
+local CharacterNames = Lua.import('Module:BrawlerNames', {loadData = true})
 
 local MatchGroupBase = Lua.import('Module:MatchGroup/Base')
 

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchTicker/DisplayComponents
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,27 +7,28 @@
 
 -- Holds DisplayComponents for the MatchTicker module
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Countdown = require('Module:Countdown')
-local DateExt = require('Module:Date/Ext')
-local I18n = require('Module:I18n')
-local Icon = require('Module:Icon')
-local LeagueIcon = require('Module:LeagueIcon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Timezone = require('Module:Timezone')
-local VodLink = require('Module:VodLink')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Countdown = Lua.import('Module:Countdown')
+local DateExt = Lua.import('Module:Date/Ext')
+local I18n = Lua.import('Module:I18n')
+local Icon = Lua.import('Module:Icon')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Timezone = Lua.import('Module:Timezone')
+local VodLink = Lua.import('Module:VodLink')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
@@ -44,6 +44,7 @@ local WINNER_TO_BG_CLASS = {
 }
 local TOURNAMENT_DEFAULT_ICON = 'Generic_Tournament_icon.png'
 local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
+local UTC = Timezone.getTimezoneString{timezone = 'UTC'}
 
 ---Display class for the header of a match ticker
 ---@class MatchTickerHeader
@@ -123,16 +124,16 @@ end
 function Versus:bestof()
 	local bestof = tonumber(self.match.bestof) or 0
 	if bestof > 0 then
-		return Abbreviation.make('Bo' .. bestof, 'Best of ' .. bestof)
+		return Abbreviation.make{text = 'Bo' .. bestof, title = 'Best of ' .. bestof}
 	end
 end
 
 ---@return string
 function Versus:gameTitle()
-	if not self.match.asGameIdx then
+	if not self.match.asGameIndexes then
 		return ''
 	end
-	return 'Game #' .. (self.match.asGameIdx)
+	return 'Game #' .. (table.concat(self.match.asGameIndexes, '-'))
 end
 
 ---@return string
@@ -293,7 +294,7 @@ function Details:_matchPageIcon()
 	if Logic.isEmpty(matchPage) then return end
 
 	local display = mw.html.create('div')
-		:addClass('btn btn-secondary')
+		:addClass('btn-secondary btn btn-extrasmall')
 		:wikitext(Icon.makeIcon{iconName = 'matchpopup'})
 
 	return Page.makeInternalLink(tostring(display), matchPage)
@@ -306,11 +307,11 @@ function Details:countdown(matchPageIcon)
 
 	local dateString
 	if Logic.readBool(match.dateexact) then
-		local timestamp = DateExt.readTimestamp(match.date) + (Timezone.getOffset(match.extradata.timezoneid) or 0)
+		local timestamp = DateExt.readTimestamp(match.date) + (Timezone.getOffset{timezone = match.extradata.timezoneid} or 0)
 		dateString = DateExt.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
-				.. (Timezone.getTimezoneString(match.extradata.timezoneid) or (Timezone.getTimezoneString('UTC')))
+				.. (Timezone.getTimezoneString{timezone = match.extradata.timezoneid} or UTC)
 	else
-		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date) .. (Timezone.getTimezoneString('UTC'))
+		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date) .. UTC
 	end
 
 	local countdownArgs = Table.merge(match.stream or {}, {
@@ -335,7 +336,7 @@ function Details:countdown(matchPageIcon)
 			}
 		end
 
-		local gameVods = Array.map(Array.map(match.match2games, Operator.property('vod')), makeVod)
+		local gameVods = Array.map(Array.map(match.match2games or {}, Operator.property('vod')), makeVod)
 
 		countdownDisplay:node(makeVod(match.vod))
 		Array.forEach(gameVods, function(vod)

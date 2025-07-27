@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=wildcard
 -- page=Module:Infobox/Character/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -61,17 +60,15 @@ end
 ---@param lpdbData table
 ---@param args table
 function CustomHero:addToLpdb(lpdbData, args)
-	lpdbData.extradata = {
-		house = args.house,
-		health = args.health,
-		damagepersecond = args.dps,
-		movespeed = args.movespeed,
-		healing = args.healing,
-		mobility = args.mobility,
-		offense = args.offense,
-		defense = args.defense,
-		utility = args.utility
-	}
+	lpdbData.extradata.house = args.house
+	lpdbData.extradata.health = args.health
+	lpdbData.extradata.damagepersecond = args.dps
+	lpdbData.extradata.movespeed = args.movespeed
+	lpdbData.extradata.healing = args.healing
+	lpdbData.extradata.mobility = args.mobility
+	lpdbData.extradata.offense = args.offense
+	lpdbData.extradata.defense = args.defense
+	lpdbData.extradata.utility = args.utility
 
 	return lpdbData
 end

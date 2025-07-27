@@ -1,28 +1,28 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Faction = require('Module:Faction')
-local Flags = require('Module:Flags')
-local FnUtil = require('Module:FnUtil')
-local CharacterAliases = mw.loadData('Module:CharacterAliases')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MapsData = mw.loadData('Module:Maps/data')
-local Operator = require('Module:Operator')
-local PatchAuto = require('Module:PatchAuto')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local Faction = Lua.import('Module:Faction')
+local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
+local CharacterAliases = Lua.import('Module:CharacterAliases', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local MapsData = Lua.import('Module:Maps/data', {loadData = true})
+local Operator = Lua.import('Module:Operator')
+local PatchAuto = Lua.import('Module:PatchAuto')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 local TBD = 'TBD'
@@ -171,9 +171,7 @@ end
 ---@param opponents table[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
-	local extradata = {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-	}
+	local extradata = {}
 
 	for prefix, mapVeto in Table.iter.pairsByPrefix(match, 'veto') do
 		extradata[prefix] = (MapsData[mapVeto:lower()] or {}).name or mapVeto
@@ -265,7 +263,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 			return {
 				faction = faction,
 				player = link,
-				flag = Flags.CountryName(playerIdData.flag),
+				flag = Flags.CountryName{flag = playerIdData.flag},
 				position = playerIndex,
 				random = Logic.readBool(mapInput[prefix .. 'random']),
 				heroes = MapFunctions.readHeroes(
@@ -502,7 +500,6 @@ end
 ---@return table
 function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
 	return {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 		ffa = 'true',
 		placementinfo = settings.placementInfo,
 		settings = settings.settings,

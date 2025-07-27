@@ -1,21 +1,24 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Display/Matchlist
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local DisplayUtil = require('Module:DisplayUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local DisplayUtil = Lua.import('Module:DisplayUtil')
+local Logic = Lua.import('Module:Logic')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
+local OpponentLibrary = Lua.import('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
 local MatchlistDisplay = {propTypes = {}, types = {}}
@@ -28,7 +31,6 @@ local SCORE_DRAW = 0
 ---@field Score function?
 ---@field attached boolean?
 ---@field collapsed boolean?
----@field collapsible boolean?
 ---@field matchHasDetails function?
 ---@field width number?
 
@@ -45,7 +47,6 @@ function MatchlistDisplay.configFromArgs(args)
 	return {
 		attached = Logic.readBoolOrNil(args.attached),
 		collapsed = Logic.readBoolOrNil(args.collapsed),
-		collapsible = not Logic.readBoolOrNil(args.nocollapse),
 		width = tonumber((string.gsub(args.width or '', 'px', ''))),
 	}
 end
@@ -54,7 +55,7 @@ end
 ---The component fetches the match data from LPDB or page variables.
 ---@param props {bracketId: string, config: MatchlistConfigOptions}
 ---@param matches MatchGroupUtilMatch[]
----@return Html
+---@return Widget
 function MatchlistDisplay.MatchlistContainer(props, matches)
 	return MatchlistDisplay.Matchlist({
 		config = props.config,
@@ -64,7 +65,7 @@ end
 
 ---Display component for a tournament matchlist. Match data is specified in the input.
 ---@param props {config: MatchlistConfigOptions, matches: MatchGroupUtilMatch[]}
----@return Html
+---@return Widget
 function MatchlistDisplay.Matchlist(props)
 	local propsConfig = props.config or {}
 	local config = {
@@ -73,47 +74,40 @@ function MatchlistDisplay.Matchlist(props)
 		Score = propsConfig.Score or MatchlistDisplay.Score,
 		attached = propsConfig.attached or false,
 		collapsed = propsConfig.collapsed or false,
-		collapsible = Logic.nilOr(propsConfig.collapsible, true),
 		matchHasDetails = propsConfig.matchHasDetails or WikiSpecific.matchHasDetails or DisplayHelper.defaultMatchHasDetails,
 		width = propsConfig.width or 300,
 	}
 
-	local matchlistNode = mw.html.create('div'):addClass('brkts-matchlist')
-		:addClass(config.collapsible and 'brkts-matchlist-collapsible' or nil)
-		:addClass(config.collapsed and 'brkts-matchlist-collapsed' or nil)
-		:addClass(config.attached and 'brkts-matchlist-attached' or nil)
-		:css('width', config.width .. 'px')
-
-	for index, match in ipairs(props.matches) do
-		local titleNode = index == 1
-			and MatchlistDisplay.Title({
-				title = match.bracketData.title or 'Match List',
-			})
-			or nil
-
-		local headerNode = match.bracketData.header
-			and MatchlistDisplay.Header({
+	return GeneralCollapsible{
+		title = props.matches[1] and props.matches[1].bracketData.title or 'Match List',
+		titleClasses = {'brkts-matchlist-title'},
+		classes = {'brkts-matchlist', config.attached and 'brkts-matchlist-attached' or nil},
+		collapseAreaClasses = {'brkts-matchlist-collapse-area'},
+		attributes = {style = 'width: ' .. config.width .. 'px;'},
+		shouldCollapse = config.collapsed,
+		children = Array.flatMap(props.matches, function(match)
+			local headerNode = match.bracketData.header
+				and MatchlistDisplay.Header({
 				header = match.bracketData.header,
+				})
+				or nil
+
+			local dateHeaderNode = match.bracketData.dateHeader
+				and match.dateIsExact
+				and MatchlistDisplay.DateHeader({match = match})
+				or nil
+
+			local matchNode = MatchlistDisplay.Match({
+				MatchSummaryContainer = config.MatchSummaryContainer,
+				Opponent = config.Opponent,
+				Score = config.Score,
+				match = match,
+				matchHasDetails = config.matchHasDetails,
 			})
-			or nil
 
-		local dateHeaderNode = match.bracketData.dateHeader
-			and match.dateIsExact
-			and MatchlistDisplay.DateHeader({match = match})
-			or nil
-
-		local matchNode = MatchlistDisplay.Match({
-			MatchSummaryContainer = config.MatchSummaryContainer,
-			Opponent = config.Opponent,
-			Score = config.Score,
-			match = match,
-			matchHasDetails = config.matchHasDetails,
-		})
-
-		matchlistNode:node(titleNode):node(headerNode):node(dateHeaderNode):node(matchNode)
-	end
-
-	return matchlistNode
+			return WidgetUtil.collect(headerNode, dateHeaderNode, matchNode)
+		end)
+	}
 end
 
 ---Display component for a match in a matchlist. Consists of two opponents, two scores,
@@ -152,7 +146,7 @@ function MatchlistDisplay.Match(props)
 		matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 			bracketId = bracketId,
 			matchId = props.match.matchId,
-		}, require('Module:Error/Display').ErrorDetails)
+		}, Lua.import('Module:Error/Display').ErrorDetails)
 			:addClass('brkts-match-info-popup')
 	else
 		matchInfoIconNode = mw.html.create('div'):addClass('brkts-matchlist-placeholder-cell')
@@ -166,16 +160,6 @@ function MatchlistDisplay.Match(props)
 		:node(renderScore(2))
 		:node(renderOpponent(2))
 		:node(matchSummaryNode)
-end
-
----Display component for a title in a matchlist.
----@param props {title: string}
----@return Html
-function MatchlistDisplay.Title(props)
-	local titleNode = mw.html.create('div'):addClass('brkts-matchlist-title')
-		:wikitext(props.title)
-
-	return DisplayUtil.applyOverflowStyles(titleNode, 'wrap')
 end
 
 ---Display component for a header in a matchlist.
@@ -241,4 +225,4 @@ function MatchlistDisplay.Score(props)
 		:node(contentNode)
 end
 
-return Class.export(MatchlistDisplay)
+return MatchlistDisplay

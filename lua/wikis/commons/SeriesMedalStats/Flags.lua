@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:SeriesMedalStats/Flags
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Flags = require('Module:Flags')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Flags = Lua.import('Module:Flags')
+local Table = Lua.import('Module:Table')
+
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 local MedalStatsBase = Lua.import('Module:SeriesMedalStats')
@@ -37,7 +37,7 @@ function MedalStats:create()
 	self:_processData()
 
 	local nameDisplay = function(identifier)
-		return Flags.Icon{flag = identifier, shouldLink = false} .. ' ' .. Flags.CountryName(identifier)
+		return Flags.Icon{flag = identifier, shouldLink = false} .. ' ' .. Flags.CountryName{flag = identifier}
 	end
 
 	return self:defaultBuild(nameDisplay, 'Country', 'Countries')

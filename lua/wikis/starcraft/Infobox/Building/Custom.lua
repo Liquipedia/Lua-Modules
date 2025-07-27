@@ -1,22 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=starcraft
 -- page=Module:Infobox/Building/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
-local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local Hotkeys = require('Module:Hotkey')
-local String = require('Module:StringUtils')
+
+local Class = Lua.import('Module:Class')
+local CostDisplay = Lua.import('Module:Infobox/Extension/CostDisplay')
+local Faction = Lua.import('Module:Faction')
+local Hotkeys = Lua.import('Module:Hotkey')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Building = Lua.import('Module:Infobox/Building')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class StarcraftBuildingInfobox: BuildingInfobox
@@ -152,9 +152,9 @@ function CustomBuilding:_getHotkeys()
 	local display
 	if not String.isEmpty(self.args.shortcut) then
 		if not String.isEmpty(self.args.shortcut2) then
-			display = Hotkeys.hotkey2(self.args.shortcut, self.args.shortcut2, 'arrow')
+			display = Hotkeys.hotkey2{hotkey1 = self.args.shortcut, hotkey2 = self.args.shortcut2, seperator = 'arrow'}
 		else
-			display = Hotkeys.hotkey(self.args.shortcut)
+			display = Hotkeys.hotkey{hotkey = self.args.shortcut}
 		end
 	end
 

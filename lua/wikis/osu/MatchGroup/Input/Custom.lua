@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=osu
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -69,7 +68,6 @@ function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
 		mapveto = MatchGroupInputUtil.getMapVeto(match, ALLOWED_VETOES),
-		casters = MatchGroupInputUtil.readCasters(match),
 	}
 end
 

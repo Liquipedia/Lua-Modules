@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/MapVeto
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -31,6 +31,7 @@ function MatchSummaryMapVeto:render()
 		classes = {'brkts-popup-mapveto'},
 		children = HtmlWidgets.Table{
 			classes = {'wikitable-striped', 'collapsible', 'collapsed'},
+			css = {['text-align'] = 'center'},
 			children = WidgetUtil.collect(
 				HtmlWidgets.Tr{children = {
 					HtmlWidgets.Th{css = {width = '33%'}},

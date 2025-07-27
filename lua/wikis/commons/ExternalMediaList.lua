@@ -1,21 +1,24 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:ExternalMediaList
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Flag = require('Module:Flags')
-local Logic = require('Module:Logic')
-local Page = require('Module:Page')
-local PlayerExt = require('Module:Player/Ext/Custom')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Tabs = require('Module:Tabs')
-local Team = require('Module:Team')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Flag = Lua.import('Module:Flags')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local PlayerExt = Lua.import('Module:Player/Ext/Custom')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Tabs = Lua.import('Module:Tabs')
+
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local MediaList = {}
 
@@ -232,7 +235,7 @@ end
 function MediaList._row(item, args)
 	local row = mw.html.create('li')
 		:node(MediaList._editButton(item.pagename))
-		:wikitext(args.showSubjectTeam and MediaList._displayTeam(args.subjects[1], item.date) or '')
+		:node(args.showSubjectTeam and MediaList._displayTeam(args.subjects[1], item.date) or '')
 		:wikitext(item.date .. NON_BREAKING_SPACE .. '|' .. NON_BREAKING_SPACE)
 
 	if String.isNotEmpty(item.language) and item.language ~= 'en' and (item.language ~= 'usuk' or args.showUsUk) then
@@ -334,13 +337,13 @@ end
 ---Displays the subject's team for a given External Media Link
 ---@param subject string
 ---@param date string
----@return string?
+---@return Widget?
 function MediaList._displayTeam(subject, date)
 	local _, team = PlayerExt.syncTeam(subject, nil, {date = date})
 	if not team then
 		return
 	end
-	return Team.icon(nil, team, date)
+	return OpponentDisplay.InlineTeamContainer{template = team, date = date, style = 'icon'}
 end
 
 ---Displays the link to the Form with which External Media Links are to be created.
@@ -363,4 +366,4 @@ function MediaList._formLink(show)
 		)
 end
 
-return Class.export(MediaList)
+return Class.export(MediaList, {exports = {'get'}})

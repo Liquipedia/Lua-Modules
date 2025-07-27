@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=callofduty
 -- page=Module:NotabilityChecker/config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

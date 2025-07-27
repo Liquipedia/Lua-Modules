@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=callofduty
 -- page=Module:Infobox/Team/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

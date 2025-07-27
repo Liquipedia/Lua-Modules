@@ -1,28 +1,28 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:TransferList
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
-local Team = require('Module:Team')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
+local Team = Lua.import('Module:Team')
+
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
 
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -363,7 +363,7 @@ function TransferList:_buildHeader()
 		:tag('div'):addClass('divCell Empty')
 			:tag('span')
 				:addClass('mobile-hide')
-				:wikitext(Abbreviation.make('Ref', 'Reference'))
+				:wikitext(Abbreviation.make{text = 'Ref', title = 'Reference'})
 		:allDone()
 end
 

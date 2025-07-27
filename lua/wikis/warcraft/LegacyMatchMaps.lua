@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:LegacyMatchMaps
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

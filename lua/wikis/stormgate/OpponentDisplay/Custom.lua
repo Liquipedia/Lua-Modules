@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:OpponentDisplay/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -27,8 +26,12 @@ local CustomOpponentDisplay = Table.merge(OpponentDisplay, {propTypes = {}, type
 CustomOpponentDisplay.BracketOpponentEntry = Class.new(
 	---@param self self
 	---@param opponent StormgateStandardOpponent
-	---@param options {forceShortName: boolean}
+	---@param options {forceShortName: boolean, showTbd: boolean}
 	function(self, opponent, options)
+		if opponent.type == Opponent.team and options.showTbd == false and
+				(Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)) then
+			opponent = Opponent.blank() --[[@as StormgateStandardOpponent]]
+		end
 		local showFactionBackground = opponent.type == Opponent.solo or opponent.extradata.hasFactionOrFlag
 
 		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
