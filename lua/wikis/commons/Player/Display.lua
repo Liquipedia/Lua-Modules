@@ -35,6 +35,7 @@ local PlayerDisplay = {}
 ---@field note string|number|nil
 ---@field team string?
 ---@field showFaction boolean?
+---@field game string?
 
 ---@class InlinePlayerProps
 ---@field flip boolean?
@@ -43,6 +44,7 @@ local PlayerDisplay = {}
 ---@field showLink boolean?
 ---@field dq boolean?
 ---@field showFaction boolean?
+---@field game string?
 
 --Displays a player as a block element. The width of the component is
 --determined by its layout context, and not by the player name.
@@ -73,7 +75,7 @@ function PlayerDisplay.BlockPlayer(props)
 	local factionNode
 	if props.showFaction ~= false and Logic.isNotEmpty(player.faction) and player.faction ~= Faction.defaultFaction then
 		factionNode = mw.html.create('span'):addClass('race')
-			:wikitext(Faction.Icon{size = 'small', showLink = false, faction = player.faction})
+			:wikitext(Faction.Icon{size = 'small', showLink = false, faction = player.faction, game = props.game})
 	end
 
 	local teamNode
@@ -105,7 +107,7 @@ function PlayerDisplay.InlinePlayer(props)
 
 	local faction = props.showFaction ~= false and Logic.isNotEmpty(player.faction)
 		and player.faction ~= Faction.defaultFaction
-		and Faction.Icon{size = 'small', showLink = false, faction = player.faction}
+		and Faction.Icon{size = 'small', showLink = false, faction = player.faction, game = props.game}
 		or nil
 
 	local nameAndLink = props.showLink ~= false and player.pageName
