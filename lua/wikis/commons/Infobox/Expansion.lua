@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Namespace = Lua.import('Module:Namespace')
-local Table = Lua.import('Module:Table')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Links = Lua.import('Module:Links')
@@ -119,16 +118,7 @@ function Expansion:createInfobox()
 			end
 		},
 		Customizable{id = 'custom', children = {}},
-		Builder{
-			builder = function()
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = links},
 		Center{children = {args.footnotes}},
 		Customizable{id = 'chronology', children = {
 				Chronology{args = args, title = self:chronologyTitle(), showTitle = true}

@@ -161,16 +161,7 @@ function Series:createInfobox()
 				},
 			}
 		},
-		Builder{
-			builder = function()
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = links},
 		Customizable{id = 'customcontent', children = {}},
 	}
 
