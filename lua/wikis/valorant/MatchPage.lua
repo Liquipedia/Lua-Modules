@@ -13,6 +13,7 @@ local MathUtil = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -121,10 +122,8 @@ end
 
 ---@private
 ---@param game MatchPageGame
----@return Widget?
+---@return Widget|Widget[]
 function MatchPage:_renderGameOverview(game)
-	if self:isBestOfOne() then return end
-
 	local team1 = getTeamHalvesDetails(game, 1)
 	local team2 = getTeamHalvesDetails(game, 2)
 
@@ -145,7 +144,30 @@ function MatchPage:_renderGameOverview(game)
 		}
 	end
 
-	return Div{
+	---@param showScore boolean
+	---@return Widget|Widget[]
+	local function createScoreHolderContent(showScore)
+		local lengthDisplay = Div{
+			classes = {'match-bm-lol-game-summary-length'},
+			children = game.length
+		}
+		if showScore then
+			return {
+				Div{
+					classes = {'match-bm-lol-game-summary-score'},
+					children = {
+						DisplayHelper.MapScore(game.opponents[1], game.status),
+						'&#8209;', -- Non-breaking hyphen
+						DisplayHelper.MapScore(game.opponents[2], game.status)
+					}
+				},
+				lengthDisplay
+			}
+		end
+		return lengthDisplay
+	end
+
+	local overview = Div{
 		classes = {'match-bm-lol-game-overview'},
 		children = {
 			Div{
@@ -160,20 +182,8 @@ function MatchPage:_renderGameOverview(game)
 					},
 					Div{
 						classes = {'match-bm-lol-game-summary-score-holder'},
-						children = game.finished and {
-							Div{
-								classes = {'match-bm-lol-game-summary-score'},
-								children = {
-									DisplayHelper.MapScore(game.opponents[1], game.status),
-									'&#8209;', -- Non-breaking hyphen
-									DisplayHelper.MapScore(game.opponents[2], game.status)
-							}
-							},
-							Div{
-								classes = {'match-bm-lol-game-summary-length'},
-								children = game.length
-							}
-						} or nil
+						children = MatchGroupUtil.computeMatchPhase(game) ~= 'upcoming'
+							and createScoreHolderContent(not self:isBestOfOne()) or nil
 					},
 					Div{
 						classes = {'match-bm-lol-game-summary-team'},
@@ -186,6 +196,14 @@ function MatchPage:_renderGameOverview(game)
 			}
 		}
 	}
+
+	if self:isBestOfOne() then
+		return {
+			HtmlWidgets.H3{children = {'Game Overview: ', game.map}},
+			overview
+		}
+	end
+	return overview
 end
 
 ---@private
