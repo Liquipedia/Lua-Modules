@@ -90,24 +90,20 @@ function VodsDropdown:render()
 	local vodToggleButton = function(vodCount)
 		local showButton = Button{
 			classes = {'general-collapsible-expand-button'},
-			children = Span{
-				children = {
-					ImageIcon{imageLight = VodLink.getIcon()},
-					'(' .. vodCount .. ')',
-					Icon{iconName = 'expand'},
-				},
+			children = {
+				ImageIcon{imageLight = VodLink.getIcon()},
+				'(' .. vodCount .. ')',
+				Icon{iconName = 'expand'},
 			},
 			size = 'sm',
 			variant = 'tertiary',
 		}
 		local hideButton = Button{
 			classes = {'general-collapsible-collapse-button'},
-			children = Span{
-				children = {
-					ImageIcon{imageLight = VodLink.getIcon()},
-					'(' .. vodCount .. ')',
-					Icon{iconName = 'hide'},
-				},
+			children = {
+				ImageIcon{imageLight = VodLink.getIcon()},
+				'(' .. vodCount .. ')',
+				Icon{iconName = 'hide'},
 			},
 			size = 'sm',
 			variant = 'tertiary',
