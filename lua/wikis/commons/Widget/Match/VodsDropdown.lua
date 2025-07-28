@@ -64,7 +64,7 @@ function VodsDropdown:render()
 			linktype = 'external',
 			title = VodLink.getTitle(gameNumber),
 			variant = 'tertiary',
-			link = vod,
+			link = vod.vod,
 			size = 'sm',
 			classes = {'vodlink'},
 			children = {
@@ -132,7 +132,7 @@ function VodsDropdown:render()
 			linktype = 'external',
 			title = VodLink.getTitle(gameNumber),
 			variant = 'tertiary',
-			link = vod,
+			link = vod.vod,
 			size = 'sm',
 			classes = {'vodlink'},
 			children = {
