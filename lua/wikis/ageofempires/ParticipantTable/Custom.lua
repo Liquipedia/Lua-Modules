@@ -155,8 +155,6 @@ function AoEParticipantTable:_createTitle(tabletitle, buttontitle, togglearea, b
 			:tag('span')
 				:addClass('toggle-area-button btn btn-small btn-primary')
 				:attr('data-toggle-area-btn', buttonarea)
-				:css('padding-top', '2px')
-				:css('padding-bottom', '2px')
 				:css('position', 'absolute')
 				:wikitext(buttontitle)
 
