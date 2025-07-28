@@ -17,6 +17,9 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local ImageIcon = Lua.import('Module:Widget/Image/Icon/Image')
+local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
+local Span = HtmlWidgets.Span
 
 ---@class VodsDropdown: Widget
 ---@operator call(table): VodsDropdown
@@ -49,21 +52,23 @@ function VodsDropdown:render()
 		end
 		return makeVod(game.vod, 'game', index)
 	end)
+	---@cast gameVods table[]
 	local matchVod = makeVod(match.vod, 'match', 1)
-	-- TODO match2vod is sometimes present (countrestrike?)
+	-- TODO second vod is sometimes present (countrestrike?)
 
 	---@param vod table
 	---@return Widget?
-	local makeVodButton = function(vod, showText)
+	local makeSingleVodButton = function(vod, showText)
+		local gameNumber = vod.type == 'game' and vod.number or nil
 		return Button{
 			linktype = 'external',
-			title = VodLink.getTitle(vod.type == 'game' and vod.number or nil),
+			title = VodLink.getTitle(gameNumber),
 			variant = 'tertiary',
 			link = vod,
 			size = 'sm',
 			classes = {'vodlink'},
 			children = {
-				ImageIcon{imageLight = VodLink.getIcon(vod.number)},
+				ImageIcon{imageLight = VodLink.getIcon(gameNumber)},
 				showText and HtmlWidgets.Span{
 					classes = {'match-button-cta-text'},
 					children = 'Watch VOD',
@@ -75,19 +80,82 @@ function VodsDropdown:render()
 	if #gameVods == 0 and not matchVod then
 		return nil
 	elseif matchVod then
-		return makeVodButton(matchVod)
+		return makeSingleVodButton(matchVod)
 	elseif #gameVods == 1 then
-		return makeVodButton(gameVods[1])
+		return makeSingleVodButton(gameVods[1])
 	end
 
-	-- TODO: Make Dropdown button, toggle and row
-	return Array.map(processedStreams, function(stream)
-		return MatchStream{
-			platform = stream.platform,
-			stream = stream.stream,
-			matchIsLive = self.props.matchIsLive,
+	---@param vodCount integer
+	---@return Widget
+	local vodToggleButton = function(vodCount)
+		local showButton = Button{
+			classes = {'general-collapsible-expand-button'},
+			children = Span{
+				children = {
+					ImageIcon{imageLight = VodLink.getIcon()},
+					'(' .. vodCount .. ')',
+					Icon{iconName = 'expand'},
+				},
+			},
+			size = 'sm',
+			variant = 'tertiary',
 		}
-	end)
+		local hideButton = Button{
+			classes = {'general-collapsible-collapse-button'},
+			children = Span{
+				children = {
+					ImageIcon{imageLight = VodLink.getIcon()},
+					'(' .. vodCount .. ')',
+					Icon{iconName = 'hide'},
+				},
+			},
+			size = 'sm',
+			variant = 'tertiary',
+		}
+
+		return Span{
+			classes = {'general-collapsible-default-toggle'},
+			css = self.props.css,
+			attributes = self.props.attributes,
+			children = {
+				showButton,
+				hideButton,
+			}
+		}
+	end
+
+	---@param vod table
+	---@return Widget?
+	local makeGameVodButton = function(vod, showText)
+		local gameNumber = vod.number
+		return Button{
+			linktype = 'external',
+			title = VodLink.getTitle(gameNumber),
+			variant = 'tertiary',
+			link = vod,
+			size = 'sm',
+			classes = {'vodlink'},
+			children = {
+				Icon{iconName = 'vod_play'},
+				HtmlWidgets.Span{
+					children = showText and ('VOD ' .. gameNumber) or gameNumber,
+				}
+			},
+		}
+	end
+
+	-- TODO: Styling
+	-- TODO: Container for child elements
+	return Collapsible{
+		classes = {'match-vods-dropdown'},
+		titleWidget = vodToggleButton(#gameVods),
+		titleClasses = {'match-vods-dropdown-title'},
+		shouldCollapse = true,
+		children = Array.map(gameVods, function(vod)
+			return makeGameVodButton(vod, #gameVods < 4)
+		end),
+		collapseAreaClasses = {'match-vodsdropdown-collapse-area'},
+	}
 end
 
 return VodsDropdown
