@@ -183,6 +183,7 @@ MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	status2 = 'string?',
 	template = 'string?',
 	type = 'string',
+	extradata = 'table',
 })
 
 ---@class GameOpponent
