@@ -7,7 +7,7 @@ describe('VodLink.display', function()
 		local result = tostring(VodLink.display(args))
 		assert.are.equal(
 			'<span class="plainlinks vodlink" title="Watch Game 5">' ..
-			'[[File:VOD Icon5.png|32px|link=somevod]]</span>',
+			'[[File:Vod-5.svg|32px|link=somevod]]</span>',
 			result
 		)
 	end)
@@ -17,7 +17,7 @@ describe('VodLink.display', function()
 		local result = tostring(VodLink.display(args))
 		assert.are.equal(
 			'<span class="plainlinks vodlink" title="Watch Game 10">' ..
-			'[[File:VOD Icon.png|32px|link=somevod]]</span>',
+			'[[File:Vod.svg|32px|link=somevod]]</span>',
 			result
 		)
 	end)
@@ -27,7 +27,7 @@ describe('VodLink.display', function()
 		local result = tostring(VodLink.display(args))
 		assert.are.equal(
 			'<span class="plainlinks vodlink" title="Watch VOD">' ..
-			'[[File:VOD Icon.png|32px|link=somevod]]</span>',
+			'[[File:Vod.svg|32px|link=somevod]]</span>',
 			result
 		)
 	end)
