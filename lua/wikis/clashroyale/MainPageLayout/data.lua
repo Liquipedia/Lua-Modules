@@ -127,7 +127,7 @@ return {
 			}
 		},
 		{
-			file = 'Clash Royale at DreamHack 2014.jpg',
+			file = 'TL Crl West Spring-2019.png',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
