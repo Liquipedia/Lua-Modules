@@ -22,7 +22,7 @@ local NUM_CHAMPIONS_PICK = 5
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px', teamStyle = 'bracket'})
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px', teamStyle = 'hybrid'})
 end
 
 ---@param match MatchGroupUtilMatch
