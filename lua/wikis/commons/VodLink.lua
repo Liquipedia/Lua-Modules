@@ -40,9 +40,9 @@ end
 ---@return string
 function VodLink.getIcon(gamenum)
 	if gamenum and gamenum > 0 and gamenum < 10 then
-		return 'VOD Icon' .. gamenum .. '.png'
+		return 'Vod-' .. gamenum .. '.svg'
 	end
-	return 'VOD Icon.png'
+	return 'Vod.svg'
 end
 
 return Class.export(VodLink, {frameOnly = true, exports = {'display'}})
