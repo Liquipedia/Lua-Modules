@@ -115,11 +115,6 @@ return {
 			},
 		},
 		{
-			file = 'Axe icon dota2 gameasset.png',
-			title = 'Chess Pieces',
-			link = 'Portal:Chess Pieces',
-		},
-		{
 			file = 'Alliance Tabzz Worlds 2014.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
