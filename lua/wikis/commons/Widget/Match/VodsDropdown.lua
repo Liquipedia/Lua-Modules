@@ -137,7 +137,6 @@ function VodsDropdown:render()
 			variant = 'tertiary',
 			link = vod.vod,
 			size = 'sm',
-			classes = {'vodlink'},
 			children = {
 				Icon{iconName = 'vod_play'},
 				HtmlWidgets.Span{
