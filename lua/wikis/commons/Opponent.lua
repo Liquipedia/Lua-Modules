@@ -532,7 +532,7 @@ function Opponent.playerFromLpdbStruct(players, playerIndex)
 	local prefix = 'p' .. playerIndex
 	return {
 		displayName = players[prefix .. 'dn'],
-		flag = Flags.CountryName{flag = players[prefix .. 'flag']},
+		flag = String.nilIfEmpty(Flags.CountryName{flag = players[prefix .. 'flag']}),
 		pageName = players[prefix],
 		team = players[prefix .. 'template'] or players[prefix .. 'team'],
 		faction = Logic.nilIfEmpty(players[prefix .. 'faction']),
