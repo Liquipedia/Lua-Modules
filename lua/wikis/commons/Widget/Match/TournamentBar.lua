@@ -34,7 +34,7 @@ function MatchTournamentBar:render()
 	end
 
 	local tournament = Tournament.partialTournamentFromMatch(match)
-	local link = mw.title.makeTitle(0, tournament.pageName, match.section).fullText
+	local link = mw.title.makeTitle(0, match.pageName, match.section).fullText
 
 	return WidgetUtil.collect(
 		self.props.displayGameIcon and Game.icon{
