@@ -92,7 +92,9 @@ function VodsDropdown:render()
 			children = Span{
 				children = {
 					ImageIcon{imageLight = VodLink.getIcon()},
+					' ',
 					'(' .. vodCount .. ')',
+					' ',
 					Icon{iconName = 'expand'},
 				},
 			},
@@ -104,7 +106,9 @@ function VodsDropdown:render()
 			children = HtmlWidgets.Fragment{
 				children = {
 					ImageIcon{imageLight = VodLink.getIcon()},
+					' ',
 					'(' .. vodCount .. ')',
+					' ',
 					Icon{iconName = 'collapse'},
 				},
 			},
