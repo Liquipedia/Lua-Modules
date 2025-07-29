@@ -29,6 +29,9 @@ local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local IconFontawesome = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class CounterstrikeLeagueInfobox: InfoboxLeague
 ---@field gameData table
@@ -84,10 +87,14 @@ local VALVE_TIERS = {
 	['rmr event'] = {meta = 'Regional Major Rankings event', name = 'RMR Event', link = 'Regional Major Rankings'},
 	['tier 1'] = {meta = 'Valve Tier 1 event', name = 'Tier 1', link = 'Valve Tier 1 Events'},
 	['tier 1 qualifier'] = {meta = 'Valve Tier 1 qualifier', name = 'Tier 1 Qualifier', link = 'Valve Tier 1 Events'},
+	['tier 1 wildcard'] = {meta = 'Valve Tier 1 Wildcard event', name = 'Tier 1 Wildcard', link = 'Valve Wildcard Events'},
 	['tier 2'] = {meta = 'Valve Tier 2 event', name = 'Tier 2', link = 'Valve Tier 2 Events'},
 	['tier 2 qualifier'] = {meta = 'Valve Tier 2 qualifier', name = 'Tier 2 Qualifier', link = 'Valve Tier 2 Events'},
+	['tier 2 wildcard'] = {meta = 'Valve Tier 2 Wildcard event', name = 'Tier 2 Wildcard', link = 'Valve Wildcard Events'},
 	['wildcard'] = {meta = 'Valve Wildcard event', name = 'Wildcard', link = 'Valve Wildcard Events'},
 }
+
+local VALVE_TOR_START_DATE = '2025-01-01'
 
 local RESTRICTIONS = {
 	female = {
@@ -169,20 +176,17 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
 		end
 	elseif id == 'liquipediatier' then
-		table.insert(
-			widgets,
+		Array.appendWith(widgets,
 			Cell{
 				name = '[[File:ESL 2019 icon.png|20x20px|link=|ESL|alt=ESL]] Pro Tour Tier',
 				content = {self.caller:_createEslProTierCell(args.eslprotier)},
 				classes = {'infobox-icon-small'}
-			}
-		)
-		table.insert(
-			widgets,
+			},
 			Cell{
 				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox') .. ' Tier',
-				content = {self.caller:_createValveTierCell()},
-				classes = {'valvepremier-highlighted'}
+				content = self.caller:_createValveTierCell(),
+				classes = {'valvepremier-highlighted'},
+				options = {separator = '&ensp;'}
 			}
 		)
 	elseif id == 'gamesettings' then
@@ -376,10 +380,23 @@ function CustomLeague:_createEslProTierCell(eslProTier)
 	end
 end
 
----@return string?
+---@return Widget[]?
 function CustomLeague:_createValveTierCell()
 	if self.valveTier then
-		return '[[' .. self.valveTier.link .. '|' .. self.valveTier.name .. ']]'
+		local showInfoIcon = self.data.endDate >= VALVE_TOR_START_DATE
+		return WidgetUtil.collect(
+			Link{
+				children = {self.valveTier.name},
+				link = self.valveTier.link
+			},
+			showInfoIcon and Link{
+				children = {IconFontawesome{
+					faName = 'info-circle',
+					hover = 'Click for further details',
+				}},
+				link = '#Valve Operational Requirements'
+			} or nil
+		)
 	end
 end
 
