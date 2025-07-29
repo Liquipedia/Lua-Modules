@@ -20,6 +20,13 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+
 local globalVars = PageVariableNamespace({cached = true})
 local playerVars = PageVariableNamespace({namespace = 'Player', cached = true})
 
@@ -107,12 +114,16 @@ end
 ---@param resolvedPageName string
 ---@return table[]
 function PlayerExt.fetchFactionHistory(resolvedPageName)
-	local conditions = {
-		'([[type::playerrace]] OR [[type::playerfaction]])',
-		'[[pagename::' .. resolvedPageName:gsub(' ', '_') .. ']]',
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('pagename'), Comparator.eq, resolvedPageName:gsub(' ', '_')),
+		ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName('type'), Comparator.eq, 'playerrace'),
+			ConditionNode(ColumnName('type'), Comparator.eq, 'playerfaction'),
+		}
 	}
+
 	local rows = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = table.concat(conditions, ' and '),
+		conditions = tostring(conditions),
 		query = 'information, extradata',
 	})
 
@@ -146,17 +157,19 @@ end)
 function PlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
 	date = date or DateExt.getContextualDateOrNow()
 
-	local conditions = {
-		'[[type::teamhistory]]',
-		'[[pagename::' .. resolvedPageName:gsub(' ', '_') .. ']]',
-		'([[extradata_joindate::<' .. date .. ']] or [[extradata_joindate::' .. date .. ']])',
-		'[[extradata_joindate::>]]',
-		'[[extradata_leavedate::>' .. date .. ']]',
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('type'), Comparator.eq, 'teamhistory'),
+		ConditionNode(ColumnName('pagename'), Comparator.eq, resolvedPageName:gsub(' ', '_')),
+		ConditionNode(ColumnName('extradata_joindate'), Comparator.neq, ''),
+		ConditionNode(ColumnName('extradata_joindate'), Comparator.le, date),
+		ConditionNode(ColumnName('extradata_leavedate'), Comparator.ge, date),
 	}
+
 	local records = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = table.concat(conditions, ' and '),
+		conditions = tostring(conditions),
 		query = 'information, extradata',
 	})
+
 	return records[1] and PlayerExt.teamHistoryEntryFromRecord(records[1])
 end
 
