@@ -9,14 +9,13 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
-local Tournament = Lua.import('Module:Tournament')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchHeader = Lua.import('Module:Widget/Match/Header')
 local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
-local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
+local TournamentBar = Lua.import('Module:Widget/Match/TournamentBar')
 local ButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
 
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
@@ -47,10 +46,9 @@ function MatchCard:render()
 	local highlightCondition = HighlightConditions.match or HighlightConditions.tournament
 	local highlight = highlightCondition(match, {onlyHighlightOnValue = self.props.onlyHighlightOnValue})
 
-	local tournamentLink = TournamentTitle{
-		tournament = Tournament.partialTournamentFromMatch(match),
+	local tournamentLink = TournamentBar{
+		match = match,
 		displayGameIcon = self.props.displayGameIcons,
-		stageName = match.section,
 	}
 
 	return HtmlWidgets.Div{
