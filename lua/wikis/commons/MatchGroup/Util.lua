@@ -248,6 +248,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field matchId string?
 ---@field mode string?
 ---@field opponents standardOpponent[]
+---@field pageName string?
 ---@field parent string?
 ---@field patch string?
 ---@field phase 'upcoming'|'ongoing'|'finished'
@@ -281,6 +282,7 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	matchId = 'string?',
 	mode = 'string',
 	opponents = TypeUtil.array(MatchGroupUtil.types.Opponent),
+	pageName = 'string?',
 	parent = 'string?',
 	patch = 'string?',
 	publisherTier = 'string?',
@@ -556,6 +558,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		liquipediatiertype = record.liquipediatiertype,
 		mode = record.mode,
 		opponents = opponents,
+		pageName = record.pagename,
 		parent = record.parent,
 		patch = record.patch,
 		publisherTier = nilIfEmpty(record.publishertier),

@@ -27,6 +27,7 @@ local TOURNAMENT_PHASE = {
 ---@field displayName string
 ---@field fullName string
 ---@field pageName string
+---@field subPage string
 ---@field icon string?
 ---@field iconDark string?
 ---@field series string?
@@ -99,6 +100,7 @@ function Tournament.partialTournamentFromMatch(match)
 		displayName = Logic.emptyOr(match.tickername, match.tournament) or (match.parent or ''):gsub('_', ' '),
 		fullName = match.tournament,
 		pageName = match.parent,
+		subPage = match.pageName,
 		liquipediaTier = Tier.toIdentifier(match.liquipediatier),
 		liquipediaTierType = Tier.toIdentifier(match.liquipediatiertype),
 		icon = match.icon,
@@ -119,6 +121,7 @@ function Tournament.tournamentFromRecord(record)
 		displayName = Logic.emptyOr(record.tickername, record.name) or record.pagename:gsub('_', ' '),
 		fullName = record.name,
 		pageName = record.pagename,
+		subPage = record.pagename,
 		startDate = startDate,
 		endDate = endDate,
 		liquipediaTier = Tier.toIdentifier(record.liquipediatier),

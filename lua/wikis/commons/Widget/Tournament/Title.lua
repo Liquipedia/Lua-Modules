@@ -35,6 +35,11 @@ function TournamentTitleWidget:render()
 
 	local hasStage = self.props.stageName ~= nil
 
+	local link = tournament.subPage
+	if hasStage then
+		link = link .. '#' .. self.props.stageName:gsub(' ', '_')
+	end
+
 	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
 		self.props.displayGameIcon and Game.icon{
 			game = tournament.game,
@@ -49,7 +54,7 @@ function TournamentTitleWidget:render()
 					icon = tournament.icon,
 					iconDark = tournament.iconDark,
 					series = tournament.series,
-					link = tournament.pageName,
+					link = tournament.subPage,
 					options = {noTemplate = true},
 				}
 			}
@@ -58,7 +63,7 @@ function TournamentTitleWidget:render()
 			classes = {'tournament-name'},
 			children = {
 				Link{
-					link = tournament.pageName,
+					link = tournament.subPage,
 					children = HtmlWidgets.Fragment{children = {
 						tournament.displayName,
 						hasStage and ' - ' or nil,
