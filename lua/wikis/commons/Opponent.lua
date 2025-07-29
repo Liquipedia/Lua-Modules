@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -501,19 +502,8 @@ function Opponent.fromLpdbStruct(storageStruct)
 	local partySize = Opponent.partySize(storageStruct.opponenttype)
 	if partySize then
 		local players = storageStruct.opponentplayers
-		local function playerFromLpdbStruct(playerIndex)
-			local prefix = 'p' .. playerIndex
-
-			return {
-				displayName = players[prefix .. 'dn'],
-				flag = Flags.CountryName{flag = players[prefix .. 'flag']},
-				pageName = players[prefix],
-				team = players[prefix .. 'template'] or players[prefix .. 'team'],
-				faction = Logic.nilIfEmpty(players[prefix .. 'faction']),
-			}
-		end
 		return {
-			players = Array.map(Array.range(1, partySize), playerFromLpdbStruct),
+			players = Array.map(Array.range(1, partySize), FnUtil.curry(Opponent.playerFromLpdbStruct, players)),
 			type = storageStruct.opponenttype,
 			extradata = {},
 		}
@@ -532,6 +522,21 @@ function Opponent.fromLpdbStruct(storageStruct)
 		}
 	end
 	error("Unknown opponent type: " .. storageStruct.type)
+end
+
+---Reads a standings or placement lpdb structure and builds an opponent struct from it
+---@param players table
+---@param playerIndex integer
+---@return standardPlayer
+function Opponent.playerFromLpdbStruct(players, playerIndex)
+	local prefix = 'p' .. playerIndex
+	return {
+		displayName = players[prefix .. 'dn'],
+		flag = Flags.CountryName{flag = players[prefix .. 'flag']},
+		pageName = players[prefix],
+		team = players[prefix .. 'template'] or players[prefix .. 'team'],
+		faction = Logic.nilIfEmpty(players[prefix .. 'faction']),
+	}
 end
 
 return Opponent
