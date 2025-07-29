@@ -128,6 +128,10 @@ return {
 			file = 'Underlords Champion Alliance.png',
 			title = 'Alliances',
 			link = 'Portal:Alliances',
+			count = {
+				method = 'CATEGORY',
+				category = 'Alliances',
+			},
 		},
 	},
 	layouts = {
