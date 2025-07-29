@@ -54,7 +54,7 @@ function TournamentTitleWidget:render()
 					icon = tournament.icon,
 					iconDark = tournament.iconDark,
 					series = tournament.series,
-					link = tournament.subPage,
+					link = link,
 					options = {noTemplate = true},
 				}
 			}
@@ -63,7 +63,7 @@ function TournamentTitleWidget:render()
 			classes = {'tournament-name'},
 			children = {
 				Link{
-					link = tournament.subPage,
+					link = link,
 					children = HtmlWidgets.Fragment{children = {
 						tournament.displayName,
 						hasStage and ' - ' or nil,
