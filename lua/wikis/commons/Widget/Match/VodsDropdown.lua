@@ -12,7 +12,6 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local VodLink = Lua.import('Module:VodLink')
 
-local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Button = Lua.import('Module:Widget/Basic/Button')
@@ -89,21 +88,25 @@ function VodsDropdown:render()
 	---@return Widget
 	local vodToggleButton = function(vodCount)
 		local showButton = Button{
-			classes = {'general-collapsible-expand-button'},
-			children = {
-				ImageIcon{imageLight = VodLink.getIcon()},
-				'(' .. vodCount .. ')',
-				Icon{iconName = 'expand'},
+			classes = {'general-collapsible-expand-button', 'btn--active'},
+			children = Span{
+				children = {
+					ImageIcon{imageLight = VodLink.getIcon()},
+					'(' .. vodCount .. ')',
+					Icon{iconName = 'expand'},
+				},
 			},
 			size = 'sm',
 			variant = 'tertiary',
 		}
 		local hideButton = Button{
 			classes = {'general-collapsible-collapse-button'},
-			children = {
-				ImageIcon{imageLight = VodLink.getIcon()},
-				'(' .. vodCount .. ')',
-				Icon{iconName = 'hide'},
+			children = HtmlWidgets.Fragment{
+				children = {
+					ImageIcon{imageLight = VodLink.getIcon()},
+					'(' .. vodCount .. ')',
+					Icon{iconName = 'collapse'},
+				},
 			},
 			size = 'sm',
 			variant = 'tertiary',
@@ -140,17 +143,13 @@ function VodsDropdown:render()
 		}
 	end
 
-	-- TODO: Styling
-	-- TODO: Container for child elements
 	return Collapsible{
-		classes = {'match-vods-dropdown'},
 		titleWidget = vodToggleButton(#gameVods),
-		titleClasses = {'match-vods-dropdown-title'},
 		shouldCollapse = true,
+		collapseAreaClasses = {'match-info-vods-area'},
 		children = Array.map(gameVods, function(vod)
 			return makeGameVodButton(vod, #gameVods < 4)
 		end),
-		collapseAreaClasses = {'match-vodsdropdown-collapse-area'},
 	}
 end
 
