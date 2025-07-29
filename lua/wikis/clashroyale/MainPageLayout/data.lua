@@ -122,9 +122,10 @@ return {
 			title = 'Cards ',
 			link = 'Portal:Cards',
 			count = {
-				method = 'CATEGORY',
-				category = 'Card',
-			}
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::card]]',
+			},
 		},
 		{
 			file = 'TL Crl West Spring-2019.png',
