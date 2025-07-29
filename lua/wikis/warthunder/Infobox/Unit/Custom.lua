@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Flags = Lua.import('Module:Flags')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
@@ -38,29 +39,27 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
+	local caller = self.caller
+	local args = caller.args
+
 	if id == 'custom' then
 		return Array.append(widgets,
 			Cell{name = 'Released', content = {args.released}},
 			Cell{name = 'Acquisition', content = {args.acquisition}},
-			Cell{name = 'Vehicle Type', content = {CustomUnit._getVehicleType(args)}},
+			Cell{name = 'Vehicle Type', content = {args.vehicletype}},
 			Cell{name = 'Battle Rating', content = {args.br}},
-			Cell{name = 'Nation', content = {Nation.run(args.nation)}},
+			Cell{name = 'Nation', content = {caller:buildNationDisplay()}},
 			Cell{name = 'Role', content = {args.role}}
 		)
 	end
 	return widgets
 end
 
----@param args table
----@return string[]
-function CustomUnit._getVehicleType(args)
-	if Logic.isEmpty(args.vehicletype) then
-		return {}
-	end
-	local releasedate = args.releasedate
-	local typeIcon = VehicleTypes.get{type = args.vehicletype, date = releasedate, size = 15}
-	return typeIcon .. ' [[' .. args.vehicletype .. ']]'
+---@return string?
+function CustomUnit:buildNationDisplay()
+	local flag = Flags.Icon{flag = self.args.country, shouldLink = false}
+	if Logic.isEmpty(flag) then return end
+	return flag .. ' ' .. Flags.CountryName{flag = self.args.country}
 end
 
 ---@param args table
@@ -83,9 +82,9 @@ function CustomUnit:setLpdbData(args)
 		extradata = {
 			acquisition = args.acquisition,
 			battlerating = args.br,
-			nation = args.nation,
+			country = Flags.CountryCode{flag = args.country},
 			role = args.role,
-			type = args.vehicletype
+			vehicletype = args.vehicletype
 		}
 	}
 
@@ -93,3 +92,4 @@ function CustomUnit:setLpdbData(args)
 end
 
 return CustomUnit
+
