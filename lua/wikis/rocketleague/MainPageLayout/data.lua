@@ -58,7 +58,12 @@ local CONTENT = {
 	},
 	rating = {
 		heading = 'Liquipedia Rating',
-		body = RatingsDisplay.graph{id = 'rating'},
+		body = HtmlWidgets.Fragment{
+			children = { 
+				RatingsDisplay.graph{id = 'rating'},
+				'<div style="text-align: center;"><i>[[Portal:Rating#The Rating|See the full ranking]]</i></div>'
+			}
+		}
 	},
 	filterButtons = {
 		noPanel = true,
