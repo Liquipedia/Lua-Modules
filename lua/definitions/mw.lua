@@ -736,7 +736,7 @@ end
 ---If the text string does not specify a namespace, namespace (which may be any key found in mw.site.namespaces) will be used.
 ---If the text is not a valid title, nil is returned.
 ---@param text string
----@param namespace string?
+---@param namespace string|integer?
 ---@return Title?
 ---@overload fun(id: number):Title?
 function mw.title.new(text, namespace)
@@ -746,7 +746,7 @@ end
 ---Creates a title object with title title in namespace namespace, optionally with the specified fragment and interwiki prefix. namespace may be any key found in mw.site.namespaces. If the resulting title is not valid, returns nil.
 ---Note that, unlike mw.title.new(), this method will always apply the specified namespace.
 ---If the text is not a valid title, nil is returned.
----@param namespace string
+---@param namespace string|integer
 ---@param title string
 ---@param fragment string?
 ---@param interwiki string?
