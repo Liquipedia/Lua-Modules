@@ -29,6 +29,8 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class HOKHeroInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)
+---@class HOKHeroInfoboxWidgetInjector: WidgetInjector
+---@field caller HOKHeroInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
