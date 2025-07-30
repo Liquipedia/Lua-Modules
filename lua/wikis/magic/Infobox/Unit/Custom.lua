@@ -71,7 +71,7 @@ function CustomUnit:getWikiCategories(args)
 		args.expansion and (args.expansion .. postfix) or nil,
 		args.type and (args.type .. postfix) or nil,
 		args.color and (args.color .. postfix) or nil,
-		args.type and args.color and (args.color .. args.type .. postfix) or nil,
+		args.type and args.color and (args.color .. ' ' .. args.type .. postfix) or nil,
 		args.artist and ('Cards illustrated by ' .. args.artist) or nil
 	)
 end
