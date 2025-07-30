@@ -2834,3 +2834,29 @@ Template(s): ChampionIconTable
 		background-color: #a90012;
 	}
 }
+
+/*******************************************************************************
+Author(s): Rathoz
+Primary attritute highlight in infoboxes
+*******************************************************************************/
+
+.primaryAttribute img {
+	.dota2 &,
+	.dota2gameru & {
+		border: 0.125rem solid var( --clr-primary-100 );
+		border-radius: 50%;
+	}
+
+	.warcraft & {
+		border: 0.25rem solid var( --clr-wiki-theme-primary );
+		border-radius: 0.75rem;
+	}
+}
+
+.secondaryAttribute img {
+	.dota2 &,
+	.dota2gameru & {
+		border: 0.125rem solid var( --clr-secondary-7 );
+		border-radius: 50%;
+	}
+}

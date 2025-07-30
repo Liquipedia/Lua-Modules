@@ -5,13 +5,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Faction = require('Module:Faction')
-local Hotkeys = require('Module:Hotkey')
 local Lua = require('Module:Lua')
-local Math = require('Module:MathUtil')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Faction = Lua.import('Module:Faction')
+local Hotkeys = Lua.import('Module:Hotkey')
+local Math = Lua.import('Module:MathUtil')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
@@ -19,8 +20,8 @@ local Character = Lua.import('Module:Infobox/Character')
 local Widgets = require('Module:Widget/All')
 local BreakDown = Widgets.Breakdown
 local Cell = Widgets.Cell
-local Center = Widgets.Center
 local Title = Widgets.Title
+local HtmlWidgets = require('Module:Widget/Html/All')
 
 ---@class WarcraftCharacterInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)
@@ -43,16 +44,9 @@ local ATTRIBUTE_ICONS = {
 }
 ATTRIBUTE_ICONS.movespeed = ATTRIBUTE_ICONS.speed
 ATTRIBUTE_ICONS['movement speed'] = ATTRIBUTE_ICONS.speed
-local LEVEL_CHANGE_CLASSES = {
-	content1 = {'infobox-description'},
-	content2 = {'infobox-center'},
-	content3 = {'infobox-center'},
-	content4 = {'infobox-center'},
-}
 local HP_REGEN_BLIGHT = 'blight'
 local HP_REGEN_NIGHT = 'night'
 local FACTION_TO_HP_REGEN_TYPE = {u = HP_REGEN_BLIGHT, n = HP_REGEN_NIGHT}
-local DEFAULT_HP_REGEN_TITLE = '[[Hit_Points#Hit_Points_Gain|HP <abbr title=Regeneration>Regen.</abbr>]]:'
 
 ---@param frame Frame
 ---@return Html
@@ -67,24 +61,44 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
+	---@type WarcraftCharacterInfobox
+	local caller = self.caller
+	local args = caller.args
 
 	if id == 'custom' then
+		local primary = args.mainattribute
+
+		local levelBreakdown = function(level)
+			level = level - 1
+			return {
+				Cell{name = 'HP', content = {caller:_calculateHitPoints(level)}},
+				Cell{name = 'HP Regen.', content = {caller:_calculateHitPointsRegen(level)} .. '/sec'},
+				Cell{name = 'Mana', content = {caller:_calculateMana(level)}},
+				Cell{name = 'Mana Regen.', content = {caller:_calculateManaRegen(level)} .. '/sec'},
+				Cell{name = 'Armor', content = {Math.round(caller:_calculateArmor(level), 2)}},
+				Cell{name = 'Damage', content = {caller:_calculateDamage(level)}},
+				Cell{name = 'Attack Cooldown', content = {Math.round(caller:_calculateCooldown(level), 2)}}
+			}
+		end
+
 		return Array.append(widgets,
+			BreakDown{children = {
+				-- Display race icon & text
+				-- Display trained at
+				Hotkeys.hotkey{hotkey = args.hotkey}, -- TODO: Make prettier
+			}, classes = {'infobox-center'}},
+
 			Title{children = 'Attributes'},
 			BreakDown{children = {
-				self.caller:_basicAttribute('str'),
-				self.caller:_basicAttribute('agi'),
-				self.caller:_basicAttribute('int'),
+				caller:_basicAttribute('str', primary == 'str'),
+				caller:_basicAttribute('agi', primary == 'agi'),
+				caller:_basicAttribute('int', primary == 'int'),
 			}, classes = {'infobox-center'}},
-			BreakDown{children = {
-				self.caller:_getDamageAttribute(),
-				self.caller:_getArmorAttribute(),
-				self.caller:_getPrimaryAttribute(),
-			}, classes = {'infobox-center'}},
+
 			Title{children = 'Base Stats'},
 			Cell{name = '[[Movement Speed]]', content = {args.basespeed}},
 			Cell{name = '[[Sight Range]]', content = {args.sightrange or (
+				-- TODO: Change abbr into icons
 				Abbreviation.make{text = args.daysight or 1800, title = 'Day'} .. ' / ' ..
 				Abbreviation.make{text = args.nightsight or 800, title = 'Night'}
 			)}},
@@ -93,27 +107,14 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Attack Duration', content = {args.attackduration}},
 			Cell{name = 'Base Attack Time', content = {args.attacktime}},
 			Cell{name = 'Turn Rate', content = {args.turnrate}},
-			Cell{name = 'Hotkey', content = {Hotkeys.hotkey{hotkey = args.hotkey}}},
-			args.icon and Title{children = 'Icon'} or nil,
-			Center{children = {self.caller:_displayIcon()}},
-			Title{children = 'Level Changes'},
-			BreakDown{children = {'[[Experience|Level]]:', 1, 5, 10}, contentClasses = LEVEL_CHANGE_CLASSES},
-			BreakDown(CustomCharacter._toLevelChangesRow(
-				function(gainFactor) return self.caller:_calculateHitPoints(gainFactor) end, '[[Hit Points]]:')),
-			BreakDown(CustomCharacter._toLevelChangesRow(function(gainFactor)
-				return self.caller:_calculateHitPointsRegen(gainFactor) end, self.caller:_hitPointsRegenTitle())),
-			BreakDown(CustomCharacter._toLevelChangesRow(
-				function(gainFactor) return self.caller:_calculateMana(gainFactor) end, '[[Mana]]:')),
-			BreakDown(CustomCharacter._toLevelChangesRow(
-				function(gainFactor) return self.caller:_calculateManaRegen(gainFactor) end,
-				'[[Mana#Mana_Gain|Mana <abbr title=Regeneration>Regen.</abbr>]]:'
-			)),
-			BreakDown(CustomCharacter._toLevelChangesRow(
-				function(gainFactor) return self.caller:_calculateArmor(gainFactor, true) end, '[[Armor]]:')),
-			BreakDown(CustomCharacter._toLevelChangesRow(
-				function(gainFactor) return self.caller:_calculateDamage(gainFactor) end, '[[Attack Damage|Damage]]:')),
-			BreakDown(CustomCharacter._toLevelChangesRow(function(gainFactor)
-				return Math.round(self.caller:_calculateCooldown(gainFactor), 2) end, '[[Attack Speed|Cooldown]]:'))
+
+			Title{children = 'Stats per Level'},
+			Slider{min = 1, max = 10, step = 1, value = 1, name = 'level',
+				title = function(level)
+					return 'Level ' .. level
+				end,
+				childrenAtValue = levelBreakdown,
+			}
 		)
 	end
 
@@ -121,11 +122,17 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param attribute string
----@return string
-function CustomCharacter:_basicAttribute(attribute)
-	return ATTRIBUTE_ICONS[ATTRIBUTES[attribute]:lower()]
-		.. '<br><b>' .. (self.args['base' .. attribute] or '') .. '</b>'
-		.. ' +' .. (self.args[attribute .. 'gain'] or '')
+---@param highlight boolean
+---@return Widget
+function CustomCharacter:_basicAttribute(attribute, highlight)
+	return HtmlWidgets.Div{
+		children = {
+			ATTRIBUTE_ICONS[ATTRIBUTES[attribute]:lower()],
+			'<br><b>' .. (self.args['base' .. attribute] or '') .. '</b>',
+			' +' .. (self.args[attribute .. 'gain'] or '')
+		},
+		classes = { highlight and 'primaryAttribute' or nil },
+	}
 end
 
 ---@return string
@@ -151,11 +158,6 @@ function CustomCharacter:_getArmorAttribute()
 
 	return ATTRIBUTE_ICONS.armor
 		.. '<br>' .. Abbreviation.make{text = Math.round(armorValue, 0), title = armorValue}
-end
-
----@return string
-function CustomCharacter:_getPrimaryAttribute()
-	return ATTRIBUTE_ICONS[ATTRIBUTES[self.args.mainattribute]:lower()] .. '<br>Primary Attribute'
 end
 
 ---@return string
@@ -189,26 +191,21 @@ function CustomCharacter:_calculateManaRegen(gainFactor)
 end
 
 ---@param gainFactor number
----@param abbreviate boolean?
----@return string|number|nil
-function CustomCharacter:_calculateArmor(gainFactor, abbreviate)
+---@return number
+function CustomCharacter:_calculateArmor(gainFactor)
 	local gain = math.floor((tonumber(self.args.agigain) or 0) * gainFactor)
-	local armor = (gain + (tonumber(self.args.baseagi) or 0)) * 0.3
+	return (gain + (tonumber(self.args.baseagi) or 0)) * 0.3
 		- 2 + (tonumber(self.args.basearmor) or 0)
-
-	if abbreviate then
-		return Abbreviation.make{text = Math.round(armor, 0), title = armor}
-	end
-
-	return armor
 end
 
 ---@param gainFactor number
 ---@return string
 function CustomCharacter:_calculateDamage(gainFactor)
 	local gain = math.floor((tonumber(self.args[self.args.mainattribute .. 'gain']) or 0) * gainFactor)
+	local baseMin, baseMax = self:_baseMinimumDamage(), self:_baseMaximumDamage()
+	local baseAvg = (baseMin + baseMax) / 2
 
-	return (self:_baseMinimumDamage() + gain) .. ' - ' .. (self:_baseMaximumDamage() + gain)
+	return (baseMin + gain) .. ' - ' .. (baseMax + gain) .. '(' .. baseAvg + gain .. ' avg)'
 end
 
 ---@return number
@@ -230,19 +227,6 @@ end
 function CustomCharacter:_calculateCooldown(gainFactor)
 	local gain = math.floor((tonumber(self.args.agigain) or 0) * gainFactor)
 	return (tonumber(self.args.basecd) or 0) / (1 + (gain + (tonumber(self.args.baseagi) or 0)) * 0.02)
-end
-
----@return string
-function CustomCharacter:_hitPointsRegenTitle()
-	local hpRegenType = self:_hitPointsRegenType()
-
-	if hpRegenType == HP_REGEN_BLIGHT then
-		return DEFAULT_HP_REGEN_TITLE .. ' (+2.00 on Blight)'
-	elseif hpRegenType == HP_REGEN_NIGHT then
-		return DEFAULT_HP_REGEN_TITLE .. ' (+0.50 at Night)'
-	end
-
-	return DEFAULT_HP_REGEN_TITLE
 end
 
 ---@param gainFactor number
@@ -281,9 +265,9 @@ end
 ---@param args table
 ---@return string
 function CustomCharacter:nameDisplay(args)
-	local factionIcon = Faction.Icon{faction = Faction.read(args.race)}
+	local characterIcon = self:_displayIcon()
 
-	return (factionIcon and (factionIcon .. NON_BREAKING_SPACE) or '') .. self.name
+	return (characterIcon and (characterIcon .. NON_BREAKING_SPACE) or '') .. self.name
 end
 
 ---@param lpdbData table
@@ -338,13 +322,6 @@ function CustomCharacter:_calculateEhp(args)
 	end
 
 	return {toEhp(0), toEhp(4), toEhp(9)}
-end
-
----@param funct fun(num:number): number|string|nil
----@param title string
----@return {content: table, contentClasses: table}}
-function CustomCharacter._toLevelChangesRow(funct, title)
-	return {children = {title, funct(0), funct(4), funct(9)}, contentClasses = LEVEL_CHANGE_CLASSES}
 end
 
 return CustomCharacter
