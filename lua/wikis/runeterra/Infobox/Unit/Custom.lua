@@ -53,10 +53,14 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Type', children = {args.type}, options = {makeLink = true}},
 			Cell{name = 'Subtype', children = {args.subtype}, options = {makeLink = true}},
-			Cell{name = 'Region', options = {separator = ' '}, children = args.region and {
-				Image{size = '25px', link = args.region, imageLight = 'Runeterra Region ' .. args.region .. '.png'},
-				Link{link = args.region},
-			}or nil},
+			Cell{
+				name = 'Region',
+				options = {separator = ' '},
+				children = args.region and {
+					Image{size = '25px', link = args.region, imageLight = 'Runeterra Region ' .. args.region .. '.png'},
+					Link{link = args.region},
+				}or nil
+			},
 			Cell{name = 'Rarity', children = {args.rarity}, options = {makeLink = true}},
 		}
 	end
@@ -68,8 +72,7 @@ end
 ---@return string[]
 function CustomUnit:getWikiCategories(args)
 	local postfix = ' Cards'
-	return Array.append({},
-		'Cards',
+	return Array.append({'Cards'},
 		args.region and (args.region .. postfix) or nil,
 		args.type and (args.type .. postfix) or nil,
 		args.region and args.type and (args.region .. ' ' .. args.type .. postfix) or nil,
