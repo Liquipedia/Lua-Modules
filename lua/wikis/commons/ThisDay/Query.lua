@@ -79,7 +79,7 @@ function ThisDayQuery.tournament(month, day)
 			ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDate),
 			ConditionNode(ColumnName('date_month'), Comparator.eq, month),
 			ConditionNode(ColumnName('date_day'), Comparator.eq, day),
-			ConditionNode(ColumnName('date'), Comparator.lt, os.date('%Y-%m-%d', os.time() - 86400)),
+			ConditionNode(ColumnName('date_year'), Comparator.lt, DateExt.getYearOf()),
 			ConditionNode(ColumnName('placement'), Comparator.eq, 1),
 			ConditionNode(ColumnName('opponentname'), Comparator.neq, 'TBD'),
 			ConditionNode(ColumnName('prizepoolindex'), Comparator.eq, '1'),
