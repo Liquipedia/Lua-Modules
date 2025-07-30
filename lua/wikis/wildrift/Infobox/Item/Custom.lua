@@ -5,23 +5,28 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Item = Lua.import('Module:Infobox/Item')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
+local RUNE = 'Rune'
 
 ---@class WildriftItemInfobox: ItemInfobox
 local CustomItem = Class.new(Item)
@@ -55,7 +60,29 @@ function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
 
-	if id == 'header' then
+	if id == 'info' and caller:_isRune() then
+		return Array.append({},
+			args.runename and Center{
+				children = {
+					Template.safeExpand(mw.getCurrentFrame(), 'RuneIcons', {args.runename}),
+					HtmlWidgets.Br{},
+					args.runetext,
+				},
+			} or nil,
+			Title{children = args.informationType .. ' Information'}
+		)
+	elseif id == 'custom' and caller:_isRune() then
+		return WidgetUtil.collect(
+			Cell{name = 'Path', content = {args.path}},
+			Cell{name = 'Slot', content = {args.slot}},
+			Array.map(caller:getAllArgsForBase(args, 'description'), function(desc)
+				return Center{children = {desc}}
+			end),
+			Cell{name = 'Cooldown', content = {args.cooldown}},
+			Cell{name = 'Account level', content = {args.level}}
+		)
+	elseif id == 'info' then return {}
+	elseif id == 'header' and not caller:_isRune() then
 		if String.isNotEmpty(args.itemcost) then
 			table.insert(widgets, Breakdown{
 				children = caller:_getCostDisplay(),
@@ -159,7 +186,6 @@ function CustomInjector:parse(id, widgets)
 			Title{children = 'Recipe'},
 			Center{children = {args.recipe}}
 		)
-	elseif id == 'info' then return {}
 	end
 
 	return widgets
@@ -169,6 +195,10 @@ end
 ---@return string[]
 function CustomItem:getWikiCategories(args)
 	if not Namespace.isMain() then return {} end
+
+	if self:_isRune() then
+		return {'Runes'}
+	end
 
 	return Array.append({},
 		String.isNotEmpty(args.str) and 'Strength Items' or nil,
@@ -369,6 +399,11 @@ function CustomItem:setLpdbData(args)
 		})
 	}
 	mw.ext.LiquipediaDB.lpdb_datapoint('item_' .. (args.itemname or self.pagename), lpdbData)
+end
+
+---@return boolean
+function CustomItem:_isRune()
+	return self.args.informationType == RUNE
 end
 
 return CustomItem
