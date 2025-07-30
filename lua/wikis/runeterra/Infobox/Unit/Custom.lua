@@ -53,7 +53,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Type', children = {args.type}, options = {makeLink = true}},
 			Cell{name = 'Subtype', children = {args.subtype}, options = {makeLink = true}},
-			Cell{name = 'Region', options = {separator = ' '}, children = args.color and {
+			Cell{name = 'Region', options = {separator = ' '}, children = args.region and {
 				Image{size = '25px', link = args.region, imageLight = 'Runeterra Region ' .. args.region .. '.png'},
 				Link{link = args.region},
 			}or nil},
@@ -81,7 +81,7 @@ end
 function CustomUnit:setLpdbData(args)
 	local readFromLorCardData = function(key)
 		if Logic.isEmpty(args.code) then return end
-		mw.getCurrentFrame():callParserFunction{name = '#getlorcarddata:' .. args.code, args = {key}}
+		return mw.getCurrentFrame():callParserFunction{name = '#getlorcarddata:' .. args.code, args = {key}}
 	end
 
 	local cardType = readFromLorCardData('type')
