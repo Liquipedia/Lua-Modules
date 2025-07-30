@@ -61,7 +61,10 @@ local CONTENT = {
 		body = HtmlWidgets.Fragment{
 			children = {
 				RatingsDisplay.graph{id = 'rating'},
-				'<div style="text-align: center;"><i>[[Portal:Rating#The Rating|See the full ranking]]</i></div>'
+				Div{
+					css = { ['text-align'] = 'center' },
+					children = HtmlWidgets.I{children = '[[Portal:Rating#The Rating|See the full ranking]]' }
+				}
 			}
 		}
 	},
