@@ -25,13 +25,6 @@ local Image = require('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local HIT_POINT_LOGOS = {
-	['hit dark'] = 'Dark Age AoE2 logo.png',
-	['hit feudal'] = 'Feudal Age AoE2 logo.png',
-	['hit castle'] = 'Castle Age AoE2 logo.png',
-	['hit imperial'] = 'Imperial Age AoE2 logo.png',
-}
-
 ---@class AoEBuildingInfobox: BuildingInfobox
 local CustomBuilding = Class.new(Building)
 ---@class AoEBuildingInfoboxInjector: WidgetInjector
@@ -81,11 +74,12 @@ function CustomInjector:parse(id, widgets)
 			return tostring(Link{link = unitType})
 		end)
 
-		local histPointsLogoDisplay = function(key)
+		local ageIconWithText = function(keyPrefix, age)
+			local key = keyPrefix .. ' ' .. age
 			if Logic.isEmpty(args[key]) then return end
 			return HtmlWidgets.Fragment{
 				children = {
-					Image{size = '20px', imageLight = HIT_POINT_LOGOS[key]},
+					AgeIcon{age = age},
 					' ',
 					args[key],
 				}
@@ -110,33 +104,57 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Size', children = {args.size}},
 			Cell{name = Link{link = 'Hit Points'}, children = {args['hit points']}},
 			Cell{name = 'Hit points', children = WidgetUtil.collect(
-				histPointsLogoDisplay('hit dark'),
-				histPointsLogoDisplay('hit feudal'),
-				histPointsLogoDisplay('hit castle'),
-				histPointsLogoDisplay('hit imperial')
+				ageIconWithText('hit', 'dark'),
+				ageIconWithText('hit', 'feudal'),
+				ageIconWithText('hit', 'castle'),
+				ageIconWithText('hit', 'imperial')
 			)},
 			Cell{
 				name = HtmlWidgets.Abbr{title = 'Number of units that can be garrisoned inside the building', children = {'Garrison'}},
 				children = {args.garrison and (args.garrison .. ' units') or nil}
 			},
-
 			Cell{
 				name = HtmlWidgets.Fragment{
 					children = {
 						Link{link = 'Armor class'},
-						'es',
+						'es:',
 						HtmlWidgets.Br{},
 						HtmlWidgets.Small{
 							children = {
-								--besides [[Pierce armor (armor class)|Pierce armor]], [[Melee armor (armor class)|Melee armor]], [[Anti-Leitis (armor class)|Anti-Leitis]]
-								''
+								'besides ',
+								Link{link = 'Pierce armor (armor class)', children = {'Pierce armor'}},
+								', ',
+								Link{link = 'Melee armor (armor class)', children = {'Melee armor'}},
+								', ',
+								Link{link = 'Anti-Leitis (armor class)', children = {'Anti-Leitis'}},
 							}
 						}
 					}
-				}'[[Armor class]]es',
+				},
 				options = {suppressColon = true},
-				children = {args.use}
+				children = {args['armor classes']}
 			},
+			Cell{name = Link{link = 'Melee armor'}, children = {args['melee armor']}},
+			Cell{name = Link{link = 'Pierce armor'}, children = {args['pierce armor']}},
+			Cell{name = 'Melee armor', children = WidgetUtil.collect(
+				ageIconWithText('melee', 'dark'),
+				ageIconWithText('melee', 'feudal'),
+				ageIconWithText('melee', 'castle'),
+				ageIconWithText('melee', 'imperial')
+			)},
+			Cell{name = 'Pierce armor', children = WidgetUtil.collect(
+				ageIconWithText('pierce', 'dark'),
+				ageIconWithText('pierce', 'feudal'),
+				ageIconWithText('pierce', 'castle'),
+				ageIconWithText('pierce', 'imperial')
+			)},
+
+
+
+			Cell{name = 'Use', children = {args.use}},
+			Cell{name = 'Use', children = {args.use}},
+			Cell{name = 'Use', children = {args.use}},
+			Cell{name = 'Use', children = {args.use}},
 			Cell{name = 'Use', children = {args.use}},
 			Cell{name = 'Use', children = {args.use}},
 			Cell{name = 'Use', children = {args.use}},
