@@ -141,12 +141,15 @@ MatchGroupUtil.types.BracketData = TypeUtil.union(
 ---@field team string?
 ---@field extradata table?
 ---@field pageIsResolved boolean?
+---@field faction string?
 MatchGroupUtil.types.Player = TypeUtil.struct({
 	displayName = 'string?',
 	flag = 'string?',
 	pageName = 'string?',
 	team = 'string?',
 	extradata = 'table?',
+	pageIsResolved = 'boolean?',
+	faction = 'string?',
 })
 
 ---@class standardOpponent
@@ -165,6 +168,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 ---@field template string?
 ---@field type OpponentType
 ---@field team string?
+---@field extradata table
 MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	advanceBg = 'string?',
 	advances = 'boolean?',
@@ -179,6 +183,7 @@ MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	status2 = 'string?',
 	template = 'string?',
 	type = 'string',
+	extradata = 'table',
 })
 
 ---@class GameOpponent
