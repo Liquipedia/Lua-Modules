@@ -128,7 +128,7 @@ return {
 			},
 		},
 		{
-			file = 'TL Crl West Spring-2019.png',
+			file = 'Nova_Crl_2018_World_Finals.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
