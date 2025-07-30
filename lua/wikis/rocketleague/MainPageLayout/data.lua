@@ -59,7 +59,7 @@ local CONTENT = {
 	rating = {
 		heading = 'Liquipedia Rating',
 		body = HtmlWidgets.Fragment{
-			children = { 
+			children = {
 				RatingsDisplay.graph{id = 'rating'},
 				'<div style="text-align: center;"><i>[[Portal:Rating#The Rating|See the full ranking]]</i></div>'
 			}
