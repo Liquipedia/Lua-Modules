@@ -21,7 +21,6 @@ local Title = Widgets.Title
 local AgeIcon = Lua.import('Module:Widget/Infobox/AgeIcon')
 local ExpansionIcon = Lua.import('Module:Widget/Infobox/ExpansionIcon')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Image = require('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -69,11 +68,7 @@ function CustomInjector:parse(id, widgets)
 			)},
 			Cell{name = 'Construction time', children = {args.time}},
 		}
-	elseif id == 'custom' then
-		local types = Array.map(caller:getAllArgsForBase(args, 'type'), function(unitType)
-			return tostring(Link{link = unitType})
-		end)
-
+	elseif id == 'defense' then
 		local ageIconWithText = function(keyPrefix, age)
 			local key = keyPrefix .. ' ' .. age
 			if Logic.isEmpty(args[key]) then return end
@@ -87,21 +82,7 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		return {
-			Cell{name = 'First introduced', children = {
-				ExpansionIcon{expansion = args.introduced},
-				HtmlWidgets.I{children = {Link{link = args.introduced}}},
-			}, options = {separator = ' '}},
-			Cell{name = 'Civilizations', children = {args.civilizations}},
-			Cell{name = 'Available in', children = {
-				AgeIcon{age = args.age},
-				Link{link = args.age and (args.age .. ' Age') or nil},
-				args.age2,
-			}, options = {separator = ' '}},
-			Cell{name = 'Use', children = {args.use}},
-			Logic.isNotEmpty(types) and Title{children = {mw.text.listToText(types, ', ', ' and ') .. ' unit'}} or nil,
-			Cell{name = 'Required building', children = {args['required building']}},
-			Cell{name = 'Required technologie', children = {args['required tech']}},
-			Cell{name = 'Size', children = {args.size}},
+			Title{children = {'Defense Stats'}},
 			Cell{name = Link{link = 'Hit Points'}, children = {args['hit points']}},
 			Cell{name = 'Hit points', children = WidgetUtil.collect(
 				ageIconWithText('hit', 'dark'),
@@ -109,10 +90,6 @@ function CustomInjector:parse(id, widgets)
 				ageIconWithText('hit', 'castle'),
 				ageIconWithText('hit', 'imperial')
 			)},
-			Cell{
-				name = HtmlWidgets.Abbr{title = 'Number of units that can be garrisoned inside the building', children = {'Garrison'}},
-				children = {args.garrison and (args.garrison .. ' units') or nil}
-			},
 			Cell{
 				name = HtmlWidgets.Fragment{
 					children = {
@@ -127,12 +104,12 @@ function CustomInjector:parse(id, widgets)
 								Link{link = 'Melee armor (armor class)', children = {'Melee armor'}},
 								', ',
 								Link{link = 'Anti-Leitis (armor class)', children = {'Anti-Leitis'}},
-							}
-						}
-					}
+							},
+						},
+					},
 				},
 				options = {suppressColon = true},
-				children = {args['armor classes']}
+				children = {args['armor classes']},
 			},
 			Cell{name = Link{link = 'Melee armor'}, children = {args['melee armor']}},
 			Cell{name = Link{link = 'Pierce armor'}, children = {args['pierce armor']}},
@@ -148,18 +125,64 @@ function CustomInjector:parse(id, widgets)
 				ageIconWithText('pierce', 'castle'),
 				ageIconWithText('pierce', 'imperial')
 			)},
+		}
+	elseif id == 'attack' then
+		if Logic.isEmpty(args.attack) then return {} end
+		return {
+			Title{children = {'Offense Stats'}},
+			Cell{name = 'Attack', children = {args.attack}},
+			Cell{name = 'Attack type', children = {args['attack type']}},
+			Cell{name = 'Attack bonuses', children = {args['attack bonus']}},
+			Cell{name = 'Range', children = {args.range}},
+			Cell{name = 'Minimum range', children = {args['min range']}},
+			Cell{name = 'Projectile Speed', children = {args['projectile speed']}},
+			Cell{name = 'Accuracy', children = {args.accuracy}},
+			Cell{
+				name = HtmlWidgets.Abb{title = 'Reload time (in seconds)', children = {'Rate of Fire'}},
+				children = {args['rate of fire']},
+			},
+		}
+	elseif id == 'custom' then
+		local types = Array.map(caller:getAllArgsForBase(args, 'type'), function(unitType)
+			return tostring(Link{link = unitType})
+		end)
 
+		return {
+			Title{children = {'Further Stats'}},
+			Cell{name = 'First introduced', children = {
+				ExpansionIcon{expansion = args.introduced},
+				HtmlWidgets.I{children = {Link{link = args.introduced}}},
+			}, options = {separator = ' '}},
+			Cell{name = 'Civilizations', children = {args.civilizations}},
+			Cell{name = 'Available in', children = {
+				AgeIcon{age = args.age},
+				Link{link = args.age and (args.age .. ' Age') or nil},
+				args.age2,
+			}, options = {separator = ' '}},
+			Cell{name = 'Use', children = {args.use}},
+			Logic.isNotEmpty(types) and Title{children = {mw.text.listToText(types, ', ', ' and ') .. ' unit'}} or nil,
+			Cell{name = 'Required building', children = {args['required building']}},
+			Cell{name = 'Required technologie', children = {args['required tech']}},
+			Cell{name = 'Size', children = {args.size}},
+			Cell{
+				name = HtmlWidgets.Abbr{title = 'Number of units that can be garrisoned inside the building', children = {'Garrison'}},
+				children = {args.garrison and (args.garrison .. ' units') or nil}
+			},
+			Cell{name = 'Line of sight', children = {args['line of sight']}},
+			Cell{
+				name = HtmlWidgets.Fragment{
+					children = {
+						'Description:',
+						HtmlWidgets.Br{},
+						HtmlWidgets.Small{children = {'(ingame description)'}},
+					}
+				},
+				options = {suppressColon = true},
+				children = {args.description}
+			},
 
-
-			Cell{name = 'Use', children = {args.use}},
-			Cell{name = 'Use', children = {args.use}},
-			Cell{name = 'Use', children = {args.use}},
-			Cell{name = 'Use', children = {args.use}},
-			Cell{name = 'Use', children = {args.use}},
-			Cell{name = 'Use', children = {args.use}},
-			Cell{name = 'Use', children = {args.use}},
-			Cell{name = 'Use', children = {args.use}},
-			Cell{name = 'Use', children = {args.use}},
+			Cell{name = 'Required for', children = caller:getAllArgsForBase(args, 'required for')},
+			Chronology{args = args, title = 'Connected Buildings', showTitle = true},
 		}
 	end
 
