@@ -47,15 +47,15 @@ function CustomInjector:parse(id, widgets)
             Cell{
 				name = 'Lane',
 				content = WidgetUtil.collect(
-					self:_toCellContent('lane1', 'ClassIcon'),
-					self:_toCellContent('lane2', 'ClassIcon')
+					self:_toCellContent('lane1'),
+					self:_toCellContent('lane2')
 				)
 			},
 			Cell{
 				name = 'Role',
 				content = WidgetUtil.collect(
-					self:_toCellContent('role1', 'ClassIcon'),
-					self:_toCellContent('role2', 'ClassIcon')
+					self:_toCellContent('role1'),
+					self:_toCellContent('role2')
 				)
 			},
 		}
@@ -68,14 +68,11 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param key string
----@param dataModule string
 ---@return Widget?
-function CustomInjector:_toCellContent(key, dataModule)
+function CustomInjector:_toCellContent(key)
 	local args = self.caller.args
 	if String.isEmpty(args[key]) then return end
-	local data = Lua.requireIfExists('Module:' .. dataModule, { loadData = true })
-	if Logic.isEmpty(data) then return end
-	local iconData = data[args[key]:lower()]
+	local iconData = ClassIcon[args[key]:lower()]
 	return Logic.isNotEmpty(iconData) and HtmlWidgets.Fragment{
 		children = {
 			IconImageWidget{
@@ -92,7 +89,6 @@ end
 function CustomCharacter:_getCustomCells()
 	local args = self.args
 	local widgets = {
-		Cell{name = 'Date Release', content = {args.date}},
 		Center{children = {Page.makeExternalLink('Official Hero Page', args.page)}},
 	}
 
@@ -114,7 +110,7 @@ function CustomCharacter:addToLpdb(lpdbData, args)
 	lpdbData.extradata.lane1 = args.lane1
 	lpdbData.extradata.lane2 = args.lane2
 	lpdbData.extradata.role1 = args.role1
-    lpdbData.extradata.role2 = args.role2
+	lpdbData.extradata.role2 = args.role2
 
 	return lpdbData
 end
