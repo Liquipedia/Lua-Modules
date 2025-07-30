@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
-local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 
 local Page = require('Module:Page')
@@ -92,7 +91,6 @@ end
 ---@return Widget[]
 function CustomCharacter:_getCustomCells()
 	local args = self.args
-    
 	local widgets = {
 		Cell{name = 'Date Release', content = {args.date}},
 		Center{children = {Page.makeExternalLink('Official Hero Page', args.page)}},
