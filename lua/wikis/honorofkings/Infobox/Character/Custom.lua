@@ -8,6 +8,7 @@
 local Array = require('Module:Array')
 local CharacterWinLoss = require('Module:CharacterWinLoss')
 local Class = require('Module:Class')
+local ClassIcon = Lua.import('Module:ClassIcon', { loadData = true })
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
