@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Infobox/Item/Custom
+-- page=Module:Infobox/Item/Rune/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -9,10 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
-local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -56,7 +53,7 @@ function CustomInjector:parse(id, widgets)
 					args.runetext,
 				},
 			} or nil,
-			Title{children = args.informationType .. ' Information'}
+			Title{children = 'Rune Information'}
 		)
 	elseif id == 'custom' then
 		return WidgetUtil.collect(
