@@ -640,12 +640,12 @@ return {
 			name = 'HUNTER×HUNTER NEN×IMPACT',
 			link = 'HUNTER×HUNTER NEN×IMPACT',
 			logo = {
-				darkMode = 'HxHNI Logo.png',
-				lightMode = 'HxHNI Logo.png',
+				darkMode = 'HxHNI allmode.png',
+				lightMode = 'HxHNI allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'HxHNI Logo.png',
-				lightMode = 'HxHNI Logo.png',
+				darkMode = 'HxHNI allmode.png',
+				lightMode = 'HxHNI allmode.png',
 			},
 		},
 		igau = {
