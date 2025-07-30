@@ -35,7 +35,7 @@ end
 ---@protected
 ---@return WidgetHtml
 function ListWidget:getType()
-	error('ListWidget:getType() cannot be called directly and must be overridden.')
+	error('ListWidget cannot be called directly and must be overridden.')
 end
 
 return ListWidget
