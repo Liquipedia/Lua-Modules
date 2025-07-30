@@ -111,6 +111,13 @@ function CustomInjector:parse(id, widgets)
 				options = {suppressColon = true},
 				children = {args['armor classes']},
 			},
+			Cell{
+				name = HtmlWidgets.Abbr{
+					title = 'Number of units that can be garrisoned inside the building',
+					children = {'Garrison'}
+				},
+				children = {args.garrison and (args.garrison .. ' units') or nil}
+			},
 			Cell{name = Link{link = 'Melee armor'}, children = {args['melee armor']}},
 			Cell{name = Link{link = 'Pierce armor'}, children = {args['pierce armor']}},
 			Cell{name = 'Melee armor', children = WidgetUtil.collect(
@@ -138,7 +145,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Projectile Speed', children = {args['projectile speed']}},
 			Cell{name = 'Accuracy', children = {args.accuracy}},
 			Cell{
-				name = HtmlWidgets.Abb{title = 'Reload time (in seconds)', children = {'Rate of Fire'}},
+				name = HtmlWidgets.Abbr{title = 'Reload time (in seconds)', children = {'Rate of Fire'}},
 				children = {args['rate of fire']},
 			},
 		}
@@ -147,7 +154,7 @@ function CustomInjector:parse(id, widgets)
 			return tostring(Link{link = unitType})
 		end)
 
-		return {
+		return WidgetUtil.collect(
 			Title{children = {'Further Stats'}},
 			Cell{name = 'First introduced', children = {
 				ExpansionIcon{expansion = args.introduced},
@@ -164,13 +171,6 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Required building', children = {args['required building']}},
 			Cell{name = 'Required technologie', children = {args['required tech']}},
 			Cell{name = 'Size', children = {args.size}},
-			Cell{
-				name = HtmlWidgets.Abbr{
-					title = 'Number of units that can be garrisoned inside the building',
-					children = {'Garrison'}
-				},
-				children = {args.garrison and (args.garrison .. ' units') or nil}
-			},
 			Cell{name = 'Line of sight', children = {args['line of sight']}},
 			Cell{
 				name = HtmlWidgets.Fragment{
@@ -185,8 +185,8 @@ function CustomInjector:parse(id, widgets)
 			},
 
 			Cell{name = 'Required for', children = caller:getAllArgsForBase(args, 'required for')},
-			Chronology{args = args, title = 'Connected Buildings', showTitle = true},
-		}
+			Chronology{args = args, title = 'Connected Buildings', showTitle = true}
+		)
 	end
 
 	return widgets
