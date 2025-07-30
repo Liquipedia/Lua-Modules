@@ -5,16 +5,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local CharacterWinLoss = require('Module:CharacterWinLoss')
-local Class = require('Module:Class')
-local ClassIcon = Lua.import('Module:ClassIcon', { loadData = true })
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Math = require('Module:MathUtil')
-local String = require('Module:StringUtils')
 
-local Page = require('Module:Page')
+local Array = Lua.import('Module:Array')
+local CharacterWinLoss = Lua.import('Module:CharacterWinLoss')
+local Class = Lua.import('Module:Class')
+local ClassIcon = Lua.import('Module:ClassIcon', { loadData = true })
+local Logic = Lua.import('Module:Logic')
+local Math = Lua.import('Module:MathUtil')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+
 local Character = Lua.import('Module:Infobox/Character')
 local Injector = Lua.import('Module:Widget/Injector')
 
