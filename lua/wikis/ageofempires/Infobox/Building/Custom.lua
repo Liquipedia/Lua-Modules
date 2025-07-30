@@ -165,7 +165,10 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Required technologie', children = {args['required tech']}},
 			Cell{name = 'Size', children = {args.size}},
 			Cell{
-				name = HtmlWidgets.Abbr{title = 'Number of units that can be garrisoned inside the building', children = {'Garrison'}},
+				name = HtmlWidgets.Abbr{
+					title = 'Number of units that can be garrisoned inside the building',
+					children = {'Garrison'}
+				},
 				children = {args.garrison and (args.garrison .. ' units') or nil}
 			},
 			Cell{name = 'Line of sight', children = {args['line of sight']}},
