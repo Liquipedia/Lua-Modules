@@ -186,6 +186,7 @@ function MatchesTable:dateDisplay(match)
 			countdownArgs.rawdatetime = true
 		end
 		countdownArgs.timestamp = match.timestamp
+		countdownArgs.date = DateExt.toCountdownArg(match.timestamp, match.timezoneId)
 		return dateCell:wikitext(Countdown._create(countdownArgs))
 	elseif self.config.onlyShowExactDates then
 		return dateCell
