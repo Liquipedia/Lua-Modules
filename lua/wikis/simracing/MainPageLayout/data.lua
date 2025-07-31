@@ -13,7 +13,6 @@ local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
@@ -56,7 +55,8 @@ local CONTENT = {
 	},
 	matches = {
 		heading = 'Matches',
-		body = '{{Liquipedia:Upcoming_and_ongoing_matches_on_mainpage}} <div style="text-align: center; padding: 5px;"><i>[[Liquipedia:Upcoming and ongoing matches|See more matches]]</i></div>',
+		body = '{{Liquipedia:Upcoming_and_ongoing_matches_on_mainpage}}  ' ..
+		'<div style="text-align: center; padding: 5px;"><i>[[Liquipedia:Upcoming and ongoing matches|See more matches]]</i></div>',
 		padding = true,
 		boxid = 1507,
 	},
