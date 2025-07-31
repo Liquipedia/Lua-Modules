@@ -64,8 +64,8 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			upcomingDays = 30,
-			completedDays = 30,
+			upcomingDays = 60,
+			completedDays = 60,
 		},
 		padding = true,
 		boxid = 1508,
@@ -128,7 +128,7 @@ return {
 			},
 		},
 		{
-			file = 'TL Crl West Spring-2019.png',
+			file = 'Nova_Crl_2018_World_Finals.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
