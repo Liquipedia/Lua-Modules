@@ -399,9 +399,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		participantsNumber = tonumber(args.player_number) or 0
 	end
 	lpdbData.participantsnumber = participantsNumber
-	lpdbData.sortdate = self.data.startTime.startTime
-		and (self.data.startTime.startTime .. (self.data.startTime.timeZone or ''))
-		or self.data.firstMatch or self.data.startDate
 	lpdbData.mode = self:_getMode()
 	lpdbData.extradata.seriesnumber = self.data.number
 
