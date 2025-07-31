@@ -14,6 +14,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
@@ -41,7 +42,7 @@ local EPT_SEASON = Lua.import('Module:Series/EPT/config', {loadData = true}).cur
 
 local ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
-local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 20
+local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = Info.config.defaultMaxPlayersPerPlacement
 local MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS = 10
 local MAXIMUM_NUMBER_OF_ACHIEVEMENTS = 30
 local NUMBER_OF_RECENT_MATCHES = 10
