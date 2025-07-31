@@ -168,39 +168,29 @@ function TransferList:fetch()
 		conditions = self.conditions,
 		limit = self.config.limit,
 		order = self.config.sortOrder,
-		groupby = 'date desc, toteam desc, fromteam desc, role1 desc',--role2 desc
 	})
 
 	local groupedData = {}
+	local currentGroup
+	local cache = {}
 	Array.forEach(queryData, function(transfer)
-		local transfers = mw.ext.LiquipediaDB.lpdb('transfer', {
-			conditions = self:_buildConditions{
-				date = transfer.date,
-				fromTeam = transfer.fromteam or '',
-				toTeam = transfer.toteam or '',
-				roles1 = {transfer.role1},
-			},
-			limit = self.config.limit + 10,
-			order = self.config.sortOrder,
-		})
-		local currentGroup
-		local cache = {}
-		Array.forEach(transfers, function(transf)
-			if
-				cache.role2 ~= transf.role2 or
-				cache.team1_2 ~= transf.extradata.fromteamsec or
-				cache.team2_2 ~= transf.extradata.toteamsec
-			then
-				cache.role2 = transf.role2
-				cache.team1_2 = transfer.extradata.fromteamsec
-				cache.team2_2 = transfer.extradata.toteamsec
-				Array.appendWith(groupedData, currentGroup)
-				currentGroup = {}
-			end
-			table.insert(currentGroup, transf)
-		end)
-		Array.appendWith(groupedData, currentGroup)
+		if
+			cache.role1 ~= transfer.role1 or
+			cache.role2 ~= transfer.role2 or
+			cache.team1_2 ~= transfer.extradata.fromteamsec or
+			cache.team2_2 ~= transfer.extradata.toteamsec
+		then
+			cache.role1 = transfer.role1
+			cache.role2 = transfer.role2
+			cache.team1_2 = transfer.extradata.fromteamsec
+			cache.team2_2 = transfer.extradata.toteamsec
+
+			Array.appendWith(groupedData, currentGroup)
+			currentGroup = {}
+		end
+		table.insert(currentGroup, transfer)
 	end)
+	Array.appendWith(groupedData, currentGroup)
 
 	self.groupedTransfers = groupedData
 
