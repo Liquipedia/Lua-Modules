@@ -6,7 +6,7 @@ const SLIDER_CHILD_ACTIVE = 'slider-value--active';
 const SLIDER_CHILD_PREFIX = 'slider-value--';
 const SLIDER_VALUE_LABEL = 'slider-value-label';
 
-liquipedia.switchButtons = {
+liquipedia.slider = {
 	sliders: {},
 
 	init: function () {
