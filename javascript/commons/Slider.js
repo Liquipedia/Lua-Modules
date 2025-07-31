@@ -4,9 +4,9 @@
  *******************************************************************************/
 const SLIDER_CONTAINER = 'slider';
 const SLIDER_RANGE = 'slider-range';
-const SLIDER_CHILD_ACTIVE = 'slider-range-value--active';
-const SLIDER_CHILD_PREFIX = 'slider-range-value--';
-const SLIDER_VALUE_LABEL = 'slider-range-value-label';
+const SLIDER_CHILD_ACTIVE = 'slider-value--active';
+const SLIDER_CHILD_PREFIX = 'slider-value--';
+const SLIDER_VALUE_LABEL = 'slider-value-label';
 
 liquipedia.slider = {
 	sliders: {},
@@ -42,7 +42,6 @@ liquipedia.slider = {
 			const leftPosition = percent * trackWidth + ( thumbWidth / 2 );
 			sliderInput.style.setProperty( '--progress-fill', `${ percent * 100 }%` );
 			sliderValue.style.setProperty( 'left', leftPosition + 'px' );
-			sliderValue.textContent = value;
 
 			container.querySelectorAll( `.${ SLIDER_CHILD_ACTIVE }` ).forEach( ( valueContainer ) => {
 				valueContainer.classList.remove( SLIDER_CHILD_ACTIVE );
@@ -51,15 +50,20 @@ liquipedia.slider = {
 			const containerToShow = container.querySelector( `.${ SLIDER_CHILD_PREFIX }${ value }` );
 			if ( containerToShow !== null ) {
 				containerToShow.classList.add( SLIDER_CHILD_ACTIVE );
+				sliderValue.textContent = containerToShow.dataset.title || value;
+			} else {
+				sliderValue.textContent = value;
 			}
+
 		};
 
 		sliderInput.addEventListener( 'input', () => {
 			updateSlider();
 		} );
 
-		container.appendChild( sliderValue );
-		container.appendChild( sliderInput );
+		const firstChild = container.firstChild;
+		container.insertBefore( sliderValue, firstChild );
+		container.insertBefore( sliderInput, firstChild );
 		updateSlider();
 	}
 };

@@ -17,11 +17,12 @@ local Math = Lua.import('Module:MathUtil')
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local BreakDown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Title = Widgets.Title
-local HtmlWidgets = require('Module:Widget/Html/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Slider = Lua.import('Widget/Basic/Slider')
 
 ---@class WarcraftCharacterInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)

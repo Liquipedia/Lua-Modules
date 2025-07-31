@@ -110,22 +110,22 @@ input[ type="range" ] {
 	margin: 20px auto;
 	padding-top: 30px;
 
-	&-range {
-		&-value-label {
-			position: absolute;
-			top: 0;
-			background-color: var( --clr-primary-44, var( --clr-primary-40 ) );
-			color: #ffffff;
-			padding: 0.125rem 0.5rem;
-			border-radius: 0.25rem;
-			font-size: 0.813rem;
-			line-height: 1.25rem;
-			font-weight: bold;
-			white-space: nowrap;
-			transform: translateX( -50% );
-		}
+	&-value-label {
+		position: absolute;
+		top: 0;
+		background-color: var( --clr-primary-44, var( --clr-primary-40 ) );
+		color: #ffffff;
+		padding: 0.125rem 0.5rem;
+		border-radius: 0.25rem;
+		font-size: 0.813rem;
+		line-height: 1.25rem;
+		font-weight: bold;
+		white-space: nowrap;
+		transform: translateX( -50% );
+	}
 
-		&-value:not( .&-value--active ) {
+	&-value {
+		&:not( .slider-value--active ) {
 			display: none;
 		}
 	}
