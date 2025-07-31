@@ -55,8 +55,8 @@ local CONTENT = {
 	},
 	matches = {
 		heading = 'Matches',
-		body = '{{Liquipedia:Upcoming_and_ongoing_matches_on_mainpage}}  ' ..
-		'<div style="text-align: center; padding: 5px;"><i>[[Liquipedia:Upcoming and ongoing matches|See more matches]]</i></div>',
+		body = '{{Liquipedia:Upcoming_and_ongoing_matches_on_mainpage}}  <div style="text-align: center; padding: 5px;"> ' ..
+		'<i>[[Liquipedia:Upcoming and ongoing matches|See more matches]]</i></div>',
 		padding = true,
 		boxid = 1507,
 	},
