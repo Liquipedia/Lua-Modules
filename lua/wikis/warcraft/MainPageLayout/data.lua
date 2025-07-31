@@ -143,6 +143,10 @@ return {
 					},
 					{
 						mobileOrder = 3,
+						content = CONTENT.thisDay,
+					},
+					{
+						mobileOrder = 4,
 						content = CONTENT.transfers,
 					},
 					{
@@ -184,10 +188,6 @@ return {
 								},
 							},
 						},
-					},
-					{
-						mobileOrder = 4,
-						content = CONTENT.thisDay,
 					},
 					{
 						mobileOrder = 5,
