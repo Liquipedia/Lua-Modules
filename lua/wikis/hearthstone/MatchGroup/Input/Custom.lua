@@ -15,8 +15,7 @@ local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local CustomMatchGroupInput = {}
 local OPPONENT_CONFIG = {

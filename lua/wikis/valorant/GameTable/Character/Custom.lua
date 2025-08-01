@@ -14,8 +14,7 @@ local Class = Lua.import('Module:Class')
 local MathUtil = Lua.import('Module:MathUtil')
 local Page = Lua.import('Module:Page')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local CharacterGameTable = Lua.import('Module:GameTable/Character')
 

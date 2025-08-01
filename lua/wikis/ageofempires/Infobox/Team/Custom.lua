@@ -9,8 +9,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local GameLookup = require('Module:GameLookup')
 local Lua = require('Module:Lua')
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 local TeamTemplates = require('Module:Team')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')

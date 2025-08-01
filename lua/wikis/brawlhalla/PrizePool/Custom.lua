@@ -10,8 +10,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local PrizePool = Lua.import('Module:PrizePool')
 

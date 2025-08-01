@@ -1716,5 +1716,4 @@ return {
 			hideOverview = true,
 		},
 	},
-	opponentLibrary = 'Opponent/Custom',
 }

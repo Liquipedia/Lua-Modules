@@ -18,8 +18,7 @@ local Template = Lua.import('Module:Template')
 local CustomPrizePool = Lua.import('Module:PrizePool/Custom')
 local CustomAwardPrizePool = Lua.import('Module:PrizePool/Award/Custom')
 
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local LegacyPrizePool = {}
 

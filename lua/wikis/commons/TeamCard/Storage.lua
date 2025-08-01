@@ -14,8 +14,7 @@ local Variables = Lua.import('Module:Variables')
 
 local Custom = Lua.import('Module:TeamCard/Custom')
 
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local TeamCardStorage = {}
 

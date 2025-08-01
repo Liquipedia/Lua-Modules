@@ -13,8 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local Variables = Lua.import('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool')
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 local CustomLpdbInjector = Class.new(LpdbInjector)

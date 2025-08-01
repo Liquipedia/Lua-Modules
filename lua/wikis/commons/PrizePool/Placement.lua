@@ -21,8 +21,7 @@ local Table = Lua.import('Module:Table')
 ---@field opponents BasePlacementOpponent[]
 local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local DASH = '&#045;'
 

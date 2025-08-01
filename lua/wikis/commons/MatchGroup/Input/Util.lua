@@ -27,8 +27,7 @@ local Links = Lua.import('Module:Links')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local globalVars = PageVariableNamespace{cached = true}
 
