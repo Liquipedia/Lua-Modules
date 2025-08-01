@@ -9,13 +9,11 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Flags = Lua.import('Module:Flags')
 local Logic = Lua.import('Module:Logic')
-local Template = Lua.import('Module:Template')
+local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class W3EloRanking: Widget
@@ -65,23 +63,18 @@ end
 ---@param placement integer
 ---@return Widget
 function W3EloRanking._buildStandingRow(data, placement)
-	local country = data.country
 	local race = string.lower(data.main_race or '')
-
-	local raceshort = string.sub(race, 0, 1)
 
 	return HtmlWidgets.Tr{
 		children = {
 			HtmlWidgets.Td{children = placement},
 			HtmlWidgets.Td{
-				children = Array.interleave({
-					Flags.Icon{flag = country or ''},
-					Template.safeExpand(mw.getCurrentFrame(), 'RaceIconSmall', {raceshort}),
-					Link{
-						link = data.name,
-						children = Logic.emptyOr(data.liquipedia, data.name)
-					}
-				}, ' ')
+				children = PlayerDisplay.InlinePlayer{player = {
+					flag = data.country,
+					displayName = data.name,
+					pageName = Logic.emptyOr(data.liquipedia, data.name),
+					faction = string.sub(race, 0, 1)
+				}}
 			},
 			HtmlWidgets.Td{children = data.elo}
 		}
