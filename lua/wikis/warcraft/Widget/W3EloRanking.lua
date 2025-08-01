@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/W3EloStandings
+-- page=Module:Widget/W3EloRanking
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -18,16 +18,16 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class W3EloStandings: Widget
----@operator call({count: integer?}): W3EloStandings
+---@class W3EloRanking: Widget
+---@operator call({count: integer?}): W3EloRanking
 ---@field props {count: integer?}
-local W3EloStandings = Class.new(Widget)
-W3EloStandings.defaultProps = {
+local W3EloRanking = Class.new(Widget)
+W3EloRanking.defaultProps = {
 	count = 10,
 }
 
 ---@return Widget?
-function W3EloStandings:render()
+function W3EloRanking:render()
 	local rawData = mw.ext.TeamLiquidIntegration.w3elo(self.props.count)
 
 	if type(rawData) ~= 'table' then
@@ -40,8 +40,8 @@ function W3EloStandings:render()
 			classes = {'wikitable', 'wikitable-striped', 'rankingtable'},
 			css = {width = '100%'},
 			children = WidgetUtil.collect(
-				W3EloStandings._buildHeader(),
-				Array.map(rawData, W3EloStandings._buildStandingRow)
+				W3EloRanking._buildHeader(),
+				Array.map(rawData, W3EloRanking._buildStandingRow)
 			)
 		}
 	}
@@ -49,7 +49,7 @@ end
 
 ---@private
 ---@return Widget
-function W3EloStandings._buildHeader()
+function W3EloRanking._buildHeader()
 	return HtmlWidgets.Tr{
 		children = Array.map({'Rank', 'Player', 'Rating'}, function (header)
 			return HtmlWidgets.Th{
@@ -64,7 +64,7 @@ end
 ---@param data table
 ---@param placement integer
 ---@return Widget
-function W3EloStandings._buildStandingRow(data, placement)
+function W3EloRanking._buildStandingRow(data, placement)
 	local country = data.country
 	local race = string.lower(data.main_race or '')
 
@@ -88,4 +88,4 @@ function W3EloStandings._buildStandingRow(data, placement)
 	}
 end
 
-return W3EloStandings
+return W3EloRanking
