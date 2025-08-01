@@ -16,6 +16,7 @@ local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
+local W3EloRanking = Lua.import('Module:Widget/W3EloRanking')
 
 local CONTENT = {
 	usefulArticles = {
@@ -45,7 +46,7 @@ local CONTENT = {
 	},
 	eloRanking = {
 		heading = 'Warcraft3.info Elo Ranking',
-		body = '{{W3EloMainpage}}',
+		body = W3EloRanking{},
 		boxid = 1525,
 	},
 	specialEvents = {
