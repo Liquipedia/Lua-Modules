@@ -26,7 +26,6 @@ function RatingsDisplayList.build(teamRankings)
 			:tag('td'):wikitext('Rating'):done()
 			:tag('td'):wikitext('Region'):done()
 			:tag('td'):wikitext('Played'):done()
-			:tag('td'):wikitext('Streak'):done()
 			:tag('td'):wikitext('History'):done()
 		:allDone()
 
@@ -64,19 +63,12 @@ function RatingsDisplayList.build(teamRankings)
 			title = 'Details for ' .. mw.ext.TeamTemplate.team(team.name),
 			content = chart,
 		})
-
-		local streakText = team.streak > 1 and team.streak .. 'W' or (team.streak < -1 and (-team.streak) .. 'L') or '-'
-		local streakClass = (team.streak > 1 and 'group-table-rank-change-up')
-				or (team.streak < -1 and 'group-table-rank-change-down')
-				or nil
-
 		htmlTable:tag('tr')
 			:tag('td'):css('font-weight', 'bold'):wikitext(rank):done()
 			:tag('td'):css('text-align', 'left'):wikitext(mw.ext.TeamTemplate.team(team.name)):done()
 			:tag('td'):wikitext(math.floor(team.rating + 0.5)):done()
 			:tag('td'):wikitext(string.upper(team.region or '')):done()
 			:tag('td'):wikitext(team.matches):done()
-			:tag('td'):css('font-weight', 'bold'):addClass(streakClass):wikitext(streakText):done()
 			:tag('td'):wikitext(popup):done()
 	end)
 	return tostring(mw.html.create('div'):addClass('table-responsive'):node(htmlTable))
