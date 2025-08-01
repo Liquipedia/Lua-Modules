@@ -345,6 +345,7 @@ liquipedia.filterButtons = {
 
 	refreshScriptsAfterContentUpdate: function() {
 		liquipedia.countdown.init();
+		liquipedia.collapse.init();
 		liquipedia.switchButtons.init();
 	},
 
