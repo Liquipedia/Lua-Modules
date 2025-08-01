@@ -66,13 +66,7 @@ end
 ---@return Widget
 function W3EloStandings._buildStandingRow(data, placement)
 	local country = data.country
-		if country == "zz" then
-			country = "xx"
-		end
-
-	local race = string.lower( data.main_race or '' )
-
-	if race == '' then mw.logObject(data) end
+	local race = string.lower(data.main_race or '')
 
 	local raceshort = string.sub(race, 0, 1)
 
