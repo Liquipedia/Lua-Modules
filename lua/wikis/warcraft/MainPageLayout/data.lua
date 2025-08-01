@@ -12,6 +12,7 @@ local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
@@ -46,7 +47,17 @@ local CONTENT = {
 	},
 	eloRanking = {
 		heading = 'Warcraft3.info Elo Ranking',
-		body = W3EloRanking{},
+		body = HtmlWidgets.Fragment{children = {
+			W3EloRanking{},
+			Div{
+				css = {['text-align'] = 'center'},
+				children = Link{
+					link = 'https://warcraft3.info/stats/elo_ranking',
+					linktype = 'external',
+					children = 'Full ranking',
+				}
+			}
+		}},
 		boxid = 1525,
 	},
 	specialEvents = {
