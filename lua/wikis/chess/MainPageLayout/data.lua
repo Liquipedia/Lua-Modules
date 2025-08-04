@@ -1,3 +1,4 @@
+---
 -- @Liquipedia
 -- page=Module:MainPageLayout/data
 --

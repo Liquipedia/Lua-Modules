@@ -22,6 +22,8 @@ local SECONDS_IN_YEAR = 365.2425 * 86400
 
 NotabilityChecker.LOGGING = true
 
+---@param args table
+---@return string
 function NotabilityChecker.run(args)
 
 	local weight = 0
@@ -56,6 +58,10 @@ function NotabilityChecker.run(args)
 	return output
 end
 
+---@private
+---@param team string
+---@return integer
+---@return string
 function NotabilityChecker._runForTeam(team)
 	team = mw.ext.TeamLiquidIntegration.resolve_redirect(team)
 	local weight = NotabilityChecker._calculateTeamNotability(team)
@@ -68,6 +74,11 @@ function NotabilityChecker._runForTeam(team)
 	return weight, output
 end
 
+---@private
+---@param team string
+---@param people string[]
+---@return number
+---@return string
 function NotabilityChecker._calculateRosterNotability(team, people)
 	local weight = 0
 	local output = ''
@@ -95,6 +106,9 @@ function NotabilityChecker._calculateRosterNotability(team, people)
 	return weight, output
 end
 
+---@private
+---@param team string
+---@return integer
 function NotabilityChecker._calculateTeamNotability(team)
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = Config.PLACEMENT_LIMIT,
@@ -105,6 +119,9 @@ function NotabilityChecker._calculateTeamNotability(team)
 	return NotabilityChecker._calculateWeight(data)
 end
 
+---@private
+---@param person string
+---@return integer
 function NotabilityChecker._calculatePersonNotability(person)
 	person = mw.ext.TeamLiquidIntegration.resolve_redirect(person)
 
@@ -129,6 +146,9 @@ function NotabilityChecker._calculatePersonNotability(person)
 	return NotabilityChecker._calculateWeight(data)
 end
 
+---@private
+---@param placementData placement[]
+---@return integer
 function NotabilityChecker._calculateWeight(placementData)
 	if type(placementData) ~= 'table' or placementData[1] == nil then
 		return 0

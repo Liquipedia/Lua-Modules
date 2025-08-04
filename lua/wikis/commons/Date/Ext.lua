@@ -103,7 +103,7 @@ function DateExt.toCountdownArg(dateOrTimestamp, timezoneId, showTime)
 		local timezoneString = Timezone.getTimezoneString{timezone = timezoneId or DateExt.defaultTimezone}
 		return DateExt.formatTimestamp('F j, Y - H:i', timestamp) .. ' ' .. timezoneString
 	end
-	return DateExt.formatTimestamp('F j, Y', baseTimestamp or '') .. ' ' .. DateExt.defaultTimezone
+	return DateExt.formatTimestamp('F j, Y', baseTimestamp or '')
 end
 
 --- Truncates the time of day in a date string or timestamp, and returns the date formatted as yyyy-mm-dd.
