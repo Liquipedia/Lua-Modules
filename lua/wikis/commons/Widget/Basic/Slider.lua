@@ -20,6 +20,7 @@ local Div = HtmlWidgets.Div
 ---@field max integer?
 ---@field step integer?
 ---@field defaultValue integer?
+---@field class string?
 ---@field title fun(value: integer): string
 ---@field childrenAtValue fun(value: integer): Widget|Widget[]|nil
 
@@ -54,7 +55,7 @@ function Slider:render()
 		},
 		children = Array.map(children, function(child)
 			return HtmlWidgets.Div{
-				classes = { 'slider-value', 'slider-value--' .. child.value },
+				classes = { 'slider-value', 'slider-value--' .. child.value, self.props.class },
 				attributes = {
 					['data-title'] = child.title,
 				},

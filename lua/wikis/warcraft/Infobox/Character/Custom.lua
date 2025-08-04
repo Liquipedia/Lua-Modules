@@ -110,7 +110,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Turn Rate', content = {args.turnrate}},
 
 			Title{children = 'Stats per Level'},
-			Slider{min = 1, max = 10, step = 1, defaultValue = 1, id = 'level',
+			Slider{min = 1, max = 10, step = 1, defaultValue = 1, id = 'level', class = 'infobox-slider',
 				title = function(level)
 					return 'Level ' .. level
 				end,
