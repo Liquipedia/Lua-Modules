@@ -36,8 +36,8 @@ function MatchPageRoundsOverview:render()
 		return
 	end
 	assert(self.props.iconRender, 'MatchPageRoundsOverview: iconRender prop is required')
-	assert(self.props.roundsPerHalf, 'MatchPageRoundsOverview: roundsPerHalf prop is required')
 	local roundsPerHalf = self.props.roundsPerHalf
+	assert(roundsPerHalf, 'MatchPageRoundsOverview: roundsPerHalf prop is required')
 	local function makeIcon(round, side)
 		if round.winningSide == side then
 			return self.props.iconRender(side, round.winBy)
