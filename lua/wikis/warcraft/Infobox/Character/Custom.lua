@@ -22,6 +22,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Slider = Lua.import('Module:Widget/Basic/Slider')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class WarcraftCharacterInfobox: CharacterInfobox
@@ -82,8 +83,8 @@ function CustomInjector:parse(id, widgets)
 			}
 		end
 
-		local factionName = Faction.toName(Faction.read(args.race)) or NEUTRAL
-		local factionIcon = Faction.Icon{faction = Faction.read(args.race), size = '54px'}
+		local factionData = Faction.getProps(Faction.read(args.race)) or NEUTRAL
+		local factionIcon = Faction.Icon{faction = Faction.read(args.race), size = '54px', showLink = true}
 
 		local function fetchBuildingInfo(buildingName)
 			if not buildingName then
@@ -93,35 +94,33 @@ function CustomInjector:parse(id, widgets)
 				'datapoint',
 				{conditions = '[[type::building]] and [[name::'.. buildingName ..']]'}
 			)[1] or {}
-			return {name = data.name, image = data.image}
+			return {name = data.name, image = data.image, page = data.pagename}
 		end
 		local buildingInfo = fetchBuildingInfo(args.trainedat)
 
+		local breakDownCard = function(content)
+			return HtmlWidgets.Div{
+				attributes = {style = 'display: flex; flex-direction: column; align-items: center;'},
+				children = content,
+			}
+		end
+
 		return Array.append(widgets,
 			BreakDown{children = {
-				HtmlWidgets.Div{
-					attributes = {style = 'display: flex; flex-direction: column; align-items: center;'},
-					children = {
-						HtmlWidgets.Div{children = {factionIcon}},
-						HtmlWidgets.Div{children = {'Race:'}},
-						HtmlWidgets.Div{children = {factionName}},
-					}
+				breakDownCard{
+					HtmlWidgets.Div{children = {factionIcon}},
+					HtmlWidgets.Div{children = {'Race:'}},
+					HtmlWidgets.Div{children = Link{children = factionData.name, link = factionData.pageName}},
 				},
-				HtmlWidgets.Div{
-					attributes = {style = 'display: flex; flex-direction: column; align-items: center;'},
-					children = {
-						HtmlWidgets.Div{children = {buildingInfo.image and ('[[File:' .. buildingInfo.image .. '|54px]]') or ''}},
-						HtmlWidgets.Div{children = {'Trained at:'}},
-						HtmlWidgets.Div{children = {buildingInfo.name or 'Unknown'}},
-					}
+				breakDownCard{
+					HtmlWidgets.Div{children = {buildingInfo.image and ('[[File:' .. buildingInfo.image .. '|link='.. buildingInfo.page ..'|54px]]') or ''}},
+					HtmlWidgets.Div{children = {'Trained at:'}},
+					HtmlWidgets.Div{children = {Link{children = buildingInfo.name or 'Unknown', link = buildingInfo.page or ''}}},
 				},
-				HtmlWidgets.Div{
-					attributes = {style = 'display: flex; flex-direction: column; align-items: center;'},
-					children = {
-						HtmlWidgets.Div{classes = {'hotkey-button'}, children = {args.hotkey}},
-						HtmlWidgets.Div{children = {'Hotkey:'}},
-						HtmlWidgets.Div{children = {args.hotkey}},
-					}
+				breakDownCard{
+					HtmlWidgets.Div{classes = {'hotkey-button'}, children = {args.hotkey}},
+					HtmlWidgets.Div{children = {'Hotkey:'}},
+					HtmlWidgets.Div{children = {args.hotkey}},
 				},
 			}, classes = {'infobox-center'}},
 
