@@ -22,7 +22,7 @@ local BreakDown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Slider = Lua.import('Widget/Basic/Slider')
+local Slider = Lua.import('Module:Widget/Basic/Slider')
 
 ---@class WarcraftCharacterInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)
@@ -73,9 +73,9 @@ function CustomInjector:parse(id, widgets)
 			level = level - 1
 			return {
 				Cell{name = 'HP', content = {caller:_calculateHitPoints(level)}},
-				Cell{name = 'HP Regen.', content = {caller:_calculateHitPointsRegen(level)} .. '/sec'},
+				Cell{name = 'HP Regen.', content = {caller:_calculateHitPointsRegen(level) .. '/sec'}},
 				Cell{name = 'Mana', content = {caller:_calculateMana(level)}},
-				Cell{name = 'Mana Regen.', content = {caller:_calculateManaRegen(level)} .. '/sec'},
+				Cell{name = 'Mana Regen.', content = {caller:_calculateManaRegen(level) .. '/sec'}},
 				Cell{name = 'Armor', content = {Math.round(caller:_calculateArmor(level), 2)}},
 				Cell{name = 'Damage', content = {caller:_calculateDamage(level)}},
 				Cell{name = 'Attack Cooldown', content = {Math.round(caller:_calculateCooldown(level), 2)}}
@@ -110,7 +110,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Turn Rate', content = {args.turnrate}},
 
 			Title{children = 'Stats per Level'},
-			Slider{min = 1, max = 10, step = 1, value = 1, name = 'level',
+			Slider{min = 1, max = 10, step = 1, defaultValue = 1, id = 'level',
 				title = function(level)
 					return 'Level ' .. level
 				end,

@@ -22,40 +22,44 @@ local Div = HtmlWidgets.Div
 ---@field step integer?
 ---@field defaultValue integer?
 ---@field title fun(value: integer): string
----@field childrenAtValue table<integer, Widget|Widget[]>
+---@field childrenAtValue fun(value: integer): Widget|Widget[]|nil
 
 ---@class SliderWidget: Widget
 ---@operator call(SliderWidgetParameters): SliderWidget
 ---@field props SliderWidgetParameters
 
 local Slider = Class.new(Widget)
-Slider.defaultProps = {
-	linktype = 'internal',
-	variant = 'primary',
-	size = 'md',
-	grow = false, -- Whether the button should grow to fill the available space
-}
-
 ---@return Widget
 function Slider:render()
 	assert(self.props.id, 'Slider requires a unique id property')
 	-- We make the real slider in js
+	local min, max, step = self.props.min or 0, self.props.max or 100, self.props.step or 1
+
+	local children = {}
+	for value = min, max, step do
+		table.insert(children, {
+			content = self.props.childrenAtValue(value) or '',
+			title = self.props.title and self.props.title(value) or value,
+			value = value,
+		})
+	end
+
 	return Div{
 		classes = { 'slider' },
 		attributes = {
 			id = self.props.id,
-			['data-min'] = self.props.min or 0,
-			['data-max'] = self.props.max or 100,
-			['data-step'] = self.props.step or 1,
-			['data-value'] = self.props.defaultValue or 0,
+			['data-min'] = min,
+			['data-max'] = max,
+			['data-step'] = step,
+			['data-value'] = self.props.defaultValue or self.props.min or 0,
 		},
-		children = Table.map(self.props.childrenAtValue, function(children, value)
+		children = Array.map(children, function(child)
 			return HtmlWidgets.Div{
-				classes = { 'slider-value', 'slider-value--' .. value },
+				classes = { 'slider-value', 'slider-value--' .. child.value },
 				attributes = {
-					['data-title'] = self.props.title and self.props.title(value) or value,
+					['data-title'] = child.title,
 				},
-				children = children,
+				children = child.content,
 			}
 		end),
 	}
