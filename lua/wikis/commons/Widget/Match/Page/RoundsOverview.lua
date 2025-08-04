@@ -20,6 +20,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 ---@class MatchPageRoundsOverviewProps
 ---@field rounds ValorantRoundData[]
+---@field roundsPerHalf integer
 ---@field iconRender fun(side: string, winBy: string): string?
 ---@field opponent1 standardOpponent
 ---@field opponent2 standardOpponent
@@ -29,14 +30,14 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 ---@field props MatchPageRoundsOverviewProps
 local MatchPageRoundsOverview = Class.new(Widget)
 
-local ROUNDS_BEFORE_SPLIT = 12
-
 ---@return Widget?
 function MatchPageRoundsOverview:render()
 	if not self.props.rounds then
 		return
 	end
 	assert(self.props.iconRender, 'MatchPageRoundsOverview: iconRender prop is required')
+	assert(self.props.roundsPerHalf, 'MatchPageRoundsOverview: roundsPerHalf prop is required')
+	local roundsPerHalf = self.props.roundsPerHalf
 	local function makeIcon(round, side)
 		if round.winningSide == side then
 			return self.props.iconRender(side, round.winBy)
@@ -44,11 +45,11 @@ function MatchPageRoundsOverview:render()
 		return '&nbsp;'
 	end
 
-	local numTeamContainers = math.ceil(#self.props.rounds / ROUNDS_BEFORE_SPLIT)
+	local numTeamContainers = math.ceil(#self.props.rounds / roundsPerHalf)
 
 	local scoreForContainer = function(container, team)
-		local start = (container - 1) * ROUNDS_BEFORE_SPLIT + 1
-		local endIdx = math.min(container * ROUNDS_BEFORE_SPLIT, #self.props.rounds)
+		local start = (container - 1) * roundsPerHalf + 1
+		local endIdx = math.min(container * roundsPerHalf, #self.props.rounds)
 
 		return Array.reduce(
 			Array.sub(self.props.rounds, start, endIdx),
@@ -63,7 +64,7 @@ function MatchPageRoundsOverview:render()
 	end
 
 	local sideInContainer = function(container, team)
-		local start = (container - 1) * ROUNDS_BEFORE_SPLIT + 1
+		local start = (container - 1) * roundsPerHalf + 1
 
 		local round = self.props.rounds[start]
 		if not round then return '' end

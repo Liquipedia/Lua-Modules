@@ -29,6 +29,7 @@ local MatchPage = Class.new(BaseMatchPage)
 
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
+local ROUNDS_BEFORE_SPLIT = 12
 local WIN_TYPE_TO_ICON = {
 	['elimination'] = 'elimination',
 	['detonate'] = 'explosion_valorant',
@@ -194,6 +195,7 @@ end
 function MatchPage:_renderRoundsOverview(game)
 	return RoundsOverview{
 		rounds = game.extradata.rounds,
+		roundsPerHalf = ROUNDS_BEFORE_SPLIT,
 		opponent1 = self.matchData.opponents[1],
 		opponent2 = self.matchData.opponents[2],
 		iconRender = function(winningSide, winBy)
