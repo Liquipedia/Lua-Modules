@@ -105,11 +105,6 @@ function RatingsList:render()
 
 	local teamRows = Array.map(teams, function(team, rank)
 		local uniqueId = dateAsString .. '-' .. rank
-		local streakText = team.streak > 1 and team.streak .. 'W' or (team.streak < -1 and (-team.streak) .. 'L') or '-'
-		local streakClass = (team.streak > 1 and 'group-table-rank-change-up')
-			or (team.streak < -1 and 'group-table-rank-change-down')
-			or nil
-
 		local changeText = (not team.change and 'NEW') or PlacementChange { change = team.change }
 
 		local teamRow = WidgetUtil.collect(
@@ -123,11 +118,6 @@ function RatingsList:render()
 			HtmlWidgets.Td {
 				attributes = { ['data-ranking-table-cell'] = 'region' },
 				children = Flags.Icon{flag = team.region} .. Flags.CountryName{flag = team.region}
-			},
-			HtmlWidgets.Td {
-				attributes = { ['data-ranking-table-cell'] = 'streak' },
-				children = streakText,
-				classes = { streakClass }
 			},
 			showGraph and (HtmlWidgets.Td {
 				attributes = {
@@ -248,7 +238,6 @@ function RatingsList:render()
 							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'team' }, children = 'Team' },
 							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = 'Points' },
 							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'region' }, children = 'Region' },
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'streak' }, children = 'Streak' },
 							showGraph and HtmlWidgets.Th {
 								attributes = { ['data-ranking-table-cell'] = 'graph' },
 								children = Icon.makeIcon { iconName = 'chart' }
