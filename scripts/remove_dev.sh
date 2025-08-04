@@ -69,7 +69,7 @@ searchAndRemove(){
       --data-urlencode "list=search" \
       --data-urlencode "srsearch=intitle:${LUA_DEV_ENV_NAME}" \
       --data-urlencode "srnamespace=828" \
-      --data-urlencode "srlimit=500" \
+      --data-urlencode "srlimit=5000" \
       --data-urlencode "srprop=" \
       -H "User-Agent: ${userAgent}" \
       -H 'Accept-Encoding: gzip' \
