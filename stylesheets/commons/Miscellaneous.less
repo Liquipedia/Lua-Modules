@@ -2225,11 +2225,12 @@ Author(s): iMarbot
 		&[ src*="Recap_Icon" ] {
 			filter: invert( 1 );
 		}
+	}
 
-		&[ src*="Vod" ] {
-			/* Changes the color of the VOD icon to Secondary 80 (B3B3B3) */
-			filter: invert( 79% ) sepia( 1% ) saturate( 0% ) hue-rotate( 121deg ) brightness( 93% ) contrast( 85% );
-		}
+	&[ src*="Vod.svg" ],
+	&[ src*="Vod-" ] {
+		/* Changes the color of the VOD icon to Secondary 80 (B3B3B3) */
+		filter: invert( 79% ) sepia( 1% ) saturate( 0% ) hue-rotate( 121deg ) brightness( 93% ) contrast( 85% );
 	}
 
 	& img.player-role-icon,
