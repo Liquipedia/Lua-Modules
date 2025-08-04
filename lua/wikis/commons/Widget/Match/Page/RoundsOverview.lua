@@ -21,7 +21,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 ---@class MatchPageRoundsOverviewProps
 ---@field rounds ValorantRoundData[]
 ---@field roundsPerHalf integer
----@field iconRender fun(side: string, winBy: string): string?
+---@field iconRender fun(side: string, winBy: string): Widget?
 ---@field opponent1 standardOpponent
 ---@field opponent2 standardOpponent
 
