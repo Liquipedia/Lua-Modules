@@ -113,7 +113,9 @@ function CustomInjector:parse(id, widgets)
 					HtmlWidgets.Div{children = Link{children = factionData.name, link = factionData.pageName}},
 				},
 				breakDownCard{
-					HtmlWidgets.Div{children = {buildingInfo.image and ('[[File:' .. buildingInfo.image .. '|link='.. buildingInfo.page ..'|54px]]') or ''}},
+					HtmlWidgets.Div{children = {buildingInfo.image and
+						('[[File:' .. buildingInfo.image .. '|link='.. buildingInfo.page ..'|54px]]') or ''
+					}},
 					HtmlWidgets.Div{children = {'Trained at:'}},
 					HtmlWidgets.Div{children = {Link{children = buildingInfo.name or 'Unknown', link = buildingInfo.page or ''}}},
 				},
