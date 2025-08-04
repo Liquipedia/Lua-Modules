@@ -53,6 +53,7 @@ function VodsDropdown:render()
 	-- TODO second vod is sometimes present (countrestrike?)
 
 	---@param vod table
+	---@param showText boolean?
 	---@return Widget?
 	local makeSingleVodButton = function(vod, showText)
 		local gameNumber = vod.type == 'game' and vod.number or nil
@@ -125,6 +126,7 @@ function VodsDropdown:render()
 	end
 
 	---@param vod table
+	---@param showText boolean?
 	---@return Widget?
 	local makeGameVodButton = function(vod, showText)
 		local gameNumber = vod.number
