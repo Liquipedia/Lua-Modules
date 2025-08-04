@@ -162,6 +162,10 @@ return {
 
 	leagueoflegends_kda = 'fas fa-swords fa-flip-vertical',
 
+	-- Usage: Day night cycle information
+	day = 'fas fa-sun',
+	night = 'fas fa-moon',
+
 	-- Usage: Boolean info
 	yes = 'fa fa-check',
 	no = 'fa fa-times',

@@ -11,7 +11,6 @@ local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Faction = Lua.import('Module:Faction')
-local Hotkeys = Lua.import('Module:Hotkey')
 local Math = Lua.import('Module:MathUtil')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -23,6 +22,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Slider = Lua.import('Module:Widget/Basic/Slider')
+local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class WarcraftCharacterInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)
@@ -82,11 +82,47 @@ function CustomInjector:parse(id, widgets)
 			}
 		end
 
+		local factionName = Faction.toName(Faction.read(args.race)) or NEUTRAL
+		local factionIcon = Faction.Icon{faction = Faction.read(args.race), size = '54px'}
+
+		local function fetchBuildingInfo(buildingName)
+			if not buildingName then
+				return {}
+			end
+			local data = mw.ext.LiquipediaDB.lpdb(
+				'datapoint',
+				{conditions = '[[type::building]] and [[name::'.. buildingName ..']]'}
+			)[1] or {}
+			return {name = data.name, image = data.image}
+		end
+		local buildingInfo = fetchBuildingInfo(args.trainedat)
+
 		return Array.append(widgets,
 			BreakDown{children = {
-				-- Display race icon & text
-				-- Display trained at
-				Hotkeys.hotkey{hotkey = args.hotkey}, -- TODO: Make prettier
+				HtmlWidgets.Div{
+					attributes = {style = 'display: flex; flex-direction: column; align-items: center;'},
+					children = {
+						HtmlWidgets.Div{children = {factionIcon}},
+						HtmlWidgets.Div{children = {'Race:'}},
+						HtmlWidgets.Div{children = {factionName}},
+					}
+				},
+				HtmlWidgets.Div{
+					attributes = {style = 'display: flex; flex-direction: column; align-items: center;'},
+					children = {
+						HtmlWidgets.Div{children = {buildingInfo.image and ('[[File:' .. buildingInfo.image .. '|54px]]') or ''}},
+						HtmlWidgets.Div{children = {'Trained at:'}},
+						HtmlWidgets.Div{children = {buildingInfo.name or 'Unknown'}},
+					}
+				},
+				HtmlWidgets.Div{
+					attributes = {style = 'display: flex; flex-direction: column; align-items: center;'},
+					children = {
+						HtmlWidgets.Div{classes = {'hotkey-button'}, children = {args.hotkey}},
+						HtmlWidgets.Div{children = {'Hotkey:'}},
+						HtmlWidgets.Div{children = {args.hotkey}},
+					}
+				},
 			}, classes = {'infobox-center'}},
 
 			Title{children = 'Attributes'},
@@ -99,9 +135,8 @@ function CustomInjector:parse(id, widgets)
 			Title{children = 'Base Stats'},
 			Cell{name = '[[Movement Speed]]', content = {args.basespeed}},
 			Cell{name = '[[Sight Range]]', content = {args.sightrange or (
-				-- TODO: Change abbr into icons
-				Abbreviation.make{text = args.daysight or 1800, title = 'Day'} .. ' / ' ..
-				Abbreviation.make{text = args.nightsight or 800, title = 'Night'}
+				tostring(Icon{iconName = 'day'}) .. (args.daysight or 1800) .. ' / ' ..
+				tostring(Icon{iconName = 'night'}) .. (args.nightsight or 800)
 			)}},
 			Cell{name = '[[Attack Range]]', content = {args.attackrange}},
 			Cell{name = 'Missile Speed', content = {args.missilespeed}},
@@ -206,7 +241,7 @@ function CustomCharacter:_calculateDamage(gainFactor)
 	local baseMin, baseMax = self:_baseMinimumDamage(), self:_baseMaximumDamage()
 	local baseAvg = (baseMin + baseMax) / 2
 
-	return (baseMin + gain) .. ' - ' .. (baseMax + gain) .. '(' .. baseAvg + gain .. ' avg)'
+	return (baseMin + gain) .. ' - ' .. (baseMax + gain) .. ' (' .. baseAvg + gain .. ' avg)'
 end
 
 ---@return number
