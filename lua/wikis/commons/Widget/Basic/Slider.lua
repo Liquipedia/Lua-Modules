@@ -47,7 +47,7 @@ function Slider:render()
 	return Div{
 		classes = { 'slider' },
 		attributes = {
-			id = self.props.id,
+			['data-id'] = self.props.id,
 			['data-min'] = min,
 			['data-max'] = max,
 			['data-step'] = step,

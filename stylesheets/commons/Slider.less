@@ -106,7 +106,7 @@ input[ type="range" ] {
 
 .slider {
 	position: relative;
-	padding-top: 1.75rem;
+	padding: 0.625rem;
 
 	&-value-label {
 		position: absolute;
@@ -126,5 +126,12 @@ input[ type="range" ] {
 		&:not( .slider-value--active ) {
 			display: none;
 		}
+	}
+
+	&-range-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 0.75rem;
 	}
 }
