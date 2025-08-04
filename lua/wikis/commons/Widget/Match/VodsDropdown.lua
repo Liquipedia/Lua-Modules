@@ -23,9 +23,6 @@ local Span = HtmlWidgets.Span
 ---@class VodsDropdown: Widget
 ---@operator call(table): VodsDropdown
 local VodsDropdown = Class.new(Widget)
-VodsDropdown.defaultProps = {
-	matchIsLive = true,
-}
 
 ---@return Widget?
 function VodsDropdown:render()
@@ -88,7 +85,7 @@ function VodsDropdown:render()
 	---@return Widget
 	local vodToggleButton = function(vodCount)
 		local showButton = Button{
-			classes = {'general-collapsible-expand-button', 'btn--active'},
+			classes = {'general-collapsible-expand-button'},
 			children = Span{
 				children = {
 					ImageIcon{imageLight = VodLink.getIcon()},
@@ -102,8 +99,8 @@ function VodsDropdown:render()
 			variant = 'tertiary',
 		}
 		local hideButton = Button{
-			classes = {'general-collapsible-collapse-button'},
-			children = HtmlWidgets.Fragment{
+			classes = {'general-collapsible-collapse-button', 'btn--active'},
+			children = Span{
 				children = {
 					ImageIcon{imageLight = VodLink.getIcon()},
 					' ',
