@@ -2119,6 +2119,17 @@ Author(s): hjpalpha
 	clear: none;
 }
 
+.hotkey-button {
+	background-color: var( --clr-moon-background-color, #f0f0f0 );
+	width: 54px;
+	height: 54px;
+	border-radius: 4px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-weight: bold;
+}
+
 /*******************************************************************************
 Template: Sad box for main page
 Author(s): FO-nTTaX
@@ -2833,5 +2844,30 @@ Template(s): ChampionIconTable
 
 	.theme--dark & {
 		background-color: #a90012;
+	}
+}
+
+/*******************************************************************************
+Author(s): Rathoz
+Attritute highlight, so far only used in Infoboxes, but can be used anywhere
+*******************************************************************************/
+.primaryAttribute img {
+	.dota2 &,
+	.dota2gameru & {
+		border: 0.125rem solid var( --clr-primary-100 );
+		border-radius: 50%;
+	}
+
+	.warcraft & {
+		border: 0.25rem solid var( --clr-wiki-theme-primary );
+		border-radius: 0.75rem;
+	}
+}
+
+.secondaryAttribute img {
+	.dota2 &,
+	.dota2gameru & {
+		border: 0.125rem solid var( --clr-secondary-7 );
+		border-radius: 50%;
 	}
 }
