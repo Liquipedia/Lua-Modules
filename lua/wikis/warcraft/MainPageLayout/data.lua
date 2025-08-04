@@ -48,6 +48,11 @@ local CONTENT = {
 		body = '{{W3EloMainpage}}',
 		boxid = 1525,
 	},
+	specialEvents = {
+		noPanel = true,
+		body = '{{Liquipedia:Special Event}}',
+		boxid = 1516,
+	},
 	filterButtons = {
 		noPanel = true,
 		body = Div{
@@ -138,19 +143,23 @@ return {
 				size = 4,
 				children = {
 					{
-						mobileOrder = 2,
-						content = CONTENT.eloRanking ,
+						mobileOrder = 1,
+						content = CONTENT.specialEvents,
 					},
 					{
 						mobileOrder = 3,
-						content = CONTENT.thisDay,
+						content = CONTENT.eloRanking ,
 					},
 					{
 						mobileOrder = 4,
+						content = CONTENT.thisDay,
+					},
+					{
+						mobileOrder = 5,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 7,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -159,7 +168,7 @@ return {
 				size = 8,
 				children = {
 					{
-						mobileOrder = 1,
+						mobileOrder = 2,
 						children = {
 							{
 								children = {
@@ -190,7 +199,7 @@ return {
 						},
 					},
 					{
-						mobileOrder = 5,
+						mobileOrder = 6,
 						content = CONTENT.usefulArticles,
 					},
 				},
