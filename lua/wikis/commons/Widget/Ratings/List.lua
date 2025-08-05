@@ -1,22 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Ratings/List
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Date = require('Module:Date/Ext')
-local Flags = require('Module:Flags')
-local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Date = Lua.import('Module:Date/Ext')
+local Flags = Lua.import('Module:Flags')
+local Icon = Lua.import('Module:Icon')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -105,11 +104,6 @@ function RatingsList:render()
 
 	local teamRows = Array.map(teams, function(team, rank)
 		local uniqueId = dateAsString .. '-' .. rank
-		local streakText = team.streak > 1 and team.streak .. 'W' or (team.streak < -1 and (-team.streak) .. 'L') or '-'
-		local streakClass = (team.streak > 1 and 'group-table-rank-change-up')
-			or (team.streak < -1 and 'group-table-rank-change-down')
-			or nil
-
 		local changeText = (not team.change and 'NEW') or PlacementChange { change = team.change }
 
 		local teamRow = WidgetUtil.collect(
@@ -123,11 +117,6 @@ function RatingsList:render()
 			HtmlWidgets.Td {
 				attributes = { ['data-ranking-table-cell'] = 'region' },
 				children = Flags.Icon{flag = team.region} .. Flags.CountryName{flag = team.region}
-			},
-			HtmlWidgets.Td {
-				attributes = { ['data-ranking-table-cell'] = 'streak' },
-				children = streakText,
-				classes = { streakClass }
 			},
 			showGraph and (HtmlWidgets.Td {
 				attributes = {
@@ -248,7 +237,6 @@ function RatingsList:render()
 							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'team' }, children = 'Team' },
 							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = 'Points' },
 							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'region' }, children = 'Region' },
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'streak' }, children = 'Streak' },
 							showGraph and HtmlWidgets.Th {
 								attributes = { ['data-ranking-table-cell'] = 'graph' },
 								children = Icon.makeIcon { iconName = 'chart' }

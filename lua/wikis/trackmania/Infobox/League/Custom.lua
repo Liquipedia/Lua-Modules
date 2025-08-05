@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=trackmania
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -161,7 +160,7 @@ function CustomLeague:_createCircuitInformation(widgets)
 		},
 		Cell{name = 'Circuit Tier', content = {args.circuittier}},
 		Cell{name = 'Tournament Region', content = {args.region}},
-		Chronology{links = {next = args.circuit_next, previous = args.circuit_previous}}
+		Chronology{args = {next = args.circuit_next, previous = args.circuit_previous}, showTitle = false}
 	)
 end
 

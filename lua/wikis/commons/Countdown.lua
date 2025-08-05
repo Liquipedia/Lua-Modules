@@ -1,16 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Countdown
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local DateExt = require('Module:Date/Ext')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Arguments = Lua.import('Module:Arguments')
+local DateExt = Lua.import('Module:Date/Ext')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local StreamLinks = Lua.import('Module:Links/Stream')
 
@@ -58,10 +58,6 @@ function Countdown._create(args)
 	if streams then
 		streams = table.concat(streams, ' ')
 		wrapper:attr('data-hasstreams', 'true')
-	end
-
-	if Logic.readBool(args.showCompleted) then
-		wrapper:attr('data-show-completed', 'true')
 	end
 
 	if args.text then

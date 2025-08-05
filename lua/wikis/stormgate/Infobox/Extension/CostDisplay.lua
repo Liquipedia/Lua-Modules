@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:Infobox/Extension/CostDisplay
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

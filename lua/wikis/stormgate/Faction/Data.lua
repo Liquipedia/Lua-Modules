@@ -1,12 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:Faction/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Info = mw.loadData('Module:Info')
+local Lua = require('Module:Lua')
+
+local Info = Lua.import('Module:Info', {loadData = true})
 
 local factionProps = {
 	v = {

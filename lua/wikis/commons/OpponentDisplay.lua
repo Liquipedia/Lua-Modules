@@ -1,23 +1,26 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:OpponentDisplay
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DisplayUtil = require('Module:DisplayUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Math = require('Module:MathUtil')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
-local TypeUtil = require('Module:TypeUtil')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DisplayUtil = Lua.import('Module:DisplayUtil')
+local Faction = Lua.import('Module:Faction')
+local Logic = Lua.import('Module:Logic')
+local Math = Lua.import('Module:MathUtil')
+local Table = Lua.import('Module:Table')
+local TypeUtil = Lua.import('Module:TypeUtil')
 
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
+
+local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
+local TeamIcon = Lua.import('Module:Widget/Image/Icon/TeamIcon')
 
 local zeroWidthSpace = '&#8203;'
 
@@ -35,9 +38,16 @@ OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'br
 OpponentDisplay.BracketOpponentEntry = Class.new(
 	---@param self self
 	---@param opponent standardOpponent
-	---@param options {forceShortName: boolean}
+	---@param options {forceShortName: boolean, showTbd: boolean}
 	function(self, opponent, options)
 		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
+
+		if options.showTbd == false and (
+			Opponent.isEmpty(opponent) or
+			Opponent.isTbd(opponent) and opponent.type ~= Opponent.literal
+		) then
+			opponent = Opponent.blank()
+		end
 
 		if opponent.type == Opponent.team then
 			self:createTeam(opponent.template or 'tbd', options)
@@ -77,6 +87,10 @@ function OpponentDisplay.BracketOpponentEntry:createPlayers(opponent)
 		showLink = false,
 	})
 	self.content:node(playerNode)
+
+	if opponent.type == Opponent.solo then
+		self.content:addClass(Faction.bgClass(opponent.players[1].faction))
+	end
 end
 
 ---Creates literal display as BracketOpponentEntry
@@ -121,6 +135,7 @@ end
 ---@field dq boolean?
 ---@field note string|number|nil
 ---@field teamStyle teamStyle?
+---@field showFaction boolean?
 
 ---Displays an opponent as an inline element. Useful for describing opponents in prose.
 ---@param props InlineOpponentProps
@@ -145,7 +160,7 @@ function OpponentDisplay.InlineOpponent(props)
 
 	return mw.html.create()
 		:node(opponentNode)
-		:node(props.note and mw.html.create('sup'):addClass('note'):wikitext(props.note) or '')
+		:node(props.note and mw.html.create('sup'):addClass('note'):wikitext(props.note) or nil)
 end
 
 ---@param props InlineOpponentProps
@@ -177,6 +192,7 @@ end
 ---@field teamStyle teamStyle?
 ---@field dq boolean?
 ---@field note string|number|nil
+---@field showFaction boolean?
 
 --[[
 Displays an opponent as a block element. The width of the component is
@@ -186,6 +202,7 @@ determined by its layout context, and not of the opponent.
 ---@return Html
 function OpponentDisplay.BlockOpponent(props)
 	local opponent = props.opponent
+	opponent.extradata = opponent.extradata or {}
 	-- Default TBDs to not show links
 	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
@@ -210,93 +227,43 @@ function OpponentDisplay.BlockOpponent(props)
 	end
 end
 
----@class BlockPlayersProps
----@field flip boolean?
----@field opponent {players: standardPlayer[]?}
----@field overflow OverflowModes?
----@field showFlag boolean?
----@field showLink boolean?
----@field showPlayerTeam boolean?
----@field abbreviateTbd boolean?
----@field playerClass string?
----@field dq boolean?
----@field note string|number|nil
-
----@param props BlockPlayersProps
+---@param props BlockOpponentProps
 ---@return Html
 function OpponentDisplay.BlockPlayers(props)
-	local opponent = props.opponent
-
-	--only apply note to first player, hence extract it here
-	local note = Table.extract(props, 'note')
-
-	local playerNodes = Array.map(opponent.players, function(player, playerIndex)
-		return PlayerDisplay.BlockPlayer(Table.merge(props, {
-			player = player,
-			team = player.team,
-			note = playerIndex == 1 and note or nil,
-		})):addClass(props.playerClass)
-	end)
-
 	local playersNode = mw.html.create('div')
 		:addClass('block-players-wrapper')
-	for _, playerNode in ipairs(playerNodes) do
+	for _, playerNode in ipairs(OpponentDisplay.getBlockPlayerNodes(props)) do
 		playersNode:node(playerNode)
 	end
 
 	return playersNode
 end
 
----Displays a team as an inline element. The team is specified by a template.
----@param props {flip: boolean?, template: string, style: teamStyle?}
----@return string?
-function OpponentDisplay.InlineTeamContainer(props)
-	local teamExists = mw.ext.TeamTemplate.teamexists(props.template)
-	if props.style == 'standard' or not props.style then
-		if not props.flip then
-			return teamExists
-				and mw.ext.TeamTemplate.team(props.template)
-				or Template.safeExpand(mw.getCurrentFrame(), 'Team', {props.template})
-		else
-			return teamExists
-				and mw.ext.TeamTemplate.team2(props.template)
-				or Template.safeExpand(mw.getCurrentFrame(), 'Team2', {props.template})
-		end
-	elseif props.style == 'short' then
-		if not props.flip then
-			return teamExists
-				and mw.ext.TeamTemplate.teamshort(props.template)
-				or Template.safeExpand(mw.getCurrentFrame(), 'TeamShort', {props.template})
-		else
-			return teamExists
-				and mw.ext.TeamTemplate.team2short(props.template)
-				or Template.safeExpand(mw.getCurrentFrame(), 'Team2Short', {props.template})
-		end
-	elseif props.style == 'bracket' then
-		if not props.flip then
-			return teamExists
-				and mw.ext.TeamTemplate.teambracket(props.template)
-				or Template.safeExpand(mw.getCurrentFrame(), 'TeamBracket', {props.template})
-		else
-			error('Flipped style=bracket is not supported')
-		end
-	end
+---@param props BlockOpponentProps
+---@return Html[]
+function OpponentDisplay.getBlockPlayerNodes(props)
+	local opponent = props.opponent
+
+	--only apply note to first player, hence extract it here
+	local note = Table.extract(props, 'note')
+
+	return Array.map(opponent.players, function(player, playerIndex)
+		return PlayerDisplay.BlockPlayer(Table.merge(props, {
+			player = player,
+			team = player.team,
+			note = playerIndex == 1 and note or nil,
+		})):addClass(props.playerClass)
+	end)
 end
 
---[[
-Displays a team as an inline element. The team is specified by a team struct.
-Only the default icon is supported.
-]]
----@param props {flip: boolean?, style: teamStyle?, team: standardTeamProps}
----@return string
-function OpponentDisplay.InlineTeam(props)
-	return (OpponentDisplay.InlineTeamContainer(Table.merge(props, {
-		template = 'default',
-	}))
-		:gsub('DefaultPage', props.team.pageName)
-		:gsub('DefaultName', Logic.emptyOr(props.team.displayName, zeroWidthSpace) --[[@as string]])
-		:gsub('DefaultShort', props.team.shortName)
-		:gsub('DefaultBracket', props.team.bracketName))
+---Displays a team as an inline element. The team is specified by a template.
+---@param props {flip: boolean?, template: string, date: number|string?, style: teamStyle?}
+---@return Widget?
+function OpponentDisplay.InlineTeamContainer(props)
+	local style = props.style or 'standard'
+	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
+	assert(style ~= 'bracket' or not props.flip, 'Flipped style=bracket is not supported')
+	return TeamInline{name = props.template, date = props.date, flip = props.flip, displayType = style}
 end
 
 --[[
@@ -315,14 +282,12 @@ function OpponentDisplay.BlockTeamContainer(props)
 	end
 
 	return OpponentDisplay.BlockTeam(Table.merge(props, {
-		icon = mw.ext.TeamTemplate.teamicon(props.template),
 		team = team,
 	}))
 end
 
 ---@class blockTeamProps
 ---@field flip boolean
----@field icon string
 ---@field overflow OverflowModes?
 ---@field showLink boolean?
 ---@field style teamStyle?
@@ -351,9 +316,13 @@ function OpponentDisplay.BlockTeam(props)
 	local bracketNameNode = createNameNode(props.team.bracketName)
 	local shortNameNode = createNameNode(props.team.shortName)
 
-	local icon = props.showLink
-		and props.icon
-		or DisplayUtil.removeLinkFromWikiLink(props.icon)
+	local icon = TeamIcon{
+		imageLight = props.team.imageLight,
+		imageDark = props.team.imageDark,
+		page = props.team.pageName,
+		legacy = props.team.hasLegacyImage,
+		noLink = props.showLink == false,
+	}
 
 	local blockNode = mw.html.create('div'):addClass('block-team')
 		:addClass(props.flip and 'flipped' or nil)

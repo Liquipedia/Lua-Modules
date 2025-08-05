@@ -1,16 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:MatchPage
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local MathUtil = require('Module:MathUtil')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local MathUtil = Lua.import('Module:MathUtil')
+local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 
@@ -29,6 +29,7 @@ local MatchPage = Class.new(BaseMatchPage)
 
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
+local ROUNDS_BEFORE_SPLIT = 12
 local WIN_TYPE_TO_ICON = {
 	['elimination'] = 'elimination',
 	['detonate'] = 'explosion_valorant',
@@ -57,7 +58,7 @@ function MatchPage:populateGames()
 			local team = {}
 
 			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
-			team.players = game.opponents[teamIdx].players or {}
+			team.players = Array.filter(game.opponents[teamIdx].players or {}, Table.isNotEmpty)
 
 			return team
 		end)
@@ -92,7 +93,7 @@ local function getTeamHalvesDetails(game, teamIndex)
 	local startNormal, otherNormal = game.extradata.t1firstside, otherSide(game.extradata.t1firstside)
 	local startOvertime, otherOvertime = game.extradata.t1firstsideot, otherSide(game.extradata.t1firstsideot)
 
-	if not startNormal or not startOvertime then
+	if not startNormal or not otherNormal then
 		return {}
 	end
 
@@ -103,16 +104,19 @@ local function getTeamHalvesDetails(game, teamIndex)
 	local teamHalf = game.extradata['t' .. teamIndex .. 'halfs']
 	if Table.isEmpty(teamHalf) then
 		return {}
+	elseif not startOvertime or not otherOvertime then
+		return {
+			{side = startNormal, score = teamHalf[startNormal]},
+			{side = otherNormal, score = teamHalf[otherNormal]},
+		}
 	end
 
-	local startOvertimeScore = teamHalf['ot' .. startOvertime]
-	local otherOvertimeScore = teamHalf['ot' .. otherOvertime]
 	---@type {score: number, side: string}[]
 	return {
 		{side = startNormal, score = teamHalf[startNormal]},
 		{side = otherNormal, score = teamHalf[otherNormal]},
-		startOvertime and startOvertimeScore and {side = startOvertime, score = startOvertimeScore} or nil,
-		startOvertime and otherOvertimeScore and {side = otherOvertime, score = otherOvertimeScore} or nil,
+		{side = startOvertime, score = teamHalf['ot' .. startOvertime]},
+		{side = otherOvertime, score = teamHalf['ot' .. otherOvertime]},
 	}
 end
 
@@ -191,12 +195,16 @@ end
 function MatchPage:_renderRoundsOverview(game)
 	return RoundsOverview{
 		rounds = game.extradata.rounds,
+		roundsPerHalf = ROUNDS_BEFORE_SPLIT,
 		opponent1 = self.matchData.opponents[1],
 		opponent2 = self.matchData.opponents[2],
+		---@param winningSide string
+		---@param winBy string
+		---@return Widget?
 		iconRender = function(winningSide, winBy)
 			local iconName = WIN_TYPE_TO_ICON[winBy]
 			if not iconName then
-				return nil
+				return
 			end
 			return IconFa{
 				iconName = iconName,
@@ -237,9 +245,15 @@ function MatchPage:_renderPerformanceForTeam(game, teamIndex)
 				classes = {'match-bm-players-team-header'},
 				children = self.opponents[teamIndex].iconDisplay
 			},
-			Array.map(game.teams[teamIndex].players, function (player)
-				return self:_renderPlayerPerformance(game, teamIndex, player)
-			end)
+			Array.map(
+				Array.reverse(Array.sortBy(
+					game.teams[teamIndex].players,
+					function (player) return player.acs or 0 end
+				)),
+				function (player)
+					return self:_renderPlayerPerformance(game, teamIndex, player)
+				end
+			)
 		)
 	}
 end

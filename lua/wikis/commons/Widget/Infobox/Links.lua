@@ -1,20 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Infobox/Links
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local UtilLinks = Lua.import('Module:Links')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local Title = Lua.import('Module:Widget/Infobox/Title')
 
 ---@class LinksWidget: Widget
 ---@operator call(table): LinksWidget
@@ -22,7 +23,7 @@ local Links = Class.new(Widget)
 
 local PRIORITY_GROUPS = Lua.import('Module:Links/PriorityGroups', {loadData = true})
 
----@return Widget?
+---@return Widget[]?
 function Links:render()
 	if Table.isEmpty(self.props.links) then
 		return nil
@@ -55,10 +56,17 @@ function Links:render()
 		table.insert(links, self:_makeLink(key, value))
 	end
 
-	return HtmlWidgets.Div{children = {HtmlWidgets.Div{
-		classes = {'infobox-center', 'infobox-icons'},
-		children = Array.interleave(links, ' ')
-	}}}
+	return {
+		Title{children = 'Links'},
+		HtmlWidgets.Div{
+			children = {
+				HtmlWidgets.Div{
+					classes = {'infobox-center', 'infobox-icons'},
+					children = Array.interleave(links, ' '),
+				}
+			}
+		},
+	}
 end
 
 ---@param key string

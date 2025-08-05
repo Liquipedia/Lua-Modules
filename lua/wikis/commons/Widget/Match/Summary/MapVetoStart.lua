@@ -1,20 +1,23 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/MapVetoStart
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local I18n = Lua.import('Module:I18n')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
-local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
-local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
+local ARROW_LEFT = IconFa{iconName = 'startleft', size = '110%'}
+local ARROW_RIGHT = IconFa{iconName = 'startright', size = '110%'}
+local START_MAP_VETO = HtmlWidgets.B{children = I18n.translate('matchsummary-mapveto-start')}
 
 ---@class MatchSummaryMapVetoStart: Widget
 ---@operator call(table): MatchSummaryMapVetoStart
@@ -30,7 +33,7 @@ function MatchSummaryMapVetoStart:render()
 	local children = {}
 	if self.props.firstVeto == 1 then
 		children = {
-			'<b>Start Map Veto</b>',
+			START_MAP_VETO,
 			ARROW_LEFT,
 			format,
 		}
@@ -38,7 +41,7 @@ function MatchSummaryMapVetoStart:render()
 		children = {
 			format,
 			ARROW_RIGHT,
-			'<b>Start Map Veto</b>',
+			START_MAP_VETO,
 		}
 	end
 

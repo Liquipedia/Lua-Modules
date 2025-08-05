@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=fighters
 -- page=Module:Player/Display/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -76,7 +75,7 @@ function CustomPlayerDisplay.BlockPlayer(props)
 	end
 
 	if props.oneLine then
-		return mw.html.create('div'):addClass('block-player starcraft-block-player')
+		return mw.html.create('div'):addClass('block-player')
 			:addClass(props.flip and 'flipped' or nil)
 			:addClass(props.showPlayerTeam and 'has-team' or nil)
 			:node(flagNode)
@@ -87,7 +86,7 @@ function CustomPlayerDisplay.BlockPlayer(props)
 
 	return mw.html.create()
 		:node(
-			mw.html.create('div'):addClass('block-player starcraft-block-player')
+			mw.html.create('div'):addClass('block-player')
 			:addClass(props.flip and 'flipped' or nil)
 			:addClass(props.showPlayerTeam and 'has-team' or nil)
 			:node(flagNode)
@@ -128,7 +127,7 @@ function CustomPlayerDisplay.InlinePlayer(props)
 			.. nameAndLink
 	end
 
-	return mw.html.create('span'):addClass('starcraft-inline-player')
+	return mw.html.create('span')
 		:addClass(props.flip and 'flipped' or nil)
 		:wikitext(text)
 end

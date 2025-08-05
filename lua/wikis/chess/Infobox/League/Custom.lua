@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=chess
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -28,6 +27,8 @@ local MODES = {
 	classical = 'Classical',
 	blitz = 'Blitz',
 	rapid = 'Rapid',
+	bullet = 'Bullet',
+	hyperbullet = 'Hyperbullet',
 }
 
 local RESTRICTIONS = {
@@ -50,6 +51,11 @@ local RESTRICTIONS = {
 		name = 'Senior Players Only',
 		link = 'Senior Tournaments',
 		data = 'senior',
+	},
+	engine = {
+		name = 'Chess Engines Only',
+		link = 'Computer Chess Tournaments',
+		data = 'engine',
 	},
 }
 

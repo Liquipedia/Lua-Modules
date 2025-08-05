@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=trackmania
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -154,6 +153,4 @@ return {
 			sortCasters = true,
 		},
 	},
-	opponentLibrary = 'Opponent',
-	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

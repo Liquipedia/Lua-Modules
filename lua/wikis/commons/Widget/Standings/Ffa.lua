@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Standings/Ffa
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
@@ -18,8 +18,7 @@ local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local RoundSelector = Lua.import('Module:Widget/Standings/RoundSelector')
 local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local STATUS_TO_DISPLAY = {
 	dq = 'DQ',
@@ -77,7 +76,7 @@ function StandingsFfaWidget:render()
 			HtmlWidgets.Tr{children = WidgetUtil.collect(
 				HtmlWidgets.Th{children = '#'},
 				HtmlWidgets.Th{children = 'Participant'},
-				HtmlWidgets.Th{children = ''},
+				showRoundColumns and HtmlWidgets.Th{children = ''} or nil,
 				HtmlWidgets.Th{children = 'Points'},
 				showRoundColumns and Array.map(standings.rounds, function(round)
 					return HtmlWidgets.Th{children = round.title}
@@ -105,16 +104,15 @@ function StandingsFfaWidget:render()
 								classes = {teamBackground},
 								children = OpponentDisplay.BlockOpponent{
 									opponent = slot.opponent,
-									showLink = true,
 									overflow = 'ellipsis',
 									teamStyle = 'hybrid',
 									showPlayerTeam = true,
 								}
 							},
-							HtmlWidgets.Td{
+							showRoundColumns and HtmlWidgets.Td{
 								classes = {teamBackground},
 								children = PlacementChange{change = slot.positionChangeFromPreviousRound}
-							},
+							} or nil,
 							HtmlWidgets.Td{
 								classes = {teamBackground},
 								children = slot.points,

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=worldoftanks
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -49,6 +48,10 @@ return {
 			status = 2,
 			matchWidth = 190,
 			sortCasters = true,
+		},
+		thisDay = {
+			tiers = {1, 2},
+			excludeTierTypes = {'Qualifier', 'Points', 'Showmatch'},
 		},
 	},
 	defaultRoundPrecision = 0,

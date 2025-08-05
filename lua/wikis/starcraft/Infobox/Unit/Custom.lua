@@ -1,23 +1,23 @@
 ---
 -- @Liquipedia
--- wiki=starcraft
 -- page=Module:Infobox/Unit/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
-local Faction = require('Module:Faction')
-local Hotkeys = require('Module:Hotkey')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Class = Lua.import('Module:Class')
+local CostDisplay = Lua.import('Module:Infobox/Extension/CostDisplay')
+local Faction = Lua.import('Module:Faction')
+local Hotkeys = Lua.import('Module:Hotkey')
+local Json = Lua.import('Module:Json')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
@@ -61,9 +61,9 @@ function CustomInjector:parse(id, widgets)
 				supplyTotal = args.totalsupply or args.totalcontrol or args.totalpsy,
 			}}},
 		}
-	elseif id == 'requirements' then
+	elseif id == 'Lua.importments' then
 		return {
-			Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(args.requires)}},
+			Cell{name = 'Lua.importments', content = {String.convertWikiListToHtmlList(args.Lua.imports)}},
 		}
 	elseif id == 'hotkey' then
 		return {

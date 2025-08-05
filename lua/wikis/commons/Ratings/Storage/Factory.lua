@@ -1,12 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Ratings/Storage/Factory
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local FnUtil = require('Module:FnUtil')
+local Lua = require('Module:Lua')
+
+local FnUtil = Lua.import('Module:FnUtil')
 
 ---@class RatingsEntry
 ---@field opponent standardOpponent
@@ -25,7 +26,7 @@ local RatingsStorageFactory = {}
 function RatingsStorageFactory.createGetRankings(props)
 	local storageType = props.storageType
 	if storageType == 'extension' then
-		local RatingsStorageExtension = require('Module:Ratings/Storage/Extension')
+		local RatingsStorageExtension = Lua.import('Module:Ratings/Storage/Extension')
 		local date = props.date
 		return FnUtil.curry(RatingsStorageExtension.getRankings, date)
 	end

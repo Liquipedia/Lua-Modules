@@ -1,19 +1,20 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Locale
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Flags = require('Module:Flags')
-local FnUtil = require('Module:FnUtil')
-local Operator = require('Module:Operator')
-local Region = require('Module:Region')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
+local Operator = Lua.import('Module:Operator')
+local Region = Lua.import('Module:Region')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 -- ISO 3166-1 alpha-2 Exceptional Reservations
 local EXCEPTIONAL_RESERVATIONS = {'eu', 'un'}

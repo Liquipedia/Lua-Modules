@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=fortnite
 -- page=Module:ResultsTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -15,8 +14,7 @@ local Table = require('Module:Table')
 local ResultsTable = Lua.import('Module:ResultsTable')
 local AwardsTable = Lua.import('Module:ResultsTable/Award')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local CustomResultsTable = {}
 

@@ -1,20 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Standings/Parse/Wiki
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
 

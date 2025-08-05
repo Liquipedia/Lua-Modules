@@ -1,24 +1,25 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
 -- page=Module:Infobox/Team/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local RoleOf = require('Module:RoleOf')
-local String = require('Module:StringUtils')
-local TeamTemplate = require('Module:Team')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local RoleOf = Lua.import('Module:RoleOf')
+local String = Lua.import('Module:StringUtils')
+
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
 local Region = Lua.import('Module:Region')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
@@ -81,7 +82,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Abbreviation', content = {args.abbreviation}},
 			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {
-				args.affiliate and TeamTemplate.team(nil, args.affiliate) or nil}}
+				args.affiliate and OpponentDisplay.InlineTeamContainer{template = args.affiliate, displayType = 'standard'} or nil}}
 		}
 	end
 

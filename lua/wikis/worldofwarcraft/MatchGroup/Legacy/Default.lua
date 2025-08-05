@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=worldofwarcraft
 -- page=Module:MatchGroup/Legacy/Default
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -13,8 +12,7 @@ local Lua = require('Module:Lua')
 
 local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local MAX_NUMBER_OF_OPPONENTS = 2
 

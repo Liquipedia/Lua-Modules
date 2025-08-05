@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:Squad/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Arguments = Lua.import('Module:Arguments')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local Squad = Lua.import('Module:Widget/Squad/Core')
 local SquadRow = Lua.import('Module:Squad/Row')
@@ -58,7 +58,7 @@ function CustomSquad._playerRow(person, squadStatus, squadType)
 
 	if squadStatus == SquadUtils.SquadStatus.ACTIVE then
 		local isMain = Logic.readBool(squadArgs.main) or Logic.isEmpty(squadArgs.squad)
-		squadPerson.extradata = Table.merge({ismain = tostring(isMain)}, squadPerson.extradata)
+		squadPerson.extradata = Table.merge({group = isMain and 'main' or 'additional'}, squadPerson.extradata)
 	end
 	squadPerson.newteamspecial = Logic.emptyOr(squadPerson.newteamspecial,
 		Logic.readBool(person.retired) and 'retired' or nil,

@@ -1,20 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=smash
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Currency = require('Module:Currency')
-local Game = require('Module:Game')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Currency = Lua.import('Module:Currency')
+local Game = Lua.import('Module:Game')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
@@ -102,8 +103,11 @@ function CustomLeague.run(frame)
 		args.doublesprizepoolusd = args.doublesprizepoolusd or args.doublesprizepool
 		args.doublesprizepool = nil
 	elseif args.doublesprizepool and args.localcurrency then
-		args.doublesprizepoolusd = CustomLeague:_currencyConversion(CustomLeague._cleanNumericInput(args.doublesprizepool),
-			args.localcurrency, League:_cleanDate(args.edate) or League:_cleanDate(args.date))
+		args.doublesprizepoolusd = CustomLeague:_currencyConversion(
+			CustomLeague._cleanNumericInput(args.doublesprizepool),
+			args.localcurrency,
+			ReferenceCleaner.cleanDateIfKnown{date = args.edate} or ReferenceCleaner.cleanDateIfKnown{date = args.date}
+		)
 	end
 
 	-- Currency rounding options
@@ -403,7 +407,7 @@ function CustomLeague:_createCircuitInformation(widgets, circuitIndex)
 		Cell{name = 'Circuit Tier', content = {circuitArgs.tier}},
 		Cell{name = 'Tournament Region', content = {circuitArgs.region}},
 		Cell{name = 'Points', content = {circuitArgs.points}},
-		Chronology{links = {next = circuitArgs.next, previous = circuitArgs.previous}}
+		Chronology{args = circuitArgs, showTitle = false}
 	)
 end
 

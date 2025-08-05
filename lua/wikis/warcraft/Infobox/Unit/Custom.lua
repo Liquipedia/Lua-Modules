@@ -1,27 +1,27 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:Infobox/Unit/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local ArmorIcon = require('Module:ArmorIcon')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
-local Faction = require('Module:Faction')
-local Hotkeys = require('Module:Hotkey')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local ArmorIcon = Lua.import('Module:ArmorIcon')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local CostDisplay = Lua.import('Module:Infobox/Extension/CostDisplay')
+local Faction = Lua.import('Module:Faction')
+local Hotkeys = Lua.import('Module:Hotkey')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 local Shared = Lua.import('Module:Infobox/Extension/BuildingUnitShared')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
@@ -31,7 +31,7 @@ local CustomUnit = Class.new(Unit)
 
 local CustomInjector = Class.new(Injector)
 
-local EXPERIENCE = mw.loadData('Module:Experience')
+local EXPERIENCE = Lua.import('Module:Experience', {loadData = true})
 
 local CRITTERS = 'critters'
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=Hit Points]]'

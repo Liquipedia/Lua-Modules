@@ -1,12 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=overwatch
 -- page=Module:NotabilityChecker/config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Table = Lua.import('Module:Table')
 
 local Config = {}
 
@@ -213,9 +214,12 @@ Config.weights = {
 	},
 }
 
--- This function adjusts the score for the placement, e.g.
--- a first placement should score more than a 10th placement.
--- See also the EXTRA_DROP_OFF_TYPES.
+--- This function adjusts the score for the placement, e.g.
+--- a first placement should score more than a 10th placement.
+--- See also the EXTRA_DROP_OFF_TYPES.
+---@param tier string|integer
+---@param tierType string
+---@return fun(number, number): number
 function Config.placementDropOffFunction(tier, tierType)
 	-- R6 is currently setting 0 points for the EXTRA_DROP_OFF types
 	-- but have plans to add points for them once modnotability is added on the wiki

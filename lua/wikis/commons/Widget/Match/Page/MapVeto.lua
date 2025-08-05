@@ -1,17 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Page/MapVeto
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Image = require('Module:Image')
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Image = Lua.import('Module:Image')
+
 local Map = Lua.import('Module:Map')
+
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -34,7 +36,10 @@ function MatchPageMapVeto:render()
 	---@return (string|Widget)[]
 	local formatTitle = function(vetoRound)
 		local teamDisplay = function()
-			return mw.ext.TeamTemplate.teamicon(vetoRound.by.template)
+			return OpponentDisplay.InlineOpponent{
+				opponent = vetoRound.by,
+				teamStyle = 'icon',
+			}
 		end
 		local actionType
 		local byText

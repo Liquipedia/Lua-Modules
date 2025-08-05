@@ -1,22 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local Page = Lua.import('Module:Page')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class AgeofEmpiresMapInfobox: MapInfobox
@@ -58,8 +58,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				name = 'First Appearance',
 				content = {Page.makeInternalLink({onlyIfExists = true}, args.appearance) or args.appearance}
-			},
-			Cell{name = 'Competition Span', content = {args.span}}
+			}
 		)
 	end
 	return widgets

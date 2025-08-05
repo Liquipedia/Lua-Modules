@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=formula1
 -- page=Module:PortalPlayers/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -14,13 +13,11 @@ local Links = require('Module:Links')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
 
 local AgeCalculation = Lua.import('Module:AgeCalculation')
 local PortalPlayers = Lua.import('Module:PortalPlayers')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local NON_PLAYER_HEADER = Abbreviation.make{text = 'Staff',
 	title = 'Team Principals, Race Engineers, Strategists and more'}
@@ -88,7 +85,9 @@ function CustomPortalPlayers:row(player, isPlayer)
 	row:tag('td'):node(CustomPortalPlayers._getAge(player))
 
 	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '') or ''
-	local teamText = mw.ext.TeamTemplate.teamexists(player.team) and Team.team(nil, player.team) or ''
+	local teamText = mw.ext.TeamTemplate.teamexists(player.team) and tostring(OpponentDisplay.InlineTeamContainer{
+		template = player.team, displayType = 'standard'
+	}) or ''
 	if String.isNotEmpty(role) and String.isEmpty(teamText) then
 		teamText = role
 	elseif String.isNotEmpty(role) then

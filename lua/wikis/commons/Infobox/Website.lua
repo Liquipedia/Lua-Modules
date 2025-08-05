@@ -1,24 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Website
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Links = Lua.import('Module:Links')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Cell = Widgets.Cell
 local Center = Widgets.Center
-local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 
 ---@class WebsiteInfobox: BasicInfobox
@@ -50,17 +48,7 @@ function Website:createInfobox()
 		Cell{name = 'Launched', content = {args.date_of_launch}},
 		Cell{name = 'Current Status', content = {args.current_status}},
 		Customizable{id = 'custom', children = {}},
-		Builder{
-			builder = function()
-				local links = Links.transform(args)
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = Links.transform(args)},
 		Center{children = {args.footnotes}},
 	}
 

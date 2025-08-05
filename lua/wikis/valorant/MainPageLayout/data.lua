@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -15,6 +14,7 @@ local Div = HtmlWidgets.Div
 local LiquipediaApp = Lua.import('Module:Widget/MainPage/LiquipediaApp')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
+local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 
 local CONTENT = {
@@ -28,6 +28,12 @@ local CONTENT = {
 		heading = 'Transfers',
 		body = TransfersList{rumours = true},
 		boxid = 1509,
+	},
+	thisDay = {
+		heading = ThisDayWidgets.Title(),
+		body = ThisDayWidgets.Content(),
+		padding = true,
+		boxid = 1510,
 	},
 	specialEvents = {
 		noPanel = true,
@@ -52,9 +58,6 @@ local CONTENT = {
 		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
-		panelAttributes = {
-			['data-switch-group-container'] = 'countdown',
-		},
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -190,6 +193,10 @@ return {
 								},
 							},
 						},
+					},
+					{
+						mobileOrder = 6,
+						content = CONTENT.thisDay,
 					},
 				},
 			},

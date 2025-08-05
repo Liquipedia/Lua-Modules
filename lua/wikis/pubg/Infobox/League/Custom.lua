@@ -1,24 +1,24 @@
 ---
 -- @Liquipedia
--- wiki=pubg
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local PageLink = require('Module:Page')
-local String = require('Module:StringUtils')
-local Template = require('Module:Template')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local PageLink = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Template = Lua.import('Module:Template')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 

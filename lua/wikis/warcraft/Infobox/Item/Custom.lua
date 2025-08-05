@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:Infobox/Item/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -108,6 +107,7 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'availability' then
 		return Array.append(widgets,
+			Title{children = 'Availability'},
 			Cell{name = 'Sold From', content = Array.map(args.soldFrom, function(soldFrom)
 				return '[[' .. soldFrom.link .. '|' .. soldFrom.name .. ']]' end)},
 			Cell{name = 'Requirements', content = {args.requires}},
@@ -128,6 +128,7 @@ function CustomInjector:parse(id, widgets)
 		)
 	elseif id == 'ability' then
 		return Array.append(widgets,
+			Title{children = 'Ability'},
 			Cell{name = 'Cast Time', content = {args.cast}},
 			Cell{name = 'Cooldown', content = {args.cooldown}},
 			Cell{name = 'Cooldown Group', content = {args.cooldown and (args.coolgroup or
@@ -135,8 +136,6 @@ function CustomInjector:parse(id, widgets)
 			) or nil}},
 			Cell{name = 'Duration', content = {args.duration}}
 		)
-	elseif Table.includes({'attributes', 'maps', 'recipe'}, id) then
-		return {}
 	end
 
 	return widgets

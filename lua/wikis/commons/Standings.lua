@@ -1,26 +1,25 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Standings
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Condition = require('Module:Condition')
-local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
-local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Condition = Lua.import('Module:Condition')
+local FnUtil = Lua.import('Module:FnUtil')
+local Json = Lua.import('Module:Json')
+local Lpdb = Lua.import('Module:Lpdb')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Tournament = Lua.import('Module:Tournament')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Standings = {}
 

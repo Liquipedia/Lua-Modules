@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=fortnite
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

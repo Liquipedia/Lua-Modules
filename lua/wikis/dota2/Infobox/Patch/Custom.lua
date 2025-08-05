@@ -1,17 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:Infobox/Patch/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Patch = Lua.import('Module:Infobox/Patch')
 local Injector = Lua.import('Module:Widget/Injector')
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 
 ---@class Dota2PatchInfobox: PatchInfobox
 local CustomPatch = Class.new(Patch)

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/GeneralCollapsible/Default
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -41,7 +40,10 @@ function DefaultCollapsible:render()
 			},
 			Div{
 				children = props.children,
-				classes = {'should-collapse'},
+				classes = Array.extend({},
+					'should-collapse',
+					props.collapseAreaClasses
+				),
 			},
 		}
 	}

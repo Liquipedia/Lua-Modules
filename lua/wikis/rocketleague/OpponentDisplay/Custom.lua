@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:OpponentDisplay/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -62,16 +61,6 @@ function CustomOpponentDisplay.BracketOpponentEntry:addScores(opponent)
 		or opponent.advances then
 		self.content:addClass('brkts-opponent-win')
 	end
-end
-
----@param opponent RocketLeagueStandardOpponent
-function CustomOpponentDisplay.BracketOpponentEntry:createPlayers(opponent)
-	local playerNode = OpponentDisplay.BlockPlayers({
-		opponent = opponent,
-		overflow = 'ellipsis',
-		showLink = true,
-	})
-	self.content:node(playerNode)
 end
 
 ---Displays a score or status of the opponent, as a string.

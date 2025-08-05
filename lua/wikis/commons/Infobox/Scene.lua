@@ -1,22 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Scene
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Links = require('Module:Links')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Class = Lua.import('Module:Class')
+local Links = Lua.import('Module:Links')
+local String = Lua.import('Module:StringUtils')
+local Variables = Lua.import('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Flags = Lua.import('Module:Flags')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -53,17 +52,7 @@ function Scene:createInfobox()
 		Cell{name = 'Size', content = {args.size}},
 		Customizable{id = 'custom', children = {}},
 		Center{children = {args.footnotes}},
-		Builder{
-			builder = function()
-				local links = Links.transform(args)
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = Links.transform(args)},
 		Builder{
 			builder = function()
 				if not String.isEmpty(args.achievements) then

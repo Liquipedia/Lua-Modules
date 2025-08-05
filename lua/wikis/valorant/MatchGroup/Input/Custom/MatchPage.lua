@@ -1,13 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:MatchGroup/Input/Custom/MatchPage
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
 
 local MapData = mw.loadJsonData('MediaWiki:Valorantdb-maps.json')
 
@@ -22,6 +23,8 @@ local CustomMatchGroupInputMatchPage = {}
 ---@field vod string?
 ---@field finished boolean
 
+local ROUNDS_PER_HALF = 12
+local ROUNDS_IN_GAME = 24
 
 ---@param side 'atk'|'def'
 ---@return 'atk'|'def'
@@ -42,7 +45,7 @@ local function makeShortSideName(longName)
 end
 
 ---@param mapInput {matchid: string?, reversed: string?, vod: string?, region: string?}
----@return dota2MatchDataExtended|table
+---@return valorantMatchDataExtended|table
 function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	-- If no matchid is provided, assume this as a normal map
 	if not mapInput or not mapInput.matchid then
@@ -66,6 +69,7 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 			return player.team_id == team.team_id
 		end)
 	end)
+	map.region = mapInput.region -- Region from the API is not what we want for region
 	map.matchid = mapInput.matchid
 	map.vod = mapInput.vod
 	map.finished = true
@@ -106,7 +110,7 @@ function CustomMatchGroupInputMatchPage.getFirstSide(map, opponentIndex, phase)
 
 	local teamSide = map.teams[opponentIndex] and map.teams[opponentIndex].team_id
 
-	local roundNumberOfFirstRound = phase == 'normal' and 0 or 24
+	local roundNumberOfFirstRound = phase == 'normal' and 1 or (ROUNDS_IN_GAME + 1)
 	local firstRound = Array.find(map.round_results, function(round)
 		return round.round_num == roundNumberOfFirstRound
 	end)
@@ -132,16 +136,16 @@ function CustomMatchGroupInputMatchPage.getScoreFromRounds(map, side, opponentIn
 	local condition
 	if firstSide then
 		if side == firstSide then
-			condition = function(round) return round.round_num < 12 end
+			condition = function(round) return round.round_num <= ROUNDS_PER_HALF end
 		elseif side == otherSide(firstSide) then
-			condition = function(round) return round.round_num >= 12 and round.round_num < 24 end
+			condition = function(round) return round.round_num > ROUNDS_PER_HALF and round.round_num <= ROUNDS_IN_GAME end
 		end
 	end
 	if firstSideOt then
 		if side == 'ot' .. firstSideOt then
-			condition = function(round) return round.round_num >= 24 and round.round_num % 2 == 0 end
+			condition = function(round) return round.round_num > ROUNDS_IN_GAME and round.round_num % 2 == 1 end
 		elseif side == 'ot' .. otherSide(firstSideOt) then
-			condition = function(round) return round.round_num >= 24 and round.round_num % 2 == 1 end
+			condition = function(round) return round.round_num > ROUNDS_IN_GAME and round.round_num % 2 == 0 end
 		end
 	end
 	if not condition then
@@ -205,10 +209,10 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 	return Array.map(map.round_results, function(round)
 		local roundNumber = round.round_num
 		local t1side, t2side
-		if roundNumber < 12 then
+		if roundNumber <= ROUNDS_PER_HALF then
 			t1side = t1start
 			t2side = otherSide(t1start)
-		elseif roundNumber < 24 then
+		elseif roundNumber <= ROUNDS_IN_GAME then
 			t1side = otherSide(t1start)
 			t2side = t1start
 		elseif nextOvertimeSide then

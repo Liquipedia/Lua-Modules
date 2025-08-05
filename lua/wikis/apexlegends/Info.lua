@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=apexlegends
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -34,6 +33,10 @@ return {
 		},
 		match2 = {
 			status = 1,
+		},
+		teamRosterNavbox = {
+			hidePlayedMatches = true,
+			excludeStreamers = true,
 		},
 	},
 	defaultRoundPrecision = 0,

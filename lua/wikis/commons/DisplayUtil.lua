@@ -1,16 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:DisplayUtil
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local FeatureFlag = require('Module:FeatureFlag')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
-local TypeUtil = require('Module:TypeUtil')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local FeatureFlag = Lua.import('Module:FeatureFlag')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local TypeUtil = Lua.import('Module:TypeUtil')
 
 local DisplayUtil = {propTypes = {}, types = {}}
 

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:PrizePool/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -55,6 +54,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	local participantLower = mw.ustring.lower(lpdbData.participant)
 
 	Variables.varDefine(participantLower .. '_prizepoints', lpdbData.extradata.prizepoints)
+	Variables.varDefine(participantLower .. '_prizepoints2', lpdbData.extradata.prizepoints2)
 	Variables.varDefine('enddate_'.. participantLower, lpdbData.date)
 
 	if Opponent.isTbd(opponent.opponentData) then

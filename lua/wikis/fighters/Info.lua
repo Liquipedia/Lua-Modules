@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=fighters
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -634,6 +633,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'HSFII Logo.png',
 				lightMode = 'HSFII Logo.png',
+			},
+		},
+		hxhni = {
+			abbreviation = 'HxHNI',
+			name = 'HUNTER×HUNTER NEN×IMPACT',
+			link = 'HUNTER×HUNTER NEN×IMPACT',
+			logo = {
+				darkMode = 'HxHNI allmode.png',
+				lightMode = 'HxHNI allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'HxHNI allmode.png',
+				lightMode = 'HxHNI allmode.png',
 			},
 		},
 		igau = {
@@ -1712,6 +1724,9 @@ return {
 		match2 = {
 			status = 1,
 		},
+		teamRosterNavbox = {
+			hideOrg = true,
+			hideOverview = true,
+		},
 	},
-	opponentLibrary = 'Opponent/Custom',
 }

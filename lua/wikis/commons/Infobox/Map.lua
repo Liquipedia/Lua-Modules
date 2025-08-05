@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Map
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -59,10 +58,22 @@ function Map:createInfobox()
 		Customizable{id = 'location', children = {
 			Cell{name = 'Location', content = {args.location}}
 		}},
-		Cell{name = 'Release Date', content = {args.releasedate}},
+		Customizable{id = 'release', children = {
+			Cell{name = 'Release Date', content = {args.releasedate}},
+			Cell{name = 'Release Patch', content = {args.releasepatch}},
+			Cell{name = 'Updated', content = {args.updated}},
+		}},
+		Cell{name = 'Filename', content = {args.filename}},
+		Cell{name = 'Theme', content = {args.theme}},
+		Cell{name = 'Competition Span', content = {args.span}},
+		Cell{name = 'Style', content = {args.style}},
+		Cell{name = 'Size', content = {args.size}},
+		Cell{name = 'Soft Platforms', content = {args.softplatforms}},
 		Customizable{id = 'custom', children = {}},
 		Center{children = {args.footnotes}},
 	}
+
+	self:bottom(self:createBottomContent())
 
 	if Namespace.isMain() then
 		self:categories('Maps', unpack(self:getWikiCategories(args)))

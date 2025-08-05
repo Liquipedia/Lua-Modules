@@ -1,16 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Ratings
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Date = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Date = Lua.import('Module:Date/Ext')
+local Table = Lua.import('Module:Table')
 
 local Info = Lua.import('Module:Info')
 local Widget = Lua.import('Module:Widget')

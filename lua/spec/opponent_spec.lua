@@ -154,7 +154,7 @@ describe('opponent', function()
 			assert.are_same(Config.blankTeam, coerce{type = Opponent.team})
 			assert.are_same(Config.blankSolo, coerce{type = Opponent.solo})
 			assert.are_same(Config.blankDuo, coerce{type = Opponent.duo})
-			assert.are_same({type = Opponent.duo, players = {{displayName = 'test'}, {displayName = ''}}},
+			assert.are_same({type = Opponent.duo, players = {{displayName = 'test'}, {displayName = ''}}, extradata = {}},
 				coerce{type = Opponent.duo, players = {{displayName = 'test'}}})
 		end)
 	end)
@@ -178,7 +178,8 @@ describe('opponent', function()
 					type = Opponent.solo,
 					players = {
 						{displayName = 'test', flag = 'Germany', pageName = 'testLink', team = 'mouz'}
-					}
+					},
+					extradata = {},
 				},
 				Opponent.readOpponentArgs{type = Opponent.solo, p1 = 'test', flag = 'de', link = 'testLink', team = 'mouz'})
 			assert.are_same({
@@ -186,30 +187,33 @@ describe('opponent', function()
 				players = {
 					{displayName = 'test', flag = 'Germany', pageName = 'testLink', team = 'mouz'},
 					{displayName = 'test2', flag = 'Austria'},
-				}
+				},
+				extradata = {},
 			}, Opponent.readOpponentArgs{p1 = 'test', p1flag = 'de', p1link = 'testLink', p1team = 'mouz',
 				p2 = 'test2', p2flag = 'at', type = Opponent.duo})
-			assert.are_same({name = 'test', type = Opponent.literal},
+			assert.are_same({name = 'test', type = Opponent.literal, extradata = {}},
 				Opponent.readOpponentArgs{type = Opponent.literal, name = 'test'})
-			assert.are_same({template = 'test', type = Opponent.team},
+			assert.are_same({template = 'test', type = Opponent.team, extradata = {}},
 				Opponent.readOpponentArgs{type = Opponent.team, template = 'test'})
-			assert.are_same({name = 'test', type = Opponent.literal},
+			assert.are_same({name = 'test', type = Opponent.literal, extradata = {}},
 				Opponent.readOpponentArgs{type = Opponent.literal, 'test'})
-			assert.are_same({template = 'test', type = Opponent.team},
+			assert.are_same({template = 'test', type = Opponent.team, extradata = {}},
 				Opponent.readOpponentArgs{type = Opponent.team, 'test'})
 		end)
 	end)
 
 	describe('from match2 record', function()
 		it('check', function()
-			assert.are_same({name = '', type = Opponent.literal},
+			assert.are_same({name = '', type = Opponent.literal, extradata = {}},
 				Opponent.fromMatch2Record(Config.exampleMatch2RecordLiteral))
-			assert.are_same({template = 'exon march 2020', type = Opponent.team},
+			assert.are_same({template = 'exon march 2020', type = Opponent.team, extradata = {}},
 				Opponent.fromMatch2Record(Config.exampleMatch2RecordTeam))
 			assert.are_same({
 					type = Opponent.solo,
 					players = {
-						{displayName = 'Krystianer', flag = 'Poland', pageName = 'Krystianer'}}
+						{displayName = 'Krystianer', flag = 'Poland', pageName = 'Krystianer'}
+					},
+					extradata = {},
 				},
 				Opponent.fromMatch2Record(Config.exampleMatch2RecordSolo))
 			assert.are_same({
@@ -217,7 +221,8 @@ describe('opponent', function()
 				players = {
 					{displayName = 'Semper', flag = 'Canada', pageName = 'Semper'},
 					{displayName = 'Jig', flag = 'Canada', pageName = 'Jig'},
-				}
+				},
+				extradata = {},
 			}, Opponent.fromMatch2Record(Config.exampleMatch2RecordDuo))
 		end)
 	end)

@@ -1,53 +1,48 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/League
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Game = require('Module:Game')
-local Info = require('Module:Info')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
-local Tier = require('Module:Tier/Custom')
-local Variables = require('Module:Variables')
 
+local Array = Lua.import('Module:Array')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
-local Flags = Lua.import('Module:Flags')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Game = Lua.import('Module:Game')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extension/PrizePool')
+local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
+local Logic = Lua.import('Module:Logic')
 local MetadataGenerator = Lua.import('Module:MetadataGenerator')
+local Namespace = Lua.import('Module:Namespace')
+local Page = Lua.import('Module:Page')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
+local Tier = Lua.import('Module:Tier/Custom')
+local Variables = Lua.import('Module:Variables')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
-local VENUE_DESCRIPTION = '<br><small><small>(${desc})</small></small>'
-local STAY22_LINK = 'https://www.stay22.com/allez/roam?aid=liquipedia&campaign=${wiki}_${page}'..
-	'&address=${address}&checkin=${checkin}&checkout=${checkout}'
 
-local Widgets = require('Module:Widget/All')
-local Cell = Widgets.Cell
-local Header = Widgets.Header
-local Title = Widgets.Title
-local Center = Widgets.Center
-local Customizable = Widgets.Customizable
+local Widgets = Lua.import('Module:Widget/All')
+local Accommodation = Widgets.Accommodation
 local Builder = Widgets.Builder
+local Cell = Widgets.Cell
+local Center = Widgets.Center
 local Chronology = Widgets.Chronology
-local Button = Lua.import('Module:Widget/Basic/Button')
-local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Customizable = Widgets.Customizable
+local Header = Widgets.Header
+local Location = Widgets.Location
+local Organizers = Widgets.Organizers
+local Title = Widgets.Title
+local Venue = Widgets.Venue
 
 ---@class InfoboxLeague: BasicInfobox
 local League = Class.new(BasicInfobox)
@@ -77,7 +72,7 @@ function League:createInfobox()
 		Title{children = 'League Information'},
 		Cell{
 			name = 'Series',
-			content = {
+			children = {
 				self:createSeriesDisplay({
 					displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
 					series = args.series,
@@ -93,32 +88,18 @@ function League:createInfobox()
 		},
 		Customizable{
 			id = 'organizers',
-			children = {
-				Builder{
-					builder = function()
-						local organizers = self:_createOrganizers(args)
-						local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
-
-						return {
-							Cell{
-								name = title,
-								content = organizers
-							}
-						}
-					end
-				},
-			},
+			children = {Organizers{args = args}},
 		},
 		Customizable{
 			id = 'sponsors',
 			children = {
-				Cell{name = 'Sponsor(s)', content = self:getAllArgsForBase(args, 'sponsor')},
+				Cell{name = 'Sponsor(s)', children = self:getAllArgsForBase(args, 'sponsor')},
 			}
 		},
 		Customizable{
 			id = 'gamesettings',
 			children = {
-				Cell{name = 'Server', content = {args.server}}
+				Cell{name = 'Server', children = {args.server}}
 			}
 		},
 		Customizable{id = 'type', children = {
@@ -141,7 +122,7 @@ function League:createInfobox()
 							return {
 								Cell{
 									name = 'Type',
-									content = {
+									children = {
 										mw.language.getContentLanguage():ucfirst(args.type)
 									}
 								}
@@ -151,166 +132,46 @@ function League:createInfobox()
 				}
 			}
 		},
-		Customizable{id = 'location', children = {Cell{
-			name = 'Location',
-			content = {
-				self:_createLocation(args)
-			}
-		}}},
-		Builder{
-			builder = function()
-				local venues = Array.map(League._parseVenues(args), function(venue)
-					return self:createLink(venue.id, venue.name, venue.link, venue.description)
-				end)
-
-				return {Cell{
-					name = 'Venue',
-					content = venues
-				}}
-			end
+		Location{
+			args = args,
+			shouldSetCategory = self:shouldStore(args),
 		},
-		Cell{name = 'Format', content = {args.format}},
+		Venue{args = args},
+		Cell{name = 'Format', children = {args.format}},
 		Customizable{id = 'prizepool', children = {
 				Cell{
 					name = 'Prize Pool',
-					content = {self.prizepoolDisplay},
+					children = {self.prizepoolDisplay},
 				},
 			},
 		},
 		Customizable{id = 'dates', children = {
-				Cell{name = 'Date', content = {args.date}},
-				Cell{name = 'Start Date', content = {args.sdate}},
-				Cell{name = 'End Date', content = {args.edate}},
+				Cell{name = 'Date', children = {args.date}},
+				Cell{name = 'Start Date', children = {args.sdate}},
+				Cell{name = 'End Date', children = {args.edate}},
 			},
 		},
 		Customizable{id = 'custom', children = {}},
 		Customizable{id = 'liquipediatier', children = {
 				Cell{
 					name = 'Liquipedia Tier',
-					content = {self:createLiquipediaTierDisplay(args)},
+					children = {self:createLiquipediaTierDisplay(args)},
 					classes = {self:liquipediaTierHighlighted(args) and 'valvepremier-highlighted' or ''},
 				},
 			},
 		},
-		Builder{
-			builder = function()
-				if Table.isNotEmpty(self.links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = self.links}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = self.links},
 		Customizable{id = 'customcontent', children = {}},
 		Center{children = {args.footnotes}},
 		Customizable{id = 'chronology', children = {
-				Builder{
-					builder = function()
-						if self:_isChronologySet(args.previous, args.next) then
-							return {
-								Title{children = 'Chronology'},
-								Chronology{
-									links = Table.filterByKey(args, function(key)
-										return type(key) == 'string' and (key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
-									end)
-								}
-							}
-						end
-					end
-				}
-			}
+			Chronology{args = args, showTitle = true},
+		}},
+		Accommodation{
+			args = args,
+			startDate = self.data.startDate,
+			endDate = self.data.endDate,
+			name = self.data.name,
 		},
-		Builder{
-			builder = function()
-				local startDate, endDate = self.data.startDate, self.data.endDate
-				if not startDate or not endDate then
-					return
-				end
-				local onlineOrOffline = tostring(args.type or ''):lower()
-				if not onlineOrOffline:match('offline') then
-					return
-				end
-				local locations = Locale.formatLocations(args)
-				-- If more than one city, don't show the accommodation section, as it is unclear which one the link is for
-				if locations.city2 then
-					return
-				end
-				-- Must have a venue or a city to show the accommodation section
-				if not locations.venue1 and not locations.city1 then
-					return
-				end
-
-				local function invalidLocation(location)
-					-- Not allowed to contain HTML Tags
-					return (location or ''):lower():match('<')
-				end
-				if invalidLocation(locations.venue1) or invalidLocation(locations.city1) then
-					return
-				end
-
-				-- if the event is finished do not show the button
-				local osdateCutoff = DateExt.parseIsoDate(endDate)
-				osdateCutoff.day = osdateCutoff.day + 1
-				if os.difftime(os.time(), os.time(osdateCutoff)) > 0 then
-					return
-				end
-
-				local addressParts = {}
-				-- Only add the venue if there is exactly one venue, otherwise we'll only use the city + country
-				table.insert(addressParts, not locations.venue2 and locations.venue1 or nil)
-				table.insert(addressParts, locations.city1)
-				table.insert(addressParts, Flags.CountryName{flag = locations.country1 or locations.region1})
-
-				-- Start date for the accommodation should be the day before the event, but at most 4 days before the event
-				-- End date for the accommodation should be 1 day after the event
-				local osdateEnd = DateExt.parseIsoDate(endDate)
-				osdateEnd.day = osdateEnd.day + 1
-				local osdateFictiveStart = DateExt.parseIsoDate(endDate)
-				osdateFictiveStart.day = osdateFictiveStart.day - 4
-				local osdateRealStart = DateExt.parseIsoDate(startDate)
-				osdateRealStart.day = osdateRealStart.day - 1
-
-				local osdateStart
-				if os.difftime(os.time(osdateFictiveStart), os.time(osdateRealStart)) > 0 then
-					osdateStart = osdateFictiveStart
-				else
-					osdateStart = osdateRealStart
-				end
-
-				local function buildStay22Link(address, checkin, checkout)
-					return String.interpolate(STAY22_LINK, {
-						wiki = Info.wikiName,
-						page = self.data.name,
-						address = address,
-						checkin = checkin,
-						checkout = checkout,
-					})
-				end
-
-				return {
-					Title{children = 'Accommodation'},
-					Center{children = {
-						Button{
-							linktype = 'external',
-							variant = 'primary',
-							size = 'md',
-							link = buildStay22Link(
-								table.concat(addressParts, ', '),
-								DateExt.toYmdInUtc(osdateStart),
-								DateExt.toYmdInUtc(osdateEnd)
-							),
-							children = {
-								IconFa{iconName = 'accommodation'},
-								' ',
-								'Find My Accommodation',
-							}
-						},
-						Center{children = 'Bookings earn Liquipedia a small commission.'}
-					}}
-				}
-			end
-		}
 	}
 
 	self.name = TextSanitizer.stripHTML(self.name)
@@ -325,24 +186,7 @@ function League:createInfobox()
 
 	return mw.html.create()
 		:node(self:build(widgets))
-		:node(Logic.readBool(args.autointro) and ('br>' .. self:seoText(args)) or nil)
-end
-
----@param args table
----@return {id: string?, name: string?, link: string?, description: string?}[]
-function League._parseVenues(args)
-	local venues = {}
-	for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue', {requireIndex = false}) do
-		local name = args[prefix .. 'name']
-		local link = args[prefix .. 'link']
-		local description
-		if String.isNotEmpty(args[prefix .. 'desc']) then
-			description = String.interpolate(VENUE_DESCRIPTION, {desc = args[prefix .. 'desc']})
-		end
-
-		table.insert(venues, {id = venueName, name = name, link = link, description = description})
-	end
-	return venues
+		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
 end
 
 function League:_parseArgs()
@@ -377,8 +221,10 @@ function League:_parseArgs()
 		game = Game.toIdentifier{game = args.game},
 		-- If no parent is available, set pagename instead to ease querying
 		parent = (args.parent or mw.title.getCurrentTitle().prefixedText):gsub(' ', '_'),
-		startDate = self:_cleanDate(args.sdate) or self:_cleanDate(args.date),
-		endDate = self:_cleanDate(args.edate) or self:_cleanDate(args.date),
+		startDate = ReferenceCleaner.cleanDateIfKnown{date = args.sdate}
+			or ReferenceCleaner.cleanDateIfKnown{date = args.date},
+		endDate = ReferenceCleaner.cleanDateIfKnown{date = args.edate}
+			or ReferenceCleaner.cleanDateIfKnown{date = args.date},
 		mode = args.mode,
 		patch = args.patch,
 		endPatch = args.endpatch or args.epatch or args.patch,
@@ -668,46 +514,6 @@ function League:_getNamedTableofAllArgsForBase(args, base)
 	return namedArgs
 end
 
----
--- Format:
--- {
---	region: Region or continent
---	country: the country
---	location: the city or place
--- }
----@param args table
----@return string
-function League:_createLocation(args)
-	if String.isEmpty(args.country) then
-		return Template.safeExpand(mw.getCurrentFrame(), 'Abbr/TBD')
-	end
-
-	local display = {}
-	args.city1 = args.city1 or args.location1 or args.city or args.location
-
-	for _, country, index in Table.iter.pairsByPrefix(args, 'country', {requireIndex = false}) do
-		local nationality = Flags.getLocalisation(country)
-
-		if String.isEmpty(nationality) then
-			self:categories('Unrecognised Country')
-
-		else
-			local location = args['city' .. index] or args['location' .. index]
-			local countryName = Flags.CountryName{flag = country}
-			local displayText = location or countryName
-			if String.isEmpty(displayText) then
-				displayText = country
-			end
-
-			if self:shouldStore(args) then
-				self:categories(nationality .. ' Tournaments')
-			end
-			table.insert(display, Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' .. displayText .. '<br>')
-		end
-	end
-	return table.concat(display)
-end
-
 ---@param seriesArgs {displayManualIcons:boolean, series:string?, abbreviation:string?, icon:string?, iconDark:string?}
 ---@param iconDisplay string?
 ---@return string?
@@ -774,6 +580,7 @@ function League:_createSeriesIcon(iconArgs)
 	return output == LeagueIcon.display{} and '' or output
 end
 
+--- used in brawlstars, chess, counterstrike customs
 ---@param id string?
 ---@param name string?
 ---@param link string?
@@ -813,42 +620,6 @@ function League:createLink(id, name, link, desc)
 	end
 
 	return output
-end
-
----@param args table
----@return string[]
-function League:_createOrganizers(args)
-	local organizers = {}
-
-	for prefix, organizer in Table.iter.pairsByPrefix(args, 'organizer', {requireIndex = false}) do
-		table.insert(organizers, self:createLink(organizer, args[prefix .. '-name'], args[prefix .. '-link']))
-	end
-
-	return organizers
-end
-
----@param date string?
----@return string?
-function League:_cleanDate(date)
-	if self:_isUnknownDate(date) then
-		return nil
-	end
-	return ReferenceCleaner.clean{input = date}
-end
-
----@param date string?
----@return boolean
-function League:_isUnknownDate(date)
-	return date == nil or string.lower(date) == 'tba' or string.lower(date) == 'tbd'
-end
-
----@param previous string?
----@param next string?
----@return boolean
-function League:_isChronologySet(previous, next)
-	-- We only need to check the first of these params, since it makes no sense
-	-- to set next2 and not next, etc.
-	return not (String.isEmpty(previous) and String.isEmpty(next))
 end
 
 -- Given the format `pagename|displayname`, returns pagename or the parameter, otherwise

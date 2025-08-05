@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Standings/Tiebreaker/Factory
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local String = Lua.import('Module:StringUtils')
 
 local TiebreakerFactory = {}
 

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:ParticipantTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -25,8 +24,7 @@ local Operator = require('Module:Operator')
 
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local AoEParticipantTable = {}
 
@@ -69,10 +67,9 @@ function AoEParticipantTable:readEntry(sectionArgs, key, index, config)
 		seed = valueFromArgs('seed'),
 	}
 
-	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
-		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
+	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
+	local opponent = Opponent.readOpponentArgs(opponentArgs)
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)
@@ -113,8 +110,8 @@ end
 
 ---@return Html
 function AoEParticipantTable:_createSeedList()
-	local width = tostring(50 + (self.config.showTeams and 212 or 156)) .. 'px'
-	local display = self:_createTitle('Seeding', self.config.title or 'Participants', 2, 1, width, true)
+	local width = tostring(50 + (self.config.showTeams and 242 or 186)) .. 'px'
+	local display = self:_createTitle('Seeding', self.config.title or 'Participants', 2, 1, width)
 
 	local wrapper = mw.html.create('div')
 		:addClass('participantTable-seeding')
@@ -146,9 +143,8 @@ end
 ---@param togglearea integer
 ---@param buttonarea integer
 ---@param width string?
----@param float boolean?
 ---@return Html
-function AoEParticipantTable:_createTitle(tabletitle, buttontitle, togglearea, buttonarea, width, float)
+function AoEParticipantTable:_createTitle(tabletitle, buttontitle, togglearea, buttonarea, width)
 	local title = mw.html.create('div')
 			:addClass('participantTable')
 			:attr('data-toggle-area-content', togglearea)
@@ -156,17 +152,10 @@ function AoEParticipantTable:_createTitle(tabletitle, buttontitle, togglearea, b
 			:css('width', width or self.config.width)
 			:css('vertical-align', 'middle')
 			:tag('span')
-				:addClass('toggle-area-button btn btn-primary')
+				:addClass('toggle-area-button btn btn-small btn-primary')
 				:attr('data-toggle-area-btn', buttonarea)
-				:css('padding-top', '2px')
-				:css('padding-bottom', '2px')
+				:css('position', 'absolute')
 				:wikitext(buttontitle)
-
-	if float then
-		title:css('float', 'left')
-	else
-		title:css('position', 'absolute')
-	end
 
 	return title:done()
 			:tag('div')

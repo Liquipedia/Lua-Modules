@@ -1,19 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Opponent
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Flags = require('Module:Flags')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate')
-local TypeUtil = require('Module:TypeUtil')
+
+local Array = Lua.import('Module:Array')
+local Faction = Lua.import('Module:Faction')
+local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local TypeUtil = Lua.import('Module:TypeUtil')
 
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
@@ -71,6 +73,7 @@ Opponent.types.Player = TypeUtil.struct({
 	flag = 'string?',
 	pageName = 'string?',
 	team = 'string?',
+	faction = 'string?',
 })
 
 Opponent.types.TeamOpponent = TypeUtil.struct({
@@ -115,7 +118,7 @@ end
 ---@return standardOpponent
 function Opponent.blank(type)
 	if type == Opponent.team then
-		return {type = type, template = 'tbd'}
+		return {type = type, template = 'tbd', extradata = {}}
 	elseif Opponent.typeIsParty(type) then
 		local partySize = Opponent.partySize(type) --[[@as integer]]
 		return {
@@ -124,9 +127,10 @@ function Opponent.blank(type)
 				Array.range(1, partySize),
 				function(_) return {displayName = ''} end
 			),
+			extradata = {},
 		}
 	else
-		return {type = Opponent.literal, name = ''}
+		return {type = Opponent.literal, name = '', extradata = {}}
 	end
 end
 
@@ -135,7 +139,7 @@ end
 ---@return standardOpponent
 function Opponent.tbd(type)
 	if type == Opponent.team then
-		return {type = type, template = 'tbd'}
+		return {type = type, template = 'tbd', extradata = {}}
 	elseif Opponent.typeIsParty(type) then
 		local partySize = Opponent.partySize(type) --[[@as integer]]
 		return {
@@ -144,9 +148,10 @@ function Opponent.tbd(type)
 				Array.range(1, partySize),
 				function(_) return {displayName = 'TBD'} end
 			),
+			extradata = {},
 		}
 	else
-		return {type = Opponent.literal, name = 'TBD'}
+		return {type = Opponent.literal, name = 'TBD', extradata = {}}
 	end
 end
 
@@ -226,6 +231,7 @@ end
 ---It's still a work in progress, it's not fully implemented all cases
 ---@param opponent1 standardOpponent
 ---@param opponent2 standardOpponent
+---@return boolean
 function Opponent.same(opponent1, opponent2)
 	return Opponent.toName(opponent1) == Opponent.toName(opponent2)
 end
@@ -234,6 +240,8 @@ end
 ---@param opponent table
 function Opponent.coerce(opponent)
 	assert(type(opponent) == 'table')
+
+	opponent.extradata = opponent.extradata or {}
 
 	opponent.type = Opponent.isType(opponent.type) and opponent.type or Opponent.literal
 	if opponent.type == Opponent.literal then
@@ -319,8 +327,10 @@ function Opponent.resolve(opponent, date, options)
 	elseif Opponent.typeIsParty(opponent.type) then
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
+				local hasFaction = String.isNotEmpty(player.faction)
 				local savePageVar = not Opponent.playerIsTbd(player)
 				PlayerExt.syncPlayer(player, {
+					date = date,
 					savePageVar = savePageVar,
 					overwritePageVars = options.overwritePageVars,
 				})
@@ -329,6 +339,7 @@ function Opponent.resolve(opponent, date, options)
 					player.team,
 					{date = date, savePageVar = savePageVar}
 				)
+				player.faction = (hasFaction or player.faction ~= Faction.defaultFaction) and player.faction or nil
 			else
 				PlayerExt.populatePageName(player)
 			end
@@ -350,7 +361,10 @@ Returns nil if the team template does not exist.
 ---@return string
 function Opponent.toName(opponent)
 	if opponent.type == Opponent.team then
-		return TeamTemplate.getPageName(opponent.template)
+		local name = TeamTemplate.getPageName(opponent.template)
+		-- annos expect a string return, so let it error if we get a nil return
+		assert(name, 'Invalid team template: ' .. (opponent.template or ''))
+		return name
 	elseif Opponent.typeIsParty(opponent.type) then
 		local pageNames = Array.map(opponent.players, function(player)
 			return player.pageName or player.displayName
@@ -382,7 +396,8 @@ function Opponent.readOpponentArgs(args)
 		return template and {
 			type = Opponent.team,
 			template = template,
-		}
+			extradata = {}
+		} or Opponent.tbd(Opponent.team)
 
 	elseif partySize == 1 then
 		local player = {
@@ -390,8 +405,9 @@ function Opponent.readOpponentArgs(args)
 			flag = String.nilIfEmpty(Flags.CountryName{flag = args.flag or args.p1flag}),
 			pageName = args.link or args.p1link,
 			team = args.team or args.p1team,
+			faction = Logic.nilIfEmpty(Faction.read(args.faction or args.race or args.p1race)),
 		}
-		return {type = Opponent.solo, players = {player}}
+		return {type = Opponent.solo, players = {player}, extradata = {}}
 
 	elseif partySize then
 		local players = Array.map(Array.range(1, partySize), function(playerIndex)
@@ -401,12 +417,14 @@ function Opponent.readOpponentArgs(args)
 				flag = String.nilIfEmpty(Flags.CountryName{flag = args['p' .. playerIndex .. 'flag']}),
 				pageName = args['p' .. playerIndex .. 'link'],
 				team = playerTeam,
+				faction = Logic.nilIfEmpty(Faction.read(args['p' .. playerIndex .. 'faction']
+					or args['p' .. playerIndex .. 'race'])),
 			}
 		end)
-		return {type = args.type, players = players}
+		return {type = args.type, players = players, extradata = {}}
 
 	elseif args.type == Opponent.literal then
-		return {type = Opponent.literal, name = args.name or args[1] or ''}
+		return {type = Opponent.literal, name = args.name or args[1] or '', extradata = {}}
 
 	end
 	error("Unknown opponent type: " .. args.type)
@@ -423,7 +441,7 @@ transformations.
 ---@return standardOpponent
 function Opponent.fromMatch2Record(record)
 	if record.type == Opponent.team then
-		return {type = Opponent.team, template = record.template}
+		return {type = Opponent.team, template = record.template, extradata = {}}
 
 	elseif Opponent.typeIsParty(record.type) then
 		return {
@@ -433,12 +451,13 @@ function Opponent.fromMatch2Record(record)
 					displayName = playerRecord.displayname,
 					flag = String.nilIfEmpty(Flags.CountryName{flag = playerRecord.flag}),
 					pageName = String.nilIfEmpty(playerRecord.name),
+					faction = Logic.nilIfEmpty(Faction.read(playerRecord.extradata.faction) or Faction.defaultFaction),
 				}
 			end),
+			extradata = {},
 		}
-
 	elseif record.type == Opponent.literal then
-		return {type = Opponent.literal, name = record.name or ''}
+		return {type = Opponent.literal, name = record.name or '', extradata = {}}
 
 	end
 	error("Unknown opponent type: " .. record.type)
@@ -465,9 +484,10 @@ function Opponent.toLpdbStruct(opponent)
 			players[prefix .. 'dn'] = player.displayName
 			players[prefix .. 'flag'] = player.flag
 			players[prefix .. 'team'] = player.team and
-				Opponent.toName({type = Opponent.team, template = player.team, players = {}}) or
+				Opponent.toName({type = Opponent.team, template = player.team, players = {}, extradata = {}}) or
 				nil
 			players[prefix .. 'template'] = player.team
+			players[prefix .. 'faction'] = Logic.nilIfEmpty(player.faction)
 		end
 		storageStruct.opponentplayers = players
 	end
@@ -482,34 +502,41 @@ function Opponent.fromLpdbStruct(storageStruct)
 	local partySize = Opponent.partySize(storageStruct.opponenttype)
 	if partySize then
 		local players = storageStruct.opponentplayers
-		local function playerFromLpdbStruct(playerIndex)
-			local prefix = 'p' .. playerIndex
-
-			return {
-				displayName = players[prefix .. 'dn'],
-				flag = Flags.CountryName{flag = players[prefix .. 'flag']},
-				pageName = players[prefix],
-				team = players[prefix .. 'template'] or players[prefix .. 'team'],
-			}
-		end
-		local opponent = {
-			players = Array.map(Array.range(1, partySize), playerFromLpdbStruct),
+		return {
+			players = Array.map(Array.range(1, partySize), FnUtil.curry(Opponent.playerFromLpdbStruct, players)),
 			type = storageStruct.opponenttype,
+			extradata = {},
 		}
-		return opponent
 	elseif storageStruct.opponenttype == Opponent.team then
 		return {
 			name = storageStruct.opponentname,
 			template = storageStruct.opponenttemplate,
 			type = Opponent.team,
+			extradata = {},
 		}
 	elseif storageStruct.opponenttype == Opponent.literal then
 		return {
 			name = storageStruct.opponentname,
 			type = Opponent.literal,
+			extradata = {},
 		}
 	end
 	error("Unknown opponent type: " .. storageStruct.type)
+end
+
+---Reads a standings or placement lpdb structure and builds an opponent struct from it
+---@param players table
+---@param playerIndex integer
+---@return standardPlayer
+function Opponent.playerFromLpdbStruct(players, playerIndex)
+	local prefix = 'p' .. playerIndex
+	return {
+		displayName = players[prefix .. 'dn'],
+		flag = String.nilIfEmpty(Flags.CountryName{flag = players[prefix .. 'flag']}),
+		pageName = players[prefix],
+		team = players[prefix .. 'template'] or players[prefix .. 'team'],
+		faction = Logic.nilIfEmpty(players[prefix .. 'faction']),
+	}
 end
 
 return Opponent

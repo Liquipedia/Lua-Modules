@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -63,7 +62,18 @@ return {
 			matchWidthMobile = 110,
 			matchWidth = 150,
 		},
+		teamRosterNavbox = {
+			links = {
+				playedMatches = 'Matches',
+				playerResults = 'Player Results',
+			},
+			hideOrg = true,
+		},
+		thisDay = {
+			hideEmptyBirthdayList = true,
+			tiers = {1, 2},
+			excludeTierTypes = {'Qualifier', 'Charity'},
+			showPatches = true,
+		},
 	},
-	opponentLibrary = 'Opponent/Starcraft',
-	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
 }

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=mobilelegends
 -- page=Module:Infobox/Item/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -115,14 +114,16 @@ function CustomInjector:parse(id, widgets)
 			return {}
 		end
 		Array.appendWith(widgets,
+			Title{children = 'Ability'},
 			Cell{name = 'Active', content = {args.active}},
 			Cell{name = 'Passive', content = {args.passive, args.passive2}}
 		)
 	elseif id == 'recipe' then
 		if String.isEmpty(args.recipe) then return {} end
-		table.insert(widgets, Center{children = {args.recipe}})
-	elseif Table.includes({'caption', 'availability', 'maps'}, id) then
-		return {}
+		Array.appendWith(widgets,
+			Title{children = 'Recipe'},
+			Center{children = {args.recipe}}
+		)
 	end
 
 	return widgets

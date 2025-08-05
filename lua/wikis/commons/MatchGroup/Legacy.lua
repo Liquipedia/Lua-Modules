@@ -1,20 +1,20 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local MatchGroup = Lua.import('Module:MatchGroup')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
@@ -378,7 +378,7 @@ end
 function MatchGroupLegacy:_get(templateid, oldTemplateid)
 	if Lua.moduleExists('Module:MatchGroup/Legacy/' .. templateid) then
 		mw.log('Module:MatchGroup/Legacy/' .. templateid .. ' exists')
-		return (require('Module:MatchGroup/Legacy/' .. templateid)[oldTemplateid] or function() return nil end)()
+		return (Lua.import('Module:MatchGroup/Legacy/' .. templateid)[oldTemplateid] or function() return nil end)()
 			or self.get(templateid, self.bracketType)
 	else
 		return self.get(templateid, self.bracketType)

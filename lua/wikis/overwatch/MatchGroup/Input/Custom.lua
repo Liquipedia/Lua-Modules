@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=overwatch
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
+
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Variables = Lua.import('Module:Variables')
 
 local CharacterNames = Lua.import('Module:CharacterNames', {loadData = true})
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')

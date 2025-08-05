@@ -1,18 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Page/TeamDisplay
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local TeamTemplate = require('Module:TeamTemplate')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -54,7 +53,7 @@ function MatchPageTeamDisplay:render()
 end
 
 ---@private
----@return Widget|(string|Widget)[]?
+---@return Widget|Widget[]?
 function MatchPageTeamDisplay:_buildChildren()
 	local opponent = self.props.opponent
 	if Opponent.isEmpty(opponent) then return
@@ -66,18 +65,19 @@ function MatchPageTeamDisplay:_buildChildren()
 	end
 	local data = self.props.opponent.teamTemplateData
 	assert(data, TeamTemplate.noTeamMessage(opponent.template))
+	local hideLink = Opponent.isTbd(opponent)
 	return {
-		mw.ext.TeamTemplate.teamicon(data.templatename),
+		opponent.iconDisplay,
 		Div{
 			classes = { 'match-bm-match-header-team-group' },
 			children = {
 				Div{
 					classes = { 'match-bm-match-header-team-long' },
-					children = { Link{ link = data.page, children = data.name } }
+					children = { hideLink and data.name or Link{ link = data.page, children = data.name } }
 				},
 				Div{
 					classes = { 'match-bm-match-header-team-short' },
-					children = { Link{ link = data.page, children = data.shortname } }
+					children = { hideLink and data.shortname or Link{ link = data.page, children = data.shortname } }
 				},
 				Div{
 					classes = { 'match-bm-match-header-round-results' },

@@ -1,14 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:TeamTemplate
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
 
 --[[
 A thin wrapper around mw.ext.TeamTemplate that memoizes extension calls
@@ -27,7 +28,6 @@ timezone parts.
 ---@param date string|number?
 ---@return string?
 function TeamTemplate.resolve(template, date)
-	template = template:gsub('_', ' ')
 	local raw = TeamTemplate.getRawOrNil(template, date) or {}
 	return raw.templatename
 end
@@ -87,7 +87,21 @@ does not exist.
 ---@return teamTemplateData?
 function TeamTemplate.getRawOrNil(team, date)
 	team = team:gsub('_', ' '):lower()
-	return mw.ext.TeamTemplate.raw(team, date)
+
+	-- return mw.ext.TeamTemplate.raw(team, date)
+	-- below is a temp fix to re-allow team templates with underscores
+	-- should be removed once team template extension is restricted and existing team templates are converted
+	local teamTemplateData = mw.ext.TeamTemplate.raw(team, date)
+	if teamTemplateData then
+		return teamTemplateData
+	end
+
+	local teamWithUnderscores = team:gsub(' ', '_'):lower()
+	teamTemplateData = mw.ext.TeamTemplate.raw(teamWithUnderscores, date)
+	if teamTemplateData then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with underscore team templates')
+	end
+	return teamTemplateData
 end
 
 ---Creates error message for missing team templates.
@@ -117,7 +131,7 @@ An empty array is returned if the specified team template does not exist.
 ---@param name string
 ---@return string[]
 function TeamTemplate.queryHistoricalNames(name)
-    local resolvedName = TeamTemplate.resolve(name)
+	local resolvedName = TeamTemplate.resolve(name)
 	if resolvedName then
 		local historical = TeamTemplate.queryHistorical(resolvedName) or {}
 		if Logic.isNotEmpty(historical) then

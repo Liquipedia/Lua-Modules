@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=crossfire
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,7 +7,6 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Role = require('Module:Role')
 local String = require('Module:StringUtils')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
@@ -54,18 +52,6 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'region' then return {}
 	end
 	return widgets
-end
-
----@param lpdbData table
----@param args table
----@param personType string
----@return table
-function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	local role = Role.run{role = self.args.role}
-	lpdbData.extradata.isplayer = role.isPlayer or 'true'
-	lpdbData.extradata.role = role.role
-
-	return lpdbData
 end
 
 return CustomPlayer

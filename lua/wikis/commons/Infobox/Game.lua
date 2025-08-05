@@ -1,21 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Game
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local Table = require('Module:Table')
-local Json = require('Module:Json')
+
+local Class = Lua.import('Module:Class')
+local Namespace = Lua.import('Module:Namespace')
+local Table = Lua.import('Module:Table')
+local Json = Lua.import('Module:Json')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Links = Lua.import('Module:Links')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -97,16 +97,7 @@ function Game:createInfobox()
 			}
 		},
 		Customizable{id = 'custom', children = {}},
-		Builder{
-			builder = function()
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = links},
 		Center{children = {args.footnotes}},
 	}
 

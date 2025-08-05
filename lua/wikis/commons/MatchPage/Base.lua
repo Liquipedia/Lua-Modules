@@ -1,29 +1,31 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchPage/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Links = require('Module:Links')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Tabs = require('Module:Tabs')
-local TeamTemplate = require('Module:TeamTemplate')
-local VodLink = require('Module:VodLink')
+
+local Array = Lua.import('Module:Array')
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Logic = Lua.import('Module:Logic')
+local Links = Lua.import('Module:Links')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Tabs = Lua.import('Module:Tabs')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local VodLink = Lua.import('Module:VodLink')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local AdditionalSection = Lua.import('Module:Widget/Match/Page/AdditionalSection')
@@ -48,7 +50,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageOpponent: standardOpponent
 ---@field opponentIndex integer
----@field iconDisplay string
+---@field iconDisplay Widget?
 ---@field teamTemplateData teamTemplateData
 ---@field seriesDots string[]
 
@@ -161,7 +163,10 @@ function BaseMatchPage:populateOpponents()
 			return
 		end
 
-		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
+		opponent.iconDisplay = OpponentDisplay.InlineTeamContainer{
+			style = 'icon',
+			template = opponent.template
+		}
 		opponent.teamTemplateData = teamTemplate
 
 		opponent.seriesDots = Array.map(self.games, function(game)
@@ -181,31 +186,34 @@ function BaseMatchPage:getCharacterIcon(character)
 end
 
 ---@protected
+---@return string
 function BaseMatchPage:makeDisplayTitle()
 	local team1data = (self.opponents[1] or {}).teamTemplateData
 	local team2data = (self.opponents[2] or {}).teamTemplateData
+	local tournamentName = self.matchData.tickername
 
 	if Logic.isEmpty(team1data) and Logic.isEmpty(team2data) then
-		return table.concat({'Match in', self.matchData.tickername}, ' ')
+		return String.isNotEmpty(tournamentName) and 'Match in ' .. tournamentName or ''
 	end
 
 	local team1name = (team1data or {}).shortname or 'TBD'
 	local team2name = (team2data or {}).shortname or 'TBD'
 
-	local tournamentName = self.matchData.tickername
-	local displayTitle = team1name .. ' vs. ' .. team2name
-	if not tournamentName then
-		return displayTitle
+	local titleParts = {team1name, 'vs.', team2name}
+	if tournamentName then
+		Array.appendWith(titleParts, '@', tournamentName)
 	end
 
-	displayTitle = displayTitle .. ' @ ' .. tournamentName
-
-	mw.getCurrentFrame():preprocess(table.concat{'{{DISPLAYTITLE:', displayTitle, '|noreplace}}'})
+	return table.concat(titleParts, ' ')
 end
 
 ---@return Widget
 function BaseMatchPage:render()
-	self:makeDisplayTitle()
+	local displayTitle = self:makeDisplayTitle()
+	if String.isNotEmpty(displayTitle) then
+		mw.getCurrentFrame():callParserFunction('DISPLAYTITLE', displayTitle, 'noreplace')
+	end
+
 	local tournamentContext = self:_getMatchContext()
 	return Div{
 		children = WidgetUtil.collect(

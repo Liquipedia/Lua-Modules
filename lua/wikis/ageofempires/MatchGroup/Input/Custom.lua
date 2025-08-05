@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -32,6 +31,7 @@ local MatchFunctions = {
 }
 local MapFunctions = {
 	BREAK_ON_EMPTY = true,
+	INHERIT_MAP_DATES = true,
 }
 
 local FffMatchFunctions = {
@@ -63,8 +63,7 @@ function MatchFunctions.readOpponent(match, opponentIndex, options)
 		return opponentIndex <= 2 and MatchGroupInputUtil.mergeRecordWithOpponent({}, Opponent.blank()) or nil
 	end
 
-	--- or Opponent.blank() is only needed because readOpponentArg can return nil for team opponents
-	local opponent = Opponent.readOpponentArgs(opponentInput) or Opponent.blank()
+	local opponent = Opponent.readOpponentArgs(opponentInput)
 	if Opponent.isBye(opponent) then
 		local byeOpponent = Opponent.blank()
 		byeOpponent.name = 'BYE'

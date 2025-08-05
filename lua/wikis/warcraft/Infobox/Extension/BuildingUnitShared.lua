@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:Infobox/Extension/BuildingUnitShared
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

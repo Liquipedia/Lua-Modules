@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
 -- page=Module:GetMatchGroupCopyPaste/wiki
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -30,6 +29,10 @@ local VETOES = {
 	[8] = 'pick,pick,pick,pick,ban',
 	[9] = 'pick,pick,pick,pick,decider',
 }
+local OPERATOR_BANS_SIZES = {
+	siege = 2,
+	siegeX = 6,
+}
 
 --returns the Code for a Match, depending on the input
 ---@param bestof integer
@@ -48,6 +51,9 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local mvps = Logic.readBool(args.mvp)
 	local showScore = Logic.readBool(args.score)
 	local streams = Logic.readBool(args.streams)
+	local numberOfOperatorBans = OPERATOR_BANS_SIZES[args.operatorbans]
+	assert(numberOfOperatorBans, 'invalid |operatorbans=')
+	local operatorBanFormat = args.operatorbans
 
 	---@param list string[]
 	---@param indents integer
@@ -95,6 +101,12 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		))
 	end
 
+	local operatorBanParams = function(opponentIndex)
+		return INDENT .. INDENT .. table.concat(Array.map(Array.range(1, numberOfOperatorBans), function(banIndex)
+			return '|t' .. opponentIndex .. 'ban' .. banIndex .. '='
+		end))
+	end
+
 	Array.forEach(Array.range(1, bestof), function(mapIndex)
 		local firstMapLine = INDENT .. '|map' .. mapIndex .. '={{Map|map=' .. score .. '|finished='
 		if not mapDetails then
@@ -104,8 +116,9 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 		Array.appendWith(lines,
 			firstMapLine,
-			INDENT .. INDENT .. '|t1ban1=|t1ban2=',
-			INDENT .. INDENT .. '|t2ban1=|t2ban2=',
+			INDENT .. INDENT .. '|bantype=' .. operatorBanFormat,
+			operatorBanParams(1),
+			operatorBanParams(2),
 			INDENT .. INDENT .. '|t1firstside=' .. (mapDetailsOT and '|t1firstsideot=' or ''),
 			atkDefParams(1),
 			atkDefParams(2),

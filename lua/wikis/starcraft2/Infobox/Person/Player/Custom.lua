@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,36 +7,37 @@
 
 -- This module is used for both the Player and Commentator infoboxes
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Faction = require('Module:Faction')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Lpdb = require('Module:Lpdb')
-local MatchTicker = require('Module:MatchTicker/Custom')
-local Math = require('Module:MathUtil')
-local Set = require('Module:Set')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
-local YearsActive = require('Module:YearsActive')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Faction = Lua.import('Module:Faction')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
+local Math = Lua.import('Module:MathUtil')
+local Set = Lua.import('Module:Set')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
+local YearsActive = Lua.import('Module:YearsActive')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local CustomPerson = Lua.import('Module:Infobox/Person/Custom')
 local Opponent = Lua.import('Module:Opponent/Starcraft')
 local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
 
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local EPT_SEASON = mw.loadData('Module:Series/EPT/config').currentSeason
+local EPT_SEASON = Lua.import('Module:Series/EPT/config', {loadData = true}).currentSeason
 
 local ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
@@ -474,7 +474,7 @@ end
 function CustomPlayer:_getRank()
 	if not self.shouldQueryData then return {{}, {}} end
 
-	local rankRegion = require('Module:EPT player region ' .. EPT_SEASON)[self.pagename]
+	local rankRegion = Lua.import('Module:EPT player region ' .. EPT_SEASON)[self.pagename]
 		or {'noregion'}
 	local typeCond = '([[type::EPT ' ..
 		table.concat(rankRegion, ' ranking ' .. EPT_SEASON .. ']] OR [[type::EPT ')

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -10,6 +9,7 @@ local Array = require('Module:Array')
 local CharacterNames = require('Module:CharacterNames')
 local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
@@ -17,7 +17,20 @@ local CustomMatchGroupInput = {}
 local MatchFunctions = {}
 local MapFunctions = {}
 
-local MAX_NUM_BANS = 2
+---@type table<string, {atk: string[], def: string[]}>
+local OPERATOR_BAN_FORMATS = {
+	-- before siegeX
+	siege = {
+		atk = {'atk', 'def'},
+		def = {'atk', 'def'},
+	},
+	-- since siegeX
+	siegeX = {
+		atk = {'def', 'def', 'def', 'atk', 'atk', 'atk'},
+		def = {'atk', 'atk', 'atk', 'def', 'def', 'def'},
+	},
+}
+
 MatchFunctions.DEFAULT_MODE = 'team'
 MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 
@@ -82,11 +95,31 @@ function MapFunctions.getExtraData(match, map, opponents)
 		t2halfs = {atk = map.t2atk, def = map.t2def, otatk = map.t2otatk, otdef = map.t2otdef},
 	}
 
+	-- temp workaround until bot job is done
+	local banTypeInput = map.bantype or 'siege'
+	local banTypes = OPERATOR_BAN_FORMATS[banTypeInput]
+	-- local banTypes = OPERATOR_BAN_FORMATS[map.bantype]
+	assert(banTypes, 'Invalid input: "|bantype=' .. (map.bantype or '') .. '"')
+
+	---@param opponentIndex integer
+	---@return string?
+	local getFirstSide = function(opponentIndex)
+		if opponentIndex == 1 then
+			return map.t1firstside
+		elseif opponentIndex == 2 and map.t1firstside == 'atk' then
+			return 'def'
+		elseif opponentIndex == 2 and map.t1firstside == 'def' then
+			return 'atk'
+		end
+	end
+
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, CharacterNames)
 	Array.forEach(opponents, function(_, opponentIndex)
-		extradata['t' .. opponentIndex .. 'bans'] = Array.map(Array.range(1, MAX_NUM_BANS), function(banIndex)
-			local ban = map['t' .. opponentIndex .. 'ban' .. banIndex]
-			return getCharacterName(ban) or ''
+		local prefix = 't' .. opponentIndex
+		extradata[prefix .. 'bantypes'] = Table.copy(banTypes[getFirstSide(opponentIndex)] or {})
+		local maxNumberOfBans = #extradata[prefix .. 'bantypes']
+		extradata[prefix .. 'bans'] = Array.map(Array.range(1, maxNumberOfBans), function(banIndex)
+			return getCharacterName(map[prefix .. 'ban' .. banIndex]) or ''
 		end)
 	end)
 

@@ -1,19 +1,18 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Standings/MatchOverview
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 ---@class MatchOverviewWidget: Widget
 ---@operator call(table): MatchOverviewWidget
@@ -45,7 +44,6 @@ function MatchOverviewWidget:render()
 			HtmlWidgets.Span{
 				children = OpponentDisplay.BlockOpponent{
 					opponent = opponent,
-					showLink = true,
 					overflow = 'ellipsis',
 					teamStyle = 'icon',
 				}

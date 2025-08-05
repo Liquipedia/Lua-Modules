@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=marvelrivals
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -59,12 +58,6 @@ local CONTENT = {
 		body = '{{Liquipedia:Special Event}}',
 		boxid = 1516,
 	},
-	heroes = {
-		heading = 'Heroes',
-		body = '{{Liquipedia:HeroTable}}',
-		padding = true,
-		boxid = 1501,
-	},
 	filterButtons = {
 		noPanel = true,
 		body = Div{
@@ -77,9 +70,6 @@ local CONTENT = {
 		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
-		panelAttributes = {
-			['data-switch-group-container'] = 'countdown',
-		},
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -191,10 +181,6 @@ return {
 						mobileOrder = 1,
 						noPanel = true,
 						content = CONTENT.specialEvents,
-					},
-					{
-						mobileOrder = 2,
-						content = CONTENT.heroes,
 					},
 					{
 						mobileOrder = 4,

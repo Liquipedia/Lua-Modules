@@ -1,30 +1,28 @@
 ---
 -- @Liquipedia
--- wiki=honorofkings
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
-local Class = require('Module:Class')
-local HeroNames = mw.loadData('Module:HeroNames')
 local Lua = require('Module:Lua')
-local Role = require('Module:Role')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local Class = Lua.import('Module:Class')
+local HeroNames = Lua.import('Module:HeroNames', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local SIZE_HERO = '25x25px'
 
----@class HonorofkingsInfoboxPlayer: Person
----@field role table
----@field role2 table
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -32,14 +30,43 @@ local CustomInjector = Class.new(Injector)
 ---@return Html
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
+	local args = player.args
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.autoTeam = true
+	args.autoTeam = true
 
-	player.role = Role.run{role = player.args.role}
-	player.role2 = Role.run{role = player.args.role2}
+	local builtInfobox = player:createInfobox()
 
-	return player:createInfobox()
+	local autoPlayerIntro = ''
+	if Logic.readBool((args.autoPI or ''):lower()) then
+		autoPlayerIntro = PlayerIntroduction.run{
+			player = player.pagename,
+			team = args.team,
+			name = args.romanized_name or args.name,
+			firstname = args.first_name,
+			lastname = args.last_name,
+			status = args.status,
+			type = player:getPersonType(args).store,
+			roles = player._getKeysOfRoles(player.roles),
+			id = args.id,
+			idIPA = args.idIPA,
+			idAudio = args.idAudio,
+			birthdate = player.age.birthDateIso,
+			deathdate = player.age.deathDateIso,
+			nationality = args.country,
+			nationality2 = args.country2,
+			nationality3 = args.country3,
+			subtext = args.subtext,
+			freetext = args.freetext,
+			convert_role = true,
+			show_role = true,
+		}
+	end
+
+	return mw.html.create()
+		:node(builtInfobox)
+		:node(autoPlayerIntro)
+
 end
 
 ---@param id string
@@ -66,10 +93,6 @@ function CustomInjector:parse(id, widgets)
 			name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
 			content = {table.concat(heroIcons, '&nbsp;')}
 		})
-	elseif id == 'role' then
-		return {
-			Cell{name = caller.role2.display and 'Roles' or 'Role', content = {caller.role.display, caller.role2.display}}
-		}
 	end
 
 	return widgets
@@ -77,13 +100,8 @@ end
 
 ---@param lpdbData table
 ---@param args table
----@param personType string
 ---@return table
-function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.isplayer = self.role.isPlayer or 'true'
-	lpdbData.extradata.role = self.role.role
-	lpdbData.extradata.role2 = self.role2.role
-
+function CustomPlayer:adjustLPDB(lpdbData, args)
 	-- store signature heroes with standardized name
 	for heroIndex, hero in ipairs(self:getAllArgsForBase(args, 'hero')) do
 		lpdbData.extradata['signatureHero' .. heroIndex] = HeroNames[hero:lower()]

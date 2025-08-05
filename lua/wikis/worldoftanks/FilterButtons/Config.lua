@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=worldoftanks
 -- page=Module:FilterButtons/Config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:Infobox/Team/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local RoleOf = require('Module:RoleOf')
+
+local Class = Lua.import('Module:Class')
+local RoleOf = Lua.import('Module:RoleOf')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Team = Lua.import('Module:Infobox/Team')

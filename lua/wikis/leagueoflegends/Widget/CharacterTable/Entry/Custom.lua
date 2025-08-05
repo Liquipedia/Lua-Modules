@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
 -- page=Module:Widget/CharacterTable/Entry/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local BaseEntry = Lua.import('Module:Widget/CharacterTable/Entry')
 

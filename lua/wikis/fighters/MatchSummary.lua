@@ -1,26 +1,24 @@
 ---
 -- @Liquipedia
--- wiki=fighters
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
+
+local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local PlayerDisplay = require('Module:Player/Display')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local PlayerDisplay = Lua.import('Module:Player/Display')
 
 local CustomMatchSummary = {}
 
@@ -49,10 +47,8 @@ function CustomMatchSummary._isSolo(match)
 end
 
 ---@param match MatchGroupUtilMatch
----@return MatchSummaryBody
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
 	local games = Array.map(match.games, function(game)
 		return CustomMatchSummary._createStandardGame(game, {
 			opponents = match.opponents,
@@ -61,10 +57,9 @@ function CustomMatchSummary.createBody(match)
 		})
 	end)
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+	return WidgetUtil.collect(
 		games
-	)}
+	)
 end
 
 ---@param game MatchGroupUtilGame
@@ -96,7 +91,6 @@ function CustomMatchSummary._createStandardGame(game, props)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '0.75rem', padding = '4px'},
 		children = WidgetUtil.collect(
 			CustomMatchSummary._createCharacterDisplay(
 				CustomMatchSummary.fetchCharactersOfPlayers(game, props.opponents, 1),
@@ -123,7 +117,7 @@ end
 ---@param displayPlayerNames boolean?
 ---@return Html
 function CustomMatchSummary._createCharacterDisplay(players, game, reverse, displayPlayerNames)
-	local CharacterIcons = mw.loadData('Module:CharacterIcons/' .. (game or ''))
+	local CharacterIcons = Lua.import('Module:CharacterIcons/' .. (game or ''), {loadData = true})
 	local wrapper = mw.html.create('div'):css('flex-basis', '40%')
 
 	if Logic.isDeepEmpty(players) then

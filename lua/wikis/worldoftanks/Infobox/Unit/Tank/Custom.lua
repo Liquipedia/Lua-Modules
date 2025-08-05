@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=worldoftanks
 -- page=Module:Infobox/Unit/Tank/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

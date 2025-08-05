@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=pubg
 -- page=Module:PrizePool/Award/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
+
+local Arguments = Lua.import('Module:Arguments')
+local Variables = Lua.import('Module:Variables')
 
 local AwardPrizePool = Lua.import('Module:PrizePool/Award')
 

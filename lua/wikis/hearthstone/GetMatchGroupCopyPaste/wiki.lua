@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=hearthstone
 -- page=Module:GetMatchGroupCopyPaste/wiki
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -12,8 +11,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 ---WikiSpecific Code for MatchList and Bracket Code Generators
 ---@class HearthstoneMatchCopyPaste: Match2CopyPasteBase

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=geoguessr
 -- page=Module:NotabilityChecker/config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -271,9 +270,12 @@ Config.scoreRanges = {
 -- 1st Place Qualification points
 Config.scoreRangeQuali = {5, 3, 2, 0.5, 0.5}
 
--- This function adjusts the score for the placement, e.g.
--- a first placement should score more than a 10th placement.
--- See also the EXTRA_DROP_OFF_TYPES and NO_POINTS_TYPES.
+--- This function adjusts the score for the placement, e.g.
+--- a first placement should score more than a 10th placement.
+--- See also the EXTRA_DROP_OFF_TYPES and NO_POINTS_TYPES.
+---@param tier string|integer
+---@param tierType string
+---@return fun(number, number): number
 function Config.placementDropOffFunction(tier, tierType)
 	-- Return scoreRangeQuali or score if tiertype is not equal to general
 	if (tierType ~= nil) and (tierType:lower() ~= Config.TIER_TYPE_GENERAL) then

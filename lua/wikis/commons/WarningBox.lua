@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:WarningBox
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,7 +7,9 @@
 
 local WarningBox = {}
 
-local Array = require('Module:Array')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
 
 ---@param text string|number
 ---@return Html

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:MatchGroup/Util/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -17,8 +16,7 @@ local TypeUtil = require('Module:TypeUtil')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local SCORE_STATUS = 'S'
 
@@ -32,7 +30,7 @@ CustomMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.types.P
 	random = 'boolean',
 })
 
----@class StormgateMatchGroupUtilGamePlayer: StormgateStandardPlayer
+---@class StormgateMatchGroupUtilGamePlayer: standardPlayer
 ---@field matchplayerIndex integer
 ---@field heroes string[]?
 ---@field position integer
@@ -67,7 +65,6 @@ CustomMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 
 ---@class StormgateMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games StormgateMatchGroupUtilGame[]
----@field opponents StormgateStandardOpponent[]
 ---@field vetoes StormgateMatchGroupUtilVeto[]
 ---@field submatches StormgateMatchGroupUtilSubmatch[]?
 ---@field casters string?
@@ -134,7 +131,7 @@ function CustomMatchGroupUtil.populateOpponents(match)
 end
 
 ---@param game StormgateMatchGroupUtilGame
----@param matchOpponents StormgateStandardOpponent[]
+---@param matchOpponents standardOpponent[]
 ---@return StormgateMatchGroupUtilGameOpponent[]
 function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	return Array.map(game.opponents, function(mapOpponent, opponentIndex)
@@ -265,7 +262,7 @@ end
 ---Determines if any players in an opponent aren't playing their main faction by comparing them to a reference opponent.
 ---Returns the factions played if at least one player chose an offFaction or nil if otherwise.
 ---@param gameOpponent StormgateMatchGroupUtilGameOpponent
----@param referenceOpponent StormgateStandardOpponent|StormgateMatchGroupUtilGameOpponent
+---@param referenceOpponent standardOpponent|StormgateMatchGroupUtilGameOpponent
 ---@return string[]?
 function CustomMatchGroupUtil.computeOffFactions(gameOpponent, referenceOpponent)
 	local gameFactions = {}

@@ -1,25 +1,25 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Series
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Tier = require('Module:Tier/Custom')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Tier = Lua.import('Module:Tier/Custom')
+local Variables = Lua.import('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Flags = Lua.import('Module:Flags')
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extension/PrizePool')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
@@ -27,13 +27,16 @@ local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
+local Builder = Widgets.Builder
 local Cell = Widgets.Cell
-local Header = Widgets.Header
-local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
-local Builder = Widgets.Builder
+local Header = Widgets.Header
+local Location = Widgets.Location
+local Organizers = Widgets.Organizers
+local Title = Widgets.Title
+local Venue = Widgets.Venue
 
 ---@class SeriesInfobox: BasicInfobox
 local Series = Class.new(BasicInfobox)
@@ -75,65 +78,39 @@ function Series:createInfobox()
 		},
 		Center{children = {args.caption}},
 		Title{children = 'Series Information'},
-		Builder{
-			builder = function()
-				local organizers = self:_createOrganizers(args)
-				local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
-
-				return {
-					Cell{
-						name = title,
-						content = organizers
-					}
-				}
-			end
-		},
+		Organizers{args = args},
 		Cell{
 			name = 'Sponsor(s)',
-			content = self:getAllArgsForBase(args, 'sponsor')
+			children = self:getAllArgsForBase(args, 'sponsor')
 		},
 		Customizable{id = 'type', children = {}},
 		Customizable{
 			id = 'location',
 			children = {
-				Cell{
-					name = 'Location',
-					content = {
-						self:_createLocation(args.country, args.city)
-					}
+				Location{
+					args = args,
+					infoboxType = 'Series',
+					shouldSetCategory = false,
+					showTbdOnEmpty = false,
 				},
 			}
 		},
-		Builder{
-			builder = function()
-				local venues = {}
-				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue', {requireIndex = false}) do
-					-- TODO: Description
-					local description = ''
-					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], description))
-				end
-
-				return {Cell{
-					name = 'Venue',
-					content = venues
-				}}
-			end
-		},
+		Venue{args = args},
 		Cell{
 			name = 'Date',
-			content = {
+			children = {
 				args.date
 			}
 		},
 		Cell{
 			name = 'Start Date',
-			content = {
+			children = {
 				args.sdate or args.launched or args.inaugurated
 			}
 		},
 		Cell{
 			name = 'End Date',
-			content = {
+			children = {
 				args.edate or args.defunct
 			}
 		},
@@ -146,7 +123,7 @@ function Series:createInfobox()
 				if self.totalSeriesPrizepool then
 					return {Cell{
 						name = 'Cumulative Prize Pool',
-						content = {InfoboxPrizePool.display{prizepoolusd = self.totalSeriesPrizepool}}
+						children = {InfoboxPrizePool.display{prizepoolusd = self.totalSeriesPrizepool}}
 					}}
 				end
 			end
@@ -156,21 +133,12 @@ function Series:createInfobox()
 			children = {
 				Cell{
 					name = 'Liquipedia Tier',
-					content = {self:createLiquipediaTierDisplay(args)},
+					children = {self:createLiquipediaTierDisplay(args)},
 					classes = {self:liquipediaTierHighlighted(args) and 'valvepremier-highlighted' or ''},
 				},
 			}
 		},
-		Builder{
-			builder = function()
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = links},
 		Customizable{id = 'customcontent', children = {}},
 	}
 
@@ -304,17 +272,6 @@ function Series:_getIconFromLeagueIconSmall(lpdbData)
 	return lpdbData
 end
 
----@param country string?
----@param city string?
----@return string
-function Series:_createLocation(country, city)
-	if country == nil or country == '' then
-		return ''
-	end
-
-	return Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' .. (city or country)
-end
-
 ---@param id string?
 ---@param name string?
 ---@param link string?
@@ -354,18 +311,6 @@ function Series:_createLink(id, name, link, desc)
 	end
 
 	return output
-end
-
----@param args table
----@return string[]
-function Series:_createOrganizers(args)
-	local organizers = {}
-
-	for prefix, organizer in Table.iter.pairsByPrefix(args, 'organizer', {requireIndex = false}) do
-		table.insert(organizers, self:_createLink(organizer, args[prefix .. '-name'], args[prefix .. '-link']))
-	end
-
-	return organizers
 end
 
 ---@param args table

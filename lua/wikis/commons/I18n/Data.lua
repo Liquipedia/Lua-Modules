@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:I18n/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,6 +7,10 @@
 
 return {
 	en = {
+		-- Match Stream
+		['matchstream-watch-live'] = 'Watch now',
+		['matchstream-watch-upcoming'] = 'Watch here',
+
 		-- Tournament Filter
 		['tournament-ticker-no-tournaments'] = 'No tournaments found for your selected filters!',
 
@@ -52,5 +55,8 @@ return {
 
 		['brkts-header-q'] = 'Qualified,Qual.,Q',
 		['brkts-header-tp'] = 'Third Place Match,3rd Place,3rd',
+
+		-- MatchSummary Map Veto
+		['matchsummary-mapveto-start'] = 'Start Map Veto',
 	}
 }

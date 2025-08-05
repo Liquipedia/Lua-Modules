@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -61,9 +60,6 @@ local CONTENT = {
 		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
-		panelAttributes = {
-			['data-switch-group-container'] = 'countdown',
-		},
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -78,8 +74,8 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Rainbow Six Siege logo lightmode.svg',
-		darkmode = 'Rainbow Six Siege logo darkmode.svg',
+		lightmode = 'Rainbow Six Siege X full lightmode.svg',
+		darkmode = 'Rainbow Six Siege X full darkmode.svg',
 	},
 	metadesc = 'The Rainbow Six (R6) esports wiki covering everything from players, teams and transfers, ' ..
 		'to tournaments and results, maps, weapons, and operators.',

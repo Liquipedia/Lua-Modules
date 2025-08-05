@@ -1,16 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=smite
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local FnUtil = require('Module:FnUtil')
-local GodNames = mw.loadData('Module:GodNames')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local FnUtil = Lua.import('Module:FnUtil')
+local GodNames = Lua.import('Module:GodNames', {loadData = true})
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 

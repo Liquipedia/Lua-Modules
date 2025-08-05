@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:ParticipantTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -23,7 +22,7 @@ local Variables = require('Module:Variables')
 ---@field soloColumnWidth number
 
 ---@class WarcraftParticipantTableEntry: ParticipantTableEntry
----@field opponent WarcraftStandardOpponent
+---@field opponent standardOpponent
 
 ---@class WarcraftParticipantTableSection: ParticipantTableSection
 ---@field entries WarcraftParticipantTableEntry[]
@@ -36,8 +35,7 @@ local Variables = require('Module:Variables')
 
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local CustomParticipantTable = {}
 
@@ -106,10 +104,9 @@ function CustomParticipantTable:readEntry(sectionArgs, key, index, config)
 		faction = valueFromArgs('race'),
 	}
 
-	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
-		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
+	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
+	local opponent = Opponent.readOpponentArgs(opponentArgs)
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)

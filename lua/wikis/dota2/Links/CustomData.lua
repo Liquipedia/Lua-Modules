@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:Links/CustomData
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -14,5 +13,9 @@ return {
 			player = 'https://www.faceit.com/en/players/',
 			match = 'https://www.faceit.com/en/dota2/room/',
 		},
+		blasttv = {
+			'https://blast.tv/dota/',
+			match = 'https://blast.tv/dota/match'
+		}
 	}
 }

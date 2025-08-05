@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Tournament/Label
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -17,8 +17,13 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local TierPill = Lua.import('Module:Widget/Tournament/TierPill')
 local Title = Lua.import('Module:Widget/Tournament/Title')
 
+---@class TournamentsTickerLabelProps
+---@field tournament StandardTournament
+---@field displayGameIcon boolean?
+
 ---@class TournamentsTickerLabelWidget: Widget
----@operator call(table): TournamentsTickerLabelWidget
+---@operator call(TournamentsTickerLabelProps): TournamentsTickerLabelWidget
+---@field props TournamentsTickerLabelProps
 local TournamentsTickerLabelWidget = Class.new(Widget)
 
 ---@return Widget?

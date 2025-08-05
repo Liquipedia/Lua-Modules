@@ -1,21 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MetadataGenerator
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local AnOrA = require('Module:A or an')
-local Class = require('Module:Class')
-local Date = require('Module:Date/Ext')
-local Flags = require('Module:Flags')
-local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Tier = require('Module:Tier/Utils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local AnOrA = Lua.import('Module:A or an')
+local Class = Lua.import('Module:Class')
+local Date = Lua.import('Module:Date/Ext')
+local Flags = Lua.import('Module:Flags')
+local Game = Lua.import('Module:Game')
+local String = Lua.import('Module:StringUtils')
+local Tier = Lua.import('Module:Tier/Utils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Currency = Lua.import('Module:Currency')
 

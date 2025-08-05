@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=wildcard
 -- page=Module:Infobox/Character/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

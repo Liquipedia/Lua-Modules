@@ -1,17 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/Ffa/GameCountdown
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Date = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Timezone = require('Module:Timezone')
-local VodLink = require('Module:VodLink')
+
+local Class = Lua.import('Module:Class')
+local Date = Lua.import('Module:Date/Ext')
+local Table = Lua.import('Module:Table')
+local Timezone = Lua.import('Module:Timezone')
+local VodLink = Lua.import('Module:VodLink')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -49,7 +49,7 @@ function MatchSummaryFfaGameCountdown:render()
 	return HtmlWidgets.Div{
 		classes = {'match-countdown-block'},
 		children = {
-			require('Module:Countdown')._create(streamParameters),
+			Lua.import('Module:Countdown')._create(streamParameters),
 			game.vod and VodLink.display{vod = game.vod} or nil,
 		},
 	}

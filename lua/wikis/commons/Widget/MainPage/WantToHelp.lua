@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/MainPage/WantToHelp
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -12,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Page = Lua.import('Module:Page')
 local Variables = Lua.import('Module:Variables')
-local WantToHelpList = Lua.import('Module:WantToHelpList')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 
@@ -23,6 +21,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local WantToHelpList = Lua.import('Module:Widget/WantToHelpList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local GREEN_CHECK_CIRCLE = IconFa{
@@ -108,6 +107,7 @@ function WantToHelp:render()
 						'&utm_campaign=Want+to+Help+' .. mw.uri.encode(mw.site.siteName) .. '&utm_id=Want+to+Help',
 					linktype = 'external',
 					title = 'Click here to create an account',
+					variant = 'tertiary',
 					children = {
 						IconFa{iconName = 'createaccount'},
 						' Create Account'
@@ -116,7 +116,7 @@ function WantToHelp:render()
 				showWhenLoggedOut(Button{
 					link = 'Special:UserLogin',
 					title = 'Click here to log in',
-					variant = 'secondary',
+					variant = 'tertiary',
 					children = {
 						IconFa{iconName = 'login'},
 						' Log In'
@@ -126,7 +126,7 @@ function WantToHelp:render()
 					link = 'https://discord.gg/liquipedia',
 					linktype = 'external',
 					title = 'Click here to join our discord server',
-					variant = 'secondary',
+					variant = 'tertiary',
 					children = {
 						IconFa{iconName = 'discord'},
 						' Join Our Discord'
@@ -135,7 +135,7 @@ function WantToHelp:render()
 				Page.exists('Help:Contents') and Button{
 					link = 'Help:Contents',
 					title = 'Click Here to Read our Help Articles',
-					variant = 'secondary',
+					variant = 'tertiary',
 					children = {
 						IconFa{iconName = 'helparticles'},
 						' Help Articles'
@@ -151,19 +151,15 @@ function WantToHelp:render()
 				['line-height'] = '2em',
 				['margin-top'] = '1em'
 			},
-			children = {'\n', WantToHelpList.get{}}
+			children = {'\n', WantToHelpList{}}
 		},
 		HtmlWidgets.Br{},
 		'In total there are ',
-		Builder{builder = function ()
-			local text = Variables.varDefault('total_number_of_todos', 0) .. ' pages'
-			if Page.exists('Liquipedia:Want to help/All') then
-				return Link{
-					link = 'Liquipedia:Want to help/All',
-					children = text
-				}
-			end
-			return text
+		Builder{builder = function () -- need the builder so the var is available when accessing it
+			return Link{
+				link = 'Liquipedia:Want to help/All',
+				children = {Variables.varDefault('total_number_of_todos', 0) .. ' pages'}
+			}
 		end},
 		' listed needing help.'
 	}

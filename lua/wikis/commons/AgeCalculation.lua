@@ -1,15 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:AgeCalculation
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local String = require('Module:StringUtils')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local String = Lua.import('Module:StringUtils')
 
 local AgeCalculation = {}
 
@@ -222,8 +223,8 @@ function Age:_secondsToAge(seconds)
 end
 
 ---@param args table
----@return {birthDateIso: string?, deathDateIso: string?, categories: string[], birth: string?, death: string?}
-function AgeCalculation.run(args)
+---@return Age
+function AgeCalculation.raw(args)
 	local birthLocation = args.birthlocation
 	local birthDate = BirthDate(args.birthdate, birthLocation)
 	local deathLocation = args.deathlocation
@@ -231,7 +232,17 @@ function AgeCalculation.run(args)
 
 	AgeCalculation._assertValidDates(birthDate, deathDate)
 
-	local age = Age(birthDate, deathDate):makeDisplay()
+	return Age(birthDate, deathDate)
+end
+
+---@param args table
+---@return {birthDateIso: string?, deathDateIso: string?, categories: string[], birth: string?, death: string?}
+function AgeCalculation.run(args)
+	local ageRaw = AgeCalculation.raw(args)
+	local age = ageRaw:makeDisplay()
+
+	local birthDate = ageRaw.birthDate
+	local deathDate = ageRaw.deathDate
 
 	local categories = Array.append({},
 		age.birth and not birthDate.isExact and 'Incomplete birth dates' or nil,
