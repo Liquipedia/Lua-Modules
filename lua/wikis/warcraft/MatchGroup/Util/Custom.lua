@@ -24,7 +24,7 @@ local SCORE_STATUS = MatchGroupInputUtil.STATUS.SCORE
 
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
----@class WarcraftMatchGroupUtilGamePlayer: WarcraftStandardPlayer
+---@class WarcraftMatchGroupUtilGamePlayer: standardPlayer
 ---@field matchplayerIndex integer
 ---@field heroes string[]?
 ---@field position integer
@@ -55,7 +55,7 @@ local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 ---@class WarcraftMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games WarcraftMatchGroupUtilGame[]
 ---@field opponentMode 'uniform'|'team'
----@field opponents WarcraftStandardOpponent[]
+---@field opponents standardOpponent[]
 ---@field vetoes WarcraftMatchGroupUtilVeto[]
 ---@field submatches WarcraftMatchGroupUtilSubmatch[]?
 ---@field casters string?
@@ -124,7 +124,7 @@ end
 
 
 ---@param game WarcraftMatchGroupUtilGame
----@param matchOpponents WarcraftStandardOpponent[]
+---@param matchOpponents standardOpponent[]
 ---@return WarcraftMatchGroupUtilGameOpponent[]
 function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	return Array.map(game.opponents, function(mapOpponent, opponentIndex)
@@ -252,7 +252,7 @@ end
 ---Determines if any player in an opponent is not playing their main faction by comparing them to a reference opponent.
 ---Returns the factions played if at least one player chose an offfaction or nil if otherwise.
 ---@param gameOpponent WarcraftMatchGroupUtilGameOpponent
----@param referenceOpponent WarcraftStandardOpponent|WarcraftMatchGroupUtilGameOpponent
+---@param referenceOpponent standardOpponent|WarcraftMatchGroupUtilGameOpponent
 ---@return string[]?
 function CustomMatchGroupUtil.computeOfffactions(gameOpponent, referenceOpponent)
 	local gameFactions = {}

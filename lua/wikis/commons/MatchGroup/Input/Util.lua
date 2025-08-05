@@ -251,7 +251,7 @@ The opponent struct is retrieved programmatically via Module:Opponent, by using 
 Using the team template extension, the opponent struct is standardised and not user input dependant, unlike the record.
 ]]
 ---@param record table
----@param opponent standardOpponent|StarcraftStandardOpponent|StormgateStandardOpponent|WarcraftStandardOpponent
+---@param opponent standardOpponent|StarcraftStandardOpponent
 ---@param substitutions MatchGroupInputSubstituteInformation[]?
 ---@return MGIParsedOpponent
 function MatchGroupInputUtil.mergeRecordWithOpponent(record, opponent, substitutions)
