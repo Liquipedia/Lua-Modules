@@ -21,9 +21,8 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Custom')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local ICONS = {
 	veto = Icon.makeIcon{iconName = 'veto', color = 'cinnabar-text', size = '110%'},
@@ -42,7 +41,7 @@ function StarcraftMatchSummary.getByMatchId(args)
 end
 
 ---@param match StarcraftMatchGroupUtilMatch
----@return MatchSummaryBody
+---@return Widget[]
 function StarcraftMatchSummary.createBody(match)
 	StarcraftMatchSummary.computeOffFactions(match)
 
@@ -52,7 +51,7 @@ function StarcraftMatchSummary.createBody(match)
 		subMatches = match.submatches or {}
 	end
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+	return WidgetUtil.collect(
 		isResetMatch and MatchSummaryWidgets.Row{
 			classes = {'brkts-popup-sc-veto-center'},
 			css = {['line-height'] = '80%', ['font-weight'] = 'bold'},
@@ -62,11 +61,11 @@ function StarcraftMatchSummary.createBody(match)
 		subMatches and Array.map(subMatches, StarcraftMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(StarcraftMatchSummary.Game, {})),
 		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
-			classes = {'brkts-popup-sc-game-header brkts-popup-sc-veto-center'},
-			children = {'Vetoes'},
+			classes = {'brkts-popup-sc-veto-center'},
+			children = {HtmlWidgets.B{children = {'Vetoes'}}},
 		} or nil,
 		Array.map(match.vetoes or {}, StarcraftMatchSummary.Veto) or nil
-	)}
+	)
 end
 
 ---@param match StarcraftMatchGroupUtilMatch

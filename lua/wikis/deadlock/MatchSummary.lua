@@ -30,14 +30,14 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return MatchSummaryBody
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+	return WidgetUtil.collect(
 		Array.map(match.games, CustomMatchSummary._createGame),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	)}
+	)
 end
 
 ---@param players table[]
@@ -54,7 +54,6 @@ function CustomMatchSummary._createGame(game, gameIndex)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '80%', padding = '4px'},
 		children = WidgetUtil.collect(
 			CustomMatchSummary._createIcon(ICONS[extradata.team1side]),
 			MatchSummaryWidgets.Characters{

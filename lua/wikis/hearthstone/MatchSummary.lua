@@ -15,8 +15,7 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local CustomMatchSummary = {}
 
@@ -27,17 +26,17 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match HearthstoneMatchGroupUtilMatch
----@return MatchSummaryBody
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
 	local submatches
 	if match.isTeamMatch then
 		submatches = match.submatches or {}
 	end
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+	return WidgetUtil.collect(
 		submatches and Array.map(submatches, CustomMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(CustomMatchSummary.Game, {isPartOfSubMatch = false}))
-	)}
+	)
 end
 
 ---@param submatch HearthstoneMatchGroupUtilSubmatch
@@ -106,7 +105,7 @@ function CustomMatchSummary.Game(options, game, gameIndex)
 
 	return rowWidget{
 		classes = {'brkts-popup-body-game'},
-		css = {width = options.isPartOfSubMatch and '100%' or nil, ['font-size'] = '0.75rem'},
+		css = {width = options.isPartOfSubMatch and '100%' or nil},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameTeamWrapper{children = createOpponentDisplay(1)},
 			MatchSummaryWidgets.GameCenter{css = {flex = '0 0 16%'}, children = 'Game ' .. gameIndex},

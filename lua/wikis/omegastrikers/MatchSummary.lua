@@ -29,11 +29,11 @@ function CustomMatchSummary.createBody(match)
 		return {bans.team1 or {}, bans.team2 or {}}
 	end)
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+	return WidgetUtil.collect(
 		Array.map(match.games, CustomMatchSummary._createMapRow),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	)}
+	)
 end
 
 function CustomMatchSummary._gameScore(game, opponentIndex)
@@ -50,7 +50,7 @@ function CustomMatchSummary._createMapRow(game)
 			MatchSummaryWidgets.Characters{
 				flipped = opponentIndex == 2,
 				characters = Array.map((game.opponents[opponentIndex] or {}).players or {}, Operator.property('striker')),
-				bg = opponentIndex == 1 and 'brkts-popup-side-color-blue' or 'brkts-popup-side-color-red',
+				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (opponentIndex == 1 and 'blue' or 'red')
 			},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
 			DisplayHelper.MapScore(game.opponents[opponentIndex], game.status)

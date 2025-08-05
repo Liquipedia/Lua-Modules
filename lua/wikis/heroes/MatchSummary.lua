@@ -30,16 +30,16 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return MatchSummaryBody
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+	return WidgetUtil.collect(
 		Array.map(match.games, FnUtil.curry(CustomMatchSummary._createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {emptyMapDisplay = FP}))
-	)}
+	)
 end
 
 ---@param date string
@@ -60,13 +60,12 @@ function CustomMatchSummary._createGame(date, game)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '90%', padding = '4px'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.Characters{
 				flipped = false,
 				date = date,
 				characters = characterData[1],
-				bg = 'brkts-popup-side-color-' .. (extradata.team1side or ''),
+				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team1side or ''),
 			},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game), css = {['flex-grow'] = 1}},
@@ -75,7 +74,7 @@ function CustomMatchSummary._createGame(date, game)
 				flipped = true,
 				date = date,
 				characters = characterData[2],
-				bg = 'brkts-popup-side-color-' .. (extradata.team2side or ''),
+				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team2side or ''),
 			},
 			MatchSummaryWidgets.GameComment{children = WidgetUtil.collect(
 				game.comment,

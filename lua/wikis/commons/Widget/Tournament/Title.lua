@@ -18,7 +18,6 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class TournamentTitleProps
 ---@field tournament StandardTournamentPartial
----@field stageName string?
 ---@field displayGameIcon boolean?
 
 ---@class TournamentTitleWidget: Widget
@@ -32,8 +31,6 @@ function TournamentTitleWidget:render()
 	if not tournament then
 		return
 	end
-
-	local hasStage = self.props.stageName ~= nil
 
 	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
 		self.props.displayGameIcon and Game.icon{
@@ -59,11 +56,9 @@ function TournamentTitleWidget:render()
 			children = {
 				Link{
 					link = tournament.pageName,
-					children = HtmlWidgets.Fragment{children = {
+					children = {
 						tournament.displayName,
-						hasStage and ' - ' or nil,
-						hasStage and self.props.stageName or nil
-					}}
+					},
 				},
 			}
 		}

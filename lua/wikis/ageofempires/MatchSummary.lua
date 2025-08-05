@@ -19,8 +19,7 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 local PlayerDisplay = require('Module:Player/Display')
 
 local CustomMatchSummary = {}
@@ -41,7 +40,7 @@ function CustomMatchSummary._determineWidth(match)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
 	local games = Array.map(match.games, function(game)
 		return CustomMatchSummary._createGame(game, {
@@ -50,9 +49,9 @@ function CustomMatchSummary.createBody(match)
 		})
 	end)
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+	return WidgetUtil.collect(
 		games
-	)}
+	)
 end
 
 ---@param match MatchGroupUtilMatch
@@ -125,7 +124,6 @@ function CustomMatchSummary._createGame(game, props)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '0.75rem'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameTeamWrapper{children = {
 					faction1,

@@ -37,7 +37,7 @@ function MatchCountdown:render()
 		classes = {'match-info-countdown'},
 		children = Countdown._create{
 			rawdatetime = match.finished,
-			date = DateExt.toCountdownArg(match.timestamp, match.extradata.timezoneid, match.dateIsExact),
+			date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
 			finished = match.finished,
 		},
 	}

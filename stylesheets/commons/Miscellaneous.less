@@ -2119,6 +2119,17 @@ Author(s): hjpalpha
 	clear: none;
 }
 
+.hotkey-button {
+	background-color: var( --clr-moon-background-color, #f0f0f0 );
+	width: 54px;
+	height: 54px;
+	border-radius: 4px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-weight: bold;
+}
+
 /*******************************************************************************
 Template: Sad box for main page
 Author(s): FO-nTTaX
@@ -2227,6 +2238,12 @@ Author(s): iMarbot
 		}
 	}
 
+	& img[ src*="Vod.svg" ],
+	& img[ src*="Vod-" ] {
+		/* Changes the color of the VOD icon to Secondary 80 (B3B3B3) */
+		filter: invert( 79% ) sepia( 1% ) saturate( 0% ) hue-rotate( 121deg ) brightness( 93% ) contrast( 85% );
+	}
+
 	& img.player-role-icon,
 	.rts-team-list-icon-tag img {
 		&[ src*="/Trial.png" ],
@@ -2234,14 +2251,6 @@ Author(s): iMarbot
 		&[ src*="Captain_Icon" ] {
 			filter: invert( 1 );
 		}
-	}
-}
-
-.theme--dark img.player-role-icon {
-	&[ src*="/Trial.png" ],
-	&[ src*="/Substitution.png" ],
-	&[ src*="Captain_Icon" ] {
-		filter: invert( 1 );
 	}
 }
 
@@ -2835,5 +2844,30 @@ Template(s): ChampionIconTable
 
 	.theme--dark & {
 		background-color: #a90012;
+	}
+}
+
+/*******************************************************************************
+Author(s): Rathoz
+Attritute highlight, so far only used in Infoboxes, but can be used anywhere
+*******************************************************************************/
+.primaryAttribute img {
+	.dota2 &,
+	.dota2gameru & {
+		border: 0.125rem solid var( --clr-primary-100 );
+		border-radius: 50%;
+	}
+
+	.warcraft & {
+		border: 0.25rem solid var( --clr-wiki-theme-primary );
+		border-radius: 0.75rem;
+	}
+}
+
+.secondaryAttribute img {
+	.dota2 &,
+	.dota2gameru & {
+		border: 0.125rem solid var( --clr-secondary-7 );
+		border-radius: 50%;
 	}
 }

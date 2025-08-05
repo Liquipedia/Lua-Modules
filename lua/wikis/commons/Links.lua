@@ -83,7 +83,7 @@ local PREFIXES = {
 		match = 'https://www.chessgames.com/perl/chessgame?gid=',
 	},
 	chessresults = {'https://chess-results.com/'},
-	chzzk = {'https://chzzk.naver.com/live/'},
+	chzzk = {'https://chzzk.naver.com/'},
 	civdraft = {match = 'https://aoe2cm.net/draft/'},
 	cntft = {'https://lol.qq.com/tft/#/masterDetail/'},
 	corestrike = {'https://corestrike.gg/lookup/'},

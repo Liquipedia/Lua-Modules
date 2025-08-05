@@ -7,9 +7,10 @@
 
 local CustomMatchSummary = {}
 
-local Array = require('Module:Array')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
@@ -26,15 +27,15 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return MatchSummaryBody
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+	return WidgetUtil.collect(
 		Array.map(match.games, CustomMatchSummary._createGame),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	)}
+	)
 end
 
 ---@param game MatchGroupUtilGame
@@ -54,12 +55,11 @@ function CustomMatchSummary._createGame(game, gameIndex)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '80%', padding = '4px'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.Characters{
 				flipped = false,
 				characters = characterData[1],
-				bg = 'brkts-popup-side-color-' .. (extradata.team1side or ''),
+				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team1side or ''),
 			},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			MatchSummaryWidgets.GameCenter{children = Logic.nilIfEmpty(game.length) or ('Game ' .. gameIndex)},
@@ -67,7 +67,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 			MatchSummaryWidgets.Characters{
 				flipped = true,
 				characters = characterData[2],
-				bg = 'brkts-popup-side-color-' .. (extradata.team2side or ''),
+				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team2side or ''),
 			},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
