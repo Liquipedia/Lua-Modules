@@ -12,8 +12,7 @@ local Table = Lua.import('Module:Table')
 
 local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local _tbd_index = 0
 
@@ -77,6 +76,7 @@ function AwardPlacement:_getLpdbData(...)
 
 		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_BASE_CURRENCY .. 1)) or 0
 		local pointsReward = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
+		local pointsReward2 = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
 		local lpdbData = {
 			date = opponent.date,
 			prizemoney = prizeMoney,
@@ -86,6 +86,7 @@ function AwardPlacement:_getLpdbData(...)
 			extradata = {
 				award = self.award,
 				prizepoints = tostring(pointsReward or ''),
+				prizepoints2 = tostring(pointsReward2 or ''),
 				-- legacy
 				participantteam = (opponentType == Opponent.solo and players.p1team)
 									and Opponent.toName{template = players.p1team, type = 'team'}

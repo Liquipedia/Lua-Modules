@@ -19,9 +19,8 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local NON_BREAKING_SPACE = '&nbsp;'
 local OPPONENT_HEIGHT_PADDING = 4
@@ -821,7 +820,10 @@ by passing in a different props.OpponentEntry in the Bracket component.
 ---@param props {opponent: standardOpponent, displayType: string, forceShortName: boolean?, height: number}
 ---@return Html
 function BracketDisplay.OpponentEntry(props)
-	local opponentEntry = OpponentDisplay.BracketOpponentEntry(props.opponent, {forceShortName = props.forceShortName})
+	local opponentEntry = OpponentDisplay.BracketOpponentEntry(
+		props.opponent,
+		{forceShortName = props.forceShortName, showTbd = false}
+	)
 	if props.displayType == 'bracket' then
 		opponentEntry:addScores(props.opponent)
 	end

@@ -13,9 +13,8 @@ local Json = Lua.import('Module:Json')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
@@ -44,7 +43,7 @@ function UnofficialWorldChampion:createInfobox()
 	local args = self.args
 
 	args.currentChampOpponent = Opponent.readOpponentArgs(
-		Json.parseIfString(args['current champion']) or Opponent.tbd()
+		Json.parseIfString(args['current champion'])
 	)
 
 	local widgets = {

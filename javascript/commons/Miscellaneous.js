@@ -33,6 +33,9 @@ liquipedia.teamcard = {
 				hideplayers = 'Hide Players';
 			}
 			const button = document.createElement( 'button' );
+			button.classList.add( 'btn' );
+			button.classList.add( 'btn-secondary' );
+			button.classList.add( 'btn-small' );
 			button.innerHTML = showplayers;
 			button.addEventListener( 'click', () => {
 				if ( teamcardsopened ) {
@@ -64,6 +67,7 @@ liquipedia.teamcard = {
 		document.querySelectorAll( '.teamcard-former-toggle-button' ).forEach( ( wrap ) => {
 			const teamcard = wrap.closest( '.teamcard' );
 			const button = document.createElement( 'button' );
+			button.classList.add( 'btn', 'btn-secondary', 'btn-small' );
 			let width = 156;
 			if ( typeof wrap.dataset.width !== 'undefined' ) {
 				width = parseInt( wrap.dataset.width );
@@ -114,6 +118,7 @@ liquipedia.teamcard = {
 		document.querySelectorAll( '.teamcard-subs-toggle-button' ).forEach( ( wrap ) => {
 			const teamcard = wrap.closest( '.teamcard' );
 			const button = document.createElement( 'button' );
+			button.classList.add( 'btn', 'btn-secondary', 'btn-small' );
 			let width = 156;
 			if ( typeof wrap.dataset.width !== 'undefined' ) {
 				width = parseInt( wrap.dataset.width );
@@ -165,6 +170,7 @@ liquipedia.teamcard = {
 		document.querySelectorAll( '.teamcard-active-toggle-button' ).forEach( ( wrap ) => {
 			const teamcard = wrap.closest( '.teamcard' );
 			const button = document.createElement( 'button' );
+			button.classList.add( 'btn', 'btn-secondary', 'btn-small' );
 			let width = 156;
 			if ( typeof wrap.dataset.width !== 'undefined' ) {
 				width = parseInt( wrap.dataset.width );

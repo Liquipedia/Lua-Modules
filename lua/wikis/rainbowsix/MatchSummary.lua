@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local DateExt = Lua.import('Module:Date/Ext')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local FnUtil = require('Module:FnUtil')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -27,13 +26,12 @@ local CustomMatchSummary = {}
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '360px'})
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return MatchSummaryBody
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
 	local characterBansData = Array.map(match.games, function(game)
 		local extradata = game.extradata or {}
@@ -43,13 +41,12 @@ function CustomMatchSummary.createBody(match)
 		}
 	end)
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+	return WidgetUtil.collect(
 		Array.map(match.games, FnUtil.curry(CustomMatchSummary.createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	)}
+	)
 end
 
 ---@param date string
@@ -93,13 +90,12 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game', gameStatusBackground},
-		css = {['font-size'] = '85%'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			MatchSummaryWidgets.DetailedScore{
 				score = scoreDisplay(1),
 				flipped = false,
-		partialScores = makePartialScores(
+				partialScores = makePartialScores(
 					extradata.t1halfs or {},
 					firstSide,
 					firstSideOt
@@ -109,7 +105,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 			MatchSummaryWidgets.DetailedScore{
 				score = scoreDisplay(2),
 				flipped = true,
-		partialScores = makePartialScores(
+				partialScores = makePartialScores(
 					extradata.t2halfs or {},
 					CustomMatchSummary._getOppositeSide(firstSide),
 					CustomMatchSummary._getOppositeSide(firstSideOt)

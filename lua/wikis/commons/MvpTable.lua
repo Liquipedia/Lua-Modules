@@ -21,9 +21,8 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local MvpTable = {}
 
@@ -195,7 +194,6 @@ function MvpTable._row(item, args)
 				pageName = item.name,
 				team = item.team and TeamTemplate.resolve(item.team, DateExt.getContextualDateOrNow()) or nil,
 			}}},
-			showLink = true,
 			overflow = 'ellipsis',
 			showPlayerTeam = true,
 		}):done()

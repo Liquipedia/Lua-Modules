@@ -18,8 +18,7 @@ local Team = Lua.import('Module:Team')
 
 local CustomDefaultOptions = Lua.requireIfExists('Module:Infobox/Extension/Achievements/Custom') or {}
 
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local NON_BREAKING_SPACE = '&nbsp;'
 local DEFAULT_PLAYER_LIMIT = 10

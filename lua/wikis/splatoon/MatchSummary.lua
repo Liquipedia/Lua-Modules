@@ -39,7 +39,6 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '90%', padding = '4px'},
 		children = WidgetUtil.collect(
 			CustomMatchSummary._opponentWeaponsDisplay{
 				data = weaponsData[1],

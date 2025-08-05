@@ -71,7 +71,11 @@ return {
 				mode = 'merge',
 			},
 		},
-
+		thisDay = {
+			tiers = {1, 2},
+			excludeTierTypes = {'Qualifier'},
+			showPatches = true,
+		},
 	},
 	defaultRoundPrecision = 0,
 }

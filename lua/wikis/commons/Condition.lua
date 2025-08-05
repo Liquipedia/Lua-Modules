@@ -176,10 +176,44 @@ function ColumnName:toString()
 	return self.name
 end
 
+local ConditionUtil = {}
+
+---Builds "matches any of" condition from the given collection of values.
+---@param column ColumnName
+---@param values (string|number)[]
+---@return ConditionTree?
+function ConditionUtil.anyOf(column, values)
+	return ConditionUtil._multiValueCondition(column, BooleanOperator.any, Comparator.equals, values)
+end
+
+---Builds "matches none of" condition from the given collection of values.
+---@param column ColumnName
+---@param values (string|number)[]
+---@return ConditionTree?
+function ConditionUtil.noneOf(column, values)
+	return ConditionUtil._multiValueCondition(column, BooleanOperator.all, Comparator.notEquals, values)
+end
+
+---@package
+---@param column ColumnName
+---@param booleanOperator lpdbBooleanOperator
+---@param comparator lpdbComparator
+---@param values (string|number)[]
+---@return ConditionTree?
+function ConditionUtil._multiValueCondition(column, booleanOperator, comparator, values)
+	if Logic.isEmpty(values) then return end
+
+	return ConditionTree(booleanOperator)
+		:add(Array.map(Array.unique(values), function(value)
+			return ConditionNode(column, comparator, value)
+		end))
+end
+
 Condition.Tree = ConditionTree
 Condition.Node = ConditionNode
 Condition.Comparator = Comparator
 Condition.BooleanOperator = BooleanOperator
 Condition.ColumnName = ColumnName
+Condition.Util = ConditionUtil
 
 return Condition

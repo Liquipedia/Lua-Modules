@@ -249,5 +249,9 @@ return {
 				mode = 'merge',
 			},
 		},
+		thisDay = {
+			tiers = {1, 2, 3},
+			excludeTierTypes = {'Qualifier'},
+		},
 	},
 }

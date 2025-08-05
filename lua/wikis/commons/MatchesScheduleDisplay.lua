@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info')
 local HiddenSort = Lua.import('Module:HiddenSort')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
@@ -18,9 +19,8 @@ local Table = Lua.import('Module:Table')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -71,7 +71,7 @@ function MatchesTable:init(args)
 		showRound = not Logic.readBool(args.hideround),
 		sortRound = Logic.readBool(args.sortround),
 		showCountdown = Logic.readBool(args.countdown),
-		showMatchPage = Logic.readBool(args.matchpage),
+		showMatchPage = Info.config.match2.matchPage,
 		onlyShowExactDates = Logic.readBool(args.dateexact),
 		shortenRoundNames = Logic.readBool(args.shortedroundnames),
 		pages = Array.map(Array.extractValues(
@@ -185,6 +185,7 @@ function MatchesTable:dateDisplay(match)
 			countdownArgs.rawdatetime = true
 		end
 		countdownArgs.timestamp = match.timestamp
+		countdownArgs.date = DateExt.toCountdownArg(match.timestamp, match.timezoneId)
 		return dateCell:wikitext(Countdown._create(countdownArgs))
 	elseif self.config.onlyShowExactDates then
 		return dateCell
@@ -324,10 +325,7 @@ end
 ---@return Html
 function MatchesTable.matchPageLinkDisplay(match)
 	return mw.html.create('td'):addClass('MatchPage')
-		:node(MatchPageButton{
-			matchId = match.matchId,
-			hasMatchPage = Logic.isNotEmpty(match.bracketData.matchPage)
-		})
+		:node(MatchPageButton{match = match})
 end
 
 ---@param opponent standardOpponent

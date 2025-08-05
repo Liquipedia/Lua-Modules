@@ -19,6 +19,7 @@ return {
 		'apexlegendsstatus',
 		'battlefy',
 		'b5csgo',
+		'blasttv',
 		'cfs',
 		'challengermode',
 		'challonge',

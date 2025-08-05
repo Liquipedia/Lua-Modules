@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
+local Ordinal = Lua.import('Module:Ordinal')
 local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
@@ -30,9 +31,31 @@ function TransferNavBox:render()
 	local miscPages = Table.extract(pagesByYear, 'misc')
 	---@cast pagesByYear table<integer, string[]>
 
+	local remainingPagesByYear = {}
+
+	local firstEntry
+
 	for year, pages in Table.iter.spairs(pagesByYear, TransferNavBox._sortByYear) do
 		---@type table
-		local childData = Array.map(pages, TransferNavBox._buildPageDisplay)
+		local childData = Array.map(pages, function(pageName)
+			local abbreviation = TransferNavBox._readQuarterOrMonth(pageName)
+			if not abbreviation then
+				if not remainingPagesByYear[year] then
+					remainingPagesByYear[year] = {}
+				end
+				table.insert(remainingPagesByYear[year], pageName)
+				return
+			end
+			if not firstEntry then
+				firstEntry = {pageName = pageName, year = year, abbreviation = abbreviation}
+			end
+
+			return Link{
+				link = pageName,
+				children = {abbreviation}
+			}
+		end)
+
 		if Logic.isNotEmpty(childData) then
 			childData.name = year
 			collapsedChildren['child' .. childIndex] = childData
@@ -40,8 +63,11 @@ function TransferNavBox:render()
 		end
 	end
 
+	if firstEntry then
+		collapsedChildren = TransferNavBox._checkForCurrentQuarterOrMonth(collapsedChildren, firstEntry)
+	end
 
-	local unsorted, unsourced, yearly, additionalMisc = TransferNavBox._getUnsortedUnsourcedYearly(pagesByYear)
+	local unsorted, unsourced, yearly, additionalMisc = TransferNavBox._getUnsortedUnsourcedYearly(remainingPagesByYear)
 	if Logic.isNotEmpty(unsorted) then
 		collapsedChildren['child' .. childIndex] = Table.merge(unsorted, {name = 'Unsorted'})
 		childIndex = childIndex + 1
@@ -83,6 +109,61 @@ function TransferNavBox:render()
 end
 
 ---@private
+---@param children table<string, table<string|integer, string|Widget|integer>>
+---@param firstEntry {pageName: string, year: integer, abbreviation: string}
+---@return table<string, table<string|integer, string|Widget|integer>>
+function TransferNavBox._checkForCurrentQuarterOrMonth(children, firstEntry)
+	local currentYear = DateExt.getYearOf()
+	local currentQuarter = DateExt.quarterOf{}
+	local currentMonth = DateExt.getMonthOf()
+	local quarter = tonumber((firstEntry.abbreviation:match('Q(%d)')))
+	local origMonthAbbreviation = firstEntry.abbreviation:gsub('#.*', '')
+	local monthTimeStamp = (not quarter) and DateExt.readTimestamp(origMonthAbbreviation .. ' 1970') or nil
+	local month = monthTimeStamp and DateExt.formatTimestamp('n', monthTimeStamp) or nil
+
+	local addCurrent = function()
+		if not month and not quarter then return children end
+		local pageName = firstEntry.pageName
+			:gsub(firstEntry.year, currentYear)
+
+		if quarter then
+			local ordinal = currentQuarter .. Ordinal.suffix(currentQuarter)
+			pageName = pageName:gsub('(%d)%a%a(_[qQ]uarter)', ordinal .. '%1')
+			table.insert(children.child0, 1, Link{
+				link = pageName,
+				children = {'Q' .. currentQuarter},
+			})
+			return children
+		end
+
+		local monthAbbreviation = TransferNavBox._getMonthAbbreviation(month)
+		if not monthAbbreviation then return children end
+
+		pageName = pageName:gsub('/[^/]*/?%d?$', '/' .. monthAbbreviation)
+		table.insert(children.child0, 1, Link{
+			link = pageName,
+			children = {monthAbbreviation},
+		})
+		return children
+	end
+
+	if currentYear == firstEntry.year then
+		if quarter == currentQuarter or month == currentMonth then
+			return children
+		end
+		return addCurrent()
+	elseif currentYear ~= (firstEntry.year + 1) or currentMonth ~= 1 then
+		return children
+	end
+	children = Table.map(children, function(key, child)
+		local index = tonumber((key:match('child(%d)')))
+		return 'child' .. (index + 1), child
+	end)
+	children.child0 = {name = currentYear}
+	return addCurrent()
+end
+
+---@private
 ---@param tbl table
 ---@param year1 integer
 ---@param year2 integer
@@ -103,11 +184,11 @@ function TransferNavBox._getUnsortedUnsourcedYearly(pagesByYear)
 	end
 
 	local unsorted, unsourced, yearly, misc = {}, {}, {}, {}
+	local latestYear
 	for year, pages in Table.iter.spairs(pagesByYear, TransferNavBox._sortByYear) do
 		Array.forEach(pages, function(pageName)
-			local name, name2, _
-			_, _, name = string.find(pageName, '.*/' .. year .. '/(.*)')
-			_, _, name2 = string.find(pageName, '.*/(.*)/' .. year)
+			local name = pageName:match('.*/' .. year .. '/(.*)')
+			local name2 = pageName:match('.*/(.*)/' .. year)
 			name = (name or name2 or ''):lower()
 			if name == 'unsorted' then
 				table.insert(unsorted, toDisplay(pageName, year))
@@ -115,31 +196,49 @@ function TransferNavBox._getUnsortedUnsourcedYearly(pagesByYear)
 				table.insert(unsourced, toDisplay(pageName, year))
 			elseif pageName:match('[tT]ransfers/' .. year .. '$') then
 				table.insert(yearly, toDisplay(pageName, year))
+				if not latestYear then
+					latestYear = {year = tonumber(year), pageName = pageName}
+				end
 			else
 				table.insert(misc, pageName)
 			end
 		end)
 	end
 
+	local currentYear = DateExt.getYearOf()
+	if latestYear and currentYear == (latestYear.year + 1) then
+		local pageName = latestYear.pageName:gsub(latestYear.year, currentYear)
+		table.insert(yearly, 1, toDisplay(pageName, currentYear))
+	end
+
 	return unsorted, unsourced, yearly, misc
 end
 
+
 ---@private
 ---@param pageName string
----@return Widget?
-function TransferNavBox._buildPageDisplay(pageName)
+---@return string?
+function TransferNavBox._readQuarterOrMonth(pageName)
 	-- try to extract quarter
-	local quarter, _
-	_, _, quarter = string.find(pageName, '.*(%d)%a%a_[qQ]uarter.*')
+	local quarter = pageName:match('.*(%d)%a%a_[qQ]uarter.*')
 	if Logic.isNotEmpty(quarter) then
-		return Link{
-			link = pageName,
-			children = {'Q' .. quarter}
-		}
+		return 'Q' .. quarter
 	end
 	-- try to extract month
-	local month
-	_, _, month = string.find(pageName, '.*[tT]ransfers/%d%d%d%d/(.*)')
+	local month = pageName:match('.*[tT]ransfers/%d%d%d%d/(.*)$')
+	if not month then return end
+	local appendix = month:match('/(%d)$')
+	month = month:gsub('/%d$', '')
+
+	local abbreviation = TransferNavBox._getMonthAbbreviation(month)
+	if not abbreviation then return end
+	return table.concat({abbreviation, appendix}, '#')
+end
+
+---@private
+---@param month string?
+---@return string?
+function TransferNavBox._getMonthAbbreviation(month)
 	if Logic.isEmpty(month) then return end
 
 	-- we have to account for transfer pages not fitting the format we will ignore those and throw them away
@@ -150,11 +249,8 @@ function TransferNavBox._buildPageDisplay(pageName)
 		return DateExt.formatTimestamp('M', timestamp)
 	end
 	local success, monthAbbrviation = pcall(formatMonth)
-	if not success then return end
-	return Link{
-		link = pageName,
-		children = {monthAbbrviation}
-	}
+
+	return success and monthAbbrviation or nil
 end
 
 ---@private

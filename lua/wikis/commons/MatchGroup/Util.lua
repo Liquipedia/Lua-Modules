@@ -22,7 +22,6 @@ local Variables = Lua.import('Module:Variables')
 local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
-local TBD_DISPLAY = '<abbr title="To Be Decided">TBD</abbr>'
 local NOW = os.time()
 
 local nilIfEmpty = String.nilIfEmpty
@@ -142,12 +141,15 @@ MatchGroupUtil.types.BracketData = TypeUtil.union(
 ---@field team string?
 ---@field extradata table?
 ---@field pageIsResolved boolean?
+---@field faction string?
 MatchGroupUtil.types.Player = TypeUtil.struct({
 	displayName = 'string?',
 	flag = 'string?',
 	pageName = 'string?',
 	team = 'string?',
 	extradata = 'table?',
+	pageIsResolved = 'boolean?',
+	faction = 'string?',
 })
 
 ---@class standardOpponent
@@ -166,6 +168,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 ---@field template string?
 ---@field type OpponentType
 ---@field team string?
+---@field extradata table
 MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	advanceBg = 'string?',
 	advances = 'boolean?',
@@ -180,6 +183,7 @@ MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	status2 = 'string?',
 	template = 'string?',
 	type = 'string',
+	extradata = 'table',
 })
 
 ---@class GameOpponent
@@ -241,10 +245,21 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field finished boolean
 ---@field game string?
 ---@field games MatchGroupUtilGame[]
+---@field icon string?
+---@field iconDark string?
 ---@field links table
+---@field liquipediatier string? # TODO: camelCase
+---@field liquipediatiertype string? # TODO: camelCase
 ---@field matchId string?
 ---@field mode string?
 ---@field opponents standardOpponent[]
+---@field pageName string?
+---@field parent string?
+---@field patch string?
+---@field phase 'upcoming'|'ongoing'|'finished'
+---@field publisherTier string?
+---@field section string?
+---@field series string?
 ---@field status MatchStatus
 ---@field stream table
 ---@field tickername string?
@@ -254,6 +269,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field winner number?
 ---@field extradata table?
 ---@field timestamp number
+---@field timezoneId string?
 ---@field bestof number?
 MatchGroupUtil.types.Match = TypeUtil.struct({
 	bracketData = MatchGroupUtil.types.BracketData,
@@ -263,10 +279,20 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	finished = 'boolean',
 	game = 'string?',
 	games = TypeUtil.array(MatchGroupUtil.types.Game),
+	icon = 'string?',
+	iconDark = 'string?',
 	links = 'table',
+	liquipediatier = 'string?',
+	liquipediatiertype = 'string?',
 	matchId = 'string?',
 	mode = 'string',
 	opponents = TypeUtil.array(MatchGroupUtil.types.Opponent),
+	pageName = 'string?',
+	parent = 'string?',
+	patch = 'string?',
+	publisherTier = 'string?',
+	section = 'string?',
+	series = 'string?',
 	status = MatchGroupUtil.types.Status,
 	stream = 'table',
 	tickername = 'string?',
@@ -289,11 +315,17 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 ---@field displayName string
 ---@field pageName string?
 ---@field shortName string
+---@field imageLight string?
+---@field imageDark string?
+---@field hasLegacyImage boolean
 MatchGroupUtil.types.Team = TypeUtil.struct({
 	bracketName = 'string',
 	displayName = 'string',
 	pageName = 'string?',
 	shortName = 'string',
+	imageLight = 'string?',
+	imageDark = 'string?',
+	hasLegacyImage = 'boolean',
 })
 
 ---@class MatchGroupUtilMatchlist
@@ -513,7 +545,7 @@ function MatchGroupUtil.matchFromRecord(record)
 
 	local walkover = nilIfEmpty(record.walkover)
 
-	return {
+	local match = {
 		bestof = tonumber(record.bestof) or 0,
 		bracketData = bracketData,
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
@@ -523,25 +555,36 @@ function MatchGroupUtil.matchFromRecord(record)
 		finished = Logic.readBool(record.finished),
 		game = record.game,
 		games = games,
+		icon = nilIfEmpty(record.icon),
+		iconDark = nilIfEmpty(record.icondark),
 		links = Json.parseIfString(record.links) or {},
 		matchId = record.match2id,
 		liquipediatier = record.liquipediatier,
 		liquipediatiertype = record.liquipediatiertype,
 		mode = record.mode,
 		opponents = opponents,
+		pageName = record.pagename,
 		parent = record.parent,
 		patch = record.patch,
+		publisherTier = nilIfEmpty(record.publishertier),
 		resultType = nilIfEmpty(record.resulttype),
+		section = nilIfEmpty(record.section),
+		series = nilIfEmpty(record.series),
 		status = nilIfEmpty(record.status),
 		stream = Json.parseIfString(record.stream) or {},
 		tickername = record.tickername,
 		timestamp = tonumber(Table.extract(extradata, 'timestamp')),
+		timezoneId = Table.extract(extradata, 'timezoneid'),
 		tournament = record.tournament,
 		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),
 		walkover = walkover and walkover:lower() or nil,
 		winner = tonumber(record.winner),
 	}
+
+	match.phase = MatchGroupUtil.computeMatchPhase(match)
+
+	return match
 end
 
 ---@param data table?
@@ -832,18 +875,10 @@ function MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
 end
 
 ---Fetches information about a team via mw.ext.TeamTemplate.
+---@deprecated This function is only used on OpponentDisplay and should be removed once team handling is refactored.
 ---@param template string
----@return table?
+---@return standardTeamProps?
 function MatchGroupUtil.fetchTeam(template)
-	--exception for TBD opponents
-	if string.lower(template) == 'tbd' then
-		return {
-			bracketName = TBD_DISPLAY,
-			displayName = TBD_DISPLAY,
-			pageName = 'TBD',
-			shortName = TBD_DISPLAY,
-		}
-	end
 	local rawTeam = mw.ext.TeamTemplate.raw(template)
 	if not rawTeam then
 		return nil
@@ -854,6 +889,9 @@ function MatchGroupUtil.fetchTeam(template)
 		displayName = rawTeam.name,
 		pageName = rawTeam.page,
 		shortName = rawTeam.shortname,
+		imageLight = Logic.emptyOr(rawTeam.image, rawTeam.legacyimage),
+		imageDark = Logic.emptyOr(rawTeam.imagedark, rawTeam.legacyimagedark),
+		hasLegacyImage = Logic.isEmpty(rawTeam.image) and Logic.isNotEmpty(rawTeam.legacyimage)
 	}
 end
 

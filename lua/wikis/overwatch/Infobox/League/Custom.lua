@@ -5,19 +5,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local PageLink = require('Module:Page')
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
-local Logic = require('Module:Logic')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local PageLink = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Variables = Lua.import('Module:Variables')
+local Logic = Lua.import('Module:Logic')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -124,6 +125,10 @@ function CustomLeague:getWikiCategories(args)
 		table.insert(categories, 'Tournaments without game version')
 	else
 		table.insert(categories, Game.name{game = args.game} .. ' Competitions')
+	end
+
+	if Logic.readBool(args.marginalized_gender) then
+		table.insert(categories, 'Marginalized Gender Tournaments')
 	end
 
 	return categories

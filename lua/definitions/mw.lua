@@ -736,7 +736,7 @@ end
 ---If the text string does not specify a namespace, namespace (which may be any key found in mw.site.namespaces) will be used.
 ---If the text is not a valid title, nil is returned.
 ---@param text string
----@param namespace string?
+---@param namespace string|integer?
 ---@return Title?
 ---@overload fun(id: number):Title?
 function mw.title.new(text, namespace)
@@ -746,7 +746,7 @@ end
 ---Creates a title object with title title in namespace namespace, optionally with the specified fragment and interwiki prefix. namespace may be any key found in mw.site.namespaces. If the resulting title is not valid, returns nil.
 ---Note that, unlike mw.title.new(), this method will always apply the specified namespace.
 ---If the text is not a valid title, nil is returned.
----@param namespace string
+---@param namespace string|integer
 ---@param title string
 ---@param fragment string?
 ---@param interwiki string?
@@ -1003,6 +1003,19 @@ function mw.uri.encode(str, enctype) end
 ---@param enctype UriEncodeType?
 ---@return string
 function mw.uri.decode(str, enctype) end
+
+---Encodes a table as a URI query string.
+---@param query table<string, string|number|any[]|false>
+---@return string
+function mw.uri.buildQueryString(query) end
+
+---Decodes the query string `s` to a table. Optional arguments `i` and `j` may be used to specify
+---the substring of `s` to be parsed.
+---@param s string
+---@param i integer? the position of first character of the substring to be parsed; defaults to 1
+---@param j integer? the position of last character of the substring to be parsed; defaults to the length of `s`
+---@return table
+function mw.uri.parseQueryString(s, i, j) end
 
 ---Validates the specified table (or URI object).
 ---@param arg table|URI

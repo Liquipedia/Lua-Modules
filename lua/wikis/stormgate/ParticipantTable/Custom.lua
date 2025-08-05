@@ -25,7 +25,6 @@ local Variables = require('Module:Variables')
 
 ---@class StormgateParticipantTableEntry: ParticipantTableEntry
 ---@field isQualified boolean?
----@field opponent StormgateStandardOpponent
 
 ---@class StormgateParticipantTableSection: ParticipantTableSection
 ---@field entries StormgateParticipantTableEntry[]
@@ -39,8 +38,7 @@ local Variables = require('Module:Variables')
 
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local StormgateParticipantTable = {}
 
@@ -122,7 +120,7 @@ function StormgateParticipantTable:readEntry(sectionArgs, key, index, config)
 		Variables.varDefine(opponentArgs.name .. '_faction', '')
 	end
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
+	local opponent = Opponent.readOpponentArgs(opponentArgs)
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)
@@ -282,7 +280,7 @@ function StormgateParticipantTable:_displaySoloFactionTableSection(section, fact
 		Array.forEach(factionColumns, function(faction)
 			local entry = byFaction[faction] and byFaction[faction][rowIndex]
 			sectionNode:node(
-				entry and self:displayEntry(entry, {hideFaction = true}) or
+				entry and self:displayEntry(entry, {showFaction = false}) or
 				mw.html.create('div'):addClass('participantTable-entry')
 			)
 		end)

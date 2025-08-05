@@ -126,7 +126,7 @@ end
 ---@return string?
 function CharacterGameTable:getSideClass(extradata, opponentIndex)
 	local side = extradata['team' .. opponentIndex .. 'side']
-	return Logic.isNotEmpty(side) and 'brkts-popup-side-color-' .. side or nil
+	return Logic.isNotEmpty(side) and 'brkts-popup-side-color brkts-popup-side-color--' .. side or nil
 end
 
 ---@return string
@@ -309,7 +309,8 @@ function CharacterGameTable:headerRow()
 
 	nodes = Array.append(nodes,
 		config.showLength and makeHeaderCell('Length') or nil,
-		config.showVod and makeHeaderCell('VOD', '60px') or nil
+		config.showVod and makeHeaderCell('VOD', '60px') or nil,
+		config.showMatchPage and makeHeaderCell('') or nil
 	)
 
 	local header = mw.html.create('tr')
@@ -429,6 +430,7 @@ function CharacterGameTable:gameRow(match, game)
 		:node(self:displayGame(match, game))
 		:node(self:_displayLength(game))
 		:node(self:_displayGameVod(game.vod))
+		:node(self:_displayMatchPage(match))
 end
 
 ---@param frame Frame

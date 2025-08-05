@@ -159,17 +159,7 @@ function Person:createInfobox()
 			end
 		},
 		Customizable{id = 'custom', children = {}},
-		Builder{
-			builder = function()
-				local links = Links.transform(args)
-				if Table.isNotEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links, variant = LINK_VARIANT}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = Links.transform(args), variant = LINK_VARIANT},
 		Customizable{id = 'achievements', children = {
 			Builder{
 				builder = function()

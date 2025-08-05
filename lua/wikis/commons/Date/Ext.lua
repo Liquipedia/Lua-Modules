@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Ordinal = Lua.import('Module:Ordinal')
+local Timezone = Lua.import('Module:Timezone')
 local Variables = Lua.import('Module:Variables')
 
 --[[
@@ -31,6 +32,8 @@ DateExt.defaultDateTime = '0000-01-01 00:00:00'
 DateExt.defaultDateTimeExtended = '0000-01-01T00:00:00+00:00'
 DateExt.defaultDate = '0000-01-01'
 DateExt.defaultYear = '0000'
+
+DateExt.defaultTimezone = 'UTC'
 
 --- Parses a date string into a timestamp, returning the number of seconds since UNIX epoch.
 --- The timezone offset is incorporated into the timestamp, and the timezone is discarded.
@@ -71,7 +74,7 @@ function DateExt.readTimestampOrNil(dateString)
 end
 
 --- Our runtime measures at most in seconds, and we don't care about that level of precision anyway.
---- Hence we can memoize it for performane, as it's relatively expensive if called a lot.
+--- Hence we can memoize it for performance, as it's relatively expensive if called a lot.
 ---@return number
 DateExt.getCurrentTimestamp = FnUtil.memoize(function()
 	local ts = tonumber(mw.getContentLanguage():formatDate('U'))
@@ -90,10 +93,17 @@ end
 
 --- Converts a date string or timestamp into a format that can be used in the date param to Module:Countdown.
 ---@param dateOrTimestamp string|integer|osdate|osdateparam
+---@param timezoneId string?
+---@param showTime boolean? #default to true
 ---@return string
-function DateExt.toCountdownArg(dateOrTimestamp)
-	local timestamp = DateExt.readTimestamp(dateOrTimestamp)
-	return DateExt.formatTimestamp('F j, Y - H:i', timestamp or '') .. ' <abbr data-tz="+0:00"></abbr>'
+function DateExt.toCountdownArg(dateOrTimestamp, timezoneId, showTime)
+	local baseTimestamp = DateExt.readTimestamp(dateOrTimestamp)
+	if showTime ~= false then
+		local timestamp = baseTimestamp + (Timezone.getOffset{timezone = timezoneId or DateExt.defaultTimezone})
+		local timezoneString = Timezone.getTimezoneString{timezone = timezoneId or DateExt.defaultTimezone}
+		return DateExt.formatTimestamp('F j, Y - H:i', timestamp) .. ' ' .. timezoneString
+	end
+	return DateExt.formatTimestamp('F j, Y', baseTimestamp or '')
 end
 
 --- Truncates the time of day in a date string or timestamp, and returns the date formatted as yyyy-mm-dd.
@@ -180,6 +190,20 @@ function DateExt.quarterOf(props)
 	end
 
 	return quarter .. Ordinal.suffix(quarter)
+end
+
+---@param date string|integer|osdateparam?
+---@return integer
+function DateExt.getYearOf(date)
+	local timestamp = DateExt.readTimestamp(date) or DateExt.getCurrentTimestamp()
+	return tonumber(DateExt.formatTimestamp('Y', timestamp)) --[[@as integer]]
+end
+
+---@param date string|integer|osdateparam?
+---@return integer
+function DateExt.getMonthOf(date)
+	local timestamp = DateExt.readTimestamp(date) or DateExt.getCurrentTimestamp()
+	return tonumber(DateExt.formatTimestamp('n', timestamp)) --[[@as integer]]
 end
 
 return DateExt

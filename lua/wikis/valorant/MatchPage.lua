@@ -5,11 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local MathUtil = require('Module:MathUtil')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local MathUtil = Lua.import('Module:MathUtil')
+local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 
@@ -28,6 +29,7 @@ local MatchPage = Class.new(BaseMatchPage)
 
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
+local ROUNDS_BEFORE_SPLIT = 12
 local WIN_TYPE_TO_ICON = {
 	['elimination'] = 'elimination',
 	['detonate'] = 'explosion_valorant',
@@ -193,12 +195,16 @@ end
 function MatchPage:_renderRoundsOverview(game)
 	return RoundsOverview{
 		rounds = game.extradata.rounds,
+		roundsPerHalf = ROUNDS_BEFORE_SPLIT,
 		opponent1 = self.matchData.opponents[1],
 		opponent2 = self.matchData.opponents[2],
+		---@param winningSide string
+		---@param winBy string
+		---@return Widget?
 		iconRender = function(winningSide, winBy)
 			local iconName = WIN_TYPE_TO_ICON[winBy]
 			if not iconName then
-				return nil
+				return
 			end
 			return IconFa{
 				iconName = iconName,
@@ -239,9 +245,15 @@ function MatchPage:_renderPerformanceForTeam(game, teamIndex)
 				classes = {'match-bm-players-team-header'},
 				children = self.opponents[teamIndex].iconDisplay
 			},
-			Array.map(game.teams[teamIndex].players, function (player)
-				return self:_renderPlayerPerformance(game, teamIndex, player)
-			end)
+			Array.map(
+				Array.reverse(Array.sortBy(
+					game.teams[teamIndex].players,
+					function (player) return player.acs or 0 end
+				)),
+				function (player)
+					return self:_renderPlayerPerformance(game, teamIndex, player)
+				end
+			)
 		)
 	}
 end

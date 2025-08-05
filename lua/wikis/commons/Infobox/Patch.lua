@@ -49,7 +49,10 @@ function Patch:createInfobox()
 		},
 		Center{children = {args.caption}},
 		Title{children = (self:getInformationType(args)) .. ' Information'},
-		Cell{name = 'Version', content = {args.version}},
+		Customizable{id = 'version', children = {
+				Cell{name = 'Version', content = {args.version}},
+			}
+		},
 		Customizable{id = 'release', children = {
 				Cell{name = 'Release Date', content = {args.release}},
 			}
@@ -66,19 +69,7 @@ function Patch:createInfobox()
 				end
 			end
 		},
-		Builder{
-			builder = function()
-				local chronologyData = self:getChronologyData(args)
-				if not Table.isEmpty(chronologyData) then
-					return {
-						Title{children = 'Chronology'},
-						Chronology{
-							links = chronologyData
-						}
-					}
-				end
-			end
-		},
+		Chronology{args = self:getChronologyData(args), showTitle = true},
 		Customizable{id = 'customcontent', children = {}},
 		Center{children = {args.footnotes}},
 	}

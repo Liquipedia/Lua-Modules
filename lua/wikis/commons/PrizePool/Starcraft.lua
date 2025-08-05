@@ -20,14 +20,12 @@ local PrizePool = Lua.import('Module:PrizePool')
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
-local PRIZE_TYPE_POINTS = 'POINTS'
 local SC2 = 'starcraft2'
 
 local _series
@@ -104,10 +102,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	lpdbData.extradata = Table.mergeInto(lpdbData.extradata, {
 		seriesnumber = CustomPrizePool._seriesNumber(),
-
-		-- to be removed once poinst storage is standardized
-		points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1),
-		points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2),
 	})
 
 	lpdbData.tournament = _tournament_name

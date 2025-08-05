@@ -8,18 +8,15 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 
 local CustomMatchSummary = {}
@@ -43,10 +40,8 @@ function CustomMatchSummary.isTeam(match)
 end
 
 ---@param match MatchGroupUtilMatch
----@return MatchSummaryBody
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
 	local games = Array.map(match.games, function(game)
 		return CustomMatchSummary._createStandardGame(game, {
 			opponents = match.opponents,
@@ -55,10 +50,9 @@ function CustomMatchSummary.createBody(match)
 		})
 	end)
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+	return WidgetUtil.collect(
 		games
-	)}
+	)
 end
 
 ---@param game MatchGroupUtilGame
@@ -94,7 +88,6 @@ function CustomMatchSummary._createStandardGame(game, props)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '0.75rem'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1), flipped = true},
 			MatchSummaryWidgets.GameCenter{children = game.map, css = {['flex-basis'] = '100px', ['text-align'] = 'center'}},

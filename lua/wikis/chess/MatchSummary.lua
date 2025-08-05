@@ -10,8 +10,6 @@ local CustomMatchSummary = {}
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local DateExt = Lua.import('Module:Date/Ext')
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Eco = Lua.import('Module:ChessOpenings')
 local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
@@ -55,21 +53,16 @@ local KING_ICONS = {
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
-		:css('overflow', 'auto')
-		:css('max-height', '70vh')
 end
 
 ---@param match table
 ---@param createGame fun(date: string, game: table, gameIndex: integer): Widget
----@return Widget
+---@return Widget[]
 function CustomMatchSummary.createBody(match, createGame)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+	return WidgetUtil.collect(
 		Array.map(match.games, createGame),
 		CustomMatchSummary._linksTable(match)
-	)}
+	)
 end
 
 ---@param game MatchGroupUtilGame
@@ -78,7 +71,6 @@ end
 function CustomMatchSummary.createGame(game, gameIndex)
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {padding = '4px'},
 		children = WidgetUtil.collect(
 			-- Header
 			CustomMatchSummary._getHeader(game),
@@ -90,14 +82,6 @@ function CustomMatchSummary.createGame(game, gameIndex)
 
 			-- Center
 			MatchSummaryWidgets.GameCenter{
-				css = {
-					['text-align'] = 'center',
-					['align-content'] = 'center',
-					['min-height'] = '1.5rem',
-					['font-size'] = '85%',
-					['line-height'] = '0.75rem',
-					['max-width'] = '200px'
-				},
 				children = CustomMatchSummary._getCenterContent(game, gameIndex),
 			},
 
@@ -127,7 +111,6 @@ function CustomMatchSummary._getCenterContent(game, gameIndex)
 			},
 			Span{
 				classes = {'brkts-popup-spaced'},
-				css = {['font-size'] = '85%'},
 				children = {Eco.getName(game.extradata.eco, true)},
 			},
 		},
@@ -139,7 +122,6 @@ end
 function CustomMatchSummary._getSideIcon(gameOpponent)
 	return Div{
 		classes = {'brkts-popup-spaced'},
-		css = {['padding'] = '0px 4px'},
 		children = KING_ICONS[gameOpponent.color],
 	}
 end
@@ -152,7 +134,6 @@ function CustomMatchSummary._getHeader(game)
 			children = game.header,
 			css = {
 				['font-weight'] = 'bold',
-				['font-size'] = '85%',
 				margin = 'auto'
 			}
 		},

@@ -18,8 +18,7 @@ local Variables = Lua.import('Module:Variables')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local CustomMatchGroupInput = {}
 local MatchFunctions = {}
@@ -66,13 +65,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 	end
 
-	return CustomMatchGroupInput.processMatchWithoutStandalone(MapParser, match)
-end
-
----@param MapParser Dota2MapParserInterface
----@param match table
----@return table
-function CustomMatchGroupInput.processMatchWithoutStandalone(MapParser, match)
 	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
 end
 

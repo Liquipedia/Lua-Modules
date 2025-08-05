@@ -635,6 +635,19 @@ return {
 				lightMode = 'HSFII Logo.png',
 			},
 		},
+		hxhni = {
+			abbreviation = 'HxHNI',
+			name = 'HUNTER×HUNTER NEN×IMPACT',
+			link = 'HUNTER×HUNTER NEN×IMPACT',
+			logo = {
+				darkMode = 'HxHNI allmode.png',
+				lightMode = 'HxHNI allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'HxHNI allmode.png',
+				lightMode = 'HxHNI allmode.png',
+			},
+		},
 		igau = {
 			abbreviation = 'Injustice 1',
 			name = 'Injustice: Gods Among Us',
@@ -1716,5 +1729,4 @@ return {
 			hideOverview = true,
 		},
 	},
-	opponentLibrary = 'Opponent/Custom',
 }

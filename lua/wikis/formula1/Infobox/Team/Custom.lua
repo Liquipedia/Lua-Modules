@@ -10,8 +10,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
@@ -67,18 +66,10 @@ function CustomInjector:parse(id, widgets)
 			)
 		end
 
-		if args.previous or args.next then
-			Array.appendWith(
-				widgets,
-				Title{children = 'Chronology'},
-				Chronology{links = {
-					previous = args.previous,
-					previous2 = args.previous2,
-					next = args.next,
-					next2 = args.next2,
-				}}
-			)
-		end
+		Array.appendWith(
+			widgets,
+			Chronology{args = args, showTitle = true}
+		)
 	end
 
 	return widgets

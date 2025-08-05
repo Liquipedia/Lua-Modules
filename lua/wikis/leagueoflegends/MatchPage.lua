@@ -5,14 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 
@@ -409,17 +410,35 @@ function MatchPage:_renderTeamStats(game)
 							team2Value = game.teams[2].objectives.inhibitors
 						},
 						{
-							icon = IconImage{imageLight = 'Lol stat icon baron.png', link = ''},
-							name = 'Barons',
-							team1Value = game.teams[1].objectives.barons,
-							team2Value = game.teams[2].objectives.barons
+							icon = IconImage{imageLight = 'Lol stat icon grub.png', link = ''},
+							name = 'Void Grubs',
+							team1Value = game.teams[1].objectives.grubs,
+							team2Value = game.teams[2].objectives.grubs
+						},
+						{
+							icon = IconImage{imageLight = 'Lol stat icon herald.png', link = ''},
+							name = 'Rift Heralds',
+							team1Value = game.teams[1].objectives.heralds,
+							team2Value = game.teams[2].objectives.heralds
+						},
+						{
+							icon = IconImage{imageLight = 'Lol stat icon atakhan.png', link = ''},
+							name = 'Atakhan',
+							team1Value = game.teams[1].objectives.atakhans,
+							team2Value = game.teams[2].objectives.atakhans
 						},
 						{
 							icon = IconImage{imageLight = 'Lol stat icon dragon.png', link = ''},
 							name = 'Dragons',
 							team1Value = game.teams[1].objectives.dragons,
 							team2Value = game.teams[2].objectives.dragons
-						}
+						},
+						{
+							icon = IconImage{imageLight = 'Lol stat icon baron.png', link = ''},
+							name = 'Barons',
+							team1Value = game.teams[1].objectives.barons,
+							team2Value = game.teams[2].objectives.barons
+						},
 					}
 				}
 			}

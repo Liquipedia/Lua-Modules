@@ -13,8 +13,7 @@ local Game = Lua.import('Module:Game')
 local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local MatchUtil = Lua.import('Module:Match/Util')
 
@@ -113,7 +112,6 @@ local MATCH_OVERVIEW_COLUMNS = {
 			value = function (opponent, idx)
 				return OpponentDisplay.BlockOpponent{
 					opponent = opponent,
-					showLink = true,
 					overflow = 'ellipsis',
 					teamStyle = 'hybrid',
 					showPlayerTeam = true,
@@ -278,7 +276,7 @@ local GAME_STANDINGS_COLUMNS = {
 		class = 'cell--team',
 		icon = 'team',
 		header = {
-			value = 'Team',
+			value = 'Participant',
 		},
 		sortVal = {
 			value = function (opponent, idx)
@@ -290,7 +288,6 @@ local GAME_STANDINGS_COLUMNS = {
 				return OpponentDisplay.BlockOpponent{
 					opponent = opponent,
 					game = opponent.game,
-					showLink = true,
 					overflow = 'ellipsis',
 					teamStyle = 'hybrid',
 					showPlayerTeam = true,

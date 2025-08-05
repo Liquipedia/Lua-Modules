@@ -49,33 +49,44 @@ function Weapon:createInfobox()
 		},
 		Center{children = {args.caption}},
 		Title{children = (args.informationType or 'Weapon') .. ' Information'},
+		Cell{name = 'Other', children = {args.othernames}},
 		Cell{
 			name = 'Class',
-			content = self:getAllArgsForBase(args, 'class', {makeLink = not Logic.readBool(args.disableClassLink)}),
+			children = self:getAllArgsForBase(args, 'class', {makeLink = not Logic.readBool(args.disableClassLink)}),
 		},
 		Cell{
 			name = 'Origin',
-			content = {self:_createLocation(args.origin)},
+			children = {self:_createLocation(args.origin)},
 		},
 		Customizable{
 			id = 'price',
 			children = {
-				Cell{name = 'Price', content = {args.price}}
-			}
+				Cell{name = 'Price', children = {args.price}},
+			},
 		},
 		Customizable{
 			id = 'killaward',
 			children = {
-				Cell{name = 'Kill Award', content = {args.killaward}}
-			}
+				Cell{name = 'Kill Award', children = {args.killaward}},
+			},
 		},
 		Customizable{
 			id = 'damage',
-			children = { Cell{name = 'Base Damage', content = {args.damage}} }
+			children = {
+				Cell{name = 'Base Damage', children = {args.damage}},
+				Cell{name = 'Armor penetration', children = {args.armorpenetration}},
+			},
 		},
-		Cell{name = 'Magazine Size', content = {args.magsize}},
-		Cell{name = 'Ammo Capacity', content = {args.ammocap}},
-		Cell{name = 'Reload Speed', content = {
+		Customizable{
+			id = 'magsize',
+			children = {
+				Cell{name = 'Magazine Size', children = {args.magsize}},
+			},
+		},
+
+		Cell{name = 'Ammo Capacity', children = {args.ammocap}},
+		Cell{name = 'Ammunition/Capacity', children = {args.ammo}},
+		Cell{name = 'Reload Speed', children = {
 			Logic.isNotEmpty(args.reloadspeed) and (
 				args.reloadspeed .. (args.reloadspeedunit and (' ' .. args.reloadspeedunit) or '')
 			) or nil
@@ -83,14 +94,18 @@ function Weapon:createInfobox()
 		Customizable{
 			id = 'rateoffire',
 			children = {
-				Cell{name = 'Rate of Fire', content = {args.rateoffire}}
+				Cell{name = 'Rate of Fire', children = {args.rateoffire}}
 			}
 		},
-		Cell{name = 'Firing Mode', content = {args.firemode}},
+		Cell{name = 'Accuracy', children = {args.accuracy}},
+		Cell{name = 'Range', children = {args.range}},
+		Cell{name = 'Unique Characteristics', children = {args.charact}},
+		Cell{name = 'Firing Mode', children = self:getAllArgsForBase(args, 'firemode')},
+		Cell{name = 'Movement Speed', children = {args.movementspeed}},
 		Customizable{
 			id = 'side',
 			children = {
-				Cell{name = 'Side', content = {args.side}},
+				Cell{name = 'Side', children = {args.side}},
 			}
 		},
 		Customizable{
@@ -102,7 +117,7 @@ function Weapon:createInfobox()
 						return {
 							Cell{
 								name = #users > 1 and 'Users' or 'User',
-								content = users,
+								children = users,
 							}
 						}
 					end
@@ -118,7 +133,7 @@ function Weapon:createInfobox()
 						return {
 							Cell{
 								name = #games > 1 and 'Game Appearances' or 'Game Appearance',
-								content = games,
+								children = games,
 							}
 						}
 					end

@@ -21,9 +21,8 @@ local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 local Variables = Lua.import('Module:Variables')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Import = Lua.import('Module:ParticipantTable/Import')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
@@ -248,7 +247,7 @@ function ParticipantTable:readEntry(sectionArgs, key, index, config)
 
 	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
+	local opponent = Opponent.readOpponentArgs(opponentArgs)
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)

@@ -96,8 +96,8 @@ function CustomPlayer.run(frame)
 			defaultGame = 'Age of Empires II',
 			team = args.team,
 			name = args.romanized_name or args.name,
-			first_name = args.first_name,
-			last_name = args.last_name,
+			firstname = args.first_name,
+			lastname = args.last_name,
 			status = args.status,
 			game = mw.text.listToText(Array.map(args.gameList, function(game)
 					return game.name .. (game.active and '' or '&nbsp;<small>(inactive)</small>')

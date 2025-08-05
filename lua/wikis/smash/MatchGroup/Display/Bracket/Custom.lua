@@ -10,9 +10,8 @@ local Characters = require('Module:Characters')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
@@ -30,10 +29,13 @@ function CustomBracketDisplay.BracketContainer(props)
 	})
 end
 
----@param props {opponent: SmashStandardOpponent, displayType: string, matchWidth: number}
+---@param props {opponent: SmashStandardOpponent, displayType: string, forceShortName: boolean?, height: number}
 ---@return Html
 function CustomBracketDisplay.OpponentEntry(props)
-	local opponentEntry = OpponentDisplay.BracketOpponentEntry(props.opponent)
+	local opponentEntry = OpponentDisplay.BracketOpponentEntry(
+		props.opponent,
+		{forceShortName = props.forceShortName, showTbd = false}
+	)
 	if props.displayType == 'bracket' and props.opponent.type == Opponent.solo then
 		CustomBracketDisplay._addHeads(opponentEntry, props.opponent)
 		if props.opponent.placement == 1 then

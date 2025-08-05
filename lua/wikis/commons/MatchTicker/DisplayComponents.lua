@@ -28,9 +28,8 @@ local VodLink = Lua.import('Module:VodLink')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local VS = 'vs'
 local SCORE_STATUS = 'S'
@@ -130,10 +129,10 @@ end
 
 ---@return string
 function Versus:gameTitle()
-	if not self.match.asGameIdx then
+	if not self.match.asGameIndexes then
 		return ''
 	end
-	return 'Game #' .. (self.match.asGameIdx)
+	return 'Game #' .. (table.concat(self.match.asGameIndexes, '-'))
 end
 
 ---@return string
@@ -294,7 +293,7 @@ function Details:_matchPageIcon()
 	if Logic.isEmpty(matchPage) then return end
 
 	local display = mw.html.create('div')
-		:addClass('btn btn-secondary')
+		:addClass('btn-secondary btn btn-extrasmall')
 		:wikitext(Icon.makeIcon{iconName = 'matchpopup'})
 
 	return Page.makeInternalLink(tostring(display), matchPage)

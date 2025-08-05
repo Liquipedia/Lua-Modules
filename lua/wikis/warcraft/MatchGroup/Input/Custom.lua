@@ -22,8 +22,7 @@ local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local TBD = 'TBD'
 local NEUTRAL_HERO_FACTION = 'neutral'
