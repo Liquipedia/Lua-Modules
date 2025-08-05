@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Table = Lua.import('Module:Table')
 
@@ -29,17 +28,15 @@ end
 
 ---@param match MatchGroupUtilMatch
 ---@param createGame fun(date: string, game: table, gameIndex: integer): Widget
----@return MatchSummaryBody
+---@return Widget[]
 function CustomMatchSummary.createBody(match, createGame)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+	return WidgetUtil.collect(
 		Array.map(match.games, FnUtil.curry(createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	)}
+	)
 end
 
 ---@param date string

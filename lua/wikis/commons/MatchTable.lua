@@ -16,6 +16,7 @@ local Info = Lua.import('Module:Info')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Math = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
@@ -28,9 +29,8 @@ local VodLink = Lua.import('Module:VodLink')
 
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
 
@@ -76,25 +76,11 @@ local SECONDS_ONE_DAY = 3600 * 24
 ---@field teamStyle teamStyle
 ---@field linkSubPage boolean
 
----@class MatchTableMatch
----@field timestamp number
----@field timezone string
----@field timeIsExact boolean
----@field liquipediatier string?
----@field liquipediatiertype string?
+---@class MatchTableMatch: MatchGroupUtilMatch
 ---@field displayName string
----@field tickerName string?
----@field icon string?
----@field iconDark string?
 ---@field pageName string
 ---@field vods {index: number, link: string}[]
----@field type string?
 ---@field result MatchTableMatchResult
----@field game string?
----@field date string
----@field bestof number?
----@field matchId string?
----@field hasMatchPage boolean?
 
 ---@class MatchTableMatchResult
 ---@field opponent match2opponent
@@ -424,26 +410,15 @@ function MatchTable:matchFromRecord(record)
 
 	record.extradata = record.extradata or {}
 
-	return {
-		timestamp = record.extradata.timestamp,
-		timezone = record.extradata.timezoneid or UTC,
-		timeIsExact = Logic.readBool(record.dateexact),
-		liquipediatier = record.liquipediatier,
-		liquipediatiertype = record.liquipediatiertype,
+	---@type MatchTableMatch
+	local match = Table.merge({
 		displayName = String.nilIfEmpty(record.tournament) or record.pagename:gsub('_', ' '),
-		tickerName = String.nilIfEmpty(record.tickername),
-		icon = String.nilIfEmpty(record.icon),
-		iconDark = String.nilIfEmpty(record.icondark),
 		pageName = record.pagename,
 		vods = self:vodsFromRecord(record),
-		type = record.type,
 		result = result,
-		game = record.game,
-		date = record.date,
-		bestof = tonumber(record.bestof) or 0,
-		hasMatchPage = Logic.isNotEmpty(record.match2bracketdata.matchpage),
-		matchId = record.match2id,
-	}
+	}, MatchGroupUtil.matchFromRecord(record))
+
+	return match
 end
 
 ---@param record table
@@ -687,14 +662,14 @@ function MatchTable:_displayDate(match)
 		return cell
 	end
 
-	if not match.timeIsExact then
+	if not match.dateIsExact then
 		return cell:node(DateExt.formatTimestamp('M d, Y', match.timestamp))
 	end
 
 	return cell:node(Countdown._create{
 		timestamp = match.timestamp,
 		finished = true,
-		date = MatchTable._calculateDateTimeString(match.timezone, match.timestamp),
+		date = MatchTable._calculateDateTimeString(match.timezoneId or UTC, match.timestamp),
 		rawdatetime = true,
 	} or nil)
 end
@@ -769,7 +744,7 @@ end
 ---@param match MatchTableMatch
 ---@return Html
 function MatchTable:_displayTournament(match)
-	local displayName = (self.config.useTickerName and match.tickerName) or match.displayName
+	local displayName = (self.config.useTickerName and match.tickername) or match.displayName
 	return mw.html.create('td')
 		:css('text-align', 'left')
 		:wikitext(Page.makeInternalLink(displayName, match.pageName))
@@ -871,11 +846,7 @@ end
 function MatchTable:_displayMatchPage(match)
 	if not self.config.showMatchPage then return end
 
-	return mw.html.create('td')
-		:node(MatchPageButton{
-			matchId = match.matchId,
-			hasMatchPage = match.hasMatchPage,
-		})
+	return mw.html.create('td'):node(MatchPageButton{match = match})
 end
 
 ---@param winner any

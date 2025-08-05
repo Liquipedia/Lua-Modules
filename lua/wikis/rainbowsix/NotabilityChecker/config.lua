@@ -206,9 +206,12 @@ Config.weights = {
 	},
 }
 
--- This function adjusts the score for the placement, e.g.
--- a first placement should score more than a 10th placement.
--- See also the EXTRA_DROP_OFF_TYPES.
+--- This function adjusts the score for the placement, e.g.
+--- a first placement should score more than a 10th placement.
+--- See also the EXTRA_DROP_OFF_TYPES.
+---@param tier string|integer
+---@param tierType string
+---@return fun(number, number): number
 function Config.placementDropOffFunction(tier, tierType)
 	-- notability can be found here: https://liquipedia.net/rainbowsix/Liquipedia:Qualifier_Notability_Points
 	if tierType ~= nil and Table.includes(Config.EXTRA_DROP_OFF_TYPES, tierType:lower()) then

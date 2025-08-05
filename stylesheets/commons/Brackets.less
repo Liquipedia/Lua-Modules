@@ -47,10 +47,8 @@
 	font-size: 13px;
 	padding: 2px;
 	position: relative;
-}
 
-@media only screen and ( max-width: 768px ) {
-	.brkts-bracket {
+	@media only screen and ( max-width: 768px ) {
 		--match-width: var( --match-width-mobile ) !important;
 	}
 }
@@ -321,6 +319,14 @@
 	border: 1px solid var( --table-border-color, #bbbbbb );
 	font-size: 13px;
 	line-height: 1.48;
+
+	@media ( max-width: 435px ) {
+		width: 100% !important;
+	}
+
+	@media ( max-width: 768px ) {
+		max-width: 100%;
+	}
 }
 
 .brkts-matchlist-collapse-area {
@@ -330,18 +336,6 @@
 
 .brkts-matchlist-attached {
 	margin-top: -1px;
-}
-
-@media ( max-width: 768px ) {
-	.brkts-matchlist {
-		max-width: 100%;
-	}
-}
-
-@media ( max-width: 435px ) {
-	.brkts-matchlist {
-		width: 100% !important;
-	}
 }
 
 .brkts-matchlist-title {
@@ -364,10 +358,8 @@
 
 .brkts-matchlist-match {
 	display: contents;
-}
 
-@supports not (display: contents) {
-	.brkts-matchlist-match {
+	@supports not (display: contents) {
 		display: grid;
 		grid-column: span 5;
 		grid-template-columns: ~"[opponent] 4fr [score] minmax(30px, 1fr) [icon] 0px [score] minmax(30px, 1fr) [opponent] 4fr";
@@ -470,41 +462,22 @@
  * MatchSummary
  */
 
-.brkts-match-info-popup {
-	border-radius: 2px;
-	border: 1px solid rgba( 0, 0, 0, 0.5 );
-	box-shadow: 0 0 2px rgba( 0, 0, 0, 0.5 );
+.brkts-popup.brkts-match-info-popup {
+	border-radius: 0.5rem;
+	box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
 	position: absolute;
 	z-index: 19;
-}
 
-@media ( max-width: 768px ) {
-	.brkts-match-info-popup {
-		bottom: 45px;
-		left: 1px !important;
-		max-height: 50vh;
+	@media ( max-width: 768px ) {
 		position: fixed;
-		right: 1px;
-		top: auto !important;
+		bottom: unset;
+		left: 1rem !important;
+		right: 1rem;
+		top: calc( ~"50% - 1.4375rem" ) !important; // 1.4375rem = 4.1875rem - 2.75rem
+		max-height: calc( ~"100dvh - (2.75rem + 4.1875rem)" );
 		width: auto !important;
-	}
-
-	.brkts-popup .hide-mobile {
-		display: none;
-	}
-}
-
-@media ( min-width: 769px ) {
-	.brkts-match-info-popup-sc-ffa:not( .brkts-match-info-flat ) {
-		overflow: auto;
-		bottom: 16%;
-		left: 1px !important;
-		max-height: 60vh;
-		position: fixed;
-		right: 1px;
-		top: auto !important;
-		width: auto !important;
-		background-color: var( --table-background-color, #f9f9f9 );
+		transform: translateY( -50% );
+		z-index: 22;
 	}
 }
 
@@ -516,20 +489,69 @@
 }
 
 .brkts-popup {
-	background: var( --table-variant-background-color, #f2f2f2 );
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-start;
-	max-height: 80vh;
-	//overflow: auto;
-	width: 330px;
+	width: 360px;
 	flex-wrap: unset;
-	font-size: 13px;
+	font-size: 0.6875rem;
+	padding: 0.5rem;
+	gap: 0.5rem;
+	border: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
+
+	.theme--light & {
+		background-color: #ffffff;
+	}
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+		border-color: rgba( 255, 255, 255, 0.08 );
+	}
+
+	@media ( min-width: 769px ) {
+		max-height: 65vh;
+	}
+
+	.timer-object-date {
+		display: block;
+	}
+
+	.brkts-popup-close-button {
+		display: none;
+
+		@media ( max-width: 768px ) {
+			display: inline-flex;
+			justify-content: center;
+			align-items: center;
+			outline: 0;
+			background: transparent;
+			width: 1.5rem;
+			height: 1.5rem;
+			position: absolute;
+			inset: 0.5rem 0.5rem auto auto;
+			padding: 0;
+			color: var( --clr-on-background );
+		}
+	}
+}
+
+// Adds backdrop for mobile popup
+.main-container:has( ~ .brkts-match-info-popup ) {
+	@media ( max-width: 768px ) {
+		&::before {
+			content: "";
+			position: fixed;
+			inset: 0;
+			background-color: var( --clr-sapphire-10 );
+			opacity: 0.66;
+			z-index: 21;
+		}
+	}
 }
 
 /* Can remove after purge */
-@media ( max-width: 768px ) {
-	.brkts-popup:not( .brkts-match-info-popup ) {
+.brkts-popup:not( .brkts-match-info-popup ) {
+	@media ( max-width: 768px ) {
 		width: 100% !important;
 	}
 }
@@ -538,28 +560,18 @@
 	max-height: unset;
 }
 
-@media ( max-width: 768px ) {
-	.brkts-popup {
-		max-height: 65vh;
-		overflow: auto;
-	}
-}
-
 .brkts-match-popup-wrapper .brkts-match-info-popup {
 	display: none;
-}
-
-/* TODO remove */
-.brkts-popup * {
-	flex-shrink: 0;
 }
 
 .brkts-popup-body {
 	display: flex;
 	justify-content: space-evenly;
-	width: 100%;
-	border-top: 1px solid var( --table-border-color, #dddddd );
 	flex-direction: column;
+	gap: 0.25rem;
+	overflow: auto;
+	margin: 0 -0.5rem;
+	padding: 0 0.5rem;
 }
 
 .brkts-popup-body-element {
@@ -579,11 +591,48 @@ div.brkts-popup-body-element-thumbs {
 
 .brkts-popup-body-element-cr-placeholder {
 	height: 58px;
+
+	@media only screen and ( max-width: 768px ) {
+		height: 50px;
+	}
 }
 
-@media only screen and ( max-width: 768px ) {
-	.brkts-popup-body-element-cr-placeholder {
-		height: 50px;
+.brkts-popup-body-element.brkts-popup-body-game {
+	padding: 0.5rem;
+	margin: 0 -0.5rem;
+
+	.brkts-champion-icon {
+		gap: 0.125rem;
+		display: flex;
+
+		img {
+			width: 1.5rem;
+			height: 1.5rem;
+			border-radius: 0.25rem;
+
+			@media ( max-width: 768px ) {
+				width: 1.25rem;
+				height: 1.25rem;
+			}
+
+			@media ( hover: hover ) {
+				&:hover {
+					height: unset;
+					box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
+					outline: 0.0625rem solid #ffffff;
+					outline-offset: -0.0625rem;
+					background-color: var( --clr-background );
+				}
+			}
+		}
+	}
+
+	.brkts-popup-winloss-icon {
+		margin: unset;
+
+		& > i {
+			font-size: 0.875rem;
+		}
 	}
 }
 
@@ -603,8 +652,14 @@ div.brkts-popup-body-element-thumbs {
 	display: flex;
 }
 
-.brkts-popup-body-element:nth-of-type( odd ) {
-	background-color: var( --table-background-color, #f9f9f9 );
+.brkts-popup-body-element:nth-of-type( even ) {
+	.theme--light & {
+		background-color: rgba( 0, 0, 0, 0.04 );
+	}
+
+	.theme--dark & {
+		background-color: rgba( 255, 255, 255, 0.04 );
+	}
 }
 
 .brkts-popup-body-element-vertical-centered {
@@ -623,6 +678,7 @@ div.brkts-popup-body-element-thumbs {
 	align-items: center;
 	justify-content: center;
 	gap: 4px;
+	text-align: center;
 }
 
 .brkts-popup-winloss-icon {
@@ -645,12 +701,9 @@ div.brkts-popup-body-element-thumbs {
 	display: block;
 	justify-content: space-around;
 	flex-wrap: wrap;
-	padding: 4px;
-	border-top: 1px solid var( --table-border-color, #dddddd );
+	padding: 0.25rem 0;
 	flex-basis: 100%;
-	background-color: var( --table-striped-background-color, #f9f9f9 );
 	text-align: center;
-	font-size: 85%;
 }
 
 .brkts-popup-footer a img,
@@ -701,18 +754,20 @@ div.brkts-popup-body-element-thumbs {
 
 .brkts-popup-header-opponent-score-left {
 	border-right: 1px solid #aaaaaa;
-	width: 28px;
+	width: 1.75rem;
 	justify-content: center;
 	align-items: center;
 	display: flex;
+	padding: 0 0.25rem;
 }
 
 .brkts-popup-header-opponent-score-right {
 	border-left: 1px solid #aaaaaa;
-	width: 28px;
+	width: 1.75rem;
 	justify-content: center;
 	align-items: center;
 	display: flex;
+	padding: 0 0.25rem;
 }
 
 .brkts-popup-header-opponent.brkts-popup-header-opponent img {
@@ -730,77 +785,126 @@ div.brkts-popup-body-element-thumbs {
  * Used by rainbowsix and other wikis.
  */
 
-.brkts-popup-mapveto table {
-	width: 100%;
-	margin-top: -2px;
-	margin-bottom: -2px;
-	border-top: 1px solid var( --table-border-color, #dddddd );
-}
+.brkts-popup-mapveto {
+	border-radius: 0.5rem;
+	padding: 0.25rem;
 
-.brkts-popup-mapveto td,
-.brkts-popup-mapveto th {
-	padding: 4px;
-	text-align: center;
-	font-size: 11px;
-}
+	.theme--light & {
+		background-color: rgba( 0, 0, 0, 0.04 );
+		color: var( --clr-secondary-25 );
+	}
 
-.brkts-popup-mapveto tr {
-	border-top: 1px dotted var( --table-border-color, #dddddd );
-	height: 10px;
-}
+	.theme--dark & {
+		background-color: rgba( 255, 255, 255, 0.04 );
+		color: #ffffff;
+	}
 
-.brkts-popup-mapveto tr:first-child {
-	background-color: var( --table-variant-background-color, #eeeeee );
-	color: var( --clr-on-background, #000000 );
-}
+	&__header {
+		&-fill {
+			width: 9.6875rem;
+		}
 
-.brkts-popup-mapveto .brkts-popup-mapveto-vetostart {
-	background-color: var( --table-striped-background-color, #f5f5f5 );
-}
+		&-title {
+			text-align: center;
+		}
+	}
 
-.brkts-popup-mapveto .brkts-popup-mapveto-vetoround {
-	background-color: var( --table-background-color, #ffffff );
-}
+	&__ban-round {
+		/* using border-top and bottom to fake padding */
+		border-top: 12px solid transparent;
+		border-bottom: 12px solid transparent;
 
-.brkts-popup-mapveto .brkts-popup-mapveto-vetotype {
-	font-weight: bold;
-	color: var( --clr-on-background, #000000 );
-	border: 0;
-	border-radius: 0;
-	letter-spacing: 0.1em;
-	font-family: "Source Code Pro", monospace;
-}
+		&-title {
+			font-size: 0.6875rem;
+			padding: 0 0.5rem;
+			text-align: center;
+		}
 
-.brkts-popup-mapveto .brkts-popup-mapveto-pick {
-	background-color: var( --clr-forestgreen-background-color, #ddf4dd ) !important;
-}
+		&-picks {
+			.brkts-champion-icon {
+				gap: 0.125rem;
+				display: flex;
+				flex-wrap: wrap;
 
-.brkts-popup-mapveto .brkts-popup-mapveto-ban {
-	background-color: var( --clr-cinnabar-background-color, #fbdfdf ) !important;
-}
+				& img {
+					width: 1.25rem;
+					height: 1.25rem;
+					border-radius: 0.1875rem;
 
-.brkts-popup-mapveto .brkts-popup-mapveto-defaultban {
-	background-color: var( --clr-sapphire-background-color, #c4c5d3 ) !important;
-}
+					@media ( hover: hover ) {
+						&:hover {
+							height: unset;
+							border: 0.0625rem solid #ffffff;
+							box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
+						}
+					}
+				}
+			}
+		}
+	}
 
-.brkts-popup-mapveto .brkts-popup-mapveto-decider {
-	background-color: var( --clr-sun-background-color, #f9f0c7 ) !important;
-}
+	table {
+		width: 100%;
 
-.brkts-popup-mapveto .brkts-popup-mapveto-protect {
-	background-color: var( --clr-vividviolet-background-color, #f1d2fa ) !important;
+		tr:nth-child( odd ):not( :first-child ) {
+			.theme--light & {
+				background-color: rgba( 0, 0, 0, 0.04 );
+			}
+
+			.theme--dark & {
+				background-color: rgba( 255, 255, 255, 0.04 );
+			}
+		}
+	}
+
+	.brkts-popup-mapveto-vetostart {
+		background-color: var( --table-striped-background-color, #f5f5f5 );
+	}
+
+	.brkts-popup-mapveto-vetoround {
+		background-color: var( --table-background-color, #ffffff );
+	}
+
+	.brkts-popup-mapveto-vetotype {
+		font-weight: bold;
+		color: var( --clr-on-background, #000000 );
+		border: 0;
+		border-radius: 0;
+		letter-spacing: 0.1em;
+		font-family: "Source Code Pro", monospace;
+	}
+
+	.brkts-popup-mapveto-pick {
+		background-color: var( --clr-forestgreen-background-color, #ddf4dd ) !important;
+	}
+
+	.brkts-popup-mapveto-ban {
+		background-color: var( --clr-cinnabar-background-color, #fbdfdf ) !important;
+	}
+
+	.brkts-popup-mapveto-defaultban {
+		background-color: var( --clr-sapphire-background-color, #c4c5d3 ) !important;
+	}
+
+	.brkts-popup-mapveto-decider {
+		background-color: var( --clr-sun-background-color, #f9f0c7 ) !important;
+	}
+
+	.brkts-popup-mapveto-protect {
+		background-color: var( --clr-vividviolet-background-color, #f1d2fa ) !important;
+	}
 }
 
 .brkts-popup-mvp {
 	background-color: var( --publisher-premier-highlight-background-color, #eee8aa );
 	font-weight: bold;
-	font-size: 85%;
 }
 
 .brkts-popup-body-match-sidewins {
 	padding: 0 0 3px 3px;
 	line-height: 11px;
 	width: 10px;
+	font-weight: 800;
 }
 
 .brkts-popup-body-match-sidewins-icon {
@@ -812,10 +916,6 @@ div.brkts-popup-body-element-thumbs {
 			filter: invert( 1 );
 		}
 	}
-}
-
-.skin-lakesideview .brkts-popup-body-match-sidewins {
-	font-weight: 800;
 }
 
 .brkts-popup-body-gradient-left {
@@ -838,63 +938,44 @@ div.brkts-popup-body-element-thumbs {
 	background: var( --table-background-color, #ffffff ) !important;
 }
 
-.brkts-popup-side-color-blue {
-	background-color: #31519c !important;
-	padding: 2px 1px 2px 1px;
-}
+.brkts-popup-side-color {
+	img {
+		outline: 0.125rem solid transparent;
+		outline-offset: -0.125rem;
+	}
 
-.brkts-popup-side-color-red {
-	background-color: #b12a2a !important;
-	padding: 2px 1px 2px 1px;
-}
+	&--blue img {
+		outline-color: #31519c;
+	}
 
-.brkts-popup-side-color-purple {
-	background-color: #7865b7 !important;
-	padding: 2px 1px 2px 1px;
-}
+	&--red img {
+		outline-color: #b12a2a;
+	}
 
-.brkts-popup-side-color-orange {
-	background-color: #cf793c !important;
-	padding: 2px 1px 2px 1px;
-}
+	&--purple img {
+		outline-color: #7865b7;
+	}
 
-.brkts-popup-side-color-radiant {
-	background-color: #bcd985 !important;
-	padding: 2px 1px 2px 1px;
-}
+	&--orange img {
+		outline-color: #cf793c;
+	}
 
-.brkts-popup-side-color-dire {
-	background-color: #e79e7e !important;
-	padding: 2px 1px 2px 1px;
+	&--radiant img {
+		outline-color: #bcd985;
+	}
+
+	&--dire img {
+		outline-color: #e79e7e;
+	}
 }
 
 .brkts-champion-icon img {
-	height: 24px;
-	width: 24px;
 	object-fit: cover;
-}
-
-@media only screen and ( max-width: 768px ) {
-	img.brkts-champion-icon {
-		height: 20px;
-		width: 20px;
-		object-fit: cover;
-	}
-}
-
-@media ( max-width: 768px ) {
-	.brkts-champion-icon img {
-		height: 20px;
-		width: 20px;
-		object-fit: cover;
-	}
 }
 
 @media ( hover: hover ) {
 	.brkts-champion-icon img:hover {
-		-ms-transform: scale( 2.5, 2.5 );
-		-webkit-transform: scale( 2.5, 2.5 );
-		transform: scale( 2.5, 2.5 );
+		transform: scale( 2 ) translateY( 0.0625rem ); // added 1px to Y-center the image
 		object-fit: contain;
 	}
 }
@@ -907,10 +988,6 @@ div.brkts-popup-body-element-thumbs {
 .brkts-popup-side-shade-out-flipped {
 	opacity: 0.5;
 	padding-right: 4px;
-}
-
-.brkts-popup:not( .brkts-match-info-flat ) {
-	border-top: 1px solid var( --table-border-color, #bbbbbb );
 }
 
 /**
@@ -1179,19 +1256,19 @@ div.brkts-opponent-hover-active::after {
 }
 
 /**
- * StarcraftBracketDisplay and StarcraftMatchlistDisplay
+ * faction/race specific stuff
  */
 
 .brkts-matchlist-slot-winner .race + .name {
 	margin-left: -1px;
 }
 
-.starcraft-block-player > .race {
+.block-player > .race {
 	margin-right: 4px;
 	flex: 0 0;
 }
 
-.starcraft-block-player.flipped > .race {
+.block-player.flipped > .race {
 	margin-left: 4px;
 	margin-right: 0;
 }
@@ -1220,7 +1297,7 @@ div.brkts-opponent-hover-active::after {
 }
 
 /**
- * StarcraftMatchSummary, used for starcraft/starcraft2 wikis
+ * StarcraftMatchSummary, used for starcraft/starcraft2/stormgate/warcraft wikis
  */
 
 .brkts-popup-sc {
@@ -1228,31 +1305,6 @@ div.brkts-opponent-hover-active::after {
 	overflow-wrap: break-word;
 	white-space: normal;
 	overflow: auto;
-}
-
-.brkts-popup-sc-game {
-	line-height: 1.4;
-	padding: 4px 10px;
-}
-
-@media ( max-width: 768px ) {
-	.brkts-popup-sc-game {
-		padding: 4px 4px;
-	}
-}
-
-.brkts-popup-sc-game-header {
-	border-top: 1px solid var( --table-border-color, #dddddd );
-	display: block;
-	margin-top: -4px;
-	padding-top: 4px;
-	text-align: center;
-}
-
-// can probably be kicked with MatchSummary refactor on WC/SG
-.brkts-popup-sc-game-body {
-	align-items: center;
-	display: flex;
 }
 
 .brkts-popup-sc-game-center {
@@ -1280,21 +1332,6 @@ div.brkts-opponent-hover-active::after {
 	padding: 0;
 }
 
-// can probably be kicked with MatchSummary refactor on WC/SG
-.brkts-popup-sc-veto-body {
-	align-items: center;
-	display: flex;
-	line-height: 1.4;
-	padding: 4px 10px;
-}
-
-// can probably be kicked with MatchSummary refactor on WC/SG
-@media ( max-width: 768px ) {
-	.brkts-popup-sc-veto-body {
-		padding: 4px 4px;
-	}
-}
-
 .brkts-popup-sc-veto-center {
 	flex: 1 1;
 	min-width: 0;
@@ -1307,8 +1344,7 @@ div.brkts-opponent-hover-active::after {
 
 .button-link {
 	background-color: #e6e6e6;
-	border: 1px solid transparent;
-	border-color: #e6e6e6;
+	border: 1px solid #e6e6e6;
 	border-radius: 0;
 	color: #212529;
 	font-size: 1rem;

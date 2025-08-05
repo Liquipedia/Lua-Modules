@@ -64,6 +64,4 @@ return {
 		},
 		defaultMaxPlayersPerPlacement = 20,
 	},
-	opponentLibrary = 'Opponent/Custom',
-	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

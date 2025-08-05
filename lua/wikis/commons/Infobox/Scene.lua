@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local Links = Lua.import('Module:Links')
 local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
@@ -53,17 +52,7 @@ function Scene:createInfobox()
 		Cell{name = 'Size', content = {args.size}},
 		Customizable{id = 'custom', children = {}},
 		Center{children = {args.footnotes}},
-		Builder{
-			builder = function()
-				local links = Links.transform(args)
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = Links.transform(args)},
 		Builder{
 			builder = function()
 				if not String.isEmpty(args.achievements) then

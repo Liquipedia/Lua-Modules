@@ -6,7 +6,6 @@
 --
 
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -24,19 +23,17 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 	local characterBansData = Array.map(match.games, function (game)
 		local extradata = game.extradata or {}
 		local bans = extradata.bans or {}
 		return {bans.team1 or {}, bans.team2 or {}}
 	end)
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+	return WidgetUtil.collect(
 		Array.map(match.games, CustomMatchSummary._createMapRow),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
-	)}
+	)
 end
 
 function CustomMatchSummary._gameScore(game, opponentIndex)
@@ -53,7 +50,7 @@ function CustomMatchSummary._createMapRow(game)
 			MatchSummaryWidgets.Characters{
 				flipped = opponentIndex == 2,
 				characters = Array.map((game.opponents[opponentIndex] or {}).players or {}, Operator.property('striker')),
-				bg = opponentIndex == 1 and 'brkts-popup-side-color-blue' or 'brkts-popup-side-color-red',
+				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (opponentIndex == 1 and 'blue' or 'red')
 			},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
 			DisplayHelper.MapScore(game.opponents[opponentIndex], game.status)

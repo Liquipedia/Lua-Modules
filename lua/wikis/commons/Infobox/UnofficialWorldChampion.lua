@@ -13,9 +13,8 @@ local Json = Lua.import('Module:Json')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 

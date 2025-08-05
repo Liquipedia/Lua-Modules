@@ -40,8 +40,7 @@ local Variables = Lua.import('Module:Variables')
 
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local StarcraftParticipantTable = {}
 

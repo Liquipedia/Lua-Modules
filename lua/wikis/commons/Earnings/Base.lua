@@ -18,8 +18,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
 
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local DEFAULT_MAX_PLAYERS_PER_PLACEMENT = Info.config.defaultMaxPlayersPerPlacement or 10
 

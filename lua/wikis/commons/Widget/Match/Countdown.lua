@@ -10,12 +10,9 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
-local Timezone = Lua.import('Module:Timezone')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-
-local UTC = Timezone.getTimezoneString{timezone = 'UTC'}
 
 ---@class MatchCountdownProps
 ---@field match MatchGroupUtilMatch
@@ -32,24 +29,15 @@ function MatchCountdown:render()
 		return nil
 	end
 
-	if match.timestamp == DateExt.defaultTimestamp then
+	if not match.timestamp or DateExt.isDefaultTimestamp(match.timestamp) then
 		return nil
-	end
-
-	local dateString
-	if match.dateIsExact then
-		local timestamp = DateExt.readTimestamp(match.date) + (Timezone.getOffset{timezone = match.extradata.timezoneid} or 0)
-		dateString = DateExt.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
-				.. (Timezone.getTimezoneString{timezone = match.extradata.timezoneid} or UTC)
-	else
-		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date) .. UTC
 	end
 
 	return HtmlWidgets.Span{
 		classes = {'match-info-countdown'},
 		children = Countdown._create{
-			rawdatetime = match.finished or nil,
-			date = dateString,
+			rawdatetime = match.finished,
+			date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
 			finished = match.finished,
 		},
 	}

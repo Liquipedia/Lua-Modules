@@ -18,8 +18,7 @@ local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibrary.OpponentDisplay
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local MatchlistDisplay = {propTypes = {}, types = {}}
 

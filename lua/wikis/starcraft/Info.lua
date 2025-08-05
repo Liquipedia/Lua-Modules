@@ -38,6 +38,4 @@ return {
 		},
 		defaultMaxPlayersPerPlacement = 35,
 	},
-	opponentLibrary = 'Opponent/Starcraft',
-	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
 }

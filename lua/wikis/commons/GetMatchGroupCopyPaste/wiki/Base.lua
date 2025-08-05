@@ -11,8 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 ---Base-WikiSpecific Code for MatchList and Bracket Code Generators
 ---@class Match2CopyPasteBase

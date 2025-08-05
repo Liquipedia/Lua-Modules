@@ -18,8 +18,7 @@ local Table = Lua.import('Module:Table')
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell

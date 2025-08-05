@@ -8,28 +8,17 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local DateExt = Lua.import('Module:Date/Ext')
-local Info = Lua.import('Module:Info')
-local Logic = Lua.import('Module:Logic')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
-local StreamLinks = Lua.import('Module:Links/Stream')
-local Tournament = Lua.import('Module:Tournament')
-local VodLink = Lua.import('Module:VodLink')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchHeader = Lua.import('Module:Widget/Match/Header')
 local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
-local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
-local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
-local Button = Lua.import('Module:Widget/Basic/Button')
-local ImageIcon = Lua.import('Module:Widget/Image/Icon/Image')
-local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
+local TournamentBar = Lua.import('Module:Widget/Match/TournamentBar')
+local ButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
 
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
-local SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE = 2 * 60 * 60 -- 2 hours in seconds
 
 ---@class MatchCardProps
 ---@field match MatchGroupUtilMatch
@@ -54,55 +43,12 @@ function MatchCard:render()
 		return nil
 	end
 
-	local matchPhase = MatchGroupUtil.computeMatchPhase(match)
-
-	local displayMatchPage = Info.config.match2.matchPage and matchPhase ~= 'upcoming'
-	local displayVods = matchPhase == 'finished'
-	local displayStreams = matchPhase == 'ongoing'
-	-- Show streams also for the last period before going live
-	if matchPhase == 'upcoming' and
-		os.difftime(match.timestamp, DateExt.getCurrentTimestamp()) < SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE then
-
-		displayStreams = true
-	end
-
 	local highlightCondition = HighlightConditions.match or HighlightConditions.tournament
 	local highlight = highlightCondition(match, {onlyHighlightOnValue = self.props.onlyHighlightOnValue})
 
-	---@param vod string?
-	---@param index integer?
-	---@param callToAction boolean
-	---@return Widget?
-	local makeVodButton = function(vod, index, callToAction)
-		if Logic.isEmpty(vod) then
-			return nil
-		end
-		---@cast vod -nil
-		return Button{
-			linktype = 'external',
-			title = VodLink.getTitle(index),
-			variant = 'tertiary',
-			link = vod,
-			size = 'sm',
-			grow = callToAction,
-			classes = {'vodlink'},
-			children = {
-				ImageIcon{imageLight = VodLink.getIcon(index)},
-				callToAction and ' ' or nil,
-				callToAction and VodLink.getTitle(index) or nil,
-			},
-		}
-	end
-
-	local tournamentLink = TournamentTitle{
-		tournament = Tournament.partialTournamentFromMatch(match),
+	local tournamentLink = TournamentBar{
+		match = match,
 		displayGameIcon = self.props.displayGameIcons,
-		stageName = match.section,
-	}
-
-	local matchPageButton = MatchPageButton{
-		matchId = match.matchId,
-		hasMatchPage = Logic.isNotEmpty(match.bracketData.matchPage),
 	}
 
 	return HtmlWidgets.Div{
@@ -114,17 +60,7 @@ function MatchCard:render()
 				classes = {'match-info-tournament', highlight and HIGHLIGHT_CLASS or nil},
 				children = {tournamentLink},
 			} or nil,
-			HtmlWidgets.Div{
-				classes = {'match-info-links'},
-				children = WidgetUtil.collect(
-					displayMatchPage and matchPageButton or nil,
-					displayStreams and StreamsContainer{
-						streams = StreamLinks.filterStreams(match.stream),
-						callToActionLimit = displayMatchPage and 0 or 2,
-					} or nil,
-					displayVods and makeVodButton(match.vod, nil, not displayMatchPage) or nil
-				)
-			}
+			ButtonBar{match = match}
 		)
 	}
 end

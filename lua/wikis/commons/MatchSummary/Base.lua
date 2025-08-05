@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
@@ -23,6 +22,8 @@ local Links = Lua.import('Module:Links')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchHeader = Lua.import('Module:Widget/Match/Header')
+local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
+local MatchButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {loadData = true})
@@ -120,7 +121,7 @@ end
 ---@operator call: MatchSummaryMatch
 ---@field root Html
 ---@field headerElement Widget?
----@field bodyElement Widget?
+---@field bodyElement Widget[]?
 ---@field commentElement Widget?
 ---@field footerElement Html?
 ---@field buttonElement Widget?
@@ -137,7 +138,7 @@ function Match:header(header)
 	return self
 end
 
----@param body Widget
+---@param body Widget[]
 ---@return MatchSummaryMatch
 function Match:body(body)
 	self.bodyElement = body
@@ -169,13 +170,9 @@ end
 function Match:create()
 	self.root
 		:node(self.headerElement)
-		:node(MatchSummaryWidgets.Break{})
-		:node(self.bodyElement)
-		:node(MatchSummaryWidgets.Break{})
-		:node(self.commentElement)
-		:node(MatchSummaryWidgets.Break{})
-		:node(self.footerElement)
-		:node(MatchSummaryWidgets.Break{})
+		:node(
+			MatchSummaryWidgets.Body{children = WidgetUtil.collect(self.bodyElement, self.commentElement, self.footerElement)}
+		)
 		:node(self.buttonElement)
 
 	return self.root
@@ -239,30 +236,34 @@ end
 
 ---Default header function
 ---@param match table
----@param options {teamStyle: teamStyle?, noScore:boolean?}?
+---@param options {teamStyle: teamStyle?}?
 ---@return Widget
 function MatchSummary.createDefaultHeader(match, options)
 	options = options or {}
-	return MatchHeader{
-		match = match,
-		teamStyle = options.teamStyle,
-		noScore = options.noScore,
+
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(
+			MatchCountdown{
+				match = match,
+			},
+			MatchHeader{
+				match = match,
+				teamStyle = options.teamStyle,
+			}
+		)
 	}
 end
 
 -- Default body function
 ---@param match MatchGroupUtilMatch
 ---@param createGame fun(date: string, game: table, gameIndex: integer): Widget
----@return Widget
+---@return Widget[]
 function MatchSummary.createDefaultBody(match, createGame)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+	return WidgetUtil.collect(
 		Array.map(match.games, FnUtil.curry(createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))
-	)}
+	)
 end
 
 ---Default footer function
@@ -332,13 +333,8 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.createDefaultFooter
 	match:footer(createFooter(matchData, MatchSummary.Footer()))
 
-	-- Original Match Id must be used to link match page if it exists.
-	-- It can be different from the matchId when shortened brackets are used.
-	local matchId = matchData.extradata.originalmatchid or matchData.matchId
-	match:button(MatchSummaryWidgets.MatchPageLink{
-		matchId = matchId,
-		hasMatchPage = Logic.isNotEmpty(matchData.bracketData.matchPage),
-	})
+	--- Vods are currently part of the footer, so we don't need them here
+	match:button(MatchButtonBar{match = matchData, showVods = false, buttonType = 'primary'})
 
 	return match
 end

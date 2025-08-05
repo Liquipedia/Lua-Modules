@@ -1,30 +1,23 @@
----
--- @Liquipedia
--- page=Module:Opponent/testcases/config
---
--- Please see https://github.com/Liquipedia/Lua-Modules to contribute
---
-
 local Lua = require('Module:Lua')
 
 local Opponent = Lua.import('Module:Opponent')
 
 return {
-	emptyTeam = {type = Opponent.team, template = ''},
-	blankLiteral = {type = Opponent.literal, name = ''},
-	blankTeam = {type = Opponent.team, template = 'tbd'},
-	blankSolo = {type = Opponent.solo, players = {{displayName = ''}}},
-	blankDuo = {type = Opponent.duo, players = {{displayName = ''}, {displayName = ''}}},
-	tbdLiteral = {type = Opponent.literal, name = 'TBD'},
-	tbdSolo = {type = Opponent.solo, players = {{displayName = 'TBD'}}},
-	tbdDuo = {type = Opponent.duo, players = {{displayName = 'TBD'}, {displayName = 'TBD'}}},
-	tbdTeam = {type = Opponent.team, template = 'tbd'},
-	filledLiteral = {type = Opponent.literal, name = 'test'},
-	filledTeam = {type = Opponent.team, template = 'test'},
-	filledSolo = {type = Opponent.solo, players = {{displayName = 'test'}}},
-	filledDuo = {type = Opponent.duo, players = {{displayName = 'test'}, {displayName = 'test2'}}},
-	byeLiteral = {type = Opponent.literal, name = 'BYE'},
-	byeTeam = {type = Opponent.team, template = 'bye'},
+	emptyTeam = {type = Opponent.team, template = '', extradata = {}},
+	blankLiteral = {type = Opponent.literal, name = '', extradata = {}},
+	blankTeam = {type = Opponent.team, template = 'tbd', extradata = {}},
+	blankSolo = {type = Opponent.solo, players = {{displayName = ''}}, extradata = {}},
+	blankDuo = {type = Opponent.duo, players = {{displayName = ''}, {displayName = ''}}, extradata = {}},
+	tbdLiteral = {type = Opponent.literal, name = 'TBD', extradata = {}},
+	tbdSolo = {type = Opponent.solo, players = {{displayName = 'TBD'}}, extradata = {}},
+	tbdDuo = {type = Opponent.duo, players = {{displayName = 'TBD'}, {displayName = 'TBD'}}, extradata = {}},
+	tbdTeam = {type = Opponent.team, template = 'tbd', extradata = {}},
+	filledLiteral = {type = Opponent.literal, name = 'test', extradata = {}},
+	filledTeam = {type = Opponent.team, template = 'test', extradata = {}},
+	filledSolo = {type = Opponent.solo, players = {{displayName = 'test'}}, extradata = {}},
+	filledDuo = {type = Opponent.duo, players = {{displayName = 'test'}, {displayName = 'test2'}}, extradata = {}},
+	byeLiteral = {type = Opponent.literal, name = 'BYE', extradata = {}},
+	byeTeam = {type = Opponent.team, template = 'bye', extradata = {}},
 	exampleMatch2RecordTeam = {
 		['extradata'] = {
 		},

@@ -15,7 +15,7 @@ local Icon = Lua.import('Module:Icon')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Abbr, Tr, Th, Td = HtmlWidgets.Abbr, HtmlWidgets.Tr, HtmlWidgets.Th, HtmlWidgets.Td
+local Tr, Th, Td = HtmlWidgets.Tr, HtmlWidgets.Th, HtmlWidgets.Td
 local Characters = Lua.import('Module:Widget/Match/Summary/Characters')
 local Collapsible = Lua.import('Module:Widget/Match/Summary/Collapsible')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -60,26 +60,24 @@ function MatchSummaryCharacterBanTable:render()
 			return nil
 		end
 		return Tr{
+			classes = {'brkts-popup-mapveto__ban-round'},
 			children = WidgetUtil.collect(
 				Td{
-					css = {float = 'left'},
+					classes = {'brkts-popup-mapveto__ban-round-picks'},
 					children = {Characters{characters = banData[1], flipped = false, date = self.props.date}}
 				},
 				hasStartIndicator and Td{
 					children = {startIndicator(1, banData.start)}
 				} or nil,
 				Td{
-					css = {['font-size'] = '80%'},
-					children = {Abbr{
-						title = 'Bans in game ' .. gameNumber,
-						children = {'Game ' .. gameNumber},
-					}}
+					classes = {'brkts-popup-mapveto__ban-round-title'},
+					children = {'Game&nbsp;' .. gameNumber},
 				},
 				hasStartIndicator and Td{
 					children = {startIndicator(2, banData.start)}
 				} or nil,
 				Td{
-					css = {float = 'right'},
+					classes = {'brkts-popup-mapveto__ban-round-picks'},
 					children = {Characters{characters = banData[2], flipped = true, date = self.props.date}}
 				}
 			),
@@ -87,13 +85,22 @@ function MatchSummaryCharacterBanTable:render()
 	end)
 
 	return Collapsible{
-		tableClasses = {'wikitable-striped'},
-		header = Tr{children = WidgetUtil.collect(
-			Th{css = {width = hasStartIndicator and '35%' or '40%'}},
-			hasStartIndicator and Th{css = {width = '5%'}} or nil,
-			Th{css = {width = '20%'}, children = {'Bans'}},
-			hasStartIndicator and Th{css = {width = '5%'}} or nil,
-			Th{css = {width = hasStartIndicator and '35%' or '40%'}}
+		tableClasses = {},
+		header =
+			Tr{
+				children = WidgetUtil.collect(
+				Th{
+					classes = {'brkts-popup-mapveto__header-fill'},
+				},
+				hasStartIndicator and Th{} or nil,
+				Th{
+					classes = {'brkts-popup-mapveto__header-title'},
+					children = {'Bans'}
+				},
+				hasStartIndicator and Th{} or nil,
+				Th{
+					classes = {'brkts-popup-mapveto__header-fill'},
+				}
 		)},
 		children = rows,
 	}
