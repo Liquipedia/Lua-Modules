@@ -5,8 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = require('Module:Class')
 
 local ListWidget = Lua.import('Module:Widget/List')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
