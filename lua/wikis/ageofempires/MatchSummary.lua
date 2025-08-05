@@ -5,14 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Faction = require('Module:Faction')
-local Game = require('Module:Game')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MapMode = require('Module:MapMode')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Faction = Lua.import('Module:Faction')
+local Game = Lua.import('Module:Game')
+local Logic = Lua.import('Module:Logic')
+local MapMode = Lua.import('Module:MapMode')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -20,7 +21,7 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
-local PlayerDisplay = require('Module:Player/Display')
+local PlayerDisplay = Lua.import('Module:Player/Display')
 
 local CustomMatchSummary = {}
 
