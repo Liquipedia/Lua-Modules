@@ -5,9 +5,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local Game = Lua.import('Module:Game')
 local Patch = Lua.import('Module:Infobox/Patch')

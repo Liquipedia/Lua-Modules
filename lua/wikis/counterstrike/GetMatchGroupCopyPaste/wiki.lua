@@ -5,11 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 local Opponent = Lua.import('Module:Opponent')
