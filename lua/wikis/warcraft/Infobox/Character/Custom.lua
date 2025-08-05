@@ -83,7 +83,7 @@ function CustomInjector:parse(id, widgets)
 			}
 		end
 
-		local factionData = Faction.getProps(Faction.read(args.race)) or NEUTRAL
+		local factionData = Faction.getProps(Faction.read(args.race)) or {name = NEUTRAL, pageName = NEUTRAL}
 		local factionIcon = Faction.Icon{faction = Faction.read(args.race), size = '54px', showLink = true}
 
 		local function fetchBuildingInfo(buildingName)
