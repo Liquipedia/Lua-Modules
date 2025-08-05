@@ -22,8 +22,7 @@ local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team') -- to be replaced by #5900 / #5649 / ...
 local Tournament = Lua.import('Module:Tournament')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Infobox = Lua.import('Module:Infobox/Team/Custom')
 local MatchTable = Lua.import('Module:MatchTable/Custom')
