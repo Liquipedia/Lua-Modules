@@ -31,6 +31,7 @@ local CONTENT = {
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Active Upcoming Series}}',
+		boxid = 1516
 	},
 	filterButtons = {
 		noPanel = true,
@@ -42,14 +43,27 @@ local CONTENT = {
 	tournaments = {
 		noPanel = true,
 		body = '{{Liquipedia:Tournaments List}}',
+		boxid = 1517
 	},
-	fullSeason = {
+	seasonOverview = {
 		noPanel = true,
-		body = '{{Liquipedia:Full Season Panel}}',
+		body = '{{Liquipedia:Season Overview}}',
+		boxid = 1518
+	},
+	driversLineup = {
+		noPanel = true,
+		body = '{{Liquipedia:Drivers Line-up}}',
+		boxid = 1519
+	},
+	seasonStandings = {
+		heading = '<span class="fas fa-trophy cinnabar-theme-dark-gb"></span>&nbsp;Current Season Standings', -- todo: use icon module here instead
+		body = '{{Liquipedia:Season Standing}}',
+		boxid = 1520
 	},
 	seasonCalendar = {
 		noPanel = true,
 		body = '{{Liquipedia:Season Calendar}}',
+		boxid = 1521
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
@@ -68,14 +82,22 @@ local CONTENT = {
 	upcomingRace = {
 		noPanel = true,
 		body = '{{Liquipedia:Upcoming Race Weekend}}',
+		boxid = 1522
+	},
+	upcomingCircuit = {
+		noPanel = true,
+		body = '{{Liquipedia:Upcoming Circuit}}',
+		boxid = 1523
 	},
 	previousRace = {
 		noPanel = true,
 		body = '{{Liquipedia:Previous Race Weekend}}',
+		boxid = 1524
 	},
 	allF1Seasons = {
 		noPanel = true,
 		body = '{{Liquipedia:All F1 Seasons}}',
+		boxid = 1525
 	},
 }
 
@@ -149,15 +171,23 @@ return {
 						content = CONTENT.specialEvents,
 					},
 					{
-						mobileOrder = 4,
-						content = CONTENT.fullSeason,
-					},
-					{
 						mobileOrder = 5,
-						content = CONTENT.seasonCalendar,
+						content = CONTENT.seasonOverview,
 					},
 					{
 						mobileOrder = 6,
+						content = CONTENT.driversLineup,
+					},
+					{
+						mobileOrder = 7,
+						content = CONTENT.seasonStandings,
+					},
+					{
+						mobileOrder = 8,
+						content = CONTENT.seasonCalendar,
+					},
+					{
+						mobileOrder = 9,
 						content = CONTENT.transfers,
 					},
 				}
@@ -170,23 +200,27 @@ return {
 						content = CONTENT.upcomingRace,
 					},
 					{
-						mobileOrder = 7,
-						content = CONTENT.previousRace,
-					},
-					{
-						mobileOrder = 8,
-						content = CONTENT.tournaments,
-					},
-					{
-						mobileOrder = 9,
-						content = CONTENT.thisDay,
+						mobileOrder = 4,
+						content = CONTENT.upcomingCircuit,
 					},
 					{
 						mobileOrder = 10,
-						content = CONTENT.wantToHelp,
+						content = CONTENT.previousRace,
 					},
 					{
 						mobileOrder = 11,
+						content = CONTENT.tournaments,
+					},
+					{
+						mobileOrder = 12,
+						content = CONTENT.thisDay,
+					},
+					{
+						mobileOrder = 13,
+						content = CONTENT.wantToHelp,
+					},
+					{
+						mobileOrder = 14,
 						content = CONTENT.allF1Seasons,
 					},
 				},
@@ -194,7 +228,7 @@ return {
 			{
 				children = {
 					{
-						mobileOrder = 12,
+						mobileOrder = 15,
 						content = CONTENT.theGame,
 					},
 				},
