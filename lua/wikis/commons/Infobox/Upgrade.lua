@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Namespace = Lua.import('Module:Namespace')
-local Table = Lua.import('Module:Table')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Links = Lua.import('Module:Links')
@@ -20,7 +19,6 @@ local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
-local Builder = Widgets.Builder
 local Chronology = Widgets.Chronology
 
 ---@class UpgradeInfobox: BasicInfobox
@@ -67,16 +65,7 @@ function Upgrade:createInfobox()
 			},
 		},
 		Customizable{id = 'custom', children = {}},
-		Builder{
-			builder = function()
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = links},
 		Center{children = {args.footnotes}},
 		Chronology{args = args, title = self:chronologyTitle(), showTitle = true}
 	}

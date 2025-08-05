@@ -12,8 +12,7 @@ local Ordinal = require('Module:Ordinal')
 local Operator = require('Module:Operator')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local CustomMatchGroupInput = {}
 CustomMatchGroupInput.DEFAULT_MODE = 'solo'

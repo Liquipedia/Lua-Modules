@@ -133,7 +133,7 @@ function CustomInjector:parse(id, widgets)
 		return {Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(args.requires)}}}
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Built From:', content = {args.builtfrom}},
+			Cell{name = 'Built From', content = {args.builtfrom}},
 			Cell{name = '[[Hotkeys_per_Race|Hotkey]]', content = {self.caller:_getHotkeys()}},
 			Cell{name = 'Builds', content = {String.convertWikiListToHtmlList(args.builds)}},
 		}

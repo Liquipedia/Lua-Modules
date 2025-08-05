@@ -134,16 +134,7 @@ function Team:createInfobox()
 			}
 		},
 		Customizable{id = 'custom', children = {}},
-		Builder{
-			builder = function()
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links, variant = LINK_VARIANT}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = links, variant = LINK_VARIANT},
 		Customizable{
 			id = 'achievements',
 			children = {
