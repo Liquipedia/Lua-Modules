@@ -64,9 +64,7 @@ function CustomInjector:parse(id, widgets)
 			},
 		}
 	elseif id == 'custom' then
-		return WidgetUtil.collect(
-			self.caller:_getCustomCells()
-		)
+		return self.caller:_getCustomCells()
     end
 	return widgets
 end
