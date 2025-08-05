@@ -174,11 +174,15 @@ function TransferList:fetch()
 	local cache = {}
 	Array.forEach(queryData, function(transfer)
 		if
+			cache.team1 ~= transfer.fromteam or
+			cache.team2 ~= transfer.toteam or
 			cache.role1 ~= transfer.role1 or
 			cache.role2 ~= transfer.role2 or
 			cache.team1_2 ~= transfer.extradata.fromteamsec or
 			cache.team2_2 ~= transfer.extradata.toteamsec
 		then
+			cache.team1 = transfer.fromteam
+			cache.team2 = transfer.toteam
 			cache.role1 = transfer.role1
 			cache.role2 = transfer.role2
 			cache.team1_2 = transfer.extradata.fromteamsec
