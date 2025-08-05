@@ -15,9 +15,8 @@ local Logic = Lua.import('Module:Logic')
 local AgeCalculation = Lua.import('Module:AgeCalculation')
 local ThisDayQuery = Lua.import('Module:ThisDay/Query')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local UnorderedList = Lua.import('Module:Widget/List/Unordered')
