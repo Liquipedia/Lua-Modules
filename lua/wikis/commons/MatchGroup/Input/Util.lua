@@ -851,10 +851,9 @@ function MatchGroupInputUtil.matchIsFinished(match, maps, opponents)
 	end
 
 	local bestof = match.bestof
-	if not bestof then
+	if not bestof or bestof == 0 then
 		return false
 	end
-	-- TODO: Investigate if bestof = 0 needs to be handled
 
 	return MatchGroupInputUtil.majorityHasBeenWon(bestof, opponents)
 end
