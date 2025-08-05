@@ -38,6 +38,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Logic.readBool(args.casters) and (INDENT .. '|caster1=|caster2=') or nil,
 		Logic.readBool(args.streams) and (INDENT .. '|twitch=|youtube=|vod=') or nil,
 		Logic.readBool(args.mplinks) and (INDENT .. '|mplink=|mplink2=|mplink3=') or nil,
+		Logic.readBool(args.lazermplinks) and (INDENT .. '|lazermplink=|lazermplink2=|lazermplink3=') or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. BaseCopyPaste.getOpponent(mode, Logic.readBool(args.score))
 		end),
