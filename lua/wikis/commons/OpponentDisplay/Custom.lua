@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Opponent/Custom
+-- page=Module:OpponentDisplay/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
