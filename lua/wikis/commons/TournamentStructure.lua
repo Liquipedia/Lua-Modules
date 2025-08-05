@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Namespace = Lua.import('Module:Namespace')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TypeUtil = Lua.import('Module:TypeUtil')
@@ -323,7 +324,7 @@ end
 function TournamentStructure._mergeGroupEntriesIntoGroup(entries, group)
 	local transformedGroup = {}
 	for _, entry in ipairs(entries) do
-		local opponent = Lua.import('Module:Opponent/Custom').Opponent.fromLpdbStruct(entry)
+		local opponent = Opponent.fromLpdbStruct(entry)
 		local finished = group.extradata.finished or group.extradata.groupfinished
 		local extradata = {
 			placeRange = entry.extradata.placerange,
