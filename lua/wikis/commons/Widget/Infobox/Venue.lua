@@ -18,6 +18,7 @@ local Widget = Lua.import('Module:Widget')
 local Cell = Lua.import('Module:Widget/Infobox/Cell')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class InfoboxVenueWidget: Widget
 ---@operator call(table):InfoboxVenueWidget
@@ -61,14 +62,13 @@ function Venue._createLink(props)
 
 	local description
 	if Logic.isNotEmpty(props.desc) then
-		description = HtmlWidgets.Br{
-			children = {
-				HtmlWidgets.Span{
-					children = {
-						HtmlWidgets.Span{
-							children = {
-								props.desc
-							}
+		description = {
+			HtmlWidgets.Br{},
+			HtmlWidgets.Span{
+				children = {
+					HtmlWidgets.Span{
+						children = {
+							props.desc
 						}
 					}
 				}
@@ -86,10 +86,10 @@ function Venue._createLink(props)
 		display = Link{linktype = 'external', link = props.link, children = {displayName}}
 	end
 
-	return HtmlWidgets.Fragment{children = {
+	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
 		display,
 		description
-	}}
+	)}
 end
 
 return Venue
