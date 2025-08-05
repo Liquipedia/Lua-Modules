@@ -7,17 +7,19 @@
 
 --shared parts for warcraft infoboxes unit and building to de-duplicate code
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local AttackIcon = require('Module:AttackIcon')
-local Faction = require('Module:Faction')
-local GameClock = require('Module:GameClock')
-local Logic = require('Module:Logic')
-local Math = require('Module:MathUtil')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
 
-local Widgets = require('Module:Widget/All')
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local AttackIcon = Lua.import('Module:AttackIcon')
+local Faction = Lua.import('Module:Faction')
+local GameClock = Lua.import('Module:GameClock')
+local Logic = Lua.import('Module:Logic')
+local Math = Lua.import('Module:MathUtil')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+
+local Widgets = Lua.import('Module:Widget/All')
 local BreakDown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Title = Widgets.Title

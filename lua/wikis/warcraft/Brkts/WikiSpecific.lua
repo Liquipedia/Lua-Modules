@@ -5,11 +5,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Table = Lua.import('Module:Table')
 
 ---@class WarcraftBrktsWikiSpecific: BrktsWikiSpecific
-local WikiSpecific = Table.copy(require('Module:Brkts/WikiSpecific/Base'))
+local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base'))
 
 ---Determine if a match has details that should be displayed via popup
 ---@param match table
