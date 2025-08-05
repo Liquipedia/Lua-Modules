@@ -176,6 +176,7 @@ function TransferList:fetch()
 		if
 			cache.team1 ~= transfer.fromteam or
 			cache.team2 ~= transfer.toteam or
+			cache.date ~= transfer.date or
 			cache.role1 ~= transfer.role1 or
 			cache.role2 ~= transfer.role2 or
 			cache.team1_2 ~= transfer.extradata.fromteamsec or
@@ -183,6 +184,7 @@ function TransferList:fetch()
 		then
 			cache.team1 = transfer.fromteam
 			cache.team2 = transfer.toteam
+			cache.date = transfer.date
 			cache.role1 = transfer.role1
 			cache.role2 = transfer.role2
 			cache.team1_2 = transfer.extradata.fromteamsec
