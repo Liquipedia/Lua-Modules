@@ -9,11 +9,9 @@
 local Lua = require('Module:Lua')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
-local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local WidgetUtil = Lua.import('Module:Widget/Util')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
