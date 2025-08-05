@@ -12,7 +12,7 @@ local Class = Lua.import('Module:Class')
 local Image = Lua.import('Module:Image')
 local Logic = Lua.import('Module:Logic')
 
-local OpponentDisplay = Lua.import('Module:OpponentLibraries').OpponentDisplay
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')

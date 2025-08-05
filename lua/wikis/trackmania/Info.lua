@@ -153,6 +153,4 @@ return {
 			sortCasters = true,
 		},
 	},
-	opponentLibrary = 'Opponent',
-	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

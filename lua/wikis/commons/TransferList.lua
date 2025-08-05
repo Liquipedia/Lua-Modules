@@ -17,8 +17,7 @@ local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
 

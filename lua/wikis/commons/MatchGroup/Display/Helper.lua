@@ -21,8 +21,7 @@ local Timezone = Lua.import('Module:Timezone')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local DisplayHelper = {}
 local NONBREAKING_SPACE = '&nbsp;'
