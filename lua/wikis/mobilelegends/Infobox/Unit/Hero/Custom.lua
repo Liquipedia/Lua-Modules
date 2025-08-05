@@ -5,23 +5,24 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local CharacterWinLoss = require('Module:CharacterWinLoss')
-local Class = require('Module:Class')
-local ClassIcon = require('Module:ClassIcon')
-local Flags = require('Module:Flags')
-local Image = require('Module:Image')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Math = require('Module:MathUtil')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local CharacterWinLoss = Lua.import('Module:CharacterWinLoss')
+local Class = Lua.import('Module:Class')
+local ClassIcon = Lua.import('Module:ClassIcon')
+local Flags = Lua.import('Module:Flags')
+local Image = Lua.import('Module:Image')
+local Logic = Lua.import('Module:Logic')
+local Math = Lua.import('Module:MathUtil')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
