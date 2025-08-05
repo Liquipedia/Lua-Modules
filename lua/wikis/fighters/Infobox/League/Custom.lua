@@ -23,6 +23,7 @@ local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Chronology = Widgets.Chronology
+local SeriesDisplay = Widgets.SeriesDisplay
 
 local ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
 local DEFAULT_TYPE = 'offline'
@@ -334,11 +335,12 @@ end
 function CustomLeague:_createCircuitLink(circuitIndex)
 	local args = self.args
 
-	return self:createSeriesDisplay({
+	return SeriesDisplay{
 		displayManualIcons = true,
 		series = args['circuit' .. circuitIndex],
 		abbreviation = args['circuit' .. circuitIndex .. 'abbr'],
-	}, self.data['circuitIconDisplay' .. circuitIndex])
+		iconDisplay = self.data['circuitIconDisplay' .. circuitIndex]
+	}
 end
 
 return CustomLeague

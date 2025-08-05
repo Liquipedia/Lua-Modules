@@ -23,6 +23,7 @@ local MetadataGenerator = Lua.import('Module:MetadataGenerator')
 local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local SeriesAbbreviation = Lua.import('Module:Infobox/Extension/SeriesAbbreviation')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
@@ -41,6 +42,8 @@ local Customizable = Widgets.Customizable
 local Header = Widgets.Header
 local Location = Widgets.Location
 local Organizers = Widgets.Organizers
+local SeriesDisplay = Widgets.SeriesDisplay
+local SeriesIcon = Widgets.SeriesIcon
 local Title = Widgets.Title
 local Venue = Widgets.Venue
 
@@ -73,14 +76,15 @@ function League:createInfobox()
 		Cell{
 			name = 'Series',
 			children = {
-				self:createSeriesDisplay({
+				SeriesDisplay{
 					displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
 					series = args.series,
 					abbreviation = args.abbreviation,
 					icon = args.icon,
 					iconDark = args.icondark or args.icondarkmode,
-				}, self.iconDisplay),
-				self:createSeriesDisplay{
+					iconDisplay = self.iconDisplay,
+				},
+				SeriesDisplay{
 					series = args.series2,
 					abbreviation = args.abbreviation2,
 				},
@@ -192,7 +196,7 @@ end
 function League:_parseArgs()
 	local args = self.args
 
-	args.abbreviation = self:_fetchAbbreviation()
+	args.abbreviation = SeriesAbbreviation.fetch{series = args.series, abbreviation = args.abbreviation}
 
 	-- Split venue from legacy format to new format.
 	-- Legacy format is a wiki-code string that can include an external link
@@ -514,35 +518,14 @@ function League:_getNamedTableofAllArgsForBase(args, base)
 	return namedArgs
 end
 
----@param seriesArgs {displayManualIcons:boolean, series:string?, abbreviation:string?, icon:string?, iconDark:string?}
----@param iconDisplay string?
----@return string?
-function League:createSeriesDisplay(seriesArgs, iconDisplay)
-	if String.isEmpty(seriesArgs.series) then
-		return nil
-	end
-
-	iconDisplay = iconDisplay or self:_createSeriesIcon(seriesArgs)
-
-	if String.isNotEmpty(iconDisplay) then
-		iconDisplay = iconDisplay .. ' '
-	end
-
-	local abbreviation = Logic.emptyOr(seriesArgs.abbreviation, seriesArgs.series)
-	local pageDisplay = Page.makeInternalLink({onlyIfExists = true}, abbreviation, seriesArgs.series)
-		or abbreviation
-
-	return iconDisplay .. pageDisplay
-end
-
 ---@param iconArgs {displayManualIcons:boolean, series:string?, abbreviation:string?, icon:string?, iconDark:string?}
 ---@return string?
 ---@return string?
 ---@return string?
 function League:getIcons(iconArgs)
-	local display = self:_createSeriesIcon(iconArgs)
+	local display = tostring(SeriesIcon(iconArgs))
 
-	if not display then
+	if Logic.isEmpty(display) then
 		return iconArgs.icon, iconArgs.iconDark, nil
 	end
 
@@ -557,27 +540,6 @@ function League:getIcons(iconArgs)
 	end
 
 	return icon, iconDark, display
-end
-
----@param iconArgs {displayManualIcons:boolean, series:string?, abbreviation:string?, icon:string?, iconDark:string?}
----@return string?
-function League:_createSeriesIcon(iconArgs)
-	if String.isEmpty(iconArgs.series) then
-		return ''
-	end
-	local series = iconArgs.series
-	---@cast series -nil
-
-	local output = LeagueIcon.display{
-		icon = iconArgs.displayManualIcons and iconArgs.icon or nil,
-		iconDark = iconArgs.displayManualIcons and iconArgs.iconDark or nil,
-		series = series,
-		abbreviation = iconArgs.abbreviation,
-		date = self.data.endDate,
-		options = {noLink = not Page.exists(series)}
-	}
-
-	return output == LeagueIcon.display{} and '' or output
 end
 
 --- used in brawlstars, chess, counterstrike customs
@@ -629,26 +591,6 @@ function League:_getPageNameFromChronology(item)
 	if item == nil then return end
 
 	return mw.ext.TeamLiquidIntegration.resolve_redirect(mw.text.split(item, '|')[1])
-end
-
--- Given a series, query its abbreviation if abbreviation is not set manually
----@return string?
-function League:_fetchAbbreviation()
-	if not String.isEmpty(self.args.abbreviation) then
-		return self.args.abbreviation
-	elseif String.isEmpty(self.args.series) then
-		return nil
-	end
-
-	local series = string.gsub(mw.ext.TeamLiquidIntegration.resolve_redirect(self.args.series), ' ', '_')
-	local seriesData = mw.ext.LiquipediaDB.lpdb('series', {
-			conditions = '[[pagename::' .. series .. ']] AND [[abbreviation::!]]',
-			query = 'abbreviation',
-			limit = 1
-		})
-	if type(seriesData) == 'table' and seriesData[1] then
-		return seriesData[1].abbreviation
-	end
 end
 
 return League
