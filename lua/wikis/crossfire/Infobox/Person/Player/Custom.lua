@@ -5,12 +5,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
-local Widgets = require('Module:Widget/All')
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
+
+local Widgets = Lua.import('Module:Widget/All')
 local Title = Widgets.Title
 local Center = Widgets.Center
 

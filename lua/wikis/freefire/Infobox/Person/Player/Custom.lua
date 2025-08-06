@@ -5,17 +5,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Lua = require('Module:lua')
-local String = require('Module:StringUtils')
-local Page = require('Module:Page')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Template = require('Module:Template')
+local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Page = Lua.import('Module:Page')
+local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
+local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
