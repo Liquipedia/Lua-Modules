@@ -29,8 +29,6 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
-
 	if id == 'region' then return {}
 	end
 	return widgets
