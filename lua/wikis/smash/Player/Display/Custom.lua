@@ -5,14 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Abbreviation = require('Module:Abbreviation')
-local FnUtil = require('Module:FnUtil')
-local Characters = require('Module:Characters')
-local DisplayUtil = require('Module:DisplayUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Abbreviation = Lua.import('Module:Abbreviation')
+local FnUtil = Lua.import('Module:FnUtil')
+local Characters = Lua.import('Module:Characters')
+local DisplayUtil = Lua.import('Module:DisplayUtil')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display')
