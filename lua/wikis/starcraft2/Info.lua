@@ -76,5 +76,11 @@ return {
 			excludeTierTypes = {'Qualifier', 'Charity'},
 			showPatches = true,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'manualPrio',
+			},
+		},
 	},
 }

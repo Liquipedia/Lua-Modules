@@ -76,6 +76,13 @@ return {
 		transfers = {
 			showTeamName = true,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'merge',
+				hasHeaderAndRefs = true,
+			},
+		},
 	},
 	defaultRoundPrecision = 0,
 }
