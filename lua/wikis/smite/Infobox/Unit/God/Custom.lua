@@ -5,19 +5,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local CharacterWinLoss = require('Module:CharacterWinLoss')
-local Class = require('Module:Class')
-local DisplayIcon = require('Module:DisplayIcon')
 local Lua = require('Module:Lua')
-local Math = require('Module:MathUtil')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local CharacterWinLoss = Lua.import('Module:CharacterWinLoss')
+local Class = Lua.import('Module:Class')
+local DisplayIcon = Lua.import('Module:DisplayIcon')
+local Math = Lua.import('Module:MathUtil')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
