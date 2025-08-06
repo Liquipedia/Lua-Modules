@@ -19,6 +19,7 @@ local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local Roles = Lua.import('Module:Roles')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TransferModel = Lua.import('Module:Transfer/Model')
 local TransferRef = Lua.import('Module:Transfer/References')
 
@@ -128,11 +129,11 @@ end
 function TeamHistoryAuto:_getTeamLinkAndText(transfer)
 	if Logic.isEmpty(transfer.team) and Table.includes(SPECIAL_ROLES, transfer.role) then
 		return nil, HtmlWidgets.B{children = {transfer.role}}
-	elseif not mw.ext.TeamTemplate.teamexists(transfer.team) then
+	elseif not TeamTemplate.exists(transfer.team) then
 		return transfer.team, Link{link = transfer.team}
 	end
 	local leaveDateCleaned = TeamHistoryAuto._adjustDate(transfer.leaveDate)
-	local teamData = mw.ext.TeamTemplate.raw(transfer.team, leaveDateCleaned) or {}
+	local teamData = TeamTemplate.getRawOrNil(transfer.team, leaveDateCleaned) or {}
 
 	return teamData.page, Link{
 		link = teamData.page,
@@ -182,14 +183,13 @@ end
 ---@return Widget
 function TeamHistoryAuto:_header()
 	local makeQueryFormLink = function()
-		local linkParts = {
-			tostring(mw.uri.fullUrl('Special:RunQuery/Transfer_history')),
-			'?pfRunQueryFormName=Transfer+history&',
-			mw.uri.buildQueryString{['Transfer_query[players]'] = self.config.player},
-			'&wpRunQuery=Run+query'
-		}
 		return Link{
-			link = table.concat(linkParts),
+			link = tostring(mw.uri.fullUrl('Special:RunQuery/Transfer history', {
+				pfRunQueryFormName = 'Transfer history',
+				['Transfer query[players]'] = self.config.player,
+				wpRunQuery ='Run query'
+			})),
+			linktype = 'external',
 			children = {'q'},
 		}
 	end
