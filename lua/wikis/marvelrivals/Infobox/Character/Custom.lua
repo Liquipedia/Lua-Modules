@@ -5,15 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
@@ -110,6 +110,7 @@ end
 
 ---@param lpdbData table
 ---@param args table
+---@return table
 function CustomHero:addToLpdb(lpdbData, args)
 	lpdbData.extradata.health = args.health
 	lpdbData.extradata.movespeed = args.movespeed
