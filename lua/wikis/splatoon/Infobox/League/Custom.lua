@@ -5,16 +5,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class SplatoonLeagueInfobox: InfoboxLeague
