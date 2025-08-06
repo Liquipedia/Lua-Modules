@@ -5,15 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local TeamRanking = require('Module:TeamRanking')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local TeamRanking = Lua.import('Module:TeamRanking')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class RocketleagueInfoboxTeam: InfoboxTeam

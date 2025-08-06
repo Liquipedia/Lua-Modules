@@ -5,21 +5,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local AchievementIcons = require('Module:AchievementIcons')
-local Array = require('Module:Array')
-local Characters = require('Module:Characters')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
-local Info = require('Module:Info')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Template = require('Module:Template')
-local YearsActive = require('Module:YearsActive') -- TODO Convert to use the commons YearsActive
+
+local AchievementIcons = Lua.import('Module:AchievementIcons')
+local Array = Lua.import('Module:Array')
+local Characters = Lua.import('Module:Characters')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local Info = Lua.import('Module:Info')
+local String = Lua.import('Module:StringUtils')
+local Template = Lua.import('Module:Template')
+local YearsActive = Lua.import('Module:YearsActive') -- TODO Convert to use the commons YearsActive
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
