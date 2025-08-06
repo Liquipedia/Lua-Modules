@@ -5,15 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local Set = require('Module:Set')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Variables = require('Module:Variables')
-local YearsActive = require('Module:YearsActive')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Faction = Lua.import('Module:Faction')
+local Set = Lua.import('Module:Set')
+local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
+local Variables = Lua.import('Module:Variables')
+local YearsActive = Lua.import('Module:YearsActive')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')

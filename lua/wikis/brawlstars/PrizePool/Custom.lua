@@ -5,13 +5,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
-local Namespace = require('Module:Namespace')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 

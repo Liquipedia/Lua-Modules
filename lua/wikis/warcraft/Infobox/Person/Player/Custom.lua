@@ -5,17 +5,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local Math = require('Module:MathUtil')
-local Variables = require('Module:Variables')
+
+local Class = Lua.import('Module:Class')
+local Faction = Lua.import('Module:Faction')
+local Math = Lua.import('Module:MathUtil')
+local Variables = Lua.import('Module:Variables')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))

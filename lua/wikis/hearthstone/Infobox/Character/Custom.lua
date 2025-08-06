@@ -15,7 +15,7 @@ local Page = Lua.import('Module:Page')
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local AutoInlineIcon = Lua.import('Module:AutoInlineIcon')

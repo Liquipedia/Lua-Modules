@@ -5,12 +5,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 
-local Widgets = require('Module:Widget/All')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
