@@ -200,7 +200,7 @@ function Transfer._completeTransfer(config, transfer)
 	for _, leaveTransfer in ipairs(leaveTransfers) do
 		if hasLeaveDate(leaveTransfer) then
 			transfer.leaveDate = DateExt.toYmdInUtc(leaveTransfer.date)
-			transfer.leaveDateDisplay = leaveTransfer.extradata.dispaydate or transfer.leaveDate
+			transfer.leaveDateDisplay = leaveTransfer.extradata.displaydate or transfer.leaveDate
 			transfer.reference.leave = leaveTransfer.reference
 
 			return transfer
