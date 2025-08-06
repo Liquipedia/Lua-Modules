@@ -203,4 +203,55 @@ function StandingsParseWiki.parseTiebreakers(args, tableType)
 	return tiebreakers
 end
 
+---@param args table
+---@param opponents StandingTableOpponentData[]
+---@return table?
+function StandingsParseWiki.parsePlaceMapping(args, opponents)
+	if not args.nomapping then
+		return
+	end
+	local input = args.placements
+
+	local function placementMappingError(msg)
+		error('Invalid placement mapping: "' .. (input or 'nil') .. '" ' .. msg)
+	end
+
+	if not input then
+		placementMappingError('No placement mapping provided')
+	end
+
+	local mapping = {}
+	for _, place in pairs(Array.parseCommaSeparatedString(input, ';')) do
+		local places = Array.parseCommaSeparatedString(place, '-')
+		local startPlace = tonumber(places[1])
+		local placeEnd = tonumber(places[#places])
+
+		if (not startPlace) or (not placeEnd) or (placeEnd < startPlace) or #places > 2 then
+			placementMappingError('Invalid placement range: ' .. place)
+		end
+
+		for placeIndex = startPlace, placeEnd do
+			if mapping[placeIndex] then
+				placementMappingError('Duplicate placement mapping: ' .. placeIndex)
+			end
+
+			mapping[placeIndex] = startPlace
+		end
+	end
+
+	local numberOfOpponents = #opponents
+
+	if Table.size(mapping) > numberOfOpponents then
+		placementMappingError('More placements than opponents: ' .. Table.size(mapping) .. ' > ' .. numberOfOpponents)
+	end
+
+	for placeIndex = 1, numberOfOpponents do
+		if not mapping[placeIndex] then
+			placementMappingError('Missing placement mapping for placement: ' .. placeIndex)
+		end
+	end
+
+	return mapping
+end
+
 return StandingsParseWiki
