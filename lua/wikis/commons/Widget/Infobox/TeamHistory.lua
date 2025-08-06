@@ -51,7 +51,6 @@ end
 ---@return Widget|string?
 function TeamHistory:_getHistory()
 	local config = (Info.config.infoboxPlayer or {}).automatedHistory or {}
-	---@type string?
 	local manualInput = self.props.manualInput
 
 	---@type automatedHistoryMode
