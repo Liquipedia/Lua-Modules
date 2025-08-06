@@ -19,6 +19,7 @@ local ROLE_CLEAN = Lua.requireIfExists('Module:TeamHistoryAuto/cleanRole', {load
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
+local ConditionUtil = Condition.Util
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
@@ -222,9 +223,10 @@ function Transfer._buildConditionsForLeaveTransfer(config, transfer)
 	local historicalNames = Team.queryHistoricalNames(transfer.team)
 
 	local buildFromConditions = function(teamField, roleField)
-		local fromConditions = ConditionTree(BooleanOperator.any):add(Array.map(historicalNames, function(team)
-			return ConditionNode(ColumnName(teamField), Comparator.eq, team)
-		end))
+		local fromConditions = ConditionUtil.anyOf(
+			ColumnName(teamField),
+			historicalNames
+		)
 
 		if ROLE_CLEAN and not transfer.role then
 			return fromConditions
