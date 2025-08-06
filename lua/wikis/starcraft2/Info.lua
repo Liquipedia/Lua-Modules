@@ -69,6 +69,7 @@ return {
 			},
 			hideOrg = true,
 		},
+		defaultMaxPlayersPerPlacement = 20,
 		thisDay = {
 			hideEmptyBirthdayList = true,
 			tiers = {1, 2},

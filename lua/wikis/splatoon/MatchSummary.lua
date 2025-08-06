@@ -7,13 +7,14 @@
 
 local CustomMatchSummary = {}
 
-local Array = require('Module:Array')
 local Lua = require('Module:Lua')
-local MapTypeIcon = require('Module:MapType')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local WeaponIcon = require('Module:WeaponIcon')
+
+local Array = Lua.import('Module:Array')
+local MapTypeIcon = Lua.import('Module:MapType')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local WeaponIcon = Lua.import('Module:WeaponIcon')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')

@@ -5,31 +5,32 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
-local Info = require('Module:Info')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchTicker = require('Module:MatchTicker/Custom')
-local Namespace = require('Module:Namespace')
-local Operator = require('Module:Operator')
-local Page = require('Module:Page')
-local PlayerIntroduction = require('Module:PlayerIntroduction/Custom')
-local Region = require('Module:Region')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local Info = Lua.import('Module:Info')
+local Logic = Lua.import('Module:Logic')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
+local Namespace = Lua.import('Module:Namespace')
+local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
+local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
+local Region = Lua.import('Module:Region')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator

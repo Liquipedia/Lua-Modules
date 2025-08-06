@@ -165,17 +165,18 @@ function TransferList:fetch()
 	self.conditions = self:_buildConditions()
 	local queryData = mw.ext.LiquipediaDB.lpdb('transfer', {
 		conditions = self.conditions,
-		limit = self.config.limit,
+		limit = self.config.limit * 5,
 		order = self.config.sortOrder,
 	})
 
 	local groupedData = {}
 	local currentGroup
 	local cache = {}
-	Array.forEach(queryData, function(transfer)
+	for _, transfer in ipairs(queryData) do
 		if
 			cache.team1 ~= transfer.fromteam or
 			cache.team2 ~= transfer.toteam or
+			cache.date ~= transfer.date or
 			cache.role1 ~= transfer.role1 or
 			cache.role2 ~= transfer.role2 or
 			cache.team1_2 ~= transfer.extradata.fromteamsec or
@@ -183,16 +184,20 @@ function TransferList:fetch()
 		then
 			cache.team1 = transfer.fromteam
 			cache.team2 = transfer.toteam
+			cache.date = transfer.date
 			cache.role1 = transfer.role1
 			cache.role2 = transfer.role2
 			cache.team1_2 = transfer.extradata.fromteamsec
 			cache.team2_2 = transfer.extradata.toteamsec
 
 			Array.appendWith(groupedData, currentGroup)
+			if #groupedData == self.config.limit then
+				break
+			end
 			currentGroup = {}
 		end
 		table.insert(currentGroup, transfer)
-	end)
+	end
 	Array.appendWith(groupedData, currentGroup)
 
 	self.groupedTransfers = groupedData

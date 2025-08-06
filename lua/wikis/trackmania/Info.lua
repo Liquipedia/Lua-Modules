@@ -152,5 +152,6 @@ return {
 			status = 1,
 			sortCasters = true,
 		},
+		defaultMaxPlayersPerPlacement = 20,
 	},
 }

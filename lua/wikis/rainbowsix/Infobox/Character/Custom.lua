@@ -5,18 +5,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
-local Image = require('Module:Image')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
+local Image = Lua.import('Module:Image')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 
 local AgeCalculation = Lua.import('Module:AgeCalculation')
 local AutoInlineIcon = Lua.import('Module:AutoInlineIcon')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
-local NameAliases = Lua.requireIfExists('Module:CharacterNames', {loadData = true})
+local NameAliases = Lua.Lua.importIfExists('Module:CharacterNames', {loadData = true})
 local Patch = Lua.import('Module:Patch')
 
 local Injector = Lua.import('Module:Widget/Injector')

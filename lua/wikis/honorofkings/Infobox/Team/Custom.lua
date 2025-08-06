@@ -5,12 +5,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local PlacementStats = require('Module:InfoboxPlacementStats')
-local RoleOf = require('Module:RoleOf')
-local Template = require('Module:Template')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local PlacementStats = Lua.import('Module:InfoboxPlacementStats')
+local RoleOf = Lua.import('Module:RoleOf')
+local Template = Lua.import('Module:Template')
 
 local Region = Lua.import('Module:Region')
 local Team = Lua.import('Module:Infobox/Team')
