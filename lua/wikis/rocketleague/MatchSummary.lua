@@ -5,11 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')

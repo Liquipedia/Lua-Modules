@@ -5,21 +5,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Currency = require('Module:Currency')
-local Game = require('Module:Game')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local Variables = require('Module:Variables')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Currency = Lua.import('Module:Currency')
+local Game = Lua.import('Module:Game')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Chronology = Widgets.Chronology
