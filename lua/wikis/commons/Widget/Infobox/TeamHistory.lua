@@ -31,6 +31,7 @@ local DEFAULT_MODE = 'manual'
 
 ---@class TeamHistoryWidget: Widget
 ---@operator call(table): TitleWidget
+---@field props {player: string, manualInput: string?}
 local TeamHistory = Class.new(Widget)
 
 ---@return Widget[]
