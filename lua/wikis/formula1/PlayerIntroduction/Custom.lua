@@ -5,12 +5,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local AnOrA = require('Module:A or an')
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local AnOrA = Lua.import('Module:A or an')
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local PlayerIntroduction = Lua.import('Module:PlayerIntroduction')
 
