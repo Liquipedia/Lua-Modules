@@ -8,12 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local String = Lua.import('Module:StringUtils')
-local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
-
-local Widgets = Lua.import('Module:Widget/All')
-local Title = Widgets.Title
-local Center = Widgets.Center
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
@@ -37,20 +31,7 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
-	if id == 'history' then
-		local manualHistory = args.history
-		local automatedHistory = TeamHistoryAuto.results{
-			convertrole = true,
-			player = self.caller.pagename
-		}
-
-		if String.isEmpty(manualHistory) and not automatedHistory then return {} end
-		return {
-			Title{children = 'History'},
-			Center{children = {manualHistory}},
-			Center{children = {automatedHistory}},
-		}
-	elseif id == 'region' then return {}
+	if id == 'region' then return {}
 	end
 	return widgets
 end

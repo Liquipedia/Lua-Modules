@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Role = Lua.import('Module:Role')
-local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
@@ -18,7 +17,6 @@ local Player = Lua.import('Module:Infobox/Person')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
-local Center = Widgets.Center
 
 ---@class Formula1InfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)
@@ -29,8 +27,6 @@ local CustomInjector = Class.new(Injector)
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
-
-	player.args.autoTeam = true
 
 	return player:createInfobox(frame)
 end
@@ -46,15 +42,6 @@ function CustomInjector:parse(id, widgets)
 
 	elseif id == 'names' then
 		table.insert(widgets, Cell{name = 'Abbreviations', content = {args.abbreviations}})
-	elseif id == 'history' then
-		return {
-			Title{children = 'History'},
-			Center{children = {TeamHistoryAuto.results{
-				convertrole = true,
-				addlpdbdata = true
-			}}},
-		}
-
 	elseif id == 'role' then
 		return {
 			Cell{name = 'Role(s)', content = {
