@@ -12,12 +12,12 @@ local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TypeUtil = Lua.import('Module:TypeUtil')
-
-local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
 local BYE = 'bye'
 
@@ -364,10 +364,10 @@ function Opponent.toName(opponent)
 		local name = TeamTemplate.getPageName(opponent.template)
 		-- annos expect a string return, so let it error if we get a nil return
 		assert(name, 'Invalid team template: ' .. (opponent.template or ''))
-		return name
+		return Page.applyUnderScoresIfEnforced(name)
 	elseif Opponent.typeIsParty(opponent.type) then
 		local pageNames = Array.map(opponent.players, function(player)
-			return player.pageName or player.displayName
+			return Page.applyUnderScoresIfEnforced(player.pageName or player.displayName)
 		end)
 		table.sort(pageNames)
 		return table.concat(pageNames, ' / ')
@@ -403,7 +403,7 @@ function Opponent.readOpponentArgs(args)
 		local player = {
 			displayName = args[1] or args.p1 or args.name or '',
 			flag = String.nilIfEmpty(Flags.CountryName{flag = args.flag or args.p1flag}),
-			pageName = args.link or args.p1link,
+			pageName = Page.applyUnderScoresIfEnforced(args.link or args.p1link),
 			team = args.team or args.p1team,
 			faction = Logic.nilIfEmpty(Faction.read(args.faction or args.race or args.p1race)),
 		}
@@ -415,7 +415,7 @@ function Opponent.readOpponentArgs(args)
 			return {
 				displayName = args[playerIndex] or args['p' .. playerIndex] or '',
 				flag = String.nilIfEmpty(Flags.CountryName{flag = args['p' .. playerIndex .. 'flag']}),
-				pageName = args['p' .. playerIndex .. 'link'],
+				pageName = Page.applyUnderScoresIfEnforced(args['p' .. playerIndex .. 'link']),
 				team = playerTeam,
 				faction = Logic.nilIfEmpty(Faction.read(args['p' .. playerIndex .. 'faction']
 					or args['p' .. playerIndex .. 'race'])),
@@ -480,7 +480,7 @@ function Opponent.toLpdbStruct(opponent)
 		for playerIndex, player in ipairs(opponent.players) do
 			local prefix = 'p' .. playerIndex
 
-			players[prefix] = player.pageName
+			players[prefix] = Page.applyUnderScoresIfEnforced(player.pageName)
 			players[prefix .. 'dn'] = player.displayName
 			players[prefix .. 'flag'] = player.flag
 			players[prefix .. 'team'] = player.team and
