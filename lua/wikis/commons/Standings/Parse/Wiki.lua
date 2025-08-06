@@ -207,7 +207,7 @@ end
 ---@param opponents StandingTableOpponentData[]
 ---@return table?
 function StandingsParseWiki.parsePlaceMapping(args, opponents)
-	if not args.nomapping then
+	if Logic.readBool(args.nomapping) then
 		return
 	end
 	local input = args.placements
