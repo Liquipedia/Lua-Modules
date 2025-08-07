@@ -25,15 +25,9 @@ local CONTENT = {
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
-		body = '{{Liquipedia:Want_to_help}}',
+		body = WantToHelp{},
 		padding = true,
 		boxid = 1504,
-	},
-	liquipediaApp = {
-		heading = 'Download the Liquipedia App',
-		padding = true,
-		body = '{{Liquipedia:App}}',
-		boxid = 1505,
 	},
 	transfers = {
 		heading = 'Transfers',
