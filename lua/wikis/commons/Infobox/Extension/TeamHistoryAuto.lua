@@ -317,13 +317,13 @@ function TeamHistoryAuto._displayRef(references, date)
 
 	if Logic.isEmpty(refs) then return end
 
-	return Fragment{children = {
+	return Fragment{children = WidgetUtil.collect(
 		Span{
 			css = {['font-size'] = '50%'},
 			children = {'&thinsp;'},
 		},
 		refs
-	}}
+	)}
 end
 
 ---@param transfer table
