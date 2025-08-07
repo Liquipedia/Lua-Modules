@@ -26,6 +26,18 @@ function StandingsTiebreaker:valueOf(state, opponent)
 	error('This is an Interface')
 end
 
+---@return string
+function StandingsTiebreaker:headerTitle()
+	error('This is an Interface')
+end
+
+---@param state TiebreakerOpponent[]
+---@param opponent TiebreakerOpponent
+---@return string
+function StandingsTiebreaker:display(state, opponent)
+	error('This is an Interface')
+end
+
 ---@return 'full'|'ml'|'h2h'
 function StandingsTiebreaker:getContextType()
 	return self.context

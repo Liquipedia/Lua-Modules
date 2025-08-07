@@ -19,8 +19,8 @@ local NAME_TO_CLASS = {
 }
 
 ---@param input string
----@return StandingsTiebreaker
-function TiebreakerFactory.tiebreakerFromName(input)
+---@return string
+function TiebreakerFactory.tiebreakerIdFromName(input)
 	local context, name = unpack(String.split(input, '%.'))
 	if name == nil then
 		name = context
@@ -31,13 +31,20 @@ function TiebreakerFactory.tiebreakerFromName(input)
 		'Invalid tie breaker context: ' .. context
 	)
 
-	local className = NAME_TO_CLASS[name]
-	assert(className, "Invalid tiebreaker type: " .. tostring(name))
+	local tiebreakerId = NAME_TO_CLASS[name]
+	assert(tiebreakerId, "Invalid tiebreaker type: " .. tostring(name))
 
 	---@type StandingsTiebreaker
-	local tiebreakerClass = Lua.import('Module:Standings/Tiebreaker/' .. className)
+	local tiebreakerClass = Lua.import('Module:Standings/Tiebreaker/' .. tiebreakerId)
 
-	return tiebreakerClass(context)
+	return {id = tiebreakerId, context = context}
+end
+
+function TiebreakerFactory.tiebreakerFromId(tiebreakerId, context)
+	---@type StandingsTiebreaker
+	local tiebreakerClass = Lua.import('Module:Standings/Tiebreaker/' .. tiebreakerId)
+
+	return tiebreakerClass.new(context), tiebreakerId.id
 end
 
 return TiebreakerFactory
