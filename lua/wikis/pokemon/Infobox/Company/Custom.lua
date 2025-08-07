@@ -39,17 +39,17 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		return Array.appendWith(widgets,
 			Title{children = 'Staff Members'},
-			Cell{name = 'Directors', content = Array.parseCommaSeparatedString(args.directors)},
-			Cell{name = 'Event Organizer', content = Array.parseCommaSeparatedString(args.organizers)},
-			Cell{name = 'Editors', content = Array.parseCommaSeparatedString(args.editors)},
-			Cell{name = 'Commentators', content = Array.parseCommaSeparatedString(args.commentators)},
+			Cell{name = 'Directors', children = Array.parseCommaSeparatedString(args.directors)},
+			Cell{name = 'Event Organizer', children = Array.parseCommaSeparatedString(args.organizers)},
+			Cell{name = 'Editors', children = Array.parseCommaSeparatedString(args.editors)},
+			Cell{name = 'Commentators', children = Array.parseCommaSeparatedString(args.commentators)},
 			unpack(Array.mapIndexes(function(roleIndex)
 				local prefix = 'role' .. roleIndex
 				if not args[prefix] then return end
-				return Cell{name = args[prefix], content = Array.parseCommaSeparatedString(args[prefix .. '_list'])}
+				return Cell{name = args[prefix], children = Array.parseCommaSeparatedString(args[prefix .. '_list'])}
 			end)),
-			Cell{name = 'Members', content = Array.parseCommaSeparatedString(args.members)},
-			Cell{name = 'Former Staff', content = Array.parseCommaSeparatedString(args.former_staff)}
+			Cell{name = 'Members', children = Array.parseCommaSeparatedString(args.members)},
+			Cell{name = 'Former Staff', children = Array.parseCommaSeparatedString(args.former_staff)}
 		)
 	end
 	return widgets

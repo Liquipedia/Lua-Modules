@@ -36,7 +36,7 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
-		table.insert(widgets, Cell{name = 'Years Active (Player)', content = {self.caller.args.years_active}})
+		table.insert(widgets, Cell{name = 'Years Active (Player)', children = {self.caller.args.years_active}})
 	end
 
 	return widgets

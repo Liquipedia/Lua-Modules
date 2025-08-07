@@ -69,7 +69,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'topcustomcontent' then
 		table.insert(widgets, Cell{
 			name = 'Clan tag',
-			content = {self.caller.teamTemplate.shortname}
+			children = {self.caller.teamTemplate.shortname}
 		})
 	elseif id == 'customcontent' then
 		local profiles = Array.extractValues(Table.map(PROFILES, function (param, profileData)

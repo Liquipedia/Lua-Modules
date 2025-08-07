@@ -139,7 +139,7 @@ function CustomInjector:parse(id, widgets)
 		})
 
 		return ageCalculationSuccess and {
-			Cell{name = 'Born', content = {age.birth}},
+			Cell{name = 'Born', children = {age.birth}},
 		} or {}
 	elseif id == 'role' then
 		return WidgetUtil.collect(
@@ -149,7 +149,7 @@ function CustomInjector:parse(id, widgets)
 			},
 			Cell{
 				name = 'Operator Role',
-				content = Array.map(
+				children = Array.map(
 					self.caller:getAllArgsForBase(args, 'function'),
 					function (role)
 						return Link{
@@ -164,12 +164,12 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Team Rainbow',
-				content = self.caller:_getTeamRainbow(args),
+				children = self.caller:_getTeamRainbow(args),
 				options = { separator = ' ' }
 			},
 			Cell{
 				name = 'Affiliation',
-				content = { args.affiliation }
+				children = { args.affiliation }
 			}
 		}
 	elseif id == 'release' then
@@ -181,7 +181,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Released',
-				content = WidgetUtil.collect(
+				children = WidgetUtil.collect(
 					Logic.isNotEmpty(patchData) and Link{
 						link = patchData.pageName,
 						children = patchData.displayName
@@ -202,6 +202,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param args table
 ---@return Widget[]
 function CustomCharacter:_getTeam(args)
 	local team = (args.team or ''):lower()
@@ -216,6 +217,7 @@ function CustomCharacter:_getTeam(args)
 	end
 end
 
+---@param args table
 ---@return (Widget|string)[]
 function CustomCharacter:_getTeamRainbow(args)
 	local teamRainbow = (args['team rainbow'] or ''):lower()
@@ -254,22 +256,22 @@ function CustomCharacter:_getAdditionalInfo(args)
 	return WidgetUtil.collect(
 		Logic.isNotEmpty(args.height) and Cell{
 			name = 'Height',
-			content = { args.height, 'm' },
+			children = { args.height, 'm' },
 			options = { separator = ' ' }
 		} or nil,
 		Logic.isNotEmpty(args.weight) and Cell{
 			name = 'Weight',
-			content = { args.weight, 'kg' },
+			children = { args.weight, 'kg' },
 			options = { separator = ' ' }
 		} or nil,
 		Logic.isNotEmpty(args.voice) and Cell{
 			name = 'Voiced by',
-			content = { args.voice }
+			children = { args.voice }
 		} or nil,
 		self:_getPriceCells(args.renownprice or args.creditprice),
 		Cell{
 			name = 'Has Elite Skin',
-			content = WidgetUtil.collect(
+			children = WidgetUtil.collect(
 				HtmlWidgets.Fragment{
 					children = Logic.readBool(args.eliteskin) and {
 						IconFa{ iconName = 'yes', color = 'forest-green-text' },
@@ -304,7 +306,7 @@ function CustomCharacter:_getAdditionalInfo(args)
 		},
 		Cell{
 			name = 'Availability',
-			content = { args.availability }
+			children = { args.availability }
 		}
 	)
 end
@@ -318,7 +320,7 @@ function CustomCharacter:_getPriceCells(input)
 		return {
 			Cell{
 				name = 'Renown price',
-				content = WidgetUtil.collect(
+				children = WidgetUtil.collect(
 					'Free',
 					Array.map({ 500, 1000, 1500, 2000 }, function (renownPrice)
 						return HtmlWidgets.Fragment{
@@ -356,7 +358,7 @@ function CustomCharacter:_getPriceCell(currency, price)
 	local lang = mw.getContentLanguage()
 	return Cell{
 		name = currency .. ' price',
-		content = {
+		children = {
 			lang:formatNum(price),
 			HtmlWidgets.Fragment{
 				children = {
@@ -410,7 +412,7 @@ end
 function CustomCharacter._generateStatCell(title, datatype, value, display)
 	return Cell{
 		name = title,
-		content = {
+		children = {
 			Image.display(
 				'R6S operator-rating-' .. datatype .. '-' ..  value .. ' lightmode.png',
 				'R6S operator-rating-' .. datatype .. '-' ..  value .. ' darkmode.png',

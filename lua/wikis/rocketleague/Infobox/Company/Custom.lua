@@ -34,7 +34,7 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
-		table.insert(widgets, Cell{name = 'Epic Creator Code', content = {args.creatorcode}})
+		table.insert(widgets, Cell{name = 'Epic Creator Code', children = {args.creatorcode}})
 	end
 
 	return widgets

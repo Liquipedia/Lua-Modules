@@ -43,7 +43,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Type',
-				content = {mw.language.getContentLanguage():ucfirst(self.caller.args.type or '')}
+				children = {mw.language.getContentLanguage():ucfirst(self.caller.args.type or '')}
 		}}
 	end
 

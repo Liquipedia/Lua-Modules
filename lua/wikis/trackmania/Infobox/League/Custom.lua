@@ -51,13 +51,13 @@ function CustomInjector:parse(id, widgets)
 		local partners = self.caller:getAllArgsForBase(args, 'partner')
 		table.insert(widgets, Cell{
 			name = 'Partner' .. (#partners > 1 and 's' or ''),
-			content = Array.map(partners, Page.makeInternalLink)
+			children = Array.map(partners, Page.makeInternalLink)
 		})
 	elseif id == 'gamesettings' then
 		local games = self.caller:getAllArgsForBase(args, 'game')
 		table.insert(widgets, Cell{
 			name = 'Game' .. (#games > 1 and 's' or ''),
-			content = Array.map(games,
+			children = Array.map(games,
 					function(game)
 						local info = Game.raw{game = game}
 						if not info then
@@ -70,11 +70,11 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Title{children = String.isNotEmpty(args.team_number) and 'Teams' or 'Players'})
 		table.insert(widgets, Cell{
 			name = 'Number of Teams',
-			content = {args.team_number}
+			children = {args.team_number}
 		})
 		table.insert(widgets, Cell{
 			name = 'Number of Players',
-			content = {args.player_number}
+			children = {args.player_number}
 		})
 
 		local maps = self.caller:getAllArgsForBase(args, 'map')
@@ -157,10 +157,10 @@ function CustomLeague:_createCircuitInformation(widgets)
 	Array.appendWith(widgets,
 		Cell{
 			name = 'Circuit',
-			content = {self:_createCircuitLink()}
+			children = {self:_createCircuitLink()}
 		},
-		Cell{name = 'Circuit Tier', content = {args.circuittier}},
-		Cell{name = 'Tournament Region', content = {args.region}},
+		Cell{name = 'Circuit Tier', children = {args.circuittier}},
+		Cell{name = 'Tournament Region', children = {args.region}},
 		Chronology{args = {next = args.circuit_next, previous = args.circuit_previous}, showTitle = false}
 	)
 end

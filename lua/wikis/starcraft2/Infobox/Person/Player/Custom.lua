@@ -111,25 +111,25 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Approx. Winnings ' .. CURRENT_YEAR,
-				content = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
+				children = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
 			},
-			Cell{name = ranks[1].name or 'Rank', content = {ranks[1].rank}},
-			Cell{name = ranks[2].name or 'Rank', content = {ranks[2].rank}},
-			Cell{name = 'Military Service', content = {args.military}},
+			Cell{name = ranks[1].name or 'Rank', children = {ranks[1].rank}},
+			Cell{name = ranks[2].name or 'Rank', children = {ranks[2].rank}},
+			Cell{name = 'Military Service', children = {args.military}},
 			Cell{
 				name = Abbreviation.make{text = 'Years Active', title = 'Years active as a player'},
-				content = {caller.yearsActive}
+				children = {caller.yearsActive}
 			},
 			Cell{
 				name = Abbreviation.make{text = 'Years Active (caster)', title = 'Years active as a caster'},
-				content = {self.caller:_getActiveCasterYears()}
+				children = {self.caller:_getActiveCasterYears()}
 			},
 		}
 	elseif id == 'status' then
 		return {
 			Cell{
 				name = 'Race',
-				content = {caller:getRaceData(args.race or 'unknown', RACE_FIELD_AS_CATEGORY_LINK)}
+				children = {caller:getRaceData(args.race or 'unknown', RACE_FIELD_AS_CATEGORY_LINK)}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -143,11 +143,11 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Title{children = 'Achievements'},
 			Center{children = {Achievements.display(caller.infoboxAchievements)}},
-			Cell{name = 'All-Kills', content = {allkills > 0 and (ALL_KILL_ICON .. allkills) or nil}}
+			Cell{name = 'All-Kills', children = {allkills > 0 and (ALL_KILL_ICON .. allkills) or nil}}
 		}
 	elseif id == 'achievements' then return {}
 	elseif id == 'history' and string.match(args.retired or '', '%d%d%d%d') then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 
 	return widgets

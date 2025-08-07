@@ -44,7 +44,7 @@ function CustomInjector:parse(id, widgets)
 		local index = 1
 		local defencesCells = {}
 		while not String.isEmpty(args['most defences against ' .. index]) do
-			table.insert(defencesCells, Breakdown{ content = {
+			table.insert(defencesCells, Breakdown{ children = {
 				args['most defences against ' .. index],
 				args['most defences against ' .. (index + 1)],
 			}})
@@ -78,7 +78,7 @@ function CustomUnofficialWorldChampion:_buildCellsFromBase(base, title)
 
 	local widgets = {Title{children = title}}
 	for key, value in Table.iter.pairsByPrefix(args, base .. ' ') do
-		table.insert(widgets, Cell{name = (args[key .. ' no'] or '?') .. ' champions', content = {value}})
+		table.insert(widgets, Cell{name = (args[key .. ' no'] or '?') .. ' champions', children = {value}})
 	end
 
 	return widgets

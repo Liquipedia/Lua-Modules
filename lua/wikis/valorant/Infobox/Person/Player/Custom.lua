@@ -91,21 +91,21 @@ function CustomInjector:parse(id, widgets)
 			return CharacterIcon.Icon{character = agent, size = SIZE_AGENT}
 		end)
 		return {
-			Cell{name = 'Signature Agent' .. (#icons > 1 and 's' or ''), content = {table.concat(icons, '&nbsp;')}}
+			Cell{name = 'Signature Agent' .. (#icons > 1 and 's' or ''), children = {table.concat(icons, '&nbsp;')}}
 		}
 	elseif id == 'status' then
 		Array.appendWith(widgets,
-			Cell{name = 'Years Active (Player)', content = {args.years_active}},
+			Cell{name = 'Years Active (Player)', children = {args.years_active}},
 			Cell{
 				name = 'Years Active (' .. Abbreviation.make{text = 'Org', title = 'Organisation'} .. ')',
-				content = {args.years_active_org}
+				children = {args.years_active_org}
 			},
-			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
-			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}}
+			Cell{name = 'Years Active (Coach)', children = {args.years_active_coach}},
+			Cell{name = 'Years Active (Talent)', children = {args.years_active_talent}}
 		)
 
 	elseif id == 'history' then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	elseif id == 'region' then
 		return {}
 	end

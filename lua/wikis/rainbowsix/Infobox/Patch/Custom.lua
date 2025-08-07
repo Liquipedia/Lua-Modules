@@ -35,9 +35,9 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'release' then
 		return {
-			Cell{name = 'Release Date', content = {args.release}},
-			Cell{name = 'PC Release Date', content = {args.pcrelease}},
-			Cell{name = 'Console Release Date', content = {args.consolerelease}},
+			Cell{name = 'Release Date', children = {args.release}},
+			Cell{name = 'PC Release Date', children = {args.pcrelease}},
+			Cell{name = 'Console Release Date', children = {args.consolerelease}},
 		}
 	end
 	return widgets
