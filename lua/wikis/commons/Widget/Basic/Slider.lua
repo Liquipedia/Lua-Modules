@@ -29,21 +29,31 @@ local Div = HtmlWidgets.Div
 ---@field props SliderWidgetParameters
 
 local Slider = Class.new(Widget)
+Slider.propSpec = {
+	id = {type = 'integer', required = true},
+	min = {type = 'integer', default = 1},
+	max = {type = 'integer', default = 100},
+	step = {type = 'integer', default = 1},
+	defaultValue = {type = 'integer', default = 1},
+	class = {type = 'string'},
+	title = {type = 'function', default = function(v) return tostring(v) end},
+	childrenAtValue = {type = 'function', required = true},
+}
+
 ---@return Widget
 function Slider:render()
-	assert(self.props.id, 'Slider requires a unique id property')
-	-- We make the real slider in js
-	local min, max, step = self.props.min or 0, self.props.max or 100, self.props.step or 1
+	local min, max, step = self.props.min, self.props.max, self.props.step
 
 	local children = {}
 	for value = min, max, step do
 		table.insert(children, {
 			content = self.props.childrenAtValue(value) or '',
-			title = self.props.title and self.props.title(value) or value,
+			title = self.props.title(value),
 			value = value,
 		})
 	end
 
+	-- We make the real slider in js
 	return Div{
 		classes = { 'slider' },
 		attributes = {
@@ -51,7 +61,7 @@ function Slider:render()
 			['data-min'] = min,
 			['data-max'] = max,
 			['data-step'] = step,
-			['data-value'] = self.props.defaultValue or self.props.min or 0,
+			['data-value'] = self.props.defaultValue,
 		},
 		children = Array.map(children, function(child)
 			return HtmlWidgets.Div{

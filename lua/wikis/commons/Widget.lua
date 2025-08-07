@@ -19,8 +19,28 @@ local Table = Lua.import('Module:Table')
 ---@operator call(table): self
 ---@field context Widget[]
 ---@field props table<string, any>
+---@field propSpec table<string, any>
 local Widget = Class.new(function(self, props)
-	self.props = Table.deepMerge(Table.deepCopy(self.defaultProps), props)
+	---@return table<string, any>
+	local getDefaultProps = function()
+		if Table.isNotEmpty(self.defaultProps) then
+			return self.defaultProps
+		end
+		if Table.isNotEmpty(self.propSpec) then
+			return Table.mapValues(self.propSpec, function(prop)
+				return prop.default
+			end)
+		end
+		return {}
+	end
+
+	self.props = Table.deepMerge(Table.deepCopy(getDefaultProps()), props)
+
+	for propName, prop in pairs(self.propSpec) do
+		if prop.required and self.props[propName] == nil then
+			error('Missing required property: ' .. propName)
+		end
+	end
 
 	if not Array.isArray(self.props.children) then
 		self.props.children = {self.props.children}
@@ -29,7 +49,9 @@ local Widget = Class.new(function(self, props)
 	self.context = {} -- Populated by the parent
 end)
 
+---@deprecated
 Widget.defaultProps = {}
+Widget.propSpec = {}
 
 ---Asserts the existence of a value and copies it
 ---@param value string
