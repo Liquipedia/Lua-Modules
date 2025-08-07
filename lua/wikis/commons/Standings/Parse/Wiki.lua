@@ -221,23 +221,23 @@ function StandingsParseWiki.parsePlaceMapping(args, opponents)
 	end
 
 	local mapping = {}
-	for _, place in pairs(Array.parseCommaSeparatedString(input, ';')) do
+	Array.forEach(Array.parseCommaSeparatedString(input, ';'), function (place)
 		local places = Array.parseCommaSeparatedString(place, '-')
 		local startPlace = tonumber(places[1])
 		local placeEnd = tonumber(places[#places])
 
 		if (not startPlace) or (not placeEnd) or (placeEnd < startPlace) or #places > 2 then
-			placementMappingError('Invalid placement range: ' .. place)
+			return placementMappingError('Invalid placement range: ' .. place)
 		end
 
-		for placeIndex = startPlace, placeEnd do
+		Array.forEach(Array.range(startPlace, placeEnd), function(placeIndex)
 			if mapping[placeIndex] then
-				placementMappingError('Duplicate placement mapping: ' .. placeIndex)
+				return placementMappingError('Duplicate placement mapping: ' .. placeIndex)
 			end
 
 			mapping[placeIndex] = startPlace
-		end
-	end
+		end)
+	end)
 
 	local numberOfOpponents = #opponents
 
@@ -245,11 +245,11 @@ function StandingsParseWiki.parsePlaceMapping(args, opponents)
 		placementMappingError('More placements than opponents: ' .. Table.size(mapping) .. ' > ' .. numberOfOpponents)
 	end
 
-	for placeIndex = 1, numberOfOpponents do
+	Array.forEach(Array.range(1, numberOfOpponents), function(placeIndex)
 		if not mapping[placeIndex] then
 			placementMappingError('Missing placement mapping for placement: ' .. placeIndex)
 		end
-	end
+	end)
 
 	return mapping
 end
