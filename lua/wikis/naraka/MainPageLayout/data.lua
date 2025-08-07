@@ -63,7 +63,6 @@ local CONTENT = {
 		body = TournamentsTicker{
 			upcomingDays = 100,
 			completedDays = 200,
-			displayGameIcons = true
 		},
 		padding = true,
 		boxid = 1508,
