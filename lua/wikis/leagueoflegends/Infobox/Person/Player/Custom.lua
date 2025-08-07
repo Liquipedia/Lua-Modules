@@ -14,7 +14,6 @@ local Page = Lua.import('Module:Page')
 local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local String = Lua.import('Module:StringUtils')
 local Team = Lua.import('Module:Team')
-local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
 local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -34,13 +33,6 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	local args = player.args
 	player:setWidgetInjector(CustomInjector(player))
-
-	args.history = String.nilIfEmpty(args.history) or TeamHistoryAuto.results{
-		hiderole = true,
-		iconModule = 'Module:PositionIcon/data',
-		addlpdbdata = true,
-	}
-	args.autoTeam = true
 
 	local builtInfobox = player:createInfobox()
 

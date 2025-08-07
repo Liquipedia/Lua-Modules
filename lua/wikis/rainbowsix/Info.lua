@@ -93,6 +93,13 @@ return {
 			excludeTierTypes = {'Qualifier'},
 			showPatches = true,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'automatic',
+				hasHeaderAndRefs = true,
+			},
+		},
 	},
 	defaultRoundPrecision = 0,
 }

@@ -16,7 +16,6 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
-local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Math = Lua.import('Module:MathUtil')
@@ -28,8 +27,7 @@ local YearsActive = Lua.import('Module:YearsActive')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local CustomPerson = Lua.import('Module:Infobox/Person/Custom')
-local Opponent = Lua.import('Module:Opponent/Starcraft')
-local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -79,16 +77,6 @@ function CustomPlayer.run(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	player.shouldQueryData = player:shouldStoreData(player.args)
-
-	player.args.autoTeam = Logic.emptyOr(player.args.autoTeam, true)
-
-	player.args.history = Logic.nilIfEmpty(player.args.history) or TeamHistoryAuto.results{
-		player = player.pagename,
-		convertrole = true,
-		addlpdbdata = Logic.emptyOr(player.args.addlpdbdata, true),
-		cleanRoles = 'Module:TeamHistoryAuto/cleanRole',
-		specialRoles = true,
-	}
 
 	if player.shouldQueryData then
 		player:_getMatchupData(player.pagename)

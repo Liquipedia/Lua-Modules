@@ -11,15 +11,12 @@ local Class = Lua.import('Module:Class')
 local GameAppearances = Lua.import('Module:GetGameAppearances')
 local Region = Lua.import('Module:Region')
 local String = Lua.import('Module:StringUtils')
-local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
-local Center = Widgets.Center
 
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
@@ -38,27 +35,11 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
-	local args = caller.args
 
 	if id == 'custom' then
 		return {
 			Cell{name = 'Game Appearances', children = GameAppearances.player({player = caller.pagename})},
 		}
-	elseif id == 'history' then
-		local manualHistory = args.history
-		local automatedHistory = TeamHistoryAuto.results{
-			convertrole = true,
-			addlpdbdata = true,
-			player = caller.pagename
-		}
-
-		if String.isNotEmpty(manualHistory) or automatedHistory then
-			return {
-				Title{children = 'History'},
-				Center{children = {manualHistory}},
-				Center{children = {automatedHistory}},
-			}
-		end
 	elseif id == 'region' then return {}
 	end
 

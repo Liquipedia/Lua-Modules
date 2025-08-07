@@ -13,7 +13,6 @@ local WeaponIcon = Lua.import('Module:WeaponIconPlayer')
 local WeaponNames = Lua.import('Module:WeaponNames', {loadData = true})
 local Region = Lua.import('Module:Region')
 local String = Lua.import('Module:StringUtils')
-local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
@@ -32,8 +31,6 @@ local CustomInjector = Class.new(Injector)
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
-
-	player.args.history = TeamHistoryAuto.results{convertrole = true}
 
 	return player:createInfobox()
 end

@@ -38,6 +38,9 @@ return {
 			hidePlayedMatches = true,
 			excludeStreamers = true,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+		},
 	},
 	defaultRoundPrecision = 0,
 }
