@@ -36,6 +36,7 @@ local REGION_TO_SUPERREGION = {
 	['Southeast Asia'] = 'APAC',
 	['Vietnam'] = 'APAC',
 	['Thailand'] = 'APAC',
+	['Saudi Arabia'] = 'emea',
 	['Singapore'] = 'APAC',
 	['Indonesia'] = 'APAC',
 	['Philippines'] = 'APAC',
