@@ -51,7 +51,10 @@ function CustomInjector:parse(id, widgets)
 	if id == 'location' and String.isNotEmpty(args.country) then
 		local locationText = String.isNotEmpty(args.city) and args.city or args.country
 		return {
-			Cell{name = 'Location', children = {Flags.Icon{flag = args.country, shouldLink = false} .. '&nbsp;' .. locationText}},
+			Cell{
+				name = 'Location',
+				children = {Flags.Icon{flag = args.country, shouldLink = false} .. '&nbsp;' .. locationText}
+			},
 		}
 	elseif id == 'custom' then
 		return Array.append(

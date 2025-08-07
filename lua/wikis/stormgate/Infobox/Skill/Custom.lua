@@ -122,7 +122,10 @@ function CustomInjector:parse(id, widgets)
 		Array.extendWith(widgets, {
 				Cell{name = 'Researched From', children = {Page.makeInternalLink({}, args.from)}},
 				Cell{name = 'Upgrade Target', children = makeArrayLinks(Array.parseCommaSeparatedString(args.upgrade_target))},
-				Cell{name = 'Tech. Requirements', children = makeArrayLinks(Array.parseCommaSeparatedString(args.tech_requirement))},
+				Cell{
+					name = 'Tech. Requirements',
+					children = makeArrayLinks(Array.parseCommaSeparatedString(args.tech_requirement))
+				},
 				Cell{name = 'Building Requirements',
 					children = makeArrayLinks(Array.parseCommaSeparatedString(args.building_requirement))},
 				Cell{name = 'Unlocks', children = makeArrayLinks(Array.parseCommaSeparatedString(args.unlocks))},
