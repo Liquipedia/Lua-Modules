@@ -41,12 +41,12 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		return Array.append(widgets,
-			Cell{name = 'Released', content = {args.released}},
-			Cell{name = 'Technical Name', content = {args.techname}},
-			Cell{name = 'Tank Type', content = {CustomUnit._getTankType(args)}},
-			Cell{name = 'Tank Tier', content = {args.tier}},
-			Cell{name = 'Nation', content = {Nation.run(args.nation)}},
-			Cell{name = 'Role', content = {args.role}}
+			Cell{name = 'Released', children = {args.released}},
+			Cell{name = 'Technical Name', children = {args.techname}},
+			Cell{name = 'Tank Type', children = {CustomUnit._getTankType(args)}},
+			Cell{name = 'Tank Tier', children = {args.tier}},
+			Cell{name = 'Nation', children = {Nation.run(args.nation)}},
+			Cell{name = 'Role', children = {args.role}}
 		)
 	end
 	return widgets

@@ -40,11 +40,11 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'status' then
 		return {
-			Cell{name = 'Status', content = caller:_getStatusContents()},
-			Cell{name = 'Years Active', content = {args.years_active}},
+			Cell{name = 'Status', children = caller:_getStatusContents()},
+			Cell{name = 'Years Active', children = {args.years_active}},
 		}
 	elseif id == 'history' then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 
 	return widgets

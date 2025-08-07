@@ -38,7 +38,7 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'history' then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 	return widgets
 end

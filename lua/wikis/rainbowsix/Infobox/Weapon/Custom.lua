@@ -40,7 +40,7 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		return {
-			Cell{name = 'Operators', content = {self.caller:_getOperators()}},
+			Cell{name = 'Operators', children = {self.caller:_getOperators()}},
 		}
 	end
 	return widgets

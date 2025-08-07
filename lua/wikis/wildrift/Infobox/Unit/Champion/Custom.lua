@@ -71,7 +71,7 @@ function CustomInjector:parse(id, widgets)
 		)
 		return {
 			Breakdown{classes = {'infobox-center'}, children = breakDownContents},
-			Cell{name = 'Real Name', content = {args.realname}},
+			Cell{name = 'Real Name', children = {args.realname}},
 		}
 	elseif id == 'cost' then
 		local cost = Array.append({},
@@ -79,7 +79,7 @@ function CustomInjector:parse(id, widgets)
 			String.isNotEmpty(args.costrp ) and (args.costrp .. ' ' .. WILD_CORES_ICON) or nil
 		)
 		return {
-			Cell{name = 'Price', content = {table.concat(cost, '&emsp;&ensp;')}},
+			Cell{name = 'Price', children = {table.concat(cost, '&emsp;&ensp;')}},
 		}
 	elseif id == 'custom' then
 		return self.caller:getCustomCells(widgets)
@@ -94,10 +94,10 @@ function CustomChampion:getCustomCells(widgets)
 	local args = self.args
 	Array.appendWith(
 		widgets,
-		Cell{name = 'Resource Bar', content = {args.secondarybar}},
-		Cell{name = 'Secondary Bar', content = {args.secondarybar1}},
-		Cell{name = 'Secondary Attributes', content = {args.secondaryattributes1}},
-		Cell{name = 'Release Date', content = {args.releasedate}}
+		Cell{name = 'Resource Bar', children = {args.secondarybar}},
+		Cell{name = 'Secondary Bar', children = {args.secondarybar1}},
+		Cell{name = 'Secondary Attributes', children = {args.secondaryattributes1}},
+		Cell{name = 'Release Date', children = {args.releasedate}}
 	)
 
 	if Array.any({'hp', 'hplvl', 'hpreg', 'hpreglvl'}, function(key) return String.isNotEmpty(args[key]) end) then
@@ -106,27 +106,27 @@ function CustomChampion:getCustomCells(widgets)
 
 	Array.appendWith(
 		widgets,
-		Cell{name = 'Health', content = {args.hp}},
-		Cell{name = 'Health Regen', content = {args.hpreg}},
-		Cell{name = 'Courage', content = {args.courage}},
-		Cell{name = 'Rage', content = {args.rage}},
-		Cell{name = 'Fury', content = {args.fury}},
-		Cell{name = 'Heat', content = {args.heat}},
-		Cell{name = 'Ferocity', content = {args.ferocity}},
-		Cell{name = 'Bloodthirst', content = {args.bloodthirst}},
-		Cell{name = 'Mana', content = {args.mana}},
-		Cell{name = 'Mana Regen', content = {args.manareg}},
-		Cell{name = 'Cooldown Reduction', content = {args.cdr}},
-		Cell{name = 'Energy', content = {args.energy}},
-		Cell{name = 'Energy Regen', content = {args.energyreg}},
-		Cell{name = 'Attack Type', content = {args.attacktype}},
-		Cell{name = 'Attack Damage', content = {args.damage}},
-		Cell{name = 'Attack Speed', content = {args.attackspeed}},
-		Cell{name = 'Attack Range', content = {args.attackrange}},
-		Cell{name = 'Ability Power', content = {args.ap}},
-		Cell{name = 'Armor', content = {args.armor}},
-		Cell{name = 'Magic Resistance', content = {args.magicresistance}},
-		Cell{name = 'Movement Speed', content = {args.movespeed}}
+		Cell{name = 'Health', children = {args.hp}},
+		Cell{name = 'Health Regen', children = {args.hpreg}},
+		Cell{name = 'Courage', children = {args.courage}},
+		Cell{name = 'Rage', children = {args.rage}},
+		Cell{name = 'Fury', children = {args.fury}},
+		Cell{name = 'Heat', children = {args.heat}},
+		Cell{name = 'Ferocity', children = {args.ferocity}},
+		Cell{name = 'Bloodthirst', children = {args.bloodthirst}},
+		Cell{name = 'Mana', children = {args.mana}},
+		Cell{name = 'Mana Regen', children = {args.manareg}},
+		Cell{name = 'Cooldown Reduction', children = {args.cdr}},
+		Cell{name = 'Energy', children = {args.energy}},
+		Cell{name = 'Energy Regen', children = {args.energyreg}},
+		Cell{name = 'Attack Type', children = {args.attacktype}},
+		Cell{name = 'Attack Damage', children = {args.damage}},
+		Cell{name = 'Attack Speed', children = {args.attackspeed}},
+		Cell{name = 'Attack Range', children = {args.attackrange}},
+		Cell{name = 'Ability Power', children = {args.ap}},
+		Cell{name = 'Armor', children = {args.armor}},
+		Cell{name = 'Magic Resistance', children = {args.magicresistance}},
+		Cell{name = 'Movement Speed', children = {args.movespeed}}
 	)
 
 	local wins, loses = CharacterWinLoss.run()
@@ -136,7 +136,7 @@ function CustomChampion:getCustomCells(widgets)
 
 	return Array.append(widgets,
 		Title{children = 'Esports Statistics'},
-		Cell{name = 'Win Rate', content = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}}
+		Cell{name = 'Win Rate', children = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}}
 	)
 end
 

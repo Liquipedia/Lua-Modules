@@ -89,16 +89,16 @@ function CustomInjector:parse(id, widgets)
 		end)
 		return {Cell{
 			name = #championIcons > 1 and 'Signature Champions' or 'Signature Champions',
-			content = {table.concat(championIcons, '&nbsp;')},
+			children = {table.concat(championIcons, '&nbsp;')},
 		}}
 	elseif id == 'status' then
 		local status = args.status and mw.getContentLanguage():ucfirst(args.status) or nil
 
 		return {
-			Cell{name = 'Status', content = {Page.makeInternalLink({onlyIfExists = true}, status) or status}},
+			Cell{name = 'Status', children = {Page.makeInternalLink({onlyIfExists = true}, status) or status}},
 		}
 	elseif id == 'history' then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 	return widgets
 end

@@ -57,13 +57,13 @@ function CustomInjector:parse(id, widgets)
 		)
 	elseif id == 'custom' then
 		return WidgetUtil.collect(
-			Cell{name = 'Path', content = {args.path}},
-			Cell{name = 'Slot', content = {args.slot}},
+			Cell{name = 'Path', children = {args.path}},
+			Cell{name = 'Slot', children = {args.slot}},
 			Array.map(caller:getAllArgsForBase(args, 'description'), function(desc)
 				return Center{children = {desc}}
 			end),
-			Cell{name = 'Cooldown', content = {args.cooldown}},
-			Cell{name = 'Account level', content = {args.level}}
+			Cell{name = 'Cooldown', children = {args.cooldown}},
+			Cell{name = 'Account level', children = {args.level}}
 		)
 	end
 

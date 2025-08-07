@@ -53,10 +53,10 @@ function CustomInjector:parse(id, widgets)
 		return self.caller:getReleaseCells(args)
 	elseif id == 'custom' then
 		return WidgetUtil.collect(
-			Cell{name = 'Versions', content = {args.versions}},
-			Cell{name = 'Layout', content = {args.layout}},
-			Cell{name = 'Playlists', content = {args.playlists}},
-			Cell{name = 'Day/Night Variant', content = {args['day/night variant']}},
+			Cell{name = 'Versions', children = {args.versions}},
+			Cell{name = 'Layout', children = {args.layout}},
+			Cell{name = 'Playlists', children = {args.playlists}},
+			Cell{name = 'Day/Night Variant', children = {args['day/night variant']}},
 			self.caller:getStatsCells(args)
 		)
 	end
@@ -100,19 +100,19 @@ function CustomMap:getReleaseCells(args)
 	return {
 		Cell{
 			name = 'Released',
-			content = CustomMap._formatPatchInfoCell(releasePatchData, 'Launch')
+			children = CustomMap._formatPatchInfoCell(releasePatchData, 'Launch')
 		},
 		Cell{
 			name = 'Reworked',
-			content = Logic.isNotEmpty(reworkPatchData) and CustomMap._formatPatchInfoCell(reworkPatchData) or nil
+			children = Logic.isNotEmpty(reworkPatchData) and CustomMap._formatPatchInfoCell(reworkPatchData) or nil
 		},
 		Cell{
 			name = 'Map buff',
-			content = Logic.isNotEmpty(mapBuffPatchData) and CustomMap._formatPatchInfoCell(mapBuffPatchData) or nil
+			children = Logic.isNotEmpty(mapBuffPatchData) and CustomMap._formatPatchInfoCell(mapBuffPatchData) or nil
 		},
 		Cell{
 			name = 'Map buff 2',
-			content = Logic.isNotEmpty(mapBuff2PatchData) and CustomMap._formatPatchInfoCell(mapBuff2PatchData) or nil
+			children = Logic.isNotEmpty(mapBuff2PatchData) and CustomMap._formatPatchInfoCell(mapBuff2PatchData) or nil
 		}
 	}
 end
@@ -173,7 +173,7 @@ function CustomMap:getStatsCells(args)
 		Title{children = 'Esports Statistics'},
 		Cell{
 			name = 'Win Rate',
-			content = {
+			children = {
 				HtmlWidgets.Fragment{children = {
 					CustomMap._createTeamDisplayWidget('atk'),
 					': ',

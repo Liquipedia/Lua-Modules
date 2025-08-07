@@ -38,21 +38,21 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		return Array.append(widgets,
-			Cell{name = 'Pronouns', content = {args.pronouns}},
-			Cell{name = 'House', content = {args.house}},
-			Cell{name = 'Rarity', content = {args.rarity}},
-			Cell{name = 'Quantity', content = {args.quantity}},
-			Cell{name = 'Mana Cost', content = {args.cost}},
-			Cell{name = 'Health', content = {args.health}},
-			Cell{name = 'Movement Speed', content = {args.movement}},
-			Cell{name = 'Sight Range', content = {args.sightrange}},
-			Cell{name = 'Key Words', content = {args.keywords}},
+			Cell{name = 'Pronouns', children = {args.pronouns}},
+			Cell{name = 'House', children = {args.house}},
+			Cell{name = 'Rarity', children = {args.rarity}},
+			Cell{name = 'Quantity', children = {args.quantity}},
+			Cell{name = 'Mana Cost', children = {args.cost}},
+			Cell{name = 'Health', children = {args.health}},
+			Cell{name = 'Movement Speed', children = {args.movement}},
+			Cell{name = 'Sight Range', children = {args.sightrange}},
+			Cell{name = 'Key Words', children = {args.keywords}},
 			Title{children = 'Basic Stats'},
-			Cell{name = 'Healing', content = {args.healing}},
-			Cell{name = 'Mobility', content = {args.mobility}},
-			Cell{name = 'Offense', content = {args.offense}},
-			Cell{name = 'Defense', content = {args.defense}},
-			Cell{name = 'Utility', content = {args.utility}}
+			Cell{name = 'Healing', children = {args.healing}},
+			Cell{name = 'Mobility', children = {args.mobility}},
+			Cell{name = 'Offense', children = {args.offense}},
+			Cell{name = 'Defense', children = {args.defense}},
+			Cell{name = 'Utility', children = {args.utility}}
 		)
 	end
 	return widgets

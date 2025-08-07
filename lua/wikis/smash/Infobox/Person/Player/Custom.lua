@@ -72,19 +72,19 @@ function CustomInjector:parse(id, widgets)
 
 			Array.appendWith(widgets,
 				(main or former or alt) and Title{children = gameData.name} or nil,
-				Cell{name = 'Current Mains', content = main or {}},
-				Cell{name = 'Former Mains', content = former or {}},
-				Cell{name = 'Secondaries', content = alt or {}}
+				Cell{name = 'Current Mains', children = main or {}},
+				Cell{name = 'Former Mains', children = former or {}},
+				Cell{name = 'Secondaries', children = alt or {}}
 			)
 		end)
 	elseif id == 'status' then
 		table.insert(widgets,
-			Cell{name = 'Years Active', content = {YearsActive.get{player = mw.title.getCurrentTitle().baseText}}}
+			Cell{name = 'Years Active', children = {YearsActive.get{player = mw.title.getCurrentTitle().baseText}}}
 		)
 	elseif id == 'team' then
-		table.insert(widgets, Cell{name = 'Crew', content = {args.crew}})
+		table.insert(widgets, Cell{name = 'Crew', children = {args.crew}})
 	elseif id == 'nationality' then
-		table.insert(widgets, Cell{name = 'Location', content = {args.residence}})
+		table.insert(widgets, Cell{name = 'Location', children = {args.residence}})
 	elseif id == 'achievements' then
 		local achievements = {}
 		Array.forEach(GAME_ORDER, function(game)
@@ -95,7 +95,7 @@ function CustomInjector:parse(id, widgets)
 		end)
 		if #achievements == 0 then return {} end
 		return Array.extend({Title{children = 'Achievements'}}, Array.map(achievements, function(achievement)
-			return Cell{name = achievement.gameName, content = {achievement.icons}, options = {columns = 3}}
+			return Cell{name = achievement.gameName, children = {achievement.icons}, options = {columns = 3}}
 		end))
 	end
 

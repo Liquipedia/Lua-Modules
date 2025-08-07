@@ -244,27 +244,27 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game', content = {Game.text{game = caller.data.game}}},
-			Cell{name = 'Game Version', content = {
+			Cell{name = 'Game', children = {Game.text{game = caller.data.game}}},
+			Cell{name = 'Game Version', children = {
 				caller:_displayGameVersion(),
 				args.patch2 and ('[[' .. args.patch2 .. ']]') or nil
 			}},
-			Cell{name = 'Server', content = caller:_getServers(args)}
+			Cell{name = 'Server', children = caller:_getServers(args)}
 			}
 	elseif id == 'liquipediatier' then
 		table.insert(widgets, Cell{
 			name = ESL_ICON .. 'Pro Tour Tier',
-			content = {ESL_TIERS[caller.data.publishertier]}
+			children = {ESL_TIERS[caller.data.publishertier]}
 		})
 	elseif id == 'dates' then
 		if args.starttime then
 			local dateCells = {}
 			if args.sdate then
-				table.insert(dateCells, Cell{name = 'Start Date', content = {caller:_displayStartDateTime()}})
+				table.insert(dateCells, Cell{name = 'Start Date', children = {caller:_displayStartDateTime()}})
 			elseif args.date then
-				table.insert(dateCells, Cell{name = 'Date', content = {caller:_displayStartDateTime()}})
+				table.insert(dateCells, Cell{name = 'Date', children = {caller:_displayStartDateTime()}})
 			end
-			table.insert(dateCells, Cell{name = 'End Date', content = {args.edate}})
+			table.insert(dateCells, Cell{name = 'End Date', children = {args.edate}})
 			return dateCells
 		end
 	elseif id == 'customcontent' then
@@ -275,14 +275,14 @@ function CustomInjector:parse(id, widgets)
 
 		if playerNumber then
 			Array.appendWith(widgets,
-				Cell{name = 'Number of Players', content = {playerNumber}},
+				Cell{name = 'Number of Players', children = {playerNumber}},
 				Breakdown{children = caller.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
 		end
 
 		if args.team_number then
 			table.insert(widgets, Cell{name = 'Number of Teams',
-				content = {CustomLeague._displayParticipantNumber(args.team_number)}})
+				children = {CustomLeague._displayParticipantNumber(args.team_number)}})
 
 			-- clean var of '+' suffix
 			args.team_number = string.gsub(args.team_number, '%+', '')

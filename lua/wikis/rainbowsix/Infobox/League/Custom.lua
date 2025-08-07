@@ -68,10 +68,10 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-		Cell{name = 'Teams', content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
-		Cell{name = 'Game', content = {Game.name{game = args.game}}},
-		Cell{name = 'Platform', content = {caller:_createPlatformCell(args)}},
-		Cell{name = 'Players', content = {args.player_number}}
+		Cell{name = 'Teams', children = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
+		Cell{name = 'Game', children = {Game.name{game = args.game}}},
+		Cell{name = 'Platform', children = {caller:_createPlatformCell(args)}},
+		Cell{name = 'Players', children = {args.player_number}}
 	)
 	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.map1) then
@@ -91,7 +91,7 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets,
 				Cell{
 					name = 'Ubisoft Tier',
-					content = {'[[' .. UBISOFT_TIERS[caller.data.publishertier] .. ']]'},
+					children = {'[[' .. UBISOFT_TIERS[caller.data.publishertier] .. ']]'},
 					classes = {'valvepremier-highlighted'}
 				}
 			)

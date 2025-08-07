@@ -36,7 +36,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		table.insert(widgets, Cell{
 			name = CustomCompany._createSisterCompaniesDescription(args),
-			content = self.caller:getAllArgsForBase(args, 'sister', {})
+			children = self.caller:getAllArgsForBase(args, 'sister', {})
 		})
 	end
 	return widgets

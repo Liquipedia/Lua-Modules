@@ -43,14 +43,14 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(widgets,
 			Cell{
 				name = '[[Portal:Rating|LPRating]]',
-				content = {
+				children = {
 					args.rating and args.ratingRank and math.floor(args.rating + 0.5) .. ' (Rank #'.. args.ratingRank ..')'
 						or 'Not enough data'
 				}
 			},
 			Cell{
 				name = '[[RankingTableRLCS|RLCS Points]]',
-				content = {TeamRanking.run{
+				children = {TeamRanking.run{
 					ranking = args.ranking_name,
 					team = self.caller.pagename
 				}}
