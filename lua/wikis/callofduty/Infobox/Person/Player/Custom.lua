@@ -5,15 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local GameAppearances = require('Module:Infobox/Extension/GameAppearances')
 local Lua = require('Module:Lua')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
+
+local Class = Lua.import('Module:Class')
+local GameAppearances = Lua.import('Module:Infobox/Extension/GameAppearances')
+local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local CustomPlayer = Class.new(Player)
@@ -39,7 +40,7 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		return {
-			Cell{name = 'Game Appearances', content = GameAppearances.player{player = self.caller.pagename}},
+			Cell{name = 'Game Appearances', children = GameAppearances.player{player = self.caller.pagename}},
 		}
 	end
 	return widgets

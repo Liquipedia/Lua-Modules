@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
+local Info = Lua.import('Module:Info', {loadData = true})
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
@@ -18,11 +19,10 @@ local Team = Lua.import('Module:Team')
 
 local CustomDefaultOptions = Lua.requireIfExists('Module:Infobox/Extension/Achievements/Custom') or {}
 
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local NON_BREAKING_SPACE = '&nbsp;'
-local DEFAULT_PLAYER_LIMIT = 10
+local DEFAULT_PLAYER_LIMIT = Info.config.defaultMaxPlayersPerPlacement or 10
 local MAX_PARTY_SIZE = 4
 local DEFAULT_BASE_CONDITIONS = {
 	'[[liquipediatiertype::!Qualifier]]',

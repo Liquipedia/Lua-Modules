@@ -62,7 +62,6 @@ return {
 			matchWidthMobile = 110,
 			matchWidth = 150,
 		},
+		defaultMaxPlayersPerPlacement = 20,
 	},
-	opponentLibrary = 'Opponent/Custom',
-	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

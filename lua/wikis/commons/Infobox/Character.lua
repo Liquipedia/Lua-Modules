@@ -46,14 +46,14 @@ function Character:createInfobox()
 			size = args.imagesize,
 		},
 		Center{children = {args.caption}},
-		Title{children = (args.informationType or 'Character') .. ' Information'},
-		Cell{name = 'Real Name', content = {args.realname}},
+		Title{children = {'General Information'}},
+		Cell{name = 'Real Name', children = {args.realname}},
 		Customizable{
 			id = 'country',
 			children = {
 				Cell{
 					name = 'Country',
-					content = {
+					children = {
 						self:_createLocation(args.country)
 					}
 				},
@@ -64,7 +64,7 @@ function Character:createInfobox()
 			children = {
 				Cell{
 					name = 'Role',
-					content = {args.role}
+					children = {args.role}
 				},
 			}
 		},
@@ -73,7 +73,7 @@ function Character:createInfobox()
 			children = {
 				Cell{
 					name = 'Class',
-					content = {args.class}
+					children = {args.class}
 				},
 			}
 		},
@@ -82,7 +82,7 @@ function Character:createInfobox()
 			children = {
 				Cell{
 					name = 'Release Date',
-					content = {args.releasedate}
+					children = {args.releasedate}
 				},
 			}
 		},

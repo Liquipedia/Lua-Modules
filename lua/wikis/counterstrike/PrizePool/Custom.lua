@@ -5,13 +5,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Json = require('Module:Json')
-local Namespace = require('Module:Namespace')
-local Variables = require('Module:Variables')
+
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Json = Lua.import('Module:Json')
+local Namespace = Lua.import('Module:Namespace')
+local Variables = Lua.import('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool')
 local Opponent = Lua.import('Module:Opponent')
@@ -78,6 +79,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	end
 
 	Variables.varDefine('prizepoints_' .. lpdbData.participant, lpdbData.extradata.prizepoints)
+	Variables.varDefine('prizepoints2_' .. lpdbData.participant, lpdbData.extradata.prizepoints2)
 	Variables.varDefine('enddate_' .. lpdbData.participant, lpdbData.date)
 	Variables.varDefine('placement_' .. lpdbData.participant, lpdbData.placement)
 

@@ -5,24 +5,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Faction = require('Module:Faction')
-local Game = require('Module:Game')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MapMode = require('Module:MapMode')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Faction = Lua.import('Module:Faction')
+local Game = Lua.import('Module:Game')
+local Logic = Lua.import('Module:Logic')
+local MapMode = Lua.import('Module:MapMode')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local PlayerDisplay = require('Module:Player/Display')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local PlayerDisplay = Lua.import('Module:Player/Display')
 
 local CustomMatchSummary = {}
 
@@ -42,9 +41,8 @@ function CustomMatchSummary._determineWidth(match)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Widget
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 	local games = Array.map(match.games, function(game)
 		return CustomMatchSummary._createGame(game, {
 			game = match.game,
@@ -52,10 +50,9 @@ function CustomMatchSummary.createBody(match)
 		})
 	end)
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+	return WidgetUtil.collect(
 		games
-	)}
+	)
 end
 
 ---@param match MatchGroupUtilMatch
@@ -128,7 +125,6 @@ function CustomMatchSummary._createGame(game, props)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '0.75rem'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameTeamWrapper{children = {
 					faction1,

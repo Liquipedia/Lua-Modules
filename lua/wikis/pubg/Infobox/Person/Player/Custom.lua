@@ -5,15 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Template = require('Module:Template')
+
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
@@ -40,8 +41,8 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'status' then
-		table.insert(widgets, Cell{name = 'Years Active (Player)', content = {args.years_active}})
-		table.insert(widgets, Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}})
+		table.insert(widgets, Cell{name = 'Years Active (Player)', children = {args.years_active}})
+		table.insert(widgets, Cell{name = 'Years Active (Talent)', children = {args.years_active_talent}})
 	elseif id == 'region' then return {}
 	elseif id == 'history' and args.nationalteams then
 		table.insert(widgets, 1, Title{children = 'National Teams'})

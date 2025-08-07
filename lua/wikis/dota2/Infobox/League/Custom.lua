@@ -5,19 +5,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
-local Template = require('Module:Template')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Variables = Lua.import('Module:Variables')
+local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class Dota2LeagueInfobox: InfoboxLeague
@@ -62,19 +63,19 @@ function CustomInjector:parse(id, widgets)
 		local points = tonumber(args.points)
 
 		Array.appendWith(widgets,
-			Cell{name = 'Game', content = {Game.text{game = args.game}}},
-			Cell{name = 'Version', content = {self.caller:_createPatchCell(args)}},
-			Cell{name = 'Teams', content = {args.team_number}},
-			Cell{name = 'Players', content = {args.player_number}},
-			Cell{name = 'Dota TV Ticket', content = {args.dotatv}},
-			Cell{name = 'Pro Circuit Points', content = {points and mw.getContentLanguage():formatNum(points)}}
+			Cell{name = 'Game', children = {Game.text{game = args.game}}},
+			Cell{name = 'Version', children = {self.caller:_createPatchCell(args)}},
+			Cell{name = 'Teams', children = {args.team_number}},
+			Cell{name = 'Players', children = {args.player_number}},
+			Cell{name = 'Dota TV Ticket', children = {args.dotatv}},
+			Cell{name = 'Pro Circuit Points', children = {points and mw.getContentLanguage():formatNum(points)}}
 		)
 	elseif id == 'liquipediatier' and self.caller.publisherTier then
 		table.insert(
 			widgets,
 			Cell{
 				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox') .. ' Tier',
-				content = {self.caller:_createPublisherTierCell()},
+				children = {self.caller:_createPublisherTierCell()},
 				classes = {'valvepremier-highlighted'}
 			}
 		)

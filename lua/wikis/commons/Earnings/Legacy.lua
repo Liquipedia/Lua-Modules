@@ -14,6 +14,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local MathUtils = Lua.import('Module:MathUtil')
@@ -43,7 +44,7 @@ function CustomEarnings.calculateForPlayer(args)
 	-- we need to check for both options
 	local playerAsPageName = player:gsub(' ', '_')
 
-	local playerPositionLimit = tonumber(args.playerPositionLimit) or CustomEarnings.defaultNumberOfStoredPlayersPerMatch
+	local playerPositionLimit = tonumber(args.playerPositionLimit) or Info.config.defaultMaxPlayersPerPlacement or 10
 	if playerPositionLimit <= 0 then
 		error('"playerPositionLimit" has to be >= 1')
 	end

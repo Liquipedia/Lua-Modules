@@ -5,21 +5,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local ActiveYears = require('Module:YearsActive')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Region = require('Module:Region')
-local Math = require('Module:MathUtil')
-local String = require('Module:StringUtils')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local ActiveYears = Lua.import('Module:YearsActive')
+local Class = Lua.import('Module:Class')
+local Region = Lua.import('Module:Region')
+local Math = Lua.import('Module:MathUtil')
+local String = Lua.import('Module:StringUtils')
+local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local PlayerAchievements = Lua.import('Module:Infobox/Extension/Achievements')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -58,14 +59,14 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		return {
-			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, content = {currentYearEarnings}},
-			Cell{name = 'Years active', content = {yearsActive}},
+			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, children = {currentYearEarnings}},
+			Cell{name = 'Years active', children = {yearsActive}},
 			Cell{
 				name = Abbreviation.make{
 					text = 'Epic Creator Code',
 					title = 'Support-A-Creator Code used when purchasing Fortnite or Epic Games Store products',
 				},
-				content = {args.creatorcode}
+				children = {args.creatorcode}
 			},
 		}
 	elseif id == 'history' then

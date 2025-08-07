@@ -5,17 +5,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Tier = require('Module:Tier/Custom')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Tier = Lua.import('Module:Tier/Custom')
 
 local Game = Lua.import('Module:Game')
 local Injector = Lua.import('Module:Widget/Injector')
 local Series = Lua.import('Module:Infobox/Series')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class CounterstrikeSeriesInfobox: SeriesInfobox
@@ -43,12 +44,12 @@ function CustomInjector:parse(id, widgets)
 	if id == 'type' then
 		return {Cell{
 				name = 'Type',
-				content = {String.isNotEmpty(args.type) and mw.getContentLanguage():ucfirst(args.type) or nil}
+				children = {String.isNotEmpty(args.type) and mw.getContentLanguage():ucfirst(args.type) or nil}
 			}}
 	elseif id == 'custom' then
 		return {
-			Cell{name = 'Fate', content = {args.fate}},
-			Cell{name = 'Games', content = Array.map(Game.listGames({ordered = true}), function (gameIdentifier)
+			Cell{name = 'Fate', children = {args.fate}},
+			Cell{name = 'Games', children = Array.map(Game.listGames({ordered = true}), function (gameIdentifier)
 				return args[gameIdentifier] and Game.text{game = gameIdentifier} or nil
 			end)},
 		}

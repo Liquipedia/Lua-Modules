@@ -24,9 +24,8 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Tier = Lua.import('Module:Tier/Custom')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -44,7 +43,7 @@ local TIMESTAMP = DateExt.readTimestamp(DATE) --[[@as integer]]
 local DEFAULT_ALLOWED_PLACES = {'1', '2', '3', '1-2', '1-3', '2-3', '2-4', '3-4'}
 local DEFAULT_ROUND_PRECISION = Info.defaultRoundPrecision or 2
 local LANG = mw.getContentLanguage()
-local MAX_OPPONENT_LIMIT = 10
+local MAX_OPPONENT_LIMIT = Info.config.defaultMaxPlayersPerPlacement or 10
 local MAX_QUERY_LIMIT = 5000
 local US_DOLLAR = 'USD'
 local SHOWMATCH = 'Showmatch'

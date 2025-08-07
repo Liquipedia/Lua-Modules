@@ -16,9 +16,8 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local MatchOverview = Lua.import('Module:Widget/Standings/MatchOverview')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 ---@class StandingsSwissWidget: Widget
 ---@operator call(table): StandingsSwissWidget
@@ -82,7 +81,6 @@ function StandingsSwissWidget:render()
 							classes = {teamBackground},
 							children = OpponentDisplay.BlockOpponent{
 								opponent = slot.opponent,
-								showLink = true,
 								overflow = 'ellipsis',
 								teamStyle = 'hybrid',
 								showPlayerTeam = true,

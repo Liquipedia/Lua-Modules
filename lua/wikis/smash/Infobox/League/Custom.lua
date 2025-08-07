@@ -5,20 +5,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Currency = require('Module:Currency')
-local Game = require('Module:Game')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Currency = Lua.import('Module:Currency')
+local Game = Lua.import('Module:Game')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Chronology = Widgets.Chronology
@@ -101,8 +103,11 @@ function CustomLeague.run(frame)
 		args.doublesprizepoolusd = args.doublesprizepoolusd or args.doublesprizepool
 		args.doublesprizepool = nil
 	elseif args.doublesprizepool and args.localcurrency then
-		args.doublesprizepoolusd = CustomLeague:_currencyConversion(CustomLeague._cleanNumericInput(args.doublesprizepool),
-			args.localcurrency, League:_cleanDate(args.edate) or League:_cleanDate(args.date))
+		args.doublesprizepoolusd = CustomLeague:_currencyConversion(
+			CustomLeague._cleanNumericInput(args.doublesprizepool),
+			args.localcurrency,
+			ReferenceCleaner.cleanDateIfKnown{date = args.edate} or ReferenceCleaner.cleanDateIfKnown{date = args.date}
+		)
 	end
 
 	-- Currency rounding options
@@ -155,9 +160,9 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Number of Players', content = {args.player_number}},
-			Cell{name = 'Doubles Players', content = {args.doubles_number}},
-			Cell{name = 'Number of Teams', content = {args.team_number}}
+			Cell{name = 'Number of Players', children = {args.player_number}},
+			Cell{name = 'Doubles Players', children = {args.doubles_number}},
+			Cell{name = 'Number of Teams', children = {args.team_number}}
 		)
 	elseif id == 'customcontent' then
 		if args.circuit or args.points or args.circuit_next or args.circuit_previous then
@@ -181,13 +186,13 @@ function CustomInjector:parse(id, widgets)
 		end
 	elseif id == 'dates' then
 		return {
-			Cell{name = 'Date', content = {
+			Cell{name = 'Date', children = {
 				args.date and CustomLeague:_formatDate(args.date)
 			}},
-			Cell{name = 'Start Date', content = {
+			Cell{name = 'Start Date', children = {
 				args.sdate and CustomLeague:_formatDate(args.sdate)
 			}},
-			Cell{name = 'End Date', content = {
+			Cell{name = 'End Date', children = {
 				args.edate and CustomLeague:_formatDate(args.edate)
 			}},
 		}
@@ -196,23 +201,23 @@ function CustomInjector:parse(id, widgets)
 
 		-- Normal prize pool
 		if args.prizepool or args.prizepoolusd then
-			table.insert(widgets, Cell{name = 'Prize pool', content = {league.prizepoolDisplay}})
+			table.insert(widgets, Cell{name = 'Prize pool', children = {league.prizepoolDisplay}})
 		end
 
 		-- Doubles prize pool
 		if args.doublesprizepool or args.doublesprizepoolusd then
-			table.insert(widgets,Cell{name = 'Doubles prize pool', content = {league.doublePrizepoolDisplay}})
+			table.insert(widgets,Cell{name = 'Doubles prize pool', children = {league.doublePrizepoolDisplay}})
 		end
 	elseif id == 'gamesettings' then
 		if not args.overview then
 			local version = {args.version, args.endversion}
 			return {
-				Cell{name = 'Game', content = {Game.name{game = args.game}}},
-				Cell{name = 'Version', content = {table.concat(version, '&nbsp;- ')}},
+				Cell{name = 'Game', children = {Game.name{game = args.game}}},
+				Cell{name = 'Version', children = {table.concat(version, '&nbsp;- ')}},
 			}
 		end
 	elseif id == 'format' then
-		table.insert(widgets, Cell{name = 'Doubles Format', content = {args.doubles_format}})
+		table.insert(widgets, Cell{name = 'Doubles Format', children = {args.doubles_format}})
 	end
 
 	return widgets
@@ -397,12 +402,12 @@ function CustomLeague:_createCircuitInformation(widgets, circuitIndex)
 	Array.appendWith(widgets,
 		Cell{
 			name = 'Circuit',
-			content = {self:_createCircuitLink(circuitIndex)}
+			children = {self:_createCircuitLink(circuitIndex)}
 		},
-		Cell{name = 'Circuit Tier', content = {circuitArgs.tier}},
-		Cell{name = 'Tournament Region', content = {circuitArgs.region}},
-		Cell{name = 'Points', content = {circuitArgs.points}},
-		Chronology{links = {next = circuitArgs.next, previous = circuitArgs.previous}}
+		Cell{name = 'Circuit Tier', children = {circuitArgs.tier}},
+		Cell{name = 'Tournament Region', children = {circuitArgs.region}},
+		Cell{name = 'Points', children = {circuitArgs.points}},
+		Chronology{args = circuitArgs, showTitle = false}
 	)
 end
 

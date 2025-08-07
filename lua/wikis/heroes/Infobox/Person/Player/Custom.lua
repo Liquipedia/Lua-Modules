@@ -43,9 +43,9 @@ function CustomInjector:parse(id, widgets)
 		local heroIcons = Array.map(self.caller:getAllArgsForBase(args, 'hero'), function(hero)
 			return CharacterIcon.Icon{character = CharacterNames[hero:lower()], size = SIZE_HERO}
 		end)
-		table.insert(widgets, Cell{name = 'Signature Heroes', content = {table.concat(heroIcons, '&nbsp;')}})
+		table.insert(widgets, Cell{name = 'Signature Heroes', children = {table.concat(heroIcons, '&nbsp;')}})
 	elseif id == 'history' and string.match(args.retired or '', '%d%d%d%d') then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 	return widgets
 end

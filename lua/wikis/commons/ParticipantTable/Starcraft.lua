@@ -40,8 +40,7 @@ local Variables = Lua.import('Module:Variables')
 
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local StarcraftParticipantTable = {}
 
@@ -123,7 +122,7 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
 		Variables.varDefine(opponentArgs.name .. '_faction', '')
 	end
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
+	local opponent = Opponent.readOpponentArgs(opponentArgs)
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)

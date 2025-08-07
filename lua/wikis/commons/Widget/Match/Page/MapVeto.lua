@@ -13,6 +13,8 @@ local Image = Lua.import('Module:Image')
 
 local Map = Lua.import('Module:Map')
 
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -34,7 +36,10 @@ function MatchPageMapVeto:render()
 	---@return (string|Widget)[]
 	local formatTitle = function(vetoRound)
 		local teamDisplay = function()
-			return mw.ext.TeamTemplate.teamicon(vetoRound.by.template)
+			return OpponentDisplay.InlineOpponent{
+				opponent = vetoRound.by,
+				teamStyle = 'icon',
+			}
 		end
 		local actionType
 		local byText

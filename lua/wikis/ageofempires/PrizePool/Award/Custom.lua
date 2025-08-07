@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
+
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
+local Variables = Lua.import('Module:Variables')
 
 local AwardPrizePool = Lua.import('Module:PrizePool/Award')
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
@@ -18,7 +19,6 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 local CustomAwardPrizePool = {}
 
 local IS_AWARD = true
-local PRIZE_TYPE_POINTS = 'POINTS'
 
 -- Template entry point
 ---@param frame Frame
@@ -45,10 +45,6 @@ end
 ---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.extradata.patch = Variables.varDefault('tournament_patch')
-
-	-- legacy points, to be standardized
-	lpdbData.extradata.points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
-	lpdbData.extradata.points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
 
 	return lpdbData
 end

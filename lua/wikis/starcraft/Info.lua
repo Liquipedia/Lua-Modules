@@ -36,8 +36,6 @@ return {
 			matchWidthMobile = 120,
 			matchWidth = 170,
 		},
+		defaultMaxPlayersPerPlacement = 35,
 	},
-	maximumNumberOfPlayersInPlacements = 35,
-	opponentLibrary = 'Opponent/Starcraft',
-	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
 }

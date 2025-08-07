@@ -5,9 +5,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
@@ -61,16 +62,6 @@ function CustomOpponentDisplay.BracketOpponentEntry:addScores(opponent)
 		or opponent.advances then
 		self.content:addClass('brkts-opponent-win')
 	end
-end
-
----@param opponent RocketLeagueStandardOpponent
-function CustomOpponentDisplay.BracketOpponentEntry:createPlayers(opponent)
-	local playerNode = OpponentDisplay.BlockPlayers({
-		opponent = opponent,
-		overflow = 'ellipsis',
-		showLink = true,
-	})
-	self.content:node(playerNode)
 end
 
 ---Displays a score or status of the opponent, as a string.

@@ -21,8 +21,7 @@ local Timezone = Lua.import('Module:Timezone')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local DisplayHelper = {}
 local NONBREAKING_SPACE = '&nbsp;'
@@ -110,9 +109,9 @@ end
 function DisplayHelper.MatchCountdownBlock(match)
 	local dateString
 	if match.dateIsExact == true then
-		local timestamp = Date.readTimestamp(match.date) + (Timezone.getOffset{timezone = match.extradata.timezoneid} or 0)
+		local timestamp = Date.readTimestamp(match.date) + (Timezone.getOffset{timezone = match.timezoneId} or 0)
 		dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
-				.. (Timezone.getTimezoneString{timezone = match.extradata.timezoneid} or UTC)
+				.. (Timezone.getTimezoneString{timezone = match.timezoneId} or UTC)
 	else
 		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date)
 	end

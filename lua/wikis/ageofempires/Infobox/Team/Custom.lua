@@ -5,22 +5,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local GameLookup = require('Module:GameLookup')
 local Lua = require('Module:Lua')
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
-local TeamTemplates = require('Module:Team')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local GameLookup = Lua.import('Module:GameLookup')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local TeamTemplates = Lua.import('Module:Team')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -54,7 +54,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'region' then
 		return {}
 	elseif id == 'custom' then
-		table.insert(widgets, Cell{name = 'Games', content = self.caller:_getGames()})
+		table.insert(widgets, Cell{name = 'Games', children = self.caller:_getGames()})
 	end
 	return widgets
 end

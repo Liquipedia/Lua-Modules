@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
+
+local Class = Lua.import('Module:Class')
+local Page = Lua.import('Module:Page')
+local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')

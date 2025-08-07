@@ -5,17 +5,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local ActiveYears = require('Module:YearsActive')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Math = require('Module:MathUtil')
-local PlayersSignatureLegends = require('Module:PlayersSignatureLegends')
+
+local ActiveYears = Lua.import('Module:YearsActive')
+local Class = Lua.import('Module:Class')
+local Math = Lua.import('Module:MathUtil')
+local PlayersSignatureLegends = Lua.import('Module:PlayersSignatureLegends')
 
 local Player = Lua.import('Module:Infobox/Person')
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Injector = Lua.import('Module:Widget/Injector')
 local Cell = Widgets.Cell
 
@@ -49,13 +50,13 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		return {
-			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, content = {currentYearEarnings}},
-			Cell{name = 'Years active', content = {yearsActive}},
-			Cell{name = 'Main Legends', content = {PlayersSignatureLegends.get{player = caller.pagename}}},
+			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, children = {currentYearEarnings}},
+			Cell{name = 'Years active', children = {yearsActive}},
+			Cell{name = 'Main Legends', children = {PlayersSignatureLegends.get{player = caller.pagename}}},
 		}
 	elseif id == 'role' then return {}
 	elseif id == 'history' and string.match(args.retired or '', '%d%d%d%d') then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 	return widgets
 end

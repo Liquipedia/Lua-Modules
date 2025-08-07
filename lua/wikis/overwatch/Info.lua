@@ -48,5 +48,6 @@ return {
 			status = 2,
 			matchWidth = 180,
 		},
+		defaultMaxPlayersPerPlacement = 12,
 	},
 }

@@ -5,8 +5,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local HighlightConditions = {}
 
@@ -24,13 +26,15 @@ local DEFAULT_HIGHLIGHTABLE_VALUES = {
 function HighlightConditions.tournament(data, options)
 	options = options or {}
 
+	local publishertier = data.publishertier or data.publisherTier
+
 	if options.onlyHighlightOnValue then
-		return data.publishertier == options.onlyHighlightOnValue
+		return publishertier == options.onlyHighlightOnValue
 	elseif options.highlightOnAnyValue then
-		return String.isNotEmpty(data.publishertier)
+		return String.isNotEmpty(publishertier)
 	end
 
-	return String.isNotEmpty(data.publishertier) and Table.includes(DEFAULT_HIGHLIGHTABLE_VALUES, data.publishertier)
+	return String.isNotEmpty(publishertier) and Table.includes(DEFAULT_HIGHLIGHTABLE_VALUES, publishertier)
 end
 
 return HighlightConditions

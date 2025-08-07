@@ -96,22 +96,22 @@ function Person:createInfobox()
 		Center{children = {args.caption}},
 		Title{children = (args.informationType or 'Player') .. ' Information'},
 		Customizable{id = 'names', children = {
-				Cell{name = 'Name', content = {args.name}},
-				Cell{name = 'Romanized Name', content = {args.romanized_name}},
+				Cell{name = 'Name', children = {args.name}},
+				Cell{name = 'Romanized Name', children = {args.romanized_name}},
 			}
 		},
 		Customizable{id = 'nationality', children = {
-				Cell{name = 'Nationality', content = self:displayLocations()}
+				Cell{name = 'Nationality', children = self:displayLocations()}
 			}
 		},
-		Cell{name = 'Born', content = {self.age.birth}},
-		Cell{name = 'Died', content = {self.age.death}},
+		Cell{name = 'Born', children = {self.age.birth}},
+		Cell{name = 'Died', children = {self.age.death}},
 		Customizable{id = 'region', children = {
-				Cell{name = 'Region', content = {self.region.display}}
+				Cell{name = 'Region', children = {self.region.display}}
 			}
 		},
 		Customizable{id = 'status', children = {
-			Cell{name = 'Status', content = {(Logic.readBool(args.banned) and 'Banned') or args.status}}
+			Cell{name = 'Status', children = {(Logic.readBool(args.banned) and 'Banned') or args.status}}
 			}
 		},
 		Customizable{id = 'role', children = {
@@ -123,7 +123,7 @@ function Person:createInfobox()
 				return {
 					Cell{
 						name = (#roles > 1 and 'Roles' or 'Role'),
-						content = roles,
+						children = roles,
 					}
 				}
 			end}
@@ -136,36 +136,26 @@ function Person:createInfobox()
 				end)
 				return {Cell{
 					name = #teams > 1 and 'Teams' or 'Team',
-					content = teams
+					children = teams
 				}}
 			end}
 		}},
-		Cell{name = 'Alternate IDs', content = {
+		Cell{name = 'Alternate IDs', children = {
 				table.concat(Array.parseCommaSeparatedString(args.ids or ''), ', ')
 			}
 		},
-		Cell{name = 'Nickname(s)', content = {args.nicknames}},
+		Cell{name = 'Nickname(s)', children = {args.nicknames}},
 		Builder{
 			builder = function()
 				if self.totalEarnings and self.totalEarnings ~= 0 then
 					return {
-						Cell{name = 'Approx. Total Winnings', content = {'$' .. Language:formatNum(self.totalEarnings)}},
+						Cell{name = 'Approx. Total Winnings', children = {'$' .. Language:formatNum(self.totalEarnings)}},
 					}
 				end
 			end
 		},
 		Customizable{id = 'custom', children = {}},
-		Builder{
-			builder = function()
-				local links = Links.transform(args)
-				if Table.isNotEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links, variant = LINK_VARIANT}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = Links.transform(args), variant = LINK_VARIANT},
 		Customizable{id = 'achievements', children = {
 			Builder{
 				builder = function()

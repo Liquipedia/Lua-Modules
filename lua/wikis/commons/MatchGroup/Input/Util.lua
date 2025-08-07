@@ -27,8 +27,7 @@ local Links = Lua.import('Module:Links')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local globalVars = PageVariableNamespace{cached = true}
 
@@ -199,8 +198,7 @@ function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 		return opponentIndex <= 2 and MatchGroupInputUtil.mergeRecordWithOpponent({}, Opponent.blank()) or nil
 	end
 
-	--- or Opponent.blank() is only needed because readOpponentArg can return nil for team opponents
-	local opponent = Opponent.readOpponentArgs(opponentInput) or Opponent.blank()
+	local opponent = Opponent.readOpponentArgs(opponentInput)
 	if Opponent.isBye(opponent) then
 		local byeOpponent = Opponent.blank()
 		byeOpponent.name = 'BYE'
@@ -253,7 +251,7 @@ The opponent struct is retrieved programmatically via Module:Opponent, by using 
 Using the team template extension, the opponent struct is standardised and not user input dependant, unlike the record.
 ]]
 ---@param record table
----@param opponent standardOpponent|StarcraftStandardOpponent|StormgateStandardOpponent|WarcraftStandardOpponent
+---@param opponent standardOpponent|StarcraftStandardOpponent
 ---@param substitutions MatchGroupInputSubstituteInformation[]?
 ---@return MGIParsedOpponent
 function MatchGroupInputUtil.mergeRecordWithOpponent(record, opponent, substitutions)
@@ -853,10 +851,9 @@ function MatchGroupInputUtil.matchIsFinished(match, maps, opponents)
 	end
 
 	local bestof = match.bestof
-	if not bestof then
+	if not bestof or bestof == 0 then
 		return false
 	end
-	-- TODO: Investigate if bestof = 0 needs to be handled
 
 	return MatchGroupInputUtil.majorityHasBeenWon(bestof, opponents)
 end

@@ -5,14 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
 
-local Widgets = require('Module:Widget/All')
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -47,12 +49,12 @@ function Attack.run(argsJson, attackIndex, faction)
 
 	return {
 		Title{children = 'Attack' .. attackIndex .. ': ' .. args.name},
-		Cell{name = 'Target', content = {Attack._displayArray(data.targets)}},
-		Cell{name = 'Damage', content = {Attack._displayDamage(data)}},
-		Cell{name = 'Effect', content = {Attack._displayArray(data.effect)}},
-		Cell{name = 'Attack Speed', content = {data.speed}},
-		Cell{name = 'DPS', content = {Attack._displayDPS(data)}},
-		Cell{name = 'Range', content = {data.range}},
+		Cell{name = 'Target', children = {Attack._displayArray(data.targets)}},
+		Cell{name = 'Damage', children = {Attack._displayDamage(data)}},
+		Cell{name = 'Effect', children = {Attack._displayArray(data.effect)}},
+		Cell{name = 'Attack Speed', children = {data.speed}},
+		Cell{name = 'DPS', children = {Attack._displayDPS(data)}},
+		Cell{name = 'Range', children = {data.range}},
 	}
 end
 

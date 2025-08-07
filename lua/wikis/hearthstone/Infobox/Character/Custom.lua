@@ -5,16 +5,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local AutoInlineIcon = Lua.import('Module:AutoInlineIcon')
@@ -29,7 +30,6 @@ local CustomInjector = Class.new(Injector)
 ---@return Html
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
-	character.args.informationType = 'Class'
 	character:setWidgetInjector(CustomInjector(character))
 	return character:createInfobox()
 end
@@ -46,11 +46,12 @@ function CustomInjector:parse(id, widgets)
 		local deckType = self.caller:getAllArgsForBase(args, 'decktype', {makeLinks = true})
 
 		Array.appendWith(widgets,
-			Cell{name = 'Default Hero', content = {Page.makeInternalLink(args.hero)}},
-			Cell{name = 'Alternative Heroes', content = alternativeHeroes},
-			Cell{name = 'Hero Power', content = {Page.makeInternalLink(args.power)}},
-			Cell{name = 'Abilities', content = abilities},
-			Cell{name = 'Deck types', content = deckType}
+			Cell{name = 'Default Hero', children = {Page.makeInternalLink(args.hero)}},
+			Cell{name = 'Alternative Heroes', children = alternativeHeroes},
+			Cell{name = 'Hero Power', children = {Page.makeInternalLink(args.power)}},
+			Cell{name = 'Abilities', children = abilities},
+			Cell{name = 'Deck types', children = deckType},
+			Cell{name = 'Playable', children = {args.playable}}
 		)
 	end
 
@@ -68,6 +69,7 @@ end
 
 ---@param lpdbData table
 ---@param args table
+---@return table
 function CustomCharacter:addToLpdb(lpdbData, args)
 	lpdbData.extradata.hero = args.hero or ''
 	lpdbData.extradata.power = args.power or ''

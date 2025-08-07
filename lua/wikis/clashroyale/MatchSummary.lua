@@ -5,24 +5,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
-local DateExt = require('Module:Date/Ext')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local NUM_CARDS_PER_PLAYER = 8
 local CARD_COLOR_1 = 'blue'
@@ -34,14 +32,12 @@ local CustomMatchSummary = {}
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '360px'})
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
 ---@param match MatchGroupUtilMatch
----@return MatchSummaryBody
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
 	local isTeamGame = Array.any(match.opponents, function(opponent) return opponent.type == Opponent.team end)
 	local games
 	if isTeamGame then
@@ -52,11 +48,10 @@ function CustomMatchSummary.createBody(match)
 		end)
 	end
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+	return WidgetUtil.collect(
 		games,
 		MatchSummaryWidgets.Mvp(match.extradata.mvp)
-	)}
+	)
 end
 
 ---@param game MatchGroupUtilGame
@@ -78,7 +73,6 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '90%', padding = '4px'},
 		children = WidgetUtil.collect(
 			CustomMatchSummary._opponentCardsDisplay{
 				data = cardData[1],
@@ -281,7 +275,7 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 		local cardDisplays = {}
 		for _, card in ipairs(cardData) do
 			table.insert(cardDisplays, mw.html.create('div')
-				:addClass('brkts-popup-side-color-' .. color)
+				:addClass('brkts-popup-side-color brkts-popup-side-color--' .. color)
 				:addClass('brkts-champion-icon')
 				:node(CharacterIcon.Icon{
 					character = card,
@@ -310,7 +304,7 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 			local towerCardDisplay = mw.html.create('div')
 					:addClass('brkts-popup-body-element-thumbs')
 					:tag('div')
-						:addClass('brkts-popup-side-color-' .. color)
+						:addClass('brkts-popup-side-color brkts-popup-side-color--' .. color)
 						:addClass('brkts-champion-icon')
 						:node(CharacterIcon.Icon{
 							character = cardData.tower,

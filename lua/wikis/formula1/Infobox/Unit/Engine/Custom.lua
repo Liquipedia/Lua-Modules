@@ -5,16 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Namespace = Lua.import('Module:Namespace')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Chronology = Widgets.Chronology
 local Title = Widgets.Title
@@ -40,26 +40,24 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Manufacturer', content = {args.manufacturer}},
-			Cell{name = 'Production', content = {args.production}},
-			Cell{name = 'Weight', content = {args.weight}},
+			Cell{name = 'Manufacturer', children = {args.manufacturer}},
+			Cell{name = 'Production', children = {args.production}},
+			Cell{name = 'Weight', children = {args.weight}},
 			Title{children = 'Engine Output'},
-			Cell{name = 'Power', content = {args.power}},
-			Cell{name = 'Torque', content = {args.torque}},
-			Cell{name = 'Idle RPM', content = {args.idlerpm}},
-			Cell{name = 'Peak RPM', content = {args.peakrpm}},
+			Cell{name = 'Power', children = {args.power}},
+			Cell{name = 'Torque', children = {args.torque}},
+			Cell{name = 'Idle RPM', children = {args.idlerpm}},
+			Cell{name = 'Peak RPM', children = {args.peakrpm}},
 			Title{children = 'Engine Layout'},
-			Cell{name = 'Configuration', content = {args.configuration}},
-			Cell{name = 'Displacement', content = {args.displacement}},
-			Cell{name = 'Compression', content = {args.compression}},
-			Cell{name = 'Cylinder Bore', content = {args.bore}},
-			Cell{name = 'Piston Stroke', content = {args.stroke}}
+			Cell{name = 'Configuration', children = {args.configuration}},
+			Cell{name = 'Displacement', children = {args.displacement}},
+			Cell{name = 'Compression', children = {args.compression}},
+			Cell{name = 'Cylinder Bore', children = {args.bore}},
+			Cell{name = 'Piston Stroke', children = {args.stroke}}
 		)
 	elseif id == 'customcontent' then
-		if String.isEmpty(args.previous) and String.isEmpty(args.next) then return widgets end
 		return {
-			Title{children = 'Chronology'},
-			Chronology{links = {previous = args.previous, next = args.next}}
+			Chronology{args = args, showTitle = true}
 		}
 	end
 	return widgets

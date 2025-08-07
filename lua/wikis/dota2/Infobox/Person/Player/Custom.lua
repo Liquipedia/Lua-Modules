@@ -70,7 +70,7 @@ function CustomInjector:parse(id, widgets)
 			return CharacterIcon.Icon{character = HeroNames[hero:lower()], size = SIZE_HERO}
 		end)
 		return {
-			Cell{name = 'Signature Hero', content = {table.concat(icons, '&nbsp;')}}
+			Cell{name = 'Signature Hero', children = {table.concat(icons, '&nbsp;')}}
 		}
 	elseif id == 'status' then
 		local statusContents = caller:_getStatusContents()
@@ -88,12 +88,12 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		return {
-			Cell{name = 'Status', content = statusContents},
-			Cell{name = 'Years Active (Player)', content = {yearsActive}},
-			Cell{name = 'Years Active (Org)', content = {yearsActiveOrg}},
-			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
-			Cell{name = 'Years Active (Analyst)', content = {args.years_active_analyst}},
-			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}},
+			Cell{name = 'Status', children = statusContents},
+			Cell{name = 'Years Active (Player)', children = {yearsActive}},
+			Cell{name = 'Years Active (Org)', children = {yearsActiveOrg}},
+			Cell{name = 'Years Active (Coach)', children = {args.years_active_coach}},
+			Cell{name = 'Years Active (Analyst)', children = {args.years_active_analyst}},
+			Cell{name = 'Years Active (Talent)', children = {args.years_active_talent}},
 		}
 	elseif id == 'history' then
 		if not String.isEmpty(args.history_iwo) then

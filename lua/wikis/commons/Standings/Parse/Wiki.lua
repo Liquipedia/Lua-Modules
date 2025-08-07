@@ -13,8 +13,7 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
 

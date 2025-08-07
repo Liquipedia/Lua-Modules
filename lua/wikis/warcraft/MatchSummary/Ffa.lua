@@ -7,12 +7,12 @@
 
 local WarcraftMatchSummaryFfa = {}
 
-local Array = require('Module:Array')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Array = Lua.import('Module:Array')
+local Table = Lua.import('Module:Table')
+
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local BaseMatchSummary = Lua.import('Module:MatchSummary/Base/Ffa')

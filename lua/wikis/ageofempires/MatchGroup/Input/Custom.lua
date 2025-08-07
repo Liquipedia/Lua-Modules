@@ -4,18 +4,20 @@
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Faction = require('Module:Faction')
-local Game = require('Module:Game')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
+
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local Faction = Lua.import('Module:Faction')
+local Game = Lua.import('Module:Game')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
@@ -63,8 +65,7 @@ function MatchFunctions.readOpponent(match, opponentIndex, options)
 		return opponentIndex <= 2 and MatchGroupInputUtil.mergeRecordWithOpponent({}, Opponent.blank()) or nil
 	end
 
-	--- or Opponent.blank() is only needed because readOpponentArg can return nil for team opponents
-	local opponent = Opponent.readOpponentArgs(opponentInput) or Opponent.blank()
+	local opponent = Opponent.readOpponentArgs(opponentInput)
 	if Opponent.isBye(opponent) then
 		local byeOpponent = Opponent.blank()
 		byeOpponent.name = 'BYE'

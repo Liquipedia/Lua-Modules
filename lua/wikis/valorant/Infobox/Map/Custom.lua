@@ -42,7 +42,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Location',
-				content = {
+				children = {
 					args.country and (Flags.Icon{flag = args.country, shouldLink = false} .. '&nbsp;' .. args.country)
 					or nil
 				},
@@ -51,9 +51,9 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'custom' then
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Bomb Sites', content = {args.bombsites}},
-			Cell{name = 'Teleporters', content = {args.teleporters}},
-			Cell{name = 'Game Mode', content = self.caller:getGameModes(args)}
+			Cell{name = 'Bomb Sites', children = {args.bombsites}},
+			Cell{name = 'Teleporters', children = {args.teleporters}},
+			Cell{name = 'Game Mode', children = self.caller:getGameModes(args)}
 		)
 	end
 	return widgets

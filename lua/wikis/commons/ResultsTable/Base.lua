@@ -12,6 +12,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local String = Lua.import('Module:StringUtils')
@@ -19,9 +20,8 @@ local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
 local Tier = Lua.import('Module:Tier/Custom')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -33,7 +33,7 @@ local ColumnName = Condition.ColumnName
 local DEFAULT_VALUES = {
 	order = 'desc',
 	resolveOpponent = true,
-	playerLimit = 10,
+	playerLimit = Info.config.defaultMaxPlayersPerPlacement or 10,
 	coachLimit = 5,
 	achievementsLimit = 10,
 	resultsLimit = 5000,

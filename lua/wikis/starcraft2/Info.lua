@@ -69,7 +69,12 @@ return {
 			},
 			hideOrg = true,
 		},
+		defaultMaxPlayersPerPlacement = 20,
+		thisDay = {
+			hideEmptyBirthdayList = true,
+			tiers = {1, 2},
+			excludeTierTypes = {'Qualifier', 'Charity'},
+			showPatches = true,
+		},
 	},
-	opponentLibrary = 'Opponent/Starcraft',
-	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
 }

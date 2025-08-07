@@ -16,10 +16,10 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
 local ICONS = {
-	win = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
-	draw = Icon.makeIcon{iconName = 'draw', color = 'bright-sun-text', size = '110%'},
-	loss = Icon.makeIcon{iconName = 'loss', color = 'cinnabar-text', size = '110%'},
-	empty = '[[File:NoCheck.png|link=|16px]]',
+	win = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text'},
+	draw = Icon.makeIcon{iconName = 'draw', color = 'bright-sun-text'},
+	loss = Icon.makeIcon{iconName = 'loss', color = 'cinnabar-text'},
+	empty = '[[File:NoCheck.png|link=|14px]]',
 }
 
 ---@class MatchSummaryGameWinLossIndicator: Widget

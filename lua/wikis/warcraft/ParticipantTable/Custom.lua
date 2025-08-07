@@ -5,13 +5,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Json = require('Module:Json')
-local Faction = require('Module:Faction')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
+local Faction = Lua.import('Module:Faction')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 ---@class WarcraftParticipantTableConfig: ParticipantTableConfig
 ---@field displayUnknownColumn boolean?
@@ -22,7 +23,7 @@ local Variables = require('Module:Variables')
 ---@field soloColumnWidth number
 
 ---@class WarcraftParticipantTableEntry: ParticipantTableEntry
----@field opponent WarcraftStandardOpponent
+---@field opponent standardOpponent
 
 ---@class WarcraftParticipantTableSection: ParticipantTableSection
 ---@field entries WarcraftParticipantTableEntry[]
@@ -35,8 +36,7 @@ local Variables = require('Module:Variables')
 
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local CustomParticipantTable = {}
 
@@ -107,7 +107,7 @@ function CustomParticipantTable:readEntry(sectionArgs, key, index, config)
 
 	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
+	local opponent = Opponent.readOpponentArgs(opponentArgs)
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)

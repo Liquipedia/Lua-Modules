@@ -6,7 +6,8 @@
 --
 
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Table = Lua.import('Module:Table')
 
 local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
 local CustomOpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
@@ -28,7 +29,10 @@ end
 ---@param props {opponent: standardOpponent, displayType: string, forceShortName: boolean?, height: number}
 ---@return unknown
 function CustomBracketDisplay.OpponentEntry(props)
-	local opponentEntry = CustomOpponentDisplay.BracketOpponentEntry(props.opponent)
+	local opponentEntry = CustomOpponentDisplay.BracketOpponentEntry(
+		props.opponent,
+		{forceShortName = props.forceShortName, showTbd = false}
+	)
 	if props.displayType == 'bracket' then
 		opponentEntry:addScores(props.opponent)
 	end

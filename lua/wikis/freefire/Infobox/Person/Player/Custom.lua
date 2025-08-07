@@ -5,17 +5,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Lua = require('Module:lua')
-local String = require('Module:StringUtils')
-local Page = require('Module:Page')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Template = require('Module:Template')
+local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Page = Lua.import('Module:Page')
+local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
+local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -57,12 +58,12 @@ function CustomInjector:parse(id, widgets)
 		end
 	elseif id == 'status' then
 		return {
-			Cell{name = 'Status', content = CustomPlayer._getStatusContents(args)},
-			Cell{name = 'Years Active (Player)', content = {args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {args.years_active_manage}},
-			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
-			Cell{name = 'Years Active (Analyst)', content = {args.years_active_analyst}},
-			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}},
+			Cell{name = 'Status', children = CustomPlayer._getStatusContents(args)},
+			Cell{name = 'Years Active (Player)', children = {args.years_active}},
+			Cell{name = 'Years Active (Org)', children = {args.years_active_manage}},
+			Cell{name = 'Years Active (Coach)', children = {args.years_active_coach}},
+			Cell{name = 'Years Active (Analyst)', children = {args.years_active_analyst}},
+			Cell{name = 'Years Active (Talent)', children = {args.years_active_talent}},
 		}
 	end
 	return widgets

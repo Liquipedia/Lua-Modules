@@ -19,9 +19,8 @@ local Table = Lua.import('Module:Table')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -186,6 +185,7 @@ function MatchesTable:dateDisplay(match)
 			countdownArgs.rawdatetime = true
 		end
 		countdownArgs.timestamp = match.timestamp
+		countdownArgs.date = DateExt.toCountdownArg(match.timestamp, match.timezoneId)
 		return dateCell:wikitext(Countdown._create(countdownArgs))
 	elseif self.config.onlyShowExactDates then
 		return dateCell
@@ -325,11 +325,7 @@ end
 ---@return Html
 function MatchesTable.matchPageLinkDisplay(match)
 	return mw.html.create('td'):addClass('MatchPage')
-		:node(MatchPageButton{
-			matchId = match.matchId,
-			hasMatchPage = Logic.isNotEmpty(match.bracketData.matchPage),
-			short = false,
-		})
+		:node(MatchPageButton{match = match})
 end
 
 ---@param opponent standardOpponent

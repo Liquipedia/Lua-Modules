@@ -5,14 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Abbreviation = require('Module:Abbreviation')
-local FnUtil = require('Module:FnUtil')
-local Characters = require('Module:Characters')
-local DisplayUtil = require('Module:DisplayUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Abbreviation = Lua.import('Module:Abbreviation')
+local FnUtil = Lua.import('Module:FnUtil')
+local Characters = Lua.import('Module:Characters')
+local DisplayUtil = Lua.import('Module:DisplayUtil')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display')
@@ -75,7 +76,7 @@ function CustomPlayerDisplay.BlockPlayer(props)
 	end
 
 	if props.oneLine then
-		return mw.html.create('div'):addClass('block-player starcraft-block-player')
+		return mw.html.create('div'):addClass('block-player')
 			:addClass(props.flip and 'flipped' or nil)
 			:addClass(props.showPlayerTeam and 'has-team' or nil)
 			:node(flagNode)
@@ -86,7 +87,7 @@ function CustomPlayerDisplay.BlockPlayer(props)
 
 	return mw.html.create()
 		:node(
-			mw.html.create('div'):addClass('block-player starcraft-block-player')
+			mw.html.create('div'):addClass('block-player')
 			:addClass(props.flip and 'flipped' or nil)
 			:addClass(props.showPlayerTeam and 'has-team' or nil)
 			:node(flagNode)
@@ -127,7 +128,7 @@ function CustomPlayerDisplay.InlinePlayer(props)
 			.. nameAndLink
 	end
 
-	return mw.html.create('span'):addClass('starcraft-inline-player')
+	return mw.html.create('span')
 		:addClass(props.flip and 'flipped' or nil)
 		:wikitext(text)
 end

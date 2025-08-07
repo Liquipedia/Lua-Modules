@@ -5,21 +5,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
-local CharacterNames = require('Module:CharacterNames')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local UpcomingMatches = require('Module:Matches Player')
+
+local Array = Lua.import('Module:Array')
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local CharacterNames = Lua.import('Module:CharacterNames')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local UpcomingMatches = Lua.import('Module:Matches Player')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local INPUTS = {
@@ -60,23 +61,23 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(widgets,
 			Cell{
 				name = #legendIcons > 1 and 'Signature Legends' or 'Signature Legend',
-				content = {table.concat(legendIcons, '&nbsp;')}
+				children = {table.concat(legendIcons, '&nbsp;')}
 			},
-			Cell{name = 'Input', content = {caller:formatInput()}}
+			Cell{name = 'Input', children = {caller:formatInput()}}
 		)
 	elseif id == 'region' then
 		return {}
 	elseif id == 'status' then
 		return {
-			Cell{name = 'Status', content = caller:_getStatusContents()},
-			Cell{name = 'Years Active (Player)', content = {args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {args.years_active_manage}},
-			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
+			Cell{name = 'Status', children = caller:_getStatusContents()},
+			Cell{name = 'Years Active (Player)', children = {args.years_active}},
+			Cell{name = 'Years Active (Org)', children = {args.years_active_manage}},
+			Cell{name = 'Years Active (Coach)', children = {args.years_active_coach}},
 		}
 	elseif id == 'history' then
 		table.insert(widgets, Cell{
 			name = 'Retired',
-			content = {args.retired}
+			children = {args.retired}
 		})
 	end
 	return widgets

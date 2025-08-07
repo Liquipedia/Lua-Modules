@@ -18,8 +18,7 @@ local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
 local Tier = Lua.import('Module:Tier/Utils')
 
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 local MatchUtil = Lua.import('Module:Match/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Tournament = Lua.import('Module:Tournament')
@@ -54,6 +53,7 @@ local DEFAULT_QUERY_COLUMNS = {
 	'match2bracketdata',
 	'match2games',
 	'game',
+	'section',
 }
 local NONE = 'none'
 local INFOBOX_DEFAULT_CLASS = 'fo-nttax-infobox panel'
@@ -441,7 +441,7 @@ function MatchTicker:expandGamesOfMatch(match)
 		end
 
 		local gameMatch = Table.copy(match)
-		gameMatch.match2games = nil
+		gameMatch.match2games = {}
 		gameMatch.asGame = true
 		gameMatch.asGameIndexes = {gameIndex}
 
@@ -452,6 +452,7 @@ function MatchTicker:expandGamesOfMatch(match)
 		gameMatch.opponents = Array.map(match.opponents, function(opponent, opponentIndex)
 			return MatchUtil.enrichGameOpponentFromMatchOpponent(opponent, game.opponents[opponentIndex])
 		end)
+		gameMatch.extradata = Table.merge(gameMatch.extradata, game.extradata)
 		return gameMatch
 	end)
 

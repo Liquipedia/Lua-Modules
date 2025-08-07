@@ -5,14 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Icon = require('Module:Icon')
-local Faction = require('Module:Faction')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Icon = Lua.import('Module:Icon')
+local Faction = Lua.import('Module:Faction')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -21,9 +22,8 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local ICONS = {
 	veto = Icon.makeIcon{iconName = 'veto', color = 'cinnabar-text', size = '110%'},
@@ -34,18 +34,16 @@ local TBD = 'TBD'
 local DEFAULT_HERO = 'default'
 
 local CustomMatchSummary = {}
---local StarcraftMatchSummary = CustomMatchSummary
 
 ---@param args {bracketId: string, matchId: string, config: table?}
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	-- later when ffa is enabled need to check for that here
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px'})
 		:addClass('brkts-popup-sc')
 end
 
 ---@param match table
----@return MatchSummaryBody
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
 	CustomMatchSummary.computeOfffactions(match)
 	local hasHeroes = CustomMatchSummary.hasHeroes(match)
@@ -55,22 +53,21 @@ function CustomMatchSummary.createBody(match)
 		subMatches = match.submatches or {}
 	end
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+	return WidgetUtil.collect(
 		isResetMatch and MatchSummaryWidgets.Row{
 			classes = {'brkts-popup-sc-veto-center'},
 			css = {['line-height'] = '80%', ['font-weight'] = 'bold'},
 			children = {'Reset match'},
 		} or nil,
-		match.dateIsExact and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.opponents, CustomMatchSummary.advantageOrPenalty),
 		subMatches and Array.map(subMatches, CustomMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(CustomMatchSummary.Game, {hasHeroes = hasHeroes})),
 		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
-			classes = {'brkts-popup-sc-game-header brkts-popup-sc-veto-center'},
-			children = {'Vetoes'},
+			classes = {'brkts-popup-sc-veto-center'},
+			children = {HtmlWidgets.B{children = {'Vetoes'}}},
 		} or nil,
 		Array.map(match.vetoes or {}, CustomMatchSummary.Veto) or nil
-	)}
+	)
 end
 
 ---@param match table
@@ -203,7 +200,7 @@ function CustomMatchSummary.DisplayHeroes(opponent, options)
 				children = MatchSummaryWidgets.Characters{
 					flipped = options.flipped,
 					characters = heroes,
-					bg = 'brkts-popup-side-color-' .. (options.flipped and 'blue' or 'red'),
+					bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (options.flipped and 'blue' or 'red'),
 				},
 			}
 		end)

@@ -152,7 +152,6 @@ return {
 			status = 1,
 			sortCasters = true,
 		},
+		defaultMaxPlayersPerPlacement = 20,
 	},
-	opponentLibrary = 'Opponent',
-	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

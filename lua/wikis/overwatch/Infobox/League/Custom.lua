@@ -5,19 +5,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local PageLink = require('Module:Page')
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
-local Logic = require('Module:Logic')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local PageLink = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Variables = Lua.import('Module:Variables')
+local Logic = Lua.import('Module:Logic')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -56,9 +57,9 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-		Cell{name = 'Teams', content = {args.team_number}},
-		Cell{name = 'Game', content = {Game.text{game = args.game}}},
-		Cell{name = 'Players', content = {args.player_number}}
+		Cell{name = 'Teams', children = {args.team_number}},
+		Cell{name = 'Game', children = {Game.text{game = args.game}}},
+		Cell{name = 'Players', children = {args.player_number}}
 	)
 	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.map1) then
@@ -75,7 +76,7 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets,
 				Cell{
 					name = 'Blizzard Tier',
-					content = {'[['..BLIZZARD_TIERS[caller.data.publishertier]..']]'},
+					children = {'[['..BLIZZARD_TIERS[caller.data.publishertier]..']]'},
 					classes = {'valvepremier-highlighted'}
 				}
 			)

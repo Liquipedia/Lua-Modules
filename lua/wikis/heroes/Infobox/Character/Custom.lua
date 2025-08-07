@@ -5,11 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Image = require('Module:Image')
 local Lua = require('Module:Lua')
-local Template = require('Module:Template')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Image = Lua.import('Module:Image')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
@@ -19,6 +19,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Breakdown = Widgets.Breakdown
 local Table = Widgets.Table
+local UniverseIcon = Lua.import('Module:Widget/UniverseIcon')
 
 ---@class HeroesCharacterInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)
@@ -51,22 +52,22 @@ function CustomInjector:parse(id, widgets)
 		return {}
 	elseif id == 'custom' then
 		local makeBreakdownCell = function(name, value)
-			return '<b>' ..name .. '</b><br/>' .. (value or '')
+			return '<b>' .. name .. '</b><br/>' .. tostring(value or '')
 		end
 		Array.appendWith(widgets,
 			Breakdown{classes = {'infobox-center'}, children = {
-				makeBreakdownCell('Universe', Template.safeExpand(mw.getCurrentFrame(), 'Faction icon', {args.universe})),
+				makeBreakdownCell('Universe', UniverseIcon{universe = args.universe}),
 				makeBreakdownCell('Role', getRoleIcon(args.role)),
 				makeBreakdownCell('Attack', table.concat({args.attacktype, args.attacktype2}, ' and ')),
 			}},
-			Cell{name = 'Cost', content = {
+			Cell{name = 'Cost', children = {
 				Image.display('HotSGold.png', nil, {alt = 'Gold', size = 16, link = ''}) .. ' ' .. (args.costgold or '?'),
 				Image.display('HotSGems.png', nil, {alt = 'Gems', size = 16, link = ''}) .. ' ' .. (args.costgem or '?'),
 			}},
 			Title{children = 'Stats'},
-			Cell{name = args.armortype or 'Armor', content = {args.armor}},
-			Cell{name = 'Attack Range', content = {args.attackrange}},
-			Cell{name = 'Attacks Per Second', content = {args.attackspeed}},
+			Cell{name = args.armortype or 'Armor', children = {args.armor}},
+			Cell{name = 'Attack Range', children = {args.attackrange}},
+			Cell{name = 'Attacks Per Second', children = {args.attackspeed}},
 			Title{children = 'Stats Change per Level'},
 			Table{
 				rows = {
@@ -98,6 +99,7 @@ end
 
 ---@param lpdbData table
 ---@param args table
+---@return table
 function CustomCharacter:addToLpdb(lpdbData, args)
 	lpdbData.extradata.role = args.role
 

@@ -22,7 +22,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extension/PrizePool')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
@@ -196,25 +196,25 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game Version', content = {caller:_getGameVersion(args)}},
-			Cell{name = 'Server', content = {caller:_getServer(args)}}
+			Cell{name = 'Game Version', children = {caller:_getGameVersion(args)}},
+			Cell{name = 'Server', children = {caller:_getServer(args)}}
 		}
 	elseif id == 'dates' and data.startTime.display then
 		local startTime = Countdown._create{date = data.startTime.display, rawdatetime = true}
 
 		if data.startDate == data.endDate then
-			return {Cell{name = 'Start Time', content = {startTime}}}
+			return {Cell{name = 'Start Time', children = {startTime}}}
 		end
 		return {
-			Cell{name = 'Start Time', content = {startTime}},
-			Cell{name = 'End Date', content = {args.edate}},
+			Cell{name = 'Start Time', children = {startTime}},
+			Cell{name = 'End Date', children = {args.edate}},
 		}
 	elseif id == 'customcontent' then
 		if args.player_number and args.player_number > 0 or args.team_number then
 			Array.appendWith(widgets,
 				Title{children = 'Participants'},
-				Cell{name = 'Number of Players', content = {args.raceBreakDown.total}},
-				Cell{name = 'Number of Teams', content = {args.team_number}},
+				Cell{name = 'Number of Players', children = {args.raceBreakDown.total}},
+				Cell{name = 'Number of Teams', children = {args.team_number}},
 				Breakdown{children = args.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
 		end

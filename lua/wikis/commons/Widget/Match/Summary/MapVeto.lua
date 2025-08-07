@@ -31,6 +31,7 @@ function MatchSummaryMapVeto:render()
 		classes = {'brkts-popup-mapveto'},
 		children = HtmlWidgets.Table{
 			classes = {'wikitable-striped', 'collapsible', 'collapsed'},
+			css = {['text-align'] = 'center'},
 			children = WidgetUtil.collect(
 				HtmlWidgets.Tr{children = {
 					HtmlWidgets.Th{css = {width = '33%'}},
