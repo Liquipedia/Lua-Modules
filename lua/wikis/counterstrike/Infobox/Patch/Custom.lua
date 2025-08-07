@@ -61,7 +61,7 @@ function CustomPatch:_createGameCell()
 
 	return Cell{
 		name = 'Game',
-		content = {
+		children = {
 			IconImageWidget{
 				imageLight = self.gameData.logo.lightMode,
 				imageDark = self.gameData.logo.darkMode,

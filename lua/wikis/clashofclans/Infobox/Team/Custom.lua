@@ -35,7 +35,7 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'topcustomcontent' then
-		table.insert(widgets, Cell{name = 'Clan Tag', content = {args.clantag}})
+		table.insert(widgets, Cell{name = 'Clan Tag', children = {args.clantag}})
 	end
 	return widgets
 end

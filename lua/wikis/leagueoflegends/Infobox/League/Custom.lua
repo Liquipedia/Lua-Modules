@@ -43,9 +43,9 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Teams', content = {args.team_number}},
-			Cell{name = 'Players', content = {args.participants_number}},
-			Cell{name = 'Version', content = {self.caller:_createPatchCell(args)}}
+			Cell{name = 'Teams', children = {args.team_number}},
+			Cell{name = 'Players', children = {args.participants_number}},
+			Cell{name = 'Version', children = {self.caller:_createPatchCell(args)}}
 		)
 	end
 

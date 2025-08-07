@@ -44,12 +44,12 @@ function CustomInjector:parse(id, widgets)
 	if id == 'type' then
 		return {Cell{
 				name = 'Type',
-				content = {String.isNotEmpty(args.type) and mw.getContentLanguage():ucfirst(args.type) or nil}
+				children = {String.isNotEmpty(args.type) and mw.getContentLanguage():ucfirst(args.type) or nil}
 			}}
 	elseif id == 'custom' then
 		return {
-			Cell{name = 'Fate', content = {args.fate}},
-			Cell{name = 'Games', content = Array.map(Game.listGames({ordered = true}), function (gameIdentifier)
+			Cell{name = 'Fate', children = {args.fate}},
+			Cell{name = 'Games', children = Array.map(Game.listGames({ordered = true}), function (gameIdentifier)
 				return args[gameIdentifier] and Game.text{game = gameIdentifier} or nil
 			end)},
 		}

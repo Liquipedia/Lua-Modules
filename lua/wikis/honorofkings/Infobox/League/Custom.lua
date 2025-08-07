@@ -39,21 +39,21 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'sponsors' then
-		table.insert(widgets, Cell{name = 'Official Device', content = {args.device}})
+		table.insert(widgets, Cell{name = 'Official Device', children = {args.device}})
 	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game version', content = {Game.name{game = args.game}}},
+			Cell{name = 'Game version', children = {Game.name{game = args.game}}},
 		}
 	elseif id == 'customcontent' then
 		if args.player_number then
 			table.insert(widgets, Title{children = 'Players'})
-			table.insert(widgets, Cell{name = 'Number of players', content = {args.player_number}})
+			table.insert(widgets, Cell{name = 'Number of players', children = {args.player_number}})
 		end
 
 		--teams section
 		if args.team_number then
 			table.insert(widgets, Title{children = 'Teams'})
-			table.insert(widgets, Cell{name = 'Number of teams', content = {args.team_number}})
+			table.insert(widgets, Cell{name = 'Number of teams', children = {args.team_number}})
 		end
 	end
 	return widgets

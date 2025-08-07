@@ -40,10 +40,10 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
-		table.insert(widgets, Cell{name = 'Games', content = self.caller.games})
+		table.insert(widgets, Cell{name = 'Games', children = self.caller.games})
 	elseif id == 'status' then
 		table.insert(widgets,
-			Cell{name = 'Years Active', content = {YearsActive.get{player = mw.title.getCurrentTitle().baseText}}}
+			Cell{name = 'Years Active', children = {YearsActive.get{player = mw.title.getCurrentTitle().baseText}}}
 		)
 	end
 

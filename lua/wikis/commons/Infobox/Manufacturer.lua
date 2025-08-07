@@ -49,11 +49,11 @@ function Manufacturer:createInfobox()
 			}
 		},
 		Title{children = (args.informationType or 'Manufacturer') .. ' Information'},
-		Cell{name = 'Former Name(s)', content = {args.formernames}},
-		Cell{name = 'Description', content = {args.description}},
-		Cell{name = 'Season(s)', content = {args.seasons}},
-		Cell{name = 'Engine Total', content = {args.enginetotal}},
-		Cell{name = 'Status', content = {args.status}},
+		Cell{name = 'Former Name(s)', children = {args.formernames}},
+		Cell{name = 'Description', children = {args.description}},
+		Cell{name = 'Season(s)', children = {args.seasons}},
+		Cell{name = 'Engine Total', children = {args.enginetotal}},
+		Cell{name = 'Status', children = {args.status}},
 		Customizable{
 			id = 'history',
 			children = {
@@ -62,8 +62,8 @@ function Manufacturer:createInfobox()
 						if args.founded or args.dissolved then
 							return {
 								Title{children = 'History'},
-								Cell{name = 'Founded', content = {args.founded}},
-								Cell{name = 'Dissolved', content = {args.dissolved}}
+								Cell{name = 'Founded', children = {args.founded}},
+								Cell{name = 'Dissolved', children = {args.dissolved}}
 							}
 						end
 					end

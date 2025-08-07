@@ -46,7 +46,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game mode', content = {
+			Cell{name = 'Game mode', children = {
 					self.caller:_getGameMode()
 				}
 			},
@@ -54,10 +54,10 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		if args.player_number then
 			table.insert(widgets, Title{children = 'Players'})
-			table.insert(widgets, Cell{name = 'Number of players', content = {args.player_number}})
+			table.insert(widgets, Cell{name = 'Number of players', children = {args.player_number}})
 		elseif args.team_number then
 			table.insert(widgets, Title{children = 'Teams'})
-			table.insert(widgets, Cell{name = 'Number of teams', content = {args.team_number}})
+			table.insert(widgets, Cell{name = 'Number of teams', children = {args.team_number}})
 		end
 	end
 	return widgets

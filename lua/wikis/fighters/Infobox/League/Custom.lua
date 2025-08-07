@@ -143,8 +143,8 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Number of Players', content = {args.player_number}},
-			Cell{name = 'Number of Teams', content = {args.team_number}}
+			Cell{name = 'Number of Players', children = {args.player_number}},
+			Cell{name = 'Number of Teams', children = {args.team_number}}
 		)
 	elseif id == 'customcontent' then
 		if args.circuit or args.points or args.circuit_next or args.circuit_previous then
@@ -156,12 +156,12 @@ function CustomInjector:parse(id, widgets)
 		end
 	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game', content = {Page.makeInternalLink(
+			Cell{name = 'Game', children = {Page.makeInternalLink(
 				{onlyIfExists = true},
 				Game.name{game = args.game},
 				Game.link{game = args.game}
 			) or Game.name{game = args.game}}},
-			Cell{name = 'Version', content = {args.version}},
+			Cell{name = 'Version', children = {args.version}},
 		}
 	end
 	return widgets
@@ -321,11 +321,11 @@ function CustomLeague:_createCircuitInformation(widgets, circuitIndex)
 	Array.appendWith(widgets,
 		Cell{
 			name = 'Circuit',
-			content = {self:_createCircuitLink(circuitIndex)}
+			children = {self:_createCircuitLink(circuitIndex)}
 		},
-		Cell{name = 'Circuit Tier', content = {circuitArgs.tier}},
-		Cell{name = 'Tournament Region', content = {circuitArgs.region}},
-		Cell{name = 'Points', content = {circuitArgs.points}},
+		Cell{name = 'Circuit Tier', children = {circuitArgs.tier}},
+		Cell{name = 'Tournament Region', children = {circuitArgs.region}},
+		Cell{name = 'Points', children = {circuitArgs.points}},
 		Chronology{args = circuitArgs, showTitle = false}
 	)
 end

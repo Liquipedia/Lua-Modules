@@ -55,16 +55,16 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
-		table.insert(widgets, Cell{name = 'Teams', content = {args.team_number}})
+		table.insert(widgets, Cell{name = 'Teams', children = {args.team_number}})
 	elseif id == 'gamesettings' then
 		Array.appendWith(widgets,
-			Cell{name = 'Game', content = {Game.text{game = self.caller.data.game}}}
+			Cell{name = 'Game', children = {Game.text{game = self.caller.data.game}}}
 		)
 	elseif id == 'organizers' then
 		local organizers = self.caller:_createOrganizers()
 		local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
 
-		return {Cell{name = title, content = organizers}}
+		return {Cell{name = title, children = organizers}}
 	end
 
 	return widgets

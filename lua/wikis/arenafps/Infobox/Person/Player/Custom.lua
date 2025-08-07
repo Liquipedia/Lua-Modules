@@ -42,11 +42,11 @@ function CustomInjector:parse(id, widgets)
 		local games = Array.map(Array.extractKeys(Table.filterByKey(args, Game.isValid)), function(game)
 			return Page.makeInternalLink({}, Game.name{game = game}, Game.link{game = game})
 		end)
-		table.insert(widgets, Cell{name = 'Games', content = games})
+		table.insert(widgets, Cell{name = 'Games', children = games})
 	elseif id == 'region' then return {}
 	elseif id == 'status' then
-		table.insert(widgets, Cell{name = 'Years Active (Player)', content = {args.years_active}})
-		table.insert(widgets, Cell{name = 'Years Active (Org)', content = {args.years_active_manage}})
+		table.insert(widgets, Cell{name = 'Years Active (Player)', children = {args.years_active}})
+		table.insert(widgets, Cell{name = 'Years Active (Org)', children = {args.years_active_manage}})
 	end
 	return widgets
 end

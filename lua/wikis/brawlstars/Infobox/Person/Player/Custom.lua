@@ -82,16 +82,16 @@ function CustomInjector:parse(id, widgets)
 			mmrDisplay = mmrDisplay .. '&nbsp;<small><i>(last update: ' .. args.mmrdate .. '</i></small>'
 		end
 
-		return {Cell{name = 'Solo MMR', content = {mmrDisplay}}}
+		return {Cell{name = 'Solo MMR', children = {mmrDisplay}}}
 	elseif id == 'status' then
 		return {
-			Cell{name = 'Status', content = {CustomPlayer._getStatus(args)}},
-			Cell{name = 'Years Active (Player)', content = {args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {args.years_active_manage}},
-			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
+			Cell{name = 'Status', children = {CustomPlayer._getStatus(args)}},
+			Cell{name = 'Years Active (Player)', children = {args.years_active}},
+			Cell{name = 'Years Active (Org)', children = {args.years_active_manage}},
+			Cell{name = 'Years Active (Coach)', children = {args.years_active_coach}},
 		}
 	elseif id == 'history' then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 	return widgets
 end

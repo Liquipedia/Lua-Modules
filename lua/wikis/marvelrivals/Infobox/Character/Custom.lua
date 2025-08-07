@@ -77,13 +77,13 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'custom' then
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Revealed Date', content = {args.revealdate}},
-			Cell{name = 'Game ID', content = {'[[Hero ID|'.. args.gameid .. ']]'}},
-			Cell{name = 'Health', content = {args.health}},
-			Cell{name = 'Movespeed', content = {args.movespeed}},
-			Cell{name = 'Difficulty', content = {args.difficulty}},
-			Cell{name = 'Affiliation', content = {args.affiliation}},
-			Cell{name = 'Voice Actor(s)', content = {args.voiceactor}}
+			Cell{name = 'Revealed Date', children = {args.revealdate}},
+			Cell{name = 'Game ID', children = {'[[Hero ID|'.. args.gameid .. ']]'}},
+			Cell{name = 'Health', children = {args.health}},
+			Cell{name = 'Movespeed', children = {args.movespeed}},
+			Cell{name = 'Difficulty', children = {args.difficulty}},
+			Cell{name = 'Affiliation', children = {args.affiliation}},
+			Cell{name = 'Voice Actor(s)', children = {args.voiceactor}}
 		)
 		return widgets
 	end

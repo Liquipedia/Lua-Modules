@@ -55,18 +55,18 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(widgets,
 			Cell{
 				name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
-				content = {table.concat(heroIcons, '&nbsp;')},
+				children = {table.concat(heroIcons, '&nbsp;')},
 			},
 			Cell{
 				name = 'Game Appearances',
-				content = GameAppearances.player({player = caller.pagename})
+				children = GameAppearances.player({player = caller.pagename})
 			}
 		)
 	elseif id == 'history' then
 		if args.nationalteams then
 			table.insert(widgets, 1, Center{children = {args.nationalteams}})
 		end
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 	return widgets
 end

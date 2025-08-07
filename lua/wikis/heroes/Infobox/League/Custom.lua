@@ -40,11 +40,11 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
-		table.insert(widgets, Cell{name = 'Teams', content = {(args.team_number)}})
+		table.insert(widgets, Cell{name = 'Teams', children = {(args.team_number)}})
 	elseif id == 'gamesettings' then
 		local server = args.server
 		if server then
-			return {Cell{name = 'Server', content = {
+			return {Cell{name = 'Server', children = {
 				Flags.Icon{flag = server} .. '&nbsp;' .. Flags.CountryName{flag = server}
 			}}}
 		end

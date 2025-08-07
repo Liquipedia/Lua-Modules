@@ -43,13 +43,13 @@ function Tool:createInfobox()
 		},
 		Center{children = {args.caption}},
 		Title{children = 'Tool Information'},
-		Cell{name = 'Game', content = {
+		Cell{name = 'Game', children = {
 				(args.game or args.defaultGame) .. (args.gameversion and (' ' .. args.gameversion) or '')
 		}},
-		Cell{name = 'Creator', content = {args.creator or UNKNOWN}},
-		Cell{name = 'Current Version', content = {args.version or UNKNOWN}},
-		Cell{name = 'Thread', content = {args.thread and ('[' .. args.thread .. ' Thread]') or nil}},
-		Cell{name = 'Download', content = {args.download}},
+		Cell{name = 'Creator', children = {args.creator or UNKNOWN}},
+		Cell{name = 'Current Version', children = {args.version or UNKNOWN}},
+		Cell{name = 'Thread', children = {args.thread and ('[' .. args.thread .. ' Thread]') or nil}},
+		Cell{name = 'Download', children = {args.download}},
 		Center{children = {args.footnotes and ('<small>' .. args.footnotes .. '</small>') or nil}},
 	}
 

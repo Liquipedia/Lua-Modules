@@ -79,7 +79,7 @@ function CustomInjector:parse(id, widgets)
 			CustomHero.getIcon('ticket', args.costticket)
 		)
 		return {
-			Cell{name = 'Price', content = {table.concat(cost, '&emsp;&ensp;')}},
+			Cell{name = 'Price', children = {table.concat(cost, '&emsp;&ensp;')}},
 		}
 	elseif id == 'custom' then
 		return self.caller:addCustomCells(widgets)
@@ -94,13 +94,13 @@ function CustomHero:addCustomCells(widgets)
 	local args = self.args
 	Array.appendWith(
 		widgets,
-		Cell{name = 'Specialty', content = {args.specialty}},
-		Cell{name = 'Region', content = {args.region}},
-		Cell{name = 'City', content = {args.city}},
-		Cell{name = 'Attack Type', content = {args.attacktype}},
-		Cell{name = 'Resource Bar', content = {args.resourcebar}},
-		Cell{name = 'Release Date', content = {args.releasedate}},
-		Cell{name = 'Voice Actor(s)', content = CustomHero._voiceActors(args)}
+		Cell{name = 'Specialty', children = {args.specialty}},
+		Cell{name = 'Region', children = {args.region}},
+		Cell{name = 'City', children = {args.city}},
+		Cell{name = 'Attack Type', children = {args.attacktype}},
+		Cell{name = 'Resource Bar', children = {args.resourcebar}},
+		Cell{name = 'Release Date', children = {args.releasedate}},
+		Cell{name = 'Voice Actor(s)', children = CustomHero._voiceActors(args)}
 	)
 	local baseStats = {
 		{name = 'Health', value = args.hp},
@@ -123,7 +123,7 @@ function CustomHero:addCustomCells(widgets)
 	end
 
 	Array.extendWith(widgets, Array.map(baseStats, function(item)
-		return Cell{name = item.name, content = {item.value}}
+		return Cell{name = item.name, children = {item.value}}
 	end))
 	local wins, loses = CharacterWinLoss.run()
 	if wins + loses == 0 then return widgets end
@@ -132,7 +132,7 @@ function CustomHero:addCustomCells(widgets)
 
 	return Array.append(widgets,
 		Title{children = 'Esports Statistics'},
-		Cell{name = 'Win Rate', content = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}}
+		Cell{name = 'Win Rate', children = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}}
 	)
 end
 

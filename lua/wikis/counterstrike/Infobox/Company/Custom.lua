@@ -35,15 +35,15 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
-		table.insert(widgets, Cell{name = 'Series', content = {args.series}})
+		table.insert(widgets, Cell{name = 'Series', children = {args.series}})
 	elseif id == 'parent' then
-		table.insert(widgets, Cell{name = 'Sister Company', content = {args.sister}})
-		table.insert(widgets, Cell{name = 'Subsidiaries', content = {args.subsidiaries}})
-		table.insert(widgets, Cell{name = 'Focus', content = {args.focus or args.industry}})
+		table.insert(widgets, Cell{name = 'Sister Company', children = {args.sister}})
+		table.insert(widgets, Cell{name = 'Subsidiaries', children = {args.subsidiaries}})
+		table.insert(widgets, Cell{name = 'Focus', children = {args.focus or args.industry}})
 	elseif id == 'dates' then
-		table.insert(widgets, Cell{name = 'Fate', content = {args.fate}})
+		table.insert(widgets, Cell{name = 'Fate', children = {args.fate}})
 	elseif id == 'employees' then
-		table.insert(widgets, Cell{name = 'Key People', content = {args.people}})
+		table.insert(widgets, Cell{name = 'Key People', children = {args.people}})
 	end
 
 	return widgets
