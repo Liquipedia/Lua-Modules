@@ -79,14 +79,14 @@ function CustomInjector:parse(id, widgets)
 
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Damage', content = fetchCustomValues('basedamage', 'damage', DAMAGE_INFO)},
-			Cell{name = 'Rates of Fire', content = fetchCustomValues('ratesoffire', 'rateoffireauto', BOLT_INFO)},
-			Cell{name = 'Ammo Capacity', content = fetchCustomValues('ammocapacity', 'ammocap', MAGAZINE_INFO)},
-			Cell{name = 'Reload Speed', content = fetchCustomValues('reloadtime', 'reloadspeed', MAGAZINE_INFO)}
+			Cell{name = 'Damage', children = fetchCustomValues('basedamage', 'damage', DAMAGE_INFO)},
+			Cell{name = 'Rates of Fire', children = fetchCustomValues('ratesoffire', 'rateoffireauto', BOLT_INFO)},
+			Cell{name = 'Ammo Capacity', children = fetchCustomValues('ammocapacity', 'ammocap', MAGAZINE_INFO)},
+			Cell{name = 'Reload Speed', children = fetchCustomValues('reloadtime', 'reloadspeed', MAGAZINE_INFO)}
 		)
 
 		if String.isNotEmpty(args.ammotype) and String.isNotEmpty(args.ammotypeicon) then
-			table.insert(widgets, Cell{name = 'Ammo Type', content = {args.ammotypeicon .. ' ' .. args.ammotype}})
+			table.insert(widgets, Cell{name = 'Ammo Type', children = {args.ammotypeicon .. ' ' .. args.ammotype}})
 		end
 
 		if String.isNotEmpty(args.attachment) then
@@ -111,13 +111,13 @@ function CustomInjector:parse(id, widgets)
 
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Rate of fire (Single)', content = {args.rateoffiresingle}},
-			Cell{name = 'Rate of fire (Auto)', content = {args.rateoffireauto}},
-			Cell{name = 'Rate of fire (Burst)', content = {args.rateoffireburst}},
-			Cell{name = 'Projectile Speed', content = {args.projectilespeed}},
-			Cell{name = 'Range', content = {args.range}},
-			Cell{name = 'Ignition Time', content = {args.ignitiontime}},
-			Cell{name = 'Release Date', content = {args.release}}
+			Cell{name = 'Rate of fire (Single)', children = {args.rateoffiresingle}},
+			Cell{name = 'Rate of fire (Auto)', children = {args.rateoffireauto}},
+			Cell{name = 'Rate of fire (Burst)', children = {args.rateoffireburst}},
+			Cell{name = 'Projectile Speed', children = {args.projectilespeed}},
+			Cell{name = 'Range', children = {args.range}},
+			Cell{name = 'Ignition Time', children = {args.ignitiontime}},
+			Cell{name = 'Release Date', children = {args.release}}
 		)
 	end
 

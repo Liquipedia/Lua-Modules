@@ -52,7 +52,7 @@ function Strategy:createInfobox()
 		Title{children = args.informationType .. ' Information'},
 		Cell{
 			name = 'Creator(s)',
-			content = {args.creator or args['created-by']},
+			children = {args.creator or args['created-by']},
 			options = {makeLink = true}
 		},
 		Customizable{id = 'custom', children = {}},

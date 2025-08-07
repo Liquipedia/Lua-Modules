@@ -38,18 +38,18 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Manufacturer', content = {args.manufacturer}},
-			Cell{name = 'Team(s)', content = {args.team}},
-			Cell{name = 'Designer', content = {args.designer}},
-			Cell{name = 'Season(s)', content = {args.season}},
-			Cell{name = 'Power', content = {args.power}},
-			Cell{name = 'Weight', content = {args.weight}},
-			Cell{name = 'Engine Provider', content = {args.engine}},
-			Cell{name = 'Fuel', content = {args.fuel}},
-			Cell{name = 'Lubricant(s)', content = {args.lubricant}},
-			Cell{name = 'Tyre Supplier', content = {args.tyres}},
-			Cell{name = 'First Entry', content = {args.firstentry}},
-			Cell{name = 'Last Entry', content = {args.lastentry}}
+			Cell{name = 'Manufacturer', children = {args.manufacturer}},
+			Cell{name = 'Team(s)', children = {args.team}},
+			Cell{name = 'Designer', children = {args.designer}},
+			Cell{name = 'Season(s)', children = {args.season}},
+			Cell{name = 'Power', children = {args.power}},
+			Cell{name = 'Weight', children = {args.weight}},
+			Cell{name = 'Engine Provider', children = {args.engine}},
+			Cell{name = 'Fuel', children = {args.fuel}},
+			Cell{name = 'Lubricant(s)', children = {args.lubricant}},
+			Cell{name = 'Tyre Supplier', children = {args.tyres}},
+			Cell{name = 'First Entry', children = {args.firstentry}},
+			Cell{name = 'Last Entry', children = {args.lastentry}}
 		)
 	elseif id == 'customcontent' then
 		return {

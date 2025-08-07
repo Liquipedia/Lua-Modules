@@ -56,7 +56,7 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(widgets,
 			Cell{
 				name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
-				content = {table.concat(heroIcons, '&nbsp;')},
+				children = {table.concat(heroIcons, '&nbsp;')},
 			}
 		)
 	end

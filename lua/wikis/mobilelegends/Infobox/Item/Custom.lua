@@ -73,12 +73,12 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'info' then
 		return {
 			Title{children = 'Item Information'},
-			Cell{name = 'Cost', content = {caller:_getCostDisplay()}},
-			Cell{name = 'Sell Value', content = {caller:_getSellValueDisplay()}},
-			Cell{name = 'Category', content = caller:_getItemCategories(args)},
-			Cell{name = 'Tier', content = {args.tier}},
-			Cell{name = 'Type', content = {ITEM_TYPE[(args.type or ''):lower()]}},
-			Cell{name = 'Status', content = {STATUS[(args.status or ''):lower()]}}
+			Cell{name = 'Cost', children = {caller:_getCostDisplay()}},
+			Cell{name = 'Sell Value', children = {caller:_getSellValueDisplay()}},
+			Cell{name = 'Category', children = caller:_getItemCategories(args)},
+			Cell{name = 'Tier', children = {args.tier}},
+			Cell{name = 'Type', children = {ITEM_TYPE[(args.type or ''):lower()]}},
+			Cell{name = 'Status', children = {STATUS[(args.status or ''):lower()]}}
 		}
 	elseif id == 'attributes' then
 		local attributeCells = {
@@ -116,8 +116,8 @@ function CustomInjector:parse(id, widgets)
 		end
 		Array.appendWith(widgets,
 			Title{children = 'Ability'},
-			Cell{name = 'Active', content = {args.active}},
-			Cell{name = 'Passive', content = {args.passive, args.passive2}}
+			Cell{name = 'Active', children = {args.active}},
+			Cell{name = 'Passive', children = {args.passive, args.passive2}}
 		)
 	elseif id == 'recipe' then
 		if String.isEmpty(args.recipe) then return {} end
@@ -205,7 +205,7 @@ function CustomItem:_getAttributeCells(attributeCells)
 		local funct = attribute.funct or DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION
 		local content = CustomItem[funct](self, attribute.parameter)
 		if String.isEmpty(content) then return nil end
-		return Cell{name = attribute.name, content = {content}}
+		return Cell{name = attribute.name, children = {content}}
 	end)
 end
 

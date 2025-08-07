@@ -37,7 +37,7 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		return{
-			Cell{name = 'Game Version', content = {Game.name{game = self.caller.args.game}}, options = {makeLink = true}},
+			Cell{name = 'Game Version', children = {Game.name{game = self.caller.args.game}}, options = {makeLink = true}},
 		}
 	end
 	return widgets

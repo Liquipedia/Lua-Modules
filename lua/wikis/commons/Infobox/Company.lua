@@ -54,22 +54,22 @@ function Company:createInfobox()
 		Customizable{id = 'parent', children = {
 			Cell{
 				name = 'Parent Company',
-				content = self:getAllArgsForBase(args, 'parent', {makeLink = true}),
+				children = self:getAllArgsForBase(args, 'parent', {makeLink = true}),
 			}
 		}},
 		Customizable{id = 'dates', children = {
-			Cell{name = 'Founded', content = {args.foundeddate or args.founded}},
-			Cell{name = 'Defunct', content = {args.defunctdate or args.defunct}},
+			Cell{name = 'Founded', children = {args.foundeddate or args.founded}},
+			Cell{name = 'Defunct', children = {args.defunctdate or args.defunct}},
 		}},
 		Cell{
 			name = 'Location',
-			content = {self:_createLocation(args.location)},
+			children = {self:_createLocation(args.location)},
 		},
-		Cell{name = 'Headquarters', content = {args.headquarters}},
+		Cell{name = 'Headquarters', children = {args.headquarters}},
 		Customizable{id = 'employees', children = {
-			Cell{name = 'Employees', content = {args.employees}},
+			Cell{name = 'Employees', children = {args.employees}},
 		}},
-		Cell{name = 'Trades as', content = {args.tradedas}},
+		Cell{name = 'Trades as', children = {args.tradedas}},
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
@@ -78,7 +78,7 @@ function Company:createInfobox()
 					return {
 						Cell{
 							name = 'Awarded Prize Pools',
-							content = {self:_getOrganizerPrizepools()}
+							children = {self:_getOrganizerPrizepools()}
 						}
 					}
 				end

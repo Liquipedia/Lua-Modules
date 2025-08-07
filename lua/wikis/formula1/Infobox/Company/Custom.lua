@@ -53,7 +53,7 @@ function CustomInjector:parse(id, widgets)
 		return Array.extendWith(widgets,
 			{Title{children = 'Staff Information'}},
 			Array.map(staffInfoCells, function(cellData)
-				return Cell{name = cellData.name, content = {args[cellData.key]}}
+				return Cell{name = cellData.name, children = {args[cellData.key]}}
 			end)
 		)
 	end

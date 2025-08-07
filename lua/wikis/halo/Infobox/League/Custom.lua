@@ -47,12 +47,12 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		return {
-			Cell{name = 'Number of teams', content = {args.team_number}},
-			Cell{name = 'Number of players', content = {args.player_number}},
+			Cell{name = 'Number of teams', children = {args.team_number}},
+			Cell{name = 'Number of players', children = {args.player_number}},
 		}
 	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game version', content = {Game.name{game = args.game}}},
+			Cell{name = 'Game version', children = {Game.name{game = args.game}}},
 		}
 	elseif id == 'customcontent' and String.isNotEmpty(args.map1) then
 		Array.appendWith(widgets,

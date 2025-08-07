@@ -36,8 +36,8 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		return {
-			Cell{name = 'Number of teams', content = {args.team_number}},
-			Cell{name = 'Number of players', content = {args.player_number}},
+			Cell{name = 'Number of teams', children = {args.team_number}},
+			Cell{name = 'Number of players', children = {args.player_number}},
 		}
 	end
 	return widgets
