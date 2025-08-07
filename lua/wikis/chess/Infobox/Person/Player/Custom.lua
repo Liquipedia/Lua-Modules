@@ -47,14 +47,6 @@ function CustomPlayer.run(frame)
 		addlpdbdata = true
 	}
 
-	-- Title.
-	player.args.title = Array.find(
-		TITLES,
-		function (title)
-			return Logic.isNotEmpty(player.args['title_' .. title.code])
-		end
-	)
-
 	return player:createInfobox()
 end
 
@@ -65,13 +57,16 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
-		-- Titles.
-		local hasTitle = Logic.isNotEmpty(args.title)
-		if hasTitle then
+		local titles = Array.filter(TITLES,
+			function (title)
+				return Logic.isNotEmpty(args['title_' .. title.code])
+			end
+		)
+		if #titles > 0 then
 			Array.extendWith(widgets,
 				{Title{children = 'Titles'}},
 				Array.map(
-					TITLES,
+					titles,
 					function (title)
 						return Cell{name = title.name, content = {args['title_' .. title.code]}}
 					end
