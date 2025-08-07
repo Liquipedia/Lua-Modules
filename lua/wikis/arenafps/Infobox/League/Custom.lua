@@ -65,10 +65,10 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Game', content = {args.game}},
-			Cell{name = 'Mode', content = {args.mode}},
-			Cell{name = 'Number of Players', content = {args.player_number}},
-			Cell{name = 'Number of Teams', content = {args.team_number}}
+			Cell{name = 'Game', children = {args.game}},
+			Cell{name = 'Mode', children = {args.mode}},
+			Cell{name = 'Number of Players', children = {args.player_number}},
+			Cell{name = 'Number of Teams', children = {args.team_number}}
 		)
 	elseif id == 'customcontent' then
 		local maps = self.caller:getAllArgsForBase(args, 'map')

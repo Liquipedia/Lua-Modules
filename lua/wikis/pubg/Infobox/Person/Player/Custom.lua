@@ -39,8 +39,8 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'status' then
-		table.insert(widgets, Cell{name = 'Years Active (Player)', content = {args.years_active}})
-		table.insert(widgets, Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}})
+		table.insert(widgets, Cell{name = 'Years Active (Player)', children = {args.years_active}})
+		table.insert(widgets, Cell{name = 'Years Active (Talent)', children = {args.years_active_talent}})
 	elseif id == 'region' then return {}
 	elseif id == 'history' and args.nationalteams then
 		table.insert(widgets, 1, Title{children = 'National Teams'})

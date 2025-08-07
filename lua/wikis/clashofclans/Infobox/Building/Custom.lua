@@ -46,18 +46,18 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Range', content = {args.range}},
-			Cell{name = 'Damage Type', content = {args.damagetype}},
-			Cell{name = 'Target', content = {args.target}},
-			Cell{name = 'Favorite Target', content = {args.favtarget}},
-			Cell{name = 'Release Date', content = {args.releasedate}}
+			Cell{name = 'Range', children = {args.range}},
+			Cell{name = 'Damage Type', children = {args.damagetype}},
+			Cell{name = 'Target', children = {args.target}},
+			Cell{name = 'Favorite Target', children = {args.favtarget}},
+			Cell{name = 'Release Date', children = {args.releasedate}}
 		)
 
 		if Table.any(args, function(key) return MODE_AVAILABILITY[key] end) then
 			table.insert(widgets, Title{children = 'Mode Availability'})
 			local modeAvailabilityOrder = function(tbl, a, b) return tbl[a].order < tbl[b].order end
 			for key, item in Table.iter.spairs(MODE_AVAILABILITY, modeAvailabilityOrder) do
-				table.insert(widgets, Cell{name = item.name, content = {args[key]}})
+				table.insert(widgets, Cell{name = item.name, children = {args[key]}})
 			end
 		end
 	end

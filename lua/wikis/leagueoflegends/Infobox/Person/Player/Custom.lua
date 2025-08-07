@@ -81,13 +81,13 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		return {
-			Cell{name = 'Status', content = {Page.makeInternalLink({onlyIfExists = true},
+			Cell{name = 'Status', children = {Page.makeInternalLink({onlyIfExists = true},
 						status) or status}},
 		}
 	elseif id == 'history' then
 		table.insert(widgets, Cell{
 			name = 'Retired',
-			content = {args.retired}
+			children = {args.retired}
 		})
 	end
 	return widgets

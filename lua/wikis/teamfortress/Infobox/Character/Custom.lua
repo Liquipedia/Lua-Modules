@@ -39,11 +39,11 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'country' then
-		return Cell{name = 'Origin', content = {args.origin}}
+		return Cell{name = 'Origin', children = {args.origin}}
 	elseif id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Voiced by', content = {args.voice}},
-			Cell{name = 'Health', content = {args.hp}}
+			Cell{name = 'Voiced by', children = {args.voice}},
+			Cell{name = 'Health', children = {args.hp}}
 		)
 	end
 

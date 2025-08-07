@@ -54,21 +54,21 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Approx. Winnings ' .. CURRENT_YEAR,
-				content = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
+				children = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
 			},
 			Cell{
 				name = Abbreviation.make{text = 'Years Active', title = 'Years active as a player'},
-				content = {YearsActive.display({player = caller.pagename})
+				children = {YearsActive.display({player = caller.pagename})
 			}
 			},
 			Cell{
 				name = Abbreviation.make{text = 'Years Active (caster)', title = 'Years active as a caster'},
-				content = {caller:_getActiveCasterYears()}
+				children = {caller:_getActiveCasterYears()}
 			},
 		}
 	elseif id == 'status' then
 		return {
-			Cell{name = 'Faction', content = {caller:getFactionData(args.faction or 'unknown')}}
+			Cell{name = 'Faction', children = {caller:getFactionData(args.faction or 'unknown')}}
 		}
 	elseif id == 'role' then return {}
 	elseif id == 'region' then return {}
@@ -86,7 +86,7 @@ function CustomInjector:parse(id, widgets)
 			Center{children = {achievements}},
 		}
 	elseif id == 'history' and string.match(args.retired or '', '%d%d%d%d') then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 
 	return widgets

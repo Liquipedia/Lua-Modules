@@ -70,25 +70,25 @@ function CustomInjector:parse(id, widgets)
 		end)
 		table.insert(widgets, Cell{
 			name = #operatorIcons > 1 and 'Signature Operators' or 'Signature Operator',
-			content = {table.concat(operatorIcons, '&nbsp;')},
+			children = {table.concat(operatorIcons, '&nbsp;')},
 		})
 
 		-- Active in Games
 		table.insert(widgets, Cell{
 			name = 'Game Appearances',
-			content = GameAppearances.player{player = caller.pagename}
+			children = GameAppearances.player{player = caller.pagename}
 		})
 	elseif id == 'status' then
 		return {
-			Cell{name = 'Status', content = caller:_getStatusContents()},
-			Cell{name = 'Years Active (Player)', content = {args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {args.years_active_manage}},
-			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
-			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}},
-			Cell{name = 'Time Banned', content = {args.time_banned}},
+			Cell{name = 'Status', children = caller:_getStatusContents()},
+			Cell{name = 'Years Active (Player)', children = {args.years_active}},
+			Cell{name = 'Years Active (Org)', children = {args.years_active_manage}},
+			Cell{name = 'Years Active (Coach)', children = {args.years_active_coach}},
+			Cell{name = 'Years Active (Talent)', children = {args.years_active_talent}},
+			Cell{name = 'Time Banned', children = {args.time_banned}},
 		}
 	elseif id == 'history' then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 	return widgets
 end

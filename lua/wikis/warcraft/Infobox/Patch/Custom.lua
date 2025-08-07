@@ -46,9 +46,9 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'release' then
 		return {
-			Cell{name = '[[Public Test Realm|PTR]] Release Date', content = {args.release_ptr}},
-			Cell{name = 'Release Date', content = {args.release}},
-			Cell{name = '[[NetEase]] Release Date', content = {CustomPatch._netEaseRelease(args)}},
+			Cell{name = '[[Public Test Realm|PTR]] Release Date', children = {args.release_ptr}},
+			Cell{name = 'Release Date', children = {args.release}},
+			Cell{name = '[[NetEase]] Release Date', children = {CustomPatch._netEaseRelease(args)}},
 		}
 	end
 

@@ -49,12 +49,12 @@ function Attack.run(argsJson, attackIndex, faction)
 
 	return {
 		Title{children = 'Attack' .. attackIndex .. ': ' .. args.name},
-		Cell{name = 'Target', content = {Attack._displayArray(data.targets)}},
-		Cell{name = 'Damage', content = {Attack._displayDamage(data)}},
-		Cell{name = 'Effect', content = {Attack._displayArray(data.effect)}},
-		Cell{name = 'Attack Speed', content = {data.speed}},
-		Cell{name = 'DPS', content = {Attack._displayDPS(data)}},
-		Cell{name = 'Range', content = {data.range}},
+		Cell{name = 'Target', children = {Attack._displayArray(data.targets)}},
+		Cell{name = 'Damage', children = {Attack._displayDamage(data)}},
+		Cell{name = 'Effect', children = {Attack._displayArray(data.effect)}},
+		Cell{name = 'Attack Speed', children = {data.speed}},
+		Cell{name = 'DPS', children = {Attack._displayDPS(data)}},
+		Cell{name = 'Range', children = {data.range}},
 	}
 end
 

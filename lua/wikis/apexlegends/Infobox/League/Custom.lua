@@ -51,19 +51,19 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Teams', content = {args.team_number}},
-			Cell{name = 'Number of players', content = {args.player_number}}
+			Cell{name = 'Teams', children = {args.team_number}},
+			Cell{name = 'Number of players', children = {args.player_number}}
 		)
 	elseif id == 'gamesettings' then
 		Array.appendWith(widgets,
-			Cell{name = 'Game mode', content = {self.caller:_getGameMode()}},
-			Cell{name = 'Platform', content = {self.caller:_getPlatform()}}
+			Cell{name = 'Game mode', children = {self.caller:_getGameMode()}},
+			Cell{name = 'Platform', children = {self.caller:_getPlatform()}}
 		)
 	elseif id == 'liquipediatier' then
 		if String.isNotEmpty(args.publishertier) then
 			table.insert(widgets, 1, Cell{
 				name = 'ALGS Circuit Tier',
-				content = {'[[Apex Legends Global Series|' .. args.publishertier .. ']]'},
+				children = {'[[Apex Legends Global Series|' .. args.publishertier .. ']]'},
 				classes = {'tournament-highlighted-bg'}
 			})
 		end

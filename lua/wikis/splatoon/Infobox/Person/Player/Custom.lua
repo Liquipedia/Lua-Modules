@@ -59,7 +59,7 @@ function CustomInjector:parse(id, widgets)
 
 		table.insert(widgets, Cell{
 			name = #weaponIcons > 1 and 'Signature Weapons' or 'Signature Weapon',
-			content = {table.concat(weaponIcons, '&nbsp;')}
+			children = {table.concat(weaponIcons, '&nbsp;')}
 		})
 	elseif id == 'region' then return {}
 	end

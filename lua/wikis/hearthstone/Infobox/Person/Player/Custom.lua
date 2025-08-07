@@ -50,8 +50,8 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		return {
-			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, content = {currentYearEarnings}},
-			Cell{name = 'Years active', content = {yearsActive}},
+			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, children = {currentYearEarnings}},
+			Cell{name = 'Years active', children = {yearsActive}},
 		}
 	elseif id == 'region' then return {}
 	end

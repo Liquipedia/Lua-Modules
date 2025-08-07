@@ -59,23 +59,23 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(widgets,
 			Cell{
 				name = #legendIcons > 1 and 'Signature Legends' or 'Signature Legend',
-				content = {table.concat(legendIcons, '&nbsp;')}
+				children = {table.concat(legendIcons, '&nbsp;')}
 			},
-			Cell{name = 'Input', content = {caller:formatInput()}}
+			Cell{name = 'Input', children = {caller:formatInput()}}
 		)
 	elseif id == 'region' then
 		return {}
 	elseif id == 'status' then
 		return {
-			Cell{name = 'Status', content = caller:_getStatusContents()},
-			Cell{name = 'Years Active (Player)', content = {args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {args.years_active_manage}},
-			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
+			Cell{name = 'Status', children = caller:_getStatusContents()},
+			Cell{name = 'Years Active (Player)', children = {args.years_active}},
+			Cell{name = 'Years Active (Org)', children = {args.years_active_manage}},
+			Cell{name = 'Years Active (Coach)', children = {args.years_active_coach}},
 		}
 	elseif id == 'history' then
 		table.insert(widgets, Cell{
 			name = 'Retired',
-			content = {args.retired}
+			children = {args.retired}
 		})
 	end
 	return widgets

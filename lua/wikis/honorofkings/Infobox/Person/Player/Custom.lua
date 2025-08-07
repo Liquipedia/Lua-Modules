@@ -88,7 +88,7 @@ function CustomInjector:parse(id, widgets)
 		if Table.isEmpty(heroIcons) then return widgets end
 		table.insert(widgets, Cell{
 			name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
-			content = {table.concat(heroIcons, '&nbsp;')}
+			children = {table.concat(heroIcons, '&nbsp;')}
 		})
 	end
 

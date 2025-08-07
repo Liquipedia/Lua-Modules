@@ -44,12 +44,12 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		return Array.append(widgets,
-			Cell{name = 'Released', content = {args.releasedate}},
-			Cell{name = 'Acquisition', content = {args.acquisition}},
-			Cell{name = 'Vehicle Type', content = {args.vehicletype}},
-			Cell{name = 'Battle Rating', content = {args.br}},
-			Cell{name = 'Nation', content = {caller:buildNationDisplay()}},
-			Cell{name = 'Role', content = {args.role}}
+			Cell{name = 'Released', children = {args.releasedate}},
+			Cell{name = 'Acquisition', children = {args.acquisition}},
+			Cell{name = 'Vehicle Type', children = {args.vehicletype}},
+			Cell{name = 'Battle Rating', children = {args.br}},
+			Cell{name = 'Nation', children = {caller:buildNationDisplay()}},
+			Cell{name = 'Role', children = {args.role}}
 		)
 	end
 	return widgets

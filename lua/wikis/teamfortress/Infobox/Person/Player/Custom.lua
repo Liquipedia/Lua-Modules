@@ -37,7 +37,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'role' then
 		if not args.role then return widgets end
 		return {
-			Cell{name = 'Main', content = {Template.safeExpand(mw.getCurrentFrame(), 'Class/'.. args.role)}}
+			Cell{name = 'Main', children = {Template.safeExpand(mw.getCurrentFrame(), 'Class/'.. args.role)}}
 		}
 	end
 	return widgets

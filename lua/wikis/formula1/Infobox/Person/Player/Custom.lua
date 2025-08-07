@@ -41,10 +41,10 @@ function CustomInjector:parse(id, widgets)
 		self.caller:addCustomCells(widgets)
 
 	elseif id == 'names' then
-		table.insert(widgets, Cell{name = 'Abbreviations', content = {args.abbreviations}})
+		table.insert(widgets, Cell{name = 'Abbreviations', children = {args.abbreviations}})
 	elseif id == 'role' then
 		return {
-			Cell{name = 'Role(s)', content = {
+			Cell{name = 'Role(s)', children = {
 				Role.run{role = args.role, useDefault = true}.display,
 				Role.run{role = args.role2}.display}
 			}
@@ -58,8 +58,8 @@ end
 function CustomPlayer:addCustomCells(widgets)
 	local args = self.args
 
-	table.insert(widgets, Cell{name = 'Reported Salary', content = {args.salary}})
-	table.insert(widgets, Cell{name = 'End of Contract', content = {args.contract}})
+	table.insert(widgets, Cell{name = 'Reported Salary', children = {args.salary}})
+	table.insert(widgets, Cell{name = 'End of Contract', children = {args.contract}})
 	local statisticsCells = {
 		{key = 'races', name = 'Races'},
 		{key = 'wins', name = 'Wins'},
@@ -79,7 +79,7 @@ function CustomPlayer:addCustomCells(widgets)
 	return Array.extendWith(widgets,
 		{Title{children = 'F1 Driver Statistics'}},
 		Array.map(statisticsCells, function(cellData)
-			return Cell{name = cellData.name, content = {args[cellData.key]}}
+			return Cell{name = cellData.name, children = {args[cellData.key]}}
 		end)
 	)
 end

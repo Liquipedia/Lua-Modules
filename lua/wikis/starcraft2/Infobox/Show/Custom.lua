@@ -43,8 +43,8 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		Array.appendWith(
 			widgets,
-			Cell{name = 'No. of episodes', content = {args['num_episodes']}},
-			Cell{name = 'Original Release', content = {self.caller:_getReleasePeriod(args.sdate, args.edate)}}
+			Cell{name = 'No. of episodes', children = {args['num_episodes']}},
+			Cell{name = 'Original Release', children = {self.caller:_getReleasePeriod(args.sdate, args.edate)}}
 		)
 	end
 

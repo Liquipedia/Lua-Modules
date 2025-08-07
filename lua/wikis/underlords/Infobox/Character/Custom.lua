@@ -92,7 +92,7 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		Array.appendWith(widgets,
-			Cell{name = 'Tier', content = {args.tier}},
+			Cell{name = 'Tier', children = {args.tier}},
 			Title{children = 'Alliances'},
 			Center{children = Array.interleave(Array.map(self.caller.alliances, allianceIcon), '&nbsp;')},
 			Title{children = 'Level Changes'},
@@ -128,6 +128,7 @@ end
 
 ---@param lpdbData table
 ---@param args table
+---@return table
 function CustomCharacter:addToLpdb(lpdbData, args)
 	local extradata = lpdbData.extradata
 	extradata.name = lpdbData.name

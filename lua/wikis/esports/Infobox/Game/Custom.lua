@@ -38,9 +38,9 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		Array.append(widgets,
-			Cell{name = 'Engine', content = {args.engine}},
-			Cell{name = 'Genre(s)', content = {args.genre}},
-			Cell{name = 'Mode(s)', content = {args.mode}}
+			Cell{name = 'Engine', children = {args.engine}},
+			Cell{name = 'Genre(s)', children = {args.genre}},
+			Cell{name = 'Mode(s)', children = {args.mode}}
 		)
 	end
 

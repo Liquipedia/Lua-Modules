@@ -68,8 +68,8 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'gamesettings' then
 		Array.appendWith(widgets,
-			Cell{name = 'Game & Version', content = caller:_getGameVersion(args)},
-			Cell{name = 'Game Mode', content = Array.map(caller.data.gameModes, function(gameMode)
+			Cell{name = 'Game & Version', children = caller:_getGameVersion(args)},
+			Cell{name = 'Game Mode', children = Array.map(caller.data.gameModes, function(gameMode)
 				return Page.makeInternalLink(gameMode)
 			end)}
 		)
@@ -78,8 +78,8 @@ function CustomInjector:parse(id, widgets)
 
 		Array.appendWith(widgets,
 			Title{children = playertitle},
-			Cell{name = 'Number of Teams', content = {args.team_number}},
-			Cell{name = 'Number of Players', content = {args.player_number}}
+			Cell{name = 'Number of Teams', children = {args.team_number}},
+			Cell{name = 'Number of Players', children = {args.player_number}}
 		)
 
 		if not String.isEmpty(args.team1) then
@@ -109,7 +109,7 @@ function CustomInjector:parse(id, widgets)
 			local sponsors = mw.text.split(args.sponsors, ',', true)
 			table.insert(widgets, Cell{
 				name = 'Sponsor(s)',
-				content = {table.concat(sponsors, '&nbsp;• ')}
+				children = {table.concat(sponsors, '&nbsp;• ')}
 			})
 		end
 	end

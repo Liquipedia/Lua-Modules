@@ -62,23 +62,23 @@ function CustomUnit:addCustomCells(widgets)
 	local race = Faction.toName(Faction.read(args.race)) or ADDITIONAL_UNIT_RACES[string.lower(args.race or '')]
 
 	Array.appendWith(widgets,
-		Cell{name = '[[Race]]', content = {race and ('[[' .. race .. ']]') or args.race}},
-		Cell{name = '[[Targeting#Target_Classifications|Classification]]', content = {
+		Cell{name = '[[Race]]', children = {race and ('[[' .. race .. ']]') or args.race}},
+		Cell{name = '[[Targeting#Target_Classifications|Classification]]', children = {
 			args.class and String.convertWikiListToHtmlList(args.class) or nil}},
-		Cell{name = 'Bounty Awarded', content = {CustomUnit._bounty(args)}},
-		Cell{name = 'Sleeps', content = {args.sleeps}},
-		Cell{name = 'Cargo Capacity', content = {args.cargo_capacity}},
-		Cell{name = 'Morphs into', content = {args.morphs}},
-		Cell{name = 'Duration', content = {args.duration}},
-		Cell{name = 'Formation Rank', content = {args.formationrank}},
-		Cell{name = '[[Sight_Range|Sight]]', content = {args.daysight .. ' / ' .. args.nightsight}},
-		Cell{name = 'Acquisition Range', content = {acquisitionRange > 0 and acquisitionRange or nil}},
-		Cell{name = '[[Experience#Determining_Experience_Gained|Level]]', content = {
+		Cell{name = 'Bounty Awarded', children = {CustomUnit._bounty(args)}},
+		Cell{name = 'Sleeps', children = {args.sleeps}},
+		Cell{name = 'Cargo Capacity', children = {args.cargo_capacity}},
+		Cell{name = 'Morphs into', children = {args.morphs}},
+		Cell{name = 'Duration', children = {args.duration}},
+		Cell{name = 'Formation Rank', children = {args.formationrank}},
+		Cell{name = '[[Sight_Range|Sight]]', children = {args.daysight .. ' / ' .. args.nightsight}},
+		Cell{name = 'Acquisition Range', children = {acquisitionRange > 0 and acquisitionRange or nil}},
+		Cell{name = '[[Experience#Determining_Experience_Gained|Level]]', children = {
 			level > 0 and ('[[Experience|'..args.level..']]') or nil}},
-		Cell{name = '[[Mana]]', content = {mana.manaDisplay}},
-		Cell{name = '[[Mana|Initial Mana]]', content = {mana.initialManaDisplay}},
-		Cell{name = '[[Mana#Mana_Gain|Mana Regeneration]]', content = {mana.manaRegenDisplay}},
-		Cell{name = 'Selection Priorty', content = {args.priority}}
+		Cell{name = '[[Mana]]', children = {mana.manaDisplay}},
+		Cell{name = '[[Mana|Initial Mana]]', children = {mana.initialManaDisplay}},
+		Cell{name = '[[Mana#Mana_Gain|Mana Regeneration]]', children = {mana.manaRegenDisplay}},
+		Cell{name = 'Selection Priorty', children = {args.priority}}
 	)
 
 	local movement = Shared.movement(args, 'Movement')
@@ -108,7 +108,7 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'cost' then
 		return {
-			Cell{name = 'Cost', content = {CostDisplay.run{
+			Cell{name = 'Cost', children = {CostDisplay.run{
 				faction = args.race,
 				gold = args.gold,
 				lumber = args.lumber,
@@ -117,13 +117,13 @@ function CustomInjector:parse(id, widgets)
 			}}},
 		}
 	elseif id == 'requirements' then
-		return {Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(args.requires)}}}
+		return {Cell{name = 'Requirements', children = {String.convertWikiListToHtmlList(args.requires)}}}
 	elseif id == 'defense' then
 		return {
-			Cell{name = '[[Hit Points|Hit Points]]', content = {self.caller:_defenseDisplay()}},
-			Cell{name = '[[Hit Points#Hit Points Gain|HP Regeneration]]', content = {
+			Cell{name = '[[Hit Points|Hit Points]]', children = {self.caller:_defenseDisplay()}},
+			Cell{name = '[[Hit Points#Hit Points Gain|HP Regeneration]]', children = {
 				Shared.hitPointsRegeneration(args, {display = true})}},
-			Cell{name = '[[Armor|Armor]]', content = {self.caller:_armorDisplay()}}
+			Cell{name = '[[Armor|Armor]]', children = {self.caller:_armorDisplay()}}
 		}
 	elseif id == 'attack' then return {}
 	elseif id == 'custom' then

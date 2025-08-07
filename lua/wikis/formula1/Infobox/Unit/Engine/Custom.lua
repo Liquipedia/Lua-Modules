@@ -40,20 +40,20 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Manufacturer', content = {args.manufacturer}},
-			Cell{name = 'Production', content = {args.production}},
-			Cell{name = 'Weight', content = {args.weight}},
+			Cell{name = 'Manufacturer', children = {args.manufacturer}},
+			Cell{name = 'Production', children = {args.production}},
+			Cell{name = 'Weight', children = {args.weight}},
 			Title{children = 'Engine Output'},
-			Cell{name = 'Power', content = {args.power}},
-			Cell{name = 'Torque', content = {args.torque}},
-			Cell{name = 'Idle RPM', content = {args.idlerpm}},
-			Cell{name = 'Peak RPM', content = {args.peakrpm}},
+			Cell{name = 'Power', children = {args.power}},
+			Cell{name = 'Torque', children = {args.torque}},
+			Cell{name = 'Idle RPM', children = {args.idlerpm}},
+			Cell{name = 'Peak RPM', children = {args.peakrpm}},
 			Title{children = 'Engine Layout'},
-			Cell{name = 'Configuration', content = {args.configuration}},
-			Cell{name = 'Displacement', content = {args.displacement}},
-			Cell{name = 'Compression', content = {args.compression}},
-			Cell{name = 'Cylinder Bore', content = {args.bore}},
-			Cell{name = 'Piston Stroke', content = {args.stroke}}
+			Cell{name = 'Configuration', children = {args.configuration}},
+			Cell{name = 'Displacement', children = {args.displacement}},
+			Cell{name = 'Compression', children = {args.compression}},
+			Cell{name = 'Cylinder Bore', children = {args.bore}},
+			Cell{name = 'Piston Stroke', children = {args.stroke}}
 		)
 	elseif id == 'customcontent' then
 		return {

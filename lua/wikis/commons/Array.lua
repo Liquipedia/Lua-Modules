@@ -5,11 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Lua = require('Module:Lua')
-
-local Logic = Lua.import('Module:Logic')
-local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
+local Logic = require('Module:Logic')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 --
 -- Array functions. Arrays are tables with numeric indexes that does not

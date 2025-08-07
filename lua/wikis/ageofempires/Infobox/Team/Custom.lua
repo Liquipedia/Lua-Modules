@@ -54,7 +54,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'region' then
 		return {}
 	elseif id == 'custom' then
-		table.insert(widgets, Cell{name = 'Games', content = self.caller:_getGames()})
+		table.insert(widgets, Cell{name = 'Games', children = self.caller:_getGames()})
 	end
 	return widgets
 end

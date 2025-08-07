@@ -60,12 +60,12 @@ function CustomInjector:parse(id, widgets)
 		if currentYearEarnings == 0 then return widgets end
 		local currentYearEarningsDisplay = '$' .. mw.getContentLanguage():formatNum(Math.round(currentYearEarnings))
 
-		table.insert(widgets, Cell{name = 'Approx. Earnings '.. CURRENT_YEAR, content = {currentYearEarningsDisplay}})
+		table.insert(widgets, Cell{name = 'Approx. Earnings '.. CURRENT_YEAR, children = {currentYearEarningsDisplay}})
 
 	elseif id == 'role' then
 		-- WC doesn't show any roles, but rather shows the Race/Faction instead
 		return {
-			Cell{name = 'Race', content = {Faction.toName(args.race)}}
+			Cell{name = 'Race', children = {Faction.toName(args.race)}}
 		}
 	end
 	return widgets

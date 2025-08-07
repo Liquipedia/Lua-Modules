@@ -38,7 +38,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		return {
-			Cell{name = 'Game Appearances', content = GameAppearances.player({player = caller.pagename})},
+			Cell{name = 'Game Appearances', children = GameAppearances.player({player = caller.pagename})},
 		}
 	elseif id == 'region' then return {}
 	end

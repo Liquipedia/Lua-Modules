@@ -80,8 +80,8 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		return {
-			Cell{name = 'Abbreviation', content = {args.abbreviation}},
-			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {
+			Cell{name = 'Abbreviation', children = {args.abbreviation}},
+			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', children = {
 				args.affiliate and OpponentDisplay.InlineTeamContainer{template = args.affiliate, displayType = 'standard'} or nil}}
 		}
 	end

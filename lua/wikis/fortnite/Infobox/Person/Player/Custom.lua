@@ -55,14 +55,14 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		return {
-			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, content = {currentYearEarnings}},
-			Cell{name = 'Years active', content = {yearsActive}},
+			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, children = {currentYearEarnings}},
+			Cell{name = 'Years active', children = {yearsActive}},
 			Cell{
 				name = Abbreviation.make{
 					text = 'Epic Creator Code',
 					title = 'Support-A-Creator Code used when purchasing Fortnite or Epic Games Store products',
 				},
-				content = {args.creatorcode}
+				children = {args.creatorcode}
 			},
 		}
 	elseif id == 'region' then return {}

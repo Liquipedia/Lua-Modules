@@ -44,11 +44,11 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{children = 'Player Breakdown'})
 			table.insert(widgets, Cell{
 				name = 'Number of Players',
-				content = {args.player_number}
+				children = {args.player_number}
 			})
 			table.insert(widgets, Cell{
 				name = 'Doubles Players',
-				content = {args.doubles_number}
+				children = {args.doubles_number}
 			})
 		end
 	end

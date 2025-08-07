@@ -51,12 +51,12 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Number of Players', content = {args.player_number}},
-			Cell{name = 'Number of Teams', content = {args.team_number}}
+			Cell{name = 'Number of Players', children = {args.player_number}},
+			Cell{name = 'Number of Teams', children = {args.team_number}}
 		)
 	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game Mode', content = {CustomLeague._getGameMode(args.mode)}},
+			Cell{name = 'Game Mode', children = {CustomLeague._getGameMode(args.mode)}},
 		}
 	end
 	return widgets
