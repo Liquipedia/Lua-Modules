@@ -114,5 +114,11 @@ return {
 			},
 		},
 		defaultMaxPlayersPerPlacement = 15,
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'cleanup',
+			},
+		},
 	},
 }

@@ -66,8 +66,8 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Teams', content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
-			Cell{name = 'Players', content = {args.player_number}}
+			Cell{name = 'Teams', children = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
+			Cell{name = 'Players', children = {args.player_number}}
 		)
 	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.map1) then
@@ -86,7 +86,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'gamesettings' then
 		table.insert(widgets, Cell{
 			name = 'Patch',
-			content = {self.caller:_createPatchCell(args)}
+			children = {self.caller:_createPatchCell(args)}
 		})
 	end
 

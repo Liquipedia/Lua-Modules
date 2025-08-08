@@ -60,19 +60,19 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell {
 				name = 'Games',
-				content = Array.map(caller.gamesList, function (gameIdentifier)
+				children = Array.map(caller.gamesList, function (gameIdentifier)
 						return Game.text{game = gameIdentifier}
 					end)
 			}
 		}
 	elseif id == 'status' then
 		return {
-			Cell{name = 'Status', content = caller:_getStatusContents(args)},
-			Cell{name = 'Years Active (Player)', content = {args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {args.years_active_manage}},
-			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
-			Cell{name = 'Years Active (Analyst)', content = {args.years_active_analyst}},
-			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}},
+			Cell{name = 'Status', children = caller:_getStatusContents(args)},
+			Cell{name = 'Years Active (Player)', children = {args.years_active}},
+			Cell{name = 'Years Active (Org)', children = {args.years_active_manage}},
+			Cell{name = 'Years Active (Coach)', children = {args.years_active_coach}},
+			Cell{name = 'Years Active (Analyst)', children = {args.years_active_analyst}},
+			Cell{name = 'Years Active (Talent)', children = {args.years_active_talent}},
 		}
 	elseif id == 'region' then
 		return {}

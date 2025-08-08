@@ -49,15 +49,15 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Map Type', content = {self.caller:_getType(args.type)}},
-			Cell{name = 'Starting [[Town Center|TC]](s)', content = {args.tc}},
-			Cell{name = 'Walls', content = {args.walls}},
-			Cell{name = 'Nomad', content = {args.nomad}},
-			Cell{name = 'Player Capacity', content = {args.players}},
-			Cell{name = 'Game', content = {Page.makeInternalLink(Game.link{game = args.game})}},
+			Cell{name = 'Map Type', children = {self.caller:_getType(args.type)}},
+			Cell{name = 'Starting [[Town Center|TC]](s)', children = {args.tc}},
+			Cell{name = 'Walls', children = {args.walls}},
+			Cell{name = 'Nomad', children = {args.nomad}},
+			Cell{name = 'Player Capacity', children = {args.players}},
+			Cell{name = 'Game', children = {Page.makeInternalLink(Game.link{game = args.game})}},
 			Cell{
 				name = 'First Appearance',
-				content = {Page.makeInternalLink({onlyIfExists = true}, args.appearance) or args.appearance}
+				children = {Page.makeInternalLink({onlyIfExists = true}, args.appearance) or args.appearance}
 			}
 		)
 	end

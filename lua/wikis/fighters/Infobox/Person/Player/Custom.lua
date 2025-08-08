@@ -5,16 +5,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local GamesPlayed = require('Module:GamesPlayed')
 local Lua = require('Module:Lua')
-local YearsActive = require('Module:YearsActive') -- TODO Convert to use the commons YearsActive
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local GamesPlayed = Lua.import('Module:GamesPlayed')
+local YearsActive = Lua.import('Module:YearsActive') -- TODO Convert to use the commons YearsActive
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class FightersInfoboxPlayer: Person
@@ -39,10 +40,10 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
-		table.insert(widgets, Cell{name = 'Games', content = self.caller.games})
+		table.insert(widgets, Cell{name = 'Games', children = self.caller.games})
 	elseif id == 'status' then
 		table.insert(widgets,
-			Cell{name = 'Years Active', content = {YearsActive.get{player = mw.title.getCurrentTitle().baseText}}}
+			Cell{name = 'Years Active', children = {YearsActive.get{player = mw.title.getCurrentTitle().baseText}}}
 		)
 	end
 

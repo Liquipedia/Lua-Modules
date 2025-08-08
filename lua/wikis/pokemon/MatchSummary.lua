@@ -7,11 +7,12 @@
 
 local CustomMatchSummary = {}
 
-local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
+
+local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')

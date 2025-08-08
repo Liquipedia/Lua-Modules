@@ -9,7 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local FnUtil = require('Module:FnUtil')
+local FnUtil = Lua.import('Module:FnUtil')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')

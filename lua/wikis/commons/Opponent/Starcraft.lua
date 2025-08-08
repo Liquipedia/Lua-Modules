@@ -101,7 +101,7 @@ function StarcraftOpponent.fromLpdbStruct(storageStruct)
 		return nil
 	end
 
-	opponent.isArchon = storageStruct.opponentplayers.isArchon
+	opponent.isArchon = (storageStruct.opponentplayers or {}).isArchon
 
 	return opponent
 end

@@ -40,5 +40,11 @@ return {
 		teamRosterNavbox = {
 			hideOverview = true,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'automatic',
+			},
+		},
 	},
 }

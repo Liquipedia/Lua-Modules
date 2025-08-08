@@ -5,12 +5,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
-local CharacterNames = require('Module:CharacterNames')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local CharacterNames = Lua.import('Module:CharacterNames')
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Weapon = Lua.import('Module:Infobox/Weapon')
@@ -39,7 +40,7 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		return {
-			Cell{name = 'Operators', content = {self.caller:_getOperators()}},
+			Cell{name = 'Operators', children = {self.caller:_getOperators()}},
 		}
 	end
 	return widgets

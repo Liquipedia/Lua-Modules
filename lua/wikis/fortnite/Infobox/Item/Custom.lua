@@ -46,7 +46,7 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'released' then
 		return {
-			Cell{name = 'Released', content = {VersionDisplay.run(args.release)}},
+			Cell{name = 'Released', children = {VersionDisplay.run(args.release)}},
 			Cell{name = 'Removed', children = {VersionDisplay.run(args.removed)}},
 		}
 	end

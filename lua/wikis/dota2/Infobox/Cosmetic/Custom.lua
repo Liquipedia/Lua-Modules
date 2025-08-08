@@ -64,7 +64,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				options = {columns = args.hero and 3 or 10, suppressColon = true},
 				name = args.hero and Template.expandTemplate(mw.getCurrentFrame(), 'Hero entry', {args.hero}) or ' ',
-				content = {
+				children = {
 					'<b>Rarity:</b> ' .. Template.safeExpand(mw.getCurrentFrame(), 'Raritylink', {args.rarity}),
 					args.slot and ('<b>Slot:</b> ' .. slotText) or nil,
 				}
@@ -73,11 +73,11 @@ function CustomInjector:parse(id, widgets)
 				CustomCosmetic._buyNow(Logic.readBool(args.marketable or true), args.defindex)
 			}},
 			Title{children = 'Extra Information'},
-			Cell{name = 'Created By', content =
+			Cell{name = 'Created By', children =
 				(args.creator == 'Valve' and {Template.safeExpand(mw.getCurrentFrame(), 'Valve icon')})
 				or self.caller:getAllArgsForBase(args, 'creator')
 			},
-			Cell{name = 'Released', content = {
+			Cell{name = 'Released', children = {
 				Template.expandTemplate(mw.getCurrentFrame(), 'Patch link', {args.releasedate})
 			}},
 			Builder{builder = function()
@@ -88,7 +88,7 @@ function CustomInjector:parse(id, widgets)
 					name = 'Expired'
 				end
 				return {
-					Cell{name = name, content = {
+					Cell{name = name, children = {
 						DateExt.formatTimestamp('j F Y', ts)
 					}}
 				}
@@ -96,7 +96,7 @@ function CustomInjector:parse(id, widgets)
 			Builder{builder = function()
 				local orgins = Array.parseCommaSeparatedString(args.availability or 'Unavailable')
 				return {
-					Cell{name = #orgins == 1 and 'Origin' or 'Origins', content = orgins}
+					Cell{name = #orgins == 1 and 'Origin' or 'Origins', children = orgins}
 				}
 			end},
 			Center{children = {args.description}},

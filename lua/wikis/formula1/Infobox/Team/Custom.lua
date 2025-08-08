@@ -5,17 +5,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -83,7 +84,7 @@ function CustomTeam._statisticsCells(args)
 	end
 	local widgets = {Title{children = 'Team Statistics'}}
 	Array.forEach(STATISTICS, function(statsData)
-		table.insert(widgets, Cell{name = statsData.name, content = {args[statsData.key]}})
+		table.insert(widgets, Cell{name = statsData.name, children = {args[statsData.key]}})
 	end)
 	return widgets
 end

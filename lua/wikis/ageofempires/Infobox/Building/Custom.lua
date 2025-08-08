@@ -60,7 +60,7 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		return {
-			Cell{name = 'Cost', content = WidgetUtil.collect(
+			Cell{name = 'Cost', children = WidgetUtil.collect(
 				costDisplay(args['food'], 'Food'),
 				costDisplay(args['wood'], 'Wood'),
 				costDisplay(args['gold'], 'Gold'),

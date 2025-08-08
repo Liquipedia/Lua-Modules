@@ -100,7 +100,7 @@ function Team:createInfobox()
 		Customizable{id = 'topcustomcontent', children = {}},
 		Cell{
 			name = 'Location',
-			content = {
+			children = {
 				self:_createLocation(args.location),
 				self:_createLocation(args.location2)
 			}
@@ -108,17 +108,17 @@ function Team:createInfobox()
 		Customizable{
 			id = 'region',
 			children = {
-				Cell{name = 'Region', content = {self.region.display}},
+				Cell{name = 'Region', children = {self.region.display}},
 			}
 		},
 		Customizable{
 			id = 'staff',
 			children = {
-				Cell{name = 'Coaches', content = {args.coaches}},
-				Cell{name = 'Coach', content = {args.coach}},
-				Cell{name = 'Director', content = {args.director}},
-				Cell{name = 'Manager', content = {args.manager}},
-				Cell{name = 'Team Captain', content = {args.captain}},
+				Cell{name = 'Coaches', children = {args.coaches}},
+				Cell{name = 'Coach', children = {args.coach}},
+				Cell{name = 'Director', children = {args.director}},
+				Cell{name = 'Manager', children = {args.manager}},
+				Cell{name = 'Team Captain', children = {args.captain}},
 			}
 		},
 		Customizable{
@@ -129,7 +129,7 @@ function Team:createInfobox()
 						text = 'Approx. Total Winnings',
 						title = 'Includes individual player winnings&#10;while representing this team',
 					} or 'Approx. Total Winnings',
-					content = {self.totalEarnings > 0 and '$' .. Language:formatNum(self.totalEarnings) or nil}
+					children = {self.totalEarnings > 0 and '$' .. Language:formatNum(self.totalEarnings) or nil}
 				}
 			}
 		},
@@ -158,8 +158,8 @@ function Team:createInfobox()
 						if Table.isNotEmpty(created) or args.disbanded then
 							return {
 								Title{children = 'History'},
-								Cell{name = 'Created', content = created},
-								Cell{name = 'Disbanded', content = {args.disbanded}}
+								Cell{name = 'Created', children = created},
+								Cell{name = 'Disbanded', children = {args.disbanded}}
 							}
 						end
 					end

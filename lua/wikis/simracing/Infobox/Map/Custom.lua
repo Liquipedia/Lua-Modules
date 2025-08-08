@@ -40,10 +40,10 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		return Array.appendWith(widgets,
-			Cell{name = 'Architect', content = {args.type}},
-			Cell{name = 'Opened', content = {args.open}},
-			Cell{name = 'Length', content = {args.length}},
-			Cell{name = 'Turns', content = {args.turns}}
+			Cell{name = 'Architect', children = {args.type}},
+			Cell{name = 'Opened', children = {args.open}},
+			Cell{name = 'Length', children = {args.length}},
+			Cell{name = 'Turns', children = {args.turns}}
 		)
 	end
 

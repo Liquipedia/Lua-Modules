@@ -5,20 +5,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local GameAppearances = require('Module:GetGameAppearances')
 local Lua = require('Module:Lua')
-local Region = require('Module:Region')
-local String = require('Module:StringUtils')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
+
+local Class = Lua.import('Module:Class')
+local GameAppearances = Lua.import('Module:GetGameAppearances')
+local Region = Lua.import('Module:Region')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
-local Center = Widgets.Center
 
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
@@ -30,8 +28,6 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.autoTeam = true
-
 	return player:createInfobox()
 end
 
@@ -40,25 +36,11 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
-	local args = caller.args
 
 	if id == 'custom' then
 		return {
-			Cell{name = 'Game Appearances', content = GameAppearances.player({player = caller.pagename})},
+			Cell{name = 'Game Appearances', children = GameAppearances.player({player = caller.pagename})},
 		}
-	elseif id == 'history' then
-		local automatedHistory = TeamHistoryAuto.results{
-			convertrole = true,
-			player = caller.pagename
-		}
-
-		if String.isNotEmpty(args.history) or automatedHistory then
-			return {
-				Title{children = 'History'},
-				Center{children = {args.history}},
-				Center{children = {automatedHistory}},
-			}
-		end
 	elseif id == 'region' then return {}
 	end
 	return widgets

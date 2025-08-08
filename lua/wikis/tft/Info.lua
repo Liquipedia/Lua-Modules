@@ -51,6 +51,9 @@ return {
 		teamRosterNavbox = {
 			hidePlayedMatches = true,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+		},
 	},
 	defaultRoundPrecision = 0,
 }

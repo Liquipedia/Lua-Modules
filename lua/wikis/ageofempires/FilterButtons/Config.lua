@@ -5,10 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Lua = require('Module:Lua')
+
 local Config = {}
-local Tier = require('Module:Tier/Utils')
-local Game = require('Module:Game')
-local HtmlWidgets = require('Module:Widget/Html/All')
+local Tier = Lua.import('Module:Tier/Utils')
+local Game = Lua.import('Module:Game')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@type FilterButtonCategory[]
 Config.categories = {

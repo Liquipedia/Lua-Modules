@@ -5,9 +5,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
@@ -39,7 +40,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Health', content = {args.health}}
+			Cell{name = 'Health', children = {args.health}}
 		)
 	end
 

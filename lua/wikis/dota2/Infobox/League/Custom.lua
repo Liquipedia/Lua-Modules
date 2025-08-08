@@ -63,19 +63,19 @@ function CustomInjector:parse(id, widgets)
 		local points = tonumber(args.points)
 
 		Array.appendWith(widgets,
-			Cell{name = 'Game', content = {Game.text{game = args.game}}},
-			Cell{name = 'Version', content = {self.caller:_createPatchCell(args)}},
-			Cell{name = 'Teams', content = {args.team_number}},
-			Cell{name = 'Players', content = {args.player_number}},
-			Cell{name = 'Dota TV Ticket', content = {args.dotatv}},
-			Cell{name = 'Pro Circuit Points', content = {points and mw.getContentLanguage():formatNum(points)}}
+			Cell{name = 'Game', children = {Game.text{game = args.game}}},
+			Cell{name = 'Version', children = {self.caller:_createPatchCell(args)}},
+			Cell{name = 'Teams', children = {args.team_number}},
+			Cell{name = 'Players', children = {args.player_number}},
+			Cell{name = 'Dota TV Ticket', children = {args.dotatv}},
+			Cell{name = 'Pro Circuit Points', children = {points and mw.getContentLanguage():formatNum(points)}}
 		)
 	elseif id == 'liquipediatier' and self.caller.publisherTier then
 		table.insert(
 			widgets,
 			Cell{
 				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox') .. ' Tier',
-				content = {self.caller:_createPublisherTierCell()},
+				children = {self.caller:_createPublisherTierCell()},
 				classes = {'valvepremier-highlighted'}
 			}
 		)
