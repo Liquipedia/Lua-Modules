@@ -207,17 +207,13 @@ end
 ---@param opponents StandingTableOpponentData[]
 ---@return table?
 function StandingsParseWiki.parsePlaceMapping(args, opponents)
-	if Logic.readBool(args.nomapping) then
+	local input = args.placements
+	if not input then
 		return
 	end
-	local input = args.placements
 
 	local function placementMappingError(msg)
 		error('Invalid placement mapping: "' .. (input or 'nil') .. '" ' .. msg)
-	end
-
-	if not input then
-		placementMappingError('No placement mapping provided')
 	end
 
 	local mapping = {}
