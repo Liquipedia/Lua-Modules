@@ -75,7 +75,7 @@ return {
 		lightmode = 'Zula_default full allmode.png',
 		darkmode = 'Zula_default full allmode.png',
 	},
-	metadesc = 'Comprehensive Critical Ops wiki with articles covering everything from weapons, upgrades , maps, ' ..
+	metadesc = 'Comprehensive Zula wiki with articles covering everything from weapons, upgrades , maps, ' ..
 		'to strategies, to tournaments, to competitive players and teams.',
 	title = 'Zula',
 	navigation = {
