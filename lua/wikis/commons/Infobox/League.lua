@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Class = Lua.import('Module:Class')
+local CountryCategory = Lua.import('Module:Infobox/Extension/CountryCategory')
 local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
@@ -290,6 +291,7 @@ function League:_getCategories(args)
 		Logic.isEmpty(args.country) and 'Tournaments without location' or nil,
 		self:addParticipantTypeCategory(args),
 		self:addTierCategories(args),
+		CountryCategory.run(args, 'Series'),
 		self:getWikiCategories(args)
 	)
 end
