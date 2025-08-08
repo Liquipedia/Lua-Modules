@@ -183,17 +183,17 @@ end
 ---@return StandingsTiebreaker[]
 function StandingsParseWiki.parseTiebreakers(args, tableType)
 	local tiebreakerInput = Json.parseIfString(args.tiebreakers) or {}
-	local tiebreakers = Array.map(tiebreakerInput, TiebreakerFactory.tiebreakerIdFromName)
+	local tiebreakers = Array.map(tiebreakerInput, TiebreakerFactory.validateAndNormalizeName)
 	if #tiebreakers == 0 then
 		if tableType == 'ffa' then
 			tiebreakers = {
-				TiebreakerFactory.tiebreakerIdFromName('points'),
-				TiebreakerFactory.tiebreakerIdFromName('manual'),
+				TiebreakerFactory.validateAndNormalizeName('points'),
+				TiebreakerFactory.validateAndNormalizeName('manual'),
 			}
 		elseif tableType == 'swiss' then
 			tiebreakers = {
-				TiebreakerFactory.tiebreakerIdFromName('matchdiff'),
-				TiebreakerFactory.tiebreakerIdFromName('manual'),
+				TiebreakerFactory.validateAndNormalizeName('matchdiff'),
+				TiebreakerFactory.validateAndNormalizeName('manual'),
 			}
 		end
 	end

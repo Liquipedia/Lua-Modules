@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
+local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
 
 local StandingsParser = {}
 
@@ -19,9 +20,9 @@ local StandingsParser = {}
 ---@param title string?
 ---@param matches string[]
 ---@param standingsType StandingsTableTypes
----@param tiebreakers StandingsTiebreaker[]
+---@param tiebreakerIds string[]
 ---@return StandingsTableStorage
-function StandingsParser.parse(rounds, opponents, bgs, title, matches, standingsType, tiebreakers)
+function StandingsParser.parse(rounds, opponents, bgs, title, matches, standingsType, tiebreakerIds)
 	-- TODO: When all legacy (of all standing type) have been converted, the wiki variable should be updated
 	-- to follow the namespace format. Eg new name could be `standings_standingsindex`
 	local lastStandingsIndex = tonumber(Variables.varDefault('standingsindex')) or -1
@@ -74,6 +75,8 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		end)
 	end)
 
+	local tiebreakers = Array.map(tiebreakerIds, TiebreakerFactory.tiebreakerFromId)
+
 	Array.forEach(rounds, function(round)
 		StandingsParser.determinePlacements(Array.filter(entries, function(opponentRound)
 			return opponentRound.roundindex == round.roundNumber
@@ -110,6 +113,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		finished = isFinished,
 		extradata = {
 			rounds = rounds,
+			tiebreakers = tiebreakerIds,
 		},
 	}
 end
