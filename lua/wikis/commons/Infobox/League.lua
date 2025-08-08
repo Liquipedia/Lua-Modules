@@ -291,7 +291,7 @@ function League:_getCategories(args)
 		Logic.isEmpty(args.country) and 'Tournaments without location' or nil,
 		self:addParticipantTypeCategory(args),
 		self:addTierCategories(args),
-		CountryCategory.run(args, 'Series'),
+		CountryCategory.run(args, 'Tournaments'),
 		self:getWikiCategories(args)
 	)
 end
