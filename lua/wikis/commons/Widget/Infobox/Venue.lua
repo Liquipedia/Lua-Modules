@@ -64,9 +64,9 @@ function Venue._createLink(props)
 	if Logic.isNotEmpty(props.desc) then
 		description = {
 			HtmlWidgets.Br{},
-			HtmlWidgets.Span{
+			HtmlWidgets.Small{
 				children = {
-					HtmlWidgets.Span{
+					HtmlWidgets.Small{
 						children = {
 							props.desc
 						}
