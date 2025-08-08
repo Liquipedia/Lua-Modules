@@ -8,22 +8,22 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
-local Logic = Lua.import('Module:Logic')
-local Namespace = Lua.import('Module:Namespace')
-local Page = Lua.import('Module:Page')
-local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
-local Tier = Lua.import('Module:Tier/Custom')
-local Variables = Lua.import('Module:Variables')
-
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
+local Class = Lua.import('Module:Class')
+local CountryCategory = Lua.import('Module:Infobox/Extension/CountryCategory')
 local Flags = Lua.import('Module:Flags')
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extension/PrizePool')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local Page = Lua.import('Module:Page')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Tier = Lua.import('Module:Tier/Custom')
+local Variables = Lua.import('Module:Variables')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 
@@ -87,12 +87,7 @@ function Series:createInfobox()
 		Customizable{
 			id = 'location',
 			children = {
-				Location{
-					args = args,
-					infoboxType = 'Series',
-					shouldSetCategory = false,
-					showTbdOnEmpty = false,
-				},
+				Location{args = args, showTbdOnEmpty = false},
 			}
 		},
 		Venue{args = args},
@@ -316,15 +311,10 @@ end
 ---@param args table
 ---@return string[]
 function Series:_getCategories(args)
-	local categories = {'Tournament series'}
-
-	for _, country in Table.iter.pairsByPrefix(args, 'country', {requireIndex = false}) do
-		table.insert(categories, self:_setCountryCategories(country))
-	end
-
-	Array.extendWith(categories, self:addTierCategories(args))
-
-	return categories
+	return Array.extend({'Tournament series'},
+		self:addTierCategories(args),
+		CountryCategory.run(args, 'Tournaments')
+	)
 end
 
 ---@param args table
@@ -350,21 +340,6 @@ function Series:addTierCategories(args)
 	end
 
 	return categories
-end
-
----@param country string?
----@return string?
-function Series:_setCountryCategories(country)
-	if String.isEmpty(country) then
-		return nil
-	end
-
-	local countryAdjective = Flags.getLocalisation(country)
-	if not countryAdjective then
-		return 'Unrecognised Country'
-	end
-
-	return countryAdjective .. ' Tournaments'
 end
 
 ---@return number?
