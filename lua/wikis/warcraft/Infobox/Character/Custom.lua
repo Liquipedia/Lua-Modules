@@ -73,17 +73,17 @@ function CustomInjector:parse(id, widgets)
 		local levelBreakdown = function(level)
 			level = level - 1
 			return {
-				Cell{name = 'HP', content = {caller:_calculateHitPoints(level)}},
-				Cell{name = 'HP Regen.', content = {caller:_calculateHitPointsRegen(level) .. '/sec'}},
-				Cell{name = 'Mana', content = {caller:_calculateMana(level)}},
-				Cell{name = 'Mana Regen.', content = {caller:_calculateManaRegen(level) .. '/sec'}},
-				Cell{name = 'Armor', content = {Math.round(caller:_calculateArmor(level), 2)}},
-				Cell{name = 'Damage', content = {caller:_calculateDamage(level)}},
-				Cell{name = 'Attack Cooldown', content = {Math.round(caller:_calculateCooldown(level), 2)}}
+				Cell{name = 'HP', children = {caller:_calculateHitPoints(level)}},
+				Cell{name = 'HP Regen.', children = {caller:_calculateHitPointsRegen(level) .. '/sec'}},
+				Cell{name = 'Mana', children = {caller:_calculateMana(level)}},
+				Cell{name = 'Mana Regen.', children = {caller:_calculateManaRegen(level) .. '/sec'}},
+				Cell{name = 'Armor', children = {Math.round(caller:_calculateArmor(level), 2)}},
+				Cell{name = 'Damage', children = {caller:_calculateDamage(level)}},
+				Cell{name = 'Attack Cooldown', children = {Math.round(caller:_calculateCooldown(level), 2)}}
 			}
 		end
 
-		local factionData = Faction.getProps(Faction.read(args.race)) or NEUTRAL
+		local factionData = Faction.getProps(Faction.read(args.race)) or {name = NEUTRAL, pageName = NEUTRAL}
 		local factionIcon = Faction.Icon{faction = Faction.read(args.race), size = '54px', showLink = true}
 
 		local function fetchBuildingInfo(buildingName)
@@ -134,16 +134,16 @@ function CustomInjector:parse(id, widgets)
 			}, classes = {'infobox-center'}},
 
 			Title{children = 'Base Stats'},
-			Cell{name = '[[Movement Speed]]', content = {args.basespeed}},
-			Cell{name = '[[Sight Range]]', content = {args.sightrange or (
+			Cell{name = '[[Movement Speed]]', children = {args.basespeed}},
+			Cell{name = '[[Sight Range]]', children = {args.sightrange or (
 				tostring(Icon{iconName = 'day'}) .. (args.daysight or 1800) .. ' / ' ..
 				tostring(Icon{iconName = 'night'}) .. (args.nightsight or 800)
 			)}},
-			Cell{name = '[[Attack Range]]', content = {args.attackrange}},
-			Cell{name = 'Missile Speed', content = {args.missilespeed}},
-			Cell{name = 'Attack Duration', content = {args.attackduration}},
-			Cell{name = 'Base Attack Time', content = {args.attacktime}},
-			Cell{name = 'Turn Rate', content = {args.turnrate}},
+			Cell{name = '[[Attack Range]]', children = {args.attackrange}},
+			Cell{name = 'Missile Speed', children = {args.missilespeed}},
+			Cell{name = 'Attack Duration', children = {args.attackduration}},
+			Cell{name = 'Base Attack Time', children = {args.attacktime}},
+			Cell{name = 'Turn Rate', children = {args.turnrate}},
 
 			Title{children = 'Stats per Level'},
 			Slider{min = 1, max = 10, step = 1, defaultValue = 1, id = 'level', class = 'infobox-slider',

@@ -5,7 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Table = Lua.import('Module:Table')
 
 local Config = {}
 
@@ -21,7 +23,6 @@ Config.TIER_TYPE_SHOW_MATCH = 'show match'
 -- How many placements should we retrieve from LPDB for a team/player?
 Config.PLACEMENT_LIMIT = 2000
 
-Config.MAX_NUMBER_OF_PARTICIPANTS = 20
 Config.MAX_NUMBER_OF_COACHES = 5
 
 -- These are the notability thresholds needed by a team/player

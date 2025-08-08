@@ -44,5 +44,11 @@ return {
 			excludeTierTypes = {'Qualifier'},
 			showPatches = true,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'merge',
+			},
+		},
 	},
 }

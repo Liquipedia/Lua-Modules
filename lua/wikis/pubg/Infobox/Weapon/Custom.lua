@@ -41,9 +41,9 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Ammo Type', content = {args.ammotype}},
-			Cell{name = 'Throw Speed', content = {args.throwspeed}},
-			Cell{name = 'Throw Cooldown', content = {args.throwcooldown}}
+			Cell{name = 'Ammo Type', children = {args.ammotype}},
+			Cell{name = 'Throw Speed', children = {args.throwspeed}},
+			Cell{name = 'Throw Cooldown', children = {args.throwcooldown}}
 		)
 
 		if String.isEmpty(args.map1) then

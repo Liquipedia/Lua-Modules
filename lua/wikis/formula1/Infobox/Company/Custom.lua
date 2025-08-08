@@ -5,14 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Company = Lua.import('Module:Infobox/Company')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -52,7 +53,7 @@ function CustomInjector:parse(id, widgets)
 		return Array.extendWith(widgets,
 			{Title{children = 'Staff Information'}},
 			Array.map(staffInfoCells, function(cellData)
-				return Cell{name = cellData.name, content = {args[cellData.key]}}
+				return Cell{name = cellData.name, children = {args[cellData.key]}}
 			end)
 		)
 	end

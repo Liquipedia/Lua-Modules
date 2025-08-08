@@ -5,16 +5,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
+
+local Class = Lua.import('Module:Class')
+local Faction = Lua.import('Module:Faction')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Strategy = Lua.import('Module:Infobox/Strategy')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 
@@ -53,11 +54,11 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'custom' then
 		return {
-			Cell{name = 'Matchups', content = {args.matchups or 'All'}},
-			Cell{name = 'Type', content = {args.type or 'Opening'}},
-			Cell{name = 'Popularized by', content = {args.popularized}, options = {makeLink = true}},
-			Cell{name = 'Converted Form', content = {args.convert}},
-			Cell{name = 'TL-Article', content = {self.caller:_getTLarticle(args.tlarticle)}},
+			Cell{name = 'Matchups', children = {args.matchups or 'All'}},
+			Cell{name = 'Type', children = {args.type or 'Opening'}},
+			Cell{name = 'Popularized by', children = {args.popularized}, options = {makeLink = true}},
+			Cell{name = 'Converted Form', children = {args.convert}},
+			Cell{name = 'TL-Article', children = {self.caller:_getTLarticle(args.tlarticle)}},
 		}
 	end
 	return widgets

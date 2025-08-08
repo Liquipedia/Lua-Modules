@@ -6,7 +6,8 @@
 --
 
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
+
+local Logic = Lua.import('Module:Logic')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 

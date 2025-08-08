@@ -44,19 +44,19 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Location',
-				content = {Flags.Icon{flag = args.location, shouldLink = false} .. '&nbsp;' .. args.location}
+				children = {Flags.Icon{flag = args.location, shouldLink = false} .. '&nbsp;' .. args.location}
 			},
 		}
 	elseif id == 'custom' then
 		return Array.append(widgets,
-			Cell{name = 'Map Season', content = {args.season}},
-			Cell{name = 'Size', content = {(args.width or '') .. ' x ' .. (args.height or '')}},
-			Cell{name = 'Battle Tier', content = {String.isNotEmpty(args.btmin) and
+			Cell{name = 'Map Season', children = {args.season}},
+			Cell{name = 'Size', children = {(args.width or '') .. ' x ' .. (args.height or '')}},
+			Cell{name = 'Battle Tier', children = {String.isNotEmpty(args.btmin) and
 				String.isNotEmpty(args.btmax) and (args.btmin .. ' - ' .. args.btmax) or nil}
 			},
 			Cell{
 				name = 'Game Modes',
-				content = Array.map(
+				children = Array.map(
 					self.caller:getGameModes(args),
 					function (gameMode)
 						local modeIcon = MapModes.get{mode = gameMode, date = args.releasedate, size = 15}

@@ -33,8 +33,6 @@ function CustomPlayer.run(frame)
 	local args = player.args
 	player:setWidgetInjector(CustomInjector(player))
 
-	args.autoTeam = true
-
 	local builtInfobox = player:createInfobox()
 
 	local autoPlayerIntro = ''
@@ -66,7 +64,6 @@ function CustomPlayer.run(frame)
 	return mw.html.create()
 		:node(builtInfobox)
 		:node(autoPlayerIntro)
-
 end
 
 ---@param id string
@@ -91,7 +88,7 @@ function CustomInjector:parse(id, widgets)
 		if Table.isEmpty(heroIcons) then return widgets end
 		table.insert(widgets, Cell{
 			name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
-			content = {table.concat(heroIcons, '&nbsp;')}
+			children = {table.concat(heroIcons, '&nbsp;')}
 		})
 	end
 

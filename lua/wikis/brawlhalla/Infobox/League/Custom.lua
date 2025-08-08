@@ -5,15 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
+
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -43,11 +44,11 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{children = 'Player Breakdown'})
 			table.insert(widgets, Cell{
 				name = 'Number of Players',
-				content = {args.player_number}
+				children = {args.player_number}
 			})
 			table.insert(widgets, Cell{
 				name = 'Doubles Players',
-				content = {args.doubles_number}
+				children = {args.doubles_number}
 			})
 		end
 	end

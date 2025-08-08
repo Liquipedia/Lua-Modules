@@ -5,23 +5,24 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
-local Faction = require('Module:Faction')
-local Hotkeys = require('Module:Hotkey')
-local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local MessageBox = require('Module:Message box')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local CostDisplay = Lua.import('Module:Infobox/Extension/CostDisplay')
+local Faction = Lua.import('Module:Faction')
+local Hotkeys = Lua.import('Module:Hotkey')
+local Icon = Lua.import('Module:Icon')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local MessageBox = Lua.import('Module:Message box')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Skill = Lua.import('Module:Infobox/Skill')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class StormgateSkillInfobox: SkillInfobox
@@ -86,21 +87,21 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'caster' then
 		return {
-			Cell{name = 'Caster(s)', content = caller:_castersDisplay()},
+			Cell{name = 'Caster(s)', children = caller:_castersDisplay()},
 		}
 	elseif id == 'cost' then
 		return {
-			Cell{name = 'Cost', content = {caller:_costDisplay()}},
-			Cell{name = 'Recharge Time', content = {args.charge_time and (args.charge_time .. 's') or nil}},
+			Cell{name = 'Cost', children = {caller:_costDisplay()}},
+			Cell{name = 'Recharge Time', children = {args.charge_time and (args.charge_time .. 's') or nil}},
 		}
 	elseif id == 'duration' then
 		return {
-			Cell{name = 'Duration', content = {args.duration and (args.duration .. 's') or nil}},
+			Cell{name = 'Duration', children = {args.duration and (args.duration .. 's') or nil}},
 		}
 	elseif id == 'hotkey' then
 		return {
-			Cell{name = 'Hotkeys', content = {CustomSkill._hotkeys(args.hotkey, args.hotkey2)}},
-			Cell{name = 'Macrokeys', content = {CustomSkill._hotkeys(args.macro_key, args.macro_key2)}},
+			Cell{name = 'Hotkeys', children = {CustomSkill._hotkeys(args.hotkey, args.hotkey2)}},
+			Cell{name = 'Macrokeys', children = {CustomSkill._hotkeys(args.macro_key, args.macro_key2)}},
 		}
 	elseif id == 'custom' then
 		local castingTime = tonumber(args.casting_time)
@@ -119,18 +120,21 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		Array.extendWith(widgets, {
-				Cell{name = 'Researched From', content = {Page.makeInternalLink({}, args.from)}},
-				Cell{name = 'Upgrade Target', content = makeArrayLinks(Array.parseCommaSeparatedString(args.upgrade_target))},
-				Cell{name = 'Tech. Requirements', content = makeArrayLinks(Array.parseCommaSeparatedString(args.tech_requirement))},
+				Cell{name = 'Researched From', children = {Page.makeInternalLink({}, args.from)}},
+				Cell{name = 'Upgrade Target', children = makeArrayLinks(Array.parseCommaSeparatedString(args.upgrade_target))},
+				Cell{
+					name = 'Tech. Requirements',
+					children = makeArrayLinks(Array.parseCommaSeparatedString(args.tech_requirement))
+				},
 				Cell{name = 'Building Requirements',
-					content = makeArrayLinks(Array.parseCommaSeparatedString(args.building_requirement))},
-				Cell{name = 'Unlocks', content = makeArrayLinks(Array.parseCommaSeparatedString(args.unlocks))},
-				Cell{name = 'Target', content = makeArrayLinks(Array.parseCommaSeparatedString(args.target))},
-				Cell{name = 'Casting Time', content = {castingTime and (castingTime .. 's') or nil}},
-				Cell{name = 'Effect', content = makeArrayLinks(Array.parseCommaSeparatedString(args.effect), ' %(effect%)$')},
-				Cell{name = 'Trigger', content = {args.trigger}},
-				Cell{name = 'Invulnerable', content = makeArrayLinks(Array.parseCommaSeparatedString(args.invulnerable))},
-				Cell{name = 'Introduced', content = {args.introducedDisplay}}
+					children = makeArrayLinks(Array.parseCommaSeparatedString(args.building_requirement))},
+				Cell{name = 'Unlocks', children = makeArrayLinks(Array.parseCommaSeparatedString(args.unlocks))},
+				Cell{name = 'Target', children = makeArrayLinks(Array.parseCommaSeparatedString(args.target))},
+				Cell{name = 'Casting Time', children = {castingTime and (castingTime .. 's') or nil}},
+				Cell{name = 'Effect', children = makeArrayLinks(Array.parseCommaSeparatedString(args.effect), ' %(effect%)$')},
+				Cell{name = 'Trigger', children = {args.trigger}},
+				Cell{name = 'Invulnerable', children = makeArrayLinks(Array.parseCommaSeparatedString(args.invulnerable))},
+				Cell{name = 'Introduced', children = {args.introducedDisplay}}
 			},
 			caller:_damageHealDisplay('damage'),
 			caller:_damageHealDisplay('heal')
@@ -227,9 +231,9 @@ function CustomSkill:_damageHealDisplay(prefix)
 
 	local textPrefix = mw.getContentLanguage():ucfirst(prefix)
 	return {
-		Cell{name = textPrefix, content = {valueText}},
-		Cell{name = 'Total ' .. textPrefix, content = {total ~= 0 and total or nil}},
-		Cell{name = textPrefix .. ' per second', content = {dps ~= 0 and dps ~= overTime and dps or nil}},
+		Cell{name = textPrefix, children = {valueText}},
+		Cell{name = 'Total ' .. textPrefix, children = {total ~= 0 and total or nil}},
+		Cell{name = textPrefix .. ' per second', children = {dps ~= 0 and dps ~= overTime and dps or nil}},
 	}
 end
 

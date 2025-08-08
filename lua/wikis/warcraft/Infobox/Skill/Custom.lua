@@ -5,17 +5,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
-local Faction = require('Module:Faction')
-local Hotkeys = require('Module:Hotkey')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Class = Lua.import('Module:Class')
+local CostDisplay = Lua.import('Module:Infobox/Extension/CostDisplay')
+local Faction = Lua.import('Module:Faction')
+local Hotkeys = Lua.import('Module:Hotkey')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Skill = Lua.import('Module:Infobox/Skill')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class WarcraftSkillInfobox: SkillInfobox
@@ -44,19 +45,19 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'cost' then
-		return {Cell{name = 'Cost', content = {self.caller:getCostDisplay()}}}
+		return {Cell{name = 'Cost', children = {self.caller:getCostDisplay()}}}
 	elseif id == 'hotkey' then
-		return {Cell{name = '[[Hotkeys per Race|Hotkey]]', content = {self.caller:getHotkeys()}}}
+		return {Cell{name = '[[Hotkeys per Race|Hotkey]]', children = {self.caller:getHotkeys()}}}
 	elseif id == 'cooldown' then
-		return {Cell{name = '[[Cooldown]]', content = {args.cooldown}}}
+		return {Cell{name = '[[Cooldown]]', children = {args.cooldown}}}
 	elseif id == 'duration' then
-		return {Cell{name = '[[Game Speed|Duration]]', content = {args.duration}}}
+		return {Cell{name = '[[Game Speed|Duration]]', children = {args.duration}}}
 	elseif id == 'custom' then
 		return {
-			Cell{name = 'Move Speed', content = {args.movespeed}},
-			Cell{name = 'Researched from', content = {self.caller:getResearchFrom()}},
-			Cell{name = 'Research Cost', content = {self.caller:getResearchCost()}},
-			Cell{name = 'Research Hotkey', content = {Hotkeys.hotkey{hotkey = args.rhotkey}}},
+			Cell{name = 'Move Speed', children = {args.movespeed}},
+			Cell{name = 'Researched from', children = {self.caller:getResearchFrom()}},
+			Cell{name = 'Research Cost', children = {self.caller:getResearchCost()}},
+			Cell{name = 'Research Hotkey', children = {Hotkeys.hotkey{hotkey = args.rhotkey}}},
 		}
 	end
 

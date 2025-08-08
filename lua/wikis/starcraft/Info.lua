@@ -36,6 +36,6 @@ return {
 			matchWidthMobile = 120,
 			matchWidth = 170,
 		},
+		defaultMaxPlayersPerPlacement = 35,
 	},
-	maximumNumberOfPlayersInPlacements = 35,
 }

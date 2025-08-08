@@ -5,19 +5,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Item = Lua.import('Module:Infobox/Item')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -86,45 +87,45 @@ function CustomInjector:parse(id, widgets)
 			}})
 		end
 		Array.appendWith(widgets,
-			Cell{name = 'Health', content = {caller:_positiveConcatedArgsForBase('hp')}},
-			Cell{name = 'Max Health', content = {caller:_positiveConcatedArgsForBase('maxhealth')}},
-			Cell{name = 'Health Regen', content = {caller:_positiveConcatedArgsForBase('hpregen')}},
-			Cell{name = 'Health Regen / Lifesteal Amp', content = {caller:_positivePercentDisplay('hpregenamp')}},
-			Cell{name = 'Mana', content = {caller:_positiveConcatedArgsForBase('mana')}},
-			Cell{name = 'Mana Regen', content = {caller:_positiveConcatedArgsForBase('manaregen')}},
-			Cell{name = 'Mana Cost / Mana Loss Reduction', content = {caller:_manaLossDisplay()}},
-			Cell{name = 'Mana Regen Amplification', content = {caller:_positivePercentDisplay('manaregenamp')}},
-			Cell{name = 'Lifesteal', content = {caller:_positiveConcatedArgsForBase('lifesteal')}},
-			Cell{name = 'Spell Lifesteal', content = {caller:_positiveConcatedArgsForBase('spellsteal')}},
-			Cell{name = 'Spell Lifesteal Amplification', content = {caller:_positiveConcatedArgsForBase('spellstealamp')}},
-			Cell{name = 'Armor', content = {caller:_positiveConcatedArgsForBase('armor')}},
-			Cell{name = 'Evasion', content = {caller:_positivePercentDisplay('evasion')}},
-			Cell{name = 'Magic Resistance', content = {caller:_positiveConcatedArgsForBase('magicresist')}},
-			Cell{name = 'Status Resistance', content = {caller:_positivePercentDisplay('statusresist')}},
-			Cell{name = 'Debuff Duration', content = {caller:_positiveConcatedArgsForBase('debuffamp')}},
-			Cell{name = 'Spell Amplification', content = {caller:_positivePercentDisplay('spellamp')}},
-			Cell{name = 'Bonus GPM', content = {caller:_positiveConcatedArgsForBase('bonusgpm')}},
-			Cell{name = 'Turn Rate Speed', content = {caller:_positiveConcatedArgsForBase('turnrate')}},
-			Cell{name = 'Projectile Speed', content = {caller:_positiveConcatedArgsForBase('projectilespeed')}},
-			Cell{name = 'Attack Damage', content = {caller:_negativeConcatedArgsForBase('damagedown')}},
-			Cell{name = 'Armor', content = {caller:_negativeConcatedArgsForBase('armordown')}},
-			Cell{name = 'Attack Speed', content = {caller:_negativeConcatedArgsForBase('attackspeeddown')}},
-			Cell{name = 'Max Mana', content = {caller:_negativeConcatedArgsForBase('maxmanadown')}},
-			Cell{name = 'Base Attack Time', content = {caller:_negativeConcatedArgsForBase('batdown')}},
-			Cell{name = 'Base Damage', content = {caller:_positiveConcatedArgsForBase('basedamage')}},
-			Cell{name = 'Damage', content = {caller:_positiveConcatedArgsForBase('damage')}},
-			Cell{name = 'Attack Speed', content = {caller:_positiveConcatedArgsForBase('attackspeed')}},
-			Cell{name = 'Ability Power', content = {caller:_positiveConcatedArgsForBase('ap')}},
-			Cell{name = 'Attack Damage', content = {caller:_positiveConcatedArgsForBase('ad')}},
-			Cell{name = 'Cooldown Reduction', content = {caller:_positiveConcatedArgsForBase('cdreduction')}},
-			Cell{name = 'Ability Haste', content = {caller:_positiveConcatedArgsForBase('haste')}},
-			Cell{name = 'Critical Chance', content = {caller:_positiveConcatedArgsForBase('critchance')}},
-			Cell{name = 'Attack Range', content = {caller:_positiveConcatedArgsForBase('attackrange')}},
-			Cell{name = 'Cast Range', content = {caller:_positiveConcatedArgsForBase('castrange')}},
-			Cell{name = 'Day Vision', content = {caller:_positiveConcatedArgsForBase('dayvision')}},
-			Cell{name = 'Night Vision', content = {caller:_positiveConcatedArgsForBase('nightvision')}},
-			Cell{name = 'Movement Speed', content = {caller:_movementSpeedDisplay()}},
-			Cell{name = 'Limitations', content = {args.limits}}
+			Cell{name = 'Health', children = {caller:_positiveConcatedArgsForBase('hp')}},
+			Cell{name = 'Max Health', children = {caller:_positiveConcatedArgsForBase('maxhealth')}},
+			Cell{name = 'Health Regen', children = {caller:_positiveConcatedArgsForBase('hpregen')}},
+			Cell{name = 'Health Regen / Lifesteal Amp', children = {caller:_positivePercentDisplay('hpregenamp')}},
+			Cell{name = 'Mana', children = {caller:_positiveConcatedArgsForBase('mana')}},
+			Cell{name = 'Mana Regen', children = {caller:_positiveConcatedArgsForBase('manaregen')}},
+			Cell{name = 'Mana Cost / Mana Loss Reduction', children = {caller:_manaLossDisplay()}},
+			Cell{name = 'Mana Regen Amplification', children = {caller:_positivePercentDisplay('manaregenamp')}},
+			Cell{name = 'Lifesteal', children = {caller:_positiveConcatedArgsForBase('lifesteal')}},
+			Cell{name = 'Spell Lifesteal', children = {caller:_positiveConcatedArgsForBase('spellsteal')}},
+			Cell{name = 'Spell Lifesteal Amplification', children = {caller:_positiveConcatedArgsForBase('spellstealamp')}},
+			Cell{name = 'Armor', children = {caller:_positiveConcatedArgsForBase('armor')}},
+			Cell{name = 'Evasion', children = {caller:_positivePercentDisplay('evasion')}},
+			Cell{name = 'Magic Resistance', children = {caller:_positiveConcatedArgsForBase('magicresist')}},
+			Cell{name = 'Status Resistance', children = {caller:_positivePercentDisplay('statusresist')}},
+			Cell{name = 'Debuff Duration', children = {caller:_positiveConcatedArgsForBase('debuffamp')}},
+			Cell{name = 'Spell Amplification', children = {caller:_positivePercentDisplay('spellamp')}},
+			Cell{name = 'Bonus GPM', children = {caller:_positiveConcatedArgsForBase('bonusgpm')}},
+			Cell{name = 'Turn Rate Speed', children = {caller:_positiveConcatedArgsForBase('turnrate')}},
+			Cell{name = 'Projectile Speed', children = {caller:_positiveConcatedArgsForBase('projectilespeed')}},
+			Cell{name = 'Attack Damage', children = {caller:_negativeConcatedArgsForBase('damagedown')}},
+			Cell{name = 'Armor', children = {caller:_negativeConcatedArgsForBase('armordown')}},
+			Cell{name = 'Attack Speed', children = {caller:_negativeConcatedArgsForBase('attackspeeddown')}},
+			Cell{name = 'Max Mana', children = {caller:_negativeConcatedArgsForBase('maxmanadown')}},
+			Cell{name = 'Base Attack Time', children = {caller:_negativeConcatedArgsForBase('batdown')}},
+			Cell{name = 'Base Damage', children = {caller:_positiveConcatedArgsForBase('basedamage')}},
+			Cell{name = 'Damage', children = {caller:_positiveConcatedArgsForBase('damage')}},
+			Cell{name = 'Attack Speed', children = {caller:_positiveConcatedArgsForBase('attackspeed')}},
+			Cell{name = 'Ability Power', children = {caller:_positiveConcatedArgsForBase('ap')}},
+			Cell{name = 'Attack Damage', children = {caller:_positiveConcatedArgsForBase('ad')}},
+			Cell{name = 'Cooldown Reduction', children = {caller:_positiveConcatedArgsForBase('cdreduction')}},
+			Cell{name = 'Ability Haste', children = {caller:_positiveConcatedArgsForBase('haste')}},
+			Cell{name = 'Critical Chance', children = {caller:_positiveConcatedArgsForBase('critchance')}},
+			Cell{name = 'Attack Range', children = {caller:_positiveConcatedArgsForBase('attackrange')}},
+			Cell{name = 'Cast Range', children = {caller:_positiveConcatedArgsForBase('castrange')}},
+			Cell{name = 'Day Vision', children = {caller:_positiveConcatedArgsForBase('dayvision')}},
+			Cell{name = 'Night Vision', children = {caller:_positiveConcatedArgsForBase('nightvision')}},
+			Cell{name = 'Movement Speed', children = {caller:_movementSpeedDisplay()}},
+			Cell{name = 'Limitations', children = {args.limits}}
 		)
 	elseif id == 'ability' then
 		if String.isEmpty(args.use) and String.isEmpty(args.active) and String.isEmpty(args.passive) then
@@ -132,9 +133,9 @@ function CustomInjector:parse(id, widgets)
 		end
 		Array.appendWith(widgets,
 			Title{children = 'Ability'},
-			Cell{name = 'Use', content = {args.use}},
-			Cell{name = 'Active', content = {args.active}},
-			Cell{name = 'Passive', content = {args.passive, args.passive2}}
+			Cell{name = 'Use', children = {args.use}},
+			Cell{name = 'Active', children = {args.active}},
+			Cell{name = 'Passive', children = {args.passive, args.passive2}}
 		)
 	elseif id == 'availability' then
 		if String.isEmpty(args.category) and String.isEmpty(args.shop) and String.isEmpty(args.drop) then
@@ -142,16 +143,16 @@ function CustomInjector:parse(id, widgets)
 		end
 		return {
 			Title{children = 'Item Tier'},
-			Cell{name = 'Category', content = {caller:_categoryDisplay()}},
-			Cell{name = 'Bought From', content = caller:_shopDisplay()},
-			Cell{name = 'Dropped From', content = {args.drop}},
+			Cell{name = 'Category', children = {caller:_categoryDisplay()}},
+			Cell{name = 'Bought From', children = caller:_shopDisplay()},
+			Cell{name = 'Dropped From', children = {args.drop}},
 		}
 	elseif id == 'maps' then
 		if String.isEmpty(args.wr) and String.isEmpty(args.ha) then return {} end
 		Array.appendWith(widgets,
 			Title{children = 'Maps'},
-			Cell{name = '[[Wild Rift (Map)|Wild Rift]]', content = {args.wr}},
-			Cell{name = '[[Howling Abyss]]', content = {args.ha}}
+			Cell{name = '[[Wild Rift (Map)|Wild Rift]]', children = {args.wr}},
+			Cell{name = '[[Howling Abyss]]', children = {args.ha}}
 		)
 	elseif id == 'recipe' then
 		if String.isEmpty(args.recipe) then return {} end

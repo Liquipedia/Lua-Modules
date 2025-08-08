@@ -26,7 +26,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Location = Class.new(Widget)
 Location.defaultProps = {
 	args = {},
-	infoboxType = 'Tournament',
+	infoboxType = 'Tournaments',
 	shouldSetCategory = true,
 	showTbdOnEmpty = true,
 }

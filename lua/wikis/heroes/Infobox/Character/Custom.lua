@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Image = require('Module:Image')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Image = Lua.import('Module:Image')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
@@ -59,14 +60,14 @@ function CustomInjector:parse(id, widgets)
 				makeBreakdownCell('Role', getRoleIcon(args.role)),
 				makeBreakdownCell('Attack', table.concat({args.attacktype, args.attacktype2}, ' and ')),
 			}},
-			Cell{name = 'Cost', content = {
+			Cell{name = 'Cost', children = {
 				Image.display('HotSGold.png', nil, {alt = 'Gold', size = 16, link = ''}) .. ' ' .. (args.costgold or '?'),
 				Image.display('HotSGems.png', nil, {alt = 'Gems', size = 16, link = ''}) .. ' ' .. (args.costgem or '?'),
 			}},
 			Title{children = 'Stats'},
-			Cell{name = args.armortype or 'Armor', content = {args.armor}},
-			Cell{name = 'Attack Range', content = {args.attackrange}},
-			Cell{name = 'Attacks Per Second', content = {args.attackspeed}},
+			Cell{name = args.armortype or 'Armor', children = {args.armor}},
+			Cell{name = 'Attack Range', children = {args.attackrange}},
+			Cell{name = 'Attacks Per Second', children = {args.attackspeed}},
 			Title{children = 'Stats Change per Level'},
 			Table{
 				rows = {
