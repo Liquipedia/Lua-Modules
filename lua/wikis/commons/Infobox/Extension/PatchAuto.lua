@@ -7,9 +7,14 @@
 
 local Lua = require('Module:Lua')
 
+local DateExt = Lua.import('Module:Date/Ext')
+local Patch = Lua.import('Module:Patch')
 local String = Lua.import('Module:StringUtils')
 
-local TODAY = os.date('!%Y-%m-%d', os.time())
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
 
 local PatchAuto = {}
 
@@ -23,15 +28,10 @@ function PatchAuto.run(data, args)
 		return PatchAuto._toData(data, patch or {}, endPatch or {})
 	end
 
-	local endDate = data.endDate or TODAY --[[@as string]]
-	local patches = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = '[[type::patch]] AND ([[date::<' .. endDate .. ']] OR [[date::' .. endDate .. ']])',
-		query = 'name, pagename, date',
-		limit = 5000,
-		order = 'date desc',
-	})
-	patch = patch or PatchAuto._getPatch(patches, data.startDate)
-	endPatch = endPatch or PatchAuto._getPatch(patches, endDate)
+	local endDate = data.endDate or DateExt.toYmdInUtc(DateExt.getCurrentTimestamp())
+
+	patch = patch or PatchAuto._getPatch(data.startDate)
+	endPatch = endPatch or PatchAuto._getPatch(endDate)
 
 	return PatchAuto._toData(data, patch or {}, endPatch or {})
 end
@@ -47,31 +47,23 @@ function PatchAuto._fetchPatchData(patch, patchDisplay)
 		return {link = patch, display = patchDisplay}
 	end
 
-	patch = patch:gsub(' ', '_')
-
-	local patchData = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = '[[type::patch]] AND [[pagename::' .. patch .. ']]',
-		query = 'name',
+	local patchData = Patch.queryPatches{
+		additionalConditions = ConditionNode(ColumnName('pagename'), Comparator.eq, patch:gsub(' ', '_')),
 		limit = 1
-	})[1]
+	}[1]
 
 	assert(patchData, '"' .. patch .. '" is not a valid patch')
 
-	patchDisplay = String.nilIfEmpty(patchData.name) or patch:gsub('_', ' ')
+	patchDisplay = String.nilIfEmpty(patchData.displayName) or patch
 	return {link = patch, display = patchDisplay}
 end
 
----@param patches {pagename: string, name: string?, date: string}[]
 ---@param date string
 ---@return table
-function PatchAuto._getPatch(patches, date)
-	for _, patch in ipairs(patches) do
-		if patch.date <= date then
-			return {link = patch.pagename, display = patch.name}
-		end
-	end
+function PatchAuto._getPatch(date)
+	local patch = Patch.getPatchByDate(date) or {}
 
-	return {}
+	return {link = patch.pageName, display = patch.displayName}
 end
 
 ---@param data table
