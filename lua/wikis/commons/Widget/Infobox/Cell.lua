@@ -47,19 +47,21 @@ function Cell:render()
 	local options = self.props.options
 
 	local mappedChildren = Array.map(self.props.children, function(child)
-		if options.makeLink then
+		if Logic.isEmpty(child) then
+			return
+		elseif options.makeLink then
 			return Link{children = {child}, link = child}
 		else
 			return child
 		end
 	end)
 
-	if Logic.isEmpty(mappedChildren[1]) then
+	if Logic.isEmpty(mappedChildren) then
 		return
 	end
 
 	return HtmlWidgets.Div{
-		classes = self.props.classes,
+		classes = Array.extend({'infobox-cell'}, self.props.classes),
 		children = {
 			HtmlWidgets.Div{
 				classes = {'infobox-cell-' .. options.columns, 'infobox-description'},
