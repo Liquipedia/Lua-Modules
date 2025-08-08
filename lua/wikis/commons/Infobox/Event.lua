@@ -64,18 +64,18 @@ function Event:createInfobox()
 		Cell{
 			name = 'Series',
 			content = {
-				SeriesDisplay{
+				tostring(SeriesDisplay{
 					displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
 					series = args.series,
 					abbreviation = args.abbreviation,
 					icon = args.icon,
 					iconDark = args.icondark or args.icondarkmode,
 					iconDisplay = self.iconDisplay
-				},
-				SeriesDisplay{
+				}),
+				tostring(SeriesDisplay{
 					series = args.series2,
 					abbreviation = args.abbreviation2,
-				},
+				}),
 			}
 		},
 		Customizable{
