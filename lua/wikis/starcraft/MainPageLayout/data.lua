@@ -151,7 +151,7 @@ return {
 					{
 						mobileOrder = 4,
 						content = CONTENT.starCraftNews,
-					},	
+					},
 					{
 						mobileOrder = 5,
 						content = CONTENT.liquipediaApp,
