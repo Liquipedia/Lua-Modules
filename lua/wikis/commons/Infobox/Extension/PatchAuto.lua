@@ -59,7 +59,7 @@ function PatchAuto._fetchPatchData(patch, patchDisplay)
 end
 
 ---@param date string
----@return table
+---@return {link: string?, display: string?}
 function PatchAuto._getPatch(date)
 	local patch = Patch.getPatchByDate(date) or {}
 
