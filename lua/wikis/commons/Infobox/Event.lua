@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local CountryCategory = Lua.import('Module:Infobox/Extension/CountryCategory')
 local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
 local Json = Lua.import('Module:Json')
@@ -102,11 +103,7 @@ function Event:createInfobox()
 				end
 			}}
 		},
-		Location{
-			args = args,
-			infoboxType = 'Events',
-			shouldSetCategory = self:shouldStore(args),
-		},
+		Location{args = args},
 		Venue{args = args},
 		Cell{name = 'Format', content = {args.format}},
 		Customizable{id = 'dates', children = {
@@ -183,12 +180,11 @@ end
 ---@param args table
 ---@return string[]
 function Event:_getCategories(args)
-	local categories = {'Events'}
-	if String.isEmpty(args.country) then
-		table.insert(categories, 'Events without location')
-	end
-
-	return Array.extend(categories, self:getWikiCategories(args))
+	return Array.extend({'Events'},
+		Logic.isEmpty(args.country) and 'Events without location' or nil,
+		CountryCategory.run(args, 'Events'),
+		self:getWikiCategories(args)
+	)
 end
 
 --- Allows for overriding this functionality
