@@ -244,6 +244,8 @@ function TeamHistoryAuto:_row(transfer)
 		teamDisplay = Span{
 			css = {['padding-left'] = '3px', ['font-style'] = 'italic'},
 			children = {
+				teamText,
+				' ',
 				'(',
 				role,
 				')',

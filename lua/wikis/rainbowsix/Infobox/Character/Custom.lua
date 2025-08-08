@@ -17,7 +17,7 @@ local Operator = Lua.import('Module:Operator')
 local AgeCalculation = Lua.import('Module:AgeCalculation')
 local AutoInlineIcon = Lua.import('Module:AutoInlineIcon')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
-local NameAliases = Lua.Lua.importIfExists('Module:CharacterNames', {loadData = true})
+local NameAliases = Lua.requireIfExists('Module:CharacterNames', {loadData = true})
 local Patch = Lua.import('Module:Patch')
 
 local Injector = Lua.import('Module:Widget/Injector')
