@@ -19,15 +19,10 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class InfoboxLocationWidget: Widget
 ---@operator call(table):InfoboxLocationWidget
----@field args table<string, string>
----@field infoboxType string
----@field shouldSetCategory boolean
----@field showTbdOnEmpty boolean
+---@field props {args: table<string, string>, showTbdOnEmpty: boolean}
 local Location = Class.new(Widget)
 Location.defaultProps = {
 	args = {},
-	infoboxType = 'Tournaments',
-	shouldSetCategory = true,
 	showTbdOnEmpty = true,
 }
 
@@ -57,16 +52,10 @@ function Location:_getLocations()
 	for _, country, index in Table.iter.pairsByPrefix(args, 'country', {requireIndex = false}) do
 		local nationality = Flags.getLocalisation(country)
 
-		if Logic.isEmpty(nationality) then
-			mw.ext.TeamLiquidIntegration.add_category('Unrecognised Country')
-		else
+		if Logic.isNotEmpty(nationality) then
 			local location = Logic.nilIfEmpty(args['city' .. index]) or Logic.nilIfEmpty(args['location' .. index])
-			local countryName = Flags.CountryName{flag = country}
-			local displayText = Logic.nilIfEmpty(location or countryName) or country
+			local displayText = Logic.nilIfEmpty(location or Flags.CountryName{flag = country}) or country
 
-			if props.shouldSetCategory then
-				mw.ext.TeamLiquidIntegration.add_category(nationality .. ' ' .. props.infoboxType)
-			end
 			table.insert(locations, HtmlWidgets.Fragment{children = {
 				Flags.Icon{flag = country, shouldLink = true},
 				'&nbsp;',
