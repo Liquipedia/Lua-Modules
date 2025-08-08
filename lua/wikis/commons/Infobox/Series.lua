@@ -265,47 +265,6 @@ function Series:_getIconFromLeagueIconSmall(lpdbData)
 	return lpdbData
 end
 
----@param id string?
----@param name string?
----@param link string?
----@param desc string?
----@return string?
-function Series:_createLink(id, name, link, desc)
-	if String.isEmpty(id) then
-		return nil
-	end
-	---@cast id -nil
-
-	local output
-
-	if Page.exists(id) then
-		output = '[[' .. id .. '|'
-		if String.isEmpty(name) then
-			output = output .. id .. ']]'
-		else
-			output = output .. name .. ']]'
-		end
-
-	elseif not String.isEmpty(link) then
-		if String.isEmpty(name) then
-			output = '[' .. link .. ' ' .. id .. ']'
-		else
-			output = '[' .. link .. ' ' .. name .. ']'
-
-		end
-	elseif String.isEmpty(name) then
-		output = id
-	else
-		output = name
-	end
-
-	if not String.isEmpty(desc) then
-		output = output .. desc
-	end
-
-	return output
-end
-
 ---@param args table
 ---@return string[]
 function Series:_getCategories(args)
