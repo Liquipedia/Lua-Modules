@@ -73,10 +73,6 @@ local CONTENT = {
 		body = TournamentsTicker{
 			upcomingDays = 7,
 			completedDays = 7,
-			modifierTypeQualifier = -2,
-			modifierTier1 = 55,
-			modifierTier2 = 55,
-			modifierTier3 = 10
 		},
 		padding = true,
 		boxid = 1508,
