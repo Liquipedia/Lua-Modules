@@ -18,6 +18,7 @@ local Table = Lua.import('Module:Table')
 ---@class Widget: BaseClass
 ---@operator call(table): self
 ---@field context Widget[]
+---@field children (Widget|string|number|Html)[]?
 ---@field props table<string, any>
 local Widget = Class.new(function(self, props)
 	self.props = Table.deepMerge(Table.deepCopy(self.defaultProps), props)
