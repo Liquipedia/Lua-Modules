@@ -14,6 +14,7 @@ local Logic = Lua.import('Module:Logic')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class CellWidgetOptions
 ---@field columns number?
@@ -47,20 +48,13 @@ function Cell:render()
 	local options = self.props.options
 
 	local mappedChildren = Array.map(self.props.children, function(child)
-		if options.makeLink then
+		if WidgetUtil.isEmpty(child) then
+			return
+		elseif options.makeLink then
 			return Link{children = {child}, link = child}
 		else
 			return child
 		end
-	end)
-	mappedChildren = Array.map(mappedChildren, function(child)
-		local renderedChild = child
-		if Class.instanceOf(child, Widget) then
-			---@cast child Widget
-			renderedChild = child:render()
-		end
-
-		return Logic.nilIfEmpty(renderedChild)
 	end)
 
 	if Logic.isEmpty(mappedChildren) then
