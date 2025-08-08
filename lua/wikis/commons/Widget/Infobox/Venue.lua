@@ -67,9 +67,7 @@ function Venue._createLink(props)
 			HtmlWidgets.Small{
 				children = {
 					HtmlWidgets.Small{
-						children = {
-							props.desc
-						}
+						children = {'(', props.desc, ')'}
 					}
 				}
 			}
