@@ -5,13 +5,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class ClashofClansInfoboxTeam: InfoboxTeam
@@ -34,7 +35,7 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'topcustomcontent' then
-		table.insert(widgets, Cell{name = 'Clan Tag', content = {args.clantag}})
+		table.insert(widgets, Cell{name = 'Clan Tag', children = {args.clantag}})
 	end
 	return widgets
 end

@@ -42,7 +42,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		local modes = self.caller:getGameModes(args)
 		Array.appendWith(widgets,
-			Cell{name = 'Environment', content = {args.environment}},
+			Cell{name = 'Environment', children = {args.environment}},
 			Title{children = modes and 'Mode' or nil},
 			Center{
 				children = modes and Array.interleave(

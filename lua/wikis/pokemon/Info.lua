@@ -248,5 +248,10 @@ return {
 			tiers = {1, 2, 3},
 			excludeTierTypes = {'Qualifier'},
 		},
+		infoboxPlayer = {
+			automatedHistory = {
+				mode = 'merge',
+			},
+		},
 	},
 }

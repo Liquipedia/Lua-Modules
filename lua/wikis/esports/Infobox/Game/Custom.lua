@@ -6,15 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 
 local Game = Lua.import('Module:Infobox/Game')
 
 local Injector = Lua.import('Module:Widget/Injector')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class EsportsGameInfobox: GameInfobox
@@ -37,9 +38,9 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		Array.append(widgets,
-			Cell{name = 'Engine', content = {args.engine}},
-			Cell{name = 'Genre(s)', content = {args.genre}},
-			Cell{name = 'Mode(s)', content = {args.mode}}
+			Cell{name = 'Engine', children = {args.engine}},
+			Cell{name = 'Genre(s)', children = {args.genre}},
+			Cell{name = 'Mode(s)', children = {args.mode}}
 		)
 	end
 

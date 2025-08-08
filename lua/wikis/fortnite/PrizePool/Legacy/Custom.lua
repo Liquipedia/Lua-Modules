@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local LegacyPrizePool = Lua.import('Module:PrizePool/Legacy')
 

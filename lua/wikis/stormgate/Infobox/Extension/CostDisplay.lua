@@ -5,10 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Faction = require('Module:Faction')
-local Icon = require('Module:Icon')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Faction = Lua.import('Module:Faction')
+local Icon = Lua.import('Module:Icon')
+local Table = Lua.import('Module:Table')
 
 local CostDisplay = {}
 

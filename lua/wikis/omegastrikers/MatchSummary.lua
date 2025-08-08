@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
+
+local Array = Lua.import('Module:Array')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local Operator = Lua.import('Module:Operator')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')

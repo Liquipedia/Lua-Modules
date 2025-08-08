@@ -52,11 +52,11 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'custom' then
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Matchups', content = {args.matchups or 'All'}},
-			Cell{name = 'Type', content = {args.type or 'Opening'}},
-			Cell{name = 'Popularized by', content = {args.popularized}, options = {makeLink = true}},
-			Cell{name = 'Converted Form', content = {args.convert}},
-			Cell{name = 'TL-Article', content = {self.caller:_getTLarticle(args.tlarticle)}}
+			Cell{name = 'Matchups', children = {args.matchups or 'All'}},
+			Cell{name = 'Type', children = {args.type or 'Opening'}},
+			Cell{name = 'Popularized by', children = {args.popularized}, options = {makeLink = true}},
+			Cell{name = 'Converted Form', children = {args.convert}},
+			Cell{name = 'TL-Article', children = {self.caller:_getTLarticle(args.tlarticle)}}
 		)
 	end
 	return widgets

@@ -5,21 +5,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local AchievementIcons = require('Module:AchievementIcons')
-local Array = require('Module:Array')
-local Characters = require('Module:Characters')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
-local Info = require('Module:Info')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Template = require('Module:Template')
-local YearsActive = require('Module:YearsActive') -- TODO Convert to use the commons YearsActive
+
+local AchievementIcons = Lua.import('Module:AchievementIcons')
+local Array = Lua.import('Module:Array')
+local Characters = Lua.import('Module:Characters')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local Info = Lua.import('Module:Info')
+local String = Lua.import('Module:StringUtils')
+local Template = Lua.import('Module:Template')
+local YearsActive = Lua.import('Module:YearsActive') -- TODO Convert to use the commons YearsActive
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -71,19 +72,19 @@ function CustomInjector:parse(id, widgets)
 
 			Array.appendWith(widgets,
 				(main or former or alt) and Title{children = gameData.name} or nil,
-				Cell{name = 'Current Mains', content = main or {}},
-				Cell{name = 'Former Mains', content = former or {}},
-				Cell{name = 'Secondaries', content = alt or {}}
+				Cell{name = 'Current Mains', children = main or {}},
+				Cell{name = 'Former Mains', children = former or {}},
+				Cell{name = 'Secondaries', children = alt or {}}
 			)
 		end)
 	elseif id == 'status' then
 		table.insert(widgets,
-			Cell{name = 'Years Active', content = {YearsActive.get{player = mw.title.getCurrentTitle().baseText}}}
+			Cell{name = 'Years Active', children = {YearsActive.get{player = mw.title.getCurrentTitle().baseText}}}
 		)
 	elseif id == 'team' then
-		table.insert(widgets, Cell{name = 'Crew', content = {args.crew}})
+		table.insert(widgets, Cell{name = 'Crew', children = {args.crew}})
 	elseif id == 'nationality' then
-		table.insert(widgets, Cell{name = 'Location', content = {args.residence}})
+		table.insert(widgets, Cell{name = 'Location', children = {args.residence}})
 	elseif id == 'achievements' then
 		local achievements = {}
 		Array.forEach(GAME_ORDER, function(game)
@@ -94,7 +95,7 @@ function CustomInjector:parse(id, widgets)
 		end)
 		if #achievements == 0 then return {} end
 		return Array.extend({Title{children = 'Achievements'}}, Array.map(achievements, function(achievement)
-			return Cell{name = achievement.gameName, content = {achievement.icons}, options = {columns = 3}}
+			return Cell{name = achievement.gameName, children = {achievement.icons}, options = {columns = 3}}
 		end))
 	end
 

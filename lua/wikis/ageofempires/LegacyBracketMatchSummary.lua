@@ -5,12 +5,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Json = require('Module:Json')
-local MatchGroupInputUtil = require('Module:MatchGroup/Input/Util')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local LegacyBracketMatchSummary = {}
 

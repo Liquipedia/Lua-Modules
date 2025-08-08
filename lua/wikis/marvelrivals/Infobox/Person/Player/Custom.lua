@@ -5,14 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Region = require('Module:Region')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Team = require('Module:Team')
-local Template = require('Module:Template')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Region = Lua.import('Module:Region')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Team = Lua.import('Module:Team')
+local Template = Lua.import('Module:Template')
 
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local CharacterNames = Lua.import('Module:HeroNames')
@@ -55,7 +56,7 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(widgets,
 			Cell{
 				name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
-				content = {table.concat(heroIcons, '&nbsp;')},
+				children = {table.concat(heroIcons, '&nbsp;')},
 			}
 		)
 	end

@@ -5,16 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
-
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -44,24 +44,24 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(
 			widgets,
 			Title{children = 'Vitality'},
-			Cell{name = 'Health', content = {args.basehealth}},
-			Cell{name = 'Health Regeneration', content = {args.basehealthregen}},
-			Cell{name = 'Bullet Resistance', content = {args.resistancebullet .. '%'}},
-			Cell{name = 'Spirit Resistance', content = {args.resistancespirit .. '%'}},
-			Cell{name = 'Move Speed', content = {args.speedmove .. 'm/s'}},
-			Cell{name = 'Sprint Speed', content = {args.speedsprint .. 'm/s'}},
-			Cell{name = 'Stamina', content = {args.stamina}}
+			Cell{name = 'Health', children = {args.basehealth}},
+			Cell{name = 'Health Regeneration', children = {args.basehealthregen}},
+			Cell{name = 'Bullet Resistance', children = {args.resistancebullet .. '%'}},
+			Cell{name = 'Spirit Resistance', children = {args.resistancespirit .. '%'}},
+			Cell{name = 'Move Speed', children = {args.speedmove .. 'm/s'}},
+			Cell{name = 'Sprint Speed', children = {args.speedsprint .. 'm/s'}},
+			Cell{name = 'Stamina', children = {args.stamina}}
 		)
 
 		Array.appendWith(
 			widgets,
 			Title{children = 'Weapon'},
-			Cell{name = 'DPS', content = {args.dps}},
-			Cell{name = 'Bullet Damage', content = {args.damagebullet}},
-			Cell{name = 'Bullets per Seconds', content = {args.bps}},
-			Cell{name = 'Ammo', content = {args.ammo}},
-			Cell{name = 'Light Melee', content = {args.damagemeleelight}},
-			Cell{name = 'Heavy Melee', content = {args.damagemeleeheavy}}
+			Cell{name = 'DPS', children = {args.dps}},
+			Cell{name = 'Bullet Damage', children = {args.damagebullet}},
+			Cell{name = 'Bullets per Seconds', children = {args.bps}},
+			Cell{name = 'Ammo', children = {args.ammo}},
+			Cell{name = 'Light Melee', children = {args.damagemeleelight}},
+			Cell{name = 'Heavy Melee', children = {args.damagemeleeheavy}}
 		)
 		return widgets
 	end

@@ -7,17 +7,19 @@
 
 --shared parts for warcraft infoboxes unit and building to de-duplicate code
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local AttackIcon = require('Module:AttackIcon')
-local Faction = require('Module:Faction')
-local GameClock = require('Module:GameClock')
-local Logic = require('Module:Logic')
-local Math = require('Module:MathUtil')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
 
-local Widgets = require('Module:Widget/All')
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local AttackIcon = Lua.import('Module:AttackIcon')
+local Faction = Lua.import('Module:Faction')
+local GameClock = Lua.import('Module:GameClock')
+local Logic = Lua.import('Module:Logic')
+local Math = Lua.import('Module:MathUtil')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+
+local Widgets = Lua.import('Module:Widget/All')
 local BreakDown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Title = Widgets.Title
@@ -345,11 +347,11 @@ function CustomBuildingUnit.mercenaryStats(args)
 
 	return {
 		Title{children = 'Mercenary Stats'},
-		Cell{name = 'Stock Maximum', content = {args.stock}},
-		Cell{name = 'Stock Start Delay', content = {Abbreviation.make{
+		Cell{name = 'Stock Maximum', children = {args.stock}},
+		Cell{name = 'Stock Start Delay', children = {Abbreviation.make{
 			text = args.stockstart .. 's', title = 'First available at ' .. GameClock.run(args.stockstart)}}},
-		Cell{name = 'Replenish Interval', content = {args.stockreplenish}},
-		Cell{name = 'Tileset', content = {args.merctileset, args.merctileset2, args.merctileset3}},
+		Cell{name = 'Replenish Interval', children = {args.stockreplenish}},
+		Cell{name = 'Tileset', children = {args.merctileset, args.merctileset2, args.merctileset3}},
 	}
 end
 
@@ -365,11 +367,11 @@ function CustomBuildingUnit.movement(args, title)
 
 	return {
 		Title{children = title},
-		Cell{name = '[[Movement Speed|Speed]]', content = {speed}},
-		Cell{name = 'Turn Rate', content = {args.turnrate}},
-		Cell{name = 'Move Type', content = {args.movetype}},
-		Cell{name = 'Collision Size', content = {args.collision}},
-		Cell{name = 'Cargo Size', content = {args.cargo_size}},
+		Cell{name = '[[Movement Speed|Speed]]', children = {speed}},
+		Cell{name = 'Turn Rate', children = {args.turnrate}},
+		Cell{name = 'Move Type', children = {args.movetype}},
+		Cell{name = 'Collision Size', children = {args.collision}},
+		Cell{name = 'Cargo Size', children = {args.cargo_size}},
 	}
 end
 

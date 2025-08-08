@@ -11,12 +11,14 @@
 	It is invoked by Template:BracketMatchSummary.
 ]]
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local DRAW = 'draw'
 local SKIP = 'skip'

@@ -5,11 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Template = require('Module:Template')
 
-local Widgets = require('Module:Widget/All')
+local Class = Lua.import('Module:Class')
+local Template = Lua.import('Module:Template')
+
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -36,7 +37,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'role' then
 		if not args.role then return widgets end
 		return {
-			Cell{name = 'Main', content = {Template.safeExpand(mw.getCurrentFrame(), 'Class/'.. args.role)}}
+			Cell{name = 'Main', children = {Template.safeExpand(mw.getCurrentFrame(), 'Class/'.. args.role)}}
 		}
 	end
 	return widgets

@@ -5,18 +5,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
 
 local Game = Lua.import('Module:Game')
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class CounterstrikeInfoboxTeam: InfoboxTeam
@@ -43,19 +44,19 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'staff' then
 		return {
-			Cell{name = 'Founders',	content = {args.founders}},
-			Cell{name = 'CEO', content = {args.ceo}},
-			Cell{name = 'Gaming Director', content = {args['gaming director']}},
+			Cell{name = 'Founders',	children = {args.founders}},
+			Cell{name = 'CEO', children = {args.ceo}},
+			Cell{name = 'Gaming Director', children = {args['gaming director']}},
 			widgets[4], -- Manager
 			widgets[5], -- Captain
-			Cell{name = 'In-Game Leader', content = {args.igl}},
+			Cell{name = 'In-Game Leader', children = {args.igl}},
 			widgets[1], -- Coaches
-			Cell{name = 'Analysts', content = {args.analysts}},
+			Cell{name = 'Analysts', children = {args.analysts}},
 		}
 	elseif id == 'custom' then
 		return {Cell {
 			name = 'Games',
-			content = Array.map(self.caller.gamesList, function (gameIdentifier)
+			children = Array.map(self.caller.gamesList, function (gameIdentifier)
 					return Game.text{game = gameIdentifier}
 				end)
 		}}

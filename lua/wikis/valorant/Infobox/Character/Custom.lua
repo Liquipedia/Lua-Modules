@@ -46,13 +46,13 @@ function CustomInjector:parse(id, widgets)
 					return {
 						Cell{
 							name = 'Abilities',
-							content = abilities,
+							children = abilities,
 						}
 					}
 				end
 			},
-			Cell{name = 'Signature Ability', content = {args.signature}},
-			Cell{name = 'Ultimate', content = {args.ultimate}}
+			Cell{name = 'Signature Ability', children = {args.signature}},
+			Cell{name = 'Ultimate', children = {args.ultimate}}
 		)
 	end
 

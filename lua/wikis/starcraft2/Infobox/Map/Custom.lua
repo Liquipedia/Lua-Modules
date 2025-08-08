@@ -45,16 +45,16 @@ function CustomInjector:parse(widgetId, widgets)
 
 	return Array.append(
 		widgets,
-		Cell{name = 'Tileset', content = {args.tileset or self.caller:_tlpdMap(id, 'tileset')}},
-		Cell{name = 'Size', content = {self.caller:_getSize(id)}},
-		Cell{name = 'Spawn Positions', content = {self.caller:_getSpawn(id)}},
-		Cell{name = 'Versions', content = {args.versions}},
-		Cell{name = 'Leagues Featured', content = {args.leagues}},
-		Cell{name = '[[Rush distance]]', content = {self.caller:_getRushDistance()}},
-		Cell{name = '1v1 Ladder', content = {args['1v1history']}},
-		Cell{name = '2v2 Ladder', content = {args['2v2history']}},
-		Cell{name = '3v3 Ladder', content = {args['3v3history']}},
-		Cell{name = '4v4 Ladder', content = {args['4v4history']}}
+		Cell{name = 'Tileset', children = {args.tileset or self.caller:_tlpdMap(id, 'tileset')}},
+		Cell{name = 'Size', children = {self.caller:_getSize(id)}},
+		Cell{name = 'Spawn Positions', children = {self.caller:_getSpawn(id)}},
+		Cell{name = 'Versions', children = {args.versions}},
+		Cell{name = 'Leagues Featured', children = {args.leagues}},
+		Cell{name = '[[Rush distance]]', children = {self.caller:_getRushDistance()}},
+		Cell{name = '1v1 Ladder', children = {args['1v1history']}},
+		Cell{name = '2v2 Ladder', children = {args['2v2history']}},
+		Cell{name = '3v3 Ladder', children = {args['3v3history']}},
+		Cell{name = '4v4 Ladder', children = {args['4v4history']}}
 	)
 	end
 

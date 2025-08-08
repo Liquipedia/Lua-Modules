@@ -42,12 +42,12 @@ function CustomInjector:parse(widgetId, widgets)
 
 	if widgetId == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Game', content = {args.game}},
-			Cell{name = 'Health Items', content = {args['health-items']}},
-			Cell{name = 'Armor Items', content = {args['armor-items']}},
-			Cell{name = 'Cooldown Items', content = {args['cooldown-items']}},
-			Cell{name = 'Spawns', content = {args.spawns}},
-			Cell{name = 'Starting Spawns', content = {args['starting-spawns']}},
+			Cell{name = 'Game', children = {args.game}},
+			Cell{name = 'Health Items', children = {args['health-items']}},
+			Cell{name = 'Armor Items', children = {args['armor-items']}},
+			Cell{name = 'Cooldown Items', children = {args['cooldown-items']}},
+			Cell{name = 'Spawns', children = {args.spawns}},
+			Cell{name = 'Starting Spawns', children = {args['starting-spawns']}},
 			args.minimap and Title{children = {'Minimap'}} or nil,
 			args.minimap and HtmlWidgets.Div{
 				classes = {'infobox-image'},

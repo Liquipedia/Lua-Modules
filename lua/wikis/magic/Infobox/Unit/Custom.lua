@@ -16,7 +16,7 @@ local Unit = Lua.import('Module:Infobox/Unit')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Link = Lua.import('Module:Widget/Basic/Link')
-local Image = require('Module:Widget/Image/Icon/Image')
+local Image = Lua.import('Module:Widget/Image/Icon/Image')
 
 
 ---@class MagicUnitInfobox: UnitInfobox
