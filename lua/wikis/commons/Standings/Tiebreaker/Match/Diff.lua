@@ -21,4 +21,16 @@ function TiebreakerMatchDiff:valueOf(state, opponent)
 	return opponent.match.w - opponent.match.l
 end
 
+---@return string
+function TiebreakerMatchDiff:headerTitle()
+	return 'Matches Diff'
+end
+
+---@param state TiebreakerOpponent[]
+---@param opponent TiebreakerOpponent
+---@return string
+function TiebreakerMatchDiff:display(state, opponent)
+	return opponent.match.w .. ' - ' .. opponent.match.l
+end
+
 return TiebreakerMatchDiff

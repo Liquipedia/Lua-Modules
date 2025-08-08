@@ -22,4 +22,16 @@ function TiebreakerMatchWinRate:valueOf(state, opponent)
 	return matchCount ~= 0 and (opponent.match.w / matchCount) or 0.5
 end
 
+---@return string
+function TiebreakerMatchWinRate:headerTitle()
+	return 'Matches Win%'
+end
+
+---@param state TiebreakerOpponent[]
+---@param opponent TiebreakerOpponent
+---@return string
+function TiebreakerMatchWinRate:display(state, opponent)
+	return tostring(self:valueOf(state, opponent)) .. '%'
+end
+
 return TiebreakerMatchWinRate

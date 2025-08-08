@@ -40,4 +40,16 @@ function TiebreakerBuchholz:valueOf(state, opponent)
 	end, 0)
 end
 
+---@return string
+function TiebreakerBuchholz:headerTitle()
+	return 'Buchholz'
+end
+
+---@param state TiebreakerOpponent[]
+---@param opponent TiebreakerOpponent
+---@return string
+function TiebreakerBuchholz:display(state, opponent)
+	return tostring(self:valueOf(state, opponent))
+end
+
 return TiebreakerBuchholz

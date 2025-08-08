@@ -18,6 +18,7 @@ local Variables = Lua.import('Module:Variables')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Tournament = Lua.import('Module:Tournament')
+local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
@@ -33,6 +34,7 @@ local Standings = {}
 ---@field matches MatchGroupUtilMatch[]
 ---@field config table
 ---@field rounds StandingsRound[]
+---@field tiebreakers string[]
 ---@field private record standingstable
 ---@field private entryRecords standingsentry[]
 
@@ -119,6 +121,7 @@ function Standings.standingsFromRecord(record, entries)
 		section = record.section,
 		type = record.type,
 		config = record.config,
+		tiebreakers = Array.map(record.extradata.tiebreakers or {}, TiebreakerFactory.tiebreakerFromId),
 		record = record,
 		entryRecords = entries,
 	}

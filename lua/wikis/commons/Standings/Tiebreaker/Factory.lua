@@ -18,9 +18,10 @@ local NAME_TO_CLASS = {
 	buchholz = 'Buchholz',
 }
 
+--- Validates and normalizes the name of a tiebreaker input.
 ---@param input string
----@return StandingsTiebreaker
-function TiebreakerFactory.tiebreakerFromName(input)
+---@return string
+function TiebreakerFactory.validateAndNormalizeName(input)
 	local context, name = unpack(String.split(input, '%.'))
 	if name == nil then
 		name = context
@@ -31,13 +32,21 @@ function TiebreakerFactory.tiebreakerFromName(input)
 		'Invalid tie breaker context: ' .. context
 	)
 
-	local className = NAME_TO_CLASS[name]
-	assert(className, "Invalid tiebreaker type: " .. tostring(name))
+	local tiebreakerClassName = NAME_TO_CLASS[name]
+	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(name))
+	return table.concat({context, tiebreakerClassName}, '.')
+end
 
+---@param tiebreakerId string
+---@return StandingsTiebreaker
+function TiebreakerFactory.tiebreakerFromId(tiebreakerId)
+	local context, name = unpack(String.split(tiebreakerId, '%.'))
+	local tiebreakerClassName = NAME_TO_CLASS[name]
+	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(name))
 	---@type StandingsTiebreaker
-	local tiebreakerClass = Lua.import('Module:Standings/Tiebreaker/' .. className)
+	local TiebreakerClass = Lua.import('Module:Standings/Tiebreaker/' .. tiebreakerClassName)
 
-	return tiebreakerClass(context)
+	return TiebreakerClass.new(context)
 end
 
 return TiebreakerFactory

@@ -21,4 +21,16 @@ function TiebreakerMatchDraws:valueOf(state, opponent)
 	return opponent.match.d
 end
 
+---@return string
+function TiebreakerMatchDraws:headerTitle()
+	return 'Matches Draws'
+end
+
+---@param state TiebreakerOpponent[]
+---@param opponent TiebreakerOpponent
+---@return string
+function TiebreakerMatchDraws:display(state, opponent)
+	return tostring(self:valueOf(state, opponent))
+end
+
 return TiebreakerMatchDraws

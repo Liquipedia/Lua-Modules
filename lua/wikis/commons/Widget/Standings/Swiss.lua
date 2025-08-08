@@ -58,6 +58,9 @@ function StandingsSwissWidget:render()
 			HtmlWidgets.Tr{children = WidgetUtil.collect(
 				HtmlWidgets.Th{children = '#'},
 				HtmlWidgets.Th{children = 'Participant'},
+				Array.map(standings.tiebreakers, function(tiebreaker)
+					return HtmlWidgets.Th{children = tiebreaker.id} -- TODO Call tiebreaker display function
+				end),
 				HtmlWidgets.Th{children = 'Matches'},
 				Array.map(standings.rounds, function(round)
 					return HtmlWidgets.Th{children = round.title}
@@ -86,11 +89,13 @@ function StandingsSwissWidget:render()
 								showPlayerTeam = true,
 							}
 						},
-						HtmlWidgets.Td{
-							classes = {teamBackground},
-							children = table.concat({slot.matchWins, slot.matchLosses}, '-'),
-							css = {['font-weight'] = 'bold', ['text-align'] = 'center'}
-						},
+						Array.map(standings.tiebreakers, function(tiebreaker, tiebreakerIndex)
+							return HtmlWidgets.Td{
+								classes = {teamBackground},
+								css = tiebreakerIndex == 1 and {['font-weight'] = 'bold', ['text-align'] = 'center'} or {},
+								children = tiebreaker.id -- TODO Call tiebreaker value function
+							}
+						end),
 						Array.map(standings.rounds, function(columnRound)
 							local entry = Array.find(columnRound.opponents, function(columnSlot)
 								return Opponent.same(columnSlot.opponent, slot.opponent)
