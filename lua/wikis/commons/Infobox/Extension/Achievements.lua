@@ -44,7 +44,7 @@ local Achievements = {}
 ---@field noTemplate boolean?
 ---@field onlyForFirstPrizePoolOfPage boolean?
 ---@field adjustItem? fun(item:table):table
----@field baseConditions string[]?
+---@field baseConditions AbstractConditionNode[]?
 ---@field player string?
 ---@field onlySolo boolean?
 ---@field playerLimit integer?

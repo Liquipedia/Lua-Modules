@@ -10,15 +10,19 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local RoleOf = Lua.import('Module:RoleOf')
 
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
+
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Team = Lua.import('Module:Infobox/Team')
 
 local ACHIEVEMENTS_BASE_CONDITIONS = {
-	'[[liquipediatiertype::!Showmatch]]',
-	'[[liquipediatiertype::!Qualifier]]',
-	'[[liquipediatiertype::!Charity]]',
-	'[[liquipediatier::1]]',
-	'[[placement::1]]',
+	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Showmatch', 'Qualifier', 'Charity'}),
+	ConditionNode(ColumnName('liquipediatier'), Comparator.eq, 1),
+	ConditionNode(ColumnName('placement'), Comparator.eq, 1),
 }
 
 ---@class Dota2InfoboxTeam: InfoboxTeam
