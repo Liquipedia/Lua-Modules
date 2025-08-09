@@ -34,7 +34,7 @@ local DEFAULT_PLAYER_LIMIT = Info.config.defaultMaxPlayersPerPlacement or 10
 local MAX_PARTY_SIZE = 4
 local DEFAULT_BASE_CONDITIONS = {
 	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Qualifier', 'Charity'}),
-	ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, 1),
+	ConditionNode(ColumnName('liquipediatier'), Comparator.eq, 1),
 	ConditionNode(ColumnName('placement'), Comparator.eq, 1),
 }
 
