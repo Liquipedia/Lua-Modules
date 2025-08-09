@@ -91,7 +91,7 @@ function Achievements._playerConditions(player, onlySolo, playerLimit)
 	return playerConditions
 end
 
----Entry point for infobox team to fetch both team achieements and solo achievements while on team as sep. icon strings
+---Entry point for infobox team to fetch both team achievements and solo achievements while on team as sep. icon strings
 ---@param args AchievementIconsArgs?
 ---@return string? #Team Achievements icon string
 ---@return string? #Solo Achievements while on team icon string
