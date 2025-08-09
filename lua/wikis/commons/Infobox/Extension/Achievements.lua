@@ -61,11 +61,10 @@ function Achievements.player(args)
 
 	local onlySolo = Logic.readBool(args.onlySolo)
 
-	local conditions = table.concat(Array.extend(
-		options.baseConditions,
-		Achievements._playerConditions(player, onlySolo, args.playerLimit or DEFAULT_PLAYER_LIMIT),
-		onlySolo and ('[[opponenttype::' .. Opponent.solo .. ']]') or nil
-	), ' AND ')
+	local conditions = ConditionTree(BooleanOperator.all)
+		:add(options.baseConditions)
+		:add(Achievements._playerConditions(player, onlySolo, args.playerLimit or DEFAULT_PLAYER_LIMIT))
+		:add(onlySolo and ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo) or nil)
 
 	return Achievements.display(Achievements._fetchData(conditions), options)
 end
@@ -74,24 +73,25 @@ end
 ---@param player string
 ---@param onlySolo boolean
 ---@param playerLimit integer
----@return string
+---@return ConditionTree
 function Achievements._playerConditions(player, onlySolo, playerLimit)
 	player = player:gsub(' ', '_')
 	local playerNoUnderScore = player:gsub('_', ' ')
 
 	if onlySolo then
-		return '([[opponentname::' .. player .. ']] OR [[opponentname::' .. playerNoUnderScore .. ']])'
+		return ConditionUtil.anyOf(ColumnName('opponentname'), {player, playerNoUnderScore}) --[[@as ConditionTree]]
 	end
 
-	local playerConditions = Array.map(Array.range(1, playerLimit), function(playerIndex)
-		local lpdbKey = 'opponentplayers_p' .. playerIndex
-		return '[[' .. lpdbKey .. '::' .. player .. ']] OR [[' .. lpdbKey .. '::' .. playerNoUnderScore .. ']]'
-	end)
+	local playerConditions = ConditionTree(BooleanOperator.any):add(
+		Array.map(Array.range(1, playerLimit), function(playerIndex)
+			return ConditionUtil.anyOf(ColumnName('p' .. playerIndex, 'opponentplayers'), {player, playerNoUnderScore})
+		end)
+	)
 
-	return '(' .. table.concat(playerConditions, ' OR ') .. ')'
+	return playerConditions
 end
 
----Entry point for infobox team to fetch both team achievements and solo achievements while on team as sep. icon strings
+---Entry point for infobox team to fetch both team achieements and solo achievements while on team as sep. icon strings
 ---@param args AchievementIconsArgs?
 ---@return string? #Team Achievements icon string
 ---@return string? #Solo Achievements while on team icon string
@@ -154,7 +154,7 @@ end
 ---@field noTemplate boolean
 ---@field onlyForFirstPrizePoolOfPage boolean
 ---@field adjustItem fun(item:table):table
----@field baseConditions string[]
+---@field baseConditions AbstractConditionNode[]
 
 ---Read options
 ---@param args AchievementIconsArgs?
@@ -185,22 +185,17 @@ end
 ---@param historicalPages string[]
 ---@param opponentType OpponentType
 ---@param options AchievementIconsOptions
----@return string
+---@return ConditionTree
 function Achievements._buildTeamConditions(historicalPages, opponentType, options)
 	local lpdbKeys = Achievements._getLpdbKeys(opponentType)
-	local teamConditions = Array.flatMap(lpdbKeys, function(lpdbKey)
-		return Array.map(historicalPages, function(team)
-			return '[[' .. lpdbKey .. '::' .. team .. ']]'
-		end)
+	local teamConditions = Array.map(lpdbKeys, function(lpdbKey)
+		return ConditionUtil.anyOf(ColumnName(lpdbKey), historicalPages)
 	end)
 
-	local conditions = Array.extend({},
-		'(' .. table.concat(teamConditions, ' OR ') .. ')',
-		'[[opponenttype::' .. opponentType .. ']]',
-		options.baseConditions
-	)
-
-	return table.concat(conditions, ' AND ')
+	return ConditionTree(BooleanOperator.all)
+		:add(teamConditions)
+		:add(ConditionNode(ColumnName('opponenttype'), Comparator.eq, opponentType))
+		:add(options.baseConditions)
 end
 
 ---@param opponentType OpponentType
@@ -216,11 +211,11 @@ function Achievements._getLpdbKeys(opponentType)
 end
 
 ---Query data for given conditions
----@param conditions string
+---@param conditions AbstractConditionNode
 ---@return {icon:string?,icondark:string?,pagename:string,tournament:string?,date:osdate,prizepoolindex:integer}[]
 function Achievements._fetchData(conditions)
 	return mw.ext.LiquipediaDB.lpdb('placement', {
-		conditions = conditions,
+		conditions = tostring(conditions),
 		query = 'icon, icondark, pagename, tournament, date, prizepoolindex',
 		order = 'date asc',
 		limit = 5000,
