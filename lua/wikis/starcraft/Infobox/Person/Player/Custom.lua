@@ -36,6 +36,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 local ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
@@ -64,9 +65,9 @@ function CustomPlayer.run(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	player.args.achievements = Achievements.player{noTemplate = true, baseConditions = {
-		'[[liquipediatiertype::]]',
-		'([[liquipediatier::1]] OR [[liquipediatier::2]])',
-		'[[placement::1]]',
+		ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, ''),
+		ConditionUtil.anyOf(ColumnName('liquipediatier'), {1, 2}),
+		ConditionNode(ColumnName('placement'), Comparator.eq, 1),
 	}}
 
 	player.achievements = {}

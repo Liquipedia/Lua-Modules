@@ -18,16 +18,21 @@ local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
 local Template = Lua.import('Module:Template')
 
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
+
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 
 local ACHIEVEMENTS_BASE_CONDITIONS = {
-	'[[liquipediatiertype::!Showmatch]]',
-	'[[liquipediatiertype::!Qualifier]]',
-	'([[liquipediatier::1]] OR [[liquipediatier::2]])',
-	'[[placement::1]]',
+	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Showmatch', 'Qualifier'}),
+	ConditionUtil.anyOf(ColumnName('liquipediatier'), {1, 2}),
+	ConditionNode(ColumnName('placement'), Comparator.eq, 1),
 }
 
 local Widgets = Lua.import('Module:Widget/All')
