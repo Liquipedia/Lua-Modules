@@ -11,7 +11,6 @@ local Lua = require('Module:Lua')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local TeamHistoryAuto = Lua.import('Module:Infobox/Extension/TeamHistoryAuto')
 local Widget = Lua.import('Module:Widget')
 local Widgets = require('Module:Widget/All')
 
@@ -19,6 +18,7 @@ local Big = HtmlWidgets.Big
 local Br = HtmlWidgets.Br
 local Div = HtmlWidgets.Div
 local Small = HtmlWidgets.Small
+local TeamHistoryAuto = Lua.import('Module:Widget/Infobox/TeamHistory/Auto')
 
 local DEFAULT_MODE = 'manual'
 
@@ -30,7 +30,7 @@ local DEFAULT_MODE = 'manual'
 ---|'cleanup' # display THA and for logged in users manual input if present too
 
 ---@class TeamHistoryWidget: Widget
----@operator call(table): TitleWidget
+---@operator call(table): TeamHistoryWidget
 ---@field props {player: string, manualInput: string?}
 local TeamHistory = Class.new(Widget)
 
@@ -59,7 +59,7 @@ function TeamHistory:_getHistory()
 		return manualInput
 	end
 
-	local automatedHistory = TeamHistoryAuto{player = self.props.player}:fetch():store():build()
+	local automatedHistory = TeamHistoryAuto{player = self.props.player, store = true}
 
 	if Logic.isEmpty(manualInput) or (mode ~= 'cleanup' and mode ~= 'merge') then
 		return automatedHistory
