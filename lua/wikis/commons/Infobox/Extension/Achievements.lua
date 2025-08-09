@@ -78,13 +78,15 @@ function Achievements._playerConditions(player, onlySolo, playerLimit)
 	player = player:gsub(' ', '_')
 	local playerNoUnderScore = player:gsub('_', ' ')
 
+	local playerNames = {player, playerNoUnderScore}
+
 	if onlySolo then
-		return ConditionUtil.anyOf(ColumnName('opponentname'), {player, playerNoUnderScore}) --[[@as ConditionTree]]
+		return ConditionUtil.anyOf(ColumnName('opponentname'), playerNames) --[[@as ConditionTree]]
 	end
 
 	local playerConditions = ConditionTree(BooleanOperator.any):add(
 		Array.map(Array.range(1, playerLimit), function(playerIndex)
-			return ConditionUtil.anyOf(ColumnName('p' .. playerIndex, 'opponentplayers'), {player, playerNoUnderScore})
+			return ConditionUtil.anyOf(ColumnName('p' .. playerIndex, 'opponentplayers'), playerNames)
 		end)
 	)
 
