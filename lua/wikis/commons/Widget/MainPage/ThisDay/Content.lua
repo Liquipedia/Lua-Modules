@@ -28,7 +28,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local Config = Info.config.thisDay or {}
 
 ---@class ThisDayContent: Widget
----@field props { month: integer?, day: integer?, birthdayListPage: string? }
+---@field props { month: integer?, day: integer?, birthdayListPage: string?, noTwitter: boolean?}
 ---@operator call(table): ThisDayContent
 local ThisDayContent = Class.new(Widget)
 ThisDayContent.defaultProps = {
@@ -53,7 +53,7 @@ function ThisDayContent:render()
 					month = month,
 					day = day,
 					hideIfEmpty = Logic.readBool(Config.hideEmptyBirthdayList),
-					noTwitter = args.noTwitter
+					noTwitter = self.props.noTwitter
 				},
 				ThisDayPatch{
 					month = month,
