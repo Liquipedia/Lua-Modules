@@ -17,6 +17,14 @@ local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Team = Lua.import('Module:Team')
 
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
+
 local CustomDefaultOptions = Lua.requireIfExists('Module:Infobox/Extension/Achievements/Custom') or {}
 
 local Opponent = Lua.import('Module:Opponent/Custom')
