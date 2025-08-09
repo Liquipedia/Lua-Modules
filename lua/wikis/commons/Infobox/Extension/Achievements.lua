@@ -15,7 +15,7 @@ local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
-local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -141,8 +141,8 @@ end
 ---@return string[]
 function Achievements._getTeamNames()
 	local pageName = mw.title.getCurrentTitle().text
-	local historicalPages = Team.queryHistoricalNames(pageName)
-	assert(historicalPages, 'No team template exists for "' .. pageName .. '"')
+	local historicalPages = TeamTemplate.queryHistoricalNames(pageName)
+	assert(Logic.isNotEmpty(historicalPages), TeamTemplate.noTeamMessage(pageName))
 
 	return Array.extend(
 		Array.map(historicalPages, function(team) return (team:gsub(' ', '_')) end),
