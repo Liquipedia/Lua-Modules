@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
+local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
 local TeamHistoryAutoExtension = Lua.import('Module:Infobox/Extension/TeamHistoryAuto')
 local Widget = Lua.import('Module:Widget')
 
@@ -17,7 +18,7 @@ local Widget = Lua.import('Module:Widget')
 ---@field props {player: string, store: boolean}
 local TeamHistory = Class.new(Widget)
 TeamHistory.defaultProps = {
-	player = mw.title.getCurrentTitle().subpageText:gsub('^%l', string.upper),
+	player = String.upperCaseFirst(mw.title.getCurrentTitle().subpageText),
 	store = false,
 }
 
