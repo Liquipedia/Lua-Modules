@@ -68,16 +68,15 @@ end
 ---@return (string|Html|Widget)[]
 function ThisDayBirthday:_toLine(player)
 	local playerAge = AgeCalculation.raw{birthdate = player.birthdate}
-	local playerData = {
-		displayName = player.id,
+	local opponentData = Opponent.readOpponentArgs{
+		type = Opponent.solo,
+		name = player.id,
 		flag = player.nationality,
-		pageName = player.pagename,
+		link = player.pagename,
 		faction = (player.extradata or {}).faction,
 	}
 	local line = {
-		OpponentDisplay.InlineOpponent{
-			opponent = {players = {playerData}, type = Opponent.solo}
-		},
+		OpponentDisplay.InlineOpponent{opponent = opponentData},
 		' - ',
 		playerAge.birthDate.year .. ' (age ' .. playerAge:calculate() .. ')'
 	}
