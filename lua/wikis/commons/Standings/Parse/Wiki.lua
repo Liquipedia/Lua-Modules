@@ -131,7 +131,8 @@ function StandingsParseWiki.getMatchIdsFromStage(rawStage)
 	local matchGroup = mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = tostring(ConditionTree(BooleanOperator.all):add(Array.append(
 			{ConditionNode(ColumnName('pagename'), Comparator.eq, basePage)},
-			namespace and ConditionNode(ColumnName('namespace'), Comparator.eq, Namespace.idFromName(namespace)) or nil
+			namespace and ConditionNode(ColumnName('namespace'), Comparator.eq, Namespace.idFromName(namespace)) or nil,
+			stage and ConditionNode(ColumnName('match2bracketdata_sectionheader'), Comparator.eq, stage) or nil
 		))),
 		query = 'match2id',
 		limit = '1000',
