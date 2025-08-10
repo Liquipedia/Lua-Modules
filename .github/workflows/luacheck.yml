@@ -64,12 +64,14 @@ jobs:
           npm install
           luarocks install --lua-version=5.1 busted
 
+      # Can probably be speed up with the help of http://github.com/microsoft/playwright/issues/23388
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
       - name: Run test
         run: |
           npm run --silent lua-test -- -v --run=ci --output=junit > busted.xml
+        id: busted
 
       - name: Report test
         uses: mikepenz/action-junit-report@v5
@@ -78,3 +80,12 @@ jobs:
           report_paths: 'busted.xml'
           check_name: 'Test Report'
           annotate_only: ${{ (github.event.pull_request.head.repo.full_name != github.repository) }}
+
+      - name: Upload Diffs on Failure
+        if: steps.busted.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: snapshot-diffs
+          path: |
+            lua/output/*_diff.png
+            lua/output/*_actual.png
