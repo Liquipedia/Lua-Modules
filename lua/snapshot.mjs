@@ -1,4 +1,3 @@
-// snapshot.js
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
 import { resolve, join, dirname } from 'path';
 import { chromium } from 'playwright';
