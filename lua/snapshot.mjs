@@ -28,7 +28,7 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 
 	const browser = await chromium.launch();
 	const page = await browser.newPage({ viewport: VIEWPORT });
-	await page.goto(`file://${htmlPath.replace(/\\/g, '/')}`);
+	await page.goto(`file://${htmlPath}`);
 	const newScreenshotBuffer = await page.screenshot({ animations: 'disabled' });
 	await browser.close();
 
