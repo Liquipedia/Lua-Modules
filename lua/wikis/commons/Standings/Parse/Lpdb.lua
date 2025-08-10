@@ -47,10 +47,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 	end)
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('namespace'), Comparator.eq, 0),
-			ConditionNode(ColumnName('namespace'), Comparator.neq, 0),
-		},
+		ConditionNode(ColumnName('namespace'), Comparator.neq, 130),
 		ConditionUtil.anyOf(ColumnName('match2id'), matchIds),
 	}
 
