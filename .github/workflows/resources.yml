@@ -11,4 +11,4 @@ jobs:
       - name: Install modules
         run: npm install
       - name: Run test
-        run: npm run test
+        run: npm run grunt-test

@@ -1,19 +1,28 @@
 {
 	"private": true,
 	"devDependencies": {
-		"eslint-config-wikimedia": "*",
-		"jquery": "*",
+		"@playwright/test": "^1.45.0",
+		"@stylistic/stylelint-plugin": "^2.1.2",
+		"eslint-config-wikimedia": "0.28.1",
 		"grunt": "*",
 		"grunt-eslint": "24.x.x",
 		"grunt-stylelint": "^0.20.x",
+		"jquery": "*",
+		"pixelmatch": "^7.1.0",
+		"playwright": "^1.54.2",
+		"pngjs": "^7.0.0",
 		"postcss-less": "^6.0.0",
+		"sass": "^1.77.8",
 		"stylelint": "^16.6.1",
 		"stylelint-config-wikimedia": "^0.17.0",
-		"stylelint-less": "^3.0.1",
-		"@stylistic/stylelint-plugin": "^2.1.2"
+		"stylelint-less": "^3.0.1"
 	},
 	"scripts": {
-		"test": "grunt main",
-		"fix": "grunt main --fix"
+		"grunt-test": "grunt main",
+		"fix": "grunt main --fix",
+		"compile:scss": "sass src/styles/main.scss output/css/main.css --style=compressed",
+		"build:css": "npm run compile:scss",
+		"test": "busted -C lua",
+		"update-snapshots": "UPDATE_SNAPSHOTS=true npm test"
 	}
 }
