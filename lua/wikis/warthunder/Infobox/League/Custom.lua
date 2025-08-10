@@ -54,10 +54,29 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		local mode = MODES[string.lower(args.mode or '')] or 'Unknown'
 		local vehicle = VEHICLES[string.lower(args.vehicle or '')] or 'Unknown'
+		
+		-- amateur vehicle pool code
+		local vehiclePool = ''
+		local i = 1
+		while args['vehicle' .. i] do
+			if i > 1 then
+				vehiclePool = vehiclePool .. ' • '
+			end
+			local v = args['vehicle' .. i]
+			local vType = args['vehicle' .. i .. 'type']
+			if vType then
+				vehiclePool = vehiclePool .. '[[' .. v .. ']] (' .. vType .. ')'
+			else
+				vehiclePool = vehiclePool .. '[[' .. v .. ']]'
+			end
+			i = i + 1
+		end
+		
 		Array.appendWith(
 			widgets,
 			Cell{name = 'Mode', children = {mode}},
-			Cell{name = 'Vehicle', children = {vehicle}}
+			Cell{name = 'Vehicle', children = {vehicle}},
+			vehiclePool ~= '' and Cell{name = 'Vehicle Pool', children = {vehiclePool}} or nil
 		)
 	end
 
