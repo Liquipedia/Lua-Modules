@@ -15,7 +15,7 @@ function allwikis(name, funcToRun, wikiArgs) error('SOMETHING WENT WRONG') end
 function GoldenTest(testname, actual) error('SOMETHING WENT WRONG') end
 
 return function(busted, helper, options)
-	-- Copy from standard/lua.lua
+	-- Copy from commons/lua.lua
 	local function fileExists(name)
 		if package.loaded[name] then
 			return true
@@ -110,9 +110,7 @@ return function(busted, helper, options)
 		local placeholder = '<!--CONTENT_HERE-->'
 		local start_pos, end_pos = string.find(template, placeholder, 1, true)
 		assert(start_pos, 'Placeholder not found in template')
-		local finalHtml = string.sub(template, 1, start_pos - 1) -- Part before placeholder
-			.. actual -- The replacement text
-			.. string.sub(template, end_pos + 1) -- Part after placeholder
+		local finalHtml = string.sub(template, 1, start_pos - 1) .. actual .. string.sub(template, end_pos + 1)
 
 		os.execute('mkdir -p output')
 		local finalHtmlPath = 'output/' .. testName .. '-full.html'
