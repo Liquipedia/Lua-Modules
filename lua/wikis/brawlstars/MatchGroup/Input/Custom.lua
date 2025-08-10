@@ -84,6 +84,7 @@ end
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
+		mapveto = MatchGroupInputUtil.getMapVeto(match),
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
 	}
 end
