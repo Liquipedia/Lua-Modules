@@ -115,7 +115,7 @@ return function(busted, helper, options)
 			.. string.sub(template, end_pos + 1) -- Part after placeholder
 
 		os.execute('mkdir -p output')
-		local finalHtmlPath = 'output/' .. testName .. '_full.html'
+		local finalHtmlPath = 'output/' .. testName .. '-full.html'
 		writeFile(finalHtmlPath, finalHtml)
 
 		local absoluteHtmlPath = os.getenv('PWD') .. '/lua/' .. finalHtmlPath

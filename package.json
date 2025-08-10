@@ -8,21 +8,23 @@
 		"grunt-eslint": "24.x.x",
 		"grunt-stylelint": "^0.20.x",
 		"jquery": "*",
+		"less": "^4.4.0",
 		"pixelmatch": "^7.1.0",
 		"playwright": "^1.54.2",
 		"pngjs": "^7.0.0",
 		"postcss-less": "^6.0.0",
-		"sass": "^1.77.8",
+		"sass": "^1.90.0",
 		"stylelint": "^16.6.1",
 		"stylelint-config-wikimedia": "^0.17.0",
 		"stylelint-less": "^3.0.1"
 	},
 	"scripts": {
-		"grunt-test": "grunt main",
+		"test": "grunt main",
 		"fix": "grunt main --fix",
-		"compile:scss": "sass src/styles/main.scss output/css/main.css --style=compressed",
-		"build:css": "npm run compile:scss",
-		"test": "busted -C lua",
-		"update-snapshots": "UPDATE_SNAPSHOTS=true npm test"
+		"compile:less": "lessc stylesheets/Main.less lua/output/css/main.css",
+		"compile:scss": "sass stylesheets/Main.scss lua/output/css/main.css",
+		"build:css": "npm run compile:less",
+		"lua-test": "npm run build:css && busted -C lua",
+		"update-snapshots": "UPDATE_SNAPSHOTS=true npm run lua-test"
 	}
 }

@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const SNAPSHOT_DIR = resolve(__dirname, 'spec', 'snapshots');
-const SNAPSHOT_DIFF_DIR = resolve(__dirname, 'spec', 'snapshots', 'diffs');
+const SNAPSHOT_DIFF_DIR = resolve(__dirname, 'output');
 const VIEWPORT = { width: 1280, height: 720 };
 const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 
@@ -33,12 +33,12 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 	await browser.close();
 
 	if (shouldUpdate || !existsSync(referencePath)) {
-		// Update snapshot, either forced or first time
+		// Update snapshot, either forced or previous snapshot doesn't exist yet
 		mkdirSync(SNAPSHOT_DIR, { recursive: true });
 		writeFileSync(referencePath, newScreenshotBuffer);
 		process.exit(0);
 	} else {
-		// Compare with snapshot
+		// Compare with existing snapshot
 		const referenceImage = PNG.sync.read(readFileSync(referencePath));
 		const newImage = PNG.sync.read(newScreenshotBuffer);
 		const { width, height } = referenceImage;
