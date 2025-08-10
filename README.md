@@ -2,7 +2,7 @@
 
 ![Code Style](https://github.com/Liquipedia/LiquipediaMediaWikiMessages/workflows/Code%20Style/badge.svg)
 
-Lua Modules are an integral part of Liquipedia. They allow for more complex logic for rendering elements. The website supports adding and editing these modules straight from the browser. For more complex modules however, a more integrated developer environment has been requested by several users. To provide in this need this github repository has been constructed.
+Lua Modules are an integral part of Liquipedia. They allow for more complex logic for rendering elements.
 Any modules added in this repository will, after a review process, be added to the modules and templates of the website.
 
 **Note:** Modules in this repository are only a subset of those on the website. Any 'duplicates' on the website will be overwritten by those in this repository.
@@ -19,12 +19,12 @@ Clone the repository. This requires [git](https://git-scm.com/downloads) to be i
 
 ##### Windows
 
-Recommended to use WSL. Then follow the Unix instructions.
+Recommended to use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install). Then follow the Unix instructions.
 
 ##### Unix (Linux Ubuntu)
 
 ###### Installing Lua and Luarocks
-1. Follow [these instruction](https://github.com/luarocks/luarocks/blob/main/docs/installation_instructions_for_unix.md) on installing needed development tools on your system. 
+1. Follow [these instruction](https://github.com/luarocks/luarocks/blob/main/docs/installation_instructions_for_unix.md) on installing needed development tools on your system.
 2. Instead of downloading and unpacking the latest Lua version, download lua-5.1.tar.gz from [lua.org](https://www.lua.org/ftp/) and unpack it.
 3. Follow the instructions linked above for the rest of the process.
 4. If you have done everything correctly, you should now have Lua and Luarocks installed on your system.
@@ -32,8 +32,13 @@ Recommended to use WSL. Then follow the Unix instructions.
 ###### Installing busted and luacheck
 1. Run `luarocks install --lua-version=5.1 busted` to install busted (used as a testing framework).
 2. Run `luarocks install --lua-version=5.1 luacheck` to install luacheck (used for linting).
-3. Make sure installed rocks are available in your path variable. 
+3. Make sure installed rocks are available in your path variable.
 4. Test if everything is correctly installed by running `busted -C lua` and `luacheck lua --config lua/.luacheckrc` from the root of this project. If all tests pass and all checks are OK, you're installation of busted and luacheck is complete.
+
+###### Installing npm, node and dependencies
+1. Follow the instructions [here](https://github.com/nvm-sh/nvm?tab=readme-ov-file#install--update-script) to install npm
+2. Run `nvm install node`
+3. Run `npm install`
 
 ##### Mac
 
@@ -54,9 +59,13 @@ Recommended to use WSL. Then follow the Unix instructions.
 
 We recommend VSCode. Highly recommend that you get the extension [Lua](https://marketplace.visualstudio.com/items?itemName=sumneko.lua). The repo is setup with presets for this.
 
+Eslint and Stylelint extensions are recommended if you're going to work with stylesheets or javascript.
+
 ##### Intellij
 
 Highly recommend that you get the extension [SumnekoLua](https://plugins.jetbrains.com/plugin/22315-sumnekolua).
+
+Eslint and Stylelint extensions are recommended if you're going to work with stylesheets or javascript.
 
 ##### Neovim
 
@@ -100,14 +109,26 @@ The page is like the path. It determines where within the wiki the file is deplo
 
 The project is divided into folders based on language. Even though the project is called Lua-Modules, a part of this repository is in different languages/techniques.
 
-- In the javascript folder are scripts that run in the client. Our current setup does not fully support all available features in html. So for example a dropdown (select) element can't be rendered from our back end properly. We use javascript to add these kind of features. Essentially anything that makes an element interactable, buttons mostly, are constructed or configured from javascript.
-- The modules written in lua are found in the `standard` or `components` folder.
-  - Most(read:some) modules are covered by unit tests. Tests are placed in the spec folder.
-- Styling is found in the stylesheets folder. For styling we use [less](https://lesscss.org/). Check out their documentation for getting up to speed on how this differs from traditional css.
+- In the `javascript` folder are scripts that run in the client. Our current setup does not fully support all available features in html. So for example a dropdown (select) element can't be rendered from our back end properly. We use javascript to add these kind of features. Essentially anything that makes an element interactable, buttons mostly, are constructed or configured from javascript.
+- The modules written in lua are found in the `lua` folder.
+  - Some modules are covered by unit tests. Tests are placed in the `spec` sub-folder.
+- Styling is found in the `stylesheets` folder. For styling we use [less](https://lesscss.org/). Check out their documentation for getting up to speed on how this differs from traditional css.
+
+### Automated Testing
+
+#### Javascript & Stylesheets
+
+Run `npm run test` in the root folder.
+
+You can run `npm run fix` for auto correctable issues to be fixed.
+
+#### Lua
+
+Run `npm run lua-test` in the root folder.
 
 ## Committing changes
 
-You need to be a member of the Liquipedia organization before you are allowed to push to this repository. In most workflows, you will make a fork of this repository to your own repository, and request a merge request from there.
+You need to be a member of the Liquipedia organization before you are allowed to push to this repository. In most workflows, you will make a fork of this repository to your own repository, and request a merge request from there. See the wiki for a step-by-step guide on how to commit a change.
 Trusted contributers may be given the privilege of directly branching within the repository. These privileges are always up to the discretion of Liquipedia staff.
 
 ## Support
