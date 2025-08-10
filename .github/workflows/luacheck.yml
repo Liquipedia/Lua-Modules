@@ -81,11 +81,11 @@ jobs:
           check_name: 'Test Report'
           annotate_only: ${{ (github.event.pull_request.head.repo.full_name != github.repository) }}
 
-      - name: Upload Diffs on Failure
-        if: steps.busted.outcome == 'failure'
+      - name: Upload Diffs
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: snapshot-diffs
           path: |
             lua/output/*_diff.png
-            lua/output/*_actual.png
+            lua/output/*_new.png
