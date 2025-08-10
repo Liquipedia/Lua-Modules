@@ -8,12 +8,17 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Condition = Lua.import('Module:Condition')
 local Lpdb = Lua.import('Module:Lpdb')
-
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
-
 local Opponent = Lua.import('Module:Opponent/Custom')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local ConditionUtil = Condition.Util
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
 
 local StandingsParseLpdb = {}
 
@@ -41,17 +46,20 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 		end)
 	end)
 
-	local conditionsMatches = Condition.Tree(Condition.BooleanOperator.any)
-	Array.forEach(matchIds, function(matchId)
-		conditionsMatches:add(Condition.Node(Condition.ColumnName('match2id'), Condition.Comparator.eq, matchId))
-	end)
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName('namespace'), Comparator.eq, 0),
+			ConditionNode(ColumnName('namespace'), Comparator.neq, 0),
+		},
+		ConditionUtil.anyOf(ColumnName('match2id'), matchIds),
+	}
 
 	---@type StandingTableOpponentData[]
 	local opponents = {}
 	Lpdb.executeMassQuery(
 		'match2',
 		{
-			conditions = conditionsMatches:toString(),
+			conditions = tostring(conditions),
 		},
 		function(match2)
 			local roundNumbers = matchIdToRound[match2.match2id]
