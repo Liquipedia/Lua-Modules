@@ -22,6 +22,8 @@ local ColumnName = Condition.ColumnName
 
 local StandingsParseLpdb = {}
 
+local NAMESPACE_MATCH = 130
+
 ---@param rounds {roundNumber: integer, matches: string[]}[]
 ---@param scoreMapper fun(opponent: match2opponent): number|nil
 ---@return StandingTableOpponentData[]
@@ -47,7 +49,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 	end)
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionNode(ColumnName('namespace'), Comparator.neq, 130),
+		ConditionNode(ColumnName('namespace'), Comparator.neq, NAMESPACE_MATCH),
 		ConditionUtil.anyOf(ColumnName('match2id'), matchIds),
 	}
 
