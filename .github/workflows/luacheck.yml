@@ -69,7 +69,7 @@ jobs:
 
       - name: Run test
         run: |
-          npm run --slient lua-test -- -v --run=ci --output=junit > busted.xml
+          npm run --silent lua-test -- -v --run=ci --output=junit > busted.xml
 
       - name: Report test
         uses: mikepenz/action-junit-report@v5
