@@ -30,7 +30,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local hasSubmatches = Logic.readBool(args.hasSubmatches)
 
 	local lines = Array.extend(
-		'{{Match|finished=',
+		'{{Match',
 		bestof ~= 0 and (INDENT .. '|bestof=' .. bestof) or nil,
 		hasSubmatches and INDENT .. '|hasSubmatches=1' or nil,
 		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil,
@@ -52,7 +52,7 @@ end
 ---@return string
 function WikiCopyPaste._getMap(hasSubmatches)
 	local lines = Array.extend(
-		'{{Map',
+		'{{Map|finished=',
 		INDENT .. INDENT .. '|score1= |score2=',
 		hasSubmatches and {
 			INDENT .. INDENT .. '|penaltyScore1= |penaltyScore2=',
