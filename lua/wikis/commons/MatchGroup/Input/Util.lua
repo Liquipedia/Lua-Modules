@@ -203,6 +203,9 @@ function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 		local byeOpponent = Opponent.blank()
 		byeOpponent.name = 'BYE'
 		return MatchGroupInputUtil.mergeRecordWithOpponent({}, byeOpponent)
+	elseif opponent.type ~= Opponent.literal and Opponent.isTbd(opponent) then
+		opponent = Opponent.tbd()
+		return MatchGroupInputUtil.mergeRecordWithOpponent({}, opponent)
 	end
 
 	---@type number|string?
