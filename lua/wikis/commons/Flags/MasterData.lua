@@ -1536,6 +1536,11 @@ local data = {
 		localised = '',
 		name = '',
 	},
+	['unknown'] = {
+		flag = 'File:World hd.png', -- Temporary for testing only
+		localised = '',
+		name = '',
+	},
 }
 
 -- This table includes:
@@ -2086,7 +2091,7 @@ local threeLetter = {
 	['sea'] = 'southeastasia',
 	['uae'] = 'unitedarabemirates',
 
-	['tbd'] = 'filler',
+	['tbd'] = 'unknown',
 }
 
 -- This table includes:

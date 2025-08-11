@@ -12,12 +12,11 @@ local DisplayUtil = Lua.import('Module:DisplayUtil')
 local Logic = Lua.import('Module:Logic')
 local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
-local Abbreviation = Lua.import('Module:Abbreviation')
 
 local Opponent = Lua.import('Module:Opponent')
 
 local TBD = 'TBD'
-local TBD_ABBREVIATION = Abbreviation.make{text = TBD, title = 'To be determined (or to be decided)'}
+local ZERO_WIDTH_SPACE = '&#8203;'
 
 --Display components for players.
 ---@class PlayerDisplay
@@ -30,7 +29,6 @@ local PlayerDisplay = {}
 ---@field showFlag boolean?
 ---@field showLink boolean?
 ---@field showPlayerTeam boolean?
----@field abbreviateTbd boolean?
 ---@field dq boolean?
 ---@field note string|number|nil
 ---@field team string?
@@ -53,13 +51,13 @@ local PlayerDisplay = {}
 function PlayerDisplay.BlockPlayer(props)
 	local player = props.player
 
-	local zeroWidthSpace = '&#8203;'
 	local nameNode = mw.html.create(props.dq and 's' or 'span'):addClass('name')
-		:wikitext(props.abbreviateTbd and Opponent.playerIsTbd(player) and TBD_ABBREVIATION
-			or props.showLink ~= false and Logic.isNotEmpty(player.pageName)
-			and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
-			or Logic.emptyOr(player.displayName, zeroWidthSpace)
-		)
+
+	if not Opponent.playerIsTbd(player) and props.showLink ~= false and Logic.isNotEmpty(player.pageName) then
+		nameNode:wikitext('[[' .. player.pageName .. '|' .. player.displayName .. ']]')
+	else
+		nameNode:wikitext(Logic.emptyOr(player.displayName, ZERO_WIDTH_SPACE))
+	end
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
 
 	local noteNode
@@ -68,7 +66,7 @@ function PlayerDisplay.BlockPlayer(props)
 	end
 
 	local flagNode
-	if props.showFlag ~= false and player.flag then
+	if props.showFlag ~= false then
 		flagNode = PlayerDisplay.Flag{flag = player.flag}
 	end
 
@@ -135,10 +133,14 @@ function PlayerDisplay.InlinePlayer(props)
 end
 
 -- Note: Lua.import('Module:Flags').Icon automatically includes a span with class="flag"
----@param args {flag: string?}
+---@param props {flag: string?}
 ---@return string
-function PlayerDisplay.Flag(args)
-	return Flags.Icon{flag = args.flag, shouldLink = false}
+function PlayerDisplay.Flag(props)
+	local flag = props.flag
+	if not flag then
+		flag = 'unknown'
+	end
+	return Flags.Icon{flag = flag, shouldLink = false}
 end
 
 return Class.export(PlayerDisplay, {exports = {

@@ -187,7 +187,6 @@ end
 ---@field showFlag boolean?
 ---@field showLink boolean?
 ---@field showPlayerTeam boolean?
----@field abbreviateTbd boolean?
 ---@field playerClass string?
 ---@field teamStyle teamStyle?
 ---@field dq boolean?
