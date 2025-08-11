@@ -40,6 +40,10 @@ local BracketOpponentEntry = Class.new(
 		if opponent.type == Opponent.team and options.showTbd == false and
 				(Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)) then
 			opponent = Opponent.blank() --[[@as StarcraftStandardOpponent]]
+		elseif Opponent.typeIsParty(opponent.type) and options.showTbd == false and Opponent.isTbd(opponent) then
+			Array.forEach(opponent.players, function(player)
+				player.displayName = player.displayName == 'TBD' and '' or player.displayName
+			end)
 		end
 
 		local showFactionBackground = opponent.type == Opponent.solo
