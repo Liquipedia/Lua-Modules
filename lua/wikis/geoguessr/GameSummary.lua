@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:GameSummary/Starcraft
+-- page=Module:GameSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
