@@ -9,10 +9,12 @@ local Lua = require('Module:Lua')
 
 local DateExt = Lua.import('Module:Date/Ext')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
+local Template = Lua.import('Module:Template')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local Link = Lua.import('Module:Widget/Basic/Link')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
@@ -56,7 +58,7 @@ local CONTENT = {
 	matches = {
 		heading = 'Matches',
 		body = HtmlWidgets.Fragment{children = {
-			'{{Liquipedia:Upcoming_and_ongoing_matches_on_mainpage}}',
+			Template.safeExpand(mw.getCurrentFrame(), 'Liquipedia:Upcoming_and_ongoing_matches_on_mainpage'),
 			Div{
 				css = {
 					['text-align'] = 'center',
