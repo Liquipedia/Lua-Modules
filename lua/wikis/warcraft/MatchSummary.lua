@@ -196,13 +196,9 @@ function CustomMatchSummary.DisplayHeroes(opponent, options)
 		classes = {'brkts-popup-body-element-vertical-centered'},
 		css = {['flex-direction'] = 'column', ['padding-' .. (options.flipped and 'left' or 'right')] = '8px'},
 		children = Array.map(heroesPerPlayer, function(heroes)
-			return HtmlWidgets.Div{
-				classes = {'brkts-popup-body-element-thumbs', 'brkts-champion-icon'},
-				children = MatchSummaryWidgets.Characters{
-					flipped = options.flipped,
-					characters = heroes,
-					bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (options.flipped and 'blue' or 'red'),
-				},
+			return MatchSummaryWidgets.Characters{
+				flipped = options.flipped,
+				characters = heroes,
 			}
 		end)
 	}
