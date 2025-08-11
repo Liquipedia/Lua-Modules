@@ -55,8 +55,21 @@ local CONTENT = {
 	},
 	matches = {
 		heading = 'Matches',
-		body = '{{Liquipedia:Upcoming_and_ongoing_matches_on_mainpage}}  <div style="text-align: center; padding: 5px;"> ' ..
-		'<i>[[Liquipedia:Upcoming and ongoing matches|See more matches]]</i></div>',
+		body = HtmlWidgets.Fragment{children = {
+			'{{Liquipedia:Upcoming_and_ongoing_matches_on_mainpage}}',
+			Div{
+				css = {
+					['text-align'] = 'center',
+					padding = '5px',
+				},
+				children = HtmlWidgets.I{
+					children = Link{
+						link = 'Liquipedia:Upcoming and ongoing matches',
+						children = 'See more matches'
+					}
+				}
+			}
+		}},
 		padding = true,
 		boxid = 1507,
 	},
