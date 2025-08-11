@@ -18,6 +18,7 @@ local REGION_TO_SUPERREGION = {
 	['Europe'] = 'EMEA',
 	['Turkey'] = 'EMEA',
 	['Middle East'] = 'EMEA',
+	['MENA'] = 'EMEA',
 	['Arab States'] = 'EMEA',
 	['CIS'] = 'EMEA',
 	['China'] = 'CN',
