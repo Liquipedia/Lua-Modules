@@ -2197,7 +2197,6 @@ local aliases = {
 	['uk'] = 'unitedkingdom',
 	['ff'] = 'filler',
 	['fillerflag'] = 'filler',
-	['unknown'] = 'filler',
 
 	['non'] = 'nonrepresenting',
 	['none'] = 'nonrepresenting',
