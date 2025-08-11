@@ -56,7 +56,7 @@ function Game:createInfobox()
 						return {
 							Cell{
 								name = #developers > 1 and 'Developers' or 'Developer',
-								content = developers,
+								children = developers,
 							}
 						}
 					end
@@ -72,14 +72,14 @@ function Game:createInfobox()
 						return {
 							Cell{
 								name = #publishers > 1 and 'Publishers' or 'Publisher',
-								content = publishers,
+								children = publishers,
 							}
 						}
 					end
 				}
 			}
 		},
-		Cell{name = 'Release Date(s)', content = self:getAllArgsForBase(args, 'releasedate')},
+		Cell{name = 'Release Date(s)', children = self:getAllArgsForBase(args, 'releasedate')},
 		Customizable{
 			id = 'platform',
 			children = {
@@ -89,7 +89,7 @@ function Game:createInfobox()
 						return {
 							Cell{
 								name = #platforms > 1 and 'Platforms' or 'Platform',
-								content = platforms,
+								children = platforms,
 							}
 						}
 					end
@@ -97,16 +97,7 @@ function Game:createInfobox()
 			}
 		},
 		Customizable{id = 'custom', children = {}},
-		Builder{
-			builder = function()
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = links},
 		Center{children = {args.footnotes}},
 	}
 

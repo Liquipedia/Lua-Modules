@@ -18,8 +18,7 @@ local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local RoundSelector = Lua.import('Module:Widget/Standings/RoundSelector')
 local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local STATUS_TO_DISPLAY = {
 	dq = 'DQ',

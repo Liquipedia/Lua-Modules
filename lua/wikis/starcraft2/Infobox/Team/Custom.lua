@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
@@ -24,8 +25,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 local Team = Lua.import('Module:Infobox/Team')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
@@ -46,7 +46,7 @@ local CustomTeam = Class.new(Team)
 local CustomInjector = Class.new(Injector)
 
 local ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
-local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 20
+local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = Info.config.defaultMaxPlayersPerPlacement
 local PLAYER_EARNINGS_ABBREVIATION = '<abbr title="Earnings of players while on the team">Player earnings</abbr>'
 
 ---@param frame Frame
@@ -71,8 +71,8 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		return {
-			Cell{name = 'Approx. Total Winnings', content = {displayEarnings(self.caller.teamEarnings)}},
-			Cell{name = PLAYER_EARNINGS_ABBREVIATION, content = {displayEarnings(self.caller.playerEarnings)}},
+			Cell{name = 'Approx. Total Winnings', children = {displayEarnings(self.caller.teamEarnings)}},
+			Cell{name = PLAYER_EARNINGS_ABBREVIATION, children = {displayEarnings(self.caller.playerEarnings)}},
 		}
 	elseif id == 'achievements' then
 		local achievements, soloAchievements = Achievements.teamAndTeamSolo()
@@ -93,7 +93,7 @@ function CustomInjector:parse(id, widgets)
 		if raceBreakdown then
 			Array.appendWith(widgets,
 				Title{children = 'Player Breakdown'},
-				Cell{name = 'Number of Players', content = {raceBreakdown.total}},
+				Cell{name = 'Number of Players', children = {raceBreakdown.total}},
 				Breakdown{children = raceBreakdown.display, classes = {'infobox-center'}}
 			)
 		end
@@ -104,7 +104,7 @@ function CustomInjector:parse(id, widgets)
 		while(not String.isEmpty(args['history' .. index .. 'title'])) do
 			table.insert(widgets, Cell{
 				name = args['history' .. index .. 'title'],
-				content = {args['history' .. index]}
+				children = {args['history' .. index]}
 			})
 			index = index + 1
 		end

@@ -9,9 +9,8 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Icon = Lua.import('Module:Icon')
-local OpponentLib = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLib.Opponent
-local OpponentDisplay = OpponentLib.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local String = Lua.import('Module:StringUtils')
 local Template = Lua.import('Module:Template')
 

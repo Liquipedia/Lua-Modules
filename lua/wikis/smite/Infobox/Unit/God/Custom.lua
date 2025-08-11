@@ -5,19 +5,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local CharacterWinLoss = require('Module:CharacterWinLoss')
-local Class = require('Module:Class')
-local DisplayIcon = require('Module:DisplayIcon')
 local Lua = require('Module:Lua')
-local Math = require('Module:MathUtil')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local CharacterWinLoss = Lua.import('Module:CharacterWinLoss')
+local Class = Lua.import('Module:Class')
+local DisplayIcon = Lua.import('Module:DisplayIcon')
+local Math = Lua.import('Module:MathUtil')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -72,7 +73,7 @@ function CustomInjector:parse(id, widgets)
 			)
 		return {
 			Breakdown{classes = {'infobox-center'}, children = breakDownContents},
-			Cell{name = 'Real Name', content = {args.realname}},
+			Cell{name = 'Real Name', children = {args.realname}},
 		}
 	elseif id == 'cost' then
 		local cost = Array.append({},
@@ -80,7 +81,7 @@ function CustomInjector:parse(id, widgets)
 				String.isNotEmpty(args.costgems ) and (args.costgems .. ' ' .. GEMS_ICON) or nil
 			)
 			return {
-				Cell{name = 'Price', content = {table.concat(cost, '&emsp;&ensp;')}},
+				Cell{name = 'Price', children = {table.concat(cost, '&emsp;&ensp;')}},
 			}
 	elseif id == 'custom' then
 		return self.caller:getCustomCells(widgets)
@@ -95,9 +96,9 @@ function CustomGod:getCustomCells(widgets)
 	local args = self.args
 	Array.appendWith(
 		widgets,
-		Cell{name = 'Attack Type', content = {args.attacktype}},
-		Cell{name = 'Difficulty', content = {args.difficulty}},
-		Cell{name = 'Release Date', content = {args.releasedate}}
+		Cell{name = 'Attack Type', children = {args.attacktype}},
+		Cell{name = 'Difficulty', children = {args.difficulty}},
+		Cell{name = 'Release Date', children = {args.releasedate}}
 	)
 
 	if Array.any({'hp', 'hplvl', 'hp5', 'hp5lvl'}, function(key) return String.isNotEmpty(args[key]) end) then
@@ -110,18 +111,18 @@ function CustomGod:getCustomCells(widgets)
 
 	Array.appendWith(
 		widgets,
-		Cell{name = 'Health', content = {bonusPerLevel(args.hp, args.hplvl)}},
-		Cell{name = 'Health Regen (HP5)', content = {bonusPerLevel(args.hp5, args.hp5lvl)}},
-		Cell{name = 'Mana', content = {bonusPerLevel(args.mana, args.manalvl)}},
-		Cell{name = 'Mana Regen (MP5)', content = {bonusPerLevel(args.mp5, args.mp5lvl)}},
-		Cell{name = 'Movement Speed', content = {bonusPerLevel(args.speed, args.speedlvl)}},
-		Cell{name = 'Attack Range', content = {bonusPerLevel(args.attackrange, args.attackrangelvl)}},
-		Cell{name = 'Attack Speed', content = {bonusPerLevel(args.attackspeed, args.attackspeedlvl)}},
-		Cell{name = 'Attack Damage', content = {bonusPerLevel(args.damage, args.damagelvl), args.damagebonus}},
-		Cell{name = 'Progression', content = {args.progression}},
+		Cell{name = 'Health', children = {bonusPerLevel(args.hp, args.hplvl)}},
+		Cell{name = 'Health Regen (HP5)', children = {bonusPerLevel(args.hp5, args.hp5lvl)}},
+		Cell{name = 'Mana', children = {bonusPerLevel(args.mana, args.manalvl)}},
+		Cell{name = 'Mana Regen (MP5)', children = {bonusPerLevel(args.mp5, args.mp5lvl)}},
+		Cell{name = 'Movement Speed', children = {bonusPerLevel(args.speed, args.speedlvl)}},
+		Cell{name = 'Attack Range', children = {bonusPerLevel(args.attackrange, args.attackrangelvl)}},
+		Cell{name = 'Attack Speed', children = {bonusPerLevel(args.attackspeed, args.attackspeedlvl)}},
+		Cell{name = 'Attack Damage', children = {bonusPerLevel(args.damage, args.damagelvl), args.damagebonus}},
+		Cell{name = 'Progression', children = {args.progression}},
 		Title{children = 'Protections'},
-		Cell{name = 'Physical', content = {bonusPerLevel(args.physical, args.physicallvl)}},
-		Cell{name = 'Magical', content = {bonusPerLevel(args.magical, args.magicallvl)}}
+		Cell{name = 'Physical', children = {bonusPerLevel(args.physical, args.physicallvl)}},
+		Cell{name = 'Magical', children = {bonusPerLevel(args.magical, args.magicallvl)}}
 	)
 
 	local wins, loses = CharacterWinLoss.run()
@@ -131,7 +132,7 @@ function CustomGod:getCustomCells(widgets)
 
 	return Array.append(widgets,
 		Title{children = 'Esports Statistics'},
-		Cell{name = 'Win Rate', content = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}}
+		Cell{name = 'Win Rate', children = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}}
 	)
 end
 

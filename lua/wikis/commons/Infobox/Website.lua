@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local Table = Lua.import('Module:Table')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Links = Lua.import('Module:Links')
@@ -18,7 +17,6 @@ local Header = Widgets.Header
 local Title = Widgets.Title
 local Cell = Widgets.Cell
 local Center = Widgets.Center
-local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 
 ---@class WebsiteInfobox: BasicInfobox
@@ -44,23 +42,13 @@ function Website:createInfobox()
 		},
 		Center{children = {args.caption}},
 		Title{children = 'Website Information'},
-		Cell{name = 'Type', content = {args.type}},
-		Cell{name = 'Available Language(s)', content = self:getAllArgsForBase(args, 'language')},
-		Cell{name = 'Content License', content = {args.content_license}},
-		Cell{name = 'Launched', content = {args.date_of_launch}},
-		Cell{name = 'Current Status', content = {args.current_status}},
+		Cell{name = 'Type', children = {args.type}},
+		Cell{name = 'Available Language(s)', children = self:getAllArgsForBase(args, 'language')},
+		Cell{name = 'Content License', children = {args.content_license}},
+		Cell{name = 'Launched', children = {args.date_of_launch}},
+		Cell{name = 'Current Status', children = {args.current_status}},
 		Customizable{id = 'custom', children = {}},
-		Builder{
-			builder = function()
-				local links = Links.transform(args)
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = Links.transform(args)},
 		Center{children = {args.footnotes}},
 	}
 

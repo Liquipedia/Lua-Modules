@@ -50,7 +50,7 @@ function CustomInjector:parse(id, widgets)
 			end
 			table.insert(locations, text)
 		end
-		return { Cell{name = 'Location', content = locations} }
+		return { Cell{name = 'Location', children = locations} }
 	elseif id == 'customcontent' then
 		return {
 			Chronology{args = args, showTitle = true}

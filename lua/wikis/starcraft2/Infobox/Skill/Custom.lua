@@ -54,22 +54,22 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		Array.appendWith(
 			widgets,
-			Cell{name = '[[Game Speed|Duration 2]]', content = {self.caller:getDuration(2)}},
-			Cell{name = 'Researched from', content = {self.caller:getResearchFrom()}},
-			Cell{name = 'Research Cost', content = {self.caller:getResearchCost()}},
-			Cell{name = 'Research Hotkey', content = {self.caller:getResearchHotkey()}},
-			Cell{name = 'Move Speed', content = {args.movespeed}}
+			Cell{name = '[[Game Speed|Duration 2]]', children = {self.caller:getDuration(2)}},
+			Cell{name = 'Researched from', children = {self.caller:getResearchFrom()}},
+			Cell{name = 'Research Cost', children = {self.caller:getResearchCost()}},
+			Cell{name = 'Research Hotkey', children = {self.caller:getResearchHotkey()}},
+			Cell{name = 'Move Speed', children = {args.movespeed}}
 		)
 	elseif id == 'cost' then
-		return {Cell{name = 'Cost', content = {self.caller:getCostDisplay()}}}
+		return {Cell{name = 'Cost', children = {self.caller:getCostDisplay()}}}
 	elseif id == 'hotkey' then
-		return {Cell{name = '[[Hotkeys per Race|Hotkey]]', content = {self.caller:getHotkeys()}}}
+		return {Cell{name = '[[Hotkeys per Race|Hotkey]]', children = {self.caller:getHotkeys()}}}
 	elseif id == 'cooldown' then
 		return {
-			Cell{name = Page.makeInternalLink({onlyIfExists = true},'Cooldown') or 'Cooldown', content = {args.cooldown}}
+			Cell{name = Page.makeInternalLink({onlyIfExists = true},'Cooldown') or 'Cooldown', children = {args.cooldown}}
 		}
 	elseif id == 'duration' then
-		return {Cell{name = '[[Game Speed|Duration]]', content = {self.caller:getDuration()}}}
+		return {Cell{name = '[[Game Speed|Duration]]', children = {self.caller:getDuration()}}}
 	end
 
 	return widgets

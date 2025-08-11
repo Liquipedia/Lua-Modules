@@ -5,16 +5,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local PlacementStats = require('Module:InfoboxPlacementStats')
-local RoleOf = require('Module:RoleOf')
-local Template = require('Module:Template')
+
+local Class = Lua.import('Module:Class')
+local PlacementStats = Lua.import('Module:InfoboxPlacementStats')
+local RoleOf = Lua.import('Module:RoleOf')
+local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class WildriftInfoboxTeam: InfoboxTeam
@@ -52,7 +53,7 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
-		table.insert(widgets, Cell{name = 'Abbreviation', content = {args.abbreviation}})
+		table.insert(widgets, Cell{name = 'Abbreviation', children = {args.abbreviation}})
 	end
 
 	return widgets

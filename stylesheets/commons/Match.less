@@ -179,4 +179,33 @@
 			}
 		}
 	}
+
+	&-vods-area {
+		display: grid;
+		grid-template-columns: repeat( auto-fit, minmax( 16%, 1fr ) );
+		margin-top: 0.5rem;
+		padding: 0.5rem;
+		gap: 0.25rem;
+		border-radius: 0.5rem;
+
+		.theme--light & {
+			border: 0.0625rem solid var( --clr-secondary-80 );
+			background-color: #ebebeb;
+		}
+
+		.theme--dark & {
+			border: 0.0625rem solid var( --clr-on-surface-dark-primary-40 );
+			background-color: var( --clr-on-surface-dark-primary-8 );
+		}
+
+		.btn {
+			.theme--light & {
+				background-color: var( --clr-secondary-100 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-8 );
+			}
+		}
+	}
 }

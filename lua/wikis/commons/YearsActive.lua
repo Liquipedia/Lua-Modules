@@ -9,8 +9,4 @@ local Lua = require('Module:Lua')
 
 local CustomActiveYears = Lua.import('Module:YearsActive/Base')
 
--- wiki specific settings
-CustomActiveYears.defaultNumberOfStoredPlayersPerPlacement = 10
-CustomActiveYears.additionalConditions = ''
-
 return CustomActiveYears

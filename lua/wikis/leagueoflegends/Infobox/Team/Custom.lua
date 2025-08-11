@@ -12,8 +12,7 @@ local Logic = Lua.import('Module:Logic')
 local RoleOf = Lua.import('Module:RoleOf')
 local String = Lua.import('Module:StringUtils')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -81,8 +80,8 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		return {
-			Cell{name = 'Abbreviation', content = {args.abbreviation}},
-			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {
+			Cell{name = 'Abbreviation', children = {args.abbreviation}},
+			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', children = {
 				args.affiliate and OpponentDisplay.InlineTeamContainer{template = args.affiliate, displayType = 'standard'} or nil}}
 		}
 	end

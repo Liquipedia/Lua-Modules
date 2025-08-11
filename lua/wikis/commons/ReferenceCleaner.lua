@@ -31,6 +31,17 @@ function ReferenceCleaner.clean(args)
 	return ''
 end
 
+---@param args {date: string?}
+---@return string?
+function ReferenceCleaner.cleanDateIfKnown(args)
+	local date = args.date
+	local isUnknownDate = function()
+		return date == nil or string.lower(date) == 'tba' or string.lower(date) == 'tbd'
+	end
+	if isUnknownDate() then return end
+	return ReferenceCleaner.clean{input = date}
+end
+
 ---@param args {input: string?}
 ---@return string
 ---@overload fun(dateWithRef: table): string

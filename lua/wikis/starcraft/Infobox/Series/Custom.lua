@@ -52,14 +52,14 @@ function CustomInjector:parse(id, widgets)
 	if id == 'totalprizepool' then
 		if Logic.readBoolOrNil(args.prizepooltot) == false then return {} end
 		return {
-			Cell{name = 'Cumulative Prize Pool', content = {self.caller:_displaySeriesPrizepools()}},
+			Cell{name = 'Cumulative Prize Pool', children = {self.caller:_displaySeriesPrizepools()}},
 		}
 	elseif id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Patch', content = {self.caller:_getPatch()}},
-			Cell{name = 'Server', content = {args.server}},
-			Cell{name = 'Type', content = {args.type}},
-			Cell{name = 'Format', content = {args.format}}
+			Cell{name = 'Patch', children = {self.caller:_getPatch()}},
+			Cell{name = 'Server', children = {args.server}},
+			Cell{name = 'Type', children = {args.type}},
+			Cell{name = 'Format', children = {args.format}}
 		)
 	end
 

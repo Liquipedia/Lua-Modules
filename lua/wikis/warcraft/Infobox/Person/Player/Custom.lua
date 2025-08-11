@@ -5,17 +5,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local Math = require('Module:MathUtil')
-local Variables = require('Module:Variables')
+
+local Class = Lua.import('Module:Class')
+local Faction = Lua.import('Module:Faction')
+local Math = Lua.import('Module:MathUtil')
+local Variables = Lua.import('Module:Variables')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
@@ -59,12 +60,12 @@ function CustomInjector:parse(id, widgets)
 		if currentYearEarnings == 0 then return widgets end
 		local currentYearEarningsDisplay = '$' .. mw.getContentLanguage():formatNum(Math.round(currentYearEarnings))
 
-		table.insert(widgets, Cell{name = 'Approx. Earnings '.. CURRENT_YEAR, content = {currentYearEarningsDisplay}})
+		table.insert(widgets, Cell{name = 'Approx. Earnings '.. CURRENT_YEAR, children = {currentYearEarningsDisplay}})
 
 	elseif id == 'role' then
 		-- WC doesn't show any roles, but rather shows the Race/Faction instead
 		return {
-			Cell{name = 'Race', content = {Faction.toName(args.race)}}
+			Cell{name = 'Race', children = {Faction.toName(args.race)}}
 		}
 	end
 	return widgets

@@ -162,6 +162,10 @@ return {
 
 	leagueoflegends_kda = 'fas fa-swords fa-flip-vertical',
 
+	-- Usage: Day night cycle information
+	day = 'fas fa-sun',
+	night = 'fas fa-moon',
+
 	-- Usage: Boolean info
 	yes = 'fa fa-check',
 	no = 'fa fa-times',
@@ -195,22 +199,23 @@ return {
 	getting_started = 'far fa-seedling',
 	file_standards_guide = 'far fa-file-check',
 
-	-- External platforms
+	-- Streams and Vods
 	youtube = 'fab fa-youtube',
 	twitch = 'fab fa-twitch',
 	facebook = 'fab fa-facebook-f',
-	kick = 'lp-icon lp-icon-21 lp-kick',
-	afreeca = 'lp-icon lp-icon-21 lp-afreeca',
-	bilibili = 'lp-icon lp-icon-21 lp-bilibili',
+	kick = 'liquipedia-custom-icon liquipedia-custom-icon-kick',
+	afreeca = 'liquipedia-custom-icon liquipedia-custom-icon-afreecatv',
+	bilibili = 'liquipedia-custom-icon liquipedia-custom-icon-bilibili',
 	cc = 'lp-icon lp-icon-21 lp-cc',
-	dailymotion = 'lp-icon lp-icon-21 lp-dailymotion',
-	douyu = 'lp-icon lp-icon-21 lp-douyu',
-	huomao = 'lp-icon lp-icon-21 lp-huomao',
-	huya = 'lp-icon lp-icon-21 lp-huya',
+	dailymotion = 'liquipedia-custom-icon liquipedia-custom-icon-dailymotion',
+	douyu = 'liquipedia-custom-icon liquipedia-custom-icon-duotone  liquipedia-custom-icon-douyu-duotone',
+	huomao = 'liquipedia-custom-icon liquipedia-custom-icon-huomao',
+	huya = 'liquipedia-custom-icon liquipedia-custom-icon-duotone liquipedia-custom-icon-huya-duotone',
 	loco = 'lp-icon lp-icon-21 lp-loco',
 	mildom = 'lp-icon lp-icon-21 lp-mildom',
-	nimo = 'lp-icon lp-icon-21 lp-nimo',
-	trovo = 'lp-icon lp-icon-21 lp-trovo',
-	tl = 'lp-icon lp-icon-21 lp-stream',
-	stream = 'lp-icon lp-icon-21 lp-stream',
+	nimo = 'liquipedia-custom-icon liquipedia-custom-icon-nimo-tv',
+	trovo = 'liquipedia-custom-icon liquipedia-custom-icon-trovo',
+	tl = 'liquipedia-custom-icon liquipedia-custom-icon-team-liquid',
+	stream = 'liquipedia-custom-icon liquipedia-custom-icon-team-liquid',
+	vod_play = 'far fa-play'
 }

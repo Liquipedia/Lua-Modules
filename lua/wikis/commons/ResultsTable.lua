@@ -19,8 +19,7 @@ local Table = Lua.import('Module:Table')
 
 local BaseResultsTable = Lua.import('Module:ResultsTable/Base')
 
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 --- @class ResultsTable: BaseResultsTable
 local ResultsTable = Class.new(BaseResultsTable)

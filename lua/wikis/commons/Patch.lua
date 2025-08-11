@@ -34,58 +34,65 @@ local function datapointType()
 	return 'patch'
 end
 
+---@param props {
+---additionalConditions: AbstractConditionNode|AbstractConditionNode[]?,
+---limit: string|integer?,
+---order: string?,
+---}?
+---@return StandardPatch[]
+function Patch.queryPatches(props)
+	props = props or {}
+
+	local conditions = ConditionTree(BooleanOperator.all)
+		:add(ConditionNode(ColumnName('type'), Comparator.eq, datapointType()))
+	if props.additionalConditions then
+		conditions:add(props.additionalConditions)
+	end
+	local records = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		conditions = tostring(conditions),
+		order = props.order,
+		limit = tonumber(props.limit) or 100,
+	})
+
+	return Array.map(records, Patch.patchFromRecord)
+end
+
 ---@param date string
 ---@return StandardPatch?
 function Patch.getPatchByDate(date)
-	local record = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = '[[type::' .. datapointType() .. ']] AND ([[date::<' .. date .. ']] OR [[date::' .. date .. ']])',
+	return Patch.queryPatches{
+		additionalConditions = ConditionNode(ColumnName('date'), Comparator.le, date),
 		order = 'date desc',
-		limit = 1,
-	})[1]
-	if not record then
-		return nil
-	end
-	return Patch.patchFromRecord(record)
+		limit = 1
+	}[1]
 end
 
 ---@param config {game: string?, startDate: integer?, endDate: integer?, year: integer?, limit: string|integer?}
 ---@return StandardPatch[]
 function Patch.getByGameYearStartDateEndDate(config)
 	local conditions = ConditionTree(BooleanOperator.all):add(Array.append(
-		{ConditionNode(ColumnName('type'), Comparator.eq, 'patch')},
-		config.game and ConditionNode(ColumnName('extradata_game'), Comparator.eq, config.game) or nil,
-		config.year and ConditionNode(ColumnName('date_year'), Comparator.eq, config.year) or nil,
+		{},
+		config.game and ConditionNode(ColumnName('game', 'extradata'), Comparator.eq, config.game) or nil,
+		config.year and ConditionNode(ColumnName('year', 'date'), Comparator.eq, config.year) or nil,
 		config.startDate and ConditionNode(ColumnName('date'), Comparator.ge, config.startDate) or nil,
 		config.endDate and ConditionNode(ColumnName('date'), Comparator.le, config.endDate) or nil
 	))
 
-	local records = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = conditions:toString(),
+	return Patch.queryPatches{
+		additionalConditions = conditions,
 		order = 'date desc, pagename desc',
-		limit = config.limit or 100,
-	})
-
-	return Array.map(records, Patch.patchFromRecord)
+		limit = config.limit or 100
+	}
 end
 
 ---@param config {game: string?}
 ---@return StandardPatch?
 function Patch.getLatestPatch(config)
-	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionNode(ColumnName('type'), Comparator.eq, 'patch'),
-		config.game and ConditionNode(ColumnName('extradata_game'), Comparator.eq, config.game) or nil
-	}
-
-	local record = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = conditions:toString(),
+	return Patch.queryPatches{
+		conditions = config.game and ConditionNode(ColumnName('extradata_game'), Comparator.eq, config.game) or nil,
 		order = 'date desc, pagename desc',
 		limit = 1,
-	})[1]
-	if type(record) ~= 'table' then
-		return nil
-	end
-
-	return Patch.patchFromRecord(record)
+	}[1]
 end
 
 ---@param record datapoint

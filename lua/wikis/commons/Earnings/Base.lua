@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local MathUtils = Lua.import('Module:MathUtil')
@@ -17,13 +18,11 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
 
-local OpponentLibrary = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
+
+local DEFAULT_MAX_PLAYERS_PER_PLACEMENT = Info.config.defaultMaxPlayersPerPlacement or 10
 
 local Earnings = {}
-
--- customizable in /Custom
-Earnings.defaultNumberOfStoredPlayersPerMatch = 10
 
 ---@class playerEarningsArgs
 ---@field player string the player/individual for whom the earnings shall be calculated
@@ -57,7 +56,7 @@ function Earnings.calculateForPlayer(args)
 
 	local prefix = args.prefix or 'p'
 
-	local playerPositionLimit = tonumber(args.playerPositionLimit) or Earnings.defaultNumberOfStoredPlayersPerMatch
+	local playerPositionLimit = tonumber(args.playerPositionLimit) or DEFAULT_MAX_PLAYERS_PER_PLACEMENT
 	if playerPositionLimit <= 0 then
 		error('"playerPositionLimit" has to be >= 1')
 	end
@@ -101,7 +100,7 @@ function Earnings.calculateForTeam(args)
 		return 0
 	end
 
-	local playerPositionLimit = tonumber(args.playerPositionLimit) or Earnings.defaultNumberOfStoredPlayersPerMatch
+	local playerPositionLimit = tonumber(args.playerPositionLimit) or DEFAULT_MAX_PLAYERS_PER_PLACEMENT
 	if playerPositionLimit <= 0 then
 		error('"playerPositionLimit" has to be >= 1')
 	end

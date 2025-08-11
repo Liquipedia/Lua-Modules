@@ -5,8 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Tier = Lua.import('Module:Tier/Custom')
 
@@ -22,6 +23,7 @@ local CustomResultsTable = {}
 ---@param args table
 ---@return Html
 function CustomResultsTable.results(args)
+	args.gameIcons = true
 	local resultsTable = ResultsTable(args)
 
 	resultsTable.tierDisplay = CustomResultsTable.tierDisplay
@@ -33,6 +35,7 @@ end
 ---@param args table
 ---@return Html
 function CustomResultsTable.awards(args)
+	args.gameIcons = true
 	local awardsTable = AwardsTable(args)
 
 	awardsTable.tierDisplay = CustomResultsTable.tierDisplay

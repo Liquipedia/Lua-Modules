@@ -39,9 +39,9 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		return {
 			Title{children = 'Hero Power Information'},
-			Cell{name = 'Class', content = {args.class}, options = {makeLink = true}},
-			Cell{name = 'Hero', content = {args.hero}, options = {makeLink = true}},
-			Cell{name = 'Playable', content = {args.playable}},
+			Cell{name = 'Class', children = {args.class}, options = {makeLink = true}},
+			Cell{name = 'Hero', children = {args.hero}, options = {makeLink = true}},
+			Cell{name = 'Playable', children = {args.playable}},
 		}
 	end
 

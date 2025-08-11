@@ -40,10 +40,10 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Layout', content = {args.layout}},
-			Cell{name = 'Versions', content = {args.versions}},
-			Cell{name = 'Playlists', content = {args.playlists}},
-			Cell{name = 'Gamemodes', content = self.caller:getGameModes(args)}
+			Cell{name = 'Layout', children = {args.layout}},
+			Cell{name = 'Versions', children = {args.versions}},
+			Cell{name = 'Playlists', children = {args.playlists}},
+			Cell{name = 'Gamemodes', children = self.caller:getGameModes(args)}
 		)
 	end
 	return widgets

@@ -5,14 +5,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Variables = Lua.import('Module:Variables')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local PrizePool = Lua.import('Module:PrizePool')
 

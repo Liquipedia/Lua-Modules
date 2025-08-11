@@ -28,8 +28,7 @@ local DEFAULT_TIER_TYPE = 'general'
 
 local Language = mw.getContentLanguage()
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 ---Entry point
 ---@param args table?

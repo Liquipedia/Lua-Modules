@@ -5,20 +5,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local CosmeticIcon = require('Module:Cosmetic')
-local DateExt = require('Module:Date/Ext')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Template = require('Module:Template')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local CosmeticIcon = Lua.import('Module:Cosmetic')
+local DateExt = Lua.import('Module:Date/Ext')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Cosmetic = Lua.import('Module:Infobox/Cosmetic')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Builder = Widgets.Builder
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -63,7 +64,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				options = {columns = args.hero and 3 or 10, suppressColon = true},
 				name = args.hero and Template.expandTemplate(mw.getCurrentFrame(), 'Hero entry', {args.hero}) or ' ',
-				content = {
+				children = {
 					'<b>Rarity:</b> ' .. Template.safeExpand(mw.getCurrentFrame(), 'Raritylink', {args.rarity}),
 					args.slot and ('<b>Slot:</b> ' .. slotText) or nil,
 				}
@@ -72,11 +73,11 @@ function CustomInjector:parse(id, widgets)
 				CustomCosmetic._buyNow(Logic.readBool(args.marketable or true), args.defindex)
 			}},
 			Title{children = 'Extra Information'},
-			Cell{name = 'Created By', content =
+			Cell{name = 'Created By', children =
 				(args.creator == 'Valve' and {Template.safeExpand(mw.getCurrentFrame(), 'Valve icon')})
 				or self.caller:getAllArgsForBase(args, 'creator')
 			},
-			Cell{name = 'Released', content = {
+			Cell{name = 'Released', children = {
 				Template.expandTemplate(mw.getCurrentFrame(), 'Patch link', {args.releasedate})
 			}},
 			Builder{builder = function()
@@ -87,7 +88,7 @@ function CustomInjector:parse(id, widgets)
 					name = 'Expired'
 				end
 				return {
-					Cell{name = name, content = {
+					Cell{name = name, children = {
 						DateExt.formatTimestamp('j F Y', ts)
 					}}
 				}
@@ -95,7 +96,7 @@ function CustomInjector:parse(id, widgets)
 			Builder{builder = function()
 				local orgins = Array.parseCommaSeparatedString(args.availability or 'Unavailable')
 				return {
-					Cell{name = #orgins == 1 and 'Origin' or 'Origins', content = orgins}
+					Cell{name = #orgins == 1 and 'Origin' or 'Origins', children = orgins}
 				}
 			end},
 			Center{children = {args.description}},

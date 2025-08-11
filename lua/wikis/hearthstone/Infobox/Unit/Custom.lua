@@ -23,7 +23,7 @@ local Title = Widgets.Title
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local Image = require('Module:Widget/Image/Icon/Image')
+local Image = Lua.import('Module:Widget/Image/Icon/Image')
 
 local CRAFT_DATA = {
 	common = {cost = '40 (Gold: 400)', value = '5 (Gold: 50)'},

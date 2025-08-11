@@ -17,8 +17,7 @@ local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
 
@@ -166,41 +165,40 @@ function TransferList:fetch()
 	self.conditions = self:_buildConditions()
 	local queryData = mw.ext.LiquipediaDB.lpdb('transfer', {
 		conditions = self.conditions,
-		limit = self.config.limit,
+		limit = self.config.limit * 5,
 		order = self.config.sortOrder,
-		groupby = 'date desc, toteam desc, fromteam desc, role1 desc',--role2 desc
 	})
 
 	local groupedData = {}
-	Array.forEach(queryData, function(transfer)
-		local transfers = mw.ext.LiquipediaDB.lpdb('transfer', {
-			conditions = self:_buildConditions{
-				date = transfer.date,
-				fromTeam = transfer.fromteam or '',
-				toTeam = transfer.toteam or '',
-				roles1 = {transfer.role1},
-			},
-			limit = self.config.limit + 10,
-			order = self.config.sortOrder,
-		})
-		local currentGroup
-		local cache = {}
-		Array.forEach(transfers, function(transf)
-			if
-				cache.role2 ~= transf.role2 or
-				cache.team1_2 ~= transf.extradata.fromteamsec or
-				cache.team2_2 ~= transf.extradata.toteamsec
-			then
-				cache.role2 = transf.role2
-				cache.team1_2 = transfer.extradata.fromteamsec
-				cache.team2_2 = transfer.extradata.toteamsec
-				Array.appendWith(groupedData, currentGroup)
-				currentGroup = {}
+	local currentGroup
+	local cache = {}
+	for _, transfer in ipairs(queryData) do
+		if
+			cache.team1 ~= transfer.fromteam or
+			cache.team2 ~= transfer.toteam or
+			cache.date ~= transfer.date or
+			cache.role1 ~= transfer.role1 or
+			cache.role2 ~= transfer.role2 or
+			cache.team1_2 ~= transfer.extradata.fromteamsec or
+			cache.team2_2 ~= transfer.extradata.toteamsec
+		then
+			cache.team1 = transfer.fromteam
+			cache.team2 = transfer.toteam
+			cache.date = transfer.date
+			cache.role1 = transfer.role1
+			cache.role2 = transfer.role2
+			cache.team1_2 = transfer.extradata.fromteamsec
+			cache.team2_2 = transfer.extradata.toteamsec
+
+			Array.appendWith(groupedData, currentGroup)
+			if #groupedData == self.config.limit then
+				break
 			end
-			table.insert(currentGroup, transf)
-		end)
-		Array.appendWith(groupedData, currentGroup)
-	end)
+			currentGroup = {}
+		end
+		table.insert(currentGroup, transfer)
+	end
+	Array.appendWith(groupedData, currentGroup)
 
 	self.groupedTransfers = groupedData
 

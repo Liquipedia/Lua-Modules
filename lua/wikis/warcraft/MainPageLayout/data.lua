@@ -12,10 +12,12 @@ local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
+local W3EloRanking = Lua.import('Module:Widget/W3EloRanking')
 
 local CONTENT = {
 	usefulArticles = {
@@ -45,8 +47,23 @@ local CONTENT = {
 	},
 	eloRanking = {
 		heading = 'Warcraft3.info Elo Ranking',
-		body = '{{W3EloMainpage}}',
+		body = HtmlWidgets.Fragment{children = {
+			W3EloRanking{},
+			Div{
+				css = {['text-align'] = 'center'},
+				children = Link{
+					link = 'https://warcraft3.info/stats/elo_ranking',
+					linktype = 'external',
+					children = 'Full ranking',
+				}
+			}
+		}},
 		boxid = 1525,
+	},
+	specialEvents = {
+		noPanel = true,
+		body = '{{Liquipedia:Special Event}}',
+		boxid = 1516,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -138,19 +155,23 @@ return {
 				size = 4,
 				children = {
 					{
-						mobileOrder = 2,
-						content = CONTENT.eloRanking ,
+						mobileOrder = 1,
+						content = CONTENT.specialEvents,
 					},
 					{
 						mobileOrder = 3,
-						content = CONTENT.thisDay,
+						content = CONTENT.eloRanking ,
 					},
 					{
 						mobileOrder = 4,
+						content = CONTENT.thisDay,
+					},
+					{
+						mobileOrder = 5,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 7,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -159,7 +180,7 @@ return {
 				size = 8,
 				children = {
 					{
-						mobileOrder = 1,
+						mobileOrder = 2,
 						children = {
 							{
 								children = {
@@ -190,7 +211,7 @@ return {
 						},
 					},
 					{
-						mobileOrder = 5,
+						mobileOrder = 6,
 						content = CONTENT.usefulArticles,
 					},
 				},

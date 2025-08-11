@@ -15,7 +15,7 @@ local Template = Lua.import('Module:Template')
 local Team = Lua.import('Module:Infobox/Team')
 local Injector = Lua.import('Module:Widget/Injector')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class HeroesInfoboxTeam: InfoboxTeam

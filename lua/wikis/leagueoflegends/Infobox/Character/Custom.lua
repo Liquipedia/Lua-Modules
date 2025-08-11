@@ -55,14 +55,14 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Region',
-				content = { self:_toCellContent('region', 'RegionIcon') }
+				children = { self:_toCellContent('region', 'RegionIcon') }
 			},
 		}
 	elseif id == 'role' then
 		return {
 			Cell{
 				name = 'Role',
-				content = WidgetUtil.collect(
+				children = WidgetUtil.collect(
 					self:_toCellContent('primaryrole', 'ClassIcon'),
 					self:_toCellContent('secondaryrole', 'ClassIcon')
 				)
@@ -110,17 +110,17 @@ function CustomCharacter:_getPriceCell()
 			children = { RIOT_POINTS_ICON, ' ', args.costrp }
 		} or nil
 	)
-	return Cell{ name = 'Price', content = costContent }
+	return Cell{ name = 'Price', children = costContent }
 end
 
 ---@return Widget[]
 function CustomCharacter:_getCustomCells()
 	local args = self.args
 	local widgets = {
-		Cell{name = 'Attack Type', content = {args.attacktype}},
-		Cell{name = 'Resource Bar', content = {args.secondarybar}},
-		Cell{name = 'Secondary Bar', content = {args.secondarybar1}},
-		Cell{name = 'Secondary Attributes', content = {args.secondaryattributes1}},
+		Cell{name = 'Attack Type', children = {args.attacktype}},
+		Cell{name = 'Resource Bar', children = {args.secondarybar}},
+		Cell{name = 'Secondary Bar', children = {args.secondarybar1}},
+		Cell{name = 'Secondary Attributes', children = {args.secondaryattributes1}},
 	}
 
 	if Array.any({'hp', 'hplvl', 'hpreg', 'hpreglvl'}, function(key) return String.isNotEmpty(args[key]) end) then
@@ -133,24 +133,24 @@ function CustomCharacter:_getCustomCells()
 
 	Array.appendWith(
 		widgets,
-		Cell{name = 'Health', content = {bonusPerLevel(args.hp, args.hplvl)}},
-		Cell{name = 'Health Regen', content = {bonusPerLevel(args.hpreg, args.hpreglvl)}},
-		Cell{name = 'Courage', content = {args.courage}},
-		Cell{name = 'Rage', content = {args.rage}},
-		Cell{name = 'Fury', content = {args.fury}},
-		Cell{name = 'Heat', content = {args.heat}},
-		Cell{name = 'Ferocity', content = {args.ferocity}},
-		Cell{name = 'Bloodthirst', content = {args.bloodthirst}},
-		Cell{name = 'Mana', content = {bonusPerLevel(args.mana, args.manalvl)}},
-		Cell{name = 'Mana Regen', content = {bonusPerLevel(args.manareg, args.manareglvl)}},
-		Cell{name = 'Energy', content = {args.energy}},
-		Cell{name = 'Energy Regen', content = {args.energyreg}},
-		Cell{name = 'Attack Damage', content = {bonusPerLevel(args.damage, args.damagelvl)}},
-		Cell{name = 'Attack Speed', content = {bonusPerLevel(args.attackspeed, args.attackspeedlvl)}},
-		Cell{name = 'Attack Range', content = {args.attackrange}},
-		Cell{name = 'Armor', content = {bonusPerLevel(args.armor, args.armorlvl)}},
-		Cell{name = 'Magic Resistance', content = {bonusPerLevel(args.magicresistance, args.magicresistancelvl)}},
-		Cell{name = 'Movement Speed', content = {args.movespeed}}
+		Cell{name = 'Health', children = {bonusPerLevel(args.hp, args.hplvl)}},
+		Cell{name = 'Health Regen', children = {bonusPerLevel(args.hpreg, args.hpreglvl)}},
+		Cell{name = 'Courage', children = {args.courage}},
+		Cell{name = 'Rage', children = {args.rage}},
+		Cell{name = 'Fury', children = {args.fury}},
+		Cell{name = 'Heat', children = {args.heat}},
+		Cell{name = 'Ferocity', children = {args.ferocity}},
+		Cell{name = 'Bloodthirst', children = {args.bloodthirst}},
+		Cell{name = 'Mana', children = {bonusPerLevel(args.mana, args.manalvl)}},
+		Cell{name = 'Mana Regen', children = {bonusPerLevel(args.manareg, args.manareglvl)}},
+		Cell{name = 'Energy', children = {args.energy}},
+		Cell{name = 'Energy Regen', children = {args.energyreg}},
+		Cell{name = 'Attack Damage', children = {bonusPerLevel(args.damage, args.damagelvl)}},
+		Cell{name = 'Attack Speed', children = {bonusPerLevel(args.attackspeed, args.attackspeedlvl)}},
+		Cell{name = 'Attack Range', children = {args.attackrange}},
+		Cell{name = 'Armor', children = {bonusPerLevel(args.armor, args.armorlvl)}},
+		Cell{name = 'Magic Resistance', children = {bonusPerLevel(args.magicresistance, args.magicresistancelvl)}},
+		Cell{name = 'Movement Speed', children = {args.movespeed}}
 	)
 
 	local wins, loses = CharacterWinLoss.run(args.name)
@@ -160,7 +160,7 @@ function CustomCharacter:_getCustomCells()
 
 	return Array.append(widgets,
 		Title{children = 'Esports Statistics'},
-		Cell{name = 'Win Rate', content = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}}
+		Cell{name = 'Win Rate', children = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}}
 	)
 end
 

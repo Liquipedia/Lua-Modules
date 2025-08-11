@@ -14,6 +14,7 @@ Widgets.Builder = Lua.import('Module:Widget/Builder')
 Widgets.Customizable = Lua.import('Module:Widget/Customizable')
 
 --- Infobox Widgets
+Widgets.Accommodation = Lua.import('Module:Widget/Infobox/Accommodation')
 Widgets.Breakdown = Lua.import('Module:Widget/Infobox/Breakdown')
 Widgets.Cell = Lua.import('Module:Widget/Infobox/Cell')
 Widgets.Center = Lua.import('Module:Widget/Infobox/Center')
@@ -21,7 +22,10 @@ Widgets.Chronology = Lua.import('Module:Widget/Infobox/ChronologyContainer')
 Widgets.Header = Lua.import('Module:Widget/Infobox/Header')
 Widgets.Highlights = Lua.import('Module:Widget/Infobox/Highlights')
 Widgets.Links = Lua.import('Module:Widget/Infobox/Links')
+Widgets.Location = Lua.import('Module:Widget/Infobox/Location')
+Widgets.Organizers = Lua.import('Module:Widget/Infobox/Organizers')
 Widgets.Title = Lua.import('Module:Widget/Infobox/Title')
+Widgets.Venue = Lua.import('Module:Widget/Infobox/Venue')
 
 --- Table Widgets (div-table) (will be removed)
 Widgets.TableOld = Lua.import('Module:Widget/Table/Old')

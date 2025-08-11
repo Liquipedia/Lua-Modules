@@ -66,6 +66,16 @@ return {
 		transfers = {
 			showTeamName = true,
 		},
+		thisDay = {
+			tiers = {1, 2},
+			excludeTierTypes = {'Qualifier'},
+			showPatches = true,
+		},
+		infoboxPlayer = {
+			automatedHistory = {
+				mode = 'merge',
+			},
+		},
 	},
 	defaultRoundPrecision = 0,
 }

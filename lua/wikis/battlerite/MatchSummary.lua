@@ -7,8 +7,9 @@
 
 local CustomMatchSummary = {}
 
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Logic = Lua.import('Module:Logic')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')

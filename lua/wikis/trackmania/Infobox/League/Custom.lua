@@ -5,19 +5,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Game = require('Module:Game')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Game = Lua.import('Module:Game')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -50,13 +51,13 @@ function CustomInjector:parse(id, widgets)
 		local partners = self.caller:getAllArgsForBase(args, 'partner')
 		table.insert(widgets, Cell{
 			name = 'Partner' .. (#partners > 1 and 's' or ''),
-			content = Array.map(partners, Page.makeInternalLink)
+			children = Array.map(partners, Page.makeInternalLink)
 		})
 	elseif id == 'gamesettings' then
 		local games = self.caller:getAllArgsForBase(args, 'game')
 		table.insert(widgets, Cell{
 			name = 'Game' .. (#games > 1 and 's' or ''),
-			content = Array.map(games,
+			children = Array.map(games,
 					function(game)
 						local info = Game.raw{game = game}
 						if not info then
@@ -69,11 +70,11 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Title{children = String.isNotEmpty(args.team_number) and 'Teams' or 'Players'})
 		table.insert(widgets, Cell{
 			name = 'Number of Teams',
-			content = {args.team_number}
+			children = {args.team_number}
 		})
 		table.insert(widgets, Cell{
 			name = 'Number of Players',
-			content = {args.player_number}
+			children = {args.player_number}
 		})
 
 		local maps = self.caller:getAllArgsForBase(args, 'map')
@@ -156,10 +157,10 @@ function CustomLeague:_createCircuitInformation(widgets)
 	Array.appendWith(widgets,
 		Cell{
 			name = 'Circuit',
-			content = {self:_createCircuitLink()}
+			children = {self:_createCircuitLink()}
 		},
-		Cell{name = 'Circuit Tier', content = {args.circuittier}},
-		Cell{name = 'Tournament Region', content = {args.region}},
+		Cell{name = 'Circuit Tier', children = {args.circuittier}},
+		Cell{name = 'Tournament Region', children = {args.region}},
 		Chronology{args = {next = args.circuit_next, previous = args.circuit_previous}, showTitle = false}
 	)
 end
