@@ -18,7 +18,9 @@ local NS_HELP = 12
 local NS_MODULE = 828
 local NS_MODULE_TALK = 829
 
-local Namespace = {}
+local Namespace = {
+	NS_MATCH = 130,
+}
 
 ---Determins whether a given title object is in the given namespaces, and optionally their talk namespaces.
 ---@param title Title

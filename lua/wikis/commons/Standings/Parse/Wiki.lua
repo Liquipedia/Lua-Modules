@@ -25,8 +25,6 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local NAMESPACE_MATCH = 130
-
 local StandingsParseWiki = {}
 
 --[[
@@ -110,7 +108,7 @@ end
 function StandingsParseWiki.getMatchIdsOfMatchGroup(matchGroupId)
 	local matchGroup = mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = tostring(ConditionTree(BooleanOperator.all):add{
-			ConditionNode(ColumnName('namespace'), Comparator.neq, NAMESPACE_MATCH),
+			ConditionNode(ColumnName('namespace'), Comparator.neq, Namespace.NS_MATCH),
 			ConditionNode(ColumnName('match2bracketid'), Comparator.eq, matchGroupId),
 		}),
 		query = 'match2id',

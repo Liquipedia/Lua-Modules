@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Lpdb = Lua.import('Module:Lpdb')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Condition = Lua.import('Module:Condition')
@@ -21,8 +22,6 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local StandingsParseLpdb = {}
-
-local NAMESPACE_MATCH = 130
 
 ---@param rounds {roundNumber: integer, matches: string[]}[]
 ---@param scoreMapper fun(opponent: match2opponent): number|nil
@@ -49,7 +48,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 	end)
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionNode(ColumnName('namespace'), Comparator.neq, NAMESPACE_MATCH),
+		ConditionNode(ColumnName('namespace'), Comparator.neq, Namespace.NS_MATCH),
 		ConditionUtil.anyOf(ColumnName('match2id'), matchIds),
 	}
 
