@@ -17,21 +17,15 @@ local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 local CONTENT = {
-	theGame = {
-		heading = 'The Sport',
-		body = '{{Liquipedia:Sport Panel}}',
-		padding = true,
-		boxid = 1503,
-	},
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{rumours = true},
-		boxid = 1509,
+		boxid = 1501,
 	},
 	specialEvents = {
-		noPanel = true,
+		heading ='<span class="fas fa-hourglass-half cinnabar-theme-dark-gb"></span>&nbsp;Active and Upcoming Series',
 		body = '{{Liquipedia:Active Upcoming Series}}',
-		boxid = 1516
+		boxid = 1502
 	},
 	filterButtons = {
 		noPanel = true,
@@ -41,35 +35,25 @@ local CONTENT = {
 		},
 	},
 	tournaments = {
-		noPanel = true,
+		heading ='<span class="fas fa-trophy cinnabar-theme-dark-gb"></span>&nbsp;F1 & Feeder Series Seasons',
 		body = '{{Liquipedia:Tournaments List}}',
-		boxid = 1517
+		boxid = 1503
 	},
 	seasonOverview = {
-		noPanel = true,
+		heading ='<span class="fas fa-trophy cinnabar-theme-dark-gb"></span>&nbsp;Current Season Overview',
 		body = '{{Liquipedia:Season Overview}}',
-		boxid = 1518
-	},
-	driversLineup = {
-		noPanel = true,
-		body = '{{Liquipedia:Drivers Line-up}}',
-		boxid = 1519
-	},
-	seasonStandings = {
-		heading = '<span class="fas fa-trophy cinnabar-theme-dark-gb"></span>&nbsp;Current Season Standings', -- todo: use icon module here instead
-		body = '{{Liquipedia:Season Standing}}',
-		boxid = 1520
+		boxid = 1504
 	},
 	seasonCalendar = {
-		noPanel = true,
+		heading ='<span class="fas fa-calendar cinnabar-theme-dark-gb"></span>&nbsp;Season Calendar',
 		body = '{{Liquipedia:Season Calendar}}',
-		boxid = 1521
+		boxid = 1505
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
 		body = WantToHelp{},
 		padding = true,
-		boxid = 1504,
+		boxid = 1508,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
@@ -77,40 +61,41 @@ local CONTENT = {
 			birthdayListPage = 'Birthday list'
 		},
 		padding = true,
-		boxid = 1510,
+		boxid = 1509,
 	},
 	upcomingRace = {
-		noPanel = true,
-		body = '{{Liquipedia:Upcoming Race Weekend}}',
-		boxid = 1522
-	},
-	upcomingCircuit = {
-		noPanel = true,
-		body = '{{Liquipedia:Upcoming Circuit}}',
-		boxid = 1523
+		heading ='<span class="fas fa-trophy cinnabar-theme-dark-gb"></span>&nbsp;Upcoming Race',
+		body = '{{Liquipedia:Upcoming Grand Prix}}',
+		boxid = 1509
 	},
 	previousRace = {
-		noPanel = true,
+		heading ='<span class="fas fa-flag-checkered cinnabar-theme-dark-gb"></span>&nbsp;Previous Race Weekend',
 		body = '{{Liquipedia:Previous Race Weekend}}',
-		boxid = 1524
+		boxid = 1511
 	},
 	allF1Seasons = {
-		noPanel = true,
+		heading ='<span class="fas fa-landmark cinnabar-theme-dark-gb"></span>&nbsp;Formula 1 Seasons',
 		body = '{{Liquipedia:All F1 Seasons}}',
-		boxid = 1525
+		boxid = 1512
+	},
+		theGame = {
+		heading = 'The Sport',
+		body = '{{Liquipedia:Sport Panel}}',
+		padding = true,
+		boxid = 1513,
 	},
 }
 
 return {
 	banner = {
-		lightmode = '',
-		darkmode = '',
+		lightmode = 'F1_2018_allmode.png',
+		darkmode = 'F1_2018_allmode.png',
 	},
 	metadesc = 'Comprehensive Formula 1 wiki with articles covering everything from drivers, to teams, to seasons, to race chassis and history.',
 	title = 'Formula 1',
 	navigation = {
 		{
-			file = '',
+			file = '2024 F1 Dutch GP Podium.jpg',
 			title = 'Drivers',
 			link = 'Portal:Drivers',
 			count = {
@@ -119,7 +104,7 @@ return {
 			},
 		},
 		{
-			file = '',
+			file = 'F1 Emilia-Romagna Grand Prix 2025.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -128,7 +113,7 @@ return {
 			},
 		},
 		{
-			file = '',
+			file = 'Leclerc vs Hamilton Silverstone.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -137,7 +122,7 @@ return {
 			},
 		},
 		{
-			file = '',
+			file = 'FIA Formula One Constructors Championship Trophy 2014.jpg',
 			title = 'Championships',
 			link = 'Portal:Championships',
 			count = {
@@ -146,17 +131,12 @@ return {
 			},
 		},
 		{
-			file = '',
+			file = 'F1 Google Earth Circuit Sao Paulo.jpeg',
 			title = 'Circuits',
 			link = 'Portal:Circuits',
 		},
 		{
-			file = 'F1 Circuit de Monaco Monochrome 2023 lightmode.svg',
-			title = 'Circuits',
-			link = 'Portal:Circuits',
-		},
-		{
-			file = '',
+			file = 'Alonso at Canada 2008.jpg',
 			title = 'Help',
 			link = 'Help:Editing',
 		},
@@ -167,7 +147,7 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 2,
+						mobileOrder = 1,
 						content = CONTENT.specialEvents,
 					},
 					{
@@ -176,18 +156,10 @@ return {
 					},
 					{
 						mobileOrder = 6,
-						content = CONTENT.driversLineup,
-					},
-					{
-						mobileOrder = 7,
-						content = CONTENT.seasonStandings,
-					},
-					{
-						mobileOrder = 8,
 						content = CONTENT.seasonCalendar,
 					},
 					{
-						mobileOrder = 9,
+						mobileOrder = 7,
 						content = CONTENT.transfers,
 					},
 				}
@@ -196,31 +168,27 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 3,
+						mobileOrder = 2,
 						content = CONTENT.upcomingRace,
 					},
 					{
-						mobileOrder = 4,
-						content = CONTENT.upcomingCircuit,
-					},
-					{
-						mobileOrder = 10,
+						mobileOrder = 3,
 						content = CONTENT.previousRace,
 					},
 					{
-						mobileOrder = 11,
+						mobileOrder = 4,
 						content = CONTENT.tournaments,
 					},
 					{
-						mobileOrder = 12,
+						mobileOrder = 9,
 						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 13,
+						mobileOrder = 10,
 						content = CONTENT.wantToHelp,
 					},
 					{
-						mobileOrder = 14,
+						mobileOrder = 8,
 						content = CONTENT.allF1Seasons,
 					},
 				},
@@ -228,7 +196,7 @@ return {
 			{
 				children = {
 					{
-						mobileOrder = 15,
+						mobileOrder = 11,
 						content = CONTENT.theGame,
 					},
 				},
