@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Image = require('Module:Image')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Image = Lua.import('Module:Image')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
@@ -91,7 +92,7 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		Array.appendWith(widgets,
-			Cell{name = 'Tier', content = {args.tier}},
+			Cell{name = 'Tier', children = {args.tier}},
 			Title{children = 'Alliances'},
 			Center{children = Array.interleave(Array.map(self.caller.alliances, allianceIcon), '&nbsp;')},
 			Title{children = 'Level Changes'},
@@ -127,6 +128,7 @@ end
 
 ---@param lpdbData table
 ---@param args table
+---@return table
 function CustomCharacter:addToLpdb(lpdbData, args)
 	local extradata = lpdbData.extradata
 	extradata.name = lpdbData.name

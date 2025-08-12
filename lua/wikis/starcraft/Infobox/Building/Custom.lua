@@ -46,19 +46,19 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		return {
-			Cell{name = 'Attributes', content = {args.att}},
-			Cell{name = '[[Distance#Sight Range|Sight]]', content = {args.sight}},
-			Cell{name = '[[Distance#Sight Range|Detection Range]]', content = {args.detection_range}},
-			Cell{name = 'Type', content = {args.type}},
-			Cell{name = 'Size', content = {args.size}},
-			Cell{name = '[[Game Speed#DPS|Energy Maximum]]', content = caller:_contentWithBonus('energy', 8)},
+			Cell{name = 'Attributes', children = {args.att}},
+			Cell{name = '[[Distance#Sight Range|Sight]]', children = {args.sight}},
+			Cell{name = '[[Distance#Sight Range|Detection Range]]', children = {args.detection_range}},
+			Cell{name = 'Type', children = {args.type}},
+			Cell{name = 'Size', children = {args.size}},
+			Cell{name = '[[Game Speed#DPS|Energy Maximum]]', children = caller:_contentWithBonus('energy', 8)},
 			Cell{name = '[[Game Speed#Regeneration Rates|Starting Energy]]',
-				content = caller:_contentWithBonus('energystart', 9)},
-			Cell{name = 'Animated', content = {args.banimation}},
+				children = caller:_contentWithBonus('energystart', 9)},
+			Cell{name = 'Animated', children = {args.banimation}},
 		}
 	elseif id == 'cost' then
 		return {
-			Cell{name = 'Cost', content = {CostDisplay.run{
+			Cell{name = 'Cost', children = {CostDisplay.run{
 				faction = args.race,
 				minerals = args.min,
 				mineralsTotal = args.totalmin,
@@ -72,49 +72,49 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(args.requires)}},
+			Cell{name = 'Requirements', children = {String.convertWikiListToHtmlList(args.requires)}},
 		}
 	elseif id == 'hotkey' then
 		return {
-			Cell{name = '[[Shortcuts|Hotkey]]', content = {caller:_getHotkeys()}}
+			Cell{name = '[[Shortcuts|Hotkey]]', children = {caller:_getHotkeys()}}
 		}
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Built By', content = {args.builtfrom}},
-			Cell{name = 'Builds', content = {String.convertWikiListToHtmlList(args.builds)}},
-			Cell{name = 'Morphs into', content = {String.convertWikiListToHtmlList(args.morphs)}},
-			Cell{name = 'Morphs into', content = {String.convertWikiListToHtmlList(args.morphsf)}},
-			Cell{name = 'Add-Ons', content = {String.convertWikiListToHtmlList(args.addons)}},
+			Cell{name = 'Built By', children = {args.builtfrom}},
+			Cell{name = 'Builds', children = {String.convertWikiListToHtmlList(args.builds)}},
+			Cell{name = 'Morphs into', children = {String.convertWikiListToHtmlList(args.morphs)}},
+			Cell{name = 'Morphs into', children = {String.convertWikiListToHtmlList(args.morphsf)}},
+			Cell{name = 'Add-Ons', children = {String.convertWikiListToHtmlList(args.addons)}},
 		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocked Tech', content = {String.convertWikiListToHtmlList(args.unlocks)}},
-			Cell{name = 'Upgrades available', content = {String.convertWikiListToHtmlList(args.upgrades)}},
+			Cell{name = 'Unlocked Tech', children = {String.convertWikiListToHtmlList(args.unlocks)}},
+			Cell{name = 'Upgrades available', children = {String.convertWikiListToHtmlList(args.upgrades)}},
 		}
 	elseif id == 'defense' then
 		return {
-			Cell{name = 'Defense', content = {caller:_defenseDisplay()}}
+			Cell{name = 'Defense', children = {caller:_defenseDisplay()}}
 		}
 	elseif id == 'attack' then
 		return {
-			Cell{name = 'Damage', content = {args.damage}},
-			Cell{name = '[[Distance#Range|Range]]', content = {args.range}},
-			Cell{name = '[[Game Speed#Cooldown|Cooldown]]', content = {args.cooldown}},
-			Cell{name = '[[Game Speed#Cooldown|Cooldown Bonus]]', content = caller:_contentWithBonus('cd2', 2)},
-			Cell{name = '[[Game Speed#DPS|DPS]]', content = {args.dps}},
-			Cell{name = '[[Game Speed#DPS|DPS Bonus]]', content = caller:_contentWithBonus('dps2', 3)},
-			Cell{name = 'Ground Attack', content = {args.ground_attack}},
-			Cell{name = '[[Distance#Range|Ground Range]]', content = {args.grange}},
-			Cell{name = '[[Game Speed#Cooldown|G. Cooldown]]', content = {args.gcd}},
-			Cell{name = '[[Game Speed#Cooldown|G. Cooldown Bonus]]', content = caller:_contentWithBonus('gcd2', 4)},
-			Cell{name = '[[Game Speed#DPS|G. DPS]]', content = {args.gdps}},
-			Cell{name = '[[Game Speed#DPS|G. DPS Bonus]]', content = caller:_contentWithBonus('gdps2', 6)},
-			Cell{name = 'Air Attack', content = {args.air_attack}},
-			Cell{name = '[[Distance#Range|Air Range]]', content = {args.arange}},
-			Cell{name = '[[Game Speed#Cooldown|A. Cooldown]]', content = {args.acd}},
-			Cell{name = '[[Game Speed#Cooldown|A. Cooldown Bonus]]', content = caller:_contentWithBonus('acd2', 5)},
-			Cell{name = '[[Game Speed#DPS|A. DPS]]', content = {args.adps}},
-			Cell{name = '[[Game Speed#DPS|A. DPS Bonus]]', content = caller:_contentWithBonus('adps2', 7)},
+			Cell{name = 'Damage', children = {args.damage}},
+			Cell{name = '[[Distance#Range|Range]]', children = {args.range}},
+			Cell{name = '[[Game Speed#Cooldown|Cooldown]]', children = {args.cooldown}},
+			Cell{name = '[[Game Speed#Cooldown|Cooldown Bonus]]', children = caller:_contentWithBonus('cd2', 2)},
+			Cell{name = '[[Game Speed#DPS|DPS]]', children = {args.dps}},
+			Cell{name = '[[Game Speed#DPS|DPS Bonus]]', children = caller:_contentWithBonus('dps2', 3)},
+			Cell{name = 'Ground Attack', children = {args.ground_attack}},
+			Cell{name = '[[Distance#Range|Ground Range]]', children = {args.grange}},
+			Cell{name = '[[Game Speed#Cooldown|G. Cooldown]]', children = {args.gcd}},
+			Cell{name = '[[Game Speed#Cooldown|G. Cooldown Bonus]]', children = caller:_contentWithBonus('gcd2', 4)},
+			Cell{name = '[[Game Speed#DPS|G. DPS]]', children = {args.gdps}},
+			Cell{name = '[[Game Speed#DPS|G. DPS Bonus]]', children = caller:_contentWithBonus('gdps2', 6)},
+			Cell{name = 'Air Attack', children = {args.air_attack}},
+			Cell{name = '[[Distance#Range|Air Range]]', children = {args.arange}},
+			Cell{name = '[[Game Speed#Cooldown|A. Cooldown]]', children = {args.acd}},
+			Cell{name = '[[Game Speed#Cooldown|A. Cooldown Bonus]]', children = caller:_contentWithBonus('acd2', 5)},
+			Cell{name = '[[Game Speed#DPS|A. DPS]]', children = {args.adps}},
+			Cell{name = '[[Game Speed#DPS|A. DPS Bonus]]', children = caller:_contentWithBonus('adps2', 7)},
 		}
 	end
 	return widgets

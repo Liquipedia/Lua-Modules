@@ -54,33 +54,33 @@ function Skill:createInfobox()
 		Customizable{
 			id = 'caster',
 			children = {
-				Cell{name = 'Caster(s)', content = self:getAllArgsForBase(args, 'caster', {makeLink = true})},
+				Cell{name = 'Caster(s)', children = self:getAllArgsForBase(args, 'caster', {makeLink = true})},
 			}
 		},
 		Customizable{
 			id = 'cost',
 			children = {
-				Cell{name = 'Cost', content = {args.cost}},
+				Cell{name = 'Cost', children = {args.cost}},
 			}
 		},
 		Customizable{
 			id = 'hotkey',
 			children = {
-				Cell{name = 'Hotkey', content = {self:_getHotkeys(args)}},
+				Cell{name = 'Hotkey', children = {self:_getHotkeys(args)}},
 			}
 		},
-		Cell{name = 'Range', content = {args.range}},
-		Cell{name = 'Radius', content = {args.radius}},
+		Cell{name = 'Range', children = {args.range}},
+		Cell{name = 'Radius', children = {args.radius}},
 		Customizable{
 			id = 'cooldown',
 			children = {
-				Cell{name = 'Cooldown', content = {args.cooldown}},
+				Cell{name = 'Cooldown', children = {args.cooldown}},
 			}
 		},
 		Customizable{
 			id = 'duration',
 			children = {
-				Cell{name = 'Duration', content = {args.duration}},
+				Cell{name = 'Duration', children = {args.duration}},
 			}
 		},
 		Customizable{id = 'custom', children = {}},

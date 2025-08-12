@@ -6,7 +6,8 @@
 --
 
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Table = Lua.import('Module:Table')
 
 local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
 local CustomOpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')

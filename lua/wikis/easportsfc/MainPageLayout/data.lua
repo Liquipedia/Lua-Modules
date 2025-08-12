@@ -5,8 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
+
+local DateExt = Lua.import('Module:Date/Ext')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')

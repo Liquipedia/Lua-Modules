@@ -50,16 +50,16 @@ function Show:createInfobox()
 		},
 		Center{children = {args.caption}},
 		Title{children = 'Show Information'},
-		Cell{name = 'Host(s)', content = self:getAllArgsForBase(args, 'host', {makeLink = true})},
-		Cell{name = 'Format', content = {args.format}},
-		Cell{name = 'Airs', content = {args.airs}},
-		Cell{name = 'Location', content = {
+		Cell{name = 'Host(s)', children = self:getAllArgsForBase(args, 'host', {makeLink = true})},
+		Cell{name = 'Format', children = {args.format}},
+		Cell{name = 'Airs', children = {args.airs}},
+		Cell{name = 'Location', children = {
 			self:_createLocation(args.country, args.city),
 			self:_createLocation(args.country2, args.city2)
 		}},
-		Cell{name = 'Status', content = {args.status}},
-		Cell{name = 'Start', content = {args.sdate}},
-		Cell{name = 'End', content = {args.edate}},
+		Cell{name = 'Status', children = {args.status}},
+		Cell{name = 'Start', children = {args.sdate}},
+		Cell{name = 'End', children = {args.edate}},
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()

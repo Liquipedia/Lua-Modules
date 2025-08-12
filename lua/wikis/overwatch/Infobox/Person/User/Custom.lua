@@ -66,13 +66,13 @@ function CustomUser:addCustomCells(widgets)
 	local args = self.args
 
 	Array.appendWith(widgets,
-		Cell{name = 'Gender', content = {args.gender}},
-		Cell{name = 'Languages', content = {args.languages}},
-		Cell{name = 'BattleTag', content = {args.battletag}},
-		Cell{name = 'Main Hero', content = {self:_getHeroes()}},
-		Cell{name = 'Favorite players', content = self:_getArgsfromBaseDefault('fav-player', 'fav-players')},
-		Cell{name = 'Favorite casters', content = self:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
-		Cell{name = 'Favorite teams', content = {args['fav-teams']}}
+		Cell{name = 'Gender', children = {args.gender}},
+		Cell{name = 'Languages', children = {args.languages}},
+		Cell{name = 'BattleTag', children = {args.battletag}},
+		Cell{name = 'Main Hero', children = {self:_getHeroes()}},
+		Cell{name = 'Favorite players', children = self:_getArgsfromBaseDefault('fav-player', 'fav-players')},
+		Cell{name = 'Favorite casters', children = self:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
+		Cell{name = 'Favorite teams', children = {args['fav-teams']}}
 )
 
 	if not String.isEmpty(args['fav-team-1']) then
@@ -90,11 +90,11 @@ function CustomUser:addCustomCells(widgets)
 		if not String.isEmpty(args['s' .. index .. 'final']) then
 			display = display .. '&nbsp;<small>(Final: ' .. args['s' .. index .. 'final'] .. ')</small>'
 		end
-		table.insert(widgets, Cell{name = 'Season ' .. index, content = {display}})
+		table.insert(widgets, Cell{name = 'Season ' .. index, children = {display}})
 		index = index + 1
 	end
 
-	table.insert(widgets, Cell{name = 'National teams', content = {args['nationalteams']}})
+	table.insert(widgets, Cell{name = 'National teams', children = {args['nationalteams']}})
 
 	return widgets
 end

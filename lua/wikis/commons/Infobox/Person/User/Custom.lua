@@ -43,11 +43,11 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Gender', content = {args.gender}},
-			Cell{name = 'Languages', content = {args.languages}},
-			Cell{name = 'Favorite Players', content = self.caller:_getArgsfromBaseDefault('fav-player', 'fav-players')},
-			Cell{name = 'Favorite Casters', content = self.caller:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
-			Cell{name = 'Favorite Teams', content = {args['fav-teams']}}
+			Cell{name = 'Gender', children = {args.gender}},
+			Cell{name = 'Languages', children = {args.languages}},
+			Cell{name = 'Favorite Players', children = self.caller:_getArgsfromBaseDefault('fav-player', 'fav-players')},
+			Cell{name = 'Favorite Casters', children = self.caller:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
+			Cell{name = 'Favorite Teams', children = {args['fav-teams']}}
 		)
 		if not String.isEmpty(args['fav-team-1']) then
 			Array.appendWith(widgets,

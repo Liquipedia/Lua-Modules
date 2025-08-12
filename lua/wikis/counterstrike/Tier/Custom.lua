@@ -6,8 +6,8 @@
 --
 
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
+local Table = Lua.import('Module:Table')
 local Tier = Lua.import('Module:Tier/Utils')
 
 local NON_BREAKING_SPACE = '&nbsp;'

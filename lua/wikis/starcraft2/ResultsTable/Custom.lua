@@ -26,7 +26,6 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]'
 local DEFAULT_EVENT_ICON = ''
 local TBD = 'TBD'
-local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 20
 
 local CustomResultsTable = {}
 
@@ -35,7 +34,6 @@ local CustomResultsTable = {}
 ---@return Html?
 function CustomResultsTable.results(frame)
 	local args = Arguments.getArgs(frame)
-	args.playerLimit = MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS
 	args.useIndivPrize = true
 
 	if Logic.readBool(args.awards) then

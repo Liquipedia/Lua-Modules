@@ -46,12 +46,12 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		return WidgetUtil.collect(
 			widgets,
-			Cell{name = 'Recoil control', content = {args['recoil control']}},
-			Cell{name = 'Accurate range', content = {args['accurate range'] and (args['accurate range'] .. 'm') or nil}},
-			Cell{name = 'Penetration power', content = {args['penetration power']}},
-			Cell{name = 'Reload time', content = {args['reload time'] and (args['reload time'] .. 's') or nil}},
-			Cell{name = 'Units per second', content = {args['units per second']}},
-			Cell{name = 'Hotkey', content = {args.hotkey}},
+			Cell{name = 'Recoil control', children = {args['recoil control']}},
+			Cell{name = 'Accurate range', children = {args['accurate range'] and (args['accurate range'] .. 'm') or nil}},
+			Cell{name = 'Penetration power', children = {args['penetration power']}},
+			Cell{name = 'Reload time', children = {args['reload time'] and (args['reload time'] .. 's') or nil}},
+			Cell{name = 'Units per second', children = {args['units per second']}},
+			Cell{name = 'Hotkey', children = {args.hotkey}},
 			caller:_achievementsDisplay()
 		)
 	end

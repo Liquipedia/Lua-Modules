@@ -49,6 +49,12 @@ return {
 			matchWidth = 180,
 			sortCasters = true,
 		},
+		defaultMaxPlayersPerPlacement = 20,
+		infoboxPlayer = {
+			automatedHistory = {
+				mode = 'automatic',
+			},
+		},
 	},
 	defaultRoundPrecision = 0,
 }

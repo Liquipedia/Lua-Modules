@@ -7,8 +7,10 @@
 
 local Json = {}
 
-local Arguments = require('Module:Arguments')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
+local Table = Lua.import('Module:Table')
 
 ---Json-stringifies all arguments from a supplied frame.
 ---@param frame Frame

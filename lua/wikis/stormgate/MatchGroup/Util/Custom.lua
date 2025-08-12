@@ -5,14 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Faction = require('Module:Faction')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
+
+local Array = Lua.import('Module:Array')
+local Faction = Lua.import('Module:Faction')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TypeUtil = Lua.import('Module:TypeUtil')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 

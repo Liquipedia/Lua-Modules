@@ -50,8 +50,8 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 	if id == 'released' then
 		return {
-			Cell{name = 'Type', content = {args.type}, options = {makeLink = true}},
-			Cell{name = 'Released', content = {VersionDisplay.run(args.release)}},
+			Cell{name = 'Type', children = {args.type}, options = {makeLink = true}},
+			Cell{name = 'Released', children = {VersionDisplay.run(args.release)}},
 			Cell{name = 'Removed', children = {VersionDisplay.run(args.removed)}},
 			Cell{name = 'Rarity', children = caller:getAllArgsForBase(args, 'rarity'), options = {makeLink = true}},
 		}

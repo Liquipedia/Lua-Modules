@@ -55,18 +55,18 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Platform', content = {caller.data.platform}}
+			Cell{name = 'Platform', children = {caller.data.platform}}
 		)
 	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.team_number) then
 			Array.appendWith(widgets,
 				Title{children = 'Teams'},
-				Cell{name = 'Number of teams', content = {args.team_number}}
+				Cell{name = 'Number of teams', children = {args.team_number}}
 			)
 		elseif String.isNotEmpty(args.player_number) then
 			Array.appendWith(widgets,
 				Title{children = 'Players'},
-				Cell{name = 'Number of players', content = {args.player_number}}
+				Cell{name = 'Number of players', children = {args.player_number}}
 			)
 		end
 	end

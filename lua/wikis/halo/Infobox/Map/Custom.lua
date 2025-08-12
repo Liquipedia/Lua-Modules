@@ -39,12 +39,12 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Type', content = {args.type}},
-			Cell{name = 'Max Players', content = {args.players}},
-			Cell{name = 'Game Version', content = {self.caller:getGame(args)}, options = {makeLink = true}},
+			Cell{name = 'Type', children = {args.type}},
+			Cell{name = 'Max Players', children = {args.players}},
+			Cell{name = 'Game Version', children = {self.caller:getGame(args)}, options = {makeLink = true}},
 			Cell{
 				name = 'Game Modes',
-				content = Array.map(
+				children = Array.map(
 					self.caller:getGameModes(args),
 					function (gameMode)
 						local modeIcon = MapModes.get({mode = gameMode, date = args.releasedate, size = 15})

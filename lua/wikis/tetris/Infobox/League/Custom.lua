@@ -5,17 +5,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class TetrisLeagueInfobox: InfoboxLeague
@@ -50,12 +51,12 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Teams', content = {args.team_number}},
-			Cell{name = 'Players', content = {args.player_number}}
+			Cell{name = 'Teams', children = {args.team_number}},
+			Cell{name = 'Players', children = {args.player_number}}
 		)
 	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game version', content = {Game.name{game = args.game}}},
+			Cell{name = 'Game version', children = {Game.name{game = args.game}}},
 		}
 	end
 	return widgets

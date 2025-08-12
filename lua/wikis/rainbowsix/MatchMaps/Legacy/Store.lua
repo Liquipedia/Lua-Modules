@@ -13,12 +13,14 @@
 	It is invoked by Template:LegacyMatchListStart, Template:MatchListEnd & Template:LegacySingleMatch.
 ]]
 
-local Arguments = require('Module:Arguments')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
-local MatchGroup = require('Module:MatchGroup')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local Template = require('Module:Template')
+local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local MatchGroup = Lua.import('Module:MatchGroup')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local Template = Lua.import('Module:Template')
 
 local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
@@ -130,7 +132,7 @@ function MatchMapsLegacyStore.closeSingle(frame)
 	-- store match
 	MatchGroup.MatchList(processMatches)
 
-	local MatchGroupBase = require('Module:MatchGroup/Base')
+	local MatchGroupBase = Lua.import('Module:MatchGroup/Base')
 	-- display match
 	local matchHtml = MatchGroup.MatchByMatchId(
 		{id = MatchGroupBase.readBracketId(processMatches.id), matchid = '1', width = matchlistVars:get('width')}

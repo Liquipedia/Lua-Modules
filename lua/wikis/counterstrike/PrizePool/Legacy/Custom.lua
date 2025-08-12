@@ -5,8 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Logic = Lua.import('Module:Logic')
 
 local PrizePoolLegacy = Lua.import('Module:PrizePool/Legacy')
 

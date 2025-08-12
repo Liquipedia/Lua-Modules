@@ -71,12 +71,12 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'custom' then
 		return {
-			Cell{ name = 'Credits Earned', content = {args.credits}},
-			Cell{ name = 'Research Points', content = {args.research}},
-			Cell{ name = 'Kerrigan Levels', content = {args.Kerrigan}},
-			Cell{ name = 'Evolution Unlock', content = {self.caller:_getEvolution()}},
-			Cell{ name = 'New Units', content = {args.units}},
-			Cell{ name = 'Available Heroes', content = {args.heroes}},
+			Cell{ name = 'Credits Earned', children = {args.credits}},
+			Cell{ name = 'Research Points', children = {args.research}},
+			Cell{ name = 'Kerrigan Levels', children = {args.Kerrigan}},
+			Cell{ name = 'Evolution Unlock', children = {self.caller:_getEvolution()}},
+			Cell{ name = 'New Units', children = {args.units}},
+			Cell{ name = 'Available Heroes', children = {args.heroes}},
 		}
 	end
 	return widgets

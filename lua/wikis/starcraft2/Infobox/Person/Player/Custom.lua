@@ -14,8 +14,8 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
-local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Math = Lua.import('Module:MathUtil')
@@ -27,8 +27,7 @@ local YearsActive = Lua.import('Module:YearsActive')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local CustomPerson = Lua.import('Module:Infobox/Person/Custom')
-local Opponent = Lua.import('Module:Opponent/Starcraft')
-local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -41,7 +40,7 @@ local EPT_SEASON = Lua.import('Module:Series/EPT/config', {loadData = true}).cur
 
 local ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
-local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 20
+local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = Info.config.defaultMaxPlayersPerPlacement
 local MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS = 10
 local MAXIMUM_NUMBER_OF_ACHIEVEMENTS = 30
 local NUMBER_OF_RECENT_MATCHES = 10
@@ -79,16 +78,6 @@ function CustomPlayer.run(frame)
 
 	player.shouldQueryData = player:shouldStoreData(player.args)
 
-	player.args.autoTeam = Logic.emptyOr(player.args.autoTeam, true)
-
-	player.args.history = Logic.nilIfEmpty(player.args.history) or TeamHistoryAuto.results{
-		player = player.pagename,
-		convertrole = true,
-		addlpdbdata = Logic.emptyOr(player.args.addlpdbdata, true),
-		cleanRoles = 'Module:TeamHistoryAuto/cleanRole',
-		specialRoles = true,
-	}
-
 	if player.shouldQueryData then
 		player:_getMatchupData(player.pagename)
 	end
@@ -110,25 +99,25 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Approx. Winnings ' .. CURRENT_YEAR,
-				content = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
+				children = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
 			},
-			Cell{name = ranks[1].name or 'Rank', content = {ranks[1].rank}},
-			Cell{name = ranks[2].name or 'Rank', content = {ranks[2].rank}},
-			Cell{name = 'Military Service', content = {args.military}},
+			Cell{name = ranks[1].name or 'Rank', children = {ranks[1].rank}},
+			Cell{name = ranks[2].name or 'Rank', children = {ranks[2].rank}},
+			Cell{name = 'Military Service', children = {args.military}},
 			Cell{
 				name = Abbreviation.make{text = 'Years Active', title = 'Years active as a player'},
-				content = {caller.yearsActive}
+				children = {caller.yearsActive}
 			},
 			Cell{
 				name = Abbreviation.make{text = 'Years Active (caster)', title = 'Years active as a caster'},
-				content = {self.caller:_getActiveCasterYears()}
+				children = {self.caller:_getActiveCasterYears()}
 			},
 		}
 	elseif id == 'status' then
 		return {
 			Cell{
 				name = 'Race',
-				content = {caller:getRaceData(args.race or 'unknown', RACE_FIELD_AS_CATEGORY_LINK)}
+				children = {caller:getRaceData(args.race or 'unknown', RACE_FIELD_AS_CATEGORY_LINK)}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -142,11 +131,11 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Title{children = 'Achievements'},
 			Center{children = {Achievements.display(caller.infoboxAchievements)}},
-			Cell{name = 'All-Kills', content = {allkills > 0 and (ALL_KILL_ICON .. allkills) or nil}}
+			Cell{name = 'All-Kills', children = {allkills > 0 and (ALL_KILL_ICON .. allkills) or nil}}
 		}
 	elseif id == 'achievements' then return {}
 	elseif id == 'history' and string.match(args.retired or '', '%d%d%d%d') then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 
 	return widgets

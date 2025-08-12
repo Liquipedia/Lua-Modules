@@ -5,14 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -37,19 +38,19 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Age', content = {args.age}},
+			Cell{name = 'Age', children = {args.age}},
 			Cell{
 				name = 'Cost',
-				content = {'[[File:Omega Strikers Striker Credits.png|20px]] ' .. args.strikercredits ..
+				children = {'[[File:Omega Strikers Striker Credits.png|20px]] ' .. args.strikercredits ..
 						'  [[File:Omega Strikers Ody Points.png|20px]] ' .. args.odypoints}
 			},
-			Cell{name = 'Affiliation', content = {'[[File:' .. args.affiliation .. ' allmode.png|20px]] ' .. args.affiliation}
+			Cell{name = 'Affiliation', children = {'[[File:' .. args.affiliation .. ' allmode.png|20px]] ' .. args.affiliation}
 			},
-			Cell{name = 'Voice Actor(s)', content = {args.voiceactors}},
+			Cell{name = 'Voice Actor(s)', children = {args.voiceactors}},
 			Title{children = 'Abilities'},
-			Cell{name = 'Primary', content = {'[[File:' .. args.name .. ' - Primary.png|20px]] ' .. args.primary}},
-			Cell{name = 'Secondary', content = {'[[File:' .. args.name .. ' - Secondary.png|20px]] ' .. args.secondary}},
-			Cell{name = 'Special', content = {'[[File:' .. args.name .. ' - Special.png|20px]] ' .. args.special}}
+			Cell{name = 'Primary', children = {'[[File:' .. args.name .. ' - Primary.png|20px]] ' .. args.primary}},
+			Cell{name = 'Secondary', children = {'[[File:' .. args.name .. ' - Secondary.png|20px]] ' .. args.secondary}},
+			Cell{name = 'Special', children = {'[[File:' .. args.name .. ' - Special.png|20px]] ' .. args.special}}
 		)
 	end
 
