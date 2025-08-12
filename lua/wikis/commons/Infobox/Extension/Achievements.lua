@@ -204,7 +204,7 @@ end
 ---@return string[]
 function Achievements._getLpdbKeys(opponentType)
 	if opponentType == Opponent.team then
-		return {'opponentname'}
+		return {'opponenttemplate'}
 	end
 
 	return Array.map(Array.range(1, MAX_PARTY_SIZE), function(opponentIndex)
