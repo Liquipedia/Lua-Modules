@@ -1537,7 +1537,7 @@ local data = {
 		name = '',
 	},
 	['unknown'] = {
-		flag = 'File:World hd.png', -- Temporary for testing only
+		flag = 'File:Flag Unknown.svg',
 		localised = '',
 		name = '',
 	},
