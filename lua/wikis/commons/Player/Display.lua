@@ -53,6 +53,7 @@ local PlayerDisplay = {}
 function PlayerDisplay.BlockPlayer(props)
 	local player = props.player
 
+	mw.logObject(player)
 	local useDefault = props.showTbd ~= false or not Opponent.playerIsTbd(player)
 
 	local nameNode = mw.html.create(props.dq and 's' or 'span'):addClass('name')

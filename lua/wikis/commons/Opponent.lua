@@ -401,7 +401,7 @@ function Opponent.readOpponentArgs(args)
 
 	elseif partySize == 1 then
 		local player = {
-			displayName = args[1] or args.p1 or args.name or '',
+			displayName = args[1] or args.p1 or args.name or 'TBD',
 			flag = String.nilIfEmpty(Flags.CountryName{flag = args.flag or args.p1flag}),
 			pageName = args.link or args.p1link,
 			team = args.team or args.p1team,
