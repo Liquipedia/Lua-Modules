@@ -956,45 +956,49 @@ span.slash {
 			height: 16px;
 		}
 	}
-}
 
-.match-bm-lol-game-summary-score-holder {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	padding: 16px;
-	gap: 4px;
-	text-align: center;
-}
+	&-score {
+		&-holder {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			padding: 16px;
+			gap: 4px;
+			text-align: center;
 
-.match-bm-lol-game-summary-score {
-	font-weight: bold;
-	line-height: 100%;
-	font-size: 20px;
+			.wiki-valorant & {
+				padding: 0.75rem;
+			}
+		}
 
-	@media ( max-width: 435px ) {
-		font-size: 15px;
+		font-weight: bold;
+		line-height: 100%;
+		font-size: 1.25rem;
+
+		@media ( max-width: 435px ) {
+			font-size: 1rem;
+		}
 	}
-}
 
-.match-bm-lol-game-summary-map {
-	font-weight: bold;
-	line-height: 100%;
-	font-size: 1rem;
+	&-map {
+		font-weight: bold;
+		line-height: 100%;
+		font-size: 1rem;
 
-	@media ( max-width: 435px ) {
-		font-size: 0.75rem;
+		@media ( max-width: 435px ) {
+			font-size: 0.75rem;
+		}
 	}
-}
 
-.match-bm-lol-game-summary-length {
-	font-weight: normal;
-	line-height: 100%;
-	font-size: 15px;
+	&-length {
+		font-weight: normal;
+		line-height: 100%;
+		font-size: 1rem;
 
-	@media ( max-width: 435px ) {
-		font-size: 12px;
+		@media ( max-width: 435px ) {
+			font-size: 0.75rem;
+		}
 	}
 }
 
