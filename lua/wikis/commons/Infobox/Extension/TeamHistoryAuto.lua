@@ -238,22 +238,19 @@ function TeamHistoryAuto:_row(transfer)
 	if role == LOAN then
 		teamText = '&#8250;&nbsp;' .. teamText
 	end
-	---@type string|Widget
+	---@type string|Widget|(string|Widget)[]
 	local teamDisplay = teamText
 	if role then
-		teamDisplay = Span{
-			css = {['padding-left'] = '3px'},
-			children = {
-				teamText,
-				' ',
-				HtmlWidgets.I{
-					children = {
-						'(',
-						role,
-						')',
-					},
+		teamDisplay = {
+			teamText,
+			Span{
+				css = {['padding-left'] = '3px', ['font-style'] = 'italic'},
+				children = {
+					'(',
+					role,
+					')',
 				},
-			}
+			},
 		}
 	end
 
