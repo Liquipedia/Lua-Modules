@@ -22,21 +22,14 @@ local CONTENT = {
 		boxid = 1504,
 	},
 	specialEvents = {
-		noPanel = true,
+		heading = 'Feature Event',
 		body = '{{Liquipedia:Special Event}}',
 		boxid = 1516,
 	},
 	popularEsports = {
-		noPanel = true,
+		heading = 'Popular Esports',
 		body = '{{Liquipedia:Popular Esports}}',
 		boxid = 1529,
-	},
-	filterButtons = {
-		noPanel = true,
-		body = Div{
-			css = { width = '100%', ['margin-bottom'] = '8px' },
-			children = { FilterButtonsWidget() }
-		}
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -109,6 +102,14 @@ return {
 						mobileOrder = 1,
 						content = CONTENT.specialEvents,
 					},
+					{
+						mobileOrder = 4,
+						content = CONTENT.transfers,
+					},
+					{
+						mobileOrder = 5,
+						content = CONTENT.thisDay,
+					},
 				}
 			},
 			{ -- Right
@@ -129,14 +130,6 @@ return {
 								children = {
 									{
 										noPanel = true,
-										content = CONTENT.filterButtons,
-									},
-								},
-							},
-							{
-								children = {
-									{
-										noPanel = true,
 										content = CONTENT.tournaments,
 									},
 								},
@@ -144,8 +137,16 @@ return {
 						},
 					},
 					{
-						mobileOrder = 3,
+						mobileOrder = 6,
 						content = CONTENT.wantToHelp,
+					},
+				},
+			},
+			{
+				children = {
+					{
+						mobileOrder = 7,
+						content = CONTENT.theGame,
 					},
 				},
 			},
