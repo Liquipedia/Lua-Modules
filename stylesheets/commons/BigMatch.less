@@ -934,31 +934,27 @@ span.slash {
 	flex-direction: row;
 	justify-content: space-evenly;
 	align-items: center;
-}
 
-.match-bm-lol-game-summary-team {
-	display: flex;
-	align-items: center;
-	padding: 16px;
-	gap: 4px;
-}
+	&-team {
+		display: flex;
+		align-items: center;
+		padding: 16px;
+		gap: 4px;
+	}
 
-.match-bm-lol-game-summary-center {
-	display: flex;
-	align-items: center;
-}
+	&-center {
+		display: flex;
+		align-items: center;
+	}
 
-@media ( min-width: 414px ) {
-	.match-bm-lol-game-summary-faction {
+	&-faction {
 		width: 20px;
 		height: 20px;
-	}
-}
 
-@media ( max-width: 435px ) {
-	.match-bm-lol-game-summary-faction {
-		width: 16px;
-		height: 16px;
+		@media ( max-width: 435px ) {
+			width: 16px;
+			height: 16px;
+		}
 	}
 }
 
