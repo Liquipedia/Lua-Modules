@@ -340,6 +340,7 @@ local SUFFIXES = {
 		stream = '/live',
 	},
 	gol = {match = '/page-game/'},
+	lazermplink = {match = '/events'},
 	iccup = {'.html'},
 	['faceit-c'] = {'/'},
 	['faceit-hub'] = {'/'},
