@@ -114,27 +114,6 @@ function TeamHistoryAuto._adjustDate(date)
 	return os.date('%Y-%m-%d', os.time(dateStruct)) --[[@as string]]
 end
 
----@return transfer[]
-function TeamHistoryAuto:_query()
-	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDate),
-		ConditionNode(ColumnName('player'), Comparator.eq, self.config.player),
-		ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('toteam'), Comparator.neq, ''),
-			Array.map(SPECIAL_ROLES, function(role)
-				return ConditionNode(ColumnName('role2'), Comparator.eq, role)
-			end),
-		},
-	}
-
-	return mw.ext.LiquipediaDB.lpdb('transfer', {
-		conditions = conditions:toString(),
-		order = 'date asc',
-		limit = 5000,
-		query = 'pagename, fromteam, toteam, role1, role2, date, extradata, reference'
-	})
-end
-
 ---@return self
 function TeamHistoryAuto:fetch()
 	self.transferList = TransferModel.getTeamHistoryForPerson{player = self.config.player, specialRoles = SPECIAL_ROLES}
