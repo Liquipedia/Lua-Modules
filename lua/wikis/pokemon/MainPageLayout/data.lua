@@ -134,7 +134,7 @@ return {
 				table = 'datapoint',
 				conditions = '[[type::game]]',
 			},
-		},		
+		},
 		{
 			file = 'TCG Cards at Melbourne Regionals 2025.jpg',
 			title = 'Statistics',
