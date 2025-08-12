@@ -958,6 +958,14 @@ span.slash {
 	}
 
 	&-score {
+		font-weight: bold;
+		line-height: 100%;
+		font-size: 1.25rem;
+
+		@media ( max-width: 435px ) {
+			font-size: 1rem;
+		}
+
 		&-holder {
 			display: flex;
 			flex-direction: column;
@@ -970,14 +978,6 @@ span.slash {
 			.wiki-valorant & {
 				padding: 0.75rem;
 			}
-		}
-
-		font-weight: bold;
-		line-height: 100%;
-		font-size: 1.25rem;
-
-		@media ( max-width: 435px ) {
-			font-size: 1rem;
 		}
 	}
 
