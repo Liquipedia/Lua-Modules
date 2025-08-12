@@ -57,7 +57,7 @@ return {
 			},
 		},
 		{
-			file = 'T1 Red Bull Homeground Arena.jpg',
+			file = 'T1 Homeground 2025 Arena.jpg',
 			title = 'Organizations',
 			link = 'Portal:Organizations',
 			count = {
