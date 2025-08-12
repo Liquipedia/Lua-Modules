@@ -51,8 +51,8 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Omega Strikers full allmode.png',
-		darkmode = 'Omega Strikers full allmode.png',
+		lightmode = 'Esports wiki full lightmode.svg',
+		darkmode = 'Esports wiki full darkmode.svg',
 	},
 	metadesc = 'Comprehensive esports wiki with everything related to esports.',
 	title = 'Esports',
