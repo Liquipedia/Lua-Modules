@@ -975,29 +975,19 @@ span.slash {
 .match-bm-lol-game-summary-score {
 	font-weight: bold;
 	line-height: 100%;
+	font-size: 20px;
+
+	@media ( max-width: 435px ) {
+		font-size: 15px;
+	}
 }
 
 .match-bm-lol-game-summary-length {
 	font-weight: normal;
 	line-height: 100%;
-}
+	font-size: 15px;
 
-@media ( min-width: 414px ) {
-	.match-bm-lol-game-summary-score {
-		font-size: 20px;
-	}
-
-	.match-bm-lol-game-summary-length {
-		font-size: 15px;
-	}
-}
-
-@media ( max-width: 435px ) {
-	.match-bm-lol-game-summary-score {
-		font-size: 15px;
-	}
-
-	.match-bm-lol-game-summary-length {
+	@media ( max-width: 435px ) {
 		font-size: 12px;
 	}
 }
