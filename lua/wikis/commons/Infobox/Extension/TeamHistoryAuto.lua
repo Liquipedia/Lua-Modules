@@ -242,13 +242,17 @@ function TeamHistoryAuto:_row(transfer)
 	local teamDisplay = teamText
 	if role then
 		teamDisplay = Span{
-			css = {['padding-left'] = '3px', ['font-style'] = 'italic'},
+			css = {['padding-left'] = '3px'},
 			children = {
 				teamText,
 				' ',
-				'(',
-				role,
-				')',
+				HtmlWidgets.I{
+					children = {
+						'(',
+						role,
+						')',
+					},
+				},
 			}
 		}
 	end
