@@ -238,11 +238,10 @@ function TeamHistoryAuto:_row(transfer)
 	if role == LOAN then
 		teamText = '&#8250;&nbsp;' .. teamText
 	end
-	---@type string|Widget|(string|Widget)[]
-	local teamDisplay = teamText
+	---@type (string|Widget)[]
+	local teamDisplay = {teamText}
 	if role then
-		teamDisplay = {
-			teamText,
+		table.insert(teamDisplay,
 			Span{
 				css = {['padding-left'] = '3px', ['font-style'] = 'italic'},
 				children = {
@@ -250,8 +249,8 @@ function TeamHistoryAuto:_row(transfer)
 					role,
 					')',
 				},
-			},
-		}
+			}
+		)
 	end
 
 	local positionIcon
