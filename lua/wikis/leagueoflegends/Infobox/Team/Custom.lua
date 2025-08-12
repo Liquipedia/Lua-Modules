@@ -48,10 +48,10 @@ function CustomTeam.run(frame)
 
 	-- Automatically load achievements
 	team.args.achievements = Achievements.team{noTemplate = true, baseConditions = {
-		ConditionNode(ColumnName('liquipediatiertype', Comparator.eq, '')),
-		ConditionNode(ColumnName('liquipediatier', Comparator.eq, 1)),
-		ConditionNode(ColumnName('placement', Comparator.eq, 1)),
-		ConditionNode(ColumnName('publishertier', Comparator.eq, 'true')),
+		ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, ''),
+		ConditionNode(ColumnName('liquipediatier'), Comparator.eq, 1),
+		ConditionNode(ColumnName('placement'), Comparator.eq, 1),
+		ConditionNode(ColumnName('publishertier'), Comparator.eq, 'true'),
 	}}
 
 	-- Automatic org people
