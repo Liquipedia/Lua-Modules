@@ -512,7 +512,7 @@ local MATCH_ICONS = {
 		text = 'Match Data'
 	},
 	lazermplink = {
-		icon = 'File:Osu single color allmode.png',
+		icon = 'File:Osu!lazer allmode.png',
 		text = 'Match Data'
 	},
 	opl = {
