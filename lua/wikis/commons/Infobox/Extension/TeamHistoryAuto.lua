@@ -19,13 +19,6 @@ local Namespace = Lua.import('Module:Namespace')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TransferModel = Lua.import('Module:Transfer/Model')
 
-local Condition = require('Module:Condition')
-local ConditionTree = Condition.Tree
-local ConditionNode = Condition.Node
-local Comparator = Condition.Comparator
-local BooleanOperator = Condition.BooleanOperator
-local ColumnName = Condition.ColumnName
-
 local SPECIAL_ROLES = {
 	'Retired',
 	'Retirement',
