@@ -43,10 +43,9 @@ OpponentDisplay.BracketOpponentEntry = Class.new(
 		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
 
 		if opponent.type == Opponent.team then
-			if options.showTbd == false and Opponent.isTbd(opponent) then
-				return
+			if options.showTbd ~= false or not Opponent.isTbd(opponent) then
+				self:createTeam(opponent.template or 'tbd', options)
 			end
-			self:createTeam(opponent.template or 'tbd', options)
 		elseif Opponent.typeIsParty(opponent.type) then
 			self:createPlayers(opponent)
 		elseif opponent.type == Opponent.literal then

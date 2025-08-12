@@ -42,15 +42,14 @@ local BracketOpponentEntry = Class.new(
 			:addClass(showFactionBackground and Faction.bgClass(opponent.players[1].faction) or nil)
 
 		if opponent.type == Opponent.team then
-			if options.showTbd == false and Opponent.isTbd(opponent) then
-				return mw.html.create()
+			if options.showTbd ~= false or not Opponent.isTbd(opponent) then
+				self.content:node(OpponentDisplay.BlockTeamContainer({
+					showLink = false,
+					style = 'hybrid',
+					team = opponent.team,
+					template = opponent.template,
+				}))
 			end
-			self.content:node(OpponentDisplay.BlockTeamContainer({
-				showLink = false,
-				style = 'hybrid',
-				team = opponent.team,
-				template = opponent.template,
-			}))
 		else
 			self.content:node(StarcraftOpponentDisplay.BlockOpponent({
 				opponent = opponent,
