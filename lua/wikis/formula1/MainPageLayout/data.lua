@@ -180,16 +180,16 @@ return {
 						content = CONTENT.tournaments,
 					},
 					{
+						mobileOrder = 8,
+						content = CONTENT.allF1Seasons,
+					},
+					{
 						mobileOrder = 9,
 						content = CONTENT.thisDay,
 					},
 					{
 						mobileOrder = 10,
 						content = CONTENT.wantToHelp,
-					},
-					{
-						mobileOrder = 8,
-						content = CONTENT.allF1Seasons,
 					},
 				},
 			},
