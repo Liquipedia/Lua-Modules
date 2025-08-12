@@ -67,7 +67,7 @@ return {
 			},
 		},
 		{
-			file = 'Worlds 2022 T1 Flag.jpg',
+			file = 'T1 Red Bull Homeground Arena.jpg',
 			title = 'Organizations',
 			link = 'Portal:Organizations',
 			count = {
