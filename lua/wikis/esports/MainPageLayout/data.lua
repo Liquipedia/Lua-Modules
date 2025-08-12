@@ -109,14 +109,6 @@ return {
 						mobileOrder = 1,
 						content = CONTENT.specialEvents,
 					},
-					{
-						mobileOrder = 4,
-						content = CONTENT.transfers,
-					},
-					{
-						mobileOrder = 5,
-						content = CONTENT.thisDay,
-					},
 				}
 			},
 			{ -- Right
@@ -152,16 +144,8 @@ return {
 						},
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 3,
 						content = CONTENT.wantToHelp,
-					},
-				},
-			},
-			{
-				children = {
-					{
-						mobileOrder = 7,
-						content = CONTENT.theGame,
 					},
 				},
 			},
