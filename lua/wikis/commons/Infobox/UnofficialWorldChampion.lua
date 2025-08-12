@@ -71,7 +71,7 @@ function UnofficialWorldChampion:createInfobox()
 						Cell{
 							name = args['gained date'],
 							options = { separator = ' ' },
-							content = WidgetUtil.collect(
+							children = WidgetUtil.collect(
 								String.nilIfEmpty(args['gained against result']),
 								'vs',
 								OpponentDisplay.InlineOpponent{
@@ -87,7 +87,7 @@ function UnofficialWorldChampion:createInfobox()
 		Title{children = 'Most Defences'},
 		Cell{
 			name = (args['most defences no'] or '?') .. ' Matches',
-			content = {
+			children = {
 				OpponentDisplay.InlineOpponent{
 					opponent = self:_parseOpponentArg('most defences')
 				}
@@ -107,7 +107,7 @@ function UnofficialWorldChampion:createInfobox()
 		Title{children = 'Longest Consecutive Time as Champion'},
 		Cell{
 			name = (args['longest consecutive no'] or '?') .. ' days',
-			content = WidgetUtil.collect(
+			children = WidgetUtil.collect(
 				OpponentDisplay.InlineOpponent{
 					opponent = self:_parseOpponentArg('longest consecutive')
 				},
@@ -117,7 +117,7 @@ function UnofficialWorldChampion:createInfobox()
 		Title{children = 'Longest Total Time as Champion'},
 		Cell{
 			name = (args['longest total no'] or '?') .. ' days',
-			content = {
+			children = {
 				OpponentDisplay.InlineOpponent{
 					opponent = self:_parseOpponentArg('longest total')
 				}
@@ -134,7 +134,7 @@ function UnofficialWorldChampion:createInfobox()
 				end
 				return Cell{
 					name = (args['most times held no'] or '?') .. ' times',
-					content = WidgetUtil.collect(
+					children = WidgetUtil.collect(
 						Array.map(opponents, function (opponent)
 							return OpponentDisplay.InlineOpponent{ opponent = opponent }
 						end),
@@ -175,7 +175,7 @@ function UnofficialWorldChampion:_parseRegionalDistribution()
 		Array.appendWith(widgets,
 			Cell{
 				name = (args[regionKey .. ' no'] or '') .. ' champions',
-				content = {region}
+				children = {region}
 			},
 			Breakdown{children = {args[regionKey .. ' champions']}}
 		)

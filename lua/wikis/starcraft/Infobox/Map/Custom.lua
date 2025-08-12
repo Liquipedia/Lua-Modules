@@ -42,11 +42,11 @@ function CustomInjector:parse(widgetId, widgets)
 
 	if widgetId == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Tileset', content = {args.tileset or self.caller:_tlpdMap(id, 'tileset')}},
-			Cell{name = 'Size', content = {self.caller:_getSize(id, args)}},
-			Cell{name = 'Spawn Positions', content = {self.caller:_getSpawn(id, args)}},
-			Cell{name = 'Versions', content = {String.convertWikiListToHtmlList(args.versions)}},
-			Cell{name = 'Leagues Featured', content = {args.leagues}}
+			Cell{name = 'Tileset', children = {args.tileset or self.caller:_tlpdMap(id, 'tileset')}},
+			Cell{name = 'Size', children = {self.caller:_getSize(id, args)}},
+			Cell{name = 'Spawn Positions', children = {self.caller:_getSpawn(id, args)}},
+			Cell{name = 'Versions', children = {String.convertWikiListToHtmlList(args.versions)}},
+			Cell{name = 'Leagues Featured', children = {args.leagues}}
 		)
 	end
 

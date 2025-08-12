@@ -5,19 +5,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Faction = require('Module:Faction')
-local Flags = require('Module:Flags')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Faction = Lua.import('Module:Faction')
+local Flags = Lua.import('Module:Flags')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
@@ -68,7 +69,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'topcustomcontent' then
 		table.insert(widgets, Cell{
 			name = 'Clan tag',
-			content = {self.caller.teamTemplate.shortname}
+			children = {self.caller.teamTemplate.shortname}
 		})
 	elseif id == 'customcontent' then
 		local profiles = Array.extractValues(Table.map(PROFILES, function (param, profileData)

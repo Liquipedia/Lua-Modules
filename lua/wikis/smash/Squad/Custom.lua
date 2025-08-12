@@ -5,14 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Characters = require('Module:Characters')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local SquadPlayerData = require('Module:SquadPlayer/data')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Characters = Lua.import('Module:Characters')
+local Class = Lua.import('Module:Class')
+local SquadPlayerData = Lua.import('Module:SquadPlayer/data')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Widget = Lua.import('Module:Widget/All')
 local Squad = Lua.import('Module:Widget/Squad/Core')

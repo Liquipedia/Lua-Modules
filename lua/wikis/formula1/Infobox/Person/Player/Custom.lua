@@ -5,19 +5,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Role = require('Module:Role')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Role = Lua.import('Module:Role')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
-local Center = Widgets.Center
 
 ---@class Formula1InfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)
@@ -28,8 +27,6 @@ local CustomInjector = Class.new(Injector)
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
-
-	player.args.autoTeam = true
 
 	return player:createInfobox(frame)
 end
@@ -44,19 +41,10 @@ function CustomInjector:parse(id, widgets)
 		self.caller:addCustomCells(widgets)
 
 	elseif id == 'names' then
-		table.insert(widgets, Cell{name = 'Abbreviations', content = {args.abbreviations}})
-	elseif id == 'history' then
-		return {
-			Title{children = 'History'},
-			Center{children = {TeamHistoryAuto.results{
-				convertrole = true,
-				addlpdbdata = true
-			}}},
-		}
-
+		table.insert(widgets, Cell{name = 'Abbreviations', children = {args.abbreviations}})
 	elseif id == 'role' then
 		return {
-			Cell{name = 'Role(s)', content = {
+			Cell{name = 'Role(s)', children = {
 				Role.run{role = args.role, useDefault = true}.display,
 				Role.run{role = args.role2}.display}
 			}
@@ -70,8 +58,8 @@ end
 function CustomPlayer:addCustomCells(widgets)
 	local args = self.args
 
-	table.insert(widgets, Cell{name = 'Reported Salary', content = {args.salary}})
-	table.insert(widgets, Cell{name = 'End of Contract', content = {args.contract}})
+	table.insert(widgets, Cell{name = 'Reported Salary', children = {args.salary}})
+	table.insert(widgets, Cell{name = 'End of Contract', children = {args.contract}})
 	local statisticsCells = {
 		{key = 'races', name = 'Races'},
 		{key = 'wins', name = 'Wins'},
@@ -91,7 +79,7 @@ function CustomPlayer:addCustomCells(widgets)
 	return Array.extendWith(widgets,
 		{Title{children = 'F1 Driver Statistics'}},
 		Array.map(statisticsCells, function(cellData)
-			return Cell{name = cellData.name, content = {args[cellData.key]}}
+			return Cell{name = cellData.name, children = {args[cellData.key]}}
 		end)
 	)
 end

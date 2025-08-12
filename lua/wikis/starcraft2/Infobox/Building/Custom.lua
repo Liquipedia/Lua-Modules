@@ -52,10 +52,10 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Size', content = {args.size}},
-			Cell{name = 'Sight', content = {args.sight}},
-			Cell{name = 'Energy', content = {args.energy}},
-			Cell{name = 'Detection/Attack Range', content = {args.detection_range}}
+			Cell{name = 'Size', children = {args.size}},
+			Cell{name = 'Sight', children = {args.sight}},
+			Cell{name = 'Energy', children = {args.energy}},
+			Cell{name = 'Detection/Attack Range', children = {args.detection_range}}
 		)
 
 		if args.game ~= GAME_LOTV then
@@ -67,7 +67,7 @@ function CustomInjector:parse(id, widgets)
 		end
 	elseif id == 'cost' then
 		return {
-			Cell{name = 'Cost', content = {CostDisplay.run{
+			Cell{name = 'Cost', children = {CostDisplay.run{
 				faction = args.race,
 				minerals = args.min,
 				mineralsTotal = args.totalmin,
@@ -81,37 +81,37 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(args.requires)}},
+			Cell{name = 'Requirements', children = {String.convertWikiListToHtmlList(args.requires)}},
 		}
 	elseif id == 'hotkey' then
 		return {
-			Cell{name = '[[Hotkeys per Race|Hotkey]]', content = {self.caller:_getHotkeys()}}
+			Cell{name = '[[Hotkeys per Race|Hotkey]]', children = {self.caller:_getHotkeys()}}
 		}
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Builds', content = {String.convertWikiListToHtmlList(args.builds)}},
-			Cell{name = 'Morphs into', content = {String.convertWikiListToHtmlList(args.morphs)}},
-			Cell{name = '[[Add-on]]s', content = {String.convertWikiListToHtmlList(args.addons)}},
+			Cell{name = 'Builds', children = {String.convertWikiListToHtmlList(args.builds)}},
+			Cell{name = 'Morphs into', children = {String.convertWikiListToHtmlList(args.morphs)}},
+			Cell{name = '[[Add-on]]s', children = {String.convertWikiListToHtmlList(args.addons)}},
 		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocked Tech', content = {String.convertWikiListToHtmlList(args.unlocks)}},
-			Cell{name = 'Upgrades available', content = {String.convertWikiListToHtmlList(args.upgrades)}},
+			Cell{name = 'Unlocked Tech', children = {String.convertWikiListToHtmlList(args.unlocks)}},
+			Cell{name = 'Upgrades available', children = {String.convertWikiListToHtmlList(args.upgrades)}},
 		}
 	elseif id == 'defense' then
 		return {
-			Cell{name = 'Defense', content = {self.caller:_defenseDisplay()}}
+			Cell{name = 'Defense', children = {self.caller:_defenseDisplay()}}
 		}
 	elseif id == 'attack' then
 		return {
-			Cell{name = 'Ground Attack', content = {args.ground_attack}},
-			Cell{name = 'Ground [[Damage Per Second|DPS]]', content = {args.ground_dps}},
-			Cell{name = 'Air Attack', content = {args.air_attack}},
-			Cell{name = 'Air [[Damage Per Second|DPS]]', content = {args.air_dps}},
-			Cell{name = 'Bonus', content = {args.bonus}},
-			Cell{name = 'Bonus [[Damage Per Second|DPS]]', content = {args.bonus_dps}},
-			Cell{name = 'Range', content = {args.range}},
-			Cell{name = 'Cooldown', content = {args.cooldown}},
+			Cell{name = 'Ground Attack', children = {args.ground_attack}},
+			Cell{name = 'Ground [[Damage Per Second|DPS]]', children = {args.ground_dps}},
+			Cell{name = 'Air Attack', children = {args.air_attack}},
+			Cell{name = 'Air [[Damage Per Second|DPS]]', children = {args.air_dps}},
+			Cell{name = 'Bonus', children = {args.bonus}},
+			Cell{name = 'Bonus [[Damage Per Second|DPS]]', children = {args.bonus_dps}},
+			Cell{name = 'Range', children = {args.range}},
+			Cell{name = 'Cooldown', children = {args.cooldown}},
 		}
 	end
 	return widgets

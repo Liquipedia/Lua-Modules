@@ -18,7 +18,7 @@ local StandingsParseLpdb = Lua.import('Module:Standings/Parse/Lpdb')
 local StandingsParser = Lua.import('Module:Standings/Parser')
 local StandingsStorage = Lua.import('Module:Standings/Storage')
 
-local Display = Lua.import('Module:Widget/Standings')
+local StandingsDisplay = Lua.import('Module:Widget/Standings')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
@@ -56,15 +56,21 @@ function StandingsTable.fromTemplate(frame)
 
 	local tiebreakers = StandingsParseWiki.parseTiebreakers(args, tableType)
 
-	if not importScoreFromMatches then
-		return StandingsTable._make(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
+	if importScoreFromMatches then
+		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args)
+
+		local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction)
+		opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
 	end
 
-	local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args)
+	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
 
-	local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction)
-	opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
-	return StandingsTable._make(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
+	if tableType == 'swiss' then
+		standingsTable.extradata.placemapping = Logic.wrapTryOrLog(StandingsParseWiki.parsePlaceMapping)(args, opponents)
+	end
+
+	StandingsStorage.run(standingsTable, {saveVars = true})
+	return StandingsDisplay{pageName = mw.title.getCurrentTitle().text, standingsIndex = standingsTable.standingsindex}
 end
 
 ---@param manualOpponents StandingTableOpponentData[]
@@ -93,20 +99,6 @@ function StandingsTable.mergeOpponentsData(manualOpponents, importedOpponents, a
 	end)
 
 	return newOpponents
-end
-
----@param rounds any
----@param opponents any
----@param bgs any
----@param title any
----@param matches any
----@param tableType StandingsTableTypes
----@param tiebreakers StandingsTiebreaker[]
----@return Widget
-function StandingsTable._make(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
-	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
-	StandingsStorage.run(standingsTable, {saveVars = true})
-	return Display{pageName = mw.title.getCurrentTitle().text, standingsIndex = standingsTable.standingsindex}
 end
 
 return StandingsTable

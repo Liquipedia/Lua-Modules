@@ -5,15 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local Set = require('Module:Set')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Variables = require('Module:Variables')
-local YearsActive = require('Module:YearsActive')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Faction = Lua.import('Module:Faction')
+local Set = Lua.import('Module:Set')
+local Variables = Lua.import('Module:Variables')
+local YearsActive = Lua.import('Module:YearsActive')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')
@@ -38,11 +38,6 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = TeamHistoryAuto.results{
-		player = player.pagename,
-		addlpdbdata = player:shouldStoreData(player.args),
-	}
-
 	return player:createInfobox()
 end
 
@@ -59,21 +54,21 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Approx. Winnings ' .. CURRENT_YEAR,
-				content = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
+				children = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
 			},
 			Cell{
 				name = Abbreviation.make{text = 'Years Active', title = 'Years active as a player'},
-				content = {YearsActive.display({player = caller.pagename})
+				children = {YearsActive.display({player = caller.pagename})
 			}
 			},
 			Cell{
 				name = Abbreviation.make{text = 'Years Active (caster)', title = 'Years active as a caster'},
-				content = {caller:_getActiveCasterYears()}
+				children = {caller:_getActiveCasterYears()}
 			},
 		}
 	elseif id == 'status' then
 		return {
-			Cell{name = 'Faction', content = {caller:getFactionData(args.faction or 'unknown')}}
+			Cell{name = 'Faction', children = {caller:getFactionData(args.faction or 'unknown')}}
 		}
 	elseif id == 'role' then return {}
 	elseif id == 'region' then return {}
@@ -91,7 +86,7 @@ function CustomInjector:parse(id, widgets)
 			Center{children = {achievements}},
 		}
 	elseif id == 'history' and string.match(args.retired or '', '%d%d%d%d') then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 
 	return widgets

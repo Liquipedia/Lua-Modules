@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
@@ -35,6 +36,7 @@ local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
+local TeamHistoryWidget = Lua.import('Module:Widget/Infobox/TeamHistory')
 
 ---@class PersonRoleData
 ---@field category string
@@ -96,22 +98,22 @@ function Person:createInfobox()
 		Center{children = {args.caption}},
 		Title{children = (args.informationType or 'Player') .. ' Information'},
 		Customizable{id = 'names', children = {
-				Cell{name = 'Name', content = {args.name}},
-				Cell{name = 'Romanized Name', content = {args.romanized_name}},
+				Cell{name = 'Name', children = {args.name}},
+				Cell{name = 'Romanized Name', children = {args.romanized_name}},
 			}
 		},
 		Customizable{id = 'nationality', children = {
-				Cell{name = 'Nationality', content = self:displayLocations()}
+				Cell{name = 'Nationality', children = self:displayLocations()}
 			}
 		},
-		Cell{name = 'Born', content = {self.age.birth}},
-		Cell{name = 'Died', content = {self.age.death}},
+		Cell{name = 'Born', children = {self.age.birth}},
+		Cell{name = 'Died', children = {self.age.death}},
 		Customizable{id = 'region', children = {
-				Cell{name = 'Region', content = {self.region.display}}
+				Cell{name = 'Region', children = {self.region.display}}
 			}
 		},
 		Customizable{id = 'status', children = {
-			Cell{name = 'Status', content = {(Logic.readBool(args.banned) and 'Banned') or args.status}}
+			Cell{name = 'Status', children = {(Logic.readBool(args.banned) and 'Banned') or args.status}}
 			}
 		},
 		Customizable{id = 'role', children = {
@@ -123,7 +125,7 @@ function Person:createInfobox()
 				return {
 					Cell{
 						name = (#roles > 1 and 'Roles' or 'Role'),
-						content = roles,
+						children = roles,
 					}
 				}
 			end}
@@ -136,20 +138,20 @@ function Person:createInfobox()
 				end)
 				return {Cell{
 					name = #teams > 1 and 'Teams' or 'Team',
-					content = teams
+					children = teams
 				}}
 			end}
 		}},
-		Cell{name = 'Alternate IDs', content = {
+		Cell{name = 'Alternate IDs', children = {
 				table.concat(Array.parseCommaSeparatedString(args.ids or ''), ', ')
 			}
 		},
-		Cell{name = 'Nickname(s)', content = {args.nicknames}},
+		Cell{name = 'Nickname(s)', children = {args.nicknames}},
 		Builder{
 			builder = function()
 				if self.totalEarnings and self.totalEarnings ~= 0 then
 					return {
-						Cell{name = 'Approx. Total Winnings', content = {'$' .. Language:formatNum(self.totalEarnings)}},
+						Cell{name = 'Approx. Total Winnings', children = {'$' .. Language:formatNum(self.totalEarnings)}},
 					}
 				end
 			end
@@ -168,17 +170,9 @@ function Person:createInfobox()
 				end
 			},
 		}},
-		Customizable{id = 'history', children = {
-			Builder{
-				builder = function()
-					if String.isNotEmpty(args.history) then
-						return {
-							Title{children = 'History'},
-							Center{children = {args.history}}
-						}
-					end
-				end
-			},
+		Customizable{id = 'history', children = TeamHistoryWidget{
+			player = self.pagename,
+			manualInput = args.history,
 		}},
 		Center{children = {args.footnotes}},
 		Customizable{id = 'customcontent', children = {}},
@@ -223,7 +217,8 @@ function Person:_parseArgs()
 
 	-- ENRICH TEAM
 	local function enrichTeam()
-		if Logic.readBool(args.autoTeam) then
+		local useAutoTeam = Logic.nilOr(Logic.readBoolOrNil(args.autoTeam), (Info.config.infoboxPlayer or {}).autoTeam)
+		if useAutoTeam then
 			local team, team2 = PlayerIntroduction.playerTeamAuto{player = self.pagename}
 			args.team = Logic.emptyOr(args.team, team)
 			args.team2 = Logic.emptyOr(args.team2, team2)

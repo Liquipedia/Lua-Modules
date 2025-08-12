@@ -49,9 +49,15 @@ return {
 			matchWidth = 190,
 			sortCasters = true,
 		},
+		defaultMaxPlayersPerPlacement = 21,
 		thisDay = {
 			tiers = {1, 2},
 			excludeTierTypes = {'Qualifier', 'Points', 'Showmatch'},
+		},
+		infoboxPlayer = {
+			automatedHistory = {
+				mode = 'automatic',
+			},
 		},
 	},
 	defaultRoundPrecision = 0,

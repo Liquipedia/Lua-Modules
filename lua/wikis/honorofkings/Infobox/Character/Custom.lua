@@ -50,14 +50,14 @@ function CustomInjector:parse(id, widgets)
 		return {
             Cell{
 				name = 'Lane',
-				content = WidgetUtil.collect(
+				children = WidgetUtil.collect(
 					self:_toCellContent('lane1'),
 					self:_toCellContent('lane2')
 				)
 			},
 			Cell{
 				name = 'Role',
-				content = WidgetUtil.collect(
+				children = WidgetUtil.collect(
 					self:_toCellContent('role1'),
 					self:_toCellContent('role2')
 				)

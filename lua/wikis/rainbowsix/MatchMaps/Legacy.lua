@@ -11,12 +11,14 @@
 	It is invoked by Template:MatchMaps.
 ]]
 
-local Arguments = require('Module:Arguments')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
+local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
 
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
 

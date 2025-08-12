@@ -5,11 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local PlacementStats = require('Module:InfoboxPlacementStats')
-local Template = require('Module:Template')
-local Variables = require('Module:Variables')
+
+local Class = Lua.import('Module:Class')
+local PlacementStats = Lua.import('Module:InfoboxPlacementStats')
+local Template = Lua.import('Module:Template')
+local Variables = Lua.import('Module:Variables')
 
 local Team = Lua.import('Module:Infobox/Team')
 

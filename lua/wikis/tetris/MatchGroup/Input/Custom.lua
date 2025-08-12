@@ -5,9 +5,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
+
+local Logic = Lua.import('Module:Logic')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 

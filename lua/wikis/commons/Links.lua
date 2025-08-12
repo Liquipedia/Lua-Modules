@@ -146,6 +146,7 @@ local PREFIXES = {
 	gol = {match = 'https://gol.gg/game/stats/'},
 	gosugamers = {''},
 	gplus = {'http://plus.google.com/-plus'},
+	h3gg = {match = 'https://www.h3.gg/competitions/v2/match/'},
 	halodatahive = {
 		'https://halodatahive.com/Tournament/Detail/',
 		team = 'https://halodatahive.com/Team/Detail/',
@@ -464,6 +465,10 @@ local MATCH_ICONS = {
 	gol = {
 		icon = 'File:Gol.gg allmode.png',
 		text = 'GolGG Match Report',
+	},
+	h3gg = {
+		icon = 'File:H3gg icon allmode.png',
+		text = 'H3.gg match details',
 	},
 	halodatahive = {
 		icon = 'File:Halo Data Hive allmode.png',
