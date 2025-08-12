@@ -146,7 +146,7 @@ function MatchPage:_renderGameOverview(game)
 	end
 
 	---@param showScore boolean
-	---@return Widget|Widget[]
+	---@return Widget[]
 	local function createScoreHolderContent(showScore)
 		local mapDisplay = Div{
 			classes = {'match-bm-lol-game-summary-map'},
