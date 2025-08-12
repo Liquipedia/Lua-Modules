@@ -34,6 +34,7 @@ local PlayerDisplay = {}
 ---@field team string?
 ---@field showFaction boolean?
 ---@field game string?
+---@field showTbd boolean?
 
 ---@class InlinePlayerProps
 ---@field flip boolean?
@@ -43,6 +44,7 @@ local PlayerDisplay = {}
 ---@field dq boolean?
 ---@field showFaction boolean?
 ---@field game string?
+---@field showTbd boolean?
 
 --Displays a player as a block element. The width of the component is
 --determined by its layout context, and not by the player name.
@@ -50,6 +52,10 @@ local PlayerDisplay = {}
 ---@return Html
 function PlayerDisplay.BlockPlayer(props)
 	local player = props.player
+
+	if Opponent.playerIsTbd(player) then
+		return mw.html.create('div'):addClass('block-player')
+	end
 
 	local nameNode = mw.html.create(props.dq and 's' or 'span'):addClass('name')
 
@@ -99,7 +105,7 @@ end
 function PlayerDisplay.InlinePlayer(props)
 	local player = props.player
 
-	local flag = props.showFlag ~= false and player.flag
+	local flag = props.showFlag ~= false
 		and PlayerDisplay.Flag{flag = player.flag}
 		or nil
 
