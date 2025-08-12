@@ -56,6 +56,7 @@ local BracketOpponentEntry = Class.new(
 				overflow = 'ellipsis',
 				playerClass = 'starcraft-bracket-block-player',
 				showLink = false,
+				showTbd = options.showTbd,
 			}))
 		end
 

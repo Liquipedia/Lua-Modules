@@ -47,7 +47,7 @@ OpponentDisplay.BracketOpponentEntry = Class.new(
 				self:createTeam(opponent.template or 'tbd', options)
 			end
 		elseif Opponent.typeIsParty(opponent.type) then
-			self:createPlayers(opponent)
+			self:createPlayers(opponent, options)
 		elseif opponent.type == Opponent.literal then
 			self:createLiteral(opponent.name or '')
 		end
@@ -75,11 +75,13 @@ end
 
 ---Creates party display as BracketOpponentEntry
 ---@param opponent standardOpponent
-function OpponentDisplay.BracketOpponentEntry:createPlayers(opponent)
+---@param options {showTbd: boolean?}
+function OpponentDisplay.BracketOpponentEntry:createPlayers(opponent, options)
 	local playerNode = OpponentDisplay.BlockPlayers({
 		opponent = opponent,
 		overflow = 'ellipsis',
 		showLink = false,
+		showTbd = options.showTbd,
 	})
 	self.content:node(playerNode)
 
