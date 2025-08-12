@@ -146,7 +146,7 @@ function Opponent.tbd(type)
 			type = type,
 			players = Array.map(
 				Array.range(1, partySize),
-				function(_) return {displayName = 'TBD', flag = 'unknown'} end
+				function(_) return {displayName = 'TBD'} end
 			),
 			extradata = {},
 		}

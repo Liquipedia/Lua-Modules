@@ -53,15 +53,13 @@ local PlayerDisplay = {}
 function PlayerDisplay.BlockPlayer(props)
 	local player = props.player
 
-	if props.showTbd == false and Opponent.playerIsTbd(player) then
-		return mw.html.create('div'):addClass('block-player')
-	end
+	local useDefault = props.showTbd ~= false or not Opponent.playerIsTbd(player)
 
 	local nameNode = mw.html.create(props.dq and 's' or 'span'):addClass('name')
 
 	if not Opponent.playerIsTbd(player) and props.showLink ~= false and Logic.isNotEmpty(player.pageName) then
 		nameNode:wikitext('[[' .. player.pageName .. '|' .. player.displayName .. ']]')
-	else
+	elseif useDefault then
 		nameNode:wikitext(Logic.emptyOr(player.displayName, ZERO_WIDTH_SPACE))
 	end
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
@@ -73,7 +71,7 @@ function PlayerDisplay.BlockPlayer(props)
 
 	local flagNode
 	if props.showFlag ~= false then
-		flagNode = PlayerDisplay.Flag{flag = player.flag}
+		flagNode = PlayerDisplay.Flag{flag = player.flag, useDefault = useDefault}
 	end
 
 	local factionNode
@@ -105,8 +103,10 @@ end
 function PlayerDisplay.InlinePlayer(props)
 	local player = props.player
 
+	local useDefault = props.showTbd ~= false or not Opponent.playerIsTbd(player)
+
 	local flag = props.showFlag ~= false
-		and PlayerDisplay.Flag{flag = player.flag}
+		and PlayerDisplay.Flag{flag = player.flag, useDefault = useDefault}
 		or nil
 
 	local faction = props.showFaction ~= false and Logic.isNotEmpty(player.faction)
@@ -139,11 +139,11 @@ function PlayerDisplay.InlinePlayer(props)
 end
 
 -- Note: Lua.import('Module:Flags').Icon automatically includes a span with class="flag"
----@param props {flag: string?}
+---@param props {flag: string?, useDefault: boolean}
 ---@return string
 function PlayerDisplay.Flag(props)
 	local flag = props.flag
-	if not flag then
+	if not flag and props.useDefault then
 		flag = 'unknown'
 	end
 	return Flags.Icon{flag = flag, shouldLink = false}
