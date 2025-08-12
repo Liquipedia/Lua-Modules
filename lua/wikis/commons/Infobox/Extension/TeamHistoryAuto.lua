@@ -26,8 +26,6 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local TeamHistoryDisplay = Lua.import('Module:Widget/Infobox/TeamHistory/Display')
-
 local SPECIAL_ROLES = {
 	'Retired',
 	'Retirement',
@@ -114,15 +112,6 @@ function TeamHistoryAuto._adjustDate(date)
 	local dateStruct = DateExt.parseIsoDate(date)
 	dateStruct.day = dateStruct.day - 1
 	return os.date('%Y-%m-%d', os.time(dateStruct)) --[[@as string]]
-end
-
----@return Widget?
-function TeamHistoryAuto:build()
-	return TeamHistoryDisplay{
-		transferList = self.transferList,
-		hasHeaderAndRefs = self.config.hasHeaderAndRefs,
-		player = self.config.player,
-	}
 end
 
 ---@return transfer[]
