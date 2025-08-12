@@ -53,7 +53,7 @@ local PlayerDisplay = {}
 function PlayerDisplay.BlockPlayer(props)
 	local player = props.player
 
-	if Opponent.playerIsTbd(player) then
+	if props.showTbd == false and Opponent.playerIsTbd(player) then
 		return mw.html.create('div'):addClass('block-player')
 	end
 
