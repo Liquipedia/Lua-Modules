@@ -23,7 +23,7 @@ local SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE = 2 * 60 * 60 -- 2 hours in seconds
 ---@class MatchButtonBarProps
 ---@field match MatchGroupUtilMatch
 ---@field showVods boolean?
----@field buttonType? 'primary' | 'secondary'
+---@field variant? 'primary' | 'secondary'
 
 ---@class MatchButtonBar: Widget
 ---@operator call(MatchButtonBarProps): MatchButtonBar
@@ -31,7 +31,7 @@ local SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE = 2 * 60 * 60 -- 2 hours in seconds
 local MatchButtonBar = Class.new(Widget)
 MatchButtonBar.defaultProps = {
 	showVods = true,
-	buttonType = 'secondary',
+	variant = 'secondary',
 }
 
 ---@return Widget?
@@ -50,6 +50,8 @@ function MatchButtonBar:render()
 		os.difftime(match.timestamp, DateExt.getCurrentTimestamp()) < SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE then
 
 		displayStreams = true
+	elseif match.phase == 'upcoming' and self.props.variant == 'primary' then
+		displayStreams = true
 	end
 
 	return HtmlWidgets.Div{
@@ -57,7 +59,7 @@ function MatchButtonBar:render()
 		children = WidgetUtil.collect(
 			MatchPageButton{
 				match = match,
-				buttonType = self.props.buttonType,
+				buttonType = self.props.variant,
 			},
 			displayStreams and StreamsContainer{
 				streams = StreamLinks.filterStreams(match.stream),
