@@ -61,7 +61,9 @@ function PlayerDisplay.BlockPlayer(props)
 	if not Opponent.playerIsTbd(player) and props.showLink ~= false and Logic.isNotEmpty(player.pageName) then
 		nameNode:wikitext('[[' .. player.pageName .. '|' .. player.displayName .. ']]')
 	elseif useDefault then
-		nameNode:wikitext(Logic.emptyOr(player.displayName, ZERO_WIDTH_SPACE))
+		nameNode:wikitext(Logic.emptyOr(player.displayName, 'TBD'))
+	else
+		nameNode:wikitext(ZERO_WIDTH_SPACE)
 	end
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
 
