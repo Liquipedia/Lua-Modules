@@ -131,13 +131,13 @@ An empty array is returned if the specified team template does not exist.
 ---@param name string
 ---@return string[]
 function TeamTemplate.queryHistoricalNames(name)
-	local resolvedName = TeamTemplate.resolve(name)
-	if resolvedName then
-		local historical = TeamTemplate.queryHistorical(resolvedName) or {}
+	local rawTemplate = TeamTemplate.getRawOrNil(name)
+	if rawTemplate then
+		local historical = TeamTemplate.queryHistorical(rawTemplate.historicaltemplate) or {}
 		if Logic.isNotEmpty(historical) then
 			return Array.unique(Array.extractValues(historical))
 		else
-			return { resolvedName }
+			return { rawTemplate.templatename }
 		end
 	else
 		return {}
