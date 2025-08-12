@@ -91,7 +91,8 @@ return {
 		lightmode = 'F1_2018_allmode.png',
 		darkmode = 'F1_2018_allmode.png',
 	},
-	metadesc = 'Comprehensive Formula 1 wiki with articles covering everything from drivers, to teams, to seasons, to race chassis and history.',
+	metadesc = 'Comprehensive Formula 1 wiki with articles covering everything from drivers, to teams, '  ..
+		'to seasons, to race chassis and history.',
 	title = 'Formula 1',
 	navigation = {
 		{
