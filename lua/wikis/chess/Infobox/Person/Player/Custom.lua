@@ -9,7 +9,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
@@ -40,12 +39,6 @@ function CustomPlayer.run(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	player.args.id = player.args.id or player.args.romanized_name or player.args.name
-
-	player.args.autoTeam = true
-	player.args.history = TeamHistoryAuto.results{
-		convertrole = true,
-		addlpdbdata = true
-	}
 
 	return player:createInfobox()
 end
