@@ -35,7 +35,6 @@ function TeamHistory:render()
 
 	return TeamHistoryDisplay{
 		transferList = teamHistory.transferList,
-		hasHeaderAndRefs = teamHistory.config.hasHeaderAndRefs,
 		player = teamHistory.config.player,
 	}
 end

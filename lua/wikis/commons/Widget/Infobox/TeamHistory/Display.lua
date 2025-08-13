@@ -65,12 +65,13 @@ local NOT_YET_IN_ROLES_DATA = {
 	['founder & training director'] = {display = 'Founder & Training Director', abbreviation = 'F. & TD.'},
 }
 
+local HAS_HEADER_AND_REFS = ((Info.config.infoboxPlayer or {}).automatedHistory or {}).hasHeaderAndRefs
+
 ---@class TeamHistoryDisplayWidget: Widget
 ---@operator call(table): TeamHistoryDisplayWidget
----@field props {transferList: table[], hasHeaderAndRefs: boolean?, player: string}
+---@field props {transferList: table[], player: string}
 local TeamHistoryDisplay = Class.new(Widget)
 TeamHistoryDisplay.defaultProps = {
-	hasHeaderAndRefs = ((Info.config.infoboxPlayer or {}).automatedHistory or {}).hasHeaderAndRefs,
 	transferList = {},
 	player = String.upperCaseFirst(mw.title.getCurrentTitle().subpageText),
 }
@@ -82,7 +83,7 @@ function TeamHistoryDisplay:render()
 	return Tbl{
 		css = {width = '100%', ['text-align'] = 'left'},
 		children = WidgetUtil.collect(
-			self.props.hasHeaderAndRefs and self:_header() or nil,
+			HAS_HEADER_AND_REFS and self:_header() or nil,
 			Array.map(self.props.transferList, FnUtil.curry(self._row, self))
 		)
 	}
@@ -169,7 +170,7 @@ function TeamHistoryDisplay:_row(transfer)
 
 	local leaveateDisplay = self:_buildLeaveDateDisplay(transfer)
 
-	if not self.props.hasHeaderAndRefs then
+	if not HAS_HEADER_AND_REFS then
 		return Tr{children = {
 			Td{
 				classes = {'th-mono'},

@@ -36,7 +36,7 @@ local SPECIAL_ROLES = {
 
 ---@class TeamHistoryAuto
 ---@operator call(table?): TeamHistoryAuto
----@field config {player: string, hasHeaderAndRefs: boolean?}
+---@field config {player: string}
 ---@field transferList table[]
 local TeamHistoryAuto = Class.new(function(self, args)
 	---@type {player: string?}
@@ -44,7 +44,6 @@ local TeamHistoryAuto = Class.new(function(self, args)
 	local configFromInfo = (Info.config.infoboxPlayer or {}).automatedHistory or {}
 	self.config = {
 		player = (args.player or mw.title.getCurrentTitle().subpageText):gsub('^%l', string.upper),
-		hasHeaderAndRefs = configFromInfo.hasHeaderAndRefs,
 	}
 end)
 
