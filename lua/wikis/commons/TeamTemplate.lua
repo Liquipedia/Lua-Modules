@@ -118,9 +118,13 @@ Returns raw data of a historical team template.
 Keys of the returned table are of form YYYY-MM-DD and
 their corresponding values are team template names.
 ]]
----@param name string
+---@param name string?
 ---@return {[string]: string}?
 function TeamTemplate.queryHistorical(name)
+	if Logic.isEmpty(name) then
+		return
+	end
+	---@cast name -nil
 	return mw.ext.TeamTemplate.raw_historical(name)
 end
 
