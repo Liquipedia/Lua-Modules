@@ -35,7 +35,6 @@ local CONTENT = {
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			rumours = true,
 			limits = 10,
 			transferPage = 'Player Transfers/' .. os.date('%Y') .. '/' ..
 				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
