@@ -21,6 +21,9 @@ local REGION_TO_SUPERREGION = {
 	['Latin America South'] = 'SAM',
 	['Brazil'] = 'SAM',
 	['South America'] = 'SAM',
+	['Middle East'] = 'MENA',
+	['Asia'] = 'APAC',
+	['Africa'] = 'SSA',
 	['Other'] = 'Other',
 }
 
@@ -51,7 +54,7 @@ Config.categories = {
 		name = 'region',
 		property = 'region',
 		expandable = true,
-		items = {'EU', 'NA', 'OCE', 'SAM', 'Other'},
+		items = {'EU', 'NA', 'OCE', 'SAM', 'MENA', 'APAC', 'SSA', 'Other'},
 		defaultItem = 'Other',
 		itemToPropertyValues = function(region)
 			-- Input is a region
