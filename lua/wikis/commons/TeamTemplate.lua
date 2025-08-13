@@ -124,7 +124,7 @@ function TeamTemplate.queryHistorical(name)
 	if Logic.isEmpty(name) then
 		return
 	end
-	---@cast name -nil 
+	---@cast name -nil
 	return mw.ext.TeamTemplate.raw_historical(name)
 end
 
