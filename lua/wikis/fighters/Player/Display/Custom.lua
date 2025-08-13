@@ -34,13 +34,16 @@ local CustomPlayerDisplay = Table.copy(PlayerDisplay)
 ---@return Html
 function CustomPlayerDisplay.BlockPlayer(props)
 	local player = props.player
+	local useDefault = props.showTbd ~= false or not Opponent.playerIsTbd(player)
 
 	local nameNode = mw.html.create(props.dq and 's' or 'span'):addClass('name')
 
 	if not Opponent.playerIsTbd(player) and props.showLink ~= false and Logic.isNotEmpty(player.pageName) then
 		nameNode:wikitext('[[' .. player.pageName .. '|' .. player.displayName .. ']]')
+	elseif useDefault then
+		nameNode:wikitext(Logic.emptyOr(player.displayName, 'TBD'))
 	else
-		nameNode:wikitext(Logic.emptyOr(player.displayName, ZERO_WIDTH_SPACE))
+		nameNode:wikitext(ZERO_WIDTH_SPACE)
 	end
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
 
@@ -54,7 +57,7 @@ function CustomPlayerDisplay.BlockPlayer(props)
 
 	local flagNode
 	if props.showFlag ~= false then
-		flagNode = PlayerDisplay.Flag{flag = player.flag}
+		flagNode = PlayerDisplay.Flag{flag = player.flag, useDefault = useDefault}
 	end
 
 	local characterNode = mw.html.create()
