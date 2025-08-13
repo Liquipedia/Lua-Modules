@@ -48,6 +48,12 @@ return {
 			status = 2,
 			matchWidth = 180,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'automatic',
+			},
+		},
 	},
 	defaultRoundPrecision = 0,
 }
