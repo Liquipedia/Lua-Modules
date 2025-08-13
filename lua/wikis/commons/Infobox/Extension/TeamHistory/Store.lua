@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
@@ -16,15 +17,17 @@ local String = Lua.import('Module:StringUtils')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Variables = Lua.import('Module:Variables')
 
+local STORE_FROM_WIKI_CODE = ((Info.config.infoboxPlayer or {}).automatedHistory or {}).storeFromWikiCode
+
 local TeamHistoryStore = {}
 
----@param transferList any
----@param player string?
-function TeamHistoryStore.store(transferList, player)
+---@param props {transferList: table[], isFromWikiCode: boolean, player: string?}
+function TeamHistoryStore.store(props)
 	if not Namespace.isMain() then return end
+	if props.isFromWikiCode and not STORE_FROM_WIKI_CODE then return end
 
-	player = player or String.upperCaseFirst(mw.title.getCurrentTitle().subpageText)
-
+	local player = props.player or String.upperCaseFirst(mw.title.getCurrentTitle().subpageText)
+	local transferList = props.transferList
 	local offset = tonumber(Variables.varDefault('teamhistory_index')) or 0
 
 	Array.forEach(transferList, function(transfer, transferIndex)

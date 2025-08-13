@@ -53,6 +53,9 @@ return {
 		},
 		infoboxPlayer = {
 			autoTeam = true,
+			automatedHistory = {
+				storeFromWikiCode = true,
+			},
 		},
 	},
 	defaultRoundPrecision = 0,

@@ -20,24 +20,26 @@ local SPECIAL_ROLES = Lua.import('Module:Infobox/Extension/TeamHistory/SpecialRo
 
 ---@class TeamHistoryAutoWidget: Widget
 ---@operator call(table): TeamHistoryAutoWidget
----@field props {player: string, store: boolean}
+---@field props {player: string, isFromWikiCode: boolean}
 local TeamHistory = Class.new(Widget)
 TeamHistory.defaultProps = {
 	player = String.upperCaseFirst(mw.title.getCurrentTitle().subpageText),
-	store = false,--move to config as `storeFromWikiCode`???
+	isFromWikiCode = false,
 }
 
 ---@return Widget?
 function TeamHistory:render()
 	local transferList = TransferModel.getTeamHistoryForPerson{player = self.props.player, specialRoles = SPECIAL_ROLES}
 
-	if Logic.readBool(self.props.store) then
-		TeamHistoryStoreExtension.store(transferList, self.props.player)
-	end
+	TeamHistoryStoreExtension.store{
+		transferList = transferList,
+		player = self.props.player,
+		isFromWikiCode = Logic.readBool(self.props.isFromWikiCode),
+	}
 
 	return TeamHistoryDisplay{
 		transferList = transferList,
-		player = self.props.player,
+		player = self.props.player
 	}
 end
 
