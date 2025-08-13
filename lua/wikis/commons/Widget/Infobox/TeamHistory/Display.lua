@@ -18,6 +18,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TransferRef = Lua.import('Module:Transfer/References')
+local Variables = Lua.import('Module:Variables')
 local Widget = Lua.import('Module:Widget')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -52,7 +53,7 @@ local NOT_YET_IN_ROLES_DATA = {
 	['founder & training director'] = {display = 'Founder & Training Director', abbreviation = 'F. & TD.'},
 }
 
-local HAS_HEADER_AND_REFS = ((Info.config.infoboxPlayer or {}).automatedHistory or {}).hasHeaderAndRefs
+local HAS_REFS = ((Info.config.infoboxPlayer or {}).automatedHistory or {}).hasHeaderAndRefs
 
 ---@class TeamHistoryDisplayWidget: Widget
 ---@operator call(table): TeamHistoryDisplayWidget
@@ -67,10 +68,13 @@ TeamHistoryDisplay.defaultProps = {
 function TeamHistoryDisplay:render()
 	if Logic.isEmpty(self.props.transferList) then return end
 
+	local offset = tonumber(Variables.varDefault('teamhistory_index')) or 0
+	Variables.varDefine('teamhistory_index', offset + #self.props.transferList)
+
 	return Tbl{
 		css = {width = '100%', ['text-align'] = 'left'},
 		children = WidgetUtil.collect(
-			HAS_HEADER_AND_REFS and self:_header() or nil,
+			HAS_REFS and offset == 0 and self:_header() or nil,
 			Array.map(self.props.transferList, FnUtil.curry(self._row, self))
 		)
 	}
@@ -157,7 +161,7 @@ function TeamHistoryDisplay:_row(transfer)
 
 	local leaveateDisplay = self:_buildLeaveDateDisplay(transfer)
 
-	if not HAS_HEADER_AND_REFS then
+	if not HAS_REFS then
 		return Tr{children = {
 			Td{
 				classes = {'th-mono'},

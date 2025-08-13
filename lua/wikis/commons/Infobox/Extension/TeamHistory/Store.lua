@@ -14,6 +14,7 @@ local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local String = Lua.import('Module:StringUtils')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Variables = Lua.import('Module:Variables')
 
 local TeamHistoryStore = {}
 
@@ -24,12 +25,15 @@ function TeamHistoryStore.store(transferList, player)
 
 	player = player or String.upperCaseFirst(mw.title.getCurrentTitle().subpageText)
 
+	local offset = tonumber(Variables.varDefault('teamhistory_index')) or 0
+
 	Array.forEach(transferList, function(transfer, transferIndex)
-		TeamHistoryStore._checkForMissingLeaveDate(transfer, transferIndex, #transferList)
+		transferIndex = transferIndex + offset
+		TeamHistoryStore._checkForMissingLeaveDate(transfer, transferIndex, offset + #transferList)
 		local teamLink = TeamHistoryStore._getTeamLink(transfer)
 		if not teamLink and not transfer.role then return end
 
-		mw.ext.LiquipediaDB.lpdb_datapoint('Team_'..transferIndex, Json.stringifySubTables{
+		mw.ext.LiquipediaDB.lpdb_datapoint('Team_'.. transferIndex, Json.stringifySubTables{
 			type = 'teamhistory',
 			name = player,
 			information = teamLink,
