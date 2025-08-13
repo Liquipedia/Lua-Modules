@@ -10,10 +10,13 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
-local TeamHistoryAutoExtension = Lua.import('Module:Infobox/Extension/TeamHistoryAuto')
+local TeamHistoryStoreExtension = Lua.import('Module:Infobox/Extension/TeamHistory/Store')
+local TransferModel = Lua.import('Module:Transfer/Model')
 local Widget = Lua.import('Module:Widget')
 
 local TeamHistoryDisplay = Lua.import('Module:Widget/Infobox/TeamHistory/Display')
+
+local SPECIAL_ROLES = Lua.import('Module:Infobox/Extension/TeamHistory/SpecialRoles', {loadData = true})
 
 ---@class TeamHistoryAutoWidget: Widget
 ---@operator call(table): TeamHistoryAutoWidget
@@ -21,21 +24,20 @@ local TeamHistoryDisplay = Lua.import('Module:Widget/Infobox/TeamHistory/Display
 local TeamHistory = Class.new(Widget)
 TeamHistory.defaultProps = {
 	player = String.upperCaseFirst(mw.title.getCurrentTitle().subpageText),
-	store = false,
+	store = false,--move to config as `storeFromWikiCode`???
 }
 
 ---@return Widget?
 function TeamHistory:render()
-	local teamHistory = TeamHistoryAutoExtension{player = self.props.player}
-		:fetch()
+	local transferList = TransferModel.getTeamHistoryForPerson{player = self.props.player, specialRoles = SPECIAL_ROLES}
 
 	if Logic.readBool(self.props.store) then
-		teamHistory:store()
+		TeamHistoryStoreExtension.store(transferList, self.props.player)
 	end
 
 	return TeamHistoryDisplay{
-		transferList = teamHistory.transferList,
-		player = teamHistory.config.player,
+		transferList = transferList,
+		player = self.props.player,
 	}
 end
 

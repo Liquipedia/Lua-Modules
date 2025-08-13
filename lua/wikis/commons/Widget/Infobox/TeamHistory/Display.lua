@@ -31,20 +31,7 @@ local Th = HtmlWidgets.Th
 local Tr = HtmlWidgets.Tr
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local SPECIAL_ROLES = {
-	'Retired',
-	'Retirement',
-	'Military',
-	'Banned',
-	'Producer',
-	'Caster',
-	'Admin',
-	'Observer',
-	'Host',
-	'Talent',
-	'League Operator',
-	'Inactive'
-}
+local SPECIAL_ROLES = Lua.import('Module:Infobox/Extension/TeamHistory/SpecialRoles', {loadData = true})
 local LOAN = 'Loan'
 local POSITION_ICON_DATA = Lua.requireIfExists('Module:PositionIcon/data', {loadData = true})
 
