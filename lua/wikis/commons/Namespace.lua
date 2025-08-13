@@ -15,12 +15,11 @@ local NS_USER = 2
 local NS_PROJECT = 4 -- "Liquipedia" namespace
 local NS_TEMPLATE = 10
 local NS_HELP = 12
+local NS_MATCH = 130
 local NS_MODULE = 828
 local NS_MODULE_TALK = 829
 
-local Namespace = {
-	NS_MATCH = 130,
-}
+local Namespace = {}
 
 ---Determins whether a given title object is in the given namespaces, and optionally their talk namespaces.
 ---@param title Title
@@ -98,6 +97,12 @@ function Namespace.prefixFromId(id)
 	end
 
 	return name
+end
+
+---can not use Namespace.idFromName because the NS does not exist on all wikis
+---@return integer
+function Namespace.matchNamespaceId()
+	return NS_MATCH
 end
 
 return Namespace

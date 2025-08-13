@@ -108,7 +108,7 @@ end
 function StandingsParseWiki.getMatchIdsOfMatchGroup(matchGroupId)
 	local matchGroup = mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = tostring(ConditionTree(BooleanOperator.all):add{
-			ConditionNode(ColumnName('namespace'), Comparator.neq, Namespace.NS_MATCH),
+			ConditionNode(ColumnName('namespace'), Comparator.neq, Namespace.matchNamespaceId()),
 			ConditionNode(ColumnName('match2bracketid'), Comparator.eq, matchGroupId),
 		}),
 		query = 'match2id',
