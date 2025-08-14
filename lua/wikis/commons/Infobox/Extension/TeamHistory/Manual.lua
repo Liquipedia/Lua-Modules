@@ -24,7 +24,7 @@ function TeamHistoryManual.parse(input)
 	end
 	if not args then return end
 
-	local dates = TeamHistoryManual._readDateInput(args[1])
+	local dates = TeamHistoryManual._readDateInput(args[1] or '')
 	local team = args.link or args[2]
 	local role = args[3]
 
@@ -43,7 +43,7 @@ function TeamHistoryManual.parse(input)
 	}
 end
 
----@param dateInput any
+---@param dateInput string
 ---@return {join: string?, leave: string?}
 function TeamHistoryManual._readDateInput(dateInput)
 	-- expected input formats (as per existing templates):
@@ -55,9 +55,11 @@ function TeamHistoryManual._readDateInput(dateInput)
 	if not joinDate then
 		mw.ext.TeamLiquidIntegration.add_category(BAD_INPUT_CATEGORY)
 	end
-	local leaveInput = string.sub(dateInput, 13)
+
+	local leaveInput = string.sub(dateInput, 11) -- everything after the first date
 	local leaveDate
 	if not leaveInput:find('Present') then
+		leaveInput = leaveInput:gsub('^[^%d]*', '') -- trim away everything before the (second) date
 		leaveDate = DateExt.toYmdInUtc(leaveInput)
 		if not leaveDate then
 			mw.ext.TeamLiquidIntegration.add_category(BAD_INPUT_CATEGORY)
