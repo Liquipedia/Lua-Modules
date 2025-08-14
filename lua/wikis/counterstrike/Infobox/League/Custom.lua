@@ -152,9 +152,9 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-		Cell{name = 'Teams', content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
-		Cell{name = 'Players', content = {args.player_number}},
-		Cell{name = 'Restrictions', content = self.caller:createRestrictionsCell(args.restrictions)}
+		Cell{name = 'Teams', children = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
+		Cell{name = 'Players', children = {args.player_number}},
+		Cell{name = 'Restrictions', children = self.caller:createRestrictionsCell(args.restrictions)}
 		)
 	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.map1) then
@@ -174,7 +174,7 @@ function CustomInjector:parse(id, widgets)
 			widgets,
 			Cell{
 				name = '[[File:ESL 2019 icon.png|20x20px|link=|ESL|alt=ESL]] Pro Tour Tier',
-				content = {self.caller:_createEslProTierCell(args.eslprotier)},
+				children = {self.caller:_createEslProTierCell(args.eslprotier)},
 				classes = {'infobox-icon-small'}
 			}
 		)
@@ -182,7 +182,7 @@ function CustomInjector:parse(id, widgets)
 			widgets,
 			Cell{
 				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox') .. ' Tier',
-				content = {self.caller:_createValveTierCell()},
+				children = {self.caller:_createValveTierCell()},
 				classes = {'valvepremier-highlighted'}
 			}
 		)
@@ -190,7 +190,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Game',
-				content = {self.caller:_createGameCell(args)}
+				children = {self.caller:_createGameCell(args)}
 			}
 		}
 	end

@@ -44,8 +44,8 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Game', content = {args.game}},
-			Cell{name = 'Players', content = {args.player_number}}
+			Cell{name = 'Game', children = {args.game}},
+			Cell{name = 'Players', children = {args.player_number}}
 		)
 	end
 

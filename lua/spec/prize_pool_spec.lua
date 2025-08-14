@@ -75,7 +75,6 @@ describe('prize pool', function()
 
 		assert.are_same(
 			{
-				abbreviateTbd = true,
 				autoExchange = true,
 				currencyRatePerOpponent = false,
 				currencyRoundPrecision = 3,

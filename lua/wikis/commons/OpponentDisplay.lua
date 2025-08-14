@@ -42,17 +42,12 @@ OpponentDisplay.BracketOpponentEntry = Class.new(
 	function(self, opponent, options)
 		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
 
-		if options.showTbd == false and (
-			Opponent.isEmpty(opponent) or
-			Opponent.isTbd(opponent) and opponent.type ~= Opponent.literal
-		) then
-			opponent = Opponent.blank()
-		end
-
 		if opponent.type == Opponent.team then
-			self:createTeam(opponent.template or 'tbd', options)
+			if options.showTbd ~= false or not Opponent.isTbd(opponent) then
+				self:createTeam(opponent.template or 'tbd', options)
+			end
 		elseif Opponent.typeIsParty(opponent.type) then
-			self:createPlayers(opponent)
+			self:createPlayers(opponent, options)
 		elseif opponent.type == Opponent.literal then
 			self:createLiteral(opponent.name or '')
 		end
@@ -80,11 +75,13 @@ end
 
 ---Creates party display as BracketOpponentEntry
 ---@param opponent standardOpponent
-function OpponentDisplay.BracketOpponentEntry:createPlayers(opponent)
+---@param options {showTbd: boolean?}
+function OpponentDisplay.BracketOpponentEntry:createPlayers(opponent, options)
 	local playerNode = OpponentDisplay.BlockPlayers({
 		opponent = opponent,
 		overflow = 'ellipsis',
 		showLink = false,
+		showTbd = options.showTbd,
 	})
 	self.content:node(playerNode)
 
@@ -136,15 +133,19 @@ end
 ---@field note string|number|nil
 ---@field teamStyle teamStyle?
 ---@field showFaction boolean?
+---@field showTbd boolean?
 
 ---Displays an opponent as an inline element. Useful for describing opponents in prose.
 ---@param props InlineOpponentProps
----@return Html|nil
+---@return Html
 function OpponentDisplay.InlineOpponent(props)
 	local opponent = props.opponent
 
 	local opponentNode
 	if opponent.type == Opponent.team then
+		if props.showTbd == false and Opponent.isTbd(opponent) then
+			return mw.html.create()
+		end
 		opponentNode = OpponentDisplay.InlineTeamContainer({
 			flip = props.flip,
 			style = props.teamStyle,
@@ -187,12 +188,12 @@ end
 ---@field showFlag boolean?
 ---@field showLink boolean?
 ---@field showPlayerTeam boolean?
----@field abbreviateTbd boolean?
 ---@field playerClass string?
 ---@field teamStyle teamStyle?
 ---@field dq boolean?
 ---@field note string|number|nil
 ---@field showFaction boolean?
+---@field showTbd boolean?
 
 --[[
 Displays an opponent as a block element. The width of the component is
@@ -207,6 +208,9 @@ function OpponentDisplay.BlockOpponent(props)
 	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
 	if opponent.type == Opponent.team then
+		if props.showTbd == false and Opponent.isTbd(opponent) then
+			return mw.html.create()
+		end
 		return OpponentDisplay.BlockTeamContainer({
 			flip = props.flip,
 			overflow = props.overflow,

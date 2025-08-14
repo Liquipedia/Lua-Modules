@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Page = Lua.import('Module:Page')
-local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
@@ -26,8 +25,6 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = TeamHistoryAuto.results{convertrole = true}
-
 	return player:createInfobox()
 end
 
@@ -40,11 +37,11 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'status' then
 		return {
-			Cell{name = 'Status', content = caller:_getStatusContents()},
-			Cell{name = 'Years Active', content = {args.years_active}},
+			Cell{name = 'Status', children = caller:_getStatusContents()},
+			Cell{name = 'Years Active', children = {args.years_active}},
 		}
 	elseif id == 'history' then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 
 	return widgets

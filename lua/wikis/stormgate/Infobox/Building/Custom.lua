@@ -78,19 +78,19 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Size', content = {args.size}},
-			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
-			Cell{name = 'Speed', content = {args.speed}},
-			Cell{name = 'Sight', content = {args.sight}},
-			Cell{name = 'Upgrades To', content = caller:_csvToPageList(args.upgrades_to)},
-			Cell{name = 'Introduced', content = {args.introducedDisplay}}
+			Cell{name = 'Size', children = {args.size}},
+			Cell{name = 'Energy', children = {caller:_energyDisplay()}},
+			Cell{name = 'Speed', children = {args.speed}},
+			Cell{name = 'Sight', children = {args.sight}},
+			Cell{name = 'Upgrades To', children = caller:_csvToPageList(args.upgrades_to)},
+			Cell{name = 'Introduced', children = {args.introducedDisplay}}
 		)
 		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
 			Array.extendWith(widgets, Attack.run(attackArgs, attackIndex, caller.faction))
 		end
 	elseif id == 'cost' then
 		return {
-			Cell{name = 'Cost', content = {CostDisplay.run{
+			Cell{name = 'Cost', children = {CostDisplay.run{
 				faction = caller.faction,
 				luminite = args.luminite,
 				luminiteTotal = args.totalluminite,
@@ -110,8 +110,8 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Tech. Requirements', content = caller:_csvToPageList(args.tech_requirement)},
-			Cell{name = 'Building Requirements', content = caller:_csvToPageList(args.building_requirement)},
+			Cell{name = 'Tech. Requirements', children = caller:_csvToPageList(args.tech_requirement)},
+			Cell{name = 'Building Requirements', children = caller:_csvToPageList(args.building_requirement)},
 		}
 	elseif id == 'hotkey' then
 		if not args.hotkey and not args.macro_key then return {} end
@@ -122,21 +122,21 @@ function CustomInjector:parse(id, widgets)
 			args.hotkey and CustomBuilding._hotkeys(args.hotkey, args.hotkey2),
 			args.macro_key and CustomBuilding._hotkeys(args.macro_key, args.macro_key2)
 		), HOTKEY_SEPERATOR)
-		return {Cell{name = hotkeyName, content = {hotkeys}}}
+		return {Cell{name = hotkeyName, children = {hotkeys}}}
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Builds', content = caller:_getBuildsOrUnlocksDisplay(args.builds)},
+			Cell{name = 'Builds', children = caller:_getBuildsOrUnlocksDisplay(args.builds)},
 		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocks', content = caller:_getBuildsOrUnlocksDisplay(args.unlocks)},
-			Cell{name = 'Supply Gained', content = Array.parseCommaSeparatedString(args.supply_gained)},
-			Cell{name = 'Power Gained', content = Array.parseCommaSeparatedString(args.power_gained)},
+			Cell{name = 'Unlocks', children = caller:_getBuildsOrUnlocksDisplay(args.unlocks)},
+			Cell{name = 'Supply Gained', children = Array.parseCommaSeparatedString(args.supply_gained)},
+			Cell{name = 'Power Gained', children = Array.parseCommaSeparatedString(args.power_gained)},
 		}
 	elseif id == 'defense' then
 		return {
-			Cell{name = 'Defense', content = {caller:_getDefenseDisplay()}},
-			Cell{name = 'Attributes', content = {caller:_displayCsvAsPageCsv(args.armor_type)}}
+			Cell{name = 'Defense', children = {caller:_getDefenseDisplay()}},
+			Cell{name = 'Attributes', children = {caller:_displayCsvAsPageCsv(args.armor_type)}}
 		}
 	elseif id == 'attack' then return {}
 	end
@@ -386,12 +386,12 @@ function CustomBuilding:_parseForCreeps(id, widgets)
 	if id ~= 'custom' then return {} end
 
 	return {
-		Cell{name = 'Start Level', content = {startLevel}},
-		Cell{name = 'Defenders', content = {self._displayCreepDefenders(creeps)}},
-		Cell{name = 'Respawn', content = {args.respawn and args.respawn .. 's'}},
+		Cell{name = 'Start Level', children = {startLevel}},
+		Cell{name = 'Defenders', children = {self._displayCreepDefenders(creeps)}},
+		Cell{name = 'Respawn', children = {args.respawn and args.respawn .. 's'}},
 		Title{children = 'Tower Rewards'},
-		Cell{name = 'Capture Point', content = {args.capture_point}},
-		Cell{name = 'Global Buff', content = {args.global_buff}},
+		Cell{name = 'Capture Point', children = {args.capture_point}},
+		Cell{name = 'Global Buff', children = {args.global_buff}},
 	}
 end
 

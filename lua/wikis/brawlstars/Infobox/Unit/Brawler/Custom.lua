@@ -42,12 +42,12 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Center{children = {args.quote}})
 	elseif id == 'type' then
 		return {
-			Cell{name = 'Real Name', content = {args.realname}},
-			Cell{name = 'Rarity', content = {args.rarity}},
+			Cell{name = 'Real Name', children = {args.realname}},
+			Cell{name = 'Rarity', children = {args.rarity}},
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Unlock', content = {args.unlock}},
+			Cell{name = 'Unlock', children = {args.unlock}},
 		}
 	elseif id == 'attack' then
 		return {}
@@ -55,16 +55,16 @@ function CustomInjector:parse(id, widgets)
 		return {}
 	elseif id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Release Date', content = {args.releasedate}},
-			Cell{name = 'Health', content = {args.hp}},
-			Cell{name = 'Movespeed', content = {args.movespeed}},
+			Cell{name = 'Release Date', children = {args.releasedate}},
+			Cell{name = 'Health', children = {args.hp}},
+			Cell{name = 'Movespeed', children = {args.movespeed}},
 			Title{children = 'Weapon & Super'},
-			Cell{name = 'Primary Weapon', content = {args.attack}},
-			Cell{name = 'Super Ability', content = {args.super}},
+			Cell{name = 'Primary Weapon', children = {args.attack}},
+			Cell{name = 'Super Ability', children = {args.super}},
 			Title{children = 'Abilities'},
-			Cell{name = 'Gadgets', content = {args.gadget}},
-			Cell{name = 'Star Powers', content = {args.star}},
-			Cell{name = 'Hypercharge', content = {args.hypercharge}}
+			Cell{name = 'Gadgets', children = {args.gadget}},
+			Cell{name = 'Star Powers', children = {args.star}},
+			Cell{name = 'Hypercharge', children = {args.hypercharge}}
 		)
 	end
 

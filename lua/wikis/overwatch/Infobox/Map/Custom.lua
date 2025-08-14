@@ -43,7 +43,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Location',
-				content = {Flags.Icon{flag = args.location, shouldLink = false} .. '&nbsp;' .. args.location},
+				children = {Flags.Icon{flag = args.location, shouldLink = false} .. '&nbsp;' .. args.location},
 			},
 		}
 	elseif id == 'custom' then
@@ -55,9 +55,9 @@ function CustomInjector:parse(id, widgets)
 		end)
 		Array.appendWith(
 			widgets,
-			Cell{name = #gameModes == 1 and 'Game Mode' or 'Game Modes', content = gameModes},
-			Cell{name = 'Lighting', content = {args.lighting}},
-			Cell{name = 'Checkpoints', content = {args.checkpoints}}
+			Cell{name = #gameModes == 1 and 'Game Mode' or 'Game Modes', children = gameModes},
+			Cell{name = 'Lighting', children = {args.lighting}},
+			Cell{name = 'Checkpoints', children = {args.checkpoints}}
 		)
 	end
 	return widgets

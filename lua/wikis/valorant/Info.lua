@@ -50,5 +50,11 @@ return {
 				playedMatches = 'Matches',
 			},
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'automatic',
+			},
+		},
 	},
 }

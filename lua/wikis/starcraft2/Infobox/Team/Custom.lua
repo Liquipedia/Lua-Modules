@@ -71,8 +71,8 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		return {
-			Cell{name = 'Approx. Total Winnings', content = {displayEarnings(self.caller.teamEarnings)}},
-			Cell{name = PLAYER_EARNINGS_ABBREVIATION, content = {displayEarnings(self.caller.playerEarnings)}},
+			Cell{name = 'Approx. Total Winnings', children = {displayEarnings(self.caller.teamEarnings)}},
+			Cell{name = PLAYER_EARNINGS_ABBREVIATION, children = {displayEarnings(self.caller.playerEarnings)}},
 		}
 	elseif id == 'achievements' then
 		local achievements, soloAchievements = Achievements.teamAndTeamSolo()
@@ -93,7 +93,7 @@ function CustomInjector:parse(id, widgets)
 		if raceBreakdown then
 			Array.appendWith(widgets,
 				Title{children = 'Player Breakdown'},
-				Cell{name = 'Number of Players', content = {raceBreakdown.total}},
+				Cell{name = 'Number of Players', children = {raceBreakdown.total}},
 				Breakdown{children = raceBreakdown.display, classes = {'infobox-center'}}
 			)
 		end
@@ -104,7 +104,7 @@ function CustomInjector:parse(id, widgets)
 		while(not String.isEmpty(args['history' .. index .. 'title'])) do
 			table.insert(widgets, Cell{
 				name = args['history' .. index .. 'title'],
-				content = {args['history' .. index]}
+				children = {args['history' .. index]}
 			})
 			index = index + 1
 		end

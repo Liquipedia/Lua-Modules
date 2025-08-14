@@ -38,19 +38,19 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Age', content = {args.age}},
+			Cell{name = 'Age', children = {args.age}},
 			Cell{
 				name = 'Cost',
-				content = {'[[File:Omega Strikers Striker Credits.png|20px]] ' .. args.strikercredits ..
+				children = {'[[File:Omega Strikers Striker Credits.png|20px]] ' .. args.strikercredits ..
 						'  [[File:Omega Strikers Ody Points.png|20px]] ' .. args.odypoints}
 			},
-			Cell{name = 'Affiliation', content = {'[[File:' .. args.affiliation .. ' allmode.png|20px]] ' .. args.affiliation}
+			Cell{name = 'Affiliation', children = {'[[File:' .. args.affiliation .. ' allmode.png|20px]] ' .. args.affiliation}
 			},
-			Cell{name = 'Voice Actor(s)', content = {args.voiceactors}},
+			Cell{name = 'Voice Actor(s)', children = {args.voiceactors}},
 			Title{children = 'Abilities'},
-			Cell{name = 'Primary', content = {'[[File:' .. args.name .. ' - Primary.png|20px]] ' .. args.primary}},
-			Cell{name = 'Secondary', content = {'[[File:' .. args.name .. ' - Secondary.png|20px]] ' .. args.secondary}},
-			Cell{name = 'Special', content = {'[[File:' .. args.name .. ' - Special.png|20px]] ' .. args.special}}
+			Cell{name = 'Primary', children = {'[[File:' .. args.name .. ' - Primary.png|20px]] ' .. args.primary}},
+			Cell{name = 'Secondary', children = {'[[File:' .. args.name .. ' - Secondary.png|20px]] ' .. args.secondary}},
+			Cell{name = 'Special', children = {'[[File:' .. args.name .. ' - Special.png|20px]] ' .. args.special}}
 		)
 	end
 

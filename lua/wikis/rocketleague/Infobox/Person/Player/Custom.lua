@@ -90,10 +90,10 @@ function CustomInjector:parse(id, widgets)
 					text = 'Epic Creator Code',
 					title = 'Support-A-Creator Code used when purchasing Rocket League or Epic Games Store products',
 				},
-				content = {args.creatorcode}
+				children = {args.creatorcode}
 			},
-			Cell{name = 'Starting Game', content = {gameDisplay}},
-			Cell{name = 'Solo MMR', content = {mmrDisplay}},
+			Cell{name = 'Starting Game', children = {gameDisplay}},
+			Cell{name = 'Solo MMR', children = {mmrDisplay}},
 		}
 	elseif id == 'status' then
 		local statusContents = CustomPlayer._getStatusContents(args)
@@ -110,10 +110,10 @@ function CustomInjector:parse(id, widgets)
 		)
 
 		return {
-			Cell{name = 'Status', content = statusContents},
-			Cell{name = 'Years Active (Player)', content = {yearsActive}},
-			Cell{name = 'Years Active (Coach)', content = {yearsActiveCoach}},
-			Cell{name = 'Years Active (Talent)', content = {yearsActiveTalent}},
+			Cell{name = 'Status', children = statusContents},
+			Cell{name = 'Years Active (Player)', children = {yearsActive}},
+			Cell{name = 'Years Active (Coach)', children = {yearsActiveCoach}},
+			Cell{name = 'Years Active (Talent)', children = {yearsActiveTalent}},
 		}
 	elseif id == 'history' then
 		local getHistoryCells = function(key, title)
@@ -133,8 +133,8 @@ function CustomInjector:parse(id, widgets)
 		)
 	elseif id == 'nationality' then
 		return {
-			Cell{name = 'Location', content = {args.location}},
-			Cell{name = 'Nationality', content = caller:displayLocations()}
+			Cell{name = 'Location', children = {args.location}},
+			Cell{name = 'Nationality', children = caller:displayLocations()}
 		}
 	end
 	return widgets

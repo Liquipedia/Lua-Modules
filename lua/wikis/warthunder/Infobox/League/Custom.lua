@@ -56,8 +56,8 @@ function CustomInjector:parse(id, widgets)
 		local vehicle = VEHICLES[string.lower(args.vehicle or '')] or 'Unknown'
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Mode', content = {mode}},
-			Cell{name = 'Vehicle', content = {vehicle}}
+			Cell{name = 'Mode', children = {mode}},
+			Cell{name = 'Vehicle', children = {vehicle}}
 		)
 	end
 

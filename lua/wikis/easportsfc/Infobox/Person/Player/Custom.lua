@@ -36,7 +36,7 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
-		table.insert(widgets, Cell{name = 'Agency', content = {Page.makeInternalLink(args.agency)}})
+		table.insert(widgets, Cell{name = 'Agency', children = {Page.makeInternalLink(args.agency)}})
 	end
 
 	return widgets

@@ -20,7 +20,6 @@ local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local Region = Lua.import('Module:Region')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -78,30 +77,6 @@ function CustomPlayer.run(frame)
 
 	local args = player.args
 
-	args.autoTeam = true
-
-	local automatedHistory = TeamHistoryAuto.results{player = player.pagename, convertrole = true, addlpdbdata = true}
-	if String.isEmpty(args.history) then
-		player.args.history = automatedHistory
-	else
-		args.history = tostring(mw.html.create('div')
-			:tag('div')
-				:tag('big')
-					:addClass("show-when-logged-in")
-					:addClass("navigation-not-searchable")
-					:wikitext("Automated History")
-					:done()
-				:wikitext(automatedHistory)
-				:done()
-			:tag('div')
-				:addClass("show-when-logged-in")
-				:addClass("navigation-not-searchable")
-				:tag('big'):wikitext("Manual History"):done()
-				:wikitext(args.history)
-				:done()
-			)
-	end
-
 	-- Automatic achievements
 	args.achievements = Achievements.player{player = player.pagename, noTemplate = true}
 
@@ -158,7 +133,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		Array.appendWith(widgets,
 			-- Games & Inactive Games
-			Cell{name = 'Games', content = Array.map(args.gameList, function(game)
+			Cell{name = 'Games', children = Array.map(args.gameList, function(game)
 				return game.name .. (game.active and '' or '&nbsp;<small>(inactive)</small>')
 			end)}
 		)
@@ -167,7 +142,7 @@ function CustomInjector:parse(id, widgets)
 		for game, ratings in Table.iter.spairs(RATINGCONFIG) do
 			game = Game.raw{game = game}
 			Array.forEach(ratings, function(rating)
-				local content = {}
+				local children = {}
 				local currentRating, bestRating
 				if rating.game then
 					currentRating, bestRating = caller:_getRating(rating.id, rating.game)
@@ -176,14 +151,14 @@ function CustomInjector:parse(id, widgets)
 				end
 				if String.isNotEmpty(currentRating) then
 					currentRating = currentRating .. '&nbsp;<small>(current)</small>'
-					table.insert(content, currentRating)
+					table.insert(children, currentRating)
 				end
 				if String.isNotEmpty(bestRating) then
 					bestRating = bestRating .. '&nbsp;<small>(highest)</small>'
-					table.insert(content, bestRating)
+					table.insert(children, bestRating)
 				end
-				if Logic.isNotEmpty(content) then
-					table.insert(ratingCells, Cell{name = rating.text .. ' (' .. game.abbreviation .. ')', content = content})
+				if Logic.isNotEmpty(children) then
+					table.insert(ratingCells, Cell{name = rating.text .. ' (' .. game.abbreviation .. ')', children = children})
 				end
 			end)
 		end
@@ -194,7 +169,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'status' then
 		table.insert(widgets, Cell{
 			name = 'Years Active',
-			content = args.years_active and mw.text.split(args.years_active, ',') or {}
+			children = args.years_active and mw.text.split(args.years_active, ',') or {}
 		})
 	elseif id == 'region' then
 		return {}

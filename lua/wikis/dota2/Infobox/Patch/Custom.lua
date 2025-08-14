@@ -33,11 +33,11 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		return {
-			Widgets.Cell{name = 'New Heroes', content = {args.new}},
-			Widgets.Cell{name = 'Nerfed Heroes', content = {args.nerfed}},
-			Widgets.Cell{name = 'Buffed Heroes', content = {args.buffed}},
-			Widgets.Cell{name = 'Rebalanced Heroes', content = {args.rebalanced}},
-			Widgets.Cell{name = 'Reworked Heroes', content = {args.reworked}},
+			Widgets.Cell{name = 'New Heroes', children = {args.new}},
+			Widgets.Cell{name = 'Nerfed Heroes', children = {args.nerfed}},
+			Widgets.Cell{name = 'Buffed Heroes', children = {args.buffed}},
+			Widgets.Cell{name = 'Rebalanced Heroes', children = {args.rebalanced}},
+			Widgets.Cell{name = 'Reworked Heroes', children = {args.reworked}},
 		}
 	end
 	return widgets

@@ -49,5 +49,10 @@ return {
 			matchWidth = 180,
 		},
 		defaultMaxPlayersPerPlacement = 12,
+		infoboxPlayer = {
+			automatedHistory = {
+				mode = 'manual',
+			},
+		},
 	},
 }

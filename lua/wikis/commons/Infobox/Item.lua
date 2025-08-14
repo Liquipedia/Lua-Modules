@@ -57,17 +57,17 @@ function Item:createInfobox()
 			id = 'info',
 			children = {
 				Title{children = 'Item Information'},
-				Cell{name = 'Type', content = {args.type}},
-				Cell{name = 'Rarity', content = self:getAllArgsForBase(args, 'rarity')},
-				Cell{name = 'Level', content = {args.level}},
-				Cell{name = 'Class', content = {args.class}},
-				Cell{name = 'Cost', content = {args.cost}},
+				Cell{name = 'Type', children = {args.type}},
+				Cell{name = 'Rarity', children = self:getAllArgsForBase(args, 'rarity')},
+				Cell{name = 'Level', children = {args.level}},
+				Cell{name = 'Class', children = {args.class}},
+				Cell{name = 'Cost', children = {args.cost}},
 			}
 		},
 		Customizable{
 			id = 'released',
 			children = {
-				Cell{name = 'Released', content = {args.release}}
+				Cell{name = 'Released', children = {args.release}}
 			},
 		},
 		Customizable{id = 'attributes', children = {}},

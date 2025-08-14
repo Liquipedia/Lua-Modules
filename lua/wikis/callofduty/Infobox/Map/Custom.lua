@@ -49,10 +49,10 @@ function CustomInjector:parse(widgetId, widgets)
 		local games = self.caller:_getGames(args)
 		return Array.append(
 			widgets,
-			Cell{name = 'Type', content = {args.type}},
-			Cell{name = #games > 1 and 'Game Versions' or 'Game Version', content = games, options = {makeLink = true}},
-			Cell{name = 'Day/Night Variant', content = {args.daynight}},
-			Cell{name = 'Playlists', content = {args.playlist}}
+			Cell{name = 'Type', children = {args.type}},
+			Cell{name = #games > 1 and 'Game Versions' or 'Game Version', children = games, options = {makeLink = true}},
+			Cell{name = 'Day/Night Variant', children = {args.daynight}},
+			Cell{name = 'Playlists', children = {args.playlist}}
 		)
 	end
 	return widgets

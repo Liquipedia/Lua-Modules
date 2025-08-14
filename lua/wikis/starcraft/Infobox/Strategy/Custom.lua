@@ -50,12 +50,12 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		return {
-			Cell{name = 'Matchups', content = {args.matchups or 'All'}},
-			Cell{name = 'Type', content = {args.type or 'Opening'}},
-			Cell{name = 'Popularized by', content = {args.popularized}},
-			Cell{name = 'Converted Form', content = {args.convert}},
-			Cell{name = 'TL-Article', content = {caller:_getTLarticle(args.tlarticle)}},
-			Cell{name = 'Game', content = {args.game or
+			Cell{name = 'Matchups', children = {args.matchups or 'All'}},
+			Cell{name = 'Type', children = {args.type or 'Opening'}},
+			Cell{name = 'Popularized by', children = {args.popularized}},
+			Cell{name = 'Converted Form', children = {args.convert}},
+			Cell{name = 'TL-Article', children = {caller:_getTLarticle(args.tlarticle)}},
+			Cell{name = 'Game', children = {args.game or
 				(args.informationType == COUNTER_INFORMATION_TYPE and DEFAULT_COUNTER_GAME or nil)}},
 		}
 	elseif id == 'header' then

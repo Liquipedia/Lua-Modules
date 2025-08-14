@@ -77,5 +77,11 @@ return {
 			showPatches = true,
 		},
 		forceUnderscores = true, -- applies to several components
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'manualPrio',
+			},
+		},
 	},
 }

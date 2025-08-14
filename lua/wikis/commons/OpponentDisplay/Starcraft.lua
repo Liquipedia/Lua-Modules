@@ -21,9 +21,6 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 ---@class StarcraftOpponentDisplay: OpponentDisplay
 local StarcraftOpponentDisplay = Table.copy(OpponentDisplay)
 
----@class StarcraftInlineOpponentProps: InlineOpponentProps
----@field opponent StarcraftStandardOpponent
-
 ---@class StarcraftBlockOpponentProps: BlockOpponentProps
 ---@field opponent StarcraftStandardOpponent
 
@@ -37,11 +34,6 @@ local BracketOpponentEntry = Class.new(
 	---@param opponent StarcraftStandardOpponent
 	---@param options {forceShortName: boolean, showTbd: boolean}
 	function(self, opponent, options)
-		if opponent.type == Opponent.team and options.showTbd == false and
-				(Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)) then
-			opponent = Opponent.blank() --[[@as StarcraftStandardOpponent]]
-		end
-
 		local showFactionBackground = opponent.type == Opponent.solo
 			or opponent.extradata.hasFactionOrFlag
 			or opponent.type == Opponent.duo and opponent.isArchon
@@ -50,18 +42,21 @@ local BracketOpponentEntry = Class.new(
 			:addClass(showFactionBackground and Faction.bgClass(opponent.players[1].faction) or nil)
 
 		if opponent.type == Opponent.team then
-			self.content:node(OpponentDisplay.BlockTeamContainer({
-				showLink = false,
-				style = 'hybrid',
-				team = opponent.team,
-				template = opponent.template,
-			}))
+			if options.showTbd ~= false or not Opponent.isTbd(opponent) then
+				self.content:node(OpponentDisplay.BlockTeamContainer({
+					showLink = false,
+					style = 'hybrid',
+					team = opponent.team,
+					template = opponent.template,
+				}))
+			end
 		else
 			self.content:node(StarcraftOpponentDisplay.BlockOpponent({
 				opponent = opponent,
 				overflow = 'ellipsis',
 				playerClass = 'starcraft-bracket-block-player',
 				showLink = false,
+				showTbd = options.showTbd,
 			}))
 		end
 
@@ -109,6 +104,9 @@ function StarcraftOpponentDisplay.BlockOpponent(props)
 		)
 	end
 
+	if props.showTbd == false and Opponent.isTbd(opponent) then
+		return mw.html.create()
+	end
 	return OpponentDisplay.BlockOpponent(props)
 end
 

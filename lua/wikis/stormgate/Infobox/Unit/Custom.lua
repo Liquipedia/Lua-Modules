@@ -74,20 +74,20 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'type' then
 		return {
-			Cell{name = 'Type', content = {caller:_displayCsvAsPageCsv(args.type)}},
+			Cell{name = 'Type', children = {caller:_displayCsvAsPageCsv(args.type)}},
 		}
 	elseif id == 'builtfrom' then
 		return {
-			Cell{name = 'Built From', content = caller:_csvToPageList(args.built)},
+			Cell{name = 'Built From', children = caller:_csvToPageList(args.built)},
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Tech. Requirement', content = {caller:_displayCsvAsPageCsv(args.tech_requirement)}},
-			Cell{name = 'Building Requirement', content = {caller:_displayCsvAsPageCsv(args.building_requirement)}},
+			Cell{name = 'Tech. Requirement', children = {caller:_displayCsvAsPageCsv(args.tech_requirement)}},
+			Cell{name = 'Building Requirement', children = {caller:_displayCsvAsPageCsv(args.building_requirement)}},
 		}
 	elseif id == 'cost' then
 		return {
-			Cell{name = 'Cost', content = {args.informationType ~= 'Hero' and CostDisplay.run{
+			Cell{name = 'Cost', children = {args.informationType ~= 'Hero' and CostDisplay.run{
 				faction = caller.faction,
 				luminite = args.luminite,
 				luminiteTotal = args.totalluminite,
@@ -103,7 +103,7 @@ function CustomInjector:parse(id, widgets)
 				animus = args.animus,
 				animusTotal = args.totalanimus,
 			} or nil}},
-			Cell{name = 'Recharge Time', content = {args.charge_time and (args.charge_time .. 's') or nil}},
+			Cell{name = 'Recharge Time', children = {args.charge_time and (args.charge_time .. 's') or nil}},
 		}
 	elseif id == 'hotkey' then
 		if not args.hotkey and not args.macro_key then return {} end
@@ -114,20 +114,20 @@ function CustomInjector:parse(id, widgets)
 			args.hotkey and CustomUnit._hotkeys(args.hotkey, args.hotkey2),
 			args.macro_key and CustomUnit._hotkeys(args.macro_key, args.macro_key2)
 		), HOTKEY_SEPERATOR)
-		return {Cell{name = hotkeyName, content = {hotkeys}}}
+		return {Cell{name = hotkeyName, children = {hotkeys}}}
 	elseif id == 'attack' then return {}
 	elseif id == 'defense' then
 		return {
-			Cell{name = 'Defense', content = {caller:_getDefenseDisplay()}},
-			Cell{name = 'Attributes', content = {caller:_displayCsvAsPageCsv(args.armor_type)}}
+			Cell{name = 'Defense', children = {caller:_getDefenseDisplay()}},
+			Cell{name = 'Attributes', children = {caller:_displayCsvAsPageCsv(args.armor_type)}}
 		}
 	elseif id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
-			Cell{name = 'Speed', content = {args.speed}},
-			Cell{name = 'Sight', content = {args.sight}},
-			Cell{name = 'Upgrades To', content = {caller:_displayCsvAsPageCsv(args.upgrades_to)}},
-			Cell{name = 'Introduced', content = {args.introducedDisplay}}
+			Cell{name = 'Energy', children = {caller:_energyDisplay()}},
+			Cell{name = 'Speed', children = {args.speed}},
+			Cell{name = 'Sight', children = {args.sight}},
+			Cell{name = 'Upgrades To', children = {caller:_displayCsvAsPageCsv(args.upgrades_to)}},
+			Cell{name = 'Introduced', children = {args.introducedDisplay}}
 		)
 		-- moved to the bottom due to having headers that would look ugly if in place where attack is set in commons
 		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do

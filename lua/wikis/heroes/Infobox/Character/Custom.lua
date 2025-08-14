@@ -60,14 +60,14 @@ function CustomInjector:parse(id, widgets)
 				makeBreakdownCell('Role', getRoleIcon(args.role)),
 				makeBreakdownCell('Attack', table.concat({args.attacktype, args.attacktype2}, ' and ')),
 			}},
-			Cell{name = 'Cost', content = {
+			Cell{name = 'Cost', children = {
 				Image.display('HotSGold.png', nil, {alt = 'Gold', size = 16, link = ''}) .. ' ' .. (args.costgold or '?'),
 				Image.display('HotSGems.png', nil, {alt = 'Gems', size = 16, link = ''}) .. ' ' .. (args.costgem or '?'),
 			}},
 			Title{children = 'Stats'},
-			Cell{name = args.armortype or 'Armor', content = {args.armor}},
-			Cell{name = 'Attack Range', content = {args.attackrange}},
-			Cell{name = 'Attacks Per Second', content = {args.attackspeed}},
+			Cell{name = args.armortype or 'Armor', children = {args.armor}},
+			Cell{name = 'Attack Range', children = {args.attackrange}},
+			Cell{name = 'Attacks Per Second', children = {args.attackspeed}},
 			Title{children = 'Stats Change per Level'},
 			Table{
 				rows = {

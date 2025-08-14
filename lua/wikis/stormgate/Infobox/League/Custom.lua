@@ -100,12 +100,12 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'gamesettings' then
-		table.insert(widgets, Cell{name = 'Game Version', content = {self.caller:_getGameVersion()}})
+		table.insert(widgets, Cell{name = 'Game Version', children = {self.caller:_getGameVersion()}})
 	elseif id == 'customcontent' then
 		if args.player_number and args.player_number > 0 then
 			Array.appendWith(widgets,
 				Title{children = 'Player Breakdown'},
-				Cell{name = 'Number of Players', content = {args.raceBreakDown.total}},
+				Cell{name = 'Number of Players', children = {args.raceBreakDown.total}},
 				Breakdown{children = args.raceBreakDown.display, classes = { 'infobox-center' }}
 			)
 		end
@@ -114,7 +114,7 @@ function CustomInjector:parse(id, widgets)
 		if Logic.isNumeric(args.team_number) and tonumber(args.team_number) > 0 then
 			Array.appendWith(widgets,
 				Title{children = 'Teams'},
-				Cell{name = 'Number of Teams', content = {args.team_number}}
+				Cell{name = 'Number of Teams', children = {args.team_number}}
 			)
 		end
 

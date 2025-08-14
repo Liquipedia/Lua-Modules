@@ -130,12 +130,6 @@ BasePrizePool.config = {
 			return args.lpdb_prefix or Variables.varDefault('lpdb_prefix')
 		end
 	},
-	abbreviateTbd = {
-		default = true,
-		read = function(args)
-			return Logic.readBoolOrNil(args.abbreviateTbd)
-		end
-	},
 	fillPlaceRange = {
 		default = true,
 		read = function(args)
@@ -676,7 +670,6 @@ function BasePrizePool:_buildRows()
 			local opponentDisplay = tostring(OpponentDisplay.BlockOpponent{
 				opponent = opponent.opponentData,
 				showPlayerTeam = true,
-				abbreviateTbd = self.options.abbreviateTbd,
 			})
 			local opponentCss = {['justify-content'] = 'start'}
 

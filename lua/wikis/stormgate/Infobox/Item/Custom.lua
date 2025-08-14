@@ -65,14 +65,14 @@ function CustomInjector:parse(id, widgets)
 	if id == 'info' then
 		return {
 			Title{children = args.informationType .. ' Information'},
-			Cell{name = 'Slot', content = {tonumber(args.slot)}},
-			Cell{name = 'Introduced', content = {caller.data.introduced.display}}
+			Cell{name = 'Slot', children = {tonumber(args.slot)}},
+			Cell{name = 'Introduced', children = {caller.data.introduced.display}}
 		}
 	elseif id == 'availability' then
 		return {
 			Title{children = 'Availability'},
-			Cell{name = 'Faction', content = {CustomItem._getFactionsDisplay(args.faction)}},
-			Cell{name = 'Unlocked', content = {CustomItem._getUnlockedDisplay(args.unlocked)}},
+			Cell{name = 'Faction', children = {CustomItem._getFactionsDisplay(args.faction)}},
+			Cell{name = 'Unlocked', children = {CustomItem._getUnlockedDisplay(args.unlocked)}},
 		}
 	elseif id == 'recipe' then
 		return {

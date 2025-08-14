@@ -347,11 +347,11 @@ function CustomBuildingUnit.mercenaryStats(args)
 
 	return {
 		Title{children = 'Mercenary Stats'},
-		Cell{name = 'Stock Maximum', content = {args.stock}},
-		Cell{name = 'Stock Start Delay', content = {Abbreviation.make{
+		Cell{name = 'Stock Maximum', children = {args.stock}},
+		Cell{name = 'Stock Start Delay', children = {Abbreviation.make{
 			text = args.stockstart .. 's', title = 'First available at ' .. GameClock.run(args.stockstart)}}},
-		Cell{name = 'Replenish Interval', content = {args.stockreplenish}},
-		Cell{name = 'Tileset', content = {args.merctileset, args.merctileset2, args.merctileset3}},
+		Cell{name = 'Replenish Interval', children = {args.stockreplenish}},
+		Cell{name = 'Tileset', children = {args.merctileset, args.merctileset2, args.merctileset3}},
 	}
 end
 
@@ -367,11 +367,11 @@ function CustomBuildingUnit.movement(args, title)
 
 	return {
 		Title{children = title},
-		Cell{name = '[[Movement Speed|Speed]]', content = {speed}},
-		Cell{name = 'Turn Rate', content = {args.turnrate}},
-		Cell{name = 'Move Type', content = {args.movetype}},
-		Cell{name = 'Collision Size', content = {args.collision}},
-		Cell{name = 'Cargo Size', content = {args.cargo_size}},
+		Cell{name = '[[Movement Speed|Speed]]', children = {speed}},
+		Cell{name = 'Turn Rate', children = {args.turnrate}},
+		Cell{name = 'Move Type', children = {args.movetype}},
+		Cell{name = 'Collision Size', children = {args.collision}},
+		Cell{name = 'Cargo Size', children = {args.cargo_size}},
 	}
 end
 

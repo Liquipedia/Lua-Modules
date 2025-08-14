@@ -71,6 +71,11 @@ return {
 			excludeTierTypes = {'Qualifier'},
 			showPatches = true,
 		},
+		infoboxPlayer = {
+			automatedHistory = {
+				mode = 'merge',
+			},
+		},
 	},
 	defaultRoundPrecision = 0,
 }

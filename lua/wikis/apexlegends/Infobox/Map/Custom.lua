@@ -51,8 +51,8 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Game Mode(s)', content = {args.gamemode}},
-			Cell{name = 'Played in ALGS', content = {self.caller:_createSpan(args)}}
+			Cell{name = 'Game Mode(s)', children = {args.gamemode}},
+			Cell{name = 'Played in ALGS', children = {self.caller:_createSpan(args)}}
 		)
 
 		if String.isEmpty(args.ring) then return widgets end
