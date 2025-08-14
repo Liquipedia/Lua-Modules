@@ -57,7 +57,7 @@ local HAS_REFS = ((Info.config.infoboxPlayer or {}).automatedHistory or {}).hasH
 
 ---@class TeamHistoryDisplayWidget: Widget
 ---@operator call(table): TeamHistoryDisplayWidget
----@field props {transferList: table[], player: string}
+---@field props {transferList: TransferSpan[], player: string}
 local TeamHistoryDisplay = Class.new(Widget)
 TeamHistoryDisplay.defaultProps = {
 	transferList = {},
@@ -117,7 +117,7 @@ function TeamHistoryDisplay:_header()
 	}}
 end
 
----@param transfer table
+---@param transfer TransferSpan
 ---@return Widget
 function TeamHistoryDisplay:_row(transfer)
 	local teamText = self:_getTeamText(transfer)
@@ -209,7 +209,7 @@ function TeamHistoryDisplay:_row(transfer)
 	}}
 end
 
----@param transfer table
+---@param transfer TransferSpan
 ---@return string?
 ---@return Widget
 function TeamHistoryDisplay:_getTeamText(transfer)
@@ -253,7 +253,7 @@ function TeamHistoryDisplay._adjustDate(date)
 	return os.date('%Y-%m-%d', os.time(dateStruct)) --[[@as string]]
 end
 
----@param transfer table
+---@param transfer TransferSpan
 ---@return string|Widget?
 function TeamHistoryDisplay:_buildLeaveDateDisplay(transfer)
 	if transfer.leaveDateDisplay then return transfer.leaveDateDisplay end
