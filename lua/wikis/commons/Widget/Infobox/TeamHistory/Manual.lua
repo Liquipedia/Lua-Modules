@@ -24,7 +24,7 @@ local TeamHistory = Class.new(Widget)
 ---@return Widget?
 function TeamHistory:render()
 	local firstElementParsed = Json.parseIfTable(self.props[1])
-	local elements = firstElementParsed and {self.props} or self.props
+	local elements = firstElementParsed and self.props or {self.props}
 
 	local transferList = Array.map(elements, TeamHistoryManualExtension.parse)
 
