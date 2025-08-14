@@ -19,12 +19,12 @@ local CONTENT = {
 		boxid = 1504,
 	},
 	specialEvents = {
-		heading = 'Feature Event',
+		noPanel = 'true',
 		body = '{{Liquipedia:Special Event}}',
 		boxid = 1516,
 	},
 	popularEsports = {
-		heading = 'Popular Esports',
+		noPanel = 'true',
 		body = '{{Liquipedia:Popular Esports}}',
 		boxid = 1529,
 	},
