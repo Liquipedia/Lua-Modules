@@ -1536,6 +1536,11 @@ local data = {
 		localised = '',
 		name = '',
 	},
+	['unknown'] = {
+		flag = 'File:Flag Unknown.svg',
+		localised = '',
+		name = '',
+	},
 }
 
 -- This table includes:
@@ -2086,7 +2091,7 @@ local threeLetter = {
 	['sea'] = 'southeastasia',
 	['uae'] = 'unitedarabemirates',
 
-	['tbd'] = 'filler',
+	['tbd'] = 'unknown',
 }
 
 -- This table includes:
@@ -2192,7 +2197,6 @@ local aliases = {
 	['uk'] = 'unitedkingdom',
 	['ff'] = 'filler',
 	['fillerflag'] = 'filler',
-	['unknown'] = 'filler',
 
 	['non'] = 'nonrepresenting',
 	['none'] = 'nonrepresenting',
