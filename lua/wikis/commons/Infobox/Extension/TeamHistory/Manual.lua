@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
 
 local BAD_INPUT_CATEGORY = 'Improperly formatted TeamHistory date'
 local ROLE_CLEAN = Lua.requireIfExists('Module:TeamHistoryAuto/cleanRole', {loadData = true})
@@ -24,7 +25,7 @@ function TeamHistoryManual.parse(input)
 	end
 	if not args then return end
 
-	local dates = TeamHistoryManual._readDateInput(args[1] or '')
+	local displayDates = TeamHistoryManual._readDateInput(args[1] or '')
 	local team = args.link or args[2]
 	local role = args[3]
 
@@ -35,12 +36,24 @@ function TeamHistoryManual.parse(input)
 	return {
 		team = team,
 		role = role,
-		joinDate = args.estimated_start or dates.join,
-		joinDateDisplay = dates.join,
-		leaveDate = args.estimated_end or dates.leave,
-		leaveDateDisplay = dates.leave,
+		joinDate = TeamHistoryManual._parseDatesToYmd(displayDates.join, args.estimated_start),
+		joinDateDisplay = displayDates.join,
+		leaveDate = TeamHistoryManual._parseDatesToYmd(displayDates.leave, args.estimated_end),
+		leaveDateDisplay = displayDates.leave,
 		reference = {},
 	}
+end
+
+---@param display string
+---@param estimate string?
+---@return string
+function TeamHistoryManual._parseDatesToYmd(display, estimate)
+	if Logic.isNotEmpty(estimate) then
+		---@cast estimate -nil
+		return DateExt.toYmdInUtc(estimate)
+	end
+
+	return DateExt.toYmdInUtc(display)
 end
 
 ---@param dateInput string
@@ -51,25 +64,27 @@ function TeamHistoryManual._readDateInput(dateInput)
 		-- YYYY-MM-DD — '''Present'''
 
 	local joinInput = string.sub(dateInput, 1, 10)
-	local joinDate = DateExt.toYmdInUtc(joinInput)
-	if not joinDate then
-		mw.ext.TeamLiquidIntegration.add_category(BAD_INPUT_CATEGORY)
-	end
+	TeamHistoryManual._checkDate(joinInput)
 
 	local leaveInput = string.sub(dateInput, 11) -- everything after the first date
 	local leaveDate
 	if not leaveInput:find('Present') then
-		leaveInput = leaveInput:gsub('^[^%d]*', '') -- trim away everything before the (second) date
-		leaveDate = DateExt.toYmdInUtc(leaveInput)
-		if not leaveDate then
-			mw.ext.TeamLiquidIntegration.add_category(BAD_INPUT_CATEGORY)
-		end
+		leaveDate = leaveInput:gsub('^[^%d]*', '') -- trim away everything before the (second) date
+		TeamHistoryManual._checkDate(leaveDate)
 	end
 
 	return {
-		join = joinDate,
+		join = joinInput,
 		leave = leaveDate,
 	}
+end
+
+---@param input string
+function TeamHistoryManual._checkDate(input)
+	-- can not use DateExt due to the need to allow `?` in the display dates
+	if not string.match(input, '[%d%?][%d%?][%d%?][%d%?]%-[%d%?][%d%?]%-[%d%?][%d%?]') then
+		mw.ext.TeamLiquidIntegration.add_category(BAD_INPUT_CATEGORY)
+	end
 end
 
 return TeamHistoryManual
