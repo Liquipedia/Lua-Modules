@@ -1,15 +1,12 @@
 ---
 -- @Liquipedia
--- wiki=formula1
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
-
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
-
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
@@ -17,8 +14,33 @@ local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+
 local HOUR_GLASS_HALF = IconFa{
-	iconName = 'outoftime',
+	iconName = 'hourglass',
+	color = 'cinnabar-theme-dark-gb',
+	size = 'lg',
+}
+
+local TROPHY = IconFa{
+	iconName = 'firstplace',
+	color = 'cinnabar-theme-dark-gb',
+	size = 'lg',
+}
+
+local CALENDAR = IconFa{
+	iconName = 'calendar',
+	color = 'cinnabar-theme-dark-gb',
+	size = 'lg',
+}
+
+local LANDMARK = IconFa{
+	iconName = 'landmark',
+	color = 'cinnabar-theme-dark-gb',
+	size = 'lg',
+}
+
+local CHECKERED_FLAG = IconFa{
+	iconName = 'checkeredflag',
 	color = 'cinnabar-theme-dark-gb',
 	size = 'lg',
 }
@@ -42,7 +64,7 @@ local CONTENT = {
 		},
 	},
 	tournaments = {
-		heading ='<span class="fas fa-trophy cinnabar-theme-dark-gb"></span>&nbsp;F1 & Feeder Series Seasons',
+		heading = HtmlWidgets.Fragment{children = {TROPHY, '&nbsp;F1 & Feeder Series Seasons'}},
 		body = TournamentsTicker{
 			upcomingDays = 90,
 			completedDays = 90
@@ -50,12 +72,12 @@ local CONTENT = {
 		boxid = 1503
 	},
 	seasonOverview = {
-		heading ='<span class="fas fa-trophy cinnabar-theme-dark-gb"></span>&nbsp;Current Season Overview',
+		heading =HtmlWidgets.Fragment{children = {TROPHY, '&nbsp;Current Season Overview'}},
 		body = '{{Liquipedia:Season Overview}}',
 		boxid = 1504
 	},
 	seasonCalendar = {
-		heading ='<span class="fas fa-calendar cinnabar-theme-dark-gb"></span>&nbsp;Season Calendar',
+		heading =HtmlWidgets.Fragment{children = {CALENDAR, '&nbsp;Season Calendar'}},
 		body = '{{Liquipedia:Season Calendar}}',
 		boxid = 1505
 	},
@@ -74,17 +96,17 @@ local CONTENT = {
 		boxid = 1509,
 	},
 	upcomingRace = {
-		heading ='<span class="fas fa-trophy cinnabar-theme-dark-gb"></span>&nbsp;Upcoming Race',
+		heading =HtmlWidgets.Fragment{children = {TROPHY, '&nbsp;Upcoming Race'}},
 		body = '{{Liquipedia:Upcoming Grand Prix}}',
 		boxid = 1509
 	},
 	previousRace = {
-		heading ='<span class="fas fa-flag-checkered cinnabar-theme-dark-gb"></span>&nbsp;Previous Race Weekend',
+		heading =HtmlWidgets.Fragment{children = {CHECKERED_FLAG, '&nbsp;Previous Race Weekend'}},
 		body = '{{Liquipedia:Previous Race Weekend}}',
 		boxid = 1511
 	},
 	allF1Seasons = {
-		heading ='<span class="fas fa-landmark cinnabar-theme-dark-gb"></span>&nbsp;Formula 1 Seasons',
+		heading =HtmlWidgets.Fragment{children = {LANDMARK, '&nbsp;Formula 1 Seasons'}},
 		body = '{{Liquipedia:All F1 Seasons}}',
 		boxid = 1512
 	},
@@ -101,7 +123,8 @@ return {
 		lightmode = 'F1_2018_allmode.png',
 		darkmode = 'F1_2018_allmode.png',
 	},
-	metadesc = 'Comprehensive Formula 1 wiki with articles covering everything from drivers, to teams, to seasons, to race chassis and history.',
+	metadesc = 'Comprehensive Formula 1 wiki with articles covering everything from drivers, to teams, '  ..
+		'to seasons, to race chassis and history.',
 	title = 'Formula 1',
 	navigation = {
 		{
@@ -162,7 +185,7 @@ return {
 					},
 					{
 						mobileOrder = 6,
-						content = CONTENT.filterButtons,
+						content = CONTENT.seasonOverview,
 					},
 					{
 						mobileOrder = 7,
@@ -187,7 +210,7 @@ return {
 					},
 					{
 						mobileOrder = 4,
-						content = CONTENT.tournaments,
+						content = CONTENT.filterButtons,
 					},
 					{
 						mobileOrder = 5,
