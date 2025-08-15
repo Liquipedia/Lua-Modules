@@ -1,5 +1,6 @@
 ---
 -- @Liquipedia
+-- wiki=formula1
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -11,9 +12,16 @@ local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
+local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+local HOUR_GLASS_HALF = IconFa{
+	iconName = 'outoftime',
+	color = 'cinnabar-theme-dark-gb',
+	size = 'lg',
+}
 
 local CONTENT = {
 	transfers = {
@@ -22,7 +30,7 @@ local CONTENT = {
 		boxid = 1501,
 	},
 	specialEvents = {
-		heading ='<span class="fas fa-hourglass-half cinnabar-theme-dark-gb"></span>&nbsp;Active and Upcoming Series',
+		heading = HtmlWidgets.Fragment{children = {HOUR_GLASS_HALF, '&nbsp;Active and Upcoming Series'}},
 		body = '{{Liquipedia:Active Upcoming Series}}',
 		boxid = 1502
 	},
@@ -35,7 +43,10 @@ local CONTENT = {
 	},
 	tournaments = {
 		heading ='<span class="fas fa-trophy cinnabar-theme-dark-gb"></span>&nbsp;F1 & Feeder Series Seasons',
-		body = '{{Liquipedia:Tournaments List}}',
+		body = TournamentsTicker{
+			upcomingDays = 90,
+			completedDays = 90
+		},
 		boxid = 1503
 	},
 	seasonOverview = {
@@ -90,8 +101,7 @@ return {
 		lightmode = 'F1_2018_allmode.png',
 		darkmode = 'F1_2018_allmode.png',
 	},
-	metadesc = 'Comprehensive Formula 1 wiki with articles covering everything from drivers, to teams, '  ..
-		'to seasons, to race chassis and history.',
+	metadesc = 'Comprehensive Formula 1 wiki with articles covering everything from drivers, to teams, to seasons, to race chassis and history.',
 	title = 'Formula 1',
 	navigation = {
 		{
@@ -151,15 +161,15 @@ return {
 						content = CONTENT.specialEvents,
 					},
 					{
-						mobileOrder = 5,
-						content = CONTENT.seasonOverview,
-					},
-					{
 						mobileOrder = 6,
-						content = CONTENT.seasonCalendar,
+						content = CONTENT.filterButtons,
 					},
 					{
 						mobileOrder = 7,
+						content = CONTENT.seasonCalendar,
+					},
+					{
+						mobileOrder = 8,
 						content = CONTENT.transfers,
 					},
 				}
@@ -180,15 +190,19 @@ return {
 						content = CONTENT.tournaments,
 					},
 					{
-						mobileOrder = 8,
-						content = CONTENT.allF1Seasons,
+						mobileOrder = 5,
+						content = CONTENT.tournaments,
 					},
 					{
 						mobileOrder = 9,
-						content = CONTENT.thisDay,
+						content = CONTENT.allF1Seasons,
 					},
 					{
 						mobileOrder = 10,
+						content = CONTENT.thisDay,
+					},
+					{
+						mobileOrder = 11,
 						content = CONTENT.wantToHelp,
 					},
 				},
@@ -196,7 +210,7 @@ return {
 			{
 				children = {
 					{
-						mobileOrder = 11,
+						mobileOrder = 12,
 						content = CONTENT.theGame,
 					},
 				},
