@@ -23,7 +23,7 @@ end
 
 ---@return string
 function TiebreakerMatchWins:headerTitle()
-	return 'Matches Wins'
+	return 'Matches Won'
 end
 
 return TiebreakerMatchWins
