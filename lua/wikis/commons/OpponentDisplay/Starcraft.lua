@@ -29,13 +29,12 @@ local StarcraftOpponentDisplay = Table.copy(OpponentDisplay)
 ---@operator call(...): StarcraftBracketOpponentEntry
 ---@field content Html
 ---@field root Html
-local BracketOpponentEntry = Class.new(
+local BracketOpponentEntry = Class.new(OpponentDisplay.BracketOpponentEntry,
 	---@param self self
 	---@param opponent StarcraftStandardOpponent
 	---@param options {forceShortName: boolean, showTbd: boolean}
 	function(self, opponent, options)
 		local showFactionBackground = opponent.type == Opponent.solo
-			or opponent.extradata.hasFactionOrFlag
 			or opponent.type == Opponent.duo and opponent.isArchon
 
 		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
@@ -43,14 +42,9 @@ local BracketOpponentEntry = Class.new(
 
 		if opponent.type == Opponent.team then
 			if options.showTbd ~= false or not Opponent.isTbd(opponent) then
-				self.content:node(OpponentDisplay.BlockTeamContainer({
-					showLink = false,
-					style = 'hybrid',
-					team = opponent.team,
-					template = opponent.template,
-				}))
+				self:createTeam(opponent.template or 'tbd', options)
 			end
-		else
+		elseif Opponent.typeIsParty(opponent.type) then
 			self.content:node(StarcraftOpponentDisplay.BlockOpponent({
 				opponent = opponent,
 				overflow = 'ellipsis',
@@ -58,6 +52,8 @@ local BracketOpponentEntry = Class.new(
 				showLink = false,
 				showTbd = options.showTbd,
 			}))
+		else
+			self:createLiteral(opponent.name or '')
 		end
 
 		self.root = mw.html.create('div'):addClass('brkts-opponent-entry')
