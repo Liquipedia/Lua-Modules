@@ -90,10 +90,13 @@ end
 ---@return string?
 function BaseMatchPage:getCountdownBlock()
 	if DateExt.isDefaultTimestamp(self.matchData.timestamp) then return end
-	return Countdown._create(Table.merge(self.matchData.stream, {
-		date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
-		finished = self.matchData.finished,
-	}))
+	return HtmlWidgets.Div{
+		classes = {'match-countdown-block'},
+		children = Countdown._create(Table.merge(self.matchData.stream, {
+			date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
+			finished = self.matchData.finished,
+		}))
+	}
 end
 
 ---@private
