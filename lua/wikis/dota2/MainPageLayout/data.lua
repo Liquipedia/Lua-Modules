@@ -182,6 +182,7 @@ local CONTENT = {
 		padding = true,
 		boxid = 1508,
 	},
+--[[
 	rankings = {
 		heading = 'Liquipedia Rankings (Beta)',
 		body = Rankings{
@@ -194,6 +195,7 @@ local CONTENT = {
 		padding = false,
 		boxid = 1511,
 	},
+]]
 }
 
 local LAYOUT_MAIN = {
@@ -260,10 +262,12 @@ local LAYOUT_MAIN = {
 					},
 				},
 			},
+--[[
 			{
 				mobileOrder = 6,
 				content = CONTENT.rankings
 			},
+]]
 			{
 				mobileOrder = 7,
 				content = CONTENT.transfers,
@@ -336,10 +340,12 @@ local LAYOUT_ESPORTS = {
 					},
 				},
 			},
+--[[
 			{
 				mobileOrder = 6,
 				content = CONTENT.rankings
 			},
+]]
 			{
 				mobileOrder = 7,
 				content = CONTENT.updates,
