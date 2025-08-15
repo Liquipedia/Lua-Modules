@@ -186,10 +186,7 @@ function MatchlistDisplay.DateHeader(match)
 			['white-space'] = 'normal',
 		},
 		children = HtmlWidgets.Div{
-			css = {
-				['font-size'] = '95%',
-				padding = '2px 10px',
-			},
+			classes = {'match-countdown-block'},
 			children = Countdown._create(Table.merge(match.stream, {
 				date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
 				finished = match.finished,
