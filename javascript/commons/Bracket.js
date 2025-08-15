@@ -423,9 +423,9 @@ liquipedia.bracket = {
 		createEventListeners: function() {
 			if ( document.querySelector( '.bracket .bracket-popup-wrapper' ) !== null ) {
 				window.addEventListener( 'scroll', liquipedia.bracket.popup.positionBracketPopup );
-				const bruinenBracketScroll = document.querySelector( 'body.logged-in .scroll-logged-in, body.logged-out .scroll-logged-out' );
-				if ( bruinenBracketScroll !== null ) {
-					bruinenBracketScroll.addEventListener( 'scroll', liquipedia.bracket.popup.positionBracketPopup );
+				const bracketScroll = document.querySelector( 'body.logged-in .scroll-logged-in, body.logged-out .scroll-logged-out' );
+				if ( bracketScroll !== null ) {
+					bracketScroll.addEventListener( 'scroll', liquipedia.bracket.popup.positionBracketPopup );
 				}
 				window.addEventListener( 'resize', liquipedia.bracket.popup.positionBracketPopup );
 				document.querySelectorAll( '.bracket-wrapper' ).forEach( ( element ) => {
@@ -434,9 +434,9 @@ liquipedia.bracket = {
 			}
 			if ( document.querySelector( '.matchlist .bracket-popup-wrapper' ) !== null ) {
 				window.addEventListener( 'scroll', liquipedia.bracket.popup.positionGroupTablePopup );
-				const bruinenGroupScroll = document.querySelector( 'body.logged-in .scroll-logged-in, body.logged-out .scroll-logged-out' );
-				if ( bruinenGroupScroll !== null ) {
-					bruinenGroupScroll.addEventListener( 'scroll', liquipedia.bracket.popup.positionGroupTablePopup );
+				const groupScroll = document.querySelector( 'body.logged-in .scroll-logged-in, body.logged-out .scroll-logged-out' );
+				if ( groupScroll !== null ) {
+					groupScroll.addEventListener( 'scroll', liquipedia.bracket.popup.positionGroupTablePopup );
 				}
 				window.addEventListener( 'resize', liquipedia.bracket.popup.positionGroupTablePopup );
 			}

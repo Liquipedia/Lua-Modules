@@ -71,16 +71,16 @@ html.client-js .prizepooltable.collapsed[ data-cutafter="32" ] tr:nth-child( n+3
 	background-color: var( --prize-pool-header-background-color, inherit );
 }
 
-body:not( .skin-bruinen ) .csstable-widget.prizepooltable {
+.csstable-widget.prizepooltable {
 	border: 0.125rem solid var( --prize-pool-header-background-color );
 }
 
-body:not( .skin-bruinen ) .csstable-widget.prizepooltable .csstable-widget-row,
-body:not( .skin-bruinen ) .csstable-widget.prizepooltable .csstable-widget-cell {
+.csstable-widget.prizepooltable .csstable-widget-row,
+.csstable-widget.prizepooltable .csstable-widget-cell {
 	border: 0;
 }
 
-body:not( .skin-bruinen ) .csstable-widget.prizepooltable .csstable-widget-row:nth-child( odd ):not( .prizepooltable-header ):not( .ppt-toggle-expand ) {
+.csstable-widget.prizepooltable .csstable-widget-row:nth-child( odd ):not( .prizepooltable-header ):not( .ppt-toggle-expand ) {
 	background-color: var( --prize-pool-alt-background-color );
 }
 
@@ -101,22 +101,22 @@ td.background-color-first-place {
 	background-color: var( --prize-pool-gold, #ffe982 );
 }
 
-body:not( .skin-bruinen ) tr.bg-first,
-body:not( .skin-bruinen ) div.bg-first,
-body:not( .skin-bruinen ) tr.bg-p1,
-body:not( .skin-bruinen ) div.bg-p1,
-body:not( .skin-bruinen ) tr.background-color-first-place,
-body:not( .skin-bruinen ) div.background-color-first-place,
-body:not( .skin-bruinen ) div.csstable-widget-row.background-color-first-place > .csstable-widget-cell {
+tr.bg-first,
+div.bg-first,
+tr.bg-p1,
+div.bg-p1,
+tr.background-color-first-place,
+div.background-color-first-place,
+div.csstable-widget-row.background-color-first-place > .csstable-widget-cell {
 	border-bottom: 0.125rem solid var( --prize-pool-gold, transparent );
 }
 
-body:not( .skin-bruinen ) tr.bg-first > td.prizepooltable-place,
-body:not( .skin-bruinen ) div.bg-first > td.prizepooltable-place,
-body:not( .skin-bruinen ) tr.bg-p1 > td.prizepooltable-place,
-body:not( .skin-bruinen ) div.bg-p1 > td.prizepooltable-place,
-body:not( .skin-bruinen ) tr.background-color-first-place > td.prizepooltable-place,
-body:not( .skin-bruinen ) div.background-color-first-place > *.prizepooltable-place {
+tr.bg-first > td.prizepooltable-place,
+div.bg-first > td.prizepooltable-place,
+tr.bg-p1 > td.prizepooltable-place,
+div.bg-p1 > td.prizepooltable-place,
+tr.background-color-first-place > td.prizepooltable-place,
+div.background-color-first-place > *.prizepooltable-place {
 	background-color: var( --prize-pool-gold, inherit );
 	color: #ffffff;
 }
@@ -136,22 +136,22 @@ td.background-color-second-place {
 	background-color: var( --prize-pool-silver, #eeeeee );
 }
 
-body:not( .skin-bruinen ) tr.bg-second,
-body:not( .skin-bruinen ) div.bg-second,
-body:not( .skin-bruinen ) tr.bg-p2,
-body:not( .skin-bruinen ) div.bg-p2,
-body:not( .skin-bruinen ) tr.background-color-second-place,
-body:not( .skin-bruinen ) div.background-color-second-place,
-body:not( .skin-bruinen ) div.csstable-widget-row.background-color-second-place > .csstable-widget-cell {
+tr.bg-second,
+div.bg-second,
+tr.bg-p2,
+div.bg-p2,
+tr.background-color-second-place,
+div.background-color-second-place,
+div.csstable-widget-row.background-color-second-place > .csstable-widget-cell {
 	border-bottom: 0.125rem solid var( --prize-pool-silver, transparent );
 }
 
-body:not( .skin-bruinen ) tr.bg-second > td.prizepooltable-place,
-body:not( .skin-bruinen ) div.bg-second > td.prizepooltable-place,
-body:not( .skin-bruinen ) tr.bg-p2 > td.prizepooltable-place,
-body:not( .skin-bruinen ) div.bg-p2 > td.prizepooltable-place,
-body:not( .skin-bruinen ) tr.background-color-second-place > td.prizepooltable-place,
-body:not( .skin-bruinen ) div.background-color-second-place > *.prizepooltable-place {
+tr.bg-second > td.prizepooltable-place,
+div.bg-second > td.prizepooltable-place,
+tr.bg-p2 > td.prizepooltable-place,
+div.bg-p2 > td.prizepooltable-place,
+tr.background-color-second-place > td.prizepooltable-place,
+div.background-color-second-place > *.prizepooltable-place {
 	background-color: var( --prize-pool-silver, inherit );
 	color: #ffffff;
 }
@@ -171,22 +171,22 @@ td.background-color-third-place {
 	background-color: var( --prize-pool-bronze, #f9e8c7 );
 }
 
-body:not( .skin-bruinen ) tr.bg-third,
-body:not( .skin-bruinen ) div.bg-third,
-body:not( .skin-bruinen ) tr.bg-p3,
-body:not( .skin-bruinen ) div.bg-p3,
-body:not( .skin-bruinen ) tr.background-color-third-place,
-body:not( .skin-bruinen ) div.background-color-third-place,
-body:not( .skin-bruinen ) div.csstable-widget-row.background-color-third-place > .csstable-widget-cell {
+tr.bg-third,
+div.bg-third,
+tr.bg-p3,
+div.bg-p3,
+tr.background-color-third-place,
+div.background-color-third-place,
+div.csstable-widget-row.background-color-third-place > .csstable-widget-cell {
 	border-bottom: 0.125rem solid var( --prize-pool-bronze, transparent );
 }
 
-body:not( .skin-bruinen ) tr.bg-third > td.prizepooltable-place,
-body:not( .skin-bruinen ) div.bg-third > td.prizepooltable-place,
-body:not( .skin-bruinen ) tr.bg-p3 > td.prizepooltable-place,
-body:not( .skin-bruinen ) div.bg-p3 > td.prizepooltable-place,
-body:not( .skin-bruinen ) tr.background-color-third-place > td.prizepooltable-place,
-body:not( .skin-bruinen ) div.background-color-third-place > *.prizepooltable-place {
+tr.bg-third > td.prizepooltable-place,
+div.bg-third > td.prizepooltable-place,
+tr.bg-p3 > td.prizepooltable-place,
+div.bg-p3 > td.prizepooltable-place,
+tr.background-color-third-place > td.prizepooltable-place,
+div.background-color-third-place > *.prizepooltable-place {
 	background-color: var( --prize-pool-bronze, inherit );
 	color: #ffffff;
 }
@@ -206,48 +206,48 @@ td.background-color-fourth-place {
 	background-color: var( --prize-pool-copper, #f9dec7 );
 }
 
-body:not( .skin-bruinen ) tr.bg-fourth,
-body:not( .skin-bruinen ) div.bg-fourth,
-body:not( .skin-bruinen ) tr.bg-p4,
-body:not( .skin-bruinen ) div.bg-p4,
-body:not( .skin-bruinen ) tr.background-color-fourth-place,
-body:not( .skin-bruinen ) div.background-color-fourth-place,
-body:not( .skin-bruinen ) div.csstable-widget-row.background-color-fourth-place > .csstable-widget-cell {
+tr.bg-fourth,
+div.bg-fourth,
+tr.bg-p4,
+div.bg-p4,
+tr.background-color-fourth-place,
+div.background-color-fourth-place,
+div.csstable-widget-row.background-color-fourth-place > .csstable-widget-cell {
 	border-bottom: 0.125rem solid var( --prize-pool-copper, transparent );
 }
 
-body:not( .skin-bruinen ) tr.bg-fourth > td.prizepooltable-place,
-body:not( .skin-bruinen ) div.bg-fourth > td.prizepooltable-place,
-body:not( .skin-bruinen ) tr.bg-p4 > td.prizepooltable-place,
-body:not( .skin-bruinen ) div.bg-p4 > td.prizepooltable-place,
-body:not( .skin-bruinen ) tr.background-color-fourth-place > td.prizepooltable-place,
-body:not( .skin-bruinen ) div.background-color-fourth-place > *.prizepooltable-place {
+tr.bg-fourth > td.prizepooltable-place,
+div.bg-fourth > td.prizepooltable-place,
+tr.bg-p4 > td.prizepooltable-place,
+div.bg-p4 > td.prizepooltable-place,
+tr.background-color-fourth-place > td.prizepooltable-place,
+div.background-color-fourth-place > *.prizepooltable-place {
 	background-color: var( --prize-pool-copper, inherit );
 	color: #ffffff;
 }
 
-body:not( .skin-bruinen ) div.prizepooltable > div.csstable-widget-row.bg-win {
+div.prizepooltable > div.csstable-widget-row.bg-win {
 	/* need the `!important` due to bg-win (sadly) having an important in one of its definitions ... */
 	background-color: inherit !important;
 }
 
-body:not( .skin-bruinen ) div.csstable-widget-row.bg-win > .csstable-widget-cell {
+div.csstable-widget-row.bg-win > .csstable-widget-cell {
 	border-bottom: 0.125rem solid var( --clr-forestgreen-background-color, transparent );
 }
 
-body:not( .skin-bruinen ) div.bg-win > *.prizepooltable-place {
+div.bg-win > *.prizepooltable-place {
 	background-color: var( --clr-forestgreen-background-color, inherit );
 }
 
-body:not( .skin-bruinen ) div.csstable-widget-row.bg-lose {
+div.csstable-widget-row.bg-lose {
 	background-color: inherit;
 }
 
-body:not( .skin-bruinen ) div.csstable-widget-row.bg-lose > .csstable-widget-cell {
+div.csstable-widget-row.bg-lose > .csstable-widget-cell {
 	border-bottom: 0.125rem solid var( --clr-cinnabar-background-color, transparent );
 }
 
-body:not( .skin-bruinen ) div.bg-lose > *.prizepooltable-place {
+div.bg-lose > *.prizepooltable-place {
 	background-color: var( --clr-cinnabar-background-color, inherit );
 }
 

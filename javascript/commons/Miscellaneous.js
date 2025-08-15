@@ -529,42 +529,42 @@ liquipedia.tracker = {
 				liquipedia.tracker.track( 'In Content TOC item clicked', true );
 			} );
 		} );
-		document.querySelectorAll( '.bruinen-menu-share' ).forEach( ( node ) => {
+		document.querySelectorAll( '.lakesideview-menu-share' ).forEach( ( node ) => {
 			node.addEventListener( 'click', () => {
 				liquipedia.tracker.track( 'Share link clicked', true );
 			} );
 		} );
-		document.querySelectorAll( '.bruinen-menu-share a[data-type=twitter], .lakesideview-menu-share a[data-type=twitter]' ).forEach( ( node ) => {
+		document.querySelectorAll( '.lakesideview-menu-share a[data-type=twitter]' ).forEach( ( node ) => {
 			node.addEventListener( 'click', () => {
 				liquipedia.tracker.track( 'Share link clicked (twitter)' );
 			} );
 		} );
-		document.querySelectorAll( '.bruinen-menu-share a[data-type=facebook], .lakesideview-menu-share a[data-type=facebook]' ).forEach( ( node ) => {
+		document.querySelectorAll( '.lakesideview-menu-share a[data-type=facebook]' ).forEach( ( node ) => {
 			node.addEventListener( 'click', () => {
 				liquipedia.tracker.track( 'Share link clicked (facebook)' );
 			} );
 		} );
-		document.querySelectorAll( '.bruinen-menu-share a[data-type=reddit], .lakesideview-menu-share a[data-type=reddit]' ).forEach( ( node ) => {
+		document.querySelectorAll( '.lakesideview-menu-share a[data-type=reddit]' ).forEach( ( node ) => {
 			node.addEventListener( 'click', () => {
 				liquipedia.tracker.track( 'Share link clicked (reddit)' );
 			} );
 		} );
-		document.querySelectorAll( '.bruinen-menu-share a[data-type=qq], .lakesideview-menu-share a[data-type=qq]' ).forEach( ( node ) => {
+		document.querySelectorAll( '.lakesideview-menu-share a[data-type=qq]' ).forEach( ( node ) => {
 			node.addEventListener( 'click', () => {
 				liquipedia.tracker.track( 'Share link clicked (qq)' );
 			} );
 		} );
-		document.querySelectorAll( '.bruinen-menu-share a[data-type=vk], .lakesideview-menu-share a[data-type=vk]' ).forEach( ( node ) => {
+		document.querySelectorAll( '.lakesideview-menu-share a[data-type=vk]' ).forEach( ( node ) => {
 			node.addEventListener( 'click', () => {
 				liquipedia.tracker.track( 'Share link clicked (vk)' );
 			} );
 		} );
-		document.querySelectorAll( '.bruinen-menu-share a[data-type=weibo], .lakesideview-menu-share a[data-type=weibo]' ).forEach( ( node ) => {
+		document.querySelectorAll( '.lakesideview-menu-share a[data-type=weibo]' ).forEach( ( node ) => {
 			node.addEventListener( 'click', () => {
 				liquipedia.tracker.track( 'Share link clicked (weibo)' );
 			} );
 		} );
-		document.querySelectorAll( '.bruinen-menu-share a[data-type=whatsapp], .lakesideview-menu-share a[data-type=whatsapp]' ).forEach( ( node ) => {
+		document.querySelectorAll( '.lakesideview-menu-share a[data-type=whatsapp]' ).forEach( ( node ) => {
 			node.addEventListener( 'click', () => {
 				liquipedia.tracker.track( 'Share link clicked (whatsapp)' );
 			} );
@@ -723,12 +723,13 @@ liquipedia.tracker = {
 				} );
 			} );
 		}
-		if ( mw.config.get( 'skin' ) === 'lakesideview' ) {
-			if ( window.localStorage.getItem( 'LiquipediaDarkMode' ) === 'true' ) {
-				liquipedia.tracker.track( 'Page view with dark theme enabled' );
-			} else {
-				liquipedia.tracker.track( 'Page view with dark theme disabled' );
-			}
+
+		if ( window.localStorage.getItem( 'LiquipediaTheme' ) === 'dark' ) {
+			liquipedia.tracker.track( 'Page view with dark theme enabled' );
+		} else if ( window.localStorage.getItem( 'LiquipediaTheme' ) === 'light' ) {
+			liquipedia.tracker.track( 'Page view with light theme enabled' );
+		} else if ( window.localStorage.getItem( 'LiquipediaTheme' ) === 'system' ) {
+			liquipedia.tracker.track( 'Page view with auto theme enabled' );
 		}
 	}
 };
