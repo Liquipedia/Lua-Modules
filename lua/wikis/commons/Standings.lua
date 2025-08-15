@@ -18,7 +18,6 @@ local Variables = Lua.import('Module:Variables')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Tournament = Lua.import('Module:Tournament')
-local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
