@@ -17,7 +17,6 @@ local Page = Lua.import('Module:Page')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Timezone = Lua.import('Module:Timezone')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 
@@ -25,7 +24,6 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 local DisplayHelper = {}
 local NONBREAKING_SPACE = '&nbsp;'
-local UTC = Timezone.getTimezoneString{timezone = 'UTC'}
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -107,18 +105,9 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return Html
 function DisplayHelper.MatchCountdownBlock(match)
-	local dateString
-	if match.dateIsExact == true then
-		local timestamp = Date.readTimestamp(match.date) + (Timezone.getOffset{timezone = match.timezoneId} or 0)
-		dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
-				.. (Timezone.getTimezoneString{timezone = match.timezoneId} or UTC)
-	else
-		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date)
-	end
-
 	local stream = Table.merge(match.stream, {
-		date = dateString,
-		finished = match.finished and 'true' or nil,
+		date = Date.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
+		finished = match.finished,
 	})
 	return mw.html.create('div'):addClass('match-countdown-block')
 		:css('text-align', 'center')
