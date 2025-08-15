@@ -12,7 +12,7 @@ local Template = Lua.import('Module:Template')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
-local Rankings = Lua.import('Module:Widget/Ratings')
+-- local Rankings = Lua.import('Module:Widget/Ratings')
 
 local Button = Lua.import('Module:Widget/Basic/Button')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -182,6 +182,7 @@ local CONTENT = {
 		padding = true,
 		boxid = 1508,
 	},
+--[[
 	rankings = {
 		heading = 'Liquipedia Rankings (Beta)',
 		body = Rankings{
@@ -194,6 +195,7 @@ local CONTENT = {
 		padding = false,
 		boxid = 1511,
 	},
+]]
 }
 
 local LAYOUT_MAIN = {
@@ -260,10 +262,12 @@ local LAYOUT_MAIN = {
 					},
 				},
 			},
+--[[
 			{
 				mobileOrder = 6,
 				content = CONTENT.rankings
 			},
+]]
 			{
 				mobileOrder = 7,
 				content = CONTENT.transfers,
@@ -336,10 +340,12 @@ local LAYOUT_ESPORTS = {
 					},
 				},
 			},
+--[[
 			{
 				mobileOrder = 6,
 				content = CONTENT.rankings
 			},
+]]
 			{
 				mobileOrder = 7,
 				content = CONTENT.updates,

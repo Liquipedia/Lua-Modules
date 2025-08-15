@@ -12,6 +12,11 @@ local Logic = Lua.import('Module:Logic')
 local RoleOf = Lua.import('Module:RoleOf')
 local String = Lua.import('Module:StringUtils')
 
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
+
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
@@ -43,10 +48,10 @@ function CustomTeam.run(frame)
 
 	-- Automatically load achievements
 	team.args.achievements = Achievements.team{noTemplate = true, baseConditions = {
-		'[[liquipediatiertype::]]',
-		'[[liquipediatier::1]]',
-		'[[placement::1]]',
-		'[[publishertier::true]]'
+		ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, ''),
+		ConditionNode(ColumnName('liquipediatier'), Comparator.eq, 1),
+		ConditionNode(ColumnName('placement'), Comparator.eq, 1),
+		ConditionNode(ColumnName('publishertier'), Comparator.eq, 'true'),
 	}}
 
 	-- Automatic org people

@@ -13,6 +13,8 @@ local String = Lua.import('Module:StringUtils')
 local TeamHistoryAutoExtension = Lua.import('Module:Infobox/Extension/TeamHistoryAuto')
 local Widget = Lua.import('Module:Widget')
 
+local TeamHistoryDisplay = Lua.import('Module:Widget/Infobox/TeamHistory/Display')
+
 ---@class TeamHistoryAutoWidget: Widget
 ---@operator call(table): TeamHistoryAutoWidget
 ---@field props {player: string, store: boolean}
@@ -31,7 +33,11 @@ function TeamHistory:render()
 		teamHistory:store()
 	end
 
-	return teamHistory:build()
+	return TeamHistoryDisplay{
+		transferList = teamHistory.transferList,
+		hasHeaderAndRefs = teamHistory.config.hasHeaderAndRefs,
+		player = teamHistory.config.player,
+	}
 end
 
 return TeamHistory

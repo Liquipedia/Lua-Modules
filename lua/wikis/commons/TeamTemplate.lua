@@ -118,9 +118,13 @@ Returns raw data of a historical team template.
 Keys of the returned table are of form YYYY-MM-DD and
 their corresponding values are team template names.
 ]]
----@param name string
+---@param name string?
 ---@return {[string]: string}?
 function TeamTemplate.queryHistorical(name)
+	if Logic.isEmpty(name) then
+		return
+	end
+	---@cast name -nil
 	return mw.ext.TeamTemplate.raw_historical(name)
 end
 
@@ -131,13 +135,13 @@ An empty array is returned if the specified team template does not exist.
 ---@param name string
 ---@return string[]
 function TeamTemplate.queryHistoricalNames(name)
-	local resolvedName = TeamTemplate.resolve(name)
-	if resolvedName then
-		local historical = TeamTemplate.queryHistorical(resolvedName) or {}
+	local rawTemplate = TeamTemplate.getRawOrNil(name)
+	if rawTemplate then
+		local historical = TeamTemplate.queryHistorical(rawTemplate.historicaltemplate) or {}
 		if Logic.isNotEmpty(historical) then
 			return Array.unique(Array.extractValues(historical))
 		else
-			return { resolvedName }
+			return { rawTemplate.templatename }
 		end
 	else
 		return {}
