@@ -146,7 +146,7 @@ function StandingsParser.calculateTiebreakerValues(opponentsInRound, tiebreakerI
 			return
 		end
 		Array.forEach(opponentsInRound, function(opponent)
-			opponent.extradata.tiebreaker[tiebreakerId] = {
+			opponent.extradata.tiebreakerValues[tiebreakerId] = {
 				value = tiebreaker:valueOf(opponentsInRound, opponent),
 				display = tiebreaker:display(opponentsInRound, opponent),
 			}
@@ -161,16 +161,16 @@ end
 ---@return TiebreakerOpponent[][]
 local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex)
 	local tiebreakerId = tiebreakerIds[tiebreakerIndex]
-	local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId)
-	if not tiebreaker then
+	if not tiebreakerId then
 		return { tiedOpponents }
 	end
+	local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId)
 
 	local _, groupedOpponents = Array.groupBy(tiedOpponents, function(opponent)
-		if not opponent.extradata.tiebreaker[tiebreakerId] then
+		if not opponent.extradata.tiebreakerValues[tiebreakerId] then
 			return tiebreaker:valueOf(allOpponents, opponent)
 		end
-		return opponent.extradata.tiebreaker[tiebreakerId].value
+		return opponent.extradata.tiebreakerValues[tiebreakerId].value
 	end)
 
 	local groupedOpponentsInOrder = Array.extractValues(groupedOpponents, Table.iter.spairs, function(_, a, b)

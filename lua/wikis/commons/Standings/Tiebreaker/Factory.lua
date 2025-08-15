@@ -33,7 +33,7 @@ function TiebreakerFactory.validateAndNormalizeInput(input)
 	)
 
 	local tiebreakerClassName = NAME_TO_CLASS[name]
-	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(name))
+	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(input))
 	return table.concat({context, name}, '.')
 end
 
@@ -42,11 +42,11 @@ end
 function TiebreakerFactory.tiebreakerFromId(tiebreakerId)
 	local context, name = unpack(String.split(tiebreakerId, '%.'))
 	local tiebreakerClassName = NAME_TO_CLASS[name]
-	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(name))
+	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(tiebreakerId))
 	---@type StandingsTiebreaker
 	local TiebreakerClass = Lua.import('Module:Standings/Tiebreaker/' .. tiebreakerClassName)
 
-	return TiebreakerClass.new(context)
+	return TiebreakerClass(context)
 end
 
 return TiebreakerFactory
