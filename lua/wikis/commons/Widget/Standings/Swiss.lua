@@ -64,7 +64,6 @@ function StandingsSwissWidget:render()
 					end
 					return HtmlWidgets.Th{children = tiebreaker.title}
 				end),
-				HtmlWidgets.Th{children = 'Matches'},
 				Array.map(standings.rounds, function(round)
 					return HtmlWidgets.Th{children = round.title}
 				end)
@@ -98,7 +97,7 @@ function StandingsSwissWidget:render()
 							end
 							return HtmlWidgets.Td{
 								classes = {teamBackground},
-								css = tiebreakerIndex == 1 and {['font-weight'] = 'bold', ['text-align'] = 'center'} or {},
+								css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil, ['text-align'] = 'center'},
 								children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
 							}
 						end),

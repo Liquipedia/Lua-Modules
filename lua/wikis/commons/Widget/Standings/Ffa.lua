@@ -124,7 +124,7 @@ function StandingsFfaWidget:render()
 								end
 								return HtmlWidgets.Td{
 									classes = {teamBackground},
-									css = tiebreakerIndex == 1 and {['font-weight'] = 'bold', ['text-align'] = 'center'} or {},
+								css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil, ['text-align'] = 'center'},
 									children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
 								}
 							end),
@@ -134,11 +134,13 @@ function StandingsFfaWidget:render()
 									local opponent = Array.find(columnRound.opponents, function(columnSlot)
 										return Table.deepEquals(columnSlot.opponent, slot.opponent)
 									end)
-									local roundStatus = opponent.specialStatus
-									if roundStatus == '' then
-										text = opponent.pointsChangeFromPreviousRound
-									else
-										text = STATUS_TO_DISPLAY[roundStatus]
+									if opponent then
+										local roundStatus = opponent.specialStatus
+										if roundStatus == '' then
+											text = opponent.pointsChangeFromPreviousRound
+										else
+											text = STATUS_TO_DISPLAY[roundStatus]
+										end
 									end
 								end
 								return HtmlWidgets.Td{children = text, css = {['text-align'] = 'center'}}

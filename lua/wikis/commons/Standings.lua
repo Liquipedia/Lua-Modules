@@ -147,7 +147,7 @@ function Standings.entryFromRecord(record)
 		pointsChangeFromPreviousRound = record.extradata.pointschange,
 		specialStatus = record.extradata.specialstatus or '',
 		positionChangeFromPreviousRound = tonumber(record.placementchange),
-		tiebreakerValues = record.extradata.tiebreaker or {},
+		tiebreakerValues = record.extradata.tiebreakerValues or {},
 		record = record,
 	}
 
