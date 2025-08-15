@@ -14,12 +14,20 @@ local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
 local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Streams = Lua.import('Module:Links/Stream')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
 
 local Info = Lua.import('Module:Info', {loadData = true})
 local Links = Lua.import('Module:Links')
@@ -167,7 +175,10 @@ end
 ---@return match2[]
 MatchGroupInputUtil.fetchStandaloneMatchGroup = FnUtil.memoize(function(bracketId)
 	return mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = '[[namespace::130]] AND [[match2bracketid::' .. bracketId .. ']]',
+		conditions = tostring(ConditionTree(BooleanOperator.all):add{
+			ConditionNode(ColumnName('namespace'), Comparator.eq, Namespace.matchNamespaceId()),
+			ConditionNode(ColumnName('match2bracketid'), Comparator.eq, bracketId)
+		}),
 		limit = 5000,
 	})
 end)
