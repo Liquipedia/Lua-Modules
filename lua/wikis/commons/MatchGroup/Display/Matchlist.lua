@@ -8,14 +8,18 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Countdown = Lua.import('Module:Countdown')
+local DateExt = Lua.import('Module:Date/Ext')
 local DisplayUtil = Lua.import('Module:DisplayUtil')
 local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
@@ -93,7 +97,7 @@ function MatchlistDisplay.Matchlist(props)
 
 			local dateHeaderNode = match.bracketData.dateHeader
 				and match.dateIsExact
-				and MatchlistDisplay.DateHeader({match = match})
+				and MatchlistDisplay.DateHeader(match)
 				or nil
 
 			local matchNode = MatchlistDisplay.Match({
@@ -172,13 +176,26 @@ function MatchlistDisplay.Header(props)
 end
 
 ---Display component for a dateHeader in a matchlist.
----@param props {match: MatchGroupUtilMatch}
----@return Html
-function MatchlistDisplay.DateHeader(props)
-	local dateHeaderNode = mw.html.create('div'):addClass('brkts-matchlist-header')
-		:node(DisplayHelper.MatchCountdownBlock(props.match))
-
-	return DisplayUtil.applyOverflowStyles(dateHeaderNode, 'wrap')
+---@param match MatchGroupUtilMatch
+---@return Widget
+function MatchlistDisplay.DateHeader(match)
+	return HtmlWidgets.Div{
+		classes = {'brkts-matchlist-header'},
+		css = {
+			['overflow-wrap'] = 'break-word',
+			['white-space'] = 'normal',
+		},
+		children = HtmlWidgets.Div{
+			css = {
+				['font-size'] = '95%',
+				padding = '2px 10px',
+			},
+			children = Countdown._create(Table.merge(match.stream, {
+				date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
+				finished = match.finished,
+			}))
+		}
+	}
 end
 
 --[[
