@@ -40,4 +40,9 @@ function TiebreakerBuchholz:valueOf(state, opponent)
 	end, 0)
 end
 
+---@return string
+function TiebreakerBuchholz:headerTitle()
+	return 'Buchholz'
+end
+
 return TiebreakerBuchholz

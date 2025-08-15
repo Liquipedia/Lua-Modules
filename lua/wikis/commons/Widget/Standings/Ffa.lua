@@ -77,7 +77,12 @@ function StandingsFfaWidget:render()
 				HtmlWidgets.Th{children = '#'},
 				HtmlWidgets.Th{children = 'Participant'},
 				showRoundColumns and HtmlWidgets.Th{children = ''} or nil,
-				HtmlWidgets.Th{children = 'Points'},
+				Array.map(standings.tiebreakers, function(tiebreaker)
+					if not tiebreaker.title then
+						return
+					end
+					return HtmlWidgets.Th{children = tiebreaker.title}
+				end),
 				showRoundColumns and Array.map(standings.rounds, function(round)
 					return HtmlWidgets.Th{children = round.title}
 				end) or nil
@@ -113,22 +118,29 @@ function StandingsFfaWidget:render()
 								classes = {teamBackground},
 								children = PlacementChange{change = slot.positionChangeFromPreviousRound}
 							} or nil,
-							HtmlWidgets.Td{
-								classes = {teamBackground},
-								children = slot.points,
-								css = {['font-weight'] = 'bold', ['text-align'] = 'center'}
-							},
+							Array.map(standings.tiebreakers, function(tiebreaker, tiebreakerIndex)
+								if not tiebreaker.title then
+									return
+								end
+								return HtmlWidgets.Td{
+									classes = {teamBackground},
+								css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil, ['text-align'] = 'center'},
+									children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
+								}
+							end),
 							showRoundColumns and Array.map(standings.rounds, function(columnRound)
 								local text
 								if columnRound.round <= round.round then
 									local opponent = Array.find(columnRound.opponents, function(columnSlot)
 										return Table.deepEquals(columnSlot.opponent, slot.opponent)
 									end)
-									local roundStatus = opponent.specialStatus
-									if roundStatus == '' then
-										text = opponent.pointsChangeFromPreviousRound
-									else
-										text = STATUS_TO_DISPLAY[roundStatus]
+									if opponent then
+										local roundStatus = opponent.specialStatus
+										if roundStatus == '' then
+											text = opponent.pointsChangeFromPreviousRound
+										else
+											text = STATUS_TO_DISPLAY[roundStatus]
+										end
 									end
 								end
 								return HtmlWidgets.Td{children = text, css = {['text-align'] = 'center'}}

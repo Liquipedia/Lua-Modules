@@ -21,4 +21,9 @@ function TiebreakerMatchWins:valueOf(state, opponent)
 	return opponent.match.w
 end
 
+---@return string
+function TiebreakerMatchWins:headerTitle()
+	return 'Matches Won'
+end
+
 return TiebreakerMatchWins

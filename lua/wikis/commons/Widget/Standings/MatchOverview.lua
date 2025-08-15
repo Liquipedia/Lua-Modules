@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
@@ -33,6 +34,11 @@ function MatchOverviewWidget:render()
 		return
 	end
 
+	local otherOpponent = Array.find(match.opponents, function(op) return op ~= opponent end)
+	if not otherOpponent then
+		return
+	end
+
 	return HtmlWidgets.Div{
 		css = {
 			['display'] = 'flex',
@@ -52,7 +58,7 @@ function MatchOverviewWidget:render()
 				css = {
 					['font-size'] = '0.8em',
 				},
-				children = match.opponents[1].score .. ' - ' .. match.opponents[2].score,
+				children = otherOpponent.score .. ' - ' .. opponent.score,
 			},
 		},
 	}

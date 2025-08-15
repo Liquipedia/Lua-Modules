@@ -21,4 +21,9 @@ function TiebreakerManual:valueOf(state, opponent)
 	return opponent.extradata.tiebreakerpoints
 end
 
+---@return string?
+function TiebreakerManual:headerTitle()
+	return
+end
+
 return TiebreakerManual

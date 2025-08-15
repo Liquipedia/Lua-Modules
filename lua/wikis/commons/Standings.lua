@@ -33,6 +33,7 @@ local Standings = {}
 ---@field matches MatchGroupUtilMatch[]
 ---@field config table
 ---@field rounds StandingsRound[]
+---@field tiebreakers {id: string, title: string?}[]
 ---@field private record standingstable
 ---@field private entryRecords standingsentry[]
 
@@ -56,6 +57,7 @@ local Standings = {}
 ---@field positionChangeFromPreviousRound integer
 ---@field pointsChangeFromPreviousRound number
 ---@field specialStatus 'dq'|'nc'|'' # nc = non-competing (not in the round)
+---@field tiebreakerValues table<string, {value: integer?, display: string?}>
 ---@field private record standingstable
 
 ---Fetches a standings table from a page. Tries to read from page variables before fetching from LPDB.
@@ -119,6 +121,7 @@ function Standings.standingsFromRecord(record, entries)
 		section = record.section,
 		type = record.type,
 		config = record.config,
+		tiebreakers = record.extradata.tiebreakers,
 		record = record,
 		entryRecords = entries,
 	}
@@ -144,6 +147,7 @@ function Standings.entryFromRecord(record)
 		pointsChangeFromPreviousRound = record.extradata.pointschange,
 		specialStatus = record.extradata.specialstatus or '',
 		positionChangeFromPreviousRound = tonumber(record.placementchange),
+		tiebreakerValues = record.extradata.tiebreakerValues or {},
 		record = record,
 	}
 
