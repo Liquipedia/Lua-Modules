@@ -21,7 +21,7 @@ local NAME_TO_CLASS = {
 --- Validates and normalizes the name of a tiebreaker input.
 ---@param input string
 ---@return string
-function TiebreakerFactory.validateAndNormalizeName(input)
+function TiebreakerFactory.validateAndNormalizeInput(input)
 	local context, name = unpack(String.split(input, '%.'))
 	if name == nil then
 		name = context
@@ -34,7 +34,7 @@ function TiebreakerFactory.validateAndNormalizeName(input)
 
 	local tiebreakerClassName = NAME_TO_CLASS[name]
 	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(name))
-	return table.concat({context, tiebreakerClassName}, '.')
+	return table.concat({context, name}, '.')
 end
 
 ---@param tiebreakerId string

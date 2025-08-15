@@ -26,11 +26,4 @@ function TiebreakerMatchWins:headerTitle()
 	return 'Matches Wins'
 end
 
----@param state TiebreakerOpponent[]
----@param opponent TiebreakerOpponent
----@return string
-function TiebreakerMatchWins:display(state, opponent)
-	return tostring(self:valueOf(state, opponent))
-end
-
 return TiebreakerMatchWins

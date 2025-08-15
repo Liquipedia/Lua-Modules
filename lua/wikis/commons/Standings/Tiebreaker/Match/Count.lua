@@ -26,11 +26,4 @@ function TiebreakerMatchCount:headerTitle()
 	return 'Matches Played'
 end
 
----@param state TiebreakerOpponent[]
----@param opponent TiebreakerOpponent
----@return string
-function TiebreakerMatchCount:display(state, opponent)
-	return tostring(self:valueOf(state, opponent))
-end
-
 return TiebreakerMatchCount

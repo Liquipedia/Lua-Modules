@@ -45,11 +45,4 @@ function TiebreakerBuchholz:headerTitle()
 	return 'Buchholz'
 end
 
----@param state TiebreakerOpponent[]
----@param opponent TiebreakerOpponent
----@return string
-function TiebreakerBuchholz:display(state, opponent)
-	return tostring(self:valueOf(state, opponent))
-end
-
 return TiebreakerBuchholz

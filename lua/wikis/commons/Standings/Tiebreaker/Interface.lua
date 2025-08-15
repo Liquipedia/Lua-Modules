@@ -14,7 +14,9 @@ local Class = Lua.import('Module:Class')
 
 ---@class StandingsTiebreaker
 ---@field context 'full'|'ml'|'h2h'
----@field valueOf fun(self, state:TiebreakerOpponent[], opponent: TiebreakerOpponent): integer
+---@field valueOf fun(self: StandingsTiebreaker, state:TiebreakerOpponent[], opponent: TiebreakerOpponent): integer
+---@field display fun(self: StandingsTiebreaker, state:TiebreakerOpponent[], opponent: TiebreakerOpponent): string
+---@field headerTitle fun(self: StandingsTiebreaker): string
 local StandingsTiebreaker = Class.new(function (self, context)
 	self.context = context
 end)
@@ -26,7 +28,8 @@ function StandingsTiebreaker:valueOf(state, opponent)
 	error('This is an Interface')
 end
 
----@return string
+---Return nil to surpress this view
+---@return string?
 function StandingsTiebreaker:headerTitle()
 	error('This is an Interface')
 end
@@ -35,7 +38,7 @@ end
 ---@param opponent TiebreakerOpponent
 ---@return string
 function StandingsTiebreaker:display(state, opponent)
-	error('This is an Interface')
+	return tostring(self:valueOf(state, opponent))
 end
 
 ---@return 'full'|'ml'|'h2h'

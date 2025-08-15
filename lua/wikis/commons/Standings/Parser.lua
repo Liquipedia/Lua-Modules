@@ -70,17 +70,22 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 					specialstatus = statusInRound,
 					tiebreakerpoints = tiebreakerPoints or 0,
 					matchid = matchId,
+					tiebreakerValues = {}
 				}
 			}
 		end)
 	end)
 
-	local tiebreakers = Array.map(tiebreakerIds, TiebreakerFactory.tiebreakerFromId)
+	Array.forEach(rounds, function(round)
+		StandingsParser.calculateTiebreakerValues(Array.filter(entries, function(opponentRound)
+			return opponentRound.roundindex == round.roundNumber
+		end), tiebreakerIds)
+	end)
 
 	Array.forEach(rounds, function(round)
 		StandingsParser.determinePlacements(Array.filter(entries, function(opponentRound)
 			return opponentRound.roundindex == round.roundNumber
-		end), tiebreakers)
+		end), tiebreakerIds)
 	end)
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer,
 	---points: number, placement: integer?, slotindex: integer}[]
@@ -113,33 +118,59 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		finished = isFinished,
 		extradata = {
 			rounds = rounds,
-			tiebreakers = tiebreakerIds,
+			tiebreakers = Array.map(tiebreakerIds, function(tiebreakerId)
+				local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId)
+				local tiebreakerContextType = tiebreaker:getContextType()
+				if tiebreakerContextType ~= 'full' then
+					return {id = tiebreakerId}
+				end
+				return {
+					id = tiebreakerId,
+					title = tiebreaker:headerTitle(),
+				}
+			end),
 		},
 	}
 end
 
----@param allOpponents {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
----placement: integer?, slotindex: integer?, matches: MatchGroupUtilMatch[], extradata: table}[]
----@param tiedOpponents {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
----placement: integer?, slotindex: integer?, matches: MatchGroupUtilMatch[], extradata: table}[]
----@param tiebreakers StandingsTiebreaker[]
+---Calculate tiebreaker values for all opponents in a round.
+---Does not calculate H2H or ML, only "full" tiebreaker types.
+---H2H and ML and resolved in resolveTieForGroup() called by determinePlacements()
+---@param opponentsInRound TiebreakerOpponent[]
+---@param tiebreakerIds string[]
+function StandingsParser.calculateTiebreakerValues(opponentsInRound, tiebreakerIds)
+	Array.forEach(tiebreakerIds, function(tiebreakerId)
+		local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId)
+		local tiebreakerContextType = tiebreaker:getContextType()
+		if tiebreakerContextType == 'h2h' or tiebreakerContextType == 'ml' then
+			return
+		end
+		Array.forEach(opponentsInRound, function(opponent)
+			opponent.extradata.tiebreaker[tiebreakerId] = {
+				value = tiebreaker:valueOf(opponentsInRound, opponent),
+				display = tiebreaker:display(opponentsInRound, opponent),
+			}
+		end)
+	end)
+end
+
+---@param allOpponents TiebreakerOpponent[]
+---@param tiedOpponents TiebreakerOpponent[]
+---@param tiebreakerIds string[]
 ---@param tiebreakerIndex integer
----@return {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
----placement: integer?, slotindex: integer?, matches: MatchGroupUtilMatch[], extradata: table}[][]
-local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakers, tiebreakerIndex)
-	local tiebreaker = tiebreakers[tiebreakerIndex]
+---@return TiebreakerOpponent[][]
+local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakerIds, tiebreakerIndex)
+	local tiebreakerId = tiebreakerIds[tiebreakerIndex]
+	local tiebreaker = TiebreakerFactory.tiebreakerFromId(tiebreakerId)
 	if not tiebreaker then
 		return { tiedOpponents }
 	end
 
-	--TODO: add support for ml & h2h tiebreakers
-	local tiebreakerContextType = tiebreaker:getContextType()
-	if tiebreakerContextType == 'h2h' or tiebreakerContextType == 'ml' then
-		error('Tiebreakers for head-to-head and minileague are not yet supported')
-	end
-
 	local _, groupedOpponents = Array.groupBy(tiedOpponents, function(opponent)
-		return tiebreaker:valueOf(allOpponents, opponent)
+		if not opponent.extradata.tiebreaker[tiebreakerId] then
+			return tiebreaker:valueOf(allOpponents, opponent)
+		end
+		return opponent.extradata.tiebreaker[tiebreakerId].value
 	end)
 
 	local groupedOpponentsInOrder = Array.extractValues(groupedOpponents, Table.iter.spairs, function(_, a, b)
@@ -150,19 +181,21 @@ local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakers, tieb
 		if #group == 1 then
 			return { group }
 		end
-		return resolveTieForGroup(allOpponents, group, tiebreakers, tiebreakerIndex + 1)
+		return resolveTieForGroup(allOpponents, group, tiebreakerIds, tiebreakerIndex + 1)
 	end)
 end
 
 ---@param opponentsInRound {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
 ---placement: integer?, slotindex: integer?, extradata: table}[]
----@param tiebreakers StandingsTiebreaker[]
-function StandingsParser.determinePlacements(opponentsInRound, tiebreakers)
-	local opponentsAfterTie = resolveTieForGroup(opponentsInRound, opponentsInRound, tiebreakers, 1)
+---@param tiebreakerIds string[]
+function StandingsParser.determinePlacements(opponentsInRound, tiebreakerIds)
+	local opponentsAfterTie = resolveTieForGroup(opponentsInRound, opponentsInRound, tiebreakerIds, 1)
 	local slotIndex = 1
 	Array.forEach(opponentsAfterTie, function(opponentGroup)
 		local rank = slotIndex
 		Array.forEach(opponentGroup, function(opponent)
+			---@cast opponent {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
+---placement: integer?, slotindex: integer, placementchange: integer?}
 			opponent.placement = rank
 			opponent.slotindex = slotIndex
 			slotIndex = slotIndex + 1

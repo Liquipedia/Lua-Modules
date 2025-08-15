@@ -26,11 +26,4 @@ function TiebreakerPoints:headerTitle()
 	return 'Points'
 end
 
----@param state TiebreakerOpponent[]
----@param opponent TiebreakerOpponent
----@return string
-function TiebreakerPoints:display(state, opponent)
-	return tostring(self:valueOf(state, opponent))
-end
-
 return TiebreakerPoints
