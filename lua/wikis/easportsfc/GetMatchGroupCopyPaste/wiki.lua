@@ -30,8 +30,8 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local hasSubmatches = Logic.readBool(args.hasSubmatches)
 
 	local lines = Array.extend(
-		'{{Match|finished=',
-		bestof ~= 0 and (INDENT .. '|bestof=' .. bestof) or nil,
+		'{{Match',
+		bestof ~= 0 and (INDENT .. '|bestof=' .. bestof) or (INDENT .. '|finished='),
 		hasSubmatches and INDENT .. '|hasSubmatches=1' or nil,
 		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil,
 		Logic.readBool(args.hasDate) and {INDENT .. '|date=', INDENT .. '|youtube=|twitch='} or {},
@@ -52,7 +52,7 @@ end
 ---@return string
 function WikiCopyPaste._getMap(hasSubmatches)
 	local lines = Array.extend(
-		'{{Map',
+		'{{Map|finished=',
 		INDENT .. INDENT .. '|score1= |score2=',
 		hasSubmatches and {
 			INDENT .. INDENT .. '|penaltyScore1= |penaltyScore2=',

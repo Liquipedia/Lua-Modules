@@ -26,7 +26,8 @@ local Center = Widgets.Center
 
 local GAME_MODE = Lua.import('Module:GameMode', {loadData = true})
 local EA_ICON = '&nbsp;[[File:EA icon.png|x15px|middle|link=Electronic Arts|'
-	.. 'Tournament sponsored by Electronirc Arts & Respawn.]]'
+	.. 'Tournament sponsored by Electronic Arts & Respawn.|class=show-when-light-mode]][[File:EA icon darkmode.png|'
+	.. 'x15px|middle|link=Electronic Arts|Tournament sponsored by Electronic Arts & Respawn.|class=show-when-dark-mode]]'
 
 ---@class ApexlegendsLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)

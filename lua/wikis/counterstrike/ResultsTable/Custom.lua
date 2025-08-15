@@ -23,6 +23,8 @@ local CustomResultsTable = {}
 ---@param args table
 ---@return Html
 function CustomResultsTable.results(args)
+	args.gameIcons = true
+	args.showType = true
 	local resultsTable = ResultsTable(args)
 
 	resultsTable.tierDisplay = CustomResultsTable.tierDisplay
@@ -34,6 +36,8 @@ end
 ---@param args table
 ---@return Html
 function CustomResultsTable.awards(args)
+	args.gameIcons = true
+	args.showType = true
 	local awardsTable = AwardsTable(args)
 
 	awardsTable.tierDisplay = CustomResultsTable.tierDisplay

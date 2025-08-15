@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Abbreviation = Lua.import('Module:Abbreviation')
 local FnUtil = Lua.import('Module:FnUtil')
 local Characters = Lua.import('Module:Characters')
 local DisplayUtil = Lua.import('Module:DisplayUtil')
@@ -18,7 +17,7 @@ local Table = Lua.import('Module:Table')
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 
-local TBD_ABBREVIATION = Abbreviation.make{text = 'TBD', title = 'To be determined (or to be decided)'}
+local TBD = 'TBD'
 local ZERO_WIDTH_SPACE = '&#8203;'
 
 ---@class SmashPlayerDisplay: PlayerDisplay
@@ -35,14 +34,19 @@ local CustomPlayerDisplay = Table.copy(PlayerDisplay)
 function CustomPlayerDisplay.BlockPlayer(props)
 	local player = props.player
 
-	local nameNode = mw.html.create(props.dq and 's' or 'span')
-		:wikitext(
-			props.abbreviateTbd and Opponent.playerIsTbd(player) and TBD_ABBREVIATION
-			or props.showLink ~= false and player.pageName
-			and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
-			or Logic.emptyOr(player.displayName, ZERO_WIDTH_SPACE)
-		)
+	local useDefault = props.showTbd ~= false or not Opponent.playerIsTbd(player)
+
+	local nameNode = mw.html.create(props.dq and 's' or 'span'):addClass('name')
+
+	if not Opponent.playerIsTbd(player) and props.showLink ~= false and Logic.isNotEmpty(player.pageName) then
+		nameNode:wikitext('[[' .. player.pageName .. '|' .. player.displayName .. ']]')
+	elseif useDefault then
+		nameNode:wikitext(Logic.emptyOr(player.displayName, 'TBD'))
+	else
+		nameNode:wikitext(ZERO_WIDTH_SPACE)
+	end
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
+
 
 	if props.note then
 		nameNode = mw.html.create('span'):addClass('name')
@@ -53,8 +57,8 @@ function CustomPlayerDisplay.BlockPlayer(props)
 	end
 
 	local flagNode
-	if props.showFlag ~= false and player.flag then
-		flagNode = PlayerDisplay.Flag{flag = player.flag}
+	if props.showFlag ~= false then
+		flagNode = PlayerDisplay.Flag{flag = player.flag, useDefault = useDefault}
 	end
 
 	local characterNode = mw.html.create()
@@ -67,7 +71,7 @@ function CustomPlayerDisplay.BlockPlayer(props)
 	end
 
 	local teamNode
-	if props.showPlayerTeam and player.team and player.team:lower() ~= 'tbd' then
+	if props.showPlayerTeam and player.team and player.team:lower() ~= TBD then
 		teamNode = mw.html.create('span')
 			:wikitext('&nbsp;')
 			:node(mw.ext.TeamTemplate.teampart(player.team))

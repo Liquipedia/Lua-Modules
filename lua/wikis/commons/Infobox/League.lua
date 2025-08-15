@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Class = Lua.import('Module:Class')
+local CountryCategory = Lua.import('Module:Infobox/Extension/CountryCategory')
 local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
@@ -132,10 +133,7 @@ function League:createInfobox()
 				}
 			}
 		},
-		Location{
-			args = args,
-			shouldSetCategory = self:shouldStore(args),
-		},
+		Location{args = args},
 		Venue{args = args},
 		Cell{name = 'Format', children = {args.format}},
 		Customizable{id = 'prizepool', children = {
@@ -289,14 +287,13 @@ end
 ---@param args table
 ---@return string[]
 function League:_getCategories(args)
-	local categories = {'Tournaments'}
-	if String.isEmpty(args.country) then
-		table.insert(categories, 'Tournaments without location')
-	end
-	Array.extendWith(categories, self:addParticipantTypeCategory(args))
-	Array.extendWith(categories, self:addTierCategories(args))
-
-	return Array.extend(categories, self:getWikiCategories(args))
+	return Array.extend({'Tournaments'},
+		Logic.isEmpty(args.country) and 'Tournaments without location' or nil,
+		self:addParticipantTypeCategory(args),
+		self:addTierCategories(args),
+		CountryCategory.run(args, 'Tournaments'),
+		self:getWikiCategories(args)
+	)
 end
 
 ---@param args table
