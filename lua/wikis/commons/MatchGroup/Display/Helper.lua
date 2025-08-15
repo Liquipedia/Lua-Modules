@@ -93,7 +93,7 @@ components.
 ---@return boolean
 function DisplayHelper.defaultMatchHasDetails(match)
 	return match.dateIsExact
-		or (not Date.isDefaultTimestamp(match.timestamp))
+		or (match.timestamp and not Date.isDefaultTimestamp(match.timestamp))
 		or Logic.isNotEmpty(match.vod)
 		or Table.isNotEmpty(match.links)
 		or Logic.isNotEmpty(match.comment)
