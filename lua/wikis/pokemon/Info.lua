@@ -55,8 +55,8 @@ return {
 			link = 'Main Page',
 			name = 'Pokemon Go',
 			logo = {
-				darkMode = 'Pokemon allmode.png',
-				lightMode = 'Pokemon allmode.png',
+				darkMode = 'Pokemon GO allmode.png',
+				lightMode = 'Pokemon GO allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Pokemon allmode.png',
@@ -133,8 +133,8 @@ return {
 			name = 'Scarlet & Violet',
 			link = 'Main Page',
 			logo = {
-				darkMode = 'Pokemon allmode.png',
-				lightMode = 'Pokemon allmode.png',
+				darkMode = 'Pokemon_Scarlet_Violet_allmode.png',
+				lightMode = 'Pokemon_Scarlet_Violet_allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Pokemon allmode.png',
@@ -159,8 +159,8 @@ return {
 			name = 'Trading Card Game',
 			link = 'Main Page',
 			logo = {
-				darkMode = 'Pokemon allmode.png',
-				lightMode = 'Pokemon allmode.png',
+				darkMode = 'Pokemon_Trading_Card_Game_allmode.png',
+				lightMode = 'Pokemon_Trading_Card_Game_allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Pokemon allmode.png',
@@ -211,8 +211,8 @@ return {
 			name = 'Unite',
 			link = 'Main Page',
 			logo = {
-				darkMode = 'Pokemon allmode.png',
-				lightMode = 'Pokemon allmode.png',
+				darkMode = 'Pokemon UNITE allmode.png',
+				lightMode = 'Pokemon UNITE allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Pokemon allmode.png',

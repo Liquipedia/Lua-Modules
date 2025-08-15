@@ -146,8 +146,12 @@ function MatchPage:_renderGameOverview(game)
 	end
 
 	---@param showScore boolean
-	---@return Widget|Widget[]
+	---@return Widget[]
 	local function createScoreHolderContent(showScore)
+		local mapDisplay = Div{
+			classes = {'match-bm-lol-game-summary-map'},
+			children = game.map
+		}
 		local lengthDisplay = Div{
 			classes = {'match-bm-lol-game-summary-length'},
 			children = game.length
@@ -162,10 +166,11 @@ function MatchPage:_renderGameOverview(game)
 						DisplayHelper.MapScore(game.opponents[2], game.status)
 					}
 				},
+				mapDisplay,
 				lengthDisplay
 			}
 		end
-		return lengthDisplay
+		return {mapDisplay, lengthDisplay}
 	end
 
 	local overview = Div{

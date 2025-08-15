@@ -21,9 +21,6 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 ---@class StarcraftOpponentDisplay: OpponentDisplay
 local StarcraftOpponentDisplay = Table.copy(OpponentDisplay)
 
----@class StarcraftInlineOpponentProps: InlineOpponentProps
----@field opponent StarcraftStandardOpponent
-
 ---@class StarcraftBlockOpponentProps: BlockOpponentProps
 ---@field opponent StarcraftStandardOpponent
 
@@ -32,37 +29,31 @@ local StarcraftOpponentDisplay = Table.copy(OpponentDisplay)
 ---@operator call(...): StarcraftBracketOpponentEntry
 ---@field content Html
 ---@field root Html
-local BracketOpponentEntry = Class.new(
+local BracketOpponentEntry = Class.new(OpponentDisplay.BracketOpponentEntry,
 	---@param self self
 	---@param opponent StarcraftStandardOpponent
 	---@param options {forceShortName: boolean, showTbd: boolean}
 	function(self, opponent, options)
-		if opponent.type == Opponent.team and options.showTbd == false and
-				(Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)) then
-			opponent = Opponent.blank() --[[@as StarcraftStandardOpponent]]
-		end
-
 		local showFactionBackground = opponent.type == Opponent.solo
-			or opponent.extradata.hasFactionOrFlag
 			or opponent.type == Opponent.duo and opponent.isArchon
 
 		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
 			:addClass(showFactionBackground and Faction.bgClass(opponent.players[1].faction) or nil)
 
 		if opponent.type == Opponent.team then
-			self.content:node(OpponentDisplay.BlockTeamContainer({
-				showLink = false,
-				style = 'hybrid',
-				team = opponent.team,
-				template = opponent.template,
-			}))
-		else
+			if options.showTbd ~= false or not Opponent.isTbd(opponent) then
+				self:createTeam(opponent.template or 'tbd', options)
+			end
+		elseif Opponent.typeIsParty(opponent.type) then
 			self.content:node(StarcraftOpponentDisplay.BlockOpponent({
 				opponent = opponent,
 				overflow = 'ellipsis',
 				playerClass = 'starcraft-bracket-block-player',
 				showLink = false,
+				showTbd = options.showTbd,
 			}))
+		else
+			self:createLiteral(opponent.name or '')
 		end
 
 		self.root = mw.html.create('div'):addClass('brkts-opponent-entry')
@@ -109,6 +100,9 @@ function StarcraftOpponentDisplay.BlockOpponent(props)
 		)
 	end
 
+	if props.showTbd == false and Opponent.isTbd(opponent) then
+		return mw.html.create()
+	end
 	return OpponentDisplay.BlockOpponent(props)
 end
 
