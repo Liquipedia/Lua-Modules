@@ -101,21 +101,6 @@ function DisplayHelper.defaultMatchHasDetails(match)
 		or Info.config.match2.matchPage
 end
 
--- Display component showing the streams, date, and countdown of a match.
----@param match MatchGroupUtilMatch
----@return Html
-function DisplayHelper.MatchCountdownBlock(match)
-	local stream = Table.merge(match.stream, {
-		date = Date.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
-		finished = match.finished,
-	})
-	return mw.html.create('div'):addClass('match-countdown-block')
-		:css('text-align', 'center')
-		-- Workaround for .brkts-popup-body-element > * selector
-		:css('display', 'block')
-		:node(Lua.import('Module:Countdown')._create(stream))
-end
-
 ---Creates comments that describe substitute player(s) of the match.
 ---@param match table
 ---@return string[]
