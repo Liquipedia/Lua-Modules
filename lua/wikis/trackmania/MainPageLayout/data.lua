@@ -83,7 +83,7 @@ return {
 	title = 'Trackmania',
 	navigation = {
 		{
-			file = 'Papou and Wosile Efrei Trackmania Cup 2022.jpg',
+			file = 'Papou and Wosile Efrei Trackmania Cup Cropped.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
