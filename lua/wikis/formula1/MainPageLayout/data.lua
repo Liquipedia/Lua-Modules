@@ -15,8 +15,8 @@ local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
-local HOUR_GLASS_HALF = IconFa{
-	iconName = 'hourglass',
+local ONGOING_SERIES = IconFa{
+	iconName = 'ongoing_series',
 	color = 'cinnabar-theme-dark-gb',
 	size = 'lg',
 }
@@ -33,14 +33,14 @@ local CALENDAR = IconFa{
 	size = 'lg',
 }
 
-local LANDMARK = IconFa{
-	iconName = 'landmark',
+local HISTORY = IconFa{
+	iconName = 'history',
 	color = 'cinnabar-theme-dark-gb',
 	size = 'lg',
 }
 
-local CHECKERED_FLAG = IconFa{
-	iconName = 'checkeredflag',
+local FINISHED_RACE = IconFa{
+	iconName = 'finished_race',
 	color = 'cinnabar-theme-dark-gb',
 	size = 'lg',
 }
@@ -52,7 +52,7 @@ local CONTENT = {
 		boxid = 1501,
 	},
 	specialEvents = {
-		heading = HtmlWidgets.Fragment{children = {HOUR_GLASS_HALF, '&nbsp;Active and Upcoming Series'}},
+		heading = HtmlWidgets.Fragment{children = {ONGOING_SERIES, '&nbsp;Active and Upcoming Series'}},
 		body = '{{Liquipedia:Active Upcoming Series}}',
 		boxid = 1502
 	},
@@ -101,12 +101,12 @@ local CONTENT = {
 		boxid = 1509
 	},
 	previousRace = {
-		heading =HtmlWidgets.Fragment{children = {CHECKERED_FLAG, '&nbsp;Previous Race Weekend'}},
+		heading =HtmlWidgets.Fragment{children = {FINISHED_RACE, '&nbsp;Previous Race Weekend'}},
 		body = '{{Liquipedia:Previous Race Weekend}}',
 		boxid = 1511
 	},
 	allF1Seasons = {
-		heading =HtmlWidgets.Fragment{children = {LANDMARK, '&nbsp;Formula 1 Seasons'}},
+		heading =HtmlWidgets.Fragment{children = {HISTORY, '&nbsp;Formula 1 Seasons'}},
 		body = '{{Liquipedia:All F1 Seasons}}',
 		boxid = 1512
 	},

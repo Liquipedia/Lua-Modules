@@ -220,7 +220,7 @@ return {
 	vod_play = 'far fa-play',
 
 	-- Usage: Formula 1
-	hourglass = 'fas fa-hourglass-half ',
-	landmark = 'fas fa-landmark',
-	checkeredflag = 'fas fa-flag-checkered'
+	ongoing_series = 'fas fa-hourglass-half ',
+	history = 'fas fa-landmark',
+	finished_race = 'fas fa-flag-checkered'
 }
