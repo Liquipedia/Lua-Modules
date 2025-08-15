@@ -32,9 +32,9 @@ function DefaultCollapsible:render()
 		),
 		children = {
 			props.titleWidget or Div{
-				classes = props.titleClasses,
+				classes = Array.extend({'general-collapsible-default-header'}, props.titleClasses),
 				children = {
-					B{children = {props.title}},
+					B{children = {props.title}, classes = {'general-collapsible-default-title'}},
 					CollapsibleToggle{css = {float = 'right'}},
 				}
 			},
