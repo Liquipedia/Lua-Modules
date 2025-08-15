@@ -194,6 +194,7 @@ local PREFIXES = {
 	matcherinolink = {'https://matcherino.com/t/'},
 	mildom = {'https://www.mildom.com/'},
 	mplink = {match = 'https://osu.ppy.sh/community/matches/'}, -- Should this key be renamed?
+	lazermplink = {match = 'https://osu.ppy.sh/multiplayer/rooms/'},
 	niconico = {'https://www.nicovideo.jp/'},
 	nimotv = {'https://www.nimo.tv/'},
 	['nwc3l'] = {
@@ -339,6 +340,7 @@ local SUFFIXES = {
 		stream = '/live',
 	},
 	gol = {match = '/page-game/'},
+	lazermplink = {match = '/events'},
 	iccup = {'.html'},
 	['faceit-c'] = {'/'},
 	['faceit-hub'] = {'/'},
@@ -513,6 +515,10 @@ local MATCH_ICONS = {
 	},
 	mplink = {
 		icon = 'File:Osu single color allmode.png',
+		text = 'Match Data'
+	},
+	lazermplink = {
+		icon = 'File:Osu!lazer allmode.png',
 		text = 'Match Data'
 	},
 	opl = {
