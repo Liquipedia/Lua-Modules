@@ -25,7 +25,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@class MatchPageHeaderParameters
 ---@field countdownBlock Html?
 ---@field isBestOfOne boolean
----@field mvp {players: {name: string, displayname: string}[], points: integer?}?
+---@field mvp {players: MatchGroupMvpPlayer[], points: integer?}?
 ---@field opponent1 MatchPageOpponent
 ---@field opponent2 MatchPageOpponent
 ---@field parent string?
