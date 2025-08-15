@@ -221,6 +221,6 @@ return {
 
 	-- Usage: Formula 1
 	ongoing_series = 'fas fa-hourglass-half ',
-	history = 'fas fa-landmark',
+	season_history = 'fas fa-landmark',
 	finished_race = 'fas fa-flag-checkered'
 }

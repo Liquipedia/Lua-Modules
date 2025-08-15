@@ -34,7 +34,7 @@ local CALENDAR = IconFa{
 }
 
 local HISTORY = IconFa{
-	iconName = 'history',
+	iconName = 'season_history',
 	color = 'cinnabar-theme-dark-gb',
 	size = 'lg',
 }
