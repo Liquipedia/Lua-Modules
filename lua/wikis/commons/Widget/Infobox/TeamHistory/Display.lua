@@ -18,6 +18,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TransferRef = Lua.import('Module:Transfer/References')
+local Variables = Lua.import('Module:Variables')
 local Widget = Lua.import('Module:Widget')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -31,20 +32,7 @@ local Th = HtmlWidgets.Th
 local Tr = HtmlWidgets.Tr
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local SPECIAL_ROLES = {
-	'Retired',
-	'Retirement',
-	'Military',
-	'Banned',
-	'Producer',
-	'Caster',
-	'Admin',
-	'Observer',
-	'Host',
-	'Talent',
-	'League Operator',
-	'Inactive'
-}
+local SPECIAL_ROLES = Lua.import('Module:Infobox/Extension/TeamHistory/SpecialRoles', {loadData = true})
 local LOAN = 'Loan'
 local POSITION_ICON_DATA = Lua.requireIfExists('Module:PositionIcon/data', {loadData = true})
 
@@ -65,12 +53,13 @@ local NOT_YET_IN_ROLES_DATA = {
 	['founder & training director'] = {display = 'Founder & Training Director', abbreviation = 'F. & TD.'},
 }
 
+local HAS_REFS = ((Info.config.infoboxPlayer or {}).automatedHistory or {}).hasHeaderAndRefs
+
 ---@class TeamHistoryDisplayWidget: Widget
 ---@operator call(table): TeamHistoryDisplayWidget
----@field props {transferList: table[], hasHeaderAndRefs: boolean?, player: string}
+---@field props {transferList: TransferSpan[], player: string}
 local TeamHistoryDisplay = Class.new(Widget)
 TeamHistoryDisplay.defaultProps = {
-	hasHeaderAndRefs = ((Info.config.infoboxPlayer or {}).automatedHistory or {}).hasHeaderAndRefs,
 	transferList = {},
 	player = String.upperCaseFirst(mw.title.getCurrentTitle().subpageText),
 }
@@ -79,10 +68,13 @@ TeamHistoryDisplay.defaultProps = {
 function TeamHistoryDisplay:render()
 	if Logic.isEmpty(self.props.transferList) then return end
 
+	local offset = tonumber(Variables.varDefault('teamhistory_index')) or 0
+	Variables.varDefine('teamhistory_index', offset + #self.props.transferList)
+
 	return Tbl{
 		css = {width = '100%', ['text-align'] = 'left'},
 		children = WidgetUtil.collect(
-			self.props.hasHeaderAndRefs and self:_header() or nil,
+			HAS_REFS and offset == 0 and self:_header() or nil,
 			Array.map(self.props.transferList, FnUtil.curry(self._row, self))
 		)
 	}
@@ -125,7 +117,7 @@ function TeamHistoryDisplay:_header()
 	}}
 end
 
----@param transfer table
+---@param transfer TransferSpan
 ---@return Widget
 function TeamHistoryDisplay:_row(transfer)
 	local teamText = self:_getTeamText(transfer)
@@ -169,7 +161,7 @@ function TeamHistoryDisplay:_row(transfer)
 
 	local leaveateDisplay = self:_buildLeaveDateDisplay(transfer)
 
-	if not self.props.hasHeaderAndRefs then
+	if not HAS_REFS then
 		return Tr{children = {
 			Td{
 				classes = {'th-mono'},
@@ -217,7 +209,7 @@ function TeamHistoryDisplay:_row(transfer)
 	}}
 end
 
----@param transfer table
+---@param transfer TransferSpan
 ---@return string?
 ---@return Widget
 function TeamHistoryDisplay:_getTeamText(transfer)
@@ -261,7 +253,7 @@ function TeamHistoryDisplay._adjustDate(date)
 	return os.date('%Y-%m-%d', os.time(dateStruct)) --[[@as string]]
 end
 
----@param transfer table
+---@param transfer TransferSpan
 ---@return string|Widget?
 function TeamHistoryDisplay:_buildLeaveDateDisplay(transfer)
 	if transfer.leaveDateDisplay then return transfer.leaveDateDisplay end

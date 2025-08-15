@@ -41,9 +41,9 @@ local Transfer = {}
 ---@field team string
 ---@field role string
 ---@field position string
----@field joinDate string|number
+---@field joinDate string
 ---@field joinDateDisplay string
----@field leaveDate string|number?
+---@field leaveDate string?
 ---@field leaveDateDisplay string?
 ---@field reference {join: table?, leave: table?}
 
