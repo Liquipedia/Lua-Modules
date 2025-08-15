@@ -89,7 +89,7 @@ end
 ---@protected
 ---@return string?
 function BaseMatchPage:getCountdownBlock()
-	if self.matchData.timestamp == DateExt.defaultTimestamp then return end
+	if DateExt.isDefaultTimestamp(self.matchData.timestamp) then return end
 	return Countdown._create(Table.merge(self.matchData.stream, {
 		date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
 		finished = self.matchData.finished,
