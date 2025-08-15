@@ -12,10 +12,14 @@ local String = Lua.import('Module:StringUtils')
 local TiebreakerFactory = {}
 
 local NAME_TO_CLASS = {
+	buchholz = 'Buchholz',
 	manual = 'Manual',
 	points = 'Points',
 	matchdiff = 'Match/Diff',
-	buchholz = 'Buchholz',
+	matchesplayed = 'Match/Count',
+	matcheswon = 'Match/Wins',
+	matchesdrawn = 'Match/Draws',
+	matcheswinpercent = 'Match/WinRate',
 }
 
 --- Validates and normalizes the name of a tiebreaker input.
