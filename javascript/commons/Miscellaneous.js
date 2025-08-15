@@ -723,11 +723,13 @@ liquipedia.tracker = {
 				} );
 			} );
 		}
-		/* TODO: Investigate if this should be changed */
-		if ( window.localStorage.getItem( 'LiquipediaDarkMode' ) === 'true' ) {
+
+		if ( window.localStorage.getItem( 'LiquipediaTheme' ) === 'dark' ) {
 			liquipedia.tracker.track( 'Page view with dark theme enabled' );
-		} else {
-			liquipedia.tracker.track( 'Page view with dark theme disabled' );
+		} else if ( window.localStorage.getItem( 'LiquipediaTheme' ) === 'light' ) {
+			liquipedia.tracker.track( 'Page view with light theme enabled' );
+		} else if ( window.localStorage.getItem( 'LiquipediaTheme' ) === 'system' ) {
+			liquipedia.tracker.track( 'Page view with auto theme enabled' );
 		}
 	}
 };
