@@ -41,7 +41,6 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local UTC = 'UTC'
 local DRAW_WINNER = 0
 local INVALID_TIER_DISPLAY = 'Undefined'
 local INVALID_TIER_SORT = 'ZZ'
@@ -662,30 +661,12 @@ function MatchTable:_displayDate(match)
 		return cell
 	end
 
-	if not match.dateIsExact then
-		return cell:node(DateExt.formatTimestamp('M d, Y', match.timestamp))
-	end
-
 	return cell:node(Countdown._create{
 		timestamp = match.timestamp,
 		finished = true,
-		date = MatchTable._calculateDateTimeString(match.timezoneId or UTC, match.timestamp),
+		date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
 		rawdatetime = true,
 	} or nil)
-end
-
----@param timezone string
----@param timestamp number
----@return string
-function MatchTable._calculateDateTimeString(timezone, timestamp)
-	local offset = Timezone.getOffset{timezone = timezone} or 0
-	local tzstring = Timezone.getTimezoneString{timezone = timezone}
-	if not tzstring then
-		error('Unsupported timezone: ' .. timezone)
-	end
-
-	return DateExt.formatTimestamp('M d, Y - H:i', timestamp + offset) ..
-		' ' .. tzstring
 end
 
 ---@param match MatchTableMatch
