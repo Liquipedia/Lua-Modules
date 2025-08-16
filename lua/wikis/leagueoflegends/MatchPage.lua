@@ -66,6 +66,16 @@ local KEYSTONES = Table.map({
 	return value, true
 end)
 
+local ROLE_ORDER = Table.map({
+	'top',
+	'jungle',
+	'middle',
+	'bottom',
+	'support',
+}, function(idx, value)
+	return value, idx
+end)
+
 local DEFAULT_ITEM = 'EmptyIcon'
 local LOADOUT_ICON_SIZE = '24px'
 local ITEMS_TO_SHOW = 6
@@ -97,17 +107,22 @@ function MatchPage:populateGames()
 			team.scoreDisplay = game.winner == teamIdx and 'W' or game.finished and 'L' or '-'
 			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
 
-			team.players = Array.map(opponent.players, function(player)
-				if Logic.isDeepEmpty(player) then return end
-				return Table.mergeInto(player, {
-					items = Array.map(Array.range(1, ITEMS_TO_SHOW), function(idx)
-						return player.items[idx] or DEFAULT_ITEM
-					end),
-					runeKeystone = Array.filter(player.runes.primary.runes, function(rune)
-						return KEYSTONES[rune]
-					end)[1]
-				})
-			end)
+			team.players = Array.map(
+				Array.sortBy(Array.filter(opponent.players, Logic.isNotEmpty), function(player)
+					return ROLE_ORDER[player.role]
+				end),
+				function(player)
+					if Logic.isDeepEmpty(player) then return end
+					return Table.mergeInto(player, {
+						items = Array.map(Array.range(1, ITEMS_TO_SHOW), function(idx)
+							return player.items[idx] or DEFAULT_ITEM
+						end),
+						runeKeystone = Array.filter(player.runes.primary.runes, function(rune)
+							return KEYSTONES[rune]
+						end)[1]
+					})
+				end
+			)
 
 			if game.finished then
 				-- Aggregate stats
