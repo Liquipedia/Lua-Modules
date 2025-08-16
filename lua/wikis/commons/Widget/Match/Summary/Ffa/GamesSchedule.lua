@@ -19,6 +19,7 @@ local GameCountdown = Lua.import('Module:Widget/Match/Summary/Ffa/GameCountdown'
 
 ---@class MatchSummaryFfaGamesSchedule: Widget
 ---@operator call(table): MatchSummaryFfaGamesSchedule
+---@field props {match: FFAMatchGroupUtilMatch}
 local MatchSummaryFfaGamesSchedule = Class.new(Widget)
 
 ---@return Widget?

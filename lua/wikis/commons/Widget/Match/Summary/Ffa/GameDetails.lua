@@ -24,6 +24,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchSummaryFfaGameDetails: Widget
 ---@operator call(table): MatchSummaryFfaGameDetails
+---@field props {game: FFAMatchGroupUtilGame}
 local MatchSummaryFfaGameDetails = Class.new(Widget)
 
 ---@return Widget

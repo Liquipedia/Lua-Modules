@@ -17,6 +17,7 @@ local Widget = Lua.import('Module:Widget')
 
 ---@class MatchSummaryFfaMatchComment: Widget
 ---@operator call(table): MatchSummaryFfaHeader
+---@field props {match: FFAMatchGroupUtilMatch}
 local MatchSummaryFfaMatchComment = Class.new(Widget)
 
 ---@return Widget?

@@ -19,6 +19,7 @@ local Widget = Lua.import('Module:Widget')
 
 ---@class MatchSummaryFfaMvp: Widget
 ---@operator call(table): MatchSummaryFfaHeader
+---@field props {players: MatchGroupMvpPlayer[], points: integer}
 local MatchSummaryFfaMvp = Class.new(Widget)
 
 ---@return Widget?

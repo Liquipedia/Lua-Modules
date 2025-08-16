@@ -22,6 +22,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchSummaryFfaMatchInformation: Widget
 ---@operator call(table): MatchSummaryFfaMatchInformation
+---@field props FFAMatchGroupUtilMatch
 local MatchSummaryFfaMatchInformation = Class.new(Widget)
 
 ---@return Widget?

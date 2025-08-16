@@ -18,6 +18,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class MatchSummaryFfaGameCountdown: Widget
 ---@operator call(table): MatchSummaryFfaGameCountdown
+---@field props {game: FFAMatchGroupUtilGame?}
 local MatchSummaryFfaGameCountdown = Class.new(Widget)
 
 ---@return Widget?
