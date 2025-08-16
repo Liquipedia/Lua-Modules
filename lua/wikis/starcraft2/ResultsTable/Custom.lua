@@ -8,7 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
-local CollapsibleToggle= Lua.import('Module:Widget/GeneralCollapsible/Toggle')
+local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
 local DivTable = Lua.import('Module:DivTable')
 local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
