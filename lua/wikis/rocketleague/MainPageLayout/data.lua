@@ -83,7 +83,15 @@ local CONTENT = {
 	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = TournamentsTicker{},
+		body = TournamentsTicker{
+			--- 1 week as threshold by default
+			upcomingDays = 7,
+			completedDays = 7,
+			--- Special thresholds for higher tier events
+			modifierTier1 = 21,
+			modifierTier2 = 14,
+			modifierTier3 = 7
+		},
 		padding = true,
 		boxid = 1508,
 	},

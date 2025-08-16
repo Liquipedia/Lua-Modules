@@ -15,6 +15,7 @@ local Config = {}
 
 local REGION_TO_SUPERREGION = {
 	['Europe'] = 'EU',
+	['Turkey'] = 'EU',
 	['North America'] = 'NA',
 	['Oceania'] = 'OCE',
 	['Latin America North'] = 'SAM',
@@ -22,7 +23,9 @@ local REGION_TO_SUPERREGION = {
 	['Brazil'] = 'SAM',
 	['South America'] = 'SAM',
 	['Middle East'] = 'MENA',
+	['MENA'] = 'MENA',
 	['Asia'] = 'APAC',
+	['Asia-Pacific'] = 'APAC',
 	['Africa'] = 'SSA',
 	['Other'] = 'Other',
 }
