@@ -58,11 +58,16 @@ end
 
 ---@param display string
 ---@param estimate string?
----@return string
+---@return string?
 function TeamHistoryManual._parseDatesToYmd(display, estimate)
 	if Logic.isNotEmpty(estimate) then
 		---@cast estimate -nil
 		return DateExt.toYmdInUtc(estimate)
+	end
+
+	if display:find('%?') then
+		mw.ext.TeamLiquidIntegration.add_category(BAD_INPUT_CATEGORY)
+		return
 	end
 
 	return DateExt.toYmdInUtc(display)
