@@ -10,9 +10,16 @@ local Lua = require('Module:Lua')
 local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
 
 local BAD_INPUT_CATEGORY = 'Improperly formatted TeamHistory date'
 local ROLE_CLEAN = Lua.requireIfExists('Module:TeamHistoryAuto/cleanRole', {loadData = true})
+
+-- we should bot these eventually...
+local ROLE_ALIASES = {
+	r = 'Retirement',
+	retired = 'Retirement',
+}
 
 local TeamHistoryManual = {}
 
@@ -29,8 +36,13 @@ function TeamHistoryManual.parse(input)
 	local team = args.link or args[2]
 	local role = args[3]
 
+	role = ROLE_ALIASES[(role or ''):lower()] or role
 	if ROLE_CLEAN then
-		role = ROLE_CLEAN[(role or ''):lower()]
+		role = ROLE_CLEAN[(role or ''):lower()] or role
+	end
+
+	if role then
+		role = String.upperCaseFirst(role)
 	end
 
 	return {

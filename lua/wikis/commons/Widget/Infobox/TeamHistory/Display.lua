@@ -39,7 +39,6 @@ local POSITION_ICON_DATA = Lua.requireIfExists('Module:PositionIcon/data', {load
 -- todo at a later date: move into standardized role data where reasonable or kick
 local NOT_YET_IN_ROLES_DATA = {
 	['coach/analyst'] = {display = 'Coach/Analyst', abbreviation = 'C./A.'},
-	['coach and analyst'] = {display = 'Coach/Analyst', abbreviation = 'C./A.'},
 	['overall coach'] = {display = 'Overall Coach', abbreviation = 'OC.'},
 	['manager and analyst'] = {display = 'Manager/Analyst', abbreviation = 'M./A.'},
 	['manager/analyst'] = {display = 'Manager/Analyst', abbreviation = 'M./A.'},
@@ -52,6 +51,10 @@ local NOT_YET_IN_ROLES_DATA = {
 	['training advisor'] = {display = 'Training Advisor', abbreviation = 'TA.'},
 	['founder & training director'] = {display = 'Founder & Training Director', abbreviation = 'F. & TD.'},
 }
+NOT_YET_IN_ROLES_DATA['coach and analyst'] = NOT_YET_IN_ROLES_DATA['coach/analyst']
+NOT_YET_IN_ROLES_DATA['coach & analyst'] = NOT_YET_IN_ROLES_DATA['coach/analyst']
+NOT_YET_IN_ROLES_DATA.gm = NOT_YET_IN_ROLES_DATA['general manager']
+NOT_YET_IN_ROLES_DATA.sub = NOT_YET_IN_ROLES_DATA.substitute
 
 local HAS_REFS = ((Info.config.infoboxPlayer or {}).automatedHistory or {}).hasHeaderAndRefs
 
