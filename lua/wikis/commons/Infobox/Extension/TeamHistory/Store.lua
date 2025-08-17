@@ -35,6 +35,7 @@ function TeamHistoryStore.store(props)
 		TeamHistoryStore._checkForMissingLeaveDate(transfer, transferIndex, offset + #transferList)
 		local teamLink = TeamHistoryStore._getTeamLink(transfer)
 		if not teamLink and not transfer.role then return end
+		if not transfer.joinDate then return end
 
 		mw.ext.LiquipediaDB.lpdb_datapoint('Team_'.. transferIndex, Json.stringifySubTables{
 			type = 'teamhistory',
