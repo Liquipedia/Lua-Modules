@@ -102,7 +102,7 @@ return {
 			},
 		},
 		{
-			file = 'Hearthstone Trophy at ESL Katowice 2016.jpg',
+			file = 'HotS Trophy at ESL Katowice 2016.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
