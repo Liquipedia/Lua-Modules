@@ -11,7 +11,6 @@ local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local Date = Lua.import('Module:Date/Ext')
 local Table = Lua.import('Module:Table')
-local Timezone = Lua.import('Module:Timezone')
 local VodLink = Lua.import('Module:VodLink')
 
 local Widget = Lua.import('Module:Widget')
