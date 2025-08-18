@@ -96,6 +96,7 @@
 			&-upper {
 				display: flex;
 				align-items: center;
+				padding: 0px 4px;
 			}
 
 			&-lower {
@@ -104,10 +105,17 @@
 				opacity: 0.7;
 			}
 
-			&-icon,
+			&-icon {
+				display: flex;
+				width: 1rem;
+				height: 1rem;
+				justify-content: center;
+				align-items: center;
+			}
+
 			&-score {
 				display: flex;
-				min-width: 1rem;
+				width: 1.5rem;
 				height: 1rem;
 				justify-content: center;
 				align-items: center;
@@ -115,7 +123,7 @@
 
 			&-divider {
 				display: flex;
-				min-width: 0.75rem;
+				width: 0.5rem;
 				justify-content: center;
 				align-items: center;
 			}
