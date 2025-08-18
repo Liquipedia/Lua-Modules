@@ -251,6 +251,7 @@ return {
 		infoboxPlayer = {
 			automatedHistory = {
 				mode = 'merge',
+				storeFromWikiCode = true,
 			},
 		},
 	},
