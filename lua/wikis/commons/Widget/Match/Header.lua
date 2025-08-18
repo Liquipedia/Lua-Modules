@@ -99,7 +99,10 @@ function MatchHeader:render()
 								},
 								children = leftTeamScore,
 							} or nil,
-							matchPhase ~= 'upcoming' and ':' or 'vs',
+							matchPhase ~= 'upcoming' and Span{
+								classes = {'match-info-header-scoreholder-divider'},
+								children = ':'
+							} or 'vs',
 							matchPhase ~= 'upcoming' and Span{
 								classes = {
 									'match-info-header-scoreholder-score',
