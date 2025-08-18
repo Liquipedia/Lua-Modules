@@ -7,9 +7,8 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
 local TeamHistoryManualExtension = Lua.import('Module:Infobox/Extension/TeamHistory/Manual')
 local TeamHistoryStoreExtension = Lua.import('Module:Infobox/Extension/TeamHistory/Store')
 local Widget = Lua.import('Module:Widget')
@@ -23,10 +22,8 @@ local TeamHistory = Class.new(Widget)
 
 ---@return Widget?
 function TeamHistory:render()
-	local firstElementParsed = Json.parseIfTable(self.props[1])
-	local elements = firstElementParsed and self.props or {self.props}
-
-	local transferList = Array.map(elements, TeamHistoryManualExtension.parse)
+	if Logic.isEmpty(self.props) then return end
+	local transferList = TeamHistoryManualExtension.parse(self.props)
 
 	TeamHistoryStoreExtension.store{
 		transferList = transferList,

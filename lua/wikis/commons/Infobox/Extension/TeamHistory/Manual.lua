@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local DateExt = Lua.import('Module:Date/Ext')
-local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 
@@ -23,15 +22,9 @@ local ROLE_ALIASES = {
 
 local TeamHistoryManual = {}
 
----@param input string|table?
----@return TransferSpan?
-function TeamHistoryManual.parse(input)
-	local args = input
-	if type(input) == 'string' then
-		args = Json.parseIfTable(input)
-	end
-	if not args then return end
-
+---@param args table
+---@return TransferSpan
+function TeamHistoryManual.parse(args)
 	local displayDates = TeamHistoryManual._readDateInput(args[1] or '')
 	local team = args.link or args[2]
 	local role = args[3]
