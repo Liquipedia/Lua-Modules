@@ -34,17 +34,9 @@ function MatchSummaryFfaGameCountdown:render()
 		return
 	end
 
-	local dateString
-	if game.dateIsExact then
-		-- TODO: Use game-TZ
-		dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
-				.. Timezone.getTimezoneString{timezone = 'UTC'}
-	else
-		dateString = mw.getContentLanguage():formatDate('F j, Y', game.date)
-	end
-
 	local streamParameters = Table.merge(game.stream, {
-		date = dateString,
+		-- TODO: Use game-TZ
+		date = Date.toCountdownArg(timestamp, nil, game.dateIsExact),
 		finished = game.winner ~= nil and 'true' or nil,
 	})
 
