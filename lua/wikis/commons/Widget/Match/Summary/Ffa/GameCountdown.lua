@@ -30,7 +30,7 @@ function MatchSummaryFfaGameCountdown:render()
 	end
 
 	local timestamp = Date.readTimestamp(game.date)
-	if not timestamp or timestamp == Date.defaultTimestamp then
+	if not timestamp or Date.isDefaultTimestamp(timestamp) then
 		return
 	end
 
