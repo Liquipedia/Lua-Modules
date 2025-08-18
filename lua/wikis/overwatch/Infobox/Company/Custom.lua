@@ -35,11 +35,10 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'parent' then
 		table.insert(widgets, Cell{name = 'Focus', content = {args.focus}})
-	elseif id == 'employees' then
-		table.insert(widgets, Cell{name = 'Key People', content = {args.people}})
 	end
 
 	return widgets
 end
 
 return CustomCompany
+
