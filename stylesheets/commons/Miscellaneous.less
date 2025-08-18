@@ -2266,20 +2266,32 @@ Author(s): trev
 Template: General Collapsible
 Author: warnull
 *******************************************************************************/
-.general-collapsible-default-toggle {
-	display: inline-block;
-	min-width: 48px;
-	text-align: right;
-}
-
 .collapsed .general-collapsible-default-toggle > .general-collapsible-collapse-button,
 .general-collapsible:not( .collapsed ) .general-collapsible-default-toggle > .general-collapsible-expand-button {
 	display: none;
 }
 
-.general-collapsible-default-placeholder {
+.general-collapsible-default-header {
+	display: grid;
+	align-items: center;
+	grid-template-columns: 1fr auto 1fr;
+	gap: 1em;
+	padding: 0 0.5rem;
+}
+
+.general-collapsible-default-title {
+	grid-column: 2;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.general-collapsible-default-toggle {
 	display: inline-block;
 	min-width: 48px;
+	text-align: right;
+	grid-column: 3;
+	justify-self: end;
 }
 
 .collapsed > .should-collapse {
