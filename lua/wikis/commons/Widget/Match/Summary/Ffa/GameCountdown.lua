@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Countdown = Lua.import('Module:Countdown')
 local Date = Lua.import('Module:Date/Ext')
 local Table = Lua.import('Module:Table')
 local Timezone = Lua.import('Module:Timezone')
@@ -50,7 +51,7 @@ function MatchSummaryFfaGameCountdown:render()
 	return HtmlWidgets.Div{
 		classes = {'match-countdown-block'},
 		children = {
-			Lua.import('Module:Countdown')._create(streamParameters),
+			Countdown._create(streamParameters),
 			game.vod and VodLink.display{vod = game.vod} or nil,
 		},
 	}
