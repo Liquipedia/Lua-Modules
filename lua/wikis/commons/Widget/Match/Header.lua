@@ -86,40 +86,45 @@ function MatchHeader:render()
 				classes = {'match-info-header-scoreholder'},
 				children = {
 					Span{
-						classes = {'match-info-header-scoreholder-upper'},
+						classes = {'match-info-header-scoreholder-icon'},
+						children = leftTeamWinner and Icon{iconName = 'winner_left'} or nil,
+					},
+					Span{
+						classes = {'match-info-header-scoreholder-scorewrapper'},
 						children = WidgetUtil.collect(
 							Span{
-								classes = {'match-info-header-scoreholder-icon'},
-								children = leftTeamWinner and Icon{iconName = 'winner_left'} or nil,
+								classes = {'match-info-header-scoreholder-upper'},
+								children = WidgetUtil.collect(
+									matchPhase ~= 'upcoming' and Span{
+										classes = {
+											'match-info-header-scoreholder-score',
+											leftTeamWinner and 'match-info-header-winner' or nil
+										},
+										children = leftTeamScore,
+									} or nil,
+									matchPhase ~= 'upcoming' and Span{
+										classes = {'match-info-header-scoreholder-divider'},
+										children = ':'
+									} or 'vs',
+									matchPhase ~= 'upcoming' and Span{
+										classes = {
+											'match-info-header-scoreholder-score',
+											rightTeamWinner and 'match-info-header-winner' or nil
+										},
+										children = rightTeamScore,
+									} or nil
+								)
 							},
-							matchPhase ~= 'upcoming' and Span{
-								classes = {
-									'match-info-header-scoreholder-score',
-									leftTeamWinner and 'match-info-header-winner' or nil
-								},
-								children = leftTeamScore,
-							} or nil,
-							matchPhase ~= 'upcoming' and Span{
-								classes = {'match-info-header-scoreholder-divider'},
-								children = ':'
-							} or 'vs',
-							matchPhase ~= 'upcoming' and Span{
-								classes = {
-									'match-info-header-scoreholder-score',
-									rightTeamWinner and 'match-info-header-winner' or nil
-								},
-								children = rightTeamScore,
-							} or nil,
-							Span{
-								classes = {'match-info-header-scoreholder-icon'},
-								children = rightTeamWinner and Icon{iconName = 'winner_right'} or nil,
-							}
+							hasBestof and Span{
+								classes = {'match-info-header-scoreholder-lower'},
+								children = '(Bo' .. match.bestof ..')'
+							} or nil
 						)
 					},
-					hasBestof and Span{
-						classes = {'match-info-header-scoreholder-lower'},
-						children = '(Bo' .. match.bestof ..')'
-					} or nil
+					Span{
+						classes = {'match-info-header-scoreholder-icon'},
+						children = rightTeamWinner and Icon{iconName = 'winner_right'} or nil,
+					}
 				}
 			},
 			Div{
