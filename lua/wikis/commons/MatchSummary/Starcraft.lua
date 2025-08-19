@@ -37,7 +37,8 @@ local StarcraftMatchSummary = {}
 ---@param args {bracketId: string, matchId: string, config: table?}
 ---@return Html
 function StarcraftMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(StarcraftMatchSummary, args):addClass('brkts-popup-sc')
+	return MatchSummary.defaultGetByMatchId(StarcraftMatchSummary, args, {width = '380px'})
+		:addClass('brkts-popup-sc')
 end
 
 ---@param match StarcraftMatchGroupUtilMatch
