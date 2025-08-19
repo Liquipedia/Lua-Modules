@@ -87,13 +87,19 @@ function BaseMatchPage:isBestOfOne()
 end
 
 ---@protected
----@return string?
+---@return Widget?
 function BaseMatchPage:getCountdownBlock()
 	if DateExt.isDefaultTimestamp(self.matchData.timestamp) then return end
-	return Countdown._create(Table.merge(self.matchData.stream, {
-		date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
-		finished = self.matchData.finished,
-	}))
+	return Div{
+		css = {
+			display = 'block',
+			['text-align'] = 'center'
+		},
+		children = Countdown._create(Table.merge(self.matchData.stream, {
+			date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
+			finished = self.matchData.finished,
+		}))
+	}
 end
 
 ---@private
