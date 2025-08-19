@@ -204,17 +204,12 @@ function StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch)
 
 	local createOpponent = function(opponentIndex)
 		local players = (opponents[opponentIndex] or {}).players or {}
-		if Logic.isEmpty(players) then
-			players = Opponent.tbd(Opponent.solo).players
-		end
+		local opponent = Opponent.tbd(Opponent.partyTypes[math.max(#players, 1)]) --[[@as StarcraftStandardOpponent]]
+		opponent.isArchon = (opponents[opponentIndex] or {}).isArchon
+		opponent.players = Logic.nilIfEmpty(players) or opponent.players
 		return OpponentDisplay.BlockOpponent{
 			flip = opponentIndex == 1,
-			opponent = {
-				players = players,
-				type = Opponent.partyTypes[math.max(#players, 1)],
-				isArchon = (opponents[opponentIndex] or {}).isArchon,
-				extradata = {}
-			},
+			opponent = opponent,
 			showLink = true,
 			overflow = 'ellipsis',
 		}
