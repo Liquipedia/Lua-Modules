@@ -88,14 +88,30 @@
 
 		&-scoreholder {
 			display: flex;
-			flex-direction: column;
 			justify-content: center;
 			align-items: center;
-			flex-basis: 4.5rem;
+
+			&-icon {
+				display: flex;
+				width: 1rem;
+				height: 1rem;
+				justify-content: center;
+				align-items: center;
+			}
+
+			&-scorewrapper {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				flex-basis: 4.5rem;
+			}
 
 			&-upper {
 				display: flex;
 				align-items: center;
+				justify-content: center;
+				padding: 0 0.25rem;
 			}
 
 			&-lower {
@@ -104,11 +120,17 @@
 				opacity: 0.7;
 			}
 
-			&-icon,
 			&-score {
 				display: flex;
-				width: 1rem;
+				width: 1.5rem;
 				height: 1rem;
+				justify-content: center;
+				align-items: center;
+			}
+
+			&-divider {
+				display: flex;
+				width: 0.5rem;
 				justify-content: center;
 				align-items: center;
 			}
