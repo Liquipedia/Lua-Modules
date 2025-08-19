@@ -94,26 +94,26 @@ function MatchHeader:render()
 						children = WidgetUtil.collect(
 							Span{
 								classes = {'match-info-header-scoreholder-upper'},
-								children = WidgetUtil.collect(
-									matchPhase ~= 'upcoming' and Span{
+								children = matchPhase == 'upcoming' and {'vs'} or {
+									Span{
 										classes = {
 											'match-info-header-scoreholder-score',
 											leftTeamWinner and 'match-info-header-winner' or nil
 										},
 										children = leftTeamScore,
-									} or nil,
-									matchPhase ~= 'upcoming' and Span{
+									},
+									Span{
 										classes = {'match-info-header-scoreholder-divider'},
 										children = ':'
-									} or 'vs',
-									matchPhase ~= 'upcoming' and Span{
+									},
+									Span{
 										classes = {
 											'match-info-header-scoreholder-score',
 											rightTeamWinner and 'match-info-header-winner' or nil
 										},
 										children = rightTeamScore,
-									} or nil
-								)
+									}
+								}
 							},
 							hasBestof and Span{
 								classes = {'match-info-header-scoreholder-lower'},
