@@ -100,7 +100,6 @@ function Company:createInfobox()
 		locations = Locale.formatLocations(args),
 		headquarterslocation = args.headquarters,
 		parentcompany = args.parent,
-		focus = args.focus,
 		foundeddate = ReferenceCleaner.clean{input = args.foundeddate},
 		defunctdate = ReferenceCleaner.clean{input = args.defunctdate},
 		numberofemployees = ReferenceCleaner.cleanNumber{input = args.employees},
