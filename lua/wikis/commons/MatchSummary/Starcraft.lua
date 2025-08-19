@@ -155,9 +155,8 @@ function StarcraftMatchSummary.Game(options, game)
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.GameComment{
 				children = (game.extradata or {}).server and ('Played server: ' .. (game.extradata or {}).server) or nil,
-				classes = {'brkts-popup-sc-game-comment'},
 			},
-			MatchSummaryWidgets.GameComment{children = game.comment, classes = {'brkts-popup-sc-game-comment'}}
+			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
 	}
 end
