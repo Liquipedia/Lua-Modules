@@ -24,18 +24,18 @@ local MatchOverviewWidget = Class.new(Widget)
 function MatchOverviewWidget:render()
 	---@type MatchGroupUtilMatch
 	local match = self.props.match
-	local showOpponent = tonumber(self.props.showOpponent)
-	if not match or not showOpponent or #match.opponents < 2 then
+	local opponentIndexToShow = tonumber(self.props.showOpponent)
+	if not match or not opponentIndexToShow or #match.opponents < 2 then
 		return
 	end
 
-	local opponent = match.opponents[showOpponent]
-	if not opponent then
+	local opponentToShow = match.opponents[opponentIndexToShow]
+	if not opponentToShow then
 		return
 	end
 
-	local otherOpponent = Array.find(match.opponents, function(op) return op ~= opponent end)
-	if not otherOpponent then
+	local leftOpponent = Array.find(match.opponents, function(op) return op ~= opponentToShow end)
+	if not leftOpponent then
 		return
 	end
 
@@ -49,7 +49,7 @@ function MatchOverviewWidget:render()
 		children = {
 			HtmlWidgets.Span{
 				children = OpponentDisplay.BlockOpponent{
-					opponent = opponent,
+					opponent = opponentToShow,
 					overflow = 'ellipsis',
 					teamStyle = 'icon',
 				}
@@ -58,7 +58,7 @@ function MatchOverviewWidget:render()
 				css = {
 					['font-size'] = '0.8em',
 				},
-				children = otherOpponent.score .. ' - ' .. opponent.score,
+				children = leftOpponent.score .. ' - ' .. opponentToShow.score,
 			},
 		},
 	}
