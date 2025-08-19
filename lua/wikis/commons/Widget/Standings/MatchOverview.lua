@@ -25,7 +25,7 @@ function MatchOverviewWidget:render()
 	---@type MatchGroupUtilMatch
 	local match = self.props.match
 	local opponentIndexToShow = tonumber(self.props.showOpponent)
-	if not match or not opponentIndexToShow or #match.opponents < 2 then
+	if not match or not opponentIndexToShow or #match.opponents ~= 2 then
 		return
 	end
 
