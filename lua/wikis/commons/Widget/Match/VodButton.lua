@@ -22,20 +22,21 @@ local VodButton = Class.new(Widget)
 
 ---@return Widget?
 function VodButton:render()
-	local vod = self.props.vods
-	local showText = self.props.showText
-	if not vod then
+	local vodLink = self.props.vodLink
+
+	if not vodLink then
 		return
 	end
 
 	local useDropdownVariant = self.props.variant == 'dropdown'
-	local gameNumber = vod.number
+	local showText = self.props.showText
+	local gameNumber = self.props.gameNumber
 
 	return Button{
 		linktype = 'external',
 		title = VodLink.getTitle(gameNumber),
 		variant = 'tertiary',
-		link = vod.vod,
+		link = vodLink,
 		size = 'sm',
 		children = useDropdownVariant and {
 			Icon{iconName = 'vod_play'},

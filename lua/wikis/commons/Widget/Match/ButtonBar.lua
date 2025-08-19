@@ -100,7 +100,7 @@ function MatchButtonBar:render()
 				matchIsLive = match.phase == 'ongoing',
 			} or nil,
 			makeDropdownForVods and VodsDropdownButton{count = #vods} or nil,
-			showInlineVods and VodButton{vod = vods[1]} or nil
+			showInlineVods and VodButton{vodLink = vods[1].vod} or nil
 		)
 	}
 
@@ -113,7 +113,7 @@ function MatchButtonBar:render()
 		shouldCollapse = true,
 		collapseAreaClasses = {'match-info-vods-area'},
 		children = displayVods and Array.Map(vods, function(vod)
-			return VodButton{vod = vod, showText = #vods < 4, variant = 'dropdown'}
+			return VodButton{vodLink = vod.vod, gameNumber = vod.number, showText = #vods < 4, variant = 'dropdown'}
 		end) or nil,
 	}
 end
