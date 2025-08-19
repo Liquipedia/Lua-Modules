@@ -91,7 +91,7 @@ function CustomMatchSummary.createGame(game, gameIndex)
 			CustomMatchSummary._getSideIcon(game.opponents[2]),
 
 			-- Comment
-			MatchSummaryWidgets.GameComment{ children = game.comment}
+			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
 	}
 end
