@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local Class = Lua.import('Module:Class')
+local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Links = Lua.import('Module:Links')
@@ -86,10 +87,19 @@ function BaseMatchPage:isBestOfOne()
 end
 
 ---@protected
----@return Html?
+---@return Widget?
 function BaseMatchPage:getCountdownBlock()
-	if self.matchData.timestamp == DateExt.defaultTimestamp then return end
-	return DisplayHelper.MatchCountdownBlock(self.matchData)
+	if DateExt.isDefaultTimestamp(self.matchData.timestamp) then return end
+	return Div{
+		css = {
+			display = 'block',
+			['text-align'] = 'center'
+		},
+		children = Countdown._create(Table.merge(self.matchData.stream, {
+			date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
+			finished = self.matchData.finished,
+		}))
+	}
 end
 
 ---@private
