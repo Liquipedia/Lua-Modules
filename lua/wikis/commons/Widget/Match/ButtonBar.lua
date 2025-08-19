@@ -69,6 +69,7 @@ function MatchButtonBar:render()
 		}
 	end
 
+	---@return {vod: string, type: 'game'|'match', number: integer?}[]
 	local makeVodDTOs = function()
 		local gameVods = Array.map(match.games, function(game, index)
 			if Logic.isEmpty(game.vod) then
@@ -109,10 +110,11 @@ function MatchButtonBar:render()
 	end
 
 	return Collapsible{
-		titleWidget = makeDropdownForVods,
+		titleWidget = standardBar,
 		shouldCollapse = true,
 		collapseAreaClasses = {'match-info-vods-area'},
-		children = displayVods and Array.Map(vods, function(vod)
+		classes = {'match-info-links-wrapper'},
+		children = displayVods and Array.map(vods, function(vod)
 			return VodButton{vodLink = vod.vod, gameNumber = vod.number, showText = #vods < 4, variant = 'dropdown'}
 		end) or nil,
 	}
