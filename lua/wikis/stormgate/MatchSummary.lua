@@ -113,7 +113,7 @@ function CustomMatchSummary.advantageOrPenalty(opponent)
 	local value = tonumber(extradata.advantage) or tonumber(extradata.penalty)
 
 	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-sc-game-center'},
+		css = {['text-align'] = 'center'},
 		children = {
 			OpponentDisplay.InlineOpponent{
 				opponent = Opponent.isTbd(opponent) and Opponent.tbd() or opponent,
