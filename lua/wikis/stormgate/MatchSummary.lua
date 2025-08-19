@@ -39,7 +39,6 @@ local CustomMatchSummary = {}
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px'})
-		:addClass('brkts-popup-sc')
 end
 
 ---@param match table
@@ -55,15 +54,14 @@ function CustomMatchSummary.createBody(match)
 
 	return WidgetUtil.collect(
 		isResetMatch and MatchSummaryWidgets.Row{
-			classes = {'brkts-popup-sc-veto-center'},
-			css = {['line-height'] = '80%', ['font-weight'] = 'bold'},
+			css = {['line-height'] = '80%', ['font-weight'] = 'bold', ['text-align'] = 'center'},
 			children = {'Reset match'},
 		} or nil,
 		Array.map(match.opponents, CustomMatchSummary.advantageOrPenalty),
 		subMatches and Array.map(subMatches, CustomMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(CustomMatchSummary.Game, {hasHeroes = hasHeroes})),
 		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
-			classes = {'brkts-popup-sc-veto-center'},
+			css = {['text-align'] = 'center'},
 			children = {HtmlWidgets.B{children = {'Vetoes'}}},
 		} or nil,
 		Array.map(match.vetoes or {}, CustomMatchSummary.Veto) or nil
@@ -321,7 +319,7 @@ function CustomMatchSummary.Veto(veto)
 				children = {statusIcon(1)},
 			},
 			HtmlWidgets.Div{
-				classes = {'brkts-popup-sc-veto-center'},
+				css = {['text-align'] = 'center'},
 				children = {map},
 			},
 			HtmlWidgets.Div{

@@ -38,7 +38,6 @@ local StarcraftMatchSummary = {}
 ---@return Html
 function StarcraftMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(StarcraftMatchSummary, args, {width = '380px'})
-		:addClass('brkts-popup-sc')
 end
 
 ---@param match StarcraftMatchGroupUtilMatch
@@ -54,15 +53,14 @@ function StarcraftMatchSummary.createBody(match)
 
 	return WidgetUtil.collect(
 		isResetMatch and MatchSummaryWidgets.Row{
-			classes = {'brkts-popup-sc-veto-center'},
-			css = {['line-height'] = '80%', ['font-weight'] = 'bold'},
+			css = {['line-height'] = '80%', ['font-weight'] = 'bold', ['text-align'] = 'center'},
 			children = {'Reset match'},
 		} or nil,
 		Array.map(match.opponents, StarcraftMatchSummary.advantageOrPenalty),
 		subMatches and Array.map(subMatches, StarcraftMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(StarcraftMatchSummary.Game, {})),
 		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
-			classes = {'brkts-popup-sc-veto-center'},
+			css = {['text-align'] = 'center'},
 			children = {HtmlWidgets.B{children = {'Vetoes'}}},
 		} or nil,
 		Array.map(match.vetoes or {}, StarcraftMatchSummary.Veto) or nil
@@ -268,7 +266,7 @@ function StarcraftMatchSummary.Veto(veto)
 				children = {statusIcon(1)},
 			},
 			HtmlWidgets.Div{
-				classes = {'brkts-popup-sc-veto-center'},
+				css = {['text-align'] = 'center'},
 				children = {map},
 			},
 			HtmlWidgets.Div{
