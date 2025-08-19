@@ -7,16 +7,20 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
+local Logic = Lua.import('Module:Logic')
 local StreamLinks = Lua.import('Module:Links/Stream')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
-local VodsDropdown = Lua.import('Module:Widget/Match/VodsDropdown')
+local VodsDropdownButton = Lua.import('Module:Widget/Match/VodsDropdownButton')
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
+local VodButton = Lua.import('Module:Widget/Match/VodButton')
+local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 
 local SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE = 2 * 60 * 60 -- 2 hours in seconds
 
@@ -54,7 +58,37 @@ function MatchButtonBar:render()
 		displayStreams = true
 	end
 
-	return HtmlWidgets.Div{
+	local makeVodDTO = function(vod, type, number)
+		if not vod then
+			return
+		end
+		return {
+			vod = vod,
+			type = type,
+			number = number,
+		}
+	end
+
+	local makeVodDTOs = function()
+		local gameVods = Array.map(match.games, function(game, index)
+			if Logic.isEmpty(game.vod) then
+				return nil
+			end
+			return makeVodDTO(game.vod, 'game', index)
+		end)
+		local matchVod = makeVodDTO(match.vod, 'match')
+
+		if #gameVods == 0 then
+			return {matchVod}
+		else
+			return gameVods
+		end
+	end
+
+	local vods = makeVodDTOs()
+	local makeDropdownForVods = displayVods and #vods > 1
+	local showInlineVods = displayVods and #vods == 1
+	local standardBar = HtmlWidgets.Div{
 		classes = {'match-info-links'},
 		children = WidgetUtil.collect(
 			MatchPageButton{
@@ -65,10 +99,22 @@ function MatchButtonBar:render()
 				streams = StreamLinks.filterStreams(match.stream),
 				matchIsLive = match.phase == 'ongoing',
 			} or nil,
-			displayVods and VodsDropdown{
-				match = match,
-			} or nil
+			makeDropdownForVods and VodsDropdownButton{count = #vods} or nil,
+			showInlineVods and VodButton{vod = vods[1]} or nil
 		)
+	}
+
+	if not makeDropdownForVods then
+		return standardBar
+	end
+
+	return Collapsible{
+		titleWidget = makeDropdownForVods,
+		shouldCollapse = true,
+		collapseAreaClasses = {'match-info-vods-area'},
+		children = displayVods and Array.Map(vods, function(vod)
+			return VodButton{vod = vod, showText = #vods < 4, variant = 'dropdown'}
+		end) or nil,
 	}
 end
 
