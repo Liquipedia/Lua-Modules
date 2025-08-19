@@ -283,7 +283,7 @@ local PREFIXES = {
 		player = 'https://www.teamfortress.tv/user/',
 		match = 'http://tf.gg/',
 	},
-	threads = {'https://threads.com/'},
+	threads = {'https://threads.com/@'},
 	tiktok = {'https://tiktok.com/@'},
 	tlpd = {''},
 	tlpdint = {
