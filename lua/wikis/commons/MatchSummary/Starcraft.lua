@@ -213,6 +213,7 @@ function StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch)
 				players = players,
 				type = Opponent.partyTypes[math.max(#players, 1)],
 				isArchon = (opponents[opponentIndex] or {}).isArchon,
+				extradata = {}
 			},
 			showLink = true,
 			overflow = 'ellipsis',

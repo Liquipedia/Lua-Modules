@@ -230,7 +230,7 @@ function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 		end
 		return OpponentDisplay.BlockOpponent{
 			flip = opponentIndex == 1,
-			opponent = {players = players, type = Opponent.partyTypes[math.max(#players, 1)]},
+			opponent = {players = players, type = Opponent.partyTypes[math.max(#players, 1)], extradata = {}},
 			showLink = true,
 			overflow = 'ellipsis',
 		}
