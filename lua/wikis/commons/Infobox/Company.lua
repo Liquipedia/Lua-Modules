@@ -69,6 +69,10 @@ function Company:createInfobox()
 		Customizable{id = 'employees', children = {
 			Cell{name = 'Employees', children = {args.employees}},
 		}},
+		Cell{
+			name = 'Focus',
+			children = {args.focus},
+		},
 		Cell{name = 'Trades as', children = {args.tradedas}},
 		Customizable{id = 'custom', children = {}},
 		Builder{
@@ -96,6 +100,7 @@ function Company:createInfobox()
 		locations = Locale.formatLocations(args),
 		headquarterslocation = args.headquarters,
 		parentcompany = args.parent,
+		focus = args.focus,
 		foundeddate = ReferenceCleaner.clean{input = args.foundeddate},
 		defunctdate = ReferenceCleaner.clean{input = args.defunctdate},
 		numberofemployees = ReferenceCleaner.cleanNumber{input = args.employees},
