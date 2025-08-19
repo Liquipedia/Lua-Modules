@@ -88,9 +88,9 @@ local CONTENT = {
 			upcomingDays = 7,
 			completedDays = 7,
 			--- Special thresholds for higher tier events
-			modifierTier1 = 21,
-			modifierTier2 = 14,
-			modifierTier3 = 7
+			modifierTier1 = 14,
+			modifierTier2 = 7,
+			modifierTier3 = 3
 		},
 		padding = true,
 		boxid = 1508,
