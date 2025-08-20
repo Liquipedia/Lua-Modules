@@ -225,6 +225,7 @@ function OpponentDisplay.BlockOpponent(props)
 			flip = props.flip,
 			name = opponent.name or '',
 			overflow = props.overflow,
+			additionalClasses = props.additionalClasses
 		})
 	elseif Opponent.typeIsParty(opponent.type) then
 		return OpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
@@ -241,6 +242,10 @@ function OpponentDisplay.BlockPlayers(props)
 	for _, playerNode in ipairs(OpponentDisplay.getBlockPlayerNodes(props)) do
 		playersNode:node(playerNode)
 	end
+
+	Array.forEach(props.additionalClasses, function (additionalClass)
+		playersNode:addClass(additionalClass)
+	end)
 
 	return playersNode
 end
@@ -299,15 +304,21 @@ OpponentDisplay.propTypes.BlockLiteral = {
 }
 
 ---Displays the name of a literal opponent as a block element.
----@param props {flip: boolean?, name: string, overflow: OverflowModes}
+---@param props {flip: boolean?, name: string, overflow: OverflowModes, additionalClasses: string[]?}
 ---@return Html
 function OpponentDisplay.BlockLiteral(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockLiteral)
 
-	return DisplayUtil.applyOverflowStyles(mw.html.create('div'), props.overflow or 'wrap')
+	local block = DisplayUtil.applyOverflowStyles(mw.html.create('div'), props.overflow or 'wrap')
 		:addClass('brkts-opponent-block-literal')
 		:addClass(props.flip and 'flipped' or nil)
 		:node(Logic.emptyOr(props.name, zeroWidthSpace))
+
+	Array.forEach(props.additionalClasses, function (additionalClass)
+		block:node(additionalClass)
+	end)
+
+	return block
 end
 
 OpponentDisplay.propTypes.BlockScore = {
