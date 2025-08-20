@@ -303,16 +303,15 @@ OpponentDisplay.propTypes.BlockLiteral = {
 function OpponentDisplay.BlockLiteral(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockLiteral)
 
-	local block = DisplayUtil.applyOverflowStyles(mw.html.create('div'), props.overflow or 'wrap')
-		:addClass('brkts-opponent-block-literal')
-		:addClass(props.flip and 'flipped' or nil)
-		:node(Logic.emptyOr(props.name, zeroWidthSpace))
-
-	Array.forEach(props.additionalClasses, function (additionalClass)
-		block:node(additionalClass)
-	end)
-
-	return HtmlWidgets.Fragment{children = block}
+	return HtmlWidgets.Div{
+		classes = Array.extend(
+			'brkts-opponent-block-literal',
+			props.flip and 'flipped' or nil,
+			props.additionalClasses
+		),
+		css = DisplayUtil.getOverflowStyles(props.overflow or 'wrap'),
+		children = Logic.emptyOr(props.name, zeroWidthSpace)
+	}
 end
 
 OpponentDisplay.propTypes.BlockScore = {

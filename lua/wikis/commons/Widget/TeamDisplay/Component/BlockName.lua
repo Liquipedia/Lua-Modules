@@ -9,7 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local FnUtil = Lua.import('Module:FnUtil')
+local DisplayUtil = Lua.import('Module:DisplayUtil')
 local String = Lua.import('Module:StringUtils')
 
 local Widget = Lua.import('Module:Widget')
@@ -37,7 +37,7 @@ function BlockTeamNameDisplay:render()
 	local container = self.props.dq and HtmlWidgets.S or HtmlWidgets.Span
 	return container{
 		classes = Array.extend('name', self.props.additionalClasses),
-		css = BlockTeamNameDisplay._getOverflowStyleCss(self.props.overflowStyle),
+		css = DisplayUtil.getOverflowStyles(self.props.overflowStyle),
 		children = {
 			(self.props.noLink and String.isNotEmpty(page)) and displayName or Link{
 				children = displayName,
@@ -46,16 +46,5 @@ function BlockTeamNameDisplay:render()
 		}
 	}
 end
-
----@param mode OverflowModes
----@return table<string, string?>
-BlockTeamNameDisplay._getOverflowStyleCss = FnUtil.memoize(function(mode)
-	return {
-		['overflow'] = (mode == 'ellipsis' or mode == 'hidden') and 'hidden' or nil,
-		['overflow-wrap'] = mode == 'wrap' and 'break-word' or nil,
-		['text-overflow'] = mode == 'ellipsis' and 'ellipsis' or nil,
-		['white-space'] = (mode == 'ellipsis' or mode == 'hidden') and 'pre' or 'normal',
-	}
-end)
 
 return BlockTeamNameDisplay
