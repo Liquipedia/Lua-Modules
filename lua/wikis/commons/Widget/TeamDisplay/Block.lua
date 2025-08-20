@@ -29,6 +29,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field noLink boolean?
 ---@field style teamStyle
 ---@field dq boolean?
+---@field note string|number?
 
 ---@class BlockTeamWidget: Widget
 ---@operator call(BlockTeamParameters): BlockTeamWidget
@@ -73,7 +74,11 @@ function BlockTeamWidget:render()
 				legacy = Logic.isEmpty(teamTemplate.image) and Logic.isNotEmpty(teamTemplate.legacyimage),
 				noLink = self.props.noLink,
 			},
-			self:_getNameComponent()
+			self:_getNameComponent(),
+			Logic.isNotEmpty(self.props.note) and HtmlWidgets.Span{
+				classes = {'note'},
+				children = self.props.note
+			} or nil
 		)
 	}
 end
