@@ -14,14 +14,13 @@ local Faction = Lua.import('Module:Faction')
 local Logic = Lua.import('Module:Logic')
 local Math = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
-local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TypeUtil = Lua.import('Module:TypeUtil')
 
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
+local BlockTeam = Lua.import('Module:Widget/TeamDisplay/Block')
 local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
-local TeamIcon = Lua.import('Module:Widget/Image/Icon/TeamIcon')
 
 local zeroWidthSpace = '&#8203;'
 
@@ -278,76 +277,10 @@ its layout context, and not of the team name. The team is specified by template.
 ---@param props {flip: boolean?, overflow: OverflowModes?, showLink: boolean?, style: teamStyle?, template: string}
 ---@return Html
 function OpponentDisplay.BlockTeamContainer(props)
-	local team = TeamTemplate.getRawOrNil(props.template)
-	if not team then
-		return mw.html.create('div'):addClass('error')
-			:wikitext(TeamTemplate.noTeamMessage(props.template))
-	end
-
-	return OpponentDisplay.BlockTeam(Table.merge(props, {
-		team = team,
-	}))
-end
-
----@class blockTeamProps
----@field flip boolean
----@field overflow OverflowModes?
----@field showLink boolean?
----@field style teamStyle?
----@field team teamTemplateData
----@field dq boolean?
-
---[[
-Displays a team as a block element. The width of the component is determined by
-its layout context, and not of the team name. The team is specified by a team
-struct and icon wikitext.
-]]
----@param props blockTeamProps
----@return Html
-function OpponentDisplay.BlockTeam(props)
 	local style = props.style or 'standard'
-
-	local function createNameNode(name)
-		return mw.html.create(props.dq and 's' or 'span'):addClass('name')
-			:wikitext(props.showLink ~= false and props.team.page
-				and '[[' .. props.team.page .. '|' .. name .. ']]'
-				or name
-			)
-	end
-
-	local displayNameNode = createNameNode(props.team.name)
-	local bracketNameNode = createNameNode(props.team.bracketname)
-	local shortNameNode = createNameNode(props.team.shortname)
-
-	local icon = TeamIcon{
-		imageLight = Logic.emptyOr(props.team.image, props.team.legacyimage),
-		imageDark = Logic.emptyOr(props.team.imagedark, props.team.legacyimagedark),
-		page = props.team.page,
-		legacy = Logic.isEmpty(props.team.image) and Logic.isNotEmpty(props.team.legacyimage),
-		noLink = props.showLink == false,
-	}
-
-	local blockNode = mw.html.create('div'):addClass('block-team')
-		:addClass(props.flip and 'flipped' or nil)
-		:node(icon)
-
-	if style == 'standard' then
-		DisplayUtil.applyOverflowStyles(displayNameNode, props.overflow or 'ellipsis')
-		blockNode:node(displayNameNode)
-	elseif style == 'bracket' then
-		DisplayUtil.applyOverflowStyles(bracketNameNode, props.overflow or 'ellipsis')
-		blockNode:node(bracketNameNode)
-	elseif style == 'short' then
-		DisplayUtil.applyOverflowStyles(shortNameNode, props.overflow or 'ellipsis')
-		blockNode:node(shortNameNode)
-	elseif style == 'hybrid' then
-		DisplayUtil.applyOverflowStyles(bracketNameNode, 'ellipsis')
-		DisplayUtil.applyOverflowStyles(shortNameNode, 'hidden')
-		blockNode:node(bracketNameNode:addClass('hidden-xs'))
-		blockNode:node(shortNameNode:addClass('visible-xs'))
-	end
-
-	return blockNode
+	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
+	assert(style ~= 'bracket' or not props.flip, 'Flipped style=bracket is not supported')
+	return BlockTeam{name = props.template, flip = props.flip, style = style, overflow = props.overflow, noLink = not props.showLink}
 end
 
 OpponentDisplay.propTypes.BlockLiteral = {
