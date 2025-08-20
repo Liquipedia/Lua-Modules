@@ -273,6 +273,7 @@ end
 function OpponentDisplay.InlineTeamContainer(props)
 	local style = props.style or 'standard'
 	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
+	assert(style ~= 'bracket' or not props.flip, 'Flipped style=bracket is not supported')
 	return TeamInline{name = props.template, date = props.date, flip = props.flip, displayType = style}
 end
 
@@ -286,7 +287,6 @@ its layout context, and not of the team name. The team is specified by template.
 function OpponentDisplay.BlockTeamContainer(props)
 	local style = props.style or 'standard'
 	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
-	assert(style ~= 'bracket' or not props.flip, 'Flipped style=bracket is not supported')
 	return BlockTeam{
 		name = props.template,
 		flip = props.flip,
