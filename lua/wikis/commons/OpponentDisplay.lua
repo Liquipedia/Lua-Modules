@@ -266,7 +266,6 @@ end
 function OpponentDisplay.InlineTeamContainer(props)
 	local style = props.style or 'standard'
 	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
-	assert(style ~= 'bracket' or not props.flip, 'Flipped style=bracket is not supported')
 	return TeamInline{name = props.template, date = props.date, flip = props.flip, displayType = style}
 end
 
