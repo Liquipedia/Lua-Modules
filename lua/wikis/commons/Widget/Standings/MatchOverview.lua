@@ -58,7 +58,11 @@ function MatchOverviewWidget:render()
 				css = {
 					['font-size'] = '0.8em',
 				},
-				children = leftOpponent.score .. ' - ' .. opponentToShow.score,
+				children = {
+					OpponentDisplay.InlineScore(leftOpponent),
+					' - ',
+					OpponentDisplay.InlineScore(opponentToShow),
+				},
 			},
 		},
 	}
