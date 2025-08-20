@@ -60,7 +60,7 @@ function MatchHeaderBR:render()
 					Div{
 						classes = {'match-info-headerbr-positionholder'},
 						children = {
-							Icon{iconName = 'trophy', color = '#CCAB00'},
+							Icon{iconName = 'firstplace', color = '#CCAB00'},
 							'1st'
 						}
 
@@ -84,7 +84,7 @@ function MatchHeaderBR:render()
 					Div{
 						classes = {'match-info-header-positionholder'},
 						children = {
-							Icon{iconName = 'trophy', color = '#557177'},
+							Icon{iconName = 'firstplace', color = '#557177'},
 							'2nd'
 						}
 
@@ -108,7 +108,7 @@ function MatchHeaderBR:render()
 					Div{
 						classes = {'match-info-header-positionholder'},
 						children = {
-							Icon{iconName = 'trophy', color = '#80704C'},
+							Icon{iconName = 'firstplace', color = '#80704C'},
 							'3rd'
 						}
 
