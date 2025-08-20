@@ -45,13 +45,13 @@ local BracketOpponentEntry = Class.new(OpponentDisplay.BracketOpponentEntry,
 				self:createTeam(opponent.template or 'tbd', options)
 			end
 		elseif Opponent.typeIsParty(opponent.type) then
-			self.content:node(StarcraftOpponentDisplay.BlockOpponent({
+			self.content:node(StarcraftOpponentDisplay.BlockOpponent{
 				opponent = opponent,
 				overflow = 'ellipsis',
 				playerClass = 'starcraft-bracket-block-player',
 				showLink = false,
 				showTbd = options.showTbd,
-			}))
+			})
 		else
 			self:createLiteral(opponent.name or '')
 		end
@@ -94,7 +94,7 @@ function StarcraftOpponentDisplay.BlockOpponent(props)
 	-- Default TBDs to not show links
 	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
-	if Opponent.typeIsParty(opponent.type) or opponent.type == 'literal' and opponent.extradata.hasFactionOrFlag then
+	if Opponent.typeIsParty(opponent.type) then
 		return StarcraftOpponentDisplay.BlockPlayers(
 			Table.merge(props, {showLink = showLink})
 		)
