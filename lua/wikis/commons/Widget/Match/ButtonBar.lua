@@ -58,8 +58,8 @@ function MatchButtonBar:render()
 		displayStreams = true
 	end
 
-	local makeVodDTO = function(vod, type, number)
-		if not vod then
+	local makeVodDTO = function(type, vod, number)
+		if Logic.isEmpty(vod) then
 			return
 		end
 		return {
@@ -71,19 +71,8 @@ function MatchButtonBar:render()
 
 	---@return {vod: string, type: 'game'|'match', number: integer?}[]
 	local makeVodDTOs = function()
-		local gameVods = Array.map(match.games, function(game, index)
-			if Logic.isEmpty(game.vod) then
-				return nil
-			end
-			return makeVodDTO(game.vod, 'game', index)
-		end)
-		local matchVod = makeVodDTO(match.vod, 'match')
-
-		if #gameVods == 0 then
-			return {matchVod}
-		else
-			return gameVods
-		end
+		local gameVods = Array.map(match.games, FnUtil.curry(makeVodDTO, 'game'))
+		return Logic.nilIfEmpty(gameVods) or makeVodDTO('match', match.vod)
 	end
 
 	local vods = makeVodDTOs()
