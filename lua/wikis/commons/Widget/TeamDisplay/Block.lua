@@ -23,6 +23,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field name string?
 ---@field date number|string?
 ---@field teamTemplate teamTemplateData?
+---@field additionalClasses string[]?
 ---@field overflow OverflowModes?
 ---@field flip boolean?
 ---@field noLink boolean?
@@ -63,7 +64,7 @@ function BlockTeamWidget:render()
 	local imageDark = Logic.emptyOr(teamTemplate.imagedark, teamTemplate.legacyimagedark)
 
 	return Div{
-		classes = Array.extend('block-team', flip and 'flipped' or nil),
+		classes = Array.extend('block-team', self.props.additionalClasses, flip and 'flipped' or nil),
 		children = WidgetUtil.collect(
 			TeamIcon{
 				imageLight = imageLight,

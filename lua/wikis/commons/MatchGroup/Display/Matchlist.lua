@@ -205,14 +205,14 @@ component.
 ---@param props {opponent: standardOpponent, winner: integer?, side: string}
 ---@return Html
 function MatchlistDisplay.Opponent(props)
-	local contentNode = OpponentDisplay.BlockOpponent({
+	local contentNode = OpponentDisplay.BlockOpponent{
 		flip = props.side == 'left',
 		opponent = props.opponent,
 		overflow = 'ellipsis',
 		showLink = false,
 		teamStyle = 'short',
-	})
-		:addClass('brkts-matchlist-cell-content')
+		additionalClasses = {'brkts-matchlist-cell-content'},
+	}
 	return mw.html.create('div')
 		:addClass('brkts-matchlist-cell brkts-matchlist-opponent')
 		:addClass(props.winner == SCORE_DRAW and 'brkts-matchlist-slot-bold bg-draw' or
