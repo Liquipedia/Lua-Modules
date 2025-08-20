@@ -36,7 +36,7 @@ function CustomGameSummary.getGameByMatchId(props)
 		children = {
 			MatchSummaryWidgets.GameDetails{game = game},
 			MatchSummaryWidgets.Mvp(game.extradata.mvp),
-			SummaryHelper.standardGame(game),
+			SummaryHelper.standardGame(game, CustomGameSummary),
 		},
 	}
 end
