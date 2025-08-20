@@ -66,7 +66,7 @@ function MatchHeaderBR:render()
 
 					},
 					Div{
-						classes = {'match-info-header-opponent'},
+						classes = {'match-info-headerbr-opponent'},
 						children = {
 							OpponentDisplay.BlockOpponent{
 								opponent = first,
@@ -90,7 +90,7 @@ function MatchHeaderBR:render()
 
 					},
 					Div{
-						classes = {'match-info-header-opponent'},
+						classes = {'match-info-headerbr-opponent'},
 						children = {
 							OpponentDisplay.BlockOpponent{
 								opponent = second,
@@ -114,7 +114,7 @@ function MatchHeaderBR:render()
 
 					},
 					Div{
-						classes = {'match-info-header-opponent'},
+						classes = {'match-info-headerbr-opponent'},
 						children = {
 							OpponentDisplay.BlockOpponent{
 								opponent = third,
