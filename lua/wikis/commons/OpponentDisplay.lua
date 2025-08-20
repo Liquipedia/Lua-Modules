@@ -19,6 +19,7 @@ local TypeUtil = Lua.import('Module:TypeUtil')
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local BlockTeam = Lua.import('Module:Widget/TeamDisplay/Block')
 local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
 
@@ -237,17 +238,10 @@ end
 ---@param props BlockOpponentProps
 ---@return Html
 function OpponentDisplay.BlockPlayers(props)
-	local playersNode = mw.html.create('div')
-		:addClass('block-players-wrapper')
-	for _, playerNode in ipairs(OpponentDisplay.getBlockPlayerNodes(props)) do
-		playersNode:node(playerNode)
-	end
-
-	Array.forEach(props.additionalClasses, function (additionalClass)
-		playersNode:addClass(additionalClass)
-	end)
-
-	return playersNode
+	return HtmlWidgets.Div{
+		classes = Array.extend('block-players-wrapper', props.additionalClasses),
+		children = OpponentDisplay.getBlockPlayerNodes(props)
+	}
 end
 
 ---@param props BlockOpponentProps
