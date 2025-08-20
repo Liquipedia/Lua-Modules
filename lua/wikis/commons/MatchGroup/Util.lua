@@ -875,27 +875,6 @@ function MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
 	return mergedMatch
 end
 
----Fetches information about a team via mw.ext.TeamTemplate.
----@deprecated This function is only used on OpponentDisplay and should be removed once team handling is refactored.
----@param template string
----@return standardTeamProps?
-function MatchGroupUtil.fetchTeam(template)
-	local rawTeam = mw.ext.TeamTemplate.raw(template)
-	if not rawTeam then
-		return nil
-	end
-
-	return {
-		bracketName = rawTeam.bracketname,
-		displayName = rawTeam.name,
-		pageName = rawTeam.page,
-		shortName = rawTeam.shortname,
-		imageLight = Logic.emptyOr(rawTeam.image, rawTeam.legacyimage),
-		imageDark = Logic.emptyOr(rawTeam.imagedark, rawTeam.legacyimagedark),
-		hasLegacyImage = Logic.isEmpty(rawTeam.image) and Logic.isNotEmpty(rawTeam.legacyimage)
-	}
-end
-
 ---Parse extradata as a JSON string if read from page variables. Otherwise create a copy if fetched from lpdb.
 ---The returned extradata table can then be mutated without altering the source.
 ---@param recordExtradata table|string?
