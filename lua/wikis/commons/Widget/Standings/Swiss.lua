@@ -123,7 +123,7 @@ function StandingsSwissWidget:render()
 							local bgClassSuffix
 							if match.finished then
 								local winner = match.winner
-								bgClassSuffix = winner == opposingOpponentIndex and 'down' or winner == 0 or 'draw' or 'up'
+								bgClassSuffix = winner == opposingOpponentIndex and 'down' or winner == 0 and 'draw' or 'up'
 							end
 
 							return HtmlWidgets.Td{
