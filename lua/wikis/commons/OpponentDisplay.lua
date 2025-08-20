@@ -14,6 +14,7 @@ local Faction = Lua.import('Module:Faction')
 local Logic = Lua.import('Module:Logic')
 local Math = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TypeUtil = Lua.import('Module:TypeUtil')
 
 local Opponent = Lua.import('Module:Opponent')
@@ -277,12 +278,10 @@ its layout context, and not of the team name. The team is specified by template.
 ---@param props {flip: boolean?, overflow: OverflowModes?, showLink: boolean?, style: teamStyle?, template: string}
 ---@return Html
 function OpponentDisplay.BlockTeamContainer(props)
-	-- only import here to avoid dependency loop (OpponentDisplay <-> MatchGroup/Util)
-	local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
-	local team = MatchGroupUtil.fetchTeam(props.template)
+	local team = TeamTemplate.getRawOrNil(props.template)
 	if not team then
 		return mw.html.create('div'):addClass('error')
-			:wikitext('No team template exists for name ' .. props.template)
+			:wikitext(TeamTemplate.noTeamMessage(props.template))
 	end
 
 	return OpponentDisplay.BlockTeam(Table.merge(props, {
@@ -295,7 +294,7 @@ end
 ---@field overflow OverflowModes?
 ---@field showLink boolean?
 ---@field style teamStyle?
----@field team standardTeamProps
+---@field team teamTemplateData
 ---@field dq boolean?
 
 --[[
@@ -310,21 +309,21 @@ function OpponentDisplay.BlockTeam(props)
 
 	local function createNameNode(name)
 		return mw.html.create(props.dq and 's' or 'span'):addClass('name')
-			:wikitext(props.showLink ~= false and props.team.pageName
-				and '[[' .. props.team.pageName .. '|' .. name .. ']]'
+			:wikitext(props.showLink ~= false and props.team.page
+				and '[[' .. props.team.page .. '|' .. name .. ']]'
 				or name
 			)
 	end
 
-	local displayNameNode = createNameNode(props.team.displayName)
-	local bracketNameNode = createNameNode(props.team.bracketName)
-	local shortNameNode = createNameNode(props.team.shortName)
+	local displayNameNode = createNameNode(props.team.name)
+	local bracketNameNode = createNameNode(props.team.bracketname)
+	local shortNameNode = createNameNode(props.team.shortname)
 
 	local icon = TeamIcon{
-		imageLight = props.team.imageLight,
-		imageDark = props.team.imageDark,
-		page = props.team.pageName,
-		legacy = props.team.hasLegacyImage,
+		imageLight = Logic.emptyOr(props.team.image, props.team.legacyimage),
+		imageDark = Logic.emptyOr(props.team.imagedark, props.team.legacyimagedark),
+		page = props.team.page,
+		legacy = Logic.isEmpty(props.team.image) and Logic.isNotEmpty(props.team.legacyimage),
 		noLink = props.showLink == false,
 	}
 
