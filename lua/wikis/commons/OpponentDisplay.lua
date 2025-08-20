@@ -315,22 +315,23 @@ function OpponentDisplay.BlockLiteral(props)
 end
 
 OpponentDisplay.propTypes.BlockScore = {
+	additionalClasses = TypeUtil.optional(TypeUtil.array('string')),
 	isWinner = 'boolean?',
 	scoreText = 'any',
 }
 
 ---Displays a score within the context of a block element.
----@param props {isWinner: boolean?, scoreText: string|number?}
----@return Html
+---@param props {isWinner: boolean?, scoreText: string|number?, additionalClasses: string[]?}
+---@return Widget
 function OpponentDisplay.BlockScore(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockScore)
 
 	local scoreText = props.scoreText
-	if props.isWinner then
-		scoreText = '<b>' .. scoreText .. '</b>'
-	end
 
-	return mw.html.create('div'):wikitext(scoreText)
+	return HtmlWidgets.Div{
+		classes = props.additionalClasses,
+		children = props.isWinner and HtmlWidgets.B{children = scoreText} or scoreText
+	}
 end
 
 ---Displays the first score or status of the opponent, as a string.
