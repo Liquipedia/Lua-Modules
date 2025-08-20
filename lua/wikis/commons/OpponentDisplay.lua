@@ -202,7 +202,7 @@ Displays an opponent as a block element. The width of the component is
 determined by its layout context, and not of the opponent.
 ]]
 ---@param props BlockOpponentProps
----@return Html
+---@return Widget
 function OpponentDisplay.BlockOpponent(props)
 	local opponent = props.opponent
 	opponent.extradata = opponent.extradata or {}
@@ -211,7 +211,7 @@ function OpponentDisplay.BlockOpponent(props)
 
 	if opponent.type == Opponent.team then
 		if props.showTbd == false and Opponent.isTbd(opponent) then
-			return mw.html.create()
+			return HtmlWidgets.Fragment{}
 		end
 		return OpponentDisplay.BlockTeamContainer({
 			flip = props.flip,
@@ -236,7 +236,7 @@ function OpponentDisplay.BlockOpponent(props)
 end
 
 ---@param props BlockOpponentProps
----@return Html
+---@return Widget
 function OpponentDisplay.BlockPlayers(props)
 	return HtmlWidgets.Div{
 		classes = Array.extend('block-players-wrapper', props.additionalClasses),
@@ -277,7 +277,7 @@ its layout context, and not of the team name. The team is specified by template.
 ]]
 ---@param props {flip: boolean?, overflow: OverflowModes?, showLink: boolean?,
 ---style: teamStyle?, template: string, additionalClasses: string[]?}
----@return Html
+---@return Widget
 function OpponentDisplay.BlockTeamContainer(props)
 	local style = props.style or 'standard'
 	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
@@ -299,7 +299,7 @@ OpponentDisplay.propTypes.BlockLiteral = {
 
 ---Displays the name of a literal opponent as a block element.
 ---@param props {flip: boolean?, name: string, overflow: OverflowModes, additionalClasses: string[]?}
----@return Html
+---@return Widget
 function OpponentDisplay.BlockLiteral(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockLiteral)
 
@@ -312,7 +312,7 @@ function OpponentDisplay.BlockLiteral(props)
 		block:node(additionalClass)
 	end)
 
-	return block
+	return HtmlWidgets.Fragment{children = block}
 end
 
 OpponentDisplay.propTypes.BlockScore = {
