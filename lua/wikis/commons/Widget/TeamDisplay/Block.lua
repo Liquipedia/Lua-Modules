@@ -104,7 +104,7 @@ end
 ---@param name string
 ---@param overflow OverflowModes
 ---@param additionalClasses string[]?
----@return BlockTeamNameDisplay
+---@return Widget
 function BlockTeamWidget:_createNameNode(name, overflow, additionalClasses)
 	return BlockTeamName{
 		additionalClasses = additionalClasses,
