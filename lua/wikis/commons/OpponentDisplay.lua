@@ -280,7 +280,13 @@ function OpponentDisplay.BlockTeamContainer(props)
 	local style = props.style or 'standard'
 	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
 	assert(style ~= 'bracket' or not props.flip, 'Flipped style=bracket is not supported')
-	return BlockTeam{name = props.template, flip = props.flip, style = style, overflow = props.overflow, noLink = not props.showLink}
+	return BlockTeam{
+		name = props.template,
+		flip = props.flip,
+		style = style,
+		overflow = props.overflow,
+		noLink = not props.showLink
+	}
 end
 
 OpponentDisplay.propTypes.BlockLiteral = {
