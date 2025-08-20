@@ -75,7 +75,7 @@ function BlockTeamWidget:render()
 				noLink = self.props.noLink,
 			},
 			self:_getNameComponent(),
-			Logic.isNotEmpty(self.props.note) and HtmlWidgets.Span{
+			Logic.isNotEmpty(self.props.note) and HtmlWidgets.Sup{
 				classes = {'note'},
 				children = self.props.note
 			} or nil
