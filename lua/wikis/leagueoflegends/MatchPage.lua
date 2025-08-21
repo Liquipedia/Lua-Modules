@@ -19,6 +19,7 @@ local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
@@ -262,32 +263,16 @@ function MatchPage:_renderDraft(game)
 						return self:_renderGameTeamVetoOverview(game, teamIndex)
 					end)
 				},
-				Div{
-					classes = {'match-bm-lol-game-veto-order-toggle', 'ppt-toggle-expand'},
-					children = {
-						Div{
-							classes = {'general-collapsible-expand-button'},
-							children = Div{children = {
-								'Show Order &nbsp;',
-								IconFa{iconName = 'expand'}
-							}}
-						},
-						Div{
-							classes = {'general-collapsible-collapse-button'},
-							children = Div{children = {
-								'Hide Order &nbsp;',
-								IconFa{iconName = 'collapse'}
-							}}
-						}
-					}
-				},
-				Div{
-					classes = {'match-bm-lol-game-veto-order-list', 'ppt-hide-on-collapse'},
+				GeneralCollapsible{
+					title = 'Draft Order',
+					titleClasses = {'match-bm-lol-game-veto-order-toggle'},
+					shouldCollapse = true,
+					collapseAreaClasses = {'match-bm-lol-game-veto-order-list'},
 					children = {
 						self:_renderGameTeamVetoOrder(game, 1),
 						self:_renderGameTeamVetoOrder(game, 2),
 					}
-				}
+				},
 			}
 		}
 	}
