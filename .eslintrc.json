@@ -10,6 +10,7 @@
 		"echarts": "readonly",
 		"_paq": "readonly",
 		"gtag": "readonly",
+		"amplitude": "readonly",
 		"Share": "readonly"
 	},
 	"rules": {
@@ -27,7 +28,12 @@
 		"es-x/no-array-prototype-findindex": "off",
 		"es-x/no-spread-elements": "off",
 		"es-x/no-property-shorthands": "off",
-		"max-len": ["warn", { "code": 120 }]
+		"max-len": [
+			"warn",
+			{
+				"code": 120
+			}
+		]
 	},
 	"env": {
 		"jquery": true
