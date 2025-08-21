@@ -91,7 +91,7 @@ function MatchButtonBar:render()
 				matchIsLive = match.phase == 'ongoing',
 			} or nil,
 			makeDropdownForVods and VodsDropdownButton{count = #vods} or nil,
-			showInlineVods and VodButton{vodLink = vods[1].vod} or nil
+			showInlineVods and VodButton{vodLink = vods[1].vod, gameNumber = vods[1].number} or nil
 		)
 	}
 
