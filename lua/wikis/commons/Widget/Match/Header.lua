@@ -24,7 +24,6 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 ---@class MatchHeaderProps
 ---@field match MatchGroupUtilMatch
 ---@field teamStyle? teamStyle
-
 ---@class MatchHeader: Widget
 ---@operator call(MatchHeaderProps): MatchHeader
 ---@field props MatchHeaderProps

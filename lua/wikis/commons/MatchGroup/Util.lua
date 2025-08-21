@@ -239,15 +239,13 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 })
 
 ---@class MatchGroupUtilGameData
----@field asGame number?
----@field gameIds number?
+---@field asGame boolean?
+---@field gameIds number[]
 ---@field map string?
----@field mapDisplayName string?
 MatchGroupUtil.types.GameData = TypeUtil.struct({
-	asGame = 'number?',
-	gameIds = 'number?',
+	asGame = 'boolean?',
+	gameIds = TypeUtil.array('number'),
 	map = 'string?',
-	mapDisplayName = 'string?'
 })
 
 ---@class MatchGroupUtilMatch
@@ -258,7 +256,6 @@ MatchGroupUtil.types.GameData = TypeUtil.struct({
 ---@field finished boolean
 ---@field game string?
 ---@field games MatchGroupUtilGame[]
----@field gameData MatchGroupUtilGameData
 ---@field icon string?
 ---@field iconDark string?
 ---@field links table

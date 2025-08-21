@@ -37,7 +37,11 @@ function MatchTournamentBar:render()
 
 	local tournament = Tournament.partialTournamentFromMatch(match)
 	local tournamentLink = mw.title.makeTitle(0, match.pageName, match.section).fullText
-	local mapLink = mw.title.makeTitle(0, match.pageName, gameData.map).fullText
+	local mapLink = ''
+
+	if gameData then
+		mapLink = mw.title.makeTitle(0, match.pageName, gameData.map.gsub(' ', '_')).fullText
+	end
 
 	return WidgetUtil.collect(
 		self.props.displayGameIcon and Game.icon{
@@ -69,16 +73,16 @@ function MatchTournamentBar:render()
 						} or nil
 					}}
 				},
-				#match.opponents > 2 and HtmlWidgets.Span{
+				#match.opponents > 2 and gameData and HtmlWidgets.Span{
 					children = HtmlWidgets.Span{children = {
 						match.bracketData.title,
 						' - ',
-						gameData.gameIds
+						gameData.gameIds,
 						' on ',
 						Link{
 							link = mapLink,
 							children = HtmlWidgets.Span{
-								gameData.mapDisplayName
+								gameData.map
 							}
 						},
 					}}
