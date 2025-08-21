@@ -12,7 +12,7 @@ local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Trophy = Lua.import('Module:Widget/Match/Summary/Ffa/Trophy')
 local Div = HtmlWidgets.Div
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
@@ -51,24 +51,24 @@ function MatchHeaderBR:render()
 	local second = sortedOpponents[2]
 	local third = sortedOpponents[3]
 
-	return Div{
-		classes = {'match-info-headerbr'},
+	return Div {
+		classes = { 'match-info-headerbr' },
 		children = {
-			Div{
-				classes = {'match-info-headerbr-positionrow'},
+			Div {
+				classes = { 'match-info-headerbr-positionrow' },
 				children = {
-					Div{
-						classes = {'match-info-headerbr-positionholder'},
+					Div {
+						classes = { 'match-info-headerbr-positionholder' },
 						children = {
-							Icon{iconName = 'firstplace', color = '#CCAB00'},
+							Trophy{place = 1},
 							'1st'
 						}
 
 					},
-					Div{
-						classes = {'match-info-headerbr-opponent'},
+					Div {
+						classes = { 'match-info-headerbr-opponent' },
 						children = {
-							OpponentDisplay.BlockOpponent{
+							OpponentDisplay.BlockOpponent {
 								opponent = first,
 								teamStyle = self.props.teamStyle,
 								overflow = 'ellipsis',
@@ -78,21 +78,21 @@ function MatchHeaderBR:render()
 					}
 				}
 			},
-			Div{
-				classes = {'match-info-header-positionrow'},
+			Div {
+				classes = { 'match-info-header-positionrow' },
 				children = {
-					Div{
-						classes = {'match-info-header-positionholder'},
+					Div {
+						classes = { 'match-info-header-positionholder' },
 						children = {
-							Icon{iconName = 'firstplace', color = '#557177'},
+							Trophy{place = 2},
 							'2nd'
 						}
 
 					},
-					Div{
-						classes = {'match-info-headerbr-opponent'},
+					Div {
+						classes = { 'match-info-headerbr-opponent' },
 						children = {
-							OpponentDisplay.BlockOpponent{
+							OpponentDisplay.BlockOpponent {
 								opponent = second,
 								teamStyle = self.props.teamStyle,
 								overflow = 'ellipsis',
@@ -102,21 +102,21 @@ function MatchHeaderBR:render()
 					}
 				}
 			},
-			Div{
-				classes = {'match-info-header-positionrow'},
+			Div {
+				classes = { 'match-info-header-positionrow' },
 				children = {
-					Div{
-						classes = {'match-info-header-positionholder'},
+					Div {
+						classes = { 'match-info-header-positionholder' },
 						children = {
-							Icon{iconName = 'firstplace', color = '#80704C'},
+							Trophy{place = 3},
 							'3rd'
 						}
 
 					},
-					Div{
-						classes = {'match-info-headerbr-opponent'},
+					Div {
+						classes = { 'match-info-headerbr-opponent' },
 						children = {
-							OpponentDisplay.BlockOpponent{
+							OpponentDisplay.BlockOpponent {
 								opponent = third,
 								teamStyle = self.props.teamStyle,
 								overflow = 'ellipsis',
