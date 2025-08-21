@@ -58,14 +58,14 @@ function VodsDropdownButton:render()
 	}
 
 	return Span{
-			classes = {'general-collapsible-default-toggle'},
-			css = self.props.css,
-			attributes = self.props.attributes,
-			children = {
-				showButton,
-				hideButton,
-			}
+		classes = {'general-collapsible-default-toggle'},
+		css = self.props.css,
+		attributes = self.props.attributes,
+		children = {
+			showButton,
+			hideButton,
 		}
+	}
 end
 
 return VodsDropdownButton
