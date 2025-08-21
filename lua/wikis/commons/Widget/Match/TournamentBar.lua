@@ -19,6 +19,7 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class MatchTournamentBarProps
 ---@field match MatchGroupUtilMatch?
+---@field gameData MatchGroupUtilGameData?
 ---@field displayGameIcon boolean?
 
 ---@class MatchTournamentBar: Widget
@@ -29,13 +30,14 @@ local MatchTournamentBar = Class.new(Widget)
 ---@return Widget[]|nil
 function MatchTournamentBar:render()
 	local match = self.props.match
+	local gameData = self.props.gameData
 	if not match then
 		return
 	end
 
 	local tournament = Tournament.partialTournamentFromMatch(match)
 	local tournamentLink = mw.title.makeTitle(0, match.pageName, match.section).fullText
-	local mapLink = mw.title.makeTitle(0, match.pageName, match.gameData.map).fullText
+	local mapLink = mw.title.makeTitle(0, match.pageName, gameData.map).fullText
 
 	return WidgetUtil.collect(
 		self.props.displayGameIcon and Game.icon{
@@ -71,12 +73,12 @@ function MatchTournamentBar:render()
 					children = HtmlWidgets.Span{children = {
 						match.bracketData.title,
 						' - ',
-						match.gameData.gameIds
+						gameData.gameIds
 						' on ',
 						Link{
 							link = mapLink,
 							children = HtmlWidgets.Span{
-								match.gameData.mapDisplayName
+								gameData.mapDisplayName
 							}
 						},
 					}}

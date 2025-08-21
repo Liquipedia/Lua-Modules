@@ -23,6 +23,7 @@ local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 
 ---@class MatchCardProps
 ---@field match MatchGroupUtilMatch
+---@field gameData MatchGroupUtilGameData?
 ---@field onlyHighlightOnValue string?
 ---@field hideTournament boolean?
 ---@field displayGameIcons boolean?
@@ -40,6 +41,7 @@ MatchCard.defaultProps = {
 ---@return Widget?
 function MatchCard:render()
 	local match = self.props.match
+	local gameData = self.props.gameData
 	if not match then
 		return nil
 	end
@@ -49,6 +51,7 @@ function MatchCard:render()
 
 	local tournamentLink = TournamentBar{
 		match = match,
+		gameData = gameData,
 		displayGameIcon = self.props.displayGameIcons,
 	}
 
