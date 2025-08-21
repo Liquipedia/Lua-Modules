@@ -40,7 +40,7 @@ function MatchTournamentBar:render()
 	local mapLink = ''
 
 	if gameData then
-		mapLink = mw.title.makeTitle(0, match.pageName, gameData.map.gsub(' ', '_')).fullText
+		mapLink = mw.title.makeTitle(0, match.pageName, string.gsub(gameData.map, ' ', '_')).fullText
 	end
 
 	return WidgetUtil.collect(
