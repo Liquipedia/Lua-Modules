@@ -30,11 +30,8 @@ function CustomMatchTicker.tournament(frame)
 	args.tournament = args.tournament or args.tournament1 or args[1] or CURRENT_PAGE
 	args.queryByParent = args.queryByParent or true
 	args.showAllTbdMatches = args.showAllTbdMatches or true
-	args.infoboxWrapperClass = args.infoboxWrapperClass or true
 
-	return MatchTicker(args):query():create(
-		MatchTicker.createHeader('Upcoming Matches')
-	)
+	return MatchTicker(args):query():create('Upcoming Matches')
 end
 
 ---Entry point for display on the main page
@@ -62,9 +59,9 @@ function CustomMatchTicker.newMainPage(frame)
 	args.games = args['filterbuttons-game']
 
 	if args.type == 'upcoming' then
-		return MatchTicker(Table.merge(args, {ongoing = true, upcoming = true})):query():create():addClass('new-match-style')
+		return MatchTicker(Table.merge(args, {ongoing = true, upcoming = true})):query():create()
 	elseif args.type == 'recent' then
-		return MatchTicker(Table.merge(args, {recent = true})):query():create():addClass('new-match-style')
+		return MatchTicker(Table.merge(args, {recent = true})):query():create()
 	end
 end
 
@@ -105,21 +102,19 @@ function CustomMatchTicker.participant(args, matches)
 		args.ongoing = true
 		args.recent = false
 		args.limit = args.limit or 5
-		return MatchTicker(args):query():create(
-			MatchTicker.createHeader('Upcoming Matches')
-		)
+		return MatchTicker(args):query():create('Upcoming Matches')
 	end
 
 	return mw.html.create()
 		:node(MatchTicker(Table.merge(args, {
 			limit = args.ongoingLimit or 5, ongoing = true
-		})):query(matches.ongoing):create(MatchTicker.createHeader('Ongoing Matches')))
+		})):query(matches.ongoing):create('Ongoing Matches'))
 		:node(MatchTicker(Table.merge(args, {
 			limit = args.upcomingLimit or 3, upcoming = true
-		})):query(matches.upcoming):create(MatchTicker.createHeader('Upcoming Matches')))
+		})):query(matches.upcoming):create('Upcoming Matches'))
 		:node(MatchTicker(Table.merge(args, {
 			limit = args.recentLimit or 5, recent = true
-		})):query(matches.recent):create(MatchTicker.createHeader('Recent Matches')))
+		})):query(matches.recent):create('Recent Matches'))
 end
 
 return CustomMatchTicker

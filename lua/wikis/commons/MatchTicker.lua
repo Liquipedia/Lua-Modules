@@ -57,8 +57,6 @@ local DEFAULT_QUERY_COLUMNS = {
 	'section',
 }
 local NONE = 'none'
-local INFOBOX_DEFAULT_CLASS = 'fo-nttax-infobox panel'
-local INFOBOX_WRAPPER_CLASS = 'fo-nttax-infobox-wrapper'
 local DEFAULT_LIMIT = 20
 local DEFAULT_ORDER = 'date asc, liquipediatier asc, tournament asc'
 local DEFAULT_RECENT_ORDER = 'date desc, liquipediatier asc, tournament asc'
@@ -96,16 +94,6 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@field config MatchTickerConfig
 ---@field matches table[]?
 local MatchTicker = Class.new(function(self, args) self:init(args) end)
-
----@param text string?
----@return Html
-function MatchTicker.createHeader(text)
-	return mw.html.create('div'):node(
-		mw.html.create('div')
-			:addClass('infobox-header')
-			:wikitext(text)
-	)
-end
 
 ---@param args table?
 ---@return table
@@ -175,17 +163,6 @@ function MatchTicker:init(args)
 		or args.wrapperClasses == NONE and {}
 		or {args.wrapperClasses}
 
-	if Logic.readBool(args.infoboxClass) or Logic.readBool(args.infoboxWrapperClass) then
-		table.insert(wrapperClasses, INFOBOX_DEFAULT_CLASS)
-	end
-
-	if Logic.readBool(args.infoboxWrapperClass) then
-		table.insert(wrapperClasses, INFOBOX_WRAPPER_CLASS)
-		local game = args.game and Game.abbreviation{game = args.game}:lower()
-		if game then
-			table.insert(wrapperClasses, 'infobox-' .. game)
-		end
-	end
 	config.wrapperClasses = wrapperClasses
 
 	self.config = config
@@ -528,9 +505,9 @@ MatchTicker.fetchTournament = FnUtil.memoize(function(tournamentPage)
 	return Tournament.getTournament(tournamentPage)
 end)
 
----@param header Html?
+---@param headerText string?
 ---@return Html
-function MatchTicker:create(header)
+function MatchTicker:create(headerText)
 	if not self.matches and not self.config.showInfoForEmptyResults then
 		return mw.html.create()
 	end
@@ -541,7 +518,13 @@ function MatchTicker:create(header)
 		wrapper:addClass(class)
 	end
 
-	wrapper:node(header)
+	if headerText then
+		wrapper:node(mw.html.create('div'):node(
+		mw.html.create('div')
+			:addClass('infobox-header')
+			:wikitext(headerText)
+		))
+	end
 
 	if not self.matches then
 		return wrapper:css('text-align', 'center'):wikitext('No Results found.')
