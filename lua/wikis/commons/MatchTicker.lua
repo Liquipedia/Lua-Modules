@@ -106,7 +106,7 @@ function MatchTicker:init(args)
 	local config = {
 		tournaments = Array.extractValues(
 			Table.filterByKey(args, function(key)
-				return string.find(key, '^turnament%d-$') ~= nil or Logic.isNumeric(key)
+				return string.find(key, '^tournament%d-$') ~= nil or Logic.isNumeric(key)
 		end)),
 		queryByParent = Logic.readBool(args.queryByParent),
 		limit = tonumber(args.limit) or DEFAULT_LIMIT,
@@ -536,12 +536,6 @@ function MatchTicker:create(headerText)
 			hideTournament = self.config.hideTournament,
 			displayGameIcons = self.config.displayGameIcons,
 			onlyHighlightOnValue = self.config.onlyHighlightOnValue,
-			-- TODO: This is bad, and needs to be refactored, but it's not relastic right now, so works for now fine for now
-			gameData = {
-				asGame = match.asGame,
-				gameIds = match.asGameIndexes,
-				map = match.map,
-			}
 		})
 	end
 
