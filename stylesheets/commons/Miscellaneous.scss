@@ -2,15 +2,15 @@
 This forces a new stacking context for the content area of the wiki. This should
 lead to things from the content area not being able to overlap things outside of
 it. Putting it here so we can easily remove it again in case things break...
-Author( s ): FO-nTTaX
+Author(s): FO-nTTaX
 *******************************************************************************/
 #mw-content-text {
 	/* isolation: isolate; */
 }
 
 /*******************************************************************************
-Template( s ): Images without license information
-Author( s ): FO-nTTaX
+Template(s): Images without license information
+Author(s): FO-nTTaX
 *******************************************************************************/
 .logged-in img.image-license-issue {
 	border: 5px solid #ff0000 !important;
@@ -18,8 +18,8 @@ Author( s ): FO-nTTaX
 }
 
 /*******************************************************************************
-Template( s ): Documentation
-Author( s ): FO-nTTaX
+Template(s): Documentation
+Author(s): FO-nTTaX
 *******************************************************************************/
 .documentation {
 	clear: both;
@@ -29,8 +29,8 @@ Author( s ): FO-nTTaX
 }
 
 /*******************************************************************************
-Template( s ): Countdowns
-Author( s ): FO-nTTaX
+Template(s): Countdowns
+Author(s): FO-nTTaX
 *******************************************************************************/
 .timer-object-countdown-live {
 	color: #008000;
@@ -48,8 +48,8 @@ Author( s ): FO-nTTaX
 }
 
 /*******************************************************************************
-Template( s ): info-icon
-Author( s ): FO-nTTaX
+Template(s): info-icon
+Author(s): FO-nTTaX
 *******************************************************************************/
 .info-icon {
 	cursor: pointer;
@@ -64,8 +64,8 @@ Author( s ): FO-nTTaX
 }
 
 /*******************************************************************************
-Template( s ): Flags
-Author( s ): FO-nTTaX, salle
+Template(s): Flags
+Author(s): FO-nTTaX, salle
 *******************************************************************************/
 .flag img {
 	width: 18px;
@@ -78,8 +78,8 @@ Author( s ): FO-nTTaX, salle
 	vertical-align: -3px;
 }
 /*******************************************************************************
-Template( s ): Flag/, FlagNoLink/
-Author( s ): salle
+Template(s): Flag/, FlagNoLink/
+Author(s): salle
 *******************************************************************************/
 .flag-template img {
 	height: 12px;
@@ -88,8 +88,8 @@ Author( s ): salle
 }
 
 /*******************************************************************************
-Template( s ): Toggle button
-Author( s ): FO-nTTaX
+Template(s): Toggle button
+Author(s): FO-nTTaX
 *******************************************************************************/
 .toggle-area {
 	@include toggle-area-loop( 50 );
@@ -114,8 +114,8 @@ Author( s ): FO-nTTaX
 	}
 }
 /*******************************************************************************
-Template( s ): Flex Table
-Author( s ): FO-nTTaX
+Template(s): Flex Table
+Author(s): FO-nTTaX
 *******************************************************************************/
 .flextable-wrap {
 	margin-bottom: 10px;
@@ -144,8 +144,8 @@ Author( s ): FO-nTTaX
 }
 
 /*******************************************************************************
-Template( s ): Liquipedia links
-Author( s ): FO-nTTaX, Elysienna
+Template(s): Liquipedia links
+Author(s): FO-nTTaX, Elysienna
 *******************************************************************************/
 @keyframes badgepopanimation {
 	0% {
@@ -208,7 +208,7 @@ Author( s ): FO-nTTaX, Elysienna
 	color: #676767;
 	border-radius: 0.25rem;
 	font-size: 0.75rem;
-	font-family: 'Open Sans', sans-serif;
+	font-family: "Open Sans", sans-serif;
 	font-weight: bold;
 	padding: 0.125rem 0.25rem;
 	top: 0.0625rem;
@@ -231,7 +231,7 @@ Author( s ): FO-nTTaX, Elysienna
 }
 
 .liquipedia-links-badge--tooltip::before {
-	content: '';
+	content: "";
 	position: absolute;
 	top: 0.25rem;
 	left: -0.3125rem;
@@ -255,8 +255,8 @@ Author( s ): FO-nTTaX, Elysienna
 }
 
 /*******************************************************************************
-Template( s ): Box
-Author( s ): FO-nTTaX
+Template(s): Box
+Author(s): FO-nTTaX
 *******************************************************************************/
 @media ( min-width: 601px ) {
 	.template-box {
@@ -279,17 +279,17 @@ Author( s ): FO-nTTaX
 }
 
 /*******************************************************************************
-Template( s ): TeamHistory
-Author( s ): FO-nTTaX
+Template(s): TeamHistory
+Author(s): FO-nTTaX
 *******************************************************************************/
 .th-mono {
-	font-family: 'Droid Sans Mono', monospace;
+	font-family: "Droid Sans Mono", monospace;
 	letter-spacing: -1.4px;
 }
 
 /*******************************************************************************
-Template( s ): Fake TOC
-Author( s ): FO-nTTaX
+Template(s): Fake TOC
+Author(s): FO-nTTaX
 *******************************************************************************/
 #mw-content-text .faketoc {
 	display: none;
@@ -300,8 +300,8 @@ Author( s ): FO-nTTaX
 	margin: 0;
 }
 
-#sidebar-toc .row > [ class*='col-' ],
-#scroll-wrapper-toc .row > [ class*='col-' ] {
+#sidebar-toc .row > [ class*="col-" ],
+#scroll-wrapper-toc .row > [ class*="col-" ] {
 	padding-left: 5px;
 	padding-right: 5px;
 }
@@ -311,8 +311,8 @@ Author( s ): FO-nTTaX
 }
 
 /*******************************************************************************
-Template( s ): Prizepool Tables
-Author( s ): FO-nTTaX
+Template(s): Prizepool Tables
+Author(s): FO-nTTaX
 *******************************************************************************/
 @media ( max-width: 767px ) {
 	.prizepooltable {
@@ -321,8 +321,8 @@ Author( s ): FO-nTTaX
 }
 
 /*******************************************************************************
-Template( s ): Upcoming and ongoing games of
-Author( s ): FO-nTTaX
+Template(s): Upcoming and ongoing games of
+Author(s): FO-nTTaX
 *******************************************************************************/
 .infobox-upcoming-ongoing-matches {
 	width: 100%;
@@ -345,8 +345,8 @@ Author( s ): FO-nTTaX
 }
 
 /*******************************************************************************
-Template( s ): LeagueIconSmall
-Author( s ): FO-nTTaX
+Template(s): LeagueIconSmall
+Author(s): FO-nTTaX
 *******************************************************************************/
 span.league-icon-small-image,
 span.icon-small {
@@ -377,7 +377,7 @@ span.icon-small.darkmode {
 	display: none;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	span.league-icon-small-image.lightmode,
 	span.icon-small.lightmode {
@@ -391,8 +391,8 @@ span.icon-small.darkmode {
 }
 
 /*******************************************************************************
-Template( s ): Race icons on the Warcraft wiki
-Author( s ): FO-nTTaX
+Template(s): Race icons on the Warcraft wiki
+Author(s): FO-nTTaX
 *******************************************************************************/
 .wiki-warcraft .race-icon-small img {
 	width: 19px;
@@ -400,8 +400,8 @@ Author( s ): FO-nTTaX
 }
 
 /*******************************************************************************
-Template( s ): Timelines
-Author( s ): FO-nTTaX
+Template(s): Timelines
+Author(s): FO-nTTaX
 *******************************************************************************/
 .timeline {
 	border: 1px solid var( --table-border-color, #dddddd );
@@ -442,7 +442,7 @@ Author( s ): FO-nTTaX
 }
 
 .timeline-row > div:nth-of-type( 2 ) {
-	width: calc( ~'100% - 150px' );
+	width: calc( ~"100% - 150px" );
 }
 
 .timeline-period {
@@ -509,8 +509,8 @@ Author( s ): FO-nTTaX
 }
 
 /*******************************************************************************
-Template( s ): Progress bars
-Author( s ): FO-nTTaX
+Template(s): Progress bars
+Author(s): FO-nTTaX
 *******************************************************************************/
 .progress {
 	border-radius: 5px;
@@ -553,8 +553,8 @@ Author( s ): FO-nTTaX
 }
 
 /*******************************************************************************
-Template( s ): Dropdown box
-Author( s ): Rapture
+Template(s): Dropdown box
+Author(s): Rapture
 *******************************************************************************/
 .dropdown-box-wrapper {
 	position: relative;
@@ -577,8 +577,8 @@ Author( s ): Rapture
 }
 
 /*******************************************************************************
-Template( s ): SpellCard
-Author( s ): FO-nTTaX, Rapture
+Template(s): SpellCard
+Author(s): FO-nTTaX, Rapture
 *******************************************************************************/
 .spellcard-wrapper {
 	display: flex;
@@ -622,7 +622,7 @@ Author( s ): FO-nTTaX, Rapture
 
 .spellcard-description {
 	display: inline-block;
-	width: calc( ~'100% - 124px' );
+	width: calc( ~"100% - 124px" );
 	border-width: 1px 0;
 	border-style: solid;
 	padding: 5px 0;
@@ -753,8 +753,8 @@ td.bold-white-text {
 }
 
 /*******************************************************************************
-Template( s ): WC3 Creep Spots
-Author( s ): FO-nTTaX, turbosau
+Template(s): WC3 Creep Spots
+Author(s): FO-nTTaX, turbosau
 *******************************************************************************/
 .creep-spot img {
 	cursor: pointer;
@@ -765,8 +765,8 @@ Author( s ): FO-nTTaX, turbosau
 }
 
 /*******************************************************************************
-Template( s ): Player Info Cards
-Author( s ): spazer
+Template(s): Player Info Cards
+Author(s): spazer
 *******************************************************************************/
 .player-info-card {
 	width: 100% !important;
@@ -798,7 +798,7 @@ Author( s ): spazer
 	border-style: solid;
 	padding-left: 2px;
 	margin: 5px 0 0 5px;
-	width: calc( ~'100% - 10px' );
+	width: calc( ~"100% - 10px" );
 	text-align: center;
 }
 
@@ -844,8 +844,8 @@ Author( s ): spazer
 }
 
 /*******************************************************************************
-Template( s ): Vodlink
-Author( s ): salle
+Template(s): Vodlink
+Author(s): salle
 *******************************************************************************/
 .vodlink img {
 	max-height: 16px;
@@ -858,14 +858,14 @@ span.vodlink.darkmode {
 	display: none;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	span.vodlink.lightmode {
 		display: none;
 	}
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	span.vodlink.darkmode {
 		display: inline-block;
@@ -876,14 +876,14 @@ span.vodlink.darkmode {
 	display: none;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.vodlink span.lightmode {
 		display: none;
 	}
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.vodlink span.darkmode {
 		display: inline;
@@ -896,8 +896,8 @@ span.vodlink.darkmode {
 }
 
 /*******************************************************************************
-Template( s ): Rumour row
-Author( s ): Vogan
+Template(s): Rumour row
+Author(s): Vogan
 *******************************************************************************/
 .StatusIcon {
 	font-size: 1.2em;
@@ -928,8 +928,8 @@ Author( s ): Vogan
 }
 
 /*******************************************************************************
-Template( s ): OffSeasonOverview
-Author( s ): Vogan
+Template(s): OffSeasonOverview
+Author(s): Vogan
 *******************************************************************************/
 .OffSeasonOverview {
 	padding: 0;
@@ -948,8 +948,8 @@ Author( s ): Vogan
 }
 
 /*******************************************************************************
-Template( s ): Documentation
-Author( s ): Wikipedia
+Template(s): Documentation
+Author(s): Wikipedia
 *******************************************************************************/
 .template-startbox {
 	padding-bottom: 3px;
@@ -981,8 +981,8 @@ td.mbox-text {
 }
 
 /*******************************************************************************
-Template( s ): Stand-in table
-Author( s ): Rapture
+Template(s): Stand-in table
+Author(s): Rapture
 *******************************************************************************/
 .stand-in-card {
 	margin: 0 0 10px 0;
@@ -995,7 +995,7 @@ Author( s ): Rapture
 	padding: 5px;
 }
 
-.stand-in-card > tbody > tr > th.large-only[ colspan='1' ] {
+.stand-in-card > tbody > tr > th.large-only[ colspan="1" ] {
 	display: none;
 }
 
@@ -1025,11 +1025,11 @@ Author( s ): Rapture
 		border: 1px solid var( --clr-border, #bbbbbb );
 	}
 
-	.stand-in-card > tbody > tr > th.large-only[ colspan='10' ] {
+	.stand-in-card > tbody > tr > th.large-only[ colspan="10" ] {
 		display: none;
 	}
 
-	.stand-in-card > tbody > tr > th.large-only[ colspan='1' ] {
+	.stand-in-card > tbody > tr > th.large-only[ colspan="1" ] {
 		display: table-cell;
 	}
 
@@ -1083,8 +1083,8 @@ Author( s ): Rapture
 }
 
 /*******************************************************************************
-Template( s ): SMW EventCalendar
-Author( s ): Inflicted
+Template(s): SMW EventCalendar
+Author(s): Inflicted
 *******************************************************************************/
 .srf-eventcalendar img {
 	width: 18px;
@@ -1103,8 +1103,8 @@ Author( s ): Inflicted
 }
 
 /*******************************************************************************
-Template( s ): Match history tables
-Author( s ): Inflicted
+Template(s): Match history tables
+Author(s): Inflicted
 *******************************************************************************/
 .match-history {
 	height: 35px;
@@ -1126,7 +1126,7 @@ Author( s ): Inflicted
 
 /*******************************************************************************
 Module( s ): MatchTable
-Author( s ): hjpalpha
+Author(s): hjpalpha
 *******************************************************************************/
 .match-table-year-header {
 	font-weight: bold;
@@ -1134,16 +1134,16 @@ Author( s ): hjpalpha
 }
 
 /*******************************************************************************
-Template( s ): Page Form Checkboxes
-Author( s ): Inflicted
+Template(s): Page Form Checkboxes
+Author(s): Inflicted
 *******************************************************************************/
 .checkboxLabel {
 	padding-right: 10px;
 }
 
 /*******************************************************************************
-Template( s ): Gradient colours for Fortnite rarities
-Author( s ): Ricci
+Template(s): Gradient colours for Fortnite rarities
+Author(s): Ricci
 *******************************************************************************/
 .fortnitebg-rarity-common {
 	background: radial-gradient( circle at 80% 30%, #bdc0c3, #7b8187 );
@@ -1170,8 +1170,8 @@ Author( s ): Ricci
 }
 
 /*******************************************************************************
-Template( s ): Mobile Group Tables, Match Lists & Showmatches
-Author( s ): iMarbot
+Template(s): Mobile Group Tables, Match Lists & Showmatches
+Author(s): iMarbot
 *******************************************************************************/
 @media ( min-width: 321px ) {
 	.grouptable-team-mobile,
@@ -1221,12 +1221,12 @@ Author( s ): iMarbot
 }
 
 /*******************************************************************************
-Template( s ): Misc Mobile Improvements
-Author( s ): iMarbot
+Template(s): Misc Mobile Improvements
+Author(s): iMarbot
 *******************************************************************************/
 @media ( min-width: 650px ) {
 	.roster-notes-squash div {
-		max-width: calc( ~'100% - 350px' );
+		max-width: calc( ~"100% - 350px" );
 	}
 }
 
@@ -1294,8 +1294,8 @@ Author( s ): iMarbot
 }
 
 /*******************************************************************************
-Template( s ): Player Role Icons
-Author( s ): salle
+Template(s): Player Role Icons
+Author(s): salle
 *******************************************************************************/
 .player-role-icon > img,
 img.player-role-icon {
@@ -1305,10 +1305,10 @@ img.player-role-icon {
 	image-rendering: -webkit-optimize-contrast;
 }
 
-.player-role-icon img[ title='Captain' ],
-.player-role-icon img[ title='In-Game Leader' ],
-img.player-role-icon[ alt='Captain' ],
-img.player-role-icon[ alt='In-Game Leader' ] {
+.player-role-icon img[ title="Captain" ],
+.player-role-icon img[ title="In-Game Leader" ],
+img.player-role-icon[ alt="Captain" ],
+img.player-role-icon[ alt="In-Game Leader" ] {
 	height: 13px;
 	width: 18px;
 	vertical-align: baseline;
@@ -1322,8 +1322,8 @@ img.player-role-icon[ alt='In-Game Leader' ] {
 	image-rendering: -webkit-optimize-contrast;
 }
 /*******************************************************************************
-Template( s ): Building settings table, Button translation
-Author( s ): salle
+Template(s): Building settings table, Button translation
+Author(s): salle
 *******************************************************************************/
 
 kbd {
@@ -1335,12 +1335,12 @@ kbd {
 	padding: 1px 2px;
 	border-radius: 3px;
 	font-weight: 500;
-	font-family: 'Open Sans', sans-serif;
+	font-family: "Open Sans", sans-serif;
 }
 
 /*******************************************************************************
-Template( s ): Achievement Table Placement Numbers
-Author( s ): spazer, Lafungo
+Template(s): Achievement Table Placement Numbers
+Author(s): spazer, Lafungo
 *******************************************************************************/
 .placement-text {
 	text-shadow: 1px 1px rgba( 64, 64, 64, 0.4 ), 1px -1px rgba( 64, 64, 64, 0.4 ), -1px -1px rgba( 64, 64, 64, 0.4 ), -1px 1px rgba( 64, 64, 64, 0.4 );
@@ -1420,8 +1420,8 @@ Author( s ): spazer, Lafungo
 }
 
 /*******************************************************************************
-Template( s ): Mobile LeagueCards
-Author( s ): iMarbot
+Template(s): Mobile LeagueCards
+Author(s): iMarbot
 *******************************************************************************/
 @media ( max-width: 600px ) {
 	.teamcard.leaguecard {
@@ -1461,8 +1461,8 @@ Author( s ): iMarbot
 }
 
 /*******************************************************************************
-Template( s ):Bracket Match Cards
-Author( s ):Rapture
+Template(s):Bracket Match Cards
+Author(s):Rapture
 *******************************************************************************/
 .match-card > tbody > tr.Match {
 	display: table-row;
@@ -1573,8 +1573,8 @@ Author( s ):Rapture
 }
 
 /*******************************************************************************
-Template( s ): Match Page CSS
-Author( s ): iMarbot
+Template(s): Match Page CSS
+Author(s): iMarbot
 *******************************************************************************/
 tr.stats-row:nth-child( 2n+1 ) {
 	background-color: var( --clr-surface-2, #f5f5f5 );
@@ -1610,8 +1610,8 @@ tr.stats-row:nth-child( 2n+1 ) {
 }
 
 /*******************************************************************************
-Template( s ): InfoboxIconSmall
-Author( s ): iMarbot
+Template(s): InfoboxIconSmall
+Author(s): iMarbot
 *******************************************************************************/
 .infobox-icon-small img {
 	max-width: 20px;
@@ -1630,8 +1630,8 @@ Author( s ): iMarbot
 }
 
 /*******************************************************************************
-Template( s ): Legends of Runeterra region colors
-Author( s ): Darkrai
+Template(s): Legends of Runeterra region colors
+Author(s): Darkrai
 *******************************************************************************/
 .lor-region-bilgewater {
 	background-color: #f9dec7;
@@ -1681,8 +1681,8 @@ Author( s ): Darkrai
 }
 
 /*******************************************************************************
-Template( s ): Copy to clipboard
-Author( s ): FO-nTTaX
+Template(s): Copy to clipboard
+Author(s): FO-nTTaX
 *******************************************************************************/
 .copy-to-clipboard .copy-this {
 	display: none;
@@ -1693,15 +1693,15 @@ Author( s ): FO-nTTaX
 }
 
 /*******************************************************************************
-Template( s ): Legends of Runeterra Card Patch Note Greyscale
-Author( s ): iMarbot
+Template(s): Legends of Runeterra Card Patch Note Greyscale
+Author(s): iMarbot
 *******************************************************************************/
 .lor-graycard img {
 	filter: grayscale( 80% );
 }
 /*******************************************************************************
-Template( s ): Miscellaneous Fixes/Changes
-Author( s ): iMarbot
+Template(s): Miscellaneous Fixes/Changes
+Author(s): iMarbot
 *******************************************************************************/
 @media ( min-width: 601px ) {
 	.hlist li {
@@ -1752,7 +1752,7 @@ Author( s ): iMarbot
 
 /*******************************************************************************
 Form: Match history
-Author( s ): Rapture
+Author(s): Rapture
 *******************************************************************************/
 #main-content-column .form-field,
 #main-content-column #pfForm select.form-field {
@@ -1765,7 +1765,7 @@ Author( s ): Rapture
 	padding: 0 !important;
 }
 
-#main-content-column .form-field-tokens input[ type='search' ] {
+#main-content-column .form-field-tokens input[ type="search" ] {
 	height: auto;
 	padding: 0;
 	margin: 3px 0 0 5px;
@@ -1784,8 +1784,8 @@ Author( s ): Rapture
 }
 
 /*******************************************************************************
-Template( s ): 16px Icons
-Author( s ): iMarbot
+Template(s): 16px Icons
+Author(s): iMarbot
 *******************************************************************************/
 .icon-16px {
 	vertical-align: middle;
@@ -1812,7 +1812,7 @@ Author( s ): iMarbot
 	display: none;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.icon-16px.lightmode {
 		display: none;
@@ -1824,8 +1824,8 @@ Author( s ): iMarbot
 }
 
 /*******************************************************************************
-Template( s ): Responsive floats
-Author( s ): FO-nTTaX
+Template(s): Responsive floats
+Author(s): FO-nTTaX
 *******************************************************************************/
 .pull-right {
 	float: right;
@@ -1856,8 +1856,8 @@ Author( s ): FO-nTTaX
 }
 
 /*******************************************************************************
-Template( s ): Battleground/Map Portal Banners ( initially created for Heroes wiki )
-Author( s ): salle
+Template(s): Battleground/Map Portal Banners ( initially created for Heroes wiki )
+Author(s): salle
 *******************************************************************************/
 div.battleground-banner {
 	position: relative;
@@ -1893,7 +1893,7 @@ div.battleground-banner {
 	padding-left: 26px;
 	line-height: 104px;
 	color: #f8f8f9 !important;
-	font-family: 'Exo', 'Trebuchet MS', 'Helvetica', sans-serif;
+	font-family: "Exo", "Trebuchet MS", "Helvetica", sans-serif;
 	font-size: 390%;
 	font-weight: 600;
 	text-shadow: 0 0 25px #3622f2;
@@ -1907,7 +1907,7 @@ div.battleground-banner {
 	padding-left: 26px;
 	line-height: 104px;
 	color: #f8f8f9 !important;
-	font-family: 'Exo', 'Trebuchet MS', 'Helvetica', sans-serif;
+	font-family: "Exo", "Trebuchet MS", "Helvetica", sans-serif;
 	font-size: 390%;
 	font-weight: 600;
 	text-shadow: 0 0 25px #b12a2a;
@@ -1962,8 +1962,8 @@ div.battleground-banner {
 }
 
 /*******************************************************************************
-Template( s ): Hiding Legend box for mobiles
-Author( s ): Ricci
+Template(s): Hiding Legend box for mobiles
+Author(s): Ricci
 *******************************************************************************/
 @media ( max-width: 435px ) {
 	.legend-box-mobile {
@@ -2031,8 +2031,8 @@ ul.halfbox > li {
 }
 
 /*******************************************************************************
-Template( s ): Esports wiki team portal
-Author( s ): Vogan, salle
+Template(s): Esports wiki team portal
+Author(s): Vogan, salle
 *******************************************************************************/
 .esports-team-game-list {
 	display: flex;
@@ -2052,21 +2052,21 @@ Author( s ): Vogan, salle
 }
 
 /*******************************************************************************
-Template( s ): Darkmode images on file pages
-Author( s ): FO-nTTaX, iMarbot
+Template(s): Darkmode images on file pages
+Author(s): FO-nTTaX, iMarbot
 *******************************************************************************/
-html:not( [ data-darkreader-scheme='dark' ] ):not( .theme--dark ) & {
-	#file img[ src*='darkmode' ]:not( :hover ),
-	.searchResultImage img[ src*='darkmode' ],
-	.gallerybox img[ src*='darkmode' ] {
+html:not( [ data-darkreader-scheme="dark" ] ):not( .theme--dark ) & {
+	#file img[ src*="darkmode" ]:not( :hover ),
+	.searchResultImage img[ src*="darkmode" ],
+	.gallerybox img[ src*="darkmode" ] {
 		background-color: #272727;
 	}
 }
 
-#file img[ src*='lightmode' ]:not( :hover ),
-.searchResultImage img[ src*='lightmode' ],
-.gallerybox img[ src*='lightmode' ] {
-	[ data-darkreader-scheme='dark' ] & {
+#file img[ src*="lightmode" ]:not( :hover ),
+.searchResultImage img[ src*="lightmode" ],
+.gallerybox img[ src*="lightmode" ] {
+	[ data-darkreader-scheme="dark" ] & {
 		background-color: #808080;
 	}
 
@@ -2075,14 +2075,14 @@ html:not( [ data-darkreader-scheme='dark' ] ):not( .theme--dark ) & {
 	}
 }
 
-.filehistory a img[ src*='darkmode' ],
-#file img[ src*='darkmode' ]:hover {
+.filehistory a img[ src*="darkmode" ],
+#file img[ src*="darkmode" ]:hover {
 	background: url( data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAAAAAA6mKC9AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAHElEQVQY02MUZoAADijNxIAG6CPAArP/x8C6AwCutQE9GsmfRAAAAABJRU5ErkJggg== ) repeat;
 }
 
 /*******************************************************************************
 Template/Module: Recent games // Recent matches ( for new Bracket/Match System )
-Author( s ): hjpalpha
+Author(s): hjpalpha
 *******************************************************************************/
 .recent-matches-left {
 	background-image: linear-gradient( to left, var( --clr-cinnabar-background-color, #fbdfdf ) 25%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 45%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 55%, var( --clr-forestgreen-background-color, #ddf4dd ) 75% ) !important;
@@ -2110,7 +2110,7 @@ Author( s ): hjpalpha
 
 /*******************************************************************************
 Template // Module: Key/Key2 // Hotkey
-Author( s ): hjpalpha
+Author(s): hjpalpha
 *******************************************************************************/
 .hotkey-key {
 	background-color: var( --clr-moon-background-color, #f0f0f0 );
@@ -2136,7 +2136,7 @@ Author( s ): hjpalpha
 
 /*******************************************************************************
 Template: Sad box for main page
-Author( s ): FO-nTTaX
+Author(s): FO-nTTaX
 *******************************************************************************/
 .sadbox {
 	border: 1px solid #000000;
@@ -2162,16 +2162,16 @@ Author( s ): FO-nTTaX
 /*******************************************************************************
 Template: LightModeDarkMode
 Use case: Display images, text, ... only in light or only in darkmode
-Author( s ): hjpalpha
+Author(s): hjpalpha
 *******************************************************************************/
 
 .show-when-dark-mode,
-[ data-darkreader-scheme='dark' ] .show-when-light-mode,
+[ data-darkreader-scheme="dark" ] .show-when-light-mode,
 .theme--dark .show-when-light-mode {
 	display: none !important;
 }
 
-[ data-darkreader-scheme='dark' ] .show-when-dark-mode,
+[ data-darkreader-scheme="dark" ] .show-when-dark-mode,
 .theme--dark .show-when-dark-mode {
 	display: unset !important;
 }
@@ -2179,7 +2179,7 @@ Author( s ): hjpalpha
 /*******************************************************************************
 Template: GroupTableLeague
 Use case: up/down arrows to indicate a ranking change between rounds
-Author( s ): hjpalpha
+Author(s): hjpalpha
 *******************************************************************************/
 
 .ranking-change-up {
@@ -2196,9 +2196,9 @@ Author( s ): hjpalpha
 
 /*******************************************************************************
 Template: Matchpage Lightmode/Darkmode class
-Author( s ): iMarbot
+Author(s): iMarbot
 *******************************************************************************/
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.matchpage span.banner.lightmode,
 	.matchpage div.logo.lightmode {
@@ -2211,7 +2211,7 @@ Author( s ): iMarbot
 	display: none;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.matchpage span.banner.darkmode,
 	.matchpage div.logo.darkmode {
@@ -2221,38 +2221,38 @@ Author( s ): iMarbot
 
 /*******************************************************************************
 Template: Darkmode 32px icons
-Author( s ): iMarbot
+Author(s): iMarbot
 *******************************************************************************/
-[ data-darkreader-scheme='dark' ],
+[ data-darkreader-scheme="dark" ],
 .theme--dark {
 	& .vodlink img,
 	.group-table-header-right img {
-		&[ src*='VOD_Icon' ],
-		&[ src*='Match_Info_Stats' ],
-		&[ src*='/Trial.png' ],
-		&[ src*='/Substitution.png' ],
-		&[ src*='Reviews32' ],
-		&[ src*='Preview_Icon32' ],
-		&[ src*='LiveReport32' ],
-		&[ src*='Interview32' ],
-		&[ src*='Highlights_Icon32' ],
-		&[ src*='Captain_Icon' ],
-		&[ src*='Recap_Icon' ] {
+		&[ src*="VOD_Icon" ],
+		&[ src*="Match_Info_Stats" ],
+		&[ src*="/Trial.png" ],
+		&[ src*="/Substitution.png" ],
+		&[ src*="Reviews32" ],
+		&[ src*="Preview_Icon32" ],
+		&[ src*="LiveReport32" ],
+		&[ src*="Interview32" ],
+		&[ src*="Highlights_Icon32" ],
+		&[ src*="Captain_Icon" ],
+		&[ src*="Recap_Icon" ] {
 			filter: invert( 1 );
 		}
 	}
 
-	& img[ src*='Vod.svg' ],
-	& img[ src*='Vod-' ] {
+	& img[ src*="Vod.svg" ],
+	& img[ src*="Vod-" ] {
 		/* Changes the color of the VOD icon to Secondary 80 ( B3B3B3 ) */
 		filter: invert( 79% ) sepia( 1% ) saturate( 0% ) hue-rotate( 121deg ) brightness( 93% ) contrast( 85% );
 	}
 
 	& img.player-role-icon,
 	.rts-team-list-icon-tag img {
-		&[ src*='/Trial.png' ],
-		&[ src*='/Substitution.png' ],
-		&[ src*='Captain_Icon' ] {
+		&[ src*="/Trial.png" ],
+		&[ src*="/Substitution.png" ],
+		&[ src*="Captain_Icon" ] {
 			filter: invert( 1 );
 		}
 	}
@@ -2260,7 +2260,7 @@ Author( s ): iMarbot
 
 /*******************************************************************************
 Template: Bans filter
-Author( s ): trev
+Author(s): trev
 *******************************************************************************/
 .bans-filter {
 	filter: grayscale( 0.8 ) contrast( 0.8 );
@@ -2315,8 +2315,8 @@ Author: hjpalpha
 }
 
 /*******************************************************************************
-Template( s ): Random background and text colors
-Author( s ): iMarbot
+Template(s): Random background and text colors
+Author(s): iMarbot
 *******************************************************************************/
 .bg-color-e6e6ff {
 	background: #e6e6ff;
@@ -2335,8 +2335,8 @@ Author( s ): iMarbot
 }
 
 /*******************************************************************************
-Template( s ): Template:Team matches table
-Author( s ): iMarbot via ???
+Template(s): Template:Team matches table
+Author(s): iMarbot via ???
 *******************************************************************************/
 .recent-matches-bg-win {
 	background-color: var( --table-green-background-color, #f0fff0 ) !important;
@@ -2351,8 +2351,8 @@ Author( s ): iMarbot via ???
 }
 
 /*******************************************************************************
-Template( s ): white-space as classes
-Author( s ): iMarbot
+Template(s): white-space as classes
+Author(s): iMarbot
 *******************************************************************************/
 .white-space-pre {
 	white-space: pre;
@@ -2363,8 +2363,8 @@ Author( s ): iMarbot
 }
 
 /*******************************************************************************
-Template( s ): Example title popup hover
-Author( s ): iMarbot via ???
+Template(s): Example title popup hover
+Author(s): iMarbot via ???
 *******************************************************************************/
 .example-title-popup {
 	border: #000000 1px solid;
@@ -2373,8 +2373,8 @@ Author( s ): iMarbot via ???
 }
 
 /*******************************************************************************
-Template( s ): App notices
-Author( s ): FO-nTTaX
+Template(s): App notices
+Author(s): FO-nTTaX
 *******************************************************************************/
 .appnotice-sm,
 .appnotice-md,
@@ -2401,8 +2401,8 @@ Author( s ): FO-nTTaX
 }
 
 /*******************************************************************************
-Template( s ): Head2HeadOverview
-Author( s ): Elysienna
+Template(s): Head2HeadOverview
+Author(s): Elysienna
 *******************************************************************************/
 .matchlist-gradient-green {
 	background: linear-gradient( 90deg, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 0%, rgba( 105, 211, 105, 1 ) 75%, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 100% );
@@ -2426,7 +2426,7 @@ Author( s ): Elysienna
 
 /*******************************************************************************
 Map on Portal:Players
-Author( s ): Elysienna
+Author(s): Elysienna
 *******************************************************************************/
 .portal-map {
 	background-color: #b6cfe5;
@@ -2435,7 +2435,7 @@ Author( s ): Elysienna
 	border-color: #00005d;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.portal-map {
 		background-color: var( --clr-secondary-16 );
@@ -2454,7 +2454,7 @@ Author( s ): Elysienna
 /*******************************************************************************
 Template: Driver Standings ( F1 Wiki )
 Use case: Moving styling from inline to css file.
-Author( s ): salle
+Author(s): salle
 *******************************************************************************/
 
 table.f1-driver-standings-table > tbody > tr > td:nth-child( n+3 ) {
@@ -2481,7 +2481,7 @@ table.f1-driver-standings-table > tbody > tr:nth-child( n+3 ) > td:nth-child( 3 
 /*******************************************************************************
 Template: Next Circuit  ( F1 Wiki )
 Use case: Main page styling with custom break-point.
-Author( s ): salle
+Author(s): salle
 *******************************************************************************/
 
 .next-circuit-image {
@@ -2557,7 +2557,7 @@ Author( s ): salle
 /*******************************************************************************
 Template: StreamPage ( SC2 )
 Use case: Stream Pages on sc2
-Author( s ): hjpalpha
+Author(s): hjpalpha
 *******************************************************************************/
 .sc2-stream-page-oppponent-info {
 	width: 20%;
@@ -2654,8 +2654,8 @@ Author( s ): hjpalpha
 }
 
 /*******************************************************************************
-Template( s ): TyreGraph
-Author( s ): salle
+Template(s): TyreGraph
+Author(s): salle
 *******************************************************************************/
 
 .tyre-graph-key-label {
@@ -2693,7 +2693,7 @@ Author( s ): salle
 }
 
 .tyre-graph-bar {
-	width: calc( ~'100% - 80px' );
+	width: calc( ~"100% - 80px" );
 	border-left: 1px solid var( --clr-secondary-39, #646464 );
 	height: 12px;
 	display: inline-flex;
@@ -2736,7 +2736,7 @@ Author( s ): salle
 
 /*******************************************************************************
 "Match Page" font-awesome stacked icon correction
-Author( s ): salle
+Author(s): salle
 *******************************************************************************/
 
 span.fa-stack i.fas.fa-info.fa-stack-1x:last-child {
@@ -2745,7 +2745,7 @@ span.fa-stack i.fas.fa-info.fa-stack-1x:last-child {
 
 /*******************************************************************************
 .scribunto-error when not added via <style> tags
-Author( s ): Scribunto developer( s )
+Author(s): Scribunto developer( s )
 *******************************************************************************/
 .scribunto-error {
 	cursor: pointer;
@@ -2757,7 +2757,7 @@ Author( s ): Scribunto developer( s )
 }
 
 /*******************************************************************************
-Author( s ): Hjpalpha, based on a template copied from Wikipedia
+Author(s): Hjpalpha, based on a template copied from Wikipedia
 Template: Sfrac
 *******************************************************************************/
 .sfrac {
@@ -2789,7 +2789,7 @@ Template: Sfrac
 }
 
 /*******************************************************************************
-Author( s ): salle
+Author(s): salle
 Template: DeadlockSpiritScalingBox
 *******************************************************************************/
 
@@ -2813,8 +2813,8 @@ div.dl-spirit-x-box > div.dl-spirit-x-box-image {
 }
 
 /*******************************************************************************
-Author( s ): SlothyMan
-Template( s ): HeroIconTable
+Author(s): SlothyMan
+Template(s): HeroIconTable
 	ItemIconTable
 *******************************************************************************/
 
@@ -2828,8 +2828,8 @@ Template( s ): HeroIconTable
 }
 
 /*******************************************************************************
-Author( s ): SlothyMan, Elisa
-Template( s ): ChampionIconTable
+Author(s): SlothyMan, Elisa
+Template(s): ChampionIconTable
 	SummonIconTable
 *******************************************************************************/
 
@@ -2864,7 +2864,7 @@ Template( s ): ChampionIconTable
 }
 
 /*******************************************************************************
-Author( s ): Rathoz
+Author(s): Rathoz
 Attritute highlight, so far only used in Infoboxes, but can be used anywhere
 *******************************************************************************/
 .primaryAttribute img {

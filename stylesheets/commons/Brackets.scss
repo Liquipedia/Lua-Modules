@@ -539,7 +539,7 @@
 .main-container:has( ~ .brkts-match-info-popup ) {
 	@media ( max-width: 768px ) {
 		&::before {
-			content: '';
+			content: "";
 			position: fixed;
 			inset: 0;
 			background-color: var( --clr-sapphire-10 );
@@ -871,7 +871,7 @@ div.brkts-popup-body-element-thumbs {
 		border: 0;
 		border-radius: 0;
 		letter-spacing: 0.1em;
-		font-family: 'Source Code Pro', monospace;
+		font-family: "Source Code Pro", monospace;
 	}
 
 	.brkts-popup-mapveto-pick {
@@ -912,7 +912,7 @@ div.brkts-popup-body-element-thumbs {
 	width: 24px;
 
 	& img {
-		[ data-darkreader-scheme='dark' ] &,
+		[ data-darkreader-scheme="dark" ] &,
 		.theme--dark & {
 			filter: invert( 1 );
 		}
@@ -1090,7 +1090,7 @@ div.brkts-opponent-hover {
 }
 
 div.brkts-opponent-hover::after {
-	content: '';
+	content: "";
 	height: 100%;
 	left: 0;
 	pointer-events: none;

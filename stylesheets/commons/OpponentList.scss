@@ -112,7 +112,7 @@ Author: hjpalpha
 
 .brkts-opponent-hover > .participantTable-entry::after {
 	clip-path: inset( -4px 0 -4px -1px );
-	content: '';
+	content: "";
 	height: 100%;
 	left: 0;
 	pointer-events: none;
@@ -164,8 +164,8 @@ Author: hjpalpha
 }
 
 /*******************************************************************************
-Template( s ): Participants Tables
-Author( s ): FO-nTTaX
+Template(s): Participants Tables
+Author(s): FO-nTTaX
 *******************************************************************************/
 .participants-table-scroller {
 	overflow: auto;
@@ -177,7 +177,7 @@ Author( s ): FO-nTTaX
 
 .participants-table-buttons::after {
 	clear: both;
-	content: ' ';
+	content: " ";
 	display: block;
 }
 
@@ -237,8 +237,8 @@ Author( s ): FO-nTTaX
 }
 
 /*******************************************************************************
-Template( s ): Module:ParticipantTable
-Author( s ): Rapture
+Template(s): Module:ParticipantTable
+Author(s): Rapture
 *******************************************************************************/
 .participanttable .team-template-image img {
 	height: 20px;

@@ -413,7 +413,7 @@
 
 	&::before {
 		@media ( min-width: 768px ) {
-			content: '';
+			content: "";
 			background-color: #000000;
 			opacity: 0.5;
 			position: absolute;

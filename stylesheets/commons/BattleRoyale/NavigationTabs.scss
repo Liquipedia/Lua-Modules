@@ -1,10 +1,10 @@
 /*******************************************************************************
-Template( s ): Battle Royale - Navigation tabs
-Author( s ): Elysienna
+Template(s): Battle Royale - Navigation tabs
+Author(s): Elysienna
 *******************************************************************************/
 
 .navigation-tabs {
-	$list-item: unquote( '.navigation-tabs__list-item' );
+	$list-item: unquote( ".navigation-tabs__list-item" );
 	display: flex;
 	border-radius: 0.25rem;
 	margin-bottom: 1.5rem;

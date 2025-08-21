@@ -26,7 +26,7 @@
 
 			&::after {
 				display: block;
-				content: '';
+				content: "";
 				opacity: 0.12;
 				position: absolute;
 				inset: 0;
@@ -46,7 +46,7 @@
 
 			&::before {
 				position: absolute;
-				content: '';
+				content: "";
 				height: 0.875rem;
 				width: 0.875rem;
 				left: 0.125rem;
@@ -82,7 +82,7 @@
 		padding: 0.25rem;
 
 		&::after {
-			content: '';
+			content: "";
 			opacity: 0.12;
 			position: absolute;
 			inset: 0;

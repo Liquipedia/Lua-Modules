@@ -1,7 +1,7 @@
 /*******************************************************************************
 Race/Faction specific css/less
 wikis: starcraft, starcraft2, stormgate, warcraft
-Author( s ): hjpalpha
+Author(s): hjpalpha
 *******************************************************************************/
 .warcraft-nightelf,
 .Protoss,
@@ -66,21 +66,21 @@ Author( s ): hjpalpha
 	background-color: var( --table-striped-background-color, var( --clr-surface-2, #f5f5f5 ) ) !important;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
-	img[ title='Human' ],
-	img[ title='Infernal' ],
-	img[ title='Vanguard' ],
-	img[ title='Orc' ],
-	img[ title='Undead' ],
-	img[ title='Celestial' ],
-	img[ title='Night Elf' ],
-	img[ title='Nightelf' ],
-	img[ title='Multiple' ],
-	img[ title='Protoss' ],
-	img[ title='Zerg' ],
-	img[ title='Terran' ],
-	img[ title='Random' ] {
+	img[ title="Human" ],
+	img[ title="Infernal" ],
+	img[ title="Vanguard" ],
+	img[ title="Orc" ],
+	img[ title="Undead" ],
+	img[ title="Celestial" ],
+	img[ title="Night Elf" ],
+	img[ title="Nightelf" ],
+	img[ title="Multiple" ],
+	img[ title="Protoss" ],
+	img[ title="Zerg" ],
+	img[ title="Terran" ],
+	img[ title="Random" ] {
 		filter: grayscale( 100% ) brightness( 40 );
 	}
 

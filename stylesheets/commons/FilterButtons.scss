@@ -1,6 +1,6 @@
 /*******************************************************************************
-Template( s ): Filter buttons
-Author( s ): Elysienna, Nadox
+Template(s): Filter buttons
+Author(s): Elysienna, Nadox
 *******************************************************************************/
 .filter-category--hidden,
 .filter-category--hidden-group > :not( [ data-filter-hideable-group-fallback ] ),
@@ -111,7 +111,7 @@ Author( s ): Elysienna, Nadox
 		}
 
 		&:not( .is--active )::after {
-			content: '';
+			content: "";
 			opacity: 0.12;
 			position: absolute;
 			inset: 0;

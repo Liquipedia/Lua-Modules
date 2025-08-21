@@ -29,7 +29,8 @@
 		"no-duplicate-selectors": null,
 		"function-url-no-scheme-relative": null,
 		"declaration-no-important": null,
-		"function-no-unknown": null
+		"function-no-unknown": null,
+		"@stylistic/string-quotes": "double"
 	}
 }
 

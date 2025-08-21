@@ -1,6 +1,6 @@
 /*******************************************************************************
-Template( s ): Match Page
-Author( s ): Rathoz
+Template(s): Match Page
+Author(s): Rathoz
 *******************************************************************************/
 span.slash {
 	margin: 0 0.125rem;
@@ -84,7 +84,7 @@ span.slash {
 		justify-content: center;
 	}
 
-	[ data-darkreader-scheme='dark' ] &,
+	[ data-darkreader-scheme="dark" ] &,
 	.theme--dark & {
 		.team-template-image-icon.darkmode,
 		.team-template-image-icon.team-template-darkmode {
@@ -151,7 +151,7 @@ span.slash {
 			background-color: var( --clr-semantic-positive-40, #27a527 );
 
 			&::before {
-				content: 'W';
+				content: "W";
 			}
 		}
 
@@ -159,7 +159,7 @@ span.slash {
 			background-color: var( --clr-semantic-negative-40, #b81414 );
 
 			&::before {
-				content: 'L';
+				content: "L";
 			}
 		}
 
@@ -167,7 +167,7 @@ span.slash {
 			background-color: var( --clr-secondary-25, #404040 );
 
 			&::before {
-				content: '-';
+				content: "-";
 			}
 		}
 	}
@@ -613,7 +613,7 @@ span.slash {
 				height: 100%;
 				width: 100%;
 
-				&[ title='Empty' ] {
+				&[ title="Empty" ] {
 					opacity: 0;
 				}
 			}

@@ -1,6 +1,6 @@
 /*******************************************************************************
-Template( s ): All Brackets
-Author( s ): ???
+Template(s): All Brackets
+Author(s): ???
 *******************************************************************************/
 .bracket {
 	font-size: 11px;
@@ -439,8 +439,8 @@ td.bracket-game .icon {
 }
 
 /*******************************************************************************
-Template( s ): All Bracket popups
-Author( s ): FO-nTTaX, salle
+Template(s): All Bracket popups
+Author(s): FO-nTTaX, salle
 *******************************************************************************/
 .bracket-popup-wrapper {
 	box-sizing: border-box;
@@ -547,7 +547,7 @@ Author( s ): FO-nTTaX, salle
 .bracket-popup-wrapper .bracket-popup .bracket-popup-header-vs::after,
 .bracket-popup-wrapper .bracket-popup .bracket-popup-header::after {
 	clear: both;
-	content: ' ';
+	content: " ";
 	width: 100%;
 	display: block;
 }
@@ -601,7 +601,7 @@ Author( s ): FO-nTTaX, salle
 
 .bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-match::after {
 	clear: both;
-	content: ' ';
+	content: " ";
 	width: 100%;
 	display: block;
 }
@@ -621,7 +621,7 @@ Author( s ): FO-nTTaX, salle
 
 .bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-time::after {
 	clear: both;
-	content: ' ';
+	content: " ";
 	width: 100%;
 	display: block;
 }
@@ -633,7 +633,7 @@ Author( s ): FO-nTTaX, salle
 
 .bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-bans::after {
 	clear: both;
-	content: ' ';
+	content: " ";
 	width: 100%;
 	display: block;
 }
@@ -648,14 +648,14 @@ Author( s ): FO-nTTaX, salle
 
 .bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-comment::after {
 	clear: both;
-	content: ' ';
+	content: " ";
 	width: 100%;
 	display: block;
 }
 
 .bracket-popup-wrapper .bracket-popup .bracket-popup-body::after {
 	clear: both;
-	content: ' ';
+	content: " ";
 	width: 100%;
 	display: block;
 }
@@ -669,7 +669,7 @@ Author( s ): FO-nTTaX, salle
 
 .bracket-popup-wrapper .bracket-popup .bracket-popup-footer::after {
 	clear: both;
-	content: ' ';
+	content: " ";
 	width: 100%;
 	display: block;
 }
@@ -1202,8 +1202,8 @@ Author( s ): FO-nTTaX, salle
 }
 
 /*******************************************************************************
-Template( s ): All Brackets, mobile support
-Author( s ): FO-nTTaX
+Template(s): All Brackets, mobile support
+Author(s): FO-nTTaX
 *******************************************************************************/
 @media ( max-width: 767px ) {
 	/*
@@ -1566,14 +1566,14 @@ Author( s ): FO-nTTaX
 		width: calc( 11 * 68px + 10 * 10px + 22px + 10px ) !important;
 	}
 
-	.bracket-doubles .bracket-column-matches-s2 .bracket-score[ style*='right' ][ style*='39px' ] {
+	.bracket-doubles .bracket-column-matches-s2 .bracket-score[ style*="right" ][ style*="39px" ] {
 		right: 22px !important;
 	}
 }
 
 /*******************************************************************************
-Template( s ): All Brackets, bracket connecting lines
-Author( s ): spazer
+Template(s): All Brackets, bracket connecting lines
+Author(s): spazer
 *******************************************************************************/
 .bracket-line-topleft {
 	border-top-left-radius: 3px;
@@ -1631,8 +1631,8 @@ Author( s ): spazer
 }
 
 /*******************************************************************************
-Template( s ): Group tables and colors
-Author( s ): spazer
+Template(s): Group tables and colors
+Author(s): spazer
 *******************************************************************************/
 
 .bg-u,
@@ -1699,8 +1699,8 @@ Author( s ): spazer
 }
 
 /*******************************************************************************
-Template( s ): Operator bans for Rainbow Six
-Author( s ): monkzize
+Template(s): Operator bans for Rainbow Six
+Author(s): monkzize
 *******************************************************************************/
 
 .wiki-rainbowsix .operator-bans a img {
@@ -1715,8 +1715,8 @@ Author( s ): monkzize
 }
 
 /*******************************************************************************
-Template( s ): Artifact hero glows for match pop ups
-Author( s ): Ricci
+Template(s): Artifact hero glows for match pop ups
+Author(s): Ricci
 *******************************************************************************/
 
 .wiki-artifact .hero-glow-red img {
@@ -1736,8 +1736,8 @@ Author( s ): Ricci
 }
 
 /*******************************************************************************
-Template( s ): Counter-Strike style match popup properties
-Author( s ): spazer
+Template(s): Counter-Strike style match popup properties
+Author(s): spazer
 *******************************************************************************/
 
 .wiki-battalion .bracket-popup-body-match-container,

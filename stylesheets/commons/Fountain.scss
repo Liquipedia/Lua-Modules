@@ -263,7 +263,7 @@ a.cf {
 	outline-offset: -0.25rem;
 
 	&::before {
-		content: '';
+		content: "";
 		position: absolute;
 		z-index: -2;
 		left: -50%;
@@ -277,7 +277,7 @@ a.cf {
 	}
 
 	&::after {
-		content: '';
+		content: "";
 		position: absolute;
 		z-index: -1;
 		left: 0.375rem;
@@ -339,7 +339,7 @@ a.cf {
 
 .target_downtime1::before,
 .item_cdshare::before {
-	content: '';
+	content: "";
 	position: absolute;
 	inset: 0; /* Replaces top: 0; left: 0; right: 0; bottom: 0; */
 	background: rgba( 117, 117, 117, 0.55 );
@@ -867,7 +867,7 @@ div.gameplay_nav ul li ul li {
 
 		&::after {
 			display: block;
-			content: '';
+			content: "";
 			clear: both;
 		}
 
@@ -1468,64 +1468,64 @@ div.skilllist-col5 ul li {
 /* Import fonts */
 // Is it needed to import all these fonts? It's extra load time for the user
 @font-face {
-	font-family: 'Radiance';
-	src: url( https://steamcdn-a.akamaihd.net/apps/underlords/fonts/Radiance-Regular.woff ) format( 'woff' );
+	font-family: "Radiance";
+	src: url( https://steamcdn-a.akamaihd.net/apps/underlords/fonts/Radiance-Regular.woff ) format( "woff" );
 	font-weight: normal;
 	font-style: normal;
 	font-display: swap;
 }
 
 @font-face {
-	font-family: 'Radiance';
-	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance-bold.woff ) format( 'woff' );
+	font-family: "Radiance";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance-bold.woff ) format( "woff" );
 	font-weight: bold;
 	font-style: normal;
 	font-display: swap;
 }
 
 @font-face {
-	font-family: 'Radiance';
-	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance-black.woff ) format( 'woff' );
+	font-family: "Radiance";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance-black.woff ) format( "woff" );
 	font-weight: 900;
 	font-style: normal;
 	font-display: swap;
 }
 
 @font-face {
-	font-family: 'Radiance';
-	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance-semibold.woff ) format( 'woff' );
+	font-family: "Radiance";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance-semibold.woff ) format( "woff" );
 	font-weight: 500;
 	font-style: normal;
 	font-display: swap;
 }
 
 @font-face {
-	font-family: 'Reaver';
-	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular.woff ) format( 'woff' ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular.ttf ) format( 'truetype' );
+	font-family: "Reaver";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular.woff ) format( "woff" ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular.ttf ) format( "truetype" );
 	font-weight: normal;
 	font-style: normal;
 	font-display: swap;
 }
 
 @font-face {
-	font-family: 'Reaver';
-	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-SemiBold.woff ) format( 'woff' ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular-SemiBold.ttf ) format( 'truetype' );
+	font-family: "Reaver";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-SemiBold.woff ) format( "woff" ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular-SemiBold.ttf ) format( "truetype" );
 	font-weight: 600;
 	font-style: normal;
 	font-display: swap;
 }
 
 @font-face {
-	font-family: 'Reaver';
-	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Bold.woff ) format( 'woff' ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular-Bold.ttf ) format( 'truetype' );
+	font-family: "Reaver";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Bold.woff ) format( "woff" ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular-Bold.ttf ) format( "truetype" );
 	font-weight: bold;
 	font-style: normal;
 	font-display: swap;
 }
 
 @font-face {
-	font-family: 'Reaver';
-	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Black.woff ) format( 'woff' ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular-Black.ttf ) format( 'truetype' );
+	font-family: "Reaver";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Black.woff ) format( "woff" ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular-Black.ttf ) format( "truetype" );
 	font-weight: 800;
 	font-style: normal;
 	font-display: swap;
@@ -1569,7 +1569,7 @@ div.skilllist-col5 ul li {
 
 	/* Generate interpuncts */
 	&::after {
-		content: ' ·';
+		content: " ·";
 		font-weight: bold;
 	}
 
@@ -1584,11 +1584,11 @@ div.skilllist-col5 ul li {
 
 	/* Add parens around nested lists */
 	&::before {
-		content: '( ';
+		content: "( ";
 	}
 
 	&::after {
-		content: ' )';
+		content: " )";
 	}
 }
 
@@ -1676,7 +1676,7 @@ img.pixelart {
 	width: 1.5rem; // 24px
 	height: 1.5rem; // 24px
 	// TODO: Steam icon
-	content: '';
+	content: "";
 	pointer-events: none;
 }
 
@@ -1752,9 +1752,9 @@ html.theme--dark .patch-layout {
 // AudioButton-related styles ( <ab> )
 a.ext-audiobutton {
 	/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
-	font-family: 'Font Awesome 5 Pro';
+	font-family: "Font Awesome 5 Pro";
 
-	&[ data-state='play' ]::before {
+	&[ data-state="play" ]::before {
 		.theme--light & {
 			color: #131313;
 		}
@@ -1762,16 +1762,16 @@ a.ext-audiobutton {
 		.theme--dark & {
 			color: #e2e2e6;
 		}
-		content: '\f144' !important;
+		content: "\f144" !important;
 	}
 
-	&[ data-state='pause' ]::before {
-		content: '\f28b' !important;
+	&[ data-state="pause" ]::before {
+		content: "\f28b" !important;
 	}
 
-	&[ data-state='error' ]::before {
+	&[ data-state="error" ]::before {
 		color: #91663d;
-		content: '\f059' !important;
+		content: "\f059" !important;
 	}
 
 	&::before {

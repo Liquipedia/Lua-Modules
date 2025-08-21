@@ -129,7 +129,7 @@
 		align-items: center;
 		justify-content: center;
 
-		&[ aria-expanded='true' ] > i {
+		&[ aria-expanded="true" ] > i {
 			transform: rotate( 180deg );
 		}
 
@@ -155,8 +155,8 @@
 
 	// Hide table cells region and streak on mobile due to limited horizontal space
 	@media ( max-width: 768px ) {
-		[ data-ranking-table-cell='region' ],
-		[ data-ranking-table-cell='streak' ] {
+		[ data-ranking-table-cell="region" ],
+		[ data-ranking-table-cell="streak" ] {
 			display: none;
 		}
 	}
@@ -164,8 +164,8 @@
 	&--small {
 		width: 100%;
 
-		[ data-ranking-table-cell='region' ],
-		[ data-ranking-table-cell='streak' ] {
+		[ data-ranking-table-cell="region" ],
+		[ data-ranking-table-cell="streak" ] {
 			display: none;
 		}
 	}

@@ -1,6 +1,6 @@
 /*******************************************************************************
-Template( s ): Team Templates
-Author( s ): FO-nTTaX
+Template(s): Team Templates
+Author(s): FO-nTTaX
 *******************************************************************************/
 
 .team-template-image {
@@ -123,8 +123,8 @@ span.team-template-team-bracket {
 }
 
 /*******************************************************************************
-Template( s ): Dark Reader support
-Author( s ): iMarbot, Darkrai
+Template(s): Dark Reader support
+Author(s): iMarbot, Darkrai
 *******************************************************************************/
 
 .team-template-image-icon.darkmode,
@@ -133,7 +133,7 @@ Author( s ): iMarbot, Darkrai
 	display: none;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.team-template-image-icon.lightmode,
 	.team-template-image-icon.team-template-lightmode,
@@ -149,8 +149,8 @@ Author( s ): iMarbot, Darkrai
 }
 
 /*******************************************************************************
-Template( s ): Group Table Hybrid
-Author( s ): iMarbot
+Template(s): Group Table Hybrid
+Author(s): iMarbot
 *******************************************************************************/
 @media ( max-width: 399px ) {
 	.grouptableslot .team-template-text.mobile-hide {

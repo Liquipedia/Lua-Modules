@@ -1,6 +1,6 @@
 /*******************************************************************************
-Template( s ): Grid
-Author( s ): Twitter, Inc., The Bootstrap Authors
+Template(s): Grid
+Author(s): Twitter, Inc., The Bootstrap Authors
 License: MIT
 *******************************************************************************/
 @supports ( display: contents ) {
@@ -208,7 +208,7 @@ License: MIT
 }
 
 .lp-no-gutters > .lp-col,
-.lp-no-gutters > [ class*='lp-col-' ] {
+.lp-no-gutters > [ class*="lp-col-" ] {
 	padding-right: 0;
 	padding-left: 0;
 }

@@ -1,6 +1,6 @@
 /*******************************************************************************
-Template( s ): Div Tables
-Author( s ): salle
+Template(s): Div Tables
+Author(s): salle
 *******************************************************************************/
 .divTable {
 	display: table;
@@ -49,8 +49,8 @@ Author( s ): salle
 }
 
 /*******************************************************************************
-Template( s ): Grid Tables
-Author( s ): iMarbot
+Template(s): Grid Tables
+Author(s): iMarbot
 *******************************************************************************/
 .gridTable {
 	display: grid;
@@ -282,7 +282,7 @@ Author( s ): iMarbot
 		justify-content: center;
 
 		&::before {
-			content: '#';
+			content: "#";
 		}
 	}
 

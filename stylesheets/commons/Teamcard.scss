@@ -1,6 +1,6 @@
 /*******************************************************************************
-Template( s ): Team Cards
-Author( s ): ???
+Template(s): Team Cards
+Author(s): ???
 *******************************************************************************/
 .teamcard {
 	position: relative;
@@ -94,7 +94,7 @@ Author( s ): ???
 		width: 100%;
 	}
 
-	.teamcard:not( .teamcard-nomobile ) table.logo img:not( [ src$='.svg' ] ) {
+	.teamcard:not( .teamcard-nomobile ) table.logo img:not( [ src$=".svg" ] ) {
 		width: auto;
 		height: auto;
 		max-width: 90%;
@@ -210,8 +210,8 @@ Author( s ): ???
 }
 
 /*******************************************************************************
-Template( s ): Responsive TeamCard columns
-Author( s ): iMarbot
+Template(s): Responsive TeamCard columns
+Author(s): iMarbot
 *******************************************************************************/
 .teamcard-columns,
 .teamcard-columns-3,
@@ -265,18 +265,18 @@ Author( s ): iMarbot
 }
 
 /*******************************************************************************
-Template( s ): TeamCard faded TBD logo
-Author( s ): iMarbot
+Template(s): TeamCard faded TBD logo
+Author(s): iMarbot
 *******************************************************************************/
 .teamlogo-tbd img {
 	opacity: 0.5;
 }
 
 /*******************************************************************************
-Template( s ): TeamCard Dark Reader support
-Author( s ): iMarbot
+Template(s): TeamCard Dark Reader support
+Author(s): iMarbot
 *******************************************************************************/
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.teamcard span.logo-lightmode {
 		display: none !important;
@@ -466,8 +466,8 @@ Author: warnull
 }
 
 /*******************************************************************************
-Template( s ): TeamCard inotes class
-Author( s ): iMarbot
+Template(s): TeamCard inotes class
+Author(s): iMarbot
 *******************************************************************************/
 .inotes-box {
 	box-shadow: 3px 3px 5px 0 rgba( 0, 0, 0, 0.5 );
@@ -492,8 +492,8 @@ Author( s ): iMarbot
 }
 
 /*******************************************************************************
-Template( s ): TeamCard inotes class
-Author( s ): iMarbot via ???
+Template(s): TeamCard inotes class
+Author(s): iMarbot via ???
 *******************************************************************************/
 .teamcard-bg-dnp {
 	background-color: rgba( 229, 229, 229, 0.5 );

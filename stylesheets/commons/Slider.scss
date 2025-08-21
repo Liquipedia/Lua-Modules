@@ -1,9 +1,9 @@
 /*******************************************************************************
-Template( s ): Slider
-Author( s ): Rathoz
+Template(s): Slider
+Author(s): Rathoz
 *******************************************************************************/
 
-input[ type='range' ] {
+input[ type="range" ] {
 	.theme--light & {
 		--track-color: var( --clr-on-surface-light-primary-8, rgba( 0, 0, 0, 0.08 ) );
 	}

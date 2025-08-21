@@ -1,6 +1,6 @@
 /*******************************************************************************
-Template( s ): Techtrees
-Author( s ): FO-nTTaX, based on http://thecodeplayer.com/walkthrough/css3-family-tree
+Template(s): Techtrees
+Author(s): FO-nTTaX, based on http://thecodeplayer.com/walkthrough/css3-family-tree
 *******************************************************************************/
 .techtree ul {
 	line-height: 0 !important;
@@ -23,7 +23,7 @@ Author( s ): FO-nTTaX, based on http://thecodeplayer.com/walkthrough/css3-family
 
 .techtree li::before,
 .techtree li::after {
-	content: '';
+	content: "";
 	position: absolute;
 	top: 0;
 	right: 50%;
@@ -62,7 +62,7 @@ Author( s ): FO-nTTaX, based on http://thecodeplayer.com/walkthrough/css3-family
 }
 
 .techtree ul ul::before {
-	content: '';
+	content: "";
 	position: absolute;
 	top: 0;
 	left: 50%;
@@ -103,8 +103,8 @@ Author( s ): FO-nTTaX, based on http://thecodeplayer.com/walkthrough/css3-family
 }
 
 /*******************************************************************************
-Template( s ): Techtree on stormgate wiki
-Author( s ): sentihs, hjpalpha
+Template(s): Techtree on stormgate wiki
+Author(s): sentihs, hjpalpha
 *******************************************************************************/
 .sg-techtree,
 .sg-techtree :not( .sg-techtree-building ) {

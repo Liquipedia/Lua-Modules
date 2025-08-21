@@ -1,6 +1,6 @@
 /*******************************************************************************
-Template( s ): All Crosstables
-Author( s ): FO-nTTaX
+Template(s): All Crosstables
+Author(s): FO-nTTaX
 *******************************************************************************/
 $crosstable-max: 40;
 $crosstable-size: 40;
@@ -8,8 +8,8 @@ $crosstable-yellow: var( --clr-pear-background-color, #f9f9c7 );
 $crosstable-green: var( --table-green-background-color, #ddf4dd );
 $crosstable-red: var( --table-red-background-color, #fbdfdf );
 
-.crosstable[ class*='crosstable-row-' ] td,
-.crosstable[ class*='crosstable-col-' ] td {
+.crosstable[ class*="crosstable-row-" ] td,
+.crosstable[ class*="crosstable-col-" ] td {
 	opacity: 0.5;
 	-moz-box-shadow: inset 0 0 10px -7px rgba( 0, 0, 0, 1 ), inset 0 0 10px -7px rgba( 0, 0, 0, 1 );
 	-webkit-box-shadow: inset 0 0 10px -7px rgba( 0, 0, 0, 1 ), inset 0 0 10px -7px rgba( 0, 0, 0, 1 );
