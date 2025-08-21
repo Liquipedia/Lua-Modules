@@ -255,7 +255,7 @@ function MatchPage:_renderDraft(game)
 	return {
 		HtmlWidgets.H3{children = 'Draft'},
 		Div{
-			classes = {'match-bm-lol-game-veto', 'collapsed', 'general-collapsible'},
+			classes = {'match-bm-lol-game-veto'},
 			children = {
 				Div{
 					classes = {'match-bm-lol-game-veto-overview'},
