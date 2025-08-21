@@ -33,7 +33,7 @@ function CustomMatchTicker.tournament(frame)
 	args.infoboxWrapperClass = args.infoboxWrapperClass or true
 
 	return MatchTicker(args):query():create(
-		MatchTicker.DisplayComponents.Header('Upcoming Matches')
+		MatchTicker.createHeader('Upcoming Matches')
 	)
 end
 
@@ -50,7 +50,6 @@ end
 ---@return Html?
 function CustomMatchTicker.newMainPage(frame)
 	local args = Arguments.getArgs(frame)
-	args.newStyle = true
 
 	args.tiers = args['filterbuttons-liquipediatier']
 	if args.tiers == 'curated' then
@@ -107,20 +106,20 @@ function CustomMatchTicker.participant(args, matches)
 		args.recent = false
 		args.limit = args.limit or 5
 		return MatchTicker(args):query():create(
-			MatchTicker.DisplayComponents.Header('Upcoming Matches')
+			MatchTicker.createHeader('Upcoming Matches')
 		)
 	end
 
 	return mw.html.create()
 		:node(MatchTicker(Table.merge(args, {
 			limit = args.ongoingLimit or 5, ongoing = true
-		})):query(matches.ongoing):create(MatchTicker.DisplayComponents.Header('Ongoing Matches')))
+		})):query(matches.ongoing):create(MatchTicker.createHeader('Ongoing Matches')))
 		:node(MatchTicker(Table.merge(args, {
 			limit = args.upcomingLimit or 3, upcoming = true
-		})):query(matches.upcoming):create(MatchTicker.DisplayComponents.Header('Upcoming Matches')))
+		})):query(matches.upcoming):create(MatchTicker.createHeader('Upcoming Matches')))
 		:node(MatchTicker(Table.merge(args, {
 			limit = args.recentLimit or 5, recent = true
-		})):query(matches.recent):create(MatchTicker.DisplayComponents.Header('Recent Matches')))
+		})):query(matches.recent):create(MatchTicker.createHeader('Recent Matches')))
 end
 
 return CustomMatchTicker

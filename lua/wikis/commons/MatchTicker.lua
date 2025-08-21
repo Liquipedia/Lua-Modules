@@ -22,6 +22,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local MatchUtil = Lua.import('Module:Match/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Tournament = Lua.import('Module:Tournament')
+local MatchCard = Lua.import('Module:Widget/Match/Card')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -63,17 +64,6 @@ local DEFAULT_ORDER = 'date asc, liquipediatier asc, tournament asc'
 local DEFAULT_RECENT_ORDER = 'date desc, liquipediatier asc, tournament asc'
 local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
 
---- Extract externally if it grows
----@param matchTickerConfig MatchTickerConfig
----@return unknown # Todo: Add interface for MatchTickerDisplay
-local MatchTickerDisplayFactory = function (matchTickerConfig)
-	if matchTickerConfig.newStyle then
-		return Lua.import('Module:MatchTicker/DisplayComponents/New')
-	else
-		return Lua.import('Module:MatchTicker/DisplayComponents')
-	end
-end
-
 ---@class MatchTickerConfig
 ---@field tournaments string[]
 ---@field limit integer
@@ -97,7 +87,6 @@ end
 ---@field tierTypes string[]?
 ---@field regions string[]?
 ---@field games string[]?
----@field newStyle boolean?
 ---@field featuredTournamentsOnly boolean?
 ---@field displayGameIcons boolean?
 
@@ -107,6 +96,16 @@ end
 ---@field config MatchTickerConfig
 ---@field matches table[]?
 local MatchTicker = Class.new(function(self, args) self:init(args) end)
+
+---@param text string?
+---@return Html
+function MatchTicker.createHeader(text)
+	return mw.html.create('div'):node(
+		mw.html.create('div')
+			:addClass('infobox-header')
+			:wikitext(text)
+	)
+end
 
 ---@param args table?
 ---@return table
@@ -119,7 +118,7 @@ function MatchTicker:init(args)
 	local config = {
 		tournaments = Array.extractValues(
 			Table.filterByKey(args, function(key)
-				return string.find(key, '^tournament%d-$') ~= nil or Logic.isNumeric(key)
+				return string.find(key, '^turnament%d-$') ~= nil or Logic.isNumeric(key)
 		end)),
 		queryByParent = Logic.readBool(args.queryByParent),
 		limit = tonumber(args.limit) or DEFAULT_LIMIT,
@@ -147,7 +146,6 @@ function MatchTicker:init(args)
 		games = args.games and Array.map(Array.parseCommaSeparatedString(args.games), function (game)
 					return Game.toIdentifier{game=game}
 				end) or nil,
-		newStyle = Logic.readBool(args.newStyle),
 		featuredTournamentsOnly = Logic.readBool(args.featuredTournamentsOnly),
 		displayGameIcons = Logic.readBool(args.displayGameIcons)
 	}
@@ -189,8 +187,6 @@ function MatchTicker:init(args)
 		end
 	end
 	config.wrapperClasses = wrapperClasses
-
-	MatchTicker.DisplayComponents = MatchTickerDisplayFactory(config)
 
 	self.config = config
 
@@ -532,7 +528,7 @@ MatchTicker.fetchTournament = FnUtil.memoize(function(tournamentPage)
 	return Tournament.getTournament(tournamentPage)
 end)
 
----@param header MatchTickerHeader?
+---@param header Html?
 ---@return Html
 function MatchTicker:create(header)
 	if not self.matches and not self.config.showInfoForEmptyResults then
@@ -545,16 +541,25 @@ function MatchTicker:create(header)
 		wrapper:addClass(class)
 	end
 
-	if header then
-		wrapper:node(header:create())
-	end
+	wrapper:node(header)
 
 	if not self.matches then
 		return wrapper:css('text-align', 'center'):wikitext('No Results found.')
 	end
 
 	for _, match in ipairs(self.matches or {}) do
-		wrapper:node(MatchTicker.DisplayComponents.Match{config = self.config, match = match}:create())
+		wrapper:node(MatchCard{
+			match = MatchGroupUtil.matchFromRecord(match),
+			hideTournament = self.config.hideTournament,
+			displayGameIcons = self.config.displayGameIcons,
+			onlyHighlightOnValue = self.config.onlyHighlightOnValue,
+			-- TODO: This is bad, and needs to be refactored, but it's not relastic right now, so works for now fine for now
+			gameData = {
+				asGame = match.asGame,
+				gameIds = match.asGameIndexes,
+				map = match.map,
+			}
+		})
 	end
 
 	return wrapper
