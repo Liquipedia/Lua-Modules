@@ -37,17 +37,6 @@ function MatchTournamentBar:render()
 
 	local tournament = Tournament.partialTournamentFromMatch(match)
 	local tournamentLink = mw.title.makeTitle(0, match.pageName, match.section).fullText
-	local mapLink
-
-	if gameData then
-		local mapPageName = mw.uri.encode(gameData.map, 'WIKI')
-		local mapTitle = mw.title.new(mapPageName, 0)
-		if mapTitle then
-			mapLink = mapTitle:fullUrl()
-		else
-			mapLink = nil
-		end
-	end
 
 	mw.logObject(gameData)
 	mw.logObject(tournament)
@@ -92,7 +81,7 @@ function MatchTournamentBar:render()
 						gameData.gameIds[1],
 						' on ',
 						Link{
-							link = mapLink,
+							link = gameData.map,
 							children = gameData.map
 						},
 					} or {
