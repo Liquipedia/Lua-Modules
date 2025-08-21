@@ -455,10 +455,7 @@ function BaseResultsTable:opponentDisplay(data, options)
 	options = options or {}
 
 	if not data.opponenttype then
-		return OpponentDisplay.BlockOpponent{
-			opponent = Opponent.tbd(),
-			flip = options.flip,
-		}
+		return mw.html.create():wikitext('-')
 	elseif data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
 		return OpponentDisplay.BlockOpponent{
 			opponent = Opponent.fromLpdbStruct(data) --[[@as standardOpponent]],
