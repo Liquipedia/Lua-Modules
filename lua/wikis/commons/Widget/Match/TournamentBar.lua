@@ -43,7 +43,7 @@ function MatchTournamentBar:render()
 		local mapPageName = mw.uri.encode(gameData.map, 'WIKI')
 		local mapTitle = mw.title.new(mapPageName, 0)
 		if mapTitle then
-			mapLink = mapTitle.fullUrl
+			mapLink = mapTitle:fullUrl()
 		else
 			mapLink = nil
 		end
@@ -86,16 +86,19 @@ function MatchTournamentBar:render()
 					}
 				},
 				#match.opponents > 2 and gameData and HtmlWidgets.Span{
-					children = {
-						tournament.fullName,
-						' - Game #',
+					children = (gameData.map and {
+						-- TODO: Tournament status here
+						'Game #',
 						gameData.gameIds[1],
 						' on ',
 						Link{
 							link = mapLink,
 							children = gameData.map
 						},
-					}
+					} or {
+						'Game #',
+						gameData.gameIds[1]
+					})
 				} or nil
 			},
 			css = {['display'] = 'flex', ['flex-direction'] = 'column'}
