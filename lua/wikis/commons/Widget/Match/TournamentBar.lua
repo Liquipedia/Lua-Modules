@@ -37,13 +37,21 @@ function MatchTournamentBar:render()
 
 	local tournament = Tournament.partialTournamentFromMatch(match)
 	local tournamentLink = mw.title.makeTitle(0, match.pageName, match.section).fullText
-	local mapLink = ''
+	local mapLink
 
 	if gameData then
-		local mapPageName = string.gsub(gameData.map, ' ', '_')
-		local fullTitle = match.pageName .. '/' .. mapPageName
-		mapLink = mw.title.makeTitle(0, fullTitle).fullText
+		local mapPageName = mw.uri.encode(gameData.map, 'WIKI')
+		local mapTitle = mw.title.new(mapPageName, 0)
+		if mapTitle then
+			mapLink = mapTitle.fullUrl
+		else
+			mapLink = nil
+		end
 	end
+
+	mw.logObject(gameData)
+	mw.logObject(tournament)
+	mw.logObject(match)
 
 	return WidgetUtil.collect(
 		self.props.displayGameIcon and Game.icon{
@@ -67,29 +75,30 @@ function MatchTournamentBar:render()
 			children = {
 				Link{
 					link = tournamentLink,
-					children = HtmlWidgets.Span{children = {
-						tournament.displayName,
-						children = match.section ~= "Results" and {
+					children = HtmlWidgets.Span{
+						children = (match.section ~= "Results" and {
+							tournament.displayName,
 							' - ',
-							match.section,
-						} or nil
-					}}
+							match.section
+						} or {
+							tournament.displayName
+						})
+					}
 				},
 				#match.opponents > 2 and gameData and HtmlWidgets.Span{
-					children = HtmlWidgets.Span{children = {
-						match.bracketData.title,
-						' - ',
-						gameData.gameIds,
+					children = {
+						tournament.fullName,
+						' - Game #',
+						gameData.gameIds[1],
 						' on ',
 						Link{
 							link = mapLink,
-							children = HtmlWidgets.Span{
-								gameData.map
-							}
+							children = gameData.map
 						},
-					}}
+					}
 				} or nil
-			}
+			},
+			css = {['display'] = 'flex', ['flex-direction'] = 'column'}
 		}
 	)
 end
