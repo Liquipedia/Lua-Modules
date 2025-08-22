@@ -104,10 +104,16 @@ return function(busted, helper, options)
 	end
 
 	local function GoldenTest(testName, actual)
+		-- Currently we're only running snapshots tests while updating them too
+		if os.getenv('UPDATE_SNAPSHOTS') ~= 'true' then
+			return
+		end
+
 		local template = readFile('spec/helpers/template.html')
 		assert(template, 'Could not read template.html')
 
 		local placeholder = '<!--CONTENT_HERE-->'
+		-- Using this over gsub. Reason is is that we need a plain replace, not pattern replace.
 		local start_pos, end_pos = string.find(template, placeholder, 1, true)
 		assert(start_pos, 'Placeholder not found in template')
 		local finalHtml = string.sub(template, 1, start_pos - 1) .. actual .. string.sub(template, end_pos + 1)
@@ -124,9 +130,9 @@ return function(busted, helper, options)
 		end
 
 		local exitCode = os.execute(nodeJsCommand)
+		os.remove(finalHtmlPath)
 
 		require('luassert').are_equal(0, exitCode, 'Snapshot comparison failed, check diffs in lua/output/' .. testName .. '-*')
-		os.remove(finalHtmlPath)
 	end
 
 	local function setupForTesting()
