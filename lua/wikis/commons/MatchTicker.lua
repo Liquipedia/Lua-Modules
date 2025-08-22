@@ -110,7 +110,6 @@ end
 ---@operator call(table): MatchTicker
 ---@field args table
 ---@field config MatchTickerConfig
----@field gameData MatchTickerGameData
 ---@field matches table[]?
 local MatchTicker = Class.new(function(self, args) self:init(args) end)
 
