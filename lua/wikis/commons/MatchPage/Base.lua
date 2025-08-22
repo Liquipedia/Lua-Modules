@@ -38,7 +38,6 @@ local Footer = Lua.import('Module:Widget/Match/Page/Footer')
 local Header = Lua.import('Module:Widget/Match/Page/Header')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -238,6 +237,7 @@ function BaseMatchPage:render()
 				opponent2 = self.matchData.opponents[2],
 				parent = self.matchData.parent,
 				phase = MatchGroupUtil.computeMatchPhase(self.matchData),
+				stream = self.matchData.stream,
 				tournamentName = self.matchData.tournament,
 				poweredBy = self.getPoweredBy(),
 				highlighted = HighlightConditions.tournament(tournamentContext),
@@ -356,13 +356,6 @@ function BaseMatchPage:footer()
 					}
 				end)
 			},
-			not self.matchData.finished and AdditionalSection{
-				header = 'Streams',
-				children = StreamsContainer{
-					streams = StreamLinks.filterStreams(self.matchData.stream),
-					matchIsLive = self.matchData.phase == 'ongoing',
-				},
-			} or nil,
 			AdditionalSection{
 				header = 'Patch',
 				children = { self:getPatchLink() }

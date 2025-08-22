@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Image = Lua.import('Module:Image')
 local Logic = Lua.import('Module:Logic')
+local StreamLinks = Lua.import('Module:Links/Stream')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
@@ -19,6 +20,7 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
+local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
 local TeamDisplay = Lua.import('Module:Widget/Match/Page/TeamDisplay')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -30,6 +32,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field opponent2 MatchPageOpponent
 ---@field parent string?
 ---@field phase 'finished'|'ongoing'|'upcoming'
+---@field stream table?
 ---@field tournamentName string?
 ---@field poweredBy string?
 ---@field highlighted boolean?
@@ -91,6 +94,22 @@ function MatchPageHeader:_showMvps()
 	}
 end
 
+---@private
+---@return Widget?
+function MatchPageHeader:_showStreams()
+	local phase = self.props.phase
+	if phase == 'finished' then
+		return
+	end
+	return Div{
+		classes = {'match-info-links'},
+		children = StreamsContainer{
+			streams = StreamLinks.filterStreams(self.props.stream),
+			matchIsLive = self.props.phase == 'ongoing',
+		}
+	}
+end
+
 ---@return Widget[]
 function MatchPageHeader:render()
 	local opponent1 = self.props.opponent1
@@ -127,7 +146,8 @@ function MatchPageHeader:render()
 					Link{ link = self.props.parent, children = self.props.tournamentName }
 				}
 			},
-			self:_showMvps()
+			self:_showMvps(),
+			self:_showStreams()
 		),
 	}
 end
