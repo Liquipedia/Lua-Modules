@@ -60,7 +60,7 @@ function MatchHeaderBR:render()
 					Div {
 						classes = { 'match-info-headerbr-positionholder' },
 						children = {
-							Trophy{place = 1},
+							Trophy{place = 1, additionalClasses = {'panel-table__cell-icon'}},
 							'1st'
 						}
 
@@ -84,7 +84,7 @@ function MatchHeaderBR:render()
 					Div {
 						classes = { 'match-info-header-positionholder' },
 						children = {
-							Trophy{place = 2},
+							Trophy{place = 2, additionalClasses = {'panel-table__cell-icon'}},
 							'2nd'
 						}
 
@@ -108,7 +108,7 @@ function MatchHeaderBR:render()
 					Div {
 						classes = { 'match-info-header-positionholder' },
 						children = {
-							Trophy{place = 3},
+							Trophy{place = 3, additionalClasses = {'panel-table__cell-icon'}},
 							'3rd'
 						}
 
