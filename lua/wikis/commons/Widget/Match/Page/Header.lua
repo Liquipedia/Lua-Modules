@@ -50,7 +50,7 @@ function MatchPageHeader:_makeResultDisplay()
 		classes = { 'match-bm-match-header-result' },
 		children = WidgetUtil.collect(
 			self:_showScore() and (
-				OpponentDisplay.InlineScore(opponent1) .. '&ndash;' .. OpponentDisplay.InlineScore(opponent2)
+				OpponentDisplay.InlineScore(opponent1) .. '&nbsp;:&nbsp;' .. OpponentDisplay.InlineScore(opponent2)
 			) or '',
 			Div{
 				classes = { 'match-bm-match-header-result-text' },
