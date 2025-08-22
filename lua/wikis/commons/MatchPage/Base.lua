@@ -15,6 +15,7 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Links = Lua.import('Module:Links')
 local Operator = Lua.import('Module:Operator')
+local StreamLinks = Lua.import('Module:Links/Stream')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
@@ -37,6 +38,7 @@ local Footer = Lua.import('Module:Widget/Match/Page/Footer')
 local Header = Lua.import('Module:Widget/Match/Page/Header')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -95,11 +97,11 @@ function BaseMatchPage:getCountdownBlock()
 			display = 'block',
 			['text-align'] = 'center'
 		},
-		children = Countdown._create(Table.merge(self.matchData.stream, {
+		children = Countdown._create{
 			date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
 			finished = self.matchData.finished,
 			rawdatetime = Logic.readBool(self.matchData.finished),
-		}))
+		}
 	}
 end
 
@@ -354,6 +356,13 @@ function BaseMatchPage:footer()
 					}
 				end)
 			},
+			not self.matchData.finished and AdditionalSection{
+				header = 'Streams',
+				children = StreamsContainer{
+					streams = StreamLinks.filterStreams(self.matchData.stream),
+					matchIsLive = self.matchData.phase == 'ongoing',
+				},
+			} or nil,
 			AdditionalSection{
 				header = 'Patch',
 				children = { self:getPatchLink() }
