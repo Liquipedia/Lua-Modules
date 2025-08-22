@@ -17,6 +17,7 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local String = Lua.import('Module:StringUtils')
 
 ---@class MatchTournamentBarProps
 ---@field match MatchGroupUtilMatch?
@@ -39,6 +40,8 @@ function MatchTournamentBar:render()
 	local tournament = Tournament.partialTournamentFromMatch(match)
 	local tournamentLink = mw.title.makeTitle(0, match.pageName, match.section).fullText
 	local stageName = DisplayHelper.expandHeader(match.bracketData.inheritedHeader)[1]
+
+	local mapIsSet = gameData and not String.isEmpty(gameData.map)
 
 	return WidgetUtil.collect(
 		self.props.displayGameIcon and Game.icon{
@@ -72,21 +75,17 @@ function MatchTournamentBar:render()
 						})
 					}
 				},
-				#match.opponents > 2 and gameData and HtmlWidgets.Span{
-					children = (gameData.map and {
+				gameData and HtmlWidgets.Span{
+					children = {
 						stageName,
 						' - Game #',
-						gameData.gameIds[1],
-						' on ',
-						Link{
+						table.concat(gameData.gameIds, '-'),
+						mapIsSet and ' on ' or nil,
+						mapIsSet and Link{
 							link = gameData.map,
 							children = gameData.map
-						},
-					} or {
-						stageName,
-						' - Game #',
-						gameData.gameIds[1]
-					})
+						} or nil,
+					}
 				} or nil
 			},
 			css = {['display'] = 'flex', ['flex-direction'] = 'column'}
