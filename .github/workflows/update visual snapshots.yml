@@ -1,11 +1,13 @@
 name: Update Visual Snapshots
 
-on:
-  pull_request:
+on: [pull_request, workflow_dispatch]
 
 jobs:
   update-snapshots:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
