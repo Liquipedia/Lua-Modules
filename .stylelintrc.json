@@ -12,7 +12,7 @@
 					"mixin",
 					"if",
 					"else",
-					"include",
+					"use",
 					"each",
 					"function",
 					"return",
