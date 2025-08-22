@@ -583,20 +583,20 @@ local factionPropsAoE4 = {
 		pageName = 'French' .. AOE4_SUFFIX,
 		faction = 'french',
 	},
-	holyromanempire = {
+	goldenhorde = {
 		index = 8,
+		name = 'Golden Horde',
+		faction = 'goldenhorde',
+	},
+	holyromanempire = {
+		index = 9,
 		name = 'Holy Roman Empire',
 		faction = 'holyromanempire',
 	},
 	houseoflancaster = {
-		index = 9,
+		index = 10,
 		name = 'House of Lancaster',
 		faction = 'houseoflancaster',
-	},
-	goldenhorde = {
-		index = 10,
-		name = 'Golden Horde',
-		faction = 'goldenhorde',
 	},
 	japanese = {
 		index = 11,
