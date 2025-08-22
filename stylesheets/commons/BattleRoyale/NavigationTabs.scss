@@ -20,7 +20,7 @@ Author(s): Elysienna
 		height: 0;
 	}
 
-	ul#{&}__list {
+	@at-root ul#{&}__list {
 		list-style: none;
 		margin: 0;
 		padding: 0;

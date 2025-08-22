@@ -2061,11 +2061,11 @@ html:not( [ data-darkreader-scheme="dark" ] ):not( .theme--dark ) {
 #file img[ src*="lightmode" ]:not( :hover ),
 .searchResultImage img[ src*="lightmode" ],
 .gallerybox img[ src*="lightmode" ] {
-	[ data-darkreader-scheme="dark" ] #{&} {
+	@at-root [ data-darkreader-scheme="dark" ] & {
 		background-color: #808080;
 	}
 
-	.theme--dark & {
+	@at-root .theme--dark & {
 		background-color: #d8d8d8;
 	}
 }

@@ -64,7 +64,7 @@
 			}
 		}
 
-		ul#{&}-list {
+		@at-root ul#{&}-list {
 			$_gutter-y: 0.5rem;
 			$_gutter-x: 0.5rem;
 			display: flex;

@@ -4,7 +4,7 @@ Author(s): Elysienna
 *******************************************************************************/
 
 .panel-tabs {
-	ul#{&}__list {
+	@at-root ul#{&}__list {
 		display: flex;
 		list-style: none;
 		margin: 0;
@@ -169,7 +169,7 @@ Author(s): Elysienna
 	}
 
 	&__game-schedule {
-		ul#{&} {
+		@at-root ul#{&} {
 			list-style: none;
 			margin: 1rem 0;
 			padding: 0;
@@ -240,7 +240,7 @@ Author(s): Elysienna
 		margin: 1rem 0;
 		padding: 0;
 
-		ul#{&} {
+		@at-root ul#{&} {
 			margin: 1rem 0;
 		}
 

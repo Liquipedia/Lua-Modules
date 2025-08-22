@@ -1085,7 +1085,7 @@ span.slash {
 			border-color: var( --clr-secondary-25 );
 		}
 
-		html h4#{&}-title {
+		@at-root html h4#{&}-title {
 			font-weight: bold;
 			text-transform: uppercase;
 			color: var( --clr-on-background ) !important;
