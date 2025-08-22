@@ -38,6 +38,7 @@ function MatchTournamentBar:render()
 
 	local tournament = Tournament.partialTournamentFromMatch(match)
 	local tournamentLink = mw.title.makeTitle(0, match.pageName, match.section).fullText
+	local stageName = DisplayHelper.expandHeader(match.bracketData.inheritedHeader)[1]
 
 	mw.logObject(gameData)
 	mw.logObject(tournament)
@@ -77,7 +78,7 @@ function MatchTournamentBar:render()
 				},
 				#match.opponents > 2 and gameData and HtmlWidgets.Span{
 					children = (gameData.map and {
-						DisplayHelper.expandHeader(match.bracketData.inheritedHeader),
+						stageName,
 						' - Game #',
 						gameData.gameIds[1],
 						' on ',
@@ -86,7 +87,7 @@ function MatchTournamentBar:render()
 							children = gameData.map
 						},
 					} or {
-						DisplayHelper.expandHeader(match.bracketData.inheritedHeader),
+						stageName,
 						' - Game #',
 						gameData.gameIds[1]
 					})

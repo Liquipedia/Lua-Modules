@@ -47,86 +47,38 @@ function MatchHeaderBR:render()
 		end
 	)
 
-	local first = sortedOpponents[1]
-	local second = sortedOpponents[2]
-	local third = sortedOpponents[3]
+	local topThree = Array.sub(sortedOpponents, 1, 3)
+	local placements = {'1st', '2nd', '3rd'}
+
+	local positionRows = Array.map(topThree, function(opponent, i)
+		return Div {
+			classes = { 'match-info-headerbr-positionrow' },
+			children = {
+				Div {
+					classes = { 'match-info-headerbr-positionholder' },
+					children = {
+						Trophy { place = i, additionalClasses = { 'panel-table__cell-icon' } },
+						placements[i]
+					}
+				},
+				Div {
+					classes = { 'match-info-headerbr-opponent' },
+					children = {
+						OpponentDisplay.BlockOpponent {
+							opponent = opponent,
+							teamStyle = self.props.teamStyle,
+							overflow = 'ellipsis',
+							flip = true,
+						}
+					}
+				}
+			}
+		}
+	end)
 
 	return Div {
 		classes = { 'match-info-headerbr' },
-		children = {
-			Div {
-				classes = { 'match-info-headerbr-positionrow' },
-				children = {
-					Div {
-						classes = { 'match-info-headerbr-positionholder' },
-						children = {
-							Trophy{place = 1, additionalClasses = {'panel-table__cell-icon'}},
-							'1st'
-						}
-
-					},
-					Div {
-						classes = { 'match-info-headerbr-opponent' },
-						children = {
-							OpponentDisplay.BlockOpponent {
-								opponent = first,
-								teamStyle = self.props.teamStyle,
-								overflow = 'ellipsis',
-								flip = true,
-							}
-						}
-					}
-				}
-			},
-			Div {
-				classes = { 'match-info-header-positionrow' },
-				children = {
-					Div {
-						classes = { 'match-info-header-positionholder' },
-						children = {
-							Trophy{place = 2, additionalClasses = {'panel-table__cell-icon'}},
-							'2nd'
-						}
-
-					},
-					Div {
-						classes = { 'match-info-headerbr-opponent' },
-						children = {
-							OpponentDisplay.BlockOpponent {
-								opponent = second,
-								teamStyle = self.props.teamStyle,
-								overflow = 'ellipsis',
-								flip = true,
-							}
-						}
-					}
-				}
-			},
-			Div {
-				classes = { 'match-info-header-positionrow' },
-				children = {
-					Div {
-						classes = { 'match-info-header-positionholder' },
-						children = {
-							Trophy{place = 3, additionalClasses = {'panel-table__cell-icon'}},
-							'3rd'
-						}
-
-					},
-					Div {
-						classes = { 'match-info-headerbr-opponent' },
-						children = {
-							OpponentDisplay.BlockOpponent {
-								opponent = third,
-								teamStyle = self.props.teamStyle,
-								overflow = 'ellipsis',
-								flip = true,
-							}
-						}
-					}
-				}
-			},
-		}
+		children = positionRows
 	}
 end
 
