@@ -68,7 +68,6 @@ function MatchHeaderBR:render()
 							opponent = opponent,
 							teamStyle = self.props.teamStyle,
 							overflow = 'ellipsis',
-							flip = true,
 						}
 					}
 				}
