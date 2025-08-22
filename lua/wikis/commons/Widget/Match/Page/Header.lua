@@ -96,42 +96,40 @@ function MatchPageHeader:render()
 	local opponent1 = self.props.opponent1
 	local opponent2 = self.props.opponent2
 
-	return WidgetUtil.collect(
-		Div{
-			classes = { 'match-bm-match-header' },
-			children = WidgetUtil.collect(
-				self.props.poweredBy and Div{
-					classes = { 'match-bm-match-header-powered-by' },
-					children = {
-						'Data provided by ',
-						Image.display(self.props.poweredBy, nil, {link = '', alt = 'SAP'})
-					}
-				} or nil,
-				Div{
-					classes = { 'match-bm-match-header-overview' },
-					children = {
-						TeamDisplay{ opponent = opponent1 },
-						self:_makeResultDisplay(),
-						TeamDisplay{ opponent = opponent2 }
-					}
-				},
-				Div{
-					classes = Array.extend(
-						'match-bm-match-header-tournament',
-						self.props.highlighted and 'tournament-highlighted-bg' or nil
-					),
-					children = {
-						Link{ link = self.props.parent, children = self.props.tournamentName }
-					}
-				},
-				Div{
-					classes = { 'match-bm-match-header-date' },
-					children = { self.props.countdownBlock }
+	return Div{
+		classes = { 'match-bm-match-header' },
+		children = WidgetUtil.collect(
+			self.props.poweredBy and Div{
+				classes = { 'match-bm-match-header-powered-by' },
+				children = {
+					'Data provided by ',
+					Image.display(self.props.poweredBy, nil, {link = '', alt = 'SAP'})
 				}
-			),
-		},
-		self:_showMvps()
-	)
+			} or nil,
+			Div{
+				classes = { 'match-bm-match-header-overview' },
+				children = {
+					TeamDisplay{ opponent = opponent1 },
+					self:_makeResultDisplay(),
+					TeamDisplay{ opponent = opponent2 }
+				}
+			},
+			Div{
+				classes = Array.extend(
+					'match-bm-match-header-tournament',
+					self.props.highlighted and 'tournament-highlighted-bg' or nil
+				),
+				children = {
+					Link{ link = self.props.parent, children = self.props.tournamentName }
+				}
+			},
+			Div{
+				classes = { 'match-bm-match-header-date' },
+				children = { self.props.countdownBlock }
+			},
+			self:_showMvps()
+		),
+	}
 end
 
 return MatchPageHeader
