@@ -65,13 +65,13 @@
 		}
 
 		ul&-list {
-			$gutter-y: 0.5rem;
-			$gutter-x: 0.5rem;
+			$_gutter-y: 0.5rem;
+			$_gutter-x: 0.5rem;
 			display: flex;
 			flex-wrap: wrap;
 			justify-content: center;
 			list-style: none;
-			margin: calc( -0.5 * $gutter-y ) calc( -0.5 * $gutter-x ) 0.5rem calc( -0.5 * $gutter-x );
+			margin: calc( -0.5 * $_gutter-y ) calc( -0.5 * $_gutter-x ) 0.5rem calc( -0.5 * $_gutter-x );
 
 			> li {
 				flex: 0 0 auto;
