@@ -57,7 +57,7 @@ function MatchHeaderBR:render()
 				Div {
 					classes = { 'match-info-headerbr-positionholder' },
 					children = {
-						Trophy { place = i, additionalClasses = { 'panel-table__cell-icon' } },
+						Trophy { place = i },
 						placements[i]
 					}
 				},
