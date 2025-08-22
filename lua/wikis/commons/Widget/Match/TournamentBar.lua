@@ -16,6 +16,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 ---@class MatchTournamentBarProps
 ---@field match MatchGroupUtilMatch?
@@ -76,7 +77,7 @@ function MatchTournamentBar:render()
 				},
 				#match.opponents > 2 and gameData and HtmlWidgets.Span{
 					children = (gameData.map and {
-						match.section,
+						DisplayHelper.expandHeader(match.bracketData.inheritedHeader),
 						' - Game #',
 						gameData.gameIds[1],
 						' on ',
@@ -85,7 +86,7 @@ function MatchTournamentBar:render()
 							children = gameData.map
 						},
 					} or {
-						match.section,
+						DisplayHelper.expandHeader(match.bracketData.inheritedHeader),
 						' - Game #',
 						gameData.gameIds[1]
 					})
