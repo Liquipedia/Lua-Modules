@@ -17,6 +17,7 @@ local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
 local Tier = Lua.import('Module:Tier/Utils')
+local TypeUtil = Lua.import('Module:TypeUtil')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local MatchUtil = Lua.import('Module:Match/Util')
@@ -101,10 +102,16 @@ end
 ---@field featuredTournamentsOnly boolean?
 ---@field displayGameIcons boolean?
 
+---@class MatchTickerGameData
+---@field asGame boolean?
+---@field gameIds number[]
+---@field map string?
+
 ---@class MatchTicker
 ---@operator call(table): MatchTicker
 ---@field args table
 ---@field config MatchTickerConfig
+---@field gameData MatchTickerGameData
 ---@field matches table[]?
 local MatchTicker = Class.new(function(self, args) self:init(args) end)
 

@@ -20,7 +20,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 ---@class MatchTournamentBarProps
 ---@field match MatchGroupUtilMatch?
----@field gameData MatchGroupUtilGameData?
+---@field gameData MatchTickerGameData?
 ---@field displayGameIcon boolean?
 
 ---@class MatchTournamentBar: Widget
@@ -39,10 +39,6 @@ function MatchTournamentBar:render()
 	local tournament = Tournament.partialTournamentFromMatch(match)
 	local tournamentLink = mw.title.makeTitle(0, match.pageName, match.section).fullText
 	local stageName = DisplayHelper.expandHeader(match.bracketData.inheritedHeader)[1]
-
-	mw.logObject(gameData)
-	mw.logObject(tournament)
-	mw.logObject(match)
 
 	return WidgetUtil.collect(
 		self.props.displayGameIcon and Game.icon{

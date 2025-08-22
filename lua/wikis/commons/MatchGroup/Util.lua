@@ -58,7 +58,7 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 ---@field advanceSpots MatchGroupUtilAdvanceSpot[]
 ---@field bracketResetMatchId string?
 ---@field header string?
----@field inheritedHeader string?
+---@field inheritedHeader string
 ---@field lowerEdges MatchGroupUtilLowerEdge[]?
 ---@field lowerMatchIds string[]
 ---@field qualLose boolean?
@@ -237,16 +237,6 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 	vod = 'string?',
 	winner = 'number?',
 	extradata = 'table?',
-})
-
----@class MatchGroupUtilGameData
----@field asGame boolean?
----@field gameIds number[]
----@field map string?
-MatchGroupUtil.types.GameData = TypeUtil.struct({
-	asGame = 'boolean?',
-	gameIds = TypeUtil.array('number'),
-	map = 'string?',
 })
 
 ---@class MatchGroupUtilMatch

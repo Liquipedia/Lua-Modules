@@ -23,7 +23,7 @@ local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 
 ---@class MatchCardProps
 ---@field match MatchGroupUtilMatch
----@field gameData MatchGroupUtilGameData?
+---@field gameData MatchTickerGameData?
 ---@field onlyHighlightOnValue string?
 ---@field hideTournament boolean?
 ---@field displayGameIcons boolean?
@@ -64,9 +64,7 @@ function MatchCard:render()
 				classes = {'match-info-tournament', highlight and HIGHLIGHT_CLASS or nil},
 				children = {tournamentLink},
 			} or nil,
-			match.finished and #match.opponents > 2 and HtmlWidgets.Div{
-				children = MatchHeaderBR{match = match},
-			} or nil,
+			MatchHeaderBR{match = match},
 			ButtonBar{match = match}
 		)
 	}

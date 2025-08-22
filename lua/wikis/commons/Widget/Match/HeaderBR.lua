@@ -36,7 +36,7 @@ function MatchHeaderBR:render()
 		return nil
 	end
 
-	if #match.opponents < 3 then
+	if #match.opponents <= 2 or not match.finished then
 		return
 	end
 
