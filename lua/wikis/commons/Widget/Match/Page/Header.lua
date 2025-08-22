@@ -107,6 +107,10 @@ function MatchPageHeader:render()
 				}
 			} or nil,
 			Div{
+				classes = { 'match-bm-match-header-date' },
+				children = { self.props.countdownBlock }
+			},
+			Div{
 				classes = { 'match-bm-match-header-overview' },
 				children = {
 					TeamDisplay{ opponent = opponent1 },
@@ -122,10 +126,6 @@ function MatchPageHeader:render()
 				children = {
 					Link{ link = self.props.parent, children = self.props.tournamentName }
 				}
-			},
-			Div{
-				classes = { 'match-bm-match-header-date' },
-				children = { self.props.countdownBlock }
 			},
 			self:_showMvps()
 		),
