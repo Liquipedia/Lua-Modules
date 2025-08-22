@@ -329,6 +329,9 @@ local byFactionAoE4 = {
 	french = {
 		icon = 'File:French AoE4 Icon.png',
 	},
+	goldenhorde = {
+		icon = 'File:Golden Horde AoE4 Icon.png',
+	},
 	holyromanempire = {
 		icon = 'File:HRE AoE4 Icon.png',
 	},
@@ -344,6 +347,9 @@ local byFactionAoE4 = {
 	knightstemplar = {
 		icon = 'File:Knights Templar AoE4 Icon.png',
 	},
+	macedoniandynasty = {
+		icon = 'File:Macedonian AoE4 Icon.png',
+	},
 	malians = {
 		icon = 'File:Malians AoE4 Icon.png',
 	},
@@ -358,6 +364,12 @@ local byFactionAoE4 = {
 	},
 	rus = {
 		icon = 'File:Rus AoE4 Icon.png',
+	},
+	sengokudaimyo = {
+		icon = 'File:Sengoku AoE4 Icon.png',
+	},
+	tughlaqdynasty = {
+		icon = 'File:Tughlaq AoE4 Icon.png',
 	},
 	zhuxislegacy = {
 		icon = 'File:Zhu Xi\'s Legacy AoE4 Icon.png',
