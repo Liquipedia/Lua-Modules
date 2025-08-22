@@ -98,6 +98,7 @@ function BaseMatchPage:getCountdownBlock()
 		children = Countdown._create(Table.merge(self.matchData.stream, {
 			date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
 			finished = self.matchData.finished,
+			rawdatetime = Logic.readBool(self.matchData.finished),
 		}))
 	}
 end
