@@ -126,6 +126,17 @@ You can run `npm run fix` for auto correctable issues to be fixed.
 
 Run `npm run lua-test` in the root folder.
 
+#### Visual Snapshot Testing
+
+This project uses visual snapshot testing to verify UI components. Snapshots are automatically
+generated and updated by our CI pipeline to ensure consistency across platforms.
+
+- You don't need to update snapshots locally
+- Submit your PR, and our CI will automatically update snapshots if needed
+- The updated snapshots will be committed back to your PR branch
+- Review the snapshot changes as part of your PR review process
+
+
 ## Committing changes
 
 You need to be a member of the Liquipedia organization before you are allowed to push to this repository. In most workflows, you will make a fork of this repository to your own repository, and request a merge request from there. See the wiki for a step-by-step guide on how to commit a change.
