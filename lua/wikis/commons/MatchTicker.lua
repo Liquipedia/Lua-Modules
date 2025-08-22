@@ -17,7 +17,6 @@ local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
 local Tier = Lua.import('Module:Tier/Utils')
-local TypeUtil = Lua.import('Module:TypeUtil')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local MatchUtil = Lua.import('Module:Match/Util')
