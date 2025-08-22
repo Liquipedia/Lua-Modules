@@ -8,7 +8,6 @@
 		"grunt-eslint": "24.x.x",
 		"grunt-stylelint": "^0.20.x",
 		"jquery": "*",
-		"less": "^4.4.0",
 		"pixelmatch": "^7.1.0",
 		"playwright": "^1.54.2",
 		"pngjs": "^7.0.0",
