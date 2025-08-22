@@ -18,63 +18,46 @@ $crosstable-red: var( --table-red-background-color, #fbdfdf );
 	background-clip: padding-box;
 }
 
-@mixin crosstable-shadows( $size ) {
-	@include crosstable-col( 1, $size );
-	@include crosstable-row( 1, $size );
+@mixin crosstable-shadows($size) {
+	@include crosstable-col(1, $size);
+	@include crosstable-row(1, $size);
 }
 
-@mixin crosstable-col( $id, $max ) {
-	$idp1: $id + 1;
-	.crosstable.crosstable-col-#{$idp1} td:nth-child( #{$id} ) {
-		-moz-box-shadow: inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset -10px 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
-		-webkit-box-shadow: inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset -10px 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
-		box-shadow: inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset -10px 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
-	}
-	.crosstable.crosstable-col-#{$id} td:nth-child( #{$idp1} ) {
-		-moz-box-shadow: inset 10px 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
-		-webkit-box-shadow: inset 10px 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
-		box-shadow: inset 10px 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
-	}
-	.crosstable.crosstable-col-#{$id} td:nth-child( #{$id} ) {
-		opacity: 1 !important;
-		-moz-box-shadow: unset !important;
-		-webkit-box-shadow: unset !important;
-		box-shadow: unset !important;
-	}
+@mixin crosstable-col($id, $max) {
+	@if $id <= $max {
+		$idp1: $id + 1;
+		.crosstable.crosstable-col-#{$idp1} td:nth-child(#{$id}) {
+			@extend .crosstable-row-left;
+		}
+		.crosstable.crosstable-col-#{$id} td:nth-child(#{$idp1}) {
+			@extend .crosstable-row-right;
+		}
+		.crosstable.crosstable-col-#{$id} td:nth-child(#{$id}) {
+			@extend .crosstable-row-standard;
+		}
 
-	@if $id < $max {
-		@include crosstable-col( $id + 1, $max );
+		@include crosstable-col($id + 1, $max);
 	}
 }
 
-@mixin crosstable-row( $id, $max ) {
-	$idp1: $id + 1;
-	.crosstable.crosstable-row-#{$idp1} tr:nth-child( #{$id} ) td {
-		-moz-box-shadow: inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 -10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
-		-webkit-box-shadow: inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 -10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
-		box-shadow: inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 -10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
-	}
-	.crosstable.crosstable-row-#{$id} tr:nth-child( #{$idp1} ) td {
-		-moz-box-shadow: inset 0 10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
-		-webkit-box-shadow: inset 0 10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
-		box-shadow: inset 0 10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
-	}
-	.crosstable.crosstable-row-#{$id} tr:nth-child( #{$id} ) td {
-		opacity: 1 !important;
-		-moz-box-shadow: unset !important;
-		-webkit-box-shadow: unset !important;
-		box-shadow: unset !important;
-	}
+@mixin crosstable-row($id, $max) {
+	@if $id <= $max {
+		$idp1: $id + 1;
+		.crosstable.crosstable-row-#{$idp1} tr:nth-child(#{$id}) td {
+			@extend .crosstable-row-over;
+		}
+		.crosstable.crosstable-row-#{$id} tr:nth-child(#{$idp1}) td {
+			@extend .crosstable-row-under;
+		}
+		.crosstable.crosstable-row-#{$id} tr:nth-child(#{$id}) td {
+			@extend .crosstable-row-standard;
+		}
 
-	@if $id < $max {
-		@include crosstable-row( $id + 1, $max );
+		@include crosstable-row($id + 1, $max);
 	}
 }
 
-$crosstable-size: 20;
-$crosstable-max: 20;
-
-@include crosstable-shadows( $crosstable-size );
+@include crosstable-shadows($crosstable-size);
 
 .crosstable-row-over {
 	-moz-box-shadow: inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 -10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
@@ -143,52 +126,52 @@ $crosstable-max: 20;
 	background-color: $crosstable-red;
 }
 
-@mixin crosstable( $min, $max ) {
-	@include crosstable-outer( $min, $max, $min );
+@mixin crosstable($min, $max) {
+	@include crosstable-outer($min, $max, $min);
 }
 
-@mixin crosstable-outer( $min, $max, $current ) {
-	@if ($current <= $max) {
-		@include crosstable-inner( $min, $max, $min, $current );
-		@include crosstable-outer( $min, $max, $current + 1 );
-	}
-}
-
-@mixin crosstable-inner( $min, $max, $current, $outer ) {
+@mixin crosstable-outer($min, $max, $current) {
 	@if $current <= $max {
-		@include crosstable-gray( $current, $outer );
-		@include crosstable-green( $current, $outer );
-		@include crosstable-red( $current, $outer );
-		@include crosstable-inner( $min, $max, $current + 1, $outer );
+		@include crosstable-inner($min, $max, $min, $current);
+		@include crosstable-outer($min, $max, $current + 1);
 	}
 }
 
-@mixin crosstable-gray( $s1, $s2 ) {
+@mixin crosstable-inner($min, $max, $current, $outer) {
+	@if $current <= $max {
+		@include crosstable-gray($current, $outer);
+		@include crosstable-green($current, $outer);
+		@include crosstable-red($current, $outer);
+		@include crosstable-inner($min, $max, $current + 1, $outer);
+	}
+}
+
+@mixin crosstable-gray($s1, $s2) {
 	@if $s1 == $s2 {
 		td.crosstable-bgc-r#{$s1}-r#{$s2} {
-			background-color: #ececec;
+			@extend .crosstable-color-gray;
 		}
 	}
 }
 
-@mixin crosstable-green( $s1, $s2 ) {
+@mixin crosstable-green($s1, $s2) {
 	@if $s1 > $s2 {
 		td.crosstable-bgc-r#{$s1}-r#{$s2} {
-			background-color: #ceffce;
+			@extend .crosstable-color-green;
 		}
 	}
 }
 
-@mixin crosstable-red( $s1, $s2 ) {
+@mixin crosstable-red($s1, $s2) {
 	@if $s1 < $s2 {
 		td.crosstable-bgc-r#{$s1}-r#{$s2} {
-			background-color: #ffcece;
+			@extend .crosstable-color-red;
 		}
 	}
 }
 
 .crosstable tr {
-	@include crosstable( 0, $crosstable-max );
+	@include crosstable(0, $crosstable-max);
 }
 
 .crosstable tr td.crosstable-bgc-r0-r0 {

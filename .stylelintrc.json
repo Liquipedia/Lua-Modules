@@ -14,6 +14,7 @@
 					"else",
 					"include",
 					"use",
+					"extend",
 					"each",
 					"function",
 					"return",

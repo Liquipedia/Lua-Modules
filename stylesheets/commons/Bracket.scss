@@ -453,11 +453,6 @@ Author(s): FO-nTTaX, salle
 	font-size: 0.75rem;
 }
 
-// exception for when the popup is inside a .bracket-game div
-.bracket-game > .bracket-popup-wrapper:not( .bracket-popup-mobile ) {
-	//transform: translateY( -50% );
-}
-
 .bracket-popup-wrapper * {
 	box-sizing: border-box;
 }
@@ -1218,9 +1213,7 @@ Author(s): FO-nTTaX
 	.bracket-column-matches-s2 {
 		width: 90px !important;
 	}
-	/* .bracket-column-matches-s2 div.bracket-score:nth-of-type( 2 ) {
-		right:22px !important;
-	} */
+
 	.bracket-column-matches-s2-s3 {
 		width: 112px !important;
 	}
