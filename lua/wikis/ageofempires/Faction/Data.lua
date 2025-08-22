@@ -593,58 +593,78 @@ local factionPropsAoE4 = {
 		name = 'House of Lancaster',
 		faction = 'houseoflancaster',
 	},
-	japanese = {
+	goldenhorde = {
 		index = 10,
+		name = 'Golden Horde',
+		faction = 'goldenhorde',
+	},
+	japanese = {
+		index = 11,
 		name = 'Japanese',
 		pageName = 'Japanese' .. AOE4_SUFFIX,
 		faction = 'japanese',
 	},
 	jeannedarc = {
-		index = 11,
+		index = 12,
 		name = 'Jeanne d\'Arc',
 		faction = 'jeannedarc',
 	},
 	knightstemplar = {
-		index = 12,
+		index = 13,
 		name = 'Knights Templar',
 		faction = 'knightstemplar',
 	},
+	macedoniandynasty = {
+		index = 14,
+		name = 'Macedonian Dynasty',
+		faction = 'macedoniandynasty',
+	},
 	malians = {
-		index = 13,
+		index = 15,
 		name = 'Malians',
 		pageName = 'Malians' .. AOE4_SUFFIX,
 		faction = 'malians',
 	},
 	mongols = {
-		index = 14,
+		index = 16,
 		name = 'Mongols',
 		pageName = 'Mongols' .. AOE4_SUFFIX,
 		faction = 'mongols',
 	},
 	ottomans = {
-		index = 15,
+		index = 17,
 		name = 'Ottomans',
 		pageName = 'Ottomans' .. AOE4_SUFFIX,
 		faction = 'ottomans',
 	},
 	orderofthedragon = {
-		index = 16,
+		index = 18,
 		name = 'Order of the Dragon',
 		faction = 'orderofthedragon',
 	},
 	rus = {
-		index = 17,
+		index = 19,
 		name = 'Rus',
 		faction = 'rus',
 	},
+	sengokudaimyo = {
+		index = 20,
+		name = 'Sengoku Daimyo',
+		faction = 'sengokudaimyo',
+	},
+	tughlaqdynasty = {
+		index = 21,
+		name = 'Tughlaq Dynasty',
+		faction = 'tughlaqdynasty',
+	},
 	zhuxislegacy = {
-		index = 18,
+		index = 22,
 		name = 'Zhu Xi\'s Legacy',
 		faction = 'zhuxislegacy',
 	},
 
 	unknown = {
-		index = 19,
+		index = 23,
 		name = 'Unknown',
 		faction = 'unknown',
 	},
