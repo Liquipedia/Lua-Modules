@@ -133,8 +133,8 @@ Author(s): iMarbot, Darkrai
 	display: none;
 }
 
-[ data-darkreader-scheme="dark" ] &,
-.theme--dark & {
+[ data-darkreader-scheme="dark" ],
+.theme--dark {
 	.team-template-image-icon.lightmode,
 	.team-template-image-icon.team-template-lightmode,
 	.team-template-image-legacy.team-template-lightmode {

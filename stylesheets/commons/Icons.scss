@@ -4,6 +4,42 @@ Author(s): PhiLtheFisH, FO-nTTaX
 Note: When adding a new icon, please add to
 https://liquipedia.net/commons/Infobox_Icons
 *******************************************************************************/
+
+@mixin icon-make-size( $size ) {
+	$size1x: $size * 1px;
+	$size2x: $size * 2px;
+	&.lp-icon-#{$size} {
+		width: $size1x;
+		height: $size1x;
+		// todo: should be back to $size2x eventually
+		background-size: auto $size2x;
+		background-position: 0 -$size1x;
+
+		.darkmode &,
+		.theme--dark &,
+		[ data-darkreader-scheme="dark" ] & {
+			background-position: -$size1x -$size1x;
+		}
+
+		&:hover {
+			background-position: 0 0;
+
+			.darkmode &,
+			.theme--dark &,
+			[ data-darkreader-scheme="dark" ] & {
+				background-position: -$size1x 0;
+			}
+		}
+	}
+}
+
+@mixin icon-make-image( $class, $url ) {
+	$prefix: lp-;
+	&.#{$prefix}#{$class} {
+		background-image: url( $url );
+	}
+}
+
 .lp-icon {
 	display: inline-block;
 	overflow: hidden;
@@ -193,39 +229,4 @@ https://liquipedia.net/commons/Infobox_Icons
 	@include icon-make-image( youtube, "//liquipedia.net/commons/images/6/6c/InfoboxIcon_YouTube.png" );
 	@include icon-make-image( zhangyutv, "//liquipedia.net/commons/images/c/cf/InfoboxIcon_ZhangyuTV.png" );
 	@include icon-make-image( zhanqitv, "//liquipedia.net/commons/images/b/b0/InfoboxIcon_ZhanqiTV.png" );
-}
-
-@mixin icon-make-size( $size ) {
-	$size1x: $size * 1px;
-	$size2x: $size * 2px;
-	&.lp-icon-#{$size} {
-		width: $size1x;
-		height: $size1x;
-		// todo: should be back to $size2x eventually
-		background-size: auto $size2x;
-		background-position: 0 -$size1x;
-
-		.darkmode &,
-		.theme--dark &,
-		[ data-darkreader-scheme="dark" ] & {
-			background-position: -$size1x -$size1x;
-		}
-
-		&:hover {
-			background-position: 0 0;
-
-			.darkmode &,
-			.theme--dark &,
-			[ data-darkreader-scheme="dark" ] & {
-				background-position: -$size1x 0;
-			}
-		}
-	}
-}
-
-@mixin icon-make-image( $class, $url ) {
-	$prefix: lp-;
-	&.#{$prefix}#{$class} {
-		background-image: url( $url );
-	}
 }

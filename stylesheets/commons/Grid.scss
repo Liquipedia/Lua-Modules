@@ -163,7 +163,7 @@ License: MIT
 	}
 }
 
-@supports ( not ( display: contents ) ) {
+@supports not ( display: contents ) {
 	.lp-col > .lp-col {
 		padding-left: 0;
 		padding-right: 0;

@@ -66,8 +66,8 @@ Author(s): hjpalpha
 	background-color: var( --table-striped-background-color, var( --clr-surface-2, #f5f5f5 ) ) !important;
 }
 
-[ data-darkreader-scheme="dark" ] &,
-.theme--dark & {
+[ data-darkreader-scheme="dark" ],
+.theme--dark {
 	img[ title="Human" ],
 	img[ title="Infernal" ],
 	img[ title="Vanguard" ],

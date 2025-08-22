@@ -137,7 +137,7 @@
 			transition: transform 0.2s linear;
 		}
 
-		td&-cell {
+		td#{&}-cell {
 			padding: 0;
 			position: relative;
 		}

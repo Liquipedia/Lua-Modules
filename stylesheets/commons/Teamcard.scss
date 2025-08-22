@@ -276,8 +276,8 @@ Author(s): iMarbot
 Template(s): TeamCard Dark Reader support
 Author(s): iMarbot
 *******************************************************************************/
-[ data-darkreader-scheme="dark" ] &,
-.theme--dark & {
+[ data-darkreader-scheme="dark" ],
+.theme--dark {
 	.teamcard span.logo-lightmode {
 		display: none !important;
 	}

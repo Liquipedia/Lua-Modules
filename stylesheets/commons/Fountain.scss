@@ -1782,7 +1782,7 @@ a.ext-audiobutton {
 }
 
 // Template:Quote ( Quote.less ) style overrides for RU
-.wiki-dota2gameru & {
+.wiki-dota2gameru #{&} {
 	blockquote.quote::before {
 		top: -2.5rem; // -40px
 	}

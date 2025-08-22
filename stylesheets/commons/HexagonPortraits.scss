@@ -32,7 +32,6 @@ Author(s): PhiLtheFisH, FO-nTTaX, salle
 
 .wiki-heroes .hexagon-tile,
 .wiki-illuvium .hexagon-tile {
-	clip-path: url( data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><clipPath id=\'heroPolygon\'><polygon points=\'72 0, 134 36, 134 108, 72 144, 10 108, 10 36\'></polygon></clipPath></svg>#heroPolygon );
 	clip-path: polygon( 72px 0, 134px 36px, 134px 108px, 72px 144px, 10px 108px, 10px 36px );
 	display: inline-block;
 	margin-left: -5px;

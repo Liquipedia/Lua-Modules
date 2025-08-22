@@ -91,14 +91,6 @@ Author(s): salle
 Template(s): Toggle button
 Author(s): FO-nTTaX
 *******************************************************************************/
-.toggle-area {
-	@include toggle-area-loop( 50 );
-
-	.toggle-area-button {
-		cursor: pointer;
-	}
-}
-
 @mixin toggle-area-loop( $counter ) {
 	@if $counter > 0 {
 		@include toggle-area-loop( ($counter - 1 ));
@@ -111,6 +103,14 @@ Author(s): FO-nTTaX
 		[data-toggle-area-content='#{$no}'] {
 			display: none;
 		}
+	}
+}
+
+.toggle-area {
+	@include toggle-area-loop( 50 );
+
+	.toggle-area-button {
+		cursor: pointer;
 	}
 }
 /*******************************************************************************
@@ -377,8 +377,8 @@ span.icon-small.darkmode {
 	display: none;
 }
 
-[ data-darkreader-scheme="dark" ] &,
-.theme--dark & {
+[ data-darkreader-scheme="dark" ],
+.theme--dark {
 	span.league-icon-small-image.lightmode,
 	span.icon-small.lightmode {
 		display: none;
@@ -442,7 +442,7 @@ Author(s): FO-nTTaX
 }
 
 .timeline-row > div:nth-of-type( 2 ) {
-	width: calc( ~"100% - 150px" );
+	width: calc( 100% - 150px );
 }
 
 .timeline-period {
@@ -622,7 +622,7 @@ Author(s): FO-nTTaX, Rapture
 
 .spellcard-description {
 	display: inline-block;
-	width: calc( ~"100% - 124px" );
+	width: calc( 100% - 124px );
 	border-width: 1px 0;
 	border-style: solid;
 	padding: 5px 0;
@@ -798,7 +798,7 @@ Author(s): spazer
 	border-style: solid;
 	padding-left: 2px;
 	margin: 5px 0 0 5px;
-	width: calc( ~"100% - 10px" );
+	width: calc( 100% - 10px );
 	text-align: center;
 }
 
@@ -858,15 +858,15 @@ span.vodlink.darkmode {
 	display: none;
 }
 
-[ data-darkreader-scheme="dark" ] &,
-.theme--dark & {
+[ data-darkreader-scheme="dark" ],
+.theme--dark {
 	span.vodlink.lightmode {
 		display: none;
 	}
 }
 
-[ data-darkreader-scheme="dark" ] &,
-.theme--dark & {
+[ data-darkreader-scheme="dark" ],
+.theme--dark {
 	span.vodlink.darkmode {
 		display: inline-block;
 	}
@@ -876,15 +876,15 @@ span.vodlink.darkmode {
 	display: none;
 }
 
-[ data-darkreader-scheme="dark" ] &,
-.theme--dark & {
+[ data-darkreader-scheme="dark" ],
+.theme--dark {
 	.vodlink span.lightmode {
 		display: none;
 	}
 }
 
-[ data-darkreader-scheme="dark" ] &,
-.theme--dark & {
+[ data-darkreader-scheme="dark" ],
+.theme--dark {
 	.vodlink span.darkmode {
 		display: inline;
 	}
@@ -1226,7 +1226,7 @@ Author(s): iMarbot
 *******************************************************************************/
 @media ( min-width: 650px ) {
 	.roster-notes-squash div {
-		max-width: calc( ~"100% - 350px" );
+		max-width: calc( 100% - 350px );
 	}
 }
 
@@ -1346,11 +1346,6 @@ Author(s): spazer, Lafungo
 	text-shadow: 1px 1px rgba( 64, 64, 64, 0.4 ), 1px -1px rgba( 64, 64, 64, 0.4 ), -1px -1px rgba( 64, 64, 64, 0.4 ), -1px 1px rgba( 64, 64, 64, 0.4 );
 	font-weight: bold;
 	color: #ffffff;
-}
-
-.placement-text-#000000 {
-	font-weight: bold;
-	color: #000000;
 }
 
 .placement-1 {
@@ -1812,8 +1807,8 @@ Author(s): iMarbot
 	display: none;
 }
 
-[ data-darkreader-scheme="dark" ] &,
-.theme--dark & {
+[ data-darkreader-scheme="dark" ],
+.theme--dark {
 	.icon-16px.lightmode {
 		display: none;
 	}
@@ -2055,7 +2050,7 @@ Author(s): Vogan, salle
 Template(s): Darkmode images on file pages
 Author(s): FO-nTTaX, iMarbot
 *******************************************************************************/
-html:not( [ data-darkreader-scheme="dark" ] ):not( .theme--dark ) & {
+html:not( [ data-darkreader-scheme="dark" ] ):not( .theme--dark ) {
 	#file img[ src*="darkmode" ]:not( :hover ),
 	.searchResultImage img[ src*="darkmode" ],
 	.gallerybox img[ src*="darkmode" ] {
@@ -2066,7 +2061,7 @@ html:not( [ data-darkreader-scheme="dark" ] ):not( .theme--dark ) & {
 #file img[ src*="lightmode" ]:not( :hover ),
 .searchResultImage img[ src*="lightmode" ],
 .gallerybox img[ src*="lightmode" ] {
-	[ data-darkreader-scheme="dark" ] & {
+	[ data-darkreader-scheme="dark" ] #{&} {
 		background-color: #808080;
 	}
 
@@ -2198,8 +2193,8 @@ Author(s): hjpalpha
 Template: Matchpage Lightmode/Darkmode class
 Author(s): iMarbot
 *******************************************************************************/
-[ data-darkreader-scheme="dark" ] &,
-.theme--dark & {
+[ data-darkreader-scheme="dark" ],
+.theme--dark {
 	.matchpage span.banner.lightmode,
 	.matchpage div.logo.lightmode {
 		display: none;
@@ -2211,8 +2206,8 @@ Author(s): iMarbot
 	display: none;
 }
 
-[ data-darkreader-scheme="dark" ] &,
-.theme--dark & {
+[ data-darkreader-scheme="dark" ],
+.theme--dark {
 	.matchpage span.banner.darkmode,
 	.matchpage div.logo.darkmode {
 		display: unset !important;
@@ -2320,10 +2315,6 @@ Author(s): iMarbot
 *******************************************************************************/
 .bg-color-e6e6ff {
 	background: #e6e6ff;
-}
-
-.color-#000000 {
-	color: #000000;
 }
 
 .color-dimgray {
@@ -2435,8 +2426,8 @@ Author(s): Elysienna
 	border-color: #00005d;
 }
 
-[ data-darkreader-scheme="dark" ] &,
-.theme--dark & {
+[ data-darkreader-scheme="dark" ],
+.theme--dark {
 	.portal-map {
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-secondary-25 );
@@ -2693,7 +2684,7 @@ Author(s): salle
 }
 
 .tyre-graph-bar {
-	width: calc( ~"100% - 80px" );
+	width: calc( 100% - 80px );
 	border-left: 1px solid var( --clr-secondary-39, #646464 );
 	height: 12px;
 	display: inline-flex;
