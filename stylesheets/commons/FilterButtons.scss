@@ -79,12 +79,12 @@ Author(s): Elysienna, Nadox
 }
 
 .filter-effect-fade {
-	animation-name: fadein;
+	animation-name: fadeIn;
 	animation-duration: 0.8s;
 }
 
 .filter-effect-bounce {
-	animation-name: bouncein;
+	animation-name: bounceIn;
 	animation-duration: 0.8s;
 }
 
@@ -146,7 +146,7 @@ Author(s): Elysienna, Nadox
 
 /* Keyframes filter effects */
 
-@keyframes fadein {
+@keyframes fadeIn {
 	from {
 		opacity: 0;
 	}
@@ -156,7 +156,7 @@ Author(s): Elysienna, Nadox
 	}
 }
 
-@keyframes bouncein {
+@keyframes bounceIn {
 	from {
 		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
 	}

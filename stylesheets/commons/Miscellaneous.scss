@@ -147,7 +147,7 @@ Author(s): FO-nTTaX
 Template(s): Liquipedia links
 Author(s): FO-nTTaX, Elysienna
 *******************************************************************************/
-@keyframes badgepopanimation {
+@keyframes badgePopAnimation {
 	0% {
 		transform: scale( 0 );
 	}
@@ -161,7 +161,7 @@ Author(s): FO-nTTaX, Elysienna
 	}
 }
 
-@keyframes badgetooltipanimation {
+@keyframes badgeTooltipAnimation {
 	0% {
 		transform: translateX( 97% );
 		opacity: 0;
@@ -195,7 +195,7 @@ Author(s): FO-nTTaX, Elysienna
 	right: 0;
 	font-size: 0.75rem;
 	display: flex;
-	animation-name: badgepopanimation;
+	animation-name: badgePopAnimation;
 	animation-delay: 1s;
 	animation-duration: 0.4s;
 	animation-fill-mode: forwards;
@@ -216,7 +216,7 @@ Author(s): FO-nTTaX, Elysienna
 	z-index: 1;
 	opacity: 0;
 	box-shadow: 0 0 0.625rem 0 rgba( 0, 0, 0, 0.5 );
-	animation-name: badgepopanimation;
+	animation-name: badgePopAnimation;
 	animation-delay: 2s;
 	animation-duration: 4s;
 	animation-fill-mode: forwards;
