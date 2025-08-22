@@ -64,7 +64,9 @@ function MatchCard:render()
 				classes = {'match-info-tournament', highlight and HIGHLIGHT_CLASS or nil},
 				children = {tournamentLink},
 			} or nil,
-			MatchHeaderBR{match = match},
+			match.finished and #match.opponents > 2 and HtmlWidgets.Div{
+				children = MatchHeaderBR{match = match},
+			} or nil,
 			ButtonBar{match = match}
 		)
 	}

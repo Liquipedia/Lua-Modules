@@ -65,7 +65,7 @@ function MatchTournamentBar:render()
 				Link{
 					link = tournamentLink,
 					children = HtmlWidgets.Span{
-						children = (match.section ~= "Results" and {
+						children = (match.section ~= "Results" and #match.opponents <= 2 and {
 							tournament.displayName,
 							' - ',
 							match.section
@@ -76,8 +76,8 @@ function MatchTournamentBar:render()
 				},
 				#match.opponents > 2 and gameData and HtmlWidgets.Span{
 					children = (gameData.map and {
-						-- TODO: Tournament status here
-						'Game #',
+						match.section,
+						' - Game #',
 						gameData.gameIds[1],
 						' on ',
 						Link{
@@ -85,7 +85,8 @@ function MatchTournamentBar:render()
 							children = gameData.map
 						},
 					} or {
-						'Game #',
+						match.section,
+						' - Game #',
 						gameData.gameIds[1]
 					})
 				} or nil
