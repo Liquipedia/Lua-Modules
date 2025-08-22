@@ -1,5 +1,7 @@
-.idea/
-node_modules
-package-lock.json
-luacov.report.out
-luacov.stats.out
+/.idea/
+/node_modules
+/lua/output
+/lua/spec/snapshots/diffs
+/package-lock.json
+/luacov.report.out
+/luacov.stats.out
