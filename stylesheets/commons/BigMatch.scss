@@ -244,13 +244,62 @@ span.slash {
 .match-bm-match-header-date {
 	display: flex;
 	justify-content: center;
-	padding: 4px;
-	background: #f5f5f5;
-	border-top: 1px solid #bbbbbb;
+	align-self: stretch;
 
-	.theme--dark & {
-		background-color: var( --clr-secondary-16 );
-		border-color: var( --clr-secondary-25 );
+	.timer-object {
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		gap: 0.5rem;
+		align-self: stretch;
+	}
+
+	.timer-object-countdown,
+	.timer-object-date {
+		padding: 0.25rem 0.5rem;
+		border-radius: 0.25rem;
+		font-weight: bold;
+		font-size: 0.6875rem;
+
+		&.timer-object-countdown-live {
+			.theme--light & {
+				color: #ffffff;
+				background-color: #b81414;
+			}
+
+			.theme--dark & {
+				color: #2e0505;
+				background-color: #f5a3a3;
+			}
+		}
+
+		&.timer-object-countdown-completed {
+			.theme--light & {
+				color: #ffffff;
+				background-color: #1d7c1d;
+			}
+
+			.theme--dark & {
+				color: #0a290a;
+				background-color: #adebad;
+			}
+		}
+
+		&:not( .timer-object-countdown-live, .timer-object-countdown-completed ) {
+			color: var( --clr-on-background );
+
+		.theme--light & {
+			background-color: #00000014;
+		}
+
+		.theme--dark & {
+			background-color: #ffffff14;
+		}
+	}
+}
+
+	.timer-object-separator {
+		display: none;
 	}
 }
 
