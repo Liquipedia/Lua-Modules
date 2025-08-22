@@ -286,15 +286,15 @@ span.slash {
 		&:not( .timer-object-countdown-live, .timer-object-countdown-completed ) {
 			color: var( --clr-on-background );
 
-		.theme--light & {
-			background-color: #00000014;
-		}
+			.theme--light & {
+				background-color: #00000014;
+			}
 
-		.theme--dark & {
-			background-color: #ffffff14;
+			.theme--dark & {
+				background-color: #ffffff14;
+			}
 		}
 	}
-}
 
 	.timer-object-separator {
 		display: none;
