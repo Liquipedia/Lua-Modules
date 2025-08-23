@@ -129,13 +129,13 @@ function Earnings.calculateForTeam(args)
 	end
 
 	if Logic.readBool(args.doNotIncludePlayerEarnings) then
-		return Earnings.calculate(formatParticipant('opponentname'), args.year, args.mode, args.perYear, queryTeams)
+		return Earnings.calculate(formatParticipant('opponenttemplate'), args.year, args.mode, args.perYear, queryTeams)
 	end
 
-	local teamConditions = {formatParticipant('opponentname')}
+	local teamConditions = {formatParticipant('opponenttemplate')}
 
 	for playerIndex = 1, playerPositionLimit do
-		table.insert(teamConditions, formatParticipant('opponentplayers_p' .. playerIndex .. 'team'))
+		table.insert(teamConditions, formatParticipant('opponentplayers_p' .. playerIndex .. 'template'))
 	end
 	local teamConditionString = '(' .. table.concat(teamConditions, ' OR ') .. ')'
 
