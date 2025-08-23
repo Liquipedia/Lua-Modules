@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Condition = Lua.import('Module:Condition')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
@@ -124,9 +125,15 @@ return {
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[type::card]] AND '
-					.. '([[extradata_type::Troop]] OR [[extradata_type::Tower Troop]]'
-					.. ' OR [[extradata_type::Spell]] OR [[extradata_type::Building]])',
+				conditions = Condition.Tree(Condition.BooleanOperator.all):add{
+					Condition.Node(Condition.ColumnName('type'), Condition.Comparator.eq, 'card'),
+					Condition.Tree(Condition.BooleanOperator.any):add{
+						Condition.Node(Condition.ColumnName('extradata_type'), Condition.Comparator.eq, 'Troop'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Condition.Comparator.eq, 'Tower Troop'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Condition.Comparator.eq, 'Spell'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Condition.Comparator.eq, 'Building'),
+					}
+				}:toString()
 			},
 		},
 		{
@@ -136,9 +143,15 @@ return {
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[type::card]] AND '
-					.. '([[extradata_type::Evolved Troop]] OR [[extradata_type::Evolved Tower Troop]]'
-					.. ' OR [[extradata_type::Evolved Spell]] OR [[extradata_type::Evolved Building]])',
+				conditions = Condition.Tree(Condition.BooleanOperator.all):add{
+					Condition.Node(Condition.ColumnName('type'), Condition.Comparator.eq, 'card'),
+					Condition.Tree(Condition.BooleanOperator.any):add{
+						Condition.Node(Condition.ColumnName('extradata_type'), Condition.Comparator.eq, 'Evolved Troop'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Condition.Comparator.eq, 'Evolved Tower Troop'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Condition.Comparator.eq, 'Evolved Spell'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Condition.Comparator.eq, 'Evolved Building'),
+					}
+				}:toString()
 			},
 		},
 		{
