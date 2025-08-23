@@ -27,6 +27,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
 local DEFAULT_VALUES = {
@@ -290,8 +291,8 @@ function TransferList:_buildTeamConditions(toTeam, fromTeam)
 	if Logic.isEmpty(self.config.conditions.teams) then return end
 
 	self.teamConditions = ConditionTree(BooleanOperator.any)
-		:add(self:_buildOrConditions('fromteam', self.config.conditions.teams))
-		:add(self:_buildOrConditions('toteam', self.config.conditions.teams))
+		:add(self:_buildOrConditions('fromteamtemplate', self.config.conditions.teams))
+		:add(self:_buildOrConditions('toteamtemplate', self.config.conditions.teams))
 
 	return self.teamConditions
 end
@@ -300,11 +301,7 @@ end
 ---@param data string[]
 ---@return ConditionTree?
 function TransferList:_buildOrConditions(lpdbField, data)
-	if Logic.isEmpty(data) then return nil end
-	return ConditionTree(BooleanOperator.any)
-		:add(Array.map(data, function(item)
-			return ConditionNode(ColumnName(lpdbField), Comparator.eq, item)
-		end))
+	return ConditionUtil.anyOf(ColumnName(lpdbField), data)
 end
 
 ---@return Html|string?
