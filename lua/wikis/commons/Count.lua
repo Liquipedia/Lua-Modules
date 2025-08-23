@@ -183,8 +183,8 @@ function Count.placements(args)
 		local opponentConditions = ConditionTree(BooleanOperator.any)
 		Array.forEach(TeamTemplate.queryHistoricalNames(args.team), function(templateValue)
 			opponentConditions:add{
-				ConditionNode(ColumnName('opponentname'), Comparator.eq, templateValue),
-				ConditionNode(ColumnName('opponentname'), Comparator.eq, templateValue:gsub(' ', '_'))
+				ConditionNode(ColumnName('opponenttemplate'), Comparator.eq, templateValue),
+				ConditionNode(ColumnName('opponenttemplate'), Comparator.eq, templateValue:gsub(' ', '_'))
 			}
 		end)
 		lpdbConditions:add{opponentConditions}
