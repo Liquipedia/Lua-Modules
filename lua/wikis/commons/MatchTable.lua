@@ -243,8 +243,10 @@ function MatchTable:getOpponentAliases(mode, opponent)
 
 	local aliases = {}
 	--for teams also query pagenames from team template
-	local opponentNames = self.config.queryHistoricalAliases and
-		TeamTemplate.queryHistoricalNames(opponent.template) or {opponent.template}
+	---@type string[]
+	local opponentNames = self.config.queryHistoricalAliases
+		and Array.map(TeamTemplate.queryHistoricalNames(opponent.template), TeamTemplate.getPageName)
+		or {opponent.template}
 
 	Array.forEach(opponentNames, function(name)
 		name = name:gsub(' ', '_')
