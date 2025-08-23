@@ -124,7 +124,9 @@ return {
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[type::card]] AND ([[extradata_type::Troop]] OR [[extradata_type::Tower Troop]] OR [[extradata_type::Spell]] OR [[extradata_type::Building]])',
+				conditions = '[[type::card]] AND '
+					.. '([[extradata_type::Troop]] OR [[extradata_type::Tower Troop]]'
+					.. ' OR [[extradata_type::Spell]] OR [[extradata_type::Building]])',
 			},
 		},
 		{
@@ -134,7 +136,9 @@ return {
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[type::card]] AND ([[extradata_type::Evolved Troop]] OR [[extradata_type::Evolved Tower Troop]] OR [[extradata_type::Evolved Spell]] OR [[extradata_type::Evolved Building]])',
+				conditions = '[[type::card]] AND '
+					.. '([[extradata_type::Evolved Troop]] OR [[extradata_type::Evolved Tower Troop]]'
+					.. ' OR [[extradata_type::Evolved Spell]] OR [[extradata_type::Evolved Building]])',
 			},
 		},
 		{
