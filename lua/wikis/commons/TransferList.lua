@@ -15,7 +15,7 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
@@ -135,7 +135,7 @@ function TransferList:_getTeams(args)
 		if not mw.ext.TeamTemplate.teamexists(team) then
 			mw.log('Missing team teamplate: ' .. team)
 		end
-		Array.extendWith(teamList, Team.queryHistoricalNames(team) or {team})
+		Array.extendWith(teamList, TeamTemplate.queryHistoricalNames(team))
 	end)
 
 	return teamList
