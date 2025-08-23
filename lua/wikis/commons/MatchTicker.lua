@@ -14,6 +14,7 @@ local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tier = Lua.import('Module:Tier/Utils')
@@ -157,15 +158,19 @@ function MatchTicker:init(args)
 		not (config.upcoming or config.ongoing)),
 		'Invalid recent, upcoming, ongoing combination')
 
-	local teamPages = args.team and TeamTemplate.queryHistoricalNames(args.team) or nil
-	if teamPages then
-		Array.extendWith(teamPages,
-		Array.map(teamPages, function(team) return (team:gsub(' ', '_')) end),
-		Array.map(teamPages, function(team) return mw.getContentLanguage():ucfirst(team) end),
-		Array.map(teamPages, function(team) return (mw.getContentLanguage():ucfirst(team):gsub(' ', '_')) end)
-		)
+	local teamTemplates = args.team and TeamTemplate.queryHistoricalNames(args.team) or nil
+	if teamTemplates then
+		config.teamPages = Array.flatMap(teamTemplates, function (teamTemplate)
+			local teamPage = TeamTemplate.getPageName(teamTemplate)
+			---@cast teamPage -nil
+			return {
+				teamPage,
+				teamPage:gsub(' ', '_'),
+				String.upperCaseFirst(teamPage),
+				String.upperCaseFirst(teamPage:gsub(' ', '_')),
+			}
+		end)
 	end
-	config.teamPages = teamPages
 
 	config.showAllTbdMatches = Logic.readBool(Logic.nilOr(args.showAllTbdMatches,
 		Table.isEmpty(config.tournaments)))
