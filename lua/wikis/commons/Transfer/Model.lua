@@ -220,7 +220,7 @@ function Transfer._buildConditionsForLeaveTransfer(config, transfer)
 		ConditionNode(ColumnName('player'), Comparator.eq, config.player),
 	}
 
-	local historicalNames = TeamTemplate.queryHistoricalNames(transfer.team)
+	local historicalNames = Array.map(TeamTemplate.queryHistoricalNames(transfer.team), TeamTemplate.getPageName)
 
 	local buildFromConditions = function(teamField, roleField)
 		local fromConditions = ConditionUtil.anyOf(
