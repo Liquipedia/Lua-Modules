@@ -16,7 +16,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 local MathUtils = Lua.import('Module:MathUtil')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
@@ -108,9 +108,9 @@ function Earnings.calculateForTeam(args)
 	local queryTeams = {}
 	if Logic.readBool(args.queryHistorical) then
 		for _, team in pairs(teams) do
-			local historicalNames = Team.queryHistoricalNames(team)
+			local historicalNames = TeamTemplate.queryHistoricalNames(team)
 
-			if not historicalNames then
+			if Logic.isEmpty(historicalNames) then
 				return 0
 			end
 
