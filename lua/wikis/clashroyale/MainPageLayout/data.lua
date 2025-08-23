@@ -124,8 +124,23 @@ return {
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[type::card]]',
+				conditions = '[[type::card]] AND ([[extradata_type::Troop]] OR [[extradata_type::Tower Troop]] OR [[extradata_type::Spell]] OR [[extradata_type::Building]])',
 			},
+		},
+		{
+			file = 'Clash_Royale_Illustration_Card_Evolution.png',
+			title = 'Evolved Cards',
+			link = 'Portal:Evolved Cards',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::card]] AND ([[extradata_type::Evolved Troop]] OR [[extradata_type::Evolved Tower Troop]] OR [[extradata_type::Evolved Spell]] OR [[extradata_type::Evolved Building]])',
+			},
+		},
+		{
+			file = 'Clash_Royale_Illustration_Merge_Tactics.png',
+			title = 'Merge Tactics',
+			link = 'Portal:Merge Tactics',
 		},
 		{
 			file = 'Nova_Crl_2018_World_Finals.jpg',
