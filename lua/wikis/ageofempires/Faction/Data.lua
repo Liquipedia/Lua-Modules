@@ -671,33 +671,34 @@ local factionPropsAoE4 = {
 }
 
 local factionPropsAoM = {
-	chinese = {
+	atlanteans = {
 		index = 1,
+		name = 'Atlanteans',
+		faction = 'atlanteans',
+	},
+	chinese = {
+		index = 2,
 		name = 'Chinese',
 		pageName = 'Chinese' .. AOM_SUFFIX,
 		faction = 'chinese',
 	},
-	greeks = {
-		index = 2,
-		name = 'Greeks',
-		pageName = 'Greeks' .. AOM_SUFFIX,
-		faction = 'greeks',
-	},
-	atlanteans = {
-		index = 3,
-		name = 'Atlanteans',
-		faction = 'atlanteans',
-	},
 	egyptians = {
-		index = 4,
+		index = 3,
 		name = 'Egyptians',
 		pageName = 'Egyptians' .. AOM_SUFFIX,
 		faction = 'egyptians',
 	},
-	freyr = {
+	greeks = {
+		index = 4,
+		name = 'Greeks',
+		pageName = 'Greeks' .. AOM_SUFFIX,
+		faction = 'greeks',
+	},
+	japanese = {
 		index = 5,
-		name = 'Freyr',
-		faction = 'freyr',
+		name = 'Japanese',
+		pageName = 'Japanese' .. AOM_SUFFIX,
+		faction = 'japanese',
 	},
 	norse = {
 		index = 6,
@@ -705,102 +706,122 @@ local factionPropsAoM = {
 		pageName = 'Norse' .. AOM_SUFFIX,
 		faction = 'norse',
 	},
-	fuxi = {
+	amaterasu = {
 		index = 7,
+		name = 'Amaterasu',
+		faction = 'amaterasu',
+	},
+	freyr = {
+		index = 8,
+		name = 'Freyr',
+		faction = 'freyr',
+	},
+	fuxi = {
+		index = 9,
 		name = 'Fuxi',
 		faction = 'fuxi',
 	},
 	gaia = {
-		index = 8,
+		index = 10,
 		name = 'Gaia',
 		pageName = 'Gaia',
 		faction = 'gaia',
 	},
 	hades = {
-		index = 9,
+		index = 11,
 		name = 'Hades',
 		faction = 'hades',
 	},
 	isis = {
-		index = 10,
+		index = 12,
 		name = 'Isis',
 		faction = 'isis',
 	},
 	kronos = {
-		index = 11,
+		index = 13,
 		name = 'Kronos',
 		faction = 'kronos',
 	},
 	loki = {
-		index = 12,
+		index = 14,
 		name = 'Loki',
 		faction = 'loki',
 	},
 	nuwa = {
-		index = 13,
+		index = 15,
 		name = 'Nüwa',
 		faction = 'nuwa',
 	},
 	odin = {
-		index = 14,
+		index = 16,
 		name = 'Odin',
 		faction = 'odin',
 	},
 	oranos = {
-		index = 15,
+		index = 17,
 		name = 'Oranos',
 		faction = 'oranos',
 	},
 	poseidon = {
-		index = 16,
+		index = 18,
 		name = 'Poseidon',
 		pageName = 'Poseidon (god)',
 		faction = 'poseidon',
 	},
 	ra = {
-		index = 17,
+		index = 19,
 		name = 'Ra',
 		pageName = 'Ra (god)',
 		faction = 'ra',
 	},
 	set = {
-		index = 18,
+		index = 20,
 		name = 'Set',
 		faction = 'set',
 	},
 	shennong = {
-		index = 19,
+		index = 21,
 		name = 'Shennong',
 		faction = 'shennong',
 	},
+	susanoo = {
+		index = 22,
+		name = 'Susanoo',
+		faction = 'susanoo',
+	},
 	thor = {
-		index = 20,
+		index = 23,
 		name = 'Thor',
 		faction = 'thor',
 	},
+	tsukuyomi = {
+		index = 24,
+		name = 'Tsukuyomi',
+		faction = 'tsukuyomi',
+	},
 	zeus = {
-		index = 21,
+		index = 25,
 		name = 'Zeus',
 		faction = 'zeus',
 	},
 	quetzalcoatl = {
-		index = 22,
+		index = 26,
 		name = 'Quetzalcoatl',
 		faction = 'quetzalcoatl',
 	},
 	huitzilopochtli = {
-		index = 23,
+		index = 27,
 		name = 'Huitzilopochtli',
 		faction = 'huitzilopochtli',
 	},
 	tezcatlipoca = {
-		index = 24,
+		index = 28,
 		name = 'Tezcatlipoca',
 		faction = 'tezcatlipoca',
 	},
 
 	unknown = {
-		index = 25,
+		index = 29,
 		name = 'Unknown',
 		faction = 'unknown',
 	},
@@ -1024,6 +1045,7 @@ return {
 			zhu = 'zhuxislegacy',
 		},
 		aom = {
+			ama = 'amaterasu',
 			atl = 'atlanteans',
 			chi = 'chinese',
 			egy = 'egyptians',
@@ -1034,6 +1056,7 @@ return {
 			gre = 'greeks',
 			had = 'hades',
 			isi = 'isis',
+			jap = 'japanese',
 			kro = 'kronos',
 			lok = 'loki',
 			nor = 'norse',
@@ -1043,7 +1066,9 @@ return {
 			ora = 'oranos',
 			pos = 'poseidon',
 			she = 'shennong',
+			sus = 'susanoo',
 			tho = 'thor',
+			tsu = 'tsukuyomi',
 			zeu = 'zeus',
 			que = 'quetzalcoatl',
 			hui = 'huitzilopochtli',
