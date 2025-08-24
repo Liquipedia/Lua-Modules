@@ -360,3 +360,66 @@ local factionPropsHOE = {
 		faction = 'unknown',
 	},
 }
+
+return {
+	factionProps = {
+		-- Heroes of Might and Magic
+		h1 = factionPropsH1,
+		h2 = factionPropsH2,
+		h3 = factionPropsH3,
+		h4 = factionPropsH4,
+		h5 = factionPropsH5,
+		hoe = factionPropsHOE,
+	},
+	defaultFaction = 'unknown',
+	factions = {
+		-- Heroes of Might and Magic
+		h1 = Array.extractKeys(factionPropsH1),
+		h2 = Array.extractKeys(factionPropsH2),
+		h3 = Array.extractKeys(factionPropsH3),
+		h4 = Array.extractKeys(factionPropsH4),
+		h5 = Array.extractKeys(factionPropsH5),
+		hoe = Array.extractKeys(factionPropsHOE),
+	},
+	aliases = {
+		-- Heroes of Might and Magic
+		h1 = {
+			far = 'farm',
+			['for'] = 'forest',
+			mou = 'mountain',
+			pla = 'plains',
+		},
+		h2 = {
+			bar = 'barbarian',
+			kni = 'knight',
+			nec = 'necromancer',
+			sor = 'sorceress',
+			war = 'warlock',
+			wiz = 'wizard',
+		},
+		h3 = {
+			cas = 'castle',
+			ram = 'rampart',
+			tow = 'tower',
+			inf = 'inferno',
+			nec = 'necropolis',
+			necro = 'necropolis',
+			dun = 'dungeon',
+			str = 'stronghold',
+			strong = 'stronghold',
+			['for'] = 'fortress',
+			fort = 'fortress',
+			con = 'conflux',
+			flux = 'conflux',
+			cov = 'cove',
+			fac = 'factory',
+			bul = 'bulwark'
+		},
+		h4 = {
+		},
+		h5 = {
+		},
+		hoe = {
+		}
+	},
+}
