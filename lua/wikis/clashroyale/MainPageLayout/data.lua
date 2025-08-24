@@ -18,6 +18,10 @@ local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
+local BooleanOperator = Condition.BooleanOperator
+local Comparator = Condition.Comparator
+
+
 local CONTENT = {
 	usefulArticles = {
 		heading = 'Useful Articles',
@@ -125,13 +129,13 @@ return {
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = Condition.Tree(Condition.BooleanOperator.all):add{
-					Condition.Node(Condition.ColumnName('type'), Condition.Comparator.eq, 'card'),
-					Condition.Tree(Condition.BooleanOperator.any):add{
-						Condition.Node(Condition.ColumnName('extradata_type'), Condition.Comparator.eq, 'Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Condition.Comparator.eq, 'Tower Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Condition.Comparator.eq, 'Spell'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Condition.Comparator.eq, 'Building'),
+				conditions = Condition.Tree(BooleanOperator.all):add{
+					Condition.Node(Condition.ColumnName('type'), Comparator.eq, 'card'),
+					Condition.Tree(BooleanOperator.any):add{
+						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Troop'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Tower Troop'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Spell'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Building'),
 					}
 				}:toString()
 			},
@@ -143,13 +147,13 @@ return {
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = Condition.Tree(Condition.BooleanOperator.all):add{
-					Condition.Node(Condition.ColumnName('type'), Condition.Comparator.eq, 'card'),
-					Condition.Tree(Condition.BooleanOperator.any):add{
-						Condition.Node(Condition.ColumnName('extradata_type'), Condition.Comparator.eq, 'Evolved Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Condition.Comparator.eq, 'Evolved Tower Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Condition.Comparator.eq, 'Evolved Spell'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Condition.Comparator.eq, 'Evolved Building'),
+				conditions = Condition.Tree(BooleanOperator.all):add{
+					Condition.Node(Condition.ColumnName('type'), Comparator.eq, 'card'),
+					Condition.Tree(BooleanOperator.any):add{
+						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Troop'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Tower Troop'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Spell'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Building'),
 					}
 				}:toString()
 			},
