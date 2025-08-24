@@ -22,6 +22,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local Count = {}
 
@@ -180,14 +181,9 @@ function Count.placements(args)
 		lpdbConditions:add{opponentConditions}
 
 	elseif String.isNotEmpty(args.team) then
-		local opponentConditions = ConditionTree(BooleanOperator.any)
-		Array.forEach(TeamTemplate.queryHistoricalNames(args.team), function(templateValue)
-			opponentConditions:add{
-				ConditionNode(ColumnName('opponenttemplate'), Comparator.eq, templateValue),
-				ConditionNode(ColumnName('opponenttemplate'), Comparator.eq, templateValue:gsub(' ', '_'))
-			}
-		end)
-		lpdbConditions:add{opponentConditions}
+		lpdbConditions:add(ConditionUtil.anyOf(
+			ColumnName('opponenttemplate'), TeamTemplate.queryHistoricalNames(args.team)
+		))
 	end
 
 	if String.isNotEmpty(args.placement) then
