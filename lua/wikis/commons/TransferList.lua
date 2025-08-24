@@ -214,7 +214,7 @@ function TransferList:_buildConditions(config)
 	local conditions = self:_buildBaseConditions()
 		:add(self:_buildDateCondition(config.date))
 		:add(self:_buildTeamConditions(config.toTeam, config.fromTeam))
-		:add(self:_buildOrConditions('role1', config.roles1 or self.config.conditions.roles1))
+		:add(ConditionUtil.anyOf(ColumnName('role1'), config.roles1 or self.config.conditions.roles1))
 
 	return conditions:toString()
 end
@@ -224,10 +224,10 @@ function TransferList:_buildBaseConditions()
 	local config = self.config.conditions
 
 	self.baseConditions = ConditionTree(BooleanOperator.all)
-		:add(self:_buildOrConditions('player', config.players))
-		:add(self:_buildOrConditions('nationality', config.nationalities))
-		:add(self:_buildOrConditions('role2', config.roles2))
-		:add(self:_buildOrConditions('extradata_position', config.positions))
+		:add(ConditionUtil.anyOf(ColumnName('player'), config.players))
+		:add(ConditionUtil.anyOf(ColumnName('nationality'), config.nationalities))
+		:add(ConditionUtil.anyOf(ColumnName('role2'), config.roles2))
+		:add(ConditionUtil.anyOf(ColumnName('extradata_position'), config.positions))
 
 	if config.platform then
 		self.baseConditions:add{ConditionNode(ColumnName('extradata_platform'), Comparator.eq, config.platform)}
@@ -291,17 +291,10 @@ function TransferList:_buildTeamConditions(toTeam, fromTeam)
 	if Logic.isEmpty(self.config.conditions.teams) then return end
 
 	self.teamConditions = ConditionTree(BooleanOperator.any)
-		:add(self:_buildOrConditions('fromteamtemplate', self.config.conditions.teams))
-		:add(self:_buildOrConditions('toteamtemplate', self.config.conditions.teams))
+		:add(ConditionUtil.anyOf(ColumnName('fromteamtemplate'), self.config.conditions.teams))
+		:add(ConditionUtil.anyOf(ColumnName('toteamtemplate'), self.config.conditions.teams))
 
 	return self.teamConditions
-end
-
----@param lpdbField string
----@param data string[]
----@return ConditionTree?
-function TransferList:_buildOrConditions(lpdbField, data)
-	return ConditionUtil.anyOf(ColumnName(lpdbField), data)
 end
 
 ---@return Html|string?
