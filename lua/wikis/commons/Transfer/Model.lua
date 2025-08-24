@@ -220,7 +220,7 @@ function Transfer._buildConditionsForLeaveTransfer(config, transfer)
 		ConditionNode(ColumnName('player'), Comparator.eq, config.player),
 	}
 
-	local historicalNames = Array.map(TeamTemplate.queryHistoricalNames(transfer.team), TeamTemplate.getPageName)
+	local historicalNames = TeamTemplate.queryHistoricalNames(transfer.team)
 
 	local buildFromConditions = function(teamField, roleField)
 		local fromConditions = ConditionUtil.anyOf(
@@ -240,8 +240,8 @@ function Transfer._buildConditionsForLeaveTransfer(config, transfer)
 
 	if Logic.isNotEmpty(historicalNames) then
 		conditions:add(ConditionTree(BooleanOperator.any):add{
-			buildFromConditions('fromteam', 'role1'),
-			buildFromConditions('extradata_fromteamsec', 'extradata_role1sec'),
+			buildFromConditions('fromteamtemplate', 'role1'),
+			buildFromConditions('extradata_fromteamsectemplate', 'extradata_role1sec'),
 		})
 	elseif Table.includes(config.specialRoles, transfer.role) then
 		conditions:add(ConditionTree(BooleanOperator.any):add{
