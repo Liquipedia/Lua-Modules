@@ -118,6 +118,7 @@ return {
 			autoTeam = true,
 			automatedHistory = {
 				mode = 'cleanup',
+				storeFromWikiCode = true,
 			},
 		},
 	},
