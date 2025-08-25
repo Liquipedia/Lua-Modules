@@ -13,8 +13,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+          # Support runs of this action in forks
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
 
       - name: Setup lua
         # Workaround until https://github.com/leafo/gh-actions-lua/issues/57 is resolved
