@@ -105,6 +105,7 @@ end
 ---@field asGame boolean?
 ---@field gameIds number[]
 ---@field map string?
+---@field mapDisplayName string?
 
 ---@class MatchTicker
 ---@operator call(table): MatchTicker
@@ -454,7 +455,7 @@ function MatchTicker:expandGamesOfMatch(match)
 		gameMatch.date = game.date
 		gameMatch.map = game.map
 		gameMatch.vod = Logic.nilIfEmpty(game.vod) or match.vod
-		gameMatch.opponents = Array.map(match.opponents, function(opponent, opponentIndex)
+		gameMatch.opponents = Array.map(match.match2opponents, function(opponent, opponentIndex)
 			return MatchUtil.enrichGameOpponentFromMatchOpponent(opponent, game.opponents[opponentIndex])
 		end)
 		gameMatch.extradata = Table.merge(gameMatch.extradata, game.extradata)

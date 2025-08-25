@@ -30,11 +30,12 @@ function Match:create()
 		hideTournament = self.config.hideTournament,
 		displayGameIcons = self.config.displayGameIcons,
 		onlyHighlightOnValue = self.config.onlyHighlightOnValue,
-		-- TODO: This is bad, and needs to be refactored, but it's not relastic right now, so works for now
+		-- TODO: This is bad, and needs to be refactored, but it's not realistic right now, so works for now
 		gameData = {
 			asGame = self.match.asGame,
 			gameIds = self.match.asGameIndexes,
 			map = self.match.map,
+			mapDisplayName = self.match.extraData.mapDisplayName
 		}
 	}
 end

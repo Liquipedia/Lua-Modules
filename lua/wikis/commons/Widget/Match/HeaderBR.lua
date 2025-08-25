@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Operator = Lua.import('Module:Operator')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -16,9 +17,10 @@ local Trophy = Lua.import('Module:Widget/Match/Summary/Ffa/Trophy')
 local Div = HtmlWidgets.Div
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local Placement = Lua.import('Module:Placement')
 
 ---@class MatchHeaderBRProps
----@field match MatchGroupUtilMatch
+---@field match FFAMatchGroupUtilMatch
 ---@field teamStyle? teamStyle
 
 ---@class MatchHeaderBR: Widget
@@ -40,15 +42,10 @@ function MatchHeaderBR:render()
 		return
 	end
 
-	local sortedOpponents = Array.sortBy(
-		match.opponents,
-		function(opponent)
-			return opponent.placement
-		end
+	local topThree = Array.filter(
+		Array.sortBy(match.opponents, Operator.property('placement')),
+		function(opponent) return opponent.placement <= 3 end
 	)
-
-	local topThree = Array.sub(sortedOpponents, 1, 3)
-	local placements = {'1st', '2nd', '3rd'}
 
 	local positionRows = Array.map(topThree, function(opponent, i)
 		return Div {
@@ -58,7 +55,7 @@ function MatchHeaderBR:render()
 					classes = { 'match-info-headerbr-positionholder' },
 					children = {
 						Trophy { place = i },
-						placements[i]
+						Placement._makeOrdinal({i})[1]
 					}
 				},
 				Div {
