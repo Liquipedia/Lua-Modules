@@ -66,7 +66,7 @@ function MatchTournamentBar:render()
 				Link{
 					link = tournamentLink,
 					children = HtmlWidgets.Span{
-						children = (match.section ~= "Results" and #match.opponents <= 2 and {
+						children = (match.section ~= 'Results' and #match.opponents <= 2 and {
 							tournament.displayName,
 							' - ',
 							match.section
