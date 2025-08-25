@@ -198,7 +198,6 @@ function TransferList:fetch()
 		end
 		table.insert(currentGroup, transfer)
 	end
-	Array.appendWith(groupedData, currentGroup)
 
 	self.groupedTransfers = groupedData
 

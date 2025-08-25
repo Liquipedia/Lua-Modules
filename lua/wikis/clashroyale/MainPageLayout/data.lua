@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Condition = Lua.import('Module:Condition')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
@@ -16,6 +17,10 @@ local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
+
+local BooleanOperator = Condition.BooleanOperator
+local Comparator = Condition.Comparator
+
 
 local CONTENT = {
 	usefulArticles = {
@@ -124,8 +129,39 @@ return {
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[type::card]]',
+				conditions = Condition.Tree(BooleanOperator.all):add{
+					Condition.Node(Condition.ColumnName('type'), Comparator.eq, 'card'),
+					Condition.Tree(BooleanOperator.any):add{
+						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Troop'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Tower Troop'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Spell'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Building'),
+					}
+				}:toString()
 			},
+		},
+		{
+			file = 'Clash_Royale_Illustration_Card_Evolution.png',
+			title = 'Evolved Cards',
+			link = 'Portal:Evolved Cards',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = Condition.Tree(BooleanOperator.all):add{
+					Condition.Node(Condition.ColumnName('type'), Comparator.eq, 'card'),
+					Condition.Tree(BooleanOperator.any):add{
+						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Troop'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Tower Troop'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Spell'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Building'),
+					}
+				}:toString()
+			},
+		},
+		{
+			file = 'Clash_Royale_Illustration_Merge_Tactics.png',
+			title = 'Merge Tactics',
+			link = 'Portal:Merge Tactics',
 		},
 		{
 			file = 'Nova_Crl_2018_World_Finals.jpg',

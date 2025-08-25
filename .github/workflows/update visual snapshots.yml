@@ -1,6 +1,6 @@
 name: Update Visual Snapshots
 
-on: [pull_request, workflow_dispatch]
+on: [pull_request]
 
 jobs:
   update-snapshots:
@@ -14,6 +14,8 @@ jobs:
         uses: actions/checkout@v5
         with:
           ref: ${{ github.head_ref }}
+          # Support runs of this action in forks
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
 
       - name: Setup lua
         # Workaround until https://github.com/leafo/gh-actions-lua/issues/57 is resolved
