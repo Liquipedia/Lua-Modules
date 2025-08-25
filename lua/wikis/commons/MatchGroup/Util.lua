@@ -58,6 +58,7 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 ---@field advanceSpots MatchGroupUtilAdvanceSpot[]
 ---@field bracketResetMatchId string?
 ---@field header string?
+---@field inheritedHeader string
 ---@field lowerEdges MatchGroupUtilLowerEdge[]?
 ---@field lowerMatchIds string[]
 ---@field qualLose boolean?

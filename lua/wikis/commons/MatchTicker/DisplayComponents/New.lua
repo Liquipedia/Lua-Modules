@@ -23,13 +23,20 @@ local Match = Class.new(
 	end
 )
 
----@return Html
+---@return Widget
 function Match:create()
 	return MatchCard{
 		match = MatchGroupUtil.matchFromRecord(self.match),
 		hideTournament = self.config.hideTournament,
 		displayGameIcons = self.config.displayGameIcons,
 		onlyHighlightOnValue = self.config.onlyHighlightOnValue,
+		-- TODO: This is bad, and needs to be refactored, but it's not realistic right now, so works for now
+		gameData = {
+			asGame = self.match.asGame,
+			gameIds = self.match.asGameIndexes,
+			map = self.match.map,
+			mapDisplayName = self.match.extradata.displayname
+		}
 	}
 end
 
