@@ -43,7 +43,13 @@ function MatchHeaderBR:render()
 	end
 
 	local topThree = Array.sub(
-		Array.sortBy(match.opponents, Operator.property('placement')),
+		Array.sortBy(
+			Array.filter(
+				match.opponents,
+				Operator.property('placement')
+			),
+			Operator.property('placement')
+		),
 		1, 3
 	)
 
@@ -55,7 +61,7 @@ function MatchHeaderBR:render()
 					classes = { 'match-info-headerbr-positionholder' },
 					children = {
 						Trophy { place = i },
-						Placement._makeOrdinal({i})[1]
+						Placement._makeOrdinal({ i })[1]
 					}
 				},
 				Div {
