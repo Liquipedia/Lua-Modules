@@ -246,7 +246,7 @@ function MedalStats.compare(row1, row2)
 	return row1.identifier:lower() < row2.identifier:lower()
 end
 
----@param nameDisplay fun(identifier: string):string|Html
+---@param nameDisplay fun(identifier: string):string|Widget|Html
 ---@param title string
 ---@param cutAfterPartial string
 ---@return Html?
@@ -285,7 +285,7 @@ function MedalStats:header(title)
 end
 
 ---@param dataSet SeriesMedalStatsDataSet
----@param nameDisplay fun(identifier: string):string|Html
+---@param nameDisplay fun(identifier: string):string|Widget|Html
 ---@return Html
 function MedalStats:row(dataSet, nameDisplay)
 	local row = mw.html.create('tr')

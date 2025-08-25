@@ -203,7 +203,7 @@ end
 ---@param args table
 ---@param prefix string
 ---@param side number
----@return Html
+---@return Widget
 function CustomResultsTable._opponentDisplay(args, prefix, side)
 	local players = {CustomResultsTable._buildPlayerStruct(args, prefix .. 'p' .. side)}
 

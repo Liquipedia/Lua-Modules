@@ -19,8 +19,9 @@ local TypeUtil = Lua.import('Module:TypeUtil')
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local BlockTeam = Lua.import('Module:Widget/TeamDisplay/Block')
 local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
-local TeamIcon = Lua.import('Module:Widget/Image/Icon/TeamIcon')
 
 local zeroWidthSpace = '&#8203;'
 
@@ -194,13 +195,14 @@ end
 ---@field note string|number|nil
 ---@field showFaction boolean?
 ---@field showTbd boolean?
+---@field additionalClasses string[]?
 
 --[[
 Displays an opponent as a block element. The width of the component is
 determined by its layout context, and not of the opponent.
 ]]
 ---@param props BlockOpponentProps
----@return Html
+---@return Widget
 function OpponentDisplay.BlockOpponent(props)
 	local opponent = props.opponent
 	opponent.extradata = opponent.extradata or {}
@@ -209,7 +211,7 @@ function OpponentDisplay.BlockOpponent(props)
 
 	if opponent.type == Opponent.team then
 		if props.showTbd == false and Opponent.isTbd(opponent) then
-			return mw.html.create()
+			return HtmlWidgets.Fragment{}
 		end
 		return OpponentDisplay.BlockTeamContainer({
 			flip = props.flip,
@@ -217,12 +219,15 @@ function OpponentDisplay.BlockOpponent(props)
 			showLink = showLink,
 			style = props.teamStyle,
 			template = opponent.template or 'tbd',
+			additionalClasses = props.additionalClasses,
+			note = props.note,
 		})
 	elseif opponent.type == Opponent.literal then
 		return OpponentDisplay.BlockLiteral({
 			flip = props.flip,
 			name = opponent.name or '',
 			overflow = props.overflow,
+			additionalClasses = props.additionalClasses
 		})
 	elseif Opponent.typeIsParty(opponent.type) then
 		return OpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
@@ -232,15 +237,12 @@ function OpponentDisplay.BlockOpponent(props)
 end
 
 ---@param props BlockOpponentProps
----@return Html
+---@return Widget
 function OpponentDisplay.BlockPlayers(props)
-	local playersNode = mw.html.create('div')
-		:addClass('block-players-wrapper')
-	for _, playerNode in ipairs(OpponentDisplay.getBlockPlayerNodes(props)) do
-		playersNode:node(playerNode)
-	end
-
-	return playersNode
+	return HtmlWidgets.Div{
+		classes = Array.extend('block-players-wrapper', props.additionalClasses),
+		children = OpponentDisplay.getBlockPlayerNodes(props)
+	}
 end
 
 ---@param props BlockOpponentProps
@@ -274,81 +276,21 @@ end
 Displays a team as a block element. The width of the component is determined by
 its layout context, and not of the team name. The team is specified by template.
 ]]
----@param props {flip: boolean?, overflow: OverflowModes?, showLink: boolean?, style: teamStyle?, template: string}
----@return Html
+---@param props {flip: boolean?, overflow: OverflowModes?, showLink: boolean?,
+---style: teamStyle?, template: string, additionalClasses: string[]?, note: string|number?}
+---@return Widget
 function OpponentDisplay.BlockTeamContainer(props)
-	-- only import here to avoid dependency loop (OpponentDisplay <-> MatchGroup/Util)
-	local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
-	local team = MatchGroupUtil.fetchTeam(props.template)
-	if not team then
-		return mw.html.create('div'):addClass('error')
-			:wikitext('No team template exists for name ' .. props.template)
-	end
-
-	return OpponentDisplay.BlockTeam(Table.merge(props, {
-		team = team,
-	}))
-end
-
----@class blockTeamProps
----@field flip boolean
----@field overflow OverflowModes?
----@field showLink boolean?
----@field style teamStyle?
----@field team standardTeamProps
----@field dq boolean?
-
---[[
-Displays a team as a block element. The width of the component is determined by
-its layout context, and not of the team name. The team is specified by a team
-struct and icon wikitext.
-]]
----@param props blockTeamProps
----@return Html
-function OpponentDisplay.BlockTeam(props)
 	local style = props.style or 'standard'
-
-	local function createNameNode(name)
-		return mw.html.create(props.dq and 's' or 'span'):addClass('name')
-			:wikitext(props.showLink ~= false and props.team.pageName
-				and '[[' .. props.team.pageName .. '|' .. name .. ']]'
-				or name
-			)
-	end
-
-	local displayNameNode = createNameNode(props.team.displayName)
-	local bracketNameNode = createNameNode(props.team.bracketName)
-	local shortNameNode = createNameNode(props.team.shortName)
-
-	local icon = TeamIcon{
-		imageLight = props.team.imageLight,
-		imageDark = props.team.imageDark,
-		page = props.team.pageName,
-		legacy = props.team.hasLegacyImage,
-		noLink = props.showLink == false,
+	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
+	return BlockTeam{
+		name = props.template,
+		flip = props.flip,
+		style = style,
+		overflow = props.overflow,
+		noLink = not props.showLink,
+		additionalClasses = props.additionalClasses,
+		note = props.note,
 	}
-
-	local blockNode = mw.html.create('div'):addClass('block-team')
-		:addClass(props.flip and 'flipped' or nil)
-		:node(icon)
-
-	if style == 'standard' then
-		DisplayUtil.applyOverflowStyles(displayNameNode, props.overflow or 'ellipsis')
-		blockNode:node(displayNameNode)
-	elseif style == 'bracket' then
-		DisplayUtil.applyOverflowStyles(bracketNameNode, props.overflow or 'ellipsis')
-		blockNode:node(bracketNameNode)
-	elseif style == 'short' then
-		DisplayUtil.applyOverflowStyles(shortNameNode, props.overflow or 'ellipsis')
-		blockNode:node(shortNameNode)
-	elseif style == 'hybrid' then
-		DisplayUtil.applyOverflowStyles(bracketNameNode, 'ellipsis')
-		DisplayUtil.applyOverflowStyles(shortNameNode, 'hidden')
-		blockNode:node(bracketNameNode:addClass('hidden-xs'))
-		blockNode:node(shortNameNode:addClass('visible-xs'))
-	end
-
-	return blockNode
 end
 
 OpponentDisplay.propTypes.BlockLiteral = {
@@ -358,34 +300,40 @@ OpponentDisplay.propTypes.BlockLiteral = {
 }
 
 ---Displays the name of a literal opponent as a block element.
----@param props {flip: boolean?, name: string, overflow: OverflowModes}
----@return Html
+---@param props {flip: boolean?, name: string, overflow: OverflowModes, additionalClasses: string[]?}
+---@return Widget
 function OpponentDisplay.BlockLiteral(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockLiteral)
 
-	return DisplayUtil.applyOverflowStyles(mw.html.create('div'), props.overflow or 'wrap')
-		:addClass('brkts-opponent-block-literal')
-		:addClass(props.flip and 'flipped' or nil)
-		:node(Logic.emptyOr(props.name, zeroWidthSpace))
+	return HtmlWidgets.Div{
+		classes = Array.extend(
+			'brkts-opponent-block-literal',
+			props.flip and 'flipped' or nil,
+			props.additionalClasses
+		),
+		css = DisplayUtil.getOverflowStyles(props.overflow or 'wrap'),
+		children = Logic.emptyOr(props.name, zeroWidthSpace)
+	}
 end
 
 OpponentDisplay.propTypes.BlockScore = {
+	additionalClasses = TypeUtil.optional(TypeUtil.array('string')),
 	isWinner = 'boolean?',
 	scoreText = 'any',
 }
 
 ---Displays a score within the context of a block element.
----@param props {isWinner: boolean?, scoreText: string|number?}
----@return Html
+---@param props {isWinner: boolean?, scoreText: string|number?, additionalClasses: string[]?}
+---@return Widget
 function OpponentDisplay.BlockScore(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockScore)
 
 	local scoreText = props.scoreText
-	if props.isWinner then
-		scoreText = '<b>' .. scoreText .. '</b>'
-	end
 
-	return mw.html.create('div'):wikitext(scoreText)
+	return HtmlWidgets.Div{
+		classes = props.additionalClasses,
+		children = props.isWinner and HtmlWidgets.B{children = scoreText} or scoreText
+	}
 end
 
 ---Displays the first score or status of the opponent, as a string.
