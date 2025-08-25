@@ -1,6 +1,6 @@
 name: Update Visual Snapshots
 
-on: [pull_request, workflow_dispatch]
+on: [pull_request]
 
 jobs:
   update-snapshots:
