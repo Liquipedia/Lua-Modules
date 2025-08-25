@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
@@ -39,7 +40,7 @@ function StandingsSwissWidget:render()
 		classes = {'wikitable-bordered', 'wikitable-striped'},
 		children = WidgetUtil.collect(
 			-- Outer header
-			HtmlWidgets.Tr{children = HtmlWidgets.Th{
+			Logic.isNotEmpty(standings.title) and HtmlWidgets.Tr{children = HtmlWidgets.Th{
 				attributes = {
 					colspan = 100,
 				},
@@ -53,7 +54,7 @@ function StandingsSwissWidget:render()
 						},
 					},
 				},
-			}},
+			}} or nil,
 			-- Column Header
 			HtmlWidgets.Tr{children = WidgetUtil.collect(
 				HtmlWidgets.Th{children = '#'},
