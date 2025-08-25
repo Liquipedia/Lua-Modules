@@ -125,8 +125,6 @@ function CustomLeague:createBottomContent()
 		local matchtickerArgs = {
 			tournament = self.pagename,
 			limit = tonumber(self.args.matchtickerlimit) or 7,
-			infoboxWrapperClass = 'false',
-			infoboxClass = true
 		}
 		return MatchTicker.tournament(matchtickerArgs)
 	end
