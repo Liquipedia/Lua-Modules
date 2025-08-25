@@ -456,9 +456,9 @@ function MatchTicker:expandGamesOfMatch(match)
 		gameMatch.map = game.map
 		gameMatch.vod = Logic.nilIfEmpty(game.vod) or match.vod
 		gameMatch.opponents = Array.map(match.match2opponents, function(opponent, opponentIndex)
-			gameMatch.match2opponents = gameMatch.opponents
 			return MatchUtil.enrichGameOpponentFromMatchOpponent(opponent, game.opponents[opponentIndex])
 		end)
+		gameMatch.match2opponents = gameMatch.opponents
 		gameMatch.extradata = Table.merge(gameMatch.extradata, game.extradata)
 		return gameMatch
 	end)
