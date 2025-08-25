@@ -174,3 +174,15 @@ local byFactionHOE = {
 		icon = 'File:Char head filler.png',
 	},
 }
+
+return {
+	byFaction = {
+		-- Heroes of Might and Magic
+		h1 = byFactionH1,
+		h2 = byFactionH2,
+		h3 = byFactionH3,
+		h4 = byFactionH4,
+		h5 = byFactionH5,
+		hoe = byFactionHOE,
+	},
+}
