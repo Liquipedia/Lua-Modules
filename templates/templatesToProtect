@@ -232,6 +232,7 @@ DuoOpponent
 DuoPrizePool
 ExternalMediaLinkWrapper
 ExternalMediaList
+FfaStandings
 Flag
 FlagNoLink
 GetBracketCopyPaste
@@ -258,13 +259,16 @@ Patches_calendar
 Patches_list
 Placement
 QuadOpponent
+Round
 ShowBracket
 ShowSingleMatch
+ShowStandings
 SingleMatch
 SoloOpponent
 SoloPrizePool
 Stage
 Streams
+SwissStandings
 Tabs_dynamic
 Tabs_static
 TeamOpponent

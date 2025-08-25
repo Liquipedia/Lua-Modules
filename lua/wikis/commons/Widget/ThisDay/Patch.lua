@@ -62,7 +62,10 @@ function ThisDayPatch:render()
 		}
 	end)
 
-	return UnorderedList{ children = lines }
+	return {
+		HEADER,
+		UnorderedList{ children = lines }
+	}
 end
 
 return ThisDayPatch
