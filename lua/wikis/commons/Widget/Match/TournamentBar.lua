@@ -83,7 +83,7 @@ function MatchTournamentBar:render()
 						mapIsSet and ' on ' or nil,
 						mapIsSet and Link{
 							link = gameData.map,
-							children = gameData.map
+							children = gameData.mapDisplayName
 						} or nil,
 					}
 				} or nil

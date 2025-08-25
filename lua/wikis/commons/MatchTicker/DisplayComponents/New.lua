@@ -35,7 +35,7 @@ function Match:create()
 			asGame = self.match.asGame,
 			gameIds = self.match.asGameIndexes,
 			map = self.match.map,
-			mapDisplayName = self.match.extraData.mapDisplayName
+			mapDisplayName = self.match.extradata.mapDisplayName
 		}
 	}
 end
