@@ -42,9 +42,9 @@ function MatchHeaderBR:render()
 		return
 	end
 
-	local topThree = Array.filter(
+	local topThree = Array.sub(
 		Array.sortBy(match.opponents, Operator.property('placement')),
-		function(opponent) return opponent.placement <= 3 end
+		1, 3
 	)
 
 	local positionRows = Array.map(topThree, function(opponent, i)
