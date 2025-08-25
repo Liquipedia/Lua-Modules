@@ -1,0 +1,73 @@
+/*
+ This file is only used for testing purpose and have no impact on actual production.
+ The equivalent to this file on production is Special:RLA, and should be kept in sync with it.
+*/
+
+@use "commons/RankingTable";
+@use "commons/Ambox";
+@use "commons/AutomaticPointsTable";
+@use "commons/BattleRoyale/NavigationContent";
+@use "commons/BattleRoyale/NavigationTabs";
+@use "commons/BattleRoyale/Panel";
+@use "commons/BattleRoyale/PanelTable";
+@use "commons/Bracket";
+@use "commons/Brackets";
+@use "commons/Colours";
+@use "commons/Crosstable";
+@use "commons/DivTable";
+@use "commons/FilterButtons";
+@use "commons/Fountain";
+@use "commons/Grid";
+@use "commons/GroupTableLeague";
+@use "commons/Icons";
+@use "commons/Infobox";
+@use "commons/Mainpage";
+@use "commons/Matchseries";
+@use "commons/NavigationCard";
+@use "commons/Miscellaneous";
+@use "commons/BigMatch";
+@use "commons/BootstrapVisibility";
+@use "commons/DeckList";
+@use "commons/Faction";
+@use "commons/HexagonPortraits";
+@use "commons/ResponsiveTable";
+@use "commons/RosterCard";
+@use "commons/TeamPortal";
+@use "commons/TournamentCard";
+@use "commons/NavFrame";
+@use "commons/Navbox";
+@use "commons/OpponentList";
+@use "commons/Panels";
+@use "commons/Prizepooltable";
+@use "commons/Quote";
+@use "commons/Selectall";
+@use "commons/Statisticstable";
+@use "commons/Standings";
+@use "commons/Tables";
+@use "commons/Tabs";
+@use "commons/TeamTemplates";
+@use "commons/PanelBox/Heroes";
+@use "commons/Banner";
+@use "commons/Teamcard";
+@use "commons/Techtree";
+@use "commons/TournamentTags";
+@use "commons/Match";
+@use "commons/MatchTicker";
+@use "commons/Slider";
+@use "commons/SwitchButtons";
+
+/* Very basic styling, so that things look a bit more realistic */
+body {
+	font-family: "Open Sans", sans-serif;
+	font-size: 1rem;
+	font-weight: normal;
+	line-height: 1.5;
+	color: #212529;
+	text-align: left;
+}
+
+*,
+::before,
+::after {
+	box-sizing: border-box;
+}

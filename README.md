@@ -71,7 +71,7 @@ Eslint and Stylelint extensions are recommended if you're going to work with sty
 
 1. Add [lua_ls](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#eslint) in your Neovims lsp configuration (useful tools for lua files). Installation instruction can be found [here](https://luals.github.io/#neovim-install).
 2. Add [eslint](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#eslint) in your Neovims lsp configration (useful linting for Javascript files)
-3. Add [stylelint_lsp](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#stylelint_lsp) in your Neovims lsp configuration (useful linting for css and less files). Make sure to add `less` as a filetype to get the benefits of this LSP on less files in this project. You can also enable `autoFixOnSave` or [other settings](https://github.com/bmatcuk/stylelint-lsp?tab=readme-ov-file#settings) if you want:
+3. Add [stylelint_lsp](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#stylelint_lsp) in your Neovims lsp configuration (useful linting for scss files). Make sure to add `scss` as a filetype to get the benefits of this LSP on scss files in this project. You can also enable `autoFixOnSave` or [other settings](https://github.com/bmatcuk/stylelint-lsp?tab=readme-ov-file#settings) if you want:
 
 ```lua
 require('lspconfig').stylelint_lsp.setup {
@@ -112,7 +112,7 @@ The project is divided into folders based on language. Even though the project i
 - In the `javascript` folder are scripts that run in the client. Our current setup does not fully support all available features in html. So for example a dropdown (select) element can't be rendered from our back end properly. We use javascript to add these kind of features. Essentially anything that makes an element interactable, buttons mostly, are constructed or configured from javascript.
 - The modules written in lua are found in the `lua` folder.
   - Some modules are covered by unit tests. Tests are placed in the `spec` sub-folder.
-- Styling is found in the `stylesheets` folder. For styling we use [less](https://lesscss.org/). Check out their documentation for getting up to speed on how this differs from traditional css.
+- Styling is found in the `stylesheets` folder. For styling we use [scss](https://sass-lang.com/). Check out their documentation for getting up to speed on how this differs from traditional css.
 
 ### Automated Testing
 
