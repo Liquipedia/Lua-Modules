@@ -97,7 +97,7 @@ return {
 			category = 'Test Sessions',
 		},
 		nonchampionship = {
-			value = 'Non-Championship',
+			value = 'Non Championship',
 			sort = 'B2',
 			name = 'Non-Championship',
 			short = 'Non-Champs',
@@ -112,7 +112,7 @@ return {
 			link = 'Showmatches',
 			category = 'Showmatch Events',
 		},
-		award = {
+		awards = {
 			value = 'Awards',
 			sort = 'B4',
 			name = 'Awards',
