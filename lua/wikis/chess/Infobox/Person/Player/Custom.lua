@@ -40,7 +40,6 @@ function CustomPlayer.run(frame)
 
 	player.args.id = player.args.id or player.args.romanized_name or player.args.name
 
-
 	return player:createInfobox()
 end
 
