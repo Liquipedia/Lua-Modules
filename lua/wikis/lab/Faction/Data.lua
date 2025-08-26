@@ -15,8 +15,8 @@ local HOMM_PREFIX = 'Heroesofmightandmagic/'
 local H3_SUFFIX = '/Heroes of Might and Magic III'
 local H4_SUFFIX = '/Heroes of Might and Magic IV'
 local H5_SUFFIX = '/Heroes of Might and Magic V'
--- local H6_SUFFIX = '/Might & Magic: Heroes VI'
--- local H7_SUFFIX = '/Might & Magic: Heroes VII'
+local H6_SUFFIX = '/Might & Magic: Heroes VI'
+local H7_SUFFIX = '/Might & Magic: Heroes VII'
 local HOE_SUFFIX = '/Heroes of Might and Magic: Olden Era'
 
 local factionPropsH1 = {
@@ -236,7 +236,6 @@ local factionPropsH5 = {
 		pageName = HOMM_PREFIX .. 'Dungeon' .. H5_SUFFIX,
 		faction = 'dungeon',
 	},
-
 	haven = {
 		index = 3,
 		name = 'Haven',
@@ -261,7 +260,6 @@ local factionPropsH5 = {
 		pageName = HOMM_PREFIX .. 'Sylvan' .. H5_SUFFIX,
 		faction = 'sylvan',
 	},
-
 	fortress = {
 		index = 7,
 		name = 'Fortress',
@@ -277,6 +275,102 @@ local factionPropsH5 = {
 
 	unknown = {
 		index = 9,
+		name = 'Unknown',
+		faction = 'unknown',
+	},
+}
+
+local factionPropsH6 = {
+	sanctuary = {
+		index = 1,
+		name = 'Sanctuary',
+		pageName = HOMM_PREFIX .. 'Sanctuary',
+		faction = 'sanctuary',
+	},
+	dungeon = {
+		index = 2,
+		name = 'Dungeon',
+		pageName = HOMM_PREFIX .. 'Dungeon' .. H6_SUFFIX,
+		faction = 'dungeon',
+	},
+	haven = {
+		index = 3,
+		name = 'Haven',
+		pageName = HOMM_PREFIX .. 'Haven' .. H6_SUFFIX,
+		faction = 'haven',
+	},
+	inferno = {
+		index = 4,
+		name = 'Inferno',
+		pageName = HOMM_PREFIX .. 'Inferno' .. H6_SUFFIX,
+		faction = 'inferno',
+	},
+	necropolis = {
+		index = 5,
+		name = 'Necropolis',
+		pageName = HOMM_PREFIX .. 'Necropolis' .. H6_SUFFIX,
+		faction = 'necropolis',
+	},
+	stronghold = {
+		index = 6,
+		name = 'Stronghold',
+		pageName = HOMM_PREFIX .. 'Stronghold' .. H6_SUFFIX,
+		faction = 'stronghold',
+	},
+
+	unknown = {
+		index = 7,
+		name = 'Unknown',
+		faction = 'unknown',
+	},
+}
+
+local factionPropsH5 = {
+	academy = {
+		index = 1,
+		name = 'Academy',
+		pageName = HOMM_PREFIX .. 'Academy' .. H7_SUFFIX,
+		faction = 'academy',
+	},
+	dungeon = {
+		index = 2,
+		name = 'Dungeon',
+		pageName = HOMM_PREFIX .. 'Dungeon' .. H7_SUFFIX,
+		faction = 'dungeon',
+	},
+	haven = {
+		index = 3,
+		name = 'Haven',
+		pageName = HOMM_PREFIX .. 'Haven' .. H7_SUFFIX,
+		faction = 'haven',
+	},
+	necropolis = {
+		index = 4,
+		name = 'Necropolis',
+		pageName = HOMM_PREFIX .. 'Necropolis' .. H7_SUFFIX,
+		faction = 'necropolis',
+	},
+	sylvan = {
+		index = 5,
+		name = 'Sylvan',
+		pageName = HOMM_PREFIX .. 'Sylvan' .. H7_SUFFIX,
+		faction = 'sylvan',
+	},
+	fortress = {
+		index = 6,
+		name = 'Fortress',
+		pageName = HOMM_PREFIX .. 'Fortress' .. H7_SUFFIX,
+		faction = 'fortress',
+	},
+	stronghold = {
+		index = 7,
+		name = 'Stronghold',
+		pageName = HOMM_PREFIX .. 'Stronghold' .. H7_SUFFIX,
+		faction = 'stronghold',
+	},
+
+	unknown = {
+		index = 8,
 		name = 'Unknown',
 		faction = 'unknown',
 	},
@@ -336,6 +430,8 @@ return {
 		h3 = factionPropsH3,
 		h4 = factionPropsH4,
 		h5 = factionPropsH5,
+		h6 = factionPropsH6,
+		h7 = factionPropsH7,
 		hoe = factionPropsHOE,
 	},
 	defaultFaction = 'unknown',
@@ -346,6 +442,8 @@ return {
 		h3 = Array.extractKeys(factionPropsH3),
 		h4 = Array.extractKeys(factionPropsH4),
 		h5 = Array.extractKeys(factionPropsH5),
+		h6 = Array.extractKeys(factionPropsH6),
+		h7 = Array.extractKeys(factionPropsH7),
 		hoe = Array.extractKeys(factionPropsHOE),
 	},
 	aliases = {
@@ -397,6 +495,28 @@ return {
 			dun = 'dungeon',
 			hav = 'haven',
 			inf = 'inferno',
+			nec = 'necropolis',
+			necro = 'necropolis',
+			syl = 'sylvan',
+			['for'] = 'fortress',
+			fort = 'fortress',
+			str = 'stronghold',
+			strong = 'stronghold',
+		},
+		h6 = {
+			san = 'sanctuary',
+			dun = 'dungeon',
+			hav = 'haven',
+			inf = 'inferno',
+			nec = 'necropolis',
+			necro = 'necropolis',
+			str = 'stronghold',
+			strong = 'stronghold',
+		},
+		h7 = {
+			aca = 'academy',
+			dun = 'dungeon',
+			hav = 'haven',
 			nec = 'necropolis',
 			necro = 'necropolis',
 			syl = 'sylvan',
