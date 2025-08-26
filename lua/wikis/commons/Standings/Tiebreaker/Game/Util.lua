@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
@@ -15,7 +16,7 @@ local TiebreakerGameUtil = {}
 
 ---@param opponent TiebreakerOpponent
 ---@return {games: integer, w: integer, d: integer, l: integer}
-function TiebreakerGameUtil.getGames(opponent)
+TiebreakerGameUtil.getGames = FnUtil.memoize(function (opponent)
 	local games = 0
 	local gameWins = 0
 	local gameDraws = 0
@@ -35,6 +36,6 @@ function TiebreakerGameUtil.getGames(opponent)
 	local gameLosses = games - gameWins - gameDraws
 
 	return {games = games, w = gameWins, d = gameDraws, l = gameLosses}
-end
+end)
 
 return TiebreakerGameUtil
