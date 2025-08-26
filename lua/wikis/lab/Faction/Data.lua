@@ -325,7 +325,7 @@ local factionPropsH6 = {
 	},
 }
 
-local factionPropsH5 = {
+local factionPropsH7 = {
 	academy = {
 		index = 1,
 		name = 'Academy',
@@ -389,7 +389,6 @@ local factionPropsHOE = {
 		pageName = HOMM_PREFIX .. 'Necropolis' .. HOE_SUFFIX,
 		faction = 'necropolis',
 	},
-
 	sylvan = {
 		index = 3,
 		name = 'Sylvan',
