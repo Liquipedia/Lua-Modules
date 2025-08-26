@@ -79,7 +79,7 @@ function ManualGroupWrapper.run(frame)
 		'}}',
 		Logic.isNotEmpty(oppIssues) and {
 			'[[Category:Pages with issues in converted manual group tables]]<!--',
-			unpack(oppIssues),
+			Json.stringify(oppIssues),
 			'-->'
 		} or nil
 	)
@@ -128,14 +128,14 @@ function ManualGroupWrapper._processOpponent(opponentInput)
 	-- assume it is player inputs if it isn't a team
 	local opponentArgs = {}
 	local playerIndex = 0
-	for playerInputStr in opponentInput:gmatch('%{%{%w*[pP]layer([^%}])}]') do
+	for playerInputStr in opponentInput:gmatch('%{%{[pP]layer([^%}]*)%}%}') do
 		playerIndex = playerIndex + 1
 		local prefix = 'p' .. playerIndex
 
-		opponentArgs[prefix] = playerInputStr:match('%|%s*([^=%|%}])[%|%}]')
-		opponentArgs[prefix .. 'link'] = playerInputStr:match('%|%s*link%s*=%s*([^%|%}])[%|%}]')
-		opponentArgs[prefix .. 'flag'] = playerInputStr:match('%|%s*flag%s*=%s*([^%|%}])[%|%}]')
-		opponentArgs[prefix .. 'faction'] = playerInputStr:match('%|%s*race%s*=%s*([^%|%}])[%|%}]')
+		opponentArgs[prefix] = playerInputStr:match('%|%s*([^=%|%}]*)[%|%}]')
+		opponentArgs[prefix .. 'link'] = playerInputStr:match('%|%s*link%s*=%s*([^%|%}]*)[%|%}]')
+		opponentArgs[prefix .. 'flag'] = playerInputStr:match('%|%s*flag%s*=%s*([^%|%}]*)[%|%}]')
+		opponentArgs[prefix .. 'faction'] = playerInputStr:match('%|%s*race%s*=%s*([^%|%}]*)[%|%}]')
 	end
 
 	local opponentType = TYPE_FROM_NUMBER[playerIndex]
