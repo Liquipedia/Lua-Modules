@@ -40,7 +40,28 @@ function CustomPlayer.run(frame)
 
 	player.args.id = player.args.id or player.args.romanized_name or player.args.name
 
+
 	return player:createInfobox()
+end
+
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	local highestTitleName
+	for _, title in ipairs(TITLES) do
+		if Logic.isNotEmpty(args['title_' .. title.code]) then
+			highestTitleName = title.name
+			break
+		end
+	end
+
+	if highestTitleName then
+		lpdbData.extradata.chesstitle = highestTitleName
+	end
+
+	return lpdbData
 end
 
 ---@param id string
