@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Standings/Tiebreaker/Match/WinRate
+-- page=Module:Standings/Tiebreaker/Game/WinRate
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

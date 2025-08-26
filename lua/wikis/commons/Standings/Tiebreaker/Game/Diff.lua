@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Standings/Tiebreaker/Match/Diff
+-- page=Module:Standings/Tiebreaker/Game/Diff
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
