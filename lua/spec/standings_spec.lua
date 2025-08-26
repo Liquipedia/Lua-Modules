@@ -220,7 +220,8 @@ insulate('Standings', function()
 						title = "Week 6"
 					},
 					rounds = 6,
-					title = "Group Stage Standings"
+					title = "Group Stage Standings",
+					type = 'ffa',
 				},
 			}
 		}})
