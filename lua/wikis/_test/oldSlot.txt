@@ -1,0 +1,50 @@
+<includeonly>|- class="show-when-logged-in navigation-not-searchable"
+|colspan=7|{{ambox
+|image=Emblem-important.svg
+|class=ambox-red
+|text=Manual group tables are deprecated. Please use [[Template:GroupTableLeague]] instead.
+}}
+|-{{#if:{{{bg|}}}|class="bg-{{{bg}}}"}}
+!{{#if:{{{pbg|}}}|class="bg-{{{pbg}}}"}} style="width: 16px;"|{{{place|X}}}. <!-- show place number in header cell -->
+|colspan="{{#expr:4-{{#if:{{{go|}}}|1|0}}-{{#if:{{{win_g|}}}{{{lose_g|}}}|1|0}}-{{#if:{{{diff|}}}|1|0}}}}" style="text-align:{{{align|left}}};" class="grouptableslot"| {{{1}}} <!-- show the player name with the correct colspan -->
+{{#if: {{{go|}}} <!-- if go= is present, add a cell and show the arror -->
+  | {{!}}style="width: 16px;"{{!}}<!-- go= with values "up", "same" and "down"
+  -->{{#switch: {{{go}}}
+    |up = {{PlaceUp}}
+        |up1 = {{PlaceUp}}&nbsp;+1
+        |up2 = {{PlaceUp}}&nbsp;+2
+        |up3 = {{PlaceUp}}&nbsp;+3
+        |up4 = {{PlaceUp}}&nbsp;+4
+        |up5 = {{PlaceUp}}&nbsp;+5
+        |up6 = {{PlaceUp}}&nbsp;+6
+        |up7 = {{PlaceUp}}&nbsp;+7
+        |same = {{PlaceSame}}
+        |same0 = {{PlaceSame}}&nbsp;–
+        |down = {{PlaceDown}}
+        |down1 = {{PlaceDown}}&nbsp;-1
+        |down2 = {{PlaceDown}}&nbsp;-2
+        |down3 = {{PlaceDown}}&nbsp;-3
+        |down4 = {{PlaceDown}}&nbsp;-4
+        |down5 = {{PlaceDown}}&nbsp;-5
+        |down6 = {{PlaceDown}}&nbsp;-6
+        |down7 = {{PlaceDown}}&nbsp;-7
+    |{{{go}}}
+  }}
+}}
+|style="width: 32px;white-space: pre; text-align:center;"|'''{{{win_m|0}}}-{{#if:{{{tie_m|}}}|{{{tie_m|}}}-}}{{{lose_m|0}}}''' <!-- always show match scores --><!--
+-->{{#if: {{{win_g|}}}{{{lose_g|}}} <!-- show games scores if present with win_g= or lose_g=-->
+	| {{!}}{{!}}style="width: 32px;white-space: pre; text-align:center;"{{!}}{{{win_g|0}}}-{{{lose_g|0}}}}}<!--
+-->{{#if: {{{diff|}}} <!-- if diff= is present, show it as well -->
+	| {{!}}{{!}}style="width: 32px;white-space: pre; text-align: center;"{{!}}''{{{diff|}}}''
+}}{{#ifeq:{{lc:{{#var:show_points|}}}}|true<!-- if show_p present, show points
+-->| {{!}}{{!}}<!--class="grouptable-points"-->style="width: 32px;white-space: pre; text-align:center;"{{!}}<!--
+-->{{#if: {{{win_m|}}}{{{lose_m|}}}<!-- if win_m or lose_m is present, calculate points
+   -->|  {{#if: {{{tie_m|}}}<!-- if tie_m is present, include tie matches in calculation
+   -->| '''<i>{{#expr: ({{{win_m}}}*{{#var:win_points|3}}) + ({{#if:{{{tie_m|}}}|{{{tie_m}}}|0}}*{{#var:tie_points|1}}) + {{#if:{{{temp_p|}}}|{{{temp_p}}}|0}}}}p</i><!--
+   -->| '''<i>{{#expr: ({{{win_m}}}*{{#var:win_points|3}}) + {{#if:{{{temp_p|}}}|{{{temp_p}}}|0}}}}p</i><!--
+   -->}}<!--
+   -->| '''<i>0p</i>'''<!--
+   -->}}<!--
+-->}}<!--
+-->{{#ifeq:{{{store|}}}|no||{{#invoke:Lua|invoke|module=Standings/Storage/StarcraftLegacy|fn=entry|type=league}}}}<!--
+--></includeonly><noinclude>{{documentation}}[[Category:Tournament Page Formatting Templates]][[Category:Templates]]</noinclude>
