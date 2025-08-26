@@ -15,8 +15,8 @@ local HOMM_PREFIX = 'Heroesofmightandmagic/'
 local H3_SUFFIX = '/Heroes of Might and Magic III'
 local H4_SUFFIX = '/Heroes of Might and Magic IV'
 local H5_SUFFIX = '/Heroes of Might and Magic V'
-local H6_SUFFIX = '/Heroes of Might and Magic VI'
-local H7_SUFFIX = '/Heroes of Might and Magic VII'
+-- local H6_SUFFIX = '/Might & Magic: Heroes VI'
+-- local H7_SUFFIX = '/Might & Magic: Heroes VII'
 local HOE_SUFFIX = '/Heroes of Might and Magic: Olden Era'
 
 local factionPropsH1 = {
