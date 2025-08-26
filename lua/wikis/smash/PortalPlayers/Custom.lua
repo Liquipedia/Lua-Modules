@@ -13,7 +13,7 @@ local Array = Lua.import('Module:Array')
 local Links = Lua.import('Module:Links')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
@@ -87,7 +87,8 @@ function CustomPortalPlayers:row(player, isPlayer)
 	row:tag('td'):node(CustomPortalPlayers._getMainCharIcons(player))
 
 	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '') or ''
-	local teamText = mw.ext.TeamTemplate.teamexists(player.team) and Team.team(nil, player.team) or ''
+	local teamText = TeamTemplate.exists(player.team)
+		and tostring(OpponentDisplay.InlineTeamContainer{template = player.team}) or ''
 	if String.isNotEmpty(role) and String.isEmpty(teamText) then
 		teamText = role
 	elseif String.isNotEmpty(role) then

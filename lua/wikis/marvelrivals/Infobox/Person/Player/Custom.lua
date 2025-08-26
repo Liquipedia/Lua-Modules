@@ -12,7 +12,7 @@ local Class = Lua.import('Module:Class')
 local Region = Lua.import('Module:Region')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Template = Lua.import('Module:Template')
 
 local CharacterIcon = Lua.import('Module:CharacterIcon')
@@ -85,7 +85,7 @@ end
 ---@return string?
 function CustomPlayer:createBottomContent()
 	if String.isEmpty(self.args.team) or not self:shouldStoreData(self.args) then return end
-	local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
+	local teamPage = TeamTemplate.getPageName(self.args.team)
 	return tostring(MatchTicker.player{recentLimit = 3}) ..
 		Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
 end
