@@ -152,7 +152,7 @@ local byFactionH5 = {
 
 local byFactionH6 = {
 	sanctuary = {
-		icon = 'File:Academy H6 icon.png',
+		icon = 'File:Sanctuary H6 icon.png',
 	},
 	dungeon = {
 		icon = 'File:Dungeon H6 icon.png',
