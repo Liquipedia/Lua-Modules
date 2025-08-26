@@ -23,8 +23,6 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local NUM_CARDS_PER_PLAYER = 8
-local CARD_COLOR_1 = 'blue'
-local CARD_COLOR_2 = 'red'
 local DEFAULT_CARD = 'default'
 
 local CustomMatchSummary = {}
@@ -256,8 +254,6 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 	local flip = args.flip
 	local date = args.date
 
-	local color = flip and CARD_COLOR_2 or CARD_COLOR_1
-
 	local sideWrapper = mw.html.create('div')
 		:css('display', 'flex')
 		:css('flex-direction', 'column')
@@ -275,7 +271,6 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 		local cardDisplays = {}
 		for _, card in ipairs(cardData) do
 			table.insert(cardDisplays, mw.html.create('div')
-				:addClass('brkts-popup-side-color brkts-popup-side-color--' .. color)
 				:addClass('brkts-champion-icon')
 				:node(CharacterIcon.Icon{
 					character = card,
@@ -304,7 +299,6 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 			local towerCardDisplay = mw.html.create('div')
 					:addClass('brkts-popup-body-element-thumbs')
 					:tag('div')
-						:addClass('brkts-popup-side-color brkts-popup-side-color--' .. color)
 						:addClass('brkts-champion-icon')
 						:node(CharacterIcon.Icon{
 							character = cardData.tower,
