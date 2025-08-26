@@ -9,16 +9,16 @@
 
 local byFactionH1 = {
 	farm = {
-		icon = 'File:Farm H1 icon.webp',
+		icon = 'File:Farm H1 icon.png',
 	},
 	forest = {
-		icon = 'File:Forest H1 icon.webp',
+		icon = 'File:Forest H1 icon.png',
 	},
 	mountain = {
-		icon = 'File:Mountain H1 icon.webp',
+		icon = 'File:Mountain H1 icon.png',
 	},
 	plains = {
-		icon = 'File:Plains H1 icon.webp',
+		icon = 'File:Plains H1 icon.png',
 	},
 
 	unknown = {
@@ -28,22 +28,22 @@ local byFactionH1 = {
 
 local byFactionH2 = {
 	barbarian = {
-		icon = 'File:Barbarian H2 icon.webp',
+		icon = 'File:Barbarian H2 icon.png',
 	},
 	knight = {
-		icon = 'File:Knight H2 icon.webp',
+		icon = 'File:Knight H2 icon.png',
 	},
 	necromancer = {
-		icon = 'File:Necromancer H2 icon.webp',
+		icon = 'File:Necromancer H2 icon.png',
 	},
 	sorceress = {
-		icon = 'File:Sorceress H2 icon.webp',
+		icon = 'File:Sorceress H2 icon.png',
 	},
 	warlock = {
-		icon = 'File:Warlock H2 icon.webp',
+		icon = 'File:Warlock H2 icon.png',
 	},
 	wizard = {
-		icon = 'File:Wizard H2 icon.webp',
+		icon = 'File:Wizard H2 icon.png',
 	},
 
 	unknown = {
@@ -96,22 +96,22 @@ local byFactionH3 = {
 
 local byFactionH4 = {
 	haven = {
-		icon = 'File:Haven H4 icon.webp',
+		icon = 'File:Haven H4 icon.png',
 	},
 	stronghold = {
-		icon = 'File:Stronghold H4 icon.webp',
+		icon = 'File:Stronghold H4 icon.png',
 	},
 	academy = {
-		icon = 'File:Academy H4 icon.webp',
+		icon = 'File:Academy H4 icon.png',
 	},
 	preserve = {
-		icon = 'File:Preserve H4 icon.webp',
+		icon = 'File:Preserve H4 icon.png',
 	},
 	necropolis = {
-		icon = 'File:Necropolis H4 icon.webp',
+		icon = 'File:Necropolis H4 icon.png',
 	},
 	asylum = {
-		icon = 'File:Asylum H4 icon.webp',
+		icon = 'File:Asylum H4 icon.png',
 	},
 
 	unknown = {
@@ -121,28 +121,28 @@ local byFactionH4 = {
 
 local byFactionH5 = {
 	academy = {
-		icon = 'File:Academy H5 icon.webp',
+		icon = 'File:Academy H5 icon.png',
 	},
 	dungeon = {
-		icon = 'File:Dungeon H5 icon.webp',
+		icon = 'File:Dungeon H5 icon.png',
 	},
 	haven = {
-		icon = 'File:Haven H5 icon.webp',
+		icon = 'File:Haven H5 icon.png',
 	},
 	inferno = {
-		icon = 'File:Inferno H5 icon.webp',
+		icon = 'File:Inferno H5 icon.png',
 	},
 	necropolis = {
-		icon = 'File:Necropolis H5 icon.webp',
+		icon = 'File:Necropolis H5 icon.png',
 	},
 	sylvan = {
-		icon = 'File:Sylvan H5 icon.webp',
+		icon = 'File:Sylvan H5 icon.png',
 	},
 	fortress = {
-		icon = 'File:Fortress H5 icon.webp',
+		icon = 'File:Fortress H5 icon.png',
 	},
 	stronghold = {
-		icon = 'File:Stronghold H5 icon.webp',
+		icon = 'File:Stronghold H5 icon.png',
 	},
 
 	unknown = {
