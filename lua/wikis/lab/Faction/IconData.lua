@@ -150,6 +150,59 @@ local byFactionH5 = {
 	},
 }
 
+local byFactionH6 = {
+	sanctuary = {
+		icon = 'File:Academy H6 icon.png',
+	},
+	dungeon = {
+		icon = 'File:Dungeon H6 icon.png',
+	},
+	haven = {
+		icon = 'File:Haven H6 icon.png',
+	},
+	inferno = {
+		icon = 'File:Inferno H6 icon.png',
+	},
+	necropolis = {
+		icon = 'File:Necropolis H6 icon.png',
+	},
+	stronghold = {
+		icon = 'File:Stronghold H6 icon.png',
+	},
+
+	unknown = {
+		icon = 'File:Char head filler.png',
+	},
+}
+
+local byFactionH7 = {
+	academy = {
+		icon = 'File:Academy H7 icon.png',
+	},
+	dungeon = {
+		icon = 'File:Dungeon H7 icon.png',
+	},
+	haven = {
+		icon = 'File:Haven H7 icon.png',
+	},
+	necropolis = {
+		icon = 'File:Necropolis H7 icon.png',
+	},
+	sylvan = {
+		icon = 'File:Sylvan H7 icon.png',
+	},
+	fortress = {
+		icon = 'File:Fortress H7 icon.png',
+	},
+	stronghold = {
+		icon = 'File:Stronghold H7 icon.png',
+	},
+
+	unknown = {
+		icon = 'File:Char head filler.png',
+	},
+}
+
 local byFactionHOE = {
 	temple = {
 		icon = 'File:Temple HOE icon.png',
@@ -183,6 +236,8 @@ return {
 		h3 = byFactionH3,
 		h4 = byFactionH4,
 		h5 = byFactionH5,
+		h6 = byFactionH6,
+		h7 = byFactionH7,
 		hoe = byFactionHOE,
 	},
 }
