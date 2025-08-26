@@ -407,7 +407,7 @@ return {
 		},
 		hoe = {
 			tem = 'temple',
-			nec = 'necropolis'',
+			nec = 'necropolis',
 			necro = 'necropolis',
 			syl = 'sylvan',
 			dun = 'dungeon',
