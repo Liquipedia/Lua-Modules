@@ -13,12 +13,12 @@ https://liquipedia.net/commons/Infobox_Icons
 		height: $size1x;
 		// todo: should be back to $size2x eventually
 		background-size: auto $size2x;
-		background-position: 0 -$size1x;
+		background-position: 0 (-$size1x);
 
 		.darkmode &,
 		.theme--dark &,
 		[ data-darkreader-scheme="dark" ] & {
-			background-position: -$size1x -$size1x;
+			background-position: -$size1x (-$size1x);
 		}
 
 		&:hover {
