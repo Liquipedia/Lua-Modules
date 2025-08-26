@@ -2,9 +2,16 @@
 insulate('Standings', function()
 	insulate('FFA', function ()
 		allwikis('smoke', function (args, wikiName)
+			local LpdbStandingsTableStub = stub(mw.ext.LiquipediaDB, 'lpdb_standingstable')
+			local LpdbStandingsEntryStub = stub(mw.ext.LiquipediaDB, 'lpdb_standingsentry')
+			local LpdbQueryStub = stub(mw.ext.LiquipediaDB, 'lpdb', {})
 			local StandingsTable = require('Module:Standings/Table')
 
 			GoldenTest('standings_ffa_' .. wikiName, tostring(StandingsTable.fromTemplate(args.input)))
+
+			LpdbStandingsTableStub:revert()
+			LpdbStandingsEntryStub:revert()
+			LpdbQueryStub:revert()
 		end, {default = {
 			input = {
 				{
