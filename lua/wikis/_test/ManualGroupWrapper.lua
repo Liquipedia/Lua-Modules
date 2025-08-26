@@ -59,9 +59,10 @@ function ManualGroupWrapper.run(frame)
 
 	local oppIssues = {}
 	local slots = Array.map(slotInputs, function(input, index)
-		local slot, hasIssue = ManualGroupWrapper._readSlot(input, index)
+		local slotArgs = Json.parseIfTable(input)
+		local slot, hasIssue = ManualGroupWrapper._readSlot(slotArgs, index)
 		if hasIssue then
-			table.insert(oppIssues, input)
+			oppIssues[index] = slotArgs[1]
 		end
 		return slot
 	end)
@@ -87,13 +88,15 @@ function ManualGroupWrapper.run(frame)
 	return table.concat(output, '\n')
 end
 
----@param input string
+---@param args table?
 ---@param index integer
 ---@return string?
 ---@return boolean?
-function ManualGroupWrapper._readSlot(input, index)
-	local args = Json.parseIfTable(input)
+function ManualGroupWrapper._readSlot(args, index)
 	if Logic.isEmpty(args) then return end
+	---@cast args -nil
+
+	local opponent = ManualGroupWrapper._processOpponent(args[1] or '')
 
 	local output = Array.append({},
 		args.bg and ('|bg' .. index .. '=' .. args.bg) or nil,
@@ -104,12 +107,9 @@ function ManualGroupWrapper._readSlot(input, index)
 		args.lose_m and ('|temp_lose_m' .. index .. '=' .. args.lose_m) or nil,
 		args.tie_m and ('|temp_tie_m' .. index .. '=' .. args.tie_m) or nil,
 		args.win_m and ('|temp_win_m' .. index .. '=' .. args.win_m) or nil,
-		args.temp_p and ('|temp_p' .. index .. '=' .. args.temp_p) or nil
+		args.temp_p and ('|temp_p' .. index .. '=' .. args.temp_p) or nil,
+		'|' .. (opponent or 'missing opponent')
 	)
-
-	local opponent = ManualGroupWrapper._processOpponent(args[1] or '')
-
-	table.insert(output, '|' .. (opponent or 'missing opponent'))
 
 	return table.concat(output), Logic.isEmpty(opponent)
 end
