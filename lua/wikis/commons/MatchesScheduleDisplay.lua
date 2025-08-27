@@ -280,19 +280,20 @@ end
 ---@param opponent standardOpponent
 ---@param flip boolean
 ---@param side string
----@return Html
+---@return Widget
 function MatchesTable._buildOpponent(opponent, flip, side)
-	local opponentCell = mw.html.create('td'):addClass('Team' .. side)
-
 	if Opponent.isTbd(opponent) or Opponent.isEmpty(opponent) then
 		opponent = Opponent.tbd(Opponent.literal)
 	end
 
-	return opponentCell:node(OpponentDisplay.InlineOpponent{
-		opponent = opponent,
-		teamStyle = 'short',
-		flip = flip,
-	})
+	return HtmlWidgets.Td{
+		classes = {'Team' .. side},
+		children = OpponentDisplay.InlineOpponent{
+			opponent = opponent,
+			teamStyle = 'short',
+			flip = flip,
+		}
+	}
 end
 
 ---@param match MatchGroupUtilMatch
