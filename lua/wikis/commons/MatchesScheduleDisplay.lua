@@ -89,7 +89,7 @@ function MatchesTable:create()
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
 		limit = self.config.limit,
 		order = 'date asc',
-		conditions = self:buildConditions(),
+		conditions = tostring(self:buildConditions()),
 	})
 
 	if type(matches[1]) ~= 'table' then
@@ -110,7 +110,7 @@ function MatchesTable:create()
 	}
 end
 
----@return string
+---@return ConditionTree
 function MatchesTable:buildConditions()
 	local config = self.config
 
@@ -136,7 +136,7 @@ function MatchesTable:buildConditions()
 		conditions:add{ConditionNode(ColumnName('match2bracketdata_sectionheader'), Comparator.eq, config.section)}
 	end
 
-	return conditions:toString()
+	return conditions
 end
 
 ---@return Widget
