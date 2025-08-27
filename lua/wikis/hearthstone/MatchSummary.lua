@@ -96,7 +96,7 @@ function CustomMatchSummary.Game(options, game, gameIndex)
 	local rowWidget = options.isPartOfSubMatch and HtmlWidgets.Div or MatchSummaryWidgets.Row
 
 	---@param opponentIndex any
-	---@return table[]
+	---@return Widget[]
 	local function createOpponentDisplay(opponentIndex)
 		return WidgetUtil.collect(
 			CustomMatchSummary.DisplayClass(game.opponents[opponentIndex], opponentIndex == 1),
