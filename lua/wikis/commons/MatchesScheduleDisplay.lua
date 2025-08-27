@@ -121,17 +121,11 @@ function MatchesTable:buildConditions()
 	conditions:add(pageConditions)
 
 	if config.startDate then
-		conditions:add(ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('date'), Comparator.eq, config.startDate),
-			ConditionNode(ColumnName('date'), Comparator.gt, config.startDate),
-		})
+		conditions:add(ConditionNode(ColumnName('date'), Comparator.ge, config.startDate))
 	end
 
 	if config.endDate then
-		conditions:add(ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('date'), Comparator.eq, config.endDate),
-			ConditionNode(ColumnName('date'), Comparator.lt, config.endDate),
-		})
+		conditions:add(ConditionNode(ColumnName('date'), Comparator.le, config.endDate))
 	end
 
 	if config.matchSection then
