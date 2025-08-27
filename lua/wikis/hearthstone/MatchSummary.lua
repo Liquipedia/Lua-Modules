@@ -51,7 +51,7 @@ function CustomMatchSummary.TeamSubmatch(submatch)
 				HtmlWidgets.Div{css = {margin = 'auto', ['font-weight'] = 'bold'}, children = {submatch.header}},
 				MatchSummaryWidgets.Break{},
 			} or nil,
-			CustomMatchSummary.TeamSubMatchOpponnetRow(submatch),
+			CustomMatchSummary.TeamSubMatchOpponentRow(submatch),
 			hasDetails and Array.map(submatch.games, function(game, gameIndex)
 				return CustomMatchSummary.Game(
 					{isPartOfSubMatch = true},
@@ -73,7 +73,7 @@ end
 
 ---@param submatch HearthstoneMatchGroupUtilSubmatch
 ---@return Widget
-function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
+function CustomMatchSummary.TeamSubMatchOpponentRow(submatch)
 	local opponents = submatch.opponents or {{}, {}}
 	Array.forEach(opponents, function (opponent, opponentIndex)
 		local players = opponent.players or {}
