@@ -51,7 +51,7 @@ function CustomMatchSummary.TeamSubmatch(submatch)
 				HtmlWidgets.Div{css = {margin = 'auto', ['font-weight'] = 'bold'}, children = {submatch.header}},
 				MatchSummaryWidgets.Break{},
 			} or nil,
-			CustomMatchSummary.TeamSubMatchOpponnetRow(submatch),
+			CustomMatchSummary.TeamSubMatchOpponentRow(submatch),
 			hasDetails and Array.map(submatch.games, function(game, gameIndex)
 				return CustomMatchSummary.Game(
 					{isPartOfSubMatch = true},
@@ -73,7 +73,7 @@ end
 
 ---@param submatch HearthstoneMatchGroupUtilSubmatch
 ---@return Widget
-function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
+function CustomMatchSummary.TeamSubMatchOpponentRow(submatch)
 	local opponents = submatch.opponents or {{}, {}}
 	Array.forEach(opponents, function (opponent, opponentIndex)
 		local players = opponent.players or {}
@@ -96,12 +96,12 @@ function CustomMatchSummary.Game(options, game, gameIndex)
 	local rowWidget = options.isPartOfSubMatch and HtmlWidgets.Div or MatchSummaryWidgets.Row
 
 	---@param opponentIndex any
-	---@return table[]
+	---@return Widget[]
 	local function createOpponentDisplay(opponentIndex)
-		return Array.extend({
+		return WidgetUtil.collect(
 			CustomMatchSummary.DisplayClass(game.opponents[opponentIndex], opponentIndex == 1),
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
-		})
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex}
+		)
 	end
 
 	return rowWidget{
@@ -115,9 +115,9 @@ function CustomMatchSummary.Game(options, game, gameIndex)
 	}
 end
 
----@param opponent table
+---@param opponent {players: table[], score: number?, status: string?}
 ---@param flip boolean?
----@return Html?
+---@return Widget?
 function CustomMatchSummary.DisplayClass(opponent, flip)
 	local player = Array.find(opponent.players or {}, function (player)
 		return Logic.isNotEmpty(player.class)
