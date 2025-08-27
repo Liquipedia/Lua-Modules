@@ -98,10 +98,10 @@ function CustomMatchSummary.Game(options, game, gameIndex)
 	---@param opponentIndex any
 	---@return table[]
 	local function createOpponentDisplay(opponentIndex)
-		return Array.extend({
+		return WidgetUtil.collect(
 			CustomMatchSummary.DisplayClass(game.opponents[opponentIndex], opponentIndex == 1),
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
-		})
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex}
+		)
 	end
 
 	return rowWidget{
