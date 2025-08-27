@@ -174,11 +174,17 @@ function MatchesTable:header()
 end
 
 ---@param match MatchGroupUtilMatch
----@return Html
+---@return Widget
 function MatchesTable:dateDisplay(match)
-	local dateCell = mw.html.create('td')
-		:addClass('Date')
-		:node(HiddenSort.run(match.date))
+	---@param props {css: table<string, string|number|nil>, children: string|Widget|(string|Widget)[]}
+	---@return Widget
+	local function createDateCell(props)
+		return HtmlWidgets.Td{
+			classes = {'Date'},
+			css = props.css,
+			children = props.children
+		}
+	end
 
 	if Logic.readBool(match.dateIsExact) then
 		local countdownArgs = {}
@@ -190,15 +196,18 @@ function MatchesTable:dateDisplay(match)
 		end
 		countdownArgs.timestamp = match.timestamp
 		countdownArgs.date = DateExt.toCountdownArg(match.timestamp, match.timezoneId)
-		return dateCell:wikitext(Countdown._create(countdownArgs))
+		return createDateCell{children = Countdown._create(countdownArgs)}
 	elseif self.config.onlyShowExactDates then
-		return dateCell
-			:css('text-align', 'center')
-			:css('font-style', 'italic')
-			:wikitext('To be announced')
+		return createDateCell{
+			css = {
+				['text-align'] = 'center',
+				['font-style'] = 'italic'
+			},
+			children = 'To be announced'
+		}
 	end
 
-	return dateCell:wikitext(mw.getContentLanguage():formatDate('F j, Y', match.date))
+	return createDateCell{children = DateExt.formatTimestamp('F j, Y', match.timestamp)}
 end
 
 ---@param record match2
