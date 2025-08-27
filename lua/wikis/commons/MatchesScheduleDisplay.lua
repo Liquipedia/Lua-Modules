@@ -31,6 +31,10 @@ local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+local Td = HtmlWidgets.Td
+local Th = HtmlWidgets.Th
+local Tr = HtmlWidgets.Tr
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -97,7 +101,7 @@ function MatchesTable:create()
 	end
 	self.matches = matches
 
-	return HtmlWidgets.Div{
+	return Div{
 		classes = {'table-responsive'},
 		css = {['margin-bottom'] = '10px'},
 		children = HtmlWidgets.Table{
@@ -141,32 +145,32 @@ end
 
 ---@return Widget
 function MatchesTable:header()
-	return HtmlWidgets.Tr{
+	return Tr{
 		classes = {'HeaderRow'},
 		children = WidgetUtil.collect(
-			HtmlWidgets.Th{
+			Th{
 				classes = {'divCell'},
 				attributes = {['data-sort-type'] = 'isoDate'},
 				children = 'Date'
 			},
-			self.config.showRound and HtmlWidgets.Th{
+			self.config.showRound and Th{
 				classes = {'divCell', not self.config.sortRound and 'unsortable' or nil},
 				children = 'Round'
 			} or nil,
-			HtmlWidgets.Th{
+			Th{
 				classes = {'divCell'},
 				children = 'Opponent'
 			},
-			HtmlWidgets.Th{
+			Th{
 				classes = {'divCell'},
 				css = {width = 50},
 				children = 'Score'
 			},
-			HtmlWidgets.Th{
+			Th{
 				classes = {'divCell'},
 				children = 'vs. Opponent'
 			},
-			self.config.showMatchPage and HtmlWidgets.Th{
+			self.config.showMatchPage and Th{
 				classes = {'divCell', 'unsortable'}
 			} or nil
 		)
@@ -179,7 +183,7 @@ function MatchesTable:dateDisplay(match)
 	---@param props {css: table<string, string|number|nil>, children: string|Widget|(string|Widget)[]}
 	---@return Widget
 	local function createDateCell(props)
-		return HtmlWidgets.Td{
+		return Td{
 			classes = {'Date'},
 			css = props.css,
 			children = WidgetUtil.collect(
@@ -220,11 +224,11 @@ function MatchesTable:row(record)
 
 	local match = MatchGroupUtil.matchFromRecord(record)
 
-	return HtmlWidgets.Tr{
+	return Tr{
 		classes = {'Match'},
 		children = WidgetUtil.collect(
 			self:dateDisplay(match),
-			self.config.showRound and HtmlWidgets.Td{
+			self.config.showRound and Td{
 				classes = {'Round'},
 				children = matchHeader
 			} or nil,
@@ -290,7 +294,7 @@ function MatchesTable._buildOpponent(opponent, flip, side)
 		opponent = Opponent.tbd(Opponent.literal)
 	end
 
-	return HtmlWidgets.Td{
+	return Td{
 		classes = {'Team' .. side},
 		children = OpponentDisplay.InlineOpponent{
 			opponent = opponent,
@@ -310,15 +314,15 @@ function MatchesTable.score(match)
 
 	local showBestOf = (tonumber(match.bestof) or 0) <= 0
 
-	return HtmlWidgets.Td{
+	return Td{
 		classes = {'Score'},
 		children = WidgetUtil.collect(
 			showBestOf and {
-				HtmlWidgets.Div{
+				Div{
 					css = {['line-height'] = '1.1'},
 					children = scoreDisplay
 				},
-				HtmlWidgets.Div{
+				Div{
 					css = {
 						['font-size'] = '75%',
 						['padding-bottom'] = '1px'
@@ -353,7 +357,7 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return Widget
 function MatchesTable.matchPageLinkDisplay(match)
-	return HtmlWidgets.Td{
+	return Td{
 		classes = {'MatchPage'},
 		children = MatchPageButton{match = match}
 	}
