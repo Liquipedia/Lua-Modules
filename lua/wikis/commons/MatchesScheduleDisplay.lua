@@ -84,7 +84,7 @@ function MatchesTable:init(args)
 	return self
 end
 
----@return Html?
+---@return Widget?
 function MatchesTable:create()
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
 		limit = self.config.limit,
