@@ -329,7 +329,7 @@ function MatchesTable.score(match)
 					},
 					children = {
 						'(',
-						MatchesTable._bestof(match.bestof)
+						MatchesTable._bestof(match.bestof),
 						')'
 					}
 				}
