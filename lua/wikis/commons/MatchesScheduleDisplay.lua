@@ -289,41 +289,53 @@ function MatchesTable._buildOpponent(opponent, flip, side)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Html
+---@return Widget
 function MatchesTable.score(match)
-	local scoreCell = mw.html.create('td')
-		:addClass('Score')
-
 	local scoreDisplay = (match.finished or (
 		match.dateIsExact and
 		DateExt.getCurrentTimestamp() >= match.timestamp
 	)) and MatchesTable.scoreDisplay(match) or 'vs'
 
-	if (tonumber(match.bestof) or 0) <= 0 then
-		return scoreCell:wikitext(scoreDisplay)
-	end
+	local showBestOf = (tonumber(match.bestof) or 0) <= 0
 
-	return scoreCell
-		:tag('div'):css('line-height', '1.1'):node(scoreDisplay):done()
-		:tag('div')
-			:css('font-size', '75%')
-			:css('padding-bottom', '1px')
-			:wikitext('(')
-			:node(MatchesTable._bestof(match.bestof))
-			:wikitext(')')
-			:done()
+	return HtmlWidgets.Td{
+		classes = {'Score'},
+		children = WidgetUtil.collect(
+			showBestOf and {
+				HtmlWidgets.Div{
+					css = {['line-height'] = '1.1'},
+					children = scoreDisplay
+				},
+				HtmlWidgets.Div{
+					css = {
+						['font-size'] = '75%',
+						['padding-bottom'] = '1px'
+					},
+					children = {
+						'(',
+						MatchesTable._bestof(match.bestof)
+						')'
+					}
+				}
+			} or scoreDisplay
+		)
+	}
 end
 
 ---@param match MatchGroupUtilMatch
----@return string
+---@return (string|Widget)[]
 function MatchesTable.scoreDisplay(match)
-	return MatchesTable.getOpponentScore(
-		match.opponents[1],
-		match.winner == WINNER_LEFT
-	) .. ':' .. MatchesTable.getOpponentScore(
-		match.opponents[2],
-		match.winner == WINNER_RIGHT
-	)
+	return {
+		MatchesTable.getOpponentScore(
+			match.opponents[1],
+			match.winner == WINNER_LEFT
+		),
+		':',
+		MatchesTable.getOpponentScore(
+			match.opponents[2],
+			match.winner == WINNER_RIGHT
+		)
+	}
 end
 
 ---@param match MatchGroupUtilMatch
@@ -335,11 +347,11 @@ end
 
 ---@param opponent standardOpponent
 ---@param isWinner boolean
----@return string
+---@return string|Widget
 function MatchesTable.getOpponentScore(opponent, isWinner)
 	local score = OpponentDisplay.InlineScore(opponent)
 	if isWinner then
-		return '<b>' .. score .. '</b>'
+		return HtmlWidgets.B{children = score}
 	end
 
 	return score
