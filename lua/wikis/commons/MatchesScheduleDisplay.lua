@@ -145,28 +145,38 @@ function MatchesTable:buildConditions()
 	return conditions:toString()
 end
 
----@return Html
+---@return Widget
 function MatchesTable:header()
-	local header = mw.html.create('tr')
-		:addClass('HeaderRow')
-		:node(mw.html.create('th')
-			:addClass('divCell')
-			:attr('data-sort-type','isoDate')
-			:wikitext('Date')
+	return HtmlWidgets.Tr{
+		classes = {'HeaderRow'},
+		children = WidgetUtil.collect(
+			HtmlWidgets.Th{
+				classes = {'divCell'},
+				attributes = {['data-sort-type'] = 'isoDate'},
+				children = 'Date'
+			},
+			self.config.showRound and HtmlWidgets.Th{
+				classes = {'divCell', not self.config.sortRound and 'unsortable' or nil},
+				children = 'Round'
+			} or nil,
+			HtmlWidgets.Th{
+				classes = {'divCell'},
+				children = 'Opponent'
+			},
+			HtmlWidgets.Th{
+				classes = {'divCell'},
+				css = {width = 50},
+				children = 'Score'
+			},
+			HtmlWidgets.Th{
+				classes = {'divCell'},
+				children = 'vs. Opponent'
+			},
+			self.config.showMatchPage and HtmlWidgets.Th{
+				classes = {'divCell', 'unsortable'}
+			} or nil
 		)
-
-	if self.config.showRound then
-		header:tag('th')
-			:addClass('divCell')
-			:addClass(not self.config.sortRound and 'unsortable' or nil)
-			:wikitext('Round')
-	end
-
-	return header
-		:tag('th'):addClass('divCell'):wikitext('Opponent'):done()
-		:tag('th'):addClass('divCell'):css('width','50'):wikitext('Score'):done()
-		:tag('th'):addClass('divCell'):wikitext('vs. Opponent'):done()
-		:node(self.config.showMatchPage and mw.html.create('th'):addClass('divCell') or nil)
+	}
 end
 
 ---@param match MatchGroupUtilMatch
