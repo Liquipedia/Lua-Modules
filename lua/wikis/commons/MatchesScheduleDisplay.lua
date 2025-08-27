@@ -312,7 +312,7 @@ function MatchesTable.score(match)
 		DateExt.getCurrentTimestamp() >= match.timestamp
 	)) and MatchesTable.scoreDisplay(match) or 'vs'
 
-	local showBestOf = (tonumber(match.bestof) or 0) <= 0
+	local showBestOf = (tonumber(match.bestof) or 0) > 0
 
 	return Td{
 		classes = {'Score'},
