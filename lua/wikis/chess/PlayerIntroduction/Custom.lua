@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
+local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local Class = require('Module:Class')
-local Arguments = require('Module:Arguments')
 
 local PlayerIntroduction = Lua.import('Module:PlayerIntroduction')
 
@@ -43,7 +44,7 @@ function CustomPlayerIntroduction:_parsePlayerInfo(args, playerInfo)
 
 	if playerInfo and playerInfo.extradata then
 		self.playerInfo.chessTitle = playerInfo.extradata.chesstitle
-		self.playerInfo.banned = playerInfo.extradata.banned == true
+		self.playerInfo.banned = Logic.readBool(playerInfo.extradata.banned)
 	end
 end
 
