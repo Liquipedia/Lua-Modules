@@ -115,9 +115,9 @@ function CustomMatchSummary.Game(options, game, gameIndex)
 	}
 end
 
----@param opponent table
+---@param opponent {players: table[], score: number?, status: string?}
 ---@param flip boolean?
----@return Html?
+---@return Widget?
 function CustomMatchSummary.DisplayClass(opponent, flip)
 	local player = Array.find(opponent.players or {}, function (player)
 		return Logic.isNotEmpty(player.class)
