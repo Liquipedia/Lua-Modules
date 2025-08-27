@@ -118,11 +118,10 @@ end
 function MatchesTable:buildConditions()
 	local config = self.config
 
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('date'), Comparator.gt, DateExt.defaultDate)}
-
-	local pageConditions = ConditionUtil.anyOf(ColumnName('pagename'), config.pages --[[ @as string[] ]])
-	conditions:add(pageConditions)
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('date'), Comparator.gt, DateExt.defaultDate),
+		ConditionUtil.anyOf(ColumnName('pagename'), config.pages --[[ @as string[] ]]),
+	}
 
 	if config.startDate then
 		conditions:add(ConditionNode(ColumnName('date'), Comparator.ge, config.startDate))
