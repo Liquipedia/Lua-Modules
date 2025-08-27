@@ -210,25 +210,26 @@ function MatchesTable:dateDisplay(match)
 end
 
 ---@param record match2
----@return Html
+---@return Widget
 function MatchesTable:row(record)
 	local matchHeader = self:determineMatchHeader(record)
 
 	local match = MatchGroupUtil.matchFromRecord(record)
 
-	local row = mw.html.create('tr')
-		:addClass('Match')
-		:node(self:dateDisplay(match))
-
-	if self.config.showRound then
-		row:tag('td'):addClass('Round'):wikitext(matchHeader)
-	end
-
-	return row
-		:node(MatchesTable._buildOpponent(match.opponents[1], DO_FLIP, LEFT_SIDE_OPPONENT))
-		:node(MatchesTable.score(match))
-		:node(MatchesTable._buildOpponent(match.opponents[2], NO_FLIP, RIGHT_SIDE_OPPONENT))
-		:node(self.config.showMatchPage and MatchesTable.matchPageLinkDisplay(match) or nil)
+	return HtmlWidgets.Tr{
+		classes = {'Match'},
+		children = WidgetUtil.collect(
+			self:dateDisplay(match),
+			self.config.showRound and HtmlWidgets.Td{
+				classes = {'Round'},
+				children = matchHeader
+			} or nil,
+			MatchesTable._buildOpponent(match.opponents[1], DO_FLIP, LEFT_SIDE_OPPONENT),
+			MatchesTable.score(match),
+			MatchesTable._buildOpponent(match.opponents[2], NO_FLIP, RIGHT_SIDE_OPPONENT),
+			self.config.showMatchPage and MatchesTable.matchPageLinkDisplay(match) or nil
+		)
+	}
 end
 
 ---@param match match2
