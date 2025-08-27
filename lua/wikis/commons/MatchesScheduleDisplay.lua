@@ -28,6 +28,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
@@ -116,10 +117,7 @@ function MatchesTable:buildConditions()
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('date'), Comparator.gt, DateExt.defaultDate)}
 
-	local pageConditions = ConditionTree(BooleanOperator.any)
-	for _, page in pairs(config.pages --[[@as string[] ]]) do
-		pageConditions:add{ConditionNode(ColumnName('pagename'), Comparator.eq, page)}
-	end
+	local pageConditions = ConditionUtil.anyOf(ColumnName('pagename'), config.pages --[[ @as string[] ]])
 	conditions:add(pageConditions)
 
 	if config.startDate then
