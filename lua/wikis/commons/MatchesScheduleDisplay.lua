@@ -182,7 +182,10 @@ function MatchesTable:dateDisplay(match)
 		return HtmlWidgets.Td{
 			classes = {'Date'},
 			css = props.css,
-			children = props.children
+			children = WidgetUtil.collect(
+				HiddenSort.run(match.date),
+				props.children
+			)
 		}
 	end
 
