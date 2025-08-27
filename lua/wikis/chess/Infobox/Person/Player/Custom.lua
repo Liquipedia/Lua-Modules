@@ -48,17 +48,9 @@ end
 ---@param personType string
 ---@return table
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	local highestTitleName
-	for _, title in ipairs(TITLES) do
-		if Logic.isNotEmpty(args['title_' .. title.code]) then
-			highestTitleName = title.name
-			break
-		end
-	end
+	local highestTitle = Array.find(TITLES, function(title) return Logic.isNotEmpty(args['title_' .. title.code]) end)
 
-	if highestTitleName then
-		lpdbData.extradata.chesstitle = highestTitleName
-	end
+	lpdbData.extradata.chesstitle = (highestTitle or {}).name
 
 	return lpdbData
 end
