@@ -37,13 +37,15 @@ jobs:
           npm install
           luarocks install --lua-version=5.1 busted
 
-      - name: Generate
+      - name: Compile stylesheets
+        run: npm run build:css
+
+      - name: Generate HTML from Lua
         id: generate-lua
         env:
           UPDATE_SNAPSHOTS: true
           GITHUB_CI: true
         run: |
-          npm run build:css
           echo 'GENERATED_ARGS<<EOF' >> "$GITHUB_ENV"
           busted -C lua
           echo EOF >> "$GITHUB_ENV"
