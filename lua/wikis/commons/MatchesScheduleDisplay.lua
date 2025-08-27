@@ -31,6 +31,7 @@ local ColumnName = Condition.ColumnName
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local WINNER_LEFT = 1
 local WINNER_RIGHT = 2
@@ -95,16 +96,17 @@ function MatchesTable:create()
 	end
 	self.matches = matches
 
-	local output = mw.html.create('table')
-		:addClass('wikitable wikitable-striped sortable match-card')
-		:node(self:header())
-
-	Array.forEach(self.matches, function(match, matchIndex) output:node(self:row(match)) end)
-
-	return mw.html.create('div')
-		:addClass('table-responsive')
-		:css('margin-bottom', '10px')
-		:node(output)
+	return HtmlWidgets.Div{
+		classes = {'table-responsive'},
+		css = {['margin-bottom'] = '10px'},
+		children = HtmlWidgets.Table{
+			classes = {'wikitable', 'wikitable-striped', 'sortable', 'match-card'},
+			children = WidgetUtil.collect(
+				self:header(),
+				Array.map(self.matches, function (match) return self:row(match) end)
+			)
+		}
+	}
 end
 
 ---@return string
