@@ -351,10 +351,12 @@ function MatchesTable.scoreDisplay(match)
 end
 
 ---@param match MatchGroupUtilMatch
----@return Html
+---@return Widget
 function MatchesTable.matchPageLinkDisplay(match)
-	return mw.html.create('td'):addClass('MatchPage')
-		:node(MatchPageButton{match = match})
+	return HtmlWidgets.Td{
+		classes = {'MatchPage'},
+		children = MatchPageButton{match = match}
+	}
 end
 
 ---@param opponent standardOpponent
