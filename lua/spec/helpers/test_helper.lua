@@ -103,6 +103,12 @@ return function(busted, helper, options)
 		file:close()
 	end
 
+	local function appendFile(fileName, data)
+		local file = assert(io.open(fileName, 'a+'))
+		file:write(data)
+		file:close()
+	end
+
 	local function GoldenTest(testName, actual)
 		-- Currently we're only running snapshots tests while updating them too
 		if os.getenv('UPDATE_SNAPSHOTS') ~= 'true' then
@@ -127,6 +133,11 @@ return function(busted, helper, options)
 		local nodeJsCommand = 'node snapshot.mjs "' .. testName .. '" "' .. absoluteHtmlPath .. '"'
 		if os.getenv('UPDATE_SNAPSHOTS') == 'true' then
 			nodeJsCommand = nodeJsCommand .. ' --update-snapshots'
+		end
+
+		if os.getenv('GITHUB_CI') == 'true' then
+			appendFile(os.getenv('GITHUB_ENV'), nodeJsCommand .. '\n')
+			return
 		end
 
 		local exitCode = os.execute(nodeJsCommand)
