@@ -15,7 +15,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local Title = Widgets.Title
 local Cell = Widgets.Cell
 
----@class IlluvItemInfobox: ItemInfobox
+---@class IlluvItemSuitInfobox: ItemInfobox
 local CustomItem = Class.new(Item)
 local CustomInjector = Class.new(Injector)
 
