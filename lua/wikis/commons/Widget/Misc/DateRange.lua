@@ -15,6 +15,7 @@ local Widget = Lua.import('Module:Widget')
 
 ---@class DateRangeWidget: Widget
 ---@operator call(table): DateRangeWidget
+---@field props {startDate: string|osdateparam?, endDate: string|osdateparam?}
 local DateRange = Class.new(Widget)
 
 ---@param startDate {day?: integer, month?: integer}?
@@ -57,10 +58,10 @@ end
 function DateRange:render()
 	local startDate, endDate = self.props.startDate, self.props.endDate
 	if type(startDate) ~= 'table' then
-		startDate = DateExt.parseIsoDate(startDate)
+		startDate = DateExt.parseIsoDate(startDate --[[ @as string? ]])
 	end
 	if type(endDate) ~= 'table' then
-		endDate = DateExt.parseIsoDate(endDate)
+		endDate = DateExt.parseIsoDate(endDate --[[ @as string? ]])
 	end
 
 	---@type osdateparam?
