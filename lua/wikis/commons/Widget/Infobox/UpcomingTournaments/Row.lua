@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
-local FnUtil = Lua.import('Module:FnUtil')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 
