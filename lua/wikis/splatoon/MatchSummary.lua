@@ -26,21 +26,13 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '500px', teamStyle = 'bracket'})
 end
 
----@param match MatchGroupUtilMatch
----@return Widget[]
-function CustomMatchSummary.createBody(match)
-	return WidgetUtil.collect(
-		Array.map(match.games, function(game, gameIndex)
-			return CustomMatchSummary._createGameRow(game, gameIndex, match.game)
-		end)
-	)
-end
-
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@param gameTitle string
 ---@return Widget?
-function CustomMatchSummary._createGameRow(game, gameIndex, gameTitle)
+function CustomMatchSummary.createGame(date, game, gameIndex)
+	local weaponsData = Array.map(game.opponents, function(opponent)
+		return Array.map(opponent.players, Operator.property('weapon'))
+	end)
 	if not game.map then
 		return
 	end
@@ -59,7 +51,7 @@ function CustomMatchSummary._createGameRow(game, gameIndex, gameTitle)
 			CustomMatchSummary._createWeaponsDisplay{
 				data = weaponsData,
 				flip = (opponentIndex == 2),
-				game = gameTitle
+				game = game.game
 			},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
 			HtmlWidgets.Div{
@@ -86,7 +78,7 @@ function CustomMatchSummary._createWeaponsDisplay(props)
 	local weaponIcons = Array.map(props.data, function(weapon)
 		return HtmlWidgets.Div{
 			classes = {'brkts-champion-icon'},
-			children = WeaponIcon._getImage{
+			children = WeaponIcon.Icon{
 				weapon = weapon,
 				game = props.game,
 				class = 'brkts-champion-icon',
