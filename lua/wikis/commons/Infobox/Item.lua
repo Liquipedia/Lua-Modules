@@ -34,10 +34,10 @@ function Item:createInfobox()
 	local args = self.args
 
 	local widgets = {
-		Customizable{
+		Customizable {
 			id = 'header',
 			children = {
-				Header{
+				Header {
 					name = self:nameDisplay(args),
 					image = args.image,
 					imageDefault = args.default,
@@ -47,39 +47,36 @@ function Item:createInfobox()
 				},
 			}
 		},
-		Customizable{
+		Customizable {
 			id = 'caption',
 			children = {
-				Center{children = {args.caption}},
+				Center { children = { args.caption } },
 			}
 		},
-		Customizable{
+		Customizable {
 			id = 'info',
 			children = {
-				Title{children = 'Item Information'},
-				Cell{name = 'Type', children = {args.type}},
-				Cell{name = 'Rarity', children = self:getAllArgsForBase(args, 'rarity')},
-				Cell{name = 'Level', children = {args.level}},
-				Cell{name = 'Class', children = {args.class}},
-				Cell{name = 'Cost', children = {args.cost}},
+				Title { children = 'Item Information' },
+				Cell { name = 'Type', children = { args.type } },
+				Cell { name = 'Rarity', children = self:getAllArgsForBase(args, 'rarity') },
+				Cell { name = 'Level', children = { args.level } },
+				Cell { name = 'Class', children = { args.class } },
+				Cell { name = 'Cost', children = { args.cost } },
 			}
 		},
-		Customizable{
+		Customizable {
 			id = 'released',
 			children = {
-				Cell{name = 'Released', children = {args.release}}
+				Cell { name = 'Released', children = { args.release } }
 			},
 		},
-		Customizable{id = 'attributes', children = {}},
-		Customizable{id = 'ability', children = {}},
-		Customizable{id = 'availability', children = {}},
-		Customizable{id = 'maps', children = {}},
-		Customizable{id = 'recipe', children = {}},
-		Customizable{id = 'custom', children = {}},
-		Customizable{id = 'weapon', children = {}},
-		Customizable{id = 'suit', children = {}},
-		Customizable{id = 'augment', children = {}},
-		Center{children = {args.footnotes}},
+		Customizable { id = 'attributes', children = {} },
+		Customizable { id = 'ability', children = {} },
+		Customizable { id = 'availability', children = {} },
+		Customizable { id = 'maps', children = {} },
+		Customizable { id = 'recipe', children = {} },
+		Customizable { id = 'custom', children = {} },
+		Center { children = { args.footnotes } },
 	}
 
 	self:categories('Items')
