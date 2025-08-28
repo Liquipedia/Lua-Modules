@@ -26,8 +26,6 @@ jobs:
         uses: tj-actions/changed-files@v42
         with:
           files: |
-            stylesheets/**/*.css
-            stylesheets/**/*.less
             stylesheets/**/*.scss
             javascript/**/*.js
 
