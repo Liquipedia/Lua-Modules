@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Infobox/Item/Suit
+-- page=Module:Infobox/Item/Suit/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

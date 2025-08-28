@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Infobox/Item/Augment
+-- page=Module:Infobox/Item/Augment/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Infobox/Item/Weapon
+-- page=Module:Infobox/Item/Weapon/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
