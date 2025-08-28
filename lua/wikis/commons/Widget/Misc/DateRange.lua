@@ -15,7 +15,6 @@ local Widget = Lua.import('Module:Widget')
 
 ---@class DateRangeWidget: Widget
 ---@operator call(table): DateRangeWidget
-
 local DateRange = Class.new(Widget)
 
 ---@param startDate {day?: integer, month?: integer}?
