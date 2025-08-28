@@ -42,21 +42,21 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
     local args = self.caller.args
-    if id == 'weapon_info' then
+    if id == 'weapon' then
         Array.appendWith(
             Title { children = 'Weapon Information' },
             Cell { name = 'Weapon type', children = { args.type } },
             Cell { name = 'Class', { CLASS_TYPE[(args.class or ''):lower()] } },
             Cell { name = 'Tier', children = { args.tier } }
         )
-    elseif id == 'suit_info' then
+    elseif id == 'suit' then
         Array.appendWith(
             Title { children = 'Suit Information' },
             Cell { name = 'Name', children = { args.name } },
             Cell { name = 'Tier', children = { args.tier } },
             Cell { name = 'Description', children = { args.description } }
         )
-    elseif id == 'augment_info' then
+    elseif id == 'augment' then
         Array.appendWith(
             Title { children = 'Augment Information' },
             Cell { name = 'Type', children = { args.type } },
