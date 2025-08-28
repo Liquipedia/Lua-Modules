@@ -76,6 +76,9 @@ function Item:createInfobox()
 		Customizable{id = 'maps', children = {}},
 		Customizable{id = 'recipe', children = {}},
 		Customizable{id = 'custom', children = {}},
+		Customizable{id = 'weapon', children = {}},
+		Customizable{id = 'suit', children = {}},
+		Customizable{id = 'augment', children = {}},
 		Center{children = {args.footnotes}},
 	}
 
