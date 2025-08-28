@@ -95,7 +95,7 @@
 		}
 	}
 
-	div.heroes-panel &__hero-card {
+	@at-root div.heroes-panel #{&}__hero-card {
 		$_border-radius: 0.25rem;
 		display: flex;
 		position: relative;
