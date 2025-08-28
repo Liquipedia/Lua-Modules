@@ -78,7 +78,7 @@ function UpcomingTournamentsRow:render()
 								classes = {'tournament-span'},
 								children = DateRange{
 									startDate = data.startdate,
-									endDate = data.endDate
+									endDate = data.date
 								}
 							}
 						}
