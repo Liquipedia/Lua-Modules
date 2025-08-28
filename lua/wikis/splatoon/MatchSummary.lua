@@ -26,7 +26,7 @@ local NON_BREAKING_SPACE = '&nbsp;'
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '490px', teamStyle = 'bracket'})
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '500px', teamStyle = 'bracket'})
 end
 
 ---@param date string
@@ -38,24 +38,25 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		return Array.map(opponent.players, Operator.property('weapon'))
 	end)
 
+	local function makeTeamSection(opponentIndex)
+		local isLeftTeam = opponentIndex == 1
+		return {
+			CustomMatchSummary._opponentWeaponsDisplay{
+				data = weaponsData[opponentIndex],
+				flip = not isLeftTeam,
+				game = game.game
+			},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
+			CustomMatchSummary._gameScore(game, opponentIndex)
+		}
+	end
+
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
 		children = WidgetUtil.collect(
-			CustomMatchSummary._opponentWeaponsDisplay{
-				data = weaponsData[1],
-				flip = false,
-				game = game.game
-			},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			CustomMatchSummary._gameScore(game, 1),
-			MatchSummaryWidgets.GameCenter{children = CustomMatchSummary._getMapDisplay(game), css = {['flex-grow'] = 1}},
-			CustomMatchSummary._gameScore(game, 2),
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			CustomMatchSummary._opponentWeaponsDisplay{
-				data = weaponsData[2],
-				flip = true,
-				game = game.game
-			},
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndMode(game)},
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
 	}
@@ -83,12 +84,9 @@ function CustomMatchSummary._gameScore(game, opponentIndex)
 	end
 	local scoreDisplay = DisplayHelper.MapScore(game.opponents[opponentIndex], game.status)
 	return mw.html.create('div')
-		:addClass('brkts-popup-body-element-vertical-centered')
 		:css('min-width', '24px')
-		:node(mw.html.create('div')
-			:css('margin', 'auto')
-			:wikitext(scoreDisplay)
-		)
+		:css('text-align', 'center')
+		:wikitext(scoreDisplay)
 end
 
 ---@param props {data: string[], flip: boolean, game: string}
