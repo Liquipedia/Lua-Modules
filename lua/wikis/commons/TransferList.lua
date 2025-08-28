@@ -190,7 +190,7 @@ function TransferList:fetch()
 			cache.team1_2 = transfer.extradata.fromteamsec
 			cache.team2_2 = transfer.extradata.toteamsec
 
-			if #groupedData == self.config.limit then
+			if #groupedData == self.config.limit - 1 then
 				break
 			end
 			Array.appendWith(groupedData, currentGroup)
