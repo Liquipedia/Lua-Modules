@@ -36,6 +36,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'info' then
 		return {
 			Title{children = 'Augment Information'},
+			Cell{name = 'Type', children = {args.type}},
 		}
 	elseif id == 'custom' then
 		return {
