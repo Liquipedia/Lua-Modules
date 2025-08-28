@@ -35,16 +35,15 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'info' then
 		return {
-			Title { children = 'Augment Information' },
+			Title{children = 'Augment Information'},
 		}
 	elseif id == 'custom' then
 		return {
-			Cell { name = 'Type', children = { args.type } },
-			Cell { name = 'Trigger Type', children = { args.trigger } },
-			Title { children = 'Mastery Point Costs' },
-			Cell { name = 'Lesser', children = { args.lesser } },
-			Cell { name = 'Greater', children = { args.greater } },
-			Cell { name = 'Exalted', children = { args.exalted } }
+			Cell{name = 'Trigger Type', children = {args.trigger}},
+			Title{children = 'Mastery Point Costs'},
+			Cell{name = 'Lesser', children = {args.lesser}},
+			Cell{name = 'Greater', children = {args.greater}},
+			Cell{name = 'Exalted', children = {args.exalted}}
 		}
 	end
 

@@ -20,11 +20,11 @@ local CustomItem = Class.new(Item)
 local CustomInjector = Class.new(Injector)
 
 local CLASS_TYPE = {
-	['rogue'] = 'Rogue',
-	['fighter'] = 'Fighter',
-	['psion'] = 'Psion',
-	['empath'] = 'Empath',
-	['bulwark'] = 'Bulwark',
+	rogue = 'Rogue',
+	fighter = 'Fighter',
+	psion = 'Psion',
+	empath = 'Empath',
+	bulwark = 'Bulwark',
 }
 
 ---@param frame Frame
@@ -43,13 +43,13 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'info' then
 		return {
-			Title { children = 'Weapon Information' },
+			Title{children = 'Weapon Information'},
+			Cell{name = 'Weapon type', children = {args.type}},
+			Cell{name = 'Class', children = {CLASS_TYPE[(args.class or ''):lower()]}},
 		}
 	elseif id == 'custom' then
 		return {
-			Cell { name = 'Weapon type', children = { args.type } },
-			Cell { name = 'Class', children = { CLASS_TYPE[(args.class or ''):lower()] } },
-			Cell { name = 'Tier', children = { args.tier } }
+			Cell{name = 'Tier', children = {args.tier}}
 		}
 	end
 
