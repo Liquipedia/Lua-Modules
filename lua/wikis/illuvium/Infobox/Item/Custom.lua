@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Injector = Lua.import('Module:Widget/Injector')
 local Weapon = Lua.import('Module:Infobox/Weapon')
@@ -43,21 +42,21 @@ end
 function CustomInjector:parse(id, widgets)
     local args = self.caller.args
     if id == 'weapon' then
-        Array.appendWith(
+        return {
             Title { children = 'Weapon Information' },
             Cell { name = 'Weapon type', children = { args.type } },
-            Cell { name = 'Class', { CLASS_TYPE[(args.class or ''):lower()] } },
+            Cell { name = 'Class', { CLASS_TYPE(args.class or ''):lower() } },
             Cell { name = 'Tier', children = { args.tier } }
-        )
+        }
     elseif id == 'suit' then
-        Array.appendWith(
+        return {
             Title { children = 'Suit Information' },
             Cell { name = 'Name', children = { args.name } },
             Cell { name = 'Tier', children = { args.tier } },
             Cell { name = 'Description', children = { args.description } }
-        )
+        }
     elseif id == 'augment' then
-        Array.appendWith(
+        return {
             Title { children = 'Augment Information' },
             Cell { name = 'Type', children = { args.type } },
             Cell { name = 'Trigger Type', children = { args.trigger_type } },
@@ -65,7 +64,7 @@ function CustomInjector:parse(id, widgets)
             Cell { name = 'Lesser', children = { args.lesser } },
             Cell { name = 'Greater', children = { args.greater } },
             Cell { name = 'Exalted', children = { args.exalted } }
-        )
+        }
     end
 
     return widgets
