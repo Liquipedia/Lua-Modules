@@ -63,7 +63,13 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		classes = {'brkts-popup-body-game'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndMode(game)},
+			MatchSummaryWidgets.GameCenter{
+				css = {
+					width = '100px',
+					['text-overflow'] = 'ellipsis',
+				},
+				children = DisplayHelper.MapAndMode(game)
+			},
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
