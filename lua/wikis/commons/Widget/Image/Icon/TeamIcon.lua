@@ -56,7 +56,7 @@ function TeamIcon:_getIcon(image, size, link)
 		imageLight = image,
 		size = size,
 		alignment = 'middle',
-		alt = self.props.name,
+		caption = self.props.name,
 		link = link,
 	}
 end
