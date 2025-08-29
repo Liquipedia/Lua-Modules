@@ -69,7 +69,7 @@ describe('Standings Storage', function()
 			currentstatus = 'stay',
 			definitestatus = 'stay',
 			extradata = '{"slotindex":10}',
-			opponentname = 'tt9 esports 2022',
+			opponentname = 'TT9 Esports',
 			opponenttemplate = 'tt9 esports 2022',
 			opponenttype = 'team',
 			parent = 'FakePage',
