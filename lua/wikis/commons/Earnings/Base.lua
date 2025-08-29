@@ -16,7 +16,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 local MathUtils = Lua.import('Module:MathUtil')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
@@ -108,9 +108,9 @@ function Earnings.calculateForTeam(args)
 	local queryTeams = {}
 	if Logic.readBool(args.queryHistorical) then
 		for _, team in pairs(teams) do
-			local historicalNames = Team.queryHistoricalNames(team)
+			local historicalNames = TeamTemplate.queryHistoricalNames(team)
 
-			if not historicalNames then
+			if Logic.isEmpty(historicalNames) then
 				return 0
 			end
 
@@ -129,13 +129,13 @@ function Earnings.calculateForTeam(args)
 	end
 
 	if Logic.readBool(args.doNotIncludePlayerEarnings) then
-		return Earnings.calculate(formatParticipant('opponentname'), args.year, args.mode, args.perYear, queryTeams)
+		return Earnings.calculate(formatParticipant('opponenttemplate'), args.year, args.mode, args.perYear, queryTeams)
 	end
 
-	local teamConditions = {formatParticipant('opponentname')}
+	local teamConditions = {formatParticipant('opponenttemplate')}
 
 	for playerIndex = 1, playerPositionLimit do
-		table.insert(teamConditions, formatParticipant('opponentplayers_p' .. playerIndex .. 'team'))
+		table.insert(teamConditions, formatParticipant('opponentplayers_p' .. playerIndex .. 'template'))
 	end
 	local teamConditionString = '(' .. table.concat(teamConditions, ' OR ') .. ')'
 

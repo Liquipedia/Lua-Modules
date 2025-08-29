@@ -14,7 +14,7 @@ local CharacterNames = Lua.import('Module:CharacterNames', {loadData = true})
 local GameAppearances = Lua.import('Module:GetGameAppearances')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local String = Lua.import('Module:StringUtils')
-local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -95,8 +95,8 @@ end
 ---@return string?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
-		local team2Page = String.isNotEmpty(self.args.team2) and Team.page(mw.getCurrentFrame(), self.args.team2) or nil
+		local teamPage = TeamTemplate.getPageName(self.args.team)
+		local team2Page = String.isNotEmpty(self.args.team2) and TeamTemplate.getPageName(self.args.team2) or nil
 		return
 			tostring(MatchTicker.player{recentLimit = 3}) ..
 			Template.safeExpand(
