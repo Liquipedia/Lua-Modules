@@ -1,6 +1,7 @@
 local aliases = {
 	mousesports = 'mouz',
 	tl = 'team liquid',
+	wol = 'wolves esports'
 }
 
 local data = {
