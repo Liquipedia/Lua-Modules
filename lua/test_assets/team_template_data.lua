@@ -131,6 +131,17 @@ local data = {
 		shortname = "SZ",
 		templatename = "streamerzone",
 	},
+	['wolves esports'] = {
+		bracketname = "Wolves Esports",
+		image = "Wolves Esports allmode.png",
+		imagedark = "Wolves Esports allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Wolves Esports",
+		page = "Wolves Esports",
+		shortname = "WOL",
+		templatename = "wolves esports",
+	},
 }
 
 return {
