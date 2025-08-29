@@ -203,7 +203,7 @@ function TransferRowWidget:_displayTeam(args)
 
 	if not data.teams[1] and not data.roles[1] then
 		return createTeamCell{
-			children = self:_createRole{'&nbsp;None&nbsp;'}:css('margin-' .. align, showTeamName and '60px' or nil)
+			children = self:_createRole{roles = {'&nbsp;None&nbsp;'}, marginDirection = align}
 		}
 	end
 
@@ -220,11 +220,7 @@ function TransferRowWidget:_displayTeam(args)
 
 	local teams = Array.map(data.teams, teamDisplay)
 
-	local roleCell = self:_createRole(data.roles, data.teams[1])
-
-	if roleCell and showTeamName and not data.teams[1] then
-		roleCell:css('margin-' .. align, '60px')
-	end
+	local roleCell = self:_createRole{roles = data.roles, team = data.teams[1], marginDirection = align}
 
 	return createTeamCell{
 		children = WidgetUtil.collect(
@@ -235,24 +231,27 @@ function TransferRowWidget:_displayTeam(args)
 	}
 end
 
----@param roles string[]
----@param team string?
+---@param props {roles: string[], team: string?, marginDirection: 'left'|'right'}
 ---@return Widget?
-function TransferRowWidget:_createRole(roles, team)
-	if Logic.isEmpty(roles) then return end
+function TransferRowWidget:_createRole(props)
+	if Logic.isEmpty(props.roles) then return end
 
-	if Logic.isEmpty(team) then
+	if Logic.isEmpty(props.team) then
 		return HtmlWidgets.Span{
 			css = {['font-style'] = 'italic'},
-			children = Array.interleave(Array.filter(roles, Logic.isNotEmpty), '/')
+			children = Array.interleave(Array.filter(props.roles, Logic.isNotEmpty), '/')
 		}
 	end
 
 	return HtmlWidgets.Span{
-		css = {['font-style'] = 'italic', ['font-size'] = '85%'},
+		css = {
+			['font-style'] = 'italic',
+			['font-size'] = '85%',
+			['margin' .. props.marginDirection] = self.props.showTeamName and '60px' or nil,
+		},
 		children = WidgetUtil.collect(
 			'(',
-			Array.interleave(Array.filter(roles, Logic.isNotEmpty), '/'),
+			Array.interleave(Array.filter(props.roles, Logic.isNotEmpty), '/'),
 			')'
 		)
 	}
