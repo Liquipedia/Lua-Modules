@@ -26,6 +26,7 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '500px', teamStyle = 'bracket'})
 end
 
+---@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@return Widget?
