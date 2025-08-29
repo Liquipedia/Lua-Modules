@@ -84,6 +84,18 @@ function DisplayUtil.applyOverflowStyles(node, mode)
 		:css('white-space', (mode == 'ellipsis' or mode == 'hidden') and 'pre' or 'normal')
 end
 
+---Returns the css properties for each overflow behavior. Mode can be 'ellipsis', 'wrap', or 'hidden'.
+---@param mode OverflowModes
+---@return table<string, string?>
+DisplayUtil.getOverflowStyles = FnUtil.memoize(function(mode)
+	return {
+		['overflow'] = (mode == 'ellipsis' or mode == 'hidden') and 'hidden' or nil,
+		['overflow-wrap'] = mode == 'wrap' and 'break-word' or nil,
+		['text-overflow'] = mode == 'ellipsis' and 'ellipsis' or nil,
+		['white-space'] = (mode == 'ellipsis' or mode == 'hidden') and 'pre' or 'normal',
+	}
+end)
+
 -- Whether a value is a mediawiki html node.
 local mwHtmlMetatable = FnUtil.memoize(function()
 	return getmetatable(mw.html.create('div'))
