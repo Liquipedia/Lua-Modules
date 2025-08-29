@@ -25,7 +25,11 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local EMPTY_POSITION_ICON = IconImage{imageLight = 'Logo filler event.png', size = '16px'}
 local SPECIAL_ROLES = {'retired', 'inactive', 'military', 'passed away'}
-local TRANSFER_ARROW = '&#x21d2;'
+local TRANSFER_STATUS_TO_ICON_NAME = {
+	neutral = 'transferbetween',
+	['from-team'] = 'transfertofreeagent',
+	['to-team'] = 'transferfromfreeagent',
+}
 local RUMOUR_STATUS_TO_ICON_ARGS = {
 	correct = {iconName = 'correct', color = 'forest-green-text'},
 	wrong = {iconName = 'wrong', color = 'cinnabar-text'},
@@ -251,13 +255,19 @@ function TransferRowWidget:_createRole(roles, team)
 		:wikitext('(' .. rolesText .. ')')
 end
 
+---@private
+---@return Widget
+function TransferRowWidget:_getTransferArrow()
+	return IconFa{iconName = TRANSFER_STATUS_TO_ICON_NAME[self:_getStatus()]}
+end
+
 ---@return Widget
 function TransferRowWidget:icon()
 	if not IconModule then
 		return createDivCell{
 			classes = {'Icon'},
 			css = {width = '70px', ['font-size'] = 'larger'},
-			children = TRANSFER_ARROW
+			children = self:_getTransferArrow()
 		}
 	end
 
@@ -287,7 +297,9 @@ function TransferRowWidget:icon()
 			Array.map(self.props.transfer.players, function (player)
 				return HtmlWidgets.Fragment{children = {
 					getIcon(player.icons[1]),
-					'&nbsp;' .. TRANSFER_ARROW .. '&nbsp;',
+					'&nbsp;',
+					self:_getTransferArrow()
+					'&nbsp;',
 					getIcon(player.icons[2] or targetRoleIsSpecialRole and player.icons[1] or nil)
 				}}
 			end),
