@@ -2,6 +2,7 @@ local aliases = {
 	bds = 'team bds',
 	mousesports = 'mouz',
 	tl = 'team liquid',
+	tt9 = 'tt9 esports',
 	wol = 'wolves esports'
 }
 
@@ -16,6 +17,11 @@ local data = {
 		['0000-01-01'] = 'mousesports orig',
 		['2016-06-01'] = 'mousesports 2016',
 		['2021-10-14'] = 'mouz 2021',
+	},
+	['tt9 esports'] = {
+		['0000-01-01'] = 'tt9 esports orig',
+		['2021-03-31'] = 'tt9 esports 2021',
+		['2022-09-01'] = 'tt9 esports 2022',
 	},
 	['team liquid'] = {
 		['0000-01-01'] = 'team liquid orig',
@@ -248,6 +254,28 @@ local data = {
 		templatename = "rogue 2021",
 	},
 	-- tt9 subtemplate
+	['tt9 esports orig'] = {
+		bracketname = "TT9 Esports",
+		image = "TT9 Esports allmode.png",
+		imagedark = "TT9 Esports allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "TT9 Esports",
+		page = "TT9 Esports",
+		shortname = "TT9",
+		templatename = "tt9 esports orig",
+	},
+	['tt9 esports 2021'] = {
+		bracketname = "TT9 Esports",
+		image = "TT9 Esports 2021 lightmode.png",
+		imagedark = "TT9 Esports 2021 darkmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "TT9 Esports",
+		page = "TT9 Esports",
+		shortname = "TT9",
+		templatename = "tt9 esports 2021",
+	},
 	['tt9 esports 2022'] = {
 		bracketname = "TT9 Esports",
 		image = "TT9 Esports 2022 lightmode.png",
