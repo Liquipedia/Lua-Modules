@@ -68,8 +68,11 @@ function ProjectOverview:_generateImage()
 		md = 6,
 		cellContent = HtmlWidgets.Div{
 			classes = not hasImage and {'mobile-hide'} or nil,
-			attributes = {
-				style = 'height: 160px; display: flex; align-items: center; justify-content: center;'
+			css = {
+				height = '160px',
+				display = 'flex',
+				['align-items'] = 'center',
+				['justify-content'] = 'center',
 			},
 			children = {
 				IconImage{
