@@ -12,5 +12,6 @@ local contractRoles = {
 	['standin'] = {category = 'Stand-in Players', display = 'Stand-in'},
 	['twoway'] = {category = 'Two-way Contracts', display = 'Two-way'},
 }
+contractRoles['stand-in'] = contractRoles.standin
 
 return contractRoles
