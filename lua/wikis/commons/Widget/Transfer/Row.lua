@@ -231,6 +231,7 @@ function TransferRowWidget:_displayTeam(args)
 	}
 end
 
+---@private
 ---@param props {roles: string[], team: string?, marginDirection: 'left'|'right'}
 ---@return Widget?
 function TransferRowWidget:_createRole(props)
