@@ -199,7 +199,67 @@ local data = {
 		shortname = "HERO",
 		templatename = "heroic 2024",
 	},
-	-- a non-historical TT
+	-- g2 subtemplate
+	['g2 esports 2019'] = {
+		bracketname = "G2 Esports",
+		image = "G2 Esports 2019 lightmode.png",
+		imagedark = "G2 Esports 2019 darkmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "G2 Esports",
+		page = "G2 Esports",
+		shortname = "G2",
+		templatename = "g2 esports 2019",
+	},
+	-- mnm subtemplate
+	['mnm gaming 2021'] = {
+		bracketname = "MNM Gaming",
+		image = "MNM Gaming allmode.png",
+		imagedark = "MNM Gaming allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "MNM Gaming",
+		page = "MNM Gaming",
+		shortname = "MNM",
+		templatename = "mnm gaming 2021",
+	},
+	-- navi subtemplate
+	['natus vincere 2021'] = {
+		bracketname = "NAVI",
+		image = "Natus Vincere 2021 lightmode.png",
+		imagedark = "Natus Vincere 2021 allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Natus Vincere",
+		page = "Natus Vincere",
+		shortname = "NAVI",
+		templatename = "natus vincere 2021",
+	},
+	-- rogue subtemplate
+	['rogue 2021'] = {
+		bracketname = "Rogue",
+		image = "Rogue 2021 lightmode.png",
+		imagedark = "Rogue 2021 darkmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Rogue",
+		page = "Rogue",
+		shortname = "RGE",
+		templatename = "rogue 2021",
+	},
+	-- tt9 subtemplate
+	['tt9 esports 2022'] = {
+		bracketname = "TT9 Esports",
+		image = "TT9 Esports 2022 lightmode.png",
+		imagedark = "TT9 Esports 2022 darkmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "TT9 Esports",
+		page = "TT9 Esports",
+		shortname = "TT9",
+		templatename = "tt9 esports 2022",
+	},
+	-- non-historical TT
 	streamerzone = {
 		bracketname = "Streamerzone",
 		image = "Streamerzone lightmode.png",
@@ -210,6 +270,17 @@ local data = {
 		page = "Streamerzone",
 		shortname = "SZ",
 		templatename = "streamerzone",
+	},
+	['team secret'] = {
+		bracketname = "Team Secret",
+		image = "Team Secret allmode.png",
+		imagedark = "Team Secret allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Team Secret",
+		page = "Team Secret",
+		shortname = "Secret",
+		templatename = "team secret",
 	},
 	['wolves esports'] = {
 		bracketname = "Wolves Esports",
