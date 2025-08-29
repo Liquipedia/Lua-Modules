@@ -237,22 +237,25 @@ end
 
 ---@param roles string[]
 ---@param team string?
----@return Html?
+---@return Widget?
 function TransferRowWidget:_createRole(roles, team)
 	if Logic.isEmpty(roles) then return end
 
-	local rolesText = table.concat(Array.filter(roles, Logic.isNotEmpty), '/')
-
-	local roleCell = mw.html.create('span')
-		:css('font-style', 'italic')
-
 	if Logic.isEmpty(team) then
-		return roleCell:wikitext(rolesText)
+		return HtmlWidgets.Span{
+			css = {['font-style'] = 'italic'},
+			children = Array.interleave(Array.filter(roles, Logic.isNotEmpty), '/')
+		}
 	end
 
-	return roleCell
-		:css('font-size', '85%')
-		:wikitext('(' .. rolesText .. ')')
+	return HtmlWidgets.Span{
+		css = {['font-style'] = 'italic', ['font-size'] = '85%'},
+		children = WidgetUtil.collect(
+			'(',
+			Array.interleave(Array.filter(roles, Logic.isNotEmpty), '/'),
+			')'
+		)
+	}
 end
 
 ---@private
