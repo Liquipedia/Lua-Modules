@@ -298,7 +298,7 @@ function TransferRowWidget:icon()
 				return HtmlWidgets.Fragment{children = {
 					getIcon(player.icons[1]),
 					'&nbsp;',
-					self:_getTransferArrow()
+					self:_getTransferArrow(),
 					'&nbsp;',
 					getIcon(player.icons[2] or targetRoleIsSpecialRole and player.icons[1] or nil)
 				}}
