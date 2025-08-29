@@ -80,6 +80,7 @@ local CONTENT = {
 		body = TournamentsTicker{
 			upcomingDays = 60,
 			completedDays = 60,
+			displayGameIcons = true,
 		},
 		padding = true,
 		boxid = 1508,
@@ -149,7 +150,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				size = 5,
 				children = {
 					{
 						mobileOrder = 2,
@@ -166,7 +167,7 @@ return {
 				}
 			},
 			{ -- Right
-				size = 6,
+				size = 7,
 				children = {
 					{
 						mobileOrder = 1,
@@ -180,7 +181,7 @@ return {
 								},
 							},
 							{
-								size = 6,
+								size = 5,
 								children = {
 									{
 										noPanel = true,
@@ -189,7 +190,7 @@ return {
 								},
 							},
 							{
-								size = 6,
+								size = 7,
 								children = {
 									{
 										noPanel = true,
