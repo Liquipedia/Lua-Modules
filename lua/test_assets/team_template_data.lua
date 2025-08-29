@@ -19,6 +19,11 @@ local data = {
 		['2023-02-21'] = 'team liquid 2023',
 		['2024-02-20'] = 'team liquid 2024',
 	},
+	['heroic'] = {
+		['0000-01-01'] = 'heroic orig',
+		['2023-01-26'] = 'heroic 2023',
+		['2024-02-20'] = 'heroic 2024',
+	},
 	-- mouz subtemplates
 	['mousesports orig'] = {
 		bracketname = "mousesports",
@@ -119,6 +124,40 @@ local data = {
 		page = "Team Liquid",
 		shortname = "Liquid",
 		templatename = "team liquid 2024",
+	},
+	-- heroic subtemplates
+	['heroic orig'] = {
+		bracketname = "Heroic",
+		image = "Heroic 2019 lightmode.png",
+		imagedark = "Heroic 2019 darkmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Heroic",
+		page = "Heroic",
+		shortname = "HERO",
+		templatename = "heroic orig",
+	},
+	['heroic 2023'] = {
+		bracketname = "Heroic",
+		image = "Heroic 2023 allmode.png",
+		imagedark = "Heroic 2023 allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Heroic",
+		page = "Heroic",
+		shortname = "HERO",
+		templatename = "heroic 2023",
+	},
+	['heroic 2024'] = {
+		bracketname = "HEROIC",
+		image = "Heroic 2023 allmode.png",
+		imagedark = "Heroic 2023 allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "HEROIC",
+		page = "HEROIC",
+		shortname = "HERO",
+		templatename = "heroic 2024",
 	},
 	-- a non-historical TT
 	streamerzone = {
