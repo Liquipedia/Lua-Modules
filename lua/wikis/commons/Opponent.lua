@@ -451,7 +451,7 @@ function Opponent.fromMatch2Record(record)
 					displayName = playerRecord.displayname,
 					flag = String.nilIfEmpty(Flags.CountryName{flag = playerRecord.flag}),
 					pageName = String.nilIfEmpty(playerRecord.name),
-					faction = Logic.nilIfEmpty(Faction.read(playerRecord.extradata.faction) or Faction.defaultFaction),
+					faction = Logic.nilIfEmpty(Faction.read((playerRecord.extradata or {}).faction) or Faction.defaultFaction),
 				}
 			end),
 			extradata = {},
