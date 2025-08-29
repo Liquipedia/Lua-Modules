@@ -260,6 +260,17 @@ local data = {
 		templatename = "tt9 esports 2022",
 	},
 	-- non-historical TT
+	['outsiders (eul)'] = {
+		bracketname = "Outsiders",
+		image = "Outsiders EUL 2022 allmode.png",
+		imagedark = "Outsiders EUL 2022 allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Outsiders",
+		page = "Outsiders (EUL)",
+		shortname = "OUT",
+		templatename = "outsiders (eul)",
+	},
 	streamerzone = {
 		bracketname = "Streamerzone",
 		image = "Streamerzone lightmode.png",
