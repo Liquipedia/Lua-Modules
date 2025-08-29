@@ -192,13 +192,6 @@ return function(busted, helper, options)
 				}
 			end
 
-			-- TODO This should be added to git
-			if newName == 'TeamTemplate' then
-				return {
-					getPageName = function(s) return s end
-				}
-			end
-
 			if fileExists(newName) then
 				return require_original(newName)
 			end
