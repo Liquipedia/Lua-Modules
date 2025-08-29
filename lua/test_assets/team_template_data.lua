@@ -1,4 +1,5 @@
 local aliases = {
+	bds = 'team bds',
 	mousesports = 'mouz',
 	tl = 'team liquid',
 	wol = 'wolves esports'
@@ -6,6 +7,11 @@ local aliases = {
 
 local data = {
 	-- historical ones
+	['team bds'] = {
+		['0000-01-01'] = 'bds esport old',
+		['2019-09-01'] = 'team bds orig',
+		['2021-12-17'] = 'team bds 2021',
+	},
 	mouz = {
 		['0000-01-01'] = 'mousesports orig',
 		['2016-06-01'] = 'mousesports 2016',
@@ -23,6 +29,40 @@ local data = {
 		['0000-01-01'] = 'heroic orig',
 		['2023-01-26'] = 'heroic 2023',
 		['2024-02-20'] = 'heroic 2024',
+	},
+	-- bds subtemplates
+	['bds esport old'] = {
+		bracketname = "BDS Esport",
+		image = "BDS Esport 2019 allmode.png",
+		imagedark = "BDS Esport 2019 allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "BDS Esport",
+		page = "BDS Esport",
+		shortname = "BDS",
+		templatename = "bds esport old",
+	},
+	['team bds orig'] = {
+		bracketname = "Team BDS",
+		image = "BDS Esport 2019.png",
+		imagedark = "BDS Esport 2019.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Team BDS",
+		page = "Team BDS",
+		shortname = "BDS",
+		templatename = "team bds orig",
+	},
+	['team bds 2021'] = {
+		bracketname = "Team BDS",
+		image = "Team BDS 2021 allmode.png",
+		imagedark = "Team BDS 2021 allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Team BDS",
+		page = "Team BDS",
+		shortname = "BDS",
+		templatename = "team bds 2021",
 	},
 	-- mouz subtemplates
 	['mousesports orig'] = {
