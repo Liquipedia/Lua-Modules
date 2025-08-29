@@ -1,4 +1,5 @@
 --- Triple Comment to Enable our LLS Plugin
+local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 describe('Standings Storage', function()
 	local StandingsStorage = require('Module:Standings/Storage')
 	local InfoboxLeague = require('Module:Infobox/League/Custom')
@@ -37,6 +38,7 @@ describe('Standings Storage', function()
 	end)
 
 	it('storage full', function()
+		TeamTemplateMock.setUp()
 		local standingsData = require('test_assets.standings')
 		local stubLpdb = stub(mw.ext.LiquipediaDB, "lpdb", {})
 		local stubLpdbTournament = stub(mw.ext.LiquipediaDB, "lpdb_tournament")
