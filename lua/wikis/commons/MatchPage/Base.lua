@@ -95,10 +95,11 @@ function BaseMatchPage:getCountdownBlock()
 			display = 'block',
 			['text-align'] = 'center'
 		},
-		children = Countdown._create(Table.merge(self.matchData.stream, {
+		children = Countdown._create{
 			date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
 			finished = self.matchData.finished,
-		}))
+			rawdatetime = Logic.readBool(self.matchData.finished),
+		}
 	}
 end
 
@@ -235,6 +236,7 @@ function BaseMatchPage:render()
 				opponent2 = self.matchData.opponents[2],
 				parent = self.matchData.parent,
 				phase = MatchGroupUtil.computeMatchPhase(self.matchData),
+				stream = self.matchData.stream,
 				tournamentName = self.matchData.tournament,
 				poweredBy = self.getPoweredBy(),
 				highlighted = HighlightConditions.tournament(tournamentContext),
