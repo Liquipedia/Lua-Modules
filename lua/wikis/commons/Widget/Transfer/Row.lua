@@ -122,8 +122,8 @@ function TransferRowWidget:status()
 
 	if not transfer.isRumour then return end
 
-	return HtmlWidgets.Div{
-		classes = {'divCell', 'Status'},
+	return createDivCell{
+		classes = {'Status'},
 		children = IconFa(RUMOUR_STATUS_TO_ICON_ARGS[transfer.confirmed])
 	}
 end
@@ -135,8 +135,8 @@ function TransferRowWidget:confidence()
 
 	local confidence = transfer.confidence
 
-	return HtmlWidgets.Div{
-		classes = {'divCell', 'Confidence', CONFIDENCE_TO_COLOR[confidence]},
+	return createDivCell{
+		classes = {'Confidence', CONFIDENCE_TO_COLOR[confidence]},
 		css = {['font-weight'] = 'bold'},
 		children = confidence and String.upperCaseFirst(confidence) or nil
 	}
@@ -144,8 +144,8 @@ end
 
 ---@return Widget
 function TransferRowWidget:date()
-	return HtmlWidgets.Div{
-		classes = {'divCell', 'Date'},
+	return createDivCell{
+		classes = {'Date'},
 		children = self.props.transfer.displayDate
 	}
 end
@@ -155,16 +155,16 @@ function TransferRowWidget:platform()
 	local transfer = self.props.transfer
 	if not transfer.platform then return end
 
-	return HtmlWidgets.Div{
-		classes = {'divCell', 'GameIcon'},
+	return createDivCell{
+		classes = {'GameIcon'},
 		children = transfer.platform
 	}
 end
 
 ---@return Widget
 function TransferRowWidget:players()
-	return HtmlWidgets.Div{
-		classes = {'divCell', 'Name'},
+	return createDivCell{
+		classes = {'Name'},
 		children = Array.map(self.props.transfer.players, function (player)
 			return PlayerDisplay.BlockPlayer{player = player}
 		end)
