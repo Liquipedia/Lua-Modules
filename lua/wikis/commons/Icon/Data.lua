@@ -78,7 +78,7 @@ return {
 	-- Usage: To indicate different transfer type with icon difference not just background colour
 	transferbetween = 'fas fa-arrow-alt-right',
 	transfertofreeagent = 'fas fa-arrow-alt-from-left',
-	fransferfromfreeagent = 'fas fa-arrow-alt-to-right',
+	transferfromfreeagent = 'fas fa-arrow-alt-to-right',
 
 	-- Usage: Reference links in tables (ie transfers)
 	reference = 'fad fa-external-link-alt',
