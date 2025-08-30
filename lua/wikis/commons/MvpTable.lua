@@ -157,16 +157,18 @@ end
 
 ---Builds the main header of the MvpTable
 ---@param args mvpTableParsedArgs
----@return Html?
+---@return Widget?
 function MvpTable._mainHeader(args)
 	if String.isEmpty(args.title) then
-		return nil
+		return
 	end
 
-	local colspan = 2 + (args.points and 1 or 0)
-
-	return mw.html.create('tr')
-		:tag('th'):wikitext(args.title):attr('colspan', colspan):done():done()
+	return HtmlWidgets.Tr{
+		children = HtmlWidgets.Th{
+			attributes = {colspan = 2 + (args.points and 1 or 0)},
+			children = args.title
+		}
+	}
 end
 
 ---Builds the sub header of the MvpTable
