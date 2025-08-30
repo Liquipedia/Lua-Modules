@@ -173,43 +173,41 @@ end
 
 ---Builds the sub header of the MvpTable
 ---@param args mvpTableParsedArgs
----@return Html
+---@return Widget
 function MvpTable._subHeader(args)
-	local header = mw.html.create('tr')
-		:tag('th'):wikitext('Player'):done()
-		:tag('th'):wikitext('#MVPs'):done()
-
-	if args.points then
-		header:tag('th'):wikitext('Points'):done()
-	end
-
-	return header:done()
+	return HtmlWidgets.Tr{
+		children = Array.map(
+			{'Player', '#MVPs', args.points and 'Points' or nil},
+			function (element) return HtmlWidgets.Th{children = element} end
+		)
+	}
 end
 
 ---Builds the display for a mvp row
 ---@param item {points: number, mvp: number, displayName:string?, name:string, flag:string?, team:string?}
 ---@param args mvpTableParsedArgs
----@return Html
+---@return Widget
 function MvpTable._row(item, args)
-	local row = mw.html.create('tr')
-		:tag('td'):css('text-align', 'left'):node(OpponentDisplay.BlockOpponent{
-			opponent = Opponent.readOpponentArgs{
-				type = Opponent.solo,
-				name = item.displayName,
-				flag = item.flag,
-				link = item.name,
-				team = item.team and TeamTemplate.resolve(item.team, DateExt.getContextualDateOrNow()) or nil,
+	return HtmlWidgets.Tr{
+		children = WidgetUtil.collect(
+			HtmlWidgets.Td{
+				css = {['text-align'] = 'left'},
+				children = OpponentDisplay.BlockOpponent{
+					opponent = Opponent.readOpponentArgs{
+						type = Opponent.solo,
+						name = item.displayName,
+						flag = item.flag,
+						link = item.name,
+						team = item.team and TeamTemplate.resolve(item.team, DateExt.getContextualDateOrNow()) or nil,
+					},
+					overflow = 'ellipsis',
+					showPlayerTeam = true,
+				}
 			},
-			overflow = 'ellipsis',
-			showPlayerTeam = true,
-		}):done()
-		:tag('td'):wikitext(item.mvp):done()
-
-	if args.points then
-		row:tag('td'):wikitext(item.points):done()
-	end
-
-	return row:done()
+			HtmlWidgets.Td{children = item.mvp},
+			args.points and HtmlWidgets.Td{children = item.points} or nil
+		)
+	}
 end
 
 ---
