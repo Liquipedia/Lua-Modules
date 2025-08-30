@@ -182,7 +182,7 @@ function MvpTable._subHeader(args)
 end
 
 ---Builds the display for a mvp row
----@param item table
+---@param item {points: number, mvp: number, displayName:string?, name:string, flag:string?, team:string?}
 ---@param args mvpTableParsedArgs
 ---@return Html
 function MvpTable._row(item, args)
