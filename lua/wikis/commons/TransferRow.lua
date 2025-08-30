@@ -325,7 +325,7 @@ function TransferRow._objectName(transfer)
 	return 'transfer_' .. transfer.date .. '_' .. string.format('%06d', transfer.extradata.sortindex)
 end
 
----@return Html?
+---@return Widget?
 function TransferRow:build()
 	return TransferRowDisplay(self.transfers):build()
 end
