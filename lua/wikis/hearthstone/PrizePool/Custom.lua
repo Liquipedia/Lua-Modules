@@ -13,7 +13,6 @@ local Logic = Lua.import('Module:Logic')
 local Variables = Lua.import('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool')
-local Opponent = Lua.import('Module:Opponent/Custom')
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 local CustomLpdbInjector = Class.new(LpdbInjector)
@@ -54,7 +53,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	Variables.varDefine('ranking' .. lpdbPrefix .. '_' .. (team:lower()) .. '_pointprize', lpdbData.extradata.prizepoints)
 	Variables.varDefine('ranking' .. lpdbPrefix .. '_' .. (team:lower()) .. '_pointprize2',
 		lpdbData.extradata.prizepoints2)
-	
+
 	return lpdbData
 end
 
