@@ -7,8 +7,10 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -20,9 +22,13 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MvpTable = {}
 
@@ -30,7 +36,7 @@ local MvpTable = {}
 ---Fetches mvpData for a given set of matchGroupIds or tournaments.
 ---Displays the fetched data as a table.
 ---@param args table
----@return Html|string|nil
+---@return Widget?
 function MvpTable.run(args)
 	args = args or {}
 	args = MvpTable._parseArgs(args)
@@ -60,22 +66,24 @@ function MvpTable.run(args)
 		return
 	end
 
-	local output = mw.html.create('table')
-		:addClass('wikitable prizepooltable collapsed')
-		:css('text-align', 'center')
-		:css('margin-top', args.margin .. 'px')
-		:attr('data-opentext', 'place ' .. (args.cutafter + 1) .. ' to ' .. #mvpList)
-		:attr('data-closetext', 'place ' .. (args.cutafter + 1) .. ' to ' .. #mvpList)
-		:attr('data-cutafter', args.cutafter + (String.isNotEmpty(args.title) and 1 or 0))
-		:attr('data-definedcutafter', '')
-		:node(MvpTable._mainHeader(args))
-		:node(MvpTable._subHeader(args))
-
-	for _, item in ipairs(mvpList) do
-		output:node(MvpTable._row(item, args))
-	end
-
-	return output
+	return HtmlWidgets.Table{
+		classes = {'wikitable', 'prizepooltable', 'collapsed'},
+		css = {
+			['text-align'] = 'center',
+			['margin-top'] = args.margin .. 'px'
+		},
+		attributes = {
+			['data-opentext'] = 'place ' .. (args.cutafter + 1) .. ' to ' .. #mvpList,
+			['data-closetext'] = 'place ' .. (args.cutafter + 1) .. ' to ' .. #mvpList,
+			['data-cutafter'] = args.cutafter + (String.isNotEmpty(args.title) and 1 or 0),
+			['data-definedcutafter'] = ''
+		},
+		children = WidgetUtil.collect(
+			MvpTable._mainHeader(args),
+			MvpTable._subHeader(args),
+			Array.map(mvpList, FnUtil.curry(MvpTable._row, args))
+		)
+	}
 end
 
 ---@class mvpTableParsedArgs
@@ -121,13 +129,7 @@ end
 ---@param args mvpTableParsedArgs
 ---@return string
 function MvpTable._buildConditions(args)
-	local matchGroupIDConditions
-	if Table.isNotEmpty(args.matchGroupIds) then
-		matchGroupIDConditions = ConditionTree(BooleanOperator.any)
-		for _, id in pairs(args.matchGroupIds) do
-			matchGroupIDConditions:add{ConditionNode(ColumnName('match2bracketid'), Comparator.eq, id)}
-		end
-	end
+	local matchGroupIDConditions = ConditionUtil.anyOf(ColumnName('match2bracketid'), args.matchGroupIds)
 
 	local tournamentConditions
 	if Table.isNotEmpty(args.tournaments) then
@@ -154,56 +156,57 @@ end
 
 ---Builds the main header of the MvpTable
 ---@param args mvpTableParsedArgs
----@return Html?
+---@return Widget?
 function MvpTable._mainHeader(args)
 	if String.isEmpty(args.title) then
-		return nil
+		return
 	end
 
-	local colspan = 2 + (args.points and 1 or 0)
-
-	return mw.html.create('tr')
-		:tag('th'):wikitext(args.title):attr('colspan', colspan):done():done()
+	return HtmlWidgets.Tr{
+		children = HtmlWidgets.Th{
+			attributes = {colspan = 2 + (args.points and 1 or 0)},
+			children = args.title
+		}
+	}
 end
 
 ---Builds the sub header of the MvpTable
 ---@param args mvpTableParsedArgs
----@return Html
+---@return Widget
 function MvpTable._subHeader(args)
-	local header = mw.html.create('tr')
-		:tag('th'):wikitext('Player'):done()
-		:tag('th'):wikitext('#MVPs'):done()
-
-	if args.points then
-		header:tag('th'):wikitext('Points'):done()
-	end
-
-	return header:done()
+	return HtmlWidgets.Tr{
+		children = Array.map(
+			{'Player', '#MVPs', args.points and 'Points' or nil},
+			function (element) return HtmlWidgets.Th{children = element} end
+		)
+	}
 end
 
 ---Builds the display for a mvp row
----@param item table
 ---@param args mvpTableParsedArgs
----@return Html
-function MvpTable._row(item, args)
-	local row = mw.html.create('tr')
-		:tag('td'):css('text-align', 'left'):node(OpponentDisplay.BlockOpponent{
-			opponent = {type = Opponent.solo, players = {{
-				displayName = item.displayName,
-				flag = item.flag,
-				pageName = item.name,
-				team = item.team and TeamTemplate.resolve(item.team, DateExt.getContextualDateOrNow()) or nil,
-			}}},
-			overflow = 'ellipsis',
-			showPlayerTeam = true,
-		}):done()
-		:tag('td'):wikitext(item.mvp):done()
-
-	if args.points then
-		row:tag('td'):wikitext(item.points):done()
-	end
-
-	return row:done()
+---@param item {points: number, mvp: number, displayName:string?, name:string, flag:string?, team:string?}
+---@return Widget
+function MvpTable._row(args, item)
+	return HtmlWidgets.Tr{
+		children = WidgetUtil.collect(
+			HtmlWidgets.Td{
+				css = {['text-align'] = 'left'},
+				children = OpponentDisplay.BlockOpponent{
+					opponent = Opponent.readOpponentArgs{
+						type = Opponent.solo,
+						name = item.displayName,
+						flag = item.flag,
+						link = item.name,
+						team = item.team and TeamTemplate.resolve(item.team, DateExt.getContextualDateOrNow()) or nil,
+					},
+					overflow = 'ellipsis',
+					showPlayerTeam = true,
+				}
+			},
+			HtmlWidgets.Td{children = item.mvp},
+			args.points and HtmlWidgets.Td{children = item.points} or nil
+		)
+	}
 end
 
 ---
