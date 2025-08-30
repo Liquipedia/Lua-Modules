@@ -21,6 +21,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
@@ -129,13 +130,7 @@ end
 ---@param args mvpTableParsedArgs
 ---@return string
 function MvpTable._buildConditions(args)
-	local matchGroupIDConditions
-	if Table.isNotEmpty(args.matchGroupIds) then
-		matchGroupIDConditions = ConditionTree(BooleanOperator.any)
-		for _, id in pairs(args.matchGroupIds) do
-			matchGroupIDConditions:add{ConditionNode(ColumnName('match2bracketid'), Comparator.eq, id)}
-		end
-	end
+	local matchGroupIDConditions = ConditionUtil.anyOf(ColumnName('match2bracketid'), args.matchGroupIds)
 
 	local tournamentConditions
 	if Table.isNotEmpty(args.tournaments) then
