@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
@@ -24,13 +25,16 @@ local ColumnName = Condition.ColumnName
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
 local MvpTable = {}
 
 ---Entry point for MvpTable.
 ---Fetches mvpData for a given set of matchGroupIds or tournaments.
 ---Displays the fetched data as a table.
 ---@param args table
----@return Html|string|nil
+---@return Widget?
 function MvpTable.run(args)
 	args = args or {}
 	args = MvpTable._parseArgs(args)
@@ -60,22 +64,26 @@ function MvpTable.run(args)
 		return
 	end
 
-	local output = mw.html.create('table')
-		:addClass('wikitable prizepooltable collapsed')
-		:css('text-align', 'center')
-		:css('margin-top', args.margin .. 'px')
-		:attr('data-opentext', 'place ' .. (args.cutafter + 1) .. ' to ' .. #mvpList)
-		:attr('data-closetext', 'place ' .. (args.cutafter + 1) .. ' to ' .. #mvpList)
-		:attr('data-cutafter', args.cutafter + (String.isNotEmpty(args.title) and 1 or 0))
-		:attr('data-definedcutafter', '')
-		:node(MvpTable._mainHeader(args))
-		:node(MvpTable._subHeader(args))
-
-	for _, item in ipairs(mvpList) do
-		output:node(MvpTable._row(item, args))
-	end
-
-	return output
+	return HtmlWidgets.Table{
+		classes = {'wikitable', 'prizepooltable', 'collapsed'},
+		css = {
+			['text-align'] = 'center',
+			['margin-top'] = args.margin .. 'px'
+		},
+		attributes = {
+			['data-opentext'] = 'place ' .. (args.cutafter + 1) .. ' to ' .. #mvpList,
+			['data-closetext'] = 'place ' .. (args.cutafter + 1) .. ' to ' .. #mvpList,
+			['data-cutafter'] = args.cutafter + (String.isNotEmpty(args.title) and 1 or 0),
+			['data-definedcutafter'] = ''
+		},
+		children = WidgetUtil.collect(
+			MvpTable._mainHeader(args),
+			MvpTable._subHeader(args),
+			Array.map(mvpList, function (item)
+				return MvpTable._row(item, args)
+			end)
+		)
+	}
 end
 
 ---@class mvpTableParsedArgs
