@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -80,9 +81,7 @@ function MvpTable.run(args)
 		children = WidgetUtil.collect(
 			MvpTable._mainHeader(args),
 			MvpTable._subHeader(args),
-			Array.map(mvpList, function (item)
-				return MvpTable._row(item, args)
-			end)
+			Array.map(mvpList, FnUtil.curry(MvpTable._row, args))
 		)
 	}
 end
@@ -184,10 +183,10 @@ function MvpTable._subHeader(args)
 end
 
 ---Builds the display for a mvp row
----@param item {points: number, mvp: number, displayName:string?, name:string, flag:string?, team:string?}
 ---@param args mvpTableParsedArgs
+---@param item {points: number, mvp: number, displayName:string?, name:string, flag:string?, team:string?}
 ---@return Widget
-function MvpTable._row(item, args)
+function MvpTable._row(args, item)
 	return HtmlWidgets.Tr{
 		children = WidgetUtil.collect(
 			HtmlWidgets.Td{
