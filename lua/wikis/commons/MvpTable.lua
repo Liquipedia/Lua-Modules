@@ -188,12 +188,13 @@ end
 function MvpTable._row(item, args)
 	local row = mw.html.create('tr')
 		:tag('td'):css('text-align', 'left'):node(OpponentDisplay.BlockOpponent{
-			opponent = {type = Opponent.solo, players = {{
-				displayName = item.displayName,
+			opponent = Opponent.readOpponentArgs{
+				type = Opponent.solo,
+				name = item.displayName,
 				flag = item.flag,
-				pageName = item.name,
+				link = item.name,
 				team = item.team and TeamTemplate.resolve(item.team, DateExt.getContextualDateOrNow()) or nil,
-			}}},
+			},
 			overflow = 'ellipsis',
 			showPlayerTeam = true,
 		}):done()
