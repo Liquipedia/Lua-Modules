@@ -14,10 +14,10 @@ return {
 		bw = {
 			abbreviation = 'BW1',
 			name = 'Black & White',
-			link = 'Main Page',
+			link = 'Pokemon Black and White',
 			logo = {
-				darkMode = 'Pokemon allmode.png',
-				lightMode = 'Pokemon allmode.png',
+				darkMode = 'Pokemon Black White allmode.png',
+				lightMode = 'Pokemon Black White allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Pokemon allmode.png',
@@ -27,10 +27,10 @@ return {
 		bw2 = {
 			abbreviation = 'BW2',
 			name = 'Black 2 & White 2',
-			link = 'Main Page',
+			link = 'Pokemon Black 2 and White 2',
 			logo = {
-				darkMode = 'Pokemon allmode.png',
-				lightMode = 'Pokemon allmode.png',
+				darkMode = 'Pokemon Black White 2 allmode.png',
+				lightMode = 'Pokemon Black White 2 allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Pokemon allmode.png',
@@ -40,10 +40,10 @@ return {
 		dpp = {
 			abbreviation = 'DPP',
 			name = 'Diamond, Pearl & Platnium',
-			link = 'Main Page',
+			link = 'Pokemon Diamond Pearl and Platinum',
 			logo = {
-				darkMode = 'Pokemon allmode.png',
-				lightMode = 'Pokemon allmode.png',
+				darkMode = 'Pokemon Diamond Pearl Platinum allmode.png',
+				lightMode = 'Pokemon Diamond Pearl Platinum allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Pokemon allmode.png',
@@ -52,7 +52,7 @@ return {
 		},
 		go = {
 			abbreviation = 'GO',
-			link = 'Main Page',
+			link = 'Pokemon Go',
 			name = 'Pokemon Go',
 			logo = {
 				darkMode = 'Pokemon GO allmode.png',
@@ -65,11 +65,11 @@ return {
 		},
 		gsc = {
 			abbreviation = 'GSC',
-			link = 'Main Page',
+			link = 'Pokemon Gold Silver and Crystal',
 			name = 'Gold, Silver & Crystal',
 			logo = {
-				darkMode = 'Pokemon allmode.png',
-				lightMode = 'Pokemon allmode.png',
+				darkMode = 'Pokemon GSC allmode.png',
+				lightMode = 'Pokemon GSC allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Pokemon allmode.png',
@@ -79,10 +79,10 @@ return {
 		oras = {
 			abbreviation = 'ORAS',
 			name = 'Omega Ruby & Alpha Sapphire',
-			link = 'Main Page',
+			link = 'Pokemon Omega Ruby and Alpha Sapphire',
 			logo = {
-				darkMode = 'Pokemon allmode.png',
-				lightMode = 'Pokemon allmode.png',
+				darkMode = 'Pokemon ORAS allmode.png',
+				lightMode = 'Pokemon ORAS allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Pokemon allmode.png',
@@ -92,10 +92,10 @@ return {
 		rby = {
 			abbreviation = 'RBY',
 			name = 'Red, Blue & Yellow',
-			link = 'Main Page',
+			link = 'Pokemon Red Blue and Yellow',
 			logo = {
-				darkMode = 'Pokemon allmode.png',
-				lightMode = 'Pokemon allmode.png',
+				darkMode = 'Pokemon RBY allmode.png',
+				lightMode = 'Pokemon RBY allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Pokemon allmode.png',
@@ -105,10 +105,10 @@ return {
 		rse = {
 			abbreviation = 'RSE',
 			name = 'Ruby, Sapphire & Emerald',
-			link = 'Main Page',
+			link = 'Pokemon Ruby Sapphire and Emerald',
 			logo = {
-				darkMode = 'Pokemon allmode.png',
-				lightMode = 'Pokemon allmode.png',
+				darkMode = 'Pokemon RSE allmode.png',
+				lightMode = 'Pokemon RSE allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Pokemon allmode.png',
@@ -118,10 +118,10 @@ return {
 		sm = {
 			abbreviation = 'SM',
 			name = 'Sun & Moon',
-			link = 'Main Page',
+			link = 'Pokemon Sun and Moon',
 			logo = {
-				darkMode = 'Pokemon allmode.png',
-				lightMode = 'Pokemon allmode.png',
+				darkMode = 'Pokemon Sun Moon allmode.png',
+				lightMode = 'Pokemon Sun Moon allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Pokemon allmode.png',
@@ -131,7 +131,7 @@ return {
 		sv = {
 			abbreviation = 'SV',
 			name = 'Scarlet & Violet',
-			link = 'Main Page',
+			link = 'Pokemon Scarlet and Violet',
 			logo = {
 				darkMode = 'Pokemon_Scarlet_Violet_allmode.png',
 				lightMode = 'Pokemon_Scarlet_Violet_allmode.png',
@@ -144,10 +144,10 @@ return {
 		swsh = {
 			abbreviation = 'SWSH',
 			name = 'Sword & Shield',
-			link = 'Main Page',
+			link = 'Pokemon Sword and Shield',
 			logo = {
-				darkMode = 'Pokemon allmode.png',
-				lightMode = 'Pokemon allmode.png',
+				darkMode = 'Pokemon Sword Shield allmode.png',
+				lightMode = 'Pokemon Sword Shield allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Pokemon allmode.png',
@@ -157,7 +157,7 @@ return {
 		tcg = {
 			abbreviation = 'TCG',
 			name = 'Trading Card Game',
-			link = 'Main Page',
+			link = 'Pokemon Trading Card Game',
 			logo = {
 				darkMode = 'Pokemon_Trading_Card_Game_allmode.png',
 				lightMode = 'Pokemon_Trading_Card_Game_allmode.png',
@@ -170,10 +170,10 @@ return {
 		tcgp = {
 			abbreviation = 'TCG-P',
 			name = 'Trading Card Game Pocket',
-			link = 'Main Page',
+			link = 'Pokemon Trading Card Game Pocket',
 			logo = {
-				darkMode = 'Pokemon allmode.png',
-				lightMode = 'Pokemon allmode.png',
+				darkMode = 'Pokemon_TCG_Pocket allmode.png',
+				lightMode = 'Pokemon_TCG_Pocket allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Pokemon allmode.png',
@@ -183,10 +183,10 @@ return {
 		tcgl = {
 			abbreviation = 'TCG-L',
 			name = 'Trading Card Game Live',
-			link = 'Main Page',
+			link = 'Pokemon Trading Card Game Live',
 			logo = {
-				darkMode = 'Pokemon allmode.png',
-				lightMode = 'Pokemon allmode.png',
+				darkMode = 'Pokemon TCG Live allmode.png',
+				lightMode = 'Pokemon TCG Live allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Pokemon allmode.png',
@@ -196,10 +196,10 @@ return {
 		tcgo = {
 			abbreviation = 'TCG-O',
 			name = 'Trading Card Game Online',
-			link = 'Main Page',
+			link = 'Pokemon Trading Card Game Online',
 			logo = {
-				darkMode = 'Pokemon allmode.png',
-				lightMode = 'Pokemon allmode.png',
+				darkMode = 'Pokemon TCG Online allmode.png',
+				lightMode = 'Pokemon TCG Online allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Pokemon allmode.png',
@@ -209,7 +209,7 @@ return {
 		unite = {
 			abbreviation = 'UNITE',
 			name = 'Unite',
-			link = 'Main Page',
+			link = 'Pokemon UNITE',
 			logo = {
 				darkMode = 'Pokemon UNITE allmode.png',
 				lightMode = 'Pokemon UNITE allmode.png',
@@ -222,10 +222,36 @@ return {
 		usum = {
 			abbreviation = 'USUM',
 			name = 'Ultra Sun & Ultra Moon',
-			link = 'Main Page',
+			link = 'Pokemon Ultra Sun and Ultra Moon',
 			logo = {
+				darkMode = 'Pokemon Ultra Sun Moon allmode.png',
+				lightMode = 'Pokemon Ultra Sun Moon allmode.png',
+			},
+			defaultTeamLogo = {
 				darkMode = 'Pokemon allmode.png',
 				lightMode = 'Pokemon allmode.png',
+			},
+		},
+		xd = {
+			abbreviation = 'XD',
+			name = 'XD: Gale of Darkness',
+			link = 'Pokemon XD: Gale of Darkness',
+			logo = {
+				darkMode = 'Pokemon XD allmode.png',
+				lightMode = 'Pokemon XD allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Pokemon allmode.png',
+				lightMode = 'Pokemon allmode.png',
+			},
+		},
+		champions = {
+			abbreviation = 'Champions',
+			name = 'Champions',
+			link = 'Pokemon Champions',
+			logo = {
+				darkMode = 'Pokemon Champions allmode.png',
+				lightMode = 'Pokemon Champions allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Pokemon allmode.png',

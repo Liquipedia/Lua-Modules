@@ -19,6 +19,7 @@ local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
@@ -66,6 +67,16 @@ local KEYSTONES = Table.map({
 	return value, true
 end)
 
+local ROLE_ORDER = Table.map({
+	'top',
+	'jungle',
+	'middle',
+	'bottom',
+	'support',
+}, function(idx, value)
+	return value, idx
+end)
+
 local DEFAULT_ITEM = 'EmptyIcon'
 local LOADOUT_ICON_SIZE = '24px'
 local ITEMS_TO_SHOW = 6
@@ -97,17 +108,22 @@ function MatchPage:populateGames()
 			team.scoreDisplay = game.winner == teamIdx and 'W' or game.finished and 'L' or '-'
 			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
 
-			team.players = Array.map(opponent.players, function(player)
-				if Logic.isDeepEmpty(player) then return end
-				return Table.mergeInto(player, {
-					items = Array.map(Array.range(1, ITEMS_TO_SHOW), function(idx)
-						return player.items[idx] or DEFAULT_ITEM
-					end),
-					runeKeystone = Array.filter(player.runes.primary.runes, function(rune)
-						return KEYSTONES[rune]
-					end)[1]
-				})
-			end)
+			team.players = Array.map(
+				Array.sortBy(Array.filter(opponent.players, Logic.isNotEmpty), function(player)
+					return ROLE_ORDER[player.role]
+				end),
+				function(player)
+					if Logic.isDeepEmpty(player) then return end
+					return Table.mergeInto(player, {
+						items = Array.map(Array.range(1, ITEMS_TO_SHOW), function(idx)
+							return player.items[idx] or DEFAULT_ITEM
+						end),
+						runeKeystone = Array.filter(player.runes.primary.runes, function(rune)
+							return KEYSTONES[rune]
+						end)[1]
+					})
+				end
+			)
 
 			if game.finished then
 				-- Aggregate stats
@@ -239,7 +255,7 @@ function MatchPage:_renderDraft(game)
 	return {
 		HtmlWidgets.H3{children = 'Draft'},
 		Div{
-			classes = {'match-bm-lol-game-veto', 'collapsed', 'general-collapsible'},
+			classes = {'match-bm-lol-game-veto'},
 			children = {
 				Div{
 					classes = {'match-bm-lol-game-veto-overview'},
@@ -247,32 +263,17 @@ function MatchPage:_renderDraft(game)
 						return self:_renderGameTeamVetoOverview(game, teamIndex)
 					end)
 				},
-				Div{
-					classes = {'match-bm-lol-game-veto-order-toggle', 'ppt-toggle-expand'},
-					children = {
-						Div{
-							classes = {'general-collapsible-expand-button'},
-							children = Div{children = {
-								'Show Order &nbsp;',
-								IconFa{iconName = 'expand'}
-							}}
-						},
-						Div{
-							classes = {'general-collapsible-collapse-button'},
-							children = Div{children = {
-								'Hide Order &nbsp;',
-								IconFa{iconName = 'collapse'}
-							}}
-						}
-					}
-				},
-				Div{
-					classes = {'match-bm-lol-game-veto-order-list', 'ppt-hide-on-collapse'},
+				GeneralCollapsible{
+					title = 'Draft Order',
+					attributes = {style = 'width:100%'},
+					titleClasses = {'match-bm-lol-game-veto-order-toggle'},
+					shouldCollapse = true,
+					collapseAreaClasses = {'match-bm-lol-game-veto-order-list'},
 					children = {
 						self:_renderGameTeamVetoOrder(game, 1),
 						self:_renderGameTeamVetoOrder(game, 2),
 					}
-				}
+				},
 			}
 		}
 	}

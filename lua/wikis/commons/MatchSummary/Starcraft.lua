@@ -37,7 +37,7 @@ local StarcraftMatchSummary = {}
 ---@param args {bracketId: string, matchId: string, config: table?}
 ---@return Html
 function StarcraftMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(StarcraftMatchSummary, args):addClass('brkts-popup-sc')
+	return MatchSummary.defaultGetByMatchId(StarcraftMatchSummary, args, {width = '380px'})
 end
 
 ---@param match StarcraftMatchGroupUtilMatch
@@ -53,15 +53,14 @@ function StarcraftMatchSummary.createBody(match)
 
 	return WidgetUtil.collect(
 		isResetMatch and MatchSummaryWidgets.Row{
-			classes = {'brkts-popup-sc-veto-center'},
-			css = {['line-height'] = '80%', ['font-weight'] = 'bold'},
+			css = {['line-height'] = '80%', ['font-weight'] = 'bold', ['text-align'] = 'center'},
 			children = {'Reset match'},
 		} or nil,
 		Array.map(match.opponents, StarcraftMatchSummary.advantageOrPenalty),
 		subMatches and Array.map(subMatches, StarcraftMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(StarcraftMatchSummary.Game, {})),
 		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
-			classes = {'brkts-popup-sc-veto-center'},
+			css = {['text-align'] = 'center'},
 			children = {HtmlWidgets.B{children = {'Vetoes'}}},
 		} or nil,
 		Array.map(match.vetoes or {}, StarcraftMatchSummary.Veto) or nil
@@ -103,7 +102,7 @@ function StarcraftMatchSummary.advantageOrPenalty(opponent)
 	local value = tonumber(extradata.advantage) or tonumber(extradata.penalty)
 
 	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-sc-game-center'},
+		css = {['text-align'] = 'center'},
 		children = {
 			OpponentDisplay.InlineOpponent{
 				opponent = Opponent.isTbd(opponent) and Opponent.tbd() or opponent,
@@ -156,9 +155,8 @@ function StarcraftMatchSummary.Game(options, game)
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.GameComment{
 				children = (game.extradata or {}).server and ('Played server: ' .. (game.extradata or {}).server) or nil,
-				classes = {'brkts-popup-sc-game-comment'},
 			},
-			MatchSummaryWidgets.GameComment{children = game.comment, classes = {'brkts-popup-sc-game-comment'}}
+			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
 	}
 end
@@ -203,16 +201,12 @@ function StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch)
 
 	local createOpponent = function(opponentIndex)
 		local players = (opponents[opponentIndex] or {}).players or {}
-		if Logic.isEmpty(players) then
-			players = Opponent.tbd(Opponent.solo).players
-		end
+		local opponent = Opponent.tbd(Opponent.partyTypes[math.max(#players, 1)]) --[[@as StarcraftStandardOpponent]]
+		opponent.isArchon = (opponents[opponentIndex] or {}).isArchon
+		opponent.players = Logic.nilIfEmpty(players) or opponent.players
 		return OpponentDisplay.BlockOpponent{
 			flip = opponentIndex == 1,
-			opponent = {
-				players = players,
-				type = Opponent.partyTypes[math.max(#players, 1)],
-				isArchon = (opponents[opponentIndex] or {}).isArchon,
-			},
+			opponent = opponent,
 			showLink = true,
 			overflow = 'ellipsis',
 		}
@@ -271,7 +265,7 @@ function StarcraftMatchSummary.Veto(veto)
 				children = {statusIcon(1)},
 			},
 			HtmlWidgets.Div{
-				classes = {'brkts-popup-sc-veto-center'},
+				css = {['text-align'] = 'center'},
 				children = {map},
 			},
 			HtmlWidgets.Div{

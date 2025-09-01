@@ -15,6 +15,7 @@ local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class MatchSummaryFfaCountdownIcon: Widget
 ---@operator call(table): MatchSummaryFfaCountdownIcon
+---@field props {game: FFAMatchGroupUtilGame, additionalClasses: string[]?}
 local MatchSummaryFfaCountdownIcon = Class.new(Widget)
 
 local PHASE_ICONS = {

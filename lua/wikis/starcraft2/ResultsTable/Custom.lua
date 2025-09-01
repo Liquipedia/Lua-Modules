@@ -8,8 +8,8 @@
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
+local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
 local DivTable = Lua.import('Module:DivTable')
-local GeneralCollapsible = Lua.import('Module:GeneralCollapsible')
 local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
@@ -126,7 +126,7 @@ function CustomResultsTable._allKillMatch(args)
 				:addClass('inherit-bg')
 				:cell(mw.html.create('div'):css('width', '35%'):wikitext('vs [[' .. teamName .. ']]'))
 				:cell(mw.html.create('div'):css('width', '30%'):wikitext(''))
-				:cell(mw.html.create('div'):css('width', '35%'):node(GeneralCollapsible.DefaultToggle()))
+				:cell(mw.html.create('div'):css('width', '35%'):node(CollapsibleToggle{}))
 		)
 
 	local mapIndex = 1
@@ -224,6 +224,7 @@ function CustomResultsTable._opponentDisplay(args, prefix, side)
 		opponent = {
 			type = CustomResultsTable._getOpponentType(#players),
 			players = players,
+			extradata = {},
 		},
 	}
 end

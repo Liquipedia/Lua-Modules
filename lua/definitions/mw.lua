@@ -339,11 +339,19 @@ end
 ---@param localTime boolean?
 ---@return string
 function mw.language:formatDate(format, timestamp, localTime)
+	local ostimeWrapper = function(date)
+		local time = os.time(date)
+		-- Fix for running on MacOS. Year = 0000 returns nil on mac, let's assume it's 0000-01-01
+		if time == nil then
+			return -62167219200
+		end
+		return time
+	end
 	local function localTimezoneOffset(ts)
 		local utcDt = os.date("!*t", ts)
 		local localDt = os.date("*t", ts)
 		localDt.isdst = false
-		return os.difftime(os.time(localDt --[[@as osdateparam]]), os.time(utcDt --[[@as osdateparam]]))
+		return os.difftime(ostimeWrapper(localDt --[[@as osdateparam]]), ostimeWrapper(utcDt --[[@as osdateparam]]))
 	end
 
 	local function parseDateString(timeString)
@@ -377,7 +385,8 @@ function mw.language:formatDate(format, timestamp, localTime)
 			return ''
 		end
 
-		local ts = os.time(makeOsdateParam(year, month, day, hour, minute, second)) - offset
+		local timestampBeforeOffset = ostimeWrapper(makeOsdateParam(year, month, day, hour, minute, second))
+		local ts = timestampBeforeOffset - offset
 
 		return tostring(ts + localTimezoneOffset(ts))
 	elseif format == 'c' then
@@ -393,9 +402,9 @@ function mw.language:formatDate(format, timestamp, localTime)
 			if not year then
 				return ''
 			end
-			return os.date(outFormat, os.time(makeOsdateParam(year, month, day, hour, minute, second))) --[[@as string]]
+			return os.date(outFormat, ostimeWrapper(makeOsdateParam(year, month, day, hour, minute, second))) --[[@as string]]
 		end
-		return os.date(outFormat, os.time(timestamp)) --[[@as string]]
+		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
 	end
 	return ''
 end

@@ -18,6 +18,7 @@ local CountdownIcon = Lua.import('Module:Widget/Match/Summary/Ffa/CountdownIcon'
 
 ---@class MatchSummaryFfaHeader: Widget
 ---@operator call(table): MatchSummaryFfaHeader
+---@field props {matchId: string, games: FFAMatchGroupUtilGame[]}
 local MatchSummaryFfaHeader = Class.new(Widget)
 
 ---@return Widget

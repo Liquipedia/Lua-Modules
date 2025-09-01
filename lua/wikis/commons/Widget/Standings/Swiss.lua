@@ -58,7 +58,12 @@ function StandingsSwissWidget:render()
 			HtmlWidgets.Tr{children = WidgetUtil.collect(
 				HtmlWidgets.Th{children = '#'},
 				HtmlWidgets.Th{children = 'Participant'},
-				HtmlWidgets.Th{children = 'Matches'},
+				Array.map(standings.tiebreakers, function(tiebreaker)
+					if not tiebreaker.title then
+						return
+					end
+					return HtmlWidgets.Th{children = tiebreaker.title}
+				end),
 				Array.map(standings.rounds, function(round)
 					return HtmlWidgets.Th{children = round.title}
 				end)
@@ -86,11 +91,16 @@ function StandingsSwissWidget:render()
 								showPlayerTeam = true,
 							}
 						},
-						HtmlWidgets.Td{
-							classes = {teamBackground},
-							children = table.concat({slot.matchWins, slot.matchLosses}, '-'),
-							css = {['font-weight'] = 'bold', ['text-align'] = 'center'}
-						},
+						Array.map(standings.tiebreakers, function(tiebreaker, tiebreakerIndex)
+							if not tiebreaker.title then
+								return
+							end
+							return HtmlWidgets.Td{
+								classes = {teamBackground},
+								css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil, ['text-align'] = 'center'},
+								children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
+							}
+						end),
 						Array.map(standings.rounds, function(columnRound)
 							local entry = Array.find(columnRound.opponents, function(columnSlot)
 								return Opponent.same(columnSlot.opponent, slot.opponent)
@@ -113,7 +123,7 @@ function StandingsSwissWidget:render()
 							local bgClassSuffix
 							if match.finished then
 								local winner = match.winner
-								bgClassSuffix = winner == opposingOpponentIndex and 'down' or winner == 0 or 'draw' or 'up'
+								bgClassSuffix = winner == opposingOpponentIndex and 'down' or winner == 0 and 'draw' or 'up'
 							end
 
 							return HtmlWidgets.Td{
