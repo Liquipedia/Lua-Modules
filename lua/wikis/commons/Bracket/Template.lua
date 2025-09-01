@@ -113,6 +113,8 @@ function BracketTemplate.readBracketData(args)
 	end
 
 	args.type = 'bracket'
+	args.templateId = pageName
+
 	local bracketData = MatchGroupUtil.bracketDataFromRecord(args)
 	--bracketData is of type bracket
 	---@cast bracketData - MatchGroupUtilMatchlistBracketData

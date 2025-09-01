@@ -66,6 +66,7 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 ---@field qualWin boolean?
 ---@field qualWinLiteral string?
 ---@field skipRound number?
+---@field templateId string
 ---@field thirdPlaceMatchId string?
 ---@field title string?
 ---@field type 'bracket'
@@ -87,6 +88,7 @@ MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	qualifiedHeader = 'boolean?',
 	qualWinLiteral = 'string?',
 	skipRound = 'number?',
+	templateId = 'string',
 	thirdPlaceMatchId = 'string?',
 	title = 'string?',
 	type = TypeUtil.literal('bracket'),
@@ -612,6 +614,7 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 			qualWinLiteral = nilIfEmpty(data.qualwinLiteral),
 			matchPage = nilIfEmpty(data.matchpage),
 			skipRound = tonumber(data.skipround) or data.skipround == 'true' and 1 or 0,
+			templateId = nilIfEmpty(data.templateId),
 			thirdPlaceMatchId = nilIfEmpty(data.thirdplace),
 			type = 'bracket',
 			upperMatchId = nilIfEmpty(data.upperMatchId),
@@ -647,6 +650,7 @@ function MatchGroupUtil.bracketDataToRecord(bracketData)
 		qualwin = bracketData.qualWin and 'true' or nil,
 		qualwinLiteral = bracketData.qualWinLiteral,
 		skipround = bracketData.skipRound ~= 0 and bracketData.skipRound or nil,
+		templateId = bracketData.templateId,
 		thirdplace = bracketData.thirdPlaceMatchId,
 		tolower = bracketData.lowerMatchIds[#bracketData.lowerMatchIds],
 		toupper = bracketData.lowerMatchIds[#bracketData.lowerMatchIds - 1],
