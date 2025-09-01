@@ -16,6 +16,9 @@ local Character = Lua.import('Module:Infobox/Character')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
+local Center = Widgets.Center
+local Link = Lua.import('Module:Widget/Basic/Link')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class IlluvCharacterInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)
@@ -27,6 +30,7 @@ function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))
 	character.args.informationType = 'Illuvial'
+	character.args.image = 'Illuvium ' .. (character.args.name or '') .. '.png'
 	return character:createInfobox()
 end
 
@@ -39,9 +43,13 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(
 			widgets,
 			Cell{name = 'Affinity', children = {args.affinity}},
-			Cell{name = 'Class', children = {args.class}},
 			Title{children = 'Stats'},
-			Cell{name = 'Glossary', children = {args.glossary}},
+			Center{children = {Link{
+				link = 'Glossary',
+				children = HtmlWidgets.Span{children = {
+					'Glossary'}
+				}
+			}}},
 			Title{children = 'Health'},
 			Cell{name = 'Max Health', children = {args.maxhealth}},
 			Cell{name = 'Regeneration', children = {args.regeneration}},
