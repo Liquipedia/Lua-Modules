@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Match/HeaderBR
+-- page=Module:Widget/Match/Header/Ffa
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -19,20 +19,20 @@ local Div = HtmlWidgets.Div
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Placement = Lua.import('Module:Placement')
 
----@class MatchHeaderBRProps
+---@class MatchHeaderFfaProps
 ---@field match FFAMatchGroupUtilMatch
 ---@field teamStyle? teamStyle
 
----@class MatchHeaderBR: Widget
----@operator call(MatchHeaderBRProps): MatchHeaderBR
----@field props MatchHeaderBRProps
-local MatchHeaderBR = Class.new(Widget)
-MatchHeaderBR.defaultProps = {
+---@class MatchHeaderFfa: Widget
+---@operator call(MatchHeaderFfaProps): MatchHeaderFfa
+---@field props MatchHeaderFfaProps
+local MatchHeaderFfa = Class.new(Widget)
+MatchHeaderFfa.defaultProps = {
 	teamStyle = 'short',
 }
 
 ---@return Widget?
-function MatchHeaderBR:render()
+function MatchHeaderFfa:render()
 	local match = self.props.match
 	if not match then
 		return nil
@@ -60,7 +60,7 @@ function MatchHeaderBR:render()
 				Div {
 					classes = { 'match-info-headerbr-positionholder' },
 					children = {
-						Trophy { place = i },
+						Trophy{ place = i },
 						Placement._makeOrdinal({ i })[1]
 					}
 				},
@@ -84,4 +84,4 @@ function MatchHeaderBR:render()
 	}
 end
 
-return MatchHeaderBR
+return MatchHeaderFfa

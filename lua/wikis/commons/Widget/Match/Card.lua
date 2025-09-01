@@ -14,7 +14,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchHeader = Lua.import('Module:Widget/Match/Header')
-local MatchHeaderBR = Lua.import('Module:Widget/Match/HeaderBR')
+local MatchHeaderFfa = Lua.import('Module:Widget/Match/Header/Ffa')
 local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
 local TournamentBar = Lua.import('Module:Widget/Match/TournamentBar')
 local ButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
@@ -64,7 +64,7 @@ function MatchCard:render()
 				classes = {'match-info-tournament', highlight and HIGHLIGHT_CLASS or nil},
 				children = {tournamentLink},
 			} or nil,
-			MatchHeaderBR{match = match},
+			MatchHeaderFfa{match = match},
 			ButtonBar{match = match}
 		)
 	}
