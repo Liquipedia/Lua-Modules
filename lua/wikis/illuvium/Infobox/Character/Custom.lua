@@ -87,3 +87,4 @@ function CustomInjector:parse(id, widgets)
 end
 
 return CustomCharacter
+
