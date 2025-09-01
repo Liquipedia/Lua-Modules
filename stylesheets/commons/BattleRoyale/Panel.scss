@@ -254,6 +254,22 @@ Author(s): Elysienna
 		&__icon {
 			width: 1.5rem;
 			font-size: 0.875rem;
+
+			& > i.icon--gold {
+				color: #ccab00;
+			}
+
+			& > i.icon--silver {
+				color: #557177;
+			}
+
+			& > i.icon--bronze {
+				color: #80704c;
+			}
+
+			& > i.icon--copper {
+				color: #cc7800;
+			}
 		}
 
 		&__title {
