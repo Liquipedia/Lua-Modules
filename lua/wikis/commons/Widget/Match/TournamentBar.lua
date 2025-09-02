@@ -18,6 +18,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local String = Lua.import('Module:StringUtils')
+local Array = Lua.import('Module:Array')
 
 ---@class MatchTournamentBarProps
 ---@field match MatchGroupUtilMatch?
