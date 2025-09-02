@@ -200,39 +200,41 @@ local CONTENT = {
 
 local LAYOUT_MAIN = {
 	{ -- Left
-		size = 6,
+		size = 5,
 		children = {
 			{
 				mobileOrder = 1,
-				content = CONTENT.aboutMain,
+				content = CONTENT.specialEvents
+			},
+
+			{
+				mobileOrder = 3,
+				content = CONTENT.transfers,
+			},
+			{
+
+				mobileOrder = 4,
+				content = CONTENT.heroes,
 			},
 			{
 				mobileOrder = 5,
-				content = CONTENT.heroes,
+				content = CONTENT.wantToHelp,
 			},
 			{
 				mobileOrder = 6,
 				content = CONTENT.updates,
 			},
 			{
-				mobileOrder = 10,
-				content = CONTENT.usefulArticles,
-			},
-			{
 				mobileOrder = 8,
-				content = CONTENT.wantToHelp,
+				content = CONTENT.usefulArticles,
 			},
 		},
 	},
 	{ -- Right
-		size = 6,
+		size = 7,
 		children = {
 			{
 				mobileOrder = 2,
-				content = CONTENT.specialEvents
-			},
-			{
-				mobileOrder = 3,
 				children = {
 					{
 						children = {
@@ -262,18 +264,8 @@ local LAYOUT_MAIN = {
 					},
 				},
 			},
---[[
-			{
-				mobileOrder = 6,
-				content = CONTENT.rankings
-			},
-]]
 			{
 				mobileOrder = 7,
-				content = CONTENT.transfers,
-			},
-			{
-				mobileOrder = 11,
 				content = CONTENT.thisDay,
 			},
 		},
