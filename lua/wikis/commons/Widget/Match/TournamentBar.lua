@@ -7,9 +7,11 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
+local String = Lua.import('Module:StringUtils')
 local Tournament = Lua.import('Module:Tournament')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -17,8 +19,6 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local String = Lua.import('Module:StringUtils')
-local Array = Lua.import('Module:Array')
 
 ---@class MatchTournamentBarProps
 ---@field match MatchGroupUtilMatch?
