@@ -86,7 +86,7 @@ function MatchTournamentBar:render()
 								link = gameData.map,
 								children = gameData.mapDisplayName
 							}
-						} or nil,
+						} or nil
 					)
 				} or nil
 			},
