@@ -115,11 +115,7 @@ local CONTENT = {
 	},
 	heroes = {
 		heading = 'Heroes',
-		body = Div{
-			classes = { 'heroes-panel' },
-			attributes = { ['data-component'] = 'heroes-panel' },
-			children = { Template.safeExpand(mw.getCurrentFrame(), 'HeroTable') }
-		},
+		body = Template.safeExpand(mw.getCurrentFrame(), 'HeroTable'),
 		padding = true,
 		boxid = 1501,
 	},
