@@ -32,7 +32,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 ---Entry point
 ---@param args table?
----@return Html
+---@return Widget
 function HiddenDataBox.run(args)
 	args = args or {}
 	local doQuery = not Logic.readBool(args.noQuery)
