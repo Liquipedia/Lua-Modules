@@ -7,13 +7,13 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 
-local Injector = Lua.import('Module:Widget/Injector')
 local Skill = Lua.import('Module:Infobox/Skill')
 
+local Injector = Lua.import('Module:Widget/Injector')
 local Widgets = Lua.import('Module:Widget/All')
-local Array = Lua.import('Module:Array')
 local Cell = Widgets.Cell
 
 ---@class IlluviumSkillInfobox: SkillInfobox
@@ -24,8 +24,6 @@ local CustomInjector = Class.new(Injector)
 ---@return Html
 function CustomSkill.run(frame)
 	local skill = CustomSkill(frame)
-
-	assert(skill.args.informationType, 'Missing "informationType"')
 
 	skill:setWidgetInjector(CustomInjector(skill))
 
@@ -43,8 +41,8 @@ function CustomInjector:parse(id, widgets)
 			widgets,
 			Cell({ name = 'Class', children = { args.class } }),
 			Cell({ name = 'Type', children = { args.type } }),
-			Cell({ name = 'Release Date:', children = { args.releasedate } }),
-			Cell({ name = 'Synergy Levels:', children = { args.synergylevels } })
+			Cell({ name = 'Release Date', children = { args.releasedate } }),
+			Cell({ name = 'Synergy Levels', children = { args.synergylevels } })
 		)
 	end
 
