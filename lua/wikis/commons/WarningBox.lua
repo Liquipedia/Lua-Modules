@@ -11,33 +11,47 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 
----@param text string|number
----@return Html
-function WarningBox.display(text)
-	local tbl = mw.html.create('table')
-		:tag('tr')
-			:tag('td'):addClass('ambox-image'):wikitext('[[File:Emblem-important.svg|40px|link=]]'):done()
-			:tag('td'):addClass('ambox-text'):wikitext(text):allDone()
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
-	return mw.html.create('div')
-		:addClass('show-when-logged-in')
-		:addClass('navigation-not-searchable')
-		:addClass('ambox-wrapper')
-		:addClass('ambox')
-		:addClass('wiki-bordercolor-dark')
-		:addClass('wiki-backgroundcolor-light')
-		:addClass('ambox-red')
-		:node(tbl)
+---@param text string|number
+---@return Widget
+function WarningBox.display(text)
+	local tbl = HtmlWidgets.Table{
+		children = HtmlWidgets.Tr{
+			children = {
+				HtmlWidgets.Td{
+					classes = {'ambox-image'},
+					children = IconImage{imageLight = 'Emblem-important.svg', size = '40px', link = ''}
+				},
+				HtmlWidgets.Td{
+					classes = {'ambox-text'},
+					children = text
+				},
+			}
+		}
+	}
+
+	return HtmlWidgets.Div{
+		classes = {
+			'show-when-logged-in',
+			'navigation-not-searchable',
+			'ambox-wrapper',
+			'ambox',
+			'wiki-bordercolor-dark',
+			'wiki-backgroundcolor-light',
+			'ambox-red'
+		},
+		children = tbl
+	}
 end
 
 ---@param arr (string|number)[]
----@return Html
+---@return Widget
 function WarningBox.displayAll(arr)
-	local wrapper = mw.html.create()
-	Array.forEach(arr, function(text)
-		wrapper:node(WarningBox.display(text))
-	end)
-	return wrapper
+	return HtmlWidgets.Fragment{
+		children = Array.map(arr, WarningBox.display)
+	}
 end
 
 return WarningBox
