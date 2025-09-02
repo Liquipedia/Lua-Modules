@@ -250,6 +250,7 @@ local LAYOUT_MAIN = {
 		},
 	},
 	{ -- Heroes
+		size = 12,
 		children = {
 			{
 				mobileOrder = 4,
@@ -281,6 +282,7 @@ local LAYOUT_MAIN = {
 		}
 	},
 	{ -- Useful articles
+		size = 12,
 		children = {
 			{
 				mobileOrder = 8,
