@@ -30,6 +30,14 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+---@class mvpTableParsedArgs
+---@field cutafter number
+---@field margin number
+---@field points boolean
+---@field title string?
+---@field matchGroupIds string[]
+---@field tournaments string[]
+
 local MvpTable = {}
 
 ---Entry point for MvpTable.
@@ -85,14 +93,6 @@ function MvpTable.run(args)
 		)
 	}
 end
-
----@class mvpTableParsedArgs
----@field cutafter number
----@field margin number
----@field points boolean
----@field title string?
----@field matchGroupIds string[]
----@field tournaments string[]
 
 ---Parses the entered arguments to a table that can be used better further down the line
 ---@param args table
