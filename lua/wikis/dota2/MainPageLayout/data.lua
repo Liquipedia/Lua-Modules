@@ -53,26 +53,6 @@ local ESPORTS_HUB_BUTTON = createHubButton('Portal:Esports', 'Esports Hub', 'esp
 local GAME_HUB_BUTTON = createHubButton('Portal:Game', 'Game Hub', 'game_hub')
 
 local CONTENT = {
-	aboutMain = {
-		heading = ABOUT_HEADING,
-		body = WidgetUtil.collect(
-			ABOUT_BODY,
-			Div{
-				css = {
-					display = 'flex',
-					['flex-wrap'] = 'wrap',
-					gap = '12px',
-					['justify-content'] = 'center',
-					['padding-top'] = '12px'
-				},
-				children = {
-					ESPORTS_HUB_BUTTON, GAME_HUB_BUTTON
-				}
-			}
-		),
-		padding = true,
-		boxid = 1500,
-	},
 	aboutEsport = {
 		heading = ABOUT_HEADING,
 		body = WidgetUtil.collect(
