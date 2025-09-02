@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
@@ -15,11 +16,17 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class WarningBoxWidget: Widget
 ---@operator call(table): WarningBoxWidget
----@field props {text: string|number}
+---@field props {text: string|number?}
 local WarningBoxWidget = Class.new(Widget)
 
----@return Widget
+---@return Widget?
 function WarningBoxWidget:render()
+	local text = self.props.text
+	if Logic.isEmpty(text) then
+		return
+	end
+	---@cast text -nil
+
 	local tbl = HtmlWidgets.Table{
 		children = HtmlWidgets.Tr{
 			children = {
@@ -29,7 +36,7 @@ function WarningBoxWidget:render()
 				},
 				HtmlWidgets.Td{
 					classes = {'ambox-text'},
-					children = self.props.text
+					children = text
 				},
 			}
 		}
