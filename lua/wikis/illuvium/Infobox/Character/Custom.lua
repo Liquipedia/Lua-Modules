@@ -18,7 +18,6 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 local Link = Lua.import('Module:Widget/Basic/Link')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class IlluvCharacterInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)
@@ -46,9 +45,7 @@ function CustomInjector:parse(id, widgets)
 			Title{children = 'Stats'},
 			Center{children = {Link{
 				link = 'Glossary',
-				children = HtmlWidgets.Span{children = {
-					'Glossary'}
-				}
+				children = 'Glossary',
 			}}},
 			Title{children = 'Health'},
 			Cell{name = 'Max Health', children = {args.maxhealth}},
