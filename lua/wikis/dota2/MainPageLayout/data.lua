@@ -199,7 +199,7 @@ local CONTENT = {
 }
 
 local LAYOUT_MAIN = {
-	{ -- Left
+	{ -- Top Left
 		size = 5,
 		children = {
 			{
@@ -211,26 +211,9 @@ local LAYOUT_MAIN = {
 				mobileOrder = 3,
 				content = CONTENT.transfers,
 			},
-			{
-
-				mobileOrder = 4,
-				content = CONTENT.heroes,
-			},
-			{
-				mobileOrder = 5,
-				content = CONTENT.wantToHelp,
-			},
-			{
-				mobileOrder = 6,
-				content = CONTENT.updates,
-			},
-			{
-				mobileOrder = 8,
-				content = CONTENT.usefulArticles,
-			},
 		},
 	},
-	{ -- Right
+	{ -- Top Right
 		size = 7,
 		children = {
 			{
@@ -264,12 +247,47 @@ local LAYOUT_MAIN = {
 					},
 				},
 			},
+		},
+	},
+	{ -- Heroes
+		children = {
+			{
+				mobileOrder = 4,
+				content = CONTENT.heroes,
+			},
+		}
+	},
+	{ -- Bottom Left
+		size = 6,
+		children = {
+			{
+				mobileOrder = 5,
+				content = CONTENT.wantToHelp,
+			},
+			{
+				mobileOrder = 6,
+				content = CONTENT.updates,
+			},
+
+		}
+	},
+	{ -- Bottom Right
+		size = 6,
+		children = {
 			{
 				mobileOrder = 7,
 				content = CONTENT.thisDay,
 			},
-		},
+		}
 	},
+	{ -- Useful articles
+		children = {
+			{
+				mobileOrder = 8,
+				content = CONTENT.usefulArticles,
+			},
+		}
+	}
 }
 
 local LAYOUT_ESPORTS = {
