@@ -76,16 +76,18 @@ function MatchTournamentBar:render()
 					}
 				},
 				gameData and HtmlWidgets.Span{
-					children = {
+					children = WidgetUtil.collect(
 						stageName,
 						' - Game #',
-						table.concat(gameData.gameIds, '-'),
-						mapIsSet and ' on ' or nil,
-						mapIsSet and Link{
-							link = gameData.map,
-							children = gameData.mapDisplayName
+						Array.interleave(gameData.gameIds, '-'),
+						mapIsSet and {
+							' on ',
+							Link{
+								link = gameData.map,
+								children = gameData.mapDisplayName
+							}
 						} or nil,
-					}
+					)
 				} or nil
 			},
 			css = {['display'] = 'flex', ['flex-direction'] = 'column'}
