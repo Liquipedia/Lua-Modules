@@ -23,32 +23,32 @@ local CustomInjector = Class.new(Injector)
 ---@param frame Frame
 ---@return Html
 function CustomSkill.run(frame)
-  local skill = CustomSkill(frame)
+	local skill = CustomSkill(frame)
 
-  assert(skill.args.informationType, 'Missing "informationType"')
+	assert(skill.args.informationType, 'Missing "informationType"')
 
-  skill:setWidgetInjector(CustomInjector(skill))
+	skill:setWidgetInjector(CustomInjector(skill))
 
-  return skill:createInfobox()
+	return skill:createInfobox()
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-  local args = self.caller.args
+	local args = self.caller.args
 
-  if id == 'custom' then
-    Array.appendWith(
-      widgets,
-      Cell{name = 'Class', children = {args.class}},
-      Cell{name = 'Type', children = {args.type}},
-      Cell{name = 'Release Date:', children = {args.releasedate}},
-      Cell{name = 'Synergy Levels:', children = {args.synergylevels}}
-    )
-  end
+	if id == 'custom' then
+		Array.appendWith(
+			widgets,
+			Cell({ name = 'Class', children = { args.class } }),
+			Cell({ name = 'Type', children = { args.type } }),
+			Cell({ name = 'Release Date:', children = { args.releasedate } }),
+			Cell({ name = 'Synergy Levels:', children = { args.synergylevels } })
+		)
+	end
 
-  return widgets
+	return widgets
 end
 
 return CustomSkill
