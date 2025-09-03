@@ -14,9 +14,19 @@ local Table = Lua.import('Module:Table')
 
 local StreamLinks = Lua.import('Module:Links/Stream')
 
+---@class CountdownArgs
+---@field date string?
+---@field timestamp integer?
+---@field rawcountdown boolean?
+---@field rawdatetime boolean?
+---@field finished boolean?
+---@field nostreams boolean?
+---@field text string?
+---@field separator string?
+
 local Countdown = {}
 
----@param args table
+---@param args CountdownArgs
 ---@return string
 function Countdown.create(args)
 	args = args or {}
