@@ -278,6 +278,10 @@ local PREFIXES = {
 	stream = {''},
 	telegram = {'https://t.me/'},
 	tespa = {match = 'https://web.archive.org/web/compete.tespa.org/tournament/'},
+	tetrio = {
+		'',
+		player = 'https://ch.tetr.io/u/'
+	},
 	tftv = {
 		'https://www.teamfortress.tv/',
 		player = 'https://www.teamfortress.tv/user/',

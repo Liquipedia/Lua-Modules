@@ -59,6 +59,7 @@ return {
 		'sostronk',
 		'start-gg',
 		'stratz',
+		'tetrio',
 		'tonamel',
 		'toornament',
 		'trackmania-io',
