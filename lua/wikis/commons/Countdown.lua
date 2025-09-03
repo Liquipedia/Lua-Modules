@@ -7,7 +7,7 @@
 
 local Lua = require('Module:Lua')
 
-local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
@@ -16,15 +16,9 @@ local StreamLinks = Lua.import('Module:Links/Stream')
 
 local Countdown = {}
 
----@param frame Frame
----@return string
-function Countdown.create(frame)
-	return Countdown._create(Arguments.getArgs(frame))
-end
-
 ---@param args table
 ---@return string
-function Countdown._create(args)
+function Countdown.create(args)
 	args = args or {}
 	if Logic.isEmpty(args.date) and not args.timestamp then
 		return ''
@@ -79,4 +73,4 @@ function Countdown._create(args)
 	)
 end
 
-return Countdown
+return Class.export(Countdown, {exports = {'create'}})
