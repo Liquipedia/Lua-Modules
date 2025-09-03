@@ -1,7 +1,7 @@
 // This file has been hacked to work around from php-scss 1.x bugs
 // Once we upgrade to php-scss 2.0, these hacks should be reverted
 
-.heroes_panel {
+.heroes-panel {
 	display: grid;
 	grid-template-columns: 1fr;
 	gap: 1rem;
