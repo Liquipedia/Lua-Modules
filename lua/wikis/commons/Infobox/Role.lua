@@ -29,8 +29,8 @@ local Role = Class.new(BasicInfobox)
 ---@param frame Frame
 ---@return Html
 function Role.run(frame)
-	local skill = Role(frame)
-	return skill:createInfobox()
+	local role = Role(frame)
+	return role:createInfobox()
 end
 
 ---@return string
@@ -38,7 +38,7 @@ function Role:createInfobox()
 	local args = self.args
 
 	if String.isEmpty(args.informationType) then
-		args.informationType = 'Class'
+		args.informationType = 'Role'
 	end
 
 	local widgets = {
@@ -78,11 +78,11 @@ end
 
 ---@param args table
 function Role:_setLpdbData(args)
-	local skillIndex = (tonumber(Variables.varDefault('skill_index')) or 0) + 1
-	Variables.varDefine('skill_index', skillIndex)
+	local roleIndex = (tonumber(Variables.varDefault('role_index')) or 0) + 1
+	Variables.varDefine('role_index', roleIndex)
 
 	local lpdbData = {
-		objectName = 'skill_' .. skillIndex .. '_' .. self.name,
+		objectName = 'role_' .. roleIndex .. '_' .. self.name,
 		name = args.name,
 		type = args.informationType,
 		image = args.image,
@@ -100,21 +100,6 @@ end
 ---@return table
 function Role:addToLpdb(lpdbData, args)
 	return lpdbData
-end
-
----@param args table
----@return string?
-function Role:_getHotkeys(args)
-	local display
-	if not String.isEmpty(args.hotkey) then
-		if not String.isEmpty(args.hotkey2) then
-			display = Hotkey.hotkey2{hotkey1 = args.hotkey, hotkey2 = args.hotkey2, seperator = 'slash'}
-		else
-			display = Hotkey.hotkey{hotkey = args.hotkey}
-		end
-	end
-
-	return display
 end
 
 return Role
