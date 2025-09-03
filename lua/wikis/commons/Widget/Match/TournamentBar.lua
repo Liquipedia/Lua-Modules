@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Tournament = Lua.import('Module:Tournament')
 
@@ -76,7 +77,7 @@ function MatchTournamentBar:render()
 						})
 					}
 				},
-				gameData and HtmlWidgets.Span{
+				Logic.isNotEmpty(gameData) and HtmlWidgets.Span{
 					children = WidgetUtil.collect(
 						stageName,
 						' - Game #',
