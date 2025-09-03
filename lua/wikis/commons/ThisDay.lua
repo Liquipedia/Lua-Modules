@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Class = Lua.import('Module:Class')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
@@ -116,4 +117,4 @@ function ThisDay._readDate(args)
 		tonumber(args.day or dateArray[#dateArray]) --[[@as integer]]
 end
 
-return ThisDay
+return Class.export(ThisDay, {exports = {'run', 'birthday', 'patch', 'tournament', 'trivia'}})
