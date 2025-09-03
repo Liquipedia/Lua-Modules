@@ -662,7 +662,7 @@ function MatchTable:_displayDate(match)
 		return cell
 	end
 
-	return cell:node(Countdown._create{
+	return cell:node(Countdown.create{
 		finished = match.finished,
 		date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
 		rawdatetime = true,

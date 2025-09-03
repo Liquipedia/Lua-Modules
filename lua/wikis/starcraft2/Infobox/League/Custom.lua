@@ -200,7 +200,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Server', children = {caller:_getServer(args)}}
 		}
 	elseif id == 'dates' and data.startTime.display then
-		local startTime = Countdown._create{date = data.startTime.display, rawdatetime = true}
+		local startTime = Countdown.create{date = data.startTime.display, rawdatetime = true}
 
 		if data.startDate == data.endDate then
 			return {Cell{name = 'Start Time', children = {startTime}}}

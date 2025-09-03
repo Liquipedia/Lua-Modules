@@ -327,7 +327,7 @@ end
 
 ---@return string
 function CustomLeague:_displayStartDateTime()
-	return Countdown._create{
+	return Countdown.create{
 		date = self.data.startTime.raw,
 		finished = self.data.isFinished,
 	}
