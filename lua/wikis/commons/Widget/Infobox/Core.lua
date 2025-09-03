@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Variables = Lua.import('Module:Variables')
 
@@ -16,7 +15,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Fragment = HtmlWidgets.Fragment
-local WarningBox = Lua.import('Module:Widget/WarningBox')
+local WarningBoxGroup = Lua.import('Module:Widget/WarningBox/Group')
 
 ---@class Infobox: Widget
 ---@operator call(table): Infobox
@@ -45,9 +44,7 @@ function Infobox:render()
 				bottomContent
 			)
 		},
-		Array.map(self.props.warnings, function (warning)
-			return WarningBox{text = warning}
-		end)
+		WarningBoxGroup{data = self.props.warnings}
 	)}
 end
 

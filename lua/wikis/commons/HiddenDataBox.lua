@@ -19,8 +19,7 @@ local TextSanitizer = Lua.import('Module:TextSanitizer')
 local Tier = Lua.import('Module:Tier/Custom')
 local Variables = Lua.import('Module:Variables')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local WarningBox = Lua.import('Module:Widget/WarningBox')
+local WarningBoxGroup = Lua.import('Module:Widget/WarningBox/Group')
 
 local HiddenDataBox = {}
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
@@ -109,11 +108,7 @@ function HiddenDataBox.run(args)
 
 	HiddenDataBox.addCustomVariables(args, queryResult)
 
-	return HtmlWidgets.Fragment{
-		children = Array.map(warnings, function (warning)
-			return WarningBox{text = warning}
-		end)
-	}
+	return WarningBoxGroup{data = warnings}
 end
 
 ---Cleans date input
