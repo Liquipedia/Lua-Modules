@@ -12,7 +12,6 @@ local Array = Lua.import('Module:Array')
 local FeatureFlag = Lua.import('Module:FeatureFlag')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
-local WarningBox = Lua.import('Module:WarningBox')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Match = Lua.import('Module:Match')
@@ -22,6 +21,8 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local ShortenBracket = Lua.import('Module:MatchGroup/ShortenBracket')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
+
+local WarningBox = Lua.import('Module:Widget/WarningBox')
 
 -- The core module behind every type of MatchGroup. A MatchGroup is a collection of matches, such as a bracket or
 -- a matchlist.
@@ -48,7 +49,9 @@ function MatchGroup.MatchList(args)
 
 	local parts = Array.extend(
 		{matchlistNode},
-		Array.map(optionsWarnings, WarningBox.display)
+		Array.map(optionsWarnings, function (optionsWarning)
+			return WarningBox{text = optionsWarning}
+		end)
 	)
 	return table.concat(Array.map(parts, tostring))
 end
