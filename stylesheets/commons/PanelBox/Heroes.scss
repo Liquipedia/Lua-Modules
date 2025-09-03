@@ -1,97 +1,107 @@
 // This file has been hacked to work around from php-scss 1.x bugs
 // Once we upgrade to php-scss 2.0, these hacks should be reverted
 
-.heroes-panel__category {
-	&-title {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		border-bottom: 0.5rem solid;
-		padding: 0.5rem 0;
-		margin-bottom: 0.5rem;
+.heroes-panel {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 1rem;
 
-		.category--strength & {
-			.theme--light & {
-				border-bottom-color: var( --clr-california-40 );
-			}
-
-			.theme--dark & {
-				border-bottom-color: var( --clr-california-80 );
-			}
-		}
-
-		.category--agility & {
-			.theme--light & {
-				border-bottom-color: var( --clr-semantic-positive-40 );
-			}
-
-			.theme--dark & {
-				border-bottom-color: var( --clr-semantic-positive-80 );
-			}
-		}
-
-		.category--intelligence & {
-			.theme--light & {
-				border-bottom-color: var( --clr-sapphire-40 );
-			}
-
-			.theme--dark & {
-				border-bottom-color: var( --clr-sapphire-80 );
-			}
-		}
-
-		.category--universal & {
-			.theme--light & {
-				border-bottom-color: var( --clr-gigas-40 );
-			}
-
-			.theme--dark & {
-				border-bottom-color: var( --clr-gigas-80 );
-			}
-		}
-
-		.category--upcoming & {
-			.theme--light & {
-				border-bottom-color: var( --clr-secondary-25 );
-			}
-
-			.theme--dark & {
-				border-bottom-color: var( --clr-secondary-100 );
-			}
-		}
-
-		> a {
-			font-weight: bold;
-			margin-right: 0.5rem;
-		}
+	@media ( min-width: 768px ) {
+		grid-template-columns: 1fr 1fr;
 	}
 
-	@at-root ul.heroes-panel__category-list {
-		$_guttery: 0.5rem;
-		$_gutterx: 0.5rem;
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		list-style: none;
-		margin: calc( -0.5 * #{$_guttery} ) calc( -0.5 * #{$_gutterx} ) 0.5rem calc( -0.5 * #{$_gutterx} );
+	&__category {
+		&-title {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			border-bottom: 0.5rem solid;
+			padding: 0.5rem 0;
+			margin-bottom: 0.5rem;
 
-		> li {
-			flex: 0 0 auto;
-			width: calc( 100% / 3 );
-			max-width: 100%;
-			padding: calc( #{$_gutterx} * 0.5 );
-			margin-bottom: 0;
+			.category--strength & {
+				.theme--light & {
+					border-bottom-color: var( --clr-california-40 );
+				}
 
-			@media ( min-width: 576px ) {
-				width: calc( 100% / 4 );
+				.theme--dark & {
+					border-bottom-color: var( --clr-california-80 );
+				}
 			}
 
-			@media ( min-width: 768px ) {
-				width: calc( 100% / 6 );
+			.category--agility & {
+				.theme--light & {
+					border-bottom-color: var( --clr-semantic-positive-40 );
+				}
+
+				.theme--dark & {
+					border-bottom-color: var( --clr-semantic-positive-80 );
+				}
 			}
 
-			@media ( min-width: 1024px ) {
-				width: calc( 100% / 8 );
+			.category--intelligence & {
+				.theme--light & {
+					border-bottom-color: var( --clr-sapphire-40 );
+				}
+
+				.theme--dark & {
+					border-bottom-color: var( --clr-sapphire-80 );
+				}
+			}
+
+			.category--universal & {
+				.theme--light & {
+					border-bottom-color: var( --clr-gigas-40 );
+				}
+
+				.theme--dark & {
+					border-bottom-color: var( --clr-gigas-80 );
+				}
+			}
+
+			.category--upcoming & {
+				.theme--light & {
+					border-bottom-color: var( --clr-secondary-25 );
+				}
+
+				.theme--dark & {
+					border-bottom-color: var( --clr-secondary-100 );
+				}
+			}
+
+			> a {
+				font-weight: bold;
+				margin-right: 0.5rem;
+			}
+		}
+
+		@at-root ul.heroes-panel__category-list {
+			$_guttery: 0.5rem;
+			$_gutterx: 0.5rem;
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			list-style: none;
+			margin: calc( -0.5 * #{$_guttery} ) calc( -0.5 * #{$_gutterx} ) 0.5rem calc( -0.5 * #{$_gutterx} );
+
+			> li {
+				flex: 0 0 auto;
+				width: calc( 100% / 3 );
+				max-width: 100%;
+				padding: calc( #{$_gutterx} * 0.5 );
+				margin-bottom: 0;
+
+				@media ( min-width: 576px ) {
+					width: calc( 100% / 4 );
+				}
+
+				@media ( min-width: 768px ) {
+					width: calc( 100% / 6 );
+				}
+
+				@media ( min-width: 1024px ) {
+					width: calc( 100% / 8 );
+				}
 			}
 		}
 	}
