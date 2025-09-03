@@ -18,7 +18,6 @@ local Variables = Lua.import('Module:Variables')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
 local Widgets = Lua.import('Module:Widget/All')
-local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
