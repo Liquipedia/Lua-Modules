@@ -40,11 +40,8 @@ function MatchTournamentBar:render()
 
 	local tournament = Tournament.partialTournamentFromMatch(match)
 	local tournamentLink = mw.title.makeTitle(0, match.pageName, match.section).fullText
-	local stageName
-	local a = match.bracketData.inheritedHeader
-	DisplayHelper.expandHeader(match.bracketData.inheritedHeader)
-	DisplayHelper.expandHeader(a)
 
+	local stageName
 	if match.bracketData.inheritedHeader then
 		stageName = DisplayHelper.expandHeader(match.bracketData.inheritedHeader)[1]
 	end
