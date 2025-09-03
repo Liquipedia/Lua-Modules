@@ -35,7 +35,7 @@ Config.categories = {
 		expandable = true,
 		items = {'cf', 'cfm', 'cfhd'},
 		transform = function(game)
-			return Game.abbreviation({game = game, noSpan = true, noLink = true})
+			return Game.abbreviation{game = game, noSpan = true, noLink = true}
 		end
 	}
 }
