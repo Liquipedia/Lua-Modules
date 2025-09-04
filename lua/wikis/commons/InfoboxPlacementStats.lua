@@ -11,7 +11,7 @@ local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Medals = Lua.import('Module:Medals')
-local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tier = Lua.import('Module:Tier/Custom')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -81,14 +81,13 @@ function PlacementStats._buildConditions(opponentType, opponent, excludedTierTyp
 	if opponentType ~= Opponent.team then
 		table.insert(conditions, '[[opponentname::' .. opponent .. ']]')
 	else
-		local rawOpponentTemplate = Team.queryRaw(opponent) or {}
+		local rawOpponentTemplate = TeamTemplate.getRawOrNil(opponent) or {}
 		local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
 		if not opponentTemplate then
 			error('Missing team template for team: ' .. opponent)
 		end
 
-		local teamTemplates = Team.queryHistorical(opponentTemplate)
-		teamTemplates = teamTemplates and Array.extractValues(teamTemplates) or {opponentTemplate}
+		local teamTemplates = TeamTemplate.queryHistoricalNames(opponentTemplate)
 		local opponentConditions = Array.map(teamTemplates, function(teamTemplate)
 			return '[[opponenttemplate::' .. teamTemplate .. ']]'
 		end)

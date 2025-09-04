@@ -17,7 +17,7 @@ local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tier = Lua.import('Module:Tier/Custom')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -330,15 +330,13 @@ end
 ---@param opponent string
 ---@return string[]
 function BaseResultsTable._getOpponentTemplates(opponent)
-	local rawOpponentTemplate = Team.queryRaw(opponent) or {}
+	local rawOpponentTemplate = TeamTemplate.getRawOrNil(opponent) or {}
 	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
 	if not opponentTemplate then
-		error('Missing team template for team: ' .. opponent)
+		error(TeamTemplate.noTeamMessage(opponent))
 	end
 
-	local opponentTeamTemplates = Team.queryHistorical(opponentTemplate)
-
-	return Array.append(Array.extractValues(opponentTeamTemplates or {}), opponentTemplate)
+	return TeamTemplate.queryHistoricalNames(opponentTemplate)
 end
 
 ---Builds Lpdb conditions for players on a given team
@@ -480,10 +478,10 @@ function BaseResultsTable:opponentDisplay(data, options)
 		return
 	end
 
-	local rawTeamTemplate = Team.queryRaw(teamTemplate, data.date) or {}
+	local rawTeamTemplate = TeamTemplate.getRawOrNil(teamTemplate, data.date) or {}
 
 	local teamDisplay = OpponentDisplay.BlockOpponent{
-		opponent = {template = rawTeamTemplate.templatename, type = Opponent.team},
+		opponent = Opponent.readOpponentArgs{template = rawTeamTemplate.templatename, type = Opponent.team},
 		flip = options.flip,
 		teamStyle = 'icon',
 	}
