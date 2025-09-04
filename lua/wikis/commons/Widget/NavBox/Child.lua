@@ -40,6 +40,7 @@ local EMPTY_CHILD_ERROR = 'Empty child found'
 ---@field collapsed boolean? # from wiki input string?
 ---@field center boolean? # from wiki input string?
 ---@field allowEmpty boolean? # from wiki input string?
+---@field supressHtmlList boolean? # from wiki input string?
 ---@field image string?
 ---@field imageleft string?
 ---@field imagedark string?
@@ -78,7 +79,7 @@ function NavBoxChild:render()
 	local listCss = {['text-align'] = Logic.readBool(props.center) and 'center' or nil}
 
 	if not props.child1 then
-		return NavBoxList{children = listElements, css = listCss}
+		return NavBoxList{children = listElements, css = listCss, supressHtmlList = Logic.readBool(props.supressHtmlList)}
 	end
 
 	local children = Array.mapIndexes(function(rowIndex)
