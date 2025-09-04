@@ -39,7 +39,6 @@ local staffRoles = {
 	['staff'] = {category = 'Staff', display = 'Staff'},
 	['referee'] = {category = 'Referees', display = 'Referee'},
 	['mapper'] = {category = 'Mappers', display = 'Mapper'},
-	['streamer'] = {category = 'Streamers', display = 'Streamer'},
 }
 
 staffRoles['commentator'] = staffRoles['caster']
