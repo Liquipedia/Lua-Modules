@@ -78,7 +78,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Physical Damage', children = {args.physicaldamage}},
 			Cell{name = 'Energy Damage', children = {args.energydamage}},
 			Cell{name = 'Pure Damage', children = {args.puredamage}},
-			Cell{name = 'Speed', children = {args.speed}},
+			Cell{name = 'Attack Speed', children = {args.attackspeed}},
 			Cell{name = 'Hit Chance', children = {args.hitchance}},
 			Cell{name = 'Crit Chance', children = {args.critchance}},
 			Cell{name = 'Crit Amplification', children = {args.critamplification}},
