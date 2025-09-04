@@ -106,7 +106,7 @@ function Earnings.calculateForTeam(args)
 	end
 
 	local queryTeams = {}
-	if Logic.readBool(args.queryHistorical) then
+	if Logic.nilOr(Logic.readBoolOrNil(args.queryHistorical), true) then
 		for _, team in pairs(teams) do
 			local historicalNames = TeamTemplate.queryHistoricalNames(team)
 
