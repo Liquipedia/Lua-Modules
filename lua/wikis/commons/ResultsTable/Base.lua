@@ -450,7 +450,7 @@ end
 ---Builds the opponent display
 ---@param data table
 ---@param options table?
----@return Html?
+---@return Widget|Html?
 function BaseResultsTable:opponentDisplay(data, options)
 	options = options or {}
 
@@ -510,7 +510,7 @@ function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate, isNotLast
 end
 
 ---Builds team icon display with text below it
----@param teamDisplay Html
+---@param teamDisplay Widget
 ---@param rawTeamTemplate table
 ---@param flip boolean?
 ---@return Html
@@ -543,7 +543,7 @@ end
 
 ---Converts the lastvsdata to display components
 ---@param placement table
----@return string, Html?, string?
+---@return string, Widget|Html?, string?
 function BaseResultsTable:processVsData(placement)
 	local lastVs = placement.lastvsdata or {}
 
