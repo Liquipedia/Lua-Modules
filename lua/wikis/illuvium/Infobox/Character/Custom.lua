@@ -29,7 +29,7 @@ function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))
 	character.args.informationType = 'Illuvial'
-	character.args.image = 'Illuvium ' .. (character.args.name or '') .. '.png'
+	character.args.image = 'Illuvium ' .. character.name .. '.png'
 	return character:createInfobox()
 end
 
@@ -49,6 +49,7 @@ function CustomInjector:parse(id, widgets)
 			}}},
 			Title{children = 'Health'},
 			Cell{name = 'Max Health', children = {args.maxhealth}},
+			Cell{name = 'Movement Speed', children = {args.movespeed}},
 			Cell{name = 'Regeneration', children = {args.healthregeneration}},
 			Cell{name = 'Heal Efficiency', children = {args.healefficiency}},
 			Title{children = 'Energy'},
@@ -77,7 +78,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Physical Damage', children = {args.physicaldamage}},
 			Cell{name = 'Energy Damage', children = {args.energydamage}},
 			Cell{name = 'Pure Damage', children = {args.puredamage}},
-			Cell{name = 'Speed', children = {args.speed}},
+			Cell{name = 'Attack Speed', children = {args.attackspeed}},
 			Cell{name = 'Hit Chance', children = {args.hitchance}},
 			Cell{name = 'Crit Chance', children = {args.critchance}},
 			Cell{name = 'Crit Amplification', children = {args.critamplification}},
