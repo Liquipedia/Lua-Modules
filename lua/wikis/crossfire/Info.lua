@@ -12,7 +12,7 @@ return {
 	defaultGame = 'cf',
 	games = {
 		cf = {
-			abbreviation = 'CF',
+			abbreviation = 'Classic',
 			name = 'CrossFire',
 			link = 'CrossFire',
 			logo = {
@@ -25,7 +25,7 @@ return {
 			},
 		},
 		cfm = {
-			abbreviation = 'CFM',
+			abbreviation = 'Mobile',
 			name = 'CrossFire Mobile',
 			link = 'CrossFire Mobile',
 			logo = {
@@ -38,7 +38,7 @@ return {
 			},
 		},
 		cfhd = {
-			abbreviation = 'CFHD',
+			abbreviation = 'HD',
 			name = 'CrossFire HD',
 			link = 'CrossFire HD',
 			logo = {
