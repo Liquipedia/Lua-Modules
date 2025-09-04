@@ -217,5 +217,10 @@ return {
 	trovo = 'liquipedia-custom-icon liquipedia-custom-icon-trovo',
 	tl = 'liquipedia-custom-icon liquipedia-custom-icon-team-liquid',
 	stream = 'liquipedia-custom-icon liquipedia-custom-icon-team-liquid',
-	vod_play = 'far fa-play'
+	vod_play = 'far fa-play',
+
+	-- Usage: Formula 1
+	ongoing_series = 'fas fa-hourglass-half ',
+	season_history = 'fas fa-landmark',
+	finished_race = 'fas fa-flag-checkered'
 }

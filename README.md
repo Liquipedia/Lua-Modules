@@ -142,6 +142,14 @@ generated and updated by our CI pipeline to ensure consistency across platforms.
 You need to be a member of the Liquipedia organization before you are allowed to push to this repository. In most workflows, you will make a fork of this repository to your own repository, and request a merge request from there. See the wiki for a step-by-step guide on how to commit a change.
 Trusted contributers may be given the privilege of directly branching within the repository. These privileges are always up to the discretion of Liquipedia staff.
 
+### Testing your branch
+
+To test your changes in action, you can run the GitHub Action called "Personal Deploy" defined in `.github/workflows/deploy test.yml`. You can do it either through the GitHub interface or with the GitHub CLI tools:
+`gh workflow run 'deploy test.yml' -r <BRANCH NAME> -f luadevenv=<DEV-ENV-NAME>`
+
+To check the workflow progress from the CLI, you can run:
+`gh run list --workflow="deploy test.yml"`
+
 ## Support
 
 If you encounter any issues or have questions, feel free to open an issue on GitHub or reach out to the Liquipedia community for support.

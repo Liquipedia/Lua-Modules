@@ -231,9 +231,11 @@ function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 	end
 
 	---@param opponentIndex any
-	---@return Html
-	local createScore = function(opponentIndex)
+	---@param additionalClasses string[]?
+	---@return Widget
+	local createScore = function(opponentIndex, additionalClasses)
 		return OpponentDisplay.BlockScore{
+			additionalClasses = additionalClasses,
 			isWinner = opponentIndex == submatch.winner or submatch.winner == 0,
 			scoreText = DisplayHelper.MapScore(submatch.opponents[opponentIndex], submatch.status),
 		}
@@ -247,13 +249,13 @@ function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 				classes = {'brkts-popup-header-opponent', 'brkts-popup-header-opponent-left'},
 				children = {
 					createOpponent(1),
-					createScore(1):addClass('brkts-popup-header-opponent-score-left'),
+					createScore(1, {'brkts-popup-header-opponent-score-left'}),
 				},
 			},
 			HtmlWidgets.Div{
 				classes = {'brkts-popup-header-opponent', 'brkts-popup-header-opponent-right'},
 				children = {
-					createScore(2):addClass('brkts-popup-header-opponent-score-right'),
+					createScore(2, {'brkts-popup-header-opponent-score-right'}),
 					createOpponent(2),
 				},
 			}

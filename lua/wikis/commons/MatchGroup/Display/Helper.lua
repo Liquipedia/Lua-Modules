@@ -17,6 +17,7 @@ local Page = Lua.import('Module:Page')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 
@@ -129,7 +130,7 @@ function DisplayHelper.createSubstitutesComment(match)
 			end
 
 			if opponent.type == Opponent.team then
-				local team = Lua.import('Module:Team').queryRaw(opponent.template)
+				local team = TeamTemplate.getRawOrNil(opponent.template)
 				if team then
 					table.insert(subString, string.format('on <b>%s</b>', Page.makeInternalLink(team.shortname, team.page)))
 				end
