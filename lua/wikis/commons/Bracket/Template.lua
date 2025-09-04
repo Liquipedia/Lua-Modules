@@ -42,7 +42,7 @@ function BracketTemplate.BracketDocumentation(props)
 		[[
 ==Bracket==
 ]],
-		BracketTemplate.BracketContainer({bracketId = props.bracketType}),
+		BracketTemplate.BracketContainer{bracketId = props.bracketType},
 		[[
 
 ==Copy-Paste==
