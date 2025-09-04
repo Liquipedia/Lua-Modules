@@ -32,7 +32,7 @@ function BracketTemplate.TemplateBracketDocumentation()
 	local bracket = BracketTemplate.readBracket(argsList)
 
 	BracketTemplate.store(bracket)
-	return BracketTemplate.BracketDocumentation({bracketType = bracket.bracketType})
+	return BracketTemplate.BracketDocumentation{bracketType = bracket.bracketType}
 end
 
 ---@param props {bracketType: string}
