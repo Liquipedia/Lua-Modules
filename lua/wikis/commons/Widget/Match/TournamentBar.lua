@@ -40,7 +40,11 @@ function MatchTournamentBar:render()
 
 	local tournament = Tournament.partialTournamentFromMatch(match)
 	local tournamentLink = mw.title.makeTitle(0, match.pageName, match.section).fullText
-	local stageName = DisplayHelper.expandHeader(match.bracketData.inheritedHeader)[1]
+
+	local stageName
+	if match.bracketData.inheritedHeader then
+		stageName = DisplayHelper.expandHeader(match.bracketData.inheritedHeader)[1]
+	end
 
 	local mapIsSet = gameData and not String.isEmpty(gameData.map)
 
@@ -76,10 +80,11 @@ function MatchTournamentBar:render()
 						})
 					}
 				},
-				gameData and HtmlWidgets.Span{
+				gameData and gameData.gameIds and HtmlWidgets.Span{
 					children = WidgetUtil.collect(
 						stageName,
-						' - Game #',
+						stageName and ' - ' or nil,
+						'Game #',
 						Array.interleave(gameData.gameIds, '-'),
 						mapIsSet and {
 							' on ',
