@@ -29,7 +29,7 @@ function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))
 	character.args.informationType = 'Illuvial'
-	character.args.image = 'Illuvium ' .. (character.name or '') .. '.png'
+	character.args.image = 'Illuvium ' .. character.name .. '.png'
 	return character:createInfobox()
 end
 
