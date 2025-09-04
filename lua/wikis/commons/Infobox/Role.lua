@@ -17,6 +17,7 @@ local Variables = Lua.import('Module:Variables')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
 local Widgets = Lua.import('Module:Widget/All')
+local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -49,6 +50,8 @@ function Role:createInfobox()
 		},
 		Center{children = {args.caption}},
 		Title{children = args.informationType .. ' Information'},
+		Cell{name = 'Type', children = { args.type }},
+		Cell{name = 'Description', children = { args.description }},
 		Customizable{id = 'custom', children = {}},
 		Center{children = {args.footnotes}},
 	}
