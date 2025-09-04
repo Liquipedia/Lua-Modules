@@ -184,9 +184,11 @@ function CustomLeague:_determineGame(game)
 
 	local startDate = self.data.startDate or self.data.endDate
 
-	if startDate and startDate > START_DATE_REFORGED then
+	if not startDate then
+		return
+	elseif startDate > START_DATE_REFORGED then
 		return Game.toIdentifier{game = GAME_REFORGED}
-	elseif startDate and startDate > START_DATE_FROZEN_THRONE then
+	elseif startDate > START_DATE_FROZEN_THRONE then
 		return Game.toIdentifier{game = GAME_FROZEN_THRONE}
 	end
 

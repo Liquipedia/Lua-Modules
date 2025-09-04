@@ -127,11 +127,11 @@ function AoEParticipantTable:_createSeedList()
 		end
 	)
 
-	Array.forEach(entries, function (entry, index)
+	Array.forEach(entries, function (entry)
 		wrapper
 			:tag('div')
 				:addClass('participantTable-seed')
-				:wikitext(index)
+				:wikitext(entry.seed)
 				:done()
 			:node(self:displayEntry(entry))
 	end)

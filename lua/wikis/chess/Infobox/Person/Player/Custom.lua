@@ -43,6 +43,18 @@ function CustomPlayer.run(frame)
 	return player:createInfobox()
 end
 
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	local highestTitle = Array.find(TITLES, function(title) return Logic.isNotEmpty(args['title_' .. title.code]) end)
+
+	lpdbData.extradata.chesstitle = (highestTitle or {}).name
+
+	return lpdbData
+end
+
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]

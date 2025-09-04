@@ -21,4 +21,9 @@ function TiebreakerMatchDraws:valueOf(state, opponent)
 	return opponent.match.d
 end
 
+---@return string
+function TiebreakerMatchDraws:headerTitle()
+	return 'Matches Drawn'
+end
+
 return TiebreakerMatchDraws

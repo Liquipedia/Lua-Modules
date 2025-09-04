@@ -329,6 +329,9 @@ local byFactionAoE4 = {
 	french = {
 		icon = 'File:French AoE4 Icon.png',
 	},
+	goldenhorde = {
+		icon = 'File:Golden Horde AoE4 Icon.png',
+	},
 	holyromanempire = {
 		icon = 'File:HRE AoE4 Icon.png',
 	},
@@ -343,6 +346,9 @@ local byFactionAoE4 = {
 	},
 	knightstemplar = {
 		icon = 'File:Knights Templar AoE4 Icon.png',
+	},
+	macedoniandynasty = {
+		icon = 'File:Macedonian AoE4 Icon.png',
 	},
 	malians = {
 		icon = 'File:Malians AoE4 Icon.png',
@@ -359,6 +365,12 @@ local byFactionAoE4 = {
 	rus = {
 		icon = 'File:Rus AoE4 Icon.png',
 	},
+	sengokudaimyo = {
+		icon = 'File:Sengoku AoE4 Icon.png',
+	},
+	tughlaqdynasty = {
+		icon = 'File:Tughlaq AoE4 Icon.png',
+	},
 	zhuxislegacy = {
 		icon = 'File:Zhu Xi\'s Legacy AoE4 Icon.png',
 	},
@@ -369,20 +381,26 @@ local byFactionAoE4 = {
 }
 
 local byFactionAoM = {
-	chinese = {
-		icon = 'File:Chinese AoM R icon.png',
-	},
-	greeks = {
-		icon = 'File:Greek AoM R icon.png',
-	},
 	atlanteans = {
 		icon = 'File:Atlantean AoM R icon.png',
+	},
+	chinese = {
+		icon = 'File:Chinese AoM R icon.png',
 	},
 	egyptians = {
 		icon = 'File:Egyptian AoM R icon.png',
 	},
+	greeks = {
+		icon = 'File:Greek AoM R icon.png',
+	},
+	japanese = {
+		icon = 'File:Japanese AoM R icon.png',
+	},
 	norse = {
 		icon = 'File:Norse AoM R icon.png',
+	},
+	amaterasu = {
+		icon = 'File:Amaterasu AoM R icon.png',
 	},
 	fuxi = {
 		icon = 'File:Fuxi AoM R icon.png',
@@ -426,8 +444,14 @@ local byFactionAoM = {
 	shennong = {
 		icon = 'File:Shennong AoM R icon.png',
 	},
+	susanoo = {
+		icon = 'File:Susanoo AoM R icon.png',
+	},
 	thor = {
 		icon = 'File:Thor AoM R icon.png',
+	},
+	tsukuyomi = {
+		icon = 'File:Tsukuyomi AoM R icon.png',
 	},
 	zeus = {
 		icon = 'File:Zeus AoM R icon.png',

@@ -5,28 +5,25 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local CustomMatchSummary = {}
-
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local MapTypeIcon = Lua.import('Module:MapType')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Operator = Lua.import('Module:Operator')
-local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
 local WeaponIcon = Lua.import('Module:WeaponIcon')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local NON_BREAKING_SPACE = '&nbsp;'
+
+local CustomMatchSummary = {}
 
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '490px', teamStyle = 'bracket'})
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '500px', teamStyle = 'bracket'})
 end
 
 ---@param date string
@@ -34,91 +31,78 @@ end
 ---@param gameIndex integer
 ---@return Widget?
 function CustomMatchSummary.createGame(date, game, gameIndex)
-	local weaponsData = Array.map(game.opponents, function(opponent)
-		return Array.map(opponent.players, Operator.property('weapon'))
-	end)
+	if not game.map then
+		return
+	end
+
+	local function makeTeamSection(opponentIndex)
+		local opponent = game.opponents[opponentIndex] or {}
+		local weaponsData = Array.map(opponent.players or {}, Operator.property('weapon'))
+
+		local score = opponent.score
+		if score and game.mode == 'turf war' then
+			score = score .. '%'
+		end
+		local scoreDisplay = DisplayHelper.MapScore({score = score}, game.status)
+
+		return {
+			CustomMatchSummary._createWeaponsDisplay{
+				data = weaponsData,
+				flip = (opponentIndex == 2),
+				game = game.game
+			},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
+			HtmlWidgets.Div{
+				css = {['min-width'] = '24px', ['text-align'] = 'center'},
+				children = scoreDisplay,
+			}
+		}
+	end
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
 		children = WidgetUtil.collect(
-			CustomMatchSummary._opponentWeaponsDisplay{
-				data = weaponsData[1],
-				flip = false,
-				game = game.game
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
+			MatchSummaryWidgets.GameCenter{
+				css = {
+					width = '100px',
+					['text-overflow'] = 'ellipsis',
+				},
+				children = DisplayHelper.MapAndMode(game)
 			},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			CustomMatchSummary._gameScore(game, 1),
-			MatchSummaryWidgets.GameCenter{children = CustomMatchSummary._getMapDisplay(game), css = {['flex-grow'] = 1}},
-			CustomMatchSummary._gameScore(game, 2),
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			CustomMatchSummary._opponentWeaponsDisplay{
-				data = weaponsData[2],
-				flip = true,
-				game = game.game
-			},
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
 	}
 end
 
----@param game MatchGroupUtilGame
----@return string
-function CustomMatchSummary._getMapDisplay(game)
-	local mapDisplay = '[[' .. game.map .. ']]'
-
-	if String.isNotEmpty(game.extradata.maptype) then
-		mapDisplay = MapTypeIcon.display(game.extradata.maptype) .. NON_BREAKING_SPACE .. mapDisplay
-	end
-
-	return mapDisplay
-end
-
----@param game MatchGroupUtilGame
----@param opponentIndex integer
----@return Html
-function CustomMatchSummary._gameScore(game, opponentIndex)
-	local opponentCopy = Table.deepCopy(game.opponents[opponentIndex])
-	if opponentCopy.score and game.mode == 'Turf War' then
-		opponentCopy.score = opponentCopy.score .. '%'
-	end
-	local scoreDisplay = DisplayHelper.MapScore(game.opponents[opponentIndex], game.status)
-	return mw.html.create('div')
-		:addClass('brkts-popup-body-element-vertical-centered')
-		:css('min-width', '24px')
-		:node(mw.html.create('div')
-			:css('margin', 'auto')
-			:wikitext(scoreDisplay)
-		)
-end
-
 ---@param props {data: string[], flip: boolean, game: string}
----@return Html
-function CustomMatchSummary._opponentWeaponsDisplay(props)
-	local flip = props.flip
-
-	local displayElements = Array.map(props.data, function(weapon)
-		return mw.html.create('div')
-			:addClass('brkts-champion-icon')
-			:node(WeaponIcon._getImage{
+---@return Widget
+function CustomMatchSummary._createWeaponsDisplay(props)
+	local weaponIcons = Array.map(props.data, function(weapon)
+		return HtmlWidgets.Div{
+			classes = {'brkts-champion-icon'},
+			children = WeaponIcon.Icon{
 				weapon = weapon,
 				game = props.game,
 				class = 'brkts-champion-icon',
-			})
+			}
+		}
 	end)
 
-	if flip then
-		displayElements = Array.reverse(displayElements)
+	if props.flip then
+		weaponIcons = Array.reverse(weaponIcons)
 	end
 
-	local display = mw.html.create('div')
-		:addClass('brkts-popup-body-element-thumbs')
-		:addClass(flip and 'brkts-popup-body-element-thumbs-right' or nil)
-
-	for _, item in ipairs(displayElements) do
-		display:node(item)
+	local classes = {'brkts-popup-body-element-thumbs'}
+	if props.flip then
+		table.insert(classes, 'brkts-popup-body-element-thumbs-right')
 	end
 
-	return display
+	return HtmlWidgets.Div{
+		classes = classes,
+		children = weaponIcons
+	}
 end
 
 return CustomMatchSummary

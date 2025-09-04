@@ -69,6 +69,10 @@ function Company:createInfobox()
 		Customizable{id = 'employees', children = {
 			Cell{name = 'Employees', children = {args.employees}},
 		}},
+		Cell{
+			name = 'Focus',
+			children = {args.focus},
+		},
 		Cell{name = 'Trades as', children = {args.tradedas}},
 		Customizable{id = 'custom', children = {}},
 		Builder{

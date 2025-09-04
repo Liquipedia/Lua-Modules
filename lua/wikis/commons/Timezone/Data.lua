@@ -304,6 +304,10 @@ return {
 		name = 'Vladivostok Time',
 		offset = {10, 0},
 	},
+	WAT = {
+		name = 'West Africa Time',
+		offset = {1, 0},
+	},
 	WEST = {
 		name = 'Western European Summer Time',
 		offset = {1, 0},

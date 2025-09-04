@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
@@ -39,7 +40,7 @@ function StandingsSwissWidget:render()
 		classes = {'wikitable-bordered', 'wikitable-striped'},
 		children = WidgetUtil.collect(
 			-- Outer header
-			HtmlWidgets.Tr{children = HtmlWidgets.Th{
+			Logic.isNotEmpty(standings.title) and HtmlWidgets.Tr{children = HtmlWidgets.Th{
 				attributes = {
 					colspan = 100,
 				},
@@ -53,12 +54,17 @@ function StandingsSwissWidget:render()
 						},
 					},
 				},
-			}},
+			}} or nil,
 			-- Column Header
 			HtmlWidgets.Tr{children = WidgetUtil.collect(
 				HtmlWidgets.Th{children = '#'},
 				HtmlWidgets.Th{children = 'Participant'},
-				HtmlWidgets.Th{children = 'Matches'},
+				Array.map(standings.tiebreakers, function(tiebreaker)
+					if not tiebreaker.title then
+						return
+					end
+					return HtmlWidgets.Th{children = tiebreaker.title}
+				end),
 				Array.map(standings.rounds, function(round)
 					return HtmlWidgets.Th{children = round.title}
 				end)
@@ -86,11 +92,16 @@ function StandingsSwissWidget:render()
 								showPlayerTeam = true,
 							}
 						},
-						HtmlWidgets.Td{
-							classes = {teamBackground},
-							children = table.concat({slot.matchWins, slot.matchLosses}, '-'),
-							css = {['font-weight'] = 'bold', ['text-align'] = 'center'}
-						},
+						Array.map(standings.tiebreakers, function(tiebreaker, tiebreakerIndex)
+							if not tiebreaker.title then
+								return
+							end
+							return HtmlWidgets.Td{
+								classes = {teamBackground},
+								css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil, ['text-align'] = 'center'},
+								children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
+							}
+						end),
 						Array.map(standings.rounds, function(columnRound)
 							local entry = Array.find(columnRound.opponents, function(columnSlot)
 								return Opponent.same(columnSlot.opponent, slot.opponent)
@@ -113,7 +124,7 @@ function StandingsSwissWidget:render()
 							local bgClassSuffix
 							if match.finished then
 								local winner = match.winner
-								bgClassSuffix = winner == opposingOpponentIndex and 'down' or winner == 0 or 'draw' or 'up'
+								bgClassSuffix = winner == opposingOpponentIndex and 'down' or winner == 0 and 'draw' or 'up'
 							end
 
 							return HtmlWidgets.Td{
