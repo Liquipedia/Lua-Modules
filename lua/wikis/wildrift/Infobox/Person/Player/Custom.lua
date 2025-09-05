@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local ChampionNames = Lua.import('Module:ChampionNames', {loadData = true})
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local Logic = Lua.import('Module:Logic')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Page = Lua.import('Module:Page')
 local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local String = Lua.import('Module:StringUtils')
@@ -22,7 +23,9 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = Lua.import('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
+local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 local SIZE_CHAMPION = '25x25px'
 
@@ -114,13 +117,16 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@return string?
+---@return Widget?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = TeamTemplate.getPageName(self.args.team)
-		return
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing matches of', {team = teamPage}) ..
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+		return HtmlWidgets.Fragment{
+			children = {
+				MatchTicker.participant{team = teamPage},
+				UpcomingTournaments{name = teamPage}
+			}
+		}
 	end
 end
 
