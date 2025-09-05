@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=esports
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
