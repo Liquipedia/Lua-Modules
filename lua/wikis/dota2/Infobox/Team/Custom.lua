@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local RoleOf = Lua.import('Module:RoleOf')
 
 local Condition = Lua.import('Module:Condition')
@@ -20,7 +19,6 @@ local ConditionUtil = Condition.Util
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Team = Lua.import('Module:Infobox/Team')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 local ACHIEVEMENTS_BASE_CONDITIONS = {
