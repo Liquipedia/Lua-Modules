@@ -11,13 +11,13 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 
 local Injector = Lua.import('Module:Widget/Injector')
-local Character = Lua.import('Module:Infobox/Character')
+local Role = Lua.import('Module:Infobox/Role')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class IlluviumRoleInfobox: RoleInfobox
-local CustomRole = Class.new(Character)
+local CustomRole = Class.new(Role)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
