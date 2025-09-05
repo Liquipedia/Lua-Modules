@@ -74,7 +74,7 @@ window.mw = window.mw || {
 };
 
 // Auto-initialize all loaded Liquipedia modules
-document.addEventListener( 'DOMContentLoaded', () => {
+onload = () => {
 	Object.keys( liquipedia ).forEach( ( module ) => {
 		if ( !liquipedia[ module ] || typeof liquipedia[ module ].init !== 'function' ) {
 			return;
@@ -82,7 +82,8 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		try {
 			liquipedia[ module ].init();
 		} catch ( e ) {
-			throw new Error( `Failed to initialize module: ${ module }. Error: ${ e }` );
+			// eslint-disable-next-line no-console
+			console.error( `Failed to initialize module: ${ module }. Error: ${ e }` );
 		}
 	} );
-} );
+};
