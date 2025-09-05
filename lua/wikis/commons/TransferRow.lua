@@ -207,7 +207,6 @@ end
 ---@return string
 function TransferRow:readPlatform()
 	if not HAS_PLATFORM_ICONS then return '' end
-	local Platform = Lua.import('Module:Platform')
 	self.args.platform = Platform._getName(self.args.platform) or ''
 	return self.args.platform
 end
