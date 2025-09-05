@@ -9,9 +9,11 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
@@ -19,10 +21,12 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
+local Platform = Lua.import('Module:Platform')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local PositionConvert = Lua.requireIfExists('Module:PositionName/data', {loadData = true})
-local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
 local References = Lua.import('Module:Transfer/References')
+
+local TransferRowWidget = Lua.import('Module:Widget/Transfer/Row')
 
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
 local VALID_CONFIDENCES = {
@@ -32,6 +36,24 @@ local VALID_CONFIDENCES = {
 	'unlikely',
 	'unknown',
 }
+
+---@class enrichedTransfer
+---@field from {teams: string[], roles: string[]}
+---@field to {teams: string[], roles: string[]}
+---@field platform string?
+---@field displayDate string
+---@field date string
+---@field wholeteam boolean
+---@field players transferPlayer[]
+---@field references string[]
+---@field confirmed boolean?
+---@field confidence string?
+---@field isRumour boolean?
+
+---@class transferPlayer: standardPlayer
+---@field icons string[]
+---@field faction string?
+---@field chars string[]
 
 ---@class TransferRow: BaseClass
 ---@field config {storage: boolean, isRumour: boolean}
@@ -185,7 +207,6 @@ end
 ---@return string
 function TransferRow:readPlatform()
 	if not HAS_PLATFORM_ICONS then return '' end
-	local Platform = Lua.import('Module:Platform')
 	self.args.platform = Platform._getName(self.args.platform) or ''
 	return self.args.platform
 end
@@ -325,9 +346,94 @@ function TransferRow._objectName(transfer)
 	return 'transfer_' .. transfer.date .. '_' .. string.format('%06d', transfer.extradata.sortindex)
 end
 
----@return Html?
+---@private
+---@param transfers transfer[]
+---@return enrichedTransfer
+function TransferRow:_enrichTransfers(transfers)
+	if Logic.isEmpty(transfers) then return {} end
+
+	local transfer = transfers[1]
+
+	local date = DateExt.toYmdInUtc(transfer.date)
+
+	return {
+		from = {
+			teams = {
+				String.nilIfEmpty(transfer.fromteamtemplate),
+				String.nilIfEmpty(transfer.extradata.fromteamsectemplate),
+			},
+			roles = {
+				String.nilIfEmpty(transfer.role1),
+				String.nilIfEmpty(transfer.extradata.role1sec),
+			},
+		},
+		to = {
+			teams = {
+				String.nilIfEmpty(transfer.toteamtemplate),
+				String.nilIfEmpty(transfer.extradata.toteamsectemplate),
+			},
+			roles = {
+				String.nilIfEmpty(transfer.role2),
+				String.nilIfEmpty(transfer.extradata.role2sec),
+			},
+		},
+		platform = HAS_PLATFORM_ICONS and self:_displayPlatform(transfer.extradata.platform) or nil,
+		displayDate = String.nilIfEmpty(transfer.extradata.displaydate) or date,
+		date = date,
+		wholeteam = Logic.readBool(transfer.wholeteam),
+		players = self:_readPlayers(transfers),
+		references = self:_getReferences(transfers),
+		confirmed = transfer.extradata.confirmed,
+		confidence = transfer.extradata.confidence,
+		isRumour = transfer.extradata.isRumour,
+	}
+end
+
+---@private
+---@param platform string
+---@return string?
+function TransferRow:_displayPlatform(platform)
+	if not HAS_PLATFORM_ICONS then return end
+	if Logic.isEmpty(platform) then return '' end
+	return Platform._getIcon(platform) or ''
+end
+
+---@private
+---@param transfers transfer[]
+---@return transferPlayer[]
+function TransferRow:_readPlayers(transfers)
+	return Array.map(transfers, function(transfer)
+		local extradata = transfer.extradata
+		return {
+			pageName = transfer.player,
+			displayName = String.nilIfEmpty(extradata.displayname) or transfer.player,
+			flag = transfer.nationality,
+			icons = {String.nilIfEmpty(extradata.icon), String.nilIfEmpty(extradata.icon2)},
+			faction = extradata.faction,
+			chars = extradata.chars,
+		}
+	end)
+end
+
+---@private
+---@param transfers transfer[]
+---@return string[]
+function TransferRow:_getReferences(transfers)
+	local references = {}
+	Array.forEach(transfers, function(transfer)
+		Array.extendWith(references, References.fromStorageData(transfer.reference))
+	end)
+	references = References.makeUnique(references)
+
+	return Array.map(references, References.createReferenceIconDisplay)
+end
+
+---@return Widget?
 function TransferRow:build()
-	return TransferRowDisplay(self.transfers):build()
+	return TransferRowWidget{
+		transfer = self:_enrichTransfers(self.transfers),
+		showTeamName = (Info.config.transfers or {}).showTeamName
+	}
 end
 
 return TransferRow
