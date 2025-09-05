@@ -46,6 +46,7 @@ function MatchStreamsContainer:render()
 			platform = stream.platform,
 			stream = stream.stream,
 			matchIsLive = self.props.matchIsLive,
+			grow = self.props.growButtons,
 		}
 	end)
 end

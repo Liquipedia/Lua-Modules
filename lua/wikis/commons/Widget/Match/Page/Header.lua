@@ -106,6 +106,7 @@ function MatchPageHeader:_showStreams()
 		children = StreamsContainer{
 			streams = StreamLinks.filterStreams(self.props.stream),
 			matchIsLive = self.props.phase == 'ongoing',
+			growButtons = true,
 		}
 	}
 end
