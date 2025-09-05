@@ -9,13 +9,16 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local IconModule = Lua.requireIfExists('Module:PositionIcon/data', {loadData = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local Platform = Lua.import('Module:Platform')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
+local References = Lua.import('Module:Transfer/References')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -24,6 +27,7 @@ local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local EMPTY_POSITION_ICON = IconImage{imageLight = 'Logo filler event.png', size = '16px'}
+local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
 local SPECIAL_ROLES = {'retired', 'inactive', 'military', 'passed away'}
 local TRANSFER_STATUS_TO_ICON_NAME = {
 	neutral = 'transferbetween',
@@ -75,6 +79,88 @@ function TransferRowWidget:render()
 			self:references()
 		)
 	}
+end
+
+---@private
+---@param transfers transfer[]
+---@return enrichedTransfer
+function TransferRowWidget:_enrichTransfers(transfers)
+	if Logic.isEmpty(transfers) then return {} end
+
+	local transfer = transfers[1]
+
+	local date = DateExt.toYmdInUtc(transfer.date)
+
+	return {
+		from = {
+			teams = {
+				String.nilIfEmpty(transfer.fromteamtemplate),
+				String.nilIfEmpty(transfer.extradata.fromteamsectemplate),
+			},
+			roles = {
+				String.nilIfEmpty(transfer.role1),
+				String.nilIfEmpty(transfer.extradata.role1sec),
+			},
+		},
+		to = {
+			teams = {
+				String.nilIfEmpty(transfer.toteamtemplate),
+				String.nilIfEmpty(transfer.extradata.toteamsectemplate),
+			},
+			roles = {
+				String.nilIfEmpty(transfer.role2),
+				String.nilIfEmpty(transfer.extradata.role2sec),
+			},
+		},
+		platform = HAS_PLATFORM_ICONS and self:_displayPlatform(transfer.extradata.platform) or nil,
+		displayDate = String.nilIfEmpty(transfer.extradata.displaydate) or date,
+		date = date,
+		wholeteam = Logic.readBool(transfer.wholeteam),
+		players = self:_readPlayers(transfers),
+		references = self:_getReferences(transfers),
+		confirmed = transfer.extradata.confirmed,
+		confidence = transfer.extradata.confidence,
+		isRumour = transfer.extradata.isRumour,
+	}
+end
+
+---@private
+---@param platform string
+---@return string?
+function TransferRowWidget:_displayPlatform(platform)
+	if not HAS_PLATFORM_ICONS then return end
+	if Logic.isEmpty(platform) then return '' end
+	return Platform._getIcon(platform) or ''
+end
+
+---@private
+---@param transfers transfer[]
+---@return transferPlayer[]
+function TransferRowWidget:_readPlayers(transfers)
+	return Array.map(transfers, function(transfer)
+		local extradata = transfer.extradata
+		return {
+			pageName = transfer.player,
+			displayName = String.nilIfEmpty(extradata.displayname) or transfer.player,
+			flag = transfer.nationality,
+			icons = {String.nilIfEmpty(extradata.icon), String.nilIfEmpty(extradata.icon2)},
+			faction = extradata.faction,
+			chars = extradata.chars,
+		}
+	end)
+end
+
+---@private
+---@param transfers transfer[]
+---@return string[]
+function TransferRowWidget:_getReferences(transfers)
+	local references = {}
+	Array.forEach(transfers, function(transfer)
+		Array.extendWith(references, References.fromStorageData(transfer.reference))
+	end)
+	references = References.makeUnique(references)
+
+	return Array.map(references, References.createReferenceIconDisplay)
 end
 
 ---@private
