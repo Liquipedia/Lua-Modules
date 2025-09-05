@@ -134,7 +134,7 @@ function MvpTable._fetchMatchGroupIds(args)
 		limit = 5000,
 	})
 
-	return Logic.nilIfEmpty(Array.unique(Array.map(queryData, Operator.property('match2bracketid'))))
+	return Array.unique(Array.map(queryData, Operator.property('match2bracketid')))
 end
 
 ---Builds the main header of the MvpTable
