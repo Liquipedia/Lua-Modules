@@ -1087,12 +1087,11 @@ span.slash {
 		flex-direction: column;
 		padding: 4px;
 		gap: 4px;
-		border: 1px solid #bbbbbb;
-		background: #f5f5f5;
+		border-radius: 0.5rem;
+		background: #00000014;
 
 		.theme--dark & {
-			background-color: var( --clr-secondary-16 );
-			border-color: var( --clr-secondary-25 );
+			background-color: #ffffff14;
 		}
 
 		> div {
