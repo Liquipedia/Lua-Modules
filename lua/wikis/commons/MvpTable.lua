@@ -55,20 +55,7 @@ function MvpTable.run(args)
 		limit = 5000,
 	})
 
-	local mvpList
-
-	if type(queryData) == 'table' and queryData[1] then
-		--catch errors on incompatible match2 data (when not yet using standard storage)
-		mvpList = Logic.tryCatch(
-			function() return MvpTable.processData(queryData) end,
-			function() return mw.logObject('MvpTable: match2 mvp data format invalid, querying match1 data instead') end
-		)
-	end
-
-	--in case we catch it and in case we did not get match2 results
-	if not mvpList then
-		mvpList = MvpTable._queryMatch1(conditions)
-	end
+	local mvpList = MvpTable.processData(queryData)
 
 	if not mvpList then
 		return
@@ -255,58 +242,6 @@ end
 function MvpTable.sortFunction(tbl, a, b)
 	return tbl[a].mvp > tbl[b].mvp or
 		tbl[a].mvp == tbl[b].mvp and tbl[a].name < tbl[b].name
-end
-
----
--- Function to legacy query data from match1 and process it
----@param conditions string
----@return {points: number, mvp: number, displayName:string?, name:string, flag:string?, team:string?}[]?
-function MvpTable._queryMatch1(conditions)
-	local queryData = mw.ext.LiquipediaDB.lpdb('match', {
-		limit = 5000,
-		conditions = conditions,
-		order = 'date desc',
-		query = 'opponent1players, opponent2players, opponent1, opponent2, extradata',
-	})
-
-	if type(queryData) ~= 'table' or not queryData[1] then
-		return
-	end
-
-	local playerList = {}
-	local mvpList = {}
-
-	---@cast queryData table
-	for _, match in pairs(queryData) do
-		local players, points = string.match((match.extradata or {}).mvp or '', '([%w%(%) _,%w-]+);(%d+)')
-		if players and points then
-			for _, player in pairs(mw.text.split(players, ',')) do
-				if String.isNotEmpty(player) then
-					player = mw.text.trim(player)
-					local redirectResolvedPlayer = mw.ext.TeamLiquidIntegration.resolve_redirect(player)
-					local identifier = redirectResolvedPlayer:gsub(' ', '_')
-
-					if not playerList[identifier] then
-						playerList[identifier] = MvpTable._findPlayerInfo(match, {
-							player:lower():gsub('_', ' '),
-							player:lower():gsub(' ', '_'),
-							redirectResolvedPlayer:lower(),
-							identifier:lower(),
-						}, identifier, player)
-					end
-
-					playerList[identifier].points = playerList[identifier].points + points
-					playerList[identifier].mvp = playerList[identifier].mvp + 1
-				end
-			end
-		end
-	end
-
-	for _, item in Table.iter.spairs(playerList, MvpTable.sortFunction) do
-		table.insert(mvpList, item)
-	end
-
-	return mvpList
 end
 
 ---
