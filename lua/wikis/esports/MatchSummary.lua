@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -31,10 +32,13 @@ end
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	local phase = MatchGroupUtil.computeMatchPhase(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp and phase ~='finished'
+	local showCountdown = (not DateExt.isDefaultTimestamp(match.timestamp)) and phase ~= 'finished'
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		showCountdown and MatchSummaryWidgets.Row{children = Countdown._create{
+			date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
+			finished = match.finished,
+		}} or nil,
 		Array.map(match.games, CustomMatchSummary._createMapRow)
 	)}
 end
