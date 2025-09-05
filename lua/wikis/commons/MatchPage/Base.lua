@@ -19,7 +19,6 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
-local VodLink = Lua.import('Module:VodLink')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
@@ -37,6 +36,7 @@ local Footer = Lua.import('Module:Widget/Match/Page/Footer')
 local Header = Lua.import('Module:Widget/Match/Page/Header')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local VodButton = Lua.import('Module:Widget/Match/VodButton')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -127,20 +127,20 @@ function BaseMatchPage:_parseLinks()
 end
 
 ---@protected
----@return (string|Html)[]
+---@return Widget[]
 function BaseMatchPage:getVods()
-	local vods = Array.map(self.games, function(game, gameIdx)
-		return game.vod and VodLink.display{
-			gamenum = gameIdx,
-			vod = game.vod,
-		} or ''
-	end)
-	if String.isNotEmpty(self.matchData.vod) then
-		table.insert(vods, 1, VodLink.display{
-			vod = self.matchData.vod,
-		})
-	end
-	return vods
+	return WidgetUtil.collect(
+		String.isNotEmpty(self.matchData.vod) and VodButton{
+			vodLink = self.matchData.vod
+		} or nil,
+		Array.map(self.games, function(game, gameIdx)
+			return game.vod and VodButton{
+				gameNumber = gameIdx,
+				variant = 'dropdown',
+				vodLink = game.vod,
+			} or nil
+		end)
+	)
 end
 
 ---@param arr any[]
@@ -340,10 +340,10 @@ function BaseMatchPage:footer()
 	return Footer{
 		comments = self:_getComments(),
 		children = WidgetUtil.collect(
-			#vods > 0 and AdditionalSection{
+			AdditionalSection{
 				header = 'VODs',
 				children = vods
-			} or nil,
+			},
 			AdditionalSection{
 				header = 'Links',
 				bodyClasses = { 'vodlink' },
