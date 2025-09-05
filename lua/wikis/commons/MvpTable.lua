@@ -240,34 +240,4 @@ function MvpTable.sortFunction(tbl, a, b)
 		tbl[a].mvp == tbl[b].mvp and tbl[a].name < tbl[b].name
 end
 
----
--- Function to find player info in match1 matches for a given lookup table
----@param match table
----@param lookupTable string[]
----@param link string
----@param displayName string
----@return {points: number, mvp: number, displayName:string, name:string, flag:string?, team:string?}
-function MvpTable._findPlayerInfo(match, lookupTable, link, displayName)
-	--basic information obtainable from mvp field without any lookup in opponent player data
-	local playerData = {
-		name = link,
-		displayName = displayName,
-		points = 0,
-		mvp = 0,
-	}
-
-	for opponentIndex = 1, 2 do
-		for prefix, player in Table.iter.pairsByPrefix(match['opponent' .. opponentIndex .. 'players'], 'p') do
-			if String.isNotEmpty(player) and Table.includes(lookupTable, player:lower()) then
-				playerData.flag = match['opponent' .. opponentIndex .. 'players'][prefix .. 'flag']
-				playerData.displayName = match['opponent' .. opponentIndex .. 'players'][prefix .. 'dn'] or playerData.displayName
-				playerData.team = match['opponent' .. opponentIndex]
-				return playerData
-			end
-		end
-	end
-
-	return playerData
-end
-
 return Class.export(MvpTable, {exports = {'run'}})
