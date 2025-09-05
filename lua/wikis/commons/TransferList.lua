@@ -19,7 +19,7 @@ local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
-local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
+local TransferRowWidget = Lua.import('Module:Widget/Transfer/Row')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -356,7 +356,7 @@ function TransferList:_buildHeader()
 end
 
 ---@param transfers transfer[]
----@return Html?
+---@return Widget?
 function TransferList:_buildRow(transfers)
 	local firstTransfer = transfers[1]
 	if not firstTransfer then
@@ -372,7 +372,7 @@ function TransferList:_buildRow(transfers)
 		firstTransfer.role2 = nil
 	end
 
-	return TransferRowDisplay(transfers):build()
+	return TransferRowWidget{transfers = transfers}
 end
 
 return TransferList

@@ -9,13 +9,16 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local IconModule = Lua.requireIfExists('Module:PositionIcon/data', {loadData = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local Platform = Lua.import('Module:Platform')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
+local References = Lua.import('Module:Transfer/References')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -24,6 +27,7 @@ local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local EMPTY_POSITION_ICON = IconImage{imageLight = 'Logo filler event.png', size = '16px'}
+local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
 local SPECIAL_ROLES = {'retired', 'inactive', 'military', 'passed away'}
 local TRANSFER_STATUS_TO_ICON_NAME = {
 	neutral = 'transferbetween',
@@ -52,13 +56,20 @@ local function createDivCell(props)
 end
 
 ---@class TransferRowWidget: Widget
----@operator call({transfer: enrichedTransfer, showTeamName: boolean?}): TransferRowWidget
----@field props {transfer: enrichedTransfer, showTeamName: boolean?}
-local TransferRowWidget = Class.new(Widget)
+---@operator call({transfers: transfer[], showTeamName: boolean?}): TransferRowWidget
+---@field props {transfers: transfer[], showTeamName: boolean?}
+---@field transfer enrichedTransfer
+local TransferRowWidget = Class.new(Widget,
+	---@param self self
+	---@param input {transfers: transfer[], showTeamName: boolean?}
+	function (self, input)
+		self.transfer = self:_enrichTransfers(input.transfers)
+	end
+)
 
 ---@return Widget?
 function TransferRowWidget:render()
-	local transfer = self.props.transfer
+	local transfer = self.transfer
 	if Logic.isEmpty(transfer) then return end
 
 	return HtmlWidgets.Div{
@@ -78,9 +89,91 @@ function TransferRowWidget:render()
 end
 
 ---@private
+---@param transfers transfer[]
+---@return enrichedTransfer
+function TransferRowWidget:_enrichTransfers(transfers)
+	if Logic.isEmpty(transfers) then return {} end
+
+	local transfer = transfers[1]
+
+	local date = DateExt.toYmdInUtc(transfer.date)
+
+	return {
+		from = {
+			teams = {
+				String.nilIfEmpty(transfer.fromteamtemplate),
+				String.nilIfEmpty(transfer.extradata.fromteamsectemplate),
+			},
+			roles = {
+				String.nilIfEmpty(transfer.role1),
+				String.nilIfEmpty(transfer.extradata.role1sec),
+			},
+		},
+		to = {
+			teams = {
+				String.nilIfEmpty(transfer.toteamtemplate),
+				String.nilIfEmpty(transfer.extradata.toteamsectemplate),
+			},
+			roles = {
+				String.nilIfEmpty(transfer.role2),
+				String.nilIfEmpty(transfer.extradata.role2sec),
+			},
+		},
+		platform = HAS_PLATFORM_ICONS and self:_displayPlatform(transfer.extradata.platform) or nil,
+		displayDate = String.nilIfEmpty(transfer.extradata.displaydate) or date,
+		date = date,
+		wholeteam = Logic.readBool(transfer.wholeteam),
+		players = self:_readPlayers(transfers),
+		references = self:_getReferences(transfers),
+		confirmed = transfer.extradata.confirmed,
+		confidence = transfer.extradata.confidence,
+		isRumour = transfer.extradata.isRumour,
+	}
+end
+
+---@private
+---@param platform string
+---@return string?
+function TransferRowWidget:_displayPlatform(platform)
+	if not HAS_PLATFORM_ICONS then return end
+	if Logic.isEmpty(platform) then return '' end
+	return Platform._getIcon(platform) or ''
+end
+
+---@private
+---@param transfers transfer[]
+---@return transferPlayer[]
+function TransferRowWidget:_readPlayers(transfers)
+	return Array.map(transfers, function(transfer)
+		local extradata = transfer.extradata
+		return {
+			pageName = transfer.player,
+			displayName = String.nilIfEmpty(extradata.displayname) or transfer.player,
+			flag = transfer.nationality,
+			icons = {String.nilIfEmpty(extradata.icon), String.nilIfEmpty(extradata.icon2)},
+			faction = extradata.faction,
+			chars = extradata.chars,
+		}
+	end)
+end
+
+---@private
+---@param transfers transfer[]
+---@return string[]
+function TransferRowWidget:_getReferences(transfers)
+	local references = {}
+	Array.forEach(transfers, function(transfer)
+		Array.extendWith(references, References.fromStorageData(transfer.reference))
+	end)
+	references = References.makeUnique(references)
+
+	return Array.map(references, References.createReferenceIconDisplay)
+end
+
+---@private
 ---@return string[]
 function TransferRowWidget:_getClasses()
-	local transfer = self.props.transfer
+	local transfer = self.transfer
 
 	if transfer.isRumour then
 		return {'RumourRow'}
@@ -94,7 +187,7 @@ end
 ---@private
 ---@return string
 function TransferRowWidget:_getStatus()
-	local transfer = self.props.transfer
+	local transfer = self.transfer
 
 	if transfer.from.teams[1] and transfer.to.teams[1] then
 		return 'neutral'
@@ -122,7 +215,7 @@ end
 
 ---@return Widget?
 function TransferRowWidget:status()
-	local transfer = self.props.transfer
+	local transfer = self.transfer
 
 	if not transfer.isRumour then return end
 
@@ -134,7 +227,7 @@ end
 
 ---@return Widget?
 function TransferRowWidget:confidence()
-	local transfer = self.props.transfer
+	local transfer = self.transfer
 	if not transfer.isRumour then return end
 
 	local confidence = transfer.confidence
@@ -150,13 +243,13 @@ end
 function TransferRowWidget:date()
 	return createDivCell{
 		classes = {'Date'},
-		children = self.props.transfer.displayDate
+		children = self.transfer.displayDate
 	}
 end
 
 ---@return Widget?
 function TransferRowWidget:platform()
-	local transfer = self.props.transfer
+	local transfer = self.transfer
 	if not transfer.platform then return end
 
 	return createDivCell{
@@ -169,7 +262,7 @@ end
 function TransferRowWidget:players()
 	return createDivCell{
 		classes = {'Name'},
-		children = Array.map(self.props.transfer.players, function (player)
+		children = Array.map(self.transfer.players, function (player)
 			return PlayerDisplay.BlockPlayer{player = player}
 		end)
 	}
@@ -178,8 +271,8 @@ end
 ---@return Widget
 function TransferRowWidget:from()
 	return self:_displayTeam{
-		data = self.props.transfer.from,
-		date = self.props.transfer.date,
+		data = self.transfer.from,
+		date = self.transfer.date,
 		isOldTeam = true,
 	}
 end
@@ -291,13 +384,13 @@ function TransferRowWidget:icon()
 		return icon
 	end
 
-	local targetRoleIsSpecialRole = self:_isSpecialRole(self.props.transfer.to.roles[1])
+	local targetRoleIsSpecialRole = self:_isSpecialRole(self.transfer.to.roles[1])
 
 	return createDivCell{
 		classes = {'Icon'},
 		css = {width = '70px'},
 		children = WidgetUtil.collect(Array.interleave(
-			Array.map(self.props.transfer.players, function (player)
+			Array.map(self.transfer.players, function (player)
 				return HtmlWidgets.Fragment{children = {
 					getIcon(player.icons[1]),
 					'&nbsp;',
@@ -314,8 +407,8 @@ end
 ---@return Widget
 function TransferRowWidget:to()
 	return self:_displayTeam{
-		data = self.props.transfer.to,
-		date = self.props.transfer.date,
+		data = self.transfer.to,
+		date = self.transfer.date,
 		isOldTeam = false,
 	}
 end
@@ -324,7 +417,7 @@ end
 function TransferRowWidget:references()
 	return createDivCell{
 		classes = {'Ref'},
-		children = Array.interleave(self.props.transfer.references, HtmlWidgets.Br{})
+		children = Array.interleave(self.transfer.references, HtmlWidgets.Br{})
 	}
 end
 
