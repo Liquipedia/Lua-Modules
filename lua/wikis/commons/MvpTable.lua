@@ -12,6 +12,8 @@ local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
+local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
@@ -22,7 +24,6 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
-local ConditionUtil = Condition.Util
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
@@ -47,15 +48,14 @@ local MvpTable = {}
 ---@return Widget?
 function MvpTable.run(args)
 	args = args or {}
-	args = MvpTable._parseArgs(args)
-	local conditions = MvpTable._buildConditions(args)
-	local queryData = mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = conditions,
-		query = 'extradata, match2opponents',
-		limit = 5000,
-	})
+	local parsedArgs = MvpTable._parseArgs(args)
+	local matchGroupIds = Logic.emptyOr(parsedArgs.matchGroupIds, MvpTable._fetchMatchGroupIds(parsedArgs))
+	if not matchGroupIds then
+		return
+	end
+	local matches = Array.flatMap(matchGroupIds, MatchGroupUtil.fetchMatches)
 
-	local mvpList = MvpTable.processData(queryData)
+	local mvpList = MvpTable.processData(matches)
 
 	if not mvpList then
 		return
@@ -114,31 +114,27 @@ function MvpTable._parseArgs(args)
 end
 
 ---@param args mvpTableParsedArgs
----@return string
-function MvpTable._buildConditions(args)
-	local matchGroupIDConditions = ConditionUtil.anyOf(ColumnName('match2bracketid'), args.matchGroupIds)
+---@return string[]?
+function MvpTable._fetchMatchGroupIds(args)
+	local tournamentConditions = ConditionTree(BooleanOperator.any)
+	Array.forEach(args.tournaments, function (tournament)
+		local page = mw.title.new(tournament)
+		assert(page, 'Invalid page name "' .. tournament .. '"')
+		tournamentConditions:add{
+			ConditionTree(BooleanOperator.all):add{
+				ConditionNode(ColumnName('pagename'), Comparator.eq, mw.ustring.gsub(page.text, ' ', '_')),
+				ConditionNode(ColumnName('namespace'), Comparator.eq, page.namespace),
+			},
+		}
+	end)
 
-	local tournamentConditions
-	if Table.isNotEmpty(args.tournaments) then
-		tournamentConditions = ConditionTree(BooleanOperator.any)
-		for _, tournament in pairs(args.tournaments) do
-			local page = mw.title.new(tournament)
-			assert(page, 'Invalid page name "' .. tournament .. '"')
-			tournamentConditions:add{
-				ConditionTree(BooleanOperator.all):add{
-					ConditionNode(ColumnName('pagename'), Comparator.eq, mw.ustring.gsub(page.text, ' ', '_')),
-					ConditionNode(ColumnName('namespace'), Comparator.eq, page.namespace),
-				},
-			}
-		end
-	end
+	local queryData = mw.ext.LiquipediaDB.lpdb('match2', {
+		conditions = tostring(tournamentConditions),
+		query = 'match2bracketid',
+		limit = 5000,
+	})
 
-	local conditions = ConditionTree(BooleanOperator.all):add{
-		tournamentConditions,
-		matchGroupIDConditions,
-	}
-
-	return conditions:toString()
+	return Logic.nilIfEmpty(Array.unique(Array.map(queryData, Operator.property('match2bracketid'))))
 end
 
 ---Builds the main header of the MvpTable
@@ -199,7 +195,7 @@ end
 ---
 -- Processes retrieved data
 -- overwritable function via /Custom
----@param queryData table[]
+---@param queryData MatchGroupUtilMatch
 ---@return {points: number, mvp: number, displayName:string?, name:string, flag:string?, team:string?}[]
 function MvpTable.processData(queryData)
 	local playerList = {}
