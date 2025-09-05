@@ -1062,6 +1062,18 @@ span.slash {
 	display: flex;
 	gap: 1rem;
 	flex-wrap: wrap;
+	border: 1px solid #bbbbbb;
+	border-radius: 0.5rem;
+	padding: 0.5rem;
+
+	.theme--light & {
+		background-color: #ffffff;
+	}
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+		border-color: rgba( 255, 255, 255, 0.08 );
+	}
 
 	@media ( max-width: 767px ) {
 		flex-direction: column;
