@@ -62,7 +62,7 @@ local TransferRowWidget = Class.new(Widget)
 
 ---@return Widget?
 function TransferRowWidget:render()
-	local transfer = self.props.transfer
+	local transfer = self:_enrichTransfers(self.props.transfer)
 	if Logic.isEmpty(transfer) then return end
 
 	return HtmlWidgets.Div{
