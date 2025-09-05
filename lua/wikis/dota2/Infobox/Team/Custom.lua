@@ -57,12 +57,7 @@ end
 ---@return Widget?
 function CustomTeam:createBottomContent()
 	if not self.args.disbanded then
-		return HtmlWidgets.Fragment{
-			children = {
-				MatchTicker.participant{team = self.pagename},
-				UpcomingTournaments{name = self.pagename}
-			}
-		}
+		return UpcomingTournaments{name = self.pagename}
 	end
 end
 
