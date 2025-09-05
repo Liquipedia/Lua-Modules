@@ -56,13 +56,20 @@ local function createDivCell(props)
 end
 
 ---@class TransferRowWidget: Widget
----@operator call({transfer: enrichedTransfer, showTeamName: boolean?}): TransferRowWidget
----@field props {transfer: enrichedTransfer, showTeamName: boolean?}
-local TransferRowWidget = Class.new(Widget)
+---@operator call({transfers: transfer[], showTeamName: boolean?}): TransferRowWidget
+---@field props {transfers: transfer[], showTeamName: boolean?}
+---@field transfer enrichedTransfer
+local TransferRowWidget = Class.new(Widget,
+	---@param self self
+	---@param input {transfers: transfer[], showTeamName: boolean?}
+	function (self, input)
+		self.transfer = self:_enrichTransfers(input.transfers)
+	end
+)
 
 ---@return Widget?
 function TransferRowWidget:render()
-	local transfer = self:_enrichTransfers(self.props.transfer)
+	local transfer = self.transfer
 	if Logic.isEmpty(transfer) then return end
 
 	return HtmlWidgets.Div{
@@ -166,7 +173,7 @@ end
 ---@private
 ---@return string[]
 function TransferRowWidget:_getClasses()
-	local transfer = self.props.transfer
+	local transfer = self.transfer
 
 	if transfer.isRumour then
 		return {'RumourRow'}
@@ -180,7 +187,7 @@ end
 ---@private
 ---@return string
 function TransferRowWidget:_getStatus()
-	local transfer = self.props.transfer
+	local transfer = self.transfer
 
 	if transfer.from.teams[1] and transfer.to.teams[1] then
 		return 'neutral'
@@ -208,7 +215,7 @@ end
 
 ---@return Widget?
 function TransferRowWidget:status()
-	local transfer = self.props.transfer
+	local transfer = self.transfer
 
 	if not transfer.isRumour then return end
 
@@ -220,7 +227,7 @@ end
 
 ---@return Widget?
 function TransferRowWidget:confidence()
-	local transfer = self.props.transfer
+	local transfer = self.transfer
 	if not transfer.isRumour then return end
 
 	local confidence = transfer.confidence
@@ -236,13 +243,13 @@ end
 function TransferRowWidget:date()
 	return createDivCell{
 		classes = {'Date'},
-		children = self.props.transfer.displayDate
+		children = self.transfer.displayDate
 	}
 end
 
 ---@return Widget?
 function TransferRowWidget:platform()
-	local transfer = self.props.transfer
+	local transfer = self.transfer
 	if not transfer.platform then return end
 
 	return createDivCell{
@@ -255,7 +262,7 @@ end
 function TransferRowWidget:players()
 	return createDivCell{
 		classes = {'Name'},
-		children = Array.map(self.props.transfer.players, function (player)
+		children = Array.map(self.transfer.players, function (player)
 			return PlayerDisplay.BlockPlayer{player = player}
 		end)
 	}
@@ -264,8 +271,8 @@ end
 ---@return Widget
 function TransferRowWidget:from()
 	return self:_displayTeam{
-		data = self.props.transfer.from,
-		date = self.props.transfer.date,
+		data = self.transfer.from,
+		date = self.transfer.date,
 		isOldTeam = true,
 	}
 end
@@ -377,13 +384,13 @@ function TransferRowWidget:icon()
 		return icon
 	end
 
-	local targetRoleIsSpecialRole = self:_isSpecialRole(self.props.transfer.to.roles[1])
+	local targetRoleIsSpecialRole = self:_isSpecialRole(self.transfer.to.roles[1])
 
 	return createDivCell{
 		classes = {'Icon'},
 		css = {width = '70px'},
 		children = WidgetUtil.collect(Array.interleave(
-			Array.map(self.props.transfer.players, function (player)
+			Array.map(self.transfer.players, function (player)
 				return HtmlWidgets.Fragment{children = {
 					getIcon(player.icons[1]),
 					'&nbsp;',
@@ -400,8 +407,8 @@ end
 ---@return Widget
 function TransferRowWidget:to()
 	return self:_displayTeam{
-		data = self.props.transfer.to,
-		date = self.props.transfer.date,
+		data = self.transfer.to,
+		date = self.transfer.date,
 		isOldTeam = false,
 	}
 end
@@ -410,7 +417,7 @@ end
 function TransferRowWidget:references()
 	return createDivCell{
 		classes = {'Ref'},
-		children = Array.interleave(self.props.transfer.references, HtmlWidgets.Br{})
+		children = Array.interleave(self.transfer.references, HtmlWidgets.Br{})
 	}
 end
 
