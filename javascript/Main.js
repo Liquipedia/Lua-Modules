@@ -35,7 +35,11 @@ jsModules.forEach( ( module ) => {
 } );
 
 // Initialize liquipedia global object
-window.liquipedia = window.liquipedia || {};
+window.liquipedia = window.liquipedia || {
+	core: {
+		modules: []
+	}
+};
 
 // Mock MediaWiki APIs for testing
 window.mw = window.mw || {
@@ -44,7 +48,8 @@ window.mw = window.mw || {
 			const mockConfig = {
 				wgPageName: 'Test_Page',
 				wgNamespaceNumber: 0,
-				wgServer: 'https://liquipedia.net'
+				wgServer: 'https://liquipedia.net',
+				wgScriptPath: ''
 			};
 			return mockConfig[ key ];
 		}
@@ -73,9 +78,9 @@ window.mw = window.mw || {
 	}
 };
 
-// Auto-initialize all loaded Liquipedia modules
+// Auto-initialize all loaded modules
 onload = () => {
-	Object.keys( liquipedia ).forEach( ( module ) => {
+	liquipedia.core.modules.forEach( ( module ) => {
 		if ( !liquipedia[ module ] || typeof liquipedia[ module ].init !== 'function' ) {
 			return;
 		}
