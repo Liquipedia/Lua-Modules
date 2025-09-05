@@ -105,7 +105,14 @@ function MatchButtonBar:render()
 		collapseAreaClasses = {'match-info-vods-area'},
 		classes = {'match-info-links-wrapper'},
 		children = displayVods and Array.map(vods, function(vod)
-			return VodButton{vodLink = vod.vod, gameNumber = vod.number, showText = #vods < 4, variant = 'dropdown', grow = true}
+			return VodButton{
+				vodLink = vod.vod,
+				gameNumber = vod.number,
+				showText = #vods < 4,
+				variant = 'dropdown',
+				grow = true,
+				leftAlign = true
+			}
 		end) or nil,
 	}
 end
