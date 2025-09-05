@@ -356,7 +356,7 @@ function TransferList:_buildHeader()
 end
 
 ---@param transfers transfer[]
----@return Html?
+---@return Widget?
 function TransferList:_buildRow(transfers)
 	local firstTransfer = transfers[1]
 	if not firstTransfer then
