@@ -49,8 +49,8 @@ local MvpTable = {}
 function MvpTable.run(args)
 	args = args or {}
 	local parsedArgs = MvpTable._parseArgs(args)
-	local matchGroupIds = Logic.emptyOr(parsedArgs.matchGroupIds, MvpTable._fetchMatchGroupIds(parsedArgs))
-	if not matchGroupIds then
+	local matchGroupIds = Array.extendWith({}, parsedArgs.matchGroupIds, MvpTable._fetchMatchGroupIds(parsedArgs))
+	if Logic.isEmpty(matchGroupIds) then
 		return
 	end
 	local matches = Array.flatMap(matchGroupIds, MatchGroupUtil.fetchMatches)
