@@ -17,7 +17,7 @@ local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local Region = Lua.import('Module:Region')
 local SignaturePlayerAgents = Lua.import('Module:SignaturePlayerAgents')
 local String = Lua.import('Module:StringUtils')
-local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
@@ -122,7 +122,7 @@ end
 ---@return Widget?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
+		local teamPage = TeamTemplate.getPageName(self.args.team)
 		return HtmlWidgets.Fragment{
 			children = {
 				MatchTicker.player{recentLimit = 3},

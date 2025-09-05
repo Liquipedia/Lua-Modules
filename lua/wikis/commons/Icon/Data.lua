@@ -78,7 +78,7 @@ return {
 	-- Usage: To indicate different transfer type with icon difference not just background colour
 	transferbetween = 'fas fa-arrow-alt-right',
 	transfertofreeagent = 'fas fa-arrow-alt-from-left',
-	fransferfromfreeagent = 'fas fa-arrow-alt-to-right',
+	transferfromfreeagent = 'fas fa-arrow-alt-to-right',
 
 	-- Usage: Reference links in tables (ie transfers)
 	reference = 'fad fa-external-link-alt',
@@ -217,5 +217,10 @@ return {
 	trovo = 'liquipedia-custom-icon liquipedia-custom-icon-trovo',
 	tl = 'liquipedia-custom-icon liquipedia-custom-icon-team-liquid',
 	stream = 'liquipedia-custom-icon liquipedia-custom-icon-team-liquid',
-	vod_play = 'far fa-play'
+	vod_play = 'far fa-play',
+
+	-- Usage: Formula 1
+	ongoing_series = 'fas fa-hourglass-half ',
+	season_history = 'fas fa-landmark',
+	finished_race = 'fas fa-flag-checkered'
 }

@@ -14,6 +14,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchHeader = Lua.import('Module:Widget/Match/Header')
+local MatchHeaderFfa = Lua.import('Module:Widget/Match/Header/Ffa')
 local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
 local TournamentBar = Lua.import('Module:Widget/Match/TournamentBar')
 local ButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
@@ -22,6 +23,7 @@ local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 
 ---@class MatchCardProps
 ---@field match MatchGroupUtilMatch
+---@field gameData MatchTickerGameData?
 ---@field onlyHighlightOnValue string?
 ---@field hideTournament boolean?
 ---@field displayGameIcons boolean?
@@ -39,6 +41,7 @@ MatchCard.defaultProps = {
 ---@return Widget?
 function MatchCard:render()
 	local match = self.props.match
+	local gameData = self.props.gameData
 	if not match then
 		return nil
 	end
@@ -48,6 +51,7 @@ function MatchCard:render()
 
 	local tournamentLink = TournamentBar{
 		match = match,
+		gameData = gameData,
 		displayGameIcon = self.props.displayGameIcons,
 	}
 
@@ -60,6 +64,7 @@ function MatchCard:render()
 				classes = {'match-info-tournament', highlight and HIGHLIGHT_CLASS or nil},
 				children = {tournamentLink},
 			} or nil,
+			MatchHeaderFfa{match = match},
 			ButtonBar{match = match}
 		)
 	}

@@ -11,7 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local GameLookup = Lua.import('Module:GameLookup')
 local Opponent = Lua.import('Module:Opponent/Custom')
-local TeamTemplates = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -134,13 +134,13 @@ end
 ---@return ConditionTree
 function CustomTeam:_buildTeamPlacementConditions()
 	local team = self.args.teamtemplate or self.args.name or self.pagename
-	local rawOpponentTemplate = TeamTemplates.queryRaw(team) or {}
+	local rawOpponentTemplate = TeamTemplate.getRawOrNil(team) or {}
 	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
 	if not opponentTemplate then
-		error('Missing team template for team: ' .. team)
+		error(TeamTemplate.noTeamMessage(team))
 	end
 
-	local opponentTeamTemplates = TeamTemplates.queryHistorical(opponentTemplate) or {opponentTemplate}
+	local opponentTeamTemplates = TeamTemplate.queryHistoricalNames(opponentTemplate)
 
 	local playerConditions = self:_buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
 

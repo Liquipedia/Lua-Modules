@@ -53,26 +53,6 @@ local ESPORTS_HUB_BUTTON = createHubButton('Portal:Esports', 'Esports Hub', 'esp
 local GAME_HUB_BUTTON = createHubButton('Portal:Game', 'Game Hub', 'game_hub')
 
 local CONTENT = {
-	aboutMain = {
-		heading = ABOUT_HEADING,
-		body = WidgetUtil.collect(
-			ABOUT_BODY,
-			Div{
-				css = {
-					display = 'flex',
-					['flex-wrap'] = 'wrap',
-					gap = '12px',
-					['justify-content'] = 'center',
-					['padding-top'] = '12px'
-				},
-				children = {
-					ESPORTS_HUB_BUTTON, GAME_HUB_BUTTON
-				}
-			}
-		),
-		padding = true,
-		boxid = 1500,
-	},
 	aboutEsport = {
 		heading = ABOUT_HEADING,
 		body = WidgetUtil.collect(
@@ -115,11 +95,7 @@ local CONTENT = {
 	},
 	heroes = {
 		heading = 'Heroes',
-		body = Div{
-			classes = { 'heroes-panel' },
-			attributes = { ['data-component'] = 'heroes-panel' },
-			children = { Template.safeExpand(mw.getCurrentFrame(), 'HeroTable') }
-		},
+		body = Template.safeExpand(mw.getCurrentFrame(), 'HeroTable'),
 		padding = true,
 		boxid = 1501,
 	},
@@ -199,40 +175,25 @@ local CONTENT = {
 }
 
 local LAYOUT_MAIN = {
-	{ -- Left
-		size = 6,
+	{ -- Top Left
+		size = 5,
 		children = {
 			{
 				mobileOrder = 1,
-				content = CONTENT.aboutMain,
+				content = CONTENT.specialEvents
 			},
+
 			{
-				mobileOrder = 5,
-				content = CONTENT.heroes,
-			},
-			{
-				mobileOrder = 6,
-				content = CONTENT.updates,
-			},
-			{
-				mobileOrder = 10,
-				content = CONTENT.usefulArticles,
-			},
-			{
-				mobileOrder = 8,
-				content = CONTENT.wantToHelp,
+				mobileOrder = 3,
+				content = CONTENT.transfers,
 			},
 		},
 	},
-	{ -- Right
-		size = 6,
+	{ -- Top Right
+		size = 7,
 		children = {
 			{
 				mobileOrder = 2,
-				content = CONTENT.specialEvents
-			},
-			{
-				mobileOrder = 3,
 				children = {
 					{
 						children = {
@@ -262,22 +223,49 @@ local LAYOUT_MAIN = {
 					},
 				},
 			},
---[[
-			{
-				mobileOrder = 6,
-				content = CONTENT.rankings
-			},
-]]
-			{
-				mobileOrder = 7,
-				content = CONTENT.transfers,
-			},
-			{
-				mobileOrder = 11,
-				content = CONTENT.thisDay,
-			},
 		},
 	},
+	{ -- Heroes
+		size = 12,
+		children = {
+			{
+				mobileOrder = 4,
+				content = CONTENT.heroes,
+			},
+		}
+	},
+	{ -- Bottom Left
+		size = 6,
+		children = {
+			{
+				mobileOrder = 5,
+				content = CONTENT.wantToHelp,
+			},
+			{
+				mobileOrder = 6,
+				content = CONTENT.updates,
+			},
+
+		}
+	},
+	{ -- Bottom Right
+		size = 6,
+		children = {
+			{
+				mobileOrder = 7,
+				content = CONTENT.thisDay,
+			},
+		}
+	},
+	{ -- Useful articles
+		size = 12,
+		children = {
+			{
+				mobileOrder = 8,
+				content = CONTENT.usefulArticles,
+			},
+		}
+	}
 }
 
 local LAYOUT_ESPORTS = {
