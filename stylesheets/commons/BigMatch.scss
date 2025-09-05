@@ -1104,7 +1104,15 @@ span.slash {
 
 	&-section {
 		flex: 1 0 20%;
-		border: 0.0625rem solid #bbbbbb;
+		border-radius: 0.5rem;
+		background: #00000014;
+		display: flex;
+		flex-flow: column;
+		padding: 0.5rem;
+
+		.theme--dark & {
+			background-color: #ffffff14;
+		}
 
 		.theme--dark & {
 			border-color: var( --clr-secondary-25 );
@@ -1115,15 +1123,9 @@ span.slash {
 			justify-content: center;
 			align-items: center;
 			padding: 0.25rem;
-			border-bottom: 0.0625rem solid #bbbbbb;
-			background: #f5f5f5;
 			font-weight: bold;
 			height: 2.375rem;
-
-			.theme--dark & {
-				background-color: var( --clr-secondary-16 );
-				border-color: var( --clr-secondary-25 );
-			}
+			flex-grow: 0;
 		}
 
 		&-body {
@@ -1131,6 +1133,15 @@ span.slash {
 			gap: 0.5rem;
 			padding: 1rem 0.5rem;
 			justify-content: center;
+			align-items: center;
+			flex-grow: 1;
+			border-radius: 0.5rem;
+			background: var( --clr-background );
+
+			.theme--dark & {
+				background-color: var( --clr-secondary-16 );
+				border-color: rgba( 255, 255, 255, 0.08 );
+			}
 		}
 	}
 }
