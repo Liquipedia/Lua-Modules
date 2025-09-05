@@ -56,15 +56,33 @@ function MatchSummaryMapVetoRound:render()
 	local children
 	if vetoType == VETO_DECIDER then
 		children = {
-			HtmlWidgets.Td{children = createVetoTypeElement()},
-			HtmlWidgets.Td{children = displayMap(self.props.map1)},
-			HtmlWidgets.Td{children = createVetoTypeElement()},
+			HtmlWidgets.Td{
+				css = {['text-align'] = 'left'},
+				children = createVetoTypeElement()
+			},
+			HtmlWidgets.Td{
+				css = {['text-align'] = 'center'},
+				children = displayMap(self.props.map1)
+			},
+			HtmlWidgets.Td{
+				css = {['text-align'] = 'right'},
+				children = createVetoTypeElement()
+			},
 		}
 	else
 		children = {
-			HtmlWidgets.Td{children = displayMap(self.props.map1)},
-			HtmlWidgets.Td{children = createVetoTypeElement()},
-			HtmlWidgets.Td{children = displayMap(self.props.map2)},
+			HtmlWidgets.Td{
+				css = {['text-align'] = 'left'},
+				children = displayMap(self.props.map1)
+			},
+			HtmlWidgets.Td{
+				css = {['text-align'] = 'center'},
+				children = createVetoTypeElement()
+			},
+			HtmlWidgets.Td{
+				css = {['text-align'] = 'right'},
+				children = displayMap(self.props.map2)
+			},
 		}
 	end
 

@@ -45,10 +45,14 @@ function MatchSummaryMapVetoStart:render()
 		}
 	end
 
+	local alignments = {'left', 'center', 'right'}
 	return HtmlWidgets.Tr{
 		classes = {'brkts-popup-mapveto-vetostart'},
-		children = Array.map(children, function(child)
-			return HtmlWidgets.Th{children = child}
+		children = Array.map(children, function(child, i)
+			return HtmlWidgets.Th{
+				css = {['text-align'] = alignments[i] or nil},
+				children = child
+			}
 		end)
 	}
 end
