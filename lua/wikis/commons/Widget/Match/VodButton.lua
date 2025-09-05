@@ -15,7 +15,6 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local ImageIcon = Lua.import('Module:Widget/Image/Icon/Image')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-local Div = HtmlWidgets.Div
 
 ---@class VodButton: Widget
 ---@operator call(table): VodButton
@@ -41,16 +40,12 @@ function VodButton:render()
 		link = vodLink,
 		size = 'sm',
 		grow = useGrow,
+		aligncontent = 'left',
 		children = useDropdownVariant and {
-			Div{
-				css = {['justify-content'] = 'left'},
-				children = {
-					Icon{iconName = 'vod_play', size = 'sm'},
-					HtmlWidgets.Span{
-						children = showText and ('Game ' .. gameNumber) or gameNumber,
-					}
-				}
-			},
+			Icon{iconName = 'vod_play', size = 'sm'},
+			HtmlWidgets.Span{
+				children = showText and ('Game ' .. gameNumber) or gameNumber,
+			}
 		} or {
 			ImageIcon{imageLight = VodLink.getIcon(gameNumber)},
 			HtmlWidgets.Span{

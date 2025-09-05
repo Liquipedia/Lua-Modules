@@ -23,6 +23,7 @@ local Div = HtmlWidgets.Div
 ---@field variant 'primary'|'secondary'|'tertiary'|'ghost'|'destructive'|nil
 ---@field size 'xs'|'sm'|'md'|'lg'|nil
 ---@field grow boolean?
+---@field aligncontent 'left'|'center'|'right'|nil
 
 ---@class ButtonWidget: Widget
 ---@operator call(ButtonWidgetParameters): ButtonWidget
@@ -33,6 +34,7 @@ Button.defaultProps = {
 	variant = 'primary',
 	size = 'md',
 	grow = false, -- Whether the button should grow to fill the available space
+	aligncontent = 'center',
 }
 
 ---@return Widget
@@ -59,8 +61,19 @@ function Button:render()
 		table.insert(cssClasses, 'btn-large')
 	end
 
+	local cssTable = {}
+	if self.props.grow then
+		cssTable.width = '100%'
+	end
+	if self.props.aligncontent == 'left' then
+		cssTable['justify-content'] = 'left'
+	end
+	if self.props.aligcontent == 'right' then
+		cssTable['justify-content'] = 'right'
+	end
+
 	local button = Div{
-		css = self.props.grow and {width = '100%'} or nil,
+		css = next(cssTable) and cssTable or nil,
 		classes = Array.extend(cssClasses, self.props.classes or {}),
 		attributes = Table.merge({
 			title = self.props.title,
