@@ -114,7 +114,7 @@ function MvpTable._parseArgs(args)
 end
 
 ---@param args mvpTableParsedArgs
----@return string[]?
+---@return string[]
 function MvpTable._fetchMatchGroupIds(args)
 	local tournamentConditions = ConditionTree(BooleanOperator.any)
 	Array.forEach(args.tournaments, function (tournament)
