@@ -49,7 +49,9 @@ local MvpTable = {}
 function MvpTable.run(args)
 	args = args or {}
 	local parsedArgs = MvpTable._parseArgs(args)
-	local matchGroupIds = Array.extendWith({}, parsedArgs.matchGroupIds, MvpTable._fetchMatchGroupIds(parsedArgs))
+	local matchGroupIds = Array.unique(
+		Array.extendWith({}, parsedArgs.matchGroupIds, MvpTable._fetchMatchGroupIds(parsedArgs))
+	)
 	if Logic.isEmpty(matchGroupIds) then
 		return
 	end
@@ -62,7 +64,7 @@ function MvpTable.run(args)
 	end
 
 	return HtmlWidgets.Table{
-		classes = {'wikitable', 'prizepooltable', 'collapsed'},
+		classes = {'wikitable', 'prizepooltable','collapsed'},
 		css = {
 			['text-align'] = 'center',
 			['margin-top'] = args.margin .. 'px'
