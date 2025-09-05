@@ -26,13 +26,6 @@ local Customizable = Widgets.Customizable
 ---@class RoleInfobox: BasicInfobox
 local Role = Class.new(BasicInfobox)
 
----@param frame Frame
----@return Html
-function Role.run(frame)
-	local role = Role(frame)
-	return role:createInfobox()
-end
-
 ---@return string
 function Role:createInfobox()
 	local args = self.args
