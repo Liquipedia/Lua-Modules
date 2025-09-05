@@ -12,6 +12,7 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
@@ -372,7 +373,10 @@ function TransferList:_buildRow(transfers)
 		firstTransfer.role2 = nil
 	end
 
-	return TransferRowWidget{transfers = transfers}
+	return TransferRowWidget{
+		transfers = transfers,
+		showTeamName = (Info.config.transfers or {}).showTeamName
+	}
 end
 
 return TransferList
