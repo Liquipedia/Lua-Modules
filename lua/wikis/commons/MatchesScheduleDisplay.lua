@@ -202,7 +202,7 @@ function MatchesTable:dateDisplay(match)
 		end
 		countdownArgs.timestamp = match.timestamp
 		countdownArgs.date = DateExt.toCountdownArg(match.timestamp, match.timezoneId)
-		return createDateCell{children = Countdown._create(countdownArgs)}
+		return createDateCell{children = Countdown.create(countdownArgs)}
 	elseif self.config.onlyShowExactDates then
 		return createDateCell{
 			css = {

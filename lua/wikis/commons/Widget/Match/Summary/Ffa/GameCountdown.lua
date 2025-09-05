@@ -42,7 +42,7 @@ function MatchSummaryFfaGameCountdown:render()
 	return HtmlWidgets.Div{
 		classes = {'match-countdown-block'},
 		children = {
-			Countdown._create(streamParameters),
+			Countdown.create(streamParameters),
 			game.vod and VodLink.display{vod = game.vod} or nil,
 		},
 	}

@@ -95,7 +95,7 @@ function BaseMatchPage:getCountdownBlock()
 			display = 'block',
 			['text-align'] = 'center'
 		},
-		children = Countdown._create{
+		children = Countdown.create{
 			date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
 			finished = self.matchData.finished,
 			rawdatetime = Logic.readBool(self.matchData.finished),

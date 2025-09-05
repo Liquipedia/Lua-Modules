@@ -130,7 +130,7 @@ function ProjectOverview:_generateOverview()
 			{
 				IconFa{iconName = 'lastupdated', screenReaderHidden = true},
 				' Last Update: ',
-				timestamp and Countdown._create{
+				timestamp and Countdown.create{
 					timestamp = timestamp,
 					date = DateExt.toCountdownArg(timestamp),
 					rawdatetime = true
