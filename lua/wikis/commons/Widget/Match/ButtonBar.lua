@@ -111,7 +111,6 @@ function MatchButtonBar:render()
 				showText = #vods < 4,
 				variant = 'dropdown',
 				grow = true,
-				leftAlign = true
 			}
 		end) or nil,
 	}
