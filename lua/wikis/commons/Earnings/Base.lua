@@ -106,7 +106,7 @@ function Earnings.calculateForTeam(args)
 	end
 
 	local queryTeams = {}
-	if Logic.readBool(args.queryHistorical) then
+	if Logic.nilOr(Logic.readBoolOrNil(args.queryHistorical), true) then
 		for _, team in pairs(teams) do
 			local historicalNames = TeamTemplate.queryHistoricalNames(team)
 
@@ -114,12 +114,14 @@ function Earnings.calculateForTeam(args)
 				return 0
 			end
 
-			Array.extendWith(queryTeams, Array.map(historicalNames, String.upperCaseFirst))
+			Array.extendWith(queryTeams, historicalNames)
 		end
 	elseif not Logic.readBool(args.noRedirect) then
-		queryTeams = Array.map(teams, mw.ext.TeamLiquidIntegration.resolve_redirect)
+		queryTeams = Array.map(teams, function(team)
+			return string.lower(mw.ext.TeamLiquidIntegration.resolve_redirect(team))
+		end)
 	else
-		queryTeams = Array.map(teams, String.upperCaseFirst)
+		queryTeams = Array.map(teams, string.lower)
 	end
 
 	local formatParticipant = function(lpdbField)
@@ -169,7 +171,7 @@ function Earnings.calculate(conditions, queryYear, mode, perYear, aliases, isPla
 
 	local queryParameters = {
 		conditions = conditions,
-		query = 'individualprizemoney, prizemoney, opponentplayers, date, opponenttype, opponentname',
+		query = 'individualprizemoney, prizemoney, opponentplayers, date, opponenttype, opponentname, opponenttemplate',
 	}
 	Lpdb.executeMassQuery('placement', queryParameters, sumUp)
 
@@ -213,7 +215,7 @@ function Earnings._determineValue(placement, aliases, isPlayerQuery)
 
 	if isPlayerQuery then
 		return indivPrize or 0
-	elseif placement.opponenttype == Opponent.team and Table.includes(aliases, placement.opponentname) then
+	elseif placement.opponenttype == Opponent.team and Table.includes(aliases, placement.opponenttemplate) then
 		return placement.prizemoney
 	end
 
@@ -223,7 +225,7 @@ function Earnings._determineValue(placement, aliases, isPlayerQuery)
 
 	-- calcualte the number of players on the team that are part of the placement
 	-- so we can get the real value of earnings for the team from their players from this placement
-	local playerData = Table.filterByKey(placement.opponentplayers or {}, function(key) return key:find('team') end)
+	local playerData = Table.filterByKey(placement.opponentplayers or {}, function(key) return key:find('template') end)
 
 	return indivPrize * Table.size(Table.filter(playerData, function(team) return Table.includes(aliases, team) end))
 end
