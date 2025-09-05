@@ -31,6 +31,7 @@ function VodButton:render()
 	local useDropdownVariant = self.props.variant == 'dropdown'
 	local showText = self.props.showText
 	local gameNumber = self.props.gameNumber
+	local useGrow = self.props.grow == true
 
 	return Button{
 		linktype = 'external',
@@ -38,6 +39,7 @@ function VodButton:render()
 		variant = 'tertiary',
 		link = vodLink,
 		size = 'sm',
+		grow = useGrow,
 		children = useDropdownVariant and {
 			Icon{iconName = 'vod_play'},
 			HtmlWidgets.Span{
