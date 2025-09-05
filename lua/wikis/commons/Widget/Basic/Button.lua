@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
@@ -34,7 +35,7 @@ Button.defaultProps = {
 	variant = 'primary',
 	size = 'md',
 	grow = false, -- Whether the button should grow to fill the available space
-	aligncontent = 'center',
+	aligncontent = nil,
 }
 
 ---@return Widget
@@ -67,13 +68,12 @@ function Button:render()
 	end
 	if self.props.aligncontent == 'left' then
 		cssTable['justify-content'] = 'left'
-	end
-	if self.props.aligcontent == 'right' then
+	elseif self.props.aligcontent == 'right' then
 		cssTable['justify-content'] = 'right'
 	end
 
 	local button = Div{
-		css = next(cssTable) and cssTable or nil,
+		css = Logic.nilIfEmpty(cssTable),
 		classes = Array.extend(cssClasses, self.props.classes or {}),
 		attributes = Table.merge({
 			title = self.props.title,

@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local VodLink = Lua.import('Module:VodLink')
 
 local Widget = Lua.import('Module:Widget')
@@ -31,7 +32,7 @@ function VodButton:render()
 	local useDropdownVariant = self.props.variant == 'dropdown'
 	local showText = self.props.showText
 	local gameNumber = self.props.gameNumber
-	local useGrow = self.props.grow == true
+	local useGrow = Logic.readBool(self.props.grow)
 
 	return Button{
 		linktype = 'external',
