@@ -54,14 +54,14 @@ function CopyPaste._generateID()
 	return CopyPaste._generateID()
 end
 
----@param templateid string
+---@param bracketType string
 ---@return table
-function CopyPaste._getBracketData(templateid)
-	templateid = 'Bracket/' .. templateid
-	local matches = mw.ext.Brackets.getCommonsBracketTemplate(templateid)
+function CopyPaste._getBracketData(bracketType)
+	bracketType = 'Bracket/' .. bracketType
+	local matches = mw.ext.Brackets.getCommonsBracketTemplate(bracketType)
 
 	assert(type(matches) == 'table' and #matches > 0,
-		templateid .. ' does not exist. If you should need it please ask a contributor with reviewer+ rights for help.')
+		bracketType .. ' does not exist. If you should need it please ask a contributor with reviewer+ rights for help.')
 
 	local bracketDataList = Array.map(matches, function(match)
 		local _, baseMatchId = MatchGroupUtil.splitMatchId(match.match2id)
@@ -123,9 +123,9 @@ function CopyPaste.bracket(frame, args)
 
 	args.id = (args.id or '') and args.id or (args.template or '') and args.template or args.name or ''
 	args.id = string.gsub(string.gsub(args.id, '^Bracket/', ''), '^bracket/', '')
-	local templateid = BracketAlias[string.lower(args.id)] or args.id
+	local bracketType = BracketAlias[string.lower(args.id)] or args.id
 
-	display, args = WikiSpecific.getStart(templateid, CopyPaste.generateID(), 'bracket', args)
+	display, args = WikiSpecific.getStart(bracketType, CopyPaste.generateID(), 'bracket', args)
 
 	local empty = Logic.readBool(args.empty)
 	local customHeader = Logic.readBool(args.customHeader)
@@ -134,7 +134,7 @@ function CopyPaste.bracket(frame, args)
 	local mode = WikiSpecific.getMode(args.mode)
 	local headersUpTop = Logic.readBool(Logic.emptyOr(args.headersUpTop, true))
 
-	local bracketDataList = CopyPaste._getBracketData(templateid)
+	local bracketDataList = CopyPaste._getBracketData(bracketType)
 
 	local matchesCopyPaste = Array.map(bracketDataList, function(bracketData, matchIndex)
 		local matchKey = bracketData.matchKey

@@ -21,7 +21,7 @@ local Opponent = Lua.import('Module:Opponent')
 ---@class BracketTemplateBracket
 ---@field bracketDatasById table<string,MatchGroupUtilBracketBracketData>
 ---@field rootMatchIds string[]
----@field templateId string
+---@field bracketType string
 
 local BracketTemplate = {}
 
@@ -32,17 +32,17 @@ function BracketTemplate.TemplateBracketDocumentation()
 	local bracket = BracketTemplate.readBracket(argsList)
 
 	BracketTemplate.store(bracket)
-	return BracketTemplate.BracketDocumentation({templateId = bracket.templateId})
+	return BracketTemplate.BracketDocumentation{bracketType = bracket.bracketType}
 end
 
----@param props {templateId: string}
+---@param props {bracketType: string}
 ---@return string
 function BracketTemplate.BracketDocumentation(props)
 	local parts = {
 		[[
 ==Bracket==
 ]],
-		BracketTemplate.BracketContainer({bracketId = props.templateId}),
+		BracketTemplate.BracketContainer{bracketId = props.bracketType},
 		[[
 
 ==Copy-Paste==
@@ -81,7 +81,7 @@ function BracketTemplate.readBracket(argsList)
 			function(_, bracketData) return bracketData.matchId, bracketData end
 		),
 		rootMatchIds = {},
-		templateId = mw.title.getCurrentTitle().text,
+		bracketType = mw.title.getCurrentTitle().text,
 	}
 
 	-- Populate in bracketData.upperMatchId and rootMatchIds
@@ -113,6 +113,8 @@ function BracketTemplate.readBracketData(args)
 	end
 
 	args.type = 'bracket'
+	args.bracketType = pageName
+
 	local bracketData = MatchGroupUtil.bracketDataFromRecord(args)
 	--bracketData is of type bracket
 	---@cast bracketData - MatchGroupUtilMatchlistBracketData
@@ -127,7 +129,7 @@ end
 ---@param bracket BracketTemplateBracket
 function BracketTemplate.store(bracket)
 	BracketTemplate.storeBracket(bracket)
-	BracketTemplate.storeDatapoint(bracket.templateId)
+	BracketTemplate.storeDatapoint(bracket.bracketType)
 end
 
 ---Store bracket with placeholder match and opponent data in commons wiki LPDB
@@ -152,9 +154,9 @@ function BracketTemplate.storeBracket(bracket)
 	end
 end
 
----@param templateId string
-function BracketTemplate.storeDatapoint(templateId)
-	mw.ext.LiquipediaDB.lpdb_datapoint('ExtensionBracket_' .. templateId, {
+---@param bracketType string
+function BracketTemplate.storeDatapoint(bracketType)
+	mw.ext.LiquipediaDB.lpdb_datapoint('ExtensionBracket_' .. bracketType, {
 		type = 'extension bracket',
 	})
 end

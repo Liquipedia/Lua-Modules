@@ -57,6 +57,7 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 ---@field coordinates MatchGroupUtilMatchCoordinates
 ---@field advanceSpots MatchGroupUtilAdvanceSpot[]
 ---@field bracketResetMatchId string?
+---@field bracketType string?
 ---@field header string?
 ---@field inheritedHeader string?
 ---@field lowerEdges MatchGroupUtilLowerEdge[]?
@@ -77,6 +78,7 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
 	bracketResetMatchId = 'string?',
+	bracketType = 'string?',
 	header = 'string?',
 	inheritedHeader = 'string?',
 	lowerEdges = TypeUtil.array(MatchGroupUtil.types.LowerEdge),
@@ -595,6 +597,7 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 			qualWinLiteral = nilIfEmpty(data.qualwinLiteral),
 			matchPage = nilIfEmpty(data.matchpage),
 			skipRound = tonumber(data.skipround) or data.skipround == 'true' and 1 or 0,
+			bracketType = nilIfEmpty(data.bracketType),
 			thirdPlaceMatchId = nilIfEmpty(data.thirdplace),
 			type = 'bracket',
 			upperMatchId = nilIfEmpty(data.upperMatchId),
@@ -630,6 +633,7 @@ function MatchGroupUtil.bracketDataToRecord(bracketData)
 		qualwin = bracketData.qualWin and 'true' or nil,
 		qualwinLiteral = bracketData.qualWinLiteral,
 		skipround = bracketData.skipRound ~= 0 and bracketData.skipRound or nil,
+		bracketType = bracketData.bracketType,
 		thirdplace = bracketData.thirdPlaceMatchId,
 		tolower = bracketData.lowerMatchIds[#bracketData.lowerMatchIds],
 		toupper = bracketData.lowerMatchIds[#bracketData.lowerMatchIds - 1],
