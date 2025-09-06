@@ -227,9 +227,9 @@ function TransferRowWidget:rumourCells()
 			children = IconFa(RUMOUR_STATUS_TO_ICON_ARGS[transfer.confirmed])
 		},
 		createDivCell{
-		classes = {'Confidence', CONFIDENCE_TO_COLOR[confidence]},
-		css = {['font-weight'] = 'bold'},
-		children = confidence and String.upperCaseFirst(confidence) or nil
+			classes = {'Confidence', CONFIDENCE_TO_COLOR[confidence]},
+			css = {['font-weight'] = 'bold'},
+			children = confidence and String.upperCaseFirst(confidence) or nil
 		}
 	}
 end
