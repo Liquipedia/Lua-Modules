@@ -77,7 +77,6 @@ function TransferRowWidget:render()
 		classes = self:_getClasses(),
 		children = WidgetUtil.collect(
 			self:status(),
-			self:confidence(),
 			self:date(),
 			self:platform(),
 			self:players(),
@@ -214,29 +213,24 @@ function TransferRowWidget:_isSpecialRole(role)
 	return Table.includes(SPECIAL_ROLES, role)
 end
 
----@return Widget?
+---@return Widget[]?
 function TransferRowWidget:status()
 	local transfer = self.transfer
 
 	if not transfer.isRumour then return end
 
-	return createDivCell{
-		classes = {'Status'},
-		children = IconFa(RUMOUR_STATUS_TO_ICON_ARGS[transfer.confirmed])
-	}
-end
-
----@return Widget?
-function TransferRowWidget:confidence()
-	local transfer = self.transfer
-	if not transfer.isRumour then return end
-
 	local confidence = transfer.confidence
 
-	return createDivCell{
+	return {
+		createDivCell{
+			classes = {'Status'},
+			children = IconFa(RUMOUR_STATUS_TO_ICON_ARGS[transfer.confirmed])
+		},
+		createDivCell{
 		classes = {'Confidence', CONFIDENCE_TO_COLOR[confidence]},
 		css = {['font-weight'] = 'bold'},
 		children = confidence and String.upperCaseFirst(confidence) or nil
+		}
 	}
 end
 
