@@ -353,9 +353,10 @@ TransferRowWidget._getTransferArrow = FnUtil.memoize(function (status)
 	return IconFa{iconName = TRANSFER_STATUS_TO_ICON_NAME[status]}
 end)
 
+---@private
 ---@param iconInput string?
 ---@return string|Widget
-TransferRowWidget.getIcon = FnUtil.memoize(function (iconInput)
+TransferRowWidget._getIcon = FnUtil.memoize(function (iconInput)
 	if Logic.isEmpty(iconInput) then
 		return EMPTY_POSITION_ICON
 	end
@@ -388,11 +389,11 @@ function TransferRowWidget:icon()
 		children = WidgetUtil.collect(Array.interleave(
 			Array.map(self.transfer.players, function (player)
 				return HtmlWidgets.Fragment{children = {
-					TransferRowWidget.getIcon(player.icons[1]),
+					TransferRowWidget._getIcon(player.icons[1]),
 					'&nbsp;',
 					TransferRowWidget._getTransferArrow(self:_getStatus()),
 					'&nbsp;',
-					TransferRowWidget.getIcon(player.icons[2] or targetRoleIsSpecialRole and player.icons[1] or nil)
+					TransferRowWidget._getIcon(player.icons[2] or targetRoleIsSpecialRole and player.icons[1] or nil)
 				}}
 			end),
 			HtmlWidgets.Br{}
