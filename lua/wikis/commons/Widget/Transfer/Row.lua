@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -352,10 +353,11 @@ function TransferRowWidget:_createRole(props)
 end
 
 ---@private
----@return Widget
-function TransferRowWidget:_getTransferArrow()
-	return IconFa{iconName = TRANSFER_STATUS_TO_ICON_NAME[self:_getStatus()]}
-end
+---@param status string?
+---@return Widget?
+TransferRowWidget._getTransferArrow = FnUtil.memoize(function (status)
+	return IconFa{iconName = TRANSFER_STATUS_TO_ICON_NAME[status]}
+end)
 
 ---@return Widget
 function TransferRowWidget:icon()
@@ -363,7 +365,7 @@ function TransferRowWidget:icon()
 		return createDivCell{
 			classes = {'Icon'},
 			css = {width = '70px', ['font-size'] = 'larger'},
-			children = self:_getTransferArrow()
+			children = TransferRowWidget._getTransferArrow(self:_getStatus())
 		}
 	end
 
@@ -394,7 +396,7 @@ function TransferRowWidget:icon()
 				return HtmlWidgets.Fragment{children = {
 					getIcon(player.icons[1]),
 					'&nbsp;',
-					self:_getTransferArrow(),
+					TransferRowWidget._getTransferArrow(self:_getStatus()),
 					'&nbsp;',
 					getIcon(player.icons[2] or targetRoleIsSpecialRole and player.icons[1] or nil)
 				}}
