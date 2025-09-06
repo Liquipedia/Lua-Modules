@@ -76,7 +76,7 @@ function TransferRowWidget:render()
 	return HtmlWidgets.Div{
 		classes = self:_getClasses(),
 		children = WidgetUtil.collect(
-			self:status(),
+			self:rumourCells(),
 			self:date(),
 			self:platform(),
 			self:players(),
@@ -214,7 +214,7 @@ function TransferRowWidget:_isSpecialRole(role)
 end
 
 ---@return Widget[]?
-function TransferRowWidget:status()
+function TransferRowWidget:rumourCells()
 	local transfer = self.transfer
 
 	if not transfer.isRumour then return end
