@@ -16,8 +16,7 @@ local staffRoles = {
 	['head coach'] = {category = 'Coaches', display = 'Head Coach', abbreviation = 'C.'},
 	['positional coach'] = {category = 'Coaches', display = 'Positional Coach'},
 	['strategic coach'] = {category = 'Coaches', display = 'Strategic Coach'},
-	['content creator'] = {category = 'Content Creators', display = 'Content Creator', abbreviation = 'CC.'},
-	['creator'] = {category = 'Content Creator', display = 'Content Creator'},
+	['creator'] = {category = 'Content Creators', display = 'Content Creator', abbreviation = 'CC.'},
 	['expert'] = {category = 'Experts', display = 'Expert'},
 	['host'] = {category = 'Hosts', display = 'Host'},
 	['interviewer'] = {category = 'Interviewers', display = 'Interviewer'},
@@ -42,5 +41,9 @@ local staffRoles = {
 staffRoles['commentator'] = staffRoles['caster']
 staffRoles['tournament organizer'] = staffRoles['organizer']
 staffRoles['content producer'] = staffRoles['content creator']
+staffRoles['content creator'] = staffRoles.creator
+staffRoles['content'] = staffRoles.creator
+staffRoles.to = staffRoles.organizer
+staffRoles['asst. coach'] = staffRoles['assistant coach']
 
 return staffRoles

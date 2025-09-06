@@ -80,6 +80,7 @@ return {
 			autoTeam = true,
 			automatedHistory = {
 				mode = 'manualPrio',
+				storeFromWikiCode = true,
 			},
 		},
 	},
