@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
 local Util = {}
@@ -26,6 +27,24 @@ function Util.collect(...)
 		end
 	end
 	return array
+end
+
+---@param widget Widget?
+---@return widget?
+function Util.nilIfRendersEmpty(widget)
+	return Util.rendersNonEmpty(widget) and widget or nil
+end
+
+---@param widget Widget?
+---@return boolean
+function Util.rendersNonEmpty(widget)
+	return not Util.rendersEmpty(widget)
+end
+
+---@param widget Widget?
+---@return boolean
+function Util.rendersEmpty(widget)
+	return widget and Logic.isEmpty(tostring(widget))
 end
 
 return Util
