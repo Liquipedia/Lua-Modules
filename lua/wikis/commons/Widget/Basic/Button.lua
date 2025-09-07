@@ -68,7 +68,7 @@ function Button:render()
 	end
 	if self.props.aligncontent == 'left' then
 		cssTable['justify-content'] = 'left'
-	elseif self.props.aligcontent == 'right' then
+	elseif self.props.aligncontent == 'right' then
 		cssTable['justify-content'] = 'right'
 	end
 
