@@ -19,6 +19,7 @@ local Br = HtmlWidgets.Br
 local Div = HtmlWidgets.Div
 local Small = HtmlWidgets.Small
 local TeamHistoryAuto = Lua.import('Module:Widget/Infobox/TeamHistory/Auto')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local DEFAULT_MODE = 'manual'
 
