@@ -19,7 +19,6 @@ local Br = HtmlWidgets.Br
 local Div = HtmlWidgets.Div
 local Small = HtmlWidgets.Small
 local TeamHistoryAuto = Lua.import('Module:Widget/Infobox/TeamHistory/Auto')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local DEFAULT_MODE = 'manual'
 
@@ -60,13 +59,13 @@ function TeamHistory:_getHistory()
 		return manualInput
 	end
 
-	local automatedHistory = WidgetUtil.nilIfRendersEmpty(TeamHistoryAuto{player = self.props.player, store = true})
+	local automatedHistory = tostring(TeamHistoryAuto{player = self.props.player, store = true})
 
 	if Logic.isEmpty(manualInput) or (mode ~= 'cleanup' and mode ~= 'merge') then
 		return automatedHistory
 	end
 
-	if not automatedHistory then
+	if Logic.isEmpty(automatedHistory) then
 		return manualInput
 	end
 
