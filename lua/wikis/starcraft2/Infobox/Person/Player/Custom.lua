@@ -117,7 +117,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Race',
-				children = {caller:getRaceData(args.race or 'unknown', RACE_FIELD_AS_CATEGORY_LINK)}
+				children = {caller:getRaceData(args.race, RACE_FIELD_AS_CATEGORY_LINK)}
 			}
 		}
 	elseif id == 'role' then return {}
