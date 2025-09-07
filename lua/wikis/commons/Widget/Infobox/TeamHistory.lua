@@ -59,10 +59,14 @@ function TeamHistory:_getHistory()
 		return manualInput
 	end
 
-	local automatedHistory = TeamHistoryAuto{player = self.props.player, store = true}
+	local automatedHistory = WidgetUtil.nilIfRendersEmpty(TeamHistoryAuto{player = self.props.player, store = true})
 
 	if Logic.isEmpty(manualInput) or (mode ~= 'cleanup' and mode ~= 'merge') then
 		return automatedHistory
+	end
+
+	if not automatedHistory then
+		return manualInput
 	end
 
 	if mode == 'merge' then
