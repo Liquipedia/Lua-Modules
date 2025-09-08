@@ -50,7 +50,8 @@ function MatchSummaryMapVetoStart:render()
 		classes = {'brkts-popup-mapveto-vetostart'},
 		children = Array.map(children, function(child, i)
 			return HtmlWidgets.Th{
-				css = {padding = '0.25rem 0.5rem', ['text-align'] = alignments[i] or nil},
+				classes = {'brkts-popup-mapveto__data-cell'},
+				css = {['text-align'] = alignments[i] or nil},
 				children = child
 			}
 		end)
