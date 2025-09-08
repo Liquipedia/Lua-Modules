@@ -42,13 +42,7 @@ function MvpTable.run(args)
 	args = args or {}
 	local parsedArgs = MvpTable._parseArgs(args)
 
-	local matches = Array.map(
-		mw.ext.LiquipediaDB.lpdb('match2', {
-			conditions = TournamentStructure.getMatch2Filter(parsedArgs.matchGroupSpec),
-			limit = 5000,
-		}),
-		MatchGroupUtil.matchFromRecord
-	)
+	local matches = TournamentStructure.fetchMatches(parsedArgs.matchGroupSpec)
 
 	if Logic.isEmpty(matches) then
 		return
