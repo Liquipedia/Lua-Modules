@@ -8,10 +8,10 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
@@ -42,13 +42,9 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@return string?
+---@return Widget?
 function CustomTeam:createBottomContent()
-	return Template.expandTemplate(
-		mw.getCurrentFrame(),
-		'Upcoming and ongoing tournaments of',
-		{team = self.name or self.pagename}
-	)
+	return UpcomingTournaments.team(self.teamTemplate.templatename)
 end
 
 return CustomTeam
