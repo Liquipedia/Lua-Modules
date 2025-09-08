@@ -859,29 +859,28 @@ div.brkts-popup-body-element-thumbs {
 
 	.brkts-popup-mapveto-vetostart {
 		background-color: var( --table-striped-background-color, #f5f5f5 );
-		padding: 0.25rem 0.25rem;
 	}
 
 	.brkts-popup-mapveto-vetoround {
 		background-color: var( --table-background-color, #ffffff );
-		padding: 0.25rem 0.25rem;
 	}
 
 	.brkts-popup-mapveto-vetotype {
 		font-weight: bold;
 		color: var( --clr-on-background, #000000 );
 		border: 0;
-		border-radius: 0;
+		border-radius: 0.875rem;
 		letter-spacing: 0.1em;
 		font-family: "Source Code Pro", monospace;
+		padding: 0 0.5rem;
 	}
 
 	.brkts-popup-mapveto-pick {
-		background-color: var( --clr-forestgreen-background-color, #ddf4dd ) !important;
+		background-color: var( --clr-semantic-positive-40, #27a527 ) !important;
 	}
 
 	.brkts-popup-mapveto-ban {
-		background-color: var( --clr-cinnabar-background-color, #fbdfdf ) !important;
+		background-color: var( --clr-semantic-negative-40, #b81414 ) !important;
 	}
 
 	.brkts-popup-mapveto-defaultban {
