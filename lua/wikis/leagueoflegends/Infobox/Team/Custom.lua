@@ -23,10 +23,10 @@ local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
 local Region = Lua.import('Module:Region')
 local Team = Lua.import('Module:Infobox/Team')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
-local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 local REGION_REMAPPINGS = {
 	['south america'] = 'latin america',
@@ -75,7 +75,7 @@ end
 
 ---@return Widget
 function CustomTeam:createBottomContent()
-	return UpcomingTournaments{name = self.name}
+	return UpcomingTournaments.team(self.name)
 end
 
 ---@param id string

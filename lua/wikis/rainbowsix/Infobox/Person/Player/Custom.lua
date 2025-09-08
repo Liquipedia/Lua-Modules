@@ -28,9 +28,9 @@ local ConditionUtil = Condition.Util
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
-local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local ACHIEVEMENTS_BASE_CONDITIONS = {
 	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Showmatch', 'Qualifier'}),
@@ -122,10 +122,11 @@ end
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = TeamTemplate.getPageName(self.args.team)
+		---@cast teamPage -nil
 		return HtmlWidgets.Fragment{
 			children = {
 				MatchTicker.participant{team = teamPage},
-				UpcomingTournaments{name = teamPage}
+				UpcomingTournaments.team(teamPage)
 			}
 		}
 	end

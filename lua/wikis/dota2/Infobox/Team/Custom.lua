@@ -17,9 +17,8 @@ local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 local Team = Lua.import('Module:Infobox/Team')
-
-local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 local ACHIEVEMENTS_BASE_CONDITIONS = {
 	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Showmatch', 'Qualifier', 'Charity'}),
@@ -55,7 +54,7 @@ end
 ---@return Widget?
 function CustomTeam:createBottomContent()
 	if not self.args.disbanded then
-		return UpcomingTournaments{name = self.pagename}
+		return UpcomingTournaments.team(self.pagename)
 	end
 end
 

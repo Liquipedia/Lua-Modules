@@ -11,9 +11,9 @@ local Class = Lua.import('Module:Class')
 local PlacementStats = Lua.import('Module:InfoboxPlacementStats')
 
 local Team = Lua.import('Module:Infobox/Team')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class FreeFireInfoboxTeam: InfoboxTeam
@@ -34,7 +34,7 @@ function CustomTeam:createBottomContent()
 			tiers = {'1', '2', '3', '4'},
 			participant = self.name,
 		},
-		not self.args.disbanded and UpcomingTournaments{name = self.pagename} or nil
+		not self.args.disbanded and UpcomingTournaments.team(self.pagename) or nil
 	)}
 end
 
