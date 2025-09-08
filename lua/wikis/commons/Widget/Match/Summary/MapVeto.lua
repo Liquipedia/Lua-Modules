@@ -32,7 +32,7 @@ function MatchSummaryMapVeto:render()
 		children = HtmlWidgets.Table{
 			classes = {'wikitable-striped', 'collapsible', 'collapsed'},
 			children = WidgetUtil.collect(
-				HtmlWidgets.Tr{children = {
+				HtmlWidgets.Tr{css = {padding = '0.25rem 0.25rem'}, children = {
 					HtmlWidgets.Th{css = {width = '33%'}},
 					HtmlWidgets.Th{css = {width = '34%', ['text-align'] = 'center'}, children = 'Map Veto'},
 					HtmlWidgets.Th{css = {width = '33%'}},
