@@ -41,7 +41,6 @@ function VodButton:render()
 		link = vodLink,
 		size = 'sm',
 		grow = useGrow,
-		aligncontent = 'left',
 		children = useDropdownVariant and {
 			Icon{iconName = 'vod_play', size = 'sm'},
 			HtmlWidgets.Span{
