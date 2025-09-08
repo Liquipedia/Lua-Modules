@@ -44,7 +44,7 @@ function UpcomingTournaments.player(args)
 	local prefix = args.prefix or 'p'
 	local defaultMaxPlayersPerPlacement = Info.config.defaultMaxPlayersPerPlacement or 10
 
-	local conditions = ConditionTree(BooleanOperator.all):add(Array.map(
+	local conditions = ConditionTree(BooleanOperator.any):add(Array.map(
 		Array.range(1, defaultMaxPlayersPerPlacement),
 		function (playerIndex)
 			return ConditionUtil.anyOf(
