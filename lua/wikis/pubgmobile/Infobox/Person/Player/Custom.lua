@@ -18,7 +18,11 @@ local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournam
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
+---@class PubgmobileInfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)
+
+---@class PubgmobileInfoboxPlayerWidgetInjector: WidgetInjector
+---@field caller PubgmobileInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame

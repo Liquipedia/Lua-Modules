@@ -30,7 +30,11 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local SIZE_HERO = '25x25px'
 local MAX_NUMBER_OF_SIGNATURE_HEROES = 3
 
+---@class OverwatchInfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)
+
+---@class OverwatchInfoboxPlayerWidgetInjector: WidgetInjector
+---@field caller OverwatchInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
