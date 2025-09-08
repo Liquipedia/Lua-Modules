@@ -51,8 +51,8 @@ function UpcomingTournaments.player(args)
 				ColumnName(prefix .. playerIndex, 'opponentplayers'),
 				{args.name, args.name:gsub(' ', '_')}
 			)
-		end)
-	)
+		end
+	))
 
 	return UpcomingTournamentsWidget{
 		opponentConditions = conditions
