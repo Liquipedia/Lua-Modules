@@ -22,7 +22,7 @@ local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/Fragment')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 
 local SIZE_HERO = '25x25px'
