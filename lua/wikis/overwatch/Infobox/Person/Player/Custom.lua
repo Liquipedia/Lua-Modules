@@ -19,10 +19,13 @@ local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local SIZE_HERO = '25x25px'
 local MAX_NUMBER_OF_SIGNATURE_HEROES = 3
@@ -97,13 +100,10 @@ function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = TeamTemplate.getPageName(self.args.team)
 		local team2Page = String.isNotEmpty(self.args.team2) and TeamTemplate.getPageName(self.args.team2) or nil
-		return
-			tostring(MatchTicker.player{recentLimit = 3}) ..
-			Template.safeExpand(
-				mw.getCurrentFrame(),
-				'Upcoming and ongoing tournaments of',
-				{team = teamPage}, {team2 = team2Page}
-			)
+		return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+			MatchTicker.player{recentLimit = 3},
+			UpcomingTournaments.team{teamPage, team2Page}
+		)}
 	end
 end
 
