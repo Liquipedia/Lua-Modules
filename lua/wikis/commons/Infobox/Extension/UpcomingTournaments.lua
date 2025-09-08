@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Opponent = Lua.import('Module:Opponent/Custom')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
@@ -34,6 +35,27 @@ function UpcomingTournaments.team(name)
 			ConditionUtil.anyOf(ColumnName('opponenttemplate'), templateNames),
 			ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
 		}
+	}
+end
+
+---@param args {name: string, prefix: string?}
+---@return Widget
+function UpcomingTournaments.player(args)
+	local prefix = args.prefix or 'p'
+	local defaultMaxPlayersPerPlacement = Info.config.defaultMaxPlayersPerPlacement or 10
+
+	local conditions = ConditionTree(BooleanOperator.all):add(Array.map(
+		Array.range(1, defaultMaxPlayersPerPlacement),
+		function (playerIndex)
+			return ConditionUtil.anyOf(
+				ColumnName(prefix .. playerIndex, 'opponentplayers'),
+				{args.name, args.name:gsub(' ', '_')}
+			)
+		end)
+	)
+
+	return UpcomingTournamentsWidget{
+		opponentConditions = conditions
 	}
 end
 

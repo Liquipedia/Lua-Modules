@@ -10,10 +10,10 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
-local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
@@ -74,8 +74,7 @@ end
 ---@return string?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) then
-		return
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of player', {player = self.pagename})
+		UpcomingTournaments.player{name = self.pagename}
 	end
 end
 
