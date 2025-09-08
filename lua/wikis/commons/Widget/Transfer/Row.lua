@@ -195,6 +195,8 @@ function TransferRowWidget:_getStatus()
 		return 'from-team'
 	elseif transfer.to.teams[1] then
 		return 'to-team'
+	elseif self:_isSpecialRole(transfer.from.roles[1]) and self:_isSpecialRole(transfer.to.roles[1]) then
+		return 'neutral'
 	elseif self:_isSpecialRole(transfer.from.roles[1]) then
 		return 'to-team'
 	elseif self:_isSpecialRole(transfer.to.roles[1]) then
