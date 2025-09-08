@@ -57,30 +57,30 @@ function MatchSummaryMapVetoRound:render()
 	if vetoType == VETO_DECIDER then
 		children = {
 			HtmlWidgets.Td{
-				css = {padding = '0.25rem 0.5rem',['text-align'] = 'left'},
+				classes = {'brkts-popup-mapveto__data-cell-text-left'},
 				children = createVetoTypeElement()
 			},
 			HtmlWidgets.Td{
-				css = {padding = '0.25rem 0.5rem',['text-align'] = 'center'},
+				classes = {'brkts-popup-mapveto__data-cell-text-center'},
 				children = displayMap(self.props.map1)
 			},
 			HtmlWidgets.Td{
-				css = {padding = '0.25rem 0.5rem',['text-align'] = 'right'},
+				classes = {'brkts-popup-mapveto__data-cell-text-right'},
 				children = createVetoTypeElement()
 			},
 		}
 	else
 		children = {
 			HtmlWidgets.Td{
-				css = {padding = '0.25rem 0.5rem',['text-align'] = 'left'},
+				classes = {'brkts-popup-mapveto__data-cell-text-left'},
 				children = displayMap(self.props.map1)
 			},
 			HtmlWidgets.Td{
-				css = {padding = '0.25rem 0.5rem',['text-align'] = 'center'},
+				classes = {'brkts-popup-mapveto__data-cell-text-center'},
 				children = createVetoTypeElement()
 			},
 			HtmlWidgets.Td{
-				css = {padding = '0.25rem 0.5rem',['text-align'] = 'right'},
+				classes = {'brkts-popup-mapveto__data-cell-text-right'},
 				children = displayMap(self.props.map2)
 			},
 		}
