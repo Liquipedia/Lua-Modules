@@ -124,7 +124,7 @@ function CustomPlayer:createBottomContent()
 		return HtmlWidgets.Fragment{
 			children = {
 				MatchTicker.participant{team = teamPage},
-				UpcomingTournaments.player{name = self.pagename}
+				UpcomingTournaments.team(teamPage)
 			}
 		}
 	end
