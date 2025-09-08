@@ -38,7 +38,7 @@ function MatchPageStatsList:render()
 		classes = {'match-bm-team-stats-list'},
 		children = Array.map(
 			Array.filter(self.props.data, function (element)
-				return element.team1Value and element.team2Value
+				return element.team1Value or element.team2Value
 			end),
 			function (dataElement)
 				return self:_renderStat(dataElement)
