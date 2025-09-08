@@ -372,16 +372,16 @@ function MatchGroupLegacy:_populateNewArgs(match2mapping)
 	end)
 end
 
----@param templateid string
----@param oldTemplateid string?
+---@param bracketType string
+---@param oldBracketType string?
 ---@return table
-function MatchGroupLegacy:_get(templateid, oldTemplateid)
-	if Lua.moduleExists('Module:MatchGroup/Legacy/' .. templateid) then
-		mw.log('Module:MatchGroup/Legacy/' .. templateid .. ' exists')
-		return (Lua.import('Module:MatchGroup/Legacy/' .. templateid)[oldTemplateid] or function() return nil end)()
-			or self.get(templateid, self.bracketType)
+function MatchGroupLegacy:_get(bracketType, oldBracketType)
+	if Lua.moduleExists('Module:MatchGroup/Legacy/' .. bracketType) then
+		mw.log('Module:MatchGroup/Legacy/' .. bracketType .. ' exists')
+		return (Lua.import('Module:MatchGroup/Legacy/' .. bracketType)[oldBracketType] or function() return nil end)()
+			or self.get(bracketType, self.bracketType)
 	else
-		return self.get(templateid, self.bracketType)
+		return self.get(bracketType, self.bracketType)
 	end
 end
 
