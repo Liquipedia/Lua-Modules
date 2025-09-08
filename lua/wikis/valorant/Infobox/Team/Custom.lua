@@ -53,7 +53,7 @@ end
 ---@return Widget?
 function CustomTeam:createBottomContent()
 	if not self.args.disbanded then
-		return UpcomingTournaments.team(self.pagename)
+		return UpcomingTournaments.team(self.teamTemplate.templatename)
 	end
 end
 

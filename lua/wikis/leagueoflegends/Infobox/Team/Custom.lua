@@ -75,7 +75,7 @@ end
 
 ---@return Widget
 function CustomTeam:createBottomContent()
-	return UpcomingTournaments.team(self.name)
+	return UpcomingTournaments.team(self.teamTemplate.templatename)
 end
 
 ---@param id string

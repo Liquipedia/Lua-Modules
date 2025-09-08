@@ -34,7 +34,7 @@ function CustomTeam:createBottomContent()
 			tiers = {'1', '2', '3', '4'},
 			participant = self.name,
 		},
-		not self.args.disbanded and UpcomingTournaments.team(self.pagename) or nil
+		not self.args.disbanded and UpcomingTournaments.team(self.teamTemplate.templatename) or nil
 	)}
 end
 
