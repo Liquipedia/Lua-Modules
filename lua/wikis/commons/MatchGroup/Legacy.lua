@@ -435,7 +435,6 @@ function MatchGroupLegacy:generate()
 		args.template,
 		id = args.id,
 		store = args.store,
-		noDuplicateCheck = args.noDuplicateCheck or '{{#var:noDuplicateCheck|}}',
 	}
 	self.mapMappings = {}
 
