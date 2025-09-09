@@ -115,7 +115,7 @@ return {
 				lightMode = 'AH3 Xtend Logo.png',
 			},
 		},
-		aquapazza = {
+		aadm = {
 			abbreviation = 'AADM',
 			name = 'Aquapazza: Aquaplus Dream Match',
 			link = 'Aquapazza: Aquaplus Dream Match',
