@@ -19,7 +19,7 @@ local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
 local Region = Lua.import('Module:Region')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team') -- to be replaced by #5900 / #5649 / ...
+local TeamTemplate = Lua.import('Module:TeamTemplate') -- to be replaced by #5900 / #5649 / ...
 local Tournament = Lua.import('Module:Tournament')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -53,11 +53,11 @@ function EmptyTeamPagePreview:render()
 		return
 	end
 
-	self.team = Team.queryDB('teampage', self.props.pageName or mw.title.getCurrentTitle().prefixedText)
+	self.team = TeamTemplate.getPageName(self.props.pageName or mw.title.getCurrentTitle().prefixedText)
 
 	if not self.team then return end
 
-	self.teams = Team.queryHistoricalNames(self.team)
+	self.teams = TeamTemplate.queryHistoricalNames(self.team)
 
 	local rosterFromLastPlacement = Logic.readBool(self.props.rosterFromLastPlacement)
 
@@ -123,7 +123,7 @@ function EmptyTeamPagePreview:_infobox()
 		location = location or 'World',
 		queryEarningsHistorical = Logic.nilOr(Logic.readBoolOrNil(self.props.queryEarningsHistorical), true),
 		doNotIncludePlayerEarnings = Logic.nilOr(Logic.readBoolOrNil(self.props.doNotIncludePlayerEarnings), true),
-		name = Team.name(nil, self.team),
+		name = TeamTemplate.getRaw(self.team).name,
 		coaches = coaches,
 		region = self:_determineRegionFromPlacements() or rosterRegion,
 		wiki = EmptyTeamPagePreview._getWiki(self.props, games),
@@ -385,10 +385,10 @@ function EmptyTeamPagePreview:_backFillForSquad(startDate, personData)
 	local makeTeamConditions = function(direction)
 		return ConditionTree(BooleanOperator.any):add{
 			Array.map(teams, function(team)
-				return ConditionNode(ColumnName(direction .. 'team'), Comparator.eq, team)
+				return ConditionNode(ColumnName(direction .. 'teamtemplate'), Comparator.eq, team)
 			end),
 			Array.map(teams, function(team)
-				return ConditionNode(ColumnName(direction .. 'team_2'), Comparator.eq, team)
+				return ConditionNode(ColumnName(direction .. 'teamsectemplate'), Comparator.eq, team)
 			end),
 		}
 	end
