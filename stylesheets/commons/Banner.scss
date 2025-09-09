@@ -258,6 +258,12 @@
 		}
 	}
 
+	.wiki-tetris & {
+		@media ( min-width: 768px ) {
+			background: url( https://liquipedia.net/commons/images/a/af/Tetris-banner.jpg ) no-repeat center / cover;
+		}
+	}
+
 	.wiki-tarkovarena & {
 		@media ( min-width: 768px ) {
 			background: url( https://liquipedia.net/commons/images/e/e7/Tarkovarena-banner.png ) no-repeat center / cover;
