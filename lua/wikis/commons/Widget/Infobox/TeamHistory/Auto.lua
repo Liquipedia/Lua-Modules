@@ -5,6 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+---@deprecated
+---to be removed in a follow up PR (first need it this way, then adjust the template and then nuke it)
+
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
