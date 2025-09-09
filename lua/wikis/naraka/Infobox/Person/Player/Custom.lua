@@ -13,12 +13,11 @@ local CharacterNames = Lua.import('Module:CharacterNames', {loadData = true})
 local Class = Lua.import('Module:Class')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team')
-local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
-local Template = Lua.import('Module:Template')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
@@ -34,9 +33,6 @@ local CustomInjector = Class.new(Injector)
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
-
-	player.args.history = TeamHistoryAuto.results{addlpdbdata = true}
-	player.args.autoTeam = true
 
 	return player:createInfobox()
 end
@@ -56,13 +52,13 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
-				content = {table.concat(heroIcons, '&nbsp;')},
+				children = {table.concat(heroIcons, '&nbsp;')},
 			}
 		}
 	elseif id == 'region' then
 		return {}
 	elseif id == 'history' then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 
 	return widgets
@@ -78,18 +74,18 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	end
 
 	if String.isNotEmpty(args.team2) then
-		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(args.team2).page
+		lpdbData.extradata.team2 = TeamTemplate.getPageName(args.team2)
 	end
 
 	return lpdbData
 end
 
----@return string?
+---@return Widget?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
-		return
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+		local teamPage = TeamTemplate.getPageName(self.args.team)
+		---@cast teamPage -nil
+		return UpcomingTournaments.team(teamPage)
 	end
 end
 

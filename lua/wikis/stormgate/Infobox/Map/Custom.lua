@@ -123,13 +123,13 @@ function CustomInjector:parse(id, widgets)
 		return Array.extend(
 			widgets,
 			{
-				Cell{name = typeName, content = self.caller:_displayTypes(args.types)},
-				Cell{name = 'Tileset', content = {args.tileset}},
-				Cell{name = 'Size', content = {self.caller:_getSizeDisplay(args)}},
-				Cell{name = 'Spawn Positions', content = {self.caller:_getSpawnDisplay(args)}},
-				Cell{name = 'Versions', content = {args.versions}},
-				Cell{name = 'Rush distance', content = {args.rushDistance and (args.rushDistance .. ' seconds') or nil}},
-				Cell{name = 'Available Resources', content = {self.caller:_resourcesDisplay(args)}},
+				Cell{name = typeName, children = self.caller:_displayTypes(args.types)},
+				Cell{name = 'Tileset', children = {args.tileset}},
+				Cell{name = 'Size', children = {self.caller:_getSizeDisplay(args)}},
+				Cell{name = 'Spawn Positions', children = {self.caller:_getSpawnDisplay(args)}},
+				Cell{name = 'Versions', children = {args.versions}},
+				Cell{name = 'Rush distance', children = {args.rushDistance and (args.rushDistance .. ' seconds') or nil}},
+				Cell{name = 'Available Resources', children = {self.caller:_resourcesDisplay(args)}},
 			},
 			self.caller:_addCellsFromDataTable(args, LADDER_HISTORY),
 			{hasCampData and Title{children = 'Camp Information'} or nil},
@@ -145,7 +145,7 @@ end
 ---@return Widget[]
 function CustomMap:_addCellsFromDataTable(args, tbl)
 	return Array.map(tbl, function(data)
-		return Cell{name = data.name, content = {args[data.key]}}
+		return Cell{name = data.name, children = {args[data.key]}}
 	end)
 end
 

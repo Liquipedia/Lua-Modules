@@ -36,6 +36,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 local ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
@@ -64,9 +65,9 @@ function CustomPlayer.run(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	player.args.achievements = Achievements.player{noTemplate = true, baseConditions = {
-		'[[liquipediatiertype::]]',
-		'([[liquipediatier::1]] OR [[liquipediatier::2]])',
-		'[[placement::1]]',
+		ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, ''),
+		ConditionUtil.anyOf(ColumnName('liquipediatier'), {1, 2}),
+		ConditionNode(ColumnName('placement'), Comparator.eq, 1),
 	}}
 
 	player.achievements = {}
@@ -95,7 +96,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Race',
-				content = {CustomPlayer._getRaceDisplay(args.race)}
+				children = {CustomPlayer._getRaceDisplay(args.race)}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -104,7 +105,7 @@ function CustomInjector:parse(id, widgets)
 		id == 'history' and
 		string.match(args.retired or '', '%d%d%d%d')
 	then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 	return widgets
 end
@@ -114,16 +115,16 @@ end
 function CustomPlayer:_addCustomCells(args)
 	if args.informationType == BOT_INFORMATION_TYPE then
 		return {
-			Cell{name = 'Programmer', content = {args.programmer}},
-			Cell{name = 'Affiliation', content = {args.affiliation}},
-			Cell{name = 'Bot Version', content = {args.botversion}},
-			Cell{name = 'BWAPI Version', content = {args.bwapiversion}},
-			Cell{name = 'Language', content = {args.language}},
-			Cell{name = 'Wrapper', content = {args.wrapper}},
-			Cell{name = 'Terrain Analysis', content = {args.terrain_analysis}},
-			Cell{name = 'AI Techniques', content = {args.aitechniques}},
-			Cell{name = 'Framework', content = {args.framework}},
-			Cell{name = 'Strategies', content = {args.strategies}},
+			Cell{name = 'Programmer', children = {args.programmer}},
+			Cell{name = 'Affiliation', children = {args.affiliation}},
+			Cell{name = 'Bot Version', children = {args.botversion}},
+			Cell{name = 'BWAPI Version', children = {args.bwapiversion}},
+			Cell{name = 'Language', children = {args.language}},
+			Cell{name = 'Wrapper', children = {args.wrapper}},
+			Cell{name = 'Terrain Analysis', children = {args.terrain_analysis}},
+			Cell{name = 'AI Techniques', children = {args.aitechniques}},
+			Cell{name = 'Framework', children = {args.framework}},
+			Cell{name = 'Strategies', children = {args.strategies}},
 		}
 	end
 
@@ -140,9 +141,9 @@ function CustomPlayer:_addCustomCells(args)
 	return {
 		Cell{
 			name = 'Approx. Winnings ' .. CURRENT_YEAR,
-			content = {currentYearEarnings}
+			children = {currentYearEarnings}
 		},
-		Cell{name = 'Years active', content = {yearsActive}}
+		Cell{name = 'Years active', children = {yearsActive}}
 	}
 end
 
@@ -353,7 +354,7 @@ function CustomPlayer:calculateEarnings(args)
 	local player = self.pagename
 	local playerWithUnderScores = player:gsub(' ', '_')
 	local playerConditions = ConditionTree(BooleanOperator.any)
-	for playerIndex = 1, Info.maximumNumberOfPlayersInPlacements do
+	for playerIndex = 1, Info.config.defaultMaxPlayersPerPlacement do
 		playerConditions:add{
 			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, player),
 			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, playerWithUnderScores),

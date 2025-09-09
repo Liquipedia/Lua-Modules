@@ -1,0 +1,52 @@
+name: Update Visual Snapshots
+
+on: [pull_request]
+
+jobs:
+  update-snapshots:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.head_ref }}
+          # Support runs of this action in forks
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+      - name: Setup lua
+        # Workaround until https://github.com/leafo/gh-actions-lua/issues/57 is resolved
+        # uses: leafo/gh-actions-lua@v11
+        uses: lewis6991/gh-actions-lua@01aab24c4de9555717b685f9b142a2abbe12ef14
+        with:
+          luaVersion: '5.1'
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Setup luarocks
+        uses: leafo/gh-actions-luarocks@v5
+
+      - name: Setup dependencies
+        run: |
+          npm install
+          luarocks install --lua-version=5.1 busted
+
+      # Very slow (3mins) - can probably be made faster using http://github.com/microsoft/playwright/issues/23388
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Update snapshots
+        run: UPDATE_SNAPSHOTS=true npm run lua-test
+
+      - name: Commit and push if snapshots changed
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          commit_message: "chore: update visual snapshots"
+          file_pattern: 'lua/spec/snapshots/*.png'
+          push_options: '--no-verify'

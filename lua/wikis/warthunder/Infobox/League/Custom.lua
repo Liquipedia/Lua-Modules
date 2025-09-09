@@ -5,14 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class WarThunderLeagueInfobox: InfoboxLeague
@@ -55,8 +56,8 @@ function CustomInjector:parse(id, widgets)
 		local vehicle = VEHICLES[string.lower(args.vehicle or '')] or 'Unknown'
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Mode', content = {mode}},
-			Cell{name = 'Vehicle', content = {vehicle}}
+			Cell{name = 'Mode', children = {mode}},
+			Cell{name = 'Vehicle', children = {vehicle}}
 		)
 	end
 

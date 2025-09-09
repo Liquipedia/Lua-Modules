@@ -5,14 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Icon = require('Module:Icon')
-local Faction = require('Module:Faction')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Icon = Lua.import('Module:Icon')
+local Faction = Lua.import('Module:Faction')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -39,7 +40,6 @@ local CustomMatchSummary = {}
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px'})
-		:addClass('brkts-popup-sc')
 end
 
 ---@param match table
@@ -55,15 +55,14 @@ function CustomMatchSummary.createBody(match)
 
 	return WidgetUtil.collect(
 		isResetMatch and MatchSummaryWidgets.Row{
-			classes = {'brkts-popup-sc-veto-center'},
-			css = {['line-height'] = '80%', ['font-weight'] = 'bold'},
+			css = {['line-height'] = '80%', ['font-weight'] = 'bold', ['text-align'] = 'center'},
 			children = {'Reset match'},
 		} or nil,
 		Array.map(match.opponents, CustomMatchSummary.advantageOrPenalty),
 		subMatches and Array.map(subMatches, CustomMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(CustomMatchSummary.Game, {hasHeroes = hasHeroes})),
 		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
-			classes = {'brkts-popup-sc-veto-center'},
+			css = {['text-align'] = 'center'},
 			children = {HtmlWidgets.B{children = {'Vetoes'}}},
 		} or nil,
 		Array.map(match.vetoes or {}, CustomMatchSummary.Veto) or nil
@@ -115,7 +114,7 @@ function CustomMatchSummary.advantageOrPenalty(opponent)
 	local value = tonumber(extradata.advantage) or tonumber(extradata.penalty)
 
 	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-sc-game-center'},
+		css = {['text-align'] = 'center'},
 		children = {
 			OpponentDisplay.InlineOpponent{
 				opponent = Opponent.isTbd(opponent) and Opponent.tbd() or opponent,
@@ -161,7 +160,7 @@ function CustomMatchSummary.Game(options, game)
 			showOffFactionIcons and offFactionIcons(2) or nil,
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			CustomMatchSummary.DisplayHeroes(game.opponents[2], {hasHeroes = options.hasHeroes, flipped = true}),
-			MatchSummaryWidgets.GameComment{children = game.comment, classes = {'brkts-popup-sc-game-comment'}}
+			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
 	}
 end
@@ -195,13 +194,9 @@ function CustomMatchSummary.DisplayHeroes(opponent, options)
 		classes = {'brkts-popup-body-element-vertical-centered'},
 		css = {['flex-direction'] = 'column', ['padding-' .. (options.flipped and 'left' or 'right')] = '8px'},
 		children = Array.map(heroesPerPlayer, function(heroes)
-			return HtmlWidgets.Div{
-				classes = {'brkts-popup-body-element-thumbs', 'brkts-champion-icon'},
-				children = MatchSummaryWidgets.Characters{
-					flipped = options.flipped,
-					characters = heroes,
-					bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (options.flipped and 'blue' or 'red'),
-				},
+			return MatchSummaryWidgets.Characters{
+				flipped = options.flipped,
+				characters = heroes,
 			}
 		end)
 	}
@@ -225,21 +220,22 @@ function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 
 	local createOpponent = function(opponentIndex)
 		local players = (opponents[opponentIndex] or {}).players or {}
-		if Logic.isEmpty(players) then
-			players = Opponent.tbd(Opponent.solo).players
-		end
+		local opponent = Opponent.tbd(Opponent.partyTypes[math.max(#players, 1)])
+		opponent.players = Logic.nilIfEmpty(players) or opponent.players
 		return OpponentDisplay.BlockOpponent{
 			flip = opponentIndex == 1,
-			opponent = {players = players, type = Opponent.partyTypes[math.max(#players, 1)]},
+			opponent = opponent,
 			showLink = true,
 			overflow = 'ellipsis',
 		}
 	end
 
 	---@param opponentIndex any
-	---@return Html
-	local createScore = function(opponentIndex)
+	---@param additionalClasses string[]?
+	---@return Widget
+	local createScore = function(opponentIndex, additionalClasses)
 		return OpponentDisplay.BlockScore{
+			additionalClasses = additionalClasses,
 			isWinner = opponentIndex == submatch.winner or submatch.winner == 0,
 			scoreText = DisplayHelper.MapScore(submatch.opponents[opponentIndex], submatch.status),
 		}
@@ -253,13 +249,13 @@ function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 				classes = {'brkts-popup-header-opponent', 'brkts-popup-header-opponent-left'},
 				children = {
 					createOpponent(1),
-					createScore(1):addClass('brkts-popup-header-opponent-score-left'),
+					createScore(1, {'brkts-popup-header-opponent-score-left'}),
 				},
 			},
 			HtmlWidgets.Div{
 				classes = {'brkts-popup-header-opponent', 'brkts-popup-header-opponent-right'},
 				children = {
-					createScore(2):addClass('brkts-popup-header-opponent-score-right'),
+					createScore(2, {'brkts-popup-header-opponent-score-right'}),
 					createOpponent(2),
 				},
 			}
@@ -324,7 +320,7 @@ function CustomMatchSummary.Veto(veto)
 				children = {statusIcon(1)},
 			},
 			HtmlWidgets.Div{
-				classes = {'brkts-popup-sc-veto-center'},
+				css = {['text-align'] = 'center'},
 				children = {map},
 			},
 			HtmlWidgets.Div{

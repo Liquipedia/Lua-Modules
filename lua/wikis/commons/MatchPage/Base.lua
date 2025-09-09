@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local Class = Lua.import('Module:Class')
+local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Links = Lua.import('Module:Links')
@@ -18,7 +19,6 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
-local VodLink = Lua.import('Module:VodLink')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
@@ -36,6 +36,7 @@ local Footer = Lua.import('Module:Widget/Match/Page/Footer')
 local Header = Lua.import('Module:Widget/Match/Page/Header')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local VodButton = Lua.import('Module:Widget/Match/VodButton')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -86,10 +87,20 @@ function BaseMatchPage:isBestOfOne()
 end
 
 ---@protected
----@return Html?
+---@return Widget?
 function BaseMatchPage:getCountdownBlock()
-	if self.matchData.timestamp == DateExt.defaultTimestamp then return end
-	return DisplayHelper.MatchCountdownBlock(self.matchData)
+	if DateExt.isDefaultTimestamp(self.matchData.timestamp) then return end
+	return Div{
+		css = {
+			display = 'block',
+			['text-align'] = 'center'
+		},
+		children = Countdown.create{
+			date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
+			finished = self.matchData.finished,
+			rawdatetime = Logic.readBool(self.matchData.finished),
+		}
+	}
 end
 
 ---@private
@@ -116,20 +127,20 @@ function BaseMatchPage:_parseLinks()
 end
 
 ---@protected
----@return (string|Html)[]
+---@return Widget[]
 function BaseMatchPage:getVods()
-	local vods = Array.map(self.games, function(game, gameIdx)
-		return game.vod and VodLink.display{
-			gamenum = gameIdx,
-			vod = game.vod,
-		} or ''
-	end)
-	if String.isNotEmpty(self.matchData.vod) then
-		table.insert(vods, 1, VodLink.display{
-			vod = self.matchData.vod,
-		})
-	end
-	return vods
+	return WidgetUtil.collect(
+		String.isNotEmpty(self.matchData.vod) and VodButton{
+			vodLink = self.matchData.vod
+		} or nil,
+		Array.map(self.games, function(game, gameIdx)
+			return game.vod and VodButton{
+				gameNumber = gameIdx,
+				variant = 'dropdown',
+				vodLink = game.vod,
+			} or nil
+		end)
+	)
 end
 
 ---@param arr any[]
@@ -225,6 +236,7 @@ function BaseMatchPage:render()
 				opponent2 = self.matchData.opponents[2],
 				parent = self.matchData.parent,
 				phase = MatchGroupUtil.computeMatchPhase(self.matchData),
+				stream = self.matchData.stream,
 				tournamentName = self.matchData.tournament,
 				poweredBy = self.getPoweredBy(),
 				highlighted = HighlightConditions.tournament(tournamentContext),
@@ -325,28 +337,31 @@ end
 ---@return Widget
 function BaseMatchPage:footer()
 	local vods = self:getVods()
+	local parsedLinks = self:_parseLinks()
+	local patchLink = self:getPatchLink()
+
 	return Footer{
 		comments = self:_getComments(),
 		children = WidgetUtil.collect(
-			#vods > 0 and AdditionalSection{
+			Logic.isNotEmpty(vods) and AdditionalSection{
 				header = 'VODs',
 				children = vods
 			} or nil,
-			AdditionalSection{
+			Logic.isNotEmpty(parsedLinks) and AdditionalSection{
 				header = 'Links',
 				bodyClasses = { 'vodlink' },
-				children = Array.map(self:_parseLinks(), function (parsedLink)
-					return IconImage{
+				children = Array.map(parsedLinks, function (parsedLink)
+					return HtmlWidgets.Span{children = IconImage{
 						imageLight = parsedLink.icon:sub(6),
 						imageDark = (parsedLink.iconDark or parsedLink.icon):sub(6),
 						link = parsedLink.link
-					}
+					}}
 				end)
-			},
-			AdditionalSection{
+			} or nil,
+			patchLink and AdditionalSection{
 				header = 'Patch',
-				children = { self:getPatchLink() }
-			}
+				children = patchLink
+			} or nil
 		)
 	}
 end
@@ -385,6 +400,7 @@ function BaseMatchPage:addComments()
 end
 
 ---@protected
+---@return Widget?
 function BaseMatchPage:getPatchLink()
 	if Logic.isEmpty(self.matchData.patch) then return end
 	return Link{ link = 'Patch ' .. self.matchData.patch }

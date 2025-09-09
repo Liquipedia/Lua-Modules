@@ -12,17 +12,19 @@ local Class = Lua.import('Module:Class')
 local ChampionNames = Lua.import('Module:ChampionNames', {loadData = true})
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local Logic = Lua.import('Module:Logic')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Page = Lua.import('Module:Page')
 local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local String = Lua.import('Module:StringUtils')
-local Team = Lua.import('Module:Team')
-local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 
 local SIZE_CHAMPION = '25x25px'
@@ -36,11 +38,6 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	local args = player.args
 	player:setWidgetInjector(CustomInjector(player))
-
-	if String.isEmpty(args.history) then
-		args.history = TeamHistoryAuto.results{addlpdbdata = true}
-	end
-	args.autoTeam = true
 
 	local builtInfobox = player:createInfobox()
 
@@ -89,16 +86,16 @@ function CustomInjector:parse(id, widgets)
 		end)
 		return {Cell{
 			name = #championIcons > 1 and 'Signature Champions' or 'Signature Champions',
-			content = {table.concat(championIcons, '&nbsp;')},
+			children = {table.concat(championIcons, '&nbsp;')},
 		}}
 	elseif id == 'status' then
 		local status = args.status and mw.getContentLanguage():ucfirst(args.status) or nil
 
 		return {
-			Cell{name = 'Status', content = {Page.makeInternalLink({onlyIfExists = true}, status) or status}},
+			Cell{name = 'Status', children = {Page.makeInternalLink({onlyIfExists = true}, status) or status}},
 		}
 	elseif id == 'history' then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 	return widgets
 end
@@ -120,13 +117,17 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@return string?
+---@return Widget?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
-		return
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing matches of', {team = teamPage}) ..
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+		local teamPage = TeamTemplate.getPageName(self.args.team)
+		---@cast teamPage -nil
+		return HtmlWidgets.Fragment{
+			children = {
+				MatchTicker.participant{team = teamPage},
+				UpcomingTournaments.team(teamPage)
+			}
+		}
 	end
 end
 

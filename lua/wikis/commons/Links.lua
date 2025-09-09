@@ -146,6 +146,7 @@ local PREFIXES = {
 	gol = {match = 'https://gol.gg/game/stats/'},
 	gosugamers = {''},
 	gplus = {'http://plus.google.com/-plus'},
+	h3gg = {match = 'https://www.h3.gg/competitions/v2/match/'},
 	halodatahive = {
 		'https://halodatahive.com/Tournament/Detail/',
 		team = 'https://halodatahive.com/Team/Detail/',
@@ -193,6 +194,7 @@ local PREFIXES = {
 	matcherinolink = {'https://matcherino.com/t/'},
 	mildom = {'https://www.mildom.com/'},
 	mplink = {match = 'https://osu.ppy.sh/community/matches/'}, -- Should this key be renamed?
+	lazermplink = {match = 'https://osu.ppy.sh/multiplayer/rooms/'},
 	niconico = {'https://www.nicovideo.jp/'},
 	nimotv = {'https://www.nimo.tv/'},
 	['nwc3l'] = {
@@ -277,11 +279,16 @@ local PREFIXES = {
 	stream = {''},
 	telegram = {'https://t.me/'},
 	tespa = {match = 'https://web.archive.org/web/compete.tespa.org/tournament/'},
+	tetrio = {
+		'',
+		player = 'https://ch.tetr.io/u/'
+	},
 	tftv = {
 		'https://www.teamfortress.tv/',
 		player = 'https://www.teamfortress.tv/user/',
 		match = 'http://tf.gg/',
 	},
+	threads = {'https://threads.com/@'},
 	tiktok = {'https://tiktok.com/@'},
 	tlpd = {''},
 	tlpdint = {
@@ -338,6 +345,7 @@ local SUFFIXES = {
 		stream = '/live',
 	},
 	gol = {match = '/page-game/'},
+	lazermplink = {match = '/events'},
 	iccup = {'.html'},
 	['faceit-c'] = {'/'},
 	['faceit-hub'] = {'/'},
@@ -464,6 +472,10 @@ local MATCH_ICONS = {
 		icon = 'File:Gol.gg allmode.png',
 		text = 'GolGG Match Report',
 	},
+	h3gg = {
+		icon = 'File:H3gg icon allmode.png',
+		text = 'H3.gg match details',
+	},
 	halodatahive = {
 		icon = 'File:Halo Data Hive allmode.png',
 		text = 'Match page on Halo Data Hive'
@@ -508,6 +520,10 @@ local MATCH_ICONS = {
 	},
 	mplink = {
 		icon = 'File:Osu single color allmode.png',
+		text = 'Match Data'
+	},
+	lazermplink = {
+		icon = 'File:Osu!lazer allmode.png',
 		text = 'Match Data'
 	},
 	opl = {

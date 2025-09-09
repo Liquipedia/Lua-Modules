@@ -12,11 +12,12 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tier = Lua.import('Module:Tier/Custom')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -32,7 +33,7 @@ local ColumnName = Condition.ColumnName
 local DEFAULT_VALUES = {
 	order = 'desc',
 	resolveOpponent = true,
-	playerLimit = 10,
+	playerLimit = Info.config.defaultMaxPlayersPerPlacement or 10,
 	coachLimit = 5,
 	achievementsLimit = 10,
 	resultsLimit = 5000,
@@ -329,15 +330,13 @@ end
 ---@param opponent string
 ---@return string[]
 function BaseResultsTable._getOpponentTemplates(opponent)
-	local rawOpponentTemplate = Team.queryRaw(opponent) or {}
+	local rawOpponentTemplate = TeamTemplate.getRawOrNil(opponent) or {}
 	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
 	if not opponentTemplate then
-		error('Missing team template for team: ' .. opponent)
+		error(TeamTemplate.noTeamMessage(opponent))
 	end
 
-	local opponentTeamTemplates = Team.queryHistorical(opponentTemplate)
-
-	return Array.append(Array.extractValues(opponentTeamTemplates or {}), opponentTemplate)
+	return TeamTemplate.queryHistoricalNames(opponentTemplate)
 end
 
 ---Builds Lpdb conditions for players on a given team
@@ -449,15 +448,12 @@ end
 ---Builds the opponent display
 ---@param data table
 ---@param options table?
----@return Html?
+---@return Widget|Html?
 function BaseResultsTable:opponentDisplay(data, options)
 	options = options or {}
 
 	if not data.opponenttype then
-		return OpponentDisplay.BlockOpponent{
-			opponent = Opponent.tbd(),
-			flip = options.flip,
-		}
+		return mw.html.create():wikitext('-')
 	elseif data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
 		return OpponentDisplay.BlockOpponent{
 			opponent = Opponent.fromLpdbStruct(data) --[[@as standardOpponent]],
@@ -482,10 +478,10 @@ function BaseResultsTable:opponentDisplay(data, options)
 		return
 	end
 
-	local rawTeamTemplate = Team.queryRaw(teamTemplate, data.date) or {}
+	local rawTeamTemplate = TeamTemplate.getRawOrNil(teamTemplate, data.date) or {}
 
 	local teamDisplay = OpponentDisplay.BlockOpponent{
-		opponent = {template = rawTeamTemplate.templatename, type = Opponent.team},
+		opponent = Opponent.readOpponentArgs{template = rawTeamTemplate.templatename, type = Opponent.team},
 		flip = options.flip,
 		teamStyle = 'icon',
 	}
@@ -512,7 +508,7 @@ function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate, isNotLast
 end
 
 ---Builds team icon display with text below it
----@param teamDisplay Html
+---@param teamDisplay Widget
 ---@param rawTeamTemplate table
 ---@param flip boolean?
 ---@return Html
@@ -545,7 +541,7 @@ end
 
 ---Converts the lastvsdata to display components
 ---@param placement table
----@return string, Html?, string?
+---@return string, Widget|Html?, string?
 function BaseResultsTable:processVsData(placement)
 	local lastVs = placement.lastvsdata or {}
 

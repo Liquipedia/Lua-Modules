@@ -35,7 +35,7 @@ function MatchCountdown:render()
 
 	return HtmlWidgets.Span{
 		classes = {'match-info-countdown'},
-		children = Countdown._create{
+		children = Countdown.create{
 			rawdatetime = match.finished,
 			date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
 			finished = match.finished,

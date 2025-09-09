@@ -7,12 +7,13 @@
 
 local MatchLegacy = {}
 
-local Array = require('Module:Array')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Opponent = require('Module:Opponent')
+
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Opponent = Lua.import('Module:Opponent')
 
 local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
 

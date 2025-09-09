@@ -78,7 +78,7 @@ return {
 	-- Usage: To indicate different transfer type with icon difference not just background colour
 	transferbetween = 'fas fa-arrow-alt-right',
 	transfertofreeagent = 'fas fa-arrow-alt-from-left',
-	fransferfromfreeagent = 'fas fa-arrow-alt-to-right',
+	transferfromfreeagent = 'fas fa-arrow-alt-to-right',
 
 	-- Usage: Reference links in tables (ie transfers)
 	reference = 'fad fa-external-link-alt',
@@ -203,19 +203,24 @@ return {
 	youtube = 'fab fa-youtube',
 	twitch = 'fab fa-twitch',
 	facebook = 'fab fa-facebook-f',
-	kick = 'lp-icon lp-icon-21 lp-kick',
-	afreeca = 'lp-icon lp-icon-21 lp-afreeca',
-	bilibili = 'lp-icon lp-icon-21 lp-bilibili',
+	kick = 'liquipedia-custom-icon liquipedia-custom-icon-kick',
+	afreeca = 'liquipedia-custom-icon liquipedia-custom-icon-afreecatv',
+	bilibili = 'liquipedia-custom-icon liquipedia-custom-icon-bilibili',
 	cc = 'lp-icon lp-icon-21 lp-cc',
-	dailymotion = 'lp-icon lp-icon-21 lp-dailymotion',
-	douyu = 'lp-icon lp-icon-21 lp-douyu',
-	huomao = 'lp-icon lp-icon-21 lp-huomao',
-	huya = 'lp-icon lp-icon-21 lp-huya',
+	dailymotion = 'liquipedia-custom-icon liquipedia-custom-icon-dailymotion',
+	douyu = 'liquipedia-custom-icon liquipedia-custom-icon-duotone  liquipedia-custom-icon-douyu-duotone',
+	huomao = 'liquipedia-custom-icon liquipedia-custom-icon-huomao',
+	huya = 'liquipedia-custom-icon liquipedia-custom-icon-duotone liquipedia-custom-icon-huya-duotone',
 	loco = 'lp-icon lp-icon-21 lp-loco',
 	mildom = 'lp-icon lp-icon-21 lp-mildom',
-	nimo = 'lp-icon lp-icon-21 lp-nimo',
-	trovo = 'lp-icon lp-icon-21 lp-trovo',
-	tl = 'lp-icon lp-icon-21 lp-stream',
-	stream = 'lp-icon lp-icon-21 lp-stream',
-	vod_play = 'far fa-play'
+	nimo = 'liquipedia-custom-icon liquipedia-custom-icon-nimo-tv',
+	trovo = 'liquipedia-custom-icon liquipedia-custom-icon-trovo',
+	tl = 'liquipedia-custom-icon liquipedia-custom-icon-team-liquid',
+	stream = 'liquipedia-custom-icon liquipedia-custom-icon-team-liquid',
+	vod_play = 'far fa-play',
+
+	-- Usage: Formula 1
+	ongoing_series = 'fas fa-hourglass-half ',
+	season_history = 'fas fa-landmark',
+	finished_race = 'fas fa-flag-checkered'
 }

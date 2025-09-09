@@ -47,7 +47,7 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'cost' and not String.isEmpty(args.min) then
 		return {
-			Cell{name = 'Cost', content = {CostDisplay.run{
+			Cell{name = 'Cost', children = {CostDisplay.run{
 				faction = args.race,
 				minerals = args.min,
 				mineralsTotal = args.totalmin,
@@ -63,11 +63,11 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'Lua.importments' then
 		return {
-			Cell{name = 'Lua.importments', content = {String.convertWikiListToHtmlList(args.Lua.imports)}},
+			Cell{name = 'Lua.importments', children = {String.convertWikiListToHtmlList(args.Lua.imports)}},
 		}
 	elseif id == 'hotkey' then
 		return {
-			Cell{name = '[[Shortcuts|Hotkey]]', content = {CustomUnit:_getHotkeys(args)}}
+			Cell{name = '[[Shortcuts|Hotkey]]', children = {CustomUnit:_getHotkeys(args)}}
 		}
 	elseif id == 'type' then
 		local display
@@ -76,7 +76,7 @@ function CustomInjector:parse(id, widgets)
 		elseif args.type then
 			display = args.size .. ' ' .. args.type
 		end
-		return {Cell{name = 'Type', content = {display}}}
+		return {Cell{name = 'Type', children = {display}}}
 	elseif id == 'defense' or id == 'attack' then return {}
 	elseif id == 'customcontent' then
 		local aoeArgs = Json.parseIfTable(args.aoe)
@@ -84,9 +84,9 @@ function CustomInjector:parse(id, widgets)
 
 		return {
 			Title{children = aoeArgs.name},
-			Cell{name = 'Inner', content = {aoeArgs.size1}},
-			Cell{name = 'Medium', content = {aoeArgs.size2}},
-			Cell{name = 'Outer', content = {aoeArgs.size3}},
+			Cell{name = 'Inner', children = {aoeArgs.size1}},
+			Cell{name = 'Medium', children = {aoeArgs.size2}},
+			Cell{name = 'Outer', children = {aoeArgs.size3}},
 			Center{children = {aoeArgs.footnotes and ('<small>' .. aoeArgs.footnotes .. '</small>') or nil}}
 		}
 	elseif id == 'custom' then
@@ -106,40 +106,40 @@ function CustomUnit:getCustomCells(widgets)
 
 	return {
 		Title{children = 'Unit stats'},
-		Cell{name = 'Attributes', content = {args.att}},
-		Cell{name = 'Defense', content = {CustomUnit:_defenseDisplay(args)}},
-		Cell{name = 'Damage', content = {args.damage}},
-		Cell{name = 'Ground Damage', content = {args.ground_attack}},
-		Cell{name = 'Air Damage', content = {args.air_attack}},
-		Cell{name = '[[Distance#Range|Range]]', content = {args.range}},
-		Cell{name = '[[Distance#Range|Ground Range]]', content = {args.grange}},
-		Cell{name = '[[Distance#Range|Air Range]]', content = {args.arange}},
-		Cell{name = '[[Distance#Range|Minimum Range]]', content = {args.mrange}},
-		Cell{name = '[[Distance#Range|Minimum A. Range]]', content = {args.marange}},
-		Cell{name = '[[Distance#Range|Minimum G. Range]]', content = {args.mgrange}},
-		Cell{name = '[[Distance#Leash Range|Leash Range]]', content = {args.lrange}},
-		Cell{name = '[[Game Speed#Cooldown|Cooldown]]', content = {args.cooldown}},
-		Cell{name = '[[Game Speed#Cooldown|G. Cooldown]]', content = {args.gcd}},
-		Cell{name = '[[Game Speed#Cooldown|A. Cooldown]]', content = {args.acd}},
-		Cell{name = '[[Game Speed#Cooldown|Cooldown Bonus]]', content = contentWithBonus('cd2', 2)},
-		Cell{name = '[[Game Speed#Cooldown|G. Cooldown Bonus]]', content = contentWithBonus('gcd2', 4)},
-		Cell{name = '[[Game Speed#Cooldown|A. Cooldown Bonus]]', content = contentWithBonus('acd2', 5)},
-		Cell{name = 'Air Attacks', content = {args.aa}},
-		Cell{name = 'Attacks', content = {args.ga}},
-		Cell{name = '[[Game Speed#DPS|DPS]]', content = {args.dps}},
-		Cell{name = '[[Game Speed#DPS|G. DPS]]', content = {args.gdps}},
-		Cell{name = '[[Game Speed#DPS|A. DPS]]', content = {args.adps}},
-		Cell{name = '[[Game Speed#DPS|DPS Bonus]]', content = contentWithBonus('dps2', 3)},
-		Cell{name = '[[Game Speed#DPS|G. DPS Bonus]]', content = contentWithBonus('gdps2', 6)},
-		Cell{name = '[[Game Speed#DPS|A. DPS Bonus]]', content = contentWithBonus('adps2', 7)},
-		Cell{name = '[[Game Speed#Regeneration Rates|Energy Maximum]]', content = contentWithBonus('energy', 8)},
-		Cell{name = '[[Game Speed#Regeneration Rates|Starting Energy]]', content = contentWithBonus('energystart', 9)},
-		Cell{name = '[[Distance#Range|Sight]]', content = {args.sight}},
-		Cell{name = '[[Distance#Range|Detection Range]]', content = {args.detection_range}},
-		Cell{name = '[[Game Speed#Movement Speed|Speed]]', content = {args.speed}},
-		Cell{name = '[[Game Speed#Movement Speed|Speed Bonus]]', content = contentWithBonus('speed2', 1)},
-		Cell{name = 'Morphs into', content = {args.morphs, args.morphs2}},
-		Cell{name = 'Morphs From', content = {args.morphsf}},
+		Cell{name = 'Attributes', children = {args.att}},
+		Cell{name = 'Defense', children = {CustomUnit:_defenseDisplay(args)}},
+		Cell{name = 'Damage', children = {args.damage}},
+		Cell{name = 'Ground Damage', children = {args.ground_attack}},
+		Cell{name = 'Air Damage', children = {args.air_attack}},
+		Cell{name = '[[Distance#Range|Range]]', children = {args.range}},
+		Cell{name = '[[Distance#Range|Ground Range]]', children = {args.grange}},
+		Cell{name = '[[Distance#Range|Air Range]]', children = {args.arange}},
+		Cell{name = '[[Distance#Range|Minimum Range]]', children = {args.mrange}},
+		Cell{name = '[[Distance#Range|Minimum A. Range]]', children = {args.marange}},
+		Cell{name = '[[Distance#Range|Minimum G. Range]]', children = {args.mgrange}},
+		Cell{name = '[[Distance#Leash Range|Leash Range]]', children = {args.lrange}},
+		Cell{name = '[[Game Speed#Cooldown|Cooldown]]', children = {args.cooldown}},
+		Cell{name = '[[Game Speed#Cooldown|G. Cooldown]]', children = {args.gcd}},
+		Cell{name = '[[Game Speed#Cooldown|A. Cooldown]]', children = {args.acd}},
+		Cell{name = '[[Game Speed#Cooldown|Cooldown Bonus]]', children = contentWithBonus('cd2', 2)},
+		Cell{name = '[[Game Speed#Cooldown|G. Cooldown Bonus]]', children = contentWithBonus('gcd2', 4)},
+		Cell{name = '[[Game Speed#Cooldown|A. Cooldown Bonus]]', children = contentWithBonus('acd2', 5)},
+		Cell{name = 'Air Attacks', children = {args.aa}},
+		Cell{name = 'Attacks', children = {args.ga}},
+		Cell{name = '[[Game Speed#DPS|DPS]]', children = {args.dps}},
+		Cell{name = '[[Game Speed#DPS|G. DPS]]', children = {args.gdps}},
+		Cell{name = '[[Game Speed#DPS|A. DPS]]', children = {args.adps}},
+		Cell{name = '[[Game Speed#DPS|DPS Bonus]]', children = contentWithBonus('dps2', 3)},
+		Cell{name = '[[Game Speed#DPS|G. DPS Bonus]]', children = contentWithBonus('gdps2', 6)},
+		Cell{name = '[[Game Speed#DPS|A. DPS Bonus]]', children = contentWithBonus('adps2', 7)},
+		Cell{name = '[[Game Speed#Regeneration Rates|Energy Maximum]]', children = contentWithBonus('energy', 8)},
+		Cell{name = '[[Game Speed#Regeneration Rates|Starting Energy]]', children = contentWithBonus('energystart', 9)},
+		Cell{name = '[[Distance#Range|Sight]]', children = {args.sight}},
+		Cell{name = '[[Distance#Range|Detection Range]]', children = {args.detection_range}},
+		Cell{name = '[[Game Speed#Movement Speed|Speed]]', children = {args.speed}},
+		Cell{name = '[[Game Speed#Movement Speed|Speed Bonus]]', children = contentWithBonus('speed2', 1)},
+		Cell{name = 'Morphs into', children = {args.morphs, args.morphs2}},
+		Cell{name = 'Morphs From', children = {args.morphsf}},
 	}
 end
 

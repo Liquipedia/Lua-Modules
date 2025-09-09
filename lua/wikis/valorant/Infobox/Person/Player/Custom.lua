@@ -17,16 +17,15 @@ local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local Region = Lua.import('Module:Region')
 local SignaturePlayerAgents = Lua.import('Module:SignaturePlayerAgents')
 local String = Lua.import('Module:StringUtils')
-local Team = Lua.import('Module:Team')
-local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
-local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 local SIZE_AGENT = '20px'
 
@@ -40,12 +39,6 @@ function CustomPlayer.run(frame)
 	local args = player.args
 	player:setWidgetInjector(CustomInjector(player))
 
-	args.history = TeamHistoryAuto.results{
-		convertrole = true,
-		addlpdbdata = true,
-		specialRoles = args.historySpecialRoles
-	}
-	args.autoTeam = true
 	args.agents = SignaturePlayerAgents.get{player = player.pagename, top = 3}
 
 	local builtInfobox = player:createInfobox()
@@ -91,21 +84,21 @@ function CustomInjector:parse(id, widgets)
 			return CharacterIcon.Icon{character = agent, size = SIZE_AGENT}
 		end)
 		return {
-			Cell{name = 'Signature Agent' .. (#icons > 1 and 's' or ''), content = {table.concat(icons, '&nbsp;')}}
+			Cell{name = 'Signature Agent' .. (#icons > 1 and 's' or ''), children = {table.concat(icons, '&nbsp;')}}
 		}
 	elseif id == 'status' then
 		Array.appendWith(widgets,
-			Cell{name = 'Years Active (Player)', content = {args.years_active}},
+			Cell{name = 'Years Active (Player)', children = {args.years_active}},
 			Cell{
 				name = 'Years Active (' .. Abbreviation.make{text = 'Org', title = 'Organisation'} .. ')',
-				content = {args.years_active_org}
+				children = {args.years_active_org}
 			},
-			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
-			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}}
+			Cell{name = 'Years Active (Coach)', children = {args.years_active_coach}},
+			Cell{name = 'Years Active (Talent)', children = {args.years_active_talent}}
 		)
 
 	elseif id == 'history' then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	elseif id == 'region' then
 		return {}
 	end
@@ -129,11 +122,12 @@ end
 ---@return Widget?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
+		local teamPage = TeamTemplate.getPageName(self.args.team)
+		---@cast teamPage -nil
 		return HtmlWidgets.Fragment{
 			children = {
 				MatchTicker.player{recentLimit = 3},
-				UpcomingTournaments{name = teamPage}
+				UpcomingTournaments.team(teamPage)
 			}
 		}
 	end

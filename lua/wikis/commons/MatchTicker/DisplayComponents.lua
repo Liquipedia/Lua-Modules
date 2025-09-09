@@ -322,7 +322,7 @@ function Details:countdown(matchPageIcon)
 
 	local countdownDisplay = mw.html.create('span')
 		:addClass('match-countdown')
-		:node(Countdown._create(countdownArgs))
+		:node(Countdown.create(countdownArgs))
 
 	if Logic.readBool(match.finished) then
 		local function makeVod(vod, num)

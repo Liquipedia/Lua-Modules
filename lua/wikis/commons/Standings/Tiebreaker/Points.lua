@@ -21,4 +21,9 @@ function TiebreakerPoints:valueOf(state, opponent)
 	return opponent.points
 end
 
+---@return string
+function TiebreakerPoints:headerTitle()
+	return 'Points'
+end
+
 return TiebreakerPoints

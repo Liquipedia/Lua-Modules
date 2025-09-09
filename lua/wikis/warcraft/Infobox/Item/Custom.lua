@@ -5,22 +5,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
-local GameClock = require('Module:GameClock')
-local Hotkey = require('Module:Hotkey')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local CostDisplay = Lua.import('Module:Infobox/Extension/CostDisplay')
+local GameClock = Lua.import('Module:GameClock')
+local Hotkey = Lua.import('Module:Hotkey')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Item = Lua.import('Module:Infobox/Item')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
@@ -101,40 +102,40 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'info' then
 		return {
 			Title{children = 'Item Information'},
-			Cell{name = 'Level', content = {args.level}},
-			Cell{name = 'Class', content = {CLASSES[(args.class or ''):lower()] or args.class}},
-			Cell{name = 'Charges', content = {args.charges}},
+			Cell{name = 'Level', children = {args.level}},
+			Cell{name = 'Class', children = {CLASSES[(args.class or ''):lower()] or args.class}},
+			Cell{name = 'Charges', children = {args.charges}},
 		}
 	elseif id == 'availability' then
 		return Array.append(widgets,
 			Title{children = 'Availability'},
-			Cell{name = 'Sold From', content = Array.map(args.soldFrom, function(soldFrom)
+			Cell{name = 'Sold From', children = Array.map(args.soldFrom, function(soldFrom)
 				return '[[' .. soldFrom.link .. '|' .. soldFrom.name .. ']]' end)},
-			Cell{name = 'Requirements', content = {args.requires}},
-			Cell{name = 'Cost', content = {CostDisplay.run{gold = args.gold, lumber = args.lumber}}},
-			Cell{name = 'Sell value', content = {CostDisplay.run{
+			Cell{name = 'Requirements', children = {args.requires}},
+			Cell{name = 'Cost', children = {CostDisplay.run{gold = args.gold, lumber = args.lumber}}},
+			Cell{name = 'Sell value', children = {CostDisplay.run{
 				gold = SELL_FACTOR * (tonumber(args.gold) or 0),
 				lumber = SELL_FACTOR * (tonumber(args.lumber) or 0)
 			}}},
-			Cell{name = 'Purchase Hotkey', content = {args.hotkey and Hotkey.hotkey{hotkey = args.hotkey} or nil}},
-			Cell{name = 'Stock Max', content = {args.stock}},
-			Cell{name = 'Stock Start Delay', content = {args.stockstart and (
+			Cell{name = 'Purchase Hotkey', children = {args.hotkey and Hotkey.hotkey{hotkey = args.hotkey} or nil}},
+			Cell{name = 'Stock Max', children = {args.stock}},
+			Cell{name = 'Stock Start Delay', children = {args.stockstart and (
 				Abbreviation.make{text = args.stockstart .. 's', title = 'First available at ' .. GameClock.run(args.stockstart)}
 			) or nil}},
 			Cell{
 				name = Abbreviation.make{text = 'Stock Repl. Interval',title = 'Stock Replenish Interval'},
-				content = {args.stockreplenish}
+				children = {args.stockreplenish}
 			}
 		)
 	elseif id == 'ability' then
 		return Array.append(widgets,
 			Title{children = 'Ability'},
-			Cell{name = 'Cast Time', content = {args.cast}},
-			Cell{name = 'Cooldown', content = {args.cooldown}},
-			Cell{name = 'Cooldown Group', content = {args.cooldown and (args.coolgroup or
+			Cell{name = 'Cast Time', children = {args.cast}},
+			Cell{name = 'Cooldown', children = {args.cooldown}},
+			Cell{name = 'Cooldown Group', children = {args.cooldown and (args.coolgroup or
 				Abbreviation.make{text = 'Custom', title = 'This item has its own cooldown group.'}
 			) or nil}},
-			Cell{name = 'Duration', content = {args.duration}}
+			Cell{name = 'Duration', children = {args.duration}}
 		)
 	end
 

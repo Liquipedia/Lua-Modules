@@ -5,10 +5,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
@@ -40,16 +40,16 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(
 			widgets,
 			Title{children = 'Basic Attributes'},
-			Cell{name = 'Health', content = {args.health}},
-			Cell{name = 'Damage per second', content = {args.dps}},
-			Cell{name = 'Move Speed', content = {args.movespeed}},
-			Cell{name = 'House', content = {args.house}},
+			Cell{name = 'Health', children = {args.health}},
+			Cell{name = 'Damage per second', children = {args.dps}},
+			Cell{name = 'Move Speed', children = {args.movespeed}},
+			Cell{name = 'House', children = {args.house}},
 			Title{children = 'Basic Stats'},
-			Cell{name = 'Healing', content = {args.healing}},
-			Cell{name = 'Mobility', content = {args.mobility}},
-			Cell{name = 'Offense', content = {args.offense}},
-			Cell{name = 'Defense', content = {args.defense}},
-			Cell{name = 'Utility', content = {args.utility}}
+			Cell{name = 'Healing', children = {args.healing}},
+			Cell{name = 'Mobility', children = {args.mobility}},
+			Cell{name = 'Offense', children = {args.offense}},
+			Cell{name = 'Defense', children = {args.defense}},
+			Cell{name = 'Utility', children = {args.utility}}
 		)
 		return widgets
 	end
@@ -59,6 +59,7 @@ end
 
 ---@param lpdbData table
 ---@param args table
+---@return table
 function CustomHero:addToLpdb(lpdbData, args)
 	lpdbData.extradata.house = args.house
 	lpdbData.extradata.health = args.health

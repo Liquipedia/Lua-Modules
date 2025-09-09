@@ -12,23 +12,30 @@ local CharacterIcon = Lua.import('Module:CharacterIcon')
 local CharacterNames = Lua.import('Module:CharacterNames')
 local Class = Lua.import('Module:Class')
 local GameAppearances = Lua.import('Module:Infobox/Extension/GameAppearances')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team')
-local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Template = Lua.import('Module:Template')
 
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local ACHIEVEMENTS_BASE_CONDITIONS = {
-	'[[liquipediatiertype::!Showmatch]]',
-	'[[liquipediatiertype::!Qualifier]]',
-	'([[liquipediatier::1]] OR [[liquipediatier::2]])',
-	'[[placement::1]]',
+	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Showmatch', 'Qualifier'}),
+	ConditionUtil.anyOf(ColumnName('liquipediatier'), {1, 2}),
+	ConditionNode(ColumnName('placement'), Comparator.eq, 1),
 }
 
 local Widgets = Lua.import('Module:Widget/All')
@@ -47,15 +54,12 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = TeamHistoryAuto.results{addlpdbdata = true, specialRoles = true}
 	-- Automatic achievements
 	player.args.achievements = Achievements.player{
 		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS
 	}
 
 	player.args.banned = tostring(player.args.banned or '')
-
-	player.args.autoTeam = true
 
 	return player:createInfobox()
 end
@@ -74,25 +78,25 @@ function CustomInjector:parse(id, widgets)
 		end)
 		table.insert(widgets, Cell{
 			name = #operatorIcons > 1 and 'Signature Operators' or 'Signature Operator',
-			content = {table.concat(operatorIcons, '&nbsp;')},
+			children = {table.concat(operatorIcons, '&nbsp;')},
 		})
 
 		-- Active in Games
 		table.insert(widgets, Cell{
 			name = 'Game Appearances',
-			content = GameAppearances.player{player = caller.pagename}
+			children = GameAppearances.player{player = caller.pagename}
 		})
 	elseif id == 'status' then
 		return {
-			Cell{name = 'Status', content = caller:_getStatusContents()},
-			Cell{name = 'Years Active (Player)', content = {args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {args.years_active_manage}},
-			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
-			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}},
-			Cell{name = 'Time Banned', content = {args.time_banned}},
+			Cell{name = 'Status', children = caller:_getStatusContents()},
+			Cell{name = 'Years Active (Player)', children = {args.years_active}},
+			Cell{name = 'Years Active (Org)', children = {args.years_active_manage}},
+			Cell{name = 'Years Active (Coach)', children = {args.years_active_coach}},
+			Cell{name = 'Years Active (Talent)', children = {args.years_active_talent}},
+			Cell{name = 'Time Banned', children = {args.time_banned}},
 		}
 	elseif id == 'history' then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 	return widgets
 end
@@ -108,7 +112,7 @@ function CustomPlayer:adjustLPDB(lpdbData, args)
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {args.country})
 
 	if String.isNotEmpty(args.team2) then
-		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(args.team2).page
+		lpdbData.extradata.team2 = TeamTemplate.getPageName(args.team2)
 	end
 
 	return lpdbData
@@ -117,10 +121,14 @@ end
 ---@return string?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(),self.args.team)
-		return
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing matches of', {team = teamPage}) ..
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+		local teamPage = TeamTemplate.getPageName(self.args.team)
+		---@cast teamPage -nil
+		return HtmlWidgets.Fragment{
+			children = {
+				MatchTicker.participant{team = teamPage},
+				UpcomingTournaments.team(teamPage)
+			}
+		}
 	end
 end
 

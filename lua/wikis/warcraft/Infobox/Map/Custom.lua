@@ -41,12 +41,12 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Tileset', content = {args.tileset}},
-			Cell{name = 'Size', content = {(args.width or '') .. 'x' .. (args.height or '')}},
-			Cell{name = 'Spawn Positions', content = {(args.players or '') .. ' at ' .. (args.positions or '')}},
-			Cell{name = 'Versions', content = {String.convertWikiListToHtmlList(args.versions)}},
-			Cell{name = 'Leagues Featured', content = {args.leagues}},
-			Cell{name = 'Mercenary Camps', content = {
+			Cell{name = 'Tileset', children = {args.tileset}},
+			Cell{name = 'Size', children = {(args.width or '') .. 'x' .. (args.height or '')}},
+			Cell{name = 'Spawn Positions', children = {(args.players or '') .. ' at ' .. (args.positions or '')}},
+			Cell{name = 'Versions', children = {String.convertWikiListToHtmlList(args.versions)}},
+			Cell{name = 'Leagues Featured', children = {args.leagues}},
+			Cell{name = 'Mercenary Camps', children = {
 				self.caller:_mercenaryCamp(),
 				self.caller:_mercenaryCamp(2),
 				self.caller:_mercenaryCamp(3),

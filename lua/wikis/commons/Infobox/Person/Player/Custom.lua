@@ -6,7 +6,8 @@
 --
 
 local Lua = require('Module:Lua')
-local Class = require('Module:Class')
+
+local Class = Lua.import('Module:Class')
 
 local Player = Lua.import('Module:Infobox/Person')
 

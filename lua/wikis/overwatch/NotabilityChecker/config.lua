@@ -23,7 +23,6 @@ Config.TIER_TYPE_SHOW_MATCH = 'show match'
 Config.NOTABILITY_THRESHOLD_MIN = 2000
 Config.PLACEMENT_LIMIT = 2000
 
-Config.MAX_NUMBER_OF_PARTICIPANTS = 12
 Config.MAX_NUMBER_OF_COACHES = 6
 
 -- Which LPDB placement parameters do we care about?

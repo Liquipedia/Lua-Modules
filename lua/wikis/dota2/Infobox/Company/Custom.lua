@@ -33,10 +33,8 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
-	if id == 'parent' then
-		table.insert(widgets, Cell{name = 'Focus', content = {args.focus}})
-	elseif id == 'employees' then
-		table.insert(widgets, Cell{name = 'Key People', content = {args.people}})
+	if id == 'employees' then
+		table.insert(widgets, Cell{name = 'Key People', children = {args.people}})
 	end
 
 	return widgets

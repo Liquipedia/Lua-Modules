@@ -63,7 +63,7 @@ function ThisDayQuery.patch(month, day)
 
 	return Patch.queryPatches{
 		limit = 5000,
-		conditions = conditions,
+		additionalConditions = conditions,
 		query = 'pagename, name, date',
 		order = 'date asc, name asc'
 	}

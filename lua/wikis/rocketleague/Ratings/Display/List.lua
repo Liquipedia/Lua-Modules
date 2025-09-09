@@ -5,9 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Operator = require('Module:Operator')
-local Template = require('Module:Template')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Operator = Lua.import('Module:Operator')
+local Template = Lua.import('Module:Template')
 
 ---@class RatingsDisplayList: RatingsDisplayInterface
 local RatingsDisplayList = {}

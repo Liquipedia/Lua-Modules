@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Template = Lua.import('Module:Template')
@@ -24,7 +25,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@operator call(table): ThisDayContent
 local ThisDayContent = Class.new(Widget)
 ThisDayContent.defaultProps = {
-	month = tonumber(os.date('%m')),
+	month = DateExt.getMonthOf(),
 	day = tonumber(os.date('%d'))
 }
 

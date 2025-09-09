@@ -8,8 +8,8 @@
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
+local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
 local DivTable = Lua.import('Module:DivTable')
-local GeneralCollapsible = Lua.import('Module:GeneralCollapsible')
 local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
@@ -26,7 +26,6 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]'
 local DEFAULT_EVENT_ICON = ''
 local TBD = 'TBD'
-local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 20
 
 local CustomResultsTable = {}
 
@@ -35,7 +34,6 @@ local CustomResultsTable = {}
 ---@return Html?
 function CustomResultsTable.results(frame)
 	local args = Arguments.getArgs(frame)
-	args.playerLimit = MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS
 	args.useIndivPrize = true
 
 	if Logic.readBool(args.awards) then
@@ -128,7 +126,7 @@ function CustomResultsTable._allKillMatch(args)
 				:addClass('inherit-bg')
 				:cell(mw.html.create('div'):css('width', '35%'):wikitext('vs [[' .. teamName .. ']]'))
 				:cell(mw.html.create('div'):css('width', '30%'):wikitext(''))
-				:cell(mw.html.create('div'):css('width', '35%'):node(GeneralCollapsible.DefaultToggle()))
+				:cell(mw.html.create('div'):css('width', '35%'):node(CollapsibleToggle{}))
 		)
 
 	local mapIndex = 1
@@ -205,7 +203,7 @@ end
 ---@param args table
 ---@param prefix string
 ---@param side number
----@return Html
+---@return Widget
 function CustomResultsTable._opponentDisplay(args, prefix, side)
 	local players = {CustomResultsTable._buildPlayerStruct(args, prefix .. 'p' .. side)}
 
@@ -226,6 +224,7 @@ function CustomResultsTable._opponentDisplay(args, prefix, side)
 		opponent = {
 			type = CustomResultsTable._getOpponentType(#players),
 			players = players,
+			extradata = {},
 		},
 	}
 end

@@ -5,19 +5,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local PlayerIntroduction = require('Module:PlayerIntroduction/Custom')
-local String = require('Module:StringUtils')
-local Team = require('Module:Team')
-local Template = require('Module:Template')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
+local Page = Lua.import('Module:Page')
+local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
+local String = Lua.import('Module:StringUtils')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 
 ---@class BrawlstarsInfoboxPlayer: Person
@@ -81,16 +85,16 @@ function CustomInjector:parse(id, widgets)
 			mmrDisplay = mmrDisplay .. '&nbsp;<small><i>(last update: ' .. args.mmrdate .. '</i></small>'
 		end
 
-		return {Cell{name = 'Solo MMR', content = {mmrDisplay}}}
+		return {Cell{name = 'Solo MMR', children = {mmrDisplay}}}
 	elseif id == 'status' then
 		return {
-			Cell{name = 'Status', content = {CustomPlayer._getStatus(args)}},
-			Cell{name = 'Years Active (Player)', content = {args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {args.years_active_manage}},
-			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
+			Cell{name = 'Status', children = {CustomPlayer._getStatus(args)}},
+			Cell{name = 'Years Active (Player)', children = {args.years_active}},
+			Cell{name = 'Years Active (Org)', children = {args.years_active_manage}},
+			Cell{name = 'Years Active (Coach)', children = {args.years_active_coach}},
 		}
 	elseif id == 'history' then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 	return widgets
 end
@@ -104,18 +108,19 @@ function CustomPlayer:adjustLPDB(lpdbData, args)
 	return lpdbData
 end
 
+---@return Widget?
 function CustomPlayer:createBottomContent()
-	local components = {}
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
+		local teamPage = TeamTemplate.getPageName(self.args.team)
+		---@cast teamPage -nil
 
-		table.insert(components,
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing matches of', {team = teamPage}))
-		table.insert(components,
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage}))
+		return HtmlWidgets.Fragment{
+			children = {
+				MatchTicker.participant{team = teamPage},
+				UpcomingTournaments.team(teamPage)
+			}
+		}
 	end
-
-	return table.concat(components)
 end
 
 ---@param args table
