@@ -61,7 +61,7 @@ function MatchSummaryMapVetoRound:render()
 				children = createVetoTypeElement()
 			},
 			HtmlWidgets.Td{
-				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell_text-center'},
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-center'},
 				children = displayMap(self.props.map1)
 			},
 			HtmlWidgets.Td{
