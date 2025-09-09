@@ -434,23 +434,25 @@ function MatchGroupLegacy:generate()
 	self.newArgs = {
 		args.template,
 		id = args.id,
-		store = self:shouldStoreData(args),
-		noDuplicateCheck = args.noDuplicateCheck,
-		isLegacy = true
+		store = args.store,
+		noDuplicateCheck = args.noDuplicateCheck or '{{#var:noDuplicateCheck|}}',
 	}
 	self.mapMappings = {}
 
 	self:_populateNewArgs(match2mapping)
 	self:handleOtherBracketParams()
 
-	return Json.stringify(self.newArgs)
+	return MatchGroupLegacy._generateWikiCode(self.newArgs)
 end
 
 function MatchGroupLegacy._generateWikiCode(args)
 	local bracketType = Table.extract(args, 1)
-	local bracketDataList = CopyPaste._getBracketData(bracketType)
+	local bracketTypeWithoutPrefix = bracketType:gsub('^[bB]racket/', '')
+	local bracketDataList = CopyPaste._getBracketData(bracketTypeWithoutPrefix)
 	local matches = Array.map(bracketDataList, function(bracketData, matchIndex)
 		local matchKey = bracketData.matchKey
+		local match = Table.extract(args, matchKey)
+		if Logic.isEmpty(match) then return end
 		local header
 		if matchKey == 'RxMTP' then
 			header = '<!-- Third Place Match -->'
@@ -459,21 +461,15 @@ function MatchGroupLegacy._generateWikiCode(args)
 		end
 		local lines = Array.append({},
 			header,
-			'|' .. matchKey .. '=' .. MatchGroupLegacy._generateMatch(Table.extract(args, matchKey))
+			'|' .. matchKey .. '=' .. MatchGroupLegacy._generateMatch(match)
 		)
 
 		return table.concat(lines, '\n')
 	end)
 
-	local otherArgs = {}
-	for key, value in Table.iter.spairs(args) do
-		table.insert(otherArgs, '|' .. key .. '=' .. value)
-	end
-
-	local lines = Array.extend({
-			'{{Bracket|' .. bracketType .. '|id=' .. Table.extract(args, 1),
-		},
-		table.concat(otherArgs),
+	local lines = Array.extend(
+		{'{{Bracket|' .. bracketType .. '|id=' .. Table.extract(args, 'id')},
+		MatchGroupLegacy._argsToString(args),
 		matches,
 		'}}'
 	)
@@ -489,38 +485,65 @@ function MatchGroupLegacy._generateMatch(match)
 		if Logic.isEmpty(opp) then return end
 		return '|opponent' .. opponentIndex .. '=' .. MatchGroupLegacy._generateOpponent(opp)
 	end)
+
 	local maps = Array.mapIndexes(function(mapIndex)
 		local map = Table.extract(match, 'map' .. mapIndex)
 		if Logic.isEmpty(map) then return end
 		return '|map' .. mapIndex .. '=' .. MatchGroupLegacy._generateMap(map)
 	end)
 
-	local otherArgs = {}
-	for key, value in Table.iter.spairs(match) do
-		table.insert(otherArgs, '|' .. key .. '=' .. value)
-	end
-
 	local addIndents = function(arr)
 		return Array.map(arr, function(item) return '    ' .. item end)
 	end
 
 	return table.concat(Array.extend({'{{Match'},
-		addIndents(table.concat(otherArgs)),
+		addIndents({MatchGroupLegacy._argsToString(match)}),
 		addIndents(opponents),
-		addIndents(maps)
+		addIndents(maps),
+		'}}'
 	), '\n')
 end
 
 ---@param opp table
 ---@return string
 function MatchGroupLegacy._generateOpponent(opp)
-	--todo
+	local opponentType = Table.extract(opp, 'type')
+	local opponentTemplate = String.upperCaseFirst(opponentType) .. 'Opponent'
+
+	return '{{' .. opponentTemplate .. MatchGroupLegacy._argsToString(opp) .. '}}'
 end
 
 ---@param map table
 ---@return string
 function MatchGroupLegacy._generateMap(map)
-	--todo
+	for key, value in pairs(map) do
+		if type(value) == 'table' then
+			map[key] = Json.stringify(value)
+		end
+	end
+
+	return '{{Map' .. MatchGroupLegacy._argsToString(map) .. '}}'
+end
+
+---@param args table
+---@return string
+function MatchGroupLegacy._argsToString(args)
+	local otherArgs = {}
+	local compare = function(tbl, a, b)
+		if type(a) == type(b) then
+			return a < b
+		end
+		if type(a) == 'number' then
+			return true
+		end
+		return false
+	end
+
+	for key, value in Table.iter.spairs(args, compare) do
+		table.insert(otherArgs, '|' .. key .. '=' .. tostring(value))
+	end
+
+	return table.concat(otherArgs)
 end
 
 return MatchGroupLegacy
