@@ -36,6 +36,7 @@ local staffRoles = {
 	['talent'] = {category = 'Talents', display = 'Talent'},
 	['organizer'] = {category = 'Tournament Organizer', display = 'Tournament Organizer'},
 	['staff'] = {category = 'Staff', display = 'Staff'},
+	['referee'] = {category = 'Referees', display = 'Referee'},
 }
 
 staffRoles['commentator'] = staffRoles['caster']
@@ -45,5 +46,6 @@ staffRoles['content creator'] = staffRoles.creator
 staffRoles['content'] = staffRoles.creator
 staffRoles.to = staffRoles.organizer
 staffRoles['asst. coach'] = staffRoles['assistant coach']
+staffRoles['mapper'] = staffRoles['map maker']
 
 return staffRoles
