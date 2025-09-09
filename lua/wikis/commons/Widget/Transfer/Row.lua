@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -75,8 +76,7 @@ function TransferRowWidget:render()
 	return HtmlWidgets.Div{
 		classes = self:_getClasses(),
 		children = WidgetUtil.collect(
-			self:status(),
-			self:confidence(),
+			self:rumourCells(),
 			self:date(),
 			self:platform(),
 			self:players(),
@@ -195,6 +195,8 @@ function TransferRowWidget:_getStatus()
 		return 'from-team'
 	elseif transfer.to.teams[1] then
 		return 'to-team'
+	elseif self:_isSpecialRole(transfer.from.roles[1]) and self:_isSpecialRole(transfer.to.roles[1]) then
+		return 'neutral'
 	elseif self:_isSpecialRole(transfer.from.roles[1]) then
 		return 'to-team'
 	elseif self:_isSpecialRole(transfer.to.roles[1]) then
@@ -213,29 +215,24 @@ function TransferRowWidget:_isSpecialRole(role)
 	return Table.includes(SPECIAL_ROLES, role)
 end
 
----@return Widget?
-function TransferRowWidget:status()
+---@return Widget[]?
+function TransferRowWidget:rumourCells()
 	local transfer = self.transfer
 
-	if not transfer.isRumour then return end
-
-	return createDivCell{
-		classes = {'Status'},
-		children = IconFa(RUMOUR_STATUS_TO_ICON_ARGS[transfer.confirmed])
-	}
-end
-
----@return Widget?
-function TransferRowWidget:confidence()
-	local transfer = self.transfer
 	if not transfer.isRumour then return end
 
 	local confidence = transfer.confidence
 
-	return createDivCell{
-		classes = {'Confidence', CONFIDENCE_TO_COLOR[confidence]},
-		css = {['font-weight'] = 'bold'},
-		children = confidence and String.upperCaseFirst(confidence) or nil
+	return {
+		createDivCell{
+			classes = {'Status'},
+			children = IconFa(RUMOUR_STATUS_TO_ICON_ARGS[transfer.confirmed])
+		},
+		createDivCell{
+			classes = {'Confidence', CONFIDENCE_TO_COLOR[confidence]},
+			css = {['font-weight'] = 'bold'},
+			children = confidence and String.upperCaseFirst(confidence) or nil
+		}
 	}
 end
 
@@ -352,10 +349,29 @@ function TransferRowWidget:_createRole(props)
 end
 
 ---@private
----@return Widget
-function TransferRowWidget:_getTransferArrow()
-	return IconFa{iconName = TRANSFER_STATUS_TO_ICON_NAME[self:_getStatus()]}
-end
+---@param status string?
+---@return Widget?
+TransferRowWidget._getTransferArrow = FnUtil.memoize(function (status)
+	return IconFa{iconName = TRANSFER_STATUS_TO_ICON_NAME[status]}
+end)
+
+---@private
+---@param iconInput string?
+---@return string|Widget
+TransferRowWidget._getIcon = FnUtil.memoize(function (iconInput)
+	if Logic.isEmpty(iconInput) then
+		return EMPTY_POSITION_ICON
+	end
+	---@cast iconInput -nil
+	local icon = IconModule[iconInput:lower()]
+	if not icon then
+		mw.log( 'No entry found in Module:PositionIcon/data: ' .. iconInput)
+		mw.ext.TeamLiquidIntegration.add_category('Pages with transfer errors')
+		return EMPTY_POSITION_ICON
+	end
+
+	return icon
+end)
 
 ---@return Widget
 function TransferRowWidget:icon()
@@ -363,25 +379,8 @@ function TransferRowWidget:icon()
 		return createDivCell{
 			classes = {'Icon'},
 			css = {width = '70px', ['font-size'] = 'larger'},
-			children = self:_getTransferArrow()
+			children = TransferRowWidget._getTransferArrow(self:_getStatus())
 		}
-	end
-
-	---@param iconInput string?
-	---@return string|Widget
-	local getIcon = function(iconInput)
-		if Logic.isEmpty(iconInput) then
-			return EMPTY_POSITION_ICON
-		end
-		---@cast iconInput -nil
-		local icon = IconModule[iconInput:lower()]
-		if not icon then
-			mw.log( 'No entry found in Module:PositionIcon/data: ' .. iconInput)
-			mw.ext.TeamLiquidIntegration.add_category('Pages with transfer errors')
-			return EMPTY_POSITION_ICON
-		end
-
-		return icon
 	end
 
 	local targetRoleIsSpecialRole = self:_isSpecialRole(self.transfer.to.roles[1])
@@ -392,11 +391,11 @@ function TransferRowWidget:icon()
 		children = WidgetUtil.collect(Array.interleave(
 			Array.map(self.transfer.players, function (player)
 				return HtmlWidgets.Fragment{children = {
-					getIcon(player.icons[1]),
+					TransferRowWidget._getIcon(player.icons[1]),
 					'&nbsp;',
-					self:_getTransferArrow(),
+					TransferRowWidget._getTransferArrow(self:_getStatus()),
 					'&nbsp;',
-					getIcon(player.icons[2] or targetRoleIsSpecialRole and player.icons[1] or nil)
+					TransferRowWidget._getIcon(player.icons[2] or targetRoleIsSpecialRole and player.icons[1] or nil)
 				}}
 			end),
 			HtmlWidgets.Br{}

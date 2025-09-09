@@ -18,6 +18,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TransferRef = Lua.import('Module:Transfer/References')
+local Variables = Lua.import('Module:Variables')
 local Widget = Lua.import('Module:Widget')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -31,46 +32,102 @@ local Th = HtmlWidgets.Th
 local Tr = HtmlWidgets.Tr
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local SPECIAL_ROLES = {
-	'Retired',
-	'Retirement',
-	'Military',
-	'Banned',
-	'Producer',
-	'Caster',
-	'Admin',
-	'Observer',
-	'Host',
-	'Talent',
-	'League Operator',
-	'Inactive'
-}
+local SPECIAL_ROLES = Lua.import('Module:Infobox/Extension/TeamHistory/SpecialRoles', {loadData = true})
 local LOAN = 'Loan'
 local POSITION_ICON_DATA = Lua.requireIfExists('Module:PositionIcon/data', {loadData = true})
 
 -- todo at a later date: move into standardized role data where reasonable or kick
 local NOT_YET_IN_ROLES_DATA = {
+	['advisor'] = {display = 'Advisor'},
+	['ambassador'] = {display = 'Ambassador'},
+	['assistant coach/analyst'] = {display = 'Asst. Coach&Analyst'},
+	['assistant general manager'] = {display = 'Assistant General Manager', abbreviation = 'AGM.'},
+	['assistant team manager'] = {display = 'Assistant Team Manager', abbreviation = 'ATM.'},
+	['associate producer'] = {display = 'Associate Producer'},
+	['asst. coach/manager'] = {display = 'Asst. Coach/Manager'},
+	['backup'] = {display = 'Backup'},
+	['ceo'] = {display = 'CEO'},
 	['coach/analyst'] = {display = 'Coach/Analyst', abbreviation = 'C./A.'},
-	['coach and analyst'] = {display = 'Coach/Analyst', abbreviation = 'C./A.'},
-	['overall coach'] = {display = 'Overall Coach', abbreviation = 'OC.'},
+	['coach/manager'] = {display = 'Coach/Manager'},
+	['coach/substitute'] = {display = 'Coach/Substitute'},
+	['co-ceo'] = {display = 'CO-CEO'},
+	['co-coach'] = {display = 'Co-Coach'},
+	['committee'] = {display = 'Committee'},
+	['community lead'] = {display = 'Community Lead'},
+	['damage'] = {display = 'Damage'},
+	['data science'] = {display = 'Data Scientist'},
+	['director of athletics'] = {display = 'Director of Athletics'},
+	['director of overwatch operations'] = {display = 'Director of Overwatch Operations', abbreviation = 'DOO'},
+	['director of players'] = {display = 'Director of Players', abbreviation = 'DP'},
+	['director of team operations'] = {display = 'Director of Team Operations', abbreviation = 'DTO'},
+	['founder & training director'] = {display = 'Founder & Training Director', abbreviation = 'F. & TD.'},
+	['founder'] = {display = 'Founder'},
+	['freestyler'] = {display = 'Freestyler'},
+	['front line'] = {display = 'Front Line'},
+	['general manager'] = {display = 'General Manager', abbreviation = 'GM.'},
+	['graphic designer'] = {display = 'Graphic Designer'},
+	['guest'] = {display = 'Guest'},
+	['head of competitive operations'] = {display = 'Head of Competitive Operations', abbreviation = 'HCO'},
+	['head of esports'] = {display = 'Head of esports'},
+	['head of gaming'] = {display = 'Head of Gaming'},
+	['head of socials'] = {display = 'Head of Socials'},
+	['inactive coach'] = {display = 'Inactive Coach'},
+	['inactive loan'] = {display = 'Inactive Loan'},
+	['inactive manager'] = {display = 'Inactive Manager'},
+	['inactive'] = {display = 'Inactive', abbreviation = 'Ia.'},
+	['interim coach'] = {display = 'Interim Coach'},
+	['loaned assistant coach'] = {display = 'Loaned Asst. Coach'},
+	['loaned coach'] = {display = 'Loaned Coach'},
 	['manager and analyst'] = {display = 'Manager/Analyst', abbreviation = 'M./A.'},
 	['manager/analyst'] = {display = 'Manager/Analyst', abbreviation = 'M./A.'},
-	['general manager'] = {display = 'General Manager', abbreviation = 'GM.'},
-	['assistant general manager'] = {display = 'Assistant General Manager', abbreviation = 'AGM.'},
+	['manager/substitute'] = {display = 'Manager/Substitute'},
+	['mental coach/manager'] = {display = 'Mental Coach/Manager'},
+	['mental coach'] = {display = 'Mental Coach'},
+	['organisation'] = {display = 'Organization', abbreviation = 'Org.'},
+	['overall coach'] = {display = 'Overall Coach', abbreviation = 'OC.'},
+	['pa'] = {display = 'Passed Away'},
+	['performance coach'] = {display = 'Performance Coach', abbreviation = 'PC'},
+	['qualifier'] = {display = 'Qualifier'},
+	['rlcs stand-in'] = {display = 'RLCS Stand-in'},
+	['social media coordinator'] = {display = 'Social Media Coordinator', abbreviation = 'SMC'},
+	['social media manager'] = {display = 'Social Media Manager', abbreviation = 'SMM'},
+	['sports director'] = {display = 'Sports Dir.'},
+	['stand-in-coach'] = {display = 'Stand-in-Coach'},
+	['substitute/manager'] = {display = 'Substitute/Manager'},
+	['substitute'] = {display = 'Substitute', abbreviation = 'Sub.'},
+	['suspended coach'] = {display = 'Suspended Coach'},
+	['suspended'] = {display = 'Suspended'},
+	['tactical coach'] = {display = 'Tactical Coach'},
+	['talent scout'] = {display = 'Talent Scout'},
+	['team leader'] = {display = 'Team Leader'},
 	['team manager'] = {display = 'Team Manager', abbreviation = 'TM.'},
-	['assistant team manager'] = {display = 'Assistant Team Manager', abbreviation = 'ATM.'},
-	substitute = {display = 'Substitute', abbreviation = 'Sub.'},
-	inactive = {display = 'Inactive', abbreviation = 'Ia.'},
+	['team owner'] = {display = 'Team Owner'},
+	['teamless'] = {display = 'Teamless'},
+	['trainee coach'] = {display = 'Trainee Coach'},
+	['trainee'] = {display = 'Trainee'},
 	['training advisor'] = {display = 'Training Advisor', abbreviation = 'TA.'},
-	['founder & training director'] = {display = 'Founder & Training Director', abbreviation = 'F. & TD.'},
+	['trial analyst'] = {display = 'Trial Analyst'},
+	['trial coach'] = {display = 'Trial Coach'},
+	['trial loan'] = {display = 'Trial Loan'},
+	['trial'] = {display = 'Trial'},
+	['tryout'] = {display = 'Tryout'},
+	['uncontracted coach'] = {display = 'Uncontracted Coach'},
+	['uncontracted'] = {display = 'Uncontracted'},
 }
+NOT_YET_IN_ROLES_DATA['coach and analyst'] = NOT_YET_IN_ROLES_DATA['coach/analyst']
+NOT_YET_IN_ROLES_DATA['coach & analyst'] = NOT_YET_IN_ROLES_DATA['coach/analyst']
+NOT_YET_IN_ROLES_DATA.gm = NOT_YET_IN_ROLES_DATA['general manager']
+NOT_YET_IN_ROLES_DATA.sub = NOT_YET_IN_ROLES_DATA.substitute
+NOT_YET_IN_ROLES_DATA.org = NOT_YET_IN_ROLES_DATA.organisation
+NOT_YET_IN_ROLES_DATA.organization = NOT_YET_IN_ROLES_DATA.organisation
+
+local HAS_REFS = ((Info.config.infoboxPlayer or {}).automatedHistory or {}).hasHeaderAndRefs
 
 ---@class TeamHistoryDisplayWidget: Widget
 ---@operator call(table): TeamHistoryDisplayWidget
----@field props {transferList: table[], hasHeaderAndRefs: boolean?, player: string}
+---@field props {transferList: TransferSpan[], player: string}
 local TeamHistoryDisplay = Class.new(Widget)
 TeamHistoryDisplay.defaultProps = {
-	hasHeaderAndRefs = ((Info.config.infoboxPlayer or {}).automatedHistory or {}).hasHeaderAndRefs,
 	transferList = {},
 	player = String.upperCaseFirst(mw.title.getCurrentTitle().subpageText),
 }
@@ -79,10 +136,13 @@ TeamHistoryDisplay.defaultProps = {
 function TeamHistoryDisplay:render()
 	if Logic.isEmpty(self.props.transferList) then return end
 
+	local offset = tonumber(Variables.varDefault('teamhistory_index')) or 0
+	Variables.varDefine('teamhistory_index', offset + #self.props.transferList)
+
 	return Tbl{
 		css = {width = '100%', ['text-align'] = 'left'},
 		children = WidgetUtil.collect(
-			self.props.hasHeaderAndRefs and self:_header() or nil,
+			HAS_REFS and offset == 0 and self:_header() or nil,
 			Array.map(self.props.transferList, FnUtil.curry(self._row, self))
 		)
 	}
@@ -125,7 +185,7 @@ function TeamHistoryDisplay:_header()
 	}}
 end
 
----@param transfer table
+---@param transfer TransferSpan
 ---@return Widget
 function TeamHistoryDisplay:_row(transfer)
 	local teamText = self:_getTeamText(transfer)
@@ -169,7 +229,7 @@ function TeamHistoryDisplay:_row(transfer)
 
 	local leaveateDisplay = self:_buildLeaveDateDisplay(transfer)
 
-	if not self.props.hasHeaderAndRefs then
+	if not HAS_REFS then
 		return Tr{children = {
 			Td{
 				classes = {'th-mono'},
@@ -217,7 +277,7 @@ function TeamHistoryDisplay:_row(transfer)
 	}}
 end
 
----@param transfer table
+---@param transfer TransferSpan
 ---@return string?
 ---@return Widget
 function TeamHistoryDisplay:_getTeamText(transfer)
@@ -261,7 +321,7 @@ function TeamHistoryDisplay._adjustDate(date)
 	return os.date('%Y-%m-%d', os.time(dateStruct)) --[[@as string]]
 end
 
----@param transfer table
+---@param transfer TransferSpan
 ---@return string|Widget?
 function TeamHistoryDisplay:_buildLeaveDateDisplay(transfer)
 	if transfer.leaveDateDisplay then return transfer.leaveDateDisplay end

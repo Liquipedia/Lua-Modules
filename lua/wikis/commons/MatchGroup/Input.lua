@@ -159,15 +159,15 @@ end
 ---@return string[]?
 function MatchGroupInput.readBracket(bracketId, args, options)
 	local warnings = {}
-	local templateId = args[1]
-	assert(templateId, 'argument \'1\' (templateId) is empty')
+	local bracketType = args[1]
+	assert(bracketType, 'argument \'1\' (bracketType) is empty')
 
 	local bracketDatasById = Logic.try(function()
-		return MatchGroupInput._fetchBracketDatas(templateId, bracketId)
+		return MatchGroupInput._fetchBracketDatas(bracketType, bracketId)
 	end)
 		:catch(function(error)
 			if String.endsWith(error.message, 'does not exist') then
-				table.insert(warnings, error.message .. ' (Maybe [[Template:' .. templateId .. ']] needs to be purged?)')
+				table.insert(warnings, error.message .. ' (Maybe [[Template:' .. bracketType .. ']] needs to be purged?)')
 				return {}
 			else
 				error(error.message)
@@ -277,13 +277,13 @@ function MatchGroupInput._readQualifiedHeader(bracketData, args, matchKey)
 end
 
 -- Retrieve bracket data from the template generated bracket on commons
----@param templateId string
+---@param bracketType string
 ---@param bracketId string
 ---@return table<string, table>
-function MatchGroupInput._fetchBracketDatas(templateId, bracketId)
-	local matches = mw.ext.Brackets.getCommonsBracketTemplate(templateId)
+function MatchGroupInput._fetchBracketDatas(bracketType, bracketId)
+	local matches = mw.ext.Brackets.getCommonsBracketTemplate(bracketType)
 	assert(type(matches) == 'table')
-	assert(#matches ~= 0, 'Template ' .. templateId .. ' does not exist')
+	assert(#matches ~= 0, 'Template ' .. bracketType .. ' does not exist')
 
 	local function replaceBracketId(matchId)
 		local _, baseMatchId = MatchGroupUtil.splitMatchId(matchId)

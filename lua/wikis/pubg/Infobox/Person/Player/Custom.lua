@@ -9,10 +9,10 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local String = Lua.import('Module:StringUtils')
-local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
@@ -60,10 +60,10 @@ function CustomPlayer:adjustLPDB(lpdbData, args)
 	return lpdbData
 end
 
----@return string?
+---@return Widget?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		return Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = self.pagename})
+		return UpcomingTournaments.team(self.args.team)
 	end
 end
 

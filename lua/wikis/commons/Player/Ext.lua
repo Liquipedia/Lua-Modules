@@ -15,6 +15,7 @@ local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -65,6 +66,7 @@ function PlayerExt.extractFromLink(name)
 	name = mw.text.trim(name)
 
 	local pageName, displayName = unpack(mw.text.split(name, '|', true))
+	pageName = Page.applyUnderScoresIfEnforced(pageName)
 	if displayName and displayName ~= '' then
 		return String.nilIfEmpty(pageName), displayName
 	end
@@ -246,12 +248,14 @@ end
 ---For specific uses only.
 ---@param player standardPlayer
 function PlayerExt.populatePageName(player)
-	player.pageName = player.pageIsResolved and player.pageName
+	local pageName = player.pageIsResolved and player.pageName
 		or player.pageName and mw.ext.TeamLiquidIntegration.resolve_redirect(player.pageName)
 		or globalVars:get(player.displayName .. '_page')
 		or player.displayName and mw.ext.TeamLiquidIntegration.resolve_redirect(player.displayName)
 
-	player.pageIsResolved = player.pageName and true or nil
+	player.pageName = Page.applyUnderScoresIfEnforced(pageName)
+
+	player.pageIsResolved = pageName and true or nil
 end
 
 ---Saves the pageName and flag of a player to page variables,
@@ -265,8 +269,9 @@ function PlayerExt.saveToPageVars(player, options)
 	options = options or {}
 	local overwrite = options.overwritePageVars
 
-	if PlayerExt.shouldWritePageVar(displayName .. '_page', player.pageName, overwrite) then
-		globalVars:set(displayName .. '_page', player.pageName)
+	local pageName = Page.applyUnderScoresIfEnforced(player.pageName)
+	if PlayerExt.shouldWritePageVar(displayName .. '_page', pageName, overwrite) then
+		globalVars:set(displayName .. '_page', pageName)
 	end
 	if PlayerExt.shouldWritePageVar(displayName .. '_flag', player.flag, overwrite) then
 		globalVars:set(displayName .. '_flag', player.flag)
@@ -317,6 +322,7 @@ PlayerExt.syncTeam. Enabled by default.
 ---@return string? resolvedTemplate
 ---@return string? rawTemplate
 function PlayerExt.syncTeam(pageName, template, options)
+	pageName = Page.applyUnderScoresIfEnforced(pageName)
 	options = options or {}
 	local dateInput = Logic.emptyOr(options.date, DateExt.getContextualDateOrNow())
 	---@cast dateInput -nil

@@ -95,7 +95,7 @@ function BaseMatchPage:getCountdownBlock()
 			display = 'block',
 			['text-align'] = 'center'
 		},
-		children = Countdown._create{
+		children = Countdown.create{
 			date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
 			finished = self.matchData.finished,
 			rawdatetime = Logic.readBool(self.matchData.finished),
@@ -337,28 +337,31 @@ end
 ---@return Widget
 function BaseMatchPage:footer()
 	local vods = self:getVods()
+	local parsedLinks = self:_parseLinks()
+	local patchLink = self:getPatchLink()
+
 	return Footer{
 		comments = self:_getComments(),
 		children = WidgetUtil.collect(
-			AdditionalSection{
+			Logic.isNotEmpty(vods) and AdditionalSection{
 				header = 'VODs',
 				children = vods
-			},
-			AdditionalSection{
+			} or nil,
+			Logic.isNotEmpty(parsedLinks) and AdditionalSection{
 				header = 'Links',
 				bodyClasses = { 'vodlink' },
-				children = Array.map(self:_parseLinks(), function (parsedLink)
-					return IconImage{
+				children = Array.map(parsedLinks, function (parsedLink)
+					return HtmlWidgets.Span{children = IconImage{
 						imageLight = parsedLink.icon:sub(6),
 						imageDark = (parsedLink.iconDark or parsedLink.icon):sub(6),
 						link = parsedLink.link
-					}
+					}}
 				end)
-			},
-			AdditionalSection{
+			} or nil,
+			patchLink and AdditionalSection{
 				header = 'Patch',
-				children = { self:getPatchLink() }
-			}
+				children = patchLink
+			} or nil
 		)
 	}
 end
@@ -397,6 +400,7 @@ function BaseMatchPage:addComments()
 end
 
 ---@protected
+---@return Widget?
 function BaseMatchPage:getPatchLink()
 	if Logic.isEmpty(self.matchData.patch) then return end
 	return Link{ link = 'Patch ' .. self.matchData.patch }

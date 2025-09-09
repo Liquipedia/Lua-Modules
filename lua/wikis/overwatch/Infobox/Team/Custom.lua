@@ -9,9 +9,9 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local String = Lua.import('Module:StringUtils')
-local Template = Lua.import('Module:Template')
 
 local Team = Lua.import('Module:Infobox/Team')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 ---@class OverwatchInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
@@ -24,13 +24,9 @@ function CustomTeam.run(frame)
 	return team:createInfobox()
 end
 
----@return string?
+---@return Widget
 function CustomTeam:createBottomContent()
-	return Template.expandTemplate(
-		mw.getCurrentFrame(),
-		'Upcoming and ongoing tournaments of',
-		{team = self.name}
-	)
+	return UpcomingTournaments.team(self.teamTemplate.templatename)
 end
 
 ---@param lpdbData table

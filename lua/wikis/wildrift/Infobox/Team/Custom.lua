@@ -10,13 +10,15 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local PlacementStats = Lua.import('Module:InfoboxPlacementStats')
 local RoleOf = Lua.import('Module:RoleOf')
-local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class WildriftInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
@@ -38,12 +40,10 @@ end
 
 ---@return string?
 function CustomTeam:createBottomContent()
-	if not self.args.disbanded then
-		return Template.expandTemplate(
-			mw.getCurrentFrame(),
-			'Upcoming and ongoing tournaments of'
-		) .. tostring(PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}})
-	end
+	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+		not self.args.disbanded and UpcomingTournaments.team(self.teamTemplate.templatename) or nil,
+		PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}}
+	)}
 end
 
 ---@param id string
