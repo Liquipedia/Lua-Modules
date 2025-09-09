@@ -42,6 +42,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 ---@class EmptyTeamPagePreview: Widget
 ---@operator call(table): EmptyTeamPagePreview
@@ -185,10 +186,7 @@ function EmptyTeamPagePreview:_fetchPlacements(options)
 		ConditionNode(ColumnName('opponentplayers'), Comparator.neq, '[]'),
 		ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
 		ConditionNode(ColumnName('liquipediatier'), Comparator.neq, -1),
-		ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('opponentname'), Comparator.eq, teamPageNameWithoutUnderscores),
-			ConditionNode(ColumnName('opponentname'), Comparator.eq, teamPageName),
-		}
+		ConditionUtil.anyOf(ColumnName('opponentname'), {teamPageName, teamPageNameWithoutUnderscores})
 	}
 
 	return mw.ext.LiquipediaDB.lpdb('placement', {
@@ -375,21 +373,14 @@ function EmptyTeamPagePreview:_backFillForSquad(startDate, personData)
 
 	local pageName = personData.pageName
 	local pageNameWithSpaces = pageName:gsub('_', ' ')
-	local personCondition = ConditionTree(BooleanOperator.any):add{
-		ConditionNode(ColumnName('player'), Comparator.eq, pageName),
-		ConditionNode(ColumnName('player'), Comparator.eq, pageNameWithSpaces),
-	}
+	local personCondition = ConditionUtil.anyOf(ColumnName('player'), {pageName, pageNameWithSpaces})
 
 	---@param direction 'to'|'from'
 	---@return ConditionTree
 	local makeTeamConditions = function(direction)
 		return ConditionTree(BooleanOperator.any):add{
-			Array.map(teams, function(team)
-				return ConditionNode(ColumnName(direction .. 'teamtemplate'), Comparator.eq, team)
-			end),
-			Array.map(teams, function(team)
-				return ConditionNode(ColumnName(direction .. 'teamsectemplate'), Comparator.eq, team)
-			end),
+			ConditionUtil.anyOf(ColumnName(direction .. 'teamtemplate'), teams),
+			ConditionUtil.anyOf(ColumnName(direction .. 'teamsectemplate'), teams),
 		}
 	end
 
