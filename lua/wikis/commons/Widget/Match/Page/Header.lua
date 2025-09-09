@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Image = Lua.import('Module:Image')
 local Logic = Lua.import('Module:Logic')
+local StreamLinks = Lua.import('Module:Links/Stream')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
@@ -19,17 +20,19 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
+local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
 local TeamDisplay = Lua.import('Module:Widget/Match/Page/TeamDisplay')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageHeaderParameters
 ---@field countdownBlock Html?
 ---@field isBestOfOne boolean
----@field mvp {players: {name: string, displayname: string}[], points: integer?}?
+---@field mvp {players: MatchGroupMvpPlayer[], points: integer?}?
 ---@field opponent1 MatchPageOpponent
 ---@field opponent2 MatchPageOpponent
 ---@field parent string?
 ---@field phase 'finished'|'ongoing'|'upcoming'
+---@field stream table?
 ---@field tournamentName string?
 ---@field poweredBy string?
 ---@field highlighted boolean?
@@ -50,7 +53,7 @@ function MatchPageHeader:_makeResultDisplay()
 		classes = { 'match-bm-match-header-result' },
 		children = WidgetUtil.collect(
 			self:_showScore() and (
-				OpponentDisplay.InlineScore(opponent1) .. '&ndash;' .. OpponentDisplay.InlineScore(opponent2)
+				OpponentDisplay.InlineScore(opponent1) .. '&nbsp;:&nbsp;' .. OpponentDisplay.InlineScore(opponent2)
 			) or '',
 			Div{
 				classes = { 'match-bm-match-header-result-text' },
@@ -91,47 +94,63 @@ function MatchPageHeader:_showMvps()
 	}
 end
 
+---@private
+---@return Widget?
+function MatchPageHeader:_showStreams()
+	local phase = self.props.phase
+	if phase == 'finished' then
+		return
+	end
+	return Div{
+		classes = {'match-info-links'},
+		children = StreamsContainer{
+			streams = StreamLinks.filterStreams(self.props.stream),
+			matchIsLive = self.props.phase == 'ongoing',
+			growButtons = true,
+		}
+	}
+end
+
 ---@return Widget[]
 function MatchPageHeader:render()
 	local opponent1 = self.props.opponent1
 	local opponent2 = self.props.opponent2
 
-	return WidgetUtil.collect(
-		Div{
-			classes = { 'match-bm-match-header' },
-			children = WidgetUtil.collect(
-				self.props.poweredBy and Div{
-					classes = { 'match-bm-match-header-powered-by' },
-					children = {
-						'Data provided by ',
-						Image.display(self.props.poweredBy, nil, {link = '', alt = 'SAP'})
-					}
-				} or nil,
-				Div{
-					classes = { 'match-bm-match-header-overview' },
-					children = {
-						TeamDisplay{ opponent = opponent1 },
-						self:_makeResultDisplay(),
-						TeamDisplay{ opponent = opponent2 }
-					}
-				},
-				Div{
-					classes = Array.extend(
-						'match-bm-match-header-tournament',
-						self.props.highlighted and 'tournament-highlighted-bg' or nil
-					),
-					children = {
-						Link{ link = self.props.parent, children = self.props.tournamentName }
-					}
-				},
-				Div{
-					classes = { 'match-bm-match-header-date' },
-					children = { self.props.countdownBlock }
+	return Div{
+		classes = { 'match-bm-match-header' },
+		children = WidgetUtil.collect(
+			self.props.poweredBy and Div{
+				classes = { 'match-bm-match-header-powered-by' },
+				children = {
+					'Data provided by ',
+					Image.display(self.props.poweredBy, nil, {link = '', alt = 'SAP'})
 				}
-			),
-		},
-		self:_showMvps()
-	)
+			} or nil,
+			Div{
+				classes = { 'match-bm-match-header-date' },
+				children = { self.props.countdownBlock }
+			},
+			Div{
+				classes = { 'match-bm-match-header-overview' },
+				children = {
+					TeamDisplay{ opponent = opponent1 },
+					self:_makeResultDisplay(),
+					TeamDisplay{ opponent = opponent2 }
+				}
+			},
+			Div{
+				classes = Array.extend(
+					'match-bm-match-header-tournament',
+					self.props.highlighted and 'tournament-highlighted-bg' or nil
+				),
+				children = {
+					Link{ link = self.props.parent, children = self.props.tournamentName }
+				}
+			},
+			self:_showMvps(),
+			self:_showStreams()
+		),
+	}
 end
 
 return MatchPageHeader

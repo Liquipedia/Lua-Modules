@@ -18,7 +18,7 @@ local MatchPageDisplay = {}
 ---@class MatchPageConfigOptions
 ---@field MatchPageContainer function?
 
----Display component for a MatchPAge. The MatchPage is specified by matchID.
+---Display component for a MatchPage. The MatchPage is specified by matchID.
 ---The component fetches the match data from LPDB or page variables.
 ---@param props {matchId: string, config: MatchPageConfigOptions}
 ---@return Html

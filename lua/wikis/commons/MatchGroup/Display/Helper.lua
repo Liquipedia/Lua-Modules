@@ -17,7 +17,7 @@ local Page = Lua.import('Module:Page')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Timezone = Lua.import('Module:Timezone')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 
@@ -25,7 +25,6 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 local DisplayHelper = {}
 local NONBREAKING_SPACE = '&nbsp;'
-local UTC = Timezone.getTimezoneString{timezone = 'UTC'}
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -95,36 +94,12 @@ components.
 ---@return boolean
 function DisplayHelper.defaultMatchHasDetails(match)
 	return match.dateIsExact
-		or (match.timestamp and match.timestamp ~= Date.defaultTimestamp)
+		or (match.timestamp and not Date.isDefaultTimestamp(match.timestamp))
 		or Logic.isNotEmpty(match.vod)
 		or Table.isNotEmpty(match.links)
 		or Logic.isNotEmpty(match.comment)
 		or 0 < #match.games
 		or Info.config.match2.matchPage
-end
-
--- Display component showing the streams, date, and countdown of a match.
----@param match MatchGroupUtilMatch
----@return Html
-function DisplayHelper.MatchCountdownBlock(match)
-	local dateString
-	if match.dateIsExact == true then
-		local timestamp = Date.readTimestamp(match.date) + (Timezone.getOffset{timezone = match.timezoneId} or 0)
-		dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
-				.. (Timezone.getTimezoneString{timezone = match.timezoneId} or UTC)
-	else
-		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date)
-	end
-
-	local stream = Table.merge(match.stream, {
-		date = dateString,
-		finished = match.finished and 'true' or nil,
-	})
-	return mw.html.create('div'):addClass('match-countdown-block')
-		:css('text-align', 'center')
-		-- Workaround for .brkts-popup-body-element > * selector
-		:css('display', 'block')
-		:node(Lua.import('Module:Countdown')._create(stream))
 end
 
 ---Creates comments that describe substitute player(s) of the match.
@@ -155,7 +130,7 @@ function DisplayHelper.createSubstitutesComment(match)
 			end
 
 			if opponent.type == Opponent.team then
-				local team = Lua.import('Module:Team').queryRaw(opponent.template)
+				local team = TeamTemplate.getRawOrNil(opponent.template)
 				if team then
 					table.insert(subString, string.format('on <b>%s</b>', Page.makeInternalLink(team.shortname, team.page)))
 				end

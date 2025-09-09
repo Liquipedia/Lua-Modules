@@ -57,7 +57,9 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 ---@field coordinates MatchGroupUtilMatchCoordinates
 ---@field advanceSpots MatchGroupUtilAdvanceSpot[]
 ---@field bracketResetMatchId string?
+---@field bracketType string?
 ---@field header string?
+---@field inheritedHeader string?
 ---@field lowerEdges MatchGroupUtilLowerEdge[]?
 ---@field lowerMatchIds string[]
 ---@field qualLose boolean?
@@ -76,6 +78,7 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
 	bracketResetMatchId = 'string?',
+	bracketType = 'string?',
 	header = 'string?',
 	inheritedHeader = 'string?',
 	lowerEdges = TypeUtil.array(MatchGroupUtil.types.LowerEdge),
@@ -204,6 +207,7 @@ MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed
 ---@class MatchGroupUtilGame
 ---@field comment string?
 ---@field date string?
+---@field dateIsExact boolean
 ---@field game string?
 ---@field header string?
 ---@field length number?
@@ -309,24 +313,6 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 
 ---@class FFAMatchGroupUtilGame: MatchGroupUtilGame
 ---@field stream table
-
----@class standardTeamProps
----@field bracketName string
----@field displayName string
----@field pageName string?
----@field shortName string
----@field imageLight string?
----@field imageDark string?
----@field hasLegacyImage boolean
-MatchGroupUtil.types.Team = TypeUtil.struct({
-	bracketName = 'string',
-	displayName = 'string',
-	pageName = 'string?',
-	shortName = 'string',
-	imageLight = 'string?',
-	imageDark = 'string?',
-	hasLegacyImage = 'boolean',
-})
 
 ---@class MatchGroupUtilMatchlist
 ---@field bracketDatasById table<string, MatchGroupUtilBracketBracketData>
@@ -611,6 +597,7 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 			qualWinLiteral = nilIfEmpty(data.qualwinLiteral),
 			matchPage = nilIfEmpty(data.matchpage),
 			skipRound = tonumber(data.skipround) or data.skipround == 'true' and 1 or 0,
+			bracketType = nilIfEmpty(data.bracketType),
 			thirdPlaceMatchId = nilIfEmpty(data.thirdplace),
 			type = 'bracket',
 			upperMatchId = nilIfEmpty(data.upperMatchId),
@@ -646,6 +633,7 @@ function MatchGroupUtil.bracketDataToRecord(bracketData)
 		qualwin = bracketData.qualWin and 'true' or nil,
 		qualwinLiteral = bracketData.qualWinLiteral,
 		skipround = bracketData.skipRound ~= 0 and bracketData.skipRound or nil,
+		bracketType = bracketData.bracketType,
 		thirdplace = bracketData.thirdPlaceMatchId,
 		tolower = bracketData.lowerMatchIds[#bracketData.lowerMatchIds],
 		toupper = bracketData.lowerMatchIds[#bracketData.lowerMatchIds - 1],
@@ -872,27 +860,6 @@ function MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
 	end
 
 	return mergedMatch
-end
-
----Fetches information about a team via mw.ext.TeamTemplate.
----@deprecated This function is only used on OpponentDisplay and should be removed once team handling is refactored.
----@param template string
----@return standardTeamProps?
-function MatchGroupUtil.fetchTeam(template)
-	local rawTeam = mw.ext.TeamTemplate.raw(template)
-	if not rawTeam then
-		return nil
-	end
-
-	return {
-		bracketName = rawTeam.bracketname,
-		displayName = rawTeam.name,
-		pageName = rawTeam.page,
-		shortName = rawTeam.shortname,
-		imageLight = Logic.emptyOr(rawTeam.image, rawTeam.legacyimage),
-		imageDark = Logic.emptyOr(rawTeam.imagedark, rawTeam.legacyimagedark),
-		hasLegacyImage = Logic.isEmpty(rawTeam.image) and Logic.isNotEmpty(rawTeam.legacyimage)
-	}
 end
 
 ---Parse extradata as a JSON string if read from page variables. Otherwise create a copy if fetched from lpdb.

@@ -214,13 +214,13 @@ function Opponent.readType(type)
 	return Table.includes(Opponent.types, type) and type or nil
 end
 
----Asserts that an arbitary value is a valid representation of an opponent
+---Asserts that an arbitrary value is a valid representation of an opponent
 ---@param opponent any
 function Opponent.assertOpponent(opponent)
 	assert(Opponent.isOpponent(opponent), 'Invalid opponent')
 end
 
----Validates that an arbitary value is a valid representation of an opponent
+---Validates that an arbitrary value is a valid representation of an opponent
 ---@param opponent any
 ---@return boolean
 function Opponent.isOpponent(opponent)
@@ -236,7 +236,7 @@ function Opponent.same(opponent1, opponent2)
 	return Opponent.toName(opponent1) == Opponent.toName(opponent2)
 end
 
----Coerces an arbitary table into an opponent
+---Coerces an arbitrary table into an opponent
 ---@param opponent table
 function Opponent.coerce(opponent)
 	assert(type(opponent) == 'table')
@@ -451,7 +451,7 @@ function Opponent.fromMatch2Record(record)
 					displayName = playerRecord.displayname,
 					flag = String.nilIfEmpty(Flags.CountryName{flag = playerRecord.flag}),
 					pageName = String.nilIfEmpty(playerRecord.name),
-					faction = Logic.nilIfEmpty(Faction.read(playerRecord.extradata.faction) or Faction.defaultFaction),
+					faction = Logic.nilIfEmpty(Faction.read((playerRecord.extradata or {}).faction) or Faction.defaultFaction),
 				}
 			end),
 			extradata = {},

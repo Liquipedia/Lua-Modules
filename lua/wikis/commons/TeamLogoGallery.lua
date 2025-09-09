@@ -15,7 +15,7 @@ local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local Ordinal = Lua.import('Module:Ordinal')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local TeamLogoGallery = {}
 
@@ -36,7 +36,7 @@ end
 ---@param showPresentLogo boolean
 ---@return {imageLightMode: string, imageDarkMode: string?, caption: string}[]
 function TeamLogoGallery._getImageData(name, showPresentLogo)
-	local historicalTeamTemplates = Logic.emptyOr(Team.queryHistorical(name)) or {[DateExt.defaultDate] = name}
+	local historicalTeamTemplates = Logic.emptyOr(TeamTemplate.queryHistorical(name)) or {[DateExt.defaultDate] = name}
 
 	local imageDatas = {}
 	for startDate, teamTemplate in Table.iter.spairs(historicalTeamTemplates) do

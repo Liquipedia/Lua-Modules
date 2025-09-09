@@ -90,7 +90,7 @@ return {
 	title = 'Omega Strikers',
 	navigation = {
 		{
-			file = 'Player at the Battle For Texas at DreamHack Dallas.jpg',
+			file = 'Placeholder Palafins at To The Stars.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -99,7 +99,7 @@ return {
 			},
 		},
 		{
-			file = 'UT Dallas at the Battle For Texas at DreamHack Dallas.jpg',
+			file = 'Demons RAAAAHHHH at For The Crown.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -108,7 +108,7 @@ return {
 			},
 		},
 		{
-			file = 'SAGU Esports at the Battle For Texas at DreamHack Dallas.jpg',
+			file = 'Brawler Group Photo at To The Stars.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -117,7 +117,7 @@ return {
 			},
 		},
 		{
-			file = 'The Trophy from the Battle For Texas at DreamHack Dallas.jpg',
+			file = 'For The Crown winshot.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -126,12 +126,12 @@ return {
 			},
 		},
 		{
-			file = 'Zephyr at the Battle For Texas at DreamHack Dallas.jpg',
+			file = 'Group Photo at For The Crown.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
 		{
-			file = 'Omega Strikers Rasmus splash.png',
+			file = 'Omega Strikers Vyce splash.png',
 			title = 'Strikers',
 			link = 'Portal:Strikers',
 			count = {
@@ -151,7 +151,7 @@ return {
 			},
 		},
 		{
-			file = 'Omega Strikers Gear Eject Button.png',
+			file = 'Omega Strikers Gear Powerhouse Pauldrons.png',
 			title = 'Gear',
 			link = 'Portal:Gear',
 		},

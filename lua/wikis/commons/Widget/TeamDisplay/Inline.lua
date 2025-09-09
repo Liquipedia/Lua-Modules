@@ -94,6 +94,7 @@ function TeamInlineWidget:render()
 		TeamIcon{
 			imageLight = imageLight,
 			imageDark = imageDark,
+			name = teamTemplate.name,
 			page = teamTemplate.page,
 			legacy = Logic.isEmpty(teamTemplate.image) and Logic.isNotEmpty(teamTemplate.legacyimage),
 			noLink = teamTemplate.page == 'TBD',

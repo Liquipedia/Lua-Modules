@@ -12,10 +12,11 @@ local CharacterIcon = Lua.import('Module:CharacterIcon')
 local CharacterNames = Lua.import('Module:CharacterNames')
 local Class = Lua.import('Module:Class')
 local GameAppearances = Lua.import('Module:Infobox/Extension/GameAppearances')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Template = Lua.import('Module:Template')
 
 local Condition = Lua.import('Module:Condition')
@@ -24,10 +25,12 @@ local Comparator = Condition.Comparator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local ACHIEVEMENTS_BASE_CONDITIONS = {
 	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Showmatch', 'Qualifier'}),
@@ -109,7 +112,7 @@ function CustomPlayer:adjustLPDB(lpdbData, args)
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {args.country})
 
 	if String.isNotEmpty(args.team2) then
-		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(args.team2).page
+		lpdbData.extradata.team2 = TeamTemplate.getPageName(args.team2)
 	end
 
 	return lpdbData
@@ -118,10 +121,14 @@ end
 ---@return string?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(),self.args.team)
-		return
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing matches of', {team = teamPage}) ..
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+		local teamPage = TeamTemplate.getPageName(self.args.team)
+		---@cast teamPage -nil
+		return HtmlWidgets.Fragment{
+			children = {
+				MatchTicker.participant{team = teamPage},
+				UpcomingTournaments.team(teamPage)
+			}
+		}
 	end
 end
 

@@ -30,6 +30,7 @@ local MODE_MIXED = 'mixed'
 local MODE_FFA = 'FFA'
 local ASSUME_FINISHED_AFTER = MatchGroupInputUtil.ASSUME_FINISHED_AFTER
 local NOW = os.time()
+local RANDOM_FACTION = 'r'
 
 ---@class WarcraftParticipant
 ---@field player string
@@ -256,7 +257,9 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 		end,
 		function(playerIndex, playerIdData, playerInputData)
 			local prefix = 't' .. opponentIndex .. 'p' .. playerIndex
+			local isRandom = Logic.readBool(mapInput[prefix .. 'random'])
 			local faction = Faction.read(mapInput[prefix .. 'race'])
+				or (isRandom and Faction.read(RANDOM_FACTION))
 				or (playerIdData.extradata or {}).faction or Faction.defaultFaction
 			local link = playerIdData.name or playerInputData.link or playerInputData.name:gsub(' ', '_')
 			return {
@@ -264,7 +267,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 				player = link,
 				flag = Flags.CountryName{flag = playerIdData.flag},
 				position = playerIndex,
-				random = Logic.readBool(mapInput[prefix .. 'random']),
+				random = isRandom,
 				heroes = MapFunctions.readHeroes(
 					mapInput[prefix .. 'heroes'],
 					faction,

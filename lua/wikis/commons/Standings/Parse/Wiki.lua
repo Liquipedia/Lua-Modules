@@ -11,11 +11,19 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local Operator = Lua.import('Module:Operator')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 
-local Opponent = Lua.import('Module:Opponent/Custom')
-
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
 
 local StandingsParseWiki = {}
 
@@ -75,9 +83,15 @@ function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 	local roundData = Json.parseIfString(roundInput)
 	local matches = Array.parseCommaSeparatedString(roundData.matches)
 	local matchGroups = Array.parseCommaSeparatedString(roundData.matchgroups)
+	local stages = Array.parseCommaSeparatedString(roundData.stages)
 	if Logic.isNotEmpty(matchGroups) then
-		matches = Array.extend(matches, Array.flatMap(matchGroups, function(matchGroupId)
+		Array.extendWith(matches, Array.flatMap(matchGroups, function(matchGroupId)
 			return StandingsParseWiki.getMatchIdsOfMatchGroup(matchGroupId)
+		end))
+	end
+	if Logic.isNotEmpty(stages) then
+		Array.extendWith(matches, Array.flatMap(stages, function(stage)
+			return StandingsParseWiki.getMatchIdsFromStage(stage)
 		end))
 	end
 	return {
@@ -85,7 +99,7 @@ function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 		started = Logic.readBool(roundData.started),
 		finished = Logic.readBool(roundData.finished),
 		title = roundData.title,
-		matches = matches,
+		matches = Array.unique(matches),
 	}
 end
 
@@ -93,13 +107,34 @@ end
 ---@return string[]
 function StandingsParseWiki.getMatchIdsOfMatchGroup(matchGroupId)
 	local matchGroup = mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = '[[match2bracketid::'.. matchGroupId ..']]',
+		conditions = tostring(ConditionTree(BooleanOperator.all):add{
+			ConditionNode(ColumnName('namespace'), Comparator.neq, Namespace.matchNamespaceId()),
+			ConditionNode(ColumnName('match2bracketid'), Comparator.eq, matchGroupId),
+		}),
 		query = 'match2id',
 		limit = '1000',
 	})
-	return Array.map(matchGroup, function(match)
-		return match.match2id
-	end)
+	return Array.map(matchGroup, Operator.property('match2id'))
+end
+
+---@param rawStage string
+---@return string[]
+function StandingsParseWiki.getMatchIdsFromStage(rawStage)
+	local title = mw.title.new(rawStage)
+	assert(title, 'Invalid pagename "' .. rawStage .. '"')
+	local namespace, basePage, stage = Logic.nilIfEmpty(title.nsText), title.text, Logic.nilIfEmpty(title.fragment)
+	basePage = basePage:gsub(' ', '_')
+
+	local matchGroup = mw.ext.LiquipediaDB.lpdb('match2', {
+		conditions = tostring(ConditionTree(BooleanOperator.all):add(Array.append(
+			{ConditionNode(ColumnName('pagename'), Comparator.eq, basePage)},
+			namespace and ConditionNode(ColumnName('namespace'), Comparator.eq, Namespace.idFromName(namespace)) or nil,
+			stage and ConditionNode(ColumnName('match2bracketdata_sectionheader'), Comparator.eq, stage) or nil
+		))),
+		query = 'match2id',
+		limit = '1000',
+	})
+	return Array.map(matchGroup, Operator.property('match2id'))
 end
 
 ---@param opponentInput string|table
@@ -183,20 +218,17 @@ end
 ---@return StandingsTiebreaker[]
 function StandingsParseWiki.parseTiebreakers(args, tableType)
 	local tiebreakerInput = Json.parseIfString(args.tiebreakers) or {}
-	local tiebreakers = {}
-	for _, tiebreaker in ipairs(tiebreakerInput) do
-		table.insert(tiebreakers, TiebreakerFactory.tiebreakerFromName(tiebreaker))
-	end
+	local tiebreakers = Array.map(tiebreakerInput, TiebreakerFactory.validateAndNormalizeInput)
 	if #tiebreakers == 0 then
 		if tableType == 'ffa' then
 			tiebreakers = {
-				TiebreakerFactory.tiebreakerFromName('points'),
-				TiebreakerFactory.tiebreakerFromName('manual'),
+				TiebreakerFactory.validateAndNormalizeInput('points'),
+				TiebreakerFactory.validateAndNormalizeInput('manual'),
 			}
 		elseif tableType == 'swiss' then
 			tiebreakers = {
-				TiebreakerFactory.tiebreakerFromName('matchdiff'),
-				TiebreakerFactory.tiebreakerFromName('manual'),
+				TiebreakerFactory.validateAndNormalizeInput('matchdiff'),
+				TiebreakerFactory.validateAndNormalizeInput('manual'),
 			}
 		end
 	end

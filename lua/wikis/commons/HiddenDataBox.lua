@@ -18,7 +18,8 @@ local Table = Lua.import('Module:Table')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
 local Tier = Lua.import('Module:Tier/Custom')
 local Variables = Lua.import('Module:Variables')
-local WarningBox = Lua.import('Module:WarningBox')
+
+local WarningBoxGroup = Lua.import('Module:Widget/WarningBox/Group')
 
 local HiddenDataBox = {}
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
@@ -32,7 +33,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 ---Entry point
 ---@param args table?
----@return Html
+---@return Widget
 function HiddenDataBox.run(args)
 	args = args or {}
 	local doQuery = not Logic.readBool(args.noQuery)
@@ -107,7 +108,7 @@ function HiddenDataBox.run(args)
 
 	HiddenDataBox.addCustomVariables(args, queryResult)
 
-	return WarningBox.displayAll(warnings)
+	return WarningBoxGroup{data = warnings}
 end
 
 ---Cleans date input

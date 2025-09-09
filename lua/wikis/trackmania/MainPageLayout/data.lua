@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=trackmania
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -83,7 +82,7 @@ return {
 	title = 'Trackmania',
 	navigation = {
 		{
-			file = 'Papou and Wosile Efrei Trackmania Cup 2022.jpg',
+			file = 'Papou and Wosile Efrei Trackmania Cup Cropped.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {

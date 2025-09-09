@@ -22,8 +22,7 @@ local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Timezone = Lua.import('Module:Timezone')
-local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tier = Lua.import('Module:Tier/Custom')
 local VodLink = Lua.import('Module:VodLink')
 
@@ -41,7 +40,6 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local UTC = 'UTC'
 local DRAW_WINNER = 0
 local INVALID_TIER_DISPLAY = 'Undefined'
 local INVALID_TIER_SORT = 'ZZ'
@@ -245,8 +243,10 @@ function MatchTable:getOpponentAliases(mode, opponent)
 
 	local aliases = {}
 	--for teams also query pagenames from team template
-	local opponentNames = self.config.queryHistoricalAliases and Team.queryHistoricalNames(opponent.template) or
-		{opponent.template}
+	---@type string[]
+	local opponentNames = self.config.queryHistoricalAliases
+		and Array.map(TeamTemplate.queryHistoricalNames(opponent.template), TeamTemplate.getPageName)
+		or {opponent.template}
 
 	Array.forEach(opponentNames, function(name)
 		name = name:gsub(' ', '_')
@@ -662,30 +662,11 @@ function MatchTable:_displayDate(match)
 		return cell
 	end
 
-	if not match.dateIsExact then
-		return cell:node(DateExt.formatTimestamp('M d, Y', match.timestamp))
-	end
-
-	return cell:node(Countdown._create{
-		timestamp = match.timestamp,
-		finished = true,
-		date = MatchTable._calculateDateTimeString(match.timezoneId or UTC, match.timestamp),
+	return cell:node(Countdown.create{
+		finished = match.finished,
+		date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
 		rawdatetime = true,
 	} or nil)
-end
-
----@param timezone string
----@param timestamp number
----@return string
-function MatchTable._calculateDateTimeString(timezone, timestamp)
-	local offset = Timezone.getOffset{timezone = timezone} or 0
-	local tzstring = Timezone.getTimezoneString{timezone = timezone}
-	if not tzstring then
-		error('Unsupported timezone: ' .. timezone)
-	end
-
-	return DateExt.formatTimestamp('M d, Y - H:i', timestamp + offset) ..
-		' ' .. tzstring
 end
 
 ---@param match MatchTableMatch

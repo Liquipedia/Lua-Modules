@@ -8,9 +8,9 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Countdown = Lua.import('Module:Countdown')
 local Date = Lua.import('Module:Date/Ext')
 local Table = Lua.import('Module:Table')
-local Timezone = Lua.import('Module:Timezone')
 local VodLink = Lua.import('Module:VodLink')
 
 local Widget = Lua.import('Module:Widget')
@@ -18,6 +18,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class MatchSummaryFfaGameCountdown: Widget
 ---@operator call(table): MatchSummaryFfaGameCountdown
+---@field props {game: FFAMatchGroupUtilGame?}
 local MatchSummaryFfaGameCountdown = Class.new(Widget)
 
 ---@return Widget?
@@ -28,28 +29,20 @@ function MatchSummaryFfaGameCountdown:render()
 	end
 
 	local timestamp = Date.readTimestamp(game.date)
-	if not timestamp or timestamp == Date.defaultTimestamp then
+	if not timestamp or Date.isDefaultTimestamp(timestamp) then
 		return
 	end
 
-	local dateString
-	if game.dateIsExact then
-		-- TODO: Use game-TZ
-		dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
-				.. Timezone.getTimezoneString{timezone = 'UTC'}
-	else
-		dateString = mw.getContentLanguage():formatDate('F j, Y', game.date)
-	end
-
 	local streamParameters = Table.merge(game.stream, {
-		date = dateString,
+		-- TODO: Use game-TZ
+		date = Date.toCountdownArg(timestamp, nil, game.dateIsExact),
 		finished = game.winner ~= nil and 'true' or nil,
 	})
 
 	return HtmlWidgets.Div{
 		classes = {'match-countdown-block'},
 		children = {
-			Lua.import('Module:Countdown')._create(streamParameters),
+			Countdown.create(streamParameters),
 			game.vod and VodLink.display{vod = game.vod} or nil,
 		},
 	}

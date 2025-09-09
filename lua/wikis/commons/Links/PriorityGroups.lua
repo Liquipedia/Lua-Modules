@@ -81,6 +81,7 @@ return {
 		'steam',
 		'steamalternative',
 		'telegram',
+		'threads',
 		'tiktok',
 		'twitter',
 		'vk',
