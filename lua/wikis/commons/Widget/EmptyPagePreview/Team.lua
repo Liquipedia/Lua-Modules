@@ -19,7 +19,7 @@ local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
 local Region = Lua.import('Module:Region')
 local Table = Lua.import('Module:Table')
-local TeamTemplate = Lua.import('Module:TeamTemplate') -- to be replaced by #5900 / #5649 / ...
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tournament = Lua.import('Module:Tournament')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
