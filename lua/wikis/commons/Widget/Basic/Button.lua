@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
@@ -23,6 +24,7 @@ local Div = HtmlWidgets.Div
 ---@field variant 'primary'|'secondary'|'tertiary'|'ghost'|'destructive'|nil
 ---@field size 'xs'|'sm'|'md'|'lg'|nil
 ---@field grow boolean?
+---@field aligncontent 'left'|'right'|nil
 
 ---@class ButtonWidget: Widget
 ---@operator call(ButtonWidgetParameters): ButtonWidget
@@ -33,6 +35,7 @@ Button.defaultProps = {
 	variant = 'primary',
 	size = 'md',
 	grow = false, -- Whether the button should grow to fill the available space
+	aligncontent = nil,
 }
 
 ---@return Widget
@@ -59,8 +62,18 @@ function Button:render()
 		table.insert(cssClasses, 'btn-large')
 	end
 
+	local cssTable = {}
+	if self.props.grow then
+		cssTable.width = '100%'
+	end
+	if self.props.aligncontent == 'left' then
+		cssTable['justify-content'] = 'left'
+	elseif self.props.aligncontent == 'right' then
+		cssTable['justify-content'] = 'right'
+	end
+
 	local button = Div{
-		css = self.props.grow and {width = '100%'} or nil,
+		css = Logic.nilIfEmpty(cssTable),
 		classes = Array.extend(cssClasses, self.props.classes or {}),
 		attributes = Table.merge({
 			title = self.props.title,
