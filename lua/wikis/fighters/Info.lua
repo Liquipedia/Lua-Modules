@@ -6,7 +6,7 @@
 --
 
 return {
-	startYear = 1996,
+	startYear = 1991,
 	wikiName = 'fighters',
 	name = 'Fighting Games',
 	defaultGame = 'fighters',
