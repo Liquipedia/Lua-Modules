@@ -12,14 +12,15 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
-local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
+local TransferRowWidget = Lua.import('Module:Widget/Transfer/Row')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -27,6 +28,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
 local DEFAULT_VALUES = {
@@ -135,7 +137,7 @@ function TransferList:_getTeams(args)
 		if not mw.ext.TeamTemplate.teamexists(team) then
 			mw.log('Missing team teamplate: ' .. team)
 		end
-		Array.extendWith(teamList, Team.queryHistoricalNames(team) or {team})
+		Array.extendWith(teamList, TeamTemplate.queryHistoricalNames(team))
 	end)
 
 	return teamList
@@ -213,7 +215,7 @@ function TransferList:_buildConditions(config)
 	local conditions = self:_buildBaseConditions()
 		:add(self:_buildDateCondition(config.date))
 		:add(self:_buildTeamConditions(config.toTeam, config.fromTeam))
-		:add(self:_buildOrConditions('role1', config.roles1 or self.config.conditions.roles1))
+		:add(ConditionUtil.anyOf(ColumnName('role1'), config.roles1 or self.config.conditions.roles1))
 
 	return conditions:toString()
 end
@@ -223,10 +225,10 @@ function TransferList:_buildBaseConditions()
 	local config = self.config.conditions
 
 	self.baseConditions = ConditionTree(BooleanOperator.all)
-		:add(self:_buildOrConditions('player', config.players))
-		:add(self:_buildOrConditions('nationality', config.nationalities))
-		:add(self:_buildOrConditions('role2', config.roles2))
-		:add(self:_buildOrConditions('extradata_position', config.positions))
+		:add(ConditionUtil.anyOf(ColumnName('player'), config.players))
+		:add(ConditionUtil.anyOf(ColumnName('nationality'), config.nationalities))
+		:add(ConditionUtil.anyOf(ColumnName('role2'), config.roles2))
+		:add(ConditionUtil.anyOf(ColumnName('extradata_position'), config.positions))
 
 	if config.platform then
 		self.baseConditions:add{ConditionNode(ColumnName('extradata_platform'), Comparator.eq, config.platform)}
@@ -290,21 +292,10 @@ function TransferList:_buildTeamConditions(toTeam, fromTeam)
 	if Logic.isEmpty(self.config.conditions.teams) then return end
 
 	self.teamConditions = ConditionTree(BooleanOperator.any)
-		:add(self:_buildOrConditions('fromteam', self.config.conditions.teams))
-		:add(self:_buildOrConditions('toteam', self.config.conditions.teams))
+		:add(ConditionUtil.anyOf(ColumnName('fromteamtemplate'), self.config.conditions.teams))
+		:add(ConditionUtil.anyOf(ColumnName('toteamtemplate'), self.config.conditions.teams))
 
 	return self.teamConditions
-end
-
----@param lpdbField string
----@param data string[]
----@return ConditionTree?
-function TransferList:_buildOrConditions(lpdbField, data)
-	if Logic.isEmpty(data) then return nil end
-	return ConditionTree(BooleanOperator.any)
-		:add(Array.map(data, function(item)
-			return ConditionNode(ColumnName(lpdbField), Comparator.eq, item)
-		end))
 end
 
 ---@return Html|string?
@@ -366,7 +357,7 @@ function TransferList:_buildHeader()
 end
 
 ---@param transfers transfer[]
----@return Html?
+---@return Widget?
 function TransferList:_buildRow(transfers)
 	local firstTransfer = transfers[1]
 	if not firstTransfer then
@@ -382,7 +373,10 @@ function TransferList:_buildRow(transfers)
 		firstTransfer.role2 = nil
 	end
 
-	return TransferRowDisplay(transfers):build()
+	return TransferRowWidget{
+		transfers = transfers,
+		showTeamName = (Info.config.transfers or {}).showTeamName
+	}
 end
 
 return TransferList

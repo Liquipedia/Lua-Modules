@@ -76,9 +76,9 @@ return {
 	helparticles = 'far fa-life-ring',
 
 	-- Usage: To indicate different transfer type with icon difference not just background colour
-	transferbetween = 'fas fa-arrow-alt-right',
-	transfertofreeagent = 'fas fa-arrow-alt-from-left',
-	fransferfromfreeagent = 'fas fa-arrow-alt-to-right',
+	transferbetween = 'far fa-arrow-alt-right',
+	transfertofreeagent = 'far fa-arrow-alt-to-right',
+	transferfromfreeagent = 'far fa-arrow-alt-from-left',
 
 	-- Usage: Reference links in tables (ie transfers)
 	reference = 'fad fa-external-link-alt',

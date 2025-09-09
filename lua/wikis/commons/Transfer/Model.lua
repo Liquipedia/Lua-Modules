@@ -12,7 +12,7 @@ local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local ROLE_CLEAN = Lua.requireIfExists('Module:TeamHistoryAuto/cleanRole', {loadData = true})
 
@@ -41,9 +41,9 @@ local Transfer = {}
 ---@field team string
 ---@field role string
 ---@field position string
----@field joinDate string|number
+---@field joinDate string
 ---@field joinDateDisplay string
----@field leaveDate string|number?
+---@field leaveDate string?
 ---@field leaveDateDisplay string?
 ---@field reference {join: table?, leave: table?}
 
@@ -220,7 +220,7 @@ function Transfer._buildConditionsForLeaveTransfer(config, transfer)
 		ConditionNode(ColumnName('player'), Comparator.eq, config.player),
 	}
 
-	local historicalNames = Team.queryHistoricalNames(transfer.team)
+	local historicalNames = TeamTemplate.queryHistoricalNames(transfer.team)
 
 	local buildFromConditions = function(teamField, roleField)
 		local fromConditions = ConditionUtil.anyOf(
@@ -240,8 +240,8 @@ function Transfer._buildConditionsForLeaveTransfer(config, transfer)
 
 	if Logic.isNotEmpty(historicalNames) then
 		conditions:add(ConditionTree(BooleanOperator.any):add{
-			buildFromConditions('fromteam', 'role1'),
-			buildFromConditions('extradata_fromteamsec', 'extradata_role1sec'),
+			buildFromConditions('fromteamtemplate', 'role1'),
+			buildFromConditions('extradata_fromteamsectemplate', 'extradata_role1sec'),
 		})
 	elseif Table.includes(config.specialRoles, transfer.role) then
 		conditions:add(ConditionTree(BooleanOperator.any):add{

@@ -48,6 +48,7 @@ return {
 			automatedHistory = {
 				mode = 'manualPrio',
 				showRole = false,
+				storeFromWikiCode = true,
 			},
 		},
 	},

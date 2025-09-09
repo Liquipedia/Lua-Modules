@@ -64,6 +64,7 @@ function MatchStream:render()
 		}},
 		variant = 'tertiary',
 		size = 'sm',
+		grow = self.props.grow,
 	}
 end
 

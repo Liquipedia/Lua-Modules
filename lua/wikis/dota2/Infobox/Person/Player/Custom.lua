@@ -12,17 +12,19 @@ local CharacterIcon = Lua.import('Module:CharacterIcon')
 local Class = Lua.import('Module:Class')
 local HeroNames = Lua.import('Module:HeroNames', {loadData = true})
 local Logic = Lua.import('Module:Logic')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
-local Template = Lua.import('Module:Template')
 local YearsActive = Lua.import('Module:YearsActive')
 
 local Flags = Lua.import('Module:Flags')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -32,7 +34,12 @@ local BANNED = Lua.import('Module:Banned', {loadData = true})
 local SIZE_HERO = '44x25px'
 local CONVERSION_PLAYER_ID_TO_STEAM = 61197960265728
 
+---@class Dota2InfoboxPlayer: Person
+---@field basePageName string
 local CustomPlayer = Class.new(Player)
+
+---@class Dota2InfoboxPlayerWidgetInjector: WidgetInjector
+---@field caller Dota2InfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -134,11 +141,10 @@ end
 ---@return string?
 function CustomPlayer:createBottomContent()
 	if Namespace.isMain() then
-		return tostring(Template.safeExpand(
-			mw.getCurrentFrame(), 'Upcoming_and_ongoing_matches_of_player', {player = self.basePageName})
-			.. '<br>' .. Template.safeExpand(
-			mw.getCurrentFrame(), 'Upcoming_and_ongoing_tournaments_of_player', {player = self.basePageName})
-		)
+		return HtmlWidgets.Fragment{children = {
+			MatchTicker.player(),
+			UpcomingTournaments.player{name = self.basePageName}
+		}}
 	end
 end
 

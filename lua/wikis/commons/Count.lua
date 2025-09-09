@@ -14,7 +14,7 @@ local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -22,6 +22,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local Count = {}
 
@@ -180,14 +181,9 @@ function Count.placements(args)
 		lpdbConditions:add{opponentConditions}
 
 	elseif String.isNotEmpty(args.team) then
-		local opponentConditions = ConditionTree(BooleanOperator.any)
-		Array.forEach(Count._getOpponentNames(args.team), function(templateValue)
-			opponentConditions:add{
-				ConditionNode(ColumnName('opponentname'), Comparator.eq, templateValue),
-				ConditionNode(ColumnName('opponentname'), Comparator.eq, templateValue:gsub(' ', '_'))
-			}
-		end)
-		lpdbConditions:add{opponentConditions}
+		lpdbConditions:add(ConditionUtil.anyOf(
+			ColumnName('opponenttemplate'), TeamTemplate.queryHistoricalNames(args.team)
+		))
 	end
 
 	if String.isNotEmpty(args.placement) then
@@ -221,15 +217,6 @@ end
 --[[
 Condition Functions
 ]]--
-
-
----Retrieve all team templates for team argument parameter
----@param opponent string
----@return string[]
-function Count._getOpponentNames(opponent)
-	local opponentNames = Team.queryHistoricalNames(opponent) or {}
-	return Array.extractValues(opponentNames)
-end
 
 
 ---Returns the base query conditions based on input args

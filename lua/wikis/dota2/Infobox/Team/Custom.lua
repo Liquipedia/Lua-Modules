@@ -17,6 +17,7 @@ local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 local Team = Lua.import('Module:Infobox/Team')
 
 local ACHIEVEMENTS_BASE_CONDITIONS = {
@@ -50,25 +51,11 @@ function CustomTeam.run(frame)
 	return team:createInfobox()
 end
 
----@return string?
+---@return Widget?
 function CustomTeam:createBottomContent()
---[[
-	if not _team.args.disbanded then
-		TODO:
-		Leaving this out for now, will be a follow-up PR,
-		as both the templates needs to be removed from team pages plus the templates also requires some div changes
-
-		return Template.expandTemplate(
-			mw.getCurrentFrame(),
-			'Upcoming and ongoing matches of',
-			{team = _team.name or _team.pagename}
-		) .. Template.expandTemplate(
-			mw.getCurrentFrame(),
-			'Upcoming and ongoing tournaments of',
-			{team = _team.name or _team.pagename}
-		)
+	if not self.args.disbanded then
+		return UpcomingTournaments.team(self.teamTemplate.templatename)
 	end
---]]
 end
 
 ---@param lpdbData table
