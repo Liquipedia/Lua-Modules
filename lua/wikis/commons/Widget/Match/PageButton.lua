@@ -23,6 +23,7 @@ local SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE = 2 * 60 * 60 -- 2 hours in seconds
 local MatchPageButton = Class.new(Widget)
 MatchPageButton.defaultProps = {
 	buttonType = 'secondary',
+	hideText = false,
 }
 
 ---@return Widget?
@@ -59,8 +60,10 @@ function MatchPageButton:render()
 			grow = true,
 			children = {
 				Icon{iconName = 'matchpagelink'},
-				' ',
-				'View match details',
+				(not self.props.hideText){
+					' ',
+					'View match details',
+				}
 			}
 		}
 	end
@@ -73,7 +76,10 @@ function MatchPageButton:render()
 		link = link,
 		grow = true,
 		children = {
-			'+ Add details',
+			'+ ',
+			(not self.props.hideText){
+				'Add details',
+			}
 		}
 	}
 end

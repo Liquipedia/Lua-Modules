@@ -85,6 +85,7 @@ function MatchButtonBar:render()
 			MatchPageButton{
 				match = match,
 				buttonType = self.props.variant,
+				hideText = displayStreams and #StreamLinks.filterStreams(match.stream) >= 3
 			},
 			displayStreams and StreamsContainer{
 				streams = StreamLinks.filterStreams(match.stream),
