@@ -24,7 +24,7 @@ local Div = HtmlWidgets.Div
 ---@field variant 'primary'|'secondary'|'tertiary'|'ghost'|'destructive'|nil
 ---@field size 'xs'|'sm'|'md'|'lg'|nil
 ---@field grow boolean?
----@field aligncontent 'left'|'center'|'right'|nil
+---@field aligncontent 'left'|'right'|nil
 
 ---@class ButtonWidget: Widget
 ---@operator call(ButtonWidgetParameters): ButtonWidget
