@@ -4,7 +4,7 @@
 */
 
 // Cache version could be made dynamic in the future
-@use "https://liquipedia.net/commons/load.php?cacheversion=cipipeline&lang=en&modules=fontawesome-pro|ext.TeamLiquidIntegration.liquipedia-custom-icon|skins.lakesideview.mw|skins.lakesideview.theme.commons&only=styles&skin=lakesideview";
+@import url( https://liquipedia.net/commons/load.php?cacheversion=cipipeline&lang=en&modules=fontawesome-pro|ext.TeamLiquidIntegration.liquipedia-custom-icon|skins.lakesideview.mw|skins.lakesideview.theme.commons&only=styles&skin=lakesideview );
 @use "commons/RankingTable";
 @use "commons/Ambox";
 @use "commons/AutomaticPointsTable";
