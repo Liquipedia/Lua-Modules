@@ -59,8 +59,9 @@ function MatchButtonBar:render()
 		displayStreams = true
 	end
 
+	local filteredStreams = StreamLinks.filterStreams(match.stream)
 	local processedStreams = Array.flatMap(StreamLinks.countdownPlatformNames, function(platform)
-		return Array.map(match.stream[platform] or {}, function(stream)
+		return Array.map(filteredStreams[platform] or {}, function(stream)
 			return {platform = platform, stream = stream}
 		end)
 	end)
@@ -96,7 +97,7 @@ function MatchButtonBar:render()
 				hideText = displayStreams and numberOfStreams >= 3
 			},
 			displayStreams and StreamsContainer{
-				streams = StreamLinks.filterStreams(match.stream),
+				streams = filteredStreams,
 				matchIsLive = match.phase == 'ongoing',
 			} or nil,
 			makeDropdownForVods and VodsDropdownButton{count = #vods} or nil,
