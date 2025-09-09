@@ -76,7 +76,7 @@ function MatchPageButton:render()
 		link = link,
 		grow = true,
 		children = self.props.hideText and {
-			'+ ',
+			'+ Add',
 		} or {
 			'+ Add details'
 		}
