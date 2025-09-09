@@ -76,6 +76,7 @@ return {
 			excludeTierTypes = {'Qualifier', 'Charity'},
 			showPatches = true,
 		},
+		forceUnderscores = true, -- applies to several components
 		infoboxPlayer = {
 			autoTeam = true,
 			automatedHistory = {
