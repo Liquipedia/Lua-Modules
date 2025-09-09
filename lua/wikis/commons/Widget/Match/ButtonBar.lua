@@ -59,6 +59,14 @@ function MatchButtonBar:render()
 		displayStreams = true
 	end
 
+	local processedStreams = Array.flatMap(StreamLinks.countdownPlatformNames, function(platform)
+		return Array.map(match.stream[platform] or {}, function(stream)
+			return {platform = platform, stream = stream}
+		end)
+	end)
+
+	local numberOfStreams = #processedStreams
+
 	local makeVodDTO = function(type, gameOrMatch, number)
 		if Logic.isEmpty(gameOrMatch.vod) then
 			return
@@ -85,7 +93,7 @@ function MatchButtonBar:render()
 			MatchPageButton{
 				match = match,
 				buttonType = self.props.variant,
-				hideText = displayStreams and #StreamLinks.filterStreams(match.stream) >= 3
+				hideText = displayStreams and numberOfStreams >= 3
 			},
 			displayStreams and StreamsContainer{
 				streams = StreamLinks.filterStreams(match.stream),
