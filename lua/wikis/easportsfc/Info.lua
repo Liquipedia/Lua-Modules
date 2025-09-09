@@ -439,6 +439,11 @@ return {
 			matchWidthMobile = 110,
 			matchWidth = 180,
 		},
+		infoboxPlayer = {
+			automatedHistory = {
+				storeFromWikiCode = true,
+			},
+		},
 	},
 	defaultRoundPrecision = 0,
 }

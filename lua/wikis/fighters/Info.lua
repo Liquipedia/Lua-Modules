@@ -1962,5 +1962,10 @@ return {
 			hideOrg = true,
 			hideOverview = true,
 		},
+		infoboxPlayer = {
+			automatedHistory = {
+				storeFromWikiCode = true,
+			},
+		},
 	},
 }
