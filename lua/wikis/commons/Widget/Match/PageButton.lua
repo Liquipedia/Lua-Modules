@@ -58,12 +58,12 @@ function MatchPageButton:render()
 			size = 'sm',
 			link = link,
 			grow = true,
-			children = {
+			children = self.props.hideText and {
 				Icon{iconName = 'matchpagelink'},
-				(not self.props.hideText){
-					' ',
-					'View match details',
-				}
+			} or {
+				Icon{iconName = 'matchpagelink'},
+				' ',
+				'View match details',
 			}
 		}
 	end
@@ -75,11 +75,10 @@ function MatchPageButton:render()
 		size = 'sm',
 		link = link,
 		grow = true,
-		children = {
+		children = self.props.hideText and {
 			'+ ',
-			(not self.props.hideText){
-				'Add details',
-			}
+		} or {
+			'+ Add details'
 		}
 	}
 end
