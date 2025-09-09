@@ -7,22 +7,28 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
-
-local Condition = Lua.import('Module:Condition')
-local ConditionTree = Condition.Tree
-local ConditionNode = Condition.Node
-local Comparator = Condition.Comparator
-local BooleanOperator = Condition.BooleanOperator
-local ColumnName = Condition.ColumnName
+local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
+---@class mvpTableParsedArgs
+---@field cutafter number
+---@field margin number
+---@field points boolean
+---@field title string?
+---@field matchGroupSpec {matchGroupIds: string[], pageNames: string[][]}
 
 local MvpTable = {}
 
@@ -30,61 +36,42 @@ local MvpTable = {}
 ---Fetches mvpData for a given set of matchGroupIds or tournaments.
 ---Displays the fetched data as a table.
 ---@param args table
----@return Html|string|nil
+---@return Widget?
 function MvpTable.run(args)
 	args = args or {}
-	args = MvpTable._parseArgs(args)
-	local conditions = MvpTable._buildConditions(args)
-	local queryData = mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = conditions,
-		query = 'extradata, match2opponents',
-		limit = 5000,
-	})
+	local parsedArgs = MvpTable._parseArgs(args)
 
-	local mvpList
+	local matches = TournamentStructure.fetchMatches(parsedArgs.matchGroupSpec)
 
-	if type(queryData) == 'table' and queryData[1] then
-		--catch errors on incompatible match2 data (when not yet using standard storage)
-		mvpList = Logic.tryCatch(
-			function() return MvpTable.processData(queryData) end,
-			function() return mw.logObject('MvpTable: match2 mvp data format invalid, querying match1 data instead') end
-		)
+	if Logic.isEmpty(matches) then
+		return
 	end
 
-	--in case we catch it and in case we did not get match2 results
-	if not mvpList then
-		mvpList = MvpTable._queryMatch1(conditions)
-	end
+	local mvpList = MvpTable.processData(matches)
 
 	if not mvpList then
 		return
 	end
 
-	local output = mw.html.create('table')
-		:addClass('wikitable prizepooltable collapsed')
-		:css('text-align', 'center')
-		:css('margin-top', args.margin .. 'px')
-		:attr('data-opentext', 'place ' .. (args.cutafter + 1) .. ' to ' .. #mvpList)
-		:attr('data-closetext', 'place ' .. (args.cutafter + 1) .. ' to ' .. #mvpList)
-		:attr('data-cutafter', args.cutafter + (String.isNotEmpty(args.title) and 1 or 0))
-		:attr('data-definedcutafter', '')
-		:node(MvpTable._mainHeader(args))
-		:node(MvpTable._subHeader(args))
-
-	for _, item in ipairs(mvpList) do
-		output:node(MvpTable._row(item, args))
-	end
-
-	return output
+	return HtmlWidgets.Table{
+		classes = {'wikitable', 'prizepooltable','collapsed'},
+		css = {
+			['text-align'] = 'center',
+			['margin-top'] = args.margin .. 'px'
+		},
+		attributes = {
+			['data-opentext'] = 'place ' .. (args.cutafter + 1) .. ' to ' .. #mvpList,
+			['data-closetext'] = 'place ' .. (args.cutafter + 1) .. ' to ' .. #mvpList,
+			['data-cutafter'] = args.cutafter + (String.isNotEmpty(args.title) and 1 or 0),
+			['data-definedcutafter'] = ''
+		},
+		children = WidgetUtil.collect(
+			MvpTable._mainHeader(args),
+			MvpTable._subHeader(args),
+			Array.map(mvpList, FnUtil.curry(MvpTable._row, args))
+		)
+	}
 end
-
----@class mvpTableParsedArgs
----@field cutafter number
----@field margin number
----@field points boolean
----@field title string?
----@field matchGroupIds string[]
----@field tournaments string[]
 
 ---Parses the entered arguments to a table that can be used better further down the line
 ---@param args table
@@ -96,120 +83,71 @@ function MvpTable._parseArgs(args)
 		points = Logic.readBool(args.points),
 		title = args.title,
 
-		matchGroupIds = {},
-		tournaments = {},
+		matchGroupSpec = TournamentStructure.readMatchGroupsSpec(args) or TournamentStructure.currentPageSpec()
 	}
-
-	for _, matchGroupId in Table.iter.pairsByPrefix(args, 'id') do
-		if String.isNotEmpty(matchGroupId) then
-			table.insert(parsedArgs.matchGroupIds, matchGroupId)
-		end
-	end
-
-	for _, tournament in Table.iter.pairsByPrefix(args, 'tournament', {requireIndex = false}) do
-		tournament = mw.ext.TeamLiquidIntegration.resolve_redirect(tournament):gsub(' ', '_')
-		table.insert(parsedArgs.tournaments, tournament)
-	end
-
-	if Table.isEmpty(parsedArgs.matchGroupIds) and Table.isEmpty(parsedArgs.tournaments) then
-		table.insert(parsedArgs.tournaments, mw.title.getCurrentTitle().text)
-	end
 
 	return parsedArgs
 end
 
----@param args mvpTableParsedArgs
----@return string
-function MvpTable._buildConditions(args)
-	local matchGroupIDConditions
-	if Table.isNotEmpty(args.matchGroupIds) then
-		matchGroupIDConditions = ConditionTree(BooleanOperator.any)
-		for _, id in pairs(args.matchGroupIds) do
-			matchGroupIDConditions:add{ConditionNode(ColumnName('match2bracketid'), Comparator.eq, id)}
-		end
-	end
-
-	local tournamentConditions
-	if Table.isNotEmpty(args.tournaments) then
-		tournamentConditions = ConditionTree(BooleanOperator.any)
-		for _, tournament in pairs(args.tournaments) do
-			local page = mw.title.new(tournament)
-			assert(page, 'Invalid page name "' .. tournament .. '"')
-			tournamentConditions:add{
-				ConditionTree(BooleanOperator.all):add{
-					ConditionNode(ColumnName('pagename'), Comparator.eq, mw.ustring.gsub(page.text, ' ', '_')),
-					ConditionNode(ColumnName('namespace'), Comparator.eq, page.namespace),
-				},
-			}
-		end
-	end
-
-	local conditions = ConditionTree(BooleanOperator.all):add{
-		tournamentConditions,
-		matchGroupIDConditions,
-	}
-
-	return conditions:toString()
-end
-
 ---Builds the main header of the MvpTable
 ---@param args mvpTableParsedArgs
----@return Html?
+---@return Widget?
 function MvpTable._mainHeader(args)
 	if String.isEmpty(args.title) then
-		return nil
+		return
 	end
 
-	local colspan = 2 + (args.points and 1 or 0)
-
-	return mw.html.create('tr')
-		:tag('th'):wikitext(args.title):attr('colspan', colspan):done():done()
+	return HtmlWidgets.Tr{
+		children = HtmlWidgets.Th{
+			attributes = {colspan = 2 + (args.points and 1 or 0)},
+			children = args.title
+		}
+	}
 end
 
 ---Builds the sub header of the MvpTable
 ---@param args mvpTableParsedArgs
----@return Html
+---@return Widget
 function MvpTable._subHeader(args)
-	local header = mw.html.create('tr')
-		:tag('th'):wikitext('Player'):done()
-		:tag('th'):wikitext('#MVPs'):done()
-
-	if args.points then
-		header:tag('th'):wikitext('Points'):done()
-	end
-
-	return header:done()
+	return HtmlWidgets.Tr{
+		children = Array.map(
+			{'Player', '#MVPs', args.points and 'Points' or nil},
+			function (element) return HtmlWidgets.Th{children = element} end
+		)
+	}
 end
 
 ---Builds the display for a mvp row
----@param item table
 ---@param args mvpTableParsedArgs
----@return Html
-function MvpTable._row(item, args)
-	local row = mw.html.create('tr')
-		:tag('td'):css('text-align', 'left'):node(OpponentDisplay.BlockOpponent{
-			opponent = {type = Opponent.solo, players = {{
-				displayName = item.displayName,
-				flag = item.flag,
-				pageName = item.name,
-				team = item.team and TeamTemplate.resolve(item.team, DateExt.getContextualDateOrNow()) or nil,
-			}}},
-			overflow = 'ellipsis',
-			showPlayerTeam = true,
-		}):done()
-		:tag('td'):wikitext(item.mvp):done()
-
-	if args.points then
-		row:tag('td'):wikitext(item.points):done()
-	end
-
-	return row:done()
+---@param item {points: number, mvp: number, displayName:string?, name:string, flag:string?, team:string?}
+---@return Widget
+function MvpTable._row(args, item)
+	return HtmlWidgets.Tr{
+		children = WidgetUtil.collect(
+			HtmlWidgets.Td{
+				css = {['text-align'] = 'left'},
+				children = OpponentDisplay.BlockOpponent{
+					opponent = Opponent.readOpponentArgs{
+						type = Opponent.solo,
+						name = item.displayName,
+						flag = item.flag,
+						link = item.name,
+						team = item.team and TeamTemplate.resolve(item.team, DateExt.getContextualDateOrNow()) or nil,
+					},
+					overflow = 'ellipsis',
+					showPlayerTeam = true,
+				}
+			},
+			HtmlWidgets.Td{children = item.mvp},
+			args.points and HtmlWidgets.Td{children = item.points} or nil
+		)
+	}
 end
 
 ---
 -- Processes retrieved data
 -- overwritable function via /Custom
----@param queryData table[]
+---@param queryData MatchGroupUtilMatch[]
 ---@return {points: number, mvp: number, displayName:string?, name:string, flag:string?, team:string?}[]
 function MvpTable.processData(queryData)
 	local playerList = {}
@@ -252,88 +190,6 @@ end
 function MvpTable.sortFunction(tbl, a, b)
 	return tbl[a].mvp > tbl[b].mvp or
 		tbl[a].mvp == tbl[b].mvp and tbl[a].name < tbl[b].name
-end
-
----
--- Function to legacy query data from match1 and process it
----@param conditions string
----@return {points: number, mvp: number, displayName:string?, name:string, flag:string?, team:string?}[]?
-function MvpTable._queryMatch1(conditions)
-	local queryData = mw.ext.LiquipediaDB.lpdb('match', {
-		limit = 5000,
-		conditions = conditions,
-		order = 'date desc',
-		query = 'opponent1players, opponent2players, opponent1, opponent2, extradata',
-	})
-
-	if type(queryData) ~= 'table' or not queryData[1] then
-		return
-	end
-
-	local playerList = {}
-	local mvpList = {}
-
-	---@cast queryData table
-	for _, match in pairs(queryData) do
-		local players, points = string.match((match.extradata or {}).mvp or '', '([%w%(%) _,%w-]+);(%d+)')
-		if players and points then
-			for _, player in pairs(mw.text.split(players, ',')) do
-				if String.isNotEmpty(player) then
-					player = mw.text.trim(player)
-					local redirectResolvedPlayer = mw.ext.TeamLiquidIntegration.resolve_redirect(player)
-					local identifier = redirectResolvedPlayer:gsub(' ', '_')
-
-					if not playerList[identifier] then
-						playerList[identifier] = MvpTable._findPlayerInfo(match, {
-							player:lower():gsub('_', ' '),
-							player:lower():gsub(' ', '_'),
-							redirectResolvedPlayer:lower(),
-							identifier:lower(),
-						}, identifier, player)
-					end
-
-					playerList[identifier].points = playerList[identifier].points + points
-					playerList[identifier].mvp = playerList[identifier].mvp + 1
-				end
-			end
-		end
-	end
-
-	for _, item in Table.iter.spairs(playerList, MvpTable.sortFunction) do
-		table.insert(mvpList, item)
-	end
-
-	return mvpList
-end
-
----
--- Function to find player info in match1 matches for a given lookup table
----@param match table
----@param lookupTable string[]
----@param link string
----@param displayName string
----@return {points: number, mvp: number, displayName:string, name:string, flag:string?, team:string?}
-function MvpTable._findPlayerInfo(match, lookupTable, link, displayName)
-	--basic information obtainable from mvp field without any lookup in opponent player data
-	local playerData = {
-		name = link,
-		displayName = displayName,
-		points = 0,
-		mvp = 0,
-	}
-
-	for opponentIndex = 1, 2 do
-		for prefix, player in Table.iter.pairsByPrefix(match['opponent' .. opponentIndex .. 'players'], 'p') do
-			if String.isNotEmpty(player) and Table.includes(lookupTable, player:lower()) then
-				playerData.flag = match['opponent' .. opponentIndex .. 'players'][prefix .. 'flag']
-				playerData.displayName = match['opponent' .. opponentIndex .. 'players'][prefix .. 'dn'] or playerData.displayName
-				playerData.team = match['opponent' .. opponentIndex]
-				return playerData
-			end
-		end
-	end
-
-	return playerData
 end
 
 return Class.export(MvpTable, {exports = {'run'}})

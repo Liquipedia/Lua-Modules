@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local String = Lua.import('Module:StringUtils')
@@ -411,6 +412,19 @@ function TournamentStructure.getMatch2Filter(spec)
 			end)
 	)
 	return '(' .. table.concat(whereClauses, ' OR ') .. ')'
+end
+
+--- Queries and returns a list of matches using the provided match group spec.
+---@param spec {matchGroupIds: table, pageNames: string[][]}
+---@return MatchGroupUtilMatch[]
+function TournamentStructure.fetchMatches(spec)
+	return Array.map(
+		mw.ext.LiquipediaDB.lpdb('match2', {
+			conditions = TournamentStructure.getMatch2Filter(spec),
+			limit = 5000,
+		}),
+		MatchGroupUtil.matchFromRecord
+	)
 end
 
 --- Splits a page name into a namespace, base, and stage.
