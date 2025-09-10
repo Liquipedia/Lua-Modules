@@ -28,7 +28,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field margin number
 ---@field points boolean
 ---@field title string?
----@field matchGroupSpec {matchGroupIds: string[], pageNames: string[][]}
+---@field matchGroupSpec MatchGroupsSpec
 
 local MvpTable = {}
 
