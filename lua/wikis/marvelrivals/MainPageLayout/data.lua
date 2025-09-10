@@ -93,7 +93,7 @@ return {
 	title = 'The Marvel Rivals Wiki',
 	navigation = {
 		{
-			file = 'SparkR OWCS Major 2024.jpg',
+			file = '100T at MRIG Mid Season Finals 2025.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -102,7 +102,7 @@ return {
 			},
 		},
 		{
-			file = 'Crazy Raccoon 2024 Esports World Cup Champions.jpg',
+			file = 'Rad EU MRIG Mid Season Finals 2025 Champions.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -111,7 +111,7 @@ return {
 			},
 		},
 		{
-			file = 'NTMR Infekted at OWCS 2024 Finals.jpg',
+			file = 'Cozy & Coluge at MRIG Mid Season Finals 2025.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -120,7 +120,7 @@ return {
 			},
 		},
 		{
-			file = 'OWCS Stockholm 2024 Trophy.jpg',
+			file = 'Ignite 2025 Mid Season Finals Trophy.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -129,7 +129,7 @@ return {
 			},
 		},
 		{
-			file = 'Marvel_Rivals_teamup_banner_Planet_X_Pals.png',
+			file = 'Season 0 Heroes Marvel Rivals.jpg',
 			title = 'Heroes',
 			link = 'Portal:Heroes',
 			count = {
@@ -139,7 +139,7 @@ return {
 			},
 		},
 		{
-			file = 'Marvel_Rivals_icon_Planet_x_Pals.png',
+			file = 'Marvel Rivals Old Hulk and Iron Man Team-Up.png',
 			title = 'Mechanics',
 			link = 'Mechanics',
 			count = {
@@ -148,7 +148,7 @@ return {
 			},
 		},
 		{
-			file = 'Marvel_Rivals_map_Royal_Palace.jpg',
+			file = 'Marvel Rivals map Celestial Husk.jpg',
 			title = 'Maps',
 			link = 'Portal:Maps',
 			count = {
@@ -168,7 +168,7 @@ return {
 			},
 		},
 		{
-			file = 'NRG hodsic at the ALGS Mannheim Split 2 Playoffs.jpg',
+			file = 'Gator at the MRIG Mid Season Finals 2025.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
