@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
@@ -81,6 +82,16 @@ end
 ---@return string
 function MatchGroupLegacyDefault.run(frame)
 	return MatchGroupLegacyDefault(frame):build()
+end
+
+---@param frame Frame
+---@return string
+function MatchGroupLegacyDefault.runGenerate(frame)
+	frame.args.template = frame.args[1]
+	frame.args.templateOld = frame.args[2]
+	frame.args.type = frame.args.type or Opponent.solo
+
+	return MatchGroupLegacyDefault(frame):generate()
 end
 
 return MatchGroupLegacyDefault
