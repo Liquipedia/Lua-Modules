@@ -49,10 +49,13 @@ function TeamHistoryManual.parse(args)
 	}
 end
 
----@param display string
+---@param display string?
 ---@param estimate string?
 ---@return string?
 function TeamHistoryManual._parseDatesToYmd(display, estimate)
+	if not display then
+		return
+	end
 	if Logic.isNotEmpty(estimate) then
 		---@cast estimate -nil
 		return DateExt.toYmdInUtc(estimate)
@@ -79,7 +82,7 @@ function TeamHistoryManual._readDateInput(dateInput)
 	local leaveInput = string.sub(dateInput, 11) -- everything after the first date
 	local leaveDate
 	if not leaveInput:find('Present') then
-		leaveDate = leaveInput:gsub('^[^%d]*', '') -- trim away everything before the (second) date
+		leaveDate = leaveInput:gsub('^[^%d%?]*', '') -- trim away everything before the (second) date
 		TeamHistoryManual._checkDate(leaveDate)
 	end
 
