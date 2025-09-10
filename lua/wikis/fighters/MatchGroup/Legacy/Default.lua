@@ -1,44 +1,32 @@
 ---
 -- @Liquipedia
--- wiki=fighters
 -- page=Module:MatchGroup/Legacy/Default
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 
 local MAX_NUMBER_OF_OPPONENTS = 2
 
 ---@class FightersMatchGroupLegacyDefault: MatchGroupLegacy
+---@operator call(Frame): FightersMatchGroupLegacyDefault
 local MatchGroupLegacyDefault = Class.new(MatchGroupLegacy)
 
 ---@param template string
 ---@param bracketType string?
 ---@return match2mapping
 function MatchGroupLegacyDefault.get(template, bracketType)
-	return MatchGroupLegacy.getAlt(template)
-end
-
----@param prefix string
----@param scoreKey string
----@return table
-function MatchGroupLegacyDefault:getOpponent(prefix, scoreKey)
-	return {
-		['$notEmpty$'] = prefix,
-		score = prefix .. scoreKey,
-		name = prefix ,
-		displayname = prefix .. 'display',
-		flag = prefix .. 'flag',
-	}
+	return MatchGroupLegacy.getAlt(template, bracketType)
 end
 
 ---@param isReset boolean
@@ -55,7 +43,6 @@ function MatchGroupLegacyDefault:handleOpponents(isReset, match1params, match)
 		opp['$notEmpty$'] = nil
 		match['opponent' .. opponentIndex] = self:readOpponent(opp)
 	end)
-	mw.logObject(match)
 end
 
 ---@param isReset boolean
@@ -67,7 +54,7 @@ function MatchGroupLegacyDefault:getDetails(isReset, prefix)
 	Table.iter.forEachPair(self.args, function (key)
 		if not tonumber(key) and String.startsWith(key, prefix) then
 			if String.contains(key, 'p1char') or String.contains(key, 'p2char') then
-				details[key:gsub(prefix, '')] = Json.stringify({self.args[key]})
+				details[key:gsub(prefix, '')] = Json.stringify(Array.parseCommaSeparatedString(self.args[key]))
 			else
 				details[key:gsub(prefix, '')] = self.args[key]
 			end
@@ -86,14 +73,8 @@ function MatchGroupLegacyDefault:getMap()
 		score2 = 'p2score$1$',
 		o1p1 = 'p1char$1$',
 		o2p1 = 'p2char$1$',
+		vod = 'vodgame$1$'
 	}
-end
-
----@param isReset boolean?
----@param match table
-function MatchGroupLegacyDefault:handleOtherMatchParams(isReset, match)
-	mw.logObject(match)
-	match.winner = Table.extract(match, 'win')
 end
 
 ---@param frame Frame
