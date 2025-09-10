@@ -57,18 +57,18 @@ function MvpTable.run(args)
 		classes = {'wikitable', 'prizepooltable','collapsed'},
 		css = {
 			['text-align'] = 'center',
-			['margin-top'] = args.margin .. 'px'
+			['margin-top'] = parsedArgs.margin .. 'px'
 		},
 		attributes = {
-			['data-opentext'] = 'place ' .. (args.cutafter + 1) .. ' to ' .. #mvpList,
-			['data-closetext'] = 'place ' .. (args.cutafter + 1) .. ' to ' .. #mvpList,
-			['data-cutafter'] = args.cutafter + (String.isNotEmpty(args.title) and 1 or 0),
+			['data-opentext'] = 'place ' .. (parsedArgs.cutafter + 1) .. ' to ' .. #mvpList,
+			['data-closetext'] = 'place ' .. (parsedArgs.cutafter + 1) .. ' to ' .. #mvpList,
+			['data-cutafter'] = parsedArgs.cutafter + (String.isNotEmpty(args.title) and 1 or 0),
 			['data-definedcutafter'] = ''
 		},
 		children = WidgetUtil.collect(
 			MvpTable._mainHeader(args),
 			MvpTable._subHeader(args),
-			Array.map(mvpList, FnUtil.curry(MvpTable._row, args))
+			Array.map(mvpList, FnUtil.curry(MvpTable._row, parsedArgs))
 		)
 	}
 end
