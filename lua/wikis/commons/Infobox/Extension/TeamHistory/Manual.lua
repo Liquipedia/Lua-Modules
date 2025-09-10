@@ -49,7 +49,7 @@ function TeamHistoryManual.parse(args)
 	}
 end
 
----@param display string
+---@param display string?
 ---@param estimate string?
 ---@return string?
 function TeamHistoryManual._parseDatesToYmd(display, estimate)
