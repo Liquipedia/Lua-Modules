@@ -53,6 +53,9 @@ end
 ---@param estimate string?
 ---@return string?
 function TeamHistoryManual._parseDatesToYmd(display, estimate)
+	if not display then
+		return
+	end
 	if Logic.isNotEmpty(estimate) then
 		---@cast estimate -nil
 		return DateExt.toYmdInUtc(estimate)
