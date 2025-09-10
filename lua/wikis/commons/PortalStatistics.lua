@@ -815,7 +815,7 @@ function StatisticsPortal._massQuery(tableName, parameters)
 
 	Lpdb.executeMassQuery(tableName, parameters, function (item)
 		table.insert(data, item)
-	end)
+	end, parameters.limit)
 
 	return data
 end
