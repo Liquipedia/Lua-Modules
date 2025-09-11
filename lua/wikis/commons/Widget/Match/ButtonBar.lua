@@ -85,6 +85,8 @@ function MatchButtonBar:render()
 		return Logic.nilIfEmpty(gameVods) or {makeVodDTO('match', match)}
 	end
 
+	local buttonText = numberOfStreams < 3 and 'full' or numberOfStreams <= 4 and 'short' or nil
+
 	local vods = makeVodDTOs()
 	local makeDropdownForVods = displayVods and #vods > 1
 	local showInlineVods = displayVods and #vods == 1
@@ -94,7 +96,7 @@ function MatchButtonBar:render()
 			MatchPageButton{
 				match = match,
 				buttonType = self.props.variant,
-				hideText = displayStreams and numberOfStreams >= 3
+				buttonText = buttonText,
 			},
 			displayStreams and StreamsContainer{
 				streams = filteredStreams,

@@ -18,12 +18,18 @@ local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 local SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE = 2 * 60 * 60 -- 2 hours in seconds
 
+---@class MatchPageButtonProps
+---@field match MatchGroupUtilMatch
+---@field buttonType 'secondary' | 'ghost'
+---@field buttonText 'full' | 'short' | nil
+
 ---@class MatchPageButton: Widget
 ---@operator call(table): MatchPageButton
+---@field props MatchPageButtonProps
 local MatchPageButton = Class.new(Widget)
 MatchPageButton.defaultProps = {
 	buttonType = 'secondary',
-	hideText = false,
+	buttonText = 'full'
 }
 
 ---@return Widget?
@@ -58,12 +64,16 @@ function MatchPageButton:render()
 			size = 'sm',
 			link = link,
 			grow = true,
-			children = self.props.hideText and {
-				Icon{iconName = 'matchpagelink'},
-			} or {
+			children = self.props.buttonText == 'full' and {
 				Icon{iconName = 'matchpagelink'},
 				' ',
 				'View match details',
+			} or self.props.buttonText == 'short' and {
+				Icon{iconName = 'matchpagelink'},
+				' ',
+				'Details'
+			} or {
+				Icon{iconName = 'matchpagelink'},
 			}
 		}
 	end
@@ -75,10 +85,10 @@ function MatchPageButton:render()
 		size = 'sm',
 		link = link,
 		grow = true,
-		children = self.props.hideText and {
-			'+ Add',
-		} or {
+		children = self.props.buttonText == 'full' and {
 			'+ Add details'
+		} or {
+			'+ Add',
 		}
 	}
 end
