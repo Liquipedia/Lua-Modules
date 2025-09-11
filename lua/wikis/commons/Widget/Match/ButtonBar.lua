@@ -60,13 +60,10 @@ function MatchButtonBar:render()
 	end
 
 	local filteredStreams = StreamLinks.filterStreams(match.stream)
-	local processedStreams = Array.flatMap(StreamLinks.countdownPlatformNames, function(platform)
-		return Array.map(filteredStreams[platform] or {}, function(stream)
-			return {platform = platform, stream = stream}
-		end)
-	end)
-
-	local numberOfStreams = #processedStreams
+	local numberOfStreams = 0
+	for _, streams in pairs(filteredStreams) do
+		numberOfStreams = numberOfStreams + #streams
+	end
 
 	local makeVodDTO = function(type, gameOrMatch, number)
 		if Logic.isEmpty(gameOrMatch.vod) then
