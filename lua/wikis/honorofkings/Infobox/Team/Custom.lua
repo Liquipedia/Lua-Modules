@@ -65,12 +65,10 @@ end
 
 ---@return Widget?
 function CustomTeam:createBottomContent()
-	if not self.args.disbanded then
-		return HtmlWidgets.Fragment{children = {
-			UpcomingTournaments.team(self.teamTemplate.templatename),
-			PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}}
-		}}
-	end
+	return HtmlWidgets.Fragment{children = {
+		UpcomingTournaments.team(self.teamTemplate.templatename),
+		PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}}
+	}}
 end
 
 return CustomTeam
