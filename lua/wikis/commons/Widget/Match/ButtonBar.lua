@@ -88,8 +88,6 @@ function MatchButtonBar:render()
 		buttonText = 'full'
 	elseif displayStreams and numberOfStreams <= 4 then
 		buttonText = 'short'
-	else
-		buttonText = nil
 	end
 
 	local vods = makeVodDTOs()
