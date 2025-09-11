@@ -85,7 +85,14 @@ function MatchButtonBar:render()
 		return Logic.nilIfEmpty(gameVods) or {makeVodDTO('match', match)}
 	end
 
-	local buttonText = numberOfStreams < 3 and 'full' or numberOfStreams <= 4 and 'short' or nil
+	local buttonText
+	if (not displayStreams) or (displayStreams and numberOfStreams < 3) then
+		buttonText = 'full'
+	elseif displayStreams and numberOfStreams <= 4 then
+		buttonText = 'short'
+	else
+		buttonText = nil
+	end
 
 	local vods = makeVodDTOs()
 	local makeDropdownForVods = displayVods and #vods > 1
