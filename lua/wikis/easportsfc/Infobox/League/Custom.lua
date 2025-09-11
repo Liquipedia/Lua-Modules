@@ -35,6 +35,7 @@ local PLATFORMS = {
 	playstation5 = 'PlayStation 5',
 	xboxplaystation = 'Xbox and PlayStation',
 	xboxandplaystation = 'Xbox and PlayStation',
+	mobile = 'Mobile',
 }
 
 ---@param frame Frame
