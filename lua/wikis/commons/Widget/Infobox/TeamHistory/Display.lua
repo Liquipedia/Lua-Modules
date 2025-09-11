@@ -204,11 +204,11 @@ function TeamHistoryDisplay:_row(transfer)
 			role = roleData and Abbr{title = roleData.display, children = {roleData.abbreviation}}
 		end
 	end
-	if role == LOAN then
-		teamText = '&#8250;&nbsp;' .. teamText
-	end
 	---@type (string|Widget)[]
-	local teamDisplay = {teamText}
+	local teamDisplay = WidgetUtil.collect(
+		role == LOAN and '&#8250;&nbsp;' or nil
+		teamText
+	)
 	if role then
 		table.insert(teamDisplay,
 			Span{
