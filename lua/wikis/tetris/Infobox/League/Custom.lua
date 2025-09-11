@@ -24,14 +24,14 @@ local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
 local GAME_GROUPS = {
-	classic = {'Tetris', 'NES (1989)', 'NES (1989) NTSC', 'NES (1989) PAL', 'NES (1989) DAS', 'Super Tetris',
-		'Plus', 'Plus 2'},
-	modern = {'Tetris Effect', 'Tetris Effect: Connected', 'Jstris', 'Worldwide Combos', 'TETR.IO', 'Nuketris',
-		'Tetris 2', 'Puyo Puyo Tetris', 'Puyo Puyo Tetris 2', 'Tetris 99', 'Tetris DS', 'Tetris Friends',
-		'Tetris Online Japan', 'Tetris Online Poland'},
-	other = {'Attack', '64 (1998)', 'The New Tetris', 'Tetris & Dr.Mario', 'NullpoMino', 'Blockbox', 'Cultris 2',
-		'TetriNET 2'},
-	tgm = {'The Grand Master', 'The Grand Master 2', 'The Grand Master 3'},
+	classic = {'tetris', 'classic', 'classic ntsc', 'classic pal', 'classic das', 'super',
+		'plus', 'plus 2'},
+	modern = {'te', 'tec', 'jstris', 'wwc', 'tetrio', 'nuketris',
+		'tetris 2', 'ppt1', 'ppt2', 't99', 'td', 'tetris friends',
+		'tetris online japan', 'tetris online poland'},
+	other = {'attack', '64', 'tnt', 'tetris & dr.mario', 'nullpomino', 'blockbox', 'cultris 2',
+		'tetrinet 2'},
+	tgm = {'tgm', 'tgm2', 'tgm3', 'tgm4'},
 }
 
 ---@param frame Frame

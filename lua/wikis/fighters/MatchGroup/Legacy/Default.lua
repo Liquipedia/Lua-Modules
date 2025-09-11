@@ -7,33 +7,43 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 
----@class HearthstoneMatchGroupLegacyDefault: MatchGroupLegacy
+local MAX_NUMBER_OF_OPPONENTS = 2
+
+---@class FightersMatchGroupLegacyDefault: MatchGroupLegacy
+---@operator call(Frame): FightersMatchGroupLegacyDefault
 local MatchGroupLegacyDefault = Class.new(MatchGroupLegacy)
 
 ---@param template string
 ---@param bracketType string?
 ---@return match2mapping
 function MatchGroupLegacyDefault.get(template, bracketType)
-	return MatchGroupLegacy.getAlt(template)
+	return MatchGroupLegacy.getAlt(template, bracketType)
 end
 
----@param prefix string
----@param scoreKey string
----@return table
-function MatchGroupLegacyDefault:getOpponent(prefix, scoreKey)
-	return {
-		['$notEmpty$'] = prefix,
-		score = prefix .. scoreKey,
-		name = prefix ,
-		displayname = prefix .. 'display',
-		flag = prefix .. 'flag',
-	}
+---@param isReset boolean
+---@param match1params match1Keys
+---@param match table
+function MatchGroupLegacyDefault:handleOpponents(isReset, match1params, match)
+	Array.forEach(Array.range(1, MAX_NUMBER_OF_OPPONENTS), function (opponentIndex)
+		local opp = self:getOpponent(match1params['opp' .. opponentIndex], 'score')
+		if isReset then
+			opp.score = match1params['details'] .. 'p' .. opponentIndex .. 'score'
+		end
+		if Logic.isEmpty(self.args[opp['$notEmpty$']]) then return end
+
+		opp['$notEmpty$'] = nil
+		match['opponent' .. opponentIndex] = self:readOpponent(opp)
+	end)
 end
 
 ---@param isReset boolean
@@ -44,7 +54,11 @@ function MatchGroupLegacyDefault:getDetails(isReset, prefix)
 
 	Table.iter.forEachPair(self.args, function (key)
 		if not tonumber(key) and String.startsWith(key, prefix) then
-			details[key:gsub(prefix, '')] = self.args[key]
+			if String.contains(key, 'p1char') or String.contains(key, 'p2char') then
+				details[key:gsub(prefix, '')] = Json.stringify(Array.parseCommaSeparatedString(self.args[key]))
+			else
+				details[key:gsub(prefix, '')] = self.args[key]
+			end
 		end
 	end)
 
@@ -56,16 +70,12 @@ function MatchGroupLegacyDefault:getMap()
 	return {
 		['$notEmpty$'] = 'win$1$',
 		winner = 'win$1$',
-		o1c1 = 'p1class$1$',
-		o2c1 = 'p2class$1$',
+		score1 = 'p1score$1$',
+		score2 = 'p2score$1$',
+		o1p1 = 'p1char$1$',
+		o2p1 = 'p2char$1$',
 		vod = 'vodgame$1$'
 	}
-end
-
----@param isReset boolean?
----@param match table
-function MatchGroupLegacyDefault:handleOtherMatchParams(isReset, match)
-	match.winner = Table.extract(match, 'win')
 end
 
 ---@param frame Frame
@@ -79,7 +89,7 @@ end
 function MatchGroupLegacyDefault.runGenerate(frame)
 	frame.args.template = frame.args[1]
 	frame.args.templateOld = frame.args[2]
-	frame.args.type = frame.args.type or 'team'
+	frame.args.type = frame.args.type or Opponent.solo
 
 	return MatchGroupLegacyDefault(frame):generate()
 end

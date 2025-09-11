@@ -875,7 +875,7 @@ div.brkts-popup-body-element-thumbs {
 
 	.brkts-popup-mapveto-vetotype {
 		font-weight: bold;
-		color: var( --clr-on-background, #000000 );
+		color: var( --clr-primary-100 );
 		border: 0;
 		border-radius: 0.875rem;
 		letter-spacing: 0.1em;
@@ -884,21 +884,21 @@ div.brkts-popup-body-element-thumbs {
 	}
 
 	.brkts-popup-mapveto-pick {
-		.theme--light {
+		.theme--light & {
 			background-color: var( --clr-semantic-positive-40, #27a527 ) !important;
 		}
 
-		.theme--dark {
+		.theme--dark & {
 			background-color: var( --clr-semantic-positive-20, #145214 ) !important;
 		}
 	}
 
 	.brkts-popup-mapveto-ban {
-		.theme--light {
+		.theme--light & {
 			background-color: var( --clr-semantic-negative-40, #b81414 ) !important;
 		}
 
-		.theme--dark {
+		.theme--dark & {
 			background-color: var( --clr-semantic-negative-20, #5c0a0a ) !important;
 		}
 	}

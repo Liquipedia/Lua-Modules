@@ -34,7 +34,7 @@ local prizePoolVars = PageVariableNamespace('PrizePool')
 ---@class ParticipantTableConfig
 ---@field lpdbPrefix string?
 ---@field noStorage boolean
----@field matchGroupSpec table?
+---@field matchGroupSpec MatchGroupsSpec?
 ---@field syncPlayers boolean
 ---@field showCountBySection boolean
 ---@field onlyNotable boolean

@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local String = Lua.import('Module:StringUtils')
@@ -20,6 +21,7 @@ local FULL_PAGENAME = mw.title.getCurrentTitle().prefixedText
 
 local TournamentStructure = {types = {}}
 
+---@alias MatchGroupsSpec {matchGroupIds: string[], pageNames: string[][]}
 TournamentStructure.types.MatchGroupsSpec = TypeUtil.struct{
 	matchGroupIds = TypeUtil.array('string'),
 	pageNames = TypeUtil.array(TypeUtil.array('string')),
@@ -46,7 +48,7 @@ end
 --- |matchGroupId1=Z1lDMZPiGA
 --- |matchGroupId2=Liquipedia_wnbxUh4Vm1
 ---@param args table
----@return table?
+---@return MatchGroupsSpec?
 function TournamentStructure.readMatchGroupsSpec(args)
 	local matchGroupIds = {args.id}
 	table.insert(matchGroupIds, args.matchGroupId)
@@ -88,7 +90,7 @@ function TournamentStructure.readMatchGroupsSpec(args)
 	end
 end
 
----@return {matchGroupIds: {}, pageNames: {[1]: {[1]: string}}}
+---@return MatchGroupsSpec
 function TournamentStructure.currentPageSpec()
 	return {
 		matchGroupIds = {},
@@ -112,7 +114,7 @@ end)
 --- the tournamentX arg determines the ordering of pages, hence stage order.
 ---@param groupTables table
 ---@param brackets table
----@param spec {matchGroupIds: table, pageNames: string[][]}
+---@param spec MatchGroupsSpec
 ---@return table
 function TournamentStructure.groupByStage(groupTables, brackets, spec)
 	local function getStageKey(recordGroup)
@@ -258,7 +260,7 @@ function TournamentStructure.fetchGroupsFromFilter(filter)
 end
 
 --- Fetch group table results from standings table.
----@param spec {matchGroupIds: table, pageNames: string[][]}
+---@param spec MatchGroupsSpec
 ---@return table
 function TournamentStructure.fetchGroupTables(spec)
 	local pageData = Array.flatten(Array.map(spec.pageNames, function(pageName, groupIndex)
@@ -369,7 +371,7 @@ function TournamentStructure._groupPlacement(finished, slotIndex, placement)
 end
 
 --- Converts a match group spec to a standing record filter. Returns a filter string for use in LPDB queries.
----@param spec {matchGroupIds: table, pageNames: string[][]}
+---@param spec MatchGroupsSpec
 ---@return string
 function TournamentStructure.getGroupTableFilter(spec)
 	local whereClauses = Array.map(spec.pageNames, function(pageName)
@@ -380,7 +382,7 @@ function TournamentStructure.getGroupTableFilter(spec)
 end
 
 --- Fetches bracket data (matches) for a given match group spec.
----@param spec {matchGroupIds: table, pageNames: string[][]}
+---@param spec MatchGroupsSpec
 ---@return table
 function TournamentStructure.fetchBrackets(spec)
 	local idData = Array.map(spec.matchGroupIds, function(matchGroupId)
@@ -401,7 +403,7 @@ function TournamentStructure.fetchBrackets(spec)
 end
 
 --- Converts a match group spec to a match2 record filter. Returns a filter string for use in LPDB queries.
----@param spec {matchGroupIds: table, pageNames: string[][]}
+---@param spec MatchGroupsSpec
 ---@return string
 function TournamentStructure.getMatch2Filter(spec)
 	local whereClauses = Array.extend(
@@ -411,6 +413,19 @@ function TournamentStructure.getMatch2Filter(spec)
 			end)
 	)
 	return '(' .. table.concat(whereClauses, ' OR ') .. ')'
+end
+
+--- Queries and returns a list of matches using the provided match group spec.
+---@param spec MatchGroupsSpec
+---@return MatchGroupUtilMatch[]
+function TournamentStructure.fetchMatches(spec)
+	return Array.map(
+		mw.ext.LiquipediaDB.lpdb('match2', {
+			conditions = TournamentStructure.getMatch2Filter(spec),
+			limit = 5000,
+		}),
+		MatchGroupUtil.matchFromRecord
+	)
 end
 
 --- Splits a page name into a namespace, base, and stage.

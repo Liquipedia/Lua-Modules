@@ -20,12 +20,6 @@ local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 local CONTENT = {
-	updates = {
-		heading = 'Updates',
-		body = '<nowiki>\n</nowiki>{{Main Page Updates}}',
-		padding = true,
-		boxid = 1502,
-	},
 	usefulArticles = {
 		heading = 'Useful Articles',
 		body = '{{Liquipedia:Useful Articles}}',
@@ -48,9 +42,7 @@ local CONTENT = {
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
-		body = ThisDayWidgets.Content{
-			birthdayListPage = 'Birthday list'
-		},
+		body = ThisDayWidgets.Content(),
 		padding = true,
 		boxid = 1510,
 	},
@@ -75,8 +67,12 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			upcomingDays = 60,
-			completedDays = 20
+			upcomingDays = 30,
+			completedDays = 20,
+			modifierTypeQualifier = -2,
+			modifierTier1 = 55,
+			modifierTier2 = 55,
+			modifierTier3 = 10
 		},
 		padding = true,
 		boxid = 1508,
@@ -85,15 +81,15 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Marvel Rivals full lightmode.png',
-		darkmode = 'Marvel Rivals full darkmode.png',
+		lightmode = 'Tetris allmode.png',
+		darkmode = 'Tetris allmode.png',
 	},
-	metadesc = 'Comprehensive Marvel Rivals wiki with articles covering everything from heroes and maps, ' ..
-	'to strategies, to tournaments, to competitive players, and teams.',
-	title = 'The Marvel Rivals Wiki',
+	metadesc = 'The Tetris wiki covering everything from players, teams and transfers, ' ..
+		'to tournaments and results, strategies, and games.',
+	title = 'Tetris',
 	navigation = {
 		{
-			file = '100T at MRIG Mid Season Finals 2025.jpg',
+			file = 'Dog CTWC2024.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -102,25 +98,7 @@ return {
 			},
 		},
 		{
-			file = 'Rad EU MRIG Mid Season Finals 2025 Champions.jpg',
-			title = 'Teams',
-			link = 'Portal:Teams',
-			count = {
-				method = 'LPDB',
-				table = 'team',
-			},
-		},
-		{
-			file = 'Cozy & Coluge at MRIG Mid Season Finals 2025.jpg',
-			title = 'Transfers',
-			link = 'Portal:Transfers',
-			count = {
-				method = 'LPDB',
-				table = 'transfer',
-			},
-		},
-		{
-			file = 'Ignite 2025 Mid Season Finals Trophy.jpg',
+			file = 'Meme vs Alex T - CTWC 2025.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -129,46 +107,22 @@ return {
 			},
 		},
 		{
-			file = 'Season 0 Heroes Marvel Rivals.jpg',
-			title = 'Heroes',
-			link = 'Portal:Heroes',
-			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::character]]',
-			},
+			file = 'CTWC 2025 Trophies.jpg',
+			title = 'Classic Tournaments',
+			link = 'S-Tier_Tournaments/Classic',
 		},
 		{
-			file = 'Marvel Rivals Old Hulk and Iron Man Team-Up.png',
-			title = 'Mechanics',
-			link = 'Mechanics',
-			count = {
-				method = 'CATEGORY',
-				category = 'Mechanics',
-			},
+			file = 'TETRIS Modern banner image.JPG',
+			title = 'Modern Tournaments',
+			link = 'S-Tier_Tournaments/Modern',
 		},
 		{
-			file = 'Marvel Rivals map Celestial Husk.jpg',
-			title = 'Maps',
-			link = 'Portal:Maps',
-			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::map]]',
-			},
+			file = 'SNES Signed - CTWC 2025.jpg',
+			title = 'Games',
+			link = 'Portal:Games',
 		},
 		{
-			file = 'Marvel Rivals gameasset Patches allmode.jpg',
-			title = 'Patches',
-			link = 'Portal:Patches',
-			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::patch]]',
-			},
-		},
-		{
-			file = 'Gator at the MRIG Mid Season Finals 2025.jpg',
+			file = 'Tetris on a CRT at 2024 CTWC.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
@@ -180,16 +134,15 @@ return {
 				children = {
 					{
 						mobileOrder = 1,
-						noPanel = true,
 						content = CONTENT.specialEvents,
+					},
+					{
+						mobileOrder = 3,
+						content = CONTENT.thisDay,
 					},
 					{
 						mobileOrder = 4,
 						content = CONTENT.transfers,
-					},
-					{
-						mobileOrder = 8,
-						content = CONTENT.wantToHelp,
 					},
 				}
 			},
@@ -197,7 +150,7 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 3,
+						mobileOrder = 2,
 						children = {
 							{
 								children = {
@@ -228,16 +181,12 @@ return {
 						},
 					},
 					{
-						mobileOrder = 6,
-						content = CONTENT.thisDay,
-					},
-					{
 						mobileOrder = 5,
-						content = CONTENT.updates,
-					},
-					{
-						mobileOrder = 7,
 						content = CONTENT.usefulArticles,
+					},
+										{
+						mobileOrder = 6,
+						content = CONTENT.wantToHelp,
 					},
 				},
 			},

@@ -74,7 +74,7 @@ local NOT_YET_IN_ROLES_DATA = {
 	['inactive coach'] = {display = 'Inactive Coach'},
 	['inactive loan'] = {display = 'Inactive Loan'},
 	['inactive manager'] = {display = 'Inactive Manager'},
-	['inactive'] = {display = 'Inactive', abbreviation = 'Ia.'},
+	['inactive'] = {display = 'Inactive', abbreviation = 'IA.'},
 	['interim coach'] = {display = 'Interim Coach'},
 	['loaned assistant coach'] = {display = 'Loaned Asst. Coach'},
 	['loaned coach'] = {display = 'Loaned Coach'},
