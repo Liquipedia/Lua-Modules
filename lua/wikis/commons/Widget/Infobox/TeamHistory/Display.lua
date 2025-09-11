@@ -206,7 +206,7 @@ function TeamHistoryDisplay:_row(transfer)
 	end
 	---@type (string|Widget)[]
 	local teamDisplay = WidgetUtil.collect(
-		role == LOAN and '&#8250;&nbsp;' or nil
+		role == LOAN and '&#8250;&nbsp;' or nil,
 		teamText
 	)
 	if role then
