@@ -64,7 +64,7 @@ function MatchPageButton:render()
 			size = 'sm',
 			link = link,
 			grow = true,
-			children =  {
+			children = {
 				Icon{iconName = 'matchpagelink'},
 				self.props.buttonText == 'full' and ' ' .. 'View match details' or nil,
 				self.props.buttonText == 'short' and ' ' .. 'Details' or nil,
