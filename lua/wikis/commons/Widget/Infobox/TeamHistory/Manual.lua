@@ -30,7 +30,10 @@ function TeamHistory:render()
 		isFromWikiCode = true,
 	}
 
-	return TeamHistoryDisplay{transferList = transferList}
+	return TeamHistoryDisplay{
+		transferList = transferList,
+		alwaysShowPresent = true,
+	}
 end
 
 return TeamHistory

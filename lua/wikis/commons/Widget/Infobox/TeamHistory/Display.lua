@@ -125,7 +125,7 @@ local HAS_REFS = ((Info.config.infoboxPlayer or {}).automatedHistory or {}).hasH
 
 ---@class TeamHistoryDisplayWidget: Widget
 ---@operator call(table): TeamHistoryDisplayWidget
----@field props {transferList: TransferSpan[], player: string}
+---@field props {transferList: TransferSpan[], player: string, alwaysShowPresent: boolean?}
 local TeamHistoryDisplay = Class.new(Widget)
 TeamHistoryDisplay.defaultProps = {
 	transferList = {},
@@ -326,7 +326,7 @@ end
 function TeamHistoryDisplay:_buildLeaveDateDisplay(transfer)
 	if transfer.leaveDateDisplay then return transfer.leaveDateDisplay end
 
-	if not Table.includes(SPECIAL_ROLES, transfer.role) then
+	if self.props.alwaysShowPresent or not Table.includes(SPECIAL_ROLES, transfer.role) then
 		return Span{
 			css = {['font-weight'] = 'bold'},
 			children = {'Present'}
