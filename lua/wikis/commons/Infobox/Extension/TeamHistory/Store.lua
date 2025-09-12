@@ -21,7 +21,7 @@ local STORE_FROM_WIKI_CODE = ((Info.config.infoboxPlayer or {}).automatedHistory
 
 local TeamHistoryStore = {}
 
----@param props {transferList: TransferSpan[], isFromWikiCode: boolean, player: string?}
+---@param props {transferList: TransferSpan[], isFromWikiCode: boolean, player: string?, isManual: boolean}
 function TeamHistoryStore.store(props)
 	if not Namespace.isMain() then return end
 	if props.isFromWikiCode and not STORE_FROM_WIKI_CODE then return end
@@ -46,7 +46,7 @@ function TeamHistoryStore.store(props)
 				leavedate = transfer.leaveDate or '2999-01-01',
 				teamcount = transferIndex,
 				role = transfer.role,
-				auto = 1,
+				auto = props.isManual and 0 or 1,
 			},
 		})
 	end)
