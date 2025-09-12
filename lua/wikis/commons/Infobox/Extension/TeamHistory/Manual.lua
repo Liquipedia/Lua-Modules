@@ -70,11 +70,11 @@ function TeamHistoryManual._parseDatesToYmd(display, estimate, useFallback)
 		mw.ext.TeamLiquidIntegration.add_category(BAD_INPUT_CATEGORY)
 		if useFallback then
 			display = display
-				:gsub('????', '0001')
-				:gsub('???', '001')
-				:gsub('??', '01')
-				:gsub('?', '1')
-		end
+				:gsub('%?%?%?%?', '0001')
+				:gsub('%?%?%?', '001')
+				:gsub('%?%?', '01')
+				:gsub('%?', '1')
+		else return end
 	end
 
 	return DateExt.toYmdInUtc(display)
