@@ -29,7 +29,7 @@ local SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE = 2 * 60 * 60 -- 2 hours in seconds
 local MatchPageButton = Class.new(Widget)
 MatchPageButton.defaultProps = {
 	buttonType = 'secondary',
-	buttonText = 'full'
+	buttonText = 'full',
 }
 
 ---@return Widget?
@@ -64,16 +64,10 @@ function MatchPageButton:render()
 			size = 'sm',
 			link = link,
 			grow = true,
-			children = self.props.buttonText == 'full' and {
+			children =  {
 				Icon{iconName = 'matchpagelink'},
-				' ',
-				'View match details',
-			} or self.props.buttonText == 'short' and {
-				Icon{iconName = 'matchpagelink'},
-				' ',
-				'Details'
-			} or {
-				Icon{iconName = 'matchpagelink'},
+				self.props.buttonText == 'full' and ' ' .. 'View match details' or nil,
+				self.props.buttonText == 'short' and ' ' .. 'Details' or nil,
 			}
 		}
 	end
@@ -85,10 +79,10 @@ function MatchPageButton:render()
 		size = 'sm',
 		link = link,
 		grow = true,
-		children = self.props.buttonText == 'full' and {
-			'+ Add details'
-		} or {
-			'+ Add',
+		children = {
+			'+',
+			self.props.buttonText == 'full' and ' ' .. 'Add details' or nil,
+			self.props.buttonText == 'short' and ' ' .. 'Details' or nil,
 		}
 	}
 end
