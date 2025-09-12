@@ -281,8 +281,7 @@ function TeamHistoryDisplay:_row(transfer)
 end
 
 ---@param transfer TransferSpan
----@return string?
----@return Widget|string
+---@return Widget|string?
 function TeamHistoryDisplay:_getTeamText(transfer)
 	if Logic.isEmpty(transfer.team) and Table.includes(SPECIAL_ROLES, transfer.role) then
 		return transfer.role
