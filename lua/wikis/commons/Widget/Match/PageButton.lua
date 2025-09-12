@@ -15,14 +15,22 @@ local Info = Lua.import('Module:Info')
 local Widget = Lua.import('Module:Widget')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE = 2 * 60 * 60 -- 2 hours in seconds
 
+---@class MatchPageButtonProps
+---@field match MatchGroupUtilMatch
+---@field buttonType 'secondary' | 'ghost'
+---@field buttonText 'full' | 'short' | nil
+
 ---@class MatchPageButton: Widget
 ---@operator call(table): MatchPageButton
+---@field props MatchPageButtonProps
 local MatchPageButton = Class.new(Widget)
 MatchPageButton.defaultProps = {
 	buttonType = 'secondary',
+	buttonText = 'full',
 }
 
 ---@return Widget?
@@ -57,11 +65,11 @@ function MatchPageButton:render()
 			size = 'sm',
 			link = link,
 			grow = true,
-			children = {
+			children = WidgetUtil.collect(
 				Icon{iconName = 'matchpagelink'},
-				' ',
-				'View match details',
-			}
+				self.props.buttonText == 'full' and ' ' .. 'View match details' or nil,
+				self.props.buttonText == 'short' and ' ' .. 'Details' or nil
+			)
 		}
 	end
 
@@ -72,9 +80,11 @@ function MatchPageButton:render()
 		size = 'sm',
 		link = link,
 		grow = true,
-		children = {
-			'+ Add details',
-		}
+		children = WidgetUtil.collect(
+			'+',
+			self.props.buttonText == 'full' and ' ' .. 'Add details' or nil,
+			self.props.buttonText == 'short' and ' ' .. 'Details' or nil
+		)
 	}
 end
 
