@@ -105,7 +105,7 @@ function MainPageLayout._makeCells(cells)
 			end
 			table.insert(cellContent, GridWidgets.Cell{cellContent = content, ['order-xs'] = item.mobileOrder})
 		end
-		table.insert(output, GridWidgets.Cell{cellContent = cellContent, lg = column.size, xs = 'ignore', sm = 'ignore'})
+		table.insert(output, GridWidgets.Cell{cellContent = cellContent, xxl = column.size, xs = 'ignore', sm = 'ignore'})
 	end
 
 	return GridWidgets.Container{ gridCells = output }
