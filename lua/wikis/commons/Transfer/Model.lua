@@ -46,6 +46,7 @@ local Transfer = {}
 ---@field leaveDate string?
 ---@field leaveDateDisplay string?
 ---@field reference {join: table?, leave: table?}
+---@field noStorage boolean?
 
 ---@param config {player: string, specialRoles: string[]?}
 ---@return TransferSpan[]

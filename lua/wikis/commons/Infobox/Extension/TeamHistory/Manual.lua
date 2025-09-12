@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
@@ -38,14 +39,17 @@ function TeamHistoryManual.parse(args)
 		role = String.upperCaseFirst(role)
 	end
 
+	local leaveDate = TeamHistoryManual._parseDatesToYmd(displayDates.leave, args.estimated_end)
+
 	return {{
 		team = team,
 		role = role,
 		joinDate = TeamHistoryManual._parseDatesToYmd(displayDates.join, args.estimated_start),
 		joinDateDisplay = displayDates.join,
-		leaveDate = TeamHistoryManual._parseDatesToYmd(displayDates.leave, args.estimated_end),
+		leaveDate = leaveDate,
 		leaveDateDisplay = displayDates.leave,
 		reference = {},
+		noStorage = displayDates.leave and not leaveDate
 	}}
 end
 
@@ -75,14 +79,20 @@ function TeamHistoryManual._readDateInput(dateInput)
 	-- expected input formats (as per existing templates):
 		-- YYYY-MM-DD — YYYY-MM-DD
 		-- YYYY-MM-DD — '''Present'''
+		-- YYYY — YYYY (used on dota2)
 
-	local joinInput = string.sub(dateInput, 1, 10)
+	local dates = Array.parseCommaSeparatedString(dateInput, '—')
+	if #dates <= 1 then -- in case someone use a normal `-` with spaces around it as seperator instead
+		dates = Array.parseCommaSeparatedString(dateInput, '%s%-%s')
+	end
+
+	local joinInput = String.trim(dates[1])
 	TeamHistoryManual._checkDate(joinInput)
 
-	local leaveInput = string.sub(dateInput, 11) -- everything after the first date
+	local leaveInput = String.trim(dates[2] or 'present')
 	local leaveDate
-	if not leaveInput:find('Present') then
-		leaveDate = leaveInput:gsub('^[^%d%?]*', '') -- trim away everything before the (second) date
+	if not leaveInput:find('[pP]resent') then
+		leaveDate = leaveInput
 		TeamHistoryManual._checkDate(leaveDate)
 	end
 
