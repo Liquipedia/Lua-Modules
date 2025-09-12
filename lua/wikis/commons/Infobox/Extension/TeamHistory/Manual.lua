@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
@@ -75,14 +76,21 @@ function TeamHistoryManual._readDateInput(dateInput)
 	-- expected input formats (as per existing templates):
 		-- YYYY-MM-DD — YYYY-MM-DD
 		-- YYYY-MM-DD — '''Present'''
+		-- YYYY — YYYY (used on dota2)
 
-	local joinInput = string.sub(dateInput, 1, 10)
+	local dates = Array.parseCommaSeparatedString(dateInput, '—')
+	if #dates <= 1 then -- in case someone use a normal `-` with spaces around it as seperator instead
+		dates = Array.parseCommaSeparatedString(dateInput, '%s%-%s')
+	end
+	assert(dates[1] and dates[2], 'Invalid date input')
+
+	local joinInput = mw.text.trim(dates[1])
 	TeamHistoryManual._checkDate(joinInput)
 
-	local leaveInput = string.sub(dateInput, 11) -- everything after the first date
+	local leaveInput = mw.text.trim(dates[2])
 	local leaveDate
-	if not leaveInput:find('Present') then
-		leaveDate = leaveInput:gsub('^[^%d%?]*', '') -- trim away everything before the (second) date
+	if not leaveInput:find('[pP]resent') then
+		leaveDate = leaveInput
 		TeamHistoryManual._checkDate(leaveDate)
 	end
 
