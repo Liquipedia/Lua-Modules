@@ -39,7 +39,7 @@ function TeamHistoryManual.parse(args)
 		role = String.upperCaseFirst(role)
 	end
 
-	local leaveDate = TeamHistoryManual._parseDatesToYmd(displayDates.leave, args.estimated_end, true)
+	local leaveDate = TeamHistoryManual._parseDatesToYmd(displayDates.leave, args.estimated_end)
 
 	return {{
 		team = team,
@@ -55,9 +55,8 @@ end
 
 ---@param display string?
 ---@param estimate string?
----@param useFallback boolean?
 ---@return string?
-function TeamHistoryManual._parseDatesToYmd(display, estimate, useFallback)
+function TeamHistoryManual._parseDatesToYmd(display, estimate)
 	if not display then
 		return
 	end
@@ -68,13 +67,7 @@ function TeamHistoryManual._parseDatesToYmd(display, estimate, useFallback)
 
 	if display:find('%?') then
 		mw.ext.TeamLiquidIntegration.add_category(BAD_INPUT_CATEGORY)
-		if useFallback then
-			display = display
-				:gsub('%?%?%?%?', '0001')
-				:gsub('%?%?%?', '001')
-				:gsub('%?%?', '01')
-				:gsub('%?', '1')
-		else return end
+		return
 	end
 
 	return DateExt.toYmdInUtc(display)
