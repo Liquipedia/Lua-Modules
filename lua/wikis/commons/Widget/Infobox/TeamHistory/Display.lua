@@ -282,10 +282,10 @@ end
 
 ---@param transfer TransferSpan
 ---@return string?
----@return Widget
+---@return Widget|string
 function TeamHistoryDisplay:_getTeamText(transfer)
 	if Logic.isEmpty(transfer.team) and Table.includes(SPECIAL_ROLES, transfer.role) then
-		return HtmlWidgets.B{children = {transfer.role}}
+		return transfer.role
 	elseif not TeamTemplate.exists(transfer.team) then
 		return Link{link = transfer.team}
 	end
