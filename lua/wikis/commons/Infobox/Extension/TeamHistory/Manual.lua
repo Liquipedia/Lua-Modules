@@ -52,8 +52,9 @@ end
 
 ---@param display string?
 ---@param estimate string?
+---@param useFallback boolean?
 ---@return string?
-function TeamHistoryManual._parseDatesToYmd(display, estimate)
+function TeamHistoryManual._parseDatesToYmd(display, estimate, useFallback)
 	if not display then
 		return
 	end
@@ -64,13 +65,13 @@ function TeamHistoryManual._parseDatesToYmd(display, estimate)
 
 	if display:find('%?') then
 		mw.ext.TeamLiquidIntegration.add_category(BAD_INPUT_CATEGORY)
-		return DateExt.toYmdInUtc(
-			display
+		if useFallback then
+			display = display
 				:gsub('????', '0001')
 				:gsub('???', '001')
 				:gsub('??', '01')
 				:gsub('?', '1')
-		)
+		end
 	end
 
 	return DateExt.toYmdInUtc(display)
@@ -88,7 +89,6 @@ function TeamHistoryManual._readDateInput(dateInput)
 	if #dates <= 1 then -- in case someone use a normal `-` with spaces around it as seperator instead
 		dates = Array.parseCommaSeparatedString(dateInput, '%s%-%s')
 	end
-	assert(dates[1] and dates[2], 'Invalid date input')
 
 	local joinInput = String.trim(dates[1])
 	TeamHistoryManual._checkDate(joinInput)
