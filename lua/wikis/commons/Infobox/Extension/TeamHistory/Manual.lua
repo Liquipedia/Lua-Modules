@@ -87,7 +87,7 @@ function TeamHistoryManual._readDateInput(dateInput)
 	local joinInput = String.trim(dates[1])
 	TeamHistoryManual._checkDate(joinInput)
 
-	local leaveInput = String.trim(dates[2])
+	local leaveInput = String.trim(dates[2] or 'present')
 	local leaveDate
 	if not leaveInput:find('[pP]resent') then
 		leaveDate = leaveInput
