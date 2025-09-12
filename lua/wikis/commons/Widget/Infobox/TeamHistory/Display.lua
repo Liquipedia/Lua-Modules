@@ -122,6 +122,7 @@ NOT_YET_IN_ROLES_DATA.org = NOT_YET_IN_ROLES_DATA.organisation
 NOT_YET_IN_ROLES_DATA.organization = NOT_YET_IN_ROLES_DATA.organisation
 
 local HAS_REFS = ((Info.config.infoboxPlayer or {}).automatedHistory or {}).hasHeaderAndRefs
+local USES_ABBREVIATION = Logic.nilOr(((Info.config.infoboxPlayer or {}).automatedHistory or {}).useAbbreviations, true)
 
 ---@class TeamHistoryDisplayWidget: Widget
 ---@operator call(table): TeamHistoryDisplayWidget
@@ -199,15 +200,15 @@ function TeamHistoryDisplay:_row(transfer)
 			or NOT_YET_IN_ROLES_DATA[transfer.role:lower()] or NOT_YET_IN_ROLES_DATA[lastSplitRole] or {}
 		if roleData.doNotShowInHistory then
 			role = nil
-		elseif roleData.abbreviation then
+		elseif USES_ABBREVIATION and roleData.abbreviation then
 			role = roleData and Abbr{title = roleData.display, children = {roleData.abbreviation}}
 		end
 	end
-	if role == LOAN then
-		teamText = '&#8250;&nbsp;' .. teamText
-	end
 	---@type (string|Widget)[]
-	local teamDisplay = {teamText}
+	local teamDisplay = WidgetUtil.collect(
+		role == LOAN and '&#8250;&nbsp;' or nil,
+		teamText
+	)
 	if role then
 		table.insert(teamDisplay,
 			Span{
