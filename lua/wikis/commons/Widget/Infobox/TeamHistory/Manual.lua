@@ -28,6 +28,7 @@ function TeamHistory:render()
 	TeamHistoryStoreExtension.store{
 		transferList = transferList,
 		isFromWikiCode = true,
+		isManual = true,
 	}
 
 	return TeamHistoryDisplay{
