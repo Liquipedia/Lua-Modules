@@ -31,6 +31,7 @@ function TeamHistoryStore.store(props)
 	local offset = tonumber(Variables.varDefault('teamhistory_index')) or 0
 
 	Array.forEach(transferList, function(transfer, transferIndex)
+		if transfer.noStorage then return end
 		transferIndex = transferIndex + offset
 		TeamHistoryStore._checkForMissingLeaveDate(transfer, transferIndex, offset + #transferList)
 		local teamLink = TeamHistoryStore._getTeamLink(transfer)
