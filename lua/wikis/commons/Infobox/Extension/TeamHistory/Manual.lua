@@ -39,7 +39,7 @@ function TeamHistoryManual.parse(args)
 		role = String.upperCaseFirst(role)
 	end
 
-	local leaveDate = TeamHistoryManual._parseDatesToYmd(displayDates.leave, args.estimated_end)
+	local leaveDate = TeamHistoryManual._parseDatesToYmd(displayDates.leave, args.estimated_end, true)
 
 	return {{
 		team = team,
