@@ -84,7 +84,7 @@ function TeamHistoryManual._readDateInput(dateInput)
 	end
 	assert(dates[1] and dates[2], 'Invalid date input')
 
-	local joinInput = mw.text.trim(dates[1])
+	local joinInput = String.trim(dates[1])
 	TeamHistoryManual._checkDate(joinInput)
 
 	local leaveInput = mw.text.trim(dates[2])
