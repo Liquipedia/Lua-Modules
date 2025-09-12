@@ -211,7 +211,7 @@ function TeamHistoryDisplay:_row(transfer)
 		role == LOAN and '&#8250;&nbsp;' or nil,
 		teamText
 	)
-	if role then
+	if role and role ~= teamText then
 		table.insert(teamDisplay,
 			Span{
 				css = {['padding-left'] = '3px', ['font-style'] = 'italic'},
@@ -281,7 +281,7 @@ function TeamHistoryDisplay:_row(transfer)
 end
 
 ---@param transfer TransferSpan
----@return Widget|string?
+---@return Widget|string
 function TeamHistoryDisplay:_getTeamText(transfer)
 	if Logic.isEmpty(transfer.team) and Table.includes(SPECIAL_ROLES, transfer.role) then
 		return transfer.role
