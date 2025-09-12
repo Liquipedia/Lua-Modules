@@ -64,7 +64,13 @@ function TeamHistoryManual._parseDatesToYmd(display, estimate)
 
 	if display:find('%?') then
 		mw.ext.TeamLiquidIntegration.add_category(BAD_INPUT_CATEGORY)
-		return
+		return DateExt.toYmdInUtc(
+			display
+				:gsub('????', '0001')
+				:gsub('???', '001')
+				:gsub('??', '01')
+				:gsub('?', '1')
+		)
 	end
 
 	return DateExt.toYmdInUtc(display)
