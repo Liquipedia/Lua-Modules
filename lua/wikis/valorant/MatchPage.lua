@@ -307,8 +307,8 @@ function MatchPage:_renderTeamStats(game)
 						{
 							icon = CREDS_ICON,
 							name = 'Post Plant',
-							team1Value = nil,
-							team2Value = nil
+							team1Value = Array.interleave(game.teams[1].postPlant, SPAN_SLASH),
+							team2Value = Array.interleave(game.teams[2].postPlant, SPAN_SLASH)
 						},
 						{
 							icon = CREDS_ICON,
