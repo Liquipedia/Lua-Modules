@@ -81,8 +81,9 @@ function LegacyMatchMaps.generateTeam(frame)
 		noDuplicateCheck = store == false or nil,
 	}
 
+	---@type table[]
 	local matches = Array.mapIndexes(function(index)
-		return args[index + offset]
+		return Json.parseIfTable(args[index + offset])
 	end)
 
 	Array.forEach(matches, function(match, matchIndex)
