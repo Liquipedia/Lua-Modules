@@ -16,9 +16,11 @@
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local MatchGroup = Lua.import('Module:MatchGroup')
+local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Template = Lua.import('Module:Template')
 
@@ -113,7 +115,6 @@ function MatchMapsLegacyStore.close()
 	return matchHtml
 end
 
-
 -- Invoked by LegacySingleMatch (previously Template:Showmatch)
 function MatchMapsLegacyStore.closeSingle(frame)
 	local args = Arguments.getArgs(frame)
@@ -149,6 +150,63 @@ function MatchMapsLegacyStore.closeSingle(frame)
 	matchlistVars:delete('width')
 
 	return matchHtml
+end
+
+--- for bot conversion to proper match2 matchlists
+---@param frame Frame
+---@return string?
+function MatchMapsLegacyStore.generate2(frame)
+	local args = Arguments.getArgs(frame)
+
+	local bracketId = args.id
+	if bracketId == 'abcs' then
+		return
+	end
+
+	local store = Logic.readBoolOrNil(args.store)
+
+	local offset = 0
+	local title = args.title
+	if not title and not Json.parseIfTable(args[1]) then
+		title = args[1]
+		offset = 1
+	end
+
+	local parsedArgs = {
+		id = bracketId,
+		title = title,
+		width = args.width,
+		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		store = store,
+		noDuplicateCheck = store == false or nil,
+		matchsection = Logic.nilOr(args.lpdb_title, args.title),
+		patch = args.patch,
+	}
+
+	---@type table[]
+	local matches = Array.mapIndexes(function(index)
+		return Json.parseIfTable(args[index + offset])
+	end)
+
+	local gsl = args.gsl
+
+	Array.forEach(matches, function(match, matchIndex)
+		local header = match.title
+		if matchIndex == 1 and (gsl == 'winners' or gsl == 'losers') then
+			header = 'Opening Matches'
+		elseif (matchIndex == 3 and gsl == 'winners') or (matchIndex == 4 and gsl == 'losers') then
+			header = 'Winners Match'
+		elseif (matchIndex == 4 and gsl == 'winners') or (matchIndex == 3 and gsl == 'losers') then
+			header = 'Elimination Match'
+		elseif matchIndex == 5 and (gsl == 'winners' or gsl == 'losers') then
+			header = 'Decider Match'
+		end
+		parsedArgs['M' .. matchIndex .. 'header'] = header
+		parsedArgs['M' .. matchIndex] = Json.stringify(match)
+	end)
+
+	return MatchGroupLegacy.generateWikiCodeForMatchList(parsedArgs)
 end
 
 return MatchMapsLegacyStore
