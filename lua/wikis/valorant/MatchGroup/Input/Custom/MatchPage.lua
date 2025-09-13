@@ -9,6 +9,8 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
 
 local MapData = mw.loadJsonData('MediaWiki:Valorantdb-maps.json')
 
@@ -16,6 +18,7 @@ local CustomMatchGroupInputMatchPage = {}
 
 ---@class valorantMatchApiTeamExtended: valorantMatchApiTeam
 ---@field players valorantMatchApiPlayer[]
+---@field puuids string[]
 
 ---@class valorantMatchDataExtended: valorantMatchData
 ---@field teams valorantMatchApiTeamExtended[]
@@ -68,6 +71,7 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 		team.players = Array.filter(map.players, function(player)
 			return player.team_id == team.team_id
 		end)
+		team.puuids = Array.map(team.players, Operator.property('puuid'))
 	end)
 	map.region = mapInput.region -- Region from the API is not what we want for region
 	map.matchid = mapInput.matchid
@@ -235,10 +239,16 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 			return nil
 		end
 
+		---@type valorantMatchApiRoundKill
+		local firstKill = Array.min(
+			Array.flatMap(round.player_stats, Operator.property('kills')),
+			Operator.property('time_since_round_start_millis')
+		)
+
 		---@type ValorantRoundData
 		return {
 			ceremony = mapCeremonyCodes(round.round_ceremony),
-			firstKill = nil,
+			firstKill = Table.includes(map.teams[1].puuids, firstKill.killer) and 1 or 2,
 			planted = round.plant_round_time > 0,
 			defused = round.defuse_round_time > 0,
 			round = roundNumber,

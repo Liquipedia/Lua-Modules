@@ -69,6 +69,10 @@ function MatchPage:populateGames()
 				return round['t' .. teamIdx .. 'side'] == round.winningSide and round.ceremony == 'Thrifty'
 			end)
 
+			team.firstKills = #Array.filter(rounds, function (round)
+				return round.firstKill == teamIdx
+			end)
+
 			team.clutches = #Array.filter(rounds, function (round)
 				return round['t' .. teamIdx .. 'side'] == round.winningSide and round.ceremony == 'Clutch'
 			end)
@@ -295,8 +299,8 @@ function MatchPage:_renderTeamStats(game)
 						{
 							icon = nil,
 							name = 'First Kills',
-							team1Value = nil,
-							team2Value = nil,
+							team1Value = game.teams[1].firstKills,
+							team2Value = game.teams[2].firstKills,
 						},
 						{
 							icon = CREDS_ICON,
