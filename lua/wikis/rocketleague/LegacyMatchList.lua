@@ -13,12 +13,17 @@ local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local Arguments = Lua.import('Module:Arguments')
 local Json = Lua.import('Module:Json')
+local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local _MAX_NUMBER_OF_MATCHES = 64
 local _MAX_NUMBER_OF_MAPS = 15
 
-function LegacyMatchList.convertMatchList(frame)
+function LegacyMatchList.generate(frame)
+	return LegacyMatchList.convertMatchList(frame, true)
+end
+
+function LegacyMatchList.convertMatchList(frame, generate)
 	local args = Arguments.getArgs(frame)
 
 	--switch matches (and headers) to the correct parameters for the new system
@@ -50,6 +55,11 @@ function LegacyMatchList.convertMatchList(frame)
 		args.title = args[1]
 	end
 	args[1] = nil
+
+	if generate then
+		return MatchGroupLegacy.generateWikiCodeForMatchList(args)
+	end
+
 	args.isLegacy = true
 
 	--pass the adjusted arguments to the MatchGroup
