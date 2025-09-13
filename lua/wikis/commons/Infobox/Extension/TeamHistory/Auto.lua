@@ -24,7 +24,8 @@ local TeamHistoryAuto = {}
 ---@return Widget?
 function TeamHistoryAuto.run(frame)
 	local args = Arguments.getArgs(frame)
-	local player = Page.applyUnderScoresIfEnforced(args.player or String.upperCaseFirst(mw.title.getCurrentTitle().subpageText))
+	local player = Page.applyUnderScoresIfEnforced(args.player
+		or String.upperCaseFirst(mw.title.getCurrentTitle().subpageText))
 
 	local transferList = TransferModel.getTeamHistoryForPerson{player = player, specialRoles = SPECIAL_ROLES}
 
