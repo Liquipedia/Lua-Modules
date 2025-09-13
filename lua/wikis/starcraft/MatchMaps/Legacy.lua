@@ -12,6 +12,7 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Match = Lua.import('Module:Match')
 local MatchGroup = Lua.import('Module:MatchGroup')
+local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
@@ -85,7 +86,7 @@ function MatchMapsLegacy._matchlist(args, generate)
 	end
 
 	if generate then
-		return Json.stringify(matches)
+		return MatchGroupLegacy.generateWikiCodeForMatchList(matches)
 	end
 
 	-- generate Display
