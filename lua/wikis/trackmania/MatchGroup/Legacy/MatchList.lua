@@ -13,6 +13,7 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Match = Lua.import('Module:Match')
 local MatchGroup = Lua.import('Module:MatchGroup')
+local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
@@ -167,7 +168,7 @@ end
 
 -- handle the second version of matchlists ...
 -- invoked by Template:LegacyMatchList
-function LegacyMatchList.run(frame)
+function LegacyMatchList.run(frame, generate)
 	local args = Arguments.getArgs(frame)
 	local store = Logic.nilOr(
 		Logic.readBoolOrNil(args.store),
@@ -178,6 +179,7 @@ function LegacyMatchList.run(frame)
 		return args['match' .. matchIndex]
 	end)
 
+	---@type table
 	local matchListArgs = Table.copy(matches)
 	matchListArgs.id = args.id
 	matchListArgs.isLegacy = true
@@ -197,7 +199,55 @@ function LegacyMatchList.run(frame)
 		matchListArgs.store = false
 	end
 
+	if generate then
+		return MatchGroupLegacy.generateWikiCodeForMatchList(args)
+	end
+
 	return MatchGroup.MatchList(matchListArgs)
+end
+
+--- for bot conversion to proper match2 matchlists
+---@param frame Frame
+---@return string
+function LegacyMatchList.generate(frame)
+	return LegacyMatchList.run(frame, true)
+end
+
+--- for bot conversion to proper match2 matchlists
+---@param frame Frame
+---@return string
+function LegacyMatchList.generate2(frame)
+	local args = Arguments.getArgs(frame)
+
+	local store = Logic.readBoolOrNil(args.store)
+
+	local offset = 0
+	local title = args.title
+	if not title and not Json.parseIfTable(args[1]) then
+		title = args[1]
+		offset = 1
+	end
+
+	local parsedArgs = {
+		id = args.id,
+		title = title,
+		width = args.width,
+		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		store = store,
+		noDuplicateCheck = store == false or nil,
+	}
+
+	---@type table[]
+	local matches = Array.mapIndexes(function(index)
+		return Json.parseIfTable(args[index + offset])
+	end)
+
+	Array.forEach(matches, function(match, matchIndex)
+		args['M' .. matchIndex] = Match.makeEncodedJson(match)
+	end)
+
+	return MatchGroupLegacy.generateWikiCodeForMatchList(parsedArgs)
 end
 
 return LegacyMatchList
