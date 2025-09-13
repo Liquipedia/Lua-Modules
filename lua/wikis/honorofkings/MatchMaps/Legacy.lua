@@ -12,6 +12,7 @@ local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local Json = Lua.import('Module:Json')
 local MatchGroup = Lua.import('Module:MatchGroup')
+local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
 
@@ -221,8 +222,9 @@ end
 
 -- invoked by Template:MatchList
 ---@param frame Frame
+---@param generate true?
 ---@return string
-function MatchMapsLegacy.matchList(frame)
+function MatchMapsLegacy.matchList(frame, generate)
 	local args = Arguments.getArgs(frame)
 	assert(args.id, 'Missing id')
 
@@ -258,7 +260,15 @@ function MatchMapsLegacy.matchList(frame)
 	args.hide = nil
 	args.lpdb_title = nil
 
+	if generate then
+		return MatchGroupLegacy.generateWikiCodeForMatchList(args)
+	end
+
 	return MatchGroup.MatchList(args)
+end
+
+function MatchMapsLegacy.generate(frame)
+	return MatchMapsLegacy.matchList(frame, true)
 end
 
 return MatchMapsLegacy
