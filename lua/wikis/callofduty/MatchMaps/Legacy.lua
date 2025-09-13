@@ -17,6 +17,7 @@ local Template = Lua.import('Module:Template')
 
 local Match = Lua.import('Module:Match')
 local MatchGroup = Lua.import('Module:MatchGroup')
+local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
@@ -48,10 +49,18 @@ function MatchMapsLegacy.init(frame)
 end
 
 ---@param frame Frame
+---@return string?
 function MatchMapsLegacy.match(frame)
-	local matchArgs = MatchMapsLegacy._mergeDetailsIntoArgs(Arguments.getArgs(frame))
+	local args = Arguments.getArgs(frame)
+	local generate = Logic.readBool(Table.extract(args, 'generate'))
+
+	local matchArgs = MatchMapsLegacy._mergeDetailsIntoArgs(args)
 	MatchMapsLegacy._readMaps(matchArgs)
 	MatchMapsLegacy._readOpponents(matchArgs)
+
+	if generate then
+		return Json.stringify(matchArgs)
+	end
 
 	Template.stashReturnValue(matchArgs, 'LegacyMatchlist')
 end
@@ -146,6 +155,45 @@ function MatchMapsLegacy._resetVars()
 	matchlistVars:delete('matchListTitle')
 	matchlistVars:delete('hide')
 	matchlistVars:delete('width')
+end
+
+--- for bot conversion to proper match2 matchlists
+---@param frame Frame
+---@return string
+function MatchMapsLegacy.generate(frame)
+	local args = Arguments.getArgs(frame)
+
+	local store = Logic.readBoolOrNil(args.store)
+
+	local offset = 0
+	local title = args.title
+	if not title and not Json.parseIfTable(args[1]) then
+		title = args[1]
+		offset = 1
+	end
+
+	local parsedArgs = {
+		id = args.id,
+		title = title,
+		width = args.width,
+		collapsed = Logic.readBoolOrNil(args.hide),
+		attached = Logic.readBoolOrNil(args.hide),
+		store = store,
+		noDuplicateCheck = store == false or nil,
+		matchsection = Logic.nilOr(args.lpdb_title, args.title),
+		patch = args.patch,
+	}
+
+	---@type table[]
+	local matches = Array.mapIndexes(function(index)
+		return Json.parseIfTable(args[index + offset])
+	end)
+
+	Array.forEach(matches, function(match, matchIndex)
+		parsedArgs['M' .. matchIndex] = Match.makeEncodedJson(match)
+	end)
+
+	return MatchGroupLegacy.generateWikiCodeForMatchList(parsedArgs)
 end
 
 return MatchMapsLegacy

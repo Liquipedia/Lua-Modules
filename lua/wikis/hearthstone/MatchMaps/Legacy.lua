@@ -12,6 +12,7 @@ local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local Json = Lua.import('Module:Json')
 local MatchGroup = Lua.import('Module:MatchGroup')
+local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
@@ -68,12 +69,15 @@ end
 ---@param frame Frame
 ---@return string|Html
 function MatchMapsLegacy.convertMatch(frame)
-	local matchArgs = MatchMapsLegacy._mergeDetailsIntoArgs(Arguments.getArgs(frame))
+	local args = Arguments.getArgs(frame)
+	local generate = Logic.readBool(Table.extract(args, 'generate'))
+
+	local matchArgs = MatchMapsLegacy._mergeDetailsIntoArgs(args)
 
 	MatchMapsLegacy._readOpponents(matchArgs)
 	MatchMapsLegacy._readMaps(matchArgs)
 
-	if Logic.readBool(matchlistVars:get('isOldMatchList')) then
+	if generate or Logic.readBool(matchlistVars:get('isOldMatchList')) then
 		return Json.stringify(matchArgs)
 	else
 		Template.stashReturnValue(matchArgs, 'LegacyMatchlist')
@@ -112,8 +116,9 @@ end
 
 -- invoked by Template:LegacyMatchList
 ---@param frame Frame
+---@param generate true?
 ---@return string
-function MatchMapsLegacy.matchList(frame)
+function MatchMapsLegacy.matchList(frame, generate)
 	local args = Arguments.getArgs(frame)
 	local matchListArgs = MatchMapsLegacy._start(args)
 
@@ -129,6 +134,10 @@ function MatchMapsLegacy.matchList(frame)
 
 	matchlistVars:delete('isOldMatchList')
 	globalVars:delete('islegacy')
+
+	if generate then
+		return MatchGroupLegacy.generateWikiCodeForMatchList(args)
+	end
 
 	return MatchGroup.MatchList(matchListArgs)
 end
@@ -159,4 +168,54 @@ function MatchMapsLegacy.matchListEnd()
 	globalVars:delete('islegacy')
 	return MatchGroup.MatchList(matchListArgs)
 end
+--- for bot conversion to proper match2 matchlists
+---@param frame Frame
+---@return string
+function MatchMapsLegacy.generate(frame)
+	return MatchMapsLegacy.matchList(frame, true)
+end
+
+--- for bot conversion to proper match2 matchlists
+---@param frame Frame
+---@return string
+function MatchMapsLegacy.generate2(frame)
+	local args = Arguments.getArgs(frame)
+
+	local store = Logic.readBoolOrNil(args.store)
+
+	local offset = 0
+	local title = args.title
+	if not title and not Json.parseIfTable(args[1]) then
+		title = args[1]
+		offset = 1
+	end
+
+	local parsedArgs = {
+		id = args.id,
+		title = title,
+		width = args.width or '300px',
+		collapsed = Logic.readBoolOrNil(args.hide),
+		attached = Logic.readBoolOrNil(args.hide),
+		store = store,
+		noDuplicateCheck = store == false or nil,
+		matchsection = Logic.nilOr(args.lpdb_title, args.title),
+		patch = args.patch,
+	}
+
+	---@type table[]
+	local matches = Array.mapIndexes(function(index)
+		return Json.parseIfTable(args[index + offset])
+	end)
+
+	local gsl = Logic.isNotEmpty(args.gsl) and args.gsl .. 'first' or nil
+	Array.forEach(matches, function(match, matchIndex)
+		if not gsl then
+			parsedArgs['M' .. matchIndex .. 'header'] = Table.extract(match, 'header')
+		end
+		parsedArgs['M' .. matchIndex] = Json.stringify(match)
+	end)
+
+	return MatchGroupLegacy.generateWikiCodeForMatchList(parsedArgs)
+end
+
 return MatchMapsLegacy
