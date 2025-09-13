@@ -246,7 +246,7 @@ function MatchMapsLegacy.generate(frame)
 
 	---@type table[]
 	local matches = Array.mapIndexes(function(index)
-		return parsedArgs[index + offset]
+		return args[index + offset]
 	end)
 
 	Array.forEach(matches, function(match, matchIndex)

@@ -87,7 +87,7 @@ function LegacyMatchMaps.generateTeam(frame)
 	end)
 
 	Array.forEach(matches, function(match, matchIndex)
-		args['M' .. matchIndex] = Match.makeEncodedJson(match)
+		parsedArgs['M' .. matchIndex] = Match.makeEncodedJson(match)
 	end)
 
 	return MatchGroupLegacy.generateWikiCodeForMatchList(parsedArgs)
