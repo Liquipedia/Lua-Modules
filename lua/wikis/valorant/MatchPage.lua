@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local AutoInlineIcon = Lua.import('Module:AutoInlineIcon')
 local Class = Lua.import('Module:Class')
 local MathUtil = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
@@ -21,6 +22,7 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
+local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
@@ -28,6 +30,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 ---@operator call(MatchPageMatch): ValorantMatchPage
 local MatchPage = Class.new(BaseMatchPage)
 
+local CREDS_ICON = AutoInlineIcon.display{onlyicon = true, category = 'M', lookup = 'creds'}
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
 local ROUNDS_BEFORE_SPLIT = 12
@@ -56,10 +59,19 @@ function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
 		game.teams = Array.map(Array.range(1, 2), function(teamIdx)
+			local rounds = game.extradata.rounds --[[ @as ValorantRoundData[] ]]
 			local team = {}
 
 			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
 			team.players = Array.filter(game.opponents[teamIdx].players or {}, Table.isNotEmpty)
+
+			team.thrifties = #Array.filter(rounds, function (round)
+				return round['t' .. teamIdx .. 'side'] == round.winningSide and round.ceremony == 'Thrifty'
+			end)
+
+			team.clutches = #Array.filter(rounds, function (round)
+				return round['t' .. teamIdx .. 'side'] == round.winningSide and round.ceremony == 'Clutch'
+			end)
 
 			return team
 		end)
@@ -73,6 +85,7 @@ function MatchPage:renderGame(game)
 		children = WidgetUtil.collect(
 			self:_renderGameOverview(game),
 			self:_renderRoundsOverview(game),
+			self:_renderTeamStats(game),
 			self:_renderPerformance(game)
 		)
 	}
@@ -237,6 +250,65 @@ function MatchPage:_renderRoundsOverview(game)
 				}
 			}
 		end,
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@return Widget[]
+function MatchPage:_renderTeamStats(game)
+	return {
+		HtmlWidgets.H3{children = 'Team Stats'},
+		Div{
+			classes = {'match-bm-team-stats'},
+			children = {
+				Div{
+					classes = {'match-bm-lol-team-stats-header'},
+					children = {
+						Div{
+							classes = {'match-bm-lol-team-stats-header-team'},
+							children = self.opponents[1].iconDisplay
+						},
+						Div{
+							classes = {'match-bm-team-stats-list-cell'}
+						},
+						Div{
+							classes = {'match-bm-lol-team-stats-header-team'},
+							children = self.opponents[2].iconDisplay
+						}
+					}
+				},
+				StatsList{
+					finished = game.finished,
+					data = {
+						{
+							icon = nil,
+							name = 'First Kills',
+							team1Value = nil,
+							team2Value = nil,
+						},
+						{
+							icon = CREDS_ICON,
+							name = 'Thrifties',
+							team1Value = game.teams[1].thrifties,
+							team2Value = game.teams[2].thrifties
+						},
+						{
+							icon = CREDS_ICON,
+							name = 'Post Plant',
+							team1Value = nil,
+							team2Value = nil
+						},
+						{
+							icon = CREDS_ICON,
+							name = 'Clutches',
+							team1Value = game.teams[1].clutches,
+							team2Value = game.teams[2].clutches
+						},
+					}
+				}
+			}
+		}
 	}
 end
 

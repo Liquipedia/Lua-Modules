@@ -30,7 +30,7 @@ local VALORANT_REGIONS = {'eu', 'na', 'ap', 'kr', 'latam', 'br', 'pbe1', 'esport
 
 ---@alias ValorantSides 'atk'|'def'
 ---@alias ValorantRoundData{round: integer, winBy:string,
----t1side: ValorantSides, t2side: ValorantSides, winningSide: ValorantSides}
+---t1side: ValorantSides, t2side: ValorantSides, winningSide: ValorantSides, ceremony: string}
 
 ---@class ValorantMapParserInterface
 ---@field getMap fun(mapInput: table): table

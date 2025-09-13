@@ -199,6 +199,15 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 		end
 	end
 
+	---@param ceremonyCode string
+	---@return string
+	local function mapCeremonyCodes(ceremonyCode)
+		if ceremonyCode == '' then
+			return ''
+		end
+		return ceremonyCode:sub(9)
+	end
+
 	local t1start = CustomMatchGroupInputMatchPage.getFirstSide(map, 1, 'normal')
 	local t1startot = CustomMatchGroupInputMatchPage.getFirstSide(map, 1, 'ot')
 	local nextOvertimeSide = t1startot
@@ -228,6 +237,7 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 
 		---@type ValorantRoundData
 		return {
+			ceremony = mapCeremonyCodes(round.round_ceremony),
 			round = roundNumber,
 			t1side = t1side,
 			t2side = t2side,
