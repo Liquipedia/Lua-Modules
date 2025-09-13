@@ -8,12 +8,16 @@
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
-local String = Lua.import('Module:StringUtils')
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
-local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
-local Template = Lua.import('Module:Template')
 local Match = Lua.import('Module:Match')
 local MatchGroup = Lua.import('Module:MatchGroup')
+local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
 
 local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
@@ -23,6 +27,43 @@ local MatchMapsLegacy = {}
 local _storageArgs
 
 local _NUMBER_OF_OPPONENTS = 2
+
+--- for bot conversion to proper match2 matchlists
+---@param frame Frame
+---@return string
+function MatchMapsLegacy.generate(frame)
+	local args = Arguments.getArgs(frame)
+
+	local store = Logic.readBoolOrNil(args.store)
+
+	local offset = 0
+	local title = args.title
+	if not title and not Json.parseIfTable(args[1]) then
+		title = args[1]
+		offset = 1
+	end
+
+	local parsedArgs = {
+		id = args.id,
+		title = title,
+		width = args.width,
+		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		store = store,
+		noDuplicateCheck = store == false or nil,
+	}
+
+	---@type table[]
+	local matches = Array.mapIndexes(function(index)
+		return Json.parseIfTable(args[index + offset])
+	end)
+
+	Array.forEach(matches, function(match, matchIndex)
+		args['M' .. matchIndex] = Match.makeEncodedJson(match)
+	end)
+
+	return MatchGroupLegacy.generateWikiCodeForMatchList(parsedArgs)
+end
 
 -- invoked by Template:Legacy Match list start
 function MatchMapsLegacy.init(frame)
@@ -52,6 +93,9 @@ end
 
 function MatchMapsLegacy._preProcess(args)
 	_storageArgs = args
+
+	local generate = Logic.readBool(Table.extract(args, 'generate'))
+
 	MatchMapsLegacy._handleOpponents()
 	MatchMapsLegacy._handleMaps()
 
@@ -61,6 +105,10 @@ function MatchMapsLegacy._preProcess(args)
 
 	-- all other args from the match maps calls are just passed along directly
 	-- as they can be read by the match2 processing
+
+	if generate then
+		return Json.stringify(args)
+	end
 
 	Template.stashReturnValue(args, 'LegacyMatchlist')
 end
