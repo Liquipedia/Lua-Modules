@@ -73,6 +73,17 @@ function MatchPage:populateGames()
 				return round['t' .. teamIdx .. 'side'] == round.winningSide and round.ceremony == 'Clutch'
 			end)
 
+			local plantedRounds = Array.filter(rounds, function (round)
+				return round['t' .. teamIdx .. 'side'] == 'atk' and round.planted
+			end)
+
+			team.postPlant = {
+				#Array.filter(plantedRounds, function (round)
+					return round.winningSide == 'atk'
+				end),
+				#plantedRounds
+			}
+
 			return team
 		end)
 	end)

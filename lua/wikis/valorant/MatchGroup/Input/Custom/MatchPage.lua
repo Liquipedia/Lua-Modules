@@ -238,6 +238,9 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 		---@type ValorantRoundData
 		return {
 			ceremony = mapCeremonyCodes(round.round_ceremony),
+			firstKill = nil,
+			planted = round.plant_round_time > 0,
+			defused = round.defuse_round_time > 0,
 			round = roundNumber,
 			t1side = t1side,
 			t2side = t2side,
