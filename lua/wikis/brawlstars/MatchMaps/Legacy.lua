@@ -364,7 +364,7 @@ function MatchMapsLegacy.generate(frame)
 	end)
 
 	Array.forEach(matches, function(match, matchIndex)
-		args['M' .. matchIndex] = match
+		parsedArgs['M' .. matchIndex] = match
 	end)
 
 	return MatchGroupLegacy.generateWikiCodeForMatchList(parsedArgs)
