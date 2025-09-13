@@ -446,10 +446,12 @@ function MatchGroupLegacy:generate()
 	self:_populateNewArgs(match2mapping)
 	self:handleOtherBracketParams()
 
-	return MatchGroupLegacy._generateWikiCode(self.newArgs)
+	return MatchGroupLegacy._generateWikiCodeForBracket(self.newArgs)
 end
 
-function MatchGroupLegacy._generateWikiCode(args)
+---@param args table
+---@return string
+function MatchGroupLegacy._generateWikiCodeForBracket(args)
 	local bracketType = Table.extract(args, 1)
 	local bracketTypeWithoutPrefix = bracketType:gsub('^[bB]racket/', '')
 	local bracketDataList = CopyPaste._getBracketData(bracketTypeWithoutPrefix)
@@ -473,6 +475,26 @@ function MatchGroupLegacy._generateWikiCode(args)
 
 	local lines = Array.extend(
 		{'{{Bracket|' .. bracketType .. '|id=' .. Table.extract(args, 'id')},
+		MatchGroupLegacy._argsToString(args),
+		matches,
+		'}}'
+	)
+
+	return table.concat(lines, '\n')
+end
+
+---@param args table
+---@return string
+function MatchGroupLegacy.generateWikiCodeForMatchList(args)
+	local matches = Array.mapIndex(function(matchIndex)
+		local matchKey = 'M' .. matchIndex
+		local match = Table.extract(args, matchKey)
+		if Logic.isEmpty(match) then return end
+		return '|' .. matchKey .. '=' .. MatchGroupLegacy._generateMatch(match)
+	end)
+
+	local lines = Array.extend(
+		{'{{Matchlist|id=' .. Table.extract(args, 'id')},
 		MatchGroupLegacy._argsToString(args),
 		matches,
 		'}}'
