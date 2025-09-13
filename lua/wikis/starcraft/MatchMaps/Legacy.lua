@@ -27,7 +27,13 @@ function MatchMapsLegacy.matchlist(frame)
 	return MatchMapsLegacy._matchlist(args)
 end
 
-function MatchMapsLegacy._matchlist(args)
+-- invoked by Template:LegacyMatchList
+function MatchMapsLegacy.generate(frame)
+	local args = Arguments.getArgs(frame)
+	return MatchMapsLegacy._matchlist(args, true)
+end
+
+function MatchMapsLegacy._matchlist(args, generate)
 	local store = Logic.nilOr(
 		Logic.readBoolOrNil(args.store),
 		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
@@ -76,6 +82,10 @@ function MatchMapsLegacy._matchlist(args)
 	else
 		matches.noDuplicateCheck = true
 		matches.store = false
+	end
+
+	if generate then
+		return Json.stringify(matches)
 	end
 
 	-- generate Display
