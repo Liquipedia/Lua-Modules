@@ -11,6 +11,7 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
 
@@ -125,10 +126,15 @@ function MatchMapsLegacy.convertMatch(frame)
 	return Match.makeEncodedJson(matchArgs)
 end
 
+function MatchMapsLegacy.generate(frame)
+	return MatchMapsLegacy.matchList(frame, true)
+end
+
 -- invoked by Template:MatchList
 ---@param frame Frame
+---@param generate true?
 ---@return string
-function MatchMapsLegacy.matchList(frame)
+function MatchMapsLegacy.matchList(frame, generate)
 	local args = Arguments.getArgs(frame)
 	assert(args.id, 'Missing id')
 	local store = Logic.nilOr(
@@ -152,6 +158,10 @@ function MatchMapsLegacy.matchList(frame)
 		newArgs['M' .. index] = match
 	end
 	globalVars:delete('islegacy')
+
+	if generate then
+		return MatchGroupLegacy.generateWikiCodeForMatchList(args)
+	end
 
 	return MatchGroup.MatchList(newArgs)
 end
