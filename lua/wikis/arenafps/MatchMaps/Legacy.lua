@@ -164,4 +164,17 @@ function MatchMapsLegacy.matchList(frame, generate)
 	return MatchGroup.MatchList(args)
 end
 
+---@param frame Frame
+---@return string
+function MatchMapsLegacy.generateSingleMatch(frame)
+	local args = Arguments.getArgs(frame)
+	args.generate = true
+
+	assert(args.id, 'Missing id')
+
+	return MatchGroupLegacy.generateWikiCodeForSingleMatch(Table.merge(args, {
+		match = MatchMapsLegacy.convertMatch(args),
+	}))
+end
+
 return MatchMapsLegacy
