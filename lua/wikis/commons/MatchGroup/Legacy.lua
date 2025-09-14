@@ -486,7 +486,6 @@ end
 ---@param args table
 ---@return string
 function MatchGroupLegacy.generateWikiCodeForMatchList(args)
-	if true then return Json.stringify(args) end
 	local headers = {}
 	local matches = Array.mapIndexes(function(matchIndex)
 		local matchKey = 'M' .. matchIndex
