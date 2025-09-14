@@ -333,9 +333,7 @@ function MatchMapsLegacy.generate(frame)
 	end)
 
 	Array.forEach(matches, function(match, matchIndex)
-		parsedArgs['M' .. matchIndex .. 'header'] = match.header
-		match.header = nil
-		parsedArgs['M' .. matchIndex] = Json.stringify(match)
+		parsedArgs['M' .. matchIndex] = match
 	end)
 
 	return MatchGroupLegacy.generateWikiCodeForMatchList(parsedArgs)

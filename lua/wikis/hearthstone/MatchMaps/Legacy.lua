@@ -212,7 +212,7 @@ function MatchMapsLegacy.generate2(frame)
 
 	local gsl = Logic.isNotEmpty(args.gsl) and args.gsl .. 'first' or nil
 	Array.forEach(matches, function(match, matchIndex)
-		parsedArgs['M' .. matchIndex] = Json.stringify(match)
+		parsedArgs['M' .. matchIndex] = match
 	end)
 
 	return MatchGroupLegacy.generateWikiCodeForMatchList(parsedArgs)
