@@ -37,7 +37,7 @@ local staffRoles = {
 	['organizer'] = {category = 'Tournament Organizer', display = 'Tournament Organizer'},
 	['staff'] = {category = 'Staff', display = 'Staff'},
 	['referee'] = {category = 'Referees', display = 'Referee'},
-	['replayer operator'] = {category = 'Replayer Operators', display = 'Replayer Operator'},
+	['replay operator'] = {category = 'Replay Operators', display = 'Replay Operator'},
 }
 
 staffRoles['commentator'] = staffRoles['caster']
