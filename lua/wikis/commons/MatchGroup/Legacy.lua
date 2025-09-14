@@ -486,16 +486,25 @@ end
 ---@param args table
 ---@return string
 function MatchGroupLegacy.generateWikiCodeForMatchList(args)
+	if true then return Json.stringify(args) end
+	local headers = {}
 	local matches = Array.mapIndexes(function(matchIndex)
 		local matchKey = 'M' .. matchIndex
 		local match = Table.extract(args, matchKey)
-		if Logic.isEmpty(match) then return end
-		return '|' .. matchKey .. '=' .. MatchGroupLegacy._generateMatch(match)
+		local headerKey = matchKey .. 'header'
+		local header = Table.extract(args, headerKey) or Table.extract(match, 'header')
+		local matchCode = MatchGroupLegacy._generateMatch(match)
+		if Logic.isEmpty(matchCode) then return end
+		if Logic.isNotEmpty(header) then
+			table.insert(headers, '|' .. headerKey .. '=' .. header)
+		end
+		return '|' .. matchKey .. '=' .. matchCode
 	end)
 
 	local lines = Array.extend(
 		{'{{Matchlist|id=' .. Table.extract(args, 'id')},
 		MatchGroupLegacy._argsToString(args),
+		headers,
 		matches,
 		'}}'
 	)
@@ -503,9 +512,18 @@ function MatchGroupLegacy.generateWikiCodeForMatchList(args)
 	return table.concat(lines, '\n')
 end
 
----@param match table
+---@param match table|string?
 ---@return string
 function MatchGroupLegacy._generateMatch(match)
+	if type(match) == 'string' then
+		match = Json.parseIfTable(match)
+	end
+
+	if Logic.isEmpty(match) then
+		return ''
+	end
+
+	---@cast match table
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		local opp = Table.extract(match, 'opponent' .. opponentIndex)
 		if opponentIndex > 2 and Logic.isEmpty(opp) then return end
