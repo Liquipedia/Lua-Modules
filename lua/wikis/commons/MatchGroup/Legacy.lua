@@ -486,7 +486,7 @@ end
 ---@param args table
 ---@return string
 function MatchGroupLegacy.generateWikiCodeForMatchList(args)
-	local matches = Array.mapIndex(function(matchIndex)
+	local matches = Array.mapIndexes(function(matchIndex)
 		local matchKey = 'M' .. matchIndex
 		local match = Table.extract(args, matchKey)
 		if Logic.isEmpty(match) then return end
