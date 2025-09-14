@@ -503,7 +503,7 @@ end
 function MatchGroupLegacy._generateMatch(match)
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		local opp = Table.extract(match, 'opponent' .. opponentIndex)
-		if Logic.isEmpty(opp) then return end
+		if opponentIndex > 2 and Logic.isEmpty(opp) then return end
 		return '|opponent' .. opponentIndex .. '=' .. MatchGroupLegacy._generateOpponent(opp)
 	end)
 
@@ -528,6 +528,7 @@ end
 ---@param opp table
 ---@return string
 function MatchGroupLegacy._generateOpponent(opp)
+	if Logic.isEmpty(opp) then return '' end
 	local opponentType = Table.extract(opp, 'type')
 	local opponentTemplate = String.upperCaseFirst(opponentType) .. 'Opponent'
 
