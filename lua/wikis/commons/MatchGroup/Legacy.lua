@@ -450,7 +450,7 @@ function MatchGroupLegacy._generateWikiCodeForBracket(args)
 	local bracketType = Table.extract(args, 1)
 	local bracketTypeWithoutPrefix = bracketType:gsub('^[bB]racket/', '')
 	local bracketDataList = CopyPaste._getBracketData(bracketTypeWithoutPrefix)
-	local matches = Array.map(bracketDataList, function(bracketData, matchIndex)
+	local matches = Array.map(bracketDataList, function(bracketData)
 		local matchKey = bracketData.matchKey
 		local match = Table.extract(args, matchKey)
 		if Logic.isEmpty(match) then return end
@@ -484,15 +484,21 @@ function MatchGroupLegacy.generateWikiCodeForMatchList(args)
 	local headers = {}
 	local matches = Array.mapIndexes(function(matchIndex)
 		local matchKey = 'M' .. matchIndex
-		local match = Table.extract(args, matchKey)
+		---@type table|string?
+		local matchJson = Table.extract(args, matchKey)
+		local match = matchJson
+		if type(matchJson) == 'string' then
+			match = Json.parseIfTable(matchJson)
+		end
+		if Logic.isEmpty(match) then return end
+		---@cast match table
+
 		local headerKey = matchKey .. 'header'
 		local header = Table.extract(args, headerKey) or Table.extract(match, 'header')
-		local matchCode = MatchGroupLegacy._generateMatch(match)
-		if Logic.isEmpty(matchCode) then return end
 		if Logic.isNotEmpty(header) then
 			table.insert(headers, '|' .. headerKey .. '=' .. header)
 		end
-		return '|' .. matchKey .. '=' .. matchCode
+		return '|' .. matchKey .. '=' .. MatchGroupLegacy._generateMatch(match)
 	end)
 
 	local lines = Array.extend(
@@ -506,18 +512,9 @@ function MatchGroupLegacy.generateWikiCodeForMatchList(args)
 	return table.concat(lines, '\n')
 end
 
----@param match table|string?
+---@param match table
 ---@return string
 function MatchGroupLegacy._generateMatch(match)
-	if type(match) == 'string' then
-		match = Json.parseIfTable(match)
-	end
-
-	if Logic.isEmpty(match) then
-		return ''
-	end
-
-	---@cast match table
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		local opp = Table.extract(match, 'opponent' .. opponentIndex)
 		if opponentIndex > 2 and Logic.isEmpty(opp) then return end
