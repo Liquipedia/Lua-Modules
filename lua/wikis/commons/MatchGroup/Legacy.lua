@@ -517,6 +517,26 @@ function MatchGroupLegacy.generateWikiCodeForMatchList(args)
 	return table.concat(lines, '\n')
 end
 
+---@param args table
+---@return string
+function MatchGroupLegacy.generateWikiCodeForSingleMatch(args)
+	local matchJson = Table.extract(args, match)
+	local match = matchJson
+	if type(matchJson) == 'string' then
+		match = Json.parseIfTable(matchJson)
+	end
+	---@cast match table
+
+	local lines = Array.extend(
+		{'{{SingleMatch|id=' .. Table.extract(args, 'id')},
+		MatchGroupLegacy._argsToString(args),
+		'|R1M1=' .. MatchGroupLegacy._generateMatch(match),
+		'}}'
+	)
+
+	return table.concat(lines, '\n')
+end
+
 ---@param match table
 ---@return string
 function MatchGroupLegacy._generateMatch(match)
