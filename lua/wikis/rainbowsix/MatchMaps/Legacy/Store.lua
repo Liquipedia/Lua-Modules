@@ -205,7 +205,7 @@ function MatchMapsLegacyStore.generate2(frame)
 			header = 'Decider Match'
 		end
 		parsedArgs['M' .. matchIndex .. 'header'] = header
-		parsedArgs['M' .. matchIndex] = Json.stringify(match)
+		parsedArgs['M' .. matchIndex] = match
 	end)
 
 	return MatchGroupLegacy.generateWikiCodeForMatchList(parsedArgs)
