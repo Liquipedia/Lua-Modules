@@ -515,7 +515,7 @@ end
 ---@param args table
 ---@return string
 function MatchGroupLegacy.generateWikiCodeForSingleMatch(args)
-	local matchJson = Table.extract(args, match)
+	local matchJson = Table.extract(args, 'match')
 	local match = matchJson
 	if type(matchJson) == 'string' then
 		match = Json.parseIfTable(matchJson)
