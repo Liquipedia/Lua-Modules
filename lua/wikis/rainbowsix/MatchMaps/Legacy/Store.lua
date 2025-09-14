@@ -21,7 +21,9 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local MatchGroup = Lua.import('Module:MatchGroup')
 local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
+local MatchMapsLegacy = Lua.import('Module:MatchMaps/Legacy')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 
 local globalVars = PageVariableNamespace()
@@ -209,6 +211,19 @@ function MatchMapsLegacyStore.generate2(frame)
 	end)
 
 	return MatchGroupLegacy.generateWikiCodeForMatchList(parsedArgs)
+end
+
+---@param frame Frame
+---@return string
+function MatchMapsLegacyStore.generateSingleMatch(frame)
+	local args = Arguments.getArgs(frame)
+	args.generate = true
+
+	assert(args.id, 'Missing id')
+
+	return MatchGroupLegacy.generateWikiCodeForSingleMatch(Table.merge(args, {
+		match = MatchMapsLegacy.main(args),
+	}))
 end
 
 return MatchMapsLegacyStore
