@@ -408,11 +408,27 @@ function MatchMapsLegacy.generate2(frame)
 		id = args.id,
 		title = title,
 		width = args.width or '300px',
-		collapsed = Logic.readBoolOrNil(args.hide),
-		attached = Logic.readBoolOrNil(args.hide),
+		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		store = store,
-		noDuplicateCheck = store == false or nil,
 	}
+
+	local gsl = args.gsl
+	if Logic.isNotEmpty(gsl) then
+		gsl = gsl:lower()
+		if String.endsWith(gsl, GSL_WINNERS) then
+			gsl = 'winnersfirst'
+		elseif String.endsWith(gsl, GSL_SEEDING) then
+			gsl = 'winnersfirst'
+			parsedArgs['M4header'] = 'Losers Match'
+		elseif String.endsWith(gsl, GSL_LOSERS) then
+			if String.startsWith(gsl, GSL_SEEDING) then
+				parsedArgs['M3header'] = 'Losers Match'
+			end
+			gsl = 'losersfirst'
+		end
+		parsedArgs.gsl = gsl
+	end
 
 	local matchsection = Logic.nilOr(args.lpdb_title, args.title)
 	if Logic.readBoolOrNil(matchsection) ~= false then

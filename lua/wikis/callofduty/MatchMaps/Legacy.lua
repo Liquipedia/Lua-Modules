@@ -176,11 +176,9 @@ function MatchMapsLegacy.generate(frame)
 		id = args.id,
 		title = title,
 		width = args.width,
-		collapsed = Logic.readBoolOrNil(args.hide),
-		attached = Logic.readBoolOrNil(args.hide),
+		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		store = store,
-		noDuplicateCheck = store == false or nil,
-		patch = args.patch,
 	}
 
 	local matchsection = Logic.nilOr(args.lpdb_title, args.title)
