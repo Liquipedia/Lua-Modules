@@ -412,8 +412,12 @@ function MatchMapsLegacy.generate2(frame)
 		attached = Logic.readBoolOrNil(args.hide),
 		store = store,
 		noDuplicateCheck = store == false or nil,
-		matchsection = Logic.nilOr(args.lpdb_title, args.title),
 	}
+
+	local matchsection = Logic.nilOr(args.lpdb_title, args.title)
+	if Logic.readBoolOrNil(matchsection) ~= false then
+		parsedArgs.matchsection = matchsection
+	end
 
 	---@type table[]
 	local matches = Array.mapIndexes(function(index)
