@@ -198,6 +198,7 @@ function MatchMapsLegacy.generate2(frame)
 		attached = Logic.readBoolOrNil(args.hide),
 		store = store,
 		patch = args.patch,
+		gsl = Logic.isNotEmpty(args.gsl) and args.gsl .. 'first' or nil,
 	}
 
 	local matchsection = Logic.nilOr(args.lpdb_title, args.title)
@@ -210,7 +211,6 @@ function MatchMapsLegacy.generate2(frame)
 		return Json.parseIfTable(args[index + offset])
 	end)
 
-	local gsl = Logic.isNotEmpty(args.gsl) and args.gsl .. 'first' or nil
 	Array.forEach(matches, function(match, matchIndex)
 		parsedArgs['M' .. matchIndex] = match
 	end)
