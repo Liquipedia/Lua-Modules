@@ -231,7 +231,6 @@ function MatchMapsLegacy.generate(frame)
 		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		store = store,
-		noDuplicateCheck = store == false or nil,
 		matchsection = args.matchsection,
 		patch = args.patch,
 	}
@@ -240,7 +239,7 @@ function MatchMapsLegacy.generate(frame)
 	if Logic.isNotEmpty(gsl) then
 		if gsl == GSL_WINNERS or gsl == GSL_LOSERS then
 			gsl = gsl .. 'first'
-			parsedArgs['gsl'] = gsl
+			parsedArgs.gsl = gsl
 		end
 	end
 

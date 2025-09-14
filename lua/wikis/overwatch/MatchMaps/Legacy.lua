@@ -361,11 +361,10 @@ function MatchMapsLegacy.generate2(frame)
 	local parsedArgs = {
 		id = args.id,
 		title = title,
-		width = args.width,
+		width = args.width or '300px',
 		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		store = store,
-		noDuplicateCheck = store == false or nil,
 	}
 
 	---@type table[]

@@ -223,7 +223,6 @@ function LegacyMatchList.generate2(frame)
 		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		store = store,
-		noDuplicateCheck = store == false or nil,
 	}
 
 	---@type table[]

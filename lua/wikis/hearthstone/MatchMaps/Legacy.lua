@@ -197,7 +197,6 @@ function MatchMapsLegacy.generate2(frame)
 		collapsed = Logic.readBoolOrNil(args.hide),
 		attached = Logic.readBoolOrNil(args.hide),
 		store = store,
-		noDuplicateCheck = store == false or nil,
 		patch = args.patch,
 	}
 
@@ -213,9 +212,6 @@ function MatchMapsLegacy.generate2(frame)
 
 	local gsl = Logic.isNotEmpty(args.gsl) and args.gsl .. 'first' or nil
 	Array.forEach(matches, function(match, matchIndex)
-		if not gsl then
-			parsedArgs['M' .. matchIndex .. 'header'] = Table.extract(match, 'header')
-		end
 		parsedArgs['M' .. matchIndex] = Json.stringify(match)
 	end)
 

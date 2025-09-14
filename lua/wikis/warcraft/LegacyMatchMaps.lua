@@ -46,7 +46,6 @@ function LegacyMatchMaps.generateSolo(frame)
 		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		store = store,
-		noDuplicateCheck = store == false or nil,
 	}
 
 	for _, matchInput, matchIndex in Table.iter.pairsByPrefix(args, 'match') do
@@ -78,7 +77,6 @@ function LegacyMatchMaps.generateTeam(frame)
 		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		store = store,
-		noDuplicateCheck = store == false or nil,
 	}
 
 	---@type table[]

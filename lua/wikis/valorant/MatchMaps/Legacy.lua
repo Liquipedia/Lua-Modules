@@ -408,17 +408,29 @@ function MatchMapsLegacy.generate(frame)
 	local parsedArgs = {
 		id = args.id,
 		title = title,
-		width = args.width,
+		width = args.width or '300px',
 		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		store = store,
-		noDuplicateCheck = store == false or nil,
 	}
 
 	---@type table[]
 	local matches = Array.mapIndexes(function(index)
 		return Json.parseIfTable(args[index + offset])
 	end)
+
+	local gsl = args.gsl
+	if Logic.isNotEmpty(gsl) then
+		if String.endsWith(gsl:lower(), GSL_WINNERS) then
+			gsl = 'winnersfirst'
+		elseif String.endsWith(gsl:lower(), GSL_LOSERS) then
+			gsl = 'losersfirst'
+		end
+		if String.startsWith(gsl:lower(), GSL_GF) then
+			parsedArgs['M6header'] = 'Grand Final'
+		end
+		parsedArgs.gsl = gsl
+	end
 
 	Array.forEach(matches, function(match, matchIndex)
 		parsedArgs['M' .. matchIndex] = match
