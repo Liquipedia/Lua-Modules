@@ -328,8 +328,8 @@ function MatchPage:_renderTeamStats(game)
 						},
 						{
 							icon = IconImage{
-								imageLight = 'VALORANT Spike lightmode.png',
-								imageDark = 'VALORANT Spike darkmode.png',
+								imageLight = 'VALORANT clutch lightmode.png',
+								imageDark = 'VALORANT clutch darkmode.png',
 								size = '16px',
 							},
 							name = 'Clutches',
