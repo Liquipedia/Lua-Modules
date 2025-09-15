@@ -77,6 +77,8 @@ function TeamHistoryManual._readDateInput(dateInput)
 		-- YYYY-MM-DD — YYYY-MM-DD
 		-- YYYY-MM-DD — '''Present'''
 		-- YYYY — YYYY (used on dota2)
+		-- YYYY-MM-DD (missing leavedate, assumed as present)
+		-- Dash is also supported as separator as long as it is wrapped with spaces
 
 	local dates = Array.parseCommaSeparatedString(dateInput, '—')
 	if #dates <= 1 then -- in case someone used a normal `-` with spaces around it as seperator instead
