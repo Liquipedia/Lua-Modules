@@ -317,7 +317,11 @@ function MatchPage:_renderTeamStats(game)
 							team2Value = game.teams[2].thrifties
 						},
 						{
-							icon = IconFa{iconName = 'explosion_valorant'},
+							icon = IconImage{
+								imageLight = 'VALORANT Spike lightmode.png',
+								imageDark = 'VALORANT Spike darkmode.png',
+								size = '16px',
+							},
 							name = 'Post Plant',
 							team1Value = Array.interleave(game.teams[1].postPlant, SPAN_SLASH),
 							team2Value = Array.interleave(game.teams[2].postPlant, SPAN_SLASH)
