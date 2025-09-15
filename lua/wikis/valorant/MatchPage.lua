@@ -284,7 +284,11 @@ function MatchPage:_renderTeamStats(game)
 							children = self.opponents[1].iconDisplay
 						},
 						Div{
-							classes = {'match-bm-team-stats-list-cell'}
+							classes = {'match-bm-team-stats-list-cell'},
+							children = IconImage{
+								imageLight = self:getMatchContext().iconlight,
+								imageDark = self:getMatchContext().icondark,
+							}
 						},
 						Div{
 							classes = {'match-bm-lol-team-stats-header-team'},

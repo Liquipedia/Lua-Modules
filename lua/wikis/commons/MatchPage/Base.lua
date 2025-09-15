@@ -225,7 +225,7 @@ function BaseMatchPage:render()
 		mw.getCurrentFrame():callParserFunction('DISPLAYTITLE', displayTitle, 'noreplace')
 	end
 
-	local tournamentContext = self:_getMatchContext()
+	local tournamentContext = self:getMatchContext()
 	return Div{
 		children = WidgetUtil.collect(
 			Header {
@@ -287,9 +287,9 @@ function BaseMatchPage:renderGame(game)
 	error('BaseMatchPage:renderGame() cannot be called directly and must be overridden.')
 end
 
----@private
+---@protected
 ---@return table
-function BaseMatchPage:_getMatchContext()
+function BaseMatchPage:getMatchContext()
 	return MatchGroupInputUtil.getTournamentContext(self.matchData)
 end
 
