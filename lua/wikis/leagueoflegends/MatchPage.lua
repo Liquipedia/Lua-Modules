@@ -500,7 +500,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 						side = game.teams[teamIndex].side,
 						roleIcon = IconImage{
 							imageLight = 'Lol role ' .. player.role .. ' icon darkmode.svg',
-							caption = mw.getContentLanguage():ucfirst(player.role),
+							caption = String.upperCaseFirst(player.role),
 							link = ''
 						},
 						playerLink = player.player,
