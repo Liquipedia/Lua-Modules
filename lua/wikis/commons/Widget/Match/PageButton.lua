@@ -23,10 +23,10 @@ local SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE = 2 * 60 * 60 -- 2 hours in seconds
 ---@class MatchPageButtonProps
 ---@field match MatchGroupUtilMatch
 ---@field buttonType 'secondary' | 'ghost'
----@field buttonText 'full' | 'short' | nil
+---@field buttonText 'full' | 'short' | nil?
 
 ---@class MatchPageButton: Widget
----@operator call(table): MatchPageButton
+---@operator call(MatchPageButtonProps): MatchPageButton
 ---@field props MatchPageButtonProps
 local MatchPageButton = Class.new(Widget)
 MatchPageButton.defaultProps = {
