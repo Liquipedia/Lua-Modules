@@ -171,7 +171,7 @@ License: MIT
 		max-width: 100%;
 	}
 
-	@media ( min-width: 1620px ) {
+	@media ( min-width: 1560px ) {
 		.lp-col-lg-5 {
 			flex: 0 0 50% !important;
 			max-width: 50% !important;
@@ -933,7 +933,7 @@ License: MIT
 	}
 }
 
-@media ( min-width: 992px ) {
+@media ( min-width: 1024px ) {
 	.lp-col-lg {
 		flex-basis: 0;
 		flex-grow: 1;
@@ -1145,7 +1145,7 @@ License: MIT
 	}
 }
 
-@media ( min-width: 1320px ) {
+@media ( min-width: 1440px ) {
 	.lp-col-xl {
 		flex-basis: 0;
 		flex-grow: 1;
@@ -1357,7 +1357,7 @@ License: MIT
 	}
 }
 
-@media ( min-width: 1620px ) {
+@media ( min-width: 1560px ) {
 	.lp-col-xxl {
 		flex-basis: 0;
 		flex-grow: 1;
