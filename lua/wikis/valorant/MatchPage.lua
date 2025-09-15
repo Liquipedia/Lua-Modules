@@ -288,6 +288,7 @@ function MatchPage:_renderTeamStats(game)
 							children = IconImage{
 								imageLight = self:getMatchContext().iconlight,
 								imageDark = self:getMatchContext().icondark,
+								size = 'x25px',
 							}
 						},
 						Div{
@@ -308,6 +309,7 @@ function MatchPage:_renderTeamStats(game)
 						{
 							icon = IconImage{
 								imageLight = 'Black Creds VALORANT.png',
+								imageDark = 'White Creds VALORANT.png',
 								size = '16px',
 							},
 							name = 'Thrifties',
