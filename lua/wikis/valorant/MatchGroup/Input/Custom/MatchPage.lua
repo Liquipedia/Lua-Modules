@@ -203,12 +203,13 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 		end
 	end
 
-	---@param ceremonyCode string
+	---@param ceremonyCode string?
 	---@return string
 	local function mapCeremonyCodes(ceremonyCode)
-		if ceremonyCode == '' then
+		if Logic.isEmpty(ceremonyCode) then
 			return ''
 		end
+		---@cast ceremonyCode -nil
 		return ceremonyCode:sub(9)
 	end
 
