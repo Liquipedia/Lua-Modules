@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
+local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
 
 local Info = Lua.import('Module:Info')
@@ -67,8 +68,8 @@ function MatchPageButton:render()
 			grow = true,
 			children = WidgetUtil.collect(
 				Icon{iconName = 'matchpagelink'},
-				self.props.buttonText == 'full' and ' ' .. 'View match details' or nil,
-				self.props.buttonText == 'short' and ' ' .. 'Details' or nil
+				self.props.buttonText == 'full' and ' ' .. I18n.translate('matchdetails-view-long') or nil,
+				self.props.buttonText == 'short' and ' ' .. I18n.translate('matchdetails-short') or nil
 			)
 		}
 	end
@@ -82,8 +83,8 @@ function MatchPageButton:render()
 		grow = true,
 		children = WidgetUtil.collect(
 			'+',
-			self.props.buttonText == 'full' and ' ' .. 'Add details' or nil,
-			self.props.buttonText == 'short' and ' ' .. 'Details' or nil
+			self.props.buttonText == 'full' and ' ' .. I18n.translate('matchdetails-add-long') or nil,
+			self.props.buttonText == 'short' and ' ' ..  I18n.translate('matchdetails-short')or nil
 		)
 	}
 end
