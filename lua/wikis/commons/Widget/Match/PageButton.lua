@@ -84,7 +84,7 @@ function MatchPageButton:render()
 		children = WidgetUtil.collect(
 			'+',
 			self.props.buttonText == 'full' and ' ' .. I18n.translate('matchdetails-add-long') or nil,
-			self.props.buttonText == 'short' and ' ' ..  I18n.translate('matchdetails-short')or nil
+			self.props.buttonText == 'short' and ' ' ..  I18n.translate('matchdetails-short') or nil
 		)
 	}
 end
