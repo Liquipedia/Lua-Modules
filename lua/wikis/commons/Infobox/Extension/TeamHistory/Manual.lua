@@ -79,7 +79,7 @@ function TeamHistoryManual._readDateInput(dateInput)
 		-- YYYY — YYYY (used on dota2)
 
 	local dates = Array.parseCommaSeparatedString(dateInput, '—')
-	if #dates <= 1 then -- in case someone use a normal `-` with spaces around it as seperator instead
+	if #dates <= 1 then -- in case someone used a normal `-` with spaces around it as seperator instead
 		dates = Array.parseCommaSeparatedString(dateInput, '%s%-%s')
 	end
 
