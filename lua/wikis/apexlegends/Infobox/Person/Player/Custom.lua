@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Array = Lua.import('Module:Array')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local CharacterNames = Lua.import('Module:CharacterNames')
@@ -17,7 +18,6 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local UpcomingMatches = Lua.import('Module:Matches Player')
 
-local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
