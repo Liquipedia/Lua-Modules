@@ -19,6 +19,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
@@ -30,7 +31,6 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 ---@operator call(MatchPageMatch): ValorantMatchPage
 local MatchPage = Class.new(BaseMatchPage)
 
-local CREDS_ICON = AutoInlineIcon.display{onlyicon = true, category = 'M', lookup = 'creds'}
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
 local ROUNDS_BEFORE_SPLIT = 12
@@ -297,25 +297,28 @@ function MatchPage:_renderTeamStats(game)
 					finished = game.finished,
 					data = {
 						{
-							icon = nil,
+							icon = IconFa{iconName = 'leagueoflegends_kda'},
 							name = 'First Kills',
 							team1Value = game.teams[1].firstKills,
 							team2Value = game.teams[2].firstKills,
 						},
 						{
-							icon = CREDS_ICON,
+							icon = IconImage{
+								imageLight = 'Black Creds VALORANT.png',
+								size = '16px',
+							},
 							name = 'Thrifties',
 							team1Value = game.teams[1].thrifties,
 							team2Value = game.teams[2].thrifties
 						},
 						{
-							icon = CREDS_ICON,
+							icon = IconFa{iconName = 'explosion_valorant'},
 							name = 'Post Plant',
 							team1Value = Array.interleave(game.teams[1].postPlant, SPAN_SLASH),
 							team2Value = Array.interleave(game.teams[2].postPlant, SPAN_SLASH)
 						},
 						{
-							icon = CREDS_ICON,
+							icon = IconFa{iconName = 'headshot'},
 							name = 'Clutches',
 							team1Value = game.teams[1].clutches,
 							team2Value = game.teams[2].clutches
