@@ -241,8 +241,13 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 
 		---@type valorantMatchApiRoundKill
 		local firstKill = Array.min(
-			Array.flatMap(round.player_stats, Operator.property('kills')),
-			Operator.property('time_since_round_start_millis')
+			Array.flatMap(round.player_stats, function (player)
+				return player.kills or {}
+			end),
+			function (kill, fastestKill)
+				return (kill.time_since_round_start_millis or math.huge) < (
+					fastestKill.time_since_round_start_millis or math.huge)
+			end
 		)
 
 		---@type ValorantRoundData
