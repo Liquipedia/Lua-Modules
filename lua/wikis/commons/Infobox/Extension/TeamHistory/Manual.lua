@@ -39,17 +39,14 @@ function TeamHistoryManual.parse(args)
 		role = String.upperCaseFirst(role)
 	end
 
-	local leaveDate = TeamHistoryManual._parseDatesToYmd(displayDates.leave, args.estimated_end)
-
 	return {{
 		team = team,
 		role = role,
 		joinDate = TeamHistoryManual._parseDatesToYmd(displayDates.join, args.estimated_start),
 		joinDateDisplay = displayDates.join,
-		leaveDate = leaveDate,
+		leaveDate = TeamHistoryManual._parseDatesToYmd(displayDates.leave, args.estimated_end),
 		leaveDateDisplay = displayDates.leave,
 		reference = {},
-		noStorage = displayDates.leave and not leaveDate
 	}}
 end
 

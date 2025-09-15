@@ -31,12 +31,16 @@ function TeamHistoryStore.store(props)
 	local offset = tonumber(Variables.varDefault('teamhistory_index')) or 0
 
 	Array.forEach(transferList, function(transfer, transferIndex)
-		if transfer.noStorage then return end
-		transferIndex = transferIndex + offset
-		TeamHistoryStore._checkForMissingLeaveDate(transfer, transferIndex, offset + #transferList)
+		-- invalid leavedate input, this would cause bad data
+		if transfer.leaveDateDisplay and not transfer.leaveDate then return end
+
+		if not transfer.joinDate then return end
+
 		local teamLink = TeamHistoryStore._getTeamLink(transfer)
 		if not teamLink and not transfer.role then return end
-		if not transfer.joinDate then return end
+
+		transferIndex = transferIndex + offset
+		TeamHistoryStore._checkForMissingLeaveDate(transfer, transferIndex, offset + #transferList)
 
 		mw.ext.LiquipediaDB.lpdb_datapoint('Team_'.. transferIndex, Json.stringifySubTables{
 			type = 'teamhistory',
@@ -53,7 +57,7 @@ function TeamHistoryStore.store(props)
 	end)
 end
 
----@param transfer table
+---@param transfer TransferSpan
 ---@param transferIndex integer
 ---@param numberOfRows integer
 function TeamHistoryStore._checkForMissingLeaveDate(transfer, transferIndex, numberOfRows)
@@ -61,7 +65,7 @@ function TeamHistoryStore._checkForMissingLeaveDate(transfer, transferIndex, num
 	mw.ext.TeamLiquidIntegration.add_category('Players with potential incomplete transfer history')
 end
 
----@param transfer table
+---@param transfer TransferSpan
 ---@return string?
 function TeamHistoryStore._getTeamLink(transfer)
 	if Logic.isEmpty(transfer.team) or not TeamTemplate.exists(transfer.team) then
