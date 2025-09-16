@@ -605,7 +605,13 @@ function MatchGroupLegacy._argsToString(args)
 	end
 
 	for key, value in Table.iter.spairs(args, compare) do
-		table.insert(otherArgs, '|' .. key .. '=' .. tostring(value))
+		local val
+		if type(value) == 'table' then
+			val = '{{Json' .. MatchGroupLegacy._argsToString(args) .. '}}'
+		else
+			val = tostring(value)
+		end
+		table.insert(otherArgs, '|' .. key .. '=' .. val)
 	end
 
 	return table.concat(otherArgs)
