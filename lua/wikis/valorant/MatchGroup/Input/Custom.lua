@@ -29,8 +29,17 @@ local MapFunctions = {}
 local VALORANT_REGIONS = {'eu', 'na', 'ap', 'kr', 'latam', 'br', 'pbe1', 'esports'}
 
 ---@alias ValorantSides 'atk'|'def'
----@alias ValorantRoundData{round: integer, winBy:string, defused: boolean, planted: boolean, firstKill: integer,
----t1side: ValorantSides, t2side: ValorantSides, winningSide: ValorantSides, ceremony: string}
+
+---@class ValorantRoundData
+---@field round integer
+---@field winBy string
+---@field defused boolean
+---@field planted boolean
+---@field firstKill {byTeam: integer, killer: string?, victim: string?}
+---@field t1side ValorantSides
+---@field t2side ValorantSides
+---@field winningSide ValorantSides
+---@field ceremony string
 
 ---@class ValorantMapParserInterface
 ---@field getMap fun(mapInput: table): table
@@ -209,6 +218,7 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 				hs = participant.hs,
 				player = playerIdData.name or playerInputData.link or playerInputData.name,
 				displayName = playerIdData.displayname or playerInputData.name,
+				puuid = participant.puuid,
 
 				agent = getCharacterName(participant.agent),
 			}
