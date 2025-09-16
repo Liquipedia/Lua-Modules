@@ -83,7 +83,7 @@ function MatchButtonBar:render()
 		return Logic.nilIfEmpty(gameVods) or {makeVodDTO('match', match)}
 	end
 
-	local buttonText
+	local buttonText = 'hide'
 	if (not displayStreams) or (displayStreams and numberOfStreams < 3) then
 		buttonText = 'full'
 	elseif displayStreams and numberOfStreams <= 4 then
