@@ -202,6 +202,13 @@ License: MIT
 			max-width: 50% !important;
 		}
 	}
+
+	@media ( min-width: 1920px ) {
+		.lp-col-lg-6 {
+			flex: 0 0 50% !important;
+			max-width: 50% !important;
+		}
+	}
 }
 
 .lp-container-fluid {
