@@ -137,7 +137,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				sizes = {xxl = nil, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
@@ -158,7 +158,7 @@ return {
 				}
 			},
 			{ -- Right
-				size = 6,
+				sizes = {xxl = nil, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 2,
