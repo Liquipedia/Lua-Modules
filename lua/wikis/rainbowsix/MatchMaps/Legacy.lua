@@ -115,7 +115,7 @@ function MatchMaps._main(args)
 	-- Let's assume that if the sum of the scores is less than 6, it's a match, otherwise it's a map
 	if (tonumber(opp1score) or 0) + (tonumber(opp2score) or 0) < 6 then
 		if generate then
-			return Json.stringify(args)
+			return Json.stringify(storage_args)
 		end
 		Template.stashReturnValue(storage_args, 'LegacyMatchlist')
 		return
@@ -131,7 +131,7 @@ function MatchMaps._main(args)
 	}
 
 	if generate then
-		return Json.stringify(args)
+		return Json.stringify(storage_args)
 	end
 
 	Template.stashReturnValue(storage_args, 'LegacyMatchlist')

@@ -221,9 +221,10 @@ function MatchMapsLegacyStore.generateSingleMatch(frame)
 
 	assert(args.id, 'Missing id')
 
-	return MatchGroupLegacy.generateWikiCodeForSingleMatch(Table.merge(args, {
+	return MatchGroupLegacy.generateWikiCodeForSingleMatch{
 		match = MatchMapsLegacy.main(args),
-	}))
+		id = args.id,
+	}
 end
 
 return MatchMapsLegacyStore
