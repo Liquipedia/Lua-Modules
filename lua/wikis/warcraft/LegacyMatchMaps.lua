@@ -268,10 +268,31 @@ function LegacyMatchMaps._readTeamOpponents(args)
 			return
 		end
 
+		local players = {}
+
+		local parsePlayer = function(key, playerInput)
+			local index = string.match(key, '^opponent' .. opponentIndex .. '_p(%d+)$')
+			if not index then return end
+			args[key] = nil
+			local player = Json.parseIfTable(playerInput)
+			if Logic.isEmpty(player) then return end
+			---@cast player -nil
+			local prefix = 'p' .. index
+			players[prefix] = player.name
+			players[prefix .. 'dn'] = player.displayname
+			players[prefix .. 'flag'] = player.flag
+			players[prefix .. 'race'] = player.race
+		end
+
+		for key, item in pairs(args) do
+			parsePlayer(key, item)
+		end
+
 		args['opponent' .. opponentIndex] = {
 			type = Opponent.team,
 			template = template,
 			score = args['games' .. opponentIndex],
+			players = Logic.nilIfEmpty(players)
 		}
 
 		args['games' .. opponentIndex] = nil
