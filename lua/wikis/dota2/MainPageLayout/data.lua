@@ -190,7 +190,7 @@ local LAYOUT_MAIN = {
 		},
 	},
 	{ -- Top Right
-		size = {xxl = 7, xxxl = 6},
+		sizes = {xxl = 7, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 2,
