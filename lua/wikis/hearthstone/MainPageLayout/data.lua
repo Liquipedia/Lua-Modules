@@ -145,12 +145,8 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 1,
-						content = CONTENT.specialEvents,
-					},
-					{
-						mobileOrder = 3,
-						content = CONTENT.transfers,
+						mobileOrder = 4,
+						content = CONTENT.usefulArticles,
 					},
 					{
 						mobileOrder = 6,
@@ -161,6 +157,10 @@ return {
 			{ -- Right
 				size = 6,
 				children = {
+					{
+						mobileOrder = 1,
+						content = CONTENT.specialEvents,
+					},
 					{
 						mobileOrder = 2,
 						children = {
@@ -193,12 +193,12 @@ return {
 						},
 					},
 					{
-						mobileOrder = 5,
-						content = CONTENT.thisDay,
+						mobileOrder = 3,
+						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 4,
-						content = CONTENT.usefulArticles,
+						mobileOrder = 5,
+						content = CONTENT.thisDay,
 					},
 				},
 			},
