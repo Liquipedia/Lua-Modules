@@ -138,6 +138,8 @@ function LegacyMatchMaps._readSoloMatch(matchInput)
 	LegacyMatchMaps._readSoloOpponents(args)
 	LegacyMatchMaps._readMaps(args)
 
+	args.details = nil
+
 	return Match.makeEncodedJson(args)
 end
 
@@ -204,9 +206,10 @@ function LegacyMatchMaps._readMaps(args)
 		end)
 		map.vod = args['vodgame' .. mapIndex]
 		args['vodgame' .. mapIndex] = nil
-		args[prefix .. 'finished'] = true
+		args[prefix .. 'finished'] = nil
 
 		if Table.isNotEmpty(map) then
+			map.finished = true
 			args[prefix] = map
 		end
 	end

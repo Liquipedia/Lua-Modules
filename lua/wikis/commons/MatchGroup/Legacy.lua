@@ -593,6 +593,7 @@ end
 ---@param args table
 ---@return string
 function MatchGroupLegacy._argsToString(args)
+	if Logic.isEmpty(args) then return '' end
 	local otherArgs = {}
 	local compare = function(tbl, a, b)
 		if type(a) == type(b) then
@@ -606,12 +607,14 @@ function MatchGroupLegacy._argsToString(args)
 
 	for key, value in Table.iter.spairs(args, compare) do
 		local val
-		if type(value) == 'table' then
-			val = '{{Json' .. MatchGroupLegacy._argsToString(args) .. '}}'
-		else
+		if type(value) == 'table' and Logic.isNotEmpty(value) then
+			val = '{{Json' .. MatchGroupLegacy._argsToString(value) .. '}}'
+		elseif type(value) ~= 'table' then
 			val = tostring(value)
 		end
-		table.insert(otherArgs, '|' .. key .. '=' .. val)
+		if val then
+			table.insert(otherArgs, '|' .. key .. '=' .. val)
+		end
 	end
 
 	return table.concat(otherArgs)
