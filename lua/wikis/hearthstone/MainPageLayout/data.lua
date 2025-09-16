@@ -173,7 +173,7 @@ return {
 								},
 							},
 							{
-								size = 6,
+								sizes = { xxl = nil, xxxl = 6},
 								children = {
 									{
 										noPanel = true,
@@ -182,7 +182,7 @@ return {
 								},
 							},
 							{
-								size = 6,
+								sizes = { xxl = nil, xxxl = 6},
 								children = {
 									{
 										noPanel = true,
