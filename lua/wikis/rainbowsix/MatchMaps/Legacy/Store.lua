@@ -23,7 +23,6 @@ local MatchGroup = Lua.import('Module:MatchGroup')
 local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 local MatchMapsLegacy = Lua.import('Module:MatchMaps/Legacy')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
-local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 
 local globalVars = PageVariableNamespace()
