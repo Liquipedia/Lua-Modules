@@ -142,7 +142,8 @@ function BaseMatchPage:getVods()
 
 	return WidgetUtil.collect(
 		String.isNotEmpty(self.matchData.vod) and VodButton{
-			vodLink = self.matchData.vod
+			vodLink = self.matchData.vod,
+			grow = true,
 		} or nil,
 		Array.map(gameVods, function (vod)
 			return VodButton{
