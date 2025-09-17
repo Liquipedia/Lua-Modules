@@ -455,9 +455,10 @@ function MatchMapsLegacy.generateSingleMatch(frame)
 
 	assert(args.id, 'Missing id')
 
-	return MatchGroupLegacy.generateWikiCodeForSingleMatch(Table.merge(args, {
+	return MatchGroupLegacy.generateWikiCodeForSingleMatch{
 		match = MatchMapsLegacy.convertMatch(args),
-	}))
+		id = args.id,
+	}
 end
 
 return MatchMapsLegacy
