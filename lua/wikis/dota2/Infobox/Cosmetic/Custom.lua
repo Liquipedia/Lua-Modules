@@ -158,9 +158,10 @@ function CustomCosmetic._buyNow(marketable, defindex)
 	local link
 
 	if marketable and defindex then
-		link = 'http://steamcommunity.com/market/search/?q=appid:570+prop_def_index:'.. defindex
+		link = 'https://steamcommunity.com/market/search/?q=appid:570+prop_def_index:'.. defindex
 	elseif marketable then
-		link = 'http://steamcommunity.com/market/search/?q=appid:570+' .. (mw.title.getCurrentTitle().fullText:gsub(' ', '_'))
+		link = 'https://steamcommunity.com/market/search/?q=appid:570+'
+			.. (mw.title.getCurrentTitle().fullText:gsub(' ', '_'))
 	else
 		return
 	end

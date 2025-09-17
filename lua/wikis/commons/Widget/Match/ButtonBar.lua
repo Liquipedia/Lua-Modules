@@ -59,6 +59,13 @@ function MatchButtonBar:render()
 		displayStreams = true
 	end
 
+	local filteredStreams = StreamLinks.filterStreams(match.stream)
+	local numberOfStreams = Array.reduce(
+		Array.extractValues(filteredStreams),
+		function(sum, streams) return sum + #streams end,
+		0
+	)
+
 	local makeVodDTO = function(type, gameOrMatch, number)
 		if Logic.isEmpty(gameOrMatch.vod) then
 			return
@@ -76,6 +83,13 @@ function MatchButtonBar:render()
 		return Logic.nilIfEmpty(gameVods) or {makeVodDTO('match', match)}
 	end
 
+	local buttonText = 'hide'
+	if (not displayStreams) or (displayStreams and numberOfStreams < 3) then
+		buttonText = 'full'
+	elseif displayStreams and numberOfStreams <= 4 then
+		buttonText = 'short'
+	end
+
 	local vods = makeVodDTOs()
 	local makeDropdownForVods = displayVods and #vods > 1
 	local showInlineVods = displayVods and #vods == 1
@@ -85,9 +99,10 @@ function MatchButtonBar:render()
 			MatchPageButton{
 				match = match,
 				buttonType = self.props.variant,
+				buttonText = buttonText,
 			},
 			displayStreams and StreamsContainer{
-				streams = StreamLinks.filterStreams(match.stream),
+				streams = filteredStreams,
 				matchIsLive = match.phase == 'ongoing',
 			} or nil,
 			makeDropdownForVods and VodsDropdownButton{count = #vods} or nil,
