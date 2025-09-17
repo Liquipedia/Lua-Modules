@@ -134,6 +134,11 @@ local infoData = {
 			tiers = {1, 2},
 			excludeTierTypes = {'Qualifier', 'Points', 'Showmatch'},
 		},
+		infoboxPlayer = {
+			automatedHistory = {
+				useAbbreviations = false,
+			},
+		},
 	},
 }
 
