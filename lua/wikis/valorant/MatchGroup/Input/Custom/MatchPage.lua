@@ -93,6 +93,7 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 		local lpdbPlayerData = player.lpdb_player
 		return {
 			player = lpdbPlayerData and lpdbPlayerData.page_name or player.game_name,
+			puuid = player.puuid,
 			agent = player.character.name,
 			acs = player.stats.acs,
 			adr = player.stats.adr,
@@ -254,7 +255,11 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 		---@type ValorantRoundData
 		return {
 			ceremony = mapCeremonyCodes(round.round_ceremony),
-			firstKill = Table.includes(map.teams[1].puuids, firstKill.killer) and 1 or 2,
+			firstKill = {
+				killer = firstKill.killer,
+				victim = firstKill.victim,
+				byTeam = Table.includes(map.teams[1].puuids, firstKill.killer) and 1 or 2
+			},
 			planted = round.plant_round_time > 0,
 			defused = round.defuse_round_time > 0,
 			round = roundNumber,

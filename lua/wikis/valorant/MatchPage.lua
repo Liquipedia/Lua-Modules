@@ -69,7 +69,16 @@ function MatchPage:populateGames()
 			end)
 
 			team.firstKills = #Array.filter(rounds, function (round)
-				return round.firstKill == teamIdx
+				return round.firstKill.byTeam == teamIdx
+			end)
+
+			Array.forEach(team.players, function (player)
+				player.firstKills = #Array.filter(rounds, function (round)
+					return round.firstKill.killer == player.puuid
+				end)
+				player.firstDeaths = #Array.filter(rounds, function (round)
+					return round.firstKill.victim == player.puuid
+				end)
 			end)
 
 			team.clutches = #Array.filter(rounds, function (round)
@@ -409,7 +418,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 				playerLink = player.player,
 			},
 			Div{
-				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-5'},
+				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-6'},
 				children = {
 					PlayerStat{
 						title = {IconFa{iconName = 'acs'}, 'ACS'},
@@ -432,6 +441,10 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 					PlayerStat{
 						title = {IconFa{iconName = 'headshot'}, 'HS%'},
 						data = player.hs and (formatNumbers(player.hs, 1) .. '%') or nil
+					},
+					PlayerStat{
+						title = {IconFa{iconName = 'firstkill'}, 'FK / FD'},
+						data = {player.firstKills, SPAN_SLASH, player.firstDeaths}
 					}
 				}
 			}
