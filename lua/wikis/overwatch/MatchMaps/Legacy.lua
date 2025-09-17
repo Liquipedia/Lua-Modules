@@ -275,6 +275,7 @@ function MatchMapsLegacy.matchList(frame, generate)
 	args.lpdb_title = nil
 
 	if generate then
+		args.isLegacy = nil
 		return MatchGroupLegacy.generateWikiCodeForMatchList(args)
 	end
 
@@ -348,6 +349,7 @@ end
 ---@return string
 function MatchMapsLegacy.generate2(frame)
 	local args = Arguments.getArgs(frame)
+	args.isLegacy = nil
 
 	local store = Logic.readBoolOrNil(args.store)
 
@@ -387,9 +389,10 @@ function MatchMapsLegacy.generateSingleMatch(frame)
 
 	assert(args.id, 'Missing id')
 
-	return MatchGroupLegacy.generateWikiCodeForSingleMatch(Table.merge(args, {
+	return MatchGroupLegacy.generateWikiCodeForSingleMatch{
 		match = MatchMapsLegacy.convertMatch(args),
-	}))
+		id = args.id,
+	}
 end
 
 return MatchMapsLegacy
