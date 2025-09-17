@@ -310,7 +310,7 @@ function MatchPage:_renderTeamStats(game)
 					finished = game.finished,
 					data = {
 						{
-							icon = IconFa{iconName = 'leagueoflegends_kda'},
+							icon = IconFa{iconName = 'team_firstkills'},
 							name = 'First Kills',
 							team1Value = game.teams[1].firstKills,
 							team2Value = game.teams[2].firstKills,
