@@ -195,8 +195,8 @@ function TeamHistoryDisplay:_row(transfer)
 	if role then
 		local splitRole = Array.parseCommaSeparatedString(role --[[@as string]], ' ')
 		local lastSplitRole = splitRole[#splitRole]:lower()
-		local roleData = Roles.All[transfer.role:lower()] or Roles.All[lastSplitRole]
-			or NOT_YET_IN_ROLES_DATA[transfer.role:lower()] or NOT_YET_IN_ROLES_DATA[lastSplitRole] or {}
+		local roleData = Roles.All[transfer.role:lower()] or NOT_YET_IN_ROLES_DATA[transfer.role:lower()]
+			or Roles.All[lastSplitRole] or NOT_YET_IN_ROLES_DATA[lastSplitRole] or {}
 		if roleData.doNotShowInHistory then
 			role = nil
 		elseif roleData.abbreviation then
