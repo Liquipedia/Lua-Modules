@@ -12,6 +12,7 @@ local Array = Lua.import('Module:Array')
 local Image = Lua.import('Module:Image')
 local LpdbCounter = Lua.import('Module:LPDB entity count')
 local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local WikiData = Lua.import('Module:MainPageLayout/data')
 local GridWidgets = Lua.import('Module:Widget/Grid')
@@ -105,14 +106,10 @@ function MainPageLayout._makeCells(cells)
 			end
 			table.insert(cellContent, GridWidgets.Cell{cellContent = content, ['order-xs'] = item.mobileOrder})
 		end
-		local cellProps = {cellContent = cellContent, xs = 'ignore', sm = 'ignore'}
-		if column.sizes then
-			for k, v in pairs(column.sizes) do
-				cellProps[k] = v
-			end
-		else
-			cellProps.xxl = column.size
-		end
+		local cellProps = Table.merge(
+			{cellContent = cellContent, xs = 'ignore', sm = 'ignore'},
+			column.sizes or {xxl = column.size}
+		)
 		table.insert(output, GridWidgets.Cell(cellProps))
 	end
 
