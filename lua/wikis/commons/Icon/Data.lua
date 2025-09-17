@@ -154,6 +154,7 @@ return {
 	acs = 'far fa-abacus',
 	kast = 'fas fa-hands-helping',
 	headshot = 'far fa-crosshairs',
+	firstkill = 'far fa-dagger',
 
 	dota2_gpm = 'fas fa-coin',
 	dota2_lhdn = 'fas fa-swords',

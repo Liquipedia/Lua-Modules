@@ -443,7 +443,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 						data = player.hs and (formatNumbers(player.hs, 1) .. '%') or nil
 					},
 					PlayerStat{
-						title = {IconFa{iconName = 'headshot'}, 'FK / FD'},
+						title = {IconFa{iconName = 'firstkill'}, 'FK / FD'},
 						data = {player.firstKills, SPAN_SLASH, player.firstDeaths}
 					}
 				}
