@@ -37,7 +37,7 @@ local CustomInjector = Class.new(Injector)
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
-	
+
 	-- Automatic achievements
 	team.args.achievements = Achievements.team{
 		noTemplate = true,
