@@ -18,6 +18,7 @@ local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Variables = Lua.import('Module:Variables')
 
 local Platform = Lua.import('Module:Platform')
@@ -124,7 +125,7 @@ function TransferRow:_readBaseData()
 	---@param teamInput string
 	---@return {name: string?, template: string?}
 	local checkTeam = function(dateInput, teamInput)
-		local teamData = Logic.isNotEmpty(teamInput) and mw.ext.TeamTemplate.raw(teamInput, dateInput)
+		local teamData = Logic.isNotEmpty(teamInput) and TeamTemplate.getRawOrNil(teamInput, dateInput)
 		if not teamData then
 			return {}
 		end

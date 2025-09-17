@@ -14,6 +14,7 @@ local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Variables = Lua.import('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -297,10 +298,10 @@ function StandingsStorage.fromTemplateEntry(frame)
 
 		-- Input contains an actual team
 		if data.team and mw.ext.TeamTemplate.teamexists(data.team) then
-			team = mw.ext.TeamTemplate.raw(data.team, date)
+			team = TeamTemplate.getRawOrNil(data.team, date)
 		-- Input is link (possiblity with icon etc), and we managed to parse it
 		elseif teamPage and mw.ext.TeamTemplate.teamexists(teamPage) then
-			team = mw.ext.TeamTemplate.raw(teamPage, date)
+			team = TeamTemplate.getRawOrNil(teamPage, date)
 		end
 
 		opponentArgs = {type = Opponent.team}
