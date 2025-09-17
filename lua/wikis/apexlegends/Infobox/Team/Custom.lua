@@ -7,14 +7,26 @@
 
 local Lua = require('Module:Lua')
 
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Class = Lua.import('Module:Class')
-
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
+
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
+
+local ACHIEVEMENTS_BASE_CONDITIONS = {
+	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Showmatch', 'Qualifier'}),
+	ConditionUtil.anyOf(ColumnName('liquipediatier'), {1, 2}),
+	ConditionNode(ColumnName('placement'), Comparator.eq, 1),
+}
 
 ---@class ApexlegendsInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
@@ -25,6 +37,12 @@ local CustomInjector = Class.new(Injector)
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
+	
+	-- Automatic achievements
+	team.args.achievements = Achievements.team{
+		noTemplate = true,
+		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS
+	}
 
 	return team:createInfobox()
 end
