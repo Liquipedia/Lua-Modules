@@ -1580,3 +1580,20 @@ $valorant-def: #01654c;
 		}
 	}
 }
+
+.match-bm {
+	div.tabs-dynamic > ul.nav-tabs > li {
+		border-top-left-radius: 0.5rem;
+		border-top-right-radius: 0.5rem;
+	}
+
+	div.tabs-dynamic > ul.nav-tabs > li > a {
+		border-top-left-radius: 0.5rem;
+		border-top-right-radius: 0.5rem;
+	}
+
+	div.tabs-content {
+		border-bottom-left-radius: 0.5rem;
+		border-bottom-right-radius: 0.5rem;
+	}
+}
