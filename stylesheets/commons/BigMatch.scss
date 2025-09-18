@@ -469,20 +469,26 @@ span.slash {
 	flex-direction: column;
 	align-items: stretch;
 
+	border: 1px solid #bbbbbb;
+	border-radius: 0.5rem;
+	padding: 0.5rem;
+	gap: 0.5rem;
+
+	.theme--light & {
+		background-color: #ffffff;
+	}
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+		border-color: rgba( 255, 255, 255, 0.08 );
+	}
+
 	&-header {
 		display: flex;
 		flex-direction: row;
 		justify-content: center;
 		align-items: center;
-		padding: 8px;
-		background: #eaecf0;
-		border: 1px solid #bbbbbb;
 		align-self: stretch;
-
-		.theme--dark & {
-			background-color: var( --clr-secondary-16 );
-			border-color: var( --clr-secondary-25 );
-		}
 	}
 }
 
@@ -490,8 +496,8 @@ span.slash {
 	display: flex;
 	padding: 1rem;
 	align-items: stretch;
-	background: #ffffff;
-	border: 0.0625rem solid #bbbbbb;
+	background: #00000014;
+	border-radius: 0.5rem;
 
 	@media ( max-width: 1199px ),
 		( min-width: 1320px ) {
@@ -528,8 +534,7 @@ span.slash {
 	}
 
 	.theme--dark & {
-		background-color: var( --clr-secondary-7 );
-		border-color: var( --clr-secondary-25 );
+		background-color: #ffffff14;
 	}
 
 	&-role {
