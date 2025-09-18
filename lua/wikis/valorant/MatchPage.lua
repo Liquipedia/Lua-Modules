@@ -120,7 +120,7 @@ function MatchPage:renderGames()
 		This = 1,
 		['hide-showall'] = true,
 		name1 = 'All games',
-		content1 = '',
+		content1 = 'wip',
 	}
 
 	Array.forEach(games, function(game, idx)
