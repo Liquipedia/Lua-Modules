@@ -176,7 +176,7 @@ local CONTENT = {
 
 local LAYOUT_MAIN = {
 	{ -- Top Left
-		sizes = {xxl = 5, xxxl = 6},
+		sizes = {md = 12, lg = 12, xl = 12, xxl = 5, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 1,
@@ -190,7 +190,7 @@ local LAYOUT_MAIN = {
 		},
 	},
 	{ -- Top Right
-		sizes = {xxl = 7, xxxl = 6},
+		sizes = {md = 12, lg = 12, xl = 12, xxl = 7, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 2,

@@ -108,7 +108,7 @@ function MainPageLayout._makeCells(cells)
 		end
 		local cellProps = Table.merge(
 			{cellContent = cellContent, xs = 'ignore', sm = 'ignore'},
-			column.sizes or {xxl = column.size}
+			column.sizes or {md = column.size}
 		)
 		table.insert(output, GridWidgets.Cell(cellProps))
 	end
