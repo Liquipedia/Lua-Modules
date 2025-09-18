@@ -370,7 +370,7 @@ function MatchPage:_renderTeamStats(game)
 							children = self:isBestOfOne() and self:_buildGameResultSummary(game) or IconImage{
 								imageLight = self:getMatchContext().icon,
 								imageDark = self:getMatchContext().icondark,
-								size = 'x25px',
+								size = 'x32px',
 							}
 						},
 						Div{
