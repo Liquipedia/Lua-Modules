@@ -376,19 +376,18 @@ span.slash {
 		}
 	}
 
-	.general-collapsible {
+	&-order {
 		border-radius: 0.5rem;
 		background: #ffffff;
 		border: 1px solid #bbbbbb;
 		padding: 0.5rem;
+		width: 100%;
 
 		.theme--dark & {
 			background-color: var( --clr-secondary-16 );
 			border-color: rgba( 255, 255, 255, 0.08 );
 		}
-	}
 
-	&-order {
 		&-list {
 			display: flex;
 			flex-direction: row;
