@@ -103,6 +103,165 @@ function MatchPage:populateGames()
 	end)
 end
 
+---@private
+---@return Widget
+function MatchPage:_renderAllGames()
+    local allPlayersStats = {}
+
+    Array.forEach(self.games, function(game)
+        if game.status ~= BaseMatchPage.NOT_PLAYED then
+            Array.forEach(Array.range(1, 2), function(teamIdx)
+                Array.forEach(game.opponents[teamIdx].players or {}, function(player)
+                    local playerId = player.player
+                    if not playerId then return end
+
+                    if not allPlayersStats[playerId] then
+                        allPlayersStats[playerId] = {
+                            displayName = player.displayName or player.player,
+                            playerLink = player.player,
+                            teamIndex = teamIdx,
+                            agents = {},
+                            stats = {
+                                acs = {},
+                                kast = {},
+                                adr = {},
+                                hs = {},
+                                kills = 0,
+                                deaths = 0,
+                                assists = 0,
+                            }
+                        }
+                    end
+
+                    local data = allPlayersStats[playerId]
+                    if player.agent then
+                        table.insert(data.agents, player.agent)
+                    end
+
+                    local stats = data.stats
+                    if player.acs then table.insert(stats.acs, player.acs) end
+                    if player.kast then table.insert(stats.kast, player.kast) end
+                    if player.adr then table.insert(stats.adr, player.adr) end
+                    if player.hs then table.insert(stats.hs, player.hs) end
+                    stats.kills = stats.kills + (player.kills or 0)
+                    stats.deaths = stats.deaths + (player.deaths or 0)
+                    stats.assists = stats.assists + (player.assists or 0)
+                end)
+            end)
+        end
+    end)
+
+    local function average(t)
+        if #t == 0 then return nil end
+        local sum = 0
+        for _, v in ipairs(t) do sum = sum + v end
+        return sum / #t
+    end
+
+    local team1Players = {}
+    local team2Players = {}
+
+    for _, playerData in pairs(allPlayersStats) do
+        local stats = playerData.stats
+        playerData.avgAcs = average(stats.acs)
+        playerData.avgKast = average(stats.kast)
+        playerData.avgAdr = average(stats.adr)
+        playerData.avgHs = average(stats.hs)
+
+        if playerData.teamIndex == 1 then
+            table.insert(team1Players, playerData)
+        else
+            table.insert(team2Players, playerData)
+        end
+    end
+
+    return Div{
+		classes = {'match-bm-players-wrapper'},
+		children = {
+			self:_renderOverallPerformanceForTeam(1, team1Players),
+			self:_renderOverallPerformanceForTeam(2, team2Players)
+		}
+	}
+end
+
+---@private
+---@param teamIndex integer
+---@param players table[]
+---@return Widget
+function MatchPage:_renderOverallPerformanceForTeam(teamIndex, players)
+	return Div{
+		classes = {'match-bm-players-team'},
+		children = WidgetUtil.collect(
+			Div{
+				classes = {'match-bm-players-team-header'},
+				children = self.opponents[teamIndex].iconDisplay
+			},
+			Array.map(
+				Array.reverse(Array.sortBy(
+					players,
+					function (player) return player.avgAcs or 0 end
+				)),
+				function (player)
+					return self:_renderOverallPlayerPerformance(player)
+				end
+			)
+		)
+	}
+end
+
+---@private
+---@param player table
+---@return Widget
+function MatchPage:_renderOverallPlayerPerformance(player)
+	local formatNumbers = function(value, numberOfDecimals)
+		if not value then
+			return nil
+		end
+		numberOfDecimals = numberOfDecimals or 0
+		local format = '%.'.. numberOfDecimals ..'f'
+		return string.format(format, MathUtil.round(value, numberOfDecimals))
+	end
+
+	return Div{
+		classes = {'match-bm-players-player match-bm-players-player--col-2'},
+		children = {
+			PlayerDisplay{
+				characterIcon = #player.agents > 0 and self:getCharacterIcon(player.agents[1]) or nil,
+				characterName = table.concat(Table.unique(player.agents), ' / '),
+				playerName = player.displayName,
+				playerLink = player.playerLink,
+			},
+			Div{
+				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-5'},
+				children = {
+					PlayerStat{
+						title = {IconFa{iconName = 'acs'}, 'ACS'},
+						data = player.avgAcs and formatNumbers(player.avgAcs) or nil,
+					},
+					PlayerStat{
+						title = {IconFa{iconName = 'kda'}, 'KDA'},
+						data = Array.interleave({
+							player.stats.kills, player.stats.deaths, player.stats.assists
+						}, SPAN_SLASH)
+					},
+					PlayerStat{
+						title = {IconFa{iconName = 'kast'}, 'KAST'},
+						data = player.avgKast and (formatNumbers(player.avgKast, 1) .. '%') or nil
+					},
+					PlayerStat{
+						title = {IconFa{iconName = 'damage'}, 'ADR'},
+						data = player.avgAdr and formatNumbers(player.avgAdr) or nil
+					},
+					PlayerStat{
+						title = {IconFa{iconName = 'headshot'}, 'HS%'},
+						data = player.avgHs and (formatNumbers(player.avgHs, 1) .. '%') or nil
+					},
+				}
+			}
+		}
+	}
+end
+
 ---@return string|Html|Widget?
 function MatchPage:renderGames()
 	local games = Array.map(Array.filter(self.games, function(game)
@@ -120,7 +279,7 @@ function MatchPage:renderGames()
 		This = 1,
 		['hide-showall'] = true,
 		name1 = 'All games',
-		content1 = 'wip',
+		content1 = self:_renderAllGames(),
 	}
 
 	Array.forEach(games, function(game, idx)
