@@ -374,10 +374,10 @@ span.slash {
 	}
 
 	&-order {
-		border-radius: 0.5rem;
+		padding: 0.5rem;
 		background: #ffffff;
 		border: 1px solid #bbbbbb;
-		padding: 0.5rem;
+		border-radius: 0.5rem;
 		width: 100%;
 
 		.theme--dark & {
