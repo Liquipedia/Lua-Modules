@@ -1580,11 +1580,7 @@ $valorant-def: #01654c;
 	div.tabs-dynamic > ul.nav-tabs > li {
 		border-top-left-radius: 0.5rem;
 		border-top-right-radius: 0.5rem;
-	}
-
-	div.tabs-dynamic > ul.nav-tabs > li > a {
-		border-top-left-radius: 0.5rem;
-		border-top-right-radius: 0.5rem;
+		overflow: hidden;
 	}
 
 	div.tabs-content {
