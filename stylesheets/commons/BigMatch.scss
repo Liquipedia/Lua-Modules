@@ -978,10 +978,14 @@ span.slash {
 }
 
 .match-bm-lol-game-overview {
+	background-color: #ffffff;
 	border: 1px solid #bbbbbb;
+	border-radius: 0.5rem;
+	padding: 0.5rem;
 
 	.theme--dark & {
-		border-color: var( --clr-secondary-25 );
+		background-color: var( --clr-secondary-16 );
+		border-color: rgba( 255, 255, 255, 0.08 );
 	}
 }
 
@@ -994,7 +998,6 @@ span.slash {
 	&-team {
 		display: flex;
 		align-items: center;
-		padding: 16px;
 		gap: 4px;
 	}
 
@@ -1027,7 +1030,7 @@ span.slash {
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
-			padding: 16px;
+			padding: 0 1rem;
 			gap: 4px;
 			text-align: center;
 
