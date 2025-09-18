@@ -255,11 +255,11 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 		---@type ValorantRoundData
 		return {
 			ceremony = mapCeremonyCodes(round.round_ceremony),
-			firstKill = {
+			firstKill = Logic.isNotEmpty(firstKill) and {
 				killer = firstKill.killer,
 				victim = firstKill.victim,
 				byTeam = Table.includes(map.teams[1].puuids, firstKill.killer) and 1 or 2
-			},
+			} or {},
 			planted = round.plant_round_time > 0,
 			defused = round.defuse_round_time > 0,
 			round = roundNumber,

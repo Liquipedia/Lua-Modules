@@ -35,7 +35,7 @@ local VALORANT_REGIONS = {'eu', 'na', 'ap', 'kr', 'latam', 'br', 'pbe1', 'esport
 ---@field winBy string
 ---@field defused boolean
 ---@field planted boolean
----@field firstKill {byTeam: integer, killer: string?, victim: string?}
+---@field firstKill {byTeam: integer?, killer: string?, victim: string?}
 ---@field t1side ValorantSides
 ---@field t2side ValorantSides
 ---@field winningSide ValorantSides
