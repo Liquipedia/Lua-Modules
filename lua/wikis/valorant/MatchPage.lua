@@ -9,8 +9,10 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
+local Tabs = Lua.import('Module:Tabs')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
@@ -99,6 +101,40 @@ function MatchPage:populateGames()
 			return team
 		end)
 	end)
+end
+
+---@return string|Html|Widget?
+function MatchPage:renderGames()
+	local games = Array.map(Array.filter(self.games, function(game)
+		return game.status ~= BaseMatchPage.NOT_PLAYED
+	end), function(game)
+		return self:renderGame(game)
+	end)
+
+	if #games < 2 then
+		return games[1]
+	end
+
+	---@type table<string, any>
+	local tabs = {
+		This = 1,
+		['hide-showall'] = true,
+		name1 = 'All games',
+		content1 = '',
+	}
+
+	Array.forEach(games, function(game, idx)
+		local tabIndex = idx + 1
+		local mapName = self.games[idx].map
+		if Logic.isNotEmpty(mapName) then
+			tabs['name' .. tabIndex] = 'Game ' .. idx .. ': ' .. mapName
+		else
+			tabs['name' .. tabIndex] = 'Game ' .. idx
+		end
+		tabs['content' .. tabIndex] = game
+	end)
+
+	return Tabs.dynamic(tabs)
 end
 
 ---@param game MatchPageGame
