@@ -18,9 +18,11 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
+local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
@@ -56,10 +58,43 @@ function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
 		game.teams = Array.map(Array.range(1, 2), function(teamIdx)
+			local rounds = game.extradata.rounds or {} --[[ @as ValorantRoundData[] ]]
 			local team = {}
 
 			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
 			team.players = Array.filter(game.opponents[teamIdx].players or {}, Table.isNotEmpty)
+
+			team.thrifties = #Array.filter(rounds, function (round)
+				return round['t' .. teamIdx .. 'side'] == round.winningSide and round.ceremony == 'Thrifty'
+			end)
+
+			team.firstKills = #Array.filter(rounds, function (round)
+				return round.firstKill.byTeam == teamIdx
+			end)
+
+			Array.forEach(team.players, function (player)
+				player.firstKills = #Array.filter(rounds, function (round)
+					return round.firstKill.killer == player.puuid
+				end)
+				player.firstDeaths = #Array.filter(rounds, function (round)
+					return round.firstKill.victim == player.puuid
+				end)
+			end)
+
+			team.clutches = #Array.filter(rounds, function (round)
+				return round['t' .. teamIdx .. 'side'] == round.winningSide and round.ceremony == 'Clutch'
+			end)
+
+			local plantedRounds = Array.filter(rounds, function (round)
+				return round['t' .. teamIdx .. 'side'] == 'atk' and round.planted
+			end)
+
+			team.postPlant = {
+				#Array.filter(plantedRounds, function (round)
+					return round.winningSide == 'atk'
+				end),
+				#plantedRounds
+			}
 
 			return team
 		end)
@@ -73,6 +108,7 @@ function MatchPage:renderGame(game)
 		children = WidgetUtil.collect(
 			self:_renderGameOverview(game),
 			self:_renderRoundsOverview(game),
+			self:_renderTeamStats(game),
 			self:_renderPerformance(game)
 		)
 	}
@@ -243,6 +279,82 @@ end
 ---@private
 ---@param game MatchPageGame
 ---@return Widget[]
+function MatchPage:_renderTeamStats(game)
+	return {
+		HtmlWidgets.H3{children = 'Team Stats'},
+		Div{
+			classes = {'match-bm-team-stats'},
+			children = {
+				Div{
+					classes = {'match-bm-lol-team-stats-header'},
+					children = {
+						Div{
+							classes = {'match-bm-lol-team-stats-header-team'},
+							children = self.opponents[1].iconDisplay
+						},
+						Div{
+							classes = {'match-bm-team-stats-list-cell'},
+							children = IconImage{
+								imageLight = self:getMatchContext().iconlight,
+								imageDark = self:getMatchContext().icondark,
+								size = 'x25px',
+							}
+						},
+						Div{
+							classes = {'match-bm-lol-team-stats-header-team'},
+							children = self.opponents[2].iconDisplay
+						}
+					}
+				},
+				StatsList{
+					finished = game.finished,
+					data = {
+						{
+							icon = IconFa{iconName = 'team_firstkills'},
+							name = 'First Kills',
+							team1Value = game.teams[1].firstKills,
+							team2Value = game.teams[2].firstKills,
+						},
+						{
+							icon = IconImage{
+								imageLight = 'Black Creds VALORANT.png',
+								imageDark = 'White Creds VALORANT.png',
+								size = '16px',
+							},
+							name = 'Thrifties',
+							team1Value = game.teams[1].thrifties,
+							team2Value = game.teams[2].thrifties
+						},
+						{
+							icon = IconImage{
+								imageLight = 'VALORANT Spike lightmode.png',
+								imageDark = 'VALORANT Spike darkmode.png',
+								size = '16px',
+							},
+							name = 'Post Plant',
+							team1Value = Array.interleave(game.teams[1].postPlant, SPAN_SLASH),
+							team2Value = Array.interleave(game.teams[2].postPlant, SPAN_SLASH)
+						},
+						{
+							icon = IconImage{
+								imageLight = 'VALORANT clutch lightmode.png',
+								imageDark = 'VALORANT clutch darkmode.png',
+								size = '16px',
+							},
+							name = 'Clutches',
+							team1Value = game.teams[1].clutches,
+							team2Value = game.teams[2].clutches
+						},
+					}
+				}
+			}
+		}
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@return Widget[]
 function MatchPage:_renderPerformance(game)
 	return {
 		HtmlWidgets.H3{children = 'Player Performance'},
@@ -306,7 +418,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 				playerLink = player.player,
 			},
 			Div{
-				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-5'},
+				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-6'},
 				children = {
 					PlayerStat{
 						title = {IconFa{iconName = 'acs'}, 'ACS'},
@@ -329,6 +441,10 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 					PlayerStat{
 						title = {IconFa{iconName = 'headshot'}, 'HS%'},
 						data = player.hs and (formatNumbers(player.hs, 1) .. '%') or nil
+					},
+					PlayerStat{
+						title = {IconFa{iconName = 'firstkill'}, 'FK / FD'},
+						data = {player.firstKills, SPAN_SLASH, player.firstDeaths}
 					}
 				}
 			}

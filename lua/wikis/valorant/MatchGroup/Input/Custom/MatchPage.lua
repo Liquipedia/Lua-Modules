@@ -9,6 +9,8 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
 
 local MapData = mw.loadJsonData('MediaWiki:Valorantdb-maps.json')
 
@@ -16,6 +18,7 @@ local CustomMatchGroupInputMatchPage = {}
 
 ---@class valorantMatchApiTeamExtended: valorantMatchApiTeam
 ---@field players valorantMatchApiPlayer[]
+---@field puuids string[]
 
 ---@class valorantMatchDataExtended: valorantMatchData
 ---@field teams valorantMatchApiTeamExtended[]
@@ -68,6 +71,7 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 		team.players = Array.filter(map.players, function(player)
 			return player.team_id == team.team_id
 		end)
+		team.puuids = Array.map(team.players, Operator.property('puuid'))
 	end)
 	map.region = mapInput.region -- Region from the API is not what we want for region
 	map.matchid = mapInput.matchid
@@ -89,6 +93,7 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 		local lpdbPlayerData = player.lpdb_player
 		return {
 			player = lpdbPlayerData and lpdbPlayerData.page_name or player.game_name,
+			puuid = player.puuid,
 			agent = player.character.name,
 			acs = player.stats.acs,
 			adr = player.stats.adr,
@@ -199,6 +204,16 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 		end
 	end
 
+	---@param ceremonyCode string?
+	---@return string
+	local function mapCeremonyCodes(ceremonyCode)
+		if Logic.isEmpty(ceremonyCode) then
+			return ''
+		end
+		---@cast ceremonyCode -nil
+		return ceremonyCode:sub(9)
+	end
+
 	local t1start = CustomMatchGroupInputMatchPage.getFirstSide(map, 1, 'normal')
 	local t1startot = CustomMatchGroupInputMatchPage.getFirstSide(map, 1, 'ot')
 	local nextOvertimeSide = t1startot
@@ -226,8 +241,27 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 			return nil
 		end
 
+		---@type valorantMatchApiRoundKill
+		local firstKill = Array.min(
+			Array.flatMap(round.player_stats, function (player)
+				return player.kills or {}
+			end),
+			function (kill, fastestKill)
+				return (kill.time_since_round_start_millis or math.huge) < (
+					fastestKill.time_since_round_start_millis or math.huge)
+			end
+		)
+
 		---@type ValorantRoundData
 		return {
+			ceremony = mapCeremonyCodes(round.round_ceremony),
+			firstKill = Logic.isNotEmpty(firstKill) and {
+				killer = firstKill.killer,
+				victim = firstKill.victim,
+				byTeam = Table.includes(map.teams[1].puuids, firstKill.killer) and 1 or 2
+			} or {},
+			planted = round.plant_round_time > 0,
+			defused = round.defuse_round_time > 0,
 			round = roundNumber,
 			t1side = t1side,
 			t2side = t2side,
