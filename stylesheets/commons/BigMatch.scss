@@ -1151,7 +1151,9 @@ span.slash {
 
 .match-bm-team-stats {
 	border: 0.0625rem solid #bbbbbb;
+	border-radius: 0.5rem;
 	margin-bottom: 1rem;
+	overflow: hidden;
 
 	.theme--dark & {
 		border-color: var( --clr-secondary-25 );
@@ -1189,7 +1191,6 @@ span.slash {
 
 	&-container {
 		display: flex;
-		padding: 1rem 0;
 		flex-wrap: wrap;
 	}
 
@@ -1234,13 +1235,34 @@ span.slash {
 	}
 
 	&-list {
-		flex: 1;
+		flex: auto;
 		display: flex;
 		flex-direction: column;
+
+		.wiki-dota2 & {
+			@media ( min-width: 768px ) {
+				border-left: 1px solid #bbbbbb;
+				border-right: 1px solid #bbbbbb;
+
+				.theme--dark & {
+					border-color: rgba( 255, 255, 255, 0.08 );
+				}
+			}
+		}
 
 		@media ( max-width: 767px ) {
 			flex: 1 0 100%;
 			order: 2;
+		}
+
+		& > :nth-child( odd ) {
+			.theme--light & {
+				background-color: rgba( 0, 0, 0, 0.04 );
+			}
+
+			.theme--dark & {
+				background-color: rgba( 255, 255, 255, 0.04 );
+			}
 		}
 
 		&-row {
@@ -1284,7 +1306,7 @@ span.slash {
 	flex-direction: row;
 	align-items: center;
 	background: #eaecf0;
-	border: 1px solid #bbbbbb;
+	border-bottom: 1px solid #bbbbbb;
 	align-self: stretch;
 
 	&-team {
