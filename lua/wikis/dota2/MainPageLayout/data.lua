@@ -176,7 +176,7 @@ local CONTENT = {
 
 local LAYOUT_MAIN = {
 	{ -- Top Left
-		sizes = {md = 12, lg = 12, xl = 12, xxl = 5, xxxl = 6},
+		sizes = {xxl = 5, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 1,
@@ -190,7 +190,7 @@ local LAYOUT_MAIN = {
 		},
 	},
 	{ -- Top Right
-		sizes = {md = 12, lg = 12, xl = 12, xxl = 7, xxxl = 6},
+		sizes = {xxl = 7, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 2,
@@ -226,7 +226,7 @@ local LAYOUT_MAIN = {
 		},
 	},
 	{ -- Heroes
-		size = 12,
+		sizes = {xxl = 12},
 		children = {
 			{
 				mobileOrder = 4,
@@ -235,7 +235,7 @@ local LAYOUT_MAIN = {
 		}
 	},
 	{ -- Bottom Left
-		size = 6,
+		sizes = {xxl = 6},
 		children = {
 			{
 				mobileOrder = 5,
@@ -249,7 +249,7 @@ local LAYOUT_MAIN = {
 		}
 	},
 	{ -- Bottom Right
-		size = 6,
+		sizes = {xxl = 6},
 		children = {
 			{
 				mobileOrder = 7,
@@ -258,7 +258,7 @@ local LAYOUT_MAIN = {
 		}
 	},
 	{ -- Useful articles
-		size = 12,
+		sizes = {xxl = 12},
 		children = {
 			{
 				mobileOrder = 8,

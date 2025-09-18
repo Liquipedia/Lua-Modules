@@ -104,11 +104,23 @@ function MainPageLayout._makeCells(cells)
 			if item.children then
 				Array.appendWith(content, MainPageLayout._makeCells(item.children))
 			end
-			table.insert(cellContent, GridWidgets.Cell{cellContent = content, ['order-xs'] = item.mobileOrder})
+			table.insert(cellContent, GridWidgets.Cell{
+				cellContent = content,
+				['order-xs'] = item.mobileOrder,
+				['order-sm'] = item.mobileOrder
+			})
 		end
+
+		local desktopBreakpoints = {'lg', 'xl', 'xxl', 'xxxl'}
+		local columnSizes = column.sizes
+		if not columnSizes and column.size then
+			columnSizes = Table.map(desktopBreakpoints, function(_, bp) return bp, column.size end)
+		end
+		columnSizes = columnSizes or {}
+
 		local cellProps = Table.merge(
 			{cellContent = cellContent, xs = 'ignore', sm = 'ignore'},
-			column.sizes or {md = column.size}
+			columnSizes
 		)
 		table.insert(output, GridWidgets.Cell(cellProps))
 	end
