@@ -21,6 +21,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
@@ -225,11 +226,9 @@ function MatchPage:_renderOverallPlayerPerformance(player)
 	return Div{
 		classes = {'match-bm-players-player match-bm-players-player--col-2'},
 		children = {
-			PlayerDisplay{
-				characterIcon = #player.agents > 0 and self:getCharacterIcon(player.agents[1]) or nil,
-				characterName = table.concat(Table.unique(player.agents), ' / '),
-				playerName = player.displayName,
-				playerLink = player.playerLink,
+			Link{
+				link = player.playerLink,
+				children = player.displayName
 			},
 			Div{
 				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-5'},
