@@ -556,7 +556,8 @@ function MatchGroupLegacy._generateMatch(match)
 		return Array.map(arr, function(item) return '    ' .. item end)
 	end
 
-	local mapVeto = Table.extract(match, 'mapveto')
+	local rawMapVeto = Table.extract(match, 'mapveto')
+	local mapVeto = Logic.nilIfEmpty(Json.parseIfTable(rawMapVeto) or rawMapVeto)
 	local mapVetoDisplay = mapVeto and ('|mapveto={{MapVeto' .. MatchGroupLegacy._argsToString(mapVeto) .. '}}') or nil
 
 	return table.concat(Array.extend({'{{Match'},
