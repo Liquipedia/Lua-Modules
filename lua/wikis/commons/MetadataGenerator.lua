@@ -131,7 +131,7 @@ function MetadataGenerator.tournament(args)
 		output = output .. 'is yet to take place'
 	end
 
-	output = output .. '.'
+	output = mw.text.killMarkers(output .. '.')
 
 	return output
 end
