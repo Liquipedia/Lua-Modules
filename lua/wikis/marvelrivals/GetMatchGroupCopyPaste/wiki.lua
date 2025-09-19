@@ -27,7 +27,7 @@ local INDENT = WikiCopyPaste.Indent
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local casters = Logic.readBool(args.casters)
-	local showScore = bestof == 0
+	local showScore = Logic.nilOr(Logic.readBool(args.score), bestof == 0)
 	local streams = Logic.readBool(args.streams)
 	local opponent = WikiCopyPaste.getOpponent(mode, showScore)
 
