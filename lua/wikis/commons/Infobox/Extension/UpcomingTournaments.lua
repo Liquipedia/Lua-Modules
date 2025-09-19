@@ -25,9 +25,11 @@ local UpcomingTournamentsWidget = Lua.import('Module:Widget/Infobox/UpcomingTour
 
 local UpcomingTournaments = {}
 
----@param name string|string[]
+---@param args {name: string|string[]?, additionalConditions: AbstractConditionNode?}
 ---@return Widget?
-function UpcomingTournaments.team(name)
+function UpcomingTournaments.team(args)
+	args = args or {}
+	local name = args.name
 	if Logic.isEmpty(name) then
 		return
 	end
@@ -38,6 +40,7 @@ function UpcomingTournaments.team(name)
 		opponentConditions = ConditionTree(BooleanOperator.all):add{
 			ConditionUtil.anyOf(ColumnName('opponenttemplate'), templateNames),
 			ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
+			args.additionalConditions
 		}
 	}
 end

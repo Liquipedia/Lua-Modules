@@ -24,9 +24,9 @@ function CustomTeam.run(frame)
 	return team:createInfobox()
 end
 
----@return Widget
+---@return Widget?
 function CustomTeam:createBottomContent()
-	return UpcomingTournaments.team(self.teamTemplate.templatename)
+	return UpcomingTournaments.team{name = self.teamTemplate.templatename}
 end
 
 ---@param lpdbData table
