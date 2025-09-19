@@ -295,7 +295,7 @@ function MatchPage:_renderTeamStats(game)
 						Div{
 							classes = {'match-bm-team-stats-list-cell'},
 							children = IconImage{
-								imageLight = self:getMatchContext().iconlight,
+								imageLight = self:getMatchContext().icon,
 								imageDark = self:getMatchContext().icondark,
 								size = 'x25px',
 							}
