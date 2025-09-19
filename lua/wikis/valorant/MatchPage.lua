@@ -538,20 +538,24 @@ function MatchPage:_renderPerformanceForTeam(game, teamIndex)
 end
 
 ---@private
+---@param value number?
+---@param numberOfDecimals number?
+---@return string|nil
+local function formatNumbers(value, numberOfDecimals)
+	if not value then
+		return nil
+	end
+	numberOfDecimals = numberOfDecimals or 0
+	local format = '%.'.. numberOfDecimals ..'f'
+	return string.format(format, MathUtil.round(value, numberOfDecimals))
+end
+
+---@private
 ---@param game MatchPageGame
 ---@param teamIndex integer
 ---@param player table
 ---@return Widget
 function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
-	local formatNumbers = function(value, numberOfDecimals)
-		if not value then
-			return nil
-		end
-		numberOfDecimals = numberOfDecimals or 0
-		local format = '%.'.. numberOfDecimals ..'f'
-		return string.format(format, MathUtil.round(value, numberOfDecimals))
-	end
-
 	return Div{
 		classes = {'match-bm-players-player match-bm-players-player--col-2'},
 		children = {
@@ -600,19 +604,11 @@ end
 ---@param player table
 ---@return Widget
 function MatchPage._renderOverallPlayerPerformance(player)
-	local formatNumbers = function(value, numberOfDecimals)
-		if not value then
-			return nil
-		end
-		numberOfDecimals = numberOfDecimals or 0
-		local format = '%.'.. numberOfDecimals ..'f'
-		return string.format(format, MathUtil.round(value, numberOfDecimals))
-	end
-
 	return Div{
 		classes = {'match-bm-players-player match-bm-players-player--col-2'},
 		children = {
 			Div{
+				classes = {'match-bm-players-player-name'},
 				children = {
 					Link{
 						link = player.playerLink,
