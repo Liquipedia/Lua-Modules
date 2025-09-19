@@ -145,6 +145,10 @@ return {
 				size = 6,
 				children = {
 					{
+						mobileOrder = 1,
+						content = CONTENT.specialEvents,
+					},
+					{
 						mobileOrder = 4,
 						content = CONTENT.usefulArticles,
 					},
@@ -157,10 +161,6 @@ return {
 			{ -- Right
 				size = 6,
 				children = {
-					{
-						mobileOrder = 1,
-						content = CONTENT.specialEvents,
-					},
 					{
 						mobileOrder = 2,
 						children = {

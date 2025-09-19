@@ -111,8 +111,12 @@ function MainPageLayout._makeCells(cells)
 			})
 		end
 
-		local desktopBreakpoints = {'lg', 'xl', 'xxl', 'xxxl'}
+		-- Change line below once all mainpages are properly migrated to new breakpoints
+		-- local columnSizes = column.sizes or {}
 		local columnSizes = column.sizes
+
+		-- 5 lines below can be removed once all mainpages are properly migrated to new breakpoints.
+		local desktopBreakpoints = {'lg', 'xl', 'xxl', 'xxxl'}
 		if not columnSizes and column.size then
 			columnSizes = Table.map(desktopBreakpoints, function(_, bp) return bp, column.size end)
 		end
