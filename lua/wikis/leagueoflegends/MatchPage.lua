@@ -367,7 +367,11 @@ function MatchPage:_renderTeamStats(game)
 						},
 						Div{
 							classes = {'match-bm-team-stats-list-cell'},
-							children = self:isBestOfOne() and self:_buildGameResultSummary(game) or nil
+							children = self:isBestOfOne() and self:_buildGameResultSummary(game) or IconImage{
+								imageLight = self:getMatchContext().icon,
+								imageDark = self:getMatchContext().icondark,
+								size = 'x32px',
+							}
 						},
 						Div{
 							classes = {'match-bm-lol-team-stats-header-team'},
@@ -500,7 +504,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 						side = game.teams[teamIndex].side,
 						roleIcon = IconImage{
 							imageLight = 'Lol role ' .. player.role .. ' icon darkmode.svg',
-							caption = mw.getContentLanguage():ucfirst(player.role),
+							caption = String.upperCaseFirst(player.role),
 							link = ''
 						},
 						playerLink = player.player,
