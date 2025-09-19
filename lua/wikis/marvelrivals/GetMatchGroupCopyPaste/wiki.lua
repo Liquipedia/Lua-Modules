@@ -26,14 +26,17 @@ local INDENT = WikiCopyPaste.Indent
 ---@param args table
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+	local casters = Logic.readBool(args.casters)
 	local showScore = bestof == 0
+	local streams = Logic.readBool(args.streams)
 	local opponent = WikiCopyPaste.getOpponent(mode, showScore)
 
 	local lines = Array.extendWith({},
 		'{{Match',
 		showScore and (INDENT .. '|finished=') or nil,
 		INDENT .. '|date=',
-		Logic.readBool(args.streams) and (INDENT .. '|twitch=|youtube=|vod=') or nil,
+		streams and (INDENT .. '|twitch=|youtube=|vod=') or nil,
+		casters and (INDENT .. '|caster1=|caster2=') or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
 		end),
