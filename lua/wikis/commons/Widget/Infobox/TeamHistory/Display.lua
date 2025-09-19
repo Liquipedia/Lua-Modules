@@ -125,7 +125,7 @@ local HAS_REFS = ((Info.config.infoboxPlayer or {}).automatedHistory or {}).hasH
 
 ---@class TeamHistoryDisplayWidget: Widget
 ---@operator call(table): TeamHistoryDisplayWidget
----@field props {transferList: TransferSpan[], player: string}
+---@field props {transferList: TransferSpan[], player: string, alwaysShowPresent: boolean?}
 local TeamHistoryDisplay = Class.new(Widget)
 TeamHistoryDisplay.defaultProps = {
 	transferList = {},
@@ -195,8 +195,8 @@ function TeamHistoryDisplay:_row(transfer)
 	if role then
 		local splitRole = Array.parseCommaSeparatedString(role --[[@as string]], ' ')
 		local lastSplitRole = splitRole[#splitRole]:lower()
-		local roleData = Roles.All[transfer.role:lower()] or Roles.All[lastSplitRole]
-			or NOT_YET_IN_ROLES_DATA[transfer.role:lower()] or NOT_YET_IN_ROLES_DATA[lastSplitRole] or {}
+		local roleData = Roles.All[transfer.role:lower()] or NOT_YET_IN_ROLES_DATA[transfer.role:lower()]
+			or Roles.All[lastSplitRole] or NOT_YET_IN_ROLES_DATA[lastSplitRole] or {}
 		if roleData.doNotShowInHistory then
 			role = nil
 		elseif roleData.abbreviation then
@@ -207,8 +207,11 @@ function TeamHistoryDisplay:_row(transfer)
 		teamText = '&#8250;&nbsp;' .. teamText
 	end
 	---@type (string|Widget)[]
-	local teamDisplay = {teamText}
-	if role then
+	local teamDisplay = WidgetUtil.collect(
+		role == LOAN and '&#8250;&nbsp;' or nil,
+		teamText
+	)
+	if role and role ~= teamText then
 		table.insert(teamDisplay,
 			Span{
 				css = {['padding-left'] = '3px', ['font-style'] = 'italic'},
@@ -278,11 +281,10 @@ function TeamHistoryDisplay:_row(transfer)
 end
 
 ---@param transfer TransferSpan
----@return string?
----@return Widget
+---@return Widget|string
 function TeamHistoryDisplay:_getTeamText(transfer)
 	if Logic.isEmpty(transfer.team) and Table.includes(SPECIAL_ROLES, transfer.role) then
-		return HtmlWidgets.B{children = {transfer.role}}
+		return transfer.role
 	elseif not TeamTemplate.exists(transfer.team) then
 		return Link{link = transfer.team}
 	end
@@ -326,7 +328,7 @@ end
 function TeamHistoryDisplay:_buildLeaveDateDisplay(transfer)
 	if transfer.leaveDateDisplay then return transfer.leaveDateDisplay end
 
-	if not Table.includes(SPECIAL_ROLES, transfer.role) then
+	if self.props.alwaysShowPresent or not Table.includes(SPECIAL_ROLES, transfer.role) then
 		return Span{
 			css = {['font-weight'] = 'bold'},
 			children = {'Present'}
