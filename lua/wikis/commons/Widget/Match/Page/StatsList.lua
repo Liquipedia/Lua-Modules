@@ -55,7 +55,7 @@ function MatchPageStatsList:_renderStat(data)
 			} or nil,
 			Div{
 				classes = {'match-bm-team-stats-list-cell', 'cell--middle'},
-				children = {data.icon, data.name}
+				children = WidgetUtil.collect(data.icon, data.name)
 			},
 			finished and Div{
 				classes = {'match-bm-team-stats-list-cell'},

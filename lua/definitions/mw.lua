@@ -1294,6 +1294,21 @@ mw.ext.valorantdb = {}
 ---@field character {riot_id: string, name: string, icon_name: string, localized_names: table<string, string>}
 ---@field lpdb_player? {page_name: string, publisher_id: string, wiki: string}
 
+---@class valorantMatchApiRoundKill
+---@field victim string
+---@field time_since_round_start_millis integer
+---@field time_since_game_start_millis integer
+---@field killer string
+---@field finishing_damage table
+---@field assistants string[]
+
+---@class valorantMatchApiRoundPlayer
+---@field kills valorantMatchApiRoundKill[]
+---@field score integer
+---@field puuid string
+---@field economy {remaining: string, armor: string, spent: integer, loadout_value: integer, weapon: string}
+---@field damage {receiver: string, leg_shots: integer, head_shots: integer, body_shots: integer, damage: integer}[]
+
 ---@class valorantMatchApiRound
 ---@field round_num integer
 ---@field round_result 'Bomb defused'|'Eliminated'|'Bomb detonated'|'Round timer expired'|'Surrendered'
@@ -1307,7 +1322,7 @@ mw.ext.valorantdb = {}
 ---@field plant_round_time integer # 0 is no plant
 ---@field defuse_round_time integer # 0 is no defuse
 ---@field plant_site? 'A'|'B'
----@field player_stats table[]
+---@field player_stats valorantMatchApiRoundPlayer[]
 
 ---@class valorantMatchApiTeam
 ---@field team_id 'Blue'|'Red'

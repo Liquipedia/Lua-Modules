@@ -1263,14 +1263,14 @@ span.slash {
 
 			&.cell--middle {
 				font-weight: normal;
+
+				.theme--dark .wiki-leagueoflegends & img {
+					filter: invert( 1 );
+				}
 			}
 
 			.slash {
 				opacity: 0.4;
-			}
-
-			.theme--dark & > img {
-				filter: invert( 1 );
 			}
 		}
 	}

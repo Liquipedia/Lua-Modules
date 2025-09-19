@@ -38,7 +38,7 @@ function TeamHistoryManual.parse(args)
 		role = String.upperCaseFirst(role)
 	end
 
-	return {
+	return {{
 		team = team,
 		role = role,
 		joinDate = TeamHistoryManual._parseDatesToYmd(displayDates.join, args.estimated_start),
@@ -46,7 +46,7 @@ function TeamHistoryManual.parse(args)
 		leaveDate = TeamHistoryManual._parseDatesToYmd(displayDates.leave, args.estimated_end),
 		leaveDateDisplay = displayDates.leave,
 		reference = {},
-	}
+	}}
 end
 
 ---@param display string?
