@@ -517,7 +517,7 @@ function MatchPage:_renderPerformanceForTeam(teamIndex, players, isOverall)
 				)),
 				function (player)
 					if isOverall then
-						return self:_renderPlayerMatchPerformance(player)
+						return MatchPage._renderPlayerMatchPerformance(player)
 					else
 						return self:_renderPlayerGamePerformance(player)
 					end
@@ -541,46 +541,39 @@ local function formatNumbers(value, numberOfDecimals)
 end
 
 ---@private
----@param player table
+---@param data table
 ---@return Widget
-function MatchPage:_renderPlayerGamePerformance(player)
+local function renderPlayerPerformanceBlock(data)
 	return Div{
 		classes = {'match-bm-players-player match-bm-players-player--col-2'},
 		children = {
-			PlayerDisplay{
-				characterIcon = self:getCharacterIcon(player.agent),
-				characterName = player.agent,
-				playerName = player.displayName or player.player,
-				playerLink = player.player,
-			},
+			data.playerDisplay,
 			Div{
-				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-6'},
+				classes = {'match-bm-players-player-stats', data.statsColClass},
 				children = {
 					PlayerStat{
 						title = {IconFa{iconName = 'acs'}, 'ACS'},
-						data = player.acs and formatNumbers(player.acs) or nil,
+						data = data.stats.acs,
 					},
 					PlayerStat{
 						title = {IconFa{iconName = 'kda'}, 'KDA'},
-						data = Array.interleave({
-							player.kills, player.deaths, player.assists
-						}, SPAN_SLASH)
+						data = data.stats.kda,
 					},
 					PlayerStat{
 						title = {IconFa{iconName = 'kast'}, 'KAST'},
-						data = player.kast and (formatNumbers(player.kast, 1) .. '%') or nil
+						data = data.stats.kast,
 					},
 					PlayerStat{
 						title = {IconFa{iconName = 'damage'}, 'ADR'},
-						data = player.adr and formatNumbers(player.adr) or nil
+						data = data.stats.adr,
 					},
 					PlayerStat{
 						title = {IconFa{iconName = 'headshot'}, 'HS%'},
-						data = player.hs and (formatNumbers(player.hs, 1) .. '%') or nil
+						data = data.stats.hs,
 					},
-					PlayerStat{
+					data.stats.fkfd and PlayerStat{
 						title = {IconFa{iconName = 'firstkill'}, 'FK / FD'},
-						data = {player.firstKills, SPAN_SLASH, player.firstDeaths}
+						data = data.stats.fkfd,
 					}
 				}
 			}
@@ -591,49 +584,56 @@ end
 ---@private
 ---@param player table
 ---@return Widget
-function MatchPage:_renderPlayerMatchPerformance(player)
-	return Div{
-		classes = {'match-bm-players-player match-bm-players-player--col-2'},
-		children = {
-			Div{
-				classes = {'match-bm-players-player-name'},
-				children = {
-					Link{
-						link = player.playerLink,
-						children = player.displayName
-					},
-					MatchSummaryWidgets.Characters{characters = player.agents},
-				}
-			},
-			Div{
-				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-5'},
-				children = {
-					PlayerStat{
-						title = {IconFa{iconName = 'acs'}, 'ACS'},
-						data = player.avgAcs and formatNumbers(player.avgAcs) or nil,
-					},
-					PlayerStat{
-						title = {IconFa{iconName = 'kda'}, 'KDA'},
-						data = Array.interleave({
-							player.stats.kills, player.stats.deaths, player.stats.assists
-						}, SPAN_SLASH)
-					},
-					PlayerStat{
-						title = {IconFa{iconName = 'kast'}, 'KAST'},
-						data = player.avgKast and (formatNumbers(player.avgKast, 1) .. '%') or nil
-					},
-					PlayerStat{
-						title = {IconFa{iconName = 'damage'}, 'ADR'},
-						data = player.avgAdr and formatNumbers(player.avgAdr) or nil
-					},
-					PlayerStat{
-						title = {IconFa{iconName = 'headshot'}, 'HS%'},
-						data = player.avgHs and (formatNumbers(player.avgHs, 1) .. '%') or nil
-					},
-				}
-			}
+function MatchPage:_renderPlayerGamePerformance(player)
+	local data = {
+		playerDisplay = PlayerDisplay{
+			characterIcon = self:getCharacterIcon(player.agent),
+			characterName = player.agent,
+			playerName = player.displayName or player.player,
+			playerLink = player.player,
+		},
+		statsColClass = 'match-bm-players-player-stats--col-6',
+		stats = {
+			acs = player.acs and formatNumbers(player.acs) or nil,
+			kda = Array.interleave({
+				player.kills, player.deaths, player.assists
+			}, SPAN_SLASH),
+			kast = player.kast and (formatNumbers(player.kast, 1) .. '%') or nil,
+			adr = player.adr and formatNumbers(player.adr) or nil,
+			hs = player.hs and (formatNumbers(player.hs, 1) .. '%') or nil,
+			fkfd = {player.firstKills, SPAN_SLASH, player.firstDeaths}
 		}
 	}
+	return renderPlayerPerformanceBlock(data)
+end
+
+---@private
+---@param player table
+---@return Widget
+function MatchPage._renderPlayerMatchPerformance(player)
+	local data = {
+		playerDisplay = Div{
+			classes = {'match-bm-players-player-name'},
+			children = {
+				Link{
+					link = player.playerLink,
+					children = player.displayName
+				},
+				MatchSummaryWidgets.Characters{characters = player.agents},
+			}
+		},
+		statsColClass = 'match-bm-players-player-stats--col-5',
+		stats = {
+			acs = player.avgAcs and formatNumbers(player.avgAcs) or nil,
+			kda = Array.interleave({
+				player.stats.kills, player.stats.deaths, player.stats.assists
+			}, SPAN_SLASH),
+			kast = player.avgKast and (formatNumbers(player.avgKast, 1) .. '%') or nil,
+			adr = player.avgAdr and formatNumbers(player.avgAdr) or nil,
+			hs = player.avgHs and (formatNumbers(player.avgHs, 1) .. '%') or nil,
+		}
+	}
+	return renderPlayerPerformanceBlock(data)
 end
 
 return MatchPage
