@@ -28,6 +28,7 @@ local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 ---@class ValorantMatchPage: BaseMatchPage
 ---@operator call(MatchPageMatch): ValorantMatchPage
@@ -226,9 +227,14 @@ function MatchPage:_renderOverallPlayerPerformance(player)
 	return Div{
 		classes = {'match-bm-players-player match-bm-players-player--col-2'},
 		children = {
-			Link{
-				link = player.playerLink,
-				children = player.displayName
+			Div{
+				children = {
+					Link{
+						link = player.playerLink,
+						children = player.displayName
+					},
+					MatchSummaryWidgets.Characters{characters = Array.keys(Table.group(player.agents))},
+				}
 			},
 			Div{
 				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-5'},
