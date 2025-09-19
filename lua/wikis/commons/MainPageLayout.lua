@@ -12,6 +12,7 @@ local Array = Lua.import('Module:Array')
 local Image = Lua.import('Module:Image')
 local LpdbCounter = Lua.import('Module:LPDB entity count')
 local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local WikiData = Lua.import('Module:MainPageLayout/data')
 local GridWidgets = Lua.import('Module:Widget/Grid')
@@ -81,6 +82,7 @@ end
 ---@return Widget
 function MainPageLayout._makeCells(cells)
 	local output = {}
+	local desktopBreakpoints = {'lg', 'xl', 'xxl', 'xxxl'}
 
 	for _, column in ipairs(cells) do
 		local cellContent = {}
@@ -103,9 +105,26 @@ function MainPageLayout._makeCells(cells)
 			if item.children then
 				Array.appendWith(content, MainPageLayout._makeCells(item.children))
 			end
-			table.insert(cellContent, GridWidgets.Cell{cellContent = content, ['order-xs'] = item.mobileOrder})
+			table.insert(cellContent, GridWidgets.Cell{
+				cellContent = content,
+				['order-xs'] = item.mobileOrder,
+				['order-sm'] = item.mobileOrder
+			})
 		end
-		table.insert(output, GridWidgets.Cell{cellContent = cellContent, lg = column.size, xs = 'ignore', sm = 'ignore'})
+
+		local columnSizes = {}
+		if column.size then
+			columnSizes = Table.map(desktopBreakpoints, function(_, bp) return bp, column.size end)
+		end
+		if column.sizes then
+			columnSizes = Table.merge(columnSizes, column.sizes)
+		end
+
+		local cellProps = Table.merge(
+			{cellContent = cellContent, xs = 'ignore', sm = 'ignore'},
+			columnSizes
+		)
+		table.insert(output, GridWidgets.Cell(cellProps))
 	end
 
 	return GridWidgets.Container{ gridCells = output }

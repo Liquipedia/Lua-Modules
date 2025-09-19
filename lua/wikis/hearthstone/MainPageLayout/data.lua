@@ -149,8 +149,8 @@ return {
 						content = CONTENT.specialEvents,
 					},
 					{
-						mobileOrder = 3,
-						content = CONTENT.transfers,
+						mobileOrder = 4,
+						content = CONTENT.usefulArticles,
 					},
 					{
 						mobileOrder = 6,
@@ -173,7 +173,7 @@ return {
 								},
 							},
 							{
-								size = 6,
+								sizes = {xxxl = 6},
 								children = {
 									{
 										noPanel = true,
@@ -182,7 +182,7 @@ return {
 								},
 							},
 							{
-								size = 6,
+								sizes = {xxxl = 6},
 								children = {
 									{
 										noPanel = true,
@@ -193,12 +193,12 @@ return {
 						},
 					},
 					{
-						mobileOrder = 5,
-						content = CONTENT.thisDay,
+						mobileOrder = 3,
+						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 4,
-						content = CONTENT.usefulArticles,
+						mobileOrder = 5,
+						content = CONTENT.thisDay,
 					},
 				},
 			},
