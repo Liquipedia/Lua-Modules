@@ -82,6 +82,7 @@ end
 ---@return Widget
 function MainPageLayout._makeCells(cells)
 	local output = {}
+	local desktopBreakpoints = {'lg', 'xl', 'xxl', 'xxxl'}
 
 	for _, column in ipairs(cells) do
 		local cellContent = {}
@@ -111,16 +112,13 @@ function MainPageLayout._makeCells(cells)
 			})
 		end
 
-		-- Change line below once all mainpages are properly migrated to new breakpoints
-		-- local columnSizes = column.sizes or {}
-		local columnSizes = column.sizes
-
-		-- 5 lines below can be removed once all mainpages are properly migrated to new breakpoints.
-		local desktopBreakpoints = {'lg', 'xl', 'xxl', 'xxxl'}
-		if not columnSizes and column.size then
+		local columnSizes = {}
+		if column.size then
 			columnSizes = Table.map(desktopBreakpoints, function(_, bp) return bp, column.size end)
 		end
-		columnSizes = columnSizes or {}
+		if column.sizes then
+			columnSizes = Table.merge(columnSizes, column.sizes)
+		end
 
 		local cellProps = Table.merge(
 			{cellContent = cellContent, xs = 'ignore', sm = 'ignore'},
