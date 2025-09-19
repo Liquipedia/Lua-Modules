@@ -255,7 +255,7 @@ function MatchMapsLegacy.convertMatch(frame)
 
 	local generate = Logic.readBool(Table.extract(args, 'generate'))
 
-	local details = Json.parseIfString(args.details or '{}')
+	local details = Json.parseIfString(Table.extract(args, 'details') or '{}')
 
 	args, details = MatchMapsLegacy._handleDetails(args, details)
 	args = MatchMapsLegacy._handleOpponents(args)
