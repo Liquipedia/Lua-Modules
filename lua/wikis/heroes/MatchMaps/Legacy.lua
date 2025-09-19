@@ -160,7 +160,8 @@ function MatchMapsLegacy.matchList(frame, generate)
 	globalVars:delete('islegacy')
 
 	if generate then
-		return MatchGroupLegacy.generateWikiCodeForMatchList(args)
+		newArgs.isLegacy = nil
+		return MatchGroupLegacy.generateWikiCodeForMatchList(newArgs)
 	end
 
 	return MatchGroup.MatchList(newArgs)
