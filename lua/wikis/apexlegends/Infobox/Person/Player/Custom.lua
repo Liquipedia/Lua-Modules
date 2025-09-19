@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Array = Lua.import('Module:Array')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local CharacterNames = Lua.import('Module:CharacterNames')
@@ -22,6 +23,18 @@ local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
+
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
+
+local ACHIEVEMENTS_BASE_CONDITIONS = {
+	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Showmatch', 'Qualifier'}),
+	ConditionUtil.anyOf(ColumnName('liquipediatier'), {1, 2}),
+	ConditionNode(ColumnName('placement'), Comparator.eq, 1),
+}
 
 local INPUTS = {
 	controller = 'Controller',
@@ -41,6 +54,12 @@ local CustomInjector = Class.new(Injector)
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
+
+	-- Automatic achievements
+	player.args.achievements = Achievements.player{
+		noTemplate = true,
+		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS
+	}
 
 	return player:createInfobox()
 end
