@@ -33,9 +33,6 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 	local lines = Array.extendWith({},
 		'{{Match',
-		index == 1 and (INDENT .. '|bestof' .. (bestof ~= 0 and bestof or '')) or nil,
-		Logic.readBool(args.needsWinner) and (INDENT .. '|winner=') or nil,
-		Logic.readBool(args.isFinished) and (INDENT .. '|finished=') or nil,
 		INDENT .. '|date=',
 		streams and (INDENT .. '|twitch=|youtube=|vod=') or nil,
 		casters and (INDENT .. '|caster1=|caster2=') or nil,
