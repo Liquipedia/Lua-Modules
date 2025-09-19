@@ -108,80 +108,83 @@ end
 ---@private
 ---@return Widget
 function MatchPage:_renderGamesOverview()
-    local allPlayersStats = {}
+	local allPlayersStats = {}
 
-    Array.forEach(self.games, function(game)
-        if game.status ~= BaseMatchPage.NOT_PLAYED then
-            Array.forEach(Array.range(1, 2), function(teamIdx)
-                Array.forEach(game.opponents[teamIdx].players or {}, function(player)
-                    local playerId = player.player
-                    if not playerId then return end
+	Array.forEach(self.games, function(game)
+		if game.status ~= BaseMatchPage.NOT_PLAYED then
+		    Array.forEach(Array.range(1, 2), function(teamIdx)
+			Array.forEach(game.opponents[teamIdx].players or {}, function(player)
+			    local playerId = player.player
+			    if not playerId then return end
 
-                    if not allPlayersStats[playerId] then
-                        allPlayersStats[playerId] = {
-                            displayName = player.displayName or player.player,
-                            playerLink = player.player,
-                            teamIndex = teamIdx,
-                            agents = {},
-                            stats = {
-                                acs = {},
-                                kast = {},
-                                adr = {},
-                                hs = {},
-                                kills = 0,
-                                deaths = 0,
-                                assists = 0,
-                            }
-                        }
-                    end
+			    if not allPlayersStats[playerId] then
+				allPlayersStats[playerId] = {
+				    displayName = player.displayName or player.player,
+				    playerLink = player.player,
+				    teamIndex = teamIdx,
+				    agents = {},
+				    stats = {
+					acs = {},
+					kast = {},
+					adr = {},
+					hs = {},
+					kills = 0,
+					deaths = 0,
+					assists = 0,
+				    }
+				}
+			    end
 
-                    local data = allPlayersStats[playerId]
-                    if player.agent then
-                        table.insert(data.agents, player.agent)
-                    end
+			    local data = allPlayersStats[playerId]
+			    if player.agent then
+				table.insert(data.agents, player.agent)
+			    end
 
-                    local stats = data.stats
-                    if player.acs then table.insert(stats.acs, player.acs) end
-                    if player.kast then table.insert(stats.kast, player.kast) end
-                    if player.adr then table.insert(stats.adr, player.adr) end
-                    if player.hs then table.insert(stats.hs, player.hs) end
-                    stats.kills = stats.kills + (player.kills or 0)
-                    stats.deaths = stats.deaths + (player.deaths or 0)
-                    stats.assists = stats.assists + (player.assists or 0)
-                end)
-            end)
-        end
-    end)
+			    local stats = data.stats
+			    if player.acs then table.insert(stats.acs, player.acs) end
+			    if player.kast then table.insert(stats.kast, player.kast) end
+			    if player.adr then table.insert(stats.adr, player.adr) end
+			    if player.hs then table.insert(stats.hs, player.hs) end
+			    stats.kills = stats.kills + (player.kills or 0)
+			    stats.deaths = stats.deaths + (player.deaths or 0)
+			    stats.assists = stats.assists + (player.assists or 0)
+			end)
+		    end)
+		end
+	end)
 
-    local function average(t)
-        if #t == 0 then return nil end
-        local sum = 0
-        for _, v in ipairs(t) do sum = sum + v end
-        return sum / #t
-    end
+	local function average(t)
+		if #t == 0 then return nil end
+		local sum = 0
+		for _, v in ipairs(t) do sum = sum + v end
+		return sum / #t
+	end
 
-    local team1Players = {}
-    local team2Players = {}
+	local team1Players = {}
+	local team2Players = {}
 
-    for _, playerData in pairs(allPlayersStats) do
-        local stats = playerData.stats
-        playerData.avgAcs = average(stats.acs)
-        playerData.avgKast = average(stats.kast)
-        playerData.avgAdr = average(stats.adr)
-        playerData.avgHs = average(stats.hs)
+	for _, playerData in pairs(allPlayersStats) do
+		local stats = playerData.stats
+		playerData.avgAcs = average(stats.acs)
+		playerData.avgKast = average(stats.kast)
+		playerData.avgAdr = average(stats.adr)
+		playerData.avgHs = average(stats.hs)
 
-        if playerData.teamIndex == 1 then
-            table.insert(team1Players, playerData)
-        else
-            table.insert(team2Players, playerData)
-        end
-    end
+		if playerData.teamIndex == 1 then
+		    table.insert(team1Players, playerData)
+		else
+		    table.insert(team2Players, playerData)
+		end
+	end
 
-    return Div{
-		classes = {'match-bm-players-wrapper'},
-		children = {
-			self:_renderOverallPerformanceForTeam(1, team1Players),
-			self:_renderOverallPerformanceForTeam(2, team2Players)
+	return {
+		HtmlWidgets.H3{children = 'Player Performance'},
+		Div{
+			classes = {'match-bm-players-wrapper'},
+			children = {
+				self:_renderOverallPerformanceForTeam(1, team1Players),
+				self:_renderOverallPerformanceForTeam(2, team2Players)
+			}
 		}
 	}
 end
