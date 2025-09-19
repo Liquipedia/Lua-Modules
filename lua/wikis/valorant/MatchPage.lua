@@ -233,7 +233,7 @@ function MatchPage:_renderOverallPlayerPerformance(player)
 						link = player.playerLink,
 						children = player.displayName
 					},
-					MatchSummaryWidgets.Characters{characters = Array.keys(Table.group(player.agents))},
+					MatchSummaryWidgets.Characters{characters = player.agents},
 				}
 			},
 			Div{
