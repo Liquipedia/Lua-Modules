@@ -607,12 +607,14 @@ function MatchGroupLegacy._argsToString(args)
 	end
 
 	for key, value in Table.iter.spairs(args, compare) do
+		value = Json.parseIfTable(value) or value
 		local val
 		if type(value) == 'table' and Logic.isNotEmpty(value) then
 			val = '{{Json' .. MatchGroupLegacy._argsToString(value) .. '}}'
 		elseif type(value) ~= 'table' then
 			val = tostring(value)
 		end
+		val = Logic.nilIfEmpty(val)
 		if val then
 			table.insert(otherArgs, '|' .. key .. '=' .. val)
 		end
