@@ -14,6 +14,7 @@ local Array = Lua.import('Module:Array')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local MatchGroup = Lua.import('Module:MatchGroup')
+local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -251,7 +252,10 @@ end
 ---@return Html
 function MatchMapsLegacy.convertMatch(frame)
 	local args = Arguments.getArgs(frame)
-	local details = Json.parseIfString(args.details or '{}')
+
+	local generate = Logic.readBool(Table.extract(args, 'generate'))
+
+	local details = Json.parseIfString(Table.extract(args, 'details') or '{}')
 
 	args, details = MatchMapsLegacy._handleDetails(args, details)
 	args = MatchMapsLegacy._handleOpponents(args)
@@ -270,6 +274,10 @@ function MatchMapsLegacy.convertMatch(frame)
 			score1 = opp1score,
 			score2 = opp2score,
 		}
+	end
+
+	if generate then
+		return Json.stringify(args)
 	end
 
 	Template.stashReturnValue(args, 'LegacyMatchlist')
@@ -296,7 +304,7 @@ function MatchMapsLegacy.showmatch(frame)
 		id = args.id,
 		hide = true,
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 		R1M1 = matches[1]
 	})
 
@@ -340,7 +348,7 @@ function MatchMapsLegacy.matchListEnd()
 		isLegacy = true,
 		id = bracketId,
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 		collapsed = hide,
 		attached = hide,
 		title = matchlistVars:get('matchListTitle'),
@@ -380,6 +388,71 @@ function MatchMapsLegacy.matchListEnd()
 	globalVars:delete('islegacy')
 
 	return MatchGroup.MatchList(args)
+end
+
+--- for bot conversion to proper match2 matchlists
+---@param frame Frame
+---@return string
+function MatchMapsLegacy.generate(frame)
+	local args = Arguments.getArgs(frame)
+
+	local store = Logic.readBoolOrNil(args.store)
+
+	local offset = 0
+	local title = args.title
+	if not title and not Json.parseIfTable(args[1]) then
+		title = args[1]
+		offset = 1
+	end
+
+	local parsedArgs = {
+		id = args.id,
+		title = title,
+		width = args.width or '300px',
+		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		store = store,
+		matchsection = args.matchsection,
+	}
+
+	---@type table[]
+	local matches = Array.mapIndexes(function(index)
+		return Json.parseIfTable(args[index + offset])
+	end)
+
+	local gsl = args.gsl
+	if Logic.isNotEmpty(gsl) then
+		if String.endsWith(gsl:lower(), GSL_WINNERS) then
+			gsl = 'winnersfirst'
+		elseif String.endsWith(gsl:lower(), GSL_LOSERS) then
+			gsl = 'losersfirst'
+		end
+		if String.startsWith(gsl:lower(), GSL_GF) then
+			parsedArgs['M6header'] = 'Grand Final'
+		end
+		parsedArgs.gsl = gsl
+	end
+
+	Array.forEach(matches, function(match, matchIndex)
+		parsedArgs['M' .. matchIndex] = match
+	end)
+
+	return MatchGroupLegacy.generateWikiCodeForMatchList(parsedArgs)
+end
+
+---@param frame Frame
+---@return string
+function MatchMapsLegacy.generateSingleMatch(frame)
+	local args = Arguments.getArgs(frame)
+	args.generate = true
+
+	assert(args.id, 'Missing id')
+
+	return MatchGroupLegacy.generateWikiCodeForSingleMatch{
+		match = MatchMapsLegacy.convertMatch(args),
+		id = args.id,
+		width = args.width,
+	}
 end
 
 return MatchMapsLegacy
