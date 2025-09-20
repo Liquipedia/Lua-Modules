@@ -223,6 +223,7 @@ function MatchMapsLegacyStore.generateSingleMatch(frame)
 	return MatchGroupLegacy.generateWikiCodeForSingleMatch{
 		match = MatchMapsLegacy.main(args),
 		id = args.id,
+		width = args.width,
 	}
 end
 

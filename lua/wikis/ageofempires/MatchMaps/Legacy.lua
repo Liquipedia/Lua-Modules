@@ -266,6 +266,7 @@ function MatchMapsLegacy.generateSingleMatch(frame)
 	return MatchGroupLegacy.generateWikiCodeForSingleMatch{
 		match = MatchMapsLegacy.convertMatch(args),
 		id = args.id,
+		width = args.width,
 	}
 end
 
