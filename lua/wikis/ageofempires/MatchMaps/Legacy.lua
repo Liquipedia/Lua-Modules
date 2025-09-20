@@ -73,11 +73,11 @@ function MatchMapsLegacy._readMaps(matchArgs)
 	end
 	--handle MatchMaps mapXwin
 	local mapWinners = Table.filterByKey(matchArgs, function (key)
-		local winner = key:match('map(%d+)win')
+		local winner = string.match(key, 'map(%d+)win')
 		return winner ~= nil
 	end)
 	Table.iter.forEachPair(mapWinners, function (key)
-		local mapKey = key:match('(map%d+)')
+		local mapKey = string.match(key, '(map%d+)')
 		local mapWinner = Table.extract(matchArgs, mapKey .. 'win')
 		matchArgs[mapKey] = matchArgs[mapKey] or {}
 		matchArgs[mapKey].winner = matchArgs[mapKey].winner or mapWinner
