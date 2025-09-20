@@ -68,7 +68,7 @@ function MatchMapsLegacy._matchlist(args, generate)
 	end
 
 	matches.id = bracketId
-	matches.isLegacy = true
+	matches.isLegacy = not generate or nil
 	matches.title = Logic.emptyOr(args.title, args[1], 'Match List')
 	matches.width = args.width
 	local hide = Logic.readBool(Logic.emptyOr(args.hide, true))
