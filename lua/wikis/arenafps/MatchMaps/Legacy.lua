@@ -111,7 +111,7 @@ function MatchMapsLegacy.showmatch(frame)
 		id = id,
 		hide = true,
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 		R1M1 = match
 	})
 
@@ -141,7 +141,7 @@ function MatchMapsLegacy.matchList(frame, generate)
 	Table.mergeInto(args, {
 		isLegacy = true,
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 		collapsed = hide,
 		attached = hide,
 		title = Logic.nilOr(Table.extract(args, 'title'), args[1]),

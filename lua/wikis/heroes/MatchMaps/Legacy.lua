@@ -148,7 +148,7 @@ function MatchMapsLegacy.matchList(frame, generate)
 		width = args.width,
 		isLegacy = true,
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 		collapsed = hide,
 		attached = hide
 	}

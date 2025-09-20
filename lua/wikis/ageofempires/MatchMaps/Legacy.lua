@@ -128,7 +128,7 @@ function MatchMapsLegacy.showmatch(frame)
 		id = id,
 		hide = true,
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 		R1M1 = match
 	})
 
