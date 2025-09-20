@@ -107,7 +107,7 @@ function MatchMapsLegacy._start(args)
 		collapsed = hide,
 		attached = hide,
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 		gsl = Logic.isNotEmpty(args.gsl) and args.gsl .. 'first' or nil
 	}
 
@@ -136,7 +136,8 @@ function MatchMapsLegacy.matchList(frame, generate)
 	globalVars:delete('islegacy')
 
 	if generate then
-		return MatchGroupLegacy.generateWikiCodeForMatchList(args)
+		matchListArgs.isLegacy = nil
+		return MatchGroupLegacy.generateWikiCodeForMatchList(matchListArgs)
 	end
 
 	return MatchGroup.MatchList(matchListArgs)

@@ -248,7 +248,7 @@ function MatchMapsLegacy.matchList(frame, generate)
 	local hide = Logic.nilOr(Logic.readBoolOrNil(args.hide), true)
 	args.isLegacy = true
 	args.store = store
-	args.noDuplicateCheck = not store
+	args.noDuplicateCheck = not store or nil
 	args.collapsed = hide
 	args.attached = hide
 	args.title = Logic.nilOr(args.title, args[1])
@@ -319,7 +319,7 @@ function MatchMapsLegacy.matchListEnd()
 		isLegacy = true,
 		id = bracketId,
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 		collapsed = hide,
 		attached = hide,
 		title = matchlistVars:get('matchListTitle'),

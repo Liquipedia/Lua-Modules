@@ -304,7 +304,7 @@ function MatchMapsLegacy.showmatch(frame)
 		id = args.id,
 		hide = true,
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 		R1M1 = matches[1]
 	})
 
@@ -348,7 +348,7 @@ function MatchMapsLegacy.matchListEnd()
 		isLegacy = true,
 		id = bracketId,
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 		collapsed = hide,
 		attached = hide,
 		title = matchlistVars:get('matchListTitle'),

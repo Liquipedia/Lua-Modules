@@ -110,7 +110,7 @@ function LegacyMatchMaps.solo(frame)
 		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 	}
 
 	for _, matchInput, matchIndex in Table.iter.pairsByPrefix(args, 'match') do
@@ -314,7 +314,7 @@ function LegacyMatchMaps.teamClose()
 		title = matchlistVars:get('matchListTitle'),
 		width = matchlistVars:get('width'),
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 		collapsed = hide,
 		attached = hide,
 	}
