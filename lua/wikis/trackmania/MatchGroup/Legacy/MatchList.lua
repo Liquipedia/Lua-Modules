@@ -96,11 +96,20 @@ end
 function LegacyMatchList._handleOpponents(processedArgs)
 	for opponentIndex = 1, NUMBER_OF_OPPONENTS do
 		local input = Table.extract(processedArgs, 'team' .. opponentIndex)
+		local player = Table.extract(processedArgs, 'player' .. opponentIndex)
 		local score = Table.extract(processedArgs, 'games' .. opponentIndex)
 		if (input or ''):lower() == 'bye' then
 			processedArgs['opponent' .. opponentIndex] = {
 				['type'] = Opponent.literal,
 				name = 'BYE',
+				score = score,
+			}
+		elseif Logic.isNotEmpty(player) then
+			processedArgs['opponent' .. opponentIndex] = {
+				['type'] = Opponent.solo,
+				name = player,
+				flag = Table.extract(processedArgs, 'p' .. opponentIndex .. 'flag'),
+				link = Table.extract(processedArgs, 'p' .. opponentIndex .. 'link'),
 				score = score,
 			}
 		elseif Logic.isEmpty(input) then
