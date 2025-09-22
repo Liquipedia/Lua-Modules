@@ -822,11 +822,11 @@ span.slash {
 	align-items: center;
 	gap: 0.5rem;
 	color: #ffffff;
-	background: #00000014;
+	background: var( --clr-on-surface-light-primary-8 );
 	border-radius: 0.5rem;
 
 	.theme--dark & {
-		background-color: #ffffff14;
+		background-color: var( --clr-on-surface-dark-primary-8 );
 	}
 
 	&-row {
