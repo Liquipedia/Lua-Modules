@@ -405,10 +405,10 @@ span.slash {
 			width: 100%;
 			gap: 0.5rem;
 			border-radius: 0.5rem;
-			background: #00000014;
+			background: var( --clr-on-surface-light-primary-8 );
 
 			.theme--dark & {
-				background-color: #ffffff14;
+				background-color: var( --clr-on-surface-dark-primary-8 );
 			}
 
 			&-choices {
@@ -498,7 +498,7 @@ span.slash {
 	display: flex;
 	padding: 1rem;
 	align-items: stretch;
-	background: #00000014;
+	background: var( --clr-on-surface-light-primary-8 );
 	border-radius: 0.5rem;
 
 	@media ( max-width: 1199px ),
@@ -536,7 +536,7 @@ span.slash {
 	}
 
 	.theme--dark & {
-		background-color: #ffffff14;
+		background-color: var( --clr-on-surface-dark-primary-8 );
 	}
 
 	&-role {
@@ -1086,10 +1086,10 @@ span.slash {
 		padding: 0.5rem;
 		gap: 4px;
 		border-radius: 0.5rem;
-		background: #00000014;
+		background: var( --clr-on-surface-light-primary-8 );
 
 		.theme--dark & {
-			background-color: #ffffff14;
+			background-color: var( --clr-on-surface-dark-primary-8 );
 		}
 
 		> div {
@@ -1103,13 +1103,13 @@ span.slash {
 	&-section {
 		flex: 1 0 20%;
 		border-radius: 0.5rem;
-		background: #00000014;
+		background: var( --clr-on-surface-light-primary-8 );
 		display: flex;
 		flex-flow: column;
 		padding: 0.5rem;
 
 		.theme--dark & {
-			background-color: #ffffff14;
+			background-color: var( --clr-on-surface-dark-primary-8 );
 		}
 
 		.theme--dark & {
