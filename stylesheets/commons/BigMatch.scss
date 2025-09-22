@@ -240,11 +240,11 @@ span.slash {
 	display: flex;
 	justify-content: center;
 	padding: 8px;
-	background-color: #00000014;
+	background-color: var( --clr-on-surface-light-primary-8 );
 	border-radius: 0.5rem;
 
 	.theme--dark & {
-		background-color: #ffffff14;
+		background-color: var( --clr-on-surface-dark-primary-8 );
 	}
 }
 
@@ -315,11 +315,11 @@ span.slash {
 	justify-content: center;
 	padding: 8px;
 	gap: 4px;
-	background-color: #00000014;
+	background-color: var( --clr-on-surface-light-primary-8 );
 	border-radius: 0.5rem;
 
 	.theme--dark & {
-		background-color: #ffffff14;
+		background-color: var( --clr-on-surface-dark-primary-8 );
 	}
 }
 
@@ -364,10 +364,10 @@ span.slash {
 				padding: 0.5rem;
 				gap: 0.5rem;
 				border-radius: 0.5rem;
-				background: #00000014;
+				background: var( --clr-on-surface-light-primary-8 );
 
 				.theme--dark & {
-					background-color: #ffffff14;
+					background-color: var( --clr-on-surface-dark-primary-8 );
 				}
 			}
 		}
