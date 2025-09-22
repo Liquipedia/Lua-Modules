@@ -227,6 +227,7 @@ function BaseMatchPage:render()
 
 	local tournamentContext = self:getMatchContext()
 	return Div{
+		classes = {'match-bm'},
 		children = WidgetUtil.collect(
 			Header {
 				countdownBlock = self:getCountdownBlock(),

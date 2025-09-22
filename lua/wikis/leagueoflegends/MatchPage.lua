@@ -265,8 +265,7 @@ function MatchPage:_renderDraft(game)
 				},
 				GeneralCollapsible{
 					title = 'Draft Order',
-					attributes = {style = 'width:100%'},
-					titleClasses = {'match-bm-lol-game-veto-order-toggle'},
+					classes = {'match-bm-lol-game-veto-order'},
 					shouldCollapse = true,
 					collapseAreaClasses = {'match-bm-lol-game-veto-order-list'},
 					children = {

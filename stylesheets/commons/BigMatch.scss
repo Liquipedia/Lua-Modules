@@ -21,7 +21,7 @@ span.slash {
 
 	.theme--dark & {
 		background-color: var( --clr-secondary-16 );
-		border-color: rgba( 255, 255, 255, 0.08 );
+		border-color: var( --clr-on-surface-dark-primary-8 );
 	}
 
 	.match-info-links {
@@ -240,11 +240,11 @@ span.slash {
 	display: flex;
 	justify-content: center;
 	padding: 8px;
-	background-color: #00000014;
+	background-color: var( --clr-on-surface-light-primary-8 );
 	border-radius: 0.5rem;
 
 	.theme--dark & {
-		background-color: #ffffff14;
+		background-color: var( --clr-on-surface-dark-primary-8 );
 	}
 }
 
@@ -315,11 +315,11 @@ span.slash {
 	justify-content: center;
 	padding: 8px;
 	gap: 4px;
-	background-color: #00000014;
+	background-color: var( --clr-on-surface-light-primary-8 );
 	border-radius: 0.5rem;
 
 	.theme--dark & {
-		background-color: #ffffff14;
+		background-color: var( --clr-on-surface-dark-primary-8 );
 	}
 }
 
@@ -327,6 +327,7 @@ span.slash {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
+	gap: 0.5rem;
 
 	&-overview {
 		display: flex;
@@ -334,6 +335,7 @@ span.slash {
 		align-items: flex-start;
 		padding: 0;
 		align-self: stretch;
+		gap: 0.5rem;
 
 		@media ( max-width: 645px ) {
 			/* >= ??px icons in 1→2 columns */
@@ -343,39 +345,44 @@ span.slash {
 		&-team {
 			display: flex;
 			flex-direction: column;
-			border: 1px solid #bbbbbb;
+			border-radius: 0.5rem;
 			width: 100%;
+			padding: 0.5rem;
+			gap: 0.5rem;
+			background: #ffffff;
+			border: 1px solid #bbbbbb;
 
 			.theme--dark & {
-				border-color: var( --clr-secondary-25 );
+				background-color: var( --clr-secondary-16 );
+				border-color: var( --clr-on-surface-dark-primary-8 );
 			}
 
 			&-veto {
 				display: flex;
 				flex-flow: row wrap;
 				justify-content: center;
-				padding: 8px;
-				gap: 8px;
-				border-top: 1px solid #bbbbbb;
+				padding: 0.5rem;
+				gap: 0.5rem;
+				border-radius: 0.5rem;
+				background: var( --clr-on-surface-light-primary-8 );
 
 				.theme--dark & {
-					border-color: var( --clr-secondary-25 );
+					background-color: var( --clr-on-surface-dark-primary-8 );
 				}
 			}
 		}
 	}
 
 	&-order {
-		&-toggle {
-			padding: 4px;
-			background: #f5f5f5;
-			border: 1px solid #bbbbbb;
-			width: 100%;
+		padding: 0.5rem;
+		background: #ffffff;
+		border: 1px solid #bbbbbb;
+		border-radius: 0.5rem;
+		width: 100%;
 
-			.theme--dark & {
-				background-color: var( --clr-secondary-16 );
-				border-color: var( --clr-secondary-25 );
-			}
+		.theme--dark & {
+			background-color: var( --clr-secondary-16 );
+			border-color: var( --clr-on-surface-dark-primary-8 );
 		}
 
 		&-list {
@@ -383,10 +390,11 @@ span.slash {
 			flex-direction: row;
 			align-items: flex-start;
 			align-self: stretch;
+			padding-top: 0.5rem;
+			gap: 0.5rem;
 
 			@media ( min-width: 768px ) {
 				flex-direction: column;
-				padding: 0;
 			}
 		}
 
@@ -395,21 +403,23 @@ span.slash {
 			flex-direction: row;
 			justify-content: center;
 			width: 100%;
+			gap: 0.5rem;
+			border-radius: 0.5rem;
+			background: var( --clr-on-surface-light-primary-8 );
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-8 );
+			}
 
 			&-choices {
 				box-sizing: border-box;
 				display: flex;
 				flex-direction: row;
 				align-items: center;
-				padding: 8px;
-				gap: 8px;
-				border: 1px solid #bbbbbb;
+				padding: 0.5rem;
+				gap: 0.5rem;
 				width: 100%;
 				color: #ffffff;
-
-				.theme--dark & {
-					border-color: var( --clr-secondary-25 );
-				}
 			}
 
 			&-header {
@@ -417,14 +427,7 @@ span.slash {
 				flex-direction: row;
 				justify-content: center;
 				align-items: center;
-				padding: 8px;
-				background: #f5f5f5;
-				border: 1px solid #bbbbbb;
-
-				.theme--dark & {
-					background-color: var( --clr-secondary-16 );
-					border-color: var( --clr-secondary-25 );
-				}
+				padding: 0.5rem;
 
 				@media ( max-width: 767px ) and ( min-width: 646px ) {
 					/* Header not needed when both in 2 col mode */
@@ -468,21 +471,26 @@ span.slash {
 	display: flex;
 	flex-direction: column;
 	align-items: stretch;
+	border: 1px solid #bbbbbb;
+	border-radius: 0.5rem;
+	padding: 0.5rem;
+	gap: 0.5rem;
+
+	.theme--light & {
+		background-color: #ffffff;
+	}
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+		border-color: var( --clr-on-surface-dark-primary-8 );
+	}
 
 	&-header {
 		display: flex;
 		flex-direction: row;
 		justify-content: center;
 		align-items: center;
-		padding: 8px;
-		background: #eaecf0;
-		border: 1px solid #bbbbbb;
 		align-self: stretch;
-
-		.theme--dark & {
-			background-color: var( --clr-secondary-16 );
-			border-color: var( --clr-secondary-25 );
-		}
 	}
 }
 
@@ -490,8 +498,8 @@ span.slash {
 	display: flex;
 	padding: 1rem;
 	align-items: stretch;
-	background: #ffffff;
-	border: 0.0625rem solid #bbbbbb;
+	background: var( --clr-on-surface-light-primary-8 );
+	border-radius: 0.5rem;
 
 	@media ( max-width: 1199px ),
 		( min-width: 1320px ) {
@@ -528,8 +536,7 @@ span.slash {
 	}
 
 	.theme--dark & {
-		background-color: var( --clr-secondary-7 );
-		border-color: var( --clr-secondary-25 );
+		background-color: var( --clr-on-surface-dark-primary-8 );
 	}
 
 	&-role {
@@ -654,10 +661,10 @@ span.slash {
 			height: 1.5rem;
 			border-radius: 0.25rem;
 			overflow: hidden;
-			background-color: rgba( 0, 0, 0, 0.16 );
+			background-color: var( --clr-on-surface-light-primary-16 );
 
 			.theme--dark & {
-				background-color: rgba( 255, 255, 255, 0.16 );
+				background-color: var( --clr-on-surface-dark-primary-16 );
 			}
 
 			&.item--backpack img {
@@ -695,7 +702,7 @@ span.slash {
 			height: 1.5rem;
 			border-radius: 100%;
 			overflow: hidden;
-			background-color: rgba( 0, 0, 0, 0.16 );
+			background-color: var( --clr-on-surface-light-primary-16 );
 
 			@media ( min-width: 768px ) {
 				width: 2rem;
@@ -703,7 +710,7 @@ span.slash {
 			}
 
 			.theme--dark & {
-				background-color: rgba( 255, 255, 255, 0.16 );
+				background-color: var( --clr-on-surface-dark-primary-16 );
 			}
 
 			img {
@@ -805,30 +812,22 @@ span.slash {
 	flex-direction: row;
 	justify-content: center;
 	align-items: center;
-	padding: 8px;
-	background: #f5f5f5;
-
-	.theme--dark & {
-		background-color: var( --clr-secondary-16 );
-	}
-
-	.wiki-dota2 & {
-		border-bottom: 0.0625rem solid #bbbbbb;
-
-		.theme--dark & {
-			border-color: var( --clr-secondary-25 );
-		}
-	}
 }
 
 .match-bm-game-veto-overview-team-veto {
-	padding: 1rem 0;
+	padding: 0.5rem;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	gap: 0.5rem;
 	color: #ffffff;
+	background: var( --clr-on-surface-light-primary-8 );
+	border-radius: 0.5rem;
+
+	.theme--dark & {
+		background-color: var( --clr-on-surface-dark-primary-8 );
+	}
 
 	&-row {
 		display: flex;
@@ -978,10 +977,14 @@ span.slash {
 }
 
 .match-bm-lol-game-overview {
+	background-color: #ffffff;
 	border: 1px solid #bbbbbb;
+	border-radius: 0.5rem;
+	padding: 0.5rem;
 
 	.theme--dark & {
-		border-color: var( --clr-secondary-25 );
+		background-color: var( --clr-secondary-16 );
+		border-color: var( --clr-on-surface-dark-primary-8 );
 	}
 }
 
@@ -994,7 +997,6 @@ span.slash {
 	&-team {
 		display: flex;
 		align-items: center;
-		padding: 16px;
 		gap: 4px;
 	}
 
@@ -1027,13 +1029,9 @@ span.slash {
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
-			padding: 16px;
+			padding: 0 1rem;
 			gap: 4px;
 			text-align: center;
-
-			.wiki-valorant & {
-				padding: 0.75rem;
-			}
 		}
 	}
 
@@ -1072,7 +1070,7 @@ span.slash {
 
 	.theme--dark & {
 		background-color: var( --clr-secondary-16 );
-		border-color: rgba( 255, 255, 255, 0.08 );
+		border-color: var( --clr-on-surface-dark-primary-8 );
 	}
 
 	@media ( max-width: 767px ) {
@@ -1088,10 +1086,10 @@ span.slash {
 		padding: 0.5rem;
 		gap: 4px;
 		border-radius: 0.5rem;
-		background: #00000014;
+		background: var( --clr-on-surface-light-primary-8 );
 
 		.theme--dark & {
-			background-color: #ffffff14;
+			background-color: var( --clr-on-surface-dark-primary-8 );
 		}
 
 		> div {
@@ -1105,13 +1103,13 @@ span.slash {
 	&-section {
 		flex: 1 0 20%;
 		border-radius: 0.5rem;
-		background: #00000014;
+		background: var( --clr-on-surface-light-primary-8 );
 		display: flex;
 		flex-flow: column;
 		padding: 0.5rem;
 
 		.theme--dark & {
-			background-color: #ffffff14;
+			background-color: var( --clr-on-surface-dark-primary-8 );
 		}
 
 		.theme--dark & {
@@ -1140,7 +1138,7 @@ span.slash {
 
 			.theme--dark & {
 				background-color: var( --clr-secondary-16 );
-				border-color: rgba( 255, 255, 255, 0.08 );
+				border-color: var( --clr-on-surface-dark-primary-8 );
 			}
 		}
 	}
@@ -1148,7 +1146,9 @@ span.slash {
 
 .match-bm-team-stats {
 	border: 0.0625rem solid #bbbbbb;
+	border-radius: 0.5rem;
 	margin-bottom: 1rem;
+	overflow: hidden;
 
 	.theme--dark & {
 		border-color: var( --clr-secondary-25 );
@@ -1186,7 +1186,6 @@ span.slash {
 
 	&-container {
 		display: flex;
-		padding: 1rem 0;
 		flex-wrap: wrap;
 	}
 
@@ -1231,13 +1230,34 @@ span.slash {
 	}
 
 	&-list {
-		flex: 1;
+		flex: auto;
 		display: flex;
 		flex-direction: column;
+
+		.wiki-dota2 & {
+			@media ( min-width: 768px ) {
+				border-left: 1px solid #bbbbbb;
+				border-right: 1px solid #bbbbbb;
+
+				.theme--dark & {
+					border-color: var( --clr-on-surface-dark-primary-8 );
+				}
+			}
+		}
 
 		@media ( max-width: 767px ) {
 			flex: 1 0 100%;
 			order: 2;
+		}
+
+		& > :nth-child( odd ) {
+			.theme--light & {
+				background-color: var( --clr-on-surface-light-primary-4 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+			}
 		}
 
 		&-row {
@@ -1281,7 +1301,7 @@ span.slash {
 	flex-direction: row;
 	align-items: center;
 	background: #eaecf0;
-	border: 1px solid #bbbbbb;
+	border-bottom: 1px solid #bbbbbb;
 	align-self: stretch;
 
 	&-team {
@@ -1547,5 +1567,18 @@ $valorant-def: #01654c;
 				color: $valorant-def;
 			}
 		}
+	}
+}
+
+.match-bm {
+	div.tabs-dynamic > ul.nav-tabs > li {
+		border-top-left-radius: 0.5rem;
+		border-top-right-radius: 0.5rem;
+		overflow: hidden;
+	}
+
+	div.tabs-content {
+		border-bottom-left-radius: 0.5rem;
+		border-bottom-right-radius: 0.5rem;
 	}
 }
