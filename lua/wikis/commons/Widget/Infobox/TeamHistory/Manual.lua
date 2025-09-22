@@ -25,12 +25,18 @@ function TeamHistory:render()
 	if Logic.isEmpty(self.props) then return end
 	local transferList = TeamHistoryManualExtension.parse(self.props)
 
-	TeamHistoryStoreExtension.store{
-		transferList = transferList,
-		isFromWikiCode = true,
-	}
+	if not Logic.readBool(self.props.disableStorage) then
+		TeamHistoryStoreExtension.store{
+			transferList = transferList,
+			isFromWikiCode = true,
+			isManual = true,
+		}
+	end
 
-	return TeamHistoryDisplay{transferList = transferList}
+	return TeamHistoryDisplay{
+		transferList = transferList,
+		alwaysShowPresent = true,
+	}
 end
 
 return TeamHistory

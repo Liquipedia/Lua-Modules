@@ -21,7 +21,7 @@ local STORE_FROM_WIKI_CODE = ((Info.config.infoboxPlayer or {}).automatedHistory
 
 local TeamHistoryStore = {}
 
----@param props {transferList: TransferSpan[], isFromWikiCode: boolean, player: string?}
+---@param props {transferList: TransferSpan[], isFromWikiCode: boolean, player: string?, isManual: boolean}
 function TeamHistoryStore.store(props)
 	if not Namespace.isMain() then return end
 	if props.isFromWikiCode and not STORE_FROM_WIKI_CODE then return end
@@ -31,11 +31,16 @@ function TeamHistoryStore.store(props)
 	local offset = tonumber(Variables.varDefault('teamhistory_index')) or 0
 
 	Array.forEach(transferList, function(transfer, transferIndex)
-		transferIndex = transferIndex + offset
-		TeamHistoryStore._checkForMissingLeaveDate(transfer, transferIndex, offset + #transferList)
+		-- invalid leavedate input, this would cause bad data
+		if transfer.leaveDateDisplay and not transfer.leaveDate then return end
+
+		if not transfer.joinDate then return end
+
 		local teamLink = TeamHistoryStore._getTeamLink(transfer)
 		if not teamLink and not transfer.role then return end
-		if not transfer.joinDate then return end
+
+		transferIndex = transferIndex + offset
+		TeamHistoryStore._checkForMissingLeaveDate(transfer, transferIndex, offset + #transferList)
 
 		mw.ext.LiquipediaDB.lpdb_datapoint('Team_'.. transferIndex, Json.stringifySubTables{
 			type = 'teamhistory',
@@ -46,13 +51,13 @@ function TeamHistoryStore.store(props)
 				leavedate = transfer.leaveDate or '2999-01-01',
 				teamcount = transferIndex,
 				role = transfer.role,
-				auto = 1,
+				auto = props.isManual and 0 or 1,
 			},
 		})
 	end)
 end
 
----@param transfer table
+---@param transfer TransferSpan
 ---@param transferIndex integer
 ---@param numberOfRows integer
 function TeamHistoryStore._checkForMissingLeaveDate(transfer, transferIndex, numberOfRows)
@@ -60,7 +65,7 @@ function TeamHistoryStore._checkForMissingLeaveDate(transfer, transferIndex, num
 	mw.ext.TeamLiquidIntegration.add_category('Players with potential incomplete transfer history')
 end
 
----@param transfer table
+---@param transfer TransferSpan
 ---@return string?
 function TeamHistoryStore._getTeamLink(transfer)
 	if Logic.isEmpty(transfer.team) or not TeamTemplate.exists(transfer.team) then
