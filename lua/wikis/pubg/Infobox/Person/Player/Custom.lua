@@ -63,7 +63,7 @@ end
 ---@return Widget?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		return UpcomingTournaments.team(self.args.team)
+		return UpcomingTournaments.team{name = self.args.team}
 	end
 end
 

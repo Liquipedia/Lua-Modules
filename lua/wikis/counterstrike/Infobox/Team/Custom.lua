@@ -12,6 +12,11 @@ local Class = Lua.import('Module:Class')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
+
 local Game = Lua.import('Module:Game')
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
@@ -67,7 +72,10 @@ end
 ---@return Widget?
 function CustomTeam:createBottomContent()
 	if not self.args.disbanded then
-		return UpcomingTournaments.team(self.args.lpdbname or self.teamTemplate.templatename)
+		return UpcomingTournaments.team{
+			name = self.args.lpdbname or self.teamTemplate.templatename,
+			additionalConditions = ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Points')
+		}
 	end
 end
 
