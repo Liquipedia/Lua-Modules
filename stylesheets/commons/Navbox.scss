@@ -49,6 +49,7 @@ table.navbox th {
 	text-align: center;      /* Title and above/below styles */
 	padding: 0.3em 1em 0.3em 1em;
 	width: 100%;
+	overflow: auto;
 }
 
 tr + tr > .navbox-abovebelow,
