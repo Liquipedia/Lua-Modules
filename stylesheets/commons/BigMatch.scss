@@ -661,10 +661,10 @@ span.slash {
 			height: 1.5rem;
 			border-radius: 0.25rem;
 			overflow: hidden;
-			background-color: rgba( 0, 0, 0, 0.16 );
+			background-color: var( --clr-on-surface-light-primary-16 );
 
 			.theme--dark & {
-				background-color: rgba( 255, 255, 255, 0.16 );
+				background-color: var( --clr-on-surface-dark-primary-16 );
 			}
 
 			&.item--backpack img {
@@ -702,7 +702,7 @@ span.slash {
 			height: 1.5rem;
 			border-radius: 100%;
 			overflow: hidden;
-			background-color: rgba( 0, 0, 0, 0.16 );
+			background-color: var( --clr-on-surface-light-primary-16 );
 
 			@media ( min-width: 768px ) {
 				width: 2rem;
@@ -710,7 +710,7 @@ span.slash {
 			}
 
 			.theme--dark & {
-				background-color: rgba( 255, 255, 255, 0.16 );
+				background-color: var( --clr-on-surface-dark-primary-16 );
 			}
 
 			img {
@@ -1252,7 +1252,7 @@ span.slash {
 
 		& > :nth-child( odd ) {
 			.theme--light & {
-				background-color: rgba( 0, 0, 0, 0.04 );
+				background-color: var( --clr-on-surface-light-primary-4 );
 			}
 
 			.theme--dark & {
