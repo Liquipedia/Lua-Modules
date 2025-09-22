@@ -129,16 +129,30 @@ end
 ---@protected
 ---@return Widget[]
 function BaseMatchPage:getVods()
+	---@type {vod: string, number: integer}[]
+	local gameVods = Array.map(self.games, function(game, gameIdx)
+		if Logic.isEmpty(game.vod) then
+			return
+		end
+		return {
+			vod = game.vod,
+			number = gameIdx,
+		}
+	end)
+
 	return WidgetUtil.collect(
 		String.isNotEmpty(self.matchData.vod) and VodButton{
-			vodLink = self.matchData.vod
+			vodLink = self.matchData.vod,
+			grow = true,
 		} or nil,
-		Array.map(self.games, function(game, gameIdx)
-			return game.vod and VodButton{
-				gameNumber = gameIdx,
+		Array.map(gameVods, function (vod)
+			return VodButton{
+				vodLink = vod.vod,
+				gameNumber = vod.number,
+				showText = #gameVods < 4,
 				variant = 'dropdown',
-				vodLink = game.vod,
-			} or nil
+				grow = true,
+			}
 		end)
 	)
 end
