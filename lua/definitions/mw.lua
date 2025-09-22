@@ -579,7 +579,9 @@ end
 ---Removes all MediaWiki strip markers from a string.
 ---@param s string
 ---@return string
-function mw.text.killMarkers(s) end
+function mw.text.killMarkers(s)
+	return s
+end
 
 ---Joins a list, prose-style. In other words, it's like table.concat() but with a different separator before the final item.
 ---@param list table

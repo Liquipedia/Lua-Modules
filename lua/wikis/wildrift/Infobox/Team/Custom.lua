@@ -41,7 +41,7 @@ end
 ---@return string?
 function CustomTeam:createBottomContent()
 	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
-		not self.args.disbanded and UpcomingTournaments.team(self.teamTemplate.templatename) or nil,
+		not self.args.disbanded and UpcomingTournaments.team{name = self.teamTemplate.templatename} or nil,
 		PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}}
 	)}
 end

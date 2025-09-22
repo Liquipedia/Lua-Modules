@@ -13,7 +13,7 @@ local staffRoles = {
 	['caster'] = {category = 'Casters', display = 'Caster'},
 	['assistant coach'] = {category = 'Coaches', display = 'Assistant Coach', abbreviation = 'AC.'},
 	['coach'] = {category = 'Coaches', display = 'Coach', abbreviation = 'C.'},
-	['head coach'] = {category = 'Coaches', display = 'Head Coach', abbreviation = 'C.'},
+	['head coach'] = {category = 'Coaches', display = 'Head Coach', abbreviation = 'HC.'},
 	['positional coach'] = {category = 'Coaches', display = 'Positional Coach'},
 	['strategic coach'] = {category = 'Coaches', display = 'Strategic Coach'},
 	['creator'] = {category = 'Content Creators', display = 'Content Creator', abbreviation = 'CC.'},

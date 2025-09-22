@@ -85,7 +85,7 @@ function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = TeamTemplate.getPageName(self.args.team)
 		---@cast teamPage -nil
-		return UpcomingTournaments.team(teamPage)
+		return UpcomingTournaments.team{name = teamPage}
 	end
 end
 
