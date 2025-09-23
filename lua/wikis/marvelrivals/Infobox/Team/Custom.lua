@@ -28,7 +28,7 @@ end
 ---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.extradata.competesin = string.upper(args.league or '')
-a
+
 	return lpdbData
 end
 
