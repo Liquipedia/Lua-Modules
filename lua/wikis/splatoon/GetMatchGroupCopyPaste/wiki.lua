@@ -69,7 +69,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Array.flatMap(Array.range(1, bestof), function (i)
 			return {
 				INDENT .. '|map' .. i .. '={{Map',
-				INDENT .. INDENT .. '|map=|maptype=',
+				INDENT .. INDENT .. '|map=|mode=',
 				INDENT .. INDENT .. '|t1w1= |t1w2= |t1w3= |t1w4=',
 				INDENT .. INDENT .. '|t2w1= |t2w2= |t2w3= |t2w4=',
 				INDENT .. INDENT .. '|score1=|score2=|winner=',
