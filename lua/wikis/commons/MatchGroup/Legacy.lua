@@ -13,6 +13,7 @@ local Class = Lua.import('Module:Class')
 local CopyPaste = Lua.import('Module:GetMatchGroupCopyPaste')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -272,6 +273,10 @@ end
 function MatchGroupLegacy:readOpponent(opponentData)
 	local opponent = self:_copyAndReplace(opponentData, self.args)
 	opponent.type = self.bracketType
+	if self.bracketType == Opponent.solo and Logic.isNotEmpty(opponent.displayname) then
+		opponent.link = opponent.name
+		opponent.name = Table.extract(opponent, 'displayname')
+	end
 	return opponent
 end
 
