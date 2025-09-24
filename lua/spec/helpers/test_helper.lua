@@ -167,7 +167,7 @@ return function(busted, helper, options)
 		end
 
 		local exitCode = os.execute(nodeJsCommand)
-		--os.remove(finalHtmlPath)
+		os.remove(finalHtmlPath)
 
 		require('luassert').are_equal(0, exitCode, 'Snapshot comparison failed, check diffs in lua/output/' .. testName .. '-*')
 	end
