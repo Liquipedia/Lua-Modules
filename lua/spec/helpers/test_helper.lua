@@ -112,7 +112,7 @@ return function(busted, helper, options)
 		for imgParams in text:gmatch('%[%[File:(.-)%]%]') do
 			local params = mw.text.split(imgParams, '|', true)
 			local img = params[1]
-			local width, height, link, alt
+			local width, height, link, alt, class
 			for i = 2, #params do
 				if params[i]:match('^(%d*)x*(%d*)px$') then
 					width, height = params[i]:match('^(%d*)x*(%d*)px$')
@@ -120,13 +120,20 @@ return function(busted, helper, options)
 					link = params[i]:gsub('^link=', '')
 				elseif params[i]:match('^alt=') then
 					alt = params[i]:gsub('^alt=', '')
+				elseif params[i]:match('^class=') then
+					class = params[i]:gsub('^class=', '')
 				end
 			end
 			width = width or 100
 			height = height or 100
-			alt = alt or ''
+			local size = width .. 'x' .. height
 			link = link or img
-			text = text:gsub('%[%[File:' .. imgParams .. '%]%]', '<img src="https://placehold.co/' .. width .. 'x' .. height .. '?text=' .. alt ..'\n'.. link ..'"/>')
+			alt = alt or ''
+			class = class or ''
+			text = text:gsub(
+				'%[%[File:' .. imgParams .. '%]%]',
+				'<img src="https://placehold.co/' .. size .. '?text=' .. alt ..'\n'.. link ..'" class="' .. class .. '"/>'
+			)
 		end
 		-- Internal Urls
 		text = text:gsub('%[%[(.-)|(.-)%]%]', '<a href="%1">%2</a>')
