@@ -132,6 +132,10 @@ function MatchPage:_renderGamesOverview()
 								kills = 0,
 								deaths = 0,
 								assists = 0,
+								totalHeadshots = 0,
+								totalShots = 0,
+								totalKastRounds = 0,
+								totalRoundsPlayed = 0,
 							}
 						}
 					end
@@ -149,6 +153,10 @@ function MatchPage:_renderGamesOverview()
 					stats.kills = stats.kills + (player.kills or 0)
 					stats.deaths = stats.deaths + (player.deaths or 0)
 					stats.assists = stats.assists + (player.assists or 0)
+					stats.totalHeadshots = stats.totalHeadshots + (player.totalHeadshots or 0)
+					stats.totalShots = stats.totalShots + (player.totalShots or 0)
+					stats.totalKastRounds = stats.totalKastRounds + (player.kastRounds or 0)
+					stats.totalRoundsPlayed = stats.totalRoundsPlayed + (player.totalRounds or 0)
 				end)
 			end)
 		end
@@ -166,9 +174,19 @@ function MatchPage:_renderGamesOverview()
 	for _, playerData in pairs(allPlayersStats) do
 		local stats = playerData.stats
 		playerData.avgAcs = average(stats.acs)
-		playerData.avgKast = average(stats.kast)
 		playerData.avgAdr = average(stats.adr)
-		playerData.avgHs = average(stats.hs)
+
+		if stats.totalRoundsPlayed > 0 then
+			playerData.overallKast = (stats.totalKastRounds / stats.totalRoundsPlayed * 100)
+		else
+			playerData.overallKast = 0
+		end
+
+		if stats.totalShots > 0 then
+			playerData.totalHsp = stats.totalHeadshots / stats.totalShots * 100
+		else
+			playerData.totalHsp = 0
+		end
 
 		if playerData.teamIndex == 1 then
 			table.insert(team1Players, playerData)
@@ -203,7 +221,7 @@ function MatchPage:renderGames()
 		return games[1]
 	end
 
-	---@type table<string, any>
+---@type table<string, any>
 	local tabs = {
 		This = 1,
 		['hide-showall'] = true,
@@ -545,9 +563,9 @@ function MatchPage:_renderPlayerPerformance(player, isOverall)
 			kills = player.stats.kills,
 			deaths = player.stats.deaths,
 			assists = player.stats.assists,
-			kast = player.avgKast,
+			kast = player.overallKast,
 			adr = player.avgAdr,
-			hs = player.avgHs,
+			hs = player.totalHsp
 		}
 		numCols = 5
 		playerDisplay = Div{

@@ -199,6 +199,15 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, AgentNames)
 
 	local participantList = MapParser.getParticipants(map, opponentIndex) or {}
+
+	local puuidToTeam = {}
+	Array.forEach(MapParser.getParticipants(map, 1) or {}, function(player_data)
+		if player_data.puuid then puuidToTeam[player_data.puuid] = 1 end
+	end)
+	Array.forEach(MapParser.getParticipants(map, 2) or {}, function(player_data)
+		if player_data.puuid then puuidToTeam[player_data.puuid] = 2 end
+	end)
+
 	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		participantList,
@@ -208,6 +217,40 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 		end,
 		function(playerIndex, playerIdData, playerInputData)
 			local participant = participantList[playerIndex]
+			if not (participant and participant.puuid) then
+				return {
+					player = playerIdData.name or playerInputData.link or playerInputData.name,
+					displayName = playerIdData.displayname or playerInputData.name,
+				}
+			end
+
+			local allRoundsData = map.round_results or {}
+
+			local totalRoundsOnMap = #allRoundsData
+			local kastRoundsOnMap = 0
+			if totalRoundsOnMap > 0 and participant.kast then
+				kastRoundsOnMap = (participant.kast / 100) * totalRoundsOnMap
+			end
+
+			local allPlayerDamageEvents = Array.flatMap(allRoundsData, function(roundData)
+				if not roundData.player_stats then return {} end
+
+				local playerRoundStats = Array.find(roundData.player_stats, function(player)
+					return player.puuid == participant.puuid end)
+
+				return (playerRoundStats and playerRoundStats.damage) or {}
+			end)
+
+			local shotCounts = Array.reduce(allPlayerDamageEvents, function(sums, damageEvent)
+				sums.head = sums.head + (damageEvent.head_shots or 0)
+				sums.body = sums.body + (damageEvent.body_shots or 0)
+				sums.leg = sums.leg + (damageEvent.leg_shots or 0)
+				return sums
+			end, {head = 0, body = 0, leg = 0})
+
+			local totalHeadshots = shotCounts.head
+			local totalShots = shotCounts.head + shotCounts.body + shotCounts.leg
+
 			return {
 				kills = participant.kills,
 				deaths = participant.deaths,
@@ -216,6 +259,10 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 				adr = participant.adr,
 				kast = participant.kast,
 				hs = participant.hs,
+				totalHeadshots = totalHeadshots,
+				totalShots = totalShots,
+				kastRounds = kastRoundsOnMap,
+				totalRounds = totalRoundsOnMap,
 				player = playerIdData.name or playerInputData.link or playerInputData.name,
 				displayName = playerIdData.displayname or playerInputData.name,
 				puuid = participant.puuid,
