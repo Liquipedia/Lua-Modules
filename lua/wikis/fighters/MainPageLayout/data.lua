@@ -52,9 +52,13 @@ local CONTENT = {
 				mw.getCurrentFrame():preprocess('<tournaments />'),
 				Div{
 					classes = {'mainpage-editlink'},
-					children = Link{
-						link = 'Special:EditPage/Liquipedia:Tournaments',
-						children = mw.text.nowiki('[edit]')
+					children = {
+						mw.text.nowiki('['),
+						Link{
+							link = 'Special:EditPage/Liquipedia:Tournaments',
+							children = mw.text.nowiki('edit')
+						},
+						mw.text.nowiki(']'),
 					}
 				}
 			}
