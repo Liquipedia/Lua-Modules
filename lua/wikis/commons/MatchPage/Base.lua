@@ -282,17 +282,32 @@ function BaseMatchPage:renderGames()
 		['hide-showall'] = true
 	}
 
+	local overallStats = self:renderOverallStats()
+	local hasOverallStats = Logic.isNotEmpty(overallStats)
+
+	if hasOverallStats then
+		tabs['name1'] = 'Overall Statistics'
+		tabs['content1'] = overallStats
+	end
+
 	Array.forEach(games, function(game, idx)
 		local mapName = self.games[idx].map
+		local tabId = hasOverallStats and (idx + 1) or idx
 		if Logic.isNotEmpty(mapName) then
-			tabs['name' .. idx] = 'Game ' .. idx .. ': ' .. mapName
+			tabs['name' .. tabId] = 'Game ' .. idx .. ': ' .. mapName
 		else
-			tabs['name' .. idx] = 'Game ' .. idx
+			tabs['name' .. tabId] = 'Game ' .. idx
 		end
-		tabs['content' .. idx] = game
+		tabs['content' .. tabId] = game
 	end)
 
 	return Tabs.dynamic(tabs)
+end
+
+---@protected
+---@return string|Html|Widget?
+function BaseMatchPage:renderOverallStats()
+	return nil
 end
 
 ---@protected
