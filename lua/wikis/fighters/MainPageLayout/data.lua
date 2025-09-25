@@ -48,7 +48,18 @@ local CONTENT = {
 	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = '<tournaments /><p class="mainpage-editlink"><small>&#91;[{{fullurl:Liquipedia:Tournaments|action=edit}} edit]&#93;</small></p>',
+		body = Div{
+			children = {
+				mw.getCurrentFrame():preprocess('<tournaments />'),
+				Div{
+					classes = {'mainpage-editlink'},
+					children = Link{
+						link = 'Special:EditPage/Liquipedia:Tournaments',
+						children = mw.text.nowiki('[edit]')
+					}
+				}
+			}
+		},
 		padding = true,
 		boxid = 1508,
 	},
