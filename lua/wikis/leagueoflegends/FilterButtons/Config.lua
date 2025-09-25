@@ -20,6 +20,7 @@ local REGION_TO_SUPERREGION = {
 	['Korea'] = 'Korea',
 	['China'] = 'China',
 	['North America'] = 'Americas',
+	['Latin America'] = 'Americas',
 	['Latin America North'] = 'Americas',
 	['Latin America South'] = 'Americas',
 	['Brazil'] = 'Americas',
