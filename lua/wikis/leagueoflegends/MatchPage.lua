@@ -264,10 +264,10 @@ function MatchPage:renderOverallStats()
 							title = {
 								IconImage{
 									imageLight = 'Lol stat icon cs.png',
-									caption = 'CSM',
+									caption = 'CS per minute',
 									link = ''
 								},
-								'CS'
+								'CSM'
 							},
 							data = player.stats.gameLength > 0 and string.format('%.2f',
 								Array.reduce(player.stats.creepscore, Operator.add) / player.stats.gameLength * 60
@@ -281,7 +281,11 @@ function MatchPage:renderOverallStats()
 						},
 						PlayerStat{
 							title = {
-								IconFa{iconName = 'damage', additionalClasses = {'fa-flip-both'}},
+								IconFa{
+									iconName = 'damage',
+									additionalClasses = {'fa-flip-both'},
+									hover = 'Damage per minute'
+								},
 								'DPM'
 							},
 							data = player.stats.gameLength > 0 and string.format('%.2f',
