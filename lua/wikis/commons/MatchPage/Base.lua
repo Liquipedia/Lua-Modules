@@ -286,8 +286,8 @@ function BaseMatchPage:renderGames()
 	local hasOverallStats = Logic.isNotEmpty(overallStats)
 
 	if hasOverallStats then
-		tabs['name1'] = 'Overall Statistics'
-		tabs['content1'] = overallStats
+		tabs.name1 = 'Overall Statistics'
+		tabs.content1 = overallStats
 	end
 
 	Array.forEach(games, function(game, idx)
