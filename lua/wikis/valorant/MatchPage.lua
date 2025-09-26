@@ -104,6 +104,22 @@ function MatchPage:populateGames()
 	end)
 end
 
+---@class PlayerOverallStats
+---@field acs number[]
+---@field kast number[]
+---@field adr number[]
+---@field hs number[]
+---@field kills number
+---@field deaths number
+---@field assists number
+---@field firstKills number
+---@field firstDeaths number
+---@field totalRoundsPlayed number
+---@field totalKastRounds number
+---@field totalHeadshots number
+---@field totalShots number
+---@field damageDealt number
+
 ---@return Widget?
 function MatchPage:renderOverallStats()
 	if self:isBestOfOne() then
@@ -111,7 +127,7 @@ function MatchPage:renderOverallStats()
 	end
 
 	---@type table<string, {displayName: string, playerName: string, teamIndex: integer,
-	---agents: string[], stats: table<table, string, integer?>}>
+	---agents: string[], stats: PlayerOverallStats}>
 	local allPlayersStats = {}
 	local allTeamsStats = {
 		{
@@ -281,6 +297,9 @@ function MatchPage:renderOverallStats()
 	end
 
 	local function calculatePercentage(value, total)
+		if total == 0 then
+			return 0
+		end
 		return value / total * 100
 	end
 

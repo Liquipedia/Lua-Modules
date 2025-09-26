@@ -200,14 +200,6 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 
 	local participantList = MapParser.getParticipants(map, opponentIndex) or {}
 
-	local puuidToTeam = {}
-	Array.forEach(MapParser.getParticipants(map, 1) or {}, function(player_data)
-		if player_data.puuid then puuidToTeam[player_data.puuid] = 1 end
-	end)
-	Array.forEach(MapParser.getParticipants(map, 2) or {}, function(player_data)
-		if player_data.puuid then puuidToTeam[player_data.puuid] = 2 end
-	end)
-
 	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		participantList,
@@ -225,21 +217,84 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 			end
 
 			local allRoundsData = map.round_results or {}
-
 			local totalRoundsOnMap = #allRoundsData
-			local kastRoundsOnMap = 0
-			if totalRoundsOnMap > 0 and participant.kast then
-				kastRoundsOnMap = (participant.kast / 100) * totalRoundsOnMap
+
+			local player = Array.find(map.players or {}, function(player) return player.puuid == participant.puuid end)
+			local currentPlayerTeamId = player and player.team_id
+
+			local enemyPuuids = {}
+			local teammatePuuids = {}
+			if currentPlayerTeamId then
+				enemyPuuids = Array.flatMap(map.players or {}, function(playerData)
+					if playerData.team_id and playerData.team_id ~= currentPlayerTeamId and playerData.team_id ~= 'Neutral' then
+						return {playerData.puuid}
+					else
+						return {}
+					end
+				end)
+				teammatePuuids = Array.flatMap(map.players or {}, function(playerData)
+					if playerData.team_id and playerData.team_id == currentPlayerTeamId and playerData.team_id ~= 'Neutral' then
+						return {playerData.puuid}
+					else
+						return {}
+					end
+				end)
 			end
+
+			local kastRoundsOnMap = Array.reduce(allRoundsData, function(currentKastRounds, roundData)
+				local allKillsInRound = Array.flatMap(roundData.player_stats or {}, function(player_stats)
+					return player_stats.kills or {}
+				end)
+
+				local participatedInKill = Array.any(allKillsInRound, function(kill)
+					return kill.killer == participant.puuid or Table.includes(kill.assistants or {}, participant.puuid)
+				end)
+
+				if participatedInKill then
+					return currentKastRounds + 1
+				end
+
+				local deathEvent = Array.find(allKillsInRound, function(kill)
+					return kill.victim == participant.puuid
+				end)
+
+				if not deathEvent then
+					-- Survived
+					return currentKastRounds + 1
+				end
+
+				-- Died, check for trade
+				local timeOfDeath = deathEvent.time_since_round_start_millis
+				local wasTraded = Array.any(allKillsInRound, function(kill)
+					return Table.includes(teammatePuuids, kill.killer) and
+						kill.time_since_round_start_millis > timeOfDeath and
+						kill.time_since_round_start_millis <= (timeOfDeath + 5000)
+				end)
+
+				if wasTraded then
+					return currentKastRounds + 1
+				end
+
+				return currentKastRounds
+			end, 0)
 
 			local allPlayerDamageEvents = Array.flatMap(allRoundsData, function(roundData)
 				if not roundData.player_stats then return {} end
 
-				local playerRoundStats = Array.find(roundData.player_stats, function(player)
-					return player.puuid == participant.puuid end)
+				local playerRoundStats = Array.find(roundData.player_stats, function(playerData)
+					return playerData.puuid == participant.puuid end)
 
 				return (playerRoundStats and playerRoundStats.damage) or {}
 			end)
+
+			local playerDamageToEnemies = Array.filter(allPlayerDamageEvents, function(damageEvent)
+				return damageEvent.receiver and Table.includes(enemyPuuids, damageEvent.receiver)
+			end)
+
+			local damageDealt = Array.reduce(playerDamageToEnemies, function(sum, damageEvent)
+				sum = sum + (damageEvent.damage or 0)
+				return sum
+			end, 0)
 
 			local shotCounts = Array.reduce(allPlayerDamageEvents, function(sums, damageEvent)
 				sums.head = sums.head + (damageEvent.head_shots or 0)
@@ -250,11 +305,6 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 
 			local totalHeadshots = shotCounts.head
 			local totalShots = shotCounts.head + shotCounts.body + shotCounts.leg
-
-			local damageDealt = Array.reduce(allPlayerDamageEvents, function(sum, damageEvent)
-				sum = sum + (damageEvent.damage or 0)
-				return sum
-			end, 0)
 
 			return {
 				kills = participant.kills,
