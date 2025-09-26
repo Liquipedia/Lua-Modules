@@ -210,7 +210,7 @@ MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed
 ---@field dateIsExact boolean
 ---@field game string?
 ---@field header string?
----@field length number?
+---@field length string|number?
 ---@field map string?
 ---@field mapDisplayName string?
 ---@field mode string?
