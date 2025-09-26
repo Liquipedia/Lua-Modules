@@ -203,64 +203,65 @@ function MatchPage:renderOverallStats()
 	}
 
 	Array.forEach(self.games, function(game)
-		if game.status ~= BaseMatchPage.NOT_PLAYED then
-			local parsedGameLength = Array.map(
-				Array.parseCommaSeparatedString(game.length --[[@as string]], ':'), function (element)
-					---Directly using tonumber as arg to Array.map causes base out of range error
-					return tonumber(element)
-				end
-			)
-			local gameLength = (parsedGameLength[1] or 0) * 60 + (parsedGameLength[2] or 0)
-
-			Array.forEach(game.teams, function(team, teamIdx)
-				allTeamsStats[teamIdx].kills = allTeamsStats[teamIdx].kills + (team.kills or 0)
-				allTeamsStats[teamIdx].deaths = allTeamsStats[teamIdx].deaths + (team.deaths or 0)
-				allTeamsStats[teamIdx].assists = allTeamsStats[teamIdx].assists + (team.assists or 0)
-				allTeamsStats[teamIdx].towers = allTeamsStats[teamIdx].towers + (team.objectives.towers or 0)
-				allTeamsStats[teamIdx].inhibitors = allTeamsStats[teamIdx].inhibitors + (team.objectives.inhibitors or 0)
-				allTeamsStats[teamIdx].dragons = allTeamsStats[teamIdx].dragons + (team.objectives.dragons or 0)
-				allTeamsStats[teamIdx].atakhans = allTeamsStats[teamIdx].atakhans + (team.objectives.atakhans or 0)
-				allTeamsStats[teamIdx].heralds = allTeamsStats[teamIdx].heralds + (team.objectives.heralds or 0)
-				allTeamsStats[teamIdx].barons = allTeamsStats[teamIdx].barons + (team.objectives.barons or 0)
-				Array.forEach(team.players or {}, function(player)
-					local playerId = player.player
-					if not playerId then return end
-
-					if not allPlayersStats[playerId] then
-						allPlayersStats[playerId] = {
-							displayName = player.displayName or player.player,
-							playerName = player.player,
-							teamIndex = teamIdx,
-							champions = {},
-							role = player.role,
-							stats = {
-								damage = 0,
-								gold = 0,
-								creepscore = 0,
-								gameLength = 0,
-								kills = 0,
-								deaths = 0,
-								assists = 0,
-							}
-						}
-					end
-
-					local data = allPlayersStats[playerId]
-					if player.character then
-						table.insert(data.champions, player.character)
-					end
-
-					local stats = data.stats
-					stats.damage = stats.damage + (player.damagedone or 0)
-					stats.gold = stats.gold + (player.gold or 0)
-					stats.creepscore = stats.creepscore + (player.creepscore or 0)
-					stats.gameLength = stats.gameLength + gameLength
-					stats.kills = stats.kills + (player.kills or 0)
-					stats.deaths = stats.deaths + (player.deaths or 0)
-					stats.assists = stats.assists + (player.assists or 0)
-				end)
-			end)
+		if game.status == BaseMatchPage.NOT_PLAYED then
+			return
 		end
+		local parsedGameLength = Array.map(
+			Array.parseCommaSeparatedString(game.length --[[@as string]], ':'), function (element)
+				---Directly using tonumber as arg to Array.map causes base out of range error
+				return tonumber(element)
+			end
+		)
+		local gameLength = (parsedGameLength[1] or 0) * 60 + (parsedGameLength[2] or 0)
+
+		Array.forEach(game.teams, function(team, teamIdx)
+			allTeamsStats[teamIdx].kills = allTeamsStats[teamIdx].kills + (team.kills or 0)
+			allTeamsStats[teamIdx].deaths = allTeamsStats[teamIdx].deaths + (team.deaths or 0)
+			allTeamsStats[teamIdx].assists = allTeamsStats[teamIdx].assists + (team.assists or 0)
+			allTeamsStats[teamIdx].towers = allTeamsStats[teamIdx].towers + (team.objectives.towers or 0)
+			allTeamsStats[teamIdx].inhibitors = allTeamsStats[teamIdx].inhibitors + (team.objectives.inhibitors or 0)
+			allTeamsStats[teamIdx].dragons = allTeamsStats[teamIdx].dragons + (team.objectives.dragons or 0)
+			allTeamsStats[teamIdx].atakhans = allTeamsStats[teamIdx].atakhans + (team.objectives.atakhans or 0)
+			allTeamsStats[teamIdx].heralds = allTeamsStats[teamIdx].heralds + (team.objectives.heralds or 0)
+			allTeamsStats[teamIdx].barons = allTeamsStats[teamIdx].barons + (team.objectives.barons or 0)
+			Array.forEach(team.players or {}, function(player)
+				local playerId = player.player
+				if not playerId then return end
+
+				if not allPlayersStats[playerId] then
+					allPlayersStats[playerId] = {
+						displayName = player.displayName or player.player,
+						playerName = player.player,
+						teamIndex = teamIdx,
+						champions = {},
+						role = player.role,
+						stats = {
+							damage = 0,
+							gold = 0,
+							creepscore = 0,
+							gameLength = 0,
+							kills = 0,
+							deaths = 0,
+							assists = 0,
+						}
+					}
+				end
+
+				local data = allPlayersStats[playerId]
+				if player.character then
+					table.insert(data.champions, player.character)
+				end
+
+				local stats = data.stats
+				stats.damage = stats.damage + (player.damagedone or 0)
+				stats.gold = stats.gold + (player.gold or 0)
+				stats.creepscore = stats.creepscore + (player.creepscore or 0)
+				stats.gameLength = stats.gameLength + gameLength
+				stats.kills = stats.kills + (player.kills or 0)
+				stats.deaths = stats.deaths + (player.deaths or 0)
+				stats.assists = stats.assists + (player.assists or 0)
+			end)
+		end)
 	end)
 
 	local ungroupedPlayers = Array.sortBy(Array.extractValues(allPlayersStats), function(player)
