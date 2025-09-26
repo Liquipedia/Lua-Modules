@@ -368,7 +368,7 @@ function MatchPage:renderOverallStats()
 					classes = {'match-bm-players-player-name'},
 					children = {
 						Link{link = player.playerName, children = player.displayName},
-						MatchSummaryCharacters{characters = player.champions},
+						MatchSummaryCharacters{characters = player.champions, date = self.matchData.date},
 					}
 				},
 				Div{
