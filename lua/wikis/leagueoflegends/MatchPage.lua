@@ -33,7 +33,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LoLMatchPageGame: MatchPageGame
 ---@field vetoGroups {type: 'ban'|'pick', team: integer, character: string, vetoNumber: integer}[][][]
----@field opponents {players: table[], score: number?, status: string?, [any]: any}[]
+---@field teams {players: table[], score: number?, status: string?, [any]: any}[]
 
 ---@class LoLMatchPage: BaseMatchPage
 ---@field games LoLMatchPageGame[]
