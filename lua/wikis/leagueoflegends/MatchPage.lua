@@ -168,7 +168,7 @@ function MatchPage:populateGames()
 	end)
 end
 
----@return string|Html|Widget?
+---@return Widget?
 function MatchPage:renderOverallStats()
 	if self:isBestOfOne() then
 		return
