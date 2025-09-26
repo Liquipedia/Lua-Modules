@@ -204,8 +204,6 @@ function MatchPage:renderOverallStats()
 
 	Array.forEach(self.games, function(game)
 		if game.status ~= BaseMatchPage.NOT_PLAYED then
-			mw.logObject(game.length, "game.length")
-			mw.logObject(Array.parseCommaSeparatedString(game.length --[[@as string]], ':'), "parsed")
 			local parsedGameLength = Array.map(
 				Array.parseCommaSeparatedString(game.length --[[@as string]], ':'), function (element)
 					---Directly using tonumber as arg to Array.map causes base out of range error
