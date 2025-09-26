@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local MathUtil = Lua.import('Module:MathUtil')
+local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
@@ -19,12 +20,14 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 ---@class ValorantMatchPage: BaseMatchPage
 ---@operator call(MatchPageMatch): ValorantMatchPage
@@ -101,6 +104,283 @@ function MatchPage:populateGames()
 	end)
 end
 
+---@class PlayerOverallStats
+---@field acs number[]
+---@field kast number[]
+---@field adr number[]
+---@field hs number[]
+---@field kills number
+---@field deaths number
+---@field assists number
+---@field firstKills number
+---@field firstDeaths number
+---@field totalRoundsPlayed number
+---@field totalKastRounds number
+---@field totalHeadshots number
+---@field totalShots number
+---@field damageDealt number
+
+---@return Widget?
+function MatchPage:renderOverallStats()
+	if self:isBestOfOne() then
+		return
+	end
+
+	---@type table<string, {displayName: string, playerName: string, teamIndex: integer,
+	---agents: string[], stats: PlayerOverallStats}>
+	local allPlayersStats = {}
+	local allTeamsStats = {
+		{
+			firstKills = 0,
+			thrifties = 0,
+			postPlant = { 0, 0 },
+			clutches = 0,
+		},
+		{
+			firstKills = 0,
+			thrifties = 0,
+			postPlant = { 0, 0 },
+			clutches = 0,
+		}
+	}
+
+	Array.forEach(self.games, function(game)
+		if game.status == BaseMatchPage.NOT_PLAYED then
+			return
+		end
+
+		Array.forEach(game.teams, function(team, teamIdx)
+			allTeamsStats[teamIdx].firstKills = allTeamsStats[teamIdx].firstKills + (team.firstKills or 0)
+			allTeamsStats[teamIdx].thrifties = allTeamsStats[teamIdx].thrifties + (team.thrifties or 0)
+			allTeamsStats[teamIdx].postPlant[1] = allTeamsStats[teamIdx].postPlant[1] + (team.postPlant[1] or 0)
+			allTeamsStats[teamIdx].postPlant[2] = allTeamsStats[teamIdx].postPlant[2] + (team.postPlant[2] or 0)
+			allTeamsStats[teamIdx].clutches = allTeamsStats[teamIdx].clutches + (team.clutches or 0)
+			Array.forEach(team.players or {}, function(player)
+				local playerId = player.player
+				if not playerId then return end
+
+				if not allPlayersStats[playerId] then
+					allPlayersStats[playerId] = {
+						displayName = player.displayName or player.player,
+						playerName = player.player,
+						teamIndex = teamIdx,
+						agents = {},
+						stats = {
+							acs = {},
+							kast = {},
+							adr = {},
+							hs = {},
+							kills = 0,
+							deaths = 0,
+							assists = 0,
+							firstKills = 0,
+							firstDeaths = 0,
+							totalRoundsPlayed = 0,
+							totalKastRounds = 0,
+							totalHeadshots = 0,
+							totalShots = 0,
+							damageDealt = 0,
+						}
+					}
+				end
+
+				local data = allPlayersStats[playerId]
+				if player.agent then
+					table.insert(data.agents, player.agent)
+				end
+
+				local stats = data.stats
+				if player.acs then table.insert(stats.acs, player.acs) end
+				if player.kast then table.insert(stats.kast, player.kast) end
+				if player.adr then table.insert(stats.adr, player.adr) end
+				if player.hs then table.insert(stats.hs, player.hs) end
+				stats.kills = stats.kills + (player.kills or 0)
+				stats.deaths = stats.deaths + (player.deaths or 0)
+				stats.assists = stats.assists + (player.assists or 0)
+				stats.firstKills = stats.firstKills + (player.firstKills or 0)
+				stats.firstDeaths = stats.firstDeaths + (player.firstDeaths or 0)
+				stats.totalRoundsPlayed = stats.totalRoundsPlayed + (player.totalRounds or 0)
+				stats.totalKastRounds = stats.totalKastRounds + (player.kastRounds or 0)
+				stats.totalHeadshots = stats.totalHeadshots + (player.totalHeadshots or 0)
+				stats.totalShots = stats.totalShots + (player.totalShots or 0)
+				stats.damageDealt = stats.damageDealt + (player.damageDealt or 0)
+			end)
+		end)
+	end)
+
+	local function renderOverallTeamStats()
+		return {
+			HtmlWidgets.H3{children = 'Overall Team Stats'},
+			Div{
+				classes = {'match-bm-team-stats'},
+				children = {
+					Div{
+						classes = {'match-bm-lol-team-stats-header'},
+						children = {
+							Div{
+								classes = {'match-bm-lol-team-stats-header-team'},
+								children = self.opponents[1].iconDisplay
+							},
+							Div{
+								classes = {'match-bm-team-stats-list-cell'},
+								children = IconImage{
+									imageLight = self:getMatchContext().icon,
+									imageDark = self:getMatchContext().icondark,
+									size = 'x25px',
+								}
+							},
+							Div{
+								classes = {'match-bm-lol-team-stats-header-team'},
+								children = self.opponents[2].iconDisplay
+							}
+						}
+					},
+					StatsList{
+						finished = true,
+						data = {
+							{
+								icon = IconFa{iconName = 'team_firstKills'},
+								name = 'First Kills',
+								team1Value = allTeamsStats[1].firstKills,
+								team2Value = allTeamsStats[2].firstKills,
+							},
+							{
+								icon = IconImage{
+									imageLight = 'Black Creds VALORANT.png',
+									imageDark = 'White Creds VALORANT.png',
+									size = '16px',
+								},
+								name = 'Thrifties',
+								team1Value = allTeamsStats[1].thrifties,
+								team2Value = allTeamsStats[2].thrifties,
+							},
+							{
+								icon = IconImage{
+									imageLight = 'VALORANT Spike lightmode.png',
+									imageDark = 'VALORANT Spike darkmode.png',
+									size = '16px',
+								},
+								name = 'Post Plant',
+								team1Value = Array.interleave(allTeamsStats[1].postPlant, SPAN_SLASH),
+								team2Value = Array.interleave(allTeamsStats[2].postPlant, SPAN_SLASH)
+							},
+							{
+								icon = IconImage{
+									imageLight = 'VALORANT clutch lightmode.png',
+									imageDark = 'VALORANT clutch darkmode.png',
+									size = '16px',
+								},
+								name = 'Clutches',
+								team1Value = allTeamsStats[1].clutches,
+								team2Value = allTeamsStats[2].clutches
+							},
+						}
+					}
+				}
+			}
+		}
+	end
+
+	local formatNumbers = function(value, numberOfDecimals)
+		if not value then
+			return nil
+		end
+		numberOfDecimals = numberOfDecimals or 0
+		local format = '%.'.. numberOfDecimals ..'f'
+		return string.format(format, MathUtil.round(value, numberOfDecimals))
+	end
+
+	local function average(statTable)
+		if #statTable == 0 then return nil end
+		local sum = Array.reduce(statTable, Operator.add)
+		return sum / #statTable
+	end
+
+	local function calculatePercentage(value, total)
+		if total == 0 then
+			return 0
+		end
+		return value / total * 100
+	end
+
+	local function renderPlayerOverallPerformance(player)
+		return Div{
+			classes = {'match-bm-players-player match-bm-players-player--col-2'},
+			children = WidgetUtil.collect(
+				Div{
+					classes = {'match-bm-players-player-name'},
+					children = {
+						Link{link = player.playerName, children = player.displayName},
+						MatchSummaryWidgets.Characters{characters = player.agents, date = self.matchData.date},
+					}
+				},
+				Div{
+					classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-3'},
+					children = {
+						PlayerStat{
+							title = {IconFa{iconName = 'acs'}, 'ACS'},
+							data = formatNumbers(average(player.stats.acs))
+						},
+						PlayerStat{
+							title = {IconFa{iconName = 'kda'}, 'KDA'},
+							data = Array.interleave({ player.stats.kills, player.stats.deaths, player.stats.assists }, SPAN_SLASH)
+						},
+						PlayerStat{
+							title = {IconFa{iconName = 'kast'}, 'KAST'},
+							data = formatNumbers(calculatePercentage(player.stats.totalKastRounds, player.stats.totalRoundsPlayed), 1) .. '%'
+						},
+						PlayerStat{
+							title = {IconFa{iconName = 'damage'}, 'ADR'},
+							data = formatNumbers(player.stats.damageDealt / player.stats.totalRoundsPlayed)
+						},
+						PlayerStat{
+							title = {IconFa{iconName = 'headshot'}, 'HS%'},
+							data = formatNumbers(calculatePercentage(player.stats.totalHeadshots, player.stats.totalShots), 1) .. '%'
+						},
+						PlayerStat{
+							title = {IconFa{iconName = 'firstkill'}, 'FK / FD'},
+							data = {player.stats.firstKills, SPAN_SLASH, player.stats.firstDeaths}
+						},
+					}
+				}
+			)
+		}
+	end
+
+	local players = {[1] = {}, [2] = {}}
+	for _, playerData in pairs(allPlayersStats) do
+		table.insert(players[playerData.teamIndex], playerData)
+	end
+
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(
+			renderOverallTeamStats(),
+			HtmlWidgets.H3{children = 'Overall Player Performance'},
+			Div{
+				classes = {'match-bm-players-wrapper'},
+				children = Array.map(self.opponents, function (opponent, teamIndex)
+					return Div{
+						classes = {'match-bm-players-team'},
+						children = WidgetUtil.collect(
+							Div{
+								classes = {'match-bm-players-team-header'},
+								children = opponent.iconDisplay
+							},
+							Array.map(
+								Array.reverse(Array.sortBy(
+									players[teamIndex],
+									function(player) return average(player.stats.acs) or 0 end
+								)),
+								renderPlayerOverallPerformance
+							)
+						)
+					}
+				end)
+			}
+		)
+	}
+end
+
 ---@param game MatchPageGame
 ---@return Widget
 function MatchPage:renderGame(game)
@@ -136,7 +416,7 @@ local function getTeamHalvesDetails(game, teamIndex)
 
 	if teamIndex == 2 then
 		startNormal, otherNormal, startOvertime, otherOvertime = otherNormal, startNormal, otherOvertime, startOvertime
-	end
+end
 
 	local teamHalf = game.extradata['t' .. teamIndex .. 'halfs']
 	if Table.isEmpty(teamHalf) then
@@ -361,8 +641,8 @@ function MatchPage:_renderPerformance(game)
 		Div{
 			classes = {'match-bm-players-wrapper'},
 			children = {
-				self:_renderPerformanceForTeam(game, 1),
-				self:_renderPerformanceForTeam(game, 2)
+				self:_renderTeamPerformance(game, 1),
+				self:_renderTeamPerformance(game, 2)
 			}
 		}
 	}
@@ -372,7 +652,7 @@ end
 ---@param game MatchPageGame
 ---@param teamIndex integer
 ---@return Widget
-function MatchPage:_renderPerformanceForTeam(game, teamIndex)
+function MatchPage:_renderTeamPerformance(game, teamIndex)
 	return Div{
 		classes = {'match-bm-players-team'},
 		children = WidgetUtil.collect(
