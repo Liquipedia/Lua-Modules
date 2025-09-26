@@ -337,7 +337,7 @@ function MatchPage:renderOverallStats()
 							},
 							{
 								icon = IconImage{imageLight = 'Lol stat icon atakhan.png', link = ''},
-								name = 'Atakhan',
+								name = 'Atakhans',
 								team1Value = allTeamsStats[1].atakhans,
 								team2Value = allTeamsStats[2].atakhans
 							},
