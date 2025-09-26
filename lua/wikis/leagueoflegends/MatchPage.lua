@@ -22,6 +22,8 @@ local Div = HtmlWidgets.Div
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local MatchSummaryCharacters = Lua.import('Module:Widget/Match/Summary/Characters')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
@@ -163,6 +165,140 @@ function MatchPage:populateGames()
 			_, game.vetoGroups[teamIndex] = Array.groupBy(team, Operator.property('groupIndex'))
 		end)
 	end)
+end
+
+---@return string|Html|Widget?
+function MatchPage:renderOverallStats()
+	if self:isBestOfOne() then
+		return
+	end
+
+	---@type table<string, {displayName: string, playerName: string, teamIndex: integer, role: string, champions: string[], stats: table}>
+	local allPlayersStats = {}
+
+	Array.forEach(self.games, function(game)
+		if game.status ~= BaseMatchPage.NOT_PLAYED then
+			mw.logObject(game.length, "game.length")
+			mw.logObject(Array.parseCommaSeparatedString(game.length --[[@as string]], ':'), "parsed")
+			local parsedGameLength = Array.map(
+				Array.parseCommaSeparatedString(game.length --[[@as string]], ':'), function (element)
+					---Directly using tonumber as arg to Array.map causes base out of range error
+					return tonumber(element)
+				end
+			)
+			local gameLength = (parsedGameLength[1] or 0) * 60 + (parsedGameLength[2] or 0)
+			Array.forEach(game.opponents, function(team, teamIdx)
+				Array.forEach(team.players or {}, function(player)
+					local playerId = player.player
+					if not playerId then return end
+
+					if not allPlayersStats[playerId] then
+						allPlayersStats[playerId] = {
+							displayName = player.displayName or player.player,
+							playerName = player.player,
+							teamIndex = teamIdx,
+							champions = {},
+							role = player.role,
+							stats = {
+								damage = {},
+								gold = {},
+								gameLength = 0,
+								kills = 0,
+								deaths = 0,
+								assists = 0,
+							}
+						}
+					end
+
+					local data = allPlayersStats[playerId]
+					if player.character then
+						table.insert(data.champions, player.character)
+					end
+
+					local stats = data.stats
+					if player.damagedone then table.insert(stats.damage, player.damagedone) end
+					if player.gold then table.insert(stats.gold, player.gold) end
+					stats.gameLength = stats.gameLength + gameLength
+					stats.kills = stats.kills + (player.kills or 0)
+					stats.deaths = stats.deaths + (player.deaths or 0)
+					stats.assists = stats.assists + (player.assists or 0)
+				end)
+			end)
+		end
+	end)
+
+	local ungroupedPlayers = Array.sortBy(Array.extractValues(allPlayersStats), function(player)
+		return ROLE_ORDER[player.role]
+	end)
+	local players = Array.map(Array.range(1, 2), function (teamIdx)
+		return Array.filter(ungroupedPlayers, function (player)
+			return player.teamIndex == teamIdx
+		end)
+	end)
+
+	local function renderPlayerOverallPerformance(player)
+		return Div{
+			classes = {'match-bm-players-player match-bm-players-player--col-2'},
+			children = {
+				Div{
+					classes = {'match-bm-players-player-name'},
+					children = {
+						Link{link = player.playerName, children = player.displayName},
+						MatchSummaryCharacters{characters = player.champions},
+					}
+				},
+				Div{
+					classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-4'},
+					children = {
+						PlayerStat{
+							title = {KDA_ICON, 'KDA'},
+							data = Array.interleave({
+								player.stats.kills,
+								player.stats.deaths,
+								player.stats.assists
+							}, SPAN_SLASH)
+						},
+						PlayerStat{
+							title = {GOLD_ICON, 'GPM'},
+							data = player.stats.gameLength > 0 and string.format('%.2f',
+								Array.reduce(player.stats.gold, Operator.add) / player.stats.gameLength * 60
+							) or nil
+						},
+						PlayerStat{
+							title = {
+								IconFa{iconName = 'damage', additionalClasses = {'fa-flip-both'}},
+								'DPM'
+							},
+							data = player.stats.gameLength > 0 and string.format('%.2f',
+								Array.reduce(player.stats.damage, Operator.add) / player.stats.gameLength * 60
+							) or nil
+						}
+					}
+				}
+			}
+		}
+	end
+
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(
+			HtmlWidgets.H3{children = 'Overall Player Performance'},
+			Div{
+				classes = {'match-bm-players-wrapper'},
+				children = Array.map(self.opponents, function (opponent, teamIndex)
+					return Div{
+						classes = {'match-bm-players-team'},
+						children = WidgetUtil.collect(
+							Div{
+								classes = {'match-bm-players-team-header'},
+								children = opponent.iconDisplay
+							},
+							Array.map(players[teamIndex], renderPlayerOverallPerformance)
+						)
+					}
+				end)
+			}
+		)
+	}
 end
 
 ---@param game LoLMatchPageGame
