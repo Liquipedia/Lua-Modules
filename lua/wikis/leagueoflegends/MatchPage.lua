@@ -202,6 +202,7 @@ function MatchPage:renderOverallStats()
 							stats = {
 								damage = {},
 								gold = {},
+								creepscore = {},
 								gameLength = 0,
 								kills = 0,
 								deaths = 0,
@@ -218,6 +219,7 @@ function MatchPage:renderOverallStats()
 					local stats = data.stats
 					if player.damagedone then table.insert(stats.damage, player.damagedone) end
 					if player.gold then table.insert(stats.gold, player.gold) end
+					if player.creepscore then table.insert(stats.creepscore, player.creepscore) end
 					stats.gameLength = stats.gameLength + gameLength
 					stats.kills = stats.kills + (player.kills or 0)
 					stats.deaths = stats.deaths + (player.deaths or 0)
@@ -257,6 +259,19 @@ function MatchPage:renderOverallStats()
 								player.stats.deaths,
 								player.stats.assists
 							}, SPAN_SLASH)
+						},
+						PlayerStat{
+							title = {
+								IconImage{
+									imageLight = 'Lol stat icon cs.png',
+									caption = 'CSM',
+									link = ''
+								},
+								'CS'
+							},
+							data = player.stats.gameLength > 0 and string.format('%.2f',
+								Array.reduce(player.stats.creepscore, Operator.add) / player.stats.gameLength * 60
+							) or nil
 						},
 						PlayerStat{
 							title = {GOLD_ICON, 'GPM'},
