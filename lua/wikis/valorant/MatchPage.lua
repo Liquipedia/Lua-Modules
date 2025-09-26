@@ -349,40 +349,6 @@ function MatchPage:renderOverallStats()
 	}
 end
 
----@return string|Html|Widget?
-function MatchPage:renderGames()
-	local games = Array.map(Array.filter(self.games, function(game)
-		return game.status ~= BaseMatchPage.NOT_PLAYED
-	end), function(game)
-		return self:renderGame(game)
-	end)
-
-	if #games < 2 then
-		return games[1]
-	end
-
----@type table<string, any>
-	local tabs = {
-		This = 1,
-		['hide-showall'] = true,
-		name1 = 'All games',
-		content1 = self:_renderGamesOverview(),
-	}
-
-	Array.forEach(games, function(game, idx)
-		local tabIndex = idx + 1
-		local mapName = self.games[idx].map
-		if Logic.isNotEmpty(mapName) then
-			tabs['name' .. tabIndex] = 'Game ' .. idx .. ': ' .. mapName
-		else
-			tabs['name' .. tabIndex] = 'Game ' .. idx
-		end
-		tabs['content' .. tabIndex] = game
-	end)
-
-	return Tabs.dynamic(tabs)
-end
-
 ---@param game MatchPageGame
 ---@return Widget
 function MatchPage:renderGame(game)
@@ -643,20 +609,18 @@ function MatchPage:_renderPerformance(game)
 		Div{
 			classes = {'match-bm-players-wrapper'},
 			children = {
-				self:_renderTeamPerformance(1, game.teams[1].players, 'acs', false),
-				self:_renderTeamPerformance(2, game.teams[2].players, 'acs', false)
+				self:_renderTeamPerformance(game, 1),
+				self:_renderTeamPerformance(game, 2)
 			}
 		}
 	}
 end
 
 ---@private
+---@param game MatchPageGame
 ---@param teamIndex integer
----@param players table[]
----@param sortKey string
----@param isOverall boolean
 ---@return Widget
-function MatchPage:_renderTeamPerformance(teamIndex, players, sortKey, isOverall)
+function MatchPage:_renderTeamPerformance(game, teamIndex)
 	return Div{
 		classes = {'match-bm-players-team'},
 		children = WidgetUtil.collect(
@@ -666,11 +630,11 @@ function MatchPage:_renderTeamPerformance(teamIndex, players, sortKey, isOverall
 			},
 			Array.map(
 				Array.reverse(Array.sortBy(
-					players,
-					function (player) return player[sortKey] or 0 end
+					game.teams[teamIndex].players,
+					function (player) return player.acs or 0 end
 				)),
 				function (player)
-					return self:_renderPlayerPerformance(player, isOverall)
+					return self:_renderPlayerPerformance(game, teamIndex, player)
 				end
 			)
 		)
@@ -678,94 +642,61 @@ function MatchPage:_renderTeamPerformance(teamIndex, players, sortKey, isOverall
 end
 
 ---@private
----@param value number?
----@param numberOfDecimals number?
----@return string|nil
-local function formatNumbers(value, numberOfDecimals)
-	if not value then
-		return nil
-	end
-	numberOfDecimals = numberOfDecimals or 0
-	local format = '%.'.. numberOfDecimals ..'f'
-	return string.format(format, MathUtil.round(value, numberOfDecimals))
-end
-
----@private
+---@param game MatchPageGame
+---@param teamIndex integer
 ---@param player table
----@param isOverall boolean
 ---@return Widget
-function MatchPage:_renderPlayerPerformance(player, isOverall)
-	local playerDisplay, statsData, numCols
-
-	if isOverall then
-		statsData = {
-			acs = player.avgAcs,
-			kills = player.stats.kills,
-			deaths = player.stats.deaths,
-			assists = player.stats.assists,
-			kast = player.overallKast,
-			adr = player.avgAdr,
-			hs = player.totalHsp
-		}
-		numCols = 5
-		playerDisplay = Div{
-			classes = {'match-bm-players-player-name'},
-			children = {
-				Link{link = player.playerLink, children = player.displayName},
-				MatchSummaryWidgets.Characters{characters = player.agents},
-			}
-		}
-	else
-		statsData = player
-		numCols = 6
-		playerDisplay = PlayerDisplay{
-			characterIcon = self:getCharacterIcon(player.agent),
-			characterName = player.agent,
-			playerName = player.displayName or player.player,
-			playerLink = player.player,
-		}
-	end
-
-	local statWidgets = {
-		PlayerStat{
-			title = {IconFa{iconName = 'acs'}, 'ACS'},
-			data = statsData.acs and formatNumbers(statsData.acs) or nil
-		},
-		PlayerStat{
-			title = {IconFa{iconName = 'kda'}, 'KDA'},
-			data = Array.interleave({ statsData.kills, statsData.deaths, statsData.assists }, SPAN_SLASH)
-		},
-		PlayerStat{
-			title = {IconFa{iconName = 'kast'}, 'KAST'},
-			data = statsData.kast and (formatNumbers(statsData.kast, 1) .. '%') or nil
-		},
-		PlayerStat{
-			title = {IconFa{iconName = 'damage'}, 'ADR'},
-			data = statsData.adr and formatNumbers(statsData.adr) or nil
-		},
-		PlayerStat{
-			title = {IconFa{iconName = 'headshot'}, 'HS%'},
-			data = statsData.hs and (formatNumbers(statsData.hs, 1) .. '%') or nil
-		},
-	}
-
-	if not isOverall then
-		table.insert(statWidgets, PlayerStat{
-			title = {IconFa{iconName = 'firstkill'}, 'FK / FD'},
-			data = {statsData.firstKills, SPAN_SLASH, statsData.firstDeaths}
-		})
+function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
+	local formatNumbers = function(value, numberOfDecimals)
+		if not value then
+			return nil
+		end
+		numberOfDecimals = numberOfDecimals or 0
+		local format = '%.'.. numberOfDecimals ..'f'
+		return string.format(format, MathUtil.round(value, numberOfDecimals))
 	end
 
 	return Div{
 		classes = {'match-bm-players-player match-bm-players-player--col-2'},
 		children = {
-			playerDisplay,
+			PlayerDisplay{
+				characterIcon = self:getCharacterIcon(player.agent),
+				characterName = player.agent,
+				playerName = player.displayName or player.player,
+				playerLink = player.player,
+			},
 			Div{
-				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-' .. numCols},
-				children = statWidgets
+				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-6'},
+				children = {
+					PlayerStat{
+						title = {IconFa{iconName = 'acs'}, 'ACS'},
+						data = player.acs and formatNumbers(player.acs) or nil,
+					},
+					PlayerStat{
+						title = {IconFa{iconName = 'kda'}, 'KDA'},
+						data = Array.interleave({
+							player.kills, player.deaths, player.assists
+						}, SPAN_SLASH)
+					},
+					PlayerStat{
+						title = {IconFa{iconName = 'kast'}, 'KAST'},
+						data = player.kast and (formatNumbers(player.kast, 1) .. '%') or nil
+					},
+					PlayerStat{
+						title = {IconFa{iconName = 'damage'}, 'ADR'},
+						data = player.adr and formatNumbers(player.adr) or nil
+					},
+					PlayerStat{
+						title = {IconFa{iconName = 'headshot'}, 'HS%'},
+						data = player.hs and (formatNumbers(player.hs, 1) .. '%') or nil
+					},
+					PlayerStat{
+						title = {IconFa{iconName = 'firstkill'}, 'FK / FD'},
+						data = {player.firstKills, SPAN_SLASH, player.firstDeaths}
+					}
+				}
 			}
 		}
 	}
 end
-
 return MatchPage
