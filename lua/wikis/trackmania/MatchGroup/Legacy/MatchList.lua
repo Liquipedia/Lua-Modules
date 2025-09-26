@@ -69,6 +69,7 @@ function LegacyMatchList.matchMaps(frame)
 		Template.stashReturnValue(processedArgs, 'LegacyMatchlist')
 		return mw.html.create('div')
 	else -- case matchlist version 2
+		processedArgs.generate = nil
 		return Json.stringify(processedArgs)
 	end
 end
@@ -190,6 +191,11 @@ function LegacyMatchList.run(frame, generate)
 
 	---@type table
 	local matchListArgs = Table.copy(matches)
+	if generate then
+		matchListArgs = Table.map(matchListArgs, function(index, value)
+			return 'M' .. index, Json.parseIfTable(value) or value
+		end)
+	end
 	matchListArgs.id = args.id
 	matchListArgs.isLegacy = true
 	matchListArgs.title = args.title or args[1] or 'Match List'
@@ -207,9 +213,9 @@ function LegacyMatchList.run(frame, generate)
 		matchListArgs.noDuplicateCheck = true
 		matchListArgs.store = false
 	end
-
 	if generate then
-		return MatchGroupLegacy.generateWikiCodeForMatchList(args)
+		matchListArgs.isLegacy = nil
+		return MatchGroupLegacy.generateWikiCodeForMatchList(matchListArgs)
 	end
 
 	return MatchGroup.MatchList(matchListArgs)

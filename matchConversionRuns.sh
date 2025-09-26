@@ -22,7 +22,7 @@ pwb replace -lang:heroes -transcludes:"LegacyMatchList" -transcludes:"LegacyBrac
 
 pwb replace -lang:arenafps -transcludes:"LegacyBracket" -transcludes:"LegacyMatchList" -transcludes:"LegacySingleMatch" -summary:"Convert LegacyMatch2 wrappers" -pt:60 -regex -always -dotall "\{\{[lL]egacyBracket" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/Default|fn=runGenerate|dev=hjp" "\{\{[mM]atchMaps" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=convertMatch|dev=hjp" "\{\{[bB]racketMatchSummary" "{{subst:#invoke:Lua|invoke|module=LegacyBracketMatchSummary|fn=convert" "\{\{[lL]egacySingleMatch" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=generateSingleMatch|dev=hjp" "\{\{[lL]egacyMatchList" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=generate|dev=hjp"
 
-pwb replace -lang:hearthstone -transcludes:"LegacyBracket" -transcludes:"LegacyMatchListStart" -transcludes:"LegacyMatchList"-summary:"Convert LegacyMatch2 wrappers" -pt:60 -regex -always -dotall "\{\{[lL]egacyBracket" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/Default|fn=runGenerate|dev=hjp" "\{\{[lL]egacyMatchList([^S])" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=generate|dev=hjp\1" "\{\{[mM]atchMaps([^N])" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=convertMatch|generate=true|dev=hjp" "\{\{[mM]atchListEnd\|?\}\}" "}}" "\{\{[bB] " "{{subst:#invoke:Lua|invoke|module=Json|fn=fromArgs" "\{\{[bB]racketMatchSummaryNew" "{{subst:#invoke:Lua|invoke|module=Json|fn=fromArgs" "\{\{[mM]atchMapsNew" "|{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=convertMatch|generate=true|dev=hjp" "\{\{[lL]egacyMatchListStart(.*?)\}\}\s*\n*\s*\{\{[mM]atchMapsNew" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=generate2|dev=hjp\1\n|{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=convertMatch|generate=true|dev=hjp" "\{\{[lL]egacyMatchListStart(.*?)\}\}\s*\n*\s*\|\{\{subst" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=generate2|dev=hjp\1\n|{{subst"
+pwb replace -lang:hearthstone -transcludes:"LegacyBracket" -transcludes:"LegacyMatchListStart" -transcludes:"LegacyMatchList"-summary:"Convert LegacyMatch2 wrappers" -pt:60 -regex -always -dotall "\{\{[lL]egacyBracket" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/Default|fn=runGenerate|dev=hjp" "\{\{[lL]egacyMatchList([^S])" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=generate|dev=hjp\1" "\{\{[mM]atchMaps([^N])" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=convertMatch|generate=true|dev=hjp" "\{\{[mM]atchListEnd\|?\}\}" "}}" "\{\{[bB]racketMatchDetails" "{{subst:#invoke:Lua|invoke|module=Json|fn=fromArgs" "\{\{[bB]racketMatchSummaryNew" "{{subst:#invoke:Lua|invoke|module=Json|fn=fromArgs" "\{\{[mM]atchMapsNew" "|{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=convertMatch|generate=true|dev=hjp" "\{\{[lL]egacyMatchListStart(.*?)\}\}\s*\n*\s*\{\{[mM]atchMapsNew" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=generate2|dev=hjp\1\n|{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=convertMatch|generate=true|dev=hjp" "\{\{[lL]egacyMatchListStart(.*?)\}\}\s*\n*\s*\|\{\{subst" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=generate2|dev=hjp\1\n|{{subst"
 
 pwb replace -lang:ageofempires -transcludes:MatchSection -summary:"Prep to convert LegacyMatch2 wrappers" -pt:60 -regex -always "\{\{\s*[mM]atchSection\s*\|([^\}]*)\}\}\s*\n*\s*\{\{[mM]atch ?[mM]apsT?e?a?m?" "{{MatchMaps|matchsection=\1"
 
@@ -30,6 +30,10 @@ pwb replace -lang:ageofempires -transcludes:LegacySingleMatch -transcludes:Legac
 
 pwb replace -lang:battalion -transcludes:"LegacyBracket" -transcludes:"LegacyMatchListStart" -summary:"Convert LegacyMatch2 wrappers" -pt:60 -regex -always -dotall "\{\{[lL]egacyBracket" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/Default|fn=runGenerate|dev=hjp" "\{\{[bB]racketMatchSummary" "{{subst:#invoke:Lua|invoke|module=Json|fn=fromArgs" "\{\{[Mm]atchListEnd\|?\}\}" "}}" "\{\{[mM]atchMaps" "|{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/MatchList|fn=matchMaps|generate=true|dev=hjp" "\{\{[lL]egacyMatchListStart(.*?)\}\}\s*\n*\s*\{\{[mM]atchMapsNew" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/MatchList|fn=generate|dev=hjp\1\n|{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/MatchList|fn=matchMaps|generate=true|dev=hjp" "\{\{[lL]egacyMatchListStart(.*?)\}\}\s*\n*\s*\|\{\{subst" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/MatchList|fn=generate|dev=hjp\1\n|{{subst"
 
+# can not convert legacy brackets as the input is fucked up in too many cases
+# see the test page `User:SobakaPirat/Legacy_match2` for good examples...
+#pwb replace -lang:trackmania -transcludes:"LegacyBracket" -transcludes:"LegacyMatchListStart" -transcludes:"LegacyMatchList" -summary:"Convert LegacyMatch2 wrappers" -pt:60 -regex -always -dotall "\{\{[bB]racketMatchSummary" "{{subst:#invoke:Lua|invoke|module=Json|fn=fromArgs" "\{\{[Mm]atchListEnd\|?\}\}" "}}" "\{\{[mM]atchMaps" "|{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/MatchList|fn=matchMaps|generate=true|dev=hjp" "\{\{[lL]egacyMatchListStart(.*?)\}\}\s*\n*\s*\{\{[mM]atchMaps" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/MatchList|fn=generate2|dev=hjp\1\n|{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/MatchList|fn=matchMaps|generate=true|dev=hjp" "\{\{[lL]egacyMatchListStart(.*?)\}\}\s*\n*\s*\|\{\{subst" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/MatchList|fn=generate2|dev=hjp\1\n|{{subst" "\|\s*match(\d+)\s*=\s*\|\{\{subst" "|match\1={{subst" "\{\{[lL]egacyMatchList" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/MatchList|fn=generate|dev=hjp" "\{\{[lL]egacyBracket" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/Default|fn=runGenerate|dev=hjp"
+
 
 
 
@@ -48,12 +52,6 @@ pwb replace -lang:battalion -transcludes:"LegacyBracket" -transcludes:"LegacyMat
 "" ""
 "" ""
 "" ""
-
-
-
-
-
-
 
 "\{\{[lL]egacyBracket" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/Default|fn=runGenerate|dev=hjp"
 
