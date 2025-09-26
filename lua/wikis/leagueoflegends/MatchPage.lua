@@ -174,7 +174,8 @@ function MatchPage:renderOverallStats()
 		return
 	end
 
-	---@type table<string, {displayName: string, playerName: string, teamIndex: integer, role: string, champions: string[], stats: table}>
+	---@type table<string, {displayName: string, playerName: string, teamIndex: integer,
+	---role: string, champions: string[], stats: table<string, integer?>}>
 	local allPlayersStats = {}
 	local allTeamsStats = {
 		{
@@ -235,9 +236,9 @@ function MatchPage:renderOverallStats()
 							champions = {},
 							role = player.role,
 							stats = {
-								damage = {},
-								gold = {},
-								creepscore = {},
+								damage = 0,
+								gold = 0,
+								creepscore = 0,
 								gameLength = 0,
 								kills = 0,
 								deaths = 0,
@@ -252,9 +253,9 @@ function MatchPage:renderOverallStats()
 					end
 
 					local stats = data.stats
-					if player.damagedone then table.insert(stats.damage, player.damagedone) end
-					if player.gold then table.insert(stats.gold, player.gold) end
-					if player.creepscore then table.insert(stats.creepscore, player.creepscore) end
+					stats.damage = stats.damage + (player.damagedone or 0)
+					stats.gold = stats.gold + (player.gold or 0)
+					stats.creepscore = stats.creepscore + (player.creepscore or 0)
 					stats.gameLength = stats.gameLength + gameLength
 					stats.kills = stats.kills + (player.kills or 0)
 					stats.deaths = stats.deaths + (player.deaths or 0)
@@ -360,6 +361,16 @@ function MatchPage:renderOverallStats()
 		}
 	end
 
+	---@param stat integer
+	---@param gameLength integer
+	---@return string?
+	local function calculateStatPerMinute(stat, gameLength)
+		if gameLength <= 0 then
+			return
+		end
+		return string.format('%.2f', stat / gameLength * 60)
+	end
+
 	local function renderPlayerOverallPerformance(player)
 		return Div{
 			classes = {'match-bm-players-player match-bm-players-player--col-2'},
@@ -391,15 +402,11 @@ function MatchPage:renderOverallStats()
 								},
 								'CSM'
 							},
-							data = player.stats.gameLength > 0 and string.format('%.2f',
-								Array.reduce(player.stats.creepscore, Operator.add) / player.stats.gameLength * 60
-							) or nil
+							data = calculateStatPerMinute(player.stats.creepscore, player.stats.gameLength)
 						},
 						PlayerStat{
 							title = {GOLD_ICON, 'GPM'},
-							data = player.stats.gameLength > 0 and string.format('%.2f',
-								Array.reduce(player.stats.gold, Operator.add) / player.stats.gameLength * 60
-							) or nil
+							data = calculateStatPerMinute(player.stats.gold, player.stats.gameLength)
 						},
 						PlayerStat{
 							title = {
@@ -410,9 +417,7 @@ function MatchPage:renderOverallStats()
 								},
 								'DPM'
 							},
-							data = player.stats.gameLength > 0 and string.format('%.2f',
-								Array.reduce(player.stats.damage, Operator.add) / player.stats.gameLength * 60
-							) or nil
+							data = calculateStatPerMinute(player.stats.damage, player.stats.gameLength)
 						}
 					}
 				}
