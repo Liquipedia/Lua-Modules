@@ -210,7 +210,7 @@ MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed
 ---@field dateIsExact boolean
 ---@field game string?
 ---@field header string?
----@field length number?
+---@field length string|number?
 ---@field map string?
 ---@field mapDisplayName string?
 ---@field mode string?
@@ -228,7 +228,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 	date = 'string?',
 	game = 'string?',
 	header = 'string?',
-	length = 'number?',
+	length = TypeUtil.optional(TypeUtil.union('number', 'string')),
 	map = 'string?',
 	mapDisplayName = 'string?',
 	mode = 'string?',
