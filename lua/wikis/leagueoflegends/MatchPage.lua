@@ -33,6 +33,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LoLMatchPageGame: MatchPageGame
 ---@field vetoGroups {type: 'ban'|'pick', team: integer, character: string, vetoNumber: integer}[][][]
+---@field opponents {players: table[], score: number?, status: string?, [any]: any}[]
 
 ---@class LoLMatchPage: BaseMatchPage
 ---@field games LoLMatchPageGame[]
@@ -175,6 +176,30 @@ function MatchPage:renderOverallStats()
 
 	---@type table<string, {displayName: string, playerName: string, teamIndex: integer, role: string, champions: string[], stats: table}>
 	local allPlayersStats = {}
+	local allTeamsStats = {
+		{
+			kills = 0,
+			deaths = 0,
+			assists = 0,
+			towers = 0,
+			inhibitors = 0,
+			dragons = 0,
+			atakhans = 0,
+			heralds = 0,
+			barons = 0,
+		},
+		{
+			kills = 0,
+			deaths = 0,
+			assists = 0,
+			towers = 0,
+			inhibitors = 0,
+			dragons = 0,
+			atakhans = 0,
+			heralds = 0,
+			barons = 0,
+		}
+	}
 
 	Array.forEach(self.games, function(game)
 		if game.status ~= BaseMatchPage.NOT_PLAYED then
@@ -187,7 +212,17 @@ function MatchPage:renderOverallStats()
 				end
 			)
 			local gameLength = (parsedGameLength[1] or 0) * 60 + (parsedGameLength[2] or 0)
-			Array.forEach(game.opponents, function(team, teamIdx)
+
+			Array.forEach(game.teams, function(team, teamIdx)
+				allTeamsStats[teamIdx].kills = allTeamsStats[teamIdx].kills + (team.kills or 0)
+				allTeamsStats[teamIdx].deaths = allTeamsStats[teamIdx].deaths + (team.deaths or 0)
+				allTeamsStats[teamIdx].assists = allTeamsStats[teamIdx].assists + (team.assists or 0)
+				allTeamsStats[teamIdx].towers = allTeamsStats[teamIdx].towers + (team.objectives.towers or 0)
+				allTeamsStats[teamIdx].inhibitors = allTeamsStats[teamIdx].inhibitors + (team.objectives.inhibitors or 0)
+				allTeamsStats[teamIdx].dragons = allTeamsStats[teamIdx].dragons + (team.objectives.dragons or 0)
+				allTeamsStats[teamIdx].atakhans = allTeamsStats[teamIdx].atakhans + (team.objectives.atakhans or 0)
+				allTeamsStats[teamIdx].heralds = allTeamsStats[teamIdx].heralds + (team.objectives.heralds or 0)
+				allTeamsStats[teamIdx].barons = allTeamsStats[teamIdx].barons + (team.objectives.barons or 0)
 				Array.forEach(team.players or {}, function(player)
 					local playerId = player.player
 					if not playerId then return end
@@ -238,10 +273,97 @@ function MatchPage:renderOverallStats()
 		end)
 	end)
 
+	local function renderOverallTeamStats()
+		return {
+			HtmlWidgets.H3{children = 'Overall Team Stats'},
+			Div{
+				classes = {'match-bm-team-stats'},
+				children = {
+					Div{
+						classes = {'match-bm-lol-team-stats-header'},
+						children = {
+							Div{
+								classes = {'match-bm-lol-team-stats-header-team'},
+								children = self.opponents[1].iconDisplay
+							},
+							Div{
+								classes = {'match-bm-team-stats-list-cell'},
+								children = IconImage{
+									imageLight = self:getMatchContext().icon,
+									imageDark = self:getMatchContext().icondark,
+									size = 'x32px',
+								}
+							},
+							Div{
+								classes = {'match-bm-lol-team-stats-header-team'},
+								children = self.opponents[2].iconDisplay
+							}
+						}
+					},
+					StatsList{
+						finished = true,
+						data = {
+							{
+								icon = KDA_ICON,
+								name = 'KDA',
+								team1Value = Array.interleave({
+									allTeamsStats[1].kills,
+									allTeamsStats[1].deaths,
+									allTeamsStats[1].assists
+								}, SPAN_SLASH),
+								team2Value = Array.interleave({
+									allTeamsStats[2].kills,
+									allTeamsStats[2].deaths,
+									allTeamsStats[2].assists
+								}, SPAN_SLASH)
+							},
+							{
+								icon = IconImage{imageLight = 'Lol stat icon tower.png', link = ''},
+								name = 'Towers',
+								team1Value = allTeamsStats[1].towers,
+								team2Value = allTeamsStats[2].towers
+							},
+							{
+								icon = IconImage{imageLight = 'Lol stat icon inhibitor.png', link = ''},
+								name = 'Inhibitors',
+								team1Value = allTeamsStats[1].inhibitors,
+								team2Value = allTeamsStats[2].inhibitors
+							},
+							{
+								icon = IconImage{imageLight = 'Lol stat icon herald.png', link = ''},
+								name = 'Rift Heralds',
+								team1Value = allTeamsStats[1].heralds,
+								team2Value = allTeamsStats[2].heralds
+							},
+							{
+								icon = IconImage{imageLight = 'Lol stat icon atakhan.png', link = ''},
+								name = 'Atakhan',
+								team1Value = allTeamsStats[1].atakhans,
+								team2Value = allTeamsStats[2].atakhans
+							},
+							{
+								icon = IconImage{imageLight = 'Lol stat icon dragon.png', link = ''},
+								name = 'Dragons',
+								team1Value = allTeamsStats[1].dragons,
+								team2Value = allTeamsStats[2].dragons
+							},
+							{
+								icon = IconImage{imageLight = 'Lol stat icon baron.png', link = ''},
+								name = 'Barons',
+								team1Value = allTeamsStats[1].barons,
+								team2Value = allTeamsStats[2].barons
+							},
+						}
+					}
+				}
+			}
+		}
+	end
+
 	local function renderPlayerOverallPerformance(player)
 		return Div{
 			classes = {'match-bm-players-player match-bm-players-player--col-2'},
-			children = {
+			children = WidgetUtil.collect(
 				Div{
 					classes = {'match-bm-players-player-name'},
 					children = {
@@ -294,12 +416,13 @@ function MatchPage:renderOverallStats()
 						}
 					}
 				}
-			}
+			)
 		}
 	end
 
 	return HtmlWidgets.Fragment{
 		children = WidgetUtil.collect(
+			renderOverallTeamStats(),
 			HtmlWidgets.H3{children = 'Overall Player Performance'},
 			Div{
 				classes = {'match-bm-players-wrapper'},
