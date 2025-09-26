@@ -251,6 +251,11 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 			local totalHeadshots = shotCounts.head
 			local totalShots = shotCounts.head + shotCounts.body + shotCounts.leg
 
+			local damageDealt = Array.reduce(allPlayerDamageEvents, function(sum, damageEvent)
+				sum = sum + (damageEvent.damage or 0)
+				return sum
+			end, 0)
+
 			return {
 				kills = participant.kills,
 				deaths = participant.deaths,
@@ -259,10 +264,11 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 				adr = participant.adr,
 				kast = participant.kast,
 				hs = participant.hs,
+				totalRounds = totalRoundsOnMap,
+				kastRounds = kastRoundsOnMap,
 				totalHeadshots = totalHeadshots,
 				totalShots = totalShots,
-				kastRounds = kastRoundsOnMap,
-				totalRounds = totalRoundsOnMap,
+				damageDealt = damageDealt,
 				player = playerIdData.name or playerInputData.link or playerInputData.name,
 				displayName = playerIdData.displayname or playerInputData.name,
 				puuid = participant.puuid,

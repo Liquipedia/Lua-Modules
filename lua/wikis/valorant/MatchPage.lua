@@ -9,11 +9,9 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
-local Tabs = Lua.import('Module:Tabs')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
@@ -119,13 +117,13 @@ function MatchPage:renderOverallStats()
 		{
 			firstKills = 0,
 			thrifties = 0,
-			postPlant = 0,
+			postPlant = { 0, 0 },
 			clutches = 0,
 		},
 		{
 			firstKills = 0,
 			thrifties = 0,
-			postPlant = 0,
+			postPlant = { 0, 0 },
 			clutches = 0,
 		}
 	}
@@ -138,7 +136,8 @@ function MatchPage:renderOverallStats()
 		Array.forEach(game.teams, function(team, teamIdx)
 			allTeamsStats[teamIdx].firstKills = allTeamsStats[teamIdx].firstKills + (team.firstKills or 0)
 			allTeamsStats[teamIdx].thrifties = allTeamsStats[teamIdx].thrifties + (team.thrifties or 0)
-			allTeamsStats[teamIdx].postPlant = allTeamsStats[teamIdx].postPlant + (team.postPlant or 0)
+			allTeamsStats[teamIdx].postPlant[1] = allTeamsStats[teamIdx].postPlant[1] + (team.postPlant[1] or 0)
+			allTeamsStats[teamIdx].postPlant[2] = allTeamsStats[teamIdx].postPlant[2] + (team.postPlant[2] or 0)
 			allTeamsStats[teamIdx].clutches = allTeamsStats[teamIdx].clutches + (team.clutches or 0)
 			Array.forEach(team.players or {}, function(player)
 				local playerId = player.player
@@ -158,10 +157,13 @@ function MatchPage:renderOverallStats()
 							kills = 0,
 							deaths = 0,
 							assists = 0,
+							firstKills = 0,
+							firstDeaths = 0,
+							totalRoundsPlayed = 0,
+							totalKastRounds = 0,
 							totalHeadshots = 0,
 							totalShots = 0,
-							totalKastRounds = 0,
-							totalRoundsPlayed = 0,
+							damageDealt = 0,
 						}
 					}
 				end
@@ -179,17 +181,14 @@ function MatchPage:renderOverallStats()
 				stats.kills = stats.kills + (player.kills or 0)
 				stats.deaths = stats.deaths + (player.deaths or 0)
 				stats.assists = stats.assists + (player.assists or 0)
+				stats.firstKills = stats.firstKills + (player.firstKills or 0)
+				stats.firstDeaths = stats.firstDeaths + (player.firstDeaths or 0)
+				stats.totalRoundsPlayed = stats.totalRoundsPlayed + (player.totalRounds or 0)
+				stats.totalKastRounds = stats.totalKastRounds + (player.kastRounds or 0)
 				stats.totalHeadshots = stats.totalHeadshots + (player.totalHeadshots or 0)
 				stats.totalShots = stats.totalShots + (player.totalShots or 0)
-				stats.totalKastRounds = stats.totalKastRounds + (player.kastRounds or 0)
-				stats.totalRoundsPlayed = stats.totalRoundsPlayed + (player.totalRounds or 0)
+				stats.damageDealt = stats.damageDealt + (player.damageDealt or 0)
 			end)
-		end)
-	end)
-
-	local players = Array.map(Array.range(1, 2), function(teamIdx)
-		return Array.filter(allPlayersStats, function(player)
-			return player.teamIndex == teamIdx
 		end)
 	end)
 
@@ -266,12 +265,12 @@ function MatchPage:renderOverallStats()
 		}
 	end
 
-	local function formatNumbers(value, numberOfDecimals)
+	local formatNumbers = function(value, numberOfDecimals)
 		if not value then
 			return nil
 		end
 		numberOfDecimals = numberOfDecimals or 0
-		local format = '%.' .. numberOfDecimals .. 'f'
+		local format = '%.'.. numberOfDecimals ..'f'
 		return string.format(format, MathUtil.round(value, numberOfDecimals))
 	end
 
@@ -297,11 +296,11 @@ function MatchPage:renderOverallStats()
 					}
 				},
 				Div{
-					classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-4'},
+					classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-3'},
 					children = {
 						PlayerStat{
 							title = {IconFa{iconName = 'acs'}, 'ACS'},
-							data = average(player.stats.acs)
+							data = formatNumbers(average(player.stats.acs))
 						},
 						PlayerStat{
 							title = {IconFa{iconName = 'kda'}, 'KDA'},
@@ -309,21 +308,29 @@ function MatchPage:renderOverallStats()
 						},
 						PlayerStat{
 							title = {IconFa{iconName = 'kast'}, 'KAST'},
-							data = calculatePercentage(player.stats.totalKastRounds, player.stats.totalRoundsPlayed) .. '%'
+							data = formatNumbers(calculatePercentage(player.stats.totalKastRounds, player.stats.totalRoundsPlayed), 1) .. '%'
 						},
 						PlayerStat{
 							title = {IconFa{iconName = 'damage'}, 'ADR'},
-							data = player.stats.adr and formatNumbers(player.stats.adr) or nil
+							data = formatNumbers(player.stats.damageDealt / player.stats.totalRoundsPlayed)
 						},
 						PlayerStat{
 							title = {IconFa{iconName = 'headshot'}, 'HS%'},
-							data = calculatePercentage(player.stats.totalHeadshots, player.stats.totalShots) .. '%'
+							data = formatNumbers(calculatePercentage(player.stats.totalHeadshots, player.stats.totalShots), 1) .. '%'
 						},
-
+						PlayerStat{
+							title = {IconFa{iconName = 'firstkill'}, 'FK / FD'},
+							data = {player.stats.firstKills, SPAN_SLASH, player.stats.firstDeaths}
+						},
 					}
 				}
 			)
 		}
+	end
+
+	local players = {[1] = {}, [2] = {}}
+	for _, playerData in pairs(allPlayersStats) do
+		table.insert(players[playerData.teamIndex], playerData)
 	end
 
 	return HtmlWidgets.Fragment{
@@ -340,7 +347,13 @@ function MatchPage:renderOverallStats()
 								classes = {'match-bm-players-team-header'},
 								children = opponent.iconDisplay
 							},
-							Array.map(players[teamIndex], renderPlayerOverallPerformance)
+							Array.map(
+								Array.reverse(Array.sortBy(
+									players[teamIndex],
+									function(player) return average(player.stats.acs) or 0 end
+								)),
+								renderPlayerOverallPerformance
+							)
 						)
 					}
 				end)
@@ -699,4 +712,5 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 		}
 	}
 end
+
 return MatchPage
