@@ -37,6 +37,7 @@ Widgets.DataTable = Lua.import('Module:Widget/Basic/DataTable')
 
 --- Base Html Widgets
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+Widgets.Br = HtmlWidgets.Br
 Widgets.Div = HtmlWidgets.Div
 Widgets.Span = HtmlWidgets.Span
 Widgets.Table = HtmlWidgets.Table

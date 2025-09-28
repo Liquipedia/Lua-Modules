@@ -22,22 +22,6 @@ local ConditionUtil = Condition.Util
 
 local StageWinningsCalculation = {}
 
---[[
-
-opponent = Opponent.fromMatch2Record(opponent),
-				scoreDetails = {},
-				matchWins = 0,
-				matchLosses = 0,
-				gameWins = 0,
-				gameLosses = 0,
-				winnings = 0,
-
-
-
-
-opponent: standardOpponent, matchWins: integer, matchLosses: integer, gameWins: integer, gameLosses: integer, winnings: number, scoreDetails
-]]
-
 ---@param props {ids: string?, tournaments: string, startDate: integer?, endDate: integer?, mode: string,
 ---startValue: number, valuePerWin: number, valueByScore: table<string, number>?}
 ---@return {opponent: standardOpponent, matchWins: integer, matchLosses: integer, gameWins: integer,
@@ -144,6 +128,5 @@ function StageWinningsCalculation._buildConditions(props)
 
 	return tostring(conditions)
 end
-
 
 return StageWinningsCalculation

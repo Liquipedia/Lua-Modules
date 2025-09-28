@@ -5,11 +5,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
---[[to replace:
-- Module:StageWinnings hok, ml
-- Module:GroupStageWinnings sc, sc2, aoe, geo
-]]
-
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
@@ -91,20 +86,14 @@ function StageWinnings:render()
 		valuePerWin = tonumber(props.valuePerWin) or 0,
 	}
 
-	if Logic.isNotEmpty(props.localcurrency) then
+	local exchangeDate = endDate or DateExt.getContextualDateOrNow()
+	if Logic.isNotEmpty(props.localcurrency) and Logic.readBool(props.autoexchange) then
 		Currency.display(props.localcurrency, nil, {setVariables = true})
-		self.exchangeSettings = {
-			exchangeDate = endDate or DateExt.getContextualDateOrNow(),
-			localCurrency = props.localcurrency,
-			precision = tonumber(props.precision) or 0,
-			rate = Currency.getExchangeRate{
-				currency = props.localcurrency,
-				currencyRate = Variables.varDefault('exchangerate_' .. props.localcurrency:upper()),
-				date = DateExt.toYmdInUtc(endDate or DateExt.getContextualDateOrNow()),
-				setVariables = false
-			},
-			autoExchange = Logic.nilOr(Logic.readBoolOrNil(props.autoexchange), true),
-			exchangeInfo = Logic.nilOr(Logic.readBoolOrNil(props.exchangeinfo), false),
+		self.currencyRate = Currency.getExchangeRate{
+			currency = props.localcurrency,
+			currencyRate = Variables.varDefault('exchangerate_' .. props.localcurrency:upper()),
+			date = DateExt.toYmdInUtc(exchangeDate),
+			setVariables = false
 		}
 	end
 
@@ -175,36 +164,88 @@ function StageWinnings:_headerRow()
 	}
 end
 
----@param opponent {opponent: standardOpponent, matchWins: integer, matchLosses: integer, gameWins: integer,
+---@param data {opponent: standardOpponent, matchWins: integer, matchLosses: integer, gameWins: integer,
 ---gameLosses: integer, winnings: number, scoreDetails: table<string, integer>}
 ---@return Widget
-function StageWinnings:_row(opponent)
+function StageWinnings:_row(data)
+	local props = self.props
+
+	local currencyDisplayConfig = {
+		displaySymbol = true,
+		formatValue = true,
+		displayCurrencyCode = false,
+		formatPrecision = tonumber(props.precision) or 0,
+	}
+
 	return Widgets.Tr{
 		children = {
 			Widgets.Td{
-				children = {},
+				css = {['text-align'] = 'left'},
+				children = {OpponentDisplay.InlineOpponent{opponent = data.opponent}},
 			},
-			Widgets.Td{
-				children = {},
-			},
-			Widgets.Td{
-				children = {},
-			},
-			Widgets.Td{
-				children = {},
-			},
-			Widgets.Td{
-				children = {},
-			},
-			Widgets.Td{
-				children = {},
-			},
-			Widgets.Td{
-				children = {},
-			},
+			(Logic.readBool(props.showMatchWL) or props.prizeMode == 'matchWins') and Widgets.Td{
+				css = {width = 'auto'},
+				children = {
+					data.matchWins,
+					'-',
+					data.matchLosses
+				},
+			} or nil,
+			(Logic.readBool(props.showGameWL) or props.prizeMode == 'gameWins') and Widgets.Td{
+				css = {width = 'auto'},
+				children = {
+					data.gameWins,
+					'-',
+					data.gameLosses
+				},
+			} or nil,
+			Logic.readBool(props.showScore) and Widgets.Td{
+				css = {width = 'auto'},
+				children = StageWinnings._detailedScores(data.scoreDetails),
+			} or nil,
+			Logic.isNotEmpty(props.localcurrency) and Widgets.Td{
+				css = {width = 'auto'},
+				children = {Currency.display(
+					props.localcurrency,
+					data.winnings,
+					currencyDisplayConfig
+				)},
+			} or nil,
+			(Logic.readBool(props.autoexchange) or Logic.isEmpty(props.localcurrency)) and Widgets.Td{
+				css = {width = 'auto'},
+				children = {Currency.display(
+					BASE_CURRENCY,
+					data.winnings * (self.currencyRate or 1),
+					currencyDisplayConfig
+				)},
+			} or nil
 		},
 	}
 end
 
+---@param scoresTable table<string, integer>
+---@return (string|Widget)[]
+function StageWinnings._detailedScores(scoresTable)
+	---@type {wins: integer, losses: integer, count: integer}
+	local scoreInfos = Array.extractValues(Table.map(scoresTable, function(score, count)
+		local wins, losses = score:match('(%d+)%-(%d+)')
+		return score, {wins = tonumber(wins), losses = tonumber(losses), count = count}
+	end))
+	table.sort(scoreInfos, function(a, b)
+		local diffA = a.wins - a.losses
+		local diffB = b.wins - b.losses
+		if diffA ~= diffB then
+			return diffA > diffB
+		end
+		return a.wins > b.wins
+	end)
+
+	return Array.interleave(
+		Array.map(scoreInfos, function(scoreInfo)
+			return scoreInfo.wins .. '-' .. scoreInfo.losses .. ': ' .. scoreInfo.count .. ' times'
+		end),
+		Widgets.Br
+	)
+end
 
 return StageWinnings
