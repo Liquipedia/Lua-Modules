@@ -87,7 +87,7 @@ function StageWinningsCalculation.run(props)
 		-- case: props.mode == 'scores'
 		local winnings = props.startValue
 		for score, count in pairs(opponent.scoreDetails) do
-			winnings = winnings + (props.valueByScore[score] or 0)
+			winnings = winnings + (props.valueByScore[score] or 0) * count
 		end
 		opponent.winnings = winnings
 	end)
