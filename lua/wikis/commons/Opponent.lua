@@ -512,9 +512,9 @@ function Opponent.fromLpdbStruct(storageStruct)
 			name = storageStruct.opponentname,
 			template = storageStruct.opponenttemplate,
 			type = Opponent.team,
-			players = Array.mapIndexes(function (index)
+			players = Logic.isNotEmpty(storageStruct.opponentplayers) and Array.mapIndexes(function (index)
 				return Logic.nilIfEmpty(Opponent.playerFromLpdbStruct(storageStruct.opponentplayers, index))
-			end),
+			end) or {},
 			extradata = {},
 		}
 	elseif storageStruct.opponenttype == Opponent.literal then
