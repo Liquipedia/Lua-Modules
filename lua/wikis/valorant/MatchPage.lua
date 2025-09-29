@@ -351,9 +351,9 @@ function MatchPage:renderOverallStats()
 		}
 	end
 
-	local ungroupedPlayers = Array.sortBy(Array.extractValues(allPlayersStats), function(player)
+	local ungroupedPlayers = Array.reverse(Array.sortBy(Array.extractValues(allPlayersStats), function(player)
 		return average(player.stats.acs) or 0
-	end)
+	end))
 	local players = Array.map(Array.range(1, 2), function (teamIdx)
 		return Array.filter(ungroupedPlayers, function (player)
 			return player.teamIndex == teamIdx
