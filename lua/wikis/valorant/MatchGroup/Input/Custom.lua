@@ -219,21 +219,6 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 			local allRoundsData = map.round_results or {}
 			local totalRoundsOnMap = #allRoundsData
 
-			local player = Array.find(map.players or {}, function(player) return player.puuid == participant.puuid end)
-			local currentPlayerTeamId = player and player.team_id
-
-			local enemyPuuids = {}
-			if currentPlayerTeamId then
-				enemyPuuids = Array.flatMap(map.players or {}, function(playerData)
-					if playerData.team_id and playerData.team_id ~= currentPlayerTeamId and playerData.team_id ~= 'Neutral' then
-						return {playerData.puuid}
-					else
-						return {}
-					end
-				end)
-			end
-
-
 			local allPlayerDamageEvents = Array.flatMap(allRoundsData, function(roundData)
 				if not roundData.player_stats then return {} end
 
@@ -242,15 +227,6 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 
 				return (playerRoundStats and playerRoundStats.damage) or {}
 			end)
-
-			local playerDamageToEnemies = Array.filter(allPlayerDamageEvents, function(damageEvent)
-				return damageEvent.receiver and Table.includes(enemyPuuids, damageEvent.receiver)
-			end)
-
-			local damageDealt = Array.reduce(playerDamageToEnemies, function(sum, damageEvent)
-				sum = sum + (damageEvent.damage or 0)
-				return sum
-			end, 0)
 
 			local shotCounts = Array.reduce(allPlayerDamageEvents, function(sums, damageEvent)
 				sums.head = sums.head + (damageEvent.head_shots or 0)
@@ -261,7 +237,9 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 
 			local totalHeadshots = shotCounts.head
 			local totalShots = shotCounts.head + shotCounts.body + shotCounts.leg
+
 			local kastRoundsOnMap = (participant.kast / 100) * totalRoundsOnMap
+			local damageDealt = participant.adr * totalRoundsOnMap
 
 			return {
 				kills = participant.kills,
