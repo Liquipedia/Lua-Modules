@@ -104,6 +104,19 @@ function MatchPage:populateGames()
 	end)
 end
 
+---@private
+---@param value number?
+---@param numberOfDecimals number?
+---@return string?
+local function formatNumbers(value, numberOfDecimals)
+	if not value then
+		return nil
+	end
+	numberOfDecimals = numberOfDecimals or 0
+	local format = '%.'.. numberOfDecimals ..'f'
+	return string.format(format, MathUtil.round(value, numberOfDecimals))
+end
+
 ---@class PlayerOverallStats
 ---@field acs number[]
 ---@field kast number[]
@@ -281,15 +294,6 @@ function MatchPage:renderOverallStats()
 		}
 	end
 
-	local formatNumbers = function(value, numberOfDecimals)
-		if not value then
-			return nil
-		end
-		numberOfDecimals = numberOfDecimals or 0
-		local format = '%.'.. numberOfDecimals ..'f'
-		return string.format(format, MathUtil.round(value, numberOfDecimals))
-	end
-
 	local function average(statTable)
 		if #statTable == 0 then return nil end
 		local sum = Array.reduce(statTable, Operator.add)
@@ -347,10 +351,14 @@ function MatchPage:renderOverallStats()
 		}
 	end
 
-	local players = {[1] = {}, [2] = {}}
-	for _, playerData in pairs(allPlayersStats) do
-		table.insert(players[playerData.teamIndex], playerData)
-	end
+	local ungroupedPlayers = Array.sortBy(Array.extractValues(allPlayersStats), function(player)
+		return average(player.stats.acs) or 0
+	end)
+	local players = Array.map(Array.range(1, 2), function (teamIdx)
+		return Array.filter(ungroupedPlayers, function (player)
+			return player.teamIndex == teamIdx
+		end)
+	end)
 
 	return HtmlWidgets.Fragment{
 		children = WidgetUtil.collect(
@@ -366,13 +374,7 @@ function MatchPage:renderOverallStats()
 								classes = {'match-bm-players-team-header'},
 								children = opponent.iconDisplay
 							},
-							Array.map(
-								Array.reverse(Array.sortBy(
-									players[teamIndex],
-									function(player) return average(player.stats.acs) or 0 end
-								)),
-								renderPlayerOverallPerformance
-							)
+							Array.map(players[teamIndex], renderPlayerOverallPerformance)
 						)
 					}
 				end)
@@ -679,15 +681,6 @@ end
 ---@param player table
 ---@return Widget
 function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
-	local formatNumbers = function(value, numberOfDecimals)
-		if not value then
-			return nil
-		end
-		numberOfDecimals = numberOfDecimals or 0
-		local format = '%.'.. numberOfDecimals ..'f'
-		return string.format(format, MathUtil.round(value, numberOfDecimals))
-	end
-
 	return Div{
 		classes = {'match-bm-players-player match-bm-players-player--col-2'},
 		children = {
