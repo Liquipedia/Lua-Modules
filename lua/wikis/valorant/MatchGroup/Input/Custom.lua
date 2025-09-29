@@ -223,7 +223,6 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 			local currentPlayerTeamId = player and player.team_id
 
 			local enemyPuuids = {}
-			local teammatePuuids = {}
 			if currentPlayerTeamId then
 				enemyPuuids = Array.flatMap(map.players or {}, function(playerData)
 					if playerData.team_id and playerData.team_id ~= currentPlayerTeamId and playerData.team_id ~= 'Neutral' then
@@ -232,51 +231,8 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 						return {}
 					end
 				end)
-				teammatePuuids = Array.flatMap(map.players or {}, function(playerData)
-					if playerData.team_id and playerData.team_id == currentPlayerTeamId and playerData.team_id ~= 'Neutral' then
-						return {playerData.puuid}
-					else
-						return {}
-					end
-				end)
 			end
 
-			local kastRoundsOnMap = Array.reduce(allRoundsData, function(currentKastRounds, roundData)
-				local allKillsInRound = Array.flatMap(roundData.player_stats or {}, function(player_stats)
-					return player_stats.kills or {}
-				end)
-
-				local participatedInKill = Array.any(allKillsInRound, function(kill)
-					return kill.killer == participant.puuid or Table.includes(kill.assistants or {}, participant.puuid)
-				end)
-
-				if participatedInKill then
-					return currentKastRounds + 1
-				end
-
-				local deathEvent = Array.find(allKillsInRound, function(kill)
-					return kill.victim == participant.puuid
-				end)
-
-				if not deathEvent then
-					-- Survived
-					return currentKastRounds + 1
-				end
-
-				-- Died, check for trade
-				local timeOfDeath = deathEvent.time_since_round_start_millis
-				local wasTraded = Array.any(allKillsInRound, function(kill)
-					return Table.includes(teammatePuuids, kill.killer) and
-						kill.time_since_round_start_millis > timeOfDeath and
-						kill.time_since_round_start_millis <= (timeOfDeath + 5000)
-				end)
-
-				if wasTraded then
-					return currentKastRounds + 1
-				end
-
-				return currentKastRounds
-			end, 0)
 
 			local allPlayerDamageEvents = Array.flatMap(allRoundsData, function(roundData)
 				if not roundData.player_stats then return {} end
@@ -305,6 +261,7 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 
 			local totalHeadshots = shotCounts.head
 			local totalShots = shotCounts.head + shotCounts.body + shotCounts.leg
+			local kastRoundsOnMap = (participant.kast / 100) * totalRoundsOnMap
 
 			return {
 				kills = participant.kills,
