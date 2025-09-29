@@ -13,12 +13,12 @@ local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 
 local BAD_INPUT_CATEGORY = 'Improperly formatted TeamHistory date'
-local ROLE_CLEAN = Lua.requireIfExists('Module:TeamHistoryAuto/cleanRole', {loadData = true})
+local ROLE_CLEAN = Lua.requireIfExists('Module:TeamHistoryAuto/cleanRole', { loadData = true })
 
 -- we should bot these eventually...
 local ROLE_ALIASES = {
-	r = 'Retirement',
-	retired = 'Retirement',
+	r = 'Retired',
+	retired = 'Retired',
 }
 
 local TeamHistoryManual = {}
@@ -39,7 +39,7 @@ function TeamHistoryManual.parse(args)
 		role = String.upperCaseFirst(role)
 	end
 
-	return {{
+	return { {
 		team = team,
 		role = role,
 		joinDate = TeamHistoryManual._parseDatesToYmd(displayDates.join, args.estimated_start),
@@ -47,7 +47,7 @@ function TeamHistoryManual.parse(args)
 		leaveDate = TeamHistoryManual._parseDatesToYmd(displayDates.leave, args.estimated_end),
 		leaveDateDisplay = displayDates.leave,
 		reference = {},
-	}}
+	} }
 end
 
 ---@param display string?
@@ -74,11 +74,11 @@ end
 ---@return {join: string?, leave: string?}
 function TeamHistoryManual._readDateInput(dateInput)
 	-- expected input formats (as per existing templates):
-		-- YYYY-MM-DD — YYYY-MM-DD
-		-- YYYY-MM-DD — '''Present'''
-		-- YYYY — YYYY (used on dota2)
-		-- YYYY-MM-DD (missing leavedate, assumed as present)
-		-- Dash is also supported as separator as long as it is wrapped with spaces
+	-- YYYY-MM-DD — YYYY-MM-DD
+	-- YYYY-MM-DD — '''Present'''
+	-- YYYY — YYYY (used on dota2)
+	-- YYYY-MM-DD (missing leavedate, assumed as present)
+	-- Dash is also supported as separator as long as it is wrapped with spaces
 
 	local dates = Array.parseCommaSeparatedString(dateInput, '—')
 	if #dates <= 1 then -- in case someone used a normal `-` with spaces around it as seperator instead
