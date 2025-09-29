@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
@@ -512,6 +513,10 @@ function Opponent.fromLpdbStruct(storageStruct)
 			name = storageStruct.opponentname,
 			template = storageStruct.opponenttemplate,
 			type = Opponent.team,
+			players = Array.map(
+				Array.range(1, Info.config.defaultMaxPlayersPerPlacement or 10),
+				FnUtil.curry(Opponent.playerFromLpdbStruct, storageStruct.opponentplayers)
+			),
 			extradata = {},
 		}
 	elseif storageStruct.opponenttype == Opponent.literal then
