@@ -29,7 +29,7 @@ local StageWinningsCalculation = {}
 function StageWinningsCalculation.run(props)
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = StageWinningsCalculation._buildConditions(props),
-		query = 'match2opponents, match2games, winner',
+		query = 'match2opponents, winner',
 		limit = 5000
 	})
 	matches = Array.filter(matches, function(match)

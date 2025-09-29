@@ -18,6 +18,7 @@ local StageWinningsCalculation = Lua.import('Module:StageWinningsCalculation')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Widget = Lua.import('Module:Widget')
 local Widgets = Lua.import('Module:Widget/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -86,18 +87,18 @@ function StageWinnings:render()
 		valuePerWin = tonumber(props.valuePerWin) or 0,
 	}
 
-	local exchangeDate = endDate or DateExt.getContextualDateOrNow()
+	self.exchangeDate = endDate or DateExt.getContextualDateOrNow()
 	if Logic.isNotEmpty(props.localcurrency) and Logic.readBool(props.autoexchange) then
 		Currency.display(props.localcurrency, nil, {setVariables = true})
 		self.currencyRate = Currency.getExchangeRate{
 			currency = props.localcurrency,
 			currencyRate = Variables.varDefault('exchangerate_' .. props.localcurrency:upper()),
-			date = DateExt.toYmdInUtc(exchangeDate),
+			date = DateExt.toYmdInUtc(self.exchangeDate),
 			setVariables = false
 		}
 	end
 
-	local tbl = Widgets.DataTable{
+	local dataDisplay = Widgets.DataTable{
 		classes = {'prizepooltable', 'collapsed'},
 		tableCss = {
 			['text-align'] = 'center',
@@ -112,9 +113,9 @@ function StageWinnings:render()
 		},
 		children = WidgetUtil.collect(
 			-- first header
-			Widgets.Tr{
+			HtmlWidgets.Tr{
 				children = {
-					Widgets.Th{
+					HtmlWidgets.Th{
 						attributes = {colspan = '100%'},
 						children = {props.title or 'Group Stage Winnings'},
 					},
@@ -124,39 +125,43 @@ function StageWinnings:render()
 			self:_headerRow(),
 			-- rows
 			Array.map(opponentList, FnUtil.curry(self._row, self))
-		)
+		),
 	}
 
-	--todo: add exchange info if enabled
-	return tbl
+	return HtmlWidgets.Fragment{
+		children = {
+			dataDisplay,
+			self:_exchangeInfo(),
+		},
+	}
 end
 
 ---@return Widget
 function StageWinnings:_headerRow()
 	local props = self.props
-	return Widgets.Tr{
+	return HtmlWidgets.Tr{
 		children = WidgetUtil.collect(
-			Widgets.Th{
+			HtmlWidgets.Th{
 				css = {width = 'auto'},
 				children = {'Participants'},
 			},
-			(Logic.readBool(props.showMatchWL) or props.prizeMode == 'matchWins') and Widgets.Th{
+			(Logic.readBool(props.showMatchWL) or props.prizeMode == 'matchWins') and HtmlWidgets.Th{
 				css = {width = 'auto'},
 				children = {'Matches'},
 			} or nil,
-			(Logic.readBool(props.showGameWL) or props.prizeMode == 'gameWins') and Widgets.Th{
+			(Logic.readBool(props.showGameWL) or props.prizeMode == 'gameWins') and HtmlWidgets.Th{
 				css = {width = 'auto'},
 				children = {'Games'},
 			} or nil,
-			Logic.readBool(props.showScore) and Widgets.Th{
+			Logic.readBool(props.showScore) and HtmlWidgets.Th{
 				css = {width = 'auto'},
 				children = {'Score Details'},
 			} or nil,
-			Logic.isNotEmpty(props.localcurrency) and Widgets.Th{
+			Logic.isNotEmpty(props.localcurrency) and HtmlWidgets.Th{
 				css = {width = 'auto'},
 				children = {Currency.display(props.localcurrency)},
 			} or nil,
-			(Logic.readBool(props.autoexchange) or Logic.isEmpty(props.localcurrency)) and Widgets.Th{
+			(Logic.readBool(props.autoexchange) or Logic.isEmpty(props.localcurrency)) and HtmlWidgets.Th{
 				css = {width = 'auto'},
 				children = {Currency.display(BASE_CURRENCY)},
 			} or nil
@@ -177,13 +182,13 @@ function StageWinnings:_row(data)
 		formatPrecision = tonumber(props.precision) or 0,
 	}
 
-	return Widgets.Tr{
+	return HtmlWidgets.Tr{
 		children = {
-			Widgets.Td{
+			HtmlWidgets.Td{
 				css = {['text-align'] = 'left'},
 				children = {OpponentDisplay.InlineOpponent{opponent = data.opponent}},
 			},
-			(Logic.readBool(props.showMatchWL) or props.prizeMode == 'matchWins') and Widgets.Td{
+			(Logic.readBool(props.showMatchWL) or props.prizeMode == 'matchWins') and HtmlWidgets.Td{
 				css = {width = 'auto'},
 				children = {
 					data.matchWins,
@@ -191,7 +196,7 @@ function StageWinnings:_row(data)
 					data.matchLosses
 				},
 			} or nil,
-			(Logic.readBool(props.showGameWL) or props.prizeMode == 'gameWins') and Widgets.Td{
+			(Logic.readBool(props.showGameWL) or props.prizeMode == 'gameWins') and HtmlWidgets.Td{
 				css = {width = 'auto'},
 				children = {
 					data.gameWins,
@@ -199,11 +204,11 @@ function StageWinnings:_row(data)
 					data.gameLosses
 				},
 			} or nil,
-			Logic.readBool(props.showScore) and Widgets.Td{
+			Logic.readBool(props.showScore) and HtmlWidgets.Td{
 				css = {width = 'auto'},
 				children = StageWinnings._detailedScores(data.scoreDetails),
 			} or nil,
-			Logic.isNotEmpty(props.localcurrency) and Widgets.Td{
+			Logic.isNotEmpty(props.localcurrency) and HtmlWidgets.Td{
 				css = {width = 'auto'},
 				children = {Currency.display(
 					props.localcurrency,
@@ -211,7 +216,7 @@ function StageWinnings:_row(data)
 					currencyDisplayConfig
 				)},
 			} or nil,
-			(Logic.readBool(props.autoexchange) or Logic.isEmpty(props.localcurrency)) and Widgets.Td{
+			(Logic.readBool(props.autoexchange) or Logic.isEmpty(props.localcurrency)) and HtmlWidgets.Td{
 				css = {width = 'auto'},
 				children = {Currency.display(
 					BASE_CURRENCY,
@@ -244,8 +249,39 @@ function StageWinnings._detailedScores(scoresTable)
 		Array.map(scoreInfos, function(scoreInfo)
 			return scoreInfo.wins .. '-' .. scoreInfo.losses .. ': ' .. scoreInfo.count .. ' times'
 		end),
-		Widgets.Br
+		HtmlWidgets.Br
 	)
+end
+
+---@return Widget?
+function StageWinnings:_exchangeInfo()
+	if Logic.isEmpty(self.props.localcurrency) or not Logic.readBool(self.props.exchangeinfo) then
+		return
+	end
+
+	return HtmlWidgets.Small{
+		css = {['font-style'] = 'italic'},
+		children = {
+			'(Converted ',
+			Currency.display(BASE_CURRENCY),
+			' prizes are based on the ',
+			HtmlWidgets.Abbr{
+				title = 'Currency exchange rate taken from exchangerate.host',
+				children = 'exchange rate',
+			},
+			' on ',
+			DateExt.formatTimestamp('M j, Y', self.exchangeDate),
+			': ',
+			Currency.display(self.props.localcurrency, 1),
+			' ≃ ',
+			Currency.display(
+				BASE_CURRENCY,
+				self.currencyRate or 1,
+				{formatValue = true, formatPrecision = EXCHANGE_SUMMARY_PRECISION}
+			)
+			')'
+		},
+	}
 end
 
 return StageWinnings
