@@ -183,7 +183,7 @@ function StageWinnings:_row(data)
 	}
 
 	return HtmlWidgets.Tr{
-		children = {
+		children = WidgetUtil.collect(
 			HtmlWidgets.Td{
 				css = {['text-align'] = 'left'},
 				children = {OpponentDisplay.InlineOpponent{opponent = data.opponent}},
@@ -205,7 +205,7 @@ function StageWinnings:_row(data)
 				},
 			} or nil,
 			Logic.readBool(props.showScore) and HtmlWidgets.Td{
-				css = {width = 'auto'},
+				css = {['text-align'] = 'left', width = 'auto'},
 				children = StageWinnings._detailedScores(data.scoreDetails),
 			} or nil,
 			Logic.isNotEmpty(props.localcurrency) and HtmlWidgets.Td{
@@ -224,7 +224,7 @@ function StageWinnings:_row(data)
 					currencyDisplayConfig
 				)},
 			} or nil
-		},
+		),
 	}
 end
 
@@ -249,7 +249,7 @@ function StageWinnings._detailedScores(scoresTable)
 		Array.map(scoreInfos, function(scoreInfo)
 			return scoreInfo.wins .. '-' .. scoreInfo.losses .. ': ' .. scoreInfo.count .. ' times'
 		end),
-		HtmlWidgets.Br
+		HtmlWidgets.Br{}
 	)
 end
 
@@ -270,7 +270,7 @@ function StageWinnings:_exchangeInfo()
 				children = 'exchange rate',
 			},
 			' on ',
-			DateExt.formatTimestamp('M j, Y', self.exchangeDate),
+			DateExt.formatTimestamp('M j, Y', DateExt.readTimestamp(self.exchangeDate) --[[@as integer]]),
 			': ',
 			Currency.display(self.props.localcurrency, 1),
 			' ≃ ',
@@ -278,8 +278,8 @@ function StageWinnings:_exchangeInfo()
 				BASE_CURRENCY,
 				self.currencyRate or 1,
 				{formatValue = true, formatPrecision = EXCHANGE_SUMMARY_PRECISION}
-			)
-			')'
+			),
+			')',
 		},
 	}
 end
