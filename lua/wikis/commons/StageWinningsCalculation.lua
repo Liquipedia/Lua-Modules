@@ -59,8 +59,11 @@ function StageWinningsCalculation.run(props)
 		local winner = match.match2opponents[winnerId]
 		local loser = match.match2opponents[loserId]
 
-		local score = winner.score .. '-' .. loser.score
-		local reversedScore = loser.score .. '-' .. winner.score
+		local winnerScore = tonumber(winner.score) or ''
+		local loserScore = tonumber(loser.score) or ''
+
+		local score = winnerScore .. '-' .. loserScore
+		local reversedScore = loserScore .. '-' .. winnerScore
 
 		byName[winner.name].scoreDetails[score] = (byName[winner.name].scoreDetails[score] or 0) + 1
 		byName[loser.name].scoreDetails[reversedScore] = (byName[loser.name].scoreDetails[reversedScore] or 0) + 1
