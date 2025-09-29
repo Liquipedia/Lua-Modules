@@ -226,7 +226,7 @@ function TeamHistoryDisplay:_row(transfer)
 
 	local positionIcon
 	if POSITION_ICON_DATA then
-		local position = (transfer.position or ''):lower()
+		local position = Table.includes(SPECIAL_ROLES, transfer.role) and '' or (transfer.position or ''):lower()
 		positionIcon = (POSITION_ICON_DATA[position] or POSITION_ICON_DATA['']) .. '&nbsp;'
 	end
 
