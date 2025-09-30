@@ -17,8 +17,8 @@ local ROLE_CLEAN = Lua.requireIfExists('Module:TeamHistoryAuto/cleanRole', {load
 
 -- we should bot these eventually...
 local ROLE_ALIASES = {
-	r = 'Retirement',
-	retired = 'Retirement',
+	r = 'Retired',
+	retired = 'Retired',
 }
 
 local TeamHistoryManual = {}
