@@ -18,6 +18,7 @@ local ConditionUtil = Condition.Util
 
 local Team = Lua.import('Module:Infobox/Team')
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local ACHIEVEMENTS_BASE_CONDITIONS = {
 	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Showmatch', 'Qualifier'}),
@@ -43,6 +44,13 @@ end
 ---@param args table
 function CustomTeam:defineCustomPageVariables(args)
 	Variables.varDefine('team_captain', args.captain)
+end
+
+---@return Widget?
+function CustomTeam:createBottomContent()
+	if not self.args.disbanded then
+		return UpcomingTournaments.team{name = self.teamTemplate.templatename}
+	end
 end
 
 return CustomTeam
