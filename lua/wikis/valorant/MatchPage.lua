@@ -117,6 +117,7 @@ local function formatNumbers(value, numberOfDecimals)
 	return string.format(format, MathUtil.round(value, numberOfDecimals))
 end
 
+-- Total HS% waiting for proper data from crossroads
 ---@class PlayerOverallStats
 ---@field acs number[]
 ---@field kast number[]
@@ -129,8 +130,6 @@ end
 ---@field firstDeaths number
 ---@field totalRoundsPlayed number
 ---@field totalKastRounds number
----@field totalHeadshots number
----@field totalShots number
 ---@field damageDealt number
 
 ---@return Widget?
@@ -190,8 +189,6 @@ function MatchPage:renderOverallStats()
 							firstDeaths = 0,
 							totalRoundsPlayed = 0,
 							totalKastRounds = 0,
-							totalHeadshots = 0,
-							totalShots = 0,
 							damageDealt = 0,
 						}
 					}
@@ -214,8 +211,6 @@ function MatchPage:renderOverallStats()
 				stats.firstDeaths = stats.firstDeaths + (player.firstDeaths or 0)
 				stats.totalRoundsPlayed = stats.totalRoundsPlayed + (player.totalRounds or 0)
 				stats.totalKastRounds = stats.totalKastRounds + (player.kastRounds or 0)
-				stats.totalHeadshots = stats.totalHeadshots + (player.totalHeadshots or 0)
-				stats.totalShots = stats.totalShots + (player.totalShots or 0)
 				stats.damageDealt = stats.damageDealt + (player.damageDealt or 0)
 			end)
 		end)
@@ -336,10 +331,6 @@ function MatchPage:renderOverallStats()
 						PlayerStat{
 							title = {IconFa{iconName = 'damage'}, 'ADR'},
 							data = formatNumbers(player.stats.damageDealt / player.stats.totalRoundsPlayed)
-						},
-						PlayerStat{
-							title = {IconFa{iconName = 'headshot'}, 'HS%'},
-							data = formatNumbers(calculatePercentage(player.stats.totalHeadshots, player.stats.totalShots), 1) .. '%'
 						},
 						PlayerStat{
 							title = {IconFa{iconName = 'firstkill'}, 'FK / FD'},

@@ -219,25 +219,6 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 			local allRoundsData = map.round_results or {}
 			local totalRoundsOnMap = #allRoundsData
 
-			local allPlayerDamageEvents = Array.flatMap(allRoundsData, function(roundData)
-				if not roundData.player_stats then return {} end
-
-				local playerRoundStats = Array.find(roundData.player_stats, function(playerData)
-					return playerData.puuid == participant.puuid end)
-
-				return (playerRoundStats and playerRoundStats.damage) or {}
-			end)
-
-			local shotCounts = Array.reduce(allPlayerDamageEvents, function(sums, damageEvent)
-				sums.head = sums.head + (damageEvent.head_shots or 0)
-				sums.body = sums.body + (damageEvent.body_shots or 0)
-				sums.leg = sums.leg + (damageEvent.leg_shots or 0)
-				return sums
-			end, {head = 0, body = 0, leg = 0})
-
-			local totalHeadshots = shotCounts.head
-			local totalShots = shotCounts.head + shotCounts.body + shotCounts.leg
-
 			local kastRoundsOnMap = (participant.kast / 100) * totalRoundsOnMap
 			local damageDealt = participant.adr * totalRoundsOnMap
 
@@ -251,8 +232,6 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 				hs = participant.hs,
 				totalRounds = totalRoundsOnMap,
 				kastRounds = kastRoundsOnMap,
-				totalHeadshots = totalHeadshots,
-				totalShots = totalShots,
 				damageDealt = damageDealt,
 				player = playerIdData.name or playerInputData.link or playerInputData.name,
 				displayName = playerIdData.displayname or playerInputData.name,
