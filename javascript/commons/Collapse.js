@@ -120,7 +120,7 @@ liquipedia.collapse = {
 				hideAllText = 'Hide all';
 			}
 			const button = document.createElement( 'button' );
-			button.classList.add( 'btn', 'btn-secondary' );
+			button.classList.add( 'btn', 'btn-secondary', 'btn-small' );
 			if ( toggleGroup.classList.contains( 'toggle-state-hide' ) ) {
 				button.innerHTML = this.makeIcon( false ) + ' ' + hideAllText;
 			} else {
