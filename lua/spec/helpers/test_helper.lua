@@ -114,8 +114,8 @@ return function(busted, helper, options)
 			local img = params[1]
 			local width, height, link, alt, class
 			for i = 2, #params do
-				if params[i]:match('^(%d*)x*(%d*)px$') then
-					width, height = params[i]:match('^(%d*)x*(%d*)px$')
+				if params[i]:match('^(%d*)x?(%d*) ?px$') then
+					width, height = params[i]:match('^(%d*)x?(%d*) ?px$')
 				elseif params[i]:match('^link=') then
 					link = params[i]:gsub('^link=', '')
 				elseif params[i]:match('^alt=') then
