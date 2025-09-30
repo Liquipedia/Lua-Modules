@@ -31,8 +31,8 @@
 		"es-x/no-array-prototype-findindex": "off",
 		"es-x/no-spread-elements": "off",
 		"es-x/no-property-shorthands": "off",
-		"jsdoc/check-tag-names": [2, {"definedTags": ["jest-environment"]}],
-		"jsdoc/require-jsdoc": 0,
+		"jsdoc/check-tag-names": ["error", {"definedTags": ["jest-environment"]}],
+		"jsdoc/require-jsdoc": "off",
 		"max-len": ["warn", { "code": 120 }]
 	},
 	"env": {
