@@ -49,7 +49,10 @@ end
 ---@return Widget?
 function CustomTeam:createBottomContent()
 	if not self.args.disbanded then
-		return UpcomingTournaments.team{name = self.teamTemplate.templatename}
+		return UpcomingTournaments.team{
+			name = self.args.lpdbname or self.teamTemplate.templatename,
+			additionalConditions = ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Points')
+		}
 	end
 end
 
