@@ -1,10 +1,13 @@
 {
+	"plugins": [
+		"jsdoc"
+	],
 	"extends": [
 		"wikimedia/mediawiki",
 		"wikimedia/client/common",
 		"wikimedia/language/es2020",
 		"wikimedia/jquery",
-		"jsdoc"
+		"plugin:jsdoc/recommended"
 	],
 	"globals": {
 		"liquipedia": "readonly",
@@ -28,6 +31,8 @@
 		"es-x/no-array-prototype-findindex": "off",
 		"es-x/no-spread-elements": "off",
 		"es-x/no-property-shorthands": "off",
+		"jsdoc/check-tag-names": [2, {"definedTags": ["jest-environment"]}],
+		"jsdoc/require-jsdoc": 0,
 		"max-len": ["warn", { "code": 120 }]
 	},
 	"env": {
