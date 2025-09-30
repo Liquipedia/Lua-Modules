@@ -22,9 +22,13 @@ function Medals.display(args)
 		return
 	end
 
-	return mw.html.create('span')
-		:attr('title', medalData.title)
-		:wikitext(Image.display(medalData.file, nil, {link = args.link or '', alt = medalData.title}))
+	local medalImage = Image.display(
+		medalData.file,
+		nil,
+		{link = args.link or '', alt = medalData.title, size = '24x24px'}
+	)
+
+	return mw.html.create('span'):attr('title', medalData.title):wikitext(medalImage)
 end
 
 ---@param input string|integer?
