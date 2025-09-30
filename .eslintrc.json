@@ -1,13 +1,9 @@
 {
-	"plugins": [
-		"jsdoc"
-	],
 	"extends": [
 		"wikimedia/mediawiki",
 		"wikimedia/client/common",
 		"wikimedia/language/es2020",
-		"wikimedia/jquery",
-		"plugin:jsdoc/recommended"
+		"wikimedia/jquery"
 	],
 	"globals": {
 		"liquipedia": "readonly",

@@ -4,7 +4,6 @@
 		"@playwright/test": "^1.45.0",
 		"@stylistic/stylelint-plugin": "^2.1.2",
 		"eslint-config-wikimedia": "0.28.1",
-		"eslint-plugin-jsdoc": "^60.5.0",
 		"grunt": "*",
 		"grunt-eslint": "24.x.x",
 		"grunt-stylelint": "^0.20.x",
