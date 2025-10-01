@@ -104,7 +104,6 @@ function MatchPage:populateGames()
 	end)
 end
 
----@private
 ---@param value number?
 ---@param numberOfDecimals number?
 ---@return string?
@@ -118,7 +117,7 @@ local function formatNumbers(value, numberOfDecimals)
 end
 
 -- Total HS% waiting for proper data from crossroads
----@class PlayerOverallStats
+---@class ValorantPlayerOverallStats
 ---@field acs number[]
 ---@field kast number[]
 ---@field adr number[]
@@ -139,7 +138,7 @@ function MatchPage:renderOverallStats()
 	end
 
 	---@type table<string, {displayName: string, playerName: string, teamIndex: integer,
-	---agents: string[], stats: PlayerOverallStats}>
+	---agents: string[], stats: ValorantPlayerOverallStats}>
 	local allPlayersStats = {}
 	local allTeamsStats = {
 		{
