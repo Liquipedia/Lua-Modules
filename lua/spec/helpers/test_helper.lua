@@ -103,11 +103,55 @@ return function(busted, helper, options)
 		file:close()
 	end
 
+	-- Simplified MediaWiki parser for testing purposes
+	local function simpleMediaWikiParser(text)
+		-- Italics and bold
+		text = text:gsub("'''(.-)'''", '<b>%1</b>')
+		text = text:gsub("''(.-)''", '<i>%1</i>')
+		-- Images
+		for imgParams in text:gmatch('%[%[File:(.-)%]%]') do
+			local params = mw.text.split(imgParams, '|', true)
+			local img = params[1]
+			local width, height, link, alt, class
+			for i = 2, #params do
+				if params[i]:match('^(%d*)x?(%d*) ?px$') then
+					width, height = params[i]:match('^(%d*)x?(%d*) ?px$')
+				elseif params[i]:match('^link=') then
+					link = params[i]:gsub('^link=', '')
+				elseif params[i]:match('^alt=') then
+					alt = params[i]:gsub('^alt=', '')
+				elseif params[i]:match('^class=') then
+					class = params[i]:gsub('^class=', '')
+				end
+			end
+			width = width or 100
+			height = height or 100
+			local size = width .. 'x' .. height
+			link = link or img
+			alt = alt or ''
+			class = class or ''
+			text = text:gsub(
+				'%[%[File:' .. imgParams .. '%]%]',
+				'<img src="https://placehold.co/' .. size .. '?text=' .. alt ..'\n'.. link ..'" class="' .. class .. '"/>'
+			)
+		end
+		-- Internal Urls
+		text = text:gsub('%[%[(.-)|(.-)%]%]', '<a href="%1">%2</a>')
+		text = text:gsub('%[%[(.-)%]%]', '<a href="%1">%1</a>')
+		-- External Urls
+		text = text:gsub('%[(.-) (.-)%]', '<a href="%1">%2</a>')
+		text = text:gsub('%[(.-)%]', '<a href="%1">%1</a>')
+
+		return text
+	end
+
 	local function GoldenTest(testName, actual)
 		-- Currently we're only running snapshots tests while updating them too
 		if os.getenv('UPDATE_SNAPSHOTS') ~= 'true' then
 			return
 		end
+
+		local generatedHtml = simpleMediaWikiParser(tostring(actual))
 
 		local template = readFile('spec/helpers/template.html')
 		assert(template, 'Could not read template.html')
@@ -116,7 +160,7 @@ return function(busted, helper, options)
 		-- Using this over gsub. Reason is is that we need a plain replace, not pattern replace.
 		local start_pos, end_pos = string.find(template, placeholder, 1, true)
 		assert(start_pos, 'Placeholder not found in template')
-		local finalHtml = string.sub(template, 1, start_pos - 1) .. actual .. string.sub(template, end_pos + 1)
+		local finalHtml = string.sub(template, 1, start_pos - 1) .. generatedHtml .. string.sub(template, end_pos + 1)
 
 		os.execute('mkdir -p output')
 		local finalHtmlPath = 'output/' .. testName .. '-full.html'
