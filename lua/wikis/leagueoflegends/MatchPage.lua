@@ -118,7 +118,7 @@ function MatchPage:populateGames()
 						items = Array.map(Array.range(1, ITEMS_TO_SHOW), function(idx)
 							return player.items[idx] or DEFAULT_ITEM
 						end),
-						runeKeystone = Array.filter(player.runes.primary.runes, function(rune)
+						runeKeystone = Array.filter(player.runes.primary.runes or {}, function(rune)
 							return KEYSTONES[rune]
 						end)[1]
 					})
