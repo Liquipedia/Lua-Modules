@@ -16,7 +16,6 @@ local Button = Lua.import('Module:Widget/Basic/Button')
 
 ---@class RoundSelectorWidget: Widget
 ---@operator call(table): RoundSelectorWidget
-
 local RoundSelectorWidget = Class.new(Widget)
 
 ---@return Widget?

@@ -27,7 +27,6 @@ local STATUS_TO_DISPLAY = {
 
 ---@class StandingsFfaWidget: Widget
 ---@operator call(table): StandingsFfaWidget
-
 local StandingsFfaWidget = Class.new(Widget)
 
 ---@return Widget?
