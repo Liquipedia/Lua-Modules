@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local MathUtil = Lua.import('Module:MathUtil')
-local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
@@ -60,76 +59,9 @@ end
 function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
-		game.teams = Array.map(Array.range(1, 2), function(teamIdx)
-			local rounds = game.extradata.rounds or {} --[[ @as ValorantRoundData[] ]]
-			local team = {}
-
-			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
-			team.players = Array.filter(game.opponents[teamIdx].players or {}, Table.isNotEmpty)
-
-			team.thrifties = #Array.filter(rounds, function (round)
-				return round['t' .. teamIdx .. 'side'] == round.winningSide and round.ceremony == 'Thrifty'
-			end)
-
-			team.firstKills = #Array.filter(rounds, function (round)
-				return round.firstKill.byTeam == teamIdx
-			end)
-
-			Array.forEach(team.players, function (player)
-				player.firstKills = #Array.filter(rounds, function (round)
-					return round.firstKill.killer == player.puuid
-				end)
-				player.firstDeaths = #Array.filter(rounds, function (round)
-					return round.firstKill.victim == player.puuid
-				end)
-			end)
-
-			team.clutches = #Array.filter(rounds, function (round)
-				return round['t' .. teamIdx .. 'side'] == round.winningSide and round.ceremony == 'Clutch'
-			end)
-
-			local plantedRounds = Array.filter(rounds, function (round)
-				return round['t' .. teamIdx .. 'side'] == 'atk' and round.planted
-			end)
-
-			team.postPlant = {
-				#Array.filter(plantedRounds, function (round)
-					return round.winningSide == 'atk'
-				end),
-				#plantedRounds
-			}
-
-			return team
-		end)
+		game.teams = game.extradata.teams
 	end)
 end
-
----@param value number?
----@param numberOfDecimals number?
----@return string?
-local function formatNumbers(value, numberOfDecimals)
-	if not value then
-		return nil
-	end
-	numberOfDecimals = numberOfDecimals or 0
-	local format = '%.'.. numberOfDecimals ..'f'
-	return string.format(format, MathUtil.round(value, numberOfDecimals))
-end
-
--- Total HS% waiting for proper data from crossroads
----@class ValorantPlayerOverallStats
----@field acs number[]
----@field kast number[]
----@field adr number[]
----@field hs number[]
----@field kills number
----@field deaths number
----@field assists number
----@field firstKills number
----@field firstDeaths number
----@field totalRoundsPlayed number
----@field totalKastRounds number
----@field damageDealt number
 
 ---@return Widget?
 function MatchPage:renderOverallStats()
@@ -137,129 +69,7 @@ function MatchPage:renderOverallStats()
 		return
 	end
 
-	---@type table<string, {displayName: string, playerName: string, teamIndex: integer,
-	---agents: string[], stats: ValorantPlayerOverallStats}>
-	local allPlayersStats = {}
-	local allTeamsStats = {
-		{
-			firstKills = 0,
-			thrifties = 0,
-			postPlant = { 0, 0 },
-			clutches = 0,
-		},
-		{
-			firstKills = 0,
-			thrifties = 0,
-			postPlant = { 0, 0 },
-			clutches = 0,
-		}
-	}
-
-	Array.forEach(self.games, function(game)
-		if game.status == BaseMatchPage.NOT_PLAYED then
-			return
-		end
-
-		Array.forEach(game.teams, function(team, teamIdx)
-			allTeamsStats[teamIdx].firstKills = allTeamsStats[teamIdx].firstKills + (team.firstKills or 0)
-			allTeamsStats[teamIdx].thrifties = allTeamsStats[teamIdx].thrifties + (team.thrifties or 0)
-			allTeamsStats[teamIdx].postPlant[1] = allTeamsStats[teamIdx].postPlant[1] + (team.postPlant[1] or 0)
-			allTeamsStats[teamIdx].postPlant[2] = allTeamsStats[teamIdx].postPlant[2] + (team.postPlant[2] or 0)
-			allTeamsStats[teamIdx].clutches = allTeamsStats[teamIdx].clutches + (team.clutches or 0)
-			Array.forEach(team.players or {}, function(player)
-				local playerId = player.player
-				if not playerId then return end
-
-				if not allPlayersStats[playerId] then
-					allPlayersStats[playerId] = {
-						displayName = player.displayName or player.player,
-						playerName = player.player,
-						teamIndex = teamIdx,
-						agents = {},
-						stats = {
-							acs = {},
-							kast = {},
-							adr = {},
-							-- hs = {},
-							kills = 0,
-							deaths = 0,
-							assists = 0,
-							firstKills = 0,
-							firstDeaths = 0,
-							totalRoundsPlayed = 0,
-							totalKastRounds = 0,
-							damageDealt = 0,
-						}
-					}
-				end
-
-				local data = allPlayersStats[playerId]
-				if player.agent then
-					table.insert(data.agents, player.agent)
-				end
-
-				local stats = data.stats
-				if player.acs then table.insert(stats.acs, player.acs) end
-				if player.kast then table.insert(stats.kast, player.kast) end
-				if player.adr then table.insert(stats.adr, player.adr) end
-				-- if player.hs then table.insert(stats.hs, player.hs) end
-				stats.kills = stats.kills + (player.kills or 0)
-				stats.deaths = stats.deaths + (player.deaths or 0)
-				stats.assists = stats.assists + (player.assists or 0)
-				stats.firstKills = stats.firstKills + (player.firstKills or 0)
-				stats.firstDeaths = stats.firstDeaths + (player.firstDeaths or 0)
-				stats.totalRoundsPlayed = stats.totalRoundsPlayed + (player.totalRounds or 0)
-				stats.totalKastRounds = stats.totalKastRounds + (player.kastRounds or 0)
-				stats.damageDealt = stats.damageDealt + (player.damageDealt or 0)
-			end)
-		end)
-	end)
-
-	local function average(statTable)
-		if #statTable == 0 then return nil end
-		local sum = Array.reduce(statTable, Operator.add)
-		return sum / #statTable
-	end
-
-	local function calculatePercentage(value, total)
-		if total == 0 then
-			return 0
-		end
-		return value / total * 100
-	end
-
-	local ungroupedPlayers = Array.map(Array.extractValues(allPlayersStats), function(playerData)
-		local stats = playerData.stats
-		return {
-			teamIndex = playerData.teamIndex,
-			player = playerData.playerName,
-			displayName = playerData.displayName,
-			agent = playerData.agents,
-			acs = average(stats.acs),
-			kills = stats.kills,
-			deaths = stats.deaths,
-			assists = stats.assists,
-			kast = stats.totalRoundsPlayed > 0 and calculatePercentage(stats.totalKastRounds, stats.totalRoundsPlayed) or nil,
-			adr = stats.totalRoundsPlayed > 0 and stats.damageDealt / stats.totalRoundsPlayed or nil,
-			-- hs = average(stats.hs),
-			firstKills = stats.firstKills,
-			firstDeaths = stats.firstDeaths,
-		}
-	end)
-
-	local players = Array.map(Array.range(1, 2), function (teamIdx)
-		return Array.filter(ungroupedPlayers, function (player)
-			return player.teamIndex == teamIdx
-		end)
-	end)
-
-	allTeamsStats[1].players = players[1] or {}
-	allTeamsStats[2].players = players[2] or {}
-
-	local overallGameData = {
-		teams = allTeamsStats,
-		finished = true
-	}
+	local overallGameData = self.matchData.extradata.overallStats
 
 	return HtmlWidgets.Fragment{
 		children = WidgetUtil.collect(
@@ -554,7 +364,7 @@ function MatchPage:_renderTeamPerformance(game, teamIndex)
 					function (player) return player.acs or 0 end
 				)),
 				function (player)
-					return self:_renderPlayerPerformance(game, teamIndex, player)
+					return self:_renderPlayerPerformance(player)
 				end
 			)
 		)
@@ -562,11 +372,18 @@ function MatchPage:_renderTeamPerformance(game, teamIndex)
 end
 
 ---@private
----@param game MatchPageGame
----@param teamIndex integer
 ---@param player table
 ---@return Widget
-function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
+function MatchPage:_renderPlayerPerformance(player)
+	local formatNumbers = function(value, numberOfDecimals)
+		if not value then
+			return nil
+		end
+		numberOfDecimals = numberOfDecimals or 0
+		local format = '%.'.. numberOfDecimals ..'f'
+		return string.format(format, MathUtil.round(value, numberOfDecimals))
+	end
+
 	local playerDisplay
 	if type(player.agent) == 'table' then
 		playerDisplay = Div{
