@@ -88,7 +88,14 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 	end
 
-	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
+	local processedMatch = MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
+
+	if processedMatch.games then
+		processedMatch.extradata = processedMatch.extradata or {}
+		processedMatch.extradata.overallStats = MatchFunctions.calculateOverallStatsForMatch(processedMatch.games)
+	end
+
+	return processedMatch
 end
 
 --
@@ -138,7 +145,6 @@ function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
-		overallStats = MatchFunctions.calculateOverallStatsForMatch(games),
 	}
 end
 
