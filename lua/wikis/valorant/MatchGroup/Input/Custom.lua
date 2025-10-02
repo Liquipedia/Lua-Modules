@@ -91,8 +91,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local processedMatch = MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
 
 	if processedMatch.games then
-		processedMatch.extradata = processedMatch.extradata or {}
-		processedMatch.extradata.overallStats = MatchFunctions.calculateOverallStatsForMatch(processedMatch.games)
+		MatchFunctions.populateOpponentExtradata(processedMatch)
 	end
 
 	return processedMatch
@@ -158,83 +157,129 @@ function MatchFunctions.getPatch(match, games)
 	)
 end
 
----@return table[]
-function MatchFunctions.calculateOverallStatsForMatch(maps)
-	---@type table<string, {displayName: string, playerName: string, teamIndex: integer,
-	---agents: string[], stats: ValorantPlayerOverallStats}>
-	local allPlayersStats = {}
-	local allTeamsStats = {
-		{
-			firstKills = 0,
-			thrifties = 0,
-			postPlant = { 0, 0 },
-			clutches = 0,
-		},
-		{
-			firstKills = 0,
-			thrifties = 0,
-			postPlant = { 0, 0 },
-			clutches = 0,
-		}
+---@return table
+function MatchFunctions.populateOpponentExtradata(match)
+	-- Players are only defined per-map, build the opponent's player list from the maps.
+	Array.forEach(match.opponents, function(opponent, opponentIdx)
+		if not opponent.match2players or #opponent.match2players == 0 then
+			local allPlayers = {}
+			local playerNames = {}
+			Array.forEach(match.games, function(game)
+				if game.status == 'not_played' then
+					return
+				end
+
+				if game.opponents and game.opponents[opponentIdx] and game.opponents[opponentIdx].players then
+					Array.forEach(game.opponents[opponentIdx].players, function(mapPlayer)
+						if mapPlayer.player and not playerNames[mapPlayer.player] then
+							table.insert(allPlayers, {
+								player = mapPlayer.player,
+								displayName = mapPlayer.displayName,
+							})
+							playerNames[mapPlayer.player] = true
+						end
+					end)
+				end
+			end)
+			opponent.match2players = allPlayers
+		end
+		opponent.extradata = opponent.extradata or {}
+		opponent.extradata.overallStats = MatchFunctions.calculateOverallStatsForOpponent(match.games, opponentIdx)
+		Array.forEach(opponent.match2players, function(player)
+			player.extradata = player.extradata or {}
+			player.extradata.overallStats = MatchFunctions.calculateOverallStatsForPlayer(
+				match.games, player, opponentIdx
+			)
+		end)
+	end)
+	return match
+end
+
+---@return table
+function MatchFunctions.calculateOverallStatsForOpponent(maps, opponentIndex)
+	local allTeamStats = {
+		firstKills = 0,
+		thrifties = 0,
+		postPlant = { 0, 0 },
+		clutches = 0,
 	}
+
+	Array.forEach(maps, function(map)
+		if map.status == 'not_played' or not map.extradata or not map.extradata.teams then
+			return
+		end
+		local teamData = map.extradata.teams[opponentIndex]
+		if not teamData then return end
+
+		allTeamStats.firstKills = allTeamStats.firstKills + (teamData.firstKills or 0)
+		allTeamStats.thrifties = allTeamStats.thrifties + (teamData.thrifties or 0)
+		if teamData.postPlant then
+			allTeamStats.postPlant[1] = allTeamStats.postPlant[1] + (teamData.postPlant[1] or 0)
+			allTeamStats.postPlant[2] = allTeamStats.postPlant[2] + (teamData.postPlant[2] or 0)
+		end
+		allTeamStats.clutches = allTeamStats.clutches + (teamData.clutches or 0)
+	end)
+
+	return allTeamStats
+end
+
+---@return table
+function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
+	local playerId = player.player
+	if not playerId then return {} end
+
+	local overallStats = {
+		acs = {},
+		kast = {},
+		adr = {},
+		kills = 0,
+		deaths = 0,
+		assists = 0,
+		firstKills = 0,
+		firstDeaths = 0,
+		totalRoundsPlayed = 0,
+		totalKastRounds = 0,
+		damageDealt = 0,
+	}
+	local agents = {}
 
 	Array.forEach(maps, function(map)
 		if map.status == 'not_played' then
 			return
 		end
 
-		local teams = map.extradata.teams or {}
-		Array.forEach(teams, function(team, teamIdx)
-			allTeamsStats[teamIdx].firstKills = allTeamsStats[teamIdx].firstKills + (team.firstKills or 0)
-			allTeamsStats[teamIdx].thrifties = allTeamsStats[teamIdx].thrifties + (team.thrifties or 0)
-			allTeamsStats[teamIdx].postPlant[1] = allTeamsStats[teamIdx].postPlant[1] + (team.postPlant[1] or 0)
-			allTeamsStats[teamIdx].postPlant[2] = allTeamsStats[teamIdx].postPlant[2] + (team.postPlant[2] or 0)
-			allTeamsStats[teamIdx].clutches = allTeamsStats[teamIdx].clutches + (team.clutches or 0)
-			Array.forEach(team.players or {}, function(player)
-				local playerId = player.player
-				if not playerId then return end
+		local mapOpponent = map.opponents[teamIdx]
+		if not mapOpponent or not mapOpponent.players then return end
 
-				if not allPlayersStats[playerId] then
-					allPlayersStats[playerId] = {
-						displayName = player.displayName or player.player,
-						playerName = player.player,
-						teamIndex = teamIdx,
-						agents = {},
-						stats = {
-							acs = {},
-							kast = {},
-							adr = {},
-							kills = 0,
-							deaths = 0,
-							assists = 0,
-							firstKills = 0,
-							firstDeaths = 0,
-							totalRoundsPlayed = 0,
-							totalKastRounds = 0,
-							damageDealt = 0,
-						}
-					}
-				end
+		local mapPlayerIndex
 
-				local data = allPlayersStats[playerId]
-				if player.agent then
-					table.insert(data.agents, player.agent)
-				end
-
-				local stats = data.stats
-				if player.acs then table.insert(stats.acs, player.acs) end
-				if player.kast then table.insert(stats.kast, player.kast) end
-				if player.adr then table.insert(stats.adr, player.adr) end
-				stats.kills = stats.kills + (player.kills or 0)
-				stats.deaths = stats.deaths + (player.deaths or 0)
-				stats.assists = stats.assists + (player.assists or 0)
-				stats.firstKills = stats.firstKills + (player.firstKills or 0)
-				stats.firstDeaths = stats.firstDeaths + (player.firstDeaths or 0)
-				stats.totalRoundsPlayed = stats.totalRoundsPlayed + (player.totalRounds or 0)
-				stats.totalKastRounds = stats.totalKastRounds + (player.kastRounds or 0)
-				stats.damageDealt = stats.damageDealt + (player.damageDealt or 0)
-			end)
+		local mapPlayer = Array.find(mapOpponent.players, function(playerData, playerIdx)
+			mapPlayerIndex = playerIdx
+			return playerData.player == playerId
 		end)
+
+		if not mapPlayer then return end
+
+		if mapPlayer.agent then
+			table.insert(agents, mapPlayer.agent)
+		end
+		if mapPlayer.acs then table.insert(overallStats.acs, mapPlayer.acs) end
+		if mapPlayer.kast then table.insert(overallStats.kast, mapPlayer.kast) end
+		if mapPlayer.adr then table.insert(overallStats.adr, mapPlayer.adr) end
+		overallStats.kills = overallStats.kills + (mapPlayer.kills or 0)
+		overallStats.deaths = overallStats.deaths + (mapPlayer.deaths or 0)
+		overallStats.assists = overallStats.assists + (mapPlayer.assists or 0)
+		overallStats.totalRoundsPlayed = overallStats.totalRoundsPlayed + (mapPlayer.totalRounds or 0)
+		overallStats.totalKastRounds = overallStats.totalKastRounds + (mapPlayer.kastRounds or 0)
+		overallStats.damageDealt = overallStats.damageDealt + (mapPlayer.damageDealt or 0)
+
+		local extraDataPlayer = Array.find(map.extradata.teams[teamIdx].players, function(p) return p.player == playerId end)
+		if not extraDataPlayer then
+			extraDataPlayer = map.extradata.teams[teamIdx].players[mapPlayerIndex]
+		end
+
+		overallStats.firstKills = overallStats.firstKills + (extraDataPlayer.firstKills or 0)
+		overallStats.firstDeaths = overallStats.firstDeaths + (extraDataPlayer.firstDeaths or 0)
 	end)
 
 	local function average(statTable)
@@ -250,36 +295,19 @@ function MatchFunctions.calculateOverallStatsForMatch(maps)
 		return value / total * 100
 	end
 
-	local ungroupedPlayers = Array.map(Array.extractValues(allPlayersStats), function(playerData)
-		local stats = playerData.stats
-		return {
-			teamIndex = playerData.teamIndex,
-			player = playerData.playerName,
-			displayName = playerData.displayName,
-			agent = playerData.agents,
-			acs = average(stats.acs),
-			kills = stats.kills,
-			deaths = stats.deaths,
-			assists = stats.assists,
-			kast = stats.totalRoundsPlayed > 0 and calculatePercentage(stats.totalKastRounds, stats.totalRoundsPlayed) or nil,
-			adr = stats.totalRoundsPlayed > 0 and stats.damageDealt / stats.totalRoundsPlayed or nil,
-			firstKills = stats.firstKills,
-			firstDeaths = stats.firstDeaths,
-		}
-	end)
-
-	local players = Array.map(Array.range(1, 2), function (teamIdx)
-		return Array.filter(ungroupedPlayers, function (player)
-			return player.teamIndex == teamIdx
-		end)
-	end)
-
-	allTeamsStats[1].players = players[1] or {}
-	allTeamsStats[2].players = players[2] or {}
-
 	return {
-		teams = allTeamsStats,
-		finished = true
+		teamIndex = teamIdx,
+		player = player.player,
+		displayName = player.displayName,
+		agent = agents,
+		acs = average(overallStats.acs),
+		kills = overallStats.kills,
+		deaths = overallStats.deaths,
+		assists = overallStats.assists,
+		kast = calculatePercentage(overallStats.totalKastRounds, overallStats.totalRoundsPlayed) or nil,
+		adr = overallStats.damageDealt / overallStats.totalRoundsPlayed or nil,
+		firstKills = overallStats.firstKills,
+		firstDeaths = overallStats.firstDeaths,
 	}
 end
 
@@ -409,7 +437,11 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 			local allRoundsData = map.round_results or {}
 			local totalRoundsOnMap = #allRoundsData
 
-			local kastRoundsOnMap = (participant.kast / 100) * totalRoundsOnMap
+			local kastValue = participant.kast
+			if kastValue > 1 then
+				kastValue = kastValue / 100
+			end
+			local kastRoundsOnMap = kastValue * totalRoundsOnMap
 			local damageDealt = participant.adr * totalRoundsOnMap
 
 			return {
