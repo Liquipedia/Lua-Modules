@@ -140,7 +140,7 @@ return {
 			},
 		},
 		{
-			file = 'T1 Worlds23 Skins Splash Art.jpg',
+			file = 'T1 Worlds24 Skins Splash Art.jpg',
 			title = 'Champions',
 			link = 'Champions',
 			count = {
@@ -150,7 +150,7 @@ return {
 			},
 		},
 		{
-			file = 'LoL Patch 14.24 Art.jpg',
+			file = 'LoL Patch 25.19 Art.jpg',
 			title = 'Patches',
 			link = 'Patches',
 			count = {
