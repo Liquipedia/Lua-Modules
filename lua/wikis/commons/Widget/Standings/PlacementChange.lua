@@ -14,7 +14,6 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class PlacementChangeWidget: Widget
 ---@operator call(table): PlacementChangeWidget
-
 local PlacementChangeWidget = Class.new(Widget)
 PlacementChangeWidget.defaultProps = {
 	change = 0,

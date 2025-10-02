@@ -17,7 +17,6 @@ local Standings = Lua.import('Module:Standings')
 
 ---@class StandingsWidget: Widget
 ---@operator call(table): StandingsWidget
-
 local StandingsWidget = Class.new(Widget)
 StandingsWidget.defaultProps = {
 }

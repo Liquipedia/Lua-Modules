@@ -22,7 +22,6 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 ---@class StandingsSwissWidget: Widget
 ---@operator call(table): StandingsSwissWidget
-
 local StandingsSwissWidget = Class.new(Widget)
 
 ---@return Widget?
