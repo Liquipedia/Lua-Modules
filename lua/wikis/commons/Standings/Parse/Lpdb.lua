@@ -132,14 +132,14 @@ function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMappe
 		assert(standingsOpponentData.rounds[roundNumber], 'Round number out of bounds')
 
 		local opponentRoundData = standingsOpponentData.rounds[roundNumber]
+		opponentRoundData.specialstatus = ''
+		opponentRoundData.match = match2
+		if (not match2.finished) and (#match2.opponents <= 2) then
+			return
+		end
 		local points = scoreMapper(opponent)
 		if points then
 			opponentRoundData.scoreboard.points = (opponentRoundData.scoreboard.points or 0) + points
-		end
-		opponentRoundData.specialstatus = ''
-		opponentRoundData.match = match2
-		if not match2.finished then
-			return
 		end
 		local matchResult = match2.winner == 0 and 'd' or opponent.placement == 1 and 'w' or 'l'
 		opponentRoundData.scoreboard.match[matchResult] = (opponentRoundData.scoreboard.match[matchResult] or 0) + 1
