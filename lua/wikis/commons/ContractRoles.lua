@@ -7,7 +7,7 @@
 
 ---@type table<string, PersonRoleData>
 local contractRoles = {
-	['loan'] = {category = 'Players On Loan', display = 'On loan', abbreviation = 'L.'},
+	['loan'] = {category = 'Players On Loan', display = 'On loan'},
 	['standard'] = {category = 'Standard Contracts', display = 'Standard'},
 	['standin'] = {category = 'Stand-in Players', display = 'Stand-in'},
 	['twoway'] = {category = 'Two-way Contracts', display = 'Two-way'},
