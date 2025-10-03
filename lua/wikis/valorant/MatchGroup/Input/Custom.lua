@@ -54,17 +54,17 @@ local VALORANT_REGIONS = {'eu', 'na', 'ap', 'kr', 'latam', 'br', 'pbe1', 'esport
 ---@field getPatch fun(map: table): string?
 
 ---@class ValorantPlayerOverallStats
----@field acs number[]
----@field kast number[]
----@field adr number[]
----@field kills number
----@field deaths number
----@field assists number
----@field firstKills number
----@field firstDeaths number
----@field totalRoundsPlayed number
----@field totalKastRounds number
----@field damageDealt number
+---@field acs integer[]
+---@field kast integer[]
+---@field adr integer[]
+---@field kills integer
+---@field deaths integer
+---@field assists integer
+---@field firstKills integer
+---@field firstDeaths integer
+---@field totalRoundsPlayed integer
+---@field totalKastRounds integer
+---@field damageDealt integer
 
 ---@param match table
 ---@param options table?
@@ -174,41 +174,46 @@ function MatchFunctions.populateOpponentStats(match)
 end
 
 ---@param maps table[]
----@param opponentIndex number
+---@param opponentIndex integer
 ---@return table
 function MatchFunctions.calculateOverallStatsForOpponent(maps, opponentIndex)
-	return Array.reduce(
+	local teamDataPerMap = Array.map(
 		Array.filter(maps, function(map)
 			return map.status ~= MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
 				and map.extradata
 				and map.extradata.teams
 				and map.extradata.teams[opponentIndex]
 		end),
-		function(stats, map)
-			local teamData = map.extradata.teams[opponentIndex]
-
-			stats.firstKills = stats.firstKills + (teamData.firstKills or 0)
-			stats.thrifties = stats.thrifties + (teamData.thrifties or 0)
-			if teamData.postPlant then
-				stats.postPlant[1] = stats.postPlant[1] + (teamData.postPlant[1] or 0)
-				stats.postPlant[2] = stats.postPlant[2] + (teamData.postPlant[2] or 0)
-			end
-			stats.clutches = stats.clutches + (teamData.clutches or 0)
-
-			return stats
-		end,
-		{
-			firstKills = 0,
-			thrifties = 0,
-			postPlant = { 0, 0 },
-			clutches = 0,
-		}
+		function(map)
+			return map.extradata.teams[opponentIndex]
+		end
 	)
+
+	local function getSumOf(key)
+		return Array.reduce(Array.map(teamDataPerMap, function (teamData)
+			return teamData[key] or 0
+		end), Operator.add, 0)
+	end
+
+	local postPlant = Array.reduce(teamDataPerMap, function (postPlantTotals, teamData)
+		if teamData.postPlant then
+			postPlantTotals[1] = postPlantTotals[1] + (teamData.postPlant[1] or 0)
+			postPlantTotals[2] = postPlantTotals[2] + (teamData.postPlant[2] or 0)
+		end
+		return postPlantTotals
+	end, {0, 0})
+
+	return {
+		firstKills = getSumOf('firstKills'),
+		thrifties = getSumOf('thrifties'),
+		clutches = getSumOf('clutches'),
+		postPlant = postPlant,
+	}
 end
 
 ---@param maps table[]
 ---@param player table
----@param teamIdx number
+---@param teamIdx integer
 ---@return table
 function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 	local playerId = player.player
@@ -239,12 +244,10 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 			return
 		end
 
-		local mapPlayerIndex
-
-		local mapPlayer = Array.find(mapOpponent.players, function(playerData, playerIdx)
-			mapPlayerIndex = playerIdx
+		local mapPlayerIndex = Array.indexOf(mapOpponent.players, function(playerData)
 			return playerData.player == playerId
 		end)
+		local mapPlayer = mapOpponent.players[mapPlayerIndex]
 
 		if not mapPlayer then
 			return
@@ -296,8 +299,8 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 		kills = overallStats.kills,
 		deaths = overallStats.deaths,
 		assists = overallStats.assists,
-		kast = calculatePercentage(overallStats.totalKastRounds, overallStats.totalRoundsPlayed) or nil,
-		adr = overallStats.damageDealt / overallStats.totalRoundsPlayed or nil,
+		kast = overallStats.totalRoundsPlayed > 0 and calculatePercentage(overallStats.totalKastRounds, overallStats.totalRoundsPlayed),
+		adr = overallStats.totalRoundsPlayed > 0 and overallStats.damageDealt / overallStats.totalRoundsPlayed,
 		firstKills = overallStats.firstKills,
 		firstDeaths = overallStats.firstDeaths,
 	}
@@ -349,6 +352,7 @@ function MapFunctions.getExtraData(MapParser, match, map, opponents)
 	local rounds = extraData.rounds or {}
 	extraData.teams = Array.map(Array.range(1, 2), function(teamIdx)
 		local team = {}
+		local teamSideKey = 't' .. teamIdx .. 'side'
 
 		local originalPlayers = Array.filter(map.opponents[teamIdx].players or {}, Table.isNotEmpty)
 		team.players = Array.map(originalPlayers, function(player)
@@ -356,7 +360,7 @@ function MapFunctions.getExtraData(MapParser, match, map, opponents)
 		end)
 
 		team.thrifties = #Array.filter(rounds, function (round)
-			return round['t' .. teamIdx .. 'side'] == round.winningSide and round.ceremony == 'Thrifty'
+			return round[teamSideKey] == round.winningSide and round.ceremony == 'Thrifty'
 		end)
 
 		team.firstKills = #Array.filter(rounds, function (round)
@@ -373,11 +377,11 @@ function MapFunctions.getExtraData(MapParser, match, map, opponents)
 		end)
 
 		team.clutches = #Array.filter(rounds, function (round)
-			return round['t' .. teamIdx .. 'side'] == round.winningSide and round.ceremony == 'Clutch'
+			return round[teamSideKey] == round.winningSide and round.ceremony == 'Clutch'
 		end)
 
 		local plantedRounds = Array.filter(rounds, function (round)
-			return round['t' .. teamIdx .. 'side'] == 'atk' and round.planted
+			return round[teamSideKey] == 'atk' and round.planted
 		end)
 
 		team.postPlant = {
@@ -428,12 +432,7 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 
 			local allRoundsData = map.round_results or {}
 			local totalRoundsOnMap = #allRoundsData
-
-			local kastValue = participant.kast
-			if kastValue > 1 then
-				kastValue = kastValue / 100
-			end
-			local kastRoundsOnMap = kastValue * totalRoundsOnMap
+			local kastRoundsOnMap = (participant.kast / 100) * totalRoundsOnMap
 			local damageDealt = participant.adr * totalRoundsOnMap
 
 			return {
