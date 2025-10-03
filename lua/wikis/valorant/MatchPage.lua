@@ -82,9 +82,16 @@ function MatchPage:renderOverallStats()
 			local opponent = self.opponents[teamIdx]
 			if opponent and opponent.players then
 				team.players = Array.map(opponent.players, function(player)
-					if player.extradata and player.extradata.overallStats then
-						return player.extradata.overallStats
+					if not player.extradata or not player.extradata.overallStats then
+						return
 					end
+					local overallStats = player.extradata.overallStats
+
+					if not overallStats.roundsPlayed or overallStats.roundsPlayed == 0 then
+						return
+					end
+
+					return player.extradata.overallStats
 				end)
 			end
 			return team

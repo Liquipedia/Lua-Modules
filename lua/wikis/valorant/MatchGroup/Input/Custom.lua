@@ -304,6 +304,7 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 		adr = adr,
 		firstKills = overallStats.firstKills,
 		firstDeaths = overallStats.firstDeaths,
+		roundsPlayed = overallStats.roundsPlayed,
 	}
 end
 
