@@ -220,9 +220,7 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 	if not playerId then return {} end
 
 	local overallStats = {
-		acs = {},
-		kast = {},
-		adr = {},
+		acs = 0,
 		kills = 0,
 		deaths = 0,
 		assists = 0,
@@ -256,7 +254,7 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 		if mapPlayer.agent then
 			table.insert(agents, mapPlayer.agent)
 		end
-		if mapPlayer.acs then table.insert(overallStats.acs, mapPlayer.acs) end
+		overallStats.acs = overallStats.acs + (mapPlayer.acs or 0)
 		overallStats.kills = overallStats.kills + (mapPlayer.kills or 0)
 		overallStats.deaths = overallStats.deaths + (mapPlayer.deaths or 0)
 		overallStats.assists = overallStats.assists + (mapPlayer.assists or 0)
