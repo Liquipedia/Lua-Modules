@@ -17,7 +17,6 @@ local Div = HtmlWidgets.Div
 local FilterButtons = Lua.import('Module:Widget/FilterButtons')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
-local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 local CONTENT = {
 	theGame = {
@@ -25,12 +24,6 @@ local CONTENT = {
 		body = '{{Liquipedia:The Game}}',
 		padding = true,
 		boxid = 1503,
-	},
-	wantToHelp = {
-		heading = 'Want To Help?',
-		body = WantToHelp{},
-		padding = true,
-		boxid = 1504,
 	},
 	transfers = {
 		heading = 'Transfers',
@@ -155,10 +148,6 @@ return {
 					{
 						mobileOrder = 4,
 						content = CONTENT.transfers,
-					},
-					{
-						mobileOrder = 8,
-						content = CONTENT.wantToHelp,
 					},
 				}
 			},
