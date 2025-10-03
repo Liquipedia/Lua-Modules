@@ -254,7 +254,7 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 		if mapPlayer.agent then
 			table.insert(agents, mapPlayer.agent)
 		end
-		overallStats.acs = overallStats.acs + (mapPlayer.acs or 0)
+		overallStats.acs = overallStats.acs + ((mapPlayer.acs or 0) * (mapPlayer.roundsPlayed or 0))
 		overallStats.kills = overallStats.kills + (mapPlayer.kills or 0)
 		overallStats.deaths = overallStats.deaths + (mapPlayer.deaths or 0)
 		overallStats.assists = overallStats.assists + (mapPlayer.assists or 0)
