@@ -298,7 +298,7 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 
 	return {
 		teamIndex = teamIdx,
-		player = player.player,
+		player = player.name,
 		displayName = player.displayName,
 		agent = agents,
 		acs = average(overallStats.acs),
