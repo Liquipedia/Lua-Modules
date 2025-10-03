@@ -91,7 +91,8 @@ function MatchPage:renderOverallStats()
 						return
 					end
 
-					return player.extradata.overallStats
+					overallStats.displayName = overallStats.displayName or player.displayName
+					return overallStats
 				end)
 			end
 			return team
