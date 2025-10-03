@@ -290,6 +290,12 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 		return value / total * 100
 	end
 
+	local kast, adr
+	if overallStats.totalRoundsPlayed > 0 then
+		kast = calculatePercentage(overallStats.totalKastRounds, overallStats.totalRoundsPlayed)
+		adr = overallStats.damageDealt / overallStats.totalRoundsPlayed
+	end
+
 	return {
 		teamIndex = teamIdx,
 		player = player.player,
@@ -299,8 +305,8 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 		kills = overallStats.kills,
 		deaths = overallStats.deaths,
 		assists = overallStats.assists,
-		kast = overallStats.totalRoundsPlayed > 0 and calculatePercentage(overallStats.totalKastRounds, overallStats.totalRoundsPlayed),
-		adr = overallStats.totalRoundsPlayed > 0 and overallStats.damageDealt / overallStats.totalRoundsPlayed,
+		kast = kast,
+		adr = adr,
 		firstKills = overallStats.firstKills,
 		firstDeaths = overallStats.firstDeaths,
 	}
