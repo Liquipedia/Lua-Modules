@@ -13,6 +13,7 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Match = Lua.import('Module:Match')
 local MatchGroup = Lua.import('Module:MatchGroup')
+local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
@@ -23,8 +24,12 @@ local NUMBER_OF_OPPONENTS = 2
 
 local LegacyMatchList = {}
 
+function LegacyMatchList.generate(frame)
+	return LegacyMatchList.run(frame, true)
+end
+
 -- invoked by Template:LegacyMatchList
-function LegacyMatchList.run(frame)
+function LegacyMatchList.run(frame, generate)
 	local args = Arguments.getArgs(frame)
 	local store = Logic.nilOr(
 		Logic.readBoolOrNil(args.store),
@@ -52,6 +57,10 @@ function LegacyMatchList.run(frame)
 	else
 		matchListArgs.noDuplicateCheck = true
 		matchListArgs.store = false
+	end
+
+	if generate then
+		return MatchGroupLegacy.generateWikiCodeForMatchList(args)
 	end
 
 	return MatchGroup.MatchList(matchListArgs)
