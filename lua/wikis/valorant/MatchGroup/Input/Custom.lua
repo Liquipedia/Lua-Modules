@@ -216,7 +216,7 @@ end
 ---@param teamIdx integer
 ---@return table
 function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
-	local playerId = player.player
+	local playerId = player.name
 	if not playerId then return {} end
 
 	local overallStats = {
