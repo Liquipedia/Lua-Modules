@@ -19,12 +19,14 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 ---@class ValorantMatchPage: BaseMatchPage
 ---@operator call(MatchPageMatch): ValorantMatchPage
@@ -57,48 +59,51 @@ end
 function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
-		game.teams = Array.map(Array.range(1, 2), function(teamIdx)
-			local rounds = game.extradata.rounds or {} --[[ @as ValorantRoundData[] ]]
-			local team = {}
+		game.teams = game.extradata.teams
+	end)
+end
 
-			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
-			team.players = Array.filter(game.opponents[teamIdx].players or {}, Table.isNotEmpty)
+---@return Widget?
+function MatchPage:renderOverallStats()
+	if self:isBestOfOne() then
+		return
+	end
 
-			team.thrifties = #Array.filter(rounds, function (round)
-				return round['t' .. teamIdx .. 'side'] == round.winningSide and round.ceremony == 'Thrifty'
-			end)
+	local overallTeamStats = {
+		finished = true,
+		teams = Array.map(self.opponents, function(opponent)
+			return (opponent.extradata and opponent.extradata.overallStats) or {}
+		end)
+	}
 
-			team.firstKills = #Array.filter(rounds, function (round)
-				return round.firstKill.byTeam == teamIdx
-			end)
+	local overallPlayerStats = {
+		teams = Array.map(Array.range(1, 2), function(teamIdx)
+			local team = { players = {} }
+			local opponent = self.opponents[teamIdx]
+			if opponent and opponent.players then
+				team.players = Array.map(opponent.players, function(player)
+					if not player.extradata or not player.extradata.overallStats then
+						return
+					end
+					local overallStats = player.extradata.overallStats
 
-			Array.forEach(team.players, function (player)
-				player.firstKills = #Array.filter(rounds, function (round)
-					return round.firstKill.killer == player.puuid
+					if not overallStats.roundsPlayed or overallStats.roundsPlayed == 0 then
+						return
+					end
+
+					return player.extradata.overallStats
 				end)
-				player.firstDeaths = #Array.filter(rounds, function (round)
-					return round.firstKill.victim == player.puuid
-				end)
-			end)
-
-			team.clutches = #Array.filter(rounds, function (round)
-				return round['t' .. teamIdx .. 'side'] == round.winningSide and round.ceremony == 'Clutch'
-			end)
-
-			local plantedRounds = Array.filter(rounds, function (round)
-				return round['t' .. teamIdx .. 'side'] == 'atk' and round.planted
-			end)
-
-			team.postPlant = {
-				#Array.filter(plantedRounds, function (round)
-					return round.winningSide == 'atk'
-				end),
-				#plantedRounds
-			}
-
+			end
 			return team
 		end)
-	end)
+	}
+
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(
+			self:_renderTeamStats(overallTeamStats),
+			self:_renderPerformance(overallPlayerStats)
+		)
+	}
 end
 
 ---@param game MatchPageGame
@@ -361,8 +366,8 @@ function MatchPage:_renderPerformance(game)
 		Div{
 			classes = {'match-bm-players-wrapper'},
 			children = {
-				self:_renderPerformanceForTeam(game, 1),
-				self:_renderPerformanceForTeam(game, 2)
+				self:_renderTeamPerformance(game, 1),
+				self:_renderTeamPerformance(game, 2)
 			}
 		}
 	}
@@ -372,7 +377,7 @@ end
 ---@param game MatchPageGame
 ---@param teamIndex integer
 ---@return Widget
-function MatchPage:_renderPerformanceForTeam(game, teamIndex)
+function MatchPage:_renderTeamPerformance(game, teamIndex)
 	return Div{
 		classes = {'match-bm-players-team'},
 		children = WidgetUtil.collect(
@@ -386,7 +391,7 @@ function MatchPage:_renderPerformanceForTeam(game, teamIndex)
 					function (player) return player.acs or 0 end
 				)),
 				function (player)
-					return self:_renderPlayerPerformance(game, teamIndex, player)
+					return self:_renderPlayerPerformance(player)
 				end
 			)
 		)
@@ -394,11 +399,9 @@ function MatchPage:_renderPerformanceForTeam(game, teamIndex)
 end
 
 ---@private
----@param game MatchPageGame
----@param teamIndex integer
 ---@param player table
 ---@return Widget
-function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
+function MatchPage:_renderPlayerPerformance(player)
 	local formatNumbers = function(value, numberOfDecimals)
 		if not value then
 			return nil
@@ -408,45 +411,66 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 		return string.format(format, MathUtil.round(value, numberOfDecimals))
 	end
 
+	local playerDisplay
+	if type(player.agent) == 'table' then
+		playerDisplay = Div{
+			classes = {'match-bm-players-player-name'},
+			children = {
+				Link{link = player.player, children = player.displayName},
+				MatchSummaryWidgets.Characters{characters = player.agent, date = self.matchData.date},
+			}
+		}
+	else
+		playerDisplay = PlayerDisplay{
+			characterIcon = self:getCharacterIcon(player.agent),
+			characterName = player.agent,
+			playerName = player.displayName or player.player,
+			playerLink = player.player,
+		}
+	end
+
+	local playerStats = {
+		PlayerStat{
+			title = {IconFa{iconName = 'acs'}, 'ACS'},
+			data = player.acs and formatNumbers(player.acs) or nil,
+		},
+		PlayerStat{
+			title = {IconFa{iconName = 'kda'}, 'KDA'},
+			data = Array.interleave({
+				player.kills, player.deaths, player.assists
+			}, SPAN_SLASH)
+		},
+		PlayerStat{
+			title = {IconFa{iconName = 'kast'}, 'KAST'},
+			data = player.kast and (formatNumbers(player.kast, 1) .. '%') or nil
+		},
+		PlayerStat{
+			title = {IconFa{iconName = 'damage'}, 'ADR'},
+			data = player.adr and formatNumbers(player.adr) or nil
+		},
+	}
+
+	if player.hs then
+		table.insert(playerStats, PlayerStat{
+			title = {IconFa{iconName = 'headshot'}, 'HS%'},
+			data = (formatNumbers(player.hs, 1) .. '%')
+		})
+	end
+
+	table.insert(playerStats, PlayerStat{
+		title = {IconFa{iconName = 'firstkill'}, 'FK / FD'},
+		data = {player.firstKills, SPAN_SLASH, player.firstDeaths}
+	})
+
+	local numCols = #playerStats
+
 	return Div{
 		classes = {'match-bm-players-player match-bm-players-player--col-2'},
 		children = {
-			PlayerDisplay{
-				characterIcon = self:getCharacterIcon(player.agent),
-				characterName = player.agent,
-				playerName = player.displayName or player.player,
-				playerLink = player.player,
-			},
+			playerDisplay,
 			Div{
-				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-6'},
-				children = {
-					PlayerStat{
-						title = {IconFa{iconName = 'acs'}, 'ACS'},
-						data = player.acs and formatNumbers(player.acs) or nil,
-					},
-					PlayerStat{
-						title = {IconFa{iconName = 'kda'}, 'KDA'},
-						data = Array.interleave({
-							player.kills, player.deaths, player.assists
-						}, SPAN_SLASH)
-					},
-					PlayerStat{
-						title = {IconFa{iconName = 'kast'}, 'KAST'},
-						data = player.kast and (formatNumbers(player.kast, 1) .. '%') or nil
-					},
-					PlayerStat{
-						title = {IconFa{iconName = 'damage'}, 'ADR'},
-						data = player.adr and formatNumbers(player.adr) or nil
-					},
-					PlayerStat{
-						title = {IconFa{iconName = 'headshot'}, 'HS%'},
-						data = player.hs and (formatNumbers(player.hs, 1) .. '%') or nil
-					},
-					PlayerStat{
-						title = {IconFa{iconName = 'firstkill'}, 'FK / FD'},
-						data = {player.firstKills, SPAN_SLASH, player.firstDeaths}
-					}
-				}
+				classes = {'match-bm-players-player-stats', 'match-bm-players-player-stats--col-' .. numCols},
+				children = playerStats
 			}
 		}
 	}
