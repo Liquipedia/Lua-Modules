@@ -257,8 +257,6 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 			table.insert(agents, mapPlayer.agent)
 		end
 		if mapPlayer.acs then table.insert(overallStats.acs, mapPlayer.acs) end
-		if mapPlayer.kast then table.insert(overallStats.kast, mapPlayer.kast) end
-		if mapPlayer.adr then table.insert(overallStats.adr, mapPlayer.adr) end
 		overallStats.kills = overallStats.kills + (mapPlayer.kills or 0)
 		overallStats.deaths = overallStats.deaths + (mapPlayer.deaths or 0)
 		overallStats.assists = overallStats.assists + (mapPlayer.assists or 0)
@@ -288,7 +286,9 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 	if overallStats.roundsPlayed > 0 then
 		kast = calculatePercentage(overallStats.roundsWithKast, overallStats.roundsPlayed)
 		adr = overallStats.damageDealt / overallStats.roundsPlayed
-		acs = overallStats.acs / overallStats.roundsPlayed
+		if overallStats.acs then
+			acs = overallStats.acs / overallStats.roundsPlayed
+		end
 	end
 
 	return {
