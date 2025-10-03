@@ -23,7 +23,6 @@ local Widget = Lua.import('Module:Widget')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Abbr = HtmlWidgets.Abbr
 local Fragment = HtmlWidgets.Fragment
 local Span = HtmlWidgets.Span
 local Tbl = HtmlWidgets.Table
