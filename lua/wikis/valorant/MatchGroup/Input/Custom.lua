@@ -91,7 +91,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local processedMatch = MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
 
 	if processedMatch.games then
-		MatchFunctions.populateOpponentExtradata(processedMatch)
+		MatchFunctions.populateOpponentStats(processedMatch)
 	end
 
 	return processedMatch
@@ -157,32 +157,10 @@ function MatchFunctions.getPatch(match, games)
 	)
 end
 
+---@param match table
 ---@return table
-function MatchFunctions.populateOpponentExtradata(match)
-	-- Players are only defined per-map, build the opponent's player list from the maps.
+function MatchFunctions.populateOpponentStats(match)
 	Array.forEach(match.opponents, function(opponent, opponentIdx)
-		if not opponent.match2players or #opponent.match2players == 0 then
-			local allPlayers = {}
-			local playerNames = {}
-			Array.forEach(match.games, function(game)
-				if game.status == 'not_played' then
-					return
-				end
-
-				if game.opponents and game.opponents[opponentIdx] and game.opponents[opponentIdx].players then
-					Array.forEach(game.opponents[opponentIdx].players, function(mapPlayer)
-						if mapPlayer.player and not playerNames[mapPlayer.player] then
-							table.insert(allPlayers, {
-								player = mapPlayer.player,
-								displayName = mapPlayer.displayName,
-							})
-							playerNames[mapPlayer.player] = true
-						end
-					end)
-				end
-			end)
-			opponent.match2players = allPlayers
-		end
 		opponent.extradata = opponent.extradata or {}
 		opponent.extradata.overallStats = MatchFunctions.calculateOverallStatsForOpponent(match.games, opponentIdx)
 		Array.forEach(opponent.match2players, function(player)
@@ -195,34 +173,42 @@ function MatchFunctions.populateOpponentExtradata(match)
 	return match
 end
 
+---@param maps table[]
+---@param opponentIndex number
 ---@return table
 function MatchFunctions.calculateOverallStatsForOpponent(maps, opponentIndex)
-	local allTeamStats = {
-		firstKills = 0,
-		thrifties = 0,
-		postPlant = { 0, 0 },
-		clutches = 0,
-	}
+	return Array.reduce(
+		Array.filter(maps, function(map)
+			return map.status ~= MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
+				and map.extradata
+				and map.extradata.teams
+				and map.extradata.teams[opponentIndex]
+		end),
+		function(stats, map)
+			local teamData = map.extradata.teams[opponentIndex]
 
-	Array.forEach(maps, function(map)
-		if map.status == 'not_played' or not map.extradata or not map.extradata.teams then
-			return
-		end
-		local teamData = map.extradata.teams[opponentIndex]
-		if not teamData then return end
+			stats.firstKills = stats.firstKills + (teamData.firstKills or 0)
+			stats.thrifties = stats.thrifties + (teamData.thrifties or 0)
+			if teamData.postPlant then
+				stats.postPlant[1] = stats.postPlant[1] + (teamData.postPlant[1] or 0)
+				stats.postPlant[2] = stats.postPlant[2] + (teamData.postPlant[2] or 0)
+			end
+			stats.clutches = stats.clutches + (teamData.clutches or 0)
 
-		allTeamStats.firstKills = allTeamStats.firstKills + (teamData.firstKills or 0)
-		allTeamStats.thrifties = allTeamStats.thrifties + (teamData.thrifties or 0)
-		if teamData.postPlant then
-			allTeamStats.postPlant[1] = allTeamStats.postPlant[1] + (teamData.postPlant[1] or 0)
-			allTeamStats.postPlant[2] = allTeamStats.postPlant[2] + (teamData.postPlant[2] or 0)
-		end
-		allTeamStats.clutches = allTeamStats.clutches + (teamData.clutches or 0)
-	end)
-
-	return allTeamStats
+			return stats
+		end,
+		{
+			firstKills = 0,
+			thrifties = 0,
+			postPlant = { 0, 0 },
+			clutches = 0,
+		}
+	)
 end
 
+---@param maps table[]
+---@param player table
+---@param teamIdx number
 ---@return table
 function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 	local playerId = player.player
@@ -244,12 +230,14 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 	local agents = {}
 
 	Array.forEach(maps, function(map)
-		if map.status == 'not_played' then
+		if map.status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
 			return
 		end
 
 		local mapOpponent = map.opponents[teamIdx]
-		if not mapOpponent or not mapOpponent.players then return end
+		if not mapOpponent or not mapOpponent.players then
+			return
+		end
 
 		local mapPlayerIndex
 
@@ -258,7 +246,9 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 			return playerData.player == playerId
 		end)
 
-		if not mapPlayer then return end
+		if not mapPlayer then
+			return
+		end
 
 		if mapPlayer.agent then
 			table.insert(agents, mapPlayer.agent)
@@ -273,7 +263,9 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 		overallStats.totalKastRounds = overallStats.totalKastRounds + (mapPlayer.kastRounds or 0)
 		overallStats.damageDealt = overallStats.damageDealt + (mapPlayer.damageDealt or 0)
 
-		local extraDataPlayer = Array.find(map.extradata.teams[teamIdx].players, function(p) return p.player == playerId end)
+		local extraDataPlayer = Array.find(map.extradata.teams[teamIdx].players, function(playerData)
+			return playerData.player == playerId
+		end)
 		if not extraDataPlayer then
 			extraDataPlayer = map.extradata.teams[teamIdx].players[mapPlayerIndex]
 		end
