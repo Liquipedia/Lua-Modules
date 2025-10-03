@@ -548,6 +548,9 @@ function MatchGroupLegacy._generateMatch(match)
 
 	local maps = Array.mapIndexes(function(mapIndex)
 		local map = Table.extract(match, 'map' .. mapIndex)
+		if type(map) == 'string' then
+			map = Json.parseIfTable(map) or map
+		end
 		if Logic.isEmpty(map) then return end
 		return '|map' .. mapIndex .. '=' .. MatchGroupLegacy._generateMap(map)
 	end)
