@@ -62,7 +62,7 @@ local VALORANT_REGIONS = {'eu', 'na', 'ap', 'kr', 'latam', 'br', 'pbe1', 'esport
 ---@field assists integer
 ---@field firstKills integer
 ---@field firstDeaths integer
----@field totalRoundsPlayed integer
+---@field roundsPlayed integer
 ---@field totalKastRounds integer
 ---@field damageDealt integer
 
@@ -228,8 +228,8 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 		assists = 0,
 		firstKills = 0,
 		firstDeaths = 0,
-		totalRoundsPlayed = 0,
-		totalKastRounds = 0,
+		roundsPlayed = 0,
+		roundsWithKast = 0,
 		damageDealt = 0,
 	}
 	local agents = {}
@@ -262,8 +262,8 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 		overallStats.kills = overallStats.kills + (mapPlayer.kills or 0)
 		overallStats.deaths = overallStats.deaths + (mapPlayer.deaths or 0)
 		overallStats.assists = overallStats.assists + (mapPlayer.assists or 0)
-		overallStats.totalRoundsPlayed = overallStats.totalRoundsPlayed + (mapPlayer.totalRounds or 0)
-		overallStats.totalKastRounds = overallStats.totalKastRounds + (mapPlayer.kastRounds or 0)
+		overallStats.roundsPlayed = overallStats.roundsPlayed + (mapPlayer.roundsPlayed or 0)
+		overallStats.roundsWithKast = overallStats.roundsWithKast + (mapPlayer.roundsWithKast or 0)
 		overallStats.damageDealt = overallStats.damageDealt + (mapPlayer.damageDealt or 0)
 
 		local extraDataPlayer = Array.find(map.extradata.teams[teamIdx].players, function(playerData)
@@ -277,12 +277,6 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 		overallStats.firstDeaths = overallStats.firstDeaths + (extraDataPlayer.firstDeaths or 0)
 	end)
 
-	local function average(statTable)
-		if #statTable == 0 then return nil end
-		local sum = Array.reduce(statTable, Operator.add)
-		return sum / #statTable
-	end
-
 	local function calculatePercentage(value, total)
 		if total == 0 then
 			return 0
@@ -290,10 +284,11 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 		return value / total * 100
 	end
 
-	local kast, adr
-	if overallStats.totalRoundsPlayed > 0 then
-		kast = calculatePercentage(overallStats.totalKastRounds, overallStats.totalRoundsPlayed)
-		adr = overallStats.damageDealt / overallStats.totalRoundsPlayed
+	local kast, adr, acs
+	if overallStats.roundsPlayed > 0 then
+		kast = calculatePercentage(overallStats.roundsWithKast, overallStats.roundsPlayed)
+		adr = overallStats.damageDealt / overallStats.roundsPlayed
+		acs = overallStats.acs / overallStats.roundsPlayed
 	end
 
 	return {
@@ -301,7 +296,7 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 		player = player.name,
 		displayName = player.displayName,
 		agent = agents,
-		acs = average(overallStats.acs),
+		acs = acs,
 		kills = overallStats.kills,
 		deaths = overallStats.deaths,
 		assists = overallStats.assists,
@@ -433,13 +428,14 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 				return {
 					player = playerIdData.name or playerInputData.link or playerInputData.name,
 					displayName = playerIdData.displayname or playerInputData.name,
+					agent = getCharacterName(participant.agent),
 				}
 			end
 
 			local allRoundsData = map.round_results or {}
-			local totalRoundsOnMap = #allRoundsData
-			local kastRoundsOnMap = (participant.kast / 100) * totalRoundsOnMap
-			local damageDealt = participant.adr * totalRoundsOnMap
+			local roundsPlayed = #allRoundsData
+			local roundsWithKast = (participant.kast / 100) * roundsPlayed
+			local damageDealt = participant.adr * roundsPlayed
 
 			return {
 				kills = participant.kills,
@@ -449,13 +445,12 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 				adr = participant.adr,
 				kast = participant.kast,
 				hs = participant.hs,
-				totalRounds = totalRoundsOnMap,
-				kastRounds = kastRoundsOnMap,
+				roundsPlayed = roundsPlayed,
+				roundsWithKast = roundsWithKast,
 				damageDealt = damageDealt,
 				player = playerIdData.name or playerInputData.link or playerInputData.name,
 				displayName = playerIdData.displayname or playerInputData.name,
 				puuid = participant.puuid,
-
 				agent = getCharacterName(participant.agent),
 			}
 		end
