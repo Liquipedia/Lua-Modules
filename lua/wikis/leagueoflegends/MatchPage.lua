@@ -300,60 +300,9 @@ function MatchPage:renderOverallStats()
 							}
 						}
 					},
-					StatsList{
+					MatchPage._buildTeamStatsList{
 						finished = true,
-						data = {
-							{
-								icon = KDA_ICON,
-								name = 'KDA',
-								team1Value = Array.interleave({
-									allTeamsStats[1].kills,
-									allTeamsStats[1].deaths,
-									allTeamsStats[1].assists
-								}, SPAN_SLASH),
-								team2Value = Array.interleave({
-									allTeamsStats[2].kills,
-									allTeamsStats[2].deaths,
-									allTeamsStats[2].assists
-								}, SPAN_SLASH)
-							},
-							{
-								icon = IconImage{imageLight = 'Lol stat icon tower.png', link = ''},
-								name = 'Towers',
-								team1Value = allTeamsStats[1].towers,
-								team2Value = allTeamsStats[2].towers
-							},
-							{
-								icon = IconImage{imageLight = 'Lol stat icon inhibitor.png', link = ''},
-								name = 'Inhibitors',
-								team1Value = allTeamsStats[1].inhibitors,
-								team2Value = allTeamsStats[2].inhibitors
-							},
-							{
-								icon = IconImage{imageLight = 'Lol stat icon herald.png', link = ''},
-								name = 'Rift Heralds',
-								team1Value = allTeamsStats[1].heralds,
-								team2Value = allTeamsStats[2].heralds
-							},
-							{
-								icon = IconImage{imageLight = 'Lol stat icon atakhan.png', link = ''},
-								name = 'Atakhans',
-								team1Value = allTeamsStats[1].atakhans,
-								team2Value = allTeamsStats[2].atakhans
-							},
-							{
-								icon = IconImage{imageLight = 'Lol stat icon dragon.png', link = ''},
-								name = 'Dragons',
-								team1Value = allTeamsStats[1].dragons,
-								team2Value = allTeamsStats[2].dragons
-							},
-							{
-								icon = IconImage{imageLight = 'Lol stat icon baron.png', link = ''},
-								name = 'Barons',
-								team1Value = allTeamsStats[1].barons,
-								team2Value = allTeamsStats[2].barons
-							},
-						}
+						data = allTeamsStats
 					}
 				}
 			}
@@ -444,6 +393,81 @@ function MatchPage:renderOverallStats()
 				end)
 			}
 		)
+	}
+end
+
+---@private
+---@param props {finished: boolean, data: {kills: integer, deaths: integer, assists: integer, gold: string,
+---towers: integer, inhibitors: integer, grubs: integer?, heralds: integer?, atakhans: integer?, dragons: integer?,
+---barons: integer?}[]}
+---@return MatchPageStatsList
+function MatchPage._buildTeamStatsList(props)
+	return StatsList{
+		finished = props.finished,
+		data = {
+			{
+				icon = KDA_ICON,
+				name = 'KDA',
+				team1Value = Array.interleave({
+					props.data[1].kills,
+					props.data[1].deaths,
+					props.data[1].assists
+				}, SPAN_SLASH),
+				team2Value = Array.interleave({
+					props.data[2].kills,
+					props.data[2].deaths,
+					props.data[2].assists
+				}, SPAN_SLASH)
+			},
+			{
+				icon = GOLD_ICON,
+				name = 'Gold',
+				team1Value = props.data[1].gold,
+				team2Value = props.data[2].gold
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon tower.png', link = ''},
+				name = 'Towers',
+				team1Value = props.data[1].towers,
+				team2Value = props.data[2].towers
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon inhibitor.png', link = ''},
+				name = 'Inhibitors',
+				team1Value = props.data[1].inhibitors,
+				team2Value = props.data[2].inhibitors
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon grub.png', link = ''},
+				name = 'Void Grubs',
+				team1Value = props.data[1].grubs,
+				team2Value = props.data[2].grubs
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon herald.png', link = ''},
+				name = 'Rift Heralds',
+				team1Value = props.data[1].heralds,
+				team2Value = props.data[2].heralds
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon atakhan.png', link = ''},
+				name = 'Atakhan',
+				team1Value = props.data[1].atakhans,
+				team2Value = props.data[2].atakhans
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon dragon.png', link = ''},
+				name = 'Dragons',
+				team1Value = props.data[1].dragons,
+				team2Value = props.data[2].dragons
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon baron.png', link = ''},
+				name = 'Barons',
+				team1Value = props.data[1].barons,
+				team2Value = props.data[2].barons
+			},
+		}
 	}
 end
 
@@ -656,72 +680,22 @@ function MatchPage:_renderTeamStats(game)
 						}
 					}
 				},
-				StatsList{
+				MatchPage._buildTeamStatsList{
 					finished = game.finished,
-					data = {
-						{
-							icon = KDA_ICON,
-							name = 'KDA',
-							team1Value = Array.interleave({
-								game.teams[1].kills,
-								game.teams[1].deaths,
-								game.teams[1].assists
-							}, SPAN_SLASH),
-							team2Value = Array.interleave({
-								game.teams[2].kills,
-								game.teams[2].deaths,
-								game.teams[2].assists
-							}, SPAN_SLASH)
-						},
-						{
-							icon = GOLD_ICON,
-							name = 'Gold',
-							team1Value = game.teams[1].gold,
-							team2Value = game.teams[2].gold
-						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon tower.png', link = ''},
-							name = 'Towers',
-							team1Value = game.teams[1].objectives.towers,
-							team2Value = game.teams[2].objectives.towers
-						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon inhibitor.png', link = ''},
-							name = 'Inhibitors',
-							team1Value = game.teams[1].objectives.inhibitors,
-							team2Value = game.teams[2].objectives.inhibitors
-						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon grub.png', link = ''},
-							name = 'Void Grubs',
-							team1Value = game.teams[1].objectives.grubs,
-							team2Value = game.teams[2].objectives.grubs
-						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon herald.png', link = ''},
-							name = 'Rift Heralds',
-							team1Value = game.teams[1].objectives.heralds,
-							team2Value = game.teams[2].objectives.heralds
-						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon atakhan.png', link = ''},
-							name = 'Atakhan',
-							team1Value = game.teams[1].objectives.atakhans,
-							team2Value = game.teams[2].objectives.atakhans
-						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon dragon.png', link = ''},
-							name = 'Dragons',
-							team1Value = game.teams[1].objectives.dragons,
-							team2Value = game.teams[2].objectives.dragons
-						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon baron.png', link = ''},
-							name = 'Barons',
-							team1Value = game.teams[1].objectives.barons,
-							team2Value = game.teams[2].objectives.barons
-						},
-					}
+					data = Array.map(game.teams, function (team)
+						return {
+							kills = team.kills,
+							deaths = team.deaths,
+							assists = team.assists,
+							gold = team.gold,
+							inhibitors = team.objectives.inhibitors,
+							grubs = team.objectives.grubs,
+							heralds = team.objectives.heralds,
+							atakhans = team.objectives.atakhans,
+							dragons = team.objectives.dragons,
+							barons = team.objectives.barons
+						}
+					end)
 				}
 			}
 		}
