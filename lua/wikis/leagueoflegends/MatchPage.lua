@@ -22,6 +22,8 @@ local Div = HtmlWidgets.Div
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local MatchSummaryCharacters = Lua.import('Module:Widget/Match/Summary/Characters')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
@@ -31,6 +33,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LoLMatchPageGame: MatchPageGame
 ---@field vetoGroups {type: 'ban'|'pick', team: integer, character: string, vetoNumber: integer}[][][]
+---@field teams {players: table[], score: number?, status: string?, [any]: any}[]
 
 ---@class LoLMatchPage: BaseMatchPage
 ---@field games LoLMatchPageGame[]
@@ -163,6 +166,309 @@ function MatchPage:populateGames()
 			_, game.vetoGroups[teamIndex] = Array.groupBy(team, Operator.property('groupIndex'))
 		end)
 	end)
+end
+
+---@return Widget?
+function MatchPage:renderOverallStats()
+	if self:isBestOfOne() then
+		return
+	end
+
+	---@type table<string, {displayName: string, playerName: string, teamIndex: integer,
+	---role: string, champions: string[], stats: table<string, integer?>}>
+	local allPlayersStats = {}
+	local allTeamsStats = {
+		{
+			kills = 0,
+			deaths = 0,
+			assists = 0,
+			towers = 0,
+			inhibitors = 0,
+			dragons = 0,
+			atakhans = 0,
+			heralds = 0,
+			barons = 0,
+		},
+		{
+			kills = 0,
+			deaths = 0,
+			assists = 0,
+			towers = 0,
+			inhibitors = 0,
+			dragons = 0,
+			atakhans = 0,
+			heralds = 0,
+			barons = 0,
+		}
+	}
+
+	Array.forEach(self.games, function(game)
+		if game.status == BaseMatchPage.NOT_PLAYED then
+			return
+		end
+		local parsedGameLength = Array.map(
+			Array.parseCommaSeparatedString(game.length --[[@as string]], ':'), function (element)
+				---Directly using tonumber as arg to Array.map causes base out of range error
+				return tonumber(element)
+			end
+		)
+		local gameLength = (parsedGameLength[1] or 0) * 60 + (parsedGameLength[2] or 0)
+
+		Array.forEach(game.teams, function(team, teamIdx)
+			allTeamsStats[teamIdx].kills = allTeamsStats[teamIdx].kills + (team.kills or 0)
+			allTeamsStats[teamIdx].deaths = allTeamsStats[teamIdx].deaths + (team.deaths or 0)
+			allTeamsStats[teamIdx].assists = allTeamsStats[teamIdx].assists + (team.assists or 0)
+			allTeamsStats[teamIdx].towers = allTeamsStats[teamIdx].towers + (team.objectives.towers or 0)
+			allTeamsStats[teamIdx].inhibitors = allTeamsStats[teamIdx].inhibitors + (team.objectives.inhibitors or 0)
+			allTeamsStats[teamIdx].dragons = allTeamsStats[teamIdx].dragons + (team.objectives.dragons or 0)
+			allTeamsStats[teamIdx].atakhans = allTeamsStats[teamIdx].atakhans + (team.objectives.atakhans or 0)
+			allTeamsStats[teamIdx].heralds = allTeamsStats[teamIdx].heralds + (team.objectives.heralds or 0)
+			allTeamsStats[teamIdx].barons = allTeamsStats[teamIdx].barons + (team.objectives.barons or 0)
+			Array.forEach(team.players or {}, function(player)
+				local playerId = player.player
+				if not playerId then return end
+
+				if not allPlayersStats[playerId] then
+					allPlayersStats[playerId] = {
+						displayName = player.displayName or player.player,
+						playerName = player.player,
+						teamIndex = teamIdx,
+						champions = {},
+						role = player.role,
+						stats = {
+							damage = 0,
+							gold = 0,
+							creepscore = 0,
+							gameLength = 0,
+							kills = 0,
+							deaths = 0,
+							assists = 0,
+						}
+					}
+				end
+
+				local data = allPlayersStats[playerId]
+				if player.character then
+					table.insert(data.champions, player.character)
+				end
+
+				local stats = data.stats
+				stats.damage = stats.damage + (player.damagedone or 0)
+				stats.gold = stats.gold + (player.gold or 0)
+				stats.creepscore = stats.creepscore + (player.creepscore or 0)
+				stats.gameLength = stats.gameLength + gameLength
+				stats.kills = stats.kills + (player.kills or 0)
+				stats.deaths = stats.deaths + (player.deaths or 0)
+				stats.assists = stats.assists + (player.assists or 0)
+			end)
+		end)
+	end)
+
+	local ungroupedPlayers = Array.sortBy(Array.extractValues(allPlayersStats), function(player)
+		return ROLE_ORDER[player.role]
+	end)
+	local players = Array.map(Array.range(1, 2), function (teamIdx)
+		return Array.filter(ungroupedPlayers, function (player)
+			return player.teamIndex == teamIdx
+		end)
+	end)
+
+	local function renderOverallTeamStats()
+		return {
+			HtmlWidgets.H3{children = 'Overall Team Stats'},
+			Div{
+				classes = {'match-bm-team-stats'},
+				children = {
+					Div{
+						classes = {'match-bm-lol-team-stats-header'},
+						children = {
+							Div{
+								classes = {'match-bm-lol-team-stats-header-team'},
+								children = self.opponents[1].iconDisplay
+							},
+							Div{
+								classes = {'match-bm-team-stats-list-cell'},
+								children = IconImage{
+									imageLight = self:getMatchContext().icon,
+									imageDark = self:getMatchContext().icondark,
+									size = 'x32px',
+								}
+							},
+							Div{
+								classes = {'match-bm-lol-team-stats-header-team'},
+								children = self.opponents[2].iconDisplay
+							}
+						}
+					},
+					MatchPage._buildTeamStatsList{
+						finished = true,
+						data = allTeamsStats
+					}
+				}
+			}
+		}
+	end
+
+	---@param stat integer
+	---@param gameLength integer
+	---@return string?
+	local function calculateStatPerMinute(stat, gameLength)
+		if gameLength <= 0 then
+			return
+		end
+		return string.format('%.2f', stat / gameLength * 60)
+	end
+
+	local function renderPlayerOverallPerformance(player)
+		return Div{
+			classes = {'match-bm-players-player match-bm-players-player--col-2'},
+			children = WidgetUtil.collect(
+				Div{
+					classes = {'match-bm-players-player-name'},
+					children = {
+						Link{link = player.playerName, children = player.displayName},
+						MatchSummaryCharacters{characters = player.champions, date = self.matchData.date},
+					}
+				},
+				Div{
+					classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-4'},
+					children = {
+						PlayerStat{
+							title = {KDA_ICON, 'KDA'},
+							data = Array.interleave({
+								player.stats.kills,
+								player.stats.deaths,
+								player.stats.assists
+							}, SPAN_SLASH)
+						},
+						PlayerStat{
+							title = {
+								IconImage{
+									imageLight = 'Lol stat icon cs.png',
+									caption = 'CS per minute',
+									link = ''
+								},
+								'CSM'
+							},
+							data = calculateStatPerMinute(player.stats.creepscore, player.stats.gameLength)
+						},
+						PlayerStat{
+							title = {GOLD_ICON, 'GPM'},
+							data = calculateStatPerMinute(player.stats.gold, player.stats.gameLength)
+						},
+						PlayerStat{
+							title = {
+								IconFa{
+									iconName = 'damage',
+									additionalClasses = {'fa-flip-both'},
+									hover = 'Damage per minute'
+								},
+								'DPM'
+							},
+							data = calculateStatPerMinute(player.stats.damage, player.stats.gameLength)
+						}
+					}
+				}
+			)
+		}
+	end
+
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(
+			renderOverallTeamStats(),
+			HtmlWidgets.H3{children = 'Overall Player Performance'},
+			Div{
+				classes = {'match-bm-players-wrapper'},
+				children = Array.map(self.opponents, function (opponent, teamIndex)
+					return Div{
+						classes = {'match-bm-players-team'},
+						children = WidgetUtil.collect(
+							Div{
+								classes = {'match-bm-players-team-header'},
+								children = opponent.iconDisplay
+							},
+							Array.map(players[teamIndex], renderPlayerOverallPerformance)
+						)
+					}
+				end)
+			}
+		)
+	}
+end
+
+---@private
+---@param props {finished: boolean, data: {kills: integer, deaths: integer, assists: integer, gold: string,
+---towers: integer, inhibitors: integer, grubs: integer?, heralds: integer?, atakhans: integer?, dragons: integer?,
+---barons: integer?}[]}
+---@return MatchPageStatsList
+function MatchPage._buildTeamStatsList(props)
+	return StatsList{
+		finished = props.finished,
+		data = {
+			{
+				icon = KDA_ICON,
+				name = 'KDA',
+				team1Value = Array.interleave({
+					props.data[1].kills,
+					props.data[1].deaths,
+					props.data[1].assists
+				}, SPAN_SLASH),
+				team2Value = Array.interleave({
+					props.data[2].kills,
+					props.data[2].deaths,
+					props.data[2].assists
+				}, SPAN_SLASH)
+			},
+			{
+				icon = GOLD_ICON,
+				name = 'Gold',
+				team1Value = props.data[1].gold,
+				team2Value = props.data[2].gold
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon tower.png', link = ''},
+				name = 'Towers',
+				team1Value = props.data[1].towers,
+				team2Value = props.data[2].towers
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon inhibitor.png', link = ''},
+				name = 'Inhibitors',
+				team1Value = props.data[1].inhibitors,
+				team2Value = props.data[2].inhibitors
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon grub.png', link = ''},
+				name = 'Void Grubs',
+				team1Value = props.data[1].grubs,
+				team2Value = props.data[2].grubs
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon herald.png', link = ''},
+				name = 'Rift Heralds',
+				team1Value = props.data[1].heralds,
+				team2Value = props.data[2].heralds
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon atakhan.png', link = ''},
+				name = 'Atakhan',
+				team1Value = props.data[1].atakhans,
+				team2Value = props.data[2].atakhans
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon dragon.png', link = ''},
+				name = 'Dragons',
+				team1Value = props.data[1].dragons,
+				team2Value = props.data[2].dragons
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon baron.png', link = ''},
+				name = 'Barons',
+				team1Value = props.data[1].barons,
+				team2Value = props.data[2].barons
+			},
+		}
+	}
 end
 
 ---@param game LoLMatchPageGame
@@ -378,72 +684,22 @@ function MatchPage:_renderTeamStats(game)
 						}
 					}
 				},
-				StatsList{
+				MatchPage._buildTeamStatsList{
 					finished = game.finished,
-					data = {
-						{
-							icon = KDA_ICON,
-							name = 'KDA',
-							team1Value = Array.interleave({
-								game.teams[1].kills,
-								game.teams[1].deaths,
-								game.teams[1].assists
-							}, SPAN_SLASH),
-							team2Value = Array.interleave({
-								game.teams[2].kills,
-								game.teams[2].deaths,
-								game.teams[2].assists
-							}, SPAN_SLASH)
-						},
-						{
-							icon = GOLD_ICON,
-							name = 'Gold',
-							team1Value = game.teams[1].gold,
-							team2Value = game.teams[2].gold
-						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon tower.png', link = ''},
-							name = 'Towers',
-							team1Value = game.teams[1].objectives.towers,
-							team2Value = game.teams[2].objectives.towers
-						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon inhibitor.png', link = ''},
-							name = 'Inhibitors',
-							team1Value = game.teams[1].objectives.inhibitors,
-							team2Value = game.teams[2].objectives.inhibitors
-						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon grub.png', link = ''},
-							name = 'Void Grubs',
-							team1Value = game.teams[1].objectives.grubs,
-							team2Value = game.teams[2].objectives.grubs
-						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon herald.png', link = ''},
-							name = 'Rift Heralds',
-							team1Value = game.teams[1].objectives.heralds,
-							team2Value = game.teams[2].objectives.heralds
-						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon atakhan.png', link = ''},
-							name = 'Atakhan',
-							team1Value = game.teams[1].objectives.atakhans,
-							team2Value = game.teams[2].objectives.atakhans
-						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon dragon.png', link = ''},
-							name = 'Dragons',
-							team1Value = game.teams[1].objectives.dragons,
-							team2Value = game.teams[2].objectives.dragons
-						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon baron.png', link = ''},
-							name = 'Barons',
-							team1Value = game.teams[1].objectives.barons,
-							team2Value = game.teams[2].objectives.barons
-						},
-					}
+					data = Array.map(game.teams, function (team)
+						return {
+							kills = team.kills,
+							deaths = team.deaths,
+							assists = team.assists,
+							gold = team.gold,
+							inhibitors = team.objectives.inhibitors,
+							grubs = team.objectives.grubs,
+							heralds = team.objectives.heralds,
+							atakhans = team.objectives.atakhans,
+							dragons = team.objectives.dragons,
+							barons = team.objectives.barons
+						}
+					end)
 				}
 			}
 		}
