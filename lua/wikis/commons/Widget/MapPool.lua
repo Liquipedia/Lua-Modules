@@ -30,7 +30,12 @@ function MapPool:render()
 		children = GeneralCollapsible{
 			title = 'Map Pool',
 			classes = {'wiki-backgroundcolor-light'},
-			attributes = {style = 'display:flex;flex-direction:column;padding:0.5rem;border-radius:0.5rem'},
+			css = {
+				display = 'flex',
+				['flex-direction'] = 'column',
+				padding = '0.5rem',
+				['border-radius'] = '0.5rem',
+			},
 			shouldCollapse = true,
 			children = {
 				Div{
