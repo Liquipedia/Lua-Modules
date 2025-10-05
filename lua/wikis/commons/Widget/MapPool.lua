@@ -71,7 +71,7 @@ function MapPool:render()
 									}
 								}},
 								Array.map(Array.parseCommaSeparatedString(self.props['map' .. index]), function (mapPage)
-									local map = Map.getMapByPageName(mw.ext.TeamLiquidIntegration.resolve_redirect(mapPage)) or {}
+									local map = Map.getMapByPageName(mapPage) or {}
 									return HtmlWidgets.Tr{children = HtmlWidgets.Td{
 										css = {
 											['text-align'] = 'center',
