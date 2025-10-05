@@ -26,36 +26,34 @@ local MapPool = Class.new(Widget)
 
 ---@return Widget
 function MapPool:render()
-	return Div{
-		children = GeneralCollapsible{
-			title = 'Map Pool',
-			classes = {'wiki-backgroundcolor-light'},
-			css = {
-				display = 'flex',
-				['flex-direction'] = 'column',
-				padding = '0.5rem',
-				['border-radius'] = '0.5rem',
-			},
-			shouldCollapse = true,
-			children = {
-				Div{
-					css = {
-						display = 'flex',
-						['flex-wrap'] = 'wrap',
-						gap = '0.5rem',
-						['padding-top'] = '0.5rem',
-					},
-					children = Array.mapIndexes(function (index)
-						local mode = self.props['mode' .. index]
-						if Logic.isEmpty(mode) then
-							return
-						end
-						return self:_renderMapsInMode(mode, Array.parseCommaSeparatedString(self.props['map' .. index]))
-					end)
-				}
+	return Div{children = GeneralCollapsible{
+		title = 'Map Pool',
+		classes = {'wiki-backgroundcolor-light'},
+		css = {
+			display = 'flex',
+			['flex-direction'] = 'column',
+			padding = '0.5rem',
+			['border-radius'] = '0.5rem',
+		},
+		shouldCollapse = true,
+		children = {
+			Div{
+				css = {
+					display = 'flex',
+					['flex-wrap'] = 'wrap',
+					gap = '0.5rem',
+					['padding-top'] = '0.5rem',
+				},
+				children = Array.mapIndexes(function (index)
+					local mode = self.props['mode' .. index]
+					if Logic.isEmpty(mode) then
+						return
+					end
+					return self:_renderMapsInMode(mode, Array.parseCommaSeparatedString(self.props['map' .. index]))
+				end)
 			}
 		}
-	}
+	}}
 end
 
 ---@private
