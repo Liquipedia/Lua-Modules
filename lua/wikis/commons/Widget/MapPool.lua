@@ -50,47 +50,55 @@ function MapPool:render()
 						if Logic.isEmpty(mode) then
 							return
 						end
-						return HtmlWidgets.Table{
-							classes = {'wikitable', 'wikitable-striped'},
-							css = {
-								['border-radius'] = '0.5rem',
-								overflow = 'hidden',
-								flex = '1 0 18%',
-								['white-space'] = 'nowrap'
-							},
-							children = WidgetUtil.collect(
-								HtmlWidgets.Tr{children = HtmlWidgets.Th{
-									css = {
-										height = '2.5rem',
-										padding = '0.2em 0.5rem'
-									},
-									children = {
-										MapModes.get{mode = mode},
-										'&nbsp;',
-										Link{link = mode}
-									}
-								}},
-								Array.map(Array.parseCommaSeparatedString(self.props['map' .. index]), function (mapPage)
-									local map = Map.getMapByPageName(mapPage) or {}
-									return HtmlWidgets.Tr{children = HtmlWidgets.Td{
-										css = {
-											['text-align'] = 'center',
-											padding = '0.2em 0.5rem'
-										},
-										children = {
-											Link{
-												link = map.pageName or mapPage,
-												children = map.displayName or mapPage
-											}
-										}
-									}}
-								end)
-							)
-						}
+						return self:_renderMapsInMode(mode, Array.parseCommaSeparatedString(self.props['map' .. index]))
 					end)
 				}
 			}
 		}
+	}
+end
+
+---@private
+---@param mode string
+---@param mapInput string[]
+---@return Widget
+function MapPool:_renderMapsInMode(mode, mapInput)
+	return HtmlWidgets.Table{
+		classes = {'wikitable', 'wikitable-striped'},
+		css = {
+			['border-radius'] = '0.5rem',
+			overflow = 'hidden',
+			flex = '1 0 18%',
+			['white-space'] = 'nowrap'
+		},
+		children = WidgetUtil.collect(
+			HtmlWidgets.Tr{children = HtmlWidgets.Th{
+				css = {
+					height = '2.5rem',
+					padding = '0.2em 0.5rem'
+				},
+				children = {
+					MapModes.get{mode = mode},
+					'&nbsp;',
+					Link{link = mode}
+				}
+			}},
+			Array.map(mapInput, function (mapPage)
+				local map = Map.getMapByPageName(mapPage) or {}
+				return HtmlWidgets.Tr{children = HtmlWidgets.Td{
+					css = {
+						['text-align'] = 'center',
+						padding = '0.2em 0.5rem'
+					},
+					children = {
+						Link{
+							link = map.pageName or mapPage,
+							children = map.displayName or mapPage
+						}
+					}
+				}}
+			end)
+		)
 	}
 end
 
