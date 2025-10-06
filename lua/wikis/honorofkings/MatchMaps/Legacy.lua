@@ -92,7 +92,7 @@ end
 function MatchMapsLegacy._handleDetails(args, details)
 	local getMapFromDetails = function (index)
 		local prefix = 'map' .. index
-		if not details[prefix] then
+		if not details[prefix] and not details[prefix .. 'winner'] then
 			return nil
 		end
 		local map = {
