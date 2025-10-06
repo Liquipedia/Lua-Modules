@@ -104,6 +104,8 @@ end
 function MatchFunctions.getExtraData(match, games, opponents)
 	if games[1] and games[1].opponents[1].stats then
 		Array.forEach(opponents, function (opponent, opponentIndex)
+			---@param name string
+			---@return number?
 			local function aggregateStats(name)
 				return Array.reduce(
 					Array.map(games, function (game)
