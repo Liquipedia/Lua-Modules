@@ -425,20 +425,8 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 		end,
 		function(playerIndex, playerIdData, playerInputData)
 			local participant = participantList[playerIndex]
-			if not (participant and participant.puuid) then
-				return {
-					player = playerIdData.name or playerInputData.link or playerInputData.name,
-					displayName = playerIdData.displayname or playerInputData.name,
-					agent = getCharacterName(participant.agent),
-				}
-			end
 
-			local allRoundsData = map.round_results or {}
-			local roundsPlayed = #allRoundsData
-			local roundsWithKast = (participant.kast / 100) * roundsPlayed
-			local damageDealt = participant.adr * roundsPlayed
-
-			return {
+			local playerData = {
 				kills = participant.kills,
 				deaths = participant.deaths,
 				assists = participant.assists,
@@ -446,14 +434,27 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 				adr = participant.adr,
 				kast = participant.kast,
 				hs = participant.hs,
-				roundsPlayed = roundsPlayed,
-				roundsWithKast = roundsWithKast,
-				damageDealt = damageDealt,
 				player = playerIdData.name or playerInputData.link or playerInputData.name,
 				displayName = playerIdData.displayname or playerInputData.name,
 				puuid = participant.puuid,
 				agent = getCharacterName(participant.agent),
 			}
+
+			-- adds overall stats to playerData for MatchPage
+			if (participant and participant.puuid) then
+				local allRoundsData = map.round_results or {}
+				local roundsPlayed = #allRoundsData
+				local roundsWithKast = (participant.kast / 100) * roundsPlayed
+				local damageDealt = participant.adr * roundsPlayed
+
+				Table.mergeInto(playerData, {
+					roundsPlayed = roundsPlayed,
+					roundsWithKast = roundsWithKast,
+					damageDealt = damageDealt,
+				})
+			end
+
+			return playerData
 		end
 	)
 end
