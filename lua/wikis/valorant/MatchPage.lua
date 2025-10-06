@@ -60,6 +60,9 @@ function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
 		game.teams = game.extradata.teams
+		Array.forEach(game.teams, function(team, teamIdx)
+			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
+		end)
 	end)
 end
 

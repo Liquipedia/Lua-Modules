@@ -354,8 +354,6 @@ function MapFunctions.getExtraData(MapParser, match, map, opponents)
 		local team = {}
 		local teamSideKey = 't' .. teamIdx .. 'side'
 
-		team.scoreDisplay = map.winner == teamIdx and 'winner' or map.finished and 'loser' or '-'
-
 		local originalPlayers = Array.filter(map.opponents[teamIdx].players or {}, Table.isNotEmpty)
 		team.players = Array.map(originalPlayers, function(player)
 			return Table.copy(player)
