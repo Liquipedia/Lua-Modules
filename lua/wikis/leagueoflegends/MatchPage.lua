@@ -160,30 +160,7 @@ function MatchPage:renderOverallStats()
 	---@type table<string, {displayName: string, playerName: string, teamIndex: integer,
 	---role: string, champions: string[], stats: table<string, integer?>}>
 	local allPlayersStats = {}
-	local allTeamsStats = {
-		{
-			kills = 0,
-			deaths = 0,
-			assists = 0,
-			towers = 0,
-			inhibitors = 0,
-			dragons = 0,
-			atakhans = 0,
-			heralds = 0,
-			barons = 0,
-		},
-		{
-			kills = 0,
-			deaths = 0,
-			assists = 0,
-			towers = 0,
-			inhibitors = 0,
-			dragons = 0,
-			atakhans = 0,
-			heralds = 0,
-			barons = 0,
-		}
-	}
+	local allTeamsStats = Array.map(self.matchData.opponents, Operator.property('extradata'))
 
 	Array.forEach(self.games, function(game)
 		if game.status == BaseMatchPage.NOT_PLAYED then
@@ -198,15 +175,6 @@ function MatchPage:renderOverallStats()
 		local gameLength = (parsedGameLength[1] or 0) * 60 + (parsedGameLength[2] or 0)
 
 		Array.forEach(game.opponents, function(team, teamIdx)
-			allTeamsStats[teamIdx].kills = allTeamsStats[teamIdx].kills + (team.stats.kills or 0)
-			allTeamsStats[teamIdx].deaths = allTeamsStats[teamIdx].deaths + (team.stats.deaths or 0)
-			allTeamsStats[teamIdx].assists = allTeamsStats[teamIdx].assists + (team.stats.assists or 0)
-			allTeamsStats[teamIdx].towers = allTeamsStats[teamIdx].towers + (team.stats.towers or 0)
-			allTeamsStats[teamIdx].inhibitors = allTeamsStats[teamIdx].inhibitors + (team.stats.inhibitors or 0)
-			allTeamsStats[teamIdx].dragons = allTeamsStats[teamIdx].dragons + (team.stats.dragons or 0)
-			allTeamsStats[teamIdx].atakhans = allTeamsStats[teamIdx].atakhans + (team.stats.atakhans or 0)
-			allTeamsStats[teamIdx].heralds = allTeamsStats[teamIdx].heralds + (team.stats.heralds or 0)
-			allTeamsStats[teamIdx].barons = allTeamsStats[teamIdx].barons + (team.stats.barons or 0)
 			Array.forEach(team.players or {}, function(player)
 				local playerId = player.player
 				if not playerId then return end

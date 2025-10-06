@@ -101,6 +101,78 @@ end
 ---@param opponents table[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
+	---@param a number?
+	---@param b number?
+	---@return number?
+	local function nilSafeAdd(a, b)
+		if not a then
+			return b
+		elseif not b then
+			return a
+		end
+		return a + b
+	end
+
+	if games[1] and games[1].opponents[1].stats then
+		Array.forEach(opponents, function (opponent, opponentIndex)
+			opponent.extradata = {
+				kills = Array.reduce(
+					Array.map(games, function (game)
+						return (game.opponents[opponentIndex].stats or {}).kills
+					end),
+					nilSafeAdd
+				),
+				deaths = Array.reduce(
+					Array.map(games, function (game)
+						return (game.opponents[opponentIndex].stats or {}).deaths
+					end),
+					nilSafeAdd
+				),
+				assists = Array.reduce(
+					Array.map(games, function (game)
+						return (game.opponents[opponentIndex].stats or {}).assists
+					end),
+					nilSafeAdd
+				),
+				towers = Array.reduce(
+					Array.map(games, function (game)
+						return (game.opponents[opponentIndex].stats or {}).towers
+					end),
+					nilSafeAdd
+				),
+				inhibitors = Array.reduce(
+					Array.map(games, function (game)
+						return (game.opponents[opponentIndex].stats or {}).inhibitors
+					end),
+					nilSafeAdd
+				),
+				dragons = Array.reduce(
+					Array.map(games, function (game)
+						return (game.opponents[opponentIndex].stats or {}).dragons
+					end),
+					nilSafeAdd
+				),
+				atakhans = Array.reduce(
+					Array.map(games, function (game)
+						return (game.opponents[opponentIndex].stats or {}).atakhans
+					end),
+					nilSafeAdd
+				),
+				heralds = Array.reduce(
+					Array.map(games, function (game)
+						return (game.opponents[opponentIndex].stats or {}).heralds
+					end),
+					nilSafeAdd
+				),
+				barons = Array.reduce(
+					Array.map(games, function (game)
+						return (game.opponents[opponentIndex].stats or {}).barons
+					end),
+					nilSafeAdd
+				)
+			}
+		end)
+	end
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
 	}
