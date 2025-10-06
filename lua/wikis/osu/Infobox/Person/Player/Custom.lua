@@ -8,14 +8,12 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = Lua.import('Module:Widget/All')
-
-local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
-
 local Cell = Widgets.Cell
 
 ---@class OsuInfoboxPlayer: Person
