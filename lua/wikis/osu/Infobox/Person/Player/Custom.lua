@@ -32,7 +32,7 @@ function CustomPlayer.run(frame)
 	return player:createInfobox()
 end
 
----@return Widget
+---@return Widget?
 function CustomPlayer:createBottomContent()
 	return UpcomingTournaments.player{name = self.pagename}
 end
