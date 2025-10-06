@@ -24,13 +24,13 @@ end
 ---@param b number?
 ---@return number?
 function Operator.nilSafeAdd(a, b)
-		if not a then
-			return b
-		elseif not b then
-			return a
-		end
-		return a + b
+	if not a then
+		return b
+	elseif not b then
+		return a
 	end
+	return a + b
+end
 
 ---Uses the __sub metamethod (a - b)
 ---@param a number
