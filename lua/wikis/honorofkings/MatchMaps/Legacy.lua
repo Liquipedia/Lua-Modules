@@ -261,6 +261,7 @@ function MatchMapsLegacy.matchList(frame, generate)
 	args.lpdb_title = nil
 
 	if generate then
+		args.isLegacy = nil
 		return MatchGroupLegacy.generateWikiCodeForMatchList(args)
 	end
 
