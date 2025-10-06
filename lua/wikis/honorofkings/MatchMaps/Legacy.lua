@@ -61,6 +61,16 @@ function MatchMapsLegacy._handleMaps(args)
 		args[mapKey .. 'winner'] = Table.extract(args, mapKey .. 'win')
 		args[matchKey] = nil
 	end
+
+	--need to determine bestof here already for brackets...
+	--need to create a copy here to not affect the real args
+	local copy = Table.deepCopy(args)
+
+	if not args.bestof then
+		local res = MatchMapsLegacy._handleDetails({}, copy)
+		args.bestof = res.bestof
+	end
+
 	return args
 end
 
@@ -125,7 +135,7 @@ function MatchMapsLegacy._handleDetails(args, details)
 		}
 	end
 
-	Array.mapIndexes(function (index)
+	local maps = Array.mapIndexes(function (index)
 		local map = getMapFromDetails(index) or getMapOnlyWithWinner(index)
 		if map and map.winner then
 			args.mapWinnersSet = true
@@ -135,7 +145,31 @@ function MatchMapsLegacy._handleDetails(args, details)
 		return map
 	end)
 
+	-- determine bestofFromMaps
+	args.bestof = args.bestof or MatchMapsLegacy._bestofHeuristic(maps)
+
 	return args, details
+end
+
+---@param maps table[]
+---@return integer?
+function MatchMapsLegacy._bestofHeuristic(maps)
+	if Logic.isEmpty(maps) then return end
+
+	local wins = {0, 0}
+	Array.forEach(maps, function(map)
+		local winner = tonumber(map.winner)
+		if winner == 1 then
+			wins[1] = wins[1] + 1
+		elseif winner == 2 then
+			wins[2] = wins[2] + 1
+		end
+	end)
+
+	local firstTo = math.max(unpack(wins))
+	local bestof = firstTo * 2 - 1
+	if bestof <= 0 then return end
+	return bestof
 end
 
 ---@param args table
