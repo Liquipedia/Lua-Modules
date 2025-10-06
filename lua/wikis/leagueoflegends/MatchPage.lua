@@ -366,11 +366,7 @@ function MatchPage:_renderTeamStats(game)
 						},
 						Div{
 							classes = {'match-bm-team-stats-list-cell'},
-							children = self:isBestOfOne() and self:_buildGameResultSummary(game) or IconImage{
-								imageLight = self:getMatchContext().icon,
-								imageDark = self:getMatchContext().icondark,
-								size = 'x32px',
-							}
+							children = self:isBestOfOne() and self:_buildGameResultSummary(game) or self:getTournamentIcon()
 						},
 						Div{
 							classes = {'match-bm-lol-team-stats-header-team'},

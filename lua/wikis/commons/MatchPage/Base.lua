@@ -324,6 +324,16 @@ function BaseMatchPage:getMatchContext()
 end
 
 ---@protected
+---@return Widget
+function BaseMatchPage:getTournamentIcon()
+	return IconImage{
+		imageLight = self:getMatchContext().icon,
+		imageDark = self:getMatchContext().icondark,
+		size = '50x32px',
+	}
+end
+
+---@protected
 ---@return Widget[]
 function BaseMatchPage:renderMapVeto()
 	local match = self.matchData
