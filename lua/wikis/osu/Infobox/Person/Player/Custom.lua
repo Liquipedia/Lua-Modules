@@ -14,12 +14,13 @@ local Player = Lua.import('Module:Infobox/Person')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Widgets = Lua.import('Module:Widget/All')
+
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
+
 local Cell = Widgets.Cell
 
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
-
-local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 ---@param frame Frame
 ---@return Html
@@ -30,13 +31,9 @@ function CustomPlayer.run(frame)
 	return player:createInfobox()
 end
 
----@return string?
+---@return Widget
 function CustomPlayer:createBottomContent()
-	return HtmlWidgets.Fragment{
-		children = {
-			UpcomingTournaments.player{name = self.pagename}
-		}
-	}
+	return UpcomingTournaments.player{name = self.pagename}
 end
 
 ---@param id string
