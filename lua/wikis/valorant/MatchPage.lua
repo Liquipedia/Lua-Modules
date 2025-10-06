@@ -69,14 +69,14 @@ function MatchPage:renderOverallStats()
 		return
 	end
 
-	local overallTeamStats = {
+	local overallTeamData = {
 		finished = true,
 		teams = Array.map(self.opponents, function(opponent)
 			return (opponent.extradata and opponent.extradata.overallStats) or {}
 		end)
 	}
 
-	local overallPlayerStats = {
+	local overallPlayerData = {
 		teams = Array.map(Array.range(1, 2), function(teamIdx)
 			local team = { players = {} }
 			local opponent = self.opponents[teamIdx]
@@ -85,14 +85,14 @@ function MatchPage:renderOverallStats()
 					if not player.extradata or not player.extradata.overallStats then
 						return
 					end
-					local overallStats = player.extradata.overallStats
+					local playerData = player.extradata.overallStats
 
-					if not overallStats.roundsPlayed or overallStats.roundsPlayed == 0 then
+					if not playerData.roundsPlayed or playerData.roundsPlayed == 0 then
 						return
 					end
 
-					overallStats.displayName = overallStats.displayName or player.displayName
-					return overallStats
+					playerData.displayName = player.displayName
+					return playerData
 				end)
 			end
 			return team
@@ -101,8 +101,8 @@ function MatchPage:renderOverallStats()
 
 	return HtmlWidgets.Fragment{
 		children = WidgetUtil.collect(
-			self:_renderTeamStats(overallTeamStats),
-			self:_renderPerformance(overallPlayerStats)
+			self:_renderTeamStats(overallTeamData),
+			self:_renderPerformance(overallPlayerData)
 		)
 	}
 end
