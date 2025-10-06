@@ -104,61 +104,24 @@ end
 function MatchFunctions.getExtraData(match, games, opponents)
 	if games[1] and games[1].opponents[1].stats then
 		Array.forEach(opponents, function (opponent, opponentIndex)
-			opponent.extradata = {
-				kills = Array.reduce(
+			local function aggregateStats(name)
+				return Array.reduce(
 					Array.map(games, function (game)
-						return (game.opponents[opponentIndex].stats or {}).kills
-					end),
-					Operator.nilSafeAdd
-				),
-				deaths = Array.reduce(
-					Array.map(games, function (game)
-						return (game.opponents[opponentIndex].stats or {}).deaths
-					end),
-					Operator.nilSafeAdd
-				),
-				assists = Array.reduce(
-					Array.map(games, function (game)
-						return (game.opponents[opponentIndex].stats or {}).assists
-					end),
-					Operator.nilSafeAdd
-				),
-				towers = Array.reduce(
-					Array.map(games, function (game)
-						return (game.opponents[opponentIndex].stats or {}).towers
-					end),
-					Operator.nilSafeAdd
-				),
-				inhibitors = Array.reduce(
-					Array.map(games, function (game)
-						return (game.opponents[opponentIndex].stats or {}).inhibitors
-					end),
-					Operator.nilSafeAdd
-				),
-				dragons = Array.reduce(
-					Array.map(games, function (game)
-						return (game.opponents[opponentIndex].stats or {}).dragons
-					end),
-					Operator.nilSafeAdd
-				),
-				atakhans = Array.reduce(
-					Array.map(games, function (game)
-						return (game.opponents[opponentIndex].stats or {}).atakhans
-					end),
-					Operator.nilSafeAdd
-				),
-				heralds = Array.reduce(
-					Array.map(games, function (game)
-						return (game.opponents[opponentIndex].stats or {}).heralds
-					end),
-					Operator.nilSafeAdd
-				),
-				barons = Array.reduce(
-					Array.map(games, function (game)
-						return (game.opponents[opponentIndex].stats or {}).barons
+						return (game.opponents[opponentIndex].stats or {})[name]
 					end),
 					Operator.nilSafeAdd
 				)
+			end
+			opponent.extradata = {
+				kills = aggregateStats('kills'),
+				deaths = aggregateStats('deaths'),
+				assists = aggregateStats('assists'),
+				towers = aggregateStats('towers'),
+				inhibitors = aggregateStats('inhibitors'),
+				dragons = aggregateStats('dragons'),
+				atakhans = aggregateStats('atakhans'),
+				heralds = aggregateStats('heralds'),
+				barons = aggregateStats('barons')
 			}
 		end)
 	end
