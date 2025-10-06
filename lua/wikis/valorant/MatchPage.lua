@@ -299,11 +299,7 @@ function MatchPage:_renderTeamStats(game)
 						},
 						Div{
 							classes = {'match-bm-team-stats-list-cell'},
-							children = IconImage{
-								imageLight = self:getMatchContext().icon,
-								imageDark = self:getMatchContext().icondark,
-								size = 'x25px',
-							}
+							children = self:getTournamentLogo()
 						},
 						Div{
 							classes = {'match-bm-lol-team-stats-header-team'},
