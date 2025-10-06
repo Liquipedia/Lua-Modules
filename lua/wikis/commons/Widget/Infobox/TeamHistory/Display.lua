@@ -200,9 +200,6 @@ function TeamHistoryDisplay:_row(transfer)
 			role = nil
 		end
 	end
-	if role == LOAN then
-		teamText = '&#8250;&nbsp;' .. teamText
-	end
 	---@type (string|Widget)[]
 	local teamDisplay = WidgetUtil.collect(
 		role == LOAN and '&#8250;&nbsp;' or nil,
