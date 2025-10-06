@@ -12,7 +12,6 @@ local Class = Lua.import('Module:Class')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Widgets = Lua.import('Module:Widget/All')
 
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
