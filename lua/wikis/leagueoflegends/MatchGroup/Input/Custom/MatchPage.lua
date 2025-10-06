@@ -125,7 +125,7 @@ function CustomMatchGroupInputMatchPage.extendMapOpponent(map, opponentIndex)
 	local participants = CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 
 	if Logic.isEmpty(participants) then
-		return
+		return {picks = {}, stats = {}}
 	end
 	---@cast participants -nil
 

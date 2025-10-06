@@ -125,8 +125,6 @@ function MatchPage:populateGames()
 					})
 				end
 			)
-			opponent.stats = opponent.stats or {}
-			opponent.picks = opponent.picks or {}
 			opponent.pickOrder = Array.filter(vetoPhase, function(veto)
 				return veto.type == 'pick' and veto.team == teamIdx
 			end)
