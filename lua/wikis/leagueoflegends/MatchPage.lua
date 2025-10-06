@@ -128,19 +128,6 @@ function MatchPage:populateGames()
 				end
 			)
 
-			if game.finished then
-				-- Aggregate stats
-				team.gold = MatchPage.abbreviateNumber(MatchPage.sumItem(team.players, 'gold'))
-				team.kills = MatchPage.sumItem(team.players, 'kills')
-				team.deaths = MatchPage.sumItem(team.players, 'deaths')
-				team.assists = MatchPage.sumItem(team.players, 'assists')
-
-				-- Set fields
-				team.objectives = game.extradata['team' .. teamIdx .. 'objectives'] or {}
-			else
-				team.objectives = {}
-			end
-
 			team.picks = Array.map(team.players, Operator.property('character'))
 			team.pickOrder = Array.filter(game.extradata.vetophase or {}, function(veto)
 				return veto.type == 'pick' and veto.team == teamIdx
@@ -214,16 +201,16 @@ function MatchPage:renderOverallStats()
 		)
 		local gameLength = (parsedGameLength[1] or 0) * 60 + (parsedGameLength[2] or 0)
 
-		Array.forEach(game.teams, function(team, teamIdx)
-			allTeamsStats[teamIdx].kills = allTeamsStats[teamIdx].kills + (team.kills or 0)
-			allTeamsStats[teamIdx].deaths = allTeamsStats[teamIdx].deaths + (team.deaths or 0)
-			allTeamsStats[teamIdx].assists = allTeamsStats[teamIdx].assists + (team.assists or 0)
-			allTeamsStats[teamIdx].towers = allTeamsStats[teamIdx].towers + (team.objectives.towers or 0)
-			allTeamsStats[teamIdx].inhibitors = allTeamsStats[teamIdx].inhibitors + (team.objectives.inhibitors or 0)
-			allTeamsStats[teamIdx].dragons = allTeamsStats[teamIdx].dragons + (team.objectives.dragons or 0)
-			allTeamsStats[teamIdx].atakhans = allTeamsStats[teamIdx].atakhans + (team.objectives.atakhans or 0)
-			allTeamsStats[teamIdx].heralds = allTeamsStats[teamIdx].heralds + (team.objectives.heralds or 0)
-			allTeamsStats[teamIdx].barons = allTeamsStats[teamIdx].barons + (team.objectives.barons or 0)
+		Array.forEach(game.opponents, function(team, teamIdx)
+			allTeamsStats[teamIdx].kills = allTeamsStats[teamIdx].kills + (team.stats.kills or 0)
+			allTeamsStats[teamIdx].deaths = allTeamsStats[teamIdx].deaths + (team.stats.deaths or 0)
+			allTeamsStats[teamIdx].assists = allTeamsStats[teamIdx].assists + (team.stats.assists or 0)
+			allTeamsStats[teamIdx].towers = allTeamsStats[teamIdx].towers + (team.stats.towers or 0)
+			allTeamsStats[teamIdx].inhibitors = allTeamsStats[teamIdx].inhibitors + (team.stats.inhibitors or 0)
+			allTeamsStats[teamIdx].dragons = allTeamsStats[teamIdx].dragons + (team.stats.dragons or 0)
+			allTeamsStats[teamIdx].atakhans = allTeamsStats[teamIdx].atakhans + (team.stats.atakhans or 0)
+			allTeamsStats[teamIdx].heralds = allTeamsStats[teamIdx].heralds + (team.stats.heralds or 0)
+			allTeamsStats[teamIdx].barons = allTeamsStats[teamIdx].barons + (team.stats.barons or 0)
 			Array.forEach(team.players or {}, function(player)
 				local playerId = player.player
 				if not playerId then return end
@@ -397,7 +384,7 @@ function MatchPage:renderOverallStats()
 end
 
 ---@private
----@param props {finished: boolean, data: {kills: integer, deaths: integer, assists: integer, gold: string,
+---@param props {finished: boolean, data: {kills: integer, deaths: integer, assists: integer, gold: number?,
 ---towers: integer, inhibitors: integer, grubs: integer?, heralds: integer?, atakhans: integer?, dragons: integer?,
 ---barons: integer?}[]}
 ---@return MatchPageStatsList
@@ -422,8 +409,8 @@ function MatchPage._buildTeamStatsList(props)
 			{
 				icon = GOLD_ICON,
 				name = 'Gold',
-				team1Value = props.data[1].gold,
-				team2Value = props.data[2].gold
+				team1Value = MatchPage.abbreviateNumber(props.data[1].gold),
+				team2Value = MatchPage.abbreviateNumber(props.data[2].gold)
 			},
 			{
 				icon = IconImage{imageLight = 'Lol stat icon tower.png', link = ''},
@@ -682,20 +669,7 @@ function MatchPage:_renderTeamStats(game)
 				},
 				MatchPage._buildTeamStatsList{
 					finished = game.finished,
-					data = Array.map(game.teams, function (team)
-						return {
-							kills = team.kills,
-							deaths = team.deaths,
-							assists = team.assists,
-							gold = team.gold,
-							inhibitors = team.objectives.inhibitors,
-							grubs = team.objectives.grubs,
-							heralds = team.objectives.heralds,
-							atakhans = team.objectives.atakhans,
-							dragons = team.objectives.dragons,
-							barons = team.objectives.barons
-						}
-					end)
+					data = Array.map(game.opponents, Operator.property('stats'))
 				}
 			}
 		}

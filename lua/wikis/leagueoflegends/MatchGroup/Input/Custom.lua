@@ -37,6 +37,7 @@ MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 ---@field getHeroBans fun(map: table, opponentIndex: integer): string[]?
 ---@field getParticipants fun(map: table, opponentIndex: integer): table[]?
 ---@field getVetoPhase fun(map: table): table?
+---@field extendMapOpponent? fun(map: table, opponentIndex: integer): table
 
 ---@param match table
 ---@param options? {isMatchPage: boolean?}
@@ -75,6 +76,7 @@ function MatchFunctions.extractMaps(match, opponents, MapParser)
 		getMap = MapParser.getMap,
 		getLength = MapParser.getLength,
 		getPlayersOfMapOpponent = FnUtil.curry(MapFunctions.getPlayersOfMapOpponent, MapParser),
+		extendMapOpponent = MapParser.extendMapOpponent
 	}
 	local maps = MatchGroupInputUtil.standardProcessMaps(match, opponents, mapParserWrapper)
 

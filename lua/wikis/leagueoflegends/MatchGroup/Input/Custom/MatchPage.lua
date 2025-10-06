@@ -121,4 +121,40 @@ function CustomMatchGroupInputMatchPage.getObjectives(map, opponentIndex)
 	}
 end
 
+function CustomMatchGroupInputMatchPage.extendMapOpponent(map, opponentIndex)
+	local participants = CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
+
+	if Logic.isEmpty(participants) then
+		return {}
+	end
+
+	---@param a number?
+	---@param b number?
+	---@return number?
+	local function nilSafeAdd(a, b)
+		if not a then
+			return b
+		elseif not b then
+			return a
+		end
+		return a + b
+	end
+
+	local function sumItem(arr, item)
+		return Array.reduce(Array.map(arr, Operator.property(item)), nilSafeAdd, 0)
+	end
+
+	return {
+		stats = Table.merge(
+			{
+				gold = sumItem(participants, 'gold'),
+				kills = sumItem(participants, 'kills'),
+				deaths = sumItem(participants, 'deaths'),
+				assists = sumItem(participants, 'assists')
+			},
+			CustomMatchGroupInputMatchPage.getObjectives(map, opponentIndex)
+		)
+	}
+end
+
 return CustomMatchGroupInputMatchPage
