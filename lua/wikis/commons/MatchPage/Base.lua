@@ -325,7 +325,7 @@ end
 
 ---@protected
 ---@return Widget
-function BaseMatchPage:getTournamentLogo()
+function BaseMatchPage:getTournamentIcon()
 	return IconImage{
 		imageLight = self:getMatchContext().icon,
 		imageDark = self:getMatchContext().icondark,

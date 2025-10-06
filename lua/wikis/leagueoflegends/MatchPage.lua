@@ -366,7 +366,7 @@ function MatchPage:_renderTeamStats(game)
 						},
 						Div{
 							classes = {'match-bm-team-stats-list-cell'},
-							children = self:isBestOfOne() and self:_buildGameResultSummary(game) or self:getTournamentLogo()
+							children = self:isBestOfOne() and self:_buildGameResultSummary(game) or self:getTournamentIcon()
 						},
 						Div{
 							classes = {'match-bm-lol-team-stats-header-team'},
