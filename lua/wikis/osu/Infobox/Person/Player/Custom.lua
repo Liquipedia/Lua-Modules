@@ -18,7 +18,9 @@ local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournam
 
 local Cell = Widgets.Cell
 
+---@class OsuInfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)
+---@class OsuPersonInfoboxInjector: WidgetInjector
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
