@@ -33,7 +33,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LoLMatchPageGame: MatchPageGame
 ---@field vetoGroups {type: 'ban'|'pick', team: integer, character: string, vetoNumber: integer}[][][]
----@field teams {players: table[], score: number?, status: string?, [any]: any}[]
+---@field opponents {players: table[], score: number?, status: string?, [string]: any}[]
 
 ---@class LoLMatchPage: BaseMatchPage
 ---@field games LoLMatchPageGame[]
@@ -104,14 +104,12 @@ end
 
 function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)
+		local vetoPhase = game.extradata.vetophase or {}
 		game.finished = game.winner ~= nil and game.winner ~= -1
 		game.teams = Array.map(game.opponents, function(opponent, teamIdx)
-			local team = {}
+			opponent.scoreDisplay = game.winner == teamIdx and 'W' or game.finished and 'L' or '-'
 
-			team.scoreDisplay = game.winner == teamIdx and 'W' or game.finished and 'L' or '-'
-			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
-
-			team.players = Array.map(
+			opponent.players = Array.map(
 				Array.sortBy(Array.filter(opponent.players, Logic.isNotEmpty), function(player)
 					return ROLE_ORDER[player.role]
 				end),
@@ -127,19 +125,19 @@ function MatchPage:populateGames()
 					})
 				end
 			)
-
-			team.picks = Array.map(team.players, Operator.property('character'))
-			team.pickOrder = Array.filter(game.extradata.vetophase or {}, function(veto)
+			opponent.stats = opponent.stats or {}
+			opponent.picks = opponent.picks or {}
+			opponent.pickOrder = Array.filter(vetoPhase, function(veto)
 				return veto.type == 'pick' and veto.team == teamIdx
 			end)
-			team.bans = Array.filter(game.extradata.vetophase or {}, function(veto)
+			opponent.bans = Array.filter(vetoPhase, function(veto)
 				return veto.type == 'ban' and veto.team == teamIdx
 			end)
 
-			return team
+			return opponent
 		end)
 
-		local _, vetoByTeam = Array.groupBy(game.extradata.vetophase or {}, Operator.property('team'))
+		local _, vetoByTeam = Array.groupBy(vetoPhase, Operator.property('team'))
 		game.vetoGroups = {}
 
 		Array.forEach(vetoByTeam, function(team, teamIndex)
