@@ -19,6 +19,19 @@ function Operator.add(a, b)
 	return a + b
 end
 
+---A `nil`-safe version of `Operator.add`
+---@param a number?
+---@param b number?
+---@return number?
+function Operator.nilSafeAdd(a, b)
+		if not a then
+			return b
+		elseif not b then
+			return a
+		end
+		return a + b
+	end
+
 ---Uses the __sub metamethod (a - b)
 ---@param a number
 ---@param b number

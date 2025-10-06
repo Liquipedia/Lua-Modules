@@ -129,23 +129,11 @@ function CustomMatchGroupInputMatchPage.extendMapOpponent(map, opponentIndex)
 	end
 	---@cast participants -nil
 
-	---@param a number?
-	---@param b number?
-	---@return number?
-	local function nilSafeAdd(a, b)
-		if not a then
-			return b
-		elseif not b then
-			return a
-		end
-		return a + b
-	end
-
 	---@param arr table[]
 	---@param item string
 	---@return number?
 	local function sumItem(arr, item)
-		return Array.reduce(Array.map(arr, Operator.property(item)), nilSafeAdd, 0)
+		return Array.reduce(Array.map(arr, Operator.property(item)), Operator.nilSafeAdd, 0)
 	end
 
 	return {

@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local HeroNames = Lua.import('Module:ChampionNames', {loadData = true})
+local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
@@ -101,18 +102,6 @@ end
 ---@param opponents table[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
-	---@param a number?
-	---@param b number?
-	---@return number?
-	local function nilSafeAdd(a, b)
-		if not a then
-			return b
-		elseif not b then
-			return a
-		end
-		return a + b
-	end
-
 	if games[1] and games[1].opponents[1].stats then
 		Array.forEach(opponents, function (opponent, opponentIndex)
 			opponent.extradata = {
@@ -120,55 +109,55 @@ function MatchFunctions.getExtraData(match, games, opponents)
 					Array.map(games, function (game)
 						return (game.opponents[opponentIndex].stats or {}).kills
 					end),
-					nilSafeAdd
+					Operator.nilSafeAdd
 				),
 				deaths = Array.reduce(
 					Array.map(games, function (game)
 						return (game.opponents[opponentIndex].stats or {}).deaths
 					end),
-					nilSafeAdd
+					Operator.nilSafeAdd
 				),
 				assists = Array.reduce(
 					Array.map(games, function (game)
 						return (game.opponents[opponentIndex].stats or {}).assists
 					end),
-					nilSafeAdd
+					Operator.nilSafeAdd
 				),
 				towers = Array.reduce(
 					Array.map(games, function (game)
 						return (game.opponents[opponentIndex].stats or {}).towers
 					end),
-					nilSafeAdd
+					Operator.nilSafeAdd
 				),
 				inhibitors = Array.reduce(
 					Array.map(games, function (game)
 						return (game.opponents[opponentIndex].stats or {}).inhibitors
 					end),
-					nilSafeAdd
+					Operator.nilSafeAdd
 				),
 				dragons = Array.reduce(
 					Array.map(games, function (game)
 						return (game.opponents[opponentIndex].stats or {}).dragons
 					end),
-					nilSafeAdd
+					Operator.nilSafeAdd
 				),
 				atakhans = Array.reduce(
 					Array.map(games, function (game)
 						return (game.opponents[opponentIndex].stats or {}).atakhans
 					end),
-					nilSafeAdd
+					Operator.nilSafeAdd
 				),
 				heralds = Array.reduce(
 					Array.map(games, function (game)
 						return (game.opponents[opponentIndex].stats or {}).heralds
 					end),
-					nilSafeAdd
+					Operator.nilSafeAdd
 				),
 				barons = Array.reduce(
 					Array.map(games, function (game)
 						return (game.opponents[opponentIndex].stats or {}).barons
 					end),
-					nilSafeAdd
+					Operator.nilSafeAdd
 				)
 			}
 		end)
