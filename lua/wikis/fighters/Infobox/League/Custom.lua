@@ -27,6 +27,7 @@ local Chronology = Widgets.Chronology
 
 local ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
 local DEFAULT_TYPE = 'offline'
+local MANUAL_SERIES_ICON = true
 local TODAY = os.date('%Y-%m-%d', os.time())
 
 ---@class FightersLeagueInfobox: InfoboxLeague
@@ -45,7 +46,7 @@ function CustomLeague.run(frame)
 	args.circuitabbr = args.circuitabbr or CustomLeague.getAbbrFromSeries(args.circuit)
 
 	-- Auto Icon
-    local seriesIconLight, seriesIconDark = CustomLeague.getIconFromSeries(args.series)
+	local seriesIconLight, seriesIconDark = CustomLeague.getIconFromSeries(args.series)
     args.circuitIconLight, args.circuitIconDark = CustomLeague.getIconFromSeries(args.circuit)
     local icons = Logic.emptyOr(
         {args.icon, args.icondark},
@@ -53,6 +54,7 @@ function CustomLeague.run(frame)
         {args.circuitIconLight, args.circuitIconDark}
     )
     args.icon, args.icondark = unpack(icons)
+	args.display_series_icon_from_manual_input = MANUAL_SERIES_ICON
 
 	-- Normalize name
 	args.game = Game.toIdentifier{game = args.game}
