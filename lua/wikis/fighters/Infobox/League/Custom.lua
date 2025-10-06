@@ -53,7 +53,7 @@ function CustomLeague.run(frame)
         {seriesIconLight, seriesIconDark},
         {args.circuitIconLight, args.circuitIconDark}
     )
-    args.icon, args.icondark = unpack(icons)
+    args.icon, args.icondark = icons[1], icons[2]
 	args.display_series_icon_from_manual_input = MANUAL_SERIES_ICON
 
 	-- Normalize name
