@@ -41,6 +41,11 @@ function LegacyMatchList.run(frame, generate)
 	end)
 
 	local matchListArgs = Table.deepCopy(matches)
+	if generate then
+		matchListArgs = Table.map(matchListArgs, function(key, value)
+			return 'M' .. key, value
+		end)
+	end
 	matchListArgs.id = args.id
 	matchListArgs.isLegacy = true
 	matchListArgs.title = args.title or args[1] or 'Match List'
@@ -60,7 +65,8 @@ function LegacyMatchList.run(frame, generate)
 	end
 
 	if generate then
-		return MatchGroupLegacy.generateWikiCodeForMatchList(args)
+		matchListArgs.isLegacy = nil
+		return MatchGroupLegacy.generateWikiCodeForMatchList(matchListArgs)
 	end
 
 	return MatchGroup.MatchList(matchListArgs)

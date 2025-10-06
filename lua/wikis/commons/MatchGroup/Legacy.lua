@@ -552,6 +552,8 @@ function MatchGroupLegacy._generateMatch(match)
 			map = Json.parseIfTable(map) or map
 		end
 		if Logic.isEmpty(map) then return end
+		---@cast map table
+		map.winner = map.winner or map.win -- for wow
 		return '|map' .. mapIndex .. '=' .. MatchGroupLegacy._generateMap(map)
 	end)
 

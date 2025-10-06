@@ -36,6 +36,8 @@ pwb replace -lang:wildrift -transcludes:LegacyBracket -transcludes:LegacyMatchLi
 
 pwb replace -lang:honorofkings -transcludes:LegacyBracket -transcludes:LegacyMatchList -summary:"Convert LegacyMatch2 wrappers" -pt:60 -regex -always -dotall "\{\{[lL]egacyBracket" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/Default|fn=runGenerate|dev=hjp" "\{\{[bB]racketMatchSummaryL?u?a?" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=convertBracketMatchSummary|dev=hjp" "\{\{[mM]atchLua" "{{subst:#invoke:Lua|invoke|module=Json|fn=fromArgs" "\{\{[mM]atchMapsL?u?a?" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=convertMatch|dev=hjp" "\{\{[lL]egacyMatchList" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=generate|dev=hjp"
 
+pwb replace -lang:worldofwarcraft -transcludes:LegacyBracket -transcludes:LegacyMatchList -summary:"Convert LegacyMatch2 wrappers" -pt:60 -regex -always -dotall "\{\{[lL]egacyBracket" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/Default|fn=runGenerate|dev=hjp" "\{\{[bB]racketMatchSummary" "{{subst:#invoke:Lua|invoke|module=Json|fn=fromArgs" "\{\{[mM]atchMaps" "{{subst:#invoke:Lua|invoke|module=Json|fn=fromArgs" "\{\{[mM]atch/old" "{{subst:#invoke:Lua|invoke|module=Json|fn=fromArgs" "\{\{[lL]egacyMatchList" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/MatchList|fn=generate|dev=hjp"
+
 
 
 
