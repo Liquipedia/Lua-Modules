@@ -12,7 +12,6 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
-local Button = Lua.import('Module:Widget/Basic/Button')
 local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
