@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -18,30 +19,30 @@ local Span = HtmlWidgets.Span
 ---@class CollapsibleToggle: Widget
 ---@operator call(table?): CollapsibleToggle
 local CollapsibleToggle = Class.new(Widget)
-CollapsibleToggle.defaultProps = {
-	showButtonChildren = {
-		Icon{iconName = 'show'},
-		' ',
-		'Show'
-	},
-	hideButtonChildren = {
-		Icon{iconName = 'hide'},
-		' ',
-		'Hide'
-	}
-}
 
 ---@return Widget
 function CollapsibleToggle:render()
 	local showButton = Button{
 		classes = {'general-collapsible-expand-button'},
-		children = Span{children = self.props.showButtonChildren},
+		children = Span{
+			children = Logic.emptyOr(self.props.showButtonChildren, {
+				Icon{iconName = 'show'},
+				' ',
+				'Show'
+			})
+		},
 		size = 'xs',
 		variant = 'secondary',
 	}
 	local hideButton = Button{
 		classes = {'general-collapsible-collapse-button'},
-		children = Span{children = self.props.hideButtonChildren},
+		children = Span{
+			children = Logic.emptyOr(self.props.hideButtonChildren, {
+				Icon{iconName = 'hide'},
+				' ',
+				'Hide'
+			})
+		},
 		size = 'xs',
 		variant = 'secondary',
 	}
