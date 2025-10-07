@@ -23,6 +23,7 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class CellWidget: Widget
 ---@operator call(table):CellWidget
+---@field props {name: string, classes: string[]?, children: (string|Widget|Html)[], options: CellWidgetOptions}
 local Cell = Class.new(Widget,
 	function(self, input)
 		self.name = self:assertExistsAndCopy(input.name)
