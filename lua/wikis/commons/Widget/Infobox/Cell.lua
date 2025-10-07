@@ -12,12 +12,16 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
+local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class CellWidgetOptions
+---@field collapsible boolean?
 ---@field columns number?
 ---@field makeLink boolean?
+---@field shouldCollapse boolean?
 ---@field suppressColon boolean?
 ---@field separator Widget|string|Html|nil
 
@@ -32,8 +36,10 @@ local Cell = Class.new(Widget,
 )
 Cell.defaultProps = {
 	options = {
+		collapsible = false,
 		columns = 2,
 		makeLink = false,
+		shouldCollapse = true,
 		suppressColon = false,
 		separator = '<br />',
 	},
@@ -66,12 +72,28 @@ function Cell:render()
 				classes = {'infobox-cell-' .. options.columns, 'infobox-description'},
 				children = {self.props.name, not options.suppressColon and ':' or nil}
 			},
-			HtmlWidgets.Div{
-				css = {width = (100 * (options.columns - 1) / options.columns) .. '%'}, -- 66.66% for col = 3
-				children = Array.interleave(mappedChildren, options.separator)
-			}
+			self:_buildChildrenContainer(mappedChildren)
 		}
 	}
+end
+
+---@private
+---@param mappedChildren (string|Widget|Html)[]
+---@return Widget
+function Cell:_buildChildrenContainer(mappedChildren)
+	local options = self.props.options
+
+	local widgetProps = {
+		css = {width = (100 * (options.columns - 1) / options.columns) .. '%'}, -- 66.66% for col = 3
+		children = Array.interleave(mappedChildren, options.separator)
+	}
+
+	if options.collapsible then
+		widgetProps.shouldCollapse = options.shouldCollapse
+		widgetProps.titleWidget = CollapsibleToggle{}
+	end
+
+	return (options.collapsible and GeneralCollapsible or HtmlWidgets.Div)(widgetProps)
 end
 
 return Cell
