@@ -130,10 +130,10 @@ function MatchFunctions.getExtraData(match, games, opponents)
 				if game.status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
 					return
 				end
-				opponent.match2players = Array.map(opponent.match2players, function (player, playerIndex)
+				Array.forEach(opponent.match2players, function (player, playerIndex)
 					local gamePlayerData = game.opponents[opponentIndex].players[playerIndex]
 					if Logic.isEmpty(gamePlayerData) then
-						return player
+						return
 					end
 					local parsedGameLength = Array.map(
 						Array.parseCommaSeparatedString(game.length --[[@as string]], ':'), function (element)
@@ -152,7 +152,6 @@ function MatchFunctions.getExtraData(match, games, opponents)
 					player.extradata.creepscore = Operator.nilSafeAdd(player.extradata.creepscore, gamePlayerData.creepscore)
 					player.extradata.gold = Operator.nilSafeAdd(player.extradata.gold, gamePlayerData.gold)
 					player.extradata.gameLength = Operator.nilSafeAdd(player.extradata.gameLength, gameLength)
-					return player
 				end)
 			end)
 		end)
