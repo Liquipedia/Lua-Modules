@@ -126,33 +126,35 @@ function MatchFunctions.getExtraData(match, games, opponents)
 				heralds = aggregateStats('heralds'),
 				barons = aggregateStats('barons')
 			}
-			Array.forEach(games, function (game)
-				if game.status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
-					return
-				end
-				Array.forEach(opponent.match2players, function (player, playerIndex)
-					local gamePlayerData = game.opponents[opponentIndex].players[playerIndex]
-					if Logic.isEmpty(gamePlayerData) then
-						return
-					end
-					local parsedGameLength = Array.map(
-						Array.parseCommaSeparatedString(game.length --[[@as string]], ':'), function (element)
-							---Directly using tonumber as arg to Array.map causes base out of range error
-							return tonumber(element)
+			Array.forEach(opponent.match2players, function (player, playerIndex)
+				Array.forEach(
+					Array.filter(games, function (game)
+						return game.status ~= MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
+					end),
+					function (game)
+						local gamePlayerData = game.opponents[opponentIndex].players[playerIndex]
+						if Logic.isEmpty(gamePlayerData) then
+							return
 						end
-					)
-					local gameLength = (parsedGameLength[1] or 0) * 60 + (parsedGameLength[2] or 0)
-					player.extradata = player.extradata or {}
-					player.extradata.role = player.extradata.role or gamePlayerData.role
-					player.extradata.characters = Array.extend(player.extradata.characters, gamePlayerData.character)
-					player.extradata.kills = Operator.nilSafeAdd(player.extradata.kills, gamePlayerData.kills)
-					player.extradata.deaths = Operator.nilSafeAdd(player.extradata.deaths, gamePlayerData.deaths)
-					player.extradata.assists = Operator.nilSafeAdd(player.extradata.assists, gamePlayerData.assists)
-					player.extradata.damage = Operator.nilSafeAdd(player.extradata.damage, gamePlayerData.damagedone)
-					player.extradata.creepscore = Operator.nilSafeAdd(player.extradata.creepscore, gamePlayerData.creepscore)
-					player.extradata.gold = Operator.nilSafeAdd(player.extradata.gold, gamePlayerData.gold)
-					player.extradata.gameLength = Operator.nilSafeAdd(player.extradata.gameLength, gameLength)
-				end)
+						local parsedGameLength = Array.map(
+							Array.parseCommaSeparatedString(game.length --[[@as string]], ':'), function (element)
+								---Directly using tonumber as arg to Array.map causes base out of range error
+								return tonumber(element)
+							end
+						)
+						local gameLength = (parsedGameLength[1] or 0) * 60 + (parsedGameLength[2] or 0)
+						player.extradata = player.extradata or {}
+						player.extradata.role = player.extradata.role or gamePlayerData.role
+						player.extradata.characters = Array.extend(player.extradata.characters, gamePlayerData.character)
+						player.extradata.kills = Operator.nilSafeAdd(player.extradata.kills, gamePlayerData.kills)
+						player.extradata.deaths = Operator.nilSafeAdd(player.extradata.deaths, gamePlayerData.deaths)
+						player.extradata.assists = Operator.nilSafeAdd(player.extradata.assists, gamePlayerData.assists)
+						player.extradata.damage = Operator.nilSafeAdd(player.extradata.damage, gamePlayerData.damagedone)
+						player.extradata.creepscore = Operator.nilSafeAdd(player.extradata.creepscore, gamePlayerData.creepscore)
+						player.extradata.gold = Operator.nilSafeAdd(player.extradata.gold, gamePlayerData.gold)
+						player.extradata.gameLength = Operator.nilSafeAdd(player.extradata.gameLength, gameLength)
+					end
+				)
 			end)
 		end)
 		---Deep copy here to work around circular reference error from LPDB storage
