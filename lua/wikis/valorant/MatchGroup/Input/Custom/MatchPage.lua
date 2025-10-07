@@ -83,6 +83,13 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 end
 
 ---@param map valorantMatchDataExtended|table
+---@return integer?
+function CustomMatchGroupInputMatchPage.readTimestamp(map)
+	if not map.game_start_millis then return end
+	return map.game_start_millis / 1000
+end
+
+---@param map valorantMatchDataExtended|table
 ---@param opponentIndex integer
 ---@return table[]?
 function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
