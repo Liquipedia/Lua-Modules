@@ -30,6 +30,8 @@ MatchFunctions.OPPONENT_CONFIG = {
 MatchFunctions.DEFAULT_MODE = 'team'
 MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 
+local NOT_PLAYED = 'notplayed'
+
 ---@class LeagueOfLegendsMapParserInterface
 ---@field getMap fun(mapInput: table): table
 ---@field getLength fun(map: table): string?
@@ -127,7 +129,7 @@ function MatchFunctions.getExtraData(match, games, opponents)
 				barons = aggregateStats('barons')
 			}
 			Array.forEach(games, function (game)
-				if game.status == 'notplayed' then
+				if game.status == NOT_PLAYED then
 					return
 				end
 				opponent.match2players = Array.map(opponent.match2players, function (player, playerIndex)
