@@ -63,7 +63,70 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 	end
 
-	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
+	local processedMatch = MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
+
+	if options.isMatchPage then
+		CustomMatchGroupInput.aggregateStats(processedMatch)
+	end
+	return processedMatch
+end
+
+---@param match {opponents: MGIParsedOpponent[], games: table[]}
+function CustomMatchGroupInput.aggregateStats(match)
+	Array.forEach(match.opponents, function (opponent, opponentIndex)
+		---@param name string
+		---@return number?
+		local function aggregateStats(name)
+			return Array.reduce(
+				Array.map(match.games, function (game)
+					return (game.opponents[opponentIndex].stats or {})[name]
+				end),
+				Operator.nilSafeAdd
+			)
+		end
+		opponent.extradata = Table.merge(opponent.extradata, {
+			kills = aggregateStats('kills'),
+			deaths = aggregateStats('deaths'),
+			assists = aggregateStats('assists'),
+			towers = aggregateStats('towers'),
+			inhibitors = aggregateStats('inhibitors'),
+			dragons = aggregateStats('dragons'),
+			atakhans = aggregateStats('atakhans'),
+			heralds = aggregateStats('heralds'),
+			barons = aggregateStats('barons')
+		})
+		Array.forEach(opponent.match2players, function (player, playerIndex)
+			player.extradata = {characters = {}}
+			Array.forEach(
+				Array.filter(match.games, function (game)
+					return game.status ~= MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
+				end),
+				function (game)
+					local gamePlayerData = game.opponents[opponentIndex].players[playerIndex]
+					if Logic.isEmpty(gamePlayerData) then
+						return
+					end
+					local parsedGameLength = Array.map(
+						Array.parseCommaSeparatedString(game.length --[[@as string]], ':'), function (element)
+							---Directly using tonumber as arg to Array.map causes base out of range error
+							return tonumber(element)
+						end
+					)
+					local gameLength = (parsedGameLength[1] or 0) * 60 + (parsedGameLength[2] or 0)
+					player.extradata.role = player.extradata.role or gamePlayerData.role
+					player.extradata.characters = Array.extend(player.extradata.characters, gamePlayerData.character)
+					player.extradata.kills = Operator.nilSafeAdd(player.extradata.kills, gamePlayerData.kills)
+					player.extradata.deaths = Operator.nilSafeAdd(player.extradata.deaths, gamePlayerData.deaths)
+					player.extradata.assists = Operator.nilSafeAdd(player.extradata.assists, gamePlayerData.assists)
+					player.extradata.damage = Operator.nilSafeAdd(player.extradata.damage, gamePlayerData.damagedone)
+					player.extradata.creepscore = Operator.nilSafeAdd(player.extradata.creepscore, gamePlayerData.creepscore)
+					player.extradata.gold = Operator.nilSafeAdd(player.extradata.gold, gamePlayerData.gold)
+					player.extradata.gameLength = Operator.nilSafeAdd(player.extradata.gameLength, gameLength)
+				end
+			)
+			player.extradata.characters = Logic.nilIfEmpty(player.extradata.characters)
+		end)
+	end)
 end
 
 ---@param match table
@@ -103,65 +166,6 @@ end
 ---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
-	if games[1] and games[1].opponents[1].stats then
-		opponents = Array.map(opponents, function (opponent, opponentIndex)
-			---@param name string
-			---@return number?
-			local function aggregateStats(name)
-				return Array.reduce(
-					Array.map(games, function (game)
-						return (game.opponents[opponentIndex].stats or {})[name]
-					end),
-					Operator.nilSafeAdd
-				)
-			end
-			opponent.extradata = Table.merge(opponent.extradata, {
-				kills = aggregateStats('kills'),
-				deaths = aggregateStats('deaths'),
-				assists = aggregateStats('assists'),
-				towers = aggregateStats('towers'),
-				inhibitors = aggregateStats('inhibitors'),
-				dragons = aggregateStats('dragons'),
-				atakhans = aggregateStats('atakhans'),
-				heralds = aggregateStats('heralds'),
-				barons = aggregateStats('barons')
-			})
-			Array.forEach(opponent.match2players, function (player, playerIndex)
-				local playerExtradata = {characters = {}}
-				Array.forEach(
-					Array.filter(games, function (game)
-						return game.status ~= MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
-					end),
-					function (game)
-						local gamePlayerData = game.opponents[opponentIndex].players[playerIndex]
-						if Logic.isEmpty(gamePlayerData) then
-							return
-						end
-						local parsedGameLength = Array.map(
-							Array.parseCommaSeparatedString(game.length --[[@as string]], ':'), function (element)
-								---Directly using tonumber as arg to Array.map causes base out of range error
-								return tonumber(element)
-							end
-						)
-						local gameLength = (parsedGameLength[1] or 0) * 60 + (parsedGameLength[2] or 0)
-						playerExtradata.role = playerExtradata.role or gamePlayerData.role
-						playerExtradata.characters = Array.extend(playerExtradata.characters, gamePlayerData.character)
-						playerExtradata.kills = Operator.nilSafeAdd(playerExtradata.kills, gamePlayerData.kills)
-						playerExtradata.deaths = Operator.nilSafeAdd(playerExtradata.deaths, gamePlayerData.deaths)
-						playerExtradata.assists = Operator.nilSafeAdd(playerExtradata.assists, gamePlayerData.assists)
-						playerExtradata.damage = Operator.nilSafeAdd(playerExtradata.damage, gamePlayerData.damagedone)
-						playerExtradata.creepscore = Operator.nilSafeAdd(playerExtradata.creepscore, gamePlayerData.creepscore)
-						playerExtradata.gold = Operator.nilSafeAdd(playerExtradata.gold, gamePlayerData.gold)
-						playerExtradata.gameLength = Operator.nilSafeAdd(playerExtradata.gameLength, gameLength)
-					end
-				)
-				playerExtradata.characters = Logic.nilIfEmpty(playerExtradata.characters)
-				player.extradata = playerExtradata
-			end)
-			return Table.deepCopy(opponent)
-		end)
-	end
-
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
 	}
