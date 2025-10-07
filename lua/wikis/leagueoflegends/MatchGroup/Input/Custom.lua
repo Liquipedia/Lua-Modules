@@ -126,7 +126,9 @@ function MatchFunctions.getExtraData(match, games, opponents)
 				heralds = aggregateStats('heralds'),
 				barons = aggregateStats('barons')
 			}
-			Array.forEach(opponent.match2players, function (player, playerIndex)
+			opponent.match2players = Array.map(opponent.match2players, function (player, playerIndex)
+				player = Table.copy(player)
+				player.extradata = {characters = {}}
 				Array.forEach(
 					Array.filter(games, function (game)
 						return game.status ~= MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
@@ -143,7 +145,6 @@ function MatchFunctions.getExtraData(match, games, opponents)
 							end
 						)
 						local gameLength = (parsedGameLength[1] or 0) * 60 + (parsedGameLength[2] or 0)
-						player.extradata = player.extradata or {}
 						player.extradata.role = player.extradata.role or gamePlayerData.role
 						player.extradata.characters = Array.extend(player.extradata.characters, gamePlayerData.character)
 						player.extradata.kills = Operator.nilSafeAdd(player.extradata.kills, gamePlayerData.kills)
@@ -155,6 +156,8 @@ function MatchFunctions.getExtraData(match, games, opponents)
 						player.extradata.gameLength = Operator.nilSafeAdd(player.extradata.gameLength, gameLength)
 					end
 				)
+				player.extradata.characters = Logic.nilIfEmpty(player.extradata.characters)
+				return player
 			end)
 		end)
 		---Deep copy here to work around circular reference error from LPDB storage
