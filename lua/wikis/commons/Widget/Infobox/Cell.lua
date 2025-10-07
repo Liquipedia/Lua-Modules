@@ -92,44 +92,21 @@ function Cell:_buildChildrenContainer(mappedChildren)
 
 	if options.collapsible then
 		widgetProps.shouldCollapse = options.shouldCollapse
-		widgetProps.titleWidget = Cell._buildCollapsibleToggle()
-	end
-
-	return (options.collapsible and GeneralCollapsible or HtmlWidgets.Div)(widgetProps)
-end
-
----@private
----@return Widget
-function Cell._buildCollapsibleToggle()
-	local expandButton = Button{
-		classes = {'general-collapsible-expand-button'},
-		children = HtmlWidgets.Span{
-			children = {
+		widgetProps.titleWidget = CollapsibleToggle{
+			showButtonChildren = {
 				'Expand',
 				' ',
 				Icon{iconName = 'expand'}
 			},
-		},
-		size = 'xs',
-		variant = 'secondary',
-	}
-	local collapseButton = Button{
-		classes = {'general-collapsible-collapse-button'},
-		children = HtmlWidgets.Span{
-			children = {
+			hideButtonChildren = {
 				'Collapse',
 				' ',
 				Icon{iconName = 'collapse'}
-			},
-		},
-		size = 'xs',
-		variant = 'secondary',
-	}
+			}
+		}
+	end
 
-	return HtmlWidgets.Span{
-		classes = {'general-collapsible-default-toggle'},
-		children = {expandButton, collapseButton}
-	}
+	return (options.collapsible and GeneralCollapsible or HtmlWidgets.Div)(widgetProps)
 end
 
 return Cell

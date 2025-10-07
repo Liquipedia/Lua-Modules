@@ -18,30 +18,30 @@ local Span = HtmlWidgets.Span
 ---@class CollapsibleToggle: Widget
 ---@operator call(table?): CollapsibleToggle
 local CollapsibleToggle = Class.new(Widget)
+CollapsibleToggle.defaultProps = {
+	showButtonChildren = {
+		Icon{iconName = 'show'},
+		' ',
+		'Show'
+	},
+	hideButtonChildren = {
+		Icon{iconName = 'hide'},
+		' ',
+		'Hide'
+	}
+}
 
 ---@return Widget
 function CollapsibleToggle:render()
 	local showButton = Button{
 		classes = {'general-collapsible-expand-button'},
-		children = Span{
-			children = {
-				Icon{iconName = 'show'},
-				' ',
-				'Show'
-			},
-		},
+		children = Span{children = self.props.showButtonChildren},
 		size = 'xs',
 		variant = 'secondary',
 	}
 	local hideButton = Button{
 		classes = {'general-collapsible-collapse-button'},
-		children = Span{
-			children = {
-				Icon{iconName = 'hide'},
-				' ',
-				'Hide'
-			},
-		},
+		children = Span{children = self.props.hideButtonChildren},
 		size = 'xs',
 		variant = 'secondary',
 	}
