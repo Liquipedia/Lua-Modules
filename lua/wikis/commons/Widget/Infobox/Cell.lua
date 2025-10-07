@@ -12,9 +12,11 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
+local Button = Lua.import('Module:Widget/Basic/Button')
 local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class CellWidgetOptions
@@ -90,10 +92,44 @@ function Cell:_buildChildrenContainer(mappedChildren)
 
 	if options.collapsible then
 		widgetProps.shouldCollapse = options.shouldCollapse
-		widgetProps.titleWidget = CollapsibleToggle{}
+		widgetProps.titleWidget = Cell._buildCollapsibleToggle()
 	end
 
 	return (options.collapsible and GeneralCollapsible or HtmlWidgets.Div)(widgetProps)
+end
+
+---@private
+---@return Widget
+function Cell._buildCollapsibleToggle()
+	local expandButton = Button{
+		classes = {'general-collapsible-expand-button'},
+		children = HtmlWidgets.Span{
+			children = {
+				'Expand',
+				' ',
+				Icon{iconName = 'expand'}
+			},
+		},
+		size = 'xs',
+		variant = 'secondary',
+	}
+	local collapseButton = Button{
+		classes = {'general-collapsible-collapse-button'},
+		children = HtmlWidgets.Span{
+			children = {
+				'Collapse',
+				' ',
+				Icon{iconName = 'collapse'}
+			},
+		},
+		size = 'xs',
+		variant = 'secondary',
+	}
+
+	return HtmlWidgets.Span{
+		classes = {'general-collapsible-default-toggle'},
+		children = {expandButton, collapseButton}
+	}
 end
 
 return Cell
