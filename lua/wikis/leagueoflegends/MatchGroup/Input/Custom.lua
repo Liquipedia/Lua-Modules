@@ -156,6 +156,7 @@ function MatchFunctions.getExtraData(match, games, opponents)
 				end)
 			end)
 		end)
+		---Deep copy here to work around circular reference error from LPDB storage
 		opponents = Table.deepCopy(opponents)
 	end
 
