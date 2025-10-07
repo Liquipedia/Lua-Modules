@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local AgentNames = Lua.import('Module:AgentNames')
+local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
@@ -51,6 +52,7 @@ local VALORANT_REGIONS = {'eu', 'na', 'ap', 'kr', 'latam', 'br', 'pbe1', 'esport
 ---@field getMapName fun(map: table): string?
 ---@field getLength fun(map: table): string?
 ---@field getRounds fun(map: table): ValorantRoundData[]?
+---@field readTimestamp? fun(map: table): integer?
 ---@field getPatch fun(map: table): string?
 
 ---@class ValorantPlayerOverallStats
@@ -114,7 +116,8 @@ function MatchFunctions.extractMaps(match, opponents, MapParser)
 		getMapName = MapParser.getMapName,
 		getLength = MapParser.getLength,
 		getPlayersOfMapOpponent = FnUtil.curry(MapFunctions.getPlayersOfMapOpponent, MapParser),
-		getPatch = MapParser.getPatch
+		getPatch = MapParser.getPatch,
+		readDate = FnUtil.curry(MapFunctions.readDate, MapParser)
 	}
 
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, mapParser)
@@ -314,6 +317,28 @@ end
 ---@return boolean
 function MapFunctions.keepMap(map)
 	return map.map ~= nil
+end
+
+---@param MapParser ValorantMapParserInterface
+---@param match table
+---@param map table
+---@return MGIParsedDate?
+function MapFunctions.readDate(MapParser, match, map)
+	if not MapParser.readTimestamp then
+		return
+	end
+	local mapTimestamp = MapParser.readTimestamp(map)
+	if not mapTimestamp then
+		return
+	end
+	---@type MGIParsedDate
+	return {
+		date = DateExt.formatTimestamp('c', mapTimestamp),
+		dateexact = true,
+		timestamp = mapTimestamp,
+		timezoneId = match.timezoneId,
+		timezoneOffset = match.timezoneOffset
+	}
 end
 
 ---@param MapParser ValorantMapParserInterface
