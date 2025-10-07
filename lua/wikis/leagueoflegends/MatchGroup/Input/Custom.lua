@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local HeroNames = Lua.import('Module:ChampionNames', {loadData = true})
+local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -126,16 +127,37 @@ function MatchFunctions.getExtraData(match, games, opponents)
 				barons = aggregateStats('barons')
 			}
 			Array.forEach(games, function (game)
+				if game.status == 'notplayed' then
+					return
+				end
 				opponent.match2players = Array.map(opponent.match2players, function (player, playerIndex)
-					player.extradata = {}
-					player.extradata.damage = Operator.nilSafeAdd(player.extradata.damage, game.opponents[opponentIndex].players[playerIndex].damage)
+					local gamePlayerData = game.opponents[opponentIndex].players[playerIndex]
+					if Logic.isEmpty(gamePlayerData) then
+						return player
+					end
+					local parsedGameLength = Array.map(
+						Array.parseCommaSeparatedString(game.length --[[@as string]], ':'), function (element)
+							---Directly using tonumber as arg to Array.map causes base out of range error
+							return tonumber(element)
+						end
+					)
+					local gameLength = (parsedGameLength[1] or 0) * 60 + (parsedGameLength[2] or 0)
+					player.extradata = player.extradata or {}
+					player.extradata.role = player.extradata.role or gamePlayerData.role
+					player.extradata.characters = Array.extend(player.extradata.characters, gamePlayerData.character)
+					player.extradata.kills = Operator.nilSafeAdd(player.extradata.kills, gamePlayerData.kills)
+					player.extradata.deaths = Operator.nilSafeAdd(player.extradata.deaths, gamePlayerData.deaths)
+					player.extradata.assists = Operator.nilSafeAdd(player.extradata.assists, gamePlayerData.assists)
+					player.extradata.damage = Operator.nilSafeAdd(player.extradata.damage, gamePlayerData.damagedone)
+					player.extradata.creepscore = Operator.nilSafeAdd(player.extradata.creepscore, gamePlayerData.creepscore)
+					player.extradata.gold = Operator.nilSafeAdd(player.extradata.gold, gamePlayerData.gold)
+					player.extradata.gameLength = Operator.nilSafeAdd(player.extradata.gameLength, gameLength)
 					return player
 				end)
 			end)
 		end)
+		opponents = Table.deepCopy(opponents)
 	end
-
-	opponents = Table.deepCopy(opponents)
 
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
