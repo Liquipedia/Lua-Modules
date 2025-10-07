@@ -104,7 +104,8 @@ end
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	if games[1] and games[1].opponents[1].stats then
-		Array.forEach(opponents, function (opponent, opponentIndex)
+		opponents = Array.map(opponents, function (opponent, opponentIndex)
+			opponent = Table.copy(opponent)
 			---@param name string
 			---@return number?
 			local function aggregateStats(name)
@@ -127,8 +128,7 @@ function MatchFunctions.getExtraData(match, games, opponents)
 				barons = aggregateStats('barons')
 			}
 			opponent.match2players = Array.map(opponent.match2players, function (player, playerIndex)
-				player = Table.copy(player)
-				player.extradata = {characters = {}}
+				local extradata = {characters = {}}
 				Array.forEach(
 					Array.filter(games, function (game)
 						return game.status ~= MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
@@ -145,23 +145,22 @@ function MatchFunctions.getExtraData(match, games, opponents)
 							end
 						)
 						local gameLength = (parsedGameLength[1] or 0) * 60 + (parsedGameLength[2] or 0)
-						player.extradata.role = player.extradata.role or gamePlayerData.role
-						player.extradata.characters = Array.extend(player.extradata.characters, gamePlayerData.character)
-						player.extradata.kills = Operator.nilSafeAdd(player.extradata.kills, gamePlayerData.kills)
-						player.extradata.deaths = Operator.nilSafeAdd(player.extradata.deaths, gamePlayerData.deaths)
-						player.extradata.assists = Operator.nilSafeAdd(player.extradata.assists, gamePlayerData.assists)
-						player.extradata.damage = Operator.nilSafeAdd(player.extradata.damage, gamePlayerData.damagedone)
-						player.extradata.creepscore = Operator.nilSafeAdd(player.extradata.creepscore, gamePlayerData.creepscore)
-						player.extradata.gold = Operator.nilSafeAdd(player.extradata.gold, gamePlayerData.gold)
-						player.extradata.gameLength = Operator.nilSafeAdd(player.extradata.gameLength, gameLength)
+						extradata.role = extradata.role or gamePlayerData.role
+						extradata.characters = Array.extend(extradata.characters, gamePlayerData.character)
+						extradata.kills = Operator.nilSafeAdd(extradata.kills, gamePlayerData.kills)
+						extradata.deaths = Operator.nilSafeAdd(extradata.deaths, gamePlayerData.deaths)
+						extradata.assists = Operator.nilSafeAdd(extradata.assists, gamePlayerData.assists)
+						extradata.damage = Operator.nilSafeAdd(extradata.damage, gamePlayerData.damagedone)
+						extradata.creepscore = Operator.nilSafeAdd(extradata.creepscore, gamePlayerData.creepscore)
+						extradata.gold = Operator.nilSafeAdd(extradata.gold, gamePlayerData.gold)
+						extradata.gameLength = Operator.nilSafeAdd(extradata.gameLength, gameLength)
 					end
 				)
-				player.extradata.characters = Logic.nilIfEmpty(player.extradata.characters)
-				return player
+				extradata.characters = Logic.nilIfEmpty(extradata.characters)
+				player.extradata = extradata
+				return Table.deepCopy(player)
 			end)
 		end)
-		---Deep copy here to work around circular reference error from LPDB storage
-		opponents = Table.deepCopy(opponents)
 	end
 
 	return {
