@@ -37,6 +37,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LoLMatchPage: BaseMatchPage
 ---@field games LoLMatchPageGame[]
+---@operator call(MatchGroupUtilMatch): BaseMatchPage
 local MatchPage = Class.new(BaseMatchPage)
 
 local KEYSTONES = Table.map({
@@ -272,7 +273,12 @@ function MatchPage:renderOverallStats()
 								classes = {'match-bm-players-team-header'},
 								children = opponent.iconDisplay
 							},
-							Array.map(opponent.players, renderPlayerOverallPerformance)
+							Array.map(
+								Array.sortBy(opponent.players, function (player)
+									return ROLE_ORDER[player.extradata.role] or -1
+								end),
+								renderPlayerOverallPerformance
+							)
 						)
 					}
 				end)
