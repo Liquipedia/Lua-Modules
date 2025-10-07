@@ -35,7 +35,7 @@ function CustomMatchSummary.createBody(match)
 	local showCountdown = (not DateExt.isDefaultTimestamp(match.timestamp)) and phase ~= 'finished'
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = Countdown._create{
+		showCountdown and MatchSummaryWidgets.Row{children = Countdown.create{
 			date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
 			finished = match.finished,
 		}} or nil,
