@@ -94,7 +94,11 @@ function League:createInfobox()
 		Customizable{
 			id = 'sponsors',
 			children = {
-				Cell{name = 'Sponsor(s)', children = self:getAllArgsForBase(args, 'sponsor')},
+				Cell{
+					name = 'Sponsor(s)',
+					children = self:getAllArgsForBase(args, 'sponsor'),
+					options = {collapsible = true},
+				},
 			}
 		},
 		Customizable{
