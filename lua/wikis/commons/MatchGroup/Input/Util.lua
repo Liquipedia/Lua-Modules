@@ -1214,6 +1214,7 @@ end
 ---@field getMapBestOf? fun(map: table): integer?
 ---@field computeOpponentScore? fun(props: table, autoScore?: fun(opponentIndex: integer):integer?): integer?, string?
 ---@field getGame? fun(match: table, map:table): string?
+---@field readDate? fun(match: table, map: table): MGIParsedDate?
 ---@field ADD_SUB_GROUP? boolean
 ---@field BREAK_ON_EMPTY? boolean
 ---@field INHERIT_MAP_DATES? boolean
@@ -1255,13 +1256,18 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		local dateToUse = map.date or match.date
-		if Parser.INHERIT_MAP_DATES then
-			dateToUse = map.date or lastDate
-			lastDate = dateToUse
+		local parsedDate = Parser.readDate and Parser.readDate(match, map) or nil
+
+		if not parsedDate then
+			local dateToUse = map.date or match.date
+			if Parser.INHERIT_MAP_DATES then
+				dateToUse = map.date or lastDate
+				lastDate = dateToUse
+			end
+			parsedDate = MatchGroupInputUtil.readDate(dateToUse)
 		end
 
-		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
+		Table.mergeInto(map, parsedDate)
 
 		if Parser.ADD_SUB_GROUP then
 			subGroup = tonumber(map.subgroup) or (subGroup + 1)
