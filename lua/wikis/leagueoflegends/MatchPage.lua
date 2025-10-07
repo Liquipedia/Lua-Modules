@@ -157,73 +157,6 @@ function MatchPage:renderOverallStats()
 		return
 	end
 
-	---@type table<string, {displayName: string, playerName: string, teamIndex: integer,
-	---role: string, champions: string[], stats: table<string, integer?>}>
-	local allPlayersStats = {}
-	local allTeamsStats = Array.map(self.matchData.opponents, Operator.property('extradata'))
-
-	Array.forEach(self.games, function(game)
-		if game.status == BaseMatchPage.NOT_PLAYED then
-			return
-		end
-		local parsedGameLength = Array.map(
-			Array.parseCommaSeparatedString(game.length --[[@as string]], ':'), function (element)
-				---Directly using tonumber as arg to Array.map causes base out of range error
-				return tonumber(element)
-			end
-		)
-		local gameLength = (parsedGameLength[1] or 0) * 60 + (parsedGameLength[2] or 0)
-
-		Array.forEach(game.opponents, function(team, teamIdx)
-			Array.forEach(team.players or {}, function(player)
-				local playerId = player.player
-				if not playerId then return end
-
-				if not allPlayersStats[playerId] then
-					allPlayersStats[playerId] = {
-						displayName = player.displayName or player.player,
-						playerName = player.player,
-						teamIndex = teamIdx,
-						champions = {},
-						role = player.role,
-						stats = {
-							damage = 0,
-							gold = 0,
-							creepscore = 0,
-							gameLength = 0,
-							kills = 0,
-							deaths = 0,
-							assists = 0,
-						}
-					}
-				end
-
-				local data = allPlayersStats[playerId]
-				if player.character then
-					table.insert(data.champions, player.character)
-				end
-
-				local stats = data.stats
-				stats.damage = stats.damage + (player.damagedone or 0)
-				stats.gold = stats.gold + (player.gold or 0)
-				stats.creepscore = stats.creepscore + (player.creepscore or 0)
-				stats.gameLength = stats.gameLength + gameLength
-				stats.kills = stats.kills + (player.kills or 0)
-				stats.deaths = stats.deaths + (player.deaths or 0)
-				stats.assists = stats.assists + (player.assists or 0)
-			end)
-		end)
-	end)
-
-	local ungroupedPlayers = Array.sortBy(Array.extractValues(allPlayersStats), function(player)
-		return ROLE_ORDER[player.role]
-	end)
-	local players = Array.map(Array.range(1, 2), function (teamIdx)
-		return Array.filter(ungroupedPlayers, function (player)
-			return player.teamIndex == teamIdx
-		end)
-	end)
-
 	local function renderOverallTeamStats()
 		return {
 			HtmlWidgets.H3{children = 'Overall Team Stats'},
@@ -249,7 +182,7 @@ function MatchPage:renderOverallStats()
 					},
 					MatchPage._buildTeamStatsList{
 						finished = true,
-						data = allTeamsStats
+						data = Array.map(self.matchData.opponents, Operator.property('extradata'))
 					}
 				}
 			}
@@ -266,15 +199,20 @@ function MatchPage:renderOverallStats()
 		return string.format('%.2f', stat / gameLength * 60)
 	end
 
+	---@param player standardPlayer
+	---@return Widget?
 	local function renderPlayerOverallPerformance(player)
+		if Logic.isEmpty(player.extradata) then
+			return
+		end
 		return Div{
 			classes = {'match-bm-players-player match-bm-players-player--col-2'},
 			children = WidgetUtil.collect(
 				Div{
 					classes = {'match-bm-players-player-name'},
 					children = {
-						Link{link = player.playerName, children = player.displayName},
-						MatchSummaryCharacters{characters = player.champions, date = self.matchData.date},
+						Link{link = player.pageName, children = player.displayName},
+						MatchSummaryCharacters{characters = player.extradata.characters, date = self.matchData.date},
 					}
 				},
 				Div{
@@ -283,9 +221,9 @@ function MatchPage:renderOverallStats()
 						PlayerStat{
 							title = {KDA_ICON, 'KDA'},
 							data = Array.interleave({
-								player.stats.kills,
-								player.stats.deaths,
-								player.stats.assists
+								player.extradata.kills,
+								player.extradata.deaths,
+								player.extradata.assists
 							}, SPAN_SLASH)
 						},
 						PlayerStat{
@@ -297,11 +235,11 @@ function MatchPage:renderOverallStats()
 								},
 								'CSM'
 							},
-							data = calculateStatPerMinute(player.stats.creepscore, player.stats.gameLength)
+							data = calculateStatPerMinute(player.extradata.creepscore, player.extradata.gameLength)
 						},
 						PlayerStat{
 							title = {GOLD_ICON, 'GPM'},
-							data = calculateStatPerMinute(player.stats.gold, player.stats.gameLength)
+							data = calculateStatPerMinute(player.extradata.gold, player.extradata.gameLength)
 						},
 						PlayerStat{
 							title = {
@@ -312,7 +250,7 @@ function MatchPage:renderOverallStats()
 								},
 								'DPM'
 							},
-							data = calculateStatPerMinute(player.stats.damage, player.stats.gameLength)
+							data = calculateStatPerMinute(player.extradata.damage, player.extradata.gameLength)
 						}
 					}
 				}
@@ -326,7 +264,7 @@ function MatchPage:renderOverallStats()
 			HtmlWidgets.H3{children = 'Overall Player Performance'},
 			Div{
 				classes = {'match-bm-players-wrapper'},
-				children = Array.map(self.opponents, function (opponent, teamIndex)
+				children = Array.map(self.opponents, function (opponent)
 					return Div{
 						classes = {'match-bm-players-team'},
 						children = WidgetUtil.collect(
@@ -334,7 +272,7 @@ function MatchPage:renderOverallStats()
 								classes = {'match-bm-players-team-header'},
 								children = opponent.iconDisplay
 							},
-							Array.map(players[teamIndex], renderPlayerOverallPerformance)
+							Array.map(opponent.players, renderPlayerOverallPerformance)
 						)
 					}
 				end)
