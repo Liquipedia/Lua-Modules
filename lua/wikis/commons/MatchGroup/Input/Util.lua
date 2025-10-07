@@ -1187,7 +1187,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
 		end)
 	elseif MatchGroupInputUtil.isPostponed(matchInput.winner, matchInput.finished) then
-		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished)
+		match.status = MatchGroupInputUtil.MATCH_STATUS.POSTPONED
 		match.dateexact = false
 	end
 
@@ -1438,7 +1438,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 			Array.forEach(opponents, FnUtil.curry(Parser.extendOpponentIfFinished, match))
 		end
 	elseif MatchGroupInputUtil.isPostponed(winnerInput, finishedInput) then
-		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+		match.status = MatchGroupInputUtil.MATCH_STATUS.POSTPONED
 		match.dateexact = false
 	end
 
