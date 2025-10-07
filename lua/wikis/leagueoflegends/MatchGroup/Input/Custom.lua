@@ -67,7 +67,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param MapParser LeagueOfLegendsMapParserInterface
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents, MapParser)
@@ -100,7 +100,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	if games[1] and games[1].opponents[1].stats then
@@ -168,7 +168,7 @@ end
 ---@param MapParser LeagueOfLegendsMapParserInterface
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(MapParser, match, map, opponents)
 	local extraData = {}
@@ -207,7 +207,7 @@ end
 
 ---@param MapParser LeagueOfLegendsMapParserInterface
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponentIndex)
