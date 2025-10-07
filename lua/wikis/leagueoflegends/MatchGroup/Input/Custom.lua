@@ -30,8 +30,6 @@ local MatchFunctions = {
 }
 local MapFunctions = {}
 
-local NOT_PLAYED = 'notplayed'
-
 ---@class LeagueOfLegendsMapParserInterface
 ---@field getMap fun(mapInput: table): table
 ---@field getLength fun(map: table): string?
@@ -129,7 +127,7 @@ function MatchFunctions.getExtraData(match, games, opponents)
 				barons = aggregateStats('barons')
 			}
 			Array.forEach(games, function (game)
-				if game.status == NOT_PLAYED then
+				if game.status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
 					return
 				end
 				opponent.match2players = Array.map(opponent.match2players, function (player, playerIndex)
