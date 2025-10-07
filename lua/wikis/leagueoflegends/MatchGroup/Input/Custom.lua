@@ -19,16 +19,16 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local CustomMatchGroupInput = {}
-local MatchFunctions = {}
-local MapFunctions = {}
-
-MatchFunctions.OPPONENT_CONFIG = {
-	resolveRedirect = true,
-	pagifyTeamNames = false,
-	maxNumPlayers = 15,
+local MatchFunctions = {
+	OPPONENT_CONFIG = {
+		resolveRedirect = true,
+		pagifyTeamNames = false,
+		maxNumPlayers = 15,
+	},
+	DEFAULT_MODE = 'team',
+	getBestOf = MatchGroupInputUtil.getBestOf
 }
-MatchFunctions.DEFAULT_MODE = 'team'
-MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
+local MapFunctions = {}
 
 local NOT_PLAYED = 'notplayed'
 
