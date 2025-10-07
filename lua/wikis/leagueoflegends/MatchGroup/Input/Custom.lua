@@ -125,8 +125,18 @@ function MatchFunctions.getExtraData(match, games, opponents)
 				heralds = aggregateStats('heralds'),
 				barons = aggregateStats('barons')
 			}
+			Array.forEach(games, function (game)
+				opponent.match2players = Array.map(opponent.match2players, function (player, playerIndex)
+					player.extradata = {}
+					player.extradata.damage = Operator.nilSafeAdd(player.extradata.damage, game.opponents[opponentIndex].players[playerIndex].damage)
+					return player
+				end)
+			end)
 		end)
 	end
+
+	opponents = Table.deepCopy(opponents)
+
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
 	}
