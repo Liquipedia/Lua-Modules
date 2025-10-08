@@ -32,7 +32,7 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@field options CellWidgetOptions
 
 ---@class CellWidget: Widget
----@operator call(CellWidgetProps):CellWidget
+---@operator call(CellWidgetProps): CellWidget
 ---@field props CellWidgetProps
 local Cell = Class.new(Widget,
 	function(self, input)
