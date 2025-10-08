@@ -93,23 +93,25 @@ function Cell:_buildChildrenContainer(mappedChildren)
 		children = Array.interleave(mappedChildren, options.separator)
 	}
 
-	if options.collapsible then
-		widgetProps.shouldCollapse = true
-		widgetProps.titleWidget = CollapsibleToggle{
-			showButtonChildren = {
-				'Expand',
-				' ',
-				Icon{iconName = 'expand'}
-			},
-			hideButtonChildren = {
-				'Collapse',
-				' ',
-				Icon{iconName = 'collapse'}
-			}
-		}
+	if not options.collapsible then
+		return HtmlWidgets.Div(widgetProps)
 	end
 
-	return (options.collapsible and GeneralCollapsible or HtmlWidgets.Div)(widgetProps)
+	widgetProps.shouldCollapse = true
+	widgetProps.titleWidget = CollapsibleToggle{
+		showButtonChildren = {
+			'Expand',
+			' ',
+			Icon{iconName = 'expand'}
+		},
+		hideButtonChildren = {
+			'Collapse',
+			' ',
+			Icon{iconName = 'collapse'}
+		}
+	}
+
+	return GeneralCollapsible(widgetProps)
 end
 
 return Cell
