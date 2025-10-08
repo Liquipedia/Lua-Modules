@@ -62,6 +62,13 @@ local MatchGroupInputUtil = {}
 ---@field startingpoints number?
 ---@field extradata table
 
+---@class MGIParsedDate
+---@field date string
+---@field dateexact boolean
+---@field timestamp integer
+---@field timezoneId string?
+---@field timezoneOffset string?
+
 local NOT_PLAYED_INPUTS = {
 	'skip',
 	'np',
@@ -124,7 +131,7 @@ local contentLanguage = mw.getContentLanguage()
 
 ---@param dateString string?
 ---@param dateFallbacks string[]?
----@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
+---@return MGIParsedDate
 function MatchGroupInputUtil.readDate(dateString, dateFallbacks)
 	if dateString then
 		-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
@@ -1066,13 +1073,7 @@ function MatchGroupInputUtil.mergeStandaloneIntoMatch(match, standaloneMatch)
 	return match
 end
 
----@alias readDateFunction fun(match: table): {
----date: string,
----dateexact: boolean,
----timestamp: integer,
----timezoneId: string?,
----timezoneOffset:string?,
----}
+---@alias readDateFunction fun(match: table): MGIParsedDate
 
 ---@class MatchParserInterface
 ---@field extractMaps fun(match: table, opponents: table[], mapProps: any?): table[]
@@ -1209,6 +1210,7 @@ end
 ---@field getMapBestOf? fun(map: table): integer?
 ---@field computeOpponentScore? fun(props: table, autoScore?: fun(opponentIndex: integer):integer?): integer?, string?
 ---@field getGame? fun(match: table, map:table): string?
+---@field readDate? fun(match: table, map: table): MGIParsedDate?
 ---@field ADD_SUB_GROUP? boolean
 ---@field BREAK_ON_EMPTY? boolean
 ---@field INHERIT_MAP_DATES? boolean
@@ -1250,13 +1252,18 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		local dateToUse = map.date or match.date
-		if Parser.INHERIT_MAP_DATES then
-			dateToUse = map.date or lastDate
-			lastDate = dateToUse
+		local parsedDate = Parser.readDate and Parser.readDate(match, map) or nil
+
+		if not parsedDate then
+			local dateToUse = map.date or match.date
+			if Parser.INHERIT_MAP_DATES then
+				dateToUse = map.date or lastDate
+				lastDate = dateToUse
+			end
+			parsedDate = MatchGroupInputUtil.readDate(dateToUse)
 		end
 
-		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
+		Table.mergeInto(map, parsedDate)
 
 		if Parser.ADD_SUB_GROUP then
 			subGroup = tonumber(map.subgroup) or (subGroup + 1)
@@ -1703,7 +1710,7 @@ end
 
 ---@param matchParser {readDate?: readDateFunction, DATE_FALLBACKS?: string[]}
 ---@param matchInput table
----@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
+---@return MGIParsedDate
 function MatchGroupInputUtil.getMatchDate(matchParser, matchInput)
 	local defaultDateParser = function(record)
 		return MatchGroupInputUtil.readDate(record.date, matchParser.DATE_FALLBACKS)
