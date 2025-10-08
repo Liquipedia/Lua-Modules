@@ -45,7 +45,6 @@ Cell.defaultProps = {
 		collapsible = false,
 		columns = 2,
 		makeLink = false,
-		shouldCollapse = true,
 		suppressColon = false,
 		separator = '<br />',
 	},
