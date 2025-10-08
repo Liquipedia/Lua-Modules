@@ -274,6 +274,12 @@ function Config.placementDropOffFunction(tier, tierType)
 	if tierType ~= nil and Table.includes(Config.NO_POINTS_TYPES, tierType:lower()) then
 		return function(score, placement) return 0 end
 	end
+	
+	-- If for some reason the tier is not one of the defined ones return 0 for weight
+	if Config.scoreRanges[tier] == nil then
+		mw.log(tier)
+		return function(score, placement) return 0 end
+	end
 
 	return function(score, placement)
         -- Workaround since in the main checker module the mode modifiers are applied before this function
