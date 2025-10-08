@@ -22,7 +22,6 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@field collapsible boolean?
 ---@field columns number?
 ---@field makeLink boolean?
----@field shouldCollapse boolean?
 ---@field suppressColon boolean?
 ---@field separator Widget|string|Html|nil
 
@@ -96,7 +95,7 @@ function Cell:_buildChildrenContainer(mappedChildren)
 	}
 
 	if options.collapsible then
-		widgetProps.shouldCollapse = options.shouldCollapse
+		widgetProps.shouldCollapse = true
 		widgetProps.titleWidget = CollapsibleToggle{
 			showButtonChildren = {
 				'Expand',
