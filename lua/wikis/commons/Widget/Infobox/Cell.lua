@@ -26,9 +26,15 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@field suppressColon boolean?
 ---@field separator Widget|string|Html|nil
 
+---@class CellWidgetProps
+---@field name string|Widget|Html
+---@field classes string[]?
+---@field children (string|Widget|Html)[]
+---@field options CellWidgetOptions
+
 ---@class CellWidget: Widget
----@operator call(table):CellWidget
----@field props {name: string, classes: string[]?, children: (string|Widget|Html)[], options: CellWidgetOptions}
+---@operator call(CellWidgetProps):CellWidget
+---@field props CellWidgetProps
 local Cell = Class.new(Widget,
 	function(self, input)
 		self.name = self:assertExistsAndCopy(input.name)
