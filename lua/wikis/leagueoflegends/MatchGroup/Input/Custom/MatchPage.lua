@@ -121,4 +121,34 @@ function CustomMatchGroupInputMatchPage.getObjectives(map, opponentIndex)
 	}
 end
 
+function CustomMatchGroupInputMatchPage.extendMapOpponent(map, opponentIndex)
+	local participants = CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
+
+	if Logic.isEmpty(participants) then
+		return {picks = {}, stats = {}}
+	end
+	---@cast participants -nil
+
+	---@param arr table[]
+	---@param item string
+	---@return number?
+	local function sumItem(arr, item)
+		return Array.reduce(Array.map(arr, Operator.property(item)), Operator.nilSafeAdd, 0)
+	end
+
+	return {
+		side = CustomMatchGroupInputMatchPage.getSide(map, opponentIndex),
+		picks = Array.map(participants, Operator.property('character')),
+		stats = Table.merge(
+			{
+				gold = sumItem(participants, 'gold'),
+				kills = sumItem(participants, 'kills'),
+				deaths = sumItem(participants, 'deaths'),
+				assists = sumItem(participants, 'assists')
+			},
+			CustomMatchGroupInputMatchPage.getObjectives(map, opponentIndex)
+		)
+	}
+end
+
 return CustomMatchGroupInputMatchPage
