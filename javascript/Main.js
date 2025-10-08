@@ -23,7 +23,8 @@ const jsModules = [
 	'Selectall',
 	'Slider',
 	'SwitchButtons',
-	'Tabs'
+	'Tabs',
+	'WikiMenu'
 ];
 
 // Dynamically load JavaScript modules
