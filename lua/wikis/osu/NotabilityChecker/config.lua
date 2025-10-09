@@ -276,7 +276,7 @@ function Config.placementDropOffFunction(tier, tierType)
 	end
 
 	-- If for some reason the tier is not one of the defined ones return 0 for weight
-	if Config.scoreRanges[tier] == nil then
+	if not Config.scoreRanges[tier] then
 		return function(score, placement) return 0 end
 	end
 
