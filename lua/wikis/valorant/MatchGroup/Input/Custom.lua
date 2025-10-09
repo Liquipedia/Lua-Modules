@@ -91,7 +91,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	local processedMatch = MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
 
-	if processedMatch.games then
+	if options.isMatchPage then
 		MatchFunctions.populateOpponentStats(processedMatch)
 	end
 
