@@ -183,12 +183,9 @@ function MatchFunctions.calculateOverallStatsForOpponent(maps, opponentIndex)
 	local teamDataPerMap = Array.map(
 		Array.filter(maps, function(map)
 			return map.status ~= MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
-				and map.extradata
-				and map.extradata.teams
-				and map.extradata.teams[opponentIndex]
 		end),
 		function(map)
-			return map.extradata.teams[opponentIndex]
+			return map.opponents[opponentIndex]
 		end
 	)
 
@@ -264,16 +261,8 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 		overallStats.roundsPlayed = overallStats.roundsPlayed + (mapPlayer.roundsPlayed or 0)
 		overallStats.roundsWithKast = overallStats.roundsWithKast + (mapPlayer.roundsWithKast or 0)
 		overallStats.damageDealt = overallStats.damageDealt + (mapPlayer.damageDealt or 0)
-
-		local extraDataPlayer = Array.find(map.extradata.teams[teamIdx].players, function(playerData)
-			return playerData.player == playerId
-		end)
-		if not extraDataPlayer then
-			extraDataPlayer = map.extradata.teams[teamIdx].players[mapPlayerIndex]
-		end
-
-		overallStats.firstKills = overallStats.firstKills + (extraDataPlayer.firstKills or 0)
-		overallStats.firstDeaths = overallStats.firstDeaths + (extraDataPlayer.firstDeaths or 0)
+		overallStats.firstKills = overallStats.firstKills + (mapPlayer.firstKills or 0)
+		overallStats.firstDeaths = overallStats.firstDeaths + (mapPlayer.firstDeaths or 0)
 	end)
 
 	local function calculatePercentage(value, total)
@@ -394,6 +383,8 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 				displayName = playerIdData.displayname or playerInputData.name,
 				puuid = participant.puuid,
 				agent = getCharacterName(participant.agent),
+				firstKills = participant.firstKills,
+				firstDeaths = participant.firstDeaths,
 			}
 
 			-- adds overall stats to playerData for MatchPage
