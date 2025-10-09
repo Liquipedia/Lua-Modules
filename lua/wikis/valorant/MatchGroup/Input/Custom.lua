@@ -166,10 +166,10 @@ function MatchFunctions.populateOpponentStats(match)
 		opponent.extradata = Table.merge(
 			opponent.extradata, MatchFunctions.calculateOverallStatsForOpponent(match.games, opponentIdx)
 		)
-		Array.forEach(opponent.match2players, function(player)
+		Array.forEach(opponent.match2players, function(player, playerIndex)
 			player.extradata = player.extradata or {}
 			player.extradata.overallStats = MatchFunctions.calculateOverallStatsForPlayer(
-				match.games, player, opponentIdx
+				match.games, opponentIdx, player, playerIndex
 			)
 		end)
 	end)
@@ -212,10 +212,11 @@ function MatchFunctions.calculateOverallStatsForOpponent(maps, opponentIndex)
 end
 
 ---@param maps table[]
----@param player table
 ---@param teamIdx integer
+---@param player table
+---@param playerIdx integer
 ---@return table
-function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
+function MatchFunctions.calculateOverallStatsForPlayer(maps, teamIdx, player, playerIdx)
 	local playerId = player.name
 	if not playerId then return {} end
 
@@ -237,19 +238,7 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 			return
 		end
 
-		local mapOpponent = map.opponents[teamIdx]
-		if not mapOpponent or not mapOpponent.players then
-			return
-		end
-
-		local mapPlayerIndex = Array.indexOf(mapOpponent.players, function(playerData)
-			return playerData.player == playerId
-		end)
-		local mapPlayer = mapOpponent.players[mapPlayerIndex]
-
-		if not mapPlayer then
-			return
-		end
+		local mapPlayer = map.opponents[teamIdx].players[playerIdx]
 
 		if mapPlayer.agent then
 			table.insert(agents, mapPlayer.agent)
