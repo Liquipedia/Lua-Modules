@@ -24,7 +24,7 @@ const jsModules = [
 	'Slider',
 	'SwitchButtons',
 	'Tabs',
-	'WikiMenu'
+	'Trackers'
 ];
 
 // Dynamically load JavaScript modules
