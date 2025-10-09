@@ -87,7 +87,8 @@ end
 function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	if not map.teams then return nil end
 	local team = map.teams[opponentIndex]
-	if not team then return end
+	local rounds = CustomMatchGroupInputMatchPage.getRounds(map)
+	if not team or not rounds then return end
 
 	return Array.map(team.players, function(player)
 		local lpdbPlayerData = player.lpdb_player
@@ -102,6 +103,12 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 			kills = player.stats.kills,
 			deaths = player.stats.deaths,
 			assists = player.stats.assists,
+			firstKills = #Array.filter(rounds, function (round)
+				return round.firstKill.killer == player.puuid
+			end),
+			firstDeaths = #Array.filter(rounds, function (round)
+				return round.firstKill.victim == player.puuid
+			end)
 		}
 	end)
 end
@@ -277,6 +284,40 @@ function CustomMatchGroupInputMatchPage.getPatch(map)
 	--- input format is "release-10.05-shipping-14-3367018"
 	local versionParts = Array.parseCommaSeparatedString(map.game_version, '-')
 	return versionParts[2]
+end
+
+---@param map table
+---@param opponentIndex integer
+---@return table
+function CustomMatchGroupInputMatchPage.extendMapOpponent(map, opponentIndex)
+	local rounds = CustomMatchGroupInputMatchPage.getRounds(map)
+
+	if not rounds then
+		return {}
+	end
+
+	local teamSideKey = 't' .. opponentIndex .. 'side'
+	local plantedRounds = Array.filter(rounds, function (round)
+		return round[teamSideKey] == 'atk' and round.planted
+	end)
+
+	return {
+		thrifties = #Array.filter(rounds, function (round)
+			return round[teamSideKey] == round.winningSide and round.ceremony == 'Thrifty'
+		end),
+		firstKills = #Array.filter(rounds, function (round)
+			return round.firstKill.byTeam == opponentIndex
+		end),
+		clutches = #Array.filter(rounds, function (round)
+			return round[teamSideKey] == round.winningSide and round.ceremony == 'Clutch'
+		end),
+		postPlant = {
+			#Array.filter(plantedRounds, function (round)
+				return round.winningSide == 'atk'
+			end),
+			#plantedRounds
+		}
+	}
 end
 
 return CustomMatchGroupInputMatchPage

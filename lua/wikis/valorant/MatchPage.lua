@@ -9,7 +9,9 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
+local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
@@ -59,7 +61,7 @@ end
 function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
-		game.teams = game.extradata.teams
+		game.teams = game.opponents
 		Array.forEach(game.teams, function(team, teamIdx)
 			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
 		end)
@@ -74,9 +76,7 @@ function MatchPage:renderOverallStats()
 
 	local overallTeamData = {
 		finished = true,
-		teams = Array.map(self.opponents, function(opponent)
-			return (opponent.extradata and opponent.extradata.overallStats) or {}
-		end)
+		teams = Array.map(self.opponents, Operator.property('extradata'))
 	}
 
 	local overallPlayerData = {
@@ -94,6 +94,7 @@ function MatchPage:renderOverallStats()
 						return
 					end
 
+					playerData.player = player.pageName
 					playerData.displayName = player.displayName
 					return playerData
 				end)
@@ -400,8 +401,12 @@ end
 
 ---@private
 ---@param player table
----@return Widget
+---@return Widget?
 function MatchPage:_renderPlayerPerformance(player)
+	if Logic.isEmpty(player) then
+		return
+	end
+
 	local formatNumbers = function(value, numberOfDecimals)
 		if not value then
 			return nil
