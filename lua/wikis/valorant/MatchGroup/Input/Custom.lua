@@ -52,6 +52,7 @@ local VALORANT_REGIONS = {'eu', 'na', 'ap', 'kr', 'latam', 'br', 'pbe1', 'esport
 ---@field getLength fun(map: table): string?
 ---@field getRounds fun(map: table): ValorantRoundData[]?
 ---@field getPatch fun(map: table): string?
+---@field extendMapOpponent? fun(map: table, opponentIndex: integer): table
 
 ---@class ValorantPlayerOverallStats
 ---@field acs integer[]
@@ -109,6 +110,7 @@ function MatchFunctions.extractMaps(match, opponents, MapParser)
 	---@type MapParserInterface
 	local mapParser = {
 		calculateMapScore = FnUtil.curry(MapFunctions.calculateMapScore, MapParser),
+		extendMapOpponent = MapParser.extendMapOpponent,
 		getExtraData = FnUtil.curry(MapFunctions.getExtraData, MapParser),
 		getMap = MapParser.getMap,
 		getMapName = MapParser.getMapName,
@@ -157,12 +159,13 @@ function MatchFunctions.getPatch(match, games)
 	)
 end
 
----@param match table
+---@param match {opponents: MGIParsedOpponent[], games: table[]}
 ---@return table
 function MatchFunctions.populateOpponentStats(match)
 	Array.forEach(match.opponents, function(opponent, opponentIdx)
-		opponent.extradata = opponent.extradata or {}
-		opponent.extradata.overallStats = MatchFunctions.calculateOverallStatsForOpponent(match.games, opponentIdx)
+		opponent.extradata = Table.merge(
+			opponent.extradata, MatchFunctions.calculateOverallStatsForOpponent(match.games, opponentIdx)
+		)
 		Array.forEach(opponent.match2players, function(player)
 			player.extradata = player.extradata or {}
 			player.extradata.overallStats = MatchFunctions.calculateOverallStatsForPlayer(
@@ -348,51 +351,6 @@ function MapFunctions.getExtraData(MapParser, match, map, opponents)
 		publisherid = publisherId,
 		publisherregion = publisherRegion,
 	}
-
-	local rounds = extraData.rounds or {}
-	extraData.teams = Array.map(Array.range(1, 2), function(teamIdx)
-		local team = {}
-		local teamSideKey = 't' .. teamIdx .. 'side'
-
-		local originalPlayers = Array.filter(map.opponents[teamIdx].players or {}, Table.isNotEmpty)
-		team.players = Array.map(originalPlayers, function(player)
-			return Table.copy(player)
-		end)
-
-		team.thrifties = #Array.filter(rounds, function (round)
-			return round[teamSideKey] == round.winningSide and round.ceremony == 'Thrifty'
-		end)
-
-		team.firstKills = #Array.filter(rounds, function (round)
-			return round.firstKill.byTeam == teamIdx
-		end)
-
-		Array.forEach(team.players, function (player)
-			player.firstKills = #Array.filter(rounds, function (round)
-				return round.firstKill.killer == player.puuid
-			end)
-			player.firstDeaths = #Array.filter(rounds, function (round)
-				return round.firstKill.victim == player.puuid
-			end)
-		end)
-
-		team.clutches = #Array.filter(rounds, function (round)
-			return round[teamSideKey] == round.winningSide and round.ceremony == 'Clutch'
-		end)
-
-		local plantedRounds = Array.filter(rounds, function (round)
-			return round[teamSideKey] == 'atk' and round.planted
-		end)
-
-		team.postPlant = {
-			#Array.filter(plantedRounds, function (round)
-				return round.winningSide == 'atk'
-			end),
-			#plantedRounds
-		}
-
-		return team
-	end)
 
 	for opponentIdx, opponent in ipairs(map.opponents) do
 		for playerIdx, player in pairs(opponent.players) do
