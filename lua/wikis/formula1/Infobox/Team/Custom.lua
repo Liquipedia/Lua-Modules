@@ -97,6 +97,7 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.extradata.previous2 = args.previous2
 	lpdbData.extradata.next = args.next
 	lpdbData.extradata.next2 = args.next2
+	lpdbData.extradata.tier = string.lower(args.tier or '')
 
 	return lpdbData
 end
