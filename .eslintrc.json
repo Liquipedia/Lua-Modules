@@ -20,6 +20,7 @@
 		"es/no-array-from": "off",
 		"mediawiki/class-doc": "off",
 		"mediawiki/no-nodelist-unsupported-methods": "off",
+		"mediawiki/no-unlabeled-buttonwidget": "off",
 		"es-x/no-block-scoped-variables": "off",
 		"es-x/no-string-prototype-startswith": "off",
 		"es-x/no-string-prototype-includes": "off",
