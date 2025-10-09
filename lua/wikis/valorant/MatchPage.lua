@@ -94,6 +94,7 @@ function MatchPage:renderOverallStats()
 						return
 					end
 
+					playerData.player = player.pageName
 					playerData.displayName = player.displayName
 					return playerData
 				end)
