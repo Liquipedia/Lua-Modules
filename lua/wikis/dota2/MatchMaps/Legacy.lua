@@ -12,6 +12,7 @@ local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local Json = Lua.import('Module:Json')
 local MatchGroup = Lua.import('Module:MatchGroup')
+local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -210,6 +211,8 @@ end
 ---@return string|Html
 function MatchMapsLegacy.convertMatch(frame)
 	local args = Arguments.getArgs(frame)
+	local generate = Logic.readBool(Table.extract(args, 'generate'))
+
 	local details = Json.parseIfString(args.details or '{}')
 
 	args, details = MatchMapsLegacy._handleDetails(args, details)
@@ -217,7 +220,7 @@ function MatchMapsLegacy.convertMatch(frame)
 	args = MatchMapsLegacy._setHeaderIfEmpty(args, details)
 	args = MatchMapsLegacy._copyDetailsToArgs(args, details)
 
-	if Logic.readBool(matchlistVars:get('isOldMatchList')) then
+	if generate or Logic.readBool(matchlistVars:get('isOldMatchList')) then
 		return Json.stringify(args)
 	else
 		Template.stashReturnValue(args, 'LegacyMatchlist')
@@ -245,7 +248,7 @@ function MatchMapsLegacy.showmatch(frame)
 		id = args.id,
 		hide = true,
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 		R1M1 = matches[1]
 	})
 
@@ -258,8 +261,9 @@ end
 
 -- invoked by Template:MatchList
 ---@param frame Frame
+---@param generate true?
 ---@return string
-function MatchMapsLegacy.matchList(frame)
+function MatchMapsLegacy.matchList(frame, generate)
 	local args = Arguments.getArgs(frame)
 	assert(args.id, 'Missing id')
 
@@ -270,7 +274,7 @@ function MatchMapsLegacy.matchList(frame)
 	local hide = Logic.nilOr(Logic.readBoolOrNil(args.hide), true)
 	args.isLegacy = true
 	args.store = store
-	args.noDuplicateCheck = not store
+	args.noDuplicateCheck = not store or nil
 	args.collapsed = hide
 	args.attached = hide
 	args.title = Logic.nilOr(args.title, args[1])
@@ -292,6 +296,10 @@ function MatchMapsLegacy.matchList(frame)
 
 	args[1] = nil
 	args.hide = nil
+
+	if generate then
+		return MatchGroupLegacy.generateWikiCodeForMatchList(args)
+	end
 
 	return MatchGroup.MatchList(args)
 end
@@ -329,7 +337,7 @@ function MatchMapsLegacy.matchListEnd()
 		isLegacy = true,
 		id = bracketId,
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 		collapsed = hide,
 		attached = hide,
 		title = matchlistVars:get('matchListTitle'),
@@ -372,6 +380,86 @@ function MatchMapsLegacy.matchListEnd()
 	globalVars:delete('islegacy')
 
 	return MatchGroup.MatchList(args)
+end
+
+--- for bot conversion to proper match2 matchlists
+---@param frame Frame
+---@return string
+function MatchMapsLegacy.generate(frame)
+	return MatchMapsLegacy.matchList(frame, true)
+end
+
+--- for bot conversion to proper match2 matchlists
+---@param frame Frame
+---@return string
+function MatchMapsLegacy.generate2(frame)
+	local args = Arguments.getArgs(frame)
+
+	local store = Logic.readBoolOrNil(args.store)
+
+	local offset = 0
+	local title = args.title
+	if not title and not Json.parseIfTable(args[1]) then
+		title = args[1]
+		offset = 1
+	end
+
+	local parsedArgs = {
+		id = args.id,
+		title = title,
+		width = args.width or '300px',
+		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		store = store,
+	}
+
+	local gsl = args.gsl
+	if Logic.isNotEmpty(gsl) then
+		gsl = gsl:lower()
+		if String.endsWith(gsl, GSL_WINNERS) then
+			gsl = 'winnersfirst'
+		elseif String.endsWith(gsl, GSL_SEEDING) then
+			gsl = 'winnersfirst'
+			parsedArgs['M4header'] = 'Losers Match'
+		elseif String.endsWith(gsl, GSL_LOSERS) then
+			if String.startsWith(gsl, GSL_SEEDING) then
+				parsedArgs['M3header'] = 'Losers Match'
+			end
+			gsl = 'losersfirst'
+		end
+		parsedArgs.gsl = gsl
+	end
+
+	local matchsection = Logic.nilOr(args.lpdb_title, args.title)
+	if Logic.readBoolOrNil(matchsection) ~= false then
+		parsedArgs.matchsection = matchsection
+	end
+
+	---@type table[]
+	local matches = Array.mapIndexes(function(index)
+		return args[index + offset]
+	end)
+
+	Array.forEach(matches, function(match, matchIndex)
+		parsedArgs['M' .. matchIndex] = match
+	end)
+
+	return MatchGroupLegacy.generateWikiCodeForMatchList(parsedArgs)
+end
+
+---@param frame Frame
+---@return string
+function MatchMapsLegacy.generateSingleMatch(frame)
+	local args = Arguments.getArgs(frame)
+	args.generate = true
+
+	assert(args.id, 'Missing id')
+
+	return MatchGroupLegacy.generateWikiCodeForSingleMatch{
+		match = MatchMapsLegacy.convertMatch(args),
+		id = args.id,
+		width = args.width,
+	}
 end
 
 return MatchMapsLegacy
