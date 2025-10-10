@@ -98,24 +98,28 @@ local CONTENT = {
 		body = Template.safeExpand(mw.getCurrentFrame(), 'HeroTable'),
 		padding = true,
 		boxid = 1501,
+		trackingId = 'Heroes panel',
 	},
 	updates = {
 		heading = 'Updates',
 		body = '<nowiki>\n</nowiki>{{Main Page Updates}}',
 		padding = true,
 		boxid = 1502,
+		trackingId = 'Updates panel',
 	},
 	usefulArticles = {
 		heading = 'Useful Articles',
 		body = '{{Main Page Useful Articles}}',
 		padding = true,
 		boxid = 1503,
+		trackingId = 'Useful articles panel',
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
 		body = WantToHelp{},
 		padding = true,
 		boxid = 1504,
+		trackingId = 'Want to help panel',
 	},
 	transfers = {
 		heading = 'Transfers',
@@ -124,30 +128,34 @@ local CONTENT = {
 				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 		},
 		boxid = 1509,
+		trackingId = 'Transfers panel',
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
 		body = ThisDayWidgets.Content{ birthdayListPage = 'Birthday list' },
 		padding = true,
 		boxid = 1510,
+		trackingId = 'This day panel',
 	},
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
 		boxid = 1516,
+		trackingId = 'Featured panel',
 	},
 	filterButtons = {
 		noPanel = true,
 		body = Div{
 			css = { width = '100%', ['margin-bottom'] = '8px' },
 			children = { FilterButtonsWidget() }
-		}
+		},
 	},
 	matches = {
 		heading = 'Matches',
 		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
+		trackingId = 'Matchticker',
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -157,6 +165,7 @@ local CONTENT = {
 		},
 		padding = true,
 		boxid = 1508,
+		trackingId = 'Tournament ticker',
 	},
 --[[
 	rankings = {
@@ -170,6 +179,7 @@ local CONTENT = {
 		},
 		padding = false,
 		boxid = 1511,
+		trackingId = 'Rankings panel',
 	},
 ]]
 }

@@ -21,7 +21,10 @@ TrackerWidget.defaultProps = {
 
 ---@return Widget
 function TrackerWidget:render()
-	return Div{attributes = {['data-tracking-id'] = self.props.trackingId, children = self.props.children}}
+	return Div{
+		attributes = {['data-tracking-id'] = self.props.trackingId},
+		children = self.props.children
+	}
 end
 
 return TrackerWidget

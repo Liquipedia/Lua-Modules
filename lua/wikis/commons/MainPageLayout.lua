@@ -19,6 +19,7 @@ local GridWidgets = Lua.import('Module:Widget/Grid')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local NavigationCard = Lua.import('Module:Widget/MainPage/NavigationCard')
 local PanelWidget = Lua.import('Module:Widget/Panel')
+local TrackerWidget = Lua.import('Module:Widget/Tracker')
 
 local MainPageLayout = {}
 
@@ -62,9 +63,14 @@ function MainPageLayout.make(frame)
 					frame:callParserFunction('#searchbox', ''),
 				}
 			},
-			HtmlWidgets.Div{
-				classes = {'navigation-cards'},
-				children = Array.map(WikiData.navigation, MainPageLayout._makeNavigationCard)
+			TrackerWidget{
+				trackingId = 'Quick navigation',
+				children = {
+					HtmlWidgets.Div{
+						classes = {'navigation-cards'},
+						children = Array.map(WikiData.navigation, MainPageLayout._makeNavigationCard)
+					}
+				}
 			},
 			MainPageLayout._makeCells(layout),
 		},
@@ -90,16 +96,26 @@ function MainPageLayout._makeCells(cells)
 			local content = {}
 			if item.content then
 				local contentBody = item.content.body
+				local contentElement
 				if item.content.noPanel then
-					table.insert(content, MainPageLayout._processCellBody(contentBody))
+					contentElement = MainPageLayout._processCellBody(contentBody)
 				else
-					table.insert(content, PanelWidget{
+					contentElement = PanelWidget{
 						children = MainPageLayout._processCellBody(contentBody),
 						boxId = item.content.boxid,
 						padding = item.content.padding,
 						heading = item.content.heading,
 						panelAttributes = item.content.panelAttributes,
+					}
+				end
+
+				if item.content.trackingId then
+					table.insert(content, TrackerWidget{
+						trackingId = item.content.trackingId,
+						children = {contentElement}
 					})
+				else
+					table.insert(content, contentElement)
 				end
 			end
 			if item.children then
