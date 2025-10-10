@@ -14,12 +14,13 @@ local LpdbCounter = Lua.import('Module:LPDB entity count')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
+local AnalyticsMapping = Lua.import('Module:MainPageLayout/AnalyticsMapping')
 local WikiData = Lua.import('Module:MainPageLayout/data')
 local GridWidgets = Lua.import('Module:Widget/Grid')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local NavigationCard = Lua.import('Module:Widget/MainPage/NavigationCard')
 local PanelWidget = Lua.import('Module:Widget/Panel')
-local TrackerWidget = Lua.import('Module:Widget/Tracker')
+local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 
 local MainPageLayout = {}
 
@@ -63,8 +64,8 @@ function MainPageLayout.make(frame)
 					frame:callParserFunction('#searchbox', ''),
 				}
 			},
-			TrackerWidget{
-				trackingId = 'Quick navigation',
+			AnalyticsWidget{
+				analyticsName = 'Quick navigation',
 				children = {
 					HtmlWidgets.Div{
 						classes = {'navigation-cards'},
@@ -109,9 +110,10 @@ function MainPageLayout._makeCells(cells)
 					}
 				end
 
-				if item.content.trackingId then
-					table.insert(content, TrackerWidget{
-						trackingId = item.content.trackingId,
+				local analyticsName = AnalyticsMapping.getAnalyticsName(item.content.boxid)
+				if analyticsName then
+					table.insert(content, AnalyticsWidget{
+						analyticsName = analyticsName,
 						children = {contentElement}
 					})
 				else

@@ -1,10 +1,10 @@
 /*******************************************************************************
  * Template(s): Links
  * Author(s): Eetwalt
- * Description: This script enables anonymous event tracking of user interactions
+ * Description: This script enables anonymous analytics of user interactions
  *              for product development and user experience improvements.
  ******************************************************************************/
-liquipedia.trackers = {
+liquipedia.analytics = {
 	init: function() {
 		const wikiMenuLinks = document.querySelectorAll( '[data-wiki-menu="link"]' );
 
@@ -24,9 +24,9 @@ liquipedia.trackers = {
 		} );
 
 		function findPosition( element ) {
-			const trackerElement = element.closest( '[data-tracking-id]' );
-			if ( trackerElement ) {
-				return trackerElement.dataset.trackingId;
+			const analyticsElement = element.closest( '[data-analytics-name]' );
+			if ( analyticsElement ) {
+				return analyticsElement.dataset.analyticsName;
 			}
 
 			const walker = document.createTreeWalker(
@@ -76,4 +76,4 @@ liquipedia.trackers = {
 		} );
 	}
 };
-liquipedia.core.modules.push( 'trackers' );
+liquipedia.core.modules.push( 'analytics' );

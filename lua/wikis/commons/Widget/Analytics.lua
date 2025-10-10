@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Tracker
+-- page=Module:Widget/Analytics
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -13,18 +13,18 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
----@class TrackerWidget: Widget
----@operator call(table): TrackerWidget
-local TrackerWidget = Class.new(Widget)
-TrackerWidget.defaultProps = {
+---@class AnalyticsWidget: Widget
+---@operator call(table): AnalyticsWidget
+local AnalyticsWidget = Class.new(Widget)
+AnalyticsWidget.defaultProps = {
 }
 
 ---@return Widget
-function TrackerWidget:render()
+function AnalyticsWidget:render()
 	return Div{
-		attributes = {['data-tracking-id'] = self.props.trackingId},
+		attributes = {['data-analytics-name'] = self.props.analyticsName},
 		children = self.props.children
 	}
 end
 
-return TrackerWidget
+return AnalyticsWidget
