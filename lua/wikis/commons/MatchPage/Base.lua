@@ -456,7 +456,7 @@ function BaseMatchPage:previousMatches()
 			limit = 5,
 			stats = false,
 			tableMode = Opponent.team,
-			teams = opponent.template,
+			teams = opponent.name,
 			useTickerName = true,
 			vod = false,
 			matchPageButtonText = 'short',
