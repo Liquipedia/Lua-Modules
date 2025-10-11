@@ -14,17 +14,20 @@ local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Links = Lua.import('Module:Links')
+local MatchTable = Lua.import('Module:MatchTable')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Template = Lua.import('Module:Template')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
+local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -258,7 +261,8 @@ function BaseMatchPage:render()
 			},
 			self:renderMapVeto(),
 			self:renderGames(),
-			self:footer()
+			self:footer(),
+			self:previousMatches()
 		)
 	}
 end
@@ -403,6 +407,48 @@ function BaseMatchPage:footer()
 				children = patchLink
 			} or nil
 		)
+	}
+end
+
+---@protected
+---@return (string|Widget)[]?
+function BaseMatchPage:previousMatches()
+	---@param opponent standardOpponent
+	---@return Html?
+	local function buildMatchTable(opponent)
+		if Opponent.isTbd(opponent) then
+			return
+		end
+		return MatchTable{
+			addCategory = false,
+			edate = self.matchData.timestamp - 86400,
+			['hide_tier'] = true,
+			limit = 5,
+			stats = false,
+			tableMode = Opponent.team,
+			teams = opponent.template,
+			useTickerName = true,
+			vod = false,
+			matchPageButtonText = 'short',
+		}:readConfig():query():buildDisplay()
+	end
+
+	if Array.all(self.opponents, Opponent.isTbd) then
+		return
+	end
+
+	return {
+		HtmlWidgets.H4{children = 'Previous Matches'},
+		Div{
+			classes = {'match-bm-match-additional'},
+			children = Array.map(self.opponents, function (opponent)
+				return AdditionalSection{
+					header = OpponentDisplay.InlineOpponent{opponent = opponent, teamStyle = 'hybrid'},
+					bodyClasses = {'match-table-wrapper'},
+					children = buildMatchTable(opponent)
+				}
+			end)
+		}
 	}
 end
 
