@@ -43,6 +43,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local DRAW_WINNER = 0
 local INVALID_TIER_DISPLAY = 'Undefined'
@@ -392,10 +393,7 @@ function MatchTable:buildAdditionalConditions()
 	local getOrCondition = function(lpdbKey, input)
 		if Logic.isEmpty(input) then return end
 
-		local orConditions = ConditionTree(BooleanOperator.any)
-		Array.forEach(mw.text.split(input, ','), function(value)
-			orConditions:add{ConditionNode(ColumnName(lpdbKey), Comparator.eq, String.trim(value))}
-		end)
+		local orConditions = ConditionUtil.anyOf(ColumnName(lpdbKey), Array.parseCommaSeparatedString(input, ','))
 		conditions:add(orConditions)
 	end
 
