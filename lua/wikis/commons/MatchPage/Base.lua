@@ -471,10 +471,11 @@ function BaseMatchPage:previousMatches()
 		Div{
 			classes = {'match-bm-match-additional'},
 			children = Array.map(self.opponents, function (opponent)
+				local matchTable = buildMatchTable(opponent)
 				return AdditionalSection{
 					header = OpponentDisplay.InlineOpponent{opponent = opponent, teamStyle = 'hybrid'},
-					bodyClasses = {'match-table-wrapper'},
-					children = buildMatchTable(opponent)
+					bodyClasses = matchTable and {'match-table-wrapper'} or nil,
+					children = matchTable or self:getTournamentIcon()
 				}
 			end)
 		}
