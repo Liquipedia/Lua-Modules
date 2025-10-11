@@ -445,7 +445,7 @@ function BaseMatchPage:previousMatches()
 	---@param opponent standardOpponent
 	---@return Html?
 	local function buildMatchTable(opponent)
-		if Opponent.isTbd(opponent) then
+		if Opponent.isTbd(opponent) or Opponent.type ~= Opponent.team then
 			return
 		end
 		return MatchTable{
