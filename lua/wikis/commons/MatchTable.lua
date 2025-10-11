@@ -556,12 +556,12 @@ function MatchTable:buildDisplay()
 		local text = 'This ' .. (self.config.mode == Opponent.solo and Opponent.solo or Opponent.team)
 			.. ' has not played any matches yet.'
 
-		return mw.html.create('tr')
+		return self.display:tag('tr')
 			:tag('td')
 				:attr('colspan', '100')
 				:css('font-style', 'italic')
 				:wikitext(text)
-				:done()
+				:allDone()
 	end
 
 	local currentYear
