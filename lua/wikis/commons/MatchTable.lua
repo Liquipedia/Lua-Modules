@@ -418,7 +418,7 @@ end
 ---@return {index: number, link: string}[]
 function MatchTable:vodsFromRecord(record)
 	local vods = {}
-	if String.nilIfEmpty(record.vod) then
+	if String.isNotEmpty(record.vod) then
 		vods = {{index = 0, link = record.vod}}
 	end
 
