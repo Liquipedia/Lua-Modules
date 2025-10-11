@@ -19,7 +19,6 @@ local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
-local Template = Lua.import('Module:Template')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
