@@ -385,7 +385,7 @@ local factionPropsAoE2 = {
 		name = 'Teutons',
 		faction = 'teutons',
 	},
-		thracians = {
+	thracians = {
 		index = 52,
 		name = 'Thracians',
 		faction = 'thracians',
