@@ -755,7 +755,7 @@ end
 ---@return Html
 function MatchTable:_displayOpponent(opponent, flipped)
 	local cell = mw.html.create('td')
-	if Logic.isEmpty(opponent) then return cell:wikitext('Unknown') end
+	if Opponent.isEmpty(opponent) then return cell:wikitext('Unknown') end
 
 	return cell
 		:node(OpponentDisplay.BlockOpponent{
