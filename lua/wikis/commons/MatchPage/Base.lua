@@ -438,7 +438,7 @@ function BaseMatchPage:previousMatches()
 	end
 
 	return {
-		HtmlWidgets.H4{children = 'Previous Matches'},
+		HtmlWidgets.H4{children = 'Last 5 Matches'},
 		Div{
 			classes = {'match-bm-match-additional'},
 			children = Array.map(self.opponents, function (opponent)
