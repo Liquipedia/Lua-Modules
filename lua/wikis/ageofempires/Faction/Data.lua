@@ -333,7 +333,7 @@ local factionPropsAoE2 = {
 		pageName = 'Portuguese' .. AOE2_SUFFIX,
 		faction = 'portuguese',
 	},
-		puru = {
+	puru = {
 		index = 42,
 		name = 'Puru',
 		faction = 'puru',
