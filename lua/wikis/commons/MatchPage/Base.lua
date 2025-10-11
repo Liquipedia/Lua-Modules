@@ -14,6 +14,7 @@ local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Links = Lua.import('Module:Links')
+local MatchTable = Lua.import('Module:MatchTable')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -25,6 +26,7 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
+local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -258,7 +260,8 @@ function BaseMatchPage:render()
 			},
 			self:renderMapVeto(),
 			self:renderGames(),
-			self:footer()
+			self:footer(),
+			self:previousMatches()
 		)
 	}
 end
@@ -403,6 +406,50 @@ function BaseMatchPage:footer()
 				children = patchLink
 			} or nil
 		)
+	}
+end
+
+---@protected
+---@return (string|Widget)[]?
+function BaseMatchPage:previousMatches()
+	---@param opponent standardOpponent
+	---@return Html?
+	local function buildMatchTable(opponent)
+		if Opponent.isTbd(opponent) or opponent.type ~= Opponent.team then
+			return
+		end
+		return MatchTable{
+			addCategory = false,
+			edate = self.matchData.timestamp - 86400 --[[ MatchTable adds 1-day offset to make edate
+														inclusive, and we don't want that here ]],
+			['hide_tier'] = true,
+			limit = 5,
+			stats = false,
+			tableMode = Opponent.team,
+			teams = opponent.name,
+			useTickerName = true,
+			vod = false,
+			matchPageButtonText = 'short',
+		}:readConfig():query():buildDisplay()
+	end
+
+	if Array.all(self.opponents, Opponent.isTbd) then
+		return
+	end
+
+	return {
+		HtmlWidgets.H4{children = 'Last 5 Matches'},
+		Div{
+			classes = {'match-bm-match-additional'},
+			children = Array.map(self.opponents, function (opponent)
+				local matchTable = buildMatchTable(opponent)
+				return AdditionalSection{
+					header = OpponentDisplay.InlineOpponent{opponent = opponent, teamStyle = 'hybrid'},
+					bodyClasses = matchTable and {'match-table-wrapper'} or nil,
+					children = matchTable or self:getTournamentIcon()
+				}
+			end)
+		}
 	}
 end
 
