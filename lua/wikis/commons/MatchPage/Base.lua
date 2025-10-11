@@ -450,7 +450,8 @@ function BaseMatchPage:previousMatches()
 		end
 		return MatchTable{
 			addCategory = false,
-			edate = self.matchData.timestamp - 86400,
+			edate = self.matchData.timestamp - 86400 --[[ MatchTable adds 1-day offset to make edate
+														inclusive, and we don't want that here ]],
 			['hide_tier'] = true,
 			limit = 5,
 			stats = false,
