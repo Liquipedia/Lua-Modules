@@ -309,7 +309,10 @@ function MatchTable:query()
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
 	end, self.config.limit)
 
-	if (self.config.limit and self.config.limit == #self.matches and not self.config.linkSubPage and self.config.addCategory) then
+	if (
+		self.config.limit and self.config.limit == #self.matches and
+		not self.config.linkSubPage and self.config.addCategory
+	) then
 		mw.ext.TeamLiquidIntegration.add_category('Limited match pages')
 	end
 

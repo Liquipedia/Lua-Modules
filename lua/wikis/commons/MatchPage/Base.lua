@@ -20,7 +20,6 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
-local Template = Lua.import('Module:Template')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
