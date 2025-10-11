@@ -1140,6 +1140,17 @@ span.slash {
 				background-color: var( --clr-secondary-16 );
 				border-color: var( --clr-on-surface-dark-primary-8 );
 			}
+
+			&.match-table-wrapper {
+				padding: unset;
+				
+				& > table.wikitable {
+					border-radius: 0.5rem;
+					overflow: hidden;
+					height: 100%;
+					width: 100%;
+				}
+			}
 		}
 	}
 }
