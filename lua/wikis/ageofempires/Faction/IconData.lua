@@ -162,7 +162,7 @@ local byFactionAoE2 = {
 	},
 	macedonians = {
 		icon = 'File:Macedonians AoE2 icon.png'
-	},	
+	},
 	magyars = {
 		icon = 'File:Magyars AoE2 icon.png'
 	},
@@ -219,7 +219,7 @@ local byFactionAoE2 = {
 	},
 	thracians = {
 		icon = 'File:Thracians AoE2 icon.png'
-	},	
+	},
 	turks = {
 		icon = 'File:Turks AoE2 icon.png'
 	},
