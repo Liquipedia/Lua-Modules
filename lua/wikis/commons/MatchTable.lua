@@ -380,8 +380,7 @@ function MatchTable:buildAdditionalConditions()
 	local getOrCondition = function(lpdbKey, input)
 		if Logic.isEmpty(input) then return end
 
-		local orConditions = ConditionUtil.anyOf(ColumnName(lpdbKey), Array.parseCommaSeparatedString(input, ','))
-		conditions:add(orConditions)
+		conditions:add(ConditionUtil.anyOf(ColumnName(lpdbKey), Array.parseCommaSeparatedString(input, ',')))
 	end
 
 	getOrCondition('liquipediatier', args.tier)
