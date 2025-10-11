@@ -56,6 +56,7 @@ local SECONDS_ONE_DAY = 3600 * 24
 ---@field displayGameIcons boolean
 ---@field showResult boolean
 ---@field aliases table<string, true>
+---@field addCategory boolean
 ---@field vs table<string, true>
 ---@field timeRange {startDate: number, endDate: number}
 ---@field title string?
@@ -63,6 +64,7 @@ local SECONDS_ONE_DAY = 3600 * 24
 ---@field showIcon boolean
 ---@field showVod boolean
 ---@field showMatchPage boolean
+---@field matchPageButtonText 'full'|'short'|'hide'
 ---@field showStats boolean
 ---@field showOnlyGameStats boolean
 ---@field showRoundStats boolean
@@ -141,6 +143,7 @@ function MatchTable:_readDefaultConfig()
 	local args = self.args
 
 	return {
+		addCategory = Logic.nilOr(Logic.readBoolOrNil(args.addCategory), true),
 		mode = args.tableMode,
 		limit = tonumber(args.limit),
 		displayGameIcons = Logic.readBool(args.gameIcons),
@@ -159,6 +162,7 @@ function MatchTable:_readDefaultConfig()
 		teamStyle = String.nilIfEmpty(args.teamStyle) or 'short',
 		linkSubPage = Logic.readBool(args.linkSubPage),
 		showMatchPage = Info.config.match2.matchPage,
+		matchPageButtonText = args.matchPageButtonText,
 	}
 end
 
@@ -305,7 +309,7 @@ function MatchTable:query()
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
 	end, self.config.limit)
 
-	if self.config.limit and self.config.limit == #self.matches and not self.config.linkSubPage then
+	if (self.config.limit and self.config.limit == #self.matches and not self.config.linkSubPage and self.config.addCategory) then
 		mw.ext.TeamLiquidIntegration.add_category('Limited match pages')
 	end
 
@@ -541,8 +545,8 @@ function MatchTable:statsFromMatches()
 end
 
 ---@return Html
-function MatchTable:build()
-	local display = mw.html.create('table')
+function MatchTable:buildDisplay()
+	self.display = mw.html.create('table')
 		:addClass('wikitable wikitable-striped sortable')
 		:css('text-align', 'center')
 		:node(self:_titleRow(self.config.title))
@@ -565,24 +569,29 @@ function MatchTable:build()
 		local year = tonumber(match.date:sub(1, 4))
 		if self.config.showYearHeaders and year ~= currentYear then
 			currentYear = year
-			display:node(self:_yearRow(year))
+			self.display:node(self:_yearRow(year))
 		end
-		display:node(self:matchRow(match))
+		self.display:node(self:matchRow(match))
 	end)
 
 	if self.config.linkSubPage then
 		local pagename = self.title.text .. '/Matches'
-		display:tag('tr')
+		self.display:tag('tr')
 			:tag('th')
 				:attr('colspan', 42)
 				:css('font-style', 'italic')
 				:wikitext('[[' .. pagename .. '|Extended list of matches]]')
 	end
 
+	return self.display
+end
+
+---@return Html
+function MatchTable:build()
 	local wrappedTableNode = mw.html.create('div')
 		:addClass('match-table-wrapper')
 		:addClass('table-responsive')
-		:node(display)
+		:node(self:buildDisplay())
 
 	return mw.html.create('div')
 		:node(self:displayStats())
@@ -827,7 +836,7 @@ end
 function MatchTable:_displayMatchPage(match)
 	if not self.config.showMatchPage then return end
 
-	return mw.html.create('td'):node(MatchPageButton{match = match})
+	return mw.html.create('td'):node(MatchPageButton{match = match, buttonText = self.config.matchPageButtonText})
 end
 
 ---@param winner any
