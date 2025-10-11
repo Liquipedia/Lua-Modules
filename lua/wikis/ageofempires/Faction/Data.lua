@@ -288,7 +288,7 @@ local factionPropsAoE2 = {
 		index = 33,
 		name = 'Macedonians',
 		faction = 'macedonians',
-	},	
+	},
 	magyars = {
 		index = 34,
 		name = 'Magyars',
