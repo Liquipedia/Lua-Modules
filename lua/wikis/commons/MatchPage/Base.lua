@@ -475,7 +475,7 @@ function BaseMatchPage:previousMatches()
 	local headToHead = buildMatchTable(self.opponents[1], self.opponents[2])
 
 	return WidgetUtil.collect(
-		HtmlWidgets.H4{children = 'Last 5 Matches'},
+		HtmlWidgets.H4{children = 'Match History'},
 		Div{
 			classes = {'match-bm-match-additional'},
 			children = WidgetUtil.collect(
