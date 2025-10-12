@@ -58,6 +58,7 @@ local factionPropsAoE1 = {
 	macedonians = {
 		index = 8,
 		name = 'Macedonians',
+		pageName = 'Macedonians' .. AOE1_SUFFIX,
 		faction = 'macedonians',
 	},
 	minoans = {
@@ -287,6 +288,7 @@ local factionPropsAoE2 = {
 	macedonians = {
 		index = 33,
 		name = 'Macedonians',
+		pageName = 'Macedonians' .. AOE2_SUFFIX,
 		faction = 'macedonians',
 	},
 	magyars = {
