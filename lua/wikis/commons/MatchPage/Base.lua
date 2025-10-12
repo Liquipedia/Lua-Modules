@@ -443,9 +443,12 @@ end
 ---@return (string|Widget)[]?
 function BaseMatchPage:previousMatches()
 	---@param opponent standardOpponent
+	---@param opponent2 standardOpponent?
 	---@return Html?
-	local function buildMatchTable(opponent)
+	local function buildMatchTable(opponent, opponent2)
 		if Opponent.isTbd(opponent) or opponent.type ~= Opponent.team then
+			return
+		elseif opponent2 and (Opponent.isTbd(opponent2) or opponent2.type ~= Opponent.team) then
 			return
 		end
 		return MatchTable{
@@ -457,6 +460,8 @@ function BaseMatchPage:previousMatches()
 			stats = false,
 			tableMode = Opponent.team,
 			teams = opponent.name,
+			vsteam = opponent2 and opponent2.name or nil,
+			showOpponent = not Opponent.isEmpty(opponent2),
 			useTickerName = true,
 			vod = false,
 			matchPageButtonText = 'short',
@@ -467,20 +472,30 @@ function BaseMatchPage:previousMatches()
 		return
 	end
 
-	return {
+	local headToHead = buildMatchTable(self.opponents[1], self.opponents[2])
+
+	return WidgetUtil.collect(
 		HtmlWidgets.H4{children = 'Last 5 Matches'},
 		Div{
 			classes = {'match-bm-match-additional'},
-			children = Array.map(self.opponents, function (opponent)
-				local matchTable = buildMatchTable(opponent)
-				return AdditionalSection{
-					header = OpponentDisplay.InlineOpponent{opponent = opponent, teamStyle = 'hybrid'},
-					bodyClasses = matchTable and {'match-table-wrapper'} or nil,
-					children = matchTable or self:getTournamentIcon()
-				}
-			end)
+			children = WidgetUtil.collect(
+				headToHead and AdditionalSection{
+					css = {flex = '2 0 100%'},
+					header = 'Head to Head',
+					bodyClasses = {'match-table-wrapper'},
+					children = headToHead,
+				} or nil,
+				Array.map(self.opponents, function (opponent)
+					local matchTable = buildMatchTable(opponent)
+					return AdditionalSection{
+						header = OpponentDisplay.InlineOpponent{opponent = opponent, teamStyle = 'hybrid'},
+						bodyClasses = matchTable and {'match-table-wrapper'} or nil,
+						children = matchTable or self:getTournamentIcon()
+					}
+				end)
+			)
 		}
-	}
+	)
 end
 
 ---@private
