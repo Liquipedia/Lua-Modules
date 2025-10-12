@@ -449,7 +449,7 @@ function BaseMatchPage:previousMatches()
 	local headToHead = self:_buildHeadToHeadMatchTable()
 
 	return WidgetUtil.collect(
-		HtmlWidgets.H4{children = 'Match History'},
+		HtmlWidgets.H3{children = 'Match History'},
 		Div{
 			classes = {'match-bm-match-additional'},
 			children = WidgetUtil.collect(
