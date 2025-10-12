@@ -440,7 +440,7 @@ function BaseMatchPage:footer()
 end
 
 ---@protected
----@return (string|Widget)[]?
+---@return Widget[]?
 function BaseMatchPage:previousMatches()
 	if Array.all(self.opponents, Opponent.isTbd) then
 		return
