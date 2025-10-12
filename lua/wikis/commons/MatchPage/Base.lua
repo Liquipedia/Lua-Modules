@@ -472,7 +472,7 @@ function BaseMatchPage:_getComments()
 		self.matchData.comment and Comment{children = self.matchData.comment} or nil,
 		Logic.isNotEmpty(substituteComments) and Comment{
 			children = Array.interleave(substituteComments, HtmlWidgets.Br{})
-	} or nil,
+		} or nil,
 		self:_getCasterComment(),
 		self:addComments()
 	)
