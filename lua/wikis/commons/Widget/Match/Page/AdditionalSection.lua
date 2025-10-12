@@ -18,6 +18,7 @@ local Div = HtmlWidgets.Div
 
 ---@class MatchPageAdditionalSectionParameters
 ---@field header string
+---@field css table<string, (string|number)?>?
 ---@field bodyClasses string[]?
 ---@field children (string|Html|Widget|nil)|(string|Html|Widget|nil)[]
 
@@ -30,7 +31,8 @@ local MatchPageAdditionalSection = Class.new(Widget)
 function MatchPageAdditionalSection:render()
 	if Logic.isDeepEmpty(self.props.children) then return end
 	return Div{
-		classes = { 'match-bm-match-additional-section' },
+		classes = {'match-bm-match-additional-section'},
+		css = self.props.css,
 		children = {
 			Div{
 				classes = { 'match-bm-match-additional-section-header' },

@@ -445,21 +445,25 @@ function BaseMatchPage:previousMatches()
 	local headToHead = buildMatchTable(self.opponents[1], self.opponents[2])
 
 	return WidgetUtil.collect(
-		headToHead and {
-			HtmlWidgets.H4{children = 'Head to Head'},
-			headToHead
-		} or nil,
 		HtmlWidgets.H4{children = 'Last 5 Matches'},
 		Div{
 			classes = {'match-bm-match-additional'},
-			children = Array.map(self.opponents, function (opponent)
-				local matchTable = buildMatchTable(opponent)
-				return AdditionalSection{
-					header = OpponentDisplay.InlineOpponent{opponent = opponent, teamStyle = 'hybrid'},
-					bodyClasses = matchTable and {'match-table-wrapper'} or nil,
-					children = matchTable or self:getTournamentIcon()
-				}
-			end)
+			children = WidgetUtil.collect(
+				headToHead and AdditionalSection{
+					css = {flex = '2 0 100%'},
+					header = 'Head to Head',
+					bodyClasses = {'match-table-wrapper'},
+					children = headToHead,
+				} or nil,
+				Array.map(self.opponents, function (opponent)
+					local matchTable = buildMatchTable(opponent)
+					return AdditionalSection{
+						header = OpponentDisplay.InlineOpponent{opponent = opponent, teamStyle = 'hybrid'},
+						bodyClasses = matchTable and {'match-table-wrapper'} or nil,
+						children = matchTable or self:getTournamentIcon()
+					}
+				end)
+			)
 		}
 	)
 end
