@@ -522,6 +522,7 @@ function BaseMatchPage:_buildHeadToHeadMatchTable()
 		team = self.opponents[1].name,
 		vsteam = self.opponents[2].name,
 		showOpponent = true,
+		teamStyle = 'hybrid',
 		useTickerName = true,
 	}
 end
