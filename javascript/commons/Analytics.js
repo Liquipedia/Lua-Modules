@@ -9,6 +9,7 @@ liquipedia.analytics = {
 		liquipedia.analytics.setupWikiMenuLinkClickAnalytics();
 		liquipedia.analytics.setupLinkClickAnalytics();
 	},
+
 	findLinkPosition: function( element ) {
 		const analyticsElement = element.closest( '[data-analytics-name]' );
 		if ( analyticsElement ) {
@@ -45,39 +46,44 @@ liquipedia.analytics = {
 
 		return clone.textContent.trim();
 	},
-	setupWikiMenuLinkClickAnalytics: function() {
-		const wikiMenuLinks = document.querySelectorAll( '[data-wiki-menu="link"]' );
 
-		wikiMenuLinks.forEach( ( wikiMenuLink ) => {
-			const eventProperties = {
+	setupClickHandler: function( selector, trackerName, propertiesBuilder ) {
+		const elements = document.querySelectorAll( selector );
+
+		elements.forEach( ( element ) => {
+			element.addEventListener( 'click', () => {
+				const eventProperties = propertiesBuilder( element );
+				window.amplitude.track( trackerName, eventProperties );
+			} );
+		} );
+	},
+
+	setupWikiMenuLinkClickAnalytics: function() {
+		liquipedia.analytics.setupClickHandler(
+			'[data-wiki-menu="link"]',
+			'Wiki switched',
+			( wikiMenuLink ) => ( {
 				wiki: wikiMenuLink.closest( '[data-wiki-id]' ).dataset.wikiId,
 				'page url': window.location.href,
 				position: 'wiki menu',
 				destination: wikiMenuLink.href,
 				'trending page': false,
 				'trending position': null
-			};
-
-			wikiMenuLink.addEventListener( 'click', () => {
-				window.amplitude.track( 'Wiki switched', eventProperties );
-			} );
-		} );
+			} )
+		);
 	},
-	setupLinkClickAnalytics: function() {
-		const links = document.querySelectorAll( 'a' );
 
-		links.forEach( ( link ) => {
-			const eventProperties = {
+	setupLinkClickAnalytics: function() {
+		liquipedia.analytics.setupClickHandler(
+			'a',
+			'Link clicked',
+			( link ) => ( {
 				title: link.innerText,
 				position: liquipedia.analytics.findLinkPosition( link ),
 				'page url': window.location.href,
 				'destination url': link.href
-			};
-
-			link.addEventListener( 'click', () => {
-				window.amplitude.track( 'Link clicked', eventProperties );
-			} );
-		} );
+			} )
+		);
 	}
 };
 liquipedia.core.modules.push( 'analytics' );
