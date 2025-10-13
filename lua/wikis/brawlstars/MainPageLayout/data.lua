@@ -80,8 +80,8 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Brawl Stars full allmode.png',
-		darkmode = 'Brawl Stars full allmode.png',
+		lightmode = 'Brawl_Stars_2025_allmode.png',
+		darkmode = 'Brawl_Stars_2025_allmode.png',
 	},
 	metadesc = 'The Brawl Stars esports wiki covering everything from players, teams and transfers, ' ..
 		'to tournaments and results, maps, and Brawlers.',
