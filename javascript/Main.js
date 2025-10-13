@@ -5,6 +5,7 @@
 
 // List of JavaScript modules to include
 const jsModules = [
+	'Analytics',
 	'BattleRoyale',
 	'Bracket',
 	'Collapse',
@@ -23,8 +24,7 @@ const jsModules = [
 	'Selectall',
 	'Slider',
 	'SwitchButtons',
-	'Tabs',
-	'Analytics'
+	'Tabs'
 ];
 
 // Dynamically load JavaScript modules

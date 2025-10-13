@@ -16,8 +16,6 @@ local Div = HtmlWidgets.Div
 ---@class AnalyticsWidget: Widget
 ---@operator call(table): AnalyticsWidget
 local AnalyticsWidget = Class.new(Widget)
-AnalyticsWidget.defaultProps = {
-}
 
 ---@return Widget
 function AnalyticsWidget:render()
