@@ -14,13 +14,11 @@ local LpdbCounter = Lua.import('Module:LPDB entity count')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
-local AnalyticsMapping = Lua.import('Module:MainPageLayout/AnalyticsMapping')
 local WikiData = Lua.import('Module:MainPageLayout/data')
 local GridWidgets = Lua.import('Module:Widget/Grid')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local NavigationCard = Lua.import('Module:Widget/MainPage/NavigationCard')
 local PanelWidget = Lua.import('Module:Widget/Panel')
-local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 
 local MainPageLayout = {}
 
@@ -64,14 +62,9 @@ function MainPageLayout.make(frame)
 					frame:callParserFunction('#searchbox', ''),
 				}
 			},
-			AnalyticsWidget{
-				analyticsName = 'Quick navigation',
-				children = {
-					HtmlWidgets.Div{
-						classes = {'navigation-cards'},
-						children = Array.map(WikiData.navigation, MainPageLayout._makeNavigationCard)
-					}
-				}
+			HtmlWidgets.Div{
+				classes = {'navigation-cards'},
+				children = Array.map(WikiData.navigation, MainPageLayout._makeNavigationCard)
 			},
 			MainPageLayout._makeCells(layout),
 		},
@@ -97,27 +90,16 @@ function MainPageLayout._makeCells(cells)
 			local content = {}
 			if item.content then
 				local contentBody = item.content.body
-				local contentElement
 				if item.content.noPanel then
-					contentElement = MainPageLayout._processCellBody(contentBody)
+					table.insert(content, MainPageLayout._processCellBody(contentBody))
 				else
-					contentElement = PanelWidget{
+					table.insert(content, PanelWidget{
 						children = MainPageLayout._processCellBody(contentBody),
 						boxId = item.content.boxid,
 						padding = item.content.padding,
 						heading = item.content.heading,
 						panelAttributes = item.content.panelAttributes,
-					}
-				end
-
-				local analyticsName = AnalyticsMapping.getAnalyticsName(item.content.boxid)
-				if analyticsName then
-					table.insert(content, AnalyticsWidget{
-						analyticsName = analyticsName,
-						children = {contentElement}
 					})
-				else
-					table.insert(content, contentElement)
 				end
 			end
 			if item.children then
