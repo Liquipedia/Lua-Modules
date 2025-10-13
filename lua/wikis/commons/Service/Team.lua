@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local TeamService = {}
 
@@ -31,11 +32,11 @@ local LPDB_TEAM_FIELDS = {
 ---@param teamTemplate string
 ---@return StandardTeam?
 function TeamService.getTeamByTemplate(teamTemplate)
-	if not teamTemplate or not mw.ext.TeamTemplate.teamexists(teamTemplate) then
+	if not teamTemplate or not TeamTemplate.exists(teamTemplate) then
 		return nil
 	end
 
-	local team = mw.ext.TeamTemplate.raw(teamTemplate)
+	local team = TeamTemplate.getRawOrNil(teamTemplate)
 
 	if not team then
 		return nil

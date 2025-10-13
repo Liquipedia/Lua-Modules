@@ -20,6 +20,7 @@ local Namespace = Lua.import('Module:Namespace')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Variables = Lua.import('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
@@ -73,7 +74,7 @@ function Team:createInfobox()
 
 	-- Team Information
 	local team = args.teamtemplate or self.pagename
-	self.teamTemplate = mw.ext.TeamTemplate.raw(team) or {}
+	self.teamTemplate = TeamTemplate.getRawOrNil(team) or {}
 
 	args.imagedark = args.imagedark or args.imagedarkmode or args.image or self.teamTemplate.imagedark
 	args.image = args.image or self.teamTemplate.image
@@ -240,15 +241,11 @@ function Team:_getTeamIcon(date)
 		return
 	end
 
-	local icon = self.teamTemplate.historicaltemplate
-		and mw.ext.TeamTemplate.raw(self.teamTemplate.historicaltemplate, date).image
-		or self.teamTemplate.image
+	local historicalTemplateName = self.teamTemplate.historicaltemplate
+		and TeamTemplate.resolve(self.teamTemplate.historicaltemplate, date)
+		or self.teamTemplate.templatename
 
-	local iconDark = self.teamTemplate.historicaltemplate
-		and mw.ext.TeamTemplate.raw(self.teamTemplate.historicaltemplate, date).imagedark
-		or self.teamTemplate.imagedark
-
-	return icon, iconDark
+	return TeamTemplate.getIcon(historicalTemplateName)
 end
 
 ---@param date? string
