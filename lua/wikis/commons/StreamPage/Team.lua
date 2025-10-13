@@ -24,6 +24,7 @@ local String = Lua.import('Module:StringUtils')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local MatchPageAdditionalSection = Lua.import('Module:Widget/Match/Page/AdditionalSection')
 local MatchPageHeader = Lua.import('Module:Widget/Match/Page/Header')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -72,19 +73,21 @@ end
 
 ---@param args table
 ---@param match MatchGroupUtilMatch
----@return (Widget|Html)[]
+---@return Widget
 function StreamPage.displayUpcomingMatches(args, match)
 	local ticker = MatchTicker{
 		additionalConditions = 'AND ([[stream_' .. args.provider .. '::' .. args.channel .. ']]' ..
 								' OR [[stream_' .. args.provider .. '_en_1::' .. args.channel .. ']])' ..
 								' AND ([[date::' .. match.timestamp .. ']] OR [[date::>' .. match.timestamp .. ']])',
 		limit = 5,
+		newStyle = true,
 		ongoing = true,
 		upcoming = true,
+		wrapperClasses = {'new-match-style'},
 	}
-	return {
-		HtmlWidgets.H3{children = 'Channel Schedule'},
-		ticker:query():create()
+	return MatchPageAdditionalSection{
+		header = 'Channel Schedule',
+		children = ticker:query():create()
 	}
 end
 
