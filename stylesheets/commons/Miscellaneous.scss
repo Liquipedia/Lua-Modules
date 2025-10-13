@@ -2080,11 +2080,11 @@ Template/Module: Recent games // Recent matches ( for new Bracket/Match System )
 Author(s): hjpalpha
 *******************************************************************************/
 .recent-matches-left {
-	background-image: linear-gradient( to left, var( --clr-cinnabar-background-color, #fbdfdf ) 25%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 45%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 55%, var( --clr-forestgreen-background-color, #ddf4dd ) 75% ) !important;
+	background-image: linear-gradient( to left, var( --clr-cinnabar-background-color, #fbdfdf ) 25%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 45%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 55%, var( --clr-forest-background-color, #ddf4dd ) 75% ) !important;
 }
 
 .recent-matches-right {
-	background-image: linear-gradient( to right, var( --clr-cinnabar-background-color, #fbdfdf ) 25%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 45%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 55%, var( --clr-forestgreen-background-color, #ddf4dd ) 75% ) !important;
+	background-image: linear-gradient( to right, var( --clr-cinnabar-background-color, #fbdfdf ) 25%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 45%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 55%, var( --clr-forest-background-color, #ddf4dd ) 75% ) !important;
 }
 
 .recent-matches-draw {
@@ -2092,11 +2092,11 @@ Author(s): hjpalpha
 }
 
 .recent-matches-left-publishertier {
-	background-image: linear-gradient( to left, var( --clr-cinnabar-background-color, #fbdfdf ) 25%, var( --publisher-premier-highlight-background-color, #ffffcc ) 45%, var( --publisher-premier-highlight-background-color, #ffffcc ) 55%, var( --clr-forestgreen-background-color, #ddf4dd ) 75% ) !important;
+	background-image: linear-gradient( to left, var( --clr-cinnabar-background-color, #fbdfdf ) 25%, var( --publisher-premier-highlight-background-color, #ffffcc ) 45%, var( --publisher-premier-highlight-background-color, #ffffcc ) 55%, var( --clr-forest-background-color, #ddf4dd ) 75% ) !important;
 }
 
 .recent-matches-right-publishertier {
-	background-image: linear-gradient( to right, var( --clr-cinnabar-background-color, #fbdfdf ) 25%, var( --publisher-premier-highlight-background-color, #ffffcc ) 45%, var( --publisher-premier-highlight-background-color, #ffffcc ) 55%, var( --clr-forestgreen-background-color, #ddf4dd ) 75% ) !important;
+	background-image: linear-gradient( to right, var( --clr-cinnabar-background-color, #fbdfdf ) 25%, var( --publisher-premier-highlight-background-color, #ffffcc ) 45%, var( --publisher-premier-highlight-background-color, #ffffcc ) 55%, var( --clr-forest-background-color, #ddf4dd ) 75% ) !important;
 }
 
 .recent-matches-draw-publishertier {
