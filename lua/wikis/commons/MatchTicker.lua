@@ -99,7 +99,7 @@ end
 ---@field regions string[]?
 ---@field games string[]?
 ---@field newStyle boolean?
----@field featuredTournamentsOnly boolean?
+---@field featuredOnly boolean?
 ---@field displayGameIcons boolean?
 
 ---@class MatchTickerGameData
@@ -155,7 +155,7 @@ function MatchTicker:init(args)
 					return Game.toIdentifier{game=game}
 				end) or nil,
 		newStyle = Logic.readBool(args.newStyle),
-		featuredTournamentsOnly = Logic.readBool(args.featuredTournamentsOnly),
+		featuredOnly = Logic.readBool(args.featuredOnly),
 		displayGameIcons = Logic.readBool(args.displayGameIcons)
 	}
 
@@ -366,7 +366,7 @@ function MatchTicker:parseMatch(match)
 	match.opponents = Array.map(match.match2opponents, function(opponent, opponentIndex)
 		return MatchGroupUtil.opponentFromRecord(match, opponent, opponentIndex)
 	end)
-	if self.config.regions or self.config.featuredTournamentsOnly then
+	if self.config.regions or self.config.featuredOnly then
 		match.tournamentData = MatchTicker.fetchTournament(match.parent)
 	end
 	return match
@@ -387,11 +387,10 @@ function MatchTicker:keepMatch(match)
 		end
 	end
 
-	if self.config.featuredTournamentsOnly then
-		if not match.tournamentData then
-			return false
-		end
-		if not match.tournamentData.featured then
+	if self.config.featuredOnly then
+		local matchIsInFeaturedTournament = match.tournamentData and match.tournamentData.featured
+		local matchIsFeatured = match.extradata and match.extradata.featured
+		if not matchIsInFeaturedTournament and not matchIsFeatured then
 			return false
 		end
 	end
