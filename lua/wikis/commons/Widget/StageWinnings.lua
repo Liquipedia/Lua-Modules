@@ -128,11 +128,9 @@ function StageWinnings:render()
 		),
 	}
 
-	return HtmlWidgets.Fragment{
-		children = {
-			dataDisplay,
-			self:_exchangeInfo(),
-		},
+	return {
+		dataDisplay,
+		self:_exchangeInfo(),
 	}
 end
 
