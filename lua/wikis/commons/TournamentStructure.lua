@@ -23,7 +23,6 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
-local ConditionUtil = Condition.Util
 
 local FULL_PAGENAME = mw.title.getCurrentTitle().prefixedText
 
