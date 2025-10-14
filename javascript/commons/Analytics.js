@@ -1,6 +1,4 @@
 /*******************************************************************************
- * Template(s): Links
- * Author(s): Eetwalt
  * Description: This script enables anonymous analytics of user interactions
  *              for product development and user experience improvements.
  ******************************************************************************/
