@@ -39,7 +39,17 @@ local CONTENT = {
 	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = HtmlWidgets.Fragment{children = { TournamentsList.getFromLpdb(), HtmlWidgets.P{classes = {'mainpage-editlink'}, children = HtmlWidgets.Small{children = {'&#91;', '[[Special:EditPage/Liquipedia:Tournaments/dynamic|edit]]', '&#93;'}}}}}
+		body = HtmlWidgets.Fragment{children = {
+			TournamentsList.getFromLpdb(),
+			HtmlWidgets.P{
+				classes = {'mainpage-editlink'},
+				children = HtmlWidgets.Small{children = {
+					'&#91;',
+					Link{link = 'Special:EditPage/Liquipedia:Tournaments/dynamic', children = 'edit'},
+					'&#93;'
+				}}
+			}
+		}},
 		padding = true,
 		boxid = 1508,
 	},
