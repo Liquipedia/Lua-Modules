@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
+local Image = Lua.import('Module:Image')
 local Logic = Lua.import('Module:Logic')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local MatchTable = Lua.import('Module:MatchTable/Custom')
@@ -43,32 +44,26 @@ function StreamPage.create(args)
 	end
 	local match = matches[1]
 
-	return HtmlWidgets.Fragment{children = {
+	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
 		'__NOTOC__',
 		StreamPage._panel(match),
-		StreamPage._opponentPlayerTable(match.opponents[1], 'left'),
-		StreamPage._opponentPlayerTable(match.opponents[2], 'right'),
-		HtmlWidgets.Div{
-			css = {
-				display = 'inline-block',
-				padding = '0.5rem',
-				width = 'calc( 100% - 454px )',
-				['min-width'] = 'min(100%, max(500px, calc( 100% - 454px)))',
-			},
-			children = WidgetUtil.collect(
-				StreamPage.displayUpcomingMatches(args, match),
-				HtmlWidgets.H3{children = 'Head to Head'},
-				MatchTable.results{
-					limit = 5,
-					edate = match.timestamp - 86400,
-					showOpponent = true,
-					tableMode = Opponent.team,
-					team = match.opponents[1].name,
-					vsteam = match.opponents[2].name,
-				}
-			)
+		StreamPage.displayUpcomingMatches(args, match),
+		{
+			HtmlWidgets.H3{children = 'Player Information'},
+			StreamPage._opponentPlayerTable(match.opponents)
 		},
-	}}
+		{
+			HtmlWidgets.H3{children = 'Head to Head'},
+			MatchTable.results{
+				limit = 5,
+				edate = match.timestamp - 86400,
+				showOpponent = true,
+				tableMode = Opponent.team,
+				team = match.opponents[1].name,
+				vsteam = match.opponents[2].name,
+			}
+		}
+	)}
 end
 
 ---@param args table
@@ -85,47 +80,43 @@ function StreamPage.displayUpcomingMatches(args, match)
 		upcoming = true,
 		wrapperClasses = {'new-match-style'},
 	}
-	return MatchPageAdditionalSection{
-		header = 'Channel Schedule',
-		children = ticker:query():create()
+	return HtmlWidgets.Div{
+		css = {float = 'right'},
+		children = MatchPageAdditionalSection{
+			header = 'Channel Schedule',
+			children = ticker:query():create()
+		}
 	}
 end
 
----@param opponent standardOpponent
----@param float string
+---@param opponents standardOpponent[]
 ---@return Html
-function StreamPage._opponentPlayerTable(opponent, float)
-	local display = mw.html.create('table')
-		:addClass('table')
-		:addClass('wikitable')
-		:css('float', float)
-		:css('margin', '0')
-		:css('width', '227px')
-	local header = mw.html.create('tr')
-		:addClass('wiki-backgroundcolor-light')
-		:css('font-size', '150%')
-		:tag('th')
-			--:css('background-color', '#c1dfdf !important') -- todo replace with css (make it wiki color)
-			:css('padding', '5px')
-			:wikitext('Players'):done():done()
-	display:node(header)
+function StreamPage._opponentPlayerTable(opponents)
+	return HtmlWidgets.Div{
+		classes = {'match-bm-players-wrapper'},
+		children = Array.map(opponents, StreamPage._teamDisplay)
+	}
+end
 
-	for _, player in ipairs(opponent.players) do
-		StreamPage._playerDisplay(player, display)
-	end
-	-- fill up with TBD players
-	if #opponent.players < 5 then
-		for index = #opponent.players, 5 do
-			StreamPage._playerDisplay({displayName = 'TBD'}, display)
-		end
-	end
-
-	return display
+---@private
+---@param opponent standardOpponent
+---@return Widget
+function StreamPage._teamDisplay(opponent)
+	return HtmlWidgets.Div{
+		classes = {'match-bm-players-team'},
+		children = WidgetUtil.collect(
+			HtmlWidgets.Div{
+				classes = {'match-bm-players-team-header'},
+				children = OpponentDisplay.InlineOpponent{opponent = opponent, teamStyle = 'icon'}
+			},
+			Array.map(opponent.players, StreamPage._playerDisplay)
+		)
+	}
 end
 
 ---@param player standardPlayer
----@param display Html
-function StreamPage._playerDisplay(player, display)
+---@return Widget
+function StreamPage._playerDisplay(player)
 	local lpdbData = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = '[[pagename::' .. (Page.pageifyLink(player.pageName) or '') .. ']]',
 		limit = 1
@@ -143,24 +134,16 @@ function StreamPage._playerDisplay(player, display)
 	if String.isEmpty(image) then
 		image = 'Blank Player Image.png'
 	end
-	local imageRow = mw.html.create('tr')
-		:tag('td')
-			:css('padding','0')
-			:css('text-align','center')
-			:wikitext('[[File:' .. image .. '|225x150px|link=]]'):done():done()
-	display:node(imageRow)
+	local imageDisplay = Image.display(image, nil, {class = 'img-fluid', size = '600px'})
 
 	local nameDisplay = PlayerDisplay.InlinePlayer{
 		player = player
 	}
-	local nameRow = mw.html.create('tr')
-		:tag('th')
-			:css('position','absolute')
-			:css('margin-top','-32px')
-			:css('width','225px')
-			:css('opacity','95%')
-			:node(nameDisplay):done():done()
-	display:node(nameRow)
+
+	return HtmlWidgets.Div{
+		classes = {'match-bm-players-player', 'match-bm-players-player--col-2'},
+		children = {imageDisplay, nameDisplay}
+	}
 end
 
 ---@param match MatchGroupUtilMatch
