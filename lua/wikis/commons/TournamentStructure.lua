@@ -252,12 +252,16 @@ function TournamentStructure.getPageNameFilter(matchGroupType, pageName)
 	return condition
 end
 
---- Fetches brackets (matches) for a given filter (condition string).
----@param filter string|AbstractConditionNode
+--- Fetches brackets (matches) for a given filter (condition node).
+---@param filter AbstractConditionNode
 ---@return match2[]
 function TournamentStructure.fetchBracketsFromFilter(filter)
+	local condition = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('type', 'match2bracketdata'), Comparator.eq, 'bracket'),
+		filter
+	}
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
-			conditions = tostring(filter) .. ' AND [[match2bracketdata_type::bracket]]',
+			conditions = tostring(condition),
 			limit = 5000,
 		})
 
@@ -275,8 +279,8 @@ function TournamentStructure.fetchBracketsFromFilter(filter)
 	return matches
 end
 
---- Fetches groups (standings tables) for a given filter (condition string).
----@param filter string|AbstractConditionNode
+--- Fetches groups (standings tables) for a given filter (condition node).
+---@param filter AbstractConditionNode
 ---@return table
 function TournamentStructure.fetchGroupsFromFilter(filter)
 	return mw.ext.LiquipediaDB.lpdb('standingstable', {
