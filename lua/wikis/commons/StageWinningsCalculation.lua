@@ -8,10 +8,8 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
-local Page = Lua.import('Module:Page')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local Condition = Lua.import('Module:Condition')
@@ -20,7 +18,6 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
-local ConditionUtil = Condition.Util
 
 local StageWinningsCalculation = {}
 
