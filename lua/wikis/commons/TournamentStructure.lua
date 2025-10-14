@@ -255,7 +255,7 @@ end
 
 --- Fetches brackets (matches) for a given filter (condition string).
 ---@param filter string|AbstractConditionNode
----@return table
+---@return match2[]
 function TournamentStructure.fetchBracketsFromFilter(filter)
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
 			conditions = tostring(filter) .. ' AND [[match2bracketdata_type::bracket]]',
