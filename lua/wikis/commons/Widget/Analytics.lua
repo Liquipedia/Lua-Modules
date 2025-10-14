@@ -1,4 +1,3 @@
----
 -- @Liquipedia
 -- page=Module:Widget/Analytics
 --
@@ -19,10 +18,22 @@ local AnalyticsWidget = Class.new(Widget)
 
 ---@return Widget
 function AnalyticsWidget:render()
-	return Div{
-		attributes = {['data-analytics-name'] = self.props.analyticsName},
-		children = self.props.children
-	}
+	local analyticsName = self.props.analyticsName
+	local analyticsKey = self.props.analyticsKey
+	local analyticsMapping = self.props.analyticsMapping
+
+	if not analyticsName and analyticsKey and analyticsMapping then
+		analyticsName = analyticsMapping[analyticsKey]
+	end
+
+	if analyticsName then
+		return Div{
+			attributes = {['data-analytics-name'] = analyticsName},
+			children = self.props.children
+		}
+	else
+		return self.props.children
+	end
 end
 
 return AnalyticsWidget

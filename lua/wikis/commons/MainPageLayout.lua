@@ -14,7 +14,7 @@ local LpdbCounter = Lua.import('Module:LPDB entity count')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
-local AnalyticsMapping = Lua.import('Module:MainPageLayout/AnalyticsMapping')
+local AnalyticsMapping = Lua.import('Module:MainPageLayout/AnalyticsMapping', {loadData = true})
 local WikiData = Lua.import('Module:MainPageLayout/data')
 local GridWidgets = Lua.import('Module:Widget/Grid')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -110,8 +110,9 @@ function MainPageLayout._makeCells(cells)
 					}
 				end
 
-				table.insert(content, AnalyticsMapping{
+				table.insert(content, AnalyticsWidget{
 					analyticsKey = item.content.boxid,
+					analyticsMapping = AnalyticsMapping,
 					children = {contentElement}
 				})
 			end
