@@ -19,7 +19,7 @@ liquipedia.analytics = {
 			NodeFilter.SHOW_ELEMENT,
 			{
 				acceptNode: function( node ) {
-					if ( node.tagName === 'H2' ) {
+					if ( node.tagName === 'H1' || node.tagName === 'H2' ) {
 						return NodeFilter.FILTER_ACCEPT;
 					}
 					return NodeFilter.FILTER_SKIP;
