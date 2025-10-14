@@ -52,6 +52,7 @@ local VALORANT_REGIONS = {'eu', 'na', 'ap', 'kr', 'latam', 'br', 'pbe1', 'esport
 ---@field getLength fun(map: table): string?
 ---@field getRounds fun(map: table): ValorantRoundData[]?
 ---@field getPatch fun(map: table): string?
+---@field extendMapOpponent? fun(map: table, opponentIndex: integer): table
 
 ---@class ValorantPlayerOverallStats
 ---@field acs integer[]
@@ -90,7 +91,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	local processedMatch = MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
 
-	if processedMatch.games then
+	if options.isMatchPage then
 		MatchFunctions.populateOpponentStats(processedMatch)
 	end
 
@@ -109,6 +110,7 @@ function MatchFunctions.extractMaps(match, opponents, MapParser)
 	---@type MapParserInterface
 	local mapParser = {
 		calculateMapScore = FnUtil.curry(MapFunctions.calculateMapScore, MapParser),
+		extendMapOpponent = MapParser.extendMapOpponent,
 		getExtraData = FnUtil.curry(MapFunctions.getExtraData, MapParser),
 		getMap = MapParser.getMap,
 		getMapName = MapParser.getMapName,
@@ -157,16 +159,17 @@ function MatchFunctions.getPatch(match, games)
 	)
 end
 
----@param match table
+---@param match {opponents: MGIParsedOpponent[], games: table[]}
 ---@return table
 function MatchFunctions.populateOpponentStats(match)
 	Array.forEach(match.opponents, function(opponent, opponentIdx)
-		opponent.extradata = opponent.extradata or {}
-		opponent.extradata.overallStats = MatchFunctions.calculateOverallStatsForOpponent(match.games, opponentIdx)
-		Array.forEach(opponent.match2players, function(player)
+		opponent.extradata = Table.merge(
+			opponent.extradata, MatchFunctions.calculateOverallStatsForOpponent(match.games, opponentIdx)
+		)
+		Array.forEach(opponent.match2players, function(player, playerIndex)
 			player.extradata = player.extradata or {}
 			player.extradata.overallStats = MatchFunctions.calculateOverallStatsForPlayer(
-				match.games, player, opponentIdx
+				match.games, opponentIdx, player, playerIndex
 			)
 		end)
 	end)
@@ -180,12 +183,9 @@ function MatchFunctions.calculateOverallStatsForOpponent(maps, opponentIndex)
 	local teamDataPerMap = Array.map(
 		Array.filter(maps, function(map)
 			return map.status ~= MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
-				and map.extradata
-				and map.extradata.teams
-				and map.extradata.teams[opponentIndex]
 		end),
 		function(map)
-			return map.extradata.teams[opponentIndex]
+			return map.opponents[opponentIndex]
 		end
 	)
 
@@ -212,10 +212,11 @@ function MatchFunctions.calculateOverallStatsForOpponent(maps, opponentIndex)
 end
 
 ---@param maps table[]
----@param player table
 ---@param teamIdx integer
+---@param player table
+---@param playerIdx integer
 ---@return table
-function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
+function MatchFunctions.calculateOverallStatsForPlayer(maps, teamIdx, player, playerIdx)
 	local playerId = player.name
 	if not playerId then return {} end
 
@@ -237,19 +238,7 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 			return
 		end
 
-		local mapOpponent = map.opponents[teamIdx]
-		if not mapOpponent or not mapOpponent.players then
-			return
-		end
-
-		local mapPlayerIndex = Array.indexOf(mapOpponent.players, function(playerData)
-			return playerData.player == playerId
-		end)
-		local mapPlayer = mapOpponent.players[mapPlayerIndex]
-
-		if not mapPlayer then
-			return
-		end
+		local mapPlayer = map.opponents[teamIdx].players[playerIdx]
 
 		if mapPlayer.agent then
 			table.insert(agents, mapPlayer.agent)
@@ -261,16 +250,8 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 		overallStats.roundsPlayed = overallStats.roundsPlayed + (mapPlayer.roundsPlayed or 0)
 		overallStats.roundsWithKast = overallStats.roundsWithKast + (mapPlayer.roundsWithKast or 0)
 		overallStats.damageDealt = overallStats.damageDealt + (mapPlayer.damageDealt or 0)
-
-		local extraDataPlayer = Array.find(map.extradata.teams[teamIdx].players, function(playerData)
-			return playerData.player == playerId
-		end)
-		if not extraDataPlayer then
-			extraDataPlayer = map.extradata.teams[teamIdx].players[mapPlayerIndex]
-		end
-
-		overallStats.firstKills = overallStats.firstKills + (extraDataPlayer.firstKills or 0)
-		overallStats.firstDeaths = overallStats.firstDeaths + (extraDataPlayer.firstDeaths or 0)
+		overallStats.firstKills = overallStats.firstKills + (mapPlayer.firstKills or 0)
+		overallStats.firstDeaths = overallStats.firstDeaths + (mapPlayer.firstDeaths or 0)
 	end)
 
 	local function calculatePercentage(value, total)
@@ -290,9 +271,6 @@ function MatchFunctions.calculateOverallStatsForPlayer(maps, player, teamIdx)
 	end
 
 	return {
-		teamIndex = teamIdx,
-		player = player.name,
-		displayName = player.displayName,
 		agent = agents,
 		acs = acs,
 		kills = overallStats.kills,
@@ -349,51 +327,6 @@ function MapFunctions.getExtraData(MapParser, match, map, opponents)
 		publisherregion = publisherRegion,
 	}
 
-	local rounds = extraData.rounds or {}
-	extraData.teams = Array.map(Array.range(1, 2), function(teamIdx)
-		local team = {}
-		local teamSideKey = 't' .. teamIdx .. 'side'
-
-		local originalPlayers = Array.filter(map.opponents[teamIdx].players or {}, Table.isNotEmpty)
-		team.players = Array.map(originalPlayers, function(player)
-			return Table.copy(player)
-		end)
-
-		team.thrifties = #Array.filter(rounds, function (round)
-			return round[teamSideKey] == round.winningSide and round.ceremony == 'Thrifty'
-		end)
-
-		team.firstKills = #Array.filter(rounds, function (round)
-			return round.firstKill.byTeam == teamIdx
-		end)
-
-		Array.forEach(team.players, function (player)
-			player.firstKills = #Array.filter(rounds, function (round)
-				return round.firstKill.killer == player.puuid
-			end)
-			player.firstDeaths = #Array.filter(rounds, function (round)
-				return round.firstKill.victim == player.puuid
-			end)
-		end)
-
-		team.clutches = #Array.filter(rounds, function (round)
-			return round[teamSideKey] == round.winningSide and round.ceremony == 'Clutch'
-		end)
-
-		local plantedRounds = Array.filter(rounds, function (round)
-			return round[teamSideKey] == 'atk' and round.planted
-		end)
-
-		team.postPlant = {
-			#Array.filter(plantedRounds, function (round)
-				return round.winningSide == 'atk'
-			end),
-			#plantedRounds
-		}
-
-		return team
-	end)
-
 	for opponentIdx, opponent in ipairs(map.opponents) do
 		for playerIdx, player in pairs(opponent.players) do
 			extraData['t' .. opponentIdx .. 'p' .. playerIdx] = player.player
@@ -436,6 +369,8 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 				displayName = playerIdData.displayname or playerInputData.name,
 				puuid = participant.puuid,
 				agent = getCharacterName(participant.agent),
+				firstKills = participant.firstKills,
+				firstDeaths = participant.firstDeaths,
 			}
 
 			-- adds overall stats to playerData for MatchPage
