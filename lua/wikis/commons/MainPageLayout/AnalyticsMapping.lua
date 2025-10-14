@@ -5,7 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----@type table<string>
+---@type table<integer, string>
 local AnalyticsMapping = {
 	[1501] = 'Heroes panel',
 	[1502] = 'Updates panel',
