@@ -6,6 +6,8 @@
 
 local Lua = require('Module:Lua')
 
+local TournamentsList = Lua.import('Module:TournamentsList')
+
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
