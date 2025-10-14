@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Table = Lua.import('Module:Table')
+local Tier = Lua.import('Module:Tier/Custom')
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
@@ -100,7 +101,7 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	local tier, _ = Tier.toValue(args.tier)
 	if tier then
 		lpdbData.extradata.tier = tier
-	elseif Logic.isNotEmpty(args.tier)
+	elseif Logic.isNotEmpty(args.tier) then
 		error("Invalid tier input: " .. args.tier)
 	end
 
