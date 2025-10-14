@@ -35,7 +35,7 @@ TournamentStructure.types.MatchGroupsSpec = TypeUtil.struct{
 }
 
 --- Fetches match groups and GroupTableLeague data point records grouped by tournament stage
----@param spec {matchGroupIds: table, pageNames: string[][]}
+---@param spec MatchGroupsSpec
 ---@return table
 function TournamentStructure.fetchStages(spec)
 	return TournamentStructure.groupByStage(
