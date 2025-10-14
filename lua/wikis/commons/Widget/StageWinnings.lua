@@ -25,7 +25,6 @@ local Widgets = Lua.import('Module:Widget/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local BASE_CURRENCY = 'USD'
-local EXCHANGE_SUMMARY_PRECISION = 5
 
 ---@class StageWinningProps
 ---@field tournaments string
@@ -104,7 +103,7 @@ function StageWinnings:render()
 		}
 	end
 
-	local dataDisplay = Widgets.DataTable{
+	return Widgets.DataTable{
 		classes = {'prizepooltable', 'collapsed'},
 		tableCss = {
 			['text-align'] = 'center',
@@ -132,11 +131,6 @@ function StageWinnings:render()
 			-- rows
 			Array.map(opponentList, FnUtil.curry(self._row, self))
 		),
-	}
-
-	return {
-		dataDisplay,
-		self:_exchangeInfo(),
 	}
 end
 
@@ -255,37 +249,6 @@ function StageWinnings._detailedScores(scoresTable)
 		end),
 		HtmlWidgets.Br{}
 	)
-end
-
----@return Widget?
-function StageWinnings:_exchangeInfo()
-	if Logic.isEmpty(self.props.localcurrency) or not Logic.readBool(self.props.exchangeinfo) then
-		return
-	end
-
-	return HtmlWidgets.Small{
-		css = {['font-style'] = 'italic'},
-		children = {
-			'(Converted ',
-			Currency.display(BASE_CURRENCY),
-			' prizes are based on the ',
-			HtmlWidgets.Abbr{
-				title = 'Currency exchange rate taken from exchangerate.host',
-				children = 'exchange rate',
-			},
-			' on ',
-			DateExt.formatTimestamp('M j, Y', DateExt.readTimestamp(self.exchangeDate) --[[@as integer]]),
-			': ',
-			Currency.display(self.props.localcurrency, 1),
-			' ≃ ',
-			Currency.display(
-				BASE_CURRENCY,
-				self.currencyRate or 1,
-				{formatValue = true, formatPrecision = EXCHANGE_SUMMARY_PRECISION}
-			),
-			')',
-		},
-	}
 end
 
 return StageWinnings
