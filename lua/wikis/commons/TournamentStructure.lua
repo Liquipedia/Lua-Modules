@@ -17,6 +17,14 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TypeUtil = Lua.import('Module:TypeUtil')
 
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
+
 local FULL_PAGENAME = mw.title.getCurrentTitle().prefixedText
 
 local TournamentStructure = {types = {}}
