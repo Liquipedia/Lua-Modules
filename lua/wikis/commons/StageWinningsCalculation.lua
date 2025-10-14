@@ -109,7 +109,6 @@ end
 ---@param props {matchGroupId1: string?, tournament1: string, startDate: integer?, endDate: integer?}
 ---@return string
 function StageWinningsCalculation._buildConditions(props)
-
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('finished'), Comparator.eq, '1'),
 		ConditionNode(ColumnName('status'), Comparator.neq, 'notplayed'),
@@ -125,7 +124,7 @@ function StageWinningsCalculation._buildConditions(props)
 	end
 
 	if props.endDate then
-	conditions:add(ConditionNode(ColumnName('date'), Comparator.le, props.endDate))
+		conditions:add(ConditionNode(ColumnName('date'), Comparator.le, props.endDate))
 	end
 
 	return tostring(conditions)
