@@ -2878,3 +2878,27 @@ Attritute highlight, so far only used in Infoboxes, but can be used anywhere
 		border-radius: 50%;
 	}
 }
+/*******************************************************************************
+Template(s): POIDraft
+Author(s): Slothyman
+Slightly transparent imagelabel on POIDraft
+*******************************************************************************/
+.poi-label-rotation-one {
+	.theme--light & {
+		background-color: rgba( 204, 171, 0, 0.95 );
+	}
+
+	.theme--dark & {
+		background-color: rgba( 102, 84, 0, 0.95 );
+	}
+}
+
+.poi-label-rotation-two {
+	.theme--light & {
+		background-color: rgba( 204, 225, 255, 0.95 );
+	}
+
+	.theme--dark & {
+		background-color: rgba( 0, 25, 51, 0.95 );
+	}
+}
