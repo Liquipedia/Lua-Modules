@@ -199,46 +199,66 @@ end
 
 --- Builds a filter (condition string) for a given matchGroupId
 ---@param matchGroupId string
----@return string
+---@return ConditionTree
 function TournamentStructure.getMatchGroupFilter(matchGroupId)
 	local namespaceName = matchGroupId:match('^(%w+)_')
-	local clauses = Array.extend(
-		namespaceName and ('[[namespace::' .. Namespace.idFromName(namespaceName) .. ']]') or nil,
-		'[[match2bracketid::' .. matchGroupId .. ']]'
-	)
-	return table.concat(clauses, ' AND ')
+	return ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('match2bracketid'), Comparator.eq, matchGroupId),
+		namespaceName and ConditionNode(
+			ColumnName('namespace'), Comparator.eq, Namespace.idFromName(namespaceName)
+		) or nil
+	}
 end
 
 --- Builds a filter (condition string) for a given matchGroupType and pageName
 ---@param matchGroupType string
 ---@param pageNames string[]
----@return string
+---@return ConditionTree
 function TournamentStructure.getPageNamesFilter(matchGroupType, pageNames)
 	local pageClauses = Array.map(pageNames, FnUtil.curry(TournamentStructure.getPageNameFilter, matchGroupType))
-	return '(' .. table.concat(pageClauses, ' OR ') .. ')'
+	return ConditionTree(BooleanOperator.any):add(pageClauses)
 end
+
+---@private
+---@param matchGroupType string
+---@return ColumnName?
+TournamentStructure._getColumnName = FnUtil.memoize(function (matchGroupType)
+	if matchGroupType == 'bracket' then
+		return ColumnName('sectionheader', 'match2bracketdata')
+	elseif matchGroupType == 'standingstable' then
+		return ColumnName('stagename', 'extradata')
+	end
+end)
 
 --- Builds a filter (condition string) for a given matchGroupType and pageName
 ---@param matchGroupType string
 ---@param pageName string
----@return string
+---@return ConditionTree
 function TournamentStructure.getPageNameFilter(matchGroupType, pageName)
 	local namespaceName, basePageName, stageName = TournamentStructure._splitPageName(pageName)
-	local clauses = Array.extend(
-		namespaceName and ('[[namespace::' .. Namespace.idFromName(namespaceName) .. ']]') or nil,
-		('[[pagename::' .. basePageName:gsub('%s', '_') .. ']]'),
-		stageName and (matchGroupType == 'bracket') and ('[[match2bracketdata_sectionheader::' .. stageName .. ']]') or nil,
-		stageName and (matchGroupType == 'standingstable') and ('[[extradata_stagename::' .. stageName .. ']]') or nil
-	)
-	return table.concat(clauses, ' AND ')
+	local condition = ConditionTree(BooleanOperator.all)
+	if namespaceName then
+		condition:add(ConditionNode(
+			ColumnName('namespace'), Comparator.eq, Namespace.idFromName(namespaceName)
+		))
+	end
+	condition:add(ConditionNode(ColumnName('pagename'), Comparator.eq, basePageName:gsub('%s', '_')))
+	if stageName then
+		condition:add(ConditionNode(
+			TournamentStructure._getColumnName(matchGroupType),
+			Comparator.eq,
+			stageName
+		))
+	end
+	return condition
 end
 
 --- Fetches brackets (matches) for a given filter (condition string).
----@param filter string
+---@param filter string|AbstractConditionNode
 ---@return table
 function TournamentStructure.fetchBracketsFromFilter(filter)
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
-			conditions = filter .. ' AND [[match2bracketdata_type::bracket]]',
+			conditions = tostring(filter) .. ' AND [[match2bracketdata_type::bracket]]',
 			limit = 5000,
 		})
 
@@ -257,12 +277,12 @@ function TournamentStructure.fetchBracketsFromFilter(filter)
 end
 
 --- Fetches groups (standings tables) for a given filter (condition string).
----@param filter string
+---@param filter string|AbstractConditionNode
 ---@return table
 function TournamentStructure.fetchGroupsFromFilter(filter)
 	return mw.ext.LiquipediaDB.lpdb('standingstable', {
 			query = 'namespace, pagename, standingsindex, title, extradata, matches, type, config',
-			conditions = filter,
+			conditions = tostring(filter),
 			limit = 5000,
 		})
 end
@@ -380,13 +400,13 @@ end
 
 --- Converts a match group spec to a standing record filter. Returns a filter string for use in LPDB queries.
 ---@param spec MatchGroupsSpec
----@return string
+---@return ConditionTree
 function TournamentStructure.getGroupTableFilter(spec)
 	local whereClauses = Array.map(spec.pageNames, function(pageName)
 			return TournamentStructure.getPageNamesFilter('standingstable', pageName)
 		end)
 
-	return '(' .. table.concat(whereClauses, ' OR ') .. ')'
+	return ConditionTree(BooleanOperator.any):add(whereClauses)
 end
 
 --- Fetches bracket data (matches) for a given match group spec.
@@ -412,7 +432,7 @@ end
 
 --- Converts a match group spec to a match2 record filter. Returns a filter string for use in LPDB queries.
 ---@param spec MatchGroupsSpec
----@return string
+---@return ConditionTree
 function TournamentStructure.getMatch2Filter(spec)
 	local whereClauses = Array.extend(
 		Array.map(spec.matchGroupIds, TournamentStructure.getMatchGroupFilter),
@@ -420,7 +440,7 @@ function TournamentStructure.getMatch2Filter(spec)
 				return TournamentStructure.getPageNamesFilter('bracket', pageName)
 			end)
 	)
-	return '(' .. table.concat(whereClauses, ' OR ') .. ')'
+	return ConditionTree(BooleanOperator.any):add(whereClauses)
 end
 
 --- Queries and returns a list of matches using the provided match group spec.
@@ -429,7 +449,7 @@ end
 function TournamentStructure.fetchMatches(spec)
 	return Array.map(
 		mw.ext.LiquipediaDB.lpdb('match2', {
-			conditions = TournamentStructure.getMatch2Filter(spec),
+			conditions = tostring(TournamentStructure.getMatch2Filter(spec)),
 			limit = 5000,
 		}),
 		MatchGroupUtil.matchFromRecord
