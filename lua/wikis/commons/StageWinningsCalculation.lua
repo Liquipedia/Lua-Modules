@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Page = Lua.import('Module:Page')
 
 local Condition = Lua.import('Module:Condition')
@@ -39,10 +40,11 @@ function StageWinningsCalculation.run(props)
 	local byName = {}
 
 	Array.forEach(matches, function(match)
-		Array.forEach(match.match2opponents, function(opponent)
-			local identifier = opponent.name
+		match.opponents = Array.map(match.match2opponents, Opponent.fromMatch2Record)
+		Array.forEach(match.opponents, function(opponent)
+			local identifier = Opponent.toName(opponent)
 			byName[identifier] = byName[identifier] or {
-				opponent = Opponent.fromMatch2Record(opponent),
+				opponent = opponent,
 				scoreDetails = {},
 				matchWins = 0,
 				matchLosses = 0,
@@ -56,11 +58,11 @@ function StageWinningsCalculation.run(props)
 		if winnerId ~= 1 and winnerId ~= 2 then return end
 		local loserId = 3 - winnerId
 
-		local winner = match.match2opponents[winnerId]
-		local loser = match.match2opponents[loserId]
+		local winner = match.opponents[winnerId]
+		local loser = match.opponents[loserId]
 
-		local winnerScore = tonumber(winner.score) or ''
-		local loserScore = tonumber(loser.score) or ''
+		local winnerScore = OpponentDisplay.InlineScore(winner)
+		local loserScore = OpponentDisplay.InlineScore(loser)
 
 		local score = winnerScore .. '-' .. loserScore
 		local reversedScore = loserScore .. '-' .. winnerScore

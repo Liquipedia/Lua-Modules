@@ -13,6 +13,7 @@ local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local StageWinningsCalculation = Lua.import('Module:StageWinningsCalculation')
 local Table = Lua.import('Module:Table')
@@ -65,7 +66,12 @@ function StageWinnings:render()
 	local endDate = DateExt.readTimestamp(props.edate)
 
 	local valueByScore = Table.filterByKey(props, function(key)
-		return key:match('^%d+%-%d+$') ~= nil
+		if key:match('^%d+%-%d+$') ~= nil then
+			return true
+		end
+		local keyParts = Array.parseCommaSeparatedString(key, '-')
+		return #keyParts == 2 and
+			Array.all(keyParts, function(keyPart) return Table.includes(MatchGroupInputUtil.STATUS, keyPart) end)
 	end)
 	valueByScore = Table.map(valueByScore, function(key, value)
 		return key, tonumber(value)
