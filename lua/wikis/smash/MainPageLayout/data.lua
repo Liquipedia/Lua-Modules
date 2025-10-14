@@ -6,11 +6,7 @@
 
 local Lua = require('Module:Lua')
 
-local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
-local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
-
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 
