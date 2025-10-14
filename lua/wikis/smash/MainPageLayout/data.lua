@@ -36,7 +36,7 @@ local CONTENT = {
 	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = '{{#invoke:Lua|invoke|module=TournamentsList|fn=getFromLpdb}}<p class="mainpage-editlink"><small>&#91;[[Special:EditPage/Liquipedia:Tournaments/dynamic|edit]]&#93;</small></p>',
+		body = TournamentsList.getFromLpdb() .. '<p class="mainpage-editlink"><small>&#91;[[Special:EditPage/Liquipedia:Tournaments/dynamic|edit]]&#93;</small></p>',
 		padding = true,
 		boxid = 1508,
 	},
