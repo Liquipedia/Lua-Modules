@@ -99,12 +99,9 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.extradata.previous2 = args.previous2
 	lpdbData.extradata.next = args.next
 	lpdbData.extradata.next2 = args.next2
-	local tier, _ = Tier.toValue(args.tier)
-	if tier then
-		lpdbData.extradata.tier = tier
-	elseif Logic.isNotEmpty(args.tier) then
-		error("Invalid tier input: " .. args.tier)
-	end
+	local tier = Tier.toValue(args.tier)
+	assert(tier or Logic.isEmpty(args.tier), 'Invalid tier input: ' .. args.tier)
+	lpdbData.extradata.tier = tier
 
 	return lpdbData
 end
