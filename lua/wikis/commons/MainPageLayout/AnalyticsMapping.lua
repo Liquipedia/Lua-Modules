@@ -5,10 +5,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----@class MainPageAnalyticsMapping
-local AnalyticsMapping = {}
-
-AnalyticsMapping.BOX_ID_TO_ANALYTICS_NAME = {
+---@type table<string>
+local AnalyticsMapping = {
 	[1501] = 'Heroes panel',
 	[1502] = 'Updates panel',
 	[1503] = 'Useful articles panel',
@@ -20,16 +18,5 @@ AnalyticsMapping.BOX_ID_TO_ANALYTICS_NAME = {
 	[1511] = 'Rankings panel',
 	[1516] = 'Featured panel',
 }
-
----@param boxId number
----@return string|nil
-function AnalyticsMapping.getAnalyticsName(boxId)
-	if not boxId then
-		return nil
-	end
-
-	local numericBoxId = tonumber(boxId)
-	return AnalyticsMapping.BOX_ID_TO_ANALYTICS_NAME[numericBoxId]
-end
 
 return AnalyticsMapping
