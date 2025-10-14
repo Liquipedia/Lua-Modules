@@ -12,6 +12,7 @@ local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Page = Lua.import('Module:Page')
+local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -23,7 +24,7 @@ local ConditionUtil = Condition.Util
 
 local StageWinningsCalculation = {}
 
----@param props {ids: string?, tournaments: string, startDate: integer?, endDate: integer?, mode: string,
+---@param props {matchGroupId1: string?, tournament1: string, startDate: integer?, endDate: integer?, mode: string,
 ---startValue: number, valuePerWin: number, valueByScore: table<string, number>?}
 ---@return {opponent: standardOpponent, matchWins: integer, matchLosses: integer, gameWins: integer,
 ---gameLosses: integer, winnings: number, scoreDetails: table<string, integer>}[]
@@ -105,30 +106,26 @@ function StageWinningsCalculation.run(props)
 
 end
 
----@param props {ids: string?, tournaments: string, startDate: integer?, endDate: integer?}
+---@param props {matchGroupId1: string?, tournament1: string, startDate: integer?, endDate: integer?}
 ---@return string
 function StageWinningsCalculation._buildConditions(props)
-	local ids = Array.parseCommaSeparatedString(props.ids)
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('finished'), Comparator.eq, '1'),
 		ConditionNode(ColumnName('status'), Comparator.neq, 'notplayed'),
 		ConditionNode(ColumnName('winner'), Comparator.neq, ''),
+		TournamentStructure.getMatch2Filter(
+			TournamentStructure.readMatchGroupsSpec(props)
+			or TournamentStructure.currentPageSpec()
+		),
 	}
-
-	if Logic.isNotEmpty(ids) then
-		conditions:add(ConditionUtil.anyOf(ColumnName('match2bracketid'), ids))
-	else
-		local tournaments = Array.map(Array.parseCommaSeparatedString(props.tournaments), Page.pageifyLink)
-		conditions:add(ConditionUtil.anyOf(ColumnName('pagename'), tournaments))
-	end
 
 	if props.startDate then
 		conditions:add(ConditionNode(ColumnName('date'), Comparator.ge, props.startDate))
 	end
 
 	if props.endDate then
-		conditions:add(ConditionNode(ColumnName('date'), Comparator.le, props.endDate))
+	conditions:add(ConditionNode(ColumnName('date'), Comparator.le, props.endDate))
 	end
 
 	return tostring(conditions)
