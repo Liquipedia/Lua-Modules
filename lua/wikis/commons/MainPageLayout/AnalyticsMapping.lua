@@ -1,3 +1,4 @@
+---
 -- @Liquipedia
 -- page=Module:MainPageLayout/AnalyticsMapping
 --
@@ -19,3 +20,4 @@ local AnalyticsMapping = {
 }
 
 return AnalyticsMapping
+

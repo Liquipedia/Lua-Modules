@@ -111,8 +111,7 @@ function MainPageLayout._makeCells(cells)
 				end
 
 				table.insert(content, AnalyticsWidget{
-					analyticsKey = item.content.boxid,
-					analyticsMapping = AnalyticsMapping,
+					analyticsName = AnalyticsMapping[item.content.boxid],
 					children = {contentElement}
 				})
 			end
