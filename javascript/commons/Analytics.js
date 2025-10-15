@@ -46,13 +46,13 @@ liquipedia.analytics = {
 	},
 
 	setupClickHandler: function( selector, trackerName, propertiesBuilder ) {
-		const elements = document.querySelectorAll( selector );
+		document.body.addEventListener( 'click', ( event ) => {
+			const element = event.target.closest( selector );
 
-		elements.forEach( ( element ) => {
-			element.addEventListener( 'click', () => {
+			if ( element ) {
 				const eventProperties = propertiesBuilder( element );
 				window.amplitude.track( trackerName, eventProperties );
-			} );
+			}
 		} );
 	},
 
