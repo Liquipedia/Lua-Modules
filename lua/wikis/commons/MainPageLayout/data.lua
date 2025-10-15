@@ -54,7 +54,7 @@ return {
 		{
 			iconName = 'find_images',
 			title = 'Find Files',
-			link = 'Special:RunQuery/Find_images',
+			link = 'Special:RunQuery/Find images',
 			count = {},
 		},
 	},
