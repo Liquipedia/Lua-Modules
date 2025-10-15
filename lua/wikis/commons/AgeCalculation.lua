@@ -226,7 +226,7 @@ function Age:_calculateAge(toTimestamp, fromTimestamp)
 	local age = toDate.year - fromDate.year
 
 	local monthDiff = toDate.month - fromDate.month
-	local dayDiff = toDate.day - fromDate.month
+	local dayDiff = toDate.day - fromDate.day
 
 	if monthDiff > 0 or (monthDiff == 0 and dayDiff >= 0) then
 		--- birthday passed
