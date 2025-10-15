@@ -19,10 +19,17 @@ local AnalyticsWidget = Class.new(Widget)
 
 ---@return Widget
 function AnalyticsWidget:render()
-	return Div{
-		attributes = {['data-analytics-name'] = self.props.analyticsName},
-		children = self.props.children
-	}
+	local analyticsName = self.props.analyticsName
+
+	if analyticsName then
+		return Div{
+			attributes = {['data-analytics-name'] = analyticsName},
+			children = self.props.children
+		}
+	else
+		return self.props.children
+	end
 end
 
 return AnalyticsWidget
+
