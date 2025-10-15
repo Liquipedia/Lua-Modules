@@ -36,7 +36,7 @@ return {
 		{
 			iconName = 'file_standards_guide',
 			title = 'File Standards Guide',
-			link = 'File_Standards_Guide',
+			link = 'File Standards Guide',
 			count = {},
 		},
 		{
