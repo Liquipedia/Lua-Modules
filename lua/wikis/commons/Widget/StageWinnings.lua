@@ -42,7 +42,6 @@ local BASE_CURRENCY = 'USD'
 ---@field title string?
 ---@field precision integer?
 ---@field autoexchange boolean
----@field exchangeinfo boolean
 ---@field showMatchWL boolean
 ---@field showGameWL boolean
 ---@field showScore boolean
@@ -94,13 +93,12 @@ function StageWinnings:render()
 		valuePerWin = tonumber(props.valuePerWin) or 0,
 	}
 
-	self.exchangeDate = endDate or DateExt.getContextualDateOrNow()
 	if Logic.isNotEmpty(props.localcurrency) and Logic.readBool(props.autoexchange) then
 		Currency.display(props.localcurrency, nil, {setVariables = true})
 		self.currencyRate = Currency.getExchangeRate{
 			currency = props.localcurrency,
 			currencyRate = Variables.varDefault('exchangerate_' .. props.localcurrency:upper()),
-			date = DateExt.toYmdInUtc(self.exchangeDate),
+			date = DateExt.toYmdInUtc(endDate or DateExt.getContextualDateOrNow()),
 			setVariables = false
 		}
 	end

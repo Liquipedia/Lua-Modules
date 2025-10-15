@@ -39,8 +39,11 @@ function StageWinningsCalculation.run(props)
 
 	Array.forEach(matches, function(match)
 		match.opponents = Array.map(match.match2opponents, Opponent.fromMatch2Record)
-		Array.forEach(match.opponents, function(opponent)
+		Array.forEach(match.opponents, function(opponent, opponentIndex)
 			local identifier = Opponent.toName(opponent)
+			opponent.name = identifier
+			opponent.score = match.match2opponents[opponentIndex].score
+			opponent.status = match.match2opponents[opponentIndex].status
 			byName[identifier] = byName[identifier] or {
 				opponent = opponent,
 				scoreDetails = {},
