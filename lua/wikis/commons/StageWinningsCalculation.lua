@@ -21,7 +21,7 @@ local ColumnName = Condition.ColumnName
 
 local StageWinningsCalculation = {}
 
----@param props {matchGroupId1: string?, tournament1: string, startDate: integer?, endDate: integer?, mode: string,
+---@param props {matchGroupsSpecProps: table<string, string>, startDate: integer?, endDate: integer?, mode: string,
 ---startValue: number, valuePerWin: number, valueByScore: table<string, number>?}
 ---@return {opponent: standardOpponent, matchWins: integer, matchLosses: integer, gameWins: integer,
 ---gameLosses: integer, winnings: number, scoreDetails: table<string, integer>}[]
@@ -103,7 +103,7 @@ function StageWinningsCalculation.run(props)
 
 end
 
----@param props {matchGroupId1: string?, tournament1: string, startDate: integer?, endDate: integer?}
+---@param props {matchGroupsSpecProps: table<string, string>, startDate: integer?, endDate: integer?}
 ---@return string
 function StageWinningsCalculation._buildConditions(props)
 	local conditions = ConditionTree(BooleanOperator.all):add{
@@ -111,7 +111,7 @@ function StageWinningsCalculation._buildConditions(props)
 		ConditionNode(ColumnName('status'), Comparator.neq, 'notplayed'),
 		ConditionNode(ColumnName('winner'), Comparator.neq, ''),
 		TournamentStructure.getMatch2Filter(
-			TournamentStructure.readMatchGroupsSpec(props)
+			TournamentStructure.readMatchGroupsSpec(props.matchGroupsSpecProps)
 			or TournamentStructure.currentPageSpec()
 		),
 	}

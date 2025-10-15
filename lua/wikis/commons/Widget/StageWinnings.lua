@@ -16,6 +16,7 @@ local Logic = Lua.import('Module:Logic')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local StageWinningsCalculation = Lua.import('Module:StageWinningsCalculation')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
@@ -82,8 +83,9 @@ function StageWinnings:render()
 		'No values per scores defined')
 
 	local opponentList = StageWinningsCalculation.run{
-		ids = props.ids,
-		tournaments = props.tournaments,
+		matchGroupsSpecProps = Table.filterByKey(props, function(key)
+			return String.startsWith(key, 'tournament') or String.startsWith(key, 'matchGroupId')
+		end) --[[@as table<string, string>]],
 		startDate = startDate,
 		endDate = endDate,
 		mode = props.prizeMode,
