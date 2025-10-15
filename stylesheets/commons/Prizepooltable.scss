@@ -232,11 +232,11 @@ div.prizepooltable > div.csstable-widget-row.bg-win {
 }
 
 div.csstable-widget-row.bg-win > .csstable-widget-cell {
-	border-bottom: 0.125rem solid var( --clr-forestgreen-background-color, transparent );
+	border-bottom: 0.125rem solid var( --clr-forest-background-color, transparent );
 }
 
 div.bg-win > *.prizepooltable-place {
-	background-color: var( --clr-forestgreen-background-color, inherit );
+	background-color: var( --clr-forest-background-color, inherit );
 }
 
 div.csstable-widget-row.bg-lose {

@@ -362,6 +362,19 @@ return {
 				lightMode = 'EA FC25 default allmode.png',
 			},
 		},
+		['fc 26'] = {
+			abbreviation = '2026',
+			name = 'EA SPORTS FC 26',
+			link = 'EA SPORTS FC 26',
+			logo = {
+				darkMode = 'EA FC26 default allmode.png',
+				lightMode = 'EA FC26 default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'EA FC26 default allmode.png',
+				lightMode = 'EA FC26 default allmode.png',
+			},
+		},
 		o2 = {
 			abbreviation = 'FO2',
 			name = 'FIFA Online 2',

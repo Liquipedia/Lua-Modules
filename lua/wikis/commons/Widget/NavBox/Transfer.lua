@@ -128,7 +128,7 @@ function TransferNavBox._checkForCurrentQuarterOrMonth(children, firstEntry)
 
 		if quarter then
 			local ordinal = currentQuarter .. Ordinal.suffix(currentQuarter)
-			pageName = pageName:gsub('(%d)%a%a(_[qQ]uarter)', ordinal .. '%1')
+			pageName = pageName:gsub('(%d)%a%a(_[qQ]uarter)', ordinal .. '%2')
 			table.insert(children.child0, 1, Link{
 				link = pageName,
 				children = {'Q' .. currentQuarter},

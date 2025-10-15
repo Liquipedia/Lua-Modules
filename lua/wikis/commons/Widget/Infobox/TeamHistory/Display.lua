@@ -23,7 +23,6 @@ local Widget = Lua.import('Module:Widget')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Abbr = HtmlWidgets.Abbr
 local Fragment = HtmlWidgets.Fragment
 local Span = HtmlWidgets.Span
 local Tbl = HtmlWidgets.Table
@@ -41,13 +40,13 @@ local NOT_YET_IN_ROLES_DATA = {
 	['advisor'] = {display = 'Advisor'},
 	['ambassador'] = {display = 'Ambassador'},
 	['assistant coach/analyst'] = {display = 'Asst. Coach&Analyst'},
-	['assistant general manager'] = {display = 'Assistant General Manager', abbreviation = 'AGM.'},
-	['assistant team manager'] = {display = 'Assistant Team Manager', abbreviation = 'ATM.'},
+	['assistant general manager'] = {display = 'Assistant General Manager'},
+	['assistant team manager'] = {display = 'Assistant Team Manager'},
 	['associate producer'] = {display = 'Associate Producer'},
 	['asst. coach/manager'] = {display = 'Asst. Coach/Manager'},
 	['backup'] = {display = 'Backup'},
 	['ceo'] = {display = 'CEO'},
-	['coach/analyst'] = {display = 'Coach/Analyst', abbreviation = 'C./A.'},
+	['coach/analyst'] = {display = 'Coach/Analyst'},
 	['coach/manager'] = {display = 'Coach/Manager'},
 	['coach/substitute'] = {display = 'Coach/Substitute'},
 	['co-ceo'] = {display = 'CO-CEO'},
@@ -57,55 +56,55 @@ local NOT_YET_IN_ROLES_DATA = {
 	['damage'] = {display = 'Damage'},
 	['data science'] = {display = 'Data Scientist'},
 	['director of athletics'] = {display = 'Director of Athletics'},
-	['director of overwatch operations'] = {display = 'Director of Overwatch Operations', abbreviation = 'DOO'},
-	['director of players'] = {display = 'Director of Players', abbreviation = 'DP'},
-	['director of team operations'] = {display = 'Director of Team Operations', abbreviation = 'DTO'},
-	['founder & training director'] = {display = 'Founder & Training Director', abbreviation = 'F. & TD.'},
+	['director of overwatch operations'] = {display = 'Director of Overwatch Operations'},
+	['director of players'] = {display = 'Director of Players'},
+	['director of team operations'] = {display = 'Director of Team Operations'},
+	['founder & training director'] = {display = 'Founder & Training Director'},
 	['founder'] = {display = 'Founder'},
 	['freestyler'] = {display = 'Freestyler'},
 	['front line'] = {display = 'Front Line'},
-	['general manager'] = {display = 'General Manager', abbreviation = 'GM.'},
+	['general manager'] = {display = 'General Manager'},
 	['graphic designer'] = {display = 'Graphic Designer'},
 	['guest'] = {display = 'Guest'},
-	['head of competitive operations'] = {display = 'Head of Competitive Operations', abbreviation = 'HCO'},
+	['head of competitive operations'] = {display = 'Head of Competitive Operations'},
 	['head of esports'] = {display = 'Head of esports'},
 	['head of gaming'] = {display = 'Head of Gaming'},
 	['head of socials'] = {display = 'Head of Socials'},
 	['inactive coach'] = {display = 'Inactive Coach'},
 	['inactive loan'] = {display = 'Inactive Loan'},
 	['inactive manager'] = {display = 'Inactive Manager'},
-	['inactive'] = {display = 'Inactive', abbreviation = 'IA.'},
+	['inactive'] = {display = 'Inactive'},
 	['interim coach'] = {display = 'Interim Coach'},
 	['loaned assistant coach'] = {display = 'Loaned Asst. Coach'},
 	['loaned coach'] = {display = 'Loaned Coach'},
-	['manager and analyst'] = {display = 'Manager/Analyst', abbreviation = 'M./A.'},
-	['manager/analyst'] = {display = 'Manager/Analyst', abbreviation = 'M./A.'},
+	['manager and analyst'] = {display = 'Manager/Analyst'},
+	['manager/analyst'] = {display = 'Manager/Analyst'},
 	['manager/substitute'] = {display = 'Manager/Substitute'},
 	['mental coach/manager'] = {display = 'Mental Coach/Manager'},
 	['mental coach'] = {display = 'Mental Coach'},
-	['organisation'] = {display = 'Organization', abbreviation = 'Org.'},
-	['overall coach'] = {display = 'Overall Coach', abbreviation = 'OC.'},
+	['organisation'] = {display = 'Organization'},
+	['overall coach'] = {display = 'Overall Coach'},
 	['pa'] = {display = 'Passed Away'},
-	['performance coach'] = {display = 'Performance Coach', abbreviation = 'PC'},
+	['performance coach'] = {display = 'Performance Coach'},
 	['qualifier'] = {display = 'Qualifier'},
 	['rlcs stand-in'] = {display = 'RLCS Stand-in'},
-	['social media coordinator'] = {display = 'Social Media Coordinator', abbreviation = 'SMC'},
-	['social media manager'] = {display = 'Social Media Manager', abbreviation = 'SMM'},
+	['social media coordinator'] = {display = 'Social Media Coordinator'},
+	['social media manager'] = {display = 'Social Media Manager'},
 	['sports director'] = {display = 'Sports Dir.'},
 	['stand-in-coach'] = {display = 'Stand-in-Coach'},
 	['substitute/manager'] = {display = 'Substitute/Manager'},
-	['substitute'] = {display = 'Substitute', abbreviation = 'Sub.'},
+	['substitute'] = {display = 'Substitute'},
 	['suspended coach'] = {display = 'Suspended Coach'},
 	['suspended'] = {display = 'Suspended'},
 	['tactical coach'] = {display = 'Tactical Coach'},
 	['talent scout'] = {display = 'Talent Scout'},
 	['team leader'] = {display = 'Team Leader'},
-	['team manager'] = {display = 'Team Manager', abbreviation = 'TM.'},
+	['team manager'] = {display = 'Team Manager'},
 	['team owner'] = {display = 'Team Owner'},
 	['teamless'] = {display = 'Teamless'},
 	['trainee coach'] = {display = 'Trainee Coach'},
 	['trainee'] = {display = 'Trainee'},
-	['training advisor'] = {display = 'Training Advisor', abbreviation = 'TA.'},
+	['training advisor'] = {display = 'Training Advisor'},
 	['trial analyst'] = {display = 'Trial Analyst'},
 	['trial coach'] = {display = 'Trial Coach'},
 	['trial loan'] = {display = 'Trial Loan'},
@@ -199,12 +198,7 @@ function TeamHistoryDisplay:_row(transfer)
 			or Roles.All[lastSplitRole] or NOT_YET_IN_ROLES_DATA[lastSplitRole] or {}
 		if roleData.doNotShowInHistory then
 			role = nil
-		elseif roleData.abbreviation then
-			role = roleData and Abbr{title = roleData.display, children = {roleData.abbreviation}}
 		end
-	end
-	if role == LOAN then
-		teamText = '&#8250;&nbsp;' .. teamText
 	end
 	---@type (string|Widget)[]
 	local teamDisplay = WidgetUtil.collect(
@@ -226,7 +220,7 @@ function TeamHistoryDisplay:_row(transfer)
 
 	local positionIcon
 	if POSITION_ICON_DATA then
-		local position = (transfer.position or ''):lower()
+		local position = Table.includes(SPECIAL_ROLES, transfer.role) and '' or (transfer.position or ''):lower()
 		positionIcon = (POSITION_ICON_DATA[position] or POSITION_ICON_DATA['']) .. '&nbsp;'
 	end
 

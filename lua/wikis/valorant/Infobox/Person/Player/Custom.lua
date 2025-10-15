@@ -29,7 +29,10 @@ local Cell = Widgets.Cell
 
 local SIZE_AGENT = '20px'
 
+---@class ValorantPlayerInfobox: Person
 local CustomPlayer = Class.new(Player)
+---@class ValorantPlayerInfoboxWidgetInjector: WidgetInjector
+---@field caller ValorantPlayerInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame

@@ -7,6 +7,8 @@
 
 local Lua = require('Module:Lua')
 
+local DateExt = Lua.import('Module:Date/Ext')
+
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
@@ -32,7 +34,7 @@ local CONTENT = {
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferPage = 'Player Transfers/' .. os.date('%Y') .. '/' .. os.date('%B')
+			transferPage = 'Player Transfers/' .. DateExt.getYearOf() .. '/' .. os.date('%B')
 		},
 		boxid = 1509,
 	},
@@ -73,11 +75,11 @@ return {
 		darkmode = 'Fortnite-logo-darkmode.svg',
 	},
 	metadesc = 'The Fortnite esports wiki covering everything from players, teams and transfers, ' ..
-		'to tournaments and results, maps, and weapons.',
+		'to tournaments and results, and maps.',
 	title = 'Fortnite',
 	navigation = {
 		{
-			file = 'XSET Fortnite at the 2024 Esports World Cup.jpg',
+			file = 'Queasy SwizzY Merstach at the FNCS 2025 Global Championship.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -86,7 +88,7 @@ return {
 			},
 		},
 		{
-			file = 'Dignitas Khanada at the 2024 Esports World Cup.jpg',
+			file = 'HavoK Pixie at the FNCS 2025 Global Championship.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -95,7 +97,7 @@ return {
 			},
 		},
 		{
-			file = 'Fortnite Trophy at the 2024 Esports World Cup.jpg',
+			file = 'FNCS Trophy at the FNCS 2025 Global Championship.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -116,16 +118,7 @@ return {
 			file = 'Karmine Corp Oslo at the 2024 Esports World Cup.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
-		},
-		{
-			file = 'Fortnite Heavy Sniper Rifle.png',
-			title = 'Weapons',
-			link = 'Portal:Weapons',
-			count = {
-				method = 'CATEGORY',
-				category = 'Weapons',
-			},
-		},
+		}
 	},
 	layouts = {
 		main = {
