@@ -223,7 +223,7 @@ function Age:_calculateAge(toTimestamp, fromTimestamp)
 	local toDate = os.date('*t', toTimestamp) --[[@as osdate]]
 	local fromDate = os.date('*t', fromTimestamp) --[[@as osdate]]
 
-	local age = toDate - fromDate
+	local age = toDate.year - fromDate.year
 
 	local monthDiff = toDate.month - fromDate.month
 	local dayDiff = toDate.day - fromDate.month
