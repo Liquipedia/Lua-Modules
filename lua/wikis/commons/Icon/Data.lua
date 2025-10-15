@@ -200,6 +200,8 @@ return {
 	copyright = 'far fa-copyright',
 	getting_started = 'far fa-seedling',
 	file_standards_guide = 'far fa-file-check',
+	find_images = 'fad fa-file-search',
+	clipboard = 'fad fa-clipboard-list',
 
 	-- Streams and Vods
 	youtube = 'fab fa-youtube',
