@@ -3,9 +3,22 @@
  *              for product development and user experience improvements.
  ******************************************************************************/
 liquipedia.analytics = {
+	clickTrackers: [],
+
 	init: function() {
 		liquipedia.analytics.setupWikiMenuLinkClickAnalytics();
 		liquipedia.analytics.setupLinkClickAnalytics();
+
+		document.body.addEventListener( 'click', ( event ) => {
+			for ( const tracker of liquipedia.analytics.clickTrackers ) {
+				const element = event.target.closest( tracker.selector );
+
+				if ( element ) {
+					const eventProperties = tracker.propertiesBuilder( element );
+					window.amplitude.track( tracker.trackerName, eventProperties );
+				}
+			}
+		} );
 	},
 
 	findLinkPosition: function( element ) {
@@ -45,22 +58,11 @@ liquipedia.analytics = {
 		return clone.textContent.trim();
 	},
 
-	setupClickHandler: function( selector, trackerName, propertiesBuilder ) {
-		document.body.addEventListener( 'click', ( event ) => {
-			const element = event.target.closest( selector );
-
-			if ( element ) {
-				const eventProperties = propertiesBuilder( element );
-				window.amplitude.track( trackerName, eventProperties );
-			}
-		} );
-	},
-
 	setupWikiMenuLinkClickAnalytics: function() {
-		liquipedia.analytics.setupClickHandler(
-			'[data-wiki-menu="link"]',
-			'Wiki switched',
-			( wikiMenuLink ) => ( {
+		liquipedia.analytics.clickTrackers.push( {
+			selector: '[data-wiki-menu="link"]',
+			trackerName: 'Wiki switched',
+			propertiesBuilder: ( wikiMenuLink ) => ( {
 				wiki: wikiMenuLink.closest( '[data-wiki-id]' ).dataset.wikiId,
 				'page url': window.location.href,
 				position: 'wiki menu',
@@ -68,20 +70,20 @@ liquipedia.analytics = {
 				'trending page': false,
 				'trending position': null
 			} )
-		);
+		} );
 	},
 
 	setupLinkClickAnalytics: function() {
-		liquipedia.analytics.setupClickHandler(
-			'a',
-			'Link clicked',
-			( link ) => ( {
+		liquipedia.analytics.clickTrackers.push( {
+			selector: 'a',
+			trackerName: 'Link clicked',
+			propertiesBuilder: ( link ) => ( {
 				title: link.innerText,
 				position: liquipedia.analytics.findLinkPosition( link ),
 				'page url': window.location.href,
 				'destination url': link.href
 			} )
-		);
+		} );
 	}
 };
 liquipedia.core.modules.push( 'analytics' );
