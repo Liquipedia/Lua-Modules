@@ -18,7 +18,7 @@ liquipedia.analytics = {
 					window.amplitude.track( tracker.trackerName, eventProperties );
 				}
 			}
-		} );
+		}, true );
 	},
 
 	findLinkPosition: function( element ) {
