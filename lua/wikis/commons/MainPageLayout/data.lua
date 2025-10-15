@@ -42,7 +42,7 @@ return {
 		{
 			iconName = 'clipboard',
 			title = 'Copyright Repository',
-			link = 'Copyrights_Repository',
+			link = 'Copyrights Repository',
 			count = {},
 		},
 		{
