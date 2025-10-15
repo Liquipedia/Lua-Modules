@@ -48,7 +48,7 @@ return {
 		{
 			iconName = 'copyright',
 			title = 'Copyright Guide',
-			link = 'hub:A_Liquipedia_Guide_to_Copyright',
+			link = 'hub:A Liquipedia Guide to Copyright',
 			count = {},
 		},
 		{
