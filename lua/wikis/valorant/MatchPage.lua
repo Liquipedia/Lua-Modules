@@ -64,6 +64,7 @@ function MatchPage:populateGames()
 		game.teams = game.opponents
 		Array.forEach(game.teams, function(team, teamIdx)
 			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
+			team.postPlant = team.postPlant or {}
 		end)
 	end)
 end
