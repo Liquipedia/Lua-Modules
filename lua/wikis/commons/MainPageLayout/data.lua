@@ -7,9 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Link = Lua.import('Module:Widget/Basic/Link')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-
 local CONTENT = {
 	usefulArticles = {
 		heading = 'About This Wiki',
