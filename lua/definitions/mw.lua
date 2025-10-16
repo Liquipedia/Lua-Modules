@@ -405,6 +405,45 @@ function mw.language:formatDate(format, timestamp, localTime)
 			return os.date(outFormat, ostimeWrapper(makeOsdateParam(year, month, day, hour, minute, second))) --[[@as string]]
 		end
 		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
+	elseif format == 'Y' then
+		local outFormat = '%Y'
+		if not timestamp then
+			return os.date(outFormat) --[[@as string]]
+		end
+		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
+			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
+		end
+		if type(timestamp) == 'string' then
+			local year = parseDateString(timestamp)
+			return year or ''
+		end
+		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
+	elseif format == 'n' then
+		local outFormat = '%m'
+		if not timestamp then
+			return os.date(outFormat) --[[@as string]]
+		end
+		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
+			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
+		end
+		if type(timestamp) == 'string' then
+			local _, month = parseDateString(timestamp)
+			return month or ''
+		end
+		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
+	elseif format == 'd' then
+		local outFormat = '%d'
+		if not timestamp then
+			return os.date(outFormat) --[[@as string]]
+		end
+		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
+			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
+		end
+		if type(timestamp) == 'string' then
+			local _, _, day = parseDateString(timestamp)
+			return day or ''
+		end
+		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
 	end
 	return ''
 end
