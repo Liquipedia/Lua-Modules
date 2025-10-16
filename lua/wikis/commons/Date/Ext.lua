@@ -206,4 +206,31 @@ function DateExt.getMonthOf(date)
 	return tonumber(DateExt.formatTimestamp('n', timestamp)) --[[@as integer]]
 end
 
+---@param to string|integer|osdateparam?
+---@param from string|integer|osdateparam?
+---@return integer
+function DateExt.calculateAge(to, from)
+	---@param date string|integer|osdateparam?
+	local function asOsDate(date)
+		if type(date) == 'table' then
+			return date
+		end
+		return os.date('*t', DateExt.readTimestamp(date) or DateExt.getCurrentTimestamp())
+	end
+
+	local toDate = asOsDate(to)
+	local fromDate = asOsDate(from)
+
+	local age = toDate.year - fromDate.year
+
+	local monthDiff = toDate.month - fromDate.month
+	local dayDiff = toDate.day - fromDate.day
+
+	if monthDiff > 0 or (monthDiff == 0 and dayDiff >= 0) then
+		--- birthday passed
+		return age
+	end
+	return age - 1
+end
+
 return DateExt
