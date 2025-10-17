@@ -7,7 +7,7 @@
 
 local Lua = require('Module:Lua')
 
-local DateExt = Lua.import('Module:Date/Ext')
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
@@ -36,8 +36,7 @@ local CONTENT = {
 		heading = 'Transfers',
 		body = TransfersList{
 			transferQuery = false,
-			transferPage = 'Player Transfers/' .. DateExt.getYearOf() .. '/' ..
-				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
+			transferPage = MainPageLayoutUtil.getQuarterlyTransferPage()
 		},
 		boxid = 1509,
 	},
