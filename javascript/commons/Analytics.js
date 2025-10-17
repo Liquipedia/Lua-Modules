@@ -2,10 +2,26 @@
  * Description: This script enables anonymous analytics of user interactions
  *              for product development and user experience improvements.
  ******************************************************************************/
+/* global RLCONF */
+
+// Event names
+const PAGE_VIEW = 'Page view';
+const LINK_CLICKED = 'Link clicked';
+const WIKI_SWITCHED = 'Wiki switched';
+
+// Constants
+const IGNORE_CATEGORY_PREFIX = 'Pages ';
+
+// Statically defined properties
+const getPageUrl = () => window.location.href;
+const getReferrerUrl = () => document.referrer;
+const getPageTitle = () => document.title;
+
 liquipedia.analytics = {
 	clickTrackers: [],
 
 	init: function() {
+		liquipedia.analytics.sendPageViewEvent();
 		liquipedia.analytics.setupWikiMenuLinkClickAnalytics();
 		liquipedia.analytics.setupLinkClickAnalytics();
 
@@ -19,6 +35,16 @@ liquipedia.analytics = {
 				}
 			}
 		}, true );
+	},
+
+	sendPageViewEvent: function() {
+		const categories = RLCONF.wgCategories || [];
+		window.amplitude.track( PAGE_VIEW, {
+			'page url': getPageUrl(),
+			'referrer url': getReferrerUrl(),
+			'page title': getPageTitle(),
+			categories: categories.filter( ( category ) => !category.startsWith( IGNORE_CATEGORY_PREFIX ) )
+		} );
 	},
 
 	findLinkPosition: function( element ) {
@@ -61,10 +87,10 @@ liquipedia.analytics = {
 	setupWikiMenuLinkClickAnalytics: function() {
 		liquipedia.analytics.clickTrackers.push( {
 			selector: '[data-wiki-menu="link"]',
-			trackerName: 'Wiki switched',
+			trackerName: WIKI_SWITCHED,
 			propertiesBuilder: ( wikiMenuLink ) => ( {
 				wiki: wikiMenuLink.closest( '[data-wiki-id]' ).dataset.wikiId,
-				'page url': window.location.href,
+				'page url': getPageUrl(),
 				position: 'wiki menu',
 				destination: wikiMenuLink.href,
 				'trending page': false,
@@ -76,11 +102,11 @@ liquipedia.analytics = {
 	setupLinkClickAnalytics: function() {
 		liquipedia.analytics.clickTrackers.push( {
 			selector: 'a',
-			trackerName: 'Link clicked',
+			trackerName: LINK_CLICKED,
 			propertiesBuilder: ( link ) => ( {
 				title: link.innerText,
 				position: liquipedia.analytics.findLinkPosition( link ),
-				'page url': window.location.href,
+				'page url': getPageUrl(),
 				'destination url': link.href
 			} )
 		} );
