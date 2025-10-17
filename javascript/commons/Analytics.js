@@ -19,12 +19,14 @@ const getPagePath = () => window.location.pathname;
 const getPageTitle = () => document.title;
 const getPageUrl = () => `${ window.location.origin }${ window.location.pathname }`;
 const getReferrerUrl = () => document.referrer;
+const getReferrerDomain = () => document.referrer ? new URL( document.referrer ).hostname : null;
 
 liquipedia.analytics = {
 	clickTrackers: [],
 
 	init: function() {
 		liquipedia.analytics.sendPageViewEvent();
+
 		liquipedia.analytics.setupWikiMenuLinkClickAnalytics();
 		liquipedia.analytics.setupLinkClickAnalytics();
 		liquipedia.analytics.setupSearchAnalytics();
@@ -56,7 +58,8 @@ liquipedia.analytics = {
 	sendPageViewEvent: function() {
 		const categories = mw.config.get( 'wgCategories' ) || [];
 		liquipedia.analytics.track( PAGE_VIEW, {
-			'referrer url': getReferrerUrl(),
+			referrer: getReferrerUrl(),
+			'referring domain': getReferrerDomain(),
 			categories: categories.filter( ( category ) => !category.startsWith( IGNORE_CATEGORY_PREFIX ) )
 		} );
 	},
