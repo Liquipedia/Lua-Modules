@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local DateExt = Lua.import('Module:Date/Ext')
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -55,13 +56,13 @@ local CONTENT = {
 			rumours = true,
 			transferPage = 'Driver Transfers/' .. DateExt.getYearOf()
 		},
-		boxid = 1501,
+		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
 	specialEvents = {
 		heading = HtmlWidgets.Fragment{children = {ONGOING_SERIES, '&nbsp;Active and Upcoming Series'}},
 		body = '{{Liquipedia:Active Upcoming Series}}',
 		padding = true,
-		boxid = 1502
+		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS
 	},
 	filterButtons = {
 		noPanel = true,
@@ -77,13 +78,13 @@ local CONTENT = {
 			completedDays = 90
 		},
 		padding = true,
-		boxid = 1503
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER
 	},
 	seasonOverview = {
 		heading =HtmlWidgets.Fragment{children = {TROPHY, '&nbsp;Current Season Overview'}},
 		body = '{{Liquipedia:Season Overview}}',
 		padding = true,
-		boxid = 1504
+		boxid = 1517
 	},
 	seasonCalendar = {
 		heading =HtmlWidgets.Fragment{children = {CALENDAR, '&nbsp;Season Calendar'}},
@@ -95,7 +96,7 @@ local CONTENT = {
 		heading = 'Want To Help?',
 		body = WantToHelp{},
 		padding = true,
-		boxid = 1508,
+		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
@@ -103,13 +104,13 @@ local CONTENT = {
 			birthdayListPage = 'Birthday list'
 		},
 		padding = true,
-		boxid = 1509,
+		boxid = MainPageLayoutUtil.BoxId.THIS_DAY,
 	},
 	upcomingRace = {
 		heading =HtmlWidgets.Fragment{children = {TROPHY, '&nbsp;Upcoming Race'}},
 		body = '{{Liquipedia:Upcoming Grand Prix}}',
 		padding = true,
-		boxid = 1509
+		boxid = 1518
 	},
 	previousRace = {
 		heading =HtmlWidgets.Fragment{children = {FINISHED_RACE, '&nbsp;Previous Race Weekend'}},
@@ -125,7 +126,7 @@ local CONTENT = {
 		heading = 'The Sport',
 		body = '{{Liquipedia:Sport Panel}}',
 		padding = true,
-		boxid = 1513,
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
 	},
 }
 
