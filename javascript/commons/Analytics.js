@@ -8,6 +8,7 @@
 const PAGE_VIEW = 'Page view';
 const LINK_CLICKED = 'Link clicked';
 const WIKI_SWITCHED = 'Wiki switched';
+const SEARCH_PERFORMED = 'Page searched';
 
 // Constants
 const IGNORE_CATEGORY_PREFIX = 'Pages ';
@@ -114,7 +115,7 @@ liquipedia.analytics = {
 
 		liquipedia.analytics.clickTrackers.push( {
 			selector: '.mw-searchSuggest-link',
-			trackerName: 'Page searched',
+			trackerName: SEARCH_PERFORMED,
 			propertiesBuilder: ( link ) => {
 				const searchTerm = searchInput?.dataset.lastSearchTerm ?? searchInput?.value ?? '';
 				const getResultPosition = () => {
@@ -140,7 +141,7 @@ liquipedia.analytics = {
 			if ( event.target.matches( '#searchform' ) ) {
 				const searchTerm = event.target.querySelector( 'input' ).value;
 
-				liquipedia.analytics.track( 'Page searched', {
+				liquipedia.analytics.track( SEARCH_PERFORMED, {
 					'search input': searchTerm,
 					title: null,
 					destination: `index.php?search=${ encodeURIComponent( searchTerm ) }`,
