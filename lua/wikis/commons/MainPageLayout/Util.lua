@@ -23,8 +23,13 @@ MainPageLayoutUtil.BoxId = {
 }
 
 ---@return string
+function MainPageLayoutUtil.getYearlyTransferPage()
+	return 'Player Transfers/' .. DateExt.getYearOf()
+end
+
+---@return string
 function MainPageLayoutUtil.getQuarterlyTransferPage()
-	return 'Player Transfers/' .. DateExt.getYearOf() .. '/' ..
+	return MainPageLayoutUtil.getYearlyTransferPage() .. '/' ..
 		DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 end
 

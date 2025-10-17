@@ -6,7 +6,7 @@
 
 local Lua = require('Module:Lua')
 
-local DateExt = Lua.import('Module:Date/Ext')
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -32,7 +32,7 @@ local CONTENT = {
 		heading = 'Transfers',
 		body = TransfersList{
 			limit = 10,
-			transferPage = 'Player Transfers/' .. DateExt.getYearOf()
+			transferPage = MainPageLayoutUtil.getYearlyTransferPage()
 		},
 		boxid = 1509,
 	},

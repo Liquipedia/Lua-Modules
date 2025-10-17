@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local RatingsDisplay = Lua.import('Module:Ratings/Display')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
