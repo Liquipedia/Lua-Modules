@@ -2,12 +2,16 @@
  * Description: This script enables anonymous analytics of user interactions
  *              for product development and user experience improvements.
  ******************************************************************************/
+
+const BUTTON_CLICKED = 'Button clicked';
+
 liquipedia.analytics = {
 	clickTrackers: [],
 
 	init: function() {
 		liquipedia.analytics.setupWikiMenuLinkClickAnalytics();
 		liquipedia.analytics.setupLinkClickAnalytics();
+		liquipedia.analytics.setupButtonClickAnalytics();
 		liquipedia.analytics.setupSearchAnalytics();
 		liquipedia.analytics.setupSearchFormSubmitAnalytics();
 
@@ -74,6 +78,17 @@ liquipedia.analytics = {
 				title: link.innerText,
 				position: liquipedia.analytics.findLinkPosition( link ),
 				destination: link.href
+			} )
+		} );
+	},
+
+	setupButtonClickAnalytics: function() {
+		liquipedia.analytics.clickTrackers.push( {
+			selector: '.btn:not(a *), button:not(a *)',
+			trackerName: BUTTON_CLICKED,
+			propertiesBuilder: ( link ) => ( {
+				title: link.innerText,
+				position: liquipedia.analytics.findLinkPosition( link )
 			} )
 		} );
 	},
