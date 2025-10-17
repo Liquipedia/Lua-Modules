@@ -7,6 +7,8 @@
 
 local Lua = require('Module:Lua')
 
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
+
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
@@ -16,12 +18,12 @@ local CONTENT = {
 		heading = 'Want To Help?',
 		body = WantToHelp{},
 		padding = true,
-		boxid = 1504,
+		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP,
 	},
 	specialEvents = {
 		heading = 'Feature Event',
 		body = '{{Liquipedia:Special Event}}',
-		boxid = 1516,
+		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
 	},
 	popularEsports = {
 		heading = 'Popular Esports',
@@ -35,7 +37,7 @@ local CONTENT = {
 			completedDays = 365
 		},
 		padding = true,
-		boxid = 1508,
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 }
 
