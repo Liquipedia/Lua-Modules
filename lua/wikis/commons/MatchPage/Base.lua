@@ -94,7 +94,6 @@ function BaseMatchPage:addCategories()
 		if phaseToDisplay[matchPhase] then
 			mw.ext.TeamLiquidIntegration.add_category(phaseToDisplay[matchPhase] .. ' Matches')
 		end
-
 	end
 end
 
