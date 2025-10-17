@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local MathUtil = Lua.import('Module:MathUtil')
 
 local TiebreakerGameUtil = Lua.import('Module:Standings/Tiebreaker/Game/Util')
 local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
@@ -36,7 +37,7 @@ function TiebreakerGameWinRate:display(state, opponent)
 	if games == 0 then
 		return '-'
 	end
-	return tostring(self:valueOf(state, opponent)) .. '%'
+	return string.format('%.2f', MathUtil.round(self:valueOf(state, opponent) * 100, 2)) .. '%'
 end
 
 return TiebreakerGameWinRate
