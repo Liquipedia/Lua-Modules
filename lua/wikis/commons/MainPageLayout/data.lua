@@ -5,12 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Lua = require('Module:Lua')
+
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
+
 local CONTENT = {
 	usefulArticles = {
 		heading = 'About This Wiki',
 		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
-		boxid = 1503,
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
 	},
 	latestUploads = {
 		heading = 'Latest Uploads',
