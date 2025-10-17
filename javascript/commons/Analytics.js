@@ -42,15 +42,15 @@ liquipedia.analytics = {
 	track: function( eventName, properties ) {
 		window.amplitude.track( eventName, {
 			'page url': getPageUrl(),
+			'page title': getPageTitle(),
 			...properties
 		} );
 	},
 
 	sendPageViewEvent: function() {
-		const categories = RLCONF.wgCategories || [];
+		const categories = RLCONF?.wgCategories || [];
 		liquipedia.analytics.track( PAGE_VIEW, {
 			'referrer url': getReferrerUrl(),
-			'page title': getPageTitle(),
 			categories: categories.filter( ( category ) => !category.startsWith( IGNORE_CATEGORY_PREFIX ) )
 		} );
 	},
