@@ -13,6 +13,7 @@ local Logic = Lua.import('Module:Logic')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
+local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local MatchOverview = Lua.import('Module:Widget/Standings/MatchOverview')
@@ -34,112 +35,115 @@ function StandingsSwissWidget:render()
 	local standings = self.props.standings
 	local lastRound = standings.rounds[#standings.rounds]
 
-	return DataTable{
-		wrapperClasses = {'standings-ffa'},
-		classes = {'wikitable-bordered', 'wikitable-striped'},
-		children = WidgetUtil.collect(
-			-- Outer header
-			Logic.isNotEmpty(standings.title) and HtmlWidgets.Tr{children = HtmlWidgets.Th{
-				attributes = {
-					colspan = 100,
-				},
-				children = {
-					HtmlWidgets.Div{
-						css = {['position'] = 'relative'},
-						children = {
-							HtmlWidgets.Span{
-								children = standings.title
+	return AnalyticsWidget{
+		analyticsName = 'Swiss standings table',
+		children = DataTable{
+			wrapperClasses = {'standings-ffa'},
+			classes = {'wikitable-bordered', 'wikitable-striped'},
+			children = WidgetUtil.collect(
+				-- Outer header
+				Logic.isNotEmpty(standings.title) and HtmlWidgets.Tr{children = HtmlWidgets.Th{
+					attributes = {
+						colspan = 100,
+					},
+					children = {
+						HtmlWidgets.Div{
+							css = {['position'] = 'relative'},
+							children = {
+								HtmlWidgets.Span{
+									children = standings.title
+								},
 							},
 						},
 					},
-				},
-			}} or nil,
-			-- Column Header
-			HtmlWidgets.Tr{children = WidgetUtil.collect(
-				HtmlWidgets.Th{children = '#'},
-				HtmlWidgets.Th{children = 'Participant'},
-				Array.map(standings.tiebreakers, function(tiebreaker)
-					if not tiebreaker.title then
-						return
+				}} or nil,
+				-- Column Header
+				HtmlWidgets.Tr{children = WidgetUtil.collect(
+					HtmlWidgets.Th{children = '#'},
+					HtmlWidgets.Th{children = 'Participant'},
+					Array.map(standings.tiebreakers, function(tiebreaker)
+						if not tiebreaker.title then
+							return
+						end
+						return HtmlWidgets.Th{children = tiebreaker.title}
+					end),
+					Array.map(standings.rounds, function(round)
+						return HtmlWidgets.Th{children = round.title}
+					end)
+				)},
+				-- Rows
+				Array.map(lastRound.opponents, function(slot)
+					local positionBackground = slot.positionStatus and ('bg-' .. slot.positionStatus) or nil
+					local teamBackground
+					if slot.definitiveStatus then
+						teamBackground = 'bg-' .. slot.definitiveStatus
 					end
-					return HtmlWidgets.Th{children = tiebreaker.title}
-				end),
-				Array.map(standings.rounds, function(round)
-					return HtmlWidgets.Th{children = round.title}
-				end)
-			)},
-			-- Rows
-			Array.map(lastRound.opponents, function(slot)
-				local positionBackground = slot.positionStatus and ('bg-' .. slot.positionStatus) or nil
-				local teamBackground
-				if slot.definitiveStatus then
-					teamBackground = 'bg-' .. slot.definitiveStatus
-				end
-				return HtmlWidgets.Tr{
-					children = WidgetUtil.collect(
-						HtmlWidgets.Td{
-							children = {slot.placement, '.'},
-							css = {['font-weight'] = 'bold'},
-							classes = {positionBackground},
-						},
-						HtmlWidgets.Td{
-							classes = {teamBackground},
-							children = OpponentDisplay.BlockOpponent{
-								opponent = slot.opponent,
-								overflow = 'ellipsis',
-								teamStyle = 'hybrid',
-								showPlayerTeam = true,
-							}
-						},
-						Array.map(standings.tiebreakers, function(tiebreaker, tiebreakerIndex)
-							if not tiebreaker.title then
-								return
-							end
-							return HtmlWidgets.Td{
+					return HtmlWidgets.Tr{
+						children = WidgetUtil.collect(
+							HtmlWidgets.Td{
+								children = {slot.placement, '.'},
+								css = {['font-weight'] = 'bold'},
+								classes = {positionBackground},
+							},
+							HtmlWidgets.Td{
 								classes = {teamBackground},
-								css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil, ['text-align'] = 'center'},
-								children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
-							}
-						end),
-						Array.map(standings.rounds, function(columnRound)
-							local entry = Array.find(columnRound.opponents, function(columnSlot)
-								return Opponent.same(columnSlot.opponent, slot.opponent)
+								children = OpponentDisplay.BlockOpponent{
+									opponent = slot.opponent,
+									overflow = 'ellipsis',
+									teamStyle = 'hybrid',
+									showPlayerTeam = true,
+								}
+							},
+							Array.map(standings.tiebreakers, function(tiebreaker, tiebreakerIndex)
+								if not tiebreaker.title then
+									return
+								end
+								return HtmlWidgets.Td{
+									classes = {teamBackground},
+									css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil, ['text-align'] = 'center'},
+									children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
+								}
+							end),
+							Array.map(standings.rounds, function(columnRound)
+								local entry = Array.find(columnRound.opponents, function(columnSlot)
+									return Opponent.same(columnSlot.opponent, slot.opponent)
+								end)
+								if not entry then
+									return HtmlWidgets.Td{}
+								end
+								local match = entry.match
+								if not match then
+									return HtmlWidgets.Td{}
+								end
+
+								local opposingOpponentIndex = Array.indexOf(match.opponents, function(opponent)
+									return not Opponent.same(entry.opponent, opponent)
+								end)
+								if not entry.match.opponents[opposingOpponentIndex] then
+									return HtmlWidgets.Td{}
+								end
+
+								local bgClassSuffix
+								if match.finished then
+									local winner = match.winner
+									bgClassSuffix = winner == opposingOpponentIndex and 'down' or winner == 0 and 'draw' or 'up'
+								end
+
+								return HtmlWidgets.Td{
+									classes = {
+										bgClassSuffix and ('bg-' .. bgClassSuffix) or nil,
+									},
+									children = MatchOverview{
+										match = match,
+										showOpponent = opposingOpponentIndex,
+									},
+								}
 							end)
-							if not entry then
-								return HtmlWidgets.Td{}
-							end
-							local match = entry.match
-							if not match then
-								return HtmlWidgets.Td{}
-							end
-
-							local opposingOpponentIndex = Array.indexOf(match.opponents, function(opponent)
-								return not Opponent.same(entry.opponent, opponent)
-							end)
-							if not entry.match.opponents[opposingOpponentIndex] then
-								return HtmlWidgets.Td{}
-							end
-
-							local bgClassSuffix
-							if match.finished then
-								local winner = match.winner
-								bgClassSuffix = winner == opposingOpponentIndex and 'down' or winner == 0 and 'draw' or 'up'
-							end
-
-							return HtmlWidgets.Td{
-								classes = {
-									bgClassSuffix and ('bg-' .. bgClassSuffix) or nil,
-								},
-								children = MatchOverview{
-									match = match,
-									showOpponent = opposingOpponentIndex,
-								},
-							}
-						end)
-					),
-				}
-			end)
-		)
+						),
+					}
+				end)
+			)
+		}
 	}
 end
 

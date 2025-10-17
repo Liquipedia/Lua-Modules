@@ -13,6 +13,7 @@ local Table = Lua.import('Module:Table')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
+local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local RoundSelector = Lua.import('Module:Widget/Standings/RoundSelector')
@@ -44,114 +45,117 @@ function StandingsFfaWidget:render()
 	local hasFutureRounds = not standings.rounds[#standings.rounds].started
 	local showRoundColumns = #standings.rounds > 1
 
-	return DataTable{
-		wrapperClasses = {'standings-ffa', 'toggle-area', 'toggle-area-' .. activeRounds},
-		classes = {'wikitable-bordered', 'wikitable-striped'},
-		attributes = {['data-toggle-area'] = activeRounds},
-		children = WidgetUtil.collect(
-			-- Outer header
-			HtmlWidgets.Tr{children = HtmlWidgets.Th{
-				attributes = {
-					colspan = 100,
-				},
-				children = {
-					HtmlWidgets.Div{
-						children = {
-							HtmlWidgets.Span{
-								children = RoundSelector{
-									rounds = activeRounds,
-									hasEnded = not hasFutureRounds,
-								}
-							},
-							HtmlWidgets.Span{
-								children = standings.title
-							},
-						},
-						classes = {'tableHeaderRow'}
+	return AnalyticsWidget{
+		analyticsName = 'FFA standings table',
+		children = DataTable{
+			wrapperClasses = {'standings-ffa', 'toggle-area', 'toggle-area-' .. activeRounds},
+			classes = {'wikitable-bordered', 'wikitable-striped'},
+			attributes = {['data-toggle-area'] = activeRounds},
+			children = WidgetUtil.collect(
+				-- Outer header
+				HtmlWidgets.Tr{children = HtmlWidgets.Th{
+					attributes = {
+						colspan = 100,
 					},
-				},
-			}},
-			-- Column Header
-			HtmlWidgets.Tr{children = WidgetUtil.collect(
-				HtmlWidgets.Th{children = '#'},
-				HtmlWidgets.Th{children = 'Participant'},
-				showRoundColumns and HtmlWidgets.Th{children = ''} or nil,
-				Array.map(standings.tiebreakers, function(tiebreaker)
-					if not tiebreaker.title then
-						return
-					end
-					return HtmlWidgets.Th{children = tiebreaker.title}
-				end),
-				showRoundColumns and Array.map(standings.rounds, function(round)
-					return HtmlWidgets.Th{children = round.title}
-				end) or nil
-			)},
-			-- Rows
-			Array.flatMap(standings.rounds, function(round)
-				if round.round > activeRounds then
-					return {}
-				end
-				return Array.map(round.opponents, function(slot)
-					local positionBackground = slot.positionStatus and ('bg-' .. slot.positionStatus) or nil
-					local teamBackground
-					if not hasFutureRounds and slot.definitiveStatus then
-						teamBackground = 'bg-' .. slot.definitiveStatus
-					end
-					return HtmlWidgets.Tr{
-						children = WidgetUtil.collect(
-							HtmlWidgets.Td{
-								children = {slot.placement, '.'},
-								css = {['font-weight'] = 'bold'},
-								classes = {positionBackground},
+					children = {
+						HtmlWidgets.Div{
+							children = {
+								HtmlWidgets.Span{
+									children = RoundSelector{
+										rounds = activeRounds,
+										hasEnded = not hasFutureRounds,
+									}
+								},
+								HtmlWidgets.Span{
+									children = standings.title
+								},
 							},
-							HtmlWidgets.Td{
-								classes = {teamBackground},
-								children = OpponentDisplay.BlockOpponent{
-									opponent = slot.opponent,
-									overflow = 'ellipsis',
-									teamStyle = 'hybrid',
-									showPlayerTeam = true,
-								}
-							},
-							showRoundColumns and HtmlWidgets.Td{
-								classes = {teamBackground},
-								children = PlacementChange{change = slot.positionChangeFromPreviousRound}
-							} or nil,
-							Array.map(standings.tiebreakers, function(tiebreaker, tiebreakerIndex)
-								if not tiebreaker.title then
-									return
-								end
-								return HtmlWidgets.Td{
+							classes = {'tableHeaderRow'}
+						},
+					},
+				}},
+				-- Column Header
+				HtmlWidgets.Tr{children = WidgetUtil.collect(
+					HtmlWidgets.Th{children = '#'},
+					HtmlWidgets.Th{children = 'Participant'},
+					showRoundColumns and HtmlWidgets.Th{children = ''} or nil,
+					Array.map(standings.tiebreakers, function(tiebreaker)
+						if not tiebreaker.title then
+							return
+						end
+						return HtmlWidgets.Th{children = tiebreaker.title}
+					end),
+					showRoundColumns and Array.map(standings.rounds, function(round)
+						return HtmlWidgets.Th{children = round.title}
+					end) or nil
+				)},
+				-- Rows
+				Array.flatMap(standings.rounds, function(round)
+					if round.round > activeRounds then
+						return {}
+					end
+					return Array.map(round.opponents, function(slot)
+						local positionBackground = slot.positionStatus and ('bg-' .. slot.positionStatus) or nil
+						local teamBackground
+						if not hasFutureRounds and slot.definitiveStatus then
+							teamBackground = 'bg-' .. slot.definitiveStatus
+						end
+						return HtmlWidgets.Tr{
+							children = WidgetUtil.collect(
+								HtmlWidgets.Td{
+									children = {slot.placement, '.'},
+									css = {['font-weight'] = 'bold'},
+									classes = {positionBackground},
+								},
+								HtmlWidgets.Td{
 									classes = {teamBackground},
-								css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil, ['text-align'] = 'center'},
-									children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
-								}
-							end),
-							showRoundColumns and Array.map(standings.rounds, function(columnRound)
-								local text
-								if columnRound.round <= round.round then
-									local opponent = Array.find(columnRound.opponents, function(columnSlot)
-										return Table.deepEquals(columnSlot.opponent, slot.opponent)
-									end)
-									if opponent then
-										local roundStatus = opponent.specialStatus
-										if roundStatus == '' then
-											text = opponent.pointsChangeFromPreviousRound
-										else
-											text = STATUS_TO_DISPLAY[roundStatus]
+									children = OpponentDisplay.BlockOpponent{
+										opponent = slot.opponent,
+										overflow = 'ellipsis',
+										teamStyle = 'hybrid',
+										showPlayerTeam = true,
+									}
+								},
+								showRoundColumns and HtmlWidgets.Td{
+									classes = {teamBackground},
+									children = PlacementChange{change = slot.positionChangeFromPreviousRound}
+								} or nil,
+								Array.map(standings.tiebreakers, function(tiebreaker, tiebreakerIndex)
+									if not tiebreaker.title then
+										return
+									end
+									return HtmlWidgets.Td{
+										classes = {teamBackground},
+									css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil, ['text-align'] = 'center'},
+										children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
+									}
+								end),
+								showRoundColumns and Array.map(standings.rounds, function(columnRound)
+									local text
+									if columnRound.round <= round.round then
+										local opponent = Array.find(columnRound.opponents, function(columnSlot)
+											return Table.deepEquals(columnSlot.opponent, slot.opponent)
+										end)
+										if opponent then
+											local roundStatus = opponent.specialStatus
+											if roundStatus == '' then
+												text = opponent.pointsChangeFromPreviousRound
+											else
+												text = STATUS_TO_DISPLAY[roundStatus]
+											end
 										end
 									end
-								end
-								return HtmlWidgets.Td{children = text, css = {['text-align'] = 'center'}}
-							end) or nil
-						),
-						attributes = {
-							['data-toggle-area-content'] = round.round,
+									return HtmlWidgets.Td{children = text, css = {['text-align'] = 'center'}}
+								end) or nil
+							),
+							attributes = {
+								['data-toggle-area-content'] = round.round,
+							}
 						}
-					}
+					end)
 				end)
-			end)
-		)
+			)
+		}
 	}
 end
 
