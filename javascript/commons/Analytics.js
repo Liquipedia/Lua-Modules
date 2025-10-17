@@ -3,12 +3,32 @@
  *              for product development and user experience improvements.
  ******************************************************************************/
 
+// Event names
+const PAGE_VIEW = 'Page view';
+const LINK_CLICKED = 'Link clicked';
+const WIKI_SWITCHED = 'Wiki switched';
+const SEARCH_PERFORMED = 'Page searched';
 const BUTTON_CLICKED = 'Button clicked';
+
+// Constants
+const IGNORE_CATEGORY_PREFIX = 'Pages ';
+
+// Statically defined properties
+const getPageDomain = () => window.location.origin;
+const getPageLocation = () => window.location.href;
+const getPagePath = () => window.location.pathname;
+const getPageTitle = () => document.title;
+const getPageUrl = () => `${ window.location.origin }${ window.location.pathname }`;
+const getReferrerUrl = () => document.referrer;
+const getReferrerDomain = () => document.referrer ? new URL( document.referrer ).hostname : null;
+const getWikiId = () => mw.config.get( 'wgScriptPath' )?.slice( 1 );
 
 liquipedia.analytics = {
 	clickTrackers: [],
 
 	init: function() {
+		liquipedia.analytics.sendPageViewEvent();
+
 		liquipedia.analytics.setupWikiMenuLinkClickAnalytics();
 		liquipedia.analytics.setupLinkClickAnalytics();
 		liquipedia.analytics.setupButtonClickAnalytics();
@@ -29,8 +49,22 @@ liquipedia.analytics = {
 
 	track: function( eventName, properties ) {
 		window.amplitude.track( eventName, {
-			'page url': window.location.href,
+			'page domain': getPageDomain(),
+			'page location': getPageLocation(),
+			'page path': getPagePath(),
+			'page title': getPageTitle(),
+			'page url': getPageUrl(),
+			wiki: getWikiId(),
 			...properties
+		} );
+	},
+
+	sendPageViewEvent: function() {
+		const categories = mw.config.get( 'wgCategories' ) || [];
+		liquipedia.analytics.track( PAGE_VIEW, {
+			referrer: getReferrerUrl(),
+			'referring domain': getReferrerDomain(),
+			categories: categories.filter( ( category ) => !category.startsWith( IGNORE_CATEGORY_PREFIX ) )
 		} );
 	},
 
@@ -59,7 +93,7 @@ liquipedia.analytics = {
 	setupWikiMenuLinkClickAnalytics: function() {
 		liquipedia.analytics.clickTrackers.push( {
 			selector: '[data-wiki-menu="link"]',
-			trackerName: 'Wiki switched',
+			trackerName: WIKI_SWITCHED,
 			propertiesBuilder: ( wikiMenuLink ) => ( {
 				wiki: wikiMenuLink.closest( '[data-wiki-id]' ).dataset.wikiId,
 				position: 'wiki menu',
@@ -73,7 +107,7 @@ liquipedia.analytics = {
 	setupLinkClickAnalytics: function() {
 		liquipedia.analytics.clickTrackers.push( {
 			selector: 'a',
-			trackerName: 'Link clicked',
+			trackerName: LINK_CLICKED,
 			propertiesBuilder: ( link ) => ( {
 				title: link.innerText,
 				position: liquipedia.analytics.findLinkPosition( link ),
@@ -104,7 +138,7 @@ liquipedia.analytics = {
 
 		liquipedia.analytics.clickTrackers.push( {
 			selector: '.mw-searchSuggest-link',
-			trackerName: 'Page searched',
+			trackerName: SEARCH_PERFORMED,
 			propertiesBuilder: ( link ) => {
 				const searchTerm = searchInput?.dataset.lastSearchTerm ?? searchInput?.value ?? '';
 				const getResultPosition = () => {
@@ -130,7 +164,7 @@ liquipedia.analytics = {
 			if ( event.target.matches( '#searchform' ) ) {
 				const searchTerm = event.target.querySelector( 'input' ).value;
 
-				liquipedia.analytics.track( 'Page searched', {
+				liquipedia.analytics.track( SEARCH_PERFORMED, {
 					'search input': searchTerm,
 					title: null,
 					destination: `index.php?search=${ encodeURIComponent( searchTerm ) }`,
