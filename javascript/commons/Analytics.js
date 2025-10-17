@@ -13,9 +13,12 @@ const SEARCH_PERFORMED = 'Page searched';
 const IGNORE_CATEGORY_PREFIX = 'Pages ';
 
 // Statically defined properties
-const getPageUrl = () => window.location.href;
-const getReferrerUrl = () => document.referrer;
+const getPageDomain = () => window.location.origin;
+const getPageLocation = () => window.location.href;
+const getPagePath = () => window.location.pathname;
 const getPageTitle = () => document.title;
+const getPageUrl = () => `${ window.location.origin }${ window.location.pathname }`;
+const getReferrerUrl = () => document.referrer;
 
 liquipedia.analytics = {
 	clickTrackers: [],
@@ -41,8 +44,11 @@ liquipedia.analytics = {
 
 	track: function( eventName, properties ) {
 		window.amplitude.track( eventName, {
-			'page url': getPageUrl(),
+			'page domain': getPageDomain(),
+			'page location': getPageLocation(),
+			'page path': getPagePath(),
 			'page title': getPageTitle(),
+			'page url': getPageUrl(),
 			...properties
 		} );
 	},
