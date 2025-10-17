@@ -26,7 +26,7 @@ TiebreakerGameUtil.getGames = FnUtil.memoize(function (opponent)
 		end)
 		games = games + #playedGames
 		gameWins = gameWins + #Array.filter(playedGames, function (game)
-			if game.winner == 0 then
+			if game.resultType == 'draw' then
 				gameDraws = gameDraws + 1
 				return false
 			end
