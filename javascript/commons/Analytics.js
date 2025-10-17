@@ -8,6 +8,7 @@ const PAGE_VIEW = 'Page view';
 const LINK_CLICKED = 'Link clicked';
 const WIKI_SWITCHED = 'Wiki switched';
 const SEARCH_PERFORMED = 'Page searched';
+const BUTTON_CLICKED = 'Button clicked';
 
 // Constants
 const IGNORE_CATEGORY_PREFIX = 'Pages ';
@@ -30,6 +31,7 @@ liquipedia.analytics = {
 
 		liquipedia.analytics.setupWikiMenuLinkClickAnalytics();
 		liquipedia.analytics.setupLinkClickAnalytics();
+		liquipedia.analytics.setupButtonClickAnalytics();
 		liquipedia.analytics.setupSearchAnalytics();
 		liquipedia.analytics.setupSearchFormSubmitAnalytics();
 
@@ -110,6 +112,17 @@ liquipedia.analytics = {
 				title: link.innerText,
 				position: liquipedia.analytics.findLinkPosition( link ),
 				destination: link.href
+			} )
+		} );
+	},
+
+	setupButtonClickAnalytics: function() {
+		liquipedia.analytics.clickTrackers.push( {
+			selector: '.btn:not(a *), button:not(a *)',
+			trackerName: BUTTON_CLICKED,
+			propertiesBuilder: ( link ) => ( {
+				title: link.innerText,
+				position: liquipedia.analytics.findLinkPosition( link )
 			} )
 		} );
 	},
