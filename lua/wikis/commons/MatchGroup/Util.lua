@@ -216,6 +216,7 @@ MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed
 ---@field mode string?
 ---@field opponents {players: table[], score: number?, status: string?}[]
 ---@field patch string?
+---@field resultType string?
 ---@field scores number[]
 ---@field subgroup number?
 ---@field type string?
@@ -233,6 +234,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 	mapDisplayName = 'string?',
 	mode = 'string?',
 	patch = 'string?',
+	resultType = 'string?',
 	scores = TypeUtil.array('number'),
 	subgroup = 'number?',
 	type = 'string?',
@@ -262,6 +264,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field patch string?
 ---@field phase 'upcoming'|'ongoing'|'finished'
 ---@field publisherTier string?
+---@field resultType string?
 ---@field section string?
 ---@field series string?
 ---@field status MatchStatus
@@ -295,6 +298,7 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	parent = 'string?',
 	patch = 'string?',
 	publisherTier = 'string?',
+	resultType = 'string?',
 	section = 'string?',
 	series = 'string?',
 	status = MatchGroupUtil.types.Status,
