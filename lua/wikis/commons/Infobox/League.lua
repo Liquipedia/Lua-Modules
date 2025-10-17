@@ -301,7 +301,8 @@ function League:_tournamentPhaseCategory()
 	if not endTimestamp then
 		return 'Live Tournaments'
 	end
-	if DateExt.getCurrentTimestamp() < (endTimestamp.timestamp + 24 * 60 * 60) then
+	local oneDayInSeconds = 24 * 60 * 60
+	if DateExt.getCurrentTimestamp() < (endTimestamp.timestamp + oneDayInSeconds) then
 		return 'Live Tournaments'
 	end
 	return 'Finished Tournaments'
