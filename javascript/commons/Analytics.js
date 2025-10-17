@@ -2,7 +2,6 @@
  * Description: This script enables anonymous analytics of user interactions
  *              for product development and user experience improvements.
  ******************************************************************************/
-/* global RLCONF */
 
 // Event names
 const PAGE_VIEW = 'Page view';
@@ -49,7 +48,7 @@ liquipedia.analytics = {
 	},
 
 	sendPageViewEvent: function() {
-		const categories = RLCONF?.wgCategories || [];
+		const categories = mw.config.get( 'wgCategories' ) || [];
 		liquipedia.analytics.track( PAGE_VIEW, {
 			'referrer url': getReferrerUrl(),
 			categories: categories.filter( ( category ) => !category.startsWith( IGNORE_CATEGORY_PREFIX ) )
