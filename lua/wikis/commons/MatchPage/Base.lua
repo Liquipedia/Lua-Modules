@@ -67,6 +67,7 @@ local BaseMatchPage = Class.new(
 		self.matchData = match
 		self.games = match.games
 		self.opponents = match.opponents
+		self:addCategories()
 	end
 )
 
@@ -77,7 +78,6 @@ BaseMatchPage.NO_CHARACTER = 'default'
 ---@return Widget
 function BaseMatchPage.getByMatchId(props)
 	local matchPage = BaseMatchPage(props.match)
-	matchPage:addCategories()
 	return matchPage:render()
 end
 
