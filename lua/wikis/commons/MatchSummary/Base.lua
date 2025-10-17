@@ -196,6 +196,7 @@ function MatchSummary:init(width)
 	self.root = mw.html.create('div')
 		:addClass('brkts-popup')
 		:css('width', width)
+		:attr('data-analytics-name', 'Match popup')
 	return self
 end
 
