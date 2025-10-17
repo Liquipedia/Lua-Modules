@@ -77,6 +77,7 @@ BaseMatchPage.NO_CHARACTER = 'default'
 ---@return Widget
 function BaseMatchPage.getByMatchId(props)
 	local matchPage = BaseMatchPage(props.match)
+	matchPage:addCategories()
 	return matchPage:render()
 end
 
