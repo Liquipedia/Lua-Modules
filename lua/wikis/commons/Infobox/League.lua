@@ -290,21 +290,21 @@ function League:_tournamentPhaseCategory()
 	local endTimestamp = TournamentService.parseDateRecord(self.data.endDate)
 
 	if self.data.status == 'finished' then
-		return 'Finished tournaments'
+		return 'Finished Tournaments'
 	end
 	if not startTimestamp then
-		return 'Upcoming tournaments'
+		return 'Upcoming Tournaments'
 	end
 	if DateExt.getCurrentTimestamp() < startTimestamp.timestamp then
-		return 'Upcoming tournaments'
+		return 'Upcoming Tournaments'
 	end
 	if not endTimestamp then
-		return 'Live tournaments'
+		return 'Live Tournaments'
 	end
 	if DateExt.getCurrentTimestamp() < (endTimestamp.timestamp + 24 * 60 * 60) then
-		return 'Live tournaments'
+		return 'Live Tournaments'
 	end
-	return 'Finished tournaments'
+	return 'Finished Tournaments'
 end
 
 ---@param args table
