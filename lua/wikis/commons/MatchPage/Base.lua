@@ -67,6 +67,7 @@ local BaseMatchPage = Class.new(
 		self.matchData = match
 		self.games = match.games
 		self.opponents = match.opponents
+		self:addCategories()
 	end
 )
 
@@ -78,6 +79,22 @@ BaseMatchPage.NO_CHARACTER = 'default'
 function BaseMatchPage.getByMatchId(props)
 	local matchPage = BaseMatchPage(props.match)
 	return matchPage:render()
+end
+
+function BaseMatchPage:addCategories()
+	local matchPhase = MatchGroupUtil.computeMatchPhase(self.matchData)
+
+	mw.ext.TeamLiquidIntegration.add_category('Matches')
+	if matchPhase then
+		local phaseToDisplay = {
+			finished = 'Finished',
+			ongoing = 'Live',
+			upcoming = 'Upcoming',
+		}
+		if phaseToDisplay[matchPhase] then
+			mw.ext.TeamLiquidIntegration.add_category(phaseToDisplay[matchPhase] .. ' Matches')
+		end
+	end
 end
 
 ---Tests whether this match page is a Bo1
