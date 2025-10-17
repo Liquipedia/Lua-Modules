@@ -41,15 +41,14 @@ liquipedia.analytics = {
 
 	track: function( eventName, properties ) {
 		window.amplitude.track( eventName, {
-			'page url': window.location.href,
+			'page url': getPageUrl(),
 			...properties
 		} );
 	},
 
 	sendPageViewEvent: function() {
 		const categories = RLCONF.wgCategories || [];
-		window.amplitude.track( PAGE_VIEW, {
-			'page url': getPageUrl(),
+		liquipedia.analytics.track( PAGE_VIEW, {
 			'referrer url': getReferrerUrl(),
 			'page title': getPageTitle(),
 			categories: categories.filter( ( category ) => !category.startsWith( IGNORE_CATEGORY_PREFIX ) )
