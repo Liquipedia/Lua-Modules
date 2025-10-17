@@ -30,7 +30,10 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{limit = 10},
+		body = TransfersList{
+			rumours = true,
+			transferPage = 'Player Transfers/' .. DateExt.getYearOf()
+		},
 		boxid = 1509,
 	},
 	thisDay = {
