@@ -144,7 +144,7 @@ end
 ---@param match any
 ---@return Widget?
 function CustomMatchSummary._linksTable(match)
-	if Logic.isDeepEmpty(match.links) then
+	if Logic.isDeepEmpty(match.links) or Logic.isEmpty(map) then
 		return
 	end
 
