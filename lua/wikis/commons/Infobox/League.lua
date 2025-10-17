@@ -28,6 +28,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
 local Tier = Lua.import('Module:Tier/Custom')
+local TournamentService = Lua.import('Module:Tournament')
 local Variables = Lua.import('Module:Variables')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
@@ -284,13 +285,37 @@ end
 function League:customParseArguments(args)
 end
 
+function League:_tournamentPhaseCategory()
+	local startTimestamp = TournamentService.parseDateRecord(self.data.startDate or self.data.endDate)
+	local endTimestamp = TournamentService.parseDateRecord(self.data.endDate)
+
+	if self.data.status == 'finished' then
+		return 'Finished tournaments'
+	end
+	if not startTimestamp then
+		return 'Upcoming tournaments'
+	end
+	if DateExt.getCurrentTimestamp() < startTimestamp.timestamp then
+		return 'Upcoming tournaments'
+	end
+	if not endTimestamp then
+		return 'Live tournaments'
+	end
+	if DateExt.getCurrentTimestamp() < (endTimestamp.timestamp + 24 * 60 * 60) then
+		return 'Live tournaments'
+	end
+	return 'Finished tournaments'
+end
+
 ---@param args table
 ---@return string[]
 function League:_getCategories(args)
-	return Array.extend({'Tournaments'},
+	return Array.extend(
+		{'Tournaments'},
 		Logic.isEmpty(args.country) and 'Tournaments without location' or nil,
 		self:addParticipantTypeCategory(args),
 		self:addTierCategories(args),
+		self:_tournamentPhaseCategory(),
 		CountryCategory.run(args, 'Tournaments'),
 		self:getWikiCategories(args)
 	)
