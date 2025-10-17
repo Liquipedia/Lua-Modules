@@ -99,7 +99,7 @@ function MatchMapsLegacy.matchMaps(frame)
 	-- as they can be read by the match2 processing
 
 	if generate then
-		return Json.stringify(args)
+		return Json.stringify(processedArgs)
 	end
 
 	Template.stashReturnValue(processedArgs, 'LegacyMatchlist')

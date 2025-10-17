@@ -38,6 +38,8 @@ cd /home/hjpalpha
 
 #pwb replace -lang:worldofwarcraft -transcludes:LegacyBracket -transcludes:LegacyMatchList -summary:"Convert LegacyMatch2 wrappers" -pt:60 -regex -always -dotall "\{\{[lL]egacyBracket" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/Default|fn=runGenerate|dev=hjp" "\{\{[bB]racketMatchSummary" "{{subst:#invoke:Lua|invoke|module=Json|fn=fromArgs" "\{\{[mM]atchMaps" "{{subst:#invoke:Lua|invoke|module=Json|fn=fromArgs" "\{\{[mM]atch/old" "{{subst:#invoke:Lua|invoke|module=Json|fn=fromArgs" "\{\{[lL]egacyMatchList" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/MatchList|fn=generate|dev=hjp"
 
+#pwb replace -lang:squadrons -transcludes:LegacyBracket -transcludes:LegacyMatchListStart -summary:"Convert LegacyMatch2 wrappers" -pt:60 -regex -always -dotall "\{\{[lL]egacyBracket" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/Default|fn=runGenerate|dev=hjp" "\{\{[bB]racketMatchSummary" "{{subst:#invoke:Lua|invoke|module=Json|fn=fromArgs" "\{\{[mM]atchListEnd\|?\s*\}\}" "}}" "\{\{[mM]atchMaps" "|{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/MatchList|fn=matchMaps|dev=hjp|generate=true" "\{\{[lL]egacyMatchListStart(.*?)\}\}\s*\n*\s*\|\{\{subst" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/MatchList|fn=generate|dev=hjp\1\n|{{subst" "\{\{[lL]egacyMatchListStart(.*?)\}\}\s*\n*\s*\|\{\{[mM]atchMaps" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/MatchList|fn=generate|dev=hjp\1\n|{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/MatchList|fn=matchMaps|dev=hjp|generate=true"
+
 
 
 
