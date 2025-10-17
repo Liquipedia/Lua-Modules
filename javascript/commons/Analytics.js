@@ -20,6 +20,7 @@ const getPageTitle = () => document.title;
 const getPageUrl = () => `${ window.location.origin }${ window.location.pathname }`;
 const getReferrerUrl = () => document.referrer;
 const getReferrerDomain = () => document.referrer ? new URL( document.referrer ).hostname : null;
+const getWikiId = () => mw.config.get( 'wgScriptPath' )?.slice( 1 );
 
 liquipedia.analytics = {
 	clickTrackers: [],
@@ -51,6 +52,7 @@ liquipedia.analytics = {
 			'page path': getPagePath(),
 			'page title': getPageTitle(),
 			'page url': getPageUrl(),
+			wiki: getWikiId(),
 			...properties
 		} );
 	},
