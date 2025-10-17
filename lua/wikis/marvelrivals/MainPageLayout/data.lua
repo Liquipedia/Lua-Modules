@@ -30,20 +30,20 @@ local CONTENT = {
 		heading = 'Useful Articles',
 		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
-		boxid = 1503,
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
 		body = WantToHelp{},
 		padding = true,
-		boxid = 1504,
+		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP,
 	},
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
 			transferPage = MainPageLayoutUtil.getQuarterlyTransferPage()
 		},
-		boxid = 1509,
+		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
@@ -51,12 +51,12 @@ local CONTENT = {
 			birthdayListPage = 'Birthday list'
 		},
 		padding = true,
-		boxid = 1510,
+		boxid = MainPageLayoutUtil.BoxId.THIS_DAY,
 	},
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
-		boxid = 1516,
+		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -69,7 +69,7 @@ local CONTENT = {
 		heading = 'Matches',
 		body = MatchTicker{},
 		padding = true,
-		boxid = 1507,
+		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -78,7 +78,7 @@ local CONTENT = {
 			completedDays = 20
 		},
 		padding = true,
-		boxid = 1508,
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 }
 
