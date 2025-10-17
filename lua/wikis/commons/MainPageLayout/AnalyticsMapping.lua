@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 local BoxId = MainPageLayoutUtil.BoxId
 
----@type table<integer, string>
+---@type table<integer|MainPageBoxId, string>
 local AnalyticsMapping = {
 	[1501] = 'Heroes panel',
 	[1502] = 'Updates panel',
