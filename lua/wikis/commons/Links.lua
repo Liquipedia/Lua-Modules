@@ -204,7 +204,7 @@ local PREFIXES = {
 	},
 	openrec = {'https://www.openrec.tv/live/'},
 	opl = {
-		match = 'https://www.opleague.eu/match/'
+		match = 'https://www.opleague.pro/match/'
 	},
 	osu = {
 		'https://osu.ppy.sh/',
