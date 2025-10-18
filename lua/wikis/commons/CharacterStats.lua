@@ -8,15 +8,10 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local CharacterIcon = Lua.import('Module:CharacterIcon')
 local Class = Lua.import('Module:Class')
-local DateExt = Lua.import('Module:Date/Ext')
-local TeamTemplate = Lua.import('Module:TeamTemplate')
-local Logic = Lua.import('Module:Logic')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
@@ -27,9 +22,6 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
-
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class CharacterStatsGame: MatchGroupUtilGame
 ---@field matchOpponents standardOpponent[]
@@ -92,7 +84,7 @@ end
 function CharacterStats:queryGames(matchIds)
 	return Array.flatMap(matchIds, function (matchId)
 		local matchOpponents = Array.map(
-			mw.ext.LiquipediaDB.lpdb('match2opponents', {
+			mw.ext.LiquipediaDB.lpdb('match2opponent', {
 				conditions = tostring(ConditionNode(ColumnName('match2id'), Comparator.eq, matchId)),
 				order = 'match2opponentid asc',
 			}),
