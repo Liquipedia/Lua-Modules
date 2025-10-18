@@ -12,6 +12,7 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Match = Lua.import('Module:Match')
 local MatchGroup = Lua.import('Module:MatchGroup')
+local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
@@ -27,7 +28,13 @@ function MatchMapsLegacy.matchlist(frame)
 	return MatchMapsLegacy._matchlist(args)
 end
 
-function MatchMapsLegacy._matchlist(args)
+-- invoked by Template:LegacyMatchList
+function MatchMapsLegacy.generate(frame)
+	local args = Arguments.getArgs(frame)
+	return MatchMapsLegacy._matchlist(args, true)
+end
+
+function MatchMapsLegacy._matchlist(args, generate)
 	local store = Logic.nilOr(
 		Logic.readBoolOrNil(args.store),
 		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
@@ -61,7 +68,7 @@ function MatchMapsLegacy._matchlist(args)
 	end
 
 	matches.id = bracketId
-	matches.isLegacy = true
+	matches.isLegacy = not generate or nil
 	matches.title = Logic.emptyOr(args.title, args[1], 'Match List')
 	matches.width = args.width
 	local hide = Logic.readBool(Logic.emptyOr(args.hide, true))
@@ -76,6 +83,10 @@ function MatchMapsLegacy._matchlist(args)
 	else
 		matches.noDuplicateCheck = true
 		matches.store = false
+	end
+
+	if generate then
+		return MatchGroupLegacy.generateWikiCodeForMatchList(matches)
 	end
 
 	-- generate Display
