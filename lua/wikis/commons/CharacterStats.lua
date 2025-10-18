@@ -159,7 +159,7 @@ function CharacterStats:processGames(games)
 		Array.forEach(game.matchOpponents, function (opponent, opponentIndex)
 			local opponentName = Opponent.toName(opponent)
 			local isWinner = game.winner == opponentIndex
-			local side = CharacterStats:getTeamSide(game, opponentIndex)
+			local side = self:getTeamSide(game, opponentIndex)
 			local characters = teamsCharacters[opponentIndex]
 
 			Array.forEach(characters, function (character, characterIndex)
@@ -190,7 +190,7 @@ function CharacterStats:processGames(games)
 						characterStats.playedVs[playedAgainstCharacter] = {pick = 0, win = 0, loss = 0}
 					end
 					characterStats.playedVs[playedAgainstCharacter].pick = characterStats.playedVs[playedAgainstCharacter].pick + 1
-					characterStats.playedVs[playedAgainstCharacter][isWinner] = characterStats.playedVs[playedAgainstCharacter][isWinner] + 1
+					characterStats.playedVs[playedAgainstCharacter][getSideKey(isWinner)] = characterStats.playedVs[playedAgainstCharacter][getSideKey(isWinner)] + 1
 				end)
 			end)
 
@@ -201,7 +201,7 @@ function CharacterStats:processGames(games)
 		end)
 	end)
 
-	return Array.sortBy(Array.extractValues(stats), Operator.property('total.pick'))
+	return Array.reverse(Array.sortBy(Array.extractValues(stats), Operator.property('total.pick')))
 end
 
 ---@private
