@@ -47,6 +47,7 @@ local CharacterStats = Class.new(
 )
 
 ---@protected
+---@return ConditionTree
 function CharacterStats:buildConditions()
 	local args = self.args
 	local conditions = ConditionTree(BooleanOperator.all):add{
@@ -105,7 +106,7 @@ function CharacterStats:queryGames(matchIds)
 end
 
 ---@protected
----@param game MatchGroupUtilGame
+---@param game CharacterStatsGame
 ---@param opponentIndex integer
 ---@return string[]
 function CharacterStats:getTeamCharacters(game, opponentIndex)
@@ -113,7 +114,7 @@ function CharacterStats:getTeamCharacters(game, opponentIndex)
 end
 
 ---@protected
----@param game MatchGroupUtilGame
+---@param game CharacterStatsGame
 ---@param opponentIndex integer
 ---@return string[]
 function CharacterStats:getTeamBans(game, opponentIndex)
@@ -121,7 +122,7 @@ function CharacterStats:getTeamBans(game, opponentIndex)
 end
 
 ---@protected
----@param game MatchGroupUtilGame
+---@param game CharacterStatsGame
 ---@param opponentIndex integer
 ---@return string
 function CharacterStats:getTeamSide(game, opponentIndex)
