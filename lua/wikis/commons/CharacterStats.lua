@@ -91,6 +91,9 @@ function CharacterStats:queryGames(matchIds)
 			}),
 			Opponent.fromMatch2Record
 		)
+		if #matchOpponents > 2 or Array.any(matchOpponents, Opponent.isTbd) then
+			return
+		end
 		local games = Array.map(
 			mw.ext.LiquipediaDB.lpdb('match2game', {
 				conditions = tostring(ConditionTree(BooleanOperator.all):add{
