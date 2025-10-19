@@ -25,7 +25,8 @@ end
 ---@param frame Frame
 ---@return Widget
 function LoLCharacterStats.run(frame)
-	local stats = LoLCharacterStats(Arguments.getArgs(frame))
+	local args = Arguments.getArgs(frame)
+	local stats = LoLCharacterStats(args)
 
 	local conditions = stats:buildConditions()
 	local matchIds = stats:getMatchIds(conditions)
@@ -38,6 +39,7 @@ function LoLCharacterStats.run(frame)
 		numGames = #games,
 		sides = stats:getSides(),
 		sideWins = processedData.overall.wins,
+		statspage = args.statspage
 	}
 end
 

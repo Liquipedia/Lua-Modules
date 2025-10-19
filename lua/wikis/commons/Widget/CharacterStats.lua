@@ -36,6 +36,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field numGames integer
 ---@field sides string[]
 ---@field sideWins table<string, integer>
+---@field statspage string
 
 ---@class CharacterStatsWidget: Widget
 ---@operator call(CharacterStatsWidgetProps): CharacterStatsWidget
@@ -43,7 +44,8 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local CharacterStatsWidget = Class.new(Widget)
 CharacterStatsWidget.defaultProps = {
 	characterSize = '25x25px',
-	numGames = 0
+	numGames = 0,
+	statspage = mw.title.getCurrentTitle().prefixedText
 }
 
 ---@return Widget[]?
@@ -52,13 +54,16 @@ function CharacterStatsWidget:render()
 	if Logic.isEmpty(data) then
 		return
 	end
+	local showExtraStats = self.props.statspage == mw.title.getCurrentTitle().prefixedText
 	return WidgetUtil.collect(
 		CharacterStatsTable(self.props),
-		self:_displayUnpickedCharacters(),
-		self.props.includeBans and {
-			self:_displayUnbannedCharacters(),
-			self:_displayUnpickedAndUnbannedCharacters(),
-		}
+		showExtraStats and WidgetUtil.collect(
+			self:_displayUnpickedCharacters(),
+			self.props.includeBans and {
+				self:_displayUnbannedCharacters(),
+				self:_displayUnpickedAndUnbannedCharacters(),
+			}
+		) or nil
 	)
 end
 

@@ -25,7 +25,8 @@ end
 ---@param frame Frame
 ---@return Widget
 function HoKCharacterStats.run(frame)
-	local stats = HoKCharacterStats(Arguments.getArgs(frame))
+	local args = Arguments.getArgs(frame)
+	local stats = HoKCharacterStats(args)
 
 	local conditions = stats:buildConditions()
 	local matchIds = stats:getMatchIds(conditions)
@@ -38,6 +39,7 @@ function HoKCharacterStats.run(frame)
 		numGames = #games,
 		sides = stats:getSides(),
 		sideWins = processedData.overall.wins,
+		statspage = args.statspage
 	}
 end
 
