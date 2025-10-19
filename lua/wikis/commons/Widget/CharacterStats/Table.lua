@@ -180,16 +180,23 @@ function CharacterStatsTable:_buildCharacterRow(characterData, characterIndex)
 	}
 end
 
+---@param a CharacterAppearanceStats
+---@param b CharacterAppearanceStats
+---@return boolean
+local function characterAppearanceStatsComparator(a, b)
+	if a.pick ~= b.pick then
+		return a.pick < b.pick
+	elseif a.win ~= b.win then
+		return a.win < b.win
+	end
+	return a.loss < b.loss
+end
+
 ---@param data table<string, CharacterAppearanceStats>
 function CharacterStatsTable._buildPlayedByTeamTable(data)
-	local sortedTeamData = Array.sortBy(Table.entries(data), Operator.property(2), function (a, b)
-		if a.pick ~= b.pick then
-			return a.pick < b.pick
-		elseif a.win ~= b.win then
-			return a.win < b.win
-		end
-		return a.loss < b.loss
-	end)
+	local sortedTeamData = Array.sortBy(
+		Table.entries(data), Operator.property(2), characterAppearanceStatsComparator
+	)
 	return CharacterStatsTable._buildDetailsTable{
 		title = 'Played by Teams',
 		entryType = 'Team',
@@ -212,14 +219,9 @@ end
 
 ---@param data table<string, CharacterAppearanceStats>
 function CharacterStatsTable:_buildPlayedTable(playedType, data)
-	local sortedCharacterData = Array.sortBy(Table.entries(data), Operator.property(2), function (a, b)
-		if a.pick ~= b.pick then
-			return a.pick < b.pick
-		elseif a.win ~= b.win then
-			return a.win < b.win
-		end
-		return a.loss < b.loss
-	end)
+	local sortedCharacterData = Array.sortBy(
+		Table.entries(data), Operator.property(2), characterAppearanceStatsComparator
+	)
 	return CharacterStatsTable._buildDetailsTable{
 		title = 'Played ' .. playedType,
 		entryType = String.upperCaseFirst(self.props.characterType),
