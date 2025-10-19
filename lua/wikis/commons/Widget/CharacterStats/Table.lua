@@ -158,7 +158,7 @@ function CharacterStatsTable:_buildCharacterRow(characterData, characterIndex)
 						character = characterData.name,
 						size = self.props.characterSize,
 						addTextLink = true
-					},
+					} .. ' Detailed Statistics',
 					children = HtmlWidgets.Div{
 						classes = {'character-stats-popup-info'},
 						children = {
