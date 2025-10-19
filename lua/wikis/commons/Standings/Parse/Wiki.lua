@@ -108,10 +108,10 @@ end
 ---@return string[]
 function StandingsParseWiki.getMatchIdsOfMatchGroup(matchGroupId)
 	return MatchGroupUtil.fetchMatchIds{
-		conditions = tostring(ConditionTree(BooleanOperator.all):add{
+		conditions = ConditionTree(BooleanOperator.all):add{
 			ConditionNode(ColumnName('namespace'), Comparator.neq, Namespace.matchNamespaceId()),
 			ConditionNode(ColumnName('match2bracketid'), Comparator.eq, matchGroupId),
-		}),
+		},
 		limit = 1000,
 	}
 end
