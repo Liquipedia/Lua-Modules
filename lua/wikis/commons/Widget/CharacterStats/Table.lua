@@ -161,13 +161,6 @@ function CharacterStatsTable:_buildCharacterRow(characterData, characterIndex)
 					},
 					children = HtmlWidgets.Div{
 						classes = {'dota-stat-popup-info'},
-						css = {
-							display = 'flex',
-							gap = '10px',
-							['justify-content'] = 'center',
-							['flex-wrap'] = 'wrap',
-							margin = '10px',
-						},
 						children = {
 							CharacterStatsTable._buildPlayedByTeamTable(characterData.playedBy),
 							self:_buildPlayedTable('with', characterData.playedWith),
