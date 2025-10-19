@@ -152,8 +152,12 @@ function CharacterStatsWidget:_buildCharacterRow(characterData, characterIndex)
 			},
 			HtmlWidgets.Td{children = characterData.total.win},
 			HtmlWidgets.Td{children = characterData.total.loss},
-			HtmlWidgets.Td{children = CharacterStatsWidget._calculatePercentage(characterData.total.win, characterData.total.pick)},
-			HtmlWidgets.Td{children = CharacterStatsWidget._calculatePercentage(characterData.total.pick, self.props.numGames)},
+			HtmlWidgets.Td{children = CharacterStatsWidget._calculatePercentage(
+				characterData.total.win, characterData.total.pick
+			)},
+			HtmlWidgets.Td{children = CharacterStatsWidget._calculatePercentage(
+				characterData.total.pick, self.props.numGames
+			)},
 			Array.flatMap(self.props.sides, function (side)
 				local picks = characterData.side[side].win + characterData.side[side].loss
 				return {
@@ -170,7 +174,9 @@ function CharacterStatsWidget:_buildCharacterRow(characterData, characterIndex)
 				HtmlWidgets.Td{children = characterData.bans},
 				HtmlWidgets.Td{children = CharacterStatsWidget._calculatePercentage(characterData.bans, self.props.numGames)},
 				HtmlWidgets.Td{children = characterData.total.pick + characterData.bans},
-				HtmlWidgets.Td{children = CharacterStatsWidget._calculatePercentage(characterData.total.pick + characterData.bans, self.props.numGames)}
+				HtmlWidgets.Td{children = CharacterStatsWidget._calculatePercentage(
+					characterData.total.pick + characterData.bans, self.props.numGames
+				)}
 			} or nil,
 			HtmlWidgets.Td{children = '-'}
 		)
@@ -199,7 +205,11 @@ function CharacterStatsWidget:_buildFooterRow()
 			return HtmlWidgets.Th{
 				classes = {'sortbottom'},
 				attributes = {colspan = 4},
-				children = sideWin .. ' W - ' ..  sideLoss .. ' L (' .. CharacterStatsWidget._calculatePercentage(sideWin, self.props.numGames) .. ')'
+				children = {
+					sideWin .. ' W - ' ..  sideLoss .. ' L',
+					' ',
+					'(' .. CharacterStatsWidget._calculatePercentage(sideWin, self.props.numGames) .. ')'
+				}
 			}
 		end),
 		HtmlWidgets.Th{

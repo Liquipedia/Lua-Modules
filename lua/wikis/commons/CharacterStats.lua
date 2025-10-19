@@ -199,7 +199,8 @@ function CharacterStats:processGames(games)
 						characterStats.playedVs[playedAgainstCharacter] = {pick = 0, win = 0, loss = 0}
 					end
 					characterStats.playedVs[playedAgainstCharacter].pick = characterStats.playedVs[playedAgainstCharacter].pick + 1
-					characterStats.playedVs[playedAgainstCharacter][sideKey] = characterStats.playedVs[playedAgainstCharacter][sideKey] + 1
+					characterStats.playedVs[playedAgainstCharacter][sideKey] =
+						characterStats.playedVs[playedAgainstCharacter][sideKey] + 1
 				end)
 			end)
 
