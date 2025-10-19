@@ -31,7 +31,6 @@ local CONTENT = {
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			rumours = true,
 			transferPage = 'Player Transfers/' .. DateExt.getYearOf()
 		},
 		boxid = 1509,
