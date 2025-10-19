@@ -358,14 +358,14 @@ MatchGroupUtil.types.MatchGroup = TypeUtil.union(
 )
 
 ---Fetches all match ids of matches that satisfy the supplied condition
----@param props {condition: string|AbstractConditionNode, limit: string|integer?, order: string?}
+---@param props {conditions: string|AbstractConditionNode, limit: string|integer?, order: string?}
 ---@return string[]
 function MatchGroupUtil.fetchMatchIds(props)
 	---@type string[]
 	return Array.map(mw.ext.LiquipediaDB.lpdb('match2', {
 		limit = tonumber(props.limit) or 1000,
 		query = 'match2id',
-		conditions = tostring(props.condition),
+		conditions = tostring(props.conditions),
 		order = props.order
 	}), Operator.property('match2id'))
 end
