@@ -152,12 +152,6 @@ function CharacterStats:processGames(games)
 		end)
 	}
 
-	---@param isWinner boolean
-	---@return 'win'|'loss'
-	local function getSideKey(isWinner)
-		return isWinner and 'win' or 'loss'
-	end
-
 	Array.forEach(games, function (game)
 		local teamsCharacters = {
 			self:getTeamCharacters(game, 1),
@@ -167,6 +161,7 @@ function CharacterStats:processGames(games)
 			local opponentName = Opponent.toName(opponent)
 			local isWinner = game.winner == opponentIndex
 			local side = self:getTeamSide(game, opponentIndex)
+			local sideKey = isWinner and 'win' or 'loss'
 
 			if isWinner then
 				overallData.wins[side] = overallData.wins[side] + 1
@@ -182,9 +177,9 @@ function CharacterStats:processGames(games)
 				characterStats.total.pick = characterStats.total.pick + 1
 				characterStats.playedBy[opponentName].pick = characterStats.playedBy[opponentName].pick + 1
 
-				characterStats.total[getSideKey(isWinner)] = characterStats.total[getSideKey(isWinner)] + 1
-				characterStats.side[side][getSideKey(isWinner)] = characterStats.side[side][getSideKey(isWinner)] + 1
-				characterStats.playedBy[opponentName][getSideKey(isWinner)] = characterStats.playedBy[opponentName][getSideKey(isWinner)] + 1
+				characterStats.total[sideKey] = characterStats.total[sideKey] + 1
+				characterStats.side[side][sideKey] = characterStats.side[side][sideKey] + 1
+				characterStats.playedBy[opponentName][sideKey] = characterStats.playedBy[opponentName][sideKey] + 1
 
 
 				Array.forEach(characters, function (playedWithCharacter, playedWithCharacterIndex)
@@ -193,8 +188,10 @@ function CharacterStats:processGames(games)
 					elseif not characterStats.playedWith[playedWithCharacter] then
 						characterStats.playedWith[playedWithCharacter] = {pick = 0, win = 0, loss = 0}
 					end
-					characterStats.playedWith[playedWithCharacter].pick = characterStats.playedWith[playedWithCharacter].pick + 1
-					characterStats.playedWith[playedWithCharacter][getSideKey(isWinner)] = characterStats.playedWith[playedWithCharacter][getSideKey(isWinner)] + 1
+					characterStats.playedWith[playedWithCharacter].pick =
+						characterStats.playedWith[playedWithCharacter].pick + 1
+					characterStats.playedWith[playedWithCharacter][sideKey] =
+						characterStats.playedWith[playedWithCharacter][sideKey] + 1
 				end)
 
 				Array.forEach(teamsCharacters[3 - opponentIndex], function (playedAgainstCharacter)
@@ -202,7 +199,7 @@ function CharacterStats:processGames(games)
 						characterStats.playedVs[playedAgainstCharacter] = {pick = 0, win = 0, loss = 0}
 					end
 					characterStats.playedVs[playedAgainstCharacter].pick = characterStats.playedVs[playedAgainstCharacter].pick + 1
-					characterStats.playedVs[playedAgainstCharacter][getSideKey(isWinner)] = characterStats.playedVs[playedAgainstCharacter][getSideKey(isWinner)] + 1
+					characterStats.playedVs[playedAgainstCharacter][sideKey] = characterStats.playedVs[playedAgainstCharacter][sideKey] + 1
 				end)
 			end)
 
