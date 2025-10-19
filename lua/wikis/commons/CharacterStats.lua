@@ -91,7 +91,7 @@ function CharacterStats:queryGames(matchIds)
 			}),
 			Opponent.fromMatch2Record
 		)
-		if #matchOpponents > 2 or Array.any(matchOpponents, Opponent.isTbd) then
+		if #matchOpponents > 2 then
 			return
 		end
 		local games = Array.map(
