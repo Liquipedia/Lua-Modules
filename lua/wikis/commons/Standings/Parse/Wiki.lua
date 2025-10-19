@@ -13,7 +13,6 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Namespace = Lua.import('Module:Namespace')
-local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 
