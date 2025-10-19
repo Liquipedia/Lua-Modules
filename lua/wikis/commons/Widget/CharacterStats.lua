@@ -90,7 +90,19 @@ function CharacterStatsWidget:_buildHeaderRow()
 			Array.map(self.props.sides, function (side)
 				return HtmlWidgets.Th{attributes = {colspan = 4}, children = String.upperCaseFirst(side)}
 			end),
-			HtmlWidgets.Th{}
+			self.props.includeBans and {
+				HtmlWidgets.Th{attributes = {colspan = 2}, children = 'Bans'},
+				HtmlWidgets.Th{
+					attributes = {colspan = 2},
+					css = {['white-space'] = 'nowrap'},
+					children = 'Picks & Bans'
+				},
+			} or nil,
+			HtmlWidgets.Th{
+				attributes = {rowspan = 2},
+				classes = {'unsortable'},
+				children = 'Details'
+			}
 		)},
 		HtmlWidgets.Tr{children = WidgetUtil.collect(
 			HtmlWidgets.Th{},
@@ -113,8 +125,7 @@ function CharacterStatsWidget:_buildHeaderRow()
 				HtmlWidgets.Th{children = '%T'},
 				HtmlWidgets.Th{children = '∑'},
 				HtmlWidgets.Th{children = '%T'},
-			} or nil,
-			HtmlWidgets.Th{classes = {'unsortable'}, children = 'Details'}
+			} or nil
 		)}
 	}
 end
