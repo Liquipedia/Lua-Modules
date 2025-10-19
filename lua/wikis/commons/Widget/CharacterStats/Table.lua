@@ -110,7 +110,7 @@ end
 ---@return Widget
 function CharacterStatsTable:_buildCharacterRow(characterData, characterIndex)
 	return HtmlWidgets.Tr{
-		classes = {'dota-stat-row'},
+		classes = {'character-stats-row'},
 		children = WidgetUtil.collect(
 			HtmlWidgets.Td{children = characterIndex},
 			HtmlWidgets.Td{
@@ -160,7 +160,7 @@ function CharacterStatsTable:_buildCharacterRow(characterData, characterIndex)
 						addTextLink = true
 					},
 					children = HtmlWidgets.Div{
-						classes = {'dota-stat-popup-info'},
+						classes = {'character-stats-popup-info'},
 						children = {
 							CharacterStatsTable._buildPlayedByTeamTable(characterData.playedBy),
 							self:_buildPlayedTable('with', characterData.playedWith),

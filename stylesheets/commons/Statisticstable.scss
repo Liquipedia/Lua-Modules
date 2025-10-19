@@ -22,11 +22,11 @@ Template(s): Character statistics table
 Author(s): Inflicted
 *******************************************************************************/
 
-tr.dota-stat-row > td {
+tr.character-stats-row > td {
 	width: 30px;
 }
 
-.dota-stat-popup {
+.character-stats-popup {
 	border: 1px solid #bbbbbb;
 	width: calc( 100% - 1rem );
 	background-color: #ffffff;

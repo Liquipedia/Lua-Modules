@@ -24,7 +24,7 @@ function CharacterStatsDetailsPopup:render()
 		return
 	end
 	return HtmlWidgets.Div{
-		classes = {'dota-stat-popup'},
+		classes = {'character-stats-popup'},
 		css = {['z-index'] = 2},
 		children = WidgetUtil.collect(
 			self:_buildHeader(),
@@ -40,7 +40,7 @@ function CharacterStatsDetailsPopup:_buildHeader()
 		return
 	end
 	return HtmlWidgets.Div{
-		classes = {'dota-stat-popup-header'},
+		classes = {'character-stats-popup-header'},
 		children = self.props.header
 	}
 end

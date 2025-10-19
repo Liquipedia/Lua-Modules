@@ -32,7 +32,7 @@ function CharacterStatsDetailsPopupContainer:render()
 				css = {border = 'none', display = 'contents'},
 				children = Array.map({'show', 'x'}, function (label)
 					return HtmlWidgets.Li{
-						classes = {'dota-stat-popup-button'},
+						classes = {'character-stats-popup-button'},
 						css = {width = (string.len(label) * 7 + 8) .. 'px'},
 						children = HtmlWidgets.Div{
 							css = {
