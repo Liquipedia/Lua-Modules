@@ -25,6 +25,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field includeBans boolean?
 ---@field numGames integer
 ---@field sides string[]
+---@field sideWins table<string, integer>
 
 ---@class CharacterStatsWidget: Widget
 ---@operator call(CharacterStatsWidgetProps): CharacterStatsWidget
@@ -53,7 +54,8 @@ function CharacterStatsWidget:render()
 				self:_buildHeaderRow(),
 				Array.map(data, function (dataEntry, dataIndex)
 					return self:_buildCharacterRow(dataEntry, dataIndex)
-				end)
+				end),
+				self:_buildFooterRow()
 			)
 		}
 	}
@@ -143,6 +145,38 @@ function CharacterStatsWidget:_buildCharacterRow(characterData, characterIndex)
 			HtmlWidgets.Td{children = '-'}
 		)
 	}
+end
+
+---@private
+---@return Widget
+function CharacterStatsWidget:_buildFooterRow()
+	return HtmlWidgets.Tr{children = WidgetUtil.collect(
+		HtmlWidgets.Th{
+			classes = {'sortbottom'},
+			attributes = {colspan = 2}
+		},
+		HtmlWidgets.Th{
+			classes = {'sortbottom'},
+			attributes = {colspan = 5},
+			children = {
+				self.props.numGames,
+				' games played'
+			}
+		},
+		Array.map(self.props.sides, function (side)
+			local sideWin = self.props.sideWins[side]
+			local sideLoss = self.props.numGames - sideWin
+			return HtmlWidgets.Th{
+				classes = {'sortbottom'},
+				attributes = {colspan = 4},
+				children = sideWin .. ' W - ' ..  sideLoss .. ' L (' .. CharacterStatsWidget._calculatePercentage(sideWin, self.props.numGames) .. ')'
+			}
+		end),
+		HtmlWidgets.Th{
+			classes = {'sortbottom'},
+			attributes = {colspan = 5}
+		}
+	)}
 end
 
 ---@param count integer

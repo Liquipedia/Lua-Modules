@@ -140,10 +140,17 @@ function CharacterStats:getSides()
 end
 
 ---@param games CharacterStatsGame[]
----@return CharacterStatistic[]
+---@return {characterData: CharacterStatistic[], overall: {games: integer, wins: table<string, integer>}}
 function CharacterStats:processGames(games)
 	---@type table<string, CharacterStatistic>
 	local stats = {}
+
+	local overallData = {
+		games = #games,
+		wins = Table.map(self:getSides(), function (key, value)
+			return value, 0
+		end)
+	}
 
 	---@param isWinner boolean
 	---@return 'win'|'loss'
@@ -160,6 +167,11 @@ function CharacterStats:processGames(games)
 			local opponentName = Opponent.toName(opponent)
 			local isWinner = game.winner == opponentIndex
 			local side = self:getTeamSide(game, opponentIndex)
+
+			if isWinner then
+				overallData.wins[side] = overallData.wins[side] + 1
+			end
+
 			local characters = teamsCharacters[opponentIndex]
 
 			Array.forEach(characters, function (character, characterIndex)
@@ -201,7 +213,10 @@ function CharacterStats:processGames(games)
 		end)
 	end)
 
-	return Array.reverse(Array.sortBy(Array.extractValues(stats), Operator.property('total.pick')))
+	return {
+		characterData = Array.reverse(Array.sortBy(Array.extractValues(stats), Operator.property('total.pick'))),
+		overall = overallData
+	}
 end
 
 ---@private
