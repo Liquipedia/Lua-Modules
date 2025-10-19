@@ -86,7 +86,10 @@ function CharacterStats:queryGames(matchIds)
 	return Array.flatMap(matchIds, function (matchId)
 		local matchOpponents = Array.map(
 			mw.ext.LiquipediaDB.lpdb('match2opponent', {
-				conditions = tostring(ConditionNode(ColumnName('match2id'), Comparator.eq, matchId)),
+				conditions = tostring(ConditionTree(BooleanOperator.all):add{
+					ConditionNode(ColumnName('match2id'), Comparator.eq, matchId),
+					ConditionNode(ColumnName('type'), Comparator.eq, Opponent.team),
+				}),
 				order = 'match2opponentid asc',
 			}),
 			Opponent.fromMatch2Record
