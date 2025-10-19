@@ -13,6 +13,7 @@ local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
+local Operator = Lua.import('Module:Operator')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -181,8 +182,13 @@ end
 
 ---@param data table<string, CharacterAppearanceStats>
 function CharacterStatsTable._buildPlayedByTeamTable(data)
-	local sortedTeamData = Array.sortBy(Table.entries(data), function (element)
-		return element[2].pick
+	local sortedTeamData = Array.sortBy(Table.entries(data), Operator.property(2), function (a, b)
+		if a.pick ~= b.pick then
+			return a.pick < b.pick
+		elseif a.win ~= b.win then
+			return a.win < b.win
+		end
+		return a.loss < b.loss
 	end)
 	return CharacterStatsTable._buildDetailsTable{
 		title = 'Played by Teams',
@@ -206,8 +212,13 @@ end
 
 ---@param data table<string, CharacterAppearanceStats>
 function CharacterStatsTable:_buildPlayedTable(playedType, data)
-	local sortedCharacterData = Array.sortBy(Table.entries(data), function (element)
-		return element[2].pick
+	local sortedCharacterData = Array.sortBy(Table.entries(data), Operator.property(2), function (a, b)
+		if a.pick ~= b.pick then
+			return a.pick < b.pick
+		elseif a.win ~= b.win then
+			return a.win < b.win
+		end
+		return a.loss < b.loss
 	end)
 	return CharacterStatsTable._buildDetailsTable{
 		title = 'Played ' .. playedType,
