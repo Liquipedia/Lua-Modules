@@ -85,7 +85,7 @@ function MathUtil.round(value, precision)
 end
 
 ---Rounds a number to specified precision, then formats it using the provided format string
----@param props {format: string, value: number, precision: number?}
+---@param props {format: string?, value: number, precision: number?}
 ---@return string
 function MathUtil.formatRounded(props)
 	local precision = props.precision or 0
