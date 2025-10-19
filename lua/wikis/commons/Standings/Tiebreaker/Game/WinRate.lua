@@ -37,7 +37,7 @@ function TiebreakerGameWinRate:display(state, opponent)
 	if games == 0 then
 		return '-'
 	end
-	return string.format('%.2f', MathUtil.round(self:valueOf(state, opponent) * 100, 2)) .. '%'
+	return MathUtil.formatPercentage(self:valueOf(state, opponent), 2)
 end
 
 return TiebreakerGameWinRate

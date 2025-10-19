@@ -32,7 +32,7 @@ end
 ---@param opponent TiebreakerOpponent
 ---@return string
 function TiebreakerMatchWinRate:display(state, opponent)
-	return string.format('%.2f', MathUtil.round(self:valueOf(state, opponent) * 100, 2)) .. '%'
+	return MathUtil.formatPercentage(self:valueOf(state, opponent), 2)
 end
 
 return TiebreakerMatchWinRate
