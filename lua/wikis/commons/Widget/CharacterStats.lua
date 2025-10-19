@@ -8,14 +8,26 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local Character = Lua.import('Module:Character')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
+local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class CharacterStatsWidgetProps
@@ -42,23 +54,30 @@ function CharacterStatsWidget:render()
 	if Logic.isEmpty(data) then
 		return
 	end
-	return HtmlWidgets.Div{
-		classes = {'table-responsive'},
-		children = HtmlWidgets.Table{
-			classes = {'wikitable', 'table-striped', 'sortable'},
-			css = {
-				margin = 0,
-				['text-align'] = 'center',
-			},
-			children = WidgetUtil.collect(
-				self:_buildHeaderRow(),
-				Array.map(data, function (dataEntry, dataIndex)
-					return self:_buildCharacterRow(dataEntry, dataIndex)
-				end),
-				self:_buildFooterRow()
-			)
+	return WidgetUtil.collect(
+		HtmlWidgets.Div{
+			classes = {'table-responsive'},
+			children = HtmlWidgets.Table{
+				classes = {'wikitable', 'table-striped', 'sortable'},
+				css = {
+					margin = 0,
+					['text-align'] = 'center',
+				},
+				children = WidgetUtil.collect(
+					self:_buildHeaderRow(),
+					Array.map(data, function (dataEntry, dataIndex)
+						return self:_buildCharacterRow(dataEntry, dataIndex)
+					end),
+					self:_buildFooterRow()
+				)
+			}
+		},
+		self:_displayUnpickedCharacters(),
+		self.props.includeBans and {
+			self:_displayUnbannedCharacters(),
+			self:_displayUnpickedAndUnbannedCharacters(),
 		}
-	}
+	)
 end
 
 ---@private
@@ -177,6 +196,73 @@ function CharacterStatsWidget:_buildFooterRow()
 			attributes = {colspan = 5}
 		}
 	)}
+end
+
+function CharacterStatsWidget:_displayUnpickedCharacters()
+	---@type string[]
+	local playedCharacters = Array.map(
+		Array.filter(self.props.data, function (dataEntry)
+			return dataEntry.total.pick > 0
+		end),
+		Operator.property('name')
+	)
+
+	return self:_buildUnchosenCharactersTable('Unpicked', playedCharacters)
+end
+
+function CharacterStatsWidget:_displayUnbannedCharacters()
+	---@type string[]
+	local bannedCharacters = Array.map(
+		Array.filter(self.props.data, function (dataEntry)
+			return dataEntry.bans > 0
+		end),
+		Operator.property('name')
+	)
+
+	return self:_buildUnchosenCharactersTable('Unpicked', bannedCharacters)
+end
+
+function CharacterStatsWidget:_displayUnpickedAndUnbannedCharacters()
+	---@type string[]
+	local playedCharacters = Array.map(
+		Array.filter(self.props.data, function (dataEntry)
+			return dataEntry.total.pick > 0 or dataEntry.bans > 0
+		end),
+		Operator.property('name')
+	)
+
+	return self:_buildUnchosenCharactersTable('Unpicked & Unbanned', playedCharacters)
+end
+
+---@private
+---@param titlePrefix string
+---@param excludedCharacters string[]
+function CharacterStatsWidget:_buildUnchosenCharactersTable(titlePrefix, excludedCharacters)
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('date'), Comparator.le, DateExt.getContextualDateOrNow()),
+		ConditionUtil.noneOf(ColumnName('name'), excludedCharacters)
+	}
+	local characters = Character.getAllCharacters(
+		'(' .. tostring(conditions) .. ')'
+	)
+	return HtmlWidgets.Table{
+		classes = {'wikitable'},
+		children = {
+			HtmlWidgets.Tr{children = HtmlWidgets.Th{
+				children = {titlePrefix .. ' ' .. self.props.characterType, ' ', HtmlWidgets.I{children = {'(', #characters, ')'}}
+			}}},
+			HtmlWidgets.Tr{children = HtmlWidgets.Td{
+				children = Array.map(characters, function (character)
+					return IconImage{
+						imageLight = character.iconLight,
+						imageDark = character.iconDark,
+						link = character.pageName,
+						size = self.props.characterSize,
+					}
+				end)
+			}}
+		}
+	}
 end
 
 ---@param count integer
