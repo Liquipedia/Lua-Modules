@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
@@ -109,31 +110,31 @@ function CharacterStats:queryGames(matchIds)
 	end)
 end
 
----@protected
 ---@param game CharacterStatsGame
 ---@param opponentIndex integer
 ---@return string[]
 function CharacterStats:getTeamCharacters(game, opponentIndex)
-	error('CharacterStats:getTeamCharacters() cannot be called directly and must be overridden.')
+	return Array.filter(Array.mapIndexes(function (characterIndex)
+		return game.extradata['team' .. opponentIndex .. 'champion' .. characterIndex]
+	end), String.isNotEmpty)
 end
 
----@protected
 ---@param game CharacterStatsGame
 ---@param opponentIndex integer
 ---@return string[]
 function CharacterStats:getTeamBans(game, opponentIndex)
-	error('CharacterStats:getTeamBans() cannot be called directly and must be overridden.')
+	return Array.filter(Array.mapIndexes(function (characterIndex)
+		return String.nilIfEmpty(game.extradata['team' .. opponentIndex .. 'ban' .. characterIndex])
+	end), String.isNotEmpty)
 end
 
----@protected
 ---@param game CharacterStatsGame
 ---@param opponentIndex integer
----@return string
+---@return string?
 function CharacterStats:getTeamSide(game, opponentIndex)
-	error('CharacterStats:getTeamSide() cannot be called directly and must be overridden.')
+	return String.nilIfEmpty(game.extradata['team' .. opponentIndex .. 'side'])
 end
 
----@protected
 ---@return string[]
 function CharacterStats:getSides()
 	error('CharacterStats:getSides() cannot be called directly and must be overridden.')
