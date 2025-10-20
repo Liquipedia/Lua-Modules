@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
 local BaseCharacterStats = Lua.import('Module:CharacterStats')
 local Class = Lua.import('Module:Class')
 
@@ -35,7 +36,9 @@ function LoLCharacterStats.run(frame)
 	return CharacterStatsWidget{
 		characterType = 'Champion',
 		data = processedData.characterData,
-		includeBans = true,
+		includeBans = Array.any(processedData.characterData, function (data)
+			return data.bans > 0
+		end),
 		numGames = #games,
 		sides = stats:getSides(),
 		sideWins = processedData.overall.wins,
