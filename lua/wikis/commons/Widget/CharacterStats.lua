@@ -67,6 +67,8 @@ function CharacterStatsWidget:render()
 	)
 end
 
+---@private
+---@return Widget
 function CharacterStatsWidget:_displayUnpickedCharacters()
 	---@type string[]
 	local playedCharacters = Array.map(
@@ -79,6 +81,8 @@ function CharacterStatsWidget:_displayUnpickedCharacters()
 	return self:_buildUnchosenCharactersTable('Unpicked', playedCharacters)
 end
 
+---@private
+---@return Widget
 function CharacterStatsWidget:_displayUnbannedCharacters()
 	---@type string[]
 	local bannedCharacters = Array.map(
@@ -91,6 +95,8 @@ function CharacterStatsWidget:_displayUnbannedCharacters()
 	return self:_buildUnchosenCharactersTable('Unpicked', bannedCharacters)
 end
 
+---@private
+---@return Widget
 function CharacterStatsWidget:_displayUnpickedAndUnbannedCharacters()
 	---@type string[]
 	local playedCharacters = Array.map(
@@ -106,6 +112,7 @@ end
 ---@private
 ---@param titlePrefix string
 ---@param excludedCharacters string[]
+---@return Widget
 function CharacterStatsWidget:_buildUnchosenCharactersTable(titlePrefix, excludedCharacters)
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('date'), Comparator.le, DateExt.getContextualDateOrNow()),
