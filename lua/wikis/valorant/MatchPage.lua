@@ -412,9 +412,7 @@ function MatchPage:_renderPlayerPerformance(player)
 		if not value then
 			return nil
 		end
-		numberOfDecimals = numberOfDecimals or 0
-		local format = '%.'.. numberOfDecimals ..'f'
-		return string.format(format, MathUtil.round(value, numberOfDecimals))
+		return MathUtil.formatRounded{value = value, precision = numberOfDecimals}
 	end
 
 	local playerDisplay
