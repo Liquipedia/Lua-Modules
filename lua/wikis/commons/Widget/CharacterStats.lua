@@ -68,7 +68,7 @@ function CharacterStatsWidget:render()
 end
 
 ---@private
----@return Widget
+---@return Widget?
 function CharacterStatsWidget:_displayUnpickedCharacters()
 	---@type string[]
 	local playedCharacters = Array.map(
@@ -82,7 +82,7 @@ function CharacterStatsWidget:_displayUnpickedCharacters()
 end
 
 ---@private
----@return Widget
+---@return Widget?
 function CharacterStatsWidget:_displayUnbannedCharacters()
 	---@type string[]
 	local bannedCharacters = Array.map(
@@ -96,7 +96,7 @@ function CharacterStatsWidget:_displayUnbannedCharacters()
 end
 
 ---@private
----@return Widget
+---@return Widget?
 function CharacterStatsWidget:_displayUnpickedAndUnbannedCharacters()
 	---@type string[]
 	local playedCharacters = Array.map(
@@ -112,7 +112,7 @@ end
 ---@private
 ---@param titlePrefix string
 ---@param excludedCharacters string[]
----@return Widget
+---@return Widget?
 function CharacterStatsWidget:_buildUnchosenCharactersTable(titlePrefix, excludedCharacters)
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('date'), Comparator.le, DateExt.getContextualDateOrNow()),
@@ -121,6 +121,9 @@ function CharacterStatsWidget:_buildUnchosenCharactersTable(titlePrefix, exclude
 	local characters = Character.getAllCharacters(
 		'(' .. tostring(conditions) .. ')'
 	)
+	if Logic.isEmpty(characters) then
+		return
+	end
 	return HtmlWidgets.Table{
 		classes = {'wikitable'},
 		children = {
