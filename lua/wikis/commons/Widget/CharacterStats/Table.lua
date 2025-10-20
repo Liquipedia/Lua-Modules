@@ -324,7 +324,7 @@ function CharacterStatsTable._calculatePercentage(count, total)
 	if total == 0 then
 		return '-'
 	end
-	return string.format('%.2f', MathUtil.round(count / total * 100, 2)) .. '%'
+	return MathUtil.formatPercentage(count / total, 2)
 end
 
 return CharacterStatsTable
