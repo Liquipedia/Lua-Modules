@@ -14,7 +14,7 @@ local CONTENT = {
 	},
 	latestUploads = {
 		heading = 'Latest Uploads',
-		body = '{{Special:NewFiles|limit=18}}',
+		body = '{{Special:NewFiles|limit=18}}For all latest uploads click [[Special:NewFiles|here]]',
 		padding = true,
 		boxid = 1556,
 	},
