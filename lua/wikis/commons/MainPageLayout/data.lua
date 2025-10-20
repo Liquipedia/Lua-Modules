@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Widgets = Lua.import('Module:Widget/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
