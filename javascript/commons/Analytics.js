@@ -193,7 +193,7 @@ liquipedia.analytics = {
 
 				return {
 					position: liquipedia.analytics.findLinkPosition( match ),
-					participants: participants,
+					participants,
 					type: containerType
 				};
 			}
