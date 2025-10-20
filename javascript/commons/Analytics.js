@@ -100,12 +100,12 @@ liquipedia.analytics = {
 
 		// eslint-disable-next-line no-bitwise
 		if ( position & Node.DOCUMENT_POSITION_FOLLOWING ) {
-			return 'below infobox';
+			return 'above infobox';
 		}
 
 		// eslint-disable-next-line no-bitwise
 		if ( position & Node.DOCUMENT_POSITION_PRECEDING ) {
-			return 'above infobox';
+			return 'below infobox';
 		}
 
 		return null;
