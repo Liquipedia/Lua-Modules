@@ -41,14 +41,13 @@ function StandingsWidget:render()
 		}
 	end
 
-	if standingsWidget then
-		return AnalyticsWidget{
-			analyticsName = StringUtils.upperCaseFirst(standings.type) .. ' standings table',
-			children = standingsWidget
-		}
-	end
-
 	assert(standingsWidget, 'This Standings Type not yet implemented')
+
+	return AnalyticsWidget{
+		analyticsName = StringUtils.upperCaseFirst(standings.type) .. ' standings table',
+		children = standingsWidget
+	}
+
 end
 
 return StandingsWidget
