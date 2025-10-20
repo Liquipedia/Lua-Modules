@@ -90,6 +90,27 @@ liquipedia.analytics = {
 		return clone.textContent.trim();
 	},
 
+	getNavboxPosition: function( navboxElement ) {
+		const infobox = document.querySelector( '.fo-nttax-infobox-wrapper' );
+		if ( !infobox ) {
+			return 'above infobox';
+		}
+
+		const position = navboxElement.compareDocumentPosition( infobox );
+
+		// eslint-disable-next-line no-bitwise
+		if ( position & Node.DOCUMENT_POSITION_FOLLOWING ) {
+			return 'below infobox';
+		}
+
+		// eslint-disable-next-line no-bitwise
+		if ( position & Node.DOCUMENT_POSITION_PRECEDING ) {
+			return 'above infobox';
+		}
+
+		return null;
+	},
+
 	setupWikiMenuLinkClickAnalytics: function() {
 		liquipedia.analytics.clickTrackers.push( {
 			selector: '[data-wiki-menu="link"]',
@@ -108,11 +129,25 @@ liquipedia.analytics = {
 		liquipedia.analytics.clickTrackers.push( {
 			selector: 'a',
 			trackerName: LINK_CLICKED,
-			propertiesBuilder: ( link ) => ( {
-				title: link.innerText,
-				position: liquipedia.analytics.findLinkPosition( link ),
-				destination: link.href
-			} )
+			propertiesBuilder: ( link ) => {
+				const properties = {
+					title: link.innerText,
+					position: liquipedia.analytics.findLinkPosition( link ),
+					destination: link.href
+				};
+
+				if ( properties.position === 'Navbox' ) {
+					const navboxElement = link.closest( '.navbox' );
+					if ( navboxElement ) {
+						const navboxPosition = liquipedia.analytics.getNavboxPosition( navboxElement );
+						if ( navboxPosition ) {
+							properties[ 'navbox position' ] = navboxPosition;
+						}
+					}
+				}
+
+				return properties;
+			}
 		} );
 	},
 
@@ -120,10 +155,24 @@ liquipedia.analytics = {
 		liquipedia.analytics.clickTrackers.push( {
 			selector: '.btn:not(a *), button:not(a *)',
 			trackerName: BUTTON_CLICKED,
-			propertiesBuilder: ( link ) => ( {
-				title: link.innerText,
-				position: liquipedia.analytics.findLinkPosition( link )
-			} )
+			propertiesBuilder: ( button ) => {
+				const properties = {
+					title: button.innerText,
+					position: liquipedia.analytics.findLinkPosition( button )
+				};
+
+				if ( properties.position === 'Navbox' ) {
+					const navboxElement = button.closest( '.navbox' );
+					if ( navboxElement ) {
+						const navboxPosition = liquipedia.analytics.getNavboxPosition( navboxElement );
+						if ( navboxPosition ) {
+							properties[ 'navbox position' ] = navboxPosition;
+						}
+					}
+				}
+
+				return properties;
+			}
 		} );
 	},
 
