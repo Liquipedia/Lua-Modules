@@ -189,6 +189,7 @@ local MatchSummary = Class.new()
 MatchSummary.Footer = Footer
 MatchSummary.Match = Match
 
+--- TODO: Instead of attaching data-analytics-name here, use Analytics Widget
 ---@param width string?
 ---@return MatchSummary
 function MatchSummary:init(width)
