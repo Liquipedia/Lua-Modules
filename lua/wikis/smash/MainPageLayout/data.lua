@@ -7,6 +7,8 @@
 
 local Lua = require('Module:Lua')
 
+local DateExt = Lua.import('Module:Date/Ext')
+
 local TournamentsList = Lua.import('Module:TournamentsList')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -30,7 +32,9 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{limit = 10},
+		body = TransfersList{
+			transferPage = 'Player Transfers/' .. DateExt.getYearOf()
+		},
 		boxid = 1509,
 	},
 	thisDay = {
