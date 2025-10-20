@@ -15,6 +15,7 @@ local Namespace = Lua.import('Module:Namespace')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
+local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local NavBoxTitle = Lua.import('Module:Widget/NavBox/Title')
 local Widget = Lua.import('Module:Widget')
@@ -46,26 +47,35 @@ function NavBox:render()
 	assert(props.child1, 'No children inputted')
 
 	local shouldCollapse = self:_determineCollapsedState(Table.extract(props, 'collapsed'))
+	local navboxPosition = shouldCollapse and 'below infobox' or 'above infobox'
 
 	local title = NavBoxTitle(Table.merge(props, {isWrapper = true}))
 	-- have to extract so the child doesn't add the header too ...
 	local titleInput = Table.extract(props, 'title')
 	assert(titleInput, 'Missing "|title="')
 
-	return Collapsible{
-		attributes = {
-			['aria-labelledby'] = titleInput:gsub(' ', '_'),
-			role = 'navigation',
-			['data-nosnippet'] = 0,
+	return AnalyticsWidget{
+		analyticsName = 'Navbox',
+		analyticsProperties = {
+			['navbox-position'] = navboxPosition,
 		},
-		classes = {
-			'navigation-not-searchable',
-			'navbox',
-			Logic.readBool(props.hideonmobile) and 'mobile-hide' or nil
-		},
-		shouldCollapse = shouldCollapse,
-		titleWidget = title,
-		children = {NavBoxChild(props)},
+		children = {
+			Collapsible{
+				attributes = {
+					['aria-labelledby'] = titleInput:gsub(' ', '_'),
+					role = 'navigation',
+					['data-nosnippet'] = 0,
+				},
+				classes = {
+					'navigation-not-searchable',
+					'navbox',
+					Logic.readBool(props.hideonmobile) and 'mobile-hide' or nil
+				},
+				shouldCollapse = shouldCollapse,
+				titleWidget = title,
+				children = {NavBoxChild(props)},
+			}
+		}
 	}
 end
 
