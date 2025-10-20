@@ -130,7 +130,7 @@ end
 ---@return string[]
 function CharacterStats:getTeamBans(game, opponentIndex)
 	return Array.filter(Array.mapIndexes(function (characterIndex)
-		return String.nilIfEmpty(game.extradata['team' .. opponentIndex .. 'ban' .. characterIndex])
+		return game.extradata['team' .. opponentIndex .. 'ban' .. characterIndex]
 	end), String.isNotEmpty)
 end
 
