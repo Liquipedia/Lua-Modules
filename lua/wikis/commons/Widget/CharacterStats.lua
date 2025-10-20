@@ -24,6 +24,7 @@ local ConditionUtil = Condition.Util
 
 local Widget = Lua.import('Module:Widget')
 local CharacterStatsTable = Lua.import('Module:Widget/CharacterStats/Table')
+local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -124,8 +125,7 @@ function CharacterStatsWidget:_buildUnchosenCharactersTable(titlePrefix, exclude
 	if Logic.isEmpty(characters) then
 		return
 	end
-	return HtmlWidgets.Table{
-		classes = {'wikitable'},
+	return DataTable{
 		children = {
 			HtmlWidgets.Tr{children = HtmlWidgets.Th{
 				children = {titlePrefix .. ' ' .. self.props.characterType, ' ', HtmlWidgets.I{children = {'(', #characters, ')'}}
