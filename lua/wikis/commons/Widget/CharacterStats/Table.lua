@@ -243,34 +243,31 @@ end
 ---@param props table
 ---@return Widget
 function CharacterStatsTable._buildDetailsTable(props)
-	return HtmlWidgets.Div{
-		css = {flex = 'auto'},
-		children = HtmlWidgets.Table{
-			classes = {'wikitable', 'wikitable-striped', 'sortable'},
-			css = {width = '100%'},
-			children = WidgetUtil.collect(
-				Logic.isNotEmpty(props.title) and HtmlWidgets.Tr{
-					children = HtmlWidgets.Th{
-						attributes = {colspan = 6},
-						children = props.title
-					}
-				} or nil,
-				HtmlWidgets.Tr{children = {
-					HtmlWidgets.Th{},
-					HtmlWidgets.Th{children = props.entryType},
-					HtmlWidgets.Th{children = '∑'},
-					HtmlWidgets.Th{children = 'W'},
-					HtmlWidgets.Th{children = 'L'},
-					HtmlWidgets.Th{children = 'WR'}
-				}},
-				Array.map(props.entries, function (entry)
-					return HtmlWidgets.Tr{children = Array.map(entry, function (data)
-						return HtmlWidgets.Td{children = data}
-					end)}
-				end)
-			)
-		}
-	}
+	return HtmlWidgets.Div{children = HtmlWidgets.Table{
+		classes = {'wikitable', 'wikitable-striped', 'sortable'},
+		css = {width = '100%'},
+		children = WidgetUtil.collect(
+			Logic.isNotEmpty(props.title) and HtmlWidgets.Tr{
+				children = HtmlWidgets.Th{
+					attributes = {colspan = 6},
+					children = props.title
+				}
+			} or nil,
+			HtmlWidgets.Tr{children = {
+				HtmlWidgets.Th{},
+				HtmlWidgets.Th{children = props.entryType},
+				HtmlWidgets.Th{children = '∑'},
+				HtmlWidgets.Th{children = 'W'},
+				HtmlWidgets.Th{children = 'L'},
+				HtmlWidgets.Th{children = 'WR'}
+			}},
+			Array.map(props.entries, function (entry)
+				return HtmlWidgets.Tr{children = Array.map(entry, function (data)
+					return HtmlWidgets.Td{children = data}
+				end)}
+			end)
+		)
+	}}
 end
 
 ---@private
