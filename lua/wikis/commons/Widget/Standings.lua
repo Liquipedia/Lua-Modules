@@ -48,7 +48,7 @@ function StandingsWidget:render()
 		}
 	end
 
-	error('This Standings Type not yet implemented')
+	assert(standingsWidget, 'This Standings Type not yet implemented')
 end
 
 return StandingsWidget
