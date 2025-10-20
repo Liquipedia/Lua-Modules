@@ -47,7 +47,7 @@ function NavBox:render()
 	assert(props.child1, 'No children inputted')
 
 	local shouldCollapse = self:_determineCollapsedState(Table.extract(props, 'collapsed'))
-	local navboxPosition = shouldCollapse and 'below infobox' or 'above infobox'
+	local navboxPosition = shouldCollapse and 'above infobox' or 'below infobox'
 
 	local title = NavBoxTitle(Table.merge(props, {isWrapper = true}))
 	-- have to extract so the child doesn't add the header too ...
