@@ -90,49 +90,61 @@ liquipedia.analytics = {
 		return clone.textContent.trim();
 	},
 
-	addInfoboxProperties: function( element, properties ) {
-		const analyticsElement = element.closest( '[data-analytics-name="Infobox"]' );
-		if ( analyticsElement ) {
-			properties[ 'infobox type' ] = analyticsElement.dataset.analyticsInfoboxType || null;
+	// Converts a camelCase dataset key into a human-readable property name like
+	// 'analyticsInfoboxType' into 'Infobox type'.
+	formatAnalyticsKey: function( key ) {
+		const baseName = key.replace( /^analytics/, '' );
+		const withSpaces = baseName.replace( /([A-Z])/g, ' $1' );
+		const trimmed = withSpaces.trim();
 
-			const parentDiv = element.parentElement;
-			if ( parentDiv ) {
-				const previousSibling = parentDiv.previousElementSibling;
-				if ( previousSibling && previousSibling.classList.contains( 'infobox-description' ) ) {
-					properties[ 'infobox section' ] = previousSibling.innerText.trim();
-				} else {
-					const allHeaders = analyticsElement.querySelectorAll( '.infobox-header' );
-					let closestHeader = null;
+		if ( !trimmed ) {
+			return '';
+		}
 
-					for ( let i = allHeaders.length - 1; i >= 0; i-- ) {
-						const header = allHeaders[ i ];
-						// eslint-disable-next-line no-bitwise
-						if ( header.compareDocumentPosition( element ) & Node.DOCUMENT_POSITION_FOLLOWING ) {
-							closestHeader = header;
-							break;
-						}
+		const lowercased = trimmed.toLowerCase();
+		return lowercased.charAt( 0 ).toUpperCase() + lowercased.slice( 1 );
+	},
+
+	addInfoboxCustomProperties: function ( element, properties, analyticsElement ) {
+		const parentDiv = element.parentElement;
+		if ( parentDiv ) {
+			const previousSibling = parentDiv.previousElementSibling;
+			if ( previousSibling && previousSibling.classList.contains( 'infobox-description' ) ) {
+				properties[ 'infobox section' ] = previousSibling.innerText.trim();
+			} else {
+				const allHeaders = analyticsElement.querySelectorAll( '.infobox-header' );
+				let closestHeader = null;
+
+				for ( let i = allHeaders.length - 1; i >= 0; i-- ) {
+					const header = allHeaders[ i ];
+					// eslint-disable-next-line no-bitwise
+					if ( header.compareDocumentPosition( element ) & Node.DOCUMENT_POSITION_FOLLOWING ) {
+						closestHeader = header;
+						break;
 					}
+				}
 
-					if ( closestHeader ) {
-						properties[ 'infobox section' ] = closestHeader.innerText.trim();
-					}
+				if ( closestHeader ) {
+					properties[ 'infobox section' ] = closestHeader.innerText.trim();
 				}
 			}
 		}
 	},
 
-	setupWikiMenuLinkClickAnalytics: function() {
-		liquipedia.analytics.clickTrackers.push( {
-			selector: '[data-wiki-menu="link"]',
-			trackerName: WIKI_SWITCHED,
-			propertiesBuilder: ( wikiMenuLink ) => ( {
-				wiki: wikiMenuLink.closest( '[data-wiki-id]' ).dataset.wikiId,
-				position: 'wiki menu',
-				destination: wikiMenuLink.href,
-				'trending page': false,
-				'trending position': null
-			} )
-		} );
+	addCustomProperties: function( element, properties ) {
+		const analyticsElement = element.closest( '[data-analytics-name]' );
+		if ( analyticsElement ) {
+			Object.entries( analyticsElement.dataset )
+				.filter( ( [ key ] ) => key.startsWith( 'analytics' ) && key !== 'analyticsName' )
+				.forEach( ( [ key, value ] ) => {
+					const propertyName = liquipedia.analytics.formatAnalyticsKey( key );
+					properties[ propertyName ] = value || null;
+				} );
+
+			if ( analyticsElement.dataset.analyticsName === 'Infobox' ) {
+				liquipedia.analytics.addInfoboxCustomProperties( element, properties, analyticsElement );
+			}
+		}
 	},
 
 	setupLinkClickAnalytics: function() {
@@ -146,9 +158,7 @@ liquipedia.analytics = {
 					destination: link.href
 				};
 
-				if ( properties.position === 'Infobox' ) {
-					liquipedia.analytics.addInfoboxProperties( link, properties );
-				}
+				liquipedia.analytics.addCustomProperties( link, properties );
 
 				return properties;
 			}
@@ -162,6 +172,20 @@ liquipedia.analytics = {
 			propertiesBuilder: ( link ) => ( {
 				title: link.innerText,
 				position: liquipedia.analytics.findLinkPosition( link )
+			} )
+		} );
+	},
+
+	setupWikiMenuLinkClickAnalytics: function() {
+		liquipedia.analytics.clickTrackers.push( {
+			selector: '[data-wiki-menu="link"]',
+			trackerName: WIKI_SWITCHED,
+			propertiesBuilder: ( wikiMenuLink ) => ( {
+				wiki: wikiMenuLink.closest( '[data-wiki-id]' ).dataset.wikiId,
+				position: 'wiki menu',
+				destination: wikiMenuLink.href,
+				'trending page': false,
+				'trending position': null
 			} )
 		} );
 	},
