@@ -292,9 +292,9 @@ function League:_tournamentPhaseCategory()
 		FINISHED = 'Finished Tournaments'
 	}
 
-	return phaseMapping[TournamentService.calculatePhase(TournamentService.tournamentFromRecord(
+	return phaseMapping[TournamentService.tournamentFromRecord(
 		self.lpdbData
-	))]
+	).phase]
 end
 
 ---@param args table
