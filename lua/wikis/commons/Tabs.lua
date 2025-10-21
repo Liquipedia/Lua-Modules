@@ -33,7 +33,7 @@ function Tabs.static(args)
 	Tabs._setThis(tabArgs)
 
 	return AnalyticsWidgets{
-		analyticsName = 'navigation tab',
+		analyticsName = 'Navigation tab',
 		children = HtmlWidgets.Fragment{children = {
 			HtmlWidgets.Div{
 				classes = {'tabs-static'},
