@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local String = Lua.import('Module:StringUtils')
 local Variables = Lua.import('Module:Variables')
 
 local Widget = Lua.import('Module:Widget')
@@ -54,14 +53,9 @@ function Infobox:render()
 		}
 	}
 
-	local modulePath = mw.getCurrentFrame():getArgument('module'):expand()
-	if modulePath and String.startsWith(modulePath, 'Infobox/') then
-		local fullType = modulePath:sub(9)
-		local parts = String.split(fullType, '/')
-		local infoboxType = parts[1]
-
+	if self.props.infoboxType then
 		analyticsProps.analyticsProperties = {
-			['infobox-type'] = infoboxType
+			['infobox-type'] = self.props.infoboxType
 		}
 	end
 
