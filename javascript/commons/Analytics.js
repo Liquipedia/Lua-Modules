@@ -155,24 +155,10 @@ liquipedia.analytics = {
 		liquipedia.analytics.clickTrackers.push( {
 			selector: '.btn:not(a *), button:not(a *)',
 			trackerName: BUTTON_CLICKED,
-			propertiesBuilder: ( button ) => {
-				const properties = {
-					title: button.innerText,
-					position: liquipedia.analytics.findLinkPosition( button )
-				};
-
-				if ( properties.position === 'Navbox' ) {
-					const navboxElement = button.closest( '.navbox' );
-					if ( navboxElement ) {
-						const navboxPosition = liquipedia.analytics.getNavboxPosition( navboxElement );
-						if ( navboxPosition ) {
-							properties[ 'navbox position' ] = navboxPosition;
-						}
-					}
-				}
-
-				return properties;
-			}
+			propertiesBuilder: ( link ) => ( {
+				title: link.innerText,
+				position: liquipedia.analytics.findLinkPosition( link )
+			} )
 		} );
 	},
 
