@@ -41,7 +41,7 @@ function Tabs.static(args)
 				children = HtmlWidgets.Ul{
 					classes = {'nav', 'nav-tabs', 'navigation-not-searchable', 'tabs', 'tabs' .. tabCount},
 					attributes = {['data-nosnippet'] = ''},
-					children = Array.map(args.tabArgs, function (tab)
+					children = Array.map(tabArgs, function (tab)
 						--if tab.name is unset tab.link is set as per `Tabs._readArguments`
 						local name = tab.name or Tabs._getDisplayNameFromLink(tab.link --[[@as string]])
 						local text = tab.link and Page.makeInternalLink({}, name, tab.link) or tab.name
@@ -54,7 +54,7 @@ function Tabs.static(args)
 			},
 			HtmlWidgets.Fragment{children =
 				Array.map(Array.filter(tabArgs, function (tab)
-					return tab.this ~- nil
+					return tab.this ~= nil
 				end), Operator.property('tabs'))
 			}
 		}}
