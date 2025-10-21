@@ -178,8 +178,8 @@ function League:createInfobox()
 	self:bottom(self:createBottomContent())
 
 	if self:shouldStore(args) then
-		self:categories(unpack(self:_getCategories(args)))
 		self:_setLpdbData(args, self.links)
+		self:categories(unpack(self:_getCategories(args)))
 		self:_setSeoTags(args)
 	end
 
@@ -286,26 +286,15 @@ function League:customParseArguments(args)
 end
 
 function League:_tournamentPhaseCategory()
-	local startTimestamp = TournamentService.parseDateRecord(self.data.startDate or self.data.endDate)
-	local endTimestamp = TournamentService.parseDateRecord(self.data.endDate)
+	local phaseMapping = {
+		ONGOING = 'Live Tournaments',
+		UPCOMING = 'Upcoming Tournaments',
+		FINISHED = 'Finished Tournaments'
+	}
 
-	if self.data.status == 'finished' then
-		return 'Finished Tournaments'
-	end
-	if not startTimestamp then
-		return 'Upcoming Tournaments'
-	end
-	if DateExt.getCurrentTimestamp() < startTimestamp.timestamp then
-		return 'Upcoming Tournaments'
-	end
-	if not endTimestamp then
-		return 'Live Tournaments'
-	end
-	local oneDayInSeconds = 24 * 60 * 60
-	if DateExt.getCurrentTimestamp() < (endTimestamp.timestamp + oneDayInSeconds) then
-		return 'Live Tournaments'
-	end
-	return 'Finished Tournaments'
+	return phaseMapping[TournamentService.calculatePhase(TournamentService.tournamentFromRecord(
+		self.lpdbData
+	))]
 end
 
 ---@param args table
@@ -515,6 +504,7 @@ function League:_setLpdbData(args, links)
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, Json.stringifySubTables(lpdbData))
+	self.lpdbData = lpdbData
 end
 
 ---@param args table
