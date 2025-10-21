@@ -34,7 +34,7 @@ function Tabs.static(args)
 
 	return AnalyticsWidgets{
 		analyticsName = 'Navigation tab',
-		children = HtmlWidgets.Fragment{children = {
+		children = {
 			HtmlWidgets.Div{
 				classes = {'tabs-static'},
 				attributes = {['data-nosnippet'] = ''},
@@ -57,7 +57,7 @@ function Tabs.static(args)
 					return tab.this ~= nil
 				end), Operator.property('tabs'))
 			}
-		}}
+		}
 	}
 end
 
