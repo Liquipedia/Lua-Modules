@@ -90,6 +90,13 @@ liquipedia.analytics = {
 		return clone.textContent.trim();
 	},
 
+	addInfoboxTypeProperty: function( element, properties ) {
+		const analyticsElement = element.closest( '[data-analytics-name="Infobox"]' );
+		if ( analyticsElement ) {
+			properties[ 'infobox type' ] = analyticsElement.dataset.analyticsInfoboxType || null;
+		}
+	},
+
 	setupWikiMenuLinkClickAnalytics: function() {
 		liquipedia.analytics.clickTrackers.push( {
 			selector: '[data-wiki-menu="link"]',
@@ -108,11 +115,15 @@ liquipedia.analytics = {
 		liquipedia.analytics.clickTrackers.push( {
 			selector: 'a',
 			trackerName: LINK_CLICKED,
-			propertiesBuilder: ( link ) => ( {
-				title: link.innerText,
-				position: liquipedia.analytics.findLinkPosition( link ),
-				destination: link.href
-			} )
+			propertiesBuilder: ( link ) => {
+				const properties = {
+					title: link.innerText,
+					position: liquipedia.analytics.findLinkPosition( link ),
+					destination: link.href
+				};
+				liquipedia.analytics.addInfoboxTypeProperty( link, properties );
+				return properties;
+			}
 		} );
 	},
 
