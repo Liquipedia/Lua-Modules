@@ -1236,7 +1236,7 @@ end
 ---@param match table
 ---@param opponents MGIParsedOpponent[]
 ---@param Parser MapParserInterface
----@return table
+---@return table[]
 function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 	local maps = {}
 	local subGroup = 0
@@ -1470,7 +1470,7 @@ end
 ---@param opponents MGIParsedOpponent[]
 ---@param scoreSettings table
 ---@param Parser FfaMapParserInterface
----@return table
+---@return table[]
 function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, Parser)
 	local maps = {}
 	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
