@@ -71,6 +71,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	Table.mergeInto(lpdbData.extradata, {
 		seriesnumber = CustomPrizePool._seriesNumber(),
+		mod = Variables.varDefault('tournament_mod'),
 	})
 
 	lpdbData.tournament = _tournament_name

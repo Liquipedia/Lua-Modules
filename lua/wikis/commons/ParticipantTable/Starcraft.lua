@@ -154,6 +154,7 @@ function StarcraftParticipantTable:adjustLpdbData(lpdbData, entry, config)
 
 	lpdbData.extradata.seriesnumber = seriesNumber and string.format('%05d', seriesNumber) or nil
 	lpdbData.extradata.isqualified = tostring(isQualified)
+	lpdbData.extradata.mod = Variables.varDefault('tournament_mod')
 
 	lpdbData.qualified = isQualified and 1 or nil
 end
