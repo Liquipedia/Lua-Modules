@@ -90,39 +90,42 @@ liquipedia.analytics = {
 		return clone.textContent.trim();
 	},
 
-	getNavboxPosition: function( navboxElement ) {
+	addNavboxCustomProperties: function( navboxElement, properties ) {
 		const infobox = document.querySelector( '.fo-nttax-infobox-wrapper' );
 		if ( !infobox ) {
-			return 'above infobox';
+			properties[ 'navbox position' ] = '';
+			return;
 		}
 
 		const position = navboxElement.compareDocumentPosition( infobox );
 
 		// eslint-disable-next-line no-bitwise
 		if ( position & Node.DOCUMENT_POSITION_FOLLOWING ) {
-			return 'above infobox';
+			properties[ 'navbox position' ] = 'above infobox';
+			return;
 		}
 
 		// eslint-disable-next-line no-bitwise
 		if ( position & Node.DOCUMENT_POSITION_PRECEDING ) {
-			return 'below infobox';
+			properties[ 'navbox position' ] = 'below infobox';
+			return;
 		}
-
-		return null;
 	},
 
-	setupWikiMenuLinkClickAnalytics: function() {
-		liquipedia.analytics.clickTrackers.push( {
-			selector: '[data-wiki-menu="link"]',
-			trackerName: WIKI_SWITCHED,
-			propertiesBuilder: ( wikiMenuLink ) => ( {
-				wiki: wikiMenuLink.closest( '[data-wiki-id]' ).dataset.wikiId,
-				position: 'wiki menu',
-				destination: wikiMenuLink.href,
-				'trending page': false,
-				'trending position': null
-			} )
-		} );
+	addCustomProperties: function( element, properties ) {
+		const analyticsElement = element.closest( '[data-analytics-name]' );
+		if ( analyticsElement ) {
+			Object.entries( analyticsElement.dataset )
+				.filter( ( [ key ] ) => key.startsWith( 'analytics' ) && key !== 'analyticsName' )
+				.forEach( ( [ key, value ] ) => {
+					const propertyName = liquipedia.analytics.formatAnalyticsKey( key );
+					properties[ propertyName ] = value || null;
+				} );
+
+			if ( analyticsElement.dataset.analyticsName === 'Navbox' ) {
+				liquipedia.analytics.addNavboxCustomProperties( element, properties );
+			}
+		}
 	},
 
 	setupLinkClickAnalytics: function() {
@@ -136,15 +139,7 @@ liquipedia.analytics = {
 					destination: link.href
 				};
 
-				if ( properties.position === 'Navbox' ) {
-					const navboxElement = link.closest( '.navbox' );
-					if ( navboxElement ) {
-						const navboxPosition = liquipedia.analytics.getNavboxPosition( navboxElement );
-						if ( navboxPosition ) {
-							properties[ 'navbox position' ] = navboxPosition;
-						}
-					}
-				}
+				liquipedia.analytics.addCustomProperties( link, properties );
 
 				return properties;
 			}
@@ -158,6 +153,20 @@ liquipedia.analytics = {
 			propertiesBuilder: ( link ) => ( {
 				title: link.innerText,
 				position: liquipedia.analytics.findLinkPosition( link )
+			} )
+		} );
+	},
+
+	setupWikiMenuLinkClickAnalytics: function() {
+		liquipedia.analytics.clickTrackers.push( {
+			selector: '[data-wiki-menu="link"]',
+			trackerName: WIKI_SWITCHED,
+			propertiesBuilder: ( wikiMenuLink ) => ( {
+				wiki: wikiMenuLink.closest( '[data-wiki-id]' ).dataset.wikiId,
+				position: 'wiki menu',
+				destination: wikiMenuLink.href,
+				'trending page': false,
+				'trending position': null
 			} )
 		} );
 	},
