@@ -1033,6 +1033,9 @@ end
 ---@param standaloneMatch table
 ---@return table
 function MatchGroupInputUtil.mergeStandaloneIntoMatch(match, standaloneMatch)
+	---@param input table
+	---@return table
+	---@overload fun(input: string): table?
 	local function ensureTable(input)
 		if type(input) == 'table' then
 			return input
