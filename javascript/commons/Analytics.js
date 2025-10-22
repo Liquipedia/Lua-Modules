@@ -103,8 +103,7 @@ liquipedia.analytics = {
 			return '';
 		}
 
-		const lowercased = trimmed.toLowerCase();
-		return lowercased.charAt( 0 ).toUpperCase() + lowercased.slice( 1 );
+		return trimmed.toLowerCase();
 	},
 
 	addCustomProperties: function( element, properties ) {
