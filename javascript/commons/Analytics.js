@@ -90,6 +90,21 @@ liquipedia.analytics = {
 		return clone.textContent.trim();
 	},
 
+	// Converts a camelCase dataset key into a human-readable property name like
+	// 'analyticsInfoboxType' into 'Infobox type'.
+	formatAnalyticsKey: function( key ) {
+		const baseName = key.replace( /^analytics/, '' );
+		const withSpaces = baseName.replace( /([A-Z])/g, ' $1' );
+		const trimmed = withSpaces.trim();
+
+		if ( !trimmed ) {
+			return '';
+		}
+
+		const lowercased = trimmed.toLowerCase();
+		return lowercased.charAt( 0 ).toUpperCase() + lowercased.slice( 1 );
+	},
+
 	addCustomProperties: function( element, properties ) {
 		const analyticsElement = element.closest( '[data-analytics-name]' );
 		if ( analyticsElement ) {
