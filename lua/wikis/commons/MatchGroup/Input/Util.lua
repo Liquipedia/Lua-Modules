@@ -1207,7 +1207,8 @@ end
 ---@field getMapMode? fun(match: table, game: table, opponents: MGIParsedOpponent[]): string?
 ---@field getPlayersOfMapOpponent? fun(game: table, opponent:MGIParsedOpponent, opponentIndex: integer): table[]
 ---@field getPatch? fun(game: table): string?
----@field mapIsFinished? fun(map: table, opponents: MGIParsedOpponent[], finishedInput: string?, winnerInput: string?): boolean
+---@field mapIsFinished? fun(map: table, opponents: MGIParsedOpponent[],
+---finishedInput: string?, winnerInput: string?): boolean
 ---@field extendMapOpponent? fun(map: table, opponentIndex: integer): table
 ---@field getMapBestOf? fun(map: table): integer?
 ---@field computeOpponentScore? fun(props: table, autoScore?: fun(opponentIndex: integer):integer?): integer?, string?
