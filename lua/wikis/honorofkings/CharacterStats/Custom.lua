@@ -11,6 +11,7 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local BaseCharacterStats = Lua.import('Module:CharacterStats')
 local Class = Lua.import('Module:Class')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local CharacterStatsWidget = Lua.import('Module:Widget/CharacterStats')
 
@@ -29,8 +30,10 @@ function HoKCharacterStats.run(frame)
 	local args = Arguments.getArgs(frame)
 	local stats = HoKCharacterStats(args)
 
-	local conditions = stats:buildConditions()
-	local matchIds = stats:getMatchIds(conditions)
+	local matchIds = MatchGroupUtil.fetchMatchIds{
+		conditions = stats:buildConditions(),
+		limit = 5000,
+	}
 	local games = stats:queryGames(matchIds)
 	local processedData = stats:processGames(games)
 	return CharacterStatsWidget{

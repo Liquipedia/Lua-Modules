@@ -68,18 +68,6 @@ function CharacterStats:buildConditions()
 	return conditions
 end
 
----@param conditions AbstractConditionNode
----@return string[]
-function CharacterStats:getMatchIds(conditions)
-	---@type string[]
-	return Array.unique(Array.map(mw.ext.LiquipediaDB.lpdb('match2', {
-		limit = 5000,
-		query = 'match2id',
-		conditions = tostring(conditions),
-		order = 'match2id asc'
-	}), Operator.property('match2id')))
-end
-
 ---@param matchIds string[]
 ---@return CharacterStatsGame[]
 function CharacterStats:queryGames(matchIds)
