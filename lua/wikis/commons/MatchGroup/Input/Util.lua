@@ -779,7 +779,7 @@ end
 ---@return boolean
 function MatchGroupInputUtil.hasSpecialStatus(opponents)
 	return Array.any(opponents, function (opponent)
-			return opponent.status and opponent.status ~= MatchGroupInputUtil.STATUS.SCORE end)
+			return opponent.status ~= nil and opponent.status ~= MatchGroupInputUtil.STATUS.SCORE end)
 end
 
 ---@param opponents MGIParsedOpponent[]
