@@ -58,7 +58,7 @@ local CONTENT = {
 	},
 	rating = {
 		heading = 'Liquipedia Rating',
-		boxid=1520
+		boxid = 1520,
 		body = HtmlWidgets.Fragment{
 			children = {
 				RatingsDisplay.graph{id = 'rating'},
