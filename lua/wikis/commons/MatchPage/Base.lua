@@ -67,6 +67,13 @@ local BaseMatchPage = Class.new(
 		self.matchData = match
 		self.games = match.games
 		self.opponents = match.opponents
+
+		-- Update the view model with game and team data
+		self:populateGames()
+
+		-- Add more opponent data field
+		self:populateOpponents()
+
 		self:addCategories()
 	end
 )
