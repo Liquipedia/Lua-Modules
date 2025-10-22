@@ -105,6 +105,7 @@ function MatchesTable:create()
 	return DataTable{
 		css = {['margin-bottom'] = '10px'},
 		classes = {'wikitable-striped', 'match-card'},
+		sortable = true,
 		children = WidgetUtil.collect(
 			self:header(),
 			Array.map(self.matches, function (match) return self:row(match) end)
