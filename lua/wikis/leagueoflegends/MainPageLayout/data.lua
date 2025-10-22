@@ -195,14 +195,6 @@ return {
 						mobileOrder = 6,
 						content = CONTENT.thisDay,
 					},
-					{
-						mobileOrder = 7,
-						content = CONTENT.wantToHelp,
-					},
-					{
-						mobileOrder = 8,
-						content = CONTENT.liquipediaApp,
-					},
 				}
 			},
 			{ -- Right
@@ -238,6 +230,14 @@ return {
 								},
 							},
 						},
+					},
+					{
+						mobileOrder = 7,
+						content = CONTENT.wantToHelp,
+					},
+					{
+						mobileOrder = 8,
+						content = CONTENT.liquipediaApp,
 					},
 				},
 			},
