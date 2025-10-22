@@ -71,10 +71,16 @@ liquipedia.analytics = {
 		} );
 	},
 
-	findLinkPosition: function( element ) {
+	findLinkPosition: function( element, properties = {} ) {
 		const analyticsElement = element.closest( '[data-analytics-name]' );
 		if ( analyticsElement ) {
 			return analyticsElement.dataset.analyticsName;
+		}
+
+		const tocElement = element.closest( '#sidebar-toc, #toc' );
+		if ( tocElement ) {
+			liquipedia.analytics.addTocProperties( tocElement, properties );
+			return TOC;
 		}
 
 		const walker = document.createTreeWalker(
@@ -107,17 +113,12 @@ liquipedia.analytics = {
 			selector: 'a',
 			trackerName: LINK_CLICKED,
 			propertiesBuilder: ( link ) => {
-				const tocElement = link.closest( '#sidebar-toc, #toc' );
-
 				const properties = {
 					title: link.innerText,
-					position: tocElement ? TOC : liquipedia.analytics.findLinkPosition( link ),
 					destination: link.href
 				};
 
-				if ( tocElement ) {
-					liquipedia.analytics.addTocProperties( tocElement, properties );
-				}
+				properties.position = liquipedia.analytics.findLinkPosition( link, properties );
 
 				return properties;
 			}
