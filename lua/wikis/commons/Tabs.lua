@@ -54,7 +54,7 @@ function Tabs.static(args)
 			},
 			HtmlWidgets.Fragment{children =
 				Array.map(Array.filter(tabArgs, function (tab)
-					return tab.this ~= nil
+					return tab.this
 				end), Operator.property('tabs'))
 			}
 		}
