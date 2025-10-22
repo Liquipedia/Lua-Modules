@@ -37,9 +37,9 @@ function AnalyticsWidget:render()
 			attributes = attributes,
 			children = self.props.children
 		}
-	else
-		return self.props.children
 	end
+
+	return HtmlWidgets.Fragment{children = self.props.children}
 end
 
 return AnalyticsWidget
