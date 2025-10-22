@@ -47,6 +47,7 @@ function NavBox:render()
 	assert(props.child1, 'No children inputted')
 
 	local shouldCollapse = self:_determineCollapsedState(Table.extract(props, 'collapsed'))
+	local navboxPosition = Variables.varDefault('has_infobox') and 'below infobox' or 'above infobox'
 
 	local title = NavBoxTitle(Table.merge(props, {isWrapper = true}))
 	-- have to extract so the child doesn't add the header too ...
@@ -55,6 +56,9 @@ function NavBox:render()
 
 	return AnalyticsWidget{
 		analyticsName = 'Navbox',
+		analyticsProperties = {
+			['navbox-position'] = navboxPosition,
+		},
 		children = {
 			Collapsible{
 				attributes = {

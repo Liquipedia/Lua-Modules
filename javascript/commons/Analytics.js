@@ -90,28 +90,6 @@ liquipedia.analytics = {
 		return clone.textContent.trim();
 	},
 
-	addNavboxCustomProperties: function( navboxElement, properties ) {
-		const infobox = document.querySelector( '.fo-nttax-infobox-wrapper' );
-		if ( !infobox ) {
-			properties[ 'navbox position' ] = '';
-			return;
-		}
-
-		const position = navboxElement.compareDocumentPosition( infobox );
-
-		// eslint-disable-next-line no-bitwise
-		if ( position & Node.DOCUMENT_POSITION_FOLLOWING ) {
-			properties[ 'navbox position' ] = 'above infobox';
-			return;
-		}
-
-		// eslint-disable-next-line no-bitwise
-		if ( position & Node.DOCUMENT_POSITION_PRECEDING ) {
-			properties[ 'navbox position' ] = 'below infobox';
-			return;
-		}
-	},
-
 	addCustomProperties: function( element, properties ) {
 		const analyticsElement = element.closest( '[data-analytics-name]' );
 		if ( analyticsElement ) {
@@ -121,10 +99,6 @@ liquipedia.analytics = {
 					const propertyName = liquipedia.analytics.formatAnalyticsKey( key );
 					properties[ propertyName ] = value || null;
 				} );
-
-			if ( analyticsElement.dataset.analyticsName === 'Navbox' ) {
-				liquipedia.analytics.addNavboxCustomProperties( element, properties );
-			}
 		}
 	},
 
