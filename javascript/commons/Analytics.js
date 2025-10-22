@@ -93,7 +93,7 @@ liquipedia.analytics = {
 	},
 
 	// Converts a camelCase dataset key into a human-readable property name like
-	// 'analyticsInfoboxType' into 'Infobox type'.
+	// 'analyticsInfoboxType' into 'infobox type'.
 	formatAnalyticsKey: function( key ) {
 		const baseName = key.replace( /^analytics/, '' );
 		const withSpaces = baseName.replace( /([A-Z])/g, ' $1' );
