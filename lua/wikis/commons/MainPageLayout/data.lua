@@ -5,6 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Lua = require('Module:Lua')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Link = Lua.import('Module:Widget/Basic/Link')
+
 local CONTENT = {
 	usefulArticles = {
 		heading = 'About This Wiki',
@@ -14,7 +19,11 @@ local CONTENT = {
 	},
 	latestUploads = {
 		heading = 'Latest Uploads',
-		body = '{{Special:NewFiles|limit=18}}',
+		body = HtmlWidgets.Fragment{children = {
+			mw.getCurrentFrame():preprocess('{{Special:NewFiles|limit=18}}'),
+			'For all latest uploads click ',
+			Link{link = 'Special:NewFiles', children = 'here'}
+		}},
 		padding = true,
 		boxid = 1556,
 	},
