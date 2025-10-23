@@ -25,6 +25,13 @@ const getReferrerDomain = () => document.referrer ? new URL( document.referrer )
 const getWikiId = () => mw.config.get( 'wgScriptPath' )?.slice( 1 );
 
 liquipedia.analytics = {
+	customPropertyFinders: {
+		/********************************************************************
+		 * A registry of functions to find component-specific properties.
+		 * Each key matches a `data-analytics-name` value.
+		 * Each function receives (element, properties, analyticsElement).
+		 *******************************************************************/
+	},
 	clickTrackers: [],
 
 	init: function() {
@@ -106,16 +113,29 @@ liquipedia.analytics = {
 		return trimmed.toLowerCase();
 	},
 
-	addCustomProperties: function( element, properties ) {
+	addCustomProperties: function( element ) {
 		const analyticsElement = element.closest( '[data-analytics-name]' );
-		if ( analyticsElement ) {
-			Object.entries( analyticsElement.dataset )
-				.filter( ( [ key ] ) => key.startsWith( 'analytics' ) && key !== 'analyticsName' )
-				.forEach( ( [ key, value ] ) => {
-					const propertyName = liquipedia.analytics.formatAnalyticsKey( key );
-					properties[ propertyName ] = value || null;
-				} );
+		let customProperties = {};
+
+		if ( !analyticsElement ) {
+			return customProperties;
 		}
+
+		Object.entries( analyticsElement.dataset )
+			.filter( ( [ key ] ) => key.startsWith( 'analytics' ) && key !== 'analyticsName' )
+			.forEach( ( [ key, value ] ) => {
+				const propertyName = liquipedia.analytics.formatAnalyticsKey( key );
+				customProperties[ propertyName ] = value || null;
+			} );
+
+		const componentName = analyticsElement.dataset.analyticsName;
+		const customFinder = liquipedia.analytics.customPropertyFinders[ componentName ];
+
+		if ( typeof customFinder === 'function' ) {
+			customProperties = { ...customProperties, ...customFinder( element, analyticsElement ) };
+		}
+
+		return customProperties;
 	},
 
 	setupLinkClickAnalytics: function() {
@@ -129,9 +149,9 @@ liquipedia.analytics = {
 					destination: link.href
 				};
 
-				liquipedia.analytics.addCustomProperties( link, properties );
+				const customProperties = liquipedia.analytics.addCustomProperties( link );
 
-				return properties;
+				return { ...properties, ...customProperties };
 			}
 		} );
 	},
