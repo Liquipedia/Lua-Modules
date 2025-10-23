@@ -144,26 +144,27 @@ liquipedia.analytics = {
 
 	addCustomProperties: function( element ) {
 		const analyticsElement = element.closest( '[data-analytics-name]' );
-		let properties = {};
-		let customProperties = {};
-		if ( analyticsElement ) {
-			Object.entries( analyticsElement.dataset )
-				.filter( ( [ key ] ) => key.startsWith( 'analytics' ) && key !== 'analyticsName' )
-				.forEach( ( [ key, value ] ) => {
-					const propertyName = liquipedia.analytics.formatAnalyticsKey( key );
-					properties[ propertyName ] = value || null;
-				} );
+		const customProperties = {};
 
-			const componentName = analyticsElement.dataset.analyticsName;
-			const customFinder = liquipedia.analytics.customPropertyFinders[ componentName ];
-
-			if ( typeof customFinder === 'function' ) {
-				customProperties = customFinder( element, analyticsElement ) || {};
-			}
+		if ( !analyticsElement ) {
+			return customProperties;
 		}
 
-		properties = { ...properties, ...customProperties };
-		return properties;
+		Object.entries( analyticsElement.dataset )
+			.filter( ( [ key ] ) => key.startsWith( 'analytics' ) && key !== 'analyticsName' )
+			.forEach( ( [ key, value ] ) => {
+				const propertyName = liquipedia.analytics.formatAnalyticsKey( key );
+				customProperties[ propertyName ] = value || null;
+			} );
+
+		const componentName = analyticsElement.dataset.analyticsName;
+		const customFinder = liquipedia.analytics.customPropertyFinders[ componentName ];
+
+		if ( typeof customFinder === 'function' ) {
+			Object.assign( customProperties, customFinder( element, analyticsElement ) );
+		}
+
+		return customProperties;
 	},
 
 	setupLinkClickAnalytics: function() {
@@ -171,16 +172,15 @@ liquipedia.analytics = {
 			selector: 'a',
 			trackerName: LINK_CLICKED,
 			propertiesBuilder: ( link ) => {
-				let properties = {
+				const properties = {
 					title: link.innerText,
 					position: liquipedia.analytics.findLinkPosition( link ),
 					destination: link.href
 				};
 
 				const customProperties = liquipedia.analytics.addCustomProperties( link );
-				properties = { ...properties, ...customProperties };
 
-				return properties;
+				return { ...properties, ...customProperties };
 			}
 		} );
 	},
