@@ -146,7 +146,7 @@ liquipedia.analytics = {
 
 	addCustomProperties: function( element ) {
 		const analyticsElement = element.closest( '[data-analytics-name]' );
-		const customProperties = {};
+		let customProperties = {};
 
 		if ( !analyticsElement ) {
 			return customProperties;
@@ -163,7 +163,7 @@ liquipedia.analytics = {
 		const customFinder = liquipedia.analytics.customPropertyFinders[ componentName ];
 
 		if ( typeof customFinder === 'function' ) {
-			Object.assign( customProperties, customFinder( element, analyticsElement ) );
+			customProperties = { ...customProperties, ...customFinder( element, analyticsElement ) };
 		}
 
 		return customProperties;
