@@ -11,8 +11,8 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Namespace = Lua.import('Module:Namespace')
-local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 
@@ -106,15 +106,13 @@ end
 ---@param matchGroupId string
 ---@return string[]
 function StandingsParseWiki.getMatchIdsOfMatchGroup(matchGroupId)
-	local matchGroup = mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = tostring(ConditionTree(BooleanOperator.all):add{
+	return MatchGroupUtil.fetchMatchIds{
+		conditions = ConditionTree(BooleanOperator.all):add{
 			ConditionNode(ColumnName('namespace'), Comparator.neq, Namespace.matchNamespaceId()),
 			ConditionNode(ColumnName('match2bracketid'), Comparator.eq, matchGroupId),
-		}),
-		query = 'match2id',
-		limit = '1000',
-	})
-	return Array.map(matchGroup, Operator.property('match2id'))
+		},
+		limit = 1000,
+	}
 end
 
 ---@param rawStage string
@@ -125,16 +123,14 @@ function StandingsParseWiki.getMatchIdsFromStage(rawStage)
 	local namespace, basePage, stage = Logic.nilIfEmpty(title.nsText), title.text, Logic.nilIfEmpty(title.fragment)
 	basePage = basePage:gsub(' ', '_')
 
-	local matchGroup = mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = tostring(ConditionTree(BooleanOperator.all):add(Array.append(
+	return MatchGroupUtil.fetchMatchIds{
+		conditions = ConditionTree(BooleanOperator.all):add(Array.append(
 			{ConditionNode(ColumnName('pagename'), Comparator.eq, basePage)},
 			namespace and ConditionNode(ColumnName('namespace'), Comparator.eq, Namespace.idFromName(namespace)) or nil,
 			stage and ConditionNode(ColumnName('match2bracketdata_sectionheader'), Comparator.eq, stage) or nil
-		))),
-		query = 'match2id',
-		limit = '1000',
-	})
-	return Array.map(matchGroup, Operator.property('match2id'))
+		)),
+		limit = 1000
+	}
 end
 
 ---@param opponentInput string|table

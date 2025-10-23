@@ -91,7 +91,9 @@ end
 function CustomCharacter:_getCustomCells()
 	local args = self.args
 	local widgets = {
-		Center{children = {Page.makeExternalLink('Official Hero Page', args.page)}},
+		Center{children = {Page.makeExternalLink('Official HoK Global Hero Page', args.page_global)}},
+		Center{children = {Page.makeExternalLink('Official HoK CN Hero Page', args.page_cn)}},
+		Center{children = {Page.makeExternalLink('Official AoV Hero Page', args.page_aov)}},
 	}
 
 	local wins, loses = CharacterWinLoss.run(args.name)
