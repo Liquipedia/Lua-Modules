@@ -9,6 +9,7 @@ const LINK_CLICKED = 'Link clicked';
 const WIKI_SWITCHED = 'Wiki switched';
 const SEARCH_PERFORMED = 'Page searched';
 const BUTTON_CLICKED = 'Button clicked';
+const MATCH_POPUP_OPENED = 'Match popup opened';
 
 // Constants
 const IGNORE_CATEGORY_PREFIX = 'Pages ';
@@ -37,6 +38,7 @@ liquipedia.analytics = {
 		liquipedia.analytics.setupButtonClickAnalytics();
 		liquipedia.analytics.setupSearchAnalytics();
 		liquipedia.analytics.setupSearchFormSubmitAnalytics();
+		liquipedia.analytics.setupMatchPopupAnalytics();
 
 		document.body.addEventListener( 'click', ( event ) => {
 			for ( const tracker of liquipedia.analytics.clickTrackers ) {
@@ -195,6 +197,31 @@ liquipedia.analytics = {
 				} );
 			}
 		} );
+	},
+
+	setupMatchPopupAnalytics: function() {
+		liquipedia.analytics.clickTrackers.push( {
+			selector: '.brkts-match-popup-wrapper',
+			trackerName: MATCH_POPUP_OPENED,
+			propertiesBuilder: ( match ) => {
+				const uniqueParticipants = new Set(
+					Array.from( match.querySelectorAll( '.brkts-opponent-hover' ) )
+						.map( ( element ) => element.getAttribute( 'aria-label' ) )
+				);
+				const participants = [ ...uniqueParticipants ];
+
+				const isMatchlist = match.closest( '.brkts-matchlist' );
+				const isBracket = match.closest( '.brkts-bracket' );
+				const containerType = isMatchlist ? 'matchlist' : isBracket ? 'bracket' : 'unknown';
+
+				return {
+					position: liquipedia.analytics.findLinkPosition( match ),
+					participants,
+					type: containerType
+				};
+			}
+		} );
 	}
 };
+
 liquipedia.core.modules.push( 'analytics' );

@@ -35,6 +35,7 @@ local Div = HtmlWidgets.Div
 local Td = HtmlWidgets.Td
 local Th = HtmlWidgets.Th
 local Tr = HtmlWidgets.Tr
+local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -101,16 +102,14 @@ function MatchesTable:create()
 	end
 	self.matches = matches
 
-	return Div{
-		classes = {'table-responsive'},
+	return DataTable{
 		css = {['margin-bottom'] = '10px'},
-		children = HtmlWidgets.Table{
-			classes = {'wikitable', 'wikitable-striped', 'sortable', 'match-card'},
-			children = WidgetUtil.collect(
-				self:header(),
-				Array.map(self.matches, function (match) return self:row(match) end)
-			)
-		}
+		classes = {'wikitable-striped', 'match-card'},
+		sortable = true,
+		children = WidgetUtil.collect(
+			self:header(),
+			Array.map(self.matches, function (match) return self:row(match) end)
+		)
 	}
 end
 
