@@ -28,6 +28,25 @@ const getReferrerDomain = () => document.referrer ? new URL( document.referrer )
 const getWikiId = () => mw.config.get( 'wgScriptPath' )?.slice( 1 );
 
 liquipedia.analytics = {
+	customPropertyFinders: {
+		/********************************************************************
+		 * A registry of functions to find component-specific properties.
+		 * Each key matches a `data-analytics-name` value.
+		 * Each function receives (element, properties, analyticsElement).
+		 *******************************************************************/
+		ToC: function( tocElement ) {
+			if ( tocElement.id === 'sidebar-toc' ) {
+				return {
+					'ToC position': SIDEBAR
+				};
+			} else {
+				return {
+					'ToC position': INLINE
+				};
+			}
+		}
+	},
+
 	clickTrackers: [],
 
 	init: function() {
@@ -73,16 +92,23 @@ liquipedia.analytics = {
 		} );
 	},
 
-	findLinkPosition: function( element, properties = {} ) {
+	getAnalyticsContextElement: function( element ) {
 		const analyticsElement = element.closest( '[data-analytics-name]' );
 		if ( analyticsElement ) {
-			return analyticsElement.dataset.analyticsName;
+			return {
+				type: 'component',
+				element: analyticsElement,
+				name: analyticsElement.dataset.analyticsName
+			};
 		}
 
 		const tocElement = element.closest( '#sidebar-toc, #toc' );
 		if ( tocElement ) {
-			liquipedia.analytics.addTocProperties( tocElement, properties );
-			return TOC;
+			return {
+				type: 'toc',
+				element: tocElement,
+				name: TOC
+			};
 		}
 
 		const walker = document.createTreeWalker(
@@ -94,20 +120,69 @@ liquipedia.analytics = {
 		);
 		walker.currentNode = element;
 		const headingNode = walker.previousNode();
-		if ( !headingNode ) {
-			return null;
+
+		if ( headingNode ) {
+			const clone = headingNode.cloneNode( true );
+			clone.querySelector( '.mw-editsection' )?.remove();
+			return {
+				type: 'heading',
+				element: headingNode,
+				name: clone.textContent.trim()
+			};
 		}
-		const clone = headingNode.cloneNode( true );
-		clone.querySelector( '.mw-editsection' )?.remove();
-		return clone.textContent.trim();
+
+		return { type: 'none', element: null, name: null };
 	},
 
-	addTocProperties: function( tocElement, properties ) {
-		if ( tocElement.id === 'sidebar-toc' ) {
-			properties[ 'ToC position' ] = SIDEBAR;
-		} else {
-			properties[ 'ToC position' ] = INLINE;
+	findLinkPosition: function( element ) {
+		const context = liquipedia.analytics.getAnalyticsContextElement( element );
+		return context.name;
+	},
+
+	// Converts a camelCase dataset key into a human-readable property name like
+	// 'analyticsInfoboxType' into 'infobox type'.
+	formatAnalyticsKey: function( key ) {
+		const baseName = key.replace( /^analytics/, '' );
+		const withSpaces = baseName.replace( /([A-Z])/g, ' $1' );
+		const trimmed = withSpaces.trim();
+
+		if ( !trimmed ) {
+			return '';
 		}
+
+		return trimmed.toLowerCase();
+	},
+
+	getDatasetAnalyticsProperties: function( dataset ) {
+		const properties = {};
+		Object.entries( dataset )
+			.filter( ( [ key ] ) => key.startsWith( 'analytics' ) && key !== 'analyticsName' )
+			.forEach( ( [ key, value ] ) => {
+				const propertyName = liquipedia.analytics.formatAnalyticsKey( key );
+				properties[ propertyName ] = value || null;
+			} );
+		return properties;
+	},
+
+	addCustomProperties: function( element ) {
+		const context = liquipedia.analytics.getAnalyticsContextElement( element );
+		let customProperties = {};
+
+		if ( context.type === 'component' ) {
+			customProperties = liquipedia.analytics.getDatasetAnalyticsProperties( context.element.dataset );
+		}
+
+		if ( context.name ) {
+			const customFinder = liquipedia.analytics.customPropertyFinders[ context.name ];
+
+			if ( typeof customFinder === 'function' ) {
+				const finderProperties = customFinder( context.element, element );
+
+				customProperties = { ...customProperties, ...finderProperties };
+			}
+		}
+
+		return customProperties;
 	},
 
 	setupLinkClickAnalytics: function() {
@@ -117,12 +192,13 @@ liquipedia.analytics = {
 			propertiesBuilder: ( link ) => {
 				const properties = {
 					title: link.innerText,
-					destination: link.href
+					destination: link.href,
+					position: liquipedia.analytics.findLinkPosition( link )
 				};
 
-				properties.position = liquipedia.analytics.findLinkPosition( link, properties );
+				const customProperties = liquipedia.analytics.addCustomProperties( link );
 
-				return properties;
+				return { ...properties, ...customProperties };
 			}
 		} );
 	},
