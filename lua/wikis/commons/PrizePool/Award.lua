@@ -97,7 +97,7 @@ function AwardPrizePool:_toggleExpand()
 	local collapseButton = TableCell{
 		children = Div{children = {
 			'Show less Awards&nbsp;',
-			IconFa{iconName = 'expand'},
+			IconFa{iconName = 'collapse'},
 		}},
 		classes = {'general-collapsible-collapse-button'},
 	}
