@@ -19,6 +19,8 @@ local Placement = Lua.import('Module:PrizePool/Placement')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Widgets = Lua.import('Module:Widget/All')
+local Div = Widgets.Div
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local TableRow = Widgets.TableRow
 local TableCell = Widgets.TableCell
 
@@ -92,11 +94,19 @@ end
 function PrizePool:_toggleExpand(placeStart, placeEnd)
 	local text = 'place ' .. placeStart .. ' to ' .. placeEnd
 	local expandButton = TableCell{
-		children = {'<div>' .. text .. '&nbsp;<i class="fa fa-chevron-down"></i></div>'},
+		children = Div{children = {
+			text,
+			'&nbsp;',
+			IconFa{iconName = 'expand'},
+		}},
 		classes = {'general-collapsible-expand-button'},
 	}
 	local collapseButton = TableCell{
-		children = {'<div>' .. text .. '&nbsp;<i class="fa fa-chevron-up"></i></div>'},
+		children = Div{children = {
+			text,
+			'&nbsp;',
+			IconFa{iconName = 'collapse'},
+		}},
 		classes = {'general-collapsible-collapse-button'},
 	}
 
