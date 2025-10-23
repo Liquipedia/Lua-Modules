@@ -24,6 +24,38 @@ const getReferrerDomain = () => document.referrer ? new URL( document.referrer )
 const getWikiId = () => mw.config.get( 'wgScriptPath' )?.slice( 1 );
 
 liquipedia.analytics = {
+	customPropertyFinders: {
+		/********************************************************************
+		 * A registry of functions to find component-specific properties.
+		 * Each key matches a `data-analytics-name` value.
+		 * Each function receives (element, properties, analyticsElement).
+		 *******************************************************************/
+		Infobox: function( element, properties, analyticsElement ) {
+			const parentDiv = element.parentElement;
+			if ( parentDiv ) {
+				const previousSibling = parentDiv.previousElementSibling;
+				if ( previousSibling && previousSibling.classList.contains( 'infobox-description' ) ) {
+					properties[ 'infobox section' ] = previousSibling.innerText.trim();
+				} else {
+					const allHeaders = analyticsElement.querySelectorAll( '.infobox-header' );
+					let closestHeader = null;
+
+					for ( let i = allHeaders.length - 1; i >= 0; i-- ) {
+						const header = allHeaders[ i ];
+						// eslint-disable-next-line no-bitwise
+						if ( header.compareDocumentPosition( element ) & Node.DOCUMENT_POSITION_FOLLOWING ) {
+							closestHeader = header;
+							break;
+						}
+					}
+
+					if ( closestHeader ) {
+						properties[ 'infobox section' ] = closestHeader.innerText.trim();
+					}
+				}
+			}
+		}
+	},
 	clickTrackers: [],
 
 	init: function() {
@@ -104,32 +136,6 @@ liquipedia.analytics = {
 		return trimmed.toLowerCase();
 	},
 
-	addInfoboxCustomProperties: function ( element, properties, analyticsElement ) {
-		const parentDiv = element.parentElement;
-		if ( parentDiv ) {
-			const previousSibling = parentDiv.previousElementSibling;
-			if ( previousSibling && previousSibling.classList.contains( 'infobox-description' ) ) {
-				properties[ 'infobox section' ] = previousSibling.innerText.trim();
-			} else {
-				const allHeaders = analyticsElement.querySelectorAll( '.infobox-header' );
-				let closestHeader = null;
-
-				for ( let i = allHeaders.length - 1; i >= 0; i-- ) {
-					const header = allHeaders[ i ];
-					// eslint-disable-next-line no-bitwise
-					if ( header.compareDocumentPosition( element ) & Node.DOCUMENT_POSITION_FOLLOWING ) {
-						closestHeader = header;
-						break;
-					}
-				}
-
-				if ( closestHeader ) {
-					properties[ 'infobox section' ] = closestHeader.innerText.trim();
-				}
-			}
-		}
-	},
-
 	addCustomProperties: function( element, properties ) {
 		const analyticsElement = element.closest( '[data-analytics-name]' );
 		if ( analyticsElement ) {
@@ -140,8 +146,11 @@ liquipedia.analytics = {
 					properties[ propertyName ] = value || null;
 				} );
 
-			if ( analyticsElement.dataset.analyticsName === 'Infobox' ) {
-				liquipedia.analytics.addInfoboxCustomProperties( element, properties, analyticsElement );
+			const componentName = analyticsElement.dataset.analyticsName;
+			const customFinder = liquipedia.analytics.customPropertyFinders[ componentName ];
+
+			if ( typeof customFinder === 'function' ) {
+				customFinder( element, properties, analyticsElement );
 			}
 		}
 	},
