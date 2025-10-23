@@ -30,29 +30,35 @@ liquipedia.analytics = {
 		 * Each key matches a `data-analytics-name` value.
 		 * Each function receives (element, properties, analyticsElement).
 		 *******************************************************************/
-		Infobox: function( element, properties, analyticsElement ) {
+		Infobox: function( element, analyticsElement ) {
 			const parentDiv = element.parentElement;
-			if ( parentDiv ) {
-				const previousSibling = parentDiv.previousElementSibling;
-				if ( previousSibling && previousSibling.classList.contains( 'infobox-description' ) ) {
-					properties[ 'infobox section' ] = previousSibling.innerText.trim();
-				} else {
-					const allHeaders = analyticsElement.querySelectorAll( '.infobox-header' );
-					let closestHeader = null;
+			if ( !parentDiv ) {
+				return;
+			}
 
-					for ( let i = allHeaders.length - 1; i >= 0; i-- ) {
-						const header = allHeaders[ i ];
-						// eslint-disable-next-line no-bitwise
-						if ( header.compareDocumentPosition( element ) & Node.DOCUMENT_POSITION_FOLLOWING ) {
-							closestHeader = header;
-							break;
-						}
-					}
+			const previousSibling = parentDiv.previousElementSibling;
+			if ( previousSibling && previousSibling.classList.contains( 'infobox-description' ) ) {
+				return {
+					'infobox section': previousSibling.innerText.trim()
+				};
+			}
 
-					if ( closestHeader ) {
-						properties[ 'infobox section' ] = closestHeader.innerText.trim();
-					}
+			const allHeaders = analyticsElement.querySelectorAll( '.infobox-header' );
+			let closestHeader = null;
+
+			for ( let i = allHeaders.length - 1; i >= 0; i-- ) {
+				const header = allHeaders[ i ];
+				// eslint-disable-next-line no-bitwise
+				if ( header.compareDocumentPosition( element ) & Node.DOCUMENT_POSITION_FOLLOWING ) {
+					closestHeader = header;
+					break;
 				}
+			}
+
+			if ( closestHeader ) {
+				return {
+					'infobox section': closestHeader.innerText.trim()
+				};
 			}
 		}
 	},
@@ -136,8 +142,10 @@ liquipedia.analytics = {
 		return trimmed.toLowerCase();
 	},
 
-	addCustomProperties: function( element, properties ) {
+	addCustomProperties: function( element ) {
 		const analyticsElement = element.closest( '[data-analytics-name]' );
+		let properties = {};
+		let customProperties = {};
 		if ( analyticsElement ) {
 			Object.entries( analyticsElement.dataset )
 				.filter( ( [ key ] ) => key.startsWith( 'analytics' ) && key !== 'analyticsName' )
@@ -150,9 +158,12 @@ liquipedia.analytics = {
 			const customFinder = liquipedia.analytics.customPropertyFinders[ componentName ];
 
 			if ( typeof customFinder === 'function' ) {
-				customFinder( element, properties, analyticsElement );
+				customProperties = customFinder( element, analyticsElement ) || {};
 			}
 		}
+
+		properties = { ...properties, ...customProperties };
+		return properties;
 	},
 
 	setupLinkClickAnalytics: function() {
@@ -160,13 +171,14 @@ liquipedia.analytics = {
 			selector: 'a',
 			trackerName: LINK_CLICKED,
 			propertiesBuilder: ( link ) => {
-				const properties = {
+				let properties = {
 					title: link.innerText,
 					position: liquipedia.analytics.findLinkPosition( link ),
 					destination: link.href
 				};
 
-				liquipedia.analytics.addCustomProperties( link, properties );
+				const customProperties = liquipedia.analytics.addCustomProperties( link );
+				properties = { ...properties, ...customProperties };
 
 				return properties;
 			}
