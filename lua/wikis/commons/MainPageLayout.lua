@@ -12,12 +12,15 @@ local Array = Lua.import('Module:Array')
 local Image = Lua.import('Module:Image')
 local LpdbCounter = Lua.import('Module:LPDB entity count')
 local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
+local AnalyticsMapping = Lua.import('Module:MainPageLayout/AnalyticsMapping', {loadData = true})
 local WikiData = Lua.import('Module:MainPageLayout/data')
 local GridWidgets = Lua.import('Module:Widget/Grid')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local NavigationCard = Lua.import('Module:Widget/MainPage/NavigationCard')
 local PanelWidget = Lua.import('Module:Widget/Panel')
+local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 
 local MainPageLayout = {}
 
@@ -61,9 +64,14 @@ function MainPageLayout.make(frame)
 					frame:callParserFunction('#searchbox', ''),
 				}
 			},
-			HtmlWidgets.Div{
-				classes = {'navigation-cards'},
-				children = Array.map(WikiData.navigation, MainPageLayout._makeNavigationCard)
+			AnalyticsWidget{
+				analyticsName = 'Quick navigation',
+				children = {
+					HtmlWidgets.Div{
+						classes = {'navigation-cards'},
+						children = Array.map(WikiData.navigation, MainPageLayout._makeNavigationCard)
+					}
+				}
 			},
 			MainPageLayout._makeCells(layout),
 		},
@@ -81,6 +89,7 @@ end
 ---@return Widget
 function MainPageLayout._makeCells(cells)
 	local output = {}
+	local desktopBreakpoints = {'lg', 'xl', 'xxl', 'xxxl'}
 
 	for _, column in ipairs(cells) do
 		local cellContent = {}
@@ -88,24 +97,47 @@ function MainPageLayout._makeCells(cells)
 			local content = {}
 			if item.content then
 				local contentBody = item.content.body
+				local contentElement
 				if item.content.noPanel then
-					table.insert(content, MainPageLayout._processCellBody(contentBody))
+					contentElement = MainPageLayout._processCellBody(contentBody)
 				else
-					table.insert(content, PanelWidget{
+					contentElement = PanelWidget{
 						children = MainPageLayout._processCellBody(contentBody),
 						boxId = item.content.boxid,
 						padding = item.content.padding,
 						heading = item.content.heading,
 						panelAttributes = item.content.panelAttributes,
-					})
+					}
 				end
+
+				table.insert(content, AnalyticsWidget{
+					analyticsName = AnalyticsMapping[item.content.boxid],
+					children = {contentElement}
+				})
 			end
 			if item.children then
 				Array.appendWith(content, MainPageLayout._makeCells(item.children))
 			end
-			table.insert(cellContent, GridWidgets.Cell{cellContent = content, ['order-xs'] = item.mobileOrder})
+			table.insert(cellContent, GridWidgets.Cell{
+				cellContent = content,
+				['order-xs'] = item.mobileOrder,
+				['order-sm'] = item.mobileOrder
+			})
 		end
-		table.insert(output, GridWidgets.Cell{cellContent = cellContent, lg = column.size, xs = 'ignore', sm = 'ignore'})
+
+		local columnSizes = {}
+		if column.size then
+			columnSizes = Table.map(desktopBreakpoints, function(_, bp) return bp, column.size end)
+		end
+		if column.sizes then
+			columnSizes = Table.merge(columnSizes, column.sizes)
+		end
+
+		local cellProps = Table.merge(
+			{cellContent = cellContent, xs = 'ignore', sm = 'ignore'},
+			columnSizes
+		)
+		table.insert(output, GridWidgets.Cell(cellProps))
 	end
 
 	return GridWidgets.Container{ gridCells = output }

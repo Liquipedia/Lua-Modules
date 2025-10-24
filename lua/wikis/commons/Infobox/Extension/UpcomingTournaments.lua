@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Info = Lua.import('Module:Info', {loadData = true})
+local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
@@ -24,9 +25,14 @@ local UpcomingTournamentsWidget = Lua.import('Module:Widget/Infobox/UpcomingTour
 
 local UpcomingTournaments = {}
 
----@param name string|string[]
----@return Widget
-function UpcomingTournaments.team(name)
+---@param args {name: string|string[]?, additionalConditions: AbstractConditionNode?}
+---@return Widget?
+function UpcomingTournaments.team(args)
+	args = args or {}
+	local name = args.name
+	if Logic.isEmpty(name) then
+		return
+	end
 	local templateNames = Array.isArray(name)
 		and Array.map(name --[[@as string[] ]], TeamTemplate.resolve)
 		or {TeamTemplate.resolve(name --[[@as string]] or mw.title.getCurrentTitle().text)}
@@ -34,13 +40,17 @@ function UpcomingTournaments.team(name)
 		opponentConditions = ConditionTree(BooleanOperator.all):add{
 			ConditionUtil.anyOf(ColumnName('opponenttemplate'), templateNames),
 			ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
+			args.additionalConditions
 		}
 	}
 end
 
 ---@param args {name: string, prefix: string?}
----@return Widget
+---@return Widget?
 function UpcomingTournaments.player(args)
+	if Logic.isEmpty(args.name) then
+		return
+	end
 	local prefix = args.prefix or 'p'
 	local defaultMaxPlayersPerPlacement = Info.config.defaultMaxPlayersPerPlacement or 10
 

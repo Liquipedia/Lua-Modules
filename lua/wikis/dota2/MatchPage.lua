@@ -41,12 +41,6 @@ local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 function MatchPage.getByMatchId(props)
 	local matchPage = MatchPage(props.match)
 
-	-- Update the view model with game and team data
-	matchPage:populateGames()
-
-	-- Add more opponent data field
-	matchPage:populateOpponents()
-
 	return matchPage:render()
 end
 

@@ -55,7 +55,7 @@ function Role:createInfobox()
 		self:_setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Role')
 end
 
 ---@param args table

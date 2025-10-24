@@ -1,0 +1,86 @@
+---
+-- @Liquipedia
+-- page=Module:MainPageLayout/data
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Link = Lua.import('Module:Widget/Basic/Link')
+
+local CONTENT = {
+	usefulArticles = {
+		heading = 'About This Wiki',
+		body = '{{Liquipedia:Useful Articles}}',
+		padding = true,
+		boxid = 1503,
+	},
+	latestUploads = {
+		heading = 'Latest Uploads',
+		body = HtmlWidgets.Fragment{children = {
+			mw.getCurrentFrame():preprocess('{{Special:NewFiles|limit=18}}'),
+			'For all latest uploads click ',
+			Link{link = 'Special:NewFiles', children = 'here'}
+		}},
+		padding = true,
+		boxid = 1556,
+	},
+}
+return {
+	banner = {
+		lightmode = 'Commons-light-theme.svg',
+		darkmode = 'Commons-dark-theme.svg',
+	},
+	metadesc = 'The Commons wiki is the file repository for Liquipedia',
+	title = 'Commons',
+	navigation = {
+		{
+			iconName = 'upload',
+			title = 'Upload',
+			link = 'Special:Upload',
+			count = {},
+		},
+		{
+			iconName = 'file_standards_guide',
+			title = 'File Standards Guide',
+			link = 'File Standards Guide',
+			count = {},
+		},
+		{
+			iconName = 'clipboard',
+			title = 'Copyright Repository',
+			link = 'Copyrights Repository',
+			count = {},
+		},
+		{
+			iconName = 'copyright',
+			title = 'Copyright Guide',
+			link = 'hub:A Liquipedia Guide to Copyright',
+			count = {},
+		},
+		{
+			iconName = 'find_images',
+			title = 'Find Files',
+			link = 'Special:RunQuery/Find images',
+			count = {},
+		},
+	},
+	layouts = {
+		main = {
+			{
+				children = {
+					{
+						mobileOrder = 1,
+						content = CONTENT.usefulArticles,
+					},
+					{
+						mobileOrder = 2,
+						content = CONTENT.latestUploads,
+					},
+				},
+			},
+		},
+	},
+}

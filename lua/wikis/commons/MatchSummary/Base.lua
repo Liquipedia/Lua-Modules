@@ -189,6 +189,7 @@ local MatchSummary = Class.new()
 MatchSummary.Footer = Footer
 MatchSummary.Match = Match
 
+--- TODO: Instead of attaching data-analytics-name here, use Analytics Widget
 ---@param width string?
 ---@return MatchSummary
 function MatchSummary:init(width)
@@ -196,6 +197,7 @@ function MatchSummary:init(width)
 	self.root = mw.html.create('div')
 		:addClass('brkts-popup')
 		:css('width', width)
+		:attr('data-analytics-name', 'Match popup')
 	return self
 end
 

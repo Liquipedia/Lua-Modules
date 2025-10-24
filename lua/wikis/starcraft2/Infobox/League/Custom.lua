@@ -66,6 +66,7 @@ function CustomLeague:customParseArguments(args)
 	args.number = tonumber(args.number)
 	self.data.mode = args.mode or DEFAULT_MODE
 	self.data.game = (args.game or ''):lower() == GAME_MOD and GAME_MOD or self.data.game
+	self.data.mod = self.data.game == GAME_MOD and args.modname or nil
 	self.data.status = self:_getStatus(args)
 
 	self.data.startTime = Logic.wrapTryOrLog(CustomLeague._readStartTime)(self)
@@ -356,6 +357,7 @@ end
 
 ---@param args table
 function CustomLeague:defineCustomPageVariables(args)
+	Variables.varDefine('tournament_mod', self.data.mod)
 	Variables.varDefine('headtohead', args.headtohead or 'true')
 	Variables.varDefine('tournament_maps', Json.stringify(args.maps))
 	Variables.varDefine('tournament_series_number', args.number and string.format('%05i', args.number) or nil)
@@ -386,6 +388,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.extradata.seriesnumber = args.number and string.format('%05i', args.number) or nil
 	lpdbData.extradata.starttime = self.data.startTime.storage
+	lpdbData.extradata.mod = self.data.mod
 
 	return lpdbData
 end

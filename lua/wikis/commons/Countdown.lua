@@ -83,7 +83,4 @@ function Countdown.create(args)
 	)
 end
 
---- temporary to not break non-Git uses
-Countdown._create = Countdown.create
-
 return Class.export(Countdown, {exports = {'create'}})

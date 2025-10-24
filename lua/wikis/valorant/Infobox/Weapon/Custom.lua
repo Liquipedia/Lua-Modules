@@ -23,6 +23,8 @@ local FIRE_RATE_UNIT = 'rounds/sec'
 
 ---@class ValorantWeaponInfobox: WeaponInfobox
 local CustomWeapon = Class.new(Weapon)
+---@class ValorantWeaponInfoboxWidgetInjector: WidgetInjector
+---@field caller ValorantWeaponInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame

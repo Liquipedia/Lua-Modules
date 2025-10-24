@@ -75,7 +75,7 @@ function Upgrade:createInfobox()
 		self:setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Upgrade')
 end
 
 --- Allows for overriding this functionality

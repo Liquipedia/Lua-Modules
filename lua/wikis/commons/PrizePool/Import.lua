@@ -45,7 +45,7 @@ local Import = Class.new(function(self, ...) self:init(...) end)
 ---@field ignoreNonScoreEliminations boolean
 ---@field importLimit integer
 ---@field placementsToSkip integer
----@field matchGroupsSpec table
+---@field matchGroupsSpec MatchGroupsSpec
 ---@field groupElimStatuses string[]
 ---@field groupScoreDelimiter string
 ---@field allGroupsUseWdl boolean

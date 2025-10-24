@@ -11,7 +11,7 @@ local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
-local MatchPlacement = Lua.import('Module:Match/Placement')
+local Medals = Lua.import('Module:Medals')
 local Ordinal = Lua.import('Module:Ordinal')
 local PlacementInfo = Lua.import('Module:Placement')
 local String = Lua.import('Module:StringUtils')
@@ -345,7 +345,7 @@ function Placement:getMedal()
 		return
 	end
 
-	local medal = MatchPlacement.MedalIcon{range = {self.placeStart, self.placeEnd}}
+	local medal = Medals.display{medal = self:_lpdbValue()}
 	if medal then
 		return tostring(medal)
 	end

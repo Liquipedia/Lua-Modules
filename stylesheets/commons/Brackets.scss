@@ -857,29 +857,50 @@ div.brkts-popup-body-element-thumbs {
 		}
 	}
 
-	.brkts-popup-mapveto-vetostart {
-		background-color: var( --table-striped-background-color, #f5f5f5 );
-	}
+	&__data-cell {
+		padding: 0.5rem;
 
-	.brkts-popup-mapveto-vetoround {
-		background-color: var( --table-background-color, #ffffff );
+		&-text-left {
+			text-align: left;
+		}
+
+		&-text-center {
+			text-align: center;
+		}
+
+		&-text-right {
+			text-align: right;
+		}
 	}
 
 	.brkts-popup-mapveto-vetotype {
 		font-weight: bold;
-		color: var( --clr-on-background, #000000 );
+		color: var( --clr-primary-100 );
 		border: 0;
-		border-radius: 0;
+		border-radius: 0.875rem;
 		letter-spacing: 0.1em;
 		font-family: "Source Code Pro", monospace;
+		padding: 0 0.5rem;
 	}
 
 	.brkts-popup-mapveto-pick {
-		background-color: var( --clr-forestgreen-background-color, #ddf4dd ) !important;
+		.theme--light & {
+			background-color: var( --clr-semantic-positive-40, #27a527 ) !important;
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-semantic-positive-20, #145214 ) !important;
+		}
 	}
 
 	.brkts-popup-mapveto-ban {
-		background-color: var( --clr-cinnabar-background-color, #fbdfdf ) !important;
+		.theme--light & {
+			background-color: var( --clr-semantic-negative-40, #b81414 ) !important;
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-semantic-negative-20, #5c0a0a ) !important;
+		}
 	}
 
 	.brkts-popup-mapveto-defaultban {
@@ -887,7 +908,7 @@ div.brkts-popup-body-element-thumbs {
 	}
 
 	.brkts-popup-mapveto-decider {
-		background-color: var( --clr-sun-background-color, #f9f0c7 ) !important;
+		background-color: var( --clr-sun-10, #332b00 ) !important;
 	}
 
 	.brkts-popup-mapveto-protect {
@@ -921,12 +942,12 @@ div.brkts-popup-body-element-thumbs {
 
 .brkts-popup-body-gradient-left {
 	padding: 4px 0;
-	background: linear-gradient( to left, var( --clr-cinnabar-background-color, #fbdfdf ) 35%, var( --table-background-color, #ffffff ) 35%, var( --table-background-color, #ffffff ) 65%, var( --clr-forestgreen-background-color, #ddf4dd ) 65% ) !important;
+	background: linear-gradient( to left, var( --clr-cinnabar-background-color, #fbdfdf ) 35%, var( --table-background-color, #ffffff ) 35%, var( --table-background-color, #ffffff ) 65%, var( --clr-forest-background-color, #ddf4dd ) 65% ) !important;
 }
 
 .brkts-popup-body-gradient-right {
 	padding: 4px 0;
-	background: linear-gradient( to right, var( --clr-cinnabar-background-color, #fbdfdf ) 35%, var( --table-background-color, #ffffff ) 35%, var( --table-background-color, #ffffff ) 65%, var( --clr-forestgreen-background-color, #ddf4dd ) 65% ) !important;
+	background: linear-gradient( to right, var( --clr-cinnabar-background-color, #fbdfdf ) 35%, var( --table-background-color, #ffffff ) 35%, var( --table-background-color, #ffffff ) 65%, var( --clr-forest-background-color, #ddf4dd ) 65% ) !important;
 }
 
 .brkts-popup-body-gradient-draw {

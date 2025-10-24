@@ -55,7 +55,7 @@ function CustomMatchTicker.newMainPage(frame)
 	args.tiers = args['filterbuttons-liquipediatier']
 	if args.tiers == 'curated' then
 		args.tiers = nil
-		args.featuredTournamentsOnly = true
+		args.featuredOnly = true
 	end
 
 	args.tiertypes = args['filterbuttons-liquipediatiertype']

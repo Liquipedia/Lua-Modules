@@ -27,6 +27,8 @@ local Center = Widgets.Center
 
 ---@class ValorantLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
+---@class ValorantLeagueInfoboxWidgetInjector: WidgetInjector
+---@field caller ValorantLeagueInfobox
 local CustomInjector = Class.new(Injector)
 
 local VALID_PUBLISHERTIERS = {

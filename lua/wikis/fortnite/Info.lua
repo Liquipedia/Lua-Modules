@@ -41,6 +41,7 @@ return {
 			autoTeam = true,
 			automatedHistory = {
 				mode = 'merge',
+				storeFromWikiCode = true,
 			},
 		},
 	},

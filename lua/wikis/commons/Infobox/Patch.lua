@@ -80,7 +80,7 @@ function Patch:createInfobox()
 		self:setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Patch')
 end
 
 --- Allows for overriding this functionality

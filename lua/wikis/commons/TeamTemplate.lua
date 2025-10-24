@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
 
 --[[
 A thin wrapper around mw.ext.TeamTemplate that memoizes extension calls
@@ -62,7 +63,8 @@ date. Returns nil if the team does not exist, or if the page is not specified.
 ---@return string|nil
 TeamTemplate.getPageName = FnUtil.memoize(function(resolvedTemplate)
 	local raw = TeamTemplate.getRawOrNil(resolvedTemplate)
-	return raw and mw.ext.TeamLiquidIntegration.resolve_redirect(raw.page) or nil
+	local pageName = raw and mw.ext.TeamLiquidIntegration.resolve_redirect(raw.page) or nil
+	return Page.applyUnderScoresIfEnforced(pageName)
 end)
 
 --[[

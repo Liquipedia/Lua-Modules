@@ -56,15 +56,33 @@ function MatchSummaryMapVetoRound:render()
 	local children
 	if vetoType == VETO_DECIDER then
 		children = {
-			HtmlWidgets.Td{children = createVetoTypeElement()},
-			HtmlWidgets.Td{children = displayMap(self.props.map1)},
-			HtmlWidgets.Td{children = createVetoTypeElement()},
+			HtmlWidgets.Td{
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-left'},
+				children = createVetoTypeElement()
+			},
+			HtmlWidgets.Td{
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-center'},
+				children = displayMap(self.props.map1)
+			},
+			HtmlWidgets.Td{
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-right'},
+				children = createVetoTypeElement()
+			},
 		}
 	else
 		children = {
-			HtmlWidgets.Td{children = displayMap(self.props.map1)},
-			HtmlWidgets.Td{children = createVetoTypeElement()},
-			HtmlWidgets.Td{children = displayMap(self.props.map2)},
+			HtmlWidgets.Td{
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-left'},
+				children = displayMap(self.props.map1)
+			},
+			HtmlWidgets.Td{
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-center'},
+				children = createVetoTypeElement()
+			},
+			HtmlWidgets.Td{
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-right'},
+				children = displayMap(self.props.map2)
+			},
 		}
 	end
 

@@ -120,6 +120,12 @@
 		}
 	}
 
+	.wiki-fighters & {
+		@media ( min-width: 768px ) {
+			background: url( https://liquipedia.net/commons/images/e/ec/Fighters-banner.png ) no-repeat center / cover;
+		}
+	}
+
 	.wiki-fortnite & {
 		@media ( min-width: 768px ) {
 			background: url( https://liquipedia.net/commons/images/1/1a/Fortnite-banner.png ) no-repeat center / cover;
@@ -210,6 +216,12 @@
 		}
 	}
 
+	.wiki-smash & {
+		@media ( min-width: 768px ) {
+			background: url( https://liquipedia.net/commons/images/7/73/Smash_banner.jpg ) no-repeat center / cover;
+		}
+	}
+
 	.wiki-smite & {
 		@media ( min-width: 768px ) {
 			background: url( https://liquipedia.net/commons/images/1/12/Smite-banner.png ) no-repeat center / cover;
@@ -255,6 +267,12 @@
 	.wiki-teamfortress & {
 		@media ( min-width: 768px ) {
 			background: url( https://liquipedia.net/commons/images/d/d0/Teamfortress-banner.png ) no-repeat center / cover;
+		}
+	}
+
+	.wiki-tetris & {
+		@media ( min-width: 768px ) {
+			background: url( https://liquipedia.net/commons/images/a/af/Tetris-banner.jpg ) no-repeat center / cover;
 		}
 	}
 

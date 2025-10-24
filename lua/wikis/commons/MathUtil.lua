@@ -84,4 +84,21 @@ function MathUtil.round(value, precision)
 	return math.floor(value * rescale + 0.5) / rescale;
 end
 
+---Rounds a number to specified precision, then formats it using the provided format string
+---@param props {format: string?, value: number, precision: number?}
+---@return string
+function MathUtil.formatRounded(props)
+	local precision = props.precision or 0
+	local format = props.format or ('%.' .. precision .. 'f')
+	return string.format(format, MathUtil.round(props.value, precision))
+end
+
+---Formats a ratio as a percentage string
+---@param ratio number
+---@param precision number?
+---@return string
+function MathUtil.formatPercentage(ratio, precision)
+	return MathUtil.formatRounded{value = ratio * 100, precision = precision} .. '%'
+end
+
 return MathUtil
