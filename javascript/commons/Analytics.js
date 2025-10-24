@@ -34,18 +34,6 @@ liquipedia.analytics = {
 		 * Each key matches a `data-analytics-name` value.
 		 * Each function receives (element, properties, analyticsElement).
 		 *******************************************************************/
-		ToC: function( tocElement ) {
-			if ( tocElement.id === 'sidebar-toc' ) {
-				return {
-					'ToC position': SIDEBAR
-				};
-			} else {
-				return {
-					'ToC position': INLINE
-				};
-			}
-		},
-
 		Infobox: function( element, analyticsElement ) {
 			const parentDiv = element.parentElement;
 			if ( !parentDiv ) {
@@ -74,6 +62,18 @@ liquipedia.analytics = {
 			if ( closestHeader ) {
 				return {
 					'infobox section': closestHeader.innerText.trim()
+				};
+			}
+		},
+
+		ToC: function( tocElement ) {
+			if ( tocElement.id === 'sidebar-toc' ) {
+				return {
+					'ToC position': SIDEBAR
+				};
+			} else {
+				return {
+					'ToC position': INLINE
 				};
 			}
 		}
