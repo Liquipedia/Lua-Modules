@@ -34,6 +34,9 @@ function Infobox:render()
 
 	local analyticsProps = {
 		analyticsName = 'Infobox',
+		analyticsProperties = {
+			['infobox-type'] = self.props.infoboxType
+		},
 		children = {
 			Fragment{children = WidgetUtil.collect(
 				Div{
@@ -52,12 +55,6 @@ function Infobox:render()
 			)}
 		}
 	}
-
-	if self.props.infoboxType then
-		analyticsProps.analyticsProperties = {
-			['infobox-type'] = self.props.infoboxType
-		}
-	end
 
 	return AnalyticsWidget(analyticsProps)
 end
