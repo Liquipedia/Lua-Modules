@@ -37,7 +37,7 @@ end
 ---@return table[]
 function ParticipantTableImport._fetchMatchRecords(matchGroupSpec)
 	return mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = TournamentStructure.getMatch2Filter(matchGroupSpec),
+		conditions = tostring(TournamentStructure.getMatch2Filter(matchGroupSpec)),
 		query = 'pagename, match2bracketdata, match2opponents, winner',
 		order = 'date asc',
 		limit = 5000,

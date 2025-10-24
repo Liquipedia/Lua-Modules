@@ -36,7 +36,7 @@ local CONTENT = {
 		heading = 'Transfers',
 		body = TransfersList{
 			transferPortal = 'Transfers',
-			transferPage = 'Player Transfers/' .. os.date('%Y') .. '/' ..
+			transferPage = 'Player Transfers/' .. DateExt.getYearOf() .. '/' ..
 				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter',
 			rumours = true
 		},
@@ -58,6 +58,7 @@ local CONTENT = {
 	},
 	rating = {
 		heading = 'Liquipedia Rating',
+		boxid = 1520,
 		body = HtmlWidgets.Fragment{
 			children = {
 				RatingsDisplay.graph{id = 'rating'},

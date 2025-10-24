@@ -40,7 +40,7 @@ function Effect:createInfobox()
 		Center{children = {args.footnotes}},
 	}
 
-	return self:build(widgets)
+	return self:build(widgets, 'Effect')
 end
 
 return Effect

@@ -405,6 +405,45 @@ function mw.language:formatDate(format, timestamp, localTime)
 			return os.date(outFormat, ostimeWrapper(makeOsdateParam(year, month, day, hour, minute, second))) --[[@as string]]
 		end
 		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
+	elseif format == 'Y' then
+		local outFormat = '%Y'
+		if not timestamp then
+			return os.date(outFormat) --[[@as string]]
+		end
+		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
+			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
+		end
+		if type(timestamp) == 'string' then
+			local year = parseDateString(timestamp)
+			return year or ''
+		end
+		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
+	elseif format == 'n' then
+		local outFormat = '%m'
+		if not timestamp then
+			return os.date(outFormat) --[[@as string]]
+		end
+		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
+			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
+		end
+		if type(timestamp) == 'string' then
+			local _, month = parseDateString(timestamp)
+			return month or ''
+		end
+		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
+	elseif format == 'd' then
+		local outFormat = '%d'
+		if not timestamp then
+			return os.date(outFormat) --[[@as string]]
+		end
+		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
+			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
+		end
+		if type(timestamp) == 'string' then
+			local _, _, day = parseDateString(timestamp)
+			return day or ''
+		end
+		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
 	end
 	return ''
 end
@@ -579,7 +618,9 @@ end
 ---Removes all MediaWiki strip markers from a string.
 ---@param s string
 ---@return string
-function mw.text.killMarkers(s) end
+function mw.text.killMarkers(s)
+	return s
+end
 
 ---Joins a list, prose-style. In other words, it's like table.concat() but with a different separator before the final item.
 ---@param list table
@@ -1294,6 +1335,21 @@ mw.ext.valorantdb = {}
 ---@field character {riot_id: string, name: string, icon_name: string, localized_names: table<string, string>}
 ---@field lpdb_player? {page_name: string, publisher_id: string, wiki: string}
 
+---@class valorantMatchApiRoundKill
+---@field victim string
+---@field time_since_round_start_millis integer
+---@field time_since_game_start_millis integer
+---@field killer string
+---@field finishing_damage table
+---@field assistants string[]
+
+---@class valorantMatchApiRoundPlayer
+---@field kills valorantMatchApiRoundKill[]
+---@field score integer
+---@field puuid string
+---@field economy {remaining: string, armor: string, spent: integer, loadout_value: integer, weapon: string}
+---@field damage {receiver: string, leg_shots: integer, head_shots: integer, body_shots: integer, damage: integer}[]
+
 ---@class valorantMatchApiRound
 ---@field round_num integer
 ---@field round_result 'Bomb defused'|'Eliminated'|'Bomb detonated'|'Round timer expired'|'Surrendered'
@@ -1307,7 +1363,7 @@ mw.ext.valorantdb = {}
 ---@field plant_round_time integer # 0 is no plant
 ---@field defuse_round_time integer # 0 is no defuse
 ---@field plant_site? 'A'|'B'
----@field player_stats table[]
+---@field player_stats valorantMatchApiRoundPlayer[]
 
 ---@class valorantMatchApiTeam
 ---@field team_id 'Blue'|'Red'

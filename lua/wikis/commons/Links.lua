@@ -204,7 +204,7 @@ local PREFIXES = {
 	},
 	openrec = {'https://www.openrec.tv/live/'},
 	opl = {
-		match = 'https://www.opleague.eu/match/'
+		match = 'https://www.opleague.pro/match/'
 	},
 	osu = {
 		'https://osu.ppy.sh/',
@@ -243,6 +243,11 @@ local PREFIXES = {
 		match = 'https://royaleapi.com/'
 	},
 	rules = {''},
+	sendou = {
+		'https://sendou.ink/to/',
+		player = 'https://sendou.ink/u/',
+		team = 'https://sendou.ink/t/',
+	},
 	shift = {
 		'https://www.shiftrle.gg/events/',
 		match = 'https://www.shiftrle.gg/matches/',
@@ -271,6 +276,11 @@ local PREFIXES = {
 	spotify = {'https://open.spotify.com/'},
 	steamalternative = {'https://steamcommunity.com/profiles/'},
 	stats = {'', match = ''},
+	statshark = {
+		'https://statshark.net/',
+		player = 'https://statshark.net/player/',
+		team = 'https://statshark.net/squadrons/',
+	},
 	stratz = {
 		'https://stratz.com/leagues/',
 		player = 'https://stratz.com/players/',

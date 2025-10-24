@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local VodLink = Lua.import('Module:VodLink')
 
 local Widget = Lua.import('Module:Widget')
@@ -31,6 +32,7 @@ function VodButton:render()
 	local useDropdownVariant = self.props.variant == 'dropdown'
 	local showText = self.props.showText
 	local gameNumber = self.props.gameNumber
+	local useGrow = Logic.readBool(self.props.grow)
 
 	return Button{
 		linktype = 'external',
@@ -38,10 +40,11 @@ function VodButton:render()
 		variant = 'tertiary',
 		link = vodLink,
 		size = 'sm',
+		grow = useGrow,
 		children = useDropdownVariant and {
-			Icon{iconName = 'vod_play'},
+			Icon{iconName = 'vod_play', size = 'sm'},
 			HtmlWidgets.Span{
-				children = showText and ('VOD ' .. gameNumber) or gameNumber,
+				children = showText and ('Game ' .. gameNumber) or gameNumber,
 			}
 		} or {
 			ImageIcon{imageLight = VodLink.getIcon(gameNumber)},

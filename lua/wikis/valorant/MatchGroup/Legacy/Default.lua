@@ -50,6 +50,7 @@ function MatchGroupLegacyDefault:getMap()
 end
 
 ---@param frame Frame
+---@return string
 function MatchGroupLegacyDefault.run(frame)
 	return MatchGroupLegacyDefault(frame):build()
 end
@@ -72,6 +73,16 @@ function MatchGroupLegacyDefault:handleOtherMatchParams(isReset, match)
 		score1 = opp1score,
 		score2 = opp2score,
 	}
+end
+
+---@param frame Frame
+---@return string
+function MatchGroupLegacyDefault.runGenerate(frame)
+	frame.args.template = frame.args[1]
+	frame.args.templateOld = frame.args[2]
+	frame.args.type = frame.args.type or 'team'
+
+	return MatchGroupLegacyDefault(frame):generate()
 end
 
 return MatchGroupLegacyDefault

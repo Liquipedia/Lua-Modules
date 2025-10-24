@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local AgentNames = Lua.import('Module:AgentNames')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
@@ -29,8 +30,17 @@ local MapFunctions = {}
 local VALORANT_REGIONS = {'eu', 'na', 'ap', 'kr', 'latam', 'br', 'pbe1', 'esports'}
 
 ---@alias ValorantSides 'atk'|'def'
----@alias ValorantRoundData{round: integer, winBy:string,
----t1side: ValorantSides, t2side: ValorantSides, winningSide: ValorantSides}
+
+---@class ValorantRoundData
+---@field round integer
+---@field winBy string
+---@field defused boolean
+---@field planted boolean
+---@field firstKill {byTeam: integer?, killer: string?, victim: string?}
+---@field t1side ValorantSides
+---@field t2side ValorantSides
+---@field winningSide ValorantSides
+---@field ceremony string
 
 ---@class ValorantMapParserInterface
 ---@field getMap fun(mapInput: table): table
@@ -42,6 +52,20 @@ local VALORANT_REGIONS = {'eu', 'na', 'ap', 'kr', 'latam', 'br', 'pbe1', 'esport
 ---@field getLength fun(map: table): string?
 ---@field getRounds fun(map: table): ValorantRoundData[]?
 ---@field getPatch fun(map: table): string?
+---@field extendMapOpponent? fun(map: table, opponentIndex: integer): table
+
+---@class ValorantPlayerOverallStats
+---@field acs integer[]
+---@field kast integer[]
+---@field adr integer[]
+---@field kills integer
+---@field deaths integer
+---@field assists integer
+---@field firstKills integer
+---@field firstDeaths integer
+---@field roundsPlayed integer
+---@field totalKastRounds integer
+---@field damageDealt integer
 
 ---@param match table
 ---@param options table?
@@ -65,7 +89,13 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 	end
 
-	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
+	local processedMatch = MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
+
+	if options.isMatchPage then
+		MatchFunctions.populateOpponentStats(processedMatch)
+	end
+
+	return processedMatch
 end
 
 --
@@ -80,6 +110,7 @@ function MatchFunctions.extractMaps(match, opponents, MapParser)
 	---@type MapParserInterface
 	local mapParser = {
 		calculateMapScore = FnUtil.curry(MapFunctions.calculateMapScore, MapParser),
+		extendMapOpponent = MapParser.extendMapOpponent,
 		getExtraData = FnUtil.curry(MapFunctions.getExtraData, MapParser),
 		getMap = MapParser.getMap,
 		getMapName = MapParser.getMapName,
@@ -126,6 +157,131 @@ function MatchFunctions.getPatch(match, games)
 		match.patch,
 		#games > 0 and games[1].patch or nil
 	)
+end
+
+---@param match {opponents: MGIParsedOpponent[], games: table[]}
+---@return table
+function MatchFunctions.populateOpponentStats(match)
+	Array.forEach(match.opponents, function(opponent, opponentIdx)
+		opponent.extradata = Table.merge(
+			opponent.extradata, MatchFunctions.calculateOverallStatsForOpponent(match.games, opponentIdx)
+		)
+		Array.forEach(opponent.match2players, function(player, playerIndex)
+			player.extradata = player.extradata or {}
+			player.extradata.overallStats = MatchFunctions.calculateOverallStatsForPlayer(
+				match.games, opponentIdx, player, playerIndex
+			)
+		end)
+	end)
+	return match
+end
+
+---@param maps table[]
+---@param opponentIndex integer
+---@return table
+function MatchFunctions.calculateOverallStatsForOpponent(maps, opponentIndex)
+	local teamDataPerMap = Array.map(
+		Array.filter(maps, function(map)
+			return map.status ~= MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
+		end),
+		function(map)
+			return map.opponents[opponentIndex]
+		end
+	)
+
+	local function getSumOf(key)
+		return Array.reduce(Array.map(teamDataPerMap, function (teamData)
+			return teamData[key] or 0
+		end), Operator.add, 0)
+	end
+
+	local postPlant = Array.reduce(teamDataPerMap, function (postPlantTotals, teamData)
+		if teamData.postPlant then
+			postPlantTotals[1] = postPlantTotals[1] + (teamData.postPlant[1] or 0)
+			postPlantTotals[2] = postPlantTotals[2] + (teamData.postPlant[2] or 0)
+		end
+		return postPlantTotals
+	end, {0, 0})
+
+	return {
+		firstKills = getSumOf('firstKills'),
+		thrifties = getSumOf('thrifties'),
+		clutches = getSumOf('clutches'),
+		postPlant = postPlant,
+	}
+end
+
+---@param maps table[]
+---@param teamIdx integer
+---@param player table
+---@param playerIdx integer
+---@return table
+function MatchFunctions.calculateOverallStatsForPlayer(maps, teamIdx, player, playerIdx)
+	local playerId = player.name
+	if not playerId then return {} end
+
+	local overallStats = {
+		acs = 0,
+		kills = 0,
+		deaths = 0,
+		assists = 0,
+		firstKills = 0,
+		firstDeaths = 0,
+		roundsPlayed = 0,
+		roundsWithKast = 0,
+		damageDealt = 0,
+	}
+	local agents = {}
+
+	Array.forEach(maps, function(map)
+		if map.status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
+			return
+		end
+
+		local mapPlayer = map.opponents[teamIdx].players[playerIdx]
+
+		if mapPlayer.agent then
+			table.insert(agents, mapPlayer.agent)
+		end
+		overallStats.acs = overallStats.acs + ((mapPlayer.acs or 0) * (mapPlayer.roundsPlayed or 0))
+		overallStats.kills = overallStats.kills + (mapPlayer.kills or 0)
+		overallStats.deaths = overallStats.deaths + (mapPlayer.deaths or 0)
+		overallStats.assists = overallStats.assists + (mapPlayer.assists or 0)
+		overallStats.roundsPlayed = overallStats.roundsPlayed + (mapPlayer.roundsPlayed or 0)
+		overallStats.roundsWithKast = overallStats.roundsWithKast + (mapPlayer.roundsWithKast or 0)
+		overallStats.damageDealt = overallStats.damageDealt + (mapPlayer.damageDealt or 0)
+		overallStats.firstKills = overallStats.firstKills + (mapPlayer.firstKills or 0)
+		overallStats.firstDeaths = overallStats.firstDeaths + (mapPlayer.firstDeaths or 0)
+	end)
+
+	local function calculatePercentage(value, total)
+		if total == 0 then
+			return 0
+		end
+		return value / total * 100
+	end
+
+	local kast, adr, acs
+	if overallStats.roundsPlayed > 0 then
+		kast = calculatePercentage(overallStats.roundsWithKast, overallStats.roundsPlayed)
+		adr = overallStats.damageDealt / overallStats.roundsPlayed
+		if overallStats.acs then
+			acs = overallStats.acs / overallStats.roundsPlayed
+		end
+	end
+
+	return {
+		agent = agents,
+		acs = acs,
+		kills = overallStats.kills,
+		deaths = overallStats.deaths,
+		assists = overallStats.assists,
+		kast = kast,
+		adr = adr,
+		firstKills = overallStats.firstKills,
+		firstDeaths = overallStats.firstDeaths,
+		roundsPlayed = overallStats.roundsPlayed,
+	}
 end
 
 --
@@ -190,6 +346,7 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, AgentNames)
 
 	local participantList = MapParser.getParticipants(map, opponentIndex) or {}
+
 	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		participantList,
@@ -199,7 +356,8 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 		end,
 		function(playerIndex, playerIdData, playerInputData)
 			local participant = participantList[playerIndex]
-			return {
+
+			local playerData = {
 				kills = participant.kills,
 				deaths = participant.deaths,
 				assists = participant.assists,
@@ -209,12 +367,31 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 				hs = participant.hs,
 				player = playerIdData.name or playerInputData.link or playerInputData.name,
 				displayName = playerIdData.displayname or playerInputData.name,
-
+				puuid = participant.puuid,
 				agent = getCharacterName(participant.agent),
+				firstKills = participant.firstKills,
+				firstDeaths = participant.firstDeaths,
 			}
+
+			-- adds overall stats to playerData for MatchPage
+			if (participant and participant.puuid) then
+				local allRoundsData = map.round_results or {}
+				local roundsPlayed = #allRoundsData
+				local roundsWithKast = (participant.kast / 100) * roundsPlayed
+				local damageDealt = participant.adr * roundsPlayed
+
+				Table.mergeInto(playerData, {
+					roundsPlayed = roundsPlayed,
+					roundsWithKast = roundsWithKast,
+					damageDealt = damageDealt,
+				})
+			end
+
+			return playerData
 		end
 	)
 end
+
 ---@param MapParser ValorantMapParserInterface
 ---@param map table
 ---@return fun(opponentIndex: integer): integer?

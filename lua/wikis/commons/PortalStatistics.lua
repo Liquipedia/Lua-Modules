@@ -806,20 +806,31 @@ end
 Section: Query Functions
 ]]--
 
+---Executes a given LPDB query using Lpdb.executeMassQuery
+---@param tableName string Name of the table
+---@param parameters table Query parameters
+---@return table
+function StatisticsPortal._massQuery(tableName, parameters)
+	local data = {}
+
+	Lpdb.executeMassQuery(tableName, parameters, function (item)
+		table.insert(data, item)
+	end, parameters.limit)
+
+	return data
+end
 
 ---@param limit number?
 ---@param addConditions string?
 ---@param addOrder string?
 ---@return table
 function StatisticsPortal._getPlayers(limit, addConditions, addOrder)
-	local data = mw.ext.LiquipediaDB.lpdb('player', {
+	return StatisticsPortal._massQuery('player', {
 		query = 'pagename, id, nationality, earnings, birthdate, team, earningsbyyear',
 		conditions = addConditions or '',
 		order = addOrder,
-		limit = limit or MAX_QUERY_LIMIT,
+		limit = limit,
 	})
-
-	return data
 end
 
 
@@ -828,14 +839,12 @@ end
 ---@param addOrder string?
 ---@return table
 function StatisticsPortal._getTeams(limit, addConditions, addOrder)
-	local data = mw.ext.LiquipediaDB.lpdb('team', {
+	return StatisticsPortal._massQuery('team', {
 		query = 'pagename, name, template, earnings, earningsbyyear',
 		conditions = addConditions or '',
 		order = addOrder,
-		limit = limit or MAX_QUERY_LIMIT,
+		limit = limit,
 	})
-
-	return data
 end
 
 

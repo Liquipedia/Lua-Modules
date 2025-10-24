@@ -54,6 +54,7 @@ local CONTENT = {
 	specialEvents = {
 		heading = HtmlWidgets.Fragment{children = {ONGOING_SERIES, '&nbsp;Active and Upcoming Series'}},
 		body = '{{Liquipedia:Active Upcoming Series}}',
+		padding = true,
 		boxid = 1502
 	},
 	filterButtons = {
@@ -69,16 +70,19 @@ local CONTENT = {
 			upcomingDays = 90,
 			completedDays = 90
 		},
+		padding = true,
 		boxid = 1503
 	},
 	seasonOverview = {
 		heading =HtmlWidgets.Fragment{children = {TROPHY, '&nbsp;Current Season Overview'}},
 		body = '{{Liquipedia:Season Overview}}',
+		padding = true,
 		boxid = 1504
 	},
 	seasonCalendar = {
 		heading =HtmlWidgets.Fragment{children = {CALENDAR, '&nbsp;Season Calendar'}},
 		body = '{{Liquipedia:Season Calendar}}',
+		padding = true,
 		boxid = 1505
 	},
 	wantToHelp = {
@@ -98,6 +102,7 @@ local CONTENT = {
 	upcomingRace = {
 		heading =HtmlWidgets.Fragment{children = {TROPHY, '&nbsp;Upcoming Race'}},
 		body = '{{Liquipedia:Upcoming Grand Prix}}',
+		padding = true,
 		boxid = 1509
 	},
 	previousRace = {

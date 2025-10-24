@@ -14,6 +14,7 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Info = Lua.import('Module:Info')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TypeUtil = Lua.import('Module:TypeUtil')
@@ -210,12 +211,13 @@ MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed
 ---@field dateIsExact boolean
 ---@field game string?
 ---@field header string?
----@field length number?
+---@field length string|number?
 ---@field map string?
 ---@field mapDisplayName string?
 ---@field mode string?
 ---@field opponents {players: table[], score: number?, status: string?}[]
 ---@field patch string?
+---@field resultType string?
 ---@field scores number[]
 ---@field subgroup number?
 ---@field type string?
@@ -228,11 +230,12 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 	date = 'string?',
 	game = 'string?',
 	header = 'string?',
-	length = 'number?',
+	length = TypeUtil.optional(TypeUtil.union('number', 'string')),
 	map = 'string?',
 	mapDisplayName = 'string?',
 	mode = 'string?',
 	patch = 'string?',
+	resultType = 'string?',
 	scores = TypeUtil.array('number'),
 	subgroup = 'number?',
 	type = 'string?',
@@ -262,6 +265,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field patch string?
 ---@field phase 'upcoming'|'ongoing'|'finished'
 ---@field publisherTier string?
+---@field resultType string?
 ---@field section string?
 ---@field series string?
 ---@field status MatchStatus
@@ -295,6 +299,7 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	parent = 'string?',
 	patch = 'string?',
 	publisherTier = 'string?',
+	resultType = 'string?',
 	section = 'string?',
 	series = 'string?',
 	status = MatchGroupUtil.types.Status,
@@ -351,6 +356,19 @@ MatchGroupUtil.types.MatchGroup = TypeUtil.union(
 	MatchGroupUtil.types.Matchlist,
 	MatchGroupUtil.types.Bracket
 )
+
+---Fetches all match ids of matches that satisfy the supplied condition
+---@param props {conditions: string|AbstractConditionNode, limit: string|integer?, order: string?}
+---@return string[]
+function MatchGroupUtil.fetchMatchIds(props)
+	---@type string[]
+	return Array.map(mw.ext.LiquipediaDB.lpdb('match2', {
+		limit = tonumber(props.limit) or 1000,
+		query = 'match2id',
+		conditions = tostring(props.conditions),
+		order = props.order
+	}), Operator.property('match2id'))
+end
 
 ---Fetches all matches in a matchlist or bracket. Tries to read from page variables before fetching from LPDB.
 ---Returns a list of records ordered lexicographically by matchId.

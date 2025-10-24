@@ -128,7 +128,7 @@ function TransferNavBox._checkForCurrentQuarterOrMonth(children, firstEntry)
 
 		if quarter then
 			local ordinal = currentQuarter .. Ordinal.suffix(currentQuarter)
-			pageName = pageName:gsub('(%d)%a%a(_[qQ]uarter)', ordinal .. '%1')
+			pageName = pageName:gsub('(%d)%a%a(_[qQ]uarter)', ordinal .. '%2')
 			table.insert(children.child0, 1, Link{
 				link = pageName,
 				children = {'Q' .. currentQuarter},
@@ -179,23 +179,30 @@ end
 ---@return Widget[] yearly
 ---@return Widget[] misc
 function TransferNavBox._getUnsortedUnsourcedYearly(pagesByYear)
-	local toDisplay = function(pageName, year)
-		return Link{link = pageName, children = {year}}
+	---@param pageName string
+	---@param year integer
+	---@param suffix string
+	---@return Widget
+	local toDisplay = function(pageName, year, suffix)
+		return Link{link = pageName, children = {year .. suffix}}
 	end
 
 	local unsorted, unsourced, yearly, misc = {}, {}, {}, {}
 	local latestYear
 	for year, pages in Table.iter.spairs(pagesByYear, TransferNavBox._sortByYear) do
 		Array.forEach(pages, function(pageName)
-			local name = pageName:match('.*/' .. year .. '/(.*)')
-			local name2 = pageName:match('.*/(.*)/' .. year)
-			name = (name or name2 or ''):lower()
+			local name, suffix = pageName:match('.*/' .. year .. '/(.*)(/%d)')
+			local name2, suffix2 = pageName:match('.*/(.*)/' .. year .. '(/%d)')
+			local name3 = pageName:match('.*/' .. year .. '/(.*)')
+			local name4 = pageName:match('.*/(.*)/' .. year)
+			name = (name or name2 or name3 or name4 or ''):lower()
+			suffix = (suffix or suffix2 or ''):lower()
 			if name == 'unsorted' then
-				table.insert(unsorted, toDisplay(pageName, year))
+				table.insert(unsorted, toDisplay(pageName, year, suffix))
 			elseif name == 'unsourced' or name == 'nosource' then
-				table.insert(unsourced, toDisplay(pageName, year))
+				table.insert(unsourced, toDisplay(pageName, year, suffix))
 			elseif pageName:match('[tT]ransfers/' .. year .. '$') then
-				table.insert(yearly, toDisplay(pageName, year))
+				table.insert(yearly, toDisplay(pageName, year, suffix))
 				if not latestYear then
 					latestYear = {year = tonumber(year), pageName = pageName}
 				end
@@ -208,7 +215,7 @@ function TransferNavBox._getUnsortedUnsourcedYearly(pagesByYear)
 	local currentYear = DateExt.getYearOf()
 	if latestYear and currentYear == (latestYear.year + 1) then
 		local pageName = latestYear.pageName:gsub(latestYear.year, currentYear)
-		table.insert(yearly, 1, toDisplay(pageName, currentYear))
+		table.insert(yearly, 1, toDisplay(pageName, currentYear, ''))
 	end
 
 	return unsorted, unsourced, yearly, misc

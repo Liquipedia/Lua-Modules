@@ -67,6 +67,14 @@ local BaseMatchPage = Class.new(
 		self.matchData = match
 		self.games = match.games
 		self.opponents = match.opponents
+
+		-- Update the view model with game and team data
+		self:populateGames()
+
+		-- Add more opponent data field
+		self:populateOpponents()
+
+		self:addCategories()
 	end
 )
 
@@ -78,6 +86,22 @@ BaseMatchPage.NO_CHARACTER = 'default'
 function BaseMatchPage.getByMatchId(props)
 	local matchPage = BaseMatchPage(props.match)
 	return matchPage:render()
+end
+
+function BaseMatchPage:addCategories()
+	local matchPhase = MatchGroupUtil.computeMatchPhase(self.matchData)
+
+	mw.ext.TeamLiquidIntegration.add_category('Matches')
+	if matchPhase then
+		local phaseToDisplay = {
+			finished = 'Finished',
+			ongoing = 'Live',
+			upcoming = 'Upcoming',
+		}
+		if phaseToDisplay[matchPhase] then
+			mw.ext.TeamLiquidIntegration.add_category(phaseToDisplay[matchPhase] .. ' Matches')
+		end
+	end
 end
 
 ---Tests whether this match page is a Bo1
@@ -129,16 +153,30 @@ end
 ---@protected
 ---@return Widget[]
 function BaseMatchPage:getVods()
+	---@type {vod: string, number: integer}[]
+	local gameVods = Array.map(self.games, function(game, gameIdx)
+		if Logic.isEmpty(game.vod) then
+			return
+		end
+		return {
+			vod = game.vod,
+			number = gameIdx,
+		}
+	end)
+
 	return WidgetUtil.collect(
 		String.isNotEmpty(self.matchData.vod) and VodButton{
-			vodLink = self.matchData.vod
+			vodLink = self.matchData.vod,
+			grow = true,
 		} or nil,
-		Array.map(self.games, function(game, gameIdx)
-			return game.vod and VodButton{
-				gameNumber = gameIdx,
+		Array.map(gameVods, function (vod)
+			return VodButton{
+				vodLink = vod.vod,
+				gameNumber = vod.number,
+				showText = #gameVods < 4,
 				variant = 'dropdown',
-				vodLink = game.vod,
-			} or nil
+				grow = true,
+			}
 		end)
 	)
 end
@@ -225,8 +263,9 @@ function BaseMatchPage:render()
 		mw.getCurrentFrame():callParserFunction('DISPLAYTITLE', displayTitle, 'noreplace')
 	end
 
-	local tournamentContext = self:_getMatchContext()
+	local tournamentContext = self:getMatchContext()
 	return Div{
+		classes = {'match-bm'},
 		children = WidgetUtil.collect(
 			Header {
 				countdownBlock = self:getCountdownBlock(),
@@ -267,17 +306,32 @@ function BaseMatchPage:renderGames()
 		['hide-showall'] = true
 	}
 
+	local overallStats = self:renderOverallStats()
+	local hasOverallStats = Logic.isNotEmpty(overallStats)
+
+	if hasOverallStats then
+		tabs.name1 = 'Overall Statistics'
+		tabs.content1 = overallStats
+	end
+
 	Array.forEach(games, function(game, idx)
 		local mapName = self.games[idx].map
+		local tabId = hasOverallStats and (idx + 1) or idx
 		if Logic.isNotEmpty(mapName) then
-			tabs['name' .. idx] = 'Game ' .. idx .. ': ' .. mapName
+			tabs['name' .. tabId] = 'Game ' .. idx .. ': ' .. mapName
 		else
-			tabs['name' .. idx] = 'Game ' .. idx
+			tabs['name' .. tabId] = 'Game ' .. idx
 		end
-		tabs['content' .. idx] = game
+		tabs['content' .. tabId] = game
 	end)
 
 	return Tabs.dynamic(tabs)
+end
+
+---@protected
+---@return string|Html|Widget?
+function BaseMatchPage:renderOverallStats()
+	return nil
 end
 
 ---@protected
@@ -287,10 +341,20 @@ function BaseMatchPage:renderGame(game)
 	error('BaseMatchPage:renderGame() cannot be called directly and must be overridden.')
 end
 
----@private
+---@protected
 ---@return table
-function BaseMatchPage:_getMatchContext()
+function BaseMatchPage:getMatchContext()
 	return MatchGroupInputUtil.getTournamentContext(self.matchData)
+end
+
+---@protected
+---@return Widget
+function BaseMatchPage:getTournamentIcon()
+	return IconImage{
+		imageLight = self:getMatchContext().icon,
+		imageDark = self:getMatchContext().icondark,
+		size = '50x32px',
+	}
 end
 
 ---@protected

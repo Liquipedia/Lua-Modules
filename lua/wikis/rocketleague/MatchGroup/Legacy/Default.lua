@@ -35,4 +35,14 @@ function RocketLeagueMatchGroupLegacyDefault.run(frame)
 	return RocketLeagueMatchGroupLegacyDefault(frame):build()
 end
 
+---@param frame Frame
+---@return string
+function RocketLeagueMatchGroupLegacyDefault.runGenerate(frame)
+	frame.args.template = frame.args[1]
+	frame.args.templateOld = frame.args[2]
+	frame.args.type = frame.args.type or 'team'
+
+	return RocketLeagueMatchGroupLegacyDefault(frame):generate()
+end
+
 return RocketLeagueMatchGroupLegacyDefault

@@ -36,6 +36,11 @@ return {
 			matchWidthMobile = 120,
 			matchWidth = 170,
 		},
+		infoboxPlayer = {
+			automatedHistory = {
+				storeFromWikiCode = true,
+			},
+		},
 		defaultMaxPlayersPerPlacement = 35,
 	},
 }

@@ -35,7 +35,7 @@ local CONTENT = {
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferPage = 'Player Transfers/' .. os.date('%Y') .. '/'
+			transferPage = 'Player Transfers/' .. DateExt.getYearOf() .. '/'
 				.. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 		},
 		boxid = 1509,
@@ -48,7 +48,7 @@ local CONTENT = {
 	},
 	specialEvents = {
 		noPanel = true,
-		body = '{{Liquipedia:2025 Season}}',
+		body = '{{Liquipedia:Special Event}}',
 		boxid = 1516,
 	},
 	filterButtons = {

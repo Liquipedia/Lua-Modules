@@ -150,6 +150,7 @@ end
 function MatchFunctions.getExtraData(match, games, opponents)
 	local extradata = {
 		ffa = 'false',
+		mod = Variables.varDefault('tournament_mod'),
 	}
 
 	for prefix, vetoMap, vetoIndex in Table.iter.pairsByPrefix(match, 'veto') do

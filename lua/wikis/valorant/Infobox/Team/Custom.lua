@@ -20,6 +20,8 @@ local Cell = Widgets.Cell
 
 ---@class ValorantInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
+---@class ValorantInfoboxTeamWidgetInjector: WidgetInjector
+---@field caller ValorantInfoboxTeam
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -53,7 +55,7 @@ end
 ---@return Widget?
 function CustomTeam:createBottomContent()
 	if not self.args.disbanded then
-		return UpcomingTournaments.team(self.teamTemplate.templatename)
+		return UpcomingTournaments.team{name = self.teamTemplate.templatename}
 	end
 end
 

@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 
@@ -37,7 +38,7 @@ TransfersList.defaultProps = {
 	limit = 15,
 	rumours = false,
 	transferPortal = 'Portal:Transfers',
-	transferPage = 'Player Transfers/' .. os.date('%Y') .. '/' .. os.date('%B'),
+	transferPage = 'Player Transfers/' .. DateExt.getYearOf() .. '/' .. os.date('%B'),
 	transferQuery = true
 }
 
