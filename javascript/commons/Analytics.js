@@ -44,9 +44,41 @@ liquipedia.analytics = {
 					'ToC position': INLINE
 				};
 			}
+		},
+
+		Infobox: function( element, analyticsElement ) {
+			const parentDiv = element.parentElement;
+			if ( !parentDiv ) {
+				return;
+			}
+
+			const previousSibling = parentDiv.previousElementSibling;
+			if ( previousSibling && previousSibling.classList.contains( 'infobox-description' ) ) {
+				return {
+					'infobox section': previousSibling.innerText.trim()
+				};
+			}
+
+			const allHeaders = analyticsElement.querySelectorAll( '.infobox-header' );
+			let closestHeader = null;
+
+			for ( let i = allHeaders.length - 1; i >= 0; i-- ) {
+				const header = allHeaders[ i ];
+				// eslint-disable-next-line no-bitwise
+				if ( header.compareDocumentPosition( element ) & Node.DOCUMENT_POSITION_FOLLOWING ) {
+					closestHeader = header;
+					break;
+				}
+			}
+
+			if ( closestHeader ) {
+				return {
+					'infobox section': closestHeader.innerText.trim()
+				};
+			}
 		}
 	},
-
+  
 	clickTrackers: [],
 
 	init: function() {
@@ -192,8 +224,8 @@ liquipedia.analytics = {
 			propertiesBuilder: ( link ) => {
 				const properties = {
 					title: link.innerText,
-					destination: link.href,
-					position: liquipedia.analytics.findLinkPosition( link )
+					position: liquipedia.analytics.findLinkPosition( link ),
+					destination: link.href
 				};
 
 				const customProperties = liquipedia.analytics.addCustomProperties( link );

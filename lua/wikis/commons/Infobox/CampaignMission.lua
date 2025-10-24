@@ -60,7 +60,7 @@ function Mission:createInfobox()
 		self:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'CampaignMission')
 end
 
 return Mission
