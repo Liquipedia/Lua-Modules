@@ -49,12 +49,6 @@ local WIN_TYPE_TO_ICON = {
 function MatchPage.getByMatchId(props)
 	local matchPage = MatchPage(props.match)
 
-	-- Update the view model with game and team data
-	matchPage:populateGames()
-
-	-- Add more opponent data field
-	matchPage:populateOpponents()
-
 	return matchPage:render()
 end
 

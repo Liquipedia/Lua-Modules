@@ -63,7 +63,7 @@ function Strategy:createInfobox()
 		self:categories('Strategies')
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Strategy')
 end
 
 return Strategy

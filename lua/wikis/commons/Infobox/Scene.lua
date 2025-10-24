@@ -67,7 +67,7 @@ function Scene:createInfobox()
 
 	self:categories('Scene')
 
-	return self:build(widgets)
+	return self:build(widgets, 'Scene')
 end
 
 --- Allows for overriding this functionality

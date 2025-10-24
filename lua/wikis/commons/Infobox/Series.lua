@@ -139,7 +139,7 @@ function Series:createInfobox()
 		self:categories(unpack(self:_getCategories(args)))
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Series')
 end
 
 ---@param args table

@@ -31,6 +31,37 @@ liquipedia.analytics = {
 		 * Each key matches a `data-analytics-name` value.
 		 * Each function receives (element, properties, analyticsElement).
 		 *******************************************************************/
+		Infobox: function( element, analyticsElement ) {
+			const parentDiv = element.parentElement;
+			if ( !parentDiv ) {
+				return;
+			}
+
+			const previousSibling = parentDiv.previousElementSibling;
+			if ( previousSibling && previousSibling.classList.contains( 'infobox-description' ) ) {
+				return {
+					'infobox section': previousSibling.innerText.trim()
+				};
+			}
+
+			const allHeaders = analyticsElement.querySelectorAll( '.infobox-header' );
+			let closestHeader = null;
+
+			for ( let i = allHeaders.length - 1; i >= 0; i-- ) {
+				const header = allHeaders[ i ];
+				// eslint-disable-next-line no-bitwise
+				if ( header.compareDocumentPosition( element ) & Node.DOCUMENT_POSITION_FOLLOWING ) {
+					closestHeader = header;
+					break;
+				}
+			}
+
+			if ( closestHeader ) {
+				return {
+					'infobox section': closestHeader.innerText.trim()
+				};
+			}
+		}
 	},
 	clickTrackers: [],
 
