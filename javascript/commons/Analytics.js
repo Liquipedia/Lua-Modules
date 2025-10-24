@@ -25,6 +25,44 @@ const getReferrerDomain = () => document.referrer ? new URL( document.referrer )
 const getWikiId = () => mw.config.get( 'wgScriptPath' )?.slice( 1 );
 
 liquipedia.analytics = {
+	customPropertyFinders: {
+		/********************************************************************
+		 * A registry of functions to find component-specific properties.
+		 * Each key matches a `data-analytics-name` value.
+		 * Each function receives (element, properties, analyticsElement).
+		 *******************************************************************/
+		Infobox: function( element, analyticsElement ) {
+			const parentDiv = element.parentElement;
+			if ( !parentDiv ) {
+				return;
+			}
+
+			const previousSibling = parentDiv.previousElementSibling;
+			if ( previousSibling && previousSibling.classList.contains( 'infobox-description' ) ) {
+				return {
+					'infobox section': previousSibling.innerText.trim()
+				};
+			}
+
+			const allHeaders = analyticsElement.querySelectorAll( '.infobox-header' );
+			let closestHeader = null;
+
+			for ( let i = allHeaders.length - 1; i >= 0; i-- ) {
+				const header = allHeaders[ i ];
+				// eslint-disable-next-line no-bitwise
+				if ( header.compareDocumentPosition( element ) & Node.DOCUMENT_POSITION_FOLLOWING ) {
+					closestHeader = header;
+					break;
+				}
+			}
+
+			if ( closestHeader ) {
+				return {
+					'infobox section': closestHeader.innerText.trim()
+				};
+			}
+		}
+	},
 	clickTrackers: [],
 
 	init: function() {
@@ -92,29 +130,60 @@ liquipedia.analytics = {
 		return clone.textContent.trim();
 	},
 
-	setupWikiMenuLinkClickAnalytics: function() {
-		liquipedia.analytics.clickTrackers.push( {
-			selector: '[data-wiki-menu="link"]',
-			trackerName: WIKI_SWITCHED,
-			propertiesBuilder: ( wikiMenuLink ) => ( {
-				wiki: wikiMenuLink.closest( '[data-wiki-id]' ).dataset.wikiId,
-				position: 'wiki menu',
-				destination: wikiMenuLink.href,
-				'trending page': false,
-				'trending position': null
-			} )
-		} );
+	// Converts a camelCase dataset key into a human-readable property name like
+	// 'analyticsInfoboxType' into 'infobox type'.
+	formatAnalyticsKey: function( key ) {
+		const baseName = key.replace( /^analytics/, '' );
+		const withSpaces = baseName.replace( /([A-Z])/g, ' $1' );
+		const trimmed = withSpaces.trim();
+
+		if ( !trimmed ) {
+			return '';
+		}
+
+		return trimmed.toLowerCase();
+	},
+
+	addCustomProperties: function( element ) {
+		const analyticsElement = element.closest( '[data-analytics-name]' );
+		let customProperties = {};
+
+		if ( !analyticsElement ) {
+			return customProperties;
+		}
+
+		Object.entries( analyticsElement.dataset )
+			.filter( ( [ key ] ) => key.startsWith( 'analytics' ) && key !== 'analyticsName' )
+			.forEach( ( [ key, value ] ) => {
+				const propertyName = liquipedia.analytics.formatAnalyticsKey( key );
+				customProperties[ propertyName ] = value || null;
+			} );
+
+		const componentName = analyticsElement.dataset.analyticsName;
+		const customFinder = liquipedia.analytics.customPropertyFinders[ componentName ];
+
+		if ( typeof customFinder === 'function' ) {
+			customProperties = { ...customProperties, ...customFinder( element, analyticsElement ) };
+		}
+
+		return customProperties;
 	},
 
 	setupLinkClickAnalytics: function() {
 		liquipedia.analytics.clickTrackers.push( {
 			selector: 'a',
 			trackerName: LINK_CLICKED,
-			propertiesBuilder: ( link ) => ( {
-				title: link.innerText,
-				position: liquipedia.analytics.findLinkPosition( link ),
-				destination: link.href
-			} )
+			propertiesBuilder: ( link ) => {
+				const properties = {
+					title: link.innerText,
+					position: liquipedia.analytics.findLinkPosition( link ),
+					destination: link.href
+				};
+
+				const customProperties = liquipedia.analytics.addCustomProperties( link );
+
+				return { ...properties, ...customProperties };
+			}
 		} );
 	},
 
@@ -125,6 +194,20 @@ liquipedia.analytics = {
 			propertiesBuilder: ( link ) => ( {
 				title: link.innerText,
 				position: liquipedia.analytics.findLinkPosition( link )
+			} )
+		} );
+	},
+
+	setupWikiMenuLinkClickAnalytics: function() {
+		liquipedia.analytics.clickTrackers.push( {
+			selector: '[data-wiki-menu="link"]',
+			trackerName: WIKI_SWITCHED,
+			propertiesBuilder: ( wikiMenuLink ) => ( {
+				wiki: wikiMenuLink.closest( '[data-wiki-id]' ).dataset.wikiId,
+				position: 'wiki menu',
+				destination: wikiMenuLink.href,
+				'trending page': false,
+				'trending position': null
 			} )
 		} );
 	},

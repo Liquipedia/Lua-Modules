@@ -155,7 +155,7 @@ function UnofficialWorldChampion:createInfobox()
 	}
 
 	self:setLpdbData(args)
-	return self:build(widgets)
+	return self:build(widgets, 'UnofficialWorldChampion')
 end
 
 ---@param key string
