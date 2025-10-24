@@ -13,6 +13,9 @@ const MATCH_POPUP_OPENED = 'Match popup opened';
 
 // Constants
 const IGNORE_CATEGORY_PREFIX = 'Pages ';
+const TOC = 'ToC';
+const SIDEBAR = 'sidebar';
+const INLINE = 'inline';
 
 // Statically defined properties
 const getPageDomain = () => window.location.origin;
@@ -29,7 +32,6 @@ liquipedia.analytics = {
 		/********************************************************************
 		 * A registry of functions to find component-specific properties.
 		 * Each key matches a `data-analytics-name` value.
-		 * Each function receives (element, properties, analyticsElement).
 		 *******************************************************************/
 		Infobox: function( element, analyticsElement ) {
 			const parentDiv = element.parentElement;
@@ -61,8 +63,21 @@ liquipedia.analytics = {
 					'infobox section': closestHeader.innerText.trim()
 				};
 			}
+		},
+
+		ToC: function( tocElement ) {
+			if ( tocElement.id === 'sidebar-toc' ) {
+				return {
+					'ToC position': SIDEBAR
+				};
+			} else {
+				return {
+					'ToC position': INLINE
+				};
+			}
 		}
 	},
+
 	clickTrackers: [],
 
 	init: function() {
@@ -108,11 +123,27 @@ liquipedia.analytics = {
 		} );
 	},
 
-	findLinkPosition: function( element ) {
+	getAnalyticsContextElement: function( element ) {
 		const analyticsElement = element.closest( '[data-analytics-name]' );
 		if ( analyticsElement ) {
-			return analyticsElement.dataset.analyticsName;
+			return {
+				type: 'component',
+				element: analyticsElement,
+				name: analyticsElement.dataset.analyticsName
+			};
 		}
+
+		// check if element is inside table of contents, as we don't have a clean way
+		// to set the data-analytics-name attribute for table of contents
+		const tocElement = element.closest( '#sidebar-toc, #toc' );
+		if ( tocElement ) {
+			return {
+				type: 'toc',
+				element: tocElement,
+				name: TOC
+			};
+		}
+
 		const walker = document.createTreeWalker(
 			document.body,
 			NodeFilter.SHOW_ELEMENT,
@@ -122,12 +153,23 @@ liquipedia.analytics = {
 		);
 		walker.currentNode = element;
 		const headingNode = walker.previousNode();
-		if ( !headingNode ) {
-			return null;
+
+		if ( headingNode ) {
+			const clone = headingNode.cloneNode( true );
+			clone.querySelector( '.mw-editsection' )?.remove();
+			return {
+				type: 'heading',
+				element: headingNode,
+				name: clone.textContent.trim()
+			};
 		}
-		const clone = headingNode.cloneNode( true );
-		clone.querySelector( '.mw-editsection' )?.remove();
-		return clone.textContent.trim();
+
+		return { type: 'none', element: null, name: null };
+	},
+
+	findLinkPosition: function( element ) {
+		const context = liquipedia.analytics.getAnalyticsContextElement( element );
+		return context.name;
 	},
 
 	// Converts a camelCase dataset key into a human-readable property name like
@@ -144,26 +186,33 @@ liquipedia.analytics = {
 		return trimmed.toLowerCase();
 	},
 
-	addCustomProperties: function( element ) {
-		const analyticsElement = element.closest( '[data-analytics-name]' );
-		let customProperties = {};
-
-		if ( !analyticsElement ) {
-			return customProperties;
-		}
-
-		Object.entries( analyticsElement.dataset )
+	getDatasetAnalyticsProperties: function( dataset ) {
+		const properties = {};
+		Object.entries( dataset )
 			.filter( ( [ key ] ) => key.startsWith( 'analytics' ) && key !== 'analyticsName' )
 			.forEach( ( [ key, value ] ) => {
 				const propertyName = liquipedia.analytics.formatAnalyticsKey( key );
-				customProperties[ propertyName ] = value || null;
+				properties[ propertyName ] = value || null;
 			} );
+		return properties;
+	},
 
-		const componentName = analyticsElement.dataset.analyticsName;
-		const customFinder = liquipedia.analytics.customPropertyFinders[ componentName ];
+	addCustomProperties: function( element ) {
+		const context = liquipedia.analytics.getAnalyticsContextElement( element );
+		let customProperties = {};
 
-		if ( typeof customFinder === 'function' ) {
-			customProperties = { ...customProperties, ...customFinder( element, analyticsElement ) };
+		if ( context.type === 'component' ) {
+			customProperties = liquipedia.analytics.getDatasetAnalyticsProperties( context.element.dataset );
+		}
+
+		if ( context.name ) {
+			const customFinder = liquipedia.analytics.customPropertyFinders[ context.name ];
+
+			if ( typeof customFinder === 'function' ) {
+				const finderProperties = customFinder( context.element, element );
+
+				customProperties = { ...customProperties, ...finderProperties };
+			}
 		}
 
 		return customProperties;
