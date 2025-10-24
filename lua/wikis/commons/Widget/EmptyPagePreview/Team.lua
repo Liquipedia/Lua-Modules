@@ -177,16 +177,13 @@ end
 function EmptyTeamPagePreview:_fetchPlacements(options)
 	options = options or {}
 
-	local teamPageNameWithoutUnderscores = self.team:gsub("^%l", string.upper):gsub('_', ' ')
-	local teamPageName = teamPageNameWithoutUnderscores:gsub(' ', '_')
-
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
 		ConditionNode(ColumnName('opponentplayers'), Comparator.neq, ''),
 		ConditionNode(ColumnName('opponentplayers'), Comparator.neq, '[]'),
 		ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
 		ConditionNode(ColumnName('liquipediatier'), Comparator.neq, -1),
-		ConditionUtil.anyOf(ColumnName('opponentname'), {teamPageName, teamPageNameWithoutUnderscores})
+		ConditionUtil.anyOf(ColumnName('opponenttemplate'), self.teams)
 	}
 
 	return mw.ext.LiquipediaDB.lpdb('placement', {
