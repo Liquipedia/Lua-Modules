@@ -134,6 +134,8 @@ liquipedia.analytics = {
 			};
 		}
 
+		// check if element is inside table of contents, as we don't have a clean way
+		// to set the data-analytics-name attribute for table of contents
 		const tocElement = element.closest( '#sidebar-toc, #toc' );
 		if ( tocElement ) {
 			return {
