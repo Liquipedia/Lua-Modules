@@ -34,7 +34,6 @@ liquipedia.analytics = {
 		/********************************************************************
 		 * A registry of functions to find component-specific properties.
 		 * Each key matches a `data-analytics-name` value.
-		 * Each function receives (element, properties, analyticsElement).
 		 *******************************************************************/
 		InfoBanner: function( element ) {
 			const content = element.querySelector( '.network-notice__content' );
