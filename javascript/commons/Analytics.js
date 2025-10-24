@@ -78,7 +78,7 @@ liquipedia.analytics = {
 			}
 		}
 	},
-  
+
 	clickTrackers: [],
 
 	init: function() {
