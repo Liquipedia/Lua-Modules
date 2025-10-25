@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -74,6 +75,9 @@ function CharacterStats:queryGames()
 		conditions = tostring(self:buildConditions()),
 		limit = 5000,
 	}
+	if Logic.isEmpty(matchIds) then
+		return {}
+	end
 	return Array.flatMap(matchIds, function (matchId)
 		local matchOpponents = Array.map(
 			mw.ext.LiquipediaDB.lpdb('match2opponent', {
