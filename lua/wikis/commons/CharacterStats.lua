@@ -165,7 +165,8 @@ function CharacterStats:processGames(games)
 			local side = self:getTeamSide(game, opponentIndex)
 			local sideKey = isWinner and 'win' or 'loss'
 
-			if isWinner then
+			if isWinner and Logic.isNotEmpty(side) then
+				---@cast side -nil
 				overallData.wins[side] = overallData.wins[side] + 1
 			end
 
@@ -180,8 +181,11 @@ function CharacterStats:processGames(games)
 				characterStats.playedBy[opponentName].pick = characterStats.playedBy[opponentName].pick + 1
 
 				characterStats.total[sideKey] = characterStats.total[sideKey] + 1
-				characterStats.side[side][sideKey] = characterStats.side[side][sideKey] + 1
-				characterStats.playedBy[opponentName][sideKey] = characterStats.playedBy[opponentName][sideKey] + 1
+				if Logic.isNotEmpty(side) then
+					---@cast side -nil
+					characterStats.side[side][sideKey] = characterStats.side[side][sideKey] + 1
+					characterStats.playedBy[opponentName][sideKey] = characterStats.playedBy[opponentName][sideKey] + 1
+				end
 
 
 				Array.forEach(characters, function (playedWithCharacter, playedWithCharacterIndex)
