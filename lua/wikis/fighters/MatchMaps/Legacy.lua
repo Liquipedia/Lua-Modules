@@ -116,16 +116,21 @@ function MatchMapsLegacy.handleDetails(args, details)
 
 		for oppIndex = 1, MAX_NUMBER_OF_OPPONENTS do
 			local opponentPrefix = 'p' .. oppIndex
-			map['o1p' .. oppIndex] = Logic.nilIfEmpty(
-				Array.parseCommaSeparatedString(Table.extract(args, opponentPrefix .. index))
-			)
-			map['score' .. oppIndex] = Table.extract(args, opponentPrefix .. index)
+			local characters = Array.parseCommaSeparatedString(Table.extract(args, opponentPrefix .. 'char' .. index))
+			if Logic.isNotEmpty(characters) then
+				map['o' .. oppIndex .. 'p1'] = Json.stringify(characters)
+			end
+			map['score' .. oppIndex] = Table.extract(args, opponentPrefix .. 'score' .. index)
 		end
 
 		return Logic.nilIfEmpty(map)
 	end
 
-	Array.mapIndexes(getMapFromDetails)
+	local maps = Array.mapIndexes(getMapFromDetails)
+
+	Array.forEach(maps, function (map, mapIndex)
+		args['map' .. mapIndex] = map
+	end)
 	return args, details
 end
 
