@@ -68,9 +68,12 @@ function CharacterStats:buildConditions()
 	return conditions
 end
 
----@param matchIds string[]
 ---@return CharacterStatsGame[]
-function CharacterStats:queryGames(matchIds)
+function CharacterStats:queryGames()
+	local matchIds = MatchGroupUtil.fetchMatchIds{
+		conditions = tostring(self:buildConditions()),
+		limit = 5000,
+	}
 	return Array.flatMap(matchIds, function (matchId)
 		local matchOpponents = Array.map(
 			mw.ext.LiquipediaDB.lpdb('match2opponent', {
