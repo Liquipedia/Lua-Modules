@@ -57,7 +57,6 @@ function MatchMapsLegacy.convertOpponents(args)
 		local player = Table.extract(args, 'p' .. index)
 		local playerLink = player
 		if Logic.isNotEmpty(args['p' .. index .. 'display']) then
-			playerLink = player
 			player = Table.extract(args, 'p' .. index .. 'display')
 		else
 			playerLink = nil
