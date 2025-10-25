@@ -184,8 +184,8 @@ function CharacterStats:processGames(games)
 				if Logic.isNotEmpty(side) then
 					---@cast side -nil
 					characterStats.side[side][sideKey] = characterStats.side[side][sideKey] + 1
-					characterStats.playedBy[opponentName][sideKey] = characterStats.playedBy[opponentName][sideKey] + 1
 				end
+				characterStats.playedBy[opponentName][sideKey] = characterStats.playedBy[opponentName][sideKey] + 1
 
 
 				Array.forEach(characters, function (playedWithCharacter, playedWithCharacterIndex)
