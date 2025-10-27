@@ -69,7 +69,7 @@ function MatchMapsLegacy.convertOpponents(args)
 			end
 		elseif args['p' .. index .. 'score'] then
 			score = tonumber(Table.extract(args, 'p' .. index .. 'score'))
-		elseif not args.mapWinnersSet and winner then
+		elseif not args.mapWinnersSet and Logic.isEmpty(args.map1) and winner then
 			score = winner == index and DEFAULT_WIN or DEFAULT_LOSS
 		end
 
