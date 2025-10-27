@@ -199,7 +199,8 @@ function TeamHistoryDisplay:_row(transfer)
 	end
 	local roleLength = 0
 	if role then
-		roleLength = string.len(role) + 2
+		-- +3 for padding left + brackets
+		roleLength = string.len(role) + 3
 	end
 
 	local teamText = self:_getTeamText(transfer, roleLength)
