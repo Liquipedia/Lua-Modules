@@ -60,12 +60,9 @@ function Show:createInfobox()
 		Location{args = args},
 		Venue{args = args},
 		Cell{name = 'Status', children = {args.status}},
-		Cell{id = 'dates', children = {
-				Cell{name = 'Date', children = {args.date}},
-				Cell{name = 'Start', children = {args.sdate}},
-				Cell{name = 'End', children = {args.edate}},
-			},
-		},
+		Cell{name = 'Date', children = {args.date}},
+		Cell{name = 'Start', children = {args.sdate}},
+		Cell{name = 'End', children = {args.edate}},
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
