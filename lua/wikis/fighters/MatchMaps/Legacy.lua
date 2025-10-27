@@ -262,13 +262,6 @@ end
 ---@param frame Frame
 ---@return string
 function MatchMapsLegacy.generate(frame)
-	return MatchMapsLegacy.matchList(frame, true)
-end
-
---- for bot conversion to proper match2 matchlists
----@param frame Frame
----@return string
-function MatchMapsLegacy.generate2(frame)
 	local args = Arguments.getArgs(frame)
 
 	local store = Logic.readBoolOrNil(args.store)
