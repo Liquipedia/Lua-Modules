@@ -210,8 +210,8 @@ function TeamHistoryDisplay:_row(transfer)
 			Span{
 				css = {['padding-left'] = '3px', ['font-style'] = 'italic'},
 				children = {
-					'(',
-					role,
+					'&ZeroWidthSpace;(',
+					role:gsub(' ', '&nbsp;'),
 					')',
 				},
 			}
@@ -287,7 +287,7 @@ function TeamHistoryDisplay:_getTeamText(transfer)
 
 	return Link{
 		link = teamData.page,
-		children = {TeamHistoryDisplay._getTeamDisplayName(teamData)}
+		children = {TeamHistoryDisplay._getTeamDisplayName(teamData):gsub(' ', '&nbsp;')}
 	}
 end
 
