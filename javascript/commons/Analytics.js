@@ -37,7 +37,7 @@ liquipedia.analytics = {
 		 *******************************************************************/
 		InfoBanner: function( element ) {
 			return {
-				'info banner id': element.dataset.id;
+				'info banner id': element.dataset.id
 			};
 		},
 
