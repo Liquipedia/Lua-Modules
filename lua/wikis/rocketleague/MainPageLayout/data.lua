@@ -34,12 +34,7 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{
-			transferPortal = 'Transfers',
-			transferPage = 'Player Transfers/' .. DateExt.getYearOf() .. '/' ..
-				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter',
-			rumours = true
-		},
+		body = TransfersList{rumours = true},
 		boxid = 1509,
 	},
 	thisDay = {
