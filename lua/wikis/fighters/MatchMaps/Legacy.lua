@@ -45,7 +45,6 @@ end
 ---@param details table
 ---@return table
 function MatchMapsLegacy.setHeaderIfEmpty(args, details)
-	args.header = args.header or args.date
 	args.date = details.date or args.date
 	return args
 end
