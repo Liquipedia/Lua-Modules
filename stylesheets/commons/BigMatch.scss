@@ -589,6 +589,13 @@ span.slash {
 			flex: 1 0 auto;
 		}
 
+		.wiki-valorant & {
+			@media ( max-width: 1199px ),
+				( min-width: 1320px ) {
+				flex: 0 0 auto;
+			}
+		}
+
 		.wiki-dota2 & {
 			@media ( min-width: 1200px ) and ( max-width: 1319px ),
 				( min-width: 1510px ) {
@@ -626,6 +633,10 @@ span.slash {
 
 			@media ( max-width: 1199px ), ( min-width: 1320px ) {
 				align-items: center;
+			}
+
+			@media ( min-width: 1510px ) {
+				align-items: flex-start;
 			}
 		}
 	}
