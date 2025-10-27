@@ -504,7 +504,7 @@ span.slash {
 	@media ( max-width: 1199px ),
 		( min-width: 1320px ) {
 		flex-wrap: wrap;
-		justify-content: space-between;
+		justify-content: center;
 	}
 
 	@media ( min-width: 1200px ) and ( max-width: 1319px ),
@@ -619,6 +619,14 @@ span.slash {
 
 		> a {
 			font-weight: bold;
+		}
+
+		&-overall {
+			align-items: flex-start;
+
+			@media ( max-width: 1199px ), ( min-width: 1320px ) {
+				align-items: center;
+			}
 		}
 	}
 
