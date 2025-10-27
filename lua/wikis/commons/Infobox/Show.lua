@@ -75,9 +75,7 @@ function Show:createInfobox()
 		},
 		Customizable{id = 'customcontent', children = {}},
 		Center{children = {args.footnotes}},
-		Customizable{id = 'chronology', children = {
-			Chronology{args = args, showTitle = true},
-		}}
+		Chronology{args = args, showTitle = true}
 	}
 
 	if Namespace.isMain() then
