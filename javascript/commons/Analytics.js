@@ -36,9 +36,8 @@ liquipedia.analytics = {
 		 * Each key matches a `data-analytics-name` value.
 		 *******************************************************************/
 		InfoBanner: function( element ) {
-			const content = element.querySelector( '.network-notice__content' );
 			return {
-				'info banner id': content.innerText.trim()
+				'info banner id': element.dataset.id;
 			};
 		},
 
@@ -157,6 +156,8 @@ liquipedia.analytics = {
 			};
 		}
 
+		// check if element is inside info banner, as we don't have a clean way
+		// to set the data-analytics-name attribute for info banners
 		const infoBannerElement = element.closest( '.network-notice' );
 		if ( infoBannerElement ) {
 			return {
