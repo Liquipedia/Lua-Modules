@@ -166,6 +166,10 @@ function CustomMatchSummary._linksTable(match)
 		}}
 	end)
 
+	if Logic.isEmpty(rows) then
+		return
+	end
+
 	return Collapsible{
 		tableClasses = {'wikitable-striped'},
 		header = Tr{children = {

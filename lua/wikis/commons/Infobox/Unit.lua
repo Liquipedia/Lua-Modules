@@ -112,7 +112,7 @@ function Unit:createInfobox()
 		self:setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Unit')
 end
 
 ---@param args table

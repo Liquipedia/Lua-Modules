@@ -86,7 +86,7 @@ function Item:createInfobox()
 		self:setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Item')
 end
 
 ---@param args table

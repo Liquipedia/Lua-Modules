@@ -9,7 +9,9 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
+local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
@@ -47,19 +49,17 @@ local WIN_TYPE_TO_ICON = {
 function MatchPage.getByMatchId(props)
 	local matchPage = MatchPage(props.match)
 
-	-- Update the view model with game and team data
-	matchPage:populateGames()
-
-	-- Add more opponent data field
-	matchPage:populateOpponents()
-
 	return matchPage:render()
 end
 
 function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
-		game.teams = game.extradata.teams
+		game.teams = game.opponents
+		Array.forEach(game.teams, function(team, teamIdx)
+			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
+			team.postPlant = team.postPlant or {}
+		end)
 	end)
 end
 
@@ -69,14 +69,12 @@ function MatchPage:renderOverallStats()
 		return
 	end
 
-	local overallTeamStats = {
+	local overallTeamData = {
 		finished = true,
-		teams = Array.map(self.opponents, function(opponent)
-			return (opponent.extradata and opponent.extradata.overallStats) or {}
-		end)
+		teams = Array.map(self.opponents, Operator.property('extradata'))
 	}
 
-	local overallPlayerStats = {
+	local overallPlayerData = {
 		teams = Array.map(Array.range(1, 2), function(teamIdx)
 			local team = { players = {} }
 			local opponent = self.opponents[teamIdx]
@@ -85,13 +83,15 @@ function MatchPage:renderOverallStats()
 					if not player.extradata or not player.extradata.overallStats then
 						return
 					end
-					local overallStats = player.extradata.overallStats
+					local playerData = player.extradata.overallStats
 
-					if not overallStats.roundsPlayed or overallStats.roundsPlayed == 0 then
+					if not playerData.roundsPlayed or playerData.roundsPlayed == 0 then
 						return
 					end
 
-					return player.extradata.overallStats
+					playerData.player = player.pageName
+					playerData.displayName = player.displayName
+					return playerData
 				end)
 			end
 			return team
@@ -100,8 +100,8 @@ function MatchPage:renderOverallStats()
 
 	return HtmlWidgets.Fragment{
 		children = WidgetUtil.collect(
-			self:_renderTeamStats(overallTeamStats),
-			self:_renderPerformance(overallPlayerStats)
+			self:_renderTeamStats(overallTeamData),
+			self:_renderPerformance(overallPlayerData)
 		)
 	}
 end
@@ -396,15 +396,17 @@ end
 
 ---@private
 ---@param player table
----@return Widget
+---@return Widget?
 function MatchPage:_renderPlayerPerformance(player)
+	if Logic.isEmpty(player) then
+		return
+	end
+
 	local formatNumbers = function(value, numberOfDecimals)
 		if not value then
 			return nil
 		end
-		numberOfDecimals = numberOfDecimals or 0
-		local format = '%.'.. numberOfDecimals ..'f'
-		return string.format(format, MathUtil.round(value, numberOfDecimals))
+		return MathUtil.formatRounded{value = value, precision = numberOfDecimals}
 	end
 
 	local playerDisplay

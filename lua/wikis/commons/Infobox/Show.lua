@@ -81,7 +81,7 @@ function Show:createInfobox()
 		end
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Show')
 end
 
 ---@param country string?

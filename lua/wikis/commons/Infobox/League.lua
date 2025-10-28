@@ -28,6 +28,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
 local Tier = Lua.import('Module:Tier/Custom')
+local TournamentService = Lua.import('Module:Tournament')
 local Variables = Lua.import('Module:Variables')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
@@ -177,13 +178,13 @@ function League:createInfobox()
 	self:bottom(self:createBottomContent())
 
 	if self:shouldStore(args) then
-		self:categories(unpack(self:_getCategories(args)))
 		self:_setLpdbData(args, self.links)
+		self:categories(unpack(self:_getCategories(args)))
 		self:_setSeoTags(args)
 	end
 
 	return mw.html.create()
-		:node(self:build(widgets))
+		:node(self:build(widgets, 'Tournament'))
 		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
 end
 
@@ -284,13 +285,26 @@ end
 function League:customParseArguments(args)
 end
 
+function League:_tournamentPhaseCategory()
+	local phaseMapping = {
+		ONGOING = 'Live Tournaments',
+		UPCOMING = 'Upcoming Tournaments',
+		FINISHED = 'Finished Tournaments'
+	}
+
+	local tournamentPhase = TournamentService.tournamentFromRecord(self.lpdbData).phase
+	return phaseMapping[tournamentPhase]
+end
+
 ---@param args table
 ---@return string[]
 function League:_getCategories(args)
-	return Array.extend({'Tournaments'},
+	return Array.extend(
+		{'Tournaments'},
 		Logic.isEmpty(args.country) and 'Tournaments without location' or nil,
 		self:addParticipantTypeCategory(args),
 		self:addTierCategories(args),
+		self:_tournamentPhaseCategory(),
 		CountryCategory.run(args, 'Tournaments'),
 		self:getWikiCategories(args)
 	)
@@ -489,6 +503,7 @@ function League:_setLpdbData(args, links)
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, Json.stringifySubTables(lpdbData))
+	self.lpdbData = lpdbData
 end
 
 ---@param args table

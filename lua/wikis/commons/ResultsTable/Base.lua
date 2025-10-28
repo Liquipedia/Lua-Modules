@@ -29,6 +29,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local DEFAULT_VALUES = {
 	order = 'desc',
@@ -86,7 +87,7 @@ function BaseResultsTable:readConfig()
 		displayDefaultLogoAsIs = Logic.readBool(args.displayDefaultLogoAsIs),
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
 		useIndivPrize = Logic.readBool(args.useIndivPrize),
-		aliases = args.aliases and Array.map(mw.text.split(args.aliases, ','), String.trim) or {}
+		aliases = Array.parseCommaSeparatedString(args.aliases)
 	}
 
 	config.sort = args.sort or
@@ -237,11 +238,9 @@ function BaseResultsTable:buildBaseConditions()
 	end
 
 	if args.tier then
-		local tierConditions = ConditionTree(BooleanOperator.any)
-		for _, tier in pairs(Array.map(mw.text.split(args.tier, ',', true), String.trim)) do
-			tierConditions:add{ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tier)}
-		end
-		conditions:add{tierConditions}
+		conditions:add(
+			ConditionUtil.anyOf(ColumnName('liquipediatier'), Array.parseCommaSeparatedString(args.tier))
+		)
 	end
 
 	return conditions:toString()
@@ -309,16 +308,13 @@ function BaseResultsTable:buildTeamOpponentConditions()
 	local config = self.config
 
 	local opponents = Array.append(config.aliases, config.opponent)
-	local opponentTeamTemplates = Array.flatten(Array.map(opponents, BaseResultsTable._getOpponentTemplates))
+	local opponentTeamTemplates = Array.flatMap(opponents, BaseResultsTable._getOpponentTemplates)
 
 	if config.playerResultsOfTeam then
 		return self:buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
 	end
 
-	local opponentConditions = ConditionTree(BooleanOperator.any)
-	for _, teamTemplate in pairs(opponentTeamTemplates) do
-		opponentConditions:add{ConditionNode(ColumnName('opponenttemplate'), Comparator.eq, teamTemplate)}
-	end
+	local opponentConditions = ConditionUtil.anyOf(ColumnName('opponenttemplate'), opponentTeamTemplates)
 
 	return ConditionTree(BooleanOperator.all):add{
 			opponentConditions,

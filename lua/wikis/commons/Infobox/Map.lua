@@ -80,7 +80,7 @@ function Map:createInfobox()
 		self:_setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Map')
 end
 
 --- Allows for overriding this functionality

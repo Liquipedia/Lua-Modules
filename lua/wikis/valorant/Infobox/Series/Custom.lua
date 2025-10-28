@@ -20,7 +20,8 @@ local Chronology = Widgets.Chronology
 
 ---@class ValorantSeriesInfobox: SeriesInfobox
 local CustomSeries = Class.new(Series)
-
+---@class ValorantSeriesInfoboxWidgetInjector: WidgetInjector
+---@field caller ValorantSeriesInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
