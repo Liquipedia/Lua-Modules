@@ -53,7 +53,7 @@ function Show:createInfobox()
 		},
 		Center{children = {args.caption}},
 		Title{children = 'Show Information'},
-		Cell{name = 'Series', children = {Page.makeInternalLink({onlyIfExists = true}, args.series, args.series)}},
+		Cell{name = 'Series', children = {Page.makeInternalLink({onlyIfExists = true}, args.series) or args.series}},
 		Cell{name = 'Host(s)', children = self:getAllArgsForBase(args, 'host', {makeLink = true})},
 		Cell{name = 'Format', children = {args.format}},
 		Cell{name = 'Airs', children = {args.airs}},
