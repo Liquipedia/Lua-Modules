@@ -28,7 +28,6 @@ local Div = HtmlWidgets.Div
 
 ---@class ButtonWidget: Widget
 ---@operator call(ButtonWidgetParameters): ButtonWidget
-
 local Button = Class.new(Widget)
 Button.defaultProps = {
 	linktype = 'internal',
