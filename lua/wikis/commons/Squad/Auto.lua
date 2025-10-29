@@ -98,16 +98,19 @@ SquadAuto.TransferType = {
 
 local ROLE_INACTIVE = 'Inactive'
 
+-- TODO: Replace with Module:Roles
+local ROLES_PLAYER = {
+	'',
+	'Loan',
+	'Substitute',
+	'Trial',
+	'Stand-in',
+	'Uncontracted'
+}
+
 local DEFAULT_INCLUDED_ROLES = {
 	[SquadUtils.SquadType.PLAYER] = {
-		[SquadUtils.SquadStatus.ACTIVE] = {
-			'',
-			'Loan',
-			'Substitute',
-			'Trial',
-			'Stand-in',
-			'Uncontracted'
-		},
+		DEFAULT = ROLES_PLAYER,
 		[SquadUtils.SquadStatus.INACTIVE] = {
 			ROLE_INACTIVE
 		}
@@ -118,15 +121,10 @@ local DEFAULT_INCLUDED_ROLES = {
 local DEFAULT_EXCLUDED_ROLES = {
 	[SquadUtils.SquadType.PLAYER] = {},
 	[SquadUtils.SquadType.STAFF] = {
-		DEFAULT = {
-			'',
-			'Loan',
-			'Substitute',
-			'Trial',
-			'Stand-in',
-			'Uncontracted',
+		DEFAULT = Array.extend(
+			ROLES_PLAYER,
 			ROLE_INACTIVE
-		},
+		),
 	},
 }
 
