@@ -5,7 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
---- copied from LAB until we have a propoer match2 setup for this wiki
+--- copied from LAB until we have a proper match2 setup for this wiki
 
 local Lua = require('Module:Lua')
 
