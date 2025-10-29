@@ -84,7 +84,7 @@ function Locale.formatLocations(args)
 
 			-- Get the Region from the country if still unknown
 			if not location.region then
-				location.region = String.nilIfEmpty(Region.name{country = location.country})
+				location.region = String.nilIfEmpty(Region.name{country = unresolvedCountry})
 			end
 		elseif location.region then
 			location.region = String.nilIfEmpty(Region.name{region = location.region})
