@@ -504,7 +504,14 @@ span.slash {
 	@media ( max-width: 1199px ),
 		( min-width: 1320px ) {
 		flex-wrap: wrap;
-		justify-content: center;
+		justify-content: justify-between;
+	}
+
+	.wiki-valorant & {
+		@media ( max-width: 1199px ),
+			( min-width: 1320px ) {
+			justify-content: center;
+		}
 	}
 
 	@media ( min-width: 1200px ) and ( max-width: 1319px ),
