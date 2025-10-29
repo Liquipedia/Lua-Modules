@@ -17,6 +17,7 @@ local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
@@ -26,6 +27,8 @@ local SquadCustom = Lua.import('Module:Squad/Custom')
 
 local BooleanOperator = Condition.BooleanOperator
 local Comparator = Condition.Comparator
+
+local pageVars = PageVariableNamespace()
 
 ---@class SquadAuto
 ---@field args table
@@ -387,9 +390,14 @@ function SquadAuto:queryTransfers()
 		end
 	end
 
-	--TODO: Cache transfers/teamhistory in pagevars
+	local teamHistoryKey = self.config.team .. '_all_transfers'
+
 	---@type table<string, TeamHistoryEntry>
-	self.playersTeamHistory = {}
+	self.playersTeamHistory = Json.parseIfTable(pageVars:get(teamHistoryKey)) or {}
+
+	if Logic.isNotEmpty(self.playersTeamHistory) then
+		return
+	end
 
 	Lpdb.executeMassQuery(
 		'transfer',
@@ -451,6 +459,7 @@ function SquadAuto:queryTransfers()
 			table.insert(self.playersTeamHistory[record.player], entry)
 		end
 	)
+	pageVars:set(teamHistoryKey, Json.stringify(self.playersTeamHistory))
 end
 
 ---Builds the conditions to fetch all transfers related
