@@ -204,7 +204,7 @@ function MatchPage:renderOverallStats()
 			classes = {'match-bm-players-player match-bm-players-player--col-2'},
 			children = WidgetUtil.collect(
 				Div{
-					classes = {'match-bm-players-player-name'},
+					classes = {'match-bm-players-player-name match-bm-players-player-name-overall'},
 					children = {
 						Link{link = player.pageName, children = player.displayName},
 						MatchSummaryCharacters{characters = player.extradata.characters, date = self.matchData.date},
