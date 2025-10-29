@@ -568,7 +568,7 @@ function SquadAuto:_mapToSquadAutoPerson(joinEntry, leaveEntry)
 	---@type SquadAutoPerson
 	local entry =  {
 		page = joinEntry.pagename,
-		id = joinEntry.displayname,
+		id = leaveEntry.displayname or joinEntry.displayname,
 		flag = joinEntry.flag,
 		joindate = joinEntry.date,
 		joindatedisplay = joinEntry.dateDisplay,
@@ -627,7 +627,10 @@ end
 function SquadAuto._fetchNextTeam(pagename, date)
 	local conditions = Condition.Tree(BooleanOperator.all)
 		:add{
-			Condition.Node(Condition.ColumnName('player'), Comparator.eq, string.gsub(pagename, ' ', '_')),
+			Condition.Tree(BooleanOperator.any):add{
+				Condition.Node(Condition.ColumnName('player'), Comparator.eq, pagename),
+				Condition.Node(Condition.ColumnName('player'), Comparator.eq, string.gsub(pagename, ' ', '_')),
+			},
 			Condition.Tree(BooleanOperator.any):add{
 				Condition.Node(Condition.ColumnName('date'), Comparator.gt, date),
 			}
