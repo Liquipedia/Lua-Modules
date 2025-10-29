@@ -35,5 +35,12 @@ return {
 			status = 2, -- copied from LAB until we have a proper match2 setup for this wiki
 			matchWidth = 180,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'automatic',
+				storeFromWikiCode = true,
+			},
+		},
 	},
 }
