@@ -1,27 +1,28 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Squad/Auto
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Condition = require('Module:Condition')
-local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
-local Lpdb = require('Module:Lpdb')
-local Operator = require('Module:Operator')
-local Page = require('Module:Page')
-local Table = require('Module:Table')
-local Tabs = require('Module:Tabs')
-local TeamTemplate = require('Module:TeamTemplate')
+local Lua = require('Module:Lua')
 
-local SquadUtils = require('Module:Squad/Utils')
-local SquadCustom = require('Module:Squad/Custom')
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Condition = Lua.import('Module:Condition')
+local FnUtil = Lua.import('Module:FnUtil')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
+local Table = Lua.import('Module:Table')
+local Tabs = Lua.import('Module:Tabs')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+
+local SquadUtils = Lua.import('Module:Squad/Utils')
+local SquadCustom = Lua.import('Module:Squad/Custom')
 
 local BooleanOperator = Condition.BooleanOperator
 local Comparator = Condition.Comparator
@@ -127,6 +128,7 @@ local DEFAULT_EXCLUDED_ROLES = {
 
 ---Entrypoint for SquadAuto tables
 ---@param frame table
+---@return Widget|Html|string?
 function SquadAuto.run(frame)
 	local autosquad = SquadAuto(frame)
 	autosquad:parseConfig()
@@ -174,7 +176,6 @@ function SquadAuto:parseConfig()
 	if self.config.status == SquadUtils.SquadStatus.FORMER_INACTIVE then
 		error('SquadStatus \'FORMER_INACTIVE\' is not supported by SquadAuto.')
 	end
-
 end
 
 ---@param entries SquadAutoPerson[]
@@ -310,8 +311,6 @@ function SquadAuto:readManualRowInput()
 		end
 	end)
 
-	mw.logObject(enrichmentInfo)
-
 	return persons, enrichmentInfo
 end
 
@@ -323,7 +322,7 @@ function SquadAuto:queryTransfers()
 		if not team then
 			return false
 		end
-		return Array.find(self.config.teams, function(t) return t == team end) ~= nil
+		return Array.any(self.config.teams, function(t) return t == team end)
 	end
 
 	---@param side 'from' | 'to'
@@ -445,14 +444,8 @@ end
 ---to the given team, respecting historical templates.
 ---@return string
 function SquadAuto:buildConditions()
-	local historicalTemplates = mw.ext.TeamTemplate.raw_historical(self.config.team)
-
-	if not historicalTemplates then
-		error('Missing team template: ' .. self.config.team)
-	end
-
 	local conditions = Condition.Tree(BooleanOperator.any)
-	Array.forEach(Array.extendWith(Array.extractValues(historicalTemplates), self.config.team), function (templatename)
+	Array.forEach(self.config.teams, function (templatename)
 		conditions:add{
 			Condition.Node(Condition.ColumnName('fromteamtemplate'), Comparator.eq, templatename),
 			Condition.Node(Condition.ColumnName('extradata_fromteamsectemplate'), Comparator.eq, templatename),
@@ -539,7 +532,7 @@ function SquadAuto:_selectHistoryEntries(entries)
 			end
 
 			table.insert(history, self:_mapToSquadAutoPerson(currentEntry, entry))
-			if entry.type == 'CHANGE' then
+			if entry.type == SquadAuto.TransferType.CHANGE then
 				currentEntry = entry
 			else
 				currentEntry = nil
@@ -634,7 +627,7 @@ function SquadAuto._fetchNextTeam(pagename, date)
 		query = 'toteamtemplate, role2'
 	})[1] or {}
 
-	-- TODO: Check if fetched transfer is in fact a join transfer (empty fromTeam)?
+	-- TODO: (Optional) Check if fetched transfer is in fact a join transfer (empty fromTeam)?
 
 	return transfer.toteamtemplate, transfer.role2
 end
