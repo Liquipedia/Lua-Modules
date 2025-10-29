@@ -16,7 +16,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local TiebreakerGameUtil = {}
 
 ---@param opponent TiebreakerOpponent
----@return {games: integer, w: integer, d: integer, l: integer, walkover: {w: integer, l: integer}}
+---@return {games: integer, w: integer, d: integer, l: integer, walkover: {w: integer, l: integer}?}
 TiebreakerGameUtil.getGames = FnUtil.memoize(function (opponent)
 	local games = 0
 	local gameWins = 0
@@ -60,7 +60,10 @@ TiebreakerGameUtil.getGames = FnUtil.memoize(function (opponent)
 
 	return {
 		games = games, w = gameWins, d = gameDraws, l = gameLosses,
-		walkover = {w = walkoverWins, l = walkoverLosses}
+		walkover = Logic.nilIfEmpty{
+			w = walkoverWins > 0 and walkoverWins or nil,
+			l = walkoverLosses > 0 and walkoverLosses or nil,
+		}
 	}
 end)
 
