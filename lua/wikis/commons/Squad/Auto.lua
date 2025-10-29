@@ -199,7 +199,7 @@ function SquadAuto:display(entries)
 end
 
 ---@param entries SquadAutoPerson[]
----@return Html|string?
+---@return Widget|Html|string?
 function SquadAuto:displayTabs(entries)
 	local _, groupedEntries = Array.groupBy(
 		entries,
@@ -209,9 +209,19 @@ function SquadAuto:displayTabs(entries)
 		end
 	)
 
+	local tabCount = Table.size(groupedEntries)
+	if tabCount == 1 then
+		return SquadCustom.runAuto(
+			SquadAuto._sortEntries(entries),
+			self.config.status,
+			self.config.type,
+			self.config.title
+		)
+	end
+
 	---@type table<string, any>
 	local tabs = {
-		This = Table.size(groupedEntries),
+		This = tabCount,
 		removeEmptyTabs = true
 	}
 
