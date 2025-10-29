@@ -25,7 +25,7 @@ end
 ---@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return Widget?
+---@return Widget
 function CustomMatchSummary.createGame(date, game, gameIndex)
 	local function makeTeamSection(opponentIndex)
 		return {
