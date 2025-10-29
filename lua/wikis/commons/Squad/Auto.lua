@@ -96,6 +96,8 @@ SquadAuto.TransferType = {
 ---@field toRole string?
 ---@field faction string?
 
+local ROLE_INACTIVE = 'Inactive'
+
 local DEFAULT_INCLUDED_ROLES = {
 	[SquadUtils.SquadType.PLAYER] = {
 		[SquadUtils.SquadStatus.ACTIVE] = {
@@ -107,7 +109,7 @@ local DEFAULT_INCLUDED_ROLES = {
 			'Uncontracted'
 		},
 		[SquadUtils.SquadStatus.INACTIVE] = {
-			'Inactive'
+			ROLE_INACTIVE
 		}
 	},
 	[SquadUtils.SquadType.STAFF] = {},
@@ -116,13 +118,15 @@ local DEFAULT_INCLUDED_ROLES = {
 local DEFAULT_EXCLUDED_ROLES = {
 	[SquadUtils.SquadType.PLAYER] = {},
 	[SquadUtils.SquadType.STAFF] = {
-		'',
-		'Loan',
-		'Substitute',
-		'Trial',
-		'Stand-in',
-		'Uncontracted',
-		'Inactive'
+		DEFAULT = {
+			'',
+			'Loan',
+			'Substitute',
+			'Trial',
+			'Stand-in',
+			'Uncontracted',
+			ROLE_INACTIVE
+		},
 	},
 }
 
@@ -152,9 +156,9 @@ function SquadAuto:parseConfig()
 		title = args.title,
 		roles = {
 			included = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.roles))
-				or DEFAULT_INCLUDED_ROLES[type][status],
+				or DEFAULT_INCLUDED_ROLES[type][status]or DEFAULT_INCLUDED_ROLES[type].DEFAULT,
 			excluded = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.not_roles))
-				or DEFAULT_EXCLUDED_ROLES[type],
+				or DEFAULT_EXCLUDED_ROLES[type][status] or DEFAULT_EXCLUDED_ROLES[type].DEFAULT,
 		}
 	}
 
@@ -509,7 +513,7 @@ function SquadAuto:_selectHistoryEntries(entries)
 
 	if self.config.status == SquadUtils.SquadStatus.INACTIVE then
 		local last, secondToLast = entries[#entries], entries[#entries - 1]
-		if secondToLast and last.type == SquadAuto.TransferType.CHANGE then
+		if secondToLast and last.type == SquadAuto.TransferType.CHANGE and last.toRole == ROLE_INACTIVE then
 			return {self:_mapToSquadAutoPerson(secondToLast, last)}
 		end
 	end
