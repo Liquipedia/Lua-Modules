@@ -5,13 +5,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Json = require('Module:Json')
-local Page = require('Module:Page')
-local Template = require('Module:Template')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Json = Lua.import('Module:Json')
+local Page = Lua.import('Module:Page')
+local Template = Lua.import('Module:Template')
 
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')

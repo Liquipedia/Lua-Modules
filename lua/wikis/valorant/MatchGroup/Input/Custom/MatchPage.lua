@@ -5,8 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
 
 local MapData = mw.loadJsonData('MediaWiki:Valorantdb-maps.json')
 
@@ -14,6 +18,7 @@ local CustomMatchGroupInputMatchPage = {}
 
 ---@class valorantMatchApiTeamExtended: valorantMatchApiTeam
 ---@field players valorantMatchApiPlayer[]
+---@field puuids string[]
 
 ---@class valorantMatchDataExtended: valorantMatchData
 ---@field teams valorantMatchApiTeamExtended[]
@@ -66,6 +71,7 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 		team.players = Array.filter(map.players, function(player)
 			return player.team_id == team.team_id
 		end)
+		team.puuids = Array.map(team.players, Operator.property('puuid'))
 	end)
 	map.region = mapInput.region -- Region from the API is not what we want for region
 	map.matchid = mapInput.matchid
@@ -81,12 +87,14 @@ end
 function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	if not map.teams then return nil end
 	local team = map.teams[opponentIndex]
-	if not team then return end
+	local rounds = CustomMatchGroupInputMatchPage.getRounds(map)
+	if not team or not rounds then return end
 
 	return Array.map(team.players, function(player)
 		local lpdbPlayerData = player.lpdb_player
 		return {
 			player = lpdbPlayerData and lpdbPlayerData.page_name or player.game_name,
+			puuid = player.puuid,
 			agent = player.character.name,
 			acs = player.stats.acs,
 			adr = player.stats.adr,
@@ -95,6 +103,12 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 			kills = player.stats.kills,
 			deaths = player.stats.deaths,
 			assists = player.stats.assists,
+			firstKills = #Array.filter(rounds, function (round)
+				return round.firstKill.killer == player.puuid
+			end),
+			firstDeaths = #Array.filter(rounds, function (round)
+				return round.firstKill.victim == player.puuid
+			end)
 		}
 	end)
 end
@@ -197,6 +211,16 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 		end
 	end
 
+	---@param ceremonyCode string?
+	---@return string
+	local function mapCeremonyCodes(ceremonyCode)
+		if Logic.isEmpty(ceremonyCode) then
+			return ''
+		end
+		---@cast ceremonyCode -nil
+		return ceremonyCode:sub(9)
+	end
+
 	local t1start = CustomMatchGroupInputMatchPage.getFirstSide(map, 1, 'normal')
 	local t1startot = CustomMatchGroupInputMatchPage.getFirstSide(map, 1, 'ot')
 	local nextOvertimeSide = t1startot
@@ -224,8 +248,27 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 			return nil
 		end
 
+		---@type valorantMatchApiRoundKill
+		local firstKill = Array.min(
+			Array.flatMap(round.player_stats, function (player)
+				return player.kills or {}
+			end),
+			function (kill, fastestKill)
+				return (kill.time_since_round_start_millis or math.huge) < (
+					fastestKill.time_since_round_start_millis or math.huge)
+			end
+		)
+
 		---@type ValorantRoundData
 		return {
+			ceremony = mapCeremonyCodes(round.round_ceremony),
+			firstKill = Logic.isNotEmpty(firstKill) and {
+				killer = firstKill.killer,
+				victim = firstKill.victim,
+				byTeam = Table.includes(map.teams[1].puuids, firstKill.killer) and 1 or 2
+			} or {},
+			planted = round.plant_round_time > 0,
+			defused = round.defuse_round_time > 0,
 			round = roundNumber,
 			t1side = t1side,
 			t2side = t2side,
@@ -241,6 +284,40 @@ function CustomMatchGroupInputMatchPage.getPatch(map)
 	--- input format is "release-10.05-shipping-14-3367018"
 	local versionParts = Array.parseCommaSeparatedString(map.game_version, '-')
 	return versionParts[2]
+end
+
+---@param map table
+---@param opponentIndex integer
+---@return table
+function CustomMatchGroupInputMatchPage.extendMapOpponent(map, opponentIndex)
+	local rounds = CustomMatchGroupInputMatchPage.getRounds(map)
+
+	if not rounds then
+		return {}
+	end
+
+	local teamSideKey = 't' .. opponentIndex .. 'side'
+	local plantedRounds = Array.filter(rounds, function (round)
+		return round[teamSideKey] == 'atk' and round.planted
+	end)
+
+	return {
+		thrifties = #Array.filter(rounds, function (round)
+			return round[teamSideKey] == round.winningSide and round.ceremony == 'Thrifty'
+		end),
+		firstKills = #Array.filter(rounds, function (round)
+			return round.firstKill.byTeam == opponentIndex
+		end),
+		clutches = #Array.filter(rounds, function (round)
+			return round[teamSideKey] == round.winningSide and round.ceremony == 'Clutch'
+		end),
+		postPlant = {
+			#Array.filter(plantedRounds, function (round)
+				return round.winningSide == 'atk'
+			end),
+			#plantedRounds
+		}
+	}
 end
 
 return CustomMatchGroupInputMatchPage

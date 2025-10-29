@@ -5,23 +5,28 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local RoleOf = require('Module:RoleOf')
-local String = require('Module:StringUtils')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local RoleOf = Lua.import('Module:RoleOf')
+local String = Lua.import('Module:StringUtils')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
+
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
 local Region = Lua.import('Module:Region')
 local Team = Lua.import('Module:Infobox/Team')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
-local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 local REGION_REMAPPINGS = {
 	['south america'] = 'latin america',
@@ -33,6 +38,8 @@ local REGION_REMAPPINGS = {
 
 ---@class LeagueoflegendsInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
+---@class LeagueoflegendsInfoboxTeamWidgetInjector: WidgetInjector
+---@field caller LeagueoflegendsInfoboxTeam
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -43,10 +50,10 @@ function CustomTeam.run(frame)
 
 	-- Automatically load achievements
 	team.args.achievements = Achievements.team{noTemplate = true, baseConditions = {
-		'[[liquipediatiertype::]]',
-		'[[liquipediatier::1]]',
-		'[[placement::1]]',
-		'[[publishertier::true]]'
+		ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, ''),
+		ConditionNode(ColumnName('liquipediatier'), Comparator.eq, 1),
+		ConditionNode(ColumnName('placement'), Comparator.eq, 1),
+		ConditionNode(ColumnName('publishertier'), Comparator.eq, 'true'),
 	}}
 
 	-- Automatic org people
@@ -68,9 +75,9 @@ function CustomTeam:createRegion(region)
 	return remappedRegion and self:createRegion(remappedRegion) or regionData
 end
 
----@return Widget
+---@return Widget?
 function CustomTeam:createBottomContent()
-	return UpcomingTournaments{name = self.name}
+	return UpcomingTournaments.team{name = self.teamTemplate.templatename}
 end
 
 ---@param id string
@@ -80,8 +87,8 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		return {
-			Cell{name = 'Abbreviation', content = {args.abbreviation}},
-			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {
+			Cell{name = 'Abbreviation', children = {args.abbreviation}},
+			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', children = {
 				args.affiliate and OpponentDisplay.InlineTeamContainer{template = args.affiliate, displayType = 'standard'} or nil}}
 		}
 	end

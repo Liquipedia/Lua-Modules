@@ -5,19 +5,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local WeaponIcon = require('Module:WeaponIconPlayer')
-local WeaponNames = mw.loadData('Module:WeaponNames')
 local Lua = require('Module:Lua')
-local Region = require('Module:Region')
-local String = require('Module:StringUtils')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local WeaponIcon = Lua.import('Module:WeaponIconPlayer')
+local WeaponNames = Lua.import('Module:WeaponNames', {loadData = true})
+local Region = Lua.import('Module:Region')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local SIZE_WEAPON = '25x25px'
@@ -31,8 +31,6 @@ local CustomInjector = Class.new(Injector)
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
-
-	player.args.history = TeamHistoryAuto.results{convertrole = true}
 
 	return player:createInfobox()
 end
@@ -61,7 +59,7 @@ function CustomInjector:parse(id, widgets)
 
 		table.insert(widgets, Cell{
 			name = #weaponIcons > 1 and 'Signature Weapons' or 'Signature Weapon',
-			content = {table.concat(weaponIcons, '&nbsp;')}
+			children = {table.concat(weaponIcons, '&nbsp;')}
 		})
 	elseif id == 'region' then return {}
 	end

@@ -5,12 +5,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 
@@ -39,12 +40,6 @@ local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 ---@return Widget
 function MatchPage.getByMatchId(props)
 	local matchPage = MatchPage(props.match)
-
-	-- Update the view model with game and team data
-	matchPage:populateGames()
-
-	-- Add more opponent data field
-	matchPage:populateOpponents()
 
 	return matchPage:render()
 end

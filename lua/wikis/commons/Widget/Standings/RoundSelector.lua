@@ -5,9 +5,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -15,7 +16,6 @@ local Button = Lua.import('Module:Widget/Basic/Button')
 
 ---@class RoundSelectorWidget: Widget
 ---@operator call(table): RoundSelectorWidget
-
 local RoundSelectorWidget = Class.new(Widget)
 
 ---@return Widget?

@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -35,9 +36,14 @@ function MatchPageStatsList:render()
 	if Logic.isEmpty(self.props.data) then return end
 	return Div{
 		classes = {'match-bm-team-stats-list'},
-		children = Array.map(self.props.data, function (dataElement)
-			return self:_renderStat(dataElement)
-		end)
+		children = Array.map(
+			Array.filter(self.props.data, function (element)
+				return element.team1Value ~= nil or element.team2Value ~= nil
+			end),
+			function (dataElement)
+				return self:_renderStat(dataElement)
+			end
+		)
 	}
 end
 
@@ -54,7 +60,7 @@ function MatchPageStatsList:_renderStat(data)
 			} or nil,
 			Div{
 				classes = {'match-bm-team-stats-list-cell', 'cell--middle'},
-				children = {data.icon, data.name}
+				children = WidgetUtil.collect(data.icon, data.name)
 			},
 			finished and Div{
 				classes = {'match-bm-team-stats-list-cell'},

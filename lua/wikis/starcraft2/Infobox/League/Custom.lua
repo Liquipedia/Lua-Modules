@@ -5,28 +5,29 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local AllowedServers = require('Module:Server')
-local Array = require('Module:Array')
-local Autopatch = require('Module:Automated Patch')
-local Class = require('Module:Class')
-local Countdown = require('Module:Countdown')
-local DateExt = require('Module:Date/Ext')
-local Game = require('Module:Game')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
+local AllowedServers = Lua.import('Module:Server')
+local Array = Lua.import('Module:Array')
+local Autopatch = Lua.import('Module:Automated Patch')
+local Class = Lua.import('Module:Class')
+local Countdown = Lua.import('Module:Countdown')
+local DateExt = Lua.import('Module:Date/Ext')
+local Game = Lua.import('Module:Game')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
+
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extension/PrizePool')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -65,6 +66,7 @@ function CustomLeague:customParseArguments(args)
 	args.number = tonumber(args.number)
 	self.data.mode = args.mode or DEFAULT_MODE
 	self.data.game = (args.game or ''):lower() == GAME_MOD and GAME_MOD or self.data.game
+	self.data.mod = self.data.game == GAME_MOD and args.modname or nil
 	self.data.status = self:_getStatus(args)
 
 	self.data.startTime = Logic.wrapTryOrLog(CustomLeague._readStartTime)(self)
@@ -195,25 +197,25 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game Version', content = {caller:_getGameVersion(args)}},
-			Cell{name = 'Server', content = {caller:_getServer(args)}}
+			Cell{name = 'Game Version', children = {caller:_getGameVersion(args)}},
+			Cell{name = 'Server', children = {caller:_getServer(args)}}
 		}
 	elseif id == 'dates' and data.startTime.display then
-		local startTime = Countdown._create{date = data.startTime.display, rawdatetime = true}
+		local startTime = Countdown.create{date = data.startTime.display, rawdatetime = true}
 
 		if data.startDate == data.endDate then
-			return {Cell{name = 'Start Time', content = {startTime}}}
+			return {Cell{name = 'Start Time', children = {startTime}}}
 		end
 		return {
-			Cell{name = 'Start Time', content = {startTime}},
-			Cell{name = 'End Date', content = {args.edate}},
+			Cell{name = 'Start Time', children = {startTime}},
+			Cell{name = 'End Date', children = {args.edate}},
 		}
 	elseif id == 'customcontent' then
 		if args.player_number and args.player_number > 0 or args.team_number then
 			Array.appendWith(widgets,
 				Title{children = 'Participants'},
-				Cell{name = 'Number of Players', content = {args.raceBreakDown.total}},
-				Cell{name = 'Number of Teams', content = {args.team_number}},
+				Cell{name = 'Number of Players', children = {args.raceBreakDown.total}},
+				Cell{name = 'Number of Teams', children = {args.team_number}},
 				Breakdown{children = args.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
 		end
@@ -355,6 +357,7 @@ end
 
 ---@param args table
 function CustomLeague:defineCustomPageVariables(args)
+	Variables.varDefine('tournament_mod', self.data.mod)
 	Variables.varDefine('headtohead', args.headtohead or 'true')
 	Variables.varDefine('tournament_maps', Json.stringify(args.maps))
 	Variables.varDefine('tournament_series_number', args.number and string.format('%05i', args.number) or nil)
@@ -385,6 +388,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.extradata.seriesnumber = args.number and string.format('%05i', args.number) or nil
 	lpdbData.extradata.starttime = self.data.startTime.storage
+	lpdbData.extradata.mod = self.data.mod
 
 	return lpdbData
 end

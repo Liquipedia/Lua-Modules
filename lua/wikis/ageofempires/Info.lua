@@ -113,5 +113,13 @@ return {
 				playedMatches = 'Matches',
 			},
 		},
+		defaultMaxPlayersPerPlacement = 15,
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'cleanup',
+				storeFromWikiCode = true,
+			},
+		},
 	},
 }

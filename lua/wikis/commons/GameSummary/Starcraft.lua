@@ -7,8 +7,9 @@
 
 local CustomGameSummary = {}
 
-local Array = require('Module:Array')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 

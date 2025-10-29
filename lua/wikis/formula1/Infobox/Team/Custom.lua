@@ -5,18 +5,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+local Tier = Lua.import('Module:Tier/Custom')
+
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -67,18 +69,10 @@ function CustomInjector:parse(id, widgets)
 			)
 		end
 
-		if args.previous or args.next then
-			Array.appendWith(
-				widgets,
-				Title{children = 'Chronology'},
-				Chronology{links = {
-					previous = args.previous,
-					previous2 = args.previous2,
-					next = args.next,
-					next2 = args.next2,
-				}}
-			)
-		end
+		Array.appendWith(
+			widgets,
+			Chronology{args = args, showTitle = true}
+		)
 	end
 
 	return widgets
@@ -92,7 +86,7 @@ function CustomTeam._statisticsCells(args)
 	end
 	local widgets = {Title{children = 'Team Statistics'}}
 	Array.forEach(STATISTICS, function(statsData)
-		table.insert(widgets, Cell{name = statsData.name, content = {args[statsData.key]}})
+		table.insert(widgets, Cell{name = statsData.name, children = {args[statsData.key]}})
 	end)
 	return widgets
 end
@@ -105,6 +99,9 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.extradata.previous2 = args.previous2
 	lpdbData.extradata.next = args.next
 	lpdbData.extradata.next2 = args.next2
+	local tier = Tier.toValue(args.tier)
+	assert(tier or Logic.isEmpty(args.tier), 'Invalid tier input: ' .. args.tier)
+	lpdbData.extradata.tier = tier
 
 	return lpdbData
 end

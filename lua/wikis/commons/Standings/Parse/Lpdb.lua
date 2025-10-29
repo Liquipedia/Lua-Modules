@@ -5,15 +5,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Condition = require('Module:Condition')
-local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
+local Lpdb = Lua.import('Module:Lpdb')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local Namespace = Lua.import('Module:Namespace')
+local Opponent = Lua.import('Module:Opponent/Custom')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local ConditionUtil = Condition.Util
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
 
 local StandingsParseLpdb = {}
 
@@ -41,17 +47,17 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 		end)
 	end)
 
-	local conditionsMatches = Condition.Tree(Condition.BooleanOperator.any)
-	Array.forEach(matchIds, function(matchId)
-		conditionsMatches:add(Condition.Node(Condition.ColumnName('match2id'), Condition.Comparator.eq, matchId))
-	end)
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('namespace'), Comparator.neq, Namespace.matchNamespaceId()),
+		ConditionUtil.anyOf(ColumnName('match2id'), matchIds),
+	}
 
 	---@type StandingTableOpponentData[]
 	local opponents = {}
 	Lpdb.executeMassQuery(
 		'match2',
 		{
-			conditions = conditionsMatches:toString(),
+			conditions = tostring(conditions),
 		},
 		function(match2)
 			local roundNumbers = matchIdToRound[match2.match2id]
@@ -132,6 +138,9 @@ function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMappe
 		end
 		opponentRoundData.specialstatus = ''
 		opponentRoundData.match = match2
+		if not match2.finished then
+			return
+		end
 		local matchResult = match2.winner == 0 and 'd' or opponent.placement == 1 and 'w' or 'l'
 		opponentRoundData.scoreboard.match[matchResult] = (opponentRoundData.scoreboard.match[matchResult] or 0) + 1
 	end)

@@ -11,11 +11,11 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
-local FnUtil = Lua.import('Module:FnUtil')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 
 local Widget = Lua.import('Module:Widget')
+local DateRange = Lua.import('Module:Widget/Misc/DateRange')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -76,7 +76,10 @@ function UpcomingTournamentsRow:render()
 							},
 							children = Div{
 								classes = {'tournament-span'},
-								children = self:_getTournamentSpan()
+								children = DateRange{
+									startDate = data.startdate,
+									endDate = data.date
+								}
 							}
 						}
 					}
@@ -103,29 +106,7 @@ function UpcomingTournamentsRow:_getCountdown()
 		children = ongoing and Span{
 			classes = {'timer-object-countdown-live'},
 			children = 'ONGOING!'
-		} or Countdown._create{timestamp = startDateTimestamp, rawcountdown = true}
-	}
-end
-
----@private
----@return string|string[]
-function UpcomingTournamentsRow:_getTournamentSpan()
-	local data = self.props.data
-	local startDateTimestamp = DateExt.readTimestamp(data.startdate)
-	assert(startDateTimestamp)
-	local endDateTimestamp = DateExt.readTimestamp(data.date)
-	assert(endDateTimestamp)
-	local getMonth = FnUtil.curry(DateExt.formatTimestamp, 'M')
-	if startDateTimestamp == endDateTimestamp then
-		return DateExt.formatTimestamp('M d', startDateTimestamp)
-	end
-	return {
-		DateExt.formatTimestamp('M d', startDateTimestamp),
-		' - ',
-		DateExt.formatTimestamp(
-			getMonth(startDateTimestamp) == getMonth(endDateTimestamp) and 'd' or 'M d',
-			endDateTimestamp
-		)
+		} or Countdown.create{timestamp = startDateTimestamp, rawcountdown = true}
 	}
 end
 

@@ -4,11 +4,13 @@
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
+
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
 
 local Flags = Lua.import('Module:Flags')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -49,15 +51,18 @@ function CustomInjector:parse(id, widgets)
 	if id == 'location' and String.isNotEmpty(args.country) then
 		local locationText = String.isNotEmpty(args.city) and args.city or args.country
 		return {
-			Cell{name = 'Location', content = {Flags.Icon{flag = args.country, shouldLink = false} .. '&nbsp;' .. locationText}},
+			Cell{
+				name = 'Location',
+				children = {Flags.Icon{flag = args.country, shouldLink = false} .. '&nbsp;' .. locationText}
+			},
 		}
 	elseif id == 'custom' then
 		return Array.append(
 				widgets,
 				Title{children = 'Other Information'},
-				Cell{name = 'Tank area size', content = {self:_getMapSize(args.tanksize)}},
-				Cell{name = 'Air area size', content = {self:_getMapSize(args.airsize)}},
-				Cell{name = 'Game Modes', content = Logic.nilIfEmpty(self.caller:getGameModes(args))}
+				Cell{name = 'Tank area size', children = {self:_getMapSize(args.tanksize)}},
+				Cell{name = 'Air area size', children = {self:_getMapSize(args.airsize)}},
+				Cell{name = 'Game Modes', children = Logic.nilIfEmpty(self.caller:getGameModes(args))}
 			)
 		end
 		return widgets

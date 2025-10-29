@@ -5,12 +5,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
-local Table = require('Module:Table')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local Info = Lua.import('Module:Info')
 local Infobox = Lua.import('Module:Widget/Infobox/Core')
@@ -99,14 +100,16 @@ function BasicInfobox:getAllArgsForBase(args, base, options)
 end
 
 ---@param widgets Widget[]
+---@param infoboxType string?
 ---@return string
-function BasicInfobox:build(widgets)
+function BasicInfobox:build(widgets, infoboxType)
 	local infobox = Infobox{
 		gameName = self.wiki,
 		forceDarkMode = Logic.readBool(self.args.darkmodeforced),
 		bottomContent = self.bottomContent,
 		warnings = self.warnings,
 		children = widgets,
+		infoboxType = infoboxType,
 	}
 	if self.injector then
 		-- Customizable backwards compatibility

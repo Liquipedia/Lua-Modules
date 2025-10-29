@@ -5,16 +5,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Faction = require('Module:Faction')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Faction = Lua.import('Module:Faction')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Person = Lua.import('Module:Infobox/Person')
 

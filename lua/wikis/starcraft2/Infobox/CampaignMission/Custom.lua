@@ -5,15 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Game = require('Module:Game')
-local String = require('Module:StringUtils')
+
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Mission = Lua.import('Module:Infobox/CampaignMission')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 
@@ -70,12 +71,12 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'custom' then
 		return {
-			Cell{ name = 'Credits Earned', content = {args.credits}},
-			Cell{ name = 'Research Points', content = {args.research}},
-			Cell{ name = 'Kerrigan Levels', content = {args.Kerrigan}},
-			Cell{ name = 'Evolution Unlock', content = {self.caller:_getEvolution()}},
-			Cell{ name = 'New Units', content = {args.units}},
-			Cell{ name = 'Available Heroes', content = {args.heroes}},
+			Cell{ name = 'Credits Earned', children = {args.credits}},
+			Cell{ name = 'Research Points', children = {args.research}},
+			Cell{ name = 'Kerrigan Levels', children = {args.Kerrigan}},
+			Cell{ name = 'Evolution Unlock', children = {self.caller:_getEvolution()}},
+			Cell{ name = 'New Units', children = {args.units}},
+			Cell{ name = 'Available Heroes', children = {args.heroes}},
 		}
 	end
 	return widgets

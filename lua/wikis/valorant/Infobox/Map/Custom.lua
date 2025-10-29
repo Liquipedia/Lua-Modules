@@ -5,15 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 local Flags = Lua.import('Module:Flags')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class ValorantMapInfobox: MapInfobox
@@ -41,7 +42,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Location',
-				content = {
+				children = {
 					args.country and (Flags.Icon{flag = args.country, shouldLink = false} .. '&nbsp;' .. args.country)
 					or nil
 				},
@@ -50,9 +51,9 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'custom' then
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Bomb Sites', content = {args.bombsites}},
-			Cell{name = 'Teleporters', content = {args.teleporters}},
-			Cell{name = 'Game Mode', content = self.caller:getGameModes(args)}
+			Cell{name = 'Bomb Sites', children = {args.bombsites}},
+			Cell{name = 'Teleporters', children = {args.teleporters}},
+			Cell{name = 'Game Mode', children = self.caller:getGameModes(args)}
 		)
 	end
 	return widgets

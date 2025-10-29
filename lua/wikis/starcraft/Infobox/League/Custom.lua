@@ -5,20 +5,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -147,13 +148,13 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'gamesettings' then
-		table.insert(widgets, Cell{name = 'Patch', content = {CustomLeague._getPatch(args)}})
+		table.insert(widgets, Cell{name = 'Patch', children = {CustomLeague._getPatch(args)}})
 	elseif id == 'customcontent' then
 		if args.player_number and args.player_number > 0 or args.team_number then
 			Array.appendWith(widgets,
 				Title{children = 'Participants'},
-				Cell{name = 'Number of Players', content = {self.caller.data.raceBreakDown.total}},
-				Cell{name = 'Number of Teams', content = {args.team_number}},
+				Cell{name = 'Number of Players', children = {self.caller.data.raceBreakDown.total}},
+				Cell{name = 'Number of Teams', children = {args.team_number}},
 				Breakdown{children = self.caller.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
 		end

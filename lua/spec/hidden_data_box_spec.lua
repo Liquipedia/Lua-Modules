@@ -3,7 +3,7 @@ describe('hidden data box', function()
 	local Hdb = require('Module:HiddenDataBox')
 	local Logic = require('Module:Logic')
 	local Variables = require('Module:Variables')
-	local WarningBox = require('Module:WarningBox')
+	local WarningBox = require('Module:Widget/WarningBox')
 
 	describe('tier parseing', function()
 		it('empty tier return nil', function()
@@ -40,7 +40,7 @@ describe('hidden data box', function()
 
 		it('has correct warning', function()
 			assert.are_same(
-				tostring(WarningBox.display('DummyPage is not a Liquipedia Tournament[[Category:Pages with invalid parent]]')),
+				tostring(WarningBox{text = 'DummyPage is not a Liquipedia Tournament[[Category:Pages with invalid parent]]'}),
 				tostring(Hdb.run({parent = 'DummyPage'}))
 			)
 		end)

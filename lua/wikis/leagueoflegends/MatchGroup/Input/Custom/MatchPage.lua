@@ -5,10 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Logic = require('Module:Logic')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
 
 local CustomMatchGroupInputMatchPage = {}
 
@@ -113,7 +115,39 @@ function CustomMatchGroupInputMatchPage.getObjectives(map, opponentIndex)
 		inhibitors = team.inhibitorKills,
 		barons = team.baronKills,
 		dragons = team.dragonKills,
-		heralds = team.heraldKills,
+		heralds = team.riftHeraldKills,
+		grubs = team.grubKills,
+		atakhans = team.atakhanKills,
+	}
+end
+
+function CustomMatchGroupInputMatchPage.extendMapOpponent(map, opponentIndex)
+	local participants = CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
+
+	if Logic.isEmpty(participants) then
+		return {picks = {}, stats = {}}
+	end
+	---@cast participants -nil
+
+	---@param arr table[]
+	---@param item string
+	---@return number?
+	local function sumItem(arr, item)
+		return Array.reduce(Array.map(arr, Operator.property(item)), Operator.nilSafeAdd, 0)
+	end
+
+	return {
+		side = CustomMatchGroupInputMatchPage.getSide(map, opponentIndex),
+		picks = Array.map(participants, Operator.property('character')),
+		stats = Table.merge(
+			{
+				gold = sumItem(participants, 'gold'),
+				kills = sumItem(participants, 'kills'),
+				deaths = sumItem(participants, 'deaths'),
+				assists = sumItem(participants, 'assists')
+			},
+			CustomMatchGroupInputMatchPage.getObjectives(map, opponentIndex)
+		)
 	}
 end
 

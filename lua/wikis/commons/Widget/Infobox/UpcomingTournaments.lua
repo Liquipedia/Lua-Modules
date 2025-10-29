@@ -19,9 +19,6 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -29,22 +26,17 @@ local Header = Lua.import('Module:Widget/Infobox/UpcomingTournaments/Header')
 local Row = Lua.import('Module:Widget/Infobox/UpcomingTournaments/Row')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class UpcomingTournamentsParameters
----@field name string
----@field type OpponentType
+---@class UpcomingTournamentsWidgetParameters
+---@field opponentConditions AbstractConditionNode
 ---@field options table?
 
----@class UpcomingTournaments: Widget
----@operator call(UpcomingTournamentsParameters): UpcomingTournaments
----@field props UpcomingTournamentsParameters
-local UpcomingTournaments = Class.new(Widget)
-UpcomingTournaments.defaultProps = {
-	name = mw.title.getCurrentTitle().text,
-	type = Opponent.team
-}
+---@class UpcomingTournamentsWidget: Widget
+---@operator call(UpcomingTournamentsWidgetParameters): UpcomingTournamentsWidget
+---@field props UpcomingTournamentsWidgetParameters
+local UpcomingTournamentsWidget = Class.new(Widget)
 
 ---@return Widget
-function UpcomingTournaments:render()
+function UpcomingTournamentsWidget:render()
 	return Div{
 		classes = {'fo-nttax-infobox', 'wiki-bordercolor-light', 'noincludereddit'},
 		css = {['border-top'] = 'none'},
@@ -57,10 +49,9 @@ end
 
 ---@private
 ---@return Widget|Widget[]
-function UpcomingTournaments:_getTournaments()
+function UpcomingTournamentsWidget:_getTournaments()
 	local conditions = ConditionTree(BooleanOperator.all)
-		:add(ConditionNode(ColumnName('opponentname'), Comparator.eq, self.props.name))
-		:add(ConditionNode(ColumnName('opponenttype'), Comparator.eq, self.props.type))
+		:add(self.props.opponentConditions)
 		:add(ConditionNode(ColumnName('date'), Comparator.gt, DateExt.getCurrentTimestamp() - 86400))
 		:add(ConditionNode(ColumnName('placement'), Comparator.eq, ''))
 
@@ -88,4 +79,4 @@ function UpcomingTournaments:_getTournaments()
 	end)
 end
 
-return UpcomingTournaments
+return UpcomingTournamentsWidget

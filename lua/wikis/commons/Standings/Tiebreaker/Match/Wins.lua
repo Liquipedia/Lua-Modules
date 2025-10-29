@@ -5,8 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
 
@@ -18,6 +19,11 @@ local TiebreakerMatchWins = Class.new(TiebreakerInterface)
 ---@return integer
 function TiebreakerMatchWins:valueOf(state, opponent)
 	return opponent.match.w
+end
+
+---@return string
+function TiebreakerMatchWins:headerTitle()
+	return 'Matches Won'
 end
 
 return TiebreakerMatchWins

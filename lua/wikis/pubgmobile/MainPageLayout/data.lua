@@ -61,9 +61,6 @@ local CONTENT = {
 		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
-		panelAttributes = {
-			['data-switch-group-container'] = 'countdown',
-		},
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -128,7 +125,7 @@ return {
 			},
 		},
 		{
-			file = 'PUBG Erangel Remaster Map.jpg',
+			file = 'PUBG Mobile Erangel 2023.png',
 			title = 'Maps',
 			link = 'Portal:Maps',
 			count = {

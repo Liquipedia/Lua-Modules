@@ -88,6 +88,18 @@ return {
 			matchWidth = 180,
 			gameScoresIfBo1 = true,
 		},
+		thisDay = {
+			tiers = {1, 2},
+			excludeTierTypes = {'Qualifier'},
+			showPatches = true,
+		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'automatic',
+				hasHeaderAndRefs = true,
+			},
+		},
 	},
 	defaultRoundPrecision = 0,
 }

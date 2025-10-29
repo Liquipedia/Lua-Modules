@@ -5,8 +5,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Game = require('Module:Game')
-local Tier = require('Module:Tier/Utils')
+local Lua = require('Module:Lua')
+
+local Game = Lua.import('Module:Game')
+local Tier = Lua.import('Module:Tier/Utils')
 
 local Config = {}
 

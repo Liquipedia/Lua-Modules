@@ -16,6 +16,8 @@ liquipedia.selectall = {
 			selectall.parentNode.replaceChild( wrapper, selectall );
 			relative.appendChild( selectall );
 			const selectbutton = document.createElement( 'button' );
+			selectbutton.classList.add( 'btn' );
+			selectbutton.classList.add( 'btn-secondary' );
 			selectbutton.innerHTML = 'Select';
 			selectbutton.onclick = function() {
 				liquipedia.selectall.selectText( this );
@@ -23,6 +25,8 @@ liquipedia.selectall = {
 			buttonwrapper.appendChild( selectbutton );
 			buttonwrapper.appendChild( document.createTextNode( ' ' ) );
 			const selectcopybutton = document.createElement( 'button' );
+			selectcopybutton.classList.add( 'btn' );
+			selectcopybutton.classList.add( 'btn-primary' );
 			selectcopybutton.innerHTML = 'Select and copy';
 			selectcopybutton.onclick = function() {
 				liquipedia.selectall.selectText( this );

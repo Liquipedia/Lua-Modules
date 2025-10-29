@@ -5,16 +5,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local MapModes = require('Module:MapModes')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local MapModes = Lua.import('Module:MapModes')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 local Flags = Lua.import('Module:Flags')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class OverwatchMapInfobox: MapInfobox
@@ -42,7 +43,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Location',
-				content = {Flags.Icon{flag = args.location, shouldLink = false} .. '&nbsp;' .. args.location},
+				children = {Flags.Icon{flag = args.location, shouldLink = false} .. '&nbsp;' .. args.location},
 			},
 		}
 	elseif id == 'custom' then
@@ -54,9 +55,9 @@ function CustomInjector:parse(id, widgets)
 		end)
 		Array.appendWith(
 			widgets,
-			Cell{name = #gameModes == 1 and 'Game Mode' or 'Game Modes', content = gameModes},
-			Cell{name = 'Lighting', content = {args.lighting}},
-			Cell{name = 'Checkpoints', content = {args.checkpoints}}
+			Cell{name = #gameModes == 1 and 'Game Mode' or 'Game Modes', children = gameModes},
+			Cell{name = 'Lighting', children = {args.lighting}},
+			Cell{name = 'Checkpoints', children = {args.checkpoints}}
 		)
 	end
 	return widgets

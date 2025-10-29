@@ -5,9 +5,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
@@ -33,9 +34,8 @@ function MatchSummaryCasters:render()
 
 	return HtmlWidgets.Div{
 		classes = {'brkts-popup-comment'},
-		css = {['white-space'] = 'normal', ['font-size'] = '85%'},
 		children = WidgetUtil.collect(
-			#casters > 1 and 'Casters: ' or 'Caster: ',
+			HtmlWidgets.B{children = {#casters > 1 and 'Casters: ' or 'Caster: '}},
 			Array.interleave(casters, ', ')
 		),
 	}

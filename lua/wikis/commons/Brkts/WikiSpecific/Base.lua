@@ -5,8 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
+
+local FnUtil = Lua.import('Module:FnUtil')
 
 ---@class BrktsWikiSpecific
 ---@field matchHasDetails? fun(match: MatchGroupUtilMatch): boolean

@@ -339,11 +339,19 @@ end
 ---@param localTime boolean?
 ---@return string
 function mw.language:formatDate(format, timestamp, localTime)
+	local ostimeWrapper = function(date)
+		local time = os.time(date)
+		-- Fix for running on MacOS. Year = 0000 returns nil on mac, let's assume it's 0000-01-01
+		if time == nil then
+			return -62167219200
+		end
+		return time
+	end
 	local function localTimezoneOffset(ts)
 		local utcDt = os.date("!*t", ts)
 		local localDt = os.date("*t", ts)
 		localDt.isdst = false
-		return os.difftime(os.time(localDt --[[@as osdateparam]]), os.time(utcDt --[[@as osdateparam]]))
+		return os.difftime(ostimeWrapper(localDt --[[@as osdateparam]]), ostimeWrapper(utcDt --[[@as osdateparam]]))
 	end
 
 	local function parseDateString(timeString)
@@ -377,7 +385,8 @@ function mw.language:formatDate(format, timestamp, localTime)
 			return ''
 		end
 
-		local ts = os.time(makeOsdateParam(year, month, day, hour, minute, second)) - offset
+		local timestampBeforeOffset = ostimeWrapper(makeOsdateParam(year, month, day, hour, minute, second))
+		local ts = timestampBeforeOffset - offset
 
 		return tostring(ts + localTimezoneOffset(ts))
 	elseif format == 'c' then
@@ -393,9 +402,48 @@ function mw.language:formatDate(format, timestamp, localTime)
 			if not year then
 				return ''
 			end
-			return os.date(outFormat, os.time(makeOsdateParam(year, month, day, hour, minute, second))) --[[@as string]]
+			return os.date(outFormat, ostimeWrapper(makeOsdateParam(year, month, day, hour, minute, second))) --[[@as string]]
 		end
-		return os.date(outFormat, os.time(timestamp)) --[[@as string]]
+		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
+	elseif format == 'Y' then
+		local outFormat = '%Y'
+		if not timestamp then
+			return os.date(outFormat) --[[@as string]]
+		end
+		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
+			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
+		end
+		if type(timestamp) == 'string' then
+			local year = parseDateString(timestamp)
+			return year or ''
+		end
+		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
+	elseif format == 'n' then
+		local outFormat = '%m'
+		if not timestamp then
+			return os.date(outFormat) --[[@as string]]
+		end
+		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
+			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
+		end
+		if type(timestamp) == 'string' then
+			local _, month = parseDateString(timestamp)
+			return month or ''
+		end
+		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
+	elseif format == 'd' then
+		local outFormat = '%d'
+		if not timestamp then
+			return os.date(outFormat) --[[@as string]]
+		end
+		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
+			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
+		end
+		if type(timestamp) == 'string' then
+			local _, _, day = parseDateString(timestamp)
+			return day or ''
+		end
+		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
 	end
 	return ''
 end
@@ -570,7 +618,9 @@ end
 ---Removes all MediaWiki strip markers from a string.
 ---@param s string
 ---@return string
-function mw.text.killMarkers(s) end
+function mw.text.killMarkers(s)
+	return s
+end
 
 ---Joins a list, prose-style. In other words, it's like table.concat() but with a different separator before the final item.
 ---@param list table
@@ -736,7 +786,7 @@ end
 ---If the text string does not specify a namespace, namespace (which may be any key found in mw.site.namespaces) will be used.
 ---If the text is not a valid title, nil is returned.
 ---@param text string
----@param namespace string?
+---@param namespace string|integer?
 ---@return Title?
 ---@overload fun(id: number):Title?
 function mw.title.new(text, namespace)
@@ -746,7 +796,7 @@ end
 ---Creates a title object with title title in namespace namespace, optionally with the specified fragment and interwiki prefix. namespace may be any key found in mw.site.namespaces. If the resulting title is not valid, returns nil.
 ---Note that, unlike mw.title.new(), this method will always apply the specified namespace.
 ---If the text is not a valid title, nil is returned.
----@param namespace string
+---@param namespace string|integer
 ---@param title string
 ---@param fragment string?
 ---@param interwiki string?
@@ -1003,6 +1053,19 @@ function mw.uri.encode(str, enctype) end
 ---@param enctype UriEncodeType?
 ---@return string
 function mw.uri.decode(str, enctype) end
+
+---Encodes a table as a URI query string.
+---@param query table<string, string|number|any[]|false>
+---@return string
+function mw.uri.buildQueryString(query) end
+
+---Decodes the query string `s` to a table. Optional arguments `i` and `j` may be used to specify
+---the substring of `s` to be parsed.
+---@param s string
+---@param i integer? the position of first character of the substring to be parsed; defaults to 1
+---@param j integer? the position of last character of the substring to be parsed; defaults to the length of `s`
+---@return table
+function mw.uri.parseQueryString(s, i, j) end
 
 ---Validates the specified table (or URI object).
 ---@param arg table|URI
@@ -1272,6 +1335,21 @@ mw.ext.valorantdb = {}
 ---@field character {riot_id: string, name: string, icon_name: string, localized_names: table<string, string>}
 ---@field lpdb_player? {page_name: string, publisher_id: string, wiki: string}
 
+---@class valorantMatchApiRoundKill
+---@field victim string
+---@field time_since_round_start_millis integer
+---@field time_since_game_start_millis integer
+---@field killer string
+---@field finishing_damage table
+---@field assistants string[]
+
+---@class valorantMatchApiRoundPlayer
+---@field kills valorantMatchApiRoundKill[]
+---@field score integer
+---@field puuid string
+---@field economy {remaining: string, armor: string, spent: integer, loadout_value: integer, weapon: string}
+---@field damage {receiver: string, leg_shots: integer, head_shots: integer, body_shots: integer, damage: integer}[]
+
 ---@class valorantMatchApiRound
 ---@field round_num integer
 ---@field round_result 'Bomb defused'|'Eliminated'|'Bomb detonated'|'Round timer expired'|'Surrendered'
@@ -1285,7 +1363,7 @@ mw.ext.valorantdb = {}
 ---@field plant_round_time integer # 0 is no plant
 ---@field defuse_round_time integer # 0 is no defuse
 ---@field plant_site? 'A'|'B'
----@field player_stats table[]
+---@field player_stats valorantMatchApiRoundPlayer[]
 
 ---@class valorantMatchApiTeam
 ---@field team_id 'Blue'|'Red'

@@ -52,15 +52,23 @@ function Map:createInfobox()
 		},
 		Center{children = {args.caption}},
 		Title{children = (args.informationType or 'Map') .. ' Information'},
-		Cell{name = 'Creator', content = Array.map(self.creators, function (creator)
+		Cell{name = 'Creator', children = Array.map(self.creators, function (creator)
 			return Link{link = creator.page, children = creator.displayName}
 		end)},
 		Customizable{id = 'location', children = {
-			Cell{name = 'Location', content = {args.location}}
+			Cell{name = 'Location', children = {args.location}}
 		}},
 		Customizable{id = 'release', children = {
-			Cell{name = 'Release Date', content = {args.releasedate}},
+			Cell{name = 'Release Date', children = {args.releasedate}},
+			Cell{name = 'Release Patch', children = {args.releasepatch}},
+			Cell{name = 'Updated', children = {args.updated}},
 		}},
+		Cell{name = 'Filename', children = {args.filename}},
+		Cell{name = 'Theme', children = {args.theme}},
+		Cell{name = 'Competition Span', children = {args.span}},
+		Cell{name = 'Style', children = {args.style}},
+		Cell{name = 'Size', children = {args.size}},
+		Cell{name = 'Soft Platforms', children = {args.softplatforms}},
 		Customizable{id = 'custom', children = {}},
 		Center{children = {args.footnotes}},
 	}
@@ -72,7 +80,7 @@ function Map:createInfobox()
 		self:_setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Map')
 end
 
 --- Allows for overriding this functionality

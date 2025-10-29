@@ -5,17 +5,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class TetrisLeagueInfobox: InfoboxLeague
@@ -23,14 +24,14 @@ local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
 local GAME_GROUPS = {
-	classic = {'Tetris', 'NES (1989)', 'NES (1989) NTSC', 'NES (1989) PAL', 'NES (1989) DAS', 'Super Tetris',
-		'Plus', 'Plus 2'},
-	modern = {'Tetris Effect', 'Tetris Effect: Connected', 'Jstris', 'Worldwide Combos', 'TETR.IO', 'Nuketris',
-		'Tetris 2', 'Puyo Puyo Tetris', 'Puyo Puyo Tetris 2', 'Tetris 99', 'Tetris DS', 'Tetris Friends',
-		'Tetris Online Japan', 'Tetris Online Poland'},
-	other = {'Attack', '64 (1998)', 'The New Tetris', 'Tetris & Dr.Mario', 'NullpoMino', 'Blockbox', 'Cultris 2',
-		'TetriNET 2'},
-	tgm = {'The Grand Master', 'The Grand Master 2', 'The Grand Master 3'},
+	classic = {'tetris', 'classic', 'classic ntsc', 'classic pal', 'classic das', 'super',
+		'plus', 'plus 2'},
+	modern = {'te', 'tec', 'jstris', 'wwc', 'tetrio', 'nuketris',
+		'tetris 2', 'ppt1', 'ppt2', 't99', 'td', 'tetris friends',
+		'tetris online japan', 'tetris online poland'},
+	other = {'attack', '64', 'tnt', 'tetris & dr.mario', 'nullpomino', 'blockbox', 'cultris 2',
+		'tetrinet 2'},
+	tgm = {'tgm', 'tgm2', 'tgm3', 'tgm4'},
 }
 
 ---@param frame Frame
@@ -50,12 +51,12 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Teams', content = {args.team_number}},
-			Cell{name = 'Players', content = {args.player_number}}
+			Cell{name = 'Teams', children = {args.team_number}},
+			Cell{name = 'Players', children = {args.player_number}}
 		)
 	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game version', content = {Game.name{game = args.game}}},
+			Cell{name = 'Game version', children = {Game.name{game = args.game}}},
 		}
 	end
 	return widgets

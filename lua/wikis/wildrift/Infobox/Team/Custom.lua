@@ -5,17 +5,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local PlacementStats = require('Module:InfoboxPlacementStats')
-local RoleOf = require('Module:RoleOf')
-local Template = require('Module:Template')
+
+local Class = Lua.import('Module:Class')
+local PlacementStats = Lua.import('Module:InfoboxPlacementStats')
+local RoleOf = Lua.import('Module:RoleOf')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class WildriftInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
@@ -37,12 +40,10 @@ end
 
 ---@return string?
 function CustomTeam:createBottomContent()
-	if not self.args.disbanded then
-		return Template.expandTemplate(
-			mw.getCurrentFrame(),
-			'Upcoming and ongoing tournaments of'
-		) .. tostring(PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}})
-	end
+	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+		not self.args.disbanded and UpcomingTournaments.team{name = self.teamTemplate.templatename} or nil,
+		PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}}
+	)}
 end
 
 ---@param id string
@@ -52,7 +53,7 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
-		table.insert(widgets, Cell{name = 'Abbreviation', content = {args.abbreviation}})
+		table.insert(widgets, Cell{name = 'Abbreviation', children = {args.abbreviation}})
 	end
 
 	return widgets

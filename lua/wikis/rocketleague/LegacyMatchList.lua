@@ -7,10 +7,12 @@
 
 local LegacyMatchList = {}
 
-local Logic = require('Module:Logic')
-local Table = require('Module:Table')
-local Arguments = require('Module:Arguments')
-local Json = require('Module:Json')
+local Lua = require('Module:Lua')
+
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+local Arguments = Lua.import('Module:Arguments')
+local Json = Lua.import('Module:Json')
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local _MAX_NUMBER_OF_MATCHES = 64
@@ -51,7 +53,7 @@ function LegacyMatchList.convertMatchList(frame)
 	args.isLegacy = true
 
 	--pass the adjusted arguments to the MatchGroup
-	return require('Module:MatchGroup').TemplateMatchlist(args)
+	return Lua.import('Module:MatchGroup').TemplateMatchlist(args)
 end
 
 function LegacyMatchList.convertMatchMaps(frame)

@@ -5,17 +5,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
+
+local Class = Lua.import('Module:Class')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
+---@class OsuInfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)
+---@class OsuPersonInfoboxInjector: WidgetInjector
+---@field caller OsuInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -24,9 +28,12 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = TeamHistoryAuto.results{convertrole = true}
-
 	return player:createInfobox()
+end
+
+---@return Widget?
+function CustomPlayer:createBottomContent()
+	return UpcomingTournaments.player{name = self.pagename}
 end
 
 ---@param id string
@@ -37,11 +44,11 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'status' then
-		table.insert(widgets, Cell{name = 'Years Active', content = {args.years_active}})
+		table.insert(widgets, Cell{name = 'Years Active', children = {args.years_active}})
 	elseif id == 'history' then
 		table.insert(widgets, Cell{
 			name = 'Retired',
-			content = {args.retired}
+			children = {args.retired}
 		})
 	end
 	return widgets

@@ -5,18 +5,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Flags = require('Module:Flags')
-local Logic = require('Module:Logic')
-local Links = require('Module:Links')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Flags = Lua.import('Module:Flags')
+local Logic = Lua.import('Module:Logic')
+local Links = Lua.import('Module:Links')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local DEFAULT_PLAYER_TYPE = 'Players'
 local NONBREAKING_SPACE = '&nbsp;'

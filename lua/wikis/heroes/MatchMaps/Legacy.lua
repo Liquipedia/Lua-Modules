@@ -5,19 +5,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local Table = require('Module:Table')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local Table = Lua.import('Module:Table')
 
 local Match = Lua.import('Module:Match')
 local MatchGroup = Lua.import('Module:MatchGroup')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local globalVars = PageVariableNamespace()
 

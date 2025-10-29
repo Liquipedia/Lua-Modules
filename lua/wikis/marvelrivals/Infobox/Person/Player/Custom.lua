@@ -5,22 +5,24 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Region = require('Module:Region')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Team = require('Module:Team')
-local Template = require('Module:Template')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Region = Lua.import('Module:Region')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local CharacterNames = Lua.import('Module:HeroNames')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 
 local SIZE_HERO = '25x25px'
@@ -55,7 +57,7 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(widgets,
 			Cell{
 				name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
-				content = {table.concat(heroIcons, '&nbsp;')},
+				children = {table.concat(heroIcons, '&nbsp;')},
 			}
 		)
 	end
@@ -81,12 +83,15 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@return string?
+---@return Widget?
 function CustomPlayer:createBottomContent()
 	if String.isEmpty(self.args.team) or not self:shouldStoreData(self.args) then return end
-	local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
-	return tostring(MatchTicker.player{recentLimit = 3}) ..
-		Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+	local teamPage = TeamTemplate.getPageName(self.args.team)
+	---@cast teamPage -nil
+	return HtmlWidgets.Fragment{children = {
+		MatchTicker.player{recentLimit = 3},
+		UpcomingTournaments.team{name = teamPage}
+	}}
 end
 
 return CustomPlayer

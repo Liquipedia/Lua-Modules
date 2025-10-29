@@ -5,13 +5,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Json = require('Module:Json')
-local Faction = require('Module:Faction')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
+local Faction = Lua.import('Module:Faction')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 ---@class StarcraftParticipantTableConfig: ParticipantTableConfig
 ---@field displayUnknownColumn boolean?
@@ -39,8 +40,7 @@ local Variables = require('Module:Variables')
 
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local StarcraftParticipantTable = {}
 
@@ -122,7 +122,7 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
 		Variables.varDefine(opponentArgs.name .. '_faction', '')
 	end
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
+	local opponent = Opponent.readOpponentArgs(opponentArgs)
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)
@@ -154,6 +154,7 @@ function StarcraftParticipantTable:adjustLpdbData(lpdbData, entry, config)
 
 	lpdbData.extradata.seriesnumber = seriesNumber and string.format('%05d', seriesNumber) or nil
 	lpdbData.extradata.isqualified = tostring(isQualified)
+	lpdbData.extradata.mod = Variables.varDefault('tournament_mod')
 
 	lpdbData.qualified = isQualified and 1 or nil
 end

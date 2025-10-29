@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local I18n = require('Module:I18n')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local I18n = Lua.import('Module:I18n')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -44,10 +45,15 @@ function MatchSummaryMapVetoStart:render()
 		}
 	end
 
+	local alignments = {'left', 'center', 'right'}
 	return HtmlWidgets.Tr{
 		classes = {'brkts-popup-mapveto-vetostart'},
-		children = Array.map(children, function(child)
-			return HtmlWidgets.Th{children = child}
+		children = Array.map(children, function(child, i)
+			return HtmlWidgets.Th{
+				classes = {'brkts-popup-mapveto__data-cell'},
+				css = {['text-align'] = alignments[i] or nil},
+				children = child
+			}
 		end)
 	}
 end

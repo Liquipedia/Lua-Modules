@@ -5,23 +5,24 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local ArmorIcon = require('Module:ArmorIcon')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
-local Faction = require('Module:Faction')
-local Hotkeys = require('Module:Hotkey')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
+
+local ArmorIcon = Lua.import('Module:ArmorIcon')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local CostDisplay = Lua.import('Module:Infobox/Extension/CostDisplay')
+local Faction = Lua.import('Module:Faction')
+local Hotkeys = Lua.import('Module:Hotkey')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Building = Lua.import('Module:Infobox/Building')
 local Shared = Lua.import('Module:Infobox/Extension/BuildingUnitShared')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
@@ -31,7 +32,7 @@ local CustomBuilding = Class.new(Building)
 
 local CustomInjector = Class.new(Injector)
 
-local EXPERIENCE = mw.loadData('Module:Experience')
+local EXPERIENCE = Lua.import('Module:Experience', {loadData = true})
 
 local DEFAULT_BUILDING_TYPE_RACE = 'Neutral'
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=Hit Points]]'
@@ -62,25 +63,25 @@ function CustomBuilding:addCustomCells(widgets)
 	local race = Faction.toName(Faction.read(args.race)) or ADDITIONAL_BUILDING_RACES[string.lower(args.race or '')]
 
 	Array.appendWith(widgets,
-		Cell{name = '[[Food supplied|Food]]', content = {
+		Cell{name = '[[Food supplied|Food]]', children = {
 			args.foodproduced and (ICON_FOOD .. ' ' .. args.foodproduced) or nil,
 		}},
-		Cell{name = '[[Race]]', content = {race and ('[[' .. race .. ']]') or args.race}},
-		Cell{name = '[[Targeting#Target_Classifications|Classification]]', content = {
+		Cell{name = '[[Race]]', children = {race and ('[[' .. race .. ']]') or args.race}},
+		Cell{name = '[[Targeting#Target_Classifications|Classification]]', children = {
 			args.class and String.convertWikiListToHtmlList(args.class) or nil}},
-		Cell{name = 'Sleeps', content = {args.sleeps}},
-		Cell{name = 'Cargo Capacity', content = {args.cargo_capacity}},
-		Cell{name = 'Morphs into', content = {args.morphs}},
-		Cell{name = 'Duration', content = {args.duration}},
-		Cell{name = 'Formation Rank', content = {args.formationrank}},
-		Cell{name = '[[Sight_Range|Sight]]', content = {race and (args.daysight .. ' / ' .. args.nightsight) or nil}},
-		Cell{name = 'Acquisition Range', content = {acquisitionRange > 0 and acquisitionRange or nil}},
-		Cell{name = '[[Experience#Determining_Experience_Gained|Level]]', content = {
+		Cell{name = 'Sleeps', children = {args.sleeps}},
+		Cell{name = 'Cargo Capacity', children = {args.cargo_capacity}},
+		Cell{name = 'Morphs into', children = {args.morphs}},
+		Cell{name = 'Duration', children = {args.duration}},
+		Cell{name = 'Formation Rank', children = {args.formationrank}},
+		Cell{name = '[[Sight_Range|Sight]]', children = {race and (args.daysight .. ' / ' .. args.nightsight) or nil}},
+		Cell{name = 'Acquisition Range', children = {acquisitionRange > 0 and acquisitionRange or nil}},
+		Cell{name = '[[Experience#Determining_Experience_Gained|Level]]', children = {
 			level > 0 and ('[[Experience|'..args.level..']]') or nil}},
-		Cell{name = '[[Mana]]', content = {mana.manaDisplay}},
-		Cell{name = '[[Mana|Initial Mana]]', content = {mana.initialManaDisplay}},
-		Cell{name = '[[Mana#Mana_Gain|Mana Regeneration]]', content = {mana.manaRegenDisplay}},
-		Cell{name = 'Selection Priorty', content = {args.priority}}
+		Cell{name = '[[Mana]]', children = {mana.manaDisplay}},
+		Cell{name = '[[Mana|Initial Mana]]', children = {mana.initialManaDisplay}},
+		Cell{name = '[[Mana#Mana_Gain|Mana Regeneration]]', children = {mana.manaRegenDisplay}},
+		Cell{name = 'Selection Priorty', children = {args.priority}}
 	)
 
 	local movement = Shared.movement(args, 'Uprooted Movement')
@@ -120,7 +121,7 @@ function CustomInjector:parse(id, widgets)
 		return self.caller:addCustomCells(widgets)
 	elseif id == 'cost' then
 		return {
-			Cell{name = 'Cost', content = {CostDisplay.run{
+			Cell{name = 'Cost', children = {CostDisplay.run{
 				faction = args.race,
 				gold = self.caller:_calculateCostValue('gold'),
 				lumber = self.caller:_calculateCostValue('lumber'),
@@ -129,25 +130,25 @@ function CustomInjector:parse(id, widgets)
 			}}},
 		}
 	elseif id == 'requirements' then
-		return {Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(args.requires)}}}
+		return {Cell{name = 'Requirements', children = {String.convertWikiListToHtmlList(args.requires)}}}
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Built From:', content = {args.builtfrom}},
-			Cell{name = '[[Hotkeys_per_Race|Hotkey]]', content = {self.caller:_getHotkeys()}},
-			Cell{name = 'Builds', content = {String.convertWikiListToHtmlList(args.builds)}},
+			Cell{name = 'Built From', children = {args.builtfrom}},
+			Cell{name = '[[Hotkeys_per_Race|Hotkey]]', children = {self.caller:_getHotkeys()}},
+			Cell{name = 'Builds', children = {String.convertWikiListToHtmlList(args.builds)}},
 		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocked Tech', content = {String.convertWikiListToHtmlList(args.unlocks)}},
-			Cell{name = 'Upgrades available', content = {String.convertWikiListToHtmlList(args.upgrades)}},
-			Cell{name = 'Upgrades to', content = {String.convertWikiListToHtmlList(args.upgradesTo)}},
+			Cell{name = 'Unlocked Tech', children = {String.convertWikiListToHtmlList(args.unlocks)}},
+			Cell{name = 'Upgrades available', children = {String.convertWikiListToHtmlList(args.upgrades)}},
+			Cell{name = 'Upgrades to', children = {String.convertWikiListToHtmlList(args.upgradesTo)}},
 		}
 	elseif id == 'defense' then
 		return {
-			Cell{name = '[[Hit Points|Hit Points]]', content = {self.caller:_defenseDisplay()}},
-			Cell{name = '[[Hit Points#Hit Points Gain|HP Regeneration]]', content = {
+			Cell{name = '[[Hit Points|Hit Points]]', children = {self.caller:_defenseDisplay()}},
+			Cell{name = '[[Hit Points#Hit Points Gain|HP Regeneration]]', children = {
 				Shared.hitPointsRegeneration(args, {display = true})}},
-			Cell{name = '[[Armor|Armor]]', content = {self.caller:_armorDisplay()}}
+			Cell{name = '[[Armor|Armor]]', children = {self.caller:_armorDisplay()}}
 		}
 	elseif id == 'attack' then return {}
 	end

@@ -35,7 +35,7 @@ end
 
 ---@param name string
 ---@param options {requireDevIfEnabled: boolean?}?
----@return any
+---@return string
 local getModuleName = function(name, options)
 	options = options or {}
 	if options.requireDevIfEnabled == false then

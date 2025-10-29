@@ -5,19 +5,24 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
-local Operator = require('Module:Operator')
-local Page = require('Module:Page')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
+local Table = Lua.import('Module:Table')
+
+local AnalyticsWidgets = Lua.import('Module:Widget/Analytics')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 local Tabs = {}
 
 ---Creates static tabs.
 ---Entry point of Template:Tabs static
 ---@param args table?
----@return Html?
+---@return Widget?
 function Tabs.static(args)
 	args = args or {}
 
@@ -27,27 +32,31 @@ function Tabs.static(args)
 
 	Tabs._setThis(tabArgs)
 
-	local tabs = mw.html.create('ul')
-		:attr('class', 'nav nav-tabs navigation-not-searchable tabs tabs' .. tabCount)
-		:attr('data-nosnippet')
-
-	local subTabs = mw.html.create()
-
-	Array.forEach(tabArgs, function(tab)
-		--if tab.name is unset tab.link is set as per `Tabs._readArguments`
-		local name = tab.name or Tabs._getDisplayNameFromLink(tab.link --[[@as string]])
-		local text = tab.link and Page.makeInternalLink({}, name, tab.link) or tab.name
-		tabs:tag('li'):addClass(tab.this and 'active' or nil):wikitext(text)
-		subTabs:node(tab.this and tab.tabs or nil)
-	end)
-
-	return mw.html.create()
-		:tag('div')
-			:addClass('tabs-static')
-			:attr('data-nosnippet', '')
-			:node(tabs)
-			:done()
-		:node(subTabs)
+	return AnalyticsWidgets{
+		analyticsName = 'Navigation tab',
+		children = {
+			HtmlWidgets.Div{
+				classes = {'tabs-static'},
+				attributes = {['data-nosnippet'] = ''},
+				children = HtmlWidgets.Ul{
+					classes = {'nav', 'nav-tabs', 'navigation-not-searchable', 'tabs', 'tabs' .. tabCount},
+					attributes = {['data-nosnippet'] = ''},
+					children = Array.map(tabArgs, function (tab)
+						--if tab.name is unset tab.link is set as per `Tabs._readArguments`
+						local name = tab.name or Tabs._getDisplayNameFromLink(tab.link --[[@as string]])
+						local text = tab.link and Page.makeInternalLink({}, name, tab.link) or tab.name
+						return HtmlWidgets.Li{
+							classes = {tab.this and 'active' or nil},
+							children = text
+						}
+					end)
+				}
+			},
+			HtmlWidgets.Fragment{
+				children = Array.map(Array.filter(tabArgs, Operator.property('this')), Operator.property('tabs'))
+			}
+		}
+	}
 end
 
 ---Creates dynamic tabs.

@@ -5,21 +5,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Date = require('Module:Date/Ext')
-local Game = require('Module:Game')
-local Image = require('Module:Image')
-local Info = require('Module:Info')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local MatchTicker = require('Module:MatchTicker/Custom')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Date = Lua.import('Module:Date/Ext')
+local Game = Lua.import('Module:Game')
+local Image = Lua.import('Module:Image')
+local Info = Lua.import('Module:Info')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Earnings = Lua.import('Module:Earnings')
@@ -29,7 +30,7 @@ local Locale = Lua.import('Module:Locale')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local Region = Lua.import('Module:Region')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -99,7 +100,7 @@ function Team:createInfobox()
 		Customizable{id = 'topcustomcontent', children = {}},
 		Cell{
 			name = 'Location',
-			content = {
+			children = {
 				self:_createLocation(args.location),
 				self:_createLocation(args.location2)
 			}
@@ -107,17 +108,17 @@ function Team:createInfobox()
 		Customizable{
 			id = 'region',
 			children = {
-				Cell{name = 'Region', content = {self.region.display}},
+				Cell{name = 'Region', children = {self.region.display}},
 			}
 		},
 		Customizable{
 			id = 'staff',
 			children = {
-				Cell{name = 'Coaches', content = {args.coaches}},
-				Cell{name = 'Coach', content = {args.coach}},
-				Cell{name = 'Director', content = {args.director}},
-				Cell{name = 'Manager', content = {args.manager}},
-				Cell{name = 'Team Captain', content = {args.captain}},
+				Cell{name = 'Coaches', children = {args.coaches}},
+				Cell{name = 'Coach', children = {args.coach}},
+				Cell{name = 'Director', children = {args.director}},
+				Cell{name = 'Manager', children = {args.manager}},
+				Cell{name = 'Team Captain', children = {args.captain}},
 			}
 		},
 		Customizable{
@@ -128,21 +129,12 @@ function Team:createInfobox()
 						text = 'Approx. Total Winnings',
 						title = 'Includes individual player winnings&#10;while representing this team',
 					} or 'Approx. Total Winnings',
-					content = {self.totalEarnings > 0 and '$' .. Language:formatNum(self.totalEarnings) or nil}
+					children = {self.totalEarnings > 0 and '$' .. Language:formatNum(self.totalEarnings) or nil}
 				}
 			}
 		},
 		Customizable{id = 'custom', children = {}},
-		Builder{
-			builder = function()
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links, variant = LINK_VARIANT}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = links, variant = LINK_VARIANT},
 		Customizable{
 			id = 'achievements',
 			children = {
@@ -166,8 +158,8 @@ function Team:createInfobox()
 						if Table.isNotEmpty(created) or args.disbanded then
 							return {
 								Title{children = 'History'},
-								Cell{name = 'Created', content = created},
-								Cell{name = 'Disbanded', content = {args.disbanded}}
+								Cell{name = 'Created', children = created},
+								Cell{name = 'Disbanded', children = {args.disbanded}}
 							}
 						end
 					end
@@ -203,7 +195,7 @@ function Team:createInfobox()
 	-- Store Wiki-variables
 	self:_definePageVariables(args)
 
-	return self:build(widgets)
+	return self:build(widgets, 'Team')
 end
 
 ---@return string|number|nil # storage date

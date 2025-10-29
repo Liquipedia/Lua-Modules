@@ -5,16 +5,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local Table = require('Module:Table')
-local Json = require('Module:Json')
+
+local Class = Lua.import('Module:Class')
+local Namespace = Lua.import('Module:Namespace')
+local Table = Lua.import('Module:Table')
+local Json = Lua.import('Module:Json')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Links = Lua.import('Module:Links')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -55,7 +56,7 @@ function Game:createInfobox()
 						return {
 							Cell{
 								name = #developers > 1 and 'Developers' or 'Developer',
-								content = developers,
+								children = developers,
 							}
 						}
 					end
@@ -71,14 +72,14 @@ function Game:createInfobox()
 						return {
 							Cell{
 								name = #publishers > 1 and 'Publishers' or 'Publisher',
-								content = publishers,
+								children = publishers,
 							}
 						}
 					end
 				}
 			}
 		},
-		Cell{name = 'Release Date(s)', content = self:getAllArgsForBase(args, 'releasedate')},
+		Cell{name = 'Release Date(s)', children = self:getAllArgsForBase(args, 'releasedate')},
 		Customizable{
 			id = 'platform',
 			children = {
@@ -88,7 +89,7 @@ function Game:createInfobox()
 						return {
 							Cell{
 								name = #platforms > 1 and 'Platforms' or 'Platform',
-								content = platforms,
+								children = platforms,
 							}
 						}
 					end
@@ -96,16 +97,7 @@ function Game:createInfobox()
 			}
 		},
 		Customizable{id = 'custom', children = {}},
-		Builder{
-			builder = function()
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = links},
 		Center{children = {args.footnotes}},
 	}
 
@@ -114,7 +106,7 @@ function Game:createInfobox()
 		self:_setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Game')
 end
 
 ---@param args table

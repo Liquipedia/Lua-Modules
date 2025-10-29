@@ -5,22 +5,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local StandingsParseWiki = Lua.import('Module:Standings/Parse/Wiki')
 local StandingsParseLpdb = Lua.import('Module:Standings/Parse/Lpdb')
 local StandingsParser = Lua.import('Module:Standings/Parser')
 local StandingsStorage = Lua.import('Module:Standings/Storage')
 
-local Display = Lua.import('Module:Widget/Standings')
+local StandingsDisplay = Lua.import('Module:Widget/Standings')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local StandingsTable = {}
 
@@ -56,15 +56,21 @@ function StandingsTable.fromTemplate(frame)
 
 	local tiebreakers = StandingsParseWiki.parseTiebreakers(args, tableType)
 
-	if not importScoreFromMatches then
-		return StandingsTable._make(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
+	if importScoreFromMatches then
+		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args)
+
+		local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction)
+		opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
 	end
 
-	local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args)
+	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
 
-	local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction)
-	opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
-	return StandingsTable._make(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
+	if tableType == 'swiss' then
+		standingsTable.extradata.placemapping = Logic.wrapTryOrLog(StandingsParseWiki.parsePlaceMapping)(args, opponents)
+	end
+
+	StandingsStorage.run(standingsTable, {saveVars = true})
+	return StandingsDisplay{pageName = mw.title.getCurrentTitle().text, standingsIndex = standingsTable.standingsindex}
 end
 
 ---@param manualOpponents StandingTableOpponentData[]
@@ -93,20 +99,6 @@ function StandingsTable.mergeOpponentsData(manualOpponents, importedOpponents, a
 	end)
 
 	return newOpponents
-end
-
----@param rounds any
----@param opponents any
----@param bgs any
----@param title any
----@param matches any
----@param tableType StandingsTableTypes
----@param tiebreakers StandingsTiebreaker[]
----@return Widget
-function StandingsTable._make(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
-	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
-	StandingsStorage.run(standingsTable, {saveVars = true})
-	return Display{pageName = mw.title.getCurrentTitle().text, standingsIndex = standingsTable.standingsindex}
 end
 
 return StandingsTable

@@ -5,8 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
+
+local DateExt = Lua.import('Module:Date/Ext')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
@@ -35,7 +36,7 @@ local CONTENT = {
 		heading = 'Transfers',
 		body = TransfersList{
 			rumours = true,
-			transferPage = 'Player Transfers/' .. os.date('%Y') .. '/' ..
+			transferPage = 'Player Transfers/' .. DateExt.getYearOf() .. '/' ..
 				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 		},
 		boxid = 1509,
@@ -65,9 +66,6 @@ local CONTENT = {
 		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
-		panelAttributes = {
-			['data-switch-group-container'] = 'countdown',
-		},
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -82,8 +80,8 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Brawl Stars full allmode.png',
-		darkmode = 'Brawl Stars full allmode.png',
+		lightmode = 'Brawl Stars 2025 allmode.png',
+		darkmode = 'Brawl Stars 2025 allmode.png',
 	},
 	metadesc = 'The Brawl Stars esports wiki covering everything from players, teams and transfers, ' ..
 		'to tournaments and results, maps, and Brawlers.',

@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
+
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -39,7 +40,6 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '85%'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
 			MatchSummaryWidgets.GameCenter{children = WidgetUtil.collect(

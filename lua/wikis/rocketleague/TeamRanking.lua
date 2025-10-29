@@ -11,7 +11,9 @@
 
 local TeamRanking = {}
 
-local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 --- Entry point
 -- returns a string representation which contains the current RLCS Points and rank of a team in terms of RLCS Points

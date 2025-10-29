@@ -5,13 +5,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Faction = require('Module:Faction')
-local FnUtil = require('Module:FnUtil')
-local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Faction = Lua.import('Module:Faction')
+local FnUtil = Lua.import('Module:FnUtil')
+local Icon = Lua.import('Module:Icon')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -20,9 +21,8 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Custom')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local ICONS = {
 	veto = Icon.makeIcon{iconName = 'veto', color = 'cinnabar-text', size = '110%'},
@@ -37,11 +37,11 @@ local StarcraftMatchSummary = {}
 ---@param args {bracketId: string, matchId: string, config: table?}
 ---@return Html
 function StarcraftMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(StarcraftMatchSummary, args):addClass('brkts-popup-sc')
+	return MatchSummary.defaultGetByMatchId(StarcraftMatchSummary, args, {width = '380px'})
 end
 
 ---@param match StarcraftMatchGroupUtilMatch
----@return MatchSummaryBody
+---@return Widget[]
 function StarcraftMatchSummary.createBody(match)
 	StarcraftMatchSummary.computeOffFactions(match)
 
@@ -51,22 +51,20 @@ function StarcraftMatchSummary.createBody(match)
 		subMatches = match.submatches or {}
 	end
 
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+	return WidgetUtil.collect(
 		isResetMatch and MatchSummaryWidgets.Row{
-			classes = {'brkts-popup-sc-veto-center'},
-			css = {['line-height'] = '80%', ['font-weight'] = 'bold'},
+			css = {['line-height'] = '80%', ['font-weight'] = 'bold', ['text-align'] = 'center'},
 			children = {'Reset match'},
 		} or nil,
-		match.dateIsExact and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.opponents, StarcraftMatchSummary.advantageOrPenalty),
 		subMatches and Array.map(subMatches, StarcraftMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(StarcraftMatchSummary.Game, {})),
 		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
-			classes = {'brkts-popup-sc-game-header brkts-popup-sc-veto-center'},
-			children = {'Vetoes'},
+			css = {['text-align'] = 'center'},
+			children = {HtmlWidgets.B{children = {'Vetoes'}}},
 		} or nil,
 		Array.map(match.vetoes or {}, StarcraftMatchSummary.Veto) or nil
-	)}
+	)
 end
 
 ---@param match StarcraftMatchGroupUtilMatch
@@ -104,7 +102,7 @@ function StarcraftMatchSummary.advantageOrPenalty(opponent)
 	local value = tonumber(extradata.advantage) or tonumber(extradata.penalty)
 
 	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-sc-game-center'},
+		css = {['text-align'] = 'center'},
 		children = {
 			OpponentDisplay.InlineOpponent{
 				opponent = Opponent.isTbd(opponent) and Opponent.tbd() or opponent,
@@ -157,9 +155,8 @@ function StarcraftMatchSummary.Game(options, game)
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.GameComment{
 				children = (game.extradata or {}).server and ('Played server: ' .. (game.extradata or {}).server) or nil,
-				classes = {'brkts-popup-sc-game-comment'},
 			},
-			MatchSummaryWidgets.GameComment{children = game.comment, classes = {'brkts-popup-sc-game-comment'}}
+			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
 	}
 end
@@ -204,25 +201,23 @@ function StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch)
 
 	local createOpponent = function(opponentIndex)
 		local players = (opponents[opponentIndex] or {}).players or {}
-		if Logic.isEmpty(players) then
-			players = Opponent.tbd(Opponent.solo).players
-		end
+		local opponent = Opponent.tbd(Opponent.partyTypes[math.max(#players, 1)]) --[[@as StarcraftStandardOpponent]]
+		opponent.isArchon = (opponents[opponentIndex] or {}).isArchon
+		opponent.players = Logic.nilIfEmpty(players) or opponent.players
 		return OpponentDisplay.BlockOpponent{
 			flip = opponentIndex == 1,
-			opponent = {
-				players = players,
-				type = Opponent.partyTypes[math.max(#players, 1)],
-				isArchon = (opponents[opponentIndex] or {}).isArchon,
-			},
+			opponent = opponent,
 			showLink = true,
 			overflow = 'ellipsis',
 		}
 	end
 
 	---@param opponentIndex any
-	---@return Html
-	local createScore = function(opponentIndex)
+	---@param additionalClasses string[]?
+	---@return Widget
+	local createScore = function(opponentIndex, additionalClasses)
 		return OpponentDisplay.BlockScore{
+			additionalClasses = additionalClasses,
 			isWinner = opponentIndex == submatch.winner or submatch.winner == 0,
 			scoreText = DisplayHelper.MapScore(submatch.opponents[opponentIndex], submatch.status),
 		}
@@ -236,13 +231,13 @@ function StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch)
 				classes = {'brkts-popup-header-opponent', 'brkts-popup-header-opponent-left'},
 				children = {
 					createOpponent(1),
-					createScore(1):addClass('brkts-popup-header-opponent-score-left'),
+					createScore(1, {'brkts-popup-header-opponent-score-left'}),
 				},
 			},
 			HtmlWidgets.Div{
 				classes = {'brkts-popup-header-opponent', 'brkts-popup-header-opponent-right'},
 				children = {
-					createScore(2):addClass('brkts-popup-header-opponent-score-right'),
+					createScore(2, {'brkts-popup-header-opponent-score-right'}),
 					createOpponent(2),
 				},
 			}
@@ -272,7 +267,7 @@ function StarcraftMatchSummary.Veto(veto)
 				children = {statusIcon(1)},
 			},
 			HtmlWidgets.Div{
-				classes = {'brkts-popup-sc-veto-center'},
+				css = {['text-align'] = 'center'},
 				children = {map},
 			},
 			HtmlWidgets.Div{

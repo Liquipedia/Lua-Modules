@@ -5,22 +5,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local SeriesTotalPrize = require('Module:SeriesTotalPrize')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Tier = require('Module:Tier/Custom')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local SeriesTotalPrize = Lua.import('Module:SeriesTotalPrize')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Tier = Lua.import('Module:Tier/Custom')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Series = Lua.import('Module:Infobox/Series')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local CustomInjector = Class.new(Injector)
@@ -51,14 +52,14 @@ function CustomInjector:parse(id, widgets)
 	if id == 'totalprizepool' then
 		if Logic.readBoolOrNil(args.prizepooltot) == false then return {} end
 		return {
-			Cell{name = 'Cumulative Prize Pool', content = {self.caller:_displaySeriesPrizepools()}},
+			Cell{name = 'Cumulative Prize Pool', children = {self.caller:_displaySeriesPrizepools()}},
 		}
 	elseif id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Patch', content = {self.caller:_getPatch()}},
-			Cell{name = 'Server', content = {args.server}},
-			Cell{name = 'Type', content = {args.type}},
-			Cell{name = 'Format', content = {args.format}}
+			Cell{name = 'Patch', children = {self.caller:_getPatch()}},
+			Cell{name = 'Server', children = {args.server}},
+			Cell{name = 'Type', children = {args.type}},
+			Cell{name = 'Format', children = {args.format}}
 		)
 	end
 

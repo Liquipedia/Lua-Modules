@@ -5,21 +5,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Faction = require('Module:Faction')
-local Flags = require('Module:Flags')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local Faction = Lua.import('Module:Faction')
+local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local ASSUME_FINISHED_AFTER = MatchGroupInputUtil.ASSUME_FINISHED_AFTER
 local NOW = os.time()
@@ -150,6 +150,7 @@ end
 function MatchFunctions.getExtraData(match, games, opponents)
 	local extradata = {
 		ffa = 'false',
+		mod = Variables.varDefault('tournament_mod'),
 	}
 
 	for prefix, vetoMap, vetoIndex in Table.iter.pairsByPrefix(match, 'veto') do

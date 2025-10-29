@@ -16,51 +16,47 @@ local Table = Lua.import('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
-local StarcraftPlayerDisplay = Lua.import('Module:Player/Display/Starcraft')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 --Display components for opponents used by the starcraft and starcraft 2 wikis
 ---@class StarcraftOpponentDisplay: OpponentDisplay
 local StarcraftOpponentDisplay = Table.copy(OpponentDisplay)
 
----@class StarcraftInlineOpponentProps: InlineOpponentProps
----@field opponent StarcraftStandardOpponent
----@field showFaction boolean?
-
 ---@class StarcraftBlockOpponentProps: BlockOpponentProps
 ---@field opponent StarcraftStandardOpponent
----@field showFaction boolean?
 
 ---Display component for an opponent entry appearing in a bracket match.
 ---@class StarcraftBracketOpponentEntry
 ---@operator call(...): StarcraftBracketOpponentEntry
 ---@field content Html
 ---@field root Html
-local BracketOpponentEntry = Class.new(
+local BracketOpponentEntry = Class.new(OpponentDisplay.BracketOpponentEntry,
 	---@param self self
 	---@param opponent StarcraftStandardOpponent
-	---@param options {forceShortName: boolean}
+	---@param options {forceShortName: boolean, showTbd: boolean}
 	function(self, opponent, options)
 		local showFactionBackground = opponent.type == Opponent.solo
-			or opponent.extradata.hasFactionOrFlag
 			or opponent.type == Opponent.duo and opponent.isArchon
 
 		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
 			:addClass(showFactionBackground and Faction.bgClass(opponent.players[1].faction) or nil)
 
 		if opponent.type == Opponent.team then
-			self.content:node(OpponentDisplay.BlockTeamContainer({
-				showLink = false,
-				style = 'hybrid',
-				team = opponent.team,
-				template = opponent.template,
-			}))
-		else
-			self.content:node(StarcraftOpponentDisplay.BlockOpponent({
+			if options.showTbd ~= false or not Opponent.isTbd(opponent) then
+				self:createTeam(opponent.template or 'tbd', options)
+			end
+		elseif Opponent.typeIsParty(opponent.type) then
+			self.content:node(StarcraftOpponentDisplay.BlockOpponent{
 				opponent = opponent,
 				overflow = 'ellipsis',
 				playerClass = 'starcraft-bracket-block-player',
 				showLink = false,
-			}))
+				showTbd = options.showTbd,
+			})
+		else
+			self:createLiteral(opponent.name or '')
 		end
 
 		self.root = mw.html.create('div'):addClass('brkts-opponent-entry')
@@ -91,125 +87,55 @@ end
 
 StarcraftOpponentDisplay.BracketOpponentEntry = BracketOpponentEntry
 
----Displays an opponent as an inline element. Useful for describing opponents in prose.
----@param props StarcraftInlineOpponentProps
----@return Html|string|nil
-function StarcraftOpponentDisplay.InlineOpponent(props)
-	local opponent = props.opponent
-
-	if Opponent.typeIsParty((opponent or {}).type) then
-		return mw.html.create()
-			:node(StarcraftOpponentDisplay.InlinePlayers(props))
-			:node(props.note and mw.html.create('sup'):addClass('note'):wikitext(props.note) or '')
-	end
-
-	return OpponentDisplay.InlineOpponent(props)
-end
-
 ---Displays an opponent as a block element. The width of the component is
 ---determined by its layout context, and not of the opponent.
 ---@param props StarcraftBlockOpponentProps
----@return Html
+---@return Widget
 function StarcraftOpponentDisplay.BlockOpponent(props)
 	local opponent = props.opponent
 	opponent.extradata = opponent.extradata or {}
 	-- Default TBDs to not show links
 	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
-	if opponent.type == Opponent.team then
-		return OpponentDisplay.BlockTeamContainer({
-			flip = props.flip,
-			overflow = props.overflow,
-			showLink = showLink,
-			style = props.teamStyle,
-			team = opponent.team,
-			template = opponent.template or 'tbd',
-		})
-	elseif opponent.type == 'literal' and opponent.extradata.hasFactionOrFlag then
-		return StarcraftOpponentDisplay.PlayerBlockOpponent(
-			Table.merge(props, {showLink = showLink})
-		)
-	elseif opponent.type == 'literal' then
-		return OpponentDisplay.BlockOpponent(props)
-	else -- opponent.type == Opponent.solo Opponent.duo Opponent.trio Opponent.quad
-		return StarcraftOpponentDisplay.PlayerBlockOpponent(
+	if Opponent.typeIsParty(opponent.type) then
+		return StarcraftOpponentDisplay.BlockPlayers(
 			Table.merge(props, {showLink = showLink})
 		)
 	end
-end
 
----Displays a player opponent (solo, duo, trio, or quad) as an inline element.
----@param props StarcraftInlineOpponentProps
----@return Html
-function StarcraftOpponentDisplay.PlayerInlineOpponent(props)
-	local showFaction = props.showFaction ~= false
-	local opponent = props.opponent
-
-	local playerTexts = Array.map(opponent.players, function(player)
-		local node = StarcraftPlayerDisplay.InlinePlayer({
-			flip = props.flip,
-			player = player,
-			showFlag = props.showFlag,
-			showLink = props.showLink,
-			showFaction = showFaction and not opponent.isArchon,
-		})
-		return tostring(node)
-	end)
-	if props.flip then
-		playerTexts = Array.reverse(playerTexts)
+	if props.showTbd == false and Opponent.isTbd(opponent) then
+		return HtmlWidgets.Fragment{}
 	end
-
-	local playersNode = opponent.isArchon
-		and '(' .. table.concat(playerTexts, ', ') .. ')'
-		or table.concat(playerTexts, ' / ')
-
-	local archonFactionNode
-	if showFaction and opponent.isArchon then
-		archonFactionNode = Faction.Icon{faction = opponent.players[1].faction}
-	end
-
-	return mw.html.create('span')
-		:node(not props.flip and archonFactionNode or nil)
-		:node(playersNode)
-		:node(props.flip and archonFactionNode or nil)
+	return OpponentDisplay.BlockOpponent(props)
 end
 
 ---Displays a player opponent (solo, duo, trio, or quad) as a block element.
 ---@param props StarcraftBlockOpponentProps
----@return Html
-function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
+---@return Widget
+function StarcraftOpponentDisplay.BlockPlayers(props)
 	local opponent = props.opponent
 	local showFaction = props.showFaction ~= false
 
-	--only apply note to first player, hence extract it here
-	local note = Table.extract(props, 'note')
+	if not showFaction or (not opponent.isArchon and not opponent.isSpecialArchon) then
+		return OpponentDisplay.BlockPlayers(props)
+	end
 
-	local playerNodes = Array.map(opponent.players, function(player, playerIndex)
-		return StarcraftPlayerDisplay.BlockPlayer(Table.merge(props, {
-			player = player,
-			team = player.team,
-			note = playerIndex == 1 and note or nil,
-			showFaction = showFaction and not opponent.isArchon and not opponent.isSpecialArchon,
-		})):addClass(props.playerClass)
-	end)
+	local playerNodes = OpponentDisplay.getBlockPlayerNodes(Table.merge(props, {showFaction = false}))
 
-	if #opponent.players == 1 then
-		return playerNodes[1]
-
-	elseif showFaction and opponent.isArchon then
+	if opponent.isArchon then
 		local factionIcon = Faction.Icon{size = 'large', faction = opponent.players[1].faction}
-		return StarcraftOpponentDisplay.BlockArchon({
+		return StarcraftOpponentDisplay.BlockArchon{
 			flip = props.flip,
 			playerNodes = playerNodes,
 			factionNode = mw.html.create('div'):wikitext(factionIcon),
-		})
-		:addClass('block-players-wrapper')
+			additionalClasses = {'block-players-wrapper'}
+		}
+	end
 
-	elseif showFaction and opponent.isSpecialArchon then
-		local archonsNode = mw.html.create('div')
-			:addClass('starcraft-special-archon-block-opponent')
-			:addClass('block-players-wrapper')
-		for archonIx = 1, #opponent.players / 2 do
+	-- remaining case: opponent.isSpecialArchon
+	return HtmlWidgets.Div{
+		classes = {'starcraft-special-archon-block-opponent', 'block-players-wrapper'},
+		children = Array.map(Array.range(1, #opponent.players / 2), function (archonIx)
 			local primaryFaction = opponent.players[2 * archonIx - 1].faction
 			local secondaryFaction = opponent.players[2 * archonIx].faction
 			local primaryIcon = Faction.Icon{size = 'large', faction = primaryFaction}
@@ -226,46 +152,41 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 				:node(primaryIcon)
 				:node(secondaryIcon)
 
-			local archonNode = StarcraftOpponentDisplay.BlockArchon({
+			return StarcraftOpponentDisplay.BlockArchon({
 				flip = props.flip,
 				playerNodes = Array.sub(playerNodes, 2 * archonIx - 1, 2 * archonIx),
 				factionNode = factionNode,
 			})
-			archonsNode:node(archonNode)
-		end
-		return archonsNode
-
-	else
-		local playersNode = mw.html.create('div')
-			:addClass('block-players-wrapper')
-		for _, playerNode in ipairs(playerNodes) do
-			playersNode:node(playerNode)
-		end
-		return playersNode
-	end
+		end)
+	}
 end
 
 ---Displays a block archon opponent
----@param props {flip: boolean?, playerNodes: Html[], factionNode: Html}
----@return Html
+---@param props {flip: boolean?, playerNodes: Html[], factionNode: Html, additionalClasses: string[]?}
+---@return Widget
 function StarcraftOpponentDisplay.BlockArchon(props)
 	props.factionNode:addClass('starcraft-block-archon-race')
 
-	local playersNode = mw.html.create('div'):addClass('starcraft-block-archon-players')
-	for _, node in ipairs(props.playerNodes) do
-		playersNode:node(node)
-	end
-
-	return mw.html.create('div'):addClass('starcraft-block-archon')
-		:addClass(props.flip and 'flipped' or nil)
-		:node(props.factionNode)
-		:node(playersNode)
+	return HtmlWidgets.Div{
+		classes = Array.extend(
+			'starcraft-block-archon',
+			props.flip and 'flipped' or nil,
+			props.additionalClasses
+		),
+		children = WidgetUtil.collect(
+			props.factionNode,
+			HtmlWidgets.Div{
+				classes = {'starcraft-block-archon-players'},
+				children = props.playerNodes
+			}
+		)
+	}
 end
 
 StarcraftOpponentDisplay.CheckMark =
 	Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', screenReaderHidden = true}
 
----Displays a score within the context of an inline element.
+---Displays a score within the context of an inline element
 ---@param opponent StarcraftStandardOpponent
 ---@return string
 function StarcraftOpponentDisplay.InlineScore(opponent)

@@ -5,8 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox')
 
@@ -14,7 +15,7 @@ local CustomHiddenDataBox = {}
 
 ---Entry point
 ---@param args table
----@return Html
+---@return Widget
 function CustomHiddenDataBox.run(args)
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
 	return BasicHiddenDataBox.run(args)

@@ -5,8 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
+
+local DateExt = Lua.import('Module:Date/Ext')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
@@ -34,7 +35,7 @@ local CONTENT = {
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferPage = 'Player Transfers/' .. os.date('%Y') .. '/' ..
+			transferPage = 'Player Transfers/' .. DateExt.getYearOf() .. '/' ..
 				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 		},
 		boxid = 1509,
@@ -62,9 +63,6 @@ local CONTENT = {
 		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
-		panelAttributes = {
-			['data-switch-group-container'] = 'countdown',
-		},
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -137,7 +135,7 @@ return {
 			link = 'Classes',
 			count = {
 				method = 'CATEGORY',
-				category = 'Classes',
+				category = 'Class',
 			}
 		},
 	},
@@ -151,8 +149,8 @@ return {
 						content = CONTENT.specialEvents,
 					},
 					{
-						mobileOrder = 3,
-						content = CONTENT.transfers,
+						mobileOrder = 4,
+						content = CONTENT.usefulArticles,
 					},
 					{
 						mobileOrder = 6,
@@ -175,7 +173,7 @@ return {
 								},
 							},
 							{
-								size = 6,
+								sizes = {xxxl = 6},
 								children = {
 									{
 										noPanel = true,
@@ -184,7 +182,7 @@ return {
 								},
 							},
 							{
-								size = 6,
+								sizes = {xxxl = 6},
 								children = {
 									{
 										noPanel = true,
@@ -195,12 +193,12 @@ return {
 						},
 					},
 					{
-						mobileOrder = 5,
-						content = CONTENT.thisDay,
+						mobileOrder = 3,
+						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 4,
-						content = CONTENT.usefulArticles,
+						mobileOrder = 5,
+						content = CONTENT.thisDay,
 					},
 				},
 			},

@@ -36,5 +36,10 @@ return {
 			matchWidthMobile = 110,
 			matchWidth = 170,
 		},
+		infoboxPlayer = {
+			automatedHistory = {
+				storeFromWikiCode = true,
+			},
+		},
 	},
 }

@@ -43,6 +43,14 @@ return {
 				display = 'LoL Esports League-Recognized Contract Database'
 			},
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'manualPrio',
+				showRole = false,
+				storeFromWikiCode = true,
+			},
+		},
 	},
 	defaultRoundPrecision = 0,
 }

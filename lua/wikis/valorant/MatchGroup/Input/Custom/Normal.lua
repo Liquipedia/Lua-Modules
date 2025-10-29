@@ -5,8 +5,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Json = require('Module:Json')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
 
 local CustomMatchGroupInputNormal = {}
 

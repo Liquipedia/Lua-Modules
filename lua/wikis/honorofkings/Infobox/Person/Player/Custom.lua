@@ -5,19 +5,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
-local Class = require('Module:Class')
-local HeroNames = mw.loadData('Module:HeroNames')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local PlayerIntroduction = require('Module:PlayerIntroduction/Custom')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local Class = Lua.import('Module:Class')
+local HeroNames = Lua.import('Module:HeroNames', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local SIZE_HERO = '25x25px'
@@ -32,8 +33,6 @@ function CustomPlayer.run(frame)
 	local args = player.args
 	player:setWidgetInjector(CustomInjector(player))
 
-	args.autoTeam = true
-
 	local builtInfobox = player:createInfobox()
 
 	local autoPlayerIntro = ''
@@ -42,8 +41,8 @@ function CustomPlayer.run(frame)
 			player = player.pagename,
 			team = args.team,
 			name = args.romanized_name or args.name,
-			first_name = args.first_name,
-			last_name = args.last_name,
+			firstname = args.first_name,
+			lastname = args.last_name,
 			status = args.status,
 			type = player:getPersonType(args).store,
 			roles = player._getKeysOfRoles(player.roles),
@@ -65,7 +64,6 @@ function CustomPlayer.run(frame)
 	return mw.html.create()
 		:node(builtInfobox)
 		:node(autoPlayerIntro)
-
 end
 
 ---@param id string
@@ -90,7 +88,7 @@ function CustomInjector:parse(id, widgets)
 		if Table.isEmpty(heroIcons) then return widgets end
 		table.insert(widgets, Cell{
 			name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
-			content = {table.concat(heroIcons, '&nbsp;')}
+			children = {table.concat(heroIcons, '&nbsp;')}
 		})
 	end
 

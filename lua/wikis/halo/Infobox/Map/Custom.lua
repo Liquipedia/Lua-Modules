@@ -5,15 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local MapModes = require('Module:MapModes')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local MapModes = Lua.import('Module:MapModes')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class HaloMapInfobox: MapInfobox
@@ -38,12 +39,12 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Type', content = {args.type}},
-			Cell{name = 'Max Players', content = {args.players}},
-			Cell{name = 'Game Version', content = {self.caller:getGame(args)}, options = {makeLink = true}},
+			Cell{name = 'Type', children = {args.type}},
+			Cell{name = 'Max Players', children = {args.players}},
+			Cell{name = 'Game Version', children = {self.caller:getGame(args)}, options = {makeLink = true}},
 			Cell{
 				name = 'Game Modes',
-				content = Array.map(
+				children = Array.map(
 					self.caller:getGameModes(args),
 					function (gameMode)
 						local modeIcon = MapModes.get({mode = gameMode, date = args.releasedate, size = 15})

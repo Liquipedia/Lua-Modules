@@ -1,10 +1,3 @@
----
--- @Liquipedia
--- page=Module:TestAssets/Lpdb/tournament
---
--- Please see https://github.com/Liquipedia/Lua-Modules to contribute
---
-
 -- luacheck: ignore
 return {
 	{

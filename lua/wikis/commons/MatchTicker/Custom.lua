@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Arguments = Lua.import('Module:Arguments')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local MatchTicker = Lua.import('Module:MatchTicker')
 
@@ -54,7 +55,7 @@ function CustomMatchTicker.newMainPage(frame)
 	args.tiers = args['filterbuttons-liquipediatier']
 	if args.tiers == 'curated' then
 		args.tiers = nil
-		args.featuredTournamentsOnly = true
+		args.featuredOnly = true
 	end
 
 	args.tiertypes = args['filterbuttons-liquipediatiertype']

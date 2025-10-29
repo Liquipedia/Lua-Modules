@@ -5,4 +5,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-return require('Module:Faction/Data/Starcraft')
+local Lua = require('Module:Lua')
+
+return Lua.import('Module:Faction/Data/Starcraft')

@@ -51,6 +51,12 @@ return {
 		teamRosterNavbox = {
 			hidePlayedMatches = true,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				storeFromWikiCode = true,
+			},
+		},
 	},
 	defaultRoundPrecision = 0,
 }

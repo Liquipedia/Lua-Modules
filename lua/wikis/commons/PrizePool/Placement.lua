@@ -5,23 +5,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchPlacement = require('Module:Match/Placement')
-local Ordinal = require('Module:Ordinal')
-local PlacementInfo = require('Module:Placement')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Medals = Lua.import('Module:Medals')
+local Ordinal = Lua.import('Module:Ordinal')
+local PlacementInfo = Lua.import('Module:Placement')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 ---@class PrizePoolPlacement: BasePlacement
 ---@field opponents BasePlacementOpponent[]
 local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local DASH = '&#045;'
 
@@ -242,6 +242,7 @@ function Placement:_getLpdbData(...)
 
 		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_BASE_CURRENCY .. 1)) or 0
 		local pointsReward = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
+		local pointsReward2 = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
 		local lpdbData = {
 			image = image,
 			imagedark = imageDark,
@@ -267,6 +268,7 @@ function Placement:_getLpdbData(...)
 			),
 			extradata = {
 				prizepoints = tostring(pointsReward or ''),
+				prizepoints2 = tostring(pointsReward2 or ''),
 				participantteam = (opponentType == Opponent.solo and players.p1team)
 									and Opponent.toName{template = players.p1team, type = 'team'}
 									or nil,
@@ -343,7 +345,7 @@ function Placement:getMedal()
 		return
 	end
 
-	local medal = MatchPlacement.MedalIcon{range = {self.placeStart, self.placeEnd}}
+	local medal = Medals.display{medal = self:_lpdbValue()}
 	if medal then
 		return tostring(medal)
 	end

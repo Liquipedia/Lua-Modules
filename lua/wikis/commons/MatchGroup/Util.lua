@@ -5,23 +5,24 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Date = require('Module:Date/Ext')
-local Faction = require('Module:Faction')
-local FnUtil = require('Module:FnUtil')
-local Info = require('Module:Info')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Date = Lua.import('Module:Date/Ext')
+local Faction = Lua.import('Module:Faction')
+local FnUtil = Lua.import('Module:FnUtil')
+local Info = Lua.import('Module:Info')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TypeUtil = Lua.import('Module:TypeUtil')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
-local TBD_DISPLAY = '<abbr title="To Be Decided">TBD</abbr>'
 local NOW = os.time()
 
 local nilIfEmpty = String.nilIfEmpty
@@ -57,7 +58,9 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 ---@field coordinates MatchGroupUtilMatchCoordinates
 ---@field advanceSpots MatchGroupUtilAdvanceSpot[]
 ---@field bracketResetMatchId string?
+---@field bracketType string?
 ---@field header string?
+---@field inheritedHeader string?
 ---@field lowerEdges MatchGroupUtilLowerEdge[]?
 ---@field lowerMatchIds string[]
 ---@field qualLose boolean?
@@ -76,6 +79,7 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
 	bracketResetMatchId = 'string?',
+	bracketType = 'string?',
 	header = 'string?',
 	inheritedHeader = 'string?',
 	lowerEdges = TypeUtil.array(MatchGroupUtil.types.LowerEdge),
@@ -141,12 +145,15 @@ MatchGroupUtil.types.BracketData = TypeUtil.union(
 ---@field team string?
 ---@field extradata table?
 ---@field pageIsResolved boolean?
+---@field faction string?
 MatchGroupUtil.types.Player = TypeUtil.struct({
 	displayName = 'string?',
 	flag = 'string?',
 	pageName = 'string?',
 	team = 'string?',
 	extradata = 'table?',
+	pageIsResolved = 'boolean?',
+	faction = 'string?',
 })
 
 ---@class standardOpponent
@@ -165,6 +172,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 ---@field template string?
 ---@field type OpponentType
 ---@field team string?
+---@field extradata table
 MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	advanceBg = 'string?',
 	advances = 'boolean?',
@@ -179,6 +187,7 @@ MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	status2 = 'string?',
 	template = 'string?',
 	type = 'string',
+	extradata = 'table',
 })
 
 ---@class GameOpponent
@@ -199,13 +208,16 @@ MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed
 ---@class MatchGroupUtilGame
 ---@field comment string?
 ---@field date string?
+---@field dateIsExact boolean
 ---@field game string?
 ---@field header string?
----@field length number?
+---@field length string|number?
 ---@field map string?
 ---@field mapDisplayName string?
 ---@field mode string?
 ---@field opponents {players: table[], score: number?, status: string?}[]
+---@field patch string?
+---@field resultType string?
 ---@field scores number[]
 ---@field subgroup number?
 ---@field type string?
@@ -218,10 +230,12 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 	date = 'string?',
 	game = 'string?',
 	header = 'string?',
-	length = 'number?',
+	length = TypeUtil.optional(TypeUtil.union('number', 'string')),
 	map = 'string?',
 	mapDisplayName = 'string?',
 	mode = 'string?',
+	patch = 'string?',
+	resultType = 'string?',
 	scores = TypeUtil.array('number'),
 	subgroup = 'number?',
 	type = 'string?',
@@ -238,19 +252,32 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field finished boolean
 ---@field game string?
 ---@field games MatchGroupUtilGame[]
+---@field icon string?
+---@field iconDark string?
 ---@field links table
+---@field liquipediatier string? # TODO: camelCase
+---@field liquipediatiertype string? # TODO: camelCase
 ---@field matchId string?
 ---@field mode string?
 ---@field opponents standardOpponent[]
+---@field pageName string?
+---@field parent string?
+---@field patch string?
+---@field phase 'upcoming'|'ongoing'|'finished'
+---@field publisherTier string?
+---@field resultType string?
+---@field section string?
+---@field series string?
 ---@field status MatchStatus
 ---@field stream table
 ---@field tickername string?
 ---@field tournament string?
 ---@field type string?
 ---@field vod string?
----@field winner string?
+---@field winner number?
 ---@field extradata table?
 ---@field timestamp number
+---@field timezoneId string?
 ---@field bestof number?
 MatchGroupUtil.types.Match = TypeUtil.struct({
 	bracketData = MatchGroupUtil.types.BracketData,
@@ -260,10 +287,21 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	finished = 'boolean',
 	game = 'string?',
 	games = TypeUtil.array(MatchGroupUtil.types.Game),
+	icon = 'string?',
+	iconDark = 'string?',
 	links = 'table',
+	liquipediatier = 'string?',
+	liquipediatiertype = 'string?',
 	matchId = 'string?',
 	mode = 'string',
 	opponents = TypeUtil.array(MatchGroupUtil.types.Opponent),
+	pageName = 'string?',
+	parent = 'string?',
+	patch = 'string?',
+	publisherTier = 'string?',
+	resultType = 'string?',
+	section = 'string?',
+	series = 'string?',
 	status = MatchGroupUtil.types.Status,
 	stream = 'table',
 	tickername = 'string?',
@@ -280,18 +318,6 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 
 ---@class FFAMatchGroupUtilGame: MatchGroupUtilGame
 ---@field stream table
-
----@class standardTeamProps
----@field bracketName string
----@field displayName string
----@field pageName string?
----@field shortName string
-MatchGroupUtil.types.Team = TypeUtil.struct({
-	bracketName = 'string',
-	displayName = 'string',
-	pageName = 'string?',
-	shortName = 'string',
-})
 
 ---@class MatchGroupUtilMatchlist
 ---@field bracketDatasById table<string, MatchGroupUtilBracketBracketData>
@@ -330,6 +356,19 @@ MatchGroupUtil.types.MatchGroup = TypeUtil.union(
 	MatchGroupUtil.types.Matchlist,
 	MatchGroupUtil.types.Bracket
 )
+
+---Fetches all match ids of matches that satisfy the supplied condition
+---@param props {conditions: string|AbstractConditionNode, limit: string|integer?, order: string?}
+---@return string[]
+function MatchGroupUtil.fetchMatchIds(props)
+	---@type string[]
+	return Array.map(mw.ext.LiquipediaDB.lpdb('match2', {
+		limit = tonumber(props.limit) or 1000,
+		query = 'match2id',
+		conditions = tostring(props.conditions),
+		order = props.order
+	}), Operator.property('match2id'))
+end
 
 ---Fetches all matches in a matchlist or bracket. Tries to read from page variables before fetching from LPDB.
 ---Returns a list of records ordered lexicographically by matchId.
@@ -496,7 +535,7 @@ end
 ---
 ---This is the implementation used on wikis by default. Wikis may specify a different conversion by setting
 ---WikiSpecific.matchFromRecord. Refer to the starcraft2 wiki as an example.
----@param record table
+---@param record match2
 ---@return MatchGroupUtilMatch
 function MatchGroupUtil.matchFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
@@ -510,7 +549,7 @@ function MatchGroupUtil.matchFromRecord(record)
 
 	local walkover = nilIfEmpty(record.walkover)
 
-	return {
+	local match = {
 		bestof = tonumber(record.bestof) or 0,
 		bracketData = bracketData,
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
@@ -520,25 +559,36 @@ function MatchGroupUtil.matchFromRecord(record)
 		finished = Logic.readBool(record.finished),
 		game = record.game,
 		games = games,
+		icon = nilIfEmpty(record.icon),
+		iconDark = nilIfEmpty(record.icondark),
 		links = Json.parseIfString(record.links) or {},
 		matchId = record.match2id,
 		liquipediatier = record.liquipediatier,
 		liquipediatiertype = record.liquipediatiertype,
 		mode = record.mode,
 		opponents = opponents,
+		pageName = record.pagename,
 		parent = record.parent,
 		patch = record.patch,
+		publisherTier = nilIfEmpty(record.publishertier),
 		resultType = nilIfEmpty(record.resulttype),
+		section = nilIfEmpty(record.section),
+		series = nilIfEmpty(record.series),
 		status = nilIfEmpty(record.status),
 		stream = Json.parseIfString(record.stream) or {},
 		tickername = record.tickername,
 		timestamp = tonumber(Table.extract(extradata, 'timestamp')),
+		timezoneId = Table.extract(extradata, 'timezoneid'),
 		tournament = record.tournament,
 		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),
 		walkover = walkover and walkover:lower() or nil,
 		winner = tonumber(record.winner),
 	}
+
+	match.phase = MatchGroupUtil.computeMatchPhase(match)
+
+	return match
 end
 
 ---@param data table?
@@ -565,6 +615,7 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 			qualWinLiteral = nilIfEmpty(data.qualwinLiteral),
 			matchPage = nilIfEmpty(data.matchpage),
 			skipRound = tonumber(data.skipround) or data.skipround == 'true' and 1 or 0,
+			bracketType = nilIfEmpty(data.bracketType),
 			thirdPlaceMatchId = nilIfEmpty(data.thirdplace),
 			type = 'bracket',
 			upperMatchId = nilIfEmpty(data.upperMatchId),
@@ -600,6 +651,7 @@ function MatchGroupUtil.bracketDataToRecord(bracketData)
 		qualwin = bracketData.qualWin and 'true' or nil,
 		qualwinLiteral = bracketData.qualWinLiteral,
 		skipround = bracketData.skipRound ~= 0 and bracketData.skipRound or nil,
+		bracketType = bracketData.bracketType,
 		thirdplace = bracketData.thirdPlaceMatchId,
 		tolower = bracketData.lowerMatchIds[#bracketData.lowerMatchIds],
 		toupper = bracketData.lowerMatchIds[#bracketData.lowerMatchIds - 1],
@@ -673,7 +725,7 @@ function MatchGroupUtil.playerFromRecord(record)
 	}
 end
 
----@param record table
+---@param record match2game
 ---@param opponentCount integer?
 ---@return MatchGroupUtilGame
 function MatchGroupUtil.gameFromRecord(record, opponentCount)
@@ -691,6 +743,7 @@ function MatchGroupUtil.gameFromRecord(record, opponentCount)
 		mapDisplayName = nilIfEmpty(Table.extract(extradata, 'displayname')),
 		mode = nilIfEmpty(record.mode),
 		opponents = record.opponents,
+		patch = record.patch,
 		resultType = nilIfEmpty(record.resulttype),
 		status = nilIfEmpty(record.status),
 		scores = Json.parseIfString(record.scores) or {},
@@ -825,32 +878,6 @@ function MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
 	end
 
 	return mergedMatch
-end
-
----Fetches information about a team via mw.ext.TeamTemplate.
----@param template string
----@return table?
-function MatchGroupUtil.fetchTeam(template)
-	--exception for TBD opponents
-	if string.lower(template) == 'tbd' then
-		return {
-			bracketName = TBD_DISPLAY,
-			displayName = TBD_DISPLAY,
-			pageName = 'TBD',
-			shortName = TBD_DISPLAY,
-		}
-	end
-	local rawTeam = mw.ext.TeamTemplate.raw(template)
-	if not rawTeam then
-		return nil
-	end
-
-	return {
-		bracketName = rawTeam.bracketname,
-		displayName = rawTeam.name,
-		pageName = rawTeam.page,
-		shortName = rawTeam.shortname,
-	}
 end
 
 ---Parse extradata as a JSON string if read from page variables. Otherwise create a copy if fetched from lpdb.

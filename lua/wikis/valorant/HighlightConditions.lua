@@ -12,7 +12,7 @@ local HighlightConditions = {}
 ---@param options table?
 ---@return boolean
 function HighlightConditions.tournament(data, options)
-	return (data.publishertier == 'highlighted')
+	return (data.publishertier or data.publisherTier) == 'highlighted'
 end
 
 return HighlightConditions

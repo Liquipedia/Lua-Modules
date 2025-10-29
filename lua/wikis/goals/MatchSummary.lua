@@ -9,7 +9,7 @@ local CustomMatchSummary = {}
 
 local Lua = require('Module:Lua')
 
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -27,7 +27,6 @@ end
 function CustomMatchSummary.createGame(date, game, gameIndex)
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '80%', padding = '4px'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			DisplayHelper.MapScore(game.opponents[1], game.status),

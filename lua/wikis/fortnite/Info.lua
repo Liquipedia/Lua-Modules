@@ -37,5 +37,12 @@ return {
 		teamRosterNavbox = {
 			hidePlayedMatches = true,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'merge',
+				storeFromWikiCode = true,
+			},
+		},
 	},
 }

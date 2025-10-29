@@ -5,34 +5,34 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Info = require('Module:Info')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
-local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local Math = require('Module:MathUtil')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Math = Lua.import('Module:MathUtil')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 local Team = Lua.import('Module:Infobox/Team')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -69,25 +69,25 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
-		table.insert(widgets, Cell{name = 'Gaming Director', content = {args['gaming director']}})
+		table.insert(widgets, Cell{name = 'Gaming Director', children = {args['gaming director']}})
 	elseif id == 'earnings' then
 		local displayEarnings = function(value)
 			return value > 0 and '$' .. mw.getContentLanguage():formatNum(value) or nil
 		end
 
 		return {
-			Cell{name = 'Approx. Total Winnings', content = {displayEarnings(self.caller.totalEarnings)}},
-			Cell{name = PLAYER_EARNINGS_ABBREVIATION, content = {displayEarnings(self.caller.totalEarningsWhileOnTeam)}},
+			Cell{name = 'Approx. Total Winnings', children = {displayEarnings(self.caller.totalEarnings)}},
+			Cell{name = PLAYER_EARNINGS_ABBREVIATION, children = {displayEarnings(self.caller.totalEarningsWhileOnTeam)}},
 		}
 	elseif id == 'achievements' then
-		table.insert(widgets, Cell{name = 'Solo Achievements', content = {args['solo achievements']}})
+		table.insert(widgets, Cell{name = 'Solo Achievements', children = {args['solo achievements']}})
 		--need this ABOVE the history display and below the
 		--achievements display, hence moved it here
 		local raceBreakdown = RaceBreakdown.run(args)
 		if raceBreakdown then
 			Array.appendWith(widgets,
 				Title{children = 'Player Breakdown'},
-				Cell{name = 'Number of Players', content = {raceBreakdown.total}},
+				Cell{name = 'Number of Players', children = {raceBreakdown.total}},
 				Breakdown{children = raceBreakdown.display, classes = { 'infobox-center' }}
 			)
 		end
@@ -96,7 +96,7 @@ function CustomInjector:parse(id, widgets)
 		while(not String.isEmpty(args['history' .. index .. 'title'])) do
 			table.insert(widgets, Cell{
 				name = args['history' .. index .. 'title'],
-				content = {args['history' .. index]}
+				children = {args['history' .. index]}
 			})
 			index = index + 1
 		end
@@ -185,7 +185,7 @@ function CustomTeam:getEarningsAndMedalsData(team)
 		.. 'individualprizemoney, prizemoney, opponentplayers, opponenttype'
 
 	local playerTeamConditions = ConditionTree(BooleanOperator.any)
-	for playerIndex = 1, Info.maximumNumberOfPlayersInPlacements do
+	for playerIndex = 1, Info.config.defaultMaxPlayersPerPlacement do
 		playerTeamConditions:add{
 			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex .. 'team'), Comparator.eq, team),
 		}

@@ -5,11 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
@@ -23,6 +24,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchSummaryFfaGameDetails: Widget
 ---@operator call(table): MatchSummaryFfaGameDetails
+---@field props {game: FFAMatchGroupUtilGame}
 local MatchSummaryFfaGameDetails = Class.new(Widget)
 
 ---@return Widget

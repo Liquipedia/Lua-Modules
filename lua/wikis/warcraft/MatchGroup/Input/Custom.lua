@@ -5,24 +5,24 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Faction = require('Module:Faction')
-local Flags = require('Module:Flags')
-local FnUtil = require('Module:FnUtil')
-local CharacterAliases = mw.loadData('Module:CharacterAliases')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MapsData = mw.loadData('Module:Maps/data')
-local Operator = require('Module:Operator')
-local PatchAuto = require('Module:PatchAuto')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local Faction = Lua.import('Module:Faction')
+local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
+local CharacterAliases = Lua.import('Module:CharacterAliases', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local MapsData = Lua.import('Module:Maps/data', {loadData = true})
+local Operator = Lua.import('Module:Operator')
+local PatchAuto = Lua.import('Module:PatchAuto')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local TBD = 'TBD'
 local NEUTRAL_HERO_FACTION = 'neutral'
@@ -30,6 +30,7 @@ local MODE_MIXED = 'mixed'
 local MODE_FFA = 'FFA'
 local ASSUME_FINISHED_AFTER = MatchGroupInputUtil.ASSUME_FINISHED_AFTER
 local NOW = os.time()
+local RANDOM_FACTION = 'r'
 
 ---@class WarcraftParticipant
 ---@field player string
@@ -256,7 +257,9 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 		end,
 		function(playerIndex, playerIdData, playerInputData)
 			local prefix = 't' .. opponentIndex .. 'p' .. playerIndex
+			local isRandom = Logic.readBool(mapInput[prefix .. 'random'])
 			local faction = Faction.read(mapInput[prefix .. 'race'])
+				or (isRandom and Faction.read(RANDOM_FACTION))
 				or (playerIdData.extradata or {}).faction or Faction.defaultFaction
 			local link = playerIdData.name or playerInputData.link or playerInputData.name:gsub(' ', '_')
 			return {
@@ -264,7 +267,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 				player = link,
 				flag = Flags.CountryName{flag = playerIdData.flag},
 				position = playerIndex,
-				random = Logic.readBool(mapInput[prefix .. 'random']),
+				random = isRandom,
 				heroes = MapFunctions.readHeroes(
 					mapInput[prefix .. 'heroes'],
 					faction,

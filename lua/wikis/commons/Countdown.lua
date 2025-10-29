@@ -5,25 +5,30 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local DateExt = require('Module:Date/Ext')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local StreamLinks = Lua.import('Module:Links/Stream')
 
+---@class CountdownArgs
+---@field date string?
+---@field timestamp integer?
+---@field rawcountdown boolean?
+---@field rawdatetime boolean?
+---@field finished boolean?
+---@field nostreams boolean?
+---@field text string?
+---@field separator string?
+
 local Countdown = {}
 
----@param frame Frame
+---@param args CountdownArgs
 ---@return string
-function Countdown.create(frame)
-	return Countdown._create(Arguments.getArgs(frame))
-end
-
----@param args table
----@return string
-function Countdown._create(args)
+function Countdown.create(args)
 	args = args or {}
 	if Logic.isEmpty(args.date) and not args.timestamp then
 		return ''
@@ -59,10 +64,6 @@ function Countdown._create(args)
 		wrapper:attr('data-hasstreams', 'true')
 	end
 
-	if Logic.readBool(args.showCompleted) then
-		wrapper:attr('data-show-completed', 'true')
-	end
-
 	if args.text then
 		wrapper:attr('data-countdown-end-text', args.text)
 	end
@@ -82,4 +83,4 @@ function Countdown._create(args)
 	)
 end
 
-return Countdown
+return Class.export(Countdown, {exports = {'create'}})

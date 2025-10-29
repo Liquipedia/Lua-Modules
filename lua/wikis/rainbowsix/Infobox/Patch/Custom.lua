@@ -5,13 +5,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Patch = Lua.import('Module:Infobox/Patch')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class R6PatchInfobox: PatchInfobox
@@ -34,9 +35,9 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'release' then
 		return {
-			Cell{name = 'Release Date', content = {args.release}},
-			Cell{name = 'PC Release Date', content = {args.pcrelease}},
-			Cell{name = 'Console Release Date', content = {args.consolerelease}},
+			Cell{name = 'Release Date', children = {args.release}},
+			Cell{name = 'PC Release Date', children = {args.pcrelease}},
+			Cell{name = 'Console Release Date', children = {args.consolerelease}},
 		}
 	end
 	return widgets

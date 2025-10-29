@@ -16,7 +16,6 @@ Config.TIER_TYPE_MONTHLY = 'monthly'
 Config.TIER_TYPE_MISC = 'misc'
 Config.TIER_TYPE_SHOW_MATCH = 'showmatch'
 Config.TIER_TYPE_CAMPAIGN = 'campaign'
-Config.MAX_NUMBER_OF_PARTICIPANTS = 20
 Config.MAX_NUMBER_OF_COACHES = 2
 
 -- How many placements should we retrieve from LPDB for a team/player?
@@ -174,9 +173,12 @@ Config.weights = {
 	},
 }
 
--- This function adjusts the score for the placement, e.g.
--- a first placement should score more than a 17th placement.
--- See also the EXTRA_DROP_OFF_TYPES.
+--- This function adjusts the score for the placement, e.g.
+--- a first placement should score more than a 17th placement.
+--- See also the EXTRA_DROP_OFF_TYPES.
+---@param tier string|integer
+---@param tierType string
+---@return fun(number, number): number
 function Config.placementDropOffFunction(tier, tierType)
 
 		return function(score, placement)

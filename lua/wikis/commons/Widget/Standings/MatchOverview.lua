@@ -5,31 +5,36 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 ---@class MatchOverviewWidget: Widget
 ---@operator call(table): MatchOverviewWidget
-
 local MatchOverviewWidget = Class.new(Widget)
 
 ---@return Widget?
 function MatchOverviewWidget:render()
 	---@type MatchGroupUtilMatch
 	local match = self.props.match
-	local showOpponent = tonumber(self.props.showOpponent)
-	if not match or not showOpponent or #match.opponents < 2 then
+	local opponentIndexToShow = tonumber(self.props.showOpponent)
+	if not match or not opponentIndexToShow or #match.opponents ~= 2 then
 		return
 	end
 
-	local opponent = match.opponents[showOpponent]
-	if not opponent then
+	local opponentToShow = match.opponents[opponentIndexToShow]
+	if not opponentToShow then
+		return
+	end
+
+	local leftOpponent = Array.find(match.opponents, function(op) return op ~= opponentToShow end)
+	if not leftOpponent then
 		return
 	end
 
@@ -43,8 +48,7 @@ function MatchOverviewWidget:render()
 		children = {
 			HtmlWidgets.Span{
 				children = OpponentDisplay.BlockOpponent{
-					opponent = opponent,
-					showLink = true,
+					opponent = opponentToShow,
 					overflow = 'ellipsis',
 					teamStyle = 'icon',
 				}
@@ -53,7 +57,11 @@ function MatchOverviewWidget:render()
 				css = {
 					['font-size'] = '0.8em',
 				},
-				children = match.opponents[1].score .. ' - ' .. match.opponents[2].score,
+				children = {
+					OpponentDisplay.InlineScore(leftOpponent),
+					' - ',
+					OpponentDisplay.InlineScore(opponentToShow),
+				},
 			},
 		},
 	}

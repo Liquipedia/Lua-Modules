@@ -1,21 +1,27 @@
----
--- @Liquipedia
--- page=Module:TestAssets/TeamTemplate/Data
---
--- Please see https://github.com/Liquipedia/Lua-Modules to contribute
---
-
 local aliases = {
+	bds = 'team bds',
 	mousesports = 'mouz',
 	tl = 'team liquid',
+	tt9 = 'tt9 esports',
+	wol = 'wolves esports'
 }
 
 local data = {
 	-- historical ones
+	['team bds'] = {
+		['0000-01-01'] = 'bds esport old',
+		['2019-09-01'] = 'team bds orig',
+		['2021-12-17'] = 'team bds 2021',
+	},
 	mouz = {
 		['0000-01-01'] = 'mousesports orig',
 		['2016-06-01'] = 'mousesports 2016',
 		['2021-10-14'] = 'mouz 2021',
+	},
+	['tt9 esports'] = {
+		['0000-01-01'] = 'tt9 esports orig',
+		['2021-03-31'] = 'tt9 esports 2021',
+		['2022-09-01'] = 'tt9 esports 2022',
 	},
 	['team liquid'] = {
 		['0000-01-01'] = 'team liquid orig',
@@ -24,6 +30,45 @@ local data = {
 		['2020-02-04'] = 'team liquid 2020',
 		['2023-02-21'] = 'team liquid 2023',
 		['2024-02-20'] = 'team liquid 2024',
+	},
+	['heroic'] = {
+		['0000-01-01'] = 'heroic orig',
+		['2023-01-26'] = 'heroic 2023',
+		['2024-02-20'] = 'heroic 2024',
+	},
+	-- bds subtemplates
+	['bds esport old'] = {
+		bracketname = "BDS Esport",
+		image = "BDS Esport 2019 allmode.png",
+		imagedark = "BDS Esport 2019 allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "BDS Esport",
+		page = "BDS Esport",
+		shortname = "BDS",
+		templatename = "bds esport old",
+	},
+	['team bds orig'] = {
+		bracketname = "Team BDS",
+		image = "BDS Esport 2019.png",
+		imagedark = "BDS Esport 2019.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Team BDS",
+		page = "Team BDS",
+		shortname = "BDS",
+		templatename = "team bds orig",
+	},
+	['team bds 2021'] = {
+		bracketname = "Team BDS",
+		image = "Team BDS 2021 allmode.png",
+		imagedark = "Team BDS 2021 allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Team BDS",
+		page = "Team BDS",
+		shortname = "BDS",
+		templatename = "team bds 2021",
 	},
 	-- mouz subtemplates
 	['mousesports orig'] = {
@@ -126,7 +171,134 @@ local data = {
 		shortname = "Liquid",
 		templatename = "team liquid 2024",
 	},
-	-- a non-historical TT
+	-- heroic subtemplates
+	['heroic orig'] = {
+		bracketname = "Heroic",
+		image = "Heroic 2019 lightmode.png",
+		imagedark = "Heroic 2019 darkmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Heroic",
+		page = "Heroic",
+		shortname = "HERO",
+		templatename = "heroic orig",
+	},
+	['heroic 2023'] = {
+		bracketname = "Heroic",
+		image = "Heroic 2023 allmode.png",
+		imagedark = "Heroic 2023 allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Heroic",
+		page = "Heroic",
+		shortname = "HERO",
+		templatename = "heroic 2023",
+	},
+	['heroic 2024'] = {
+		bracketname = "HEROIC",
+		image = "Heroic 2023 allmode.png",
+		imagedark = "Heroic 2023 allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "HEROIC",
+		page = "HEROIC",
+		shortname = "HERO",
+		templatename = "heroic 2024",
+	},
+	-- g2 subtemplate
+	['g2 esports 2019'] = {
+		bracketname = "G2 Esports",
+		image = "G2 Esports 2019 lightmode.png",
+		imagedark = "G2 Esports 2019 darkmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "G2 Esports",
+		page = "G2 Esports",
+		shortname = "G2",
+		templatename = "g2 esports 2019",
+	},
+	-- mnm subtemplate
+	['mnm gaming 2021'] = {
+		bracketname = "MNM Gaming",
+		image = "MNM Gaming allmode.png",
+		imagedark = "MNM Gaming allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "MNM Gaming",
+		page = "MNM Gaming",
+		shortname = "MNM",
+		templatename = "mnm gaming 2021",
+	},
+	-- navi subtemplate
+	['natus vincere 2021'] = {
+		bracketname = "NAVI",
+		image = "Natus Vincere 2021 lightmode.png",
+		imagedark = "Natus Vincere 2021 allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Natus Vincere",
+		page = "Natus Vincere",
+		shortname = "NAVI",
+		templatename = "natus vincere 2021",
+	},
+	-- rogue subtemplate
+	['rogue 2021'] = {
+		bracketname = "Rogue",
+		image = "Rogue 2021 lightmode.png",
+		imagedark = "Rogue 2021 darkmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Rogue",
+		page = "Rogue",
+		shortname = "RGE",
+		templatename = "rogue 2021",
+	},
+	-- tt9 subtemplate
+	['tt9 esports orig'] = {
+		bracketname = "TT9 Esports",
+		image = "TT9 Esports allmode.png",
+		imagedark = "TT9 Esports allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "TT9 Esports",
+		page = "TT9 Esports",
+		shortname = "TT9",
+		templatename = "tt9 esports orig",
+	},
+	['tt9 esports 2021'] = {
+		bracketname = "TT9 Esports",
+		image = "TT9 Esports 2021 lightmode.png",
+		imagedark = "TT9 Esports 2021 darkmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "TT9 Esports",
+		page = "TT9 Esports",
+		shortname = "TT9",
+		templatename = "tt9 esports 2021",
+	},
+	['tt9 esports 2022'] = {
+		bracketname = "TT9 Esports",
+		image = "TT9 Esports 2022 lightmode.png",
+		imagedark = "TT9 Esports 2022 darkmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "TT9 Esports",
+		page = "TT9 Esports",
+		shortname = "TT9",
+		templatename = "tt9 esports 2022",
+	},
+	-- non-historical TT
+	['outsiders (eul)'] = {
+		bracketname = "Outsiders",
+		image = "Outsiders EUL 2022 allmode.png",
+		imagedark = "Outsiders EUL 2022 allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Outsiders",
+		page = "Outsiders (EUL)",
+		shortname = "OUT",
+		templatename = "outsiders (eul)",
+	},
 	streamerzone = {
 		bracketname = "Streamerzone",
 		image = "Streamerzone lightmode.png",
@@ -137,6 +309,28 @@ local data = {
 		page = "Streamerzone",
 		shortname = "SZ",
 		templatename = "streamerzone",
+	},
+	['team secret'] = {
+		bracketname = "Team Secret",
+		image = "Team Secret allmode.png",
+		imagedark = "Team Secret allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Team Secret",
+		page = "Team Secret",
+		shortname = "Secret",
+		templatename = "team secret",
+	},
+	['wolves esports'] = {
+		bracketname = "Wolves Esports",
+		image = "Wolves Esports allmode.png",
+		imagedark = "Wolves Esports allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Wolves Esports",
+		page = "Wolves Esports",
+		shortname = "WOL",
+		templatename = "wolves esports",
 	},
 }
 

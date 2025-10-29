@@ -5,8 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Widgets = Lua.import('Module:Widget/All')
 local SquadWidget = Lua.import('Module:Widget/Squad/Core')

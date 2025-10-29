@@ -5,16 +5,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class WarcraftMapInfobox: MapInfobox
@@ -40,13 +41,12 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Tileset', content = {args.tileset}},
-			Cell{name = 'Size', content = {(args.width or '') .. 'x' .. (args.height or '')}},
-			Cell{name = 'Spawn Positions', content = {(args.players or '') .. ' at ' .. (args.positions or '')}},
-			Cell{name = 'Versions', content = {String.convertWikiListToHtmlList(args.versions)}},
-			Cell{name = 'Competition Span', content = {args.span}},
-			Cell{name = 'Leagues Featured', content = {args.leagues}},
-			Cell{name = 'Mercenary Camps', content = {
+			Cell{name = 'Tileset', children = {args.tileset}},
+			Cell{name = 'Size', children = {(args.width or '') .. 'x' .. (args.height or '')}},
+			Cell{name = 'Spawn Positions', children = {(args.players or '') .. ' at ' .. (args.positions or '')}},
+			Cell{name = 'Versions', children = {String.convertWikiListToHtmlList(args.versions)}},
+			Cell{name = 'Leagues Featured', children = {args.leagues}},
+			Cell{name = 'Mercenary Camps', children = {
 				self.caller:_mercenaryCamp(),
 				self.caller:_mercenaryCamp(2),
 				self.caller:_mercenaryCamp(3),

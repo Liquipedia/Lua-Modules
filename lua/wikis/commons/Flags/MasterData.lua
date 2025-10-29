@@ -1405,6 +1405,11 @@ local data = {
 		localised = 'EMEA',
 		name = 'EMEA',
 	},
+	['hongkongtaiwan'] = {
+		flag = 'File:HkTw hd.png',
+		localised = 'HKTW',
+		name = 'HKTW',
+	},
 	['iberia'] = {
 		flag = 'File:EsPt hd.png',
 		localised = 'Iberian',
@@ -1533,6 +1538,11 @@ local data = {
 	},
 	['filler'] = {
 		flag = 'File:Space filler flag.png',
+		localised = '',
+		name = '',
+	},
+	['unknown'] = {
+		flag = 'File:Flag Unknown.svg',
 		localised = '',
 		name = '',
 	},
@@ -2086,7 +2096,7 @@ local threeLetter = {
 	['sea'] = 'southeastasia',
 	['uae'] = 'unitedarabemirates',
 
-	['tbd'] = 'filler',
+	['tbd'] = 'unknown',
 }
 
 -- This table includes:
@@ -2124,7 +2134,7 @@ local aliases = {
 	['gulfcooperationcouncil'] = 'arabia',
 	['greatbritain'] = 'unitedkingdom',
 	['britain'] = 'unitedkingdom',
-	['hktw'] = 'eastasia',
+	['hktw'] = 'hongkongtaiwan',
 	['holland'] = 'netherlands',
 	['international'] = 'world',
 	['ivorycoast'] = 'cotedivoire',
@@ -2192,7 +2202,6 @@ local aliases = {
 	['uk'] = 'unitedkingdom',
 	['ff'] = 'filler',
 	['fillerflag'] = 'filler',
-	['unknown'] = 'filler',
 
 	['non'] = 'nonrepresenting',
 	['none'] = 'nonrepresenting',

@@ -5,18 +5,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -122,13 +123,13 @@ function CustomInjector:parse(id, widgets)
 		return Array.extend(
 			widgets,
 			{
-				Cell{name = typeName, content = self.caller:_displayTypes(args.types)},
-				Cell{name = 'Tileset', content = {args.tileset}},
-				Cell{name = 'Size', content = {self.caller:_getSizeDisplay(args)}},
-				Cell{name = 'Spawn Positions', content = {self.caller:_getSpawnDisplay(args)}},
-				Cell{name = 'Versions', content = {args.versions}},
-				Cell{name = 'Rush distance', content = {args.rushDistance and (args.rushDistance .. ' seconds') or nil}},
-				Cell{name = 'Available Resources', content = {self.caller:_resourcesDisplay(args)}},
+				Cell{name = typeName, children = self.caller:_displayTypes(args.types)},
+				Cell{name = 'Tileset', children = {args.tileset}},
+				Cell{name = 'Size', children = {self.caller:_getSizeDisplay(args)}},
+				Cell{name = 'Spawn Positions', children = {self.caller:_getSpawnDisplay(args)}},
+				Cell{name = 'Versions', children = {args.versions}},
+				Cell{name = 'Rush distance', children = {args.rushDistance and (args.rushDistance .. ' seconds') or nil}},
+				Cell{name = 'Available Resources', children = {self.caller:_resourcesDisplay(args)}},
 			},
 			self.caller:_addCellsFromDataTable(args, LADDER_HISTORY),
 			{hasCampData and Title{children = 'Camp Information'} or nil},
@@ -144,7 +145,7 @@ end
 ---@return Widget[]
 function CustomMap:_addCellsFromDataTable(args, tbl)
 	return Array.map(tbl, function(data)
-		return Cell{name = data.name, content = {args[data.key]}}
+		return Cell{name = data.name, children = {args[data.key]}}
 	end)
 end
 

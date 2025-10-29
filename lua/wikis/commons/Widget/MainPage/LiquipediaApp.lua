@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Flags = require('Module:Flags')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Flags = Lua.import('Module:Flags')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 

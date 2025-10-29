@@ -5,20 +5,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Item = Lua.import('Module:Infobox/Item')
 
 local AutoInlineIcon = Lua.import('Module:AutoInlineIcon')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = Lua.import('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -89,6 +90,7 @@ function CustomInjector:parse(id, widgets)
 			return {}
 		end
 		Array.appendWith(widgets,
+			Title{children = 'Ability'},
 			Cell{name = 'Active', children = {args.active, args.active2, args.active3}},
 			Cell{name = 'Passive', children = {args.passive, args.passive2, args.passive3}}
 		)
@@ -105,7 +107,6 @@ function CustomInjector:parse(id, widgets)
 			Title{children = 'Components'},
 			Center{children = {args.recipe}}
 		}
-	elseif id == 'maps' then return {}
 	elseif id == 'info' then return {}
 	end
 

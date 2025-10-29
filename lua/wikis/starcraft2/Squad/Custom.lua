@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Arguments = Lua.import('Module:Arguments')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local Squad = Lua.import('Module:Widget/Squad/Core')
 local SquadRow = Lua.import('Module:Squad/Row')

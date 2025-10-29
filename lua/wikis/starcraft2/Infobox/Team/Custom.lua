@@ -5,34 +5,35 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
-local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local Math = require('Module:MathUtil')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info', {loadData = true})
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Math = Lua.import('Module:MathUtil')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 local Team = Lua.import('Module:Infobox/Team')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
 
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -45,7 +46,7 @@ local CustomTeam = Class.new(Team)
 local CustomInjector = Class.new(Injector)
 
 local ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
-local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 20
+local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = Info.config.defaultMaxPlayersPerPlacement
 local PLAYER_EARNINGS_ABBREVIATION = '<abbr title="Earnings of players while on the team">Player earnings</abbr>'
 
 ---@param frame Frame
@@ -70,8 +71,8 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		return {
-			Cell{name = 'Approx. Total Winnings', content = {displayEarnings(self.caller.teamEarnings)}},
-			Cell{name = PLAYER_EARNINGS_ABBREVIATION, content = {displayEarnings(self.caller.playerEarnings)}},
+			Cell{name = 'Approx. Total Winnings', children = {displayEarnings(self.caller.teamEarnings)}},
+			Cell{name = PLAYER_EARNINGS_ABBREVIATION, children = {displayEarnings(self.caller.playerEarnings)}},
 		}
 	elseif id == 'achievements' then
 		local achievements, soloAchievements = Achievements.teamAndTeamSolo()
@@ -92,7 +93,7 @@ function CustomInjector:parse(id, widgets)
 		if raceBreakdown then
 			Array.appendWith(widgets,
 				Title{children = 'Player Breakdown'},
-				Cell{name = 'Number of Players', content = {raceBreakdown.total}},
+				Cell{name = 'Number of Players', children = {raceBreakdown.total}},
 				Breakdown{children = raceBreakdown.display, classes = {'infobox-center'}}
 			)
 		end
@@ -103,7 +104,7 @@ function CustomInjector:parse(id, widgets)
 		while(not String.isEmpty(args['history' .. index .. 'title'])) do
 			table.insert(widgets, Cell{
 				name = args['history' .. index .. 'title'],
-				content = {args['history' .. index]}
+				children = {args['history' .. index]}
 			})
 			index = index + 1
 		end

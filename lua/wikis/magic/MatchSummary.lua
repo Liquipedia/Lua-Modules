@@ -26,7 +26,6 @@ end
 function CustomMatchSummary.createGame(date, game, gameIndex)
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '80%', padding = '4px'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			MatchSummaryWidgets.GameCenter{children = 'Game ' .. gameIndex},

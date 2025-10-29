@@ -5,15 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local Hotkey = require('Module:Hotkey')
-local String = require('Module:StringUtils')
+
+local Class = Lua.import('Module:Class')
+local Namespace = Lua.import('Module:Namespace')
+local Hotkey = Lua.import('Module:Hotkey')
+local String = Lua.import('Module:StringUtils')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -48,47 +49,47 @@ function Building:createInfobox()
 		},
 		Center{children = {args.caption}},
 		Title{children = (args.informationType or 'Building') .. ' Information'},
-		Cell{name = 'Built by', content = {args.builtby}},
+		Cell{name = 'Built by', children = {args.builtby}},
 		Customizable{
 			id = 'cost',
 			children = {
-				Cell{name = 'Cost', content = {args.cost}},
+				Cell{name = 'Cost', children = {args.cost}},
 			}
 		},
 		Customizable{
 			id = 'hotkey',
 			children = {
-				Cell{name = 'Hotkey', content = {self:_getHotkeys(args)}},
+				Cell{name = 'Hotkey', children = {self:_getHotkeys(args)}},
 			}
 		},
 		Customizable{
 			id = 'defense',
 			children = {
-				Cell{name = 'Defense', content = {args.defense}},
+				Cell{name = 'Defense', children = {args.defense}},
 			}
 		},
 		Customizable{
 			id = 'attack',
 			children = {
-				Cell{name = 'Attack', content = {args.attack}},
+				Cell{name = 'Attack', children = {args.attack}},
 			}
 		},
 		Customizable{
 			id = 'requirements',
 			children = {
-				Cell{name = 'Requirements', content = {args.requires}},
+				Cell{name = 'Requirements', children = {args.requires}},
 			}
 		},
 		Customizable{
 			id = 'builds',
 			children = {
-				Cell{name = 'Builds', content = {args.builds}},
+				Cell{name = 'Builds', children = {args.builds}},
 			}
 		},
 		Customizable{
 			id = 'unlocks',
 			children = {
-				Cell{name = 'Unlocks', content = {args.unlocks}},
+				Cell{name = 'Unlocks', children = {args.unlocks}},
 			}
 		},
 		Customizable{id = 'custom', children = {}},
@@ -102,7 +103,7 @@ function Building:createInfobox()
 		self:setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Building')
 end
 
 ---@param args table

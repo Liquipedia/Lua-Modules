@@ -5,11 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Operator = Lua.import('Module:Operator')
 
 local Widget = Lua.import('Module:Widget')
 local ContentItemContainer = Lua.import('Module:Widget/Match/Summary/Ffa/ContentItemContainer')
@@ -18,6 +19,7 @@ local GameCountdown = Lua.import('Module:Widget/Match/Summary/Ffa/GameCountdown'
 
 ---@class MatchSummaryFfaGamesSchedule: Widget
 ---@operator call(table): MatchSummaryFfaGamesSchedule
+---@field props {match: FFAMatchGroupUtilMatch}
 local MatchSummaryFfaGamesSchedule = Class.new(Widget)
 
 ---@return Widget?

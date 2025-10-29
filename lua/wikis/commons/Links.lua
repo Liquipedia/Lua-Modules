@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local CustomData = Lua.requireIfExists('Module:Links/CustomData', {loadData = true}) or {}
 
@@ -51,6 +52,10 @@ local PREFIXES = {
 		stream = 'https://live.bilibili.com/',
 	},
 	['bilibili-stream'] = {'https://live.bilibili.com/'},
+	blasttv = {
+		'https://blast.tv/',
+		match = 'https://blast.tv/',
+	},
 	bluesky = {'https://bsky.app/profile/'},
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
@@ -78,7 +83,7 @@ local PREFIXES = {
 		match = 'https://www.chessgames.com/perl/chessgame?gid=',
 	},
 	chessresults = {'https://chess-results.com/'},
-	chzzk = {'https://chzzk.naver.com/live/'},
+	chzzk = {'https://chzzk.naver.com/'},
 	civdraft = {match = 'https://aoe2cm.net/draft/'},
 	cntft = {'https://lol.qq.com/tft/#/masterDetail/'},
 	corestrike = {'https://corestrike.gg/lookup/'},
@@ -110,9 +115,9 @@ local PREFIXES = {
 	['esea-d'] = {'https://play.esea.net/league/standings?divisionId='},
 	esl = {
 		'',
-		team = 'https://play.eslgaming.com/team/',
-		player = 'https://play.eslgaming.com/player/',
-		match = 'https://play.eslgaming.com/match/',
+		team = 'https://web.archive.org/web/play.eslgaming.com/team/',
+		player = 'https://web.archive.org/web/play.eslgaming.com/player/',
+		match = 'https://web.archive.org/web/play.eslgaming.com/match/',
 	},
 	esplay = {'https://esplay.com/tournament/'},
 	esportal = {'https://esportal.com/tournament/'},
@@ -141,6 +146,7 @@ local PREFIXES = {
 	gol = {match = 'https://gol.gg/game/stats/'},
 	gosugamers = {''},
 	gplus = {'http://plus.google.com/-plus'},
+	h3gg = {match = 'https://www.h3.gg/competitions/v2/match/'},
 	halodatahive = {
 		'https://halodatahive.com/Tournament/Detail/',
 		team = 'https://halodatahive.com/Team/Detail/',
@@ -188,6 +194,7 @@ local PREFIXES = {
 	matcherinolink = {'https://matcherino.com/t/'},
 	mildom = {'https://www.mildom.com/'},
 	mplink = {match = 'https://osu.ppy.sh/community/matches/'}, -- Should this key be renamed?
+	lazermplink = {match = 'https://osu.ppy.sh/multiplayer/rooms/'},
 	niconico = {'https://www.nicovideo.jp/'},
 	nimotv = {'https://www.nimo.tv/'},
 	['nwc3l'] = {
@@ -197,7 +204,7 @@ local PREFIXES = {
 	},
 	openrec = {'https://www.openrec.tv/live/'},
 	opl = {
-		match = 'https://www.opleague.eu/match/'
+		match = 'https://www.opleague.pro/match/'
 	},
 	osu = {
 		'https://osu.ppy.sh/',
@@ -236,6 +243,11 @@ local PREFIXES = {
 		match = 'https://royaleapi.com/'
 	},
 	rules = {''},
+	sendou = {
+		'https://sendou.ink/to/',
+		player = 'https://sendou.ink/u/',
+		team = 'https://sendou.ink/t/',
+	},
 	shift = {
 		'https://www.shiftrle.gg/events/',
 		match = 'https://www.shiftrle.gg/matches/',
@@ -264,6 +276,11 @@ local PREFIXES = {
 	spotify = {'https://open.spotify.com/'},
 	steamalternative = {'https://steamcommunity.com/profiles/'},
 	stats = {'', match = ''},
+	statshark = {
+		'https://statshark.net/',
+		player = 'https://statshark.net/player/',
+		team = 'https://statshark.net/squadrons/',
+	},
 	stratz = {
 		'https://stratz.com/leagues/',
 		player = 'https://stratz.com/players/',
@@ -272,11 +289,16 @@ local PREFIXES = {
 	stream = {''},
 	telegram = {'https://t.me/'},
 	tespa = {match = 'https://web.archive.org/web/compete.tespa.org/tournament/'},
+	tetrio = {
+		'',
+		player = 'https://ch.tetr.io/u/'
+	},
 	tftv = {
 		'https://www.teamfortress.tv/',
 		player = 'https://www.teamfortress.tv/user/',
 		match = 'http://tf.gg/',
 	},
+	threads = {'https://threads.com/@'},
 	tiktok = {'https://tiktok.com/@'},
 	tlpd = {''},
 	tlpdint = {
@@ -333,6 +355,7 @@ local SUFFIXES = {
 		stream = '/live',
 	},
 	gol = {match = '/page-game/'},
+	lazermplink = {match = '/events'},
 	iccup = {'.html'},
 	['faceit-c'] = {'/'},
 	['faceit-hub'] = {'/'},
@@ -362,6 +385,7 @@ local ALIASES = {
 local ICON_KEYS_TO_RENAME = {
 	['bilibili-stream'] = 'bilibili',
 	daumcafe = 'cafe-daum',
+	blasttv = 'blast',
 	['esea-d'] = 'esea-league',
 	['faceit-c'] = 'faceit',
 	['faceit-c2'] = 'faceit',
@@ -388,6 +412,10 @@ local MATCH_ICONS = {
 	ballchasing = {
 		icon = 'File:Ballchasing icon.png',
 		text = 'Ballchasing replays'
+	},
+	blasttv = {
+		icon = 'File:BLAST icon allmode.png',
+		text = 'BLAST.tv matchpage'
 	},
 	breakingpoint = {
 		icon = 'File:Breaking Point GG icon lightmode.png',
@@ -454,6 +482,10 @@ local MATCH_ICONS = {
 		icon = 'File:Gol.gg allmode.png',
 		text = 'GolGG Match Report',
 	},
+	h3gg = {
+		icon = 'File:H3gg icon allmode.png',
+		text = 'H3.gg match details',
+	},
 	halodatahive = {
 		icon = 'File:Halo Data Hive allmode.png',
 		text = 'Match page on Halo Data Hive'
@@ -498,6 +530,10 @@ local MATCH_ICONS = {
 	},
 	mplink = {
 		icon = 'File:Osu single color allmode.png',
+		text = 'Match Data'
+	},
+	lazermplink = {
+		icon = 'File:Osu!lazer allmode.png',
 		text = 'Match Data'
 	},
 	opl = {
@@ -688,7 +724,7 @@ function Links.makeFullLinksForTableItems(links, variant, fallbackToBase)
 end
 
 --remove appended number
---needed because the link icons require e.g. 'esl' instead of 'esl2'
+--needed because the link icons require e.g. 'twitch' instead of 'twitch2'
 ---@param key string
 ---@return string
 function Links.removeAppendedNumber(key)

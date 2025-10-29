@@ -5,21 +5,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchGroup = require('Module:MatchGroup')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local Table = require('Module:Table')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local MatchGroup = Lua.import('Module:MatchGroup')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local Table = Lua.import('Module:Table')
 
 local MatchGroupBase = Lua.import('Module:MatchGroup/Base')
 
 local globalVars = PageVariableNamespace()
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local MAX_NUMBER_OF_OPPONENTS = 2
 local MAX_NUM_MAPS = 9

@@ -5,20 +5,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -43,7 +43,7 @@ function UnofficialWorldChampion:createInfobox()
 	local args = self.args
 
 	args.currentChampOpponent = Opponent.readOpponentArgs(
-		Json.parseIfString(args['current champion']) or Opponent.tbd()
+		Json.parseIfString(args['current champion'])
 	)
 
 	local widgets = {
@@ -71,7 +71,7 @@ function UnofficialWorldChampion:createInfobox()
 						Cell{
 							name = args['gained date'],
 							options = { separator = ' ' },
-							content = WidgetUtil.collect(
+							children = WidgetUtil.collect(
 								String.nilIfEmpty(args['gained against result']),
 								'vs',
 								OpponentDisplay.InlineOpponent{
@@ -87,7 +87,7 @@ function UnofficialWorldChampion:createInfobox()
 		Title{children = 'Most Defences'},
 		Cell{
 			name = (args['most defences no'] or '?') .. ' Matches',
-			content = {
+			children = {
 				OpponentDisplay.InlineOpponent{
 					opponent = self:_parseOpponentArg('most defences')
 				}
@@ -107,7 +107,7 @@ function UnofficialWorldChampion:createInfobox()
 		Title{children = 'Longest Consecutive Time as Champion'},
 		Cell{
 			name = (args['longest consecutive no'] or '?') .. ' days',
-			content = WidgetUtil.collect(
+			children = WidgetUtil.collect(
 				OpponentDisplay.InlineOpponent{
 					opponent = self:_parseOpponentArg('longest consecutive')
 				},
@@ -117,7 +117,7 @@ function UnofficialWorldChampion:createInfobox()
 		Title{children = 'Longest Total Time as Champion'},
 		Cell{
 			name = (args['longest total no'] or '?') .. ' days',
-			content = {
+			children = {
 				OpponentDisplay.InlineOpponent{
 					opponent = self:_parseOpponentArg('longest total')
 				}
@@ -134,7 +134,7 @@ function UnofficialWorldChampion:createInfobox()
 				end
 				return Cell{
 					name = (args['most times held no'] or '?') .. ' times',
-					content = WidgetUtil.collect(
+					children = WidgetUtil.collect(
 						Array.map(opponents, function (opponent)
 							return OpponentDisplay.InlineOpponent{ opponent = opponent }
 						end),
@@ -155,7 +155,7 @@ function UnofficialWorldChampion:createInfobox()
 	}
 
 	self:setLpdbData(args)
-	return self:build(widgets)
+	return self:build(widgets, 'UnofficialWorldChampion')
 end
 
 ---@param key string
@@ -175,7 +175,7 @@ function UnofficialWorldChampion:_parseRegionalDistribution()
 		Array.appendWith(widgets,
 			Cell{
 				name = (args[regionKey .. ' no'] or '') .. ' champions',
-				content = {region}
+				children = {region}
 			},
 			Breakdown{children = {args[regionKey .. ' champions']}}
 		)

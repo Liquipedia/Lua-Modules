@@ -5,7 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
 
 local Operator = {}
 
@@ -14,6 +16,19 @@ local Operator = {}
 ---@param b number
 ---@return number
 function Operator.add(a, b)
+	return a + b
+end
+
+---A `nil`-safe version of `Operator.add`
+---@param a number?
+---@param b number?
+---@return number?
+function Operator.nilSafeAdd(a, b)
+	if not a then
+		return b
+	elseif not b then
+		return a
+	end
 	return a + b
 end
 

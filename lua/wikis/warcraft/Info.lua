@@ -62,7 +62,11 @@ return {
 			matchWidthMobile = 110,
 			matchWidth = 150,
 		},
+		infoboxPlayer = {
+			automatedHistory = {
+				storeFromWikiCode = true,
+			},
+		},
+		defaultMaxPlayersPerPlacement = 20,
 	},
-	opponentLibrary = 'Opponent/Custom',
-	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

@@ -23,7 +23,6 @@ Widgets.GameTeamWrapper = Lua.import('Module:Widget/Match/Summary/GameTeamWrappe
 Widgets.GameWinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLossIndicator')
 Widgets.MapVeto = Lua.import('Module:Widget/Match/Summary/MapVeto')
 Widgets.MatchComment = Lua.import('Module:Widget/Match/Summary/MatchComment')
-Widgets.MatchPageLink = Lua.import('Module:Widget/Match/Summary/MatchPageLink')
 Widgets.Mvp = Lua.import('Module:Widget/Match/Summary/Mvp')
 Widgets.Row = Lua.import('Module:Widget/Match/Summary/Row')
 

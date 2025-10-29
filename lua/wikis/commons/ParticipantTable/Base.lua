@@ -7,22 +7,22 @@
 
 --can not name it `Module:ParticipantTable` due to that already existing on some wikis
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
-local Variables = require('Module:Variables')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
+local Variables = Lua.import('Module:Variables')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Import = Lua.import('Module:ParticipantTable/Import')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
@@ -34,7 +34,7 @@ local prizePoolVars = PageVariableNamespace('PrizePool')
 ---@class ParticipantTableConfig
 ---@field lpdbPrefix string?
 ---@field noStorage boolean
----@field matchGroupSpec table?
+---@field matchGroupSpec MatchGroupsSpec?
 ---@field syncPlayers boolean
 ---@field showCountBySection boolean
 ---@field onlyNotable boolean
@@ -247,7 +247,7 @@ function ParticipantTable:readEntry(sectionArgs, key, index, config)
 
 	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
+	local opponent = Opponent.readOpponentArgs(opponentArgs)
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)

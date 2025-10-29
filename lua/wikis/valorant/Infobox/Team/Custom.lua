@@ -5,21 +5,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Class = Lua.import('Module:Class')
+
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
-local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 ---@class ValorantInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
+---@class ValorantInfoboxTeamWidgetInjector: WidgetInjector
+---@field caller ValorantInfoboxTeam
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -39,21 +41,21 @@ function CustomInjector:parse(id, widgets)
 	if id == 'staff' then
 		table.insert(widgets, Cell{
 			name = 'In-Game Leader',
-			content = {args.igl}
+			children = {args.igl}
 		})
 	elseif id == 'custom' then
 		return {
-			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {
+			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', children = {
 				args.affiliate and OpponentDisplay.InlineTeamContainer{template = args.affiliate, displayType = 'standard'} or nil}}
 		}
 	end
 	return widgets
 end
 
----@return string?
+---@return Widget?
 function CustomTeam:createBottomContent()
 	if not self.args.disbanded then
-		return UpcomingTournaments{name = self.pagename}
+		return UpcomingTournaments.team{name = self.teamTemplate.templatename}
 	end
 end
 

@@ -103,6 +103,10 @@ return {
 			hideOrg = true,
 			hideOverview = true,
 		},
+		infoboxPlayer = {
+			automatedHistory = {
+				storeFromWikiCode = true,
+			},
+		},
 	},
-	opponentLibrary = 'Opponent/Custom',
 }

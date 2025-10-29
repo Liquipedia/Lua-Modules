@@ -5,17 +5,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local DisplayUtil = require('Module:DisplayUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Flags = require('Module:Flags')
-local Abbreviation = require('Module:Abbreviation')
+
+local Class = Lua.import('Module:Class')
+local DisplayUtil = Lua.import('Module:DisplayUtil')
+local Logic = Lua.import('Module:Logic')
+local Faction = Lua.import('Module:Faction')
+local Flags = Lua.import('Module:Flags')
 
 local Opponent = Lua.import('Module:Opponent')
 
 local TBD = 'TBD'
-local TBD_ABBREVIATION = Abbreviation.make{text = TBD, title = 'To be determined (or to be decided)'}
+local ZERO_WIDTH_SPACE = '&#8203;'
 
 --Display components for players.
 ---@class PlayerDisplay
@@ -28,10 +29,12 @@ local PlayerDisplay = {}
 ---@field showFlag boolean?
 ---@field showLink boolean?
 ---@field showPlayerTeam boolean?
----@field abbreviateTbd boolean?
 ---@field dq boolean?
 ---@field note string|number|nil
 ---@field team string?
+---@field showFaction boolean?
+---@field game string?
+---@field showTbd boolean?
 
 ---@class InlinePlayerProps
 ---@field flip boolean?
@@ -39,6 +42,9 @@ local PlayerDisplay = {}
 ---@field showFlag boolean?
 ---@field showLink boolean?
 ---@field dq boolean?
+---@field showFaction boolean?
+---@field game string?
+---@field showTbd boolean?
 
 --Displays a player as a block element. The width of the component is
 --determined by its layout context, and not by the player name.
@@ -47,13 +53,17 @@ local PlayerDisplay = {}
 function PlayerDisplay.BlockPlayer(props)
 	local player = props.player
 
-	local zeroWidthSpace = '&#8203;'
+	local useDefault = props.showTbd ~= false or not Opponent.playerIsTbd(player)
+
 	local nameNode = mw.html.create(props.dq and 's' or 'span'):addClass('name')
-		:wikitext(props.abbreviateTbd and Opponent.playerIsTbd(player) and TBD_ABBREVIATION
-			or props.showLink ~= false and Logic.isNotEmpty(player.pageName)
-			and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
-			or Logic.emptyOr(player.displayName, zeroWidthSpace)
-		)
+
+	if not Opponent.playerIsTbd(player) and props.showLink ~= false and Logic.isNotEmpty(player.pageName) then
+		nameNode:wikitext('[[' .. player.pageName .. '|' .. player.displayName .. ']]')
+	elseif useDefault then
+		nameNode:wikitext(Logic.emptyOr(player.displayName, 'TBD'))
+	else
+		nameNode:wikitext(ZERO_WIDTH_SPACE)
+	end
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
 
 	local noteNode
@@ -62,8 +72,14 @@ function PlayerDisplay.BlockPlayer(props)
 	end
 
 	local flagNode
-	if props.showFlag ~= false and player.flag then
-		flagNode = PlayerDisplay.Flag{flag = player.flag}
+	if props.showFlag ~= false then
+		flagNode = PlayerDisplay.Flag{flag = player.flag, useDefault = useDefault}
+	end
+
+	local factionNode
+	if props.showFaction ~= false and Logic.isNotEmpty(player.faction) and player.faction ~= Faction.defaultFaction then
+		factionNode = mw.html.create('span'):addClass('race')
+			:wikitext(Faction.Icon{size = 'small', showLink = false, faction = player.faction, game = props.game})
 	end
 
 	local teamNode
@@ -77,6 +93,7 @@ function PlayerDisplay.BlockPlayer(props)
 		:addClass(props.flip and 'flipped' or nil)
 		:addClass(props.showPlayerTeam and 'has-team' or nil)
 		:node(flagNode)
+		:node(factionNode)
 		:node(nameNode)
 		:node(noteNode)
 		:node(teamNode)
@@ -88,8 +105,15 @@ end
 function PlayerDisplay.InlinePlayer(props)
 	local player = props.player
 
-	local flag = props.showFlag ~= false and player.flag
-		and PlayerDisplay.Flag{flag = player.flag}
+	local useDefault = props.showTbd ~= false or not Opponent.playerIsTbd(player)
+
+	local flag = props.showFlag ~= false
+		and PlayerDisplay.Flag{flag = player.flag, useDefault = useDefault}
+		or nil
+
+	local faction = props.showFaction ~= false and Logic.isNotEmpty(player.faction)
+		and player.faction ~= Faction.defaultFaction
+		and Faction.Icon{size = 'small', showLink = false, faction = player.faction, game = props.game}
 		or nil
 
 	local nameAndLink = props.showLink ~= false and player.pageName
@@ -102,9 +126,11 @@ function PlayerDisplay.InlinePlayer(props)
 	local text
 	if props.flip then
 		text = nameAndLink
+			.. (faction and '&nbsp;' .. faction or '')
 			.. (flag and ('&nbsp;' .. flag) or '')
 	else
 		text = (flag and (flag .. '&nbsp;') or '')
+			.. (faction and faction .. '&nbsp;' or '')
 			.. nameAndLink
 	end
 
@@ -114,11 +140,15 @@ function PlayerDisplay.InlinePlayer(props)
 		:wikitext(text)
 end
 
--- Note: require('Module:Flags').Icon automatically includes a span with class="flag"
----@param args {flag: string?}
+-- Note: Lua.import('Module:Flags').Icon automatically includes a span with class="flag"
+---@param props {flag: string?, useDefault: boolean}
 ---@return string
-function PlayerDisplay.Flag(args)
-	return Flags.Icon{flag = args.flag, shouldLink = false}
+function PlayerDisplay.Flag(props)
+	local flag = props.flag
+	if not flag and props.useDefault then
+		flag = 'unknown'
+	end
+	return Flags.Icon{flag = flag, shouldLink = false}
 end
 
 return Class.export(PlayerDisplay, {exports = {

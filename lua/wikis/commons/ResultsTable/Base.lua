@@ -5,33 +5,36 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
-local HighlightConditions = require('Module:HighlightConditions')
-local Logic = require('Module:Logic')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Team = require('Module:Team')
-local Tier = require('Module:Tier/Custom')
+local Lua = require('Module:Lua')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
+local Info = Lua.import('Module:Info', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Tier = Lua.import('Module:Tier/Custom')
 
-local Condition = require('Module:Condition')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local DEFAULT_VALUES = {
 	order = 'desc',
 	resolveOpponent = true,
-	playerLimit = 10,
+	playerLimit = Info.config.defaultMaxPlayersPerPlacement or 10,
 	coachLimit = 5,
 	achievementsLimit = 10,
 	resultsLimit = 5000,
@@ -84,7 +87,7 @@ function BaseResultsTable:readConfig()
 		displayDefaultLogoAsIs = Logic.readBool(args.displayDefaultLogoAsIs),
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
 		useIndivPrize = Logic.readBool(args.useIndivPrize),
-		aliases = args.aliases and Array.map(mw.text.split(args.aliases, ','), String.trim) or {}
+		aliases = Array.parseCommaSeparatedString(args.aliases)
 	}
 
 	config.sort = args.sort or
@@ -235,11 +238,9 @@ function BaseResultsTable:buildBaseConditions()
 	end
 
 	if args.tier then
-		local tierConditions = ConditionTree(BooleanOperator.any)
-		for _, tier in pairs(Array.map(mw.text.split(args.tier, ',', true), String.trim)) do
-			tierConditions:add{ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tier)}
-		end
-		conditions:add{tierConditions}
+		conditions:add(
+			ConditionUtil.anyOf(ColumnName('liquipediatier'), Array.parseCommaSeparatedString(args.tier))
+		)
 	end
 
 	return conditions:toString()
@@ -307,16 +308,13 @@ function BaseResultsTable:buildTeamOpponentConditions()
 	local config = self.config
 
 	local opponents = Array.append(config.aliases, config.opponent)
-	local opponentTeamTemplates = Array.flatten(Array.map(opponents, BaseResultsTable._getOpponentTemplates))
+	local opponentTeamTemplates = Array.flatMap(opponents, BaseResultsTable._getOpponentTemplates)
 
 	if config.playerResultsOfTeam then
 		return self:buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
 	end
 
-	local opponentConditions = ConditionTree(BooleanOperator.any)
-	for _, teamTemplate in pairs(opponentTeamTemplates) do
-		opponentConditions:add{ConditionNode(ColumnName('opponenttemplate'), Comparator.eq, teamTemplate)}
-	end
+	local opponentConditions = ConditionUtil.anyOf(ColumnName('opponenttemplate'), opponentTeamTemplates)
 
 	return ConditionTree(BooleanOperator.all):add{
 			opponentConditions,
@@ -328,15 +326,13 @@ end
 ---@param opponent string
 ---@return string[]
 function BaseResultsTable._getOpponentTemplates(opponent)
-	local rawOpponentTemplate = Team.queryRaw(opponent) or {}
+	local rawOpponentTemplate = TeamTemplate.getRawOrNil(opponent) or {}
 	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
 	if not opponentTemplate then
-		error('Missing team template for team: ' .. opponent)
+		error(TeamTemplate.noTeamMessage(opponent))
 	end
 
-	local opponentTeamTemplates = Team.queryHistorical(opponentTemplate)
-
-	return Array.append(Array.extractValues(opponentTeamTemplates or {}), opponentTemplate)
+	return TeamTemplate.queryHistoricalNames(opponentTemplate)
 end
 
 ---Builds Lpdb conditions for players on a given team
@@ -448,15 +444,12 @@ end
 ---Builds the opponent display
 ---@param data table
 ---@param options table?
----@return Html?
+---@return Widget|Html?
 function BaseResultsTable:opponentDisplay(data, options)
 	options = options or {}
 
 	if not data.opponenttype then
-		return OpponentDisplay.BlockOpponent{
-			opponent = Opponent.tbd(),
-			flip = options.flip,
-		}
+		return mw.html.create():wikitext('-')
 	elseif data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
 		return OpponentDisplay.BlockOpponent{
 			opponent = Opponent.fromLpdbStruct(data) --[[@as standardOpponent]],
@@ -481,10 +474,10 @@ function BaseResultsTable:opponentDisplay(data, options)
 		return
 	end
 
-	local rawTeamTemplate = Team.queryRaw(teamTemplate, data.date) or {}
+	local rawTeamTemplate = TeamTemplate.getRawOrNil(teamTemplate, data.date) or {}
 
 	local teamDisplay = OpponentDisplay.BlockOpponent{
-		opponent = {template = rawTeamTemplate.templatename, type = Opponent.team},
+		opponent = Opponent.readOpponentArgs{template = rawTeamTemplate.templatename, type = Opponent.team},
 		flip = options.flip,
 		teamStyle = 'icon',
 	}
@@ -511,7 +504,7 @@ function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate, isNotLast
 end
 
 ---Builds team icon display with text below it
----@param teamDisplay Html
+---@param teamDisplay Widget
 ---@param rawTeamTemplate table
 ---@param flip boolean?
 ---@return Html
@@ -544,7 +537,7 @@ end
 
 ---Converts the lastvsdata to display components
 ---@param placement table
----@return string, Html?, string?
+---@return string, Widget|Html?, string?
 function BaseResultsTable:processVsData(placement)
 	local lastVs = placement.lastvsdata or {}
 

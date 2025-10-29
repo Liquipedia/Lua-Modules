@@ -5,9 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Page = require('Module:Page')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Page = Lua.import('Module:Page')
+local Table = Lua.import('Module:Table')
 
 local TeamService = {}
 

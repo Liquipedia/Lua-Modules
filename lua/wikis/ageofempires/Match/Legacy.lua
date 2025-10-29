@@ -7,17 +7,17 @@
 
 local MatchLegacy = {}
 
-local Array = require('Module:Array')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 
 function MatchLegacy.storeMatch(match2)

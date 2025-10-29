@@ -5,11 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local CharacterNames = require('Module:CharacterNames')
-local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local CharacterNames = Lua.import('Module:CharacterNames')
+local FnUtil = Lua.import('Module:FnUtil')
+local Table = Lua.import('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 

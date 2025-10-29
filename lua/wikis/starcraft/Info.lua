@@ -36,8 +36,11 @@ return {
 			matchWidthMobile = 120,
 			matchWidth = 170,
 		},
+		infoboxPlayer = {
+			automatedHistory = {
+				storeFromWikiCode = true,
+			},
+		},
+		defaultMaxPlayersPerPlacement = 35,
 	},
-	maximumNumberOfPlayersInPlacements = 35,
-	opponentLibrary = 'Opponent/Starcraft',
-	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
 }

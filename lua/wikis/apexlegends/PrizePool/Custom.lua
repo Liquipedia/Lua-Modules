@@ -5,11 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
-local Weight = require('Module:Weight')
+
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
+local Variables = Lua.import('Module:Variables')
+local Weight = Lua.import('Module:Weight')
 
 local PrizePool = Lua.import('Module:PrizePool')
 
@@ -48,6 +49,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	local participantLower = mw.ustring.lower(lpdbData.participant)
 
 	Variables.varDefine(participantLower .. '_prizepoints', lpdbData.extradata.prizepoints)
+	Variables.varDefine(participantLower .. '_prizepoints2', lpdbData.extradata.prizepoints2)
 	lpdbData.extradata.location = Variables.varDefault('tournament_location_region', '')
 	return lpdbData
 end

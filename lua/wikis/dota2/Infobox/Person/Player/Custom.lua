@@ -5,33 +5,41 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
-local Class = require('Module:Class')
-local HeroNames = mw.loadData('Module:HeroNames')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Template = require('Module:Template')
-local YearsActive = require('Module:YearsActive')
+
+local Array = Lua.import('Module:Array')
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local Class = Lua.import('Module:Class')
+local HeroNames = Lua.import('Module:HeroNames', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
+local Namespace = Lua.import('Module:Namespace')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local YearsActive = Lua.import('Module:YearsActive')
 
 local Flags = Lua.import('Module:Flags')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local BANNED = mw.loadData('Module:Banned')
+local BANNED = Lua.import('Module:Banned', {loadData = true})
 
 local SIZE_HERO = '44x25px'
 local CONVERSION_PLAYER_ID_TO_STEAM = 61197960265728
 
+---@class Dota2InfoboxPlayer: Person
+---@field basePageName string
 local CustomPlayer = Class.new(Player)
+
+---@class Dota2InfoboxPlayerWidgetInjector: WidgetInjector
+---@field caller Dota2InfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -69,7 +77,7 @@ function CustomInjector:parse(id, widgets)
 			return CharacterIcon.Icon{character = HeroNames[hero:lower()], size = SIZE_HERO}
 		end)
 		return {
-			Cell{name = 'Signature Hero', content = {table.concat(icons, '&nbsp;')}}
+			Cell{name = 'Signature Hero', children = {table.concat(icons, '&nbsp;')}}
 		}
 	elseif id == 'status' then
 		local statusContents = caller:_getStatusContents()
@@ -87,12 +95,12 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		return {
-			Cell{name = 'Status', content = statusContents},
-			Cell{name = 'Years Active (Player)', content = {yearsActive}},
-			Cell{name = 'Years Active (Org)', content = {yearsActiveOrg}},
-			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
-			Cell{name = 'Years Active (Analyst)', content = {args.years_active_analyst}},
-			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}},
+			Cell{name = 'Status', children = statusContents},
+			Cell{name = 'Years Active (Player)', children = {yearsActive}},
+			Cell{name = 'Years Active (Org)', children = {yearsActiveOrg}},
+			Cell{name = 'Years Active (Coach)', children = {args.years_active_coach}},
+			Cell{name = 'Years Active (Analyst)', children = {args.years_active_analyst}},
+			Cell{name = 'Years Active (Talent)', children = {args.years_active_talent}},
 		}
 	elseif id == 'history' then
 		if not String.isEmpty(args.history_iwo) then
@@ -133,11 +141,10 @@ end
 ---@return string?
 function CustomPlayer:createBottomContent()
 	if Namespace.isMain() then
-		return tostring(Template.safeExpand(
-			mw.getCurrentFrame(), 'Upcoming_and_ongoing_matches_of_player', {player = self.basePageName})
-			.. '<br>' .. Template.safeExpand(
-			mw.getCurrentFrame(), 'Upcoming_and_ongoing_tournaments_of_player', {player = self.basePageName})
-		)
+		return HtmlWidgets.Fragment{children = {
+			MatchTicker.player(),
+			UpcomingTournaments.player{name = self.basePageName}
+		}}
 	end
 end
 

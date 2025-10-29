@@ -5,11 +5,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Image = require('Module:Image')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Image = Lua.import('Module:Image')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
 
 local DEFAULT_HEIGHT = 200
 

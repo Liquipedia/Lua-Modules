@@ -5,18 +5,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local MapModes = require('Module:MapModes')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local MapModes = Lua.import('Module:MapModes')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 local Flags = Lua.import('Module:Flags')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class WorldoftanksMapInfobox: MapInfobox
@@ -43,19 +44,19 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Location',
-				content = {Flags.Icon{flag = args.location, shouldLink = false} .. '&nbsp;' .. args.location}
+				children = {Flags.Icon{flag = args.location, shouldLink = false} .. '&nbsp;' .. args.location}
 			},
 		}
 	elseif id == 'custom' then
 		return Array.append(widgets,
-			Cell{name = 'Map Season', content = {args.season}},
-			Cell{name = 'Size', content = {(args.width or '') .. ' x ' .. (args.height or '')}},
-			Cell{name = 'Battle Tier', content = {String.isNotEmpty(args.btmin) and
+			Cell{name = 'Map Season', children = {args.season}},
+			Cell{name = 'Size', children = {(args.width or '') .. ' x ' .. (args.height or '')}},
+			Cell{name = 'Battle Tier', children = {String.isNotEmpty(args.btmin) and
 				String.isNotEmpty(args.btmax) and (args.btmin .. ' - ' .. args.btmax) or nil}
 			},
 			Cell{
 				name = 'Game Modes',
-				content = Array.map(
+				children = Array.map(
 					self.caller:getGameModes(args),
 					function (gameMode)
 						local modeIcon = MapModes.get{mode = gameMode, date = args.releasedate, size = 15}

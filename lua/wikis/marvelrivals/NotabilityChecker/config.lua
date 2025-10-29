@@ -13,15 +13,14 @@ Config.TIER_TYPE_WEEKLY = 'weekly'
 Config.TIER_TYPE_MONTHLY = 'monthly'
 Config.TIER_TYPE_SHOW_MATCH = 'show match'
 Config.TIER_TYPE_MISC = 'misc'
-Config.MAX_NUMBER_OF_PARTICIPANTS = 12
 Config.MAX_NUMBER_OF_COACHES = 6
 
 -- How many placements should we retrieve from LPDB for a team/player?
 Config.PLACEMENT_LIMIT = 2000
 
 -- These are the notability thresholds needed by a team/player
-Config.NOTABILITY_THRESHOLD_MIN = 13
-Config.NOTABILITY_THRESHOLD_NOTABLE = 15
+Config.NOTABILITY_THRESHOLD_MIN = 10
+Config.NOTABILITY_THRESHOLD_NOTABLE = 22
 
 -- Weights used for tournaments
 Config.weights = {
@@ -45,7 +44,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 5,
+				points = 3,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
@@ -81,7 +80,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 2,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
@@ -117,7 +116,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 1,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
@@ -207,8 +206,11 @@ Config.weights = {
 	},
 }
 
--- This function adjusts the score for the placement, e.g.
--- a first placement should score more than a 10th placement.
+--- This function adjusts the score for the placement, e.g.
+--- a first placement should score more than a 10th placement.
+---@param tier string|integer
+---@param tierType string
+---@return fun(number, number): number
 function Config.placementDropOffFunction(tier, tierType)
 
 		return function(score, placement)

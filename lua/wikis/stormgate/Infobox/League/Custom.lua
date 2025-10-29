@@ -5,22 +5,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local PatchAuto = Lua.import('Module:Infobox/Extension/PatchAuto')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -99,12 +100,12 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'gamesettings' then
-		table.insert(widgets, Cell{name = 'Game Version', content = {self.caller:_getGameVersion()}})
+		table.insert(widgets, Cell{name = 'Game Version', children = {self.caller:_getGameVersion()}})
 	elseif id == 'customcontent' then
 		if args.player_number and args.player_number > 0 then
 			Array.appendWith(widgets,
 				Title{children = 'Player Breakdown'},
-				Cell{name = 'Number of Players', content = {args.raceBreakDown.total}},
+				Cell{name = 'Number of Players', children = {args.raceBreakDown.total}},
 				Breakdown{children = args.raceBreakDown.display, classes = { 'infobox-center' }}
 			)
 		end
@@ -113,7 +114,7 @@ function CustomInjector:parse(id, widgets)
 		if Logic.isNumeric(args.team_number) and tonumber(args.team_number) > 0 then
 			Array.appendWith(widgets,
 				Title{children = 'Teams'},
-				Cell{name = 'Number of Teams', content = {args.team_number}}
+				Cell{name = 'Number of Teams', children = {args.team_number}}
 			)
 		end
 
