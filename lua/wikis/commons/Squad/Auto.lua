@@ -116,7 +116,11 @@ local DEFAULT_INCLUDED_ROLES = {
 		DEFAULT = ROLES_PLAYER,
 		[SquadUtils.SquadStatus.INACTIVE] = {
 			ROLE_INACTIVE
-		}
+		},
+		[SquadUtils.SquadStatus.FORMER] = Array.extend(
+			ROLES_PLAYER,
+			ROLE_INACTIVE
+		),
 	},
 	[SquadUtils.SquadType.STAFF] = {},
 }
