@@ -32,7 +32,7 @@ return {
 			allowManual = false,
 		},
 		match2 = {
-			status = 0,
+			status = 2, -- copied from LAB until we have a propoer match2 setup for this wiki
 			matchWidth = 180,
 		},
 	},
