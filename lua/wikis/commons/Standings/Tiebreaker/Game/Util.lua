@@ -38,9 +38,7 @@ TiebreakerGameUtil.getGames = FnUtil.memoize(function (opponent)
 				return Opponent.same(opponent.opponent, match.opponents[game.winner])
 			end)
 		else
-			local opponentIndex = Array.indexOf(match.opponents, function (matchOpponent)
-				return Opponent.same(opponent.opponent, matchOpponent)
-			end)
+			local opponentIndex = Array.indexOf(match.opponents, FnUtil.curry(Opponent.same, opponent.opponent))
 			--Fall back to using match score if game data is unavailable
 			if Array.any(match.opponents, function (matchOpponent)
 				return matchOpponent.status ~= 'S'
