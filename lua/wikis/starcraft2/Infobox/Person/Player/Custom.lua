@@ -19,6 +19,7 @@ local Json = Lua.import('Module:Json')
 local Lpdb = Lua.import('Module:Lpdb')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Math = Lua.import('Module:MathUtil')
+local Page = Lua.import('Module:Page')
 local Set = Lua.import('Module:Set')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -148,7 +149,7 @@ function CustomPlayer:_getActiveCasterYears()
 
 	local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 		query = 'year::date',
-		conditions = '[[page::' .. self.pagename .. ']] OR [[page::' .. self.pagename:gsub(' ', '_') .. ']]',
+		conditions = '[[page::' .. Page.applyUnderScoresIfEnforced(self.pagename) .. ']]',
 		limit = 5000,
 	})
 
@@ -175,7 +176,7 @@ function CustomPlayer:_getMatchupData(player)
 	self.recentMatches = {}
 	self.stats = {total = {}}
 
-	player = player:gsub(' ', '_')
+	player = Page.applyUnderScoresIfEnforced(player)
 
 	local years = Set{}
 
@@ -298,7 +299,7 @@ function CustomPlayer:calculateEarnings(args)
 		self:_addToMedals(placement, fallBackAchievements)
 	end
 
-	local player = self.pagename:gsub(' ', '_')
+	local player = Page.applyUnderScoresIfEnforced(self.pagename)
 
 	local playerConditions = ConditionTree(BooleanOperator.any):add{
 		ConditionNode(ColumnName('opponentname'), Comparator.eq, player),
@@ -486,7 +487,7 @@ function CustomPlayer:_getAllkills()
 	if not self.shouldQueryData then return end
 
 	local allkillsData = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = '[[pagename::' .. self.pagename:gsub(' ', '_') .. ']] AND [[type::allkills]]',
+		conditions = '[[pagename::' .. Page.applyUnderScoresIfEnforced(self.pagename) .. ']] AND [[type::allkills]]',
 		query = 'information',
 		limit = 1
 	})
