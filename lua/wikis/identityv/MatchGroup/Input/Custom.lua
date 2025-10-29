@@ -9,9 +9,6 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
-local Operator = Lua.import('Module:Operator')
-
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
