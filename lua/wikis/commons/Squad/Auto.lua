@@ -169,11 +169,12 @@ function SquadAuto:parseConfig()
 		self.config.title = 'Former Players'
 	end
 
-	local historicalTemplates = TeamTemplate.queryHistorical(self.config.team)
-	if not historicalTemplates then
+	local historicalTemplates = TeamTemplate.queryHistorical(self.config.team) or {}
+	self.config.teams = Array.append(Array.extractValues(historicalTemplates), TeamTemplate.resolve(self.config.team))
+
+	if Logic.isEmpty(self.config.teams) then
 		error(TeamTemplate.noTeamMessage(self.config.team))
 	end
-	self.config.teams = Array.append(Array.extractValues(historicalTemplates), self.config.team)
 
 	if self.config.status == SquadUtils.SquadStatus.FORMER_INACTIVE then
 		error('SquadStatus \'FORMER_INACTIVE\' is not supported by SquadAuto.')
