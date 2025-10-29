@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local TiebreakerGameUtil = {}
@@ -24,14 +25,30 @@ TiebreakerGameUtil.getGames = FnUtil.memoize(function (opponent)
 		local playedGames = Array.filter(match.games, function (game)
 			return Logic.isNotEmpty(game.winner) and game.status ~= 'notplayed'
 		end)
-		games = games + #playedGames
-		gameWins = gameWins + #Array.filter(playedGames, function (game)
-			if game.resultType == 'draw' then
-				gameDraws = gameDraws + 1
-				return false
+		if Logic.isNotEmpty(playedGames) then
+			--Use game data by default, if it is available
+			games = games + #playedGames
+			gameWins = gameWins + #Array.filter(playedGames, function (game)
+				if game.resultType == 'draw' then
+					gameDraws = gameDraws + 1
+					return false
+				end
+				return Opponent.same(opponent.opponent, match.opponents[game.winner])
+			end)
+		else
+			--Fall back to using match score if game data is unavailable
+			if Array.any(match.opponents, function (matchOpponent)
+				return matchOpponent.status ~= 'S'
+			end) then
+				--TODO: Handle walkover/default wins
+				return
 			end
-			return Opponent.same(opponent.opponent, match.opponents[game.winner])
-		end)
+			local opponentIndex = Array.indexOf(match.opponents, function (matchOpponent)
+				return Opponent.same(opponent.opponent, matchOpponent)
+			end)
+			games = games + Array.reduce(match.opponents, Operator.property('score'))
+			gameWins = gameWins + match.opponents[opponentIndex].score
+		end
 	end)
 	local gameLosses = games - gameWins - gameDraws
 
