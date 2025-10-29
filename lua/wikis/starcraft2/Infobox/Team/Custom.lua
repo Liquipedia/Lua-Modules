@@ -193,13 +193,11 @@ function CustomTeam:getEarningsAndMedalsData()
 	self.cleanPageName = self.pagename:gsub(' ', '_')
 
 	local playerTeamConditions = ConditionTree(BooleanOperator.any):add{
-		ConditionNode(ColumnName('opponentname'), Comparator.eq, self.pagename),
 		ConditionNode(ColumnName('opponentname'), Comparator.eq, self.cleanPageName),
 	}
 
 	for playerIndex = 1, MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS do
 		playerTeamConditions:add{
-			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex .. 'team'), Comparator.eq, self.pagename),
 			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex .. 'team'), Comparator.eq, self.cleanPageName),
 		}
 	end
@@ -259,7 +257,7 @@ end
 ---@param team string
 ---@return boolean
 function CustomTeam:_isCorrectTeam(team)
-	return team == self.pagename or team == self.cleanPageName
+	return team == self.cleanPageName
 end
 
 ---@param tbl table
@@ -321,7 +319,7 @@ end
 function CustomTeam:_amountOfTeamPlayersInPlacement(players)
 	local amount = 0
 	for playerKey in Table.iter.pairsByPrefix(players, 'p') do
-		if players[playerKey .. 'team'] == self.pagename then
+		if players[playerKey .. 'team'] == self.cleanPageName then
 			amount = amount + 1
 		end
 	end
