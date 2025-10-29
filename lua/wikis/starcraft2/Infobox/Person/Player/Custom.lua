@@ -35,6 +35,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local EPT_SEASON = Lua.import('Module:Series/EPT/config', {loadData = true}).currentSeason
 
@@ -175,7 +176,6 @@ function CustomPlayer:_getMatchupData(player)
 	self.stats = {total = {}}
 
 	player = player:gsub(' ', '_')
-	local playerWithoutUnderscore = player:gsub('_', ' ')
 
 	local years = Set{}
 
@@ -192,7 +192,7 @@ function CustomPlayer:_getMatchupData(player)
 			return
 		end
 
-		self:_addToStats(match, player, playerWithoutUnderscore)
+		self:_addToStats(match, player)
 	end
 
 	Lpdb.executeMassQuery('match2', {
@@ -201,7 +201,7 @@ function CustomPlayer:_getMatchupData(player)
 			'[[winner::!]]', -- expect a winner
 			'[[status::!notplayed]]', -- i.e. ignore not played matches
 			'[[date::!' .. DateExt.defaultDate .. ']]', --i.e. wrongly set up
-			'([[opponent::' .. player .. ']] OR [[opponent::' .. playerWithoutUnderscore .. ']])'
+			'([[opponent::' .. player .. ']])'
 		}, ' AND '),
 		order = 'date desc',
 		query = table.concat({
@@ -230,8 +230,7 @@ end
 
 ---@param match match2
 ---@param player string
----@param playerWithoutUnderscore string
-function CustomPlayer:_addToStats(match, player, playerWithoutUnderscore)
+function CustomPlayer:_addToStats(match, player)
 	local opponents = match.match2opponents
 
 	--catch matches vs empty opponents and literals
@@ -239,7 +238,7 @@ function CustomPlayer:_addToStats(match, player, playerWithoutUnderscore)
 		return
 	end
 
-	local playerIndex = (opponents[1].name == player or opponents[1].name == playerWithoutUnderscore) and 1 or 2
+	local playerIndex = opponents[1].name == player and 1 or 2
 	local playerOpponent = opponents[playerIndex]
 	local vsOpponent = opponents[3 - playerIndex]
 
@@ -299,30 +298,17 @@ function CustomPlayer:calculateEarnings(args)
 		self:_addToMedals(placement, fallBackAchievements)
 	end
 
-	local player = self.pagename
-	local playerWithUnderScores = player:gsub(' ', '_')
+	local player = self.pagename:gsub(' ', '_')
 
-	local playerConditions = ConditionTree(BooleanOperator.any)
-	Array.forEach(Array.range(1, MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS), function (playerIndex)
-		playerConditions:add({
-			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, player),
-			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, playerWithUnderScores),
-		})
-	end)
-
-	local placementConditions = ConditionTree(BooleanOperator.any)
-	for _, item in pairs(ALLOWED_PLACES) do
-		placementConditions:add({
-			ConditionNode(ColumnName('placement'), Comparator.eq, item),
-		})
-	end
+	local playerConditions = ConditionTree(BooleanOperator.any):add{
+		ConditionNode(ColumnName('opponentname'), Comparator.eq, player),
+		Array.map(Array.range(1, MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS), function (playerIndex)
+			return ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, player)
+		end)
+	}
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('opponentname'), Comparator.eq, player),
-			ConditionNode(ColumnName('opponentname'), Comparator.eq, playerWithUnderScores),
-			playerConditions,
-		},
+		playerConditions,
 		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
 		ConditionNode(ColumnName('liquipediatier'), Comparator.neq, '-1'),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
@@ -331,7 +317,7 @@ function CustomPlayer:calculateEarnings(args)
 			ConditionNode(ColumnName('extradata_award'), Comparator.neq, ''),
 			ConditionTree(BooleanOperator.all):add{
 				ConditionNode(ColumnName('opponenttype'), Comparator.gt, Opponent.solo),
-				placementConditions,
+				ConditionUtil.anyOf(ColumnName('placement'), ALLOWED_PLACES),
 			},
 		},
 	}
