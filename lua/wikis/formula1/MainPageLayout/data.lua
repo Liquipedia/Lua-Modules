@@ -6,6 +6,9 @@
 --
 
 local Lua = require('Module:Lua')
+
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
+
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -71,13 +74,13 @@ local CONTENT = {
 			completedDays = 90
 		},
 		padding = true,
-		boxid = 1503
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES
 	},
 	seasonOverview = {
 		heading =HtmlWidgets.Fragment{children = {TROPHY, '&nbsp;Current Season Overview'}},
 		body = '{{Liquipedia:Season Overview}}',
 		padding = true,
-		boxid = 1504
+		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP
 	},
 	seasonCalendar = {
 		heading =HtmlWidgets.Fragment{children = {CALENDAR, '&nbsp;Season Calendar'}},
@@ -89,7 +92,7 @@ local CONTENT = {
 		heading = 'Want To Help?',
 		body = WantToHelp{},
 		padding = true,
-		boxid = 1508,
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
@@ -97,13 +100,13 @@ local CONTENT = {
 			birthdayListPage = 'Birthday list'
 		},
 		padding = true,
-		boxid = 1509,
+		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
 	upcomingRace = {
 		heading =HtmlWidgets.Fragment{children = {TROPHY, '&nbsp;Upcoming Race'}},
 		body = '{{Liquipedia:Upcoming Grand Prix}}',
 		padding = true,
-		boxid = 1509
+		boxid = MainPageLayoutUtil.BoxId.TRANSFERS
 	},
 	previousRace = {
 		heading =HtmlWidgets.Fragment{children = {FINISHED_RACE, '&nbsp;Previous Race Weekend'}},
