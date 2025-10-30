@@ -342,7 +342,7 @@ function SquadAuto:queryTransfers()
 		if not team then
 			return false
 		end
-		return Array.any(self.config.teams, function(t) return t == team end)
+		return Array.any(self.config.teams, FnUtil.curry(Operator.eq, team))
 	end
 
 	---@param side 'from' | 'to'
@@ -640,9 +640,7 @@ end
 function SquadAuto._fetchNextTeam(pagename, date)
 	local conditions = Condition.Tree(BooleanOperator.all)
 		:add{
-			Condition.Tree(BooleanOperator.any):add{
-				Condition.Node(Condition.ColumnName('player'), Comparator.eq, pagename),
-				Condition.Node(Condition.ColumnName('player'), Comparator.eq, string.gsub(pagename, ' ', '_')),
+			Condition.Util.anyOf(Condition.ColumnName('player'), {pagename, string.gsub(pagename, ' ', '_')}),
 			},
 			Condition.Tree(BooleanOperator.any):add{
 				Condition.Node(Condition.ColumnName('date'), Comparator.gt, date),
