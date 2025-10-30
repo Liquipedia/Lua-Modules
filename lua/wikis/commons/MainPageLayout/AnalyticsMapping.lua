@@ -11,6 +11,7 @@ local AnalyticsMapping = {
 	[1502] = 'Updates panel',
 	[1503] = 'Useful articles panel',
 	[1504] = 'Want to help panel',
+	[1505] = 'Mobile app panel',
 	[1507] = 'Matchticker',
 	[1508] = 'Tournament ticker',
 	[1509] = 'Transfers panel',
