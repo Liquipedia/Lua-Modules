@@ -99,6 +99,12 @@ SquadAuto.TransferType = {
 ---@field toRole string?
 ---@field faction string?
 
+---@enum Side
+local Side = {
+	from = 'from',
+	to = 'to',
+}
+
 local ROLE_INACTIVE = 'Inactive'
 
 -- TODO: Replace with Module:Roles
@@ -136,7 +142,7 @@ local DEFAULT_EXCLUDED_ROLES = {
 }
 
 ---Entrypoint for SquadAuto tables
----@param frame table
+---@param frame Frame|table
 ---@return Widget|Html|string?
 function SquadAuto.run(frame)
 	local autosquad = SquadAuto(frame)
@@ -351,7 +357,7 @@ function SquadAuto:queryTransfers()
 		return Array.any(self.config.teams, FnUtil.curry(Operator.eq, team))
 	end
 
-	---@param side 'from' | 'to'
+	---@param side Side
 	---@param transfer transfer
 	---@return string | nil, boolean
 	local function parseRelevantTeam(side, transfer)
@@ -383,7 +389,7 @@ function SquadAuto:queryTransfers()
 	end
 
 	---Parses the relevant role for the current team from a transfer
-	---@param side 'from' | 'to'
+	---@param side Side
 	---@param transfer transfer
 	---@param team string?
 	---@param isMain boolean
@@ -394,9 +400,9 @@ function SquadAuto:queryTransfers()
 		end
 
 		if isMain then
-			return side == 'from' and transfer.role1 or transfer.role2
+			return side == Side.from and transfer.role1 or transfer.role2
 		else
-			return side == 'from' and transfer.extradata.role1sec or transfer.extradata.role2sec
+			return side == Side.from and transfer.extradata.role1sec or transfer.extradata.role2sec
 		end
 	end
 
@@ -421,8 +427,8 @@ function SquadAuto:queryTransfers()
 			record.extradata = record.extradata or {}
 
 
-			local relevantFromTeam, isFromMain = parseRelevantTeam('from', record)
-			local relevantToTeam, isToMain = parseRelevantTeam('to', record)
+			local relevantFromTeam, isFromMain = parseRelevantTeam(Side.from, record)
+			local relevantToTeam, isToMain = parseRelevantTeam(Side.to, record)
 			local transferType = getTransferType(relevantFromTeam, relevantToTeam)
 
 			-- For leave transfers: Pass on new team for display as next team
@@ -447,8 +453,8 @@ function SquadAuto:queryTransfers()
 				references = record.reference,
 
 				-- Roles
-				fromRole = parseRelevantRole('from', record, relevantFromTeam, isFromMain),
-				toRole = parseRelevantRole('to', record, relevantToTeam, isToMain),
+				fromRole = parseRelevantRole(Side.from, record, relevantFromTeam, isFromMain),
+				toRole = parseRelevantRole(Side.to, record, relevantToTeam, isToMain),
 
 				fromTeam = relevantFromTeam,
 				toTeam = relevantToTeam,
@@ -647,7 +653,6 @@ function SquadAuto._fetchNextTeam(pagename, date)
 	local conditions = Condition.Tree(BooleanOperator.all)
 		:add{
 			Condition.Util.anyOf(Condition.ColumnName('player'), {pagename, string.gsub(pagename, ' ', '_')}),
-			},
 			Condition.Tree(BooleanOperator.any):add{
 				Condition.Node(Condition.ColumnName('date'), Comparator.gt, date),
 			}
