@@ -99,7 +99,7 @@ SquadAuto.TransferType = {
 ---@field toRole string?
 ---@field faction string?
 
----@enum Side
+---@enum TransferSide
 local Side = {
 	from = 'from',
 	to = 'to',
@@ -357,7 +357,7 @@ function SquadAuto:queryTransfers()
 		return Array.any(self.config.teams, FnUtil.curry(Operator.eq, team))
 	end
 
-	---@param side Side
+	---@param side TransferSide
 	---@param transfer transfer
 	---@return string | nil, boolean
 	local function parseRelevantTeam(side, transfer)
@@ -389,7 +389,7 @@ function SquadAuto:queryTransfers()
 	end
 
 	---Parses the relevant role for the current team from a transfer
-	---@param side Side
+	---@param side TransferSide
 	---@param transfer transfer
 	---@param team string?
 	---@param isMain boolean
