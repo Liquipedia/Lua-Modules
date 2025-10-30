@@ -74,7 +74,7 @@ end)
 ---@field type SquadType
 ---@field title string?
 ---@field teams string[]?
----@field roles {excluded: string[], included: string[]}
+---@field roles {excluded: string[]?, included: string[]?}
 
 ---@enum TransferType
 SquadAuto.TransferType = {
@@ -160,10 +160,16 @@ function SquadAuto:parseConfig()
 		status = status,
 		title = args.title,
 		roles = {
-			included = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.roles))
-				or DEFAULT_INCLUDED_ROLES[type][status]or DEFAULT_INCLUDED_ROLES[type].DEFAULT,
-			excluded = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.not_roles))
-				or DEFAULT_EXCLUDED_ROLES[type][status] or DEFAULT_EXCLUDED_ROLES[type].DEFAULT,
+			included = Logic.emptyOr(
+				Array.parseCommaSeparatedString(args.roles),
+				DEFAULT_INCLUDED_ROLES[type][status],
+				DEFAULT_INCLUDED_ROLES[type].DEFAULT
+			),
+			excluded = Logic.emptyOr(
+				Array.parseCommaSeparatedString(args.not_roles),
+				DEFAULT_EXCLUDED_ROLES[type][status],
+				DEFAULT_EXCLUDED_ROLES[type].DEFAULT
+			)
 		}
 	}
 
