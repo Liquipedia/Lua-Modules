@@ -1,2 +1,4 @@
+*.js eol=lf
 *.lua eol=lf
+*.scss eol=lf
 *.sh eol=lf
