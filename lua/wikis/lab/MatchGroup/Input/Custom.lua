@@ -14,14 +14,22 @@ local Operator = Lua.import('Module:Operator')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
+
+---@class LabMatchParser: MatchParserInterface
 local MatchFunctions = {
 	DEFAULT_MODE = 'team',
 	getBestOf = MatchGroupInputUtil.getBestOf,
 }
+
+---@class LabMapParser: MapParserInterface
 local MapFunctions = {}
+
+---@class LabFfaMatchParser: FfaMatchParserInterface
 local FfaMatchFunctions = {
 	DEFAULT_MODE = 'team',
 }
+
+---@class LabFfaMapParser: FfaMapParserInterface
 local FfaMapFunctions = {}
 
 ---@param match table
