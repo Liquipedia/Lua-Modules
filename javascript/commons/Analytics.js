@@ -19,6 +19,18 @@ const SIDEBAR = 'sidebar';
 const INLINE = 'inline';
 const INFOBANNER = 'InfoBanner';
 
+// Mapping from category name to page type
+const categoryToPageTypeMap = {
+	Players: 'player',
+	Teams: 'team',
+	Tournaments: 'tournament',
+	Matches: 'match',
+	'Tournament series': 'series',
+	Maps: 'map',
+	Characters: 'character',
+	Units: 'unit'
+};
+
 // Statically defined properties
 const getPageDomain = () => window.location.origin;
 const getPageLocation = () => window.location.href;
@@ -112,6 +124,10 @@ liquipedia.analytics = {
 	},
 
 	track: function( eventName, properties ) {
+		// amplitude is blocked, either by user choice or by an adblocker
+		if ( !window.amplitude ) {
+			return;
+		}
 		window.amplitude.track( eventName, {
 			'page domain': getPageDomain(),
 			'page location': getPageLocation(),
@@ -125,10 +141,12 @@ liquipedia.analytics = {
 
 	sendPageViewEvent: function() {
 		const categories = mw.config.get( 'wgCategories' ) || [];
+		const pageType = categories.map( ( category ) => categoryToPageTypeMap[ category ] ).filter( Boolean );
 		liquipedia.analytics.track( PAGE_VIEW, {
 			referrer: getReferrerUrl(),
 			'referring domain': getReferrerDomain(),
-			categories: categories.filter( ( category ) => !category.startsWith( IGNORE_CATEGORY_PREFIX ) )
+			categories: categories.filter( ( category ) => !category.startsWith( IGNORE_CATEGORY_PREFIX ) ),
+			'page type': pageType.length === 1 ? pageType[ 0 ] : null
 		} );
 	},
 
