@@ -233,7 +233,8 @@ end
 ---@param opponent2 standardOpponent
 ---@return boolean
 function Opponent.same(opponent1, opponent2)
-	return Opponent.toName(opponent1) == Opponent.toName(opponent2)
+	-- gsub needed until all wikis have switched fully to underscores instead of spaces
+	return Opponent.toName(opponent1):gsub(' ', '_') == Opponent.toName(opponent2):gsub(' ', '_')
 end
 
 ---Coerces an arbitrary table into an opponent
