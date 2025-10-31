@@ -25,6 +25,8 @@ local TeamTemplate = Lua.import('Module:TeamTemplate')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 local SquadCustom = Lua.import('Module:Squad/Custom')
 
+local SquadAutoRank = Lua.import('Module:SquadAuto/rank', {loadData=true})
+
 local BooleanOperator = Condition.BooleanOperator
 local Comparator = Condition.Comparator
 
@@ -104,6 +106,9 @@ local Side = {
 	from = 'from',
 	to = 'to',
 }
+
+-- Default key for SquadAuto/rank
+local DEFAULT_RANK_KEY = ''
 
 local ROLE_INACTIVE = 'Inactive'
 
@@ -211,7 +216,8 @@ function SquadAuto:display(entries)
 		return self:displayTabs(entries)
 	end
 
-	entries = SquadAuto._sortEntries(entries)
+	local useRankSort = self.config.status == SquadUtils.SquadStatus.ACTIVE
+	entries = SquadAuto._sortEntries(entries, useRankSort)
 
 	return SquadCustom.runAuto(entries, self.config.status, self.config.type, self.config.title)
 end
@@ -674,10 +680,16 @@ end
 -- Active entries (no leavedate) sorted by joindate,
 -- Former entries sorted by leavedate
 ---@param entries SquadAutoPerson[]
+---@param useRankSort boolean?
 ---@return SquadAutoPerson[]
-function SquadAuto._sortEntries(entries)
+function SquadAuto._sortEntries(entries, useRankSort)
 	return Array.sortBy(entries, function (element)
-		return {element.leavedate or element.joindate, element.id}
+		return {
+			useRankSort and SquadAutoRank[element.thisTeam.position] or SquadAutoRank[DEFAULT_RANK_KEY],
+			useRankSort and SquadAutoRank[element.thisTeam.role] or SquadAutoRank[DEFAULT_RANK_KEY],
+			element.leavedate or element.joindate,
+			element.id
+		}
 	end)
 end
 
