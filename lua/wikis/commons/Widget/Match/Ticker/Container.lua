@@ -15,9 +15,9 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
+local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
-local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 
 ---@class MatchTickerContainer: Widget
 ---@operator call(table): MatchTickerContainer

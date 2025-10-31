@@ -79,3 +79,5 @@ function ContentSwitch:render()
 	}
 end
 
+return ContentSwitch
+
