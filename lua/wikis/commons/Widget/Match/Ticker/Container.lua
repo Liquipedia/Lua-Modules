@@ -15,6 +15,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
+local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
 
@@ -83,36 +84,14 @@ function MatchTickerContainer:render()
 			HtmlWidgets.Div{
 				classes = {'match-section-header'},
 				children = {
-					HtmlWidgets.Div{
-						classes = {'switch-pill-container'},
-						children = {
-							HtmlWidgets.Div{
-								classes = {'switch-pill'},
-								attributes = {
-									['data-switch-group'] = 'matchFiler',
-									['data-store-value'] = 'true',
-								},
-								children = {
-									HtmlWidgets.Div{
-										classes = {'switch-pill-option', 'switch-pill-active', 'toggle-area-button'},
-										attributes = {
-											['data-toggle-area-btn'] = '1',
-											['data-switch-value'] = 'upcoming',
-										},
-										children = 'Upcoming',
-									},
-									HtmlWidgets.Div{
-										classes = {'switch-pill-option', 'toggle-area-button'},
-										attributes = {
-											['data-toggle-area-btn'] = '2',
-											['data-switch-value'] = 'completed',
-										},
-										children = 'Completed',
-									},
-								},
-							},
+					ContentSwitch{
+						tabs = {
+							{label = 'Upcoming', value = 'upcoming'},
+							{label = 'Completed', value = 'completed'}
 						},
-					},
+						switchGroup = 'matchFiler',
+						defaultActive = 1,
+					}
 				},
 			},
 			HtmlWidgets.Div{
