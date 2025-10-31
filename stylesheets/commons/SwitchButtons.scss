@@ -125,5 +125,27 @@
 				color: #ffffff;
 			}
 		}
+
+		&.switch-pill-generic {
+			.switch-pill-option {
+				.theme--light & {
+					color: var( --clr-secondary-25 );
+				}
+
+				.theme--dark & {
+					color: var( --clr-secondary-90 );
+				}
+			}
+
+			.switch-pill-option.switch-pill-active {
+				.theme--light & {
+					background-color: var( --clr-on-surface-light-primary-12, rgba( 0, 0, 0, 0.12 ) );
+				}
+
+				.theme--dark & {
+					background-color: var( --clr-on-surface-dark-primary-12, rgba( 255, 255, 255, 0.12 ) );
+				}
+			}
+		}
 	}
 }

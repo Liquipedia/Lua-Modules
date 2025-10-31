@@ -41,7 +41,6 @@ function ContentSwitch:render()
 	local defaultActive = self.props.defaultActive
 	local switchGroup = self.props.switchGroup
 
-	-- Create the tab options
 	local tabOptions = Array.map(tabs, function(tab, index)
 		local isActive = index == defaultActive
 		local classes = {'switch-pill-option', 'toggle-area-button'}
@@ -59,16 +58,16 @@ function ContentSwitch:render()
 		}
 	end)
 
-	local containerClasses = Array.extend({'switch-pill-container'}, self.props.classes or {})
-	if variant == 'themed' then
-		table.insert(containerClasses, 'switch-pill-container-themed')
+	local switchPillClasses = {'switch-pill'}
+	if variant == 'generic' then
+		table.insert(switchPillClasses, 'switch-pill-generic')
 	end
 
 	return Div{
-		classes = containerClasses,
+		classes = {'switch-pill-container'},
 		children = {
 			Div{
-				classes = {'switch-pill'},
+				classes = switchPillClasses,
 				attributes = {
 					['data-switch-group'] = switchGroup,
 					['data-store-value'] = 'true',
