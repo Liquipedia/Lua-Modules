@@ -91,7 +91,6 @@ function MatchTickerContainer:render()
 						},
 						switchGroup = 'matchFiler',
 						defaultActive = 1,
-						variant = 'generic',
 					}
 				},
 			},
