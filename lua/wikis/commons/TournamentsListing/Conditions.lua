@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
+local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
@@ -64,8 +65,10 @@ function TournamentsListingConditions.base(args)
 		conditions:add{ConditionNode(ColumnName('mode'), Comparator.eq, args.mode)}
 	end
 
-	if args.game then
-		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, args.game)}
+	if Logic.isNotEmpty(args.game) then
+		-- need the fallback to args.game to be able to use it for e.g. mod on sc2
+		local game = Game.toIdentifier{game = args.game} or args.game
+		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, game)}
 	end
 
 	if args.series1 or args.series then
