@@ -77,7 +77,7 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'IdentityV logo darkmode.png',
+		lightmode = 'IdentityV logo lightmode.png',
 		darkmode = 'IdentityV logo darkmode.png',
 	},
 	metadesc = 'The Identity V (IDV) esports wiki covering everything from players, teams and transfers, ' ..
