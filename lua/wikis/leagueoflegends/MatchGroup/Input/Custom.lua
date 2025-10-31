@@ -20,7 +20,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local CustomMatchGroupInput = {}
 
----@class LoLMatchParser: MatchParserInterface
+---@class LeagueOfLegendsMatchParser: MatchParserInterface
 local MatchFunctions = {
 	OPPONENT_CONFIG = {
 		resolveRedirect = true,
