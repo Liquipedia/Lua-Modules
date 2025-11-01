@@ -289,7 +289,7 @@ describe('opponent', function()
 		end)
 
 		it('same type, different opponents', function ()
-			TeamTemplateMock.setup()
+			TeamTemplateMock.setUp()
 
 			assert.is_false(Opponent.same(
 				Opponent.resolve(Opponent.readOpponentArgs{type = 'team', 'tl'}),
@@ -308,7 +308,7 @@ describe('opponent', function()
 		end)
 
 		it('same opponents', function ()
-			TeamTemplateMock.setup()
+			TeamTemplateMock.setUp()
 
 			assert.is_true(Opponent.same(
 				Opponent.resolve(Opponent.readOpponentArgs{type = 'team', 'team exon'}),
