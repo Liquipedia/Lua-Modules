@@ -243,19 +243,19 @@ function Opponent.same(opponent1, opponent2)
 
 	---@param player standardPlayer
 	---@return string?
-	local function getPageifiedPageName(player)
+	local function getPageName(player)
 		if Opponent.playerIsTbd(player) then
 			return
 		end
-		return Page.pageifyLink(player.pageName)
+		return player.pageName
 	end
 
 	return Array.equals(
 		Array.sortBy(
-			Array.map(opponent1.players, getPageifiedPageName), FnUtil.identity
+			Array.map(opponent1.players, getPageName), FnUtil.identity
 		),
 		Array.sortBy(
-			Array.map(opponent2.players, getPageifiedPageName), FnUtil.identity
+			Array.map(opponent2.players, getPageName), FnUtil.identity
 		)
 	)
 end
