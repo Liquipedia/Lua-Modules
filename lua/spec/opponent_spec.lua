@@ -1,4 +1,5 @@
 --- Triple Comment to Enable our LLS Plugin
+local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 describe('opponent', function()
 	local Config = require('test_assets.opponent_test_config')
 	local Opponent = require('Module:Opponent')
@@ -269,5 +270,67 @@ describe('opponent', function()
 		end)
 	end)
 
-	--not testing `resolve` due to missing team templates and lpdb data
+	describe('same', function ()
+		it('different type', function ()
+			assert.is_false(Opponent.same(
+				Opponent.tbd('team'),
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordDuo)
+			))
+
+			assert.is_false(Opponent.same(
+				Opponent.tbd('team'),
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordDuo)
+			))
+
+			assert.is_false(Opponent.same(
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordSolo),
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordDuo)
+			))
+		end)
+
+		it('same type, different opponents', function ()
+			TeamTemplateMock.setup()
+
+			assert.is_false(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{type = 'team', 'tl'}),
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordTeam))
+			)
+
+			assert.is_false(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{
+					p1 = 'Faker', p1flag = 'South Korea',
+					p2 = 'Deft', p2flag = 'South Korea',
+				}),
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordDuo)
+			))
+
+			TeamTemplateMock.tearDown()
+		end)
+
+		it('same opponents', function ()
+			TeamTemplateMock.setup()
+
+			assert.is_true(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{type = 'team', 'team exon'}),
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordTeam))
+			)
+
+			assert.is_true(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{
+					p1 = 'Semper', p1flag = 'Canada',
+					p2 = 'Jig', p2flag = 'Canada',
+				}),
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordDuo)
+			))
+
+			assert.is_true(Opponent.same(
+				Opponent.blank('literal'),
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordLiteral)
+			))
+
+			TeamTemplateMock.tearDown()
+		end)
+	end)
+
+	--not testing `resolve` due to missing team templates and lpdb dta
 end)

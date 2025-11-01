@@ -1,6 +1,7 @@
 local aliases = {
 	bds = 'team bds',
 	mousesports = 'mouz',
+	['team exon'] = 'exon',
 	tl = 'team liquid',
 	tt9 = 'tt9 esports',
 	wol = 'wolves esports'
@@ -8,6 +9,11 @@ local aliases = {
 
 local data = {
 	-- historical ones
+	exon = {
+		['0000-01-01'] = 'exon jan 2020',
+		['2020-02-12'] = 'exon feb 2020',
+		['2020-03-10'] = 'exon mar 2020',
+	},
 	['team bds'] = {
 		['0000-01-01'] = 'bds esport old',
 		['2019-09-01'] = 'team bds orig',
@@ -69,6 +75,40 @@ local data = {
 		page = "Team BDS",
 		shortname = "BDS",
 		templatename = "team bds 2021",
+	},
+	-- exon subtemplates
+	['exon jan 2020'] = {
+		bracketname = "eXon",
+		image = "",
+		imagedark = "",
+		legacyimage = "Exon logo std.png",
+		legacyimagedark = "Exon logo std.png",
+		name = "eXon",
+		page = "eXon",
+		shortname = "eXon",
+		templatename = "exon jan 2020",
+	},
+	['exon feb 2020'] = {
+		bracketname = "Team eXon",
+		image = "",
+		imagedark = "",
+		legacyimage = "Exon feb 2020 logo std.png",
+		legacyimagedark = "Exon feb 2020 logo std.png",
+		name = "Team eXon",
+		page = "Team eXon",
+		shortname = "eXon",
+		templatename = "exon feb 2020",
+	},
+	['exon march 2020'] = {
+		bracketname = "Team eXoN",
+		image = "",
+		imagedark = "",
+		legacyimage = "Exon feb 2020 logo std.png",
+		legacyimagedark = "Exon feb 2020 logo std.png",
+		name = "Team eXoN",
+		page = "Team eXoN",
+		shortname = "eXoN",
+		templatename = "exon march 2020",
 	},
 	-- mouz subtemplates
 	['mousesports orig'] = {
