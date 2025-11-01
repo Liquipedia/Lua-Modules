@@ -228,12 +228,36 @@ function Opponent.isOpponent(opponent)
 end
 
 ---Check if two opponents are the same opponent
----It's still a work in progress, it's not fully implemented all cases
 ---@param opponent1 standardOpponent
 ---@param opponent2 standardOpponent
 ---@return boolean
 function Opponent.same(opponent1, opponent2)
-	return Opponent.toName(opponent1) == Opponent.toName(opponent2)
+	if opponent1.type ~= opponent2.type then
+		return false
+	elseif opponent1.type == Opponent.literal then
+		return opponent1.name == opponent2.name
+	elseif opponent1.type == Opponent.team then
+		return Opponent.toName(opponent1) == Opponent.toName(opponent2)
+	end
+	-- opponent.type is a party type
+
+	---@param player standardPlayer
+	---@return string?
+	local function getPageifiedPageName(player)
+		if Opponent.playerIsTbd(player) then
+			return
+		end
+		return Page.pageifyLink(player.pageName)
+	end
+
+	return Array.equals(
+		Array.sortBy(
+			Array.map(opponent1.players, getPageifiedPageName), FnUtil.identity
+		),
+		Array.sortBy(
+			Array.map(opponent2.players, getPageifiedPageName), FnUtil.identity
+		)
+	)
 end
 
 ---Coerces an arbitrary table into an opponent
