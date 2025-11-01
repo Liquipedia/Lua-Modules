@@ -66,6 +66,11 @@ end
 ---@param match table
 function MatchGroupLegacyDefault:handleOtherMatchParams(isReset, match)
 	match.winner = Table.extract(match, 'win')
+	for key in pairs(match) do
+		if string.match(key, '^p%d+') then
+			match[key] = nil
+		end
+	end
 end
 
 ---@param frame Frame

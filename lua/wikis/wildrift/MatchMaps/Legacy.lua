@@ -14,6 +14,7 @@ local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local Json = Lua.import('Module:Json')
 local MatchGroup = Lua.import('Module:MatchGroup')
+local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
@@ -214,6 +215,8 @@ end
 ---@return Html
 function MatchMapsLegacy.convertMatch(frame)
 	local args = Arguments.getArgs(frame)
+	local generate = Logic.readBool(Table.extract(args, 'generate'))
+
 	local details = Json.parseIfString(args.details or '{}')
 
 	args, details = MatchMapsLegacy.handleDetails(args, details)
@@ -222,6 +225,9 @@ function MatchMapsLegacy.convertMatch(frame)
 	args = MatchMapsLegacy.setHeaderIfEmpty(args, details)
 	args = MatchMapsLegacy.copyDetailsToArgs(args, details)
 
+	if generate then
+		return Json.stringify(args)
+	end
 	Template.stashReturnValue(args, 'LegacyMatchlist')
 	return mw.html.create('div'):css('display', 'none')
 end
@@ -262,7 +268,7 @@ function MatchMapsLegacy.matchListEnd()
 		isLegacy = true,
 		id = bracketId,
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 		collapsed = hide,
 		attached = hide,
 		title = matchlistVars:get('matchListTitle'),
@@ -289,6 +295,48 @@ function MatchMapsLegacy.matchListEnd()
 	globalVars:delete('islegacy')
 
 	return MatchGroup.MatchList(args)
+end
+
+--- for bot conversion to proper match2 matchlists
+---@param frame Frame
+---@return string
+function MatchMapsLegacy.generate(frame)
+	local args = Arguments.getArgs(frame)
+
+	local store = Logic.readBoolOrNil(args.store)
+
+	local offset = 0
+	local title = args.title
+	if not title and not Json.parseIfTable(args[1]) then
+		title = args[1]
+		offset = 1
+	end
+
+	local parsedArgs = {
+		id = args.id,
+		title = title,
+		width = args.width or '300px',
+		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		store = store,
+		patch = args.patch,
+	}
+
+	local matchsection = Logic.nilOr(args.lpdb_title, args.title)
+	if Logic.readBoolOrNil(matchsection) ~= false then
+		parsedArgs.matchsection = matchsection
+	end
+
+	---@type table[]
+	local matches = Array.mapIndexes(function(index)
+		return Json.parseIfTable(args[index + offset])
+	end)
+
+	Array.forEach(matches, function(match, matchIndex)
+		parsedArgs['M' .. matchIndex] = match
+	end)
+
+	return MatchGroupLegacy.generateWikiCodeForMatchList(parsedArgs)
 end
 
 return MatchMapsLegacy
