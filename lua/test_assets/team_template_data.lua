@@ -12,7 +12,7 @@ local data = {
 	exon = {
 		['0000-01-01'] = 'exon jan 2020',
 		['2020-02-12'] = 'exon feb 2020',
-		['2020-03-10'] = 'exon mar 2020',
+		['2020-03-10'] = 'exon march 2020',
 	},
 	['team bds'] = {
 		['0000-01-01'] = 'bds esport old',
