@@ -89,6 +89,40 @@ return {
 		['template'] = '',
 		['type'] = 'solo',
 	},
+	exampleMatch2RecordSoloWithSpace = {
+		['extradata'] = {
+		},
+		['icon'] = '',
+		['icondark'] = '',
+		['match2id'] = 'TOC25FRF24_0003',
+		['match2opponentid'] = '3',
+		['match2players'] = {
+			{
+				['displayname'] = 'A Bai',
+				['extradata'] = {
+				},
+				['flag'] = 'China',
+				['match2id'] = 'TOC25FRF24_0003',
+				['match2opponentid'] = '3',
+				['match2playerid'] = '1',
+				['name'] = 'A_Bai',
+				['namespace'] = '0',
+				['objectname'] = '10004_TOC25FRF24_0003_m2o_03_m2p_01',
+				['pageid'] = '10004',
+				['pagename'] = 'TOC/2025/Fall/Regional_Finals/Swiss_Stage',
+			},
+		},
+		['name'] = 'A_Bai',
+		['namespace'] = '0',
+		['objectname'] = '10004_TOC25FRF24_0003_m2o_03',
+		['pageid'] = '10004',
+		['pagename'] = 'TOC/2025/Fall/Regional_Finals/Swiss_Stage',
+		['placement'] = '3',
+		['score'] = '11.00',
+		['status'] = 'S',
+		['template'] = '',
+		['type'] = 'solo',
+	},
 	exampleMatch2RecordDuo = {
 		['extradata'] = {
 		},

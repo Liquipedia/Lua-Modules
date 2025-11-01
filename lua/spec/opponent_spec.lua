@@ -1,4 +1,5 @@
 --- Triple Comment to Enable our LLS Plugin
+local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 describe('opponent', function()
 	local Config = require('test_assets.opponent_test_config')
 	local Opponent = require('Module:Opponent')
@@ -266,6 +267,78 @@ describe('opponent', function()
 			opponent = Opponent.fromMatch2Record(Config.exampleMatch2RecordDuo) --[[@as standardOpponent]]
 			assert.are_same(opponent, Opponent.fromLpdbStruct(Opponent.toLpdbStruct(opponent)))
 			--can not test for team opponent due to missing team templates
+		end)
+	end)
+
+	describe('same', function ()
+		it('different type', function ()
+			assert.is_false(Opponent.same(
+				Opponent.tbd('team'),
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordDuo)
+			))
+
+			assert.is_false(Opponent.same(
+				Opponent.tbd('team'),
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordDuo)
+			))
+
+			assert.is_false(Opponent.same(
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordSolo),
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordDuo)
+			))
+		end)
+
+		it('same type, different opponents', function ()
+			TeamTemplateMock.setUp()
+
+			assert.is_false(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{type = 'team', 'tl'}),
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordTeam))
+			)
+
+			assert.is_false(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{
+					p1 = 'Faker', p1flag = 'South Korea',
+					p2 = 'Deft', p2flag = 'South Korea',
+					type = 'duo'
+				}),
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordDuo)
+			))
+
+			TeamTemplateMock.tearDown()
+		end)
+
+		it('same opponents', function ()
+			TeamTemplateMock.setUp()
+
+			assert.is_true(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{type = 'team', 'team exon'}),
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordTeam))
+			)
+
+			assert.is_true(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{
+					p1 = 'A Bai', p1flag = 'China',
+					type = 'solo',
+				}),
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordSoloWithSpace)
+			))
+
+			assert.is_true(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{
+					p1 = 'Semper', p1flag = 'Canada',
+					p2 = 'Jig', p2flag = 'Canada',
+					type = 'duo',
+				}),
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordDuo)
+			))
+
+			assert.is_true(Opponent.same(
+				Opponent.blank('literal'),
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordLiteral)
+			))
+
+			TeamTemplateMock.tearDown()
 		end)
 	end)
 
