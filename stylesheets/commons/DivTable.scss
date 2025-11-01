@@ -252,6 +252,10 @@ Author(s): iMarbot
 
 .gridTable.tournamentCard .gridCell.Placement.Qualified > .Participants {
 	flex-direction: row;
+
+	& > div {
+		flex-basis: 49%;
+	}
 }
 
 @media ( max-width: 1100px ) {
