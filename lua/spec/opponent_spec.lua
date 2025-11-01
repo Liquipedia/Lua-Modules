@@ -300,6 +300,7 @@ describe('opponent', function()
 				Opponent.resolve(Opponent.readOpponentArgs{
 					p1 = 'Faker', p1flag = 'South Korea',
 					p2 = 'Deft', p2flag = 'South Korea',
+					type = 'duo'
 				}),
 				Opponent.fromMatch2Record(Config.exampleMatch2RecordDuo)
 			))
@@ -319,6 +320,7 @@ describe('opponent', function()
 				Opponent.resolve(Opponent.readOpponentArgs{
 					p1 = 'Semper', p1flag = 'Canada',
 					p2 = 'Jig', p2flag = 'Canada',
+					type = 'duo',
 				}),
 				Opponent.fromMatch2Record(Config.exampleMatch2RecordDuo)
 			))
