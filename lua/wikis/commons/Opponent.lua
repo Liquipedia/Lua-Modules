@@ -247,7 +247,7 @@ function Opponent.same(opponent1, opponent2)
 		if Opponent.playerIsTbd(player) then
 			return
 		end
-		return player.pageName
+		return Page.pageifyLink(player.pageName)
 	end
 
 	return Array.equals(
