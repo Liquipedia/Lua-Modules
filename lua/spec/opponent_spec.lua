@@ -342,5 +342,5 @@ describe('opponent', function()
 		end)
 	end)
 
-	--not testing `resolve` due to missing team templates and lpdb dta
+	--not testing `resolve` due to missing team templates and lpdb data
 end)
