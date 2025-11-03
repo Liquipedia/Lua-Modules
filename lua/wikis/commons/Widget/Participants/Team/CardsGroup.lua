@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Participants/Team/CardGroup
+-- page=Module:Widget/Participants/Team/CardsGroup
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -35,7 +35,6 @@ function ParticipantsTeamCard:render()
 			}
 		end),
 	}
-
 end
 
 return ParticipantsTeamCard
