@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local TeamParticipantsRepository = Lua.import('Module:TeamParticipants/Repository')
 
 local Widget = Lua.import('Module:Widget')
@@ -31,7 +32,7 @@ function ParticipantsTeamCard:render()
 		analyticsName = 'Team participants card',
 		children = Array.map(participants, function(participant)
 			return HtmlWidgets.Div{
-				children = Opponent.toName(participant.opponent),
+				children = OpponentDisplay.BlockOpponent{opponent = participant.opponent},
 			}
 		end),
 	}
