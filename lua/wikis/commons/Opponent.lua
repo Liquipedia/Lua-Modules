@@ -232,7 +232,9 @@ end
 ---@param opponent2 standardOpponent
 ---@return boolean
 function Opponent.same(opponent1, opponent2)
-	if opponent1.type ~= opponent2.type then
+	if opponent1 == opponent2 then
+		return true
+	elseif opponent1.type ~= opponent2.type then
 		return false
 	elseif opponent1.type == Opponent.literal then
 		return opponent1.name == opponent2.name
