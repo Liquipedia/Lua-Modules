@@ -141,12 +141,12 @@ liquipedia.analytics = {
 
 	sendPageViewEvent: function() {
 		const categories = mw.config.get( 'wgCategories' ) || [];
-		const pageType = categories.map( ( category ) => categoryToPageTypeMap[ category ] ).filter( Boolean );
+		const pageTypes = categories.map( ( category ) => categoryToPageTypeMap[ category ] ).filter( Boolean );
 		liquipedia.analytics.track( PAGE_VIEW, {
 			referrer: getReferrerUrl(),
 			'referring domain': getReferrerDomain(),
 			categories: categories.filter( ( category ) => !category.startsWith( IGNORE_CATEGORY_PREFIX ) ),
-			'page type': pageType.length === 1 ? pageType[ 0 ] : null
+			'page type': pageTypes.length === 1 ? pageTypes[ 0 ] : null
 		} );
 	},
 
