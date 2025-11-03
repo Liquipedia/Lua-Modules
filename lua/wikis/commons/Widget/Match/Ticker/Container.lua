@@ -126,7 +126,7 @@ function MatchTickerContainer:render()
 						label = 'Show Countdown',
 						switchGroup = 'countdown',
 						storeValue = true,
-						css = {margin = '1rem 0'},
+						css = {margin = '1rem 0', ['justify-content'] = 'center'},
 					},
 					HtmlWidgets.Div{
 						attributes = {
