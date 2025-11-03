@@ -326,6 +326,14 @@ describe('opponent', function()
 
 			assert.is_true(Opponent.same(
 				Opponent.resolve(Opponent.readOpponentArgs{
+					p1 = 'A Bai', p1flag = 'China',
+					type = 'solo',
+				}),
+				Opponent.fromMatch2Record(Config.exampleMatch2RecordSoloWithUnderscore)
+			))
+
+			assert.is_true(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{
 					p1 = 'Semper', p1flag = 'Canada',
 					p2 = 'Jig', p2flag = 'Canada',
 					type = 'duo',
