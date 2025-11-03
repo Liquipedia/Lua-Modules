@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local TypeUtil = {}
@@ -18,7 +19,7 @@ end
 
 function TypeUtil.optional (typeSpec)
 	if type(typeSpec) == 'string' then
-		return Lua.import('Module:StringUtils').endsWith(typeSpec, '?')
+		return String.endsWith(typeSpec, '?')
 			and typeSpec
 			or typeSpec .. '?'
 	else
@@ -97,7 +98,7 @@ function TypeUtil.valueIsTypeNoTable (value, typeSpec)
 		elseif typeSpec == 'pagename' then
 			-- A pagename is a string, with first letter capitalized and may not contains spaces
 			return type(value) == 'string' and value:find('^%u') and not value:find(' ')
-		elseif Lua.import('Module:StringUtils').endsWith(typeSpec, '?') then
+		elseif String.endsWith(typeSpec, '?') then
 			return value == nil or TypeUtil.valueIsTypeNoTable(value, typeSpec:sub(1, -2))
 		elseif typeSpec == 'any' then
 			return true
