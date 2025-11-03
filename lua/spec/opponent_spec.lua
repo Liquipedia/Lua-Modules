@@ -308,6 +308,43 @@ describe('opponent', function()
 			TeamTemplateMock.tearDown()
 		end)
 
+		it('same team opponents', function ()
+			TeamTemplateMock.setUp()
+
+			assert.is_true(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{
+					template = 'sk telecom t1 orig',
+					type = 'team',
+				}),
+				Opponent.resolve(Opponent.readOpponentArgs{
+					template = 't1 2019',
+					type = 'team',
+				})
+			))
+			assert.is_true(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{
+					template = 'team liquid orig',
+					type = 'team',
+				}),
+				Opponent.resolve(Opponent.readOpponentArgs{
+					template = 'team liquid',
+					type = 'team',
+				})
+			))
+			assert.is_true(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{
+					template = 'mousesports',
+					type = 'team',
+				}, '2010-01-01'),
+				Opponent.resolve(Opponent.readOpponentArgs{
+					template = 'mouz',
+					type = 'team',
+				}, '2025-11-01')
+			))
+
+			TeamTemplateMock.tearDown()
+		end)
+
 		it('same opponents', function ()
 			TeamTemplateMock.setUp()
 
