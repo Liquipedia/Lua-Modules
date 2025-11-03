@@ -60,7 +60,9 @@ end
 function Array.equals(arr1, arr2)
 	assert(Array.isArray(arr1), 'arr1 is not an array')
 	assert(Array.isArray(arr2), 'arr2 is not an array')
-	if #arr1 ~= #arr2 then
+	if arr1 == arr2 then
+		return true
+	elseif #arr1 ~= #arr2 then
 		return false
 	end
 	for index = 1, #arr1 do

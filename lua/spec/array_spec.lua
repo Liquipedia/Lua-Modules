@@ -21,7 +21,11 @@ describe('array', function()
 			assert.is_true(Array.equals({}, {}))
 		end)
 		it('check array equality', function()
+			local a = {0, 1}
+
+			assert.is_true(Array.equals(a, a))
 			assert.is_false(Array.equals({0}, {0, 1}))
+			assert.is_true(Array.equals(a, {0, 1}))
 			assert.is_true(Array.equals(Array.range(1, 5), {1, 2, 3, 4, 5}))
 			assert.is_true(Array.equals({'a', 'b', 'c'}, {'a', 'b', 'c'}))
 		end)
