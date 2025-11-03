@@ -237,7 +237,15 @@ function Opponent.same(opponent1, opponent2)
 	elseif opponent1.type == Opponent.literal then
 		return opponent1.name == opponent2.name
 	elseif opponent1.type == Opponent.team then
-		return Opponent.toName(opponent1) == Opponent.toName(opponent2)
+		if opponent1.template == opponent2.template then
+			return true
+		end
+		local opponent1Name = Opponent.toName(opponent1)
+		local opponent2Name = Opponent.toName(opponent2)
+		if opponent1Name == opponent2Name then
+			return true
+		end
+		return TeamTemplate.getRaw(opponent1Name).historicaltemplate == TeamTemplate.getRaw(opponent2Name).historicaltemplate
 	end
 	-- opponent.type is a party type
 
