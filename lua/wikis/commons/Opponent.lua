@@ -542,4 +542,28 @@ function Opponent.playerFromLpdbStruct(players, playerIndex)
 	}
 end
 
+---@param opponent standardOpponent
+---@param options {resolveRedirect: boolean?}?
+---@return {participant: string, participantlink: string, participanttemplate: string?}
+function Opponent.toLegacyParticipantData(opponent, options)
+	local participant
+
+	if opponent.type == Opponent.team then
+		local teamTemplate = mw.ext.TeamTemplate.raw(opponent.template) or {}
+
+		participant = teamTemplate.page or ''
+		if options and options.resolveRedirect then
+			participant = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
+		end
+	else
+		participant = Opponent.toName(opponent)
+	end
+
+	return {
+		participant = participant,
+		participantlink = Opponent.toName(opponent),
+		participanttemplate = opponent.template,
+	}
+end
+
 return Opponent
