@@ -17,6 +17,7 @@ local Div = HtmlWidgets.Div
 ---@class ContentSwitchTab
 ---@field label string
 ---@field value string
+---@field content Widget
 
 ---@class ContentSwitchParameters
 ---@field tabs ContentSwitchTab[]
@@ -59,21 +60,42 @@ function ContentSwitch:render()
 		}
 	end)
 
+	local contentAreas = Array.map(tabs, function(tab, index)
+		local isActive = index == defaultActive
+		return Div{
+			attributes = {
+				['data-toggle-area-content'] = tostring(index),
+			},
+			classes = {isActive and 'toggle-area-content-active' or 'toggle-area-content-inactive'},
+			children = tab.content or {},
+		}
+	end)
+
 	local switchPillClasses = {'switch-pill'}
 	if variant == 'generic' then
 		table.insert(switchPillClasses, 'switch-pill-generic')
 	end
 
 	return Div{
-		classes = {'switch-pill-container'},
+		classes = {'toggle-area', 'toggle-area-1'},
+		attributes = {['data-toggle-area'] = '1'},
 		children = {
 			Div{
-				classes = switchPillClasses,
-				attributes = {
-					['data-switch-group'] = switchGroup,
-					['data-store-value'] = 'true',
+				classes = {'switch-pill-container'},
+				children = {
+					Div{
+						classes = switchPillClasses,
+						attributes = {
+							['data-switch-group'] = switchGroup,
+							['data-store-value'] = 'true',
+						},
+						children = tabOptions,
+					},
 				},
-				children = tabOptions,
+			},
+			Div{
+				classes = {'content-switch-content-container'},
+				children = contentAreas,
 			},
 		},
 	}

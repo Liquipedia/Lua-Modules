@@ -78,62 +78,64 @@ function MatchTickerContainer:render()
 	end
 
 	return HtmlWidgets.Div{
-		classes = {'toggle-area', 'toggle-area-1'},
-		attributes = {['data-toggle-area'] = '1'},
+		classes = {'match-section-header'},
 		children = {
-			HtmlWidgets.Div{
-				classes = {'match-section-header'},
-				children = {
-					ContentSwitch{
-						tabs = {
-							{label = 'Upcoming', value = 'upcoming'},
-							{label = 'Completed', value = 'completed'}
-						},
-						switchGroup = 'matchFiler',
-						defaultActive = 1,
-					}
-				},
-			},
-			HtmlWidgets.Div{
-				attributes = {
-					['data-switch-group-container'] = 'countdown',
-					['data-toggle-area-content'] = '1',
-				},
-				children = {
-					HtmlWidgets.Div{
-						classes = {'switch-toggle-container'},
-						css = {margin = '1rem 0'},
-						children = {
+			ContentSwitch{
+				tabs = {
+					{
+						label = 'Upcoming',
+						value = 'upcoming',
+						content = {
 							HtmlWidgets.Div{
-								classes = {'switch-toggle'},
 								attributes = {
-									['data-switch-group'] = 'countdown',
-									['data-store-value'] = 'true',
+									['data-switch-group-container'] = 'countdown',
 								},
 								children = {
-									HtmlWidgets.Div{classes = {'switch-toggle-slider'}},
-								},
-							},
-							HtmlWidgets.Div{children = 'Show Countdown'},
-						},
+									HtmlWidgets.Div{
+										classes = {'switch-toggle-container'},
+										css = {margin = '1rem 0'},
+										children = {
+											HtmlWidgets.Div{
+												classes = {'switch-toggle'},
+												attributes = {
+													['data-switch-group'] = 'countdown',
+													['data-store-value'] = 'true',
+												},
+												children = {
+													HtmlWidgets.Div{classes = {'switch-toggle-slider'}},
+												},
+											},
+											HtmlWidgets.Div{children = 'Show Countdown'},
+										},
+									},
+									HtmlWidgets.Div{
+										attributes = {
+											['data-filter-expansion-template'] = buildTemplateExpansionString('upcoming'),
+											['data-filter-groups'] = filterText,
+										},
+										children = callTemplate('upcoming'),
+									}
+								}
+							}
+						}
 					},
-					HtmlWidgets.Div{
-						attributes = {
-							['data-filter-expansion-template'] = buildTemplateExpansionString('upcoming'),
-							['data-filter-groups'] = filterText,
-						},
-						children = callTemplate('upcoming'),
+					{
+						label = 'Completed',
+						value = 'completed',
+						content = {
+							HtmlWidgets.Div{
+								attributes = {
+									['data-filter-expansion-template'] = buildTemplateExpansionString('recent'),
+									['data-filter-groups'] = filterText,
+								},
+								children = callTemplate('recent'),
+							}
+						}
 					}
-				}
-			},
-			HtmlWidgets.Div{
-				attributes = {
-					['data-toggle-area-content'] = '2',
-					['data-filter-expansion-template'] = buildTemplateExpansionString('recent'),
-					['data-filter-groups'] = filterText,
 				},
-				children = callTemplate('recent'),
-			},
+				switchGroup = 'matchFiler',
+				defaultActive = 1,
+			}
 		},
 	}
 end
