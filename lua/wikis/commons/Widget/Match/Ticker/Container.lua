@@ -121,22 +121,11 @@ function MatchTickerContainer:render()
 					['data-toggle-area-content'] = '1',
 				},
 				children = {
-					HtmlWidgets.Div{
-						classes = {'switch-toggle-container'},
+					Switch{
+						label = 'Show Countdown',
+						switchGroup = 'countdown',
+						storeValue = true,
 						css = {margin = '1rem 0'},
-						children = {
-							HtmlWidgets.Div{
-								classes = {'switch-toggle'},
-								attributes = {
-									['data-switch-group'] = 'countdown',
-									['data-store-value'] = 'true',
-								},
-								children = {
-									HtmlWidgets.Div{classes = {'switch-toggle-slider'}},
-								},
-							},
-							HtmlWidgets.Div{children = 'Show Countdown'},
-						},
 					},
 					HtmlWidgets.Div{
 						attributes = {
