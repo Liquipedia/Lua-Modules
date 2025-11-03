@@ -247,7 +247,8 @@ function Opponent.same(opponent1, opponent2)
 		if Opponent.playerIsTbd(player) then
 			return
 		end
-		return Page.pageifyLink(player.pageName)
+		-- Remove gsub once underscore storage is sorted out
+		return (player.pageName:gsub(' ', '_'))
 	end
 
 	return Array.equals(
