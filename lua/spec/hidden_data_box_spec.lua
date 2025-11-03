@@ -79,9 +79,9 @@ describe('hidden data box', function()
 
 		it('player wiki variables are correctly set', function()
 			Hdb.run{parent = 'Six_Lounge_Series/4'}
-			assert.are_equal('Xy_G', Variables.varDefault('BUTEO eSports_p7'))
-			assert.are_equal('xy_G', Variables.varDefault('BUTEO eSports_p7dn'))
-			assert.are_equal('Germany', Variables.varDefault('BUTEO eSports_p7flag'))
+			assert.are_equal('Xy_G', Variables.varDefault('BUTEO eSports_p5'))
+			assert.are_equal('xy_G', Variables.varDefault('BUTEO eSports_p5dn'))
+			assert.are_equal('Germany', Variables.varDefault('BUTEO eSports_p5flag'))
 		end)
 	end)
 end)
