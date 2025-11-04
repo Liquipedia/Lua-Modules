@@ -275,6 +275,11 @@ function Config.placementDropOffFunction(tier, tierType)
 		return function(score, placement) return 0 end
 	end
 
+	-- If for some reason the tier is not one of the defined ones return 0 for weight
+	if not Config.scoreRanges[tier] then
+		return function(score, placement) return 0 end
+	end
+
 	return function(score, placement)
         -- Workaround since in the main checker module the mode modifiers are applied before this function
 		local scoreForFirst = Config.scoreRanges[tier][1]
