@@ -8,27 +8,24 @@
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
-local Array = Lua.import('Module:Array')
-local FnUtil = Lua.import('Module:FnUtil')
-local Logic = Lua.import('Module:Logic')
-local Table = Lua.import('Module:Table')
+local Json = Lua.import('Module:Json')
 
-local StandingsParseWiki = Lua.import('Module:TeamParticipants/Parse/Wiki')
-local StandingsParseLpdb = Lua.import('Module:TeamParticipants/Parse/Lpdb')
-local StandingsParser = Lua.import('Module:TeamParticipants/Parser')
-local StandingsStorage = Lua.import('Module:TeamParticipants/Storage')
+local TeamParticipantsWikiParser = Lua.import('Module:TeamParticipants/Parse/Wiki')
+local TeamParticipantsRepository = Lua.import('Module:TeamParticipants/Repository')
 
-local StandingsDisplay = Lua.import('Module:Widget/Standings')
+local TeamParticipantsDisplay = Lua.import('Module:Widget/Participants/Team/CardsGroup')
 
 local TeamParticipantsController = {}
 
 ---@param frame Frame
 ---@return Widget
 function TeamParticipantsController.fromTemplate(frame)
-	local args = Arguments.getArgs(frame)
-
-	local parsedData = StandingsParseWiki.parseWikiInput(args)
-
+	local args = Json.parseStringified(Arguments.getArgs(frame))
+	local parsedData = TeamParticipantsWikiParser.parseWikiInput(args)
+	TeamParticipantsRepository.save(parsedData)
+	return TeamParticipantsDisplay{
+		pageName = mw.title.getCurrentTitle().text
+	}
 end
 
 return TeamParticipantsController

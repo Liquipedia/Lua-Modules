@@ -324,30 +324,35 @@ function Opponent.resolve(opponent, date, options)
 	if opponent.type == Opponent.team then
 		opponent.template = TeamTemplate.resolve(opponent.template, date) or opponent.template or 'tbd'
 		opponent.icon, opponent.icondark = TeamTemplate.getIcon(opponent.template)
-	elseif Opponent.typeIsParty(opponent.type) then
-		for _, player in ipairs(opponent.players) do
-			if options.syncPlayer then
-				local hasFaction = String.isNotEmpty(player.faction)
-				local savePageVar = not Opponent.playerIsTbd(player)
-				PlayerExt.syncPlayer(player, {
-					date = date,
-					savePageVar = savePageVar,
-					overwritePageVars = options.overwritePageVars,
-				})
-				player.team = PlayerExt.syncTeam(
-					player.pageName:gsub(' ', '_'),
-					player.team,
-					{date = date, savePageVar = savePageVar}
-				)
-				player.faction = (hasFaction or player.faction ~= Faction.defaultFaction) and player.faction or nil
-			else
-				PlayerExt.populatePageName(player)
-			end
-			if player.team then
-				player.team = TeamTemplate.resolve(player.team, date)
-			end
+	end
+
+	if not opponent.players then
+		return opponent
+	end
+
+	for _, player in ipairs(opponent.players) do
+		if options.syncPlayer then
+			local hasFaction = String.isNotEmpty(player.faction)
+			local savePageVar = not Opponent.playerIsTbd(player)
+			PlayerExt.syncPlayer(player, {
+				date = date,
+				savePageVar = savePageVar,
+				overwritePageVars = options.overwritePageVars,
+			})
+			player.team = PlayerExt.syncTeam(
+				player.pageName:gsub(' ', '_'),
+				player.team,
+				{date = date, savePageVar = savePageVar}
+			)
+			player.faction = (hasFaction or player.faction ~= Faction.defaultFaction) and player.faction or nil
+		else
+			PlayerExt.populatePageName(player)
+		end
+		if player.team then
+			player.team = TeamTemplate.resolve(player.team, date)
 		end
 	end
+
 	return opponent
 end
 
