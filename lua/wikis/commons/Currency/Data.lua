@@ -852,6 +852,15 @@ return {
 			text = '$',
 		},
 	},
+	uyu = {
+		code = 'UYU'
+		name = 'Uruguayan Peso'
+		synbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '$',
+		},
+	},
 	uzs = {
 		code = 'UZS',
 		name = 'Uzbekistani Som',
