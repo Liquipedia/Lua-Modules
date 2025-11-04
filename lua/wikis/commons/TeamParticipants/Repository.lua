@@ -33,7 +33,6 @@ local TeamParticipantsRepository = {}
 
 ---@param TeamParticipant table
 function TeamParticipantsRepository.save(TeamParticipant)
-	mw.logObject(TeamParticipant, 'Saving Team Participant')
 	-- Since we merge data from prizepool and teamparticipants, we need to first fetch the existing record from prizepool
 	local lpdbData = TeamParticipantsRepository.getPrizepoolRecordForTeam(TeamParticipant.opponentData) or {}
 

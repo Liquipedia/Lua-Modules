@@ -30,7 +30,6 @@ function TeamParticipantsWikiParser.parseWikiInput(args)
 end
 
 function TeamParticipantsWikiParser.parseOpponent(input, date)
-	mw.logObject(input, 'Parsing Team Participant Opponent')
 	local opponent = Opponent.readOpponentArgs(Table.merge(input, {
 		type = Opponent.team,
 	}))
