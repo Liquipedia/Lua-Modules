@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
 local Json = Lua.import('Module:Json')
 
 local TeamParticipantsWikiParser = Lua.import('Module:TeamParticipants/Parse/Wiki')
@@ -20,9 +21,10 @@ local TeamParticipantsController = {}
 ---@param frame Frame
 ---@return Widget
 function TeamParticipantsController.fromTemplate(frame)
-	local args = Json.parseStringified(Arguments.getArgs(frame))
-	local parsedData = TeamParticipantsWikiParser.parseWikiInput(args)
-	TeamParticipantsRepository.save(parsedData)
+	local args = Arguments.getArgs(frame)
+	local parsedArgs = Json.parseStringifiedArgs(args)
+	local parsedData = TeamParticipantsWikiParser.parseWikiInput(parsedArgs)
+	Array.forEach(parsedData.opponents, TeamParticipantsRepository.save)
 	return TeamParticipantsDisplay{
 		pageName = mw.title.getCurrentTitle().text
 	}

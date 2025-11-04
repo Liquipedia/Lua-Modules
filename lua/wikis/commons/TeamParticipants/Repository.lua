@@ -32,6 +32,7 @@ local TeamParticipantsRepository = {}
 
 ---@param TeamParticipant table
 function TeamParticipantsRepository.save(TeamParticipant)
+	mw.logObject(TeamParticipant, 'Saving Team Participant')
 	-- Since we merge data from prizepool and teamparticipants, we need to first fetch the existing record from prizepool
 	local lpdbData = TeamParticipantsRepository.getPrizepoolRecordForTeam(TeamParticipant.opponentData) or {}
 
@@ -59,11 +60,11 @@ function TeamParticipantsRepository.save(TeamParticipant)
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(TeamParticipant.opponentData))
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(TeamParticipant.opponentData))
 
-	local numberOfPlayersOnTeam = #(lpdbData.opponentData.players or {})
+	local numberOfPlayersOnTeam = #(TeamParticipant.opponentData.players or {})
 	if numberOfPlayersOnTeam == 0 then
 		numberOfPlayersOnTeam = 1
 	end
-	lpdbData.individualprizemoney = lpdbData.prizemoney / numberOfPlayersOnTeam
+	lpdbData.individualprizemoney = (lpdbData.prizemoney or 0) / numberOfPlayersOnTeam
 
 	-- TODO: Store aliases (page names) for opponents
 	-- TODO: Store page vars
@@ -71,7 +72,8 @@ function TeamParticipantsRepository.save(TeamParticipant)
 	lpdbData = Json.stringifySubTables(lpdbData)
 	lpdbData.opponentplayers = lpdbData.players -- TODO: Until this is included in Opponent
 
-	mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, lpdbData)
+	-- TODO: Object name
+	mw.ext.LiquipediaDB.lpdb_placement('foo_bar', lpdbData)
 end
 
 ---@param opponent standardOpponent

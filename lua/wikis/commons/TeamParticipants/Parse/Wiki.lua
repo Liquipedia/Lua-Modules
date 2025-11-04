@@ -10,11 +10,12 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local Table = Lua.import('Module:Table')
 
 local TeamParticipantsWikiParser = {}
 
 ---@param args table
----@return standardOpponent[]
+---@return {opponents: standardOpponent[]}
 function TeamParticipantsWikiParser.parseWikiInput(args)
 	local date = DateExt.readTimestamp(args.date) or DateExt.getContextualDateOrNow()
 
@@ -29,18 +30,18 @@ function TeamParticipantsWikiParser.parseWikiInput(args)
 end
 
 function TeamParticipantsWikiParser.parseOpponent(input, date)
-	-- TODO add players to readOpponentArgs
-	local opponent = Opponent.readOpponentArgs(input)
+	mw.logObject(input, 'Parsing Team Participant Opponent')
+	local opponent = Opponent.readOpponentArgs(Table.merge(input, {
+		type = Opponent.team,
+	}))
 	opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
 	opponent = Opponent.resolve(opponent, date, {syncPlayer = true})
 	return {
-		opponent = opponent,
+		opponentData = opponent,
 		qualifierText = input.qualifier,
 		qualifierPage = input.qualifierpage,
 		qualifierUrl = input.qualifierurl,
-		extradata = {
-			notes = input.notes,
-		},
+		notes = input.notes,
 	}
 end
 
