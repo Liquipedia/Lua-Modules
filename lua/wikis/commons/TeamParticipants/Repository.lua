@@ -20,6 +20,7 @@ local Variables = Lua.import('Module:Variables')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local prizePoolVars = PageVariableNamespace('PrizePool')
+local teamCardsVars = PageVariableNamespace('TeamCards')
 
 ---@class TeamParticipantsEntity
 ---@field pagename string
@@ -36,7 +37,26 @@ function TeamParticipantsRepository.save(TeamParticipant)
 	-- Since we merge data from prizepool and teamparticipants, we need to first fetch the existing record from prizepool
 	local lpdbData = TeamParticipantsRepository.getPrizepoolRecordForTeam(TeamParticipant.opponentData) or {}
 
+	local function generateObjectName()
+		local team = Opponent.toName(TeamParticipant.opponentData)
+		local isTbd = Opponent.isTbd(TeamParticipant.opponentData)
+
+		if not isTbd then
+			return 'ranking_' .. mw.ustring.lower(team)
+		end
+
+		-- Ensure names are unique for TBDs
+		local storageName = 'participant_' .. mw.ustring.lower(team)
+		local tbdCounter = tonumber(teamCardsVars:get('TBDs')) or 1
+
+		storageName = storageName .. '_' .. tbdCounter
+		teamCardsVars:set('TBDs', tbdCounter + 1)
+
+		return storageName
+	end
+
 	-- Use the tournament defaults if no data is provided from prizepool
+	lpdbData.objectName = lpdbData.objectName or generateObjectName()
 	lpdbData.tournament = lpdbData.tournament or Variables.varDefault('tournament_name')
 	lpdbData.parent = lpdbData.parent or Variables.varDefault('tournament_parent')
 	lpdbData.series = lpdbData.series or Variables.varDefault('tournament_series')
@@ -72,8 +92,7 @@ function TeamParticipantsRepository.save(TeamParticipant)
 	lpdbData = Json.stringifySubTables(lpdbData)
 	lpdbData.opponentplayers = lpdbData.players -- TODO: Until this is included in Opponent
 
-	-- TODO: Object name
-	mw.ext.LiquipediaDB.lpdb_placement('foo_bar', lpdbData)
+	mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, lpdbData)
 end
 
 ---@param opponent standardOpponent

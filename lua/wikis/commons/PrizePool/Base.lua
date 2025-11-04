@@ -876,7 +876,7 @@ function BasePrizePool:storeData()
 
 	for _, lpdbEntry in ipairs(lpdbData) do
 		lpdbEntry = Json.stringifySubTables(lpdbEntry)
-		local objectName = Table.extract(lpdbEntry, 'objectName')
+		local objectName = lpdbEntry.objectName
 
 		if self.options.storeLpdb then
 			mw.ext.LiquipediaDB.lpdb_placement(objectName, lpdbEntry)
