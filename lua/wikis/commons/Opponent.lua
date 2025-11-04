@@ -501,7 +501,7 @@ function Opponent.toLpdbStruct(opponent)
 end
 
 ---Reads a standings or placement lpdb structure and builds an opponent struct from it
----@param storageStruct table
+---@param storageStruct placement|standingsentry
 ---@return standardOpponent
 function Opponent.fromLpdbStruct(storageStruct)
 	local partySize = Opponent.partySize(storageStruct.opponenttype)
