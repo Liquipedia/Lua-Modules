@@ -31,6 +31,7 @@ function ParticipantsTeamCard:render()
 
 	return AnalyticsWidget{
 		analyticsName = 'Team participants card',
+		classes = { 'team-participant-cards' },
 		children = Array.map(participants, function(participant)
 			return Div{
 				classes = { 'team-participant-card' },
@@ -41,15 +42,15 @@ function ParticipantsTeamCard:render()
 							OpponentDisplay.BlockOpponent{
 								opponent = participant.opponent,
 								overflow = 'ellipsis',
-								teamStyle = 'icon',
+								teamStyle = 'hybrid',
 								additionalClasses = {'team-participant-card-header-opponent'},
 							},
 							Div{
 								classes = { 'team-participant-card-header-label' },
-								children = {
-									participant.qualifierText and HtmlWidgets.Span{
+								children = participant.qualifierText and {
+									HtmlWidgets.Span{
 										participant.qualifierText
-									} or nil
+									}
 								}
 							},
 							Div{
