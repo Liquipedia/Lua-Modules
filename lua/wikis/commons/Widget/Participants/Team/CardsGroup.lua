@@ -44,10 +44,6 @@ function ParticipantsTeamCard:render()
 							['data-component'] = "team-participant-card-collapsible-button"
 						},
 						children = {
-							Div{
-								classes = { 'team-participant-card-header-icon' },
-								children = { IconFa{iconName = 'collapse'}, }
-							},
 							OpponentDisplay.BlockOpponent{
 								opponent = participant.opponent,
 								overflow = 'ellipsis',
@@ -63,6 +59,10 @@ function ParticipantsTeamCard:render()
 										}
 									}
 								}
+							},
+							Div{
+								classes = { 'team-participant-card-header-icon' },
+								children = { IconFa{iconName = 'collapse'}, }
 							}
 						}
 					}
@@ -72,7 +72,7 @@ function ParticipantsTeamCard:render()
 						attributes = {
 							['data-component'] = 'team-participant-card-content'
 						},
-						children = { participant.opponent.name .. ' content' } -- Team details & roster here
+						children = { 'content' } -- Team details & roster here
 					}
 
 					return Div{
