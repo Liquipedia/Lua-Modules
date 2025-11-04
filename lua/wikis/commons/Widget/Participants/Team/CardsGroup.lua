@@ -44,14 +44,14 @@ function ParticipantsTeamCard:render()
 									OpponentDisplay.BlockOpponent{
 										opponent = participant.opponent,
 										overflow = 'ellipsis',
-										teamStyle = 'hybrid',
+										teamStyle = 'standard',
 										additionalClasses = {'team-participant-card-header-opponent', 'team-participant-square-icon'},
 									},
 									Div{
 										classes = { 'team-participant-card-header-label' },
-										children = participant.qualifierText and {
+										children = {
 											HtmlWidgets.Span{
-												participant.qualifierText
+												participant.qualifierText and participant.qualifierText ~= '' and 'Qualified' or 'Invited'
 											}
 										}
 									},
