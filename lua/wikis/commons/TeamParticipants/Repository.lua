@@ -9,13 +9,17 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Condition = Lua.import('Module:Condition')
+local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Lpdb = Lua.import('Module:Lpdb')
 local Page = Lua.import('Module:Page')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
+
+local prizePoolVars = PageVariableNamespace('PrizePool')
 
 ---@class TeamParticipantsEntity
 ---@field pagename string
@@ -28,50 +32,63 @@ local TeamParticipantsRepository = {}
 
 ---@param TeamParticipant table
 function TeamParticipantsRepository.save(TeamParticipant)
-	local lpdbData = {
-		objectName = '', -- TODO
+	-- Since we merge data from prizepool and teamparticipants, we need to first fetch the existing record from prizepool
+	local lpdbData = TeamParticipantsRepository.getPrizepoolRecordForTeam(TeamParticipant.opponentData) or {}
 
-		tournament = Variables.varDefault('tournament_name'),
-		parent = Variables.varDefault('tournament_parent'),
-		series = Variables.varDefault('tournament_series'),
-		shortname = Variables.varDefault('tournament_tickername'),
-		mode = Variables.varDefault('tournament_mode'),
-		type = Variables.varDefault('tournament_type'),
-		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
-		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
-		publishertier = Variables.varDefault('tournament_publishertier'),
-		icon = Variables.varDefault('tournament_icon'),
-		icondark = Variables.varDefault('tournament_icondark'),
-		game = Variables.varDefault('tournament_game'),
-		startdate = Variables.varDefault('tournament_startdate'),
+	-- Use the tournament defaults if no data is provided from prizepool
+	lpdbData.tournament = lpdbData.tournament or Variables.varDefault('tournament_name')
+	lpdbData.parent = lpdbData.parent or Variables.varDefault('tournament_parent')
+	lpdbData.series = lpdbData.series or Variables.varDefault('tournament_series')
+	lpdbData.shortname = lpdbData.shortname or Variables.varDefault('tournament_tickername')
+	lpdbData.mode = lpdbData.mode or Variables.varDefault('tournament_mode')
+	lpdbData.type = lpdbData.type or Variables.varDefault('tournament_type')
+	lpdbData.liquipediatier = lpdbData.liquipediatier or Variables.varDefault('tournament_liquipediatier')
+	lpdbData.liquipediatiertype = lpdbData.liquipediatiertype or Variables.varDefault('tournament_liquipediatiertype')
+	lpdbData.publishertier = lpdbData.publishertier or Variables.varDefault('tournament_publishertier')
+	lpdbData.icon = lpdbData.icon or Variables.varDefault('tournament_icon')
+	lpdbData.icondark = lpdbData.icondark or Variables.varDefault('tournament_icondark')
+	lpdbData.game = lpdbData.game or Variables.varDefault('tournament_game')
+	lpdbData.startdate = lpdbData.startdate or Variables.varDefault('tournament_startdate')
+	lpdbData.date = lpdbData.date or Variables.varDefault('tournament_enddate')
 
-		date = TeamParticipant.finalDate or Variables.varDefault('tournament_enddate'),
-
-		opponentname = Variables.varDefault('tournament_opponentname'),
-		opponenttemplate = Variables.varDefault('tournament_opponenttemplate'),
-		opponenttype = Variables.varDefault('tournament_opponenttype'),
-		opponentplayers = Variables.varDefault('tournament_opponentplayers'),
-		qualifier = Variables.varDefault('tournament_qualifier'),
-		qualifierpage = Variables.varDefault('tournament_qualifierpage'),
-		qualifierurl = Variables.varDefault('tournament_qualifierurl'),
-		extradata = {},
-	}
+	lpdbData.qualifier = TeamParticipant.qualifierText
+	lpdbData.qualifierpage = TeamParticipant.qualifierPage
+	lpdbData.qualifierurl = TeamParticipant.qualifierUrl
+	lpdbData.extradata = lpdbData.extradata or {}
 
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(TeamParticipant.opponentData))
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(TeamParticipant.opponentData))
 
-	-- TODO: individual prize money
+	local numberOfPlayersOnTeam = #(lpdbData.players or {})
+	if numberOfPlayersOnTeam == 0 then
+		numberOfPlayersOnTeam = 1
+	end
+	lpdbData.individualprizemoney = lpdbData.prizemoney / numberOfPlayersOnTeam
 
-	-- TODO: If a custom override for LPDB exists, use it
+	-- TODO: Store aliases (page names) for opponents
+	-- TODO: Store page vars
 
-	-- TODO: Store aliases (page names) for opponents for setting page vars
-
-	-- TODO: Qualifier storing
 	lpdbData = Json.stringifySubTables(lpdbData)
 	lpdbData.opponentplayers = lpdbData.players -- TODO: Until this is included in Opponent
 
 	mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, lpdbData)
 end
+
+---@param opponent standardOpponent
+---@return placement?
+function TeamParticipantsRepository.getPrizepoolRecordForTeam(opponent)
+	local prizepoolRecords = TeamParticipantsRepository.getPrizepoolRecords()
+	return Array.find(prizepoolRecords, function(record)
+		return Opponent.same(opponent, Opponent.fromLpdbStruct(record.opponent))
+	end)
+end
+
+---@return placement[]
+TeamParticipantsRepository.getPrizepoolRecords = FnUtil.memoize(function()
+	return Array.flatten(Array.mapIndexes(function(prizePoolIndex)
+		return Json.parseIfString(prizePoolVars:get('placementRecords.' .. prizePoolIndex))
+	end))
+end)
 
 ---@param pageName string
 ---@return TeamParticipantsEntity[]
