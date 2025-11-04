@@ -34,6 +34,30 @@ describe('opponent', function()
 		end)
 	end)
 
+	describe('is opponent', function()
+		it('check', function()
+			TeamTemplateMock.setUp()
+			assert.is_true(Opponent.isOpponent(Opponent.blank(Opponent.solo)))
+			assert.is_true(Opponent.isOpponent(Opponent.blank(Opponent.duo)))
+			assert.is_true(Opponent.isOpponent(Opponent.tbd(Opponent.team)))
+			assert.is_true(Opponent.isOpponent(Opponent.blank(Opponent.literal)))
+			assert.is_true(Opponent.isOpponent(Opponent.fromMatch2Record(Config.exampleMatch2RecordSolo)))
+			assert.is_true(Opponent.isOpponent(Opponent.resolve(Opponent.readOpponentArgs{
+				p1 = 'Semper', p1flag = 'Canada',
+				p2 = 'Jig', p2flag = 'Canada',
+				type = 'duo',
+			})))
+			assert.is_true(Opponent.isOpponent(Opponent.resolve(Opponent.readOpponentArgs{
+				template = 'tl',
+				type = 'team',
+			})))
+
+			assert.is_false(Opponent.isOpponent({}))
+			assert.is_false(Opponent.isOpponent({1, 2, 3}))
+			TeamTemplateMock.tearDown()
+		end)
+	end)
+
 	describe('blank opponent', function()
 		it('check', function()
 			assert.are_same(Config.blankSolo, Opponent.blank(Opponent.solo))

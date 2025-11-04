@@ -79,6 +79,7 @@ Opponent.types.Player = TypeUtil.struct({
 Opponent.types.TeamOpponent = TypeUtil.struct({
 	template = 'string',
 	type = TypeUtil.literal(Opponent.team),
+	players = TypeUtil.optional(TypeUtil.array(Opponent.types.Player)),
 })
 
 Opponent.types.PartyOpponent = TypeUtil.struct({
@@ -224,7 +225,7 @@ end
 ---@param opponent any
 ---@return boolean
 function Opponent.isOpponent(opponent)
-	error('Opponent.isOpponent: Not Implemented')
+	return #TypeUtil.checkValue(opponent, Opponent.types.Opponent) == 0
 end
 
 ---Check if two opponents are the same opponent
