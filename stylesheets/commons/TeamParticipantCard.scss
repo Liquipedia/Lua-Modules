@@ -1,7 +1,23 @@
 .team-participant-cards {
-	display: flex;
+	display: grid;
 	gap: 0.625rem;
-	flex-wrap: wrap;
+	grid-template-columns: 1fr;
+
+	@media ( min-width: 768px ) {
+		grid-template-columns: repeat( 2, 1fr );
+	}
+
+	@media ( min-width: 1024px ) {
+		grid-template-columns: repeat( 3, 1fr );
+	}
+
+	@media ( min-width: 1319px ) {
+		grid-template-columns: repeat( 4, 1fr );
+	}
+
+	@media ( min-width: 1920px ) {
+		grid-template-columns: repeat( 5, 1fr );
+	}
 }
 
 .team-participant-card {
@@ -13,7 +29,6 @@
 	background-color: var( --clr-secondary-100, rgba( 255, 255, 255, 1 ) );
 	border: 1px solid var( --clr-on-surface-light-primary-8, rgba( 0, 0, 0, 0.08 ) );
 	padding: 0.5rem 0;
-	min-width: 308px;
 
 	&-header {
 		display: flex;
@@ -55,19 +70,29 @@
 		}
 	}
 }
-
 /* Square participant icons */
 .team-participant-square-icon .team-template-image-icon {
 	width: 48px;
 	height: 48px;
 	line-height: 48px;
 	text-align: center;
-}
 
-.team-participant-square-icon .team-template-image-icon img {
-	max-width: 40px;
-	max-height: 40px;
-	width: auto;
-	height: auto;
-	vertical-align: middle;
+	@media ( max-width: 767px ) {
+		width: 36px;
+		height: 36px;
+		line-height: 36px;
+	}
+
+	img {
+		max-width: 40px;
+		max-height: 40px;
+		width: auto;
+		height: auto;
+		vertical-align: middle;
+
+		@media ( max-width: 767px ) {
+			max-width: 32px;
+			max-height: 32px;
+		}
+	}
 }

@@ -51,7 +51,9 @@ function ParticipantsTeamCard:render()
 										classes = { 'team-participant-card-header-label' },
 										children = {
 											HtmlWidgets.Span{
-												participant.qualifierText and participant.qualifierText ~= '' and 'Qualified' or 'Invited'
+												children = {
+													participant.qualifierText and participant.qualifierText ~= '' and 'Qualified' or 'Invited'
+												}
 											}
 										}
 									},
