@@ -37,6 +37,7 @@ function ParticipantsTeamCard:render()
 				children = Array.map(participants, function(participant, index)
 					local boxId = self.props.pageName .. '-participant-' .. index
 
+					-- TODO: Implement the non-compact version
 					local header = Div{
 						classes = { 'team-participant-card-header' },
 						attributes = {
@@ -44,12 +45,14 @@ function ParticipantsTeamCard:render()
 							['data-component'] = "team-participant-card-collapsible-button"
 						},
 						children = {
+							-- TODO: Figure out flag rendering
 							OpponentDisplay.BlockOpponent{
 								opponent = participant.opponent,
 								overflow = 'ellipsis',
 								teamStyle = 'standard',
 								additionalClasses = {'team-participant-card-header-opponent', 'team-participant-square-icon'},
 							},
+							-- TODO: Implement the label text logic properly and TBD coloring
 							Div{
 								classes = { 'team-participant-card-header-label' },
 								children = {
@@ -67,6 +70,7 @@ function ParticipantsTeamCard:render()
 						}
 					}
 
+					-- TODO: Implement qualifier box, roster functionality & notes
 					local content = Div{
 						classes = { 'team-participant-card-collapsible-content' },
 						attributes = {
