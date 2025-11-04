@@ -34,36 +34,54 @@ function ParticipantsTeamCard:render()
 		children = {
 			Div{
 				classes = { 'team-participant-cards' },
-				children = Array.map(participants, function(participant)
-					return Div{
-						classes = { 'team-participant-card' },
+				children = Array.map(participants, function(participant, index)
+					local boxId = self.props.pageName .. '-participant-' .. index
+
+					local header = Div{
+						classes = { 'team-participant-card-header' },
+						attributes = {
+							tabindex = "0",
+							['data-component'] = "team-participant-card-collapsible-button"
+						},
 						children = {
 							Div{
-								classes = { 'team-participant-card-header' },
+								classes = { 'team-participant-card-header-icon' },
+								children = { IconFa{iconName = 'collapse'}, }
+							},
+							OpponentDisplay.BlockOpponent{
+								opponent = participant.opponent,
+								overflow = 'ellipsis',
+								teamStyle = 'standard',
+								additionalClasses = {'team-participant-card-header-opponent', 'team-participant-square-icon'},
+							},
+							Div{
+								classes = { 'team-participant-card-header-label' },
 								children = {
-									OpponentDisplay.BlockOpponent{
-										opponent = participant.opponent,
-										overflow = 'ellipsis',
-										teamStyle = 'standard',
-										additionalClasses = {'team-participant-card-header-opponent', 'team-participant-square-icon'},
-									},
-									Div{
-										classes = { 'team-participant-card-header-label' },
+									HtmlWidgets.Span{
 										children = {
-											HtmlWidgets.Span{
-												children = {
-													participant.qualifierText and participant.qualifierText ~= '' and 'Qualified' or 'Invited'
-												}
-											}
+											participant.qualifierText and participant.qualifierText ~= '' and 'Qualified' or 'Invited'
 										}
-									},
-									Div{
-										classes = { 'team-participant-card-header-icon' },
-										children = { IconFa{iconName = 'collapse'}, }
 									}
 								}
 							}
 						}
+					}
+
+					local content = Div{
+						classes = { 'team-participant-card-collapsible-content' },
+						attributes = {
+							['data-component'] = 'team-participant-card-content'
+						},
+						children = { participant.opponent.name .. ' content' } -- Team details & roster here
+					}
+
+					return Div{
+						classes = { 'team-participant-card' },
+						attributes = {
+							['data-component'] = 'team-participant-card',
+							['data-team-participant-card-id'] = boxId
+						},
+						children = { header, content }
 					}
 				end),
 			}
@@ -72,3 +90,4 @@ function ParticipantsTeamCard:render()
 end
 
 return ParticipantsTeamCard
+

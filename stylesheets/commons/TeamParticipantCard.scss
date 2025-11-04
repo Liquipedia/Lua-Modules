@@ -28,7 +28,17 @@
 	border-radius: 0.5rem;
 	background-color: var( --clr-secondary-100, rgba( 255, 255, 255, 1 ) );
 	border: 1px solid var( --clr-on-surface-light-primary-8, rgba( 0, 0, 0, 0.08 ) );
-	padding: 0.5rem 0;
+	padding: 0;
+
+	&.is--collapsed {
+		.team-participant-card-header-icon {
+			transform: rotate( 180deg );
+		}
+
+		.team-participant-card-collapsible-content {
+			display: none;
+		}
+	}
 
 	&-header {
 		display: flex;
@@ -36,6 +46,7 @@
 		align-items: center;
 		align-self: stretch;
 		padding: 0 0.5rem;
+		cursor: pointer;
 
 		&-opponent {
 			display: flex;
@@ -68,6 +79,11 @@
 			transform-origin: center;
 			transition: transform 0.2s linear;
 		}
+	}
+
+	&-collapsible-content {
+		// Add any specific styling for the collapsible content here if needed
+		padding: 0 0.5rem 0.5rem;
 	}
 }
 /* Square participant icons */
