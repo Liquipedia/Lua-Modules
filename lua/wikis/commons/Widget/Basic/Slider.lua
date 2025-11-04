@@ -27,8 +27,8 @@ local Div = HtmlWidgets.Div
 ---@class SliderWidget: Widget
 ---@operator call(SliderWidgetParameters): SliderWidget
 ---@field props SliderWidgetParameters
-
 local Slider = Class.new(Widget)
+
 ---@return Widget
 function Slider:render()
 	assert(self.props.id, 'Slider requires a unique id property')

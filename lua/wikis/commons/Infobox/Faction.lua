@@ -58,7 +58,7 @@ function FactionInfobox:createInfobox()
 		self:setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Faction')
 end
 
 ---@param args table

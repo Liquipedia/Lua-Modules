@@ -103,7 +103,7 @@ function Building:createInfobox()
 		self:setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Building')
 end
 
 ---@param args table

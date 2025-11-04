@@ -78,7 +78,7 @@ function Manufacturer:createInfobox()
 		self:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Manufacturer')
 end
 
 ---@param args table

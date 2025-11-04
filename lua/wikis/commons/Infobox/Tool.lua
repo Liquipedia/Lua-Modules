@@ -57,7 +57,7 @@ function Tool:createInfobox()
 		self:categories('Tools', unpack(self:getWikiCategories(args)))
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Tool')
 end
 
 --- Allows for overriding this functionality

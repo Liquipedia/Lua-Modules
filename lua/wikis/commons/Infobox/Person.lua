@@ -199,7 +199,7 @@ function Person:createInfobox()
 
 	self:_definePageVariables(args)
 
-	return self:build(widgets)
+	return self:build(widgets, 'Person')
 end
 
 function Person:_parseArgs()

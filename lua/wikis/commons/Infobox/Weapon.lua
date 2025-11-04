@@ -151,7 +151,7 @@ function Weapon:createInfobox()
 		self:setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Weapon')
 end
 
 ---@param location string?

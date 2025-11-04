@@ -10,9 +10,26 @@ const WIKI_SWITCHED = 'Wiki switched';
 const SEARCH_PERFORMED = 'Page searched';
 const BUTTON_CLICKED = 'Button clicked';
 const MATCH_POPUP_OPENED = 'Match popup opened';
+const INFO_BANNER_CLOSED = 'Info banner closed';
 
 // Constants
 const IGNORE_CATEGORY_PREFIX = 'Pages ';
+const TOC = 'ToC';
+const SIDEBAR = 'sidebar';
+const INLINE = 'inline';
+const INFOBANNER = 'InfoBanner';
+
+// Mapping from category name to page type
+const categoryToPageTypeMap = {
+	Players: 'player',
+	Teams: 'team',
+	Tournaments: 'tournament',
+	Matches: 'match',
+	'Tournament series': 'series',
+	Maps: 'map',
+	Characters: 'character',
+	Units: 'unit'
+};
 
 // Statically defined properties
 const getPageDomain = () => window.location.origin;
@@ -25,6 +42,62 @@ const getReferrerDomain = () => document.referrer ? new URL( document.referrer )
 const getWikiId = () => mw.config.get( 'wgScriptPath' )?.slice( 1 );
 
 liquipedia.analytics = {
+	customPropertyFinders: {
+		/********************************************************************
+		 * A registry of functions to find component-specific properties.
+		 * Each key matches a `data-analytics-name` value.
+		 *******************************************************************/
+		InfoBanner: function( element ) {
+			return {
+				'info banner id': element.dataset.id
+			};
+		},
+
+		Infobox: function( element, analyticsElement ) {
+			const parentDiv = element.parentElement;
+			if ( !parentDiv ) {
+				return;
+			}
+
+			const previousSibling = parentDiv.previousElementSibling;
+			if ( previousSibling && previousSibling.classList.contains( 'infobox-description' ) ) {
+				return {
+					'infobox section': previousSibling.innerText.trim()
+				};
+			}
+
+			const allHeaders = analyticsElement.querySelectorAll( '.infobox-header' );
+			let closestHeader = null;
+
+			for ( let i = allHeaders.length - 1; i >= 0; i-- ) {
+				const header = allHeaders[ i ];
+				// eslint-disable-next-line no-bitwise
+				if ( header.compareDocumentPosition( element ) & Node.DOCUMENT_POSITION_FOLLOWING ) {
+					closestHeader = header;
+					break;
+				}
+			}
+
+			if ( closestHeader ) {
+				return {
+					'infobox section': closestHeader.innerText.trim()
+				};
+			}
+		},
+
+		ToC: function( tocElement ) {
+			if ( tocElement.id === 'sidebar-toc' ) {
+				return {
+					'ToC position': SIDEBAR
+				};
+			} else {
+				return {
+					'ToC position': INLINE
+				};
+			}
+		}
+	},
+
 	clickTrackers: [],
 
 	init: function() {
@@ -36,6 +109,7 @@ liquipedia.analytics = {
 		liquipedia.analytics.setupSearchAnalytics();
 		liquipedia.analytics.setupSearchFormSubmitAnalytics();
 		liquipedia.analytics.setupMatchPopupAnalytics();
+		liquipedia.analytics.setupInfoBannerAnalytics();
 
 		document.body.addEventListener( 'click', ( event ) => {
 			for ( const tracker of liquipedia.analytics.clickTrackers ) {
@@ -50,6 +124,10 @@ liquipedia.analytics = {
 	},
 
 	track: function( eventName, properties ) {
+		// amplitude is blocked, either by user choice or by an adblocker
+		if ( !window.amplitude ) {
+			return;
+		}
 		window.amplitude.track( eventName, {
 			'page domain': getPageDomain(),
 			'page location': getPageLocation(),
@@ -63,18 +141,51 @@ liquipedia.analytics = {
 
 	sendPageViewEvent: function() {
 		const categories = mw.config.get( 'wgCategories' ) || [];
+		const pageTypes = categories.map( ( category ) => categoryToPageTypeMap[ category ] ).filter( Boolean );
 		liquipedia.analytics.track( PAGE_VIEW, {
 			referrer: getReferrerUrl(),
 			'referring domain': getReferrerDomain(),
-			categories: categories.filter( ( category ) => !category.startsWith( IGNORE_CATEGORY_PREFIX ) )
+			categories: categories.filter( ( category ) => !category.startsWith( IGNORE_CATEGORY_PREFIX ) ),
+			'page type': pageTypes.length === 1 ? pageTypes[ 0 ] : null
 		} );
 	},
 
-	findLinkPosition: function( element ) {
+	getAnalyticsContextElement: function( element ) {
 		const analyticsElement = element.closest( '[data-analytics-name]' );
 		if ( analyticsElement ) {
-			return analyticsElement.dataset.analyticsName;
+			const name = analyticsElement.dataset.analyticsName;
+			return {
+				type: 'component',
+				element: analyticsElement,
+				name,
+				position: name
+			};
 		}
+
+		// check if element is inside table of contents, as we don't have a clean way
+		// to set the data-analytics-name attribute for table of contents
+		const tocElement = element.closest( '#sidebar-toc, #toc' );
+		if ( tocElement ) {
+			return {
+				type: 'toc',
+				element: tocElement,
+				name: TOC,
+				position: TOC
+			};
+		}
+
+		// check if element is inside info banner, as we don't have a clean way
+		// to set the data-analytics-name attribute for info banners
+		const infoBannerElement = element.closest( '.network-notice' );
+		if ( infoBannerElement ) {
+			return {
+				type: 'infobanner',
+				element: infoBannerElement,
+				name: INFOBANNER,
+				position: 'info banner'
+			};
+		}
+
 		const walker = document.createTreeWalker(
 			document.body,
 			NodeFilter.SHOW_ELEMENT,
@@ -84,12 +195,100 @@ liquipedia.analytics = {
 		);
 		walker.currentNode = element;
 		const headingNode = walker.previousNode();
-		if ( !headingNode ) {
-			return null;
+
+		if ( headingNode ) {
+			const clone = headingNode.cloneNode( true );
+			clone.querySelector( '.mw-editsection' )?.remove();
+			const name = clone.textContent.trim();
+			return {
+				type: 'heading',
+				element: headingNode,
+				name,
+				position: name
+			};
 		}
-		const clone = headingNode.cloneNode( true );
-		clone.querySelector( '.mw-editsection' )?.remove();
-		return clone.textContent.trim();
+
+		return { type: 'none', element: null, name: null, position: null };
+	},
+
+	findLinkPosition: function( element ) {
+		const context = liquipedia.analytics.getAnalyticsContextElement( element );
+		return context.position;
+	},
+
+	// Converts a camelCase dataset key into a human-readable property name like
+	// 'analyticsInfoboxType' into 'infobox type'.
+	formatAnalyticsKey: function( key ) {
+		const baseName = key.replace( /^analytics/, '' );
+		const withSpaces = baseName.replace( /([A-Z])/g, ' $1' );
+		const trimmed = withSpaces.trim();
+
+		if ( !trimmed ) {
+			return '';
+		}
+
+		return trimmed.toLowerCase();
+	},
+
+	getDatasetAnalyticsProperties: function( dataset ) {
+		const properties = {};
+		Object.entries( dataset )
+			.filter( ( [ key ] ) => key.startsWith( 'analytics' ) && key !== 'analyticsName' )
+			.forEach( ( [ key, value ] ) => {
+				const propertyName = liquipedia.analytics.formatAnalyticsKey( key );
+				properties[ propertyName ] = value || null;
+			} );
+		return properties;
+	},
+
+	addCustomProperties: function( element ) {
+		const context = liquipedia.analytics.getAnalyticsContextElement( element );
+		let customProperties = {};
+
+		if ( context.type === 'component' ) {
+			customProperties = liquipedia.analytics.getDatasetAnalyticsProperties( context.element.dataset );
+		}
+
+		if ( context.name ) {
+			const customFinder = liquipedia.analytics.customPropertyFinders[ context.name ];
+
+			if ( typeof customFinder === 'function' ) {
+				const finderProperties = customFinder( context.element, element );
+
+				customProperties = { ...customProperties, ...finderProperties };
+			}
+		}
+
+		return customProperties;
+	},
+
+	setupLinkClickAnalytics: function() {
+		liquipedia.analytics.clickTrackers.push( {
+			selector: 'a',
+			trackerName: LINK_CLICKED,
+			propertiesBuilder: ( link ) => {
+				const properties = {
+					title: link.innerText,
+					position: liquipedia.analytics.findLinkPosition( link ),
+					destination: link.href
+				};
+
+				const customProperties = liquipedia.analytics.addCustomProperties( link );
+
+				return { ...properties, ...customProperties };
+			}
+		} );
+	},
+
+	setupButtonClickAnalytics: function() {
+		liquipedia.analytics.clickTrackers.push( {
+			selector: '.btn:not(a *), button:not(a *)',
+			trackerName: BUTTON_CLICKED,
+			propertiesBuilder: ( link ) => ( {
+				title: link.innerText,
+				position: liquipedia.analytics.findLinkPosition( link )
+			} )
+		} );
 	},
 
 	setupWikiMenuLinkClickAnalytics: function() {
@@ -102,29 +301,6 @@ liquipedia.analytics = {
 				destination: wikiMenuLink.href,
 				'trending page': false,
 				'trending position': null
-			} )
-		} );
-	},
-
-	setupLinkClickAnalytics: function() {
-		liquipedia.analytics.clickTrackers.push( {
-			selector: 'a',
-			trackerName: LINK_CLICKED,
-			propertiesBuilder: ( link ) => ( {
-				title: link.innerText,
-				position: liquipedia.analytics.findLinkPosition( link ),
-				destination: link.href
-			} )
-		} );
-	},
-
-	setupButtonClickAnalytics: function() {
-		liquipedia.analytics.clickTrackers.push( {
-			selector: '.btn:not(a *), button:not(a *)',
-			trackerName: BUTTON_CLICKED,
-			propertiesBuilder: ( link ) => ( {
-				title: link.innerText,
-				position: liquipedia.analytics.findLinkPosition( link )
 			} )
 		} );
 	},
@@ -196,6 +372,17 @@ liquipedia.analytics = {
 					participants,
 					type: containerType
 				};
+			}
+		} );
+	},
+
+	setupInfoBannerAnalytics: function() {
+		liquipedia.analytics.clickTrackers.push( {
+			selector: '.network-notice__close-button',
+			trackerName: INFO_BANNER_CLOSED,
+			propertiesBuilder: ( closeButton ) => {
+				const infoBannerElement = closeButton.closest( '.network-notice' );
+				return liquipedia.analytics.customPropertyFinders.InfoBanner( infoBannerElement );
 			}
 		} );
 	}

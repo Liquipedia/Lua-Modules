@@ -59,7 +59,7 @@ function Cosmetic:createInfobox()
 		self:setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Cosmetic')
 end
 
 ---@param args table

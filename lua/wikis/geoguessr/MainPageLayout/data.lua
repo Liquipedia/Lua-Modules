@@ -48,7 +48,7 @@ local CONTENT = {
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
-		boxid = 1511,
+		boxid = 1516,
 	},
 	filterButtons = {
 		noPanel = true,

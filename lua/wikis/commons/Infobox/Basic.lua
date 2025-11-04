@@ -100,14 +100,16 @@ function BasicInfobox:getAllArgsForBase(args, base, options)
 end
 
 ---@param widgets Widget[]
+---@param infoboxType string?
 ---@return string
-function BasicInfobox:build(widgets)
+function BasicInfobox:build(widgets, infoboxType)
 	local infobox = Infobox{
 		gameName = self.wiki,
 		forceDarkMode = Logic.readBool(self.args.darkmodeforced),
 		bottomContent = self.bottomContent,
 		warnings = self.warnings,
 		children = widgets,
+		infoboxType = infoboxType,
 	}
 	if self.injector then
 		-- Customizable backwards compatibility

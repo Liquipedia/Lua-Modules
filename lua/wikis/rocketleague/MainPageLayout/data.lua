@@ -34,11 +34,7 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{
-			transferPortal = 'Transfers',
-			transferPage = MainPageLayoutUtil.getQuarterlyTransferPage(),
-			rumours = true
-		},
+		body = TransfersList{rumours = true},
 		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
 	thisDay = {
@@ -57,6 +53,7 @@ local CONTENT = {
 	},
 	rating = {
 		heading = 'Liquipedia Rating',
+		boxid = 1520,
 		body = HtmlWidgets.Fragment{
 			children = {
 				RatingsDisplay.graph{id = 'rating'},

@@ -195,7 +195,7 @@ function Team:createInfobox()
 	-- Store Wiki-variables
 	self:_definePageVariables(args)
 
-	return self:build(widgets)
+	return self:build(widgets, 'Team')
 end
 
 ---@return string|number|nil # storage date

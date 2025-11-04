@@ -20,8 +20,8 @@ local AnalyticsMapping = {
 	[BoxId.TOURNAMENTS_TICKER] = 'Tournament ticker',
 	[BoxId.TRANSFERS] = 'Transfers panel',
 	[BoxId.THIS_DAY] = 'This day panel',
-	[1511] = 'Rankings panel',
 	[BoxId.SPECIAL_EVENTS] = 'Featured panel',
+	[1520] = 'Rankings panel',
 }
 
 return AnalyticsMapping

@@ -52,10 +52,8 @@ function Tabs.static(args)
 					end)
 				}
 			},
-			HtmlWidgets.Fragment{children =
-				Array.map(Array.filter(tabArgs, function (tab)
-					return tab.this ~= nil
-				end), Operator.property('tabs'))
+			HtmlWidgets.Fragment{
+				children = Array.map(Array.filter(tabArgs, Operator.property('this')), Operator.property('tabs'))
 			}
 		}
 	}

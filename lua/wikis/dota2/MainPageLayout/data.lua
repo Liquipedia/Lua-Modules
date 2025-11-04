@@ -170,7 +170,7 @@ local CONTENT = {
 			isSmallerVersion = true
 		},
 		padding = false,
-		boxid = 1511,
+		boxid = 1520,
 	},
 ]]
 }

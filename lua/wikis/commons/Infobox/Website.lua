@@ -52,7 +52,7 @@ function Website:createInfobox()
 		Center{children = {args.footnotes}},
 	}
 
-	return self:build(widgets)
+	return self:build(widgets, 'Website')
 end
 
 return Website

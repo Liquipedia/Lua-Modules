@@ -41,7 +41,7 @@ function Campaign:createInfobox()
 
 	self:categories('Campaign')
 
-	return self:build(widgets)
+	return self:build(widgets, 'Campaign')
 end
 
 

@@ -106,7 +106,7 @@ function Game:createInfobox()
 		self:_setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Game')
 end
 
 ---@param args table

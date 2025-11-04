@@ -118,7 +118,7 @@ function Company:createInfobox()
 
 	self:categories('Companies')
 
-	return self:build(widgets)
+	return self:build(widgets, 'Company')
 end
 
 ---@param location string?

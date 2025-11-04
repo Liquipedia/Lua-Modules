@@ -91,12 +91,13 @@ function Character:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		self:categories(args.informationType or 'Character')
+		self:categories('Characters')
+		self:categories(args.informationType)
 		self:categories(unpack(self:getWikiCategories(args)))
 		self:setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Character')
 end
 
 ---@param location string?

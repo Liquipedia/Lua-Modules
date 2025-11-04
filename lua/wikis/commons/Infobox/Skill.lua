@@ -93,7 +93,7 @@ function Skill:createInfobox()
 		self:_setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Skill')
 end
 
 ---@param args table

@@ -226,6 +226,7 @@ function MatchPage:renderOverallStats()
 								IconImage{
 									imageLight = 'Lol stat icon cs.png',
 									caption = 'CS per minute',
+									size = 'x16px',
 									link = ''
 								},
 								'CSM'
@@ -650,6 +651,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 							IconImage{
 								imageLight = 'Lol stat icon cs.png',
 								caption = 'CS',
+								size = 'x16px',
 								link = ''
 							},
 							'CS'
