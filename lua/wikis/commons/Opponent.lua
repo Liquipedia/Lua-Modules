@@ -228,12 +228,47 @@ function Opponent.isOpponent(opponent)
 end
 
 ---Check if two opponents are the same opponent
----It's still a work in progress, it's not fully implemented all cases
 ---@param opponent1 standardOpponent
 ---@param opponent2 standardOpponent
 ---@return boolean
 function Opponent.same(opponent1, opponent2)
-	return Opponent.toName(opponent1) == Opponent.toName(opponent2)
+	if opponent1 == opponent2 then
+		return true
+	elseif opponent1.type ~= opponent2.type then
+		return false
+	elseif opponent1.type == Opponent.literal then
+		return opponent1.name == opponent2.name
+	elseif opponent1.type == Opponent.team then
+		if opponent1.template == opponent2.template then
+			return true
+		end
+		local opponent1Name = Opponent.toName(opponent1)
+		local opponent2Name = Opponent.toName(opponent2)
+		if opponent1Name == opponent2Name then
+			return true
+		end
+		return TeamTemplate.getRaw(opponent1Name).historicaltemplate == TeamTemplate.getRaw(opponent2Name).historicaltemplate
+	end
+	-- opponent.type is a party type
+
+	---@param player standardPlayer
+	---@return string?
+	local function getPageName(player)
+		if Opponent.playerIsTbd(player) then
+			return
+		end
+		-- Remove gsub once underscore storage is sorted out
+		return (player.pageName:gsub(' ', '_'))
+	end
+
+	return Array.equals(
+		Array.sortBy(
+			Array.map(opponent1.players, getPageName), FnUtil.identity
+		),
+		Array.sortBy(
+			Array.map(opponent2.players, getPageName), FnUtil.identity
+		)
+	)
 end
 
 ---Coerces an arbitrary table into an opponent
