@@ -45,7 +45,7 @@ function ParticipantsTeamCard:render()
 										opponent = participant.opponent,
 										overflow = 'ellipsis',
 										teamStyle = 'hybrid',
-										additionalClasses = {'team-participant-card-header-opponent'},
+										additionalClasses = {'team-participant-card-header-opponent', 'team-participant-square-icon'},
 									},
 									Div{
 										classes = { 'team-participant-card-header-label' },
