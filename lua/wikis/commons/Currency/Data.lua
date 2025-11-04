@@ -855,7 +855,7 @@ return {
 	uyu = {
 		code = 'UYU',
 		name = 'Uruguayan Peso',
-		synbol = {
+		symbol = {
 			hasSpace = false,
 			isAfter = false,
 			text = '$',
