@@ -853,8 +853,8 @@ return {
 		},
 	},
 	uyu = {
-		code = 'UYU'
-		name = 'Uruguayan Peso'
+		code = 'UYU',
+		name = 'Uruguayan Peso',
 		synbol = {
 			hasSpace = false,
 			isAfter = false,
