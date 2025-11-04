@@ -87,6 +87,7 @@ function TeamParticipantsRepository.save(TeamParticipant)
 
 	-- TODO: Store aliases (page names) for opponents
 	-- TODO: Store page vars
+	-- TODO: Set players
 
 	lpdbData = Json.stringifySubTables(lpdbData)
 	lpdbData.opponentplayers = lpdbData.players -- TODO: Until this is included in Opponent
