@@ -99,7 +99,7 @@ end
 function TeamParticipantsRepository.getPrizepoolRecordForTeam(opponent)
 	local prizepoolRecords = TeamParticipantsRepository.getPrizepoolRecords()
 	return Array.find(prizepoolRecords, function(record)
-		return Opponent.same(opponent, Opponent.fromLpdbStruct(record.opponent))
+		return Opponent.same(opponent, Opponent.fromLpdbStruct(record))
 	end)
 end
 
