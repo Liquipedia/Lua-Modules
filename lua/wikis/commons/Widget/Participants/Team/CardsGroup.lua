@@ -31,37 +31,41 @@ function ParticipantsTeamCard:render()
 
 	return AnalyticsWidget{
 		analyticsName = 'Team participants card',
-		classes = { 'team-participant-cards' },
-		children = Array.map(participants, function(participant)
-			return Div{
-				classes = { 'team-participant-card' },
-				children = {
-					Div{
-						classes = { 'team-participant-card-header' },
+		children = {
+			Div{
+				classes = { 'team-participant-cards' },
+				children = Array.map(participants, function(participant)
+					return Div{
+						classes = { 'team-participant-card' },
 						children = {
-							OpponentDisplay.BlockOpponent{
-								opponent = participant.opponent,
-								overflow = 'ellipsis',
-								teamStyle = 'hybrid',
-								additionalClasses = {'team-participant-card-header-opponent'},
-							},
 							Div{
-								classes = { 'team-participant-card-header-label' },
-								children = participant.qualifierText and {
-									HtmlWidgets.Span{
-										participant.qualifierText
+								classes = { 'team-participant-card-header' },
+								children = {
+									OpponentDisplay.BlockOpponent{
+										opponent = participant.opponent,
+										overflow = 'ellipsis',
+										teamStyle = 'hybrid',
+										additionalClasses = {'team-participant-card-header-opponent'},
+									},
+									Div{
+										classes = { 'team-participant-card-header-label' },
+										children = participant.qualifierText and {
+											HtmlWidgets.Span{
+												participant.qualifierText
+											}
+										}
+									},
+									Div{
+										classes = { 'team-participant-card-header-icon' },
+										children = { IconFa{iconName = 'collapse'}, }
 									}
 								}
-							},
-							Div{
-								classes = { 'team-participant-card-header-icon' },
-								children = { IconFa{iconName = 'collapse'}, }
 							}
 						}
 					}
-				}
+				end),
 			}
-		end),
+		},
 	}
 end
 
