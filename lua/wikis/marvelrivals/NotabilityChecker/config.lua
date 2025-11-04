@@ -11,7 +11,7 @@ Config.TIER_TYPE_GENERAL = 'general'
 Config.TIER_TYPE_QUALIFIER = 'qualifier'
 Config.TIER_TYPE_WEEKLY = 'weekly'
 Config.TIER_TYPE_MONTHLY = 'monthly'
-Config.TIER_TYPE_SHOW_MATCH = 'show match'
+Config.TIER_TYPE_SHOW_MATCH = 'showmatch'
 Config.TIER_TYPE_MISC = 'misc'
 Config.MAX_NUMBER_OF_COACHES = 6
 
@@ -36,11 +36,11 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
@@ -48,15 +48,11 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 0,
-			},
-			{
-				name = Config.TIER_TYPE_SHOWMATCH,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_MISC,
-				points = 0,
+				points = 0.5,
 			},
 		},
 	},
@@ -72,11 +68,11 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
@@ -84,15 +80,11 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 0,
-			},
-			{
-				name = Config.TIER_TYPE_SHOWMATCH,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_MISC,
-				points = 0,
+				points = 0.5,
 			},
 		},
 	},
@@ -108,11 +100,11 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
@@ -120,15 +112,11 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 0,
-			},
-			{
-				name = Config.TIER_TYPE_SHOWMATCH,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_MISC,
-				points = 0,
+				points = 0.5,
 			},
 		},
 	},
@@ -144,27 +132,23 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 0,
-			},
-			{
-				name = Config.TIER_TYPE_SHOWMATCH,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_MISC,
-				points = 0,
+				points = 0.5,
 			},
 		},
 	},
@@ -180,27 +164,23 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 0,
-			},
-			{
-				name = Config.TIER_TYPE_SHOWMATCH,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_MISC,
-				points = 0,
+				points = 0.5,
 			},
 		},
 	},
