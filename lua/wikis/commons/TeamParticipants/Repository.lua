@@ -59,7 +59,7 @@ function TeamParticipantsRepository.save(TeamParticipant)
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(TeamParticipant.opponentData))
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(TeamParticipant.opponentData))
 
-	local numberOfPlayersOnTeam = #(lpdbData.players or {})
+	local numberOfPlayersOnTeam = #(lpdbData.opponentData.players or {})
 	if numberOfPlayersOnTeam == 0 then
 		numberOfPlayersOnTeam = 1
 	end
