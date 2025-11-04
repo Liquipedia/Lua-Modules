@@ -77,8 +77,8 @@ function ContentSwitch:render()
 	end
 
 	return Div{
-		classes = {'toggle-area', 'toggle-area-1'},
-		attributes = {['data-toggle-area'] = '1'},
+		classes = {'toggle-area', 'toggle-area-' .. tostring(defaultActive)},
+		attributes = {['data-toggle-area'] = tostring(defaultActive)},
 		children = {
 			Div{
 				classes = {'switch-pill-container'},
