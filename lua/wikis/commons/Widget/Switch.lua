@@ -20,10 +20,11 @@ local Div = HtmlWidgets.Div
 ---@field defaultActive boolean
 ---@field css table?
 
----@class Switch: Widget
----@operator call(SwitchParameters): Switch
-local Switch = Class.new(Widget)
-Switch.defaultProps = {
+---@class SwitchWidget: Widget
+---@operator call(SwitchParameters): SwitchWidget
+---@field props SwitchParameters
+local SwitchWidget = Class.new(Widget)
+SwitchWidget.defaultProps = {
 	label = '',
 	switchGroup = 'switch',
 	storeValue = true,
@@ -31,7 +32,7 @@ Switch.defaultProps = {
 }
 
 ---@return Widget
-function Switch:render()
+function SwitchWidget:render()
 	local label = self.props.label
 	local switchGroup = self.props.switchGroup
 	local storeValue = self.props.storeValue
@@ -46,7 +47,7 @@ function Switch:render()
 
 	return Div{
 		classes = switchToggleClasses,
-		css = self.props.css or {},
+		css = self.props.css,
 		children = {
 			Div{
 				classes = toggleClasses,
@@ -63,4 +64,4 @@ function Switch:render()
 	}
 end
 
-return Switch
+return SwitchWidget
