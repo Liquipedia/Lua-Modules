@@ -76,7 +76,7 @@ function ParticipantsTeamCard:render()
 					}
 
 					return Div{
-						classes = { 'team-participant-card' },
+						classes = { 'team-participant-card', 'is--collapsed' }, -- Hardcoded collapsed state
 						attributes = {
 							['data-component'] = 'team-participant-card',
 							['data-team-participant-card-id'] = boxId
