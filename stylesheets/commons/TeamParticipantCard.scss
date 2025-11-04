@@ -1,6 +1,7 @@
 .team-participant-cards {
 	display: flex;
 	gap: 0.625rem;
+	flex-wrap: wrap;
 }
 
 .team-participant-card {
@@ -12,6 +13,7 @@
 	background-color: var( --clr-secondary-100, rgba( 255, 255, 255, 1 ) );
 	border: 1px solid var( --clr-on-surface-light-primary-8, rgba( 0, 0, 0, 0.08 ) );
 	padding: 0.5rem 0;
+	min-width: 308px;
 
 	&-header {
 		display: flex;
@@ -35,6 +37,9 @@
 			padding: 0.125rem 0.5rem;
 			border-radius: 0.25rem;
 			border: 1px solid var( --clr-on-surface-light-primary-8, rgba( 0, 0, 0, 0.08 ) );
+			font-weight: bold;
+			font-size: 0.6875rem;
+			color: var( --clr-secondary-9 );
 		}
 
 		&-icon {
@@ -44,7 +49,6 @@
 			align-items: center;
 			justify-content: center;
 			cursor: pointer;
-			margin-right: 0.75rem;
 			transform-origin: center;
 			transition: transform 0.2s linear;
 		}
