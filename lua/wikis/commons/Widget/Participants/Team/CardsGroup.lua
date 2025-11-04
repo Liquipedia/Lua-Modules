@@ -15,6 +15,8 @@ local TeamParticipantsRepository = Lua.import('Module:TeamParticipants/Repositor
 local Widget = Lua.import('Module:Widget')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class ParticipantsTeamCard: Widget
 ---@operator call(table): ParticipantsTeamCard
@@ -30,8 +32,33 @@ function ParticipantsTeamCard:render()
 	return AnalyticsWidget{
 		analyticsName = 'Team participants card',
 		children = Array.map(participants, function(participant)
-			return HtmlWidgets.Div{
-				children = OpponentDisplay.BlockOpponent{opponent = participant.opponent},
+			return Div{
+				classes = { 'team-participant-card' },
+				children = {
+					Div{
+						classes = { 'team-participant-card-header' },
+						children = {
+							OpponentDisplay.BlockOpponent{
+								opponent = participant.opponent,
+								overflow = 'ellipsis',
+								teamStyle = 'icon',
+								additionalClasses = {'team-participant-card-header-opponent'},
+							},
+							Div{
+								classes = { 'team-participant-card-header-label' },
+								children = {
+									participant.qualifierText and HtmlWidgets.Span{
+										participant.qualifierText
+									} or nil
+								}
+							},
+							Div{
+								classes = { 'team-participant-card-header-icon' },
+								children = { IconFa{iconName = 'collapse'}, }
+							}
+						}
+					}
+				}
 			}
 		end),
 	}
