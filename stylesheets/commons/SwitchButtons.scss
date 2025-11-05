@@ -94,6 +94,7 @@
 			}
 
 			.theme--dark & {
+				opacity: 0.04;
 				background-color: #ffffff;
 			}
 		}
@@ -155,6 +156,10 @@
 			&.switch-pill-active {
 				background-color: var( --clr-wiki-theme-primary, #1f3d7a );
 				color: #ffffff;
+			}
+
+			&.switch-pill-small {
+				padding: 0.375rem 0.75rem;
 			}
 		}
 	}

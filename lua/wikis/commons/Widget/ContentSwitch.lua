@@ -9,15 +9,16 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
 ---@class ContentSwitchTab
----@field label string
+---@field label string|Widget|Html|(string|Widget|Html)[]
 ---@field value string
----@field content Widget
+---@field content string|Widget|Html|(string|Widget|Html)[]
 
 ---@class ContentSwitchParameters
 ---@field tabs ContentSwitchTab[]
@@ -25,15 +26,20 @@ local Div = HtmlWidgets.Div
 ---@field defaultActive integer
 ---@field switchGroup string
 ---@field classes string[]?
+---@field smallThreshold integer
+---@field storeValue boolean
 
 ---@class ContentSwitch: Widget
 ---@operator call(ContentSwitchParameters): ContentSwitch
+---@field props ContentSwitchParameters
 local ContentSwitch = Class.new(Widget)
 ContentSwitch.defaultProps = {
 	tabs = {},
 	variant = 'themed',
 	defaultActive = 1,
 	switchGroup = 'contentSwitch',
+	smallThreshold = 3,
+	storeValue = true,
 }
 
 ---@return Widget
@@ -42,10 +48,14 @@ function ContentSwitch:render()
 	local variant = self.props.variant
 	local defaultActive = self.props.defaultActive
 	local switchGroup = self.props.switchGroup
+	local smallThreshold = self.props.smallThreshold
 
 	local tabOptions = Array.map(tabs, function(tab, index)
 		local isActive = index == defaultActive
 		local classes = {'switch-pill-option', 'toggle-area-button'}
+		if #tabs >= smallThreshold then
+			table.insert(classes, 'switch-pill-small')
+		end
 		if isActive then
 			table.insert(classes, 'switch-pill-active')
 		end
@@ -56,7 +66,7 @@ function ContentSwitch:render()
 				['data-toggle-area-btn'] = tostring(index),
 				['data-switch-value'] = tab.value or tostring(index),
 			},
-			children = tab.label or tostring(index),
+			children = Logic.emptyOr(tab.label, tostring(index)),
 		}
 	end)
 
@@ -67,7 +77,7 @@ function ContentSwitch:render()
 				['data-toggle-area-content'] = tostring(index),
 			},
 			classes = {isActive and 'toggle-area-content-active' or 'toggle-area-content-inactive'},
-			children = tab.content or {},
+			children = tab.content,
 		}
 	end)
 
@@ -75,6 +85,8 @@ function ContentSwitch:render()
 	if variant == 'generic' then
 		table.insert(switchPillClasses, 'switch-pill-generic')
 	end
+
+	local storeValueStr = self.props.storeValue and 'true' or 'false'
 
 	return Div{
 		classes = {'toggle-area', 'toggle-area-' .. tostring(defaultActive)},
@@ -87,7 +99,7 @@ function ContentSwitch:render()
 						classes = switchPillClasses,
 						attributes = {
 							['data-switch-group'] = switchGroup,
-							['data-store-value'] = 'true',
+							['data-store-value'] = storeValueStr,
 						},
 						children = tabOptions,
 					},
