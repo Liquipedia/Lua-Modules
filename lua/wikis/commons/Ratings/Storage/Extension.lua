@@ -20,13 +20,57 @@ local PROGRESSION_STEP_DAYS = 7 -- How many days each progression step is
 ---@return RatingsEntry[]
 function RatingsStorageExtension.getRankings(teamLimit)
 	local rankings = mw.ext.Dota2Ranking.get()
+	local nonProvisionalRankings = Array.filter(rankings, function(record)
+		return not record.provisional
+	end)
+	local progressionDates = Array.map(nonProvisionalRankings, function(record) return record.date end)
+	local teams = RatingsStorageExtension._mapDataToExpectedFormat(rankings)
+	-- Endpoint doesn't support team limit (yet?), so we'll have to cut it short here
+	teams = Array.sub(teams, 1, math.min(teamLimit or #teams))
 
-	return Array.map(rankings, FnUtil.curry(RatingsStorageExtension._createTeamEntry, progressionDates))
+	return Array.map(teams, FnUtil.curry(RatingsStorageExtension._createTeamEntry, progressionDates))
 end
+
+---@param rankings Dota2RankingRecord[]
+---@return Dota2RankingTeam[]
+function RatingsStorageExtension._mapDataToExpectedFormat(rankings)
+	local teamsData = {}
+
+	for _, datedResults in ipairs(rankings) do
+		for _, datedEntry in ipairs(datedResults.entries) do
+			if not teamsData[datedEntry.name] then
+				teamsData[datedEntry.name] = {
+					name = datedEntry.name,
+					rank = datedEntry.rank,
+					rating = datedEntry.rating,
+					streak = 0, -- Default value as PHP doesn't set this
+					progression = {}
+				}
+			else
+				table.insert(teamsData[datedEntry.name].progression, {
+					date = string.match(datedResults.date, "^(%d%d%d%d%-%d%d%-%d%d)"), -- Format date to Y-m-d
+					rank = datedEntry.rank,
+					rating = datedEntry.rating
+				})
+			end
+		end
+	end
+
+	-- Convert hash table to array
+	local finalTeamsData = {}
+	for _, teamData in pairs(teamsData) do
+		table.insert(finalTeamsData, teamData)
+	end
+
+	return finalTeamsData
+end
+
+---@alias Dota2RankingTeam {name: string, rank: integer, rating: number, streak: integer,
+---progression: {date: string, rating: number, rank: integer}[]}
 
 --- Takes a team record from the endpoint and creates a RatingsEntry
 ---@param progressionDates string[]
----@param team Dota2RankingRecord
+---@param team Dota2RankingTeam
 ---@return RatingsEntry
 function RatingsStorageExtension._createTeamEntry(progressionDates, team)
 	local endDate = progressionDates[1]

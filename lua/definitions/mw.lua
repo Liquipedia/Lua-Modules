@@ -1094,7 +1094,7 @@ mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
 mw.ext.Dota2Ranking = {}
 
 ---@alias Dota2RankingEntry {external_id: string, name: string, rating: number, rank: integer}
----@alias Dota2RankingRecord {date: string, entries: Dota2RankingEntry[]}
+---@alias Dota2RankingRecord {date: string, provisional: boolean,  entries: Dota2RankingEntry[]}
 ---@return Dota2RankingRecord[]
 function mw.ext.Dota2Ranking.get() end
 
