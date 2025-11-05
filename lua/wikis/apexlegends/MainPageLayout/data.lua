@@ -38,7 +38,7 @@ local CONTENT = {
 		heading = 'Download the Liquipedia App',
 		padding = true,
 		body = LiquipediaApp{},
-		boxid = 1505,
+		boxid = MainPageLayoutUtil.BoxId.MOBILE_APP,
 	},
 	transfers = {
 		heading = 'Transfers',

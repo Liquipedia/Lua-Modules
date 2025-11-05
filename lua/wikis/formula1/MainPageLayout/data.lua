@@ -90,7 +90,7 @@ local CONTENT = {
 		heading =HtmlWidgets.Fragment{children = {CALENDAR, '&nbsp;Season Calendar'}},
 		body = '{{Liquipedia:Season Calendar}}',
 		padding = true,
-		boxid = 1505
+		boxid = MainPageLayoutUtil.BoxId.MOBILE_APP
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
