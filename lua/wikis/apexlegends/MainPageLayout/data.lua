@@ -146,7 +146,7 @@ return {
 			link = 'Legends',
 			count = {
 				method = 'CATEGORY',
-				category = 'Character',
+				category = 'Characters',
 			},
 		},
 		{

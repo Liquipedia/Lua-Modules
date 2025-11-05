@@ -37,7 +37,7 @@ end
 ---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 function MatchFunctions.adjustOpponent(opponent, opponentIndex)
-	opponent.extradata = CustomMatchGroupInput.getOpponentExtradata(opponent)
+	Table.mergeInto(opponent.extradata, CustomMatchGroupInput.getOpponentExtradata(opponent))
 	if opponent.extradata.additionalScores then
 		opponent.score = CustomMatchGroupInput._getSetWins(opponent)
 	end
