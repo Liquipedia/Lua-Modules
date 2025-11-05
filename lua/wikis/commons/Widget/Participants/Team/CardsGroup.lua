@@ -12,8 +12,8 @@ local Class = Lua.import('Module:Class')
 local String = Lua.import('Module:StringUtils')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local TeamParticipantsRepository = Lua.import('Module:TeamParticipants/Repository')
-local LeagueIcon = Lua.import('Module:LeagueIcon')
-local Tournament = Lua.import('Module:Tournament')
+-- local LeagueIcon = Lua.import('Module:LeagueIcon')
+-- local Tournament = Lua.import('Module:Tournament')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -81,11 +81,11 @@ function ParticipantsTeamCard:_renderHeader(participant)
 	local variant = self.props.variant
 	local headerClasses = { 'team-participant-card-header' }
 
+	-- TODO: Should be stylistically same as compact on <= 1023 viewports
 	if variant == 'expanded' then
 		table.insert(headerClasses, 'team-participant-card-header--expanded')
 	end
 
-	-- TODO: Implement the non-compact version
 	return Div{
 		classes = headerClasses,
 			attributes = {
@@ -145,13 +145,14 @@ function ParticipantsTeamCard:_renderQualifierBox(participant)
 	return Div{
 		classes = { 'team-participant-card-qualifier' },
 		children = {
-			LeagueIcon.display{
-				icon = Tournament.icon(qualifierPage),
-				iconDark = Tournament.darkIcon(qualifierPage),
-				series = Tournament.series(qualifierPage),
-				link = qualifierPage,
-				options = {noTemplate = true},
-			},
+			-- TODO: Render the qualifier tournament icon
+			-- LeagueIcon.display{
+			-- 	icon = Tournament.icon(qualifierPage),
+			-- 	iconDark = Tournament.darkIcon(qualifierPage),
+			-- 	series = Tournament.series(qualifierPage),
+			-- 	link = qualifierPage,
+			-- 	options = {noTemplate = true},
+			-- },
 			Div{
 				classes = { 'team-participant-card-qualifier-details' },
 				children = Link{
