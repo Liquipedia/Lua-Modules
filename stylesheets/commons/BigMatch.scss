@@ -1571,14 +1571,16 @@ $valorant-def: #01654c;
 }
 
 .match-bm {
-	div.tabs-dynamic > ul.nav-tabs > li {
-		border-top-left-radius: 0.5rem;
-		border-top-right-radius: 0.5rem;
-		overflow: hidden;
-	}
+	.switch-pill {
+		overflow-x: auto;
 
-	div.tabs-content {
-		border-bottom-left-radius: 0.5rem;
-		border-bottom-right-radius: 0.5rem;
+		&-container {
+			margin-top: 0.5rem;
+			margin-bottom: 0.5rem;
+		}
+
+		&-option {
+			text-align: center;
+		}
 	}
 }
