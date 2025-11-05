@@ -39,38 +39,43 @@ local StandingsTable = {}
 ---@param frame Frame
 ---@return Widget
 function StandingsTable.fromTemplate(frame)
-	local args = Arguments.getArgs(frame)
-	local tableType = args.tabletype
-	if tableType ~= 'ffa' and tableType ~= 'swiss' then
-		error('Unknown Standing Table Type')
-	end
-	local title = args.title
-	local importScoreFromMatches = Logic.nilOr(Logic.readBoolOrNil(args.import), true)
-	local importOpponentFromMatches = Logic.nilOr(Logic.readBoolOrNil(args.importopponents), importScoreFromMatches)
+    local args = Arguments.getArgs(frame)
+    local tableType = args.tabletype
+    if tableType ~= 'ffa' and tableType ~= 'swiss' then
+        error('Unknown Standing Table Type')
+    end
+    local title = args.title
+    local importScoreFromMatches = Logic.nilOr(Logic.readBoolOrNil(args.import), true)
+    local importOpponentFromMatches = Logic.nilOr(Logic.readBoolOrNil(args.importopponents), importScoreFromMatches)
 
-	local parsedData = StandingsParseWiki.parseWikiInput(args)
-	local rounds = parsedData.rounds
-	local opponents = parsedData.opponents
-	local bgs = parsedData.bgs
-	local matches = parsedData.matches
+    local parsedData = StandingsParseWiki.parseWikiInput(args)
+    local rounds = parsedData.rounds
+    local opponents = parsedData.opponents
+    local bgs = parsedData.bgs
+    local matches = parsedData.matches
 
-	local tiebreakers = StandingsParseWiki.parseTiebreakers(args, tableType)
+    local tiebreakers = StandingsParseWiki.parseTiebreakers(args, tableType)
 
-	if importScoreFromMatches then
-		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args)
+    local statusConfigs
+    if importScoreFromMatches then
+        local automaticScoreFunction
+        automaticScoreFunction, statusConfigs = StandingsParseWiki.makeScoringFunction(tableType, args)
 
-		local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction)
-		opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
-	end
+        local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction, statusConfigs)
+        opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
+    end
 
-	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
+    local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
 
-	if tableType == 'swiss' then
-		standingsTable.extradata.placemapping = Logic.wrapTryOrLog(StandingsParseWiki.parsePlaceMapping)(args, opponents)
-	end
+    if tableType == 'swiss' then
+        standingsTable.extradata.placemapping = Logic.wrapTryOrLog(StandingsParseWiki.parsePlaceMapping)(args, opponents)
+        if statusConfigs then
+            standingsTable.extradata.statusConfigs = statusConfigs
+        end
+    end
 
-	StandingsStorage.run(standingsTable, {saveVars = true})
-	return StandingsDisplay{pageName = mw.title.getCurrentTitle().text, standingsIndex = standingsTable.standingsindex}
+    StandingsStorage.run(standingsTable, { saveVars = true })
+    return StandingsDisplay { pageName = mw.title.getCurrentTitle().text, standingsIndex = standingsTable.standingsindex }
 end
 
 ---@param manualOpponents StandingTableOpponentData[]
@@ -78,27 +83,27 @@ end
 ---@param addNewOpponents boolean
 ---@return StandingTableOpponentData[]
 function StandingsTable.mergeOpponentsData(manualOpponents, importedOpponents, addNewOpponents)
-	--- Add all manual opponents to the new opponents list
-	local newOpponents = Array.map(manualOpponents, FnUtil.identity)
+    --- Add all manual opponents to the new opponents list
+    local newOpponents = Array.map(manualOpponents, FnUtil.identity)
 
-	--- Find all imported opponents
-	Array.forEach(importedOpponents, function(importedOpponent)
-		--- Find the matching manual opponent
-		local manualOpponentId = Array.indexOf(newOpponents, function(manualOpponent)
-			return Opponent.same(manualOpponent.opponent, importedOpponent.opponent)
-		end)
-		--- If there isn't one, means this is a new opponent
-		if manualOpponentId == 0 then
-			if addNewOpponents then
-				table.insert(newOpponents, importedOpponent)
-			end
-			return
-		end
-		--- Manual data has priority over imported data
-		newOpponents[manualOpponentId] = Table.deepMerge(importedOpponent, newOpponents[manualOpponentId])
-	end)
+    --- Find all imported opponents
+    Array.forEach(importedOpponents, function(importedOpponent)
+        --- Find the matching manual opponent
+        local manualOpponentId = Array.indexOf(newOpponents, function(manualOpponent)
+            return Opponent.same(manualOpponent.opponent, importedOpponent.opponent)
+        end)
+        --- If there isn't one, means this is a new opponent
+        if manualOpponentId == 0 then
+            if addNewOpponents then
+                table.insert(newOpponents, importedOpponent)
+            end
+            return
+        end
+        --- Manual data has priority over imported data
+        newOpponents[manualOpponentId] = Table.deepMerge(importedOpponent, newOpponents[manualOpponentId])
+    end)
 
-	return newOpponents
+    return newOpponents
 end
 
 return StandingsTable
