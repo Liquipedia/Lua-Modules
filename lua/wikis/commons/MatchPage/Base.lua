@@ -321,7 +321,7 @@ function BaseMatchPage:renderGames()
 		),
 		switchGroup = 'matchPage',
 		defaultActive = 1,
-		variant = 'themed'
+		variant = 'generic'
 	}
 end
 
