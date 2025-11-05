@@ -248,7 +248,12 @@ function Opponent.same(opponent1, opponent2)
 		if opponent1Name == opponent2Name then
 			return true
 		end
-		return TeamTemplate.getRaw(opponent1Name).historicaltemplate == TeamTemplate.getRaw(opponent2Name).historicaltemplate
+		local opponent1Historical = TeamTemplate.getRaw(opponent1Name).historicaltemplate
+		local opponent2Historical = TeamTemplate.getRaw(opponent2Name).historicaltemplate
+		if Logic.isEmpty(opponent1Historical) or Logic.isEmpty(opponent2Historical) then
+			return false
+		end
+		return opponent1Historical == opponent2Historical
 	end
 	-- opponent.type is a party type
 
