@@ -113,41 +113,41 @@
 	}
 }
 
-$participant-icon-size: 48px;
-$participant-icon-size-mobile: 36px;
-$participant-icon-max-size: 40px;
-$participant-icon-max-size-mobile: 32px;
+$participant-icon-wrapper-size: 48px;
+$participant-icon-wrapper-size-mobile: 36px;
+$participant-icon-size: 40px;
+$participant-icon-size-mobile: 32px;
 
-@mixin responsive-participant-icon($size, $max-size, $mobile-size, $mobile-max-size) {
-	min-width: $size;
-	width: $size;
-	height: $size;
-	line-height: $size;
+@mixin responsive-participant-icon($wrapper-size, $icon-size, $wrapper-size-mobile, $icon-size-mobile) {
+	min-width: $wrapper-size;
+	width: $wrapper-size;
+	height: $wrapper-size;
+	line-height: $wrapper-size;
 	text-align: center;
 
 	@media ( max-width: 767px ) {
-		width: $mobile-size;
-		height: $mobile-size;
-		line-height: $mobile-size;
+		width: $wrapper-size-mobile;
+		height: $wrapper-size-mobile;
+		line-height: $wrapper-size-mobile;
 	}
 
 	img {
-		max-width: $max-size;
-		max-height: $max-size;
+		max-width: $icon-size;
+		max-height: $icon-size;
 		width: auto;
 		height: auto;
 		vertical-align: middle;
 
 		@media ( max-width: 767px ) {
-			max-width: $mobile-max-size;
-			max-height: $mobile-max-size;
+			max-width: $icon-size-mobile;
+			max-height: $icon-size-mobile;
 		}
 	}
 }
 
 .team-participant-square-icon {
 	.team-template-image-icon {
-		@include responsive-participant-icon($participant-icon-size, $participant-icon-max-size, $participant-icon-size-mobile, $participant-icon-max-size-mobile);
+		@include responsive-participant-icon($participant-icon-wrapper-size, $participant-icon-size, $participant-icon-wrapper-size-mobile, $participant-icon-size-mobile);
 	}
 
 	.block-player {
@@ -157,7 +157,7 @@ $participant-icon-max-size-mobile: 32px;
 		.flag {
 			margin-right: 0;
 
-			@include responsive-participant-icon($participant-icon-size, $participant-icon-max-size, $participant-icon-size-mobile, $participant-icon-max-size-mobile);
+			@include responsive-participant-icon($participant-icon-wrapper-size, $participant-icon-size, $participant-icon-wrapper-size-mobile, $participant-icon-size-mobile);
 		}
 	}
 }

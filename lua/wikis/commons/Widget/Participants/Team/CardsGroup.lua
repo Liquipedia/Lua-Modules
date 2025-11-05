@@ -75,6 +75,7 @@ function ParticipantsTeamCard:_renderHeader(participant)
 				additionalClasses = {'team-participant-card-header-opponent', 'team-participant-square-icon'},
 			},
 			labelDiv,
+			-- TODO: Implement toggle functionality
 			Div{
 				classes = { 'team-participant-card-header-icon' },
 				children = { IconFa{iconName = 'collapse'}, }
