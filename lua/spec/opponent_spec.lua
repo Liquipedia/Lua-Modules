@@ -320,6 +320,21 @@ describe('opponent', function()
 				Opponent.fromMatch2Record(Config.exampleMatch2RecordTeam))
 			)
 
+			assert.is_true(Opponent.same(
+				Opponent.readOpponentArgs{type = 'team', 'bds esport old'},
+				Opponent.readOpponentArgs{type = 'team', 'bds'}
+			))
+
+			assert.is_true(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{type = 'team', 'wolves esports'}),
+				Opponent.resolve(Opponent.readOpponentArgs{type = 'team', 'wol'})
+			))
+
+			assert.is_false(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{type = 'team', 'streamerzone'}),
+				Opponent.resolve(Opponent.readOpponentArgs{type = 'team', 'team secret'})
+			))
+
 			assert.is_false(Opponent.same(
 				Opponent.resolve(Opponent.readOpponentArgs{
 					p1 = 'Faker', p1flag = 'South Korea',

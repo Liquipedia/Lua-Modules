@@ -1,5 +1,6 @@
 local aliases = {
 	bds = 'team bds',
+	['bds esport'] = 'team bds',
 	mousesports = 'mouz',
 	skt = 't1',
 	['sk telecom t1'] = 't1',
