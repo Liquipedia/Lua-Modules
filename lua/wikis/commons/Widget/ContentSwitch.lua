@@ -86,8 +86,6 @@ function ContentSwitch:render()
 		table.insert(switchPillClasses, 'switch-pill-generic')
 	end
 
-	local storeValueStr = self.props.storeValue and 'true' or 'false'
-
 	return Div{
 		classes = {'toggle-area', 'toggle-area-' .. tostring(defaultActive)},
 		attributes = {['data-toggle-area'] = tostring(defaultActive)},
@@ -99,7 +97,7 @@ function ContentSwitch:render()
 						classes = switchPillClasses,
 						attributes = {
 							['data-switch-group'] = switchGroup,
-							['data-store-value'] = storeValueStr,
+							['data-store-value'] = Logic.readBool(self.props.storeValue) and 'true' or nil,
 						},
 						children = tabOptions,
 					},
