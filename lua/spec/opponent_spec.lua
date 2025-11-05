@@ -321,6 +321,11 @@ describe('opponent', function()
 			)
 
 			assert.is_false(Opponent.same(
+				Opponent.resolve(Opponent.readOpponentArgs{type = 'team', 'streamerzone'}),
+				Opponent.resolve(Opponent.readOpponentArgs{type = 'team', 'team secret'})
+			))
+
+			assert.is_false(Opponent.same(
 				Opponent.resolve(Opponent.readOpponentArgs{
 					p1 = 'Faker', p1flag = 'South Korea',
 					p2 = 'Deft', p2flag = 'South Korea',
