@@ -187,12 +187,11 @@ end
 ---@param tabletype StandingsTableTypes
 ---Parse status-based scoring configurations from template arguments
 ---@param args table
----@return table<string, {points: number?, matchWins: number?, matchLosses: number?, matchDraws: number?}>
+---@return table<string, {points: number?, roundWins: number?, roundLosses: number?, roundDraws: number?, gameWins: number?, gameLosses: number?, gameDraws: number?}>
 function StandingsParseWiki.parseStatusConfigs(args)
     local configs = {}
     local statusKeys = {
-        'normalWin', 'normalLoss', 'draw',
-        'defaultWin', 'defaultLoss',
+        'defaultWin', 'defaultLoss', 'draw',
         'ffWin', 'ffLoss',
         'dqWin', 'dqLoss'
     }
@@ -214,18 +213,16 @@ function StandingsParseWiki.getStatusConfigKey(opponent)
     local status = opponent.status
 
     if status == 'D' then return 'draw' end
-    if status == 'W' then return 'defaultWin' end
-    if status == 'L' then return 'defaultLoss' end
     if status == 'FF' then return isWin and 'ffWin' or 'ffLoss' end
     if status == 'DQ' then return isWin and 'dqWin' or 'dqLoss' end
 
-    -- Default: normal score (status == 'S' or nil)
-    return isWin and 'normalWin' or 'normalLoss'
+    -- Default: covers both scored ('S') and unknown score ('W'/'L') matches
+    return isWin and 'defaultWin' or 'defaultLoss'
 end
 
 ---@param args table
 ---@return fun(opponent: match2opponent): number|nil
----@return table<string, {points: number?, matchWins: number?, matchLosses: number?, matchDraws: number?}>?
+---@return table<string, {points: number?, roundWins: number?, roundLosses: number?, roundDraws: number?, gameWins: number?, gameLosses: number?, gameDraws: number?}>?
 function StandingsParseWiki.makeScoringFunction(tabletype, args)
     if tabletype == 'ffa' then
         if not args['p1'] then
@@ -245,15 +242,13 @@ function StandingsParseWiki.makeScoringFunction(tabletype, args)
 
         -- Set defaults if not configured
         local defaultConfigs = {
-            normalWin = { points = 1, matchWins = 1, matchLosses = 0 },
-            normalLoss = { points = 0, matchWins = 0, matchLosses = 1 },
-            defaultWin = { points = 1, matchWins = 1, matchLosses = 0 },
-            defaultLoss = { points = 0, matchWins = 0, matchLosses = 1 },
-            ffWin = { points = 1, matchWins = 1, matchLosses = 0 },
-            ffLoss = { points = 0, matchWins = 0, matchLosses = 1 },
-            dqWin = { points = 1, matchWins = 1, matchLosses = 0 },
-            dqLoss = { points = 0, matchWins = 0, matchLosses = 1 },
-            draw = { points = 0, matchWins = 0, matchLosses = 0, matchDraws = 1 },
+            defaultWin = { points = 1, roundWins = 1, roundLosses = 0 },
+            defaultLoss = { points = 0, roundWins = 0, roundLosses = 1 },
+            ffWin = { points = 1, roundWins = 1, roundLosses = 0 },
+            ffLoss = { points = 0, roundWins = 0, roundLosses = 1 },
+            dqWin = { points = 1, roundWins = 1, roundLosses = 0 },
+            dqLoss = { points = 0, roundWins = 0, roundLosses = 1 },
+            draw = { points = 0, roundWins = 0, roundLosses = 0, roundDraws = 1 },
         }
 
         -- Merge with defaults

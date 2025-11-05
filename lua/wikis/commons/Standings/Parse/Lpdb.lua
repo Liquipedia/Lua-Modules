@@ -25,7 +25,7 @@ local StandingsParseLpdb = {}
 
 ---@param rounds {roundNumber: integer, matches: string[]}[]
 ---@param scoreMapper fun(opponent: match2opponent): number|nil
----@param statusConfigs table<string, {points: number?, matchWins: number?, matchLosses: number?, matchDraws: number?}>?
+---@param statusConfigs table<string, {points: number?, roundWins: number?, roundLosses: number?, roundDraws: number?, gameWins: number?, gameLosses: number?, gameDraws: number?}>?
 ---@return StandingTableOpponentData[]
 function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, statusConfigs)
     local matchIds = Array.flatMap(rounds, function(round)
@@ -118,7 +118,7 @@ end
 ---@param match match2
 ---@param opponents StandingTableOpponentData[]
 ---@param scoreMapper fun(opponent: standardOpponent): number?
----@param statusConfigs table<string, {points: number?, matchWins: number?, matchLosses: number?, matchDraws: number?}>?
+---@param statusConfigs table<string, {points: number?, roundWins: number?, roundLosses: number?, roundDraws: number?, gameWins: number?, gameLosses: number?, gameDraws: number?}>?
 ---@param maxRounds integer
 function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMapper, statusConfigs, maxRounds)
     local match2 = MatchGroupUtil.matchFromRecord(match)
@@ -143,8 +143,34 @@ function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMappe
         if not match2.finished then
             return
         end
-        local matchResult = match2.winner == 0 and 'd' or opponent.placement == 1 and 'w' or 'l'
-        opponentRoundData.scoreboard.match[matchResult] = (opponentRoundData.scoreboard.match[matchResult] or 0) + 1
+
+        -- Use status configuration for W-D-L tracking if available
+        if statusConfigs then
+            local StandingsParseWiki = Lua.import('Module:Standings/Parse/Wiki')
+            local configKey = StandingsParseWiki.getStatusConfigKey(opponent)
+            local config = statusConfigs[configKey]
+
+            if config then
+                -- Track round/series wins-losses-draws
+                opponentRoundData.scoreboard.match.w = opponentRoundData.scoreboard.match.w + (config.roundWins or 0)
+                opponentRoundData.scoreboard.match.l = opponentRoundData.scoreboard.match.l + (config.roundLosses or 0)
+                opponentRoundData.scoreboard.match.d = opponentRoundData.scoreboard.match.d + (config.roundDraws or 0)
+
+                -- Track game wins-losses-draws if configured
+                if config.gameWins or config.gameLosses or config.gameDraws then
+                    if not opponentRoundData.scoreboard.game then
+                        opponentRoundData.scoreboard.game = {w = 0, l = 0, d = 0}
+                    end
+                    opponentRoundData.scoreboard.game.w = opponentRoundData.scoreboard.game.w + (config.gameWins or 0)
+                    opponentRoundData.scoreboard.game.l = opponentRoundData.scoreboard.game.l + (config.gameLosses or 0)
+                    opponentRoundData.scoreboard.game.d = opponentRoundData.scoreboard.game.d + (config.gameDraws or 0)
+                end
+            end
+        else
+            -- Fallback to old logic if no status configs provided
+            local matchResult = match2.winner == 0 and 'd' or opponent.placement == 1 and 'w' or 'l'
+            opponentRoundData.scoreboard.match[matchResult] = (opponentRoundData.scoreboard.match[matchResult] or 0) + 1
+        end
     end)
 end
 
