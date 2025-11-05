@@ -1,9 +1,10 @@
 .team-participant-cards {
 	display: grid;
-	gap: 0.625rem;
+	gap: 0.25rem;
 	grid-template-columns: 1fr;
 
 	@media ( min-width: 768px ) {
+		gap: 0.625rem;
 		grid-template-columns: repeat( 2, 1fr );
 	}
 
@@ -111,29 +112,52 @@
 		padding: 0.5rem;
 	}
 }
-/* Square participant icons */
-.team-participant-square-icon .team-template-image-icon {
-	width: 48px;
-	height: 48px;
-	line-height: 48px;
+
+$participant-icon-size: 48px;
+$participant-icon-size-mobile: 36px;
+$participant-icon-max-size: 40px;
+$participant-icon-max-size-mobile: 32px;
+
+@mixin responsive-participant-icon($size, $max-size, $mobile-size, $mobile-max-size) {
+	min-width: $size;
+	width: $size;
+	height: $size;
+	line-height: $size;
 	text-align: center;
 
 	@media ( max-width: 767px ) {
-		width: 36px;
-		height: 36px;
-		line-height: 36px;
+		width: $mobile-size;
+		height: $mobile-size;
+		line-height: $mobile-size;
 	}
 
 	img {
-		max-width: 40px;
-		max-height: 40px;
+		max-width: $max-size;
+		max-height: $max-size;
 		width: auto;
 		height: auto;
 		vertical-align: middle;
 
 		@media ( max-width: 767px ) {
-			max-width: 32px;
-			max-height: 32px;
+			max-width: $mobile-max-size;
+			max-height: $mobile-max-size;
+		}
+	}
+}
+
+.team-participant-square-icon {
+	.team-template-image-icon {
+		@include responsive-participant-icon($participant-icon-size, $participant-icon-max-size, $participant-icon-size-mobile, $participant-icon-max-size-mobile);
+	}
+
+	.block-player {
+		gap: 0.5rem;
+		flex: 1 0 0;
+
+		.flag {
+			margin-right: 0;
+
+			@include responsive-participant-icon($participant-icon-size, $participant-icon-max-size, $participant-icon-size-mobile, $participant-icon-max-size-mobile);
 		}
 	}
 }

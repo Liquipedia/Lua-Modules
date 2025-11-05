@@ -45,7 +45,6 @@ function ParticipantsTeamCard:render()
 							['data-component'] = "team-participant-card-collapsible-button"
 						},
 						children = {
-							-- TODO: Figure out flag rendering
 							OpponentDisplay.BlockOpponent{
 								opponent = participant.opponent,
 								overflow = 'ellipsis',
@@ -80,7 +79,7 @@ function ParticipantsTeamCard:render()
 					}
 
 					return Div{
-						classes = { 'team-participant-card', 'is--collapsed' }, -- Hardcoded collapsed state
+						classes = { 'team-participant-card', 'is--collapsed' }, -- Hardcoded collapsed state until we implement the js
 						attributes = {
 							['data-component'] = 'team-participant-card',
 							['data-team-participant-card-id'] = boxId
