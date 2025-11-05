@@ -33,24 +33,22 @@ function ParticipantsTeamCard:render()
 
 	return AnalyticsWidget{
 		analyticsName = 'Team participants card',
-		children = {
-			Div{
-				classes = { 'team-participant-cards' },
-				children = Array.map(participants, function(participant, index)
-					local header = self:_renderHeader(participant)
-					local content = self:_renderContent(participant)
+		children = Div{
+			classes = { 'team-participant-cards' },
+			children = Array.map(participants, function(participant, index)
+				local header = self:_renderHeader(participant)
+				local content = self:_renderContent(participant)
 
-					return Div{
-						classes = { 'team-participant-card', 'is--collapsed' }, -- Hardcoded collapsed state until we implement the js
-						attributes = {
-							['data-component'] = 'team-participant-card',
-							['data-team-participant-card-id'] = index
-						},
-						children = { header, content }
-					}
-				end),
-			}
-		},
+				return Div{
+					classes = { 'team-participant-card', 'is--collapsed' }, -- Hardcoded collapsed state until we implement the js
+					attributes = {
+						['data-component'] = 'team-participant-card',
+						['data-team-participant-card-id'] = index
+					},
+					children = { header, content }
+				}
+			end),
+		}
 	}
 end
 
@@ -64,8 +62,8 @@ function ParticipantsTeamCard:_renderHeader(participant)
 	return Div{
 		classes = { 'team-participant-card-header' },
 			attributes = {
-				tabindex = "0",
-				['data-component'] = "team-participant-card-collapsible-button"
+				tabindex = '0',
+				['data-component'] = 'team-participant-card-collapsible-button'
 		},
 		children = WidgetUtil.collect(
 			OpponentDisplay.BlockOpponent{
@@ -78,7 +76,7 @@ function ParticipantsTeamCard:_renderHeader(participant)
 			-- TODO: Implement toggle functionality
 			Div{
 				classes = { 'team-participant-card-header-icon' },
-				children = { IconFa{iconName = 'collapse'}, }
+				children = IconFa{iconName = 'collapse'},
 			}
 		)
 	}
