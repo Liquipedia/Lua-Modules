@@ -13,22 +13,20 @@ local FnUtil = Lua.import('Module:FnUtil')
 ---@field opponent standardOpponent
 ---@field rating number
 ---@field region string
----@field streak integer
 ---@field change integer? # nil = new, otherwise indicate change in rank
 ---@field progression {date: string, rating: number?, rank: integer?}[]
 
----@alias RatingsDisplayGetRankings fun(teamLimit: integer, progressionLimit?: integer):RatingsEntry[]
+---@alias RatingsDisplayGetRankings fun(teamLimit: integer):RatingsEntry[]
 
 local RatingsStorageFactory = {}
 
----@param props {storageType: 'extension', id: string?, date: string?}
+---@param props {storageType: 'extension', id: string?}
 ---@return RatingsDisplayGetRankings
 function RatingsStorageFactory.createGetRankings(props)
 	local storageType = props.storageType
 	if storageType == 'extension' then
 		local RatingsStorageExtension = Lua.import('Module:Ratings/Storage/Extension')
-		local date = props.date
-		return FnUtil.curry(RatingsStorageExtension.getRankings, date)
+		return RatingsStorageExtension.getRankings
 	end
 
 	error('Unknown storage type: ' .. (storageType or ''))

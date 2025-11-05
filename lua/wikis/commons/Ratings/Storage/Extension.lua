@@ -16,26 +16,12 @@ local RatingsStorageExtension = {}
 
 local PROGRESSION_STEP_DAYS = 7 -- How many days each progression step is
 
----@param date string
 ---@param teamLimit integer?
----@param progressionLimit integer?
 ---@return RatingsEntry[]
-function RatingsStorageExtension.getRankings(date, teamLimit, progressionLimit)
-	if not date then
-		error('No date provided')
-	end
-	if date > Date.getContextualDateOrNow() then
-		error('Cannot get rankings for future date')
-	end
+function RatingsStorageExtension.getRankings(teamLimit)
+	local rankings = mw.ext.Dota2Ranking.get()
 
-	local progressionDates = RatingsStorageExtension._calculateProgressionDates(date, progressionLimit)
-
-	local teams = mw.ext.Dota2Ranking.get(progressionDates[#progressionDates], date)
-
-	-- Endpoint doesn't support team limit (yet?), so we'll have to cut it short here
-	teams = Array.sub(teams, 1, math.min(teamLimit or #teams))
-
-	return Array.map(teams, FnUtil.curry(RatingsStorageExtension._createTeamEntry, progressionDates))
+	return Array.map(rankings, FnUtil.curry(RatingsStorageExtension._createTeamEntry, progressionDates))
 end
 
 --- Takes a team record from the endpoint and creates a RatingsEntry
@@ -61,7 +47,8 @@ function RatingsStorageExtension._createTeamEntry(progressionDates, team)
 	end
 
 	local progression = Array.map(progressionDates, function(progressionDate)
-		return findProgressionForDate(progressionDate) or RatingsStorageExtension._createProgressionRecord(progressionDate)
+		return findProgressionForDate(progressionDate) or
+			RatingsStorageExtension._createProgressionRecord(progressionDate)
 	end)
 
 	local hasRankLastInterval = progression[2].rank ~= nil
@@ -71,27 +58,11 @@ function RatingsStorageExtension._createTeamEntry(progressionDates, team)
 		rank = team.rank,
 		rating = RatingsStorageExtension._normalizeRating(team.rating),
 		region = lpdbTeamInfo.region,
-		opponent = Opponent.resolve(Opponent.readOpponentArgs({type = Opponent.team, team.name}), endDate),
+		opponent = Opponent.resolve(Opponent.readOpponentArgs({ type = Opponent.team, team.name }), endDate),
 		change = hasRankLastInterval and progression[2].rank - progression[1].rank or nil,
-		streak = team.streak,
 		progression = progression,
 	}
 	return newTeam
-end
-
---- Calculate which dates to get progression for
----@param date string
----@param progressionLimit integer?
----@return string[]
-function RatingsStorageExtension._calculateProgressionDates(date, progressionLimit)
-	local progressionDates = {}
-	local nextProgression = Date.parseIsoDate(date)
-	table.insert(progressionDates, os.date('%F', os.time(nextProgression)) --[[@as string]])
-	for _ = 1, progressionLimit or 1 do
-		nextProgression.day = nextProgression.day - PROGRESSION_STEP_DAYS
-		table.insert(progressionDates, os.date('%F', os.time(nextProgression)) --[[@as string]])
-	end
-	return progressionDates
 end
 
 ---@param date string

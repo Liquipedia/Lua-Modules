@@ -91,16 +91,14 @@ function RatingsList:render()
 	local dateAsString = os.date('%F', os.time(date)) --[[@as string]]
 
 	local teamLimit = tonumber(self.props.teamLimit) or self.defaultProps.teamLimit
-	local progressionLimit = tonumber(self.props.progressionLimit) or self.defaultProps.progressionLimit
 	local showGraph = Logic.readBool(self.props.showGraph)
 	local isSmallerVersion = Logic.readBool(self.props.isSmallerVersion)
 
 	local getRankings = RatingsStorageFactory.createGetRankings {
 		storageType = self.props.storageType,
-		date = dateAsString,
 		id = self.props.id,
 	}
-	local teams = getRankings(teamLimit, progressionLimit)
+	local teams = getRankings(teamLimit)
 
 	local teamRows = Array.map(teams, function(team, rank)
 		local uniqueId = dateAsString .. '-' .. rank
@@ -116,7 +114,7 @@ function RatingsList:render()
 			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = team.rating },
 			HtmlWidgets.Td {
 				attributes = { ['data-ranking-table-cell'] = 'region' },
-				children = Flags.Icon{flag = team.region} .. Flags.CountryName{flag = team.region}
+				children = Flags.Icon { flag = team.region } .. Flags.CountryName { flag = team.region }
 			},
 			showGraph and (HtmlWidgets.Td {
 				attributes = {
@@ -132,7 +130,7 @@ function RatingsList:render()
 						tabindex = '1'
 					},
 					children = Icon.makeIcon { iconName = 'expand' }
-			} }) or nil
+				} }) or nil
 		)
 
 		local graphRow = showGraph and {
@@ -185,15 +183,15 @@ function RatingsList:render()
 				children = {
 					HtmlWidgets.Div {
 						children = {
-							HtmlWidgets.B{children = 'BETA'},
-							HtmlWidgets.Span{children = 'Last updated: ' .. formattedDate}
+							HtmlWidgets.B { children = 'BETA' },
+							HtmlWidgets.Span { children = 'Last updated: ' .. formattedDate }
 						},
 						classes = { 'ranking-table__top-row-text' }
 					},
 					HtmlWidgets.Div {
 						children = {
-							HtmlWidgets.Span {children = 'Data provided by '},
-							HtmlWidgets.Div {children = '[[File:SAP_logo.svg|link=|SAP]]'}
+							HtmlWidgets.Span { children = 'Data provided by ' },
+							HtmlWidgets.Div { children = '[[File:SAP_logo.svg|link=|SAP]]' }
 						},
 						classes = { 'ranking-table__top-row-logo-container' }
 					}
