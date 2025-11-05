@@ -41,7 +41,7 @@ local CONTENT = {
 		heading = 'Download the Liquipedia App',
 		padding = true,
 		body = '{{Liquipedia:App}}',
-		boxid = 1505,
+		boxid = MainPageLayoutUtil.BoxId.MOBILE_APP,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),

@@ -15,6 +15,7 @@ local MainPageLayoutUtil = {}
 MainPageLayoutUtil.BoxId = {
 	USEFUL_ARTICLES = 1503,
 	WANT_TO_HELP = 1504,
+	MOBILE_APP = 1505,
 	MATCH_TICKER = 1507,
 	TOURNAMENTS_TICKER = 1508,
 	TRANSFERS = 1509,
