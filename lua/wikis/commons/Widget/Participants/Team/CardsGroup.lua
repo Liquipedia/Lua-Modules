@@ -9,10 +9,12 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local TeamParticipantsRepository = Lua.import('Module:TeamParticipants/Repository')
 
 local Widget = Lua.import('Module:Widget')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -37,6 +39,25 @@ function ParticipantsTeamCard:render()
 				children = Array.map(participants, function(participant, index)
 					local boxId = self.props.pageName .. '-participant-' .. index
 
+					local labelText
+					if String.isNotEmpty(participant.qualifierPage) or String.isNotEmpty(participant.qualifierUrl) then
+						labelText = 'Qualifier'
+					elseif String.isNotEmpty(participant.qualifierText) then
+						labelText = 'Invited'
+					end
+
+					local labelDiv = nil
+					if labelText then
+						labelDiv = Div{
+							classes = { 'team-participant-card-header-label' },
+							children = {
+								HtmlWidgets.Span{
+									children = { labelText }
+								}
+							}
+						}
+					end
+
 					-- TODO: Implement the non-compact version
 					local header = Div{
 						classes = { 'team-participant-card-header' },
@@ -44,29 +65,19 @@ function ParticipantsTeamCard:render()
 							tabindex = "0",
 							['data-component'] = "team-participant-card-collapsible-button"
 						},
-						children = {
+						children = WidgetUtil.collect(
 							OpponentDisplay.BlockOpponent{
 								opponent = participant.opponent,
 								overflow = 'ellipsis',
 								teamStyle = 'standard',
 								additionalClasses = {'team-participant-card-header-opponent', 'team-participant-square-icon'},
 							},
-							-- TODO: Implement the label text logic properly and TBD coloring
-							Div{
-								classes = { 'team-participant-card-header-label' },
-								children = {
-									HtmlWidgets.Span{
-										children = {
-											participant.qualifierText and participant.qualifierText ~= '' and 'Qualified' or 'Invited'
-										}
-									}
-								}
-							},
+							labelDiv,
 							Div{
 								classes = { 'team-participant-card-header-icon' },
 								children = { IconFa{iconName = 'collapse'}, }
 							}
-						}
+						)
 					}
 
 					-- TODO: Implement qualifier box, roster functionality & notes
