@@ -37,63 +37,14 @@ function ParticipantsTeamCard:render()
 			Div{
 				classes = { 'team-participant-cards' },
 				children = Array.map(participants, function(participant, index)
-					local boxId = self.props.pageName .. '-participant-' .. index
-
-					local labelText
-					if String.isNotEmpty(participant.qualifierPage) or String.isNotEmpty(participant.qualifierUrl) then
-						labelText = 'Qualifier'
-					elseif String.isNotEmpty(participant.qualifierText) then
-						labelText = 'Invited'
-					end
-
-					local labelDiv = nil
-					if labelText then
-						labelDiv = Div{
-							classes = { 'team-participant-card-header-label' },
-							children = {
-								HtmlWidgets.Span{
-									children = { labelText }
-								}
-							}
-						}
-					end
-
-					-- TODO: Implement the non-compact version
-					local header = Div{
-						classes = { 'team-participant-card-header' },
-						attributes = {
-							tabindex = "0",
-							['data-component'] = "team-participant-card-collapsible-button"
-						},
-						children = WidgetUtil.collect(
-							OpponentDisplay.BlockOpponent{
-								opponent = participant.opponent,
-								overflow = 'ellipsis',
-								teamStyle = 'standard',
-								additionalClasses = {'team-participant-card-header-opponent', 'team-participant-square-icon'},
-							},
-							labelDiv,
-							Div{
-								classes = { 'team-participant-card-header-icon' },
-								children = { IconFa{iconName = 'collapse'}, }
-							}
-						)
-					}
-
-					-- TODO: Implement qualifier box, roster functionality & notes
-					local content = Div{
-						classes = { 'team-participant-card-collapsible-content' },
-						attributes = {
-							['data-component'] = 'team-participant-card-content'
-						},
-						children = { 'content' } -- Team details & roster here
-					}
+					local header = self:_renderHeader(participant)
+					local content = self:_renderContent(participant)
 
 					return Div{
 						classes = { 'team-participant-card', 'is--collapsed' }, -- Hardcoded collapsed state until we implement the js
 						attributes = {
 							['data-component'] = 'team-participant-card',
-							['data-team-participant-card-id'] = boxId
+							['data-team-participant-card-id'] = index
 						},
 						children = { header, content }
 					}
@@ -103,5 +54,70 @@ function ParticipantsTeamCard:render()
 	}
 end
 
-return ParticipantsTeamCard
+---@private
+---@param participant TeamParticipantsEntity
+---@return Widget
+function ParticipantsTeamCard:_renderHeader(participant)
+	local labelDiv = self:_renderLabel(participant)
 
+	-- TODO: Implement the non-compact version
+	return Div{
+		classes = { 'team-participant-card-header' },
+			attributes = {
+				tabindex = "0",
+				['data-component'] = "team-participant-card-collapsible-button"
+		},
+		children = WidgetUtil.collect(
+			OpponentDisplay.BlockOpponent{
+				opponent = participant.opponent,
+				overflow = 'ellipsis',
+				teamStyle = 'standard',
+				additionalClasses = {'team-participant-card-header-opponent', 'team-participant-square-icon'},
+			},
+			labelDiv,
+			Div{
+				classes = { 'team-participant-card-header-icon' },
+				children = { IconFa{iconName = 'collapse'}, }
+			}
+		)
+	}
+end
+
+---@private
+---@param participant TeamParticipantsEntity
+---@return Widget?
+function ParticipantsTeamCard:_renderLabel(participant)
+	local labelText
+	if String.isNotEmpty(participant.qualifierPage) or String.isNotEmpty(participant.qualifierUrl) then
+		labelText = 'Qualifier'
+	elseif String.isNotEmpty(participant.qualifierText) then
+		labelText = 'Invited'
+	end
+
+	if labelText then
+		return Div{
+			classes = { 'team-participant-card-header-label' },
+			children = {
+				HtmlWidgets.Span{
+					children = { labelText }
+				}
+			}
+		}
+	end
+end
+
+---@private
+---@param participant TeamParticipantsEntity
+---@return Widget
+function ParticipantsTeamCard:_renderContent(participant)
+	-- TODO: Implement qualifier box, roster functionality & notes
+	return Div{
+		classes = { 'team-participant-card-collapsible-content' },
+		attributes = {
+			['data-component'] = 'team-participant-card-content'
+		},
+		children = { participant.opponent.name } -- Team details & roster here
+	}
+end
+
+return ParticipantsTeamCard
