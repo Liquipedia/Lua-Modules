@@ -187,7 +187,8 @@ end
 ---@param tabletype StandingsTableTypes
 ---Parse status-based scoring configurations from template arguments
 ---@param args table
----@return table<string, {points: number?, roundWins: number?, roundLosses: number?, roundDraws: number?, gameWins: number?, gameLosses: number?, gameDraws: number?}>
+---@return table<string, {points: number?, roundWins: number?, roundLosses: number?, roundDraws: number?,
+---gameWins: number?, gameLosses: number?, gameDraws: number?}>
 function StandingsParseWiki.parseStatusConfigs(args)
 	local configs = {}
 	local statusKeys = {
@@ -222,7 +223,8 @@ end
 
 ---@param args table
 ---@return fun(opponent: match2opponent): number|nil
----@return table<string, {points: number?, roundWins: number?, roundLosses: number?, roundDraws: number?, gameWins: number?, gameLosses: number?, gameDraws: number?}>?
+---@return table<string, {points: number?, roundWins: number?, roundLosses: number?, roundDraws: number?,
+---gameWins: number?, gameLosses: number?, gameDraws: number?}>?
 function StandingsParseWiki.makeScoringFunction(tabletype, args)
 	if tabletype == 'ffa' then
 		if not args['p1'] then

@@ -25,7 +25,8 @@ local StandingsParseLpdb = {}
 
 ---@param rounds {roundNumber: integer, matches: string[]}[]
 ---@param scoreMapper fun(opponent: match2opponent): number|nil
----@param statusConfigs table<string, {points: number?, roundWins: number?, roundLosses: number?, roundDraws: number?, gameWins: number?, gameLosses: number?, gameDraws: number?}>?
+---@param statusConfigs table<string, {points: number?, roundWins: number?, roundLosses: number?, roundDraws: number?,
+---gameWins: number?, gameLosses: number?, gameDraws: number?}>?
 ---@return StandingTableOpponentData[]
 function StandingsParseLpdb.importFromMatches(rounds, scoreMapper, statusConfigs)
 	local matchIds = Array.flatMap(rounds, function(round)
@@ -118,7 +119,8 @@ end
 ---@param match match2
 ---@param opponents StandingTableOpponentData[]
 ---@param scoreMapper fun(opponent: standardOpponent): number?
----@param statusConfigs table<string, {points: number?, roundWins: number?, roundLosses: number?, roundDraws: number?, gameWins: number?, gameLosses: number?, gameDraws: number?}>?
+---@param statusConfigs table<string, {points: number?, roundWins: number?, roundLosses: number?, roundDraws: number?,
+---gameWins: number?, gameLosses: number?, gameDraws: number?}>?
 ---@param maxRounds integer
 function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMapper, statusConfigs, maxRounds)
 	local match2 = MatchGroupUtil.matchFromRecord(match)
