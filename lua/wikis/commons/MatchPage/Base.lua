@@ -319,8 +319,8 @@ function BaseMatchPage:renderGames()
 				}
 			end)
 		),
+		storeValue = false,
 		switchGroup = 'matchPage',
-		defaultActive = 1,
 		variant = 'generic'
 	}
 end
