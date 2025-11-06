@@ -198,6 +198,11 @@ function Config.placementDropOffFunction(tier, tierType)
 				if ((tier == 1 or tier == 2 or tier == 3) and placement == 1) then
 					return score
 				end
+			elseif (tierType == Config.TIER_TYPE_MISC
+					or tierType == Config.TIER_TYPE_WEEKLY
+					or tierType == Config.TIER_TYPE_MONTHLY
+					or tierType == Config.TIER_TYPE_SHOW_MATCH) then
+				return score
 			else
 				if (tier == 1 and placement <= 16) or placement == 1 then
 					return score
