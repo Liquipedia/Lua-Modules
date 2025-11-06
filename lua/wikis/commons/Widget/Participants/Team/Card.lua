@@ -8,14 +8,12 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local String = Lua.import('Module:StringUtils')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
-local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
+local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local ParticipantsTeamHeader = Lua.import('Module:Widget/Participants/Team/Header')
 
 ---@class ParticipantsTeamCard: Widget
 ---@operator call(table): ParticipantsTeamCard
@@ -25,73 +23,19 @@ local ParticipantsTeamCard = Class.new(Widget)
 function ParticipantsTeamCard:render()
 	local participant = self.props.participant
 
-	local header = self:_renderHeader(participant)
-	local content = self:_renderContent(participant)
-
 	return Div{
 		classes = { 'team-participant-card', 'is--collapsed' }, -- Hardcoded collapsed state until we implement the js
 		attributes = {
 			['data-component'] = 'team-participant-card'
 		},
-		children = { header, content }
-	}
-end
-
----@private
----@param participant TeamParticipantsEntity
----@return Widget
-function ParticipantsTeamCard:_renderHeader(participant)
-	local labelDiv = self:_renderLabel(participant)
-
-	-- TODO: Implement the non-compact version
-	return Div{
-		classes = { 'team-participant-card-header' },
-			attributes = {
-				tabindex = '0',
-				['data-component'] = 'team-participant-card-collapsible-button'
-		},
 		children = WidgetUtil.collect(
-			OpponentDisplay.BlockOpponent{
-				opponent = participant.opponent,
-				overflow = 'ellipsis',
-				teamStyle = 'standard',
-				additionalClasses = {'team-participant-card-header-opponent', 'team-participant-square-icon'},
-			},
-			labelDiv,
-			-- TODO: Implement toggle functionality
-			Div{
-				classes = { 'team-participant-card-header-icon' },
-				children = IconFa{iconName = 'collapse'},
-			}
+			ParticipantsTeamHeader{participant = participant},
+			self:_renderContent(participant)
 		)
 	}
 end
 
----@private
----@param participant TeamParticipantsEntity
----@return Widget?
-function ParticipantsTeamCard:_renderLabel(participant)
-	local labelText
-	if String.isNotEmpty(participant.qualifierPage) or String.isNotEmpty(participant.qualifierUrl) then
-		labelText = 'Qualifier'
-	elseif String.isNotEmpty(participant.qualifierText) then
-		labelText = 'Invited'
-	end
-
-	if not labelText then
-		return
-	end
-
-	return Div{
-		classes = { 'team-participant-card-header-label' },
-		children = {
-			HtmlWidgets.Span{
-				children = { labelText }
-			}
-		}
-	}
-end
-
+-- TODO: This will be divided to multiple components
 ---@private
 ---@param participant TeamParticipantsEntity
 ---@return Widget
