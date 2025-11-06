@@ -15,6 +15,7 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Match = Lua.import('Module:Match')
 local MatchGroup = Lua.import('Module:MatchGroup')
+local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
@@ -29,6 +30,66 @@ local TBD = 'TBD'
 local BYE = 'BYE'
 
 local LegacyMatchMaps = {}
+
+--- for bot conversion to proper match2 matchlists
+---@param frame Frame
+---@return string
+function LegacyMatchMaps.generateSolo(frame)
+	local args = Arguments.getArgs(frame)
+
+	local store = Logic.readBoolOrNil(args.store)
+
+	local parsedArgs = {
+		id = args.id,
+		title = args.title,
+		width = args.width,
+		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		store = store,
+	}
+
+	for _, matchInput, matchIndex in Table.iter.pairsByPrefix(args, 'match') do
+		parsedArgs['M' .. matchIndex] = LegacyMatchMaps._readSoloMatch(matchInput)
+	end
+
+	return MatchGroupLegacy.generateWikiCodeForMatchList(parsedArgs)
+end
+
+--- for bot conversion to proper match2 matchlists
+---@param frame Frame
+---@return string
+function LegacyMatchMaps.generateTeam(frame)
+	local args = Arguments.getArgs(frame)
+
+	local store = Logic.readBoolOrNil(args.store)
+
+	local offset = 0
+	local title = args.title
+	if not title and not Json.parseIfTable(args[1]) then
+		title = args[1]
+		offset = 1
+	end
+
+	local parsedArgs = {
+		id = args.id,
+		title = title,
+		width = args.width or '350px',
+		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		store = store,
+	}
+
+	---@type table[]
+	local matches = Array.mapIndexes(function(index)
+		return Json.parseIfTable(args[index + offset])
+	end)
+
+	Array.forEach(matches, function(match, matchIndex)
+		parsedArgs['M' .. matchIndex] = Match.makeEncodedJson(match)
+	end)
+
+	return MatchGroupLegacy.generateWikiCodeForMatchList(parsedArgs)
+end
 
 -- invoked by Template:MatchList
 ---@param frame Frame
@@ -49,7 +110,7 @@ function LegacyMatchMaps.solo(frame)
 		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 	}
 
 	for _, matchInput, matchIndex in Table.iter.pairsByPrefix(args, 'match') do
@@ -76,6 +137,8 @@ function LegacyMatchMaps._readSoloMatch(matchInput)
 
 	LegacyMatchMaps._readSoloOpponents(args)
 	LegacyMatchMaps._readMaps(args)
+
+	args.details = nil
 
 	return Match.makeEncodedJson(args)
 end
@@ -143,9 +206,10 @@ function LegacyMatchMaps._readMaps(args)
 		end)
 		map.vod = args['vodgame' .. mapIndex]
 		args['vodgame' .. mapIndex] = nil
-		args[prefix .. 'finished'] = true
+		args[prefix .. 'finished'] = nil
 
 		if Table.isNotEmpty(map) then
+			map.finished = true
 			args[prefix] = map
 		end
 	end
@@ -171,8 +235,11 @@ end
 
 -- invoked by Template:MatchMapsTeams
 ---@param frame Frame
+---@return string?
 function LegacyMatchMaps.teamMatch(frame)
 	local args = Arguments.getArgs(frame)
+
+	local generate = Logic.readBool(Table.extract(args, 'generate'))
 
 	args = Table.merge(Json.parseIfString(args.details) or {}, args)
 	args.details = nil
@@ -180,6 +247,10 @@ function LegacyMatchMaps.teamMatch(frame)
 	LegacyMatchMaps._readTeamOpponents(args)
 	--map data gets preprocessed already due to using the same template as in brackets
 	LegacyMatchMaps._readMaps(args)
+
+	if generate then
+		return Json.stringify(args)
+	end
 
 	Template.stashReturnValue(args, 'LegacyMatchlist')
 end
@@ -197,10 +268,31 @@ function LegacyMatchMaps._readTeamOpponents(args)
 			return
 		end
 
+		local players = {}
+
+		local parsePlayer = function(key, playerInput)
+			local index = string.match(key, '^opponent' .. opponentIndex .. '_p(%d+)$')
+			if not index then return end
+			args[key] = nil
+			local player = Json.parseIfTable(playerInput)
+			if Logic.isEmpty(player) then return end
+			---@cast player -nil
+			local prefix = 'p' .. index
+			players[prefix] = player.name
+			players[prefix .. 'dn'] = player.displayname
+			players[prefix .. 'flag'] = player.flag
+			players[prefix .. 'race'] = player.race
+		end
+
+		for key, item in pairs(args) do
+			parsePlayer(key, item)
+		end
+
 		args['opponent' .. opponentIndex] = {
 			type = Opponent.team,
 			template = template,
 			score = args['games' .. opponentIndex],
+			players = Logic.nilIfEmpty(players)
 		}
 
 		args['games' .. opponentIndex] = nil
@@ -222,7 +314,7 @@ function LegacyMatchMaps.teamClose()
 		title = matchlistVars:get('matchListTitle'),
 		width = matchlistVars:get('width'),
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 		collapsed = hide,
 		attached = hide,
 	}

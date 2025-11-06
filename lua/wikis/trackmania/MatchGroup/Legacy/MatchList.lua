@@ -13,6 +13,7 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Match = Lua.import('Module:Match')
 local MatchGroup = Lua.import('Module:MatchGroup')
+local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
@@ -68,6 +69,7 @@ function LegacyMatchList.matchMaps(frame)
 		Template.stashReturnValue(processedArgs, 'LegacyMatchlist')
 		return mw.html.create('div')
 	else -- case matchlist version 2
+		processedArgs.generate = nil
 		return Json.stringify(processedArgs)
 	end
 end
@@ -95,11 +97,20 @@ end
 function LegacyMatchList._handleOpponents(processedArgs)
 	for opponentIndex = 1, NUMBER_OF_OPPONENTS do
 		local input = Table.extract(processedArgs, 'team' .. opponentIndex)
+		local player = Table.extract(processedArgs, 'player' .. opponentIndex)
 		local score = Table.extract(processedArgs, 'games' .. opponentIndex)
 		if (input or ''):lower() == 'bye' then
 			processedArgs['opponent' .. opponentIndex] = {
 				['type'] = Opponent.literal,
 				name = 'BYE',
+				score = score,
+			}
+		elseif Logic.isNotEmpty(player) then
+			processedArgs['opponent' .. opponentIndex] = {
+				['type'] = Opponent.solo,
+				name = player,
+				flag = Table.extract(processedArgs, 'p' .. opponentIndex .. 'flag'),
+				link = Table.extract(processedArgs, 'p' .. opponentIndex .. 'link'),
 				score = score,
 			}
 		elseif Logic.isEmpty(input) then
@@ -167,7 +178,7 @@ end
 
 -- handle the second version of matchlists ...
 -- invoked by Template:LegacyMatchList
-function LegacyMatchList.run(frame)
+function LegacyMatchList.run(frame, generate)
 	local args = Arguments.getArgs(frame)
 	local store = Logic.nilOr(
 		Logic.readBoolOrNil(args.store),
@@ -178,7 +189,13 @@ function LegacyMatchList.run(frame)
 		return args['match' .. matchIndex]
 	end)
 
+	---@type table
 	local matchListArgs = Table.copy(matches)
+	if generate then
+		matchListArgs = Table.map(matchListArgs, function(index, value)
+			return 'M' .. index, Json.parseIfTable(value) or value
+		end)
+	end
 	matchListArgs.id = args.id
 	matchListArgs.isLegacy = true
 	matchListArgs.title = args.title or args[1] or 'Match List'
@@ -196,8 +213,55 @@ function LegacyMatchList.run(frame)
 		matchListArgs.noDuplicateCheck = true
 		matchListArgs.store = false
 	end
+	if generate then
+		matchListArgs.isLegacy = nil
+		return MatchGroupLegacy.generateWikiCodeForMatchList(matchListArgs)
+	end
 
 	return MatchGroup.MatchList(matchListArgs)
+end
+
+--- for bot conversion to proper match2 matchlists
+---@param frame Frame
+---@return string
+function LegacyMatchList.generate(frame)
+	return LegacyMatchList.run(frame, true)
+end
+
+--- for bot conversion to proper match2 matchlists
+---@param frame Frame
+---@return string
+function LegacyMatchList.generate2(frame)
+	local args = Arguments.getArgs(frame)
+
+	local store = Logic.readBoolOrNil(args.store)
+
+	local offset = 0
+	local title = args.title
+	if not title and not Json.parseIfTable(args[1]) then
+		title = args[1]
+		offset = 1
+	end
+
+	local parsedArgs = {
+		id = args.id,
+		title = title,
+		width = args.width,
+		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
+		store = store,
+	}
+
+	---@type table[]
+	local matches = Array.mapIndexes(function(index)
+		return Json.parseIfTable(args[index + offset])
+	end)
+
+	Array.forEach(matches, function(match, matchIndex)
+		parsedArgs['M' .. matchIndex] = Match.makeEncodedJson(match)
+	end)
+
+	return MatchGroupLegacy.generateWikiCodeForMatchList(parsedArgs)
 end
 
 return LegacyMatchList
