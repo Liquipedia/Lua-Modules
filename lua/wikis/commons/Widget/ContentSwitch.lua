@@ -26,7 +26,7 @@ local Div = HtmlWidgets.Div
 ---@field defaultActive integer
 ---@field switchGroup string
 ---@field classes string[]?
----@field smallThreshold integer
+---@field size 'small'|'medium'
 ---@field storeValue boolean
 
 ---@class ContentSwitch: Widget
@@ -37,7 +37,7 @@ ContentSwitch.defaultProps = {
 	tabs = {},
 	variant = 'themed',
 	defaultActive = 1,
-	smallThreshold = 3,
+	size = 'medium',
 	storeValue = true,
 }
 
@@ -47,12 +47,11 @@ function ContentSwitch:render()
 	local variant = self.props.variant
 	local defaultActive = self.props.defaultActive
 	local switchGroup = self:assertExistsAndCopy(self.props.switchGroup)
-	local smallThreshold = self.props.smallThreshold
 
 	local tabOptions = Array.map(tabs, function(tab, index)
 		local isActive = index == defaultActive
 		local classes = {'switch-pill-option', 'toggle-area-button'}
-		if #tabs >= smallThreshold then
+		if self.props.size == 'small' then
 			table.insert(classes, 'switch-pill-small')
 		end
 		if isActive then
