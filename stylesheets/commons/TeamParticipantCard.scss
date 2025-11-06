@@ -29,6 +29,7 @@
 	border-radius: 0.5rem;
 	border: 1px solid;
 	padding: 0.5rem 0;
+	overflow: hidden;
 
 	.theme--light & {
 		background-color: var( --clr-secondary-100 );
@@ -64,6 +65,7 @@
 			align-items: center;
 			flex: 1 0 0;
 			font-weight: bold;
+			min-width: 0;
 		}
 
 		&-label {
