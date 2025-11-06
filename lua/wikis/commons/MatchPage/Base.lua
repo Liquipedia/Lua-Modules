@@ -312,7 +312,7 @@ function BaseMatchPage:renderGames()
 			Array.map(games, function (game, gameIndex)
 				local mapName = self.games[gameIndex].map
 				return {
-					label = 'Game ' .. gameIndex .. (
+					label = 'Game&nbsp;' .. gameIndex .. (
 						Logic.isNotEmpty(mapName) and (': ' .. mapName) or ''
 					),
 					content = game
