@@ -76,8 +76,10 @@ function TeamParticipantsRepository.save(TeamParticipant)
 	lpdbData.qualifierurl = TeamParticipant.qualifierUrl
 	lpdbData.extradata = lpdbData.extradata or {}
 
-	lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(TeamParticipant.opponentData))
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(TeamParticipant.opponentData, {setPlayersInTeam = true}))
+	-- Legacy participant fields
+	lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(TeamParticipant.opponentData))
+	lpdbData.players = lpdbData.opponentplayers
 
 	local numberOfPlayersOnTeam = #(TeamParticipant.opponentData.players or {})
 	if numberOfPlayersOnTeam == 0 then
@@ -89,7 +91,6 @@ function TeamParticipantsRepository.save(TeamParticipant)
 	-- TODO: Store page vars
 
 	lpdbData = Json.stringifySubTables(lpdbData)
-	lpdbData.opponentplayers = lpdbData.players -- TODO: Until this is included in Opponent
 
 	mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, lpdbData)
 end
