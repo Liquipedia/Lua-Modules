@@ -319,6 +319,7 @@ function BaseMatchPage:renderGames()
 				}
 			end)
 		),
+		size = 'small',
 		storeValue = false,
 		switchGroup = 'matchPage',
 		variant = 'generic'
