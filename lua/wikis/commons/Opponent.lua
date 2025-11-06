@@ -470,17 +470,18 @@ end
 
 ---Reads an opponent struct and builds a standings/placement lpdb struct from it
 ---@param opponent standardOpponent
+---@param options {setPlayersInTeam: boolean?}?
 ---@return {opponentname: string, opponenttemplate: string?, opponenttype: OpponentType, opponentplayers: table?}
-function Opponent.toLpdbStruct(opponent)
+function Opponent.toLpdbStruct(opponent, options)
+	options = options or {}
 	local storageStruct = {
 		opponentname = Opponent.toName(opponent),
 		opponenttemplate = opponent.template,
 		opponenttype = opponent.type,
 	}
 
-	-- Add players for Party Type opponents.
-	-- Team's will have their players added via the TeamCard.
-	if Opponent.typeIsParty(opponent.type) then
+	-- Add players for Party Type opponents, or if config is set to force it.
+	if Opponent.typeIsParty(opponent.type) or options.setPlayersInTeam then
 		local players = {}
 		for playerIndex, player in ipairs(opponent.players) do
 			local prefix = 'p' .. playerIndex

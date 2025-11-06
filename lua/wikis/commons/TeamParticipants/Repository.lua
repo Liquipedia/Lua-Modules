@@ -77,7 +77,7 @@ function TeamParticipantsRepository.save(TeamParticipant)
 	lpdbData.extradata = lpdbData.extradata or {}
 
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(TeamParticipant.opponentData))
-	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(TeamParticipant.opponentData))
+	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(TeamParticipant.opponentData, {setPlayersInTeam = true}))
 
 	local numberOfPlayersOnTeam = #(TeamParticipant.opponentData.players or {})
 	if numberOfPlayersOnTeam == 0 then
@@ -87,7 +87,6 @@ function TeamParticipantsRepository.save(TeamParticipant)
 
 	-- TODO: Store aliases (page names) for opponents
 	-- TODO: Store page vars
-	-- TODO: Set players
 
 	lpdbData = Json.stringifySubTables(lpdbData)
 	lpdbData.opponentplayers = lpdbData.players -- TODO: Until this is included in Opponent
