@@ -37,7 +37,6 @@ ContentSwitch.defaultProps = {
 	tabs = {},
 	variant = 'themed',
 	defaultActive = 1,
-	switchGroup = 'contentSwitch',
 	smallThreshold = 3,
 	storeValue = true,
 }
@@ -47,7 +46,7 @@ function ContentSwitch:render()
 	local tabs = self.props.tabs
 	local variant = self.props.variant
 	local defaultActive = self.props.defaultActive
-	local switchGroup = self.props.switchGroup
+	local switchGroup = self:assertExistsAndCopy(self.props.switchGroup)
 	local smallThreshold = self.props.smallThreshold
 
 	local tabOptions = Array.map(tabs, function(tab, index)
