@@ -252,7 +252,7 @@ Author(s): iMarbot
 
 .gridTable.tournamentCard .gridCell.Placement.Qualified > .Participants {
 	display: inline-grid;
-	grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
+	grid-template-columns: repeat( auto-fit, minmax( 150px, 1fr ) );
 	min-width: 15vw;
 }
 
