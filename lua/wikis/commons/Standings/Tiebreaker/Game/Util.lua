@@ -35,8 +35,8 @@ TiebreakerGameUtil.getGames = FnUtil.memoize(function (opponent)
 			end
 			return
 		end
-		games = games + Array.reduce(match.opponents, Operator.property('score'))
-		gameWins = gameWins + match.opponents[opponentIndex].score
+		games = games + Array.reduce(Array.map(match.opponents, Operator.property('score')), Operator.nilSafeAdd)
+		gameWins = gameWins + (match.opponents[opponentIndex].score or 0)
 	end)
 	local gameLosses = games - gameWins
 
