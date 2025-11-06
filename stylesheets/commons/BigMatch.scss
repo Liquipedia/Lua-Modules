@@ -1570,17 +1570,7 @@ $valorant-def: #01654c;
 	}
 }
 
-.match-bm {
-	.switch-pill {
-		overflow-x: auto;
-
-		&-container {
-			margin-top: 0.5rem;
-			margin-bottom: 0.5rem;
-		}
-
-		&-option {
-			text-align: center;
-		}
-	}
+.match-bm .switch-pill-container {
+	margin-top: 0.5rem;
+	margin-bottom: 0.5rem;
 }

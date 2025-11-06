@@ -78,7 +78,7 @@
 	.switch-pill {
 		display: flex;
 		border-radius: 0.5rem;
-		overflow: hidden;
+		overflow: auto hidden;
 		padding: 0.25rem;
 
 		&::after {
@@ -144,6 +144,7 @@
 			font-size: 0.875rem;
 			font-weight: bold;
 			line-height: 1.25rem;
+			text-align: center;
 
 			.theme--light & {
 				color: var( --clr-wiki-theme-primary );
