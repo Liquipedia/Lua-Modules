@@ -26,6 +26,7 @@
 	flex-direction: column;
 	gap: 0.25rem;
 	justify-content: center;
+	align-self: start;
 	border-radius: 0.5rem;
 	border: 1px solid;
 	padding: 0.5rem 0;
@@ -72,6 +73,19 @@
 
 			.theme--dark & {
 				border-color: var( --clr-on-surface-dark-primary-8 );
+				color: var( --clr-secondary-90 );
+			}
+		}
+
+		.general-collapsible-expand-button,
+		.general-collapsible-collapse-button {
+			outline: none;
+
+			.theme--light & {
+				color: var( --clr-secondary-7 );
+			}
+
+			.theme--dark & {
 				color: var( --clr-secondary-90 );
 			}
 		}
