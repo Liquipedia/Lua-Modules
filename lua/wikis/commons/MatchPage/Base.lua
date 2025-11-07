@@ -306,7 +306,6 @@ function BaseMatchPage:renderGames()
 		tabs = WidgetUtil.collect(
 			overallStats and {
 				label = 'Overall Statistics',
-				value = 'overall',
 				content = overallStats
 			} or nil,
 			Array.map(games, function (game, gameIndex)
