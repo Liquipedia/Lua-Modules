@@ -355,10 +355,14 @@ function EmptyTeamPagePreview:_rosterFromLastPlacement()
 		HtmlWidgets.H3{children = 'Most Recent Roster'},
 		hasFormer and HtmlWidgets.H4{children = 'Active'} or nil,
 		SquadCustom.runAuto(activePlayers, SquadUtils.SquadStatus.ACTIVE, SquadUtils.SquadType.PLAYER),
-		hasFormer and HtmlWidgets.H4{children = 'Former'} or nil,
-		hasFormer and SquadCustom.runAuto(formerPlayers, SquadUtils.SquadStatus.FORMER, SquadUtils.SquadType.PLAYER) or nil,
-		hasCoaches and HtmlWidgets.H3{children = 'Active Organization'} or nil,
-		hasCoaches and SquadCustom.runAuto(activeCoaches, SquadUtils.SquadStatus.ACTIVE, SquadUtils.SquadType.STAFF) or nil
+		hasFormer and {
+			HtmlWidgets.H4{children = 'Former'},
+			SquadCustom.runAuto(formerPlayers, SquadUtils.SquadStatus.FORMER, SquadUtils.SquadType.PLAYER),
+		} or nil,
+		hasCoaches and {
+			HtmlWidgets.H3{children = 'Active Organization'},
+			SquadCustom.runAuto(activeCoaches, SquadUtils.SquadStatus.ACTIVE, SquadUtils.SquadType.STAFF),
+		} or nil
 	)
 end
 
