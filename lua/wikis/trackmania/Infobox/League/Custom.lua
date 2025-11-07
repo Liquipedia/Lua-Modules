@@ -47,13 +47,7 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
-	if id == 'sponsors' then
-		local partners = self.caller:getAllArgsForBase(args, 'partner')
-		table.insert(widgets, Cell{
-			name = 'Partner' .. (#partners > 1 and 's' or ''),
-			children = Array.map(partners, Page.makeInternalLink)
-		})
-	elseif id == 'gamesettings' then
+	if id == 'gamesettings' then
 		local games = self.caller:getAllArgsForBase(args, 'game')
 		table.insert(widgets, Cell{
 			name = 'Game' .. (#games > 1 and 's' or ''),
