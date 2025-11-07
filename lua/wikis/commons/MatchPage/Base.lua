@@ -305,7 +305,10 @@ function BaseMatchPage:renderGames()
 	return ContentSwitch{
 		tabs = WidgetUtil.collect(
 			overallStats and {
-				label = 'Overall Statistics',
+				label = {
+					HtmlWidgets.Span{classes = {'mobile-hide'}, children = 'Overall Statistics'},
+					HtmlWidgets.Span{classes = {'mobile-only'}, children = 'Overall'}
+				},
 				content = overallStats
 			} or nil,
 			Array.map(games, function (game, gameIndex)
