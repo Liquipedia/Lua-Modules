@@ -1,24 +1,7 @@
 .team-participant-cards {
 	display: grid;
 	gap: 0.25rem;
-	grid-template-columns: 1fr;
-
-	@media ( min-width: 768px ) {
-		gap: 0.625rem;
-		grid-template-columns: repeat( 2, 1fr );
-	}
-
-	@media ( min-width: 1024px ) {
-		grid-template-columns: repeat( 3, 1fr );
-	}
-
-	@media ( min-width: 1319px ) {
-		grid-template-columns: repeat( 4, 1fr );
-	}
-
-	@media ( min-width: 1920px ) {
-		grid-template-columns: repeat( 5, 1fr );
-	}
+	grid-template-columns: repeat( auto-fit, minmax( 280px, 1fr ) );
 }
 
 .team-participant-card {
