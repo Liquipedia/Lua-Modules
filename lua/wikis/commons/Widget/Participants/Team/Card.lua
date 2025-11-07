@@ -1,4 +1,3 @@
----
 -- @Liquipedia
 -- page=Module:Widget/Participants/Team/Card
 --
@@ -22,14 +21,52 @@ local ParticipantsTeamCard = Class.new(Widget)
 ---@return Widget
 function ParticipantsTeamCard:render()
 	local participant = self.props.participant
+	local variant = self.props.variant or 'compact'
 
-	return Collapsible{
-		titleWidget = ParticipantsTeamHeader{participant = participant},
+	local qualifierBox = self:_renderQualifierBox(participant)
+	local content = { self:_renderContent(participant) }
+
+	local header = ParticipantsTeamHeader{
+		participant = participant,
+		variant = variant
+	}
+
+	local collapsible = Collapsible{
 		shouldCollapse = true,
 		collapseAreaClasses = {'team-participant-card-collapsible-content'},
-		classes = {'team-participant-card'},
-		children = self:_renderContent(participant)
+		classes = {'team-participant-card', 'team-participant-card--' .. variant},
 	}
+
+	if variant == 'expanded' then
+		collapsible.props.titleWidget = Div{
+			children = {
+				header,
+				qualifierBox
+			}
+		}
+		collapsible.props.children = content
+	else
+		collapsible.props.titleWidget = header
+		if qualifierBox then
+			table.insert(content, 1, qualifierBox)
+		end
+		collapsible.props.children = content
+	end
+
+	return collapsible
+end
+
+---@private
+---@param participant TeamParticipantsEntity
+---@return Widget?
+function ParticipantsTeamCard:_renderQualifierBox(participant)
+	-- TODO: Implement qualifier box content based on figma
+	if participant.qualifierPage or participant.qualifierUrl or participant.qualifierText then
+		return Div{
+			classes = {'team-participant-card-qualifier'},
+			children = {'Qualifier Info Box Placeholder'}
+		}
+	end
 end
 
 -- TODO: This will be divided to multiple components

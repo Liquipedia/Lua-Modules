@@ -81,6 +81,81 @@
 	&-collapsible-content {
 		padding: 0.5rem;
 	}
+
+	@media ( min-width: 1024px ) {
+		&--expanded {
+			&.collapsible-widget {
+				> .collapsible-title {
+					display: flex;
+					flex-direction: column;
+					gap: 0.5rem;
+					padding-bottom: 0.5rem;
+				}
+			}
+
+			.team-participant-card-header--expanded {
+				position: relative;
+				flex-direction: column;
+				gap: 0.5rem;
+				width: 100%;
+
+				.team-participant-card-header__main {
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					gap: 0.5rem;
+					width: 100%;
+				}
+
+				.team-participant-card-header-opponent {
+					flex-direction: column;
+					gap: 0.25rem;
+
+					.team-template-text {
+						font-size: 1.125rem;
+						font-weight: bold;
+					}
+				}
+
+				.team-participant-square-icon {
+					.team-template-image-icon {
+						width: 56px;
+						height: 56px;
+						line-height: 56px;
+
+						img {
+							max-width: 48px;
+							max-height: 48px;
+						}
+					}
+				}
+
+				.general-collapsible-default-toggle {
+					position: absolute;
+					top: 0;
+					right: 0.5rem;
+				}
+			}
+
+			.team-participant-card-qualifier {
+				padding: 0.5rem;
+				margin: 0 0.5rem;
+				border-radius: 0.25rem;
+				border: 1px solid;
+				text-align: center;
+
+				.theme--light & {
+					border-color: var( --clr-on-surface-light-primary-8 );
+					background-color: var( --clr-secondary-95 );
+				}
+
+				.theme--dark & {
+					border-color: var( --clr-on-surface-dark-primary-8 );
+					background-color: var( --clr-on-surface-dark-primary-2 );
+				}
+			}
+		}
+	}
 }
 
 $participant-icon-wrapper-size: 48px;
@@ -116,6 +191,6 @@ $participant-icon-size-mobile: 32px;
 
 .team-participant-square-icon {
 	.team-template-image-icon {
-		@include responsive-participant-icon($participant-icon-wrapper-size, $participant-icon-size, $participant-icon-wrapper-size-mobile, $participant-icon-size-mobile);
+		@include responsive-participant-icon($participant-icon-wrapper-size, $participant-icon-size, $participant-icon-wrapper-size-mobile, $icon-size-mobile);
 	}
 }

@@ -28,6 +28,8 @@ function ParticipantsTeamCardsGroup:render()
 		return
 	end
 
+	local variant = self.props.variant or 'compact'
+
 	return AnalyticsWidget{
 		analyticsName = 'Team participants card',
 		children = Div{
@@ -35,6 +37,7 @@ function ParticipantsTeamCardsGroup:render()
 			children = Array.map(participants, function(participant)
 				return ParticipantsTeamCard{
 					participant = participant,
+					variant = variant,
 				}
 			end),
 		}
