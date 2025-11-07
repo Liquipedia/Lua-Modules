@@ -14,6 +14,7 @@ local Json = Lua.import('Module:Json')
 local Lpdb = Lua.import('Module:Lpdb')
 local Page = Lua.import('Module:Page')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local String = Lua.import('Module:String')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
@@ -21,6 +22,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 local prizePoolVars = PageVariableNamespace('PrizePool')
 local teamCardsVars = PageVariableNamespace('TeamCards')
+local globalVars = PageVariableNamespace()
 
 ---@class TeamParticipantsEntity
 ---@field pagename string
@@ -93,6 +95,20 @@ function TeamParticipantsRepository.save(TeamParticipant)
 	lpdbData = Json.stringifySubTables(lpdbData)
 
 	mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, lpdbData)
+end
+
+---@param TeamParticipant table
+function TeamParticipantsRepository.setWikiVariables(TeamParticipant)
+	Array.forEach(TeamParticipant.aliases or {}, function(teamName)
+		local teamPrefix = String(teamName):gsub('_', ' ')
+		Array.forEach(TeamParticipant.opponentData.players or {}, function(player, index)
+			local combinedPrefix = teamPrefix .. '_' .. 'p' .. index
+			globalVars:set(combinedPrefix, player.pageName)
+			globalVars:set(combinedPrefix .. 'flag', player.flag)
+			globalVars:set(combinedPrefix .. 'dn', player.displayName)
+			-- TODO: joindate, leavedate
+		end)
+	end)
 end
 
 ---@param opponent standardOpponent
