@@ -99,8 +99,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	if placement.args.forceQualified ~= nil then
 		lpdbData.qualified = Logic.readBool(placement.args.forceQualified) and 1 or 0
-	else
-		lpdbData.qualified = placement:getPrizeRewardForOpponent(opponent, 'QUALIFIES1') and 1 or 0
 	end
 
 	if lpdbData.opponenttype == Opponent.solo then
