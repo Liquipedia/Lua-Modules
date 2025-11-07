@@ -66,7 +66,7 @@ function ExternalMediaLink._fallBackArgs(args)
 	end
 end
 
----Parses the supplied arguments and returns it as its LPDB form
+---Parses the supplied arguments and returns as LPDB form
 ---@param args table
 ---@return table
 function ExternalMediaLink._readArgs(args)
