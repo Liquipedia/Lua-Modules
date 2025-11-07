@@ -27,7 +27,7 @@ function TeamParticipantsController.fromTemplate(frame)
 	local savedParticipants = Array.map(parsedData.opponents, TeamParticipantsRepository.save)
 	Array.forEach(parsedData.opponents, TeamParticipantsRepository.setPageVars)
 	return TeamParticipantsDisplay{
-		participants = savedParticipants
+		placements = savedParticipants
 	}
 end
 

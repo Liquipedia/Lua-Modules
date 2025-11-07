@@ -22,7 +22,7 @@ local ParticipantsTeamCard = Class.new(Widget)
 
 ---@return Widget?
 function ParticipantsTeamCard:render()
-	local placements = self.props.placement
+	local placements = self.props.placements
 	if not placements then
 		return
 	end
