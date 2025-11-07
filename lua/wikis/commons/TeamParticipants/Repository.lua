@@ -33,7 +33,9 @@ local globalVars = PageVariableNamespace()
 
 local TeamParticipantsRepository = {}
 
+--- Save a team participant to lpdb placement table and returns the data saved
 ---@param TeamParticipant table
+---@return placement
 function TeamParticipantsRepository.save(TeamParticipant)
 	-- Since we merge data from prizepool and teamparticipants, we need to first fetch the existing record from prizepool
 	local lpdbData = TeamParticipantsRepository.getPrizepoolRecordForTeam(TeamParticipant.opponentData) or {}
@@ -76,29 +78,34 @@ function TeamParticipantsRepository.save(TeamParticipant)
 	lpdbData.qualifier = TeamParticipant.qualifierText
 	lpdbData.qualifierpage = TeamParticipant.qualifierPage
 	lpdbData.qualifierurl = TeamParticipant.qualifierUrl
+
 	lpdbData.extradata = lpdbData.extradata or {}
+	lpdbData.extradata.opponentaliases = TeamParticipant.aliases
 
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(TeamParticipant.opponentData, {setPlayersInTeam = true}))
 	-- Legacy participant fields
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(TeamParticipant.opponentData))
 	lpdbData.players = lpdbData.opponentplayers
 
+	-- Calculate individual prize money (prize money per player on team)
 	local numberOfPlayersOnTeam = #(TeamParticipant.opponentData.players or {})
 	if numberOfPlayersOnTeam == 0 then
 		numberOfPlayersOnTeam = 1
 	end
-	lpdbData.individualprizemoney = (lpdbData.prizemoney or 0) / numberOfPlayersOnTeam
+	if lpdbData.prizemoney then
+		lpdbData.individualprizemoney = lpdbData.prizemoney / numberOfPlayersOnTeam
+	end
 
-	-- TODO: Store aliases (page names) for opponents
-	-- TODO: Store page vars
+	mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, Json.stringifySubTables(lpdbData))
 
-	lpdbData = Json.stringifySubTables(lpdbData)
-
-	mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, lpdbData)
+	return lpdbData
 end
 
+--- Set wiki variables for team participants to be used in other modules/templates, primarily matches
+--- This matches with what HiddenDataBox also does
+--- We should change all usages to be more sane structure instead of flat variables in the future
 ---@param TeamParticipant table
-function TeamParticipantsRepository.setWikiVariables(TeamParticipant)
+function TeamParticipantsRepository.setPageVars(TeamParticipant)
 	Array.forEach(TeamParticipant.aliases or {}, function(teamName)
 		local teamPrefix = String(teamName):gsub('_', ' ')
 		Array.forEach(TeamParticipant.opponentData.players or {}, function(player, index)

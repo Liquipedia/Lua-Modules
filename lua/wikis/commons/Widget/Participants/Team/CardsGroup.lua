@@ -22,10 +22,12 @@ local ParticipantsTeamCard = Class.new(Widget)
 
 ---@return Widget?
 function ParticipantsTeamCard:render()
-	local participants = TeamParticipantsRepository.getAllByPageName(self.props.pageName)
-	if not participants then
+	local placements = self.props.placement
+	if not placements then
 		return
 	end
+
+	local participants = Array.map(placements, TeamParticipantsRepository.entityFromRecord)
 
 	return AnalyticsWidget{
 		analyticsName = 'Team participants card',
