@@ -75,7 +75,7 @@ function ExternalMediaLinkDisplay:_renderAuthors()
 	local authors = Array.mapIndexes(function (index)
 		return Logic.nilIfEmpty{
 			pageName = data.authors['author' .. index],
-			displayName = data.authors['author' .. index .. 'displayName']
+			displayName = data.authors['author' .. index .. 'dn']
 		}
 	end)
 
