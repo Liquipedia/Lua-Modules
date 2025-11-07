@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
+local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
@@ -81,7 +82,7 @@ function ExternalMediaLink._store(args)
 	-- set a maximum for authors due to the same being used in queries
 	assert(Table.size(authors) <= 2 * MAXIMUM_VALUES.authors,
 		'Maximum Value of authors (' .. MAXIMUM_VALUES.authors .. ') exceeded')
-	lpdbData.authors = mw.ext.LiquipediaDB.lpdb_create_json(authors)
+	lpdbData.authors = authors
 
 	local extradata = {
 		translation = args.translation,
@@ -109,9 +110,9 @@ function ExternalMediaLink._store(args)
 	assert(Table.size(subjects) <= MAXIMUM_VALUES.subjects,
 		'Maximum Value of subjects (' .. MAXIMUM_VALUES.subjects .. ') exceeded')
 
-	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(Table.merge(extradata, orgs, subjects))
+	lpdbData.extradata = Table.merge(extradata, orgs, subjects)
 
-	mw.ext.LiquipediaDB.lpdb_externalmedialink(ExternalMediaLink._objectName(args), lpdbData)
+	mw.ext.LiquipediaDB.lpdb_externalmedialink(ExternalMediaLink._objectName(args), Json.stringifySubTables(lpdbData))
 end
 
 ---Builds the object name for an External Media Link
