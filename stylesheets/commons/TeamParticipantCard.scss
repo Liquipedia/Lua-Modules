@@ -62,7 +62,7 @@
 
 		.general-collapsible-expand-button,
 		.general-collapsible-collapse-button {
-			outline: none;
+			outline: unset;
 
 			.theme--light & {
 				color: var( --clr-secondary-7 );
