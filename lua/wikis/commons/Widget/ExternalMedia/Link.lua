@@ -33,6 +33,7 @@ function ExternalMediaLinkDisplay:render()
 		self:_renderTitle(),
 		self:_renderAuthors(),
 		self:_renderPublisher(),
+		self:_renderEvent(),
 		self:_renderTranslation()
 	), NON_BREAKING_SPACE)
 end
