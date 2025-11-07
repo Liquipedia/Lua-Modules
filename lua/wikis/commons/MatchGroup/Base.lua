@@ -125,7 +125,7 @@ function MatchGroupBase._checkBracketDuplicate(bracketId)
 		return makeWarning()
 	end
 
-	local bracketIdUsedOnSamePage = Variables.varDefault(bracketId)
+	local bracketIdUsedOnSamePage = Variables.varDefault(bracketId) ~= nil
 	if bracketIdUsedOnSamePage then
 		return makeWarning()
 	end
