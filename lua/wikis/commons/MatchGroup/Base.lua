@@ -118,7 +118,7 @@ function MatchGroupBase._checkBracketDuplicate(bracketId)
 	end
 
 	local bracketIdUsedOnOtherPage = mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = '[[match2bracketid::'.. bracketId ..']] AND [[pageid::!='.. mw.title.getCurrentTitle().id ..']]' ..
+		conditions = '[[match2bracketid::'.. bracketId ..']] AND [[pageid::!'.. mw.title.getCurrentTitle().id ..']]' ..
 		'AND ([[namespace::0]] OR [[namespace::!0]])',
 	})
 	if #bracketIdUsedOnOtherPage > 0 then
