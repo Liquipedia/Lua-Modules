@@ -12,10 +12,10 @@ local String = Lua.import('Module:StringUtils')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Widget = Lua.import('Module:Widget')
+local ChevronToggle = Lua.import('Module:Widget/Participants/Team/ChevronToggle')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class ParticipantsTeamHeader: Widget
 ---@operator call(table): ParticipantsTeamHeader
@@ -25,13 +25,9 @@ function ParticipantsTeamHeader:render()
     local participant = self.props.participant
 	local labelDiv = self:_renderLabel(participant)
 
-	-- TODO: Implement the non-compact version
+	-- TODO: Implement the expanded variant
 	return Div{
 		classes = { 'team-participant-card-header' },
-			attributes = {
-				tabindex = '0',
-				['data-component'] = 'team-participant-card-collapsible-button'
-		},
 		children = WidgetUtil.collect(
 			OpponentDisplay.BlockOpponent{
 				opponent = participant.opponent,
@@ -40,11 +36,7 @@ function ParticipantsTeamHeader:render()
 				additionalClasses = {'team-participant-card-header-opponent', 'team-participant-square-icon'},
 			},
 			labelDiv,
-			-- TODO: Implement toggle functionality
-			Div{
-				classes = { 'team-participant-card-header-icon' },
-				children = IconFa{iconName = 'collapse'},
-			}
+			ChevronToggle{}
 		)
 	}
 end

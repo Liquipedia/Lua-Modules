@@ -41,16 +41,6 @@
 		border-color: var( --clr-on-surface-dark-primary-8 );
 	}
 
-	&.is--collapsed {
-		.team-participant-card-header-icon {
-			transform: rotate( 180deg );
-		}
-
-		.team-participant-card-collapsible-content {
-			display: none;
-		}
-	}
-
 	&-header {
 		display: flex;
 		gap: 0.25rem;
@@ -82,25 +72,6 @@
 
 			.theme--dark & {
 				border-color: var( --clr-on-surface-dark-primary-8 );
-				color: var( --clr-secondary-90 );
-			}
-		}
-
-		&-icon {
-			height: 1.5rem;
-			width: 1.5rem;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			cursor: pointer;
-			transform-origin: center;
-			transition: transform 0.2s linear;
-
-			.theme--light & {
-				color: var( --clr-secondary-7 );
-			}
-
-			.theme--dark & {
 				color: var( --clr-secondary-90 );
 			}
 		}
