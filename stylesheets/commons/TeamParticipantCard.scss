@@ -88,6 +88,7 @@ $participant-icon-size-mobile: 32px;
 	width: $wrapper-size;
 	height: $wrapper-size;
 	text-align: center;
+	line-height: $wrapper-size;
 
 	@media ( max-width: 767px ) {
 		width: $wrapper-size-mobile;
