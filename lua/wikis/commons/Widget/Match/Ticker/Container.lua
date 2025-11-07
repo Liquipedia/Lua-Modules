@@ -92,22 +92,11 @@ function MatchTickerContainer:render()
 									['data-switch-group-container'] = 'countdown',
 								},
 								children = {
-									HtmlWidgets.Div{
-										classes = {'switch-toggle-container'},
-										css = {margin = '1rem 0'},
-										children = {
-											HtmlWidgets.Div{
-												classes = {'switch-toggle'},
-												attributes = {
-													['data-switch-group'] = 'countdown',
-													['data-store-value'] = 'true',
-												},
-												children = {
-													HtmlWidgets.Div{classes = {'switch-toggle-slider'}},
-												},
-											},
-											HtmlWidgets.Div{children = 'Show Countdown'},
-										},
+									Switch{
+										label = 'Show Countdown',
+										switchGroup = 'countdown',
+										storeValue = true,
+										css = {margin = '1rem 0', ['justify-content'] = 'center'},
 									},
 									HtmlWidgets.Div{
 										attributes = {
@@ -120,26 +109,6 @@ function MatchTickerContainer:render()
 							}
 						}
 					},
-				},
-			},
-			HtmlWidgets.Div{
-				attributes = {
-					['data-switch-group-container'] = 'countdown',
-					['data-toggle-area-content'] = '1',
-				},
-				children = {
-					Switch{
-						label = 'Show Countdown',
-						switchGroup = 'countdown',
-						storeValue = true,
-						css = {margin = '1rem 0', ['justify-content'] = 'center'},
-					},
-					HtmlWidgets.Div{
-						attributes = {
-							['data-filter-expansion-template'] = buildTemplateExpansionString('upcoming'),
-							['data-filter-groups'] = filterText,
-						},
-						children = callTemplate('upcoming'),
 					{
 						label = 'Completed',
 						value = 'completed',
