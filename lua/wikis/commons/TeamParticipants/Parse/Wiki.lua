@@ -11,10 +11,11 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local TeamParticipantsWikiParser = {}
 
----@alias TeamParticipant {opponent: standardOpponent, notes: string?,
+---@alias TeamParticipant {opponent: standardOpponent, notes: string?, aliases: string[],
 ---qualifierText: string?, qualifierPage: string?, qualifierUrl: string?}
 
 ---@param args table
@@ -41,11 +42,16 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 	}))
 	opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
 	opponent = Opponent.resolve(opponent, date, {syncPlayer = true})
+	local aliases = Array.parseCommaSeparatedString(input.aliases, ';')
+	table.insert(aliases, Opponent.toName(opponent))
 	return {
 		opponent = opponent,
 		qualifierText = input.qualifier,
 		qualifierPage = input.qualifierpage,
 		qualifierUrl = input.qualifierurl,
+		aliases = Array.flatMap(aliases, function(alias)
+			return TeamTemplate.queryHistoricalNames(alias)
+		end),
 		notes = input.notes,
 	}
 end

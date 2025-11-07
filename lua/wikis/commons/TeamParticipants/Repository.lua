@@ -69,7 +69,7 @@ function TeamParticipantsRepository.save(participant)
 	lpdbData.qualifierurl = participant.qualifierUrl
 
 	lpdbData.extradata = lpdbData.extradata or {}
-	lpdbData.extradata.opponentaliases = participant.aliases or {}
+	lpdbData.extradata.opponentaliases = participant.aliases
 
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(participant.opponent, {setPlayersInTeam = true}))
 	-- Legacy participant fields
