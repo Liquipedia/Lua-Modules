@@ -7,8 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local FnUtil = Lua.import('Module:FnUtil')
-
 ---@class RatingsEntry
 ---@field opponent standardOpponent
 ---@field rank integer
