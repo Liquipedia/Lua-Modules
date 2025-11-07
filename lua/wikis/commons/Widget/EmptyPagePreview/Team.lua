@@ -123,7 +123,6 @@ function EmptyTeamPagePreview:_infobox()
 
 	local args = {
 		location = location or 'World',
-		queryEarningsHistorical = Logic.nilOr(Logic.readBoolOrNil(self.props.queryEarningsHistorical), true),
 		doNotIncludePlayerEarnings = Logic.nilOr(Logic.readBoolOrNil(self.props.doNotIncludePlayerEarnings), true),
 		name = TeamTemplate.getRaw(self.team).name,
 		coaches = coaches,
