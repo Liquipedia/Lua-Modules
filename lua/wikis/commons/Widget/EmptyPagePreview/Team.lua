@@ -264,7 +264,7 @@ end
 ---@return (Widget|Html)[]
 function EmptyTeamPagePreview:_results()
 	return {
-		HtmlWidgets.H3{children = 'Notable Results'},
+		HtmlWidgets.H3{children = 'Achievements'},
 		ResultsTable.results{
 			team = self.team,
 			showType = true,
