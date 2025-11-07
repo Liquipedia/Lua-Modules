@@ -117,6 +117,7 @@ function Match.storeMatchGroup(matchRecords, options)
 				Match.populateSubobjectReferences(records)
 			end
 		end
+		Variables.varDefine(options.bracketId, 'used') -- Used in MatchGroupBase._checkBracketDuplicate duplicate check
 		Array.forEach(matchRecordsCopy, Logic.wrapTryOrLog(storeMatch2))
 	end
 

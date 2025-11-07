@@ -17,6 +17,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
+local MatchGroupBase = Lua.import('Module:MatchGroup/Base')
 local WikiSpecific = Lua.import('Module:GetMatchGroupCopyPaste/wiki')
 
 ---@class Match2CopyPaste
@@ -47,7 +48,7 @@ function CopyPaste._generateID()
 		return charFromNumber(math.random(62))
 	end))
 
-	if mw.ext.Brackets.checkBracketDuplicate(id) == 'ok' then
+	if not MatchGroupBase._checkBracketDuplicate(id) then
 		return id
 	end
 

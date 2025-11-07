@@ -1244,11 +1244,9 @@ function mw.ext.SearchEngineOptimization.metadescl(desc) end
 function mw.ext.SearchEngineOptimization.metaimage(image) end
 
 mw.ext.Brackets = {}
----@param idToCheck string
----@return string
-function mw.ext.Brackets.checkBracketDuplicate(idToCheck)
-	return 'ok'
-end
+---@param bracketType string
+---@return table
+function mw.ext.Brackets.getCommonsBracketTemplate(bracketType) end
 
 mw.ext.Dota2DB = {}
 
