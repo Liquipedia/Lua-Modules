@@ -234,7 +234,6 @@ function MediaList._row(item, args)
 	local row = mw.html.create('li')
 		:node(MediaList._editButton(item.pagename))
 		:node(args.showSubjectTeam and MediaList._displayTeam(args.subjects[1], item.date) or '')
-		:wikitext(item.date .. NON_BREAKING_SPACE .. '|' .. NON_BREAKING_SPACE)
 		:node(ExternalMediaLinkDisplay{data = item, showUsUk = args.showUsUk})
 
 	return row
