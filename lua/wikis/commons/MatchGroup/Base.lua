@@ -120,7 +120,8 @@ function MatchGroupBase.isBracketIdAvailable(bracketId)
 		query = 'pageid',
 	})[1]
 	local bracketIdUsedOnSamePage = Variables.varDefault('matchid_duplicate_check_' .. bracketId)
-	return #bracketIdUsedOnOtherPage == nil and bracketIdUsedOnSamePage == nil
+
+	return bracketIdUsedOnOtherPage == nil and bracketIdUsedOnSamePage == nil
 end
 
 return MatchGroupBase
