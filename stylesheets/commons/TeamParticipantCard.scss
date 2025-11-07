@@ -69,10 +69,6 @@
 		}
 
 		&-label {
-			display: flex;
-			gap: 0.25rem;
-			justify-content: center;
-			align-items: center;
 			padding: 0.125rem 0.5rem;
 			border-radius: 0.25rem;
 			border: 1px solid;
@@ -121,10 +117,8 @@ $participant-icon-size: 40px;
 $participant-icon-size-mobile: 32px;
 
 @mixin responsive-participant-icon($wrapper-size, $icon-size, $wrapper-size-mobile, $icon-size-mobile) {
-	min-width: $wrapper-size;
 	width: $wrapper-size;
 	height: $wrapper-size;
-	line-height: $wrapper-size;
 	text-align: center;
 
 	@media ( max-width: 767px ) {
@@ -150,16 +144,5 @@ $participant-icon-size-mobile: 32px;
 .team-participant-square-icon {
 	.team-template-image-icon {
 		@include responsive-participant-icon($participant-icon-wrapper-size, $participant-icon-size, $participant-icon-wrapper-size-mobile, $participant-icon-size-mobile);
-	}
-
-	.block-player {
-		gap: 0.5rem;
-		flex: 1 0 0;
-
-		.flag {
-			margin-right: 0;
-
-			@include responsive-participant-icon($participant-icon-wrapper-size, $participant-icon-size, $participant-icon-wrapper-size-mobile, $participant-icon-size-mobile);
-		}
 	}
 }
