@@ -1,12 +1,44 @@
+$participant-icon-wrapper-size: 48px;
+$participant-icon-wrapper-size-mobile: 36px;
+$participant-icon-size: 40px;
+$participant-icon-size-mobile: 32px;
+
+@mixin responsive-participant-icon(
+	$wrapper-size,
+	$icon-size,
+	$wrapper-size-mobile,
+	$icon-size-mobile
+) {
+	width: $wrapper-size;
+	height: $wrapper-size;
+	text-align: center;
+	line-height: $wrapper-size;
+
+	@media ( max-width: 767px ) {
+		width: $wrapper-size-mobile;
+		height: $wrapper-size-mobile;
+		line-height: $wrapper-size-mobile;
+	}
+
+	img {
+		max-width: $icon-size;
+		max-height: $icon-size;
+		width: auto;
+		height: auto;
+		vertical-align: middle;
+
+		@media ( max-width: 767px ) {
+			max-width: $icon-size-mobile;
+			max-height: $icon-size-mobile;
+		}
+	}
+}
+
 [ data-switch-group-container="team-cards-compact" ] {
 	display: contents;
 
 	> .widget-wrapper:first-child {
 		display: none;
-
-		@media ( min-width: 1024px ) {
-			display: block;
-		}
 	}
 }
 
@@ -45,6 +77,10 @@
 		padding: 0 0.5rem;
 		cursor: pointer;
 
+		&__main {
+			display: contents;
+		}
+
 		&-opponent {
 			display: flex;
 			gap: 0.5rem;
@@ -77,7 +113,7 @@
 		}
 
 		.general-collapsible-expand-button,
-		.general-collapsible-collapse-button {
+		.general-apsible-collapse-button {
 			outline: unset;
 
 			.theme--light & {
@@ -95,39 +131,21 @@
 	}
 }
 
-$participant-icon-wrapper-size: 48px;
-$participant-icon-wrapper-size-mobile: 36px;
-$participant-icon-size: 40px;
-$participant-icon-size-mobile: 32px;
-
-@mixin responsive-participant-icon($wrapper-size, $icon-size, $wrapper-size-mobile, $icon-size-mobile) {
-	width: $wrapper-size;
-	height: $wrapper-size;
-	text-align: center;
-	line-height: $wrapper-size;
-
-	@media ( max-width: 767px ) {
-		width: $wrapper-size-mobile;
-		height: $wrapper-size-mobile;
-		line-height: $wrapper-size-mobile;
-	}
-
-	img {
-		max-width: $icon-size;
-		max-height: $icon-size;
-		width: auto;
-		height: auto;
-		vertical-align: middle;
-
-		@media ( max-width: 767px ) {
-			max-width: $icon-size-mobile;
-			max-height: $icon-size-mobile;
-		}
+.team-participant-square-icon {
+	.team-template-image-icon {
+		@include responsive-participant-icon(
+			$participant-icon-wrapper-size,
+			$participant-icon-size,
+			$participant-icon-wrapper-size-mobile,
+			$participant-icon-size-mobile
+		);
 	}
 }
 
-.team-participant-square-icon {
-	.team-template-image-icon {
-		@include responsive-participant-icon($participant-icon-wrapper-size, $participant-icon-size, $participant-icon-wrapper-size-mobile, $participant-icon-size-mobile);
+@media ( min-width: 1024px ) {
+	[ data-switch-group-container="team-cards-compact" ] {
+		> .widget-wrapper:first-child {
+			display: block;
+		}
 	}
 }
