@@ -309,7 +309,7 @@ function EmptyTeamPagePreview:_getPlayersAndCoachesFromLastPlacement()
 
 		if Logic.isEmpty(personObject) then
 			personObject = mw.ext.LiquipediaDB.lpdb('squadplayer', {
-			conditions = '[[link::' .. person .. ']]',
+			conditions = tostring(ConditionNode(ColumnName('link'), Comparator.eq, person)),
 			query = 'name, id, nationality'
 		})[1] or {}
 		end
