@@ -11,6 +11,7 @@ local FnUtil = Lua.import('Module:FnUtil')
 
 ---@class RatingsEntry
 ---@field opponent standardOpponent
+---@field rank integer
 ---@field rating number
 ---@field region string
 ---@field change integer? # nil = new, otherwise indicate change in rank

@@ -14,6 +14,7 @@ local Flags = Lua.import('Module:Flags')
 local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
+local MathUtil = Lua.import('Module:MathUtil')
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
@@ -84,12 +85,6 @@ end
 
 ---@return Widget
 function RatingsList:render()
-	-- Simple check to verify that the input is a osdate
-	assert(self.props.date and self.props.date.wday, 'Invalid date provided')
-	---@type osdate
-	local date = self.props.date
-	local dateAsString = os.date('%F', os.time(date)) --[[@as string]]
-
 	local teamLimit = tonumber(self.props.teamLimit) or self.defaultProps.teamLimit
 	local showGraph = Logic.readBool(self.props.showGraph)
 	local isSmallerVersion = Logic.readBool(self.props.isSmallerVersion)
@@ -100,18 +95,18 @@ function RatingsList:render()
 	}
 	local teams = getRankings(teamLimit)
 
-	local teamRows = Array.map(teams, function(team, rank)
-		local uniqueId = dateAsString .. '-' .. rank
+	local teamRows = Array.map(teams, function(team, index)
+		local uniqueId = index
 		local changeText = (not team.change and 'NEW') or PlacementChange { change = team.change }
 
 		local teamRow = WidgetUtil.collect(
-			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'rank' }, children = rank },
+			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'rank' }, children = team.rank },
 			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'change' }, children = changeText },
 			HtmlWidgets.Td {
 				attributes = { ['data-ranking-table-cell'] = 'team' },
 				children = OpponentDisplay.BlockOpponent { opponent = team.opponent, teamStyle = 'hybrid' }
 			},
-			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = team.rating },
+			HtmlWidgets.Td { atributes = { ['data-ranking-table-cell'] = 'rating' }, children = MathUtil.round(team.rating) },
 			HtmlWidgets.Td {
 				attributes = { ['data-ranking-table-cell'] = 'region' },
 				children = Flags.Icon { flag = team.region } .. Flags.CountryName { flag = team.region }
@@ -152,12 +147,12 @@ function RatingsList:render()
 			}
 		} or nil
 
-		local isEven = rank % 2 == 0
+		local isEven = team.rank % 2 == 0
 		local rowClasses = { 'ranking-table__row' }
 		if isEven then
 			table.insert(rowClasses, 'ranking-table__row--even')
 		end
-		if rank > 5 and isSmallerVersion then
+		if team.rank > 5 and isSmallerVersion then
 			table.insert(rowClasses, 'ranking-table__row--overfive')
 		end
 
@@ -175,7 +170,10 @@ function RatingsList:render()
 		}
 	end)
 
-	local formattedDate = os.date('%b %d, %Y', os.time(date)) --[[@as string]]
+	local anyTeam = teams[1]
+	local lastDate = anyTeam.progression[#anyTeam.progression].date
+	local formattedDate = Date.toYmdInUtc(Date.parseIsoDate(lastDate))
+
 	local tableHeader = HtmlWidgets.Tr {
 		children = HtmlWidgets.Th {
 			attributes = { colspan = '7' },
@@ -222,7 +220,6 @@ function RatingsList:render()
 			['data-ranking-table'] = 'content',
 		},
 		children = WidgetUtil.collect(
-
 			HtmlWidgets.Table {
 				attributes = { ['data-ranking-table'] = 'table' },
 				classes = { 'ranking-table', isSmallerVersion and 'ranking-table--small' or nil },

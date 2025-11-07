@@ -9,26 +9,24 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Date = Lua.import('Module:Date/Ext')
-local FnUtil = Lua.import('Module:FnUtil')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local Operator = Lua.import('Module:Operator')
 
 local RatingsStorageExtension = {}
-
-local PROGRESSION_STEP_DAYS = 7 -- How many days each progression step is
 
 ---@param teamLimit integer?
 ---@return RatingsEntry[]
 function RatingsStorageExtension.getRankings(teamLimit)
 	local rankings = mw.ext.Dota2Ranking.get()
-	local nonProvisionalRankings = Array.filter(rankings, function(record)
-		return not record.provisional
-	end)
-	local progressionDates = Array.map(nonProvisionalRankings, function(record) return record.date end)
+	if not rankings then
+		return {}
+	end
 	local teams = RatingsStorageExtension._mapDataToExpectedFormat(rankings)
+	teams = Array.sortBy(teams, Operator.property('rank'))
 	-- Endpoint doesn't support team limit (yet?), so we'll have to cut it short here
 	teams = Array.sub(teams, 1, math.min(teamLimit or #teams))
 
-	return Array.map(teams, FnUtil.curry(RatingsStorageExtension._createTeamEntry, progressionDates))
+	return Array.map(teams, RatingsStorageExtension._createTeamEntry)
 end
 
 ---@param rankings Dota2RankingRecord[]
@@ -43,89 +41,47 @@ function RatingsStorageExtension._mapDataToExpectedFormat(rankings)
 					name = datedEntry.name,
 					rank = datedEntry.rank,
 					rating = datedEntry.rating,
-					streak = 0, -- Default value as PHP doesn't set this
 					progression = {}
 				}
-			else
-				table.insert(teamsData[datedEntry.name].progression, {
-					date = string.match(datedResults.date, "^(%d%d%d%d%-%d%d%-%d%d)"), -- Format date to Y-m-d
-					rank = datedEntry.rank,
-					rating = datedEntry.rating
-				})
 			end
+			table.insert(teamsData[datedEntry.name].progression, {
+				timestamp = Date.readTimestamp(datedResults.date),
+				date = Date.toYmdInUtc(Date.parseIsoDate(datedResults.date)),
+				rank = datedEntry.rank,
+				rating = datedEntry.rating
+			})
 		end
 	end
 
-	-- Convert hash table to array
-	local finalTeamsData = {}
-	for _, teamData in pairs(teamsData) do
-		table.insert(finalTeamsData, teamData)
-	end
-
-	return finalTeamsData
+	return Array.map(Array.extractValues(teamsData), function(team)
+		team.progression = Array.sortBy(team.progression, Operator.property('timestamp'), function (a, b)
+			return a < b
+		end)
+		return team
+	end)
 end
 
----@alias Dota2RankingTeam {name: string, rank: integer, rating: number, streak: integer,
+---@alias Dota2RankingTeam {name: string, rank: integer, rating: number,
 ---progression: {date: string, rating: number, rank: integer}[]}
 
 --- Takes a team record from the endpoint and creates a RatingsEntry
----@param progressionDates string[]
 ---@param team Dota2RankingTeam
 ---@return RatingsEntry
-function RatingsStorageExtension._createTeamEntry(progressionDates, team)
-	local endDate = progressionDates[1]
+function RatingsStorageExtension._createTeamEntry(team)
 	local lpdbTeamInfo = RatingsStorageExtension._getTeamInfoFromLpdb(team.name)
 
-	local teamProgressionParsed = Array.map(team.progression, function(progression)
-		return RatingsStorageExtension._createProgressionRecord(progression.date, progression.rating, progression.rank)
-	end)
+	local hasRankLastInterval = #team.progression >= 1
 
-	-- Add today's progression record to the start of the list
-	local progressionToday = RatingsStorageExtension._createProgressionRecord(endDate, team.rating, team.rank)
-	table.insert(teamProgressionParsed, 1, progressionToday)
-
-	local function findProgressionForDate(date)
-		return Array.find(teamProgressionParsed, function(progression)
-			return progression.date == date
-		end)
-	end
-
-	local progression = Array.map(progressionDates, function(progressionDate)
-		return findProgressionForDate(progressionDate) or
-			RatingsStorageExtension._createProgressionRecord(progressionDate)
-	end)
-
-	local hasRankLastInterval = progression[2].rank ~= nil
 	---@type RatingsEntry
-	local newTeam = {
+	return {
 		name = team.name,
 		rank = team.rank,
-		rating = RatingsStorageExtension._normalizeRating(team.rating),
+		rating = team.rating,
 		region = lpdbTeamInfo.region,
-		opponent = Opponent.resolve(Opponent.readOpponentArgs({ type = Opponent.team, team.name }), endDate),
-		change = hasRankLastInterval and progression[2].rank - progression[1].rank or nil,
-		progression = progression,
+		opponent = Opponent.resolve(Opponent.readOpponentArgs({ type = Opponent.team, team.name })),
+		change = hasRankLastInterval and team.progression[#team.progression].rank - team.rank or nil,
+		progression = team.progression,
 	}
-	return newTeam
-end
-
----@param date string
----@param rating number?
----@param rank integer?
----@return {date: string, rating?: number, rank?: integer}
-function RatingsStorageExtension._createProgressionRecord(date, rating, rank)
-	return {
-		date = date,
-		rating = rating and RatingsStorageExtension._normalizeRating(rating) or nil,
-		rank = rank,
-	}
-end
-
---- Normalize a rating
----@param rating number
----@return number
-function RatingsStorageExtension._normalizeRating(rating)
-	return math.floor((rating * 1000) + 0.5)
 end
 
 --- Get team information from the Team Page via LPDB
