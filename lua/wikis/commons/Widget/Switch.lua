@@ -19,6 +19,7 @@ local Div = HtmlWidgets.Div
 ---@field storeValue boolean
 ---@field defaultActive boolean
 ---@field css table?
+---@field content string|Widget|Html|(string|Widget|Html)[]?
 
 ---@class SwitchWidget: Widget
 ---@operator call(SwitchParameters): SwitchWidget
@@ -37,6 +38,7 @@ function SwitchWidget:render()
 	local switchGroup = self.props.switchGroup
 	local storeValue = self.props.storeValue
 	local defaultActive = self.props.defaultActive
+	local content = self.props.content
 
 	local switchToggleClasses = {'switch-toggle-container'}
 
@@ -45,7 +47,7 @@ function SwitchWidget:render()
 		table.insert(toggleClasses, 'switch-toggle-active')
 	end
 
-	return Div{
+	local switchElement = Div{
 		classes = switchToggleClasses,
 		css = self.props.css,
 		children = {
@@ -60,6 +62,20 @@ function SwitchWidget:render()
 				},
 			},
 			Div{children = label},
+		},
+	}
+
+	if not content then
+		return switchElement
+	end
+
+	return Div{
+		attributes = {
+			['data-switch-group-container'] = switchGroup,
+		},
+		children = {
+			switchElement,
+			content,
 		},
 	}
 end
