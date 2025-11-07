@@ -74,6 +74,7 @@ function EmptyTeamPagePreview:render()
 	}
 end
 
+---@private
 ---@return Html
 function EmptyTeamPagePreview:_infobox()
 	local data = self:_getNationalitiesAndCoachesFromLastPlacement()
@@ -158,6 +159,7 @@ function EmptyTeamPagePreview._getWiki(props, games)
 	end
 end
 
+---@private
 ---@return string[]
 function EmptyTeamPagePreview:_fetchGamesFromPlacements()
 	local placements = self:_fetchPlacements{
@@ -172,6 +174,7 @@ function EmptyTeamPagePreview:_fetchGamesFromPlacements()
 	return Array.map(placements, Operator.property('game'))
 end
 
+---@private
 ---@param options {query: string?, groupBy: string?, additionalConditions: ConditionTree?, limit: integer?}?
 ---@return placement[]
 function EmptyTeamPagePreview:_fetchPlacements(options)
@@ -195,6 +198,7 @@ function EmptyTeamPagePreview:_fetchPlacements(options)
 	})
 end
 
+---@private
 ---@return string?
 function EmptyTeamPagePreview:_determineRegionFromPlacements()
 	local placements = self:_fetchPlacements{
@@ -210,6 +214,7 @@ function EmptyTeamPagePreview:_determineRegionFromPlacements()
 	return (regionGroups[1] or {})[1]
 end
 
+---@private
 ---@return Widget[]
 function EmptyTeamPagePreview:_rosterFromTransfers()
 	return WidgetUtil.collect(
@@ -242,6 +247,7 @@ function EmptyTeamPagePreview:_rosterFromTransfers()
 	)
 end
 
+---@private
 ---@return (Widget|Html)[]
 function EmptyTeamPagePreview:_matches()
 	return {
@@ -255,6 +261,7 @@ function EmptyTeamPagePreview:_matches()
 	}
 end
 
+---@private
 ---@return (Widget|Html)[]
 function EmptyTeamPagePreview:_results()
 	return {
@@ -271,6 +278,7 @@ function EmptyTeamPagePreview:_results()
 	}
 end
 
+---@private
 ---@return {coaches: {flag: string?, displayName: string, pageName: string}[], nationalities: table<string, integer>}
 function EmptyTeamPagePreview:_getNationalitiesAndCoachesFromLastPlacement()
 	local data = self:_getPlayersAndCoachesFromLastPlacement()
@@ -285,6 +293,7 @@ function EmptyTeamPagePreview:_getNationalitiesAndCoachesFromLastPlacement()
 	return {coaches = data.coaches, nationalities = nationalities}
 end
 
+---@private
 ---@return {coaches: {flag: string?, displayName: string, pageName: string, name: string?}[],
 ---players: {flag: string?, displayName: string, pageName: string, name: string?}[], startDate: string?}
 function EmptyTeamPagePreview:_getPlayersAndCoachesFromLastPlacement()
@@ -329,6 +338,7 @@ function EmptyTeamPagePreview:_getPlayersAndCoachesFromLastPlacement()
 	return {coaches = coaches, players = players, startDate = latestResult.startdate}
 end
 
+---@private
 ---@return Widget[]
 function EmptyTeamPagePreview:_rosterFromLastPlacement()
 	local data = self:_getPlayersAndCoachesFromLastPlacement()
@@ -366,6 +376,7 @@ function EmptyTeamPagePreview:_rosterFromLastPlacement()
 	)
 end
 
+---@private
 ---@param startDate string?
 ---@param personData {flag: string?, displayName: string, pageName: string, name: string?}
 ---@return table
