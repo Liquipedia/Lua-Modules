@@ -1,0 +1,121 @@
+.team-participant-cards {
+	display: grid;
+	gap: 0.25rem;
+	grid-template-columns: repeat( auto-fit, minmax( 280px, 1fr ) );
+}
+
+.team-participant-card {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	justify-content: center;
+	align-self: start;
+	border-radius: 0.5rem;
+	border: 1px solid;
+	padding: 0.5rem 0;
+	overflow: hidden;
+
+	.theme--light & {
+		background-color: var( --clr-secondary-100 );
+		border-color: var( --clr-on-surface-light-primary-8 );
+	}
+
+	.theme--dark & {
+		background-color: var( --clr-on-surface-dark-primary-4 );
+		border-color: var( --clr-on-surface-dark-primary-8 );
+	}
+
+	&-header {
+		display: flex;
+		gap: 0.25rem;
+		align-items: center;
+		align-self: stretch;
+		padding: 0 0.5rem;
+		cursor: pointer;
+
+		&-opponent {
+			display: flex;
+			gap: 0.5rem;
+			align-items: center;
+			flex: 1 0 0;
+			font-weight: bold;
+			min-width: 0;
+		}
+
+		&-label {
+			padding: 0.125rem 0.5rem;
+			border-radius: 0.25rem;
+			border: 1px solid;
+			font-weight: bold;
+			font-size: 0.6875rem;
+
+			.theme--light & {
+				border-color: var( --clr-on-surface-light-primary-8 );
+				color: var( --clr-secondary-9 );
+			}
+
+			.theme--dark & {
+				border-color: var( --clr-on-surface-dark-primary-8 );
+				color: var( --clr-secondary-90 );
+			}
+		}
+
+		.general-collapsible-default-toggle {
+			min-width: unset;
+		}
+
+		.general-collapsible-expand-button,
+		.general-collapsible-collapse-button {
+			outline: unset;
+
+			.theme--light & {
+				color: var( --clr-secondary-7 );
+			}
+
+			.theme--dark & {
+				color: var( --clr-secondary-90 );
+			}
+		}
+	}
+
+	&-collapsible-content {
+		padding: 0.5rem;
+	}
+}
+
+$participant-icon-wrapper-size: 48px;
+$participant-icon-wrapper-size-mobile: 36px;
+$participant-icon-size: 40px;
+$participant-icon-size-mobile: 32px;
+
+@mixin responsive-participant-icon($wrapper-size, $icon-size, $wrapper-size-mobile, $icon-size-mobile) {
+	width: $wrapper-size;
+	height: $wrapper-size;
+	text-align: center;
+	line-height: $wrapper-size;
+
+	@media ( max-width: 767px ) {
+		width: $wrapper-size-mobile;
+		height: $wrapper-size-mobile;
+		line-height: $wrapper-size-mobile;
+	}
+
+	img {
+		max-width: $icon-size;
+		max-height: $icon-size;
+		width: auto;
+		height: auto;
+		vertical-align: middle;
+
+		@media ( max-width: 767px ) {
+			max-width: $icon-size-mobile;
+			max-height: $icon-size-mobile;
+		}
+	}
+}
+
+.team-participant-square-icon {
+	.team-template-image-icon {
+		@include responsive-participant-icon($participant-icon-wrapper-size, $participant-icon-size, $participant-icon-wrapper-size-mobile, $participant-icon-size-mobile);
+	}
+}

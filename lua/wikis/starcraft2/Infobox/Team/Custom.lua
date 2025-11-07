@@ -16,6 +16,7 @@ local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Math = Lua.import('Module:MathUtil')
 local Namespace = Lua.import('Module:Namespace')
+local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
@@ -190,16 +191,14 @@ end
 ---@return number
 ---@return table<integer, number>
 function CustomTeam:getEarningsAndMedalsData()
-	self.cleanPageName = self.pagename:gsub(' ', '_')
+	self.cleanPageName = Page.applyUnderScoresIfEnforced(self.pagename)
 
 	local playerTeamConditions = ConditionTree(BooleanOperator.any):add{
-		ConditionNode(ColumnName('opponentname'), Comparator.eq, self.pagename),
 		ConditionNode(ColumnName('opponentname'), Comparator.eq, self.cleanPageName),
 	}
 
 	for playerIndex = 1, MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS do
 		playerTeamConditions:add{
-			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex .. 'team'), Comparator.eq, self.pagename),
 			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex .. 'team'), Comparator.eq, self.cleanPageName),
 		}
 	end
@@ -259,7 +258,7 @@ end
 ---@param team string
 ---@return boolean
 function CustomTeam:_isCorrectTeam(team)
-	return team == self.pagename or team == self.cleanPageName
+	return team == self.cleanPageName
 end
 
 ---@param tbl table
@@ -321,7 +320,7 @@ end
 function CustomTeam:_amountOfTeamPlayersInPlacement(players)
 	local amount = 0
 	for playerKey in Table.iter.pairsByPrefix(players, 'p') do
-		if players[playerKey .. 'team'] == self.pagename then
+		if players[playerKey .. 'team'] == self.cleanPageName then
 			amount = amount + 1
 		end
 	end

@@ -47,9 +47,13 @@ function CustomLeague.run(frame)
 
 	-- Auto Icon
 	local seriesIconLight, seriesIconDark = CustomLeague.getIconFromSeries(args.series)
-	args.circuitIconLight, args.circuitIconDark = CustomLeague.getIconFromSeries(args.circuit)
-	args.icon = args.icon or seriesIconLight or args.circuitIconLight
-	args.icondark = args.icondark or seriesIconDark or args.circuitIconDark
+    args.circuitIconLight, args.circuitIconDark = CustomLeague.getIconFromSeries(args.circuit)
+    local icons = Logic.emptyOr(
+        {args.icon, args.icondark},
+        {seriesIconLight, seriesIconDark},
+        {args.circuitIconLight, args.circuitIconDark}
+    )
+    args.icon, args.icondark = icons[1], icons[2]
 	args.display_series_icon_from_manual_input = MANUAL_SERIES_ICON
 
 	-- Normalize name

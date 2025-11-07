@@ -386,7 +386,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
 	lpdbData.maps = Json.stringify(args.maps)
 
-	lpdbData.extradata.seriesnumber = args.number and string.format('%05i', args.number) or nil
+	lpdbData.extradata.seriesnumber = self.data.number and string.format('%05i', self.data.number) or nil
 	lpdbData.extradata.starttime = self.data.startTime.storage
 	lpdbData.extradata.mod = self.data.mod
 

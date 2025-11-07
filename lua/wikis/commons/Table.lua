@@ -528,8 +528,8 @@ Table.iter = {}
 -- iterate over table in a sorted order
 ---@generic K, V
 ---@param tbl {[K]: V}
----@param order? fun(tbl: table, a: K, b: K): boolean
----@return function
+---@param order? fun(tbl: {[K]: V}, a: K, b: K): boolean
+---@return fun(): K?, V?
 function Table.iter.spairs(tbl, order)
 	-- collect the keys
 	local keys = {}
