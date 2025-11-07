@@ -1,3 +1,4 @@
+---
 -- @Liquipedia
 -- page=Module:Widget/Participants/Team/Header
 --
