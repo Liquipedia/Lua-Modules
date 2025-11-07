@@ -100,20 +100,6 @@ function CustomLeague:customParseArguments(args)
 end
 
 ---@param args table
-function CustomLeague:defineCustomPageVariables(args)
-	-- legacy variables, to be removed
-	Variables.varDefine('tournament_tier', self.data.liquipediatier)
-	Variables.varDefine('tournament_tier_type', self.data.liquipediatiertype)
-
-	Variables.varDefine('tournament_sdate', self.data.startDate)
-	Variables.varDefine('tournament_edate', self.data.endDate)
-	Variables.varDefine('tournament_date', self.data.endDate)
-	Variables.varDefine('date', self.data.endDate)
-	Variables.varDefine('sdate', self.data.startDate)
-	Variables.varDefine('edate', self.data.endDate)
-end
-
----@param args table
 ---@return string[]
 function CustomLeague:getWikiCategories(args)
 	local categories = Array.map(self:getAllArgsForBase(args, 'game'), function(game)
