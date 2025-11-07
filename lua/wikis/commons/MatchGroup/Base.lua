@@ -44,9 +44,12 @@ function MatchGroupBase.readOptions(args, matchGroupType)
 	local warnings = {}
 
 	if options.storeMatch2 or not Logic.readBool(args.noDuplicateCheck) then
-		local warning = MatchGroupBase._checkBracketDuplicate(options.bracketId)
-		if warning then
-			table.insert(warnings, warning)
+		local isAvailable = MatchGroupBase.isBracketIdAvailable(options.bracketId)
+		if not isAvailable then
+			local warningText = 'This match group uses the duplicate ID \'' .. options.bracketId .. '\'.'
+			mw.ext.TeamLiquidIntegration.add_category('Pages with duplicate Bracketid')
+			mw.addWarning(warningText)
+			table.insert(warnings, warningText)
 		end
 	end
 
@@ -108,27 +111,14 @@ function MatchGroupBase.getBracketIdPrefix()
 end
 
 ---@param bracketId string
----@return string?
-function MatchGroupBase._checkBracketDuplicate(bracketId)
-	local makeWarning = function()
-		local warning = 'This match group uses the duplicate ID \'' .. bracketId .. '\'.'
-		mw.ext.TeamLiquidIntegration.add_category('Pages with duplicate Bracketid')
-		mw.addWarning(warning)
-		return warning
-	end
-
+---@return boolean
+function MatchGroupBase.isBracketIdAvailable(bracketId)
 	local bracketIdUsedOnOtherPage = mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = '[[match2bracketid::'.. bracketId ..']] AND [[pageid::!'.. mw.title.getCurrentTitle().id ..']]' ..
 		'AND ([[namespace::0]] OR [[namespace::!0]])',
-	})
-	if #bracketIdUsedOnOtherPage > 0 then
-		return makeWarning()
-	end
-
-	local bracketIdUsedOnSamePage = Variables.varDefault(bracketId) ~= nil
-	if bracketIdUsedOnSamePage then
-		return makeWarning()
-	end
+	})[1]
+	local bracketIdUsedOnSamePage = Variables.varDefault('matchid_duplicate_check_' .. bracketId)
+	return #bracketIdUsedOnOtherPage == nil and bracketIdUsedOnSamePage == nil
 end
 
 return MatchGroupBase

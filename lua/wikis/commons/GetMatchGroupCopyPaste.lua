@@ -48,7 +48,7 @@ function CopyPaste._generateID()
 		return charFromNumber(math.random(62))
 	end))
 
-	if not MatchGroupBase._checkBracketDuplicate(id) then
+	if MatchGroupBase.isBracketIdAvailable(id) then
 		return id
 	end
 
