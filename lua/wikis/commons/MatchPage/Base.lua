@@ -321,7 +321,7 @@ function BaseMatchPage:renderGames()
 		),
 		size = 'small',
 		storeValue = false,
-		switchGroup = 'matchPage',
+		switchGroup = 'matchPageGameSelector',
 		variant = 'generic'
 	}
 end
