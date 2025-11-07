@@ -24,10 +24,10 @@ function TeamParticipantsController.fromTemplate(frame)
 	local args = Arguments.getArgs(frame)
 	local parsedArgs = Json.parseStringifiedArgs(args)
 	local parsedData = TeamParticipantsWikiParser.parseWikiInput(parsedArgs)
-	local savedParticipants = Array.map(parsedData.opponents, TeamParticipantsRepository.save)
-	Array.forEach(parsedData.opponents, TeamParticipantsRepository.setPageVars)
+	Array.forEach(parsedData.participants, TeamParticipantsRepository.save)
+	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
 	return TeamParticipantsDisplay{
-		placements = savedParticipants
+		participants = parsedData.participants
 	}
 end
 

@@ -8,11 +8,8 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Condition = Lua.import('Module:Condition')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
-local Lpdb = Lua.import('Module:Lpdb')
-local Page = Lua.import('Module:Page')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local String = Lua.import('Module:String')
 local Table = Lua.import('Module:Table')
@@ -24,25 +21,17 @@ local prizePoolVars = PageVariableNamespace('PrizePool')
 local teamCardsVars = PageVariableNamespace('TeamCards')
 local globalVars = PageVariableNamespace()
 
----@class TeamParticipantsEntity
----@field pagename string
----@field opponent standardOpponent
----@field qualifierText string?
----@field qualifierPage string?
----@field qualifierUrl string?
-
 local TeamParticipantsRepository = {}
 
---- Save a team participant to lpdb placement table and returns the data saved
----@param TeamParticipant table
----@return placement
-function TeamParticipantsRepository.save(TeamParticipant)
+--- Save a team participant to lpdb placement table, after merging data from prizepool if exists
+---@param participant TeamParticipant
+function TeamParticipantsRepository.save(participant)
 	-- Since we merge data from prizepool and teamparticipants, we need to first fetch the existing record from prizepool
-	local lpdbData = TeamParticipantsRepository.getPrizepoolRecordForTeam(TeamParticipant.opponentData) or {}
+	local lpdbData = TeamParticipantsRepository.getPrizepoolRecordForTeam(participant.opponent) or {}
 
 	local function generateObjectName()
-		local team = Opponent.toName(TeamParticipant.opponentData)
-		local isTbd = Opponent.isTbd(TeamParticipant.opponentData)
+		local team = Opponent.toName(participant.opponent)
+		local isTbd = Opponent.isTbd(participant.opponent)
 
 		if not isTbd then
 			return 'ranking_' .. mw.ustring.lower(team)
@@ -75,20 +64,20 @@ function TeamParticipantsRepository.save(TeamParticipant)
 	lpdbData.startdate = lpdbData.startdate or Variables.varDefault('tournament_startdate')
 	lpdbData.date = lpdbData.date or Variables.varDefault('tournament_enddate')
 
-	lpdbData.qualifier = TeamParticipant.qualifierText
-	lpdbData.qualifierpage = TeamParticipant.qualifierPage
-	lpdbData.qualifierurl = TeamParticipant.qualifierUrl
+	lpdbData.qualifier = participant.qualifierText
+	lpdbData.qualifierpage = participant.qualifierPage
+	lpdbData.qualifierurl = participant.qualifierUrl
 
 	lpdbData.extradata = lpdbData.extradata or {}
-	lpdbData.extradata.opponentaliases = TeamParticipant.aliases
+	lpdbData.extradata.opponentaliases = participant.aliases or {}
 
-	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(TeamParticipant.opponentData, {setPlayersInTeam = true}))
+	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(participant.opponent, {setPlayersInTeam = true}))
 	-- Legacy participant fields
-	lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(TeamParticipant.opponentData))
+	lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(participant.opponent))
 	lpdbData.players = lpdbData.opponentplayers
 
 	-- Calculate individual prize money (prize money per player on team)
-	local numberOfPlayersOnTeam = #(TeamParticipant.opponentData.players or {})
+	local numberOfPlayersOnTeam = #(participant.opponent.players or {})
 	if numberOfPlayersOnTeam == 0 then
 		numberOfPlayersOnTeam = 1
 	end
@@ -97,8 +86,6 @@ function TeamParticipantsRepository.save(TeamParticipant)
 	end
 
 	mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, Json.stringifySubTables(lpdbData))
-
-	return lpdbData
 end
 
 --- Set wiki variables for team participants to be used in other modules/templates, primarily matches
@@ -133,38 +120,5 @@ TeamParticipantsRepository.getPrizepoolRecords = FnUtil.memoize(function()
 		return Json.parseIfString(prizePoolVars:get('placementRecords.' .. prizePoolIndex))
 	end))
 end)
-
----@param pageName string
----@return TeamParticipantsEntity[]
-function TeamParticipantsRepository.getAllByPageName(pageName)
-	---@type placement[]
-	local records = {}
-	Lpdb.executeMassQuery(
-		'placement',
-		{
-			conditions = tostring(
-				Condition.Node(Condition.ColumnName('pagename'), Condition.Comparator.eq, Page.pageifyLink(pageName))
-			),
-		},
-		function(record)
-			table.insert(records, record)
-		end
-	)
-	return Array.map(records, TeamParticipantsRepository.entityFromRecord)
-end
-
----@param record placement
----@return TeamParticipantsEntity
-function TeamParticipantsRepository.entityFromRecord(record)
-	---@type TeamParticipantsEntity
-	local entity = {
-		pagename = record.pagename,
-		opponent = Opponent.fromLpdbStruct(record),
-		qualifierText = record.qualifier,
-		qualifierPage = record.qualifierpage,
-		qualifierUrl = record.qualifierurl,
-	}
-	return entity
-end
 
 return TeamParticipantsRepository

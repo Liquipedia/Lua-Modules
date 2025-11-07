@@ -14,29 +14,35 @@ local Table = Lua.import('Module:Table')
 
 local TeamParticipantsWikiParser = {}
 
+---@alias TeamParticipant {opponent: standardOpponent, notes: string?,
+---qualifierText: string?, qualifierPage: string?, qualifierUrl: string?}
+
 ---@param args table
----@return {opponents: standardOpponent[]}
+---@return {participants: TeamParticipant[]}
 function TeamParticipantsWikiParser.parseWikiInput(args)
 	local date = DateExt.readTimestamp(args.date) or DateExt.getContextualDateOrNow()
 
-	---@type StandingTableOpponentData[]
-	local opponents = Array.map(args, function (opponentData)
-		return TeamParticipantsWikiParser.parseOpponent(opponentData, date)
+	local participants = Array.map(args, function (input)
+		return TeamParticipantsWikiParser.parseParticipant(input, date)
 	end)
 
 	return {
-		opponents = opponents
+		participants = participants
 	}
 end
 
-function TeamParticipantsWikiParser.parseOpponent(input, date)
+--- Parse a single participant from input
+---@param input table
+---@param date string|number|nil
+---@return TeamParticipant
+function TeamParticipantsWikiParser.parseParticipant(input, date)
 	local opponent = Opponent.readOpponentArgs(Table.merge(input, {
 		type = Opponent.team,
 	}))
 	opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
 	opponent = Opponent.resolve(opponent, date, {syncPlayer = true})
 	return {
-		opponentData = opponent,
+		opponent = opponent,
 		qualifierText = input.qualifier,
 		qualifierPage = input.qualifierpage,
 		qualifierUrl = input.qualifierurl,
