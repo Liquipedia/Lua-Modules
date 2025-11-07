@@ -7,21 +7,17 @@
 
 local Lua = require('Module:Lua')
 
-local Condition = Lua.import('Module:Condition')
 local DateExt = Lua.import('Module:Date/Ext')
+
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
+local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
-
-local BooleanOperator = Condition.BooleanOperator
-local Comparator = Condition.Comparator
-
 
 local CONTENT = {
 	usefulArticles = {
@@ -39,7 +35,8 @@ local CONTENT = {
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferPage = 'Player Transfers/' .. DateExt.getYearOf()
+			limit = 10,
+			transferPage = 'Player Transfers/' .. DateExt.getYearOf(),
 		},
 		boxid = 1509,
 	},
@@ -51,7 +48,7 @@ local CONTENT = {
 	},
 	specialEvents = {
 		noPanel = true,
-		body = '{{Liquipedia:Special Event}}',
+		body = '{{Liquipedia:Special_Event}}',
 		boxid = 1516,
 	},
 	filterButtons = {
@@ -70,8 +67,8 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			upcomingDays = 60,
-			completedDays = 60,
+			upcomingDays = 120,
+			completedDays = 120
 		},
 		padding = true,
 		boxid = 1508,
@@ -80,24 +77,15 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Clash Royale allmode.png',
-		darkmode = 'Clash Royale allmode.png',
+		lightmode = 'IdentityV logo lightmode.png',
+		darkmode = 'IdentityV logo darkmode.png',
 	},
-	metadesc = 'The Clash Royale wiki covering everything from players, teams and transfers, ' ..
-		'to tournaments and results, strategies and cards.',
-	title = 'Clash Royale',
+	metadesc = 'The Identity V (IDV) esports wiki covering everything from players, teams and transfers, ' ..
+		'to tournaments and results, maps and characters.',
+	title = 'Identity V',
 	navigation = {
 		{
-			file = 'SuperCardCompDraft RunicMountain Banner.png',
-			title = 'Players',
-			link = 'Portal:Players',
-			count = {
-				method = 'LPDB',
-				table = 'player',
-			},
-		},
-		{
-			file = 'HolidayFeast CozyClashmas Banner.png',
+			file = 'Identity V Team Pills.webp',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -106,7 +94,16 @@ return {
 			},
 		},
 		{
-			file = 'Touchdown LumberLove Banner.png',
+			file = 'Identity V Player Pills.webp',
+			title = 'Players',
+			link = 'Portal:Players',
+			count = {
+				method = 'LPDB',
+				table = 'player',
+			},
+		},
+		{
+			file = 'Identity V Tournament Pills.webp',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -115,7 +112,7 @@ return {
 			},
 		},
 		{
-			file = 'Clash_Royale_Classic_2018_Card_Illustration_allmode.jpg',
+			file = 'Identity V Transfer Pills.webp',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -124,50 +121,14 @@ return {
 			},
 		},
 		{
-			file = 'Clash_Royale_Evergreen_Illustration_allmode.png',
-			title = 'Cards ',
-			link = 'Portal:Cards',
-			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = Condition.Tree(BooleanOperator.all):add{
-					Condition.Node(Condition.ColumnName('type'), Comparator.eq, 'card'),
-					Condition.Tree(BooleanOperator.any):add{
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Tower Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Spell'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Building'),
-					}
-				}:toString()
-			},
+			file = 'Identity V Character Pills.webp',
+			title = 'Characters',
+			link = 'Portal:Characters',
 		},
 		{
-			file = 'Clash_Royale_Illustration_Card_Evolution.png',
-			title = 'Evolved Cards',
-			link = 'Portal:Evolved Cards',
-			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = Condition.Tree(BooleanOperator.all):add{
-					Condition.Node(Condition.ColumnName('type'), Comparator.eq, 'card'),
-					Condition.Tree(BooleanOperator.any):add{
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Tower Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Spell'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Building'),
-					}
-				}:toString()
-			},
-		},
-		{
-			file = 'Clash_Royale_Illustration_Merge_Tactics.png',
-			title = 'Merge Tactics',
-			link = 'Portal:Merge Tactics',
-		},
-		{
-			file = 'RuneGiant RunicMountain Banner.png',
-			title = 'Statistics',
-			link = 'Portal:Statistics',
+			file = 'Identity V Map Pills.webp',
+			title = 'Maps',
+			link = 'Portal:Maps',
 		},
 	},
 	layouts = {
@@ -182,6 +143,10 @@ return {
 					{
 						mobileOrder = 3,
 						content = CONTENT.transfers,
+					},
+					{
+						mobileOrder = 5,
+						content = CONTENT.thisDay,
 					},
 					{
 						mobileOrder = 6,
@@ -223,12 +188,12 @@ return {
 							},
 						},
 					},
+				},
+			},
+			{ -- Bottom
+				children = {
 					{
 						mobileOrder = 5,
-						content = CONTENT.thisDay,
-					},
-					{
-						mobileOrder = 4,
 						content = CONTENT.usefulArticles,
 					},
 				},

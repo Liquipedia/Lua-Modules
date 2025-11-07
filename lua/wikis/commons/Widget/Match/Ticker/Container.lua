@@ -15,6 +15,7 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
+local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Switch = Lua.import('Module:Widget/Switch')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
@@ -78,41 +79,46 @@ function MatchTickerContainer:render()
 	end
 
 	return HtmlWidgets.Div{
-		classes = {'toggle-area', 'toggle-area-1'},
-		attributes = {['data-toggle-area'] = '1'},
+		classes = {'match-section-header'},
 		children = {
-			HtmlWidgets.Div{
-				classes = {'match-section-header'},
-				children = {
-					HtmlWidgets.Div{
-						classes = {'switch-pill-container'},
-						children = {
+			ContentSwitch{
+				tabs = {
+					{
+						label = 'Upcoming',
+						value = 'upcoming',
+						content = {
 							HtmlWidgets.Div{
-								classes = {'switch-pill'},
 								attributes = {
-									['data-switch-group'] = 'matchFiler',
-									['data-store-value'] = 'true',
+									['data-switch-group-container'] = 'countdown',
 								},
 								children = {
 									HtmlWidgets.Div{
-										classes = {'switch-pill-option', 'switch-pill-active', 'toggle-area-button'},
-										attributes = {
-											['data-toggle-area-btn'] = '1',
-											['data-switch-value'] = 'upcoming',
+										classes = {'switch-toggle-container'},
+										css = {margin = '1rem 0'},
+										children = {
+											HtmlWidgets.Div{
+												classes = {'switch-toggle'},
+												attributes = {
+													['data-switch-group'] = 'countdown',
+													['data-store-value'] = 'true',
+												},
+												children = {
+													HtmlWidgets.Div{classes = {'switch-toggle-slider'}},
+												},
+											},
+											HtmlWidgets.Div{children = 'Show Countdown'},
 										},
-										children = 'Upcoming',
 									},
 									HtmlWidgets.Div{
-										classes = {'switch-pill-option', 'toggle-area-button'},
 										attributes = {
-											['data-toggle-area-btn'] = '2',
-											['data-switch-value'] = 'completed',
+											['data-filter-expansion-template'] = buildTemplateExpansionString('upcoming'),
+											['data-filter-groups'] = filterText,
 										},
-										children = 'Completed',
-									},
-								},
-							},
-						},
+										children = callTemplate('upcoming'),
+									}
+								}
+							}
+						}
 					},
 				},
 			},
@@ -134,17 +140,23 @@ function MatchTickerContainer:render()
 							['data-filter-groups'] = filterText,
 						},
 						children = callTemplate('upcoming'),
+					{
+						label = 'Completed',
+						value = 'completed',
+						content = {
+							HtmlWidgets.Div{
+								attributes = {
+									['data-filter-expansion-template'] = buildTemplateExpansionString('recent'),
+									['data-filter-groups'] = filterText,
+								},
+								children = callTemplate('recent'),
+							}
+						}
 					}
-				}
-			},
-			HtmlWidgets.Div{
-				attributes = {
-					['data-toggle-area-content'] = '2',
-					['data-filter-expansion-template'] = buildTemplateExpansionString('recent'),
-					['data-filter-groups'] = filterText,
 				},
-				children = callTemplate('recent'),
-			},
+				switchGroup = 'matchFiler',
+				defaultActive = 1,
+			}
 		},
 	}
 end

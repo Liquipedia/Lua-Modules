@@ -7,20 +7,34 @@
 
 local Config = {}
 
+-- These are constants, you don't need to touch them
+-- unless values for liquipediatiertype change
 Config.TIER_TYPE_GENERAL = 'general'
 Config.TIER_TYPE_QUALIFIER = 'qualifier'
 Config.TIER_TYPE_WEEKLY = 'weekly'
 Config.TIER_TYPE_MONTHLY = 'monthly'
-Config.TIER_TYPE_SHOW_MATCH = 'showmatch'
 Config.TIER_TYPE_MISC = 'misc'
-Config.MAX_NUMBER_OF_COACHES = 6
+Config.TIER_TYPE_SHOW_MATCH = 'showmatch'
+Config.MAX_NUMBER_OF_PARTICIPANTS = 10
+Config.MAX_NUMBER_OF_COACHES = 2
 
 -- How many placements should we retrieve from LPDB for a team/player?
-Config.PLACEMENT_LIMIT = 2000
+Config.PLACEMENT_LIMIT = 5000
 
 -- These are the notability thresholds needed by a team/player
-Config.NOTABILITY_THRESHOLD_MIN = 10
-Config.NOTABILITY_THRESHOLD_NOTABLE = 22
+Config.NOTABILITY_THRESHOLD_MIN = 20
+Config.NOTABILITY_THRESHOLD_NOTABLE = 25
+
+-- These are all the liquipediatiertypes which should be extra "penalised"
+-- for a lower placement, see also the placementDropOffFunction below.
+-- Generally these types will award the same points for first, but then
+-- quickly decrease the point rewards as the placement gets lower
+Config.EXTRA_DROP_OFF_TYPES = {
+	Config.TIER_TYPE_GENERAL,
+	Config.TIER_TYPE_MONTHLY,
+	Config.TIER_TYPE_WEEKLY,
+	Config.TIER_TYPE_QUALIFIER,
+}
 
 -- Weights used for tournaments
 Config.weights = {
@@ -32,79 +46,79 @@ Config.weights = {
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 20,
+				points = 25,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 0.5,
+				points = 15,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0.5,
+				points = 10,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 3,
+				points = 1,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 0.5,
+				points = 1,
 			},
 			{
 				name = Config.TIER_TYPE_MISC,
-				points = 0.5,
+				points = 0,
 			},
 		},
 	},
 	{
 		tier = 2,
 		options = {
-			dateLossIgnored = true,
+			dateLossIgnored = false,
 		},
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 12,
+				points = 15,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 0.5,
+				points = 10,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0.5,
+				points = 5,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 2,
+				points = 1,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 0.5,
+				points = 1,
 			},
 			{
 				name = Config.TIER_TYPE_MISC,
-				points = 0.5,
+				points = 0,
 			},
 		},
 	},
 	{
 		tier = 3,
 		options = {
-			dateLossIgnored = true,
+			dateLossIgnored = false,
 		},
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 6,
+				points = 10,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 0.5,
+				points = 5,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0.5,
+				points = 2,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
@@ -112,75 +126,75 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 0.5,
+				points = 0,
 			},
 			{
 				name = Config.TIER_TYPE_MISC,
-				points = 0.5,
+				points = 0,
 			},
 		},
 	},
 	{
 		tier = 4,
 		options = {
-			dateLossIgnored = true,
+			dateLossIgnored = false,
 		},
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 3,
+				points = 5,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 0.5,
+				points = 2,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0.5,
+				points = 1
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0.5,
+				points = 0,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 0.5,
+				points = 0,
 			},
 			{
 				name = Config.TIER_TYPE_MISC,
-				points = 0.5,
+				points = 0,
 			},
 		},
 	},
 	{
 		tier = 5,
 		options = {
-			dateLossIgnored = true,
+			dateLossIgnored = false,
 		},
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 1,
+				points = 2,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 0.5,
+				points = 1,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0.5,
+				points = 0,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0.5,
+				points = 0,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 0.5,
+				points = 0,
 			},
 			{
 				name = Config.TIER_TYPE_MISC,
-				points = 0.5,
+				points = 0,
 			},
 		},
 	},
@@ -188,75 +202,46 @@ Config.weights = {
 
 --- This function adjusts the score for the placement, e.g.
 --- a first placement should score more than a 10th placement.
+--- See also the EXTRA_DROP_OFF_TYPES.
 ---@param tier string|integer
 ---@param tierType string
 ---@return fun(number, number): number
 function Config.placementDropOffFunction(tier, tierType)
-
-		return function(score, placement)
-			if (tierType == Config.TIER_TYPE_QUALIFIER) then
-				if ((tier == 1 or tier == 2 or tier == 3) and placement == 1) then
-					return score
-				end
-			elseif (tierType == Config.TIER_TYPE_MISC
-					or tierType == Config.TIER_TYPE_WEEKLY
-					or tierType == Config.TIER_TYPE_MONTHLY
-					or tierType == Config.TIER_TYPE_SHOW_MATCH) then
-				return score
-			else
-				if (tier == 1 and placement <= 16) or placement == 1 then
-					return score
-
-				elseif (tier == 1) then
-					return (score - 5)
-
-				elseif (tier == 2 and placement == 1) then
-					return (score)
-
-				elseif (tier == 2 and placement <= 4) then
-					return (score - 2)
-
-				elseif (tier == 2 and placement <= 8) then
-					return (score - 5)
-
-				elseif (tier == 2 and placement <= 12) then
-					return (score - 8)
-
-				elseif (tier == 2 and placement <= 16) then
-					return (score - 10)
-
-				elseif (tier == 2) then
-					return (score - 11)
-
-				elseif (tier == 3 and placement == 1) then
-					return (score)
-
-				elseif (tier == 3 and placement <= 4) then
-					return (score - 3)
-
-				elseif (tier == 3 and placement <= 8) then
-					return (score - 4)
-
-				elseif (tier == 3 and placement <= 12) then
-					return (score - 5)
-				elseif (tier == 3) then
-					return (score - 5.5)
-				elseif (tier == 4 and placement == 3) then
-					return (score)
-				elseif (tier == 4 and placement <= 4) then
-					return (score - 2)
-				elseif (tier == 4) then
-					return (score - 2.5)
-
-				elseif (tier == 5 and placement == 1) then
-					return (score)
-				elseif (tier == 5) then
-					return (score - 0.5)
-				end
-			end
-
+	return function(score, placement)
+		if (tier == 1 and placement <= 4)
+			or (tier == 2 and placement <= 2)
+			or (tier == 3 and placement == 1)
+			or (tier == 4 and placement == 1)
+			or (tier == 5 and placement == 1)
+		then
+			return score
+		elseif (tier == 1 and placement <= 8)
+			or (tier == 2 and placement <= 4)
+			or (tier == 3 and placement <= 2)
+		then
+			return (score * 0.8)
+		elseif (tier == 1 and placement <= 16)
+			or (tier == 2 and placement <= 8)
+		then
+			return (score * 0.6)
+		elseif (tier == 3 and placement <= 4)
+			or (tier == 4 and placement <= 2)
+			or (tier == 5 and placement <= 2)
+		then
+			return (score * 0.5)
+		elseif (tier == 1 and placement <= 32) then
+			return (score * 0.4)
+		elseif (tier == 2 and placement <= 16) then
+			return (score * 0.3)
+		elseif (tier == 1 and placement <= 64)
+			or (tier == 3 and placement <= 8)
+			or (tier == 4 and placement <= 4)
+		then
+			return (score * 0.2)
+		else
 			return 0
 		end
+	end
 end
 
 -- Adjusts the score to compensate for the mode, you might
