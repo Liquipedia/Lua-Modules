@@ -25,6 +25,7 @@ local NON_BREAKING_SPACE = '&nbsp;'
 ---@field props {data: externalmedialink, showUsUk: boolean?}
 local ExternalMediaLinkDisplay = Class.new(Widget)
 
+---@return (string|Widget)[]
 function ExternalMediaLinkDisplay:render()
 	local data = self.props.data
 	return Array.interleave(WidgetUtil.collect(
