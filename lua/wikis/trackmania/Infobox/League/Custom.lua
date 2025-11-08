@@ -34,8 +34,6 @@ function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
 
-	league.args.player_number = league.args.participants_number
-
 	return league:createInfobox()
 end
 
@@ -66,7 +64,7 @@ function CustomInjector:parse(id, widgets)
 		})
 		table.insert(widgets, Cell{
 			name = 'Number of Players',
-			children = {args.player_number}
+			children = {args.participants_number}
 		})
 
 		local maps = self.caller:getAllArgsForBase(args, 'map')
