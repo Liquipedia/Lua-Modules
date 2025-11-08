@@ -165,7 +165,7 @@ function EmptyTeamPagePreview:_fetchGamesFromPlacements()
 		groupBy = 'game asc',
 		additionalConditions = ConditionTree(BooleanOperator.all):add{
 			ConditionNode(ColumnName('placement'), Comparator.neq, ''),
-			ConditionNode(ColumnName('game'), Comparator.neq, 'csgocs2'), -- needed for cs wiki, has no impact on others
+			ConditionUtil.noneOf(ColumnName('game'), Game.unlistedGames()),
 		}
 	}
 
