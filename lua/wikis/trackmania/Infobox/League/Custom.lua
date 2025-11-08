@@ -24,8 +24,6 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 local Chronology = Widgets.Chronology
 
-local DEFAULT_MODE = 'solo'
-
 ---@class TrackmaniaLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
@@ -88,11 +86,6 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.mode = Logic.emptyOr(
-		args.mode,
-		(String.isNotEmpty(args.team_number) and 'team' or nil),
-		DEFAULT_MODE
-	)
 	self.data.publishertier = self.data.publishertier or Array.any(self:getAllArgsForBase(args, 'organizer'),
 		function(organizer)
 			return organizer:find('Nadeo', 1, true) or organizer:find('Ubisoft', 1, true)
@@ -123,9 +116,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.extradata.circuit = args.circuit
 	lpdbData.extradata.circuittier = args.circuittier
-
-	-- Legacy, can be superseeded by lpdbData.mode
-	lpdbData.extradata.individual = self.data.mode == DEFAULT_MODE
 
 	return lpdbData
 end
