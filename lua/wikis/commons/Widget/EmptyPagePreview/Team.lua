@@ -127,7 +127,6 @@ function EmptyTeamPagePreview:_infobox()
 		name = TeamTemplate.getRaw(self.team).name,
 		coaches = coaches,
 		region = self:_determineRegionFromPlacements() or rosterRegion,
-		wiki = EmptyTeamPagePreview._getWiki(self.props, games),
 	}
 	-- some wikis (e.g. cs, val) will need this
 	Array.forEach(games, function(game)
@@ -152,7 +151,7 @@ function EmptyTeamPagePreview._getWiki(props, games)
 	end
 
 	for _, game in ipairs(Array.reverse(Game.listGames({ordered = true}))) do
-		if Table.includes(games, game) and (game ~= 'csgocs2') then
+		if Table.includes(games, game) then
 			return game
 		end
 	end
