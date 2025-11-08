@@ -97,7 +97,7 @@ return {
 			category = 'Showmatch Tournaments',
 		},
 		engine = {
-			value = 'engine',
+			value = 'Engine',
 			sort = 'B2',
 			name = 'Engine',
 			short = 'Engine',
