@@ -108,10 +108,6 @@ end
 ---@param args table
 ---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
-	if String.isEmpty(args.tickername) then
-		lpdbData.tickername = args.name
-	end
-
 	lpdbData.maps = table.concat(self:getAllArgsForBase(args, 'map'), ';')
 
 	lpdbData.extradata.circuit = args.circuit
