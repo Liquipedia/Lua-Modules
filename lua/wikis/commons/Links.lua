@@ -119,7 +119,7 @@ local PREFIXES = {
 		player = 'https://web.archive.org/web/play.eslgaming.com/player/',
 		match = 'https://web.archive.org/web/play.eslgaming.com/match/',
 	},
-	esplay = {'https://esplay.com/tournament/'},
+	esplay = {'https://esplay.com/'},
 	esportal = {'https://esportal.com/tournament/'},
 	etf2l = {
 		'',
