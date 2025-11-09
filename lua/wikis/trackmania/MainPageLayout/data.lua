@@ -31,7 +31,11 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{limit = 10},
+		body = TransfersList{
+			limit = 10,
+			transferPage = 'Player Transfers/' .. DateExt.getYearOf() .. '/' ..
+				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
+		},
 		boxid = 1509,
 	},
 	thisDay = {
