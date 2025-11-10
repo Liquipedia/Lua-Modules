@@ -255,17 +255,11 @@ function Count._baseConditions(args, isTournament)
 	end
 
 	if args.sdate then
-		conditions:add{ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName(startDateKey), Comparator.gt, args.sdate),
-			ConditionNode(ColumnName(startDateKey), Comparator.eq, args.sdate)
-		}}
+		conditions:add(ConditionNode(ColumnName(startDateKey), Comparator.ge, args.sdate))
 	end
 
 	if args.edate then
-		conditions:add{ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName(endDateKey), Comparator.lt, args.edate),
-			ConditionNode(ColumnName(endDateKey), Comparator.eq, args.edate)
-		}}
+		conditions:add(ConditionNode(ColumnName(endDateKey), Comparator.le, args.edate))
 	end
 
 	if args.year then
