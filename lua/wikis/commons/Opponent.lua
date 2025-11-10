@@ -371,7 +371,7 @@ function Opponent.resolve(opponent, date, options)
 		return opponent
 	end
 
-	for _, player in ipairs(opponent.players) do
+	Array.forEach(opponent.players, function(player)
 		if options.syncPlayer then
 			local hasFaction = String.isNotEmpty(player.faction)
 			local savePageVar = not Opponent.playerIsTbd(player)
@@ -392,7 +392,7 @@ function Opponent.resolve(opponent, date, options)
 		if player.team then
 			player.team = TeamTemplate.resolve(player.team, date)
 		end
-	end
+	end)
 
 	return opponent
 end
@@ -596,7 +596,7 @@ function Opponent.toLegacyParticipantData(opponent, options)
 	local participant
 
 	if opponent.type == Opponent.team then
-		local teamTemplate = mw.ext.TeamTemplate.raw(opponent.template) or {}
+		local teamTemplate = TeamTemplate.getRawOrNil(opponent.template) or {}
 
 		participant = teamTemplate.page or ''
 		if options and options.resolveRedirect then
