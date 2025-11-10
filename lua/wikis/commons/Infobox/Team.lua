@@ -348,7 +348,7 @@ function Team:_setLpdbData(args, links)
 		disbanddate = ReferenceCleaner.clean{input = args.disbanded},
 		template = self.teamTemplate.historicaltemplate or self.teamTemplate.templatename,
 		status = args.disbanded and Status.DISBANDED or Status.ACTIVE,
-		links = mw.ext.LiquipediaDB.lpdb_create_json(
+		links = Json.stringify(
 			Links.makeFullLinksForTableItems(links or {}, 'team')
 		),
 		extradata = {}
