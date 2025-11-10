@@ -170,6 +170,7 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 	end
 
 	local placeConditions = ConditionTree(BooleanOperator.any)
+	local allowedPlacements = Table.copy(config.allowedPlacements)
 	if config.dynamicPlacements then
 		local queryResult = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = conditions:toString(),
@@ -181,7 +182,7 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 
 		-- A placement 1-... will be sorted before 10-..., so this will be the best placement
 		local firstPlacement = queryResult[1]
-		table.insert(config.allowedPlacements, firstPlacement.placement)
+		table.insert(allowedPlacements, firstPlacement.placement)
 
 		local parts = mw.text.split(firstPlacement.placement, '-')
 		local runnerupPlacementStart = tonumber(parts[2] or parts[1]) + 1
@@ -203,10 +204,10 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 			limit = 1,
 		})
 		local secondPlacement = queryResult[1]
-		table.insert(config.allowedPlacements, secondPlacement.placement)
+		table.insert(allowedPlacements, secondPlacement.placement)
 	end
 
-	for _, allowedPlacement in pairs(config.allowedPlacements) do
+	for _, allowedPlacement in pairs(allowedPlacements) do
 		placeConditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, allowedPlacement)}
 	end
 	conditions:add{placeConditions}
