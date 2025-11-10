@@ -74,7 +74,7 @@ function ParticipantsTeamCard:_renderQualifierBox(participant, location)
 					classes = { 'team-participant-card-qualifier-details' },
 					children = {
 						Link{
-							link = participant.qualifierUrl,
+							link = participant.qualifierPage,
 							children = participant.qualifierText
 						}
 					}
