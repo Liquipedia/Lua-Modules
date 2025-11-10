@@ -155,17 +155,21 @@ function Count.placements(args)
 	lpdbConditions = Count._tierConditions(args, lpdbConditions)
 
 	if not Logic.readBool(args.includeShowmatch) then
-		lpdbConditions:add{ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Showmatch')}
+		lpdbConditions:add(ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Showmatch'))
 	end
 
 	if not Logic.readBool(args.includeQualifier) then
-		lpdbConditions:add{ConditionNode(ColumnName('liquipediatier'), Comparator.neq, 'Qualifier')}
-		lpdbConditions:add{ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier')}
+		lpdbConditions:add{
+			ConditionNode(ColumnName('liquipediatier'), Comparator.neq, 'Qualifier'),
+			ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier'),
+		}
 	end
 
 	if Logic.readBool(args.noEmptyPrizePool) then
-		lpdbConditions:add{ConditionNode(ColumnName('prizemoney'), Comparator.neq, '')}
-		lpdbConditions:add{ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0)}
+		lpdbConditions:add{
+			ConditionNode(ColumnName('prizemoney'), Comparator.neq, ''),
+			ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0),
+		}
 	end
 
 	if String.isNotEmpty(args.player) then
