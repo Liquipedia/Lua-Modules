@@ -1,23 +1,45 @@
 --- Triple Comment to Enable our LLS Plugin
 insulate('Team Participant', function()
 	it('integration tests', function()
-		local Array = require('Module:Array')
 		local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 		TeamTemplateMock.setUp()
 
-		local LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function(tbl)
-			if tbl == 'placement' then
-				return Array.filter(require('test_assets/lpdb_placement'), function (asset)
-					return asset.pagename == 'Six_Lounge_Series/4/Online_Stage'
-				end)
-			end
-			return {}
-		end)
-		local TeamParticipantCardGroup = require('Module:Widget/Participants/Team/CardsGroup')
+		local TeamParticipantsController = require('Module:TeamParticipants/Controller')
 
-		GoldenTest('team_participant', tostring(TeamParticipantCardGroup{pageName = 'Six_Lounge_Series/4/Online_Stage'}))
+		GoldenTest('team_participant', tostring(TeamParticipantsController{
+			{
+				'Team Liquid',
+				qualifyingPage = 'TripleVCT/2025/Game Changers/North America/Stage 2',
+				players = {
+					{'alexis'},
+					{'dodonut'},
+					{'meL'},
+					{'Noia'},
+					{'sarah'},
+					{'effys', role = 'Head Coach'},
+					{'Veer', role = 'Coach'},
+				},
+				notes = {
+					{'SOME TEXT HERE'},
+				}
+			},
+			{
+				'bds',
+				qualifyingPage = 'TripleVCT/2025/Game Changers/North America/Stage 2',
+				players = {
+					{'EletricBoy'},
+					{'hjpalpha'},
+					{'Eetu'},
+					{'Syntactic Sugar'},
+					{'Syntactic Salt'},
+					{'Rathoz', role = 'Coach'},
+				},
+				notes = {
+					{'Best Team in the World!', highlighted = true},
+				}
+			},
+		}))
 
-		LpdbQuery:revert()
 		TeamTemplateMock.tearDown()
 	end)
 end)
