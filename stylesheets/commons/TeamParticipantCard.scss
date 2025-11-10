@@ -72,6 +72,13 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 					$participant-icon-size-mobile
 				);
 			}
+
+			@media ( min-width: 768px ) and ( max-width: 1024px ) {
+				@include set-participant-icon-size(
+					$participant-icon-wrapper-size-compact,
+					$participant-icon-size-compact
+				);
+			}
 		}
 	}
 
