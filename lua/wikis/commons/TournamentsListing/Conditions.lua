@@ -181,7 +181,7 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 
 		-- A placement 1-... will be sorted before 10-..., so this will be the best placement
 		local firstPlacement = queryResult[1]
-		placeConditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, firstPlacement.placement)}
+		table.insert(config.allowedPlacements, firstPlacement.placement)
 
 		local parts = mw.text.split(firstPlacement.placement, '-')
 		local runnerupPlacementStart = tonumber(parts[2] or parts[1]) + 1
@@ -203,11 +203,11 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 			limit = 1,
 		})
 		local secondPlacement = queryResult[1]
-		placeConditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, secondPlacement.placement)}
-	else
-		for _, allowedPlacement in pairs(config.allowedPlacements) do
-			placeConditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, allowedPlacement)}
-		end
+		table.insert(config.allowedPlacements, secondPlacement.placement)
+	end
+
+	for _, allowedPlacement in pairs(config.allowedPlacements) do
+		placeConditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, allowedPlacement)}
 	end
 	conditions:add{placeConditions}
 
