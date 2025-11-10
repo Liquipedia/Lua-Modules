@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
-local String = Lua.import('Module:String')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
