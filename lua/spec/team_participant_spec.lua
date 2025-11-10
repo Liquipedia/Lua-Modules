@@ -6,7 +6,7 @@ insulate('Team Participant', function()
 
 		local TeamParticipantsController = require('Module:TeamParticipants/Controller')
 
-		GoldenTest('team_participant', tostring(TeamParticipantsController{
+		GoldenTest('team_participant', tostring(TeamParticipantsController.fromTemplate{
 			{
 				'Team Liquid',
 				qualifyingPage = 'TripleVCT/2025/Game Changers/North America/Stage 2',
