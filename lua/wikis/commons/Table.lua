@@ -529,7 +529,7 @@ Table.iter = {}
 ---@generic K, V
 ---@param tbl {[K]: V}
 ---@param order? fun(tbl: {[K]: V}, a: K, b: K): boolean
----@return fun(): K, V
+---@return fun(): K?, V?
 function Table.iter.spairs(tbl, order)
 	-- collect the keys
 	local keys = {}
