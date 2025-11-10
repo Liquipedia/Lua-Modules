@@ -187,13 +187,9 @@ function Count.placements(args)
 	end
 
 	if String.isNotEmpty(args.placement) then
-		local placementConditions = ConditionTree(BooleanOperator.any)
-		Array.forEach(Array.map(mw.text.split(args.placement, ',', true), String.trim),
-			function(placementValue)
-				placementConditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, placementValue)}
-			end
+		lpdbConditions:add(
+			ConditionUtil.anyOf(ColumnName('placement'), Array.parseCommaSeparatedString(args.placement))
 		)
-		lpdbConditions:add{placementConditions}
 	end
 
 	return Count.query('placement', lpdbConditions)
