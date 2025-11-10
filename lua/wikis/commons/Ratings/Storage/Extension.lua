@@ -32,6 +32,10 @@ end
 ---@param rankings Dota2RankingRecord[]
 ---@return Dota2RankingTeam[]
 function RatingsStorageExtension._mapDataToExpectedFormat(rankings)
+	local dateOfLastEntry = Array.maxBy(rankings, function(rankedDate)
+		return Date.readTimestamp(rankedDate.date)
+	end).date
+
 	local teamsData = {}
 
 	for _, datedResults in ipairs(rankings) do
@@ -39,12 +43,17 @@ function RatingsStorageExtension._mapDataToExpectedFormat(rankings)
 			if not teamsData[datedEntry.name] then
 				teamsData[datedEntry.name] = {
 					name = datedEntry.name,
-					rank = datedEntry.rank,
-					rating = datedEntry.rating,
 					progression = {}
 				}
 			end
-			table.insert(teamsData[datedEntry.name].progression, {
+			local teamData = teamsData[datedEntry.name]
+
+			if datedResults.date == dateOfLastEntry then
+				teamData.rank = datedEntry.rank
+				teamData.rating = datedEntry.rating
+			end
+
+			table.insert(teamData.progression, {
 				timestamp = Date.readTimestamp(datedResults.date),
 				date = Date.toYmdInUtc(Date.parseIsoDate(datedResults.date)),
 				rank = datedEntry.rank,
@@ -53,12 +62,16 @@ function RatingsStorageExtension._mapDataToExpectedFormat(rankings)
 		end
 	end
 
-	return Array.map(Array.extractValues(teamsData), function(team)
+	local teamList = Array.map(Array.extractValues(teamsData), function(team)
 		team.progression = Array.sortBy(team.progression, Operator.property('timestamp'), function (a, b)
 			return a < b
 		end)
 		return team
 	end)
+
+	teamList = Array.filter(teamList, Operator.property('rank'))
+
+	return teamList
 end
 
 ---@alias Dota2RankingTeam {name: string, rank: integer, rating: number,
