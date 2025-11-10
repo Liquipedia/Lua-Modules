@@ -30,7 +30,7 @@ function ParticipantsTeamCardsGroup:render()
 	end
 
 	return Switch{
-		label = 'Compact mode',
+		label = 'Compact view',
 		switchGroup = 'team-cards-compact',
 		defaultActive = true,
 		content = AnalyticsWidget{

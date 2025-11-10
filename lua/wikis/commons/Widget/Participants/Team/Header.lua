@@ -28,7 +28,8 @@ function ParticipantsTeamHeader:render()
 	local opponentDisplay = OpponentDisplay.BlockOpponent{
 		opponent = participant.opponent,
 		teamStyle = 'standard',
-		additionalClasses = {'team-participant-card-header-opponent', 'team-participant-card-square-icon'},	}
+		additionalClasses = {'team-participant-card-header-opponent', 'team-participant-card-square-icon'}
+	}
 
 	return Div{
 		classes = { 'team-participant-card-header' },
