@@ -528,6 +528,11 @@ function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 		end
 
 		if place then
+			if place and place > 2 then
+				-- Map runnerup placements to second slot
+				place = 2
+			end
+
 			if not placements[place] then
 				placements[place] = {}
 			end

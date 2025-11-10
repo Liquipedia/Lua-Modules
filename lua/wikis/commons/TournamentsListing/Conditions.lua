@@ -161,6 +161,7 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 			ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tournamentData.liquipediatier),
 			ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, tournamentData.liquipediatiertype),
 			ConditionNode(ColumnName(config.useParent and 'parent' or 'pagename'), Comparator.eq, tournamentData.pagename),
+			ConditionNode(ColumnName('placement'), Comparator.neq, '')
 		}
 
 	if config.showQualifierColumnOverWinnerRunnerup then
@@ -171,7 +172,7 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 	local placeConditions = ConditionTree(BooleanOperator.any)
 	if config.dynamicPlacements then
 		local queryResult = mw.ext.LiquipediaDB.lpdb('placement', {
-			conditions = conditions,
+			conditions = conditions:toString(),
 			query = 'placement',
 			order = 'placement asc',
 			groupby = 'placement asc',
@@ -182,12 +183,19 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 		local firstPlacement = queryResult[1]
 		placeConditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, firstPlacement.placement)}
 
-		local runnerupPlacementStart = tonumber(mw.text.split(firstPlacement.placement, '-')[2]) + 1
-		local dynamicPlacements = Table.deepCopy(conditions)
-		dynamicPlacements:add(
-			ConditionNode(ColumnName('placement'), Comparator.gt, runnerupPlacementStart .. '-')
-		)
-		local queryResult = mw.ext.LiquipediaDB.lpdb('placement', {
+		local parts = mw.text.split(firstPlacement.placement, '-')
+		local runnerupPlacementStart = tonumber(parts[2] or parts[1]) + 1
+		local dynamicPlacements = ConditionTree(BooleanOperator.all)
+			:add{
+				ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tournamentData.liquipediatier),
+				ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, tournamentData.liquipediatiertype),
+				ConditionNode(ColumnName(config.useParent and 'parent' or 'pagename'), Comparator.eq, tournamentData.pagename),
+			}
+		dynamicPlacements:add(ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName('placement'), Comparator.gt, runnerupPlacementStart .. '-'),
+			ConditionNode(ColumnName('placement'), Comparator.eq, runnerupPlacementStart),
+		})
+		queryResult = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = dynamicPlacements:toString(),
 			query = 'placement',
 			order = 'placement asc',
