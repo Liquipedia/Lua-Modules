@@ -11,6 +11,13 @@ local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local Variables = Lua.import('Module:Variables')
 
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+
 local MatchGroupBase = {}
 
 ---@class MatchGroupBaseOptions
@@ -113,9 +120,14 @@ end
 ---@param bracketId string
 ---@return boolean
 function MatchGroupBase.isBracketIdAvailable(bracketId)
+	local lpdbConditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('match2bracketid'), Comparator.eq, bracketId),
+		ConditionNode(ColumnName('pageid'), Comparator.neq, mw.title.getCurrentTitle().id),
+		ConditionNode(ColumnName('namespace'), Comparator.ge, '0'), -- Query all namespaces
+	}
+
 	local bracketIdUsedOnOtherPage = mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = '[[match2bracketid::'.. bracketId ..']] AND [[pageid::!'.. mw.title.getCurrentTitle().id ..']]' ..
-		'AND ([[namespace::0]] OR [[namespace::!0]])',
+		conditions = tostring(lpdbConditions),
 		limit = 1,
 		query = 'pageid',
 	})[1]
