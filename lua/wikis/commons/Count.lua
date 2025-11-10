@@ -280,9 +280,11 @@ function Count._tierConditions(args, lpdbConditions)
 	end
 
 	if args.publishertier then
-		lpdbConditions:add{ConditionNode(ColumnName('publishertier'), Comparator.eq, args.publishertier)}
-		lpdbConditions:add{ConditionNode(ColumnName('liquipediatier'), Comparator.neq, 'Qualifier')}
-		lpdbConditions:add{ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier')}
+		lpdbConditions:add{
+			ConditionNode(ColumnName('publishertier'), Comparator.eq, args.publishertier),
+			ConditionNode(ColumnName('liquipediatier'), Comparator.neq, 'Qualifier'),
+			ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier')
+		}
 	end
 
 	if args.liquipediatiertype then
