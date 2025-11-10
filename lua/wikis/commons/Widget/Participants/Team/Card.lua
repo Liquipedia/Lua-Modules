@@ -28,18 +28,18 @@ function ParticipantsTeamCard:render()
 	local participant = self.props.participant
 	local variant = self.props.variant or 'compact'
 
-	local qualifierBox = self:_renderQualifierBox(participant)
+	local qualifierBoxHeader = self:_renderQualifierBox(participant, 'header')
+	local qualifierBoxContent = self:_renderQualifierBox(participant, 'content')
 	local content = { self:_renderContent(participant) }
 
 	local header = ParticipantsTeamHeader{
 		participant = participant,
-		variant = variant
 	}
 
 	local collapsible = Collapsible{
 		shouldCollapse = true,
 		collapseAreaClasses = {'team-participant-card-collapsible-content'},
-		classes = {'team-participant-card', 'team-participant-card--' .. variant},
+		classes = {'team-participant-card'},
 	}
 
 	collapsible.props.titleWidget = Div{
