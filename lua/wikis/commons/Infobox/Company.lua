@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
+local Json = Lua.import('Module:Json')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
 local Logic = Lua.import('Module:Logic')
@@ -103,7 +104,7 @@ function Company:createInfobox()
 		foundeddate = ReferenceCleaner.clean{input = args.foundeddate},
 		defunctdate = ReferenceCleaner.clean{input = args.defunctdate},
 		numberofemployees = ReferenceCleaner.cleanNumber{input = args.employees},
-		links = mw.ext.LiquipediaDB.lpdb_create_json({
+		links = Json.stringify({
 			discord = Links.makeFullLink{platform = 'discord', id = args.discord},
 			facebook = Links.makeFullLink{platform = 'facebook', id = args.facebook},
 			instagram = Links.makeFullLink{platform = 'instagram', id = args.instagram},
