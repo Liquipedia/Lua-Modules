@@ -1,6 +1,10 @@
 local aliases = {
 	bds = 'team bds',
+	['bds esport'] = 'team bds',
 	mousesports = 'mouz',
+	skt = 't1',
+	['sk telecom t1'] = 't1',
+	['team exon'] = 'exon',
 	tl = 'team liquid',
 	tt9 = 'tt9 esports',
 	wol = 'wolves esports'
@@ -8,6 +12,11 @@ local aliases = {
 
 local data = {
 	-- historical ones
+	exon = {
+		['0000-01-01'] = 'exon jan 2020',
+		['2020-02-12'] = 'exon feb 2020',
+		['2020-03-10'] = 'exon march 2020',
+	},
 	['team bds'] = {
 		['0000-01-01'] = 'bds esport old',
 		['2019-09-01'] = 'team bds orig',
@@ -22,6 +31,10 @@ local data = {
 		['0000-01-01'] = 'tt9 esports orig',
 		['2021-03-31'] = 'tt9 esports 2021',
 		['2022-09-01'] = 'tt9 esports 2022',
+	},
+	['t1'] = {
+		['0000-01-01'] = 'sk telecom t1 orig',
+		['2019-11-11'] = 't1 2019',
 	},
 	['team liquid'] = {
 		['0000-01-01'] = 'team liquid orig',
@@ -70,6 +83,40 @@ local data = {
 		shortname = "BDS",
 		templatename = "team bds 2021",
 	},
+	-- exon subtemplates
+	['exon jan 2020'] = {
+		bracketname = "eXon",
+		image = "",
+		imagedark = "",
+		legacyimage = "Exon logo std.png",
+		legacyimagedark = "Exon logo std.png",
+		name = "eXon",
+		page = "eXon",
+		shortname = "eXon",
+		templatename = "exon jan 2020",
+	},
+	['exon feb 2020'] = {
+		bracketname = "Team eXon",
+		image = "",
+		imagedark = "",
+		legacyimage = "Exon feb 2020 logo std.png",
+		legacyimagedark = "Exon feb 2020 logo std.png",
+		name = "Team eXon",
+		page = "Team eXon",
+		shortname = "eXon",
+		templatename = "exon feb 2020",
+	},
+	['exon march 2020'] = {
+		bracketname = "Team eXoN",
+		image = "",
+		imagedark = "",
+		legacyimage = "Exon feb 2020 logo std.png",
+		legacyimagedark = "Exon feb 2020 logo std.png",
+		name = "Team eXoN",
+		page = "Team eXoN",
+		shortname = "eXoN",
+		templatename = "exon march 2020",
+	},
 	-- mouz subtemplates
 	['mousesports orig'] = {
 		bracketname = "mousesports",
@@ -103,6 +150,29 @@ local data = {
 		page = "MOUZ",
 		shortname = "MOUZ",
 		templatename = "mouz 2021",
+	},
+	-- t1 subtemplates
+	['sk telecom t1 orig'] = {
+		bracketname = "SK Telecom T1",
+		image = "SK Telecom T1 full allmode.png",
+		imagedark = "SK Telecom T1 full allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "SK Telecom T1",
+		page = "SK Telecom T1",
+		shortname = "SKT",
+		templatename = "sk telecom t1 orig",
+	},
+	['t1 2019'] = {
+		bracketname = "T1",
+		image = "T1 2019 allmode.png",
+		imagedark = "T1 2019 allmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "T1",
+		page = "T1",
+		shortname = "T1",
+		templatename = "t1 2019",
 	},
 	-- tl subtemplates
 	['team liquid orig'] = {

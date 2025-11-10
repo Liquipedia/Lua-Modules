@@ -7,21 +7,22 @@
 
 local Lua = require('Module:Lua')
 
+local DateExt = Lua.import('Module:Date/Ext')
+
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
-local RatingsDisplay = Lua.import('Module:Ratings/Display')
+local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 local CONTENT = {
-	theGame = {
-		heading = 'The Game',
-		body = '{{Liquipedia:The Game}}',
+	usefulArticles = {
+		heading = 'Useful Articles',
+		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
 		boxid = 1503,
 	},
@@ -33,7 +34,10 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{rumours = true},
+		body = TransfersList{
+			limit = 10,
+			transferPage = 'Player Transfers/' .. DateExt.getYearOf(),
+		},
 		boxid = 1509,
 	},
 	thisDay = {
@@ -42,26 +46,10 @@ local CONTENT = {
 		padding = true,
 		boxid = 1510,
 	},
-	rlcsEvents = {
+	specialEvents = {
 		noPanel = true,
-		body = '{{Liquipedia:RLCS Events}}',
-	},
-	specialEvent = {
-		noPanel = true,
-		body = '{{Liquipedia:Special Event}}',
-	},
-	rating = {
-		heading = 'Liquipedia Rating',
-		boxid = 1520,
-		body = HtmlWidgets.Fragment{
-			children = {
-				RatingsDisplay.graph{id = 'rating'},
-				Div{
-					css = { ['text-align'] = 'center' },
-					children = HtmlWidgets.I{children = '[[Portal:Rating#The Rating|See the full ranking]]' }
-				}
-			}
-		}
+		body = '{{Liquipedia:Special_Event}}',
+		boxid = 1516,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -79,13 +67,8 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			--- 1 week as threshold by default
-			upcomingDays = 7,
-			completedDays = 7,
-			--- Special thresholds for higher tier events
-			modifierTier1 = 14,
-			modifierTier2 = 7,
-			modifierTier3 = 3
+			upcomingDays = 120,
+			completedDays = 120
 		},
 		padding = true,
 		boxid = 1508,
@@ -94,24 +77,15 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Rocket League default lightmode.png',
-		darkmode = 'Rocket League default darkmode.png',
+		lightmode = 'IdentityV logo lightmode.png',
+		darkmode = 'IdentityV logo darkmode.png',
 	},
-	metadesc = 'Comprehensive Rocket League wiki with articles covering everything from cars and maps, ' ..
-		'to tournaments, to competitive players and teams.',
-	title = 'Rocket League',
+	metadesc = 'The Identity V (IDV) esports wiki covering everything from players, teams and transfers, ' ..
+		'to tournaments and results, maps and characters.',
+	title = 'Identity V',
 	navigation = {
 		{
-			file = 'RLCS Worlds 2024 LAN Michal Konkol zen.jpg',
-			title = 'Players',
-			link = 'Portal:Players',
-			count = {
-				method = 'LPDB',
-				table = 'player',
-			},
-		},
-		{
-			file = 'RLCS Worlds 2024 Media Day Rachel Mathews Team BDS.jpg',
+			file = 'Identity V Team Pills.webp',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -120,7 +94,16 @@ return {
 			},
 		},
 		{
-			file = 'RLCS Season 8 Trophy.jpg',
+			file = 'Identity V Player Pills.webp',
+			title = 'Players',
+			link = 'Portal:Players',
+			count = {
+				method = 'LPDB',
+				table = 'player',
+			},
+		},
+		{
+			file = 'Identity V Tournament Pills.webp',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -129,12 +112,7 @@ return {
 			},
 		},
 		{
-			file = 'RLCS Worlds 2024 LAN Michal Konkol Bachi.jpg',
-			title = 'Statistics',
-			link = 'Portal:Statistics',
-		},
-		{
-			file = 'RLCS Copenhagen Major 2024 LAN Adela Sznajder itachi.jpg',
+			file = 'Identity V Transfer Pills.webp',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -143,9 +121,14 @@ return {
 			},
 		},
 		{
-			file = 'Flakes casual photo.jpg',
-			title = 'Help',
-			link = 'Help:Contents',
+			file = 'Identity V Character Pills.webp',
+			title = 'Characters',
+			link = 'Portal:Characters',
+		},
+		{
+			file = 'Identity V Map Pills.webp',
+			title = 'Maps',
+			link = 'Portal:Maps',
 		},
 	},
 	layouts = {
@@ -155,18 +138,18 @@ return {
 				children = {
 					{
 						mobileOrder = 1,
-						content = CONTENT.rlcsEvents,
+						content = CONTENT.specialEvents,
 					},
 					{
-						mobileOrder = 2,
-						content = CONTENT.specialEvent,
-					},
-					{
-						mobileOrder = 4,
+						mobileOrder = 3,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 7,
+						mobileOrder = 5,
+						content = CONTENT.thisDay,
+					},
+					{
+						mobileOrder = 6,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -175,7 +158,7 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 3,
+						mobileOrder = 2,
 						children = {
 							{
 								children = {
@@ -205,22 +188,14 @@ return {
 							},
 						},
 					},
-					{
-						mobileOrder = 5,
-						content = CONTENT.rating,
-					},
-					{
-						mobileOrder = 6,
-						content = CONTENT.thisDay,
-					},
 				},
 			},
-			{
+			{ -- Bottom
 				children = {
 					{
-						mobileOrder = 8,
-						content = CONTENT.theGame,
-					}
+						mobileOrder = 5,
+						content = CONTENT.usefulArticles,
+					},
 				},
 			},
 		},
