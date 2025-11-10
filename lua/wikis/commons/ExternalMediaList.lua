@@ -9,15 +9,14 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Flag = Lua.import('Module:Flags')
 local Logic = Lua.import('Module:Logic')
-local Page = Lua.import('Module:Page')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local ExternalMediaLinkDisplay = Lua.import('Module:Widget/ExternalMedia/Link')
 
 local MediaList = {}
 
@@ -228,54 +227,14 @@ function MediaList._displayYear(data, args)
 end
 
 ---Displays a single External Media Link
----@param item table
+---@param item externalmedialink
 ---@param args table
 ---@return Html
 function MediaList._row(item, args)
 	local row = mw.html.create('li')
 		:node(MediaList._editButton(item.pagename))
 		:node(args.showSubjectTeam and MediaList._displayTeam(args.subjects[1], item.date) or '')
-		:wikitext(item.date .. NON_BREAKING_SPACE .. '|' .. NON_BREAKING_SPACE)
-
-	if String.isNotEmpty(item.language) and item.language ~= 'en' and (item.language ~= 'usuk' or args.showUsUk) then
-		row:wikitext(Flag.Icon({flag = item.language, shouldLink = false}) .. NON_BREAKING_SPACE)
-	end
-
-	row:node(MediaList._displayTitle(item))
-
-	if String.isNotEmpty(item.translatedtitle) then
-		row:wikitext(' ' .. mw.text.nowiki('[') .. item.translatedtitle .. mw.text.nowiki(']'))
-	end
-
-	local authors = {}
-	for key, author in Table.iter.pairsByPrefix(item.authors, 'author') do
-		local displayname = item.authors[key .. 'dn']
-		if String.isNotEmpty(author) then
-			table.insert(authors,
-				Page.makeInternalLink({},
-					String.isNotEmpty(displayname) and displayname or author,
-					author
-				)
-			)
-		end
-	end
-	if Table.isNotEmpty(authors) then
-		row
-			:wikitext(NON_BREAKING_SPACE .. 'by' .. NON_BREAKING_SPACE)
-			:wikitext(mw.text.listToText(authors, ',' .. NON_BREAKING_SPACE, NON_BREAKING_SPACE .. 'and' .. NON_BREAKING_SPACE))
-	end
-
-	if String.isNotEmpty(item.publisher) then
-		row:wikitext(NON_BREAKING_SPACE .. 'of' .. NON_BREAKING_SPACE .. '[[' .. item.publisher .. ']]')
-	end
-
-	if String.isNotEmpty(item.extradata.event) and not args.isEventPage then
-		row:wikitext(MediaList._displayEvent(item))
-	end
-
-	if String.isNotEmpty(item.extradata.translation) then
-		row:wikitext(MediaList._displayTranslation(item))
-	end
+		:node(ExternalMediaLinkDisplay{data = item, showUsUk = args.showUsUk})
 
 	return row
 end
@@ -285,52 +244,6 @@ end
 ---@return string
 function MediaList._editButton(page)
 	return mw.text.nowiki('[') .. '[[Data:' .. page .. '|e]]' .. mw.text.nowiki(']') .. NON_BREAKING_SPACE
-end
-
----Displays the title for a given External Media Link
----@param item table
----@return Html
-function MediaList._displayTitle(item)
-	local title = item.link
-
-	if String.isNotEmpty(item.title) then
-		title = item.title
-	end
-
-	return mw.html.create('span')
-			:addClass('plainlinks')
-			:css('font-style', 'italic')
-			:wikitext('[' .. item.link .. ' ' .. title .. ']')
-end
-
----Displays the event for a given External Media Link
----@param item table
----@return string
-function MediaList._displayEvent(item)
-	local prefix = NON_BREAKING_SPACE .. 'at' .. NON_BREAKING_SPACE
-	if Logic.readBoolOrNil(item.extradata.event_link) == false then
-		return prefix .. item.extradata.event
-	end
-
-	if String.isNotEmpty(item.extradata.event_link) then
-		return prefix .. '[[' .. item.extradata.event_link .. '|' .. item.extradata.event .. ']]'
-	end
-
-	return prefix .. '[[' .. item.extradata.event .. ']]'
-end
-
----Displays the translation for a given External Media Link
----@param item table
----@return string
-function MediaList._displayTranslation(item)
-	local translation = NON_BREAKING_SPACE .. '(trans. '
-		.. Flag.Icon({flag = item.extradata.translation, shouldLink = false})
-
-	if String.isEmpty(item.extradata.translator) then
-		return translation .. ')'
-	end
-
-	return translation .. NON_BREAKING_SPACE .. 'by' .. NON_BREAKING_SPACE .. item.extradata.translator .. ')'
 end
 
 ---Displays the subject's team for a given External Media Link
