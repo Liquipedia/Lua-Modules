@@ -149,7 +149,7 @@ function MainPageLayout._makeNavigationCard(navigationData)
 	local count
 	if navigationData.count then
 		if navigationData.count.method == 'LPDB' then
-			count = Count.query(navigationData.count.table, navigationData.count.conditions)
+			count = Count.query(navigationData.count.table, navigationData.count.conditions or '')
 		elseif navigationData.count.method == 'CATEGORY' then
 			count = mw.site.stats.pagesInCategory(navigationData.count.category, 'pages')
 		else
