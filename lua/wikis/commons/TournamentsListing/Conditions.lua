@@ -169,8 +169,37 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 	end
 
 	local placeConditions = ConditionTree(BooleanOperator.any)
-	for _, allowedPlacement in pairs(config.allowedPlacements) do
-		placeConditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, allowedPlacement)}
+	if config.dynamicPlacements then
+		local queryResult = mw.ext.LiquipediaDB.lpdb('placement', {
+			conditions = conditions,
+			query = 'placement',
+			order = 'placement asc',
+			groupby = 'placement asc',
+			limit = 1,
+		})
+
+		-- A placement 1-... will be sorted before 10-..., so this will be the best placement
+		local firstPlacement = queryResult[1]
+		placeConditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, firstPlacement.placement)}
+
+		local runnerupPlacementStart = tonumber(mw.text.split(firstPlacement.placement, '-')[2]) + 1
+		local dynamicPlacements = Table.deepCopy(conditions)
+		dynamicPlacements:add(
+			ConditionNode(ColumnName('placement'), Comparator.gt, runnerupPlacementStart .. '-')
+		)
+		local queryResult = mw.ext.LiquipediaDB.lpdb('placement', {
+			conditions = dynamicPlacements:toString(),
+			query = 'placement',
+			order = 'placement asc',
+			groupby = 'placement asc',
+			limit = 1,
+		})
+		local secondPlacement = queryResult[1]
+		placeConditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, secondPlacement.placement)}
+	else
+		for _, allowedPlacement in pairs(config.allowedPlacements) do
+			placeConditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, allowedPlacement)}
+		end
 	end
 	conditions:add{placeConditions}
 

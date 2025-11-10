@@ -42,7 +42,23 @@ local CANCELLED = 'cancelled'
 local DEFAULT_ALLOWED_PLACES = '1,2,1-2,2-3,W,L'
 local DEFAULT_LIMIT = 5000
 
+---@class BaseTournamentsListingConfig
+---@field showTier boolean
+---@field onlyTierTypeIfBoth boolean
+---@field showOrganizer boolean
+---@field showGameIcon boolean
+---@field showHighlight boolean
+---@field showQualifierColumnOverWinnerRunnerup boolean
+---@field useParent boolean
+---@field showRank boolean
+---@field noLis boolean
+---@field offset number
+---@field allowedPlacements string[]
+---@field dynamicPlacements boolean
+---@field onlyHighlightOnValue string?
+
 --- @class BaseTournamentsListing
+--- @field config BaseTournamentsListingConfig
 --- @operator call(...): BaseTournamentsListing
 local BaseTournamentsListing = Class.new(function(self, ...) self:init(...) end)
 
@@ -105,6 +121,7 @@ function BaseTournamentsListing:readConfig()
 		noLis = Logic.readBool(args.noLis),
 		offset = tonumber(args.offset) or 0,
 		allowedPlacements = self:_allowedPlacements(),
+		dynamicPlacements = Logic.readBool(args.dynamicPlacements),
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
 	}
 end
@@ -274,7 +291,7 @@ function BaseTournamentsListing:_row(tournamentData)
 	row:tag('div')
 		:addClass('gridCell Tournament Header')
 		:node(LeagueIcon.display{
-			options = {noTemplate = Logic.readBool(config.noLIS)},
+			options = {noTemplate = config.noLis},
 			icon = tournamentData.icon,
 			iconDark = tournamentData.icondark,
 			series = tournamentData.series,
