@@ -83,7 +83,7 @@ end
 function RatingsStorageExtension._createTeamEntry(team)
 	local lpdbTeamInfo = RatingsStorageExtension._getTeamInfoFromLpdb(team.name)
 
-	local hasRankLastInterval = #team.progression >= 1
+	local hasRankLastInterval = #team.progression >= 2
 
 	---@type RatingsEntry
 	return {
@@ -92,7 +92,7 @@ function RatingsStorageExtension._createTeamEntry(team)
 		rating = team.rating,
 		region = lpdbTeamInfo.region,
 		opponent = Opponent.resolve(Opponent.readOpponentArgs({ type = Opponent.team, team.name })),
-		change = hasRankLastInterval and team.progression[#team.progression].rank - team.rank or nil,
+		change = hasRankLastInterval and team.progression[#team.progression - 1].rank - team.rank or nil,
 		progression = team.progression,
 	}
 end
