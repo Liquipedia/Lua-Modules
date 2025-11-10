@@ -10,9 +10,9 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
+local Div = Lua.import('Module:Widget/Html/All').Div
 local ParticipantsTeamHeader = Lua.import('Module:Widget/Participants/Team/Header')
+local ParticipantsTeamQualifierInfo = Lua.import('Module:Widget/Participants/Team/QualifierInfo')
 local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 
 ---@class ParticipantsTeamCard: Widget
@@ -23,24 +23,39 @@ local ParticipantsTeamCard = Class.new(Widget)
 function ParticipantsTeamCard:render()
 	local participant = self.props.participant
 
-	return Collapsible{
-		titleWidget = ParticipantsTeamHeader{participant = participant},
+	local qualifierInfoHeader = ParticipantsTeamQualifierInfo{participant = participant, location = 'header'}
+	local qualifierInfoContent = ParticipantsTeamQualifierInfo{participant = participant, location = 'content'}
+	local content = { self:_renderContent(participant) }
+
+	local header = ParticipantsTeamHeader{
+		participant = participant,
+	}
+
+	local collapsible = Collapsible{
 		shouldCollapse = true,
 		collapseAreaClasses = {'team-participant-card-collapsible-content'},
 		classes = {'team-participant-card'},
-		children = self:_renderContent(participant)
 	}
+
+	collapsible.props.titleWidget = Div{
+		children = {
+			header,
+			qualifierInfoHeader
+		}
+	}
+	table.insert(content, 1, qualifierInfoContent)
+	collapsible.props.children = content
+
+	return collapsible
 end
 
--- TODO: This will be divided to multiple components
 ---@private
 ---@param participant TeamParticipantsEntity
 ---@return Widget
 function ParticipantsTeamCard:_renderContent(participant)
-	-- TODO: Implement qualifier box, roster functionality & notes
 	return Div{
 		classes = { 'team-participant-card-collapsible-content' },
-		children = { participant.opponent.name } -- Team details & roster here
+		children = { participant.opponent.name } -- Team roster & notes here
 	}
 end
 
