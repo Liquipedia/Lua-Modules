@@ -22,7 +22,6 @@ local ParticipantsTeamCard = Class.new(Widget)
 ---@return Widget
 function ParticipantsTeamCard:render()
 	local participant = self.props.participant
-	local variant = self.props.variant or 'compact'
 
 	local qualifierInfoHeader = ParticipantsTeamQualifierInfo{participant = participant, location = 'header'}
 	local qualifierInfoContent = ParticipantsTeamQualifierInfo{participant = participant, location = 'content'}
@@ -56,7 +55,7 @@ end
 function ParticipantsTeamCard:_renderContent(participant)
 	return Div{
 		classes = { 'team-participant-card-collapsible-content' },
-		children = { participant.opponent.name } -- Team details & roster here
+		children = { participant.opponent.name } -- Team roster & notes here
 	}
 end
 
