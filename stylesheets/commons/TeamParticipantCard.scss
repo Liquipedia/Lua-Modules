@@ -35,9 +35,7 @@ $participant-icon-size-mobile: 32px;
 }
 
 [ data-switch-group-container="team-cards-compact" ] {
-	display: contents;
-
-	> .widget-wrapper:first-child {
+	.switch-toggle-container {
 		display: none;
 	}
 }
@@ -144,8 +142,8 @@ $participant-icon-size-mobile: 32px;
 
 @media ( min-width: 1024px ) {
 	[ data-switch-group-container="team-cards-compact" ] {
-		> .widget-wrapper:first-child {
-			display: block;
+		.switch-toggle-container {
+			display: flex;
 		}
 	}
 }

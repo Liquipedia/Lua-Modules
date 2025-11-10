@@ -8,8 +8,10 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
 
 local Widget = Lua.import('Module:Widget')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local ParticipantsTeamHeader = Lua.import('Module:Widget/Participants/Team/Header')
@@ -38,34 +40,41 @@ function ParticipantsTeamCard:render()
 		classes = {'team-participant-card', 'team-participant-card--' .. variant},
 	}
 
-	if variant == 'expanded' then
-		collapsible.props.titleWidget = Div{
-			children = {
-				header,
-				qualifierBox
-			}
+	collapsible.props.titleWidget = Div{
+		children = {
+			header,
+			qualifierBoxHeader
 		}
-		collapsible.props.children = content
-	else
-		collapsible.props.titleWidget = header
-		if qualifierBox then
-			table.insert(content, 1, qualifierBox)
-		end
-		collapsible.props.children = content
-	end
+	}
+	table.insert(content, 1, qualifierBoxContent)
+	collapsible.props.children = content
 
 	return collapsible
 end
 
 ---@private
 ---@param participant TeamParticipantsEntity
+---@param location string
 ---@return Widget?
-function ParticipantsTeamCard:_renderQualifierBox(participant)
+function ParticipantsTeamCard:_renderQualifierBox(participant, location)
 	-- TODO: Implement qualifier box content based on figma
 	if participant.qualifierPage or participant.qualifierUrl or participant.qualifierText then
 		return Div{
-			classes = {'team-participant-card-qualifier'},
-			children = {'Qualifier Info Box Placeholder'}
+			classes = {'team-participant-card-qualifier', 'team-participant-card-qualifier--' .. location},
+			children = WidgetUtil.collect(
+				LeagueIcon.display{
+					-- icon = participant.icon,
+					-- iconDark = participant.iconDark,
+					link = participant.qualifierUrl,
+					options = {noTemplate = true},
+				},
+				Div{
+					classes = { 'team-participant-card-qualifier-details' },
+					children = {
+						participant.qualifierText,
+					}
+				}
+			)
 		}
 	end
 end
