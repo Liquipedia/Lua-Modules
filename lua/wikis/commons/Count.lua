@@ -35,7 +35,7 @@ function Count.match2(args)
 	local lpdbConditions = Count._baseConditions(args)
 	lpdbConditions = Count._tierConditions(args, lpdbConditions)
 
-	return Count._query('match2', lpdbConditions)
+	return Count.query('match2', lpdbConditions)
 end
 
 
@@ -47,7 +47,7 @@ function Count.match2game(args)
 
 	local lpdbConditions = Count._baseConditions(args)
 
-	return Count._query('match2game', lpdbConditions)
+	return Count.query('match2game', lpdbConditions)
 end
 
 
@@ -88,7 +88,7 @@ function Count.games(args)
 
 	local lpdbConditions = Count._baseConditions(args)
 
-	return Count._query('game', lpdbConditions)
+	return Count.query('game', lpdbConditions)
 end
 
 
@@ -102,7 +102,7 @@ function Count.matches(args)
 	local lpdbConditions = Count._baseConditions(args)
 	lpdbConditions = Count._tierConditions(args, lpdbConditions)
 
-	return Count._query('match', lpdbConditions)
+	return Count.query('match', lpdbConditions)
 end
 
 
@@ -115,7 +115,7 @@ function Count.tournaments(args)
 	local lpdbConditions = Count._baseConditions(args, true)
 	lpdbConditions = Count._tierConditions(args, lpdbConditions)
 
-	return Count._query('tournament', lpdbConditions)
+	return Count.query('tournament', lpdbConditions)
 end
 
 ---Counts the number of tournaments played on a wiki per tier/tiertype
@@ -196,17 +196,17 @@ function Count.placements(args)
 		lpdbConditions:add{placementConditions}
 	end
 
-	return Count._query('placement', lpdbConditions)
+	return Count.query('placement', lpdbConditions)
 end
 
 
 ---Returns the counted number based on the type of query
 ---@param queryType string
----@param lpdbConditions ConditionTree
+---@param lpdbConditions string|ConditionTree
 ---@return integer
-function Count._query(queryType, lpdbConditions)
+function Count.query(queryType, lpdbConditions)
 	local data = mw.ext.LiquipediaDB.lpdb(queryType, {
-		conditions = lpdbConditions:toString(),
+		conditions = tostring(lpdbConditions),
 		query = 'count::objectname',
 	})
 
