@@ -14,6 +14,8 @@ local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local Span = HtmlWidgets.Span
+local Link = Lua.import('Module:Widget/Basic/Link')
 local ParticipantsTeamHeader = Lua.import('Module:Widget/Participants/Team/Header')
 local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 
@@ -63,15 +65,18 @@ function ParticipantsTeamCard:_renderQualifierBox(participant, location)
 			classes = {'team-participant-card-qualifier', 'team-participant-card-qualifier--' .. location},
 			children = WidgetUtil.collect(
 				LeagueIcon.display{
-					-- icon = participant.icon,
-					-- iconDark = participant.iconDark,
+					-- icon = participant.qualifierIcon,
+					-- iconDark = participant.qualifierIconDark,
 					link = participant.qualifierUrl,
 					options = {noTemplate = true},
 				},
-				Div{
+				Span{
 					classes = { 'team-participant-card-qualifier-details' },
 					children = {
-						participant.qualifierText,
+						Link{
+							link = participant.qualifierUrl,
+							children = participant.qualifierText
+						}
 					}
 				}
 			)
