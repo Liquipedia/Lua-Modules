@@ -3,6 +3,7 @@ insulate('Team Participant', function()
 	it('integration tests', function()
 		local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 		TeamTemplateMock.setUp()
+		local LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function() return {} end)
 
 		local TeamParticipantsController = require('Module:TeamParticipants/Controller')
 
@@ -40,6 +41,7 @@ insulate('Team Participant', function()
 			},
 		}))
 
+		LpdbQuery:revert()
 		TeamTemplateMock.tearDown()
 	end)
 end)
