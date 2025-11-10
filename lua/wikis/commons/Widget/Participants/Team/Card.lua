@@ -10,10 +10,10 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
+local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local Div = Lua.import('Module:Widget/Html/All').Div
 local TeamHeader = Lua.import('Module:Widget/Participants/Team/Header')
 local TeamQualifierInfo = Lua.import('Module:Widget/Participants/Team/QualifierInfo')
-local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 
 ---@class ParticipantsTeamCard: Widget
 ---@operator call(table): ParticipantsTeamCard
@@ -25,28 +25,24 @@ function ParticipantsTeamCard:render()
 
 	local qualifierInfoHeader = TeamQualifierInfo{participant = participant, location = 'header'}
 	local qualifierInfoContent = TeamQualifierInfo{participant = participant, location = 'content'}
-	local content = { self:_renderContent(participant) }
 
-	local header = TeamHeader{
-		participant = participant,
-	}
-
-	local collapsible = Collapsible{
+	return Collapsible{
 		shouldCollapse = true,
 		collapseAreaClasses = {'team-participant-card-collapsible-content'},
 		classes = {'team-participant-card'},
-	}
-
-	collapsible.props.titleWidget = Div{
+		titleWidget = Div{
+			children = {
+				TeamHeader{
+					participant = participant,
+				},
+				qualifierInfoHeader
+			}
+		},
 		children = {
-			header,
-			qualifierInfoHeader
+			qualifierInfoContent,
+			self:_renderContent(participant)
 		}
 	}
-	table.insert(content, 1, qualifierInfoContent)
-	collapsible.props.children = content
-
-	return collapsible
 end
 
 ---@private
