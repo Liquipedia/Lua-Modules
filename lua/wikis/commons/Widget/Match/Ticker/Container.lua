@@ -17,6 +17,7 @@ local Table = Lua.import('Module:Table')
 local Widget = Lua.import('Module:Widget')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Switch = Lua.import('Module:Widget/Switch')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
 
 ---@class MatchTickerContainer: Widget
@@ -86,35 +87,17 @@ function MatchTickerContainer:render()
 						label = 'Upcoming',
 						value = 'upcoming',
 						content = {
-							HtmlWidgets.Div{
-								attributes = {
-									['data-switch-group-container'] = 'countdown',
-								},
-								children = {
-									HtmlWidgets.Div{
-										classes = {'switch-toggle-container'},
-										css = {margin = '1rem 0'},
-										children = {
-											HtmlWidgets.Div{
-												classes = {'switch-toggle'},
-												attributes = {
-													['data-switch-group'] = 'countdown',
-													['data-store-value'] = 'true',
-												},
-												children = {
-													HtmlWidgets.Div{classes = {'switch-toggle-slider'}},
-												},
-											},
-											HtmlWidgets.Div{children = 'Show Countdown'},
-										},
+							Switch{
+								label = 'Show Countdown',
+								switchGroup = 'countdown',
+								storeValue = true,
+								css = {margin = '1rem 0', ['justify-content'] = 'center'},
+								content = HtmlWidgets.Div{
+									attributes = {
+										['data-filter-expansion-template'] = buildTemplateExpansionString('upcoming'),
+										['data-filter-groups'] = filterText,
 									},
-									HtmlWidgets.Div{
-										attributes = {
-											['data-filter-expansion-template'] = buildTemplateExpansionString('upcoming'),
-											['data-filter-groups'] = filterText,
-										},
-										children = callTemplate('upcoming'),
-									}
+									children = callTemplate('upcoming'),
 								}
 							}
 						}
