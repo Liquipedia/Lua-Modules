@@ -91,11 +91,11 @@ end
 --- Set wiki variables for team participants to be used in other modules/templates, primarily matches
 --- This matches with what HiddenDataBox also does
 --- We should change all usages to be more sane structure instead of flat variables in the future
----@param TeamParticipant table
-function TeamParticipantsRepository.setPageVars(TeamParticipant)
-	Array.forEach(TeamParticipant.aliases or {}, function(teamName)
-		local teamPrefix = String(teamName):gsub('_', ' ')
-		Array.forEach(TeamParticipant.opponentData.players or {}, function(player, index)
+---@param participant TeamParticipant
+function TeamParticipantsRepository.setPageVars(participant)
+	Array.forEach(participant.aliases or {}, function(teamName)
+		local teamPrefix = teamName:gsub('_', ' ')
+		Array.forEach(participant.opponent.players or {}, function(player, index)
 			local combinedPrefix = teamPrefix .. '_' .. 'p' .. index
 			globalVars:set(combinedPrefix, player.pageName)
 			globalVars:set(combinedPrefix .. 'flag', player.flag)
