@@ -47,6 +47,7 @@ function TeamParticipantsRepository.save(participant)
 	end
 
 	-- Use the tournament defaults if no data is provided from prizepool
+	-- TODO: Refactor in the future to have a util function deal with this, including prizepool, broadcasters, etc.
 	lpdbData.objectName = lpdbData.objectName or generateObjectName()
 	lpdbData.tournament = lpdbData.tournament or Variables.varDefault('tournament_name')
 	lpdbData.parent = lpdbData.parent or Variables.varDefault('tournament_parent')
@@ -70,12 +71,14 @@ function TeamParticipantsRepository.save(participant)
 	lpdbData.extradata = lpdbData.extradata or {}
 	lpdbData.extradata.opponentaliases = participant.aliases
 
+	-- TODO: Staff should be stored with a 'c' prefix instead of a 'p' prefix
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(participant.opponent, {setPlayersInTeam = true}))
 	-- Legacy participant fields
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(participant.opponent))
 	lpdbData.players = lpdbData.opponentplayers
 
 	-- Calculate individual prize money (prize money per player on team)
+	-- TODO: filter out staff members
 	local numberOfPlayersOnTeam = #(participant.opponent.players or {})
 	if numberOfPlayersOnTeam == 0 then
 		numberOfPlayersOnTeam = 1
@@ -95,6 +98,7 @@ function TeamParticipantsRepository.setPageVars(participant)
 	Array.forEach(participant.aliases or {}, function(teamName)
 		local teamPrefix = teamName:gsub('_', ' ')
 		Array.forEach(participant.opponent.players or {}, function(player, index)
+			-- TODO: staff support ('c' instead of 'p')
 			local combinedPrefix = teamPrefix .. '_' .. 'p' .. index
 			globalVars:set(combinedPrefix, player.pageName)
 			globalVars:set(combinedPrefix .. 'flag', player.flag)
