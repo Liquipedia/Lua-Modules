@@ -197,7 +197,10 @@ liquipedia.switchButtons = {
 	},
 
 	triggerCustomEvent: function ( node, data ) {
-		const customEvent = new CustomEvent( this.triggerEventName, { detail: { data } } );
+		const customEvent = new CustomEvent( this.triggerEventName, {
+			detail: { data },
+			bubbles: true
+		} );
 		node.dispatchEvent( customEvent );
 	},
 

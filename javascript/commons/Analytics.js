@@ -11,6 +11,7 @@ const SEARCH_PERFORMED = 'Page searched';
 const BUTTON_CLICKED = 'Button clicked';
 const MATCH_POPUP_OPENED = 'Match popup opened';
 const INFO_BANNER_CLOSED = 'Info banner closed';
+const USER_SETTINGS_ADDED = 'User settings added';
 
 // Constants
 const IGNORE_CATEGORY_PREFIX = 'Pages ';
@@ -83,18 +84,6 @@ liquipedia.analytics = {
 					'infobox section': closestHeader.innerText.trim()
 				};
 			}
-		},
-
-		ParticipantsCompactSwitch: function( element ) {
-			const propertyName = element.dataset.analyticsPropertyName;
-			const switchToggle = element.querySelector( '.switch-toggle' );
-			if ( propertyName && switchToggle ) {
-				const isActive = switchToggle.classList.contains( 'switch-toggle-active' );
-				return {
-					[ propertyName ]: isActive
-				};
-			}
-			return {};
 		},
 
 		ToC: function( tocElement ) {
@@ -404,8 +393,14 @@ liquipedia.analytics = {
 	setupSwitchButtonAnalytics: function() {
 		document.body.addEventListener( 'switchButtonChanged', ( event ) => {
 			const switchElement = event.target;
+			const switchGroup = event.detail.data;
 			const customProperties = liquipedia.analytics.addCustomProperties( switchElement );
-			liquipedia.analytics.track( 'User settings added', customProperties );
+
+			if ( customProperties[ 'participants compact' ] ) {
+				customProperties[ 'participants compact' ] = switchGroup.value;
+			}
+
+			liquipedia.analytics.track( USER_SETTINGS_ADDED, customProperties );
 		} );
 	}
 
