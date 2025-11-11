@@ -238,8 +238,7 @@ liquipedia.analytics = {
 	getDatasetAnalyticsProperties: function( dataset ) {
 		const properties = {};
 		Object.entries( dataset )
-			.filter( ( [ key ] ) => 
-				key.startsWith( 'analytics' ) &&
+			.filter( ( [ key ] ) => key.startsWith( 'analytics' ) &&
 				key !== 'analyticsName' &&
 				key !== 'analyticsTrackValueAs'
 			)
