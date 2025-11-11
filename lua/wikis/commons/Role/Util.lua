@@ -8,7 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local String = Lua.import('Module:String')
+local String = Lua.import('Module:StringUtils')
 
 local Roles = Lua.import('Module:Roles')
 
