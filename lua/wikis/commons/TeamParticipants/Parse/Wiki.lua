@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local RoleUtil = Lua.import('Module:Role/Util')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
@@ -67,8 +68,8 @@ function TeamParticipantsWikiParser.parsePlayers(input)
 			team = playerInput.team,
 			faction = playerInput.faction,
 			extradata = {
-				role = playerInput.role,
-				trophies = playerInput.trophies,
+				roles = RoleUtil.readRoleArgs(playerInput.role),
+				trophies = tonumber(playerInput.trophies),
 				tab = playerInput.tab,
 			},
 		}

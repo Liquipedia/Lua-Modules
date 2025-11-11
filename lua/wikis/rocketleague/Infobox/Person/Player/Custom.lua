@@ -153,7 +153,7 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 	local roles = self.roles
 
 	---@param roleString string
-	---@param role PersonRoleDataExtended
+	---@param role RoleData
 	---@return boolean
 	local roleIsContained = function(roleString, role)
 		return (role.key or role.display or ''):lower():find(roleString) ~= nil
