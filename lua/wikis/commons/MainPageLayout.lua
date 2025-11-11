@@ -9,8 +9,8 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local Count = Lua.import('Module:Count')
 local Image = Lua.import('Module:Image')
-local LpdbCounter = Lua.import('Module:LPDB entity count')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
@@ -149,7 +149,7 @@ function MainPageLayout._makeNavigationCard(navigationData)
 	local count
 	if navigationData.count then
 		if navigationData.count.method == 'LPDB' then
-			count = LpdbCounter.count{table = navigationData.count.table, conditions = navigationData.count.conditions}
+			count = Count.query(navigationData.count.table, navigationData.count.conditions or '')
 		elseif navigationData.count.method == 'CATEGORY' then
 			count = mw.site.stats.pagesInCategory(navigationData.count.category, 'pages')
 		else
