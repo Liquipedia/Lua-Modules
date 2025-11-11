@@ -180,6 +180,10 @@ liquipedia.switchButtons = {
 		const localStorageKey = `${ this.baseLocalStorageKey }_${ groupName }`;
 		const storageValue = window.localStorage.getItem( localStorageKey );
 
+		if ( storageValue === null ) {
+			return null;
+		}
+
 		if ( switchGroup.type === 'toggle' ) {
 			return storageValue === 'true';
 		} else {
