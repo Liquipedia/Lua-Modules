@@ -219,25 +219,16 @@ end
 function Placement:_getLpdbData(...)
 	local entries = {}
 	for _, opponent in ipairs(self.opponents) do
-		local participant, image, imageDark, players
+		local image, imageDark, players
 		local opponentType = opponent.opponentData.type
 
 		if opponentType == Opponent.team then
 			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template) or {}
-
-			participant = teamTemplate.page or ''
-			if self.parent.options.resolveRedirect then
-				participant = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
-			end
-
 			image = teamTemplate.image
 			imageDark = teamTemplate.imagedark
 		elseif opponentType == Opponent.solo then
-			participant = Opponent.toName(opponent.opponentData)
 			local p1 = opponent.opponentData.players[1]
 			players = {p1 = p1.pageName, p1dn = p1.displayName, p1flag = p1.flag, p1team = p1.team}
-		else
-			participant = Opponent.toName(opponent.opponentData)
 		end
 
 		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_BASE_CURRENCY .. 1)) or 0
@@ -247,10 +238,7 @@ function Placement:_getLpdbData(...)
 			image = image,
 			imagedark = imageDark,
 			date = opponent.date,
-			participant = participant,
-			participantlink = Opponent.toName(opponent.opponentData),
 			participantflag = opponentType == Opponent.solo and players.p1flag or nil,
-			participanttemplate = opponent.opponentData.template,
 			players = players,
 			placement = self:_lpdbValue(),
 			prizemoney = prizeMoney,
@@ -270,7 +258,7 @@ function Placement:_getLpdbData(...)
 				prizepoints = tostring(pointsReward or ''),
 				prizepoints2 = tostring(pointsReward2 or ''),
 				participantteam = (opponentType == Opponent.solo and players.p1team)
-									and Opponent.toName{template = players.p1team, type = 'team'}
+									and Opponent.toName{template = players.p1team, type = 'team', extradata = {}}
 									or nil,
 			}
 			-- TODO: We need to create additional LPDB Fields
@@ -278,6 +266,10 @@ function Placement:_getLpdbData(...)
 			-- Points struct (json?)
 		}
 
+		lpdbData = Table.mergeInto(
+			lpdbData,
+			Opponent.toLegacyParticipantData(opponent.opponentData, {resolveRedirect = self.parent.options.resolveRedirect})
+		)
 		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(opponent.opponentData))
 		lpdbData.players = lpdbData.players or Table.copy(lpdbData.opponentplayers or {})
 

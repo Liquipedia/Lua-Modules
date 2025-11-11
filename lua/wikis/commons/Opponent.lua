@@ -365,30 +365,35 @@ function Opponent.resolve(opponent, date, options)
 	if opponent.type == Opponent.team then
 		opponent.template = TeamTemplate.resolve(opponent.template, date) or opponent.template or 'tbd'
 		opponent.icon, opponent.icondark = TeamTemplate.getIcon(opponent.template)
-	elseif Opponent.typeIsParty(opponent.type) then
-		for _, player in ipairs(opponent.players) do
-			if options.syncPlayer then
-				local hasFaction = String.isNotEmpty(player.faction)
-				local savePageVar = not Opponent.playerIsTbd(player)
-				PlayerExt.syncPlayer(player, {
-					date = date,
-					savePageVar = savePageVar,
-					overwritePageVars = options.overwritePageVars,
-				})
-				player.team = PlayerExt.syncTeam(
-					player.pageName:gsub(' ', '_'),
-					player.team,
-					{date = date, savePageVar = savePageVar}
-				)
-				player.faction = (hasFaction or player.faction ~= Faction.defaultFaction) and player.faction or nil
-			else
-				PlayerExt.populatePageName(player)
-			end
-			if player.team then
-				player.team = TeamTemplate.resolve(player.team, date)
-			end
-		end
 	end
+
+	if not opponent.players then
+		return opponent
+	end
+
+	Array.forEach(opponent.players, function(player)
+		if options.syncPlayer then
+			local hasFaction = String.isNotEmpty(player.faction)
+			local savePageVar = not Opponent.playerIsTbd(player)
+			PlayerExt.syncPlayer(player, {
+				date = date,
+				savePageVar = savePageVar,
+				overwritePageVars = options.overwritePageVars,
+			})
+			player.team = PlayerExt.syncTeam(
+				player.pageName:gsub(' ', '_'),
+				player.team,
+				{date = date, savePageVar = savePageVar}
+			)
+			player.faction = (hasFaction or player.faction ~= Faction.defaultFaction) and player.faction or nil
+		else
+			PlayerExt.populatePageName(player)
+		end
+		if player.team then
+			player.team = TeamTemplate.resolve(player.team, date)
+		end
+	end)
+
 	return opponent
 end
 
@@ -506,17 +511,18 @@ end
 
 ---Reads an opponent struct and builds a standings/placement lpdb struct from it
 ---@param opponent standardOpponent
+---@param options {setPlayersInTeam: boolean?}?
 ---@return {opponentname: string, opponenttemplate: string?, opponenttype: OpponentType, opponentplayers: table?}
-function Opponent.toLpdbStruct(opponent)
+function Opponent.toLpdbStruct(opponent, options)
+	options = options or {}
 	local storageStruct = {
 		opponentname = Opponent.toName(opponent),
 		opponenttemplate = opponent.template,
 		opponenttype = opponent.type,
 	}
 
-	-- Add players for Party Type opponents.
-	-- Team's will have their players added via the TeamCard.
-	if Opponent.typeIsParty(opponent.type) then
+	-- Add players for Party Type opponents, or if config is set to force it.
+	if Opponent.typeIsParty(opponent.type) or options.setPlayersInTeam then
 		local players = {}
 		for playerIndex, player in ipairs(opponent.players) do
 			local prefix = 'p' .. playerIndex
@@ -537,7 +543,7 @@ function Opponent.toLpdbStruct(opponent)
 end
 
 ---Reads a standings or placement lpdb structure and builds an opponent struct from it
----@param storageStruct table
+---@param storageStruct placement|standingsentry
 ---@return standardOpponent
 function Opponent.fromLpdbStruct(storageStruct)
 	local partySize = Opponent.partySize(storageStruct.opponenttype)
@@ -580,6 +586,30 @@ function Opponent.playerFromLpdbStruct(players, playerIndex)
 		pageName = players[prefix],
 		team = players[prefix .. 'template'] or players[prefix .. 'team'],
 		faction = Logic.nilIfEmpty(players[prefix .. 'faction']),
+	}
+end
+
+---@param opponent standardOpponent
+---@param options {resolveRedirect: boolean?}?
+---@return {participant: string, participantlink: string, participanttemplate: string?}
+function Opponent.toLegacyParticipantData(opponent, options)
+	local participant
+
+	if opponent.type == Opponent.team then
+		local teamTemplate = TeamTemplate.getRawOrNil(opponent.template) or {}
+
+		participant = teamTemplate.page or ''
+		if options and options.resolveRedirect then
+			participant = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
+		end
+	else
+		participant = Opponent.toName(opponent)
+	end
+
+	return {
+		participant = participant,
+		participantlink = Opponent.toName(opponent),
+		participanttemplate = opponent.template,
 	}
 end
 

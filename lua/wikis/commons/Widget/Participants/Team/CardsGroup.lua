@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local TeamParticipantsRepository = Lua.import('Module:TeamParticipants/Repository')
 
 local Widget = Lua.import('Module:Widget')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
@@ -23,7 +22,7 @@ local ParticipantsTeamCardsGroup = Class.new(Widget)
 
 ---@return Widget?
 function ParticipantsTeamCardsGroup:render()
-	local participants = TeamParticipantsRepository.getAllByPageName(self.props.pageName)
+	local participants = self.props.participants
 	if not participants then
 		return
 	end

@@ -8,52 +8,130 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Condition = Lua.import('Module:Condition')
-local Lpdb = Lua.import('Module:Lpdb')
-local Page = Lua.import('Module:Page')
+local FnUtil = Lua.import('Module:FnUtil')
+local Json = Lua.import('Module:Json')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Variables = Lua.import('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
----@class TeamParticipantsEntity
----@field pagename string
----@field opponent standardOpponent
----@field qualifierText string?
----@field qualifierPage string?
----@field qualifierUrl string?
+local prizePoolVars = PageVariableNamespace('PrizePool')
+local teamCardsVars = PageVariableNamespace('TeamCards')
+local globalVars = PageVariableNamespace()
 
 local TeamParticipantsRepository = {}
 
----@param pageName string
----@return TeamParticipantsEntity[]
-function TeamParticipantsRepository.getAllByPageName(pageName)
-	---@type placement[]
-	local records = {}
-	Lpdb.executeMassQuery(
-		'placement',
-		{
-			conditions = tostring(
-				Condition.Node(Condition.ColumnName('pagename'), Condition.Comparator.eq, Page.pageifyLink(pageName))
-			),
-		},
-		function(record)
-			table.insert(records, record)
+--- Save a team participant to lpdb placement table, after merging data from prizepool if exists
+---@param participant TeamParticipant
+function TeamParticipantsRepository.save(participant)
+	-- Since we merge data from prizepool and teamparticipants, we need to first fetch the existing record from prizepool
+	local lpdbData = TeamParticipantsRepository.getPrizepoolRecordForTeam(participant.opponent) or {}
+
+	local function generateObjectName()
+		local team = Opponent.toName(participant.opponent)
+		local isTbd = Opponent.isTbd(participant.opponent)
+
+		if not isTbd then
+			return 'ranking_' .. mw.ustring.lower(team)
 		end
-	)
-	return Array.map(records, TeamParticipantsRepository.entityFromRecord)
+
+		-- Ensure names are unique for TBDs
+		local storageName = 'participant_' .. mw.ustring.lower(team)
+		local tbdCounter = tonumber(teamCardsVars:get('TBDs')) or 1
+
+		storageName = storageName .. '_' .. tbdCounter
+		teamCardsVars:set('TBDs', tbdCounter + 1)
+
+		return storageName
+	end
+
+	-- Use the tournament defaults if no data is provided from prizepool
+	-- TODO: Refactor in the future to have a util function deal with this, including prizepool, broadcasters, etc.
+	lpdbData.objectName = lpdbData.objectName or generateObjectName()
+	lpdbData.tournament = lpdbData.tournament or Variables.varDefault('tournament_name')
+	lpdbData.parent = lpdbData.parent or Variables.varDefault('tournament_parent')
+	lpdbData.series = lpdbData.series or Variables.varDefault('tournament_series')
+	lpdbData.shortname = lpdbData.shortname or Variables.varDefault('tournament_tickername')
+	lpdbData.mode = lpdbData.mode or Variables.varDefault('tournament_mode')
+	lpdbData.type = lpdbData.type or Variables.varDefault('tournament_type')
+	lpdbData.liquipediatier = lpdbData.liquipediatier or Variables.varDefault('tournament_liquipediatier')
+	lpdbData.liquipediatiertype = lpdbData.liquipediatiertype or Variables.varDefault('tournament_liquipediatiertype')
+	lpdbData.publishertier = lpdbData.publishertier or Variables.varDefault('tournament_publishertier')
+	lpdbData.icon = lpdbData.icon or Variables.varDefault('tournament_icon')
+	lpdbData.icondark = lpdbData.icondark or Variables.varDefault('tournament_icondark')
+	lpdbData.game = lpdbData.game or Variables.varDefault('tournament_game')
+	lpdbData.startdate = lpdbData.startdate or Variables.varDefault('tournament_startdate')
+	lpdbData.date = lpdbData.date or Variables.varDefault('tournament_enddate')
+
+	lpdbData.qualifier = participant.qualifierText
+	lpdbData.qualifierpage = participant.qualifierPage
+	lpdbData.qualifierurl = participant.qualifierUrl
+
+	lpdbData.extradata = lpdbData.extradata or {}
+	lpdbData.extradata.opponentaliases = participant.aliases
+
+	-- TODO: Staff should be stored with a 'c' prefix instead of a 'p' prefix
+	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(participant.opponent, {setPlayersInTeam = true}))
+	-- Legacy participant fields
+	lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(participant.opponent))
+	lpdbData.players = lpdbData.opponentplayers
+
+	-- Calculate individual prize money (prize money per player on team)
+	-- TODO: filter out staff members
+	local numberOfPlayersOnTeam = #(participant.opponent.players or {})
+	if numberOfPlayersOnTeam == 0 then
+		numberOfPlayersOnTeam = 1
+	end
+	if lpdbData.prizemoney then
+		lpdbData.individualprizemoney = lpdbData.prizemoney / numberOfPlayersOnTeam
+	end
+
+	mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, Json.stringifySubTables(lpdbData))
 end
 
----@param record placement
----@return TeamParticipantsEntity
-function TeamParticipantsRepository.entityFromRecord(record)
-	---@type TeamParticipantsEntity
-	local entity = {
-		pagename = record.pagename,
-		opponent = Opponent.fromLpdbStruct(record),
-		qualifierText = record.qualifier,
-		qualifierPage = record.qualifierpage,
-		qualifierUrl = record.qualifierurl,
-	}
-	return entity
+--- Set wiki variables for team participants to be used in other modules/templates, primarily matches
+--- This matches with what HiddenDataBox also does
+--- We should change all usages to be more sane structure instead of flat variables in the future
+---@param participant TeamParticipant
+function TeamParticipantsRepository.setPageVars(participant)
+	Array.forEach(participant.aliases or {}, function(teamTemplate)
+		local teamName = TeamTemplate.getPageName(teamTemplate)
+		if not teamName then
+			return
+		end
+		local teamPrefixes = {
+			teamName:gsub('_', ' '),
+			teamName:gsub(' ', '_'),
+		}
+		Array.forEach(participant.opponent.players or {}, function(player, index)
+			Array.forEach(teamPrefixes, function(teamPrefix)
+				-- TODO: staff support ('c' instead of 'p')
+				local combinedPrefix = teamPrefix .. '_' .. 'p' .. index
+				globalVars:set(combinedPrefix, player.pageName)
+				globalVars:set(combinedPrefix .. 'flag', player.flag)
+				globalVars:set(combinedPrefix .. 'dn', player.displayName)
+				-- TODO: joindate, leavedate
+			end)
+		end)
+	end)
 end
+
+---@param opponent standardOpponent
+---@return placement?
+function TeamParticipantsRepository.getPrizepoolRecordForTeam(opponent)
+	local prizepoolRecords = TeamParticipantsRepository.getPrizepoolRecords()
+	return Array.find(prizepoolRecords, function(record)
+		return Opponent.same(opponent, Opponent.fromLpdbStruct(record))
+	end)
+end
+
+---@return placement[]
+TeamParticipantsRepository.getPrizepoolRecords = FnUtil.memoize(function()
+	return Array.flatten(Array.mapIndexes(function(prizePoolIndex)
+		return Json.parseIfString(prizePoolVars:get('placementRecords.' .. prizePoolIndex))
+	end))
+end)
 
 return TeamParticipantsRepository

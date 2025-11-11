@@ -121,4 +121,15 @@ function Json.parseStringified(any)
 	return Table.mapValues(tbl, Json.parseStringified), false
 end
 
+---Wrapper on parseStringified when the input param is expected to be a table containing stringified JSON values.
+---@param any table
+---@return table, boolean
+---@overload fun(any: any): any, true
+function Json.parseStringifiedArgs(any)
+	if type(any) ~= 'table' then
+		return any, true
+	end
+	return Table.mapValues(any, Json.parseStringified), false
+end
+
 return Json
