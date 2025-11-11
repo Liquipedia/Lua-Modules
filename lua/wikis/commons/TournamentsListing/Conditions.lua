@@ -184,14 +184,13 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 		local firstPlacement = queryResult[1]
 		table.insert(allowedPlacements, firstPlacement.placement)
 
-		local parts = mw.text.split(firstPlacement.placement, '-')
+		local parts = Array.parseCommaSeparatedString(firstPlacement.placement, '-')
 		local runnerupPlacementStart = tonumber(parts[2] or parts[1]) + 1
-		local dynamicPlacements = ConditionTree(BooleanOperator.all)
-			:add{
-				ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tournamentData.liquipediatier),
-				ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, tournamentData.liquipediatiertype),
-				ConditionNode(ColumnName(config.useParent and 'parent' or 'pagename'), Comparator.eq, tournamentData.pagename),
-			}
+		local dynamicPlacements = ConditionTree(BooleanOperator.all):add{
+			ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tournamentData.liquipediatier),
+			ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, tournamentData.liquipediatiertype),
+			ConditionNode(ColumnName(config.useParent and 'parent' or 'pagename'), Comparator.eq, tournamentData.pagename),
+		}
 		dynamicPlacements:add(ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('placement'), Comparator.gt, runnerupPlacementStart .. '-'),
 			ConditionNode(ColumnName('placement'), Comparator.eq, runnerupPlacementStart),
@@ -202,15 +201,11 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 			order = 'placement asc',
 			groupby = 'placement asc',
 			limit = 1,
-		})
-		local secondPlacement = queryResult[1]
-		table.insert(allowedPlacements, secondPlacement.placement)
+		})[1]
+		table.insert(allowedPlacements, queryResult.placement)
 	end
 
-	for _, allowedPlacement in pairs(allowedPlacements) do
-		placeConditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, allowedPlacement)}
-	end
-	conditions:add{placeConditions}
+	conditions:add(Condition.Util.anyOf(ColumnName('placement'), Array.extractValues(allowedPlacements))
 
 	return conditions:toString()
 end
