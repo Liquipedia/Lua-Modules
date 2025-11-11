@@ -85,6 +85,18 @@ liquipedia.analytics = {
 			}
 		},
 
+		ParticipantsCompactSwitch: function( element ) {
+			const propertyName = element.dataset.analyticsPropertyName;
+			const switchToggle = element.querySelector( '.switch-toggle' );
+			if ( propertyName && switchToggle ) {
+				const isActive = switchToggle.classList.contains( 'switch-toggle-active' );
+				return {
+					[ propertyName ]: isActive
+				};
+			}
+			return {};
+		},
+
 		ToC: function( tocElement ) {
 			if ( tocElement.id === 'sidebar-toc' ) {
 				return {
@@ -96,6 +108,7 @@ liquipedia.analytics = {
 				};
 			}
 		}
+
 	},
 
 	clickTrackers: [],
@@ -110,6 +123,7 @@ liquipedia.analytics = {
 		liquipedia.analytics.setupSearchFormSubmitAnalytics();
 		liquipedia.analytics.setupMatchPopupAnalytics();
 		liquipedia.analytics.setupInfoBannerAnalytics();
+		liquipedia.analytics.setupSwitchButtonAnalytics();
 
 		document.body.addEventListener( 'click', ( event ) => {
 			for ( const tracker of liquipedia.analytics.clickTrackers ) {
@@ -385,7 +399,16 @@ liquipedia.analytics = {
 				return liquipedia.analytics.customPropertyFinders.InfoBanner( infoBannerElement );
 			}
 		} );
+	},
+
+	setupSwitchButtonAnalytics: function() {
+		document.body.addEventListener( 'switchButtonChanged', ( event ) => {
+			const switchElement = event.target;
+			const customProperties = liquipedia.analytics.addCustomProperties( switchElement );
+			liquipedia.analytics.track( 'User settings added', customProperties );
+		} );
 	}
+
 };
 
 liquipedia.core.modules.push( 'analytics' );

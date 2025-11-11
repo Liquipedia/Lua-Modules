@@ -28,19 +28,25 @@ function ParticipantsTeamCardsGroup:render()
 		return
 	end
 
-	return Switch{
-		label = 'Compact view',
-		switchGroup = 'team-cards-compact',
-		defaultActive = true,
-		content = AnalyticsWidget{
-			analyticsName = 'Team participants card',
-			children = Div{
-				classes = { 'team-participant-cards' },
-				children = Array.map(participants, function(participant)
-					return ParticipantsTeamCard{
-						participant = participant,
-					}
-				end),
+	return AnalyticsWidget{
+		analyticsName = 'ParticipantsCompactSwitch',
+		analyticsProperties = {
+			propertyName = 'participants compact'
+		},
+		children = Switch{
+			label = 'Compact view',
+			switchGroup = 'team-cards-compact',
+			defaultActive = true,
+			content = AnalyticsWidget{
+				analyticsName = 'Team participants card',
+				children = Div{
+					classes = { 'team-participant-cards' },
+					children = Array.map(participants, function(participant)
+						return ParticipantsTeamCard{
+							participant = participant,
+						}
+					end),
+				}
 			}
 		}
 	}
