@@ -5,6 +5,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+
 ---@class LeagueOfLegendsNormalMapParser: LeagueOfLegendsMapParserInterface
 local CustomMatchGroupInputNormal = {}
 
@@ -38,13 +45,20 @@ end
 ---@param opponentIndex integer
 ---@return table[]?
 function CustomMatchGroupInputNormal.getParticipants(map, opponentIndex)
-	return
+	return Logic.nilIfEmpty(Array.map(Array.range(1, MAX_NUM_PICKS), function (playerIndex)
+		return Json.parseIfString(map['t' .. opponentIndex .. 'p' .. playerIndex])
+	end))
 end
 
 ---@param map table
 ---@param opponentIndex integer
 ---@return string[]
 function CustomMatchGroupInputNormal.getHeroPicks(map, opponentIndex)
+	local participants = CustomMatchGroupInputNormal.getParticipants(map, opponentIndex)
+	if Logic.isNotEmpty(participants) then
+		---@cast participants -nil
+		return Array.map(participants, Operator.property('character'))
+	end
 	local picks = {}
 	local teamPrefix = 't' .. opponentIndex
 	for playerIndex = 1, MAX_NUM_PICKS do
