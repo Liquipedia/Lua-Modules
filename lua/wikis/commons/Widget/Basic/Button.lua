@@ -21,7 +21,7 @@ local Div = HtmlWidgets.Div
 ---@field title string?
 ---@field link string?
 ---@field linktype 'internal'|'external'|nil
----@field variant 'primary'|'secondary'|'tertiary'|'ghost'|'destructive'|nil
+---@field variant 'primary'|'secondary'|'themed'|'tertiary'|'ghost'|'destructive'|nil
 ---@field size 'xs'|'sm'|'md'|'lg'|nil
 ---@field grow boolean?
 ---@field aligncontent 'left'|'right'|nil
@@ -45,6 +45,8 @@ function Button:render()
 		table.insert(cssClasses, 'btn-primary')
 	elseif self.props.variant == 'secondary' then
 		table.insert(cssClasses, 'btn-secondary')
+	elseif self.props.variant == 'themed' then
+		table.insert(cssClasses, 'btn-themed')
 	elseif self.props.variant == 'tertiary' then
 		table.insert(cssClasses, 'btn-tertiary')
 	elseif self.props.variant == 'ghost' then
