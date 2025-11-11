@@ -17,6 +17,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local ParticipantsTeamHeader = Lua.import('Module:Widget/Participants/Team/Header')
 local ParticipantsTeamMember = Lua.import('Module:Widget/Participants/Team/TeamMember')
+local ParticipantNotification = Lua.import('Module:Widget/Participants/Team/ParticipantNotification')
 local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 
 ---@class ParticipantsTeamCard: Widget
@@ -95,8 +96,13 @@ function ParticipantsTeamCard:_renderContent(participant)
 						trophies = player.extradata.trophies or 0,
 					}
 				end)
-			}
-			-- TODO: Notes
+			},
+			Array.map(participant.notes or {}, function(note)
+				return ParticipantNotification{
+					text = note.text,
+					highlighted = note.highlighted,
+				}
+			end)
 		)
 	}
 end

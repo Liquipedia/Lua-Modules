@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
+local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local RoleUtil = Lua.import('Module:Role/Util')
 local Table = Lua.import('Module:Table')
@@ -16,7 +17,7 @@ local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local TeamParticipantsWikiParser = {}
 
----@alias TeamParticipant {opponent: standardOpponent, notes: string?, aliases: string[],
+---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
 ---qualifierText: string?, qualifierPage: string?, qualifierUrl: string?}
 
 ---@param args table
@@ -53,7 +54,16 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 		aliases = Array.flatMap(aliases, function(alias)
 			return TeamTemplate.queryHistoricalNames(alias)
 		end),
-		notes = input.notes,
+		notes = Array.map(input.notes or {}, function(note)
+			local text = note[1]
+			if not text then
+				return nil
+			end
+			return {
+				text = text,
+				highlighted = Logic.readBool(note.highlighted),
+			}
+		end),
 	}
 end
 
