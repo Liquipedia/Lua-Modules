@@ -26,29 +26,31 @@ function ParticipantsTeamQualifierInfo:render()
 	local participant = self.props.participant
 	local location = self.props.location
 
-	if participant.qualifierPage or participant.qualifierUrl or participant.qualifierText then
-		return Div{
-			classes = {'team-participant-card-qualifier', 'team-participant-card-qualifier--' .. location},
-			children = WidgetUtil.collect(
-				-- TODO: Get the qualifier tournament icon
-				LeagueIcon.display{
-					-- icon = participant.qualifierIcon,
-					-- iconDark = participant.qualifierIconDark,
-					link = participant.qualifierUrl,
-					options = {noTemplate = true},
-				},
-				Span{
-					classes = { 'team-participant-card-qualifier-details' },
-					children = {
-						Link{
-							link = participant.qualifierPage,
-							children = participant.qualifierText
-						}
+	if not participant.qualifierPage or not participant.qualifierUrl or not participant.qualifierText then
+		return
+	end
+
+	return Div{
+		classes = {'team-participant-card-qualifier', 'team-participant-card-qualifier--' .. location},
+		children = WidgetUtil.collect(
+			-- TODO: Get the qualifier tournament icon
+			LeagueIcon.display{
+				-- icon = participant.qualifierIcon,
+				-- iconDark = participant.qualifierIconDark,
+				link = participant.qualifierUrl,
+				options = {noTemplate = true},
+			},
+			Span{
+				classes = { 'team-participant-card-qualifier-details' },
+				children = {
+					Link{
+						link = participant.qualifierPage,
+						children = participant.qualifierText
 					}
 				}
-			)
-		}
-	end
+			}
+		)
+	}
 end
 
 return ParticipantsTeamQualifierInfo
