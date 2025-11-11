@@ -119,7 +119,7 @@ function Match.storeMatchGroup(matchRecords, options)
 		end
 		Array.forEach(matchRecordsCopy, Logic.wrapTryOrLog(storeMatch2))
 		-- Used in MatchGroupBase.isBracketIdAvailable duplicate check
-		Variables.varDefine('matchid_duplicate_check_' .. options.bracketId, 'used')
+		Variables.varDefine('matchid_duplicate_check_' .. (options.bracketId or ''), 'used')
 	end
 
 	if not LegacyMatch then

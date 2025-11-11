@@ -1,3 +1,37 @@
+$participant-icon-wrapper-size-expanded: 56px;
+$participant-icon-wrapper-size-compact: 48px;
+$participant-icon-wrapper-size-mobile: 36px;
+$participant-icon-size-expanded: 52px;
+$participant-icon-size-compact: 44px;
+$participant-icon-size-mobile: 33px;
+
+$compact-selector: '[data-switch-group-container="team-cards-compact"]';
+
+@mixin set-participant-icon-size($wrapper-size, $icon-size) {
+	width: $wrapper-size;
+	height: $wrapper-size;
+	line-height: $wrapper-size;
+	text-align: center;
+
+	img {
+		max-width: $icon-size;
+		max-height: $icon-size;
+		width: auto;
+		height: auto;
+		vertical-align: middle;
+	}
+}
+
+#{ $compact-selector } {
+	.switch-toggle-container {
+		display: none;
+
+		@media ( min-width: 768px ) {
+			display: flex;
+		}
+	}
+}
+
 .team-participant-cards {
 	display: grid;
 	gap: 0.25rem;
@@ -25,13 +59,33 @@
 		border-color: var( --clr-on-surface-dark-primary-8 );
 	}
 
+	&-square-icon {
+		.team-template-image-icon {
+			@include set-participant-icon-size(
+				$participant-icon-wrapper-size-expanded,
+				$participant-icon-size-expanded
+			);
+
+			@media ( max-width: 767px ) {
+				@include set-participant-icon-size(
+					$participant-icon-wrapper-size-mobile,
+					$participant-icon-size-mobile
+				);
+			}
+		}
+	}
+
 	&-header {
 		display: flex;
-		gap: 0.25rem;
+		gap: 0.5rem;
 		align-items: center;
 		align-self: stretch;
 		padding: 0 0.5rem;
 		cursor: pointer;
+
+		&__main {
+			display: contents;
+		}
 
 		&-opponent {
 			display: flex;
@@ -78,44 +132,116 @@
 		}
 	}
 
-	&-collapsible-content {
-		padding: 0.5rem;
-	}
-}
-
-$participant-icon-wrapper-size: 48px;
-$participant-icon-wrapper-size-mobile: 36px;
-$participant-icon-size: 40px;
-$participant-icon-size-mobile: 32px;
-
-@mixin responsive-participant-icon($wrapper-size, $icon-size, $wrapper-size-mobile, $icon-size-mobile) {
-	width: $wrapper-size;
-	height: $wrapper-size;
-	text-align: center;
-	line-height: $wrapper-size;
-
-	@media ( max-width: 767px ) {
-		width: $wrapper-size-mobile;
-		height: $wrapper-size-mobile;
-		line-height: $wrapper-size-mobile;
+	&-qualifier--header {
+		display: none;
 	}
 
-	img {
-		max-width: $icon-size;
-		max-height: $icon-size;
-		width: auto;
-		height: auto;
-		vertical-align: middle;
+	@media ( min-width: 768px ) {
+		&-header {
+			position: relative;
+			flex-direction: column;
+			width: 100%;
 
-		@media ( max-width: 767px ) {
-			max-width: $icon-size-mobile;
-			max-height: $icon-size-mobile;
+			&__main {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 0.5rem;
+				width: 100%;
+			}
+
+			.general-collapsible-default-toggle {
+				position: absolute;
+				top: 50%;
+				right: 0.5rem;
+				transform: translateY( -50% );
+			}
+
+			&-opponent {
+				flex-direction: column;
+				gap: 0.25rem;
+
+				.team-template-text {
+					font-size: 1.125rem;
+				}
+			}
 		}
-	}
-}
 
-.team-participant-square-icon {
-	.team-template-image-icon {
-		@include responsive-participant-icon($participant-icon-wrapper-size, $participant-icon-size, $participant-icon-wrapper-size-mobile, $participant-icon-size-mobile);
+		&-qualifier {
+			display: flex;
+			gap: 0.25rem;
+			align-items: center;
+			border-radius: 0.25rem;
+			padding: 0.25rem 0.5rem;
+			margin: 0.25rem 0.5rem;
+
+			.theme--light & {
+				background-color: var( --clr-on-surface-light-primary-4 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+			}
+
+			&-details {
+				display: flex;
+				flex-direction: column;
+				font-weight: bold;
+				font-size: 12px;
+			}
+		}
+
+		&-qualifier--header {
+			display: flex;
+		}
+
+		&-qualifier--content {
+			display: none;
+		}
+
+		#{ $compact-selector }:has(.switch-toggle-active) & {
+			&-square-icon {
+				.team-template-image-icon {
+					@include set-participant-icon-size(
+						$participant-icon-wrapper-size-compact,
+						$participant-icon-size-compact
+					);
+				}
+			}
+
+			&-header {
+				position: static;
+				flex-direction: row;
+				width: auto;
+
+				&__main {
+					display: contents;
+				}
+
+				.general-collapsible-default-toggle {
+					position: static;
+					top: initial;
+					right: initial;
+					transform: none;
+				}
+
+				&-opponent {
+					flex-direction: row;
+					gap: 0.5rem;
+
+					.team-template-text {
+						font-size: initial;
+					}
+				}
+			}
+
+			&-qualifier--header {
+				display: none;
+			}
+
+			&-qualifier--content {
+				display: flex;
+			}
+		}
 	}
 }

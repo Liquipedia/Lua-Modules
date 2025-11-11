@@ -13,12 +13,13 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
+local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local ParticipantsTeamHeader = Lua.import('Module:Widget/Participants/Team/Header')
+local TeamHeader = Lua.import('Module:Widget/Participants/Team/Header')
 local ParticipantsTeamMember = Lua.import('Module:Widget/Participants/Team/TeamMember')
 local ParticipantNotification = Lua.import('Module:Widget/Participants/Team/ParticipantNotification')
-local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
+local TeamQualifierInfo = Lua.import('Module:Widget/Participants/Team/QualifierInfo')
 
 ---@class ParticipantsTeamCard: Widget
 ---@operator call(table): ParticipantsTeamCard
@@ -28,12 +29,25 @@ local ParticipantsTeamCard = Class.new(Widget)
 function ParticipantsTeamCard:render()
 	local participant = self.props.participant
 
+	local qualifierInfoHeader = TeamQualifierInfo{participant = participant, location = 'header'}
+	local qualifierInfoContent = TeamQualifierInfo{participant = participant, location = 'content'}
+
 	return Collapsible{
-		titleWidget = ParticipantsTeamHeader{participant = participant},
 		shouldCollapse = true,
 		collapseAreaClasses = {'team-participant-card-collapsible-content'},
 		classes = {'team-participant-card'},
-		children = self:_renderContent(participant)
+		titleWidget = Div{
+			children = {
+				TeamHeader{
+					participant = participant,
+				},
+				qualifierInfoHeader
+			}
+		},
+		children = {
+			qualifierInfoContent,
+			self:_renderContent(participant)
+		}
 	}
 end
 

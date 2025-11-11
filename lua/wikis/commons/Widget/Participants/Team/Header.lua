@@ -25,19 +25,24 @@ function ParticipantsTeamHeader:render()
     local participant = self.props.participant
 	local labelDiv = self:_renderLabel(participant)
 
-	-- TODO: Implement the expanded variant
+	local opponentDisplay = OpponentDisplay.BlockOpponent{
+		opponent = participant.opponent,
+		teamStyle = 'standard',
+		additionalClasses = {'team-participant-card-header-opponent', 'team-participant-card-square-icon'}
+	}
+
 	return Div{
 		classes = { 'team-participant-card-header' },
-		children = WidgetUtil.collect(
-			OpponentDisplay.BlockOpponent{
-				opponent = participant.opponent,
-				overflow = 'ellipsis',
-				teamStyle = 'standard',
-				additionalClasses = {'team-participant-card-header-opponent', 'team-participant-square-icon'},
+		children = {
+			Div{
+				classes = {'team-participant-card-header__main'},
+				children = WidgetUtil.collect(
+					opponentDisplay,
+					labelDiv
+				)
 			},
-			labelDiv,
 			ChevronToggle{}
-		)
+		}
 	}
 end
 
