@@ -83,6 +83,7 @@ function ParticipantsTeamMember:render()
 					OpponentDisplay.BlockOpponent({
 						opponent = team,
 						teamStyle = 'icon',
+						additionalClasses = {'team-participant-square-icon'}
 					}),
 				}
 			} or nil
