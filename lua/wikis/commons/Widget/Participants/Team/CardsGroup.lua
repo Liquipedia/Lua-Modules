@@ -15,6 +15,7 @@ local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local ParticipantsTeamCard = Lua.import('Module:Widget/Participants/Team/Card')
+local Switch = Lua.import('Module:Widget/Switch')
 
 ---@class ParticipantsTeamCardsGroup: Widget
 ---@operator call(table): ParticipantsTeamCardsGroup
@@ -28,14 +29,25 @@ function ParticipantsTeamCardsGroup:render()
 	end
 
 	return AnalyticsWidget{
-		analyticsName = 'Team participants card',
-		children = Div{
-			classes = { 'team-participant-cards' },
-			children = Array.map(participants, function(participant)
-				return ParticipantsTeamCard{
-					participant = participant,
+		analyticsName = 'ParticipantsCompactSwitch',
+		analyticsProperties = {
+			['track-value-as'] = 'participants compact',
+		},
+		children = Switch{
+			label = 'Compact view',
+			switchGroup = 'team-cards-compact',
+			defaultActive = true,
+			content = AnalyticsWidget{
+				analyticsName = 'Team participants card',
+				children = Div{
+					classes = { 'team-participant-cards' },
+					children = Array.map(participants, function(participant)
+						return ParticipantsTeamCard{
+							participant = participant,
+						}
+					end),
 				}
-			end),
+			}
 		}
 	}
 end
