@@ -238,9 +238,10 @@ liquipedia.analytics = {
 	getDatasetAnalyticsProperties: function( dataset ) {
 		const properties = {};
 		Object.entries( dataset )
-			.filter( ( [ key ] ) => key.startsWith( 'analytics' ) &&
-            key !== 'analyticsName' &&
-            key !== 'analyticsTrackValueAs'
+			.filter( ( [ key ] ) => 
+				key.startsWith( 'analytics' ) &&
+				key !== 'analyticsName' &&
+				key !== 'analyticsTrackValueAs'
 			)
 			.forEach( ( [ key, value ] ) => {
 				const propertyName = liquipedia.analytics.formatAnalyticsKey( key );
