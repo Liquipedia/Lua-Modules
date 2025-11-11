@@ -12,6 +12,7 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Variables = Lua.import('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -95,15 +96,24 @@ end
 --- We should change all usages to be more sane structure instead of flat variables in the future
 ---@param participant TeamParticipant
 function TeamParticipantsRepository.setPageVars(participant)
-	Array.forEach(participant.aliases or {}, function(teamName)
-		local teamPrefix = teamName:gsub('_', ' ')
+	Array.forEach(participant.aliases or {}, function(teamTemplate)
+		local teamName = TeamTemplate.getPageName(teamTemplate)
+		if not teamName then
+			return
+		end
+		local teamPrefixes = {
+			teamName:gsub('_', ' '),
+			teamName:gsub(' ', '_'),
+		}
 		Array.forEach(participant.opponent.players or {}, function(player, index)
-			-- TODO: staff support ('c' instead of 'p')
-			local combinedPrefix = teamPrefix .. '_' .. 'p' .. index
-			globalVars:set(combinedPrefix, player.pageName)
-			globalVars:set(combinedPrefix .. 'flag', player.flag)
-			globalVars:set(combinedPrefix .. 'dn', player.displayName)
-			-- TODO: joindate, leavedate
+			Array.forEach(teamPrefixes, function(teamPrefix)
+				-- TODO: staff support ('c' instead of 'p')
+				local combinedPrefix = teamPrefix .. '_' .. 'p' .. index
+				globalVars:set(combinedPrefix, player.pageName)
+				globalVars:set(combinedPrefix .. 'flag', player.flag)
+				globalVars:set(combinedPrefix .. 'dn', player.displayName)
+				-- TODO: joindate, leavedate
+			end)
 		end)
 	end)
 end
