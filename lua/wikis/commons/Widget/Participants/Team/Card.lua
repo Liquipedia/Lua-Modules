@@ -11,7 +11,8 @@ local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
 local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
-local Div = Lua.import('Module:Widget/Html/All').Div
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
 local TeamHeader = Lua.import('Module:Widget/Participants/Team/Header')
 local TeamQualifierInfo = Lua.import('Module:Widget/Participants/Team/QualifierInfo')
 
