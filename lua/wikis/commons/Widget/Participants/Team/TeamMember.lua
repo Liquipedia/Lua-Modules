@@ -27,9 +27,9 @@ function ParticipantsTeamMember:render()
 	---@type boolean
 	local isEven = self.props.even
 	---@type string?
-	local leftRole = self.props.leftRole
+	local roleLeft = self.props.roleLeft
 	---@type string?
-	local rightRole = self.props.rightRole
+	local roleRight = self.props.roleRight
 	---@type integer
 	local trophies = self.props.trophies
 	---@type standardPlayer
@@ -37,7 +37,7 @@ function ParticipantsTeamMember:render()
 	---@type standardOpponent
 	local team = self.props.team
 
-	local trophyIcon = Icon{iconName = 'firstteam'}
+	local trophyIcon = Icon{iconName = 'firstplace'}
 
 	return Div{
 		classes = {
@@ -45,10 +45,10 @@ function ParticipantsTeamMember:render()
 			isEven and 'even' or 'odd',
 		},
 		children = WidgetUtil.collect(
-			leftRole and Div{
+			roleLeft and Div{
 				classes = {'team-member-role-left'},
 				children = {
-					leftRole
+					roleLeft
 				}
 			} or nil,
 			Div{
@@ -71,10 +71,10 @@ function ParticipantsTeamMember:render()
 						return trophyIcon
 					end) or 'x'.. trophies .. trophyIcon
 			} or nil,
-			rightRole and Div{
+			roleRight and Div{
 				classes = {'team-member-role-right'},
 				children = {
-					rightRole
+					roleRight
 				}
 			} or nil,
 			team and Div{

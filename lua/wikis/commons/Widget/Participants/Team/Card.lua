@@ -43,9 +43,10 @@ end
 -- * Left-role:
 --   * If the first role has an icon, we use that to render the left-role
 --   * If not then we instead display the text of the first ingame role
----@param roles RoleData
+---@param roles RoleData[]
 ---@return string?, string?
 local function getRoleDisplays(roles)
+	mw.logObject(roles)
 	local function roleLeftDisplay()
 		local firstRole = roles[1]
 		if firstRole and firstRole.icon then
@@ -63,7 +64,6 @@ local function getRoleDisplays(roles)
 				return role.display
 			end
 		end
-		return nil
 	end
 	return roleLeftDisplay(), roleRightDisplay()
 end
