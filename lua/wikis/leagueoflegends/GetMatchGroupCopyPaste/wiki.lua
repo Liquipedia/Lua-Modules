@@ -85,7 +85,7 @@ function WikiCopyPaste._getMapCode(mapIndex, args)
 		bans and (INDENT .. INDENT .. '|t1b1= |t1b2= |t1b3= |t1b4= |t1b5=') or nil,
 		INDENT .. INDENT .. '|team2side=',
 		detailedPlayerInput and Array.map(Array.range(1, 5), function (index)
-			return INDENT .. INDENT .. '|t1p' .. index .. '={{Json|player= |kills= |deaths= |assists= |character=}}'
+			return INDENT .. INDENT .. '|t2p' .. index .. '={{Json|player= |kills= |deaths= |assists= |character=}}'
 		end) or (INDENT .. INDENT .. '|t2c1= |t2c2= |t2c3= |t2c4= |t2c5='),
 		bans and (INDENT .. INDENT .. '|t2b1= |t2b2= |t2b3= |t2b4= |t2b5=') or nil,
 		INDENT .. INDENT .. '|length= |winner=',
