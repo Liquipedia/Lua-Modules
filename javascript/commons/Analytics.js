@@ -12,6 +12,7 @@ const BUTTON_CLICKED = 'Button clicked';
 const MATCH_POPUP_OPENED = 'Match popup opened';
 const INFO_BANNER_CLOSED = 'Info banner closed';
 const USER_SETTINGS_ADDED = 'User settings added';
+const TOGGLE_CLICKED = 'Toggle clicked';
 
 // Constants
 const IGNORE_CATEGORY_PREFIX = 'Pages ';
@@ -113,6 +114,7 @@ liquipedia.analytics = {
 		liquipedia.analytics.setupMatchPopupAnalytics();
 		liquipedia.analytics.setupInfoBannerAnalytics();
 		liquipedia.analytics.setupSwitchButtonAnalytics();
+		liquipedia.analytics.setupToggleClickAnalytics();
 
 		document.body.addEventListener( 'click', ( event ) => {
 			for ( const tracker of liquipedia.analytics.clickTrackers ) {
@@ -389,6 +391,19 @@ liquipedia.analytics = {
 			propertiesBuilder: ( closeButton ) => {
 				const infoBannerElement = closeButton.closest( '.network-notice' );
 				return liquipedia.analytics.customPropertyFinders.InfoBanner( infoBannerElement );
+			}
+		} );
+	},
+
+	setupToggleClickAnalytics: function() {
+		liquipedia.analytics.clickTrackers.push( {
+			selector: '.switch-toggle',
+			trackerName: TOGGLE_CLICKED,
+			propertiesBuilder: ( toggle ) => {
+				const position = liquipedia.analytics.findLinkPosition( toggle );
+				return {
+					position: liquipedia.analytics.formatAnalyticsKey( position )
+				};
 			}
 		} );
 	},
