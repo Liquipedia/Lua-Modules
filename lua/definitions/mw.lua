@@ -715,7 +715,7 @@ function mw.text.unstrip(s) end
 
 
 ---@class Title
----@field id number
+---@field id integer
 ---@field interwiki string
 ---@field namespace number
 ---@field nsText string
@@ -748,6 +748,7 @@ function mw.text.unstrip(s) end
 ---@field cascadingProtection table
 mw.title = {
 	namespace = 0,
+	id = 123,
 	nsText = '',
 	text = 'FakePage',
 	prefixedText = 'FakePage',
@@ -1244,11 +1245,9 @@ function mw.ext.SearchEngineOptimization.metadescl(desc) end
 function mw.ext.SearchEngineOptimization.metaimage(image) end
 
 mw.ext.Brackets = {}
----@param idToCheck string
----@return string
-function mw.ext.Brackets.checkBracketDuplicate(idToCheck)
-	return 'ok'
-end
+---@param bracketType string
+---@return table
+function mw.ext.Brackets.getCommonsBracketTemplate(bracketType) end
 
 mw.ext.Dota2DB = {}
 
