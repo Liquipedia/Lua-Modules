@@ -26,7 +26,7 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 	.switch-toggle-container {
 		display: none;
 
-		@media ( min-width: 1024px ) {
+		@media ( min-width: 768px ) {
 			display: flex;
 		}
 	}
@@ -70,13 +70,6 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 				@include set-participant-icon-size(
 					$participant-icon-wrapper-size-mobile,
 					$participant-icon-size-mobile
-				);
-			}
-
-			@media ( min-width: 768px ) and ( max-width: 1024px ) {
-				@include set-participant-icon-size(
-					$participant-icon-wrapper-size-compact,
-					$participant-icon-size-compact
 				);
 			}
 		}
@@ -143,7 +136,7 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 		display: none;
 	}
 
-	@media ( min-width: 1024px ) {
+	@media ( min-width: 768px ) {
 		&-header {
 			position: relative;
 			flex-direction: column;
