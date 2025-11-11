@@ -47,10 +47,9 @@ end
 ---@return string?, string?
 local function getRoleDisplays(roles)
 	local function roleLeftDisplay()
-		for _, role in ipairs(roles) do
-			if role.icon then
-				return role.icon
-			end
+		local firstRole = roles[1]
+		if firstRole and firstRole.icon then
+			return firstRole.icon
 		end
 		for _, role in ipairs(roles) do
 			if role.type == 'ingame' then
