@@ -236,7 +236,10 @@ liquipedia.analytics = {
 	getDatasetAnalyticsProperties: function( dataset ) {
 		const properties = {};
 		Object.entries( dataset )
-			.filter( ( [ key ] ) => key.startsWith( 'analytics' ) && key !== 'analyticsName' )
+			.filter( ( [ key ] ) => key.startsWith( 'analytics' ) &&
+            key !== 'analyticsName' &&
+            key !== 'analyticsTrackValueAs'
+			)
 			.forEach( ( [ key, value ] ) => {
 				const propertyName = liquipedia.analytics.formatAnalyticsKey( key );
 				properties[ propertyName ] = value || null;
@@ -394,16 +397,19 @@ liquipedia.analytics = {
 		document.body.addEventListener( 'switchButtonChanged', ( event ) => {
 			const switchElement = event.target;
 			const switchGroup = event.detail.data;
-			const customProperties = liquipedia.analytics.addCustomProperties( switchElement );
 
-			if ( customProperties[ 'participants compact' ] ) {
-				customProperties[ 'participants compact' ] = switchGroup.value;
+			const customProperties = liquipedia.analytics.addCustomProperties( switchElement );
+			const context = liquipedia.analytics.getAnalyticsContextElement( switchElement );
+
+			const propertyToTrack = context.element?.dataset.analyticsTrackValueAs;
+
+			if ( propertyToTrack ) {
+				customProperties[ propertyToTrack ] = switchGroup.value;
 			}
 
 			liquipedia.analytics.track( USER_SETTINGS_ADDED, customProperties );
 		} );
 	}
-
 };
 
 liquipedia.core.modules.push( 'analytics' );

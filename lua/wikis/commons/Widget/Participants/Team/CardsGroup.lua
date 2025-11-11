@@ -31,7 +31,7 @@ function ParticipantsTeamCardsGroup:render()
 	return AnalyticsWidget{
 		analyticsName = 'ParticipantsCompactSwitch',
 		analyticsProperties = {
-			['participants compact'] = true
+			['track-value-as'] = 'participants compact',
 		},
 		children = Switch{
 			label = 'Compact view',
