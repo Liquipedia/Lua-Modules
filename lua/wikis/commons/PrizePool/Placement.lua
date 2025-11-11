@@ -266,9 +266,12 @@ function Placement:_getLpdbData(...)
 			-- Points struct (json?)
 		}
 
-		lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(opponent.opponentData))
+		lpdbData = Table.mergeInto(
+			lpdbData,
+			Opponent.toLegacyParticipantData(opponent.opponentData, {resolveRedirect = self.parent.options.resolveRedirect})
+		)
 		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(opponent.opponentData))
-		lpdbData.players = lpdbData.players or Table.copy(lpdbData.opponentplayers or {})
+		lpdbData.players = lpdbData.players or Table.copy(lpdbData.oppoentplayers or {})
 
 		lpdbData.objectName = self.parent:_lpdbObjectName(lpdbData, ...)
 		if Opponent.isTbd(opponent.opponentData) then

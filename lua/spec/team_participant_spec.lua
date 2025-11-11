@@ -32,8 +32,8 @@ insulate('Team Participant', function()
 					{'EletricBoy'},
 					{'hjpalpha'},
 					{'Eetu'},
-					{'Syntactic Sugar'},
-					{'Syntactic Salt'},
+					{'SyntacticSugar'},
+					{'SyntacticSalt'},
 					{'Rathoz', role = 'Coach'},
 				},
 				notes = {

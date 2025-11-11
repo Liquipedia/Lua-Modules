@@ -27,11 +27,11 @@ function TeamParticipantsController.fromTemplate(frame)
 	local parsedArgs = Json.parseStringifiedArgs(args)
 	local parsedData = TeamParticipantsWikiParser.parseWikiInput(parsedArgs)
 
-	local shouldNotStore =
-		Logic.readBoolOrNil(args.store) == false or
-		Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+	local shouldStore =
+		Logic.readBoolOrNil(args.store) ~= false and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 
-	if not shouldNotStore then
+	if shouldStore then
 		Array.forEach(parsedData.participants, TeamParticipantsRepository.save)
 	end
 	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
