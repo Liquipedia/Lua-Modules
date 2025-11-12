@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 local RoleUtil = Lua.import('Module:Role/Util')
 
 local Widget = Lua.import('Module:Widget')
@@ -151,13 +152,17 @@ function ParticipantsTeamCard:_renderContent(participant)
 	end)
 	tabs = Array.sortBy(tabs, Operator.property('order'))
 
+	local switchGroupUniqueId = tonumber(Variables.varDefault('teamParticipantRostersSwitchGroupId')) or 0
+	switchGroupUniqueId = switchGroupUniqueId + 1
+	Variables.varDefine('teamParticipantRostersSwitchGroupId', switchGroupUniqueId)
+
 	return Div{
 		classes = { 'team-participant-card-collapsible-content' },
 		children = WidgetUtil.collect(
 			participant.opponent.name,
 			-- TODO: Qualifier box here
 			(#tabs > 1 and ContentSwitch{
-				switchGroup = 'team-participant-rosters',
+				switchGroup = 'team-participant-rosters-'.. switchGroupUniqueId,
 				variant = 'generic',
 				storeValue = false,
 				size = 'small',
