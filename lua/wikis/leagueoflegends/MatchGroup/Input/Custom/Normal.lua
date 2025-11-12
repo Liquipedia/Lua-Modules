@@ -55,7 +55,7 @@ function CustomMatchGroupInputNormal.getParticipants(map, opponentIndex)
 		if Logic.isEmpty(playerData.role) then
 			return playerData
 		end
-		local playerRole = InGameRoles[playerData.role]
+		local playerRole = InGameRoles[playerData.role:lower()]
 		assert(playerRole, 'Invalid |role=' .. playerData.role)
 		playerData.role = playerRole.display:lower()
 		return playerData
