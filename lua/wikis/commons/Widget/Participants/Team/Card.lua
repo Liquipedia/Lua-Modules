@@ -26,25 +26,28 @@ local ParticipantNotification = Lua.import('Module:Widget/Participants/Team/Part
 local TeamQualifierInfo = Lua.import('Module:Widget/Participants/Team/QualifierInfo')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 
+---@enum ParticipantsTeamCardTabs
 local TAB_ENUM = {
-	main = 'main',
-	sub = 'sub',
-	staff = 'staff',
-	former = 'former',
+	MAIN = 'main',
+	SUB = 'sub',
+	STAFF = 'staff',
+	FORMER = 'former',
 }
 
+---@type table<ParticipantsTeamCardTabs, {title: string, order: integer}>
 local TAB_DATA = {
-	[TAB_ENUM.main] = {title = 'Main', order = 1},
-	[TAB_ENUM.sub] = {title = 'Subs', order = 2},
-	[TAB_ENUM.former] = {title = 'Former', order = 3},
-	[TAB_ENUM.staff] = {title = 'Staff', order = 4},
+	[TAB_ENUM.MAIN] = {title = 'Main', order = 1},
+	[TAB_ENUM.SUB] = {title = 'Subs', order = 2},
+	[TAB_ENUM.FORMER] = {title = 'Former', order = 3},
+	[TAB_ENUM.STAFF] = {title = 'Staff', order = 4},
 }
 
+---@type table<string, ParticipantsTeamCardTabs>
 local PERSON_TYPE_TO_TAB = {
-	player = TAB_ENUM.main,
-	sub = TAB_ENUM.sub,
-	former = TAB_ENUM.former,
-	staff = TAB_ENUM.staff,
+	player = TAB_ENUM.MAIN,
+	sub = TAB_ENUM.SUB,
+	former = TAB_ENUM.FORMER,
+	staff = TAB_ENUM.STAFF,
 }
 
 ---@class ParticipantsTeamCard: Widget
@@ -159,9 +162,7 @@ function ParticipantsTeamCard:_renderContent(participant)
 	return Div{
 		classes = { 'team-participant-card-collapsible-content' },
 		children = WidgetUtil.collect(
-			participant.opponent.name,
-			-- TODO: Qualifier box here
-			(#tabs > 1 and ContentSwitch{
+			ContentSwitch{
 				switchGroup = 'team-participant-rosters-'.. switchGroupUniqueId,
 				variant = 'generic',
 				storeValue = false,
@@ -173,7 +174,7 @@ function ParticipantsTeamCard:_renderContent(participant)
 						content = makeRostersDisplay(tab.players),
 					}
 				end),
-			}) or (#tabs == 1 and makeRostersDisplay(tabs[1].players)) or nil,
+			},
 			Array.map(participant.notes or {}, function(note)
 				return ParticipantNotification{
 					text = note.text,
