@@ -261,7 +261,10 @@ function MatchPage:renderOverallStats()
 							},
 							Array.map(
 								Array.sortBy(opponent.players, function (player)
-									return (InGameRoles[player.extradata.role] or {}).sortOrder or -1
+									if Logic.isEmpty(player.extradata.role) then
+										return -1
+									end
+									return InGameRoles[player.extradata.role].sortOrder
 								end),
 								renderPlayerOverallPerformance
 							)
