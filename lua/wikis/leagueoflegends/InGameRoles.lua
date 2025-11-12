@@ -14,7 +14,9 @@ local inGameRoles = {
 	['bottom'] = {category = 'Bot Lane players', display = 'Bot', doNotShowInHistory = true},
 }
 
+inGameRoles['jg'] = inGameRoles.jungle
 inGameRoles['jgl'] = inGameRoles.jungle
+inGameRoles['jun'] = inGameRoles.jungle
 inGameRoles['middle'] = inGameRoles.mid
 inGameRoles['solomiddle'] = inGameRoles.mid
 inGameRoles['carry'] = inGameRoles.bottom
