@@ -9,9 +9,9 @@
 local inGameRoles = {
 	['awper'] = {category = 'AWPers', display = 'AWPer'},
 	['igl'] = {category = 'In-game leaders', display = 'In-game leader'},
-	['lurker'] = {category = 'Riflers', display = 'Lurker'},
-	['support'] = {category = 'Riflers', display = 'Support'},
-	['entry'] = {category = 'Riflers', display = 'Entry'},
+	['lurker'] = {category = 'Lurkers', display = 'Lurker'},
+	['support'] = {category = 'Support players', display = 'Support'},
+	['entry'] = {category = 'Entry fraggers', display = 'Entry'},
 	['rifler'] = {category = 'Riflers', display = 'Rifler'},
 }
 
