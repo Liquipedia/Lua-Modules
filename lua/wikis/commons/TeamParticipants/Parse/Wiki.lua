@@ -80,7 +80,7 @@ function TeamParticipantsWikiParser.parsePlayers(input)
 			extradata = {
 				roles = RoleUtil.readRoleArgs(playerInput.role),
 				trophies = tonumber(playerInput.trophies),
-				tab = playerInput.tab,
+				type = playerInput.type or 'player',
 			},
 		}
 	end)

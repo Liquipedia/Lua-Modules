@@ -9,7 +9,9 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local Table = Lua.import('Module:Table')
 local RoleUtil = Lua.import('Module:Role/Util')
 
 local Widget = Lua.import('Module:Widget')
@@ -21,6 +23,28 @@ local TeamHeader = Lua.import('Module:Widget/Participants/Team/Header')
 local ParticipantsTeamMember = Lua.import('Module:Widget/Participants/Team/TeamMember')
 local ParticipantNotification = Lua.import('Module:Widget/Participants/Team/ParticipantNotification')
 local TeamQualifierInfo = Lua.import('Module:Widget/Participants/Team/QualifierInfo')
+local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
+
+local TAB_ENUM = {
+	main = 'main',
+	sub = 'sub',
+	staff = 'staff',
+	former = 'former',
+}
+
+local TAB_DATA = {
+	[TAB_ENUM.main] = {title = 'Main', order = 1},
+	[TAB_ENUM.sub] = {title = 'Subs', order = 2},
+	[TAB_ENUM.former] = {title = 'Former', order = 3},
+	[TAB_ENUM.staff] = {title = 'Staff', order = 4},
+}
+
+local PERSON_TYPE_TO_TAB = {
+	player = TAB_ENUM.main,
+	sub = TAB_ENUM.sub,
+	former = TAB_ENUM.former,
+	staff = TAB_ENUM.staff,
+}
 
 ---@class ParticipantsTeamCard: Widget
 ---@operator call(table): ParticipantsTeamCard
@@ -62,7 +86,6 @@ end
 ---@param roles RoleData[]
 ---@return string?, string?
 local function getRoleDisplays(roles)
-	mw.logObject(roles)
 	local function roleLeftDisplay()
 		local firstRole = roles[1]
 		if firstRole and firstRole.icon then
@@ -88,37 +111,72 @@ end
 ---@param participant TeamParticipant
 ---@return Widget
 function ParticipantsTeamCard:_renderContent(participant)
+	local makeRostersDisplay = function(players)
+		if not players or #players == 0 then
+			return
+		end
+		return Div{
+			classes = { 'team-participant-roster' },
+			children = Array.map(players, function(player, index)
+				local playerTeam = participant.opponent.template ~= player.team and player.team or nil
+				local playerTeamAsOpponent = playerTeam and Opponent.readOpponentArgs{
+					type = Opponent.team,
+					template = playerTeam,
+				} or nil
+				local roleLeft, roleRight = getRoleDisplays(player.extradata.roles or {})
+				return ParticipantsTeamMember{
+					player = player,
+					team = playerTeamAsOpponent,
+					even = index % 2 == 0,
+					roleLeft = roleLeft,
+					roleRight = roleRight,
+					trophies = player.extradata.trophies or 0,
+				}
+			end)
+		}
+	end
+
+	local tabs = Array.map(Table.entries(TAB_DATA), function(tabTuple)
+		local tabTypeEnum, tabData = tabTuple[1], tabTuple[2]
+		local tabPlayers = Array.filter(participant.opponent.players or {}, function(player)
+			local personType = player.extradata.type
+			return PERSON_TYPE_TO_TAB[personType] == tabTypeEnum
+		end)
+		return {
+			order = tabData.order,
+			title = tabData.title,
+			players = tabPlayers,
+		}
+	end)
+
+	tabs = Array.filter(tabs, function(tab)
+		return #tab.players > 0
+	end)
+	tabs = Array.sortBy(tabs, Operator.property('order'))
+
 	return Div{
 		classes = { 'team-participant-card-collapsible-content' },
 		children = WidgetUtil.collect(
-			Div{
-				classes = { 'team-participant-roster' },
-				children = Array.map(participant.opponent.players, function(player, index)
-					local playerTeam = participant.opponent.template ~= player.team and player.team or nil
-					local playerTeamAsOpponent = playerTeam and Opponent.readOpponentArgs{
-						type = Opponent.team,
-						template = playerTeam,
-					} or nil
-					local roleLeft, roleRight = getRoleDisplays(player.extradata.roles or {})
-					return ParticipantsTeamMember{
-						player = player,
-						team = playerTeamAsOpponent,
-						even = index % 2 == 0,
-						roleLeft = roleLeft,
-						roleRight = roleRight,
-						trophies = player.extradata.trophies or 0,
+			participant.opponent.name,
+			-- TODO: Qualifier box here
+			(#tabs > 1 and ContentSwitch{
+				switchGroup = 'team-participant-rosters',
+				variant = 'generic',
+				storeValue = false,
+				size = 'small',
+				tabs = Array.map(tabs, function(tab)
+					return {
+						label = tab.title,
+						content = makeRostersDisplay(tab.players),
 					}
-				end)
-			},
-			Div{
-				classes = { 'team-participant-notifications' },
-				children = Array.map(participant.notes or {}, function(note)
-					return ParticipantNotification{
-						text = note.text,
-						highlighted = note.highlighted,
-					}
-				end)
-			}
+				end),
+			}) or (#tabs == 1 and makeRostersDisplay(tabs[1].players)) or nil,
+			Array.map(participant.notes or {}, function(note)
+				return ParticipantNotification{
+					text = note.text,
+					highlighted = note.highlighted,
+				}
+			end)
 		)
 	}
 end

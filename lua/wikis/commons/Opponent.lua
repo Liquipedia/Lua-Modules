@@ -525,7 +525,11 @@ function Opponent.toLpdbStruct(opponent, options)
 	if Opponent.typeIsParty(opponent.type) or options.setPlayersInTeam then
 		local players = {}
 		for playerIndex, player in ipairs(opponent.players) do
+			local playerType = (player.extradata or {}).type
 			local prefix = 'p' .. playerIndex
+			if playerType == 'staff' then
+				prefix = 'c' .. playerIndex
+			end
 
 			players[prefix] = Page.applyUnderScoresIfEnforced(player.pageName)
 			players[prefix .. 'dn'] = player.displayName
