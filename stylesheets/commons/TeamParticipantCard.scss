@@ -133,25 +133,33 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 			}
 		}
 	}
-}
 
-.team-participant-square-icon {
-	.team-template-image-icon {
-		@include set-participant-icon-size(
-			$participant-icon-wrapper-size-compact,
-			$participant-icon-size-compact
-		);
+	&-qualifier {
+		display: flex;
+		gap: 0.25rem;
+		align-items: center;
+		border-radius: 0.25rem;
+		padding: 0.25rem 0.5rem;
+		margin: 0.25rem 0.5rem;
+
+		.theme--light & {
+			background-color: var( --clr-on-surface-light-primary-4 );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+		}
+
+		&-details {
+			display: flex;
+			flex-direction: column;
+			font-weight: bold;
+			font-size: 12px;
+		}
 	}
 
 	&-qualifier--header {
 		display: none;
-
-		@media ( max-width: 767px ) {
-			@include set-participant-icon-size(
-				$participant-icon-wrapper-size-mobile,
-				$participant-icon-size-mobile
-			);
-		}
 	}
 
 	@media ( min-width: 768px ) {
@@ -182,30 +190,6 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 				.team-template-text {
 					font-size: 1.125rem;
 				}
-			}
-		}
-
-		&-qualifier {
-			display: flex;
-			gap: 0.25rem;
-			align-items: center;
-			border-radius: 0.25rem;
-			padding: 0.25rem 0.5rem;
-			margin: 0.25rem 0.5rem;
-
-			.theme--light & {
-				background-color: var( --clr-on-surface-light-primary-4 );
-			}
-
-			.theme--dark & {
-				background-color: var( --clr-on-surface-dark-primary-4 );
-			}
-
-			&-details {
-				display: flex;
-				flex-direction: column;
-				font-weight: bold;
-				font-size: 12px;
 			}
 		}
 
@@ -264,6 +248,15 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 	}
 }
 
+.team-participant-square-icon {
+	.team-template-image-icon {
+		@include set-participant-icon-size(
+			$participant-icon-wrapper-size-compact,
+			$participant-icon-size-compact
+		);
+	}
+}
+
 .team-member {
 	display: flex;
 	gap: 0.25rem;
@@ -313,6 +306,11 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 		align-items: center;
 		gap: 0.25rem;
 		color: var( --clr-secondary-44 );
+
+		&-text {
+			font-size: 0.6875rem;
+			font-weight: bold;
+		}
 	}
 
 	&-role-right {
