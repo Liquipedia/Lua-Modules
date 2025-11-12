@@ -15,6 +15,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
 ---@class ParticipantNotification: Widget
+---@field props {text: string?, highlighted: boolean?}
 ---@operator call(table): ParticipantNotification
 local ParticipantNotification = Class.new(Widget)
 
