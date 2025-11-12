@@ -185,11 +185,7 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 
 		local parts = Array.parseCommaSeparatedString(firstPlacement.placement, '-')
 		local runnerupPlacementStart = tonumber(parts[2] or parts[1]) + 1
-		local placeConditions = ConditionTree(BooleanOperator.all):add{
-			ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tournamentData.liquipediatier),
-			ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, tournamentData.liquipediatiertype),
-			ConditionNode(ColumnName(config.useParent and 'parent' or 'pagename'), Comparator.eq, tournamentData.pagename),
-		}
+		local placeConditions = ConditionTree(BooleanOperator.all):add(conditions)
 		placeConditions:add(ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('placement'), Comparator.gt, runnerupPlacementStart .. '-'),
 			ConditionNode(ColumnName('placement'), Comparator.eq, runnerupPlacementStart),
