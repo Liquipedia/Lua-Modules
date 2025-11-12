@@ -122,7 +122,7 @@ function BaseMatchPage:getCountdownBlock()
 		children = Countdown.create{
 			date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
 			finished = self.matchData.finished,
-			rawdatetime = Logic.readBool(self.matchData.finished),
+			rawdatetime = (not self.matchData.dateIsExact) or self.matchData.finished,
 		}
 	}
 end
