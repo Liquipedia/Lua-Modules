@@ -141,6 +141,8 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 		border-radius: 0.25rem;
 		padding: 0.25rem 0.5rem;
 		margin: 0.25rem 0.5rem;
+		min-height: 2rem;
+		color: var( --clr-secondary-25 );
 
 		.theme--light & {
 			background-color: var( --clr-on-surface-light-primary-4 );
