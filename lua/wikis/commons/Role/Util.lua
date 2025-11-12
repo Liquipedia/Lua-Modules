@@ -37,12 +37,24 @@ RoleUtil.ROLE_TYPE = {
 	UNKNOWN = 'unknown',
 }
 
+--- Parses role arguments in a comma separated string to it's corresponding RoleData
+---@param input string
+---@return RoleData[]
 function RoleUtil.readRoleArgs(input)
-	return Array.map(Array.parseCommaSeparatedString(input), RoleUtil._createRoleData)
+	return Array.map(Array.parseCommaSeparatedString(input), RoleUtil.getRoleForKey)
 end
 
+---@param roleKey string?
+---@return RoleData?
+function RoleUtil.getRoleForKey(roleKey)
+	return RoleUtil._createRoleData(roleKey)
+end
+
+---@param roleKey string?
+---@return RoleData?
 function RoleUtil._createRoleData(roleKey)
 	if String.isEmpty(roleKey) then return nil end
+	---@cast roleKey -nil
 
 	local key = roleKey:lower()
 	local roleData = Roles.All[key]
