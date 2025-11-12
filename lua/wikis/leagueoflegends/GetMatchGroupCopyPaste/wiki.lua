@@ -9,7 +9,9 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local InGameRoles = Lua.import('Module:InGameRoles', {loadData = true})
 local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
@@ -17,13 +19,10 @@ local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 local WikiCopyPaste = Class.new(BaseCopyPaste)
 
 local INDENT = WikiCopyPaste.Indent
-local ROLES = {
-	'top',
-	'jungle',
-	'mid',
-	'bot',
-	'support',
-}
+local ROLES = Array.map(
+	Array.sortBy(Array.unique(Array.extractValues(InGameRoles)), Operator.property('sortOrder')),
+	Operator.property('display')
+)
 
 --returns the Code for a Match, depending on the input
 ---@param bestof integer
