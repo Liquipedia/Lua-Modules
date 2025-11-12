@@ -16,16 +16,6 @@ local Table = Lua.import('Module:Table')
 ---@class LeagueOfLegendsMatchPageMapParser: LeagueOfLegendsMapParserInterface
 local CustomMatchGroupInputMatchPage = {}
 
-local ROLE_ORDER = Table.map({
-	'top',
-	'jungle',
-	'mid',
-	'bot',
-	'support',
-}, function(idx, value)
-	return value, idx
-end)
-
 ---@param mapInput table
 ---@return table
 function CustomMatchGroupInputMatchPage.getMap(mapInput)
@@ -46,7 +36,7 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 			player.role = playerRole.display:lower()
 		end)
 		team.players = Array.sortBy(team.players, function(player)
-			return ROLE_ORDER[player.role]
+			return InGameRoles[player.role].sortOrder
 		end)
 	end
 	sortPlayersOnRole(map.team1)

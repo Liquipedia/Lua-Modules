@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
+local InGameRoles = Lua.import('Module:InGameRoles', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
@@ -71,16 +72,6 @@ local KEYSTONES = Table.map({
 	return value, true
 end)
 
-local ROLE_ORDER = Table.map({
-	'top',
-	'jungle',
-	'mid',
-	'bot',
-	'support',
-}, function(idx, value)
-	return value, idx
-end)
-
 local DEFAULT_ITEM = 'EmptyIcon'
 local LOADOUT_ICON_SIZE = '24px'
 local ITEMS_TO_SHOW = 6
@@ -106,7 +97,7 @@ function MatchPage:populateGames()
 
 			opponent.players = Array.map(
 				Array.sortBy(Array.filter(opponent.players, Logic.isNotEmpty), function(player)
-					return ROLE_ORDER[player.role]
+					return InGameRoles[player.role].sortOrder
 				end),
 				function(player)
 					if Logic.isDeepEmpty(player) then return end
@@ -270,7 +261,7 @@ function MatchPage:renderOverallStats()
 							},
 							Array.map(
 								Array.sortBy(opponent.players, function (player)
-									return ROLE_ORDER[player.extradata.role] or -1
+									return (InGameRoles[player.extradata.role] or {}).sortOrder or -1
 								end),
 								renderPlayerOverallPerformance
 							)
