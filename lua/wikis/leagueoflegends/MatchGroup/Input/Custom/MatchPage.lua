@@ -77,7 +77,7 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	if not team then return end
 	if not team.players then return end
 	return Array.map(team.players, function(player)
-		local playerRole = InGameRoles[(player.role or ''):lower()] or {}
+		local playerRole = InGameRoles[(player.role or '')] or {}
 		return {
 			player = player.id,
 			role = (playerRole.display or player.role):lower(),
