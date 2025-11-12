@@ -57,7 +57,7 @@ end
 --   * is only shown if there's a non-ingame role assigned. It will use the first one provided
 -- * Left-role:
 --   * If the first role has an icon, we use that to render the left-role
---   * If not then we instead display the text of the first ingame role
+--   * If not then we instead display the icon or text of the first ingame role
 ---@param roles RoleData[]
 ---@return string?, string?
 local function getRoleDisplays(roles)
@@ -69,7 +69,7 @@ local function getRoleDisplays(roles)
 		end
 		for _, role in ipairs(roles) do
 			if role.type == 'ingame' then
-				return role.display
+				return role.icon or role.display
 			end
 		end
 	end
