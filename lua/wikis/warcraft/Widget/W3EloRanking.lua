@@ -14,6 +14,7 @@ local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class W3EloRanking: Widget
@@ -32,16 +33,13 @@ function W3EloRanking:render()
 		return rawData
 	end
 
-	return HtmlWidgets.Div{
-		classes = {'table-responsive'},
-		children = HtmlWidgets.Table{
-			classes = {'wikitable', 'wikitable-striped', 'rankingtable'},
-			css = {width = '100%'},
-			children = WidgetUtil.collect(
-				W3EloRanking._buildHeader(),
-				Array.map(rawData, W3EloRanking._buildStandingRow)
-			)
-		}
+	return DataTable{
+		classes = {'wikitable-striped', 'rankingtable'},
+		tableCss = {width = '100%'},
+		children = WidgetUtil.collect(
+			W3EloRanking._buildHeader(),
+			Array.map(rawData, W3EloRanking._buildStandingRow)
+		)
 	}
 end
 

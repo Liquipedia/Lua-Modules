@@ -153,7 +153,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('firstmatch', self.data.firstMatch)
 	Variables.varDefine('tournament_finished', tostring(self.data.isFinished or false))
 	Variables.varDefine('tournament_maps', Json.stringify(self.data.maps))
-	Variables.varDefine('tournament_series_number', self.data.number)
+	Variables.varDefine('tournament_series_number', self.data.number and string.format('%05i', self.data.number) or nil)
 end
 
 ---@param prefix string
@@ -402,7 +402,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	end
 	lpdbData.participantsnumber = participantsNumber
 	lpdbData.mode = self:_getMode()
-	lpdbData.extradata.seriesnumber = self.data.number
+	lpdbData.extradata.seriesnumber = self.data.number and string.format('%05i', self.data.number) or nil
 
 	lpdbData.extradata.server2 = args.server2
 	lpdbData.extradata.patch2 = args.patch2

@@ -17,7 +17,6 @@ local Links = Lua.import('Module:Links')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Tabs = Lua.import('Module:Tabs')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
@@ -31,6 +30,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local AdditionalSection = Lua.import('Module:Widget/Match/Page/AdditionalSection')
 local MatchPageMapVeto = Lua.import('Module:Widget/Match/Page/MapVeto')
 local Comment = Lua.import('Module:Widget/Match/Page/Comment')
+local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local Div = HtmlWidgets.Div
 local Footer = Lua.import('Module:Widget/Match/Page/Footer')
 local Header = Lua.import('Module:Widget/Match/Page/Header')
@@ -67,6 +67,14 @@ local BaseMatchPage = Class.new(
 		self.matchData = match
 		self.games = match.games
 		self.opponents = match.opponents
+
+		-- Update the view model with game and team data
+		self:populateGames()
+
+		-- Add more opponent data field
+		self:populateOpponents()
+
+		self:addCategories()
 	end
 )
 
@@ -78,6 +86,22 @@ BaseMatchPage.NO_CHARACTER = 'default'
 function BaseMatchPage.getByMatchId(props)
 	local matchPage = BaseMatchPage(props.match)
 	return matchPage:render()
+end
+
+function BaseMatchPage:addCategories()
+	local matchPhase = MatchGroupUtil.computeMatchPhase(self.matchData)
+
+	mw.ext.TeamLiquidIntegration.add_category('Matches')
+	if matchPhase then
+		local phaseToDisplay = {
+			finished = 'Finished',
+			ongoing = 'Live',
+			upcoming = 'Upcoming',
+		}
+		if phaseToDisplay[matchPhase] then
+			mw.ext.TeamLiquidIntegration.add_category(phaseToDisplay[matchPhase] .. ' Matches')
+		end
+	end
 end
 
 ---Tests whether this match page is a Bo1
@@ -98,7 +122,7 @@ function BaseMatchPage:getCountdownBlock()
 		children = Countdown.create{
 			date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
 			finished = self.matchData.finished,
-			rawdatetime = Logic.readBool(self.matchData.finished),
+			rawdatetime = (not self.matchData.dateIsExact) or self.matchData.finished,
 		}
 	}
 end
@@ -129,16 +153,30 @@ end
 ---@protected
 ---@return Widget[]
 function BaseMatchPage:getVods()
+	---@type {vod: string, number: integer}[]
+	local gameVods = Array.map(self.games, function(game, gameIdx)
+		if Logic.isEmpty(game.vod) then
+			return
+		end
+		return {
+			vod = game.vod,
+			number = gameIdx,
+		}
+	end)
+
 	return WidgetUtil.collect(
 		String.isNotEmpty(self.matchData.vod) and VodButton{
-			vodLink = self.matchData.vod
+			vodLink = self.matchData.vod,
+			grow = true,
 		} or nil,
-		Array.map(self.games, function(game, gameIdx)
-			return game.vod and VodButton{
-				gameNumber = gameIdx,
+		Array.map(gameVods, function (vod)
+			return VodButton{
+				vodLink = vod.vod,
+				gameNumber = vod.number,
+				showText = #gameVods < 4,
 				variant = 'dropdown',
-				vodLink = game.vod,
-			} or nil
+				grow = true,
+			}
 		end)
 	)
 end
@@ -225,8 +263,9 @@ function BaseMatchPage:render()
 		mw.getCurrentFrame():callParserFunction('DISPLAYTITLE', displayTitle, 'noreplace')
 	end
 
-	local tournamentContext = self:_getMatchContext()
+	local tournamentContext = self:getMatchContext()
 	return Div{
+		classes = {'match-bm'},
 		children = WidgetUtil.collect(
 			Header {
 				countdownBlock = self:getCountdownBlock(),
@@ -261,23 +300,38 @@ function BaseMatchPage:renderGames()
 		return games[1]
 	end
 
-	---@type table<string, any>
-	local tabs = {
-		This = 1,
-		['hide-showall'] = true
+	local overallStats = self:renderOverallStats()
+
+	return ContentSwitch{
+		tabs = WidgetUtil.collect(
+			overallStats and {
+				label = {
+					HtmlWidgets.Span{classes = {'mobile-hide'}, children = 'Overall Statistics'},
+					HtmlWidgets.Span{classes = {'mobile-only'}, children = 'Overall'}
+				},
+				content = overallStats
+			} or nil,
+			Array.map(games, function (game, gameIndex)
+				local mapName = self.games[gameIndex].map
+				return {
+					label = 'Game&nbsp;' .. gameIndex .. (
+						Logic.isNotEmpty(mapName) and (': ' .. mapName) or ''
+					),
+					content = game
+				}
+			end)
+		),
+		size = 'small',
+		storeValue = false,
+		switchGroup = 'matchPageGameSelector',
+		variant = 'generic'
 	}
+end
 
-	Array.forEach(games, function(game, idx)
-		local mapName = self.games[idx].map
-		if Logic.isNotEmpty(mapName) then
-			tabs['name' .. idx] = 'Game ' .. idx .. ': ' .. mapName
-		else
-			tabs['name' .. idx] = 'Game ' .. idx
-		end
-		tabs['content' .. idx] = game
-	end)
-
-	return Tabs.dynamic(tabs)
+---@protected
+---@return string|Html|Widget?
+function BaseMatchPage:renderOverallStats()
+	return nil
 end
 
 ---@protected
@@ -287,10 +341,20 @@ function BaseMatchPage:renderGame(game)
 	error('BaseMatchPage:renderGame() cannot be called directly and must be overridden.')
 end
 
----@private
+---@protected
 ---@return table
-function BaseMatchPage:_getMatchContext()
+function BaseMatchPage:getMatchContext()
 	return MatchGroupInputUtil.getTournamentContext(self.matchData)
+end
+
+---@protected
+---@return Widget
+function BaseMatchPage:getTournamentIcon()
+	return IconImage{
+		imageLight = self:getMatchContext().icon,
+		imageDark = self:getMatchContext().icondark,
+		size = '50x32px',
+	}
 end
 
 ---@protected

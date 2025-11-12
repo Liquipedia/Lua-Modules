@@ -120,7 +120,7 @@ local CONTENT = {
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferPage = 'Transfers/' .. os.date('%Y') .. '/' ..
+			transferPage = 'Transfers/' .. DateExt.getYearOf() .. '/' ..
 				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 		},
 		boxid = 1509,
@@ -169,14 +169,14 @@ local CONTENT = {
 			isSmallerVersion = true
 		},
 		padding = false,
-		boxid = 1511,
+		boxid = 1520,
 	},
 ]]
 }
 
 local LAYOUT_MAIN = {
 	{ -- Top Left
-		size = 5,
+		sizes = {xxl = 5, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 1,
@@ -190,7 +190,7 @@ local LAYOUT_MAIN = {
 		},
 	},
 	{ -- Top Right
-		size = 7,
+		sizes = {xxl = 7, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 2,
@@ -226,7 +226,7 @@ local LAYOUT_MAIN = {
 		},
 	},
 	{ -- Heroes
-		size = 12,
+		sizes = {xxl = 12},
 		children = {
 			{
 				mobileOrder = 4,
@@ -235,7 +235,7 @@ local LAYOUT_MAIN = {
 		}
 	},
 	{ -- Bottom Left
-		size = 6,
+		sizes = {xxl = 6},
 		children = {
 			{
 				mobileOrder = 5,
@@ -249,7 +249,7 @@ local LAYOUT_MAIN = {
 		}
 	},
 	{ -- Bottom Right
-		size = 6,
+		sizes = {xxl = 6},
 		children = {
 			{
 				mobileOrder = 7,
@@ -258,7 +258,7 @@ local LAYOUT_MAIN = {
 		}
 	},
 	{ -- Useful articles
-		size = 12,
+		sizes = {xxl = 12},
 		children = {
 			{
 				mobileOrder = 8,

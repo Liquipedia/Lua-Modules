@@ -12,6 +12,7 @@ local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Class = Lua.import('Module:Class')
 local CountryCategory = Lua.import('Module:Infobox/Extension/CountryCategory')
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extension/PrizePool')
+local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
@@ -139,7 +140,7 @@ function Series:createInfobox()
 		self:categories(unpack(self:_getCategories(args)))
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Series')
 end
 
 ---@param args table
@@ -170,21 +171,21 @@ function Series:_setLpdbData(args, links)
 		launcheddate = ReferenceCleaner.clean{input = args.launcheddate or args.sdate or args.inaugurated},
 		defunctdate = ReferenceCleaner.clean{input = args.defunctdate or args.edate},
 		defunctfate = ReferenceCleaner.clean{input = args.defunctfate},
-		organizers = mw.ext.LiquipediaDB.lpdb_create_json({
+		organizers = Json.stringify({
 			organizer1 = args.organizer or args.organizer1,
 			organizer2 = args.organizer2,
 			organizer3 = args.organizer3,
 			organizer4 = args.organizer4,
 			organizer5 = args.organizer5,
 		}),
-		sponsors = mw.ext.LiquipediaDB.lpdb_create_json({
+		sponsors = Json.stringify({
 			sponsor1 = args.sponsor1,
 			sponsor2 = args.sponsor2,
 			sponsor3 = args.sponsor3,
 			sponsor4 = args.sponsor4,
 			sponsor5 = args.sponsor5,
 		}),
-		links = mw.ext.LiquipediaDB.lpdb_create_json(
+		links = Json.stringify(
 			Links.makeFullLinksForTableItems(links or {})
 		),
 	}

@@ -12,6 +12,7 @@ local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
+---@class LeagueOfLegendsMatchPageMapParser: LeagueOfLegendsMapParserInterface
 local CustomMatchGroupInputMatchPage = {}
 
 local ROLE_ORDER = Table.map({
@@ -24,6 +25,8 @@ local ROLE_ORDER = Table.map({
 	return value, idx
 end)
 
+---@param mapInput table
+---@return table
 function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	-- If no matchid is provided, assume this as a normal map
 	if not mapInput or not mapInput.matchid then
@@ -48,6 +51,8 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	return map
 end
 
+---@param map table
+---@return string?
 function CustomMatchGroupInputMatchPage.getLength(map)
 	if not map.length or not Logic.isNumeric(map.length) then
 		return
@@ -56,10 +61,16 @@ function CustomMatchGroupInputMatchPage.getLength(map)
 	return math.floor(map.length / 60) .. ':' .. string.format('%02d', map.length % 60)
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return string?
 function CustomMatchGroupInputMatchPage.getSide(map, opponentIndex)
 	return (map['team' .. opponentIndex] or {}).color
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return table[]?
 function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
 	if not team then return end
@@ -82,12 +93,18 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	end)
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return string[]?
 function CustomMatchGroupInputMatchPage.getHeroPicks(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
 	if not team then return end
 	return Array.map(team.players or {}, Operator.property('champion'))
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return string[]?
 function CustomMatchGroupInputMatchPage.getHeroBans(map, opponentIndex)
 	if not map.championVeto then return end
 
@@ -98,6 +115,8 @@ function CustomMatchGroupInputMatchPage.getHeroBans(map, opponentIndex)
 	return Array.map(bans, Operator.property('champion'))
 end
 
+---@param map table
+---@return table[]?
 function CustomMatchGroupInputMatchPage.getVetoPhase(map)
 	if not map.championVeto then return end
 	return Array.map(map.championVeto, function(veto)
@@ -107,6 +126,9 @@ function CustomMatchGroupInputMatchPage.getVetoPhase(map)
 	end)
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return table?
 function CustomMatchGroupInputMatchPage.getObjectives(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
 	if not team then return end
@@ -118,6 +140,39 @@ function CustomMatchGroupInputMatchPage.getObjectives(map, opponentIndex)
 		heralds = team.riftHeraldKills,
 		grubs = team.grubKills,
 		atakhans = team.atakhanKills,
+	}
+end
+
+---@param map table
+---@param opponentIndex integer
+---@return table
+function CustomMatchGroupInputMatchPage.extendMapOpponent(map, opponentIndex)
+	local participants = CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
+
+	if Logic.isEmpty(participants) then
+		return {picks = {}, stats = {}}
+	end
+	---@cast participants -nil
+
+	---@param arr table[]
+	---@param item string
+	---@return number?
+	local function sumItem(arr, item)
+		return Array.reduce(Array.map(arr, Operator.property(item)), Operator.nilSafeAdd, 0)
+	end
+
+	return {
+		side = CustomMatchGroupInputMatchPage.getSide(map, opponentIndex),
+		picks = Array.map(participants, Operator.property('character')),
+		stats = Table.merge(
+			{
+				gold = sumItem(participants, 'gold'),
+				kills = sumItem(participants, 'kills'),
+				deaths = sumItem(participants, 'deaths'),
+				assists = sumItem(participants, 'assists')
+			},
+			CustomMatchGroupInputMatchPage.getObjectives(map, opponentIndex)
+		)
 	}
 end
 

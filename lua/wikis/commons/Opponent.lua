@@ -79,6 +79,7 @@ Opponent.types.Player = TypeUtil.struct({
 Opponent.types.TeamOpponent = TypeUtil.struct({
 	template = 'string',
 	type = TypeUtil.literal(Opponent.team),
+	players = TypeUtil.optional(TypeUtil.array(Opponent.types.Player)),
 })
 
 Opponent.types.PartyOpponent = TypeUtil.struct({
@@ -224,16 +225,56 @@ end
 ---@param opponent any
 ---@return boolean
 function Opponent.isOpponent(opponent)
-	error('Opponent.isOpponent: Not Implemented')
+	return #TypeUtil.checkValue(opponent, Opponent.types.Opponent) == 0
 end
 
 ---Check if two opponents are the same opponent
----It's still a work in progress, it's not fully implemented all cases
 ---@param opponent1 standardOpponent
 ---@param opponent2 standardOpponent
 ---@return boolean
 function Opponent.same(opponent1, opponent2)
-	return Opponent.toName(opponent1) == Opponent.toName(opponent2)
+	if opponent1 == opponent2 then
+		return true
+	elseif opponent1.type ~= opponent2.type then
+		return false
+	elseif opponent1.type == Opponent.literal then
+		return opponent1.name == opponent2.name
+	elseif opponent1.type == Opponent.team then
+		if opponent1.template == opponent2.template then
+			return true
+		end
+		local opponent1Name = Opponent.toName(opponent1)
+		local opponent2Name = Opponent.toName(opponent2)
+		if opponent1Name == opponent2Name then
+			return true
+		end
+		local opponent1Historical = TeamTemplate.getRaw(opponent1Name).historicaltemplate
+		local opponent2Historical = TeamTemplate.getRaw(opponent2Name).historicaltemplate
+		if Logic.isEmpty(opponent1Historical) or Logic.isEmpty(opponent2Historical) then
+			return false
+		end
+		return opponent1Historical == opponent2Historical
+	end
+	-- opponent.type is a party type
+
+	---@param player standardPlayer
+	---@return string?
+	local function getPageName(player)
+		if Opponent.playerIsTbd(player) then
+			return
+		end
+		-- Remove gsub once underscore storage is sorted out
+		return (player.pageName:gsub(' ', '_'))
+	end
+
+	return Array.equals(
+		Array.sortBy(
+			Array.map(opponent1.players, getPageName), FnUtil.identity
+		),
+		Array.sortBy(
+			Array.map(opponent2.players, getPageName), FnUtil.identity
+		)
+	)
 end
 
 ---Coerces an arbitrary table into an opponent
@@ -324,30 +365,35 @@ function Opponent.resolve(opponent, date, options)
 	if opponent.type == Opponent.team then
 		opponent.template = TeamTemplate.resolve(opponent.template, date) or opponent.template or 'tbd'
 		opponent.icon, opponent.icondark = TeamTemplate.getIcon(opponent.template)
-	elseif Opponent.typeIsParty(opponent.type) then
-		for _, player in ipairs(opponent.players) do
-			if options.syncPlayer then
-				local hasFaction = String.isNotEmpty(player.faction)
-				local savePageVar = not Opponent.playerIsTbd(player)
-				PlayerExt.syncPlayer(player, {
-					date = date,
-					savePageVar = savePageVar,
-					overwritePageVars = options.overwritePageVars,
-				})
-				player.team = PlayerExt.syncTeam(
-					player.pageName:gsub(' ', '_'),
-					player.team,
-					{date = date, savePageVar = savePageVar}
-				)
-				player.faction = (hasFaction or player.faction ~= Faction.defaultFaction) and player.faction or nil
-			else
-				PlayerExt.populatePageName(player)
-			end
-			if player.team then
-				player.team = TeamTemplate.resolve(player.team, date)
-			end
-		end
 	end
+
+	if not opponent.players then
+		return opponent
+	end
+
+	Array.forEach(opponent.players, function(player)
+		if options.syncPlayer then
+			local hasFaction = String.isNotEmpty(player.faction)
+			local savePageVar = not Opponent.playerIsTbd(player)
+			PlayerExt.syncPlayer(player, {
+				date = date,
+				savePageVar = savePageVar,
+				overwritePageVars = options.overwritePageVars,
+			})
+			player.team = PlayerExt.syncTeam(
+				player.pageName:gsub(' ', '_'),
+				player.team,
+				{date = date, savePageVar = savePageVar}
+			)
+			player.faction = (hasFaction or player.faction ~= Faction.defaultFaction) and player.faction or nil
+		else
+			PlayerExt.populatePageName(player)
+		end
+		if player.team then
+			player.team = TeamTemplate.resolve(player.team, date)
+		end
+	end)
+
 	return opponent
 end
 
@@ -465,17 +511,18 @@ end
 
 ---Reads an opponent struct and builds a standings/placement lpdb struct from it
 ---@param opponent standardOpponent
+---@param options {setPlayersInTeam: boolean?}?
 ---@return {opponentname: string, opponenttemplate: string?, opponenttype: OpponentType, opponentplayers: table?}
-function Opponent.toLpdbStruct(opponent)
+function Opponent.toLpdbStruct(opponent, options)
+	options = options or {}
 	local storageStruct = {
 		opponentname = Opponent.toName(opponent),
 		opponenttemplate = opponent.template,
 		opponenttype = opponent.type,
 	}
 
-	-- Add players for Party Type opponents.
-	-- Team's will have their players added via the TeamCard.
-	if Opponent.typeIsParty(opponent.type) then
+	-- Add players for Party Type opponents, or if config is set to force it.
+	if Opponent.typeIsParty(opponent.type) or options.setPlayersInTeam then
 		local players = {}
 		for playerIndex, player in ipairs(opponent.players) do
 			local prefix = 'p' .. playerIndex
@@ -496,7 +543,7 @@ function Opponent.toLpdbStruct(opponent)
 end
 
 ---Reads a standings or placement lpdb structure and builds an opponent struct from it
----@param storageStruct table
+---@param storageStruct placement|standingsentry
 ---@return standardOpponent
 function Opponent.fromLpdbStruct(storageStruct)
 	local partySize = Opponent.partySize(storageStruct.opponenttype)
@@ -512,6 +559,9 @@ function Opponent.fromLpdbStruct(storageStruct)
 			name = storageStruct.opponentname,
 			template = storageStruct.opponenttemplate,
 			type = Opponent.team,
+			players = Logic.isNotEmpty(storageStruct.opponentplayers) and Array.mapIndexes(function (index)
+				return Logic.nilIfEmpty(Opponent.playerFromLpdbStruct(storageStruct.opponentplayers, index))
+			end) or {},
 			extradata = {},
 		}
 	elseif storageStruct.opponenttype == Opponent.literal then
@@ -536,6 +586,30 @@ function Opponent.playerFromLpdbStruct(players, playerIndex)
 		pageName = players[prefix],
 		team = players[prefix .. 'template'] or players[prefix .. 'team'],
 		faction = Logic.nilIfEmpty(players[prefix .. 'faction']),
+	}
+end
+
+---@param opponent standardOpponent
+---@param options {resolveRedirect: boolean?}?
+---@return {participant: string, participantlink: string, participanttemplate: string?}
+function Opponent.toLegacyParticipantData(opponent, options)
+	local participant
+
+	if opponent.type == Opponent.team then
+		local teamTemplate = TeamTemplate.getRawOrNil(opponent.template) or {}
+
+		participant = teamTemplate.page or ''
+		if options and options.resolveRedirect then
+			participant = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
+		end
+	else
+		participant = Opponent.toName(opponent)
+	end
+
+	return {
+		participant = participant,
+		participantlink = Opponent.toName(opponent),
+		participanttemplate = opponent.template,
 	}
 end
 

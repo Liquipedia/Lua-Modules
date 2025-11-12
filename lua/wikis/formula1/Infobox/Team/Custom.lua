@@ -9,7 +9,9 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
+local Tier = Lua.import('Module:Tier/Custom')
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
@@ -31,8 +33,8 @@ local STATISTICS = {
 	{key = 'wins', name = 'Wins'},
 	{key = 'podiums', name = 'Podiums'},
 	{key = 'poles', name = 'Pole positions'},
-	{key = 'fastestlaps', name = 'Fastest Laps'},
-	{key = 'points', name = 'Career Points'},
+	{key = 'fastestlaps', name = 'Fastest laps'},
+	{key = 'points', name = 'Total points'},
 	{key = 'firstentry', name = 'First entry'},
 	{key = 'firstwin', name = 'First win'},
 	{key = 'lastwin', name = 'Last win'},
@@ -97,6 +99,9 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.extradata.previous2 = args.previous2
 	lpdbData.extradata.next = args.next
 	lpdbData.extradata.next2 = args.next2
+	local tier = Tier.toValue(args.tier)
+	assert(tier or Logic.isEmpty(args.tier), 'Invalid tier input: ' .. args.tier)
+	lpdbData.extradata.tier = tier
 
 	return lpdbData
 end

@@ -43,7 +43,7 @@ local CONTENT = {
 		heading = 'Transfers',
 		body = TransfersList{
 			rumours = true,
-			transferPage = 'Player Transfers/' .. os.date('%Y') .. '/' ..
+			transferPage = 'Player Transfers/' .. DateExt.getYearOf() .. '/' ..
 				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 		},
 		boxid = 1509,
@@ -137,7 +137,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				sizes = {xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
@@ -158,7 +158,7 @@ return {
 				}
 			},
 			{ -- Right
-				size = 6,
+				sizes = {xxxl = 6},
 				children = {
 					{
 						mobileOrder = 2,

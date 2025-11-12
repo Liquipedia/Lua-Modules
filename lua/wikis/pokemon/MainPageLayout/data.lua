@@ -35,8 +35,8 @@ local CONTENT = {
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			limits = 10,
-			transferPage = 'Player Transfers/' .. os.date('%Y') .. '/' ..
+			limit = 10,
+			transferPage = 'Player Transfers/' .. DateExt.getYearOf() .. '/' ..
 				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 		},
 		boxid = 1509,

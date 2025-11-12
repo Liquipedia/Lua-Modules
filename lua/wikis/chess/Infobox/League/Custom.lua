@@ -77,9 +77,10 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 	local data = caller.data
 	if id == 'custom' then
-		table.insert(
-			widgets,
-			Cell{name = 'Restrictions', children = caller:createRestrictionsCell(args.restrictions)}
+		Array.appendWith(widgets,
+			Cell{name = 'Restrictions', children = caller:createRestrictionsCell(args.restrictions)},
+			Cell{name = 'Number of Players', children = {args.player_number}},
+			Cell{name = 'Number of Teams', children = {args.team_number}}
 		)
 	elseif id == 'gamesettings' then
 		local isVariant = caller.data.game ~= Game.toIdentifier()

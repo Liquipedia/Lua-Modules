@@ -26,7 +26,9 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 
 	const referencePath = join(SNAPSHOT_DIR, `${testName}.png`);
 
-	const browser = await chromium.launch();
+	const browser = await chromium.launch({
+		args: ['--disable-web-security']
+	});
 	const page = await browser.newPage({ viewport: VIEWPORT });
 	await page.goto(`file://${htmlPath}`);
 	const newScreenshotBuffer = await page.screenshot({ animations: 'disabled' });

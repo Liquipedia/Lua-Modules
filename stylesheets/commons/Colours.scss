@@ -379,11 +379,11 @@ ul.nav-tabs li.game-brawl,
 /* FOREST GREEN */
 .forest-green-text,
 .forest-theme-dark-text {
-	color: var( --clr-forestgreen-20, #1e7a1d );
+	color: var( --clr-forest-20, #1e7a1d );
 }
 
 .forest-green-faction-text {
-	color: var( --clr-forestgreen-20, #1f821f );
+	color: var( --clr-forest-20, #1f821f );
 }
 
 .forest-green-non-text {
@@ -391,7 +391,7 @@ ul.nav-tabs li.game-brawl,
 }
 
 .bg-seedup {
-	background-color: var( --clr-forestgreen-90, #dbeded );
+	background-color: var( --clr-forest-90, #dbeded );
 }
 
 .forest-green-bg,
@@ -408,15 +408,15 @@ ul.nav-tabs li.game-brawl,
 ul.nav-tabs li.game-melee,
 .overview.game-melee,
 .ambox-green {
-	background-color: var( --clr-forestgreen-background-color, #ddf4dd );
+	background-color: var( --clr-forest-background-color, #ddf4dd );
 }
 
 .bg-win-important {
-	background-color: var( --clr-forestgreen-background-color, #ddf4dd ) !important;
+	background-color: var( --clr-forest-background-color, #ddf4dd ) !important;
 }
 
 .forest-theme-dark-bg {
-	background-color: var( --clr-forestgreen-20, #1e7a1d );
+	background-color: var( --clr-forest-20, #1e7a1d );
 }
 
 .forest-green-dark-alt-bg,
@@ -425,15 +425,15 @@ ul.nav-tabs li.game-melee,
 }
 
 .forest-theme-light-text {
-	color: var( --clr-forestgreen-90, #ddf4dd );
+	color: var( --clr-forest-90, #ddf4dd );
 }
 
 .forest-theme-light-alt-text {
-	color: var( --clr-forestgreen-80, #c4ecc4 );
+	color: var( --clr-forest-80, #c4ecc4 );
 }
 
 .forest-theme-light-alt-bg {
-	background-color: var( --clr-forestgreen-80, #c4ecc4 );
+	background-color: var( --clr-forest-80, #c4ecc4 );
 }
 
 .forest-green-theme-dark-alt-bg-striped {
@@ -704,7 +704,7 @@ ul.nav-tabs li.game-wiiu,
 }
 
 .ambox-green {
-	border-color: var( --clr-forestgreen-40, #5ecb5e );
+	border-color: var( --clr-forest-40, #5ecb5e );
 }
 
 .ambox-red {

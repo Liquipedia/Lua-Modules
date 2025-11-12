@@ -5,6 +5,7 @@
 
 // List of JavaScript modules to include
 const jsModules = [
+	'Analytics',
 	'BattleRoyale',
 	'Bracket',
 	'Collapse',

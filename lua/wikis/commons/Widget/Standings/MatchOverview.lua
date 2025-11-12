@@ -17,7 +17,6 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 ---@class MatchOverviewWidget: Widget
 ---@operator call(table): MatchOverviewWidget
-
 local MatchOverviewWidget = Class.new(Widget)
 
 ---@return Widget?

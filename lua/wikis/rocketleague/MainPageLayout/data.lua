@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local DateExt = Lua.import('Module:Date/Ext')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local RatingsDisplay = Lua.import('Module:Ratings/Display')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
@@ -34,12 +33,7 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{
-			transferPortal = 'Transfers',
-			transferPage = 'Player Transfers/' .. os.date('%Y') .. '/' ..
-				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter',
-			rumours = true
-		},
+		body = TransfersList{rumours = true},
 		boxid = 1509,
 	},
 	thisDay = {
@@ -58,6 +52,7 @@ local CONTENT = {
 	},
 	rating = {
 		heading = 'Liquipedia Rating',
+		boxid = 1520,
 		body = HtmlWidgets.Fragment{
 			children = {
 				RatingsDisplay.graph{id = 'rating'},

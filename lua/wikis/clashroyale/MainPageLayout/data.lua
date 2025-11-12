@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Condition = Lua.import('Module:Condition')
+local DateExt = Lua.import('Module:Date/Ext')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
@@ -38,7 +39,7 @@ local CONTENT = {
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferPage = 'Player Transfers/' .. os.date('%Y')
+			transferPage = 'Player Transfers/' .. DateExt.getYearOf()
 		},
 		boxid = 1509,
 	},
@@ -87,7 +88,7 @@ return {
 	title = 'Clash Royale',
 	navigation = {
 		{
-			file = 'Mohamed_Light_CRL_2024_World_Finals.jpg',
+			file = 'SuperCardCompDraft RunicMountain Banner.png',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -96,7 +97,7 @@ return {
 			},
 		},
 		{
-			file = 'TL_Crl_World_Finals-2019.png',
+			file = 'HolidayFeast CozyClashmas Banner.png',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -105,7 +106,7 @@ return {
 			},
 		},
 		{
-			file = 'Mugi_CRL_2023_World_Finals.jpeg ',
+			file = 'Touchdown LumberLove Banner.png',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -164,7 +165,7 @@ return {
 			link = 'Portal:Merge Tactics',
 		},
 		{
-			file = 'Nova_Crl_2018_World_Finals.jpg',
+			file = 'RuneGiant RunicMountain Banner.png',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},

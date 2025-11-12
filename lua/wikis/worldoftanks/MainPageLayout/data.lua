@@ -7,6 +7,8 @@
 
 local Lua = require('Module:Lua')
 
+local DateExt = Lua.import('Module:Date/Ext')
+
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
@@ -34,8 +36,8 @@ local CONTENT = {
 		heading = 'Transfers',
 		body = TransfersList{
 			rumours = true,
-			limits = 10,
-			transferPage = 'Player Transfers/' .. os.date('%Y')
+			limit = 10,
+			transferPage = 'Player Transfers/' .. DateExt.getYearOf()
 		},
 		boxid = 1509,
 	},
@@ -46,6 +48,11 @@ local CONTENT = {
 		},
 		padding = true,
 		boxid = 1510,
+	},
+	specialEvents = {
+		noPanel = true,
+		body = '{{Liquipedia:Special Event}}',
+		boxid = 1516,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -139,15 +146,19 @@ return {
 				size = 5,
 				children = {
 					{
-						mobileOrder = 4,
-						content = CONTENT.thisDay,
+						mobileOrder = 1,
+						content = CONTENT.specialEvents,
 					},
 					{
 						mobileOrder = 2,
+						content = CONTENT.thisDay,
+					},
+					{
+						mobileOrder = 3,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 5,
+						mobileOrder = 4,
 						content = CONTENT.wantToHelp,
 					},
 				}

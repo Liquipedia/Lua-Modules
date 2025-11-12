@@ -206,4 +206,27 @@ function DateExt.getMonthOf(date)
 	return tonumber(DateExt.formatTimestamp('n', timestamp)) --[[@as integer]]
 end
 
+---@param date string|integer|osdateparam?
+---@return integer
+function DateExt.getDayOf(date)
+	local timestamp = DateExt.readTimestamp(date) or DateExt.getCurrentTimestamp()
+	return tonumber(DateExt.formatTimestamp('d', timestamp)) --[[@as integer]]
+end
+
+---@param to string|integer|osdateparam?
+---@param from string|integer|osdateparam?
+---@return integer
+function DateExt.calculateAge(to, from)
+	local age = DateExt.getYearOf(to) - DateExt.getYearOf(from)
+
+	local monthDiff = DateExt.getMonthOf(to) - DateExt.getMonthOf(from)
+	local dayDiff = DateExt.getDayOf(to) - DateExt.getDayOf(from)
+
+	if monthDiff > 0 or (monthDiff == 0 and dayDiff >= 0) then
+		--- birthday passed
+		return age
+	end
+	return age - 1
+end
+
 return DateExt

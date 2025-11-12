@@ -9,7 +9,9 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
+local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
@@ -18,11 +20,15 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
+local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 ---@class ValorantMatchPage: BaseMatchPage
 ---@operator call(MatchPageMatch): ValorantMatchPage
@@ -43,27 +49,61 @@ local WIN_TYPE_TO_ICON = {
 function MatchPage.getByMatchId(props)
 	local matchPage = MatchPage(props.match)
 
-	-- Update the view model with game and team data
-	matchPage:populateGames()
-
-	-- Add more opponent data field
-	matchPage:populateOpponents()
-
 	return matchPage:render()
 end
 
 function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
-		game.teams = Array.map(Array.range(1, 2), function(teamIdx)
-			local team = {}
-
+		game.teams = game.opponents
+		Array.forEach(game.teams, function(team, teamIdx)
 			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
-			team.players = Array.filter(game.opponents[teamIdx].players or {}, Table.isNotEmpty)
-
-			return team
+			team.postPlant = team.postPlant or {}
 		end)
 	end)
+end
+
+---@return Widget?
+function MatchPage:renderOverallStats()
+	if self:isBestOfOne() then
+		return
+	end
+
+	local overallTeamData = {
+		finished = true,
+		teams = Array.map(self.opponents, Operator.property('extradata'))
+	}
+
+	local overallPlayerData = {
+		teams = Array.map(Array.range(1, 2), function(teamIdx)
+			local team = { players = {} }
+			local opponent = self.opponents[teamIdx]
+			if opponent and opponent.players then
+				team.players = Array.map(opponent.players, function(player)
+					if not player.extradata or not player.extradata.overallStats then
+						return
+					end
+					local playerData = player.extradata.overallStats
+
+					if not playerData.roundsPlayed or playerData.roundsPlayed == 0 then
+						return
+					end
+
+					playerData.player = player.pageName
+					playerData.displayName = player.displayName
+					return playerData
+				end)
+			end
+			return team
+		end)
+	}
+
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(
+			self:_renderTeamStats(overallTeamData),
+			self:_renderPerformance(overallPlayerData)
+		)
+	}
 end
 
 ---@param game MatchPageGame
@@ -73,6 +113,7 @@ function MatchPage:renderGame(game)
 		children = WidgetUtil.collect(
 			self:_renderGameOverview(game),
 			self:_renderRoundsOverview(game),
+			self:_renderTeamStats(game),
 			self:_renderPerformance(game)
 		)
 	}
@@ -243,14 +284,86 @@ end
 ---@private
 ---@param game MatchPageGame
 ---@return Widget[]
+function MatchPage:_renderTeamStats(game)
+	return {
+		HtmlWidgets.H3{children = 'Team Stats'},
+		Div{
+			classes = {'match-bm-team-stats'},
+			children = {
+				Div{
+					classes = {'match-bm-lol-team-stats-header'},
+					children = {
+						Div{
+							classes = {'match-bm-lol-team-stats-header-team'},
+							children = self.opponents[1].iconDisplay
+						},
+						Div{
+							classes = {'match-bm-team-stats-list-cell'},
+							children = self:getTournamentIcon()
+						},
+						Div{
+							classes = {'match-bm-lol-team-stats-header-team'},
+							children = self.opponents[2].iconDisplay
+						}
+					}
+				},
+				StatsList{
+					finished = game.finished,
+					data = {
+						{
+							icon = IconFa{iconName = 'team_firstkills'},
+							name = 'First Kills',
+							team1Value = game.teams[1].firstKills,
+							team2Value = game.teams[2].firstKills,
+						},
+						{
+							icon = IconImage{
+								imageLight = 'Black Creds VALORANT.png',
+								imageDark = 'White Creds VALORANT.png',
+								size = '16px',
+							},
+							name = 'Thrifties',
+							team1Value = game.teams[1].thrifties,
+							team2Value = game.teams[2].thrifties
+						},
+						{
+							icon = IconImage{
+								imageLight = 'VALORANT Spike lightmode.png',
+								imageDark = 'VALORANT Spike darkmode.png',
+								size = '16px',
+							},
+							name = 'Post Plant',
+							team1Value = Array.interleave(game.teams[1].postPlant, SPAN_SLASH),
+							team2Value = Array.interleave(game.teams[2].postPlant, SPAN_SLASH)
+						},
+						{
+							icon = IconImage{
+								imageLight = 'VALORANT clutch lightmode.png',
+								imageDark = 'VALORANT clutch darkmode.png',
+								size = '16px',
+							},
+							name = 'Clutches',
+							team1Value = game.teams[1].clutches,
+							team2Value = game.teams[2].clutches
+						},
+					}
+				}
+			}
+		}
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@return Widget[]
 function MatchPage:_renderPerformance(game)
 	return {
 		HtmlWidgets.H3{children = 'Player Performance'},
 		Div{
 			classes = {'match-bm-players-wrapper'},
 			children = {
-				self:_renderPerformanceForTeam(game, 1),
-				self:_renderPerformanceForTeam(game, 2)
+				self:_renderTeamPerformance(game, 1),
+				self:_renderTeamPerformance(game, 2)
 			}
 		}
 	}
@@ -260,7 +373,7 @@ end
 ---@param game MatchPageGame
 ---@param teamIndex integer
 ---@return Widget
-function MatchPage:_renderPerformanceForTeam(game, teamIndex)
+function MatchPage:_renderTeamPerformance(game, teamIndex)
 	return Div{
 		classes = {'match-bm-players-team'},
 		children = WidgetUtil.collect(
@@ -274,7 +387,7 @@ function MatchPage:_renderPerformanceForTeam(game, teamIndex)
 					function (player) return player.acs or 0 end
 				)),
 				function (player)
-					return self:_renderPlayerPerformance(game, teamIndex, player)
+					return self:_renderPlayerPerformance(player)
 				end
 			)
 		)
@@ -282,55 +395,80 @@ function MatchPage:_renderPerformanceForTeam(game, teamIndex)
 end
 
 ---@private
----@param game MatchPageGame
----@param teamIndex integer
 ---@param player table
----@return Widget
-function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
+---@return Widget?
+function MatchPage:_renderPlayerPerformance(player)
+	if Logic.isEmpty(player) then
+		return
+	end
+
 	local formatNumbers = function(value, numberOfDecimals)
 		if not value then
 			return nil
 		end
-		numberOfDecimals = numberOfDecimals or 0
-		local format = '%.'.. numberOfDecimals ..'f'
-		return string.format(format, MathUtil.round(value, numberOfDecimals))
+		return MathUtil.formatRounded{value = value, precision = numberOfDecimals}
 	end
+
+	local playerDisplay
+	if type(player.agent) == 'table' then
+		playerDisplay = Div{
+			classes = {'match-bm-players-player-name'},
+			children = {
+				Link{link = player.player, children = player.displayName},
+				MatchSummaryWidgets.Characters{characters = player.agent, date = self.matchData.date},
+			}
+		}
+	else
+		playerDisplay = PlayerDisplay{
+			characterIcon = self:getCharacterIcon(player.agent),
+			characterName = player.agent,
+			playerName = player.displayName or player.player,
+			playerLink = player.player,
+		}
+	end
+
+	local playerStats = {
+		PlayerStat{
+			title = {IconFa{iconName = 'acs'}, 'ACS'},
+			data = player.acs and formatNumbers(player.acs) or nil,
+		},
+		PlayerStat{
+			title = {IconFa{iconName = 'kda'}, 'KDA'},
+			data = Array.interleave({
+				player.kills, player.deaths, player.assists
+			}, SPAN_SLASH)
+		},
+		PlayerStat{
+			title = {IconFa{iconName = 'kast'}, 'KAST'},
+			data = player.kast and (formatNumbers(player.kast, 1) .. '%') or nil
+		},
+		PlayerStat{
+			title = {IconFa{iconName = 'damage'}, 'ADR'},
+			data = player.adr and formatNumbers(player.adr) or nil
+		},
+	}
+
+	if player.hs then
+		table.insert(playerStats, PlayerStat{
+			title = {IconFa{iconName = 'headshot'}, 'HS%'},
+			data = (formatNumbers(player.hs, 1) .. '%')
+		})
+	end
+
+	table.insert(playerStats, PlayerStat{
+		title = {IconFa{iconName = 'firstkill'}, 'FK / FD'},
+		data = {player.firstKills, SPAN_SLASH, player.firstDeaths}
+	})
+
+	local numCols = #playerStats
 
 	return Div{
 		classes = {'match-bm-players-player match-bm-players-player--col-2'},
 		children = {
-			PlayerDisplay{
-				characterIcon = self:getCharacterIcon(player.agent),
-				characterName = player.agent,
-				playerName = player.displayName or player.player,
-				playerLink = player.player,
-			},
+			playerDisplay,
 			Div{
-				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-5'},
-				children = {
-					PlayerStat{
-						title = {IconFa{iconName = 'acs'}, 'ACS'},
-						data = player.acs and formatNumbers(player.acs) or nil,
-					},
-					PlayerStat{
-						title = {IconFa{iconName = 'kda'}, 'KDA'},
-						data = Array.interleave({
-							player.kills, player.deaths, player.assists
-						}, SPAN_SLASH)
-					},
-					PlayerStat{
-						title = {IconFa{iconName = 'kast'}, 'KAST'},
-						data = player.kast and (formatNumbers(player.kast, 1) .. '%') or nil
-					},
-					PlayerStat{
-						title = {IconFa{iconName = 'damage'}, 'ADR'},
-						data = player.adr and formatNumbers(player.adr) or nil
-					},
-					PlayerStat{
-						title = {IconFa{iconName = 'headshot'}, 'HS%'},
-						data = player.hs and (formatNumbers(player.hs, 1) .. '%') or nil
-					}
-				}
+				classes = {'match-bm-players-player-stats', 'match-bm-players-player-stats--col-' .. numCols},
+				children = playerStats
 			}
 		}
 	}
