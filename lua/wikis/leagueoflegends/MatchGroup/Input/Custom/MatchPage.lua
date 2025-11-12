@@ -42,9 +42,8 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 		if not team.players then return end
 		Array.forEach(team.players, function (player)
 			local playerRole = InGameRoles[player.role]
-			if playerRole then
-				player.role = playerRole.display:lower()
-			end
+			assert(playerRole, 'Invalid role input: ' .. player.role)
+			player.role = playerRole.display:lower()
 		end)
 		team.players = Array.sortBy(team.players, function(player)
 			return ROLE_ORDER[player.role]
