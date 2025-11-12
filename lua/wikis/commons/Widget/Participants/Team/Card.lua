@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local RoleUtil = Lua.import('Module:Role/Util')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -68,14 +69,14 @@ local function getRoleDisplays(roles)
 			return firstRole.icon
 		end
 		for _, role in ipairs(roles) do
-			if role.type == 'ingame' then
+			if role.type == RoleUtil.ROLE_TYPE.INGAME then
 				return role.icon or role.display
 			end
 		end
 	end
 	local function roleRightDisplay()
 		for _, role in ipairs(roles) do
-			if role.type ~= 'ingame' then
+			if role.type ~= RoleUtil.ROLE_TYPE.INGAME then
 				return role.display
 			end
 		end

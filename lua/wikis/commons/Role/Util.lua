@@ -21,12 +21,21 @@ local RoleUtil = {}
 ---@field display string
 ---@field category string
 
+
 ---@class RoleData
 ---@field category string
 ---@field display string
 ---@field key string?
----@field type 'contract'|'staff'|'ingame'|'unknown'
+---@field type RoleTypes
 ---@field icon string?
+
+---@enum RoleTypes
+local ROLE_TYPE = {
+	CONTRACT = 'contract',
+	STAFF = 'staff',
+	INGAME = 'ingame',
+	UNKNOWN = 'unknown',
+}
 
 function RoleUtil.readRoleArgs(input)
 	return Array.map(Array.parseCommaSeparatedString(input), RoleUtil._createRoleData)
@@ -45,19 +54,19 @@ function RoleUtil._createRoleData(roleKey)
 		roleData = {
 			display = display,
 			category = display .. 's',
-			key = display,
 		}
 	end
 
+	---@return RoleTypes
 	local roleType = function()
 		if Roles.ContractRoles[key] then
-			return 'contract'
+			return ROLE_TYPE.CONTRACT
 		elseif Roles.StaffRoles[key] then
-			return 'staff'
+			return ROLE_TYPE.STAFF
 		elseif Roles.InGameRoles[key] then
-			return 'ingame'
+			return ROLE_TYPE.INGAME
 		else
-			return 'unknown'
+			return ROLE_TYPE.UNKNOWN
 		end
 	end
 
