@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local InGameRoles = Lua.import('Module:InGameRoles', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
@@ -76,9 +77,10 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	if not team then return end
 	if not team.players then return end
 	return Array.map(team.players, function(player)
+		local playerRole = InGameRoles[(player.role or ''):lower()] or {}
 		return {
 			player = player.id,
-			role = player.role,
+			role = (playerRole.display or player.role):lower(),
 			character = player.champion,
 			gold = player.gold,
 			kills = player.kills,
