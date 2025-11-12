@@ -14,11 +14,18 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local RoleUtil = Lua.import('Module:Role/Util')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Tournament = Lua.import('Module:Tournament')
 
 local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
----qualifierText: string?, qualifierPage: string?, qualifierUrl: string?}
+---qualification: QualificationStructure?}
+
+---@alias QualificationMethod 'invite'|'qual'
+---@alias QualificationType 'tournament'|'external'|'other'
+
+---@alias QualificationStructure {method: QualificationMethod, type: QualificationType,
+---tournament?: StandardTournament, url?: string, text?: string}
 
 ---@param args table
 ---@return {participants: TeamParticipant[]}
@@ -32,6 +39,47 @@ function TeamParticipantsWikiParser.parseWikiInput(args)
 	return {
 		participants = participants
 	}
+end
+
+---@param input table?
+---@return QualificationStructure?
+local function parseQualifier(input)
+	if not input then
+		return
+	end
+	local qualificationMethod = input.method
+	if not qualificationMethod then
+		return
+	end
+
+	local qualificationType
+	if input.page then
+		qualificationType = 'tournament'
+	elseif input.url then
+		qualificationType = 'external'
+	else
+		qualificationType = 'other'
+	end
+
+	local qualificationStructure = {
+		method = qualificationMethod,
+		type = qualificationType,
+	}
+
+	if qualificationType == 'tournament' then
+		local tournament = Tournament.getTournament(input.page)
+		if not tournament then
+			qualificationStructure.type = 'other'
+		else
+			qualificationStructure.tournament = tournament
+		end
+	elseif qualificationType == 'external' then
+		qualificationStructure.url = input.url
+	end
+
+	qualificationStructure.text = input.text
+
+	return qualificationStructure
 end
 
 --- Parse a single participant from input
@@ -48,9 +96,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 	table.insert(aliases, Opponent.toName(opponent))
 	return {
 		opponent = opponent,
-		qualifierText = input.qualifier,
-		qualifierPage = input.qualifierpage,
-		qualifierUrl = input.qualifierurl,
+		qualification = parseQualifier(input.qualification),
 		aliases = Array.flatMap(aliases, function(alias)
 			return TeamTemplate.queryHistoricalNames(alias)
 		end),

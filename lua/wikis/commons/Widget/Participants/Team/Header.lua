@@ -22,7 +22,7 @@ local Div = HtmlWidgets.Div
 local ParticipantsTeamHeader = Class.new(Widget)
 
 function ParticipantsTeamHeader:render()
-    local participant = self.props.participant
+	local participant = self.props.participant
 	local labelDiv = self:_renderLabel(participant)
 
 	local opponentDisplay = OpponentDisplay.BlockOpponent{
@@ -51,13 +51,16 @@ end
 ---@return Widget?
 function ParticipantsTeamHeader:_renderLabel(participant)
 	local labelText
-	if String.isNotEmpty(participant.qualifierPage) or String.isNotEmpty(participant.qualifierUrl) then
-		labelText = 'Qualifier'
-	elseif String.isNotEmpty(participant.qualifierText) then
-		labelText = 'Invited'
+	local qualificationData = participant.qualification
+	if not qualificationData then
+		return
 	end
 
-	if not labelText then
+	if qualificationData.method == 'qual' then
+		labelText = 'Qualifier'
+	elseif qualificationData.method == 'invite' then
+		labelText = 'Invited'
+	else
 		return
 	end
 
