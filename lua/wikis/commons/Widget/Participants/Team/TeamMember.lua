@@ -65,7 +65,7 @@ function ParticipantsTeamMember:render()
 				classes = {'team-member-trophies'},
 				children = trophies < 4 and Array.map(Array.range(1, trophies), function()
 						return trophyIcon
-					end) or 'x'.. trophies .. trophyIcon
+					end) or WidgetUtil.collect('x'.. trophies, trophyIcon)
 			} or nil,
 			roleRight and Div{
 				classes = {'team-member-role-right'},

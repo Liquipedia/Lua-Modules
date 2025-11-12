@@ -310,6 +310,7 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 
 	&-trophies {
 		display: flex;
+		align-items: center;
 		gap: 0.25rem;
 		color: var( --clr-secondary-44 );
 	}
