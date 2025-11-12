@@ -74,8 +74,8 @@ end)
 local ROLE_ORDER = Table.map({
 	'top',
 	'jungle',
-	'middle',
-	'bottom',
+	'mid',
+	'bot',
 	'support',
 }, function(idx, value)
 	return value, idx

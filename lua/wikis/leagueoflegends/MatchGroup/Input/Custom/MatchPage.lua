@@ -19,8 +19,8 @@ local CustomMatchGroupInputMatchPage = {}
 local ROLE_ORDER = Table.map({
 	'top',
 	'jungle',
-	'middle',
-	'bottom',
+	'mid',
+	'bot',
 	'support',
 }, function(idx, value)
 	return value, idx
@@ -40,6 +40,12 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 
 	local function sortPlayersOnRole(team)
 		if not team.players then return end
+		Array.forEach(team.players, function (player)
+			local playerRole = InGameRoles[player.role]
+			if playerRole then
+				player.role = playerRole.display:lower()
+			end
+		end)
 		team.players = Array.sortBy(team.players, function(player)
 			return ROLE_ORDER[player.role]
 		end)
@@ -77,10 +83,9 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	if not team then return end
 	if not team.players then return end
 	return Array.map(team.players, function(player)
-		local playerRole = InGameRoles[(player.role or '')] or {}
 		return {
 			player = player.id,
-			role = (playerRole.display or player.role):lower(),
+			role = player.role,
 			character = player.champion,
 			gold = player.gold,
 			kills = player.kills,

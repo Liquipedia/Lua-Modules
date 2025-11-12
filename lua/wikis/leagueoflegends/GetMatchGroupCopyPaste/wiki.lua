@@ -20,8 +20,8 @@ local INDENT = WikiCopyPaste.Indent
 local ROLES = {
 	'top',
 	'jungle',
-	'middle',
-	'bottom',
+	'mid',
+	'bot',
 	'support',
 }
 
