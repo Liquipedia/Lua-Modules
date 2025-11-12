@@ -112,9 +112,6 @@ end
 ---@return Widget
 function ParticipantsTeamCard:_renderContent(participant)
 	local makeRostersDisplay = function(players)
-		if not players or #players == 0 then
-			return
-		end
 		return Div{
 			classes = { 'team-participant-roster' },
 			children = Array.map(players, function(player, index)
