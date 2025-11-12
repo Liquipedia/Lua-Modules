@@ -347,3 +347,46 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 		}
 	}
 }
+
+.team-participant-notifications {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	margin: 0.5rem 0.5rem 0;
+}
+
+.participant-notification {
+	display: flex;
+	gap: 0.25rem;
+	padding: 0.25rem;
+	border-radius: 0.25rem;
+	font-size: 0.75rem;
+
+	.theme--light & {
+		background-color: var( --clr-on-surface-light-primary-4 );
+		color: var( --clr-secondary-25 );
+	}
+
+	.theme--dark & {
+		background-color: var( --clr-on-surface-dark-primary-4 );
+		color: var( --clr-secondary-90 );
+	}
+
+	&-highlighted {
+		.theme--light & {
+			background-color: var( --clr-semantic-gold-90 );
+			color: var( --clr-semantic-gold-20 );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-semantic-gold-30 );
+			color: var( --clr-semantic-gold-90 );
+		}
+
+		&-icon {
+			.theme--light & {
+				color: var( --clr-semantic-gold-30 );
+			}
+		}
+	}
+}

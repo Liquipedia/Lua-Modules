@@ -33,7 +33,12 @@ function ParticipantNotification:render()
 			highlighted and 'participant-notification-highlighted' or nil,
 		},
 		children = {
-			Icon{iconName = 'info'}, -- TODO use/make icon that exists
+			Div{
+				classes = {'participant-notification-icon'},
+				children = {
+					Icon{iconName = 'notification'},
+				}
+			},
 			Div{
 				classes = {'participant-notification-text'},
 				children = {text}
