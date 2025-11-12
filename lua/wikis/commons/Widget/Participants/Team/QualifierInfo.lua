@@ -65,6 +65,10 @@ function ParticipantsTeamQualifierInfo:render()
 	local text = getDisplayText()
 	local link = getLinkPage()
 
+	if not text then
+		return
+	end
+
 	return Div{
 		classes = {'team-participant-card-qualifier', 'team-participant-card-qualifier--' .. location},
 		children = WidgetUtil.collect(
