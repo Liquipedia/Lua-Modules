@@ -30,6 +30,7 @@ local staffRoles = {
 	['director'] = {category = 'Production Staff', display = 'Director'},
 	['interpreter'] = {category = 'Production Staff', display = 'Interpreter'},
 	['producer'] = {category = 'Production Staff', display = 'Producer'},
+	['replay operator'] = {category = 'Production Staff', display = 'Replay Operator'},
 	['stats producer'] = {category = 'Production Staff', display = 'Stats Producer'},
 	['translator'] = {category = 'Production Staff', display = 'Translator'},
 	['streamer'] = {category = 'Streamers', display = 'Streamer'},
@@ -37,7 +38,6 @@ local staffRoles = {
 	['organizer'] = {category = 'Tournament Organizer', display = 'Tournament Organizer'},
 	['staff'] = {category = 'Staff', display = 'Staff'},
 	['referee'] = {category = 'Referees', display = 'Referee'},
-	['replay operator'] = {category = 'Production Staff', display = 'Replay Operator'},
 }
 
 staffRoles['commentator'] = staffRoles['caster']
