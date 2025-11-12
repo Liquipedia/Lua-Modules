@@ -20,7 +20,7 @@ local RoleUtil = {}
 ---@class RoleBaseData
 ---@field display string
 ---@field category string
-
+---@field sortOrder integer?
 
 ---@class RoleData: RoleBaseData
 ---@field key string?
