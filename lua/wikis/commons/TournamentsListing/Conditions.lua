@@ -205,7 +205,7 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 		table.insert(allowedPlacements, queryResult.placement)
 	end
 
-	conditions:add(Condition.Util.anyOf(ColumnName('placement'), Array.extractValues(allowedPlacements))
+	conditions:add(Condition.Util.anyOf(ColumnName('placement'), Array.extractValues(allowedPlacements)))
 
 	return conditions:toString()
 end
