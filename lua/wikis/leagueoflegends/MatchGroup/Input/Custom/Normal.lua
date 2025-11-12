@@ -57,6 +57,7 @@ function CustomMatchGroupInputNormal.getParticipants(map, opponentIndex)
 		end
 		local playerRole = InGameRoles[playerData.role]
 		assert(playerRole, 'Invalid |role=' .. playerData.role)
+		playerData.role = playerRole.display:lower()
 		return playerData
 	end))
 end
