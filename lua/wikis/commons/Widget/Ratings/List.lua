@@ -106,7 +106,7 @@ function RatingsList:render()
 				attributes = { ['data-ranking-table-cell'] = 'team' },
 				children = OpponentDisplay.BlockOpponent { opponent = team.opponent, teamStyle = 'hybrid' }
 			},
-			HtmlWidgets.Td { atributes = { ['data-ranking-table-cell'] = 'rating' }, children = MathUtil.round(team.rating) },
+			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = MathUtil.round(team.rating) },
 			HtmlWidgets.Td {
 				attributes = { ['data-ranking-table-cell'] = 'region' },
 				children = Flags.Icon { flag = team.region } .. Flags.CountryName { flag = team.region }
