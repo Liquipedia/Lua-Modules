@@ -15,6 +15,7 @@ local inGameRoles = {
 }
 
 inGameRoles['jgl'] = inGameRoles.jungle
+inGameRoles['middle'] = inGameRoles.mid
 inGameRoles['solomiddle'] = inGameRoles.mid
 inGameRoles['carry'] = inGameRoles.bottom
 inGameRoles['adc'] = inGameRoles.bottom
