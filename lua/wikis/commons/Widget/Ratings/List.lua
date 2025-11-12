@@ -247,11 +247,4 @@ function RatingsList:render()
 	}
 end
 
----@param error Error
----@return string
-function RatingsList:getDerivedStateFromError(error)
-	error.message = 'Could not load the selected week.'
-	return self._base:getDerivedStateFromError(error)
-end
-
 return RatingsList
