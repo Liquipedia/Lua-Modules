@@ -91,8 +91,6 @@ function ParticipantsTeamCard:_renderContent(participant)
 	return Div{
 		classes = { 'team-participant-card-collapsible-content' },
 		children = WidgetUtil.collect(
-			participant.opponent.name,
-			-- TODO: Qualifier box here
 			Div{
 				classes = { 'team-participant-roster' },
 				children = Array.map(participant.opponent.players, function(player, index)
