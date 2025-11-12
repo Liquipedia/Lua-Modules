@@ -166,6 +166,7 @@ function ParticipantsTeamCard:_renderContent(participant)
 				variant = 'generic',
 				storeValue = false,
 				size = 'small',
+				css = {margin = '0.25rem 0.5rem'},
 				tabs = Array.map(tabs, function(tab)
 					return {
 						label = tab.title,

@@ -28,6 +28,7 @@ local Div = HtmlWidgets.Div
 ---@field classes string[]?
 ---@field size 'small'|'medium'
 ---@field storeValue boolean
+---@field css table?
 
 ---@class ContentSwitch: Widget
 ---@operator call(ContentSwitchParameters): ContentSwitch
@@ -90,6 +91,7 @@ function ContentSwitch:render()
 		children = {
 			Div{
 				classes = {'switch-pill-container'},
+				css = self.props.css,
 				children = {
 					Div{
 						classes = switchPillClasses,
