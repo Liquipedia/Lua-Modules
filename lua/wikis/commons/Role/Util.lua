@@ -30,7 +30,7 @@ local RoleUtil = {}
 ---@field icon string?
 
 ---@enum RoleTypes
-local ROLE_TYPE = {
+RoleUtil.ROLE_TYPE = {
 	CONTRACT = 'contract',
 	STAFF = 'staff',
 	INGAME = 'ingame',
@@ -60,13 +60,13 @@ function RoleUtil._createRoleData(roleKey)
 	---@return RoleTypes
 	local roleType = function()
 		if Roles.ContractRoles[key] then
-			return ROLE_TYPE.CONTRACT
+			return RoleUtil.ROLE_TYPE.CONTRACT
 		elseif Roles.StaffRoles[key] then
-			return ROLE_TYPE.STAFF
+			return RoleUtil.ROLE_TYPE.STAFF
 		elseif Roles.InGameRoles[key] then
-			return ROLE_TYPE.INGAME
+			return RoleUtil.ROLE_TYPE.INGAME
 		else
-			return ROLE_TYPE.UNKNOWN
+			return RoleUtil.ROLE_TYPE.UNKNOWN
 		end
 	end
 
