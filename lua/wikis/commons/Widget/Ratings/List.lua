@@ -13,8 +13,8 @@ local Date = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
 local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
-local Operator = Lua.import('Module:Operator')
 local MathUtil = Lua.import('Module:MathUtil')
+local Operator = Lua.import('Module:Operator')
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
