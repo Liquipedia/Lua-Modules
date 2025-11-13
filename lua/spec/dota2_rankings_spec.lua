@@ -2,7 +2,7 @@
 insulate('Rankings', function()
 	it('dota2', function()
 		local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
-		local TestAsset = require('test_assets')
+		local TestAsset = require('test_assets/dota2_rankings_example')
 		TeamTemplateMock.setUp()
 		local LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function() return {} end)
 		local Dota2Extension = stub(mw.ext.Dota2Ranking, 'get', function() return TestAsset end)
