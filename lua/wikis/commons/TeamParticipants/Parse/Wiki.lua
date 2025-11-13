@@ -18,7 +18,7 @@ local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
----qualifierText: string?, qualifierPage: string?, qualifierUrl: string?}
+---qualifierText: string?, qualifierPage: string?, qualifierUrl: string?, shouldImportFromDb: boolean}
 
 ---@param args table
 ---@return {participants: TeamParticipant[]}
@@ -64,6 +64,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 				highlighted = Logic.readBool(note.highlighted),
 			}
 		end),
+		shouldImportFromDb = Logic.readBool(input.import),
 	}
 end
 

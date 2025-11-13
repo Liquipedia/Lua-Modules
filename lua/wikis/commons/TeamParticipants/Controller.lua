@@ -34,47 +34,53 @@ function TeamParticipantsController.fromTemplate(frame)
 	local parsedArgs = Json.parseStringifiedArgs(args)
 	local parsedData = TeamParticipantsWikiParser.parseWikiInput(parsedArgs)
 
-	if Logic.readBool(args.import) then
-		Array.forEach(parsedData.participants, function (participant)
-			local team = TeamService.getTeamByTemplate(participant.opponent.template)
-			if not team or not team.members then
-				return
-			end
-			local activeMembers = Array.filter(team.members, function (member)
-				return member.status == 'active'
-			end)
-			local membersToImport = Array.filter(activeMembers, function (member)
-				if member.type == 'player' then
-					return true
-				end
-				return Array.contains(AUTO_IMPORTED_STAFF_ROLES, member.role:lower())
-			end)
+	Array.forEach(parsedData.participants, function (participant)
+		if not Logic.readBool(participant.shouldImportFromDb) then
+			return
+		end
 
-			local playersFromDatabase = Array.map(membersToImport, function (member)
-				return TeamParticipantsWikiParser.parsePlayer{
-					member.displayName,
-					link = member.pageName,
-					flag = member.flag,
-					faction = member.faction,
-					role = member.role,
-				}
-			end)
+		local team = TeamService.getTeamByTemplate(participant.opponent.template)
+		if not team or not team.members then
+			return
+		end
 
-			local manualPlayers = participant.opponent.players or {}
-			for _, player in ipairs(playersFromDatabase) do
-				local indexOfManualPlayer = Array.indexOf(manualPlayers, function (p)
-					return p.pageName == player.pageName
-				end)
-
-				if not indexOfManualPlayer then
-					table.insert(manualPlayers, player)
-				else
-					local newPlayer = Table.deepMerge(player, manualPlayers[indexOfManualPlayer])
-					manualPlayers[indexOfManualPlayer] = newPlayer
-				end
-			end
+		local activeMembers = Array.filter(team.members, function (member)
+			return member.status == 'active'
 		end)
-	end
+		local membersToImport = Array.filter(activeMembers, function (member)
+			if member.type == 'player' then
+				return true
+			end
+			return Array.find(AUTO_IMPORTED_STAFF_ROLES, function (role)
+				return role == member.role:lower()
+			end) ~= nil
+		end)
+
+		local playersFromDatabase = Array.map(membersToImport, function (member)
+			return TeamParticipantsWikiParser.parsePlayer{
+				member.displayName,
+				link = member.pageName,
+				flag = member.nationality,
+				faction = member.faction,
+				role = member.role,
+				type = member.type,
+			}
+		end)
+
+		local manualPlayers = participant.opponent.players or {}
+		for _, player in ipairs(playersFromDatabase) do
+			local indexOfManualPlayer = Array.indexOf(manualPlayers, function (p)
+				return p.pageName == player.pageName
+			end)
+
+			if indexOfManualPlayer == 0 then
+				table.insert(manualPlayers, player)
+			else
+				local newPlayer = Table.deepMerge(player, manualPlayers[indexOfManualPlayer])
+				manualPlayers[indexOfManualPlayer] = newPlayer
+			end
+		end
+	end)
 
 	local shouldStore =
 		Logic.readBoolOrNil(args.store) ~= false and
