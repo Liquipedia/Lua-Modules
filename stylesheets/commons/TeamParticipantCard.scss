@@ -7,7 +7,7 @@ $participant-icon-size-compact: 44px;
 $participant-icon-size-mobile: 33px;
 $participant-icon-size-small: 18px;
 
-$compact-selector: '[data-switch-group-container="team-cards-compact"]';
+$compact-selector: '[data-switch-group="team-cards-compact"]';
 
 @mixin set-participant-icon-size($wrapper-size, $icon-size) {
 	width: $wrapper-size;
@@ -24,13 +24,11 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 	}
 }
 
-#{ $compact-selector } {
-	.switch-toggle-container {
-		display: none;
+.switch-toggle-container:has(#{ $compact-selector }) {
+	display: none;
 
-		@media ( min-width: 768px ) {
-			display: flex;
-		}
+	@media ( min-width: 768px ) {
+		display: flex;
 	}
 }
 
@@ -213,50 +211,52 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 		&-qualifier--content {
 			display: none;
 		}
+	}
+}
 
-		#{ $compact-selector }:has(.switch-toggle-active) & {
-			&-square-icon {
-				.team-template-image-icon {
-					@include set-participant-icon-size(
-						$participant-icon-wrapper-size-compact,
-						$participant-icon-size-compact
-					);
-				}
+.team-participant-wrapper:has( .switch-toggle-active#{ $compact-selector } ) {
+	.team-participant-card {
+		&-square-icon {
+			.team-template-image-icon {
+				@include set-participant-icon-size(
+					$participant-icon-wrapper-size-compact,
+					$participant-icon-size-compact
+				);
+			}
+		}
+
+		&-header {
+			position: static;
+			flex-direction: row;
+			width: auto;
+
+			&__main {
+				display: contents;
 			}
 
-			&-header {
+			.general-collapsible-default-toggle {
 				position: static;
+				top: initial;
+				right: initial;
+				transform: none;
+			}
+
+			&-opponent {
 				flex-direction: row;
-				width: auto;
+				gap: 0.5rem;
 
-				&__main {
-					display: contents;
-				}
-
-				.general-collapsible-default-toggle {
-					position: static;
-					top: initial;
-					right: initial;
-					transform: none;
-				}
-
-				&-opponent {
-					flex-direction: row;
-					gap: 0.5rem;
-
-					.team-template-text {
-						font-size: initial;
-					}
+				.team-template-text {
+					font-size: initial;
 				}
 			}
+		}
 
-			&-qualifier--header {
-				display: none;
-			}
+		&-qualifier--header {
+			display: none;
+		}
 
-			&-qualifier--content {
-				display: flex;
-			}
+		&-qualifier--content {
+			display: flex;
 		}
 	}
 }

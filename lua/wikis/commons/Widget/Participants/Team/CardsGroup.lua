@@ -30,36 +30,38 @@ function ParticipantsTeamCardsGroup:render()
 
 	return Div{
 		classes = { 'team-participant-wrapper' },
-		children = Div{
-			classes = { 'team-participant-switches' },
-			children = {
-				Switch{
-					label = 'Show rosters',
-					switchGroup = 'team-cards-show-rosters',
-					defaultActive = false,
-				},
-				AnalyticsWidget{
-					analyticsName = 'ParticipantsCompactSwitch',
-					analyticsProperties = {
-						['track-value-as'] = 'participants compact',
+		children = {
+			Div{
+				classes = { 'team-participant-switches' },
+				children = {
+					Switch{
+						label = 'Show rosters',
+						switchGroup = 'team-cards-show-rosters',
+						defaultActive = false,
 					},
-					children = Switch{
-						label = 'Compact view',
-						switchGroup = 'team-cards-compact',
-						defaultActive = true,
-					},
-				}
-			}
-		},
-		AnalyticsWidget{
-			analyticsName = 'Team participants card',
-			children = Div{
-				classes = { 'team-participant-cards' },
-				children = Array.map(participants, function(participant)
-					return ParticipantsTeamCard{
-						participant = participant,
+					AnalyticsWidget{
+						analyticsName = 'ParticipantsCompactSwitch',
+						analyticsProperties = {
+							['track-value-as'] = 'participants compact',
+						},
+						children = Switch{
+							label = 'Compact view',
+							switchGroup = 'team-cards-compact',
+							defaultActive = true,
+						},
 					}
-				end),
+				}
+			},
+			AnalyticsWidget{
+				analyticsName = 'Team participants card',
+				children = Div{
+					classes = { 'team-participant-cards' },
+					children = Array.map(participants, function(participant)
+						return ParticipantsTeamCard{
+							participant = participant,
+						}
+					end),
+				}
 			}
 		}
 	}
