@@ -85,6 +85,7 @@ function RoleUtil._createRoleData(roleKey)
 		category = roleData.category,
 		key = key,
 		type = roleType(),
+		sortOrder = roleData.sortOrder,
 		icon = POSITION_ICON_DATA and POSITION_ICON_DATA[key] or nil,
 	}
 end
