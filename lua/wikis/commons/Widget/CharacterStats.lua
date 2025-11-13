@@ -93,7 +93,7 @@ function CharacterStatsWidget:_displayUnbannedCharacters()
 		Operator.property('name')
 	)
 
-	return self:_buildUnchosenCharactersTable('Unpicked', bannedCharacters)
+	return self:_buildUnchosenCharactersTable('Unbanned', bannedCharacters)
 end
 
 ---@private
