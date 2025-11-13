@@ -7,7 +7,9 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
@@ -17,6 +19,8 @@ local Cell = Widgets.Cell
 
 ---@class DeadlockLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
+---@class DeadlockLeagueInfoboxWidgetInjector: WidgetInjector
+---@field caller DeadlockLeagueInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -35,12 +39,29 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
-		return {
+		Array.appendWith(widgets,
 			Cell{name = 'Number of teams', children = {args.team_number}},
 			Cell{name = 'Number of players', children = {args.player_number}},
-		}
+			Cell{name = 'Version', children = {self.caller:_createPatchCell(args)}}
+		)
 	end
+
 	return widgets
+end
+
+---@param args table
+---@return string?
+function CustomLeague:_createPatchCell(args)
+	if String.isEmpty(args.patch) then
+		return nil
+	end
+
+	local displayText = '[[Patch_' .. args.patch .. '|' .. args.patch .. ']]'
+
+	if args.epatch then
+		displayText = displayText .. ' &ndash; [[Patch_' .. args.epatch .. '|' .. args.epatch .. ']]'
+	end
+	return displayText
 end
 
 return CustomLeague
