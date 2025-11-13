@@ -52,7 +52,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param args table
----@return string?
+---@return Widget[]?
 function CustomLeague:_createPatchCell(args)
 	if String.isEmpty(args.patch) then
 		return
