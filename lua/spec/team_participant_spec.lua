@@ -29,7 +29,7 @@ insulate('Team Participant', function()
 				'bds',
 				qualifyingPage = 'TripleVCT/2025/Game Changers/North America/Stage 2',
 				players = {
-					{'EletricBoy'},
+					{'ElectricalBoy'},
 					{'hjpalpha'},
 					{'Eetu'},
 					{'SyntacticSugar'},

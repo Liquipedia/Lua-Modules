@@ -47,7 +47,7 @@ function ParticipantsTeamHeader:render()
 end
 
 ---@private
----@param participant TeamParticipantsEntity
+---@param participant TeamParticipant
 ---@return Widget?
 function ParticipantsTeamHeader:_renderLabel(participant)
 	local labelText

@@ -5,7 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----@type table<string, PersonRoleData>
+---@type table<string, RoleBaseData>
 local inGameRoles = {
 	['top'] = {category = 'Top Lane players', display = 'Top', doNotShowInHistory = true},
 	['support'] = {category = 'Support players', display = 'Support', doNotShowInHistory = true},

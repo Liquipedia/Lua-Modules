@@ -7,6 +7,7 @@
 return {
 	-- Usage: Team information
 	team_tbd = 'far fa-users',
+	notification = 'fas fa-info-circle',
 
 	-- Usage: Different ways to see data
 	schedule = 'far fa-table',

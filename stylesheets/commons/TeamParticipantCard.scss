@@ -1,9 +1,11 @@
 $participant-icon-wrapper-size-expanded: 56px;
 $participant-icon-wrapper-size-compact: 48px;
 $participant-icon-wrapper-size-mobile: 36px;
+$participant-icon-wrapper-size-small: 20px;
 $participant-icon-size-expanded: 52px;
 $participant-icon-size-compact: 44px;
 $participant-icon-size-mobile: 33px;
+$participant-icon-size-small: 18px;
 
 $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 
@@ -132,6 +134,32 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 		}
 	}
 
+	&-qualifier {
+		display: flex;
+		gap: 0.25rem;
+		align-items: center;
+		border-radius: 0.25rem;
+		padding: 0.25rem 0.5rem;
+		margin: 0.25rem 0.5rem;
+		min-height: 2rem;
+		color: var( --clr-secondary-25 );
+
+		.theme--light & {
+			background-color: var( --clr-on-surface-light-primary-4 );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+		}
+
+		&-details {
+			display: flex;
+			flex-direction: column;
+			font-weight: bold;
+			font-size: 12px;
+		}
+	}
+
 	&-qualifier--header {
 		display: none;
 	}
@@ -164,30 +192,6 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 				.team-template-text {
 					font-size: 1.125rem;
 				}
-			}
-		}
-
-		&-qualifier {
-			display: flex;
-			gap: 0.25rem;
-			align-items: center;
-			border-radius: 0.25rem;
-			padding: 0.25rem 0.5rem;
-			margin: 0.25rem 0.5rem;
-
-			.theme--light & {
-				background-color: var( --clr-on-surface-light-primary-4 );
-			}
-
-			.theme--dark & {
-				background-color: var( --clr-on-surface-dark-primary-4 );
-			}
-
-			&-details {
-				display: flex;
-				flex-direction: column;
-				font-weight: bold;
-				font-size: 12px;
 			}
 		}
 
@@ -241,6 +245,148 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 
 			&-qualifier--content {
 				display: flex;
+			}
+		}
+	}
+}
+
+.team-participant-square-icon {
+	.team-template-image-icon {
+		@include set-participant-icon-size(
+			$participant-icon-wrapper-size-compact,
+			$participant-icon-size-compact
+		);
+	}
+}
+
+.team-member {
+	display: flex;
+	gap: 0.25rem;
+	align-items: center;
+	padding: 0.5rem 0.75rem;
+
+	&.odd {
+		.theme--light & {
+			background-color: var( --clr-on-surface-light-primary-4 );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+		}
+	}
+
+	&-role-left {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 20px;
+		height: 20px;
+		margin-right: 0.25rem;
+
+		img {
+			width: auto;
+			height: auto;
+		}
+
+		& > *:not( span ):not( img ) {
+			.theme--light & {
+				background-color: var( --clr-on-surface-light-primary-4 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+			}
+		}
+	}
+
+	&-name {
+		flex-grow: 1;
+	}
+
+	&-trophies {
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+		color: var( --clr-secondary-44 );
+
+		&-text {
+			font-size: 0.6875rem;
+			font-weight: bold;
+		}
+	}
+
+	&-role-right {
+		padding: 0.125rem 0.5rem;
+		border-radius: 0.25rem;
+		font-weight: bold;
+		font-size: 0.6875rem;
+
+		.theme--light & {
+			background-color: var( --clr-on-surface-light-primary-4 );
+			color: var( --clr-secondary-25 );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+			color: var( --clr-secondary-90 );
+		}
+	}
+
+	&-team {
+		.team-participant-square-icon {
+			.team-template-image-icon {
+				& > a {
+					display: flex;
+					justify-content: center;
+				}
+
+				@include set-participant-icon-size(
+					$participant-icon-wrapper-size-small,
+					$participant-icon-size-small
+				);
+			}
+		}
+	}
+}
+
+.team-participant-notifications {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	margin: 0.5rem 0.5rem 0;
+}
+
+.participant-notification {
+	display: flex;
+	gap: 0.25rem;
+	padding: 0.25rem;
+	border-radius: 0.25rem;
+	font-size: 0.75rem;
+
+	.theme--light & {
+		background-color: var( --clr-on-surface-light-primary-4 );
+		color: var( --clr-secondary-25 );
+	}
+
+	.theme--dark & {
+		background-color: var( --clr-on-surface-dark-primary-4 );
+		color: var( --clr-secondary-90 );
+	}
+
+	&-highlighted {
+		.theme--light & {
+			background-color: var( --clr-semantic-gold-90 );
+			color: var( --clr-semantic-gold-20 );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-semantic-gold-30 );
+			color: var( --clr-semantic-gold-90 );
+		}
+
+		&-icon {
+			.theme--light & {
+				color: var( --clr-semantic-gold-30 );
 			}
 		}
 	}
