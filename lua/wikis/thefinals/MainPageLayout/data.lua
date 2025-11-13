@@ -77,8 +77,8 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'The Finals full default lightmode.png',
-		darkmode = 'The Finals full default darkmode.png',
+		lightmode = 'The Finals full lightmode.svg',
+		darkmode = 'The Finals full default darkmode.svg',
 	},
 	metadesc = 'The Finals esports wiki covering everything from players, teams and transfers, ' ..
 		'to tournaments and results, modes, maps and weapons.',
