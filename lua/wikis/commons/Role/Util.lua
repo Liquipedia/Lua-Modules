@@ -22,9 +22,7 @@ local RoleUtil = {}
 ---@field category string
 
 
----@class RoleData
----@field category string
----@field display string
+---@class RoleData: RoleBaseData
 ---@field key string?
 ---@field type RoleTypes
 ---@field icon string?
