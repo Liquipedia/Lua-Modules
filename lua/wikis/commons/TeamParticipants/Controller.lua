@@ -35,6 +35,12 @@ function TeamParticipantsController.fromTemplate(frame)
 	local parsedData = TeamParticipantsWikiParser.parseWikiInput(parsedArgs)
 
 	Array.forEach(parsedData.participants, function (participant)
+		local players = participant.opponent.players
+		-- Bad structure, this should always exist
+		if not players then
+			return
+		end
+
 		if not Logic.readBool(participant.shouldImportFromDb) then
 			return
 		end
@@ -65,19 +71,18 @@ function TeamParticipantsController.fromTemplate(frame)
 			}
 		end)
 
-		local manualPlayers = participant.opponent.players or {}
-		for _, player in ipairs(playersFromDatabase) do
-			local indexOfManualPlayer = Array.indexOf(manualPlayers, function (p)
+		Array.forEach(playersFromDatabase, function (player)
+			local indexOfManualPlayer = Array.indexOf(players, function (p)
 				return p.pageName == player.pageName
 			end)
 
 			if indexOfManualPlayer == 0 then
-				table.insert(manualPlayers, player)
+				table.insert(players, player)
 			else
-				local newPlayer = Table.deepMerge(player, manualPlayers[indexOfManualPlayer])
-				manualPlayers[indexOfManualPlayer] = newPlayer
+				local newPlayer = Table.deepMerge(player, players[indexOfManualPlayer])
+				players[indexOfManualPlayer] = newPlayer
 			end
-		end
+		end)
 	end)
 
 	local shouldStore =
