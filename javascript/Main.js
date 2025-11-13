@@ -24,8 +24,7 @@ const jsModules = [
 	'Selectall',
 	'Slider',
 	'SwitchButtons',
-	'Tabs',
-	'TeamParticipantsCards'
+	'Tabs'
 ];
 
 // Dynamically load JavaScript modules

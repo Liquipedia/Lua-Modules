@@ -14,6 +14,7 @@ liquipedia.collapse = {
 		liquipedia.collapse.setupToggleGroups();
 		liquipedia.collapse.setupDropdownBox();
 		liquipedia.collapse.setupCollapsibleNavFrameButtons();
+		liquipedia.collapse.setupSwitchToggleCollapsibles();
 	},
 	makeIcon: function( isShow ) {
 		return isShow ? '<span class="far fa-eye"></span>' : '<span class="far fa-eye-slash"></span>';
@@ -185,6 +186,56 @@ liquipedia.collapse = {
 					}
 				} );
 			};
+		} );
+	},
+
+	setupSwitchToggleCollapsibles: function() {
+		// Find all elements with switch toggle configuration
+		const switchToggleElements = document.querySelectorAll( '[data-switch-group]' );
+		if ( switchToggleElements.length === 0 ) {
+			return;
+		}
+
+		// Process each switch toggle element
+		switchToggleElements.forEach( ( element ) => {
+			const switchGroupName = element.getAttribute( 'data-switch-group' );
+			const collapsibleSelector = element.getAttribute( 'data-collapsible-selector' ) || '.collapsible';
+			const collapsibleClass = element.getAttribute( 'data-collapsible-class' ) || 'collapsed';
+
+			// Listen for changes to the specific switch button with the given group name
+			document.addEventListener( 'switchButtonChanged', ( e ) => {
+				if ( e.detail.data.name === switchGroupName ) {
+					liquipedia.collapse.updateCollapsibleElements(
+						collapsibleSelector,
+						collapsibleClass,
+						e.detail.data.value
+					);
+				}
+			} );
+
+			// Initialize the state of elements based on the current switch value
+			if ( window.liquipedia && window.liquipedia.switchButtons ) {
+				liquipedia.switchButtons.getSwitchGroup( switchGroupName ).then( ( switchGroup ) => {
+					if ( switchGroup ) {
+						liquipedia.collapse.updateCollapsibleElements(
+							collapsibleSelector,
+							collapsibleClass,
+							switchGroup.value
+						);
+					}
+				} );
+			}
+		} );
+	},
+
+	updateCollapsibleElements: function( selector, className, show ) {
+		const elements = document.querySelectorAll( selector );
+		elements.forEach( ( element ) => {
+			if ( show ) {
+				element.classList.remove( className );
+			} else {
+				element.classList.add( className );
+			}
 		} );
 	}
 };
