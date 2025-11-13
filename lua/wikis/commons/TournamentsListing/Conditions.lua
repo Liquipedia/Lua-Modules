@@ -161,6 +161,7 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 			ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tournamentData.liquipediatier),
 			ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, tournamentData.liquipediatiertype),
 			ConditionNode(ColumnName(config.useParent and 'parent' or 'pagename'), Comparator.eq, tournamentData.pagename),
+			ConditionNode(ColumnName('placement'), Comparator.neq, '')
 		}
 
 	if config.showQualifierColumnOverWinnerRunnerup then
@@ -168,11 +169,38 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 		return conditions:toString()
 	end
 
-	local placeConditions = ConditionTree(BooleanOperator.any)
-	for _, allowedPlacement in pairs(config.allowedPlacements) do
-		placeConditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, allowedPlacement)}
+	local allowedPlacements = Table.copy(config.allowedPlacements)
+	if config.dynamicPlacements then
+		local queryResult = mw.ext.LiquipediaDB.lpdb('placement', {
+			conditions = conditions:toString(),
+			query = 'placement',
+			order = 'placement asc',
+			groupby = 'placement asc',
+			limit = 1,
+		})
+
+		-- A placement 1-... will be sorted before 10-..., so this will be the best placement
+		local firstPlacement = queryResult[1]
+		table.insert(allowedPlacements, firstPlacement.placement)
+
+		local parts = Array.parseCommaSeparatedString(firstPlacement.placement, '-')
+		local runnerupPlacementStart = tonumber(parts[2] or parts[1]) + 1
+		local placeConditions = ConditionTree(BooleanOperator.all):add(conditions)
+		placeConditions:add(ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName('placement'), Comparator.gt, runnerupPlacementStart .. '-'),
+			ConditionNode(ColumnName('placement'), Comparator.eq, runnerupPlacementStart),
+		})
+		queryResult = mw.ext.LiquipediaDB.lpdb('placement', {
+			conditions = placeConditions:toString(),
+			query = 'placement',
+			order = 'placement asc',
+			groupby = 'placement asc',
+			limit = 1,
+		})[1]
+		table.insert(allowedPlacements, queryResult.placement)
 	end
-	conditions:add{placeConditions}
+
+	conditions:add(Condition.Util.anyOf(ColumnName('placement'), Array.extractValues(allowedPlacements)))
 
 	return conditions:toString()
 end
