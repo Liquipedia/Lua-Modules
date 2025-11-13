@@ -1,7 +1,14 @@
-( function() {
-	const GROUP_NAME = 'team-cards-show-rosters';
+/*******************************************************************************
+ * Description: This script manages the team participants cards, specifically
+ *              controlling whether rosters are shown or hidden based on user
+ *              preferences.
+ ******************************************************************************/
 
-	const updateCards = ( showRosters ) => {
+// Constants
+const GROUP_NAME = 'team-cards-show-rosters';
+
+liquipedia.teamParticipantsCards = {
+	updateCards: function( showRosters ) {
 		const teamCards = document.querySelectorAll( '.team-participant-card' );
 		teamCards.forEach( ( card ) => {
 			if ( showRosters ) {
@@ -10,21 +17,23 @@
 				card.classList.add( 'collapsed' );
 			}
 		} );
-	};
+	},
 
-	// Handle switch changes
-	document.addEventListener( 'switchButtonChanged', ( e ) => {
-		if ( e.detail.data.name === GROUP_NAME ) {
-			updateCards( e.detail.data.value );
-		}
-	} );
+	init: function() {
+		// Listen for changes to the specific switch button with team-cards-show-rosters group
+		document.addEventListener( 'switchButtonChanged', ( e ) => {
+			if ( e.detail.data.name === GROUP_NAME ) {
+				liquipedia.teamParticipantsCards.updateCards( e.detail.data.value );
+			}
+		} );
 
-	// Handle initial state on page load
-	if ( window.liquipedia && window.liquipedia.switchButtons ) {
+		// Initialize cards state based on current switch value
 		liquipedia.switchButtons.getSwitchGroup( GROUP_NAME ).then( ( switchGroup ) => {
 			if ( switchGroup ) {
-				updateCards( switchGroup.value );
+				liquipedia.teamParticipantsCards.updateCards( switchGroup.value );
 			}
 		} );
 	}
-}() );
+};
+
+liquipedia.core.modules.push( 'teamParticipantsCards' );
