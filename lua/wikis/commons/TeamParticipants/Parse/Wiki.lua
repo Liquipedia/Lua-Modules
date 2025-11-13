@@ -64,6 +64,7 @@ local function parseQualifier(input)
 	local qualificationStructure = {
 		method = qualificationMethod,
 		type = qualificationType,
+		text = input.text
 	}
 
 	if qualificationType == 'tournament' then
@@ -77,7 +78,9 @@ local function parseQualifier(input)
 		qualificationStructure.url = input.url
 	end
 
-	qualificationStructure.text = input.text
+	if qualificationType == 'external' and not qualificationStructure.text then
+		error('External qualifier must have text')
+	end
 
 	return qualificationStructure
 end
