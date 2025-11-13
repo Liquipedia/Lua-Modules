@@ -73,7 +73,7 @@ function RoleUtil._createRoleData(roleKey)
 			return RoleUtil.ROLE_TYPE.CONTRACT
 		elseif Roles.StaffRoles[key] then
 			return RoleUtil.ROLE_TYPE.STAFF
-		elseif Roles.InGameRoles[key] then
+		elseif Roles.InGameRoles and Roles.InGameRoles[key] then
 			return RoleUtil.ROLE_TYPE.INGAME
 		else
 			return RoleUtil.ROLE_TYPE.UNKNOWN
