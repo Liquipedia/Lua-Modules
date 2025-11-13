@@ -70,20 +70,24 @@ end
 ---@param input table
 ---@return standardPlayer[]
 function TeamParticipantsWikiParser.parsePlayers(input)
-	return Array.map(input.players or {}, function(playerInput)
-		return {
-			displayName = playerInput[1],
-			flag = playerInput.flag,
-			pageName = playerInput.link,
-			team = playerInput.team,
-			faction = playerInput.faction,
-			extradata = {
-				roles = RoleUtil.readRoleArgs(playerInput.role),
-				trophies = tonumber(playerInput.trophies),
-				type = playerInput.type or 'player',
-			},
-		}
-	end)
+	return Array.map(input.players or {}, TeamParticipantsWikiParser.parsePlayer)
+end
+
+---@param playerInput table
+---@return standardPlayer
+function TeamParticipantsWikiParser.parsePlayer(playerInput)
+	return {
+		displayName = playerInput[1],
+		flag = playerInput.flag,
+		pageName = playerInput.link,
+		team = playerInput.team,
+		faction = playerInput.faction,
+		extradata = {
+			roles = RoleUtil.readRoleArgs(playerInput.role),
+			trophies = tonumber(playerInput.trophies),
+			type = playerInput.type or 'player',
+		},
+	}
 end
 
 return TeamParticipantsWikiParser
