@@ -18,8 +18,8 @@ insulate('Team Participant', function()
 					{'meL'},
 					{'Noia'},
 					{'sarah'},
-					{'effys', role = 'Head Coach'},
-					{'Veer', role = 'Coach'},
+					{'effys', role = 'Head Coach', type = 'staff'},
+					{'Veer', role = 'Coach', type = 'staff'},
 				},
 				notes = {
 					{'SOME TEXT HERE'},
@@ -34,7 +34,7 @@ insulate('Team Participant', function()
 					{'Eetu'},
 					{'SyntacticSugar'},
 					{'SyntacticSalt'},
-					{'Rathoz', role = 'Coach'},
+					{'Rathoz', role = 'Coach', type = 'staff'},
 				},
 				notes = {
 					{'Best Team in the World!', highlighted = true},

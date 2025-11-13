@@ -9,7 +9,10 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 local RoleUtil = Lua.import('Module:Role/Util')
 
 local Widget = Lua.import('Module:Widget')
@@ -21,6 +24,31 @@ local TeamHeader = Lua.import('Module:Widget/Participants/Team/Header')
 local ParticipantsTeamMember = Lua.import('Module:Widget/Participants/Team/TeamMember')
 local ParticipantNotification = Lua.import('Module:Widget/Participants/Team/ParticipantNotification')
 local TeamQualifierInfo = Lua.import('Module:Widget/Participants/Team/QualifierInfo')
+local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
+
+---@enum ParticipantsTeamCardTabs
+local TAB_ENUM = {
+	MAIN = 'main',
+	SUB = 'sub',
+	STAFF = 'staff',
+	FORMER = 'former',
+}
+
+---@type table<ParticipantsTeamCardTabs, {title: string, order: integer}>
+local TAB_DATA = {
+	[TAB_ENUM.MAIN] = {title = 'Main', order = 1},
+	[TAB_ENUM.SUB] = {title = 'Subs', order = 2},
+	[TAB_ENUM.FORMER] = {title = 'Former', order = 3},
+	[TAB_ENUM.STAFF] = {title = 'Staff', order = 4},
+}
+
+---@type table<string, ParticipantsTeamCardTabs>
+local PERSON_TYPE_TO_TAB = {
+	player = TAB_ENUM.MAIN,
+	sub = TAB_ENUM.SUB,
+	former = TAB_ENUM.FORMER,
+	staff = TAB_ENUM.STAFF,
+}
 
 ---@class ParticipantsTeamCard: Widget
 ---@operator call(table): ParticipantsTeamCard
@@ -62,7 +90,6 @@ end
 ---@param roles RoleData[]
 ---@return string?, string?
 local function getRoleDisplays(roles)
-	mw.logObject(roles)
 	local function roleLeftDisplay()
 		local firstRole = roles[1]
 		if firstRole and firstRole.icon then
@@ -88,37 +115,72 @@ end
 ---@param participant TeamParticipant
 ---@return Widget
 function ParticipantsTeamCard:_renderContent(participant)
+	local makeRostersDisplay = function(players)
+		return Div{
+			classes = { 'team-participant-roster' },
+			children = Array.map(players, function(player, index)
+				local playerTeam = participant.opponent.template ~= player.team and player.team or nil
+				local playerTeamAsOpponent = playerTeam and Opponent.readOpponentArgs{
+					type = Opponent.team,
+					template = playerTeam,
+				} or nil
+				local roleLeft, roleRight = getRoleDisplays(player.extradata.roles or {})
+				return ParticipantsTeamMember{
+					player = player,
+					team = playerTeamAsOpponent,
+					even = index % 2 == 0,
+					roleLeft = roleLeft,
+					roleRight = roleRight,
+					trophies = player.extradata.trophies or 0,
+				}
+			end)
+		}
+	end
+
+	local tabs = Array.map(Table.entries(TAB_DATA), function(tabTuple)
+		local tabTypeEnum, tabData = tabTuple[1], tabTuple[2]
+		local tabPlayers = Array.filter(participant.opponent.players or {}, function(player)
+			local personType = player.extradata.type
+			return PERSON_TYPE_TO_TAB[personType] == tabTypeEnum
+		end)
+		return {
+			order = tabData.order,
+			title = tabData.title,
+			players = tabPlayers,
+		}
+	end)
+
+	tabs = Array.filter(tabs, function(tab)
+		return #tab.players > 0
+	end)
+	tabs = Array.sortBy(tabs, Operator.property('order'))
+
+	local switchGroupUniqueId = tonumber(Variables.varDefault('teamParticipantRostersSwitchGroupId')) or 0
+	switchGroupUniqueId = switchGroupUniqueId + 1
+	Variables.varDefine('teamParticipantRostersSwitchGroupId', switchGroupUniqueId)
+
 	return Div{
 		classes = { 'team-participant-card-collapsible-content' },
 		children = WidgetUtil.collect(
-			Div{
-				classes = { 'team-participant-roster' },
-				children = Array.map(participant.opponent.players, function(player, index)
-					local playerTeam = participant.opponent.template ~= player.team and player.team or nil
-					local playerTeamAsOpponent = playerTeam and Opponent.readOpponentArgs{
-						type = Opponent.team,
-						template = playerTeam,
-					} or nil
-					local roleLeft, roleRight = getRoleDisplays(player.extradata.roles or {})
-					return ParticipantsTeamMember{
-						player = player,
-						team = playerTeamAsOpponent,
-						even = index % 2 == 0,
-						roleLeft = roleLeft,
-						roleRight = roleRight,
-						trophies = player.extradata.trophies or 0,
+			ContentSwitch{
+				switchGroup = 'team-participant-rosters-'.. switchGroupUniqueId,
+				variant = 'generic',
+				storeValue = false,
+				size = 'small',
+				css = {margin = '0.25rem 0.5rem'},
+				tabs = Array.map(tabs, function(tab)
+					return {
+						label = tab.title,
+						content = makeRostersDisplay(tab.players),
 					}
-				end)
+				end),
 			},
-			Div{
-				classes = { 'team-participant-notifications' },
-				children = Array.map(participant.notes or {}, function(note)
-					return ParticipantNotification{
-						text = note.text,
-						highlighted = note.highlighted,
-					}
-				end)
-			}
+			Array.map(participant.notes or {}, function(note)
+				return ParticipantNotification{
+					text = note.text,
+					highlighted = note.highlighted,
+				}
+			end)
 		)
 	}
 end

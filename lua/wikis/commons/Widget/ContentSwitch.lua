@@ -28,6 +28,7 @@ local Div = HtmlWidgets.Div
 ---@field classes string[]?
 ---@field size 'small'|'medium'
 ---@field storeValue boolean
+---@field css table?
 
 ---@class ContentSwitch: Widget
 ---@operator call(ContentSwitchParameters): ContentSwitch
@@ -43,10 +44,14 @@ ContentSwitch.defaultProps = {
 
 ---@return Widget
 function ContentSwitch:render()
-	local tabs = self.props.tabs
+	local tabs = assert(self.props.tabs, 'ContentSwitch requires at least the tabs property to be set')
 	local variant = self.props.variant
 	local defaultActive = self.props.defaultActive
 	local switchGroup = self:assertExistsAndCopy(self.props.switchGroup)
+
+	if #tabs < 2 then
+		return HtmlWidgets.fragment{children = (tabs[1] or {}).content}
+	end
 
 	local tabOptions = Array.map(tabs, function(tab, index)
 		local isActive = index == defaultActive
@@ -90,6 +95,7 @@ function ContentSwitch:render()
 		children = {
 			Div{
 				classes = {'switch-pill-container'},
+				css = self.props.css,
 				children = {
 					Div{
 						classes = switchPillClasses,
