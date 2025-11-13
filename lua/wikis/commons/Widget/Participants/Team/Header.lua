@@ -20,6 +20,7 @@ local Div = HtmlWidgets.Div
 ---@operator call(table): ParticipantsTeamHeader
 local ParticipantsTeamHeader = Class.new(Widget)
 
+---@return Widget
 function ParticipantsTeamHeader:render()
 	local participant = self.props.participant
 	local labelDiv = self:_renderLabel(participant)
