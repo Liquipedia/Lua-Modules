@@ -40,14 +40,12 @@ function TeamParticipantsController.fromTemplate(frame)
 		end
 
 		local team = TeamService.getTeamByTemplate(participant.opponent.template)
-		if not team or not team.members then
+		if not team then
 			return
 		end
 
-		local activeMembers = Array.filter(team.members, function (member)
-			return member.status == 'active'
-		end)
-		local membersToImport = Array.filter(activeMembers, function (member)
+		local squad = TeamService.getSquadOn(team, args.date)
+		local membersToImport = Array.filter(squad, function (member)
 			if member.type == 'player' then
 				return true
 			end

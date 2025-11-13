@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 
@@ -20,7 +21,7 @@ local TeamService = {}
 ---@field shortName string?
 ---@field image string?
 ---@field imageDark string?
----@field members table[]?
+---@field members table[]
 
 --- TODO: Add the rest and implement the lazy loading
 local LPDB_TEAM_FIELDS = {
@@ -44,6 +45,46 @@ function TeamService.getTeamByTemplate(teamTemplate)
 end
 
 ---@param team StandardTeam
+---@param date string|number|nil
+---@return table[]
+function TeamService.getSquadOn(team, date)
+	local timestamp = DateExt.readTimestamp(date) or DateExt.getContextualDateOrNow()
+	local members = team.members or {}
+	return Array.filter(members, function(member)
+		local joinDate = DateExt.readTimestamp(member.joindate)
+		local leaveDate = DateExt.readTimestamp(member.leavedate)
+		local inactiveDate = DateExt.readTimestamp(member.inactivedate)
+
+		-- Bad data
+		if not joinDate or DateExt.isDefaultTimestamp(joinDate) then
+			return false
+		end
+
+		-- Joined after the requested date
+		if joinDate > timestamp then
+			return false
+		end
+
+		-- Bad data
+		if not leaveDate then
+			return false
+		end
+
+		-- Left before the requested date
+		if not DateExt.isDefaultTimestamp(leaveDate) and leaveDate < date then
+			return false
+		end
+
+		-- Went inactive before the requested date
+		if inactiveDate and not DateExt.isDefaultTimestamp(inactiveDate) and inactiveDate < date then
+			return false
+		end
+
+		return true
+	end)
+end
+
+---@param team StandardTeam
 ---@return table[]
 function TeamService.getMembers(team)
 	local records = mw.ext.LiquipediaDB.lpdb('squadplayer', {
@@ -61,6 +102,11 @@ function TeamService.getMembers(team)
 			role = record.role,
 			type = record.type,
 			status = record.status,
+
+			joindate = record.joindate,
+			leavedate = record.leavedate,
+			inactivedate = record.inactivedate,
+
 			faction = extradata.faction,
 			group = extradata.group or 'main',
 		}
