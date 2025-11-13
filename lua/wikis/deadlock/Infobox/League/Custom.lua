@@ -16,6 +16,8 @@ local League = Lua.import('Module:Infobox/League')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
+local Link = Lua.import('Module:Widget/Basic/Link')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class DeadlockLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -42,7 +44,7 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(widgets,
 			Cell{name = 'Number of teams', children = {args.team_number}},
 			Cell{name = 'Number of players', children = {args.player_number}},
-			Cell{name = 'Version', children = {self.caller:_createPatchCell(args)}}
+			Cell{name = 'Version', children = self.caller:_createPatchCell(args)}
 		)
 	end
 
@@ -53,15 +55,15 @@ end
 ---@return string?
 function CustomLeague:_createPatchCell(args)
 	if String.isEmpty(args.patch) then
-		return nil
+		return
 	end
-
-	local displayText = '[[Patch_' .. args.patch .. '|' .. args.patch .. ']]'
-
-	if args.epatch then
-		displayText = displayText .. ' &ndash; [[Patch_' .. args.epatch .. '|' .. args.epatch .. ']]'
-	end
-	return displayText
+	return WidgetUtil.collect(
+		Link{link = 'Patch_' .. args.patch, children = {args.patch}},
+		String.isNotEmpty(args.epatch) and args.patch ~= args.epatch and {
+			' &ndash; ',
+			Link{link = 'Patch_' .. args.epatch, children = {args.epatch}},
+		} or nil
+	)
 end
 
 return CustomLeague
