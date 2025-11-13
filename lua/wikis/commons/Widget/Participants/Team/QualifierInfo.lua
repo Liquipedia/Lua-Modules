@@ -34,7 +34,7 @@ function ParticipantsTeamQualifierInfo:render()
 	end
 
 	local getIconToDisplay = function()
-		if qualification.type =='tournament' then
+		if qualification.type == 'tournament' then
 			return LeagueIcon.display{
 				icon = qualification.tournament.icon,
 				iconDark = qualification.tournament.iconDark,
