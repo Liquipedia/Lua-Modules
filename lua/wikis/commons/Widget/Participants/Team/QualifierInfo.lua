@@ -42,7 +42,7 @@ function ParticipantsTeamQualifierInfo:render()
 				options = {noTemplate = true},
 			}
 		elseif qualification.type == 'external' then
-			return Icon{iconName = 'reference'}
+			return Icon{iconName = 'external_link', additionalClasses = { 'team-participant-card-qualifier-external-link-icon' } }
 		end
 	end
 

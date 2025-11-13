@@ -158,6 +158,16 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 			font-weight: bold;
 			font-size: 12px;
 		}
+
+		&-external-link-icon {
+			.theme--light & {
+				color: var( --clr-primary-44 );
+			}
+
+			.theme--dark & {
+				color: var( --clr-primary-80 );
+			}
+		}
 	}
 
 	&-qualifier--header {
