@@ -107,7 +107,7 @@ function Company:createInfobox()
 		foundeddate = ReferenceCleaner.clean{input = args.foundeddate},
 		defunctdate = ReferenceCleaner.clean{input = args.defunctdate},
 		numberofemployees = ReferenceCleaner.cleanNumber{input = args.employees},
-		links = Json.stringify(Links.makeFullLinksForTableItems(links))
+		links = Json.stringify(Links.makeFullLinksForTableItems(links, LINK_VARIANT))
 	})
 
 	self:categories('Companies')
