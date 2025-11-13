@@ -43,22 +43,18 @@ function ParticipantsTeamMember:render()
 		children = WidgetUtil.collect(
 			roleLeft and Div{
 				classes = {'team-member-role-left'},
-				children = {
-					roleLeft
-				}
+				children = roleLeft,
 			} or nil,
 			Div{
 				classes = {'team-member-name'},
-				children = {
-					PlayerDisplay.BlockPlayer{
-						player = player,
-						showFlag = true,
-						showLink = true,
-						showFaction = true,
-						showTbd = true,
-						showPlayerTeam = false,
-						overflow = 'ellipsis',
-					}
+				children = PlayerDisplay.BlockPlayer{
+					player = player,
+					showFlag = true,
+					showLink = true,
+					showFaction = true,
+					showTbd = true,
+					showPlayerTeam = false,
+					overflow = 'ellipsis',
 				}
 			},
 			trophies and trophies > 0 and Div{
@@ -75,19 +71,15 @@ function ParticipantsTeamMember:render()
 			} or nil,
 			roleRight and Div{
 				classes = {'team-member-role-right'},
-				children = {
-					roleRight
-				}
+				children = roleRight,
 			} or nil,
 			team and Div{
 				classes = {'team-member-team'},
-				children = {
-					OpponentDisplay.BlockOpponent({
-						opponent = team,
-						teamStyle = 'icon',
-						additionalClasses = {'team-participant-square-icon'}
-					}),
-				}
+				children = OpponentDisplay.BlockOpponent({
+					opponent = team,
+					teamStyle = 'icon',
+					additionalClasses = {'team-participant-square-icon'}
+				}),
 			} or nil
 		)
 	}
