@@ -29,33 +29,37 @@ function ParticipantsTeamCardsGroup:render()
 	end
 
 	return Div{
-		children = {
-			Switch{
-				label = 'Show rosters',
-				switchGroup = 'team-cards-show-rosters',
-				defaultActive = false,
-			},
-			AnalyticsWidget{
-				analyticsName = 'ParticipantsCompactSwitch',
-				analyticsProperties = {
-					['track-value-as'] = 'participants compact',
+		classes = { 'team-participant-wrapper' },
+		children = Div{
+			classes = { 'team-participant-switches' },
+			children = {
+				Switch{
+					label = 'Show rosters',
+					switchGroup = 'team-cards-show-rosters',
+					defaultActive = false,
 				},
-				children = Switch{
-					label = 'Compact view',
-					switchGroup = 'team-cards-compact',
-					defaultActive = true,
-					content = AnalyticsWidget{
-						analyticsName = 'Team participants card',
-						children = Div{
-							classes = { 'team-participant-cards' },
-							children = Array.map(participants, function(participant)
-								return ParticipantsTeamCard{
-									participant = participant,
-								}
-							end),
-						}
-					}
+				AnalyticsWidget{
+					analyticsName = 'ParticipantsCompactSwitch',
+					analyticsProperties = {
+						['track-value-as'] = 'participants compact',
+					},
+					children = Switch{
+						label = 'Compact view',
+						switchGroup = 'team-cards-compact',
+						defaultActive = true,
+					},
 				}
+			}
+		},
+		AnalyticsWidget{
+			analyticsName = 'Team participants card',
+			children = Div{
+				classes = { 'team-participant-cards' },
+				children = Array.map(participants, function(participant)
+					return ParticipantsTeamCard{
+						participant = participant,
+					}
+				end),
 			}
 		}
 	}

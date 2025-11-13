@@ -34,6 +34,17 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 	}
 }
 
+.team-participant-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.team-participant-switches {
+	display: flex;
+	gap: 0.5rem;
+}
+
 .team-participant-cards {
 	display: grid;
 	gap: 0.25rem;
