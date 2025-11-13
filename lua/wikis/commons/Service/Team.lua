@@ -48,7 +48,7 @@ end
 ---@param date string|number|nil
 ---@return table[]
 function TeamService.getSquadOn(team, date)
-	local timestamp = DateExt.readTimestamp(date) or DateExt.getContextualDateOrNow()
+	local timestamp = DateExt.readTimestamp(date) or DateExt.readTimestamp(DateExt.getContextualDateOrNow())
 	local members = team.members or {}
 	return Array.filter(members, function(member)
 		local joinDate = DateExt.readTimestamp(member.joindate)
@@ -71,12 +71,12 @@ function TeamService.getSquadOn(team, date)
 		end
 
 		-- Left before the requested date
-		if not DateExt.isDefaultTimestamp(leaveDate) and leaveDate < date then
+		if not DateExt.isDefaultTimestamp(leaveDate) and leaveDate < timestamp then
 			return false
 		end
 
 		-- Went inactive before the requested date
-		if inactiveDate and not DateExt.isDefaultTimestamp(inactiveDate) and inactiveDate < date then
+		if inactiveDate and not DateExt.isDefaultTimestamp(inactiveDate) and inactiveDate < timestamp then
 			return false
 		end
 
