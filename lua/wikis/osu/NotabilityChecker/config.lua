@@ -216,49 +216,49 @@ Config.weights = {
 
 -- Currently the score ranges are used but in the future a more simple method might get added
 Config.scoreRanges = {
-    -- "Tier 1"
-    {
-        {max = 4, points = 300},
-        {max = 6, points = 250},
-        {max = 8, points = 200},
-        {max = 16, points = 100},
-        {max = math.huge, points = 50} -- "Other"
-    },
-    -- "Tier 2"
-    {
-        {max = 1, points = 150},
-        {max = 2, points = 100},
-        {max = 4, points = 80},
-        {max = 6, points = 60},
-        {max = 8, points = 40},
-        {max = 16, points = 20},
-        {max = math.huge, points = 10} -- "Other"
-    },
+	-- "Tier 1"
+	{
+		{max = 4, points = 300},
+		{max = 6, points = 250},
+		{max = 8, points = 200},
+		{max = 16, points = 100},
+		{max = math.huge, points = 50} -- "Other"
+	},
+	-- "Tier 2"
+	{
+		{max = 1, points = 150},
+		{max = 2, points = 100},
+		{max = 4, points = 80},
+		{max = 6, points = 60},
+		{max = 8, points = 40},
+		{max = 16, points = 20},
+		{max = math.huge, points = 10} -- "Other"
+	},
 	-- "Tier 3"
-    {
-        {max = 1, points = 30},
-        {max = 2, points = 20},
-        {max = 4, points = 15},
-        {max = 6, points = 10},
-        {max = 8, points = 7},
-        {max = 16, points = 3},
-        {max = math.huge, points = 2} -- "Other"
-    },
+	{
+		{max = 1, points = 30},
+		{max = 2, points = 20},
+		{max = 4, points = 15},
+		{max = 6, points = 10},
+		{max = 8, points = 7},
+		{max = 16, points = 3},
+		{max = math.huge, points = 2} -- "Other"
+	},
 	-- "Tier 4"
-    {
-        {max = 1, points = 5},
-        {max = 2, points = 4},
-        {max = 4, points = 3},
-        {max = 6, points = 2},
-        {max = 8, points = 1},
-        {max = math.huge, points = 0} -- "Other"
-    },
+	{
+		{max = 1, points = 5},
+		{max = 2, points = 4},
+		{max = 4, points = 3},
+		{max = 6, points = 2},
+		{max = 8, points = 1},
+		{max = math.huge, points = 0} -- "Other"
+	},
 	-- "Tier 5"
-    {
-        {max = 1, points = 2},
-        {max = 2, points = 1},
-        {max = math.huge, points = 0} -- "Other"
-    }
+	{
+		{max = 1, points = 2},
+		{max = 2, points = 1},
+		{max = math.huge, points = 0} -- "Other"
+	}
 }
 
 --- This function adjusts the score for the placement, e.g.
@@ -281,14 +281,14 @@ function Config.placementDropOffFunction(tier, tierType)
 	end
 
 	return function(score, placement)
-        -- Workaround since in the main checker module the mode modifiers are applied before this function
+		-- Workaround since in the main checker module the mode modifiers are applied before this function
 		local scoreForFirst = Config.scoreRanges[tier][1]
 		local needModifier = false
 		if (score > scoreForFirst.points) then
 			needModifier = true
 		end
 
-        -- The current notability guidelines award set amount of points based on placement and tier of event.
+		-- The current notability guidelines award set amount of points based on placement and tier of event.
 		for _, range in ipairs(Config.scoreRanges[tier]) do
 			if placement <= range.max then
 				local points = range.points
@@ -307,16 +307,16 @@ end
 -- want to decrease the points given for a certain mode
 function Config.adjustScoreForMode(score, mode)
 	if string.lower(mode or '') == 'taiko' then
-        return score * 1.2
-    end
+		return score * 1.2
+	end
 
 	if string.lower(mode or '') == 'catch' then
-        return score * 1.2
-    end
+		return score * 1.2
+	end
 
 	if string.lower(mode or '') == 'mania 7k' then
-        return score * 1.2
-    end
+		return score * 1.2
+	end
 
 	return score
 end

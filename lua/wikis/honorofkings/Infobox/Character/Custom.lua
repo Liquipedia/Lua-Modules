@@ -48,7 +48,7 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'role' then
 		return {
-            Cell{
+			Cell{
 				name = 'Lane',
 				children = WidgetUtil.collect(
 					self:_toCellContent('lane1'),
@@ -65,7 +65,7 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'custom' then
 		return self.caller:_getCustomCells()
-    end
+	end
 	return widgets
 end
 
