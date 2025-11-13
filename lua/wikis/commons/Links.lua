@@ -184,6 +184,7 @@ local PREFIXES = {
 	},
 	linkedin = {
 		team = 'https://www.linkedin.com/company/',
+		company = 'https://www.linkedin.com/company/',
 		player = 'https://www.linkedin.com/in/',
 	},
 	loco = {'https://loco.gg/streamers/'},
