@@ -14,6 +14,7 @@ local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 
 ---@class Dota2PartnerWikis: Widget
 ---@operator call(table): Dota2PartnerWikis
@@ -39,11 +40,16 @@ function Dota2PartnerWikis:render()
 	end
 
 	return DataTable{
+		classes = {'wikitable-striped'},
+		tableAttributes = {width = '100%'},
 		tableCss = {['text-align'] = 'center'},
 		children = {
 			HtmlWidgets.Tr{children = {
 				HtmlWidgets.Th{
-					attributes = {rowspan = 2},
+					attributes = {
+						rowspan = 2,
+						width = '15%',
+					},
 					children = IconImage{
 						imageLight = 'Dota 2 Partners VWN.png',
 						link = 'Valve Wiki Network',
@@ -114,19 +120,21 @@ function Dota2PartnerWikis:render()
 				HtmlWidgets.Td{
 					attributes = {colspan = 5},
 					css = {['text-align'] = 'left'},
-					children = {
-						IconImage{
-							imageLight = 'Dota 2 Partners IWF.png',
-							link = 'https://indiewikifederation.org/',
-							caption = 'Indie Wiki Federation',
-						},
-						' ',
-						Link{
-							linktype = 'external',
-							link = 'https://indiewikifederation.org/',
-							children = 'Indie Wiki Federation',
+					children = UnorderedList{children = {
+						{
+							IconImage{
+								imageLight = 'Dota 2 Partners IWF.png',
+								link = 'https://indiewikifederation.org/',
+								caption = 'Indie Wiki Federation',
+							},
+							' ',
+							Link{
+								linktype = 'external',
+								link = 'https://indiewikifederation.org/',
+								children = 'Indie Wiki Federation',
+							}
 						}
-					}
+					}}
 				}
 			}}
 		}
