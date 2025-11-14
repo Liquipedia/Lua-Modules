@@ -268,14 +268,14 @@ local PREFIXES = {
 		'https://start.gg/',
 		player = 'https://start.gg/user/',
 	},
-	steam = {'https://steamcommunity.com/id/'},
+	steam = {'https://steamcommunity.com/id/'}, -- to be removed after conversion
+	steamID64 = {'https://steamcommunity.com/profiles/'},
 	steamtv = {'https://steam.tv/'},
 	strikr = {'https://strikr.pro/pilot/'},
 	privsteam = {'https://steamcommunity.com/groups/'},
 	pubsteam = {'https://steamcommunity.com/groups/'},
 	smiteesports = {match = 'https://www.smiteesports.com/matches/'},
 	spotify = {'https://open.spotify.com/'},
-	steamalternative = {'https://steamcommunity.com/profiles/'},
 	stats = {'', match = ''},
 	statshark = {
 		'https://statshark.net/',
@@ -381,6 +381,8 @@ local ALIASES = {
 	['start-gg'] = {'startgg', 'smashgg'},
 	yandexefir = {'yandex'},
 	zhanqitv = {'zhanqi'},
+	-- temporarily for conversion
+	steamID64 = {'steamalternative'},
 }
 
 local ICON_KEYS_TO_RENAME = {
