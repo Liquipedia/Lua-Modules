@@ -181,6 +181,12 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 
 		-- A placement 1-... will be sorted before 10-..., so this will be the best placement
 		local firstPlacement = queryResult[1]
+		if not firstPlacement then
+			-- Early return is allowed since there is not placement available,
+			-- thus allowedPlacements won't be needed.
+			return conditions:toString()
+		end
+
 		table.insert(allowedPlacements, firstPlacement.placement)
 
 		local parts = Array.parseCommaSeparatedString(firstPlacement.placement, '-')
@@ -197,7 +203,9 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 			groupby = 'placement asc',
 			limit = 1,
 		})[1]
-		table.insert(allowedPlacements, queryResult.placement)
+		if queryResult then
+			table.insert(allowedPlacements, queryResult.placement)
+		end
 	end
 
 	conditions:add(Condition.Util.anyOf(ColumnName('placement'), Array.extractValues(allowedPlacements)))
