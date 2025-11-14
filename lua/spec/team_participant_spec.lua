@@ -11,7 +11,6 @@ insulate('Team Participant', function()
 		GoldenTest('team_participant', tostring(TeamParticipantsController.fromTemplate{
 			{
 				'Team Liquid',
-				qualifyingPage = 'TripleVCT/2025/Game Changers/North America/Stage 2',
 				players = {
 					{'alexis'},
 					{'dodonut'},
@@ -21,13 +20,21 @@ insulate('Team Participant', function()
 					{'effys', role = 'Head Coach', type = 'staff'},
 					{'Veer', role = 'Coach', type = 'staff'},
 				},
+				qualification = {
+					method = 'qual',
+					url = 'https://google.com',
+					text = 'FooBar',
+				},
 				notes = {
 					{'SOME TEXT HERE'},
 				}
 			},
 			{
 				'bds',
-				qualifyingPage = 'TripleVCT/2025/Game Changers/North America/Stage 2',
+				qualification = {
+					method = 'invite',
+					text = 'Invited',
+				},
 				players = {
 					{'ElectricalBoy'},
 					{'hjpalpha'},
