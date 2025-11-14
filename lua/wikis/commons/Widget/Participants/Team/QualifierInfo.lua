@@ -33,61 +33,61 @@ function ParticipantsTeamQualifierInfo:render()
 		return
 	end
 
-	local getIconToDisplay = function()
-		if qualification.type == 'tournament' then
-			return LeagueIcon.display{
-				icon = qualification.tournament.icon,
-				iconDark = qualification.tournament.iconDark,
-				link = qualification.tournament.pageName,
-				options = {noTemplate = true},
-			}
-		elseif qualification.type == 'external' then
-			return Icon{
-				iconName = 'external_link',
-				additionalClasses = { 'team-participant-card-qualifier-external-link-icon' }
-			}
-		end
+	local text = qualification.text
+	if not text and qualification.type == 'tournament' then
+		text = qualification.tournament.displayName
 	end
-
-	local getLinkPage = function()
-		if qualification.type == 'tournament' then
-			return qualification.tournament.pageName
-		elseif qualification.type == 'external' then
-			return qualification.url
-		end
-	end
-
-	local getDisplayText = function()
-		if qualification.text then
-			return qualification.text
-		elseif qualification.type == 'tournament' then
-			return qualification.tournament.displayName
-		end
-	end
-
-	local text = getDisplayText()
-	local link = getLinkPage()
 
 	if not text then
 		return
 	end
 
-	return Div{
+	local link, icon, linktype
+	if qualification.type == 'tournament' then
+		link = qualification.tournament.pageName
+		icon = LeagueIcon.display{
+			icon = qualification.tournament.icon,
+			iconDark = qualification.tournament.iconDark,
+			link = qualification.tournament.pageName,
+			options = {noTemplate = true},
+		}
+		linktype = 'internal'
+	elseif qualification.type == 'external' then
+		link = qualification.url
+		icon = Icon{
+			iconName = 'external_link',
+			additionalClasses = { 'team-participant-card-qualifier-external-link-icon' }
+		}
+		linktype = 'external'
+	end
+
+	local spanClasses = {'team-participant-card-qualifier-details'}
+	if link then
+		table.insert(spanClasses, 'team-participant-card-qualifier-details--link')
+	end
+
+	local content = Div{
 		classes = {'team-participant-card-qualifier', 'team-participant-card-qualifier--' .. location},
 		children = WidgetUtil.collect(
-			getIconToDisplay(),
+			icon,
 			Span{
-				classes = { 'team-participant-card-qualifier-details' },
+				classes = spanClasses,
 				children = {
-					link and Link{
-						link = getLinkPage(),
-						children = getDisplayText(),
-						linktype = qualification.type == 'external' and 'external' or 'internal',
-					} or text,
+					text,
 				}
 			}
 		)
 	}
+
+	if link then
+		return Link{
+			link = link,
+			linktype = linktype,
+			children = content
+		}
+	end
+
+	return content
 end
 
 return ParticipantsTeamQualifierInfo
