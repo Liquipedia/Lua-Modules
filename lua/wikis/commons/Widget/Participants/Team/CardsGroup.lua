@@ -34,11 +34,17 @@ function ParticipantsTeamCardsGroup:render()
 			Div{
 				classes = { 'team-participant-switches' },
 				children = {
-					Switch{
-						label = 'Show rosters',
-						switchGroup = 'team-cards-show-rosters',
-						defaultActive = false,
-						collapsibleSelector = '.team-participant-card',
+					AnalyticsWidget{
+						analyticsName = 'ParticipantsShowRostersSwitch',
+						analyticsProperties = {
+							['track-value-as'] = 'participants show rosters',
+						},
+						children = Switch{
+							label = 'Show rosters',
+							switchGroup = 'team-cards-show-rosters',
+							defaultActive = false,
+							collapsibleSelector = '.team-participant-card',
+						},
 					},
 					AnalyticsWidget{
 						analyticsName = 'ParticipantsCompactSwitch',
