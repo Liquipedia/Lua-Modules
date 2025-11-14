@@ -30,11 +30,6 @@ function ParticipantsTeamCardsGroup:render()
 
 	return Div{
 		classes = { 'team-participant-wrapper' },
-		attributes = {
-			['data-switch-group'] = 'team-cards-show-rosters',
-			['data-collapsible-selector'] = '.team-participant-card',
-			['data-collapsible-class'] = 'collapsed',
-		},
 		children = {
 			Div{
 				classes = { 'team-participant-switches' },
@@ -43,6 +38,7 @@ function ParticipantsTeamCardsGroup:render()
 						label = 'Show rosters',
 						switchGroup = 'team-cards-show-rosters',
 						defaultActive = false,
+						collapsibleSelector = '.team-participant-card',
 					},
 					AnalyticsWidget{
 						analyticsName = 'ParticipantsCompactSwitch',

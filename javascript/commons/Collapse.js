@@ -190,53 +190,49 @@ liquipedia.collapse = {
 	},
 
 	setupSwitchToggleCollapsibles: function() {
-		// Find all elements with switch toggle configuration
 		const switchToggleElements = document.querySelectorAll( '[data-switch-group]' );
 		if ( switchToggleElements.length === 0 ) {
 			return;
 		}
 
-		// Process each switch toggle element
+		const groupToSelectorMap = new Map();
+
 		switchToggleElements.forEach( ( element ) => {
 			const switchGroupName = element.getAttribute( 'data-switch-group' );
-			const collapsibleSelector = element.getAttribute( 'data-collapsible-selector' ) || '.collapsible';
-			const collapsibleClass = element.getAttribute( 'data-collapsible-class' ) || 'collapsed';
+			const collapsibleSelector = element.getAttribute( 'data-collapsible-selector' );
 
-			// Listen for changes to the specific switch button with the given group name
-			document.addEventListener( 'switchButtonChanged', ( e ) => {
-				if ( e.detail.data.name === switchGroupName ) {
-					liquipedia.collapse.updateCollapsibleElements(
+			if ( collapsibleSelector === undefined ) {
+				return;
+			}
+
+			groupToSelectorMap.set( switchGroupName, collapsibleSelector );
+
+			liquipedia.switchButtons.getSwitchGroup( switchGroupName ).then( ( switchGroup ) => {
+				if ( switchGroup ) {
+					this.updateCollapsibleElements(
 						collapsibleSelector,
-						collapsibleClass,
-						e.detail.data.value
+						switchGroup.value
 					);
 				}
 			} );
+		} );
 
-			// Initialize the state of elements based on the current switch value
-			if ( window.liquipedia && window.liquipedia.switchButtons ) {
-				liquipedia.switchButtons.getSwitchGroup( switchGroupName ).then( ( switchGroup ) => {
-					if ( switchGroup ) {
-						liquipedia.collapse.updateCollapsibleElements(
-							collapsibleSelector,
-							collapsibleClass,
-							switchGroup.value
-						);
-					}
-				} );
+		document.addEventListener( 'switchButtonChanged', ( event ) => {
+			const { name, value } = event.detail.data;
+
+			const selector = groupToSelectorMap.get( name );
+
+			if ( selector ) {
+				this.updateCollapsibleElements( selector, value );
 			}
 		} );
 	},
 
-	updateCollapsibleElements: function( selector, className, show ) {
+	updateCollapsibleElements: function( selector, show ) {
 		const elements = document.querySelectorAll( selector );
+
 		elements.forEach( ( element ) => {
-			if ( show ) {
-				element.classList.remove( className );
-			} else {
-				element.classList.add( className );
-			}
+			element.classList.toggle( 'collapsed', !show );
 		} );
-	}
-};
+	} };
 liquipedia.core.modules.push( 'collapse' );
