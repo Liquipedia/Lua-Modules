@@ -20,7 +20,7 @@ local RoleUtil = {}
 ---@class RoleBaseData
 ---@field display string
 ---@field category string
-
+---@field sortOrder integer?
 
 ---@class RoleData: RoleBaseData
 ---@field key string?
@@ -85,6 +85,7 @@ function RoleUtil._createRoleData(roleKey)
 		category = roleData.category,
 		key = key,
 		type = roleType(),
+		sortOrder = roleData.sortOrder,
 		icon = POSITION_ICON_DATA and POSITION_ICON_DATA[key] or nil,
 	}
 end

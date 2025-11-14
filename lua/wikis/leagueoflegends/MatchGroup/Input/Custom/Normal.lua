@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local InGameRoles = Lua.import('Module:InGameRoles', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
@@ -46,7 +47,18 @@ end
 ---@return table[]?
 function CustomMatchGroupInputNormal.getParticipants(map, opponentIndex)
 	return Logic.nilIfEmpty(Array.map(Array.range(1, MAX_NUM_PICKS), function (playerIndex)
-		return Json.parseIfString(map['t' .. opponentIndex .. 'p' .. playerIndex])
+		local playerData = Json.parseIfTable(map['t' .. opponentIndex .. 'p' .. playerIndex])
+		if Logic.isEmpty(playerData) then
+			return
+		end
+		---@cast playerData -nil
+		if Logic.isEmpty(playerData.role) then
+			return playerData
+		end
+		local playerRole = InGameRoles[playerData.role:lower()]
+		assert(playerRole, 'Invalid |role=' .. playerData.role)
+		playerData.role = playerRole.display:lower()
+		return playerData
 	end))
 end
 
