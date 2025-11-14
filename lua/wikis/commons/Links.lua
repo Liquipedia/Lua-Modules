@@ -193,6 +193,7 @@ local PREFIXES = {
 	mapdraft = {match = 'https://aoe2cm.net/draft/'},
 	matcherino = {'https://matcherino.com/tournaments/'},
 	matcherinolink = {'https://matcherino.com/t/'},
+	metafy = {'https://metafy.gg/@'},
 	mildom = {'https://www.mildom.com/'},
 	mplink = {match = 'https://osu.ppy.sh/community/matches/'}, -- Should this key be renamed?
 	lazermplink = {match = 'https://osu.ppy.sh/multiplayer/rooms/'},
