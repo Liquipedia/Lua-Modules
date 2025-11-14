@@ -11,14 +11,21 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
 local TeamParticipantsWikiParser = Lua.import('Module:TeamParticipants/Parse/Wiki')
 local TeamParticipantsRepository = Lua.import('Module:TeamParticipants/Repository')
+local TeamService = Lua.import('Module:Service/Team')
 
 local TeamParticipantsDisplay = Lua.import('Module:Widget/Participants/Team/CardsGroup')
 
 local TeamParticipantsController = {}
+
+local AUTO_IMPORTED_STAFF_ROLES = {
+	'coach',
+	'head coach',
+}
 
 ---@param frame Frame
 ---@return Widget
@@ -26,6 +33,57 @@ function TeamParticipantsController.fromTemplate(frame)
 	local args = Arguments.getArgs(frame)
 	local parsedArgs = Json.parseStringifiedArgs(args)
 	local parsedData = TeamParticipantsWikiParser.parseWikiInput(parsedArgs)
+
+	Array.forEach(parsedData.participants, function (participant)
+		local players = participant.opponent.players
+		-- Bad structure, this should always exist
+		if not players then
+			return
+		end
+
+		if not Logic.readBool(participant.shouldImportFromDb) then
+			return
+		end
+
+		local team = TeamService.getTeamByTemplate(participant.opponent.template)
+		if not team then
+			return
+		end
+
+		local squad = TeamService.getSquadOn(team, args.date)
+		local membersToImport = Array.filter(squad, function (member)
+			if member.type == 'player' then
+				return true
+			end
+			return Array.find(AUTO_IMPORTED_STAFF_ROLES, function (role)
+				return role == member.role:lower()
+			end) ~= nil
+		end)
+
+		local playersFromDatabase = Array.map(membersToImport, function (member)
+			return TeamParticipantsWikiParser.parsePlayer{
+				member.displayName,
+				link = member.pageName,
+				flag = member.nationality,
+				faction = member.faction,
+				role = member.role,
+				type = member.type,
+			}
+		end)
+
+		Array.forEach(playersFromDatabase, function (player)
+			local indexOfManualPlayer = Array.indexOf(players, function (p)
+				return p.pageName == player.pageName
+			end)
+
+			if indexOfManualPlayer == 0 then
+				table.insert(players, player)
+			else
+				local newPlayer = Table.deepMerge(player, players[indexOfManualPlayer])
+				players[indexOfManualPlayer] = newPlayer
+			end
+		end)
+	end)
 
 	local shouldStore =
 		Logic.readBoolOrNil(args.store) ~= false and

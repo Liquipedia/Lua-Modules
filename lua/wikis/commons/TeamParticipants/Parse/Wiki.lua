@@ -18,7 +18,7 @@ local TeamTemplate = Lua.import('Module:TeamTemplate')
 local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
----qualifierText: string?, qualifierPage: string?, qualifierUrl: string?}
+---qualifierText: string?, qualifierPage: string?, qualifierUrl: string?, shouldImportFromDb: boolean}
 
 ---@param args table
 ---@return {participants: TeamParticipant[]}
@@ -64,26 +64,31 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 				highlighted = Logic.readBool(note.highlighted),
 			}
 		end),
+		shouldImportFromDb = Logic.readBool(input.import),
 	}
 end
 
 ---@param input table
 ---@return standardPlayer[]
 function TeamParticipantsWikiParser.parsePlayers(input)
-	return Array.map(input.players or {}, function(playerInput)
-		return {
-			displayName = playerInput[1],
-			flag = playerInput.flag,
-			pageName = playerInput.link,
-			team = playerInput.team,
-			faction = playerInput.faction,
-			extradata = {
-				roles = RoleUtil.readRoleArgs(playerInput.role),
-				trophies = tonumber(playerInput.trophies),
-				type = playerInput.type or 'player',
-			},
-		}
-	end)
+	return Array.map(input.players or {}, TeamParticipantsWikiParser.parsePlayer)
+end
+
+---@param playerInput table
+---@return standardPlayer
+function TeamParticipantsWikiParser.parsePlayer(playerInput)
+	return {
+		displayName = playerInput[1],
+		flag = playerInput.flag,
+		pageName = playerInput.link,
+		team = playerInput.team,
+		faction = playerInput.faction,
+		extradata = {
+			roles = RoleUtil.readRoleArgs(playerInput.role),
+			trophies = tonumber(playerInput.trophies),
+			type = playerInput.type or 'player',
+		},
+	}
 end
 
 return TeamParticipantsWikiParser
