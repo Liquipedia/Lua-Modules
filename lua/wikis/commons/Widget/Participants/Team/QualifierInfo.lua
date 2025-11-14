@@ -55,8 +55,20 @@ function ParticipantsTeamQualifierInfo:render()
 		link = qualification.url
 		icon = Icon{
 			iconName = 'external_link',
+			additionalClasses = { 'team-participant-card-qualifier-external-link-icon' }
 		}
 		linktype = 'external'
+	end
+
+	local textChildren = {text}
+	if link then
+		textChildren = {
+			Link{
+				link = link,
+				linktype = linktype,
+				children = text,
+			}
+		}
 	end
 
 	local content = Div{
@@ -65,20 +77,10 @@ function ParticipantsTeamQualifierInfo:render()
 			icon,
 			Span{
 				classes = {'team-participant-card-qualifier-details'},
-				children = {
-					text,
-				}
+				children = textChildren
 			}
 		)
 	}
-
-	if link then
-		return Link{
-			link = link,
-			linktype = linktype,
-			children = content
-		}
-	end
 
 	return content
 end

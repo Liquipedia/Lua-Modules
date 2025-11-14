@@ -135,6 +135,7 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 	}
 
 	&-qualifier {
+		position: relative;
 		display: flex;
 		gap: 0.25rem;
 		align-items: center;
@@ -156,11 +157,30 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 			color: inherit;
 		}
 
+		a {
+			&::after {
+				content: "";
+				position: absolute;
+				inset: 0;
+				z-index: 1;
+			}
+		}
+
 		&-details {
 			display: flex;
 			flex-direction: column;
 			font-weight: bold;
 			font-size: 12px;
+		}
+
+		&-external-link-icon {
+			.theme--light & {
+				color: var( --clr-primary-44 );
+			}
+
+			.theme--dark & {
+				color: var( --clr-primary-80 );
+			}
 		}
 	}
 
