@@ -14,6 +14,7 @@ local Logic = Lua.import('Module:Logic')
 local StreamLinks = Lua.import('Module:Links/Stream')
 
 local Info = Lua.import('Module:Info', {loadData = true})
+local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Widget = Lua.import('Module:Widget')
@@ -21,6 +22,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
 local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
+local PartyDisplay = Lua.import('Module:Widget/Match/Page/PartyDisplay')
 local TeamDisplay = Lua.import('Module:Widget/Match/Page/TeamDisplay')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -116,6 +118,15 @@ function MatchPageHeader:render()
 	local opponent1 = self.props.opponent1
 	local opponent2 = self.props.opponent2
 
+	---@param opponent standardOpponent
+	---@return Widget
+	local function createOpponentDisplay(opponent)
+		if opponent.type == Opponent.team or opponent.type == Opponent.literal then
+			return TeamDisplay{opponent = opponent}
+		end
+		return PartyDisplay{opponent = opponent}
+	end
+
 	return Div{
 		classes = { 'match-bm-match-header' },
 		children = WidgetUtil.collect(
@@ -133,9 +144,9 @@ function MatchPageHeader:render()
 			Div{
 				classes = { 'match-bm-match-header-overview' },
 				children = {
-					TeamDisplay{ opponent = opponent1 },
+					createOpponentDisplay(opponent1),
 					self:_makeResultDisplay(),
-					TeamDisplay{ opponent = opponent2 }
+					createOpponentDisplay(opponent2)
 				}
 			},
 			Div{
