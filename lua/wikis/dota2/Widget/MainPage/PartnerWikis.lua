@@ -21,7 +21,7 @@ local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local Dota2PartnerWikis = Class.new(Widget)
 
 function Dota2PartnerWikis:render()
-	function createCellHeader(props)
+	local function createCellHeader(props)
 		return HtmlWidgets.Th{
 			attributes = {width = '17%'},
 			children = {
