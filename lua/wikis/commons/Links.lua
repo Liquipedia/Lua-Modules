@@ -268,7 +268,6 @@ local PREFIXES = {
 		'https://start.gg/',
 		player = 'https://start.gg/user/',
 	},
-	steam = {'https://steamcommunity.com/id/'}, -- to be removed after conversion
 	steamID64 = {'https://steamcommunity.com/profiles/'},
 	steamtv = {'https://steam.tv/'},
 	strikr = {'https://strikr.pro/pilot/'},
@@ -381,8 +380,6 @@ local ALIASES = {
 	['start-gg'] = {'startgg', 'smashgg'},
 	yandexefir = {'yandex'},
 	zhanqitv = {'zhanqi'},
-	-- temporarily for conversion
-	steamID64 = {'steamalternative'},
 }
 
 local ICON_KEYS_TO_RENAME = {
@@ -399,7 +396,7 @@ local ICON_KEYS_TO_RENAME = {
 	playlist = 'music',
 	privsteam = 'steam',
 	pubsteam = 'steam',
-	steamalternative = 'steam',
+	steamID64 = 'steam',
 	tlpdint = 'tlpd',
 	tlpdkr = 'tlpd-wol-korea',
 	tlpdsospa = 'tlpd-sospa',

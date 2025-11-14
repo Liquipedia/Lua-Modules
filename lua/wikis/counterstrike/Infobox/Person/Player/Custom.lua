@@ -33,11 +33,6 @@ function CustomPlayer.run(frame)
 
 	player.args.history = player.args.team_history
 
-	for steamKey, steamInput, steamIndex in Table.iter.pairsByPrefix(player.args, 'steam', {requireIndex = false}) do
-		player.args['steamalternative' .. steamIndex] = steamInput
-		player.args[steamKey] = nil
-	end
-
 	player.args.informationType = player.args.informationType or 'Player'
 
 	player.args.banned = tostring(player.args.banned or '')
