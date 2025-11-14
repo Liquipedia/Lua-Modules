@@ -55,14 +55,8 @@ function ParticipantsTeamQualifierInfo:render()
 		link = qualification.url
 		icon = Icon{
 			iconName = 'external_link',
-			additionalClasses = { 'team-participant-card-qualifier-external-link-icon' }
 		}
 		linktype = 'external'
-	end
-
-	local spanClasses = {'team-participant-card-qualifier-details'}
-	if link then
-		table.insert(spanClasses, 'team-participant-card-qualifier-details--link')
 	end
 
 	local content = Div{
@@ -70,7 +64,7 @@ function ParticipantsTeamQualifierInfo:render()
 		children = WidgetUtil.collect(
 			icon,
 			Span{
-				classes = spanClasses,
+				classes = {'team-participant-card-qualifier-details'},
 				children = {
 					text,
 				}

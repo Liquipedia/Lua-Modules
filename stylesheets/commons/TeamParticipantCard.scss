@@ -152,31 +152,15 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 			background-color: var( --clr-on-surface-dark-primary-4 );
 		}
 
+		a & {
+			color: inherit;
+		}
+
 		&-details {
 			display: flex;
 			flex-direction: column;
 			font-weight: bold;
 			font-size: 12px;
-
-			&--link {
-				.theme--light & {
-					color: var( --clr-primary-44 );
-				}
-
-				.theme--dark & {
-					color: var( --clr-primary-80 );
-				}
-			}
-		}
-
-		&-external-link-icon {
-			.theme--light & {
-				color: var( --clr-primary-44 );
-			}
-
-			.theme--dark & {
-				color: var( --clr-primary-80 );
-			}
 		}
 	}
 
