@@ -175,12 +175,15 @@ function ParticipantsTeamCard:_renderContent(participant)
 					}
 				end),
 			},
-			Array.map(participant.notes or {}, function(note)
-				return ParticipantNotification{
-					text = note.text,
-					highlighted = note.highlighted,
-				}
-			end)
+			Div{
+				classes = { 'team-participant-notifications' },
+				children = Array.map(participant.notes or {}, function(note)
+					return ParticipantNotification{
+						text = note.text,
+						highlighted = note.highlighted,
+					}
+				end)
+			}
 		)
 	}
 end

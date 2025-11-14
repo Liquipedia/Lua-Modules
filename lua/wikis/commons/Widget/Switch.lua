@@ -20,6 +20,7 @@ local Div = HtmlWidgets.Div
 ---@field defaultActive boolean
 ---@field css table?
 ---@field content string|Widget|Html|(string|Widget|Html)[]?
+---@field collapsibleSelector string?
 
 ---@class SwitchWidget: Widget
 ---@operator call(SwitchParameters): SwitchWidget
@@ -47,16 +48,22 @@ function SwitchWidget:render()
 		table.insert(toggleClasses, 'switch-toggle-active')
 	end
 
+	local toggleAttributes = {
+		['data-switch-group'] = switchGroup,
+		['data-store-value'] = tostring(storeValue),
+	}
+
+	if self.props.collapsibleSelector then
+		toggleAttributes['data-collapsible-selector'] = self.props.collapsibleSelector
+	end
+
 	local switchElement = Div{
 		classes = switchToggleClasses,
 		css = self.props.css,
 		children = {
 			Div{
 				classes = toggleClasses,
-				attributes = {
-					['data-switch-group'] = switchGroup,
-					['data-store-value'] = tostring(storeValue),
-				},
+				attributes = toggleAttributes,
 				children = {
 					Div{classes = {'switch-toggle-slider'}},
 				},

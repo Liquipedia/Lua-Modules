@@ -14,6 +14,7 @@ liquipedia.collapse = {
 		liquipedia.collapse.setupToggleGroups();
 		liquipedia.collapse.setupDropdownBox();
 		liquipedia.collapse.setupCollapsibleNavFrameButtons();
+		liquipedia.collapse.setupSwitchToggleCollapsibles();
 	},
 	makeIcon: function( isShow ) {
 		return isShow ? '<span class="far fa-eye"></span>' : '<span class="far fa-eye-slash"></span>';
@@ -186,6 +187,52 @@ liquipedia.collapse = {
 				} );
 			};
 		} );
-	}
-};
+	},
+
+	setupSwitchToggleCollapsibles: function() {
+		const switchToggleElements = document.querySelectorAll( '[data-switch-group]' );
+		if ( switchToggleElements.length === 0 ) {
+			return;
+		}
+
+		const groupToSelectorMap = new Map();
+
+		switchToggleElements.forEach( ( element ) => {
+			const switchGroupName = element.getAttribute( 'data-switch-group' );
+			const collapsibleSelector = element.getAttribute( 'data-collapsible-selector' );
+
+			if ( collapsibleSelector === undefined ) {
+				return;
+			}
+
+			groupToSelectorMap.set( switchGroupName, collapsibleSelector );
+
+			liquipedia.switchButtons.getSwitchGroup( switchGroupName ).then( ( switchGroup ) => {
+				if ( switchGroup ) {
+					this.updateCollapsibleElements(
+						collapsibleSelector,
+						switchGroup.value
+					);
+				}
+			} );
+		} );
+
+		document.addEventListener( 'switchButtonChanged', ( event ) => {
+			const { name, value } = event.detail.data;
+
+			const selector = groupToSelectorMap.get( name );
+
+			if ( selector ) {
+				this.updateCollapsibleElements( selector, value );
+			}
+		} );
+	},
+
+	updateCollapsibleElements: function( selector, show ) {
+		const elements = document.querySelectorAll( selector );
+
+		elements.forEach( ( element ) => {
+			element.classList.toggle( 'collapsed', !show );
+		} );
+	} };
 liquipedia.core.modules.push( 'collapse' );

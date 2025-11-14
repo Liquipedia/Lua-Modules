@@ -28,16 +28,38 @@ function ParticipantsTeamCardsGroup:render()
 		return
 	end
 
-	return AnalyticsWidget{
-		analyticsName = 'ParticipantsCompactSwitch',
-		analyticsProperties = {
-			['track-value-as'] = 'participants compact',
-		},
-		children = Switch{
-			label = 'Compact view',
-			switchGroup = 'team-cards-compact',
-			defaultActive = true,
-			content = AnalyticsWidget{
+	return Div{
+		classes = { 'team-participant-wrapper' },
+		children = {
+			Div{
+				classes = { 'team-participant-switches' },
+				children = {
+					AnalyticsWidget{
+						analyticsName = 'ParticipantsShowRostersSwitch',
+						analyticsProperties = {
+							['track-value-as'] = 'participants show rosters',
+						},
+						children = Switch{
+							label = 'Show rosters',
+							switchGroup = 'team-cards-show-rosters',
+							defaultActive = false,
+							collapsibleSelector = '.team-participant-card',
+						},
+					},
+					AnalyticsWidget{
+						analyticsName = 'ParticipantsCompactSwitch',
+						analyticsProperties = {
+							['track-value-as'] = 'participants compact',
+						},
+						children = Switch{
+							label = 'Compact view',
+							switchGroup = 'team-cards-compact',
+							defaultActive = true,
+						},
+					}
+				}
+			},
+			AnalyticsWidget{
 				analyticsName = 'Team participants card',
 				children = Div{
 					classes = { 'team-participant-cards' },
