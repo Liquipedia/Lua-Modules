@@ -48,18 +48,18 @@ local StandingsParseWiki = {}
 function StandingsParseWiki.parseWikiInput(args)
 	---@type {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}[]
 	local rounds = {}
-	for _, roundData, roundIndex in Table.iter.pairsByPrefix(args, 'round', {requireIndex = true}) do
+	for _, roundData, roundIndex in Table.iter.pairsByPrefix(args, 'round', { requireIndex = true }) do
 		table.insert(rounds, StandingsParseWiki.parseWikiRound(roundData, roundIndex))
 	end
 
 	if Logic.isEmpty(rounds) then
-		rounds = {StandingsParseWiki.parseWikiRound(args, 1)}
+		rounds = { StandingsParseWiki.parseWikiRound(args, 1) }
 	end
 
 	local date = DateExt.readTimestamp(args.date) or DateExt.getContextualDateOrNow()
 
 	---@type StandingTableOpponentData[]
-	local opponents = Array.map(args, function (opponentData)
+	local opponents = Array.map(args, function(opponentData)
 		return StandingsParseWiki.parseWikiOpponent(opponentData, #rounds, date)
 	end)
 
@@ -106,8 +106,8 @@ end
 ---@param matchGroupId string
 ---@return string[]
 function StandingsParseWiki.getMatchIdsOfMatchGroup(matchGroupId)
-	return MatchGroupUtil.fetchMatchIds{
-		conditions = ConditionTree(BooleanOperator.all):add{
+	return MatchGroupUtil.fetchMatchIds {
+		conditions = ConditionTree(BooleanOperator.all):add {
 			ConditionNode(ColumnName('namespace'), Comparator.neq, Namespace.matchNamespaceId()),
 			ConditionNode(ColumnName('match2bracketid'), Comparator.eq, matchGroupId),
 		},
@@ -123,9 +123,9 @@ function StandingsParseWiki.getMatchIdsFromStage(rawStage)
 	local namespace, basePage, stage = Logic.nilIfEmpty(title.nsText), title.text, Logic.nilIfEmpty(title.fragment)
 	basePage = basePage:gsub(' ', '_')
 
-	return MatchGroupUtil.fetchMatchIds{
+	return MatchGroupUtil.fetchMatchIds {
 		conditions = ConditionTree(BooleanOperator.all):add(Array.append(
-			{ConditionNode(ColumnName('pagename'), Comparator.eq, basePage)},
+			{ ConditionNode(ColumnName('pagename'), Comparator.eq, basePage) },
 			namespace and ConditionNode(ColumnName('namespace'), Comparator.eq, Namespace.idFromName(namespace)) or nil,
 			stage and ConditionNode(ColumnName('match2bracketdata_sectionheader'), Comparator.eq, stage) or nil
 		)),
@@ -152,14 +152,14 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, res
 		end
 		local tiebreakerPoints = numberOfRounds == i and tonumber(opponentData.tiebreaker) or nil
 		table.insert(rounds, {
-			scoreboard = {points = points},
+			scoreboard = { points = points },
 			specialstatus = specialStatus,
 			tiebreakerPoints = tiebreakerPoints,
 		})
 	end
 
 	local opponent = Opponent.readOpponentArgs(opponentData)
-	opponent = Opponent.resolve(opponent, resolveDate, {syncPlayer = true})
+	opponent = Opponent.resolve(opponent, resolveDate, { syncPlayer = true })
 
 	return {
 		rounds = rounds,
@@ -172,7 +172,7 @@ end
 ---@return table<integer, string>
 function StandingsParseWiki.parseWikiBgs(input)
 	local statusParsed = {}
-	Array.forEach(Array.parseCommaSeparatedString(input, ','), function (status)
+	Array.forEach(Array.parseCommaSeparatedString(input, ','), function(status)
 		local placements, color = unpack(Array.parseCommaSeparatedString(status, '='))
 		local pStart, pEnd = unpack(Array.parseCommaSeparatedString(placements, '-'))
 		local pStartNumber = tonumber(pStart) --[[@as integer]]
@@ -185,8 +185,46 @@ function StandingsParseWiki.parseWikiBgs(input)
 end
 
 ---@param tabletype StandingsTableTypes
+---Parse status-based scoring configurations from template arguments
+---@param args table
+---@return table<string, {points: number?, roundWins: number?, roundLosses: number?, roundDraws: number?,
+---gameWins: number?, gameLosses: number?, gameDraws: number?}>
+function StandingsParseWiki.parseStatusConfigs(args)
+	local configs = {}
+	local statusKeys = {
+		'defaultWin', 'defaultLoss', 'draw',
+		'ffWin', 'ffLoss',
+		'dqWin', 'dqLoss'
+	}
+
+	for _, key in ipairs(statusKeys) do
+		if args[key] then
+			configs[key] = Json.parseIfString(args[key])
+		end
+	end
+
+	return configs
+end
+
+---Determine which status configuration key to use for an opponent
+---@param opponent match2opponent
+---@return string
+function StandingsParseWiki.getStatusConfigKey(opponent)
+	local isWin = opponent.placement == 1
+	local status = opponent.status
+
+	if status == 'D' then return 'draw' end
+	if status == 'FF' then return isWin and 'ffWin' or 'ffLoss' end
+	if status == 'DQ' then return isWin and 'dqWin' or 'dqLoss' end
+
+	-- Default: covers both scored ('S') and unknown score ('W'/'L') matches
+	return isWin and 'defaultWin' or 'defaultLoss'
+end
+
 ---@param args table
 ---@return fun(opponent: match2opponent): number|nil
+---@return table<string, {points: number?, roundWins: number?, roundLosses: number?, roundDraws: number?,
+---gameWins: number?, gameLosses: number?, gameDraws: number?}>?
 function StandingsParseWiki.makeScoringFunction(tabletype, args)
 	if tabletype == 'ffa' then
 		if not args['p1'] then
@@ -195,16 +233,35 @@ function StandingsParseWiki.makeScoringFunction(tabletype, args)
 					return tonumber(opponent.score)
 				end
 				return nil
-			end
+			end, nil
 		end
 		return function(opponent)
 			local scoreFromPlacement = tonumber(args['p' .. opponent.placement])
 			return scoreFromPlacement or 0
-		end
+		end, nil
 	elseif tabletype == 'swiss' then
+		local statusConfigs = StandingsParseWiki.parseStatusConfigs(args)
+
+		-- Set defaults if not configured
+		local defaultConfigs = {
+			defaultWin = { points = 1, roundWins = 1, roundLosses = 0 },
+			defaultLoss = { points = 0, roundWins = 0, roundLosses = 1 },
+			ffWin = { points = 1, roundWins = 1, roundLosses = 0 },
+			ffLoss = { points = 0, roundWins = 0, roundLosses = 1 },
+			dqWin = { points = 1, roundWins = 1, roundLosses = 0 },
+			dqLoss = { points = 0, roundWins = 0, roundLosses = 1 },
+			draw = { points = 0, roundWins = 0, roundLosses = 0, roundDraws = 1 },
+		}
+
+		-- Merge with defaults
+		statusConfigs = Table.merge(defaultConfigs, statusConfigs)
+
 		return function(opponent)
-			return opponent.placement == 1 and 1 or 0
-		end
+			local configKey = StandingsParseWiki.getStatusConfigKey(opponent)
+			local config = statusConfigs[configKey]
+
+			return config and config.points or 0
+		end, statusConfigs
 	end
 	error('Unknown table type')
 end
@@ -245,7 +302,7 @@ function StandingsParseWiki.parsePlaceMapping(args, opponents)
 	end
 
 	local mapping = {}
-	Array.forEach(Array.parseCommaSeparatedString(input, ';'), function (place)
+	Array.forEach(Array.parseCommaSeparatedString(input, ';'), function(place)
 		local places = Array.parseCommaSeparatedString(place, '-')
 		local startPlace = tonumber(places[1])
 		local placeEnd = tonumber(places[#places])
