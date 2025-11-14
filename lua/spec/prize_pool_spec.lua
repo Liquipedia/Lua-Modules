@@ -125,6 +125,7 @@ describe('prize pool', function()
 				startdate = '2022-10-13',
 				tournament = 'Test Tournament',
 				type = 'Offline',
+				qualified = 0,
 			})
 		end)
 	end)
