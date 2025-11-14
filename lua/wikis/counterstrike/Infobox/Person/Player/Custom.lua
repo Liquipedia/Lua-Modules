@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
 
 local Game = Lua.import('Module:Game')
 local Injector = Lua.import('Module:Widget/Injector')
