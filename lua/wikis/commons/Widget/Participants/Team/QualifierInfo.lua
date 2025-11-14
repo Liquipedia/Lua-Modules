@@ -48,8 +48,7 @@ function ParticipantsTeamQualifierInfo:render()
 		icon = LeagueIcon.display{
 			icon = qualification.tournament.icon,
 			iconDark = qualification.tournament.iconDark,
-			link = qualification.tournament.pageName,
-			options = {noTemplate = true},
+			options = {noTemplate = true, noLink = true},
 		}
 		linktype = 'internal'
 	elseif qualification.type == 'external' then
