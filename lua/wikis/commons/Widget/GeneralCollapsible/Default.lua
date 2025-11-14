@@ -25,6 +25,7 @@ function DefaultCollapsible:render()
 	local props = self.props
 	return Div{
 		attributes = props.attributes,
+		css = props.css,
 		classes = Array.extend({},
 			'general-collapsible',
 			props.shouldCollapse and 'collapsed' or nil,
