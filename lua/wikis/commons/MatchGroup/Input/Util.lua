@@ -1449,6 +1449,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 end
 
 ---@class FfaMapParserInterface
+---@field getMap? fun(mapInput: table): table
 ---@field getMapName? fun(game: table, mapIndex: integer, match: table): string?, string?
 ---@field getPatch? fun(game: table): string?
 ---@field getPlayersOfMapOpponent? fun(game: table, opponent: MGIParsedOpponent, opponentIndex: integer): table[]
@@ -1477,7 +1478,8 @@ end
 ---@return table[]
 function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, Parser)
 	local maps = {}
-	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+	for key, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		local map = Parser.getMap and Parser.getMap(mapInput) or mapInput
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
