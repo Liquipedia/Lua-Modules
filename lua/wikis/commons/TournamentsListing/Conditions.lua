@@ -182,7 +182,7 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 		-- A placement 1-... will be sorted before 10-..., so this will be the best placement
 		local firstPlacement = queryResult[1]
 		if not firstPlacement then
-			-- Early return is allowed since there is not placement available,
+			-- Early return is allowed since there is no placement available,
 			-- thus allowedPlacements won't be needed.
 			return conditions:toString()
 		end
