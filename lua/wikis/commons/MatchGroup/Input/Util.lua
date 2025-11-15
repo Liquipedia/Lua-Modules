@@ -1455,7 +1455,8 @@ end
 ---@field getPlayersOfMapOpponent? fun(game: table, opponent: MGIParsedOpponent, opponentIndex: integer): table[]
 ---@field getMapMode? fun(match: table, game: table, opponents: MGIParsedOpponent[]): string?
 ---@field getExtraData? fun(match: table, game: table, opponents: MGIParsedOpponent[]): table?
----@field readMapOpponent? fun(map: table, matchOpponent: MGIParsedOpponent, opponentIndex: integer): table
+---@field readMapOpponent? fun(map: table, mapIndex: integer, scoreSettings: table,
+---matchOpponent: MGIParsedOpponent, opponentIndex: integer): table
 ---@field getMapWinner? fun(status: string?, winnerInput: integer|string?, mapOpponents: table[]): integer?
 ---@field mapIsFinished? fun(match: table, map: table): boolean
 ---@field getGame? fun(match: table, map:table): string?
@@ -1498,14 +1499,24 @@ function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSetti
 		local dateToUse = map.date or match.date
 		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
 
-		local opponentParser = Parser.readMapOpponent and FnUtil.curry(Parser.readMapOpponent, map) or function(matchOpponent)
-			local opponentMapInput = Json.parseIfString(matchOpponent['m' .. mapIndex])
-			local opponent = MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(opponentMapInput, scoreSettings)
-			if Parser.getPlayersOfMapOpponent then
-				opponent.players = Parser.getPlayersOfMapOpponent(map, matchOpponent, opponentMapInput)
+		local opponentParser = Parser.readMapOpponent and
+			---@param matchOpponent MGIParsedOpponent
+			---@param opponentIndex integer
+			---@return table
+			function (matchOpponent, opponentIndex)
+				return Parser.readMapOpponent(map, mapIndex, scoreSettings, matchOpponent, opponentIndex)
 			end
-			return opponent
-		end
+		or
+			---@param matchOpponent MGIParsedOpponent
+			---@return table
+			function(matchOpponent)
+				local opponentMapInput = Json.parseIfString(matchOpponent['m' .. mapIndex])
+				local opponent = MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(opponentMapInput, scoreSettings)
+				if Parser.getPlayersOfMapOpponent then
+					opponent.players = Parser.getPlayersOfMapOpponent(map, matchOpponent, opponentMapInput)
+				end
+				return opponent
+			end
 		map.opponents = Array.map(opponents, opponentParser)
 
 		map.finished = Parser.mapIsFinished and Parser.mapIsFinished(match, map) or MatchGroupInputUtil.mapIsFinished(map)
