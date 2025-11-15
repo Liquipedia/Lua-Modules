@@ -131,7 +131,7 @@ function FfaMapFunctions.getMap(mapInput)
 		function (player)
 			local teamSeparatorIndex = player.pubgdbm_name:find('_')
 			local teamName = teamSeparatorIndex and player.pubgdbm_name:sub(1, teamSeparatorIndex - 1) or player.pubgdbmr_name
-			return Logic.nilIfEmpty(teamName)
+			return Logic.nilIfEmpty(teamName:lower())
 		end
 	)
 
@@ -155,8 +155,8 @@ function FfaMapFunctions.readMapOpponent(map, mapIndex, scoreSettings, matchOppo
 			Json.parseIfString(matchOpponent['m' .. mapIndex]), scoreSettings
 		)
 	end
-	local teamPrefix = Logic.emptyOr(matchOpponent['prefix'], matchOpponent.name)
-	local teamData = map.teams[teamPrefix] --[[@as PUBGDBMatchPlayer[] ]]
+	local teamPrefix = Logic.emptyOr(matchOpponent['prefix'], matchOpponent.name) or ''
+	local teamData = map.teams[teamPrefix:lower()] --[[@as PUBGDBMatchPlayer[] ]]
 
 	if Logic.isEmpty(teamData) then
 		return {}
