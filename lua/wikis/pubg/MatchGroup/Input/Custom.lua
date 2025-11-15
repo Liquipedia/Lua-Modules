@@ -114,21 +114,19 @@ end
 ---@param mapInput table
 ---@return table
 function FfaMapFunctions.getMap(mapInput)
-	if Logic.isEmpty(mapInput.tournamentid) or Logic.isEmpty(mapInput.matchid) then
+	if Logic.isEmpty(mapInput.matchid) then
 		return mapInput
 	end
-	local tournamentData = mw.ext.PUBGDB.tournament(mapInput.tournamentid)
+	local tournamentData = Logic.isNotEmpty(mapInput.tournamentid)
+		and mw.ext.PUBGDB.tournament(mapInput.tournamentid)
+		or {}
 	assert(
-		tournamentData and type(tournamentData) == 'table',
-		'|tournamentid=' .. mapInput.tournamentid .. ' could not be retrieved.'
+		type(tournamentData) == 'table',
+		'|tournamentid=' .. (mapInput.tournamentid or '') .. ' could not be retrieved.'
 	)
 	local matchInfo = Array.find(tournamentData, function (element)
 		return element.pubgdbt_match_id == mapInput.matchid
 	end)
-	assert(
-		matchInfo,
-		'|matchid=' .. mapInput.matchid .. ' could not be found with |tournamentid=' .. mapInput.tournamentid
-	)
 	local mapData = mw.ext.PUBGDB.match(mapInput.matchid)
 	assert(mapData and type(mapData) == 'table', '|matchid=' .. mapInput.matchid .. ' could not be retrieved.')
 
@@ -144,7 +142,7 @@ function FfaMapFunctions.getMap(mapInput)
 	return Table.merge(
 		mapInput,
 		{
-			date = matchInfo.pubgdbt_match_timestamp,
+			date = matchInfo and matchInfo.pubgdbt_match_timestamp or nil,
 			finished = true,
 			teams = playersByTeam
 		}
