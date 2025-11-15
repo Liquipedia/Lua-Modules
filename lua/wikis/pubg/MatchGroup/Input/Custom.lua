@@ -142,7 +142,7 @@ function FfaMapFunctions.getMap(mapInput)
 	return Table.merge(
 		mapInput,
 		{
-			date = matchInfo and matchInfo.pubgdbt_match_timestamp or nil,
+			date = Logic.emptyOr(mapInput.date, (matchInfo or {}).pubgdbt_match_timestamp),
 			finished = true,
 			teams = playersByTeam
 		}
