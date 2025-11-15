@@ -118,11 +118,17 @@ function FfaMapFunctions.getMap(mapInput)
 		return mapInput
 	end
 	local tournamentData = mw.ext.PUBGDB.tournament(mapInput.tournamentid)
-	assert(tournamentData and type(tournamentData) == 'table', '|tournamentid=' .. mapInput.tournamentid .. ' could not be retrieved.')
+	assert(
+		tournamentData and type(tournamentData) == 'table',
+		'|tournamentid=' .. mapInput.tournamentid .. ' could not be retrieved.'
+	)
 	local matchInfo = Array.find(tournamentData, function (element)
 		return element.pubgdbt_match_id == mapInput.matchid
 	end)
-	assert(matchInfo, '|matchid=' .. mapInput.matchid .. ' could not be found with |tournamentid=' .. mapInput.tournamentid)
+	assert(
+		matchInfo,
+		'|matchid=' .. mapInput.matchid .. ' could not be found with |tournamentid=' .. mapInput.tournamentid
+	)
 	local mapData = mw.ext.PUBGDB.match(mapInput.matchid)
 	assert(mapData and type(mapData) == 'table', '|matchid=' .. mapInput.matchid .. ' could not be retrieved.')
 
