@@ -72,7 +72,7 @@ function CustomPlayerIntroduction:typeDisplay()
 	elseif String.isNotEmpty(title) then
 		return self._addConcatText('chess ' .. title)
 	else
-		return PlayerIntroduction.typeDisplay(self)
+		return self._addConcatText('chess player')
 	end
 end
 
