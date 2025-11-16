@@ -51,7 +51,7 @@ end
 ---@return table[]
 function MatchFunctions.removeUnsetMaps(games)
 	return Array.filter(games, function(map)
-		return map.map ~= nil
+		return map.map ~= nil or Logic.readBool(map.finished) or map.t1survivor or map.t1hunter or map.score1
 	end)
 end
 

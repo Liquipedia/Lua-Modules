@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local Operator = Lua.import('Module:Operator')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CustomMatchSummary = {}
@@ -18,7 +19,7 @@ local CustomMatchSummary = {}
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '500px'})
 end
 
 ---@param match MatchGroupUtilMatch
@@ -44,7 +45,7 @@ end
 ---@param gameIndex integer
 ---@return Widget?
 function CustomMatchSummary.createGame(game, gameIndex)
-	if not game.map then
+	if not game.map and not CustomMatchSummary.hasScores(game) then
 		return
 	end
 
@@ -86,7 +87,7 @@ function CustomMatchSummary.createGame(game, gameIndex)
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
 			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(mapInfo), css = {['flex-grow'] = '1'}},
-			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2)},
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
 	}
@@ -101,6 +102,13 @@ function CustomMatchSummary._getOppositeSide(side)
 		return 'hunter'
 	end
 	return ''
+end
+
+---@param game MatchGroupUtilGame
+---@return boolean
+function CustomMatchSummary.hasScores(game)
+	local scores = Array.map(game.opponents, Operator.property('score'))
+	return Array.any(scores, function(score) return score ~= 0 end)
 end
 
 return CustomMatchSummary
