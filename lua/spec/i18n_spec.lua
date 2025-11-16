@@ -25,4 +25,66 @@ describe('i18n', function ()
 			languageStub:revert()
 		end)
 	end)
+
+	describe('date formats with year', function ()
+		local data = {
+			startYear = '2024', startMonth = 'Oct', startDate = '03',
+			endYear = '2025', endMonth = 'Nov', endDate = '04',
+		}
+
+		it('Prints an unknown date', function ()
+			assert.are.equal('TBA', I18n.translate('date-unknown', data))
+			assert.are.equal('TBA', I18n.translate('date-range-unknown', data))
+		end)
+
+		it('Confirmed startYear', function ()
+			assert.are.equal('2024', I18n.translate('date-range-year', data))
+			assert.are.equal('2024 - TBA', I18n.translate('date-range-year--unknown', data))
+			assert.are.equal('2024 - 2025', I18n.translate('date-range-year--year', data))
+			assert.are.equal('2024 - 2025', I18n.translate('date-range-year--year-month', data))
+			assert.are.equal('2024 - 2025', I18n.translate('date-range-year--year-month-day', data))
+		end)
+
+		it('Confirmed startYear, startMonth', function ()
+			assert.are.equal('Oct, 2024', I18n.translate('date-range-year-month', data))
+			assert.are.equal('Oct, 2024 - TBA', I18n.translate('date-range-year-month--unknown', data))
+			assert.are.equal('Oct, 2024 - 2025', I18n.translate('date-range-year-month--year', data))
+			assert.are.equal('Oct, 2024 - Nov, 2025', I18n.translate('date-range-year-month--year-month', data))
+			assert.are.equal('Oct, 2024 - Nov, 2025', I18n.translate('date-range-year-month--year-month-day', data))
+		end)
+
+		it('Confirmed startYear, startMonth, startDay', function ()
+			assert.are.equal('Oct 03, 2024', I18n.translate('date-range-year-month-day', data))
+			assert.are.equal('Oct 03, 2024 - TBA', I18n.translate('date-range-year-month-day--unknown', data))
+			assert.are.equal('Oct 03, 2024 - 2025', I18n.translate('date-range-year-month-day--year', data))
+			assert.are.equal('Oct 03, 2024 - Nov, 2025', I18n.translate('date-range-year-month-day--year-month', data))
+			assert.are.equal('Oct 03, 2024 - Nov 04, 2025', I18n.translate('date-range-year-month-day--year-month-day', data))
+		end)
+	end)
+
+	describe('date formats without year', function ()
+		local data = {
+			startYear = '2024', startMonth = 'Oct', startDate = '03',
+			endYear = '2025', endMonth = 'Nov', endDate = '04',
+		}
+
+		it('Prints an unknown date', function ()
+			assert.are.equal('TBA', I18n.translate('date-unknown', data))
+			assert.are.equal('TBA', I18n.translate('date-range-unknown', data))
+		end)
+
+		it('Confirmed startMonth', function ()
+			assert.are.equal('Oct', I18n.translate('date-range-month', data))
+			assert.are.equal('Oct - TBA', I18n.translate('date-range-month--unknown', data))
+			assert.are.equal('Oct - Nov', I18n.translate('date-range-month--month', data))
+			assert.are.equal('Oct - Nov', I18n.translate('date-range-month--month-day', data))
+		end)
+
+		it('Confirmed startMonth, startDay', function ()
+			assert.are.equal('Oct 03', I18n.translate('date-range-month-day', data))
+			assert.are.equal('Oct 03 - TBA', I18n.translate('date-range-month-day--unknown', data))
+			assert.are.equal('Oct 03 - Nov TBA', I18n.translate('date-range-month-day--month', data))
+			assert.are.equal('Oct 03 - Nov 04', I18n.translate('date-range-month-day--month-day', data))
+		end)
+	end)
 end)

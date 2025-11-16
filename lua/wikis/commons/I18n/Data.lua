@@ -25,14 +25,35 @@ return {
 
 		-- Dates
 		['date-unknown'] = 'TBA',
-		['date-range-different-months'] = '${startMonth} ${startDate} - ${endMonth} ${endDate}',
-		['date-range-same-month'] = '${startMonth} ${startDate} - ${endDate}',
-		['date-range-same-day'] = '${startMonth} ${startDate}',
-		['date-range-different-months-unknown-end'] = '${startMonth} ${startDate} - TBA',
-		['date-range-different-months-unknown-end-day'] = '${startMonth} ${startDate} - ${endMonth} TBA',
-		['date-range-different-months-unknown-days'] = '${startMonth} - ${endMonth}',
-		['date-range-different-months-unknown-days-and-end-month'] = '${startMonth} - TBA',
-		['date-range-same-month-unknown-days'] = '${startMonth}',
+		['date-range-unknown'] = 'TBA',
+
+		['date-range-year'] = '${startYear}',
+		['date-range-year--unknown'] = '${startYear} - TBA',
+		['date-range-year--year'] = '${startYear} - ${endYear}',
+		['date-range-year--year-month'] = '${startYear} - ${endYear}',
+		['date-range-year--year-month-day'] = '${startYear} - ${endYear}',
+
+		['date-range-year-month'] = '${startMonth}, ${startYear}',
+		['date-range-year-month--unknown'] = '${startMonth}, ${startYear} - TBA',
+		['date-range-year-month--year'] = '${startMonth}, ${startYear} - ${endYear}',
+		['date-range-year-month--year-month'] = '${startMonth}, ${startYear} - ${endMonth}, ${endYear}',
+		['date-range-year-month--year-month-day'] = '${startMonth}, ${startYear} - ${endMonth}, ${endYear}',
+
+		['date-range-year-month-day'] = '${startMonth} ${startDate}, ${startYear}',
+		['date-range-year-month-day--unknown'] = '${startMonth} ${startDate}, ${startYear} - TBA',
+		['date-range-year-month-day--year'] = '${startMonth} ${startDate}, ${startYear} - ${endYear}',
+		['date-range-year-month-day--year-month'] = '${startMonth} ${startDate}, ${startYear} - ${endMonth}, ${endYear}',
+		['date-range-year-month-day--year-month-day'] = '${startMonth} ${startDate}, ${startYear} - ${endMonth} ${endDate}, ${endYear}',
+
+		['date-range-month'] = '${startMonth}',
+		['date-range-month--unknown'] = '${startMonth} - TBA',
+		['date-range-month--month'] = '${startMonth} - ${endMonth}',
+		['date-range-month--month-day'] = '${startMonth} - ${endMonth}',
+		['date-range-month-day'] = '${startMonth} ${startDate}',
+		['date-range-month-day--day'] = '${startMonth} ${startDate} - ${endDate}',
+		['date-range-month-day--month'] = '${startMonth} ${startDate} - ${endMonth} TBA',
+		['date-range-month-day--month-day'] = '${startMonth} ${startDate} - ${endMonth} ${endDate}',
+		['date-range-month-day--unknown'] = '${startMonth} ${startDate} - TBA',
 
 		-- Bracket Headers
 		['brkts-header-r1'] = 'Grand Final,Final,GF',
