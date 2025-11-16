@@ -62,20 +62,31 @@ function CustomMatchSummary.createGame(game, gameIndex)
 		}
 	end
 
+	local function makeTeamSection(opponentIndex)
+		local flipped = opponentIndex == 2
+		local characters = extradata['t' .. opponentIndex .. 'picks'] or {}
+		return {
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
+			MatchSummaryWidgets.Characters{characters = characters, flipped = flipped, hideOnMobile = true},
+			MatchSummaryWidgets.DetailedScore{
+				score = scoreDisplay(opponentIndex),
+				flipped = flipped,
+				partialScores = getScoreDetails(opponentIndex),
+			}
+		}
+	end
+
 	local mapInfo = {
 		mapDisplayName = game.map,
 		map = game.map,
 	}
 
-	--TODO: add char picks
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
 		children = WidgetUtil.collect(
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.DetailedScore{score = scoreDisplay(1), partialScores = getScoreDetails(1), flipped = false},
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
 			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(mapInfo), css = {['flex-grow'] = '1'}},
-			MatchSummaryWidgets.DetailedScore{score = scoreDisplay(2), partialScores = getScoreDetails(2), flipped = true},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2)},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
 	}
