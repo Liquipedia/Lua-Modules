@@ -65,26 +65,31 @@ function TeamParticipantsRepository.save(participant)
 	lpdbData.startdate = lpdbData.startdate or Variables.varDefault('tournament_startdate')
 	lpdbData.date = lpdbData.date or Variables.varDefault('tournament_enddate')
 
-	lpdbData.qualifier = participant.qualifierText
-	lpdbData.qualifierpage = participant.qualifierPage
-	lpdbData.qualifierurl = participant.qualifierUrl
+	if participant.qualification then
+		lpdbData.qualifier = participant.qualification.text
+		if participant.qualification.type == 'tournament' then
+			lpdbData.qualifierpage = participant.qualification.tournament.pageName
+		elseif participant.qualification.type == 'external' then
+			lpdbData.qualifierurl = participant.qualification.url
+		end
+	end
 
 	lpdbData.extradata = lpdbData.extradata or {}
 	lpdbData.extradata.opponentaliases = participant.aliases
 
-	-- TODO: Staff should be stored with a 'c' prefix instead of a 'p' prefix
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(participant.opponent, {setPlayersInTeam = true}))
 	-- Legacy participant fields
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(participant.opponent))
 	lpdbData.players = lpdbData.opponentplayers
 
 	-- Calculate individual prize money (prize money per player on team)
-	-- TODO: filter out staff members
-	local numberOfPlayersOnTeam = #(participant.opponent.players or {})
-	if numberOfPlayersOnTeam == 0 then
-		numberOfPlayersOnTeam = 1
-	end
 	if lpdbData.prizemoney then
+		local players = participant.opponent.players or {}
+		local filteredPlayers = Array.filter(players, function(player)
+			-- TODO: Check if subs have played flag
+			return player.extradata.type == 'player' or player.extradata.type == 'sub'
+		end)
+		local numberOfPlayersOnTeam = math.max(#(filteredPlayers), 1)
 		lpdbData.individualprizemoney = lpdbData.prizemoney / numberOfPlayersOnTeam
 	end
 
@@ -107,8 +112,11 @@ function TeamParticipantsRepository.setPageVars(participant)
 		}
 		Array.forEach(participant.opponent.players or {}, function(player, index)
 			Array.forEach(teamPrefixes, function(teamPrefix)
-				-- TODO: staff support ('c' instead of 'p')
-				local combinedPrefix = teamPrefix .. '_' .. 'p' .. index
+				local prefix = 'p'
+				if player.extradata.type == 'staff' then
+					prefix = 'c'
+				end
+				local combinedPrefix = teamPrefix .. '_' .. prefix .. index
 				globalVars:set(combinedPrefix, player.pageName)
 				globalVars:set(combinedPrefix .. 'flag', player.flag)
 				globalVars:set(combinedPrefix .. 'dn', player.displayName)

@@ -31,6 +31,7 @@ local Language = mw.getContentLanguage()
 local Company = Class.new(BasicInfobox)
 
 local COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
+local LINK_VARIANT = 'company'
 
 ---@param frame Frame
 ---@return Html
@@ -42,6 +43,8 @@ end
 ---@return string
 function Company:createInfobox()
 	local args = self.args
+
+	local links = Links.transform(args)
 
 	local widgets = {
 		Header{
@@ -90,7 +93,7 @@ function Company:createInfobox()
 			end
 		},
 		Center{children = {args.footnotes}},
-		Widgets.Links{links = Links.transform(args)},
+		Widgets.Links{links = links, variant = LINK_VARIANT},
 	}
 
 	mw.ext.LiquipediaDB.lpdb_company('company_' .. self.name, {
@@ -104,17 +107,7 @@ function Company:createInfobox()
 		foundeddate = ReferenceCleaner.clean{input = args.foundeddate},
 		defunctdate = ReferenceCleaner.clean{input = args.defunctdate},
 		numberofemployees = ReferenceCleaner.cleanNumber{input = args.employees},
-		links = Json.stringify({
-			discord = Links.makeFullLink{platform = 'discord', id = args.discord},
-			facebook = Links.makeFullLink{platform = 'facebook', id = args.facebook},
-			instagram = Links.makeFullLink{platform = 'instagram', id = args.instagram},
-			twitch = Links.makeFullLink{platform = 'twitch', id = args.twitch},
-			twitter = Links.makeFullLink{platform = 'twitter', id = args.twitter},
-			website = Links.makeFullLink{platform = 'website', id = args.website},
-			weibo = Links.makeFullLink{platform = 'weibo', id = args.weibo},
-			vk = Links.makeFullLink{platform = 'vk', id = args.vk},
-			youtube = Links.makeFullLink{platform = 'youtube', id = args.youtube},
-		})
+		links = Json.stringify(Links.makeFullLinksForTableItems(links, LINK_VARIANT))
 	})
 
 	self:categories('Companies')

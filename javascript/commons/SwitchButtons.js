@@ -130,15 +130,12 @@ liquipedia.switchButtons = {
 		}
 	},
 
-	getValueFromDOM: function ( switchGroup, activeClassName ) {
+	getValueFromDOM: function ( switchGroup ) {
 		if ( switchGroup.type === 'toggle' ) {
-			return switchGroup.nodes[ 0 ]?.classList.contains( activeClassName ) ?? false;
+			return switchGroup.nodes[ 0 ]?.classList.contains( switchGroup.activeClassName ) ?? false;
 		} else {
-			switchGroup.nodes.forEach( ( pillNode ) => {
-				if ( pillNode.classList.contains( activeClassName ) ) {
-					return pillNode.dataset.switchValue;
-				}
-			} );
+			const activeNode = switchGroup.nodes.find( ( pillNode ) => pillNode.classList.contains( switchGroup.activeClassName ) );
+			return activeNode?.dataset.switchValue;
 		}
 	},
 

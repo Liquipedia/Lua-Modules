@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local String = Lua.import('Module:StringUtils')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Widget = Lua.import('Module:Widget')
@@ -21,8 +20,9 @@ local Div = HtmlWidgets.Div
 ---@operator call(table): ParticipantsTeamHeader
 local ParticipantsTeamHeader = Class.new(Widget)
 
+---@return Widget
 function ParticipantsTeamHeader:render()
-    local participant = self.props.participant
+	local participant = self.props.participant
 	local labelDiv = self:_renderLabel(participant)
 
 	local opponentDisplay = OpponentDisplay.BlockOpponent{
@@ -47,17 +47,20 @@ function ParticipantsTeamHeader:render()
 end
 
 ---@private
----@param participant TeamParticipantsEntity
+---@param participant TeamParticipant
 ---@return Widget?
 function ParticipantsTeamHeader:_renderLabel(participant)
 	local labelText
-	if String.isNotEmpty(participant.qualifierPage) or String.isNotEmpty(participant.qualifierUrl) then
-		labelText = 'Qualifier'
-	elseif String.isNotEmpty(participant.qualifierText) then
-		labelText = 'Invited'
+	local qualificationData = participant.qualification
+	if not qualificationData then
+		return
 	end
 
-	if not labelText then
+	if qualificationData.method == 'qual' then
+		labelText = 'Qualifier'
+	elseif qualificationData.method == 'invite' then
+		labelText = 'Invited'
+	else
 		return
 	end
 

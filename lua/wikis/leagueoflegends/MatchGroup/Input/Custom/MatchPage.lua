@@ -8,22 +8,13 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local InGameRoles = Lua.import('Module:InGameRoles', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
 ---@class LeagueOfLegendsMatchPageMapParser: LeagueOfLegendsMapParserInterface
 local CustomMatchGroupInputMatchPage = {}
-
-local ROLE_ORDER = Table.map({
-	'top',
-	'jungle',
-	'middle',
-	'bottom',
-	'support',
-}, function(idx, value)
-	return value, idx
-end)
 
 ---@param mapInput table
 ---@return table
@@ -39,8 +30,13 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 
 	local function sortPlayersOnRole(team)
 		if not team.players then return end
+		Array.forEach(team.players, function (player)
+			local playerRole = InGameRoles[player.role]
+			assert(playerRole, 'Invalid role input: ' .. player.role)
+			player.role = playerRole.display:lower()
+		end)
 		team.players = Array.sortBy(team.players, function(player)
-			return ROLE_ORDER[player.role]
+			return InGameRoles[player.role].sortOrder
 		end)
 	end
 	sortPlayersOnRole(map.team1)

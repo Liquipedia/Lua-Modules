@@ -1,0 +1,830 @@
+[
+	{
+		"date": "2025-09-29T08:38:19.324Z",
+		"entries": [
+			{
+				"external_id": "9572001",
+				"name": "PARIVISION",
+				"rating": 1657.7081093094457,
+				"rank": 1
+			},
+			{
+				"external_id": "9247354",
+				"name": "Team_Falcons",
+				"rating": 1639.5844133721334,
+				"rank": 2
+			},
+			{
+				"external_id": "7119388",
+				"name": "Team_Spirit",
+				"rating": 1604.681621491348,
+				"rank": 3
+			},
+			{
+				"external_id": "8291895",
+				"name": "Tundra_Esports",
+				"rating": 1576.119915556865,
+				"rank": 4
+			},
+			{
+				"external_id": "8255888",
+				"name": "BetBoom_Team",
+				"rating": 1571.5496168310017,
+				"rank": 5
+			},
+			{
+				"external_id": "2163",
+				"name": "Team_Liquid",
+				"rating": 1555.0236004653555,
+				"rank": 6
+			},
+			{
+				"external_id": "8261500",
+				"name": "Xtreme_Gaming",
+				"rating": 1554.0470221412527,
+				"rank": 7
+			},
+			{
+				"external_id": "9640842",
+				"name": "Team_Tidebound",
+				"rating": 1529.72170776268,
+				"rank": 8
+			},
+			{
+				"external_id": "9467224",
+				"name": "Aurora_Gaming",
+				"rating": 1474.9691681819727,
+				"rank": 9
+			},
+			{
+				"external_id": "36",
+				"name": "Natus_Vincere",
+				"rating": 1457.8251445218361,
+				"rank": 10
+			},
+			{
+				"external_id": "9303484",
+				"name": "HEROIC",
+				"rating": 1433.8891295794435,
+				"rank": 11
+			},
+			{
+				"external_id": "7554697",
+				"name": "Nigma_Galaxy",
+				"rating": 1429.4349493635432,
+				"rank": 12
+			},
+			{
+				"external_id": "7732977",
+				"name": "BOOM_Esports",
+				"rating": 1424.7021079509045,
+				"rank": 13
+			},
+			{
+				"external_id": "9351740",
+				"name": "Yakult_Brothers",
+				"rating": 1424.572876979879,
+				"rank": 14
+			},
+			{
+				"external_id": "9651185",
+				"name": "Wildcard",
+				"rating": 1354.1933538428832,
+				"rank": 15
+			}
+		]
+	},
+	{
+		"date": "2025-10-06T08:38:19.324Z",
+		"entries": [
+			{
+				"external_id": "9572001",
+				"name": "PARIVISION",
+				"rating": 1648.5158012330298,
+				"rank": 1
+			},
+			{
+				"external_id": "9247354",
+				"name": "Team_Falcons",
+				"rating": 1627.0679913672752,
+				"rank": 2
+			},
+			{
+				"external_id": "7119388",
+				"name": "Team_Spirit",
+				"rating": 1595.433918379507,
+				"rank": 3
+			},
+			{
+				"external_id": "8291895",
+				"name": "Tundra_Esports",
+				"rating": 1574.8600892267161,
+				"rank": 4
+			},
+			{
+				"external_id": "8255888",
+				"name": "BetBoom_Team",
+				"rating": 1569.500940187392,
+				"rank": 5
+			},
+			{
+				"external_id": "2163",
+				"name": "Team_Liquid",
+				"rating": 1559.1413052901562,
+				"rank": 6
+			},
+			{
+				"external_id": "8261500",
+				"name": "Xtreme_Gaming",
+				"rating": 1556.366961393189,
+				"rank": 7
+			},
+			{
+				"external_id": "9640842",
+				"name": "Team_Tidebound",
+				"rating": 1555.582476308318,
+				"rank": 8
+			},
+			{
+				"external_id": "9467224",
+				"name": "Aurora_Gaming",
+				"rating": 1489.7774161678021,
+				"rank": 9
+			},
+			{
+				"external_id": "9255039",
+				"name": "1win_Team",
+				"rating": 1476.2731217068051,
+				"rank": 10
+			},
+			{
+				"external_id": "2586976",
+				"name": "OG",
+				"rating": 1465.0695989419119,
+				"rank": 11
+			},
+			{
+				"external_id": "36",
+				"name": "Natus_Vincere",
+				"rating": 1456.4817239038928,
+				"rank": 12
+			},
+			{
+				"external_id": "9303484",
+				"name": "HEROIC",
+				"rating": 1456.0752430553482,
+				"rank": 13
+			},
+			{
+				"external_id": "7554697",
+				"name": "Nigma_Galaxy",
+				"rating": 1441.0614619982405,
+				"rank": 14
+			},
+			{
+				"external_id": "9351740",
+				"name": "Yakult_Brothers",
+				"rating": 1438.6649343814722,
+				"rank": 15
+			},
+			{
+				"external_id": "7732977",
+				"name": "BOOM_Esports",
+				"rating": 1417.7467308319483,
+				"rank": 16
+			},
+			{
+				"external_id": "9498970",
+				"name": "AVULUS",
+				"rating": 1373.48803891746,
+				"rank": 17
+			},
+			{
+				"external_id": "2576071",
+				"name": "Yellow_Submarine",
+				"rating": 1367.4208314377101,
+				"rank": 18
+			},
+			{
+				"external_id": "9338413",
+				"name": "MOUZ",
+				"rating": 1355.3012640344757,
+				"rank": 19
+			},
+			{
+				"external_id": "9651185",
+				"name": "Wildcard",
+				"rating": 1352.1392587319415,
+				"rank": 20
+			}
+		]
+	},
+	{
+		"date": "2025-10-13T08:38:19.324Z",
+		"entries": [
+			{
+				"external_id": "9572001",
+				"name": "PARIVISION",
+				"rating": 1647.9165354573438,
+				"rank": 1
+			},
+			{
+				"external_id": "9247354",
+				"name": "Team_Falcons",
+				"rating": 1625.5808984429523,
+				"rank": 2
+			},
+			{
+				"external_id": "7119388",
+				"name": "Team_Spirit",
+				"rating": 1594.6838356532303,
+				"rank": 3
+			},
+			{
+				"external_id": "8291895",
+				"name": "Tundra_Esports",
+				"rating": 1575.6842607581157,
+				"rank": 4
+			},
+			{
+				"external_id": "8255888",
+				"name": "BetBoom_Team",
+				"rating": 1570.764240201763,
+				"rank": 5
+			},
+			{
+				"external_id": "9640842",
+				"name": "Team_Tidebound",
+				"rating": 1561.896565689676,
+				"rank": 6
+			},
+			{
+				"external_id": "8261500",
+				"name": "Xtreme_Gaming",
+				"rating": 1557.6689232889132,
+				"rank": 7
+			},
+			{
+				"external_id": "2163",
+				"name": "Team_Liquid",
+				"rating": 1557.6670208356159,
+				"rank": 8
+			},
+			{
+				"external_id": "9467224",
+				"name": "Aurora_Gaming",
+				"rating": 1492.5771328100345,
+				"rank": 9
+			},
+			{
+				"external_id": "9255039",
+				"name": "1win_Team",
+				"rating": 1474.0693580519267,
+				"rank": 10
+			},
+			{
+				"external_id": "9303484",
+				"name": "HEROIC",
+				"rating": 1466.3290169693814,
+				"rank": 11
+			},
+			{
+				"external_id": "2586976",
+				"name": "OG",
+				"rating": 1460.0074911161948,
+				"rank": 12
+			},
+			{
+				"external_id": "9303383",
+				"name": "L1GA_TEAM",
+				"rating": 1458.3191557936555,
+				"rank": 13
+			},
+			{
+				"external_id": "36",
+				"name": "Natus_Vincere",
+				"rating": 1456.7569894945714,
+				"rank": 14
+			},
+			{
+				"external_id": "7554697",
+				"name": "Nigma_Galaxy",
+				"rating": 1445.4103344516989,
+				"rank": 15
+			},
+			{
+				"external_id": "9351740",
+				"name": "Yakult_Brothers",
+				"rating": 1442.6128672458758,
+				"rank": 16
+			},
+			{
+				"external_id": "7732977",
+				"name": "BOOM_Esports",
+				"rating": 1416.5309579058803,
+				"rank": 17
+			},
+			{
+				"external_id": "9498970",
+				"name": "AVULUS",
+				"rating": 1384.8408524873362,
+				"rank": 18
+			},
+			{
+				"external_id": "9338413",
+				"name": "MOUZ",
+				"rating": 1374.7956722556694,
+				"rank": 19
+			},
+			{
+				"external_id": "2576071",
+				"name": "Yellow_Submarine",
+				"rating": 1361.7965215378001,
+				"rank": 20
+			},
+			{
+				"external_id": "9651185",
+				"name": "Wildcard",
+				"rating": 1348.496644401524,
+				"rank": 21
+			}
+		]
+	},
+	{
+		"date": "2025-10-20T08:38:19.324Z",
+		"entries": [
+			{
+				"external_id": "9572001",
+				"name": "PARIVISION",
+				"rating": 1648.379515179689,
+				"rank": 1
+			},
+			{
+				"external_id": "9247354",
+				"name": "Team_Falcons",
+				"rating": 1626.9368215084035,
+				"rank": 2
+			},
+			{
+				"external_id": "7119388",
+				"name": "Team_Spirit",
+				"rating": 1595.0368301006451,
+				"rank": 3
+			},
+			{
+				"external_id": "8291895",
+				"name": "Tundra_Esports",
+				"rating": 1579.064486608521,
+				"rank": 4
+			},
+			{
+				"external_id": "8255888",
+				"name": "BetBoom_Team",
+				"rating": 1569.6279696234617,
+				"rank": 5
+			},
+			{
+				"external_id": "9640842",
+				"name": "Team_Tidebound",
+				"rating": 1565.0843075147122,
+				"rank": 6
+			},
+			{
+				"external_id": "8261500",
+				"name": "Xtreme_Gaming",
+				"rating": 1558.568273281503,
+				"rank": 7
+			},
+			{
+				"external_id": "2163",
+				"name": "Team_Liquid",
+				"rating": 1555.6961268637058,
+				"rank": 8
+			},
+			{
+				"external_id": "9467224",
+				"name": "Aurora_Gaming",
+				"rating": 1495.3967115454564,
+				"rank": 9
+			},
+			{
+				"external_id": "9303484",
+				"name": "HEROIC",
+				"rating": 1473.695006025972,
+				"rank": 10
+			},
+			{
+				"external_id": "9255039",
+				"name": "1win_Team",
+				"rating": 1472.0277375410044,
+				"rank": 11
+			},
+			{
+				"external_id": "36",
+				"name": "Natus_Vincere",
+				"rating": 1458.0808576059774,
+				"rank": 12
+			},
+			{
+				"external_id": "2586976",
+				"name": "OG",
+				"rating": 1457.7266728716475,
+				"rank": 13
+			},
+			{
+				"external_id": "9303383",
+				"name": "L1GA_TEAM",
+				"rating": 1452.1882675630902,
+				"rank": 14
+			},
+			{
+				"external_id": "7554697",
+				"name": "Nigma_Galaxy",
+				"rating": 1447.535142586526,
+				"rank": 15
+			},
+			{
+				"external_id": "9351740",
+				"name": "Yakult_Brothers",
+				"rating": 1434.3730272829175,
+				"rank": 16
+			},
+			{
+				"external_id": "7732977",
+				"name": "BOOM_Esports",
+				"rating": 1416.6460025628476,
+				"rank": 17
+			},
+			{
+				"external_id": "9338413",
+				"name": "MOUZ",
+				"rating": 1392.1595289807697,
+				"rank": 18
+			},
+			{
+				"external_id": "9498970",
+				"name": "AVULUS",
+				"rating": 1389.6662154601584,
+				"rank": 19
+			},
+			{
+				"external_id": "2576071",
+				"name": "Yellow_Submarine",
+				"rating": 1359.4917036054903,
+				"rank": 20
+			},
+			{
+				"external_id": "9651185",
+				"name": "Wildcard",
+				"rating": 1344.719425603176,
+				"rank": 21
+			},
+			{
+				"external_id": "8254145",
+				"name": "Execration",
+				"rating": 1314.8999826741172,
+				"rank": 22
+			},
+			{
+				"external_id": "9691969",
+				"name": "Team_Nemesis",
+				"rating": 1224.396506647081,
+				"rank": 23
+			},
+			{
+				"external_id": "9381678",
+				"name": "Apex_Genesis",
+				"rating": 968.7860172280803,
+				"rank": 24
+			}
+		]
+	},
+	{
+		"date": "2025-10-27T08:38:19.324Z",
+		"entries": [
+			{
+				"external_id": "9572001",
+				"name": "PARIVISION",
+				"rating": 1648.8743870150415,
+				"rank": 1
+			},
+			{
+				"external_id": "9247354",
+				"name": "Team_Falcons",
+				"rating": 1628.5564432322356,
+				"rank": 2
+			},
+			{
+				"external_id": "7119388",
+				"name": "Team_Spirit",
+				"rating": 1596.9086545385383,
+				"rank": 3
+			},
+			{
+				"external_id": "8291895",
+				"name": "Tundra_Esports",
+				"rating": 1580.75361349531,
+				"rank": 4
+			},
+			{
+				"external_id": "8255888",
+				"name": "BetBoom_Team",
+				"rating": 1570.445866230581,
+				"rank": 5
+			},
+			{
+				"external_id": "9640842",
+				"name": "Team_Tidebound",
+				"rating": 1566.9862541032528,
+				"rank": 6
+			},
+			{
+				"external_id": "8261500",
+				"name": "Xtreme_Gaming",
+				"rating": 1559.3521377041234,
+				"rank": 7
+			},
+			{
+				"external_id": "2163",
+				"name": "Team_Liquid",
+				"rating": 1555.2325688676847,
+				"rank": 8
+			},
+			{
+				"external_id": "9824702",
+				"name": "PARIVISION",
+				"rating": 1522.9699988971238,
+				"rank": 9
+			},
+			{
+				"external_id": "9467224",
+				"name": "Aurora_Gaming",
+				"rating": 1498.6401350214537,
+				"rank": 10
+			},
+			{
+				"external_id": "5014799",
+				"name": "Nemiga_Gaming",
+				"rating": 1490.9975590613653,
+				"rank": 11
+			},
+			{
+				"external_id": "9303484",
+				"name": "HEROIC",
+				"rating": 1476.756951827874,
+				"rank": 12
+			},
+			{
+				"external_id": "9255039",
+				"name": "1win_Team",
+				"rating": 1466.909341209658,
+				"rank": 13
+			},
+			{
+				"external_id": "36",
+				"name": "Natus_Vincere",
+				"rating": 1459.1628270268163,
+				"rank": 14
+			},
+			{
+				"external_id": "2586976",
+				"name": "OG",
+				"rating": 1456.9075108346967,
+				"rank": 15
+			},
+			{
+				"external_id": "7554697",
+				"name": "Nigma_Galaxy",
+				"rating": 1447.5813498667835,
+				"rank": 16
+			},
+			{
+				"external_id": "9303383",
+				"name": "L1GA_TEAM",
+				"rating": 1447.1154551665145,
+				"rank": 17
+			},
+			{
+				"external_id": "9351740",
+				"name": "Yakult_Brothers",
+				"rating": 1425.7472890086779,
+				"rank": 18
+			},
+			{
+				"external_id": "7732977",
+				"name": "BOOM_Esports",
+				"rating": 1416.9647902471845,
+				"rank": 19
+			},
+			{
+				"external_id": "9338413",
+				"name": "MOUZ",
+				"rating": 1407.2679070421434,
+				"rank": 20
+			},
+			{
+				"external_id": "9498970",
+				"name": "AVULUS",
+				"rating": 1392.4075780036862,
+				"rank": 21
+			},
+			{
+				"external_id": "2576071",
+				"name": "Yellow_Submarine",
+				"rating": 1358.6474353174158,
+				"rank": 22
+			},
+			{
+				"external_id": "9651185",
+				"name": "Wildcard",
+				"rating": 1342.6411462152453,
+				"rank": 23
+			},
+			{
+				"external_id": "9758040",
+				"name": "Runa_Team",
+				"rating": 1341.202140619981,
+				"rank": 24
+			},
+			{
+				"external_id": "8254145",
+				"name": "Execration",
+				"rating": 1312.5124731567123,
+				"rank": 25
+			},
+			{
+				"external_id": "9691969",
+				"name": "Team_Nemesis",
+				"rating": 1221.350357097716,
+				"rank": 26
+			},
+			{
+				"external_id": "9381678",
+				"name": "Apex_Genesis",
+				"rating": 965.0303019759903,
+				"rank": 27
+			}
+		]
+	},
+	{
+		"date": "2025-11-05T08:38:19.324Z",
+		"entries": [
+			{
+				"external_id": "9572001",
+				"name": "PARIVISION",
+				"rating": 1649.4933886247238,
+				"rank": 1
+			},
+			{
+				"external_id": "9823272",
+				"name": "Team_Yandex",
+				"rating": 1648.145864606999,
+				"rank": 2
+			},
+			{
+				"external_id": "9247354",
+				"name": "Team_Falcons",
+				"rating": 1630.6009804427847,
+				"rank": 3
+			},
+			{
+				"external_id": "7119388",
+				"name": "Team_Spirit",
+				"rating": 1598.0638642722847,
+				"rank": 4
+			},
+			{
+				"external_id": "8291895",
+				"name": "Tundra_Esports",
+				"rating": 1581.238838004542,
+				"rank": 5
+			},
+			{
+				"external_id": "8255888",
+				"name": "BetBoom_Team",
+				"rating": 1572.3992541705832,
+				"rank": 6
+			},
+			{
+				"external_id": "9640842",
+				"name": "Team_Tidebound",
+				"rating": 1568.2608451656629,
+				"rank": 7
+			},
+			{
+				"external_id": "8261500",
+				"name": "Xtreme_Gaming",
+				"rating": 1560.07168947554,
+				"rank": 8
+			},
+			{
+				"external_id": "2163",
+				"name": "Team_Liquid",
+				"rating": 1555.7467845806982,
+				"rank": 9
+			},
+			{
+				"external_id": "9824702",
+				"name": "PARIVISION",
+				"rating": 1512.0316642685589,
+				"rank": 10
+			},
+			{
+				"external_id": "9467224",
+				"name": "Aurora_Gaming",
+				"rating": 1500.7442733062212,
+				"rank": 11
+			},
+			{
+				"external_id": "5014799",
+				"name": "Nemiga_Gaming",
+				"rating": 1491.3858120956702,
+				"rank": 12
+			},
+			{
+				"external_id": "9303484",
+				"name": "HEROIC",
+				"rating": 1478.12035612709,
+				"rank": 13
+			},
+			{
+				"external_id": "9255039",
+				"name": "1win_Team",
+				"rating": 1465.490770430169,
+				"rank": 14
+			},
+			{
+				"external_id": "36",
+				"name": "Natus_Vincere",
+				"rating": 1460.0465298571157,
+				"rank": 15
+			},
+			{
+				"external_id": "2586976",
+				"name": "OG",
+				"rating": 1456.6820572493907,
+				"rank": 16
+			},
+			{
+				"external_id": "7554697",
+				"name": "Nigma_Galaxy",
+				"rating": 1447.6290433756537,
+				"rank": 17
+			},
+			{
+				"external_id": "9303383",
+				"name": "L1GA_TEAM",
+				"rating": 1443.9679364496826,
+				"rank": 18
+			},
+			{
+				"external_id": "9351740",
+				"name": "Yakult_Brothers",
+				"rating": 1422.287468207471,
+				"rank": 19
+			},
+			{
+				"external_id": "9338413",
+				"name": "MOUZ",
+				"rating": 1421.5580355317024,
+				"rank": 20
+			},
+			{
+				"external_id": "9498970",
+				"name": "AVULUS",
+				"rating": 1393.7637808787476,
+				"rank": 21
+			},
+			{
+				"external_id": "2576071",
+				"name": "Yellow_Submarine",
+				"rating": 1358.5297734361038,
+				"rank": 22
+			},
+			{
+				"external_id": "9651185",
+				"name": "Wildcard",
+				"rating": 1340.957591704406,
+				"rank": 23
+			},
+			{
+				"external_id": "9758040",
+				"name": "Runa_Team",
+				"rating": 1325.6114241012147,
+				"rank": 24
+			},
+			{
+				"external_id": "8254145",
+				"name": "Execration",
+				"rating": 1311.057276061887,
+				"rank": 25
+			},
+			{
+				"external_id": "9381678",
+				"name": "Apex_Genesis",
+				"rating": 962.317009175718,
+				"rank": 26
+			}
+		]
+	}
+]

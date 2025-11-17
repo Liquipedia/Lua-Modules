@@ -289,7 +289,7 @@ function Config.placementDropOffFunction(tier, tierType)
 	end
 
 	return function(score, placement)
-        -- The current notability guidelines award set amount of points based on placement and tier of event.
+		-- The current notability guidelines award set amount of points based on placement and tier of event.
 		for _, range in ipairs(Config.scoreRanges[tier]) do
 			if placement <= range.max then
 				local points = range.points
