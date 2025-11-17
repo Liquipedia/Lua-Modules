@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
 
 local Game = Lua.import('Module:Game')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -32,11 +31,6 @@ function CustomPlayer.run(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	player.args.history = player.args.team_history
-
-	for steamKey, steamInput, steamIndex in Table.iter.pairsByPrefix(player.args, 'steam', {requireIndex = false}) do
-		player.args['steamalternative' .. steamIndex] = steamInput
-		player.args[steamKey] = nil
-	end
 
 	player.args.informationType = player.args.informationType or 'Player'
 

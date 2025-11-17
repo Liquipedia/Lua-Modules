@@ -268,7 +268,6 @@ local PREFIXES = {
 		'https://start.gg/',
 		player = 'https://start.gg/user/',
 	},
-	steam = {'https://steamcommunity.com/id/'}, -- to be removed after conversion
 	steamID64 = {'https://steamcommunity.com/profiles/'},
 	steamtv = {'https://steam.tv/'},
 	strikr = {'https://strikr.pro/pilot/'},
