@@ -14,7 +14,6 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local RoleUtil = Lua.import('Module:Role/Util')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
-local Json = Lua.import('Module:Json') -- Add this import
 
 local TeamParticipantsWikiParser = {}
 
@@ -45,7 +44,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 
 	if input.contenders then
 		opponent = Opponent.tbd(Opponent.team)
-		local contenderNames = Json.parse(input.contenders)
+		local contenderNames = input.contenders
 		if type(contenderNames) == 'table' then
 			for _, name in ipairs(contenderNames) do
 				if type(name) == 'string' and name ~= '' then
@@ -63,6 +62,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 	opponent = Opponent.resolve(opponent, date, {syncPlayer = true})
 	local aliases = Array.parseCommaSeparatedString(input.aliases, ';')
 	table.insert(aliases, Opponent.toName(opponent))
+
 	return {
 		opponent = opponent,
 		qualifierText = input.qualifier,

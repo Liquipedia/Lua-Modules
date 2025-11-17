@@ -25,6 +25,7 @@ local ParticipantsTeamMember = Lua.import('Module:Widget/Participants/Team/TeamM
 local ParticipantNotification = Lua.import('Module:Widget/Participants/Team/ParticipantNotification')
 local TeamQualifierInfo = Lua.import('Module:Widget/Participants/Team/QualifierInfo')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
+local PotentialQualifiers = Lua.import('Module:Widget/Participants/Team/PotentialQualifiers')
 
 ---@enum ParticipantsTeamCardTabs
 local TAB_ENUM = {
@@ -75,6 +76,7 @@ function ParticipantsTeamCard:render()
 		},
 		children = {
 			qualifierInfoContent,
+			PotentialQualifiers{participant = participant},
 			self:_renderContent(participant)
 		}
 	}
