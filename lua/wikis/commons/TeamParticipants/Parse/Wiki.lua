@@ -14,11 +14,12 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local RoleUtil = Lua.import('Module:Role/Util')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Json = Lua.import('Module:Json') -- Add this import
 
 local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
----qualifierText: string?, qualifierPage: string?, qualifierUrl: string?}
+---qualifierText: string?, qualifierPage: string?, qualifierUrl: string?, potentialQualifiers: standardOpponent[]?}
 
 ---@param args table
 ---@return {participants: TeamParticipant[]}
@@ -39,9 +40,25 @@ end
 ---@param date string|number|nil
 ---@return TeamParticipant
 function TeamParticipantsWikiParser.parseParticipant(input, date)
-	local opponent = Opponent.readOpponentArgs(Table.merge(input, {
-		type = Opponent.team,
-	}))
+	local potentialQualifiers = {}
+	local opponent
+
+	if input.contenders then
+		opponent = Opponent.tbd(Opponent.team)
+		local contenderNames = Json.parse(input.contenders)
+		if type(contenderNames) == 'table' then
+			for _, name in ipairs(contenderNames) do
+				if type(name) == 'string' and name ~= '' then
+					table.insert(potentialQualifiers, Opponent.readOpponentArgs({type = Opponent.team, template = name}))
+				end
+			end
+		end
+	else
+		opponent = Opponent.readOpponentArgs(Table.merge(input, {
+			type = Opponent.team,
+		}))
+	end
+
 	opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
 	opponent = Opponent.resolve(opponent, date, {syncPlayer = true})
 	local aliases = Array.parseCommaSeparatedString(input.aliases, ';')
@@ -64,6 +81,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 				highlighted = Logic.readBool(note.highlighted),
 			}
 		end),
+		potentialQualifiers = potentialQualifiers,
 	}
 end
 

@@ -71,6 +71,12 @@ function TeamParticipantsRepository.save(participant)
 
 	lpdbData.extradata = lpdbData.extradata or {}
 	lpdbData.extradata.opponentaliases = participant.aliases
+	if participant.potentialQualifiers and #participant.potentialQualifiers > 0 then
+		local serializedQualifiers = Array.map(participant.potentialQualifiers, function(qualifierOpponent)
+			return Opponent.toLpdbStruct(qualifierOpponent)
+		end)
+		lpdbData.extradata.potentialQualifiers = Json.stringify(serializedQualifiers)
+	end
 
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(participant.opponent, {setPlayersInTeam = true}))
 	-- Legacy participant fields
