@@ -65,9 +65,14 @@ function TeamParticipantsRepository.save(participant)
 	lpdbData.startdate = lpdbData.startdate or Variables.varDefault('tournament_startdate')
 	lpdbData.date = lpdbData.date or Variables.varDefault('tournament_enddate')
 
-	lpdbData.qualifier = participant.qualifierText
-	lpdbData.qualifierpage = participant.qualifierPage
-	lpdbData.qualifierurl = participant.qualifierUrl
+	if participant.qualification then
+		lpdbData.qualifier = participant.qualification.text
+		if participant.qualification.type == 'tournament' then
+			lpdbData.qualifierpage = participant.qualification.tournament.pageName
+		elseif participant.qualification.type == 'external' then
+			lpdbData.qualifierurl = participant.qualification.url
+		end
+	end
 
 	lpdbData.extradata = lpdbData.extradata or {}
 	lpdbData.extradata.opponentaliases = participant.aliases

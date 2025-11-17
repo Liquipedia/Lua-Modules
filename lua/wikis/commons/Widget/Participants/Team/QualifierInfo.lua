@@ -16,8 +16,10 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
 local Link = Lua.import('Module:Widget/Basic/Link')
+local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class ParticipantsTeamQualifierInfo: Widget
+---@field props {participant: TeamParticipant, location: 'card'|'list'}
 ---@operator call(table): ParticipantsTeamQualifierInfo
 local ParticipantsTeamQualifierInfo = Class.new(Widget)
 
@@ -25,32 +27,62 @@ local ParticipantsTeamQualifierInfo = Class.new(Widget)
 function ParticipantsTeamQualifierInfo:render()
 	local participant = self.props.participant
 	local location = self.props.location
+	local qualification = participant.qualification
 
-	if not participant.qualifierPage or not participant.qualifierUrl or not participant.qualifierText then
+	if not qualification then
 		return
 	end
 
-	return Div{
+	local text = qualification.text
+	if not text and qualification.type == 'tournament' then
+		text = qualification.tournament.displayName
+	end
+
+	if not text then
+		return
+	end
+
+	local link, icon, linktype
+	if qualification.type == 'tournament' then
+		link = qualification.tournament.pageName
+		icon = LeagueIcon.display{
+			icon = qualification.tournament.icon,
+			iconDark = qualification.tournament.iconDark,
+			options = {noTemplate = true, noLink = true},
+		}
+		linktype = 'internal'
+	elseif qualification.type == 'external' then
+		link = qualification.url
+		icon = Icon{
+			iconName = 'external_link',
+			additionalClasses = { 'team-participant-card-qualifier-external-link-icon' }
+		}
+		linktype = 'external'
+	end
+
+	local textChildren = {text}
+	if link then
+		textChildren = {
+			Link{
+				link = link,
+				linktype = linktype,
+				children = text,
+			}
+		}
+	end
+
+	local content = Div{
 		classes = {'team-participant-card-qualifier', 'team-participant-card-qualifier--' .. location},
 		children = WidgetUtil.collect(
-			-- TODO: Get the qualifier tournament icon
-			LeagueIcon.display{
-				-- icon = participant.qualifierIcon,
-				-- iconDark = participant.qualifierIconDark,
-				link = participant.qualifierUrl,
-				options = {noTemplate = true},
-			},
+			icon,
 			Span{
-				classes = { 'team-participant-card-qualifier-details' },
-				children = {
-					Link{
-						link = participant.qualifierPage,
-						children = participant.qualifierText
-					}
-				}
+				classes = {'team-participant-card-qualifier-details'},
+				children = textChildren
 			}
 		)
 	}
+
+	return content
 end
 
 return ParticipantsTeamQualifierInfo
