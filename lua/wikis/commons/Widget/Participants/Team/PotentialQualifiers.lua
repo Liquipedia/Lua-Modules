@@ -41,7 +41,7 @@ function PotentialQualifiers:render()
 					teamStyle = 'standard',
 					additionalClasses = {
 						'potential-qualifiers-list-item',
-						(index % 2 == 0 and 'even' or 'uneven')
+						(index % 2 == 0 and 'even' or 'odd')
 					}
 				}
 			end)

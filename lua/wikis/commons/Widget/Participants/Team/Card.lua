@@ -62,6 +62,16 @@ function ParticipantsTeamCard:render()
 	local qualifierInfoHeader = TeamQualifierInfo{participant = participant, location = 'header'}
 	local qualifierInfoContent = TeamQualifierInfo{participant = participant, location = 'content'}
 
+	local content = {
+		qualifierInfoContent,
+	}
+
+	if Opponent.isTbd(participant.opponent) then
+		table.insert(content, PotentialQualifiers{participant = participant})
+	else
+		table.insert(content, self:_renderContent(participant))
+	end
+
 	return Collapsible{
 		shouldCollapse = true,
 		collapseAreaClasses = {'team-participant-card-collapsible-content'},
@@ -74,11 +84,7 @@ function ParticipantsTeamCard:render()
 				qualifierInfoHeader
 			}
 		},
-		children = {
-			qualifierInfoContent,
-			PotentialQualifiers{participant = participant},
-			self:_renderContent(participant)
-		}
+		children = content
 	}
 end
 
