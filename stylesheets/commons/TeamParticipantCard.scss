@@ -114,6 +114,16 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 				border-color: var( --clr-on-surface-dark-primary-8 );
 				color: var( --clr-secondary-90 );
 			}
+
+			&.tbd {
+				.theme--light & {
+					color: var( --clr-secondary-80 );
+				}
+
+				.theme--dark & {
+					color: var( --clr-secondary-44 );
+				}
+			}
 		}
 
 		.general-collapsible-default-toggle {
@@ -425,7 +435,7 @@ $compact-selector: '[data-switch-group-container="team-cards-compact"]';
 
 	&-title {
 		padding: 0 0.5rem;
-		font-size: 0, 875rem;
+		font-size: 0.875rem;
 		font-weight: bold;
 
 		.theme--light & {
