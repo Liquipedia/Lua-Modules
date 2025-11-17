@@ -35,6 +35,7 @@ function TeamParticipantsController.fromTemplate(frame)
 	local parsedArgs = Json.parseStringifiedArgs(args)
 	local parsedData = TeamParticipantsWikiParser.parseWikiInput(parsedArgs)
 
+	-- TODO Extract this bad boi
 	Array.forEach(parsedData.participants, function (participant)
 		local players = participant.opponent.players
 		-- Bad structure, this should always exist
@@ -51,6 +52,7 @@ function TeamParticipantsController.fromTemplate(frame)
 			return
 		end
 
+		-- TODO: Allow manual end date override
 		local squad = TeamService.getSquadBetween(team, DateExt.getStartDateOrNow(), DateExt.getContextualDateOrNow())
 		local membersToImport = Array.filter(squad, function (member)
 			if member.type == 'player' then
