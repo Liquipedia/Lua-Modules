@@ -137,6 +137,10 @@ local PREFIXES = {
 	['faceit-c'] = {'https://www.faceit.com/en/championship/'},
 	['faceit-hub'] = {'https://www.faceit.com/en/hub/'},
 	['faceit-org'] = {'https://www.faceit.com/en/organizers/'},
+	faceitdb = {
+		'',
+		player = 'https://faceitdb.com/profile/faceit/',
+	},	
 	fanclub = {''},
 	fide = {
 		'https://ratings.fide.com/tournament_information.phtml?event=',
@@ -395,6 +399,7 @@ local ICON_KEYS_TO_RENAME = {
 	['faceit-l'] = 'faceit',
 	['faceit-hub'] = 'faceit',
 	['faceit-org'] = 'faceit',
+	['faceitdb'] = 'faceit',
 	matcherinolink = 'matcherino',
 	playlist = 'music',
 	privsteam = 'steam',
