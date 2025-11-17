@@ -64,11 +64,11 @@ function WikiCopyPaste._getMapCode(mapIndex)
 	local lines = {
 		INDENT .. '|map' .. mapIndex .. '={{Map|map=|finished=|t1firstside=',
 		INDENT .. INDENT .. '|t1hunter=|t1survivor=',
-		INDENT .. INDENT .. charsCode(1, 'pick', 5),
-		INDENT .. INDENT .. charsCode(1, 'ban', 6),
+		INDENT .. INDENT .. charsCode(1, 'p', 5),
+		INDENT .. INDENT .. charsCode(1, 'b', 6),
 		INDENT .. INDENT .. '|t2hunter=|t2survivor=',
-		INDENT .. INDENT .. charsCode(2, 'pick', 5),
-		INDENT .. INDENT .. charsCode(2, 'ban', 6),
+		INDENT .. INDENT .. charsCode(2, 'p', 5),
+		INDENT .. INDENT .. charsCode(2, 'b', 6),
 		INDENT .. INDENT .. '}}',
 	}
 
