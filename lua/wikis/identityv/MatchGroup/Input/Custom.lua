@@ -20,7 +20,7 @@ local CustomMatchGroupInput = {}
 local MatchFunctions = {}
 
 ---@class IdentityvMapParser: MapParserInterface
- local MapFunctions = {}
+local MapFunctions = {}
 
 local MAX_NUM_BANS = 6
 local MAX_NUM_PICKS = 5
@@ -100,10 +100,10 @@ function MapFunctions.getExtraData(match, map, opponents)
 	Array.forEach(opponents, function(_, opponentIndex)
 		local prefix = 't' .. opponentIndex
 		extradata[prefix .. 'bans'] = Array.map(Array.range(1, MAX_NUM_BANS), function(banIndex)
-			return getCharacterName(map[prefix .. 'ban' .. banIndex]) or ''
+			return getCharacterName(map[prefix .. 'b' .. banIndex]) or ''
 		end)
 		extradata[prefix .. 'picks'] = Array.map(Array.range(1, MAX_NUM_PICKS), function(pickIndex)
-			return getCharacterName(map[prefix .. 'pick' .. pickIndex]) or ''
+			return getCharacterName(map[prefix .. 'p' .. pickIndex]) or ''
 		end)
 	end)
 
