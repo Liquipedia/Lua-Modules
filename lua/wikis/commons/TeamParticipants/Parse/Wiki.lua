@@ -19,8 +19,7 @@ local Tournament = Lua.import('Module:Tournament')
 local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
----qualifierText: string?, qualifierPage: string?, qualifierUrl: string?, potentialQualifiers: standardOpponent[]?}
----qualification: QualificationStructure?}
+---qualification: QualificationStructure, potentialQualifiers: standardOpponent[]?}
 
 ---@alias QualificationMethod 'invite'|'qual'
 ---@alias QualificationType 'tournament'|'external'|'other'
