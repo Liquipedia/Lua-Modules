@@ -16,8 +16,11 @@ local Table = Lua.import('Module:Table')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
+---@class IdentityvMatchParser: MatchParserInterface
 local MatchFunctions = {}
-local MapFunctions = {}
+
+---@class IdentityvMapParser: MapParserInterface
+ local MapFunctions = {}
 
 local MAX_NUM_BANS = 6
 local MAX_NUM_PICKS = 5
