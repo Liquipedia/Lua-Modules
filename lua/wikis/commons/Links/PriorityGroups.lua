@@ -78,7 +78,7 @@ return {
 		'pubsteam',
 		'reddit',
 		'snapchat',
-		'steamID64',
+		'steam64ID',
 		'telegram',
 		'threads',
 		'tiktok',
