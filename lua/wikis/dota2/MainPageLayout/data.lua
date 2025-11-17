@@ -163,7 +163,6 @@ local CONTENT = {
 		heading = 'Liquipedia Rankings (Beta)',
 		body = Rankings{
 			teamLimit = 5,
-			progressionLimit = 12,
 			storageType = 'extension',
 			showGraph = false,
 			isSmallerVersion = true
