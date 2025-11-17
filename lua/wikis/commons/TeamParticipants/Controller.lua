@@ -62,13 +62,19 @@ function TeamParticipantsController.fromTemplate(frame)
 		end)
 
 		local playersFromDatabase = Array.map(membersToImport, function (member)
+			local memberType = member.type
+			if member.hasLeft then
+				memberType = 'former'
+			elseif member.role:lower() == 'substitute' then
+				memberType = 'sub'
+			end
 			return TeamParticipantsWikiParser.parsePlayer{
 				member.displayName,
 				link = member.pageName,
 				flag = member.nationality,
 				faction = member.faction,
 				role = member.role,
-				type = member.type,
+				type = memberType,
 			}
 		end)
 
