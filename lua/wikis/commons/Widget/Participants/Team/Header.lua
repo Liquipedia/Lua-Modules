@@ -69,7 +69,7 @@ function ParticipantsTeamHeader:_renderLabel(participant)
 	return Div{
 		classes = {
 			'team-participant-card-header-label',
-			isFinal and nil or 'tbd'
+			isFinal and 'final' or 'tbd'
 		},
 		children = {
 			HtmlWidgets.Span{
