@@ -62,9 +62,9 @@
  * ```
  *
  * #### Filterable items counters
- * Filterable items can be counted and the value updated in a seprate counter location.
+ * Filterable items can be counted and the value updated in a separate counter location.
  *
- * Counting can be done using a hidable group where only top-level hidable items will be counted.
+ * Counting can be done using a hideable group where only top-level hidable items will be counted.
  * ```html
  * <span data-filter-counter="counter1">0</span>
  * <div data-filter-hideable-group data-filter-effect="fade" data-filter-count="counter1">
