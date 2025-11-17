@@ -140,7 +140,7 @@ local PREFIXES = {
 	faceitdb = {
 		'',
 		player = 'https://faceitdb.com/profile/faceit/',
-	},	
+	},
 	fanclub = {''},
 	fide = {
 		'https://ratings.fide.com/tournament_information.phtml?event=',
