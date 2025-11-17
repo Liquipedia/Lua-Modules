@@ -235,4 +235,5 @@ liquipedia.collapse = {
 			element.classList.toggle( 'collapsed', !show );
 		} );
 	} };
+
 liquipedia.core.modules.push( 'collapse' );
