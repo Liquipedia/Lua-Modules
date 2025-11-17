@@ -44,13 +44,21 @@ function TeamService.getTeamByTemplate(teamTemplate)
 	return TeamService.teamFromRecord(team)
 end
 
+--- Gets the squad of a team between two dates, usually for tournaments
 ---@param team StandardTeam
----@param date string|number|nil
+---@param startDate string|number
+---@param endDate string|number
 ---@return table[]
-function TeamService.getSquadOn(team, date)
-	local timestamp = DateExt.readTimestamp(date) or DateExt.readTimestamp(DateExt.getContextualDateOrNow())
+function TeamService.getSquadBetween(team, startDate, endDate)
+	assert(startDate and endDate, 'TeamService.getSquadBetween: Start date and end date are required')
+
+	local startTimestamp = DateExt.readTimestamp(startDate)
+	local endTimestamp = DateExt.readTimestamp(endDate)
+
+	assert(startTimestamp and endTimestamp, 'TeamService.getSquadBetween: Could not read start date or end date')
+
 	local members = team.members or {}
-	return Array.filter(members, function(member)
+	local filteredMembers = Array.filter(members, function(member)
 		local joinDate = DateExt.readTimestamp(member.joindate)
 		local leaveDate = DateExt.readTimestamp(member.leavedate)
 		local inactiveDate = DateExt.readTimestamp(member.inactivedate)
@@ -60,8 +68,8 @@ function TeamService.getSquadOn(team, date)
 			return false
 		end
 
-		-- Joined after the requested date
-		if joinDate > timestamp then
+		-- Joined after the end date
+		if joinDate > endTimestamp then
 			return false
 		end
 
@@ -70,17 +78,36 @@ function TeamService.getSquadOn(team, date)
 			return false
 		end
 
-		-- Left before the requested date
-		if not DateExt.isDefaultTimestamp(leaveDate) and leaveDate < timestamp then
+		-- Left before the start date
+		if not DateExt.isDefaultTimestamp(leaveDate) and leaveDate < startTimestamp then
 			return false
 		end
 
-		-- Went inactive before the requested date
-		if inactiveDate and not DateExt.isDefaultTimestamp(inactiveDate) and inactiveDate < timestamp then
+		-- Went inactive before the start date
+		if inactiveDate and not DateExt.isDefaultTimestamp(inactiveDate) and inactiveDate < startTimestamp then
 			return false
 		end
 
 		return true
+	end)
+
+	return Array.map(filteredMembers, function(member)
+		member.hasLeft = false
+		local leaveDate = DateExt.readTimestamp(member.leavedate)
+		local inactiveDate = DateExt.readTimestamp(member.inactivedate)
+
+		-- Bad data check
+		if not inactiveDate or not leaveDate then
+			return member
+		end
+
+		if not DateExt.isDefaultTimestamp(inactiveDate) and inactiveDate < endTimestamp then
+			member.hasLeft = true
+		elseif not DateExt.isDefaultTimestamp(leaveDate) and leaveDate < endTimestamp then
+			member.hasLeft = true
+		end
+
+		return member
 	end)
 end
 

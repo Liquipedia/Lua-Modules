@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
@@ -50,7 +51,7 @@ function TeamParticipantsController.fromTemplate(frame)
 			return
 		end
 
-		local squad = TeamService.getSquadOn(team, args.date)
+		local squad = TeamService.getSquadBetween(team, DateExt.getStartDateOrNow(), DateExt.getContextualDateOrNow())
 		local membersToImport = Array.filter(squad, function (member)
 			if member.type == 'player' then
 				return true
