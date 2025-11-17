@@ -1,39 +1,40 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Series
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Tier = require('Module:Tier/Custom')
-local Variables = require('Module:Variables')
 
+local Array = Lua.import('Module:Array')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
-local Flags = Lua.import('Module:Flags')
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
+local Class = Lua.import('Module:Class')
+local CountryCategory = Lua.import('Module:Infobox/Extension/CountryCategory')
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extension/PrizePool')
+local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local String = Lua.import('Module:StringUtils')
+local Tier = Lua.import('Module:Tier/Custom')
+local Variables = Lua.import('Module:Variables')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
+local Builder = Widgets.Builder
 local Cell = Widgets.Cell
-local Header = Widgets.Header
-local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
-local Builder = Widgets.Builder
+local Header = Widgets.Header
+local Location = Widgets.Location
+local Organizers = Widgets.Organizers
+local Title = Widgets.Title
+local Venue = Widgets.Venue
 
 ---@class SeriesInfobox: BasicInfobox
 local Series = Class.new(BasicInfobox)
@@ -75,65 +76,34 @@ function Series:createInfobox()
 		},
 		Center{children = {args.caption}},
 		Title{children = 'Series Information'},
-		Builder{
-			builder = function()
-				local organizers = self:_createOrganizers(args)
-				local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
-
-				return {
-					Cell{
-						name = title,
-						content = organizers
-					}
-				}
-			end
-		},
+		Organizers{args = args},
 		Cell{
 			name = 'Sponsor(s)',
-			content = self:getAllArgsForBase(args, 'sponsor')
+			children = self:getAllArgsForBase(args, 'sponsor')
 		},
 		Customizable{id = 'type', children = {}},
 		Customizable{
 			id = 'location',
 			children = {
-				Cell{
-					name = 'Location',
-					content = {
-						self:_createLocation(args.country, args.city)
-					}
-				},
+				Location{args = args, showTbdOnEmpty = false},
 			}
 		},
-		Builder{
-			builder = function()
-				local venues = {}
-				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue', {requireIndex = false}) do
-					-- TODO: Description
-					local description = ''
-					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], description))
-				end
-
-				return {Cell{
-					name = 'Venue',
-					content = venues
-				}}
-			end
-		},
+		Venue{args = args},
 		Cell{
 			name = 'Date',
-			content = {
+			children = {
 				args.date
 			}
 		},
 		Cell{
 			name = 'Start Date',
-			content = {
+			children = {
 				args.sdate or args.launched or args.inaugurated
 			}
 		},
 		Cell{
 			name = 'End Date',
-			content = {
+			children = {
 				args.edate or args.defunct
 			}
 		},
@@ -146,7 +116,7 @@ function Series:createInfobox()
 				if self.totalSeriesPrizepool then
 					return {Cell{
 						name = 'Cumulative Prize Pool',
-						content = {InfoboxPrizePool.display{prizepoolusd = self.totalSeriesPrizepool}}
+						children = {InfoboxPrizePool.display{prizepoolusd = self.totalSeriesPrizepool}}
 					}}
 				end
 			end
@@ -156,21 +126,12 @@ function Series:createInfobox()
 			children = {
 				Cell{
 					name = 'Liquipedia Tier',
-					content = {self:createLiquipediaTierDisplay(args)},
+					children = {self:createLiquipediaTierDisplay(args)},
 					classes = {self:liquipediaTierHighlighted(args) and 'valvepremier-highlighted' or ''},
 				},
 			}
 		},
-		Builder{
-			builder = function()
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links}
-					}
-				end
-			end
-		},
+		Widgets.Links{links = links},
 		Customizable{id = 'customcontent', children = {}},
 	}
 
@@ -179,7 +140,7 @@ function Series:createInfobox()
 		self:categories(unpack(self:_getCategories(args)))
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Series')
 end
 
 ---@param args table
@@ -207,24 +168,24 @@ function Series:_setLpdbData(args, links)
 		liquipediatier = tier,
 		liquipediatiertype = tierType,
 		publishertier = args.publishertier,
-		launcheddate = ReferenceCleaner.clean(args.launcheddate or args.sdate or args.inaugurated),
-		defunctdate = ReferenceCleaner.clean(args.defunctdate or args.edate),
-		defunctfate = ReferenceCleaner.clean(args.defunctfate),
-		organizers = mw.ext.LiquipediaDB.lpdb_create_json({
+		launcheddate = ReferenceCleaner.clean{input = args.launcheddate or args.sdate or args.inaugurated},
+		defunctdate = ReferenceCleaner.clean{input = args.defunctdate or args.edate},
+		defunctfate = ReferenceCleaner.clean{input = args.defunctfate},
+		organizers = Json.stringify({
 			organizer1 = args.organizer or args.organizer1,
 			organizer2 = args.organizer2,
 			organizer3 = args.organizer3,
 			organizer4 = args.organizer4,
 			organizer5 = args.organizer5,
 		}),
-		sponsors = mw.ext.LiquipediaDB.lpdb_create_json({
+		sponsors = Json.stringify({
 			sponsor1 = args.sponsor1,
 			sponsor2 = args.sponsor2,
 			sponsor3 = args.sponsor3,
 			sponsor4 = args.sponsor4,
 			sponsor5 = args.sponsor5,
 		}),
-		links = mw.ext.LiquipediaDB.lpdb_create_json(
+		links = Json.stringify(
 			Links.makeFullLinksForTableItems(links or {})
 		),
 	}
@@ -304,82 +265,13 @@ function Series:_getIconFromLeagueIconSmall(lpdbData)
 	return lpdbData
 end
 
----@param country string?
----@param city string?
----@return string
-function Series:_createLocation(country, city)
-	if country == nil or country == '' then
-		return ''
-	end
-
-	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' .. (city or country)
-end
-
----@param id string?
----@param name string?
----@param link string?
----@param desc string?
----@return string?
-function Series:_createLink(id, name, link, desc)
-	if String.isEmpty(id) then
-		return nil
-	end
-	---@cast id -nil
-
-	local output
-
-	if Page.exists(id) then
-		output = '[[' .. id .. '|'
-		if String.isEmpty(name) then
-			output = output .. id .. ']]'
-		else
-			output = output .. name .. ']]'
-		end
-
-	elseif not String.isEmpty(link) then
-		if String.isEmpty(name) then
-			output = '[' .. link .. ' ' .. id .. ']'
-		else
-			output = '[' .. link .. ' ' .. name .. ']'
-
-		end
-	elseif String.isEmpty(name) then
-		output = id
-	else
-		output = name
-	end
-
-	if not String.isEmpty(desc) then
-		output = output .. desc
-	end
-
-	return output
-end
-
----@param args table
----@return string[]
-function Series:_createOrganizers(args)
-	local organizers = {}
-
-	for prefix, organizer in Table.iter.pairsByPrefix(args, 'organizer', {requireIndex = false}) do
-		table.insert(organizers, self:_createLink(organizer, args[prefix .. '-name'], args[prefix .. '-link']))
-	end
-
-	return organizers
-end
-
 ---@param args table
 ---@return string[]
 function Series:_getCategories(args)
-	local categories = {'Tournament series'}
-
-	for _, country in Table.iter.pairsByPrefix(args, 'country', {requireIndex = false}) do
-		table.insert(categories, self:_setCountryCategories(country))
-	end
-
-	Array.extendWith(categories, self:addTierCategories(args))
-
-	return categories
+	return Array.extend({'Tournament series'},
+		self:addTierCategories(args),
+		CountryCategory.run(args, 'Tournaments')
+	)
 end
 
 ---@param args table
@@ -405,21 +297,6 @@ function Series:addTierCategories(args)
 	end
 
 	return categories
-end
-
----@param country string?
----@return string?
-function Series:_setCountryCategories(country)
-	if String.isEmpty(country) then
-		return nil
-	end
-
-	local countryAdjective = Flags.getLocalisation(country)
-	if not countryAdjective then
-		return 'Unrecognised Country'
-	end
-
-	return countryAdjective .. ' Tournaments'
 end
 
 ---@return number?

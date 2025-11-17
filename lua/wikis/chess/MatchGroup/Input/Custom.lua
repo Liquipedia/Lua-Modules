@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=chess
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
+
+local Array = Lua.import('Module:Array')
+local Operator = Lua.import('Module:Operator')
 
 local Eco = Lua.import('Module:ChessOpenings')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')

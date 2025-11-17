@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=starcraft
 -- page=Module:Match/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,14 +7,15 @@
 
 local MatchLegacy = {}
 
-local Array = require('Module:Array')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
+
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
 
 local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
 

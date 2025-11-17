@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:Tier/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -52,7 +51,7 @@ return {
 			value = '-1',
 			sort = 'A6',
 			name = 'Misc',
-			short = 'Misc',
+			short = 'M.',
 			link = 'Misc Tournaments',
 			category = 'Misc Tournaments',
 		},

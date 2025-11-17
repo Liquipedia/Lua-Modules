@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:Infobox/Weapon/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local AutoInlineIcon = Lua.import('Module:AutoInlineIcon')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -18,11 +18,13 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local CREDS_ICON = AutoInlineIcon.display({ onlyicon = true }, 'M', 'creds')
+local CREDS_ICON = AutoInlineIcon.display{onlyicon = true, category = 'M', lookup = 'creds'}
 local FIRE_RATE_UNIT = 'rounds/sec'
 
 ---@class ValorantWeaponInfobox: WeaponInfobox
 local CustomWeapon = Class.new(Weapon)
+---@class ValorantWeaponInfoboxWidgetInjector: WidgetInjector
+---@field caller ValorantWeaponInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -48,14 +50,14 @@ function CustomInjector:parse(id, widgets)
 			args.price and Cell{
 				name = 'Price',
 				options = { separator = ' ' },
-				content = { CREDS_ICON, args.price }
+				children = { CREDS_ICON, args.price }
 			} or nil
 		}
 	elseif id == 'damage' then
 		return {
 			Cell{
 				name = 'Damage',
-				content = self.caller:getAllArgsForBase(args, 'damage'),
+				children = self.caller:getAllArgsForBase(args, 'damage'),
 			}
 		}
 	elseif id == 'killaward' then
@@ -63,7 +65,7 @@ function CustomInjector:parse(id, widgets)
 			args.killaward and Cell{
 				name = 'Kill Award',
 				options = { separator = ' ' },
-				content = { CREDS_ICON, args.killaward }
+				children = { CREDS_ICON, args.killaward }
 			} or nil
 		}
 	elseif id == 'rateoffire' then
@@ -80,12 +82,12 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				name = 'Firerate',
 				options = { separator = ' ' },
-				content = { rateOfFire, FIRE_RATE_UNIT }
+				children = { rateOfFire, FIRE_RATE_UNIT }
 			},
 			Cell{
 				name = 'Alternate Fire rate',
 				options = { separator = ' ' },
-				content = {
+				children = {
 					args.altrateoffire,
 					args.altrateoffire and FIRE_RATE_UNIT or nil
 				}
@@ -96,11 +98,11 @@ function CustomInjector:parse(id, widgets)
 		return WidgetUtil.collect(
 			Cell{
 				name = 'Wall peneration',
-				content = { args.wallpenetration }
+				children = { args.wallpenetration }
 			},
 			Cell{
 				name = 'Movement speed',
-				content = { args.movementspeed and (args.movementspeed .. ' m/sec') or nil }
+				children = { args.movementspeed and (args.movementspeed .. ' m/sec') or nil }
 			}
 		)
 	end

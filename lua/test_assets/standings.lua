@@ -1,11 +1,3 @@
----
--- @Liquipedia
--- wiki=commons
--- page=Module:TestAssets/Standings
---
--- Please see https://github.com/Liquipedia/Lua-Modules to contribute
---
-
 -- luacheck: ignore
 return {
 	standingsindex = 0,

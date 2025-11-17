@@ -1,17 +1,18 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Coordinates
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Iterator = require('Module:Iterator')
-local MathUtil = require('Module:MathUtil')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TreeUtil = require('Module:TreeUtil')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Iterator = Lua.import('Module:Iterator')
+local MathUtil = Lua.import('Module:MathUtil')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TreeUtil = Lua.import('Module:TreeUtil')
 
 ---@class MatchGroupCoordinatesRoundProps
 ---@field depth integer

@@ -7,8 +7,10 @@ jobs:
   test-resources:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install modules
         run: npm install
-      - name: Run test
+      - name: Run lint check
         run: npm run test
+      - name: Run unit test
+        run: npm run test:js

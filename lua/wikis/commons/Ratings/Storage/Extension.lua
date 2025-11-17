@@ -1,116 +1,100 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Ratings/Storage/Extension
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Date = require('Module:Date/Ext')
-local FnUtil = require('Module:FnUtil')
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Date = Lua.import('Module:Date/Ext')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local Operator = Lua.import('Module:Operator')
 
 local RatingsStorageExtension = {}
 
-local PROGRESSION_STEP_DAYS = 7 -- How many days each progression step is
-
----@param date string
 ---@param teamLimit integer?
----@param progressionLimit integer?
 ---@return RatingsEntry[]
-function RatingsStorageExtension.getRankings(date, teamLimit, progressionLimit)
-	if not date then
-		error('No date provided')
+function RatingsStorageExtension.getRankings(teamLimit)
+	local rankings = mw.ext.Dota2Ranking.get()
+	if not rankings then
+		return {}
 	end
-	if date > Date.getContextualDateOrNow() then
-		error('Cannot get rankings for future date')
-	end
-
-	local progressionDates = RatingsStorageExtension._calculateProgressionDates(date, progressionLimit)
-
-	local teams = mw.ext.Dota2Ranking.get(progressionDates[#progressionDates], date)
-
+	local teams = RatingsStorageExtension._mapDataToExpectedFormat(rankings)
+	teams = Array.sortBy(teams, Operator.property('rank'))
 	-- Endpoint doesn't support team limit (yet?), so we'll have to cut it short here
 	teams = Array.sub(teams, 1, math.min(teamLimit or #teams))
 
-	return Array.map(teams, FnUtil.curry(RatingsStorageExtension._createTeamEntry, progressionDates))
+	return Array.map(teams, RatingsStorageExtension._createTeamEntry)
 end
+
+---@param rankings Dota2RankingRecord[]
+---@return Dota2RankingTeam[]
+function RatingsStorageExtension._mapDataToExpectedFormat(rankings)
+	local dateOfLastEntry = Array.maxBy(rankings, function(rankedDate)
+		return Date.readTimestamp(rankedDate.date)
+	end).date
+
+	local teamsData = {}
+
+	for _, datedResults in ipairs(rankings) do
+		for _, datedEntry in ipairs(datedResults.entries) do
+			if not teamsData[datedEntry.name] then
+				teamsData[datedEntry.name] = {
+					name = datedEntry.name,
+					progression = {}
+				}
+			end
+			local teamData = teamsData[datedEntry.name]
+
+			if datedResults.date == dateOfLastEntry then
+				teamData.rank = datedEntry.rank
+				teamData.rating = datedEntry.rating
+			end
+
+			table.insert(teamData.progression, {
+				timestamp = Date.readTimestamp(datedResults.date),
+				date = Date.toYmdInUtc(Date.parseIsoDate(datedResults.date)),
+				rank = datedEntry.rank,
+				rating = datedEntry.rating
+			})
+		end
+	end
+
+	local teamList = Array.map(Array.extractValues(teamsData), function(team)
+		team.progression = Array.sortBy(team.progression, Operator.property('timestamp'), function (a, b)
+			return a < b
+		end)
+		return team
+	end)
+
+	teamList = Array.filter(teamList, Operator.property('rank'))
+
+	return teamList
+end
+
+---@alias Dota2RankingTeam {name: string, rank: integer, rating: number,
+---progression: {date: string, rating: number, rank: integer}[]}
 
 --- Takes a team record from the endpoint and creates a RatingsEntry
----@param progressionDates string[]
----@param team Dota2RankingRecord
+---@param team Dota2RankingTeam
 ---@return RatingsEntry
-function RatingsStorageExtension._createTeamEntry(progressionDates, team)
-	local endDate = progressionDates[1]
+function RatingsStorageExtension._createTeamEntry(team)
 	local lpdbTeamInfo = RatingsStorageExtension._getTeamInfoFromLpdb(team.name)
 
-	local teamProgressionParsed = Array.map(team.progression, function(progression)
-		return RatingsStorageExtension._createProgressionRecord(progression.date, progression.rating, progression.rank)
-	end)
+	local hasRankLastInterval = #team.progression >= 2
 
-	-- Add today's progression record to the start of the list
-	local progressionToday = RatingsStorageExtension._createProgressionRecord(endDate, team.rating, team.rank)
-	table.insert(teamProgressionParsed, 1, progressionToday)
-
-	local function findProgressionForDate(date)
-		return Array.find(teamProgressionParsed, function(progression)
-			return progression.date == date
-		end)
-	end
-
-	local progression = Array.map(progressionDates, function(progressionDate)
-		return findProgressionForDate(progressionDate) or RatingsStorageExtension._createProgressionRecord(progressionDate)
-	end)
-
-	local hasRankLastInterval = progression[2].rank ~= nil
 	---@type RatingsEntry
-	local newTeam = {
+	return {
 		name = team.name,
 		rank = team.rank,
-		rating = RatingsStorageExtension._normalizeRating(team.rating),
+		rating = team.rating,
 		region = lpdbTeamInfo.region,
-		opponent = Opponent.resolve(Opponent.readOpponentArgs({type = Opponent.team, team.name}), endDate),
-		change = hasRankLastInterval and progression[2].rank - progression[1].rank or nil,
-		streak = team.streak,
-		progression = progression,
+		opponent = Opponent.resolve(Opponent.readOpponentArgs({ type = Opponent.team, team.name })),
+		change = hasRankLastInterval and team.progression[#team.progression - 1].rank - team.rank or nil,
+		progression = team.progression,
 	}
-	return newTeam
-end
-
---- Calculate which dates to get progression for
----@param date string
----@param progressionLimit integer?
----@return string[]
-function RatingsStorageExtension._calculateProgressionDates(date, progressionLimit)
-	local progressionDates = {}
-	local nextProgression = Date.parseIsoDate(date)
-	table.insert(progressionDates, os.date('%F', os.time(nextProgression)) --[[@as string]])
-	for _ = 1, progressionLimit or 1 do
-		nextProgression.day = nextProgression.day - PROGRESSION_STEP_DAYS
-		table.insert(progressionDates, os.date('%F', os.time(nextProgression)) --[[@as string]])
-	end
-	return progressionDates
-end
-
----@param date string
----@param rating number?
----@param rank integer?
----@return {date: string, rating?: number, rank?: integer}
-function RatingsStorageExtension._createProgressionRecord(date, rating, rank)
-	return {
-		date = date,
-		rating = rating and RatingsStorageExtension._normalizeRating(rating) or nil,
-		rank = rank,
-	}
-end
-
---- Normalize a rating
----@param rating number
----@return number
-function RatingsStorageExtension._normalizeRating(rating)
-	return math.floor((rating * 1000) + 0.5)
 end
 
 --- Get team information from the Team Page via LPDB

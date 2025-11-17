@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -14,9 +13,11 @@ local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Headlines = Lua.import('Module:Widget/MainPage/Headlines')
+local LiquipediaApp = Lua.import('Module:Widget/MainPage/LiquipediaApp')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
+local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 local CONTENT = {
 	usefulArticles = {
@@ -27,14 +28,14 @@ local CONTENT = {
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
-		body = '{{Liquipedia:Want_to_help}}',
+		body = WantToHelp{},
 		padding = true,
 		boxid = 1504,
 	},
 	liquipediaApp = {
 		heading = 'Download the Liquipedia App',
 		padding = true,
-		body = '{{Liquipedia:App}}',
+		body = LiquipediaApp{},
 		boxid = 1505,
 	},
 	transfers = {
@@ -65,9 +66,6 @@ local CONTENT = {
 		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
-		panelAttributes = {
-			['data-switch-group-container'] = 'countdown',
-		},
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -142,7 +140,7 @@ return {
 			},
 		},
 		{
-			file = 'T1 Worlds23 Skins Splash Art.jpg',
+			file = 'T1 Worlds24 Skins Splash Art.jpg',
 			title = 'Champions',
 			link = 'Champions',
 			count = {
@@ -152,7 +150,7 @@ return {
 			},
 		},
 		{
-			file = 'LoL Patch 14.24 Art.jpg',
+			file = 'LoL Patch 25.19 Art.jpg',
 			title = 'Patches',
 			link = 'Patches',
 			count = {

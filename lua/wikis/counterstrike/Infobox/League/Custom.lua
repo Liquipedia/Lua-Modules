@@ -1,32 +1,32 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Json = require('Module:Json')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Json = Lua.import('Module:Json')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
+local Variables = Lua.import('Module:Variables')
 
 local Currency = Lua.import('Module:Currency')
 local Game = Lua.import('Module:Game')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extension/PrizePool')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local Tier = Lua.import('Module:Tier/Custom')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -152,9 +152,9 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-		Cell{name = 'Teams', content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
-		Cell{name = 'Players', content = {args.player_number}},
-		Cell{name = 'Restrictions', content = self.caller:createRestrictionsCell(args.restrictions)}
+		Cell{name = 'Teams', children = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
+		Cell{name = 'Players', children = {args.player_number}},
+		Cell{name = 'Restrictions', children = self.caller:createRestrictionsCell(args.restrictions)}
 		)
 	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.map1) then
@@ -174,7 +174,7 @@ function CustomInjector:parse(id, widgets)
 			widgets,
 			Cell{
 				name = '[[File:ESL 2019 icon.png|20x20px|link=|ESL|alt=ESL]] Pro Tour Tier',
-				content = {self.caller:_createEslProTierCell(args.eslprotier)},
+				children = {self.caller:_createEslProTierCell(args.eslprotier)},
 				classes = {'infobox-icon-small'}
 			}
 		)
@@ -182,7 +182,7 @@ function CustomInjector:parse(id, widgets)
 			widgets,
 			Cell{
 				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox') .. ' Tier',
-				content = {self.caller:_createValveTierCell()},
+				children = {self.caller:_createValveTierCell()},
 				classes = {'valvepremier-highlighted'}
 			}
 		)
@@ -190,7 +190,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Game',
-				content = {self.caller:_createGameCell(args)}
+				children = {self.caller:_createGameCell(args)}
 			}
 		}
 	end
@@ -261,17 +261,17 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_icon_darkmode', self.data.iconDark)
 
 	if String.isNotEmpty(args.date) and args.date:lower() ~= DATE_TBA then
-		Variables.varDefine('date', ReferenceCleaner.clean(args.date))
+		Variables.varDefine('date', ReferenceCleaner.clean{input = args.date})
 	end
 
 	if String.isNotEmpty(args.sdate) and args.sdate:lower() ~= DATE_TBA then
-		Variables.varDefine('sdate', ReferenceCleaner.clean(args.sdate))
-		Variables.varDefine('tournament_sdate', ReferenceCleaner.clean(args.sdate or args.date))
+		Variables.varDefine('sdate', ReferenceCleaner.clean{input = args.sdate})
+		Variables.varDefine('tournament_sdate', ReferenceCleaner.clean{input = args.sdate or args.date})
 	end
 
 	if String.isNotEmpty(args.edate) and args.edate:lower() ~= DATE_TBA then
-		local cleandDate = ReferenceCleaner.clean(args.edate or args.date)
-		Variables.varDefine('edate', ReferenceCleaner.clean(args.edate))
+		local cleandDate = ReferenceCleaner.clean{input = args.edate or args.date}
+		Variables.varDefine('edate', ReferenceCleaner.clean{input = args.edate})
 		Variables.varDefine('tournament_date', cleandDate)
 		Variables.varDefine('tournament_edate', cleandDate)
 	end

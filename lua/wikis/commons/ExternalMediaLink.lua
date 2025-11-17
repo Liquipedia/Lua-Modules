@@ -1,19 +1,24 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:ExternalMediaLink
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Flags = require('Module:Flags')
-local Logic = require('Module:Logic')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
+
+local ExternalMediaLinkDisplay = Lua.import('Module:Widget/ExternalMedia/Link')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local ExternalMediaLink = {}
 
@@ -23,19 +28,21 @@ local MAXIMUM_VALUES = {
 	authors = 5,
 }
 local DEFAULT_LANGUAGE = 'en'
-local NON_BREAKING_SPACE = '&nbsp;'
 
 ---Main function for External Media Links.
 ---Calls storage and display (if not disabled).
 ---@param args table
----@return Html?
+---@return Widget?
 function ExternalMediaLink.run(args)
 	ExternalMediaLink._fallBackArgs(args)
+	local parsedData = ExternalMediaLink._readArgs(args)
 
 	if Logic.nilOr(Logic.readBoolOrNil(args.storage), true)
 		and not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
 
-		ExternalMediaLink._store(args)
+		mw.ext.LiquipediaDB.lpdb_externalmedialink(
+			ExternalMediaLink._objectName(args), Json.stringifySubTables(parsedData)
+		)
 	end
 
 	mw.ext.TeamLiquidIntegration.add_category('Pages with ExternalMediaLinks')
@@ -43,7 +50,7 @@ function ExternalMediaLink.run(args)
 		return
 	end
 
-	return ExternalMediaLink._display(args)
+	return ExternalMediaLink._display(parsedData, args.note)
 end
 
 ---Applies fallback and alias args
@@ -59,9 +66,10 @@ function ExternalMediaLink._fallBackArgs(args)
 	end
 end
 
----Stores an External Media Link to Lpdb
+---Parses the supplied arguments and returns as LPDB form
 ---@param args table
-function ExternalMediaLink._store(args)
+---@return table
+function ExternalMediaLink._readArgs(args)
 	local lpdbData = {
 		date = args.date,
 		language = args.language or DEFAULT_LANGUAGE,
@@ -80,7 +88,7 @@ function ExternalMediaLink._store(args)
 	-- set a maximum for authors due to the same being used in queries
 	assert(Table.size(authors) <= 2 * MAXIMUM_VALUES.authors,
 		'Maximum Value of authors (' .. MAXIMUM_VALUES.authors .. ') exceeded')
-	lpdbData.authors = mw.ext.LiquipediaDB.lpdb_create_json(authors)
+	lpdbData.authors = authors
 
 	local extradata = {
 		translation = args.translation,
@@ -108,9 +116,9 @@ function ExternalMediaLink._store(args)
 	assert(Table.size(subjects) <= MAXIMUM_VALUES.subjects,
 		'Maximum Value of subjects (' .. MAXIMUM_VALUES.subjects .. ') exceeded')
 
-	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(Table.merge(extradata, orgs, subjects))
+	lpdbData.extradata = Table.merge(extradata, orgs, subjects)
 
-	mw.ext.LiquipediaDB.lpdb_externalmedialink(ExternalMediaLink._objectName(args), lpdbData)
+	return lpdbData
 end
 
 ---Builds the object name for an External Media Link
@@ -127,97 +135,25 @@ function ExternalMediaLink._objectName(args)
 end
 
 ---Builds the display for an External Media Link
----@param args table
----@return Html
-function ExternalMediaLink._display(args)
-	local display = mw.html.create()
-
-	if args.date then
-		display:wikitext(args.date .. NON_BREAKING_SPACE .. '|' .. NON_BREAKING_SPACE)
-	end
-
-	if args.language and args.language ~= DEFAULT_LANGUAGE then
-		display:wikitext(Flags.Icon({flag = args.language, shouldLink = false}) .. NON_BREAKING_SPACE)
-	end
-
-	if args.title then
-		display:tag('span')
-			:addClass('plainlinks')
-			:css('font-style', 'italic')
-			:wikitext(Page.makeExternalLink(args.title, args.link))
-	else
-		display:tag('span')
-			:addClass('plainlinks')
-			:wikitext(Page.makeExternalLink(args.link, args.link))
-	end
-
-	if args.trans_title then
-		display:wikitext(NON_BREAKING_SPACE .. '[' .. args.trans_title .. ']')
-	end
-
-	local authors = {}
-	for _, author, authorIndex in Table.iter.pairsByPrefix(args, 'by') do
-		table.insert(authors, Page.makeInternalLink({}, author, args['by_link' .. authorIndex]))
-	end
-	if Table.isNotEmpty(authors) then
-		display
-			:wikitext(NON_BREAKING_SPACE .. 'by' .. NON_BREAKING_SPACE)
-			:wikitext(mw.text.listToText(authors, ',' .. NON_BREAKING_SPACE, NON_BREAKING_SPACE .. 'and' .. NON_BREAKING_SPACE))
-	end
-
-	if args.of then
-		display:wikitext(NON_BREAKING_SPACE .. 'of' .. NON_BREAKING_SPACE .. Page.makeInternalLink({}, args.of))
-	end
-
-	if args.event then
-		display:wikitext(ExternalMediaLink._displayEvent(args))
-	end
-
-	if args.translation then
-		display:wikitext(ExternalMediaLink._displayTranslation(args))
-	end
-
-	if args.note then
-		display
-			:wikitext(NON_BREAKING_SPACE)
-			:tag('span')
-				:css('font-style', 'italic')
-				:wikitext('(' .. args.note .. ')')
-	end
-
-	return display
-end
-
----Builds the event display for an External Media Link
----@param args table
----@return string
-function ExternalMediaLink._displayEvent(args)
-	local prefix = NON_BREAKING_SPACE .. 'at' .. NON_BREAKING_SPACE
-
-	if Logic.readBoolOrNil(args['event-link']) == false then
-		return prefix .. args.event
-	end
-
-	return prefix .. Page.makeInternalLink({}, args.event, args['event-link'])
-end
-
----Builds the translation display for an External Media Link
----@param args table
----@return string
-function ExternalMediaLink._displayTranslation(args)
-	local translation = NON_BREAKING_SPACE .. '(trans. '
-		.. Flags.Icon({flag = args.translation, shouldLink = false})
-
-	if String.isEmpty(args.translator) then
-		return translation .. ')'
-	end
-
-	return translation .. NON_BREAKING_SPACE .. 'by' .. NON_BREAKING_SPACE .. args.translator .. ')'
+---@param data table
+---@param note string?
+---@return Widget
+function ExternalMediaLink._display(data, note)
+	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+		ExternalMediaLinkDisplay{data = data},
+		Logic.isNotEmpty(note) and {
+			'&nbsp;',
+			HtmlWidgets.Span{
+				css = {['font-style'] = 'italic'},
+				children = {'(', note, ')'},
+			}
+		}
+	)}
 end
 
 ---Wrapper function for External Media Link display in the Data namespace
 ---@param args table
----@return Html
+---@return Widget
 function ExternalMediaLink.wrapper(args)
 	local wrapperInfoDisplay = mw.html.create('table')
 		:attr('border', 0)
@@ -254,7 +190,7 @@ function ExternalMediaLink.wrapper(args)
 	}
 
 	if args.authors then
-		local authors = Array.map(mw.text.split(args.authors, ','), ExternalMediaLink._cleanValue)
+		local authors = Array.parseCommaSeparatedString(args.authors)
 		args.by_link1 = args.by_link1 or args.by_link
 		for authorIndex, author in pairs(authors) do
 			parsedArgs['by' .. authorIndex] = author
@@ -263,30 +199,25 @@ function ExternalMediaLink.wrapper(args)
 	end
 
 	if args.subjects then
-		local subjects = Array.map(mw.text.split(args.subjects, ','), ExternalMediaLink._cleanValue)
+		local subjects = Array.parseCommaSeparatedString(args.subjects)
 		for subjectIndex, subject in pairs(subjects) do
 			parsedArgs['subject' .. subjectIndex] = subject
 		end
 	end
 
 	if args.subject_organizations then
-		local orgs = Array.map(mw.text.split(args.subject_organizations, ','), ExternalMediaLink._cleanValue)
+		local orgs = Array.parseCommaSeparatedString(args.subject_organizations)
 		for orgIndex, org in pairs(orgs) do
 			parsedArgs['subject_organization' .. orgIndex] = org
 		end
 	end
 
-	return mw.html.create()
-		:wikitext('[[Special:FormEdit/ExternalMediaLinks|Go back to the form]]<br>')
-		:node(ExternalMediaLink.run(parsedArgs))
-		:node(wrapperInfoDisplay)
+	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+		Link{link = 'Special:FormEdit/ExternalMediaLinks', children = 'Go back to the form'},
+		HtmlWidgets.Br{},
+		ExternalMediaLink.run(parsedArgs),
+		wrapperInfoDisplay
+	)}
 end
 
----Remove whitespace from the beginning and end of a string. Returns nil if empty string remains.
----@param value string
----@return string?
-function ExternalMediaLink._cleanValue(value)
-	return String.nilIfEmpty(mw.text.trim(value))
-end
-
-return Class.export(ExternalMediaLink)
+return Class.export(ExternalMediaLink, {exports = {'run', 'wrapper'}})

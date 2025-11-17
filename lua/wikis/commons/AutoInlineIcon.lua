@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:AutoInlineIcon
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local InlineIconAndText = Lua.import('Module:Widget/Misc/InlineIconAndText')
 local ManualData = Lua.requireIfExists('Module:InlineIcon/ManualData', {loadData = true})
@@ -16,16 +16,13 @@ local Character  = Lua.import('Module:Character')
 
 local AutoInlineIcon = {}
 
----@param options {onlyicon: boolean?}
----@param category string
----@param lookup string
+---onlyicon default false, link default true
+---@param options {onlyicon: boolean?, link: boolean?, category: string, lookup: string}
 ---@return Widget
----@overload fun(options: table): Widget
-function AutoInlineIcon.display(options, category, lookup)
-	if not category then
-		category = options.category or options[1]
-		lookup = options.lookup or options[2]
-	end
+function AutoInlineIcon.display(options)
+	local category = options.category
+	local lookup = options.lookup
+	local skipLink = not Logic.readBool(options.link)
 	assert(category, 'Category parameter is required.')
 	assert(lookup, 'Lookup parameter is required.')
 
@@ -41,7 +38,7 @@ function AutoInlineIcon.display(options, category, lookup)
 	return InlineIconAndText{
 		icon = icon,
 		text = data.text,
-		link = data.link,
+		link = skipLink and '' or data.link,
 	}
 end
 
@@ -66,7 +63,7 @@ end
 ---@return IconWidget
 function AutoInlineIcon._iconCreator(data)
 	if data.iconType == 'image' then
-		local IconImage = require('Module:Widget/Image/Icon/Image')
+		local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 		return IconImage{
 			imageLight = data.iconLight,
 			imageDark = data.iconDark,
@@ -74,7 +71,7 @@ function AutoInlineIcon._iconCreator(data)
 			size = Logic.emptyOr(data.size),
 		}
 	elseif data.iconType == 'fa' then
-		local IconFa = require('Module:Widget/Image/Icon/Fontawesome')
+		local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 		return IconFa{
 			iconName = data.icon,
 			link = data.link,
@@ -115,4 +112,4 @@ function AutoInlineIcon._queryCharacterData(name)
 	}
 end
 
-return Class.export(AutoInlineIcon)
+return Class.export(AutoInlineIcon, {exports = {'display'}})

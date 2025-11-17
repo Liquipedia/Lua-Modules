@@ -1,16 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=pubg
 -- page=Module:PrizePool/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
-local Weight = require('Module:Weight')
+
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
+local Variables = Lua.import('Module:Variables')
+local Weight = Lua.import('Module:Weight')
 
 local PrizePool = Lua.import('Module:PrizePool')
 
@@ -47,6 +47,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	)
 
 	Variables.varDefine(mw.ustring.lower(lpdbData.participant) .. '_prizepoints', lpdbData.extradata.prizepoints)
+	Variables.varDefine(mw.ustring.lower(lpdbData.participant) .. '_prizepoints2', lpdbData.extradata.prizepoints2)
 
 	return lpdbData
 end

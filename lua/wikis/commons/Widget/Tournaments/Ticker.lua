@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Tournaments/Ticker
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Condition = require('Module:Condition')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local I18n = require('Module:I18n')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
+
+local Array = Lua.import('Module:Array')
+local Condition = Lua.import('Module:Condition')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local I18n = Lua.import('Module:I18n')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')

@@ -1,33 +1,33 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Countdown = require('Module:Countdown')
-local Faction = require('Module:Faction')
-local Game = require('Module:Game')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MapsData = mw.loadData('Module:Maps/data')
-local Operator = require('Module:Operator')
-local Page = require('Module:Page')
-local PatchAuto = require('Module:PatchAuto')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Tier = require('Module:Tier/Custom')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Countdown = Lua.import('Module:Countdown')
+local Faction = Lua.import('Module:Faction')
+local Game = Lua.import('Module:Game')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local MapsData = Lua.import('Module:Maps/data', {loadData = true})
+local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
+local PatchAuto = Lua.import('Module:PatchAuto')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Tier = Lua.import('Module:Tier/Custom')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -153,7 +153,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('firstmatch', self.data.firstMatch)
 	Variables.varDefine('tournament_finished', tostring(self.data.isFinished or false))
 	Variables.varDefine('tournament_maps', Json.stringify(self.data.maps))
-	Variables.varDefine('tournament_series_number', self.data.number)
+	Variables.varDefine('tournament_series_number', self.data.number and string.format('%05i', self.data.number) or nil)
 end
 
 ---@param prefix string
@@ -184,9 +184,11 @@ function CustomLeague:_determineGame(game)
 
 	local startDate = self.data.startDate or self.data.endDate
 
-	if startDate and startDate > START_DATE_REFORGED then
+	if not startDate then
+		return
+	elseif startDate > START_DATE_REFORGED then
 		return Game.toIdentifier{game = GAME_REFORGED}
-	elseif startDate and startDate > START_DATE_FROZEN_THRONE then
+	elseif startDate > START_DATE_FROZEN_THRONE then
 		return Game.toIdentifier{game = GAME_FROZEN_THRONE}
 	end
 
@@ -244,27 +246,27 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game', content = {Game.text{game = caller.data.game}}},
-			Cell{name = 'Game Version', content = {
+			Cell{name = 'Game', children = {Game.text{game = caller.data.game}}},
+			Cell{name = 'Game Version', children = {
 				caller:_displayGameVersion(),
 				args.patch2 and ('[[' .. args.patch2 .. ']]') or nil
 			}},
-			Cell{name = 'Server', content = caller:_getServers(args)}
+			Cell{name = 'Server', children = caller:_getServers(args)}
 			}
 	elseif id == 'liquipediatier' then
 		table.insert(widgets, Cell{
 			name = ESL_ICON .. 'Pro Tour Tier',
-			content = {ESL_TIERS[caller.data.publishertier]}
+			children = {ESL_TIERS[caller.data.publishertier]}
 		})
 	elseif id == 'dates' then
 		if args.starttime then
 			local dateCells = {}
 			if args.sdate then
-				table.insert(dateCells, Cell{name = 'Start Date', content = {caller:_displayStartDateTime()}})
+				table.insert(dateCells, Cell{name = 'Start Date', children = {caller:_displayStartDateTime()}})
 			elseif args.date then
-				table.insert(dateCells, Cell{name = 'Date', content = {caller:_displayStartDateTime()}})
+				table.insert(dateCells, Cell{name = 'Date', children = {caller:_displayStartDateTime()}})
 			end
-			table.insert(dateCells, Cell{name = 'End Date', content = {args.edate}})
+			table.insert(dateCells, Cell{name = 'End Date', children = {args.edate}})
 			return dateCells
 		end
 	elseif id == 'customcontent' then
@@ -275,14 +277,14 @@ function CustomInjector:parse(id, widgets)
 
 		if playerNumber then
 			Array.appendWith(widgets,
-				Cell{name = 'Number of Players', content = {playerNumber}},
+				Cell{name = 'Number of Players', children = {playerNumber}},
 				Breakdown{children = caller.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
 		end
 
 		if args.team_number then
 			table.insert(widgets, Cell{name = 'Number of Teams',
-				content = {CustomLeague._displayParticipantNumber(args.team_number)}})
+				children = {CustomLeague._displayParticipantNumber(args.team_number)}})
 
 			-- clean var of '+' suffix
 			args.team_number = string.gsub(args.team_number, '%+', '')
@@ -325,7 +327,7 @@ end
 
 ---@return string
 function CustomLeague:_displayStartDateTime()
-	return Countdown._create{
+	return Countdown.create{
 		date = self.data.startTime.raw,
 		finished = self.data.isFinished,
 	}
@@ -399,11 +401,8 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		participantsNumber = tonumber(args.player_number) or 0
 	end
 	lpdbData.participantsnumber = participantsNumber
-	lpdbData.sortdate = self.data.startTime.startTime
-		and (self.data.startTime.startTime .. (self.data.startTime.timeZone or ''))
-		or self.data.firstMatch or self.data.startDate
 	lpdbData.mode = self:_getMode()
-	lpdbData.extradata.seriesnumber = self.data.number
+	lpdbData.extradata.seriesnumber = self.data.number and string.format('%05i', self.data.number) or nil
 
 	lpdbData.extradata.server2 = args.server2
 	lpdbData.extradata.patch2 = args.patch2

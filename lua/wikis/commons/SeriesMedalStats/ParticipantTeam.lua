@@ -1,20 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:SeriesMedalStats/ParticipantTeam
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local MedalStatsBase = Lua.import('Module:SeriesMedalStats')
 

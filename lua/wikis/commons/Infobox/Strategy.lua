@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Strategy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
+
+local Class = Lua.import('Module:Class')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -52,7 +52,7 @@ function Strategy:createInfobox()
 		Title{children = args.informationType .. ' Information'},
 		Cell{
 			name = 'Creator(s)',
-			content = {args.creator or args['created-by']},
+			children = {args.creator or args['created-by']},
 			options = {makeLink = true}
 		},
 		Customizable{id = 'custom', children = {}},
@@ -63,7 +63,7 @@ function Strategy:createInfobox()
 		self:categories('Strategies')
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Strategy')
 end
 
 return Strategy

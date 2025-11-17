@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=splatoon
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Lua = require('Module:Lua')
-local WeaponNames = mw.loadData('Module:WeaponNames')
+
+local Array = Lua.import('Module:Array')
+local WeaponNames = Lua.import('Module:WeaponNames', {loadData = true})
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 

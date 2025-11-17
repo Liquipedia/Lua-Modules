@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Json
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,8 +7,10 @@
 
 local Json = {}
 
-local Arguments = require('Module:Arguments')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
+local Table = Lua.import('Module:Table')
 
 ---Json-stringifies all arguments from a supplied frame.
 ---@param frame Frame
@@ -118,6 +119,17 @@ function Json.parseStringified(any)
 		return any, true
 	end
 	return Table.mapValues(tbl, Json.parseStringified), false
+end
+
+---Wrapper on parseStringified when the input param is expected to be a table containing stringified JSON values.
+---@param any table
+---@return table, boolean
+---@overload fun(any: any): any, true
+function Json.parseStringifiedArgs(any)
+	if type(any) ~= 'table' then
+		return any, true
+	end
+	return Table.mapValues(any, Json.parseStringified), false
 end
 
 return Json

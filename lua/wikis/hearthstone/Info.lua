@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=hearthstone
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -34,6 +33,12 @@ return {
 		},
 		match2 = {
 			status = 2,
+		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'merge',
+			},
 		},
 	},
 }

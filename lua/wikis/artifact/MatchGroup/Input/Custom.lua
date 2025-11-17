@@ -1,16 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=artifact
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local ChampionNames = mw.loadData('Module:ChampionNames')
-local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
+
+local Array = Lua.import('Module:Array')
+local ChampionNames = Lua.import('Module:ChampionNames', {loadData = true})
+local FnUtil = Lua.import('Module:FnUtil')
+local Opponent = Lua.import('Module:Opponent')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 

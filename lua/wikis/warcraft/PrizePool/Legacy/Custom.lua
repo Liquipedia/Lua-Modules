@@ -1,19 +1,18 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:PrizePool/Legacy/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Table = Lua.import('Module:Table')
 
 local LegacyPrizePool = Lua.import('Module:PrizePool/Legacy')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l', q = 'q'}
 

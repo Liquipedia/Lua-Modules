@@ -239,6 +239,7 @@ function mw.language.fetchLanguageNames(inLanguage, include) end
 function mw.language.getContentLanguage()
 	return setmetatable(mw.language, {})
 end
+
 mw.getContentLanguage = mw.language.getContentLanguage
 
 ---Returns a list of MediaWiki's fallback language codes for the specified code.
@@ -272,6 +273,7 @@ function mw.language.isValidCode(code) end
 function mw.language.new(code)
 	return mw.language.getContentLanguage()
 end
+
 mw.getLanguage = mw.language.new
 
 ---Returns the language code for this language object.
@@ -339,11 +341,19 @@ end
 ---@param localTime boolean?
 ---@return string
 function mw.language:formatDate(format, timestamp, localTime)
+	local ostimeWrapper = function(date)
+		local time = os.time(date)
+		-- Fix for running on MacOS. Year = 0000 returns nil on mac, let's assume it's 0000-01-01
+		if time == nil then
+			return -62167219200
+		end
+		return time
+	end
 	local function localTimezoneOffset(ts)
 		local utcDt = os.date("!*t", ts)
 		local localDt = os.date("*t", ts)
 		localDt.isdst = false
-		return os.difftime(os.time(localDt --[[@as osdateparam]]), os.time(utcDt --[[@as osdateparam]]))
+		return os.difftime(ostimeWrapper(localDt --[[@as osdateparam]]), ostimeWrapper(utcDt --[[@as osdateparam]]))
 	end
 
 	local function parseDateString(timeString)
@@ -356,7 +366,7 @@ function mw.language:formatDate(format, timestamp, localTime)
 	end
 
 	local function makeOsdateParam(year, month, day, hour, minute, second)
-		return {year = year, month = month or 1, day = day or 1, hour = hour or 0, min = minute, sec = second}
+		return { year = year, month = month or 1, day = day or 1, hour = hour or 0, min = minute, sec = second }
 	end
 
 	if format == 'U' then
@@ -377,7 +387,8 @@ function mw.language:formatDate(format, timestamp, localTime)
 			return ''
 		end
 
-		local ts = os.time(makeOsdateParam(year, month, day, hour, minute, second)) - offset
+		local timestampBeforeOffset = ostimeWrapper(makeOsdateParam(year, month, day, hour, minute, second))
+		local ts = timestampBeforeOffset - offset
 
 		return tostring(ts + localTimezoneOffset(ts))
 	elseif format == 'c' then
@@ -393,9 +404,48 @@ function mw.language:formatDate(format, timestamp, localTime)
 			if not year then
 				return ''
 			end
-			return os.date(outFormat, os.time(makeOsdateParam(year, month, day, hour, minute, second))) --[[@as string]]
+			return os.date(outFormat, ostimeWrapper(makeOsdateParam(year, month, day, hour, minute, second))) --[[@as string]]
 		end
-		return os.date(outFormat, os.time(timestamp)) --[[@as string]]
+		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
+	elseif format == 'Y' then
+		local outFormat = '%Y'
+		if not timestamp then
+			return os.date(outFormat) --[[@as string]]
+		end
+		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
+			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
+		end
+		if type(timestamp) == 'string' then
+			local year = parseDateString(timestamp)
+			return year or ''
+		end
+		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
+	elseif format == 'n' then
+		local outFormat = '%m'
+		if not timestamp then
+			return os.date(outFormat) --[[@as string]]
+		end
+		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
+			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
+		end
+		if type(timestamp) == 'string' then
+			local _, month = parseDateString(timestamp)
+			return month or ''
+		end
+		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
+	elseif format == 'd' then
+		local outFormat = '%d'
+		if not timestamp then
+			return os.date(outFormat) --[[@as string]]
+		end
+		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
+			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
+		end
+		if type(timestamp) == 'string' then
+			local _, _, day = parseDateString(timestamp)
+			return day or ''
+		end
+		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
 	end
 	return ''
 end
@@ -417,6 +467,7 @@ function mw.language:parseFormattedNumber(str) end
 ---@return string
 ---@overload fun(n: number, forms: table):string
 function mw.language:convertPlural(n, ...) end
+
 mw.language.plural = mw.language.convertPlural
 
 ---This chooses the appropriate inflected form of word for the given inflection code case.
@@ -429,7 +480,7 @@ function mw.language:convertGrammar(word, case) end
 ---@param case string
 ---@param word string
 ---@return string
-function mw.language:gammer(case, word) end
+function mw.language:grammar(case, word) end
 
 ---Returns a Unicode arrow character corresponding to direction:
 ---@param direction 'forwards'|'backwards'|'left'|'right'|'up'|'down'
@@ -530,7 +581,7 @@ function mw.message:isDisabled() end
 ---@field subjectNamespaces table<integer, namespaceInfo>
 ---@field talkNamespaces table<integer, namespaceInfo>
 ---@field stats {pages: number, articles: number, files: number, edits: number, users: number, activeUsers: number, admins: number, pagesInCategory: fun(category: string, which: 'all'|'subcats'|'files'|'pages'|'*'):integer}
-mw.site = {server = 'https://liquipedia.net/wiki/'}
+mw.site = { server = 'https://liquipedia.net/wiki/' }
 
 ---Returns a table holding data about available interwiki prefixes. If filter is the string "local", then only data for local interwiki prefixes is returned. If filter is the string "!local", then only data for non-local prefixes is returned. If no filter is specified, data for all prefixes is returned. A "local" prefix in this context is one that is for the same project.
 ---@param filter nil|'local'|'!local'
@@ -570,7 +621,9 @@ end
 ---Removes all MediaWiki strip markers from a string.
 ---@param s string
 ---@return string
-function mw.text.killMarkers(s) end
+function mw.text.killMarkers(s)
+	return s
+end
 
 ---Joins a list, prose-style. In other words, it's like table.concat() but with a different separator before the final item.
 ---@param list table
@@ -584,7 +637,7 @@ function mw.text.listToText(list, separator, conjunction) end
 ---@return string
 function mw.text.nowiki(s)
 	-- TODO: This only covers some
-	return (string.gsub( s, '["&\'<=>%[%]{|}]', {
+	return (string.gsub(s, '["&\'<=>%[%]{|}]', {
 		['"'] = '&#34;',
 		['&'] = '&#38;',
 		["'"] = '&#39;',
@@ -642,7 +695,7 @@ function mw.text.tag(name, attrs, content) end
 ---@return string
 function mw.text.trim(s, charset)
 	-- TODO: UTF8 support in fake
-	return string.match( s, '^()%s*$' ) and '' or string.match( s, '^%s*(.*%S)' )
+	return string.match(s, '^()%s*$') and '' or string.match(s, '^%s*(.*%S)')
 end
 
 ---Truncates text to the specified length in code points, adding ellipsis if truncation was performed. If length is positive, the end of the string will be truncated; if negative, the beginning will be removed
@@ -663,9 +716,8 @@ function mw.text.unstripNoWiki(s) end
 ---@return string
 function mw.text.unstrip(s) end
 
-
 ---@class Title
----@field id number
+---@field id integer
 ---@field interwiki string
 ---@field namespace number
 ---@field nsText string
@@ -698,6 +750,7 @@ function mw.text.unstrip(s) end
 ---@field cascadingProtection table
 mw.title = {
 	namespace = 0,
+	id = 123,
 	nsText = '',
 	text = 'FakePage',
 	prefixedText = 'FakePage',
@@ -736,7 +789,7 @@ end
 ---If the text string does not specify a namespace, namespace (which may be any key found in mw.site.namespaces) will be used.
 ---If the text is not a valid title, nil is returned.
 ---@param text string
----@param namespace string?
+---@param namespace string|integer?
 ---@return Title?
 ---@overload fun(id: number):Title?
 function mw.title.new(text, namespace)
@@ -746,7 +799,7 @@ end
 ---Creates a title object with title title in namespace namespace, optionally with the specified fragment and interwiki prefix. namespace may be any key found in mw.site.namespaces. If the resulting title is not valid, returns nil.
 ---Note that, unlike mw.title.new(), this method will always apply the specified namespace.
 ---If the text is not a valid title, nil is returned.
----@param namespace string
+---@param namespace string|integer
 ---@param title string
 ---@param fragment string?
 ---@param interwiki string?
@@ -963,21 +1016,87 @@ function mw.ustring.toNFKD(s) return tostring(s) end
 ---@return string
 function mw.ustring.upper(s) return string.upper(s) end
 
+---@class URI
+---@field protocol string?
+---@field user string?
+---@field password string?
+---@field host string?
+---@field port integer?
+---@field path string?
+---@field query table?
+---@field fragment string?
 mw.uri = {}
-function mw.uri.localUrl(s, s2) return '' end
-function mw.uri.fullUrl(s, s2) return 'https://liquipedia.net/' end
+
+---Returns a URI object for the local URL for a page, with optional query string/table
+---@param page string
+---@param query string|table?
+---@return URI
+function mw.uri.localUrl(page, query)
+	return ''
+end
+
+---Returns a URI object for the full URL for a page, with optional query string/table
+---@param page string
+---@param query string|table?
+---@return URI
+function mw.uri.fullUrl(page, query)
+	return 'https://liquipedia.net/'
+end
+
+---@alias UriEncodeType 'QUERY'|'PATH'|'WIKI'
+
+---Percent-encodes a string with the specified encoding type.
+---@param str string
+---@param enctype UriEncodeType?
+---@return string
+function mw.uri.encode(str, enctype) end
+
+---Percent-decodes a string with the specified encoding type.
+---@param str string
+---@param enctype UriEncodeType?
+---@return string
+function mw.uri.decode(str, enctype) end
+
+---Encodes a table as a URI query string.
+---@param query table<string, string|number|any[]|false>
+---@return string
+function mw.uri.buildQueryString(query) end
+
+---Decodes the query string `s` to a table. Optional arguments `i` and `j` may be used to specify
+---the substring of `s` to be parsed.
+---@param s string
+---@param i integer? the position of first character of the substring to be parsed; defaults to 1
+---@param j integer? the position of last character of the substring to be parsed; defaults to the length of `s`
+---@return table
+function mw.uri.parseQueryString(s, i, j) end
+
+---Validates the specified table (or URI object).
+---@param arg table|URI
+---@return boolean result whether the argument was valid
+---@return string? desc explanation of the found problems (if any)
+function mw.uri.validate(arg) end
+
+---Parses a string into this URI object.
+---@param str string
+function mw.uri:parse(str) end
+
+---Creates a copy of this URI object.
+---@return URI
+function mw.uri:clone() end
+
+---Merges the parameters table into the query table of this URI object.
+---@param parameters table
+function mw.uri:extend(parameters) end
 
 mw.ext = {}
 mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
 
 mw.ext.Dota2Ranking = {}
 
----@alias Dota2RankingRecord {name: string, rank: integer, rating: number, streak: integer,
----progression: {date: string, rating: number, rank: integer}[]}
----@param startDate string #YYYY-MM-DD
----@param endDate string #YYYY-MM-DD
+---@alias Dota2RankingEntry {external_id: string, name: string, rating: number, rank: integer}
+---@alias Dota2RankingRecord {date: string, provisional: boolean,  entries: Dota2RankingEntry[]}
 ---@return Dota2RankingRecord[]
-function mw.ext.Dota2Ranking.get(startDate, endDate) end
+function mw.ext.Dota2Ranking.get() end
 
 mw.ext.VariablesLua = {}
 ---@alias wikiVariableKey string|number
@@ -1126,11 +1245,9 @@ function mw.ext.SearchEngineOptimization.metadescl(desc) end
 function mw.ext.SearchEngineOptimization.metaimage(image) end
 
 mw.ext.Brackets = {}
----@param idToCheck string
----@return string
-function mw.ext.Brackets.checkBracketDuplicate(idToCheck)
-	return 'ok'
-end
+---@param bracketType string
+---@return table
+function mw.ext.Brackets.getCommonsBracketTemplate(bracketType) end
 
 mw.ext.Dota2DB = {}
 
@@ -1188,5 +1305,90 @@ mw.ext.Dota2DB = {}
 ---@param reversed boolean?
 ---@return dota2MatchData
 function mw.ext.Dota2DB.getBigMatch(matchId, reversed) end
+
+mw.ext.valorantdb = {}
+
+---@class valorantMatchApiPlayerStats
+---@field score integer
+---@field rounds_played integer
+---@field kills integer
+---@field deaths integer
+---@field assists integer
+---@field ability_casts {ability_1: integer, ability_2: integer, grenade_casts: integer, ultimate_casts: integer}
+---@field head_shot_percent number
+---@field acs number
+---@field adr number
+---@field kast number
+---@field playtime_millis integer
+
+---@class valorantMatchApiPlayer
+---@field puuid string
+---@field game_name string
+---@field tag_line string
+---@field team_id 'Blue'|'Red'|'Neutral'
+---@field competitive_tier integer
+---@field party_id string
+---@field is_observer boolean
+---@field account_level integer
+---@field stats valorantMatchApiPlayerStats
+---@field character {riot_id: string, name: string, icon_name: string, localized_names: table<string, string>}
+---@field lpdb_player? {page_name: string, publisher_id: string, wiki: string}
+
+---@class valorantMatchApiRoundKill
+---@field victim string
+---@field time_since_round_start_millis integer
+---@field time_since_game_start_millis integer
+---@field killer string
+---@field finishing_damage table
+---@field assistants string[]
+
+---@class valorantMatchApiRoundPlayer
+---@field kills valorantMatchApiRoundKill[]
+---@field score integer
+---@field puuid string
+---@field economy {remaining: string, armor: string, spent: integer, loadout_value: integer, weapon: string}
+---@field damage {receiver: string, leg_shots: integer, head_shots: integer, body_shots: integer, damage: integer}[]
+
+---@class valorantMatchApiRound
+---@field round_num integer
+---@field round_result 'Bomb defused'|'Eliminated'|'Bomb detonated'|'Round timer expired'|'Surrendered'
+---@field round_result_code 'Defuse'|'Elimination'|'Detonate'|'Surrendered'|'' #empty string is for 'time expired'
+---@field round_ceremony 'CeremonyDefault'|'CeremonyTeamAce'|'CeremonyFlawless'|'CeremonyCloser'|
+---'CeremonyClutch'|'CeremonyThrifty'|'CeremonyAce'| '';
+---@field winning_team 'Blue'|'Red'
+---@field winning_team_role 'Attacker'|'Defender'
+---@field bomb_planter? string
+---@field bomb_defuser? string
+---@field plant_round_time integer # 0 is no plant
+---@field defuse_round_time integer # 0 is no defuse
+---@field plant_site? 'A'|'B'
+---@field player_stats valorantMatchApiRoundPlayer[]
+
+---@class valorantMatchApiTeam
+---@field team_id 'Blue'|'Red'
+---@field won boolean
+---@field rounds_played integer
+---@field rounds_won integer
+---@field num_points integer
+
+---@class valorantMatchData
+---@field match_id string
+---@field map_id string
+---@field game_version string
+---@field game_length_millis integer
+---@field region string
+---@field game_start_millis integer
+---@field provisioning_flow_id string
+---@field is_completed boolean
+---@field queue_id string
+---@field is_ranked boolean
+---@field season_id string
+---@field players valorantMatchApiPlayer[]
+---@field teams valorantMatchApiTeam[]
+---@field round_results valorantMatchApiRound[]
+
+---@param matchId string
+---@return valorantMatchData
+function mw.ext.valorantdb.getMatchDetails(matchId) end
 
 return mw

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=paladins
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,11 +7,12 @@
 
 local CustomMatchSummary = {}
 
-local Array = require('Module:Array')
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
+
+local Array = Lua.import('Module:Array')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
@@ -49,7 +49,6 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '85%'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
 			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},

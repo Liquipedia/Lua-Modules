@@ -1,22 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=chess
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class ChessLeagueInfobox: InfoboxLeague
@@ -28,6 +28,8 @@ local MODES = {
 	classical = 'Classical',
 	blitz = 'Blitz',
 	rapid = 'Rapid',
+	bullet = 'Bullet',
+	hyperbullet = 'Hyperbullet',
 }
 
 local RESTRICTIONS = {
@@ -51,6 +53,11 @@ local RESTRICTIONS = {
 		link = 'Senior Tournaments',
 		data = 'senior',
 	},
+	engine = {
+		name = 'Chess Engines Only',
+		link = 'Computer Chess Tournaments',
+		data = 'engine',
+	},
 }
 
 ---@param frame Frame
@@ -70,15 +77,16 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 	local data = caller.data
 	if id == 'custom' then
-		table.insert(
-			widgets,
-			Cell{name = 'Restrictions', content = caller:createRestrictionsCell(args.restrictions)}
+		Array.appendWith(widgets,
+			Cell{name = 'Restrictions', children = caller:createRestrictionsCell(args.restrictions)},
+			Cell{name = 'Number of Players', children = {args.player_number}},
+			Cell{name = 'Number of Teams', children = {args.team_number}}
 		)
 	elseif id == 'gamesettings' then
 		local isVariant = caller.data.game ~= Game.toIdentifier()
 		Array.appendWith(widgets,
-			Cell{name = 'Time Control' .. (#data.modes > 1 and 's' or ''), content = data.modes},
-			isVariant and Cell{name = 'Variant', content = {Game.name{game = caller.data.game}}} or nil
+			Cell{name = 'Time Control' .. (#data.modes > 1 and 's' or ''), children = data.modes},
+			isVariant and Cell{name = 'Variant', children = {Game.name{game = caller.data.game}}} or nil
 		)
 	end
 	return widgets

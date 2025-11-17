@@ -1,15 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
 -- page=Module:GetMatchGroupCopyPaste/wiki
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local InGameRoles = Lua.import('Module:InGameRoles', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
@@ -17,6 +19,10 @@ local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 local WikiCopyPaste = Class.new(BaseCopyPaste)
 
 local INDENT = WikiCopyPaste.Indent
+local ROLES = Array.map(
+	Array.sortBy(Array.unique(Array.extractValues(InGameRoles)), Operator.property('sortOrder')),
+	Operator.property('display')
+)
 
 --returns the Code for a Match, depending on the input
 ---@param bestof integer
@@ -34,7 +40,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local casters = tonumber(args.casters) or 0
 
 	local lines = Array.extend(
-		'{{Match|patch=',
+		'{{Match',
 		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
@@ -51,11 +57,9 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			end), ' ')
 		} or nil,
 		Array.map(Array.range(1, bestof), function(mapIndex)
-			return INDENT .. '|vodgame'.. mapIndex ..'='
-		end),
-		Array.map(Array.range(1, bestof), function(mapIndex)
 			return WikiCopyPaste._getMapCode(mapIndex, args)
 		end),
+		INDENT .. '|patch=',
 		'}}'
 	)
 
@@ -67,16 +71,30 @@ end
 ---@return string
 function WikiCopyPaste._getMapCode(mapIndex, args)
 	if Logic.readBool(args.generateMatchPage) then
-		return INDENT .. '|map' .. mapIndex .. '={{ApiMap|matchid=|reversed=}}'
+		return table.concat({
+			INDENT .. '|map' .. mapIndex .. '={{ApiMap',
+			INDENT .. INDENT .. '|matchid=',
+			INDENT .. INDENT .. '|reversed=',
+			INDENT .. INDENT .. '|vod=',
+			INDENT .. '}}'
+		}, '\n')
 	end
+	local detailedPlayerInput = Logic.readBool(args.detailedInput)
 	local bans = Logic.readBool(args.bans)
 	return table.concat(Array.extend(
 		INDENT .. '|map' .. mapIndex .. '={{Map',
+		INDENT .. INDENT .. '|vod=',
 		INDENT .. INDENT .. '|team1side=',
-		INDENT .. INDENT .. '|t1c1= |t1c2= |t1c3= |t1c4= |t1c5=',
+		detailedPlayerInput and Array.map(Array.range(1, 5), function (index)
+			return INDENT .. INDENT .. '|t1p' .. index .. '={{Json|player= |role=' ..
+					ROLES[index] .. ' |character= |kills= |deaths= |assists=}}'
+		end) or (INDENT .. INDENT .. '|t1c1= |t1c2= |t1c3= |t1c4= |t1c5='),
 		bans and (INDENT .. INDENT .. '|t1b1= |t1b2= |t1b3= |t1b4= |t1b5=') or nil,
 		INDENT .. INDENT .. '|team2side=',
-		INDENT .. INDENT .. '|t2c1= |t2c2= |t2c3= |t2c4= |t2c5=',
+		detailedPlayerInput and Array.map(Array.range(1, 5), function (index)
+			return INDENT .. INDENT .. '|t2p' .. index .. '={{Json|player= |role=' ..
+					ROLES[index] .. ' |character= |kills= |deaths= |assists=}}'
+		end) or (INDENT .. INDENT .. '|t2c1= |t2c2= |t2c3= |t2c4= |t2c5='),
 		bans and (INDENT .. INDENT .. '|t2b1= |t2b2= |t2b3= |t2b4= |t2b5=') or nil,
 		INDENT .. INDENT .. '|length= |winner=',
 		INDENT .. '}}'

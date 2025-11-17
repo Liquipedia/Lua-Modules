@@ -1,28 +1,31 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:TransferRow
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Faction = require('Module:Faction')
-local Flags = require('Module:Flags')
-local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Faction = Lua.import('Module:Faction')
+local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
+local Info = Lua.import('Module:Info', {loadData = true})
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
+
+local Platform = Lua.import('Module:Platform')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local PositionConvert = Lua.requireIfExists('Module:PositionName/data', {loadData = true})
-local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
 local References = Lua.import('Module:Transfer/References')
+
+local TransferRowWidget = Lua.import('Module:Widget/Transfer/Row')
 
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
 local VALID_CONFIDENCES = {
@@ -32,6 +35,24 @@ local VALID_CONFIDENCES = {
 	'unlikely',
 	'unknown',
 }
+
+---@class enrichedTransfer
+---@field from {teams: string[], roles: string[]}
+---@field to {teams: string[], roles: string[]}
+---@field platform string?
+---@field displayDate string
+---@field date string
+---@field wholeteam boolean
+---@field players transferPlayer[]
+---@field references string[]
+---@field confirmed boolean?
+---@field confidence string?
+---@field isRumour boolean?
+
+---@class transferPlayer: standardPlayer
+---@field icons string[]
+---@field faction string?
+---@field chars string[]
 
 ---@class TransferRow: BaseClass
 ---@field config {storage: boolean, isRumour: boolean}
@@ -185,7 +206,6 @@ end
 ---@return string
 function TransferRow:readPlatform()
 	if not HAS_PLATFORM_ICONS then return '' end
-	local Platform = require('Module:Platform')
 	self.args.platform = Platform._getName(self.args.platform) or ''
 	return self.args.platform
 end
@@ -325,9 +345,12 @@ function TransferRow._objectName(transfer)
 	return 'transfer_' .. transfer.date .. '_' .. string.format('%06d', transfer.extradata.sortindex)
 end
 
----@return Html?
+---@return Widget?
 function TransferRow:build()
-	return TransferRowDisplay(self.transfers):build()
+	return TransferRowWidget{
+		transfers = self.transfers,
+		showTeamName = (Info.config.transfers or {}).showTeamName
+	}
 end
 
 return TransferRow

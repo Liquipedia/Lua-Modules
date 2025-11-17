@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=splatoon
 -- page=Module:GetMatchGroupCopyPaste/wiki
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
@@ -51,11 +51,9 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Logic.readBool(args.hasDate) and {
 			INDENT .. '|date=',
 			INDENT .. '|twitch= |youtube=',
-			INDENT .. '|mvp='
+			INDENT .. '|mvp=',
+			INDENT .. '|vod='
 		} or nil,
-		Array.map(Array.range(1, bestof), function (i)
-			return INDENT .. '|vodgame'.. i ..'='
-		end),
 		(mapVeto and VETOES[bestof]) and {
 			INDENT .. '|mapveto={{MapVeto',
 			INDENT .. INDENT .. '|firstpick=',
@@ -69,10 +67,11 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Array.flatMap(Array.range(1, bestof), function (i)
 			return {
 				INDENT .. '|map' .. i .. '={{Map',
-				INDENT .. INDENT .. '|map=|maptype=',
+				INDENT .. INDENT .. '|map=|mode=',
 				INDENT .. INDENT .. '|t1w1= |t1w2= |t1w3= |t1w4=',
 				INDENT .. INDENT .. '|t2w1= |t2w2= |t2w3= |t2w4=',
 				INDENT .. INDENT .. '|score1=|score2=|winner=',
+				INDENT .. INDENT .. '|vod=',
 				INDENT .. '}}'
 			}
 		end),

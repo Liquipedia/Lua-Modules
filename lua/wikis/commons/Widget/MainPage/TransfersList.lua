@@ -1,16 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/MainPage/TransfersList
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
 
 local TransferList = Lua.import('Module:TransferList')
 
@@ -25,7 +26,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field limit integer?
 ---@field rumours boolean?
 ---@field transferPortal string?
----@field transferPage fun():string
+---@field transferPage string?
 ---@field transferQuery boolean?
 ---@field onlyNotableTransfers boolean?
 
@@ -37,9 +38,7 @@ TransfersList.defaultProps = {
 	limit = 15,
 	rumours = false,
 	transferPortal = 'Portal:Transfers',
-	transferPage = function ()
-		return 'Player Transfers/' .. os.date('%Y') .. '/' .. os.date('%B')
-	end,
+	transferPage = 'Player Transfers/' .. DateExt.getYearOf() .. '/' .. os.date('%B'),
 	transferQuery = true
 }
 
@@ -63,7 +62,7 @@ function TransfersList:render()
 						'&#91;',
 							Link {
 							children = 'edit',
-							link = 'Special:EditPage/' .. self.props.transferPage()
+							link = 'Special:EditPage/' .. self.props.transferPage
 						},
 						'&#93;'
 					},
@@ -71,7 +70,9 @@ function TransfersList:render()
 				Div {
 					css = {
 						['white-space'] = 'nowrap',
-						display = 'inline',
+						display = 'inline flex',
+						['flex-wrap'] = 'wrap',
+						['justify-content'] = 'center',
 						margin = '0 10px',
 						['font-size'] = '15px',
 						['font-style'] = 'italic'

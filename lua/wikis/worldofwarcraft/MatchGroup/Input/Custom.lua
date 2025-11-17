@@ -1,16 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=worldofwarcraft
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local SpecNames = mw.loadData('Module:SpecNames')
+
+local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local SpecNames = Lua.import('Module:SpecNames', {loadData = true})
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 

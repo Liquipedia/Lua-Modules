@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=pubg
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -34,6 +33,9 @@ return {
 		},
 		match2 = {
 			status = 1,
+		},
+		infoboxPlayer = {
+			autoTeam = true,
 		},
 	},
 	defaultRoundPrecision = 0,

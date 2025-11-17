@@ -1,22 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:Infobox/UnofficialWorldChampion/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local UnofficialWorldChampion = Lua.import('Module:Infobox/UnofficialWorldChampion')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Title = Widgets.Title
@@ -44,7 +44,7 @@ function CustomInjector:parse(id, widgets)
 		local index = 1
 		local defencesCells = {}
 		while not String.isEmpty(args['most defences against ' .. index]) do
-			table.insert(defencesCells, Breakdown{ content = {
+			table.insert(defencesCells, Breakdown{ children = {
 				args['most defences against ' .. index],
 				args['most defences against ' .. (index + 1)],
 			}})
@@ -78,7 +78,7 @@ function CustomUnofficialWorldChampion:_buildCellsFromBase(base, title)
 
 	local widgets = {Title{children = title}}
 	for key, value in Table.iter.pairsByPrefix(args, base .. ' ') do
-		table.insert(widgets, Cell{name = (args[key .. ' no'] or '?') .. ' champions', content = {value}})
+		table.insert(widgets, Cell{name = (args[key .. ' no'] or '?') .. ' champions', children = {value}})
 	end
 
 	return widgets

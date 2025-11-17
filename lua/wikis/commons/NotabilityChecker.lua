@@ -1,26 +1,31 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:NotabilityChecker
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Config = require('Module:NotabilityChecker/config')
-local Logic = require('Module:Logic')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Config = Lua.import('Module:NotabilityChecker/config')
+local Info = Lua.import('Module:Info', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local NotabilityChecker = {}
 
 local LANG = mw.getContentLanguage()
 local NOW = os.time()
 local SECONDS_IN_YEAR = 365.2425 * 86400
+local MAX_NUMBER_OF_PARTICIPANTS = Config.MAX_NUMBER_OF_PARTICIPANTS or Info.config.defaultMaxPlayersPerPlacement or 10
 
 NotabilityChecker.LOGGING = true
 
+---@param args table
+---@return string
 function NotabilityChecker.run(args)
 
 	local weight = 0
@@ -55,6 +60,10 @@ function NotabilityChecker.run(args)
 	return output
 end
 
+---@private
+---@param team string
+---@return integer
+---@return string
 function NotabilityChecker._runForTeam(team)
 	team = mw.ext.TeamLiquidIntegration.resolve_redirect(team)
 	local weight = NotabilityChecker._calculateTeamNotability(team)
@@ -67,6 +76,11 @@ function NotabilityChecker._runForTeam(team)
 	return weight, output
 end
 
+---@private
+---@param team string
+---@param people string[]
+---@return number
+---@return string
 function NotabilityChecker._calculateRosterNotability(team, people)
 	local weight = 0
 	local output = ''
@@ -94,16 +108,22 @@ function NotabilityChecker._calculateRosterNotability(team, people)
 	return weight, output
 end
 
+---@private
+---@param team string
+---@return integer
 function NotabilityChecker._calculateTeamNotability(team)
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = Config.PLACEMENT_LIMIT,
-		conditions = '[[participant::' .. team .. ']]',
+		conditions = '[[opponentname::' .. team .. ']]',
 		query = 'pagename, tournament, date, placement, liquipediatier, liquipediatiertype, extradata, mode',
 	})
 
 	return NotabilityChecker._calculateWeight(data)
 end
 
+---@private
+---@param person string
+---@return integer
 function NotabilityChecker._calculatePersonNotability(person)
 	person = mw.ext.TeamLiquidIntegration.resolve_redirect(person)
 
@@ -111,8 +131,8 @@ function NotabilityChecker._calculatePersonNotability(person)
 	-- We check for names with spaces, then names with underscores.
 	local conditions = {}
 	for _, name in pairs({person, (person:gsub(' ', '_'))}) do
-		table.insert(conditions, '[[participant::' .. name .. ']]')
-		for i = 1, Config.MAX_NUMBER_OF_PARTICIPANTS do
+		table.insert(conditions, '[[opponentname::' .. name .. ']]')
+		for i = 1, MAX_NUMBER_OF_PARTICIPANTS do
 			table.insert(conditions, '[[opponentplayers_p' .. tostring(i) .. '::' .. name .. ']]')
 		end
 		for i = 1, Config.MAX_NUMBER_OF_COACHES do
@@ -128,6 +148,9 @@ function NotabilityChecker._calculatePersonNotability(person)
 	return NotabilityChecker._calculateWeight(data)
 end
 
+---@private
+---@param placementData placement[]
+---@return integer
 function NotabilityChecker._calculateWeight(placementData)
 	if type(placementData) ~= 'table' or placementData[1] == nil then
 		return 0
@@ -272,4 +295,4 @@ function NotabilityChecker._calculateDateLoss(date)
 	return math.floor(differenceSeconds / SECONDS_IN_YEAR) + 1
 end
 
-return Class.export(NotabilityChecker)
+return Class.export(NotabilityChecker, {exports = {'run'}})

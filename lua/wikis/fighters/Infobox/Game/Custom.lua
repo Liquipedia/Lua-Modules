@@ -1,21 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=fighters
 -- page=Module:Infobox/Game/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Game = Lua.import('Module:Infobox/Game')
 
 local Injector = Lua.import('Module:Widget/Injector')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Builder = Widgets.Builder
 local Chronology = Widgets.Chronology
 local Title = Widgets.Title

@@ -1,25 +1,25 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:Infobox/Unit/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
-local Faction = require('Module:Faction')
-local Game = require('Module:Game')
-local Hotkeys = require('Module:Hotkey')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local CostDisplay = Lua.import('Module:Infobox/Extension/CostDisplay')
+local Faction = Lua.import('Module:Faction')
+local Game = Lua.import('Module:Game')
+local Hotkeys = Lua.import('Module:Hotkey')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -53,7 +53,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'cost' and not String.isEmpty(args.min) then
 		return {
-			Cell{name = 'Cost', content = {CostDisplay.run{
+			Cell{name = 'Cost', children = {CostDisplay.run{
 				faction = args.race,
 				minerals = args.min,
 				mineralsTotal = args.totalmin,
@@ -69,11 +69,11 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(args.requires)}},
+			Cell{name = 'Requirements', children = {String.convertWikiListToHtmlList(args.requires)}},
 		}
 	elseif id == 'hotkey' then
 		return {
-			Cell{name = '[[Hotkeys per Race|Hotkey]]', content = {self.caller:_getHotkeys()}}
+			Cell{name = '[[Hotkeys per Race|Hotkey]]', children = {self.caller:_getHotkeys()}}
 		}
 	elseif id == 'type' and (not String.isEmpty(args.size) or not String.isEmpty(args.type)) then
 		local display = args.size
@@ -83,7 +83,7 @@ function CustomInjector:parse(id, widgets)
 			display = display .. ' ' .. args.type
 		end
 		return {
-			Cell{name = 'Type', content = {display}}
+			Cell{name = 'Type', children = {display}}
 		}
 	elseif id == 'defense' then return {}
 	elseif id == 'attack' then
@@ -100,20 +100,20 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(
 			widgets,
 			Title{children = 'Unit stats'},
-			Cell{name = 'Defense', content = {self.caller:_defenseDisplay()}},
-			Cell{name = 'Attributes', content = {args.attributes}},
-			Cell{name = 'Energy', content = {args.energy}},
-			Cell{name = 'Sight', content = {args.sight}},
-			Cell{name = 'Detection range', content = {args.detection_range}},
-			Cell{name = 'Speed', content = {args.speed}},
-			Cell{name = 'Speed Multiplier on Creep', content = {args.creepspeedmult}},
-			Cell{name = 'Speed on Creep', content = {args.speedoncreep}},
-			Cell{name = 'Flags', content = {args.flags}},
-			Cell{name = 'Morphs into', content = {args.morphs}},
-			Cell{name = 'Cargo size', content = {args.cargo_size}},
-			Cell{name = 'Cargo capacity', content = {args.cargo_capacity}},
-			Cell{name = 'Strong against', content = {String.convertWikiListToHtmlList(args.strong)}},
-			Cell{name = 'Weak against', content = {String.convertWikiListToHtmlList(args.weak)}}
+			Cell{name = 'Defense', children = {self.caller:_defenseDisplay()}},
+			Cell{name = 'Attributes', children = {args.attributes}},
+			Cell{name = 'Energy', children = {args.energy}},
+			Cell{name = 'Sight', children = {args.sight}},
+			Cell{name = 'Detection range', children = {args.detection_range}},
+			Cell{name = 'Speed', children = {args.speed}},
+			Cell{name = 'Speed Multiplier on Creep', children = {args.creepspeedmult}},
+			Cell{name = 'Speed on Creep', children = {args.speedoncreep}},
+			Cell{name = 'Flags', children = {args.flags}},
+			Cell{name = 'Morphs into', children = {args.morphs}},
+			Cell{name = 'Cargo size', children = {args.cargo_size}},
+			Cell{name = 'Cargo capacity', children = {args.cargo_capacity}},
+			Cell{name = 'Strong against', children = {String.convertWikiListToHtmlList(args.strong)}},
+			Cell{name = 'Weak against', children = {String.convertWikiListToHtmlList(args.weak)}}
 		)
 
 		if args.game ~= GAME_LOTV and args.buildtime then
@@ -152,9 +152,9 @@ function CustomUnit:_getHotkeys()
 	local display
 	if not String.isEmpty(self.args.hotkey) then
 		if not String.isEmpty(self.args.hotkey2) then
-			display = Hotkeys.hotkey2(self.args.hotkey, self.args.hotkey2, 'arrow')
+			display = Hotkeys.hotkey2{hotkey1 = self.args.hotkey, hotkey2 = self.args.hotkey2, seperator = 'arrow'}
 		else
-			display = Hotkeys.hotkey(self.args.hotkey)
+			display = Hotkeys.hotkey{hotkey = self.args.hotkey}
 		end
 	end
 
@@ -218,13 +218,13 @@ function CustomUnit:_getAttack(index)
 
 	return {
 		Title{children = attackHeader},
-		Cell{name = 'Targets', content = {args['attack' .. index .. '_target']}},
-		Cell{name = 'Damage', content = {args['attack' .. index .. '_damage']}},
-		Cell{name = '[[Damage Per Second|DPS]]', content = {args['attack' .. index .. '_dps']}},
-		Cell{name = '[[Cooldown]]', content = {args['attack' .. index .. '_cooldown']}},
-		Cell{name = 'Bonus', content = {args['attack' .. index .. '_bonus']}},
-		Cell{name = 'Bonus DPS', content = {args['attack' .. index .. '_bonus_dps']}},
-		Cell{name = '[[Range]]', content = {
+		Cell{name = 'Targets', children = {args['attack' .. index .. '_target']}},
+		Cell{name = 'Damage', children = {args['attack' .. index .. '_damage']}},
+		Cell{name = '[[Damage Per Second|DPS]]', children = {args['attack' .. index .. '_dps']}},
+		Cell{name = '[[Cooldown]]', children = {args['attack' .. index .. '_cooldown']}},
+		Cell{name = 'Bonus', children = {args['attack' .. index .. '_bonus']}},
+		Cell{name = 'Bonus DPS', children = {args['attack' .. index .. '_bonus_dps']}},
+		Cell{name = '[[Range]]', children = {
 				(args['attack' .. index .. '_range'] or '')..
 				(args['attack' .. index .. '_range_note'] or '')
 			}

@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Tournament/TierPill
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Tier = require('Module:Tier/Utils')
+
+local Class = Lua.import('Module:Class')
+local Tier = Lua.import('Module:Tier/Utils')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')

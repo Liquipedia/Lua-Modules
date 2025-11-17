@@ -1,29 +1,29 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:BroadcastTalentTable
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Flags = require('Module:Flags')
-local Game = require('Module:Game')
-local HighlightConditions = require('Module:HighlightConditions')
-local LeagueIcon = require('Module:LeagueIcon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local Operator = require('Module:Operator')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Flags = Lua.import('Module:Flags')
+local Game = Lua.import('Module:Game')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Tier = Lua.import('Module:Tier/Custom')
 
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator

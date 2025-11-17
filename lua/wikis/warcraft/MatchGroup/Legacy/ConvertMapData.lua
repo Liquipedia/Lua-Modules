@@ -1,16 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:MatchGroup/Legacy/ConvertMapData
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local TBD = 'TBD'
 local NUMBER_OF_OPPONENTS = 2
@@ -212,4 +213,4 @@ function ConvertMapData._readSubmatchPlayers(args, players, opponentPlayers, pre
 	table.insert(players[opponentIndex], Table.copy(opponentPlayers[opponentIndex][name2] or {}))
 end
 
-return Class.export(ConvertMapData)
+return Class.export(ConvertMapData, {exports = {'solo', 'team', 'teamMulti'}})

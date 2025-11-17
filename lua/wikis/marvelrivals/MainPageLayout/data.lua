@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=marvelrivals
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
+
+local DateExt = Lua.import('Module:Date/Ext')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
@@ -17,6 +17,7 @@ local Div = HtmlWidgets.Div
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
+local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 local CONTENT = {
 	updates = {
@@ -33,16 +34,15 @@ local CONTENT = {
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
-		body = '{{Liquipedia:Want_to_help}}',
+		body = WantToHelp{},
 		padding = true,
 		boxid = 1504,
 	},
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferPage = function ()
-				return 'Player Transfers/' .. os.date('%Y') .. '/' .. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
-			end
+			transferPage = 'Player Transfers/' .. DateExt.getYearOf() .. '/' ..
+				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 		},
 		boxid = 1509,
 	},
@@ -59,12 +59,6 @@ local CONTENT = {
 		body = '{{Liquipedia:Special Event}}',
 		boxid = 1516,
 	},
-	heroes = {
-		heading = 'Heroes',
-		body = '{{Liquipedia:HeroTable}}',
-		padding = true,
-		boxid = 1501,
-	},
 	filterButtons = {
 		noPanel = true,
 		body = Div{
@@ -77,9 +71,6 @@ local CONTENT = {
 		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
-		panelAttributes = {
-			['data-switch-group-container'] = 'countdown',
-		},
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -102,7 +93,7 @@ return {
 	title = 'The Marvel Rivals Wiki',
 	navigation = {
 		{
-			file = 'SparkR OWCS Major 2024.jpg',
+			file = '100T at MRIG Mid Season Finals 2025.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -111,7 +102,7 @@ return {
 			},
 		},
 		{
-			file = 'Crazy Raccoon 2024 Esports World Cup Champions.jpg',
+			file = 'Rad EU MRIG Mid Season Finals 2025 Champions.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -120,7 +111,7 @@ return {
 			},
 		},
 		{
-			file = 'NTMR Infekted at OWCS 2024 Finals.jpg',
+			file = 'Cozy & Coluge at MRIG Mid Season Finals 2025.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -129,7 +120,7 @@ return {
 			},
 		},
 		{
-			file = 'OWCS Stockholm 2024 Trophy.jpg',
+			file = 'Ignite 2025 Mid Season Finals Trophy.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -138,7 +129,7 @@ return {
 			},
 		},
 		{
-			file = 'Marvel_Rivals_teamup_banner_Planet_X_Pals.png',
+			file = 'Season 0 Heroes Marvel Rivals.jpg',
 			title = 'Heroes',
 			link = 'Portal:Heroes',
 			count = {
@@ -148,7 +139,7 @@ return {
 			},
 		},
 		{
-			file = 'Marvel_Rivals_icon_Planet_x_Pals.png',
+			file = 'Marvel Rivals Old Hulk and Iron Man Team-Up.png',
 			title = 'Mechanics',
 			link = 'Mechanics',
 			count = {
@@ -157,7 +148,7 @@ return {
 			},
 		},
 		{
-			file = 'Marvel_Rivals_map_Royal_Palace.jpg',
+			file = 'Marvel Rivals map Celestial Husk.jpg',
 			title = 'Maps',
 			link = 'Portal:Maps',
 			count = {
@@ -177,7 +168,7 @@ return {
 			},
 		},
 		{
-			file = 'NRG hodsic at the ALGS Mannheim Split 2 Playoffs.jpg',
+			file = 'Gator at the MRIG Mid Season Finals 2025.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
@@ -191,10 +182,6 @@ return {
 						mobileOrder = 1,
 						noPanel = true,
 						content = CONTENT.specialEvents,
-					},
-					{
-						mobileOrder = 2,
-						content = CONTENT.heroes,
 					},
 					{
 						mobileOrder = 4,

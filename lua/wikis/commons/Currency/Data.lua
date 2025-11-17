@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Currency/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -847,6 +846,15 @@ return {
 	usd = {
 		code = 'USD',
 		name = 'United States Dollar',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '$',
+		},
+	},
+	uyu = {
+		code = 'UYU',
+		name = 'Uruguayan Peso',
 		symbol = {
 			hasSpace = false,
 			isAfter = false,

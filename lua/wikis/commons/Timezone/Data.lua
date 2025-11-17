@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Timezone/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -304,6 +303,10 @@ return {
 	VLAT = {
 		name = 'Vladivostok Time',
 		offset = {10, 0},
+	},
+	WAT = {
+		name = 'West Africa Time',
+		offset = {1, 0},
 	},
 	WEST = {
 		name = 'Western European Summer Time',

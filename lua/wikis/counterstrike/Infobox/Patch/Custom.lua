@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:Infobox/Patch/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local Game = Lua.import('Module:Game')
 local Patch = Lua.import('Module:Infobox/Patch')
@@ -61,7 +61,7 @@ function CustomPatch:_createGameCell()
 
 	return Cell{
 		name = 'Game',
-		content = {
+		children = {
 			IconImageWidget{
 				imageLight = self.gameData.logo.lightMode,
 				imageDark = self.gameData.logo.darkMode,
@@ -100,7 +100,7 @@ function CustomPatch:getChronologyData(args)
 		data.previous = (args['previous link'] or args.previous .. ' Patch') .. '|' .. args.previous
 	end
 	if args.next then
-		data.next = (args['next link'] or args.next .. ' Patch') .. '|' .. args.previous
+		data.next = (args['next link'] or args.next .. ' Patch') .. '|' .. args.next
 	end
 	return data
 end

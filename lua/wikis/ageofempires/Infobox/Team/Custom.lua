@@ -1,27 +1,26 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:Infobox/Team/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local GameLookup = require('Module:GameLookup')
 local Lua = require('Module:Lua')
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
-local TeamTemplates = require('Module:Team')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local GameLookup = Lua.import('Module:GameLookup')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -55,7 +54,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'region' then
 		return {}
 	elseif id == 'custom' then
-		table.insert(widgets, Cell{name = 'Games', content = self.caller:_getGames()})
+		table.insert(widgets, Cell{name = 'Games', children = self.caller:_getGames()})
 	end
 	return widgets
 end
@@ -135,13 +134,13 @@ end
 ---@return ConditionTree
 function CustomTeam:_buildTeamPlacementConditions()
 	local team = self.args.teamtemplate or self.args.name or self.pagename
-	local rawOpponentTemplate = TeamTemplates.queryRaw(team) or {}
+	local rawOpponentTemplate = TeamTemplate.getRawOrNil(team) or {}
 	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
 	if not opponentTemplate then
-		error('Missing team template for team: ' .. team)
+		error(TeamTemplate.noTeamMessage(team))
 	end
 
-	local opponentTeamTemplates = TeamTemplates.queryHistorical(opponentTemplate) or {opponentTemplate}
+	local opponentTeamTemplates = TeamTemplate.queryHistoricalNames(opponentTemplate)
 
 	local playerConditions = self:_buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
 

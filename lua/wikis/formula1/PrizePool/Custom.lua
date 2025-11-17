@@ -1,18 +1,18 @@
 ---
 -- @Liquipedia
--- wiki=formula1
 -- page=Module:PrizePool/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool')
 local PrizePoolPlacement = Lua.import('Module:PrizePool/Placement')
@@ -23,7 +23,7 @@ PrizePoolPlacement.specialStatuses = Table.merge(PrizePoolPlacement.specialStatu
 			return Logic.readBool(args.dns)
 		end,
 		display = function ()
-			return Abbreviation.make('DNS', 'Did not start')
+			return Abbreviation.make{text = 'DNS', title = 'Did not start'}
 		end,
 		lpdb = 'DNS',
 	},
@@ -32,7 +32,7 @@ PrizePoolPlacement.specialStatuses = Table.merge(PrizePoolPlacement.specialStatu
 			return Logic.readBool(args.dnpq)
 		end,
 		display = function ()
-			return Abbreviation.make('DNPQ', 'Did not pre-qualify')
+			return Abbreviation.make{text = 'DNPQ', title = 'Did not pre-qualify'}
 		end,
 		lpdb = 'DNPQ',
 	},
@@ -41,7 +41,7 @@ PrizePoolPlacement.specialStatuses = Table.merge(PrizePoolPlacement.specialStatu
 			return Logic.readBool(args.dnq)
 		end,
 		display = function ()
-			return Abbreviation.make('DNQ', 'Did not qualify')
+			return Abbreviation.make{text = 'DNQ', title = 'Did not qualify'}
 		end,
 		lpdb = 'DNQ',
 	},
@@ -50,7 +50,7 @@ PrizePoolPlacement.specialStatuses = Table.merge(PrizePoolPlacement.specialStatu
 			return Logic.readBool(args.nc)
 		end,
 		display = function ()
-			return Abbreviation.make('NC', 'Not classified')
+			return Abbreviation.make{text = 'NC', title = 'Not classified'}
 		end,
 		lpdb = 'NC',
 	},
@@ -91,6 +91,8 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	Variables.varDefine('enddate_' .. lpdbPrefix .. team, lpdbData.date)
 	Variables.varDefine('ranking' .. lpdbPrefix .. '_' .. (team:lower()) .. '_pointprize', lpdbData.extradata.prizepoints)
+	Variables.varDefine('ranking' .. lpdbPrefix .. '_' .. (team:lower()) .. '_pointprize2',
+		lpdbData.extradata.prizepoints2)
 
 	return lpdbData
 end

@@ -1,17 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=smash
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization')
-local Game = require('Module:Game')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local CharacterStandardizationData = Lua.import('Module:CharacterStandardization', {loadData = true})
+local Game = Lua.import('Module:Game')
+local Json = Lua.import('Module:Json')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')

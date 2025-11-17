@@ -1,20 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local CopyPaste = Lua.import('Module:GetMatchGroupCopyPaste')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local MatchGroup = Lua.import('Module:MatchGroup')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
@@ -271,6 +273,10 @@ end
 function MatchGroupLegacy:readOpponent(opponentData)
 	local opponent = self:_copyAndReplace(opponentData, self.args)
 	opponent.type = self.bracketType
+	if self.bracketType == Opponent.solo and Logic.isNotEmpty(opponent.displayname) then
+		opponent.link = opponent.name
+		opponent.name = Table.extract(opponent, 'displayname')
+	end
 	return opponent
 end
 
@@ -372,16 +378,16 @@ function MatchGroupLegacy:_populateNewArgs(match2mapping)
 	end)
 end
 
----@param templateid string
----@param oldTemplateid string?
+---@param bracketType string
+---@param oldBracketType string?
 ---@return table
-function MatchGroupLegacy:_get(templateid, oldTemplateid)
-	if Lua.moduleExists('Module:MatchGroup/Legacy/' .. templateid) then
-		mw.log('Module:MatchGroup/Legacy/' .. templateid .. ' exists')
-		return (require('Module:MatchGroup/Legacy/' .. templateid)[oldTemplateid] or function() return nil end)()
-			or self.get(templateid, self.bracketType)
+function MatchGroupLegacy:_get(bracketType, oldBracketType)
+	if Lua.moduleExists('Module:MatchGroup/Legacy/' .. bracketType) then
+		mw.log('Module:MatchGroup/Legacy/' .. bracketType .. ' exists')
+		return (Lua.import('Module:MatchGroup/Legacy/' .. bracketType)[oldBracketType] or function() return nil end)()
+			or self.get(bracketType, self.bracketType)
 	else
-		return self.get(templateid, self.bracketType)
+		return self.get(bracketType, self.bracketType)
 	end
 end
 
@@ -420,6 +426,128 @@ function MatchGroupLegacy:build()
 	self:handleOtherBracketParams()
 
 	return MatchGroup.Bracket(self.newArgs)
+end
+
+--does the same as run but returns wiki code instead of displayed bracket
+---@return string
+function MatchGroupLegacy:generate()
+	local args = self.args
+
+	self.bracketType = args.type
+	local match2mapping = self:_get(args.template, args.templateOld)
+
+	self.newArgs = {
+		args.template,
+		id = args.id,
+		store = args.store,
+	}
+	self.mapMappings = {}
+
+	self:_populateNewArgs(match2mapping)
+	self:handleOtherBracketParams()
+
+	return MatchGroupLegacy._generateWikiCode(self.newArgs)
+end
+
+function MatchGroupLegacy._generateWikiCode(args)
+	local bracketType = Table.extract(args, 1)
+	local bracketTypeWithoutPrefix = bracketType:gsub('^[bB]racket/', '')
+	local bracketDataList = CopyPaste._getBracketData(bracketTypeWithoutPrefix)
+	local matches = Array.map(bracketDataList, function(bracketData, matchIndex)
+		local matchKey = bracketData.matchKey
+		local match = Table.extract(args, matchKey)
+		if Logic.isEmpty(match) then return end
+		local header
+		if matchKey == 'RxMTP' then
+			header = '<!-- Third Place Match -->'
+		elseif matchKey ~= 'RxMBR' then
+			header = CopyPaste._getHeader(bracketData.header, false)
+		end
+		local lines = Array.append({},
+			header,
+			'|' .. matchKey .. '=' .. MatchGroupLegacy._generateMatch(match)
+		)
+
+		return table.concat(lines, '\n')
+	end)
+
+	local lines = Array.extend(
+		{'{{Bracket|' .. bracketType .. '|id=' .. Table.extract(args, 'id')},
+		MatchGroupLegacy._argsToString(args),
+		matches,
+		'}}'
+	)
+
+	return table.concat(lines, '\n')
+end
+
+---@param match table
+---@return string
+function MatchGroupLegacy._generateMatch(match)
+	local opponents = Array.mapIndexes(function(opponentIndex)
+		local opp = Table.extract(match, 'opponent' .. opponentIndex)
+		if Logic.isEmpty(opp) then return end
+		return '|opponent' .. opponentIndex .. '=' .. MatchGroupLegacy._generateOpponent(opp)
+	end)
+
+	local maps = Array.mapIndexes(function(mapIndex)
+		local map = Table.extract(match, 'map' .. mapIndex)
+		if Logic.isEmpty(map) then return end
+		return '|map' .. mapIndex .. '=' .. MatchGroupLegacy._generateMap(map)
+	end)
+
+	local addIndents = function(arr)
+		return Array.map(arr, function(item) return '    ' .. item end)
+	end
+
+	return table.concat(Array.extend({'{{Match'},
+		addIndents({MatchGroupLegacy._argsToString(match)}),
+		addIndents(opponents),
+		addIndents(maps),
+		'}}'
+	), '\n')
+end
+
+---@param opp table
+---@return string
+function MatchGroupLegacy._generateOpponent(opp)
+	local opponentType = Table.extract(opp, 'type')
+	local opponentTemplate = String.upperCaseFirst(opponentType) .. 'Opponent'
+
+	return '{{' .. opponentTemplate .. MatchGroupLegacy._argsToString(opp) .. '}}'
+end
+
+---@param map table
+---@return string
+function MatchGroupLegacy._generateMap(map)
+	for key, value in pairs(map) do
+		if type(value) == 'table' then
+			map[key] = Json.stringify(value)
+		end
+	end
+
+	return '{{Map' .. MatchGroupLegacy._argsToString(map) .. '}}'
+end
+
+---@param args table
+---@return string
+function MatchGroupLegacy._argsToString(args)
+	local otherArgs = {}
+	local compare = function(tbl, a, b)
+		if type(a) == type(b) then
+			return a < b
+		end
+		if type(a) == 'number' then
+			return true
+		end
+		return false
+	end
+
+	for key, value in Table.iter.spairs(args, compare) do
+		table.insert(otherArgs, '|' .. key .. '=' .. tostring(value))
+	end
+
+	return table.concat(otherArgs)
 end
 
 return MatchGroupLegacy

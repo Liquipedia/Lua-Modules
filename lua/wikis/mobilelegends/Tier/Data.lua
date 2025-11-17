@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=mobilelegends
 -- page=Module:Tier/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -52,7 +51,7 @@ return {
 			value = '-1',
 			sort = 'C1',
 			name = 'Misc',
-			short = 'Misc',
+			short = 'M.',
 			link = 'Miscellaneous Tournaments',
 			category = 'Misc Tournaments',
 		},

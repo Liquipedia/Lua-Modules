@@ -1,21 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=heroes
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
-local CharacterNames = mw.loadData('Module:HeroNames')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local CharacterNames = Lua.import('Module:HeroNames', {loadData = true})
+local Class = Lua.import('Module:Class')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local SIZE_HERO = '28x28px'
@@ -43,9 +43,9 @@ function CustomInjector:parse(id, widgets)
 		local heroIcons = Array.map(self.caller:getAllArgsForBase(args, 'hero'), function(hero)
 			return CharacterIcon.Icon{character = CharacterNames[hero:lower()], size = SIZE_HERO}
 		end)
-		table.insert(widgets, Cell{name = 'Signature Heroes', content = {table.concat(heroIcons, '&nbsp;')}})
+		table.insert(widgets, Cell{name = 'Signature Heroes', children = {table.concat(heroIcons, '&nbsp;')}})
 	elseif id == 'history' and string.match(args.retired or '', '%d%d%d%d') then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 	return widgets
 end

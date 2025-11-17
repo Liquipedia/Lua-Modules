@@ -1,14 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Extension/GameApperances
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Game = require('Module:Game')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Game = Lua.import('Module:Game')
+local Table = Lua.import('Module:Table')
 
 local DEFAULT_MAX_NUMBER_OF_PLAYERS_IN_PLACEMENT = 10
 

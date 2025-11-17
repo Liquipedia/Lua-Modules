@@ -1,17 +1,18 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:MatchMapsTeam/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local String = require('Module:StringUtils')
-local Logic = require('Module:Logic')
-local Template = require('Module:Template')
-local Json = require('Module:Json')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
+local String = Lua.import('Module:StringUtils')
+local Logic = Lua.import('Module:Logic')
+local Template = Lua.import('Module:Template')
+local Json = Lua.import('Module:Json')
+local Table = Lua.import('Module:Table')
 
 local MatchMapsTeamLegacy = {}
 

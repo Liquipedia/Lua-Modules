@@ -1,20 +1,20 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Manufacturer
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
+
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Namespace = Lua.import('Module:Namespace')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Locale = Lua.import('Module:Locale')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -49,11 +49,11 @@ function Manufacturer:createInfobox()
 			}
 		},
 		Title{children = (args.informationType or 'Manufacturer') .. ' Information'},
-		Cell{name = 'Former Name(s)', content = {args.formernames}},
-		Cell{name = 'Description', content = {args.description}},
-		Cell{name = 'Season(s)', content = {args.seasons}},
-		Cell{name = 'Engine Total', content = {args.enginetotal}},
-		Cell{name = 'Status', content = {args.status}},
+		Cell{name = 'Former Name(s)', children = {args.formernames}},
+		Cell{name = 'Description', children = {args.description}},
+		Cell{name = 'Season(s)', children = {args.seasons}},
+		Cell{name = 'Engine Total', children = {args.enginetotal}},
+		Cell{name = 'Status', children = {args.status}},
 		Customizable{
 			id = 'history',
 			children = {
@@ -62,8 +62,8 @@ function Manufacturer:createInfobox()
 						if args.founded or args.dissolved then
 							return {
 								Title{children = 'History'},
-								Cell{name = 'Founded', content = {args.founded}},
-								Cell{name = 'Dissolved', content = {args.dissolved}}
+								Cell{name = 'Founded', children = {args.founded}},
+								Cell{name = 'Dissolved', children = {args.dissolved}}
 							}
 						end
 					end
@@ -78,7 +78,7 @@ function Manufacturer:createInfobox()
 		self:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Manufacturer')
 end
 
 ---@param args table

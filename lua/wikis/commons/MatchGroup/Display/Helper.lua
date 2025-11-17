@@ -1,32 +1,30 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Display/Helper
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Date = require('Module:Date/Ext')
-local Flags = require('Module:Flags')
-local FnUtil = require('Module:FnUtil')
-local I18n = require('Module:I18n')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local PlayerDisplay = require('Module:Player/Display')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Timezone = require('Module:Timezone')
+
+local Array = Lua.import('Module:Array')
+local Date = Lua.import('Module:Date/Ext')
+local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
+local I18n = Lua.import('Module:I18n')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local PlayerDisplay = Lua.import('Module:Player/Display')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local DisplayHelper = {}
 local NONBREAKING_SPACE = '&nbsp;'
-local UTC = Timezone.getTimezoneString('UTC')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -96,35 +94,12 @@ components.
 ---@return boolean
 function DisplayHelper.defaultMatchHasDetails(match)
 	return match.dateIsExact
-		or (match.timestamp and match.timestamp ~= Date.defaultTimestamp)
+		or (match.timestamp and not Date.isDefaultTimestamp(match.timestamp))
 		or Logic.isNotEmpty(match.vod)
-		or not Table.isEmpty(match.links)
+		or Table.isNotEmpty(match.links)
 		or Logic.isNotEmpty(match.comment)
 		or 0 < #match.games
-end
-
--- Display component showing the streams, date, and countdown of a match.
----@param match MatchGroupUtilMatch
----@return Html
-function DisplayHelper.MatchCountdownBlock(match)
-	local dateString
-	if match.dateIsExact == true then
-		local timestamp = Date.readTimestamp(match.date) + (Timezone.getOffset(match.extradata.timezoneid) or 0)
-		dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
-				.. (Timezone.getTimezoneString(match.extradata.timezoneid) or UTC)
-	else
-		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date)
-	end
-
-	local stream = Table.merge(match.stream, {
-		date = dateString,
-		finished = match.finished and 'true' or nil,
-	})
-	return mw.html.create('div'):addClass('match-countdown-block')
-		:css('text-align', 'center')
-		-- Workaround for .brkts-popup-body-element > * selector
-		:css('display', 'block')
-		:node(require('Module:Countdown')._create(stream))
+		or Info.config.match2.matchPage
 end
 
 ---Creates comments that describe substitute player(s) of the match.
@@ -155,7 +130,7 @@ function DisplayHelper.createSubstitutesComment(match)
 			end
 
 			if opponent.type == Opponent.team then
-				local team = require('Module:Team').queryRaw(opponent.template)
+				local team = TeamTemplate.getRawOrNil(opponent.template)
 				if team then
 					table.insert(subString, string.format('on <b>%s</b>', Page.makeInternalLink(team.shortname, team.page)))
 				end
@@ -192,7 +167,7 @@ function DisplayHelper.createCastersDisplay(casters)
 		end
 
 		return HtmlWidgets.Fragment{children = {
-			Flags.Icon(caster.flag),
+			Flags.Icon{flag = caster.flag},
 			NONBREAKING_SPACE,
 			casterLink,
 		}}
@@ -232,7 +207,7 @@ end
 ---@param config {noLink: boolean?}?
 ---@return string
 function DisplayHelper.MapAndMode(game, config)
-	local MapModes = require('Module:MapModes')
+	local MapModes = Lua.import('Module:MapModes')
 
 	local mapText = DisplayHelper.Map(game, config)
 

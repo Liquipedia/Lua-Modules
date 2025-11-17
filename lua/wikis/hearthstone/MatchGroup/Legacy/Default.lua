@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=hearthstone
 -- page=Module:MatchGroup/Legacy/Default
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 
@@ -72,6 +72,16 @@ end
 ---@return string
 function MatchGroupLegacyDefault.run(frame)
 	return MatchGroupLegacyDefault(frame):build()
+end
+
+---@param frame Frame
+---@return string
+function MatchGroupLegacyDefault.runGenerate(frame)
+	frame.args.template = frame.args[1]
+	frame.args.templateOld = frame.args[2]
+	frame.args.type = frame.args.type or 'team'
+
+	return MatchGroupLegacyDefault(frame):generate()
 end
 
 return MatchGroupLegacyDefault

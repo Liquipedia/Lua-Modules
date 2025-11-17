@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=halo
 -- page=Module:Infobox/Team/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Region = require('Module:Region')
+
+local Class = Lua.import('Module:Class')
+local Region = Lua.import('Module:Region')
 
 local Team = Lua.import('Module:Infobox/Team')
 

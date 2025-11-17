@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:Tier/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -44,7 +43,7 @@ return {
 			value = '-1',
 			sort = 'A5',
 			name = 'Misc',
-			short = 'M',
+			short = 'M.',
 		},
 		[''] = {
 			value = nil,

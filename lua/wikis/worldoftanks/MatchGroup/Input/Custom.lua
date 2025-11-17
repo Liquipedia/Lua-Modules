@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=worldoftanks
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
@@ -70,7 +70,6 @@ function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
-		casters = MatchGroupInputUtil.readCasters(match),
 	}
 end
 

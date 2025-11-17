@@ -1,20 +1,20 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Character
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Flags = require('Module:Flags')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
+
+local Class = Lua.import('Module:Class')
+local Flags = Lua.import('Module:Flags')
+local Json = Lua.import('Module:Json')
+local Namespace = Lua.import('Module:Namespace')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -46,14 +46,14 @@ function Character:createInfobox()
 			size = args.imagesize,
 		},
 		Center{children = {args.caption}},
-		Title{children = (args.informationType or 'Character') .. ' Information'},
-		Cell{name = 'Real Name', content = {args.realname}},
+		Title{children = {'General Information'}},
+		Cell{name = 'Real Name', children = {args.realname}},
 		Customizable{
 			id = 'country',
 			children = {
 				Cell{
 					name = 'Country',
-					content = {
+					children = {
 						self:_createLocation(args.country)
 					}
 				},
@@ -64,7 +64,7 @@ function Character:createInfobox()
 			children = {
 				Cell{
 					name = 'Role',
-					content = {args.role}
+					children = {args.role}
 				},
 			}
 		},
@@ -73,7 +73,7 @@ function Character:createInfobox()
 			children = {
 				Cell{
 					name = 'Class',
-					content = {args.class}
+					children = {args.class}
 				},
 			}
 		},
@@ -82,7 +82,7 @@ function Character:createInfobox()
 			children = {
 				Cell{
 					name = 'Release Date',
-					content = {args.releasedate}
+					children = {args.releasedate}
 				},
 			}
 		},
@@ -91,12 +91,13 @@ function Character:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		self:categories(args.informationType or 'Character')
+		self:categories('Characters')
+		self:categories(args.informationType)
 		self:categories(unpack(self:getWikiCategories(args)))
 		self:setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Character')
 end
 
 ---@param location string?
@@ -106,7 +107,7 @@ function Character:_createLocation(location)
 		return ''
 	end
 
-	return Flags.Icon({flag = location, shouldLink = true}) .. '&nbsp;' ..
+	return Flags.Icon{flag = location, shouldLink = true} .. '&nbsp;' ..
 		'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 

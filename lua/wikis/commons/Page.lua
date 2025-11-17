@@ -1,13 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Page
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local String = require('Module:StringUtils')
+local Lua = require('Module:Lua')
+
+local Info = Lua.import('Module:Info', {loadData = true})
+local String = Lua.import('Module:StringUtils')
+
+local FORCE_UNDERSCORES = Info.config.forceUnderscores
 
 local Page = {}
 
@@ -75,4 +78,14 @@ function Page.pageifyLink(link)
 	return (mw.ext.TeamLiquidIntegration.resolve_redirect(link):gsub(' ', '_'))
 end
 
-return Class.export(Page)
+---@param pageName string
+---@return string
+---@overload fun(pageName: nil?): nil
+function Page.applyUnderScoresIfEnforced(pageName)
+	if pageName and FORCE_UNDERSCORES then
+		pageName = pageName:gsub(' ', '_')
+	end
+	return pageName
+end
+
+return Page

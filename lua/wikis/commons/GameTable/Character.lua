@@ -1,23 +1,23 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:GameTable/Character
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
 
 local GameTable = Lua.import('Module:GameTable')
 
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -75,7 +75,7 @@ function CharacterGameTable:readCharacter()
 	if Logic.isNotEmpty(self.args.character) then
 		self.character = self.args.character
 	else
-		assert(self.title.namespace == 0, 'Required character= argument')
+		assert(self.title.namespace == 0, 'Lua.importd character= argument')
 		self.character = self.title.rootText
 	end
 
@@ -126,7 +126,7 @@ end
 ---@return string?
 function CharacterGameTable:getSideClass(extradata, opponentIndex)
 	local side = extradata['team' .. opponentIndex .. 'side']
-	return Logic.isNotEmpty(side) and 'brkts-popup-side-color-' .. side or nil
+	return Logic.isNotEmpty(side) and 'brkts-popup-side-color brkts-popup-side-color--' .. side or nil
 end
 
 ---@return string
@@ -309,7 +309,8 @@ function CharacterGameTable:headerRow()
 
 	nodes = Array.append(nodes,
 		config.showLength and makeHeaderCell('Length') or nil,
-		config.showVod and makeHeaderCell('VOD', '60px') or nil
+		config.showVod and makeHeaderCell('VOD', '60px') or nil,
+		config.showMatchPage and makeHeaderCell('') or nil
 	)
 
 	local header = mw.html.create('tr')
@@ -429,6 +430,7 @@ function CharacterGameTable:gameRow(match, game)
 		:node(self:displayGame(match, game))
 		:node(self:_displayLength(game))
 		:node(self:_displayGameVod(game.vod))
+		:node(self:_displayMatchPage(match))
 end
 
 ---@param frame Frame

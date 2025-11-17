@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Lua
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -36,7 +35,7 @@ end
 
 ---@param name string
 ---@param options {requireDevIfEnabled: boolean?}?
----@return any
+---@return string
 local getModuleName = function(name, options)
 	options = options or {}
 	if options.requireDevIfEnabled == false then

@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/Characters
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -39,7 +39,7 @@ function MatchSummaryCharacters:render()
 			'brkts-popup-body-element-thumbs',
 			'brkts-champion-icon',
 			flipped and 'brkts-popup-body-element-thumbs-right' or nil,
-			self.props.hideOnMobile and 'hide-mobile' or nil
+			self.props.hideOnMobile and 'mobile-hide' or nil
 		),
 		children = Array.map(self.props.characters, function(character)
 			return Character{

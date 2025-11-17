@@ -1,14 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Template
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Json = require('Module:Json')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
+local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
+local Json = Lua.import('Module:Json')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 
 local Template = {}
 

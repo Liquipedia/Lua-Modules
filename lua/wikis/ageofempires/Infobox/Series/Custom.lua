@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:Infobox/Series/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Tier = require('Module:Tier/Custom')
+
+local Class = Lua.import('Module:Class')
+local Tier = Lua.import('Module:Tier/Custom')
 
 local Series = Lua.import('Module:Infobox/Series')
 

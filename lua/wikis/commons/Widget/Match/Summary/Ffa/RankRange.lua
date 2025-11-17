@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/Ffa/RankRange
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Ordinal = require('Module:Ordinal')
+
+local Class = Lua.import('Module:Class')
+local Ordinal = Lua.import('Module:Ordinal')
 
 local Widget = Lua.import('Module:Widget')
 

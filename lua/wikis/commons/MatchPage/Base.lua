@@ -1,36 +1,42 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchPage/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Links = require('Module:Links')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Tabs = require('Module:Tabs')
-local TeamTemplate = require('Module:TeamTemplate')
-local VodLink = require('Module:VodLink')
 
+local Array = Lua.import('Module:Array')
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local Class = Lua.import('Module:Class')
+local Countdown = Lua.import('Module:Countdown')
+local DateExt = Lua.import('Module:Date/Ext')
+local Logic = Lua.import('Module:Logic')
+local Links = Lua.import('Module:Links')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+
+local HighlightConditions = Lua.import('Module:HighlightConditions')
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local AdditionalSection = Lua.import('Module:Widget/Match/Page/AdditionalSection')
+local MatchPageMapVeto = Lua.import('Module:Widget/Match/Page/MapVeto')
 local Comment = Lua.import('Module:Widget/Match/Page/Comment')
+local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local Div = HtmlWidgets.Div
 local Footer = Lua.import('Module:Widget/Match/Page/Footer')
 local Header = Lua.import('Module:Widget/Match/Page/Header')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local VodButton = Lua.import('Module:Widget/Match/VodButton')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -45,12 +51,12 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageOpponent: standardOpponent
 ---@field opponentIndex integer
----@field iconDisplay string
+---@field iconDisplay Widget?
 ---@field teamTemplateData teamTemplateData
 ---@field seriesDots string[]
 
 ---@class BaseMatchPage
----@operator call(MatchPageMatch): self
+---@operator call(MatchPageMatch): BaseMatchPage
 ---@field matchData MatchPageMatch
 ---@field games MatchPageGame[]
 ---@field opponents MatchPageOpponent[]
@@ -61,23 +67,41 @@ local BaseMatchPage = Class.new(
 		self.matchData = match
 		self.games = match.games
 		self.opponents = match.opponents
+
+		-- Update the view model with game and team data
+		self:populateGames()
+
+		-- Add more opponent data field
+		self:populateOpponents()
+
+		self:addCategories()
 	end
 )
 
 BaseMatchPage.NOT_PLAYED = 'notplayed'
 BaseMatchPage.NO_CHARACTER = 'default'
 
----@param match table
----@return boolean
-function BaseMatchPage.isEnabledFor(match)
-	error('BaseMatchPage.isEnabledFor() cannot be called directly and must be overridden.')
-end
-
 ---@param props {match: MatchGroupUtilMatch}
 ---@return Widget
 function BaseMatchPage.getByMatchId(props)
 	local matchPage = BaseMatchPage(props.match)
 	return matchPage:render()
+end
+
+function BaseMatchPage:addCategories()
+	local matchPhase = MatchGroupUtil.computeMatchPhase(self.matchData)
+
+	mw.ext.TeamLiquidIntegration.add_category('Matches')
+	if matchPhase then
+		local phaseToDisplay = {
+			finished = 'Finished',
+			ongoing = 'Live',
+			upcoming = 'Upcoming',
+		}
+		if phaseToDisplay[matchPhase] then
+			mw.ext.TeamLiquidIntegration.add_category(phaseToDisplay[matchPhase] .. ' Matches')
+		end
+	end
 end
 
 ---Tests whether this match page is a Bo1
@@ -87,10 +111,20 @@ function BaseMatchPage:isBestOfOne()
 end
 
 ---@protected
----@return Html?
+---@return Widget?
 function BaseMatchPage:getCountdownBlock()
-	if self.matchData.timestamp == DateExt.defaultTimestamp then return end
-	return DisplayHelper.MatchCountdownBlock(self.matchData)
+	if DateExt.isDefaultTimestamp(self.matchData.timestamp) then return end
+	return Div{
+		css = {
+			display = 'block',
+			['text-align'] = 'center'
+		},
+		children = Countdown.create{
+			date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
+			finished = self.matchData.finished,
+			rawdatetime = (not self.matchData.dateIsExact) or self.matchData.finished,
+		}
+	}
 end
 
 ---@private
@@ -117,20 +151,34 @@ function BaseMatchPage:_parseLinks()
 end
 
 ---@protected
----@return (string|Html)[]
+---@return Widget[]
 function BaseMatchPage:getVods()
-	local vods = Array.map(self.games, function(game, gameIdx)
-		return game.vod and VodLink.display{
-			gamenum = gameIdx,
+	---@type {vod: string, number: integer}[]
+	local gameVods = Array.map(self.games, function(game, gameIdx)
+		if Logic.isEmpty(game.vod) then
+			return
+		end
+		return {
 			vod = game.vod,
-		} or ''
+			number = gameIdx,
+		}
 	end)
-	if String.isNotEmpty(self.matchData.vod) then
-		table.insert(vods, 1, VodLink.display{
-			vod = self.matchData.vod,
-		})
-	end
-	return vods
+
+	return WidgetUtil.collect(
+		String.isNotEmpty(self.matchData.vod) and VodButton{
+			vodLink = self.matchData.vod,
+			grow = true,
+		} or nil,
+		Array.map(gameVods, function (vod)
+			return VodButton{
+				vodLink = vod.vod,
+				gameNumber = vod.number,
+				showText = #gameVods < 4,
+				variant = 'dropdown',
+				grow = true,
+			}
+		end)
+	)
 end
 
 ---@param arr any[]
@@ -164,7 +212,10 @@ function BaseMatchPage:populateOpponents()
 			return
 		end
 
-		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
+		opponent.iconDisplay = OpponentDisplay.InlineTeamContainer{
+			style = 'icon',
+			template = opponent.template
+		}
 		opponent.teamTemplateData = teamTemplate
 
 		opponent.seriesDots = Array.map(self.games, function(game)
@@ -184,32 +235,37 @@ function BaseMatchPage:getCharacterIcon(character)
 end
 
 ---@protected
+---@return string
 function BaseMatchPage:makeDisplayTitle()
 	local team1data = (self.opponents[1] or {}).teamTemplateData
 	local team2data = (self.opponents[2] or {}).teamTemplateData
+	local tournamentName = self.matchData.tickername
 
 	if Logic.isEmpty(team1data) and Logic.isEmpty(team2data) then
-		return table.concat({'Match in', self.matchData.tickername}, ' ')
+		return String.isNotEmpty(tournamentName) and 'Match in ' .. tournamentName or ''
 	end
 
 	local team1name = (team1data or {}).shortname or 'TBD'
 	local team2name = (team2data or {}).shortname or 'TBD'
 
-	local tournamentName = self.matchData.tickername
-	local displayTitle = team1name .. ' vs. ' .. team2name
-	if not tournamentName then
-		return displayTitle
+	local titleParts = {team1name, 'vs.', team2name}
+	if tournamentName then
+		Array.appendWith(titleParts, '@', tournamentName)
 	end
 
-	displayTitle = displayTitle .. ' @ ' .. tournamentName
-
-	mw.getCurrentFrame():preprocess(table.concat{'{{DISPLAYTITLE:', displayTitle, '|noreplace}}'})
+	return table.concat(titleParts, ' ')
 end
 
 ---@return Widget
 function BaseMatchPage:render()
-	self:makeDisplayTitle()
+	local displayTitle = self:makeDisplayTitle()
+	if String.isNotEmpty(displayTitle) then
+		mw.getCurrentFrame():callParserFunction('DISPLAYTITLE', displayTitle, 'noreplace')
+	end
+
+	local tournamentContext = self:getMatchContext()
 	return Div{
+		classes = {'match-bm'},
 		children = WidgetUtil.collect(
 			Header {
 				countdownBlock = self:getCountdownBlock(),
@@ -219,8 +275,12 @@ function BaseMatchPage:render()
 				opponent2 = self.matchData.opponents[2],
 				parent = self.matchData.parent,
 				phase = MatchGroupUtil.computeMatchPhase(self.matchData),
+				stream = self.matchData.stream,
 				tournamentName = self.matchData.tournament,
+				poweredBy = self.getPoweredBy(),
+				highlighted = HighlightConditions.tournament(tournamentContext),
 			},
+			self:renderMapVeto(),
 			self:renderGames(),
 			self:footer()
 		)
@@ -240,18 +300,38 @@ function BaseMatchPage:renderGames()
 		return games[1]
 	end
 
-	---@type table<string, any>
-	local tabs = {
-		This = 1,
-		['hide-showall'] = true
+	local overallStats = self:renderOverallStats()
+
+	return ContentSwitch{
+		tabs = WidgetUtil.collect(
+			overallStats and {
+				label = {
+					HtmlWidgets.Span{classes = {'mobile-hide'}, children = 'Overall Statistics'},
+					HtmlWidgets.Span{classes = {'mobile-only'}, children = 'Overall'}
+				},
+				content = overallStats
+			} or nil,
+			Array.map(games, function (game, gameIndex)
+				local mapName = self.games[gameIndex].map
+				return {
+					label = 'Game&nbsp;' .. gameIndex .. (
+						Logic.isNotEmpty(mapName) and (': ' .. mapName) or ''
+					),
+					content = game
+				}
+			end)
+		),
+		size = 'small',
+		storeValue = false,
+		switchGroup = 'matchPageGameSelector',
+		variant = 'generic'
 	}
+end
 
-	Array.forEach(games, function(game, idx)
-		tabs['name' .. idx] = 'Game ' .. idx
-		tabs['content' .. idx] = game
-	end)
-
-	return Tabs.dynamic(tabs)
+---@protected
+---@return string|Html|Widget?
+function BaseMatchPage:renderOverallStats()
+	return nil
 end
 
 ---@protected
@@ -262,31 +342,90 @@ function BaseMatchPage:renderGame(game)
 end
 
 ---@protected
+---@return table
+function BaseMatchPage:getMatchContext()
+	return MatchGroupInputUtil.getTournamentContext(self.matchData)
+end
+
+---@protected
+---@return Widget
+function BaseMatchPage:getTournamentIcon()
+	return IconImage{
+		imageLight = self:getMatchContext().icon,
+		imageDark = self:getMatchContext().icondark,
+		size = '50x32px',
+	}
+end
+
+---@protected
+---@return Widget[]
+function BaseMatchPage:renderMapVeto()
+	local match = self.matchData
+	if not match.extradata or not match.extradata.mapveto then
+		return {}
+	end
+
+	local mapVetoes = match.extradata.mapveto
+	local firstVeto = tonumber(mapVetoes[1].vetostart)
+
+	if not firstVeto or not (firstVeto == 1 or firstVeto == 2) then
+		return {}
+	end
+
+	local secondVeto = firstVeto == 1 and 2 or 1
+
+	local opponent1 = match.opponents[firstVeto]
+	local opponent2 = match.opponents[secondVeto]
+
+	local mapVetoRounds = Array.flatMap(mapVetoes, function(vetoRound, vetoRoundIdx)
+		local vetoRoundFirst = vetoRoundIdx * 2 - 1
+		local vetoRoundSecond = vetoRoundIdx * 2
+		if vetoRound.type == 'decider' then
+			return {{map = vetoRound.decider, type = vetoRound.type, round = vetoRoundFirst}}
+		end
+		local firstMap = vetoRound['team' .. firstVeto]
+		local secondMap = vetoRound['team' .. secondVeto]
+		return {
+			{map = firstMap, type = vetoRound.type, round = vetoRoundFirst, by = opponent1},
+			{map = secondMap, type = vetoRound.type, round = vetoRoundSecond, by = opponent2},
+		}
+	end)
+
+	return {
+		HtmlWidgets.H3{children = 'Map Veto'},
+		MatchPageMapVeto{vetoRounds = mapVetoRounds},
+	}
+end
+
+---@protected
 ---@return Widget
 function BaseMatchPage:footer()
 	local vods = self:getVods()
+	local parsedLinks = self:_parseLinks()
+	local patchLink = self:getPatchLink()
+
 	return Footer{
 		comments = self:_getComments(),
 		children = WidgetUtil.collect(
-			#vods > 0 and AdditionalSection{
+			Logic.isNotEmpty(vods) and AdditionalSection{
 				header = 'VODs',
 				children = vods
 			} or nil,
-			AdditionalSection{
+			Logic.isNotEmpty(parsedLinks) and AdditionalSection{
 				header = 'Links',
 				bodyClasses = { 'vodlink' },
-				children = Array.map(self:_parseLinks(), function (parsedLink)
-					return IconImage{
+				children = Array.map(parsedLinks, function (parsedLink)
+					return HtmlWidgets.Span{children = IconImage{
 						imageLight = parsedLink.icon:sub(6),
 						imageDark = (parsedLink.iconDark or parsedLink.icon):sub(6),
 						link = parsedLink.link
-					}
+					}}
 				end)
-			},
-			AdditionalSection{
+			} or nil,
+			patchLink and AdditionalSection{
 				header = 'Patch',
-				children = { self:getPatchLink() }
-			}
+				children = patchLink
+			} or nil
 		)
 	}
 end
@@ -300,8 +439,22 @@ function BaseMatchPage:_getComments()
 		Logic.isNotEmpty(substituteComments) and Comment{
 			children = Array.interleave(substituteComments, HtmlWidgets.Br{})
 		} or nil,
+		self:_getCasterComment(),
 		self:addComments()
 	)
+end
+
+---@private
+---@return MatchPageComment?
+function BaseMatchPage:_getCasterComment()
+	local casters = self.matchData.extradata.casters
+	if Logic.isEmpty(casters) then return end
+	return Comment{
+		children = WidgetUtil.collect(
+			#casters > 1 and 'Casters: ' or 'Caster: ',
+			Array.interleave(DisplayHelper.createCastersDisplay(casters), ', ')
+		)
+	}
 end
 
 ---@protected
@@ -311,9 +464,16 @@ function BaseMatchPage:addComments()
 end
 
 ---@protected
+---@return Widget?
 function BaseMatchPage:getPatchLink()
 	if Logic.isEmpty(self.matchData.patch) then return end
 	return Link{ link = 'Patch ' .. self.matchData.patch }
+end
+
+---@protected
+---@return string?
+function BaseMatchPage.getPoweredBy()
+	return nil
 end
 
 return BaseMatchPage

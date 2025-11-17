@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
 -- page=Module:MatchMaps/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,14 +7,16 @@
 
 local MatchMapsLegacy = {}
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Logic = require('Module:Logic')
-local Json = require('Module:Json')
-local MatchGroup = require('Module:MatchGroup')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
+local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+local Json = Lua.import('Module:Json')
+local MatchGroup = Lua.import('Module:MatchGroup')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
 
 local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')

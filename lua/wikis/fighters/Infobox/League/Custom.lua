@@ -1,26 +1,26 @@
 ---
 -- @Liquipedia
--- wiki=fighters
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Currency = require('Module:Currency')
-local Game = require('Module:Game')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local Variables = require('Module:Variables')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Currency = Lua.import('Module:Currency')
+local Game = Lua.import('Module:Game')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Chronology = Widgets.Chronology
@@ -48,8 +48,12 @@ function CustomLeague.run(frame)
 	-- Auto Icon
 	local seriesIconLight, seriesIconDark = CustomLeague.getIconFromSeries(args.series)
 	args.circuitIconLight, args.circuitIconDark = CustomLeague.getIconFromSeries(args.circuit)
-	args.icon = args.icon or seriesIconLight or args.circuitIconLight
-	args.icondark = args.icondark or seriesIconDark or args.circuitIconDark
+	local icons = Logic.emptyOr(
+		{args.icon, args.icondark},
+		{seriesIconLight, seriesIconDark},
+		{args.circuitIconLight, args.circuitIconDark}
+	)
+	args.icon, args.icondark = icons[1], icons[2]
 	args.display_series_icon_from_manual_input = MANUAL_SERIES_ICON
 
 	-- Normalize name
@@ -129,10 +133,7 @@ function CustomLeague:displayPrizePool(args, endDate)
 		string.upper(Variables.varDefault('tournament_currency', localCurrency) or ''))
 
 	if args.prizepoolassumed then
-		display = Abbreviation.make(
-			display,
-			'This prize is assumed, and has not been confirmed'
-		)
+		display = Abbreviation.make{text = display, title = 'This prize is assumed, and has not been confirmed'}
 	end
 
 	return display
@@ -146,8 +147,8 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Number of Players', content = {args.player_number}},
-			Cell{name = 'Number of Teams', content = {args.team_number}}
+			Cell{name = 'Number of Players', children = {args.player_number}},
+			Cell{name = 'Number of Teams', children = {args.team_number}}
 		)
 	elseif id == 'customcontent' then
 		if args.circuit or args.points or args.circuit_next or args.circuit_previous then
@@ -159,12 +160,12 @@ function CustomInjector:parse(id, widgets)
 		end
 	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game', content = {Page.makeInternalLink(
+			Cell{name = 'Game', children = {Page.makeInternalLink(
 				{onlyIfExists = true},
 				Game.name{game = args.game},
 				Game.link{game = args.game}
 			) or Game.name{game = args.game}}},
-			Cell{name = 'Version', content = {args.version}},
+			Cell{name = 'Version', children = {args.version}},
 		}
 	end
 	return widgets
@@ -185,6 +186,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.circuit_tier = args.circuittier
 	lpdbData.extradata.circuit2 = args.circuit2
 	lpdbData.extradata.circuit2_tier = args.circuit2tier
+	lpdbData.extradata.region = args.region
 
 	Variables.varDefine('tournament_extradata', Json.stringify(lpdbData.extradata))
 
@@ -323,12 +325,12 @@ function CustomLeague:_createCircuitInformation(widgets, circuitIndex)
 	Array.appendWith(widgets,
 		Cell{
 			name = 'Circuit',
-			content = {self:_createCircuitLink(circuitIndex)}
+			children = {self:_createCircuitLink(circuitIndex)}
 		},
-		Cell{name = 'Circuit Tier', content = {circuitArgs.tier}},
-		Cell{name = 'Tournament Region', content = {circuitArgs.region}},
-		Cell{name = 'Points', content = {circuitArgs.points}},
-		Chronology{links = {next = circuitArgs.next, previous = circuitArgs.previous}}
+		Cell{name = 'Circuit Tier', children = {circuitArgs.tier}},
+		Cell{name = 'Tournament Region', children = {circuitArgs.region}},
+		Cell{name = 'Points', children = {circuitArgs.points}},
+		Chronology{args = circuitArgs, showTitle = false}
 	)
 end
 

@@ -1,18 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:MatchMaps/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local String = require('Module:StringUtils')
-local Logic = require('Module:Logic')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local Template = require('Module:Template')
-local Match = require('Module:Match')
-local MatchGroup = require('Module:MatchGroup')
+local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
+local String = Lua.import('Module:StringUtils')
+local Logic = Lua.import('Module:Logic')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local Template = Lua.import('Module:Template')
+local Match = Lua.import('Module:Match')
+local MatchGroup = Lua.import('Module:MatchGroup')
 
 local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')

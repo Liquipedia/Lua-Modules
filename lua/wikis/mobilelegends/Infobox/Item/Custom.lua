@@ -1,26 +1,26 @@
 ---
 -- @Liquipedia
--- wiki=mobilelegends
 -- page=Module:Infobox/Item/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local CostDisplay = require('Module:CostDisplay')
-local ItemIcon = require('Module:ItemIcon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local CostDisplay = Lua.import('Module:CostDisplay')
+local ItemIcon = Lua.import('Module:ItemIcon')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Item = Lua.import('Module:Infobox/Item')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -73,12 +73,12 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'info' then
 		return {
 			Title{children = 'Item Information'},
-			Cell{name = 'Cost', content = {caller:_getCostDisplay()}},
-			Cell{name = 'Sell Value', content = {caller:_getSellValueDisplay()}},
-			Cell{name = 'Category', content = caller:_getItemCategories(args)},
-			Cell{name = 'Tier', content = {args.tier}},
-			Cell{name = 'Type', content = {ITEM_TYPE[(args.type or ''):lower()]}},
-			Cell{name = 'Status', content = {STATUS[(args.status or ''):lower()]}}
+			Cell{name = 'Cost', children = {caller:_getCostDisplay()}},
+			Cell{name = 'Sell Value', children = {caller:_getSellValueDisplay()}},
+			Cell{name = 'Category', children = caller:_getItemCategories(args)},
+			Cell{name = 'Tier', children = {args.tier}},
+			Cell{name = 'Type', children = {ITEM_TYPE[(args.type or ''):lower()]}},
+			Cell{name = 'Status', children = {STATUS[(args.status or ''):lower()]}}
 		}
 	elseif id == 'attributes' then
 		local attributeCells = {
@@ -115,14 +115,16 @@ function CustomInjector:parse(id, widgets)
 			return {}
 		end
 		Array.appendWith(widgets,
-			Cell{name = 'Active', content = {args.active}},
-			Cell{name = 'Passive', content = {args.passive, args.passive2}}
+			Title{children = 'Ability'},
+			Cell{name = 'Active', children = {args.active}},
+			Cell{name = 'Passive', children = {args.passive, args.passive2}}
 		)
 	elseif id == 'recipe' then
 		if String.isEmpty(args.recipe) then return {} end
-		table.insert(widgets, Center{children = {args.recipe}})
-	elseif Table.includes({'caption', 'availability', 'maps'}, id) then
-		return {}
+		Array.appendWith(widgets,
+			Title{children = 'Recipe'},
+			Center{children = {args.recipe}}
+		)
 	end
 
 	return widgets
@@ -153,7 +155,7 @@ end
 ---@return string?
 function CustomItem:_getCostDisplay()
 	local itemCost = self.args.itemcost
-	local recipeCost = Abbreviation.make(self.args.recipecost, 'Recipe cost')
+	local recipeCost = Abbreviation.make{text = self.args.recipecost, title = 'Recipe cost'}
 
 	if String.isNotEmpty(recipeCost) then
 		return CostDisplay.display('gold', '15px', itemCost) .. ' (' .. recipeCost .. ')'
@@ -203,7 +205,7 @@ function CustomItem:_getAttributeCells(attributeCells)
 		local funct = attribute.funct or DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION
 		local content = CustomItem[funct](self, attribute.parameter)
 		if String.isEmpty(content) then return nil end
-		return Cell{name = attribute.name, content = {content}}
+		return Cell{name = attribute.name, children = {content}}
 	end)
 end
 

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:LegacyMatchMaps
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,18 +7,18 @@
 
 --converts the old matchlists to be readable by the match2 system
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
-local Match = require('Module:Match')
-local MatchGroup = require('Module:MatchGroup')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
+local Lua = require('Module:Lua')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Match = Lua.import('Module:Match')
+local MatchGroup = Lua.import('Module:MatchGroup')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
 
 local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')

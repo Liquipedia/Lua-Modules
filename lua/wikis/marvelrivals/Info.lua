@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=marvelrivals
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -10,7 +9,7 @@ return {
 	startYear = 2024,
 	wikiName = 'marvelrivals',
 	name = 'Marvel Rivals',
-	defaultGame = 'Marvel Rivals',
+	defaultGame = 'marvelrivals',
 	games = {
 		marvelrivals = {
 			abbreviation = 'Marvel Rivals',
@@ -36,6 +35,7 @@ return {
 			status = 2,
 			matchWidth = 180,
 		},
+		defaultMaxPlayersPerPlacement = 12,
 	},
 	defaultRoundPrecision = 0,
 }

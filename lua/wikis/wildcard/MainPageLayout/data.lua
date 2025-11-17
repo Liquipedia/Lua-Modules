@@ -1,10 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=wildcard
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
+
+local Lua = require('Module:Lua')
+
+local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 local CONTENT = {
 	about = {
@@ -31,7 +34,7 @@ local CONTENT = {
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
-		body = '{{Liquipedia:Want_to_help}}',
+		body = WantToHelp{},
 		padding = true,
 		boxid = 1504,
 	},
@@ -42,8 +45,8 @@ local CONTENT = {
 		boxid = 1501,
 	},
 	wildcards = {
-		heading = 'Wildcards',
-		body = '{{Liquipedia:Wildcards}}',
+		heading = 'Wild Cards',
+		body = '{{Liquipedia:Wild Cards}}',
 		padding = true,
 		boxid = 1513,
 	},
@@ -71,12 +74,12 @@ return {
 	title = 'The Wildcard Wiki',
 	navigation = {
 		{
-			file = 'Wildcard gameasset wildcards pill.png',
-			title = 'Wildcards',
-			link = 'Portal:Wildcards',
+			file = 'Wildcard header Wildcards.webp',
+			title = 'Wild Cards',
+			link = 'Portal:Wild Cards',
 		},
 		{
-			file = 'Wildcard Champions Lineup.webp',
+			file = 'Wildcard header Champions.webp',
 			title = 'Champions',
 			link = 'Portal:Champions',
 			count = {
@@ -86,7 +89,7 @@ return {
 			},
 		},
 		{
-			file = 'Wildcard Characters 1.jpg',
+			file = 'Wildcard header Summons.webp',
 			title = 'Summons',
 			link = 'Portal:Summons',
 			count = {
@@ -96,7 +99,7 @@ return {
 			},
 		},
 		{
-			file = 'Wildcard Lushland Arena.jpg',
+			file = 'Wildcard header Arenas.webp',
 			title = 'Arenas',
 			link = 'Portal:Arenas',
 			count = {
@@ -105,12 +108,12 @@ return {
 			},
 		},
 		{
-			file = 'Wildcard Frostburn Arena.jpg',
+			file = 'Wildcard header Mechanics.webp',
 			title = 'Mechanics',
 			link = 'Portal:Mechanics',
 		},
 		{
-			file = 'Wildcard gameasset Wildcard Bulwark Boost.png',
+			file = 'Wildcard header Decks.webp',
 			title = 'Decks',
 			link = 'Portal:Decks',
 		},

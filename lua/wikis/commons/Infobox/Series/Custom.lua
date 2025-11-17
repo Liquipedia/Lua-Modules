@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Series/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Series = Lua.import('Module:Infobox/Series')
 

@@ -1,13 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
 -- page=Module:MatchGroup/Legacy/Default
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 
@@ -50,6 +51,9 @@ end
 ---@param isReset boolean
 ---@param match table
 function MatchGroupLegacyDefault:handleOtherMatchParams(isReset, match)
+	for _, map in Table.iter.pairsByPrefix(match, 'map') do
+		map.bantype = 'siege'
+	end
 	local opp1score, opp2score = (match.opponent1 or {}).score, (match.opponent2 or {}).score
 	-- Legacy maps are Bo10 or Bo12, while >Bo5 in legacy matches are non existent
 	-- Let's assume that if the sum of the scores is less than 6, it's a match, otherwise it's a map
@@ -65,6 +69,16 @@ function MatchGroupLegacyDefault:handleOtherMatchParams(isReset, match)
 		score1 = opp1score,
 		score2 = opp2score,
 	}
+end
+
+---@param frame Frame
+---@return string
+function MatchGroupLegacyDefault.runGenerate(frame)
+	frame.args.template = frame.args[1]
+	frame.args.templateOld = frame.args[2]
+	frame.args.type = frame.args.type or 'team'
+
+	return MatchGroupLegacyDefault(frame):generate()
 end
 
 return MatchGroupLegacyDefault

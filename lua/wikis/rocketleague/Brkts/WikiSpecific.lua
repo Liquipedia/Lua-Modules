@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:Brkts/WikiSpecific
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Table = Lua.import('Module:Table')
 
 local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
 

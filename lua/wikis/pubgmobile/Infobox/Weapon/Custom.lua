@@ -1,27 +1,26 @@
 ---
 -- @Liquipedia
--- wiki=pubgmobile
 -- page=Module:Infobox/Weapon/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local PageLink = require('Module:Page')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Weapon = Lua.import('Module:Infobox/Weapon')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
-local Center = Widgets.Center
-local Title = Widgets.Title
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class PubgmobileWeaponInfobox: WeaponInfobox
 local CustomWeapon = Class.new(Weapon)
+---@class PubgmobileWeaponInfoboxInjector
+---@field caller PubgmobileWeaponInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -37,37 +36,52 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
+	local caller = self.caller
+	local args = caller.args
 	if id == 'custom' then
-		Array.appendWith(
-			widgets,
-			Cell{name = 'Ammo Type', content = {args.ammotype}},
-			Cell{name = 'Throw Speed', content = {args.throwspeed}},
-			Cell{name = 'Throw Cooldown', content = {args.throwcooldown}}
-		)
-
-		if String.isEmpty(args.map1) then
-			return widgets
-		end
-
-		local maps = Array.map(self.caller:getAllArgsForBase(args, 'map'), function(map)
-			return tostring(CustomWeapon:_createNoWrappingSpan(PageLink.makeInternalLink({}, map)))
-		end)
-
-		table.insert(widgets, Title{children = 'Maps'})
-		table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
+		return {
+			Cell{name = 'Type', children = {
+				args.type and Link{
+					link = ':Category:' .. args.type .. 's',
+					children = {args.type .. 's'},
+				} or nil
+			}},
+			Cell{name = 'Ammo Type', children = {args.ammotype}, options = {makeLink = true}},
+			Cell{name = 'Reload time', children = {args['reload time']}},
+			Cell{name = 'Throw time', children = {args['throw time'] and (args['throw time'] .. 's') or nil}},
+			Cell{name = 'Throw cooldown', children = {args['throw time'] and (args['throw cooldown'] .. 's') or nil}},
+			Cell{name = 'Released', children = {args.release}},
+			Cell{name = 'Removed', children = {args.removed}},
+			Cell{name = 'Maps', children = caller:getAllArgsForBase(args, 'map', {makeLink = true})}
+		}
+	elseif id == 'damage' then
+		return {
+			Cell{name = 'Damage', children = {args.damage}},
+			Cell{name = 'Base Damage', children = {args['base damage']}},
+			Cell{name = 'Area Damage', children = {args['area damage']}},
+		}
+	elseif id == 'magsize' then
+		return {
+			Cell{name = 'Magazine Size', options = {separator = ' '}, children = {
+				args.damage,
+				args['ext-magazine'] and ('(Extended: ' .. args['ext-magazine'] .. ')') or nil,
+			}},
+		}
 	end
 
 	return widgets
 end
 
----@param content string|number|Html|nil
----@return Html
-function CustomWeapon:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
-	return span
+---@param args table
+---@return string[]
+function CustomWeapon:getWikiCategories(args)
+	local maps = self:getAllArgsForBase(args, 'map')
+	local categories = Array.map(maps, function(map)
+		return map .. ' Weapons'
+	end)
+	return Array.append(categories,
+		args.ammotype and (args.ammotype .. ' Gun') or nil
+	)
 end
 
 return CustomWeapon

@@ -1,12 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:NotabilityChecker/config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Table = Lua.import('Module:Table')
 
 local Config = {}
 
@@ -16,13 +17,12 @@ Config.TIER_TYPE_GENERAL = 'general'
 Config.TIER_TYPE_QUALIFIER = 'qualifier'
 Config.TIER_TYPE_WEEKLY = 'weekly'
 Config.TIER_TYPE_MONTHLY = 'monthly'
-Config.TIER_TYPE_SHOW_MATCH = 'show match'
+Config.TIER_TYPE_SHOW_MATCH = 'showmatch'
 Config.TIER_TYPE_SCHOOL = 'school'
 
 -- How many placements should we retrieve from LPDB for a team/player?
 Config.PLACEMENT_LIMIT = 2000
 
-Config.MAX_NUMBER_OF_PARTICIPANTS = 10
 Config.MAX_NUMBER_OF_COACHES = 0
 
 -- These are the notability thresholds needed by a team/player
@@ -201,9 +201,12 @@ Config.weights = {
 	},
 }
 
--- This function adjusts the score for the placement, e.g.
--- a first placement should score more than a 10th placement.
--- See also the EXTRA_DROP_OFF_TYPES.
+--- This function adjusts the score for the placement, e.g.
+--- a first placement should score more than a 10th placement.
+--- See also the EXTRA_DROP_OFF_TYPES.
+---@param tier string|integer
+---@param tierType string
+---@return fun(number, number): number
 function Config.placementDropOffFunction(tier, tierType)
 	if tierType ~= nil and Table.includes(Config.EXTRA_DROP_OFF_TYPES, tierType:lower()) then
 		return function(score, placement) return score / (placement * placement) end

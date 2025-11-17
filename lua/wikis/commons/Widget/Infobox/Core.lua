@@ -1,21 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Infobox/Core
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
-local WarningBox = require('Module:WarningBox')
+
+local Class = Lua.import('Module:Class')
+local Variables = Lua.import('Module:Variables')
 
 local Widget = Lua.import('Module:Widget')
+local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Fragment = HtmlWidgets.Fragment
+local WarningBoxGroup = Lua.import('Module:Widget/WarningBox/Group')
 
 ---@class Infobox: Widget
 ---@operator call(table): Infobox
@@ -31,21 +32,31 @@ function Infobox:render()
 	local content = Div{classes = {'fo-nttax-infobox'}, children = self.props.children}
 	local bottomContent = Div{children = self.props.bottomContent}
 
-	return Fragment{children = {
-		Div{
-			classes = {
-				'fo-nttax-infobox-wrapper',
-				'infobox-' .. self.props.gameName:lower(),
-				self.props.forceDarkMode and 'infobox-darkmodeforced' or nil,
-			},
-			children = WidgetUtil.collect(
-				content,
-				firstInfobox and adbox or nil,
-				bottomContent
-			)
+	local analyticsProps = {
+		analyticsName = 'Infobox',
+		analyticsProperties = {
+			['infobox-type'] = self.props.infoboxType
 		},
-		WarningBox.displayAll(self.props.warnings),
-	}}
+		children = {
+			Fragment{children = WidgetUtil.collect(
+				Div{
+					classes = {
+						'fo-nttax-infobox-wrapper',
+						'infobox-' .. self.props.gameName:lower(),
+						self.props.forceDarkMode and 'infobox-darkmodeforced' or nil,
+					},
+					children = WidgetUtil.collect(
+						content,
+						firstInfobox and adbox or nil,
+						bottomContent
+					)
+				},
+				WarningBoxGroup{data = self.props.warnings}
+			)}
+		}
+	}
+
+	return AnalyticsWidget(analyticsProps)
 end
 
 return Infobox

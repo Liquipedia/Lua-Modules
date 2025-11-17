@@ -1,17 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=fighters
 -- page=Module:Opponent/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Info = require('Module:Info')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Info = Lua.import('Module:Info')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent')
 
@@ -32,7 +32,7 @@ function CustomOpponent.readOpponentArgs(args)
 	if not opponent or not Opponent.typeIsParty(opponent.type) then return opponent end
 
 	local game = args.game or Variables.varDefault('tournament_game') or Info.defaultGame
-	local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization/' .. game)
+	local CharacterStandardizationData = Lua.import('Module:CharacterStandardization/' .. game, {loadData = true})
 
 	Array.forEach(opponent.players, function (player, playerIndex)
 		player.game = game

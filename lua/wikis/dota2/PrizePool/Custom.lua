@@ -1,16 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:PrizePool/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
-local Variables = require('Module:Variables')
+
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Variables = Lua.import('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool')
 
@@ -53,6 +53,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	Variables.varDefine(redirectedTeam .. '_' .. lpdbPrefix .. 'date', lpdbData.date)
 	Variables.varDefine(lpdbPrefix .. (redirectedTeam:lower()) .. '_prizepoints', lpdbData.extradata.prizepoints)
+	Variables.varDefine(lpdbPrefix .. (redirectedTeam:lower()) .. '_prizepoints2', lpdbData.extradata.prizepoints2)
 
 
 	return lpdbData

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=criticalops
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -36,6 +35,11 @@ return {
 			status = 2,
 			matchWidth = 180,
 			gameScoresIfBo1 = true,
+		},
+		infoboxPlayer = {
+			automatedHistory = {
+				mode = 'automatic',
+			},
 		},
 	},
 }

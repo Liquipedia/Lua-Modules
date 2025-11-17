@@ -1,18 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Flags
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local MasterData = mw.loadData('Module:Flags/MasterData')
-local Template = require('Module:Template')
-local Logic = require('Module:Logic')
-local Table = require('Module:Table')
-local String = require('Module:StringUtils')
-local FnUtil = require('Module:FnUtil')
-local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+
+local MasterData = Lua.import('Module:Flags/MasterData', {loadData = true})
+local Template = Lua.import('Module:Template')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+local String = Lua.import('Module:StringUtils')
+local FnUtil = Lua.import('Module:FnUtil')
+local Class = Lua.import('Module:Class')
 
 local Flags = {}
 
@@ -22,24 +23,15 @@ local Flags = {}
 
 ---Returns a flag
 ---@param args flagIconArgs?
----@param flagName string?
 ---@return string
----@overload fun(flagName: string): string
-function Flags.Icon(args, flagName)
-	local shouldLink
-	if type(args) == 'string' then
-		flagName = args
-	elseif type(args) == 'table' then
-		shouldLink = args.shouldLink
-		if String.isEmpty(flagName) then
-			flagName = args.flag
-		end
-	end
+function Flags.Icon(args)
+	args = args or {}
+	local flagName = args.flag
 	if String.isEmpty(flagName) then
 		return ''
 	end
 	---@cast flagName -nil
-	shouldLink = Logic.readBool(shouldLink)
+	local shouldLink = Logic.readBool(args.shouldLink)
 
 	local flagKey = Flags._convertToKey(flagName)
 	local flagData = MasterData.data[flagKey]
@@ -110,30 +102,22 @@ function Flags.localisationTemplate(args)
 end
 
 ---@class flagLanguageArgs
----@field flag string? country name, flag code, or alias of the Flag
 ---@field language string? language name
 ---@field shouldLink boolean? decides if the flag should link or not
 
 ---Returns a flag display indicating the language
 ---@param args flagLanguageArgs?
----@param langName string?
 ---@return string
----@overload fun(args: string): string
-function Flags.languageIcon(args, langName)
-	if type(args) == 'string' then
-		langName = args
-		args = {}
-	elseif String.isEmpty(langName) then
-		args = args or {}
-		langName = args.language or args.flag
-	end
+function Flags.languageIcon(args)
+	args = args or {}
+	local langName = args.language
 	if String.isEmpty(langName) then
 		return ''
 	end
 	---@cast langName -nil
 	langName = Flags._convertToLangKey(langName)
 
-	return Flags.Icon(args --[[@as flagIconArgs]], langName)
+	return Flags.Icon{flag = langName, shouldLink = args.shouldLink}
 end
 
 -- Converts a country name, flag code, or alias to a standardized country name
@@ -250,8 +234,16 @@ function Flags._convertToLangKey(langName)
 		or langName
 end
 
+---@param flagInput string
+---@return boolean
 function Flags.isValidFlagInput(flagInput)
 	return String.isNotEmpty(Flags._convertToKey(flagInput))
 end
 
-return Class.export(Flags)
+return Class.export(Flags, {exports = {
+	'Icon',
+	'CountryCode',
+	'CountryName',
+	'localisationTemplate',
+	'languageIcon'
+}})

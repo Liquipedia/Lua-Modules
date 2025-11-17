@@ -1,23 +1,26 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MainPageLayout
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Image = require('Module:Image')
-local LpdbCounter = require('Module:LPDB entity count')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Count = Lua.import('Module:Count')
+local Image = Lua.import('Module:Image')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+
+local AnalyticsMapping = Lua.import('Module:MainPageLayout/AnalyticsMapping', {loadData = true})
 local WikiData = Lua.import('Module:MainPageLayout/data')
 local GridWidgets = Lua.import('Module:Widget/Grid')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local NavigationCard = Lua.import('Module:Widget/MainPage/NavigationCard')
 local PanelWidget = Lua.import('Module:Widget/Panel')
+local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 
 local MainPageLayout = {}
 
@@ -41,7 +44,7 @@ function MainPageLayout.make(frame)
 		children = {
 			NO_TABLE_OF_CONTENTS,
 			frame:preprocess(String.interpolate(METADESC, {metadesc = WikiData.metadesc})),
-			frame:preprocess('{{DISPLAYTITLE:' .. WikiData.title .. '}}'),
+			frame:callParserFunction('DISPLAYTITLE', WikiData.title),
 			HtmlWidgets.Div{
 				classes = {'header-banner'},
 				children = {
@@ -58,12 +61,17 @@ function MainPageLayout.make(frame)
 							}
 						},
 					},
-					frame:preprocess('{{#searchbox:}}'),
+					frame:callParserFunction('#searchbox', ''),
 				}
 			},
-			HtmlWidgets.Div{
-				classes = {'navigation-cards'},
-				children = Array.map(WikiData.navigation, MainPageLayout._makeNavigationCard)
+			AnalyticsWidget{
+				analyticsName = 'Quick navigation',
+				children = {
+					HtmlWidgets.Div{
+						classes = {'navigation-cards'},
+						children = Array.map(WikiData.navigation, MainPageLayout._makeNavigationCard)
+					}
+				}
 			},
 			MainPageLayout._makeCells(layout),
 		},
@@ -81,6 +89,7 @@ end
 ---@return Widget
 function MainPageLayout._makeCells(cells)
 	local output = {}
+	local desktopBreakpoints = {'lg', 'xl', 'xxl', 'xxxl'}
 
 	for _, column in ipairs(cells) do
 		local cellContent = {}
@@ -88,36 +97,59 @@ function MainPageLayout._makeCells(cells)
 			local content = {}
 			if item.content then
 				local contentBody = item.content.body
+				local contentElement
 				if item.content.noPanel then
-					table.insert(content, MainPageLayout._processCellBody(contentBody))
+					contentElement = MainPageLayout._processCellBody(contentBody)
 				else
-					table.insert(content, PanelWidget{
+					contentElement = PanelWidget{
 						children = MainPageLayout._processCellBody(contentBody),
 						boxId = item.content.boxid,
 						padding = item.content.padding,
 						heading = item.content.heading,
 						panelAttributes = item.content.panelAttributes,
-					})
+					}
 				end
+
+				table.insert(content, AnalyticsWidget{
+					analyticsName = AnalyticsMapping[item.content.boxid],
+					children = {contentElement}
+				})
 			end
 			if item.children then
 				Array.appendWith(content, MainPageLayout._makeCells(item.children))
 			end
-			table.insert(cellContent, GridWidgets.Cell{cellContent = content, ['order-xs'] = item.mobileOrder})
+			table.insert(cellContent, GridWidgets.Cell{
+				cellContent = content,
+				['order-xs'] = item.mobileOrder,
+				['order-sm'] = item.mobileOrder
+			})
 		end
-		table.insert(output, GridWidgets.Cell{cellContent = cellContent, lg = column.size, xs = 'ignore', sm = 'ignore'})
+
+		local columnSizes = {}
+		if column.size then
+			columnSizes = Table.map(desktopBreakpoints, function(_, bp) return bp, column.size end)
+		end
+		if column.sizes then
+			columnSizes = Table.merge(columnSizes, column.sizes)
+		end
+
+		local cellProps = Table.merge(
+			{cellContent = cellContent, xs = 'ignore', sm = 'ignore'},
+			columnSizes
+		)
+		table.insert(output, GridWidgets.Cell(cellProps))
 	end
 
 	return GridWidgets.Container{ gridCells = output }
 end
 
----@param navigationData {file: string?, link: string?, count: table?, title: string?}
+---@param navigationData {file: string?, iconName: string?, link: string?, count: table?, title: string?}
 ---@return Widget
 function MainPageLayout._makeNavigationCard(navigationData)
 	local count
 	if navigationData.count then
 		if navigationData.count.method == 'LPDB' then
-			count = LpdbCounter.count{table = navigationData.count.table, conditions = navigationData.count.conditions}
+			count = Count.query(navigationData.count.table, navigationData.count.conditions or '')
 		elseif navigationData.count.method == 'CATEGORY' then
 			count = mw.site.stats.pagesInCategory(navigationData.count.category, 'pages')
 		else
@@ -127,6 +159,7 @@ function MainPageLayout._makeNavigationCard(navigationData)
 
 	return NavigationCard{
 		file = navigationData.file,
+		iconName = navigationData.iconName,
 		link = navigationData.link,
 		title = navigationData.title,
 		count = count

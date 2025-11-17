@@ -1,23 +1,25 @@
 ---
 -- @Liquipedia
--- wiki=formula1
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class Formula1MapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class Formula1MapInfoboxWidgetInjector: WidgetInjector
+---@field caller Formula1MapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -37,20 +39,19 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		return Array.appendWith(widgets,
-			Cell{name = 'Architect', content = {args.architect}},
-			Cell{name = 'Capacity', content = {args.capacity}},
-			Cell{name = 'Opened', content = {args.opened}},
-			Cell{name = 'Status', content = {args.status}},
-			Cell{name = 'Turns', content = {args.turns}},
-			Cell{name = 'Laps', content = {args.laps}},
-			Cell{name = 'Direction', content = {args.direction}},
-			Cell{name = 'Length', content = {args.length}},
-			Cell{name = 'Debut', content = {args.debut}},
-			Cell{name = 'Last Race', content = {args.lastrace}},
-			Cell{name = 'Most wins (drivers)', content = {args.driverwin}},
-			Cell{name = 'Most wins (teams)', content = {args.teamwin}},
-			Cell{name = 'Lap Record', content = {args.laprecord}},
-			Cell{name = 'Span', content = {args.span}}
+			Cell{name = 'Architect', children = {args.architect}},
+			Cell{name = 'Capacity', children = {args.capacity}},
+			Cell{name = 'Opened', children = {args.opened}},
+			Cell{name = 'Status', children = {args.status}},
+			Cell{name = 'Turns', children = {args.turns}},
+			Cell{name = 'Laps', children = {args.laps}},
+			Cell{name = 'Direction', children = {args.direction}},
+			Cell{name = 'Length', children = {args.length}},
+			Cell{name = 'Debut', children = {args.debut}},
+			Cell{name = 'Last Race', children = {args.lastrace}},
+			Cell{name = 'Most wins (drivers)', children = {args.driverwin}},
+			Cell{name = 'Most wins (teams)', children = {args.teamwin}},
+			Cell{name = 'Lap Record', children = {args.laprecord}}
 		)
 	end
 

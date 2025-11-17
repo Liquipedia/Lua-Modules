@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=tft
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -26,10 +25,6 @@ end
 ---@param gameIndex integer
 ---@return Widget?
 function CustomMatchSummary.createGame(date, game, gameIndex)
-	if not game.map then
-		return
-	end
-
 	local function makeTeamSection(opponentIndex)
 		return {
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
@@ -41,7 +36,10 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		classes = {'brkts-popup-body-game'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
+			MatchSummaryWidgets.GameCenter{children =
+				game.map and DisplayHelper.Map(game)
+				or {'Game ', gameIndex}
+			},
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)

@@ -1,23 +1,23 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Company
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Flags = require('Module:Flags')
-local Links = require('Module:Links')
-local Locale = require('Module:Locale')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local Flags = Lua.import('Module:Flags')
+local Json = Lua.import('Module:Json')
+local Links = Lua.import('Module:Links')
+local Locale = Lua.import('Module:Locale')
+local Logic = Lua.import('Module:Logic')
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -31,6 +31,7 @@ local Language = mw.getContentLanguage()
 local Company = Class.new(BasicInfobox)
 
 local COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
+local LINK_VARIANT = 'company'
 
 ---@param frame Frame
 ---@return Html
@@ -42,6 +43,8 @@ end
 ---@return string
 function Company:createInfobox()
 	local args = self.args
+
+	local links = Links.transform(args)
 
 	local widgets = {
 		Header{
@@ -55,22 +58,26 @@ function Company:createInfobox()
 		Customizable{id = 'parent', children = {
 			Cell{
 				name = 'Parent Company',
-				content = self:getAllArgsForBase(args, 'parent', {makeLink = true}),
+				children = self:getAllArgsForBase(args, 'parent', {makeLink = true}),
 			}
 		}},
 		Customizable{id = 'dates', children = {
-			Cell{name = 'Founded', content = {args.foundeddate or args.founded}},
-			Cell{name = 'Defunct', content = {args.defunctdate or args.defunct}},
+			Cell{name = 'Founded', children = {args.foundeddate or args.founded}},
+			Cell{name = 'Defunct', children = {args.defunctdate or args.defunct}},
 		}},
 		Cell{
 			name = 'Location',
-			content = {self:_createLocation(args.location)},
+			children = {self:_createLocation(args.location)},
 		},
-		Cell{name = 'Headquarters', content = {args.headquarters}},
+		Cell{name = 'Headquarters', children = {args.headquarters}},
 		Customizable{id = 'employees', children = {
-			Cell{name = 'Employees', content = {args.employees}},
+			Cell{name = 'Employees', children = {args.employees}},
 		}},
-		Cell{name = 'Trades as', content = {args.tradedas}},
+		Cell{
+			name = 'Focus',
+			children = {args.focus},
+		},
+		Cell{name = 'Trades as', children = {args.tradedas}},
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
@@ -79,24 +86,14 @@ function Company:createInfobox()
 					return {
 						Cell{
 							name = 'Awarded Prize Pools',
-							content = {self:_getOrganizerPrizepools()}
+							children = {self:_getOrganizerPrizepools()}
 						}
 					}
 				end
 			end
 		},
 		Center{children = {args.footnotes}},
-		Builder{
-			builder = function()
-				local links = Links.transform(args)
-				if not Table.isEmpty(links) then
-					return {
-						Title{children = 'Links'},
-						Widgets.Links{links = links}
-					}
-				end
-			end
-		}
+		Widgets.Links{links = links, variant = LINK_VARIANT},
 	}
 
 	mw.ext.LiquipediaDB.lpdb_company('company_' .. self.name, {
@@ -107,25 +104,15 @@ function Company:createInfobox()
 		locations = Locale.formatLocations(args),
 		headquarterslocation = args.headquarters,
 		parentcompany = args.parent,
-		foundeddate = ReferenceCleaner.clean(args.foundeddate),
-		defunctdate = ReferenceCleaner.clean(args.defunctdate),
-		numberofemployees = ReferenceCleaner.cleanNumber(args.employees),
-		links = mw.ext.LiquipediaDB.lpdb_create_json({
-			discord = Links.makeFullLink('discord', args.discord),
-			facebook = Links.makeFullLink('facebook', args.facebook),
-			instagram = Links.makeFullLink('instagram', args.instagram),
-			twitch = Links.makeFullLink('twitch', args.twitch),
-			twitter = Links.makeFullLink('twitter', args.twitter),
-			website = Links.makeFullLink('website', args.website),
-			weibo = Links.makeFullLink('weibo', args.weibo),
-			vk = Links.makeFullLink('vk', args.vk),
-			youtube = Links.makeFullLink('youtube', args.youtube),
-		})
+		foundeddate = ReferenceCleaner.clean{input = args.foundeddate},
+		defunctdate = ReferenceCleaner.clean{input = args.defunctdate},
+		numberofemployees = ReferenceCleaner.cleanNumber{input = args.employees},
+		links = Json.stringify(Links.makeFullLinksForTableItems(links, LINK_VARIANT))
 	})
 
 	self:categories('Companies')
 
-	return self:build(widgets)
+	return self:build(widgets, 'Company')
 end
 
 ---@param location string?
@@ -135,7 +122,7 @@ function Company:_createLocation(location)
 		return ''
 	end
 
-	return Flags.Icon({flag = location, shouldLink = true}) .. '&nbsp;' ..
+	return Flags.Icon{flag = location, shouldLink = true} .. '&nbsp;' ..
 				'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 

@@ -1,24 +1,23 @@
 ---
 -- @Liquipedia
--- wiki=fighters
 -- page=Module:Player/Display/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Abbreviation = require('Module:Abbreviation')
-local FnUtil = require('Module:FnUtil')
-local Characters = require('Module:Characters')
-local DisplayUtil = require('Module:DisplayUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
+local Characters = Lua.import('Module:Characters')
+local DisplayUtil = Lua.import('Module:DisplayUtil')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 
-local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
+local TBD = 'TBD'
 local ZERO_WIDTH_SPACE = '&#8203;'
 
 ---@class FightersPlayerDisplay: PlayerDisplay
@@ -35,14 +34,17 @@ local CustomPlayerDisplay = Table.copy(PlayerDisplay)
 ---@return Html
 function CustomPlayerDisplay.BlockPlayer(props)
 	local player = props.player
+	local useDefault = props.showTbd ~= false or not Opponent.playerIsTbd(player)
 
-	local nameNode = mw.html.create(props.dq and 's' or 'span')
-		:wikitext(
-			props.abbreviateTbd and Opponent.playerIsTbd(player) and TBD_ABBREVIATION
-			or props.showLink ~= false and player.pageName
-			and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
-			or Logic.emptyOr(player.displayName, ZERO_WIDTH_SPACE)
-		)
+	local nameNode = mw.html.create(props.dq and 's' or 'span'):addClass('name')
+
+	if not Opponent.playerIsTbd(player) and props.showLink ~= false and Logic.isNotEmpty(player.pageName) then
+		nameNode:wikitext('[[' .. player.pageName .. '|' .. player.displayName .. ']]')
+	elseif useDefault then
+		nameNode:wikitext(Logic.emptyOr(player.displayName, 'TBD'))
+	else
+		nameNode:wikitext(ZERO_WIDTH_SPACE)
+	end
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
 
 	if props.note then
@@ -54,8 +56,8 @@ function CustomPlayerDisplay.BlockPlayer(props)
 	end
 
 	local flagNode
-	if props.showFlag ~= false and player.flag then
-		flagNode = PlayerDisplay.Flag(player.flag)
+	if props.showFlag ~= false then
+		flagNode = PlayerDisplay.Flag{flag = player.flag, useDefault = useDefault}
 	end
 
 	local characterNode = mw.html.create()
@@ -69,14 +71,14 @@ function CustomPlayerDisplay.BlockPlayer(props)
 	end
 
 	local teamNode
-	if props.showPlayerTeam and player.team and player.team:lower() ~= 'tbd' then
+	if props.showPlayerTeam and player.team and player.team:lower() ~= TBD then
 		teamNode = mw.html.create('span')
 			:wikitext('&nbsp;')
 			:node(mw.ext.TeamTemplate.teampart(player.team))
 	end
 
 	if props.oneLine then
-		return mw.html.create('div'):addClass('block-player starcraft-block-player')
+		return mw.html.create('div'):addClass('block-player')
 			:addClass(props.flip and 'flipped' or nil)
 			:addClass(props.showPlayerTeam and 'has-team' or nil)
 			:node(flagNode)
@@ -87,7 +89,7 @@ function CustomPlayerDisplay.BlockPlayer(props)
 
 	return mw.html.create()
 		:node(
-			mw.html.create('div'):addClass('block-player starcraft-block-player')
+			mw.html.create('div'):addClass('block-player')
 			:addClass(props.flip and 'flipped' or nil)
 			:addClass(props.showPlayerTeam and 'has-team' or nil)
 			:node(flagNode)
@@ -103,7 +105,7 @@ function CustomPlayerDisplay.InlinePlayer(props)
 	local player = props.player
 
 	local flag = props.showFlag ~= false and player.flag
-		and PlayerDisplay.Flag(player.flag)
+		and PlayerDisplay.Flag{flag = player.flag}
 		or nil
 
 	local faction = player.chars
@@ -128,7 +130,7 @@ function CustomPlayerDisplay.InlinePlayer(props)
 			.. nameAndLink
 	end
 
-	return mw.html.create('span'):addClass('starcraft-inline-player')
+	return mw.html.create('span')
 		:addClass(props.flip and 'flipped' or nil)
 		:wikitext(text)
 end

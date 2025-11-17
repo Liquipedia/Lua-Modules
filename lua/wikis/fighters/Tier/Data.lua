@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=fighters
 -- page=Module:Tier/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

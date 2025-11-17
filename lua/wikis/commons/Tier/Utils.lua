@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Tier/Utils
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,13 +7,15 @@
 
 -- module intended to be moved to `Module:Tier` after the old ones usage has been eliminated
 
-local Logic = require('Module:Logic')
-local FnUtil = require('Module:FnUtil')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
 
-local TierData = mw.loadData('Module:Tier/Data')
+local Logic = Lua.import('Module:Logic')
+local FnUtil = Lua.import('Module:FnUtil')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+
+local TierData = Lua.import('Module:Tier/Data', {loadData = true})
 
 local NON_BREAKING_SPACE = '&nbsp;'
 local DEFAULT_TIER_TYPE = 'General'
@@ -193,25 +194,24 @@ end
 ---@return {[string]: integer?}
 Tier.legacyNumbers = FnUtil.memoize(function()
 	return Table.map(TierData.tiers, function(key, data)
-		return data.name:lower():gsub(' ', ''), tonumber(key)
+		return data.name:lower(), tonumber(key)
 	end)
 end)
 
 ---@return {[string]: integer?}
 Tier.legacyShortNumbers = FnUtil.memoize(function()
 	return Table.map(TierData.tiers, function(key, data)
-		return data.short:lower():gsub(' ', ''), tonumber(key)
+		return data.short:lower(), tonumber(key)
 	end)
 end)
 
---- Legacy: Converts legacy tier input to its numeric value. DEPRECATED!!!
+--- Converts legacy tier input to its numeric value.
 ---@param tier string|integer|nil
 ---@return integer?
----@deprecated
 function Tier.toNumber(tier)
 	return tonumber(tier)
-		or Tier.legacyNumbers()[string.lower(tier or ''):gsub(' ', '')]
-		or Tier.legacyShortNumbers()[string.lower(tier or ''):gsub(' ', '')]
+		or Tier.legacyNumbers()[string.lower(tier or '')]
+		or Tier.legacyShortNumbers()[string.lower(tier or '')]
 end
 
 return Tier

@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:Infobox/UnofficialWorldChampion/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
 
 local UnofficialWorldChampion = Lua.import('Module:Infobox/UnofficialWorldChampion')
 

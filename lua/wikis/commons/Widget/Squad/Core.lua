@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Squad/Core
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
 
 local SquadUtils = Lua.import('Module:Squad/Utils')
 local Widgets = Lua.import('Module:Widget/All')

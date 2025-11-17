@@ -1,45 +1,25 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local Set = require('Module:Set')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Variables = require('Module:Variables')
-local YearsActive = require('Module:YearsActive')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Faction = Lua.import('Module:Faction')
+local Set = Lua.import('Module:Set')
+local Variables = Lua.import('Module:Variables')
+local YearsActive = Lua.import('Module:YearsActive')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Player = Lua.import('Module:Infobox/Person')
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
-
-local ROLES = {
-	analyst = {category = 'Analyst', variable = 'Analyst', personType = 'Talent'},
-	observer = {category = 'Observer', variable = 'Observer', personType = 'Talent'},
-	host = {category = 'Host', variable = 'Host', personType = 'Talent'},
-	journalist = {category = 'Journalist', variable = 'Journalist', personType = 'Talent'},
-	expert = {category = 'Expert', variable = 'Expert', personType = 'Talent'},
-	caster = {category = 'Caster', variable = 'Caster', personType = 'Talent'},
-	talent = {category = 'Talent', variable = 'Talent', personType = 'Talent'},
-	streamer = {category = 'Streamer', variable = 'Streamer', personType = 'Talent'},
-	interviewer = {category = 'Interviewer', variable = 'Interviewer', personType = 'Talent'},
-	photographer = {category = 'Photographer', variable = 'Photographer', personType = 'Talent'},
-	organizer = {category = 'Organizer', variable = 'Organizer', personType = 'Staff'},
-	coach = {category = 'Coache', variable = 'Coach', personType = 'Staff'},
-	admin = {category = 'Admin', variable = 'Admin', personType = 'Staff'},
-	manager = {category = 'Manager', variable = 'Manager', personType = 'Staff'},
-	producer = {category = 'Producer', variable = 'Producer', personType = 'Staff'},
-	player = {category = 'Player', variable = 'Player', personType = 'Player'},
-}
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Widgets = Lua.import('Module:Widget/All')
@@ -58,11 +38,6 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = TeamHistoryAuto.results{
-		player = player.pagename,
-		addlpdbdata = player:shouldStoreData(player.args),
-	}
-
 	return player:createInfobox()
 end
 
@@ -79,21 +54,21 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Approx. Winnings ' .. CURRENT_YEAR,
-				content = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
+				children = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
 			},
 			Cell{
-				name = Abbreviation.make('Years Active', 'Years active as a player'),
-				content = {YearsActive.display({player = caller.pagename})
+				name = Abbreviation.make{text = 'Years Active', title = 'Years active as a player'},
+				children = {YearsActive.display({player = caller.pagename})
 			}
 			},
 			Cell{
-				name = Abbreviation.make('Years Active (caster)', 'Years active as a caster'),
-				content = {caller:_getActiveCasterYears()}
+				name = Abbreviation.make{text = 'Years Active (caster)', title = 'Years active as a caster'},
+				children = {caller:_getActiveCasterYears()}
 			},
 		}
 	elseif id == 'status' then
 		return {
-			Cell{name = 'Faction', content = {caller:getFactionData(args.faction or 'unknown')}}
+			Cell{name = 'Faction', children = {caller:getFactionData(args.faction or 'unknown')}}
 		}
 	elseif id == 'role' then return {}
 	elseif id == 'region' then return {}
@@ -111,7 +86,7 @@ function CustomInjector:parse(id, widgets)
 			Center{children = {achievements}},
 		}
 	elseif id == 'history' and string.match(args.retired or '', '%d%d%d%d') then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 
 	return widgets
@@ -197,26 +172,12 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 
 	extradata.faction = factions[1]
 	extradata.faction2 = factions[2]
-	extradata.role = CustomPlayer:_getRoleData(args.role).variable
-	extradata.role2 = args.role2 and CustomPlayer:_getRoleData(args.role2).variable or nil
 
 	if Variables.varDefault('factioncount') then
 		extradata.factionhistorical = true
 	end
 
 	return lpdbData
-end
----@param args table
----@return {store: string, category: string}
-function CustomPlayer:getPersonType(args)
-	local roleData = self:_getRoleData(args.role)
-	return {store = roleData.personType, category = roleData.category}
-end
-
----@param roleInput string?
----@return {category:string, variable: string, personType: string}
-function CustomPlayer:_getRoleData(roleInput)
-	return ROLES[roleInput] or ROLES.player
 end
 
 return CustomPlayer

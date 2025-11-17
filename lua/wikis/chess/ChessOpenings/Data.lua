@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=chess
 -- page=Module:ChessOpenings/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

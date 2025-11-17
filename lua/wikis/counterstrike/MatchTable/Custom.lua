@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:MatchTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Tier = require('Module:Tier/Custom')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Tier = Lua.import('Module:Tier/Custom')
 
 local MatchTable = Lua.import('Module:MatchTable')
 
@@ -52,4 +52,4 @@ function CustomMatchTable:_displayTier(match)
 		:wikitext(Tier.display(tier, tierType, options))
 end
 
-return Class.export(CustomMatchTable)
+return Class.export(CustomMatchTable, {exports = {'results'}})

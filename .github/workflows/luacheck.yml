@@ -8,10 +8,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup lua
-        uses: leafo/gh-actions-lua@v11
+        # Workaround until https://github.com/leafo/gh-actions-lua/issues/57 is resolved
+        # uses: leafo/gh-actions-lua@v11
+        uses: lewis6991/gh-actions-lua@01aab24c4de9555717b685f9b142a2abbe12ef14
         with:
           luaVersion: '5.1'
 
@@ -40,10 +42,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup lua
-        uses: leafo/gh-actions-lua@v11
+        # Workaround until https://github.com/leafo/gh-actions-lua/issues/57 is resolved
+        # uses: leafo/gh-actions-lua@v11
+        uses: lewis6991/gh-actions-lua@01aab24c4de9555717b685f9b142a2abbe12ef14
         with:
           luaVersion: '5.1'
 

@@ -1,16 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=tetris
 -- page=Module:PrizePool/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
-local Variables = require('Module:Variables')
+
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Variables = Lua.import('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool')
 
@@ -50,6 +50,9 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	Variables.varDefine('enddate_' .. lpdbPrefix .. participants, lpdbData.date)
 	Variables.varDefine('ranking' .. lpdbPrefix .. '_' .. (participants:lower()) ..
 		'_pointprize', lpdbData.extradata.prizepoints
+	)
+	Variables.varDefine('ranking' .. lpdbPrefix .. '_' .. (participants:lower()) ..
+		'_pointprize2', lpdbData.extradata.prizepoints2
 	)
 
 	return lpdbData

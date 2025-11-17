@@ -1,18 +1,18 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
@@ -37,7 +37,7 @@ end
 ---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 function MatchFunctions.adjustOpponent(opponent, opponentIndex)
-	opponent.extradata = CustomMatchGroupInput.getOpponentExtradata(opponent)
+	Table.mergeInto(opponent.extradata, CustomMatchGroupInput.getOpponentExtradata(opponent))
 	if opponent.extradata.additionalScores then
 		opponent.score = CustomMatchGroupInput._getSetWins(opponent)
 	end
@@ -145,7 +145,6 @@ end
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		isfeatured = MatchFunctions.isFeatured(opponents, tonumber(match.liquipediatier)),
-		casters = MatchGroupInputUtil.readCasters(match),
 		hasopponent1 = MatchFunctions._checkForNonEmptyOpponent(opponents[1]),
 		hasopponent2 = MatchFunctions._checkForNonEmptyOpponent(opponents[2]),
 		liquipediatiertype2 = Variables.varDefault('tournament_tiertype2'),
@@ -196,15 +195,14 @@ function MatchFunctions.currentEarnings(name)
 	end
 	local data = mw.ext.LiquipediaDB.lpdb('team', {
 		conditions = '[[name::' .. name .. ']]',
-		query = 'extradata'
+		query = 'earningsbyyear'
 	})[1]
 
 	if not data then
 		return 0
 	end
 
-	local currentEarnings = (data.extradata or {})['earningsin' .. CURRENT_YEAR]
-	return tonumber(currentEarnings) or 0
+	return data.earningsbyyear[tonumber(CURRENT_YEAR)] or 0
 end
 
 --

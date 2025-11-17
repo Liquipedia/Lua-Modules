@@ -1,27 +1,27 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:Infobox/Unit/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local ArmorIcon = require('Module:ArmorIcon')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
-local Faction = require('Module:Faction')
-local Hotkeys = require('Module:Hotkey')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local ArmorIcon = Lua.import('Module:ArmorIcon')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local CostDisplay = Lua.import('Module:Infobox/Extension/CostDisplay')
+local Faction = Lua.import('Module:Faction')
+local Hotkeys = Lua.import('Module:Hotkey')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 local Shared = Lua.import('Module:Infobox/Extension/BuildingUnitShared')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
@@ -31,7 +31,7 @@ local CustomUnit = Class.new(Unit)
 
 local CustomInjector = Class.new(Injector)
 
-local EXPERIENCE = mw.loadData('Module:Experience')
+local EXPERIENCE = Lua.import('Module:Experience', {loadData = true})
 
 local CRITTERS = 'critters'
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=Hit Points]]'
@@ -62,23 +62,23 @@ function CustomUnit:addCustomCells(widgets)
 	local race = Faction.toName(Faction.read(args.race)) or ADDITIONAL_UNIT_RACES[string.lower(args.race or '')]
 
 	Array.appendWith(widgets,
-		Cell{name = '[[Race]]', content = {race and ('[[' .. race .. ']]') or args.race}},
-		Cell{name = '[[Targeting#Target_Classifications|Classification]]', content = {
+		Cell{name = '[[Race]]', children = {race and ('[[' .. race .. ']]') or args.race}},
+		Cell{name = '[[Targeting#Target_Classifications|Classification]]', children = {
 			args.class and String.convertWikiListToHtmlList(args.class) or nil}},
-		Cell{name = 'Bounty Awarded', content = {CustomUnit._bounty(args)}},
-		Cell{name = 'Sleeps', content = {args.sleeps}},
-		Cell{name = 'Cargo Capacity', content = {args.cargo_capacity}},
-		Cell{name = 'Morphs into', content = {args.morphs}},
-		Cell{name = 'Duration', content = {args.duration}},
-		Cell{name = 'Formation Rank', content = {args.formationrank}},
-		Cell{name = '[[Sight_Range|Sight]]', content = {args.daysight .. ' / ' .. args.nightsight}},
-		Cell{name = 'Acquisition Range', content = {acquisitionRange > 0 and acquisitionRange or nil}},
-		Cell{name = '[[Experience#Determining_Experience_Gained|Level]]', content = {
+		Cell{name = 'Bounty Awarded', children = {CustomUnit._bounty(args)}},
+		Cell{name = 'Sleeps', children = {args.sleeps}},
+		Cell{name = 'Cargo Capacity', children = {args.cargo_capacity}},
+		Cell{name = 'Morphs into', children = {args.morphs}},
+		Cell{name = 'Duration', children = {args.duration}},
+		Cell{name = 'Formation Rank', children = {args.formationrank}},
+		Cell{name = '[[Sight_Range|Sight]]', children = {args.daysight .. ' / ' .. args.nightsight}},
+		Cell{name = 'Acquisition Range', children = {acquisitionRange > 0 and acquisitionRange or nil}},
+		Cell{name = '[[Experience#Determining_Experience_Gained|Level]]', children = {
 			level > 0 and ('[[Experience|'..args.level..']]') or nil}},
-		Cell{name = '[[Mana]]', content = {mana.manaDisplay}},
-		Cell{name = '[[Mana|Initial Mana]]', content = {mana.initialManaDisplay}},
-		Cell{name = '[[Mana#Mana_Gain|Mana Regeneration]]', content = {mana.manaRegenDisplay}},
-		Cell{name = 'Selection Priorty', content = {args.priority}}
+		Cell{name = '[[Mana]]', children = {mana.manaDisplay}},
+		Cell{name = '[[Mana|Initial Mana]]', children = {mana.initialManaDisplay}},
+		Cell{name = '[[Mana#Mana_Gain|Mana Regeneration]]', children = {mana.manaRegenDisplay}},
+		Cell{name = 'Selection Priorty', children = {args.priority}}
 	)
 
 	local movement = Shared.movement(args, 'Movement')
@@ -108,7 +108,7 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'cost' then
 		return {
-			Cell{name = 'Cost', content = {CostDisplay.run{
+			Cell{name = 'Cost', children = {CostDisplay.run{
 				faction = args.race,
 				gold = args.gold,
 				lumber = args.lumber,
@@ -117,13 +117,13 @@ function CustomInjector:parse(id, widgets)
 			}}},
 		}
 	elseif id == 'requirements' then
-		return {Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(args.requires)}}}
+		return {Cell{name = 'Requirements', children = {String.convertWikiListToHtmlList(args.requires)}}}
 	elseif id == 'defense' then
 		return {
-			Cell{name = '[[Hit Points|Hit Points]]', content = {self.caller:_defenseDisplay()}},
-			Cell{name = '[[Hit Points#Hit Points Gain|HP Regeneration]]', content = {
+			Cell{name = '[[Hit Points|Hit Points]]', children = {self.caller:_defenseDisplay()}},
+			Cell{name = '[[Hit Points#Hit Points Gain|HP Regeneration]]', children = {
 				Shared.hitPointsRegeneration(args, {display = true})}},
-			Cell{name = '[[Armor|Armor]]', content = {self.caller:_armorDisplay()}}
+			Cell{name = '[[Armor|Armor]]', children = {self.caller:_armorDisplay()}}
 		}
 	elseif id == 'attack' then return {}
 	elseif id == 'custom' then
@@ -177,9 +177,9 @@ end
 function CustomUnit:_getHotkeys()
 	if not String.isEmpty(self.args.shortcut) then
 		if not String.isEmpty(self.args.shortcut2) then
-			return Hotkeys.hotkey2(self.args.shortcut, self.args.shortcut2, 'arrow')
+			return Hotkeys.hotkey2{hotkey1 = self.args.shortcut, hotkey2 = self.args.shortcut2, seperator = 'arrow'}
 		else
-			return Hotkeys.hotkey(self.args.shortcut)
+			return Hotkeys.hotkey{hotkey = self.args.shortcut}
 		end
 	end
 end

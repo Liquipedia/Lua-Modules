@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Factory
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local WidgetFactory = {}
 
@@ -21,4 +21,4 @@ function WidgetFactory.fromTemplate(args)
 	return WidgetClass(args)
 end
 
-return Class.export(WidgetFactory)
+return Class.export(WidgetFactory, {exports = {'fromTemplate'}})

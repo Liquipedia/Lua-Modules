@@ -1,15 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:AgeCalculation
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local String = require('Module:StringUtils')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local String = Lua.import('Module:StringUtils')
 
 local AgeCalculation = {}
 
@@ -165,7 +166,7 @@ function Age:calculate()
 
 	if self.birthDate.isExact and (self.deathDate.isExact or self.deathDate.isEmpty) then
 		---@cast endDate -nil
-		return self:_secondsToAge(os.difftime(endDate, self.birthDate.time))
+		return DateExt.calculateAge(endDate, self.birthDate.time)
 	elseif self.birthDate.year and (self.deathDate.year or self.deathDate.isEmpty) then
 		local minEndDate
 		local maxEndDate
@@ -177,8 +178,8 @@ function Age:calculate()
 			maxEndDate = self.deathDate:getLatestPossible()
 		end
 
-		local minAge = self:_secondsToAge(os.difftime(minEndDate, self.birthDate:getLatestPossible()))
-		local maxAge = self:_secondsToAge(os.difftime(maxEndDate, self.birthDate:getEarliestPossible()))
+		local minAge = DateExt.calculateAge(minEndDate, self.birthDate:getLatestPossible())
+		local maxAge = DateExt.calculateAge(maxEndDate, self.birthDate:getEarliestPossible())
 
 		-- If our min and max age values are identical, then we can just display that value. Else,
 		-- we have to display a range of ages
@@ -215,15 +216,9 @@ function Age:makeDisplay()
 	return result
 end
 
----@param seconds integer
----@return integer
-function Age:_secondsToAge(seconds)
-	return math.floor(seconds / 60 / 60 / 24 / 365.2425)
-end
-
 ---@param args table
----@return {birthDateIso: string?, deathDateIso: string?, categories: string[], birth: string?, death: string?}
-function AgeCalculation.run(args)
+---@return Age
+function AgeCalculation.raw(args)
 	local birthLocation = args.birthlocation
 	local birthDate = BirthDate(args.birthdate, birthLocation)
 	local deathLocation = args.deathlocation
@@ -231,7 +226,17 @@ function AgeCalculation.run(args)
 
 	AgeCalculation._assertValidDates(birthDate, deathDate)
 
-	local age = Age(birthDate, deathDate):makeDisplay()
+	return Age(birthDate, deathDate)
+end
+
+---@param args table
+---@return {birthDateIso: string?, deathDateIso: string?, categories: string[], birth: string?, death: string?}
+function AgeCalculation.run(args)
+	local ageRaw = AgeCalculation.raw(args)
+	local age = ageRaw:makeDisplay()
+
+	local birthDate = ageRaw.birthDate
+	local deathDate = ageRaw.deathDate
 
 	local categories = Array.append({},
 		age.birth and not birthDate.isExact and 'Incomplete birth dates' or nil,
@@ -289,4 +294,4 @@ function AgeCalculation._showErrorForDateIfNeeded(date, dateType)
 	end
 end
 
-return Class.export(AgeCalculation)
+return AgeCalculation

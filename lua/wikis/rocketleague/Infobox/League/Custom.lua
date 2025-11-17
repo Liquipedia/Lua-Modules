@@ -1,26 +1,26 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Math = require('Module:MathUtil')
-local String = require('Module:StringUtils')
-local Tier = require('Module:Tier/Custom')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local Logic = Lua.import('Module:Logic')
+local Math = Lua.import('Module:MathUtil')
+local String = Lua.import('Module:StringUtils')
+local Tier = Lua.import('Module:Tier/Custom')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -54,9 +54,9 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Mode', content = {args.mode}},
-			Cell{name = 'Game', content = {Game.text{game = args.game}}},
-			Cell{name = 'Misc Mode', content = {args.miscmode}}
+			Cell{name = 'Mode', children = {args.mode}},
+			Cell{name = 'Game', children = {Game.text{game = args.game}}},
+			Cell{name = 'Misc Mode', children = {args.miscmode}}
 		)
 	elseif id == 'customcontent' then
 		if not String.isEmpty(args.map1) then
@@ -79,13 +79,13 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{children = 'Teams'})
 			table.insert(widgets, Cell{
 				name = 'Number of teams',
-				content = {args.team_number}
+				children = {args.team_number}
 			})
 		elseif not String.isEmpty(args.player_number) then
 			table.insert(widgets, Title{children = 'Players'})
 			table.insert(widgets, Cell{
 				name = 'Number of players',
-				content = {args.player_number}
+				children = {args.player_number}
 			})
 		end
 	end
@@ -121,9 +121,9 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_organizer', self:_concatArgs(args, 'organizer'))
 	Variables.varDefine('tournament_sponsors', self:_concatArgs(args, 'sponsor'))
 	Variables.varDefine('tournament_rlcs_premier', self.data.rlcsPremier)
-	Variables.varDefine('date', ReferenceCleaner.clean(args.date))
-	Variables.varDefine('sdate', ReferenceCleaner.clean(args.sdate))
-	Variables.varDefine('edate', ReferenceCleaner.clean(args.edate))
+	Variables.varDefine('date', ReferenceCleaner.clean{input = args.date})
+	Variables.varDefine('sdate', ReferenceCleaner.clean{input = args.sdate})
+	Variables.varDefine('edate', ReferenceCleaner.clean{input = args.edate})
 
 	-- Legacy tier vars
 	Variables.varDefine('tournament_lptier', args.liquipediatier)

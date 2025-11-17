@@ -1,17 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:CharacterIcon
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
 
 local Data = Lua.requireIfExists('Module:CharacterIcon/Data', {loadData = true})
 
@@ -99,4 +99,4 @@ function CharacterIcon.raw(character, date)
 	return CharacterIcon._getCharacterIconInfo(characterIcons, date)
 end
 
-return Class.export(CharacterIcon)
+return Class.export(CharacterIcon, {exports = {'Icon'}})

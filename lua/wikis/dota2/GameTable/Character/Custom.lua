@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:GameTable/Character/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
 
 local GameTableCharacter = Lua.import('Module:GameTable/Character')
 

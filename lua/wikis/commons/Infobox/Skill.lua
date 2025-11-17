@@ -1,23 +1,23 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Skill
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Hotkey = require('Module:Hotkey')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Hotkey = Lua.import('Module:Hotkey')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -54,33 +54,33 @@ function Skill:createInfobox()
 		Customizable{
 			id = 'caster',
 			children = {
-				Cell{name = 'Caster(s)', content = self:getAllArgsForBase(args, 'caster', {makeLink = true})},
+				Cell{name = 'Caster(s)', children = self:getAllArgsForBase(args, 'caster', {makeLink = true})},
 			}
 		},
 		Customizable{
 			id = 'cost',
 			children = {
-				Cell{name = 'Cost', content = {args.cost}},
+				Cell{name = 'Cost', children = {args.cost}},
 			}
 		},
 		Customizable{
 			id = 'hotkey',
 			children = {
-				Cell{name = 'Hotkey', content = {self:_getHotkeys(args)}},
+				Cell{name = 'Hotkey', children = {self:_getHotkeys(args)}},
 			}
 		},
-		Cell{name = 'Range', content = {args.range}},
-		Cell{name = 'Radius', content = {args.radius}},
+		Cell{name = 'Range', children = {args.range}},
+		Cell{name = 'Radius', children = {args.radius}},
 		Customizable{
 			id = 'cooldown',
 			children = {
-				Cell{name = 'Cooldown', content = {args.cooldown}},
+				Cell{name = 'Cooldown', children = {args.cooldown}},
 			}
 		},
 		Customizable{
 			id = 'duration',
 			children = {
-				Cell{name = 'Duration', content = {args.duration}},
+				Cell{name = 'Duration', children = {args.duration}},
 			}
 		},
 		Customizable{id = 'custom', children = {}},
@@ -93,7 +93,7 @@ function Skill:createInfobox()
 		self:_setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Skill')
 end
 
 ---@param args table
@@ -141,9 +141,9 @@ function Skill:_getHotkeys(args)
 	local display
 	if not String.isEmpty(args.hotkey) then
 		if not String.isEmpty(args.hotkey2) then
-			display = Hotkey.hotkey2(args.hotkey, args.hotkey2, 'slash')
+			display = Hotkey.hotkey2{hotkey1 = args.hotkey, hotkey2 = args.hotkey2, seperator = 'slash'}
 		else
-			display = Hotkey.hotkey(args.hotkey)
+			display = Hotkey.hotkey{hotkey = args.hotkey}
 		end
 	end
 

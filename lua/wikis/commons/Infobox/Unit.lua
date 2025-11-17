@@ -1,20 +1,20 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Unit
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local Hotkey = require('Module:Hotkey')
-local String = require('Module:StringUtils')
+
+local Class = Lua.import('Module:Class')
+local Namespace = Lua.import('Module:Namespace')
+local Hotkey = Lua.import('Module:Hotkey')
+local String = Lua.import('Module:StringUtils')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -60,44 +60,44 @@ function Unit:createInfobox()
 		Customizable{
 			id = 'type',
 			children = {
-				Cell{name = 'Type', content = {args.type}},
+				Cell{name = 'Type', children = {args.type}},
 			}
 		},
-		Cell{name = 'Description', content = {args.description}},
+		Cell{name = 'Description', children = {args.description}},
 		Customizable{
 			id = 'builtfrom',
 			children = {
-				Cell{name = 'Built From', content = {args.builtfrom}},
+				Cell{name = 'Built From', children = {args.builtfrom}},
 			}
 		},
 		Customizable{
 			id = 'requirements',
 			children = {
-				Cell{name = 'Requirements', content = {args.requires}},
+				Cell{name = 'Requirements', children = {args.requires}},
 			}
 		},
 		Customizable{
 			id = 'cost',
 			children = {
-				Cell{name = 'Cost', content = {args.cost}},
+				Cell{name = 'Cost', children = {args.cost}},
 			}
 		},
 		Customizable{
 			id = 'hotkey',
 			children = {
-				Cell{name = 'Hotkey', content = {self:_getHotkeys(args)}},
+				Cell{name = 'Hotkey', children = {self:_getHotkeys(args)}},
 			}
 		},
 		Customizable{
 			id = 'attack',
 			children = {
-				Cell{name = 'Attack', content = {args.attack}},
+				Cell{name = 'Attack', children = {args.attack}},
 			}
 		},
 		Customizable{
 			id = 'defense',
 			children = {
-				Cell{name = 'Defense', content = {args.defense}},
+				Cell{name = 'Defense', children = {args.defense}},
 			}
 		},
 		Customizable{id = 'custom', children = {}},
@@ -112,7 +112,7 @@ function Unit:createInfobox()
 		self:setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Unit')
 end
 
 ---@param args table
@@ -127,9 +127,9 @@ function Unit:_getHotkeys(args)
 	local display
 	if not String.isEmpty(args.hotkey) then
 		if not String.isEmpty(args.hotkey2) then
-			display = Hotkey.hotkey2(args.hotkey, args.hotkey2, 'slash')
+			display = Hotkey.hotkey2{hotkey1 = args.hotkey, hotkey2 = args.hotkey2, seperator = 'slash'}
 		else
-			display = Hotkey.hotkey(args.hotkey)
+			display = Hotkey.hotkey{hotkey = args.hotkey}
 		end
 	end
 

@@ -1,30 +1,30 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:Infobox/Building/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Attack = require('Module:Infobox/Extension/Attack')
-local Class = require('Module:Class')
-local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
-local Faction = require('Module:Faction')
-local Hotkeys = require('Module:Hotkey')
-local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local MessageBox = require('Module:Message box')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Attack = Lua.import('Module:Infobox/Extension/Attack')
+local Class = Lua.import('Module:Class')
+local CostDisplay = Lua.import('Module:Infobox/Extension/CostDisplay')
+local Faction = Lua.import('Module:Faction')
+local Hotkeys = Lua.import('Module:Hotkey')
+local Icon = Lua.import('Module:Icon')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local MessageBox = Lua.import('Module:Message box')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Building = Lua.import('Module:Infobox/Building')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -78,19 +78,19 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Size', content = {args.size}},
-			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
-			Cell{name = 'Speed', content = {args.speed}},
-			Cell{name = 'Sight', content = {args.sight}},
-			Cell{name = 'Upgrades To', content = caller:_csvToPageList(args.upgrades_to)},
-			Cell{name = 'Introduced', content = {args.introducedDisplay}}
+			Cell{name = 'Size', children = {args.size}},
+			Cell{name = 'Energy', children = {caller:_energyDisplay()}},
+			Cell{name = 'Speed', children = {args.speed}},
+			Cell{name = 'Sight', children = {args.sight}},
+			Cell{name = 'Upgrades To', children = caller:_csvToPageList(args.upgrades_to)},
+			Cell{name = 'Introduced', children = {args.introducedDisplay}}
 		)
 		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
 			Array.extendWith(widgets, Attack.run(attackArgs, attackIndex, caller.faction))
 		end
 	elseif id == 'cost' then
 		return {
-			Cell{name = 'Cost', content = {CostDisplay.run{
+			Cell{name = 'Cost', children = {CostDisplay.run{
 				faction = caller.faction,
 				luminite = args.luminite,
 				luminiteTotal = args.totalluminite,
@@ -110,8 +110,8 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Tech. Requirements', content = caller:_csvToPageList(args.tech_requirement)},
-			Cell{name = 'Building Requirements', content = caller:_csvToPageList(args.building_requirement)},
+			Cell{name = 'Tech. Requirements', children = caller:_csvToPageList(args.tech_requirement)},
+			Cell{name = 'Building Requirements', children = caller:_csvToPageList(args.building_requirement)},
 		}
 	elseif id == 'hotkey' then
 		if not args.hotkey and not args.macro_key then return {} end
@@ -122,21 +122,21 @@ function CustomInjector:parse(id, widgets)
 			args.hotkey and CustomBuilding._hotkeys(args.hotkey, args.hotkey2),
 			args.macro_key and CustomBuilding._hotkeys(args.macro_key, args.macro_key2)
 		), HOTKEY_SEPERATOR)
-		return {Cell{name = hotkeyName, content = {hotkeys}}}
+		return {Cell{name = hotkeyName, children = {hotkeys}}}
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Builds', content = caller:_getBuildsOrUnlocksDisplay(args.builds)},
+			Cell{name = 'Builds', children = caller:_getBuildsOrUnlocksDisplay(args.builds)},
 		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocks', content = caller:_getBuildsOrUnlocksDisplay(args.unlocks)},
-			Cell{name = 'Supply Gained', content = Array.parseCommaSeparatedString(args.supply_gained)},
-			Cell{name = 'Power Gained', content = Array.parseCommaSeparatedString(args.power_gained)},
+			Cell{name = 'Unlocks', children = caller:_getBuildsOrUnlocksDisplay(args.unlocks)},
+			Cell{name = 'Supply Gained', children = Array.parseCommaSeparatedString(args.supply_gained)},
+			Cell{name = 'Power Gained', children = Array.parseCommaSeparatedString(args.power_gained)},
 		}
 	elseif id == 'defense' then
 		return {
-			Cell{name = 'Defense', content = {caller:_getDefenseDisplay()}},
-			Cell{name = 'Attributes', content = {caller:_displayCsvAsPageCsv(args.armor_type)}}
+			Cell{name = 'Defense', children = {caller:_getDefenseDisplay()}},
+			Cell{name = 'Attributes', children = {caller:_displayCsvAsPageCsv(args.armor_type)}}
 		}
 	elseif id == 'attack' then return {}
 	end
@@ -160,8 +160,8 @@ function CustomBuilding:subHeaderDisplay(args)
 	if Table.includes(subfactionData, '1v1') then
 		return tostring(mw.html.create('span')
 			:css('font-size', '90%')
-			:wikitext(Abbreviation.make('Standard', 'This is part of Head to Head 1v1. '
-				.. 'It might also be part of certain Hero rosters in Team Mayhem or Co-op.'))
+			:wikitext(Abbreviation.make{text = 'Standard', title = 'This is part of Head to Head 1v1. '
+				.. 'It might also be part of certain Hero rosters in Team Mayhem or Co-op.'})
 		)
 	end
 
@@ -188,7 +188,7 @@ function CustomBuilding:_energyDisplay()
 	return table.concat({
 		ICON_ENERGY .. ' ' .. energy,
 		'/' .. (maxEnergy == 0 and '?' or maxEnergy),
-		gainRate and (' (+' .. gainRate .. '/s)') or Abbreviation.make('+ varies', self.args.energy_desc),
+		gainRate and (' (+' .. gainRate .. '/s)') or Abbreviation.make{text = '+ varies', title = self.args.energy_desc},
 	})
 end
 
@@ -198,9 +198,9 @@ end
 function CustomBuilding._hotkeys(hotkey1, hotkey2)
 	if String.isEmpty(hotkey1) then return end
 	if String.isEmpty(hotkey2) then
-		return Hotkeys.hotkey(hotkey1)
+		return Hotkeys.hotkey{hotkey = hotkey1}
 	end
-	return Hotkeys.hotkey2(hotkey1, hotkey2, 'plus')
+	return Hotkeys.hotkey2{hotkey1 = hotkey1, hotkey2 = hotkey2, seperator = 'plus'}
 end
 
 ---@param inputString string?
@@ -386,12 +386,12 @@ function CustomBuilding:_parseForCreeps(id, widgets)
 	if id ~= 'custom' then return {} end
 
 	return {
-		Cell{name = 'Start Level', content = {startLevel}},
-		Cell{name = 'Defenders', content = {self._displayCreepDefenders(creeps)}},
-		Cell{name = 'Respawn', content = {args.respawn and args.respawn .. 's'}},
+		Cell{name = 'Start Level', children = {startLevel}},
+		Cell{name = 'Defenders', children = {self._displayCreepDefenders(creeps)}},
+		Cell{name = 'Respawn', children = {args.respawn and args.respawn .. 's'}},
 		Title{children = 'Tower Rewards'},
-		Cell{name = 'Capture Point', content = {args.capture_point}},
-		Cell{name = 'Global Buff', content = {args.global_buff}},
+		Cell{name = 'Capture Point', children = {args.capture_point}},
+		Cell{name = 'Global Buff', children = {args.global_buff}},
 	}
 end
 

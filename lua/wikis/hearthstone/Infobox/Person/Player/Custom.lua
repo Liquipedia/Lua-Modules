@@ -1,33 +1,27 @@
 ---
 -- @Liquipedia
--- wiki=hearthstone
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local ActiveYears = require('Module:YearsActive')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Role = require('Module:Role')
-local Region = require('Module:Region')
-local Math = require('Module:MathUtil')
-local String = require('Module:StringUtils')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
+
+local ActiveYears = Lua.import('Module:YearsActive')
+local Class = Lua.import('Module:Class')
+local Region = Lua.import('Module:Region')
+local Math = Lua.import('Module:MathUtil')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
-local Center = Widgets.Center
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
 ---@class HearthstoneInfoboxPlayer: Person
----@field role table
----@field role2 table
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -37,10 +31,6 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.autoTeam = true
-	player.role = Role.run{role = player.args.role}
-	player.role2 = Role.run{role = player.args.role2}
-
 	return player:createInfobox()
 end
 
@@ -49,7 +39,6 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
-	local args = caller.args
 
 	if id == 'custom' then
 		local yearsActive = ActiveYears.display{player = caller.pagename}
@@ -61,29 +50,10 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		return {
-			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, content = {currentYearEarnings}},
-			Cell{name = 'Years active', content = {yearsActive}},
+			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, children = {currentYearEarnings}},
+			Cell{name = 'Years active', children = {yearsActive}},
 		}
-	elseif id == 'history' then
-		local manualHistory = args.history
-		local automatedHistory = TeamHistoryAuto.results{
-			addlpdbdata = true,
-			convertrole = true,
-			player = self.caller.pagename
-		}
-
-		if String.isNotEmpty(manualHistory) or automatedHistory then
-			return {
-				Title{children = 'History'},
-				Center{children = {manualHistory}},
-				Center{children = {automatedHistory}},
-			}
-		end
 	elseif id == 'region' then return {}
-	elseif id == 'role' then
-		return {
-			Cell{name = 'Role(s)', content = {caller.role.display, caller.role2.display}}
-		}
 	end
 	return widgets
 end
@@ -93,9 +63,6 @@ end
 ---@param personType string
 ---@return table
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.role = (self.role or {}).variable
-	lpdbData.extradata.role2 = (self.role2 or {}).variable
-
 	lpdbData.region = String.nilIfEmpty(Region.name({region = args.region, country = args.country}))
 
 	return lpdbData

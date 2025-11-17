@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=arenafps
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -425,6 +424,11 @@ return {
 		match2 = {
 			status = 2,
 			matchWidth = 180,
+		},
+		infoboxPlayer = {
+			automatedHistory = {
+				storeFromWikiCode = true,
+			},
 		},
 	},
 }

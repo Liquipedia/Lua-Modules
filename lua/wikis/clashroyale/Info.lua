@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=clashroyale
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -33,9 +32,14 @@ return {
 			allowManual = true,
 		},
 		match2 = {
-			status = 1,
+			status = 2,
 			matchWidthMobile = 110,
 			matchWidth = 170,
+		},
+		infoboxPlayer = {
+			automatedHistory = {
+				storeFromWikiCode = true,
+			},
 		},
 	},
 }

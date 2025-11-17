@@ -1,21 +1,23 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Ticker/Container
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local FeatureFlag = require('Module:FeatureFlag')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local FeatureFlag = Lua.import('Module:FeatureFlag')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
+local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Switch = Lua.import('Module:Widget/Switch')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
 
 ---@class MatchTickerContainer: Widget
@@ -40,6 +42,11 @@ function MatchTickerContainer:render()
 		return filterName(category.name), table.concat(category.defaultItems or {}, ',')
 	end)
 
+	local matchTickerArgs = {
+		limit = self.props.limit,
+		displayGameIcons = self.props.displayGameIcons
+	}
+
 	local devFlag = FeatureFlag.get('dev')
 
 	---@param type 'upcoming' | 'recent'
@@ -50,9 +57,9 @@ function MatchTickerContainer:render()
 				module = self.defaultProps.module,
 				fn = self.defaultProps.fn,
 				args = table.concat(Array.extractValues(Table.map(
-					{limit=self.props.limit, type=type, dev=devFlag},
+					Table.merge(matchTickerArgs, {type=type, dev=devFlag}),
 					function (key, value)
-						return key, String.interpolate('|${key}=${value}', {key=key, value=value})
+						return key, String.interpolate('|${key}=${value}', {key = key, value = tostring(value)})
 					end
 				)), '')
 			}
@@ -64,84 +71,54 @@ function MatchTickerContainer:render()
 		local ticker = Lua.import('Module:' .. self.defaultProps.module)
 		return ticker[self.defaultProps.fn](
 			Table.merge(
-				{limit=self.props.limit, type=type},
+				{type=type},
+				matchTickerArgs,
 				defaultFilterParams
 			)
 		)
 	end
 
 	return HtmlWidgets.Div{
-		classes = {'toggle-area', 'toggle-area-1'},
-		attributes = {['data-toggle-area'] = '1'},
+		classes = {'match-section-header'},
 		children = {
-			HtmlWidgets.Div{
-				classes = {'match-section-header'},
-				children = {
-					HtmlWidgets.Div{
-						classes = {'switch-pill-container'},
-						children = {
+			ContentSwitch{
+				tabs = {
+					{
+						label = 'Upcoming',
+						value = 'upcoming',
+						content = {
+							Switch{
+								label = 'Show Countdown',
+								switchGroup = 'countdown',
+								storeValue = true,
+								css = {margin = '1rem 0', ['justify-content'] = 'center'},
+								content = HtmlWidgets.Div{
+									attributes = {
+										['data-filter-expansion-template'] = buildTemplateExpansionString('upcoming'),
+										['data-filter-groups'] = filterText,
+									},
+									children = callTemplate('upcoming'),
+								}
+							}
+						}
+					},
+					{
+						label = 'Completed',
+						value = 'completed',
+						content = {
 							HtmlWidgets.Div{
-								classes = {'switch-pill'},
 								attributes = {
-									['data-switch-group'] = 'matchFiler',
-									['data-store-value'] = 'true',
+									['data-filter-expansion-template'] = buildTemplateExpansionString('recent'),
+									['data-filter-groups'] = filterText,
 								},
-								children = {
-									HtmlWidgets.Div{
-										classes = {'switch-pill-option', 'switch-pill-active', 'toggle-area-button'},
-										attributes = {
-											['data-toggle-area-btn'] = '1',
-											['data-switch-value'] = 'upcoming',
-										},
-										children = 'Upcoming',
-									},
-									HtmlWidgets.Div{
-										classes = {'switch-pill-option', 'toggle-area-button'},
-										attributes = {
-											['data-toggle-area-btn'] = '2',
-											['data-switch-value'] = 'completed',
-										},
-										children = 'Completed',
-									},
-								},
-							},
-						},
-					},
+								children = callTemplate('recent'),
+							}
+						}
+					}
 				},
-			},
-			HtmlWidgets.Div{
-				classes = {'switch-toggle-container'},
-				css = {margin = '1rem 0'},
-				children = {
-					HtmlWidgets.Div{
-						classes = {'switch-toggle'},
-						attributes = {
-							['data-switch-group'] = 'countdown',
-							['data-store-value'] = 'true',
-						},
-						children = {
-							HtmlWidgets.Div{classes = {'switch-toggle-slider'}},
-						},
-					},
-					HtmlWidgets.Div{children = 'Show Countdown'},
-				},
-			},
-			HtmlWidgets.Div{
-				attributes = {
-					['data-toggle-area-content'] = '1',
-					['data-filter-expansion-template'] = buildTemplateExpansionString('upcoming'),
-					['data-filter-groups'] = filterText,
-				},
-				children = callTemplate('upcoming'),
-			},
-			HtmlWidgets.Div{
-				attributes = {
-					['data-toggle-area-content'] = '2',
-					['data-filter-expansion-template'] = buildTemplateExpansionString('recent'),
-					['data-filter-groups'] = filterText,
-				},
-				children = callTemplate('recent'),
-			},
+				switchGroup = 'matchFiler',
+				defaultActive = 1,
+			}
 		},
 	}
 end

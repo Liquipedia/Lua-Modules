@@ -1,23 +1,29 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
 -- page=Module:Infobox/Team/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
+
+local Class = Lua.import('Module:Class')
+local Variables = Lua.import('Module:Variables')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local Team = Lua.import('Module:Infobox/Team')
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local ACHIEVEMENTS_BASE_CONDITIONS = {
-	'[[liquipediatiertype::!Showmatch]]',
-	'[[liquipediatiertype::!Qualifier]]',
-	'([[liquipediatier::1]] OR [[liquipediatier::2]])',
-	'[[placement::1]]',
+	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Showmatch', 'Qualifier'}),
+	ConditionUtil.anyOf(ColumnName('liquipediatier'), {1, 2}),
+	ConditionNode(ColumnName('placement'), Comparator.eq, 1),
 }
 
 ---@class RainbowsixInfoboxTeam: InfoboxTeam
@@ -38,6 +44,16 @@ end
 ---@param args table
 function CustomTeam:defineCustomPageVariables(args)
 	Variables.varDefine('team_captain', args.captain)
+end
+
+---@return Widget?
+function CustomTeam:createBottomContent()
+	if not self.args.disbanded then
+		return UpcomingTournaments.team{
+			name = self.args.lpdbname or self.teamTemplate.templatename,
+			additionalConditions = ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Points')
+		}
+	end
 end
 
 return CustomTeam

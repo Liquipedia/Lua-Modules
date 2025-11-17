@@ -1,29 +1,28 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:PrizePool/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
-local LeagueIcon = require('Module:LeagueIcon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Logic = Lua.import('Module:Logic')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Currency = Lua.import('Module:Currency')
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Widgets = Lua.import('Module:Widget/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -129,12 +128,6 @@ BasePrizePool.config = {
 		default = '',
 		read = function(args)
 			return args.lpdb_prefix or Variables.varDefault('lpdb_prefix')
-		end
-	},
-	abbreviateTbd = {
-		default = true,
-		read = function(args)
-			return Logic.readBoolOrNil(args.abbreviateTbd)
 		end
 	},
 	fillPlaceRange = {
@@ -306,7 +299,7 @@ BasePrizePool.prizeTypes = {
 
 		header = 'points',
 		headerParse = function (prizePool, input, context, index)
-			local pointsData = Table.copy(mw.loadData('Module:Points/data')[input] or {})
+			local pointsData = Table.copy(Lua.import('Module:Points/data', {loadData = true})[input] or {})
 			pointsData.title = pointsData.title or 'Points'
 
 			-- Manual overrides
@@ -329,7 +322,7 @@ BasePrizePool.prizeTypes = {
 			if String.isNotEmpty(data.title) then
 				local text
 				if String.isNotEmpty(data.titleLong) then
-					text = Abbreviation.make(data.title, data.titleLong)
+					text = Abbreviation.make{text = data.title, title = data.titleLong}
 				elseif String.isNotEmpty(data.title) then
 					text = data.title
 				end
@@ -677,7 +670,6 @@ function BasePrizePool:_buildRows()
 			local opponentDisplay = tostring(OpponentDisplay.BlockOpponent{
 				opponent = opponent.opponentData,
 				showPlayerTeam = true,
-				abbreviateTbd = self.options.abbreviateTbd,
 			})
 			local opponentCss = {['justify-content'] = 'start'}
 
@@ -717,7 +709,7 @@ end
 
 ---@return string
 function BasePrizePool:_getPrizeSummaryText()
-	local tba = Abbreviation.make('TBA', 'To Be Announced')
+	local tba = Abbreviation.make{text = 'TBA', title = 'To Be Announced'}
 	local tournamentCurrency = Variables.varDefault('tournament_currency')
 	local baseMoneyRaw = Variables.varDefault('tournament_prizepool' .. BASE_CURRENCY:lower(), tba)
 	local baseMoneyDisplay = Currency.display(BASE_CURRENCY, baseMoneyRaw, {formatValue = true})
@@ -743,7 +735,8 @@ end
 function BasePrizePool:_currencyExchangeInfo()
 	if self.usedAutoConvertedCurrency then
 		local currencyText = Currency.display(BASE_CURRENCY)
-		local exchangeProvider = Abbreviation.make('exchange rate', Variables.varDefault('tournament_currency_text'))
+		local exchangeProvider = Abbreviation.make{text = 'exchange rate',
+			title = Variables.varDefault('tournament_currency_text')}
 
 		if not exchangeProvider then
 			return
@@ -881,6 +874,10 @@ function BasePrizePool:storeData()
 		Array.extendWith(lpdbData, lpdbEntries)
 	end
 
+	if self.options.storeLpdb then
+		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(lpdbData))
+	end
+
 	for _, lpdbEntry in ipairs(lpdbData) do
 		lpdbEntry = Json.stringifySubTables(lpdbEntry)
 		local objectName = Table.extract(lpdbEntry, 'objectName')
@@ -890,10 +887,6 @@ function BasePrizePool:storeData()
 		end
 
 		Variables.varDefine(objectName .. '_placementdate', lpdbEntry.date)
-	end
-
-	if self.options.storeLpdb then
-		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(lpdbData))
 	end
 
 	return self

@@ -1,13 +1,12 @@
 ---
 -- @Liquipedia
--- wiki=fighters
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 return {
-	startYear = 1996,
+	startYear = 1991,
 	wikiName = 'fighters',
 	name = 'Fighting Games',
 	defaultGame = 'fighters',
@@ -64,6 +63,32 @@ return {
 				lightMode = 'ABK Ausf Achse Logo.png',
 			},
 		},
+		ah = {
+			abbreviation = 'AH',
+			name = 'Arcana Heart',
+			link = 'Arcana Heart',
+			logo = {
+				darkMode = 'Arcana Heart allmode.png',
+				lightMode = 'Arcana Heart allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Arcana Heart allmode.png',
+				lightMode = 'Arcana Heart allmode.png',
+			},
+		},
+		ah2 = {
+			abbreviation = 'AH2',
+			name = 'Arcana Heart 2',
+			link = 'Arcana Heart 2',
+			logo = {
+				darkMode = 'Arcana Heart 2 allmode.png',
+				lightMode = 'Arcana Heart 2 allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Arcana Heart 2 allmode.png',
+				lightMode = 'Arcana Heart 2 allmode.png',
+			},
+		},
 		ah3 = {
 			abbreviation = 'AH3',
 			name = 'Arcana Heart 3',
@@ -90,6 +115,19 @@ return {
 				lightMode = 'AH3 Xtend Logo.png',
 			},
 		},
+		aadm = {
+			abbreviation = 'AADM',
+			name = 'Aquapazza: Aquaplus Dream Match',
+			link = 'Aquapazza: Aquaplus Dream Match',
+			logo = {
+				darkMode = 'Aquapazza Aquaplus Dream Match allmode.png',
+				lightMode = 'Aquapazza Aquaplus Dream Match allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Aquapazza Aquaplus Dream Match allmode.png',
+				lightMode = 'Aquapazza Aquaplus Dream Match allmode.png',
+			},
+		},
 		arms = {
 			abbreviation = 'ARMS',
 			name = 'ARMS',
@@ -101,6 +139,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'ARMS default allmode.png',
 				lightMode = 'ARMS default allmode.png',
+			},
+		},
+		aof3 = {
+			abbreviation = 'AOF3',
+			name = 'Art of Fighting 3',
+			link = 'Art of Fighting 3',
+			logo = {
+				darkMode = 'Art of Fighting 3 allmode.png',
+				lightMode = 'Art of Fighting 3 allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Art of Fighting 3 allmode.png',
+				lightMode = 'Art of Fighting 3 allmode.png',
 			},
 		},
 		bbcf = {
@@ -218,6 +269,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'Bloody Roar Extreme logo.png',
 				lightMode = 'Bloody Roar Extreme logo.png',
+			},
+		},
+		cfj = {
+			abbreviation = 'CFJ',
+			name = 'Capcom Fighting Jam',
+			link = 'Capcom Fighting Jam',
+			logo = {
+				darkMode = 'Capcom Fighting Jam allmode.png',
+				lightMode = 'Capcom Fighting Jam allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Capcom Fighting Jam allmode.png',
+				lightMode = 'Capcom Fighting Jam allmode.png',
 			},
 		},
 		cotw = {
@@ -376,6 +440,19 @@ return {
 				lightMode = 'Eternal Fighter Zero Logo.png',
 			},
 		},
+		fateuc = {
+			abbreviation = 'FateUC',
+			name = 'Fate Unlimited Codes',
+			link = 'Fate Unlimited Codes',
+			logo = {
+				darkMode = 'Fate Unlimited Codes allmode.png',
+				lightMode = 'Fate Unlimited Codes allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Fate Unlimited Codes allmode.png',
+				lightMode = 'Fate Unlimited Codes allmode.png',
+			},
+		},
 		fexl = {
 			abbreviation = 'FEXL',
 			name = 'Fighting EX Layer',
@@ -521,6 +598,19 @@ return {
 		},
 		ggxrd = {
 			abbreviation = 'GG XRD',
+			name = 'Guilty Gear Xrd',
+			link = 'Guilty Gear Xrd',
+			logo = {
+				darkMode = 'GGXrdSign Logo.png',
+				lightMode = 'GGXrdSign Logo.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'GGXrdSign Logo.png',
+				lightMode = 'GGXrdSign Logo.png',
+			},
+		},
+		ggxrds = {
+			abbreviation = 'GG XRD S',
 			name = 'Guilty Gear Xrd -SIGN-',
 			link = 'Guilty Gear Xrd -SIGN-',
 			logo = {
@@ -621,6 +711,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'HSFII Logo.png',
 				lightMode = 'HSFII Logo.png',
+			},
+		},
+		hxhni = {
+			abbreviation = 'HxHNI',
+			name = 'HUNTER×HUNTER NEN×IMPACT',
+			link = 'HUNTER×HUNTER NEN×IMPACT',
+			logo = {
+				darkMode = 'HxHNI allmode.png',
+				lightMode = 'HxHNI allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'HxHNI allmode.png',
+				lightMode = 'HxHNI allmode.png',
 			},
 		},
 		igau = {
@@ -766,6 +869,58 @@ return {
 				lightMode = 'KOF 2002 default allmode.png',
 			},
 		},
+		kof2003 = {
+			abbreviation = 'KOF03',
+			name = 'The King of Fighters 2003',
+			link = 'The King of Fighters 2003',
+			logo = {
+				darkMode = 'KoF2003 allmode.png',
+				lightMode = 'KoF2003 allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'KoF2003 allmode.png',
+				lightMode = 'KoF2003 allmode.png',
+			},
+		},
+		kofnw = {
+			abbreviation = 'KOF NW',
+			name = 'The King of Fighters Neowave',
+			link = 'The King of Fighters Neowave',
+			logo = {
+				darkMode = 'The King of Fighters Neowave allmode.png',
+				lightMode = 'The King of Fighters Neowave allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'The King of Fighters Neowave allmode.png',
+				lightMode = 'The King of Fighters Neowave allmode.png',
+			},
+		},
+		kofxi = {
+			abbreviation = 'KOF XI',
+			name = 'The King of Fighters XI',
+			link = 'The King of Fighters XI',
+			logo = {
+				darkMode = 'The King of Fighters XI allmode.png',
+				lightMode = 'The King of Fighters XI allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'The King of Fighters XI allmode.png',
+				lightMode = 'The King of Fighters XI allmode.png',
+			},
+		},
+		kofxii = {
+			abbreviation = 'KOF XII',
+			name = 'The King of Fighters XII',
+			link = 'The King of Fighters XII',
+			logo = {
+				darkMode = 'The King of Fighters XII allmode.png',
+				lightMode = 'The King of Fighters XII allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'The King of Fighters XII allmode.png',
+				lightMode = 'The King of Fighters XII allmode.png',
+			},
+		},
 		kofxiii = {
 			abbreviation = 'KOF XIII',
 			name = 'The King of Fighters XIII',
@@ -844,6 +999,19 @@ return {
 				lightMode = 'Million Arthur Arcana Blood Logo.png',
 			},
 		},
+		mbac = {
+			abbreviation = 'MBAC',
+			name = 'Melty Blood: Act Cadenza',
+			link = 'Melty Blood: Act Cadenza',
+			logo = {
+				darkMode = 'Melty Blood Act Cadenza allmode.png',
+				lightMode = 'Melty Blood Act Cadenza allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Melty Blood Act Cadenza allmode.png',
+				lightMode = 'Melty Blood Act Cadenza allmode.png',
+			},
+		},
 		mbaa = {
 			abbreviation = 'MBAA',
 			name = 'Melty Blood: Actress Again',
@@ -881,6 +1049,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'Melty Blood Type Lumina Logo.png',
 				lightMode = 'Melty Blood Type Lumina Logo.png',
+			},
+		},
+		mk3 = {
+			abbreviation = 'MK3',
+			name = 'Mortal Kombat 3',
+			link = 'Mortal Kombat 3',
+			logo = {
+				darkMode = 'Mortal Kombat 3 default allmode.png',
+				lightMode = 'Mortal Kombat 3 default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Mortal Kombat 3 default allmode.png',
+				lightMode = 'Mortal Kombat 3 default allmode.png',
 			},
 		},
 		mk9 = {
@@ -985,6 +1166,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'MVCI Logo.png',
 				lightMode = 'MVCI Logo.png',
+			},
+		},
+		ngbc = {
+			abbreviation = 'NGBC',
+			name = 'Neo Geo Battle Coliseum',
+			link = 'Neo Geo Battle Coliseum',
+			logo = {
+				darkMode = 'Neo Geo Battle Coliseum allmode.png',
+				lightMode = 'Neo Geo Battle Coliseum allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Neo Geo Battle Coliseum allmode.png',
+				lightMode = 'Neo Geo Battle Coliseum allmode.png',
 			},
 		},
 		p4a = {
@@ -1104,6 +1298,19 @@ return {
 				lightMode = 'Samurai Shodown II Logo.png',
 			},
 		},
+		ssv = {
+			abbreviation = 'SSV',
+			name = 'Samurai Shodown V',
+			link = 'Samurai Shodown V',
+			logo = {
+				darkMode = 'Samurai Shodown V allmode.png',
+				lightMode = 'Samurai Shodown V allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Samurai Shodown V allmode.png',
+				lightMode = 'Samurai Shodown V allmode.png',
+			},
+		},
 		ssvs = {
 			abbreviation = 'SSVS',
 			name = 'Samurai Shodown V Special',
@@ -1115,6 +1322,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'Samurai Shodown V Special Logo.png',
 				lightMode = 'Samurai Shodown V Special Logo.png',
+			},
+		},
+		ssvi = {
+			abbreviation = 'SSVI',
+			name = 'Samurai Shodown VI',
+			link = 'Samurai Shodown VI',
+			logo = {
+				darkMode = 'Samurai Shodown VI allmode.png',
+				lightMode = 'Samurai Shodown VI allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Samurai Shodown VI allmode.png',
+				lightMode = 'Samurai Shodown VI allmode.png',
 			},
 		},
 		ss2019 = {
@@ -1130,6 +1350,19 @@ return {
 				lightMode = 'Samurai Shodown 2019 default allmode.png',
 			},
 		},
+		sbx = {
+			abbreviation = 'SBX',
+			name = 'Sengoku Basara X',
+			link = 'Sengoku Basara X',
+			logo = {
+				darkMode = 'Sengoku Basara X allmode.png',
+				lightMode = 'Sengoku Basara X allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Sengoku Basara X allmode.png',
+				lightMode = 'Sengoku Basara X allmode.png',
+			},
+		},
 		scii = {
 			abbreviation = 'SCII',
 			name = 'Soulcalibur II',
@@ -1141,6 +1374,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'SCII Logo.png',
 				lightMode = 'SCII Logo.png',
+			},
+		},
+		sciii = {
+			abbreviation = 'SCIII',
+			name = 'Soulcalibur III',
+			link = 'Soulcalibur III',
+			logo = {
+				darkMode = 'SoulCalibur III allmode.png',
+				lightMode = 'SoulCalibur III allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'SoulCalibur III allmode.png',
+				lightMode = 'SoulCalibur III allmode.png',
 			},
 		},
 		sciv = {
@@ -1663,6 +1909,19 @@ return {
 				lightMode = 'Under Night In-Birth II allmode.png',
 			},
 		},
+		xvsf = {
+			abbreviation = 'XVSF',
+			name = 'X-Men vs. Street Fighter',
+			link = 'X-Men vs. Street Fighter',
+			logo = {
+				darkMode = 'X-Men vs. Street Fighter allmode.png',
+				lightMode = 'X-Men vs. Street Fighter allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'X-Men vs. Street Fighter allmode.png',
+				lightMode = 'X-Men vs. Street Fighter allmode.png',
+			},
+		},
 		['project l'] = {
 			abbreviation = 'Project L',
 			name = 'Project L',
@@ -1699,6 +1958,14 @@ return {
 		match2 = {
 			status = 1,
 		},
+		teamRosterNavbox = {
+			hideOrg = true,
+			hideOverview = true,
+		},
+		infoboxPlayer = {
+			automatedHistory = {
+				storeFromWikiCode = true,
+			},
+		},
 	},
-	opponentLibrary = 'Opponent/Custom',
 }

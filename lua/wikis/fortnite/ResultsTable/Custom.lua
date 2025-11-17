@@ -1,22 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=fortnite
 -- page=Module:ResultsTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local ResultsTable = Lua.import('Module:ResultsTable')
 local AwardsTable = Lua.import('Module:ResultsTable/Award')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local CustomResultsTable = {}
 
@@ -61,11 +60,11 @@ function CustomResultsTable:processVsData(placement)
 	local lastVs = placement.lastvsdata
 
 	if String.isNotEmpty(lastVs.groupscore) then
-		return placement.groupscore, Abbreviation.make('Grp S.', 'Group Stage')
+		return placement.groupscore, Abbreviation.make{text = 'Grp S.', title = 'Group Stage'}
 	end
 
 	-- return empty strings for non group scores since it is a BattleRoyale wiki
 	return '', ''
 end
 
-return Class.export(CustomResultsTable)
+return Class.export(CustomResultsTable, {exports = {'results', 'awards'}})

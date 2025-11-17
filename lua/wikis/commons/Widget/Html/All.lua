@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Html/All
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,10 +7,11 @@
 
 local Widgets = {}
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
 
 local Widget = Lua.import('Module:Widget')
 

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=omegastrikers
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -38,6 +37,12 @@ return {
 		},
 		transfers = {
 			showTeamName = true,
+		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'automatic',
+			},
 		},
 	},
 }

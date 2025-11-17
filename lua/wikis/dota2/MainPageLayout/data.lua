@@ -1,17 +1,18 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
-local Template = require('Module:Template')
+
+local DateExt = Lua.import('Module:Date/Ext')
+local Template = Lua.import('Module:Template')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+-- local Rankings = Lua.import('Module:Widget/Ratings')
 
 local Button = Lua.import('Module:Widget/Basic/Button')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -20,6 +21,7 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
+local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local ABOUT_HEADING = 'About Liquipedia\'s Dota 2 Wiki'
@@ -30,47 +32,27 @@ local ABOUT_BODY = 'We are the largest Dota 2 wiki that anyone can edit, maintai
 
 ---@param link string
 ---@param displayName string
+---@param hubIcon string
 ---@return Widget
-local function createHubButton(link, displayName)
+local function createHubButton(link, displayName, hubIcon)
 	return Button{
 		link = link,
 		title = 'Click here to get to the ' .. displayName:lower(),
-		variant = 'secondary',
+		variant = 'tertiary',
 		children = {
 			IconFa{
-				additionalClasses = { 'wiki-color-dark' },
-				iconName = 'hub'
+				iconName = hubIcon,
 			},
 			' View ' .. displayName
 		}
 	}
 end
 
-local MAIN_PAGE_BUTTON = createHubButton('Main Page', 'Main Page')
-local ESPORTS_HUB_BUTTON = createHubButton('Portal:Esports', 'Esports Hub')
-local GAME_HUB_BUTTON = createHubButton('Portal:Game', 'Game Hub')
+local MAIN_PAGE_BUTTON = createHubButton('Main Page', 'Main Page', 'main_hub')
+local ESPORTS_HUB_BUTTON = createHubButton('Portal:Esports', 'Esports Hub', 'esports_hub')
+local GAME_HUB_BUTTON = createHubButton('Portal:Game', 'Game Hub', 'game_hub')
 
 local CONTENT = {
-	aboutMain = {
-		heading = ABOUT_HEADING,
-		body = WidgetUtil.collect(
-			ABOUT_BODY,
-			Div{
-				css = {
-					display = 'flex',
-					['flex-wrap'] = 'wrap',
-					gap = '12px',
-					['justify-content'] = 'center',
-					['padding-top'] = '12px'
-				},
-				children = {
-					ESPORTS_HUB_BUTTON, GAME_HUB_BUTTON
-				}
-			}
-		),
-		padding = true,
-		boxid = 1500,
-	},
 	aboutEsport = {
 		heading = ABOUT_HEADING,
 		body = WidgetUtil.collect(
@@ -113,11 +95,7 @@ local CONTENT = {
 	},
 	heroes = {
 		heading = 'Heroes',
-		body = Div{
-			classes = { 'heroes-panel' },
-			attributes = { ['data-component'] = 'heroes-panel' },
-			children = { Template.safeExpand(mw.getCurrentFrame(), 'HeroTable') }
-		},
+		body = Template.safeExpand(mw.getCurrentFrame(), 'HeroTable'),
 		padding = true,
 		boxid = 1501,
 	},
@@ -135,16 +113,15 @@ local CONTENT = {
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
-		body = '{{Liquipedia:Want_to_help}}',
+		body = WantToHelp{},
 		padding = true,
 		boxid = 1504,
 	},
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferPage = function ()
-				return 'Transfers/' .. os.date('%Y') .. '/' .. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
-			end
+			transferPage = 'Transfers/' .. DateExt.getYearOf() .. '/' ..
+				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 		},
 		boxid = 1509,
 	},
@@ -171,9 +148,6 @@ local CONTENT = {
 		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
-		panelAttributes = {
-			['data-switch-group-container'] = 'countdown',
-		},
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -184,43 +158,41 @@ local CONTENT = {
 		padding = true,
 		boxid = 1508,
 	},
+--[[
+	rankings = {
+		heading = 'Liquipedia Rankings (Beta)',
+		body = Rankings{
+			teamLimit = 5,
+			storageType = 'extension',
+			showGraph = false,
+			isSmallerVersion = true
+		},
+		padding = false,
+		boxid = 1520,
+	},
+]]
 }
 
 local LAYOUT_MAIN = {
-	{ -- Left
-		size = 6,
+	{ -- Top Left
+		sizes = {xxl = 5, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 1,
-				content = CONTENT.aboutMain,
+				content = CONTENT.specialEvents
 			},
+
 			{
-				mobileOrder = 4,
-				content = CONTENT.heroes,
-			},
-			{
-				mobileOrder = 5,
-				content = CONTENT.updates,
-			},
-			{
-				mobileOrder = 9,
-				content = CONTENT.usefulArticles,
-			},
-			{
-				mobileOrder = 7,
-				content = CONTENT.wantToHelp,
+				mobileOrder = 3,
+				content = CONTENT.transfers,
 			},
 		},
 	},
-	{ -- Right
-		size = 6,
+	{ -- Top Right
+		sizes = {xxl = 7, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 2,
-				content = CONTENT.specialEvents
-			},
-			{
-				mobileOrder = 3,
 				children = {
 					{
 						children = {
@@ -250,16 +222,49 @@ local LAYOUT_MAIN = {
 					},
 				},
 			},
-			{
-				mobileOrder = 6,
-				content = CONTENT.transfers,
-			},
-			{
-				mobileOrder = 9,
-				content = CONTENT.thisDay,
-			},
 		},
 	},
+	{ -- Heroes
+		sizes = {xxl = 12},
+		children = {
+			{
+				mobileOrder = 4,
+				content = CONTENT.heroes,
+			},
+		}
+	},
+	{ -- Bottom Left
+		sizes = {xxl = 6},
+		children = {
+			{
+				mobileOrder = 5,
+				content = CONTENT.wantToHelp,
+			},
+			{
+				mobileOrder = 6,
+				content = CONTENT.updates,
+			},
+
+		}
+	},
+	{ -- Bottom Right
+		sizes = {xxl = 6},
+		children = {
+			{
+				mobileOrder = 7,
+				content = CONTENT.thisDay,
+			},
+		}
+	},
+	{ -- Useful articles
+		sizes = {xxl = 12},
+		children = {
+			{
+				mobileOrder = 8,
+				content = CONTENT.usefulArticles,
+			},
+		}
+	}
 }
 
 local LAYOUT_ESPORTS = {
@@ -275,15 +280,15 @@ local LAYOUT_ESPORTS = {
 				content = CONTENT.specialEvents,
 			},
 			{
-				mobileOrder = 4,
+				mobileOrder = 5,
 				content = CONTENT.transfers,
 			},
 			{
-				mobileOrder = 6,
+				mobileOrder = 7,
 				content = CONTENT.thisDay,
 			},
 			{
-				mobileOrder = 7,
+				mobileOrder = 8,
 				content = CONTENT.wantToHelp,
 			},
 		}
@@ -322,8 +327,14 @@ local LAYOUT_ESPORTS = {
 					},
 				},
 			},
+--[[
 			{
-				mobileOrder = 5,
+				mobileOrder = 6,
+				content = CONTENT.rankings
+			},
+]]
+			{
+				mobileOrder = 7,
 				content = CONTENT.updates,
 			},
 		},

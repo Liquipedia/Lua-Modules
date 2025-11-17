@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:YearsActive/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,16 +7,18 @@
 
 local ActiveYears = {}
 
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Info = mw.loadData('Module:Info')
-local Logic = require('Module:Logic')
-local Lpdb = require('Module:Lpdb')
-local Set = require('Module:Set')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
 
-local Condition = require('Module:Condition')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Set = Lua.import('Module:Set')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -26,10 +27,6 @@ local ColumnName = Condition.ColumnName
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
--- overwritable per wiki
-ActiveYears.startYear = Info.startYear
-ActiveYears.defaultNumberOfStoredPlayersPerPlacement = 10
-ActiveYears.additionalConditions = ''
 ActiveYears.noResultsText = 'Player has no results.'
 
 ---
@@ -39,6 +36,8 @@ ActiveYears.noResultsText = 'Player has no results.'
 -- @noRedirect - (optional) player redirects get not resolved before query
 -- @prefix - (optional) the prefix under which the players are stored in the placements
 -- @playerPositionLimit - (optional) the number for how many params the query should look in LPDB
+---@param args {player: string, mode: string?, noRedirect: boolean?, prefix: string?, playerPositionLimit: integer?}
+---@return string
 function ActiveYears.display(args)
 	args = args or {}
 	local player = args.player
@@ -58,7 +57,7 @@ function ActiveYears.display(args)
 
 	local prefix = args.prefix or 'p'
 
-	local playerPositionLimit = tonumber(args.playerPositionLimit) or ActiveYears.defaultNumberOfStoredPlayersPerPlacement
+	local playerPositionLimit = tonumber(args.playerPositionLimit) or Info.config.defaultMaxPlayersPerPlacement or 10
 	if playerPositionLimit <=0 then
 		error('"playerPositionLimit" has to be >= 1')
 	end
@@ -69,6 +68,12 @@ function ActiveYears.display(args)
 	return ActiveYears._calculate(conditions)
 end
 
+---@param player string
+---@param playerAsPageName string
+---@param playerPositionLimit integer
+---@param prefix string
+---@param mode string?
+---@return string
 function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLimit, prefix, mode)
 	local playerConditionTree = ConditionTree(BooleanOperator.any)
 	if prefix == 'p' then
@@ -87,7 +92,7 @@ function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLi
 	local conditionTree = ConditionTree(BooleanOperator.all):add({
 		playerConditionTree,
 		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
-		ConditionNode(ColumnName('date_year'), Comparator.ge, ActiveYears.startYear),
+		ConditionNode(ColumnName('date_year'), Comparator.ge, Info.startYear),
 	})
 
 	if String.isNotEmpty(mode) then
@@ -96,9 +101,11 @@ function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLi
 		})
 	end
 
-	return conditionTree:toString() .. ActiveYears.additionalConditions
+	return conditionTree:toString()
 end
 
+---@param conditions string
+---@return string
 function ActiveYears._calculate(conditions)
 	-- Get years
 	local years = ActiveYears._getYears(conditions)
@@ -109,6 +116,8 @@ function ActiveYears._calculate(conditions)
 	return ActiveYears.displayYears(years)
 end
 
+---@param years integer[]
+---@return string
 function ActiveYears.displayYears(years)
 	-- Sort years chronologically
 	table.sort(years)
@@ -120,6 +129,8 @@ function ActiveYears.displayYears(years)
 	return output
 end
 
+---@param conditions string
+---@return integer[]
 function ActiveYears._getYears(conditions)
 	local years = Set{}
 	local checkYear = function(placement)
@@ -137,6 +148,8 @@ function ActiveYears._getYears(conditions)
 	return years:toArray()
 end
 
+---@param sortedYears integer[]
+---@return string[]
 function ActiveYears._groupYears(sortedYears)
 	if Logic.isEmpty(sortedYears) then return {} end
 
@@ -164,6 +177,10 @@ function ActiveYears._groupYears(sortedYears)
 	return yearRanges
 end
 
+---@param startYear integer
+---@param endYear integer
+---@param yearRanges string[]
+---@return string[]
 function ActiveYears._insertYears(startYear, endYear, yearRanges)
 	if startYear == endYear then
 		table.insert(yearRanges, tostring(startYear))
@@ -174,4 +191,4 @@ function ActiveYears._insertYears(startYear, endYear, yearRanges)
 	return yearRanges
 end
 
-return Class.export(ActiveYears)
+return Class.export(ActiveYears, {exports = {'display'}})

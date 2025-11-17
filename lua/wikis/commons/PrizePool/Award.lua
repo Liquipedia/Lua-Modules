@@ -1,24 +1,25 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:PrizePool/Award
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local String = Lua.import('Module:StringUtils')
 
 local BasePrizePool = Lua.import('Module:PrizePool/Base')
 local Placement = Lua.import('Module:PrizePool/Award/Placement')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
+local Div = Widgets.Div
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local TableRow = Widgets.TableRow
 local TableCell = Widgets.TableCell
 
@@ -87,11 +88,17 @@ end
 ---@return WidgetTableRow
 function AwardPrizePool:_toggleExpand()
 	local expandButton = TableCell{
-		children = {'<div>Show more Awards&nbsp;<i class="fa fa-chevron-down"></i></div>'},
+		children = Div{children = {
+			'Show more Awards&nbsp;',
+			IconFa{iconName = 'expand'},
+		}},
 		classes = {'general-collapsible-expand-button'},
 	}
 	local collapseButton = TableCell{
-		children = {'<div>Show less Awards&nbsp;<i class="fa fa-chevron-up"></i></div>'},
+		children = Div{children = {
+			'Show less Awards&nbsp;',
+			IconFa{iconName = 'collapse'},
+		}},
 		classes = {'general-collapsible-collapse-button'},
 	}
 

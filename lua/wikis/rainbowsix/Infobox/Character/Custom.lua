@@ -1,22 +1,24 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
 -- page=Module:Infobox/Character/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
-local Image = require('Module:Image')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
+local Image = Lua.import('Module:Image')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 
 local AgeCalculation = Lua.import('Module:AgeCalculation')
+local AutoInlineIcon = Lua.import('Module:AutoInlineIcon')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local NameAliases = Lua.requireIfExists('Module:CharacterNames', {loadData = true})
+local Patch = Lua.import('Module:Patch')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
@@ -29,23 +31,6 @@ local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Title = Widgets.Title
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
----@param teamType 'atk'|'def'
----@param displayName 'Attack'|'Defense'
----@return Widget
-local function createTeamDisplayWidget(teamType, displayName)
-	return HtmlWidgets.Fragment{
-		children = {
-			IconImageWidget{
-				imageLight = 'R6S Para Bellum ' .. teamType .. ' logo.png',
-				link = '',
-				size = '14px'
-			},
-			' ',
-			displayName
-		}
-	}
-end
 
 ---@param label string
 ---@return Widget
@@ -67,8 +52,8 @@ end
 
 local STANDARD_EDITION_LABEL = createPriceLabel('SE')
 local SEASON_PASS_LABEL = createPriceLabel('SP')
-local TEAM_ATTACK = createTeamDisplayWidget('atk','Attack')
-local TEAM_DEFENSE = createTeamDisplayWidget('def', 'Defense')
+local TEAM_ATTACK = AutoInlineIcon.display{category = 'M', lookup = 'attackTeam'}
+local TEAM_DEFENSE = AutoInlineIcon.display{category = 'M', lookup = 'defenseTeam'}
 
 local OPERATOR_PRICES = {
 	launch = {
@@ -154,7 +139,7 @@ function CustomInjector:parse(id, widgets)
 		})
 
 		return ageCalculationSuccess and {
-			Cell{name = 'Born', content = {age.birth}},
+			Cell{name = 'Born', children = {age.birth}},
 		} or {}
 	elseif id == 'role' then
 		return WidgetUtil.collect(
@@ -164,7 +149,7 @@ function CustomInjector:parse(id, widgets)
 			},
 			Cell{
 				name = 'Operator Role',
-				content = Array.map(
+				children = Array.map(
 					self.caller:getAllArgsForBase(args, 'function'),
 					function (role)
 						return Link{
@@ -179,31 +164,27 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Team Rainbow',
-				content = self.caller:_getTeamRainbow(args),
+				children = self.caller:_getTeamRainbow(args),
 				options = { separator = ' ' }
 			},
 			Cell{
 				name = 'Affiliation',
-				content = { args.affiliation }
+				children = { args.affiliation }
 			}
 		}
 	elseif id == 'release' then
 		if Logic.isEmpty(args.releasedate) then
 			return {}
 		end
-		local patchData = mw.ext.LiquipediaDB.lpdb('datapoint', {
-			conditions = '[[type::patch]] AND [[date::' .. args.releasedate .. ']]',
-			query = 'name, pagename, date',
-			limit = 1
-		})[1]
+		local patchData = Patch.getPatchByDate(args.releasedate) or {}
 
 		return {
 			Cell{
 				name = 'Released',
-				content = WidgetUtil.collect(
+				children = WidgetUtil.collect(
 					Logic.isNotEmpty(patchData) and Link{
-						link = patchData.pagename,
-						children = patchData.name
+						link = patchData.pageName,
+						children = patchData.displayName
 					} or 'Launch',
 					HtmlWidgets.Small{
 						children = { args.releasedate }
@@ -221,6 +202,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param args table
 ---@return Widget[]
 function CustomCharacter:_getTeam(args)
 	local team = (args.team or ''):lower()
@@ -235,6 +217,7 @@ function CustomCharacter:_getTeam(args)
 	end
 end
 
+---@param args table
 ---@return (Widget|string)[]
 function CustomCharacter:_getTeamRainbow(args)
 	local teamRainbow = (args['team rainbow'] or ''):lower()
@@ -273,22 +256,22 @@ function CustomCharacter:_getAdditionalInfo(args)
 	return WidgetUtil.collect(
 		Logic.isNotEmpty(args.height) and Cell{
 			name = 'Height',
-			content = { args.height, 'm' },
+			children = { args.height, 'm' },
 			options = { separator = ' ' }
 		} or nil,
 		Logic.isNotEmpty(args.weight) and Cell{
 			name = 'Weight',
-			content = { args.weight, 'kg' },
+			children = { args.weight, 'kg' },
 			options = { separator = ' ' }
 		} or nil,
 		Logic.isNotEmpty(args.voice) and Cell{
 			name = 'Voiced by',
-			content = { args.voice }
+			children = { args.voice }
 		} or nil,
 		self:_getPriceCells(args.renownprice or args.creditprice),
 		Cell{
 			name = 'Has Elite Skin',
-			content = WidgetUtil.collect(
+			children = WidgetUtil.collect(
 				HtmlWidgets.Fragment{
 					children = Logic.readBool(args.eliteskin) and {
 						IconFa{ iconName = 'yes', color = 'forest-green-text' },
@@ -323,7 +306,7 @@ function CustomCharacter:_getAdditionalInfo(args)
 		},
 		Cell{
 			name = 'Availability',
-			content = { args.availability }
+			children = { args.availability }
 		}
 	)
 end
@@ -337,7 +320,7 @@ function CustomCharacter:_getPriceCells(input)
 		return {
 			Cell{
 				name = 'Renown price',
-				content = WidgetUtil.collect(
+				children = WidgetUtil.collect(
 					'Free',
 					Array.map({ 500, 1000, 1500, 2000 }, function (renownPrice)
 						return HtmlWidgets.Fragment{
@@ -375,7 +358,7 @@ function CustomCharacter:_getPriceCell(currency, price)
 	local lang = mw.getContentLanguage()
 	return Cell{
 		name = currency .. ' price',
-		content = {
+		children = {
 			lang:formatNum(price),
 			HtmlWidgets.Fragment{
 				children = {
@@ -429,7 +412,7 @@ end
 function CustomCharacter._generateStatCell(title, datatype, value, display)
 	return Cell{
 		name = title,
-		content = {
+		children = {
 			Image.display(
 				'R6S operator-rating-' .. datatype .. '-' ..  value .. ' lightmode.png',
 				'R6S operator-rating-' .. datatype .. '-' ..  value .. ' darkmode.png',

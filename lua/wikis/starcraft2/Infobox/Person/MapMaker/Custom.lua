@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:Infobox/Person/MapMaker/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local CustomPerson = Lua.import('Module:Infobox/Person/Custom')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -39,13 +39,13 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		return {
-			Cell{name = 'Military Service', content = {args.military}},
+			Cell{name = 'Military Service', children = {args.military}},
 		}
 	elseif id == 'status' then
 		return {
 			Cell{
 				name = 'Race',
-				content = {self.caller:getRaceData(args.race or 'unknown')}
+				children = {self.caller:getRaceData(args.race)}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -54,8 +54,8 @@ function CustomInjector:parse(id, widgets)
 		if String.isNotEmpty(args.maps_ladder) or String.isNotEmpty(args.maps_special) then
 			return {
 				Title{children = 'Achievements'},
-				Cell{name = 'Ladder maps created', content = {args.maps_ladder}},
-				Cell{name = 'Non-ladder competitive maps created', content = {args.maps_special}}
+				Cell{name = 'Ladder maps created', children = {args.maps_ladder}},
+				Cell{name = 'Non-ladder competitive maps created', children = {args.maps_special}}
 			}
 		end
 		return {}
@@ -65,7 +65,7 @@ function CustomInjector:parse(id, widgets)
 	then
 		table.insert(widgets, Cell{
 				name = 'Retired',
-				content = {args.retired}
+				children = {args.retired}
 			})
 	end
 	return widgets

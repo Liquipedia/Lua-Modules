@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=arenafps
 -- page=Module:MatchGroup/Legacy/Default
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 
@@ -29,8 +29,19 @@ function MatchGroupLegacyDefault:getMap()
 end
 
 ---@param frame Frame
+---@return string
 function MatchGroupLegacyDefault.run(frame)
 	return MatchGroupLegacyDefault(frame):build()
+end
+
+---@param frame Frame
+---@return string
+function MatchGroupLegacyDefault.runGenerate(frame)
+	frame.args.template = frame.args[1]
+	frame.args.templateOld = frame.args[2]
+	frame.args.type = frame.args.type or 'team'
+
+	return MatchGroupLegacyDefault(frame):generate()
 end
 
 return MatchGroupLegacyDefault

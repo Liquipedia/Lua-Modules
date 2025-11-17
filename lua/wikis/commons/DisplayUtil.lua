@@ -1,16 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:DisplayUtil
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local FeatureFlag = require('Module:FeatureFlag')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
-local TypeUtil = require('Module:TypeUtil')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local FeatureFlag = Lua.import('Module:FeatureFlag')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local TypeUtil = Lua.import('Module:TypeUtil')
 
 local DisplayUtil = {propTypes = {}, types = {}}
 
@@ -82,6 +83,18 @@ function DisplayUtil.applyOverflowStyles(node, mode)
 		:css('text-overflow', mode == 'ellipsis' and 'ellipsis' or nil)
 		:css('white-space', (mode == 'ellipsis' or mode == 'hidden') and 'pre' or 'normal')
 end
+
+---Returns the css properties for each overflow behavior. Mode can be 'ellipsis', 'wrap', or 'hidden'.
+---@param mode OverflowModes
+---@return table<string, string?>
+DisplayUtil.getOverflowStyles = FnUtil.memoize(function(mode)
+	return {
+		['overflow'] = (mode == 'ellipsis' or mode == 'hidden') and 'hidden' or nil,
+		['overflow-wrap'] = mode == 'wrap' and 'break-word' or nil,
+		['text-overflow'] = mode == 'ellipsis' and 'ellipsis' or nil,
+		['white-space'] = (mode == 'ellipsis' or mode == 'hidden') and 'pre' or 'normal',
+	}
+end)
 
 -- Whether a value is a mediawiki html node.
 local mwHtmlMetatable = FnUtil.memoize(function()

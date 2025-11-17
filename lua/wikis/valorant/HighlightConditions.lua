@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:HighlightConditions
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -13,7 +12,7 @@ local HighlightConditions = {}
 ---@param options table?
 ---@return boolean
 function HighlightConditions.tournament(data, options)
-	return (data.publishertier == 'highlighted')
+	return (data.publishertier or data.publisherTier) == 'highlighted'
 end
 
 return HighlightConditions

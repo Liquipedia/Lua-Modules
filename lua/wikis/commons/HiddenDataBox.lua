@@ -1,24 +1,25 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:HiddenDataBox
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Game = require('Module:Game')
-local Namespace = require('Module:Namespace')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TextSanitizer = require('Module:TextSanitizer')
-local Tier = require('Module:Tier/Custom')
-local Variables = require('Module:Variables')
-local WarningBox = require('Module:WarningBox')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Game = Lua.import('Module:Game')
+local Namespace = Lua.import('Module:Namespace')
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TextSanitizer = Lua.import('Module:TextSanitizer')
+local Tier = Lua.import('Module:Tier/Custom')
+local Variables = Lua.import('Module:Variables')
+
+local WarningBoxGroup = Lua.import('Module:Widget/WarningBox/Group')
 
 local HiddenDataBox = {}
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
@@ -28,12 +29,11 @@ local DEFAULT_TIER_TYPE = 'general'
 
 local Language = mw.getContentLanguage()
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 ---Entry point
 ---@param args table?
----@return Html
+---@return Widget
 function HiddenDataBox.run(args)
 	args = args or {}
 	local doQuery = not Logic.readBool(args.noQuery)
@@ -108,7 +108,7 @@ function HiddenDataBox.run(args)
 
 	HiddenDataBox.addCustomVariables(args, queryResult)
 
-	return WarningBox.displayAll(warnings)
+	return WarningBoxGroup{data = warnings}
 end
 
 ---Cleans date input
@@ -116,8 +116,8 @@ end
 ---@param secondaryDate string?
 ---@return string?
 function HiddenDataBox.cleanDate(primaryDate, secondaryDate)
-	return String.nilIfEmpty(ReferenceCleaner.clean(primaryDate)) or
-		String.nilIfEmpty(ReferenceCleaner.clean(secondaryDate))
+	return String.nilIfEmpty(ReferenceCleaner.clean{input = primaryDate}) or
+		String.nilIfEmpty(ReferenceCleaner.clean{input = secondaryDate})
 end
 
 ---Assigns the wiki Variables according to given input, wiki variable and queryResults
@@ -215,4 +215,4 @@ function HiddenDataBox.validateTier(tier, tierType)
 	return tierValue, tierTypeValue, warnings
 end
 
-return Class.export(HiddenDataBox)
+return Class.export(HiddenDataBox, {exports = {'run'}})

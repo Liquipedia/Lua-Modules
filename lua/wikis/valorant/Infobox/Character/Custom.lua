@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:Infobox/Character/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
@@ -18,8 +18,10 @@ local Builder = Widgets.Builder
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
----@class ValorantHeroInfobox: CharacterInfobox
+---@class ValorantAgentInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)
+---@class ValorantAgentInfoboxWidgetInjector: WidgetInjector
+---@field caller ValorantAgentInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -46,13 +48,13 @@ function CustomInjector:parse(id, widgets)
 					return {
 						Cell{
 							name = 'Abilities',
-							content = abilities,
+							children = abilities,
 						}
 					}
 				end
 			},
-			Cell{name = 'Signature Ability', content = {args.signature}},
-			Cell{name = 'Ultimate', content = {args.ultimate}}
+			Cell{name = 'Signature Ability', children = {args.signature}},
+			Cell{name = 'Ultimate', children = {args.ultimate}}
 		)
 	end
 

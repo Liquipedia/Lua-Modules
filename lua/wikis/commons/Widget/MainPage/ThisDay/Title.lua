@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/MainPage/ThisDay/Title
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Ordinal = require('Module:Ordinal')
-local String = require('Module:StringUtils')
+
+local Class = Lua.import('Module:Class')
+local Ordinal = Lua.import('Module:Ordinal')
+local String = Lua.import('Module:StringUtils')
 
 local Info = Lua.import('Module:Info', { loadData = true })
 

@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/MainPage/MatchTicker
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 
@@ -17,7 +17,7 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchTicker: Widget
----@field props { matchesPortal: string? }
+---@field props { matchesPortal: string?, displayGameIcons: boolean? }
 ---@operator call(table): MatchTicker
 local MatchTicker = Class.new(Widget)
 MatchTicker.defaultProps = {
@@ -27,7 +27,7 @@ MatchTicker.defaultProps = {
 ---@return Widget[]
 function MatchTicker:render()
 	return WidgetUtil.collect(
-		MatchTickerContainer{},
+		MatchTickerContainer{displayGameIcons = self.props.displayGameIcons},
 		HtmlWidgets.Div{
 			css = {
 				['white-space'] = 'nowrap',
