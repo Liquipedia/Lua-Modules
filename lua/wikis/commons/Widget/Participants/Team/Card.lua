@@ -62,9 +62,18 @@ function ParticipantsTeamCard:render()
 	local qualifierInfoHeader = TeamQualifierInfo{participant = participant, location = 'header'}
 	local qualifierInfoContent = TeamQualifierInfo{participant = participant, location = 'content'}
 
-	local content = {
-		qualifierInfoContent,
-	}
+	local content = {}
+
+	if participant.warnings then
+		Array.forEach(participant.warnings, function(warningText)
+			table.insert(content, ParticipantNotification{
+				text = warningText,
+				highlighted = true,
+			})
+		end)
+	end
+
+	table.insert(content, qualifierInfoContent)
 
 	if Opponent.isTbd(participant.opponent) then
 		table.insert(content, PotentialQualifiers{participant = participant})

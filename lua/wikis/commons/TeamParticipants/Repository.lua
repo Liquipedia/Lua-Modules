@@ -80,7 +80,7 @@ function TeamParticipantsRepository.save(participant)
 		local serializedQualifiers = Array.map(participant.potentialQualifiers, function(qualifierOpponent)
 			return Opponent.toLpdbStruct(qualifierOpponent)
 		end)
-		lpdbData.extradata.potentialQualifiers = Json.stringify(serializedQualifiers)
+		lpdbData.extradata.potentialQualifiers = serializedQualifiers
 	end
 
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(participant.opponent, {setPlayersInTeam = true}))

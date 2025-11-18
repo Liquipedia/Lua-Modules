@@ -19,7 +19,7 @@ local Tournament = Lua.import('Module:Tournament')
 local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
----qualification: QualificationStructure, potentialQualifiers: standardOpponent[]?}
+---qualification: QualificationStructure, potentialQualifiers: standardOpponent[]?, warnings: string[]?}
 
 ---@alias QualificationMethod 'invite'|'qual'
 ---@alias QualificationType 'tournament'|'external'|'other'
@@ -92,16 +92,22 @@ end
 function TeamParticipantsWikiParser.parseParticipant(input, date)
 	local potentialQualifiers = {}
 	local opponent
+	local warnings = {}
 
 	if input.contenders then
 		opponent = Opponent.tbd(Opponent.team)
 		local contenderNames = input.contenders
-		if type(contenderNames) == 'table' then
-			for _, name in ipairs(contenderNames) do
-				if type(name) == 'string' and name ~= '' then
-					table.insert(potentialQualifiers, Opponent.readOpponentArgs({type = Opponent.team, template = name}))
+
+		if type(contenderNames) ~= 'table' then
+			table.insert(warnings, 'Invalid contenders: expected a list of non-empty strings')
+		else
+			Array.forEach(contenderNames, function(name, idx)
+				if type(name) ~= 'string' or name == '' then
+					table.insert(warnings, string.format('Invalid contender entry at position %d: %s', idx, tostring(name)))
+					return
 				end
-			end
+				table.insert(potentialQualifiers, Opponent.readOpponentArgs({type = Opponent.team, template = name}))
+			end)
 		end
 	else
 		opponent = Opponent.readOpponentArgs(Table.merge(input, {
@@ -131,6 +137,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 			}
 		end),
 		potentialQualifiers = potentialQualifiers,
+		warnings = warnings,
 	}
 end
 
