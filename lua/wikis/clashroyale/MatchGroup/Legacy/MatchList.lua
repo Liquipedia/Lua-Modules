@@ -158,10 +158,15 @@ end
 -- invoked by Template:LegacyMatchList
 function LegacyMatchList.run(frame, generate)
 	local args = Arguments.getArgs(frame)
-	local store = Logic.nilOr(
-		Logic.readBoolOrNil(args.store),
-		not Logic.readBool(globalVars:get('disable_LPDB_storage'))
-	)
+	local store
+	if generate then
+		store = Logic.readBoolOrNil(args.store)
+	else
+		store = Logic.nilOr(
+			Logic.readBoolOrNil(args.store),
+			not Logic.readBool(globalVars:get('disable_LPDB_storage'))
+		)
+	end
 
 	local matches = Array.mapIndexes(function(matchIndex)
 		return args['match' .. matchIndex]
@@ -169,6 +174,11 @@ function LegacyMatchList.run(frame, generate)
 
 	---@type table
 	local matchListArgs = Table.copy(matches)
+	if generate then
+		matchListArgs = Table.map(matches, function(key, value)
+			return 'M' .. key, value
+		end)
+	end
 	matchListArgs.id = args.id
 	matchListArgs.isLegacy = true
 	matchListArgs.title = args.title or args[1] or 'Match List'
@@ -188,7 +198,7 @@ function LegacyMatchList.run(frame, generate)
 	end
 
 	if generate then
-		return MatchGroupLegacy.generateWikiCodeForMatchList(args)
+		return MatchGroupLegacy.generateWikiCodeForMatchList(matchListArgs)
 	end
 
 	return MatchGroup.MatchList(matchListArgs)
