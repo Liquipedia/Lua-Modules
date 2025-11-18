@@ -62,7 +62,6 @@ liquipedia.collapse = {
 	// Note that unlike .collapsible, the button is the anchor itself, instead
 	// of a wrapper around the anchor.
 	setupGeneralCollapsibleButtons: function() {
-
 		// Replaces the button (usually a <span>) with <a href="#">...</a>.
 		// For xss safety, only the child nodes and class name are copied over.
 		function replaceWithAnchor( button ) {
@@ -132,22 +131,14 @@ liquipedia.collapse = {
 					toggleGroup.classList.remove( 'toggle-state-hide' );
 					toggleGroup.classList.add( 'toggle-state-show' );
 					button.innerHTML = this.makeIcon( true ) + ' ' + showAllText;
-					toggleGroup.querySelectorAll( '.collapsible, .general-collapsible' ).forEach( ( collapsible ) => {
-						collapsible.classList.add( 'collapsed' );
-					} );
-					toggleGroup.querySelectorAll( '.brkts-matchlist-collapsible' ).forEach( ( collapsible ) => {
-						collapsible.classList.add( 'brkts-matchlist-collapsed' );
-					} );
+					this.updateCollapsibleElements( '.collapsible, .general-collapsible', true, toggleGroup );
+					this.updateCollapsibleElements( '.brkts-matchlist-collapsible', true, toggleGroup );
 				} else {
 					toggleGroup.classList.remove( 'toggle-state-show' );
 					toggleGroup.classList.add( 'toggle-state-hide' );
 					button.innerHTML = this.makeIcon( false ) + ' ' + hideAllText;
-					toggleGroup.querySelectorAll( '.collapsible, .general-collapsible' ).forEach( ( collapsible ) => {
-						collapsible.classList.remove( 'collapsed' );
-					} );
-					toggleGroup.querySelectorAll( '.brkts-matchlist-collapsible' ).forEach( ( collapsible ) => {
-						collapsible.classList.remove( 'brkts-matchlist-collapsed' );
-					} );
+					this.updateCollapsibleElements( '.collapsible, .general-collapsible', false, toggleGroup );
+					this.updateCollapsibleElements( '.brkts-matchlist-collapsible', false, toggleGroup );
 				}
 			};
 			toggleGroup.insertBefore( button, toggleGroup.firstChild );
@@ -209,10 +200,7 @@ liquipedia.collapse = {
 
 			liquipedia.switchButtons.getSwitchGroup( switchGroupName ).then( ( switchGroup ) => {
 				if ( switchGroup ) {
-					this.updateCollapsibleElements(
-						collapsibleSelector,
-						switchGroup.value
-					);
+					this.updateCollapsibleElements( collapsibleSelector, switchGroup.value, document );
 				}
 			} );
 		} );
@@ -223,17 +211,19 @@ liquipedia.collapse = {
 			const selector = groupToSelectorMap.get( name );
 
 			if ( selector ) {
-				this.updateCollapsibleElements( selector, value );
+				this.updateCollapsibleElements( selector, value, document );
 			}
 		} );
 	},
 
-	updateCollapsibleElements: function( selector, show ) {
-		const elements = document.querySelectorAll( selector );
+	updateCollapsibleElements: function( selector, show, scope ) {
+		const root = ( scope instanceof Element ) ? scope : document;
+		const elements = root.querySelectorAll( selector );
 
 		elements.forEach( ( element ) => {
 			element.classList.toggle( 'collapsed', !show );
 		} );
-	} };
+	}
+};
 
 liquipedia.core.modules.push( 'collapse' );
