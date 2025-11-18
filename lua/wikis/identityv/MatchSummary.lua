@@ -57,9 +57,10 @@ function CustomMatchSummary.createGame(game, gameIndex)
 	local getScoreDetails = function(oppIdx)
 		local firstSide = oppIdx == 1 and extradata.t1firstside or CustomMatchSummary._getOppositeSide(extradata.t1firstside)
 		local secondSide = CustomMatchSummary._getOppositeSide(firstSide)
+		local halfes = extradata['t' .. oppIdx .. 'halfs'] or {}
 		return {
-			{score = (extradata.t1halfs or {})[firstSide], style = 'brkts-identityv-score-color-' .. firstSide},
-			{score = (extradata.t2halfs or {})[secondSide], style = 'brkts-identityv-score-color-' .. secondSide},
+			{score = halfes[firstSide], style = 'brkts-identityv-score-color-' .. firstSide},
+			{score = halfes[secondSide], style = 'brkts-identityv-score-color-' .. secondSide},
 		}
 	end
 
