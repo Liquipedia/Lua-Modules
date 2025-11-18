@@ -42,10 +42,15 @@ cd /home/hjpalpha
 
 pwb replace -lang:clashroyale -transcludes:"LegacyMatchList" -transcludes:"LegacyBracket" -summary:"Convert LegacyMatch2 wrappers" -pt:60 -regex -always -dotall "\{\{[lL]egacyBracket" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/Default|fn=runGenerate|dev=hjp" "\{\{[bB]racketMatchSummary" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/BMS|fn=run|dev=hjp" "\{\{[mM]atchMaps" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/MatchList|fn=matchMaps|dev=hjp" "\{\{[lL]egacyMatchList" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/MatchList|fn=generate|dev=hjp"
 
+pwb replace -lang:brawlstars -transcludes:"LegacyBracket" -transcludes:"LegacyMatchListStart" -transcludes:"LegacySingleMatch" -summary:"Convert LegacyMatch2 wrappers" -pt:60 -regex -always -dotall "\{\{[lL]egacyBracket" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/Default|fn=runGenerate|dev=hjp" "\{\{[bB]racketMatchSummary" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=convertBracketMatchSummary|dev=hjp" "\{\{[lL]egacySingleMatch" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=generateSingleMatch|dev=hjp" "\{\{[mM]atchListEnd\|?\s*\}\}" "}}" "\{\{[mM]atchMaps" "|{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=convertMatch|dev=hjp|generate=true" "\{\{[lL]egacyMatchListStart(.*?)\}\}\s*\n*\s*\|\{\{subst" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=generate|dev=hjp\1\n|{{subst" "\{\{[lL]egacyMatchListStart(.*?)\}\}\s*\n*\s*\|\{\{[mM]atchMaps" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=generate|dev=hjp\1\n|{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=convertMatch|dev=hjp|generate=true"
 
 
 
-
+"" ""
+"" ""
+"" ""
+"" ""
+"" ""
 "" ""
 "" ""
 "" ""
