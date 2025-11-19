@@ -109,13 +109,28 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 				table.insert(potentialQualifiers, Opponent.readOpponentArgs({type = Opponent.team, template = name}))
 			end)
 		end
+		local tbdPlayers = Array.map(Array.range(1, 5), function()
+			return {
+				displayName = 'TBD',
+				flag = nil,
+				pageName = nil,
+				team = nil,
+				faction = nil,
+				extradata = {
+					roles = {},
+					trophies = 0,
+					type = 'player',
+				}
+			}
+		end)
+		opponent.players = tbdPlayers
 	else
 		opponent = Opponent.readOpponentArgs(Table.merge(input, {
 			type = Opponent.team,
 		}))
+		opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
 	end
 
-	opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
 	opponent = Opponent.resolve(opponent, date, {syncPlayer = true})
 	local aliases = Array.parseCommaSeparatedString(input.aliases, ';')
 	table.insert(aliases, Opponent.toName(opponent))
