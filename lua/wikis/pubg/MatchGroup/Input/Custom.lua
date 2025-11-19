@@ -179,8 +179,9 @@ function FfaMapFunctions.readMapOpponent(map, mapIndex, scoreSettings, matchOppo
 			if Logic.isEmpty(playerData) then
 				return
 			end
-			local separatorIndex = playerData.pubgdbm_name:find('_')
-			return {name = separatorIndex and playerData.pubgdbm_name:sub(separatorIndex + 1)}
+			local dbName = playerData.pubgdbm_name
+			local separatorIndex = dbName:find('_')
+			return {name = separatorIndex and dbName:sub(separatorIndex + 1) or dbName}
 		end,
 		function (playerIndex, playerIdData, playerInputData)
 			local playerData = teamData[playerIndex]
