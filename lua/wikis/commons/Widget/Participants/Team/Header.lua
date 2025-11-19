@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Widget = Lua.import('Module:Widget')
@@ -51,6 +52,7 @@ end
 ---@return Widget?
 function ParticipantsTeamHeader:_renderLabel(participant)
 	local labelText
+	local isFinal = Logic.isEmpty(participant.potentialQualifiers);
 	local qualificationData = participant.qualification
 	if not qualificationData then
 		return
@@ -65,7 +67,10 @@ function ParticipantsTeamHeader:_renderLabel(participant)
 	end
 
 	return Div{
-		classes = { 'team-participant-card-header-label' },
+		classes = {
+			'team-participant-card-header-label',
+			isFinal and 'final' or 'tbd'
+		},
 		children = {
 			HtmlWidgets.Span{
 				children = { labelText }
