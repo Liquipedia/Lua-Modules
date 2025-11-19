@@ -132,23 +132,11 @@ liquipedia.collapse = {
 					toggleGroup.classList.add( 'toggle-state-show' );
 					button.innerHTML = this.makeIcon( true ) + ' ' + showAllText;
 					this.updateCollapsibleElements( '.collapsible, .general-collapsible', true, toggleGroup );
-					this.updateCollapsibleElements(
-						'.brkts-matchlist-collapsible',
-						true,
-						toggleGroup,
-						'brkts-matchlist-collapsed'
-					);
 				} else {
 					toggleGroup.classList.remove( 'toggle-state-show' );
 					toggleGroup.classList.add( 'toggle-state-hide' );
 					button.innerHTML = this.makeIcon( false ) + ' ' + hideAllText;
 					this.updateCollapsibleElements( '.collapsible, .general-collapsible', false, toggleGroup );
-					this.updateCollapsibleElements(
-						'.brkts-matchlist-collapsible',
-						false,
-						toggleGroup,
-						'brkts-matchlist-collapsed'
-					);
 				}
 			};
 			toggleGroup.insertBefore( button, toggleGroup.firstChild );
@@ -226,13 +214,12 @@ liquipedia.collapse = {
 		} );
 	},
 
-	updateCollapsibleElements: function( selector, show, scope, collapsedClass ) {
+	updateCollapsibleElements: function( selector, show, scope ) {
 		const root = ( scope instanceof Element ) ? scope : document;
 		const elements = root.querySelectorAll( selector );
-		const collapsedClassName = collapsedClass || 'collapsed';
 
 		elements.forEach( ( element ) => {
-			element.classList.toggle( collapsedClassName, !show );
+			element.classList.toggle( 'collapsed', !show );
 		} );
 	}
 };
