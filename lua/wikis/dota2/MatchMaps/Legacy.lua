@@ -69,9 +69,6 @@ end
 function MatchMapsLegacy._handleDetails(args, details)
 	local getMapFromDetails = function (index)
 		local prefix = 'map' .. index
-		if not details[prefix] then
-			return nil
-		end
 		local map = {}
 		map.map = details[prefix]
 		map.winner = Table.extract(details, prefix .. 'winner')
@@ -101,7 +98,7 @@ function MatchMapsLegacy._handleDetails(args, details)
 			end)
 		end)
 		details[prefix] = nil
-		return map
+		return Logic.nilIfEmpty(map)
 	end
 
 	local getMapOnlyWithWinner = function (index)
