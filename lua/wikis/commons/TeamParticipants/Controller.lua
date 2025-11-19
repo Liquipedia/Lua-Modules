@@ -34,6 +34,7 @@ function TeamParticipantsController.fromTemplate(frame)
 	local args = Arguments.getArgs(frame)
 	local parsedArgs = Json.parseStringifiedArgs(args)
 	local parsedData = TeamParticipantsWikiParser.parseWikiInput(parsedArgs)
+	TeamParticipantsController.importParticipants(parsedData)
 
 	local shouldStore =
 		Logic.readBoolOrNil(args.store) ~= false and
@@ -80,7 +81,7 @@ function TeamParticipantsController.importSquadMembersFromDatabase(participant)
 		return
 	end
 
-	local squad = TeamService.getquadBetween(team, DateExt.getStartDateOrNow(), participant.date)
+	local squad = TeamService.getSquadBetween(team, DateExt.getStartDateOrNow(), participant.date)
 	local membersToImport = Array.filter(squad, function (member)
 		if member.type == 'player' then
 			return true
