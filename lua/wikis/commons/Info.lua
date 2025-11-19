@@ -29,6 +29,7 @@ return {
 			hasPosition = false,
 			hasSpecialTeam = false,
 			allowManual = true,
+			defaultPlayerNumber = 5,
 		},
 		match2 = {
 			matchPage = false,

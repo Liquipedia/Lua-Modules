@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local RoleUtil = Lua.import('Module:Role/Util')
@@ -110,21 +111,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 				table.insert(potentialQualifiers, Opponent.readOpponentArgs({type = Opponent.team, template = name}))
 			end)
 		end
-		local tbdPlayers = Array.map(Array.range(1, 5), function()
-			return {
-				displayName = 'TBD',
-				flag = nil,
-				pageName = nil,
-				team = nil,
-				faction = nil,
-				extradata = {
-					roles = {},
-					trophies = 0,
-					type = 'player',
-				}
-			}
-		end)
-		opponent.players = tbdPlayers
+		opponent.players = TeamParticipantsWikiParser._getTBDPlayers()
 	else
 		opponent = Opponent.readOpponentArgs(Table.merge(input, {
 			type = Opponent.team,
@@ -179,6 +166,25 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 		type = playerInput.type or 'player',
 	}
 	return player
+end
+
+---@return TeamParticipant
+function TeamParticipantsWikiParser._getTBDPlayers()
+	local count = Info.config.squads.defaultPlayerNumber
+	return Array.map(Array.range(1, count), function()
+		return {
+			displayName = 'TBD',
+			flag = nil,
+			pageName = nil,
+			team = nil,
+			faction = nil,
+			extradata = {
+				roles = {},
+				trophies = 0,
+				type = 'player',
+			}
+		}
+	end)
 end
 
 return TeamParticipantsWikiParser

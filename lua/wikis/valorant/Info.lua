@@ -30,6 +30,7 @@ return {
 			hasPosition = false,
 			hasSpecialTeam = true,
 			allowManual = true,
+			defaultPlayerNumber = 7,
 		},
 		match2 = {
 			status = 2,
