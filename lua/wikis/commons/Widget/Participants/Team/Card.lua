@@ -63,14 +63,19 @@ function ParticipantsTeamCard:render()
 	local qualifierInfoContent = TeamQualifierInfo{participant = participant, location = 'content'}
 
 	local content = {}
+	local notificationWidgets = {}
 
 	if participant.warnings then
 		Array.forEach(participant.warnings, function(warningText)
-			table.insert(content, ParticipantNotification{
+			table.insert(notificationWidgets, ParticipantNotification{
 				text = warningText,
 				highlighted = true,
 			})
 		end)
+		table.insert(content, Div{
+			classes = {'team-participant-notifications'},
+			children = notificationWidgets
+		})
 	end
 
 	table.insert(content, qualifierInfoContent)
