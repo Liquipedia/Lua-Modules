@@ -36,6 +36,7 @@ return {
 		'esportal',
 		'etf2l',
 		'faceit',
+		'faceitdb',
 		'faceit-l',
 		'faceit-c',
 		'faceit-hub',
