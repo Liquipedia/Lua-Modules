@@ -117,13 +117,9 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 			type = Opponent.team,
 		}))
 		opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
+		opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), {syncPlayer = true})
 	end
 
-	opponent = Opponent.readOpponentArgs(Table.merge(input, {
-		type = Opponent.team,
-	}))
-	opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
-	opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), {syncPlayer = true})
 	local aliases = Array.parseCommaSeparatedString(input.aliases, ';')
 	table.insert(aliases, Opponent.toName(opponent))
 
