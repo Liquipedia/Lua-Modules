@@ -26,6 +26,7 @@ local ParticipantNotification = Lua.import('Module:Widget/Participants/Team/Part
 local TeamQualifierInfo = Lua.import('Module:Widget/Participants/Team/QualifierInfo')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local PotentialQualifiers = Lua.import('Module:Widget/Participants/Team/PotentialQualifiers')
+local WarningBoxGroup = Lua.import('Module:Widget/WarningBox/Group')
 
 ---@enum ParticipantsTeamCardTabs
 local TAB_ENUM = {
@@ -65,12 +66,7 @@ function ParticipantsTeamCard:render()
 	local content = {}
 
 	if participant.warnings then
-		Array.forEach(participant.warnings, function(warningText)
-			table.insert(content, ParticipantNotification{
-				text = warningText,
-				highlighted = true,
-			})
-		end)
+		table.insert(content, WarningBoxGroup{data = participant.warnings})
 	end
 
 	table.insert(content, qualifierInfoContent)
