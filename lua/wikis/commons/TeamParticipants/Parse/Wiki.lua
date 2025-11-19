@@ -33,9 +33,10 @@ local TeamParticipantsWikiParser = {}
 ---@return {participants: TeamParticipant[]}
 function TeamParticipantsWikiParser.parseWikiInput(args)
 	local date = DateExt.parseIsoDate(args.date) or DateExt.parseIsoDate(DateExt.getContextualDateOrNow())
+	local playerNumber = args.playernumber
 
 	local participants = Array.map(args, function (input)
-		return TeamParticipantsWikiParser.parseParticipant(input, date)
+		return TeamParticipantsWikiParser.parseParticipant(input, date, playerNumber)
 	end)
 
 	return {
@@ -90,8 +91,9 @@ end
 --- Parse a single participant from input
 ---@param input table
 ---@param date osdateparam
+---@param playerNumber number
 ---@return TeamParticipant
-function TeamParticipantsWikiParser.parseParticipant(input, date)
+function TeamParticipantsWikiParser.parseParticipant(input, date, playerNumber)
 	local potentialQualifiers = {}
 	local opponent
 	local warnings = {}
@@ -111,7 +113,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 				table.insert(potentialQualifiers, Opponent.readOpponentArgs({type = Opponent.team, template = name}))
 			end)
 		end
-		opponent.players = TeamParticipantsWikiParser._getTBDPlayers()
+		opponent.players = TeamParticipantsWikiParser._getTBDPlayers(playerNumber)
 	else
 		opponent = Opponent.readOpponentArgs(Table.merge(input, {
 			type = Opponent.team,
@@ -164,9 +166,10 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 	return player
 end
 
+---@param playerNumber number
 ---@return TeamParticipant
-function TeamParticipantsWikiParser._getTBDPlayers()
-	local count = Info.config.squads.defaultPlayerNumber
+function TeamParticipantsWikiParser._getTBDPlayers(playerNumber)
+	local count = playerNumber or Info.config.squads.defaultPlayerNumber
 	return Array.map(Array.range(1, count), function()
 		return {
 			displayName = 'TBD',
