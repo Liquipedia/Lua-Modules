@@ -18,6 +18,7 @@ local TeamHeader = Lua.import('Module:Widget/Participants/Team/Header')
 local ParticipantNotification = Lua.import('Module:Widget/Participants/Team/ParticipantNotification')
 local TeamQualifierInfo = Lua.import('Module:Widget/Participants/Team/QualifierInfo')
 local ParticipantsTeamRoster = Lua.import('Module:Widget/Participants/Team/Roster')
+local WarningBoxGroup = Lua.import('Module:Widget/WarningBox/Group')
 
 ---@class ParticipantsTeamCard: Widget
 ---@operator call(table): ParticipantsTeamCard
@@ -31,20 +32,10 @@ function ParticipantsTeamCard:render()
 	local qualifierInfoContent = TeamQualifierInfo{participant = participant, location = 'content'}
 
 	local content = {}
-	local warningWidgets = {}
 	local notificationWidgets = {}
 
 	if participant.warnings then
-		Array.forEach(participant.warnings, function(warningText)
-			table.insert(warningWidgets, ParticipantNotification{
-				text = warningText,
-				highlighted = true,
-			})
-		end)
-		table.insert(content, Div{
-			classes = {'team-participant-notifications'},
-			children = warningWidgets
-		})
+		table.insert(content, WarningBoxGroup{data = participant.warnings})
 	end
 
 	table.insert(content, qualifierInfoContent)

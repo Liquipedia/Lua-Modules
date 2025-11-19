@@ -78,7 +78,7 @@ function TeamParticipantsRepository.save(participant)
 	lpdbData.extradata.opponentaliases = participant.aliases
 	if participant.potentialQualifiers and #participant.potentialQualifiers > 0 then
 		local serializedQualifiers = Array.map(participant.potentialQualifiers, function(qualifierOpponent)
-			return Opponent.toLpdbStruct(qualifierOpponent)
+			return Opponent.toName(qualifierOpponent)
 		end)
 		lpdbData.extradata.potentialQualifiers = serializedQualifiers
 	end
