@@ -140,6 +140,13 @@ function DateExt.getContextualDateOrNow()
 		or os.date('%F') --[[@as string]]
 end
 
+--- Fetches startDate on a tournament page with fallback to now.
+---@return string
+function DateExt.getStartDateOrNow()
+	return Variables.varDefault('tournament_startdate')
+		or os.date('%F') --[[@as string]]
+end
+
 --- Parses a YYYY-MM-DD string into a simplified osdate class
 --- String must start with the YYYY. Text is allowed after after the DD.
 --- YYYY is required, MM and DD are optional. They are assumed to be 1 if not supplied.
