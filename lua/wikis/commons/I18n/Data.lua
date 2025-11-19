@@ -43,7 +43,8 @@ return {
 		['date-range-year-month-day--unknown'] = '${startMonth} ${startDate}, ${startYear} - TBA',
 		['date-range-year-month-day--year'] = '${startMonth} ${startDate}, ${startYear} - ${endYear}',
 		['date-range-year-month-day--year-month'] = '${startMonth} ${startDate}, ${startYear} - ${endMonth}, ${endYear}',
-		['date-range-year-month-day--year-month-day'] = '${startMonth} ${startDate}, ${startYear} - ${endMonth} ${endDate}, ${endYear}',
+		['date-range-year-month-day--year-month-day']
+			= '${startMonth} ${startDate}, ${startYear} - ${endMonth} ${endDate}, ${endYear}',
 
 		['date-range-month'] = '${startMonth}',
 		['date-range-month--unknown'] = '${startMonth} - TBA',

@@ -64,14 +64,20 @@ describe('DateRange Widget', function()
 	end)
 
 	it('should return "date-range-month-day--day" if startDate and endDate are in the same month', function()
-		local widget = DateRange{startDate = {year = 2023, month = 10, day = 1}, endDate = {year = 2023, month = 10, day = 10}}
+		local widget = DateRange{
+			startDate = {year = 2023, month = 10, day = 1},
+			endDate = {year = 2023, month = 10, day = 10}
+		}
 		assert.are.equal(I18n.translate('date-range-month-day--day', {
 			startMonth = 'Oct', startDate = '01', endMonth = 'Oct', endDate = '10'
 		}), widget:render())
 	end)
 
 	it('should return "date-range-month-day--month-day" if startDate and endDate are in different months', function()
-		local widget = DateRange{startDate = {year = 2023, month = 10, day = 1}, endDate = {year = 2023, month = 11, day = 10}}
+		local widget = DateRange{
+			startDate = {year = 2023, month = 10, day = 1},
+			endDate = {year = 2023, month = 11, day = 10}
+		}
 		assert.are.equal(I18n.translate('date-range-month-day--month-day', {
 			startMonth = 'Oct', startDate = '01', endMonth = 'Nov', endDate = '10'
 		}), widget:render())
