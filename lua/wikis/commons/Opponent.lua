@@ -446,26 +446,12 @@ function Opponent.readOpponentArgs(args)
 		} or Opponent.tbd(Opponent.team)
 
 	elseif partySize == 1 then
-		local player = {
-			displayName = args[1] or args.p1 or args.name or '',
-			flag = String.nilIfEmpty(Flags.CountryName{flag = args.flag or args.p1flag}),
-			pageName = Page.applyUnderScoresIfEnforced(args.link or args.p1link),
-			team = args.team or args.p1team,
-			faction = Logic.nilIfEmpty(Faction.read(args.faction or args.race or args.p1race)),
-		}
+		local player = Opponent.readSinglePlayerArgs(args)
 		return {type = Opponent.solo, players = {player}, extradata = {}}
 
 	elseif partySize then
 		local players = Array.map(Array.range(1, partySize), function(playerIndex)
-			local playerTeam = args['p' .. playerIndex .. 'team']
-			return {
-				displayName = args[playerIndex] or args['p' .. playerIndex] or '',
-				flag = String.nilIfEmpty(Flags.CountryName{flag = args['p' .. playerIndex .. 'flag']}),
-				pageName = Page.applyUnderScoresIfEnforced(args['p' .. playerIndex .. 'link']),
-				team = playerTeam,
-				faction = Logic.nilIfEmpty(Faction.read(args['p' .. playerIndex .. 'faction']
-					or args['p' .. playerIndex .. 'race'])),
-			}
+			return Opponent.readPlayerArgs(args, playerIndex)
 		end)
 		return {type = args.type, players = players, extradata = {}}
 
@@ -474,6 +460,35 @@ function Opponent.readOpponentArgs(args)
 
 	end
 	error("Unknown opponent type: " .. args.type)
+end
+
+---Parses an argument table of a single player input into a player struct.
+---@param args table
+---@return standardPlayer
+function Opponent.readSinglePlayerArgs(args)
+	return Opponent.readPlayerArgs({
+		[1] = args[1] or args.p1 or args.name,
+		p1flag = args.flag or args.p1flag,
+		p1link = args.link or args.p1link,
+		p1team = args.team or args.p1team,
+		p1faction = args.faction or args.race or args.p1race,
+	}, 1)
+end
+
+---Parses an argument table of an opponent input into a player struct.
+---@param args table
+---@param playerIndex integer
+---@return standardPlayer
+function Opponent.readPlayerArgs(args, playerIndex)
+	local playerTeam = args['p' .. playerIndex .. 'team']
+	return {
+		displayName = args[playerIndex] or args['p' .. playerIndex] or '',
+		flag = String.nilIfEmpty(Flags.CountryName{flag = args['p' .. playerIndex .. 'flag']}),
+		pageName = Page.applyUnderScoresIfEnforced(args['p' .. playerIndex .. 'link']),
+		team = playerTeam,
+		faction = Logic.nilIfEmpty(Faction.read(args['p' .. playerIndex .. 'faction']
+			or args['p' .. playerIndex .. 'race'])),
+	}
 end
 
 --[[

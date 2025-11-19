@@ -126,18 +126,13 @@ end
 ---@param playerInput table
 ---@return standardPlayer
 function TeamParticipantsWikiParser.parsePlayer(playerInput)
-	return {
-		displayName = playerInput[1],
-		flag = playerInput.flag,
-		pageName = playerInput.link,
-		team = playerInput.team,
-		faction = playerInput.faction,
-		extradata = {
-			roles = RoleUtil.readRoleArgs(playerInput.role),
-			trophies = tonumber(playerInput.trophies),
-			type = playerInput.type or 'player',
-		},
+	local player = Opponent.readSinglePlayerArgs(playerInput)
+	player.extradata = {
+		roles = RoleUtil.readRoleArgs(playerInput.role),
+		trophies = tonumber(playerInput.trophies),
+		type = playerInput.type or 'player',
 	}
+	return player
 end
 
 return TeamParticipantsWikiParser
