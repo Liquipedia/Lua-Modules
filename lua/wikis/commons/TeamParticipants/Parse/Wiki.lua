@@ -19,7 +19,7 @@ local Tournament = Lua.import('Module:Tournament')
 local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
----qualification: QualificationStructure?, shouldImportFromDb: boolean}
+---qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer}
 
 ---@alias QualificationMethod 'invite'|'qual'
 ---@alias QualificationType 'tournament'|'external'|'other'
@@ -30,7 +30,7 @@ local TeamParticipantsWikiParser = {}
 ---@param args table
 ---@return {participants: TeamParticipant[]}
 function TeamParticipantsWikiParser.parseWikiInput(args)
-	local date = DateExt.readTimestamp(args.date) or DateExt.getContextualDateOrNow()
+	local date = DateExt.parseIsoDate(args.date) or DateExt.parseIsoDate(DateExt.getContextualDateOrNow())
 
 	local participants = Array.map(args, function (input)
 		return TeamParticipantsWikiParser.parseParticipant(input, date)
@@ -87,14 +87,14 @@ end
 
 --- Parse a single participant from input
 ---@param input table
----@param date string|number|nil
+---@param date osdateparam
 ---@return TeamParticipant
 function TeamParticipantsWikiParser.parseParticipant(input, date)
 	local opponent = Opponent.readOpponentArgs(Table.merge(input, {
 		type = Opponent.team,
 	}))
 	opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
-	opponent = Opponent.resolve(opponent, date, {syncPlayer = true})
+	opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), {syncPlayer = true})
 	local aliases = Array.parseCommaSeparatedString(input.aliases, ';')
 	table.insert(aliases, Opponent.toName(opponent))
 	return {
@@ -114,6 +114,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 			}
 		end),
 		shouldImportFromDb = Logic.readBool(input.import),
+		date = DateExt.parseIsoDate(input.date) or date, -- TODO: fetch from wiki var too
 	}
 end
 

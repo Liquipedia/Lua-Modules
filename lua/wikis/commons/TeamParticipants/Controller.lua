@@ -35,65 +35,6 @@ function TeamParticipantsController.fromTemplate(frame)
 	local parsedArgs = Json.parseStringifiedArgs(args)
 	local parsedData = TeamParticipantsWikiParser.parseWikiInput(parsedArgs)
 
-	-- TODO Extract this bad boi
-	Array.forEach(parsedData.participants, function (participant)
-		local players = participant.opponent.players
-		-- Bad structure, this should always exist
-		if not players then
-			return
-		end
-
-		if not Logic.readBool(participant.shouldImportFromDb) then
-			return
-		end
-
-		local team = TeamService.getTeamByTemplate(participant.opponent.template)
-		if not team then
-			return
-		end
-
-		-- TODO: Allow manual end date override
-		local squad = TeamService.getSquadBetween(team, DateExt.getStartDateOrNow(), DateExt.getContextualDateOrNow())
-		local membersToImport = Array.filter(squad, function (member)
-			if member.type == 'player' then
-				return true
-			end
-			return Array.find(AUTO_IMPORTED_STAFF_ROLES, function (role)
-				return role == member.role:lower()
-			end) ~= nil
-		end)
-
-		local playersFromDatabase = Array.map(membersToImport, function (member)
-			local memberType = member.type
-			if member.hasLeft then
-				memberType = 'former'
-			elseif member.role:lower() == 'substitute' then
-				memberType = 'sub'
-			end
-			return TeamParticipantsWikiParser.parsePlayer{
-				member.displayName,
-				link = member.pageName,
-				flag = member.nationality,
-				faction = member.faction,
-				role = member.role,
-				type = memberType,
-			}
-		end)
-
-		Array.forEach(playersFromDatabase, function (player)
-			local indexOfManualPlayer = Array.indexOf(players, function (p)
-				return p.pageName == player.pageName
-			end)
-
-			if indexOfManualPlayer == 0 then
-				table.insert(players, player)
-			else
-				local newPlayer = Table.deepMerge(player, players[indexOfManualPlayer])
-				players[indexOfManualPlayer] = newPlayer
-			end
-		end)
-	end)
-
 	local shouldStore =
 		Logic.readBoolOrNil(args.store) ~= false and
 		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
@@ -105,6 +46,85 @@ function TeamParticipantsController.fromTemplate(frame)
 	return TeamParticipantsDisplay{
 		participants = parsedData.participants
 	}
+end
+
+--- Imports participants' squad members from the database if requested.
+--- May mutate the input.
+---@param participants {participants: TeamParticipant[]}
+function TeamParticipantsController.importParticipants(participants)
+	Array.forEach(participants.participants, function (participant)
+		local players = participant.opponent.players
+		-- Bad structure, this should always exist
+		if not players then
+			return
+		end
+
+		if not Logic.readBool(participant.shouldImportFromDb) then
+			return
+		end
+
+		local importedPlayers = TeamParticipantsController.importSquadMembersFromDatabase(participant)
+		if not importedPlayers then
+			return
+		end
+
+		TeamParticipantsController.mergeManualAndImportedPlayers(players, importedPlayers)
+	end)
+end
+
+---@param participant TeamParticipant
+---@return standardPlayer[]?
+function TeamParticipantsController.importSquadMembersFromDatabase(participant)
+	local team = TeamService.getTeamByTemplate(participant.opponent.template)
+	if not team then
+		return
+	end
+
+	local squad = TeamService.getquadBetween(team, DateExt.getStartDateOrNow(), participant.date)
+	local membersToImport = Array.filter(squad, function (member)
+		if member.type == 'player' then
+			return true
+		end
+		return Array.find(AUTO_IMPORTED_STAFF_ROLES, function (role)
+			return role == member.role:lower()
+		end) ~= nil
+	end)
+
+	return Array.map(membersToImport, function (member)
+		local memberType = member.type
+		if member.hasLeft then
+			memberType = 'former'
+		elseif member.role:lower() == 'substitute' then
+			memberType = 'sub'
+		end
+		return TeamParticipantsWikiParser.parsePlayer{
+			member.displayName,
+			link = member.pageName,
+			flag = member.nationality,
+			faction = member.faction,
+			role = member.role,
+			type = memberType,
+		}
+	end)
+end
+
+--- Merges players from the second parameters into the first parameter.
+--- If a player exists in both lists, the two entries are deep merged, with the first parameter taking precedence.
+---@param manualPlayers standardPlayer[]
+---@param importedPlayers standardPlayer[]
+function TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers, importedPlayers)
+	Array.forEach(importedPlayers, function (player)
+		local indexOfManualPlayer = Array.indexOf(manualPlayers, function (p)
+			return p.pageName == player.pageName
+		end)
+
+		if indexOfManualPlayer == 0 then
+			table.insert(manualPlayers, player)
+		else
+			local newPlayer = Table.deepMerge(player, manualPlayers[indexOfManualPlayer])
+			manualPlayers[indexOfManualPlayer] = newPlayer
+		end
+	end)
 end
 
 return TeamParticipantsController
