@@ -41,7 +41,11 @@ function MvpTable.run(args)
 	args = args or {}
 	local parsedArgs = MvpTable._parseArgs(args)
 
-	local matches = TournamentStructure.fetchMatches(parsedArgs.matchGroupSpec)
+	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
+		conditions = tostring(TournamentStructure.getMatch2Filter(parsedArgs.matchGroupSpec)),
+		query = 'extradata',
+		limit = 5000,
+	})
 
 	if Logic.isEmpty(matches) then
 		return
@@ -147,7 +151,7 @@ end
 ---
 -- Processes retrieved data
 -- overwritable function via /Custom
----@param queryData MatchGroupUtilMatch[]
+---@param queryData {extradata: {mvp: {players: MatchGroupMvpPlayer[], points: integer}?}}[]
 ---@return {points: number, mvp: number, displayName:string?, name:string, flag:string?, team:string?}[]
 function MvpTable.processData(queryData)
 	local playerList = {}
