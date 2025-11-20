@@ -25,6 +25,8 @@ local ParticipantsTeamMember = Lua.import('Module:Widget/Participants/Team/TeamM
 local ParticipantNotification = Lua.import('Module:Widget/Participants/Team/ParticipantNotification')
 local TeamQualifierInfo = Lua.import('Module:Widget/Participants/Team/QualifierInfo')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
+local PotentialQualifiers = Lua.import('Module:Widget/Participants/Team/PotentialQualifiers')
+local WarningBoxGroup = Lua.import('Module:Widget/WarningBox/Group')
 
 ---@enum ParticipantsTeamCardTabs
 local TAB_ENUM = {
@@ -61,6 +63,20 @@ function ParticipantsTeamCard:render()
 	local qualifierInfoHeader = TeamQualifierInfo{participant = participant, location = 'header'}
 	local qualifierInfoContent = TeamQualifierInfo{participant = participant, location = 'content'}
 
+	local content = {}
+
+	if participant.warnings then
+		table.insert(content, WarningBoxGroup{data = participant.warnings})
+	end
+
+	table.insert(content, qualifierInfoContent)
+
+	if Opponent.isTbd(participant.opponent) then
+		table.insert(content, PotentialQualifiers{participant = participant})
+	else
+		table.insert(content, self:_renderContent(participant))
+	end
+
 	return Collapsible{
 		shouldCollapse = true,
 		collapseAreaClasses = {'team-participant-card-collapsible-content'},
@@ -73,10 +89,7 @@ function ParticipantsTeamCard:render()
 				qualifierInfoHeader
 			}
 		},
-		children = {
-			qualifierInfoContent,
-			self:_renderContent(participant)
-		}
+		children = content
 	}
 end
 

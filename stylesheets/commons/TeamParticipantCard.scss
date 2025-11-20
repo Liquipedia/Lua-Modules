@@ -123,6 +123,16 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 				border-color: var( --clr-on-surface-dark-primary-8 );
 				color: var( --clr-secondary-90 );
 			}
+
+			&.tbd {
+				.theme--light & {
+					color: var( --clr-secondary-80 );
+				}
+
+				.theme--dark & {
+					color: var( --clr-secondary-44 );
+				}
+			}
 		}
 
 		.general-collapsible-default-toggle {
@@ -423,6 +433,49 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 			.theme--light & {
 				color: var( --clr-semantic-gold-30 );
 			}
+		}
+	}
+}
+
+.potential-qualifiers {
+	&-container {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	&-title {
+		padding: 0 0.5rem;
+		font-size: 0.875rem;
+		font-weight: bold;
+
+		.theme--light & {
+			color: var( --clr-secondary-25 );
+		}
+
+		.theme--dark & {
+			color: var( --clr-secondary-90 );
+		}
+	}
+
+	&-list-item {
+		padding: 0.5rem 0.75rem;
+
+		&.odd {
+			.theme--light & {
+				background-color: var( --clr-on-surface-light-primary-4 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+			}
+		}
+
+		.team-template-image-icon {
+			@include set-participant-icon-size(
+				$participant-icon-wrapper-size-small,
+				$participant-icon-size-small
+			);
 		}
 	}
 }

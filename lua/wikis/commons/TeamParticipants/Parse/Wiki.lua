@@ -19,7 +19,8 @@ local Tournament = Lua.import('Module:Tournament')
 local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
----qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer}
+---qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer,
+---potentialQualifiers: standardOpponent[]?, warnings: string[]?}
 
 ---@alias QualificationMethod 'invite'|'qual'
 ---@alias QualificationType 'tournament'|'external'|'other'
@@ -90,13 +91,36 @@ end
 ---@param date osdateparam
 ---@return TeamParticipant
 function TeamParticipantsWikiParser.parseParticipant(input, date)
-	local opponent = Opponent.readOpponentArgs(Table.merge(input, {
-		type = Opponent.team,
-	}))
+	local potentialQualifiers = {}
+	local opponent
+	local warnings = {}
+
+	if input.contenders then
+		opponent = Opponent.tbd(Opponent.team)
+		local contenderNames = input.contenders
+
+		if type(contenderNames) ~= 'table' then
+			table.insert(warnings, 'Invalid contenders: expected a list of non-empty strings')
+		else
+			Array.forEach(contenderNames, function(name, idx)
+				if type(name) ~= 'string' or name == '' then
+					table.insert(warnings, string.format('Invalid contender entry at position %d: %s', idx, tostring(name)))
+					return
+				end
+				table.insert(potentialQualifiers, Opponent.readOpponentArgs({type = Opponent.team, template = name}))
+			end)
+		end
+	else
+		opponent = Opponent.readOpponentArgs(Table.merge(input, {
+			type = Opponent.team,
+		}))
+	end
+
 	opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
 	opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), {syncPlayer = true})
 	local aliases = Array.parseCommaSeparatedString(input.aliases, ';')
 	table.insert(aliases, Opponent.toName(opponent))
+
 	return {
 		opponent = opponent,
 		qualification = parseQualifier(input.qualification),
@@ -113,6 +137,8 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 				highlighted = Logic.readBool(note.highlighted),
 			}
 		end),
+		potentialQualifiers = potentialQualifiers,
+		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
 		date = DateExt.parseIsoDate(input.date) or date, -- TODO: fetch from wiki var too
 	}
