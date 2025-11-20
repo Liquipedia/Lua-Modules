@@ -75,4 +75,13 @@ function FfaMatchFunctions.calculateMatchScore(opponents, maps)
 	end
 end
 
+---@param match table
+---@param numberOfOpponents integer
+---@return table
+function FfaMatchFunctions.parseSettings(match, numberOfOpponents)
+	local settings = MatchGroupInputUtil.parseSettings(match, numberOfOpponents)
+	settings.settings.hidetotalpoints = Logic.readBool(match.hidetotalpoints)
+	return settings
+end
+
 return CustomMatchGroupInput
