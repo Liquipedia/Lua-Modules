@@ -173,19 +173,14 @@ function TeamParticipantsWikiParser._getTBDPlayers(playerNumber)
 	if  not count then
 		return
 	end
-	return Array.map(Array.range(1, count), function()
-		return {
-			displayName = 'TBD',
-			flag = nil,
-			pageName = nil,
-			team = nil,
-			faction = nil,
-			extradata = {
-				roles = {},
-				trophies = 0,
-				type = 'player',
-			}
+	return Array.map(Array.range(1, count), function(i)
+		local player = Opponent.readPlayerArgs({[i] = 'TBD'}, i)
+		player.extradata = {
+			roles = {},
+			trophies = 0,
+			type = 'player',
 		}
+		return player
 	end)
 end
 

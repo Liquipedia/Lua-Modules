@@ -124,6 +124,11 @@ function ParticipantsTeamRoster:render()
 	end)
 	tabs = Array.sortBy(tabs, Operator.property('order'))
 
+	if #tabs <= 1 then
+		local players = (#tabs == 1) and tabs[1].players or {}
+		return makeRostersDisplay(players)
+	end
+
 	local switchGroupUniqueId = tonumber(Variables.varDefault('teamParticipantRostersSwitchGroupId')) or 0
 	switchGroupUniqueId = switchGroupUniqueId + 1
 	Variables.varDefine('teamParticipantRostersSwitchGroupId', switchGroupUniqueId)

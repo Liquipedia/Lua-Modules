@@ -42,7 +42,7 @@ function ParticipantsTeamCard:render()
 
 	table.insert(content, ParticipantsTeamRoster{participant = participant})
 
-	if participant.notes then
+	if participant.notes and #participant.notes > 0 then
 		Array.forEach(participant.notes, function(note)
 			table.insert(notificationWidgets, ParticipantNotification{
 				text = note.text,
