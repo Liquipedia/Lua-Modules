@@ -9,27 +9,28 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
 
----@class LabMatchParser: MatchParserInterface
+---@class ThefinalsMatchParser: MatchParserInterface
 local MatchFunctions = {
 	DEFAULT_MODE = 'team',
 	getBestOf = MatchGroupInputUtil.getBestOf,
 }
 
----@class LabMapParser: MapParserInterface
+---@class ThefinalsMapParser: MapParserInterface
 local MapFunctions = {}
 
----@class LabFfaMatchParser: FfaMatchParserInterface
+---@class ThefinalsFfaMatchParser: FfaMatchParserInterface
 local FfaMatchFunctions = {
 	DEFAULT_MODE = 'team',
 }
 
----@class LabFfaMapParser: FfaMapParserInterface
+---@class ThefinalsFfaMapParser: FfaMapParserInterface
 local FfaMapFunctions = {}
 
 ---@param match table

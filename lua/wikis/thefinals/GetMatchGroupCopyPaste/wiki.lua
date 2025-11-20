@@ -13,7 +13,7 @@ local Logic = Lua.import('Module:Logic')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
----@class LabMatch2CopyPaste: Match2CopyPasteBase
+---@class ThefinalsMatch2CopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
 
 local INDENT = WikiCopyPaste.Indent
