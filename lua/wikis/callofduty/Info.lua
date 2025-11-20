@@ -394,6 +394,9 @@ return {
 				storeFromWikiCode = true,
 			},
 		},
+		participants = {
+			defaultPlayerNumber = 5,
+		},
 	},
 	defaultRoundPrecision = 0,
 }

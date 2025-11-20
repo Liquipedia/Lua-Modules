@@ -59,6 +59,9 @@ return {
 				mode = 'automatic',
 			},
 		},
+		participants = {
+			defaultPlayerNumber = 7,
+		},
 	},
 	defaultRoundPrecision = 0,
 }

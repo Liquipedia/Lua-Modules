@@ -167,9 +167,12 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 end
 
 ---@param playerNumber number
----@return TeamParticipant
+---@return TeamParticipant?
 function TeamParticipantsWikiParser._getTBDPlayers(playerNumber)
-	local count = playerNumber or Info.config.squads.defaultPlayerNumber
+	local count = playerNumber or Info.config.participants.defaultPlayerNumber
+	if  not count then
+		return
+	end
 	return Array.map(Array.range(1, count), function()
 		return {
 			displayName = 'TBD',

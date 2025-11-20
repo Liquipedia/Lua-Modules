@@ -30,7 +30,6 @@ return {
 			hasPosition = false,
 			hasSpecialTeam = true,
 			allowManual = true,
-			defaultPlayerNumber = 7,
 		},
 		match2 = {
 			status = 2,
@@ -56,6 +55,9 @@ return {
 			automatedHistory = {
 				mode = 'automatic',
 			},
+		},
+		participants = {
+			defaultPlayerNumber = 5,
 		},
 	},
 }

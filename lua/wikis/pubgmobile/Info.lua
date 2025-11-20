@@ -83,6 +83,9 @@ return {
 				hasHeaderAndRefs = true,
 			},
 		},
+		participants = {
+			defaultPlayerNumber = 4,
+		},
 	},
 	defaultRoundPrecision = 0,
 }
