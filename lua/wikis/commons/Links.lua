@@ -137,6 +137,10 @@ local PREFIXES = {
 	['faceit-c'] = {'https://www.faceit.com/en/championship/'},
 	['faceit-hub'] = {'https://www.faceit.com/en/hub/'},
 	['faceit-org'] = {'https://www.faceit.com/en/organizers/'},
+	faceitdb = {
+		'',
+		player = 'https://faceitdb.com/profile/faceit/',
+	},
 	fanclub = {''},
 	fide = {
 		'https://ratings.fide.com/tournament_information.phtml?event=',
@@ -184,6 +188,7 @@ local PREFIXES = {
 	},
 	linkedin = {
 		team = 'https://www.linkedin.com/company/',
+		company = 'https://www.linkedin.com/company/',
 		player = 'https://www.linkedin.com/in/',
 	},
 	loco = {'https://loco.gg/streamers/'},
@@ -267,14 +272,14 @@ local PREFIXES = {
 		'https://start.gg/',
 		player = 'https://start.gg/user/',
 	},
-	steam = {'https://steamcommunity.com/id/'},
+	steam = {'https://steamcommunity.com/id/'}, -- to be removed after conversion
+	steam64ID = {'https://steamcommunity.com/profiles/'},
 	steamtv = {'https://steam.tv/'},
 	strikr = {'https://strikr.pro/pilot/'},
 	privsteam = {'https://steamcommunity.com/groups/'},
 	pubsteam = {'https://steamcommunity.com/groups/'},
 	smiteesports = {match = 'https://www.smiteesports.com/matches/'},
 	spotify = {'https://open.spotify.com/'},
-	steamalternative = {'https://steamcommunity.com/profiles/'},
 	stats = {'', match = ''},
 	statshark = {
 		'https://statshark.net/',
@@ -380,6 +385,8 @@ local ALIASES = {
 	['start-gg'] = {'startgg', 'smashgg'},
 	yandexefir = {'yandex'},
 	zhanqitv = {'zhanqi'},
+	-- temporarily for conversion
+	steam64ID = {'steamalternative'},
 }
 
 local ICON_KEYS_TO_RENAME = {
@@ -392,11 +399,12 @@ local ICON_KEYS_TO_RENAME = {
 	['faceit-l'] = 'faceit',
 	['faceit-hub'] = 'faceit',
 	['faceit-org'] = 'faceit',
+	['faceitdb'] = 'faceit',
 	matcherinolink = 'matcherino',
 	playlist = 'music',
 	privsteam = 'steam',
 	pubsteam = 'steam',
-	steamalternative = 'steam',
+	steam64ID = 'steam',
 	tlpdint = 'tlpd',
 	tlpdkr = 'tlpd-wol-korea',
 	tlpdsospa = 'tlpd-sospa',

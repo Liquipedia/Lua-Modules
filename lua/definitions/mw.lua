@@ -239,6 +239,7 @@ function mw.language.fetchLanguageNames(inLanguage, include) end
 function mw.language.getContentLanguage()
 	return setmetatable(mw.language, {})
 end
+
 mw.getContentLanguage = mw.language.getContentLanguage
 
 ---Returns a list of MediaWiki's fallback language codes for the specified code.
@@ -272,6 +273,7 @@ function mw.language.isValidCode(code) end
 function mw.language.new(code)
 	return mw.language.getContentLanguage()
 end
+
 mw.getLanguage = mw.language.new
 
 ---Returns the language code for this language object.
@@ -364,7 +366,7 @@ function mw.language:formatDate(format, timestamp, localTime)
 	end
 
 	local function makeOsdateParam(year, month, day, hour, minute, second)
-		return {year = year, month = month or 1, day = day or 1, hour = hour or 0, min = minute, sec = second}
+		return { year = year, month = month or 1, day = day or 1, hour = hour or 0, min = minute, sec = second }
 	end
 
 	if format == 'U' then
@@ -465,6 +467,7 @@ function mw.language:parseFormattedNumber(str) end
 ---@return string
 ---@overload fun(n: number, forms: table):string
 function mw.language:convertPlural(n, ...) end
+
 mw.language.plural = mw.language.convertPlural
 
 ---This chooses the appropriate inflected form of word for the given inflection code case.
@@ -578,7 +581,7 @@ function mw.message:isDisabled() end
 ---@field subjectNamespaces table<integer, namespaceInfo>
 ---@field talkNamespaces table<integer, namespaceInfo>
 ---@field stats {pages: number, articles: number, files: number, edits: number, users: number, activeUsers: number, admins: number, pagesInCategory: fun(category: string, which: 'all'|'subcats'|'files'|'pages'|'*'):integer}
-mw.site = {server = 'https://liquipedia.net/wiki/'}
+mw.site = { server = 'https://liquipedia.net/wiki/' }
 
 ---Returns a table holding data about available interwiki prefixes. If filter is the string "local", then only data for local interwiki prefixes is returned. If filter is the string "!local", then only data for non-local prefixes is returned. If no filter is specified, data for all prefixes is returned. A "local" prefix in this context is one that is for the same project.
 ---@param filter nil|'local'|'!local'
@@ -634,7 +637,7 @@ function mw.text.listToText(list, separator, conjunction) end
 ---@return string
 function mw.text.nowiki(s)
 	-- TODO: This only covers some
-	return (string.gsub( s, '["&\'<=>%[%]{|}]', {
+	return (string.gsub(s, '["&\'<=>%[%]{|}]', {
 		['"'] = '&#34;',
 		['&'] = '&#38;',
 		["'"] = '&#39;',
@@ -692,7 +695,7 @@ function mw.text.tag(name, attrs, content) end
 ---@return string
 function mw.text.trim(s, charset)
 	-- TODO: UTF8 support in fake
-	return string.match( s, '^()%s*$' ) and '' or string.match( s, '^%s*(.*%S)' )
+	return string.match(s, '^()%s*$') and '' or string.match(s, '^%s*(.*%S)')
 end
 
 ---Truncates text to the specified length in code points, adding ellipsis if truncation was performed. If length is positive, the end of the string will be truncated; if negative, the beginning will be removed
@@ -712,7 +715,6 @@ function mw.text.unstripNoWiki(s) end
 ---@param s string
 ---@return string
 function mw.text.unstrip(s) end
-
 
 ---@class Title
 ---@field id integer
@@ -1091,12 +1093,10 @@ mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
 
 mw.ext.Dota2Ranking = {}
 
----@alias Dota2RankingRecord {name: string, rank: integer, rating: number, streak: integer,
----progression: {date: string, rating: number, rank: integer}[]}
----@param startDate string #YYYY-MM-DD
----@param endDate string #YYYY-MM-DD
+---@alias Dota2RankingEntry {external_id: string, name: string, rating: number, rank: integer}
+---@alias Dota2RankingRecord {date: string, provisional: boolean,  entries: Dota2RankingEntry[]}
 ---@return Dota2RankingRecord[]
-function mw.ext.Dota2Ranking.get(startDate, endDate) end
+function mw.ext.Dota2Ranking.get() end
 
 mw.ext.VariablesLua = {}
 ---@alias wikiVariableKey string|number
@@ -1390,6 +1390,5 @@ mw.ext.valorantdb = {}
 ---@param matchId string
 ---@return valorantMatchData
 function mw.ext.valorantdb.getMatchDetails(matchId) end
-
 
 return mw
