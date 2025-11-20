@@ -103,7 +103,7 @@ MatchGroupInputUtil.ASSUME_FINISHED_AFTER = ASSUME_FINISHED_AFTER
 local NOW = os.time()
 local contentLanguage = mw.getContentLanguage()
 
----@class MatchGroupMvpPlayer
+---@class MatchGroupMvpPlayer: MGIParsedPlayer
 ---@field displayname string
 ---@field name string
 ---@field comment string?
@@ -330,7 +330,7 @@ function MatchGroupInputUtil.getTournamentContext(obj, parent)
 end
 
 ---@param match table
----@param opponents? table[]
+---@param opponents? MGIParsedOpponent[]
 ---@return {players: MatchGroupMvpPlayer[], points: integer}?
 function MatchGroupInputUtil.readMvp(match, opponents)
 	if not match.mvp then return end
