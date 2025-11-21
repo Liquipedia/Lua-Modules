@@ -31,11 +31,12 @@ function ParticipantsTeamHeader:render()
 	local isTbdOpponent = Opponent.isTbd(participant.opponent)
 	local isQualificationTournament = participant.qualification and participant.qualification.type == 'tournament'
 
+	local opponentClasses = {'team-participant-card-header-opponent', 'team-participant-card-square-icon'}
 	local opponentDisplay
 
 	if isTbdOpponent and isQualificationTournament then
 		opponentDisplay = Div{
-			classes = {'team-participant-card-header-opponent', 'team-participant-card-square-icon'},
+			classes = opponentClasses,
 			children = WidgetUtil.collect(
 				LeagueIcon.display{
 					icon = participant.qualification.tournament.icon,
@@ -53,7 +54,7 @@ function ParticipantsTeamHeader:render()
 		opponentDisplay = OpponentDisplay.BlockOpponent{
 			opponent = participant.opponent,
 			teamStyle = 'standard',
-			additionalClasses = {'team-participant-card-header-opponent', 'team-participant-card-square-icon'}
+			additionalClasses = opponentClasses
 		}
 	end
 
