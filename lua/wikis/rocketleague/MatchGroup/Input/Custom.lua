@@ -20,16 +20,16 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local CustomMatchGroupInput = {}
 
 ---@class RocketLeagueMatchParser: MatchParserInterface
-local MatchFunctions = {}
+local MatchFunctions = {
+	DEFAULT_MODE = '3v3',
+	DATE_FALLBACKS = {'tournament_enddate'},
+}
 
 ---@class RocketLeagueMapParser: MapParserInterface
 local MapFunctions = {}
 
 local EARNINGS_LIMIT_FOR_FEATURED = 10000
 local CURRENT_YEAR = DateExt.getYearOf()
-MatchFunctions.DEFAULT_MODE = '3v3'
-MatchFunctions.DATE_FALLBACKS = {'tournament_enddate'}
-MatchFunctions.getBestOf = function (bestOfInput, maps) return tonumber(bestOfInput) end
 
 ---@param match table
 ---@param options table?
@@ -168,6 +168,13 @@ function MatchFunctions.currentEarnings(name)
 	end
 
 	return data.earningsbyyear[tonumber(CURRENT_YEAR)] or 0
+end
+
+---@param bestOfInput string|integer?
+---@param maps table[]
+---@return integer?
+function MatchFunctions.getBestOf(bestOfInput, maps)
+	return tonumber(bestOfInput)
 end
 
 --
