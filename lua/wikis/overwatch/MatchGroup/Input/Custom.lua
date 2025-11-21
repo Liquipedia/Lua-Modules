@@ -15,7 +15,11 @@ local CharacterNames = Lua.import('Module:CharacterNames', {loadData = true})
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
+
+---@class OverwatchMatchParser: MatchParserInterface
 local MatchFunctions = {}
+
+---@class OverwatchMapParser: MapParserInterface
 local MapFunctions = {
 	BREAK_ON_EMPTY = true,
 }
