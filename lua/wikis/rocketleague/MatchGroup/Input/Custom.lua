@@ -123,23 +123,10 @@ end
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		isfeatured = MatchFunctions.isFeatured(opponents, tonumber(match.liquipediatier)),
-		hasopponent1 = MatchFunctions._checkForNonEmptyOpponent(opponents[1]),
-		hasopponent2 = MatchFunctions._checkForNonEmptyOpponent(opponents[2]),
+		hasopponent1 = not Opponent.isTbd(Opponent.fromMatch2Record(opponents[1])),
+		hasopponent2 = not Opponent.isTbd(Opponent.fromMatch2Record(opponents[2])),
 		liquipediatiertype2 = Variables.varDefault('tournament_tiertype2'),
 	}
-end
-
----@param opponent table
----@return boolean
-function MatchFunctions._checkForNonEmptyOpponent(opponent)
-	if Opponent.typeIsParty(opponent.type) then
-		local playerIsTbd = function (player)
-			return String.isEmpty(player.displayname) or player.displayname:upper() == 'TBD'
-		end
-		return not Array.all(opponent.match2players, playerIsTbd)
-	end
-	-- Literal and Teams can use the default function, player's can not because of match2player vs player list names
-	return not Opponent.isTbd(opponent)
 end
 
 ---@param opponents MGIParsedOpponent[]
