@@ -21,6 +21,8 @@ local CustomMatchGroupInput = {}
 
 ---@class RocketLeagueMatchParser: MatchParserInterface
 local MatchFunctions = {}
+
+---@class RocketLeagueMapParser: MapParserInterface
 local MapFunctions = {}
 
 local EARNINGS_LIMIT_FOR_FEATURED = 10000
