@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Json = Lua.import('Module:Json')
 
+---@class ValorantNormalMapParser: ValorantMapParserInterface
 local CustomMatchGroupInputNormal = {}
 
 function CustomMatchGroupInputNormal.getMap(mapInput)
