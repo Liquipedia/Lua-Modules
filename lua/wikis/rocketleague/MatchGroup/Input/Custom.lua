@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
@@ -22,7 +23,7 @@ local MatchFunctions = {}
 local MapFunctions = {}
 
 local EARNINGS_LIMIT_FOR_FEATURED = 10000
-local CURRENT_YEAR = os.date('%Y')
+local CURRENT_YEAR = DateExt.getYearOf()
 MatchFunctions.DEFAULT_MODE = '3v3'
 MatchFunctions.DATE_FALLBACKS = {'tournament_enddate'}
 MatchFunctions.getBestOf = function (bestOfInput, maps) return tonumber(bestOfInput) end
