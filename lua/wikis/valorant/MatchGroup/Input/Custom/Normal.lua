@@ -13,10 +13,14 @@ local Json = Lua.import('Module:Json')
 ---@class ValorantNormalMapParser: ValorantMapParserInterface
 local CustomMatchGroupInputNormal = {}
 
+---@param mapInput table
+---@return table
 function CustomMatchGroupInputNormal.getMap(mapInput)
 	return mapInput
 end
 
+---@param mapInput table
+---@return string?
 function CustomMatchGroupInputNormal.getMapName(mapInput)
 	return mapInput.map
 end
@@ -27,10 +31,15 @@ function CustomMatchGroupInputNormal.getMatchId(map)
 	return map.matchid, map.region
 end
 
+---@param mapInput table
+---@return string?
 function CustomMatchGroupInputNormal.getLength(mapInput)
 	return mapInput.length
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return table[]
 function CustomMatchGroupInputNormal.getParticipants(map, opponentIndex)
 	return Array.mapIndexes(function(playerIndex)
 		return Json.parseIfString(map['t' .. opponentIndex .. 'p' .. playerIndex])
@@ -49,14 +58,22 @@ function CustomMatchGroupInputNormal.getFirstSide(map, opponentIndex, phase)
 	end
 end
 
+---@param map table
+---@param side 'atk'|'def'|'otatk'|'otdef'
+---@param opponentIndex integer
+---@return integer?
 function CustomMatchGroupInputNormal.getScoreFromRounds(map, side, opponentIndex)
 	return tonumber(map['t'.. opponentIndex .. side ])
 end
 
+---@param map table
+---@return nil
 function CustomMatchGroupInputNormal.getRounds(map)
 	return nil
 end
 
+---@param map table
+---@return string?
 function CustomMatchGroupInputNormal.getPatch(map)
 	return map.patch
 end
