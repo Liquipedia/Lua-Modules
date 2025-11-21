@@ -186,10 +186,7 @@ function TeamParticipantsWikiParser.fillIncompleteRoster(opponent, minimumPlayer
 	end
 
 	local tbdPlayers = TeamParticipantsWikiParser.createTBDPlayers(expectedPlayerCount - actualPlayerCount)
-
-	Array.forEach(tbdPlayers, function(tbdPlayer)
-		table.insert(opponent.players, tbdPlayer)
-	end)
+	Array.extendWith(opponent.players, tbdPlayers)
 end
 
 ---@param count number
