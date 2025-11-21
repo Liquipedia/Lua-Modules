@@ -113,13 +113,14 @@ function TeamParticipantsWikiParser.parseParticipant(input, date, playerNumber)
 				table.insert(potentialQualifiers, Opponent.readOpponentArgs({type = Opponent.team, template = name}))
 			end)
 		end
-		opponent.players = TeamParticipantsWikiParser._getTBDPlayers(playerNumber)
 	else
 		opponent = Opponent.readOpponentArgs(Table.merge(input, {
 			type = Opponent.team,
 		}))
 		opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
 		opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), {syncPlayer = true})
+
+		TeamParticipantsWikiParser.fillIncompleteRoster(opponent, playerNumber)
 	end
 
 	local aliases = Array.parseCommaSeparatedString(input.aliases, ';')
@@ -166,14 +167,34 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 	return player
 end
 
----@param playerNumber number
----@return TeamParticipant?
-function TeamParticipantsWikiParser._getTBDPlayers(playerNumber)
-	local count = playerNumber or Info.config.participants.defaultPlayerNumber
-	if  not count then
+---@param opponent standardOpponent
+---@param playerNumber number?
+function TeamParticipantsWikiParser.fillIncompleteRoster(opponent, playerNumber)
+	local expectedPlayerCount = playerNumber or (Info.config.participants and Info.config.participants.defaultPlayerNumber)
+	if not expectedPlayerCount or not opponent.players then
 		return
 	end
-	return Array.map(Array.range(1, count), function(i)
+
+	local actualPlayerCount = #opponent.players
+	if actualPlayerCount >= expectedPlayerCount then
+		return
+	end
+
+	local tbdPlayers = TeamParticipantsWikiParser.createTBDPlayers(
+		expectedPlayerCount - actualPlayerCount,
+		actualPlayerCount + 1
+	)
+	Array.forEach(tbdPlayers, function(tbdPlayer)
+		table.insert(opponent.players, tbdPlayer)
+	end)
+end
+
+---@param count number
+---@param startIndex number?
+---@return standardPlayer[]
+function TeamParticipantsWikiParser.createTBDPlayers(count, startIndex)
+	startIndex = startIndex or 1
+	return Array.map(Array.range(startIndex, startIndex + count - 1), function(i)
 		local player = Opponent.readPlayerArgs({[i] = 'TBD'}, i)
 		player.extradata = {
 			roles = {},
