@@ -80,7 +80,7 @@ function CustomMatchGroupInput.getOpponentExtradata(opponent)
 	}
 end
 
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@return integer
 function CustomMatchGroupInput._getSetWins(opponent)
 	local extradata = opponent.extradata
@@ -95,7 +95,7 @@ end
 --
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return string?
 function MatchFunctions.getHeadToHeadLink(match, opponents)
 	if not Logic.readBool(Logic.emptyOr(match.showh2h, Variables.varDefault('showh2h'))) or
