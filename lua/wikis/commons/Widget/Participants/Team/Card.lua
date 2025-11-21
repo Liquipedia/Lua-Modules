@@ -18,6 +18,7 @@ local TeamHeader = Lua.import('Module:Widget/Participants/Team/Header')
 local ParticipantNotification = Lua.import('Module:Widget/Participants/Team/ParticipantNotification')
 local TeamQualifierInfo = Lua.import('Module:Widget/Participants/Team/QualifierInfo')
 local ParticipantsTeamRoster = Lua.import('Module:Widget/Participants/Team/Roster')
+local PotentialQualifiers = Lua.import('Module:Widget/Participants/Team/PotentialQualifiers')
 local WarningBoxGroup = Lua.import('Module:Widget/WarningBox/Group')
 
 ---@class ParticipantsTeamCard: Widget
@@ -40,6 +41,7 @@ function ParticipantsTeamCard:render()
 
 	table.insert(content, qualifierInfoContent)
 
+	table.insert(content, PotentialQualifiers{participant = participant})
 	table.insert(content, ParticipantsTeamRoster{participant = participant})
 
 	if participant.notes and #participant.notes > 0 then
