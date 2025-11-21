@@ -19,6 +19,8 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local CustomMatchGroupInput = {}
+
+---@class RocketLeagueMatchParser: MatchParserInterface
 local MatchFunctions = {}
 local MapFunctions = {}
 
@@ -45,7 +47,7 @@ function MatchFunctions.adjustOpponent(opponent, opponentIndex)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	local maps = {}
@@ -141,7 +143,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
@@ -165,7 +167,7 @@ function MatchFunctions._checkForNonEmptyOpponent(opponent)
 	return not Opponent.isTbd(opponent)
 end
 
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param tier integer?
 ---@return boolean
 function MatchFunctions.isFeatured(opponents, tier)
