@@ -70,6 +70,8 @@ function TeamParticipantsController.importParticipants(participants)
 		end
 
 		TeamParticipantsController.mergeManualAndImportedPlayers(players, importedPlayers)
+
+		TeamParticipantsWikiParser.fillIncompleteRoster(participant.opponent, participant.expectedPlayerCount)
 	end)
 end
 

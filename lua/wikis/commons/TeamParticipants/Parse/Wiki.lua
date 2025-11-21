@@ -21,7 +21,7 @@ local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
 ---qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer,
----potentialQualifiers: standardOpponent[]?, warnings: string[]?}
+---potentialQualifiers: standardOpponent[]?, warnings: string[]?, expectedPlayerCount: integer?}
 
 ---@alias QualificationMethod 'invite'|'qual'
 ---@alias QualificationType 'tournament'|'external'|'other'
@@ -33,10 +33,10 @@ local TeamParticipantsWikiParser = {}
 ---@return {participants: TeamParticipant[]}
 function TeamParticipantsWikiParser.parseWikiInput(args)
 	local date = DateExt.parseIsoDate(args.date) or DateExt.parseIsoDate(DateExt.getContextualDateOrNow())
-	local playerNumber = args.playernumber
+	local minimumPlayers = tonumber(args.playernumber)
 
 	local participants = Array.map(args, function (input)
-		return TeamParticipantsWikiParser.parseParticipant(input, date, playerNumber)
+		return TeamParticipantsWikiParser.parseParticipant(input, date, minimumPlayers)
 	end)
 
 	return {
@@ -91,9 +91,9 @@ end
 --- Parse a single participant from input
 ---@param input table
 ---@param date osdateparam
----@param playerNumber number
+---@param minimumPlayers number?
 ---@return TeamParticipant
-function TeamParticipantsWikiParser.parseParticipant(input, date, playerNumber)
+function TeamParticipantsWikiParser.parseParticipant(input, date, minimumPlayers)
 	local potentialQualifiers = {}
 	local opponent
 	local warnings = {}
@@ -121,7 +121,9 @@ function TeamParticipantsWikiParser.parseParticipant(input, date, playerNumber)
 		opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
 		opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), {syncPlayer = true})
 
-		TeamParticipantsWikiParser.fillIncompleteRoster(opponent, playerNumber)
+		if not Logic.readBool(input.import) then
+			TeamParticipantsWikiParser.fillIncompleteRoster(opponent, minimumPlayers)
+		end
 	end
 
 	local aliases = Array.parseCommaSeparatedString(input.aliases, ';')
@@ -146,7 +148,8 @@ function TeamParticipantsWikiParser.parseParticipant(input, date, playerNumber)
 		potentialQualifiers = potentialQualifiers,
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
-		date = DateExt.parseIsoDate(input.date) or date, -- TODO: fetch from wiki var too
+		date = DateExt.parseIsoDate(input.date) or date,
+		expectedPlayerCount = minimumPlayers,
 	}
 end
 
@@ -169,9 +172,11 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 end
 
 ---@param opponent standardOpponent
----@param playerNumber number?
-function TeamParticipantsWikiParser.fillIncompleteRoster(opponent, playerNumber)
-	local expectedPlayerCount = playerNumber or (Info.config.participants and Info.config.participants.defaultPlayerNumber)
+---@param minimumPlayers number?
+function TeamParticipantsWikiParser.fillIncompleteRoster(opponent, minimumPlayers)
+	local expectedPlayerCount = minimumPlayers or
+		(Info.config.participants and Info.config.participants.defaultPlayerNumber)
+
 	if not expectedPlayerCount or not opponent.players then
 		return
 	end
@@ -195,14 +200,8 @@ end
 ---@return standardPlayer[]
 function TeamParticipantsWikiParser.createTBDPlayers(count, startIndex)
 	startIndex = startIndex or 1
-	return Array.map(Array.range(startIndex, startIndex + count - 1), function(i)
-		local player = Opponent.readPlayerArgs({[i] = 'TBD'}, i)
-		player.extradata = {
-			roles = {},
-			trophies = 0,
-			type = 'player',
-		}
-		return player
+	return Array.map(Array.range(startIndex, startIndex + count - 1), function()
+		TeamParticipantsWikiParser.parsePlayer{'TBD'}
 	end)
 end
 
