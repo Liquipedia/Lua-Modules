@@ -103,10 +103,15 @@ function MatchFunctions.getHeadToHeadLink(match, opponents)
 		return nil
 	end
 
-	local team1, team2 = mw.uri.encode(opponents[1].name), mw.uri.encode(opponents[2].name)
-	return tostring(mw.uri.fullUrl('Special:RunQuery/Head2head'))
-		.. '?RunQuery=Run&pfRunQueryFormName=Head2head&Headtohead%5Bteam1%5D='
-		.. team1 .. '&Headtohead%5Bteam2%5D=' .. team2
+	return tostring(mw.uri.fullUrl(
+		'Special:RunQuery/Head2head',
+		{
+			RunQuery = 'Run',
+			pfRunQueryFormName = 'Head2head',
+			['Headtohead[team1]'] = opponents[1].name,
+			['Headtohead[team2]'] = opponents[2].name,
+		}
+	))
 end
 
 ---@param match table
