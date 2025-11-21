@@ -174,6 +174,20 @@ end
 -- map related functions
 --
 
+---@param map table
+---@param opponents MGIParsedOpponent[]
+---@param finishedInput string?
+---@param winnerInput string?
+---@return boolean
+function MapFunctions.mapIsFinished(map, opponents, finishedInput, winnerInput)
+	if MatchGroupInputUtil.mapIsFinished(map) then
+		return true
+	end
+	return Logic.readBoolOrNil(finishedInput) == nil and Array.any(
+		map.opponents, function (mapOpponent) return mapOpponent.score ~= nil end
+	)
+end
+
 ---@param match table
 ---@param map table
 ---@param opponents MGIParsedOpponent[]
