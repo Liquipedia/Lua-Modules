@@ -113,6 +113,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, date, playerNumber)
 				table.insert(potentialQualifiers, Opponent.readOpponentArgs({type = Opponent.team, template = name}))
 			end)
 		end
+		opponent.players = {}
 	else
 		opponent = Opponent.readOpponentArgs(Table.merge(input, {
 			type = Opponent.team,
