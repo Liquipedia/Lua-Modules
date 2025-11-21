@@ -67,7 +67,7 @@ function TeamParticipantsController.importParticipants(parsedData)
 			end
 		end
 
-		if Logic.isNotEmpty(participant.potentialQualifiers) then
+		if participant.opponent.template == 'tbd' then
 			return
 		end
 
