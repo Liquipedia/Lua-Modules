@@ -180,14 +180,15 @@ describe('Team Participants TBD Functionality', function()
 				date = '2024-01-01',
 			}
 
-			TeamParticipantsController.importParticipants(parsedData)
+		TeamParticipantsController.importParticipants(parsedData)
+		TeamParticipantsController.fillIncompleteRosters(parsedData)
 
-			local opponent = parsedData.participants[1].opponent
-			local actualPlayers = Array.filter(opponent.players, function(p)
-				return p.extradata.type == 'player'
-			end)
+		local opponent = parsedData.participants[1].opponent
+		local actualPlayers = Array.filter(opponent.players, function(p)
+			return p.extradata.type == 'player'
+		end)
 
-			assert.are_equal(5, #actualPlayers)
+		assert.are_equal(5, #actualPlayers)
 			assert.are_equal('alexis', actualPlayers[1].displayName)
 			assert.are_equal('TBD', actualPlayers[4].displayName)
 			assert.are_equal('TBD', actualPlayers[5].displayName)

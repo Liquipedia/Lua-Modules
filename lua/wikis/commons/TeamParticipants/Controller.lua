@@ -35,6 +35,7 @@ function TeamParticipantsController.fromTemplate(frame)
 	local parsedArgs = Json.parseStringifiedArgs(args)
 	local parsedData = TeamParticipantsWikiParser.parseWikiInput(parsedArgs)
 	TeamParticipantsController.importParticipants(parsedData)
+	TeamParticipantsController.fillIncompleteRosters(parsedData)
 
 	local shouldStore =
 		Logic.readBoolOrNil(args.store) ~= false and
@@ -66,12 +67,6 @@ function TeamParticipantsController.importParticipants(parsedData)
 				TeamParticipantsController.mergeManualAndImportedPlayers(players, importedPlayers)
 			end
 		end
-
-		if participant.opponent.template == 'tbd' then
-			return
-		end
-
-		TeamParticipantsWikiParser.fillIncompleteRoster(participant.opponent, parsedData.expectedPlayerCount)
 	end)
 end
 
@@ -127,6 +122,19 @@ function TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers,
 			local newPlayer = Table.deepMerge(player, manualPlayers[indexOfManualPlayer])
 			manualPlayers[indexOfManualPlayer] = newPlayer
 		end
+	end)
+end
+
+--- Fills incomplete rosters for all participants with TBD players if needed.
+--- May mutate the input.
+---@param parsedData {participants: TeamParticipant[], expectedPlayerCount: integer?}
+function TeamParticipantsController.fillIncompleteRosters(parsedData)
+	Array.forEach(parsedData.participants, function (participant)
+		if participant.opponent.template == 'tbd' then
+			return
+		end
+
+		TeamParticipantsWikiParser.fillIncompleteRoster(participant.opponent, parsedData.expectedPlayerCount)
 	end)
 end
 
