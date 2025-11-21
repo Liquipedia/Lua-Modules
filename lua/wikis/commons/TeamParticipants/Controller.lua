@@ -51,27 +51,23 @@ end
 
 --- Imports participants' squad members from the database if requested.
 --- May mutate the input.
----@param participants {participants: TeamParticipant[]}
-function TeamParticipantsController.importParticipants(participants)
-	Array.forEach(participants.participants, function (participant)
+---@param parsedData {participants: TeamParticipant[], expectedPlayerCount: integer?}
+function TeamParticipantsController.importParticipants(parsedData)
+	Array.forEach(parsedData.participants, function (participant)
 		local players = participant.opponent.players
 		-- Bad structure, this should always exist
 		if not players then
 			return
 		end
 
-		if not Logic.readBool(participant.shouldImportFromDb) then
-			return
+		if Logic.readBool(participant.shouldImportFromDb) then
+			local importedPlayers = TeamParticipantsController.importSquadMembersFromDatabase(participant)
+			if importedPlayers then
+				TeamParticipantsController.mergeManualAndImportedPlayers(players, importedPlayers)
+			end
 		end
 
-		local importedPlayers = TeamParticipantsController.importSquadMembersFromDatabase(participant)
-		if not importedPlayers then
-			return
-		end
-
-		TeamParticipantsController.mergeManualAndImportedPlayers(players, importedPlayers)
-
-		TeamParticipantsWikiParser.fillIncompleteRoster(participant.opponent, participant.expectedPlayerCount)
+		TeamParticipantsWikiParser.fillIncompleteRoster(participant.opponent, parsedData.expectedPlayerCount)
 	end)
 end
 

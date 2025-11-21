@@ -21,7 +21,7 @@ local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
 ---qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer,
----potentialQualifiers: standardOpponent[]?, warnings: string[]?, expectedPlayerCount: integer?}
+---potentialQualifiers: standardOpponent[]?, warnings: string[]?}
 
 ---@alias QualificationMethod 'invite'|'qual'
 ---@alias QualificationType 'tournament'|'external'|'other'
@@ -30,7 +30,7 @@ local TeamParticipantsWikiParser = {}
 ---tournament?: StandardTournament, url?: string, text?: string}
 
 ---@param args table
----@return {participants: TeamParticipant[]}
+---@return {participants: TeamParticipant[], expectedPlayerCount: integer?}
 function TeamParticipantsWikiParser.parseWikiInput(args)
 	local date = DateExt.parseIsoDate(args.date) or DateExt.parseIsoDate(DateExt.getContextualDateOrNow())
 	local minimumPlayers = tonumber(args.minimumplayers)
@@ -40,7 +40,8 @@ function TeamParticipantsWikiParser.parseWikiInput(args)
 	end)
 
 	return {
-		participants = participants
+		participants = participants,
+		expectedPlayerCount = minimumPlayers,
 	}
 end
 
@@ -91,9 +92,8 @@ end
 --- Parse a single participant from input
 ---@param input table
 ---@param date osdateparam
----@param minimumPlayers number?
 ---@return TeamParticipant
-function TeamParticipantsWikiParser.parseParticipant(input, date, minimumPlayers)
+function TeamParticipantsWikiParser.parseParticipant(input, date)
 	local potentialQualifiers = {}
 	local opponent
 	local warnings = {}
@@ -120,10 +120,6 @@ function TeamParticipantsWikiParser.parseParticipant(input, date, minimumPlayers
 		}))
 		opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
 		opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), {syncPlayer = true})
-
-		if not Logic.readBool(input.import) then
-			TeamParticipantsWikiParser.fillIncompleteRoster(opponent, minimumPlayers)
-		end
 	end
 
 	local aliases = Array.parseCommaSeparatedString(input.aliases, ';')
@@ -149,7 +145,6 @@ function TeamParticipantsWikiParser.parseParticipant(input, date, minimumPlayers
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
 		date = DateExt.parseIsoDate(input.date) or date, -- TODO: fetch from wiki var too
-		expectedPlayerCount = minimumPlayers,
 	}
 end
 
