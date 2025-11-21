@@ -148,7 +148,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, date, minimumPlayers
 		potentialQualifiers = potentialQualifiers,
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
-		date = DateExt.parseIsoDate(input.date) or date,
+		date = DateExt.parseIsoDate(input.date) or date, -- TODO: fetch from wiki var too
 		expectedPlayerCount = minimumPlayers,
 	}
 end
@@ -190,21 +190,17 @@ function TeamParticipantsWikiParser.fillIncompleteRoster(opponent, minimumPlayer
 		return
 	end
 
-	local tbdPlayers = TeamParticipantsWikiParser.createTBDPlayers(
-		expectedPlayerCount - actualPlayerCount,
-		actualPlayerCount + 1
-	)
+	local tbdPlayers = TeamParticipantsWikiParser.createTBDPlayers(expectedPlayerCount - actualPlayerCount)
+
 	Array.forEach(tbdPlayers, function(tbdPlayer)
 		table.insert(opponent.players, tbdPlayer)
 	end)
 end
 
 ---@param count number
----@param startIndex number?
 ---@return standardPlayer[]
-function TeamParticipantsWikiParser.createTBDPlayers(count, startIndex)
-	startIndex = startIndex or 1
-	return Array.map(Array.range(startIndex, startIndex + count - 1), function()
+function TeamParticipantsWikiParser.createTBDPlayers(count)
+	return Array.map(Array.range(1, count), function()
 		return TeamParticipantsWikiParser.parsePlayer{'TBD'}
 	end)
 end
