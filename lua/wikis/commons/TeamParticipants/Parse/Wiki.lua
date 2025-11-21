@@ -190,17 +190,12 @@ function TeamParticipantsWikiParser.fillIncompleteRoster(opponent, minimumPlayer
 		return
 	end
 
-	local lastPlayer = actualPlayers[actualPlayerCount]
-	local lastPlayerIndex = Array.indexOf(opponent.players, function(player)
-		return player == lastPlayer
-	end)
-
 	local tbdPlayers = TeamParticipantsWikiParser.createTBDPlayers(
 		expectedPlayerCount - actualPlayerCount,
 		actualPlayerCount + 1
 	)
-	Array.forEach(Array.reverse(tbdPlayers), function(tbdPlayer)
-		table.insert(opponent.players, lastPlayerIndex + 1, tbdPlayer)
+	Array.forEach(tbdPlayers, function(tbdPlayer)
+		table.insert(opponent.players, tbdPlayer)
 	end)
 end
 
