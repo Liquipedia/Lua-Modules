@@ -61,12 +61,16 @@ function TeamParticipantsController.importParticipants(parsedData)
 			return
 		end
 
-		if Logic.readBool(participant.shouldImportFromDb) then
-			local importedPlayers = TeamParticipantsController.importSquadMembersFromDatabase(participant)
-			if importedPlayers then
-				TeamParticipantsController.mergeManualAndImportedPlayers(players, importedPlayers)
-			end
+		if not Logic.readBool(participant.shouldImportFromDb) then
+			return
 		end
+
+		local importedPlayers = TeamParticipantsController.importSquadMembersFromDatabase(participant)
+		if not importedPlayers then
+			return
+		end
+
+		TeamParticipantsController.mergeManualAndImportedPlayers(players, importedPlayers)
 	end)
 end
 
