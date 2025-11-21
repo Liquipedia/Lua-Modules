@@ -67,6 +67,10 @@ function TeamParticipantsController.importParticipants(parsedData)
 			end
 		end
 
+		if Logic.isNotEmpty(participant.potentialQualifiers) then
+			return
+		end
+
 		TeamParticipantsWikiParser.fillIncompleteRoster(participant.opponent, parsedData.expectedPlayerCount)
 	end)
 end

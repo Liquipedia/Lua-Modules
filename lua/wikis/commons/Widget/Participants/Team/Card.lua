@@ -41,15 +41,18 @@ function ParticipantsTeamCard:render()
 	table.insert(content, qualifierInfoContent)
 	table.insert(content, PotentialQualifiers{participant = participant})
 	table.insert(content, ParticipantsTeamRoster{participant = participant})
-	table.insert(content, Div{
-		classes = {'team-participant-notifications'},
-		children = Array.map(participant.notes, function(note)
-			return ParticipantNotification{
-				text = note.text,
-				highlighted = note.highlighted,
-			}
-		end)
-	})
+
+	if participant.notes and #participant.notes > 0 then
+		table.insert(content, Div{
+			classes = {'team-participant-notifications'},
+			children = Array.map(participant.notes, function(note)
+				return ParticipantNotification{
+					text = note.text,
+					highlighted = note.highlighted,
+				}
+			end)
+		})
+	end
 
 	return Collapsible{
 		shouldCollapse = true,
