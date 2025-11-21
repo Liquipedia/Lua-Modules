@@ -201,7 +201,7 @@ end
 function TeamParticipantsWikiParser.createTBDPlayers(count, startIndex)
 	startIndex = startIndex or 1
 	return Array.map(Array.range(startIndex, startIndex + count - 1), function()
-		TeamParticipantsWikiParser.parsePlayer{'TBD'}
+		return TeamParticipantsWikiParser.parsePlayer{'TBD'}
 	end)
 end
 
