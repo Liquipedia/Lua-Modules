@@ -71,7 +71,8 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 	}
 
 	&-square-icon {
-		.team-template-image-icon {
+		.team-template-image-icon,
+		.league-icon-small-image {
 			@include set-participant-icon-size(
 				$participant-icon-wrapper-size-expanded,
 				$participant-icon-size-expanded
@@ -94,6 +95,14 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 		padding: 0 0.5rem;
 		cursor: pointer;
 
+		.theme--light & {
+			color: var( --clr-secondary-25 );
+		}
+
+		.theme--dark & {
+			color: var( --clr-secondary-90 );
+		}
+
 		&__main {
 			display: contents;
 		}
@@ -105,6 +114,11 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 			flex: 1 0 0;
 			font-weight: bold;
 			min-width: 0;
+
+			.league-icon-small-image > img {
+				filter: grayscale( 1 );
+				opacity: 0.3;
+			}
 		}
 
 		&-label {
@@ -251,11 +265,19 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 .team-participant-wrapper:has( .switch-toggle-active#{ $compact-selector } ) {
 	.team-participant-card {
 		&-square-icon {
-			.team-template-image-icon {
+			.team-template-image-icon,
+			.league-icon-small-image {
 				@include set-participant-icon-size(
 					$participant-icon-wrapper-size-compact,
 					$participant-icon-size-compact
 				);
+
+				@media ( max-width: 767px ) {
+					@include set-participant-icon-size(
+						$participant-icon-wrapper-size-mobile,
+						$participant-icon-size-mobile
+					);
+				}
 			}
 		}
 
@@ -296,7 +318,8 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 }
 
 .team-participant-square-icon {
-	.team-template-image-icon {
+	.team-template-image-icon,
+	.league-icon-small-image {
 		@include set-participant-icon-size(
 			$participant-icon-wrapper-size-compact,
 			$participant-icon-size-compact
@@ -379,7 +402,8 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 
 	&-team {
 		.team-participant-square-icon {
-			.team-template-image-icon {
+			.team-template-image-icon,
+			.league-icon-small-image {
 				& > a {
 					display: flex;
 					justify-content: center;

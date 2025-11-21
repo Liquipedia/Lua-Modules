@@ -37,6 +37,9 @@ return {
 			matchWidth = 190,
 			sortCasters = true,
 		},
+		participants = {
+			defaultPlayerNumber = 5,
+		},
 	},
 	defaultRoundPrecision = 0,
 }
