@@ -33,7 +33,7 @@ local TeamParticipantsWikiParser = {}
 ---@return {participants: TeamParticipant[]}
 function TeamParticipantsWikiParser.parseWikiInput(args)
 	local date = DateExt.parseIsoDate(args.date) or DateExt.parseIsoDate(DateExt.getContextualDateOrNow())
-	local minimumPlayers = tonumber(args.playernumber)
+	local minimumPlayers = tonumber(args.minimumplayers)
 
 	local participants = Array.map(args, function (input)
 		return TeamParticipantsWikiParser.parseParticipant(input, date, minimumPlayers)
