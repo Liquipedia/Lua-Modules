@@ -33,29 +33,23 @@ function ParticipantsTeamCard:render()
 	local qualifierInfoContent = TeamQualifierInfo{participant = participant, location = 'content'}
 
 	local content = {}
-	local notificationWidgets = {}
 
 	if participant.warnings then
 		table.insert(content, WarningBoxGroup{data = participant.warnings})
 	end
 
 	table.insert(content, qualifierInfoContent)
-
 	table.insert(content, PotentialQualifiers{participant = participant})
 	table.insert(content, ParticipantsTeamRoster{participant = participant})
-
-	if participant.notes and #participant.notes > 0 then
-		Array.forEach(participant.notes, function(note)
-			table.insert(notificationWidgets, ParticipantNotification{
+	table.insert(content, Div{
+		classes = {'team-participant-notifications'},
+		children = Array.map(participant.notes, function(note)
+			return ParticipantNotification{
 				text = note.text,
 				highlighted = note.highlighted,
-			})
+			}
 		end)
-		table.insert(content, Div{
-			classes = {'team-participant-notifications'},
-			children = notificationWidgets
-		})
-	end
+	})
 
 	return Collapsible{
 		shouldCollapse = true,
