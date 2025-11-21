@@ -117,12 +117,12 @@ end
 function CustomCharacter:addToLpdb(lpdbData, args)
 	lpdbData.extradata.lane1 = args.lane1
 	lpdbData.extradata.lane2 = args.lane2
-	lpdbData.extradata.lane1 = args.lane3
-	lpdbData.extradata.lane1 = args.lane4
+	lpdbData.extradata.lane3 = args.lane3
+	lpdbData.extradata.lane4 = args.lane4
 	lpdbData.extradata.role1 = args.role1
 	lpdbData.extradata.role2 = args.role2
-	lpdbData.extradata.role1 = args.role3
-	lpdbData.extradata.role1 = args.role4
+	lpdbData.extradata.role3 = args.role3
+	lpdbData.extradata.role4 = args.role4
 
 	return lpdbData
 end
