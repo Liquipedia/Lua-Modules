@@ -36,7 +36,7 @@ function TeamParticipantsWikiParser.parseWikiInput(args)
 	local minimumPlayers = tonumber(args.minimumplayers)
 
 	local participants = Array.map(args, function (input)
-		return TeamParticipantsWikiParser.parseParticipant(input, date, minimumPlayers)
+		return TeamParticipantsWikiParser.parseParticipant(input, date)
 	end)
 
 	return {
