@@ -92,6 +92,14 @@ function MatchFunctions.extractMaps(match, opponents)
 	return maps
 end
 
+---@param games table[]
+---@return table[]
+function MatchFunctions.removeUnsetMaps(games)
+	return Array.filter(games, function(map)
+		return map.map ~= nil
+	end)
+end
+
 ---@param opponent table
 ---@return table
 function CustomMatchGroupInput.getOpponentExtradata(opponent)
@@ -212,9 +220,11 @@ end
 -- map related functions
 --
 
+---@param match table
 ---@param map table
+---@param opponents MGIParsedOpponent[]
 ---@return table
-function MapFunctions.getExtraData(map)
+function MapFunctions.getExtraData(match, map, opponents)
 	local timeouts = Array.extractValues(Table.mapValues(mw.text.split(map.timeout or '', ','), tonumber))
 
 	return {
