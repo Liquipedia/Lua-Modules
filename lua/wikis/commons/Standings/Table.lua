@@ -29,6 +29,7 @@ local StandingsTable = {}
 ---@class Scoreboard
 ---@field points number?
 ---@field match {w: integer, d: integer, l: integer}
+---@field game {w: integer, d: integer, l: integer}?
 
 ---@class StandingTableOpponentData
 ---@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?,
@@ -56,21 +57,30 @@ function StandingsTable.fromTemplate(frame)
 
 	local tiebreakers = StandingsParseWiki.parseTiebreakers(args, tableType)
 
+	local statusConfigs
 	if importScoreFromMatches then
-		local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args)
+		local automaticScoreFunction
+		automaticScoreFunction, statusConfigs = StandingsParseWiki.makeScoringFunction(tableType, args)
 
-		local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction)
+		local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction, statusConfigs)
 		opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
 	end
 
 	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
 
 	if tableType == 'swiss' then
-		standingsTable.extradata.placemapping = Logic.wrapTryOrLog(StandingsParseWiki.parsePlaceMapping)(args, opponents)
+		standingsTable.extradata.placemapping =
+			Logic.wrapTryOrLog(StandingsParseWiki.parsePlaceMapping)(args, opponents)
+		if statusConfigs then
+			standingsTable.extradata.statusConfigs = statusConfigs
+		end
 	end
 
-	StandingsStorage.run(standingsTable, {saveVars = true})
-	return StandingsDisplay{pageName = mw.title.getCurrentTitle().text, standingsIndex = standingsTable.standingsindex}
+	StandingsStorage.run(standingsTable, { saveVars = true })
+	return StandingsDisplay {
+		pageName = mw.title.getCurrentTitle().text,
+		standingsIndex = standingsTable.standingsindex
+	}
 end
 
 ---@param manualOpponents StandingTableOpponentData[]
