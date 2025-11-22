@@ -12,6 +12,7 @@ local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local Json = Lua.import('Module:Json')
 local MatchGroup = Lua.import('Module:MatchGroup')
+local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
 
@@ -60,6 +61,16 @@ function MatchMapsLegacy._handleMaps(args)
 		args[mapKey .. 'winner'] = Table.extract(args, mapKey .. 'win')
 		args[matchKey] = nil
 	end
+
+	--need to determine bestof here already for brackets...
+	--need to create a copy here to not affect the real args
+	local copy = Table.deepCopy(args)
+
+	if not args.bestof then
+		local res = MatchMapsLegacy._handleDetails({}, copy)
+		args.bestof = res.bestof
+	end
+
 	return args
 end
 
@@ -91,7 +102,7 @@ end
 function MatchMapsLegacy._handleDetails(args, details)
 	local getMapFromDetails = function (index)
 		local prefix = 'map' .. index
-		if not details[prefix] then
+		if not details[prefix] and not details[prefix .. 'winner'] then
 			return nil
 		end
 		local map = {
@@ -124,7 +135,7 @@ function MatchMapsLegacy._handleDetails(args, details)
 		}
 	end
 
-	Array.mapIndexes(function (index)
+	local maps = Array.mapIndexes(function (index)
 		local map = getMapFromDetails(index) or getMapOnlyWithWinner(index)
 		if map and map.winner then
 			args.mapWinnersSet = true
@@ -134,7 +145,31 @@ function MatchMapsLegacy._handleDetails(args, details)
 		return map
 	end)
 
+	-- determine bestofFromMaps
+	args.bestof = args.bestof or MatchMapsLegacy._bestofHeuristic(maps)
+
 	return args, details
+end
+
+---@param maps table[]
+---@return integer?
+function MatchMapsLegacy._bestofHeuristic(maps)
+	if Logic.isEmpty(maps) then return end
+
+	local wins = {0, 0}
+	Array.forEach(maps, function(map)
+		local winner = tonumber(map.winner)
+		if winner == 1 then
+			wins[1] = wins[1] + 1
+		elseif winner == 2 then
+			wins[2] = wins[2] + 1
+		end
+	end)
+
+	local firstTo = math.max(unpack(wins))
+	local bestof = firstTo * 2 - 1
+	if bestof <= 0 then return end
+	return bestof
 end
 
 ---@param args table
@@ -221,8 +256,9 @@ end
 
 -- invoked by Template:MatchList
 ---@param frame Frame
+---@param generate true?
 ---@return string
-function MatchMapsLegacy.matchList(frame)
+function MatchMapsLegacy.matchList(frame, generate)
 	local args = Arguments.getArgs(frame)
 	assert(args.id, 'Missing id')
 
@@ -233,7 +269,7 @@ function MatchMapsLegacy.matchList(frame)
 	local hide = Logic.nilOr(Logic.readBoolOrNil(args.hide), true)
 	args.isLegacy = true
 	args.store = store
-	args.noDuplicateCheck = not store
+	args.noDuplicateCheck = not store or nil
 	args.collapsed = hide
 	args.attached = hide
 	args.title = Logic.nilOr(args.title, args[1])
@@ -258,7 +294,16 @@ function MatchMapsLegacy.matchList(frame)
 	args.hide = nil
 	args.lpdb_title = nil
 
+	if generate then
+		args.isLegacy = nil
+		return MatchGroupLegacy.generateWikiCodeForMatchList(args)
+	end
+
 	return MatchGroup.MatchList(args)
+end
+
+function MatchMapsLegacy.generate(frame)
+	return MatchMapsLegacy.matchList(frame, true)
 end
 
 return MatchMapsLegacy

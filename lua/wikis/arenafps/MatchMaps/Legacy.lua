@@ -12,6 +12,7 @@ local Array = Lua.import('Module:Array')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local MatchGroup = Lua.import('Module:MatchGroup')
+local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
 
@@ -110,7 +111,7 @@ function MatchMapsLegacy.showmatch(frame)
 		id = id,
 		hide = true,
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 		R1M1 = match
 	})
 
@@ -120,10 +121,17 @@ function MatchMapsLegacy.showmatch(frame)
 	})
 end
 
+---@param frame any
+---@return string
+function MatchMapsLegacy.generate(frame)
+	return MatchMapsLegacy.matchList(frame, true)
+end
+
 -- invoked by Template:LegacyMatchList
 ---@param frame Frame
+---@param generate true?
 ---@return string
-function MatchMapsLegacy.matchList(frame)
+function MatchMapsLegacy.matchList(frame, generate)
 	globalVars:set('islegacy', 'true')
 	local args = Arguments.getArgs(frame)
 	assert(args.id, 'Missing id')
@@ -133,7 +141,7 @@ function MatchMapsLegacy.matchList(frame)
 	Table.mergeInto(args, {
 		isLegacy = true,
 		store = store,
-		noDuplicateCheck = not store,
+		noDuplicateCheck = not store or nil,
 		collapsed = hide,
 		attached = hide,
 		title = Logic.nilOr(Table.extract(args, 'title'), args[1]),
@@ -148,7 +156,28 @@ function MatchMapsLegacy.matchList(frame)
 	end
 
 	globalVars:delete('islegacy')
+
+	if generate then
+		args.isLegacy = nil
+		return MatchGroupLegacy.generateWikiCodeForMatchList(args)
+	end
+
 	return MatchGroup.MatchList(args)
+end
+
+---@param frame Frame
+---@return string
+function MatchMapsLegacy.generateSingleMatch(frame)
+	local args = Arguments.getArgs(frame)
+	args.generate = true
+
+	assert(args.id, 'Missing id')
+
+	return MatchGroupLegacy.generateWikiCodeForSingleMatch{
+		match = MatchMapsLegacy.convertMatch(args),
+		id = args.id,
+		width = args.width,
+	}
 end
 
 return MatchMapsLegacy
