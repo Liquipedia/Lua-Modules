@@ -46,22 +46,4 @@ pwb replace -lang:brawlstars -transcludes:"LegacyBracket" -transcludes:"LegacyMa
 
 pwb replace -lang:dota2 -transcludes:"LegacyMatchListStart" -transcludes:"LegacyBracket" -transcludes:"LegacyMatchList" -summary:"Convert LegacyMatch2 wrappers" -pt:60 -regex -always -dotall "\{\{[lL]egacyBracket" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/Default|fn=runGenerate|dev=hjp" "\{\{[mM]atchListEnd\|?\s*\}\}" "}}" "\{\{[mM]atch/old" "{{subst:#invoke:Lua|invoke|module=Json|fn=fromArgs" "\{\{[bB]racketMatchSummary" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=convertBracketMatchSummary|dev=hjp" "\{\{[lL]egacyMatchListStart(.*?)\}\}\s*\n*\s*\|\{\{subst" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=generate2|dev=hjp\1\n|{{subst" "\{\{[lL]egacyMatchListStart(.*?)\}\}\s*\n*\s*\{\{[mM]atchMaps" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=generate2|dev=hjp\1\n|{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=convertMatch|dev=hjp|generate=true" "([^=])\s*\{\{[mM]atchMaps" "\1|{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=convertMatch|dev=hjp|generate=true" "=\s*\{\{[mM]atchMaps" "={{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=convertMatch|dev=hjp|generate=true" "\{\{[lL]egacyMatchList([^S])" "{{subst:#invoke:Lua|invoke|module=MatchMaps/Legacy|fn=generate|dev=hjp\1"
 
-
-
-"" ""
-"" ""
-"" ""
-"" ""
-"" ""
-"" ""
-"" ""
-"" ""
-"" ""
-"" ""
-"" ""
-"" ""
-"" ""
-
-"\{\{[lL]egacyBracket" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/Default|fn=runGenerate|dev=hjp"
-
-pwb replace -lang:.... -page:"...." -summary:"Convert LegacyMatch2 wrappers" -pt:60 -regex -always -dotall
+pwb replace -lang:rocketleague -transcludes:"LegacyBracket" -transcludes:"LegacyMatchList" -summary:"Convert LegacyMatch2 wrappers" -pt:60 -regex -always -dotall "\{\{[lL]egacyBracket" "{{subst:#invoke:Lua|invoke|module=MatchGroup/Legacy/Default|fn=runGenerate|dev=hjp" "\{\{[lL]egacyMatchList" "{{subst:#invoke:Lua|invoke|module=LegacyMatchList|fn=generate|dev=hjp" "\{\{[bB]racketMatchSummary" "{{subst:#invoke:Json|fromArgs" "\{\{[mM]atchMaps" "{{subst:#invoke:Lua|invoke|module=LegacyMatchList|fn=convertMatchMaps|dev=hjp" "\{\{[sS]wissMatchMaps" "{{subst:#invoke:Lua|invoke|module=LegacyMatchList|fn=convertSwissMatchMaps|dev=hjp"
