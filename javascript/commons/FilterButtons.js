@@ -262,6 +262,10 @@ liquipedia.filterButtons = {
 	},
 
 	updateFromFilterStates: function() {
+		Object.values( this.filterCounters ).forEach ( ( filterCounter ) => {
+			filterCounter.count = 0;
+		} );
+
 		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
 			let allState = true;
 
@@ -281,7 +285,6 @@ liquipedia.filterButtons = {
 			}
 
 			filterGroup.filterableItems.forEach( ( filterableItem ) => {
-				const initialHidden = filterableItem.hidden;
 				if ( filterGroup.curated ) {
 					filterableItem.hidden = !filterableItem.curated;
 				} else {
@@ -289,11 +292,8 @@ liquipedia.filterButtons = {
 						( category ) => filterGroup.filterStates[ category ]
 					);
 				}
-				if ( initialHidden !== filterableItem.hidden && filterableItem.counter ) {
-					const existingCount = this.filterCounters[ filterableItem.counter ].count;
-					let newCount = existingCount + ( filterableItem.hidden ? -1 : 1 );
-					newCount = newCount < 0 ? 0 : newCount;
-					this.filterCounters[ filterableItem.counter ].count = newCount;
+				if ( filterableItem.counter && !filterableItem.hidden ) {
+					this.filterCounters[ filterableItem.counter ].count += 1;
 				}
 			} );
 		} );
@@ -328,7 +328,6 @@ liquipedia.filterButtons = {
 		this.hideableGroups.forEach( ( hideableGroup ) => {
 			const groupElement = hideableGroup.element;
 			const filterableItems = this.getTopLevelFilterableItems( groupElement );
-			const initialHidden = groupElement.classList.contains( hideableGroup.hiddenClass );
 			if ( !filterableItems.some( this.isFilterableVisible, this ) ) {
 				groupElement.classList.remove( hideableGroup.effectClass );
 				groupElement.classList.add( hideableGroup.hiddenClass );
@@ -337,12 +336,8 @@ liquipedia.filterButtons = {
 				groupElement.classList.replace( hideableGroup.hiddenClass, hideableGroup.effectClass );
 				hideableGroup.fallbackItem?.classList.remove( hideableGroup.effectClass );
 			}
-			const newHidden = groupElement.classList.contains( hideableGroup.hiddenClass );
-			if ( initialHidden !== newHidden && hideableGroup.counter ) {
-				const existingCount = this.filterCounters[ hideableGroup.counter ].count;
-				let newCount = existingCount + ( newHidden ? -1 : 1 );
-				newCount = newCount < 0 ? 0 : newCount;
-				this.filterCounters[ hideableGroup.counter ].count = newCount;
+			if ( hideableGroup.counter && !groupElement.classList.contains( hideableGroup.hiddenClass ) ) {
+				this.filterCounters[ hideableGroup.counter ].count += 1;
 			}
 		} );
 
