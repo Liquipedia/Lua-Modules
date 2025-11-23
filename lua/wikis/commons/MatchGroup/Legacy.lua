@@ -580,6 +580,7 @@ function MatchGroupLegacy._generateOpponent(opp)
 	if Logic.isEmpty(opp) then return '' end
 	local opponentType = Table.extract(opp, 'type')
 	local opponentTemplate = String.upperCaseFirst(opponentType) .. 'Opponent'
+	opp.win = nil
 
 	return '{{' .. opponentTemplate .. MatchGroupLegacy._argsToString(opp) .. '}}'
 end
