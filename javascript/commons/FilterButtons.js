@@ -262,7 +262,7 @@ liquipedia.filterButtons = {
 	},
 
 	updateFromFilterStates: function() {
-		Object.values( this.filterCounters ).forEach ( ( filterCounter ) => {
+		Object.values( this.filterCounters ).forEach( ( filterCounter ) => {
 			filterCounter.count = 0;
 		} );
 
