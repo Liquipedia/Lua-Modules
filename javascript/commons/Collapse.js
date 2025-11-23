@@ -138,12 +138,12 @@ liquipedia.collapse = {
 					toggleGroup.classList.remove( 'toggle-state-hide' );
 					toggleGroup.classList.add( 'toggle-state-show' );
 					button.innerHTML = this.makeIcon( true ) + ' ' + showAllText;
-					this.updateCollapsibleElements( '.collapsible, .general-collapsible', true, toggleGroup );
+					this.updateCollapsibleElements( '.collapsible, .general-collapsible', false, toggleGroup );
 				} else {
 					toggleGroup.classList.remove( 'toggle-state-show' );
 					toggleGroup.classList.add( 'toggle-state-hide' );
 					button.innerHTML = this.makeIcon( false ) + ' ' + hideAllText;
-					this.updateCollapsibleElements( '.collapsible, .general-collapsible', false, toggleGroup );
+					this.updateCollapsibleElements( '.collapsible, .general-collapsible', true, toggleGroup );
 				}
 			};
 			toggleGroup.insertBefore( button, toggleGroup.firstChild );
