@@ -27,7 +27,7 @@ local TeamParticipantsWikiParser = {}
 ---@alias QualificationType 'tournament'|'external'|'other'
 
 ---@alias QualificationStructure {method: QualificationMethod, type: QualificationType,
----tournament?: StandardTournament, url?: string, text?: string, seed?: number}
+---tournament?: StandardTournament, url?: string, text?: string, placement?: number}
 
 ---@param args table
 ---@return {participants: TeamParticipant[], expectedPlayerCount: integer?}
@@ -47,15 +47,18 @@ end
 
 ---@param input string|number
 ---@return number
-local function validateSeed(input)
-	local seed = tonumber(input)
-	assert(seed, 'Invalid seed: must be a number (got: ' .. tostring(input) .. ')')
+local function validatePlacement(input)
+	local placement = tonumber(input)
+	assert(placement, 'Invalid placement: must be a number (got: ' .. tostring(input) .. ')')
 
-	assert(seed == math.floor(seed), 'Invalid seed: must be a whole number (got: ' .. tostring(input) .. ')')
+	assert(
+		placement == math.floor(placement),
+		'Invalid placement: must be a whole number (got: ' .. tostring(input) .. ')'
+	)
 
-	assert(seed > 0, 'Invalid seed: must be a positive number (got: ' .. tostring(input) .. ')')
+	assert(placement > 0, 'Invalid placement: must be a positive number (got: ' .. tostring(input) .. ')')
 
-	return seed
+	return placement
 end
 
 ---@param input table?
@@ -100,10 +103,10 @@ local function parseQualifier(input)
 		error('External qualifier must have text')
 	end
 
-	if input.seed then
+	if input.placement then
 		Logic.tryCatch(
 			function()
-				qualificationStructure.seed = validateSeed(input.seed)
+				qualificationStructure.placement = validatePlacement(input.placement)
 			end,
 			function(errorMessage)
 				table.insert(warnings, errorMessage)

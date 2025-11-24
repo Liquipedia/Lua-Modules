@@ -84,23 +84,23 @@ function ParticipantsTeamQualifierInfo:render()
 					}
 				)
 			},
-			self:createSeedBadge(qualification.seed)
+			self:createPlacementBadge(qualification.placement)
 		}
 	}
 
 	return content
 end
 
----@param seed number?
+---@param placement number?
 ---@return Widget?
-function ParticipantsTeamQualifierInfo:createSeedBadge(seed)
-	if not seed then
+function ParticipantsTeamQualifierInfo:createPlacementBadge(placement)
+	if not placement then
 		return nil
 	end
 
 	return Span{
-		classes = {'team-participant-card-qualifier-seed'},
-		children = {'#' .. seed}
+		classes = {'team-participant-card-qualifier-placement'},
+		children = {'#' .. placement}
 	}
 end
 
