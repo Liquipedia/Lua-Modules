@@ -209,7 +209,7 @@ function MapFunctions.getExtraData(match, map, opponents)
 		--the following is used to store 'mapXtYgoals' from LegacyMatchLists
 		t1goals = map.t1goals,
 		t2goals = map.t2goals,
-		timeout = Table.isNotEmpty(timeouts) and timeouts or nil,
+		timeout = Logic.nilIfEmpty(timeouts),
 	}
 end
 
