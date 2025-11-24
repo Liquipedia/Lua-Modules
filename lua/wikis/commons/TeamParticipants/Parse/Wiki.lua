@@ -69,11 +69,12 @@ local function validateSeed(input)
 end
 
 ---@param input table?
----@return QualificationStructure?
+---@return QualificationStructure?, string[]?
 local function parseQualifier(input)
 	if not input then
 		return
 	end
+	local warnings = {}
 	local qualificationMethod = input.method
 	if not qualificationMethod then
 		return
@@ -109,11 +110,16 @@ local function parseQualifier(input)
 		error('External qualifier must have text')
 	end
 
-	local seed = validateSeed(input.seed)
-	if seed then
+	local seed, warning = validateSeed(input.seed)
+	if warning then
+		table.insert(warnings, warning)
+	elseif seed then
 		qualificationStructure.seed = seed
 	end
 
+	if #warnings > 0 then
+		return qualificationStructure, warnings
+	end
 	return qualificationStructure
 end
 
@@ -150,14 +156,8 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 		opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), {syncPlayer = true})
 	end
 
-	local qualification = parseQualifier(input.qualification)
-
-	if input.qualification and input.qualification.seed then
-		local _, warning = validateSeed(input.qualification.seed)
-		if warning then
-			table.insert(warnings, warning)
-		end
-	end
+	local qualification, qualificationWarnings = parseQualifier(input.qualification)
+	Array.extendWith(warnings, qualificationWarnings)
 
 	local aliases = Array.parseCommaSeparatedString(input.aliases, ';')
 	table.insert(aliases, Opponent.toName(opponent))
