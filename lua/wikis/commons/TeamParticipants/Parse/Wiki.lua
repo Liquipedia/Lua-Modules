@@ -127,12 +127,26 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 		opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), {syncPlayer = true})
 	end
 
+	local qualification = parseQualifier(input.qualification)
+
+	if input.qualification and input.qualification.seed then
+		local seed = tonumber(input.qualification.seed)
+		if not seed then
+			table.insert(warnings, string.format('Invalid seed: must be a number (got: %s)', tostring(input.qualification.seed)))
+		elseif seed <= 0 then
+			table.insert(
+				warnings,
+				string.format('Invalid seed: must be a positive number (got: %s)', tostring(input.qualification.seed))
+			)
+		end
+	end
+
 	local aliases = Array.parseCommaSeparatedString(input.aliases, ';')
 	table.insert(aliases, Opponent.toName(opponent))
 
 	return {
 		opponent = opponent,
-		qualification = parseQualifier(input.qualification),
+		qualification = qualification,
 		aliases = Array.flatMap(aliases, function(alias)
 			return TeamTemplate.queryHistoricalNames(alias)
 		end),

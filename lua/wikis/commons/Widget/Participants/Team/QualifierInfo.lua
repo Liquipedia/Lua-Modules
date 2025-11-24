@@ -23,19 +23,6 @@ local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 ---@operator call(table): ParticipantsTeamQualifierInfo
 local ParticipantsTeamQualifierInfo = Class.new(Widget)
 
----@param seed number?
----@return Widget?
-function ParticipantsTeamQualifierInfo:createSeedBadge(seed)
-	if not seed then
-		return nil
-	end
-
-	return Span{
-		classes = {'team-participant-card-qualifier-seed'},
-		children = {'#' .. seed}
-	}
-end
-
 ---@return Widget?
 function ParticipantsTeamQualifierInfo:render()
 	local participant = self.props.participant
@@ -88,7 +75,7 @@ function ParticipantsTeamQualifierInfo:render()
 		classes = {'team-participant-card-qualifier', 'team-participant-card-qualifier--' .. location},
 		children = {
 			Div{
-				classes = {'team-participant-card-qualifier--content'},
+				classes = {'team-participant-card-qualifier-content'},
 				children = WidgetUtil.collect(
 					icon,
 					Span{
@@ -102,6 +89,19 @@ function ParticipantsTeamQualifierInfo:render()
 	}
 
 	return content
+end
+
+---@param seed number?
+---@return Widget?
+function ParticipantsTeamQualifierInfo:createSeedBadge(seed)
+	if not seed then
+		return nil
+	end
+
+	return Span{
+		classes = {'team-participant-card-qualifier-seed'},
+		children = {'#' .. seed}
+	}
 end
 
 return ParticipantsTeamQualifierInfo
