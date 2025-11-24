@@ -170,7 +170,7 @@ end
 ---@param minimumPlayers number?
 function TeamParticipantsWikiParser.fillIncompleteRoster(opponent, minimumPlayers)
 	local expectedPlayerCount = minimumPlayers or
-		(Info.config.participants and Info.config.participants.defaultPlayerNumber)
+		(Info.config.participants or {}).defaultPlayerNumber
 
 	if not expectedPlayerCount or not opponent.players then
 		return
