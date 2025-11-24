@@ -21,6 +21,8 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local CustomMatchGroupInput = {}
+
+---@class Dota2MatchParser: MatchParserInterface
 local MatchFunctions = {}
 local MapFunctions = {}
 
