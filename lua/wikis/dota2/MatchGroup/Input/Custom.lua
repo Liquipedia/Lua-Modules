@@ -71,7 +71,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param MapParser Dota2MapParserInterface
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents, MapParser)
@@ -125,7 +125,7 @@ function MatchFunctions.getLinks(match, games)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return string?
 function MatchFunctions.getHeadToHeadLink(match, opponents)
 	local isTeamGame = Array.all(opponents, function(opponent)
@@ -146,7 +146,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
@@ -166,7 +166,7 @@ end
 ---@param MapParser Dota2MapParserInterface
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(MapParser, match, map, opponents)
 	local extraData = {
@@ -207,7 +207,7 @@ end
 
 ---@param MapParser Dota2MapParserInterface
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponentIndex)
