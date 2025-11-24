@@ -49,14 +49,14 @@ end
 ---@return number
 local function validatePlacement(input)
 	local placement = tonumber(input)
-	assert(placement, 'Invalid placement: must be a number (got: ' .. tostring(input) .. ')')
+	assert(placement, 'Invalid placement: must be a number (got: ' .. input .. ')')
 
 	assert(
 		placement == math.floor(placement),
-		'Invalid placement: must be a whole number (got: ' .. tostring(input) .. ')'
+		'Invalid placement: must be a whole number (got: ' .. input .. ')'
 	)
 
-	assert(placement > 0, 'Invalid placement: must be a positive number (got: ' .. tostring(input) .. ')')
+	assert(placement > 0, 'Invalid placement: must be a positive number (got: ' .. input .. ')')
 
 	return placement
 end
