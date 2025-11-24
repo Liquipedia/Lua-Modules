@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
+---@class Dota2MatchPageMapParser: Dota2MapParserInterface
 local CustomMatchGroupInputMatchPage = {}
 
 ---@class dota2MatchDataExtended: dota2MatchData

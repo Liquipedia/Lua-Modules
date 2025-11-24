@@ -5,6 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+---@class Dota2NormalMapParser: Dota2MapParserInterface
 local CustomMatchGroupInputNormal = {}
 
 local MAX_NUM_PICKS = 5
