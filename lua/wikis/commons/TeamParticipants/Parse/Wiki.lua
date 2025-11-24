@@ -45,6 +45,29 @@ function TeamParticipantsWikiParser.parseWikiInput(args)
 	}
 end
 
+---@param input string|number|nil
+---@return number?, string?
+local function validateSeed(input)
+	if not input then
+		return nil, nil
+	end
+
+	local seed = tonumber(input)
+	if not seed then
+		return nil, 'Invalid seed: must be a number (got: ' .. tostring(input) .. ')'
+	end
+
+	if seed ~= math.floor(seed) then
+		return nil, 'Invalid seed: must be a whole number (got: ' .. tostring(input) .. ')'
+	end
+
+	if seed <= 0 then
+		return nil, 'Invalid seed: must be a positive number (got: ' .. tostring(input) .. ')'
+	end
+
+	return seed, nil
+end
+
 ---@param input table?
 ---@return QualificationStructure?
 local function parseQualifier(input)
@@ -86,8 +109,8 @@ local function parseQualifier(input)
 		error('External qualifier must have text')
 	end
 
-	local seed = tonumber(input.seed)
-	if seed and seed > 0 then
+	local seed = validateSeed(input.seed)
+	if seed then
 		qualificationStructure.seed = seed
 	end
 
@@ -130,14 +153,9 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 	local qualification = parseQualifier(input.qualification)
 
 	if input.qualification and input.qualification.seed then
-		local seed = tonumber(input.qualification.seed)
-		if not seed then
-			table.insert(warnings, string.format('Invalid seed: must be a number (got: %s)', tostring(input.qualification.seed)))
-		elseif seed <= 0 then
-			table.insert(
-				warnings,
-				string.format('Invalid seed: must be a positive number (got: %s)', tostring(input.qualification.seed))
-			)
+		local _, warning = validateSeed(input.qualification.seed)
+		if warning then
+			table.insert(warnings, warning)
 		end
 	end
 
