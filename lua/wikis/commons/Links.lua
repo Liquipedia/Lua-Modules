@@ -195,7 +195,10 @@ local PREFIXES = {
 	lolchess = {'https://lolchess.gg/profile/'},
 	lrthread = {'', match = ''},
 	mapdraft = {match = 'https://aoe2cm.net/draft/'},
-	matcherino = {'https://matcherino.com/tournaments/'},
+	matcherino = {
+		'https://matcherino.com/tournaments/',
+		player = 'https://matcherino.com/',
+	},
 	matcherinolink = {'https://matcherino.com/t/'},
 	mildom = {'https://www.mildom.com/'},
 	mplink = {match = 'https://osu.ppy.sh/community/matches/'}, -- Should this key be renamed?
