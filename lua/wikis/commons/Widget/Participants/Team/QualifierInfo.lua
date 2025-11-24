@@ -86,14 +86,19 @@ function ParticipantsTeamQualifierInfo:render()
 
 	local content = Div{
 		classes = {'team-participant-card-qualifier', 'team-participant-card-qualifier--' .. location},
-		children = WidgetUtil.collect(
-			icon,
-			Span{
-				classes = {'team-participant-card-qualifier-details'},
-				children = textChildren
+		children = {
+			Div{
+				classes = {'team-participant-card-qualifier--content'},
+				children = WidgetUtil.collect(
+					icon,
+					Span{
+						classes = {'team-participant-card-qualifier-details'},
+						children = textChildren
+					}
+				)
 			},
 			self:createSeedBadge(qualification.seed)
-		)
+		}
 	}
 
 	return content
