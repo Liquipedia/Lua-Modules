@@ -241,11 +241,6 @@ function Placement:_getLpdbData(...)
 			participant = Opponent.toName(opponent.opponentData)
 		end
 
-
-		local opponentHasPrize = function (prize)
-			return self:getPrizeRewardForOpponent(opponent, prize.id)
-		end
-
 		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_BASE_CURRENCY .. 1)) or 0
 		local pointsReward = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
 		local pointsReward2 = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
