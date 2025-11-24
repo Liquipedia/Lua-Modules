@@ -52,6 +52,9 @@ return {
 		transfers = {
 			showTeamName = true,
 		},
+		participants = {
+			defaultPlayerNumber = 3,
+		},
 	},
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

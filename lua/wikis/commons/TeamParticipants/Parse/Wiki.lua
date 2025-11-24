@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local RoleUtil = Lua.import('Module:Role/Util')
@@ -29,16 +30,18 @@ local TeamParticipantsWikiParser = {}
 ---tournament?: StandardTournament, url?: string, text?: string}
 
 ---@param args table
----@return {participants: TeamParticipant[]}
+---@return {participants: TeamParticipant[], expectedPlayerCount: integer?}
 function TeamParticipantsWikiParser.parseWikiInput(args)
 	local date = DateExt.parseIsoDate(args.date) or DateExt.parseIsoDate(DateExt.getContextualDateOrNow())
+	local minimumPlayers = tonumber(args.minimumplayers)
 
 	local participants = Array.map(args, function (input)
 		return TeamParticipantsWikiParser.parseParticipant(input, date)
 	end)
 
 	return {
-		participants = participants
+		participants = participants,
+		expectedPlayerCount = minimumPlayers,
 	}
 end
 
@@ -110,14 +113,15 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 				table.insert(potentialQualifiers, Opponent.readOpponentArgs({type = Opponent.team, template = name}))
 			end)
 		end
+		opponent.players = {}
 	else
 		opponent = Opponent.readOpponentArgs(Table.merge(input, {
 			type = Opponent.team,
 		}))
+		opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
+		opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), {syncPlayer = true})
 	end
 
-	opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
-	opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), {syncPlayer = true})
 	local aliases = Array.parseCommaSeparatedString(input.aliases, ';')
 	table.insert(aliases, Opponent.toName(opponent))
 
@@ -160,6 +164,37 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 		type = playerInput.type or 'player',
 	}
 	return player
+end
+
+---@param opponent standardOpponent
+---@param minimumPlayers number?
+function TeamParticipantsWikiParser.fillIncompleteRoster(opponent, minimumPlayers)
+	local expectedPlayerCount = minimumPlayers or
+		(Info.config.participants or {}).defaultPlayerNumber
+
+	if not expectedPlayerCount or not opponent.players then
+		return
+	end
+
+	local actualPlayers = Array.filter(opponent.players, function(player)
+		return player.extradata.type == 'player'
+	end)
+
+	local actualPlayerCount = #actualPlayers
+	if actualPlayerCount >= expectedPlayerCount then
+		return
+	end
+
+	local tbdPlayers = TeamParticipantsWikiParser.createTBDPlayers(expectedPlayerCount - actualPlayerCount)
+	Array.extendWith(opponent.players, tbdPlayers)
+end
+
+---@param count number
+---@return standardPlayer[]
+function TeamParticipantsWikiParser.createTBDPlayers(count)
+	return Array.map(Array.range(1, count), function()
+		return TeamParticipantsWikiParser.parsePlayer{'TBD'}
+	end)
 end
 
 return TeamParticipantsWikiParser
