@@ -24,6 +24,19 @@ local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 ---@operator call(table): ParticipantsTeamQualifierInfo
 local ParticipantsTeamQualifierInfo = Class.new(Widget)
 
+---@param seed number?
+---@return Widget?
+function ParticipantsTeamQualifierInfo:createSeedBadge(seed)
+	if not seed then
+		return nil
+	end
+
+	return Span{
+		classes = {'team-participant-card-qualifier-seed'},
+		children = {'#' .. seed}
+	}
+end
+
 ---@return Widget?
 function ParticipantsTeamQualifierInfo:render()
 	local participant = self.props.participant
