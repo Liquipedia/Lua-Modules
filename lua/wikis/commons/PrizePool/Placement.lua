@@ -242,9 +242,6 @@ function Placement:_getLpdbData(...)
 		end
 
 
-		local prizeIsQualifier = function(prize)
-			return prize.type == PRIZE_TYPE_QUALIFIES
-		end
 		local opponentHasPrize = function (prize)
 			return self:getPrizeRewardForOpponent(opponent, prize.id)
 		end
@@ -252,7 +249,7 @@ function Placement:_getLpdbData(...)
 		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_BASE_CURRENCY .. 1)) or 0
 		local pointsReward = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
 		local pointsReward2 = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
-		local isQualified = Array.any(Array.filter(self.parent.prizes, prizeIsQualifier), opponentHasPrize)
+		local isQualified = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_QUALIFIES .. '1')
 
 		local lpdbData = {
 			image = image,
