@@ -27,7 +27,7 @@ local TeamParticipantsWikiParser = {}
 ---@alias QualificationType 'tournament'|'external'|'other'
 
 ---@alias QualificationStructure {method: QualificationMethod, type: QualificationType,
----tournament?: StandardTournament, url?: string, text?: string}
+---tournament?: StandardTournament, url?: string, text?: string, seed?: number}
 
 ---@param args table
 ---@return {participants: TeamParticipant[], expectedPlayerCount: integer?}
@@ -84,6 +84,11 @@ local function parseQualifier(input)
 
 	if qualificationType == 'external' and not qualificationStructure.text then
 		error('External qualifier must have text')
+	end
+
+	local seed = tonumber(input.seed)
+	if seed and seed > 0 then
+		qualificationStructure.seed = seed
 	end
 
 	return qualificationStructure
