@@ -222,6 +222,7 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 		}
 
 		&-placement {
+			align-self: center;
 			padding: 0.125rem 0.5rem;
 			border-radius: 0.25rem;
 			font-weight: bold;
