@@ -57,13 +57,11 @@ function MatchGroupLegacyDefault:getDetails(isReset, prefix)
 			---@cast key string
 			if String.contains(key, 'p1char') or String.contains(key, 'p2char') then
 				local playerPrefix = key:gsub(prefix, ''):sub(1, 2)
-				details[key:gsub(prefix, '')] = Json.stringify(
-					Array.map(Array.parseCommaSeparatedString(self.args[key]), function (char, charIndex)
-						return char .. ',' .. (self.args[
-							prefix .. playerPrefix .. 'stock' .. key:gsub(prefix .. playerPrefix, ''):sub(5)
-						] or '')
-					end)
-				)
+				details[key:gsub(prefix, '')] = Json.stringify{
+					self.args[key] .. ',' .. (self.args[
+						prefix .. playerPrefix .. 'stock' .. key:gsub(prefix .. playerPrefix, ''):sub(5)
+					] or '')
+				}
 			else
 				details[key:gsub(prefix, '')] = self.args[key]
 			end
