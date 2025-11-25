@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Ordinal = Lua.import('Module:Ordinal')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -100,7 +101,7 @@ function ParticipantsTeamQualifierInfo:createPlacementBadge(placement)
 
 	return Span{
 		classes = {'team-participant-card-qualifier-placement'},
-		children = {'#' .. placement}
+		children = {Ordinal.toOrdinal(placement)}
 	}
 end
 
