@@ -45,5 +45,8 @@ return {
 				mode = 'manualPrio',
 			},
 		},
+		participants = {
+			defaultPlayerNumber = 5,
+		},
 	},
 }
