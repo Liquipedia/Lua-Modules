@@ -67,7 +67,6 @@ function MatchGroupLegacyDefault:getDetails(isReset, prefix)
 			end
 		end
 	end)
-	mw.logObject(details)
 	return details
 end
 
