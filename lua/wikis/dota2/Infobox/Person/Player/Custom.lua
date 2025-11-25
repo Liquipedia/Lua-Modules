@@ -53,7 +53,7 @@ function CustomPlayer.run(frame)
 	player.args.dotabuff = player.args.playerid
 	player.args.stratz = player.args.playerid
 	if Logic.isNumeric(player.args.playerid) then
-		player.args.steamalternative = '765' .. (tonumber(player.args.playerid) + CONVERSION_PLAYER_ID_TO_STEAM)
+		player.args.steamID64 = '765' .. (tonumber(player.args.playerid) + CONVERSION_PLAYER_ID_TO_STEAM)
 	end
 
 	player.args.informationType = player.args.informationType or 'Player'

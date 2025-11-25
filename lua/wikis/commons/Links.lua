@@ -275,7 +275,6 @@ local PREFIXES = {
 		'https://start.gg/',
 		player = 'https://start.gg/user/',
 	},
-	steam = {'https://steamcommunity.com/id/'}, -- to be removed after conversion
 	steam64ID = {'https://steamcommunity.com/profiles/'},
 	steamtv = {'https://steam.tv/'},
 	strikr = {'https://strikr.pro/pilot/'},
@@ -388,8 +387,6 @@ local ALIASES = {
 	['start-gg'] = {'startgg', 'smashgg'},
 	yandexefir = {'yandex'},
 	zhanqitv = {'zhanqi'},
-	-- temporarily for conversion
-	steam64ID = {'steamalternative'},
 }
 
 local ICON_KEYS_TO_RENAME = {
