@@ -138,7 +138,7 @@ describe('prize pool', function()
 				lastvsdata = '[]',
 				liquipediatier = '1',
 				liquipediatiertype = 'Qualifier',
-				opponentname = 'Rathoz',
+				opponentname = 'Salt',
 				opponentplayers = '{"p1":"Salt","p1dn":"Salt"}',
 				opponenttype = 'solo',
 				parent = 'FakePage',
@@ -162,7 +162,7 @@ describe('prize pool', function()
 	describe('enabling/disabling lpdb storage', function()
 		it('normal behavior', function()
 			PrizePool(prizePoolArgs):create():build()
-			assert.stub(LpdbPlacementStub).called(1)
+			assert.stub(LpdbPlacementStub).called(2)
 		end)
 
 		it('disabled', function()
@@ -173,7 +173,7 @@ describe('prize pool', function()
 		it('wiki-var enabled', function()
 			Variables.varDefine('disable_LPDB_storage', 'false')
 			PrizePool(prizePoolArgs):create():build()
-			assert.stub(LpdbPlacementStub).called(1)
+			assert.stub(LpdbPlacementStub).called(2)
 		end)
 
 		it('wiki-var enabled with override', function()
@@ -186,7 +186,7 @@ describe('prize pool', function()
 		it('wiki-var disable with override', function()
 			Variables.varDefine('disable_LPDB_storage', 'true')
 			PrizePool(Table.merge(prizePoolArgs, {storelpdb = true})):create():build()
-			assert.stub(LpdbPlacementStub).called(1)
+			assert.stub(LpdbPlacementStub).called(2)
 		end)
 
 		it('wiki-var disable without override', function()
