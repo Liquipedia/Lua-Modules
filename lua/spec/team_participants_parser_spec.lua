@@ -10,6 +10,8 @@ describe('Team Participants Parser', function()
 		Table = require('Module:Table')
 	end)
 
+	-- Helper to create a minimal valid participant input for testing.
+	-- Provides sensible defaults that can be overridden per test.
 	local function createBasicParticipantInput(overrides)
 		return Table.merge({
 			'team liquid',
@@ -100,6 +102,17 @@ describe('Team Participants Parser', function()
 				assert.is_table(result.participants[1])
 				assert.is_table(result.participants[1].opponent)
 				assert.are_equal('team', result.participants[1].opponent.type)
+			end)
+
+			it('handles invalid date format gracefully', function()
+				local args = {
+					createBasicParticipantInput(),
+					date = 'not-a-date',
+				}
+
+				local result = TeamParticipantsWikiParser.parseWikiInput(args)
+
+				assert.is_not_nil(result.participants[1].date)
 			end)
 		end)
 	end)
@@ -219,6 +232,19 @@ describe('Team Participants Parser', function()
 				assert.is_table(result.opponent.players)
 				assert.are_equal(0, #result.opponent.players)
 			end)
+
+			it('includes valid contenders even when some are invalid', function()
+				local input = {
+					contenders = {'team liquid', '', 'mouz'}
+				}
+
+				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+
+				assert.are_equal(2, #result.potentialQualifiers)
+				assert.is_true(#result.warnings > 0)
+				assert.are_equal('team liquid', result.potentialQualifiers[1].template:lower())
+				assert.are_equal('mouz', result.potentialQualifiers[2].template:lower())
+			end)
 		end)
 
 		insulate('qualification structure parsing', function()
@@ -270,7 +296,7 @@ describe('Team Participants Parser', function()
 
 				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
 
-				assert.is_truthy(#result.warnings > 0)
+				assert.is_true(#result.warnings > 0)
 			end)
 		end)
 
@@ -357,7 +383,7 @@ describe('Team Participants Parser', function()
 
 				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
 
-				assert.is_truthy(#result.aliases >= 3)
+				assert.is_true(#result.aliases >= 3)
 			end)
 
 			it('adds opponent name to aliases', function()
@@ -365,10 +391,11 @@ describe('Team Participants Parser', function()
 
 				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
 
-				local hasTeamName = Array.any(result.aliases, function(alias)
+				local hasTeamRelatedAlias = Array.any(result.aliases, function(alias)
 					return alias:lower():find('liquid')
 				end)
-				assert.is_true(hasTeamName)
+				assert.is_true(hasTeamRelatedAlias)
+				assert.is_true(#result.aliases > 0)
 			end)
 
 			it('handles empty aliases', function()
@@ -376,7 +403,7 @@ describe('Team Participants Parser', function()
 
 				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
 
-				assert.is_truthy(#result.aliases >= 1)
+				assert.is_true(#result.aliases >= 1)
 			end)
 		end)
 
@@ -578,6 +605,22 @@ describe('Team Participants Parser', function()
 
 				assert.are_equal('former', result.extradata.type)
 			end)
+
+			it('handles invalid trophies gracefully', function()
+				local playerInput = {'PlayerName', trophies = 'not a number'}
+
+				local result = TeamParticipantsWikiParser.parsePlayer(playerInput)
+
+				assert.is_nil(result.extradata.trophies)
+			end)
+
+			it('handles nil trophies', function()
+				local playerInput = {'PlayerName'}
+
+				local result = TeamParticipantsWikiParser.parsePlayer(playerInput)
+
+				assert.is_nil(result.extradata.trophies)
+			end)
 		end)
 	end)
 
@@ -646,6 +689,7 @@ describe('Team Participants Parser', function()
 				TeamTemplateMock.setUp()
 				LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function() return {} end)
 
+				-- Re-require Tournament module to enable stubbing getTournament function
 				local Tournament = require('Module:Tournament')
 				TournamentGetStub = stub(Tournament, 'getTournament')
 			end)
@@ -820,7 +864,7 @@ describe('Team Participants Parser', function()
 				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
 
 				assert.is_nil(result.qualification.placement)
-				assert.is_truthy(#result.warnings > 0)
+				assert.is_true(#result.warnings > 0)
 			end)
 
 			it('validates placement is a whole number', function()
@@ -835,7 +879,7 @@ describe('Team Participants Parser', function()
 				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
 
 				assert.is_nil(result.qualification.placement)
-				assert.is_truthy(#result.warnings > 0)
+				assert.is_true(#result.warnings > 0)
 			end)
 		end)
 	end)
