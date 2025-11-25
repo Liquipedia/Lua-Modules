@@ -37,16 +37,16 @@ function ParticipantsTeamMember:render()
 
 	return Div{
 		classes = {
-			'team-member',
-			isEven and 'even' or 'odd',
+			'team-participant-card__member',
+			(not isEven) and 'team-participant-card__member--odd' or nil,
 		},
 		children = WidgetUtil.collect(
 			roleLeft and Div{
-				classes = {'team-member-role-left'},
+				classes = {'team-participant-card__member-role-left'},
 				children = roleLeft,
 			} or nil,
 			Div{
-				classes = {'team-member-name'},
+				classes = {'team-participant-card__member-name'},
 				children = PlayerDisplay.BlockPlayer{
 					player = player,
 					showFlag = true,
@@ -58,27 +58,27 @@ function ParticipantsTeamMember:render()
 				}
 			},
 			trophies and trophies > 0 and Div{
-				classes = {'team-member-trophies'},
+				classes = {'team-participant-card__member-trophies'},
 				children = trophies < 4 and Array.map(Array.range(1, trophies), function()
 						return trophyIcon
 					end) or WidgetUtil.collect(
 						Div{
-							classes = {'team-member-trophies-text'},
+							classes = {'team-participant-card__member-trophies-text'},
 							children = {'x'.. trophies}
 						},
 						trophyIcon
 					)
 			} or nil,
 			roleRight and Div{
-				classes = {'team-member-role-right'},
+				classes = {'team-participant-card__member-role-right'},
 				children = roleRight,
 			} or nil,
 			team and Div{
-				classes = {'team-member-team'},
+				classes = {'team-participant-card__member-team'},
 				children = OpponentDisplay.BlockOpponent({
 					opponent = team,
 					teamStyle = 'icon',
-					additionalClasses = {'team-participant-square-icon'}
+					additionalClasses = {'team-participant-icon'}
 				}),
 			} or nil
 		)

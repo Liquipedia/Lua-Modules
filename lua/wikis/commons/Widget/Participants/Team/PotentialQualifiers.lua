@@ -30,18 +30,18 @@ function PotentialQualifiers:render()
 
 	local children = {
 		Div{
-			classes = {'potential-qualifiers-title'},
+			classes = {'team-participant-card__potential-qualifiers-title'},
 			children = 'Potential qualifiers'
 		},
 		Div{
-			classes = {'potential-qualifiers-list'},
+			classes = {'team-participant-card__potential-qualifiers-list'},
 			children = Array.map(potentialQualifiers, function(qualifierOpponent, index)
 				return OpponentDisplay.BlockOpponent{
 					opponent = qualifierOpponent,
 					teamStyle = 'standard',
 					additionalClasses = {
-						'potential-qualifiers-list-item',
-						(index % 2 == 0 and 'even' or 'odd')
+						'team-participant-card__potential-qualifiers-item',
+						(index % 2 == 1) and 'team-participant-card__potential-qualifiers-item--odd' or nil
 					}
 				}
 			end)
@@ -49,7 +49,7 @@ function PotentialQualifiers:render()
 	}
 
 	return Div{
-		classes = {'potential-qualifiers-container'},
+		classes = {'team-participant-card__potential-qualifiers'},
 		children = children
 	}
 end

@@ -29,10 +29,10 @@ function ParticipantsTeamCardsGroup:render()
 	end
 
 	return Div{
-		classes = { 'team-participant-wrapper' },
+		classes = { 'team-participant' },
 		children = {
 			Div{
-				classes = { 'team-participant-switches' },
+				classes = { 'team-participant__switches' },
 				children = {
 					AnalyticsWidget{
 						analyticsName = 'ParticipantsShowRostersSwitch',
@@ -62,7 +62,7 @@ function ParticipantsTeamCardsGroup:render()
 			AnalyticsWidget{
 				analyticsName = 'Team participants card',
 				children = Div{
-					classes = { 'team-participant-cards' },
+					classes = { 'team-participant__grid' },
 					children = Array.map(participants, function(participant)
 						return ParticipantsTeamCard{
 							participant = participant,
