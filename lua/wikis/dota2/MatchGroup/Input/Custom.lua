@@ -21,6 +21,8 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local CustomMatchGroupInput = {}
+
+---@class Dota2MatchParser: MatchParserInterface
 local MatchFunctions = {}
 local MapFunctions = {}
 
@@ -37,11 +39,11 @@ MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 ---@field getMap fun(mapInput: table): table
 ---@field getLength fun(map: table): string?
 ---@field getSide fun(map: table, opponentIndex: integer): string?
----@field getObjectives fun(map: table, opponentIndex: integer): string?
+---@field getObjectives fun(map: table, opponentIndex: integer): table?
 ---@field getHeroPicks fun(map: table, opponentIndex: integer): string[]?
 ---@field getHeroBans fun(map: table, opponentIndex: integer): string[]?
 ---@field getParticipants fun(map: table, opponentIndex: integer): table[]?
----@field getVetoPhase fun(map: table): table?
+---@field getVetoPhase fun(map: table): table[]?
 
 ---@param match table
 ---@param options? {isMatchPage: boolean?}
@@ -69,7 +71,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param MapParser Dota2MapParserInterface
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents, MapParser)
@@ -123,7 +125,7 @@ function MatchFunctions.getLinks(match, games)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return string?
 function MatchFunctions.getHeadToHeadLink(match, opponents)
 	local isTeamGame = Array.all(opponents, function(opponent)
@@ -144,7 +146,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
@@ -164,7 +166,7 @@ end
 ---@param MapParser Dota2MapParserInterface
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(MapParser, match, map, opponents)
 	local extraData = {
@@ -205,7 +207,7 @@ end
 
 ---@param MapParser Dota2MapParserInterface
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponentIndex)
