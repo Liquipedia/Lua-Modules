@@ -109,6 +109,7 @@ function MatchStagesLegacy.handleDetails(args, details)
 	---@return table?
 	local getMapFromDetails = function (index)
 		local map = {
+			vod = Table.extract(details, 'vodgame' .. index),
 			winner = Table.extract(args, 'win' .. index),
 			map = Table.extract(args, 'stage' .. index)
 		}
