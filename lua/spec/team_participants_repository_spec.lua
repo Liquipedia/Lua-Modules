@@ -294,8 +294,10 @@ describe('Team Participants Repository', function()
 				assert.are_equal(data.opponentplayers, data.players)
 			end)
 
-			it('calculates individualprizemoney by dividing by player count', function()
-				local participant = createBasicParticipant({
+			it('calculates individualprizemoney correctly based on player types', function()
+				local getPrizepoolRecordStub = stub(TeamParticipantsRepository, 'getPrizepoolRecordForTeam')
+
+				local fivePlayers = createBasicParticipant({
 					opponent = {
 						type = 'team',
 						template = 'team liquid',
@@ -309,71 +311,28 @@ describe('Team Participants Repository', function()
 						}
 					}
 				})
-
-				local getPrizepoolRecordStub = stub(TeamParticipantsRepository, 'getPrizepoolRecordForTeam')
 				getPrizepoolRecordStub.returns(createPrizepoolRecord({prizemoney = 10000}))
+				TeamParticipantsRepository.save(fivePlayers)
+				local data1 = Json.parseIfString(LpdbPlacementStore.calls[1].vals[2])
+				assert.are_equal(2000, data1.individualprizemoney)
 
-				TeamParticipantsRepository.save(participant)
-
-				local callArgs = LpdbPlacementStore.calls[1].vals
-				local data = Json.parseIfString(callArgs[2])
-
-				assert.are_equal(2000, data.individualprizemoney)
-
-				getPrizepoolRecordStub:revert()
-			end)
-
-			it('includes substitutes in player count for prize calculation', function()
-				local participant = createBasicParticipant({
+				local withSubAndStaff = createBasicParticipant({
 					opponent = {
 						type = 'team',
-						template = 'team liquid',
-						name = 'Team Liquid',
+						template = 'bds',
+						name = 'BDS',
 						players = {
 							{displayName = 'P1', pageName = 'P1', extradata = {type = 'player'}},
 							{displayName = 'P2', pageName = 'P2', extradata = {type = 'player'}},
-							{displayName = 'P3', pageName = 'P3', extradata = {type = 'player'}},
 							{displayName = 'Sub1', pageName = 'Sub1', extradata = {type = 'sub'}},
-						}
-					}
-				})
-
-				local getPrizepoolRecordStub = stub(TeamParticipantsRepository, 'getPrizepoolRecordForTeam')
-				getPrizepoolRecordStub.returns(createPrizepoolRecord({prizemoney = 8000}))
-
-				TeamParticipantsRepository.save(participant)
-
-				local callArgs = LpdbPlacementStore.calls[1].vals
-				local data = Json.parseIfString(callArgs[2])
-
-				assert.are_equal(2000, data.individualprizemoney)
-
-				getPrizepoolRecordStub:revert()
-			end)
-
-			it('excludes staff from player count for prize calculation', function()
-				local participant = createBasicParticipant({
-					opponent = {
-						type = 'team',
-						template = 'team liquid',
-						name = 'Team Liquid',
-						players = {
-							{displayName = 'P1', pageName = 'P1', extradata = {type = 'player'}},
-							{displayName = 'P2', pageName = 'P2', extradata = {type = 'player'}},
 							{displayName = 'Coach', pageName = 'Coach', extradata = {type = 'staff'}},
 						}
 					}
 				})
-
-				local getPrizepoolRecordStub = stub(TeamParticipantsRepository, 'getPrizepoolRecordForTeam')
-				getPrizepoolRecordStub.returns(createPrizepoolRecord({prizemoney = 4000}))
-
-				TeamParticipantsRepository.save(participant)
-
-				local callArgs = LpdbPlacementStore.calls[1].vals
-				local data = Json.parseIfString(callArgs[2])
-
-				assert.are_equal(2000, data.individualprizemoney)
+				getPrizepoolRecordStub.returns(createPrizepoolRecord({prizemoney = 6000, opponenttemplate = 'bds'}))
+				TeamParticipantsRepository.save(withSubAndStaff)
+				local data2 = Json.parseIfString(LpdbPlacementStore.calls[2].vals[2])
+				assert.are_equal(2000, data2.individualprizemoney)
 
 				getPrizepoolRecordStub:revert()
 			end)
@@ -495,53 +454,7 @@ describe('Team Participants Repository', function()
 				assert.is_not_nil(varWithUnderscore)
 			end)
 
-			it('uses p prefix for players', function()
-				local participant = createBasicParticipant({
-					aliases = {'Team Liquid'},
-					opponent = {
-						type = 'team',
-						template = 'team liquid',
-						name = 'Team Liquid',
-						players = {
-							{displayName = 'Player1', pageName = 'Player1', flag = 'us', extradata = {type = 'player'}},
-							{displayName = 'Player2', pageName = 'Player2', flag = 'ca', extradata = {type = 'player'}},
-						}
-					}
-				})
-
-				TeamParticipantsRepository.setPageVars(participant)
-
-				local p1 = globalVars:get('Team Liquid_p1')
-				local p2 = globalVars:get('Team Liquid_p2')
-
-				assert.are_equal('Player1', p1)
-				assert.are_equal('Player2', p2)
-			end)
-
-			it('uses c prefix for staff', function()
-				local participant = createBasicParticipant({
-					aliases = {'Team Liquid'},
-					opponent = {
-						type = 'team',
-						template = 'team liquid',
-						name = 'Team Liquid',
-						players = {
-							{displayName = 'Player1', pageName = 'Player1', flag = 'us', extradata = {type = 'player'}},
-							{displayName = 'Coach1', pageName = 'Coach1', flag = 'us', extradata = {type = 'staff'}},
-						}
-					}
-				})
-
-				TeamParticipantsRepository.setPageVars(participant)
-
-				local p1 = globalVars:get('Team Liquid_p1')
-				local c2 = globalVars:get('Team Liquid_c2')
-
-				assert.are_equal('Player1', p1)
-				assert.are_equal('Coach1', c2)
-			end)
-
-			it('sets pageName variable', function()
+			it('sets page variables with correct prefixes and suffixes', function()
 				local participant = createBasicParticipant({
 					aliases = {'Team Liquid'},
 					opponent = {
@@ -550,96 +463,20 @@ describe('Team Participants Repository', function()
 						name = 'Team Liquid',
 						players = {
 							{displayName = 'DisplayName', pageName = 'ActualPageName', flag = 'us', extradata = {type = 'player'}},
+							{displayName = 'Player2', pageName = 'Player2', flag = 'ca', extradata = {type = 'player'}},
+							{displayName = 'Coach1', pageName = 'Coach1', flag = 'gb', extradata = {type = 'staff'}},
 						}
 					}
 				})
 
 				TeamParticipantsRepository.setPageVars(participant)
 
-				local pageName = globalVars:get('Team Liquid_p1')
-				assert.are_equal('ActualPageName', pageName)
-			end)
-
-			it('sets flag variable with suffix', function()
-				local participant = createBasicParticipant({
-					aliases = {'Team Liquid'},
-					opponent = {
-						type = 'team',
-						template = 'team liquid',
-						name = 'Team Liquid',
-						players = {
-							{displayName = 'Player1', pageName = 'Player1', flag = 'us', extradata = {type = 'player'}},
-						}
-					}
-				})
-
-				TeamParticipantsRepository.setPageVars(participant)
-
-				local flag = globalVars:get('Team Liquid_p1flag')
-				assert.are_equal('us', flag)
-			end)
-
-			it('sets displayName variable with dn suffix', function()
-				local participant = createBasicParticipant({
-					aliases = {'Team Liquid'},
-					opponent = {
-						type = 'team',
-						template = 'team liquid',
-						name = 'Team Liquid',
-						players = {
-							{displayName = 'DisplayName', pageName = 'PageName', flag = 'us', extradata = {type = 'player'}},
-						}
-					}
-				})
-
-				TeamParticipantsRepository.setPageVars(participant)
-
-				local displayName = globalVars:get('Team Liquid_p1dn')
-				assert.are_equal('DisplayName', displayName)
-			end)
-
-			it('sets variables for both space and underscore variants', function()
-				local participant = createBasicParticipant({
-					aliases = {'Team Liquid'},
-					opponent = {
-						type = 'team',
-						template = 'team liquid',
-						name = 'Team Liquid',
-						players = {
-							{displayName = 'Player1', pageName = 'Player1', flag = 'us', extradata = {type = 'player'}},
-						}
-					}
-				})
-
-				TeamParticipantsRepository.setPageVars(participant)
-
-				local withSpace = globalVars:get('Team Liquid_p1')
-				local withUnderscore = globalVars:get('Team_Liquid_p1')
-
-				assert.are_equal('Player1', withSpace)
-				assert.are_equal('Player1', withUnderscore)
-			end)
-
-			it('iterates over all aliases', function()
-				local participant = createBasicParticipant({
-					aliases = {'Team Liquid', 'TL'},
-					opponent = {
-						type = 'team',
-						template = 'team liquid',
-						name = 'Team Liquid',
-						players = {
-							{displayName = 'Player1', pageName = 'Player1', flag = 'us', extradata = {type = 'player'}},
-						}
-					}
-				})
-
-				TeamParticipantsRepository.setPageVars(participant)
-
-				local var1 = globalVars:get('Team Liquid_p1')
-				local var2 = globalVars:get('Team_Liquid_p1')
-
-				assert.are_equal('Player1', var1)
-				assert.are_equal('Player1', var2)
+				assert.are_equal('ActualPageName', globalVars:get('Team Liquid_p1'))
+				assert.are_equal('DisplayName', globalVars:get('Team Liquid_p1dn'))
+				assert.are_equal('us', globalVars:get('Team Liquid_p1flag'))
+				assert.are_equal('Player2', globalVars:get('Team Liquid_p2'))
+				assert.are_equal('Coach1', globalVars:get('Team Liquid_c3'))
+				assert.are_equal('ActualPageName', globalVars:get('Team_Liquid_p1'))
 			end)
 
 			it('handles empty aliases gracefully', function()
