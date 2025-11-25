@@ -180,6 +180,7 @@ end
 ---@return string|Html
 function MatchStagesLegacy.convertMatch(frame)
 	local args = Arguments.getArgs(frame)
+	local generate = Logic.readBool(Table.extract(args, 'generate'))
 	local details = Json.parseIfString(args.details or '{}')
 
 	args, details = MatchStagesLegacy.handleDetails(args, details)
@@ -188,7 +189,7 @@ function MatchStagesLegacy.convertMatch(frame)
 	args = MatchStagesLegacy.setHeaderIfEmpty(args, details)
 	args = MatchStagesLegacy.copyDetailsToArgs(args, details)
 
-	if Logic.readBool(matchlistVars:get('isOldMatchList')) then
+	if generate or Logic.readBool(matchlistVars:get('isOldMatchList')) then
 		return Json.stringify(args)
 	else
 		Template.stashReturnValue(args, 'LegacyMatchlist')
