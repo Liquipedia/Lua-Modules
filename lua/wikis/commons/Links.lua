@@ -384,8 +384,6 @@ local ALIASES = {
 	['start-gg'] = {'startgg', 'smashgg'},
 	yandexefir = {'yandex'},
 	zhanqitv = {'zhanqi'},
-	-- temporarily for conversion
-	steam64ID = {'steamalternative'},
 }
 
 local ICON_KEYS_TO_RENAME = {
