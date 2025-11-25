@@ -36,6 +36,7 @@ describe('prize pool', function()
 		freetext = 'A title',
 		import = false,
 		[1] = {localprize = '1,000', [1] = {'Rathoz', flag='se'}},
+		[2] = {qualified1 = true, [1] = {'Salt'}},
 	}
 
 	it('parameters are correctly parsed', function()
@@ -126,6 +127,34 @@ describe('prize pool', function()
 				tournament = 'Test Tournament',
 				type = 'Offline',
 				qualified = 0,
+			})
+			assert.stub(LpdbPlacementStub).was.called_with('ranking_abc1_Salt', {
+				date = '2022-10-15',
+				extradata = '{"prizepoints":"","prizepoints2":""}',
+				game = 'commons',
+				icon = 'test.png',
+				icondark = 'test dark.png',
+				individualprizemoney = 0,
+				lastvsdata = '[]',
+				liquipediatier = '1',
+				liquipediatiertype = 'Qualifier',
+				opponentname = 'Rathoz',
+				opponentplayers = '{"p1":"Salt","p1dn":"Salt"}',
+				opponenttype = 'solo',
+				parent = 'FakePage',
+				participant = 'Salt', -- Legacy
+				participantflag = nil, -- Legacy
+				participantlink = 'Salt', -- Legacy
+				placement = 2,
+				players = '{"p1":"Salt","p1dn":"Salt"}', -- Legacy
+				prizemoney = 0,
+				prizepoolindex = 1,
+				series = 'Test Series',
+				shortname = 'Test Tourney',
+				startdate = '2022-10-13',
+				tournament = 'Test Tournament',
+				type = 'Offline',
+				qualified = 1,
 			})
 		end)
 	end)
