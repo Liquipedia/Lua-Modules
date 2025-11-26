@@ -74,18 +74,41 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponent, opponentI
 			image = item.image,
 		}
 	end
-	local function fetchLpdbPlayer(playerId)
-		if not playerId then return end
-		return mw.ext.LiquipediaDB.lpdb('player', {
+
+	---@param players MGIParsedPlayer[]
+	---@param playerId integer
+	---@return {pageName: string, displayName: string}?
+	local function fetchLpdbPlayer(players, playerId)
+		if not playerId then
+			return
+		end
+		local lpdbData = mw.ext.LiquipediaDB.lpdb('player', {
 			conditions = '[[extradata_playerid::' .. playerId .. ']]',
 			query = 'pagename, id',
 		})[1]
-	end
-	local players = Array.map(team.players, function(player)
-		local playerData = fetchLpdbPlayer(player.id) or {}
+		if lpdbData then
+			return {
+				pageName = lpdbData.pagename,
+				displayName = lpdbData.id,
+			}
+		end
+		local parsedPlayer = Array.find(players, function (player)
+			return (player.extradata or {}).publisherId == playerId
+		end)
+		if not parsedPlayer then
+			return
+		end
 		return {
-			player = playerData.pagename or player.name,
-			name = playerData.id,
+			pageName = parsedPlayer.name,
+			displayName = parsedPlayer.displayname,
+		}
+	end
+
+	local players = Array.map(team.players, function(player)
+		local playerData = fetchLpdbPlayer(opponent.match2players, player.id) or {}
+		return {
+			player = playerData.pageName or player.name,
+			name = playerData.displayName,
 			role = player.position,
 			facet = player.facet,
 			character = player.heroName,
