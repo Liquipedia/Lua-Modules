@@ -44,7 +44,7 @@ function ParticipantsTeamCard:render()
 
 	if participant.notes and #participant.notes > 0 then
 		table.insert(content, Div{
-			classes = {'team-participant-notifications'},
+			classes = {'team-participant-card__notifications'},
 			children = Array.map(participant.notes, function(note)
 				return ParticipantNotification{
 					text = note.text,
@@ -56,7 +56,7 @@ function ParticipantsTeamCard:render()
 
 	return Collapsible{
 		shouldCollapse = true,
-		collapseAreaClasses = {'team-participant-card-collapsible-content'},
+		collapseAreaClasses = {'team-participant-card__content'},
 		classes = {'team-participant-card'},
 		titleWidget = Div{
 			children = {

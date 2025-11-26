@@ -56,7 +56,7 @@ function ParticipantsTeamQualifierInfo:render()
 		link = qualification.url
 		icon = Icon{
 			iconName = 'external_link',
-			additionalClasses = { 'team-participant-card-qualifier-external-link-icon' }
+			additionalClasses = { 'team-participant-card__qualifier-icon' }
 		}
 		linktype = 'external'
 	end
@@ -73,14 +73,14 @@ function ParticipantsTeamQualifierInfo:render()
 	end
 
 	local content = Div{
-		classes = {'team-participant-card-qualifier', 'team-participant-card-qualifier--' .. location},
+		classes = {'team-participant-card__qualifier', 'team-participant-card__qualifier--' .. location},
 		children = {
 			Div{
-				classes = {'team-participant-card-qualifier-content'},
+				classes = {'team-participant-card__qualifier-content'},
 				children = WidgetUtil.collect(
 					icon,
 					Span{
-						classes = {'team-participant-card-qualifier-details'},
+						classes = {'team-participant-card__qualifier-details'},
 						children = textChildren
 					}
 				)
@@ -100,7 +100,7 @@ function ParticipantsTeamQualifierInfo:createPlacementBadge(placement)
 	end
 
 	return Span{
-		classes = {'team-participant-card-qualifier-placement'},
+		classes = {'team-participant-card__qualifier-placement'},
 		children = {Ordinal.toOrdinal(placement)}
 	}
 end

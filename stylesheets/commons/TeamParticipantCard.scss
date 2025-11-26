@@ -1,3 +1,8 @@
+// Participant icon sizes for different view modes:
+// - expanded: Desktop expanded view (large team icons in headers)
+// - compact: Desktop compact view (smaller team icons in headers)
+// - mobile: Mobile/narrow viewports (responsive sizing for small screens)
+// - small: Nested/inline icons (team members, potential qualifiers)
 $participant-icon-wrapper-size-expanded: 56px;
 $participant-icon-wrapper-size-compact: 48px;
 $participant-icon-wrapper-size-mobile: 36px;
@@ -32,18 +37,18 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 	}
 }
 
-.team-participant-wrapper {
+.team-participant {
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
 }
 
-.team-participant-switches {
+.team-participant__switches {
 	display: flex;
 	gap: 0.5rem;
 }
 
-.team-participant-cards {
+.team-participant__grid {
 	display: grid;
 	gap: 0.25rem;
 	grid-template-columns: repeat( auto-fit, minmax( 280px, 1fr ) );
@@ -70,24 +75,7 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 		border-color: var( --clr-on-surface-dark-primary-8 );
 	}
 
-	&-square-icon {
-		.team-template-image-icon,
-		.league-icon-small-image {
-			@include set-participant-icon-size(
-				$participant-icon-wrapper-size-expanded,
-				$participant-icon-size-expanded
-			);
-
-			@media ( max-width: 767px ) {
-				@include set-participant-icon-size(
-					$participant-icon-wrapper-size-mobile,
-					$participant-icon-size-mobile
-				);
-			}
-		}
-	}
-
-	&-header {
+	&__header {
 		display: flex;
 		gap: 0.5rem;
 		align-items: center;
@@ -101,52 +89,6 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 
 		.theme--dark & {
 			color: var( --clr-secondary-90 );
-		}
-
-		&__main {
-			display: contents;
-		}
-
-		&-opponent {
-			display: flex;
-			gap: 0.5rem;
-			align-items: center;
-			flex: 1 0 0;
-			font-weight: bold;
-			min-width: 0;
-
-			.league-icon-small-image > img {
-				filter: grayscale( 1 );
-				opacity: 0.3;
-			}
-		}
-
-		&-label {
-			padding: 0.125rem 0.5rem;
-			border-radius: 0.25rem;
-			border: 1px solid;
-			font-weight: bold;
-			font-size: 0.6875rem;
-
-			.theme--light & {
-				border-color: var( --clr-on-surface-light-primary-8 );
-				color: var( --clr-secondary-9 );
-			}
-
-			.theme--dark & {
-				border-color: var( --clr-on-surface-dark-primary-8 );
-				color: var( --clr-secondary-90 );
-			}
-
-			&.tbd {
-				.theme--light & {
-					color: var( --clr-secondary-80 );
-				}
-
-				.theme--dark & {
-					color: var( --clr-secondary-44 );
-				}
-			}
 		}
 
 		.general-collapsible-default-toggle {
@@ -167,7 +109,70 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 		}
 	}
 
-	&-qualifier {
+	&__header-main {
+		display: contents;
+	}
+
+	&__opponent {
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+		flex: 1 0 0;
+		font-weight: bold;
+		min-width: 0;
+
+		.league-icon-small-image > img {
+			filter: grayscale( 1 );
+			opacity: 0.3;
+		}
+
+		&--square-icon {
+			.team-template-image-icon,
+			.league-icon-small-image {
+				@include set-participant-icon-size(
+					$participant-icon-wrapper-size-expanded,
+					$participant-icon-size-expanded
+				);
+
+				@media ( max-width: 767px ) {
+					@include set-participant-icon-size(
+						$participant-icon-wrapper-size-mobile,
+						$participant-icon-size-mobile
+					);
+				}
+			}
+		}
+	}
+
+	&__label {
+		padding: 0.125rem 0.5rem;
+		border-radius: 0.25rem;
+		border: 1px solid;
+		font-weight: bold;
+		font-size: 0.6875rem;
+
+		.theme--light & {
+			border-color: var( --clr-on-surface-light-primary-8 );
+			color: var( --clr-secondary-9 );
+		}
+
+		.theme--dark & {
+			border-color: var( --clr-on-surface-dark-primary-8 );
+			color: var( --clr-secondary-90 );
+		}
+
+		&--tbd {
+			.theme--light & {
+				color: var( --clr-secondary-80 );
+			}
+
+			.theme--dark & {
+				color: var( --clr-secondary-44 );
+			}
+		}
+	}
+
+	&__qualifier {
 		position: relative;
 		display: flex;
 		justify-content: space-between;
@@ -198,36 +203,102 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 			}
 		}
 
-		&-content {
-			display: flex;
-			gap: 0.25rem;
-			align-items: center;
+		&--header {
+			display: none;
 		}
 
-		&-details {
+		&--content {
+			display: flex;
+		}
+	}
+
+	&__qualifier-content {
+		display: flex;
+		gap: 0.25rem;
+		align-items: center;
+	}
+
+	&__qualifier-details {
+		display: flex;
+		flex-direction: column;
+		font-weight: bold;
+		font-size: 12px;
+	}
+
+	&__qualifier-icon {
+		.theme--light & {
+			color: var( --clr-primary-44 );
+		}
+
+		.theme--dark & {
+			color: var( --clr-primary-80 );
+		}
+	}
+
+	&__qualifier-placement {
+		align-self: center;
+		padding: 0.125rem 0.5rem;
+		border-radius: 0.25rem;
+		font-weight: bold;
+		font-size: 0.6875rem;
+
+		.theme--light & {
+			background-color: var( --clr-on-surface-light-primary-4 );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+			color: var( --clr-secondary-90 );
+		}
+	}
+
+	@media ( min-width: 768px ) {
+		&__header {
+			position: relative;
+			flex-direction: column;
+			width: 100%;
+
+			.general-collapsible-default-toggle {
+				position: absolute;
+				top: 50%;
+				right: 0.5rem;
+				transform: translateY( -50% );
+			}
+		}
+
+		&__header-main {
 			display: flex;
 			flex-direction: column;
-			font-weight: bold;
-			font-size: 12px;
+			align-items: center;
+			gap: 0.5rem;
+			width: 100%;
 		}
 
-		&-external-link-icon {
-			.theme--light & {
-				color: var( --clr-primary-44 );
-			}
+		&__opponent {
+			flex-direction: column;
+			gap: 0.25rem;
 
-			.theme--dark & {
-				color: var( --clr-primary-80 );
+			.team-template-text {
+				font-size: 1.125rem;
 			}
 		}
 
-		&-placement {
-			align-self: center;
-			padding: 0.125rem 0.5rem;
-			border-radius: 0.25rem;
-			font-weight: bold;
-			font-size: 0.6875rem;
+		&__qualifier--header {
+			display: flex;
+		}
 
+		&__qualifier--content {
+			display: none;
+		}
+	}
+
+	&__member {
+		display: flex;
+		gap: 0.25rem;
+		align-items: center;
+		padding: 0.5rem 0.75rem;
+
+		&--odd {
 			.theme--light & {
 				background-color: var( --clr-on-surface-light-primary-4 );
 			}
@@ -236,56 +307,175 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 				background-color: var( --clr-on-surface-dark-primary-4 );
 			}
 		}
-	}
 
-	&-qualifier--header {
-		display: none;
-	}
+		&-role-left {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			width: 20px;
+			height: 20px;
+			margin-right: 0.25rem;
 
-	@media ( min-width: 768px ) {
-		&-header {
-			position: relative;
-			flex-direction: column;
-			width: 100%;
-
-			&__main {
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-				gap: 0.5rem;
-				width: 100%;
+			img {
+				width: auto;
+				height: auto;
 			}
 
-			.general-collapsible-default-toggle {
-				position: absolute;
-				top: 50%;
-				right: 0.5rem;
-				transform: translateY( -50% );
-			}
+			& > *:not( span ):not( img ) {
+				.theme--light & {
+					background-color: var( --clr-on-surface-light-primary-4 );
+				}
 
-			&-opponent {
-				flex-direction: column;
-				gap: 0.25rem;
-
-				.team-template-text {
-					font-size: 1.125rem;
+				.theme--dark & {
+					background-color: var( --clr-on-surface-dark-primary-4 );
 				}
 			}
 		}
 
-		&-qualifier--header {
-			display: flex;
+		&-name {
+			flex-grow: 1;
 		}
 
-		&-qualifier--content {
-			display: none;
+		&-trophies {
+			display: flex;
+			align-items: center;
+			gap: 0.25rem;
+			color: var( --clr-secondary-44 );
+
+			&-text {
+				font-size: 0.6875rem;
+				font-weight: bold;
+			}
+		}
+
+		&-role-right {
+			padding: 0.125rem 0.5rem;
+			border-radius: 0.25rem;
+			font-weight: bold;
+			font-size: 0.6875rem;
+
+			.theme--light & {
+				background-color: var( --clr-on-surface-light-primary-4 );
+				color: var( --clr-secondary-25 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+				color: var( --clr-secondary-90 );
+			}
+		}
+
+		&-team {
+			.team-participant-icon {
+				.team-template-image-icon,
+				.league-icon-small-image {
+					& > a {
+						display: flex;
+						justify-content: center;
+					}
+
+					@include set-participant-icon-size(
+						$participant-icon-wrapper-size-small,
+						$participant-icon-size-small
+					);
+				}
+			}
+		}
+	}
+
+	&__notifications {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		margin: 0.5rem 0.5rem 0;
+	}
+
+	&__notification {
+		display: flex;
+		gap: 0.25rem;
+		padding: 0.25rem;
+		border-radius: 0.25rem;
+		font-size: 0.75rem;
+
+		.theme--light & {
+			background-color: var( --clr-on-surface-light-primary-4 );
+			color: var( --clr-secondary-25 );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+			color: var( --clr-secondary-90 );
+		}
+
+		&--highlighted {
+			.theme--light & {
+				background-color: var( --clr-semantic-gold-90 );
+				color: var( --clr-semantic-gold-20 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-semantic-gold-30 );
+				color: var( --clr-semantic-gold-90 );
+			}
+
+			.team-participant-card__notification-icon {
+				.theme--light & {
+					color: var( --clr-semantic-gold-30 );
+				}
+			}
+		}
+	}
+
+	&__potential-qualifiers {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+
+		&-title {
+			padding: 0 0.5rem;
+			font-size: 0.875rem;
+			font-weight: bold;
+
+			.theme--light & {
+				color: var( --clr-secondary-25 );
+			}
+
+			.theme--dark & {
+				color: var( --clr-secondary-90 );
+			}
+		}
+
+		&-list {
+			display: flex;
+			flex-direction: column;
+		}
+
+		&-item {
+			padding: 0.5rem 0.75rem;
+
+			&--odd {
+				.theme--light & {
+					background-color: var( --clr-on-surface-light-primary-4 );
+				}
+
+				.theme--dark & {
+					background-color: var( --clr-on-surface-dark-primary-4 );
+				}
+			}
+
+			.team-template-image-icon {
+				@include set-participant-icon-size(
+					$participant-icon-wrapper-size-small,
+					$participant-icon-size-small
+				);
+			}
 		}
 	}
 }
 
-.team-participant-wrapper:has( .switch-toggle-active#{ $compact-selector } ) {
+.team-participant:has( .switch-toggle-active#{ $compact-selector } ) {
 	.team-participant-card {
-		&-square-icon {
+		&__opponent--square-icon {
 			.team-template-image-icon,
 			.league-icon-small-image {
 				@include set-participant-icon-size(
@@ -302,14 +492,10 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 			}
 		}
 
-		&-header {
+		&__header {
 			position: static;
 			flex-direction: row;
 			width: auto;
-
-			&__main {
-				display: contents;
-			}
 
 			.general-collapsible-default-toggle {
 				position: static;
@@ -317,210 +503,37 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 				right: initial;
 				transform: none;
 			}
+		}
 
-			&-opponent {
-				flex-direction: row;
-				gap: 0.5rem;
+		&__header-main {
+			display: contents;
+		}
 
-				.team-template-text {
-					font-size: initial;
-				}
+		&__opponent {
+			flex-direction: row;
+			gap: 0.5rem;
+
+			.team-template-text {
+				font-size: initial;
 			}
 		}
 
-		&-qualifier--header {
+		&__qualifier--header {
 			display: none;
 		}
 
-		&-qualifier--content {
+		&__qualifier--content {
 			display: flex;
 		}
 	}
 }
 
-.team-participant-square-icon {
+.team-participant-icon {
 	.team-template-image-icon,
 	.league-icon-small-image {
 		@include set-participant-icon-size(
 			$participant-icon-wrapper-size-compact,
 			$participant-icon-size-compact
 		);
-	}
-}
-
-.team-member {
-	display: flex;
-	gap: 0.25rem;
-	align-items: center;
-	padding: 0.5rem 0.75rem;
-
-	&.odd {
-		.theme--light & {
-			background-color: var( --clr-on-surface-light-primary-4 );
-		}
-
-		.theme--dark & {
-			background-color: var( --clr-on-surface-dark-primary-4 );
-		}
-	}
-
-	&-role-left {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		width: 20px;
-		height: 20px;
-		margin-right: 0.25rem;
-
-		img {
-			width: auto;
-			height: auto;
-		}
-
-		& > *:not( span ):not( img ) {
-			.theme--light & {
-				background-color: var( --clr-on-surface-light-primary-4 );
-			}
-
-			.theme--dark & {
-				background-color: var( --clr-on-surface-dark-primary-4 );
-			}
-		}
-	}
-
-	&-name {
-		flex-grow: 1;
-	}
-
-	&-trophies {
-		display: flex;
-		align-items: center;
-		gap: 0.25rem;
-		color: var( --clr-secondary-44 );
-
-		&-text {
-			font-size: 0.6875rem;
-			font-weight: bold;
-		}
-	}
-
-	&-role-right {
-		padding: 0.125rem 0.5rem;
-		border-radius: 0.25rem;
-		font-weight: bold;
-		font-size: 0.6875rem;
-
-		.theme--light & {
-			background-color: var( --clr-on-surface-light-primary-4 );
-			color: var( --clr-secondary-25 );
-		}
-
-		.theme--dark & {
-			background-color: var( --clr-on-surface-dark-primary-4 );
-			color: var( --clr-secondary-90 );
-		}
-	}
-
-	&-team {
-		.team-participant-square-icon {
-			.team-template-image-icon,
-			.league-icon-small-image {
-				& > a {
-					display: flex;
-					justify-content: center;
-				}
-
-				@include set-participant-icon-size(
-					$participant-icon-wrapper-size-small,
-					$participant-icon-size-small
-				);
-			}
-		}
-	}
-}
-
-.team-participant-notifications {
-	display: flex;
-	flex-direction: column;
-	gap: 0.25rem;
-	margin: 0.5rem 0.5rem 0;
-}
-
-.participant-notification {
-	display: flex;
-	gap: 0.25rem;
-	padding: 0.25rem;
-	border-radius: 0.25rem;
-	font-size: 0.75rem;
-
-	.theme--light & {
-		background-color: var( --clr-on-surface-light-primary-4 );
-		color: var( --clr-secondary-25 );
-	}
-
-	.theme--dark & {
-		background-color: var( --clr-on-surface-dark-primary-4 );
-		color: var( --clr-secondary-90 );
-	}
-
-	&-highlighted {
-		.theme--light & {
-			background-color: var( --clr-semantic-gold-90 );
-			color: var( --clr-semantic-gold-20 );
-		}
-
-		.theme--dark & {
-			background-color: var( --clr-semantic-gold-30 );
-			color: var( --clr-semantic-gold-90 );
-		}
-
-		&-icon {
-			.theme--light & {
-				color: var( --clr-semantic-gold-30 );
-			}
-		}
-	}
-}
-
-.potential-qualifiers {
-	&-container {
-		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
-	}
-
-	&-title {
-		padding: 0 0.5rem;
-		font-size: 0.875rem;
-		font-weight: bold;
-
-		.theme--light & {
-			color: var( --clr-secondary-25 );
-		}
-
-		.theme--dark & {
-			color: var( --clr-secondary-90 );
-		}
-	}
-
-	&-list-item {
-		padding: 0.5rem 0.75rem;
-
-		&.odd {
-			.theme--light & {
-				background-color: var( --clr-on-surface-light-primary-4 );
-			}
-
-			.theme--dark & {
-				background-color: var( --clr-on-surface-dark-primary-4 );
-			}
-		}
-
-		.team-template-image-icon {
-			@include set-participant-icon-size(
-				$participant-icon-wrapper-size-small,
-				$participant-icon-size-small
-			);
-		}
 	}
 }

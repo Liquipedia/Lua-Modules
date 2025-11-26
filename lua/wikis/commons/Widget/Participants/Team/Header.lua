@@ -31,7 +31,7 @@ function ParticipantsTeamHeader:render()
 	local isTbdOpponent = Opponent.isTbd(participant.opponent)
 	local isQualificationTournament = participant.qualification and participant.qualification.type == 'tournament'
 
-	local opponentClasses = {'team-participant-card-header-opponent', 'team-participant-card-square-icon'}
+	local opponentClasses = {'team-participant-card__opponent', 'team-participant-card__opponent--square-icon'}
 	local opponentDisplay
 
 	if isTbdOpponent and isQualificationTournament then
@@ -59,10 +59,10 @@ function ParticipantsTeamHeader:render()
 	end
 
 	return Div{
-		classes = { 'team-participant-card-header' },
+		classes = { 'team-participant-card__header' },
 		children = {
 			Div{
-				classes = {'team-participant-card-header__main'},
+				classes = {'team-participant-card__header-main'},
 				children = WidgetUtil.collect(
 					opponentDisplay,
 					labelDiv
@@ -94,8 +94,8 @@ function ParticipantsTeamHeader:_renderLabel(participant)
 
 	return Div{
 		classes = {
-			'team-participant-card-header-label',
-			isTbd and 'tbd' or ''
+			'team-participant-card__label',
+			isTbd and 'team-participant-card__label--tbd' or nil
 		},
 		children = {
 			HtmlWidgets.Span{
