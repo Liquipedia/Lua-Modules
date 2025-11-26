@@ -450,8 +450,8 @@ describe('Team Participants Repository', function()
 				local varWithSpace = globalVars:get('Team Liquid_p1')
 				local varWithUnderscore = globalVars:get('Team_Liquid_p1')
 
-				assert.is_not_nil(varWithSpace)
-				assert.is_not_nil(varWithUnderscore)
+				assert.are_equal('Player1', varWithSpace)
+				assert.are_equal('Player1', varWithUnderscore)
 			end)
 
 			it('sets page variables with correct prefixes and suffixes', function()
