@@ -649,54 +649,54 @@ describe('Team Participants Repository', function()
 	end)
 
 	describe('getPrizepoolRecords', function()
-		insulate('fetches placement records from PageVariableNamespace', function()
-			local prizePoolVars
-			local TeamParticipantsRepositoryLocal
+		insulate('returns empty array when no records exist', function()
+			local prizePoolVars = PageVariableNamespace('PrizePool')
+			prizePoolVars:delete('placementRecords.1')
+			prizePoolVars:delete('placementRecords.2')
+			local TeamParticipantsRepositoryLocal = require('Module:TeamParticipants/Repository')
 
-			before_each(function()
-				prizePoolVars = PageVariableNamespace('PrizePool')
-				TeamParticipantsRepositoryLocal = require('Module:TeamParticipants/Repository')
-			end)
+			local result = TeamParticipantsRepositoryLocal.getPrizepoolRecords()
 
-			it('returns empty array when no records exist', function()
-				local result = TeamParticipantsRepositoryLocal.getPrizepoolRecords()
+			assert.is_table(result)
+			assert.are_equal(0, #result)
+		end)
 
-				assert.is_table(result)
-				assert.are_equal(0, #result)
-			end)
+		insulate('fetches and returns records with correct placement values', function()
+			local prizePoolVars = PageVariableNamespace('PrizePool')
+			prizePoolVars:delete('placementRecords.1')
+			prizePoolVars:delete('placementRecords.2')
+			prizePoolVars:set('placementRecords.1', Json.stringify({
+				createPrizepoolRecord({placement = '1'}),
+				createPrizepoolRecord({placement = '2'}),
+			}))
+			local TeamParticipantsRepositoryLocal = require('Module:TeamParticipants/Repository')
 
-			it('fetches and returns an array', function()
-				prizePoolVars:set('placementRecords.1', Json.stringify({
-					createPrizepoolRecord({placement = '1'}),
-					createPrizepoolRecord({placement = '2'}),
-				}))
+			local result = TeamParticipantsRepositoryLocal.getPrizepoolRecords()
 
-				local result = TeamParticipantsRepositoryLocal.getPrizepoolRecords()
+			assert.is_table(result)
+			assert.are_equal(2, #result)
+			assert.are_equal('1', result[1].placement)
+			assert.are_equal('2', result[2].placement)
+		end)
 
-				assert.is_table(result)
-			end)
+		insulate('flattens multiple prizepool indices', function()
+			local prizePoolVars = PageVariableNamespace('PrizePool')
+			prizePoolVars:delete('placementRecords.1')
+			prizePoolVars:delete('placementRecords.2')
+			prizePoolVars:set('placementRecords.1', Json.stringify({
+				createPrizepoolRecord({placement = '1'}),
+			}))
+			prizePoolVars:set('placementRecords.2', Json.stringify({
+				createPrizepoolRecord({placement = '2'}),
+			}))
+			local TeamParticipantsRepositoryLocal = require('Module:TeamParticipants/Repository')
 
-			it('flattens multiple prizepool indices', function()
-				prizePoolVars:set('placementRecords.1', Json.stringify({
-					createPrizepoolRecord({placement = '1'}),
-				}))
-				prizePoolVars:set('placementRecords.2', Json.stringify({
-					createPrizepoolRecord({placement = '2'}),
-				}))
+			local result = TeamParticipantsRepositoryLocal.getPrizepoolRecords()
 
-				local result = TeamParticipantsRepositoryLocal.getPrizepoolRecords()
-
-				assert.is_table(result)
-			end)
-
-			it('parses JSON strings from variables', function()
-				local record = createPrizepoolRecord({placement = '1', prizemoney = 10000})
-				prizePoolVars:set('placementRecords.1', Json.stringify({record}))
-
-				local result = TeamParticipantsRepositoryLocal.getPrizepoolRecords()
-
-				assert.is_table(result)
-			end)
+			assert.is_table(result)
+			assert.are_equal(2, #result)
+			assert.are_equal('1', result[1].placement)
+			assert.are_equal('2', result[2].placement)
 		end)
 	end)
 end)
