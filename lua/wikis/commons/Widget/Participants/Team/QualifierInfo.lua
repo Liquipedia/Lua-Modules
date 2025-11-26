@@ -100,7 +100,7 @@ function ParticipantsTeamQualifierInfo:createPlacementBadge(placement)
 	end
 
 	return Span{
-		classes = {'team-participant-card-qualifier-placement'},
+		classes = {'team-participant-card__qualifier-placement'},
 		children = {Ordinal.toOrdinal(placement)}
 	}
 end
