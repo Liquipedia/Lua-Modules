@@ -78,7 +78,7 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponent, opponentI
 	---@param players MGIParsedPlayer[]
 	---@param playerId integer
 	---@return {pageName: string, displayName: string}?
-	local function fetchLpdbPlayer(players, playerId)
+	local function fetchPlayerName(players, playerId)
 		if not playerId then
 			return
 		end
@@ -105,7 +105,7 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponent, opponentI
 	end
 
 	local players = Array.map(team.players, function(player)
-		local playerData = fetchLpdbPlayer(opponent.match2players, player.id) or {}
+		local playerData = fetchPlayerName(opponent.match2players, player.id) or {}
 		return {
 			player = playerData.pageName or player.name,
 			name = playerData.displayName,
