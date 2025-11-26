@@ -27,7 +27,7 @@ local TeamParticipantsWikiParser = {}
 ---@alias QualificationType 'tournament'|'external'|'other'
 
 ---@alias QualificationStructure {method: QualificationMethod, type: QualificationType,
----tournament?: StandardTournament, url?: string, text?: string}
+---tournament?: StandardTournament, url?: string, text?: string, placement?: number}
 
 ---@param args table
 ---@return {participants: TeamParticipant[], expectedPlayerCount: integer?}
@@ -45,12 +45,29 @@ function TeamParticipantsWikiParser.parseWikiInput(args)
 	}
 end
 
+---@param input string|number
+---@return number
+local function validatePlacement(input)
+	local placement = tonumber(input)
+	assert(placement, 'Invalid placement: must be a number (got: ' .. input .. ')')
+
+	assert(
+		placement == math.floor(placement),
+		'Invalid placement: must be a whole number (got: ' .. input .. ')'
+	)
+
+	assert(placement > 0, 'Invalid placement: must be a positive number (got: ' .. input .. ')')
+
+	return placement
+end
+
 ---@param input table?
----@return QualificationStructure?
+---@return QualificationStructure?, string[]?
 local function parseQualifier(input)
 	if not input then
 		return
 	end
+	local warnings = {}
 	local qualificationMethod = input.method
 	if not qualificationMethod then
 		return
@@ -86,6 +103,20 @@ local function parseQualifier(input)
 		error('External qualifier must have text')
 	end
 
+	if input.placement then
+		Logic.tryCatch(
+			function()
+				qualificationStructure.placement = validatePlacement(input.placement)
+			end,
+			function(errorMessage)
+				table.insert(warnings, errorMessage)
+			end
+		)
+	end
+
+	if #warnings > 0 then
+		return qualificationStructure, warnings
+	end
 	return qualificationStructure
 end
 
@@ -122,12 +153,15 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 		opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), {syncPlayer = true})
 	end
 
+	local qualification, qualificationWarnings = parseQualifier(input.qualification)
+	Array.extendWith(warnings, qualificationWarnings)
+
 	local aliases = Array.parseCommaSeparatedString(input.aliases, ';')
 	table.insert(aliases, Opponent.toName(opponent))
 
 	return {
 		opponent = opponent,
-		qualification = parseQualifier(input.qualification),
+		qualification = qualification,
 		aliases = Array.flatMap(aliases, function(alias)
 			return TeamTemplate.queryHistoricalNames(alias)
 		end),
