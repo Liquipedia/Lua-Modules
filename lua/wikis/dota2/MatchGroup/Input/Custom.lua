@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local HeroNames = Lua.import('Module:HeroNames', {loadData = true})
 local Logic = Lua.import('Module:Logic')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
@@ -19,6 +20,8 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
+
+local globalVars = PageVariableNamespace{cached = true}
 
 local CustomMatchGroupInput = {}
 
@@ -68,6 +71,22 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end
 
 	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
+end
+
+---@param opponent MGIParsedOpponent
+---@param opponentIndex integer
+function MatchFunctions.adjustOpponent(opponent, opponentIndex)
+	if opponent.type ~= Opponent.team then
+		return
+	end
+	local prefix = opponent.name .. '_p'
+	Array.forEach(opponent.match2players, function (player, playerIndex)
+		local publisherId = globalVars:get(prefix .. playerIndex .. 'id')
+		if Logic.isNotEmpty(publisherId) then
+			player.extradata = player.extradata or {}
+			player.extradata.publisherId = tonumber(publisherId)
+		end
+	end)
 end
 
 ---@param match table
