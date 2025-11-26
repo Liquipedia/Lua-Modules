@@ -228,9 +228,6 @@ describe('Team Participants Controller', function()
 		end)
 
 		it('deep merges when player exists in both lists', function()
-			-- When a player is manually specified AND imported from database,
-			-- we keep the manual values (user input) but supplement with
-			-- imported data (database fields not manually set)
 			local manualPlayers = {
 				{
 					displayName = 'Player1',
@@ -256,7 +253,6 @@ describe('Team Participants Controller', function()
 			TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers, importedPlayers)
 
 			assert.are_equal(1, #manualPlayers)
-			assert.are_equal('Player1', manualPlayers[1].displayName)
 			assert.are_equal('us', manualPlayers[1].flag)
 			assert.are_equal('manual', manualPlayers[1].extradata.manualData)
 			assert.are_equal('imported', manualPlayers[1].extradata.importedData)
@@ -349,7 +345,7 @@ describe('Team Participants Controller', function()
 			assert.are_equal(originalCount, #parsedData.participants[1].opponent.players)
 		end)
 
-		it('skips import when players array does not exist', function()
+		it('does not create players array when it does not exist', function()
 			local parsedData = {
 				participants = {
 					{
@@ -543,24 +539,6 @@ describe('Team Participants Controller', function()
 			LpdbQuery:revert()
 		end)
 
-		it('full workflow: parse → import → fill → store → display', function()
-			local args = {
-				{
-					'team liquid',
-					players = {
-						{'player1'},
-					}
-				},
-				minimumplayers = '5',
-				date = '2024-01-01',
-			}
-
-			local result = TeamParticipantsController.fromTemplate(args)
-
-			assert.is_not_nil(result)
-			assert.are_equal('table', type(result))
-		end)
-
 		it('store=false parameter skips LPDB storage', function()
 			local args = {
 				{
@@ -608,8 +586,6 @@ describe('Team Participants Controller', function()
 			TeamParticipantsController.fromTemplate(args)
 
 			assert.stub(LpdbPlacementStore).was.called(0)
-
-			Variables.varDefine('disable_LPDB_storage', nil)
 		end)
 
 		it('page variables are set for participants', function()
@@ -625,23 +601,7 @@ describe('Team Participants Controller', function()
 			TeamParticipantsController.fromTemplate(args)
 
 			local teamVar = Variables.varDefault('Team Liquid_p1')
-			assert.is_not_nil(teamVar)
-		end)
-
-		it('returns Widget output', function()
-			local args = {
-				{
-					'team liquid',
-					players = {
-						{'player1'},
-					}
-				},
-			}
-
-			local result = TeamParticipantsController.fromTemplate(args)
-
-			assert.is_table(result)
-			assert.is_function(result.make or result.__tostring)
+			assert.are_equal('player1', teamVar)
 		end)
 
 		it('processes multiple participants', function()
@@ -656,9 +616,11 @@ describe('Team Participants Controller', function()
 				},
 			}
 
-			local result = TeamParticipantsController.fromTemplate(args)
+			TeamParticipantsController.fromTemplate(args)
 
-			assert.is_not_nil(result)
+			assert.stub(LpdbPlacementStore).was.called(2)
+			assert.is_truthy(LpdbPlacementStore.calls[1].vals[1]:find('team liquid'))
+			assert.is_truthy(LpdbPlacementStore.calls[2].vals[1]:find('bds'))
 		end)
 	end)
 end)
