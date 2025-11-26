@@ -377,6 +377,9 @@ local previousMatchWasTbd
 ---@param match table
 ---@return boolean
 function MatchTicker:keepMatch(match)
+	if match.extradata and match.extradata.hidden then
+		return false
+	end
 	-- Remove matches with wrong region
 	if self.config.regions then
 		if not match.tournamentData then
