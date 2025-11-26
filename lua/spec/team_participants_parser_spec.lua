@@ -75,13 +75,16 @@ describe('Team Participants Parser', function()
 			end)
 
 			it('falls back to contextual date', function()
+				local Variables = require('Module:Variables')
+				Variables.varDefine('tournament_enddate', '2024-12-25')
+
 				local args = {
 					createBasicParticipantInput(),
 				}
 
 				local result = TeamParticipantsWikiParser.parseWikiInput(args)
 
-				assert.is_not_nil(result.participants[1].date)
+				assert.same({day = 25, month = 12, year = 2024}, result.participants[1].date)
 			end)
 
 			it('handles empty input', function()
