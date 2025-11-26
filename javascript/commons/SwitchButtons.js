@@ -130,15 +130,12 @@ liquipedia.switchButtons = {
 		}
 	},
 
-	getValueFromDOM: function ( switchGroup, activeClassName ) {
+	getValueFromDOM: function ( switchGroup ) {
 		if ( switchGroup.type === 'toggle' ) {
-			return switchGroup.nodes[ 0 ]?.classList.contains( activeClassName ) ?? false;
+			return switchGroup.nodes[ 0 ]?.classList.contains( switchGroup.activeClassName ) ?? false;
 		} else {
-			switchGroup.nodes.forEach( ( pillNode ) => {
-				if ( pillNode.classList.contains( activeClassName ) ) {
-					return pillNode.dataset.switchValue;
-				}
-			} );
+			const activeNode = switchGroup.nodes.find( ( pillNode ) => pillNode.classList.contains( switchGroup.activeClassName ) );
+			return activeNode?.dataset.switchValue;
 		}
 	},
 
@@ -180,6 +177,10 @@ liquipedia.switchButtons = {
 		const localStorageKey = `${ this.baseLocalStorageKey }_${ groupName }`;
 		const storageValue = window.localStorage.getItem( localStorageKey );
 
+		if ( storageValue === null ) {
+			return null;
+		}
+
 		if ( switchGroup.type === 'toggle' ) {
 			return storageValue === 'true';
 		} else {
@@ -193,7 +194,10 @@ liquipedia.switchButtons = {
 	},
 
 	triggerCustomEvent: function ( node, data ) {
-		const customEvent = new CustomEvent( this.triggerEventName, { detail: { data } } );
+		const customEvent = new CustomEvent( this.triggerEventName, {
+			detail: { data },
+			bubbles: true
+		} );
 		node.dispatchEvent( customEvent );
 	},
 

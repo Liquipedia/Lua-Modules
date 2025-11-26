@@ -246,6 +246,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	-- BW wiki has several series that are displayed on the same page
 	-- hence they need to not RR them
 	lpdbData.series = args.series
+	lpdbData.extradata.seriesnumber = self.data.number and string.format('%05i', self.data.number) or nil
 
 	lpdbData.extradata.female = Logic.readBool(args.female) or nil
 

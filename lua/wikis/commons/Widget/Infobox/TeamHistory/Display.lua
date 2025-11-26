@@ -187,12 +187,9 @@ end
 ---@param transfer TransferSpan
 ---@return Widget
 function TeamHistoryDisplay:_row(transfer)
-	local teamText = self:_getTeamText(transfer)
-
-	---@type Widget|string?
 	local role = Logic.nilIfEmpty(transfer.role)
 	if role then
-		local splitRole = Array.parseCommaSeparatedString(role --[[@as string]], ' ')
+		local splitRole = Array.parseCommaSeparatedString(role, ' ')
 		local lastSplitRole = splitRole[#splitRole]:lower()
 		local roleData = Roles.All[transfer.role:lower()] or NOT_YET_IN_ROLES_DATA[transfer.role:lower()]
 			or Roles.All[lastSplitRole] or NOT_YET_IN_ROLES_DATA[lastSplitRole] or {}
@@ -200,6 +197,13 @@ function TeamHistoryDisplay:_row(transfer)
 			role = nil
 		end
 	end
+	local roleLength = 0
+	if role then
+		-- +3 for padding left + brackets
+		roleLength = string.len(role) + 3
+	end
+
+	local teamText = self:_getTeamText(transfer, roleLength)
 	---@type (string|Widget)[]
 	local teamDisplay = WidgetUtil.collect(
 		role == LOAN and '&#8250;&nbsp;' or nil,
@@ -275,8 +279,9 @@ function TeamHistoryDisplay:_row(transfer)
 end
 
 ---@param transfer TransferSpan
+---@param roleLength integer
 ---@return Widget|string
-function TeamHistoryDisplay:_getTeamText(transfer)
+function TeamHistoryDisplay:_getTeamText(transfer, roleLength)
 	if Logic.isEmpty(transfer.team) and Table.includes(SPECIAL_ROLES, transfer.role) then
 		return transfer.role
 	elseif not TeamTemplate.exists(transfer.team) then
@@ -287,16 +292,18 @@ function TeamHistoryDisplay:_getTeamText(transfer)
 
 	return Link{
 		link = teamData.page,
-		children = {TeamHistoryDisplay._getTeamDisplayName(teamData)}
+		children = {TeamHistoryDisplay._getTeamDisplayName(teamData, roleLength)}
 	}
 end
 
 ---@param teamData {name: string, bracketname: string, shortname: string}
+---@param roleLength integer
 ---@return string
-function TeamHistoryDisplay._getTeamDisplayName(teamData)
-	if string.len(teamData.name) <= 17 then
+function TeamHistoryDisplay._getTeamDisplayName(teamData, roleLength)
+	local maxLength = 22 - (POSITION_ICON_DATA and 4 or 0) - (HAS_REFS and 4 or 0) - roleLength
+	if string.len(teamData.name) <= maxLength then
 		return teamData.name
-	elseif string.len(teamData.bracketname) <= 17 then
+	elseif string.len(teamData.bracketname) <= maxLength then
 		return teamData.bracketname
 	else
 		return teamData.shortname or teamData.name

@@ -63,7 +63,7 @@ function CustomLeague:customParseArguments(args)
 	args.raceBreakDown = RaceBreakdown.run(args) or {}
 	args.player_number = args.raceBreakDown.total
 	args.maps = self:_getMaps('map', args)
-	args.number = tonumber(args.number)
+	self.data.number = tonumber(args.number)
 	self.data.mode = args.mode or DEFAULT_MODE
 	self.data.game = (args.game or ''):lower() == GAME_MOD and GAME_MOD or self.data.game
 	self.data.mod = self.data.game == GAME_MOD and args.modname or nil
@@ -169,7 +169,7 @@ function CustomLeague:_computeChronology(args)
 	local number = tonumber(title.subpageText)
 	local automateChronology = String.isNotEmpty(args.series)
 		and number
-		and args.number == number
+		and self.data.number == number
 		and title.subpageText ~= title.text
 		and Logic.readBool(args.auto_chronology or true)
 		and (String.isEmpty(args.next) or String.isEmpty(args.previous))
@@ -360,7 +360,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_mod', self.data.mod)
 	Variables.varDefine('headtohead', args.headtohead or 'true')
 	Variables.varDefine('tournament_maps', Json.stringify(args.maps))
-	Variables.varDefine('tournament_series_number', args.number and string.format('%05i', args.number) or nil)
+	Variables.varDefine('tournament_series_number', self.data.number and string.format('%05i', self.data.number) or nil)
 	Variables.varDefine('match_date', self.data.startTime.storage)
 end
 
@@ -386,7 +386,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
 	lpdbData.maps = Json.stringify(args.maps)
 
-	lpdbData.extradata.seriesnumber = args.number and string.format('%05i', args.number) or nil
+	lpdbData.extradata.seriesnumber = self.data.number and string.format('%05i', self.data.number) or nil
 	lpdbData.extradata.starttime = self.data.startTime.storage
 	lpdbData.extradata.mod = self.data.mod
 

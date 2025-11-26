@@ -17,7 +17,6 @@ local Links = Lua.import('Module:Links')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Tabs = Lua.import('Module:Tabs')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
@@ -31,6 +30,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local AdditionalSection = Lua.import('Module:Widget/Match/Page/AdditionalSection')
 local MatchPageMapVeto = Lua.import('Module:Widget/Match/Page/MapVeto')
 local Comment = Lua.import('Module:Widget/Match/Page/Comment')
+local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local Div = HtmlWidgets.Div
 local Footer = Lua.import('Module:Widget/Match/Page/Footer')
 local Header = Lua.import('Module:Widget/Match/Page/Header')
@@ -122,7 +122,7 @@ function BaseMatchPage:getCountdownBlock()
 		children = Countdown.create{
 			date = DateExt.toCountdownArg(self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact),
 			finished = self.matchData.finished,
-			rawdatetime = Logic.readBool(self.matchData.finished),
+			rawdatetime = (not self.matchData.dateIsExact) or self.matchData.finished,
 		}
 	}
 end
@@ -300,32 +300,32 @@ function BaseMatchPage:renderGames()
 		return games[1]
 	end
 
-	---@type table<string, any>
-	local tabs = {
-		This = 1,
-		['hide-showall'] = true
-	}
-
 	local overallStats = self:renderOverallStats()
-	local hasOverallStats = Logic.isNotEmpty(overallStats)
 
-	if hasOverallStats then
-		tabs.name1 = 'Overall Statistics'
-		tabs.content1 = overallStats
-	end
-
-	Array.forEach(games, function(game, idx)
-		local mapName = self.games[idx].map
-		local tabId = hasOverallStats and (idx + 1) or idx
-		if Logic.isNotEmpty(mapName) then
-			tabs['name' .. tabId] = 'Game ' .. idx .. ': ' .. mapName
-		else
-			tabs['name' .. tabId] = 'Game ' .. idx
-		end
-		tabs['content' .. tabId] = game
-	end)
-
-	return Tabs.dynamic(tabs)
+	return ContentSwitch{
+		tabs = WidgetUtil.collect(
+			overallStats and {
+				label = {
+					HtmlWidgets.Span{classes = {'mobile-hide'}, children = 'Overall Statistics'},
+					HtmlWidgets.Span{classes = {'mobile-only'}, children = 'Overall'}
+				},
+				content = overallStats
+			} or nil,
+			Array.map(games, function (game, gameIndex)
+				local mapName = self.games[gameIndex].map
+				return {
+					label = 'Game&nbsp;' .. gameIndex .. (
+						Logic.isNotEmpty(mapName) and (': ' .. mapName) or ''
+					),
+					content = game
+				}
+			end)
+		),
+		size = 'small',
+		storeValue = false,
+		switchGroup = 'matchPageGameSelector',
+		variant = 'generic'
+	}
 end
 
 ---@protected

@@ -42,7 +42,7 @@ function CustomInjector:parse(id, widgets)
 		return widgets
 	end
 
-        return widgets
+		return widgets
 end
 
 return CustomRole

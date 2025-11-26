@@ -28,6 +28,7 @@ local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local Region = Lua.import('Module:Region')
 
 local Roles = Lua.import('Module:Roles')
+local RoleUtil = Lua.import('Module:Role/Util')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Header = Widgets.Header
@@ -38,16 +39,9 @@ local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 local TeamHistoryWidget = Lua.import('Module:Widget/Infobox/TeamHistory')
 
----@class PersonRoleData
----@field category string
----@field display string
-
----@class PersonRoleDataExtended: PersonRoleData
----@field key string?
-
 ---@class Person: BasicInfobox
 ---@field locations string[]
----@field roles PersonRoleDataExtended[]
+---@field roles RoleData[]
 local Person = Class.new(BasicInfobox)
 
 local Language = mw.getContentLanguage()
@@ -273,7 +267,7 @@ function Person:_parseArgs()
 			}, ', ')
 		end
 
-		self.roles = Array.map(Array.parseCommaSeparatedString(args.roles), Person._createRoleData)
+		self.roles = RoleUtil.readRoleArgs(args.roles)
 	end
 
 	Logic.tryOrElseLog(parseStatusAndBanned)
@@ -494,41 +488,15 @@ function Person:displayLocations()
 	end)
 end
 
----@param roles PersonRoleDataExtended[]
+---@param roles RoleData[]
 ---@return string[]
 function Person._getKeysOfRoles(roles)
 	return Array.map(roles, function(roleData)
-		-- With backwards compatibility for old roles, otherwise only key would be needed
-		return roleData.key or roleData.display or roleData.category or ''
+		return roleData.key or ''
 	end)
 end
 
----@param roleKey string
----@return PersonRoleDataExtended?
-function Person._createRoleData(roleKey)
-	if String.isEmpty(roleKey) then return nil end
-
-	local key = roleKey:lower()
-	local roleData = Roles.All[key]
-
-	--- Backwards compatibility for old roles
-	if not roleData then
-		mw.ext.TeamLiquidIntegration.add_category('Pages with invalid role input')
-		local display = String.upperCaseFirst(roleKey)
-		return {
-			display = display,
-			category = display .. 's'
-		}
-	end
-
-	return {
-		display = roleData.display,
-		category = roleData.category,
-		key = key,
-	}
-end
-
----@param roleData PersonRoleData?
+---@param roleData RoleData?
 ---@return string?
 function Person:_displayRole(roleData)
 	if not roleData then return end

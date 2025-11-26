@@ -874,6 +874,10 @@ function BasePrizePool:storeData()
 		Array.extendWith(lpdbData, lpdbEntries)
 	end
 
+	if self.options.storeLpdb then
+		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(lpdbData))
+	end
+
 	for _, lpdbEntry in ipairs(lpdbData) do
 		lpdbEntry = Json.stringifySubTables(lpdbEntry)
 		local objectName = Table.extract(lpdbEntry, 'objectName')
@@ -883,10 +887,6 @@ function BasePrizePool:storeData()
 		end
 
 		Variables.varDefine(objectName .. '_placementdate', lpdbEntry.date)
-	end
-
-	if self.options.storeLpdb then
-		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(lpdbData))
 	end
 
 	return self

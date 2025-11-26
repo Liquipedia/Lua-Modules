@@ -11,6 +11,8 @@ const SEARCH_PERFORMED = 'Page searched';
 const BUTTON_CLICKED = 'Button clicked';
 const MATCH_POPUP_OPENED = 'Match popup opened';
 const INFO_BANNER_CLOSED = 'Info banner closed';
+const USER_SETTINGS_ADDED = 'User settings added';
+const TOGGLE_CLICKED = 'Toggle clicked';
 
 // Constants
 const IGNORE_CATEGORY_PREFIX = 'Pages ';
@@ -18,6 +20,18 @@ const TOC = 'ToC';
 const SIDEBAR = 'sidebar';
 const INLINE = 'inline';
 const INFOBANNER = 'InfoBanner';
+
+// Mapping from category name to page type
+const categoryToPageTypeMap = {
+	Players: 'player',
+	Teams: 'team',
+	Tournaments: 'tournament',
+	Matches: 'match',
+	'Tournament series': 'series',
+	Maps: 'map',
+	Characters: 'character',
+	Units: 'unit'
+};
 
 // Statically defined properties
 const getPageDomain = () => window.location.origin;
@@ -84,6 +98,7 @@ liquipedia.analytics = {
 				};
 			}
 		}
+
 	},
 
 	clickTrackers: [],
@@ -98,6 +113,8 @@ liquipedia.analytics = {
 		liquipedia.analytics.setupSearchFormSubmitAnalytics();
 		liquipedia.analytics.setupMatchPopupAnalytics();
 		liquipedia.analytics.setupInfoBannerAnalytics();
+		liquipedia.analytics.setupSwitchButtonAnalytics();
+		liquipedia.analytics.setupToggleClickAnalytics();
 
 		document.body.addEventListener( 'click', ( event ) => {
 			for ( const tracker of liquipedia.analytics.clickTrackers ) {
@@ -112,6 +129,10 @@ liquipedia.analytics = {
 	},
 
 	track: function( eventName, properties ) {
+		// amplitude is blocked, either by user choice or by an adblocker
+		if ( !window.amplitude ) {
+			return;
+		}
 		window.amplitude.track( eventName, {
 			'page domain': getPageDomain(),
 			'page location': getPageLocation(),
@@ -125,10 +146,12 @@ liquipedia.analytics = {
 
 	sendPageViewEvent: function() {
 		const categories = mw.config.get( 'wgCategories' ) || [];
+		const pageTypes = categories.map( ( category ) => categoryToPageTypeMap[ category ] ).filter( Boolean );
 		liquipedia.analytics.track( PAGE_VIEW, {
 			referrer: getReferrerUrl(),
 			'referring domain': getReferrerDomain(),
-			categories: categories.filter( ( category ) => !category.startsWith( IGNORE_CATEGORY_PREFIX ) )
+			categories: categories.filter( ( category ) => !category.startsWith( IGNORE_CATEGORY_PREFIX ) ),
+			'page type': pageTypes.length === 1 ? pageTypes[ 0 ] : null
 		} );
 	},
 
@@ -215,7 +238,10 @@ liquipedia.analytics = {
 	getDatasetAnalyticsProperties: function( dataset ) {
 		const properties = {};
 		Object.entries( dataset )
-			.filter( ( [ key ] ) => key.startsWith( 'analytics' ) && key !== 'analyticsName' )
+			.filter( ( [ key ] ) => key.startsWith( 'analytics' ) &&
+				key !== 'analyticsName' &&
+				key !== 'analyticsTrackValueAs'
+			)
 			.forEach( ( [ key, value ] ) => {
 				const propertyName = liquipedia.analytics.formatAnalyticsKey( key );
 				properties[ propertyName ] = value || null;
@@ -366,6 +392,37 @@ liquipedia.analytics = {
 				const infoBannerElement = closeButton.closest( '.network-notice' );
 				return liquipedia.analytics.customPropertyFinders.InfoBanner( infoBannerElement );
 			}
+		} );
+	},
+
+	setupToggleClickAnalytics: function() {
+		liquipedia.analytics.clickTrackers.push( {
+			selector: '.switch-toggle',
+			trackerName: TOGGLE_CLICKED,
+			propertiesBuilder: ( toggle ) => {
+				const position = liquipedia.analytics.findLinkPosition( toggle );
+				return {
+					position: liquipedia.analytics.formatAnalyticsKey( position )
+				};
+			}
+		} );
+	},
+
+	setupSwitchButtonAnalytics: function() {
+		document.body.addEventListener( 'switchButtonChanged', ( event ) => {
+			const switchElement = event.target;
+			const switchGroup = event.detail.data;
+
+			const customProperties = liquipedia.analytics.addCustomProperties( switchElement );
+			const context = liquipedia.analytics.getAnalyticsContextElement( switchElement );
+
+			const propertyToTrack = context.element?.dataset.analyticsTrackValueAs;
+
+			if ( propertyToTrack ) {
+				customProperties[ propertyToTrack ] = switchGroup.value;
+			}
+
+			liquipedia.analytics.track( USER_SETTINGS_ADDED, customProperties );
 		} );
 	}
 };

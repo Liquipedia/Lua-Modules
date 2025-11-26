@@ -19,6 +19,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
+local PartnerWikis = Lua.import('Module:Widget/MainPage/PartnerWikis')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
@@ -149,6 +150,12 @@ local CONTENT = {
 		padding = true,
 		boxid = 1507,
 	},
+	partnerWikis = {
+		heading = 'Partner Wikis',
+		body = PartnerWikis{},
+		padding = true,
+		boxid = 1518,
+	},
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
@@ -163,13 +170,12 @@ local CONTENT = {
 		heading = 'Liquipedia Rankings (Beta)',
 		body = Rankings{
 			teamLimit = 5,
-			progressionLimit = 12,
 			storageType = 'extension',
 			showGraph = false,
 			isSmallerVersion = true
 		},
 		padding = false,
-		boxid = 1511,
+		boxid = 1520,
 	},
 ]]
 }
@@ -263,6 +269,10 @@ local LAYOUT_MAIN = {
 			{
 				mobileOrder = 8,
 				content = CONTENT.usefulArticles,
+			},
+			{
+				mobileOrder = 9,
+				content = CONTENT.partnerWikis
 			},
 		}
 	}

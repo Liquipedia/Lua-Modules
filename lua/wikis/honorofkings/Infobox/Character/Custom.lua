@@ -48,24 +48,28 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'role' then
 		return {
-            Cell{
+			Cell{
 				name = 'Lane',
 				children = WidgetUtil.collect(
 					self:_toCellContent('lane1'),
-					self:_toCellContent('lane2')
+					self:_toCellContent('lane2'),
+					self:_toCellContent('lane3'),
+					self:_toCellContent('lane4')
 				)
 			},
 			Cell{
 				name = 'Role',
 				children = WidgetUtil.collect(
 					self:_toCellContent('role1'),
-					self:_toCellContent('role2')
+					self:_toCellContent('role2'),
+					self:_toCellContent('role3'),
+					self:_toCellContent('role4')
 				)
 			},
 		}
 	elseif id == 'custom' then
 		return self.caller:_getCustomCells()
-    end
+	end
 	return widgets
 end
 
@@ -113,8 +117,12 @@ end
 function CustomCharacter:addToLpdb(lpdbData, args)
 	lpdbData.extradata.lane1 = args.lane1
 	lpdbData.extradata.lane2 = args.lane2
+	lpdbData.extradata.lane3 = args.lane3
+	lpdbData.extradata.lane4 = args.lane4
 	lpdbData.extradata.role1 = args.role1
 	lpdbData.extradata.role2 = args.role2
+	lpdbData.extradata.role3 = args.role3
+	lpdbData.extradata.role4 = args.role4
 
 	return lpdbData
 end

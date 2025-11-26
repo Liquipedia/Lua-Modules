@@ -103,7 +103,7 @@ MatchGroupInputUtil.ASSUME_FINISHED_AFTER = ASSUME_FINISHED_AFTER
 local NOW = os.time()
 local contentLanguage = mw.getContentLanguage()
 
----@class MatchGroupMvpPlayer
+---@class MatchGroupMvpPlayer: MGIParsedPlayer
 ---@field displayname string
 ---@field name string
 ---@field comment string?
@@ -330,7 +330,7 @@ function MatchGroupInputUtil.getTournamentContext(obj, parent)
 end
 
 ---@param match table
----@param opponents? table[]
+---@param opponents? MGIParsedOpponent[]
 ---@return {players: MatchGroupMvpPlayer[], points: integer}?
 function MatchGroupInputUtil.readMvp(match, opponents)
 	if not match.mvp then return end
@@ -1338,7 +1338,7 @@ end
 ---@class FfaMatchParserInterface
 ---@field extractMaps fun(match: table, opponents: MGIParsedOpponent[], mapProps: any?): table[]
 ---@field parseSettings? fun(match: table, opponentCount: integer): table
----@field calculateMatchScore? fun(maps: table[], opponents: MGIParsedOpponent[]): fun(opponentIndex: integer): integer?
+---@field calculateMatchScore? fun(opponents: MGIParsedOpponent[], maps: table[]): fun(opponentIndex: integer): integer?
 ---@field getExtraData? fun(match: table, games: table[], opponents: MGIParsedOpponent[], settings: table): table?
 ---@field getMode? fun(opponents: MGIParsedOpponent[]): string
 ---@field readDate? readDateFunction
@@ -1357,7 +1357,7 @@ end
 ---
 --- It may optionally have the following functions:
 --- - parseSettings(match, opponentCount): table
---- - calculateMatchScore(maps, opponents): fun(opponentIndex): integer?
+--- - calculateMatchScore(opponents, maps): fun(opponentIndex): integer?
 --- - getExtraData(match, games, opponents, settings): table?
 --- - getMode(opponents): string?
 --- - readDate(match): table
