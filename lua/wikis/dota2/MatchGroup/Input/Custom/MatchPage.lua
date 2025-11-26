@@ -60,9 +60,10 @@ function CustomMatchGroupInputMatchPage.getSide(map, opponentIndex)
 end
 
 ---@param map dota2MatchDataExtended
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]?
-function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
+function CustomMatchGroupInputMatchPage.getParticipants(map, opponent, opponentIndex)
 	local team = map['team' .. opponentIndex] ---@type dota2MatchTeam?
 	if not team then return end
 	if not team.players then return end

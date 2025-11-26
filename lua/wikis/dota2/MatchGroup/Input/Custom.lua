@@ -45,7 +45,7 @@ MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 ---@field getObjectives fun(map: table, opponentIndex: integer): table?
 ---@field getHeroPicks fun(map: table, opponentIndex: integer): string[]?
 ---@field getHeroBans fun(map: table, opponentIndex: integer): string[]?
----@field getParticipants fun(map: table, opponentIndex: integer): table[]?
+---@field getParticipants fun(map: table, opponent: MGIParsedOpponent, opponentIndex: integer): table[]?
 ---@field getVetoPhase fun(map: table): table[]?
 
 ---@param match table
@@ -232,7 +232,7 @@ end
 function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponentIndex)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
 
-	local participantList = MapParser.getParticipants(map, opponentIndex) or {}
+	local participantList = MapParser.getParticipants(map, opponent, opponentIndex) or {}
 	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		participantList,
