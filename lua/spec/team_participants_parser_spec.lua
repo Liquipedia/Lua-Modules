@@ -47,9 +47,9 @@ describe('Team Participants Parser', function()
 				local result = TeamParticipantsWikiParser.parseWikiInput(args)
 
 				assert.are_equal(3, #result.participants)
-				assert.is_not_nil(result.participants[1].opponent)
-				assert.is_not_nil(result.participants[2].opponent)
-				assert.is_not_nil(result.participants[3].opponent)
+				assert.are_equal('team', result.participants[1].opponent.type)
+				assert.are_equal('team', result.participants[2].opponent.type)
+				assert.are_equal('team', result.participants[3].opponent.type)
 			end)
 
 			it('extracts minimumplayers parameter', function()
@@ -71,7 +71,7 @@ describe('Team Participants Parser', function()
 
 				local result = TeamParticipantsWikiParser.parseWikiInput(args)
 
-				assert.is_not_nil(result.participants[1].date)
+				assert.same({year = 2024, month = 6, day = 15}, result.participants[1].date)
 			end)
 
 			it('falls back to contextual date', function()
@@ -143,7 +143,8 @@ describe('Team Participants Parser', function()
 
 				assert.is_table(result.opponent)
 				assert.are_equal('team', result.opponent.type)
-				assert.is_not_nil(result.opponent.template)
+				assert.is_string(result.opponent.template)
+				assert.is_truthy(result.opponent.template:find('team liquid'))
 			end)
 
 			it('parses and assigns players', function()
@@ -168,8 +169,8 @@ describe('Team Participants Parser', function()
 
 				local result = TeamParticipantsWikiParser.parseParticipant(input, date)
 
-				assert.is_not_nil(result.opponent)
-				assert.is_not_nil(result.date)
+				assert.are_equal('team', result.opponent.type)
+				assert.are_equal(date, result.date)
 			end)
 		end)
 
@@ -197,9 +198,9 @@ describe('Team Participants Parser', function()
 
 				assert.are_equal('tbd', result.opponent.template)
 				assert.are_equal(3, #result.potentialQualifiers)
-				assert.is_not_nil(result.potentialQualifiers[1].template)
-				assert.is_not_nil(result.potentialQualifiers[2].template)
-				assert.is_not_nil(result.potentialQualifiers[3].template)
+				assert.are_equal('team liquid', result.potentialQualifiers[1].template)
+				assert.are_equal('bds', result.potentialQualifiers[2].template)
+				assert.are_equal('mouz', result.potentialQualifiers[3].template)
 			end)
 
 			it('generates warnings for invalid contenders', function()
@@ -513,7 +514,7 @@ describe('Team Participants Parser', function()
 
 				local result = TeamParticipantsWikiParser.parsePlayer(playerInput)
 
-				assert.is_not_nil(result.flag)
+				assert.are_equal('United States', result.flag)
 			end)
 
 			it('has extradata structure', function()
