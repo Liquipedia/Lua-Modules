@@ -11,9 +11,32 @@ local Arguments = Lua.import('Module:Arguments')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
+
+local ListingConditions = Lua.import('Module:TournamentsListing/Conditions')
 local TournamentsListing = Lua.import('Module:TournamentsListing/CardList')
 
 local CustomTournamentsListing = Class.new(TournamentsListing)
+
+---@protected
+---@return string
+function CustomTournamentsListing:buildConditions()
+
+	local conditions = ListingConditions.base(self.args)
+
+	if Logic.isNotEmpty(self.args.circuit) then
+		conditions:add(ConditionNode(ColumnName('circuit', 'extradata'), Comparator.eq, self.args.circuit))
+	end
+
+	if self.args.additionalConditions then
+		return tostring(conditions) .. self.args.additionalConditions
+	end
+
+	return tostring(conditions)
+end
 
 ---@param frame Frame
 ---@return Html|Widget?
