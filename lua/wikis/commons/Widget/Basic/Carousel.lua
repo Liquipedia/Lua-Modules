@@ -1,0 +1,91 @@
+---
+-- @Liquipedia
+-- page=Module:Widget/Basic/Carousel
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Icon = Lua.import('Module:Icon')
+
+local Widget = Lua.import('Module:Widget')
+local Button = Lua.import('Module:Widget/Basic/Button')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+local Span = HtmlWidgets.Span
+
+---@class CarouselWidgetParameters
+---@field itemMinWidth string?
+---@field gap string?
+---@field classes string[]?
+---@field css table?
+
+---@class CarouselWidget: Widget
+---@operator call(CarouselWidgetParameters): CarouselWidget
+local Carousel = Class.new(Widget)
+Carousel.defaultProps = {
+	itemMinWidth = '200px',
+	gap = '0.5rem',
+	classes = {},
+	css = {},
+}
+
+---@return Widget
+function Carousel:render()
+	local carouselCss = {
+		gap = self.props.gap,
+	}
+
+	for key, value in pairs(self.props.css) do
+		carouselCss[key] = value
+	end
+
+	local carouselContent = Div{
+		classes = {'carousel-content'},
+		css = carouselCss,
+		children = Array.map(self.props.children, function(child)
+			return Div{
+				classes = {'carousel-item'},
+				css = {
+					['min-width'] = self.props.itemMinWidth,
+				},
+				children = {child},
+			}
+		end),
+	}
+
+	local leftButton = Button{
+		classes = {'carousel-button', 'carousel-button--left'},
+		title = 'Previous',
+		children = {
+			Span{children = {Icon.makeIcon{iconName = 'previous', size = 'lg'}}},
+		},
+	}
+
+	local rightButton = Button{
+		classes = {'carousel-button', 'carousel-button--right'},
+		title = 'Next',
+		children = {
+			Span{children = {Icon.makeIcon{iconName = 'next', size = 'lg'}}},
+		},
+	}
+
+	local leftFade = Div{classes = {'carousel-fade', 'carousel-fade--left'}}
+	local rightFade = Div{classes = {'carousel-fade', 'carousel-fade--right'}}
+
+	return Div{
+		classes = Array.extend({'carousel'}, self.props.classes),
+		children = {
+			leftButton,
+			rightButton,
+			leftFade,
+			rightFade,
+			carouselContent,
+		},
+	}
+end
+
+return Carousel
