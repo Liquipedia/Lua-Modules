@@ -66,9 +66,10 @@ function CustomPlayer.run(frame)
 		}
 	end
 
-	return mw.html.create()
-		:node(builtInfobox)
-		:node(autoPlayerIntro)
+	return HtmlWidgets.Fragment{children = {
+		builtInfobox,
+		autoPlayerIntro,
+	}}
 end
 
 ---@param id string
