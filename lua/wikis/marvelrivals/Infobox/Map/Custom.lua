@@ -44,9 +44,9 @@ function CustomInjector:parse(id, widgets)
 		local gameModes = self.caller:_getGameMode(args)
 		Array.appendWith(
 			widgets,
-			Cell{name = #gameModes == 1 and 'Game Mode' or 'Game Modes', content = gameModes},
-			Cell{name = 'Lighting', content = {args.lighting}},
-			Cell{name = 'Checkpoints', content = {args.checkpoints}}
+			Cell{name = #gameModes == 1 and 'Game Mode' or 'Game Modes', children = gameModes},
+			Cell{name = 'Lighting', children = args.lighting},
+			Cell{name = 'Checkpoints', children = args.checkpoints}
 		)
 	end
 	return widgets
