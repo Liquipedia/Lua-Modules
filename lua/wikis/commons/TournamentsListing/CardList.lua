@@ -209,6 +209,7 @@ function BaseTournamentsListing:build()
 	return self.display
 end
 
+---@private
 ---@return Html
 function BaseTournamentsListing:_header()
 	local config = self.config
@@ -253,6 +254,7 @@ function BaseTournamentsListing:_header()
 	return header
 end
 
+---@private
 ---@param tournamentData table
 function BaseTournamentsListing:_row(tournamentData)
 	local config = self.config
@@ -388,6 +390,7 @@ function BaseTournamentsListing:_row(tournamentData)
 	self.display:node(row)
 end
 
+---@private
 ---@param opponents table[]
 ---@return Html
 function BaseTournamentsListing:_buildParticipantsSpan(opponents)
@@ -400,6 +403,7 @@ function BaseTournamentsListing:_buildParticipantsSpan(opponents)
 	return participantsSpan
 end
 
+---@private
 ---@param prize number
 function BaseTournamentsListing:_calculateRank(prize)
 
@@ -415,6 +419,7 @@ function BaseTournamentsListing:_calculateRank(prize)
 	}
 end
 
+---@private
 ---@param tournamentData table
 ---@return Html
 function BaseTournamentsListing._organizerDisplay(tournamentData)
@@ -451,6 +456,7 @@ function BaseTournamentsListing._displayLocations(locationData, tournamentType)
 	return table.concat(locations)
 end
 
+---@private
 ---@param locationData table
 ---@param locationIndex integer
 ---@return string?
@@ -471,6 +477,7 @@ function BaseTournamentsListing._displayLocation(locationData, locationIndex)
 	return String.nilIfEmpty(display .. (city or Flags.CountryName{flag = country}))
 end
 
+---@private
 ---@param startDate string
 ---@param endDate string
 ---@param status string?
@@ -498,6 +505,7 @@ function BaseTournamentsListing._dateDisplay(startDate, endDate, status)
 	return LANG:formatDate('M j', startDate) .. ' - ' .. LANG:formatDate('M j, Y', endDate)
 end
 
+---@private
 ---@param tournamentData table
 ---@return {qualified: table[]?, [1]: table[]?, [2]: table[]?}
 function BaseTournamentsListing:_fetchPlacementData(tournamentData)
@@ -573,6 +581,7 @@ function BaseTournamentsListing.participantsNumber(number)
 end
 
 -- overwritable in case wikis want several highlight options
+---@protected
 ---@param tournamentData table
 ---@return string?
 function BaseTournamentsListing:getHighlightClass(tournamentData)
