@@ -320,11 +320,6 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 			height: 20px;
 			margin-right: 0.25rem;
 
-			img {
-				width: auto;
-				height: auto;
-			}
-
 			& > *:not( span ):not( img ) {
 				.theme--light & {
 					background-color: var( --clr-on-surface-light-primary-4 );
