@@ -35,6 +35,7 @@ function TeamParticipantsController.fromTemplate(frame)
 	local parsedArgs = Json.parseStringifiedArgs(args)
 	local parsedData = TeamParticipantsWikiParser.parseWikiInput(parsedArgs)
 	TeamParticipantsController.importParticipants(parsedData)
+	TeamParticipantsController.fillIncompleteRosters(parsedData)
 
 	local shouldStore =
 		Logic.readBoolOrNil(args.store) ~= false and
@@ -51,9 +52,9 @@ end
 
 --- Imports participants' squad members from the database if requested.
 --- May mutate the input.
----@param participants {participants: TeamParticipant[]}
-function TeamParticipantsController.importParticipants(participants)
-	Array.forEach(participants.participants, function (participant)
+---@param parsedData {participants: TeamParticipant[], expectedPlayerCount: integer?}
+function TeamParticipantsController.importParticipants(parsedData)
+	Array.forEach(parsedData.participants, function (participant)
 		local players = participant.opponent.players
 		-- Bad structure, this should always exist
 		if not players then
@@ -95,7 +96,7 @@ function TeamParticipantsController.importSquadMembersFromDatabase(participant)
 		local memberType = member.type
 		if member.hasLeft then
 			memberType = 'former'
-		elseif member.role:lower() == 'substitute' then
+		elseif member.role and member.role:lower() == 'substitute' then
 			memberType = 'sub'
 		end
 		return TeamParticipantsWikiParser.parsePlayer{
@@ -125,6 +126,19 @@ function TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers,
 			local newPlayer = Table.deepMerge(player, manualPlayers[indexOfManualPlayer])
 			manualPlayers[indexOfManualPlayer] = newPlayer
 		end
+	end)
+end
+
+--- Fills incomplete rosters for all participants with TBD players if needed.
+--- May mutate the input.
+---@param parsedData {participants: TeamParticipant[], expectedPlayerCount: integer?}
+function TeamParticipantsController.fillIncompleteRosters(parsedData)
+	Array.forEach(parsedData.participants, function (participant)
+		if participant.opponent.template == 'tbd' then
+			return
+		end
+
+		TeamParticipantsWikiParser.fillIncompleteRoster(participant.opponent, parsedData.expectedPlayerCount)
 	end)
 end
 

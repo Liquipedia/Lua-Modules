@@ -539,11 +539,17 @@ function Opponent.toLpdbStruct(opponent, options)
 	-- Add players for Party Type opponents, or if config is set to force it.
 	if Opponent.typeIsParty(opponent.type) or options.setPlayersInTeam then
 		local players = {}
-		for playerIndex, player in ipairs(opponent.players) do
+		local playerCount, staffCount = 0, 0
+
+		for _, player in ipairs(opponent.players) do
+			local prefix
 			local playerType = (player.extradata or {}).type
-			local prefix = 'p' .. playerIndex
 			if playerType == 'staff' then
-				prefix = 'c' .. playerIndex
+				staffCount = staffCount + 1
+				prefix = 'c' .. staffCount
+			else
+				playerCount = playerCount + 1
+				prefix = 'p' .. playerCount
 			end
 
 			players[prefix] = Page.applyUnderScoresIfEnforced(player.pageName)

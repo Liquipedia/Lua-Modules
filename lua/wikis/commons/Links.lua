@@ -195,7 +195,10 @@ local PREFIXES = {
 	lolchess = {'https://lolchess.gg/profile/'},
 	lrthread = {'', match = ''},
 	mapdraft = {match = 'https://aoe2cm.net/draft/'},
-	matcherino = {'https://matcherino.com/tournaments/'},
+	matcherino = {
+		'https://matcherino.com/tournaments/',
+		player = 'https://matcherino.com/',
+	},
 	matcherinolink = {'https://matcherino.com/t/'},
 	mildom = {'https://www.mildom.com/'},
 	mplink = {match = 'https://osu.ppy.sh/community/matches/'}, -- Should this key be renamed?
@@ -272,7 +275,6 @@ local PREFIXES = {
 		'https://start.gg/',
 		player = 'https://start.gg/user/',
 	},
-	steam = {'https://steamcommunity.com/id/'}, -- to be removed after conversion
 	steam64ID = {'https://steamcommunity.com/profiles/'},
 	steamtv = {'https://steam.tv/'},
 	strikr = {'https://strikr.pro/pilot/'},
@@ -385,8 +387,6 @@ local ALIASES = {
 	['start-gg'] = {'startgg', 'smashgg'},
 	yandexefir = {'yandex'},
 	zhanqitv = {'zhanqi'},
-	-- temporarily for conversion
-	steam64ID = {'steamalternative'},
 }
 
 local ICON_KEYS_TO_RENAME = {

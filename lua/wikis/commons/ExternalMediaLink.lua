@@ -73,7 +73,7 @@ function ExternalMediaLink._readArgs(args)
 	local lpdbData = {
 		date = args.date,
 		language = args.language or DEFAULT_LANGUAGE,
-		title = args.title,
+		title = mw.text.unstripNoWiki(args.title),
 		translatedtitle = args.trans_title,
 		link = args.link,
 		publisher = args.of,
