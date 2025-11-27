@@ -33,6 +33,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local Count = Lua.import('Module:Count')
 
@@ -700,7 +701,9 @@ function StatisticsPortal.earningsTable(args)
 	if args.opponentType == Opponent.team then
 		opponentData = StatisticsPortal._getTeams()
 	elseif args.opponentType == Opponent.solo then
-		opponentData = StatisticsPortal._getPlayers()
+		opponentData = StatisticsPortal._getPlayers(
+			args.limit, ConditionUtil.anyOf(ColumnName('nationality'), Array.parseCommaSeparatedString(args.nationality))
+		)
 	end
 
 	table.sort(opponentData, function(a, b) return earningsFunction(a) > earningsFunction(b) end)
