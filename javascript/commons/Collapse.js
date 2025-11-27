@@ -11,7 +11,7 @@ liquipedia.collapse = {
 		} );
 		liquipedia.collapse.setupCollapsibleButtons();
 		liquipedia.collapse.setupGeneralCollapsibleButtons();
-		liquipedia.collapse.setupHeaderToggleCollapsibles();
+		liquipedia.collapse.setupClickableRegionCollapsibles();
 		liquipedia.collapse.setupToggleGroups();
 		liquipedia.collapse.setupDropdownBox();
 		liquipedia.collapse.setupCollapsibleNavFrameButtons();
@@ -104,18 +104,22 @@ liquipedia.collapse = {
 			}
 		} );
 	},
-	setupHeaderToggleCollapsibles: function() {
-		const headers = document.querySelectorAll( '[data-header-click-toggles="true"]' );
+	setupClickableRegionCollapsibles: function() {
+		const regions = document.querySelectorAll( '[data-collapsible-click-region]' );
 
-		headers.forEach( ( header ) => {
-			header.addEventListener( 'click', ( event ) => {
-				const clickedLink = event.target.closest( 'a' );
+		regions.forEach( ( region ) => {
+			const exclusionSelector = region.getAttribute( 'data-collapsible-exclude' ) || 'a';
 
-				if ( clickedLink ) {
-					return;
+			region.addEventListener( 'click', ( event ) => {
+				if ( exclusionSelector ) {
+					const clickedExcluded = event.target.closest( exclusionSelector );
+
+					if ( clickedExcluded ) {
+						return;
+					}
 				}
 
-				const collapsible = header.closest( '.general-collapsible' );
+				const collapsible = region.closest( '.general-collapsible' );
 				if ( collapsible ) {
 					event.preventDefault();
 					collapsible.classList.toggle( 'collapsed' );

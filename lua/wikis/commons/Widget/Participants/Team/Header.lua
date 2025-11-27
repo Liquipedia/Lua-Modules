@@ -60,7 +60,7 @@ function ParticipantsTeamHeader:render()
 
 	return Div{
 		classes = { 'team-participant-card__header' },
-		attributes = {['data-header-click-toggles'] = 'true'},
+		attributes = {['data-collapsible-click-region'] = 'true'},
 		children = {
 			Div{
 				classes = {'team-participant-card__header-main'},
