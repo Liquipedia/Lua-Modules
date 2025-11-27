@@ -122,12 +122,14 @@ end
 
 --- Parse a single participant from input
 ---@param input table
----@param date osdateparam
+---@param defaultDate osdateparam
 ---@return TeamParticipant
-function TeamParticipantsWikiParser.parseParticipant(input, date)
+function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 	local potentialQualifiers = {}
 	local opponent
 	local warnings = {}
+
+	local date = DateExt.parseIsoDate(input.date) or defaultDate -- TODO: fetch from wiki var too
 
 	if input.contenders then
 		opponent = Opponent.tbd(Opponent.team)
@@ -178,7 +180,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 		potentialQualifiers = potentialQualifiers,
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
-		date = DateExt.parseIsoDate(input.date) or date, -- TODO: fetch from wiki var too
+		date = date,
 	}
 end
 
