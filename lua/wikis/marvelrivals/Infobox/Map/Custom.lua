@@ -15,7 +15,7 @@ local String = Lua.import('Module:StringUtils')
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class MarvelRivalsMapInfobox: MapInfobox
