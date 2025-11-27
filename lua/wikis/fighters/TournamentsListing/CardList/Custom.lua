@@ -19,6 +19,8 @@ local ColumnName = Condition.ColumnName
 local ListingConditions = Lua.import('Module:TournamentsListing/Conditions')
 local TournamentsListing = Lua.import('Module:TournamentsListing/CardList')
 
+--- @class FightersTournamentsListing: BaseTournamentsListing
+--- @operator call(...): FightersTournamentsListing
 local CustomTournamentsListing = Class.new(TournamentsListing)
 
 ---@protected
