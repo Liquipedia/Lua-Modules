@@ -27,16 +27,17 @@ local Customizable = Widgets.Customizable
 local Highlights = Widgets.Highlights
 
 ---@class PatchInfobox: BasicInfobox
+---@operator call(Frame): PatchInfobox
 local Patch = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function Patch.run(frame)
 	local patch = Patch(frame)
 	return patch:createInfobox()
 end
 
----@return string
+---@return Widget
 function Patch:createInfobox()
 	local args = self.args
 

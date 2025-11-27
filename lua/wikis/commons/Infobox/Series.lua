@@ -37,16 +37,17 @@ local Title = Widgets.Title
 local Venue = Widgets.Venue
 
 ---@class SeriesInfobox: BasicInfobox
+---@operator call(Frame): SeriesInfobox
 local Series = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function Series.run(frame)
 	local series = Series(frame)
 	return series:createInfobox()
 end
 
----@return string
+---@return Widget
 function Series:createInfobox()
 	local args = self.args
 
