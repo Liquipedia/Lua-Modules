@@ -120,17 +120,15 @@ function TeamParticipantsRepository.setPageVars(participant)
 		}
 		local playerCount, staffCount = 0, 0
 		Array.forEach(participant.opponent.players or {}, function(player)
-			local typePrefix, countOfType
+			local playerPrefix
 			if player.extradata.type == 'staff' then
-				typePrefix = 'c'
 				staffCount = staffCount + 1
-				countOfType = staffCount
+				playerPrefix = 'c' .. staffCount
 			else
-				typePrefix = 'p'
 				playerCount = playerCount + 1
-				countOfType = playerCount
+				playerPrefix = 'p' .. playerCount
 			end
-			local playerPrefix = typePrefix .. countOfType
+
 			Array.forEach(teamPrefixes, function(teamPrefix)
 				local combinedPrefix = teamPrefix .. '_' .. playerPrefix
 				globalVars:set(combinedPrefix, player.pageName)

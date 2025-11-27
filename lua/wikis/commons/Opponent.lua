@@ -542,19 +542,15 @@ function Opponent.toLpdbStruct(opponent, options)
 		local playerCount, staffCount = 0, 0
 
 		for _, player in ipairs(opponent.players) do
-			local typePrefix, countOfType
+			local prefix
 			local playerType = (player.extradata or {}).type
 			if playerType == 'staff' then
-				typePrefix = 'c'
 				staffCount = staffCount + 1
-				countOfType = staffCount
+				prefix = 'c' .. staffCount
 			else
-				typePrefix = 'p'
 				playerCount = playerCount + 1
-				countOfType = playerCount
+				prefix = 'p' .. playerCount
 			end
-
-			local prefix = typePrefix .. countOfType
 
 			players[prefix] = Page.applyUnderScoresIfEnforced(player.pageName)
 			players[prefix .. 'dn'] = player.displayName
