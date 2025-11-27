@@ -46,7 +46,7 @@ local DAMAGE_INFO = {
 local NON_BREAKING_SPACE = '&nbsp;'
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomWeapon.run(frame)
 	local weapon = CustomWeapon(frame)
 	weapon:setWidgetInjector(CustomInjector(weapon))

@@ -23,7 +23,7 @@ local CustomEffect = Class.new(Effect)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomEffect.run(frame)
 	local effect = CustomEffect(frame)
 	effect:setWidgetInjector(CustomInjector(effect))

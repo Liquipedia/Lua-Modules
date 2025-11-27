@@ -35,7 +35,7 @@ local MAX_NUMBER_OF_PLAYERS = 10
 local INACTIVITY_THRESHOLD_YEARS = 1
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 

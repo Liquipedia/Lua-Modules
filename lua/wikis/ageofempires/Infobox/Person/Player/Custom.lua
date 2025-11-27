@@ -69,7 +69,7 @@ local INACTIVITY_THRESHOLD_PLAYER = {year = 1}
 local INACTIVITY_THRESHOLD_BROADCAST = {month = 6}
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPlayer.run(frame)
 	---@type AgeofempiresInfoboxPlayer
 	local player = CustomPlayer(frame)

@@ -20,7 +20,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local CustomTeam = Class.new(Team)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 

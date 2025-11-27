@@ -23,7 +23,7 @@ local CustomHero = Class.new(Character)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomHero.run(frame)
 	local character = CustomHero(frame)
 	character:setWidgetInjector(CustomInjector(character))

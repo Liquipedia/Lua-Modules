@@ -31,7 +31,7 @@ local CustomUpgrade = Class.new(Upgrade)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomUpgrade.run(frame)
 	local upgrade = CustomUpgrade(frame)
 	upgrade.args.informationType = 'Tech'

@@ -33,7 +33,7 @@ local GAME_ORDER = {'64', 'melee', 'brawl', 'pm', 'wiiu', 'ultimate'}
 local NON_BREAKING_SPACE = '&nbsp;'
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))

@@ -116,7 +116,7 @@ local MODE_TEAM = 'team'
 local PRIZE_POOL_ROUND_PRECISION = 2
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))

@@ -38,7 +38,7 @@ local CustomInjector = Class.new(Injector)
 local SECONDS_PER_DAY = 86400
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
