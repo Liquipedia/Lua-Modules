@@ -70,7 +70,7 @@ end
 ---@return StandardTournament?
 function Tournament.getTournament(pagename)
 	local record = mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = '[[pagename::' .. pagename .. ']]',
+		conditions = '[[pagename::' .. Page.pageifyLink(pagename) .. ']]',
 		limit = 1,
 	})[1]
 	if not record then
