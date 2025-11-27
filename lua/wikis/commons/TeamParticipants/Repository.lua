@@ -87,7 +87,7 @@ function TeamParticipantsRepository.save(participant)
 		return player.extradata.played
 	end)
 	-- Add full opponent data for played opponents
-	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(activeOpponent, {setPlayersInTeam = true}))
+	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(activeOpponent, { setPlayersInTeam = true }))
 	-- Legacy participant fields
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(activeOpponent))
 	lpdbData.players = lpdbData.opponentplayers
@@ -121,18 +121,19 @@ function TeamParticipantsRepository.setPageVars(participant)
 		}
 		local playerCount, staffCount = 0, 0
 		Array.forEach(participant.opponent.players or {}, function(player)
+			local typePrefix, countOfType
+			if player.extradata.type == 'staff' then
+				typePrefix = 'c'
+				staffCount = staffCount + 1
+				countOfType = staffCount
+			else
+				typePrefix = 'p'
+				playerCount = playerCount + 1
+				countOfType = playerCount
+			end
+			local playerPrefix = typePrefix .. countOfType
 			Array.forEach(teamPrefixes, function(teamPrefix)
-				local prefix, index
-				if player.extradata.type == 'staff' then
-					prefix = 'c'
-					staffCount = staffCount + 1
-					index = staffCount
-				else
-					prefix = 'p'
-					playerCount = playerCount + 1
-					index = playerCount
-				end
-				local combinedPrefix = teamPrefix .. '_' .. prefix .. index
+				local combinedPrefix = teamPrefix .. '_' .. playerPrefix
 				globalVars:set(combinedPrefix, player.pageName)
 				globalVars:set(combinedPrefix .. 'flag', player.flag)
 				globalVars:set(combinedPrefix .. 'dn', player.displayName)
