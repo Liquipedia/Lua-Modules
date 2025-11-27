@@ -19,6 +19,7 @@ local Condition = Lua.import('Module:Condition')
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local ListingConditions = Lua.import('Module:TournamentsListing/Conditions')
 local TournamentsListing = Lua.import('Module:TournamentsListing/CardList')
@@ -40,6 +41,9 @@ function CustomTournamentsListing:buildConditions()
 
 	if Logic.isNotEmpty(self.args.circuit) then
 		conditions:add(ConditionNode(ColumnName('circuit', 'extradata'), Comparator.eq, self.args.circuit))
+		conditions:add(ConditionUtil.anyOf(
+			ColumnName('circuit_tier', 'extradata'), Array.parseCommaSeparatedString(self.args.circuittier)
+		))
 	end
 
 	if self.args.additionalConditions then
