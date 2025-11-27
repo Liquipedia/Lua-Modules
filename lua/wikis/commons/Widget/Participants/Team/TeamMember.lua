@@ -19,7 +19,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
 ---@class ParticipantsTeamMember: Widget
----@field props {even: boolean?, roleLeft: string?, roleRight: string?, trophies: integer?,
+---@field props {even: boolean?, roleLeft: string?, roleRight: string?, trophies: integer?, strikethrough: boolean?,
 ---player: standardPlayer, team: standardOpponent?}
 ---@operator call(table): ParticipantsTeamMember
 local ParticipantsTeamMember = Class.new(Widget)
@@ -53,6 +53,7 @@ function ParticipantsTeamMember:render()
 					showLink = true,
 					showFaction = true,
 					showTbd = true,
+					dq = self.props.strikethrough,
 					showPlayerTeam = false,
 					overflow = 'ellipsis',
 				}
