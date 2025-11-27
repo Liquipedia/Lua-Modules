@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local RoleUtil = Lua.import('Module:Role/Util')
@@ -85,9 +86,20 @@ local ParticipantsTeamRoster = Class.new(Widget)
 function ParticipantsTeamRoster:render()
 	local participant = self.props.participant
 	local makeRostersDisplay = function(players)
-		players = Array.sortBy(players, function(player)
-			local roles = player.extradata.roles or {}
-			return roles[1] and roles[1].sortOrder or math.huge
+		-- Used for making the sorting stable
+		local playerToIndex = Table.map(players, function(index, player) return player, index end)
+		-- Sort the players based on their roles first, then by their original order
+		players = Array.sortBy(players, FnUtil.identity, function (a, b)
+			local function getPlayerSortOrder(player)
+				local roles = player.extradata.roles or {}
+				return roles[1] and roles[1].sortOrder or math.huge
+			end
+			local orderA = getPlayerSortOrder(a)
+			local orderB = getPlayerSortOrder(b)
+			if orderA == orderB then
+				return playerToIndex[a] < playerToIndex[b]
+			end
+			return orderA < orderB
 		end)
 		return Div{
 			classes = { 'team-participant-roster' },
