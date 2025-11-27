@@ -781,6 +781,13 @@ function StatisticsPortal.playerAgeTable(args)
 		conditions:add{typeConditions}
 	end
 
+	conditions:add(ConditionUtil.anyOf(
+		ColumnName('nationality'),
+		Array.map(Array.parseCommaSeparatedString(args.nationality), function (nationality)
+			return Flags.CountryName{flag = nationality}
+		end)
+	))
+
 	local playerData = StatisticsPortal._getPlayers(args.limit, conditions:toString(), args.order)
 
 	local tbl = mw.html.create('table')
