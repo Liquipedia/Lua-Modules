@@ -723,7 +723,7 @@ function StatisticsPortal.earningsTable(args)
 
 		if args.opponentType == Opponent.team then
 			opponentDisplay = OpponentDisplay.BlockOpponent{
-				opponent = {template = opponent.template, type = Opponent.team},
+				opponent = Opponent.readOpponentArgs{template = opponent.template, type = Opponent.team},
 				teamStyle = 'standard',
 			}
 		else
@@ -1143,7 +1143,7 @@ end
 ---@param placements table
 ---@param earnings number
 ---@param opponentIndex number
----@param opponentDisplay Html
+---@param opponentDisplay Widget|Html
 ---@return Html
 function StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay)
 	local row = mw.html.create('tr')
