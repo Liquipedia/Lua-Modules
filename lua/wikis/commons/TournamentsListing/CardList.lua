@@ -146,7 +146,7 @@ end
 ---@return table
 function BaseTournamentsListing:_query()
 	return mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = self:_buildConditions(),
+		conditions = self:buildConditions(),
 		query = 'pagename, name, icon, icondark, organizers, startdate, enddate, status, locations, series, '
 			.. 'prizepool, participantsnumber, game, liquipediatier, liquipediatiertype, extradata, publishertier, type',
 		order = self.args.order,
@@ -155,8 +155,9 @@ function BaseTournamentsListing:_query()
 	})
 end
 
+---@protected
 ---@return string
-function BaseTournamentsListing:_buildConditions()
+function BaseTournamentsListing:buildConditions()
 
 	local conditions = Conditions.base(self.args)
 
