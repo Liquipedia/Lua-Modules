@@ -47,16 +47,17 @@ local Title = Widgets.Title
 local Venue = Widgets.Venue
 
 ---@class InfoboxLeague: BasicInfobox
+---@operator call(Frame): InfoboxLeague
 local League = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function League.run(frame)
 	local league = League(frame)
 	return league:createInfobox()
 end
 
----@return Html
+---@return Widget
 function League:createInfobox()
 	local args = self.args
 	self:_parseArgs()
