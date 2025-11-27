@@ -94,8 +94,7 @@ function TeamParticipantsRepository.save(participant)
 
 	-- Calculate individual prize money (prize money per player on team)
 	if lpdbData.prizemoney then
-		local players = activeOpponent.players or {}
-		local filteredPlayers = Array.filter(players, function(player)
+		local filteredPlayers = Array.filter(activeOpponent.players, function(player)
 			return player.extradata.type ~= 'staff'
 		end)
 		local numberOfPlayersOnTeam = math.max(#(filteredPlayers), 1)
