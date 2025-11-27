@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
+local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 
@@ -125,8 +126,7 @@ function TeamService.getMembers(team)
 			pageName = record.link,
 			realName = record.name,
 			nationality = record.nationality,
-			position = record.position,
-			role = record.role,
+			role = Logic.emptyOr(record.role, record.position),
 			type = record.type,
 			status = record.status,
 
