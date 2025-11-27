@@ -34,9 +34,9 @@ local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 ---@field props MatchCardProps
 local MatchCard = Class.new(Widget)
 MatchCard.defaultProps = {
-	hideTournament = false,
-	displayGameIcons = false,
-	onlyHighlightOnValue = nil,
+	hideTournament = false, -- Hide the tournament and stage
+	displayGameIcons = false, -- Display the game icon in the tournament title
+	onlyHighlightOnValue = nil, -- Only highlight if the publishertier has this value
 	variant = nil,
 }
 
