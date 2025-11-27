@@ -159,7 +159,7 @@ end
 ---@return string
 function BaseTournamentsListing:buildConditions()
 
-	local conditions = Conditions.base(self.args)
+	local conditions = tostring(Conditions.base(self.args))
 
 	if self.args.additionalConditions then
 		return conditions .. self.args.additionalConditions
