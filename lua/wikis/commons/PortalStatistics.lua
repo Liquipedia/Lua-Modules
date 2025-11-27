@@ -12,6 +12,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
+local Flags = Lua.import('Module:Flags')
 local Game = Lua.import('Module:Game')
 local Info = Lua.import('Module:Info')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
@@ -702,7 +703,13 @@ function StatisticsPortal.earningsTable(args)
 		opponentData = StatisticsPortal._getTeams()
 	elseif args.opponentType == Opponent.solo then
 		opponentData = StatisticsPortal._getPlayers(
-			args.limit, ConditionUtil.anyOf(ColumnName('nationality'), Array.parseCommaSeparatedString(args.nationality))
+			args.limit,
+			ConditionUtil.anyOf(
+				ColumnName('nationality'),
+				Array.map(Array.parseCommaSeparatedString(args.nationality), function (nationality)
+					return Flags.CountryName{flag = nationality}
+				end)
+			)
 		)
 	end
 
