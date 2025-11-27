@@ -38,7 +38,11 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 ---@class AgeofempiresInfoboxPlayer: Person
+---@operator call(Frame): AgeofempiresInfoboxPlayer
 local CustomPlayer = Class.new(Player)
+
+---@class AgeofempiresInfoboxPlayerWidgetInjector: WidgetInjector
+---@field caller AgeofempiresInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 local RATINGCONFIG = {
@@ -72,7 +76,6 @@ local INACTIVITY_THRESHOLD_BROADCAST = {month = 6}
 ---@param frame Frame
 ---@return Widget
 function CustomPlayer.run(frame)
-	---@type AgeofempiresInfoboxPlayer
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 

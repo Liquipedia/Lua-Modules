@@ -28,7 +28,11 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 ---@class AoeInfoboxTeam: InfoboxTeam
+---@operator call(Frame): AoeInfoboxTeam
 local CustomTeam = Class.new(Team)
+
+---@class AoeInfoboxTeamWidgetInjector: WidgetInjector
+---@field caller AoeInfoboxTeam
 local CustomInjector = Class.new(Injector)
 
 local MAX_NUMBER_OF_PLAYERS = 10

@@ -13,6 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local Patch = Lua.import('Module:Infobox/Patch')
 
 ---@class LoLPatchInfobox: PatchInfobox
+---@operator call(Frame): LoLPatchInfobox
 local CustomPatch = Class.new(Patch)
 
 ---@param frame Frame

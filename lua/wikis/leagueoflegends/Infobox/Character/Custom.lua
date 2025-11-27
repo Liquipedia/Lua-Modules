@@ -35,7 +35,9 @@ local RIOT_POINTS_ICON = IconImageWidget{
 }
 
 ---@class LeagueofLegendsChampionInfobox: CharacterInfobox
+---@operator call(Frame): LeagueofLegendsChampionInfobox
 local CustomCharacter = Class.new(Character)
+
 ---@class LeagueofLegendsChampionInfoboxWidgetInjector: WidgetInjector
 ---@field caller LeagueofLegendsChampionInfobox
 local CustomInjector = Class.new(Injector)

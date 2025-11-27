@@ -37,7 +37,9 @@ local REGION_REMAPPINGS = {
 }
 
 ---@class LeagueoflegendsInfoboxTeam: InfoboxTeam
+---@operator call(Frame): LeagueoflegendsInfoboxTeam
 local CustomTeam = Class.new(Team)
+
 ---@class LeagueoflegendsInfoboxTeamWidgetInjector: WidgetInjector
 ---@field caller LeagueoflegendsInfoboxTeam
 local CustomInjector = Class.new(Injector)

@@ -25,6 +25,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 
 ---@class LeagueoflegendsInfoboxPlayer: Person
+---@operator call(Frame): LeagueoflegendsInfoboxPlayer
 local CustomPlayer = Class.new(Player)
 
 ---@class LeagueoflegendsInfoboxPlayerWidgetInjector: WidgetInjector
