@@ -703,7 +703,7 @@ function StatisticsPortal.earningsTable(args)
 		opponentData = StatisticsPortal._getTeams()
 	elseif args.opponentType == Opponent.solo then
 		opponentData = StatisticsPortal._getPlayers(
-			args.limit,
+			nil,
 			ConditionUtil.anyOf(
 				ColumnName('nationality'),
 				Array.map(Array.parseCommaSeparatedString(args.nationality), function (nationality)
