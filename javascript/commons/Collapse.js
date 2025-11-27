@@ -11,6 +11,7 @@ liquipedia.collapse = {
 		} );
 		liquipedia.collapse.setupCollapsibleButtons();
 		liquipedia.collapse.setupGeneralCollapsibleButtons();
+		liquipedia.collapse.setupHeaderToggleCollapsibles();
 		liquipedia.collapse.setupToggleGroups();
 		liquipedia.collapse.setupDropdownBox();
 		liquipedia.collapse.setupCollapsibleNavFrameButtons();
@@ -101,6 +102,25 @@ liquipedia.collapse = {
 					event.preventDefault();
 				} );
 			}
+		} );
+	},
+	setupHeaderToggleCollapsibles: function() {
+		const headers = document.querySelectorAll( '[data-header-click-toggles="true"]' );
+
+		headers.forEach( ( header ) => {
+			header.addEventListener( 'click', ( event ) => {
+				const clickedLink = event.target.closest( 'a' );
+
+				if ( clickedLink ) {
+					return;
+				}
+
+				const collapsible = header.closest( '.general-collapsible' );
+				if ( collapsible ) {
+					event.preventDefault();
+					collapsible.classList.toggle( 'collapsed' );
+				}
+			} );
 		} );
 	},
 	setupCollapsibleNavFrameButtons: function() {
