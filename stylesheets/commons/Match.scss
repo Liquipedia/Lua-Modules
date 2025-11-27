@@ -266,4 +266,45 @@
 			}
 		}
 	}
+
+	&--vertical {
+		border-radius: 0.5rem;
+		border: 1px solid var( --clr-border );
+		border-bottom: 1px solid var( --clr-border );
+		padding: 0.75rem;
+		min-width: 16rem;
+		max-width: 20rem;
+
+		.theme--light & {
+			background-color: #ffffff;
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-surface-dark-primary );
+		}
+
+		.match-info-header {
+			flex-direction: column;
+			gap: 0.5rem;
+
+			&-opponent {
+				width: 100%;
+				justify-content: center;
+
+				&-left,
+				&-right {
+					justify-content: center;
+				}
+			}
+
+			&-scoreholder {
+				width: 100%;
+				justify-content: center;
+			}
+		}
+
+		.match-info-tournament {
+			justify-content: center;
+		}
+	}
 }

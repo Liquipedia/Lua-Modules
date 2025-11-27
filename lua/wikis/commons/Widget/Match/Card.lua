@@ -27,15 +27,17 @@ local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 ---@field onlyHighlightOnValue string?
 ---@field hideTournament boolean?
 ---@field displayGameIcons boolean?
+---@field variant 'vertical'?
 
 ---@class MatchCard: Widget
 ---@operator call(MatchCardProps): MatchCard
 ---@field props MatchCardProps
 local MatchCard = Class.new(Widget)
 MatchCard.defaultProps = {
-	hideTournament = false, -- Hide the tournament and stage
-	displayGameIcons = false, -- Display the game icon in the tournament title
-	onlyHighlightOnValue = nil, -- Only highlight if the publishertier has this value
+	hideTournament = false,
+	displayGameIcons = false,
+	onlyHighlightOnValue = nil,
+	variant = nil,
 }
 
 ---@return Widget?
@@ -55,8 +57,13 @@ function MatchCard:render()
 		displayGameIcon = self.props.displayGameIcons,
 	}
 
+	local classes = {'match-info'}
+	if self.props.variant == 'vertical' then
+		table.insert(classes, 'match-info--vertical')
+	end
+
 	return HtmlWidgets.Div{
-		classes = {'match-info'},
+		classes = classes,
 		children = WidgetUtil.collect(
 			MatchCountdown{match = match},
 			MatchHeader{match = match},
