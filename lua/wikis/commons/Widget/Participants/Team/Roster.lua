@@ -85,6 +85,10 @@ local ParticipantsTeamRoster = Class.new(Widget)
 function ParticipantsTeamRoster:render()
 	local participant = self.props.participant
 	local makeRostersDisplay = function(players)
+		players = Array.sortBy(players, function(player)
+			local roles = player.extradata.roles or {}
+			return roles[1] and roles[1].sortOrder or math.huge
+		end)
 		return Div{
 			classes = { 'team-participant-roster' },
 			children = Array.map(players, function(player, index)
