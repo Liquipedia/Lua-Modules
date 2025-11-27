@@ -821,13 +821,13 @@ function StatisticsPortal._massQuery(tableName, parameters)
 end
 
 ---@param limit number?
----@param addConditions string?
+---@param addConditions string|AbstractConditionNode?
 ---@param addOrder string?
 ---@return table
 function StatisticsPortal._getPlayers(limit, addConditions, addOrder)
 	return StatisticsPortal._massQuery('player', {
 		query = 'pagename, id, nationality, earnings, birthdate, team, earningsbyyear',
-		conditions = addConditions or '',
+		conditions = addConditions and tostring(addConditions) or '',
 		order = addOrder,
 		limit = limit,
 	})
