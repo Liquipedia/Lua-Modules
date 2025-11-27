@@ -72,7 +72,7 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	lpdbData.extradata.modes = table.concat(self:getAllArgsForBase(args, 'mode'), ',')
+	lpdbData.extradata.modes = self:getAllArgsForBase(args, 'mode')
 	return lpdbData
 end
 
