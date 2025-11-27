@@ -87,6 +87,8 @@ end
 function CustomTournamentsListing.run(frame)
 	local args = Arguments.getArgs(frame)
 
+	args.showGameIcon = Logic.nilOr(Logic.readBoolOrNil(args.showGameIcon), true)
+
 	if Logic.readBool(args.byYear) then
 		return CustomTournamentsListing.byYear(args)
 	end
