@@ -36,7 +36,7 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
-	
+
 	if id == 'custom' then
 		local gameModes = self.caller:_getGameMode(args)
 		Array.appendWith(
