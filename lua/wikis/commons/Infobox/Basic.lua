@@ -101,7 +101,7 @@ end
 
 ---@param widgets Widget[]
 ---@param infoboxType string?
----@return string
+---@return Widget
 function BasicInfobox:build(widgets, infoboxType)
 	local infobox = Infobox{
 		gameName = self.wiki,
@@ -114,9 +114,9 @@ function BasicInfobox:build(widgets, infoboxType)
 	if self.injector then
 		-- Customizable backwards compatibility
 		local CustomizableContext = Lua.import('Module:Widget/Contexts/Customizable')
-		return CustomizableContext.LegacyCustomizable{value = self.injector, children = {infobox}}:tryMake()
+		return CustomizableContext.LegacyCustomizable{value = self.injector, children = {infobox}}
 	end
-	return infobox:tryMake()
+	return infobox
 end
 
 return BasicInfobox
