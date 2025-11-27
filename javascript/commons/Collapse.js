@@ -108,6 +108,8 @@ liquipedia.collapse = {
 		const regions = document.querySelectorAll( '[data-collapsible-click-region]' );
 
 		regions.forEach( ( region ) => {
+			// Get exclusion selector from attribute, default to 'a' (links)
+			// Can pass empty string for "no exclusions" (everything toggles collapse)
 			const exclusionSelector = region.getAttribute( 'data-collapsible-exclude' ) || 'a';
 
 			region.addEventListener( 'click', ( event ) => {
