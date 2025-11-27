@@ -81,17 +81,22 @@ function TeamParticipantsRepository.save(participant)
 		lpdbData.extradata.potentialQualifiers = serializedQualifiers
 	end
 
-	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(participant.opponent, {setPlayersInTeam = true}))
+	-- Remove players that did not play
+	local activeOpponent = Table.deepCopy(participant.opponent)
+	activeOpponent.players = Array.filter(activeOpponent.players or {}, function(player)
+		return player.extradata.played
+	end)
+	-- Add full opponent data for played opponents
+	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(activeOpponent, {setPlayersInTeam = true}))
 	-- Legacy participant fields
-	lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(participant.opponent))
+	lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(activeOpponent))
 	lpdbData.players = lpdbData.opponentplayers
 
 	-- Calculate individual prize money (prize money per player on team)
 	if lpdbData.prizemoney then
-		local players = participant.opponent.players or {}
+		local players = activeOpponent.players or {}
 		local filteredPlayers = Array.filter(players, function(player)
-			-- TODO: Check if subs have played flag
-			return player.extradata.type == 'player' or player.extradata.type == 'sub'
+			return player.extradata.type ~= 'staff'
 		end)
 		local numberOfPlayersOnTeam = math.max(#(filteredPlayers), 1)
 		lpdbData.individualprizemoney = lpdbData.prizemoney / numberOfPlayersOnTeam
@@ -114,11 +119,18 @@ function TeamParticipantsRepository.setPageVars(participant)
 			teamName:gsub('_', ' '),
 			teamName:gsub(' ', '_'),
 		}
-		Array.forEach(participant.opponent.players or {}, function(player, index)
+		local playerCount, staffCount = 0, 0
+		Array.forEach(participant.opponent.players or {}, function(player)
 			Array.forEach(teamPrefixes, function(teamPrefix)
-				local prefix = 'p'
+				local prefix, index
 				if player.extradata.type == 'staff' then
 					prefix = 'c'
+					staffCount = staffCount + 1
+					index = staffCount
+				else
+					prefix = 'p'
+					playerCount = playerCount + 1
+					index = playerCount
 				end
 				local combinedPrefix = teamPrefix .. '_' .. prefix .. index
 				globalVars:set(combinedPrefix, player.pageName)
