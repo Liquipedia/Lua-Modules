@@ -62,13 +62,10 @@ function CustomMap:_getGameMode(args)
 	local modes = self:getAllArgsForBase(args, 'mode')
 	local releaseDate = args.releasedate
 
-	local modeDisplayTable = {}
-	for _, mode in ipairs(modes) do
-		local modeIcon = MapModes.get({mode = mode, date = releaseDate, size = 15})
-		local mapModeDisplay = modeIcon .. ' [[' .. mode .. ']]'
-		table.insert(modeDisplayTable, mapModeDisplay)
-	end
-	return modeDisplayTable
+	return Array.map(modes, function (mode)
+		local modeIcon = MapModes.get{mode = mode, date = releaseDate, size = 15}
+		return modeIcon .. ' [[' .. mode .. ']]'
+	end)
 end
 
 ---@param lpdbData table
