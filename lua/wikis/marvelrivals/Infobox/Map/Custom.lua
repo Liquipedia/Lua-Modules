@@ -20,6 +20,9 @@ local Cell = Widgets.Cell
 
 ---@class MarvelRivalsMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+
+---@class MarvelRivalsMapInfoboxWidgetInjector: WidgetInjector
+---@field caller MarvelRivalsMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
