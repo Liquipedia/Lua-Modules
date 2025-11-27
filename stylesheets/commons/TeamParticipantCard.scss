@@ -52,6 +52,10 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 	display: grid;
 	gap: 0.25rem;
 	grid-template-columns: repeat( auto-fit, minmax( 280px, 1fr ) );
+
+	@media ( min-width: 1024px ) {
+		gap: 0.5rem;
+	}
 }
 
 .team-participant-card {
@@ -315,11 +319,6 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 			width: 20px;
 			height: 20px;
 			margin-right: 0.25rem;
-
-			img {
-				width: auto;
-				height: auto;
-			}
 
 			& > *:not( span ):not( img ) {
 				.theme--light & {
