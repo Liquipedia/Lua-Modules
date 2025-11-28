@@ -215,6 +215,7 @@ function Tournament.isFeatured(record)
 		local parentPage = table.concat(Array.sub(mw.text.split(page, '/'), 1, -2), '/')
 		if Logic.isEmpty(parentPage) then
 			return nil
+		-- Avoid infinite loops
 		elseif page == Page.pageifyLink(parentPage) then
 			return nil
 		end
