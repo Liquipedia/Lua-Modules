@@ -20,7 +20,7 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class BasePlayerDisplayProps: PlayerExtSyncOptions
 ---@field flip boolean?
----@field player standardPlayer
+---@field player standardPlayer?
 ---@field showFlag boolean?
 ---@field showLink boolean?
 ---@field dq boolean?
@@ -38,9 +38,11 @@ local BasePlayerDisplayWidget = Class.new(Widget,
 	---@param input BasePlayerDisplayProps
 	function (self, input)
 		if Logic.isEmpty(input.player) then
-			input.player = Opponent.readSinglePlayerArgs(input)
+			local parsedPlayer = Opponent.readSinglePlayerArgs(input)
+			self.player = PlayerExt.syncPlayer(parsedPlayer, input)
+		else
+			self.player = input.player
 		end
-		self.player = PlayerExt.syncPlayer(input.player, input)
 		self.useDefault = Logic.nilOr(Logic.readBoolOrNil(input.showTbd), true) or not Opponent.playerIsTbd(self.player)
 	end
 )
