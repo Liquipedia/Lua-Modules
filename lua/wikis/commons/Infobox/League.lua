@@ -14,12 +14,14 @@ local CountryCategory = Lua.import('Module:Infobox/Extension/CountryCategory')
 local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
+local Info = Lua.import('Module:Info')
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extension/PrizePool')
 local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
 local Logic = Lua.import('Module:Logic')
+local MatchTicker = Lua.import('Module:MatchTicker')
 local MetadataGenerator = Lua.import('Module:MetadataGenerator')
 local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
@@ -62,6 +64,8 @@ function League:createInfobox()
 	self:_parseArgs()
 
 	self:_definePageVariables(args)
+
+	self:_createUpcomingMatches()
 
 	local widgets = {
 		Header{
@@ -308,6 +312,38 @@ function League:_getCategories(args)
 		CountryCategory.run(args, 'Tournaments'),
 		self:getWikiCategories(args)
 	)
+end
+
+---@return Widget?
+function League:_createUpcomingMatches()
+	if not self:shouldStore(self.args) then
+		return nil
+	end
+
+	if Info.config.match2.status == 0 then
+		return nil
+	end
+
+	local matchTicker = MatchTicker{
+		tournaments = {self.pagename},
+		limit = 5,
+		upcoming = true,
+		ongoing = true,
+		hideTournament = true,
+		entityStyle = true,
+	}
+
+	matchTicker:query()
+
+	if not matchTicker.matches or #matchTicker.matches == 0 then
+		return nil
+	end
+
+	local EntityDisplay = Lua.import('Module:MatchTicker/DisplayComponents/Entity')
+	return EntityDisplay.Container{
+		config = matchTicker.config,
+		matches = matchTicker.matches,
+	}:create()
 end
 
 ---@param args table
