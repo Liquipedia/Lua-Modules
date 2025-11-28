@@ -200,6 +200,7 @@ local PREFIXES = {
 		player = 'https://matcherino.com/',
 	},
 	matcherinolink = {'https://matcherino.com/t/'},
+	metafy = {'https://metafy.gg/@'},
 	mildom = {'https://www.mildom.com/'},
 	mplink = {match = 'https://osu.ppy.sh/community/matches/'}, -- Should this key be renamed?
 	lazermplink = {match = 'https://osu.ppy.sh/multiplayer/rooms/'},
@@ -361,11 +362,12 @@ local SUFFIXES = {
 		'',
 		stream = '/live',
 	},
-	gol = {match = '/page-game/'},
-	lazermplink = {match = '/events'},
-	iccup = {'.html'},
 	['faceit-c'] = {'/'},
 	['faceit-hub'] = {'/'},
+	gol = {match = '/page-game/'},
+	iccup = {'.html'},
+	lazermplink = {match = '/events'},
+	metafy = {'?utm_source=liquipedia&campaign=infoblock'},
 	vk = {
 		'',
 		stream = '/live',
