@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Lpdb = Lua.import('Module:Lpdb')
 local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 local Tier = Lua.import('Module:Tier/Utils')
 
@@ -70,7 +71,7 @@ end
 ---@return StandardTournament?
 function Tournament.getTournament(pagename)
 	local record = mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = '[[pagename::' .. pagename .. ']]',
+		conditions = '[[pagename::' .. Page.pageifyLink(pagename) .. ']]',
 		limit = 1,
 	})[1]
 	if not record then
