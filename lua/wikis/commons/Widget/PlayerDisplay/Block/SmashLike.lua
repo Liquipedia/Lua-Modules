@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/PlayerDisplay/Block/Custom
+-- page=Module:Widget/PlayerDisplay/Block/SmashLike
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
