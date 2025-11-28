@@ -62,7 +62,10 @@ function Carousel:render()
 		title = 'Previous',
 		size = 'xs',
 		children = {
-			Span{children = {Icon.makeIcon{iconName = 'previous', size = '16'}}},
+			Span{
+				css = {display = 'inline-flex'},
+				children = {Icon.makeIcon{iconName = 'previous', size = 'xs'}}
+			},
 		},
 	}
 
@@ -71,7 +74,10 @@ function Carousel:render()
 		title = 'Next',
 		size = 'xs',
 		children = {
-			Span{children = {Icon.makeIcon{iconName = 'next', size = '16'}}},
+			Span{
+				css = {display = 'inline-flex'},
+				children = {Icon.makeIcon{iconName = 'next', size = 'xs'}}
+			},
 		},
 	}
 
