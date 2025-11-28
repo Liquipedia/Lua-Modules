@@ -14,6 +14,7 @@ local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
 
 local Opponent = Lua.import('Module:Opponent')
+local InlinePlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Inline')
 
 local TBD = 'TBD'
 local ZERO_WIDTH_SPACE = '&#8203;'
@@ -101,43 +102,9 @@ end
 
 ---Displays a player as an inline element. Useful for referencing players in prose.
 ---@param props InlinePlayerProps
----@return Html
+---@return Widget
 function PlayerDisplay.InlinePlayer(props)
-	local player = props.player
-
-	local useDefault = props.showTbd ~= false or not Opponent.playerIsTbd(player)
-
-	local flag = props.showFlag ~= false
-		and PlayerDisplay.Flag{flag = player.flag, useDefault = useDefault}
-		or nil
-
-	local faction = props.showFaction ~= false and Logic.isNotEmpty(player.faction)
-		and player.faction ~= Faction.defaultFaction
-		and Faction.Icon{size = 'small', showLink = false, faction = player.faction, game = props.game}
-		or nil
-
-	local nameAndLink = props.showLink ~= false and player.pageName
-		and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
-		or player.displayName
-	if props.dq then
-		nameAndLink = '<s>' .. nameAndLink .. '</s>'
-	end
-
-	local text
-	if props.flip then
-		text = nameAndLink
-			.. (faction and '&nbsp;' .. faction or '')
-			.. (flag and ('&nbsp;' .. flag) or '')
-	else
-		text = (flag and (flag .. '&nbsp;') or '')
-			.. (faction and faction .. '&nbsp;' or '')
-			.. nameAndLink
-	end
-
-	return mw.html.create('span'):addClass('inline-player')
-		:addClass(props.flip and 'flipped' or nil)
-		:css('white-space', 'pre')
-		:wikitext(text)
+	return InlinePlayerWidget(props)
 end
 
 -- Note: Lua.import('Module:Flags').Icon automatically includes a span with class="flag"
