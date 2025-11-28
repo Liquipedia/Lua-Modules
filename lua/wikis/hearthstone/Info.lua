@@ -40,5 +40,10 @@ return {
 				mode = 'merge',
 			},
 		},
+		tournamentsListing = {
+			showTier = true,
+			useParent = false,
+			onlyTierTypeIfBoth = false,
+		},
 	},
 }

@@ -137,6 +137,9 @@ local infoData = {
 		participants = {
 			defaultPlayerNumber = 5,
 		},
+		tournamentsListing = {
+			showGameIcon = true,
+		},
 	},
 }
 
