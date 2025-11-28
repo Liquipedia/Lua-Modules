@@ -106,7 +106,7 @@ function BaseTournamentsListing:readConfig()
 
 	local tier1 = args.tier1 or args.tier
 
-	self.config = Table.merge({
+	self.config = {
 		-- either manually toggled tier column or if parameters are made in a way that allows for multiple tiers
 		--- case 1: tier is set as '!' --> all tiers can be returned
 		--- case 2: tier1 and tier2 both set --> multiple tiers can be returned
@@ -123,7 +123,7 @@ function BaseTournamentsListing:readConfig()
 		allowedPlacements = self:_allowedPlacements(),
 		dynamicPlacements = Logic.readBool(args.dynamicPlacements),
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
-	})
+	}
 end
 
 ---@return string[]
