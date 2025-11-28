@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/PlayerDisplay/Inline/Custom
+-- page=Module:Widget/PlayerDisplay/Inline/SmashLike
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
