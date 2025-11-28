@@ -68,7 +68,13 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@param matchTickerConfig MatchTickerConfig
 ---@return unknown # Todo: Add interface for MatchTickerDisplay
 local MatchTickerDisplayFactory = function (matchTickerConfig)
-	if matchTickerConfig.newStyle then
+	if matchTickerConfig.entityStyle and matchTickerConfig.newStyle then
+		error("Invalid MatchTicker configuration: 'entityStyle' and 'newStyle' cannot both be true")
+	end
+
+	if matchTickerConfig.entityStyle then
+		return Lua.import('Module:MatchTicker/DisplayComponents/Entity')
+	elseif matchTickerConfig.newStyle then
 		return Lua.import('Module:MatchTicker/DisplayComponents/New')
 	else
 		return Lua.import('Module:MatchTicker/DisplayComponents')
@@ -99,6 +105,7 @@ end
 ---@field regions string[]?
 ---@field games string[]?
 ---@field newStyle boolean?
+---@field entityStyle boolean?
 ---@field featuredOnly boolean?
 ---@field displayGameIcons boolean?
 
