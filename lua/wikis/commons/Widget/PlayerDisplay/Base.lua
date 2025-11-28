@@ -83,7 +83,7 @@ end
 function BasePlayerDisplayWidget:getName()
 	local player = self.player
 	local showLink = Logic.nilOr(Logic.readBoolOrNil(self.props.showLink), true)
-	local name = showLink and Link{
+	local name = (showLink and Logic.isNotEmpty(player.pageName)) and Link{
 		link = player.pageName, children = player.displayName
 	} or player.displayName
 	if self.props.dq then
