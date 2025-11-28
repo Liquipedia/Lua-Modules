@@ -24,6 +24,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 ---@class MatchHeaderProps
 ---@field match MatchGroupUtilMatch
 ---@field teamStyle? teamStyle
+---@field variant? 'vertical'
 
 ---@class MatchHeader: Widget
 ---@operator call(MatchHeaderProps): MatchHeader
@@ -45,6 +46,16 @@ function MatchHeader:render()
 		return
 	end
 
+	if self.props.variant == 'vertical' then
+		return self:_renderVertical(match)
+	else
+		return self:_renderHorizontal(match)
+	end
+end
+
+---@param match MatchGroupUtilMatch
+---@return Widget
+function MatchHeader:_renderHorizontal(match)
 	local hasBestof = match.bestof and match.bestof > 0
 	local matchPhase = MatchGroupUtil.computeMatchPhase(match)
 
@@ -142,6 +153,54 @@ function MatchHeader:render()
 				}
 			},
 		}
+	}
+end
+
+---@param match MatchGroupUtilMatch
+---@return Widget
+function MatchHeader:_renderVertical(match)
+	local matchPhase = MatchGroupUtil.computeMatchPhase(match)
+	local hasBestof = match.bestof and match.bestof > 0
+
+	return Div{
+		classes = {'match-info-header', 'match-info-header-vertical'},
+		children = WidgetUtil.collect(
+			Array.map(match.opponents, function(opponent, idx)
+				local isWinner = (match.winner == idx or match.winner == 0)
+				local score = OpponentDisplay.InlineScore(opponent)
+
+				return Div{
+					classes = WidgetUtil.collect(
+						'match-info-opponent-row',
+						matchPhase == 'finished' and not isWinner and 'match-info-opponent-row-loser' or nil,
+						isWinner and 'match-info-opponent-row-winner' or nil
+					),
+					children = {
+						Div{
+							classes = {'match-info-opponent-identity'},
+							children = {
+								OpponentDisplay.BlockOpponent{
+									opponent = opponent,
+									teamStyle = self.props.teamStyle,
+									overflow = 'ellipsis',
+								}
+							}
+						},
+						Span{
+							classes = WidgetUtil.collect(
+								'match-info-opponent-score',
+								isWinner and 'match-info-opponent-score-winner' or nil
+							),
+							children = matchPhase == 'upcoming' and '-' or score
+						}
+					}
+				}
+			end),
+			hasBestof and Div{
+				classes = {'match-info-bestof'},
+				children = '(Bo' .. match.bestof .. ')'
+			} or nil
+		)
 	}
 end
 
