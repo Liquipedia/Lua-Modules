@@ -18,7 +18,7 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
----@class BasePlayerDisplayProps
+---@class BasePlayerDisplayProps: PlayerExtSyncOptions
 ---@field flip boolean?
 ---@field player standardPlayer
 ---@field showFlag boolean?
@@ -40,7 +40,7 @@ local BasePlayerDisplayWidget = Class.new(Widget,
 		if Logic.isEmpty(input.player) then
 			input.player = Opponent.readSinglePlayerArgs(input)
 		end
-		self.player = PlayerExt.syncPlayer(input.player)
+		self.player = PlayerExt.syncPlayer(input.player, input)
 		self.useDefault = Logic.nilOr(Logic.readBoolOrNil(input.showTbd), true) or not Opponent.playerIsTbd(self.player)
 	end
 )
