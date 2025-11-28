@@ -18,14 +18,14 @@ local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class FightersBlockPlayerProps: BlockPlayerProps
----@field player FightersStandardPlayer
+---@class SmashLikeBlockPlayerProps: BlockPlayerProps
+---@field player FightersStandardPlayer|SmashStandardPlayer
 ---@field oneLine boolean?
 
----@class FightersBlockPlayerWidget: BlockPlayerWidget
----@operator call(FightersBlockPlayerProps): FightersBlockPlayerWidget
----@field protected player FightersStandardPlayer
----@field props FightersBlockPlayerProps
+---@class SmashLikeBlockPlayerWidget: BlockPlayerWidget
+---@operator call(SmashLikeBlockPlayerProps): SmashLikeBlockPlayerWidget
+---@field protected player FightersStandardPlayer|SmashStandardPlayer
+---@field props SmashLikeBlockPlayerProps
 local CustomBlockPlayerWidget = Class.new(BlockPlayerWidget)
 
 ---@return Widget|(string|Widget)[]

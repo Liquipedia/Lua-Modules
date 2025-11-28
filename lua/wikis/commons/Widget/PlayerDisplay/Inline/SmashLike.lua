@@ -16,12 +16,12 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Span = HtmlWidgets.Span
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class FightersInlinePlayerProps: BasePlayerDisplayProps
----@field player FightersStandardPlayer
+---@class SmashLikeInlinePlayerProps: BasePlayerDisplayProps
+---@field player FightersStandardPlayer|SmashStandardPlayer
 
----@class FightersInlinePlayerWidget: InlinePlayerWidget
----@operator call(FightersInlinePlayerProps): InlinePlayerWidget
----@field protected player FightersStandardPlayer
+---@class SmashLikeInlinePlayerWidget: InlinePlayerWidget
+---@operator call(SmashLikeInlinePlayerProps): InlinePlayerWidget
+---@field protected player FightersStandardPlayer|SmashStandardPlayer
 local CustomInlinePlayerWidget = Class.new(InlinePlayerWidget)
 
 ---@return Widget
