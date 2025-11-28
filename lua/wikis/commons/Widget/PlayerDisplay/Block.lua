@@ -79,6 +79,7 @@ function BlockPlayerWidget:getName()
 	end
 
 	return (props.dq and HtmlWidgets.S or Span){
+		classes = {'name'},
 		css = DisplayUtil.getOverflowStyles(props.overflow or 'ellipsis'),
 		children = getChildren(),
 	}
