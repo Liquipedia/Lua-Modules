@@ -13,9 +13,6 @@ local Flags = Lua.import('Module:Flags')
 local BlockPlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Block')
 local InlinePlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Inline')
 
-local TBD = 'TBD'
-local ZERO_WIDTH_SPACE = '&#8203;'
-
 --Display components for players.
 ---@class PlayerDisplay
 local PlayerDisplay = {}
