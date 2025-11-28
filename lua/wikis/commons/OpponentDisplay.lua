@@ -258,7 +258,7 @@ function OpponentDisplay.getBlockPlayerNodes(props)
 			player = player,
 			team = player.team,
 			note = playerIndex == 1 and note or nil,
-		})):addClass(props.playerClass)
+		}))
 	end)
 end
 
