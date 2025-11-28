@@ -283,6 +283,76 @@
 			background-color: var( --clr-surface-dark-primary );
 		}
 
+		.match-info-top-row {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			width: 100%;
+			margin-bottom: 0.5rem;
+		}
+
+		.match-info-stage {
+			display: block;
+			width: 100%;
+			text-align: center;
+			font-size: 0.75rem;
+			font-weight: 600;
+			margin-bottom: 0.5rem;
+			color: var( --clr-on-background );
+		}
+
+		.match-info-header-vertical {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+			width: 100%;
+		}
+
+		.match-info-opponent-row {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 0.5rem;
+			width: 100%;
+
+			&-loser {
+				opacity: 0.6;
+			}
+		}
+
+		.match-info-opponent-identity {
+			flex: 1;
+			min-width: 0;
+		}
+
+		.match-info-opponent-score {
+			font-weight: bold;
+			font-size: 1rem;
+			line-height: 1.25rem;
+			min-width: 2rem;
+			text-align: right;
+			color: var( --clr-on-background );
+		}
+
+		.match-info-bestof {
+			text-align: center;
+			font-size: 0.75rem;
+			color: var( --clr-on-background-secondary );
+		}
+
+		.match-info-ffa-info {
+			display: block;
+			width: 100%;
+			text-align: center;
+			font-size: 0.875rem;
+			margin: 0.5rem 0;
+			color: var( --clr-on-background );
+		}
+
+		.match-info-header:not( .match-info-header-vertical ) {
+			display: none;
+		}
+
 		.match-info-header {
 			flex-direction: column;
 			gap: 0.5rem;
@@ -305,6 +375,7 @@
 
 		.match-info-tournament {
 			justify-content: center;
+			margin-top: 0.75rem;
 		}
 	}
 }

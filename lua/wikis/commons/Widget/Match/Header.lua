@@ -160,7 +160,6 @@ end
 ---@return Widget
 function MatchHeader:_renderVertical(match)
 	local matchPhase = MatchGroupUtil.computeMatchPhase(match)
-	local hasBestof = match.bestof and match.bestof > 0
 
 	return Div{
 		classes = {'match-info-header', 'match-info-header-vertical'},
@@ -195,11 +194,7 @@ function MatchHeader:_renderVertical(match)
 						}
 					}
 				}
-			end),
-			hasBestof and Div{
-				classes = {'match-info-bestof'},
-				children = '(Bo' .. match.bestof .. ')'
-			} or nil
+			end)
 		)
 	}
 end
