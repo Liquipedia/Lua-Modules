@@ -60,16 +60,18 @@ function Carousel:render()
 	local leftButton = Button{
 		classes = {'carousel-button', 'carousel-button--left'},
 		title = 'Previous',
+		size = 'xs',
 		children = {
-			Span{children = {Icon.makeIcon{iconName = 'previous', size = 'lg'}}},
+			Span{children = {Icon.makeIcon{iconName = 'previous', size = '16'}}},
 		},
 	}
 
 	local rightButton = Button{
 		classes = {'carousel-button', 'carousel-button--right'},
 		title = 'Next',
+		size = 'xs',
 		children = {
-			Span{children = {Icon.makeIcon{iconName = 'next', size = 'lg'}}},
+			Span{children = {Icon.makeIcon{iconName = 'next', size = '16'}}},
 		},
 	}
 
