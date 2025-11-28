@@ -24,6 +24,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local ZERO_WIDTH_SPACE = '&#8203;'
 
 ---@class BlockPlayerProps: BasePlayerDisplayProps
+---@field playerClass string|string[]?
 ---@field overflow OverflowModes?
 ---@field showPlayerTeam boolean?
 ---@field note string|number|nil
@@ -42,7 +43,8 @@ function BlockPlayerWidget:render()
 		classes = Array.extend(
 			'block-player',
 			self.props.flip and 'flipped' or nil,
-			self.props.showPlayerTeam and 'has-team' or nil
+			self.props.showPlayerTeam and 'has-team' or nil,
+			self.props.playerClass
 		),
 		css = {['white-space'] = 'pre'},
 		children = WidgetUtil.collect(
