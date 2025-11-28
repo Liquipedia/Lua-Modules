@@ -177,7 +177,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				sizes = {lg = 4, xl = 6, xxl = 5, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
@@ -195,18 +195,10 @@ return {
 						mobileOrder = 6,
 						content = CONTENT.thisDay,
 					},
-					{
-						mobileOrder = 7,
-						content = CONTENT.wantToHelp,
-					},
-					{
-						mobileOrder = 8,
-						content = CONTENT.liquipediaApp,
-					},
 				}
 			},
 			{ -- Right
-				size = 6,
+				sizes = {lg = 8, xl = 6, xxl = 7, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 3,
@@ -238,6 +230,14 @@ return {
 								},
 							},
 						},
+					},
+					{
+						mobileOrder = 7,
+						content = CONTENT.wantToHelp,
+					},
+					{
+						mobileOrder = 8,
+						content = CONTENT.liquipediaApp,
 					},
 				},
 			},
