@@ -49,7 +49,7 @@ local STATUS = {
 }
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomItem.run(frame)
 	local item = CustomItem(frame)
 	item:setWidgetInjector(CustomInjector(item))

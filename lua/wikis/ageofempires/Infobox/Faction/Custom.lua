@@ -23,12 +23,16 @@ local AgeIcon = Lua.import('Module:Widget/Infobox/AgeIcon')
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 
 ---@class AoECustomFactionInfobox: FactionInfobox
+---@operator call(Frame): AoECustomFactionInfobox
 ---@field game string
 local CustomFactionInfobox = Class.new(FactionInfobox)
+
+---@class AoECustomFactionInfoboxWidgetInjector: WidgetInjector
+---@field caller AoECustomFactionInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomFactionInfobox.run(frame)
 	local infobox = CustomFactionInfobox(frame)
 

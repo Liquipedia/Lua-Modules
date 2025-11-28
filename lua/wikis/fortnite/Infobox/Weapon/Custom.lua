@@ -28,7 +28,7 @@ local CustomInjector = Class.new(Injector)
 local HARVESTING_TOOL = 'Harvesting Tool'
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomWeapon.run(frame)
 	local weapon = CustomWeapon(frame)
 	local args = weapon.args

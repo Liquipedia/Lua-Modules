@@ -15,7 +15,7 @@ local Patch = Lua.import('Module:Infobox/Patch')
 local CustomPatch = Class.new(Patch)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPatch.run(frame)
 	local patch = CustomPatch(frame)
 

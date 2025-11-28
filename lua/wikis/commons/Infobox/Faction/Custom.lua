@@ -12,10 +12,11 @@ local Class = Lua.import('Module:Class')
 local FactionInfobox = Lua.import('Module:Infobox/Faction')
 
 ---@class CustomFactionInfobox: FactionInfobox
+---@operator call(Frame): CustomFactionInfobox
 local CustomFactionInfobox = Class.new(FactionInfobox)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomFactionInfobox.run(frame)
 	local infobox = CustomFactionInfobox(frame)
 	return infobox:createInfobox()

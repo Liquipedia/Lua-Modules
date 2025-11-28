@@ -30,7 +30,7 @@ local ACHIEVEMENTS_BASE_CONDITIONS = {
 local CustomTeam = Class.new(Team)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	-- Automatic achievements

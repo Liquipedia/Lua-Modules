@@ -22,9 +22,10 @@ local Customizable = Widgets.Customizable
 local Chronology = Widgets.Chronology
 
 ---@class UpgradeInfobox: BasicInfobox
+---@operator call(Frame): UpgradeInfobox
 local Upgrade = Class.new(BasicInfobox)
 
----@return string
+---@return Widget
 function Upgrade:createInfobox()
 	local args = self.args
 	local links = Links.transform(args)

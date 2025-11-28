@@ -52,7 +52,7 @@ local ROLE_LOOKUP = {
 }
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomHero.run(frame)
 	local character = CustomHero(frame)
 	character:setWidgetInjector(CustomInjector(character))

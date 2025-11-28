@@ -20,16 +20,17 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
 ---@class WebsiteInfobox: BasicInfobox
+---@operator call(Frame): WebsiteInfobox
 local Website = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function Website.run(frame)
 	local website = Website(frame)
 	return website:createInfobox()
 end
 
----@return string
+---@return Widget
 function Website:createInfobox()
 	local args = self.args
 

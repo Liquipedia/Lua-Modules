@@ -29,7 +29,7 @@ local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPlayer.run(frame)
 	---@type BrawlstarsInfoboxPlayer
 	local player = CustomPlayer(frame)
