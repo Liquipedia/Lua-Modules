@@ -13,6 +13,8 @@ local Logic = Lua.import('Module:Logic')
 
 local TournamentsListing = Lua.import('Module:TournamentsListing/CardList')
 
+---@class RainbowsixTournamentsListing: BaseTournamentsListing
+---@operator call(...): RainbowsixTournamentsListing
 local CustomTournamentsListing = Class.new(TournamentsListing)
 
 ---@param frame Frame
