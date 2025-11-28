@@ -65,8 +65,6 @@ function League:createInfobox()
 
 	self:_definePageVariables(args)
 
-	self:_createUpcomingMatches()
-
 	local widgets = {
 		Header{
 			name = args.name,
@@ -179,6 +177,7 @@ function League:createInfobox()
 
 	self.name = TextSanitizer.stripHTML(self.name)
 
+	self:top(self:_createUpcomingMatches())
 	self:bottom(self:createBottomContent())
 
 	if self:shouldStore(args) then
