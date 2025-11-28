@@ -8,12 +8,9 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local DisplayUtil = Lua.import('Module:DisplayUtil')
-local Logic = Lua.import('Module:Logic')
-local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
 
-local Opponent = Lua.import('Module:Opponent')
+local BlockPlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Block')
 local InlinePlayerWidget = Lua.import('Module:Widget/PlayerDisplay/Inline')
 
 local TBD = 'TBD'
@@ -23,85 +20,16 @@ local ZERO_WIDTH_SPACE = '&#8203;'
 ---@class PlayerDisplay
 local PlayerDisplay = {}
 
----@class BlockPlayerProps
----@field flip boolean?
----@field player standardPlayer
----@field overflow OverflowModes?
----@field showFlag boolean?
----@field showLink boolean?
----@field showPlayerTeam boolean?
----@field dq boolean?
----@field note string|number|nil
----@field team string?
----@field showFaction boolean?
----@field game string?
----@field showTbd boolean?
-
----@class InlinePlayerProps
----@field flip boolean?
----@field player standardPlayer
----@field showFlag boolean?
----@field showLink boolean?
----@field dq boolean?
----@field showFaction boolean?
----@field game string?
----@field showTbd boolean?
-
 --Displays a player as a block element. The width of the component is
 --determined by its layout context, and not by the player name.
 ---@param props BlockPlayerProps
----@return Html
+---@return Widget
 function PlayerDisplay.BlockPlayer(props)
-	local player = props.player
-
-	local useDefault = props.showTbd ~= false or not Opponent.playerIsTbd(player)
-
-	local nameNode = mw.html.create(props.dq and 's' or 'span'):addClass('name')
-
-	if not Opponent.playerIsTbd(player) and props.showLink ~= false and Logic.isNotEmpty(player.pageName) then
-		nameNode:wikitext('[[' .. player.pageName .. '|' .. player.displayName .. ']]')
-	elseif useDefault then
-		nameNode:wikitext(Logic.emptyOr(player.displayName, 'TBD'))
-	else
-		nameNode:wikitext(ZERO_WIDTH_SPACE)
-	end
-	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
-
-	local noteNode
-	if props.note then
-		noteNode = mw.html.create('sup'):addClass('note'):wikitext(props.note)
-	end
-
-	local flagNode
-	if props.showFlag ~= false then
-		flagNode = PlayerDisplay.Flag{flag = player.flag, useDefault = useDefault}
-	end
-
-	local factionNode
-	if props.showFaction ~= false and Logic.isNotEmpty(player.faction) and player.faction ~= Faction.defaultFaction then
-		factionNode = mw.html.create('span'):addClass('race')
-			:wikitext(Faction.Icon{size = 'small', showLink = false, faction = player.faction, game = props.game})
-	end
-
-	local teamNode
-	if props.showPlayerTeam and player.team and player.team:upper() ~= TBD then
-		teamNode = mw.html.create('span')
-			:wikitext('&nbsp;')
-			:node(mw.ext.TeamTemplate.teampart(player.team))
-	end
-
-	return mw.html.create('div'):addClass('block-player')
-		:addClass(props.flip and 'flipped' or nil)
-		:addClass(props.showPlayerTeam and 'has-team' or nil)
-		:node(flagNode)
-		:node(factionNode)
-		:node(nameNode)
-		:node(noteNode)
-		:node(teamNode)
+	return BlockPlayerWidget(props)
 end
 
 ---Displays a player as an inline element. Useful for referencing players in prose.
----@param props InlinePlayerProps
+---@param props BasePlayerDisplayProps
 ---@return Widget
 function PlayerDisplay.InlinePlayer(props)
 	return InlinePlayerWidget(props)
