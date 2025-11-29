@@ -211,7 +211,7 @@ function TournamentPlayerInfo:buildIntro()
 			'.',
 			Logic.isNotEmpty(tournament.startDate) and {
 				' Age at tournament start, ',
-				DateExt.formatTimestamp('%B %d %Y', tournament.startDate.timestamp):gsub(' 0',' '),
+				DateExt.formatTimestamp('F j, Y', tournament.startDate.timestamp),
 				'.'
 			} or nil,
 			' ',
