@@ -50,6 +50,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@operator call(table): TournamentPlayerInfo
 ---@field config {opponenttype: OpponentType?}
 ---@field tournament StandardTournament
+---@field protected data EnrichedStandardPlayer[]
 local TournamentPlayerInfo = Class.new(function(self, ...) self:init(...) end)
 
 ---@param args {page: string?, mode: string?, opponenttype: OpponentType?}
@@ -78,7 +79,7 @@ function TournamentPlayerInfo:isValidTournament()
 	return Logic.isNotEmpty(self.tournament)
 end
 
----@return standardPlayer[]
+---@return self
 function TournamentPlayerInfo:query()
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('pagename'), Comparator.eq, self.tournament.pageName),
@@ -98,7 +99,7 @@ end
 
 ---@protected
 ---@param records placement[]
----@return standardPlayer[]
+---@return self
 function TournamentPlayerInfo:parseRecords(records)
 	local players = Array.flatMap(records, function (record)
 		local opponent = Opponent.fromLpdbStruct(record)
@@ -112,7 +113,8 @@ function TournamentPlayerInfo:parseRecords(records)
 		end)
 	end)
 
-	return Array.sortBy(players, Operator.property('team'))
+	self.data = Array.sortBy(players, Operator.property('team'))
+	return self
 end
 
 ---@protected
