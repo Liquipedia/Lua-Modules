@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
@@ -54,13 +55,16 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field protected data EnrichedStandardPlayer[]
 local TournamentPlayerInfo = Class.new(function(self, ...) self:init(...) end)
 
----@param args {page: string?, mode: string?, opponenttype: OpponentType?}
-function TournamentPlayerInfo.create(args)
+---@param frame Frame
+function TournamentPlayerInfo.create(frame)
+	local args = Arguments.getArgs(frame)
 	local tournamentPlayerInfo = TournamentPlayerInfo(args)
 
 	if not tournamentPlayerInfo:isValidTournament() then
 		return 'No conditions set.'
 	end
+
+	return tournamentPlayerInfo:query():build()
 end
 
 ---@param args table
@@ -70,7 +74,11 @@ function TournamentPlayerInfo:init(args)
 		opponenttype = Logic.emptyOr(args.opponenttype, Opponent.team)
 	}
 
-	self.tournament = Tournament.getTournament(args.pagename) or {}
+	local pageName = Logic.emptyOr(args.pagename, args.page)
+
+	assert(pageName, 'pagename must be specified')
+
+	self.tournament = Tournament.getTournament(pageName) or {}
 
 	return self
 end
@@ -424,4 +432,4 @@ function TournamentPlayerInfo:buildPlayerRow(player)
 	)}
 end
 
-return Class.export(TournamentPlayerInfo, {exports = {'create'}})
+return TournamentPlayerInfo
