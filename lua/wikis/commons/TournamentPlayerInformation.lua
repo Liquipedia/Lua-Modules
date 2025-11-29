@@ -141,7 +141,7 @@ function TournamentPlayerInfo:queryPlayerInfo(player)
 			name = extradata.firstname and table.concat({extradata.firstname, extradata.lastname}, ' ') or playerData.name,
 			image = playerData.image,
 			birthDate = playerData.birthdate,
-			currentTeam = playerData.currentTeam,
+			currentTeam = playerData.team,
 			links = playerData.links,
 			currentRole = extradata.role,
 		})
