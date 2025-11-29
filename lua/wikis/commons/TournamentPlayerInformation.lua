@@ -95,13 +95,13 @@ function TournamentPlayerInfo:query()
 		order = 'opponentname asc',
 	})
 
-	return self:parseRecords(data)
+	return self:_parseRecords(data)
 end
 
----@protected
+---@private
 ---@param records placement[]
 ---@return self
-function TournamentPlayerInfo:parseRecords(records)
+function TournamentPlayerInfo:_parseRecords(records)
 	local players = Array.flatMap(records, function (record)
 		local opponent = Opponent.fromLpdbStruct(record)
 
