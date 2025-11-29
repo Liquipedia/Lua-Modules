@@ -113,7 +113,9 @@ function TournamentPlayerInfo:_parseRecords(records)
 	local players = Array.flatMap(records, function (record)
 		local opponent = Opponent.fromLpdbStruct(record)
 
-		return Array.map(opponent.players, function (player)
+		return Array.map(opponent.players, function (player, playerIndex)
+			player.extradata = player.extradata or {}
+			player.extradata.index = playerIndex
 			if opponent.type == Opponent.team then
 				player.team = opponent.template
 			end
@@ -122,7 +124,16 @@ function TournamentPlayerInfo:_parseRecords(records)
 		end)
 	end)
 
-	self.data = Array.sortBy(players, Operator.property('team'))
+	self.data = Array.sortBy(players, function(x) return x end, function (a, b)
+		if Logic.isEmpty(a.team) then
+			return Logic.isEmpty(b.team)
+		elseif Logic.isEmpty(a.team) then
+			return Logic.isEmpty(b.team)
+		elseif a.team ~= b.team then
+			return a.team < b.team
+		end
+		return a.extradata.index < b.extradata.index
+	end)
 	return self
 end
 
