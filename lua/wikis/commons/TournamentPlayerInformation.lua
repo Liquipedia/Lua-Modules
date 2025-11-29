@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:TournamentPlayerInfo
+-- page=Module:TournamentPlayerInformation
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
