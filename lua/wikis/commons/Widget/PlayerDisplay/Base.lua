@@ -43,7 +43,7 @@ local BasePlayerDisplayWidget = Class.new(Widget,
 		else
 			self.player = input.player
 		end
-		self.useDefault = Logic.nilOr(Logic.readBoolOrNil(input.showTbd), true) or not Opponent.playerIsTbd(self.player)
+		self.useDefault = Logic.nilOr(Logic.readBoolOrNil(input.showTbd), not Opponent.playerIsTbd(self.player))
 	end
 )
 
