@@ -189,7 +189,7 @@ function TournamentPlayerInfo:_calculateAgeData(players)
 	end, 0) / #playersWithBirthDate --[[@as integer]]
 	local playersByAge = Array.sortBy(playersWithBirthDate, FnUtil.identity, function (a, b)
 		if a.birthDate ~= b.birthDate then
-			return a.birthDate < b.birthDate
+			return a.birthDate > b.birthDate
 		end
 		return a.displayName < b.displayName
 	end)
