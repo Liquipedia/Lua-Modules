@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Links = Lua.import('Module:Links')
 local Logic = Lua.import('Module:Logic')
@@ -145,6 +146,36 @@ function TournamentPlayerInfo:queryPlayerInfo(player)
 		player.name = squadPlayerData.name
 	end
 	return player
+end
+
+---@private
+---@param players EnrichedStandardPlayer[]
+---@return {averageAge: integer, youngest: EnrichedStandardPlayer, oldest: EnrichedStandardPlayer}?
+function TournamentPlayerInfo:_calculateAgeData(players)
+	if not self.tournament.startDate then
+		return
+	end
+	local playersWithBirthDate = Array.filter(players, function (player)
+		return Logic.isNotEmpty(player.birthDate) and player.birthDate ~= DateExt.defaultDate
+	end)
+	if Logic.isEmpty(playersWithBirthDate) then
+		return
+	end
+	local averageAge = Array.reduce(playersWithBirthDate, function (aggregate, player)
+		return aggregate + DateExt.readTimestamp(player.birthDate)
+	end, 0) / #playersWithBirthDate --[[@as integer]]
+	local playersByAge = Array.sortBy(playersWithBirthDate, FnUtil.identity, function (a, b)
+		if a.birthDate ~= b.birthDate then
+			return a.birthDate < b.birthDate
+		end
+		return a.displayName < b.displayName
+	end)
+
+	return {
+		averageAge = averageAge - self.tournament.startDate.timestamp,
+		youngest = playersByAge[1],
+		oldest = playersByAge[#playersByAge],
+	}
 end
 
 return Class.export(TournamentPlayerInfo, {exports = {'create'}})
