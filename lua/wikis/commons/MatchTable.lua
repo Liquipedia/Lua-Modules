@@ -734,11 +734,12 @@ function MatchTable:_displayIcon(match)
 end
 
 ---@param match MatchTableMatch
----@return Html
+---@return Widget
 function MatchTable:_displayTournament(match)
-	return mw.html.create('td')
-		:css('text-align', 'left')
-		:wikitext(Page.makeInternalLink(match.displayName, match.pageName))
+	return HtmlWidgets.Td{
+		css = {['text-align'] = 'left'},
+		children = Link{children = match.displayName, link = match.pageName}
+	}
 end
 
 ---@param match MatchTableMatch
