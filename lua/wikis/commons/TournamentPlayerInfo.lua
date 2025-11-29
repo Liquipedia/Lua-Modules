@@ -174,7 +174,7 @@ function TournamentPlayerInfo:_calculateAgeData(players)
 	end)
 
 	return {
-		averageAge = averageAge - self.tournament.startDate.timestamp,
+		averageAge = self.tournament.startDate.timestamp - averageAge,
 		youngest = playersByAge[1],
 		oldest = playersByAge[#playersByAge],
 	}
