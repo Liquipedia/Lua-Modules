@@ -132,6 +132,7 @@ function TournamentPlayerInfo:_parseRecords(records)
 		elseif a.team ~= b.team then
 			return a.team < b.team
 		end
+		-- TODO: sort by role when it becomes available in placement
 		return a.extradata.index < b.extradata.index
 	end)
 	return self
