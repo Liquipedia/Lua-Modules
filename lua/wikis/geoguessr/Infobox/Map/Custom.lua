@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Map = Lua.import('Module:Infobox/Map')
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
-local String = Lua.import('Module:StringUtils')
 
 local Link = require('Module:Widget/Basic/Link')
 local Widgets = require('Module:Widget/All')
