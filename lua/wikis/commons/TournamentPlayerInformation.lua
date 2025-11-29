@@ -349,6 +349,8 @@ function TournamentPlayerInfo:buildTeamAgeTable()
 	}}
 end
 
+---@protected
+---@return Widget
 function TournamentPlayerInfo:buildPlayersTable()
 	return DataTable{
 		css = {margin = '10px 0'},
