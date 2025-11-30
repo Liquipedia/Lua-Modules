@@ -99,10 +99,7 @@ function TeamParticipantsController.playedDataFromMatchData(participants)
 	if not Array.any(participants, Operator.property('autoPlayed')) then
 		return {}
 	end
-	local parent = Variables.varDefault('tournament_parent')
-	if not parent then
-		return {}
-	end
+	local parent = Variables.varDefault('tournament_parent', mw.title.getCurrentTitle().prefixedText:gsub(' ', '_'))
 	local playedData = {}
 	Lpdb.executeMassQuery(
 		'match2',
