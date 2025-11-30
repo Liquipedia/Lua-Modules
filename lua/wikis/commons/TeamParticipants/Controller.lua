@@ -94,7 +94,7 @@ function TeamParticipantsController.importParticipants(parsedData)
 end
 
 ---@param participants TeamParticipant[]
----@return table<string, {pageName: string, displayName: string, flag: string?, faction: string?}[]>
+---@return table<string, standardPlayer[]>
 function TeamParticipantsController.playedDataFromMatchData(participants)
 	if not Array.any(participants, Operator.property('autoPlayed')) then
 		return {}
@@ -118,7 +118,7 @@ function TeamParticipantsController.playedDataFromMatchData(participants)
 	end)
 end
 
----@param playedData table<string, table<string, {pageName: string, displayName: string, flag: string?, faction: string?}>>
+---@param playedData table<string, table<string, standardPlayer>>
 ---@param participants TeamParticipant[]
 ---@param match match2
 function TeamParticipantsController.getPlayedPlayersFromMatch(playedData, participants, match)
@@ -184,7 +184,7 @@ function TeamParticipantsController.getPlayedPlayersFromMatch(playedData, partic
 end
 
 ---@param players standardPlayer[]
----@param playedData {pageName: string, displayName: string, flag: string?}[]?
+---@param playedData standardPlayer[]?
 function TeamParticipantsController.applyPlayed(players, playedData)
 	local autoHasPlayed = function(pageName)
 		if Logic.isEmpty(playedData) then
