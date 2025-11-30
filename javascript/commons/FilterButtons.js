@@ -88,6 +88,7 @@ liquipedia.filterButtons = {
 	fallbackFilterEffect: 'none',
 	activeButtonClass: 'filter-button--active',
 	hiddenCategoryClass: 'filter-category--hidden',
+	hiddenGroupClass: 'filter-category--hidden-group',
 	fallbackFilterGroup: 'filter-group-fallback-common',
 
 	filterGroups: {},
