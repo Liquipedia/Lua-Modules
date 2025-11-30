@@ -10,10 +10,21 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Operator = Lua.import('Module:Operator')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
+
+local Condition = Lua.import('Module:Condition')
+local BooleanOperator = Condition.BooleanOperator
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
 
 local TeamParticipantsWikiParser = Lua.import('Module:TeamParticipants/Parse/Wiki')
 local TeamParticipantsRepository = Lua.import('Module:TeamParticipants/Repository')
@@ -51,15 +62,23 @@ function TeamParticipantsController.fromTemplate(frame)
 end
 
 --- Imports participants' squad members from the database if requested.
+--- Determines played status
 --- May mutate the input.
 ---@param parsedData {participants: TeamParticipant[], expectedPlayerCount: integer?}
 function TeamParticipantsController.importParticipants(parsedData)
+	local playedData = TeamParticipantsController.playedDataFromMatchData(parsedData.participants)
+
 	Array.forEach(parsedData.participants, function (participant)
 		local players = participant.opponent.players
 		-- Bad structure, this should always exist
 		if not players then
 			return
 		end
+
+		TeamParticipantsController.applyPlayed(
+			players,
+			participant.autoPlayed and playedData[participant.opponent.template] or nil
+		)
 
 		if not Logic.readBool(participant.shouldImportFromDb) then
 			return
@@ -70,7 +89,119 @@ function TeamParticipantsController.importParticipants(parsedData)
 			return
 		end
 
-		TeamParticipantsController.mergeManualAndImportedPlayers(players, importedPlayers)
+		TeamParticipantsController.mergManualAndImportedPlayers(players, importedPlayers)
+	end)
+end
+
+---@param participants TeamParticipant[]
+---@return table<string, standardPlayer[]>
+function TeamParticipantsController.playedDataFromMatchData(participants)
+	if not Array.any(participants, Operator.property('autoPlayed')) then
+		return {}
+	end
+	local parent = Variables.varDefault('tournament_parent', mw.title.getCurrentTitle().prefixedText:gsub(' ', '_'))
+	local playedData = {}
+	Lpdb.executeMassQuery(
+		'match2',
+		{
+			conditions = tostring(ConditionTree(BooleanOperator.all):add{
+				ConditionNode(ColumnName('finished'), Comparator.eq, 1),
+				ConditionNode(ColumnName('parent'), Comparator.eq, parent),
+			}),
+			query = 'match2opponents, match2games'
+		},
+		FnUtil.curry(FnUtil.curry(TeamParticipantsController.getPlayedPlayersFromMatch, playedData), participants)
+	)
+
+	return Table.map(playedData, function(opponentName, playedPlayers)
+		return opponentName, Array.extractValues(playedPlayers)
+	end)
+end
+
+---@param playedData table<string, table<string, standardPlayer>>
+---@param participants TeamParticipant[]
+---@param match match2
+function TeamParticipantsController.getPlayedPlayersFromMatch(playedData, participants, match)
+	-- we only care for team matches
+	if Array.any(match.match2opponents, function(opponent) return opponent.type ~= Opponent.team end) then
+		return
+	end
+
+	---@param template string
+	---@return string?
+	local determineParticipantTemplate = function(template)
+		local participant = Array.find(participants, function(participant)
+			return Array.any(participant.aliases, function(alias)
+				return alias == template
+			end)
+		end)
+		if not participant then return end
+		return participant.opponent.template
+	end
+
+	---@type table<integer, string>
+	local opponentTemplates = {}
+	-- can not us Array.map since we might have opponents in match data that do not have a participant entry
+	Array.forEach(match.match2opponents, function(opponent, opponentIndex)
+		opponentTemplates[opponentIndex] = determineParticipantTemplate(opponent.template)
+	end)
+
+	-- match not relevant for any of the participants
+	if Logic.isEmpty(opponentTemplates) then
+		return
+	end
+
+	Array.forEach(match.match2games, function(game)
+		local gameOpponents = game.opponents
+		if type(gameOpponents) ~= 'table' then
+			gameOpponents = Json.parseIfTable(gameOpponents) or {}
+		end
+		Array.forEach(gameOpponents, function(opp, opponentIndex)
+			local matchOpponent = match.match2opponents[opponentIndex]
+			local opponentTemplate = opponentTemplates[opponentIndex]
+			if not matchOpponent or not opponentTemplate then return end
+
+			-- opp.players may have gaps, hence can not use Array.forEach
+			Table.iter.forEachPair(opp.players or {}, function(playerIndex, player)
+				local matchPlayer = matchOpponent.match2players[playerIndex]
+				if Logic.isEmpty(player) or Logic.isEmpty(matchPlayer) then
+					return
+				end
+				playedData[opponentTemplate] = playedData[opponentTemplate] or {}
+				local matchPlayerName = matchPlayer.name
+				if playedData[opponentTemplate][matchPlayerName] then
+					return
+				end
+				playedData[opponentTemplate][matchPlayerName] = {
+					pageName = matchPlayerName,
+					displayName = matchPlayer.displayname,
+					flag = matchPlayer.flag,
+					faction = (matchPlayer.extradata or {}).faction,
+				}
+			end)
+		end)
+	end)
+end
+
+---@param players standardPlayer[]
+---@param playedData standardPlayer[]?
+function TeamParticipantsController.applyPlayed(players, playedData)
+	local autoHasPlayed = function(pageName)
+		if Logic.isEmpty(playedData) then
+			return nil
+		end
+		---@cast playedData -nil
+		return Array.any(playedData, function(referencePlayer)
+			return referencePlayer.pageName == pageName
+		end)
+	end
+
+	Array.forEach(players, function(player)
+		player.extradata.played = Logic.nilOr(
+			player.extradata.played,
+			autoHasPlayed(player.pageName),
+			player.extradata.type ~= 'sub' and player.extradata.type ~= 'staff'
+		)
 	end)
 end
 
