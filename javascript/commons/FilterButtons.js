@@ -52,9 +52,11 @@
  * items. Optionally can also add an effect type as with items which will be used on the whole group as well. The groups
  * can also be nested, but, this will still check filterable items and not whether child groups themselves are hidden.
  * Can also add a fallback item as a direct child of the group using `data-filter-hideable-group-fallback`; this item
- * will instead be shown when the group is determined to be hidden instead of hiding the actual group element.
+ * will instead be shown when the group is determined to be hidden instead of hiding the actual group element. Finally,
+ * optionally, can set a custom class to use when the group is hidden with `data-filter-hidden-class`; defaults to class
+ * `filter-category--hidden-group` otherwise.
  * ```html
- * <div data-filter-hideable-group data-filter-effect="fade">
+ * <div data-filter-hideable-group data-filter-effect="fade" data-filter-hidden-class="filter-category--hidden-group">
  *   <span data-filter-group="group1" data-filter-category="cat1">cat1</span>
  *   <span data-filter-group="group1" data-filter-category="cat2">cat2</span>
  *   <span data-filter-hideable-group-fallback>DEFAULT CONTENT</span>
