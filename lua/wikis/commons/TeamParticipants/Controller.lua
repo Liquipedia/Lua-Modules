@@ -10,10 +10,21 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Operator = Lua.import('Module:Operator')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
+
+local Condition = Lua.import('Module:Condition')
+local BooleanOperator = Condition.BooleanOperator
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
 
 local TeamParticipantsWikiParser = Lua.import('Module:TeamParticipants/Parse/Wiki')
 local TeamParticipantsRepository = Lua.import('Module:TeamParticipants/Repository')
@@ -51,15 +62,23 @@ function TeamParticipantsController.fromTemplate(frame)
 end
 
 --- Imports participants' squad members from the database if requested.
+--- Determines played status
 --- May mutate the input.
 ---@param parsedData {participants: TeamParticipant[], expectedPlayerCount: integer?}
 function TeamParticipantsController.importParticipants(parsedData)
+	local playedData = TeamParticipantsController.playedDataFromMatchData(parsedData.participants)
+
 	Array.forEach(parsedData.participants, function (participant)
 		local players = participant.opponent.players
 		-- Bad structure, this should always exist
 		if not players then
 			return
 		end
+
+		TeamParticipantsController.applyPlayed(
+			players,
+			participant.autoPlayed and playedData[participant.opponent.name] or nil
+		)
 
 		if not Logic.readBool(participant.shouldImportFromDb) then
 			return
@@ -70,7 +89,66 @@ function TeamParticipantsController.importParticipants(parsedData)
 			return
 		end
 
-		TeamParticipantsController.mergeManualAndImportedPlayers(players, importedPlayers)
+		TeamParticipantsController.mergManualAndImportedPlayers(players, importedPlayers)
+	end)
+end
+
+---@param participants TeamParticipant[]
+---@return table<string, {pageName: string, displayName: string, flag: string?}[]>
+function TeamParticipantsController.playedDataFromMatchData(participants)
+	if not Array.any(participants, Operator.property('autoPlayed')) then
+		return {}
+	end
+	local parent = Variables.varDefault('tournament_parent')
+	if not parent then
+		return {}
+	end
+	local playedData = {}
+	Lpdb.executeMassQuery(
+		'match2',
+		{
+			conditions = tostring(ConditionTree(BooleanOperator.all):add{
+				ConditionNode(ColumnName('finished'), Comparator.eq, 1),
+				ConditionNode(ColumnName('parent'), Comparator.eq, parent),
+			}),
+			query = 'match2opponents, match2games'
+		},
+		FnUtil.curry(TeamParticipantsController.getPlayedPlayersFromMatch, playedData)
+	)
+
+	return playedData
+end
+
+---@param playedData table<string, {pageName: string, displayName: string, flag: string?}[]>
+---@param match match2
+function TeamParticipantsController.getPlayedPlayersFromMatch(playedData, match)
+	if Array.any(match.match2opponents, function(opponent) return opponent.type ~= Opponent.team end) then
+		return
+	end
+
+	-- todo: implement logic for finding players that played
+
+end
+
+---@param players standardPlayer[]
+---@param playedData {pageName: string, displayName: string, flag: string?}[]?
+function TeamParticipantsController.applyPlayed(players, playedData)
+	local autoHasPlayed = function(pageName)
+		if Logic.isEmpty(playedData) then
+			return nil
+		end
+		---@cast playedData -nil
+		return Array.any(playedData, function(referencePlayer)
+			return referencePlayer.pageName == pageName
+		end)
+	end
+
+	Array.forEach(players, function(player)
+		player.extradata.played = Logic.nilOr(
+			player.extradata.played,
+			autoHasPlayed(player.pageName),
+			player.extradata.type ~= 'sub' and player.extradata.type ~= 'staff'
+		)
 	end)
 end
 
