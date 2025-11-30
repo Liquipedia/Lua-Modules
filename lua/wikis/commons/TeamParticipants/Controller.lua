@@ -77,7 +77,7 @@ function TeamParticipantsController.importParticipants(parsedData)
 
 		TeamParticipantsController.applyPlayed(
 			players,
-			participant.autoPlayed and playedData[participant.opponent.name] or nil
+			participant.autoPlayed and playedData[participant.opponent.template] or nil
 		)
 
 		if not Logic.readBool(participant.shouldImportFromDb) then
@@ -110,7 +110,7 @@ function TeamParticipantsController.playedDataFromMatchData(participants)
 			}),
 			query = 'match2opponents, match2games'
 		},
-		FnUtil.curry(FnUtil.curry(TeamParticipantsController.getPlayedPlayersFromMatch, participants), playedData)
+		FnUtil.curry(FnUtil.curry(TeamParticipantsController.getPlayedPlayersFromMatch, playedData), participants)
 	)
 
 	return Table.map(playedData, function(opponentName, playedPlayers)
@@ -129,22 +129,27 @@ function TeamParticipantsController.getPlayedPlayersFromMatch(playedData, partic
 
 	---@param template string
 	---@return string?
-	local determineTeamName = function(template)
+	local determineParticipantTemplate = function(template)
 		local participant = Array.find(participants, function(participant)
 			return Array.any(participant.aliases, function(alias)
 				return alias == template
 			end)
 		end)
 		if not participant then return end
-		return participant.opponent.name
+		return participant.opponent.template
 	end
 
 	---@type table<integer, string>
-	local opponentNames = {}
+	local opponentTemplates = {}
 	-- can not us Array.map since we might have opponents in match data that do not have a participant entry
 	Array.forEach(match.match2opponents, function(opponent, opponentIndex)
-		opponentNames[opponentIndex] = determineTeamName(opponent.template)
+		opponentTemplates[opponentIndex] = determineParticipantTemplate(opponent.template)
 	end)
+
+	-- match not relevant for any of the participants
+	if Logic.isEmpty(opponentTemplates) then
+		return
+	end
 
 	Array.forEach(match.match2games, function(game)
 		local gameOpponents = game.opponents
@@ -153,20 +158,21 @@ function TeamParticipantsController.getPlayedPlayersFromMatch(playedData, partic
 		end
 		Array.forEach(gameOpponents, function(opp, opponentIndex)
 			local matchOpponent = match.match2opponents[opponentIndex]
-			if not matchOpponent then return end
-			local opponentName = opponentNames[opponentIndex]
+			local opponentTemplate = opponentTemplates[opponentIndex]
+			if not matchOpponent or not opponentTemplate then return end
 
 			-- opp.players may have gaps, hence can not use Array.forEach
 			Table.iter.forEachPair(opp.players or {}, function(playerIndex, player)
-				local matchPlayer = matchOpponent.players[playerIndex]
+				local matchPlayer = matchOpponent.match2players[playerIndex]
 				if Logic.isEmpty(player) or Logic.isEmpty(matchPlayer) then
 					return
 				end
+				playedData[opponentTemplate] = playedData[opponentTemplate] or {}
 				local matchPlayerName = matchPlayer.name
-				if playedData[opponentName][matchPlayerName] then
+				if playedData[opponentTemplate][matchPlayerName] then
 					return
 				end
-				playedData[opponentName][matchPlayerName] = {
+				playedData[opponentTemplate][matchPlayerName] = {
 					pageName = matchPlayerName,
 					displayName = matchPlayer.displayname,
 					flag = matchPlayer.flag,
