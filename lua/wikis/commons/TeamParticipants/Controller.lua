@@ -94,7 +94,7 @@ function TeamParticipantsController.importParticipants(parsedData)
 end
 
 ---@param participants TeamParticipant[]
----@return table<string, {pageName: string, displayName: string, flag: string?}[]>
+---@return table<string, {pageName: string, displayName: string, flag: string?, faction: string?}[]>
 function TeamParticipantsController.playedDataFromMatchData(participants)
 	if not Array.any(participants, Operator.property('autoPlayed')) then
 		return {}
@@ -113,21 +113,71 @@ function TeamParticipantsController.playedDataFromMatchData(participants)
 			}),
 			query = 'match2opponents, match2games'
 		},
-		FnUtil.curry(TeamParticipantsController.getPlayedPlayersFromMatch, playedData)
+		FnUtil.curry(FnUtil.curry(TeamParticipantsController.getPlayedPlayersFromMatch, participants), playedData)
 	)
 
-	return playedData
+	return Table.map(playedData, function(opponentName, playedPlayers)
+		return opponentName, Array.extractValues(playedPlayers)
+	end)
 end
 
----@param playedData table<string, {pageName: string, displayName: string, flag: string?}[]>
+---@param playedData table<string, table<string, {pageName: string, displayName: string, flag: string?, faction: string?}>>
+---@param participants TeamParticipant[]
 ---@param match match2
-function TeamParticipantsController.getPlayedPlayersFromMatch(playedData, match)
+function TeamParticipantsController.getPlayedPlayersFromMatch(playedData, participants, match)
+	-- we only care for team matches
 	if Array.any(match.match2opponents, function(opponent) return opponent.type ~= Opponent.team end) then
 		return
 	end
 
-	-- todo: implement logic for finding players that played
+	---@param template string
+	---@return string?
+	local determineTeamName = function(template)
+		local participant = Array.find(participants, function(participant)
+			return Array.any(participant.aliases, function(alias)
+				return alias == template
+			end)
+		end)
+		if not participant then return end
+		return participant.opponent.name
+	end
 
+	---@type table<integer, string>
+	local opponentNames = {}
+	-- can not us Array.map since we might have opponents in match data that do not have a participant entry
+	Array.forEach(match.match2opponents, function(opponent, opponentIndex)
+		opponentNames[opponentIndex] = determineTeamName(opponent.template)
+	end)
+
+	Array.forEach(match.match2games, function(game)
+		local gameOpponents = game.opponents
+		if type(gameOpponents) ~= 'table' then
+			gameOpponents = Json.parseIfTable(gameOpponents) or {}
+		end
+		Array.forEach(gameOpponents, function(opp, opponentIndex)
+			local matchOpponent = match.match2opponents[opponentIndex]
+			if not matchOpponent then return end
+			local opponentName = opponentNames[opponentIndex]
+
+			-- opp.players may have gaps, hence can not use Array.forEach
+			Table.iter.forEachPair(opp.players or {}, function(playerIndex, player)
+				local matchPlayer = matchOpponent.players[playerIndex]
+				if Logic.isEmpty(player) or Logic.isEmpty(matchPlayer) then
+					return
+				end
+				local matchPlayerName = matchPlayer.name
+				if playedData[opponentName][matchPlayerName] then
+					return
+				end
+				playedData[opponentName][matchPlayerName] = {
+					pageName = matchPlayerName,
+					displayName = matchPlayer.displayname,
+					flag = matchPlayer.flag,
+					faction = (matchPlayer.extradata or {}).faction,
+				}
+			end)
+		end)
+	end)
 end
 
 ---@param players standardPlayer[]
