@@ -211,7 +211,7 @@ liquipedia.filterButtons = {
 			/** @param {HTMLElement} hideableGroup */
 			( hideableGroup ) => ( {
 				element: hideableGroup,
-				hiddenClass: hideableGroup.dataset.filterHiddenClass ?? 'filter-category--hidden-group',
+				hiddenClass: hideableGroup.dataset.filterHiddenClass ?? this.hiddenGroupClass,
 				effectClass: 'filter-effect-' + ( hideableGroup.dataset.filterEffect ?? this.fallbackFilterEffect ),
 				fallbackItem: hideableGroup.querySelector( ':scope > [data-filter-hideable-group-fallback]' ),
 				counter: hideableGroup.dataset.filterCount
