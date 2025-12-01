@@ -60,7 +60,7 @@ return {
 	down = 'fas fa-chevron-circle-down',
 	left = 'fas fa-chevron-circle-left',
 
-	-- Usage: Indicate if a team/player went up or down in placement in a league system or in a ranking system
+	-- Usage: Indicate if a team/ went up or down in placement in a league system or in a ranking system
 	rankup = 'fas fa-long-arrow-up',
 	rankdown = 'fas fa-long-arrow-down',
 
@@ -104,7 +104,7 @@ return {
 	-- Usage: buildtime, duration, cooldown, ...
 	time = 'far fa-clock',
 
-	-- Usage: Player Roles
+	-- Usage:  Roles
 	captain = 'fas fa-crown',
 	substitute = 'fas fa-people-arrows',
 
@@ -206,7 +206,7 @@ return {
 	clipboard = 'fad fa-clipboard-list',
 
 	-- Usage: Main Pages navcards
-	players = 'fas fa-user',
+	player = 'fas fa-user',
 	statistics = 'fad fa-chart-bar',
 	maps = 'fad fa-map',
 
