@@ -25,6 +25,8 @@ Widgets.Links = Lua.import('Module:Widget/Infobox/Links')
 Widgets.Location = Lua.import('Module:Widget/Infobox/Location')
 Widgets.Organizers = Lua.import('Module:Widget/Infobox/Organizers')
 Widgets.Title = Lua.import('Module:Widget/Infobox/Title')
+Widgets.SeriesDisplay = Lua.import('Module:Widget/Infobox/Series/Display')
+Widgets.SeriesIcon = Lua.import('Module:Widget/Infobox/Series/Icon')
 Widgets.Venue = Lua.import('Module:Widget/Infobox/Venue')
 
 --- Table Widgets (div-table) (will be removed)
