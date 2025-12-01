@@ -89,7 +89,7 @@ function TeamParticipantsController.importParticipants(parsedData)
 			return
 		end
 
-		TeamParticipantsController.mergManualAndImportedPlayers(players, importedPlayers)
+		TeamParticipantsController.mergeManualAndImportedPlayers(players, importedPlayers)
 	end)
 end
 
@@ -141,7 +141,7 @@ function TeamParticipantsController.getPlayedPlayersFromMatch(playedData, partic
 
 	---@type table<integer, string>
 	local opponentTemplates = {}
-	-- can not us Array.map since we might have opponents in match data that do not have a participant entry
+	-- cannot use Array.map since we might have opponents in match data that do not have a participant entry
 	Array.forEach(match.match2opponents, function(opponent, opponentIndex)
 		opponentTemplates[opponentIndex] = determineParticipantTemplate(opponent.template)
 	end)
