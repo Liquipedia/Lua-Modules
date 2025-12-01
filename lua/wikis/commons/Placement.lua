@@ -157,7 +157,7 @@ end
 
 ---Takes parent mw html object and childs a placement.
 ---Expected args fields are `parent` and `placement`.
----@param args table?
+---@param args {placement: string|integer?, parent: Html, text: string?}
 function Placement._placement(args)
 	if not (type(args) == 'table' and type(args.parent) == 'table') then
 		return
