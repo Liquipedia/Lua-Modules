@@ -133,7 +133,8 @@ function Placement.raw(placement)
 		raw.display = raw.ordinal[1] .. (raw.ordinal[2] and ('&nbsp;-&nbsp;' .. raw.ordinal[2]) or '')
 	else
 		mw.log('No placement found in Module:Placement: ' .. placement)
-		raw.display = placement .. '[[Category:Pages with unknown placements]]'
+		mw.ext.TeamLiquidIntegration.add_category('Pages with unknown placements')
+		raw.display = placement
 	end
 
 	-- Determine any black text placements
