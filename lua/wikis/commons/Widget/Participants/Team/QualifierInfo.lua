@@ -92,7 +92,7 @@ function ParticipantsTeamQualifierInfo:render()
 	return content
 end
 
----@param placement number?
+---@param placement string|integer?
 ---@return Widget?
 function ParticipantsTeamQualifierInfo:createPlacementBadge(placement)
 	if not placement then
