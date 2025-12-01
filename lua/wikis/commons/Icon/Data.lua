@@ -104,7 +104,7 @@ return {
 	-- Usage: buildtime, duration, cooldown, ...
 	time = 'far fa-clock',
 
-	-- Usage:  Roles
+	-- Usage: Player Roles
 	captain = 'fas fa-crown',
 	substitute = 'fas fa-people-arrows',
 
