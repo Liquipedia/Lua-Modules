@@ -236,7 +236,7 @@ function TournamentPlayerInfo:buildIntro()
 			' ',
 			CopyToClipboard{
 				children = '[Copy URL to clipboard]',
-				copyText = tostring(mw.uri.fullUrl('Special:RunQuery/Tournament player information', {
+				textToCopy = tostring(mw.uri.fullUrl('Special:RunQuery/Tournament player information', {
 					pfRunQueryFormName = 'Tournament player information',
 					['TPI[page]'] = tournament.pageName,
 					wpRunQuery = 'Run query'

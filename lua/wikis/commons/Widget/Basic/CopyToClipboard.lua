@@ -15,7 +15,7 @@ local Span = HtmlWidgets.Span
 
 ---@class CopyToClipboardProps
 ---@field children string|Widget|Html|(string|Widget|Html)[]?
----@field copyText string? text to be copied to clipboard
+---@field textToCopy string? text to be copied to clipboard
 ---@field successText string?
 
 ---@class CopyToClipboardWidget: Widget
@@ -32,7 +32,7 @@ function CopyToClipboard:render()
 		children = {
 			Span{
 				classes = {'copy-this'},
-				children = self.props.copyText,
+				children = self.props.textToCopy,
 			},
 			Span{
 				classes = {'see-this'},
