@@ -70,7 +70,7 @@ end
 ---@return self
 function TournamentPlayerInfo:init(args)
 	self.config = {
-		opponenttype = Logic.emptyOr(args.opponenttype, Opponent.team)
+		opponenttype = Logic.nilIfEmpty(args.opponenttype)
 	}
 
 	local pageName = Logic.emptyOr(args.pagename, args.page)
@@ -91,10 +91,13 @@ end
 function TournamentPlayerInfo:query()
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('pagename'), Comparator.eq, self.tournament.pageName),
-		ConditionNode(ColumnName('opponenttype'), Comparator.eq, self.config.opponenttype),
 		ConditionNode(ColumnName('opponentplayers'), Comparator.neq, ''),
 		ConditionNode(ColumnName('mode'), Comparator.neq, 'award_individual'),
 	}
+
+	if self.config.opponenttype then
+		conditions:add(ConditionNode(ColumnName('opponenttype'), Comparator.eq, self.config.opponenttype))
+	end
 
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = tostring(conditions),
