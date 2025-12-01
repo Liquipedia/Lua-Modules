@@ -258,13 +258,13 @@ local function createTemplateBox(props)
 end
 
 ---@private
----@param lengthInSeconds integer?
+---@param ageInSeconds integer?
 ---@return string
-function TournamentPlayerInfo:_formatAge(lengthInSeconds)
-	if not lengthInSeconds then
+function TournamentPlayerInfo:_formatAge(ageInSeconds)
+	if not ageInSeconds then
 		return '-'
 	end
-	return mw.getContentLanguage():formatDuration(lengthInSeconds, {'years', 'days'})
+	return mw.getContentLanguage():formatDuration(ageInSeconds, {'years', 'days'})
 end
 
 ---@private
