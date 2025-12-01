@@ -195,7 +195,7 @@ describe('Team Participants Qualification Placement', function()
 			local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
 			assert.is_nil(result.qualification.placement)
 			assert.are_equal(1, #result.warnings)
-			assert.matches('Invalid placement: -5$', result.warnings[1])
+			assert.matches('Invalid placement: %-5$', result.warnings[1])
 		end)
 
 		it('generates warning for non-numeric placement', function()
