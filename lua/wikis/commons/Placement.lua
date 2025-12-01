@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
 local Ordinal = Lua.import('Module:Ordinal')
 local Table = Lua.import('Module:Table')
 
@@ -111,16 +112,16 @@ function Placement.raw(placement)
 	-- Identify appropriate background class
 	if PLACEMENT_CLASSES[raw.placement[1]] then
 		raw.backgroundClass = PLACEMENT_CLASSES[raw.placement[1]]
-	elseif Logic.isNumeric(raw.placement[1]) and tonumber(raw.placement[1]) <= 128 then
+	elseif MathUtil.isInteger(raw.placement[1]) and tonumber(raw.placement[1]) <= 128 then
 		raw.backgroundClass = PLACEMENT_CLASSES['17']
-	elseif Logic.isNumeric(raw.placement[1]) then
+	elseif MathUtil.isInteger(raw.placement[1]) then
 		raw.backgroundClass = PLACEMENT_CLASSES['129']
 	else
 		raw.unknown = true
 	end
 
 	-- Intercept non-numeric placements for sorting and ordinal creation
-	if not Logic.isNumeric(raw.placement[1]) then
+	if not MathUtil.isInteger(raw.placement[1]) then
 		raw.sort = CUSTOM_SORTS[raw.placement[1]] or CUSTOM_SORTS['']
 		raw.ordinal = mw.text.split(string.upper(placement or ''), '-', true)
 	else
