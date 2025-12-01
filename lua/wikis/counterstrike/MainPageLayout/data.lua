@@ -11,7 +11,6 @@ local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local LiquipediaApp = Lua.import('Module:Widget/MainPage/LiquipediaApp')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
@@ -157,7 +156,6 @@ return {
 						mobileOrder = 7,
 						content = CONTENT.wantToHelp,
 					},
-					
 				}
 			},
 			{ -- Right
