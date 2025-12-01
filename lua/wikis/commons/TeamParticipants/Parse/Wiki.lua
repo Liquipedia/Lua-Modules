@@ -28,7 +28,7 @@ local TeamParticipantsWikiParser = {}
 ---@alias QualificationType 'tournament'|'external'|'other'
 
 ---@alias QualificationStructure {method: QualificationMethod, type: QualificationType,
----tournament?: StandardTournament, url?: string, text?: string, placement?: number}
+---tournament?: StandardTournament, url?: string, text?: string, placement?: string}
 
 ---@param args table
 ---@return {participants: TeamParticipant[], expectedPlayerCount: integer?}
