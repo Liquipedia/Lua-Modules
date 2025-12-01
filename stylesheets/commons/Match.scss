@@ -353,12 +353,8 @@ $team-icon-size: 22px;
 		}
 
 		.match-info-ffa-info {
-			display: block;
 			width: 100%;
-			text-align: center;
-			font-size: 0.875rem;
-			margin: 0.5rem 0;
-			color: var( --clr-on-background );
+			font-size: 0.6875rem;
 		}
 
 		.match-info-header:not( .match-info-header-vertical ) {

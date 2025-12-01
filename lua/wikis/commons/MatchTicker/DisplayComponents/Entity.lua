@@ -12,7 +12,9 @@ local Class = Lua.import('Module:Class')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local Carousel = Lua.import('Module:Widget/Basic/Carousel')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchCard = Lua.import('Module:Widget/Match/Card')
+local Switch = Lua.import('Module:Widget/Switch')
 
 ---@class EntityMatchTickerMatch
 ---@operator call({config: MatchTickerConfig, match: table}): EntityMatchTickerMatch
@@ -59,12 +61,35 @@ function Container:create()
 		return nil
 	end
 
-	return Carousel{
+	local carousel = Carousel{
 		children = Array.map(self.matches, function(match)
 			return Match{config = self.config, match = match}:create()
 		end),
 		itemMinWidth = '18rem',
 		gap = '0.5rem',
+	}
+
+	return HtmlWidgets.Div{
+		css = {['margin-bottom'] = '1rem'},
+		children = {
+			HtmlWidgets.H2{
+				css = {
+					['font-size'] = '1.5rem',
+					['font-weight'] = 'bold',
+					color = 'var(--clr-primary)',
+					['margin-bottom'] = '1rem',
+				},
+				children = 'Upcoming Matches',
+			},
+			Switch{
+				label = 'Show countdown',
+				switchGroup = 'countdown',
+				storeValue = true,
+				defaultActive = true,
+				css = {margin = '1rem 0', ['justify-content'] = 'center'},
+				content = carousel,
+			},
+		},
 	}
 end
 
