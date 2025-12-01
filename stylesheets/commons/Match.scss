@@ -292,13 +292,9 @@
 		}
 
 		.match-info-stage {
-			display: block;
 			width: 100%;
-			text-align: center;
-			font-size: 0.75rem;
-			font-weight: 600;
+			font-size: 0.6875rem;
 			margin-bottom: 0.5rem;
-			color: var( --clr-on-background );
 		}
 
 		.match-info-header-vertical {
@@ -326,12 +322,8 @@
 		}
 
 		.match-info-opponent-score {
-			font-weight: bold;
-			font-size: 1rem;
-			line-height: 1.25rem;
-			min-width: 2rem;
+			font-size: 0.75rem;
 			text-align: right;
-			color: var( --clr-on-background );
 		}
 
 		.match-info-bestof {

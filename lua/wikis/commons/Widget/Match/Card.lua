@@ -119,8 +119,7 @@ function MatchCard:_renderVertical(match, gameData, highlight)
 						displayGameIcon = self.props.displayGameIcons,
 					}
 				},
-			} or nil,
-			ButtonBar{match = match}
+			} or nil
 		)
 	}
 end
