@@ -112,10 +112,15 @@ function Placement.raw(placement)
 	-- Identify appropriate background class
 	if PLACEMENT_CLASSES[raw.placement[1]] then
 		raw.backgroundClass = PLACEMENT_CLASSES[raw.placement[1]]
-	elseif MathUtil.isInteger(raw.placement[1]) and tonumber(raw.placement[1]) <= 128 then
-		raw.backgroundClass = PLACEMENT_CLASSES['17']
 	elseif MathUtil.isInteger(raw.placement[1]) then
-		raw.backgroundClass = PLACEMENT_CLASSES['129']
+		local parsedPlacement = MathUtil.toInteger(raw.placement[1])
+		if parsedPlacement <= 0 then
+			raw.unknown = true
+		elseif parsedPlacement <= 128 then
+			raw.backgroundClass = PLACEMENT_CLASSES['17']
+		else
+			raw.backgroundClass = PLACEMENT_CLASSES['129']
+		end
 	else
 		raw.unknown = true
 	end
