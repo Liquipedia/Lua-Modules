@@ -102,7 +102,11 @@ function ParticipantsTeamQualifierInfo:createPlacementBadge(placement)
 	local placementData = Placement.raw(placement)
 
 	return Span{
-		classes = {'team-participant-card__qualifier-placement', placementData.backgroundClass},
+		classes = {
+			'team-participant-card__qualifier-placement',
+			'placement-text',
+			placementData.backgroundClass
+		},
 		children = placementData.display
 	}
 end
