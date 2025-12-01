@@ -122,8 +122,10 @@ end
 ---@param participants TeamParticipant[]
 ---@param match match2
 function TeamParticipantsController.getPlayedPlayersFromMatch(playedData, participants, match)
-	-- we only care for team matches
-	if Array.any(match.match2opponents, function(opponent) return opponent.type ~= Opponent.team end) then
+	-- we only care for team matches and want to ignore TBD opponnets
+	if Array.any(match.match2opponents, function(opponent)
+		return opponent.type ~= Opponent.team or opponent.template == 'tbd'
+	end) then
 		return
 	end
 
