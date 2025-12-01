@@ -87,6 +87,11 @@ function TournamentPlayerInfo:isValidTournament()
 	return Logic.isNotEmpty(self.tournament)
 end
 
+---@return boolean
+function TournamentPlayerInfo:tournamentIsFinished()
+	return self.tournament.phase == 'FINISHED'
+end
+
 ---@return self
 function TournamentPlayerInfo:query()
 	local conditions = ConditionTree(BooleanOperator.all):add{
@@ -370,7 +375,7 @@ function TournamentPlayerInfo:buildPlayersTable()
 				},
 				HtmlWidgets.Th{children = 'Born'},
 				HtmlWidgets.Th{children = 'Team'},
-				self.tournament.phase == "FINISHED" and {
+				self:tournamentIsFinished() and {
 					HtmlWidgets.Th{children = 'Current Team'}
 				} or nil,
 				HtmlWidgets.Th{
@@ -430,7 +435,7 @@ function TournamentPlayerInfo:buildPlayerRow(player)
 		HtmlWidgets.Td{
 			children = Logic.isNotEmpty(player.team) and OpponentDisplay.InlineTeamContainer{template = player.team} or nil
 		},
-		self.tournament.phase == "FINISHED" and {
+		self:tournamentIsFinished() and {
 			HtmlWidgets.Td{children = Logic.isNotEmpty(player.currentTeam) and OpponentDisplay.InlineTeamContainer{
 				template = player.currentTeam
 			} or nil}
