@@ -16,6 +16,11 @@
 	&-item {
 		flex: 0 0 auto;
 		scroll-snap-align: start;
+		scroll-margin-left: 5rem;
+
+		&:first-child {
+			scroll-margin-left: 0;
+		}
 	}
 
 	&-button {

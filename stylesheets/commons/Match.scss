@@ -1,3 +1,21 @@
+$team-icon-wrapper-size: 24px;
+$team-icon-size: 22px;
+
+@mixin set-team-icon-size($wrapper-size, $icon-size) {
+	width: $wrapper-size;
+	height: $wrapper-size;
+	line-height: $wrapper-size;
+	text-align: center;
+
+	img {
+		max-width: $icon-size;
+		max-height: $icon-size;
+		width: auto;
+		height: auto;
+		vertical-align: middle;
+	}
+}
+
 .match-info {
 	display: flex;
 	padding: 0.75rem 0;
@@ -288,13 +306,11 @@
 			justify-content: space-between;
 			align-items: center;
 			width: 100%;
-			margin-bottom: 0.5rem;
 		}
 
 		.match-info-stage {
 			width: 100%;
 			font-size: 0.6875rem;
-			margin-bottom: 0.5rem;
 		}
 
 		.match-info-header-vertical {
@@ -319,6 +335,10 @@
 		.match-info-opponent-identity {
 			flex: 1;
 			min-width: 0;
+
+			.team-template-image-icon {
+				@include set-team-icon-size($team-icon-wrapper-size, $team-icon-size);
+			}
 		}
 
 		.match-info-opponent-score {
