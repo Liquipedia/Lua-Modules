@@ -100,7 +100,7 @@ local USE_BLACK_TEXT = {
 
 ---Processes a placement text input into raw data.
 ---Returned table will not always contain every key.
----@param placement string?
+---@param placement string|integer?
 ---@return table
 function Placement.raw(placement)
 	local raw = {}
@@ -145,7 +145,7 @@ end
 
 ---Takes a table of placement numbers and makes them ordinal.
 ---@param placement number[]
----@return table
+---@return table<number, string>
 function Placement._makeOrdinal(placement)
 	return Table.mapValues(placement,
 		function(place)
