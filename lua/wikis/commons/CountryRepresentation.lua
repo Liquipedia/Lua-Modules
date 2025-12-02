@@ -24,6 +24,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local Widgets = Lua.import('Module:Widget/All')
 local Td = Widgets.Td
@@ -75,11 +76,7 @@ end
 function CountryRepresentation:_buildConditions()
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('mode'), Comparator.neq, 'award_individual'),
-		ConditionTree(BooleanOperator.any):add(
-			Array.map(self.config.tournaments, function(page)
-				return ConditionNode(ColumnName('pagename'), Comparator.eq, page)
-			end)
-		),
+		ConditionUtil.anyOf(ColumnName('pagename'), self.config.tournaments)
 	}
 
 	return conditions:toString()
