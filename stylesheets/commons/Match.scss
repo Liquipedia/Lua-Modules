@@ -300,6 +300,10 @@ $team-icon-size: 22px;
 			background-color: var( --clr-secondary-9 );
 		}
 
+		.match-button-cta-text {
+			display: none;
+		}
+
 		.match-info-top-row {
 			display: flex;
 			justify-content: space-between;

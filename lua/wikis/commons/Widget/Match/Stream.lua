@@ -23,7 +23,6 @@ local TLNET_STREAM = 'stream'
 local MatchStream = Class.new(Widget)
 MatchStream.defaultProps = {
 	matchIsLive = true,
-	variant = nil,
 }
 
 ---@return Widget?
@@ -58,10 +57,10 @@ function MatchStream:render()
 		link = link,
 		children = HtmlWidgets.Fragment{children = {
 			Icon{iconName = platform},
-			self.props.variant ~= 'icon' and HtmlWidgets.Span{
+			HtmlWidgets.Span{
 				classes = {'match-button-cta-text'},
 				children = CTA_Text,
-			} or nil,
+			},
 		}},
 		variant = 'tertiary',
 		size = 'sm',
