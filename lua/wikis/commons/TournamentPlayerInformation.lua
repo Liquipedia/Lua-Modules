@@ -397,7 +397,7 @@ function TournamentPlayerInfo:buildPlayerRow(player)
 	---@return string|(string|integer)[]?
 	local function displayBirthDateWithAge()
 		if not self.tournament.startDate then
-			return player.birthDate
+			return (player.birthDate ~= DateExt.defaultDate) and player.birthDate or nil
 		end
 		if not player.birthDate or player.birthDate == DateExt.defaultDate then
 			return
