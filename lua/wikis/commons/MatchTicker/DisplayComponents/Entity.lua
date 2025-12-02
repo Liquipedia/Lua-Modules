@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local I18n = Lua.import('Module:I18n')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local Carousel = Lua.import('Module:Widget/Basic/Carousel')
@@ -74,7 +75,7 @@ function Container:create()
 		children = {
 			HtmlWidgets.H2{
 				css = {border = 'unset'},
-				children = 'Upcoming Matches',
+				children = I18n.translate('matchticker-upcoming-matches'),
 			},
 			Switch{
 				label = 'Show countdown',
