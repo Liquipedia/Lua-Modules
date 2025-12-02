@@ -166,7 +166,7 @@ return {
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[extradata_type::Hero Troop]]', 
+				conditions = '[[extradata_type::Hero Troop]]',
 			},
 		},
 		{
