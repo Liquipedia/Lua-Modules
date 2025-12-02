@@ -172,7 +172,7 @@ function CountryRepresentation:create()
 	}
 
 	return DataTable{
-		classes = {'sortable'},
+		sortable = true,
 		children = WidgetUtil.collect(headerRow, rows),
 	}
 end
