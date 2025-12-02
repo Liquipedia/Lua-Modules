@@ -612,7 +612,9 @@ end
 ---@return standardPlayer
 function Opponent.staffFromLpdbStruct(players, staffIndex)
 	local parsed = Opponent._personFromLpdbStruct('c', players, staffIndex)
-	parsed.extradata = {type = 'staff'}
+	if Logic.isNotEmpty(parsed) then
+		parsed.extradata = {type = 'staff'}
+	end
 	return parsed
 end
 
