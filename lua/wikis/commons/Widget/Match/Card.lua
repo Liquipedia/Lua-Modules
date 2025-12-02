@@ -130,7 +130,7 @@ function MatchCard:_renderVerticalTopRow(match)
 	return HtmlWidgets.Div{
 		classes = {'match-info-top-row'},
 		children = WidgetUtil.collect(
-			MatchCountdown{match = match},
+			MatchCountdown{match = match, format = 'compact'},
 			self:_renderStreamButtons(match)
 		)
 	}
