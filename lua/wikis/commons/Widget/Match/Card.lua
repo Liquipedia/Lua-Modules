@@ -147,7 +147,8 @@ function MatchCard:_renderStreamButtons(match)
 
 	if phase == 'upcoming' and match.timestamp then
 		local SHOW_STREAMS_THRESHOLD = 2 * 60 * 60
-		if os.difftime(match.timestamp, DateExt.getCurrentTimestamp()) < SHOW_STREAMS_THRESHOLD then
+		local currentTimestamp = DateExt.getCurrentTimestamp()
+		if currentTimestamp and os.difftime(match.timestamp, currentTimestamp) < SHOW_STREAMS_THRESHOLD then
 			displayStreams = true
 		end
 	end

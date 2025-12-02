@@ -1,5 +1,6 @@
 liquipedia.carousel = {
 	carousels: [],
+	resizeListenerAdded: false,
 
 	init: function() {
 		const carouselElements = document.querySelectorAll( '.carousel' );
@@ -11,13 +12,16 @@ liquipedia.carousel = {
 			liquipedia.carousel.initCarousel( carousel );
 		} );
 
-		let resizeTimeout;
-		window.addEventListener( 'resize', () => {
-			clearTimeout( resizeTimeout );
-			resizeTimeout = setTimeout( () => {
-				liquipedia.carousel.handleResize();
-			}, 150 );
-		} );
+		if ( !liquipedia.carousel.resizeListenerAdded ) {
+			let resizeTimeout;
+			window.addEventListener( 'resize', () => {
+				clearTimeout( resizeTimeout );
+				resizeTimeout = setTimeout( () => {
+					liquipedia.carousel.handleResize();
+				}, 150 );
+			} );
+			liquipedia.carousel.resizeListenerAdded = true;
+		}
 	},
 
 	initCarousel: function( carousel ) {

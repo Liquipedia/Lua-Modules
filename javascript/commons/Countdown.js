@@ -88,8 +88,10 @@ liquipedia.countdown = {
 			// Find countdown nodes live so we don't run into issues with injected timer nodes
 			const timerObjectNodes = container.querySelectorAll( '.timer-object' );
 			timerObjectNodes.forEach( ( timerObjectNode ) => {
-				timerObjectNode.querySelector( '.timer-object-date' ).classList.toggle( this.timerHiddenClass, isCountdownToggled );
-				timerObjectNode.querySelector( '.timer-object-countdown' ).classList.toggle( this.timerHiddenClass, !isCountdownToggled );
+				const dateElement = timerObjectNode.querySelector( '.timer-object-date' );
+				const countdownElement = timerObjectNode.querySelector( '.timer-object-countdown' );
+				dateElement.classList.toggle( this.timerHiddenClass, isCountdownToggled );
+				countdownElement.classList.toggle( this.timerHiddenClass, !isCountdownToggled );
 			} );
 		} );
 	},
@@ -298,17 +300,24 @@ liquipedia.countdown = {
 		[ 'Yekaterinburg Standard Time', 'YEKT' ]
 	] ),
 	getMonthNameFromMonthNumber: function ( newFutureMonth ) {
-		const monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
+		const monthNames = [
+			'January', 'February', 'March', 'April', 'May', 'June',
+			'July', 'August', 'September', 'October', 'November', 'December'
+		];
 		return monthNames[ newFutureMonth ];
 	},
 	getMonthNameShortFromMonthNumber: function ( newFutureMonth ) {
-		const monthNamesShort = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ];
+		const monthNamesShort = [
+			'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+			'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+		];
 		return monthNamesShort[ newFutureMonth ];
 	},
 	getTimeZoneNameLong: function ( dateObject ) {
 		let date;
 		let result;
-		const dateTimeFormat = new Intl.DateTimeFormat( 'en', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, timeZoneName: 'long' } );
+		const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+		const dateTimeFormat = new Intl.DateTimeFormat( 'en', { timeZone: timeZone, timeZoneName: 'long' } );
 		if ( typeof Intl.DateTimeFormat.prototype.formatToParts === 'function' ) {
 			date = dateTimeFormat.formatToParts( dateObject );
 			date.forEach( ( element ) => {
@@ -368,10 +377,16 @@ liquipedia.countdown = {
 				// -24 Hours because of the day before
 				calculatedOffsetHours = -( userTime.utcHours ) + userTime.localHours - 24;
 			}
-		} else if ( ( userTime.localMonth > userTime.utcMonth && userTime.localYear === userTime.utcYear ) || userTime.localYear > userTime.utcYear ) {
+		} else if (
+			( userTime.localMonth > userTime.utcMonth && userTime.localYear === userTime.utcYear ) ||
+			userTime.localYear > userTime.utcYear
+		) {
 			// +24 Hours because of the next day (in next month or year)
 			calculatedOffsetHours = -( userTime.utcHours ) + userTime.localHours + 24;
-		} else if ( ( userTime.localMonth < userTime.utcMonth && userTime.localYear === userTime.utcYear ) || userTime.localYear < userTime.utcYear ) {
+		} else if (
+			( userTime.localMonth < userTime.utcMonth && userTime.localYear === userTime.utcYear ) ||
+			userTime.localYear < userTime.utcYear
+		) {
 			// -24 Hours because of the day before (in previous month or year)
 			calculatedOffsetHours = -( userTime.utcHours ) + userTime.localHours - 24;
 		}
@@ -409,17 +424,23 @@ liquipedia.countdown = {
 		if ( format === 'compact' ) {
 			const currentYear = new Date().getFullYear();
 			const monthName = liquipedia.countdown.getMonthNameShortFromMonthNumber( userTime.dateObjectMonth );
+			const hours = ( '0' + userTime.dateObjectHours ).slice( -2 );
+			const minutes = ( '0' + userTime.dateObjectMinutes ).slice( -2 );
 			if ( currentYear === userTime.dateObjectYear ) {
-				strLocalTime1 = monthName + ' ' + userTime.dateObjectDay + ' - ' + ( '0' + userTime.dateObjectHours ).slice( -2 ) + ':' + ( '0' + userTime.dateObjectMinutes ).slice( -2 );
+				strLocalTime1 = `${ monthName } ${ userTime.dateObjectDay } - ${ hours }:${ minutes }`;
 			} else {
-				strLocalTime1 = monthName + ' ' + userTime.dateObjectDay + ', ' + userTime.dateObjectYear + ' - ' + ( '0' + userTime.dateObjectHours ).slice( -2 ) + ':' + ( '0' + userTime.dateObjectMinutes ).slice( -2 );
+				strLocalTime1 = `${ monthName } ${ userTime.dateObjectDay }, ${ userTime.dateObjectYear } - ${ hours }:${ minutes }`;
 			}
 		} else {
-			strLocalTime1 = ( liquipedia.countdown.getMonthNameFromMonthNumber( userTime.dateObjectMonth ) ) + ' ' + userTime.dateObjectDay + ', ' + userTime.dateObjectYear + ' - ' + ( '0' + userTime.dateObjectHours ).slice( -2 ) + ':' + ( '0' + userTime.dateObjectMinutes ).slice( -2 );
+			const monthName = liquipedia.countdown.getMonthNameFromMonthNumber( userTime.dateObjectMonth );
+			const hours = ( '0' + userTime.dateObjectHours ).slice( -2 );
+			const minutes = ( '0' + userTime.dateObjectMinutes ).slice( -2 );
+			strLocalTime1 = `${ monthName } ${ userTime.dateObjectDay }, ${ userTime.dateObjectYear } - ${ hours }:${ minutes }`;
 		}
 
-		const strLocalTime2 = ' <abbr data-tz="' + offsetHoursWithSign + ':' + ( '0' + calculatedOffsetMinutes ).slice( -2 ) + '"';
-		const strLocalTime3 = ' title="' + finalTimeZoneName + '">' + finalTimeZoneAbbr + '</abbr>';
+		const offsetMinutesStr = ( '0' + calculatedOffsetMinutes ).slice( -2 );
+		const strLocalTime2 = ` <abbr data-tz="${ offsetHoursWithSign }:${ offsetMinutesStr }"`;
+		const strLocalTime3 = ` title="${ finalTimeZoneName }">${ finalTimeZoneAbbr }</abbr>`;
 		const dateObjectString = strLocalTime1 + strLocalTime2 + strLocalTime3;
 		return dateObjectString;
 	}

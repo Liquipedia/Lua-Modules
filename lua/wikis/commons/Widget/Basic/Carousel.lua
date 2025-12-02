@@ -18,6 +18,7 @@ local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
 
 ---@class CarouselWidgetParameters
+---@field children (Widget|string|number)[]
 ---@field itemWidth string?
 ---@field gap string?
 ---@field classes string[]?
@@ -35,6 +36,9 @@ Carousel.defaultProps = {
 
 ---@return Widget
 function Carousel:render()
+	assert(self.props.children, 'Carousel: children is required')
+	assert(type(self.props.children) == 'table', 'Carousel: children must be a table')
+
 	local carouselCss = {
 		gap = self.props.gap,
 	}
