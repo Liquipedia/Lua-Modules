@@ -60,7 +60,7 @@ return {
 	down = 'fas fa-chevron-circle-down',
 	left = 'fas fa-chevron-circle-left',
 
-	-- Usage: Indicate if a team/ went up or down in placement in a league system or in a ranking system
+	-- Usage: Indicate if a team/player went up or down in placement in a league system or in a ranking system
 	rankup = 'fas fa-long-arrow-up',
 	rankdown = 'fas fa-long-arrow-down',
 
