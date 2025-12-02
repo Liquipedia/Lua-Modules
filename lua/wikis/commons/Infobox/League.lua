@@ -326,12 +326,13 @@ function League:_createUpcomingMatches()
 	local result = Logic.tryCatch(
 		function()
 			local matchTicker = MatchTicker{
-				tournaments = {self.pagename},
+				tournament = self.pagename,
 				limit = 5,
 				upcoming = true,
 				ongoing = true,
 				hideTournament = true,
 				entityStyle = true,
+				queryByParent = true,
 			}
 			matchTicker:query()
 			return matchTicker
