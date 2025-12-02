@@ -190,8 +190,8 @@ end
 ---@param numberOfPlayers integer
 ---@return string
 function CountryRepresentation:_ratioDisplay(numberOfPlayers)
-	local percentage = self.count == 0 and 0 or MathUtil.round(100 * numberOfPlayers / self.count, 0)
-	return numberOfPlayers .. ' / ' .. self.count .. ' (' .. percentage .. '%)'
+	local percentage = self.count > 0 and MathUtil.formatPercentage(numberOfPlayers / self.count) or '-'
+	return numberOfPlayers .. ' / ' .. self.count .. ' (' .. percentage .. ')'
 end
 
 return CountryRepresentation
