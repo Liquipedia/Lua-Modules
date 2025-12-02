@@ -45,15 +45,8 @@ $team-icon-size: 22px;
 			font-size: 0.6875rem;
 
 			&.timer-object-countdown-live {
-				.theme--light & {
-					color: #ffffff;
-					background-color: #b81414;
-				}
-
-				.theme--dark & {
-					color: #2e0505;
-					background-color: #f5a3a3;
-				}
+				color: #ffffff;
+				background-color: #b81414;
 			}
 
 			&.timer-object-countdown-completed {

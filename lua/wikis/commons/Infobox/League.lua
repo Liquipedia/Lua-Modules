@@ -323,20 +323,25 @@ function League:_createUpcomingMatches()
 		return nil
 	end
 
-	local success, result = Logic.tryCatch(function()
-		local matchTicker = MatchTicker{
-			tournaments = {self.pagename},
-			limit = 5,
-			upcoming = true,
-			ongoing = true,
-			hideTournament = true,
-			entityStyle = true,
-		}
-		matchTicker:query()
-		return matchTicker
-	end)
+	local result = Logic.tryCatch(
+		function()
+			local matchTicker = MatchTicker{
+				tournaments = {self.pagename},
+				limit = 5,
+				upcoming = true,
+				ongoing = true,
+				hideTournament = true,
+				entityStyle = true,
+			}
+			matchTicker:query()
+			return matchTicker
+		end,
+		function()
+			return nil
+		end
+	)
 
-	if not success or not result or not result.matches or #result.matches == 0 then
+	if not result or not result.matches or #result.matches == 0 then
 		return nil
 	end
 
