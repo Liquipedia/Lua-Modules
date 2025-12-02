@@ -286,19 +286,18 @@ $team-icon-size: 22px;
 	}
 
 	&--vertical {
-		border-radius: 0.5rem;
-		border: 1px solid var( --clr-border );
-		border-bottom: 1px solid var( --clr-border );
-		padding: 0.75rem;
-		min-width: 16rem;
-		max-width: 20rem;
+		border-radius: 0.25rem;
+		border: 1px solid;
+		padding: 0.5rem;
 
 		.theme--light & {
-			background-color: #ffffff;
+			border-color: var( --clr-on-surface-light-primary-8 );
+			background-color: var( --clr-on-surface-light-primary-4 );
 		}
 
 		.theme--dark & {
-			background-color: var( --clr-surface-dark-primary );
+			border-color: var( --clr-on-surface-dark-primary-8 );
+			background-color: var( --clr-secondary-9 );
 		}
 
 		.match-info-top-row {

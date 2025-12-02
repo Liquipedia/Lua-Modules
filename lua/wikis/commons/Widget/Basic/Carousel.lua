@@ -18,7 +18,7 @@ local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
 
 ---@class CarouselWidgetParameters
----@field itemMinWidth string?
+---@field itemWidth string?
 ---@field gap string?
 ---@field classes string[]?
 ---@field css table?
@@ -27,7 +27,7 @@ local Span = HtmlWidgets.Span
 ---@operator call(CarouselWidgetParameters): CarouselWidget
 local Carousel = Class.new(Widget)
 Carousel.defaultProps = {
-	itemMinWidth = '200px',
+	itemWidth = '200px',
 	gap = '0.5rem',
 	classes = {},
 	css = {},
@@ -50,7 +50,7 @@ function Carousel:render()
 			return Div{
 				classes = {'carousel-item'},
 				css = {
-					['min-width'] = self.props.itemMinWidth,
+					['width'] = self.props.itemWidth,
 				},
 				children = {child},
 			}

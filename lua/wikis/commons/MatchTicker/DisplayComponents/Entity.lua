@@ -65,7 +65,7 @@ function Container:create()
 		children = Array.map(self.matches, function(match)
 			return Match{config = self.config, match = match}:create()
 		end),
-		itemMinWidth = '18rem',
+		itemWidth = '12.5rem',
 		gap = '0.5rem',
 	}
 

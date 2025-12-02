@@ -16,7 +16,11 @@
 	&-item {
 		flex: 0 0 auto;
 		scroll-snap-align: start;
-		scroll-margin-left: 5rem;
+		scroll-margin-left: 3rem;
+
+		@media ( min-width: 1024px ) {
+			scroll-margin-left: 5rem;
+		}
 
 		&:first-child {
 			scroll-margin-left: 0;
@@ -30,11 +34,19 @@
 		z-index: 2;
 
 		&--left {
-			left: 1.25rem;
+			left: 0;
+
+			@media ( min-width: 1024px ) {
+				left: 1.25rem;
+			}
 		}
 
 		&--right {
-			right: 1.25rem;
+			right: 0;
+
+			@media ( min-width: 1024px ) {
+				right: 1.25rem;
+			}
 		}
 	}
 
@@ -42,9 +54,13 @@
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		width: 5rem;
+		width: 3rem;
 		z-index: 1;
 		opacity: 1;
+
+		@media ( min-width: 1024px ) {
+			width: 5rem;
+		}
 
 		&--left {
 			left: 0;
