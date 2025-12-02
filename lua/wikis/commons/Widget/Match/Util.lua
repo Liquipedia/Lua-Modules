@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local DateExt = Lua.import('Module:Date/Ext')
 
+---@class MatchUtil
 local MatchUtil = {}
 
 MatchUtil.STREAM_DISPLAY_THRESHOLD_SECONDS = 2 * 60 * 60

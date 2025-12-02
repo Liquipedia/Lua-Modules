@@ -187,7 +187,7 @@ function MatchCard:_renderFfaInfo(match, gameData)
 		}
 	end
 
-	local mapIsSet = gameData and not String.isEmpty(gameData.map)
+	local mapIsSet = not String.isEmpty(gameData.map)
 
 	return HtmlWidgets.Span{
 		classes = {'match-info-ffa-info'},

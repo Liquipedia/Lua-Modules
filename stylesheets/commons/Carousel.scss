@@ -1,6 +1,12 @@
 .carousel {
 	position: relative;
 
+	--carousel-face-width: 3rem;
+
+	@media ( min-width: 1024px ) {
+		--carousel-face-width: 5rem;
+	}
+
 	&-content {
 		display: flex;
 		overflow-x: auto;
@@ -16,11 +22,7 @@
 	&-item {
 		flex: 0 0 auto;
 		scroll-snap-align: start;
-		scroll-margin-left: 3rem;
-
-		@media ( min-width: 1024px ) {
-			scroll-margin-left: 5rem;
-		}
+		scroll-margin-left: var( --carousel-face-width );
 
 		&:first-child {
 			scroll-margin-left: 0;
@@ -54,13 +56,9 @@
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		width: 3rem;
+		width: var( --carousel-face-width );
 		z-index: 1;
 		opacity: 1;
-
-		@media ( min-width: 1024px ) {
-			width: 5rem;
-		}
 
 		&--left {
 			left: 0;
