@@ -573,8 +573,19 @@ function MatchTicker:create(header)
 		return wrapper:css('text-align', 'center'):wikitext('No Results found.')
 	end
 
-	for _, match in ipairs(self.matches or {}) do
-		wrapper:node(MatchTicker.DisplayComponents.Match{config = self.config, match = match}:create())
+	if MatchTicker.DisplayComponents.Container then
+		local container = MatchTicker.DisplayComponents.Container{
+			config = self.config,
+			matches = self.matches
+		}:create()
+
+		if container then
+			wrapper:node(container)
+		end
+	else
+		for _, match in ipairs(self.matches or {}) do
+			wrapper:node(MatchTicker.DisplayComponents.Match{config = self.config, match = match}:create())
+		end
 	end
 
 	return wrapper

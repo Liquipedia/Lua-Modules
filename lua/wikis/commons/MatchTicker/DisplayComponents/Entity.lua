@@ -73,12 +73,7 @@ function Container:create()
 		css = {['margin-bottom'] = '1rem'},
 		children = {
 			HtmlWidgets.H2{
-				css = {
-					['font-size'] = '1.5rem',
-					['font-weight'] = 'bold',
-					color = 'var(--clr-primary)',
-					['margin-bottom'] = '1rem',
-				},
+				css = {border = 'unset'},
 				children = 'Upcoming Matches',
 			},
 			Switch{
@@ -86,7 +81,7 @@ function Container:create()
 				switchGroup = 'countdown',
 				storeValue = true,
 				defaultActive = true,
-				css = {margin = '1rem 0', ['justify-content'] = 'center'},
+				css = {margin = '0.75rem 0 1rem'},
 				content = carousel,
 			},
 		},
