@@ -110,17 +110,7 @@ function MatchCard:_renderVertical(match, gameData, highlight)
 				match = match,
 				variant = 'vertical'
 			} or nil,
-			isFfa and self:_renderFfaInfo(match, gameData) or nil,
-			not self.props.hideTournament and HtmlWidgets.Div{
-				classes = {'match-info-tournament', highlight and HIGHLIGHT_CLASS or nil},
-				children = {
-					TournamentBar{
-						match = match,
-						gameData = gameData,
-						displayGameIcon = self.props.displayGameIcons,
-					}
-				},
-			} or nil
+			isFfa and self:_renderFfaInfo(match, gameData) or nil
 		)
 	}
 end
