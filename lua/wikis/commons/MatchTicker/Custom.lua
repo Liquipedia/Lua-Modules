@@ -18,23 +18,14 @@ local CURRENT_PAGE = mw.title.getCurrentTitle().text
 local CustomMatchTicker = {}
 
 ---Entry point for display on tournament pages
+---@deprecated Upcoming matches are now automatically displayed in the league infobox.
+---Remove this template invocation from the page.
 ---@param frame Frame|table|nil
 ---@return Html
 function CustomMatchTicker.tournament(frame)
-	local args = Arguments.getArgs(frame)
+	Arguments.getArgs(frame)
 
-	--adjusting args
-	args.upcoming = true
-	args.ongoing = true
-	args.recent = false
-	args.tournament = args.tournament or args.tournament1 or args[1] or CURRENT_PAGE
-	args.queryByParent = args.queryByParent or true
-	args.showAllTbdMatches = args.showAllTbdMatches or true
-	args.infoboxWrapperClass = args.infoboxWrapperClass or true
-
-	return MatchTicker(args):query():create(
-		MatchTicker.DisplayComponents.Header('Upcoming Matches')
-	)
+	return mw.html.create()
 end
 
 ---Entry point for display on the main page
