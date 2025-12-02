@@ -131,7 +131,10 @@ function MatchCard:_renderVerticalTopRow(match)
 		classes = {'match-info-top-row'},
 		children = WidgetUtil.collect(
 			MatchCountdown{match = match, format = 'compact'},
-			self:_renderStreamButtons(match)
+			HtmlWidgets.Div{
+				classes = {'match-info-stream-buttons'},
+				children = self:_renderStreamButtons(match)
+			}
 		)
 	}
 end
@@ -159,6 +162,7 @@ function MatchCard:_renderStreamButtons(match)
 		streams = filteredStreams,
 		matchIsLive = phase == 'ongoing',
 		maxStreams = 2,
+		buttonSize = 'xs',
 	}
 end
 

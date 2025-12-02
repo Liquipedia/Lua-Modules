@@ -21,6 +21,7 @@ local MatchStreamsContainer = Class.new(Widget)
 MatchStreamsContainer.defaultProps = {
 	matchIsLive = true,
 	maxStreams = nil,
+	buttonSize = 'sm',
 }
 
 ---@return Widget?
@@ -51,6 +52,7 @@ function MatchStreamsContainer:render()
 			stream = stream.stream,
 			matchIsLive = self.props.matchIsLive,
 			grow = self.props.growButtons,
+			buttonSize = self.props.buttonSize,
 		}
 	end)
 end

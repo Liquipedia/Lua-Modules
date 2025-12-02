@@ -309,6 +309,11 @@ $team-icon-size: 22px;
 			justify-content: space-between;
 			align-items: center;
 			width: 100%;
+
+			.match-info-stream-buttons {
+				display: flex;
+				gap: 0.25rem;
+			}
 		}
 
 		.match-info-stage {
