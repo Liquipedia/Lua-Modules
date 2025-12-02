@@ -20,15 +20,16 @@ local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
 local TournamentBar = Lua.import('Module:Widget/Match/TournamentBar')
 local ButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
 local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
+local MatchUtil = Lua.import('Module:Widget/Match/Util')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local StreamLinks = Lua.import('Module:Links/Stream')
-local DateExt = Lua.import('Module:Date/Ext')
 local String = Lua.import('Module:StringUtils')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
+local MAX_VERTICAL_CARD_STREAMS = 2
 
 ---@class MatchCardProps
 ---@field match MatchGroupUtilMatch
@@ -142,27 +143,17 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return Widget?
 function MatchCard:_renderStreamButtons(match)
-	local phase = MatchGroupUtil.computeMatchPhase(match)
-	local displayStreams = phase == 'ongoing'
-
-	if phase == 'upcoming' and match.timestamp then
-		local SHOW_STREAMS_THRESHOLD = 2 * 60 * 60
-		local currentTimestamp = DateExt.getCurrentTimestamp()
-		if currentTimestamp and os.difftime(match.timestamp, currentTimestamp) < SHOW_STREAMS_THRESHOLD then
-			displayStreams = true
-		end
-	end
-
-	if not displayStreams then
+	if not MatchUtil.shouldShowStreams(match) then
 		return nil
 	end
 
 	local filteredStreams = StreamLinks.filterStreams(match.stream)
+	local phase = MatchGroupUtil.computeMatchPhase(match)
 
 	return StreamsContainer{
 		streams = filteredStreams,
 		matchIsLive = phase == 'ongoing',
-		maxStreams = 2,
+		maxStreams = MAX_VERTICAL_CARD_STREAMS,
 		buttonSize = 'xs',
 	}
 end
