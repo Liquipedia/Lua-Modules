@@ -118,9 +118,10 @@ liquipedia.carousel = {
 		const clientWidth = content.clientWidth;
 		const maxScroll = scrollWidth - clientWidth;
 
-		// Tolerance of 10px allows for minor browser rounding differences
-		const atStart = scrollLeft <= 10;
-		const atEnd = scrollLeft >= maxScroll - 10;
+		// Tolerance allows for minor browser rounding differences
+		const SCROLL_TOLERANCE_PX = 10;
+		const atStart = scrollLeft <= SCROLL_TOLERANCE_PX;
+		const atEnd = scrollLeft >= maxScroll - SCROLL_TOLERANCE_PX;
 
 		if ( carouselData.leftButton ) {
 			carouselData.leftButton.style.display = atStart ? 'none' : '';

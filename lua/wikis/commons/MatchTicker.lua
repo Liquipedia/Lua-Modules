@@ -68,9 +68,10 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@param matchTickerConfig MatchTickerConfig
 ---@return unknown # Todo: Add interface for MatchTickerDisplay
 local MatchTickerDisplayFactory = function (matchTickerConfig)
-	if matchTickerConfig.entityStyle and matchTickerConfig.newStyle then
-		error("Invalid MatchTicker configuration: 'entityStyle' and 'newStyle' cannot both be true")
-	end
+	assert(not (matchTickerConfig.entityStyle and matchTickerConfig.newStyle),
+		"Invalid MatchTicker configuration: 'entityStyle' and 'newStyle' are mutually exclusive. " ..
+		"Choose one display mode: use 'entityStyle' for carousel-based entity display, " ..
+		"'newStyle' for new-style match cards, or neither for legacy display.")
 
 	if matchTickerConfig.entityStyle then
 		return Lua.import('Module:MatchTicker/DisplayComponents/Entity')
