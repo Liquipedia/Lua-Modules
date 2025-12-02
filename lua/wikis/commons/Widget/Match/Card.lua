@@ -158,6 +158,7 @@ function MatchCard:_renderStreamButtons(match)
 	return StreamsContainer{
 		streams = filteredStreams,
 		matchIsLive = phase == 'ongoing',
+		maxStreams = 2,
 	}
 end
 
