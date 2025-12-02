@@ -70,6 +70,7 @@ function CountryRepresentation:init(args)
 	return self
 end
 
+---@private
 ---@return string
 function CountryRepresentation:_buildConditions()
 	local conditions = ConditionTree(BooleanOperator.all):add{
@@ -176,6 +177,7 @@ function CountryRepresentation:create()
 	}
 end
 
+---@private
 ---@param byCountry table<string, standardPlayer[]>
 ---@param country1 string
 ---@param country2 string
@@ -187,6 +189,7 @@ function CountryRepresentation._sortCountries(byCountry, country1, country2)
 	return country1 < country2
 end
 
+---@private
 ---@param numberOfPlayers integer
 ---@return string
 function CountryRepresentation:_ratioDisplay(numberOfPlayers)
