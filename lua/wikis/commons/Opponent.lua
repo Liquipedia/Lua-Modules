@@ -604,7 +604,25 @@ end
 ---@param playerIndex integer
 ---@return standardPlayer
 function Opponent.playerFromLpdbStruct(players, playerIndex)
-	local prefix = 'p' .. playerIndex
+	return Opponent._personFromLpdbStruct('p', players, playerIndex)
+end
+
+---@param players table
+---@param staffIndex integer
+---@return standardPlayer
+function Opponent.staffFromLpdbStruct(players, staffIndex)
+	local parsed = Opponent._personFromLpdbStruct('c', players, staffIndex)
+	parsed.extradata = {type = 'staff'}
+	return parsed
+end
+
+---@private
+---@param roleIndicator 'p'|'c'
+---@param players table
+---@param playerIndex integer
+---@return standardPlayer
+function Opponent._personFromLpdbStruct(roleIndicator, players, playerIndex)
+	local prefix = roleIndicator .. playerIndex
 	return {
 		displayName = players[prefix .. 'dn'],
 		flag = String.nilIfEmpty(Flags.CountryName{flag = players[prefix .. 'flag']}),
