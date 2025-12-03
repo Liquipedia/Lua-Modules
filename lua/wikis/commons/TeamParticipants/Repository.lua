@@ -81,12 +81,12 @@ function TeamParticipantsRepository.save(participant)
 		lpdbData.extradata.potentialQualifiers = serializedQualifiers
 	end
 
-	-- Remove players that did not play
+	-- Remove players that should not be counted for results
 	local activeOpponent = Table.deepCopy(participant.opponent)
 	activeOpponent.players = Array.filter(activeOpponent.players or {}, function(player)
-		return player.extradata.played
+		return player.extradata.results
 	end)
-	-- Add full opponent data for played opponents
+	-- Add full opponent data for players with results with this team
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(activeOpponent, { setPlayersInTeam = true }))
 	-- Legacy participant fields
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLegacyParticipantData(activeOpponent))
