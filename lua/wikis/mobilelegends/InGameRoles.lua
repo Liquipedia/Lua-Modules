@@ -8,11 +8,11 @@
 ---@type table<string, RoleBaseData>
 local inGameRoles = {
 	['igl'] = {category = 'In-game leaders', display = 'In-game Leader'},
-	['exp'] = {category = 'EXP Laner', display = 'EXP Laner'},
-	['gold'] = {category = 'Gold Laner', display = 'Gold Laner'},
-	['mid'] = {category = 'Mid Laner', display = 'Mid Laner'},
-	['jungler'] = {category = 'Jungler', display = 'Jungler'},
-	['roamer'] = {category = 'Roamer', display = 'Roamer'},
+	['exp'] = {category = 'EXP Laner', display = 'EXP Laner', sortOrder = 1},
+	['gold'] = {category = 'Gold Laner', display = 'Gold Laner', sortOrder = 4},
+	['mid'] = {category = 'Mid Laner', display = 'Mid Laner', sortOrder = 3},
+	['jungler'] = {category = 'Jungler', display = 'Jungler', sortOrder = 2},
+	['roamer'] = {category = 'Roamer', display = 'Roamer', sortOrder = 5},
 }
 
 inGameRoles['jgl'] = inGameRoles.jungler
