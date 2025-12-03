@@ -171,7 +171,7 @@ function BaseResultsTable:create()
 end
 
 ---Fetches data from Lpdb
----@return table[]
+---@return placement[]
 function BaseResultsTable:queryData()
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = self.config.limit,
