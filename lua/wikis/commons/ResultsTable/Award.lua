@@ -17,6 +17,8 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 local BaseResultsTable = Lua.import('Module:ResultsTable/Base')
 
+---@class AwardsTable: BaseResultsTable
+---@operator call(table): AwardsTable
 local AwardsTable = Class.new(BaseResultsTable)
 
 ---Builds the Header of the award table
