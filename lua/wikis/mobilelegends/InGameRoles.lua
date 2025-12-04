@@ -12,6 +12,7 @@ local inGameRoles = {
 	['mid'] = {category = 'Mid Laner', display = 'Mid Laner', sortOrder = 3},
 	['jungler'] = {category = 'Jungler', display = 'Jungler', sortOrder = 2},
 	['roamer'] = {category = 'Roamer', display = 'Roamer', sortOrder = 5},
+	['flex'] = {category = 'Flex', display = 'Flex', sortOrder = 6},
 }
 
 inGameRoles['jgl'] = inGameRoles.jungler
