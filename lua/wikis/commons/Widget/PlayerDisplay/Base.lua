@@ -52,7 +52,7 @@ function BasePlayerDisplayWidget:render()
 	error('BasePlayerDisplayWidget:render() cannot be called directly and must be overridden.')
 end
 
----@orotected
+---@protected
 ---@return string?
 function BasePlayerDisplayWidget:getFlag()
 	if not Logic.nilOr(Logic.readBoolOrNil(self.props.showFlag), true) then
@@ -65,7 +65,7 @@ function BasePlayerDisplayWidget:getFlag()
 	return Flags.Icon{flag = flag, shouldLink = false}
 end
 
----@orotected
+---@protected
 ---@return string?
 function BasePlayerDisplayWidget:getFaction()
 	if not Logic.nilOr(Logic.readBoolOrNil(self.props.showFaction), true) then
@@ -78,7 +78,7 @@ function BasePlayerDisplayWidget:getFaction()
 	return Faction.Icon{size = 'small', showLink = false, faction = self.player.faction, game = self.props.game}
 end
 
----@orotected
+---@protected
 ---@return string|Widget?
 function BasePlayerDisplayWidget:getName()
 	local player = self.player
