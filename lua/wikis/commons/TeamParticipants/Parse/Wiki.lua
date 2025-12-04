@@ -195,11 +195,18 @@ end
 function TeamParticipantsWikiParser.parsePlayer(playerInput)
 	local player = Opponent.readSinglePlayerArgs(playerInput)
 	local playedInput = Logic.readBoolOrNil(playerInput.played)
+	local roles = RoleUtil.readRoleArgs(playerInput.role)
+	local type = playerInput.type or 'player'
+
+	if type ~= 'staff' and not Array.all(roles, function(role) return role.type ~= RoleUtil.ROLE_TYPE.STAFF end) then
+		type = 'staff'
+	end
+
 	player.extradata = {
-		roles = RoleUtil.readRoleArgs(playerInput.role),
+		roles = roles,
 		trophies = tonumber(playerInput.trophies),
-		type = playerInput.type or 'player',
-		played = Logic.nilOr(playedInput, playerInput.type ~= 'sub' and playerInput.type ~= 'staff' ),
+		type = type,
+		played = Logic.nilOr(playedInput, type ~= 'sub' and type ~= 'staff'),
 	}
 	return player
 end

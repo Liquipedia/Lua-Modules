@@ -142,6 +142,7 @@ function ParticipantsTeamRoster:render()
 		return {
 			order = tabData.order,
 			title = tabData.title,
+			type = tabTypeEnum,
 			players = tabPlayers,
 		}
 	end)
@@ -149,6 +150,10 @@ function ParticipantsTeamRoster:render()
 	tabs = Array.filter(tabs, function(tab)
 		return #tab.players > 0
 	end)
+	if #tabs == 2 and tabs[1].type == TAB_ENUM.MAIN and tabs[2].type == TAB_ENUM.SUB and #tabs[2].players == 1 then
+		-- If we only have main and staff, and exact one staff, just show both rosters without a switch
+		return makeRostersDisplay(Array.concat(tabs[1].players, tabs[2].players))
+	end
 	tabs = Array.sortBy(tabs, Operator.property('order'))
 
 	local switchGroupUniqueId = tonumber(Variables.varDefault('teamParticipantRostersSwitchGroupId')) or 0
