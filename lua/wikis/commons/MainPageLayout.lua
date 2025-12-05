@@ -37,11 +37,12 @@ function MainPageLayout.make(frame)
 	local args = Arguments.getArgs(frame)
 	local layout = WikiData.layouts[args.layout] or WikiData.layouts.main
 
+	mw.ext.SearchEngineOptimization.metadesc(WikiData.metadesc)
+
 	return HtmlWidgets.Div{
 		classes = {'mainpage-v2'},
 		children = {
 			NO_TABLE_OF_CONTENTS,
-			mw.ext.SearchEngineOptimization.metadesc(WikiData.metadesc),
 			frame:callParserFunction('DISPLAYTITLE', WikiData.title),
 			HtmlWidgets.Div{
 				classes = {'header-banner'},
