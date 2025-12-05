@@ -319,6 +319,11 @@ $team-icon-size: 22px;
 			font-size: 0.6875rem;
 		}
 
+		.match-info-tournament {
+			display: flex;
+			gap: 0.125rem;
+		}
+
 		.match-info-header-vertical {
 			display: flex;
 			flex-direction: column;

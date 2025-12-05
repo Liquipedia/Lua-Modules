@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
+local Logic = Lua.import('Module:Logic')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
@@ -101,11 +102,25 @@ end
 function MatchCard:_renderVertical(match, gameData, highlight)
 	local isFfa = #match.opponents > 2
 
+	local tournamentLink = TournamentBar{
+		match = match,
+		gameData = gameData,
+	}
+
 	return HtmlWidgets.Div{
 		classes = {'match-info', 'match-info--vertical'},
 		children = WidgetUtil.collect(
 			self:_renderVerticalTopRow(match),
-			self:_renderStageName(match),
+			self.props.hideTournament
+				and self:_renderStageName(match)
+				or HtmlWidgets.Div{
+					classes = {'match-info-tournament'},
+					children = WidgetUtil.collect(
+						tournamentLink,
+						Logic.isNotEmpty(match.bracketData.inheritedHeader) and '-' or nil,
+						self:_renderStageName(match)
+					),
+				},
 			not isFfa and MatchHeader{
 				match = match,
 				variant = 'vertical'

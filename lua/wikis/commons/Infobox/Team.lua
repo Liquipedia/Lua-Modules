@@ -299,12 +299,43 @@ function Team:_createLocation(location)
 			(locationDisplay or '')
 end
 
----@return Html?
+---@return Widget?
 function Team:_createUpcomingMatches()
-	if self:shouldStore(self.args) and Info.config.match2.status > 0 then
-		local frame = {short = true} ---@type Frame
-		return MatchTicker.team(frame)
+	if not self:shouldStore(self.args) then
+		return nil
 	end
+
+	if Info.config.match2.status == 0 then
+		return nil
+	end
+
+	local result = Logic.tryCatch(
+		function()
+			local matchTicker = MatchTicker{
+				team = self.pagename,
+				limit = 5,
+				upcoming = true,
+				ongoing = true,
+				hideTournament = false,
+				entityStyle = true,
+			}
+			matchTicker:query()
+			return matchTicker
+		end,
+		function()
+			return nil
+		end
+	)
+
+	if not result or not result.matches or #result.matches == 0 then
+		return nil
+	end
+
+	local EntityDisplay = Lua.import('Module:MatchTicker/DisplayComponents/Entity')
+	return EntityDisplay.Container{
+		config = result.config,
+		matches = result.matches,
+	}:create()
 end
 
 ---@param location string?
