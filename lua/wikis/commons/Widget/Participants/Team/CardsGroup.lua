@@ -19,8 +19,12 @@ local Div = HtmlWidgets.Div
 local ParticipantsTeamCard = Lua.import('Module:Widget/Participants/Team/Card')
 local Switch = Lua.import('Module:Widget/Switch')
 
+---@class ParticipantsTeamCardsGroupProps
+---@field participants TeamParticipant[]?
+
 ---@class ParticipantsTeamCardsGroup: Widget
----@operator call(table): ParticipantsTeamCardsGroup
+---@operator call(ParticipantsTeamCardsGroupProps): ParticipantsTeamCardsGroup
+---@field props ParticipantsTeamCardsGroupProps
 local ParticipantsTeamCardsGroup = Class.new(Widget)
 
 ---@return Widget?
