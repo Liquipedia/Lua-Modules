@@ -41,7 +41,7 @@ function Carousel:render()
 	assert(self.props.children, 'Carousel: children is required')
 	assert(Array.isArray(self.props.children), 'Carousel: children must be an array')
 
-	local carouselCss = Table.megeInto({
+	local carouselCss = Table.mergeInto({
 		gap = self.props.gap,
 	}, self.props.css)
 
