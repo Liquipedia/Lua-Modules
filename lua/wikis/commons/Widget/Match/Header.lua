@@ -24,7 +24,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 ---@class MatchHeaderProps
 ---@field match MatchGroupUtilMatch
 ---@field teamStyle? teamStyle
----@field variant? 'vertical'
+---@field variant 'horizontal' | 'vertical'
 
 ---@class MatchHeader: Widget
 ---@operator call(MatchHeaderProps): MatchHeader
@@ -32,6 +32,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local MatchHeader = Class.new(Widget)
 MatchHeader.defaultProps = {
 	teamStyle = 'short',
+	variant = 'horizontal',
 }
 
 ---@return Widget?
@@ -48,9 +49,9 @@ function MatchHeader:render()
 
 	if self.props.variant == 'vertical' then
 		return self:_renderVertical(match)
-	else
-		return self:_renderHorizontal(match)
 	end
+
+	return self:_renderHorizontal(match)
 end
 
 ---@param match MatchGroupUtilMatch
