@@ -17,15 +17,9 @@ local CURRENT_PAGE = mw.title.getCurrentTitle().text
 
 local CustomMatchTicker = {}
 
----Entry point for display on tournament pages
 ---@deprecated Upcoming matches are now automatically displayed in the league infobox.
 ---Remove this template invocation from the page.
----@param frame Frame|table|nil
----@return Html
-function CustomMatchTicker.tournament(frame)
-	Arguments.getArgs(frame)
-
-	return mw.html.create()
+function CustomMatchTicker.tournament()
 end
 
 ---Entry point for display on the main page

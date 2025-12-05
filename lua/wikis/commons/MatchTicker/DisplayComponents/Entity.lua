@@ -21,7 +21,7 @@ local Switch = Lua.import('Module:Widget/Switch')
 ---@operator call({config: MatchTickerConfig, match: table}): EntityMatchTickerMatch
 ---@field config MatchTickerConfig
 ---@field match table
-local Match = Class.new(
+local MatchCardEntity = Class.new(
 	function(self, args)
 		self.config = args.config
 		self.match = args.match
@@ -29,7 +29,7 @@ local Match = Class.new(
 )
 
 ---@return Widget
-function Match:create()
+function MatchCardEntity:create()
 	return MatchCard{
 		match = MatchGroupUtil.matchFromRecord(self.match),
 		hideTournament = self.config.hideTournament,
@@ -64,7 +64,7 @@ function Container:create()
 
 	local carousel = Carousel{
 		children = Array.map(self.matches, function(match)
-			return Match{config = self.config, match = match}:create()
+			return MatchCardEntity{config = self.config, match = match}:create()
 		end),
 		itemWidth = '12.5rem',
 		gap = '0.5rem',
@@ -90,6 +90,6 @@ function Container:create()
 end
 
 return {
-	Match = Match,
+	Match = MatchCardEntity,
 	Container = Container,
 }

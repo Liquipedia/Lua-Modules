@@ -9,14 +9,14 @@ local Lua = require('Module:Lua')
 
 local DateExt = Lua.import('Module:Date/Ext')
 
----@class MatchUtil
-local MatchUtil = {}
+---@class MatchWidgetUtil
+local MatchWidgetUtil = {}
 
-MatchUtil.STREAM_DISPLAY_THRESHOLD_SECONDS = 2 * 60 * 60
+MatchWidgetUtil.STREAM_DISPLAY_THRESHOLD_SECONDS = 2 * 60 * 60
 
 ---@param match MatchGroupUtilMatch
 ---@return boolean
-function MatchUtil.shouldShowStreams(match)
+function MatchWidgetUtil.shouldShowStreams(match)
 	if match.phase == 'ongoing' then
 		return true
 	end
@@ -26,7 +26,7 @@ function MatchUtil.shouldShowStreams(match)
 		if not currentTimestamp then
 			return false
 		end
-		return os.difftime(match.timestamp, currentTimestamp) < MatchUtil.STREAM_DISPLAY_THRESHOLD_SECONDS
+		return os.difftime(match.timestamp, currentTimestamp) < MatchWidgetUtil.STREAM_DISPLAY_THRESHOLD_SECONDS
 	end
 
 	return false
@@ -34,7 +34,7 @@ end
 
 ---@param match MatchGroupUtilMatch
 ---@return boolean
-function MatchUtil.shouldShowMatchDetails(match)
+function MatchWidgetUtil.shouldShowMatchDetails(match)
 	if match.phase == 'finished' or match.phase == 'ongoing' then
 		return true
 	end
@@ -44,7 +44,7 @@ function MatchUtil.shouldShowMatchDetails(match)
 		if not currentTimestamp then
 			return false
 		end
-		return os.difftime(match.timestamp, currentTimestamp) < MatchUtil.STREAM_DISPLAY_THRESHOLD_SECONDS
+		return os.difftime(match.timestamp, currentTimestamp) < MatchWidgetUtil.STREAM_DISPLAY_THRESHOLD_SECONDS
 	end
 
 	return false
@@ -52,7 +52,7 @@ end
 
 ---@param match MatchGroupUtilMatch
 ---@return boolean
-function MatchUtil.isMatchCloseToStart(match)
+function MatchWidgetUtil.isMatchCloseToStart(match)
 	if match.phase ~= 'upcoming' or not match.timestamp then
 		return false
 	end
@@ -62,7 +62,7 @@ function MatchUtil.isMatchCloseToStart(match)
 		return false
 	end
 
-	return os.difftime(match.timestamp, currentTimestamp) < MatchUtil.STREAM_DISPLAY_THRESHOLD_SECONDS
+	return os.difftime(match.timestamp, currentTimestamp) < MatchWidgetUtil.STREAM_DISPLAY_THRESHOLD_SECONDS
 end
 
-return MatchUtil
+return MatchWidgetUtil

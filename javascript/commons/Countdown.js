@@ -26,7 +26,7 @@ liquipedia.countdown = {
 						dateChild = document.createElement( 'span' );
 						if (
 							mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' ) ||
-						typeof dateObject !== 'object'
+							typeof dateObject !== 'object'
 						) {
 							dateChild.innerHTML = timerObjectNode.innerHTML;
 						} else {
@@ -90,8 +90,12 @@ liquipedia.countdown = {
 			timerObjectNodes.forEach( ( timerObjectNode ) => {
 				const dateElement = timerObjectNode.querySelector( '.timer-object-date' );
 				const countdownElement = timerObjectNode.querySelector( '.timer-object-countdown' );
-				dateElement.classList.toggle( this.timerHiddenClass, isCountdownToggled );
-				countdownElement.classList.toggle( this.timerHiddenClass, !isCountdownToggled );
+				if ( dateElement ) {
+					dateElement.classList.toggle( this.timerHiddenClass, isCountdownToggled );
+				}
+				if ( countdownElement ) {
+					countdownElement.classList.toggle( this.timerHiddenClass, !isCountdownToggled );
+				}
 			} );
 		} );
 	},

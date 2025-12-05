@@ -9,9 +9,10 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Icon = Lua.import('Module:Icon')
+local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
+local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -26,6 +27,7 @@ local Span = HtmlWidgets.Span
 
 ---@class CarouselWidget: Widget
 ---@operator call(CarouselWidgetParameters): CarouselWidget
+---@field props CarouselWidgetParameters
 local Carousel = Class.new(Widget)
 Carousel.defaultProps = {
 	itemWidth = '200px',
@@ -37,15 +39,11 @@ Carousel.defaultProps = {
 ---@return Widget
 function Carousel:render()
 	assert(self.props.children, 'Carousel: children is required')
-	assert(type(self.props.children) == 'table', 'Carousel: children must be a table')
+	assert(Array.isArray(self.props.children), 'Carousel: children must be an array')
 
-	local carouselCss = {
+	local carouselCss = Table.megeInto({
 		gap = self.props.gap,
-	}
-
-	for key, value in pairs(self.props.css) do
-		carouselCss[key] = value
-	end
+	}, self.props.css)
 
 	local carouselContent = Div{
 		classes = {'carousel-content'},
@@ -54,7 +52,7 @@ function Carousel:render()
 			return Div{
 				classes = {'carousel-item'},
 				css = {
-					['width'] = self.props.itemWidth,
+					width = self.props.itemWidth,
 				},
 				children = {child},
 			}
@@ -68,7 +66,7 @@ function Carousel:render()
 		children = {
 			Span{
 				css = {display = 'inline-flex'},
-				children = {Icon.makeIcon{iconName = 'previous', size = 'xs'}}
+				children = {IconWidget{iconName = 'previous', size = 'xs'}}
 			},
 		},
 	}
@@ -80,7 +78,7 @@ function Carousel:render()
 		children = {
 			Span{
 				css = {display = 'inline-flex'},
-				children = {Icon.makeIcon{iconName = 'next', size = 'xs'}}
+				children = {IconWidget{iconName = 'next', size = 'xs'}}
 			},
 		},
 	}

@@ -41,6 +41,7 @@ liquipedia.carousel = {
 			return;
 		}
 
+		// Single item carousels don't need scroll tracking or button handlers
 		if ( items.length === 1 ) {
 			[ ...controls.left, ...controls.right ].forEach( ( element ) => {
 				if ( element ) {

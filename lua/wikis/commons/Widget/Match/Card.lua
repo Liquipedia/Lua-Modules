@@ -37,7 +37,7 @@ local MAX_VERTICAL_CARD_STREAMS = 2
 ---@field onlyHighlightOnValue string?
 ---@field hideTournament boolean?
 ---@field displayGameIcons boolean?
----@field variant 'vertical'?
+---@field variant 'horizontal' | 'vertical'
 
 ---@class MatchCard: Widget
 ---@operator call(MatchCardProps): MatchCard
@@ -47,7 +47,7 @@ MatchCard.defaultProps = {
 	hideTournament = false, -- Hide the tournament and stage
 	displayGameIcons = false, -- Display the game icon in the tournament title
 	onlyHighlightOnValue = nil, -- Only highlight if the publishertier has this value
-	variant = nil,
+	variant = 'horizontal',
 }
 
 ---@return Widget?
@@ -63,9 +63,9 @@ function MatchCard:render()
 
 	if self.props.variant == 'vertical' then
 		return self:_renderVertical(match, gameData, highlight)
-	else
-		return self:_renderHorizontal(match, gameData, highlight)
 	end
+
+	return self:_renderHorizontal(match, gameData, highlight)
 end
 
 ---@param match MatchGroupUtilMatch

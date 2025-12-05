@@ -584,9 +584,9 @@ function MatchTicker:create(header)
 			wrapper:node(container)
 		end
 	else
-		for _, match in ipairs(self.matches or {}) do
-			wrapper:node(MatchTicker.DisplayComponents.Match{config = self.config, match = match}:create())
-		end
+		wrapper:node(Array.map(self.matches or {}, function(match)
+			return MatchTicker.DisplayComponents.Match{config = self.config, match = match}:create()
+		end))
 	end
 
 	return wrapper
