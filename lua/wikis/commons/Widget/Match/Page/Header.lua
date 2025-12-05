@@ -125,7 +125,7 @@ function MatchPageHeader:render()
 		if opponent.type == Opponent.team or opponent.type == Opponent.literal then
 			return TeamDisplay{opponent = opponent}
 		end
-		return PartyDisplay{opponent = opponent, flipped = flip}
+		return PartyDisplay{opponent = opponent, flip = flip}
 	end
 
 	return Div{
