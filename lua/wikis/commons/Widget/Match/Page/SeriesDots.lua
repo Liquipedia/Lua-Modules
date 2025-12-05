@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
@@ -34,11 +35,11 @@ local MatchPageSeriesDots = Class.new(Widget)
 ---@private
 ---@param result string
 ---@return Widget
-function MatchPageSeriesDots._makeGameResultIcon(result)
+MatchPageSeriesDots._makeGameResultIcon = FnUtil.memoize(function (result)
 	return Div{
 		classes = { 'match-bm-match-header-round-result', 'result--' .. RESULT_DISPLAY_TYPES[result:lower()] }
 	}
-end
+end)
 
 ---@return Widget?
 function MatchPageSeriesDots:render()
