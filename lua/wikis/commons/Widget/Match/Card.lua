@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
+local Logic = Lua.import('Module:Logic')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
