@@ -15,43 +15,71 @@ local Widget = Lua.import('Module:Widget')
 
 ---@class DateRangeWidget: Widget
 ---@operator call(table): DateRangeWidget
----@field props {startDate: string|osdateparam?, endDate: string|osdateparam?}
+---@field props {startDate: string|osdateparam?, endDate: string|osdateparam?, showYear: boolean?}
 local DateRange = Class.new(Widget)
 
----@param startDate {day?: integer, month?: integer}?
----@param endDate {day?: integer, month?: integer}?
+---@param startDate {day?: integer, month?: integer, year?: integer}?
+---@param endDate {day?: integer, month?: integer, year?: integer}?
+---@param showYear boolean
 ---@return string
-local function determineTranslateString(startDate, endDate)
-	if not startDate or not startDate.month then
+local function determineTranslateString(startDate, endDate, showYear)
+	if not startDate
+		or (showYear and not startDate.year)
+		or (not showYear and not startDate.month) then
 		return 'date-unknown'
 	end
 
-	if not endDate or not endDate.month then
-		if not startDate.day then
-			return 'date-range-different-months-unknown-days-and-end-month'
+	---@param date {day?: integer, month?: integer, year?: integer}?
+	local determineSingleDateString = function(date)
+		if not date then
+			return 'unknown'
 		end
-		return 'date-range-different-months-unknown-end'
+		if showYear then
+			if not date.year then
+				return 'unknown'
+			end
+			if not date.month then
+				return 'year'
+			end
+			if not date.day then
+				return 'year-month'
+			end
+			return 'year-month-day'
+		else
+			if not date.month then
+				return 'unknown'
+			end
+			if not date.day then
+				return 'month'
+			end
+			return 'month-day'
+		end
 	end
 
-	if not startDate.day and not endDate.day then
+	if not endDate or (showYear and not endDate.year) or (not showYear and not endDate.month) then
+		return 'date-range-' .. determineSingleDateString(startDate) .. '--unknown'
+	end
+
+	if  startDate.year == endDate.year then
 		if startDate.month == endDate.month then
-			return 'date-range-same-month-unknown-days'
+			if startDate.day == endDate.day then
+				return 'date-range-' .. determineSingleDateString(startDate)
+			end
+			return showYear and 'date-range-year-month-day--day'
+				or 'date-range-month-day--day'
 		end
-		return 'date-range-different-months-unknown-days'
-	end
-
-	if not endDate.day then
-		return 'date-range-different-months-unknown-end-day'
-	end
-
-	if startDate.month == endDate.month then
-		if startDate.day == endDate.day then
-			return 'date-range-same-day'
+		if showYear then
+			if not endDate.month then
+				return 'date-range-' .. determineSingleDateString(startDate) .. '--year'
+			end
+			if not endDate.day then
+				return 'date-range-' .. determineSingleDateString(startDate) .. '--month'
+			end
+			return 'date-range-' .. determineSingleDateString(startDate) .. '--month-day'
 		end
-		return 'date-range-same-month'
 	end
 
-	return 'date-range-different-months'
+	return 'date-range-' .. determineSingleDateString(startDate) .. '--' .. determineSingleDateString(endDate)
 end
 
 ---@return string
@@ -78,13 +106,15 @@ function DateRange:render()
 	} or nil
 
 	local dateData = {
+		startYear = calculatingStartDate and os.date('%Y', os.time(calculatingStartDate)) or nil,
 		startMonth = calculatingStartDate and os.date('%b', os.time(calculatingStartDate)) or nil,
 		startDate = calculatingStartDate and os.date('%d', os.time(calculatingStartDate)) or nil,
+		endYear = calculatingEndDate and os.date('%Y', os.time(calculatingEndDate)) or nil,
 		endMonth = calculatingEndDate and os.date('%b', os.time(calculatingEndDate)) or nil,
 		endDate = calculatingEndDate and os.date('%d', os.time(calculatingEndDate)) or nil,
 	}
 
-	return I18n.translate(determineTranslateString(startDate, endDate), dateData)
+	return I18n.translate(determineTranslateString(startDate, endDate, self.props.showYear), dateData)
 end
 
 return DateRange
