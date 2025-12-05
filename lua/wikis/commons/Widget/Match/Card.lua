@@ -105,6 +105,7 @@ function MatchCard:_renderVertical(match, gameData, highlight)
 	local tournamentLink = TournamentBar{
 		match = match,
 		gameData = gameData,
+		displayIcon = false,
 	}
 
 	return HtmlWidgets.Div{

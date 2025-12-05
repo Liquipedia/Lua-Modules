@@ -65,15 +65,8 @@ function CustomMatchTicker.player(frame)
 	return CustomMatchTicker.participant(args)
 end
 
----Entry point for display on team pages
----@param frame Frame|table|nil
----@return Html
-function CustomMatchTicker.team(frame)
-	local args = Arguments.getArgs(frame)
-
-	args.team = args.team or CURRENT_PAGE
-
-	return CustomMatchTicker.participant(args)
+---@deprecated Upcoming matches are now automatically displayed in the team infobox.
+function CustomMatchTicker.team()
 end
 
 ---Entry point for display on any participant-type page
