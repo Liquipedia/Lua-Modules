@@ -12,8 +12,8 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Table = Lua.import('Module:Table')
-local Variables = Lua.import('Module:Variables')
 
 local TeamParticipantsWikiParser = Lua.import('Module:TeamParticipants/Parse/Wiki')
 local TeamParticipantsRepository = Lua.import('Module:TeamParticipants/Repository')
@@ -37,9 +37,7 @@ function TeamParticipantsController.fromTemplate(frame)
 	TeamParticipantsController.importParticipants(parsedData)
 	TeamParticipantsController.fillIncompleteRosters(parsedData)
 
-	local shouldStore =
-		Logic.readBoolOrNil(args.store) ~= false and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+	local shouldStore = Logic.readBoolOrNil(args.store) ~= false and Lpdb.isStorageEnabled()
 
 	if shouldStore then
 		Array.forEach(parsedData.participants, TeamParticipantsRepository.save)
