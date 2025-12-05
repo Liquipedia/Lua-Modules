@@ -1239,6 +1239,9 @@ function mw.ext.TeamTemplate.teampart(teamtemplate, date) end
 mw.ext.SearchEngineOptimization = {}
 
 ---@param desc string
+function mw.ext.SearchEngineOptimization.metadesc(desc) end
+
+---@param desc string
 function mw.ext.SearchEngineOptimization.metadescl(desc) end
 
 ---@param image string
