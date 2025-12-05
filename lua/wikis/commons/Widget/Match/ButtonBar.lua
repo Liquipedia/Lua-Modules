@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local StreamLinks = Lua.import('Module:Links/Stream')
@@ -22,8 +21,7 @@ local VodsDropdownButton = Lua.import('Module:Widget/Match/VodsDropdownButton')
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
 local VodButton = Lua.import('Module:Widget/Match/VodButton')
 local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
-
-local SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE = 2 * 60 * 60 -- 2 hours in seconds
+local MatchUtil = Lua.import('Module:Widget/Match/Util')
 
 ---@class MatchButtonBarProps
 ---@field match MatchGroupUtilMatch
@@ -47,15 +45,9 @@ function MatchButtonBar:render()
 	end
 
 	local displayVods = match.phase == 'finished' and self.props.showVods
-	local displayStreams = match.phase == 'ongoing'
+	local displayStreams = MatchUtil.shouldShowStreams(match)
 
-	-- TODO: This logic is duplicated in PageButton, and should be refactored.
-	-- Show streams also for the last period before going live
-	if match.phase == 'upcoming' and match.timestamp and
-		os.difftime(match.timestamp, DateExt.getCurrentTimestamp()) < SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE then
-
-		displayStreams = true
-	elseif match.phase == 'upcoming' and self.props.variant == 'primary' then
+	if match.phase == 'upcoming' and self.props.variant == 'primary' then
 		displayStreams = true
 	end
 

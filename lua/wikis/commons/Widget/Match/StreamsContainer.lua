@@ -20,6 +20,8 @@ local MatchStream = Lua.import('Module:Widget/Match/Stream')
 local MatchStreamsContainer = Class.new(Widget)
 MatchStreamsContainer.defaultProps = {
 	matchIsLive = true,
+	maxStreams = nil,
+	buttonSize = 'sm',
 }
 
 ---@return Widget?
@@ -40,6 +42,9 @@ function MatchStreamsContainer:render()
 		return nil
 	end
 
+	if self.props.maxStreams and numberOfStreams > self.props.maxStreams then
+		processedStreams = Array.sub(processedStreams, 1, self.props.maxStreams)
+	end
 
 	return Array.map(processedStreams, function(stream)
 		return MatchStream{
@@ -47,6 +52,7 @@ function MatchStreamsContainer:render()
 			stream = stream.stream,
 			matchIsLive = self.props.matchIsLive,
 			grow = self.props.growButtons,
+			buttonSize = self.props.buttonSize,
 		}
 	end)
 end

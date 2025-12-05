@@ -28,6 +28,7 @@ function Infobox:render()
 	local firstInfobox = not Variables.varDefault('has_infobox')
 	Variables.varDefine('has_infobox', 'true')
 
+	local topContent = Div{children = self.props.topContent}
 	local adbox = Div{classes = {'fo-nttax-infobox-adbox'}, children = {mw.getCurrentFrame():preprocess('<adbox />')}}
 	local content = Div{classes = {'fo-nttax-infobox'}, children = self.props.children}
 	local bottomContent = Div{children = self.props.bottomContent}
@@ -39,6 +40,7 @@ function Infobox:render()
 		},
 		children = {
 			Fragment{children = WidgetUtil.collect(
+				topContent,
 				Div{
 					classes = {
 						'fo-nttax-infobox-wrapper',
