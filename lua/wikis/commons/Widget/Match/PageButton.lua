@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local DateExt = Lua.import('Module:Date/Ext')
 local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
 
@@ -17,8 +16,7 @@ local Widget = Lua.import('Module:Widget')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE = 2 * 60 * 60 -- 2 hours in seconds
+local MatchUtil = Lua.import('Module:Widget/Match/Util')
 
 ---@class MatchPageButtonProps
 ---@field match MatchGroupUtilMatch
@@ -44,13 +42,7 @@ function MatchPageButton:render()
 		return nil
 	end
 
-	-- TODO: This logic is duplicated in MatchButtonBar, and should be refactored.
-	local showMatchDetails = match.phase == 'finished' or match.phase == 'ongoing'
-	if match.phase == 'upcoming' and match.timestamp and
-		os.difftime(match.timestamp, DateExt.getCurrentTimestamp()) < SHOW_STREAMS_WHEN_LESS_THAN_TO_LIVE then
-
-		showMatchDetails = true
-	end
+	local showMatchDetails = MatchUtil.shouldShowMatchDetails(match)
 
 	-- Original Match Id must be used to link match page if it exists.
 	-- It can be different from the matchId when shortened brackets are used.
