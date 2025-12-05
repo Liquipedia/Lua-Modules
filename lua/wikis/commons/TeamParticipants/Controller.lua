@@ -47,6 +47,7 @@ function TeamParticipantsController.fromTemplate(frame)
 	end
 	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
 	return TeamParticipantsDisplay{
+		showPlayerInformationButton = Logic.readBool(args.playerinfo),
 		participants = parsedData.participants,
 		mergeStaffTabIfOnlyOneStaff = Logic.nilOr(
 			Logic.readBoolOrNil(args.mergeStaffTabIfOnlyOneStaff), Logic.readBool(Config.mergeStaffTabIfOnlyOneStaff)
