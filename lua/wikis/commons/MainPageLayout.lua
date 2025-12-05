@@ -11,7 +11,6 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Count = Lua.import('Module:Count')
 local Image = Lua.import('Module:Image')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local AnalyticsMapping = Lua.import('Module:MainPageLayout/AnalyticsMapping', {loadData = true})
