@@ -194,7 +194,9 @@ end
 ---@return standardPlayer
 function TeamParticipantsWikiParser.parsePlayer(playerInput)
 	local player = Opponent.readSinglePlayerArgs(playerInput)
+
 	local playedInput = Logic.readBoolOrNil(playerInput.played)
+	local resultsInput = Logic.readBoolOrNil(playerInput.results)
 	local roles = RoleUtil.readRoleArgs(playerInput.role)
 	local playerType = playerInput.type or 'player'
 
@@ -208,7 +210,8 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 		roles = roles,
 		trophies = tonumber(playerInput.trophies),
 		type = playerType,
-		played = Logic.nilOr(playedInput, playerType ~= 'sub' and playerType ~= 'staff'),
+		played = Logic.nilOr(playedInput, true),
+		results = Logic.nilOr(resultsInput, playedInput, true),
 	}
 	return player
 end
