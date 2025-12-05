@@ -147,6 +147,9 @@ end
 
 ---@return self
 function ModelRow:save()
+	if Lpdb.isStorageDisabled() then
+		return self
+	end
 	Array.forEach(self.tableColumns, FnUtil.curry(ModelRow._prepareFieldForStorage, self))
 	local objectName = Table.extract(self.fields, 'objectname')
 	mw.ext.LiquipediaDB['lpdb_' .. self.tableName](objectName, self.fields)
