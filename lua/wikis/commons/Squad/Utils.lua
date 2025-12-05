@@ -188,9 +188,7 @@ end
 
 ---@param squadPerson ModelRow
 function SquadUtils.storeSquadPerson(squadPerson)
-	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
-		squadPerson:save()
-	end
+	squadPerson:save()
 end
 
 ---@param frame table
