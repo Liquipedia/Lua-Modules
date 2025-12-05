@@ -119,12 +119,13 @@ function MatchPageHeader:render()
 	local opponent2 = self.props.opponent2
 
 	---@param opponent standardOpponent
+	---@param flip boolean?
 	---@return Widget
-	local function createOpponentDisplay(opponent)
+	local function createOpponentDisplay(opponent, flip)
 		if opponent.type == Opponent.team or opponent.type == Opponent.literal then
 			return TeamDisplay{opponent = opponent}
 		end
-		return PartyDisplay{opponent = opponent}
+		return PartyDisplay{opponent = opponent, flipped = flip}
 	end
 
 	return Div{
@@ -144,7 +145,7 @@ function MatchPageHeader:render()
 			Div{
 				classes = { 'match-bm-match-header-overview' },
 				children = {
-					createOpponentDisplay(opponent1),
+					createOpponentDisplay(opponent1, true),
 					self:_makeResultDisplay(),
 					createOpponentDisplay(opponent2)
 				}

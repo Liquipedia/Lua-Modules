@@ -19,6 +19,7 @@ local SeriesDots = Lua.import('Module:Widget/Match/Page/SeriesDots')
 
 ---@class MatchPagePartyDisplayParameters
 ---@field opponent MatchPageOpponent
+---@field flip boolean?
 
 ---@class MatchPagePartyDisplay: Widget
 ---@operator call(MatchPagePartyDisplayParameters): MatchPagePartyDisplay
@@ -46,7 +47,7 @@ function MatchPagePartyDisplay:_buildChildren()
 			Div{
 				classes = { 'match-bm-match-header-party-group-container' },
 				children = Array.map(opponent.players, function (player)
-					return PlayerDisplay.InlinePlayer{player = player}
+					return PlayerDisplay.BlockPlayer{player = player, flip = self.props.flip}
 				end)
 			},
 			SeriesDots{seriesDots = opponent.seriesDots},

@@ -163,10 +163,6 @@ span.slash {
 				align-items: flex-end;
 				text-align: end;
 			}
-
-			.inline-player {
-				flex-direction: row-reverse;
-			}
 		}
 	}
 
@@ -181,10 +177,6 @@ span.slash {
 		&-container {
 			display: flex;
 			flex-direction: column;
-
-			.inline-player {
-				display: flex;
-			}
 		}
 	}
 }
