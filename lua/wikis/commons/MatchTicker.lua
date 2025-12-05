@@ -584,9 +584,9 @@ function MatchTicker:create(header)
 			wrapper:node(container)
 		end
 	else
-		wrapper:node(Array.map(self.matches or {}, function(match)
-			return MatchTicker.DisplayComponents.Match{config = self.config, match = match}:create()
-		end))
+		Array.forEach(self.matches or {}, function(match)
+			wrapper:node(MatchTicker.DisplayComponents.Match{config = self.config, match = match}:create())
+		end)
 	end
 
 	return wrapper
