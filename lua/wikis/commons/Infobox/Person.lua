@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local NameOrder = Lua.import('Module:NameOrder')
 local Page = Lua.import('Module:Page')
@@ -418,8 +419,7 @@ end
 ---@param args table
 ---@return boolean
 function Person:shouldStoreData(args)
-	return Namespace.isMain() and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+	return Namespace.isMain() and Lpdb.isStorageEnabled()
 end
 
 --- Allows for overriding this functionality

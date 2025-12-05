@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local Variables = Lua.import('Module:Variables')
 
@@ -35,8 +36,7 @@ local MatchGroupBase = {}
 ---@return string[]
 function MatchGroupBase.readOptions(args, matchGroupType)
 	local currentTitle = mw.title.getCurrentTitle()
-	local store = Logic.nilOr(Logic.readBoolOrNil(args.store),
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage')))
+	local store = Logic.nilOr(Logic.readBoolOrNil(args.store), Lpdb.isStorageEnabled())
 	local show = not Logic.readBool(args.hide)
 	local options = {
 		bracketId = MatchGroupBase.readBracketId(args.id),

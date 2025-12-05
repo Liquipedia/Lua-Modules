@@ -16,7 +16,6 @@ local Logic = Lua.import('Module:Logic')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Variables = Lua.import('Module:Variables')
 
 local Lpdb = Lua.import('Module:Lpdb')
 local Faction = Lua.import('Module:Faction')
@@ -188,9 +187,7 @@ end
 
 ---@param squadPerson ModelRow
 function SquadUtils.storeSquadPerson(squadPerson)
-	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
-		squadPerson:save()
-	end
+	squadPerson:save()
 end
 
 ---@param frame table

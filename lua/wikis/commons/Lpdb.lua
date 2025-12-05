@@ -10,12 +10,26 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local TextSanitizer = Lua.import('Module:TextSanitizer')
+local Variables = Lua.import('Module:Variables')
 
 local Lpdb = {}
 
 local MAXIMUM_QUERY_LIMIT = 5000
+
+---Checks whether LPDB storage is enabled by page variable
+---@return boolean
+function Lpdb.isStorageEnabled()
+	return not Lpdb.isStorageDisabled()
+end
+
+---Checks whether LPDB storage is disabled by page variable
+---@return boolean
+function Lpdb.isStorageDisabled()
+	return Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+end
 
 -- Executes a mass query.
 --[==[
@@ -139,6 +153,9 @@ end
 
 ---@return self
 function ModelRow:save()
+	if Lpdb.isStorageDisabled() then
+		return self
+	end
 	Array.forEach(self.tableColumns, FnUtil.curry(ModelRow._prepareFieldForStorage, self))
 	local objectName = Table.extract(self.fields, 'objectname')
 	mw.ext.LiquipediaDB['lpdb_' .. self.tableName](objectName, self.fields)
