@@ -31,7 +31,7 @@ local TeamService = {}
 ---@field nationality string?
 ---@field role string?
 ---@field type string
----@field status any
+---@field status string
 ---@field joindate string?
 ---@field leavedate string?
 ---@field inactivedate string?
