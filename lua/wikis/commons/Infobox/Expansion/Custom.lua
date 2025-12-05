@@ -15,7 +15,7 @@ local Expansion = Lua.import('Module:Infobox/Expansion')
 local CustomExpansion = Class.new(Expansion)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomExpansion.run(frame)
 	local customExpansion = CustomExpansion(frame)
 	return customExpansion:createInfobox()

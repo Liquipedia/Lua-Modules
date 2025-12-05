@@ -34,7 +34,7 @@ local FINISHED = 'finished'
 local DEFAULT_MODE = '1v1'
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))

@@ -30,17 +30,18 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ShowInfobox: BasicInfobox
+---@operator call(Frame): ShowInfobox
 local Show = Class.new(BasicInfobox)
 
 ---Entry point
 ---@param frame Frame
----@return Html
+---@return Widget
 function Show.run(frame)
 	local show = Show(frame)
 	return show:createInfobox()
 end
 
----@return string
+---@return Widget
 function Show:createInfobox()
 	local args = self.args
 

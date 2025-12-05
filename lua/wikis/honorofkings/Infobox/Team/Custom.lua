@@ -40,7 +40,7 @@ local REGION_REMAPPINGS = {
 local CustomTeam = Class.new(Team)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 

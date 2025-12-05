@@ -26,13 +26,15 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class AgeOfEmpiresUnitInfobox: UnitInfobox
+---@operator call(Frame): AgeOfEmpiresUnitInfobox
 local CustomUnit = Class.new(Unit)
+
 ---@class AgeOfEmpiresUnitInfoboxWidgetInjector: WidgetInjector
 ---@field caller AgeOfEmpiresUnitInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomUnit.run(frame)
 	local unit = CustomUnit(frame)
 	unit:setWidgetInjector(CustomInjector(unit))

@@ -29,16 +29,17 @@ local Breakdown = Widgets.Breakdown
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class UnofficialWorldChampionInfobox: BasicInfobox
+---@operator call(Frame): UnofficialWorldChampionInfobox
 local UnofficialWorldChampion = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function UnofficialWorldChampion.run(frame)
 	local unofficialWorldChampion = UnofficialWorldChampion(frame)
 	return unofficialWorldChampion:createInfobox()
 end
 
----@return string
+---@return Widget
 function UnofficialWorldChampion:createInfobox()
 	local args = self.args
 
