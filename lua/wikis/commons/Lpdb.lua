@@ -19,6 +19,12 @@ local Lpdb = {}
 
 local MAXIMUM_QUERY_LIMIT = 5000
 
+---Checks whether LPDB storage is enabled by page variable
+---@return boolean
+function Lpdb.isStorageEnabled()
+	return not Lpdb.isStorageDisabled()
+end
+
 ---Checks whether LPDB storage is disabled by page variable
 ---@return boolean
 function Lpdb.isStorageDisabled()
