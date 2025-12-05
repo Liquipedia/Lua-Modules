@@ -18,6 +18,8 @@ jobs:
   removedev:
     name: Remove Dev Env
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v5
@@ -34,3 +36,6 @@ jobs:
           INCLUDE_COMMONS: ${{ github.event.inputs.includecommons }}
           INCLUDE_SUB_ENVS: ${{ github.event.inputs.includesubenvs }}
         run: bash scripts/remove_dev.sh
+
+      - name: Delete deployment tags
+        run: bash scripts/delete_deploy_tags.sh "${{ github.event.inputs.luadevenv }}" "${{ github.event.inputs.includesubenvs }}"
