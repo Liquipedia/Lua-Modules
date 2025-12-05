@@ -14,22 +14,25 @@ local MatchWidgetUtil = {}
 
 MatchWidgetUtil.STREAM_DISPLAY_THRESHOLD_SECONDS = 2 * 60 * 60
 
+---@param matchTimestamp number
+---@return boolean
+local function isWithinDisplayThreshold(matchTimestamp)
+	local currentTimestamp = DateExt.getCurrentTimestamp()
+	return os.difftime(matchTimestamp, currentTimestamp) < MatchWidgetUtil.STREAM_DISPLAY_THRESHOLD_SECONDS
+end
+
 ---@param match MatchGroupUtilMatch
 ---@return boolean
 function MatchWidgetUtil.shouldShowStreams(match)
 	if match.phase == 'ongoing' then
 		return true
+	elseif match.phase == 'finished' then
+		return false
+	elseif not match.timestamp then
+		return false
 	end
 
-	if match.phase == 'upcoming' and match.timestamp then
-		local currentTimestamp = DateExt.getCurrentTimestamp()
-		if not currentTimestamp then
-			return false
-		end
-		return os.difftime(match.timestamp, currentTimestamp) < MatchWidgetUtil.STREAM_DISPLAY_THRESHOLD_SECONDS
-	end
-
-	return false
+	return isWithinDisplayThreshold(match.timestamp)
 end
 
 ---@param match MatchGroupUtilMatch
@@ -37,32 +40,23 @@ end
 function MatchWidgetUtil.shouldShowMatchDetails(match)
 	if match.phase == 'finished' or match.phase == 'ongoing' then
 		return true
+	elseif not match.timestamp then
+		return false
 	end
 
-	if match.phase == 'upcoming' and match.timestamp then
-		local currentTimestamp = DateExt.getCurrentTimestamp()
-		if not currentTimestamp then
-			return false
-		end
-		return os.difftime(match.timestamp, currentTimestamp) < MatchWidgetUtil.STREAM_DISPLAY_THRESHOLD_SECONDS
-	end
-
-	return false
+	return isWithinDisplayThreshold(match.timestamp)
 end
 
 ---@param match MatchGroupUtilMatch
 ---@return boolean
 function MatchWidgetUtil.isMatchCloseToStart(match)
-	if match.phase ~= 'upcoming' or not match.timestamp then
+	if match.phase ~= 'upcoming' then
+		return false
+	elseif not match.timestamp then
 		return false
 	end
 
-	local currentTimestamp = DateExt.getCurrentTimestamp()
-	if not currentTimestamp then
-		return false
-	end
-
-	return os.difftime(match.timestamp, currentTimestamp) < MatchWidgetUtil.STREAM_DISPLAY_THRESHOLD_SECONDS
+	return isWithinDisplayThreshold(match.timestamp)
 end
 
 return MatchWidgetUtil
