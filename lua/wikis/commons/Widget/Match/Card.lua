@@ -89,13 +89,13 @@ function MatchCard:_renderVertical(match, gameData, highlight)
 		children = WidgetUtil.collect(
 			self:_renderVerticalTopRow(match),
 			self.props.hideTournament
-				and self:_renderStageName(match)
+				and self:_renderStageName(match, 1)
 				or HtmlWidgets.Div{
 					classes = {'match-info-tournament'},
 					children = WidgetUtil.collect(
 						tournamentLink,
 						Logic.isNotEmpty(match.bracketData.inheritedHeader) and '-' or nil,
-						self:_renderStageName(match)
+						self:_renderStageName(match, 3)
 					),
 				},
 			not isFfa and MatchHeader{
@@ -141,11 +141,13 @@ function MatchCard:_renderStreamButtons(match)
 end
 
 ---@param match MatchGroupUtilMatch
+---@param variantIndex number? 1 for full name (default), 2 for medium, 3 for short
 ---@return Widget?
-function MatchCard:_renderStageName(match)
+function MatchCard:_renderStageName(match, variantIndex)
+	variantIndex = variantIndex or 1
 	local stageName
 	if match.bracketData and match.bracketData.inheritedHeader then
-		stageName = DisplayHelper.expandHeader(match.bracketData.inheritedHeader)[1]
+		stageName = DisplayHelper.expandHeader(match.bracketData.inheritedHeader)[variantIndex]
 	end
 
 	if not stageName then
