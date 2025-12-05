@@ -25,7 +25,6 @@ local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local MainPageLayout = {}
 
 local NO_TABLE_OF_CONTENTS = '__NOTOC__'
-local METADESC = '<metadesc>${metadesc}</metadesc>'
 
 ---@param frame Frame
 ---@return WidgetHtml
@@ -43,7 +42,7 @@ function MainPageLayout.make(frame)
 		classes = {'mainpage-v2'},
 		children = {
 			NO_TABLE_OF_CONTENTS,
-			frame:preprocess(String.interpolate(METADESC, {metadesc = WikiData.metadesc})),
+			mw.ext.SearchEngineOptimization.metadesc(WikiData.metadesc),
 			frame:callParserFunction('DISPLAYTITLE', WikiData.title),
 			HtmlWidgets.Div{
 				classes = {'header-banner'},
