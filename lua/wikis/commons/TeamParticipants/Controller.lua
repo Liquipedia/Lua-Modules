@@ -46,6 +46,7 @@ function TeamParticipantsController.fromTemplate(frame)
 	end
 	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
 	return TeamParticipantsDisplay{
+		showPlayerInformationButton = Logic.readBool(args.playerinfo),
 		participants = parsedData.participants
 	}
 end

@@ -18,9 +18,11 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local ParticipantsTeamCard = Lua.import('Module:Widget/Participants/Team/Card')
 local Switch = Lua.import('Module:Widget/Switch')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ParticipantsTeamCardsGroupProps
 ---@field participants TeamParticipant[]?
+---@field showPlayerInformationButton boolean?
 
 ---@class ParticipantsTeamCardsGroup: Widget
 ---@operator call(ParticipantsTeamCardsGroupProps): ParticipantsTeamCardsGroup
@@ -39,7 +41,7 @@ function ParticipantsTeamCardsGroup:render()
 		children = {
 			Div{
 				classes = { 'team-participant__switches' },
-				children = {
+				children = WidgetUtil.collect(
 					AnalyticsWidget{
 						analyticsName = 'ParticipantsShowRostersSwitch',
 						analyticsProperties = {
@@ -63,7 +65,7 @@ function ParticipantsTeamCardsGroup:render()
 							defaultActive = true,
 						},
 					},
-					Button{
+					self.props.showPlayerInformationButton and Button{
 						linktype = 'external',
 						link = tostring(mw.uri.fullUrl('Special:RunQuery/Tournament player information', {
 							pfRunQueryFormName = 'Tournament player information',
@@ -78,8 +80,8 @@ function ParticipantsTeamCardsGroup:render()
 							'Player',
 							'Info'
 						}, '&nbsp;')
-					}
-				}
+					} or nil
+				)
 			},
 			AnalyticsWidget{
 				analyticsName = 'Team participants card',
