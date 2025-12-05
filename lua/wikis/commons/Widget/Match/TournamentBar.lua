@@ -24,11 +24,15 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 ---@field match MatchGroupUtilMatch?
 ---@field gameData MatchTickerGameData?
 ---@field displayGameIcon boolean?
+---@field displayIcon boolean?
 
 ---@class MatchTournamentBar: Widget
 ---@operator call(MatchTournamentBarProps): MatchTournamentBar
 ---@field props MatchTournamentBarProps
 local MatchTournamentBar = Class.new(Widget)
+MatchTournamentBar.defaultProps = {
+	displayIcon = true,
+}
 
 ---@return Widget[]|nil
 function MatchTournamentBar:render()
@@ -49,13 +53,13 @@ function MatchTournamentBar:render()
 	local mapIsSet = gameData and not String.isEmpty(gameData.map)
 
 	return WidgetUtil.collect(
-		self.props.displayGameIcon and Game.icon{
+		self.props.displayIcon and self.props.displayGameIcon and Game.icon{
 			game = tournament.game,
 			noLink = true,
 			spanClass = 'icon-small',
 			size = '50px',
 		} or nil,
-		HtmlWidgets.Span{
+		self.props.displayIcon and HtmlWidgets.Span{
 			children = {
 				LeagueIcon.display{
 					icon = tournament.icon,
@@ -65,7 +69,7 @@ function MatchTournamentBar:render()
 					options = {noTemplate = true},
 				}
 			}
-		},
+		} or nil,
 		HtmlWidgets.Span{
 			children = {
 				Link{

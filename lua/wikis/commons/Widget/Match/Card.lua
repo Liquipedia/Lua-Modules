@@ -71,4 +71,120 @@ function MatchCard:render()
 	}
 end
 
+---@param match MatchGroupUtilMatch
+---@param gameData MatchTickerGameData?
+---@param highlight boolean
+---@return Widget
+function MatchCard:_renderVertical(match, gameData, highlight)
+	local isFfa = #match.opponents > 2
+
+	local tournamentLink = TournamentBar{
+		match = match,
+		gameData = gameData,
+		displayIcon = false,
+	}
+
+	return HtmlWidgets.Div{
+		classes = {'match-info', 'match-info--vertical'},
+		children = WidgetUtil.collect(
+			self:_renderVerticalTopRow(match),
+			self.props.hideTournament
+				and self:_renderStageName(match)
+				or HtmlWidgets.Div{
+					classes = {'match-info-tournament'},
+					children = WidgetUtil.collect(
+						tournamentLink,
+						Logic.isNotEmpty(match.bracketData.inheritedHeader) and '-' or nil,
+						self:_renderStageName(match)
+					),
+				},
+			not isFfa and MatchHeader{
+				match = match,
+				variant = 'vertical'
+			} or nil,
+			isFfa and self:_renderFfaInfo(match, gameData) or nil
+		)
+	}
+end
+
+---@param match MatchGroupUtilMatch
+---@return Widget
+function MatchCard:_renderVerticalTopRow(match)
+	return HtmlWidgets.Div{
+		classes = {'match-info-top-row'},
+		children = WidgetUtil.collect(
+			MatchCountdown{match = match, format = 'compact'},
+			HtmlWidgets.Div{
+				classes = {'match-info-stream-buttons'},
+				children = self:_renderStreamButtons(match)
+			}
+		)
+	}
+end
+
+---@param match MatchGroupUtilMatch
+---@return Widget?
+function MatchCard:_renderStreamButtons(match)
+	if not MatchUtil.shouldShowStreams(match) then
+		return nil
+	end
+
+	local filteredStreams = StreamLinks.filterStreams(match.stream)
+	local phase = MatchGroupUtil.computeMatchPhase(match)
+
+	return StreamsContainer{
+		streams = filteredStreams,
+		matchIsLive = phase == 'ongoing',
+		maxStreams = MAX_VERTICAL_CARD_STREAMS,
+		buttonSize = 'xs',
+	}
+end
+
+---@param match MatchGroupUtilMatch
+---@return Widget?
+function MatchCard:_renderStageName(match)
+	local stageName
+	if match.bracketData and match.bracketData.inheritedHeader then
+		stageName = DisplayHelper.expandHeader(match.bracketData.inheritedHeader)[1]
+	end
+
+	if not stageName then
+		return nil
+	end
+
+	return HtmlWidgets.Span{
+		classes = {'match-info-stage'},
+		children = stageName
+	}
+end
+
+---@param match MatchGroupUtilMatch
+---@param gameData MatchTickerGameData?
+---@return Widget
+function MatchCard:_renderFfaInfo(match, gameData)
+	if not gameData or not gameData.gameIds then
+		return HtmlWidgets.Span{
+			classes = {'match-info-ffa-info'},
+			children = 'FFA Match'
+		}
+	end
+
+	local mapIsSet = not String.isEmpty(gameData.map)
+
+	return HtmlWidgets.Span{
+		classes = {'match-info-ffa-info'},
+		children = WidgetUtil.collect(
+			'Game #',
+			Array.interleave(gameData.gameIds, '-'),
+			mapIsSet and {
+				' on ',
+				Link{
+					link = gameData.map,
+					children = gameData.mapDisplayName
+				}
+			} or nil
+		)
+	}
+end
+
 return MatchCard

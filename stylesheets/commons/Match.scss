@@ -304,8 +304,12 @@
 		}
 
 		.match-info-tournament {
-			display: flex;
 			gap: 0.125rem;
+			padding: 0;
+			border-radius: 0;
+			font-size: 0.6875rem;
+			line-height: 1;
+			background-color: unset;
 		}
 
 		.match-info-header-vertical {
