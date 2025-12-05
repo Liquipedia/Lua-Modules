@@ -12,6 +12,7 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local Placement = Lua.import('Module:Placement')
 local RoleUtil = Lua.import('Module:Role/Util')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
@@ -27,7 +28,7 @@ local TeamParticipantsWikiParser = {}
 ---@alias QualificationType 'tournament'|'external'|'other'
 
 ---@alias QualificationStructure {method: QualificationMethod, type: QualificationType,
----tournament?: StandardTournament, url?: string, text?: string, placement?: number}
+---tournament?: StandardTournament, url?: string, text?: string, placement?: string}
 
 ---@param args table
 ---@return {participants: TeamParticipant[], expectedPlayerCount: integer?}
@@ -46,19 +47,13 @@ function TeamParticipantsWikiParser.parseWikiInput(args)
 end
 
 ---@param input string|number
----@return number
+---@return string
 local function validatePlacement(input)
-	local placement = tonumber(input)
-	assert(placement, 'Invalid placement: must be a number (got: ' .. input .. ')')
+	local placement = Placement.raw(input)
 
-	assert(
-		placement == math.floor(placement),
-		'Invalid placement: must be a whole number (got: ' .. input .. ')'
-	)
+	assert(not placement.unknown, 'Invalid placement: ' .. input)
 
-	assert(placement > 0, 'Invalid placement: must be a positive number (got: ' .. input .. ')')
-
-	return placement
+	return table.concat(placement.placement, '-')
 end
 
 ---@param input table?
