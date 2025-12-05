@@ -36,9 +36,10 @@ local MatchPageSeriesDots = Class.new(Widget)
 ---@param result string
 ---@return Widget
 MatchPageSeriesDots._makeGameResultIcon = FnUtil.memoize(function (result)
-	return Div{
-		classes = { 'match-bm-match-header-round-result', 'result--' .. RESULT_DISPLAY_TYPES[result:lower()] }
-	}
+	return Div{classes = {
+		'match-bm-match-header-round-result',
+		'result--' .. RESULT_DISPLAY_TYPES[result:lower()]
+	}}
 end)
 
 ---@return Widget?
@@ -51,7 +52,7 @@ function MatchPageSeriesDots:render()
 	---@cast seriesDots -nil
 
 	return Div{
-		classes = { 'match-bm-match-header-round-results' },
+		classes = {'match-bm-match-header-round-results'},
 		children = Array.map(seriesDots, MatchPageSeriesDots._makeGameResultIcon)
 	}
 end
