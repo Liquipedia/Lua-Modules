@@ -88,4 +88,13 @@ function Page.applyUnderScoresIfEnforced(pageName)
 	return pageName
 end
 
+---@param link string
+---@return string
+function Page.makeSubPage(link)
+	if link:sub(1, 1) ~= '/' then
+		return link
+	end
+	return mw.title.getCurrentTitle().text .. link
+end
+
 return Page
