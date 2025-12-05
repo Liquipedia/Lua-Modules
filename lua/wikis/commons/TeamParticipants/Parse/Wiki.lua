@@ -198,7 +198,9 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 	local roles = RoleUtil.readRoleArgs(playerInput.role)
 	local playerType = playerInput.type or 'player'
 
-	if playerType ~= 'staff' and not Array.all(roles, function(role) return role.type ~= RoleUtil.ROLE_TYPE.STAFF end) then
+	local hasNoStaffRoles = Array.all(roles, function(role) return role.type ~= RoleUtil.ROLE_TYPE.STAFF end)
+
+	if playerType ~= 'staff' and not hasNoStaffRoles then
 		playerType = 'staff'
 	end
 
