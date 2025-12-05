@@ -83,8 +83,8 @@ function TransferRow:readConfig()
 	local isRumour = Logic.readBool(self.args.isRumour)
 	return {
 		storage = not isRumour and
-			not Logic.readBool(self.args.disable_storage) and
-			Lpdb.isStorageEnabled()
+			not Logic.readBool(self.args.disable_storage)
+			and Lpdb.isStorageEnabled()
 			and Namespace.isMain(),
 		isRumour = isRumour,
 	}
