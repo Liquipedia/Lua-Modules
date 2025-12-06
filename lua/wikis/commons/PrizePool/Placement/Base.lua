@@ -22,10 +22,10 @@ local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
 local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
 
---- @class BasePlacement
 --- A BasePlacement is a set of opponents who all share the same final place/award in the tournament.
 --- Its input is generally a table created by `Template:Slot`.
 --- It has a range from placeStart to placeEnd (e.g. 5 to 8) or a slotSize (count) or an award.
+--- @class BasePlacement
 --- @field parent BasePrizePool
 --- @field count integer
 --- @field opponents BasePlacementOpponent
