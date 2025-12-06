@@ -90,7 +90,7 @@ function BasePlacement:_readPrizeRewards(args)
 end
 
 ---@param args table
----@return table[]
+---@return BasePlacementOpponent[]
 function BasePlacement:parseOpponents(args)
 	return Array.mapIndexes(function(opponentIndex)
 		local opponentInput = Json.parseIfString(args[opponentIndex])
