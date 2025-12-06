@@ -436,6 +436,7 @@ function BasePrizePool:create()
 	return self
 end
 
+---@protected
 ---@param args table
 function BasePrizePool:readPlacements(args)
 	error('Function readPlacements needs to be implemented by a child class of "Module:PrizePool/Base"')
@@ -689,17 +690,20 @@ function BasePrizePool:_buildRows()
 	return rows
 end
 
+---@protected
 ---@param placement BasePlacement
 function BasePrizePool:placeOrAwardCell(placement)
 	error('Function placeOrAwardCell needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
+---@protected
 ---@param placement BasePlacement
 ---@return boolean
 function BasePrizePool:applyCutAfter(placement)
 	error('Function applyCutAfter needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
+---@protected
 ---@param placement BasePlacement?
 ---@param nextPlacement BasePlacement
 ---@param row WidgetTableRow
