@@ -11,8 +11,8 @@ local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
+local Image = Lua.import('Module:Image')
 local Logic = Lua.import('Module:Logic')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local VodLink = Lua.import('Module:VodLink')
 
@@ -57,16 +57,9 @@ end
 ---@param text string
 ---@return MatchSummaryFooter
 function Footer:addLink(link, icon, iconDark, text)
-	local content
-	if String.isEmpty(iconDark) then
-		content = '[[' .. icon .. '|link=' .. link .. '|32px|' .. text .. '|alt=' .. link .. ']]'
-	else
-		---@cast iconDark -nil
-		content = '[[' .. icon .. '|link=' .. link .. '|32px|' .. text .. '|alt=' .. link .. '|class=show-when-light-mode]]'
-			.. '[[' .. iconDark .. '|link=' .. link .. '|32px|' .. text .. '|alt=' .. link .. '|class=show-when-dark-mode]]'
-	end
-
-	table.insert(self.elements, content)
+	table.insert(self.elements, Image.display(icon, iconDark, {
+		link = link, size = '32px', caption = text, alt = link
+	}))
 	return self
 end
 
