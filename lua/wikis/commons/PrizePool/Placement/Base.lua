@@ -26,6 +26,7 @@ local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
 --- Its input is generally a table created by `Template:Slot`.
 --- It has a range from placeStart to placeEnd (e.g. 5 to 8) or a slotSize (count) or an award.
 --- @class BasePlacement
+--- @operator call(...): BasePlacement
 --- @field parent BasePrizePool
 --- @field count integer
 --- @field opponents BasePlacementOpponent

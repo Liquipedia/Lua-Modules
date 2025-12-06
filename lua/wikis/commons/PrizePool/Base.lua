@@ -36,6 +36,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local pageVars = PageVariableNamespace('PrizePool')
 
 --- @class BasePrizePool
+--- @operator call(...): BasePrizePool
 local BasePrizePool = Class.new(function(self, ...) self:init(...) end)
 
 ---@class BasePrizePoolPrize

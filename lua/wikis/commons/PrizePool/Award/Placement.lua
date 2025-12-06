@@ -22,6 +22,7 @@ local PRIZE_TYPE_POINTS = 'POINTS'
 --- An AwardPlacement is a set of opponents who all share the same award in the tournament.
 --- Its input is generally a table created by `Template:Slot`.
 --- @class AwardPlacement: BasePlacement
+--- @operator call(...): AwardPlacement
 --- @field parent AwardPrizePool
 --- @field previousTotalNumberOfParticipants integer
 --- @field currentTotalNumberOfParticipants integer
