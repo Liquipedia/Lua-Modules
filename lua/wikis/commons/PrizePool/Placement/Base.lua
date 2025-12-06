@@ -29,7 +29,7 @@ local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
 --- @operator call(...): BasePlacement
 --- @field parent BasePrizePool
 --- @field count integer
---- @field opponents BasePlacementOpponent
+--- @field opponents BasePlacementOpponent[]
 local BasePlacement = Class.new(function(self, ...) self:init(...) end)
 
 ---@class BasePlacementOpponent
