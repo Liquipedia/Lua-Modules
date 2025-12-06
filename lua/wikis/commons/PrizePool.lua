@@ -25,8 +25,7 @@ local TableRow = Widgets.TableRow
 local TableCell = Widgets.TableCell
 
 ---@class PrizePool: BasePrizePool
----@field options table
----@field _lpdbInjector LpdbInjector?
+---@operator call(...): PrizePool
 ---@field placements PrizePoolPlacement[]
 local PrizePool = Class.new(BasePrizePool)
 

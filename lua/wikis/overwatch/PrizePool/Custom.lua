@@ -26,7 +26,7 @@ local TIER_TYPE_MODIFIER = {Qualifier = 0.001}
 
 -- Template entry point
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	local prizePool = PrizePool(args):create()

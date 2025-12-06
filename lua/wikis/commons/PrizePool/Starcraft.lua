@@ -34,7 +34,7 @@ local _tournament_name
 
 -- Template entry point
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 
