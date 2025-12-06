@@ -31,15 +31,9 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 
 ---@class MatchSummaryFooter
 ---@operator call: MatchSummaryFooter
----@field root Html
----@field inner Html
 ---@field elements (Widget|Html|string|number)[]
 local Footer = Class.new(
 	function(self)
-		self.root = mw.html.create('div')
-			:addClass('brkts-popup-footer')
-		self.inner = mw.html.create('div')
-			:addClass('brkts-popup-spaced vodlink')
 		self.elements = {}
 	end
 )
@@ -98,16 +92,9 @@ function Footer:addLinks(links)
 	return self
 end
 
----@return Html?
+---@return Widget?
 function Footer:create()
-	if Table.isEmpty(self.elements) then
-		return
-	end
-	for _, element in ipairs(self.elements) do
-		self.inner:node(element)
-	end
-	self.root:node(self.inner)
-	return self.root
+	return MatchSummaryWidgets.Footer{children = self.elements}
 end
 
 ---@class MatchSummaryMatch
@@ -116,7 +103,7 @@ end
 ---@field headerElement Widget?
 ---@field bodyElement Widget[]?
 ---@field commentElement Widget?
----@field footerElement Html?
+---@field footerElement Widget?
 ---@field buttonElement Widget?
 local Match = Class.new(
 	function(self)
