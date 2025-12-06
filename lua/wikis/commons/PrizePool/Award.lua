@@ -25,8 +25,6 @@ local TableCell = Widgets.TableCell
 
 --- @class AwardPrizePool: BasePrizePool
 --- @operator call(...): AwardPrizePool
---- @field options table
---- @field _lpdbInjector LpdbInjector?
 local AwardPrizePool = Class.new(BasePrizePool)
 
 ---@param args table

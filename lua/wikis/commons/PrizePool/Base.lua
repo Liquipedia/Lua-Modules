@@ -37,6 +37,8 @@ local pageVars = PageVariableNamespace('PrizePool')
 
 --- @class BasePrizePool
 --- @operator call(...): BasePrizePool
+--- @field options table
+--- @field _lpdbInjector LpdbInjector?
 local BasePrizePool = Class.new(function(self, ...) self:init(...) end)
 
 ---@class BasePrizePoolPrize
