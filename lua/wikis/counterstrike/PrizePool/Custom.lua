@@ -29,7 +29,7 @@ local HEADER_DATA = {}
 
 -- Template entry point
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 

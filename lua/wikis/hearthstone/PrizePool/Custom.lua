@@ -24,7 +24,7 @@ local TIER_TYPE_MODIFIER = {Showmatch = 0.01, Monthly = 0.4, Weekly = 0.2, Daily
 
 -- Template entry point
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	local prizePool = PrizePool(args):create()
