@@ -23,7 +23,7 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local TableRow = Widgets.TableRow
 local TableCell = Widgets.TableCell
 
---- @class AwardPrizePool
+--- @class AwardPrizePool: BasePrizePool
 --- @field options table
 --- @field _lpdbInjector LpdbInjector?
 local AwardPrizePool = Class.new(BasePrizePool)
