@@ -144,6 +144,7 @@ function BasePlacement:_shouldAddTbdOpponent(opponentIndex, place)
 	return false
 end
 
+---@protected
 ---@param args table
 function BasePlacement:readAdditionalData(args)
 	error('Function readAdditionalData needs to be implemented by child class of `PrizePool/Placement/Base`')
