@@ -37,7 +37,7 @@ local TeamService = {}
 ---@field inactivedate string?
 ---@field faction string?
 ---@field group string
----@field hasLeft boolean?
+---@field hasLeft boolean
 
 --- TODO: Add the rest and implement the lazy loading
 local LPDB_TEAM_FIELDS = {
@@ -149,6 +149,7 @@ function TeamService.getMembers(team)
 			joindate = record.joindate,
 			leavedate = record.leavedate,
 			inactivedate = record.inactivedate,
+			hasLeft = Logic.isNotEmpty(record.leavedate) and record.leavedate ~= DateExt.defaultDate,
 
 			faction = extradata.faction,
 			group = extradata.group or 'main',
