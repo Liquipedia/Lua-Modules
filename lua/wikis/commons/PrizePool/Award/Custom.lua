@@ -17,7 +17,7 @@ local IS_AWARD = true
 
 -- Template entry point
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomAwardPrizePool.run(frame)
 	local awardsPrizePool = AwardPrizePool(Arguments.getArgs(frame))
 

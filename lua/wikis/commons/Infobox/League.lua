@@ -14,12 +14,15 @@ local CountryCategory = Lua.import('Module:Infobox/Extension/CountryCategory')
 local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
+local Info = Lua.import('Module:Info', {loadData = true})
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extension/PrizePool')
 local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local MatchTicker = Lua.import('Module:MatchTicker')
 local MetadataGenerator = Lua.import('Module:MetadataGenerator')
 local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
@@ -175,6 +178,7 @@ function League:createInfobox()
 
 	self.name = TextSanitizer.stripHTML(self.name)
 
+	self:top(self:_createUpcomingMatches())
 	self:bottom(self:createBottomContent())
 
 	if self:shouldStore(args) then
@@ -188,6 +192,7 @@ function League:createInfobox()
 		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
 end
 
+---@private
 function League:_parseArgs()
 	local args = self.args
 
@@ -250,6 +255,7 @@ function League:_parseArgs()
 	self:customParseArguments(args)
 end
 
+---@private
 ---@param args table
 ---@param endDate string?
 ---@return number|string?, number?, string?
@@ -285,6 +291,7 @@ end
 function League:customParseArguments(args)
 end
 
+---@private
 function League:_tournamentPhaseCategory()
 	local phaseMapping = {
 		ONGOING = 'Live Tournaments',
@@ -296,6 +303,7 @@ function League:_tournamentPhaseCategory()
 	return phaseMapping[tournamentPhase]
 end
 
+---@private
 ---@param args table
 ---@return string[]
 function League:_getCategories(args)
@@ -308,6 +316,46 @@ function League:_getCategories(args)
 		CountryCategory.run(args, 'Tournaments'),
 		self:getWikiCategories(args)
 	)
+end
+
+---@private
+---@return Widget?
+function League:_createUpcomingMatches()
+	if not self:shouldStore(self.args) then
+		return nil
+	end
+
+	if Info.config.match2.status == 0 then
+		return nil
+	end
+
+	local result = Logic.tryCatch(
+		function()
+			local matchTicker = MatchTicker{
+				tournament = self.pagename,
+				limit = 5,
+				upcoming = true,
+				ongoing = true,
+				hideTournament = true,
+				queryByParent = true,
+			}
+			matchTicker:query()
+			return matchTicker
+		end,
+		function()
+			return nil
+		end
+	)
+
+	if not result or not result.matches or #result.matches == 0 then
+		return nil
+	end
+
+	local EntityDisplay = Lua.import('Module:MatchTicker/DisplayComponents/Entity')
+	return EntityDisplay.Container{
+		config = result.config,
+		matches = result.matches,
+	}:create()
 end
 
 ---@param args table
@@ -353,8 +401,7 @@ end
 ---@param args table
 ---@return boolean
 function League:shouldStore(args)
-	return Namespace.isMain() and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+	return Namespace.isMain() and Lpdb.isStorageEnabled()
 end
 
 --- Allows for overriding this functionality
@@ -403,6 +450,7 @@ function League:createLiquipediaTierDisplay(args)
 	return tierDisplay .. self:appendLiquipediatierDisplay(args)
 end
 
+---@private
 ---@param args table
 function League:_definePageVariables(args)
 	Variables.varDefine('tournament_name', self.data.name)
@@ -446,6 +494,7 @@ function League:_definePageVariables(args)
 	self:defineCustomPageVariables(args)
 end
 
+---@private
 ---@param args table
 ---@param links table
 function League:_setLpdbData(args, links)
@@ -506,6 +555,7 @@ function League:_setLpdbData(args, links)
 	self.lpdbData = lpdbData
 end
 
+---@private
 ---@param args table
 function League:_setSeoTags(args)
 	local desc = self:seoText(args)
@@ -514,6 +564,7 @@ function League:_setSeoTags(args)
 	end
 end
 
+---@private
 ---@param args table
 ---@param base string
 ---@return table
@@ -571,6 +622,7 @@ function League:getIcons(iconArgs)
 	return icon, iconDark, display
 end
 
+---@private
 ---@param iconArgs {displayManualIcons:boolean, series:string?, abbreviation:string?, icon:string?, iconDark:string?}
 ---@return string?
 function League:_createSeriesIcon(iconArgs)
@@ -635,6 +687,7 @@ function League:createLink(id, name, link, desc)
 end
 
 -- Given the format `pagename|displayname`, returns pagename or the parameter, otherwise
+---@private
 ---@param item string?
 ---@return string?
 function League:_getPageNameFromChronology(item)
@@ -644,6 +697,7 @@ function League:_getPageNameFromChronology(item)
 end
 
 -- Given a series, query its abbreviation if abbreviation is not set manually
+---@private
 ---@return string?
 function League:_fetchAbbreviation()
 	if not String.isEmpty(self.args.abbreviation) then

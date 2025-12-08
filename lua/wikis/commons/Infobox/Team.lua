@@ -13,11 +13,12 @@ local Class = Lua.import('Module:Class')
 local Date = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
 local Image = Lua.import('Module:Image')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
-local MatchTicker = Lua.import('Module:MatchTicker/Custom')
+local MatchTicker = Lua.import('Module:MatchTicker')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
@@ -178,7 +179,7 @@ function Team:createInfobox()
 		Customizable{id = 'customcontent', children = {}},
 		Center{children = {args.footnotes}},
 	}
-	self:bottom(self:_createUpcomingMatches())
+	self:top(self:_createUpcomingMatches())
 	self:bottom(self:createBottomContent())
 
 	-- Categories
@@ -299,12 +300,42 @@ function Team:_createLocation(location)
 			(locationDisplay or '')
 end
 
----@return Html?
+---@return Widget?
 function Team:_createUpcomingMatches()
-	if self:shouldStore(self.args) and Info.config.match2.status > 0 then
-		local frame = {short = true} ---@type Frame
-		return MatchTicker.team(frame)
+	if not self:shouldStore(self.args) then
+		return nil
 	end
+
+	if Info.config.match2.status == 0 then
+		return nil
+	end
+
+	local result = Logic.tryCatch(
+		function()
+			local matchTicker = MatchTicker{
+				team = self.pagename,
+				limit = 5,
+				upcoming = true,
+				ongoing = true,
+				hideTournament = false,
+			}
+			matchTicker:query()
+			return matchTicker
+		end,
+		function()
+			return nil
+		end
+	)
+
+	if not result or not result.matches or #result.matches == 0 then
+		return nil
+	end
+
+	local EntityDisplay = Lua.import('Module:MatchTicker/DisplayComponents/Entity')
+	return EntityDisplay.Container{
+		config = result.config,
+		matches = result.matches,
+	}:create()
 end
 
 ---@param location string?
@@ -382,8 +413,7 @@ end
 ---@param args table
 ---@return boolean
 function Team:shouldStore(args)
-	return Namespace.isMain() and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+	return Namespace.isMain() and Lpdb.isStorageEnabled()
 end
 
 ---@param args table

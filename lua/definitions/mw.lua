@@ -580,8 +580,35 @@ function mw.message:isDisabled() end
 ---@field contentNamespaces table<integer, namespaceInfo>
 ---@field subjectNamespaces table<integer, namespaceInfo>
 ---@field talkNamespaces table<integer, namespaceInfo>
----@field stats {pages: number, articles: number, files: number, edits: number, users: number, activeUsers: number, admins: number, pagesInCategory: fun(category: string, which: 'all'|'subcats'|'files'|'pages'|'*'):integer}
+---@field stats SiteStats
 mw.site = { server = 'https://liquipedia.net/wiki/' }
+
+---@class SiteStats
+---@field pages integer
+---@field articles integer
+---@field files integer
+---@field edits integer
+---@field users integer
+---@field activeUsers integer
+---@field admins integer
+mw.site.stats = {}
+
+---Gets statistics about the category. Each new category queried will increment the expensive function count.
+---@param category string
+---@param which 'all'|'subcats'|'files'|'pages'
+---@return integer
+---@overload fun(category: string, which: '*'): {all: integer, subcats: integer, files: integer, pages: integer}
+function mw.site.stats.pagesInCategory(category, which) end
+
+---Returns the number of pages in the given namespace.
+---@param namespace integer
+---@return integer
+function mw.site.stats.pagesInNamespace(namespace) end
+
+---Returns the number of users in the given group.
+---@param group string
+---@return integer
+function mw.site.stats.usersInGroup(group) end
 
 ---Returns a table holding data about available interwiki prefixes. If filter is the string "local", then only data for local interwiki prefixes is returned. If filter is the string "!local", then only data for non-local prefixes is returned. If no filter is specified, data for all prefixes is returned. A "local" prefix in this context is one that is for the same project.
 ---@param filter nil|'local'|'!local'
@@ -1237,6 +1264,9 @@ function mw.ext.TeamTemplate.teampage(teamtemplate, date) end
 function mw.ext.TeamTemplate.teampart(teamtemplate, date) end
 
 mw.ext.SearchEngineOptimization = {}
+
+---@param desc string
+function mw.ext.SearchEngineOptimization.metadesc(desc) end
 
 ---@param desc string
 function mw.ext.SearchEngineOptimization.metadescl(desc) end

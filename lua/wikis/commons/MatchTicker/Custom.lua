@@ -17,24 +17,9 @@ local CURRENT_PAGE = mw.title.getCurrentTitle().text
 
 local CustomMatchTicker = {}
 
----Entry point for display on tournament pages
----@param frame Frame|table|nil
----@return Html
-function CustomMatchTicker.tournament(frame)
-	local args = Arguments.getArgs(frame)
-
-	--adjusting args
-	args.upcoming = true
-	args.ongoing = true
-	args.recent = false
-	args.tournament = args.tournament or args.tournament1 or args[1] or CURRENT_PAGE
-	args.queryByParent = args.queryByParent or true
-	args.showAllTbdMatches = args.showAllTbdMatches or true
-	args.infoboxWrapperClass = args.infoboxWrapperClass or true
-
-	return MatchTicker(args):query():create(
-		MatchTicker.DisplayComponents.Header('Upcoming Matches')
-	)
+---@deprecated Upcoming matches are now automatically displayed in the league infobox.
+---Remove this template invocation from the page.
+function CustomMatchTicker.tournament()
 end
 
 ---Entry point for display on the main page
@@ -80,15 +65,8 @@ function CustomMatchTicker.player(frame)
 	return CustomMatchTicker.participant(args)
 end
 
----Entry point for display on team pages
----@param frame Frame|table|nil
----@return Html
-function CustomMatchTicker.team(frame)
-	local args = Arguments.getArgs(frame)
-
-	args.team = args.team or CURRENT_PAGE
-
-	return CustomMatchTicker.participant(args)
+---@deprecated Upcoming matches are now automatically displayed in the team infobox.
+function CustomMatchTicker.team()
 end
 
 ---Entry point for display on any participant-type page

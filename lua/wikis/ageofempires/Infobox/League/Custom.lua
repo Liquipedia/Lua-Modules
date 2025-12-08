@@ -15,7 +15,6 @@ local GameModeLookup = Lua.import('Module:GameModeLookup')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local MapMode = Lua.import('Module:MapMode')
-local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -34,8 +33,6 @@ local Center = Widgets.Center
 ---@class AgeofempiresLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
-
-local SECONDS_PER_DAY = 86400
 
 ---@param frame Frame
 ---@return Html
@@ -115,21 +112,6 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	return widgets
-end
-
----@return Html?
-function CustomLeague:createBottomContent()
-	local yesterday = os.date('%Y-%m-%d', os.time() - SECONDS_PER_DAY)
-
-	if self.data.endDate and yesterday <= self.data.endDate then
-		local matchtickerArgs = {
-			tournament = self.pagename,
-			limit = tonumber(self.args.matchtickerlimit) or 7,
-			infoboxWrapperClass = 'false',
-			infoboxClass = true
-		}
-		return MatchTicker.tournament(matchtickerArgs)
-	end
 end
 
 ---@param args table

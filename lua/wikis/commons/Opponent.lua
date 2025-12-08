@@ -481,7 +481,7 @@ end
 ---@return standardPlayer
 function Opponent.readPlayerArgs(args, playerIndex)
 	local playerTeam = args['p' .. playerIndex .. 'team']
-	return {
+	local player = {
 		displayName = args[playerIndex] or args['p' .. playerIndex] or '',
 		flag = String.nilIfEmpty(Flags.CountryName{flag = args['p' .. playerIndex .. 'flag']}),
 		pageName = Page.applyUnderScoresIfEnforced(args['p' .. playerIndex .. 'link']),
@@ -489,6 +489,9 @@ function Opponent.readPlayerArgs(args, playerIndex)
 		faction = Logic.nilIfEmpty(Faction.read(args['p' .. playerIndex .. 'faction']
 			or args['p' .. playerIndex .. 'race'])),
 	}
+	assert(not player.displayName:find('|'), 'Invalid character "|" in player name')
+	assert(not player.pageName or not player.pageName:find('|'), 'Invalid character "|" in player pagename')
+	return player
 end
 
 --[[
@@ -539,11 +542,17 @@ function Opponent.toLpdbStruct(opponent, options)
 	-- Add players for Party Type opponents, or if config is set to force it.
 	if Opponent.typeIsParty(opponent.type) or options.setPlayersInTeam then
 		local players = {}
-		for playerIndex, player in ipairs(opponent.players) do
+		local playerCount, staffCount = 0, 0
+
+		for _, player in ipairs(opponent.players) do
+			local prefix
 			local playerType = (player.extradata or {}).type
-			local prefix = 'p' .. playerIndex
 			if playerType == 'staff' then
-				prefix = 'c' .. playerIndex
+				staffCount = staffCount + 1
+				prefix = 'c' .. staffCount
+			else
+				playerCount = playerCount + 1
+				prefix = 'p' .. playerCount
 			end
 
 			players[prefix] = Page.applyUnderScoresIfEnforced(player.pageName)

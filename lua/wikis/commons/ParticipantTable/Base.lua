@@ -15,6 +15,7 @@ local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
@@ -98,7 +99,7 @@ function ParticipantTable.readConfig(args, parentConfig)
 	local config = {
 		lpdbPrefix = args.lpdbPrefix or parentConfig.lpdbPrefix or Variables.varDefault('lpdbPrefix'),
 		noStorage = Logic.readBool(args.noStorage or parentConfig.noStorage or
-			Variables.varDefault('disable_LPDB_storage') or not Namespace.isMain()),
+			Lpdb.isStorageDisabled() or not Namespace.isMain()),
 		matchGroupSpec = TournamentStructure.readMatchGroupsSpec(args),
 		syncPlayers = Logic.nilOr(Logic.readBoolOrNil(args.syncPlayers), parentConfig.syncPlayers, true),
 		showCountBySection = Logic.readBool(args.showCountBySection or parentConfig.showCountBySection),
