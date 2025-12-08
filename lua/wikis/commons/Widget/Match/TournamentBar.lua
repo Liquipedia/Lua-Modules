@@ -72,16 +72,21 @@ function MatchTournamentBar:render()
 		} or nil,
 		HtmlWidgets.Span{
 			children = {
-				Link{
-					link = tournamentLink,
-					children = HtmlWidgets.Span{
-						children = (match.section ~= 'Results' and #match.opponents <= 2 and {
-							tournament.displayName,
-							' - ',
-							match.section
-						} or {
-							tournament.displayName
-						})
+				HtmlWidgets.Span{
+					classes = {'match-info-tournament-name'},
+					children = {
+						Link{
+							link = tournamentLink,
+							children = HtmlWidgets.Span{
+								children = (match.section ~= 'Results' and #match.opponents <= 2 and {
+									tournament.displayName,
+									' - ',
+									match.section
+								} or {
+									tournament.displayName
+								})
+							}
+						}
 					}
 				},
 				gameData and gameData.gameIds and HtmlWidgets.Span{
@@ -100,7 +105,7 @@ function MatchTournamentBar:render()
 					)
 				} or nil
 			},
-			css = {['display'] = 'flex', ['flex-direction'] = 'column'}
+			css = {['display'] = 'flex', ['flex-direction'] = 'column', ['max-width'] = '100%'}
 		}
 	)
 end

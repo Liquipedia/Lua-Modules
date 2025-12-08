@@ -312,6 +312,20 @@
 			background-color: unset;
 			margin: 0;
 			justify-content: start;
+			width: 100%;
+			overflow: hidden;
+
+			.match-info-tournament-name {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				min-width: 0;
+				flex-shrink: 1;
+			}
+
+			.match-info-stage {
+				flex-shrink: 0;
+			}
 		}
 
 		.match-info-header-vertical {
