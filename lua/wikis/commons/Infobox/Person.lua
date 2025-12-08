@@ -216,7 +216,7 @@ function Person:_createUpcomingMatches()
 				limit = 5,
 				upcoming = true,
 				ongoing = true,
-				hideTournament = true,
+				hideTournament = false,
 				entityStyle = true,
 			}
 			matchTicker:query()
