@@ -90,7 +90,7 @@ function MatchCard:_renderVertical(match, gameData)
 
 	local tournamentLink = TournamentBar{
 		match = match,
-		gameData = gameData,
+		gameData = not isFfa and gameData or nil,
 		displayIcon = false,
 	}
 
