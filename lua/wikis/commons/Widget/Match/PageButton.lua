@@ -16,7 +16,7 @@ local Widget = Lua.import('Module:Widget')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local MatchUtil = Lua.import('Module:Widget/Match/Util')
+local MatchUtil = Lua.import('Module:Match/Util')
 
 ---@class MatchPageButtonProps
 ---@field match MatchGroupUtilMatch

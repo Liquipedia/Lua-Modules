@@ -20,7 +20,7 @@ local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
 local TournamentBar = Lua.import('Module:Widget/Match/TournamentBar')
 local ButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
 local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
-local MatchUtil = Lua.import('Module:Widget/Match/Util')
+local MatchUtil = Lua.import('Module:Match/Util')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')

@@ -21,7 +21,7 @@ local VodsDropdownButton = Lua.import('Module:Widget/Match/VodsDropdownButton')
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
 local VodButton = Lua.import('Module:Widget/Match/VodButton')
 local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
-local MatchUtil = Lua.import('Module:Widget/Match/Util')
+local MatchUtil = Lua.import('Module:Match/Util')
 
 ---@class MatchButtonBarProps
 ---@field match MatchGroupUtilMatch
