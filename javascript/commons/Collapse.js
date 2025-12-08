@@ -11,6 +11,7 @@ liquipedia.collapse = {
 		} );
 		liquipedia.collapse.setupCollapsibleButtons();
 		liquipedia.collapse.setupGeneralCollapsibleButtons();
+		liquipedia.collapse.setupClickableRegionCollapsibles();
 		liquipedia.collapse.setupToggleGroups();
 		liquipedia.collapse.setupDropdownBox();
 		liquipedia.collapse.setupCollapsibleNavFrameButtons();
@@ -101,6 +102,31 @@ liquipedia.collapse = {
 					event.preventDefault();
 				} );
 			}
+		} );
+	},
+	setupClickableRegionCollapsibles: function() {
+		const regions = document.querySelectorAll( '[data-collapsible-click-region]' );
+
+		regions.forEach( ( region ) => {
+			// Get exclusion selector from attribute, default to 'a' (links)
+			// Can pass empty string for "no exclusions" (everything toggles collapse)
+			const exclusionSelector = region.getAttribute( 'data-collapsible-exclude' ) || 'a';
+
+			region.addEventListener( 'click', ( event ) => {
+				if ( exclusionSelector ) {
+					const clickedExcluded = event.target.closest( exclusionSelector );
+
+					if ( clickedExcluded ) {
+						return;
+					}
+				}
+
+				const collapsible = region.closest( '.general-collapsible' );
+				if ( collapsible ) {
+					event.preventDefault();
+					collapsible.classList.toggle( 'collapsed' );
+				}
+			} );
 		} );
 	},
 	setupCollapsibleNavFrameButtons: function() {

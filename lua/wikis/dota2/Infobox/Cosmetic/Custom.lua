@@ -213,6 +213,30 @@ function CustomCosmetic:_createIntroText()
 		output:node(CosmeticIcon._main{item, '130px'})
 	end
 
+	local thirdSet = CustomCosmetic._createSet(self.args.setname3)
+
+	if not thirdSet then
+		return output
+	end
+
+	output:newline():wikitext('Also part of the following set:'):newline()
+	output:node(CosmeticIcon._main{args.setname3, '170px'})
+	for _, item in ipairs(thirdSet) do
+		output:node(CosmeticIcon._main{item, '130px'})
+	end
+
+	local fourthSet = CustomCosmetic._createSet(self.args.setname4)
+
+	if not fourthSet then
+		return output
+	end
+
+	output:newline():wikitext('Also part of the following set:'):newline()
+	output:node(CosmeticIcon._main{args.setname4, '170px'})
+	for _, item in ipairs(fourthSet) do
+		output:node(CosmeticIcon._main{item, '130px'})
+	end
+
 	return output
 end
 
@@ -245,6 +269,8 @@ function CustomCosmetic:setLpdbData(args)
 			marketlock = args.marketlock or '',
 			setname = args.setname or '',
 			setname2 = args.setname2 or '',
+			setname3 = args.setname3 or '',
+			setname4 = args.setname4 or '',
 			setitems = self:getAllArgsForBase(args, 'setitem'),
 			releasedate = args.releasedate or '',
 			expiredate = args.expiredate or '',
