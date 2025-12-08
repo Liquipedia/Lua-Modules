@@ -12,7 +12,6 @@ local Class = Lua.import('Module:Class')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local CharacterNames = Lua.import('Module:CharacterNames', {loadData = true})
 local GameAppearances = Lua.import('Module:GetGameAppearances')
-local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local String = Lua.import('Module:StringUtils')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Template = Lua.import('Module:Template')
@@ -22,10 +21,8 @@ local Player = Lua.import('Module:Infobox/Person')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local SIZE_HERO = '25x25px'
 local MAX_NUMBER_OF_SIGNATURE_HEROES = 3
@@ -101,14 +98,20 @@ end
 
 ---@return string?
 function CustomPlayer:createBottomContent()
-	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		local teamPage = TeamTemplate.getPageName(self.args.team)
-		local team2Page = String.isNotEmpty(self.args.team2) and TeamTemplate.getPageName(self.args.team2) or nil
-		return HtmlWidgets.Fragment{children = WidgetUtil.collect(
-			MatchTicker.player{recentLimit = 3},
-			UpcomingTournaments.team{name = {teamPage, team2Page}}
-		)}
+	if not self:shouldStoreData(self.args) or String.isEmpty(self.args.team) then
+		return nil
 	end
+
+	local teamPage = TeamTemplate.getPageName(self.args.team)
+	local team2Page = String.isNotEmpty(self.args.team2) and TeamTemplate.getPageName(self.args.team2) or nil
+
+	local teamNames = {teamPage}
+	if team2Page then
+		table.insert(teamNames, team2Page)
+	end
+
+	local tournamentsWidget = UpcomingTournaments.team{name = teamNames}
+	return tournamentsWidget and tournamentsWidget:tryMake() or nil
 end
 
 return CustomPlayer

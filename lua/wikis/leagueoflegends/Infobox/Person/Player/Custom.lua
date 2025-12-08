@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
-local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Page = Lua.import('Module:Page')
 local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local String = Lua.import('Module:StringUtils')
@@ -21,7 +20,6 @@ local Player = Lua.import('Module:Infobox/Person')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 
 ---@class LeagueoflegendsInfoboxPlayer: Person
@@ -116,18 +114,19 @@ function CustomPlayer:adjustLPDB(lpdbData, args)
 	return lpdbData
 end
 
----@return Widget?
+---@return string?
 function CustomPlayer:createBottomContent()
-	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		local teamPage = TeamTemplate.getPageName(self.args.team)
-		---@cast teamPage -nil
-		return HtmlWidgets.Fragment{
-			children = {
-				MatchTicker.participant{team = teamPage},
-				UpcomingTournaments.team{name = teamPage},
-			}
-		}
+	if not self:shouldStoreData(self.args) or String.isEmpty(self.args.team) then
+		return nil
 	end
+
+	local teamPage = TeamTemplate.getPageName(self.args.team)
+	if not teamPage then
+		return nil
+	end
+
+	local tournamentsWidget = UpcomingTournaments.team{name = teamPage}
+	return tournamentsWidget and tournamentsWidget:tryMake() or nil
 end
 
 return CustomPlayer

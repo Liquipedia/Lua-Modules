@@ -31,9 +31,14 @@ function CustomPlayer.run(frame)
 	return player:createInfobox()
 end
 
----@return Widget?
+---@return string?
 function CustomPlayer:createBottomContent()
-	return UpcomingTournaments.player{name = self.pagename}
+	if not self:shouldStoreData(self.args) then
+		return nil
+	end
+
+	local tournamentsWidget = UpcomingTournaments.player{name = self.pagename}
+	return tournamentsWidget and tournamentsWidget:tryMake() or nil
 end
 
 ---@param id string

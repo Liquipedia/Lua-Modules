@@ -80,13 +80,19 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@return Widget?
+---@return string?
 function CustomPlayer:createBottomContent()
-	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		local teamPage = TeamTemplate.getPageName(self.args.team)
-		---@cast teamPage -nil
-		return UpcomingTournaments.team{name = teamPage}
+	if not self:shouldStoreData(self.args) or String.isEmpty(self.args.team) then
+		return nil
 	end
+
+	local teamPage = TeamTemplate.getPageName(self.args.team)
+	if not teamPage then
+		return nil
+	end
+
+	local tournamentsWidget = UpcomingTournaments.team{name = teamPage}
+	return tournamentsWidget and tournamentsWidget:tryMake() or nil
 end
 
 return CustomPlayer

@@ -18,11 +18,9 @@ local CharacterIcon = Lua.import('Module:CharacterIcon')
 local CharacterNames = Lua.import('Module:HeroNames')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
-local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 
 local SIZE_HERO = '25x25px'
@@ -83,15 +81,19 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@return Widget?
+---@return string?
 function CustomPlayer:createBottomContent()
-	if String.isEmpty(self.args.team) or not self:shouldStoreData(self.args) then return end
+	if not self:shouldStoreData(self.args) or String.isEmpty(self.args.team) then
+		return nil
+	end
+
 	local teamPage = TeamTemplate.getPageName(self.args.team)
-	---@cast teamPage -nil
-	return HtmlWidgets.Fragment{children = {
-		MatchTicker.player{recentLimit = 3},
-		UpcomingTournaments.team{name = teamPage}
-	}}
+	if not teamPage then
+		return nil
+	end
+
+	local tournamentsWidget = UpcomingTournaments.team{name = teamPage}
+	return tournamentsWidget and tournamentsWidget:tryMake() or nil
 end
 
 return CustomPlayer
