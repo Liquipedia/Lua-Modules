@@ -226,12 +226,12 @@ describe('opponent', function()
 				Opponent.readOpponentArgs{type = Opponent.team, 'test'})
 			assert.error(function ()
 				Opponent.readOpponentArgs{'The Big| Zuhaib Akuma', flag = 'pk', type = Opponent.solo}
-			end, 'Invalid character in player name')
+			end, 'Invalid character "|" in player name')
 			assert.error(function ()
 				Opponent.readOpponentArgs{
 					'The Big Zuhaib Akuma', link = 'The Big| Zuhaib Akuma', flag = 'pk', type = Opponent.solo
 				}
-			end, 'Invalid character in player pagename')
+			end, 'Invalid character "|" in player pagename')
 		end)
 	end)
 

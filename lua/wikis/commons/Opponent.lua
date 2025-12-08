@@ -489,8 +489,8 @@ function Opponent.readPlayerArgs(args, playerIndex)
 		faction = Logic.nilIfEmpty(Faction.read(args['p' .. playerIndex .. 'faction']
 			or args['p' .. playerIndex .. 'race'])),
 	}
-	assert(not player.displayName:find('|'), 'Invalid character in player name')
-	assert(not player.pageName or not player.pageName:find('|'), 'Invalid character in player pagename')
+	assert(not player.displayName:find('|'), 'Invalid character "|" in player name')
+	assert(not player.pageName or not player.pageName:find('|'), 'Invalid character "|" in player pagename')
 	return player
 end
 
