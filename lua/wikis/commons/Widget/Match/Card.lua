@@ -50,6 +50,18 @@ function MatchCard:render()
 	local highlightCondition = HighlightConditions.match or HighlightConditions.tournament
 	local highlight = highlightCondition(match, {onlyHighlightOnValue = self.props.onlyHighlightOnValue})
 
+	if self.props.variant == 'vertical' then
+		return self:_renderVertical(match, gameData)
+	end
+
+	return self:_renderHorizontal(match, gameData, highlight)
+end
+
+---@param match MatchGroupUtilMatch
+---@param gameData MatchTickerGameData?
+---@param highlight boolean
+---@return Widget
+function MatchCard:_renderHorizontal(match, gameData, highlight)
 	local tournamentLink = TournamentBar{
 		match = match,
 		gameData = gameData,
@@ -73,9 +85,8 @@ end
 
 ---@param match MatchGroupUtilMatch
 ---@param gameData MatchTickerGameData?
----@param highlight boolean
 ---@return Widget
-function MatchCard:_renderVertical(match, gameData, highlight)
+function MatchCard:_renderVertical(match, gameData)
 	local isFfa = #match.opponents > 2
 
 	local tournamentLink = TournamentBar{
