@@ -42,7 +42,7 @@ function TeamLogoGallery._getImageData(name, showPresentLogo)
 	for startDate, teamTemplate in Table.iter.spairs(historicalTeamTemplates) do
 		table.insert(imageDatas, {
 			startDate = startDate,
-			raw = mw.ext.TeamTemplate.raw(teamTemplate)
+			raw = TeamTemplate.getRawOrNil(teamTemplate)
 		})
 	end
 

@@ -17,6 +17,7 @@ local NameOrder = Lua.import('Module:NameOrder')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Variables = Lua.import('Module:Variables')
 
 local AgeCalculation = Lua.import('Module:AgeCalculation')
@@ -293,7 +294,7 @@ end
 function Person:_setLpdbData(args, links, status, personType)
 	local teamLink, teamTemplate
 	local team = args.teamlink or args.team
-	local teamRaw = team and mw.ext.TeamTemplate.raw(team) or nil
+	local teamRaw = team and TeamTemplate.getRawOrNil(team)
 	if teamRaw then
 		teamLink = teamRaw.page
 		teamTemplate = teamRaw.templatename
@@ -337,7 +338,7 @@ function Person:_setLpdbData(args, links, status, personType)
 	for teamKey, otherTeam, teamIndex in Table.iter.pairsByPrefix(args, 'team', {requireIndex = false}) do
 		if teamIndex > 1 then
 			otherTeam = args[teamKey .. 'link'] or otherTeam
-			lpdbData.extradata[teamKey] = (mw.ext.TeamTemplate.raw(otherTeam) or {}).templatename
+			lpdbData.extradata[teamKey] = (TeamTemplate.getRawOrNil(otherTeam) or {}).templatename
 		end
 	end
 
@@ -514,7 +515,7 @@ function Person:_createTeam(team, link)
 	end
 	---@cast link -nil
 
-	local teamRaw = mw.ext.TeamTemplate.raw(link)
+	local teamRaw = TeamTemplate.getRawOrNil(link)
 	if teamRaw then
 		link, team = teamRaw.page, teamRaw.name
 	end
