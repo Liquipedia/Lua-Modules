@@ -96,7 +96,7 @@ function TeamParticipantsController.importSquadMembersFromDatabase(participant)
 		local memberType = member.type
 		if member.hasLeft then
 			memberType = 'former'
-		elseif member.role:lower() == 'substitute' then
+		elseif member.role and member.role:lower() == 'substitute' then
 			memberType = 'sub'
 		end
 		return TeamParticipantsWikiParser.parsePlayer{

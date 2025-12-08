@@ -122,12 +122,14 @@ end
 
 --- Parse a single participant from input
 ---@param input table
----@param date osdateparam
+---@param defaultDate osdateparam
 ---@return TeamParticipant
-function TeamParticipantsWikiParser.parseParticipant(input, date)
+function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 	local potentialQualifiers = {}
 	local opponent
 	local warnings = {}
+
+	local date = DateExt.parseIsoDate(input.date) or defaultDate -- TODO: fetch from wiki var too
 
 	if input.contenders then
 		opponent = Opponent.tbd(Opponent.team)
@@ -178,7 +180,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 		potentialQualifiers = potentialQualifiers,
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
-		date = DateExt.parseIsoDate(input.date) or date, -- TODO: fetch from wiki var too
+		date = date,
 	}
 end
 
@@ -192,10 +194,14 @@ end
 ---@return standardPlayer
 function TeamParticipantsWikiParser.parsePlayer(playerInput)
 	local player = Opponent.readSinglePlayerArgs(playerInput)
+	local playedInput = Logic.readBoolOrNil(playerInput.played)
+	local resultsInput = Logic.readBoolOrNil(playerInput.results)
 	player.extradata = {
 		roles = RoleUtil.readRoleArgs(playerInput.role),
 		trophies = tonumber(playerInput.trophies),
 		type = playerInput.type or 'player',
+		played = Logic.nilOr(playedInput, true),
+		results = Logic.nilOr(resultsInput, playedInput, true),
 	}
 	return player
 end
