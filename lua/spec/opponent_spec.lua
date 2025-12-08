@@ -224,6 +224,14 @@ describe('opponent', function()
 				Opponent.readOpponentArgs{type = Opponent.literal, 'test'})
 			assert.are_same({template = 'test', type = Opponent.team, extradata = {}},
 				Opponent.readOpponentArgs{type = Opponent.team, 'test'})
+			assert.error(function ()
+				Opponent.readOpponentArgs{'The Big| Zuhaib Akuma', flag = 'pk', type = Opponent.solo}
+			end, 'Invalid character in player name')
+			assert.error(function ()
+				Opponent.readOpponentArgs{
+					'The Big Zuhaib Akuma', link = 'The Big| Zuhaib Akuma', flag = 'pk', type = Opponent.solo
+				}
+			end, 'Invalid character in player pagename')
 		end)
 	end)
 
