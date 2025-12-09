@@ -773,12 +773,7 @@ function StatisticsPortal.playerAgeTable(args)
 	end
 
 	if Logic.readBool(args.playersOnly) then
-		local typeConditions = ConditionTree(BooleanOperator.any)
-		typeConditions:add{
-			ConditionNode(ColumnName('type'), Comparator.eq, 'player'),
-			ConditionNode(ColumnName('type'), Comparator.eq, 'Player'),
-		}
-		conditions:add{typeConditions}
+		conditions:add(ConditionUtil.anyOf(ColumnName('type'), {'player', 'Player'}))
 	end
 
 	conditions:add(ConditionUtil.anyOf(
