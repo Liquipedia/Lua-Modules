@@ -724,16 +724,7 @@ function MatchPage._buildPlayerLoadout(player)
 			},
 			Div{
 				classes = {'match-bm-lol-players-player-loadout-items'},
-				children = {
-					Div{
-						classes = {'match-bm-lol-players-player-loadout-item'},
-						children = Array.map(Array.sub(player.items, 1, 3), MatchPage._generateItemImage)
-					},
-					Div{
-						classes = {'match-bm-lol-players-player-loadout-item'},
-						children = Array.map(Array.sub(player.items, 4, 6), MatchPage._generateItemImage)
-					}
-				}
+				children = Array.map(player.items, MatchPage._generateItemImage)
 			}
 		}
 	}

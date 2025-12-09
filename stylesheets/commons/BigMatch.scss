@@ -961,15 +961,8 @@ span.slash {
 		}
 
 		&-items {
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 2px;
-		}
-
-		&-item {
-			display: flex;
-			flex-direction: row;
+			display: grid;
+			grid-template-columns: repeat( 3, minmax( 0, 1fr ) );
 			align-items: flex-start;
 			gap: 2px;
 		}
