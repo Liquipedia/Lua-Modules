@@ -1446,16 +1446,14 @@ end
 
 
 ---@param player table
----@return table
+---@return standardOpponent
 function StatisticsPortal._toOpponent(player)
-	return {
+	return Opponent.readOpponentArgs{
 		type = Opponent.solo,
-		players = {{
-			pageName = player.pagename,
-			displayName = player.id,
-			flag = player.nationality,
-			team = String.isNotEmpty(player.team) and player.team or nil,
-		}},
+		link = player.pagename,
+		name = player.id,
+		flag = player.nationality,
+		team = String.isNotEmpty(player.team) and player.team or nil,
 	}
 end
 
