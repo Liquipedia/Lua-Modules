@@ -1453,7 +1453,7 @@ function StatisticsPortal._toOpponent(player)
 		link = player.pagename,
 		name = player.id,
 		flag = player.nationality,
-		team = String.isNotEmpty(player.team) and player.team or nil,
+		team = String.nilIfEmpty(player.team),
 	}
 end
 
