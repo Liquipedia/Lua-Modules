@@ -1043,9 +1043,10 @@ end
 ---@param args table
 ---@return table
 function StatisticsPortal._cacheOpponentPlacementData(args)
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier')}
-		:add{ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0)}
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier'),
+		ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0)
+	}
 
 	if String.isNotEmpty(args.year) then
 		conditions:add{
@@ -1053,12 +1054,7 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 		}
 	end
 
-	local placementConditions = ConditionTree(BooleanOperator.any)
-	for _, allowedPlacement in pairs(args.allowedPlacements) do
-		placementConditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, allowedPlacement)}
-	end
-
-	conditions:add{placementConditions}
+	conditions:add(ConditionUtil.anyOf(ColumnName('placement'), args.allowedPlacements))
 	local data = {}
 
 	local queryParameters = {
@@ -1265,12 +1261,13 @@ Section: Utility Functions
 
 ---@return ConditionTree
 function StatisticsPortal._returnBaseConditions()
-	return ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'cancelled')}
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'delayed')}
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'postponed')}
-		:add{ConditionNode(ColumnName('prizepool'), Comparator.neq, '')}
-		:add{ConditionNode(ColumnName('prizepool'), Comparator.neq, '0')}
+	return ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('status'), Comparator.neq, 'cancelled'),
+		ConditionNode(ColumnName('status'), Comparator.neq, 'delayed'),
+		ConditionNode(ColumnName('status'), Comparator.neq, 'postponed'),
+		ConditionNode(ColumnName('prizepool'), Comparator.neq, ''),
+		ConditionNode(ColumnName('prizepool'), Comparator.neq, '0'),
+	}
 end
 
 
