@@ -337,7 +337,6 @@ function League:_createUpcomingMatches()
 				upcoming = true,
 				ongoing = true,
 				hideTournament = true,
-				entityStyle = true,
 				queryByParent = true,
 			}
 			matchTicker:query()

@@ -221,7 +221,6 @@ function UnofficialWorldChampion:_createUpcomingMatches()
 				upcoming = true,
 				ongoing = true,
 				hideTournament = false,
-				entityStyle = true,
 			}
 			matchTicker:query()
 			return matchTicker
