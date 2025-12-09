@@ -21,6 +21,7 @@ local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local MatchTicker = Lua.import('Module:MatchTicker')
 local MetadataGenerator = Lua.import('Module:MetadataGenerator')
 local Namespace = Lua.import('Module:Namespace')
@@ -401,8 +402,7 @@ end
 ---@param args table
 ---@return boolean
 function League:shouldStore(args)
-	return Namespace.isMain() and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+	return Namespace.isMain() and Lpdb.isStorageEnabled()
 end
 
 --- Allows for overriding this functionality

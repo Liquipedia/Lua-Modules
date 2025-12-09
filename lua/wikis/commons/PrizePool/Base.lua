@@ -13,6 +13,7 @@ local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -93,13 +94,9 @@ BasePrizePool.config = {
 	storeLpdb = {
 		default = true,
 		read = function(args)
-			local disabledVariable = Logic.readBoolOrNil(Variables.varDefault('disable_LPDB_storage'))
-			if disabledVariable ~= nil then
-				disabledVariable = not disabledVariable
-			end
 			return Logic.nilOr(
 				Logic.readBoolOrNil(args.storelpdb),
-				disabledVariable
+				Lpdb.isStorageEnabled()
 			)
 		end
 	},

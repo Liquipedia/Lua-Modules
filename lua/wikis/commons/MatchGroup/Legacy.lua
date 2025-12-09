@@ -13,15 +13,13 @@ local Class = Lua.import('Module:Class')
 local CopyPaste = Lua.import('Module:GetMatchGroupCopyPaste')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Opponent = Lua.import('Module:Opponent/Custom')
-local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local MatchGroup = Lua.import('Module:MatchGroup')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
-
-local globalVars = PageVariableNamespace()
 
 local MAX_NUMBER_OF_OPPONENTS = 2
 local RESET_MATCH = 'RxMBR'
@@ -399,7 +397,7 @@ end
 function MatchGroupLegacy:shouldStoreData(args)
 	return Logic.nilOr(
 		Logic.readBoolOrNil(args.store),
-		not Logic.readBool(globalVars:get('disable_LPDB_storage'))
+		Lpdb.isStorageEnabled()
 	)
 end
 
