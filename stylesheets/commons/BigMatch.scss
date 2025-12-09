@@ -674,8 +674,10 @@ span.slash {
 			}
 
 			@media ( min-width: 768px ) {
-				width: 2rem;
-				height: 2rem;
+				.wiki-dota2 & {
+					width: 2rem;
+					height: 2rem;
+				}
 			}
 
 			img {
@@ -709,11 +711,6 @@ span.slash {
 			@media ( min-width: 768px ) {
 				width: 2rem;
 				height: 2rem;
-
-				.wiki-leagueoflegends & {
-					width: 1.75rem;
-					height: 1.75rem;
-				}
 			}
 
 			.theme--dark & {
@@ -801,8 +798,9 @@ span.slash {
 			align-items: center;
 
 			@media ( min-width: 1200px ) and ( max-width: 1319px ),
-				( min-width: 1510px ) {
+				( min-width: 1510px ) and ( max-width: 1680px ) {
 				grid-template-columns: repeat( 2, minmax( 0, 1fr ) );
+				grid-template-rows: 1fr 1fr;
 			}
 		}
 
@@ -943,11 +941,6 @@ span.slash {
 	img {
 		width: 1.5rem;
 		height: 1.5rem;
-
-		@media ( min-width: 768px ) {
-			width: 1.75rem;
-			height: 1.75rem;
-		}
 	}
 }
 
