@@ -38,10 +38,13 @@ local ConditionUtil = Condition.Util
 
 local Count = Lua.import('Module:Count')
 
+local DataTable = Lua.import('Module:Widget/Basic/DataTable')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
 local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, displayCurrencyCode = false, formatValue = true}
 local CURRENT_YEAR = DateExt.getYearOf()
 local DATE = os.date('%F') --[[@as string]]
-local TIMESTAMP = DateExt.readTimestamp(DATE) --[[@as integer]]
 local DEFAULT_ALLOWED_PLACES = {'1', '2', '3', '1-2', '1-3', '2-3', '2-4', '3-4'}
 local DEFAULT_ROUND_PRECISION = Info.defaultRoundPrecision or 2
 local LANG = mw.getContentLanguage()
@@ -755,7 +758,7 @@ Section: Player Age Table Breakdown
 
 
 ---@param args table?
----@return Html
+---@return Widget
 function StatisticsPortal.playerAgeTable(args)
 	args = args or {}
 	args.earnings = tonumber(args.earnings) or 500
@@ -785,32 +788,32 @@ function StatisticsPortal.playerAgeTable(args)
 
 	local playerData = StatisticsPortal._getPlayers(args.limit, conditions:toString(), args.order)
 
-	local tbl = mw.html.create('table')
-		:addClass('wikitable wikitable-striped sortable')
-		:css('margin-left', '0px')
-		:css('margin-right', 'auto')
+	return DataTable{
+		sortable = true,
+		classes = {'wikitable-striped'},
+		tableCss = {
+			['margin-left'] = '0px',
+			['margin-right'] = 'auto',
+		},
+		children = WidgetUtil.collect(
+			HtmlWidgets.Tr{children = {
+				HtmlWidgets.Th{classes = {'unsortable'}, children = 'ID'},
+				HtmlWidgets.Th{children = 'Age'},
+			}},
+			Array.map(playerData, function (player)
+				local birthdate = DateExt.readTimestamp(player.birthdate) --[[@as integer]]
+				local ageInSeconds = os.difftime(DateExt.getCurrentTimestamp(), birthdate)
 
-	tbl:tag('tr')
-		:tag('th'):wikitext('ID'):addClass('unsortable'):done()
-		:tag('th'):wikitext('Age')
-
-	for _, player in ipairs(playerData) do
-		local birthdate = DateExt.readTimestamp(player.birthdate) --[[@as integer]]
-		local age = os.date('*t', os.difftime(TIMESTAMP, birthdate))
-		local yearAge = age.year - 1970
-		local dayAge = age.yday - 1
-
-		tbl:tag('tr')
-			:tag('td')
-				:node(OpponentDisplay.BlockOpponent{
-					opponent = StatisticsPortal._toOpponent(player),
-					showPlayerTeam = true,
-				}):done()
-			:tag('td')
-				:wikitext(yearAge .. ' years, ' .. dayAge .. ' days')
-	end
-
-	return mw.html.create('div'):addClass('table-responsive'):node(tbl)
+				return HtmlWidgets.Tr{children = {
+					HtmlWidgets.Td{children = OpponentDisplay.BlockOpponent{
+						opponent = StatisticsPortal._toOpponent(player),
+						showPlayerTeam = true,
+					}},
+					HtmlWidgets.Td{children = LANG:formatDuration(ageInSeconds, {'years', 'days'})}
+				}}
+			end)
+		)
+	}
 end
 
 
