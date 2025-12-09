@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
 local InGameRoles = Lua.import('Module:InGameRoles', {loadData = true})
 local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -173,7 +174,7 @@ function MatchPage:renderOverallStats()
 		if gameLength <= 0 then
 			return
 		end
-		return string.format('%.2f', stat / gameLength * 60)
+		return MathUtil.formatRounded{precision = 2, value = stat / gameLength * 60}
 	end
 
 	---@param player standardPlayer
