@@ -162,8 +162,6 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 			)
 		}
 		opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), resolvedOptions)
-
-		--(Info.config.participants or }).defaultPlayerNumber
 	end
 
 	local qualification, qualificationWarnings = parseQualifier(input.qualification)
