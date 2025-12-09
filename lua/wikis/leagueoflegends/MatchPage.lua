@@ -122,17 +122,8 @@ function MatchPage:populateGames()
 		end)
 
 		local _, vetoByTeam = Array.groupBy(vetoPhase, Operator.property('team'))
-		game.vetoGroups = {}
-
-		Array.forEach(vetoByTeam, function(team, teamIndex)
-			local groupIndex = 1
-			local lastType = 'ban'
-			Array.forEach(team, function(veto)
-				if lastType ~= veto.type then groupIndex = groupIndex + 1 end
-				veto.groupIndex = groupIndex
-				lastType = veto.type
-			end)
-			_, game.vetoGroups[teamIndex] = Array.groupBy(team, Operator.property('groupIndex'))
+		game.vetoGroups = Array.map(vetoByTeam, function (team)
+			return Array.groupAdjacentBy(team, Operator.property('type'))
 		end)
 	end)
 end
