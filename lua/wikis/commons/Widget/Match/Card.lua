@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 
@@ -18,8 +19,17 @@ local MatchHeaderFfa = Lua.import('Module:Widget/Match/Header/Ffa')
 local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
 local TournamentBar = Lua.import('Module:Widget/Match/TournamentBar')
 local ButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
+local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
+local MatchUtil = Lua.import('Module:Match/Util')
+
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local StreamLinks = Lua.import('Module:Links/Stream')
+local String = Lua.import('Module:StringUtils')
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
+local MAX_VERTICAL_CARD_STREAMS = 2
 
 ---@class MatchCardProps
 ---@field match MatchGroupUtilMatch
@@ -27,6 +37,7 @@ local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 ---@field onlyHighlightOnValue string?
 ---@field hideTournament boolean?
 ---@field displayGameIcons boolean?
+---@field variant 'horizontal' | 'vertical'
 
 ---@class MatchCard: Widget
 ---@operator call(MatchCardProps): MatchCard
@@ -36,6 +47,7 @@ MatchCard.defaultProps = {
 	hideTournament = false, -- Hide the tournament and stage
 	displayGameIcons = false, -- Display the game icon in the tournament title
 	onlyHighlightOnValue = nil, -- Only highlight if the publishertier has this value
+	variant = 'horizontal',
 }
 
 ---@return Widget?

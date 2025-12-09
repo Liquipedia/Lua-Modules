@@ -8,6 +8,7 @@ const jsModules = [
 	'Analytics',
 	'BattleRoyale',
 	'Bracket',
+	'Carousel',
 	'Collapse',
 	'Commons_mainpage',
 	'Commons_tools',

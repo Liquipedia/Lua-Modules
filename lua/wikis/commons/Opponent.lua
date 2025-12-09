@@ -481,7 +481,7 @@ end
 ---@return standardPlayer
 function Opponent.readPlayerArgs(args, playerIndex)
 	local playerTeam = args['p' .. playerIndex .. 'team']
-	return {
+	local player = {
 		displayName = args[playerIndex] or args['p' .. playerIndex] or '',
 		flag = String.nilIfEmpty(Flags.CountryName{flag = args['p' .. playerIndex .. 'flag']}),
 		pageName = Page.applyUnderScoresIfEnforced(args['p' .. playerIndex .. 'link']),
@@ -489,6 +489,9 @@ function Opponent.readPlayerArgs(args, playerIndex)
 		faction = Logic.nilIfEmpty(Faction.read(args['p' .. playerIndex .. 'faction']
 			or args['p' .. playerIndex .. 'race'])),
 	}
+	assert(not player.displayName:find('|'), 'Invalid character "|" in player name')
+	assert(not player.pageName or not player.pageName:find('|'), 'Invalid character "|" in player pagename')
+	return player
 end
 
 --[[

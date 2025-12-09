@@ -16,6 +16,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class MatchCountdownProps
 ---@field match MatchGroupUtilMatch
+---@field format ('full'|'compact')?
 
 ---@class MatchCountdown: Widget
 ---@operator call(MatchCountdownProps): MatchCountdown
@@ -33,12 +34,15 @@ function MatchCountdown:render()
 		return nil
 	end
 
+	local format = self.props.format or 'full'
+
 	return HtmlWidgets.Span{
 		classes = {'match-info-countdown'},
 		children = Countdown.create{
 			rawdatetime = (not match.dateIsExact) or match.finished,
-			date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
+			date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact, format),
 			finished = match.finished,
+			format = format,
 		},
 	}
 end
