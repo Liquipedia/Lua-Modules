@@ -284,6 +284,7 @@ $team-icon-size: 22px;
 	}
 
 	&--vertical {
+		align-items: start;
 		border-radius: 0.25rem;
 		border: 1px solid;
 		padding: 0.5rem;
@@ -315,8 +316,32 @@ $team-icon-size: 22px;
 		}
 
 		.match-info-stage {
-			width: 100%;
 			font-size: 0.6875rem;
+		}
+
+		.match-info-tournament {
+			gap: 0.125rem;
+			padding: 0;
+			border-radius: 0;
+			font-size: 0.6875rem;
+			line-height: 1rem;
+			background-color: unset;
+			margin: 0;
+			justify-content: start;
+			width: 100%;
+			overflow: hidden;
+
+			.match-info-tournament-name {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				min-width: 0;
+				flex-shrink: 1;
+			}
+
+			.match-info-stage {
+				flex-shrink: 0;
+			}
 		}
 
 		.match-info-header-vertical {
@@ -385,11 +410,6 @@ $team-icon-size: 22px;
 				width: 100%;
 				justify-content: center;
 			}
-		}
-
-		.match-info-tournament {
-			justify-content: center;
-			margin-top: 0.75rem;
 		}
 	}
 }
