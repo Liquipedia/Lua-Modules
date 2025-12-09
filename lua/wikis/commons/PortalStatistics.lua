@@ -680,7 +680,7 @@ end
 
 
 ---@param args table?
----@return Html
+---@return Widget
 function StatisticsPortal.earningsTable(args)
 	args = args or {}
 	args.limit = tonumber(args.limit) or 20
@@ -720,35 +720,39 @@ function StatisticsPortal.earningsTable(args)
 
 	local opponentPlacements = StatisticsPortal._cacheOpponentPlacementData(args)
 
-	local tbl = mw.html.create('table')
-		:addClass('wikitable wikitable-striped wikitable-bordered sortable')
-		:css('margin-left', '0px')
-		:css('margin-right', 'auto')
-		:css('width', '100%')
+	return DataTable{
+		sortable = true,
+		classes = {'wikitable-striped', 'wikitable-bordered'},
+		tableCss = {
+			['margin-left'] = '0px',
+			['margin-right'] = 'auto',
+			width = '100%',
+		},
+		children = WidgetUtil.collect(
+			StatisticsPortal._earningsTableHeader(args),
+			Array.map(opponentData, function (opponent, opponentIndex)
+				local opponentDisplay
+				local earnings = earningsFunction(opponent)
 
-	tbl:node(StatisticsPortal._earningsTableHeader(args))
+				if opponentIndex > args.limit or earnings < args.minimumEarnings then
+					return
+				end
 
-	for opponentIndex, opponent in ipairs(opponentData) do
-		local opponentDisplay
-		local earnings = earningsFunction(opponent)
-
-		if opponentIndex > args.limit or earnings < args.minimumEarnings then break end
-
-		if args.opponentType == Opponent.team then
-			opponentDisplay = OpponentDisplay.BlockOpponent{
-				opponent = Opponent.readOpponentArgs{template = opponent.template, type = Opponent.team},
-				teamStyle = 'standard',
-			}
-		else
-			opponentDisplay = OpponentDisplay.BlockOpponent{
-				opponent = StatisticsPortal._toOpponent(opponent),
-			}
-		end
-		local placements = opponentPlacements[opponent.pagename] or {}
-		tbl:node(StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay))
-	end
-
-	return mw.html.create('div'):addClass('table-responsive'):node(tbl)
+				if args.opponentType == Opponent.team then
+					opponentDisplay = OpponentDisplay.BlockOpponent{
+						opponent = Opponent.readOpponentArgs{template = opponent.template, type = Opponent.team},
+						teamStyle = 'standard',
+					}
+				else
+					opponentDisplay = OpponentDisplay.BlockOpponent{
+						opponent = StatisticsPortal._toOpponent(opponent),
+					}
+				end
+				local placements = opponentPlacements[opponent.pagename] or {}
+				return StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay)
+			end)
+		)
+	}
 end
 
 
