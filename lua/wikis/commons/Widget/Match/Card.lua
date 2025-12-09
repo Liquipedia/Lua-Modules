@@ -172,6 +172,9 @@ function MatchCard:_renderStageName(match, variantIndex)
 	local stageName
 	if match.bracketData and match.bracketData.inheritedHeader then
 		stageName = DisplayHelper.expandHeader(match.bracketData.inheritedHeader)[variantIndex]
+		if String.isEmpty(stageName) then
+			stageName = DisplayHelper.expandHeader(match.bracketData.inheritedHeader)[1]
+		end
 	else
 		stageName = match.section
 	end
