@@ -446,14 +446,16 @@ function MatchGroupLegacy:generate()
 	self:_populateNewArgs(match2mapping)
 	self:handleOtherBracketParams()
 
-	return MatchGroupLegacy._generateWikiCode(self.newArgs)
+	return MatchGroupLegacy._generateWikiCodeForBracket(self.newArgs)
 end
 
-function MatchGroupLegacy._generateWikiCode(args)
+---@param args table
+---@return string
+function MatchGroupLegacy._generateWikiCodeForBracket(args)
 	local bracketType = Table.extract(args, 1)
 	local bracketTypeWithoutPrefix = bracketType:gsub('^[bB]racket/', '')
 	local bracketDataList = CopyPaste._getBracketData(bracketTypeWithoutPrefix)
-	local matches = Array.map(bracketDataList, function(bracketData, matchIndex)
+	local matches = Array.map(bracketDataList, function(bracketData)
 		local matchKey = bracketData.matchKey
 		local match = Table.extract(args, matchKey)
 		if Logic.isEmpty(match) then return end
@@ -481,18 +483,77 @@ function MatchGroupLegacy._generateWikiCode(args)
 	return table.concat(lines, '\n')
 end
 
+---@param args table
+---@return string
+function MatchGroupLegacy.generateWikiCodeForMatchList(args)
+	local headers = {}
+	local matches = Array.mapIndexes(function(matchIndex)
+		local matchKey = 'M' .. matchIndex
+		---@type table|string?
+		local matchJson = Table.extract(args, matchKey)
+		local match = matchJson
+		if type(matchJson) == 'string' then
+			match = Json.parseIfTable(matchJson)
+		end
+		if Logic.isEmpty(match) then return end
+		---@cast match table
+
+		local headerKey = matchKey .. 'header'
+		local header = Table.extract(args, headerKey) or Table.extract(match, 'header')
+		if Logic.isNotEmpty(header) then
+			table.insert(headers, '|' .. headerKey .. '=' .. header)
+		end
+		return '|' .. matchKey .. '=' .. MatchGroupLegacy._generateMatch(match)
+	end)
+
+	local lines = Array.extend(
+		{'{{Matchlist|id=' .. Table.extract(args, 'id')},
+		MatchGroupLegacy._argsToString(args),
+		headers,
+		matches,
+		'}}'
+	)
+
+	return table.concat(lines, '\n')
+end
+
+---@param args table
+---@return string
+function MatchGroupLegacy.generateWikiCodeForSingleMatch(args)
+	local matchJson = Table.extract(args, 'match')
+	local match = matchJson
+	if type(matchJson) == 'string' then
+		match = Json.parseIfTable(matchJson)
+	end
+	---@cast match table
+
+	local lines = Array.extend(
+		{'{{SingleMatch|id=' .. Table.extract(args, 'id')},
+		MatchGroupLegacy._argsToString(args),
+		'|R1M1=' .. MatchGroupLegacy._generateMatch(match),
+		'}}'
+	)
+
+	return table.concat(lines, '\n')
+end
+
 ---@param match table
 ---@return string
 function MatchGroupLegacy._generateMatch(match)
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		local opp = Table.extract(match, 'opponent' .. opponentIndex)
-		if Logic.isEmpty(opp) then return end
+		if opponentIndex > 2 and Logic.isEmpty(opp) then return end
 		return '|opponent' .. opponentIndex .. '=' .. MatchGroupLegacy._generateOpponent(opp)
 	end)
 
 	local maps = Array.mapIndexes(function(mapIndex)
 		local map = Table.extract(match, 'map' .. mapIndex)
+		if type(map) == 'string' then
+			map = Json.parseIfTable(map) or map
+		end
 		if Logic.isEmpty(map) then return end
+		---@cast map table
+		map.winner = map.winner or map.win -- for wow
 		return '|map' .. mapIndex .. '=' .. MatchGroupLegacy._generateMap(map)
 	end)
 
@@ -500,10 +561,15 @@ function MatchGroupLegacy._generateMatch(match)
 		return Array.map(arr, function(item) return '    ' .. item end)
 	end
 
+	local rawMapVeto = Table.extract(match, 'mapveto')
+	local mapVeto = Logic.nilIfEmpty(Json.parseIfTable(rawMapVeto) or rawMapVeto)
+	local mapVetoDisplay = mapVeto and ('|mapveto={{MapVeto' .. MatchGroupLegacy._argsToString(mapVeto) .. '}}') or nil
+
 	return table.concat(Array.extend({'{{Match'},
 		addIndents({MatchGroupLegacy._argsToString(match)}),
 		addIndents(opponents),
 		addIndents(maps),
+		addIndents({mapVetoDisplay}),
 		'}}'
 	), '\n')
 end
@@ -511,8 +577,10 @@ end
 ---@param opp table
 ---@return string
 function MatchGroupLegacy._generateOpponent(opp)
+	if Logic.isEmpty(opp) then return '' end
 	local opponentType = Table.extract(opp, 'type')
 	local opponentTemplate = String.upperCaseFirst(opponentType) .. 'Opponent'
+	opp.win = nil
 
 	return '{{' .. opponentTemplate .. MatchGroupLegacy._argsToString(opp) .. '}}'
 end
@@ -532,6 +600,7 @@ end
 ---@param args table
 ---@return string
 function MatchGroupLegacy._argsToString(args)
+	if Logic.isEmpty(args) then return '' end
 	local otherArgs = {}
 	local compare = function(tbl, a, b)
 		if type(a) == type(b) then
@@ -544,7 +613,17 @@ function MatchGroupLegacy._argsToString(args)
 	end
 
 	for key, value in Table.iter.spairs(args, compare) do
-		table.insert(otherArgs, '|' .. key .. '=' .. tostring(value))
+		value = Json.parseIfTable(value) or value
+		local val
+		if type(value) == 'table' and Logic.isNotEmpty(value) then
+			val = '{{Json' .. MatchGroupLegacy._argsToString(value) .. '}}'
+		elseif type(value) ~= 'table' then
+			val = tostring(value)
+		end
+		val = Logic.nilIfEmpty(val)
+		if val then
+			table.insert(otherArgs, '|' .. key .. '=' .. val)
+		end
 	end
 
 	return table.concat(otherArgs)
