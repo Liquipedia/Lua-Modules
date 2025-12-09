@@ -1,3 +1,25 @@
+$team-icon-wrapper-size: 24px;
+$team-icon-size: 22px;
+
+@mixin set-team-icon-size($wrapper-size, $icon-size) {
+	width: $wrapper-size;
+	height: $wrapper-size;
+	line-height: $wrapper-size;
+	text-align: center;
+
+	img {
+		max-width: $icon-size;
+		max-height: $icon-size;
+		width: auto;
+		height: auto;
+		vertical-align: middle;
+	}
+
+	i {
+		font-size: 1rem;
+	}
+}
+
 .match-info {
 	display: flex;
 	padding: 0.75rem 0;
@@ -27,15 +49,9 @@
 			font-size: 0.6875rem;
 
 			&.timer-object-countdown-live {
-				.theme--light & {
-					color: #ffffff;
-					background-color: #b81414;
-				}
-
-				.theme--dark & {
-					color: #2e0505;
-					background-color: #f5a3a3;
-				}
+				/* Same for both light and dark */
+				color: #ffffff;
+				background-color: #b81414;
 			}
 
 			&.timer-object-countdown-completed {
@@ -264,6 +280,116 @@
 			.theme--dark & {
 				background-color: var( --clr-on-surface-dark-primary-8 );
 			}
+		}
+	}
+
+	&--vertical {
+		border-radius: 0.25rem;
+		border: 1px solid;
+		padding: 0.5rem;
+
+		.theme--light & {
+			border-color: var( --clr-on-surface-light-primary-8 );
+			background-color: var( --clr-on-surface-light-primary-4 );
+		}
+
+		.theme--dark & {
+			border-color: var( --clr-on-surface-dark-primary-8 );
+			background-color: var( --clr-secondary-9 );
+		}
+
+		.match-button-cta-text {
+			display: none;
+		}
+
+		.match-info-top-row {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			width: 100%;
+
+			.match-info-stream-buttons {
+				display: flex;
+				gap: 0.25rem;
+			}
+		}
+
+		.match-info-stage {
+			width: 100%;
+			font-size: 0.6875rem;
+		}
+
+		.match-info-header-vertical {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+			width: 100%;
+		}
+
+		.match-info-opponent-row {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 0.5rem;
+			width: 100%;
+
+			&-loser {
+				opacity: 0.6;
+			}
+		}
+
+		.match-info-opponent-identity {
+			flex: 1;
+			min-width: 0;
+
+			.team-template-image-icon {
+				@include set-team-icon-size($team-icon-wrapper-size, $team-icon-size);
+			}
+		}
+
+		.match-info-opponent-score {
+			font-size: 0.75rem;
+			text-align: right;
+		}
+
+		.match-info-bestof {
+			text-align: center;
+			font-size: 0.75rem;
+			color: var( --clr-on-background-secondary );
+		}
+
+		.match-info-ffa-info {
+			width: 100%;
+			font-size: 0.6875rem;
+		}
+
+		.match-info-header:not( .match-info-header-vertical ) {
+			display: none;
+		}
+
+		.match-info-header {
+			flex-direction: column;
+			gap: 0.5rem;
+
+			&-opponent {
+				width: 100%;
+				justify-content: center;
+
+				&-left,
+				&-right {
+					justify-content: center;
+				}
+			}
+
+			&-scoreholder {
+				width: 100%;
+				justify-content: center;
+			}
+		}
+
+		.match-info-tournament {
+			justify-content: center;
+			margin-top: 0.75rem;
 		}
 	}
 }
