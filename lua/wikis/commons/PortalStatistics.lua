@@ -819,9 +819,10 @@ Section: Query Functions
 ]]--
 
 ---Executes a given LPDB query using Lpdb.executeMassQuery
----@param tableName string Name of the table
+---@generic T:LpdbBaseData
+---@param tableName `T` Name of the table
 ---@param parameters table Query parameters
----@return table
+---@return T[]
 function StatisticsPortal._massQuery(tableName, parameters)
 	local data = {}
 
@@ -835,7 +836,7 @@ end
 ---@param limit number?
 ---@param addConditions string|AbstractConditionNode?
 ---@param addOrder string?
----@return table
+---@return table[]
 function StatisticsPortal._getPlayers(limit, addConditions, addOrder)
 	return StatisticsPortal._massQuery('player', {
 		query = 'pagename, id, nationality, earnings, birthdate, team, earningsbyyear',
@@ -849,7 +850,7 @@ end
 ---@param limit number?
 ---@param addConditions string?
 ---@param addOrder string?
----@return table
+---@return table[]
 function StatisticsPortal._getTeams(limit, addConditions, addOrder)
 	return StatisticsPortal._massQuery('team', {
 		query = 'pagename, name, template, earnings, earningsbyyear',
