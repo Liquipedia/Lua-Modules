@@ -60,36 +60,24 @@ end
 function CustomMatchTicker.team()
 end
 
----Entry point for display on any participant-type page
+---Entry point for displaying recent matches on player/team pages.
+---NOTE: Upcoming and ongoing matches are now automatically displayed via the entity match ticker
+---in player/team infoboxes. This function should ONLY be used for displaying recent matches.
+---
 ---@param args table
----@param matches {ongoing: table?, upcoming: table?, recent: table?}?
+---@param matches {recent: table?}?
 ---@return Html
 function CustomMatchTicker.participant(args, matches)
 	matches = matches or {}
 
 	--adjusting args
 	args.infoboxClass = Logic.nilOr(Logic.readBoolOrNil(args.infoboxClass), true)
+	args.recent = true
+	args.limit = args.limit or args.recentLimit or 5
 
-	if Logic.readBool(args.short) then
-		args.upcoming = true
-		args.ongoing = true
-		args.recent = false
-		args.limit = args.limit or 5
-		return MatchTicker(args):query():create(
-			MatchTicker.DisplayComponents.Header('Upcoming Matches')
-		)
-	end
-
-	return mw.html.create()
-		:node(MatchTicker(Table.merge(args, {
-			limit = args.ongoingLimit or 5, ongoing = true
-		})):query(matches.ongoing):create(MatchTicker.DisplayComponents.Header('Ongoing Matches')))
-		:node(MatchTicker(Table.merge(args, {
-			limit = args.upcomingLimit or 3, upcoming = true
-		})):query(matches.upcoming):create(MatchTicker.DisplayComponents.Header('Upcoming Matches')))
-		:node(MatchTicker(Table.merge(args, {
-			limit = args.recentLimit or 5, recent = true
-		})):query(matches.recent):create(MatchTicker.DisplayComponents.Header('Recent Matches')))
+	return MatchTicker(args):query(matches.recent):create(
+		MatchTicker.DisplayComponents.Header('Recent Matches')
+	)
 end
 
 return CustomMatchTicker

@@ -136,14 +136,13 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@return string?
+---@return Widget?
 function CustomPlayer:createBottomContent()
 	if not Namespace.isMain() then
-		return nil
+		return
 	end
 
-	local tournamentsWidget = UpcomingTournaments.player{name = self.basePageName}
-	return tournamentsWidget and tournamentsWidget:tryMake() or nil
+	return UpcomingTournaments.player{name = self.basePageName}
 end
 
 ---@return string[]
