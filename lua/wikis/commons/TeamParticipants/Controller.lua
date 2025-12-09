@@ -46,6 +46,7 @@ function TeamParticipantsController.fromTemplate(frame)
 	local parsedArgs = Json.parseStringifiedArgs(args)
 	local parsedData = TeamParticipantsWikiParser.parseWikiInput(parsedArgs)
 	TeamParticipantsController.importParticipants(parsedData)
+	TeamParticipantsController.applyPlayedAndResults(parsedData)
 	TeamParticipantsController.fillIncompleteRosters(parsedData)
 
 	local shouldStore =
@@ -62,23 +63,15 @@ function TeamParticipantsController.fromTemplate(frame)
 end
 
 --- Imports participants' squad members from the database if requested.
---- Determines played status
 --- May mutate the input.
 ---@param parsedData {participants: TeamParticipant[], expectedPlayerCount: integer?}
 function TeamParticipantsController.importParticipants(parsedData)
-	local playedData = TeamParticipantsController.playedDataFromMatchData(parsedData.participants)
-
 	Array.forEach(parsedData.participants, function (participant)
 		local players = participant.opponent.players
 		-- Bad structure, this should always exist
 		if not players then
 			return
 		end
-
-		TeamParticipantsController.applyPlayed(
-			players,
-			participant.autoPlayed and playedData[participant.opponent.template] or nil
-		)
 
 		if not Logic.readBool(participant.shouldImportFromDb) then
 			return
@@ -90,6 +83,29 @@ function TeamParticipantsController.importParticipants(parsedData)
 		end
 
 		TeamParticipantsController.mergeManualAndImportedPlayers(players, importedPlayers)
+	end)
+end
+
+--- Imports auto played data from match2 data if requested.
+--- May mutate the input.
+---@param parsedData {participants: TeamParticipant[], expectedPlayerCount: integer?}
+function TeamParticipantsController.applyPlayedAndResults(parsedData)
+	local playedData = TeamParticipantsController.playedDataFromMatchData(parsedData.participants)
+	if not playedData then
+		return
+	end
+
+	Array.forEach(parsedData.participants, function (participant)
+		local players = participant.opponent.players
+		-- Bad structure, this should always exist
+		if not players then
+			return
+		end
+
+		TeamParticipantsController.applyPlayedData(
+			players,
+			participant.autoPlayed and playedData[participant.opponent.template] or nil
+		)
 	end)
 end
 
@@ -187,7 +203,7 @@ end
 
 ---@param players standardPlayer[]
 ---@param playedData standardPlayer[]?
-function TeamParticipantsController.applyPlayed(players, playedData)
+function TeamParticipantsController.applyPlayedData(players, playedData)
 	local autoHasPlayed = function(pageName)
 		if Logic.isEmpty(playedData) then
 			return nil
@@ -199,11 +215,13 @@ function TeamParticipantsController.applyPlayed(players, playedData)
 	end
 
 	Array.forEach(players, function(player)
-		player.extradata.played = Logic.nilOr(
+		local hasPlayed = Logic.nilOr(
 			player.extradata.played,
 			autoHasPlayed(player.pageName),
-			player.extradata.type ~= 'sub' and player.extradata.type ~= 'staff'
+			true
 		)
+		player.extradata.played = hasPlayed
+		player.extradata.results = Logic.nilOr(player.extradata.results, hasPlayed)
 	end)
 end
 
