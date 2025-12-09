@@ -988,10 +988,11 @@ end
 ---@param config table
 ---@return table
 function StatisticsPortal._cacheModeEarningsData(config)
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0)}
-		:add{ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDate)}
-		:add{ConditionNode(ColumnName('date'), Comparator.lt, DATE)}
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0),
+		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDate),
+		ConditionNode(ColumnName('date'), Comparator.lt, DATE),
+	}
 
 	if String.isNotEmpty(config.startYear) then
 		conditions:add{ConditionNode(ColumnName('date_year'), Comparator.gt, (config.startYear - 1))}
@@ -1001,10 +1002,9 @@ function StatisticsPortal._cacheModeEarningsData(config)
 		local teamConditions = ConditionTree(BooleanOperator.any)
 			:add{ConditionNode(ColumnName('opponentname'), Comparator.eq, config.opponentName)}
 		local prefix = config.opponentType == Opponent.team and 'team' or ''
-		for index = 1, config.maxOpponents do
-			teamConditions:add{
-				ConditionNode(ColumnName('opponentplayers_p' .. index .. prefix), Comparator.eq, config.opponentName)}
-		end
+		teamConditions:add(Array.map(Array.range(1, config.maxOpponents), function (index)
+			return ConditionNode(ColumnName('opponentplayers_p' .. index .. prefix), Comparator.eq, config.opponentName)
+		end))
 		conditions:add{teamConditions}
 	end
 
