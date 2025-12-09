@@ -1262,11 +1262,8 @@ Section: Utility Functions
 ---@return ConditionTree
 function StatisticsPortal._returnBaseConditions()
 	return ConditionTree(BooleanOperator.all):add{
-		ConditionNode(ColumnName('status'), Comparator.neq, 'cancelled'),
-		ConditionNode(ColumnName('status'), Comparator.neq, 'delayed'),
-		ConditionNode(ColumnName('status'), Comparator.neq, 'postponed'),
-		ConditionNode(ColumnName('prizepool'), Comparator.neq, ''),
-		ConditionNode(ColumnName('prizepool'), Comparator.neq, '0'),
+		ConditionUtil.noneOf(ColumnName('status'), {'cancelled', 'delayed', 'postponed'}),
+		ConditionUtil.noneOf(ColumnName('prizepool'), {'', '0'}),
 	}
 end
 
