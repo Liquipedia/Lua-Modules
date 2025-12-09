@@ -16,6 +16,7 @@ local Image = Lua.import('Module:Image')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local MatchTicker = Lua.import('Module:MatchTicker')
 local String = Lua.import('Module:StringUtils')
@@ -413,8 +414,7 @@ end
 ---@param args table
 ---@return boolean
 function Team:shouldStore(args)
-	return Namespace.isMain() and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+	return Namespace.isMain() and Lpdb.isStorageEnabled()
 end
 
 ---@param args table
