@@ -152,7 +152,18 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 			type = Opponent.team,
 		}))
 		opponent.players = TeamParticipantsWikiParser.parsePlayers(input)
-		opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), {syncPlayer = true})
+		local resolvedOptions = {
+			syncPlayer = true,
+			-- syncTeam basically doubles the lpdb callbacks hence disable it by default for TeamParticipant
+			syncTeam = Logic.nilOr(
+				Logic.readBoolOrNil(input.syncteam),
+				(Info.config.participants or {}).syncTeam,
+				false
+			)
+		}
+		opponent = Opponent.resolve(opponent, DateExt.toYmdInUtc(date), resolvedOptions)
+
+		--(Info.config.participants or }).defaultPlayerNumber
 	end
 
 	local qualification, qualificationWarnings = parseQualifier(input.qualification)
