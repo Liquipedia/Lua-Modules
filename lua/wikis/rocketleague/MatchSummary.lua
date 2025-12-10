@@ -24,7 +24,7 @@ local TIMEOUT = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end

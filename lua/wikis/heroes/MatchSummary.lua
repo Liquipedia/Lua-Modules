@@ -25,7 +25,7 @@ local NUM_CHAMPIONS_PICK = 5
 local FP = Abbreviation.make{text = 'First Pick', title = 'First Pick for Heroes on this map'}
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '480px'})
 end
