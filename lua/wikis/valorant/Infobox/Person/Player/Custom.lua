@@ -18,7 +18,9 @@ local SignaturePlayerAgents = Lua.import('Module:SignaturePlayerAgents')
 local String = Lua.import('Module:StringUtils')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Injector = Lua.import('Module:Widget/Injector')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Player = Lua.import('Module:Infobox/Person')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
@@ -122,16 +124,17 @@ end
 
 ---@return Widget?
 function CustomPlayer:createBottomContent()
-	if not self:shouldStoreData(self.args) or String.isEmpty(self.args.team) then
-		return
-	end
+	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
+		local teamPage = TeamTemplate.getPageName(self.args.team)
+		---@cast teamPage -nil
 
-	local teamPage = TeamTemplate.getPageName(self.args.team)
-	if not teamPage then
-		return
+		return HtmlWidgets.Fragment{
+			children = {
+				MatchTicker.player{recentLimit = 3},
+				UpcomingTournaments.team{name = teamPage}
+			}
+		}
 	end
-
-	return UpcomingTournaments.team{name = teamPage}
 end
 
 return CustomPlayer

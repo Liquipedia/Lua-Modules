@@ -18,7 +18,9 @@ local String = Lua.import('Module:StringUtils')
 local YearsActive = Lua.import('Module:YearsActive')
 
 local Flags = Lua.import('Module:Flags')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Injector = Lua.import('Module:Widget/Injector')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Player = Lua.import('Module:Infobox/Person')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
@@ -142,7 +144,10 @@ function CustomPlayer:createBottomContent()
 		return
 	end
 
-	return UpcomingTournaments.player{name = self.basePageName}
+	return HtmlWidgets.Fragment{children = {
+		MatchTicker.player(),
+		UpcomingTournaments.player{name = self.basePageName}
+	}}
 end
 
 ---@return string[]
