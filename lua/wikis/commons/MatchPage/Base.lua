@@ -303,6 +303,10 @@ function BaseMatchPage:renderGames()
 	local overallStats = self:renderOverallStats()
 
 	return ContentSwitch{
+		css = {
+			['margin-top'] = '0.5rem',
+			['margin-bottom'] = '0.5rem',
+		},
 		tabs = WidgetUtil.collect(
 			overallStats and {
 				label = {
