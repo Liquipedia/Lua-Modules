@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
@@ -29,10 +30,13 @@ local MatchSummaryContainer = Class.new(Widget)
 
 ---@private
 ---@param matchData MatchGroupUtilMatch
----@return string
+---@return string?
 function MatchSummaryContainer._getExpandedHeader(matchData)
 	local bracketData = matchData.bracketData
 	local header = bracketData.header or bracketData.inheritedHeader --[[@as string]]
+	if Logic.isEmpty(header) then
+		return
+	end
 	return DisplayHelper.expandHeader(header)[1]
 end
 
