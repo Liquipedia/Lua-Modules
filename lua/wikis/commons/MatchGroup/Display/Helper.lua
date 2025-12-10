@@ -260,7 +260,7 @@ in a different props.MatchSummaryContainer in the Bracket and Matchlist
 components.
 ]]
 ---@param props table
----@return Html
+---@return Widget
 function DisplayHelper.DefaultMatchSummaryContainer(props)
 	local MatchSummaryModule = Lua.import('Module:MatchSummary')
 
