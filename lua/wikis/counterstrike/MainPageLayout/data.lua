@@ -84,7 +84,7 @@ return {
 	title = 'Counter-Strike',
 	navigation = {
 		{
-			iconName = 'players',
+			iconName = 'player',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
