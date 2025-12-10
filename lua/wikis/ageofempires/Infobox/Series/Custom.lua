@@ -13,10 +13,11 @@ local Tier = Lua.import('Module:Tier/Custom')
 local Series = Lua.import('Module:Infobox/Series')
 
 ---@class AoeSeriesInfobox: SeriesInfobox
+---@operator call(Frame): AoeSeriesInfobox
 local CustomSeries = Class.new(Series)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomSeries.run(frame)
 	local series = CustomSeries(frame)
 

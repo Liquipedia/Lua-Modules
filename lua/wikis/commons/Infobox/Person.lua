@@ -41,6 +41,7 @@ local Customizable = Widgets.Customizable
 local TeamHistoryWidget = Lua.import('Module:Widget/Infobox/TeamHistory')
 
 ---@class Person: BasicInfobox
+---@operator call(Frame): Person
 ---@field locations string[]
 ---@field roles RoleData[]
 local Person = Class.new(BasicInfobox)
@@ -68,13 +69,13 @@ local STATUS_TRANSLATE = {
 local BANNED = 'banned' -- Temporary until conversion
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function Person.run(frame)
 	local person = Person(frame)
 	return person:createInfobox()
 end
 
----@return string
+---@return Widget
 function Person:createInfobox()
 	local args = self.args
 	assert(String.isNotEmpty(args.id), 'You need to specify an "id"')

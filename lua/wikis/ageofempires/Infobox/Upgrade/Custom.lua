@@ -24,6 +24,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class AoeUpgradeInfobox: UpgradeInfobox
+---@operator call(Frame): AoeUpgradeInfobox
 local CustomUpgrade = Class.new(Upgrade)
 
 ---@class AoeUpgradeInfoboxWidgetInjector: WidgetInjector
@@ -31,7 +32,7 @@ local CustomUpgrade = Class.new(Upgrade)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomUpgrade.run(frame)
 	local upgrade = CustomUpgrade(frame)
 	upgrade.args.informationType = 'Tech'

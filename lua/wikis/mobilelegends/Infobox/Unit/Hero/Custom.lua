@@ -42,7 +42,7 @@ local ICON_DATA = {
 local NON_BREAKING_SPACE = '&nbsp;'
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomHero.run(frame)
 	local unit = CustomHero(frame)
 	unit:setWidgetInjector(CustomInjector(unit))
