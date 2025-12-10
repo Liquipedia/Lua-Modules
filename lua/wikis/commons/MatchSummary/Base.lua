@@ -19,7 +19,6 @@ local VodLink = Lua.import('Module:VodLink')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Links = Lua.import('Module:Links')
-local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchHeader = Lua.import('Module:Widget/Match/Header')
@@ -326,7 +325,7 @@ end
 ---@param CustomMatchSummary table
 ---@param args table
 ---@param options {teamStyle:teamStyle?, width: fun(MatchGroupUtilMatch):string?|string?, noScore:boolean?}?
----@return Html
+---@return Widget
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(
 		(type(CustomMatchSummary.createBody) == 'function' or type(CustomMatchSummary.createGame) == 'function'),
@@ -343,36 +342,14 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 		width = width(match)
 	end
 
-	local matchSummary = MatchSummary():init(width)
-
-	local createMatch = CustomMatchSummary.createMatch or function(matchData)
-		return MatchSummary.createMatch(matchData, CustomMatchSummary, options)
-	end
-
-	---@param matchData MatchGroupUtilMatch
-	---@return string
-	local function getExpandedHeader(matchData)
-		local bracketData = matchData.bracketData
-		local header = bracketData.header or bracketData.inheritedHeader --[[@as string]]
-		return DisplayHelper.expandHeader(header)[1]
-	end
-
-	matchSummary.root:node(ContentSwitch{
-		tabs = WidgetUtil.collect(
-			{
-				label = getExpandedHeader(match),
-				content = createMatch(match):create()
-			},
-			bracketResetMatch and {
-				label = getExpandedHeader(bracketResetMatch) .. ' Reset',
-				content = createMatch(bracketResetMatch):create()
-			} or nil
-		),
-		storeValue = false,
-		switchGroup = match.matchId .. 'resetSelector',
-	})
-
-	return matchSummary:create()
+	return MatchSummaryWidgets.Container{
+		width = width,
+		createMatch = CustomMatchSummary.createMatch or function(matchData)
+			return MatchSummary.createMatch(matchData, CustomMatchSummary, options)
+		end,
+		match = match,
+		resetMatch = bracketResetMatch,
+	}
 end
 
 ---@param mapVetoes table

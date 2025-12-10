@@ -1,0 +1,73 @@
+---
+-- @Liquipedia
+-- page=Module:Widget/Match/Summary/Container
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+
+local Widget = Lua.import('Module:Widget')
+local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
+local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
+
+---@class MatchSummaryContainerProps
+---@field width string?
+---@field createMatch fun(matchData: MatchGroupUtilMatch): MatchSummaryMatch
+---@field match MatchGroupUtilMatch
+---@field resetMatch MatchGroupUtilMatch?
+
+---@class MatchSummaryContainer: Widget
+---@operator call(MatchSummaryContainerProps): MatchSummaryContainer
+---@field props MatchSummaryContainerProps
+---@field private additionalClasses string[]
+local MatchSummaryContainer = Class.new(Widget)
+
+---@private
+---@param matchData MatchGroupUtilMatch
+---@return string
+function MatchSummaryContainer._getExpandedHeader(matchData)
+	local bracketData = matchData.bracketData
+	local header = bracketData.header or bracketData.inheritedHeader --[[@as string]]
+	return DisplayHelper.expandHeader(header)[1]
+end
+
+---@param class string
+---@return self
+function MatchSummaryContainer:addClass(class)
+	self.additionalClasses = self.additionalClasses or {}
+	Array.extendWith(self.additionalClasses, class)
+	return self
+end
+
+---@return Widget
+function MatchSummaryContainer:render()
+	local resetMatch = self.props.resetMatch
+	return AnalyticsWidget{
+		analyticsName = 'Match popup',
+		classes = Array.extend('brkts-popup', self.additionalClasses),
+		css = {width = self.props.width},
+		children = ContentSwitch{
+			css = {['margin-bottom'] = '0.5rem'},
+			tabs = {
+				{
+					label = MatchSummaryContainer._getExpandedHeader(self.props.match),
+					content = self.props.createMatch(self.props.match):create()
+				},
+				resetMatch and {
+					label = MatchSummaryContainer._getExpandedHeader(resetMatch) .. ' Reset',
+					content = self.props.createMatch(resetMatch):create()
+				} or nil,
+			},
+			size = 'small',
+			storeValue = false,
+			switchGroup = self.props.match.matchId .. '_resetSelector',
+		}
+	}
+end
+
+return MatchSummaryContainer
