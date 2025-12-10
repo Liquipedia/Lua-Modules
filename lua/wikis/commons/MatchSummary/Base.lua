@@ -285,12 +285,14 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	local match, bracketResetMatch = MatchGroupUtil.fetchMatchForBracketDisplay(
 		args.bracketId, args.matchId)
 
-	local width = options.width
+	---@type fun(MatchGroupUtilMatch):string?|string|integer?
+	local width = options.width or args.width
 	if type(width) == 'function' then
 		width = width(match)
 	end
 
 	return MatchSummaryWidgets.Container{
+		classes = args.classes,
 		width = width,
 		createMatch = CustomMatchSummary.createMatch or function(matchData)
 			return MatchSummary.createMatch(matchData, CustomMatchSummary, options)
