@@ -60,20 +60,20 @@ end
 function CustomMatchTicker.player(frame)
 	local args = Arguments.getArgs(frame)
 	args.player = args.player or mw.title.getCurrentTitle().text
-	return CustomMatchTicker.participant(args)
+	return CustomMatchTicker.recent(args)
 end
 
 ---@deprecated Upcoming matches are now automatically displayed in the team infobox.
 function CustomMatchTicker.team()
 end
 
----Entry point for displaying recent matches on player/team pages.
----NOTE: Upcoming and ongoing matches are now automatically displayed via the entity match ticker
+---Displays recent matches for a player or team.
+---Upcoming and ongoing matches are automatically displayed via the entity match ticker in the infobox.
 ---
 ---@param args table
 ---@param matches {recent: table?}?
 ---@return Html
-function CustomMatchTicker.participant(args, matches)
+function CustomMatchTicker.recent(args, matches)
 	matches = matches or {}
 
 	--adjusting args
@@ -84,6 +84,14 @@ function CustomMatchTicker.participant(args, matches)
 	return MatchTicker(args):query(matches.recent):create(
 		MatchTicker.DisplayComponents.Header('Recent Matches')
 	)
+end
+
+---@deprecated Use CustomMatchTicker.recent() instead. This function only displays recent matches.
+---@param args table
+---@param matches {recent: table?}?
+---@return Html
+function CustomMatchTicker.participant(args, matches)
+	return CustomMatchTicker.recent(args, matches)
 end
 
 return CustomMatchTicker
