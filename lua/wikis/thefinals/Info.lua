@@ -6,7 +6,7 @@
 --
 
 return {
-	startYear = 2022,
+	startYear = 2023,
 	wikiName = 'thefinals',
 	name = 'The Finals',
 	defaultGame = 'thefinals',
