@@ -189,12 +189,22 @@ end
 ---@return standardPlayer
 function TeamParticipantsWikiParser.parsePlayer(playerInput)
 	local player = Opponent.readSinglePlayerArgs(playerInput)
+
 	local playedInput = Logic.readBoolOrNil(playerInput.played)
 	local resultsInput = Logic.readBoolOrNil(playerInput.results)
+	local roles = RoleUtil.readRoleArgs(playerInput.role)
+	local playerType = playerInput.type or 'player'
+
+	local hasNoStaffRoles = Array.all(roles, function(role) return role.type ~= RoleUtil.ROLE_TYPE.STAFF end)
+
+	if playerType ~= 'staff' and not hasNoStaffRoles then
+		playerType = 'staff'
+	end
+
 	player.extradata = {
-		roles = RoleUtil.readRoleArgs(playerInput.role),
+		roles = roles,
 		trophies = tonumber(playerInput.trophies),
-		type = playerInput.type or 'player',
+		type = playerType,
 		played = Logic.nilOr(playedInput, true),
 		results = Logic.nilOr(resultsInput, playedInput, true),
 	}
