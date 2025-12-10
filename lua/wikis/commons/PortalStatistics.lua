@@ -780,7 +780,7 @@ function StatisticsPortal.playerAgeTable(args)
 	end
 
 	if Logic.readBool(args.playersOnly) then
-		conditions:add(ConditionUtil.anyOf(ColumnName('type'), {'player', 'Player'}))
+		conditions:add(ConditionNode(ColumnName('type'), Comparator.eq, 'player'))
 	end
 
 	conditions:add(ConditionUtil.anyOf(
