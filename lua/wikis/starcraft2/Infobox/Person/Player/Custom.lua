@@ -165,11 +165,11 @@ end
 
 ---@return Html?
 function CustomPlayer:createBottomContent()
-	if self.shouldQueryData and self.recentMatches and #self.recentMatches > 0 then
-		return MatchTicker.participant(
-			{player = self.pagename, limit = NUMBER_OF_RECENT_MATCHES},
-			{recent = self.recentMatches}
-		)
+	if self.shouldQueryData then
+		return MatchTicker.participant({
+			player = self.pagename,
+			limit = NUMBER_OF_RECENT_MATCHES
+		})
 	end
 end
 
