@@ -19,6 +19,7 @@ local VodLink = Lua.import('Module:VodLink')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Links = Lua.import('Module:Links')
+local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchHeader = Lua.import('Module:Widget/Match/Header')
@@ -344,18 +345,32 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 
 	local matchSummary = MatchSummary():init(width)
 
-	--additional header for when martin adds the the css and buttons for switching between match and reset match
-	--if bracketResetMatch then
-		--local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
-		--matchSummary:header(createHeader(match, {noScore = true, teamStyle = options.teamStyle}))
-		--here martin can add the buttons for switching between match and reset match
-	--end
-
 	local createMatch = CustomMatchSummary.createMatch or function(matchData)
 		return MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	end
-	matchSummary:addMatch(createMatch(match))
-	matchSummary:addMatch(createMatch(bracketResetMatch))
+
+	---@param matchData MatchGroupUtilMatch
+	---@return string
+	local function getExpandedHeader(matchData)
+		local bracketData = matchData.bracketData
+		local header = bracketData.header or bracketData.inheritedHeader --[[@as string]]
+		return DisplayHelper.expandHeader(header)[1]
+	end
+
+	matchSummary.root:node(ContentSwitch{
+		tabs = WidgetUtil.collect(
+			{
+				label = getExpandedHeader(match),
+				content = createMatch(match):create()
+			},
+			bracketResetMatch and {
+				label = getExpandedHeader(bracketResetMatch) .. ' Reset',
+				content = createMatch(bracketResetMatch):create()
+			} or nil
+		),
+		storeValue = false,
+		switchGroup = match.matchId .. 'resetSelector',
+	})
 
 	return matchSummary:create()
 end
