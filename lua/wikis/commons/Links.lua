@@ -413,226 +413,226 @@ local ICON_KEYS_TO_RENAME = {
 
 local MATCH_ICONS = {
 	['365chess'] = {
-		icon = 'File:365chess_allmode.png',
-		iconDark = 'File:365chess_allmode.png',
+		icon = '365chess_allmode.png',
+		iconDark = '365chess_allmode.png',
 		text = '365Chess matchpage'
 	},
 	ballchasing = {
-		icon = 'File:Ballchasing icon.png',
+		icon = 'Ballchasing icon.png',
 		text = 'Ballchasing replays'
 	},
 	blasttv = {
-		icon = 'File:BLAST icon allmode.png',
+		icon = 'BLAST icon allmode.png',
 		text = 'BLAST.tv matchpage'
 	},
 	breakingpoint = {
-		icon = 'File:Breaking Point GG icon lightmode.png',
-		iconDark = 'File:Breaking Point GG icon darkmode.png',
+		icon = 'Breaking Point GG icon lightmode.png',
+		iconDark = 'Breaking Point GG icon darkmode.png',
 		text = 'Breaking Point matchpage'
 	},
 	cdl = {
-		icon = 'File:Call of Duty League lightmode.png',
-		iconDark = 'File:Call of Duty League darkmode.png',
+		icon = 'Call of Duty League lightmode.png',
+		iconDark = 'Call of Duty League darkmode.png',
 		text = 'Call of Duty League matchpage'
 	},
 	challengermode = {
-		icon = 'File:Challengermode icon.png',
+		icon = 'Challengermode icon.png',
 		text = 'Match page on Challengermode'
 	},
 	chesscom = {
-		icon = 'File:ChessCom_allmode.png',
-		iconDark = 'File:ChessCom_allmode.png',
+		icon = 'ChessCom_allmode.png',
+		iconDark = 'ChessCom_allmode.png',
 		text = 'Chess.com matchpage'
 	},
 	chessgames = {
-		icon = 'File:Chessgames_allmode.png',
-		iconDark = 'File:Chessgames_allmode.png',
+		icon = 'Chessgames_allmode.png',
+		iconDark = 'Chessgames_allmode.png',
 		text = 'Chessgames matchpage'
 	},
 	civdraft = {
 		text = 'Civ Draft',
-		icon = 'File:Civ Draft Icon.png'
+		icon = 'Civ Draft Icon.png'
 	},
 	datdota = {
-		icon = 'File:DatDota-icon.png',
+		icon = 'DatDota-icon.png',
 		text = 'datDota'
 	},
 	dbstats = {
-		icon = 'File:Diabotical icon.png',
+		icon = 'Diabotical icon.png',
 		text = 'QuakeLife matchpage'
 	},
 	dotabuff = {
-		icon = 'File:DOTABUFF-icon.png',
+		icon = 'DOTABUFF-icon.png',
 		text = 'DOTABUFF'
 	},
 	ebattle = {
-		icon = 'File:Ebattle Series allmode.png',
+		icon = 'Ebattle Series allmode.png',
 		text = 'Match page on ebattle'
 	},
 	esl = {
-		icon = 'File:ESL_2019_icon_lightmode.png',
-		iconDark = 'File:ESL_2019_icon_darkmode.png',
+		icon = 'ESL_2019_icon_lightmode.png',
+		iconDark = 'ESL_2019_icon_darkmode.png',
 		text = 'Match page on ESL'
 	},
 	esea = {
-		icon = 'File:ESEA icon allmode.png',
+		icon = 'ESEA icon allmode.png',
 		text = 'ESEA Match Page'
 	},
 	etf2l = {
-		icon = 'File:ETF2L.png',
+		icon = 'ETF2L.png',
 		text = 'ETF2L Match Page'
 	},
 	faceit = {
-		icon = 'File:FACEIT icon allmode.png',
+		icon = 'FACEIT icon allmode.png',
 		text = 'FACEIT match room'
 	},
 	gol = {
-		icon = 'File:Gol.gg allmode.png',
+		icon = 'Gol.gg allmode.png',
 		text = 'GolGG Match Report',
 	},
 	h3gg = {
-		icon = 'File:H3gg icon allmode.png',
+		icon = 'H3gg icon allmode.png',
 		text = 'H3.gg match details',
 	},
 	halodatahive = {
-		icon = 'File:Halo Data Hive allmode.png',
+		icon = 'Halo Data Hive allmode.png',
 		text = 'Match page on Halo Data Hive'
 	},
 	headtohead = {
-		icon = 'File:Match Info Stats.png',
+		icon = 'Match Info Stats.png',
 		text = 'Head-to-head statistics'
 	},
 	interview = {
-		icon = 'File:Interview32.png',
+		icon = 'Interview32.png',
 		text = 'Interview'
 	},
 	jcg = {
-		icon = 'File:JCG-BMS icon.png',
+		icon = 'JCG-BMS icon.png',
 		text = 'JCG matchpage'
 	},
 	lichess = {
-		icon = 'File:Lichess_lightmode.png',
-		iconDark = 'File:Lichess_darkmode.png',
+		icon = 'Lichess_lightmode.png',
+		iconDark = 'Lichess_darkmode.png',
 		text = 'Game page on Lichess'
 	},
 	logstf = {
-		icon = 'File:Logstf_icon.png',
+		icon = 'Logstf_icon.png',
 		text = 'logs.tf Match Page '
 	},
 	logstfgold = {
-		icon = 'File:Logstf_gold_icon.png',
+		icon = 'Logstf_gold_icon.png',
 		text = 'logs.tf Match Page (Golden Cap) '
 	},
 	lpl = {
-		icon = 'File:LPL_Logo_lightmode.png',
-		iconDark = 'File:LPL_Logo_darkmode.png',
+		icon = 'LPL_Logo_lightmode.png',
+		iconDark = 'LPL_Logo_darkmode.png',
 		text = 'Match page on LPL Play'
 	},
 	lrthread = {
-		icon = 'File:LiveReport32.png',
+		icon = 'LiveReport32.png',
 		text = 'Live Report Thread'
 	},
 	mapdraft = {
 		text = 'Map Draft',
-		icon = 'File:Map Draft Icon.png'
+		icon = 'Map Draft Icon.png'
 	},
 	mplink = {
-		icon = 'File:Osu single color allmode.png',
+		icon = 'Osu single color allmode.png',
 		text = 'Match Data'
 	},
 	lazermplink = {
-		icon = 'File:Osu!lazer allmode.png',
+		icon = 'Osu!lazer allmode.png',
 		text = 'Match Data'
 	},
 	opl = {
-		icon = 'File:OPL Icon 2023 allmode.png',
+		icon = 'OPL Icon 2023 allmode.png',
 		text = 'OPL Match Page'
 	},
 	overgg = {
-		icon = 'File:overgg icon.png',
+		icon = 'overgg icon.png',
 		text = 'over.gg matchpage'
 	},
 	owl = {
-		icon = 'File:Overwatch League 2023 allmode.png',
+		icon = 'Overwatch League 2023 allmode.png',
 		text = 'Overwatch League matchpage'
 	},
 	ozf = {
-		icon = 'File:ozfortress-icon.png',
+		icon = 'ozfortress-icon.png',
 		text = 'ozfortress Match Page'
 	},
 	pf = {
-		icon = 'File:Plus Forward icon.png',
+		icon = 'Plus Forward icon.png',
 		text = 'Plus Forward matchpage'
 	},
 	preview = {
-		icon = 'File:Preview Icon32.png',
+		icon = 'Preview Icon32.png',
 		text = 'Preview'
 	},
 	qrindr = {
-		icon = 'File:Quake Champions icon.png',
+		icon = 'Quake Champions icon.png',
 		text = 'Qrindr matchpage'
 	},
 	r6esports = {
-		icon = 'File:Rainbow 6 Esports 2023 lightmode.png',
-		iconDark = 'File:Rainbow 6 Esports 2023 darkmode.png',
+		icon = 'Rainbow 6 Esports 2023 lightmode.png',
+		iconDark = 'Rainbow 6 Esports 2023 darkmode.png',
 		text = 'R6 Esports Match Page'
 	},
 	recap = {
-		icon = 'File:Reviews32.png',
+		icon = 'Reviews32.png',
 		text = 'Recap'
 	},
 	reddit = {
-		icon = 'File:Reddit-icon.png',
+		icon = 'Reddit-icon.png',
 		text = 'Reddit Thread',
 	},
 	review = {
-		icon = 'File:Reviews32.png',
+		icon = 'Reviews32.png',
 		text = 'Review'
 	},
 	rgl = {
-		icon = 'File:RGL_Logo.png',
+		icon = 'RGL_Logo.png',
 		text = 'RGL Match Page'
 	},
 	royaleapi = {
-		icon = 'File:RoyaleAPI_allmode.png',
+		icon = 'RoyaleAPI_allmode.png',
 		text = 'RoyaleAPI Match Page'
 	},
 	shift = {
-		icon = 'File:ShiftRLE icon.png',
+		icon = 'ShiftRLE icon.png',
 		text = 'ShiftRLE matchpage'
 	},
 	siegegg = {
-		icon = 'File:SiegeGG icon.png',
+		icon = 'SiegeGG icon.png',
 		text = 'SiegeGG Match Page'
 	},
 	smiteesports = {
-		icon = 'File:SMITE default lightmode.png',
-		iconDark = 'File:SMITE default darkmode.png',
+		icon = 'SMITE default lightmode.png',
+		iconDark = 'SMITE default darkmode.png',
 		text = 'Smite Esports Match Page'
 	},
 	stats = {
-		icon = 'File:Match_Info_Stats.png',
+		icon = 'Match_Info_Stats.png',
 		text = 'Match Statistics'
 	},
 	stratz = {
-		icon = 'File:STRATZ_icon_lightmode.svg',
-		iconDark = 'File:STRATZ_icon_darkmode.svg',
+		icon = 'STRATZ_icon_lightmode.svg',
+		iconDark = 'STRATZ_icon_darkmode.svg',
 		text = 'STRATZ'
 	},
 	tespa = {
-		icon = 'File:Tespa icon.png',
+		icon = 'Tespa icon.png',
 		text = 'Tespa matchpage'
 	},
 	tftv = {
-		icon = 'File:Teamfortress.tv.png',
+		icon = 'Teamfortress.tv.png',
 		text = 'TFTV Match Page'
 	},
 	vlr = {
-		icon = 'File:VLR icon.png',
+		icon = 'VLR icon.png',
 		text = 'Matchpage and Stats on VLR'
 	},
 	wl = {
-		icon = 'File:Winstons Lab-icon.png',
+		icon = 'Winstons Lab-icon.png',
 		text = 'Winstons Lab matchpage'
 	},
 }

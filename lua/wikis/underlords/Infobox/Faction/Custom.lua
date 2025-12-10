@@ -16,6 +16,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class UnderlordsCustomFactionInfobox: FactionInfobox
+---@operator call(Frame): UnderlordsCustomFactionInfobox
 ---@field game string
 local CustomFactionInfobox = Class.new(FactionInfobox)
 ---@class UnderlordsCustomFactionInfoboxInjector: WidgetInjector
@@ -23,7 +24,7 @@ local CustomFactionInfobox = Class.new(FactionInfobox)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomFactionInfobox.run(frame)
 	local infobox = CustomFactionInfobox(frame)
 

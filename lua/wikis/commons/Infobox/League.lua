@@ -37,6 +37,7 @@ local Variables = Lua.import('Module:Variables')
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 
 local Widgets = Lua.import('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Accommodation = Widgets.Accommodation
 local Builder = Widgets.Builder
 local Cell = Widgets.Cell
@@ -50,16 +51,17 @@ local Title = Widgets.Title
 local Venue = Widgets.Venue
 
 ---@class InfoboxLeague: BasicInfobox
+---@operator call(Frame): InfoboxLeague
 local League = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function League.run(frame)
 	local league = League(frame)
 	return league:createInfobox()
 end
 
----@return Html
+---@return Widget
 function League:createInfobox()
 	local args = self.args
 	self:_parseArgs()
@@ -187,9 +189,10 @@ function League:createInfobox()
 		self:_setSeoTags(args)
 	end
 
-	return mw.html.create()
-		:node(self:build(widgets, 'Tournament'))
-		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
+	return HtmlWidgets.Fragment{children = Array.interleave({
+		self:build(widgets, 'Tournament'),
+		Logic.readBool(args.autointro) and self:seoText(args) or nil
+	}, HtmlWidgets.Br{})}
 end
 
 ---@private

@@ -19,6 +19,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class MarvelRivalsMapInfobox: MapInfobox
+---@operator call(Frame): MarvelRivalsMapInfobox
 local CustomMap = Class.new(Map)
 
 ---@class MarvelRivalsMapInfoboxWidgetInjector: WidgetInjector
@@ -26,7 +27,7 @@ local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomMap.run(frame)
 	local map = CustomMap(frame)
 	map:setWidgetInjector(CustomInjector(map))

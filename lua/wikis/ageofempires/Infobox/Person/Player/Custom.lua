@@ -26,6 +26,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = Lua.import('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -37,7 +38,11 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 ---@class AgeofempiresInfoboxPlayer: Person
+---@operator call(Frame): AgeofempiresInfoboxPlayer
 local CustomPlayer = Class.new(Player)
+
+---@class AgeofempiresInfoboxPlayerWidgetInjector: WidgetInjector
+---@field caller AgeofempiresInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 local RATINGCONFIG = {
@@ -69,9 +74,8 @@ local INACTIVITY_THRESHOLD_PLAYER = {year = 1}
 local INACTIVITY_THRESHOLD_BROADCAST = {month = 6}
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPlayer.run(frame)
-	---@type AgeofempiresInfoboxPlayer
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
@@ -118,9 +122,10 @@ function CustomPlayer.run(frame)
 		}
 	end
 
-	return mw.html.create()
-		:node(builtInfobox)
-		:node(autoPlayerIntro)
+	return HtmlWidgets.Fragment{children = {
+		builtInfobox,
+		autoPlayerIntro,
+	}}
 end
 
 ---@param id string

@@ -32,7 +32,7 @@ local ADDITIONAL_GAME_NAMES = {
 }
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomMission.run(frame)
 	local mission = CustomMission(frame)
 	mission:setWidgetInjector(CustomInjector(mission))

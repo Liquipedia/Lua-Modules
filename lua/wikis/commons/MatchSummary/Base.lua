@@ -11,8 +11,8 @@ local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
+local Image = Lua.import('Module:Image')
 local Logic = Lua.import('Module:Logic')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local VodLink = Lua.import('Module:VodLink')
 
@@ -31,15 +31,9 @@ local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 
 ---@class MatchSummaryFooter
 ---@operator call: MatchSummaryFooter
----@field root Html
----@field inner Html
 ---@field elements (Widget|Html|string|number)[]
 local Footer = Class.new(
 	function(self)
-		self.root = mw.html.create('div')
-			:addClass('brkts-popup-footer')
-		self.inner = mw.html.create('div')
-			:addClass('brkts-popup-spaced vodlink')
 		self.elements = {}
 	end
 )
@@ -57,16 +51,9 @@ end
 ---@param text string
 ---@return MatchSummaryFooter
 function Footer:addLink(link, icon, iconDark, text)
-	local content
-	if String.isEmpty(iconDark) then
-		content = '[[' .. icon .. '|link=' .. link .. '|32px|' .. text .. '|alt=' .. link .. ']]'
-	else
-		---@cast iconDark -nil
-		content = '[[' .. icon .. '|link=' .. link .. '|32px|' .. text .. '|alt=' .. link .. '|class=show-when-light-mode]]'
-			.. '[[' .. iconDark .. '|link=' .. link .. '|32px|' .. text .. '|alt=' .. link .. '|class=show-when-dark-mode]]'
-	end
-
-	table.insert(self.elements, content)
+	table.insert(self.elements, Image.display(icon, iconDark, {
+		link = link, size = '32px', caption = text, alt = link
+	}))
 	return self
 end
 
@@ -105,16 +92,9 @@ function Footer:addLinks(links)
 	return self
 end
 
----@return Html?
+---@return Widget?
 function Footer:create()
-	if Table.isEmpty(self.elements) then
-		return
-	end
-	for _, element in ipairs(self.elements) do
-		self.inner:node(element)
-	end
-	self.root:node(self.inner)
-	return self.root
+	return MatchSummaryWidgets.Footer{children = self.elements}
 end
 
 ---@class MatchSummaryMatch
@@ -123,7 +103,7 @@ end
 ---@field headerElement Widget?
 ---@field bodyElement Widget[]?
 ---@field commentElement Widget?
----@field footerElement Html?
+---@field footerElement Widget?
 ---@field buttonElement Widget?
 local Match = Class.new(
 	function(self)

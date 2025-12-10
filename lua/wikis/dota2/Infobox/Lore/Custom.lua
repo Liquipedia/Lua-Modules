@@ -22,7 +22,7 @@ local CustomCosmetic = Class.new(Lore)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomCosmetic.run(frame)
 	local lore = CustomCosmetic(frame)
 	lore:setWidgetInjector(CustomInjector(lore))

@@ -31,7 +31,7 @@ local CustomInjector = Class.new(Injector)
 local DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION = '_positiveConcatedArgsForBase'
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomItem.run(frame)
 	local item = CustomItem(frame)
 	item.args.image = item.args.image or ('Deadlock_gameasset_Item ' .. item.args.name .. '.png')

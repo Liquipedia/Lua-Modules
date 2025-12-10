@@ -40,6 +40,7 @@ local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
 ---@class InfoboxTeam : BasicInfobox
+---@operator call(Frame): InfoboxTeam
 local Team = Class.new(BasicInfobox)
 
 local LINK_VARIANT = 'team'
@@ -55,13 +56,13 @@ local Status = {
 }
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function Team.run(frame)
 	local team = Team(frame)
 	return team:createInfobox()
 end
 
----@return string
+---@return Widget
 function Team:createInfobox()
 	local args = self.args
 

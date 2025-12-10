@@ -30,7 +30,7 @@ local CustomExpansion = Class.new(Expansion)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomExpansion.run(frame)
 	local expansion = CustomExpansion(frame)
 	expansion:setWidgetInjector(CustomInjector(expansion))
