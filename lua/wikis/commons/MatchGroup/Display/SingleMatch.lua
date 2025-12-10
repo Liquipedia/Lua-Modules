@@ -54,18 +54,15 @@ function SingleMatchDisplay.SingleMatch(props)
 		width = propsConfig.width or 400,
 	}
 
-	local matchNode = SingleMatchDisplay.Match{
+	return SingleMatchDisplay.Match{
 		MatchSummaryContainer = config.MatchSummaryContainer,
 		match = props.match,
+		width = config.width,
 	}
-
-	return matchNode
-		:addClass('brkts-popup brkts-match-info-flat')
-		:css('width', config.width .. 'px')
 end
 
 ---Display component for a match in a singleMatch. Consists of the match summary.
----@param props {MatchSummaryContainer: function, match: MatchGroupUtilMatch}
+---@param props {MatchSummaryContainer: function, match: MatchGroupUtilMatch, width: string|integer?}
 ---@return Html
 function SingleMatchDisplay.Match(props)
 	local bracketId = MatchGroupUtil.splitMatchId(props.match.matchId)
@@ -73,6 +70,8 @@ function SingleMatchDisplay.Match(props)
 		bracketId = bracketId,
 		matchId = props.match.matchId,
 		config = {showScore = true},
+		classes = {'brkts-popup', 'brkts-match-info-flat'},
+		width = props.width,
 	}, Lua.import('Module:Error/Display').ErrorList)
 end
 
