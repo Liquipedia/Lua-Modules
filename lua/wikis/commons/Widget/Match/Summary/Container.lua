@@ -16,7 +16,8 @@ local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 
 ---@class MatchSummaryContainerProps
----@field width string?
+---@field classes string[]?
+---@field width string|integer?
 ---@field createMatch fun(matchData: MatchGroupUtilMatch): MatchSummaryMatch
 ---@field match MatchGroupUtilMatch
 ---@field resetMatch MatchGroupUtilMatch?
@@ -36,20 +37,12 @@ function MatchSummaryContainer._getExpandedHeader(matchData)
 	return DisplayHelper.expandHeader(header)[1]
 end
 
----@param class string
----@return self
-function MatchSummaryContainer:addClass(class)
-	self.additionalClasses = self.additionalClasses or {}
-	Array.extendWith(self.additionalClasses, class)
-	return self
-end
-
 ---@return Widget
 function MatchSummaryContainer:render()
 	local resetMatch = self.props.resetMatch
 	return AnalyticsWidget{
 		analyticsName = 'Match popup',
-		classes = Array.extend('brkts-popup', self.additionalClasses),
+		classes = Array.extend('brkts-popup', self.props.classes),
 		css = {width = self.props.width},
 		children = ContentSwitch{
 			css = {['margin-bottom'] = '0.5rem'},
