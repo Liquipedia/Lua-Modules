@@ -52,8 +52,15 @@ function CustomMatchTicker.newMainPage(frame)
 	end
 end
 
----@deprecated Upcoming matches are now automatically displayed in the player infobox.
-function CustomMatchTicker.player()
+---Entry point for display on player pages
+---NOTE: Upcoming and ongoing matches are now automatically displayed via the entity match ticker
+---
+---@param frame Frame|table|nil
+---@return Html
+function CustomMatchTicker.player(frame)
+	local args = Arguments.getArgs(frame)
+	args.player = args.player or mw.title.getCurrentTitle().text
+	return CustomMatchTicker.participant(args)
 end
 
 ---@deprecated Upcoming matches are now automatically displayed in the team infobox.
@@ -62,7 +69,6 @@ end
 
 ---Entry point for displaying recent matches on player/team pages.
 ---NOTE: Upcoming and ongoing matches are now automatically displayed via the entity match ticker
----in player/team infoboxes. This function should ONLY be used for displaying recent matches.
 ---
 ---@param args table
 ---@param matches {recent: table?}?
