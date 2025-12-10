@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local String = Lua.import('Module:StringUtils')
@@ -23,6 +24,8 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
+
+local MAX_OPPONENT_LIMIT = Info.config.defaultMaxPlayersPerPlacement or 10
 
 local Count = {}
 
@@ -176,7 +179,8 @@ function Count.placements(args)
 		local opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(args.player)
 		local opponentWithUnderscores = opponent:gsub(' ', '_')
 		local opponentConditions = ConditionTree(BooleanOperator.any)
-		for index = 1, 10 do
+
+		for index = 1, MAX_OPPONENT_LIMIT do
 			opponentConditions:add{
 				ConditionNode(ColumnName('opponentplayers_p' .. index), Comparator.eq, opponent),
 				ConditionNode(ColumnName('opponentplayers_p' .. index), Comparator.eq, opponentWithUnderscores)
