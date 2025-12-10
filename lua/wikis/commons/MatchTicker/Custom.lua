@@ -53,8 +53,7 @@ function CustomMatchTicker.newMainPage(frame)
 end
 
 ---Entry point for display on player pages
----NOTE: Upcoming and ongoing matches are now automatically displayed via the entity match ticker
----
+---Upcoming and ongoing matches are now automatically displayed via the entity match ticker
 ---@param frame Frame|table|nil
 ---@return Html
 function CustomMatchTicker.player(frame)
@@ -68,8 +67,6 @@ function CustomMatchTicker.team()
 end
 
 ---Displays recent matches for a player or team.
----Upcoming and ongoing matches are automatically displayed via the entity match ticker in the infobox.
----
 ---@param args table
 ---@param matches {recent: table?}?
 ---@return Html
