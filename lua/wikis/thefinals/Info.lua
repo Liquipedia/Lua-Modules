@@ -32,7 +32,7 @@ return {
 			allowManual = false,
 		},
 		match2 = {
-			status = 0, -- copied from LAB until we have a proper match2 setup for this wiki
+			status = 2,
 			matchWidth = 180,
 		},
 		infoboxPlayer = {
