@@ -25,7 +25,6 @@ local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 ---@class MatchSummaryContainer: Widget
 ---@operator call(MatchSummaryContainerProps): MatchSummaryContainer
 ---@field props MatchSummaryContainerProps
----@field private additionalClasses string[]
 local MatchSummaryContainer = Class.new(Widget)
 
 ---@private
