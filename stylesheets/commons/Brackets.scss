@@ -539,7 +539,7 @@
 		}
 	}
 
-	&:has( .toggle-area ) {
+	&:has( > .toggle-area ) {
 		.brkts-popup-close-button {
 			@media ( max-width: 768px ) {
 				top: 3.5rem;
