@@ -13,7 +13,9 @@ local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local Page = Lua.import('Module:Page')
+local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 local Table = Lua.import('Module:Table')
 
 local Condition = Lua.import('Module:Condition')
@@ -22,6 +24,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local Widgets = Lua.import('Module:Widget/All')
 local Td = Widgets.Td
@@ -34,7 +37,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@class CountryRepresentation
 ---@operator call(table<string, any>): CountryRepresentation
 ---@field config CountryRepresentationConfig
----@field byCountry table<string, {page:string, displayName: string?}[]>
+---@field byCountry table<string, standardPlayer[]>
 ---@field count integer
 local CountryRepresentation = Class.new(function(self, args) self:init(args) end)
 
@@ -68,15 +71,12 @@ function CountryRepresentation:init(args)
 	return self
 end
 
+---@private
 ---@return string
 function CountryRepresentation:_buildConditions()
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('mode'), Comparator.neq, 'award_individual'),
-		ConditionTree(BooleanOperator.any):add(
-			Array.map(self.config.tournaments, function(page)
-				return ConditionNode(ColumnName('pagename'), Comparator.eq, page)
-			end)
-		),
+		ConditionUtil.anyOf(ColumnName('pagename'), self.config.tournaments)
 	}
 
 	return conditions:toString()
@@ -92,37 +92,42 @@ function CountryRepresentation:fetchAndProcess()
 	})
 
 	local count = 0
+	---@type table<string, boolean>
 	local cache = {}
+	---@type table<string, standardPlayer[]>
 	local byCountry = {}
-	local handleEntry = function(prefix, players)
-		local page = players[prefix]
-		if Logic.isEmpty(page) or cache[page] then return end
 
-		local flag = players[prefix .. 'flag']
+	---@param player standardPlayer
+	local function handleEntry(player)
+		local page = player.pageName
+		if Logic.isEmpty(page) or cache[page] then return end
+		---@cast page -nil
+
+		local flag = player.flag
 		if Logic.isEmpty(flag) and not self.config.showNoCountry then return end
 
 		cache[page] = true
 		count = count + 1
 
 		byCountry[flag or ''] = byCountry[flag or ''] or {}
-		table.insert(byCountry[flag or ''], {page = page, displayName = players[prefix .. 'dn']})
+		table.insert(byCountry[flag or ''], player)
 	end
 
 	Array.forEach(queryResult, function(placement)
 		local players = placement.opponentplayers or {}
-		for prefix in Table.iter.pairsByPrefix(players, 'p') do
-			handleEntry(prefix, players)
-		end
+		Array.forEach(Array.mapIndexes(function (index)
+			return Logic.nilIfEmpty(Opponent.playerFromLpdbStruct(players, index))
+		end), handleEntry)
 		if not self.config.staff then return end
-		for prefix in Table.iter.pairsByPrefix(players, 'c') do
-			handleEntry(prefix, players)
-		end
+		Array.forEach(Array.mapIndexes(function (index)
+			return Logic.nilIfEmpty(Opponent.staffFromLpdbStruct(players, index))
+		end), handleEntry)
 	end)
 
 	-- sort the players alphabetically for each country
 	for _, tbl in pairs(byCountry) do
 		table.sort(tbl, function(player1, player2)
-			return string.lower(player1.page) < string.lower(player2.page)
+			return string.lower(player1.pageName) < string.lower(player2.pageName)
 		end)
 	end
 
@@ -147,9 +152,9 @@ function CountryRepresentation:create()
 				Td{css = {['text-align'] = 'right'}, children = {cache.rank}},
 				Td{children = {Flags.Icon{flag = country}, '&nbsp;', country}},
 				Td{css = {['text-align'] = 'right'}, children = {self:_ratioDisplay(#players)}},
-				Td{children = {table.concat(Array.map(players, function(player)
-					return Page.makeInternalLink({}, player.displayName or player.page, player.page)
-				end), ', ')}},
+				Td{children = Array.interleave(Array.map(players, function (player)
+					return PlayerDisplay.InlinePlayer{player = player, showFlag = false}
+				end), ', ')},
 			}
 		})
 	end
@@ -164,12 +169,13 @@ function CountryRepresentation:create()
 	}
 
 	return DataTable{
-		classes = {'sortable'},
+		sortable = true,
 		children = WidgetUtil.collect(headerRow, rows),
 	}
 end
 
----@param byCountry {page:string, displayName: string?}[]
+---@private
+---@param byCountry table<string, standardPlayer[]>
 ---@param country1 string
 ---@param country2 string
 ---@return boolean
@@ -180,11 +186,12 @@ function CountryRepresentation._sortCountries(byCountry, country1, country2)
 	return country1 < country2
 end
 
+---@private
 ---@param numberOfPlayers integer
 ---@return string
 function CountryRepresentation:_ratioDisplay(numberOfPlayers)
-	local percentage = self.count == 0 and 0 or MathUtil.round(100 * numberOfPlayers / self.count, 0)
-	return numberOfPlayers .. ' / ' .. self.count .. ' (' .. percentage .. '%)'
+	local percentage = self.count > 0 and MathUtil.formatPercentage(numberOfPlayers / self.count) or '-'
+	return numberOfPlayers .. ' / ' .. self.count .. ' (' .. percentage .. ')'
 end
 
 return CountryRepresentation
