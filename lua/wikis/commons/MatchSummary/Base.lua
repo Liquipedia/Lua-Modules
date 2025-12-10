@@ -159,62 +159,10 @@ function Match:create()
 end
 
 ---@class MatchSummary
----@operator call(string?):MatchSummary
----@field Footer MatchSummaryFooter
----@field Match MatchSummaryMatch
----@field matches Html[]?
----@field headerElement Widget?
----@field root Html?
-local MatchSummary = Class.new()
-MatchSummary.Footer = Footer
-MatchSummary.Match = Match
-
---- TODO: Instead of attaching data-analytics-name here, use Analytics Widget
----@param width string?
----@return MatchSummary
-function MatchSummary:init(width)
-	self.matches = {}
-	self.root = mw.html.create('div')
-		:addClass('brkts-popup')
-		:css('width', width)
-		:attr('data-analytics-name', 'Match popup')
-	return self
-end
-
----@param cssClass string?
----@return MatchSummary
-function MatchSummary:addClass(cssClass)
-	self.root:addClass(cssClass)
-	return self
-end
-
----@param header Widget?
----@return MatchSummary
-function MatchSummary:header(header)
-	self.headerElement = header
-	return self
-end
-
----@param match MatchSummaryMatch?
----@return MatchSummary
-function MatchSummary:addMatch(match)
-	if not match then return self end
-
-	table.insert(self.matches, match:create())
-
-	return self
-end
-
----@return Html
-function MatchSummary:create()
-	self.root:node(self.headerElement)
-
-	for _, match in ipairs(self.matches) do
-		self.root:node(match)
-	end
-
-	return self.root
-end
+local MatchSummary = {
+	Footer = Footer,
+	Match = Match,
+}
 
 ---Default header function
 ---@param match table
