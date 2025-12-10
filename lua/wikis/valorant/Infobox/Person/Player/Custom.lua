@@ -12,19 +12,19 @@ local Array = Lua.import('Module:Array')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
-local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local Region = Lua.import('Module:Region')
 local SignaturePlayerAgents = Lua.import('Module:SignaturePlayerAgents')
 local String = Lua.import('Module:StringUtils')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Injector = Lua.import('Module:Widget/Injector')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Player = Lua.import('Module:Infobox/Person')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 
 local SIZE_AGENT = '20px'
@@ -127,6 +127,7 @@ function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = TeamTemplate.getPageName(self.args.team)
 		---@cast teamPage -nil
+
 		return HtmlWidgets.Fragment{
 			children = {
 				MatchTicker.player{recentLimit = 3},

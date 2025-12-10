@@ -82,11 +82,16 @@ end
 
 ---@return Widget?
 function CustomPlayer:createBottomContent()
-	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		local teamPage = TeamTemplate.getPageName(self.args.team)
-		---@cast teamPage -nil
-		return UpcomingTournaments.team{name = teamPage}
+	if not self:shouldStoreData(self.args) or String.isEmpty(self.args.team) then
+		return
 	end
+
+	local teamPage = TeamTemplate.getPageName(self.args.team)
+	if not teamPage then
+		return
+	end
+
+	return UpcomingTournaments.team{name = teamPage}
 end
 
 return CustomPlayer

@@ -166,7 +166,10 @@ end
 ---@return Html?
 function CustomPlayer:createBottomContent()
 	if self.shouldQueryData then
-		return MatchTicker.participant({player = self.pagename}, self.recentMatches)
+		return MatchTicker.recent({
+			player = self.pagename,
+			limit = NUMBER_OF_RECENT_MATCHES
+		})
 	end
 end
 

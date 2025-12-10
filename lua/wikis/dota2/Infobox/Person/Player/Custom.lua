@@ -12,19 +12,19 @@ local CharacterIcon = Lua.import('Module:CharacterIcon')
 local Class = Lua.import('Module:Class')
 local HeroNames = Lua.import('Module:HeroNames', {loadData = true})
 local Logic = Lua.import('Module:Logic')
-local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local YearsActive = Lua.import('Module:YearsActive')
 
 local Flags = Lua.import('Module:Flags')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Injector = Lua.import('Module:Widget/Injector')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Player = Lua.import('Module:Infobox/Person')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -138,14 +138,16 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@return string?
+---@return Widget?
 function CustomPlayer:createBottomContent()
-	if Namespace.isMain() then
-		return HtmlWidgets.Fragment{children = {
-			MatchTicker.player(),
-			UpcomingTournaments.player{name = self.basePageName}
-		}}
+	if not Namespace.isMain() then
+		return
 	end
+
+	return HtmlWidgets.Fragment{children = {
+		MatchTicker.player(),
+		UpcomingTournaments.player{name = self.basePageName}
+	}}
 end
 
 ---@return string[]

@@ -184,7 +184,7 @@ end
 
 ---@return Html?
 function CustomPlayer:createBottomContent()
-	return MatchTicker.participant{player = self.pagename}
+	return MatchTicker.recent{player = self.pagename}
 end
 
 ---@param id string

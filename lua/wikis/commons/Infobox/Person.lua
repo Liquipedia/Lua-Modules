@@ -25,6 +25,7 @@ local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Earnings = Lua.import('Module:Earnings')
 local Flags = Lua.import('Module:Flags')
 local Links = Lua.import('Module:Links')
+local MatchTicker = Lua.import('Module:MatchTicker')
 local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local Region = Lua.import('Module:Region')
 
@@ -174,6 +175,7 @@ function Person:createInfobox()
 		Customizable{id = 'customcontent', children = {}},
 	}
 
+	self:top(self:_createUpcomingMatches())
 	self:bottom(self:createBottomContent())
 
 	local statusToStore = self:getStatusToStore(args)
@@ -196,6 +198,44 @@ function Person:createInfobox()
 	self:_definePageVariables(args)
 
 	return self:build(widgets, 'Person')
+end
+
+---@return Widget?
+function Person:_createUpcomingMatches()
+	if not self:shouldStoreData(self.args) then
+		return nil
+	end
+
+	if Info.config.match2.status == 0 then
+		return nil
+	end
+
+	local result = Logic.tryCatch(
+		function()
+			local matchTicker = MatchTicker{
+				player = self.pagename,
+				limit = 5,
+				upcoming = true,
+				ongoing = true,
+				hideTournament = false,
+			}
+			matchTicker:query()
+			return matchTicker
+		end,
+		function()
+			return nil
+		end
+	)
+
+	if not result or not result.matches or #result.matches == 0 then
+		return nil
+	end
+
+	local EntityDisplay = Lua.import('Module:MatchTicker/DisplayComponents/Entity')
+	return EntityDisplay.Container{
+		config = result.config,
+		matches = result.matches,
+	}:create()
 end
 
 function Person:_parseArgs()

@@ -33,6 +33,10 @@ end
 
 ---@return Widget?
 function CustomPlayer:createBottomContent()
+	if not self:shouldStoreData(self.args) then
+		return
+	end
+
 	return UpcomingTournaments.player{name = self.pagename}
 end
 

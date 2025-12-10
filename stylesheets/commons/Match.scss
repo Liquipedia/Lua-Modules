@@ -344,6 +344,11 @@ $team-icon-size: 22px;
 			}
 		}
 
+		.match-info-tournament-wrapper {
+			max-width: 100%;
+			min-width: 0;
+		}
+
 		.match-info-header-vertical {
 			display: flex;
 			flex-direction: column;
@@ -411,5 +416,10 @@ $team-icon-size: 22px;
 				justify-content: center;
 			}
 		}
+	}
+
+	&-tournament-wrapper {
+		display: flex;
+		flex-direction: column;
 	}
 }

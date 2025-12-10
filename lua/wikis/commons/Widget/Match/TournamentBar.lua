@@ -71,6 +71,7 @@ function MatchTournamentBar:render()
 			}
 		} or nil,
 		HtmlWidgets.Span{
+			classes = {'match-info-tournament-wrapper'},
 			children = {
 				HtmlWidgets.Span{
 					classes = {'match-info-tournament-name'},
@@ -104,8 +105,7 @@ function MatchTournamentBar:render()
 						} or nil
 					)
 				} or nil
-			},
-			css = {['display'] = 'flex', ['flex-direction'] = 'column', ['max-width'] = '100%'}
+			}
 		}
 	)
 end
