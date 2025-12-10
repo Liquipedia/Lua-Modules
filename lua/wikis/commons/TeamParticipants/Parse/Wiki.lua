@@ -12,8 +12,8 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
-local Page = Lua.import('Module:Page')
 local RoleUtil = Lua.import('Module:Role/Util')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tournament = Lua.import('Module:Tournament')
@@ -90,10 +90,13 @@ local function parseQualifier(input)
 	}
 
 	if qualificationType == 'tournament' then
-		if not input.page then
+		local tournamentPage = input.page
+		if not tournamentPage then
 			error('Tournament qualifier must have a page')
 		end
-		local tournamentPage = Page.makeSubPage(input.page)
+		if String.startsWith(tournamentPage, '/') then
+			tournamentPage = mw.title.getCurrentTitle().text .. tournamentPage
+		end
 		local tournament = Tournament.getTournament(tournamentPage)
 		if not tournament then
 			qualificationStructure.type = 'other'
