@@ -66,6 +66,8 @@ function CountryRepresentation:init(args)
 		end)), Page.pageifyLink),
 	}
 
+	assert(self.config.player or self.config.staff, 'Invalid config: at least one of |player= or |staff= must be true')
+
 	if Logic.isEmpty(self.config.tournaments) then
 		self.config.tournaments = {Page.pageifyLink(mw.title.getCurrentTitle().text)}
 	end
