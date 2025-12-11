@@ -2,6 +2,10 @@
 Template(s): All Infoboxes
 Author(s): FO-nTTaX
 *******************************************************************************/
+$infobox-width: 336px;
+$infobox-margin: 10px;
+$infobox-padding: 10px;
+
 .fo-nttax-infobox-container {
 	@media ( max-width: 600px ) {
 		display: flex;
@@ -12,7 +16,7 @@ Author(s): FO-nTTaX
 .fo-nttax-infobox-wrapper {
 	clear: right;
 	float: right;
-	margin: 10px 0 10px 10px;
+	margin: $infobox-margin 0 $infobox-margin $infobox-margin;
 	font-size: 0.8125rem;
 
 	@media ( max-width: 600px ) {
@@ -28,15 +32,14 @@ Author(s): FO-nTTaX
 	}
 
 	@media ( min-width: 601px ) {
-		// full screeen minus infobox width minus margin
-		width: calc( 100% - 336px - 10px );
+		width: calc( 100% - $infobox-width - $infobox-margin );
 	}
 }
 
 .fo-nttax-infobox-adbox {
-	width: 336px;
+	width: $infobox-width;
 	min-height: 292px;
-	padding-top: 10px;
+	padding-top: $infobox-padding;
 	padding-bottom: 30px;
 	border-bottom: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
 	overflow: hidden;
@@ -48,9 +51,9 @@ Author(s): FO-nTTaX
 }
 
 .fo-nttax-infobox {
-	width: 336px;
-	padding-top: 10px;
-	padding-bottom: 10px;
+	width: $infobox-width;
+	padding-top: $infobox-padding;
+	padding-bottom: $infobox-padding;
 	border-top: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
 	border-bottom: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
 }
@@ -349,7 +352,7 @@ Author(s): salle, Ricci
 *******************************************************************************/
 .fo-nttax-infobox div.infobox-image.infobox-double-image > div {
 	overflow-x: scroll;
-	width: 336px;
+	width: $infobox-width;
 	white-space: nowrap;
 }
 
