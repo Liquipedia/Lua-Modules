@@ -17,6 +17,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Condition = Lua.import('Module:Condition')
 local BooleanOperator = Condition.BooleanOperator
