@@ -94,14 +94,8 @@ function TeamParticipantsController.applyPlayedAndResults(parsedData)
 	end
 
 	Array.forEach(parsedData.participants, function (participant)
-		local players = participant.opponent.players
-		-- Bad structure, this should always exist
-		if not players then
-			return
-		end
-
 		TeamParticipantsController.applyPlayedData(
-			players,
+			participant.opponent,
 			participant.autoPlayed and playedData[participant.opponent.template] or nil
 		)
 	end)
@@ -199,12 +193,23 @@ function TeamParticipantsController.getPlayedPlayersFromMatch(playedData, partic
 	end)
 end
 
----@param players standardPlayer[]
+---@param opponent standardOpponent
 ---@param playedData standardPlayer[]?
-function TeamParticipantsController.applyPlayedData(players, playedData)
+function TeamParticipantsController.applyPlayedData(opponent, playedData)
+	local players = opponent.players
+	-- Bad structure, this should always exist
+	if Logic.isEmpty(players) then
+		return
+	end
+	---@cast players -nil
+
+	local placement = (TeamParticipantsRepository.getPrizepoolRecordForTeam(opponent) or {}).placement
+
+	---@param pageName string
+	---@return boolean?
 	local autoHasPlayed = function(pageName)
-		if Logic.isEmpty(playedData) then
-			return nil
+		if Logic.isEmpty(playedData) or Logic.isEmpty(placement) then
+			return
 		end
 		---@cast playedData -nil
 		return Array.any(playedData, function(referencePlayer)
