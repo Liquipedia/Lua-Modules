@@ -531,10 +531,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, gameIdentifier)}
 	end
 
-	conditions:add{ConditionTree(BooleanOperator.all):add{
-			ConditionNode(ColumnName('sortdate'), Comparator.lt, DATE)
-		},
-	}
+	conditions:add(ConditionNode(ColumnName('sortdate'), Comparator.lt, DATE))
 
 	local totalData = mw.ext.LiquipediaDB.lpdb('tournament', {
 			query = 'sum::prizepool',
@@ -632,15 +629,9 @@ function StatisticsPortal.pieChartBreakdown(args)
 	local conditions = StatisticsPortal._returnBaseConditions()
 
 	if args.year then
-		conditions:add{ConditionTree(BooleanOperator.all):add{
-				ConditionNode(ColumnName('sortdate_year'), Comparator.eq, args.year),
-			},
-		}
+		conditions:add(ConditionNode(ColumnName('sortdate_year'), Comparator.eq, args.year))
 	else
-		conditions:add{ConditionTree(BooleanOperator.all):add{
-				ConditionNode(ColumnName('sortdate'), Comparator.lt, DATE),
-			},
-		}
+		conditions:add(ConditionNode(ColumnName('sortdate'), Comparator.lt, DATE))
 	end
 
 	if args.game then
@@ -880,9 +871,6 @@ function StatisticsPortal._getOpponentEarningsData(args, config)
 		queryFields = 'pagename, id, nationality, earnings, birthdate, team, earningsbyyear'
 	end
 
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('earnings'), Comparator.gt, 0)}
-
 	local data = {}
 
 	local processData = function(item)
@@ -890,7 +878,7 @@ function StatisticsPortal._getOpponentEarningsData(args, config)
 	end
 
 	local queryParameters = {
-		conditions = conditions:toString(),
+		conditions = tostring(ConditionNode(ColumnName('earnings'), Comparator.gt, 0)),
 		limit = MAX_QUERY_LIMIT,
 		query = queryFields,
 	}
