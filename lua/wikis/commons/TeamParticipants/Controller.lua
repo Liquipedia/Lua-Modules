@@ -42,7 +42,7 @@ function TeamParticipantsController.fromTemplate(frame)
 	TeamParticipantsController.applySorting(
 		parsedData,
 		Logic.readBool(args.sortparticipants),
-		Logic.readBool(args.sortplayers)
+		Logic.readBool(args.sortplayersalphabetically)
 	)
 
 	local shouldStore = Logic.readBoolOrNil(args.store) ~= false and Lpdb.isStorageEnabled()
