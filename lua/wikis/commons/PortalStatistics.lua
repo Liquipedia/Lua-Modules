@@ -760,11 +760,12 @@ function StatisticsPortal.playerAgeTable(args)
 	args.limit = tonumber(args.limit) or 20
 	args.order = 'birthdate ' .. (args.order or 'desc')
 
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('birthdate'), Comparator.neq, '')}
-		:add{ConditionNode(ColumnName('birthdate'), Comparator.neq, DateExt.defaultDate)}
-		:add{ConditionNode(ColumnName('deathdate'), Comparator.eq, DateExt.defaultDate)}
-		:add{ConditionNode(ColumnName('earnings'), Comparator.gt, args.earnings)}
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('birthdate'), Comparator.neq, ''),
+		ConditionNode(ColumnName('birthdate'), Comparator.neq, DateExt.defaultDate),
+		ConditionNode(ColumnName('deathdate'), Comparator.eq, DateExt.defaultDate),
+		ConditionNode(ColumnName('earnings'), Comparator.gt, args.earnings),
+	}
 
 	if Logic.readBool(args.isActive) then
 		conditions:add{ConditionNode(ColumnName('status'), Comparator.eq, 'Active')}
