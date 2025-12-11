@@ -91,6 +91,12 @@ BasePrizePool.config = {
 			return tonumber(args.cutafter)
 		end
 	},
+	hideafter = {
+		default = math.huge,
+		read = function(args)
+			return tonumber(args.hideafter)
+		end
+	},
 	storeLpdb = {
 		default = true,
 		read = function(args)
