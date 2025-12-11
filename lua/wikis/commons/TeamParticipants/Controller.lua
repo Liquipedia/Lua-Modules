@@ -13,6 +13,8 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
+local Operator = Lua.import('Module:Operator')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 
 local TeamParticipantsWikiParser = Lua.import('Module:TeamParticipants/Parse/Wiki')
@@ -36,6 +38,12 @@ function TeamParticipantsController.fromTemplate(frame)
 	local parsedData = TeamParticipantsWikiParser.parseWikiInput(parsedArgs)
 	TeamParticipantsController.importParticipants(parsedData)
 	TeamParticipantsController.fillIncompleteRosters(parsedData)
+
+	TeamParticipantsController.applySorting(
+		parsedData,
+		Logic.readBool(args.sortparticipants),
+		Logic.readBool(args.sortplayers)
+	)
 
 	local shouldStore = Logic.readBoolOrNil(args.store) ~= false and Lpdb.isStorageEnabled()
 
@@ -137,6 +145,25 @@ function TeamParticipantsController.fillIncompleteRosters(parsedData)
 		end
 
 		TeamParticipantsWikiParser.fillIncompleteRoster(participant.opponent, parsedData.expectedPlayerCount)
+	end)
+end
+
+---@param parsedData {participants: TeamParticipant[], expectedPlayerCount: integer?}
+---@param sortParticipants boolean
+---@param sortPlayers boolean
+function TeamParticipantsController.applySorting(parsedData, sortParticipants, sortPlayers)
+	if sortParticipants then
+		Array.sortInPlaceBy(parsedData.participants, function(participant)
+			return Opponent.toName(participant.opponent)
+		end)
+	end
+
+	Array.forEach(parsedData.participants, function(participant)
+		if not Logic.nilOr(participant.sortPlayersAlphabetically, sortPlayers) then
+			return
+		end
+
+		Array.sortInPlaceBy(participant.opponent.players, Operator.property('displayName'))
 	end)
 end
 

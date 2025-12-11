@@ -23,7 +23,7 @@ local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
 ---qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer,
----potentialQualifiers: standardOpponent[]?, warnings: string[]?}
+---potentialQualifiers: standardOpponent[]?, warnings: string[]?, sortPlayersAlphabetically: boolean?}
 
 ---@alias QualificationMethod 'invite'|'qual'
 ---@alias QualificationType 'tournament'|'external'|'other'
@@ -183,6 +183,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 		potentialQualifiers = potentialQualifiers,
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
+		sortPlayersAlphabetically = Logic.readBoolOrNil(input.sortplayersalphabetically),
 		date = date,
 	}
 end
