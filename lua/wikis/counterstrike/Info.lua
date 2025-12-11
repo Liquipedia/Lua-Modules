@@ -136,6 +136,7 @@ local infoData = {
 		},
 		participants = {
 			defaultPlayerNumber = 5,
+			mergeStaffTabIfOnlyOneStaff = true,
 		},
 	},
 }

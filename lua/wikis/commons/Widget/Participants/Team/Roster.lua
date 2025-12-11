@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local RoleUtil = Lua.import('Module:Role/Util')
@@ -45,6 +46,8 @@ local PERSON_TYPE_TO_TAB = {
 	former = TAB_ENUM.FORMER,
 	staff = TAB_ENUM.STAFF,
 }
+
+local Config = Info.config.participants or {}
 
 
 -- The biz logic behind the role display is somewhat complicated.
@@ -150,7 +153,12 @@ function ParticipantsTeamRoster:render()
 	tabs = Array.filter(tabs, function(tab)
 		return #tab.players > 0
 	end)
-	if #tabs == 2 and tabs[1].type == TAB_ENUM.MAIN and tabs[2].type == TAB_ENUM.STAFF and #tabs[2].players == 1 then
+	if Config.mergeStaffTabIfOnlyOneStaff
+		and #tabs == 2
+		and tabs[1].type == TAB_ENUM.MAIN
+		and tabs[2].type == TAB_ENUM.STAFF
+		and #tabs[2].players == 1
+	then
 		-- If we only have main and staff, and exactly one staff, just show both rosters without a switch
 		return makeRostersDisplay(Array.extend(tabs[1].players, tabs[2].players))
 	end
