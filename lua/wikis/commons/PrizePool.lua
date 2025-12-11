@@ -65,6 +65,12 @@ end
 
 ---@param placement PrizePoolPlacement
 ---@return boolean
+function PrizePool:applyHideAfter(placement)
+	return placement.placeStart > self.options.hideafter
+end
+
+---@param placement PrizePoolPlacement
+---@return boolean
 function PrizePool:applyCutAfter(placement)
 	if placement.placeStart > self.options.cutafter then
 		return true
