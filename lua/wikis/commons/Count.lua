@@ -206,7 +206,7 @@ end
 
 ---Returns the counted number based on the type of query
 ---@param queryType string
----@param lpdbConditions string|ConditionTree
+---@param lpdbConditions string|AbstractConditionNode
 ---@return integer
 function Count.query(queryType, lpdbConditions)
 	local data = mw.ext.LiquipediaDB.lpdb(queryType, {
