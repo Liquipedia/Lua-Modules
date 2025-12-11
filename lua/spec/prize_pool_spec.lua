@@ -79,6 +79,7 @@ describe('prize pool', function()
 				currencyRatePerOpponent = false,
 				currencyRoundPrecision = 3,
 				cutafter = 4,
+				hideafter = math.huge,
 				exchangeInfo = true,
 				fillPlaceRange = true,
 				lpdbPrefix = 'abc',
