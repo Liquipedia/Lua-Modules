@@ -100,13 +100,13 @@ function PrizePool:_toggleExpand(placeStart)
 	local placeEnd = self.placements[#self.placements].placeEnd
 
 	if self.options.hideafter < math.huge then
-		local firstHide = Array.min(
+		local lastCut = Array.max(
 			Array.filter(self.placements, function (placement)
-				return placement.placeStart > self.options.hideafter
+				return placement.placeEnd <= self.options.hideafter
 			end),
-			Operator.property('placeStart')
+			Operator.property('placeEnd')
 		)
-		placeEnd = firstHide.placeStart - 1
+		placeEnd = lastCut.placeEnd
 	end
 
 	local text = 'place ' .. placeStart .. ' to ' .. placeEnd
