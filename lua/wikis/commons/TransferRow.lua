@@ -15,6 +15,7 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -82,8 +83,8 @@ function TransferRow:readConfig()
 	local isRumour = Logic.readBool(self.args.isRumour)
 	return {
 		storage = not isRumour and
-			not Logic.readBool(self.args.disable_storage) and
-			not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+			not Logic.readBool(self.args.disable_storage)
+			and Lpdb.isStorageEnabled()
 			and Namespace.isMain(),
 		isRumour = isRumour,
 	}

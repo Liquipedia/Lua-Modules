@@ -27,7 +27,7 @@ local CustomStrategy = Class.new(Strategy)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomStrategy.run(frame)
 	local strategy = CustomStrategy(frame)
 	strategy:setWidgetInjector(CustomInjector(strategy))

@@ -643,6 +643,8 @@ span.slash {
 		display: flex;
 		gap: 1rem;
 		flex: 0 0 7.5rem;
+		align-items: center;
+		justify-content: flex-end;
 
 		@media ( min-width: 768px ) {
 			flex: 0 0 9.5rem;
@@ -672,8 +674,10 @@ span.slash {
 			}
 
 			@media ( min-width: 768px ) {
-				width: 2rem;
-				height: 2rem;
+				.wiki-dota2 & {
+					width: 2rem;
+					height: 2rem;
+				}
 			}
 
 			img {
@@ -688,8 +692,8 @@ span.slash {
 		}
 
 		&-items {
-			display: flex;
-			align-items: flex-start;
+			display: grid;
+			grid-template-columns: repeat( 3, 1fr );
 			gap: 0.25rem;
 			flex-wrap: wrap;
 		}
@@ -792,6 +796,12 @@ span.slash {
 			grid-template-columns: repeat( 4, minmax( 0, 1fr ) );
 			grid-template-rows: 1fr;
 			align-items: center;
+
+			@media ( min-width: 1200px ) and ( max-width: 1319px ),
+				( min-width: 1510px ) and ( max-width: 1680px ) {
+				grid-template-columns: repeat( 2, minmax( 0, 1fr ) );
+				grid-template-rows: 1fr 1fr;
+			}
 		}
 
 		&.match-bm-players-player-stats--col-5 {
@@ -915,64 +925,22 @@ span.slash {
 	}
 }
 
-.match-bm-lol-players-player {
-	&-details {
+.match-bm-lol-players-player-loadout-rs {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.25rem;
+
+	&-wrap {
 		display: flex;
 		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-		gap: 16px;
-		align-self: stretch;
-		flex: 2 0 50%;
+		align-items: flex-start;
+		gap: 4px;
 	}
 
-	&-loadout {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		gap: 16px;
-
-		@media ( max-width: 435px ) {
-			img {
-				width: 16px;
-				height: 16px;
-			}
-		}
-
-		@media ( min-width: 414px ) {
-			img {
-				width: 24px;
-				height: 24px;
-			}
-		}
-
-		&-rs {
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 2px;
-
-			&-wrap {
-				display: flex;
-				flex-direction: row;
-				align-items: flex-start;
-				gap: 4px;
-			}
-		}
-
-		&-items {
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 2px;
-		}
-
-		&-item {
-			display: flex;
-			flex-direction: row;
-			align-items: flex-start;
-			gap: 2px;
-		}
+	img {
+		width: 1.5rem;
+		height: 1.5rem;
 	}
 }
 
@@ -1568,9 +1536,4 @@ $valorant-def: #01654c;
 			}
 		}
 	}
-}
-
-.match-bm .switch-pill-container {
-	margin-top: 0.5rem;
-	margin-bottom: 0.5rem;
 }

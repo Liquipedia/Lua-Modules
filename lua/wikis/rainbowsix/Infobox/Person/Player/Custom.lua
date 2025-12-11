@@ -49,7 +49,7 @@ local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -125,7 +125,7 @@ function CustomPlayer:createBottomContent()
 		---@cast teamPage -nil
 		return HtmlWidgets.Fragment{
 			children = {
-				MatchTicker.participant{team = teamPage},
+				MatchTicker.recent{team = teamPage},
 				UpcomingTournaments.team{name = teamPage}
 			}
 		}

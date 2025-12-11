@@ -205,6 +205,11 @@ return {
 	find_images = 'fad fa-file-search',
 	clipboard = 'fad fa-clipboard-list',
 
+	-- Usage: Main Pages navcards
+	player = 'fas fa-user',
+	statistics = 'fad fa-chart-bar',
+	maps = 'fad fa-map',
+
 	-- Streams and Vods
 	youtube = 'fab fa-youtube',
 	twitch = 'fab fa-twitch',

@@ -21,7 +21,7 @@ local CustomSkill = Class.new(Skill)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomSkill.run(frame)
 	local skill = CustomSkill(frame)
 

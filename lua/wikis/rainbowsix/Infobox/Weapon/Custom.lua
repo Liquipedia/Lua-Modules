@@ -26,7 +26,7 @@ local CustomInjector = Class.new(Injector)
 local SIZE_OPERATOR = '25x25px'
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomWeapon.run(frame)
 	local weapon = CustomWeapon(frame)
 	weapon:setWidgetInjector(CustomInjector(weapon))

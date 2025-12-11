@@ -7,9 +7,12 @@
 
 local Lua = require('Module:Lua')
 
+local DateExt = Lua.import('Module:Date/Ext')
 local Table = Lua.import('Module:Table')
 
 local MatchUtil = {}
+
+MatchUtil.STREAM_DISPLAY_THRESHOLD_SECONDS = 2 * 60 * 60
 
 ---@param matchOpponent table
 ---@param gameOpponent table
@@ -23,6 +26,51 @@ function MatchUtil.enrichGameOpponentFromMatchOpponent(matchOpponent, gameOppone
 	-- TODO: match2players vs players duplication. Which one to keep? How to merge?
 
 	return newGameOpponent
+end
+
+---@param matchTimestamp number
+---@return boolean
+local function isWithinDisplayThreshold(matchTimestamp)
+	local currentTimestamp = DateExt.getCurrentTimestamp()
+	return os.difftime(matchTimestamp, currentTimestamp) < MatchUtil.STREAM_DISPLAY_THRESHOLD_SECONDS
+end
+
+---@param match MatchGroupUtilMatch
+---@return boolean
+function MatchUtil.shouldShowStreams(match)
+	if match.phase == 'ongoing' then
+		return true
+	elseif match.phase == 'finished' then
+		return false
+	elseif not match.timestamp then
+		return false
+	end
+
+	return isWithinDisplayThreshold(match.timestamp)
+end
+
+---@param match MatchGroupUtilMatch
+---@return boolean
+function MatchUtil.shouldShowMatchDetails(match)
+	if match.phase == 'finished' or match.phase == 'ongoing' then
+		return true
+	elseif not match.timestamp then
+		return false
+	end
+
+	return isWithinDisplayThreshold(match.timestamp)
+end
+
+---@param match MatchGroupUtilMatch
+---@return boolean
+function MatchUtil.isMatchCloseToStart(match)
+	if match.phase ~= 'upcoming' then
+		return false
+	elseif not match.timestamp then
+		return false
+	end
+
+	return isWithinDisplayThreshold(match.timestamp)
 end
 
 return MatchUtil

@@ -24,6 +24,7 @@ local Infobox = Lua.import('Module:Widget/Infobox/Core')
 ---@field wiki string
 ---@field injector WidgetInjector?
 ---@field warnings string[]
+---@field topContent string[]
 ---@field bottomContent string[]
 local BasicInfobox = Class.new(
 	function(self, frame)
@@ -31,6 +32,7 @@ local BasicInfobox = Class.new(
 		self.pagename = mw.title.getCurrentTitle().text
 		self.name = self.args.name or self.pagename
 		self.wiki = self.args.wiki or Info.wikiName
+		self.topContent = {}
 		self.bottomContent = {}
 		self.warnings = {}
 		self.injector = nil
@@ -42,6 +44,14 @@ local BasicInfobox = Class.new(
 ---@return self
 function BasicInfobox:categories(...)
 	Array.forEach({...}, function(cat) return mw.ext.TeamLiquidIntegration.add_category(cat) end)
+	return self
+end
+
+---Adds top content
+---@param content string|number|Html|Widget|nil
+---@return self
+function BasicInfobox:top(content)
+	table.insert(self.topContent, content)
 	return self
 end
 
@@ -101,11 +111,12 @@ end
 
 ---@param widgets Widget[]
 ---@param infoboxType string?
----@return string
+---@return Widget
 function BasicInfobox:build(widgets, infoboxType)
 	local infobox = Infobox{
 		gameName = self.wiki,
 		forceDarkMode = Logic.readBool(self.args.darkmodeforced),
+		topContent = self.topContent,
 		bottomContent = self.bottomContent,
 		warnings = self.warnings,
 		children = widgets,
@@ -114,9 +125,9 @@ function BasicInfobox:build(widgets, infoboxType)
 	if self.injector then
 		-- Customizable backwards compatibility
 		local CustomizableContext = Lua.import('Module:Widget/Contexts/Customizable')
-		return CustomizableContext.LegacyCustomizable{value = self.injector, children = {infobox}}:tryMake()
+		return CustomizableContext.LegacyCustomizable{value = self.injector, children = {infobox}}
 	end
-	return infobox:tryMake()
+	return infobox
 end
 
 return BasicInfobox

@@ -24,16 +24,17 @@ local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
 ---@class SceneInfobox: BasicInfobox
+---@operator call(Frame): SceneInfobox
 local Scene = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function Scene.run(frame)
 	local scene = Scene(frame)
 	return scene:createInfobox()
 end
 
----@return string
+---@return Widget
 function Scene:createInfobox()
 	local args = self.args
 
