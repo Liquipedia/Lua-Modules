@@ -2,11 +2,35 @@
 Template(s): All Infoboxes
 Author(s): FO-nTTaX
 *******************************************************************************/
+.fo-nttax-infobox-container {
+	@media ( max-width: 600px ) {
+		display: flex;
+		flex-wrap: wrap;
+	}
+}
+
 .fo-nttax-infobox-wrapper {
 	clear: right;
 	float: right;
 	margin: 10px 0 10px 10px;
 	font-size: 0.8125rem;
+
+	@media ( max-width: 600px ) {
+		order: 2;
+	}
+}
+
+.fo-nttax-infobox-topcontent {
+	width: 100%;
+
+	@media ( max-width: 600px ) {
+		order: 1;
+	}
+
+	@media ( min-width: 601px ) {
+		// full screeen minus infobox width minus margin
+		width: calc( 100% - 336px - 10px );
+	}
 }
 
 .fo-nttax-infobox-adbox {
