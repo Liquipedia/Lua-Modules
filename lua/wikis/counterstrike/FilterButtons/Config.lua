@@ -18,7 +18,7 @@ Config.categories = {
 				table.insert(category.items, tier.value)
 			end
 		end,
-		defaultItems = {},
+		defaultItems = {'curated'},
 		transform = function(tier)
 			return Tier.toName(tier)
 		end,
