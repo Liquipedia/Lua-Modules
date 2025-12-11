@@ -44,6 +44,7 @@ local CountryRepresentation = Class.new(function(self, args) self:init(args) end
 ---@class CountryRepresentationConfig
 ---@field tournaments string[]
 ---@field showNoCountry boolean
+---@field player boolean
 ---@field staff boolean
 
 ---@param frame Frame
@@ -58,11 +59,14 @@ end
 function CountryRepresentation:init(args)
 	self.config = {
 		showNoCountry = Logic.nilOr(Logic.readBoolOrNil(args.noCountry), true),
+		player = Logic.nilOr(Logic.readBoolOrNil(args.player), true),
 		staff = Logic.readBool(args.staff),
 		tournaments = Array.map(Array.extractValues(Table.filterByKey(args, function(key)
 			return key:sub(1, #'tournament') == 'tournament'
 		end)), Page.pageifyLink),
 	}
+
+	assert(self.config.player or self.config.staff, 'Invalid config: at least one of |player= or |staff= must be true')
 
 	if Logic.isEmpty(self.config.tournaments) then
 		self.config.tournaments = {Page.pageifyLink(mw.title.getCurrentTitle().text)}
@@ -115,13 +119,16 @@ function CountryRepresentation:fetchAndProcess()
 
 	Array.forEach(queryResult, function(placement)
 		local players = placement.opponentplayers or {}
-		Array.forEach(Array.mapIndexes(function (index)
-			return Logic.nilIfEmpty(Opponent.playerFromLpdbStruct(players, index))
-		end), handleEntry)
-		if not self.config.staff then return end
-		Array.forEach(Array.mapIndexes(function (index)
-			return Logic.nilIfEmpty(Opponent.staffFromLpdbStruct(players, index))
-		end), handleEntry)
+		if self.config.player then
+			Array.forEach(Array.mapIndexes(function (index)
+				return Logic.nilIfEmpty(Opponent.playerFromLpdbStruct(players, index))
+			end), handleEntry)
+		end
+		if self.config.staff then
+			Array.forEach(Array.mapIndexes(function (index)
+				return Logic.nilIfEmpty(Opponent.staffFromLpdbStruct(players, index))
+			end), handleEntry)
+		end
 	end)
 
 	-- sort the players alphabetically for each country
@@ -164,7 +171,13 @@ function CountryRepresentation:create()
 			Th{classes = {'unsortable'}, children = {'#'}},
 			Th{children = {'Country / Region'}},
 			Th{children = {'Representation'}},
-			Th{classes = {'unsortable'}, children = {'Players'}},
+			Th{
+				classes = {'unsortable'},
+				children = Array.interleave(WidgetUtil.collect(
+					self.config.player and 'Players' or nil,
+					self.config.staff and 'Staff' or nil
+				), ' & ')
+			},
 		}
 	}
 
