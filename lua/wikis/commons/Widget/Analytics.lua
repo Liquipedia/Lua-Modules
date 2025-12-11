@@ -14,8 +14,15 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
+---@class AnalyticsWidgetParameters
+---@field analyticsName string?
+---@field analyticsProperties table<string, string>?
+---@field classes string[]?
+---@field children (Widget|string|number|nil)[]?
+
 ---@class AnalyticsWidget: Widget
----@operator call(table): AnalyticsWidget
+---@operator call(AnalyticsWidgetParameters): AnalyticsWidget
+---@field props AnalyticsWidgetParameters
 local AnalyticsWidget = Class.new(Widget)
 
 ---@return Widget
@@ -35,11 +42,15 @@ function AnalyticsWidget:render()
 
 		return Div{
 			attributes = attributes,
+			classes = self.props.classes,
 			children = self.props.children
 		}
 	end
 
-	return HtmlWidgets.Fragment{children = self.props.children}
+	return Div{
+		classes = self.props.classes,
+		children = self.props.children
+	}
 end
 
 return AnalyticsWidget
