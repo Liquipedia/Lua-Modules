@@ -761,8 +761,7 @@ function StatisticsPortal.playerAgeTable(args)
 	args.order = 'birthdate ' .. (args.order or 'desc')
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionNode(ColumnName('birthdate'), Comparator.neq, ''),
-		ConditionNode(ColumnName('birthdate'), Comparator.neq, DateExt.defaultDate),
+		ConditionUtil.noneOf(ColumnName('birthdate'), {'', DateExt.defaultDate}),
 		ConditionNode(ColumnName('deathdate'), Comparator.eq, DateExt.defaultDate),
 		ConditionNode(ColumnName('earnings'), Comparator.gt, args.earnings),
 	}
