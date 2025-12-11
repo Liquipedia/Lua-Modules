@@ -94,7 +94,12 @@ BasePrizePool.config = {
 	hideafter = {
 		default = math.huge,
 		read = function(args)
-			return tonumber(args.hideafter)
+			local hideAfter = tonumber(args.hideafter)
+			local cutAfter = tonumber(args.cutafter) or 4
+			if not hideAfter then
+				return
+			end
+			return math.max(cutAfter, hideAfter)
 		end
 	},
 	storeLpdb = {
