@@ -1,16 +1,18 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Match/Page/TeamDisplay
+-- page=Module:Widget/Match/Page/OpponentDisplay
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
+local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -18,25 +20,34 @@ local Div = HtmlWidgets.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
 local SeriesDots = Lua.import('Module:Widget/Match/Page/SeriesDots')
 
----@class MatchPageTeamDisplayParameters
+---@class MatchPageOpponentDisplayParameters
 ---@field opponent MatchPageOpponent
+---@field flip boolean?
 
----@class MatchPageTeamDisplay: Widget
----@operator call(MatchPageTeamDisplayParameters): MatchPageTeamDisplay
----@field props MatchPageTeamDisplayParameters
-local MatchPageTeamDisplay = Class.new(Widget)
+---@class MatchPageOpponentDisplay: Widget
+---@operator call(MatchPageOpponentDisplayParameters): MatchPageOpponentDisplay
+---@field props MatchPageOpponentDisplayParameters
+local MatchPageOpponentDisplay = Class.new(Widget)
 
 ---@return Widget?
-function MatchPageTeamDisplay:render()
+function MatchPageOpponentDisplay:render()
 	return Div{
-		classes = { 'match-bm-match-header-team' },
-		children = self:_buildChildren()
+		classes = {
+			'match-bm-match-header-' .. (self:_isPartyType() and 'party' or 'team')
+		},
+		children = self:_isPartyType() and self:_buildPartyDisplay() or self:_buildTeamDisplay()
 	}
 end
 
 ---@private
+---@return boolean
+function MatchPageOpponentDisplay:_isPartyType()
+	return Opponent.typeIsParty(self.props.opponent.type)
+end
+
+---@private
 ---@return Widget|Widget[]?
-function MatchPageTeamDisplay:_buildChildren()
+function MatchPageOpponentDisplay:_buildTeamDisplay()
 	local opponent = self.props.opponent
 	if Opponent.isEmpty(opponent) then return
 	elseif opponent.type == Opponent.literal then
@@ -67,4 +78,25 @@ function MatchPageTeamDisplay:_buildChildren()
 	}
 end
 
-return MatchPageTeamDisplay
+---@private
+---@return Widget?
+function MatchPageOpponentDisplay:_buildPartyDisplay()
+	local opponent = self.props.opponent
+	if Opponent.isEmpty(opponent) then
+		return
+	end
+	return Div{
+		classes = { 'match-bm-match-header-party-group' },
+		children = {
+			Div{
+				classes = { 'match-bm-match-header-party-group-container' },
+				children = Array.map(opponent.players, function (player)
+					return PlayerDisplay.BlockPlayer{player = player, flip = self.props.flip}
+				end)
+			},
+			SeriesDots{seriesDots = opponent.seriesDots},
+		}
+	}
+end
+
+return MatchPageOpponentDisplay

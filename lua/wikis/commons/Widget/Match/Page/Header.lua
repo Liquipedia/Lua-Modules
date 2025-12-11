@@ -21,9 +21,8 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
+local MatchPageOpponentDisplay = Lua.import('Module:Widget/Match/Page/OpponentDisplay')
 local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
-local PartyDisplay = Lua.import('Module:Widget/Match/Page/PartyDisplay')
-local TeamDisplay = Lua.import('Module:Widget/Match/Page/TeamDisplay')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageHeaderParameters
@@ -118,16 +117,6 @@ function MatchPageHeader:render()
 	local opponent1 = self.props.opponent1
 	local opponent2 = self.props.opponent2
 
-	---@param opponent standardOpponent
-	---@param flip boolean?
-	---@return Widget
-	local function createOpponentDisplay(opponent, flip)
-		if opponent.type == Opponent.team or opponent.type == Opponent.literal then
-			return TeamDisplay{opponent = opponent}
-		end
-		return PartyDisplay{opponent = opponent, flip = flip}
-	end
-
 	return Div{
 		classes = { 'match-bm-match-header' },
 		children = WidgetUtil.collect(
@@ -145,9 +134,14 @@ function MatchPageHeader:render()
 			Div{
 				classes = { 'match-bm-match-header-overview' },
 				children = {
-					createOpponentDisplay(opponent1, true),
+					MatchPageOpponentDisplay{
+						opponent = opponent1,
+						flip = true
+					},
 					self:_makeResultDisplay(),
-					createOpponentDisplay(opponent2)
+					MatchPageOpponentDisplay{
+						opponent = opponent2
+					},
 				}
 			},
 			Div{
