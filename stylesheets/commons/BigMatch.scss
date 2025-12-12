@@ -496,34 +496,27 @@ span.slash {
 }
 
 .match-bm-players-player {
-	display: flex;
+	display: grid;
+	align-items: center;
+	grid-template-columns: 9.375rem calc( 100% - 21rem ) 9.5rem; /* set as default */
 	padding: 1rem;
-	align-items: stretch;
 	background: var( --clr-on-surface-light-primary-8 );
 	border-radius: 0.5rem;
 	flex-wrap: wrap;
 	justify-content: space-between;
-
-	@container players-team ( min-width: 560px ) {
-		display: grid;
-		align-items: center;
-		grid-template-columns: 9.375rem calc( 100% - 21rem ) 9.5rem; /* set as default */
-		grid-gap: 1rem;
-	}
+	gap: 0.5rem;
 
 	&.match-bm-players-player--col-1 {
-		@container players-team ( min-width: 560px ) {
-			grid-template-columns: minmax( 0, 1fr );
-		}
+		grid-template-columns: 1fr;
 	}
 
 	&.match-bm-players-player--col-2 {
-		@container players-team ( min-width: 560px ) {
-			grid-template-columns: 9.375rem 1fr;
-		}
+		grid-template-columns: 9.375rem calc( 100% - 9.375rem );
 	}
 
 	&.match-bm-players-player--col-3 {
+		grid-template-columns: repeat( 2, 1fr );
+
 		@container players-team ( min-width: 560px ) {
 			grid-template-columns: 9.375rem calc( 100% - 21rem ) 9.5rem;
 		}
@@ -770,8 +763,10 @@ span.slash {
 
 		&-container {
 			container: player-stats-container / inline-size;
-			flex: 1 0 100%;
-			margin-top: 1rem;
+
+			@container players-team ( max-width: 559px ) {
+				grid-column: 1 / 3;
+			}
 
 			@container players-team ( min-width: 560px ) {
 				order: 2;
