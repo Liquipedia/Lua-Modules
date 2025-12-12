@@ -27,6 +27,7 @@ local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchSummaryCharacters = Lua.import('Module:Widget/Match/Summary/Characters')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
+local PlayerStatContainer = Lua.import('Module:Widget/Match/Page/PlayerStat/Container')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local VetoItem = Lua.import('Module:Widget/Match/Page/VetoItem')
@@ -193,8 +194,8 @@ function MatchPage:renderOverallStats()
 						MatchSummaryCharacters{characters = player.extradata.characters, date = self.matchData.date},
 					}
 				},
-				Div{
-					classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-4'},
+				PlayerStatContainer{
+					columns = 4,
 					children = {
 						PlayerStat{
 							title = {KDA_ICON, 'KDA'},
@@ -618,8 +619,8 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 				playerName = player.displayName or player.player
 			},
 			MatchPage._buildPlayerLoadout(player),
-			Div{
-				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-4'},
+			PlayerStatContainer{
+				columns = 4,
 				children = {
 					PlayerStat{
 						title = {KDA_ICON, 'KDA'},
