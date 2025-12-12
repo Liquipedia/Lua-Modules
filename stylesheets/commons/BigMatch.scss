@@ -570,13 +570,6 @@ span.slash {
 		display: flex;
 		align-items: center;
 		position: relative;
-		flex: 1 0 auto;
-
-		.wiki-dota2 & {
-			@container players-team ( min-width: 560px ) {
-				order: 1;
-			}
-		}
 	}
 
 	&-avatar {
@@ -624,13 +617,8 @@ span.slash {
 	&-loadout {
 		display: flex;
 		gap: 1rem;
-		flex: 0 0 7.5rem;
 		align-items: center;
 		justify-content: flex-end;
-
-		@media ( min-width: 768px ) {
-			flex: 0 0 9.5rem;
-		}
 
 		@container players-team ( min-width: 560px ) {
 			order: 3;
