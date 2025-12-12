@@ -56,6 +56,7 @@ local DEFAULT_LIMIT = 5000
 ---@field allowedPlacements string[]
 ---@field dynamicPlacements boolean
 ---@field onlyHighlightOnValue string?
+---@field additionalPlacementConditions string?
 
 --- @class BaseTournamentsListing
 --- @field config BaseTournamentsListingConfig
@@ -122,6 +123,7 @@ function BaseTournamentsListing:readConfig()
 		offset = tonumber(args.offset) or 0,
 		allowedPlacements = self:_allowedPlacements(),
 		dynamicPlacements = Logic.readBool(args.dynamicPlacements),
+		additionalPlacementConditions = args.additionalPlacementConditions,
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
 	}
 end
