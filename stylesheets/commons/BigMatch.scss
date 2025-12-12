@@ -782,7 +782,7 @@ span.slash {
 		grid-template-rows: 1fr 1fr;
 
 		&-container {
-			container-type: inline-size;
+			container: player-stats-container / inline-size;
 
 			@media ( max-width: 1199px ),
 				( min-width: 1320px ) {
@@ -802,7 +802,7 @@ span.slash {
 			grid-template-rows: 1fr;
 			align-items: center;
 
-			@container ( width < 300px ) {
+			@container player-stats-container ( width < 300px ) {
 				grid-template-columns: repeat( 2, 1fr );
 				grid-template-rows: 1fr 1fr;
 			}
@@ -813,7 +813,7 @@ span.slash {
 			grid-template-rows: 1fr;
 			align-items: center;
 
-			@container ( width < 300px ) {
+			@container player-stats-container ( width < 300px ) {
 				grid-template-columns: repeat( 2, 1fr );
 				grid-template-rows: 1fr 1fr;
 			}
