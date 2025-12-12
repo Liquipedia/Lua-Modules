@@ -510,7 +510,7 @@ span.slash {
 	@media ( min-width: 1200px ) and ( max-width: 1319px ),
 		( min-width: 1510px ) {
 		display: grid;
-		grid-template-columns: 9.375rem auto 9.5rem; /* set as default */
+		grid-template-columns: 9.375rem calc( 100% - 21rem ) 9.5rem; /* set as default */
 		grid-gap: 1rem;
 	}
 
@@ -531,7 +531,7 @@ span.slash {
 	&.match-bm-players-player--col-3 {
 		@media ( min-width: 1200px ) and ( max-width: 1319px ),
 			( min-width: 1510px ) {
-			grid-template-columns: 9.375rem auto 9.5rem;
+			grid-template-columns: 9.375rem calc( 100% - 21rem ) 9.5rem;
 		}
 	}
 
@@ -777,40 +777,44 @@ span.slash {
 	&-stats {
 		display: grid;
 		grid-gap: 0.5rem;
-		grid-template-columns: repeat( 3, minmax( 0, 1fr ) ); /* set as default */
+		grid-template-columns: repeat( 3, 1fr ); /* set as default */
 		grid-template-rows: 1fr 1fr;
 
-		@media ( max-width: 1199px ),
-			( min-width: 1320px ) {
-			flex: 1 0 100%;
-			margin-top: 1rem;
-		}
+		&-container {
+			container-type: inline-size;
+			min-width: 200px;
 
-		@media ( min-width: 1200px ) and ( max-width: 1319px ),
-			( min-width: 1510px ) {
-			order: 2;
-			margin-top: unset;
+			@media ( max-width: 1199px ),
+				( min-width: 1320px ) {
+				flex: 1 0 100%;
+				margin-top: 1rem;
+			}
+
+			@media ( min-width: 1200px ) and ( max-width: 1319px ),
+				( min-width: 1510px ) {
+				order: 2;
+				margin-top: unset;
+			}
 		}
 
 		&.match-bm-players-player-stats--col-4 {
-			grid-template-columns: repeat( 4, minmax( 0, 1fr ) );
+			grid-template-columns: repeat( 4, 1fr );
 			grid-template-rows: 1fr;
 			align-items: center;
 
-			@media ( min-width: 1200px ) and ( max-width: 1319px ),
-				( min-width: 1510px ) and ( max-width: 1680px ) {
-				grid-template-columns: repeat( 2, minmax( 0, 1fr ) );
+			@container ( width < 300px ) {
+				grid-template-columns: repeat( 2, 1fr );
 				grid-template-rows: 1fr 1fr;
 			}
 		}
 
 		&.match-bm-players-player-stats--col-5 {
-			grid-template-columns: repeat( 5, minmax( 0, 1fr ) );
+			grid-template-columns: repeat( 5, 1fr );
 			grid-template-rows: 1fr;
 			align-items: center;
 
-			@media ( max-width: 1023px ) {
-				grid-template-columns: repeat( 3, minmax( 0, 1fr ) );
+			@container ( width < 300px ) {
+				grid-template-columns: repeat( 2, 1fr );
 				grid-template-rows: 1fr 1fr;
 			}
 		}
