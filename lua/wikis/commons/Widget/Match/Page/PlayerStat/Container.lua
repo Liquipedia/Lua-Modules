@@ -15,7 +15,7 @@ local Div = HtmlWidgets.Div
 
 ---@class MatchPagePlayerStatContainerParameters
 ---@field columns integer
----@field children (string|Html|Widget|nil)|(string|Html|Widget|nil)[]
+---@field children? string|Html|Widget|(string|Html|Widget)[]
 
 ---@class MatchPagePlayerStatContainer: Widget
 ---@operator call(MatchPagePlayerStatContainerParameters): MatchPagePlayerStatContainer
