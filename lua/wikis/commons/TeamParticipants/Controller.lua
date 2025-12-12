@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
@@ -39,18 +40,15 @@ function TeamParticipantsController.fromTemplate(frame)
 	TeamParticipantsController.importParticipants(parsedData)
 	TeamParticipantsController.fillIncompleteRosters(parsedData)
 
-	TeamParticipantsController.applySorting(
-		parsedData,
-		Logic.readBool(args.sortparticipants),
-		Logic.readBool(args.sortplayersalphabetically)
-	)
-
 	local shouldStore = Logic.readBoolOrNil(args.store) ~= false and Lpdb.isStorageEnabled()
 
 	if shouldStore then
 		Array.forEach(parsedData.participants, TeamParticipantsRepository.save)
 	end
 	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
+
+	parsedData.participants = TeamParticipantsController.sortParticipants(parsedData.participants)
+
 	return TeamParticipantsDisplay{
 		participants = parsedData.participants
 	}
@@ -148,22 +146,16 @@ function TeamParticipantsController.fillIncompleteRosters(parsedData)
 	end)
 end
 
----@param parsedData {participants: TeamParticipant[], expectedPlayerCount: integer?}
----@param sortParticipants boolean
----@param sortPlayers boolean
-function TeamParticipantsController.applySorting(parsedData, sortParticipants, sortPlayers)
-	if sortParticipants then
-		Array.sortInPlaceBy(parsedData.participants, function(participant)
-			return Opponent.toName(participant.opponent)
-		end)
+---@param participants TeamParticipant[]
+---@return TeamParticipant[]
+function TeamParticipantsController.sortParticipants(participants)
+	local sortOrder = (Info.config.participants or {}).participantsSortOrder
+	if sortOrder ~= 'alphabetical' or Logic.isEmpty(participants) then
+		return participants
 	end
 
-	Array.forEach(parsedData.participants, function(participant)
-		if not Logic.nilOr(participant.sortPlayersAlphabetically, sortPlayers) then
-			return
-		end
-
-		Array.sortInPlaceBy(participant.opponent.players, Operator.property('displayName'))
+	return Array.sortBy(participants, function(participant)
+		return Opponent.toName(participant.opponent)
 	end)
 end
 

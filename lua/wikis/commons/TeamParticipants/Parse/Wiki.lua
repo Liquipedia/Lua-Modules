@@ -183,7 +183,6 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 		potentialQualifiers = potentialQualifiers,
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
-		sortPlayersAlphabetically = Logic.readBoolOrNil(input.sortplayersalphabetically),
 		date = date,
 	}
 end

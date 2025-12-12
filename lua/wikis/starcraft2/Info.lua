@@ -84,5 +84,9 @@ return {
 				storeFromWikiCode = true,
 			},
 		},
+		participants = {
+			playerSortOrder = 'alphabetical',
+			participantsSortOrder = 'alphabetical',
+		},
 	},
 }
