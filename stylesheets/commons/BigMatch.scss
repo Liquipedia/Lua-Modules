@@ -660,8 +660,8 @@ span.slash {
 			display: flex;
 			flex-direction: row;
 			align-items: flex-start;
-			max-width: 1.5rem;
-			max-height: 1.5rem;
+			width: 1.5rem;
+			height: 1.5rem;
 			border-radius: 0.25rem;
 			overflow: hidden;
 			background-color: var( --clr-on-surface-light-primary-16 );
