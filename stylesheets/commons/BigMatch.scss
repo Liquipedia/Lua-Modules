@@ -818,7 +818,7 @@ span.slash {
 				grid-template-rows: 1fr 1fr;
 			}
 
-			@container ( width > 300px ) and ( width < 400px ) {
+			@container player-stats-container ( width > 300px ) and ( width < 400px ) {
 				grid-template-columns: repeat( 3, 1fr );
 				grid-template-rows: 1fr 1fr;
 			}
