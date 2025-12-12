@@ -510,6 +510,7 @@ span.slash {
 	@media ( min-width: 1200px ) and ( max-width: 1319px ),
 		( min-width: 1510px ) {
 		display: grid;
+		align-items: center;
 		grid-template-columns: 9.375rem calc( 100% - 21rem ) 9.5rem; /* set as default */
 		grid-gap: 1rem;
 	}
