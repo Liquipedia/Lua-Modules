@@ -204,7 +204,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		match.bracketdata = Table.mergeInto(bracketData, match.bracketdata or {})
 
 		bracketData.type = 'bracket'
-		bracketData.header = args[matchKey .. 'header'] or bracketData.header
+		bracketData.header = args[matchKey .. 'header'] or bracketData.header or (matchKey == 'RxMTP' and '!tp') or nil
 		bracketData.qualifiedheader = MatchGroupInput._readQualifiedHeader(bracketData, args, matchKey)
 		bracketData.inheritedheader = MatchGroupInput._inheritedHeader(bracketData.header)
 
