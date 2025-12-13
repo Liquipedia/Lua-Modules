@@ -494,15 +494,18 @@
 }
 
 .brkts-popup {
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
 	width: 360px;
-	flex-wrap: unset;
 	font-size: 0.6875rem;
 	padding: 0.5rem;
-	gap: 0.5rem;
 	border: 0.0625rem solid var( --clr-on-surface-light-primary-8 );
+
+	&-container {
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		flex-wrap: unset;
+		gap: 0.5rem;
+	}
 
 	.theme--light & {
 		background-color: #ffffff;
