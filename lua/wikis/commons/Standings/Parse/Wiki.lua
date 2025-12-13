@@ -87,12 +87,18 @@ function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 	local stages = Array.parseCommaSeparatedString(roundData.stages)
 	if Logic.isNotEmpty(matchGroups) then
 		Array.extendWith(matches, Array.flatMap(matchGroups, function(matchGroupId)
-			return StandingsParseWiki.getMatchIdsOfMatchGroup(matchGroupId)
+			return MatchGroupUtil.fetchMatchIds{
+				conditions = TournamentStructure.getMatchGroupFilter(matchGroupId),
+				limit = 1000,
+			}
 		end))
 	end
 	if Logic.isNotEmpty(stages) then
 		Array.extendWith(matches, Array.flatMap(stages, function(stage)
-			return StandingsParseWiki.getMatchIdsFromStage(stage)
+			return MatchGroupUtil.fetchMatchIds{
+				conditions = TournamentStructure.getPageNameFilter('bracket', stage),
+				limit = 1000
+			}
 		end))
 	end
 	return {
@@ -101,24 +107,6 @@ function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 		finished = Logic.readBool(roundData.finished),
 		title = roundData.title,
 		matches = Array.unique(matches),
-	}
-end
-
----@param matchGroupId string
----@return string[]
-function StandingsParseWiki.getMatchIdsOfMatchGroup(matchGroupId)
-	return MatchGroupUtil.fetchMatchIds{
-		conditions = TournamentStructure.getMatchGroupFilter(matchGroupId),
-		limit = 1000,
-	}
-end
-
----@param rawStage string
----@return string[]
-function StandingsParseWiki.getMatchIdsFromStage(rawStage)
-	return MatchGroupUtil.fetchMatchIds{
-		conditions = TournamentStructure.getPageNameFilter('bracket', rawStage),
-		limit = 1000
 	}
 end
 
