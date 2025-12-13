@@ -79,7 +79,7 @@ end
 
 ---@param roundInput string|table
 ---@param roundIndex integer
----@return {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}[]
+---@return {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}
 function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 	local roundData = Json.parseIfString(roundInput)
 	local matches = Array.parseCommaSeparatedString(roundData.matches)
