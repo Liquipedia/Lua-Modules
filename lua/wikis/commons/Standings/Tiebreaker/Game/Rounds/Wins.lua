@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Standings/Tiebreaker/Game/Round/Wins
+-- page=Module:Standings/Tiebreaker/Game/Rounds/Wins
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -9,7 +9,7 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 
-local TiebreakerRoundUtil = Lua.import('Module:Standings/Tiebreaker/Game/Round/Util')
+local TiebreakerRoundUtil = Lua.import('Module:Standings/Tiebreaker/Game/Rounds/Util')
 local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
 
 ---@class TiebreakerRoundWins : StandingsTiebreaker
