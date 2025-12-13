@@ -35,6 +35,8 @@ function AnalyticsWidget:render()
 
 		return Div{
 			attributes = attributes,
+			classes = self.props.classes,
+			css = self.props.css,
 			children = self.props.children
 		}
 	end
