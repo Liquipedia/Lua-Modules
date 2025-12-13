@@ -12,19 +12,11 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
-local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
-
-local Condition = Lua.import('Module:Condition')
-local ConditionTree = Condition.Tree
-local ConditionNode = Condition.Node
-local Comparator = Condition.Comparator
-local BooleanOperator = Condition.BooleanOperator
-local ColumnName = Condition.ColumnName
 
 local StandingsParseWiki = {}
 
