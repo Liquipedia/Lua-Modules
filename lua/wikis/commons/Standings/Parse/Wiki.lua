@@ -83,23 +83,15 @@ end
 function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 	local roundData = Json.parseIfString(roundInput)
 	local matches = Array.parseCommaSeparatedString(roundData.matches)
-	local matchGroups = Array.parseCommaSeparatedString(roundData.matchgroups)
-	local stages = Array.parseCommaSeparatedString(roundData.stages)
-	if Logic.isNotEmpty(matchGroups) then
-		Array.extendWith(matches, Array.flatMap(matchGroups, function(matchGroupId)
-			return MatchGroupUtil.fetchMatchIds{
-				conditions = TournamentStructure.getMatchGroupFilter(matchGroupId),
-				limit = 1000,
-			}
-		end))
-	end
-	if Logic.isNotEmpty(stages) then
-		Array.extendWith(matches, Array.flatMap(stages, function(stage)
-			return MatchGroupUtil.fetchMatchIds{
-				conditions = TournamentStructure.getPageNameFilter('bracket', stage),
-				limit = 1000
-			}
-		end))
+	local matchGroupsSpec = {
+		matchGroupIds = Array.parseCommaSeparatedString(roundData.matchgroups),
+		pageNames = {Array.parseCommaSeparatedString(roundData.stages)},
+	}
+	if Logic.isNotDeepEmpty(matchGroupsSpec) then
+		Array.extendWith(matches, MatchGroupUtil.fetchMatchIds{
+			conditions = TournamentStructure.getMatch2Filter(matchGroupsSpec),
+			limit = 1000,
+		})
 	end
 	return {
 		roundNumber = roundIndex,
