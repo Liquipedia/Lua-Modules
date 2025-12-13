@@ -45,29 +45,37 @@ end
 function MatchSummaryContainer:render()
 	return AnalyticsWidget{
 		analyticsName = 'Match popup',
-		classes = Array.extend('brkts-popup', self.props.classes),
+		classes = Array.extend(
+			'brkts-popup',
+			not self:_hasResetMatch() and 'brkts-popup-container' or nil,
+			self.props.classes
+		),
 		css = {width = self.props.width},
 		children = self:_buildChildren(),
 	}
 end
 
 ---@private
+---@return boolean
+function MatchSummaryContainer:_hasResetMatch()
+	return Logic.isNotEmpty(self.props.resetMatch)
+end
+
+---@private
 ---@return Widget|Html
 function MatchSummaryContainer:_buildChildren()
-	local resetMatch = self.props.resetMatch
-	if not resetMatch then
+	if not self:_hasResetMatch() then
 		return self.props.createMatch(self.props.match):create()
 	end
+
+	local resetMatch = self.props.resetMatch
+	---@cast resetMatch -nil
 
 	---@param matchData MatchGroupUtilMatch
 	---@return Widget
 	local function createMatchContainer(matchData)
 		return HtmlWidgets.Div{
-			css = {
-				display = 'flex',
-				['flex-direction'] = 'column',
-				gap = '0.5rem',
-			},
+			classes = {'brkts-popup-container'},
 			children = self.props.createMatch(matchData):create()
 		}
 	end
