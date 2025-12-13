@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
-local Operator = Lua.import('Module:Operator')
+local MathUtil = Lua.import('Module:MathUtil')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local TiebreakerRoundUtil = {}
@@ -28,20 +28,11 @@ TiebreakerRoundUtil.getGames = FnUtil.memoize(function (opponent)
 		if Logic.isEmpty(playedGames) then
 			return
 		end
-		rounds = rounds + Array.reduce(
-			Array.map(playedGames, Operator.property('scores')),
-			function (aggregate, gameScores)
-				return aggregate + Array.reduce(gameScores, Operator.add, 0)
-			end,
-			0
-		)
-		roundWins = roundWins + Array.reduce(
-			Array.map(playedGames, function (game)
-				return game.scores[opponentIndex]
-			end),
-			Operator.add,
-			0
-		)
+		Array.forEach(playedGames, function (game)
+			local scores = game.scores
+			rounds = rounds + MathUtil.sum(scores)
+			roundWins = roundWins + scores[opponentIndex]
+		end)
 	end)
 	local roundLosses = rounds - roundWins
 
