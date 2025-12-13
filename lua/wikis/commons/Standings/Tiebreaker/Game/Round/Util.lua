@@ -17,7 +17,7 @@ local TiebreakerRoundUtil = {}
 
 ---@param opponent TiebreakerOpponent
 ---@return {rounds: integer, w: integer, l: integer}
-TiebreakerRoundUtil.getGames = FnUtil.memoize(function (opponent)
+TiebreakerRoundUtil.getRounds = FnUtil.memoize(function (opponent)
 	local rounds = 0
 	local roundWins = 0
 	Array.forEach(opponent.matches, function (match)
