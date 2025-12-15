@@ -2,6 +2,23 @@
 describe('math', function()
 	local MathUtil = require('Module:MathUtil')
 
+	describe('isInteger', function()
+		it('check numbers', function()
+			assert.is_true(MathUtil.isInteger(0))
+			assert.is_true(MathUtil.isInteger('5'))
+			assert.is_true(MathUtil.isInteger(-125146145))
+			assert.is_true(MathUtil.isInteger('142365709145'))
+			assert.is_false(MathUtil.isInteger(math.pi))
+			assert.is_false(MathUtil.isInteger('some nonsense'))
+		end)
+
+		it('check special values', function ()
+			assert.is_false(MathUtil.isInteger(math.huge))
+			assert.is_false(MathUtil.isInteger(-math.huge))
+			assert.is_false(MathUtil.isInteger(0 / 0 --[[ NaN ]]))
+		end)
+	end)
+
 	describe('i log 2', function()
 		it('check', function()
 			assert.are_equal(3, MathUtil.ilog2(8))
