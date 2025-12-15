@@ -107,7 +107,7 @@ function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 		roundNumber = roundIndex,
 		started = Logic.nilOr(
 			Logic.readBoolOrNil(roundData.started),
-			not DateExt.isDefaultTimestamp(startDate) and startDate >= DateExt.getCurrentTimestamp()
+			not DateExt.isDefaultTimestamp(startDate) and startDate <= DateExt.getCurrentTimestamp()
 		),
 		finished = Logic.nilOr(
 			Logic.readBoolOrNil(roundData.finished),
