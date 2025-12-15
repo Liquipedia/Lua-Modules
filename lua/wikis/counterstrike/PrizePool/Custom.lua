@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Json = Lua.import('Module:Json')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Namespace = Lua.import('Module:Namespace')
 local Tier = Lua.import('Module:Tier/Utils')
 local Variables = Lua.import('Module:Variables')
@@ -71,12 +72,14 @@ end
 ---@param opponent BasePlacementOpponent
 ---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
+	lpdbData.publishertier = Variables.varDefault('tournament_valve_tier', '')
 	if not placement.specialStatuses.DQ.active(placement.args) then
 		lpdbData.weight = CustomPrizePool.calculateWeight(
 			lpdbData.prizemoney,
 			Variables.varDefault('tournament_liquipediatier'),
 			placement.placeStart,
-			Variables.varDefault('tournament_type', '')
+			Variables.varDefault('tournament_type', ''),
+			HighlightConditions.tournament(lpdbData, {onlyHighlightOnValue = 'Major Championship'})
 		)
 	end
 
@@ -97,7 +100,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	lpdbData.extradata.scorename = HEADER_DATA.resultName
 	lpdbData.tournament = HEADER_DATA.tournamentName or lpdbData.tournament
-	lpdbData.publishertier = Variables.varDefault('tournament_valve_tier', '')
 
 	if placement.args.forceQualified ~= nil then
 		lpdbData.qualified = Logic.readBool(placement.args.forceQualified) and 1 or 0
@@ -117,16 +119,17 @@ end
 ---@param tier string?
 ---@param place integer
 ---@param type string
+---@param isHighlighted boolean
 ---@return integer
-function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
+function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type, isHighlighted)
 	if Logic.isEmpty(tier) then
 		return 0
 	end
 
 	local tierValue = TIER_VALUE[Tier.toNumber(tier)] or 1
 
-	return tierValue * math.max(prizeMoney, 0.1) * (TYPE_MODIFIER[type:lower()] or TYPE_MODIFIER.default) /
-		(prizeMoney > 0 and place or 1)
+	return tierValue * math.max(prizeMoney, 0.1) * (isHighlighted and 2 or 1) *
+		(TYPE_MODIFIER[type:lower()] or TYPE_MODIFIER.default) / (prizeMoney > 0 and place or 1)
 end
 
 return CustomPrizePool
