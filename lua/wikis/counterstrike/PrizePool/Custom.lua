@@ -13,6 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Json = Lua.import('Module:Json')
 local Namespace = Lua.import('Module:Namespace')
+local Tier = Lua.import('Module:Tier/Utils')
 local Variables = Lua.import('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool')
@@ -122,7 +123,7 @@ function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
 		return 0
 	end
 
-	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier)] or 1
+	local tierValue = TIER_VALUE[Tier.toNumber(tier)] or 1
 
 	return tierValue * math.max(prizeMoney, 0.1) * (TYPE_MODIFIER[type:lower()] or TYPE_MODIFIER.default) /
 		(prizeMoney > 0 and place or 1)
