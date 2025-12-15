@@ -16,6 +16,13 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
 
 local StandingsParseWiki = {}
@@ -75,11 +82,20 @@ end
 function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 	local roundData = Json.parseIfString(roundInput)
 	local matches = Array.parseCommaSeparatedString(roundData.matches)
+	local startDate = DateExt.readTimestampOrNil(roundInput.sdate) or DateExt.defaultTimestamp
+	local endDate = DateExt.readTimestampOrNil(roundInput.edate) or DateExt.defaultTimestamp
 	local matchGroupsSpec = {
 		matchGroupIds = Array.parseCommaSeparatedString(roundData.matchgroups),
 		pageNames = {Array.parseCommaSeparatedString(roundData.stages)},
 	}
 	if Logic.isNotDeepEmpty(matchGroupsSpec) then
+		local conditions = ConditionTree(BooleanOperator.all):add(TournamentStructure.getMatch2Filter(matchGroupsSpec))
+		if not DateExt.isDefaultTimestamp(startDate) then
+			conditions:add(ConditionNode(ColumnName('date'), Comparator.ge, startDate))
+		end
+		if not DateExt.isDefaultTimestamp(endDate) then
+			conditions:add(ConditionNode(ColumnName('date'), Comparator.le, endDate))
+		end
 		Array.extendWith(matches, MatchGroupUtil.fetchMatchIds{
 			conditions = TournamentStructure.getMatch2Filter(matchGroupsSpec),
 			limit = 1000,
@@ -87,8 +103,14 @@ function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 	end
 	return {
 		roundNumber = roundIndex,
-		started = Logic.readBool(roundData.started),
-		finished = Logic.readBool(roundData.finished),
+		started = Logic.nilOr(
+			Logic.readBoolOrNil(roundData.started),
+			not DateExt.isDefaultTimestamp(startDate) and startDate >= DateExt.getCurrentTimestamp()
+		),
+		finished = Logic.nilOr(
+			Logic.readBoolOrNil(roundData.finished),
+			not DateExt.isDefaultTimestamp(endDate) and endDate >= DateExt.getCurrentTimestamp()
+		),
 		title = roundData.title,
 		matches = Array.unique(matches),
 	}
