@@ -99,7 +99,7 @@ function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 			conditions:add(ConditionNode(ColumnName('date'), Comparator.le, endDate))
 		end
 		Array.extendWith(matches, MatchGroupUtil.fetchMatchIds{
-			conditions = TournamentStructure.getMatch2Filter(matchGroupsSpec),
+			conditions = tostring(conditions),
 			limit = 1000,
 		})
 	end
