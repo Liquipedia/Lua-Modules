@@ -9,7 +9,7 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Class = Lua.import('Module:Class')
-local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local Variables = Lua.import('Module:Variables')
 
@@ -42,7 +42,7 @@ function CustomAwardPrizePool.run(frame)
 
 	awardsPrizePool:setLpdbInjector(CustomLpdbInjector())
 
-	if args['smw mute'] or not Namespace.isMain() or Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
+	if args['smw mute'] or not Namespace.isMain() or Lpdb.isStorageDisabled() then
 		awardsPrizePool:setConfig('storeLpdb', false)
 	end
 
