@@ -42,7 +42,7 @@ function CustomAwardPrizePool.run(frame)
 
 	awardsPrizePool:setLpdbInjector(CustomLpdbInjector())
 
-	if args['smw mute'] or not Namespace.isMain() or Lpdb.isStorageDisabled() then
+	if not Namespace.isMain() or Lpdb.isStorageDisabled() then
 		awardsPrizePool:setConfig('storeLpdb', false)
 	end
 
