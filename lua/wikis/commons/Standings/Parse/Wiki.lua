@@ -82,10 +82,10 @@ end
 function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 	local roundData = Json.parseIfString(roundInput)
 	local matches = Array.parseCommaSeparatedString(roundData.matches)
-	local startDate = Logic.isNotEmpty(roundInput.sdate) and
-		DateExt.readTimestamp(roundInput.sdate) or DateExt.defaultTimestamp
-	local endDate = Logic.isNotEmpty(roundInput.edate) and
-		DateExt.readTimestamp(roundInput.edate) or DateExt.defaultTimestamp
+	local startDate = Logic.isNotEmpty(roundData.sdate) and
+		DateExt.readTimestamp(roundData.sdate) or DateExt.defaultTimestamp
+	local endDate = Logic.isNotEmpty(roundData.edate) and
+		DateExt.readTimestamp(roundData.edate) or DateExt.defaultTimestamp
 	local matchGroupsSpec = {
 		matchGroupIds = Array.parseCommaSeparatedString(roundData.matchgroups),
 		pageNames = {Array.parseCommaSeparatedString(roundData.stages)},
