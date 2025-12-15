@@ -25,7 +25,7 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
-local TIER_VALUE = {10, 6, 4, 2, 1, 2}
+local TIER_VALUE = {10, 6, 4, 2}
 local TYPE_MODIFIER = {offline = 1, ['offline/online'] = 0.75, ['online/offline'] = 0.75, default = 0.65}
 
 local HEADER_DATA = {}
