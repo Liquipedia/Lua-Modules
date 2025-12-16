@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -24,11 +25,11 @@ function CollapsibleToggle:render()
 	local showButton = Button{
 		classes = {'general-collapsible-expand-button'},
 		children = Span{
-			children = {
+			children = Logic.emptyOr(self.props.showButtonChildren, {
 				Icon{iconName = 'show'},
 				' ',
 				'Show'
-			},
+			})
 		},
 		size = 'xs',
 		variant = 'secondary',
@@ -36,11 +37,11 @@ function CollapsibleToggle:render()
 	local hideButton = Button{
 		classes = {'general-collapsible-collapse-button'},
 		children = Span{
-			children = {
+			children = Logic.emptyOr(self.props.hideButtonChildren, {
 				Icon{iconName = 'hide'},
 				' ',
 				'Hide'
-			},
+			})
 		},
 		size = 'xs',
 		variant = 'secondary',
