@@ -25,6 +25,7 @@ local DASH = '&#045;'
 
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_POINTS = 'POINTS'
+local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 
 -- Allowed none-numeric score values.
 local SPECIAL_SCORES = {'W', 'FF' , 'L', 'DQ', 'D'}
@@ -233,6 +234,8 @@ function Placement:_getLpdbData(...)
 		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_BASE_CURRENCY .. 1)) or 0
 		local pointsReward = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
 		local pointsReward2 = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
+		local isQualified = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_QUALIFIES .. '1')
+
 		local lpdbData = {
 			image = image,
 			imagedark = imageDark,
@@ -259,7 +262,8 @@ function Placement:_getLpdbData(...)
 				participantteam = (opponentType == Opponent.solo and players.p1team)
 									and Opponent.toName{template = players.p1team, type = 'team', extradata = {}}
 									or nil,
-			}
+			},
+			qualified = isQualified and 1 or 0
 			-- TODO: We need to create additional LPDB Fields
 			-- Qualified To struct (json?)
 			-- Points struct (json?)
