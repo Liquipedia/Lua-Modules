@@ -21,7 +21,7 @@ local NUM_HEROES_PICK = 5
 local STATUS_NOT_PLAYED = 'notplayed'
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', teamStyle = 'bracket'})
 end
