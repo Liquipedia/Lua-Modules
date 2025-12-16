@@ -412,7 +412,7 @@ function MatchPage:_renderPlayerPerformance(player)
 	local playerDisplay
 	if type(player.agent) == 'table' then
 		playerDisplay = Div{
-			classes = {'match-bm-players-player-name'},
+			classes = {'match-bm-players-player-name match-bm-players-player-name-overall'},
 			children = {
 				Link{link = player.player, children = player.displayName},
 				MatchSummaryWidgets.Characters{characters = player.agent, date = self.matchData.date},
