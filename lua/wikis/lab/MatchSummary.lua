@@ -17,6 +17,11 @@ local CustomMatchSummary = {}
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
+	local projectName = mw.title.getCurrentTitle().rootText
+	local ProjectCustomMatchSummary = Lua.requireIfExists('Module:MatchSummary/' .. projectName)
+	if ProjectCustomMatchSummary then
+		return ProjectCustomMatchSummary.getByMatchId(args)
+	end
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 

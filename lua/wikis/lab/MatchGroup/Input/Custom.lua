@@ -36,6 +36,11 @@ local FfaMapFunctions = {}
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
+	local projectName = mw.title.getCurrentTitle().rootText
+	local ProjectCustomMatchGroupInput = Lua.requireIfExists('Module:MatchGroup/Input/Custom/' .. projectName)
+	if ProjectCustomMatchGroupInput then
+		return ProjectCustomMatchGroupInput.processMatch(match, options)
+	end
 	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, FfaMatchFunctions)
 end
 
