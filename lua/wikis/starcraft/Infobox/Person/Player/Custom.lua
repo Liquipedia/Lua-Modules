@@ -79,9 +79,7 @@ end
 ---@param args table
 ---@return boolean
 function CustomPlayer:shouldStoreData(args)
-	return Namespace.isMain() and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
-		and args.informationType ~= BOT_INFORMATION_TYPE
+	return Namespace.isMain() and Lpdb.isStorageEnabled() and args.informationType ~= BOT_INFORMATION_TYPE
 end
 
 ---@param id string
