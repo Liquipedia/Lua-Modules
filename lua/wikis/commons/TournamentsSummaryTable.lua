@@ -30,6 +30,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local SECONDS_PER_DAY = 86400
 
@@ -181,32 +182,14 @@ function TournamentsSummaryTable._tierConditions()
 	return conditions
 end
 
----@return ConditionTree|{}
+---@return ConditionTree?
 function TournamentsSummaryTable._tierTypeConditions()
-	if Table.isEmpty(TournamentsSummaryTable.tierTypeExcluded) then
-		return {}
-	end
-
-	local conditions = ConditionTree(BooleanOperator.all)
-	for _, tierType in pairs(TournamentsSummaryTable.tierTypeExcluded) do
-		conditions:add({ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, tierType)})
-	end
-
-	return conditions
+	return ConditionUtil.noneOf(ColumnName('liquipediatiertype'), TournamentsSummaryTable.tierTypeExcluded)
 end
 
----@return ConditionTree|{}
+---@return ConditionTree?
 function TournamentsSummaryTable._statusConditions()
-	if Table.isEmpty(TournamentsSummaryTable.statusExcluded) then
-		return {}
-	end
-
-	local conditions = ConditionTree(BooleanOperator.all)
-	for _, status in pairs(TournamentsSummaryTable.statusExcluded) do
-		conditions:add({ConditionNode(ColumnName('status'), Comparator.neq, status)})
-	end
-
-	return conditions
+	return ConditionUtil.noneOf(ColumnName('status'), TournamentsSummaryTable.statusExcluded)
 end
 
 ---@param type conditionTypes
