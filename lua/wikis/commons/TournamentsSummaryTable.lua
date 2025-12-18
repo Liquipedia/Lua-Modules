@@ -20,7 +20,6 @@ local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 local Variables = Lua.import('Module:Variables')
 
