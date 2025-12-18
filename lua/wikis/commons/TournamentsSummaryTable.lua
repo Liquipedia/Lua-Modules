@@ -172,14 +172,9 @@ function TournamentsSummaryTable._buildConditions(type)
 	return conditions:toString()
 end
 
----@return ConditionTree
+---@return ConditionTree?
 function TournamentsSummaryTable._tierConditions()
-	local conditions = ConditionTree(BooleanOperator.any)
-	for _, tier in pairs(TournamentsSummaryTable.tiers) do
-		conditions:add({ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tier)})
-	end
-
-	return conditions
+	return ConditionUtil.anyOf(ColumnName('liquipediatier'), TournamentsSummaryTable.tiers)
 end
 
 ---@return ConditionTree?
