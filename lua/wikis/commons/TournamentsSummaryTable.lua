@@ -199,27 +199,24 @@ function TournamentsSummaryTable.dateConditions(type)
 		- TournamentsSummaryTable.completedOffset * SECONDS_PER_DAY)
 
 	if type == TournamentsSummaryTable.upcomingType then
-		conditions
-			:add({
-				ConditionNode(ColumnName('startdate'), Comparator.lt, upcomingThreshold),
-				ConditionNode(ColumnName('startdate'), Comparator.gt, _today),
-			})
+		conditions:add{
+			ConditionNode(ColumnName('startdate'), Comparator.lt, upcomingThreshold),
+			ConditionNode(ColumnName('startdate'), Comparator.gt, _today),
+		}
 	elseif type == TournamentsSummaryTable.ongoingType then
-		conditions
-			:add{
-				ConditionNode(ColumnName('startdate'), Comparator.le, _today),
-				ConditionNode(ColumnName('enddate'), Comparator.ge, _today),
-				ConditionTree(BooleanOperator.any):add({
-					ConditionNode(ColumnName('status'), Comparator.neq, 'finished'),
-					ConditionNode(ColumnName('enddate'), Comparator.gt, _today),
-				}),
-			}
+		conditions:add{
+			ConditionNode(ColumnName('startdate'), Comparator.le, _today),
+			ConditionNode(ColumnName('enddate'), Comparator.ge, _today),
+			ConditionTree(BooleanOperator.any):add{
+				ConditionNode(ColumnName('status'), Comparator.neq, 'finished'),
+				ConditionNode(ColumnName('enddate'), Comparator.gt, _today),
+			},
+		}
 	elseif type == TournamentsSummaryTable.recentType then
-		conditions
-			:add({
-				ConditionNode(ColumnName('enddate'), Comparator.gt, completedThreshold),
-				ConditionNode(ColumnName('enddate'), Comparator.lt, _today),
-			})
+		conditions:add{
+			ConditionNode(ColumnName('enddate'), Comparator.gt, completedThreshold),
+			ConditionNode(ColumnName('enddate'), Comparator.lt, _today),
+		}
 	end
 
 	return conditions
