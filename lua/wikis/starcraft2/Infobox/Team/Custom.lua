@@ -171,7 +171,7 @@ function CustomTeam:shouldStore(args)
 	return Namespace.isMain() and
 		not Logic.readBool(args.disable_lpdb) and
 		not Logic.readBool(args.disable_storage) and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+		Lpdb.isStorageEnabled()
 end
 
 ---@param args table
