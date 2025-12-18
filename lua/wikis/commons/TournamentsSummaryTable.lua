@@ -86,23 +86,23 @@ function TournamentsSummaryTable.run(args)
 
 	TournamentsSummaryTable._parseArgsToSettings(args)
 
-	local type
+	local tableType
 	if Logic.readBool(args.upcoming) then
-		type = TournamentsSummaryTable.upcomingType
+		tableType = TournamentsSummaryTable.upcomingType
 	elseif Logic.readBool(args.ongoing) then
-		type = TournamentsSummaryTable.ongoingType
+		tableType = TournamentsSummaryTable.ongoingType
 	elseif Logic.readBool(args.recent) then
-		type = TournamentsSummaryTable.recentType
+		tableType = TournamentsSummaryTable.recentType
 	else
 		error('No type parameter (upcoming, ongoing, recent) specified')
 	end
 
-	local title = String.upperCaseFirst(args.title or TYPE_TO_TITLE[type])
+	local title = String.upperCaseFirst(args.title or TYPE_TO_TITLE[tableType])
 	local limit = args.limit and tonumber(args.limit) or TournamentsSummaryTable.defaultLimit
-	local sort = args.sort or (type == TournamentsSummaryTable.recentType and 'end' or 'start')
-	local order = args.order or (type == TournamentsSummaryTable.recentType and 'desc' or 'asc')
+	local sort = args.sort or (tableType == TournamentsSummaryTable.recentType and 'end' or 'start')
+	local order = args.order or (tableType == TournamentsSummaryTable.recentType and 'desc' or 'asc')
 
-	local data = TournamentsSummaryTable._getTournaments(type, sort, order, limit)
+	local data = TournamentsSummaryTable._getTournaments(tableType, sort, order, limit)
 
 	if Logic.readBool(args.reverseDisplay) then
 		data = Array.reverse(data)
@@ -111,7 +111,7 @@ function TournamentsSummaryTable.run(args)
 	local wrapper = mw.html.create():wikitext('*' .. title)
 
 	for _, tournamentData in ipairs(data) do
-		wrapper:wikitext(TournamentsSummaryTable.row(tournamentData, type))
+		wrapper:wikitext(TournamentsSummaryTable.row(tournamentData, tableType))
 	end
 
 	return wrapper
@@ -159,15 +159,15 @@ function TournamentsSummaryTable._getTournaments(conditionType, sort, order, lim
 	return {}
 end
 
----@param type conditionTypes
+---@param tableType conditionTypes
 ---@return string
-function TournamentsSummaryTable._buildConditions(type)
+function TournamentsSummaryTable._buildConditions(tableType)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add(TournamentsSummaryTable._tierConditions())
 		:add(TournamentsSummaryTable._tierTypeConditions())
 		:add(TournamentsSummaryTable._statusConditions())
-		:add(TournamentsSummaryTable.dateConditions(type))
-		:add(TournamentsSummaryTable.additionalConditions(type))
+		:add(TournamentsSummaryTable.dateConditions(tableType))
+		:add(TournamentsSummaryTable.additionalConditions(tableType))
 
 	return conditions:toString()
 end
@@ -227,10 +227,10 @@ function TournamentsSummaryTable.additionalConditions(type)
 end
 
 ---@param eventInformation table
----@param type conditionTypes
+---@param tableType conditionTypes
 ---@return string
-function TournamentsSummaryTable.row(eventInformation, type)
-	if type == TournamentsSummaryTable.upcomingType then
+function TournamentsSummaryTable.row(eventInformation, tableType)
+	if tableType == TournamentsSummaryTable.upcomingType then
 		Variables.varDefine('upcoming_' .. eventInformation.pagename, 1)
 	end
 
