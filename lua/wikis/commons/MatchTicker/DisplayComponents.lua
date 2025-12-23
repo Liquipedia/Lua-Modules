@@ -383,11 +383,9 @@ function Details:tournament()
 end
 
 ---Display class for matches shown within a match ticker
----@class MatchTickerMatch
+---@class MatchTickerMatch: MatchTickerMatchInterface
 ---@operator call({config: MatchTickerConfig, match: table}): MatchTickerMatch
 ---@field root Html
----@field config MatchTickerConfig
----@field match table
 local Match = Class.new(
 	function(self, args)
 		self.root = mw.html.create('table')
