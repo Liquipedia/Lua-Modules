@@ -246,7 +246,7 @@ end
 
 ---Display class for matches shown within a match ticker
 ---@class MatchTickerDetails
----@operator call(table): MatchTickerMatch
+---@operator call(table): MatchTickerDetails
 ---@field root Html
 ---@field hideTournament boolean
 ---@field isBrMatch boolean
