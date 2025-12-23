@@ -15,7 +15,11 @@ local Table = Lua.import('Module:Table')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
+
+---@class RainbowsixMatchParser: MatchParserInterface
 local MatchFunctions = {}
+
+---@class RainbowsixMapParser: MapParserInterface
 local MapFunctions = {}
 
 ---@type table<string, {atk: string[], def: string[]}>
