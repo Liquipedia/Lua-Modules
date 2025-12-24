@@ -49,7 +49,15 @@ function TournamentsTickerWidget:render()
 		['qualifier'] = self.props.modifierTypeQualifier,
 	}
 
+	---@param tournament StandardTournament
+	---@return boolean
+	local function isNotHidden(tournament)
+		return not Logic.readBool(tournament.extradata.hideontournamentsticker)
+	end
+
 	local currentTimestamp = DateExt.getCurrentTimestamp()
+	---@param tournament StandardTournament
+	---@return boolean
 	local function isWithinDateRange(tournament)
 		local modifiedThreshold = tierThresholdModifiers[tournament.liquipediaTier] or 0
 		local modifiedCompletedThreshold = tierTypeThresholdModifiers[tournament.liquipediaTierType] or modifiedThreshold
@@ -79,7 +87,7 @@ function TournamentsTickerWidget:render()
 		:add(Condition.Node(Condition.ColumnName('liquipediatiertype'), Condition.Comparator.eq, '!Points'))
 
 	local allTournaments = Tournament.getAllTournaments(lpdbFilter, function(tournament)
-		return isWithinDateRange(tournament)
+		return isNotHidden(tournament) and isWithinDateRange(tournament)
 	end)
 
 	local function filterByPhase(phase)
