@@ -52,7 +52,7 @@ function TournamentsTickerWidget:render()
 	---@param tournament StandardTournament
 	---@return boolean
 	local function isNotHidden(tournament)
-		return not Logic.readBool(tournament.extradata.hideontournamentsticker)
+		return not tournament.extradata.hideontournamentsticker
 	end
 
 	local currentTimestamp = DateExt.getCurrentTimestamp()
