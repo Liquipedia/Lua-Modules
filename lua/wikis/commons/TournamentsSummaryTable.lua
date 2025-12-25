@@ -145,14 +145,16 @@ end
 ---@return table[]
 function TournamentsSummaryTable._getTournaments(conditionType, sort, order, limit)
 	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
-		query = 'pagename, name, tickername, icon, icondark, startdate, enddate, series',
+		query = 'pagename, name, tickername, icon, icondark, startdate, enddate, series, extradata',
 		conditions = TournamentsSummaryTable._buildConditions(conditionType),
 		order = sort .. 'date ' .. order .. ', liquipediatier asc, name asc',
 		limit = limit,
 	})
 
 	if type(data) == 'table' and data[1] then
-		return data
+		return Array.filter(data, function(tournament)
+			return not (tournament.extradata or {}).hideontournamentsticker
+		end)
 	end
 
 	return {}
