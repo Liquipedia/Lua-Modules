@@ -550,7 +550,7 @@ function League:_setLpdbData(args, links)
 		summary = self:seoText(args),
 		extradata = {
 			series2 = args.series2 and mw.ext.TeamLiquidIntegration.resolve_redirect(args.series2) or nil,
-			hideontournamentsticker = Logic.readBool(args.hideontournamentsticker),
+			hideontournamentsticker = Logic.readBool(args.hide_on_tournaments_ticker),
 		},
 	}
 
