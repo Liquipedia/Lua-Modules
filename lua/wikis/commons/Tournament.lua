@@ -91,9 +91,11 @@ local TournamentMT = {
 		if property == 'phase' then
 			tournament[property] = Tournament.calculatePhase(tournament)
 		end
+		if property == 'isHighlighted' then
+			return HighlightConditions.tournament
+		end
 		return rawget(tournament, property)
-	end,
-	isHighlighted = HighlightConditions.tournament
+	end
 }
 
 ---@param match MatchGroupUtilMatch
