@@ -68,13 +68,13 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@operator call({config: MatchTickerConfig, match: table}): MatchTickerMatchInterface
 ---@field config MatchTickerConfig
 ---@field match table
----@field create fun(self): Widget|Html?
+---@field create fun(self: MatchTickerMatchInterface): Widget|Html?
 
 ---@class MatchTickerContainerInterface
 ---@operator call({config: MatchTickerConfig, matches: table[]}): MatchTickerContainerInterface
 ---@field config MatchTickerConfig
 ---@field matches table[]
----@field create fun(self): Widget|Html?
+---@field create fun(self: MatchTickerContainerInterface): Widget|Html?
 
 --- Extract externally if it grows
 ---@param matchTickerConfig MatchTickerConfig
