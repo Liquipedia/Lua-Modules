@@ -44,6 +44,7 @@ function ParticipantsTeamQualifierInfo:render()
 	end
 
 	local link, icon, linktype
+	local highlighted = false
 	if qualification.type == 'tournament' then
 		link = qualification.tournament.pageName
 		icon = LeagueIcon.display{
@@ -51,6 +52,7 @@ function ParticipantsTeamQualifierInfo:render()
 			iconDark = qualification.tournament.iconDark,
 			options = {noTemplate = true, noLink = true},
 		}
+		highlighted = qualification.tournament:isHighlighted()
 		linktype = 'internal'
 	elseif qualification.type == 'external' then
 		link = qualification.url
@@ -73,7 +75,11 @@ function ParticipantsTeamQualifierInfo:render()
 	end
 
 	local content = Div{
-		classes = {'team-participant-card__qualifier', 'team-participant-card__qualifier--' .. location},
+		classes = {
+			'team-participant-card__qualifier',
+			'team-participant-card__qualifier--' .. location,
+			highlighted and 'tournament-highlighted-bg' or nil,
+		},
 		children = {
 			Div{
 				classes = {'team-participant-card__qualifier-content'},
