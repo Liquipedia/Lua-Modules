@@ -17,10 +17,8 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchCard = Lua.import('Module:Widget/Match/Card')
 local Switch = Lua.import('Module:Widget/Switch')
 
----@class EntityMatchTickerMatch
+---@class EntityMatchTickerMatch: MatchTickerMatchInterface
 ---@operator call({config: MatchTickerConfig, match: table}): EntityMatchTickerMatch
----@field config MatchTickerConfig
----@field match table
 local MatchCardEntity = Class.new(
 	function(self, args)
 		self.config = args.config
@@ -45,10 +43,8 @@ function MatchCardEntity:create()
 	}
 end
 
----@class EntityMatchTickerContainer
+---@class EntityMatchTickerContainer: MatchTickerContainerInterface
 ---@operator call({config: MatchTickerConfig, matches: table[]}): EntityMatchTickerContainer
----@field config MatchTickerConfig
----@field matches table[]
 local Container = Class.new(
 	function(self, args)
 		self.config = args.config
