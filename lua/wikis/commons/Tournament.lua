@@ -44,7 +44,6 @@ local TOURNAMENT_PHASE = {
 ---@field featured boolean
 ---@field status string?
 ---@field phase TournamentPhase
----@field publisherTier string
 ---@field extradata table
 ---@field isHighlighted fun(self: StandardTournament, options?: table): boolean
 
@@ -110,6 +109,7 @@ function Tournament.partialTournamentFromMatch(match)
 		iconDark = match.iconDark,
 		series = match.series,
 		game = match.game,
+		publisherTier = match.publisherTier,
 	}
 end
 
