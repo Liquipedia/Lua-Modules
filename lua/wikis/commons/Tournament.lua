@@ -138,7 +138,7 @@ function Tournament.tournamentFromRecord(record)
 		extradata = extradata,
 	}
 
-	-- Some properties are derived from other properies and we can calculate them when accessed.
+	-- Some properties are derived from other properties and we can calculate them when accessed.
 	setmetatable(tournament, TournamentMT)
 
 	return tournament
