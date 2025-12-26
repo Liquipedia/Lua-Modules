@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Lpdb = Lua.import('Module:Lpdb')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
@@ -43,7 +44,9 @@ local TOURNAMENT_PHASE = {
 ---@field featured boolean
 ---@field status string?
 ---@field phase TournamentPhase
+---@field publisherTier string
 ---@field extradata table
+---@field isHighlighted fun(self: StandardTournament, options?: table): boolean
 
 ---@param conditions ConditionTree?
 ---@param filterTournament fun(tournament: StandardTournament): boolean
@@ -89,7 +92,8 @@ local TournamentMT = {
 			tournament[property] = Tournament.calculatePhase(tournament)
 		end
 		return rawget(tournament, property)
-	end
+	end,
+	isHighlighted = HighlightConditions.tournament
 }
 
 ---@param match MatchGroupUtilMatch
@@ -124,6 +128,7 @@ function Tournament.tournamentFromRecord(record)
 		endDate = endDate,
 		liquipediaTier = Tier.toIdentifier(record.liquipediatier),
 		liquipediaTierType = Tier.toIdentifier(record.liquipediatiertype),
+		publisherTier = record.publishertier,
 		region = (record.locations or {}).region1,
 		status = record.status,
 		icon = record.icon,
