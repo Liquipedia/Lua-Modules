@@ -87,11 +87,9 @@ local TournamentMT = {
 	__index = function(tournament, property)
 		if property == 'featured' then
 			tournament[property] = Tournament.isFeatured(tournament)
-		end
-		if property == 'phase' then
+		elseif property == 'phase' then
 			tournament[property] = Tournament.calculatePhase(tournament)
-		end
-		if property == 'isHighlighted' then
+		elseif property == 'isHighlighted' then
 			return HighlightConditions.tournament
 		end
 		return rawget(tournament, property)
