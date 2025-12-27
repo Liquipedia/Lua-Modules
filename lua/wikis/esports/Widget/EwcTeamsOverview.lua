@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Json = Lua.import('Module:Json')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Page = Lua.import('Module:Page')
 local Template = Lua.import('Module:Template')
 
@@ -136,7 +137,7 @@ function EwcTeamsOverview:render()
 				return HtmlWidgets.Tr{
 					children = WidgetUtil.collect(
 						HtmlWidgets.Td{
-							children = mw.ext.TeamTemplate.team(club.name),
+							children = OpponentDisplay.InlineTeamContainer{template = club.name},
 							css = {['text-align'] = 'left', ['text-wrap'] = 'nowrap'}
 						},
 						HtmlWidgets.Td{children = club.club and Template.safeExpand(mw.getCurrentFrame(), 'LeagueIconSmall/ewc') or nil},
