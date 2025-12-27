@@ -88,6 +88,9 @@ does not exist.
 ---@param date string|number?
 ---@return teamTemplateData?
 function TeamTemplate.getRawOrNil(team, date)
+	if Logic.isEmpty(team) then
+		return
+	end
 	team = team:gsub('_', ' '):lower()
 
 	-- return mw.ext.TeamTemplate.raw(team, date)
