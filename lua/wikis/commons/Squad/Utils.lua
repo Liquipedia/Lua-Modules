@@ -16,6 +16,7 @@ local Logic = Lua.import('Module:Logic')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Lpdb = Lua.import('Module:Lpdb')
 local Faction = Lua.import('Module:Faction')
@@ -125,10 +126,11 @@ end
 ---@return ModelRow
 function SquadUtils.readSquadPersonArgs(args)
 	local function getTeamInfo(page, property)
-		if not page or not mw.ext.TeamTemplate.teamexists(page) then
+		local teamTemplate = TeamTemplate.getRawOrNil(page)
+		if not teamTemplate then
 			return
 		end
-		return mw.ext.TeamTemplate.raw(page)[property]
+		return teamTemplate[property]
 	end
 
 	local name = String.nilIfEmpty(args.name)

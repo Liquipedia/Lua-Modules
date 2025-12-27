@@ -16,6 +16,7 @@ local Ordinal = Lua.import('Module:Ordinal')
 local PlacementInfo = Lua.import('Module:Placement')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
@@ -222,7 +223,7 @@ function Placement:_getLpdbData(...)
 		local opponentType = opponent.opponentData.type
 
 		if opponentType == Opponent.team then
-			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template) or {}
+			local teamTemplate = TeamTemplate.getRawOrNil(opponent.opponentData.template) or {}
 			image = teamTemplate.image
 			imageDark = teamTemplate.imagedark
 		elseif opponentType == Opponent.solo then
