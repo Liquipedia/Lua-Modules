@@ -16,6 +16,7 @@ local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local UpcomingMatches = Lua.import('Module:Matches Player')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -112,7 +113,7 @@ function CustomPlayer:adjustLPDB(lpdbData, args)
 	end
 
 	if String.isNotEmpty(args.team2) then
-		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(args.team2).page
+		lpdbData.extradata.team2 = TeamTemplate.getPageName(args.team2)
 	end
 
 	return lpdbData
