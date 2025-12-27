@@ -15,6 +15,7 @@ local Logic = Lua.import('Module:Logic')
 local Links = Lua.import('Module:Links')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
@@ -264,7 +265,7 @@ function PortalPlayers:row(player, isPlayer)
 		:wikitext(self.showLocalizedName and (' (' .. player.localizedname .. ')') or nil)
 
 	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '') or ''
-	local teamText = mw.ext.TeamTemplate.teamexists(player.team) and tostring(OpponentDisplay.InlineTeamContainer{
+	local teamText = TeamTemplate.exists(player.team) and tostring(OpponentDisplay.InlineTeamContainer{
 		template = player.team, displayType = 'standard'
 	}) or ''
 	if String.isNotEmpty(role) and String.isEmpty(teamText) then
