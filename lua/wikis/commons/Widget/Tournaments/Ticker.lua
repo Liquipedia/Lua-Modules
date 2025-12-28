@@ -66,6 +66,7 @@ function TournamentsTickerWidget:render()
 		elseif tournament.phase == 'UPCOMING' then
 			return tournament.startDate.timestamp < startDateThreshold
 		elseif tournament.phase == 'FINISHED' then
+			assert(tournament.endDate, 'Tournament without end date: ' .. tournament.pageName)
 			return tournament.endDate.timestamp > endDateThreshold
 		end
 		return false
