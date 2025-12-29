@@ -49,6 +49,9 @@ function TournamentsTickerWidget:render()
 	}
 
 	local currentTimestamp = DateExt.getCurrentTimestamp()
+
+	---@param tournament StandardTournament
+	---@return boolean
 	local function isWithinDateRange(tournament)
 		local modifiedThreshold = tierThresholdModifiers[tournament.liquipediaTier] or 0
 		local modifiedCompletedThreshold = tierTypeThresholdModifiers[tournament.liquipediaTierType] or modifiedThreshold
@@ -105,6 +108,9 @@ function TournamentsTickerWidget:render()
 		return nil
 	end
 
+	---@param a StandardTournament
+	---@param b StandardTournament
+	---@return boolean
 	local function sortByDate(a, b)
 		local endDateSort = sortByDateProperty(a, b, 'endDate', Operator.gt)
 		if endDateSort ~= nil then
@@ -117,6 +123,9 @@ function TournamentsTickerWidget:render()
 		return a.pageName < b.pageName
 	end
 
+	---@param a StandardTournament
+	---@param b StandardTournament
+	---@return boolean
 	local function sortByDateUpcoming(a, b)
 		local endDateSort = sortByDateProperty(a, b, 'startDate', Operator.gt)
 		if endDateSort ~= nil then
