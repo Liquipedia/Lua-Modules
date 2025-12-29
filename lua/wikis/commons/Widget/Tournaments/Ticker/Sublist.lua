@@ -17,7 +17,6 @@ local FilterConfig = Lua.import('Module:FilterButtons/Config')
 
 ---@class TournamentsTickerSublistWidget: Widget
 ---@operator call(table): TournamentsTickerSublistWidget
-
 local TournamentsTickerSublistWidget = Class.new(Widget)
 
 ---@return Widget?
