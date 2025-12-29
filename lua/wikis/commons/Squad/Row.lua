@@ -64,7 +64,9 @@ function SquadRow:id()
 	local teamNode = Widget.Td{
 		css = hasTeamRole and {'text-align', 'center'} or nil,
 		children = {
-			hasTeam and OpponentDisplay.InlineTeamContainer{template = self.model.extradata.loanedto, date = date, style = 'icon'} or nil,
+			hasTeam and OpponentDisplay.InlineTeamContainer{
+				template = self.model.extradata.loanedto, date = date, style = 'icon'
+			} or nil,
 			hasTeamRole and mw.html.create('small'):tag('i'):wikitext(self.model.extradata.loanedtorole) or nil,
 		}
 	}
