@@ -96,7 +96,7 @@ function CustomInjector:parse(id, widgets)
 			children = {table.concat(championIcons, '&nbsp;')},
 		}}
 	elseif id == 'status' then
-		local status = args.status and mw.getContentLanguage():ucfirst(args.status) or nil
+		local status = args.status and String.upperCaseFirst(args.status) or nil
 
 		return {
 			Cell{name = 'Status', children = {Page.makeInternalLink({onlyIfExists = true}, status) or status}},
