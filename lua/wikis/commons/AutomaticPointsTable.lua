@@ -15,6 +15,7 @@ local TableDisplay = Lua.import('Module:AutomaticPointsTable/Display')
 local MinifiedDisplay = Lua.import('Module:AutomaticPointsTable/MinifiedDisplay')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
@@ -78,6 +79,9 @@ function AutomaticPointsTable.run(frame)
 end
 
 function AutomaticPointsTable:storeLPDB(pointsData)
+	if Lpdb.isStorageDisabled() then
+		return
+	end
 	local date = os.date()
 	Array.forEach(pointsData, function(teamPointsData)
 		local team = teamPointsData.team
