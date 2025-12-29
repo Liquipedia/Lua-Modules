@@ -30,6 +30,10 @@ local POINTS_TYPE = {
 	SECURED = 'SECURED'
 }
 
+---@class AutomaticPointsTable
+---@operator call(Frame): AutomaticPointsTable
+---@field args table
+---@field parsedInput table
 local AutomaticPointsTable = Class.new(
 	function(self, frame)
 		self.frame = frame
@@ -38,6 +42,8 @@ local AutomaticPointsTable = Class.new(
 	end
 )
 
+---@param frame Frame
+---@return Html
 function AutomaticPointsTable.run(frame)
 	local pointsTable = AutomaticPointsTable(frame)
 
