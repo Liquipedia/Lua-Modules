@@ -31,10 +31,19 @@ local POINTS_TYPE = {
 	SECURED = 'SECURED'
 }
 
+---@class AutomaticPointsTableConfig
+---@field positionBackgrounds string[]
+---@field tournaments table[]
+---@field teams table[]
+---@field shouldTableBeMinified boolean
+---@field limit number
+---@field lpdbName string
+---@field shouldResolveRedirect boolean
+
 ---@class AutomaticPointsTable
 ---@operator call(Frame): AutomaticPointsTable
 ---@field args table
----@field parsedInput table
+---@field parsedInput AutomaticPointsTableConfig
 local AutomaticPointsTable = Class.new(
 	function(self, frame)
 		self.frame = frame
@@ -105,6 +114,8 @@ function AutomaticPointsTable:storeLPDB(pointsData)
 	end)
 end
 
+---@param args table
+---@return AutomaticPointsTableConfig
 function AutomaticPointsTable:parseInput(args)
 	local positionBackgrounds = self:parsePositionBackgroundData(args)
 	local tournaments = self:parseTournaments(args)
