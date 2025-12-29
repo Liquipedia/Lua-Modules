@@ -46,6 +46,7 @@ local POINTS_TYPE = {
 ---@field deductions table<integer, {amount: number?, note: string?}?>
 ---@field manualPoints table<integer, number?>
 ---@field tiebreakerPoints number
+---@field results placement[]
 
 ---@class AutomaticPointsTable
 ---@operator call(Frame): AutomaticPointsTable
@@ -245,6 +246,9 @@ function AutomaticPointsTable:parseManualPoints(team, tournamentCount)
 	return manualPoints
 end
 
+---@param teams AutomaticPointsTableParsedTeam[]
+---@param tournaments table[]
+---@return table<string, integer?>[]
 function AutomaticPointsTable:generateReverseAliases(teams, tournaments)
 	local reverseAliases = {}
 	local shouldResolveRedirect = self.parsedInput.shouldResolveRedirect
@@ -265,7 +269,10 @@ function AutomaticPointsTable:generateReverseAliases(teams, tournaments)
 	return reverseAliases
 end
 
-
+---@param teams AutomaticPointsTableParsedTeam[]
+---@param tournaments table[]
+---@return AutomaticPointsTableParsedTeam[]
+---@return {name: string, placements: placement[]}[]
 function AutomaticPointsTable:queryPlacements(teams, tournaments)
 	-- to get a team index, use reverseAliases[tournamentIndex][alias]
 	local reverseAliases = self:generateReverseAliases(teams, tournaments)
@@ -300,7 +307,7 @@ function AutomaticPointsTable:queryPlacements(teams, tournaments)
 			result.extradata = nil
 			table.insert(tournament.placements, result)
 
-			local participant = result.participant
+			local participant = result.opponentname
 			local teamIndex = reverseAliases[tournamentIndex][participant]
 			if teamIndex ~= nil then
 				teams[teamIndex].results[tournamentIndex] = result
