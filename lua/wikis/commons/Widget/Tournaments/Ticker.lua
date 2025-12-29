@@ -75,7 +75,7 @@ function TournamentsTickerWidget:render()
 			:add(Condition.Node(Condition.ColumnName('status'), Condition.Comparator.eq, ''))
 			:add(Condition.Node(Condition.ColumnName('status'), Condition.Comparator.eq, 'finished'))
 		)
-		:add(Condition.Node(Condition.ColumnName('liquipediatiertype'), Condition.Comparator.eq, '!Points'))
+		:add(Condition.Node(Condition.ColumnName('liquipediatiertype'), Condition.Comparator.neq, 'Points'))
 
 	local allTournaments = Tournament.getAllTournaments(lpdbFilter, function(tournament)
 		return isWithinDateRange(tournament)
