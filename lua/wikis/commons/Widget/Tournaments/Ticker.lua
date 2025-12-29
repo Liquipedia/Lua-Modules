@@ -82,6 +82,8 @@ function TournamentsTickerWidget:render()
 		return isWithinDateRange(tournament)
 	end)
 
+	---@param phase TournamentPhase
+	---@return fun(tournament: StandardTournament): boolean
 	local function filterByPhase(phase)
 		return function(tournament)
 			return tournament.phase == phase
@@ -91,7 +93,8 @@ function TournamentsTickerWidget:render()
 	---@param a StandardTournament
 	---@param b StandardTournament
 	---@param dateProperty 'endDate' | 'startDate'
-	---@param operator fun(a: StandardTournament, b: StandardTournament): boolean
+	---@param operator fun(a: integer, b: integer): boolean
+	---@return boolean?
 	local function sortByDateProperty(a, b, dateProperty, operator)
 		if not a[dateProperty] and not b[dateProperty] then
 			return nil
