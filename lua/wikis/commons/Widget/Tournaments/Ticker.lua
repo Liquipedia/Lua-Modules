@@ -23,7 +23,6 @@ local Tournament = Lua.import('Module:Tournament')
 
 ---@class TournamentsTickerWidget: Widget
 ---@operator call(table): TournamentsTickerWidget
-
 local TournamentsTickerWidget = Class.new(Widget)
 TournamentsTickerWidget.defaultProps = {
 	upcomingDays = 5,
