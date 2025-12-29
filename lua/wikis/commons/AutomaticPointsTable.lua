@@ -34,11 +34,18 @@ local POINTS_TYPE = {
 ---@class AutomaticPointsTableConfig
 ---@field positionBackgrounds string[]
 ---@field tournaments table[]
----@field teams table[]
+---@field teams AutomaticPointsTableParsedTeam[]
 ---@field shouldTableBeMinified boolean
 ---@field limit number
 ---@field lpdbName string
 ---@field shouldResolveRedirect boolean
+
+---@class AutomaticPointsTableParsedTeam
+---@field name string
+---@field aliases string[]
+---@field deductions table<integer, {amount: number?, note: string?}?>
+---@field manualPoints table<integer, number?>
+---@field tiebreakerPoints number
 
 ---@class AutomaticPointsTable
 ---@operator call(Frame): AutomaticPointsTable
@@ -138,6 +145,8 @@ end
 
 --- parses the positionbg arguments, these are the background colors of specific
 --- positions, usually used to indicate if a team in a specific position will end up qualifying
+---@param args table
+---@return string[]
 function AutomaticPointsTable:parsePositionBackgroundData(args)
 	local positionBackgrounds = {}
 	for _, background in Table.iter.pairsByPrefix(args, 'positionbg') do
@@ -146,6 +155,8 @@ function AutomaticPointsTable:parsePositionBackgroundData(args)
 	return positionBackgrounds
 end
 
+---@param args table
+---@return table[]
 function AutomaticPointsTable:parseTournaments(args)
 	local tournaments = {}
 	for _, tournament in Table.iter.pairsByPrefix(args, 'tournament') do
@@ -154,6 +165,10 @@ function AutomaticPointsTable:parseTournaments(args)
 	return tournaments
 end
 
+---@param args table
+---@param tournamentCount integer
+---@param shouldResolveRedirect boolean
+---@return AutomaticPointsTableParsedTeam[]
 function AutomaticPointsTable:parseTeams(args, tournamentCount, shouldResolveRedirect)
 	local teams = {}
 	for _, team in Table.iter.pairsByPrefix(args, 'team') do
@@ -171,6 +186,10 @@ end
 --- Parses the team aliases, used in cases where a team is picked up by an org or changed
 --- name in some of the tournaments, in which case aliases are required to correctly query
 --- the team's results & points
+---@param team table
+---@param tournamentCount integer
+---@param shouldResolveRedirect boolean
+---@return string[]
 function AutomaticPointsTable:parseAliases(team, tournamentCount, shouldResolveRedirect)
 	local aliases = {}
 	local parseAlias = function(x)
@@ -192,6 +211,9 @@ end
 --- Parses the teams' deductions, used in cases where a team has disbanded or made a roster
 --- change that causes them to lose a portion or all of their points that they've accumulated
 --- up until that change
+---@param team table
+---@param tournamentCount integer
+---@return table<integer, {amount: number?, note: string?}?>
 function AutomaticPointsTable:parseDeductions(team, tournamentCount)
 	local deductions = {}
 	for index = 1, tournamentCount do
@@ -210,6 +232,9 @@ function AutomaticPointsTable:parseDeductions(team, tournamentCount)
 	return deductions
 end
 
+---@param team table
+---@param tournamentCount integer
+---@return table<integer, number?>
 function AutomaticPointsTable:parseManualPoints(team, tournamentCount)
 	local manualPoints = {}
 	for index = 1, tournamentCount do
