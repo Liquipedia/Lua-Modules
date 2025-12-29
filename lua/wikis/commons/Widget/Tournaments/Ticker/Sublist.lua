@@ -31,6 +31,9 @@ function TournamentsTickerSublistWidget:render()
 		return
 	end
 
+	---@param tournament StandardTournament
+	---@param child Widget
+	---@return Widget
 	local createFilterWrapper = function(tournament, child)
 		return Array.reduce(FilterConfig.categories, function(prev, filterCategory)
 			local itemIsValid = filterCategory.itemIsValid or function(item) return true end
