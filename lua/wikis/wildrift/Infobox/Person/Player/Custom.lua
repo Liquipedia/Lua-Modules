@@ -30,9 +30,11 @@ local Cell = Widgets.Cell
 local SIZE_CHAMPION = '25x25px'
 
 ---@class WildriftPlayerInfobox: Person
+---@operator call(Frame): WildriftPlayerInfobox
 local CustomPlayer = Class.new(Player)
 
 ---@class WildriftPlayerInfoboxWidgetInjector: WidgetInjector
+---@operator call(WildriftPlayerInfobox): WildriftPlayerInfoboxWidgetInjector
 ---@field caller WildriftPlayerInfobox
 local CustomInjector = Class.new(Injector)
 
