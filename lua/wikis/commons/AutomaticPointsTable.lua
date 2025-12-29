@@ -25,6 +25,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+---@enum PointsType
 local POINTS_TYPE = {
 	MANUAL = 'MANUAL',
 	PRIZE = 'PRIZE',
@@ -318,6 +319,9 @@ function AutomaticPointsTable:queryPlacements(teams, tournaments)
 	return teams, tournaments
 end
 
+---@param teams AutomaticPointsTableParsedTeam[]
+---@param tournaments {name: string, placements: placement[], shouldDeductionsBeVisible: boolean}[]
+---@return {team: AutomaticPointsTableParsedTeam, totalPoints: number, tiebreakerPoints: number}[]
 function AutomaticPointsTable:getPointsData(teams, tournaments)
 	return Table.mapValues(teams,
 		function(team)
@@ -327,13 +331,14 @@ function AutomaticPointsTable:getPointsData(teams, tournaments)
 				local manualPoints = team.manualPoints[tournamentIndex]
 				local placement = team.results[tournamentIndex]
 
-				local pointsForTournament = self:calculatePointsForTournament(placement, manualPoints)
+				local pointsForTournament = self:calculatePointsForTournament(placement, manualPoints) --[[@as table]]
 				if Table.isNotEmpty(pointsForTournament) then
 					totalPoints = totalPoints + pointsForTournament.amount
 				end
 
 				local deduction = team.deductions[tournamentIndex]
 				if Table.isNotEmpty(deduction) then
+					---@cast deduction -nil
 					pointsForTournament.deduction = deduction
 					-- will only show the deductions column if there's atleast one team with
 					-- some deduction for a tournament
@@ -352,6 +357,9 @@ function AutomaticPointsTable:getPointsData(teams, tournaments)
 	)
 end
 
+---@param placement {prizePoints: number?, securedPoints: number?}
+---@param manualPoints number?
+---@return {amount: number?, type: PointsType?}
 function AutomaticPointsTable:calculatePointsForTournament(placement, manualPoints)
 	-- manual points get highest priority
 	if manualPoints ~= nil then
