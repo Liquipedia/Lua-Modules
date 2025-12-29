@@ -70,12 +70,10 @@ function TournamentsTickerWidget:render()
 		return false
 	end
 
-	local lpdbFilter = Condition.Tree(Condition.BooleanOperator.all)
-		:add(Condition.Tree(Condition.BooleanOperator.any)
-			:add(Condition.Node(Condition.ColumnName('status'), Condition.Comparator.eq, ''))
-			:add(Condition.Node(Condition.ColumnName('status'), Condition.Comparator.eq, 'finished'))
-		)
-		:add(Condition.Node(Condition.ColumnName('liquipediatiertype'), Condition.Comparator.neq, 'Points'))
+	local lpdbFilter = Condition.Tree(Condition.BooleanOperator.all):add{
+		Condition.Util.anyOf(Condition.ColumnName('status'), {'', 'finished'}),
+		Condition.Node(Condition.ColumnName('liquipediatiertype'), Condition.Comparator.neq, 'Points')
+	}
 
 	local allTournaments = Tournament.getAllTournaments(lpdbFilter, function(tournament)
 		return isWithinDateRange(tournament)
