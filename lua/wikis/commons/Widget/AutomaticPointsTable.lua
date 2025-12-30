@@ -28,6 +28,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field props AutomaticPointsTableWidgetProps
 local AutomaticPointsTableWidget = Class.new(Widget)
 
+---@return Widget
 function AutomaticPointsTableWidget:render()
 	return Div{
 		classes = {'table-responsive', 'automatic-points-table'},
@@ -39,6 +40,8 @@ function AutomaticPointsTableWidget:render()
 	}
 end
 
+---@protected
+---@return Widget
 function AutomaticPointsTableWidget:createTable()
 	return Div{
 		classes = {'divTable', 'border-color-grey', 'border-bottom'},
@@ -51,6 +54,7 @@ function AutomaticPointsTableWidget:createTable()
 	}
 end
 
+---@private
 ---@param child string|Widget
 ---@param additionalClass string?
 ---@return Widget
@@ -64,6 +68,8 @@ function AutomaticPointsTableWidget._createHeaderCell(child, additionalClass)
 	}
 end
 
+---@protected
+---@return Widget
 function AutomaticPointsTableWidget:createHeader()
 	local tournaments = self.props.tournaments
 
@@ -80,6 +86,7 @@ function AutomaticPointsTableWidget:createHeader()
 	}
 end
 
+---@private
 ---@param props {children: string|number|Widget|Html|(string|number|Widget|Html)[]?,
 ---additionalClasses: string[]?, background: string?, bold: boolean?, css: table?}
 ---@return Widget
@@ -102,6 +109,7 @@ function AutomaticPointsTableWidget._createRowCell(props)
 	}
 end
 
+---@protected
 ---@param opponent AutomaticPointsTableOpponent
 ---@param opponentIndex integer
 ---@return Widget
