@@ -125,7 +125,7 @@ function AutomaticPointsTableWidget:createRow(opponent, opponentIndex)
 			AutomaticPointsTableWidget._createRowCell{
 				additionalClasses = {'name-cell'},
 				background = opponent.background,
-				children = OpponentDisplay.InlineOpponent{opponent = opponent.opponent},
+				children = OpponentDisplay.InlineOpponent{opponent = opponent.opponent, note = opponent.note},
 			},
 			AutomaticPointsTableWidget._createRowCell{
 				bold = true,
