@@ -14,8 +14,11 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
 local WidgetUtil = Lua.import('Module:Widget/Util')
+
+local QUALIFIED_ICON = IconFa{iconName = 'qualified', color = 'forest-green-text', hover = 'Qualified'}
 
 ---@class AutomaticPointsTableWidgetProps
 ---@field opponents AutomaticPointsTableOpponent
@@ -120,27 +123,42 @@ function AutomaticPointsTableWidget:createRow(opponent, opponentIndex)
 			AutomaticPointsTableWidget._createRowCell{
 				background = self.props.positionBackgrounds[opponentIndex],
 				children = opponent.placement,
-				bold = true,
+				css = {['font-weight'] = 'bold'},
 			},
 			AutomaticPointsTableWidget._createRowCell{
 				additionalClasses = {'name-cell'},
 				background = opponent.background,
 				children = OpponentDisplay.InlineOpponent{opponent = opponent.opponent, note = opponent.note},
 			},
-			AutomaticPointsTableWidget._createRowCell{
-				bold = true,
-				children = opponent.totalPoints,
-			},
+			self:_createTotalPointsCell(opponent),
 			Array.map(opponent.results, function (result, resultIndex)
+				local resultDisplay
+				if result.qualified then
+					resultDisplay = QUALIFIED_ICON
+				elseif result.amount then
+					resultDisplay = result.amount
+				elseif self.props.tournaments[resultIndex].phase == 'FINISHED' then
+					resultDisplay = '-'
+				end
 				return AutomaticPointsTableWidget._createRowCell{
 					css = result.type == "SECURED" and {
 						['font-weight'] = 'lighter',
 						['font-style'] = 'italic'
 					} or nil,
-					children = result.amount or (self.props.tournaments[resultIndex].phase == "FINISHED" and '-' or nil),
+					children = resultDisplay,
 				}
 			end)
 		)
+	}
+end
+
+---@private
+---@param opponent AutomaticPointsTableOpponent
+---@return Widget
+function AutomaticPointsTableWidget:_createTotalPointsCell(opponent)
+	return AutomaticPointsTableWidget._createRowCell{
+		css = {['font-weight'] = 'bold'},
+		children = opponent.qualified and QUALIFIED_ICON or opponent.totalPoints,
 	}
 end
 
