@@ -16,6 +16,7 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
+local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -50,7 +51,8 @@ local POINTS_TYPE = {
 ---@field opponent standardOpponent
 ---@field aliases string[][]
 ---@field tiebreakerPoints number
----@field results {type: PointsType?, amount: number?, deduction: number?, note: string?}[]
+---@field results {type: PointsType?, amount: number?, qualified: boolean?, deduction: number?, note: string?}[]
+---@field qualified boolean
 ---@field totalPoints number
 ---@field placement integer
 ---@field background string?
@@ -161,10 +163,13 @@ function AutomaticPointsTable:parseOpponents(args, tournaments)
 
 		parsedOpponent.results = Array.map(tournaments, function (tournament, tournamentIndex)
 			local manualPoints = parsedArgs['points' .. tournamentIndex]
+			local qualified = Logic.readBoolOrNil(parsedArgs['qualified' .. tournamentIndex])
 			if String.isNotEmpty(manualPoints) then
 				return Table.mergeInto({
+					qualified = qualified,
 					type = POINTS_TYPE.MANUAL,
 					amount = tonumber(manualPoints)
+
 				}, self:parseDeduction(parsedArgs, tournamentIndex))
 			end
 
@@ -174,12 +179,13 @@ function AutomaticPointsTable:parseOpponents(args, tournaments)
 				return {}
 			end
 
-			return Table.merge(queriedPoints, self:parseDeduction(parsedArgs, tournamentIndex))
+			return Table.merge(queriedPoints, {qualified = qualified}, self:parseDeduction(parsedArgs, tournamentIndex))
 		end)
 
 		parsedOpponent.totalPoints = Array.reduce(parsedOpponent.results, function (aggregate, result)
 			return aggregate + (result.amount or 0) - (result.deduction or 0)
 		end, 0)
+		parsedOpponent.qualified = Array.any(parsedOpponent.results, Operator.property('qualified'))
 
 		Array.appendWith(opponents, parsedOpponent)
 	end
@@ -299,6 +305,13 @@ function AutomaticPointsTable:sortData(opponents)
 		---@param opp1 AutomaticPointsTableOpponent
 		---@param opp2 AutomaticPointsTableOpponent
 		function (opp1, opp2)
+			if opp1.qualified then
+				if not opp2.qualified then
+					return true
+				end
+			elseif opp2.qualified then
+				return false
+			end
 			local totalPoints1 = opp1.totalPoints
 			local totalPoints2 = opp2.totalPoints
 			if totalPoints1 ~= totalPoints2 then
@@ -316,6 +329,8 @@ end
 function AutomaticPointsTable:addPlacements(opponents)
 	Array.forEach(opponents, function (opponent, index)
 		if index == 1 then
+			opponent.placement = index
+		elseif opponent.qualified ~= opponents[index - 1].qualified then
 			opponent.placement = index
 		elseif opponent.totalPoints ~= opponents[index - 1].totalPoints then
 			opponent.placement = index
