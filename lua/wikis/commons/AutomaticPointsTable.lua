@@ -179,7 +179,9 @@ function AutomaticPointsTable:parseOpponents(args, tournaments)
 				return {}
 			end
 
-			return Table.merge(queriedPoints, {qualified = qualified}, self:parseDeduction(parsedArgs, tournament, tournamentIndex))
+			return Table.merge(
+				queriedPoints, {qualified = qualified}, self:parseDeduction(parsedArgs, tournament, tournamentIndex)
+			)
 		end)
 
 		parsedOpponent.totalPoints = Array.reduce(parsedOpponent.results, function (aggregate, result)
