@@ -54,6 +54,7 @@ local POINTS_TYPE = {
 ---@field totalPoints number
 ---@field placement integer
 ---@field background string?
+---@field note string?
 
 ---@class AutomaticPointsTable
 ---@operator call(Frame): AutomaticPointsTable
@@ -152,6 +153,7 @@ function AutomaticPointsTable:parseOpponents(args, tournaments)
 			opponent = Opponent.readOpponentArgs(parsedArgs),
 			tiebreakerPoints = tonumber(parsedArgs.tiebreaker) or 0,
 			background = parsedArgs.bg,
+			note = parsedArgs.note,
 		}
 		assert(parsedOpponent.opponent.type == Opponent.team)
 		assert(not Opponent.isTbd(parsedOpponent.opponent))
