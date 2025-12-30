@@ -319,7 +319,7 @@ function AutomaticPointsTable:addPlacements(opponents)
 			opponent.placement = index
 		elseif opponent.totalPoints ~= opponents[index - 1].totalPoints then
 			opponent.placement = index
-		elseif opponent.tiebreakerPoints ~= opponents[index - 1].totalPoints then
+		elseif opponent.tiebreakerPoints ~= opponents[index - 1].tiebreakerPoints then
 			opponent.placement = index
 		else
 			opponent.placement = opponents[index - 1].placement
