@@ -33,11 +33,17 @@ local AutomaticPointsTableWidget = Class.new(Widget)
 
 ---@return Widget
 function AutomaticPointsTableWidget:render()
+	local numCols = Array.reduce(self.props.tournaments, function (aggregate, tournament)
+		if tournament.extradata.includesDeduction then
+			return aggregate + 2
+		end
+		return aggregate + 1
+	end, 0)
 	return Div{
 		classes = {'table-responsive', 'automatic-points-table'},
 		children = Div{
 			classes = {'fixed-size-table-container', 'border-color-grey'},
-			css = {width = (450 + #self.props.tournaments * 50) .. 'px'},
+			css = {width = (450 + numCols * 50) .. 'px'},
 			children = self:createTable()
 		}
 	}
@@ -82,8 +88,11 @@ function AutomaticPointsTableWidget:createHeader()
 			AutomaticPointsTableWidget._createHeaderCell('Ranking','ranking'),
 			AutomaticPointsTableWidget._createHeaderCell('Team', 'team'),
 			AutomaticPointsTableWidget._createHeaderCell('Total Points'),
-			Array.map(tournaments, function (tournament)
-				return AutomaticPointsTableWidget._createHeaderCell(TournamentTitle{tournament = tournament})
+			Array.flatMap(tournaments, function (tournament)
+				return {
+					AutomaticPointsTableWidget._createHeaderCell(TournamentTitle{tournament = tournament}),
+					tournament.extradata.includesDeduction and AutomaticPointsTableWidget._createHeaderCell('Deductions') or nil
+				}
 			end)
 		)
 	}
@@ -131,7 +140,7 @@ function AutomaticPointsTableWidget:createRow(opponent, opponentIndex)
 				children = OpponentDisplay.InlineOpponent{opponent = opponent.opponent, note = opponent.note},
 			},
 			self:_createTotalPointsCell(opponent),
-			Array.map(opponent.results, function (result, resultIndex)
+			Array.flatMap(opponent.results, function (result, resultIndex)
 				local resultDisplay
 				if result.qualified then
 					resultDisplay = QUALIFIED_ICON
@@ -140,12 +149,23 @@ function AutomaticPointsTableWidget:createRow(opponent, opponentIndex)
 				elseif self.props.tournaments[resultIndex].phase == 'FINISHED' then
 					resultDisplay = '-'
 				end
-				return AutomaticPointsTableWidget._createRowCell{
-					css = result.type == "SECURED" and {
-						['font-weight'] = 'lighter',
-						['font-style'] = 'italic'
-					} or nil,
-					children = resultDisplay,
+				return {
+					AutomaticPointsTableWidget._createRowCell{
+						css = result.type == "SECURED" and {
+							['font-weight'] = 'lighter',
+							['font-style'] = 'italic'
+						} or nil,
+						children = resultDisplay,
+					},
+					self.props.tournaments[resultIndex].extradata.includesDeduction and AutomaticPointsTableWidget._createRowCell{
+						children = result.deduction and {
+							HtmlWidgets.Abbr{
+								classes = {'deduction-box'},
+								title = result.note,
+								children = result.deduction
+							}
+						} or nil
+					} or nil
 				}
 			end)
 		)

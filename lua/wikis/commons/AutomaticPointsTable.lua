@@ -170,7 +170,7 @@ function AutomaticPointsTable:parseOpponents(args, tournaments)
 					type = POINTS_TYPE.MANUAL,
 					amount = tonumber(manualPoints)
 
-				}, self:parseDeduction(parsedArgs, tournamentIndex))
+				}, self:parseDeduction(parsedArgs, tournament, tournamentIndex))
 			end
 
 			local queriedPoints = self:queryPlacement(aliases[tournamentIndex], tournament)
@@ -179,7 +179,7 @@ function AutomaticPointsTable:parseOpponents(args, tournaments)
 				return {}
 			end
 
-			return Table.merge(queriedPoints, {qualified = qualified}, self:parseDeduction(parsedArgs, tournamentIndex))
+			return Table.merge(queriedPoints, {qualified = qualified}, self:parseDeduction(parsedArgs, tournament, tournamentIndex))
 		end)
 
 		parsedOpponent.totalPoints = Array.reduce(parsedOpponent.results, function (aggregate, result)
@@ -216,18 +216,20 @@ end
 --- change that causes them to lose a portion or all of their points that they've accumulated
 --- up until that change
 ---@param args table
----@param index integer
+---@param tournament StandardTournament
+---@param tournamentIndex integer
 ---@return {deduction: number?, note: string?}[]
-function AutomaticPointsTable:parseDeduction(args, index)
-	local deduction = args['deduction' .. index]
+function AutomaticPointsTable:parseDeduction(args, tournament, tournamentIndex)
+	local deduction = args['deduction' .. tournamentIndex]
 	if String.isEmpty(deduction) then
 		return {}
 	elseif not Logic.isNumeric(deduction) then
 		return {}
 	end
+	tournament.extradata.includesDeduction = true
 	return {
 		deduction = tonumber(deduction),
-		note = args['deduction' .. index .. 'note']
+		note = args['deduction' .. tournamentIndex .. 'note']
 	}
 end
 
