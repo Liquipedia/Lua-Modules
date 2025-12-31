@@ -163,6 +163,7 @@ function AutomaticPointsTable:parseOpponents(args, tournaments)
 
 		parsedOpponent.results = Array.map(tournaments, function (tournament, tournamentIndex)
 			local manualPoints = parsedArgs['points' .. tournamentIndex]
+			-- TODO: Automate qualified once #6762 is merged
 			local qualified = Logic.readBoolOrNil(parsedArgs['qualified' .. tournamentIndex])
 			if String.isNotEmpty(manualPoints) then
 				return Table.mergeInto({
@@ -188,7 +189,6 @@ function AutomaticPointsTable:parseOpponents(args, tournaments)
 			return aggregate + (result.amount or 0) - (result.deduction or 0)
 		end, 0)
 
-		-- TODO: Automate qualified once #6762 is merged
 		parsedOpponent.qualified = Array.any(parsedOpponent.results, Operator.property('qualified'))
 
 		Array.appendWith(opponents, parsedOpponent)
