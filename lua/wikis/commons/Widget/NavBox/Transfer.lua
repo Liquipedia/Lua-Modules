@@ -156,7 +156,7 @@ function TransferNavBox._checkForCurrentQuarterOrMonth(children, firstEntry)
 		return children
 	end
 	children = Table.map(children, function(key, child)
-		local index = tonumber((key:match('child(%d)')))
+		local index = tonumber((key:match('child(%d+)')))
 		return 'child' .. (index + 1), child
 	end)
 	children.child0 = {name = currentYear}
