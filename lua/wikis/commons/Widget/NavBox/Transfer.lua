@@ -243,7 +243,7 @@ function TransferNavBox._readQuarterOrMonth(pageName)
 end
 
 ---@private
----@param month string?
+---@param month string|integer?
 ---@return string?
 function TransferNavBox._getMonthAbbreviation(month)
 	if Logic.isEmpty(month) then return end
