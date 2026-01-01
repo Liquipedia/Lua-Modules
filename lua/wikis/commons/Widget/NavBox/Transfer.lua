@@ -139,7 +139,12 @@ function TransferNavBox._checkForCurrentQuarterOrMonth(children, firstEntry)
 		local monthAbbreviation = TransferNavBox._getMonthAbbreviation(currentMonth)
 		if not monthAbbreviation then return children end
 
-		pageName = pageName:gsub('/[^/]*/?%d?$', '/' .. monthAbbreviation)
+		local currentMonthTimeStamp = DateExt.readTimestamp(monthAbbreviation .. ' 1970')
+		--can not be nil since it is a valid timestamp as per above nil check
+		--@cast currentMonthTimeStamp -nil
+		local monthName = DateExt.formatTimestamp('F', currentMonthTimeStamp)
+		pageName = pageName:gsub('/[^/]*/?%d?$', '/' .. monthName)
+
 		table.insert(children.child0, 1, Link{
 			link = pageName,
 			children = {monthAbbreviation},
