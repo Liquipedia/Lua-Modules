@@ -95,7 +95,7 @@ function MainPageLayout._makeInMemoryOfDisplay()
 		conditions = tostring(ConditionTree(BooleanOperator.all):add{
 			ConditionNode(ColumnName('deathdate'), Comparator.neq, DateExt.defaultDate),
 			ConditionNode(ColumnName('deathdate'), Comparator.ge, DateExt.toYmdInUtc(
-				DateExt.getCurrentTimestamp() - 1209600 --[[2 weeks]]
+				DateExt.getCurrentTimestamp() - DateExt.daysToSeconds(14)
 			))
 		}),
 		query = 'pagename'
