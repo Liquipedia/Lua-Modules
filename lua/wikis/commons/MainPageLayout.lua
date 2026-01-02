@@ -17,6 +17,8 @@ local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
 local ConditionNode = Condition.Node
+local ConditionTree = Condition.Tree
+local BooleanOperator = Condition.BooleanOperator
 local Comparator = Condition.Comparator
 local ColumnName = Condition.ColumnName
 
@@ -90,9 +92,12 @@ end
 ---@return Widget[]?
 function MainPageLayout._makeInMemoryOfDisplay()
 	local passedAwayPlayers = mw.ext.LiquipediaDB.lpdb('player', {
-		conditions = tostring(
-			ConditionNode(ColumnName('deathdate'), Comparator.ge, DateExt.getCurrentTimestamp() - 1209600 --[[2 weeks]])
-		),
+		conditions = tostring(ConditionTree(BooleanOperator.all):add{
+			ConditionNode(ColumnName('deathdate'), Comparator.neq, DateExt.defaultDate),
+			ConditionNode(ColumnName('deathdate'), Comparator.ge, DateExt.toYmdInUtc(
+				DateExt.getCurrentTimestamp() - 1209600 --[[2 weeks]]
+			))
+		}),
 		query = 'pagename'
 	})
 	if Logic.isEmpty(passedAwayPlayers) then
