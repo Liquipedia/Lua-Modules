@@ -81,14 +81,14 @@ end
 function AutomaticPointsTable:storeLPDB(opponents)
 	local date = DateExt.getContextualDateOrNow()
 	Array.forEach(opponents, function(opponent)
-		local teamName = Opponent.toName(opponent.opponent)
+		local opponentName = Opponent.toName(opponent.opponent)
 		local lpdbName = self.parsedInput.lpdbName
-		local uniqueId = teamName .. '_' .. lpdbName
+		local uniqueId = opponentName .. '_' .. lpdbName
 		local position = opponent.placement
 		local totalPoints = opponent.totalPoints
 		local objectData = {
 			type = 'automatic_points',
-			name = teamName,
+			name = opponentName,
 			information = position,
 			date = date,
 			extradata = {
