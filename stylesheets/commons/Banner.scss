@@ -5,440 +5,296 @@
 	position: relative;
 	border-radius: 0.5rem;
 
-	.wiki-ageofempires & {
-		@media ( min-width: 768px ) {
+	@media ( min-width: 768px ) {
+		.wiki-ageofempires & {
 			background: url( https://liquipedia.net/commons/images/b/bc/Age_of_Empires_4_Order_of_the_Dragon_banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-arenafps & {
-		@media ( min-width: 768px ) {
+		.wiki-arenafps & {
 			background: url( https://liquipedia.net/commons/images/b/ba/Arenafps-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-artifact & {
-		@media ( min-width: 768px ) {
+		.wiki-artifact & {
 			background: url( https://liquipedia.net/commons/images/a/a1/Artifact-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-autochess & {
-		@media ( min-width: 768px ) {
+		.wiki-autochess & {
 			background: url( https://liquipedia.net/commons/images/b/bf/Autochess-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-battlerite & {
-		@media ( min-width: 768px ) {
+		.wiki-battlerite & {
 			background: url( https://liquipedia.net/commons/images/1/1f/Battlerite-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-battalion & {
-		@media ( min-width: 768px ) {
+		.wiki-battalion & {
 			background: url( https://liquipedia.net/commons/images/e/ee/Battalion-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-brawlstars & {
-		@media ( min-width: 768px ) {
+		.wiki-brawlstars & {
 			background: url( https://liquipedia.net/commons/images/a/a8/Brawlstars-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-brawlhalla & {
-		@media ( min-width: 768px ) {
+		.wiki-brawlhalla & {
 			background: url( https://liquipedia.net/commons/images/3/36/Brawlhalla-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-chess & {
-		@media ( min-width: 768px ) {
+		.wiki-chess & {
 			background: url( https://liquipedia.net/commons/images/e/ed/Chess_Banner_bg.jpg ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-callofduty & {
-		@media ( min-width: 768px ) {
+		.wiki-callofduty & {
 			background: url( https://liquipedia.net/commons/images/b/bc/COD_Wiki_Banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-clashofclans & {
-		@media ( min-width: 768px ) {
+		.wiki-clashofclans & {
 			background: url( https://liquipedia.net/commons/images/4/4c/Clash_of_Clans_wiki_banner.webp ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-clashroyale & {
-		@media ( min-width: 768px ) {
+		.wiki-clashroyale & {
 			background: url( https://liquipedia.net/commons/images/2/21/Clash_Royale_wiki_banner.webp ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-crossfire & {
-		@media ( min-width: 768px ) {
+		.wiki-crossfire & {
 			background: url( https://liquipedia.net/commons/images/2/2b/Crossfire-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-criticalops & {
-		@media ( min-width: 768px ) {
+		.wiki-criticalops & {
 			background: url( https://liquipedia.net/commons/images/0/08/Criticalops-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-deadlock & {
-		@media ( min-width: 768px ) {
+		.wiki-deadlock & {
 			background: url( https://liquipedia.net/commons/images/8/8f/Deadlock_mainpage_banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-dota2 & {
-		@media ( min-width: 768px ) {
+		.wiki-dota2 & {
 			background: url( https://liquipedia.net/commons/images/1/19/Bgdota2.jpg ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-counterstrike & {
-		@media ( min-width: 768px ) {
+		.wiki-counterstrike & {
 			background: url( https://liquipedia.net/commons/images/d/d1/Counter-strike-bg.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-easportsfc & {
-		@media ( min-width: 768px ) {
+		.wiki-easportsfc & {
 			background: url( https://liquipedia.net/commons/images/3/3e/Easportsfc-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-esports & {
-		@media ( min-width: 768px ) {
+		.wiki-esports & {
 			background: url( https://liquipedia.net/commons/images/4/46/Esports-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-freefire & {
-		@media ( min-width: 768px ) {
+		.wiki-freefire & {
 			background: url( https://liquipedia.net/commons/images/5/51/Freefire-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-fighters & {
-		@media ( min-width: 768px ) {
+		.wiki-fighters & {
 			background: url( https://liquipedia.net/commons/images/e/ec/Fighters-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-fortnite & {
-		@media ( min-width: 768px ) {
+		.wiki-fortnite & {
 			background: url( https://liquipedia.net/commons/images/1/1a/Fortnite-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-geoguessr & {
-		@media ( min-width: 768px ) {
+		.wiki-geoguessr & {
 			background: url( https://liquipedia.net/commons/images/7/74/GeoGuessr_Banner.jpg ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-goals & {
-		@media ( min-width: 768px ) {
+		.wiki-goals & {
 			background: url( https://liquipedia.net/commons/images/a/ae/Goals-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-hearthstone & {
-		@media ( min-width: 768px ) {
+		.wiki-hearthstone & {
 			background: url( https://liquipedia.net/commons/images/4/4d/Hearthstone_banner_bg.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-honorofkings & {
-		@media ( min-width: 768px ) {
+		.wiki-honorofkings & {
 			background: url( https://liquipedia.net/commons/images/f/fb/Hok-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-heroes & {
-		@media ( min-width: 768px ) {
+		.wiki-heroes & {
 			background: url( https://liquipedia.net/commons/images/5/5f/Heroesofthestorm-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-identityv & {
-		@media ( min-width: 768px ) {
+		.wiki-identityv & {
 			background: url( https://liquipedia.net/commons/images/8/8e/Identityv-bg.webp ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-magic & {
-		@media ( min-width: 768px ) {
+		.wiki-magic & {
 			background: url( https://liquipedia.net/commons/images/a/a2/Magic-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-naraka & {
-		@media ( min-width: 768px ) {
+		.wiki-naraka & {
 			background: url( https://liquipedia.net/commons/images/8/8a/Naraka-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-illuvium & {
-		@media ( min-width: 768px ) {
+		.wiki-illuvium & {
 			background: url( https://liquipedia.net/commons/images/0/0b/Illuvium-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-omegastrikers & {
-		@media ( min-width: 768px ) {
+		.wiki-omegastrikers & {
 			background: url( https://liquipedia.net/commons/images/8/80/Omegastrikers-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-pokemon & {
-		@media ( min-width: 768px ) {
+		.wiki-pokemon & {
 			background: url( https://liquipedia.net/commons/images/d/d6/Pokemon_wiki_banner.webp ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-rainbowsix & {
-		@media ( min-width: 768px ) {
+		.wiki-rainbowsix & {
 			background: url( https://liquipedia.net/commons/images/c/c0/R6_bg.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-rematch & {
-		@media ( min-width: 768px ) {
+		.wiki-rematch & {
 			background: url( https://liquipedia.net/commons/images/c/c1/Rematch_wiki_banner.webp ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-rocketleague & {
-		@media ( min-width: 768px ) {
+		.wiki-rocketleague & {
 			background: url( https://liquipedia.net/commons/images/5/56/Header-rl.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-runeterra & {
-		@media ( min-width: 768px ) {
+		.wiki-runeterra & {
 			background: url( https://liquipedia.net/commons/images/4/4f/Runeterra-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-smash & {
-		@media ( min-width: 768px ) {
+		.wiki-smash & {
 			background: url( https://liquipedia.net/commons/images/7/73/Smash_banner.jpg ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-smite & {
-		@media ( min-width: 768px ) {
+		.wiki-smite & {
 			background: url( https://liquipedia.net/commons/images/1/12/Smite-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-stormgate & {
-		@media ( min-width: 768px ) {
+		.wiki-stormgate & {
 			background: url( https://liquipedia.net/commons/images/6/6b/Stormgate-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-splatoon & {
-		@media ( min-width: 768px ) {
+		.wiki-splatoon & {
 			background: url( https://liquipedia.net/commons/images/0/03/Splatoon-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-splitgate & {
-		@media ( min-width: 768px ) {
+		.wiki-splitgate & {
 			background: url( https://liquipedia.net/commons/images/d/d8/Splitgate-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-sideswipe & {
-		@media ( min-width: 768px ) {
+		.wiki-sideswipe & {
 			background: url( https://liquipedia.net/commons/images/3/37/Sideswipe-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-simracing & {
-		@media ( min-width: 768px ) {
+		.wiki-simracing & {
 			background: url( https://liquipedia.net/commons/images/f/f6/Simracing-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-squadrons & {
-		@media ( min-width: 768px ) {
+		.wiki-squadrons & {
 			background: url( https://liquipedia.net/commons/images/6/6e/Squadrons-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-teamfortress & {
-		@media ( min-width: 768px ) {
+		.wiki-teamfortress & {
 			background: url( https://liquipedia.net/commons/images/d/d0/Teamfortress-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-tetris & {
-		@media ( min-width: 768px ) {
+		.wiki-tetris & {
 			background: url( https://liquipedia.net/commons/images/a/af/Tetris-banner.jpg ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-tarkovarena & {
-		@media ( min-width: 768px ) {
+		.wiki-tarkovarena & {
 			background: url( https://liquipedia.net/commons/images/e/e7/Tarkovarena-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-thefinals & {
-		@media ( min-width: 768px ) {
+		.wiki-thefinals & {
 			background: url( https://liquipedia.net/commons/images/b/b8/Thefinals-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-trackmania & {
-		@media ( min-width: 768px ) {
+		.wiki-trackmania & {
 			background: url( https://liquipedia.net/commons/images/4/43/Trackmania-banner.jpg ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-underlords & {
-		@media ( min-width: 768px ) {
+		.wiki-underlords & {
 			background: url( https://liquipedia.net/commons/images/4/4d/Underlords-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-apexlegends & {
-		@media ( min-width: 768px ) {
+		.wiki-apexlegends & {
 			background: url( https://liquipedia.net/commons/images/3/3d/Apex_Legends_Banner_bg.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-leagueoflegends & {
-		@media ( min-width: 768px ) {
+		.wiki-leagueoflegends & {
 			background: url( https://liquipedia.net/commons/images/b/bb/League_of_Legends_Banner_bg.jpg ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-marvelrivals & {
-		@media ( min-width: 768px ) {
+		.wiki-marvelrivals & {
 			background: url( https://liquipedia.net/commons/images/4/47/Marvelrivals-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-osu & {
-		@media ( min-width: 768px ) {
+		.wiki-osu & {
 			background: url( https://liquipedia.net/commons/images/2/2b/Osu_mainpage_banner.jpg ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-overwatch & {
-		@media ( min-width: 768px ) {
+		.wiki-overwatch & {
 			background: url( https://liquipedia.net/commons/images/0/0a/Overwatch-bg.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-paladins & {
-		@media ( min-width: 768px ) {
+		.wiki-paladins & {
 			background: url( https://liquipedia.net/commons/images/e/e0/Paladins-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-pubg & {
-		@media ( min-width: 768px ) {
+		.wiki-pubg & {
 			background: url( https://liquipedia.net/commons/images/2/2d/PUBG_Banner_bg.jpg ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-pubgmobile & {
-		@media ( min-width: 768px ) {
+		.wiki-pubgmobile & {
 			background: url( https://liquipedia.net/commons/images/1/1a/PUBG_Mobile_banner_bg.jpg ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-halo & {
-		@media ( min-width: 768px ) {
+		.wiki-halo & {
 			background: url( https://liquipedia.net/commons/images/f/f8/Halo_Banner_bg.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-starcraft & {
-		@media ( min-width: 768px ) {
+		.wiki-starcraft & {
 			background: url( https://liquipedia.net/commons/images/d/d4/Starcraft-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-starcraft2 & {
-		@media ( min-width: 768px ) {
+		.wiki-starcraft2 & {
 			background: url( https://liquipedia.net/commons/images/6/6c/Starcraft2-bg.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-tft & {
-		@media ( min-width: 768px ) {
+		.wiki-tft & {
 			background: url( https://liquipedia.net/commons/images/f/f6/Tft-bg.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-valorant & {
-		@media ( min-width: 768px ) {
+		.wiki-valorant & {
 			background: url( https://liquipedia.net/commons/images/a/a6/Valorant-bg-2.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-warthunder & {
-		@media ( min-width: 768px ) {
+		.wiki-warthunder & {
 			background: url( https://liquipedia.net/commons/images/6/6a/Warthunder-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-warcraft & {
-		@media ( min-width: 768px ) {
+		.wiki-warcraft & {
 			background: url( https://liquipedia.net/commons/images/f/f0/Warcraft-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-worldofwarcraft & {
-		@media ( min-width: 768px ) {
+		.wiki-worldofwarcraft & {
 			background: url( https://liquipedia.net/commons/images/2/2f/Worldofwarcraft-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-mobilelegends & {
-		@media ( min-width: 768px ) {
+		.wiki-mobilelegends & {
 			background: url( https://liquipedia.net/commons/images/0/07/MLBB_Wiki_banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-wildcard & {
-		@media ( min-width: 768px ) {
+		.wiki-wildcard & {
 			background: url( https://liquipedia.net/commons/images/c/c0/Wildcard-bg.webp ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-wildrift & {
-		@media ( min-width: 768px ) {
+		.wiki-wildrift & {
 			background: url( https://liquipedia.net/commons/images/f/f3/Wild_Rift_wiki_banner.webp ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-worldoftanks & {
-		@media ( min-width: 768px ) {
+		.wiki-worldoftanks & {
 			background: url( https://liquipedia.net/commons/images/f/f3/Worldoftanks_banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-zula & {
-		@media ( min-width: 768px ) {
+		.wiki-zula & {
 			background: url( https://liquipedia.net/commons/images/2/2f/Zula-banner.png ) no-repeat center / cover;
 		}
-	}
 
-	.wiki-formula1 & {
-		@media ( min-width: 768px ) {
+		.wiki-formula1 & {
 			background: url( https://liquipedia.net/commons/images/9/99/Formula1_banner.png ) no-repeat center / cover;
 		}
 	}
@@ -450,10 +306,8 @@
 		justify-content: space-between;
 		padding: 0 2.5rem;
 		overflow: hidden;
-	}
 
-	&::before {
-		@media ( min-width: 768px ) {
+		&::before {
 			content: "";
 			background-color: #000000;
 			opacity: 0.5;
