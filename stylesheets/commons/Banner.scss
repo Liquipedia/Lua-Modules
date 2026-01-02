@@ -1,4 +1,4 @@
-@mixin create-banner-rule($banner-url) {
+@mixin banner-background($banner-url) {
 	background: url( https://liquipedia.net/commons/images/#{$banner-url} ) no-repeat center / cover;
 }
 
@@ -11,295 +11,295 @@
 
 	@media ( min-width: 768px ) {
 		.wiki-ageofempires & {
-			@include create-banner-rule( "b/bc/Age_of_Empires_4_Order_of_the_Dragon_banner.png" );
+			@include banner-background( "b/bc/Age_of_Empires_4_Order_of_the_Dragon_banner.png" );
 		}
 
 		.wiki-arenafps & {
-			@include create-banner-rule( "b/ba/Arenafps-banner.png" );
+			@include banner-background( "b/ba/Arenafps-banner.png" );
 		}
 
 		.wiki-artifact & {
-			@include create-banner-rule( "a/a1/Artifact-banner.png" );
+			@include banner-background( "a/a1/Artifact-banner.png" );
 		}
 
 		.wiki-autochess & {
-			@include create-banner-rule( "b/bf/Autochess-banner.png" );
+			@include banner-background( "b/bf/Autochess-banner.png" );
 		}
 
 		.wiki-battlerite & {
-			@include create-banner-rule( "1/1f/Battlerite-banner.png" );
+			@include banner-background( "1/1f/Battlerite-banner.png" );
 		}
 
 		.wiki-battalion & {
-			@include create-banner-rule( "e/ee/Battalion-banner.png" );
+			@include banner-background( "e/ee/Battalion-banner.png" );
 		}
 
 		.wiki-brawlstars & {
-			@include create-banner-rule( "a/a8/Brawlstars-banner.png" );
+			@include banner-background( "a/a8/Brawlstars-banner.png" );
 		}
 
 		.wiki-brawlhalla & {
-			@include create-banner-rule( "3/36/Brawlhalla-banner.png" );
+			@include banner-background( "3/36/Brawlhalla-banner.png" );
 		}
 
 		.wiki-chess & {
-			@include create-banner-rule( "e/ed/Chess_Banner_bg.jpg" );
+			@include banner-background( "e/ed/Chess_Banner_bg.jpg" );
 		}
 
 		.wiki-callofduty & {
-			@include create-banner-rule( "b/bc/COD_Wiki_Banner.png" );
+			@include banner-background( "b/bc/COD_Wiki_Banner.png" );
 		}
 
 		.wiki-clashofclans & {
-			@include create-banner-rule( "4/4c/Clash_of_Clans_wiki_banner.webp" );
+			@include banner-background( "4/4c/Clash_of_Clans_wiki_banner.webp" );
 		}
 
 		.wiki-clashroyale & {
-			@include create-banner-rule( "2/21/Clash_Royale_wiki_banner.webp" );
+			@include banner-background( "2/21/Clash_Royale_wiki_banner.webp" );
 		}
 
 		.wiki-crossfire & {
-			@include create-banner-rule( "2/2b/Crossfire-banner.png" );
+			@include banner-background( "2/2b/Crossfire-banner.png" );
 		}
 
 		.wiki-criticalops & {
-			@include create-banner-rule( "0/08/Criticalops-banner.png" );
+			@include banner-background( "0/08/Criticalops-banner.png" );
 		}
 
 		.wiki-deadlock & {
-			@include create-banner-rule( "8/8f/Deadlock_mainpage_banner.png" );
+			@include banner-background( "8/8f/Deadlock_mainpage_banner.png" );
 		}
 
 		.wiki-dota2 & {
-			@include create-banner-rule( "1/19/Bgdota2.jpg" );
+			@include banner-background( "1/19/Bgdota2.jpg" );
 		}
 
 		.wiki-counterstrike & {
-			@include create-banner-rule( "d/d1/Counter-strike-bg.png" );
+			@include banner-background( "d/d1/Counter-strike-bg.png" );
 		}
 
 		.wiki-easportsfc & {
-			@include create-banner-rule( "3/3e/Easportsfc-banner.png" );
+			@include banner-background( "3/3e/Easportsfc-banner.png" );
 		}
 
 		.wiki-esports & {
-			@include create-banner-rule( "4/46/Esports-banner.png" );
+			@include banner-background( "4/46/Esports-banner.png" );
 		}
 
 		.wiki-freefire & {
-			@include create-banner-rule( "5/51/Freefire-banner.png" );
+			@include banner-background( "5/51/Freefire-banner.png" );
 		}
 
 		.wiki-fighters & {
-			@include create-banner-rule( "e/ec/Fighters-banner.png" );
+			@include banner-background( "e/ec/Fighters-banner.png" );
 		}
 
 		.wiki-fortnite & {
-			@include create-banner-rule( "1/1a/Fortnite-banner.png" );
+			@include banner-background( "1/1a/Fortnite-banner.png" );
 		}
 
 		.wiki-geoguessr & {
-			@include create-banner-rule( "7/74/GeoGuessr_Banner.jpg" );
+			@include banner-background( "7/74/GeoGuessr_Banner.jpg" );
 		}
 
 		.wiki-goals & {
-			@include create-banner-rule( "a/ae/Goals-banner.png" );
+			@include banner-background( "a/ae/Goals-banner.png" );
 		}
 
 		.wiki-hearthstone & {
-			@include create-banner-rule( "4/4d/Hearthstone_banner_bg.png" );
+			@include banner-background( "4/4d/Hearthstone_banner_bg.png" );
 		}
 
 		.wiki-honorofkings & {
-			@include create-banner-rule( "f/fb/Hok-banner.png" );
+			@include banner-background( "f/fb/Hok-banner.png" );
 		}
 
 		.wiki-heroes & {
-			@include create-banner-rule( "5/5f/Heroesofthestorm-banner.png" );
+			@include banner-background( "5/5f/Heroesofthestorm-banner.png" );
 		}
 
 		.wiki-identityv & {
-			@include create-banner-rule( "8/8e/Identityv-bg.webp" );
+			@include banner-background( "8/8e/Identityv-bg.webp" );
 		}
 
 		.wiki-magic & {
-			@include create-banner-rule( "a/a2/Magic-banner.png" );
+			@include banner-background( "a/a2/Magic-banner.png" );
 		}
 
 		.wiki-naraka & {
-			@include create-banner-rule( "8/8a/Naraka-banner.png" );
+			@include banner-background( "8/8a/Naraka-banner.png" );
 		}
 
 		.wiki-illuvium & {
-			@include create-banner-rule( "0/0b/Illuvium-banner.png" );
+			@include banner-background( "0/0b/Illuvium-banner.png" );
 		}
 
 		.wiki-omegastrikers & {
-			@include create-banner-rule( "8/80/Omegastrikers-banner.png" );
+			@include banner-background( "8/80/Omegastrikers-banner.png" );
 		}
 
 		.wiki-pokemon & {
-			@include create-banner-rule( "d/d6/Pokemon_wiki_banner.webp" );
+			@include banner-background( "d/d6/Pokemon_wiki_banner.webp" );
 		}
 
 		.wiki-rainbowsix & {
-			@include create-banner-rule( "c/c0/R6_bg.png" );
+			@include banner-background( "c/c0/R6_bg.png" );
 		}
 
 		.wiki-rematch & {
-			@include create-banner-rule( "c/c1/Rematch_wiki_banner.webp" );
+			@include banner-background( "c/c1/Rematch_wiki_banner.webp" );
 		}
 
 		.wiki-rocketleague & {
-			@include create-banner-rule( "5/56/Header-rl.png" );
+			@include banner-background( "5/56/Header-rl.png" );
 		}
 
 		.wiki-runeterra & {
-			@include create-banner-rule( "4/4f/Runeterra-banner.png" );
+			@include banner-background( "4/4f/Runeterra-banner.png" );
 		}
 
 		.wiki-smash & {
-			@include create-banner-rule( "7/73/Smash_banner.jpg" );
+			@include banner-background( "7/73/Smash_banner.jpg" );
 		}
 
 		.wiki-smite & {
-			@include create-banner-rule( "1/12/Smite-banner.png" );
+			@include banner-background( "1/12/Smite-banner.png" );
 		}
 
 		.wiki-stormgate & {
-			@include create-banner-rule( "6/6b/Stormgate-banner.png" );
+			@include banner-background( "6/6b/Stormgate-banner.png" );
 		}
 
 		.wiki-splatoon & {
-			@include create-banner-rule( "0/03/Splatoon-banner.png" );
+			@include banner-background( "0/03/Splatoon-banner.png" );
 		}
 
 		.wiki-splitgate & {
-			@include create-banner-rule( "d/d8/Splitgate-banner.png" );
+			@include banner-background( "d/d8/Splitgate-banner.png" );
 		}
 
 		.wiki-sideswipe & {
-			@include create-banner-rule( "3/37/Sideswipe-banner.png" );
+			@include banner-background( "3/37/Sideswipe-banner.png" );
 		}
 
 		.wiki-simracing & {
-			@include create-banner-rule( "f/f6/Simracing-banner.png" );
+			@include banner-background( "f/f6/Simracing-banner.png" );
 		}
 
 		.wiki-squadrons & {
-			@include create-banner-rule( "6/6e/Squadrons-banner.png" );
+			@include banner-background( "6/6e/Squadrons-banner.png" );
 		}
 
 		.wiki-teamfortress & {
-			@include create-banner-rule( "d/d0/Teamfortress-banner.png" );
+			@include banner-background( "d/d0/Teamfortress-banner.png" );
 		}
 
 		.wiki-tetris & {
-			@include create-banner-rule( "a/af/Tetris-banner.jpg" );
+			@include banner-background( "a/af/Tetris-banner.jpg" );
 		}
 
 		.wiki-tarkovarena & {
-			@include create-banner-rule( "e/e7/Tarkovarena-banner.png" );
+			@include banner-background( "e/e7/Tarkovarena-banner.png" );
 		}
 
 		.wiki-thefinals & {
-			@include create-banner-rule( "b/b8/Thefinals-banner.png" );
+			@include banner-background( "b/b8/Thefinals-banner.png" );
 		}
 
 		.wiki-trackmania & {
-			@include create-banner-rule( "4/43/Trackmania-banner.jpg" );
+			@include banner-background( "4/43/Trackmania-banner.jpg" );
 		}
 
 		.wiki-underlords & {
-			@include create-banner-rule( "4/4d/Underlords-banner.png" );
+			@include banner-background( "4/4d/Underlords-banner.png" );
 		}
 
 		.wiki-apexlegends & {
-			@include create-banner-rule( "3/3d/Apex_Legends_Banner_bg.png" );
+			@include banner-background( "3/3d/Apex_Legends_Banner_bg.png" );
 		}
 
 		.wiki-leagueoflegends & {
-			@include create-banner-rule( "b/bb/League_of_Legends_Banner_bg.jpg" );
+			@include banner-background( "b/bb/League_of_Legends_Banner_bg.jpg" );
 		}
 
 		.wiki-marvelrivals & {
-			@include create-banner-rule( "4/47/Marvelrivals-banner.png" );
+			@include banner-background( "4/47/Marvelrivals-banner.png" );
 		}
 
 		.wiki-osu & {
-			@include create-banner-rule( "2/2b/Osu_mainpage_banner.jpg" );
+			@include banner-background( "2/2b/Osu_mainpage_banner.jpg" );
 		}
 
 		.wiki-overwatch & {
-			@include create-banner-rule( "0/0a/Overwatch-bg.png" );
+			@include banner-background( "0/0a/Overwatch-bg.png" );
 		}
 
 		.wiki-paladins & {
-			@include create-banner-rule( "e/e0/Paladins-banner.png" );
+			@include banner-background( "e/e0/Paladins-banner.png" );
 		}
 
 		.wiki-pubg & {
-			@include create-banner-rule( "2/2d/PUBG_Banner_bg.jpg" );
+			@include banner-background( "2/2d/PUBG_Banner_bg.jpg" );
 		}
 
 		.wiki-pubgmobile & {
-			@include create-banner-rule( "1/1a/PUBG_Mobile_banner_bg.jpg" );
+			@include banner-background( "1/1a/PUBG_Mobile_banner_bg.jpg" );
 		}
 
 		.wiki-halo & {
-			@include create-banner-rule( "f/f8/Halo_Banner_bg.png" );
+			@include banner-background( "f/f8/Halo_Banner_bg.png" );
 		}
 
 		.wiki-starcraft & {
-			@include create-banner-rule( "d/d4/Starcraft-banner.png" );
+			@include banner-background( "d/d4/Starcraft-banner.png" );
 		}
 
 		.wiki-starcraft2 & {
-			@include create-banner-rule( "6/6c/Starcraft2-bg.png" );
+			@include banner-background( "6/6c/Starcraft2-bg.png" );
 		}
 
 		.wiki-tft & {
-			@include create-banner-rule( "f/f6/Tft-bg.png" );
+			@include banner-background( "f/f6/Tft-bg.png" );
 		}
 
 		.wiki-valorant & {
-			@include create-banner-rule( "a/a6/Valorant-bg-2.png" );
+			@include banner-background( "a/a6/Valorant-bg-2.png" );
 		}
 
 		.wiki-warthunder & {
-			@include create-banner-rule( "6/6a/Warthunder-banner.png" );
+			@include banner-background( "6/6a/Warthunder-banner.png" );
 		}
 
 		.wiki-warcraft & {
-			@include create-banner-rule( "f/f0/Warcraft-banner.png" );
+			@include banner-background( "f/f0/Warcraft-banner.png" );
 		}
 
 		.wiki-worldofwarcraft & {
-			@include create-banner-rule( "2/2f/Worldofwarcraft-banner.png" );
+			@include banner-background( "2/2f/Worldofwarcraft-banner.png" );
 		}
 
 		.wiki-mobilelegends & {
-			@include create-banner-rule( "0/07/MLBB_Wiki_banner.png" );
+			@include banner-background( "0/07/MLBB_Wiki_banner.png" );
 		}
 
 		.wiki-wildcard & {
-			@include create-banner-rule( "c/c0/Wildcard-bg.webp" );
+			@include banner-background( "c/c0/Wildcard-bg.webp" );
 		}
 
 		.wiki-wildrift & {
-			@include create-banner-rule( "f/f3/Wild_Rift_wiki_banner.webp" );
+			@include banner-background( "f/f3/Wild_Rift_wiki_banner.webp" );
 		}
 
 		.wiki-worldoftanks & {
-			@include create-banner-rule( "f/f3/Worldoftanks_banner.png" );
+			@include banner-background( "f/f3/Worldoftanks_banner.png" );
 		}
 
 		.wiki-zula & {
-			@include create-banner-rule( "2/2f/Zula-banner.png" );
+			@include banner-background( "2/2f/Zula-banner.png" );
 		}
 
 		.wiki-formula1 & {
-			@include create-banner-rule( "9/99/Formula1_banner.png" );
+			@include banner-background( "9/99/Formula1_banner.png" );
 		}
 	}
 
