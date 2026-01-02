@@ -151,7 +151,7 @@ function AutomaticPointsTableWidget:createRow(opponent, opponentIndex)
 				end
 				return {
 					AutomaticPointsTableWidget._createRowCell{
-						css = result.type == "SECURED" and {
+						css = result.type == 'SECURED' and {
 							['font-weight'] = 'lighter',
 							['font-style'] = 'italic'
 						} or nil,
