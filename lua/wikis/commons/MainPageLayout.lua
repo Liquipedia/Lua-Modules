@@ -91,7 +91,7 @@ end
 function MainPageLayout._makeInMemoryOfDisplay()
 	local passedAwayPlayers = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = tostring(
-			ConditionNode(ColumnName('deathdate'), Comparator.ge, DateExt.getCurrentTimestamp - 1209600 --[[2 weeks]])
+			ConditionNode(ColumnName('deathdate'), Comparator.ge, DateExt.getCurrentTimestamp() - 1209600 --[[2 weeks]])
 		),
 		query = 'pagename'
 	})
