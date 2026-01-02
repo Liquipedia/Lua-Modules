@@ -260,7 +260,7 @@ BasePrizePool.prizeTypes = {
 			local tournamentData = Tournament.getTournament(input) or {}
 			local prefix = 'qualifies' .. index
 			return {
-				link = tournamentData.pageName,
+				link = tournamentData.pageName or input,
 				title = context[prefix .. 'name'] or tournamentData.displayName,
 				icon = tournamentData.icon or context[prefix .. 'icon'],
 				iconDark = tournamentData.iconDark or context[prefix .. 'icondark']
