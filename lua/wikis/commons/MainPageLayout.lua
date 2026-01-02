@@ -74,6 +74,7 @@ function MainPageLayout.make(frame)
 					frame:callParserFunction('#searchbox', ''),
 				}
 			},
+			MainPageLayout._makeInMemoryOfDisplay(),
 			AnalyticsWidget{
 				analyticsName = 'Quick navigation',
 				children = {
@@ -83,7 +84,6 @@ function MainPageLayout.make(frame)
 					}
 				}
 			},
-			MainPageLayout._makeInMemoryOfDisplay(),
 			MainPageLayout._makeCells(layout)
 		),
 	}
