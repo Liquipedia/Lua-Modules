@@ -74,7 +74,6 @@ local AutomaticPointsTable = Class.new(
 ---@return Widget
 function AutomaticPointsTable.run(frame)
 	local pointsTable = AutomaticPointsTable(frame):process()
-	mw.logObject(pointsTable.opponents, 'opponents')
 	return pointsTable:display()
 end
 
