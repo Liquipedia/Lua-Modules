@@ -20,6 +20,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local NavigationCard = Lua.import('Module:Widget/MainPage/NavigationCard')
 local PanelWidget = Lua.import('Module:Widget/Panel')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MainPageLayout = {}
 
@@ -41,7 +42,7 @@ function MainPageLayout.make(frame)
 
 	return HtmlWidgets.Div{
 		classes = {'mainpage-v2'},
-		children = {
+		children = WidgetUtil.collect(
 			NO_TABLE_OF_CONTENTS,
 			frame:callParserFunction('DISPLAYTITLE', WikiData.title),
 			HtmlWidgets.Div{
@@ -72,8 +73,8 @@ function MainPageLayout.make(frame)
 					}
 				}
 			},
-			MainPageLayout._makeCells(layout),
-		},
+			MainPageLayout._makeCells(layout)
+		),
 	}
 end
 
