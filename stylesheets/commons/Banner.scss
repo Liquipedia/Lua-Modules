@@ -1,3 +1,7 @@
+@mixin create-banner-rule($banner-url) {
+	background: url( "https://liquipedia.net/commons/images/#{$banner-url}" ) no-repeat center / cover;
+}
+
 .header-banner {
 	display: flex;
 	flex-direction: column;
@@ -7,295 +11,295 @@
 
 	@media ( min-width: 768px ) {
 		.wiki-ageofempires & {
-			background: url( https://liquipedia.net/commons/images/b/bc/Age_of_Empires_4_Order_of_the_Dragon_banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "b/bc/Age_of_Empires_4_Order_of_the_Dragon_banner.png" );
 		}
 
 		.wiki-arenafps & {
-			background: url( https://liquipedia.net/commons/images/b/ba/Arenafps-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "b/ba/Arenafps-banner.png" );
 		}
 
 		.wiki-artifact & {
-			background: url( https://liquipedia.net/commons/images/a/a1/Artifact-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "a/a1/Artifact-banner.png" );
 		}
 
 		.wiki-autochess & {
-			background: url( https://liquipedia.net/commons/images/b/bf/Autochess-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "b/bf/Autochess-banner.png" );
 		}
 
 		.wiki-battlerite & {
-			background: url( https://liquipedia.net/commons/images/1/1f/Battlerite-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "1/1f/Battlerite-banner.png" );
 		}
 
 		.wiki-battalion & {
-			background: url( https://liquipedia.net/commons/images/e/ee/Battalion-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "e/ee/Battalion-banner.png" );
 		}
 
 		.wiki-brawlstars & {
-			background: url( https://liquipedia.net/commons/images/a/a8/Brawlstars-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "a/a8/Brawlstars-banner.png" );
 		}
 
 		.wiki-brawlhalla & {
-			background: url( https://liquipedia.net/commons/images/3/36/Brawlhalla-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "3/36/Brawlhalla-banner.png" );
 		}
 
 		.wiki-chess & {
-			background: url( https://liquipedia.net/commons/images/e/ed/Chess_Banner_bg.jpg ) no-repeat center / cover;
+			@include create-banner-rule( "e/ed/Chess_Banner_bg.jpg" );
 		}
 
 		.wiki-callofduty & {
-			background: url( https://liquipedia.net/commons/images/b/bc/COD_Wiki_Banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "b/bc/COD_Wiki_Banner.png" );
 		}
 
 		.wiki-clashofclans & {
-			background: url( https://liquipedia.net/commons/images/4/4c/Clash_of_Clans_wiki_banner.webp ) no-repeat center / cover;
+			@include create-banner-rule( "4/4c/Clash_of_Clans_wiki_banner.webp" );
 		}
 
 		.wiki-clashroyale & {
-			background: url( https://liquipedia.net/commons/images/2/21/Clash_Royale_wiki_banner.webp ) no-repeat center / cover;
+			@include create-banner-rule( "2/21/Clash_Royale_wiki_banner.webp" );
 		}
 
 		.wiki-crossfire & {
-			background: url( https://liquipedia.net/commons/images/2/2b/Crossfire-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "2/2b/Crossfire-banner.png" );
 		}
 
 		.wiki-criticalops & {
-			background: url( https://liquipedia.net/commons/images/0/08/Criticalops-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "0/08/Criticalops-banner.png" );
 		}
 
 		.wiki-deadlock & {
-			background: url( https://liquipedia.net/commons/images/8/8f/Deadlock_mainpage_banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "8/8f/Deadlock_mainpage_banner.png" );
 		}
 
 		.wiki-dota2 & {
-			background: url( https://liquipedia.net/commons/images/1/19/Bgdota2.jpg ) no-repeat center / cover;
+			@include create-banner-rule( "1/19/Bgdota2.jpg" );
 		}
 
 		.wiki-counterstrike & {
-			background: url( https://liquipedia.net/commons/images/d/d1/Counter-strike-bg.png ) no-repeat center / cover;
+			@include create-banner-rule( "d/d1/Counter-strike-bg.png" );
 		}
 
 		.wiki-easportsfc & {
-			background: url( https://liquipedia.net/commons/images/3/3e/Easportsfc-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "3/3e/Easportsfc-banner.png" );
 		}
 
 		.wiki-esports & {
-			background: url( https://liquipedia.net/commons/images/4/46/Esports-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "4/46/Esports-banner.png" );
 		}
 
 		.wiki-freefire & {
-			background: url( https://liquipedia.net/commons/images/5/51/Freefire-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "5/51/Freefire-banner.png" );
 		}
 
 		.wiki-fighters & {
-			background: url( https://liquipedia.net/commons/images/e/ec/Fighters-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "e/ec/Fighters-banner.png" );
 		}
 
 		.wiki-fortnite & {
-			background: url( https://liquipedia.net/commons/images/1/1a/Fortnite-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "1/1a/Fortnite-banner.png" );
 		}
 
 		.wiki-geoguessr & {
-			background: url( https://liquipedia.net/commons/images/7/74/GeoGuessr_Banner.jpg ) no-repeat center / cover;
+			@include create-banner-rule( "7/74/GeoGuessr_Banner.jpg" );
 		}
 
 		.wiki-goals & {
-			background: url( https://liquipedia.net/commons/images/a/ae/Goals-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "a/ae/Goals-banner.png" );
 		}
 
 		.wiki-hearthstone & {
-			background: url( https://liquipedia.net/commons/images/4/4d/Hearthstone_banner_bg.png ) no-repeat center / cover;
+			@include create-banner-rule( "4/4d/Hearthstone_banner_bg.png" );
 		}
 
 		.wiki-honorofkings & {
-			background: url( https://liquipedia.net/commons/images/f/fb/Hok-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "f/fb/Hok-banner.png" );
 		}
 
 		.wiki-heroes & {
-			background: url( https://liquipedia.net/commons/images/5/5f/Heroesofthestorm-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "5/5f/Heroesofthestorm-banner.png" );
 		}
 
 		.wiki-identityv & {
-			background: url( https://liquipedia.net/commons/images/8/8e/Identityv-bg.webp ) no-repeat center / cover;
+			@include create-banner-rule( "8/8e/Identityv-bg.webp" );
 		}
 
 		.wiki-magic & {
-			background: url( https://liquipedia.net/commons/images/a/a2/Magic-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "a/a2/Magic-banner.png" );
 		}
 
 		.wiki-naraka & {
-			background: url( https://liquipedia.net/commons/images/8/8a/Naraka-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "8/8a/Naraka-banner.png" );
 		}
 
 		.wiki-illuvium & {
-			background: url( https://liquipedia.net/commons/images/0/0b/Illuvium-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "0/0b/Illuvium-banner.png" );
 		}
 
 		.wiki-omegastrikers & {
-			background: url( https://liquipedia.net/commons/images/8/80/Omegastrikers-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "8/80/Omegastrikers-banner.png" );
 		}
 
 		.wiki-pokemon & {
-			background: url( https://liquipedia.net/commons/images/d/d6/Pokemon_wiki_banner.webp ) no-repeat center / cover;
+			@include create-banner-rule( "d/d6/Pokemon_wiki_banner.webp" );
 		}
 
 		.wiki-rainbowsix & {
-			background: url( https://liquipedia.net/commons/images/c/c0/R6_bg.png ) no-repeat center / cover;
+			@include create-banner-rule( "c/c0/R6_bg.png" );
 		}
 
 		.wiki-rematch & {
-			background: url( https://liquipedia.net/commons/images/c/c1/Rematch_wiki_banner.webp ) no-repeat center / cover;
+			@include create-banner-rule( "c/c1/Rematch_wiki_banner.webp" );
 		}
 
 		.wiki-rocketleague & {
-			background: url( https://liquipedia.net/commons/images/5/56/Header-rl.png ) no-repeat center / cover;
+			@include create-banner-rule( "5/56/Header-rl.png" );
 		}
 
 		.wiki-runeterra & {
-			background: url( https://liquipedia.net/commons/images/4/4f/Runeterra-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "4/4f/Runeterra-banner.png" );
 		}
 
 		.wiki-smash & {
-			background: url( https://liquipedia.net/commons/images/7/73/Smash_banner.jpg ) no-repeat center / cover;
+			@include create-banner-rule( "7/73/Smash_banner.jpg" );
 		}
 
 		.wiki-smite & {
-			background: url( https://liquipedia.net/commons/images/1/12/Smite-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "1/12/Smite-banner.png" );
 		}
 
 		.wiki-stormgate & {
-			background: url( https://liquipedia.net/commons/images/6/6b/Stormgate-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "6/6b/Stormgate-banner.png" );
 		}
 
 		.wiki-splatoon & {
-			background: url( https://liquipedia.net/commons/images/0/03/Splatoon-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "0/03/Splatoon-banner.png" );
 		}
 
 		.wiki-splitgate & {
-			background: url( https://liquipedia.net/commons/images/d/d8/Splitgate-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "d/d8/Splitgate-banner.png" );
 		}
 
 		.wiki-sideswipe & {
-			background: url( https://liquipedia.net/commons/images/3/37/Sideswipe-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "3/37/Sideswipe-banner.png" );
 		}
 
 		.wiki-simracing & {
-			background: url( https://liquipedia.net/commons/images/f/f6/Simracing-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "f/f6/Simracing-banner.png" );
 		}
 
 		.wiki-squadrons & {
-			background: url( https://liquipedia.net/commons/images/6/6e/Squadrons-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "6/6e/Squadrons-banner.png" );
 		}
 
 		.wiki-teamfortress & {
-			background: url( https://liquipedia.net/commons/images/d/d0/Teamfortress-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "d/d0/Teamfortress-banner.png" );
 		}
 
 		.wiki-tetris & {
-			background: url( https://liquipedia.net/commons/images/a/af/Tetris-banner.jpg ) no-repeat center / cover;
+			@include create-banner-rule( "a/af/Tetris-banner.jpg" );
 		}
 
 		.wiki-tarkovarena & {
-			background: url( https://liquipedia.net/commons/images/e/e7/Tarkovarena-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "e/e7/Tarkovarena-banner.png" );
 		}
 
 		.wiki-thefinals & {
-			background: url( https://liquipedia.net/commons/images/b/b8/Thefinals-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "b/b8/Thefinals-banner.png" );
 		}
 
 		.wiki-trackmania & {
-			background: url( https://liquipedia.net/commons/images/4/43/Trackmania-banner.jpg ) no-repeat center / cover;
+			@include create-banner-rule( "4/43/Trackmania-banner.jpg" );
 		}
 
 		.wiki-underlords & {
-			background: url( https://liquipedia.net/commons/images/4/4d/Underlords-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "4/4d/Underlords-banner.png" );
 		}
 
 		.wiki-apexlegends & {
-			background: url( https://liquipedia.net/commons/images/3/3d/Apex_Legends_Banner_bg.png ) no-repeat center / cover;
+			@include create-banner-rule( "3/3d/Apex_Legends_Banner_bg.png" );
 		}
 
 		.wiki-leagueoflegends & {
-			background: url( https://liquipedia.net/commons/images/b/bb/League_of_Legends_Banner_bg.jpg ) no-repeat center / cover;
+			@include create-banner-rule( "b/bb/League_of_Legends_Banner_bg.jpg" );
 		}
 
 		.wiki-marvelrivals & {
-			background: url( https://liquipedia.net/commons/images/4/47/Marvelrivals-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "4/47/Marvelrivals-banner.png" );
 		}
 
 		.wiki-osu & {
-			background: url( https://liquipedia.net/commons/images/2/2b/Osu_mainpage_banner.jpg ) no-repeat center / cover;
+			@include create-banner-rule( "2/2b/Osu_mainpage_banner.jpg" );
 		}
 
 		.wiki-overwatch & {
-			background: url( https://liquipedia.net/commons/images/0/0a/Overwatch-bg.png ) no-repeat center / cover;
+			@include create-banner-rule( "0/0a/Overwatch-bg.png" );
 		}
 
 		.wiki-paladins & {
-			background: url( https://liquipedia.net/commons/images/e/e0/Paladins-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "e/e0/Paladins-banner.png" );
 		}
 
 		.wiki-pubg & {
-			background: url( https://liquipedia.net/commons/images/2/2d/PUBG_Banner_bg.jpg ) no-repeat center / cover;
+			@include create-banner-rule( "2/2d/PUBG_Banner_bg.jpg" );
 		}
 
 		.wiki-pubgmobile & {
-			background: url( https://liquipedia.net/commons/images/1/1a/PUBG_Mobile_banner_bg.jpg ) no-repeat center / cover;
+			@include create-banner-rule( "1/1a/PUBG_Mobile_banner_bg.jpg" );
 		}
 
 		.wiki-halo & {
-			background: url( https://liquipedia.net/commons/images/f/f8/Halo_Banner_bg.png ) no-repeat center / cover;
+			@include create-banner-rule( "f/f8/Halo_Banner_bg.png" );
 		}
 
 		.wiki-starcraft & {
-			background: url( https://liquipedia.net/commons/images/d/d4/Starcraft-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "d/d4/Starcraft-banner.png" );
 		}
 
 		.wiki-starcraft2 & {
-			background: url( https://liquipedia.net/commons/images/6/6c/Starcraft2-bg.png ) no-repeat center / cover;
+			@include create-banner-rule( "6/6c/Starcraft2-bg.png" );
 		}
 
 		.wiki-tft & {
-			background: url( https://liquipedia.net/commons/images/f/f6/Tft-bg.png ) no-repeat center / cover;
+			@include create-banner-rule( "f/f6/Tft-bg.png" );
 		}
 
 		.wiki-valorant & {
-			background: url( https://liquipedia.net/commons/images/a/a6/Valorant-bg-2.png ) no-repeat center / cover;
+			@include create-banner-rule( "a/a6/Valorant-bg-2.png" );
 		}
 
 		.wiki-warthunder & {
-			background: url( https://liquipedia.net/commons/images/6/6a/Warthunder-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "6/6a/Warthunder-banner.png" );
 		}
 
 		.wiki-warcraft & {
-			background: url( https://liquipedia.net/commons/images/f/f0/Warcraft-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "f/f0/Warcraft-banner.png" );
 		}
 
 		.wiki-worldofwarcraft & {
-			background: url( https://liquipedia.net/commons/images/2/2f/Worldofwarcraft-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "2/2f/Worldofwarcraft-banner.png" );
 		}
 
 		.wiki-mobilelegends & {
-			background: url( https://liquipedia.net/commons/images/0/07/MLBB_Wiki_banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "0/07/MLBB_Wiki_banner.png" );
 		}
 
 		.wiki-wildcard & {
-			background: url( https://liquipedia.net/commons/images/c/c0/Wildcard-bg.webp ) no-repeat center / cover;
+			@include create-banner-rule( "c/c0/Wildcard-bg.webp" );
 		}
 
 		.wiki-wildrift & {
-			background: url( https://liquipedia.net/commons/images/f/f3/Wild_Rift_wiki_banner.webp ) no-repeat center / cover;
+			@include create-banner-rule( "f/f3/Wild_Rift_wiki_banner.webp" );
 		}
 
 		.wiki-worldoftanks & {
-			background: url( https://liquipedia.net/commons/images/f/f3/Worldoftanks_banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "f/f3/Worldoftanks_banner.png" );
 		}
 
 		.wiki-zula & {
-			background: url( https://liquipedia.net/commons/images/2/2f/Zula-banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "2/2f/Zula-banner.png" );
 		}
 
 		.wiki-formula1 & {
-			background: url( https://liquipedia.net/commons/images/9/99/Formula1_banner.png ) no-repeat center / cover;
+			@include create-banner-rule( "9/99/Formula1_banner.png" );
 		}
 	}
 
