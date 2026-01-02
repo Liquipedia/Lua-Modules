@@ -45,7 +45,6 @@ local POINTS_TYPE = {
 ---@field shouldTableBeMinified boolean
 ---@field limit number
 ---@field lpdbName string
----@field shouldResolveRedirect boolean
 
 ---@class AutomaticPointsTableOpponent
 ---@field opponent standardOpponent
