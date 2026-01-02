@@ -31,7 +31,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local SECONDS_PER_DAY = 86400
+local SECONDS_PER_DAY = DateExt.daysToSeconds(1)
 
 local _today = os.date('!%Y-%m-%d', os.time())
 
