@@ -2141,17 +2141,17 @@ Author(s): FO-nTTaX
 	text-align: center;
 	border-radius: 0.5rem;
 	overflow: hidden;
-}
 
-.sadbox a {
-	background-color: #464646;
-	color: #ffffff !important;
-	display: block;
-	padding: 10px;
-}
+	a {
+		background-color: #464646;
+		color: #ffffff !important;
+		display: block;
+		padding: 10px;
 
-.sadbox a:hover {
-	background-color: #232323;
+		&:hover {
+			background-color: #232323;
+		}
+	}
 }
 
 /*******************************************************************************
