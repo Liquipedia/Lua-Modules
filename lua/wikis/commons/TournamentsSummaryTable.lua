@@ -31,8 +31,6 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local SECONDS_PER_DAY = DateExt.daysToSeconds(1)
-
 local _today = os.date('!%Y-%m-%d', os.time())
 
 -- Default settings
@@ -193,9 +191,9 @@ function TournamentsSummaryTable.dateConditions(type)
 
 	local currentTime = os.time()
 	local upcomingThreshold = os.date('!%Y-%m-%d', currentTime
-		+ TournamentsSummaryTable.upcomingOffset * SECONDS_PER_DAY)
+		+ DateExt.daysToSeconds(TournamentsSummaryTable.upcomingOffset))
 	local completedThreshold = os.date('!%Y-%m-%d', currentTime
-		- TournamentsSummaryTable.completedOffset * SECONDS_PER_DAY)
+		- DateExt.daysToSeconds(TournamentsSummaryTable.completedOffset))
 
 	if type == TournamentsSummaryTable.upcomingType then
 		conditions:add{
