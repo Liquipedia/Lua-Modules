@@ -261,7 +261,11 @@ BasePrizePool.prizeTypes = {
 			local prefix = 'qualifies' .. index
 			return {
 				link = tournamentData.pageName or input:gsub(' ', '_'),
-				title = context[prefix .. 'name'] or tournamentData.displayName,
+				title = Logic.emptyOr(
+					context[prefix .. 'name'],
+					tournamentData.displayName,
+					input:gsub('_', ' '):gsub('/', ' ')
+				),
 				icon = tournamentData.icon or context[prefix .. 'icon'],
 				iconDark = tournamentData.iconDark or context[prefix .. 'icondark']
 			}
