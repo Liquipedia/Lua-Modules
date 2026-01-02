@@ -117,7 +117,7 @@ function AutomaticPointsTable:parseInput(args)
 		opponents = opponents,
 		shouldTableBeMinified = minified,
 		limit = limit,
-		lpdbName = lpdbName
+		lpdbName = lpdbName,
 	}
 end
 
