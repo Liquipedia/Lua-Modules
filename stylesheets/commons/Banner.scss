@@ -1,5 +1,5 @@
 @mixin create-banner-rule($banner-url) {
-	background: url( "https://liquipedia.net/commons/images/#{$banner-url}" ) no-repeat center / cover;
+	background: url( https://liquipedia.net/commons/images/#{$banner-url} ) no-repeat center / cover;
 }
 
 .header-banner {
