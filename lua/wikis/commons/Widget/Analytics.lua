@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
@@ -18,14 +19,14 @@ local Div = HtmlWidgets.Div
 ---@field analyticsName string?
 ---@field analyticsProperties table<string, string>?
 ---@field classes string[]?
----@field children (Widget|string|number|nil)[]?
+---@field children (Widget|Html|string|number|nil)[]|(Widget|Html|string|number|nil)?
 
 ---@class AnalyticsWidget: Widget
 ---@operator call(AnalyticsWidgetParameters): AnalyticsWidget
 ---@field props AnalyticsWidgetParameters
 local AnalyticsWidget = Class.new(Widget)
 
----@return Widget
+---@return (string|number|Widget|Html|nil)[]|(string|number|Widget|Html|nil)
 function AnalyticsWidget:render()
 	local analyticsName = self.props.analyticsName
 
@@ -45,6 +46,10 @@ function AnalyticsWidget:render()
 			classes = self.props.classes,
 			children = self.props.children
 		}
+	end
+
+	if Logic.isEmpty(self.props.classes) then
+		return self.props.children
 	end
 
 	return Div{
