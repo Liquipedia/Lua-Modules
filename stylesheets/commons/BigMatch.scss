@@ -1381,7 +1381,8 @@ $valorant-def: #01654c;
 	display: flex;
 	gap: 0.25rem;
 	overflow-y: auto;
-	margin-top: 1rem;
+	margin-top: 0.5rem;
+	margin-bottom: 0.5rem;
 
 	&-teams-container {
 		display: grid;
