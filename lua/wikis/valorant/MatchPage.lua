@@ -13,7 +13,6 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
@@ -453,10 +452,7 @@ function MatchPage:_renderRoundDetails(game)
 							'<i class="fas fa-fist-raised"></i> ',
 							HtmlWidgets.B{children = 'Winner:'},
 							' ',
-							OpponentDisplay.InlineOpponent{
-								opponent = self.matchData.opponents[(round.winningSide == round.t1side) and 1 or 2],
-								teamStyle = 'icon',
-							}
+							self.opponents[(round.winningSide == round.t1side) and 1 or 2].iconDisplay
 						}},
 						displayCeremony(round.ceremony)
 					)
