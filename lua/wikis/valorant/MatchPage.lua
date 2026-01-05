@@ -9,16 +9,21 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Carousel = Lua.import('Module:Widget/Basic/Carousel')
 local Div = HtmlWidgets.Div
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -26,6 +31,7 @@ local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local PlayerStatContainer = Lua.import('Module:Widget/Match/Page/PlayerStat/Container')
 local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
+local Span = HtmlWidgets.Span
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -114,6 +120,7 @@ function MatchPage:renderGame(game)
 		children = WidgetUtil.collect(
 			self:_renderGameOverview(game),
 			self:_renderRoundsOverview(game),
+			self:_renderRoundDetails(game),
 			self:_renderTeamStats(game),
 			self:_renderPerformance(game)
 		)
@@ -350,6 +357,111 @@ function MatchPage:_renderTeamStats(game)
 					}
 				}
 			}
+		}
+	}
+end
+
+---@param game MatchPageGame
+---@param puuid string
+---@return {player: string, displayName: string}?
+function MatchPage._findPlayerByPuuid(game, puuid)
+	for _, opponent in ipairs(game.opponents) do
+		for _, player in ipairs(opponent.players) do
+			if player.puuid == puuid then
+				return player
+			end
+		end
+	end
+end
+
+---@private
+---@param game MatchPageGame
+---@return Widget
+function MatchPage:_renderRoundDetails(game)
+	local findPlayer = FnUtil.memoize(FnUtil.curry(MatchPage._findPlayerByPuuid, game))
+
+	---@param ceremony string
+	---@return Widget?
+	local function displayCeremony(ceremony)
+		if Logic.isEmpty(ceremony) then
+			return
+		end
+		if ceremony == 'Clutch' then
+			return Span{children = {
+				IconImage{
+					imageLight = 'VALORANT clutch lightmode.png',
+					imageDark = 'VALORANT clutch darkmode.png',
+					size = '16px',
+				},
+				' ',
+				HtmlWidgets.B{children = 'CLUTCH'}
+			}}
+		end
+		if ceremony == 'Ace' then
+			return Span{children = {
+				'<i class="far fa-thumbs-up"></i>',
+				' ',
+				HtmlWidgets.B{children = 'ACE'}
+			}}
+		end
+		if ceremony == 'Thrifty' then
+			return Span{children = {
+				IconImage{
+					imageLight = 'Black Creds VALORANT.png',
+					imageDark = 'White Creds VALORANT.png',
+					size = '16px',
+				},
+				' ',
+				HtmlWidgets.B{children = 'THRIFTY'}
+			}}
+		end
+	end
+
+	return GeneralCollapsible{
+		title = 'Round Details',
+		classes = {'match-bm-match-collapsible'},
+		shouldCollapse = true,
+		children = Carousel{
+			classes = {'match-bm-match-collapsible-content'},
+			children = Array.map(game.extradata.rounds --[[ @as ValorantRoundData[] ]], function (round, roundIndex)
+				local firstKillPlayer = findPlayer(round.firstKill.killer) or {}
+				return Div{
+					classes = {'match-bm-match-round-detail'},
+					children = WidgetUtil.collect(
+						HtmlWidgets.B{
+							classes = {'match-bm-rounds-overview-round-outcome-icon--' .. round.winningSide},
+							css = {
+								padding = '0.25rem',
+								['border-radius'] = '0.25rem',
+							},
+							children = {
+								IconFa{
+									iconName = WIN_TYPE_TO_ICON[round.winBy],
+									hover = String.upperCaseFirst(round.winBy),
+								},
+								' Round ',
+								roundIndex,
+							}
+						},
+						Span{children = {
+							IconFa{iconName = 'team_firstkills'},
+							HtmlWidgets.B{children = ' First Kill:'},
+							' ',
+							Link{link = firstKillPlayer.player, children = firstKillPlayer.displayName}
+						}},
+						Span{children = {
+							'<i class="fas fa-fist-raised"></i> ',
+							HtmlWidgets.B{children = 'Winner:'},
+							' ',
+							OpponentDisplay.InlineOpponent{
+								opponent = self.matchData.opponents[(round.winningSide == round.t1side) and 1 or 2],
+								teamStyle = 'icon',
+							}
+						}},
+						displayCeremony(round.ceremony)
+					)
+				}
+			end)
 		}
 	}
 end

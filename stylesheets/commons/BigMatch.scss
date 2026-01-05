@@ -323,6 +323,36 @@ span.slash {
 	}
 }
 
+.match-bm-match-collapsible {
+	padding: 0.5rem;
+	background: #ffffff;
+	border: 1px solid #bbbbbb;
+	border-radius: 0.5rem;
+	width: 100%;
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+		border-color: var( --clr-on-surface-dark-primary-8 );
+	}
+
+	&-content {
+		margin-top: 0.5rem;
+		border-radius: 0.5rem;
+	}
+}
+
+.match-bm-match-round-detail {
+	display: flex;
+	flex-flow: column nowrap;
+	background: var( --clr-on-surface-light-primary-4 );
+	padding: 0.5rem;
+	border-radius: 0.5rem;
+
+	.theme--dark & {
+		background-color: var( --clr-on-surface-dark-primary-4 );
+	}
+}
+
 .match-bm-lol-game-veto {
 	display: flex;
 	flex-direction: column;
