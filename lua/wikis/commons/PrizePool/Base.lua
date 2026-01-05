@@ -91,6 +91,17 @@ BasePrizePool.config = {
 			return tonumber(args.cutafter)
 		end
 	},
+	hideafter = {
+		default = math.huge,
+		read = function(args)
+			local hideAfter = tonumber(args.hideafter)
+			local cutAfter = tonumber(args.cutafter) or 4
+			if not hideAfter then
+				return
+			end
+			return math.max(cutAfter, hideAfter)
+		end
+	},
 	storeLpdb = {
 		default = true,
 		read = function(args)
@@ -621,6 +632,10 @@ function BasePrizePool:_buildRows()
 	for _, placement in ipairs(self.placements) do
 		local previousOpponent = {}
 
+		if self:applyHideAfter(placement) then
+			break
+		end
+
 		self:applyToggleExpand(previousPlacement, placement, rows)
 
 		local cells = {}
@@ -694,6 +709,13 @@ end
 ---@param placement BasePlacement
 function BasePrizePool:placeOrAwardCell(placement)
 	error('Function placeOrAwardCell needs to be implemented by a child class of "Module:PrizePool/Base"')
+end
+
+---@protected
+---@param placement BasePlacement
+---@return boolean
+function BasePrizePool:applyHideAfter(placement)
+	return false
 end
 
 ---@protected
