@@ -75,7 +75,7 @@ function EmptyTeamPagePreview:render()
 end
 
 ---@private
----@return Html
+---@return Widget
 function EmptyTeamPagePreview:_infobox()
 	local data = self:_getNationalitiesAndCoachesFromLastPlacement()
 
