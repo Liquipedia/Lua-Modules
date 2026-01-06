@@ -40,6 +40,13 @@ function CustomPatch.runLegacy(frame)
 	args.release = args.dota2
 	patch:setWidgetInjector(CustomInjector(patch))
 
+	Array.forEach(
+		Array.parseCommaSeparatedString(args.highlights, '\n?*'),
+		function (highlight, highlightIndex)
+			args['highlight' .. highlightIndex] = highlight
+		end
+	)
+
 	return patch:createInfobox()
 end
 
