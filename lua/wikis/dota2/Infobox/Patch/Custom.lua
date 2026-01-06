@@ -10,14 +10,22 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
+local Patch = Lua.import('Module:Patch')
 
-local Patch = Lua.import('Module:Infobox/Patch')
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+
+local PatchInfobox = Lua.import('Module:Infobox/Patch')
 local Injector = Lua.import('Module:Widget/Injector')
 local Widgets = Lua.import('Module:Widget/All')
 
 ---@class Dota2PatchInfobox: PatchInfobox
 ---@operator call(Frame): Dota2PatchInfobox
-local CustomPatch = Class.new(Patch)
+local CustomPatch = Class.new(PatchInfobox)
 
 ---@class Dota2PatchInfoboxWidgetInjector: WidgetInjector
 ---@operator call(Dota2PatchInfobox): Dota2PatchInfoboxWidgetInjector
@@ -120,14 +128,18 @@ end
 ---@param time 'before' | 'after'
 ---@param date string
 ---@param informationType string
----@return string
+---@return string?
 function CustomPatch:_getChronology(time, date, informationType)
 	local timeModifier = time == 'before' and '<' or '>'
-	return (mw.ext.LiquipediaDB.lpdb('datapoint', {
+	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = '[[type::'.. informationType ..']] and [[date::'.. timeModifier .. date ..']]',
 		order = 'date ' .. (time == 'before' and 'DESC' or 'ASC'),
 		limit = 1,
-	})[1] or {}).name
+	})[1]
+	if not data then
+		return
+	end
+	return data.pagename .. '|' .. data.name
 end
 
 function CustomPatch:addToLpdb(lpdbData, args)
