@@ -39,6 +39,7 @@ function CustomPatch.runLegacy(frame)
 	local patch = CustomPatch(frame)
 	local args = patch.args
 	args.release = args.dota2
+	args.informationType = 'version'
 	patch:setWidgetInjector(CustomInjector(patch))
 
 	Array.forEach(
