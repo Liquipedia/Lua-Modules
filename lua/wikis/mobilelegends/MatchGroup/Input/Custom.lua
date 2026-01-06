@@ -17,7 +17,11 @@ local ChampionNames = Lua.import('Module:HeroNames', {loadData = true})
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
+
+---@class MobilelegendsMatchParser: MatchParserInterface
 local MatchFunctions = {}
+
+---@class MobilelegendsMapParser: MapParserInterface
 local MapFunctions = {}
 
 local DEFAULT_BESTOF_MATCH = 3
