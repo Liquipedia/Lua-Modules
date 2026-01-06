@@ -75,11 +75,31 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		return {
-			Widgets.Cell{name = 'New Heroes', children = toCharacterList(args.new)},
-			Widgets.Cell{name = 'Nerfed Heroes', children = toCharacterList(args.nerfed)},
-			Widgets.Cell{name = 'Buffed Heroes', children = toCharacterList(args.buffed)},
-			Widgets.Cell{name = 'Rebalanced Heroes', children = toCharacterList(args.rebalanced)},
-			Widgets.Cell{name = 'Reworked Heroes', children = toCharacterList(args.reworked)},
+			Widgets.Cell{
+				name = 'New Heroes',
+				children = toCharacterList(args.new),
+				options = {columns = 3, suppressColon = true},
+			},
+			Widgets.Cell{
+				name = 'Nerfed Heroes',
+				children = toCharacterList(args.nerfed),
+				options = {columns = 3, suppressColon = true},
+			},
+			Widgets.Cell{
+				name = 'Buffed Heroes',
+				children = toCharacterList(args.buffed),
+				options = {columns = 3, suppressColon = true},
+			},
+			Widgets.Cell{
+				name = 'Rebalanced Heroes',
+				children = toCharacterList(args.rebalanced),
+				options = {columns = 3, suppressColon = true},
+			},
+			Widgets.Cell{
+				name = 'Reworked Heroes',
+				children = toCharacterList(args.reworked),
+				options = {columns = 3, suppressColon = true},
+			},
 		}
 	end
 	return widgets
