@@ -35,7 +35,7 @@ end
 
 ---@param frame Frame
 ---@return Widget
-function CustomPatch.runLegacy(frame)
+function CustomPatch.runVersion(frame)
 	local patch = CustomPatch(frame)
 	local args = patch.args
 	args.release = args.dota2
