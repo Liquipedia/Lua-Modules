@@ -15,6 +15,7 @@ local String = Lua.import('Module:StringUtils')
 local PatchInfobox = Lua.import('Module:Infobox/Patch')
 local Injector = Lua.import('Module:Widget/Injector')
 local Widgets = Lua.import('Module:Widget/All')
+local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 
 ---@class Dota2PatchInfobox: PatchInfobox
 ---@operator call(Frame): Dota2PatchInfobox
@@ -101,6 +102,14 @@ function CustomInjector:parse(id, widgets)
 				children = toCharacterList(args.reworked),
 				options = {columns = 3, suppressColon = true},
 			},
+		}
+	end
+	if id == 'customcontent' then
+		return {
+			Widgets.Center{children = LinkWidget{
+				link = 'Game Versions',
+				children = 'Full list'
+			}}
 		}
 	end
 	return widgets
