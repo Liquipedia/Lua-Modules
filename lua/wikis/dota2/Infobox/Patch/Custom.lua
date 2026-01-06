@@ -111,8 +111,8 @@ function CustomPatch:getChronologyData(args)
 	local informationType = self:getInformationType(args):lower()
 
 	local data = {
-		previous = CustomPatch:_getChronology('before', args.release, informationType),
-		next = CustomPatch:_getChronology('after', args.release, informationType),
+		previous = self:_getChronology('before', args.release, informationType),
+		next = self:_getChronology('after', args.release, informationType),
 	}
 	return data
 end
