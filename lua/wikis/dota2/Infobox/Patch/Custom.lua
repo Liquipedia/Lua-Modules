@@ -10,14 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
-local Patch = Lua.import('Module:Patch')
-
-local Condition = Lua.import('Module:Condition')
-local ConditionTree = Condition.Tree
-local ConditionNode = Condition.Node
-local Comparator = Condition.Comparator
-local BooleanOperator = Condition.BooleanOperator
-local ColumnName = Condition.ColumnName
 
 local PatchInfobox = Lua.import('Module:Infobox/Patch')
 local Injector = Lua.import('Module:Widget/Injector')
