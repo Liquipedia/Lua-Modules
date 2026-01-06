@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 
 local Patch = Lua.import('Module:Infobox/Patch')
@@ -14,13 +15,29 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Widgets = Lua.import('Module:Widget/All')
 
 ---@class Dota2PatchInfobox: PatchInfobox
+---@operator call(Frame): Dota2PatchInfobox
 local CustomPatch = Class.new(Patch)
+
+---@class Dota2PatchInfoboxWidgetInjector: WidgetInjector
+---@operator call(Dota2PatchInfobox): Dota2PatchInfoboxWidgetInjector
+---@field caller Dota2PatchInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
 ---@return Widget
 function CustomPatch.run(frame)
 	local patch = CustomPatch(frame)
+	patch:setWidgetInjector(CustomInjector(patch))
+
+	return patch:createInfobox()
+end
+
+---@param frame Frame
+---@return Widget
+function CustomPatch.runLegacy(frame)
+	local patch = CustomPatch(frame)
+	local args = patch.args
+	args.release = args.dota2
 	patch:setWidgetInjector(CustomInjector(patch))
 
 	return patch:createInfobox()
@@ -33,11 +50,11 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		return {
-			Widgets.Cell{name = 'New Heroes', children = {args.new}},
-			Widgets.Cell{name = 'Nerfed Heroes', children = {args.nerfed}},
-			Widgets.Cell{name = 'Buffed Heroes', children = {args.buffed}},
-			Widgets.Cell{name = 'Rebalanced Heroes', children = {args.rebalanced}},
-			Widgets.Cell{name = 'Reworked Heroes', children = {args.reworked}},
+			Widgets.Cell{name = 'New Heroes', children = Array.parseCommaSeparatedString(args.new)},
+			Widgets.Cell{name = 'Nerfed Heroes', children = Array.parseCommaSeparatedString(args.nerfed)},
+			Widgets.Cell{name = 'Buffed Heroes', children = Array.parseCommaSeparatedString(args.buffed)},
+			Widgets.Cell{name = 'Rebalanced Heroes', children = Array.parseCommaSeparatedString(args.rebalanced)},
+			Widgets.Cell{name = 'Reworked Heroes', children = Array.parseCommaSeparatedString(args.reworked)},
 		}
 	end
 	return widgets
