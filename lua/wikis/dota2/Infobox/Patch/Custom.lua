@@ -40,6 +40,7 @@ end
 function CustomPatch.runVersion(frame)
 	local patch = CustomPatch(frame)
 	local args = patch.args
+	args.name = 'Version ' .. args.version
 	args.release = args.dota2
 	args.informationType = 'Version'
 	patch:setWidgetInjector(CustomInjector(patch))
