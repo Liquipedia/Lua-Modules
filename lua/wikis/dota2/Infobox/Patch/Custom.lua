@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
+local String = Lua.import('Module:StringUtils')
 
 local PatchInfobox = Lua.import('Module:Infobox/Patch')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -39,11 +40,11 @@ function CustomPatch.runVersion(frame)
 	local patch = CustomPatch(frame)
 	local args = patch.args
 	args.release = args.dota2
-	args.informationType = 'version'
+	args.informationType = 'Version'
 	patch:setWidgetInjector(CustomInjector(patch))
 
 	Array.forEach(
-		Array.parseCommaSeparatedString(args.highlights, '\n?*'),
+		Array.filter(Array.parseCommaSeparatedString(args.highlights, '\n?*'), String.isNotEmpty),
 		function (highlight, highlightIndex)
 			args['highlight' .. highlightIndex] = highlight
 		end
@@ -138,11 +139,11 @@ function CustomPatch:addToLpdb(lpdbData, args)
 	lpdbData.date = args.release or args.dota
 
 	lpdbData.extradata.version = args.name or ''
-	lpdbData.extradata.new = args.new or ''
-	lpdbData.extradata.nerfed = args.nerfed or ''
-	lpdbData.extradata.buffed = args.buffed or ''
-	lpdbData.extradata.rebalanced = args.rebalanced or ''
-	lpdbData.extradata.reworked = args.reworked or ''
+	lpdbData.extradata.new = Array.parseCommaSeparatedString(args.new)
+	lpdbData.extradata.nerfed = Array.parseCommaSeparatedString(args.nerfed)
+	lpdbData.extradata.buffed = Array.parseCommaSeparatedString(args.buffed)
+	lpdbData.extradata.rebalanced = Array.parseCommaSeparatedString(args.rebalanced)
+	lpdbData.extradata.reworked = Array.parseCommaSeparatedString(args.reworked)
 	lpdbData.extradata.significant = args.significant or 'no'
 	lpdbData.extradata.dota2 = args.release or ''
 	lpdbData.extradata.dota = args.dota or ''
