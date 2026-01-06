@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local CharacterIcon = Lua.import('Module:CharacterIcon')
 
 local Patch = Lua.import('Module:Infobox/Patch')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -56,12 +57,28 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
+		---@param characterInput string
+		---@return string[]
+		local function toCharacterList(characterInput)
+			return Array.map(
+				Array.parseCommaSeparatedString(characterInput),
+				function (character)
+					return CharacterIcon.Icon{
+						character = character,
+						date = args.release,
+						size = '40px',
+						addTextLink = true,
+					}
+				end
+			)
+		end
+
 		return {
-			Widgets.Cell{name = 'New Heroes', children = Array.parseCommaSeparatedString(args.new)},
-			Widgets.Cell{name = 'Nerfed Heroes', children = Array.parseCommaSeparatedString(args.nerfed)},
-			Widgets.Cell{name = 'Buffed Heroes', children = Array.parseCommaSeparatedString(args.buffed)},
-			Widgets.Cell{name = 'Rebalanced Heroes', children = Array.parseCommaSeparatedString(args.rebalanced)},
-			Widgets.Cell{name = 'Reworked Heroes', children = Array.parseCommaSeparatedString(args.reworked)},
+			Widgets.Cell{name = 'New Heroes', children = toCharacterList(args.new)},
+			Widgets.Cell{name = 'Nerfed Heroes', children = toCharacterList(args.nerfed)},
+			Widgets.Cell{name = 'Buffed Heroes', children = toCharacterList(args.buffed)},
+			Widgets.Cell{name = 'Rebalanced Heroes', children = toCharacterList(args.rebalanced)},
+			Widgets.Cell{name = 'Reworked Heroes', children = toCharacterList(args.reworked)},
 		}
 	end
 	return widgets
