@@ -336,8 +336,8 @@ function MatchPage:_renderTeamStats(game)
 						},
 						{
 							icon = IconImage{
-								imageLight = 'Black Creds VALORANT.png',
-								imageDark = 'White Creds VALORANT.png',
+								imageLight = 'VALORANT Creds lightmode.png',
+								imageDark = 'VALORANT Creds darkmode.png',
 								size = '16px',
 							},
 							name = 'Thrifties',
@@ -411,8 +411,8 @@ MatchPage._displayCeremony = FnUtil.memoize(function (ceremony)
 	if ceremony == 'Thrifty' then
 		return Span{children = {
 			IconImage{
-				imageLight = 'Black Creds VALORANT.png',
-				imageDark = 'White Creds VALORANT.png',
+				imageLight = 'VALORANT Creds lightmode.png',
+				imageDark = 'VALORANT Creds darkmode.png',
 				size = '16px',
 			},
 			' ',
