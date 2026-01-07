@@ -385,48 +385,48 @@ function MatchPage._findPlayerByPuuid(game, puuid)
 	end
 end
 
+---@param ceremony string
+---@return Widget?
+MatchPage._displayCeremony = FnUtil.memoize(function (ceremony)
+	if Logic.isEmpty(ceremony) then
+		return
+	end
+	if ceremony == 'Clutch' then
+		return Span{children = {
+			IconImage{
+				imageLight = 'VALORANT clutch lightmode.png',
+				imageDark = 'VALORANT clutch darkmode.png',
+				size = '16px',
+			},
+			' ',
+			HtmlWidgets.B{children = 'CLUTCH'}
+		}}
+	end
+	if ceremony == 'Ace' then
+		return Span{children = {
+			'<i class="far fa-thumbs-up"></i>',
+			' ',
+			HtmlWidgets.B{children = 'ACE'}
+		}}
+	end
+	if ceremony == 'Thrifty' then
+		return Span{children = {
+			IconImage{
+				imageLight = 'Black Creds VALORANT.png',
+				imageDark = 'White Creds VALORANT.png',
+				size = '16px',
+			},
+			' ',
+			HtmlWidgets.B{children = 'THRIFTY'}
+		}}
+	end
+end)
+
 ---@private
 ---@param game MatchPageGame
 ---@return Widget
 function MatchPage:_renderRoundDetails(game)
 	local findPlayer = FnUtil.memoize(FnUtil.curry(MatchPage._findPlayerByPuuid, game))
-
-	---@param ceremony string
-	---@return Widget?
-	local function displayCeremony(ceremony)
-		if Logic.isEmpty(ceremony) then
-			return
-		end
-		if ceremony == 'Clutch' then
-			return Span{children = {
-				IconImage{
-					imageLight = 'VALORANT clutch lightmode.png',
-					imageDark = 'VALORANT clutch darkmode.png',
-					size = '16px',
-				},
-				' ',
-				HtmlWidgets.B{children = 'CLUTCH'}
-			}}
-		end
-		if ceremony == 'Ace' then
-			return Span{children = {
-				'<i class="far fa-thumbs-up"></i>',
-				' ',
-				HtmlWidgets.B{children = 'ACE'}
-			}}
-		end
-		if ceremony == 'Thrifty' then
-			return Span{children = {
-				IconImage{
-					imageLight = 'Black Creds VALORANT.png',
-					imageDark = 'White Creds VALORANT.png',
-					size = '16px',
-				},
-				' ',
-				HtmlWidgets.B{children = 'THRIFTY'}
-			}}
-		end
-	end
 
 	return GeneralCollapsible{
 		title = 'Round Details',
@@ -470,7 +470,7 @@ function MatchPage:_renderRoundDetails(game)
 							' ',
 							self.opponents[(round.winningSide == round.t1side) and 1 or 2].iconDisplay
 						}},
-						displayCeremony(round.ceremony)
+						MatchPage._displayCeremony(round.ceremony)
 					)
 				}
 			end)
