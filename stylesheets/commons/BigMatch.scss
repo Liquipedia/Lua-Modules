@@ -475,6 +475,7 @@ span.slash {
 	border-radius: 0.5rem;
 	padding: 0.5rem;
 	gap: 0.5rem;
+	container: players-team / inline-size;
 
 	.theme--light & {
 		background-color: #ffffff;
@@ -495,43 +496,29 @@ span.slash {
 }
 
 .match-bm-players-player {
-	display: flex;
+	display: grid;
+	align-items: center;
+	grid-template-columns: 9.375rem calc( 100% - 21rem ) 9.5rem; /* set as default */
 	padding: 1rem;
-	align-items: stretch;
 	background: var( --clr-on-surface-light-primary-8 );
 	border-radius: 0.5rem;
-
-	@media ( max-width: 1199px ),
-		( min-width: 1320px ) {
-		flex-wrap: wrap;
-		justify-content: space-between;
-	}
-
-	@media ( min-width: 1200px ) and ( max-width: 1319px ),
-		( min-width: 1510px ) {
-		display: grid;
-		grid-template-columns: 9.375rem auto 9.5rem; /* set as default */
-		grid-gap: 1rem;
-	}
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 0.5rem;
 
 	&.match-bm-players-player--col-1 {
-		@media ( min-width: 1200px ) and ( max-width: 1319px ),
-			( min-width: 1510px ) {
-			grid-template-columns: minmax( 0, 1fr );
-		}
+		grid-template-columns: 1fr;
 	}
 
 	&.match-bm-players-player--col-2 {
-		@media ( min-width: 1200px ) and ( max-width: 1319px ),
-			( min-width: 1510px ) {
-			grid-template-columns: 9.375rem 1fr;
-		}
+		grid-template-columns: 9.375rem calc( 100% - 9.375rem );
 	}
 
 	&.match-bm-players-player--col-3 {
-		@media ( min-width: 1200px ) and ( max-width: 1319px ),
-			( min-width: 1510px ) {
-			grid-template-columns: 9.375rem auto 9.5rem;
+		grid-template-columns: repeat( 2, 1fr );
+
+		@container players-team ( min-width: 560px ) {
+			grid-template-columns: 9.375rem calc( 100% - 21rem ) 9.5rem;
 		}
 	}
 
@@ -583,18 +570,6 @@ span.slash {
 		display: flex;
 		align-items: center;
 		position: relative;
-
-		@media ( max-width: 1199px ),
-			( min-width: 1320px ) {
-			flex: 1 0 auto;
-		}
-
-		.wiki-dota2 & {
-			@media ( min-width: 1200px ) and ( max-width: 1319px ),
-				( min-width: 1510px ) {
-				order: 1;
-			}
-		}
 	}
 
 	&-avatar {
@@ -642,16 +617,10 @@ span.slash {
 	&-loadout {
 		display: flex;
 		gap: 1rem;
-		flex: 0 0 7.5rem;
 		align-items: center;
 		justify-content: flex-end;
 
-		@media ( min-width: 768px ) {
-			flex: 0 0 9.5rem;
-		}
-
-		@media ( min-width: 1200px ) and ( max-width: 1319px ),
-			( min-width: 1510px ) {
+		@container players-team ( min-width: 560px ) {
 			order: 3;
 		}
 
@@ -742,6 +711,7 @@ span.slash {
 			display: flex;
 			align-items: center;
 			font-size: 0.875rem;
+			white-space: nowrap;
 
 			.wiki-leagueoflegends & {
 				@media ( max-width: 413px ) {
@@ -777,40 +747,37 @@ span.slash {
 	&-stats {
 		display: grid;
 		grid-gap: 0.5rem;
-		grid-template-columns: repeat( 3, minmax( 0, 1fr ) ); /* set as default */
+		grid-template-columns: repeat( 3, 1fr ); /* set as default */
 		grid-template-rows: 1fr 1fr;
 
-		@media ( max-width: 1199px ),
-			( min-width: 1320px ) {
-			flex: 1 0 100%;
-			margin-top: 1rem;
-		}
+		&-container {
+			container: player-stats-container / inline-size;
+			grid-column: 1 / 3;
 
-		@media ( min-width: 1200px ) and ( max-width: 1319px ),
-			( min-width: 1510px ) {
-			order: 2;
-			margin-top: unset;
+			@container players-team ( min-width: 560px ) {
+				order: 2;
+				grid-column: unset;
+			}
 		}
 
 		&.match-bm-players-player-stats--col-4 {
-			grid-template-columns: repeat( 4, minmax( 0, 1fr ) );
+			grid-template-columns: repeat( 4, 1fr );
 			grid-template-rows: 1fr;
 			align-items: center;
 
-			@media ( min-width: 1200px ) and ( max-width: 1319px ),
-				( min-width: 1510px ) and ( max-width: 1680px ) {
-				grid-template-columns: repeat( 2, minmax( 0, 1fr ) );
+			@container player-stats-container ( max-width: 300px ) {
+				grid-template-columns: repeat( 2, 1fr );
 				grid-template-rows: 1fr 1fr;
 			}
 		}
 
 		&.match-bm-players-player-stats--col-5 {
-			grid-template-columns: repeat( 5, minmax( 0, 1fr ) );
+			grid-template-columns: repeat( 5, 1fr );
 			grid-template-rows: 1fr;
 			align-items: center;
 
-			@media ( max-width: 1023px ) {
-				grid-template-columns: repeat( 3, minmax( 0, 1fr ) );
+			@container player-stats-container ( max-width: 350px ) {
+				grid-template-columns: repeat( 3, 1fr );
 				grid-template-rows: 1fr 1fr;
 			}
 		}
