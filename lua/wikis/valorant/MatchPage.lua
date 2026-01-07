@@ -24,6 +24,7 @@ local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
+local PlayerStatContainer = Lua.import('Module:Widget/Match/Page/PlayerStat/Container')
 local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -466,8 +467,8 @@ function MatchPage:_renderPlayerPerformance(player)
 		classes = {'match-bm-players-player match-bm-players-player--col-2'},
 		children = {
 			playerDisplay,
-			Div{
-				classes = {'match-bm-players-player-stats', 'match-bm-players-player-stats--col-' .. numCols},
+			PlayerStatContainer{
+				columns = numCols,
 				children = playerStats
 			}
 		}
