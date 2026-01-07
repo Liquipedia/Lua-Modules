@@ -43,11 +43,19 @@ local MatchPage = Class.new(BaseMatchPage)
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
 local ROUNDS_BEFORE_SPLIT = 12
-local WIN_TYPE_TO_ICON = {
-	['elimination'] = 'elimination',
-	['detonate'] = 'explosion_valorant',
-	['defuse'] = 'defuse',
-	['time'] = 'outoftime'
+local WIN_TYPES = {
+	['elimination'] = {
+		icon = 'elimination'
+	},
+	['detonate'] = {
+		icon = 'explosion_valorant'
+	},
+	['defuse'] = {
+		icon = 'defuse'
+	},
+	['time'] = {
+		icon = 'outoftime'
+	}
 }
 
 ---@param props {match: MatchGroupUtilMatch}
@@ -273,7 +281,7 @@ function MatchPage:_renderRoundsOverview(game)
 		---@param winBy string
 		---@return Widget?
 		iconRender = function(winningSide, winBy)
-			local iconName = WIN_TYPE_TO_ICON[winBy]
+			local iconName = (WIN_TYPES[winBy] or {}).icon
 			if not iconName then
 				return
 			end
@@ -435,7 +443,7 @@ function MatchPage:_renderRoundDetails(game)
 							},
 							children = {
 								IconFa{
-									iconName = WIN_TYPE_TO_ICON[round.winBy],
+									iconName = (WIN_TYPES[round.winBy] or {}).icon,
 									hover = String.upperCaseFirst(round.winBy),
 								},
 								' Round ',
