@@ -20,7 +20,6 @@ local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Carousel = Lua.import('Module:Widget/Basic/Carousel')
 local Div = HtmlWidgets.Div
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
@@ -432,50 +431,49 @@ function MatchPage:_renderRoundDetails(game)
 		title = 'Round Details',
 		classes = {'match-bm-match-collapsible'},
 		shouldCollapse = true,
-		children = Carousel{
-			classes = {'match-bm-match-collapsible-content'},
-			children = Array.map(game.extradata.rounds --[[ @as ValorantRoundData[] ]], function (round, roundIndex)
-				local firstKillPlayer = findPlayer(round.firstKill.killer) or {}
-				local roundWinType = WIN_TYPES[round.winBy] or {}
-				return Div{
-					classes = {'match-bm-match-round-detail'},
-					children = WidgetUtil.collect(
-						Span{
-							classes = {
-								'match-bm-match-round-detail-header',
-								'match-bm-match-round-detail-header--' .. round.winningSide
-							},
-							children = {
-								'Round ',
-								roundIndex,
-							}
+		collapseAreaClasses = {'match-bm-match-collapsible-content', 'match-bm-match-round-detail-container'},
+		children = Array.map(game.extradata.rounds --[[ @as ValorantRoundData[] ]], function (round, roundIndex)
+			local firstKillPlayer = findPlayer(round.firstKill.killer) or {}
+			local roundWinType = WIN_TYPES[round.winBy] or {}
+			return Div{
+				classes = {'match-bm-match-round-detail'},
+				children = WidgetUtil.collect(
+					Span{
+						classes = {
+							'match-bm-match-round-detail-header',
+							'match-bm-match-round-detail-header--' .. round.winningSide
 						},
-						Span{children = {
-							IconFa{
-								iconName = roundWinType.icon,
-								hover = String.upperCaseFirst(round.winBy),
-							},
-							' ',
-							HtmlWidgets.B{children = roundWinType.description}
-						}},
-						Span{children = {
-							IconFa{iconName = 'team_firstkills'},
-							HtmlWidgets.B{children = ' First Kill:'},
-							' ',
-							Link{link = firstKillPlayer.player, children = firstKillPlayer.displayName}
-						}},
-						Span{children = {
-							IconFa{iconName = 'round_winner'},
-							HtmlWidgets.B{children = ' Winner:'},
-							' ',
-							self.opponents[(round.winningSide == round.t1side) and 1 or 2].iconDisplay
-						}},
-						MatchPage._displayCeremony(round.ceremony)
-					)
-				}
-			end)
-		}
+						children = {
+							'Round ',
+							roundIndex,
+						}
+					},
+					Span{children = {
+						IconFa{
+							iconName = roundWinType.icon,
+							hover = String.upperCaseFirst(round.winBy),
+						},
+						' ',
+						HtmlWidgets.B{children = roundWinType.description}
+					}},
+					Span{children = {
+						IconFa{iconName = 'team_firstkills'},
+						HtmlWidgets.B{children = ' First Kill:'},
+						' ',
+						Link{link = firstKillPlayer.player, children = firstKillPlayer.displayName}
+					}},
+					Span{children = {
+						IconFa{iconName = 'round_winner'},
+						HtmlWidgets.B{children = ' Winner:'},
+						' ',
+						self.opponents[(round.winningSide == round.t1side) and 1 or 2].iconDisplay
+					}},
+					MatchPage._displayCeremony(round.ceremony)
+				)
+			}
+		end)
 	}
+
 end
 
 ---@private
