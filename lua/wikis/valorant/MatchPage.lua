@@ -404,7 +404,7 @@ MatchPage._displayCeremony = FnUtil.memoize(function (ceremony)
 	end
 	if ceremony == 'Ace' then
 		return Span{children = {
-			'<i class="far fa-thumbs-up"></i>',
+			IconFa{iconName = 'ace_valorant'},
 			' ',
 			HtmlWidgets.B{children = 'ACE'}
 		}}
@@ -465,8 +465,8 @@ function MatchPage:_renderRoundDetails(game)
 							Link{link = firstKillPlayer.player, children = firstKillPlayer.displayName}
 						}},
 						Span{children = {
-							'<i class="fas fa-fist-raised"></i> ',
-							HtmlWidgets.B{children = 'Winner:'},
+							IconFa{iconName = 'round_winner'},
+							HtmlWidgets.B{children = ' Winner:'},
 							' ',
 							self.opponents[(round.winningSide == round.t1side) and 1 or 2].iconDisplay
 						}},
