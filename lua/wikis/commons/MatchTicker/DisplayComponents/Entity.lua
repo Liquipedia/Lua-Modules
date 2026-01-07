@@ -69,9 +69,14 @@ function Container:create()
 	return HtmlWidgets.Div{
 		css = {['margin-bottom'] = '1rem'},
 		children = {
-			HtmlWidgets.H2{
-				css = {border = 'unset'},
-				children = I18n.translate('matchticker-upcoming-matches'),
+			HtmlWidgets.Div{
+				classes = {'mw-heading', 'mw-heading2'},
+				children = {
+					HtmlWidgets.H2{
+						css = {border = 'unset'},
+						children = I18n.translate('matchticker-upcoming-matches'),
+					},
+				},
 			},
 			Switch{
 				label = 'Show countdown',
