@@ -440,11 +440,10 @@ function MatchPage:_renderRoundDetails(game)
 				return Div{
 					classes = {'match-bm-match-round-detail'},
 					children = WidgetUtil.collect(
-						HtmlWidgets.B{
-							classes = {'match-bm-rounds-overview-round-outcome-icon--' .. round.winningSide},
-							css = {
-								padding = '0.25rem',
-								['border-radius'] = '0.25rem',
+						Span{
+							classes = {
+								'match-bm-match-round-detail-header',
+								'match-bm-match-round-detail-header--' .. round.winningSide
 							},
 							children = {
 								'Round ',

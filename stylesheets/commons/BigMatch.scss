@@ -1535,4 +1535,24 @@ $valorant-def: #01654c;
 	.theme--dark & {
 		background-color: var( --clr-on-surface-dark-primary-4 );
 	}
+
+	&-header {
+		padding: 0.25rem;
+		border-radius: 0.25rem;
+		font-weight: bold;
+
+		&--atk {
+			.wiki-valorant & {
+				color: #ffffff;
+				background-color: $valorant-atk;
+			}
+		}
+
+		&--def {
+			.wiki-valorant & {
+				color: #ffffff;
+				background-color: $valorant-def;
+			}
+		}
+	}
 }
