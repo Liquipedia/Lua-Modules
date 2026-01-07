@@ -477,7 +477,6 @@ function MatchPage:_renderRoundDetails(game)
 			}
 		end)
 	}
-
 end
 
 ---@private
