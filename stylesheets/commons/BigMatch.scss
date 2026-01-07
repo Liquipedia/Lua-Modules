@@ -347,6 +347,7 @@ span.slash {
 	background: var( --clr-on-surface-light-primary-4 );
 	padding: 0.5rem;
 	border-radius: 0.5rem;
+	gap: 0.25rem;
 
 	.theme--dark & {
 		background-color: var( --clr-on-surface-dark-primary-4 );
