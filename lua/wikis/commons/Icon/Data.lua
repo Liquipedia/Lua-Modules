@@ -36,7 +36,7 @@ return {
 	defuse = 'fas fa-wrench',
 	outoftime = 'fas fa-hourglass',
 	ace_valorant = 'far fa-thumbs-up',
-	round_winner = 'fas fa-fist-raised',
+	round_winner = 'far fa-trophy-alt',
 
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',
