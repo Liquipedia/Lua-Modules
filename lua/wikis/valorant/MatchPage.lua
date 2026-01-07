@@ -45,16 +45,20 @@ local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 local ROUNDS_BEFORE_SPLIT = 12
 local WIN_TYPES = {
 	['elimination'] = {
-		icon = 'elimination'
+		icon = 'elimination',
+		description = 'Enemy eliminated',
 	},
 	['detonate'] = {
-		icon = 'explosion_valorant'
+		icon = 'explosion_valorant',
+		description = 'Spike detonated',
 	},
 	['defuse'] = {
-		icon = 'defuse'
+		icon = 'defuse',
+		description = 'Spike defused',
 	},
 	['time'] = {
-		icon = 'outoftime'
+		icon = 'outoftime',
+		description = 'Timer expired',
 	}
 }
 
@@ -432,6 +436,7 @@ function MatchPage:_renderRoundDetails(game)
 			classes = {'match-bm-match-collapsible-content'},
 			children = Array.map(game.extradata.rounds --[[ @as ValorantRoundData[] ]], function (round, roundIndex)
 				local firstKillPlayer = findPlayer(round.firstKill.killer) or {}
+				local roundWinType = WIN_TYPES[round.winBy] or {}
 				return Div{
 					classes = {'match-bm-match-round-detail'},
 					children = WidgetUtil.collect(
@@ -442,14 +447,18 @@ function MatchPage:_renderRoundDetails(game)
 								['border-radius'] = '0.25rem',
 							},
 							children = {
-								IconFa{
-									iconName = (WIN_TYPES[round.winBy] or {}).icon,
-									hover = String.upperCaseFirst(round.winBy),
-								},
-								' Round ',
+								'Round ',
 								roundIndex,
 							}
 						},
+						Span{children = {
+							IconFa{
+								iconName = roundWinType.icon,
+								hover = String.upperCaseFirst(round.winBy),
+							},
+							' ',
+							HtmlWidgets.B{children = roundWinType.description}
+						}},
 						Span{children = {
 							IconFa{iconName = 'team_firstkills'},
 							HtmlWidgets.B{children = ' First Kill:'},
