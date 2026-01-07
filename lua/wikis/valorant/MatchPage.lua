@@ -431,7 +431,11 @@ function MatchPage:_renderRoundDetails(game)
 		title = 'Round Details',
 		classes = {'match-bm-match-collapsible'},
 		shouldCollapse = true,
-		collapseAreaClasses = {'match-bm-match-collapsible-content', 'match-bm-match-round-detail-container'},
+		collapseAreaClasses = {
+			'match-bm-match-collapsible-content',
+			-- TODO: Replace container class with Carousel widget after #6951
+			'match-bm-match-round-detail-container',
+		},
 		children = Array.map(game.extradata.rounds --[[ @as ValorantRoundData[] ]], function (round, roundIndex)
 			local firstKillPlayer = findPlayer(round.firstKill.killer) or {}
 			local roundWinType = WIN_TYPES[round.winBy] or {}
