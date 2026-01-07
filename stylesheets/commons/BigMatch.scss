@@ -341,19 +341,6 @@ span.slash {
 	}
 }
 
-.match-bm-match-round-detail {
-	display: flex;
-	flex-flow: column nowrap;
-	background: var( --clr-on-surface-light-primary-4 );
-	padding: 0.5rem;
-	border-radius: 0.5rem;
-	gap: 0.25rem;
-
-	.theme--dark & {
-		background-color: var( --clr-on-surface-dark-primary-4 );
-	}
-}
-
 .match-bm-lol-game-veto {
 	display: flex;
 	flex-direction: column;
@@ -1534,5 +1521,18 @@ $valorant-def: #01654c;
 				color: $valorant-def;
 			}
 		}
+	}
+}
+
+.match-bm-match-round-detail {
+	display: flex;
+	flex-flow: column nowrap;
+	background: var( --clr-on-surface-light-primary-4 );
+	padding: 0.5rem;
+	border-radius: 0.5rem;
+	gap: 0.25rem;
+
+	.theme--dark & {
+		background-color: var( --clr-on-surface-dark-primary-4 );
 	}
 }
