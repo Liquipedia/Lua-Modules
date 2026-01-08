@@ -88,7 +88,12 @@ function Container:create()
 				css = {margin = '0.75rem 0 1rem'},
 				content = carousel,
 			},
-			TABLE_OF_CONTENTS,
+			HtmlWidgets.Div{
+				css = {['margin-top'] = '1rem'},
+				children = {
+					TABLE_OF_CONTENTS,
+				},
+			},
 		},
 	}
 end
