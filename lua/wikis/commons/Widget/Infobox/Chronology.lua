@@ -47,6 +47,8 @@ end
 function Chronology._createChronologyRow(links)
 	if Logic.isEmpty(links) then return end
 
+	---@param mode 'previous'|'next'
+	---@return Widget?
 	local makeCell = function(mode)
 		if not links[mode] then return end
 		return Div{
