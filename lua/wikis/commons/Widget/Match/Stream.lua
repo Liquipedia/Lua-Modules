@@ -63,7 +63,7 @@ function MatchStream:render()
 				children = CTA_Text,
 			},
 		}},
-		variant = 'tertiary',
+		variant = 'secondary',
 		size = self.props.buttonSize,
 		grow = self.props.grow,
 	}
