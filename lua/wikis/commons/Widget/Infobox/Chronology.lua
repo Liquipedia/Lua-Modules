@@ -51,16 +51,14 @@ function Chronology._createChronologyRow(links)
 		if not links[mode] then return end
 		return Div{
 			classes = {'infobox-cell-2', 'infobox-text-' .. (mode == 'previous' and 'left' or 'right')},
-			children = {
-				InlineIconAndText{
+			children = InlineIconAndText{
+				link = links[mode].link,
+				text = links[mode].text,
+				icon = IconFa{
+					iconName = mode,
 					link = links[mode].link,
-					text = links[mode].text,
-					icon = IconFa{
-						iconName = mode,
-						link = links[mode].link,
-					},
-					flipped = mode ~= 'previous',
-				}
+				},
+				flipped = mode ~= 'previous',
 			}
 		}
 	end
