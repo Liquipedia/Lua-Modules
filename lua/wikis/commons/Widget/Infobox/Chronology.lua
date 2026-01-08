@@ -29,19 +29,17 @@ Chronology.defaultProps = {
 	showTitle = false,
 }
 
----@return Widget?
+---@return Widget[]?
 function Chronology:render()
 	local links = self.props.links
 	if Logic.isEmpty(links) then
 		return
 	end
 
-	return HtmlWidgets.Fragment{
-		children = WidgetUtil.collect(
-			Logic.readBool(self.props.showTitle) and Title{children = self.props.title} or nil,
-			Array.map(self.props.links, Chronology._createChronologyRow)
-		)
-	}
+	return WidgetUtil.collect(
+		Logic.readBool(self.props.showTitle) and Title{children = self.props.title} or nil,
+		Array.map(self.props.links, Chronology._createChronologyRow)
+	)
 end
 
 ---@param links {previous: {link:string, text: string}?, next: {link:string, text: string}?}
