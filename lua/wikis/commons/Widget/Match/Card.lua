@@ -179,7 +179,7 @@ function MatchCard:_renderStageName(match, variantIndex)
 		stageName = match.section
 	end
 
-	if not stageName then
+	if String.isEmpty(stageName) then
 		return nil
 	end
 
