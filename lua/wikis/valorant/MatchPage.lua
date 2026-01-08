@@ -439,6 +439,11 @@ function MatchPage:_renderRoundDetails(game)
 		children = Array.map(game.extradata.rounds --[[ @as ValorantRoundData[] ]], function (round, roundIndex)
 			local firstKillPlayer = findPlayer(round.firstKill.killer) or {}
 			local roundWinType = WIN_TYPES[round.winBy] or {}
+			local roundWinIcon = IconFa{
+				iconName = roundWinType.icon,
+				hover = String.upperCaseFirst(round.winBy),
+			}
+
 			return Div{
 				classes = {'match-bm-match-round-detail'},
 				children = WidgetUtil.collect(
@@ -450,16 +455,23 @@ function MatchPage:_renderRoundDetails(game)
 						children = {
 							'Round ',
 							roundIndex,
+							Span{
+								classes = {'mobile-only'},
+								children = {
+									' ',
+									roundWinIcon
+								}
+							}
 						}
 					},
-					Span{children = {
-						IconFa{
-							iconName = roundWinType.icon,
-							hover = String.upperCaseFirst(round.winBy),
-						},
-						' ',
-						HtmlWidgets.B{children = roundWinType.description}
-					}},
+					Span{
+						classes = {'mobile-hide'},
+						children = {
+							roundWinIcon,
+							' ',
+							HtmlWidgets.B{children = roundWinType.description}
+						}
+					},
 					Span{children = {
 						IconFa{iconName = 'team_firstkills'},
 						HtmlWidgets.B{children = ' First Kill:'},
