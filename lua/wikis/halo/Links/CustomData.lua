@@ -16,8 +16,8 @@ return {
 	},
 	matchIcons = {
 		headtohead = {
-			icon = 'File:Match_Info_Halo_H2H.png',
-			iconDark = 'File:Match_Info_Halo_H2H_darkmode.png',
+			icon = 'Match_Info_Halo_H2H.png',
+			iconDark = 'Match_Info_Halo_H2H_darkmode.png',
 			text = 'Head-to-head statistics'
 		},
 	}
