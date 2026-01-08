@@ -17,7 +17,12 @@ local Widgets = Lua.import('Module:Widget/All')
 local Chronology = Widgets.Chronology
 
 ---@class FightersGameInfobox: GameInfobox
+---@operator call(Frame): FightersGameInfobox
 local CustomGame = Class.new(Game)
+
+---@class FightersGameInfoboxWidgetInjector: WidgetInjector
+---@operator call(FightersGameInfobox): FightersGameInfoboxWidgetInjector
+---@field caller FightersGameInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
