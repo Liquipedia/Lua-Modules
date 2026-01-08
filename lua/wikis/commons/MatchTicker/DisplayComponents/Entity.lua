@@ -17,6 +17,8 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchCard = Lua.import('Module:Widget/Match/Card')
 local Switch = Lua.import('Module:Widget/Switch')
 
+local TABLE_OF_CONTENTS = '__TOC__'
+
 ---@class EntityMatchTickerMatch: MatchTickerMatchInterface
 ---@operator call({config: MatchTickerConfig, match: table}): EntityMatchTickerMatch
 local MatchCardEntity = Class.new(
@@ -86,6 +88,7 @@ function Container:create()
 				css = {margin = '0.75rem 0 1rem'},
 				content = carousel,
 			},
+			TABLE_OF_CONTENTS,
 		},
 	}
 end
