@@ -387,7 +387,7 @@ function MatchPage._findPlayerByPuuid(game, puuid)
 	end
 end
 
----@param ceremony string
+---@param ceremony string?
 ---@return Widget?
 MatchPage._displayCeremony = FnUtil.memoize(function (ceremony)
 	if Logic.isEmpty(ceremony) then
@@ -413,10 +413,16 @@ MatchPage._displayCeremony = FnUtil.memoize(function (ceremony)
 		end
 	end
 
+	local ceremonyIcon = getCeremonyIcon()
+
+	if not ceremonyIcon then
+		return
+	end
+
 	return Span{children = Array.interleave(
 		WidgetUtil.collect(
-			getCeremonyIcon(),
-			ceremony
+			ceremonyIcon,
+			HtmlWidgets.B{children = ceremony}
 		),
 		' '
 	)}
