@@ -393,35 +393,33 @@ MatchPage._displayCeremony = FnUtil.memoize(function (ceremony)
 	if Logic.isEmpty(ceremony) then
 		return
 	end
-	if ceremony == 'Clutch' then
-		return Span{children = {
-			IconImage{
+
+	---@return Widget?
+	local function getCeremonyIcon()
+		if ceremony == 'Clutch' then
+			return IconImage{
 				imageLight = 'VALORANT clutch lightmode.png',
 				imageDark = 'VALORANT clutch darkmode.png',
 				size = '16px',
-			},
-			' ',
-			HtmlWidgets.B{children = 'CLUTCH'}
-		}}
-	end
-	if ceremony == 'Ace' then
-		return Span{children = {
-			IconFa{iconName = 'ace_valorant'},
-			' ',
-			HtmlWidgets.B{children = 'ACE'}
-		}}
-	end
-	if ceremony == 'Thrifty' then
-		return Span{children = {
-			IconImage{
+			}
+		elseif ceremony == 'Ace' then
+			return IconFa{iconName = 'ace_valorant'}
+		elseif ceremony == 'Thrifty' then
+			return IconImage{
 				imageLight = 'VALORANT Creds lightmode.png',
 				imageDark = 'VALORANT Creds darkmode.png',
 				size = '16px',
-			},
-			' ',
-			HtmlWidgets.B{children = 'THRIFTY'}
-		}}
+			}
+		end
 	end
+
+	return Span{children = Array.interleave(
+		WidgetUtil.collect(
+			getCeremonyIcon(),
+			ceremony
+		),
+		' '
+	)}
 end)
 
 ---@private
