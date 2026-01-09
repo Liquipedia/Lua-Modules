@@ -433,7 +433,6 @@ end)
 ---@return Widget
 function MatchPage:_renderRoundDetails(game)
 	local findPlayer = FnUtil.memoize(FnUtil.curry(MatchPage._findPlayerByPuuid, game))
-
 	return GeneralCollapsible{
 		title = 'Round Details',
 		classes = {'match-bm-match-collapsible'},
@@ -443,59 +442,68 @@ function MatchPage:_renderRoundDetails(game)
 			-- TODO: Replace container class with Carousel widget after #6951
 			'match-bm-match-round-detail-container',
 		},
-		children = Array.map(game.extradata.rounds --[[ @as ValorantRoundData[] ]], function (round, roundIndex)
-			local firstKillPlayer = findPlayer(round.firstKill.killer) or {}
-			local roundWinType = WIN_TYPES[round.winBy] or {}
+		children = Array.map(game.extradata.rounds, function (round, roundIndex)
+			return self:_renderRoundDetail(findPlayer, round, roundIndex)
+		end)
+	}
+end
 
-			return Div{
-				classes = {'match-bm-match-round-detail'},
-				children = WidgetUtil.collect(
-					Span{
-						classes = {
-							'match-bm-match-round-detail-header',
-							'match-bm-match-round-detail-header--' .. round.winningSide
-						},
+---@private
+---@param findPlayer fun(puuid: string): {player: string, displayName: string}?
+---@param round ValorantRoundData
+---@param roundIndex integer
+---@return Widget
+function MatchPage:_renderRoundDetail(findPlayer, round, roundIndex)
+	local firstKillPlayer = findPlayer(round.firstKill.killer) or {}
+	local roundWinType = WIN_TYPES[round.winBy] or {}
+
+	return Div{
+		classes = {'match-bm-match-round-detail'},
+		children = WidgetUtil.collect(
+			Span{
+				classes = {
+					'match-bm-match-round-detail-header',
+					'match-bm-match-round-detail-header--' .. round.winningSide
+				},
+				children = {
+					'Round ',
+					roundIndex,
+				}
+			},
+			Div{
+				classes = {
+					'match-bm-match-round-detail-body',
+				},
+				children = {
+					Div{
+						classes = {'match-bm-match-round-detail-body-result'},
 						children = {
-							'Round ',
-							roundIndex,
+							MatchPage._renderRoundOutcomeIcon(round.winningSide, round.winBy),
+							Span{
+								classes = {'match-bm-match-round-detail-body-result-desc'},
+								children = roundWinType.description
+							},
+							Div{
+								classes = {'match-bm-match-round-detail-body-result-winner'},
+								children = {
+									self.opponents[(round.winningSide == round.t1side) and 1 or 2].iconDisplay,
+									HtmlWidgets.B{children = 'Winner'},
+								}
+							}
 						}
 					},
-					Div{
-						classes = {
-							'match-bm-match-round-detail-body',
-						},
-						children = {
-							Div{
-								classes = {'match-bm-match-round-detail-body-result'},
-								children = {
-									MatchPage._renderRoundOutcomeIcon(round.winningSide, round.winBy),
-									Span{
-										classes = {'match-bm-match-round-detail-body-result-desc'},
-										children = roundWinType.description
-									},
-									Div{
-										classes = {'match-bm-match-round-detail-body-result-winner'},
-										children = {
-											self.opponents[(round.winningSide == round.t1side) and 1 or 2].iconDisplay,
-											HtmlWidgets.B{children = 'Winner'},
-										}
-									}
-								}
-							},
-							HtmlWidgets.Hr{},
-							Span{children = {
-								IconFa{iconName = 'team_firstkills'},
-								HtmlWidgets.B{children = ' First Kill'},
-								' ',
-								Link{link = firstKillPlayer.player, children = firstKillPlayer.displayName}
-							}},
-							MatchPage._displayCeremony(round.ceremony)
-						}
+					HtmlWidgets.Hr{},
+					Span{children = {
+						IconFa{iconName = 'team_firstkills'},
+						HtmlWidgets.B{children = ' First Kill'},
+						' ',
+						Link{link = firstKillPlayer.player, children = firstKillPlayer.displayName}
+					}},
+					MatchPage._displayCeremony(round.ceremony)
+				}
 
-					}
-				)
 			}
-		end)
+		)
 	}
 end
 
