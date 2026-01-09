@@ -418,13 +418,11 @@ MatchPage._displayCeremony = FnUtil.memoize(function (ceremony)
 		return
 	end
 
-	return Span{children = Array.interleave(
-		WidgetUtil.collect(
-			ceremonyIcon,
-			HtmlWidgets.B{children = ceremony}
-		),
-		' '
-	)}
+	return Span{children = {
+		ceremonyIcon,
+		' ',
+		HtmlWidgets.B{children = ceremony}
+	}}
 end)
 
 ---@private
