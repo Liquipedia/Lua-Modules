@@ -13,7 +13,6 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
