@@ -442,10 +442,6 @@ function MatchPage:_renderRoundDetails(game)
 		children = Array.map(game.extradata.rounds --[[ @as ValorantRoundData[] ]], function (round, roundIndex)
 			local firstKillPlayer = findPlayer(round.firstKill.killer) or {}
 			local roundWinType = WIN_TYPES[round.winBy] or {}
-			local roundWinIcon = IconFa{
-				iconName = roundWinType.icon,
-				hover = String.upperCaseFirst(round.winBy),
-			}
 
 			return Div{
 				classes = {'match-bm-match-round-detail'},
@@ -458,36 +454,41 @@ function MatchPage:_renderRoundDetails(game)
 						children = {
 							'Round ',
 							roundIndex,
-							Span{
-								classes = {'mobile-only'},
-								children = {
-									' ',
-									roundWinIcon
-								}
-							}
 						}
 					},
-					Span{
-						classes = {'mobile-hide'},
+					Div{
+						classes = {
+							'match-bm-match-round-detail-body',
+						},
 						children = {
-							roundWinIcon,
-							' ',
-							HtmlWidgets.B{children = roundWinType.description}
+							Div{
+								classes = {'match-bm-match-round-detail-body-result'},
+								children = {
+									MatchPage._renderRoundOutcomeIcon(round.winningSide, round.winBy),
+									Span{
+										classes = {'match-bm-match-round-detail-body-result-desc'},
+										children = roundWinType.description
+									},
+									Div{
+										classes = {'match-bm-match-round-detail-body-result-winner'},
+										children = {
+											self.opponents[(round.winningSide == round.t1side) and 1 or 2].iconDisplay,
+											HtmlWidgets.B{children = 'Winner'},
+										}
+									}
+								}
+							},
+							HtmlWidgets.Hr{},
+							Span{children = {
+								IconFa{iconName = 'team_firstkills'},
+								HtmlWidgets.B{children = ' First Kill:'},
+								' ',
+								Link{link = firstKillPlayer.player, children = firstKillPlayer.displayName}
+							}},
+							MatchPage._displayCeremony(round.ceremony)
 						}
-					},
-					Span{children = {
-						IconFa{iconName = 'team_firstkills'},
-						HtmlWidgets.B{children = ' First Kill:'},
-						' ',
-						Link{link = firstKillPlayer.player, children = firstKillPlayer.displayName}
-					}},
-					Span{children = {
-						IconFa{iconName = 'round_winner'},
-						HtmlWidgets.B{children = ' Winner:'},
-						' ',
-						self.opponents[(round.winningSide == round.t1side) and 1 or 2].iconDisplay
-					}},
-					MatchPage._displayCeremony(round.ceremony)
+
+					}
 				)
 			}
 		end)
