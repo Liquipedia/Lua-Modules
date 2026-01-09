@@ -485,7 +485,7 @@ function MatchPage:_renderRoundDetails(game)
 							HtmlWidgets.Hr{},
 							Span{children = {
 								IconFa{iconName = 'team_firstkills'},
-								HtmlWidgets.B{children = ' First Kill:'},
+								HtmlWidgets.B{children = ' First Kill'},
 								' ',
 								Link{link = firstKillPlayer.player, children = firstKillPlayer.displayName}
 							}},
