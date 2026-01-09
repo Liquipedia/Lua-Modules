@@ -272,6 +272,24 @@ function MatchPage:_renderGameOverview(game)
 end
 
 ---@private
+---@param winningSide string
+---@param winBy string
+---@return Widget?
+function MatchPage._renderRoundOutcomeIcon(winningSide, winBy)
+	local iconName = (WIN_TYPES[winBy] or {}).icon
+	if not iconName then
+		return
+	end
+	return IconFa{
+		iconName = iconName,
+		additionalClasses = {
+			'match-bm-rounds-overview-round-outcome-icon',
+			'match-bm-rounds-overview-round-outcome-icon--' .. winningSide
+		}
+	}
+end
+
+---@private
 ---@param game MatchPageGame
 ---@return Widget
 function MatchPage:_renderRoundsOverview(game)
@@ -280,22 +298,7 @@ function MatchPage:_renderRoundsOverview(game)
 		roundsPerHalf = ROUNDS_BEFORE_SPLIT,
 		opponent1 = self.matchData.opponents[1],
 		opponent2 = self.matchData.opponents[2],
-		---@param winningSide string
-		---@param winBy string
-		---@return Widget?
-		iconRender = function(winningSide, winBy)
-			local iconName = (WIN_TYPES[winBy] or {}).icon
-			if not iconName then
-				return
-			end
-			return IconFa{
-				iconName = iconName,
-				additionalClasses = {
-					'match-bm-rounds-overview-round-outcome-icon',
-					'match-bm-rounds-overview-round-outcome-icon--' .. winningSide
-				}
-			}
-		end,
+		iconRender = MatchPage._renderRoundOutcomeIcon,
 	}
 end
 
