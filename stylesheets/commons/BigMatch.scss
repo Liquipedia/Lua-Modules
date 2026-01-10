@@ -41,17 +41,15 @@ span.slash {
 	padding: 16px;
 }
 
-.match-bm-match-header-team {
+.match-bm-match-header-opponent {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
 	gap: 0.5rem;
 	width: 100%;
 	font-weight: bold;
 
-	@media ( min-width: 768px ) {
-		flex-direction: row;
-		gap: 1.5rem;
+	@media ( max-width: 767px ) {
+		align-items: center;
 	}
 
 	&:first-child {
@@ -59,7 +57,7 @@ span.slash {
 			flex-direction: row-reverse;
 		}
 
-		.match-bm-match-header-team-group {
+		.match-bm-match-header-opponent-group {
 			@media ( min-width: 768px ) {
 				align-items: flex-end;
 				text-align: end;
@@ -74,6 +72,25 @@ span.slash {
 		@media ( max-width: 768px ) {
 			align-items: center;
 		}
+
+		&-container {
+			display: flex;
+			flex-direction: column;
+		}
+	}
+
+	&-literal {
+		font-style: italic;
+		font-weight: normal;
+	}
+}
+
+.match-bm-match-header-team {
+	align-items: center;
+
+	@media ( min-width: 768px ) {
+		flex-direction: row;
+		gap: 1.5rem;
 	}
 
 	&-long {
@@ -88,11 +105,6 @@ span.slash {
 		@media ( min-width: 768px ) {
 			display: none !important;
 		}
-	}
-
-	&-literal {
-		font-style: italic;
-		font-weight: normal;
 	}
 
 	.team-template-team-icon {
@@ -139,6 +151,11 @@ span.slash {
 			}
 		}
 	}
+}
+
+.match-bm-match-header-party {
+	align-items: flex-start;
+	font-size: 1.25rem;
 }
 
 .match-bm-match-header-round {
