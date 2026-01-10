@@ -7,14 +7,25 @@ Template(s): Dialog (popup)
 }
 
 div.general-dialog-container {
+	display: flex;
+	flex-flow: column nowrap;
 	border: 1px solid #bbbbbb;
 	background-color: #ffffff;
 	border-radius: 0.5rem;
 	box-shadow: 0 0.0625rem 0.25rem 0 var( --clr-on-surface-dark-primary-12 );
 	padding: 0.5rem;
+	gap: 0.5rem;
 
 	.theme--dark & {
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-on-surface-dark-primary-8 );
+	}
+
+	.ui-dialog-title {
+		display: none;
+	}
+
+	.ui-dialog-content {
+		padding: unset;
 	}
 }
