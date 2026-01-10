@@ -17,7 +17,7 @@ liquipedia.dialog = {
 				if ( dialogTrigger && dialogTitle && dialogContent ) {
 					const $trigger = $( dialogTrigger );
 
-					const $dialogChildren = $( '<div>' ).addClass( dialog.getAttribute( 'dialog-classes' ) );
+					const $dialogChildren = $( '<div>' );
 					dialogContent.childNodes.forEach( ( child ) => {
 						$dialogChildren.append( child );
 					} );
