@@ -23,7 +23,6 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local Dialog = Lua.import('Module:Widget/Basic/Dialog')
-local DetailsPopup = Lua.import('Module:Widget/CharacterStats/DetailsPopup')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
