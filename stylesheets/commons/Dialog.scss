@@ -2,8 +2,12 @@
 Template(s): Dialog (popup)
 *******************************************************************************/
 
-.general-dialog-wrapper {
-	display: none;
+.general-dialog {
+	display: inline-block;
+
+	&-wrapper {
+		display: none;
+	}
 }
 
 div.general-dialog-container {
@@ -15,10 +19,20 @@ div.general-dialog-container {
 	box-shadow: 0 0.0625rem 0.25rem 0 var( --clr-on-surface-dark-primary-12 );
 	padding: 0.5rem;
 	gap: 0.5rem;
+	width: auto !important;
+	max-width: calc( 100vw - 1rem );
 
 	.theme--dark & {
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-on-surface-dark-primary-8 );
+	}
+
+	@media ( max-width: 435px ) {
+		left: 0.5rem !important;
+	}
+
+	@media ( min-width: 1320px ) {
+		max-width: calc( 100vw - 320px - 1rem );
 	}
 
 	.ui-dialog-title {
@@ -27,5 +41,6 @@ div.general-dialog-container {
 
 	.ui-dialog-content {
 		padding: unset;
+		max-height: 90vh;
 	}
 }
