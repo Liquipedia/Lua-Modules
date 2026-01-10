@@ -27,6 +27,10 @@ div.general-dialog-container {
 		border-color: var( --clr-on-surface-dark-primary-8 );
 	}
 
+	@media ( max-width: 435px ) {
+		max-height: 80vh;
+	}
+
 	@media ( min-width: 1320px ) {
 		max-width: calc( min( 2160px, 100vw ) - 320px - 1rem );
 	}
