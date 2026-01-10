@@ -26,8 +26,8 @@ liquipedia.dialog = {
 							'close'
 						).html( $dialogChildren ).dialog(
 							'option', {
-								'position': [ e.clientX + 5, e.clientY + 5 ],
-								'title': dialogTitle.innerHTML.toString()
+								position: [ e.clientX + 5, e.clientY + 5 ],
+								title: dialogTitle.innerHTML.toString()
 							}
 						).dialog( 'open' );
 					} );
