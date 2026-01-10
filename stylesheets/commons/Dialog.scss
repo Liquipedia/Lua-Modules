@@ -5,7 +5,8 @@ Template(s): Dialog (popup)
 .general-dialog {
 	display: inline-block;
 
-	&-wrapper {
+	&-wrapper,
+	&-title {
 		display: none;
 	}
 }
@@ -34,10 +35,6 @@ div.general-dialog-container {
 
 	@media ( min-width: 1320px ) {
 		max-width: calc( 100vw - 320px - 1rem );
-	}
-
-	.ui-dialog-title {
-		display: none;
 	}
 
 	.ui-dialog-content {
