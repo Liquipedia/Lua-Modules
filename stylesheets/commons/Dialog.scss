@@ -28,7 +28,7 @@ div.general-dialog-container {
 	}
 
 	@media ( min-width: 1320px ) {
-		max-width: calc( 100vw - 320px - 1rem );
+		max-width: calc( min( 2160px, 100vw ) - 320px - 1rem );
 	}
 
 	.ui-dialog-content {
