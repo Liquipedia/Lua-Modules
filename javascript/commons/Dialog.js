@@ -11,9 +11,10 @@ liquipedia.dialog = {
 			} );
 			document.querySelectorAll( '#mw-content-text .general-dialog' ).forEach( ( dialog ) => {
 				const dialogTrigger = dialog.querySelector( '.general-dialog-trigger' );
+				const dialogTitle = dialog.querySelector( '.general-dialog-title' );
 				const dialogContent = dialog.querySelector( '.general-dialog-wrapper' );
 
-				if ( dialogTrigger && dialogContent ) {
+				if ( dialogTrigger && dialogTitle && dialogContent ) {
 					const $trigger = $( dialogTrigger );
 
 					const $dialogChildren = $( '<div>' ).addClass( dialog.getAttribute( 'dialog-classes' ) );
@@ -24,7 +25,10 @@ liquipedia.dialog = {
 						$dialog.dialog(
 							'close'
 						).html( $dialogChildren ).dialog(
-							'option', 'position', [ e.clientX + 5, e.clientY + 5 ]
+							'option', {
+								'position': [ e.clientX + 5, e.clientY + 5 ],
+								'title': dialogTitle.innerHTML.toString()
+							}
 						).dialog( 'open' );
 					} );
 				}
