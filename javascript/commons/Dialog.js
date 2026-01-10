@@ -13,21 +13,20 @@ liquipedia.dialog = {
 				const dialogTrigger = dialog.querySelector( '.general-dialog-trigger' );
 				const dialogContent = dialog.querySelector( '.general-dialog-wrapper' );
 
-				if ( dialogTrigger ) {
+				if ( dialogTrigger && dialogContent ) {
 					const $trigger = $( dialogTrigger );
-					if ( dialogContent ) {
-						const $dialogChildren = $( '<div>' ).addClass( dialog.getAttribute( 'dialog-classes' ) );
-						dialogContent.childNodes.forEach( ( child ) => {
-							$dialogChildren.append( child );
-						} );
-						$trigger.on( 'click', ( e ) => {
-							$dialog.dialog(
-								'close'
-							).html( $dialogChildren ).dialog(
-								'option', 'position', [ e.clientX + 5, e.clientY + 5 ]
-							).dialog( 'open' );
-						} );
-					}
+
+					const $dialogChildren = $( '<div>' ).addClass( dialog.getAttribute( 'dialog-classes' ) );
+					dialogContent.childNodes.forEach( ( child ) => {
+						$dialogChildren.append( child );
+					} );
+					$trigger.on( 'click', ( e ) => {
+						$dialog.dialog(
+							'close'
+						).html( $dialogChildren ).dialog(
+							'option', 'position', [ e.clientX + 5, e.clientY + 5 ]
+						).dialog( 'open' );
+					} );
 				}
 			} );
 		} );
