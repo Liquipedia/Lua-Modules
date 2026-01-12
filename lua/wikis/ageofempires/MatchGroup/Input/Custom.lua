@@ -17,6 +17,7 @@ local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
@@ -88,7 +89,7 @@ function MatchFunctions.readOpponent(match, opponentIndex, options)
 		local manualPlayersInput = MatchGroupInputUtil.extractManualPlayersInput(match, opponentIndex, opponentInput)
 		substitutions = manualPlayersInput.substitutions
 		-- Change compared to commons MatchGroupInputUtil.readOpponent
-		local template = mw.ext.TeamTemplate.raw(opponent.template or '') or {}
+		local template = TeamTemplate.getRawOrNil(opponent.template) or {}
 		opponent.players = MatchGroupInputUtil.readPlayersOfTeam(
 			template.page or '',
 			manualPlayersInput,

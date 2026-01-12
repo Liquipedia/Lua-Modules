@@ -134,8 +134,8 @@ function TransferList:_getTeams(args)
 
 	local teamList = {}
 	Array.forEach(teams, function(team)
-		if not mw.ext.TeamTemplate.teamexists(team) then
-			mw.log('Missing team teamplate: ' .. team)
+		if not TeamTemplate.exists(team) then
+			mw.log(TeamTemplate.noTeamMessage(team))
 		end
 		Array.extendWith(teamList, TeamTemplate.queryHistoricalNames(team))
 	end)
