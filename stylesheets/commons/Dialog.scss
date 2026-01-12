@@ -25,6 +25,7 @@ div.general-dialog-container {
 	.theme--dark & {
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-on-surface-dark-primary-8 );
+		color-scheme: dark;
 	}
 
 	@media ( max-width: 435px ) {
