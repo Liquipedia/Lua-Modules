@@ -110,17 +110,17 @@ function Accommodation:render()
 		Center{children = {
 			Button{
 				linktype = 'external',
-				variant = 'primary',
+				variant = 'themed',
 				size = 'md',
 				link = buildStay22Link(
-		table.concat(addressParts, ', '),
-		DateExt.toYmdInUtc(osdateStart),
-		DateExt.toYmdInUtc(osdateEnd)
+					table.concat(addressParts, ', '),
+					DateExt.toYmdInUtc(osdateStart),
+					DateExt.toYmdInUtc(osdateEnd)
 				),
 				children = {
-		IconFa{iconName = 'accommodation'},
-		' ',
-		'Find My Accommodation',
+					IconFa{iconName = 'accommodation'},
+					' ',
+					'Find My Accommodation',
 				}
 			},
 			Center{children = 'Bookings earn Liquipedia a small commission.'}
