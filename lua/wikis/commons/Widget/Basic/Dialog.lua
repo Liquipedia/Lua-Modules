@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
@@ -15,6 +16,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
 ---@class DialogWidgetProps
+---@field dialogClasses? string[]
 ---@field title? string|number|Widget|Html|(string|number|Widget|Html)[]
 ---@field trigger? string|number|Widget|Html|(string|number|Widget|Html)[]
 ---@field children? string|number|Widget|Html|(string|number|Widget|Html)[]
@@ -31,6 +33,12 @@ function DialogWidget:render()
 		return
 	end
 	return Div{
+		attributes = {
+			['data-dialog-additional-classes'] = table.concat(
+				Array.extend('general-dialog-container', props.dialogClasses),
+				' '
+			),
+		},
 		classes = {'general-dialog'},
 		children = {
 			Div{

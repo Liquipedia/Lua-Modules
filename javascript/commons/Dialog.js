@@ -6,7 +6,6 @@ liquipedia.dialog = {
 		mw.loader.using( 'jquery.ui', () => {
 			const $dialog = $( '<div>' ).dialog( {
 				autoOpen: false,
-				dialogClass: 'general-dialog-container',
 				resizable: false
 			} );
 			document.querySelectorAll( '#mw-content-text .general-dialog' ).forEach( ( dialog ) => {
@@ -26,6 +25,7 @@ liquipedia.dialog = {
 							'close'
 						).html( $dialogChildren ).dialog(
 							'option', {
+								dialogClass: dialog.getAttribute( 'data-dialog-additional-classes' ),
 								position: [ e.clientX + 5, e.clientY + 5 ],
 								title: dialogTitle.innerHTML.toString()
 							}
