@@ -18,9 +18,9 @@ local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Tournament = Lua.import('Module:Tournament')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
-local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
@@ -346,9 +346,9 @@ function BaseMatchPage:renderGame(game)
 end
 
 ---@protected
----@return table
+---@return StandardTournamentPartial
 function BaseMatchPage:getMatchContext()
-	return MatchGroupInputUtil.getTournamentContext(self.matchData)
+	return Tournament.partialTournamentFromMatch(self.matchData)
 end
 
 ---@protected
