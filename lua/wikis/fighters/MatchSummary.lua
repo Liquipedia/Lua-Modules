@@ -40,10 +40,12 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return boolean
 function CustomMatchSummary._isSolo(match)
-	if type(match.opponents[1]) ~= 'table' or type(match.opponents[2]) ~= 'table' then
-		return false
-	end
-	return match.opponents[1].type == Opponent.solo and match.opponents[2].type == Opponent.solo
+	return Array.all(match.opponents, function (opponent)
+		if not Opponent.isOpponent(opponent) then
+			return false
+		end
+		return opponent.type == Opponent.solo
+	end)
 end
 
 ---@param match MatchGroupUtilMatch
