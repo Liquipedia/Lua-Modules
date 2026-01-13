@@ -106,7 +106,7 @@ function CustomMatchSummary._createStandardGame(game, props)
 				props.soloMode
 			),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.GameCenter{children = scoreDisplay, css = {['flex-grow'] = 1}},
+			MatchSummaryWidgets.GameCenter{children = scoreDisplay, css = {flex = 'auto'}},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			CustomMatchSummary._createCharacterDisplay(
 				CustomMatchSummary.fetchCharactersOfPlayers(game, props.opponents, 2),
