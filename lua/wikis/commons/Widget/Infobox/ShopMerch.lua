@@ -88,11 +88,10 @@ function ShopMerch:render()
 
 	local buttonText = Logic.nilIfEmpty(args.shoptext) or SHOP_DEFAULT_TEXT
 	local iconName = Logic.nilIfEmpty(args.shopicon) or SHOP_DEFAULT_ICON
-	local hasIcon = Logic.isNotEmpty(iconName)
 
 	local children = WidgetUtil.collect(
-		hasIcon and IconFa{iconName = iconName} or nil,
-		hasIcon and ' ' or nil,
+		IconFa{iconName = iconName},
+		' ',
 		buttonText
 	)
 
