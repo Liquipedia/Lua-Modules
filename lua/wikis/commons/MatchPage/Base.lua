@@ -12,6 +12,7 @@ local CharacterIcon = Lua.import('Module:CharacterIcon')
 local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Links = Lua.import('Module:Links')
 local Operator = Lua.import('Module:Operator')
@@ -346,10 +347,11 @@ function BaseMatchPage:renderGame(game)
 end
 
 ---@protected
+---@param self BaseMatchPage
 ---@return StandardTournamentPartial
-function BaseMatchPage:getMatchContext()
+BaseMatchPage.getMatchContext = FnUtil.memoize(function (self)
 	return Tournament.partialTournamentFromMatch(self.matchData)
-end
+end)
 
 ---@protected
 ---@return Widget
