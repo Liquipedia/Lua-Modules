@@ -65,7 +65,7 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param game MatchGroupUtilGame
----@param matchOpponents table[]
+---@param matchOpponents standardOpponent[]
 ---@param teamIdx integer
 ---@return {player: standardPlayer, characters: string[]}[]
 function CustomMatchSummary.fetchCharactersOfPlayers(game, matchOpponents, teamIdx)
