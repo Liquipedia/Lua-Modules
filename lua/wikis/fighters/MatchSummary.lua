@@ -102,8 +102,8 @@ function CustomMatchSummary._createStandardGame(game, props)
 			CustomMatchSummary._createCharacterDisplay(
 				CustomMatchSummary.fetchCharactersOfPlayers(game, props.opponents, 1),
 				props.game,
-				false,
-				not props.soloMode
+				true,
+				props.soloMode
 			),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			MatchSummaryWidgets.GameCenter{children = scoreDisplay, css = {['flex-grow'] = 1}},
@@ -111,8 +111,8 @@ function CustomMatchSummary._createStandardGame(game, props)
 			CustomMatchSummary._createCharacterDisplay(
 				CustomMatchSummary.fetchCharactersOfPlayers(game, props.opponents, 2),
 				props.game,
-				true,
-				not props.soloMode
+				false,
+				props.soloMode
 			)
 		)
 	}
@@ -121,52 +121,65 @@ end
 ---@param players {player: standardPlayer, characters: string[]}[]
 ---@param game string?
 ---@param reverse boolean?
----@param displayPlayerNames boolean?
+---@param soloMode boolean?
 ---@return Widget
-function CustomMatchSummary._createCharacterDisplay(players, game, reverse, displayPlayerNames)
+function CustomMatchSummary._createCharacterDisplay(players, game, reverse, soloMode)
 	local CharacterIcons = Lua.import('Module:CharacterIcons/' .. (game or ''), {loadData = true})
 
-	---@param player {player: standardPlayer, characters: string[]}
-	---@return Html?
-	local playerDisplays = function (player)
-		local characters = player.characters
-		if #characters == 0 then
+	---@param showCharacterName boolean
+	---@param character string
+	---@return Widget
+	local function createCharacterDisplay(showCharacterName, character)
+		local children = WidgetUtil.collect(
+			CharacterIcons[character],
+			showCharacterName and {
+				'&nbsp;',
+				character
+			} or nil
+		)
+		return HtmlWidgets.Div{
+			classes = {'brkts-popup-body-element-thumbs'},
+			children = reverse and Array.reverse(children) or children
+		}
+	end
+
+	---@return Widget|Widget[]?
+	local function buildPlayerDisplay()
+		if Logic.isDeepEmpty(players) then
 			return
+		elseif soloMode then
+			local player = players[1]
+			return Array.map(player.characters, FnUtil.curry(createCharacterDisplay, true))
 		end
-		local playerWrapper = mw.html.create('div')
-			:css('display', 'flex')
-			:css('flex-direction', reverse and 'row' or 'row-reverse')
-		local playerNode = PlayerDisplay.BlockPlayer{player = player.player, flip = not reverse}
-
-		if #characters == 1 and not displayPlayerNames then
-			local characterDisplay = mw.html.create('div'):addClass('brkts-popup-body-element-thumbs')
-			local character = characters[1]
-			if reverse then
-				characterDisplay:wikitext(CharacterIcons[character]):wikitext('&nbsp;'):wikitext(character)
-			else
-				characterDisplay:wikitext(character):wikitext('&nbsp;'):wikitext(CharacterIcons[character])
+		return Array.map(players, function (player)
+			if Logic.isEmpty(player.characters) then
+				return
 			end
-			playerWrapper:node(characterDisplay)
-			return playerWrapper
-		end
-
-		local characterDisplays = Array.map(characters, function (character)
-			local characterDisplay = mw.html.create('div'):addClass('brkts-popup-body-element-thumbs')
-			characterDisplay:wikitext(CharacterIcons[character])
-			return characterDisplay
+			return HtmlWidgets.Div{
+				css = {
+					display = 'flex',
+					['flex-direction'] = 'row' .. (reverse and '-reverse' or ''),
+				},
+				children = Array.interleave(
+					WidgetUtil.collect(
+						Array.map(player.characters, FnUtil.curry(createCharacterDisplay, false)),
+						PlayerDisplay.BlockPlayer{player = player.player, flip = reverse}
+					),
+					'&nbsp;'
+				)
+			}
 		end)
-		if displayPlayerNames then
-			table.insert(characterDisplays, '&nbsp;')
-			table.insert(characterDisplays, playerNode)
-		end
-
-		Array.forEach(characterDisplays, FnUtil.curry(playerWrapper.node, playerWrapper))
-		return playerWrapper
 	end
 
 	return HtmlWidgets.Div{
-		css = {['flex-basis'] = '40%'},
-		children = Logic.isNotDeepEmpty(players) and Array.map(players, playerDisplays) or nil
+		css = {
+			display = 'inline-flex',
+			flex = '2 1 30%',
+			['flex-direction'] = 'column',
+			gap = '0.25rem',
+			['align-items'] = reverse and 'flex-end' or nil,
+		},
+		children = buildPlayerDisplay()
 	}
 end
 
