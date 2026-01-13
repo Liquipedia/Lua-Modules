@@ -42,10 +42,7 @@ end
 ---@return boolean
 function CustomMatchSummary._isSolo(match)
 	return Array.all(match.opponents, function (opponent)
-		if not Opponent.isOpponent(opponent) then
-			return false
-		end
-		return opponent.type == Opponent.solo
+		return Opponent.isOpponent(opponent) and opponent.type == Opponent.solo
 	end)
 end
 
