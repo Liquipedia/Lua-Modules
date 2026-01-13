@@ -13,6 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -121,16 +122,13 @@ end
 ---@param game string?
 ---@param reverse boolean?
 ---@param displayPlayerNames boolean?
----@return Html
+---@return Widget
 function CustomMatchSummary._createCharacterDisplay(players, game, reverse, displayPlayerNames)
 	local CharacterIcons = Lua.import('Module:CharacterIcons/' .. (game or ''), {loadData = true})
-	local wrapper = mw.html.create('div'):css('flex-basis', '40%')
 
-	if Logic.isDeepEmpty(players) then
-		return wrapper
-	end
-
-	local playerDisplays = Array.map(players, function (player)
+	---@param player {player: standardPlayer, characters: string[]}
+	---@return Html?
+	local playerDisplays = function (player)
 		local characters = player.characters
 		if #characters == 0 then
 			return
@@ -164,11 +162,12 @@ function CustomMatchSummary._createCharacterDisplay(players, game, reverse, disp
 
 		Array.forEach(characterDisplays, FnUtil.curry(playerWrapper.node, playerWrapper))
 		return playerWrapper
-	end)
+	end
 
-	Array.forEach(playerDisplays, FnUtil.curry(wrapper.node, wrapper))
-
-	return wrapper
+	return HtmlWidgets.Div{
+		css = {['flex-basis'] = '40%'},
+		children = Logic.isNotDeepEmpty(players) and Array.map(players, playerDisplays) or nil
+	}
 end
 
 return CustomMatchSummary
