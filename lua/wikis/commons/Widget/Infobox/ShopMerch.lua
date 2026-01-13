@@ -32,6 +32,7 @@ local ALLOWED_PREFIX_SCHEMELESS = 'links.liquipedia.net/'
 
 local MAX_URL_LENGTH = 2000
 
+local SHOP_DEFAULT_LINK = 'https://links.liquipedia.net/'
 local SHOP_DEFAULT_ICON = 'fas fa-shopping-bag'
 local SHOP_DEFAULT_TEXT = 'Shop in the Liquipedia Store'
 
@@ -75,7 +76,12 @@ end
 function ShopMerch:render()
 	local args = self.props.args or {}
 
-	local shopLink = normalizeAndValidateShopLink(args.shoplink)
+	local rawShopLink = mw.text.trim(args.shoplink or '')
+	if Logic.isEmpty(rawShopLink) then
+		return
+	end
+
+	local shopLink = normalizeAndValidateShopLink(Logic.readBool(rawShopLink) and SHOP_DEFAULT_LINK or rawShopLink)
 	if not shopLink then
 		return
 	end

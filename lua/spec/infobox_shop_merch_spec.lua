@@ -14,6 +14,12 @@ describe('Infobox/ShopMerch', function()
 		assert.is_truthy(output:find('https://links.liquipedia.net/test', 1, true))
 	end)
 
+	it('uses default shop url when shoplink=true', function()
+		local output = render{shoplink = 'true'}
+		assert.is_not_nil(output)
+		assert.is_truthy(output:find('https://links.liquipedia.net/', 1, true))
+	end)
+
 	it('normalizes schemeless links.liquipedia.net URLs to https', function()
 		local output = render{shoplink = 'links.liquipedia.net/test'}
 		assert.is_not_nil(output)
