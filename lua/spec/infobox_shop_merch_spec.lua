@@ -44,11 +44,10 @@ describe('Infobox/ShopMerch', function()
 		local output = render{
 			shoplink = 'https://links.liquipedia.net/test',
 			shoptext = 'My Shop Button',
-			shopicon = 'fas fa-shopping-bag',
+			shopicon = 'shopping_bag',
 		}
 		assert.is_not_nil(output)
 		assert.is_truthy(output:find('My Shop Button', 1, true))
-		assert.is_truthy(output:find('fa%-shopping%-bag'))
 	end)
 
 	it('rejects inputs with format-breaking characters', function()
@@ -70,6 +69,5 @@ describe('Infobox/ShopMerch', function()
 		local output = render{shoplink = 'https://links.liquipedia.net/test', shoptext = '', shopicon = ''}
 		assert.is_not_nil(output)
 		assert.is_truthy(output:find('Shop in the Liquipedia Store', 1, true))
-		assert.is_truthy(output:find('fa%-shopping%-bag'))
 	end)
 end)

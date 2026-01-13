@@ -33,7 +33,7 @@ local ALLOWED_PREFIX_SCHEMELESS = 'links.liquipedia.net/'
 local MAX_URL_LENGTH = 2000
 
 local SHOP_DEFAULT_LINK = 'https://links.liquipedia.net/'
-local SHOP_DEFAULT_ICON = 'fas fa-shopping-bag'
+local SHOP_DEFAULT_ICON = 'shopping_bag'
 local SHOP_DEFAULT_TEXT = 'Shop in the Liquipedia Store'
 
 
