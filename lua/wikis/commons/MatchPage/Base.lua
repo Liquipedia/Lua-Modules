@@ -239,7 +239,7 @@ end
 function BaseMatchPage:makeDisplayTitle()
 	local team1data = (self.opponents[1] or {}).teamTemplateData
 	local team2data = (self.opponents[2] or {}).teamTemplateData
-	local tournamentName = self.matchData.tickername
+	local tournamentName = self:getMatchContext().displayName
 
 	if Logic.isEmpty(team1data) and Logic.isEmpty(team2data) then
 		return String.isNotEmpty(tournamentName) and 'Match in ' .. tournamentName or ''
@@ -356,7 +356,7 @@ end
 function BaseMatchPage:getTournamentIcon()
 	return IconImage{
 		imageLight = self:getMatchContext().icon,
-		imageDark = self:getMatchContext().icondark,
+		imageDark = self:getMatchContext().iconDark,
 		size = '50x32px',
 	}
 end
