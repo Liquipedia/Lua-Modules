@@ -53,11 +53,12 @@ local function normalizeAndValidateShopLink(shopLink)
 		return
 	end
 
-	if shopLink:find('[|`\\]') then
+	if shopLink:find('[|`\\]<>') then
 		return
 	end
 
-	if not shopLink:match("^[A-Za-z0-9%-%._~:/%?#%[%]@!$&'()%*%+,;=%%%%]+$") then
+	local ALLOWED_URL_CHARS_PATTERN = "^[A-Za-z0-9%-%._~:/%?#%[%]@!$&'()%*%+,;=%%%%]+$"
+	if not shopLink:match(ALLOWED_URL_CHARS_PATTERN) then
 		return
 	end
 
