@@ -20,7 +20,6 @@ local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 local Variables = Lua.import('Module:Variables')
 
@@ -30,6 +29,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local SECONDS_PER_DAY = 86400
 
@@ -85,23 +85,23 @@ function TournamentsSummaryTable.run(args)
 
 	TournamentsSummaryTable._parseArgsToSettings(args)
 
-	local type
-	if args.upcoming == 'true' then
-		type = TournamentsSummaryTable.upcomingType
-	elseif args.ongoing == 'true' then
-		type = TournamentsSummaryTable.ongoingType
-	elseif args.recent == 'true' then
-		type = TournamentsSummaryTable.recentType
+	local tableType
+	if Logic.readBool(args.upcoming) then
+		tableType = TournamentsSummaryTable.upcomingType
+	elseif Logic.readBool(args.ongoing) then
+		tableType = TournamentsSummaryTable.ongoingType
+	elseif Logic.readBool(args.recent) then
+		tableType = TournamentsSummaryTable.recentType
 	else
 		error('No type parameter (upcoming, ongoing, recent) specified')
 	end
 
-	local title = mw.language.getContentLanguage():ucfirst(args.title or TYPE_TO_TITLE[type])
+	local title = String.upperCaseFirst(args.title or TYPE_TO_TITLE[tableType])
 	local limit = args.limit and tonumber(args.limit) or TournamentsSummaryTable.defaultLimit
-	local sort = args.sort or (type == TournamentsSummaryTable.recentType and 'end' or 'start')
-	local order = args.order or (type == TournamentsSummaryTable.recentType and 'desc' or 'asc')
+	local sort = args.sort or (tableType == TournamentsSummaryTable.recentType and 'end' or 'start')
+	local order = args.order or (tableType == TournamentsSummaryTable.recentType and 'desc' or 'asc')
 
-	local data = TournamentsSummaryTable._getTournaments(type, sort, order, limit)
+	local data = TournamentsSummaryTable._getTournaments(tableType, sort, order, limit)
 
 	if Logic.readBool(args.reverseDisplay) then
 		data = Array.reverse(data)
@@ -110,7 +110,7 @@ function TournamentsSummaryTable.run(args)
 	local wrapper = mw.html.create():wikitext('*' .. title)
 
 	for _, tournamentData in ipairs(data) do
-		wrapper:wikitext(TournamentsSummaryTable.row(tournamentData, type))
+		wrapper:wikitext(TournamentsSummaryTable.row(tournamentData, tableType))
 	end
 
 	return wrapper
@@ -128,13 +128,13 @@ function TournamentsSummaryTable._parseArgsToSettings(args)
 	end
 
 	TournamentsSummaryTable.tiers = args.tiers
-		and Array.map(mw.text.split(args.tiers, ','), parseTier)
+		and Array.map(Array.parseCommaSeparatedString(args.tiers), parseTier)
 		or TournamentsSummaryTable.tiers
 
 	TournamentsSummaryTable.disableLIS = Logic.readBool(args.disableLIS) or TournamentsSummaryTable.disableLIS
 
 	TournamentsSummaryTable.tierTypeExcluded = args.tierTypeExcluded
-		and Array.map(mw.text.split(args.tierTypeExcluded, ','), parseTier)
+		and Array.map(Array.parseCommaSeparatedString(args.tierTypeExcluded), parseTier)
 		or TournamentsSummaryTable.tierTypeExcluded
 end
 
@@ -158,55 +158,32 @@ function TournamentsSummaryTable._getTournaments(conditionType, sort, order, lim
 	return {}
 end
 
----@param type conditionTypes
+---@param tableType conditionTypes
 ---@return string
-function TournamentsSummaryTable._buildConditions(type)
+function TournamentsSummaryTable._buildConditions(tableType)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add(TournamentsSummaryTable._tierConditions())
 		:add(TournamentsSummaryTable._tierTypeConditions())
 		:add(TournamentsSummaryTable._statusConditions())
-		:add(TournamentsSummaryTable.dateConditions(type))
-		:add(TournamentsSummaryTable.additionalConditions(type))
+		:add(TournamentsSummaryTable.dateConditions(tableType))
+		:add(TournamentsSummaryTable.additionalConditions(tableType))
 
 	return conditions:toString()
 end
 
----@return ConditionTree
+---@return ConditionTree?
 function TournamentsSummaryTable._tierConditions()
-	local conditions = ConditionTree(BooleanOperator.any)
-	for _, tier in pairs(TournamentsSummaryTable.tiers) do
-		conditions:add({ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tier)})
-	end
-
-	return conditions
+	return ConditionUtil.anyOf(ColumnName('liquipediatier'), TournamentsSummaryTable.tiers)
 end
 
----@return ConditionTree|{}
+---@return ConditionTree?
 function TournamentsSummaryTable._tierTypeConditions()
-	if Table.isEmpty(TournamentsSummaryTable.tierTypeExcluded) then
-		return {}
-	end
-
-	local conditions = ConditionTree(BooleanOperator.all)
-	for _, tierType in pairs(TournamentsSummaryTable.tierTypeExcluded) do
-		conditions:add({ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, tierType)})
-	end
-
-	return conditions
+	return ConditionUtil.noneOf(ColumnName('liquipediatiertype'), TournamentsSummaryTable.tierTypeExcluded)
 end
 
----@return ConditionTree|{}
+---@return ConditionTree?
 function TournamentsSummaryTable._statusConditions()
-	if Table.isEmpty(TournamentsSummaryTable.statusExcluded) then
-		return {}
-	end
-
-	local conditions = ConditionTree(BooleanOperator.all)
-	for _, status in pairs(TournamentsSummaryTable.statusExcluded) do
-		conditions:add({ConditionNode(ColumnName('status'), Comparator.neq, status)})
-	end
-
-	return conditions
+	return ConditionUtil.noneOf(ColumnName('status'), TournamentsSummaryTable.statusExcluded)
 end
 
 ---@param type conditionTypes
@@ -221,33 +198,24 @@ function TournamentsSummaryTable.dateConditions(type)
 		- TournamentsSummaryTable.completedOffset * SECONDS_PER_DAY)
 
 	if type == TournamentsSummaryTable.upcomingType then
-		conditions
-			:add({
-				ConditionNode(ColumnName('startdate'), Comparator.lt, upcomingThreshold),
-				ConditionNode(ColumnName('startdate'), Comparator.gt, _today),
-			})
+		conditions:add{
+			ConditionNode(ColumnName('startdate'), Comparator.lt, upcomingThreshold),
+			ConditionNode(ColumnName('startdate'), Comparator.gt, _today),
+		}
 	elseif type == TournamentsSummaryTable.ongoingType then
-		conditions
-			:add({
-				ConditionTree(BooleanOperator.any):add({
-					ConditionNode(ColumnName('startdate'), Comparator.lt, _today),
-					ConditionNode(ColumnName('startdate'), Comparator.eq, _today),
-				}),
-				ConditionTree(BooleanOperator.any):add({
-					ConditionNode(ColumnName('enddate'), Comparator.gt, _today),
-					ConditionNode(ColumnName('enddate'), Comparator.eq, _today),
-				}),
-				ConditionTree(BooleanOperator.any):add({
-					ConditionNode(ColumnName('status'), Comparator.neq, 'finished'),
-					ConditionNode(ColumnName('enddate'), Comparator.gt, _today),
-				}),
-			})
+		conditions:add{
+			ConditionNode(ColumnName('startdate'), Comparator.le, _today),
+			ConditionNode(ColumnName('enddate'), Comparator.ge, _today),
+			ConditionTree(BooleanOperator.any):add{
+				ConditionNode(ColumnName('status'), Comparator.neq, 'finished'),
+				ConditionNode(ColumnName('enddate'), Comparator.gt, _today),
+			},
+		}
 	elseif type == TournamentsSummaryTable.recentType then
-		conditions
-			:add({
-				ConditionNode(ColumnName('enddate'), Comparator.gt, completedThreshold),
-				ConditionNode(ColumnName('enddate'), Comparator.lt, _today),
-			})
+		conditions:add{
+			ConditionNode(ColumnName('enddate'), Comparator.gt, completedThreshold),
+			ConditionNode(ColumnName('enddate'), Comparator.lt, _today),
+		}
 	end
 
 	return conditions
@@ -258,10 +226,10 @@ function TournamentsSummaryTable.additionalConditions(type)
 end
 
 ---@param eventInformation table
----@param type conditionTypes
+---@param tableType conditionTypes
 ---@return string
-function TournamentsSummaryTable.row(eventInformation, type)
-	if type == TournamentsSummaryTable.upcomingType then
+function TournamentsSummaryTable.row(eventInformation, tableType)
+	if tableType == TournamentsSummaryTable.upcomingType then
 		Variables.varDefine('upcoming_' .. eventInformation.pagename, 1)
 	end
 
