@@ -62,12 +62,12 @@ describe('Infobox/ShopMerch', function()
 	it('uses default text when not customized', function()
 		local output = render{shoplink = 'https://links.liquipedia.net/test'}
 		assert.is_not_nil(output)
-		assert.is_truthy(output:find('Shop in the Liquipedia Store', 1, true))
+		assert.is_truthy(output:find('Shop Official Team Liquid Gear', 1, true))
 	end)
 
 	it('falls back to defaults when values empty', function()
 		local output = render{shoplink = 'https://links.liquipedia.net/test', shoptext = '', shopicon = ''}
 		assert.is_not_nil(output)
-		assert.is_truthy(output:find('Shop in the Liquipedia Store', 1, true))
+		assert.is_truthy(output:find('Shop Official Team Liquid Gear', 1, true))
 	end)
 end)
