@@ -53,7 +53,7 @@ local function normalizeAndValidateShopLink(shopLink)
 		return
 	end
 
-	if shopLink:find('[|`\\]<>') then
+	if shopLink:find('[|`\\<>]') then
 		return
 	end
 
