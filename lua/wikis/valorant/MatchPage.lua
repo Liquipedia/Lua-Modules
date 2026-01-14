@@ -439,7 +439,7 @@ function MatchPage:_renderRoundDetails(game)
 			-- TODO: Replace container class with Carousel widget after #6951
 			'match-bm-match-round-detail-container',
 		},
-		children = Array.map(game.extradata.rounds, function (round, roundIndex)
+		children = Array.map(game.extradata.rounds or {}, function (round, roundIndex)
 			return self:_renderRoundDetail(findPlayer, round, roundIndex)
 		end)
 	}
