@@ -35,6 +35,8 @@ return {
 	explosion_valorant = 'fas fa-fire-alt',
 	defuse = 'fas fa-wrench',
 	outoftime = 'fas fa-hourglass',
+	ace_valorant = 'fas fa-dagger',
+	round_winner = 'far fa-trophy-alt',
 
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',
