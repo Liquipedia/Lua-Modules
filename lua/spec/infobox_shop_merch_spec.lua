@@ -40,16 +40,6 @@ describe('Infobox/ShopMerch', function()
 		assert.is_truthy(output:find('utm_source=lp', 1, true))
 	end)
 
-	it('allows customizing text and icon via separate args', function()
-		local output = render{
-			shoplink = 'https://links.liquipedia.net/test',
-			shoptext = 'My Shop Button',
-			shopicon = 'shopping_bag',
-		}
-		assert.is_not_nil(output)
-		assert.is_truthy(output:find('My Shop Button', 1, true))
-	end)
-
 	it('rejects inputs with format-breaking characters', function()
 		assert.is_nil(render{shoplink = 'https://links.liquipedia.net/te st'})
 		assert.is_nil(render{shoplink = 'https://links.liquipedia.net/<test>'})
@@ -61,12 +51,6 @@ describe('Infobox/ShopMerch', function()
 
 	it('uses default text when not customized', function()
 		local output = render{shoplink = 'https://links.liquipedia.net/test'}
-		assert.is_not_nil(output)
-		assert.is_truthy(output:find('Shop Official Team Liquid Gear', 1, true))
-	end)
-
-	it('falls back to defaults when values empty', function()
-		local output = render{shoplink = 'https://links.liquipedia.net/test', shoptext = '', shopicon = ''}
 		assert.is_not_nil(output)
 		assert.is_truthy(output:find('Shop Official Team Liquid Gear', 1, true))
 	end)

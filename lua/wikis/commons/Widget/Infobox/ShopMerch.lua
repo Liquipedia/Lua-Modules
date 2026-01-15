@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 
@@ -47,7 +48,7 @@ local function normalizeAndValidateShopLink(shopLink)
 	end
 	---@cast shopLink -nil
 
-	shopLink = mw.text.trim(shopLink)
+	shopLink = String.trim(shopLink)
 
 	if #shopLink > MAX_URL_LENGTH then
 		return
@@ -77,7 +78,7 @@ end
 function ShopMerch:render()
 	local args = self.props.args or {}
 
-	local rawShopLink = mw.text.trim(args.shoplink or '')
+	local rawShopLink = String.trim(args.shoplink or '')
 	if Logic.isEmpty(rawShopLink) then
 		return
 	end
@@ -87,13 +88,10 @@ function ShopMerch:render()
 		return
 	end
 
-	local buttonText = Logic.nilIfEmpty(args.shoptext) or SHOP_DEFAULT_TEXT
-	local iconName = Logic.nilIfEmpty(args.shopicon) or SHOP_DEFAULT_ICON
-
 	local children = WidgetUtil.collect(
-		IconFa{iconName = iconName},
+		IconFa{iconName = SHOP_DEFAULT_ICON},
 		' ',
-		buttonText
+		SHOP_DEFAULT_TEXT
 	)
 
 	return {
@@ -106,7 +104,7 @@ function ShopMerch:render()
 				link = shopLink,
 				children = children,
 			},
-			'Purchases through this link support Liquipedia.',
+			I18n.translate('shop-merch-support-text'),
 		}},
 	}
 end
