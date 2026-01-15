@@ -28,8 +28,7 @@ ShopMerch.defaultProps = {
 	args = {},
 }
 
-local ALLOWED_PREFIX = 'https://links.liquipedia.net/'
-local ALLOWED_PREFIX_SCHEMELESS = 'links.liquipedia.net/'
+local TARGET_HOST = 'links.liquipedia.net'
 
 local MAX_URL_LENGTH = 2000
 
@@ -44,34 +43,39 @@ local SHOP_DEFAULT_TEXT = 'Shop Official Team Liquid Gear'
 ---@return string? normalizedUrl
 local function normalizeAndValidateShopLink(shopLink)
 	if String.isEmpty(shopLink) then
-		return
+		return nil
 	end
 	---@cast shopLink -nil
 
 	shopLink = String.trim(shopLink)
 
 	if #shopLink > MAX_URL_LENGTH then
-		return
+		return nil
 	end
 
-	if shopLink:find('[|`\\<>]') then
-		return
+	if not shopLink:find('^https://') then
+		if shopLink:find('^' .. TARGET_HOST:gsub('%.', '%%.')) then
+			shopLink = 'https://' .. shopLink
+		else
+			return nil
+		end
 	end
 
-	local ALLOWED_URL_CHARS_PATTERN = "^[A-Za-z0-9%-%._~:/%?#%[%]@!$&'()%*%+,;=%%%%]+$"
-	if not shopLink:match(ALLOWED_URL_CHARS_PATTERN) then
-		return
+	local uri = mw.uri.new(shopLink)
+
+	if not mw.uri.validate(uri) then
+		return nil
 	end
 
-	local lower = shopLink:lower()
-
-	if lower:sub(1, #ALLOWED_PREFIX) == ALLOWED_PREFIX then
-		return shopLink
+	if uri.protocol ~= 'https' then
+		return nil
 	end
 
-	if lower:sub(1, #ALLOWED_PREFIX_SCHEMELESS) == ALLOWED_PREFIX_SCHEMELESS then
-		return 'https://' .. shopLink
+	if uri.host ~= TARGET_HOST then
+		return nil
 	end
+
+	return tostring(uri)
 end
 
 ---@return Widget[]?
