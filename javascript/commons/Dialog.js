@@ -31,6 +31,7 @@ liquipedia.dialog = {
 							}
 						).dialog( 'open' );
 					} );
+					$( dialog ).replaceWith( $trigger );
 				}
 			} );
 		} );
