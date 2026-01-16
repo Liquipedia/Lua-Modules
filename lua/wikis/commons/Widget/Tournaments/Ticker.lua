@@ -23,7 +23,6 @@ local Tournament = Lua.import('Module:Tournament')
 
 ---@class TournamentsTickerWidget: Widget
 ---@operator call(table): TournamentsTickerWidget
-
 local TournamentsTickerWidget = Class.new(Widget)
 TournamentsTickerWidget.defaultProps = {
 	upcomingDays = 5,
@@ -50,6 +49,9 @@ function TournamentsTickerWidget:render()
 	}
 
 	local currentTimestamp = DateExt.getCurrentTimestamp()
+
+	---@param tournament StandardTournament
+	---@return boolean
 	local function isWithinDateRange(tournament)
 		local modifiedThreshold = tierThresholdModifiers[tournament.liquipediaTier] or 0
 		local modifiedCompletedThreshold = tierTypeThresholdModifiers[tournament.liquipediaTierType] or modifiedThreshold
@@ -72,17 +74,17 @@ function TournamentsTickerWidget:render()
 		return false
 	end
 
-	local lpdbFilter = Condition.Tree(Condition.BooleanOperator.all)
-		:add(Condition.Tree(Condition.BooleanOperator.any)
-			:add(Condition.Node(Condition.ColumnName('status'), Condition.Comparator.eq, ''))
-			:add(Condition.Node(Condition.ColumnName('status'), Condition.Comparator.eq, 'finished'))
-		)
-		:add(Condition.Node(Condition.ColumnName('liquipediatiertype'), Condition.Comparator.eq, '!Points'))
+	local lpdbFilter = Condition.Tree(Condition.BooleanOperator.all):add{
+		Condition.Util.anyOf(Condition.ColumnName('status'), {'', 'finished'}),
+		Condition.Node(Condition.ColumnName('liquipediatiertype'), Condition.Comparator.neq, 'Points')
+	}
 
 	local allTournaments = Tournament.getAllTournaments(lpdbFilter, function(tournament)
 		return isWithinDateRange(tournament)
 	end)
 
+	---@param phase TournamentPhase
+	---@return fun(tournament: StandardTournament): boolean
 	local function filterByPhase(phase)
 		return function(tournament)
 			return tournament.phase == phase
@@ -92,7 +94,8 @@ function TournamentsTickerWidget:render()
 	---@param a StandardTournament
 	---@param b StandardTournament
 	---@param dateProperty 'endDate' | 'startDate'
-	---@param operator fun(a: StandardTournament, b: StandardTournament): boolean
+	---@param operator fun(a: integer, b: integer): boolean
+	---@return boolean?
 	local function sortByDateProperty(a, b, dateProperty, operator)
 		if not a[dateProperty] and not b[dateProperty] then
 			return nil
@@ -109,6 +112,9 @@ function TournamentsTickerWidget:render()
 		return nil
 	end
 
+	---@param a StandardTournament
+	---@param b StandardTournament
+	---@return boolean
 	local function sortByDate(a, b)
 		local endDateSort = sortByDateProperty(a, b, 'endDate', Operator.gt)
 		if endDateSort ~= nil then
@@ -121,6 +127,9 @@ function TournamentsTickerWidget:render()
 		return a.pageName < b.pageName
 	end
 
+	---@param a StandardTournament
+	---@param b StandardTournament
+	---@return boolean
 	local function sortByDateUpcoming(a, b)
 		local endDateSort = sortByDateProperty(a, b, 'startDate', Operator.gt)
 		if endDateSort ~= nil then
