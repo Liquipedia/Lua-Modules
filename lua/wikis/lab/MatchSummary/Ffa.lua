@@ -19,6 +19,11 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@param props {bracketId: string, matchId: string}
 ---@return Widget
 function CustomMatchSummary.getByMatchId(props)
+	local projectName = mw.title.getCurrentTitle().rootText
+	local ProjectCustomMatchSummary = Lua.requireIfExists('Module:MatchSummary/Ffa/' .. projectName)
+	if ProjectCustomMatchSummary then
+		return ProjectCustomMatchSummary.getByMatchId(props)
+	end
 	---@class FFAMatchGroupUtilMatch
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
 	SummaryHelper.updateMatchOpponents(match)
