@@ -103,8 +103,6 @@ function ShopMerch:render()
 		Center{children = {
 			Button{
 				linktype = 'external',
-				variant = 'primary',
-				size = 'md',
 				link = shopLink,
 				children = children,
 			},
