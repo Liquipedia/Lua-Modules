@@ -6,6 +6,7 @@
 --
 
 local Lua = require('Module:Lua')
+local DateExt = Lua.import('Module:Date/Ext')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -48,7 +49,10 @@ local FINISHED_RACE = IconFa{
 local CONTENT = {
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{rumours = true},
+		body = TransfersList{
+			rumours = true,
+			transferPage = 'Driver Transfers/' .. DateExt.getYearOf()
+		},
 		boxid = 1501,
 	},
 	specialEvents = {
