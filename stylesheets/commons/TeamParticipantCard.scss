@@ -45,6 +45,7 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 
 .team-participant__switches {
 	display: flex;
+	align-items: center;
 	gap: 0.5rem;
 }
 
