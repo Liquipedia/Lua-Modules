@@ -117,6 +117,9 @@ return {
 	-- Usage: Accommodations
 	accommodation = 'far fa-home-alt',
 
+	-- Usage: Shop merchandise
+	shopping_bag = 'fas fa-shopping-bag',
+
 	-- Usage: Matches etc
 	firstplace = 'fas fa-trophy',
 	map = 'far fa-map',
