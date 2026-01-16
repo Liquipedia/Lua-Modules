@@ -10,9 +10,11 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 
 local TeamParticipantsWikiParser = Lua.import('Module:TeamParticipants/Parse/Wiki')
@@ -43,6 +45,9 @@ function TeamParticipantsController.fromTemplate(frame)
 		Array.forEach(parsedData.participants, TeamParticipantsRepository.save)
 	end
 	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
+
+	parsedData.participants = TeamParticipantsController.sortParticipants(parsedData.participants)
+
 	return TeamParticipantsDisplay{
 		participants = parsedData.participants
 	}
@@ -137,6 +142,19 @@ function TeamParticipantsController.fillIncompleteRosters(parsedData)
 		end
 
 		TeamParticipantsWikiParser.fillIncompleteRoster(participant.opponent, parsedData.expectedPlayerCount)
+	end)
+end
+
+---@param participants TeamParticipant[]
+---@return TeamParticipant[]
+function TeamParticipantsController.sortParticipants(participants)
+	local sortOrder = (Info.config.participants or {}).participantsSortOrder
+	if sortOrder ~= 'alphabetical' or Logic.isEmpty(participants) then
+		return participants
+	end
+
+	return Array.sortBy(participants, function(participant)
+		return Opponent.toName(participant.opponent)
 	end)
 end
 
