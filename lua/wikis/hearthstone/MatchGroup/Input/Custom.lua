@@ -24,16 +24,22 @@ local OPPONENT_CONFIG = {
 	pagifyPlayerNames = true,
 }
 
+---@class HearthstoneMatchParser: MatchParserInterface
 local MatchFunctions = {
 	OPPONENT_CONFIG = OPPONENT_CONFIG,
 }
+
+---@class HearthstoneMapParser: MapParserInterface
 local MapFunctions = {
 	ADD_SUB_GROUP = true,
 }
 
+---@class HearthstoneFfaMatchParser: FfaMatchParserInterface
 local FfaMatchFunctions = {
 	OPPONENT_CONFIG = OPPONENT_CONFIG,
 }
+
+---@class HearthstoneFfaMapParser: FfaMapParserInterface
 local FfaMapFunctions = {}
 
 ---@param match table
