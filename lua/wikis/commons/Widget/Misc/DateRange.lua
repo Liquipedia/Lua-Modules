@@ -23,63 +23,73 @@ local DateRange = Class.new(Widget)
 ---@param showYear boolean
 ---@return string
 local function determineTranslateString(startDate, endDate, showYear)
-	if not startDate
-		or (showYear and not startDate.year)
-		or (not showYear and not startDate.month) then
+	if not startDate or not startDate.year then
 		return 'date-unknown'
 	end
 
-	---@param date {day?: integer, month?: integer, year?: integer}?
-	local determineSingleDateString = function(date)
-		if not date then
-			return 'unknown'
-		end
-		if showYear then
-			if not date.year then
-				return 'unknown'
-			end
-			if not date.month then
-				return 'year'
-			end
-			if not date.day then
-				return 'year-month'
-			end
-			return 'year-month-day'
+	if not startDate.month then
+		if not endDate or not endDate.year then
+			return 'date-range-year--unknown'
+		elseif startDate.year == endDate.year then
+				return 'date-range-year'
 		else
-			if not date.month then
-				return 'unknown'
-			end
-			if not date.day then
-				return 'month'
-			end
-			return 'month-day'
+			return 'date-range-year--year'
 		end
 	end
 
-	if not endDate or (showYear and not endDate.year) or (not showYear and not endDate.month) then
-		return 'date-range-' .. determineSingleDateString(startDate) .. '--unknown'
+	if not startDate.day then
+		if not endDate or not endDate.year then
+			return 'date-range-year-month--unknown'
+		elseif not endDate.month then
+			if startDate.year == endDate.year then
+				return 'date-range-year-month--unknown_month'
+			else
+				return 'date-range-year-month--year-unknown_month'
+			end
+		else
+			if startDate.year == endDate.year then
+				if startDate.month == endDate.month then
+					return 'date-range-year-month'
+				else
+					return 'date-range-year-month--month'
+				end
+			else
+				return 'date-range-year-month--year-month'
+			end
+		end
 	end
 
-	if  startDate.year == endDate.year then
-		if startDate.month == endDate.month then
-			if startDate.day == endDate.day then
-				return 'date-range-' .. determineSingleDateString(startDate)
-			end
-			return showYear and 'date-range-year-month-day--day'
-				or 'date-range-month-day--day'
+	if not endDate or not endDate.year then
+		return 'date-range-year-month-day--unknown'
+	elseif not endDate.month then
+		-- No check on same year:
+		-- Dec 12, 2025 - TBA would be ambiguous, so display
+		-- Dec 12, 2025 - TBA, 2025
+		return 'date-range-year-month-day--year-unknown_month'
+	elseif not endDate.day then
+		if startDate.year == endDate.year then
+			-- No check on same month:
+			-- Dec 12 - TBA, 2025 would be ambiguous, so display
+			-- Dec 12 - Dec TBA, 2025
+			return 'date-range-year-month-day--month-unknown_day'
+		else
+			return 'date-range-year-month-day--year-month-unknown_day'
 		end
-		if showYear then
-			if not endDate.month then
-				return 'date-range-' .. determineSingleDateString(startDate) .. '--year'
+	else
+		if startDate.year == endDate.year then
+			if startDate.month == endDate.month then
+				if startDate.day == endDate.day then
+					return 'date-range-year-month-day'
+				else
+					return 'date-range-year-month-day--day'
+				end
+			else
+				return 'date-range-year-month-day--month-day'
 			end
-			if not endDate.day then
-				return 'date-range-' .. determineSingleDateString(startDate) .. '--month'
-			end
-			return 'date-range-' .. determineSingleDateString(startDate) .. '--month-day'
+		else
+			return 'date-range-year-month-day--year-month-day'
 		end
 	end
-
-	return 'date-range-' .. determineSingleDateString(startDate) .. '--' .. determineSingleDateString(endDate)
 end
 
 ---@return string
@@ -114,7 +124,12 @@ function DateRange:render()
 		endDate = calculatingEndDate and os.date('%d', os.time(calculatingEndDate)) or nil,
 	}
 
-	return I18n.translate(determineTranslateString(startDate, endDate, self.props.showYear), dateData)
+	local translateString = determineTranslateString(startDate, endDate, self.props.showYear)
+	if self.props.showYear then
+		translateString = translateString:gsub('year-', '')
+	end
+
+	return I18n.translate(translateString, dateData)
 end
 
 return DateRange
