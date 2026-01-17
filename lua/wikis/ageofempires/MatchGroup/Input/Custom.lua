@@ -29,18 +29,23 @@ local OPPONENT_CONFIG = {
 	pagifyTeamNames = true,
 }
 
+---@class AoEMatchParser: MatchParserInterface
 local MatchFunctions = {
 	OPPONENT_CONFIG = OPPONENT_CONFIG,
 }
+
+---@class AoEMapParser: MapParserInterface
 local MapFunctions = {
 	BREAK_ON_EMPTY = true,
 	INHERIT_MAP_DATES = true,
 }
 
+---@class AoEFfaMatchParser: FfaMatchParserInterface
 local FfaMatchFunctions = {
 	OPPONENT_CONFIG = OPPONENT_CONFIG,
 }
----@type FfaMapParserInterface
+
+---@class AoEFfaMapParser: FfaMapParserInterface
 local FfaMapFunctions = {}
 
 ---@param match table
@@ -58,7 +63,7 @@ end
 ---@param match table
 ---@param opponentIndex integer
 ---@param options readOpponentOptions
----@return table?
+---@return MGIParsedOpponent?
 function MatchFunctions.readOpponent(match, opponentIndex, options)
 	options = options or {}
 	local opponentInput = Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex))
@@ -114,7 +119,7 @@ function MatchFunctions.readOpponent(match, opponentIndex, options)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
@@ -133,7 +138,7 @@ function MatchFunctions.getBestOf(bestofInput, maps)
 	return bestof
 end
 
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return string
 function MatchFunctions.getMode(opponents)
 	return Opponent.toLegacyMode(opponents[1].type, opponents[2].type)
@@ -224,7 +229,7 @@ function MapFunctions.getMapName(map, mapIndex, match)
 end
 
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return {civ: string?, flag: string?, displayName: string?, pageName: string?}[]
 function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
@@ -278,7 +283,7 @@ end
 
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	return {
@@ -296,14 +301,14 @@ end
 --- FFA Match
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param scoreSettings table
 ---@return table[]
 function FfaMatchFunctions.extractMaps(match, opponents, scoreSettings)
 	return MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, FfaMapFunctions)
 end
 
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function FfaMatchFunctions.calculateMatchScore(opponents, maps)
@@ -316,7 +321,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param settings table
 ---@return table
 function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
@@ -330,7 +335,7 @@ FfaMapFunctions.getMapName = MapFunctions.getMapName
 FfaMapFunctions.getGame = MapFunctions.getGame
 
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentMapInput table
 ---@return {civ: string?, flag: string?, displayName: string?, pageName: string?}[]
 function FfaMapFunctions.getPlayersOfMapOpponent(map, opponent, opponentMapInput)
