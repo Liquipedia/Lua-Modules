@@ -89,7 +89,7 @@ function MatchFunctions.adjustOpponent(opponent, opponentIndex)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
@@ -145,7 +145,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	local extradata = {
@@ -253,7 +253,7 @@ function MapFunctions.calculateMapScore(map)
 end
 
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]?
 function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
@@ -266,7 +266,7 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return {faction: string?, player: string, position: string, flag: string?}[]
 function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
@@ -375,7 +375,7 @@ FfaMapFunctions.getMapMode = MapFunctions.getMapMode
 
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
@@ -411,7 +411,7 @@ function MapFunctions.getExtraData(match, map, opponents)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return boolean
 function MapFunctions.isArchon(mapInput, opponent, opponentIndex)
@@ -534,7 +534,7 @@ function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param scoreSettings table
 ---@return table[]
 function FfaMatchFunctions.extractMaps(match, opponents, scoreSettings)

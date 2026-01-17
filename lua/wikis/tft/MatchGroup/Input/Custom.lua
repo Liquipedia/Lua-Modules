@@ -38,7 +38,7 @@ end
 --- Normal 2-opponent Match
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
@@ -46,7 +46,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
@@ -84,14 +84,14 @@ end
 --- FFA Match
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param scoreSettings table
 ---@return table[]
 function FfaMatchFunctions.extractMaps(match, opponents, scoreSettings)
 	return MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, FfaMapFunctions)
 end
 
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function FfaMatchFunctions.calculateMatchScore(opponents, maps)
