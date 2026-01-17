@@ -25,6 +25,8 @@ local MIN_EARNINGS_FOR_FEATURED = 200000
 
 -- containers for process helper functions
 local CustomMatchGroupInput = {}
+
+---@class CounterstrikeMatchParser: MatchParserInterface
 local MatchFunctions = {
 	DEFAULT_MODE = 'team',
 	getBestOf = MatchGroupInputUtil.getBestOf,
@@ -34,7 +36,11 @@ local MatchFunctions = {
 		applyUnderScores = true,
 	},
 }
+
+---@class CounterstrikeMapParser: MapParserInterface
 local MapFunctions = {}
+
+---@class CounterstrikeFfaMatchParser: FfaMatchParserInterface
 local FfaMatchFunctions = {
 	DEFAULT_MODE = 'team',
 	OPPONENT_CONFIG = {
@@ -43,6 +49,8 @@ local FfaMatchFunctions = {
 		applyUnderScores = true,
 	},
 }
+
+---@class CounterstrikeFfaMapParser: FfaMapParserInterface
 local FfaMapFunctions = {}
 
 ---@param match table
@@ -140,7 +148,7 @@ function MatchFunctions.getEarnings(name, year)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return boolean
 function MatchFunctions.isFeatured(match, opponents)
 	if Table.includes(FEATURED_TIERS, tonumber(match.liquipediatier)) then
