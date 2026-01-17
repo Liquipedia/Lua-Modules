@@ -128,8 +128,8 @@ function DateRange:render()
 	}
 
 	local translateString = determineTranslateString(startDate, endDate, self.props.showYear)
-	if self.props.showYear then
-		translateString = translateString:gsub('year-', '')
+	if not self.props.showYear then
+		translateString = translateString:gsub('year%-', '')
 	end
 
 	return I18n.translate(translateString, dateData)
