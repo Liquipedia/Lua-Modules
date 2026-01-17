@@ -11,12 +11,17 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Condition = Lua.import('Module:Condition')
-local TableDisplay = Lua.import('Module:AutomaticPointsTable/Display')
-local MinifiedDisplay = Lua.import('Module:AutomaticPointsTable/MinifiedDisplay')
+local DateExt = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Operator = Lua.import('Module:Operator')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Tournament = Lua.import('Module:Tournament')
 
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
@@ -24,12 +29,38 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local AutomaticPointsTableWidget = Lua.import('Module:Widget/AutomaticPointsTable')
+
+---@enum PointsType
 local POINTS_TYPE = {
 	MANUAL = 'MANUAL',
 	PRIZE = 'PRIZE',
 	SECURED = 'SECURED'
 }
 
+---@class AutomaticPointsTableConfig
+---@field positionBackgrounds string[]
+---@field tournaments StandardTournament[]
+---@field opponents AutomaticPointsTableOpponent[]
+---@field shouldTableBeMinified boolean
+---@field limit number
+---@field lpdbName string
+
+---@class AutomaticPointsTableOpponent
+---@field opponent standardOpponent
+---@field aliases string[][]
+---@field tiebreakerPoints number
+---@field results {type: PointsType?, amount: number?, qualified: boolean?, deduction: number?, note: string?}[]
+---@field qualified boolean
+---@field totalPoints number
+---@field placement integer
+---@field background string?
+---@field note string?
+
+---@class AutomaticPointsTable
+---@operator call(Frame): AutomaticPointsTable
+---@field args table
+---@field parsedInput AutomaticPointsTableConfig
 local AutomaticPointsTable = Class.new(
 	function(self, frame)
 		self.frame = frame
@@ -38,85 +69,61 @@ local AutomaticPointsTable = Class.new(
 	end
 )
 
+---@param frame Frame
+---@return Widget
 function AutomaticPointsTable.run(frame)
-	local pointsTable = AutomaticPointsTable(frame)
-
-	local teams = pointsTable.parsedInput.teams
-	local tournaments = pointsTable.parsedInput.tournaments
-	local teamsWithResults, tournamentsWithResults = pointsTable:queryPlacements(teams, tournaments)
-	local pointsData = pointsTable:getPointsData(teamsWithResults, tournamentsWithResults)
-	local sortedData = pointsTable:sortData(pointsData)
-	local sortedDataWithPositions = pointsTable:addPositionData(sortedData)
-	local positionBackgrounds = pointsTable.parsedInput.positionBackgrounds
-	local limit = pointsTable.parsedInput.limit
-
-	-- A display module is a module that takes in 3 arguments and returns some html,
-	-- which will be displayed when this module is invoked
-	local usedDisplayModule
-	if pointsTable.parsedInput.shouldTableBeMinified then
-		usedDisplayModule = MinifiedDisplay
-	else
-		usedDisplayModule = TableDisplay
-	end
-
-	pointsTable:storeLPDB(sortedDataWithPositions)
-
-	local divTable = usedDisplayModule(
-		sortedDataWithPositions,
-		tournamentsWithResults,
-		positionBackgrounds,
-		limit
-	)
-
-	return divTable:create()
+	local pointsTable = AutomaticPointsTable(frame):process()
+	return pointsTable:display()
 end
 
-function AutomaticPointsTable:storeLPDB(pointsData)
-	local date = os.date()
-	Array.forEach(pointsData, function(teamPointsData)
-		local team = teamPointsData.team
-		local teamName = string.lower(team.aliases[#team.aliases])
+---@param opponents AutomaticPointsTableOpponent[]
+function AutomaticPointsTable:storeLPDB(opponents)
+	local date = DateExt.getContextualDateOrNow()
+	Array.forEach(opponents, function(opponent)
+		local opponentName = Opponent.toName(opponent.opponent)
 		local lpdbName = self.parsedInput.lpdbName
-		local uniqueId = teamName .. '_' .. lpdbName
-		local position = teamPointsData.position
-		local totalPoints = teamPointsData.totalPoints
+		local uniqueId = opponentName .. '_' .. lpdbName
+		local position = opponent.placement
+		local totalPoints = opponent.totalPoints
 		local objectData = {
 			type = 'automatic_points',
-			name = teamName,
+			name = opponentName,
 			information = position,
 			date = date,
-			extradata = Json.stringify({
+			extradata = {
 				position = position,
 				totalPoints = totalPoints
-			})
+			}
 		}
 
-		mw.ext.LiquipediaDB.lpdb_datapoint(uniqueId, objectData)
+		mw.ext.LiquipediaDB.lpdb_datapoint(uniqueId, Json.stringifySubTables(objectData))
 	end)
 end
 
+---@param args table
+---@return AutomaticPointsTableConfig
 function AutomaticPointsTable:parseInput(args)
 	local positionBackgrounds = self:parsePositionBackgroundData(args)
 	local tournaments = self:parseTournaments(args)
-	local shouldResolveRedirect = Logic.readBool(args.resolveRedirect)
-	local teams = self:parseTeams(args, #tournaments, shouldResolveRedirect)
+	local opponents = self:parseOpponents(args, tournaments)
 	local minified = Logic.readBool(args.minified)
-	local limit = tonumber(args.limit) or #teams
+	local limit = tonumber(args.limit) or #opponents
 	local lpdbName = args.lpdbName or mw.title.getCurrentTitle().text
 
 	return {
 		positionBackgrounds = positionBackgrounds,
 		tournaments = tournaments,
-		teams = teams,
+		opponents = opponents,
 		shouldTableBeMinified = minified,
 		limit = limit,
 		lpdbName = lpdbName,
-		shouldResolveRedirect = shouldResolveRedirect,
 	}
 end
 
 --- parses the positionbg arguments, these are the background colors of specific
 --- positions, usually used to indicate if a team in a specific position will end up qualifying
+---@param args table
+---@return string[]
 function AutomaticPointsTable:parsePositionBackgroundData(args)
 	local positionBackgrounds = {}
 	for _, background in Table.iter.pairsByPrefix(args, 'positionbg') do
@@ -125,45 +132,84 @@ function AutomaticPointsTable:parsePositionBackgroundData(args)
 	return positionBackgrounds
 end
 
+---@param args table
+---@return StandardTournament[]
 function AutomaticPointsTable:parseTournaments(args)
 	local tournaments = {}
 	for _, tournament in Table.iter.pairsByPrefix(args, 'tournament') do
-		table.insert(tournaments, (Json.parse(tournament)))
+		Array.appendWith(tournaments, Tournament.getTournament(tournament))
 	end
 	return tournaments
 end
 
-function AutomaticPointsTable:parseTeams(args, tournamentCount, shouldResolveRedirect)
-	local teams = {}
-	for _, team in Table.iter.pairsByPrefix(args, 'team') do
-		local parsedTeam = Json.parse(team)
-		parsedTeam.aliases = self:parseAliases(parsedTeam, tournamentCount, shouldResolveRedirect)
-		parsedTeam.deductions = self:parseDeductions(parsedTeam, tournamentCount)
-		parsedTeam.manualPoints = self:parseManualPoints(parsedTeam, tournamentCount)
-		parsedTeam.tiebreakerPoints = tonumber(parsedTeam.tiebreaker_points) or 0
-		parsedTeam.results = {}
-		table.insert(teams, parsedTeam)
+---@param args table
+---@param tournaments StandardTournament[]
+---@return AutomaticPointsTableOpponent[]
+function AutomaticPointsTable:parseOpponents(args, tournaments)
+	local opponents = {}
+	for _, opponentArgs in Table.iter.pairsByPrefix(args, 'opponent') do
+		local parsedArgs = Json.parseIfString(opponentArgs)
+		local parsedOpponent = {
+			opponent = Opponent.readOpponentArgs(parsedArgs),
+			tiebreakerPoints = tonumber(parsedArgs.tiebreaker) or 0,
+			background = parsedArgs.bg,
+			note = parsedArgs.note,
+		}
+		assert(parsedOpponent.opponent.type == Opponent.team)
+		assert(not Opponent.isTbd(parsedOpponent.opponent))
+		local aliases = self:parseAliases(parsedArgs, parsedOpponent.opponent, #tournaments)
+
+		parsedOpponent.results = Array.map(tournaments, function (tournament, tournamentIndex)
+			local manualPoints = parsedArgs['points' .. tournamentIndex]
+			-- TODO: Automate qualified once #6762 is merged
+			local qualified = Logic.readBoolOrNil(parsedArgs['qualified' .. tournamentIndex])
+			if String.isNotEmpty(manualPoints) then
+				return Table.mergeInto({
+					qualified = qualified,
+					type = POINTS_TYPE.MANUAL,
+					amount = tonumber(manualPoints)
+
+				}, self:parseDeduction(parsedArgs, tournament, tournamentIndex))
+			end
+
+			local queriedPoints = self:queryPlacement(aliases[tournamentIndex], tournament)
+
+			if not queriedPoints then
+				return {}
+			end
+
+			return Table.merge(
+				queriedPoints, {qualified = qualified}, self:parseDeduction(parsedArgs, tournament, tournamentIndex)
+			)
+		end)
+
+		parsedOpponent.totalPoints = Array.reduce(parsedOpponent.results, function (aggregate, result)
+			return aggregate + (result.amount or 0) - (result.deduction or 0)
+		end, 0)
+
+		parsedOpponent.qualified = Array.any(parsedOpponent.results, Operator.property('qualified'))
+
+		Array.appendWith(opponents, parsedOpponent)
 	end
-	return teams
+	return opponents
 end
 
 --- Parses the team aliases, used in cases where a team is picked up by an org or changed
 --- name in some of the tournaments, in which case aliases are required to correctly query
 --- the team's results & points
-function AutomaticPointsTable:parseAliases(team, tournamentCount, shouldResolveRedirect)
+---@param args table
+---@param opponent standardOpponent
+---@param tournamentCount integer
+---@return string[][]
+function AutomaticPointsTable:parseAliases(args, opponent, tournamentCount)
 	local aliases = {}
-	local parseAlias = function(x)
-		if (shouldResolveRedirect) then
-			return mw.ext.TeamLiquidIntegration.resolve_redirect(x)
-		end
-		return mw.language.getContentLanguage():ucfirst(x)
-	end
-	local lastAlias = team.name
+	local lastAliases = TeamTemplate.queryHistoricalNames(Opponent.toName(opponent))
+
 	for index = 1, tournamentCount do
-		if String.isNotEmpty(team['alias' .. index]) then
-			lastAlias = team['alias' .. index]
+		if String.isNotEmpty(args['alias' .. index]) then
+			lastAliases = TeamTemplate.queryHistoricalNames(args['alias' .. index])
 		end
-		aliases[index] = parseAlias(lastAlias)
+		aliases[index] = lastAliases
 	end
 	return aliases
 end
@@ -171,134 +217,61 @@ end
 --- Parses the teams' deductions, used in cases where a team has disbanded or made a roster
 --- change that causes them to lose a portion or all of their points that they've accumulated
 --- up until that change
-function AutomaticPointsTable:parseDeductions(team, tournamentCount)
-	local deductions = {}
-	for index = 1, tournamentCount do
-		if String.isNotEmpty(team['deduction' .. index]) then
-			if not deductions[index] then
-				deductions[index] = {}
-			end
-			deductions[index].amount = tonumber(team['deduction' .. index])
-
-			if String.isNotEmpty(team['deduction' .. index .. 'note']) then
-				deductions[index].note = team['deduction' .. index .. 'note']
-			end
-		end
+---@param args table
+---@param tournament StandardTournament
+---@param tournamentIndex integer
+---@return {deduction: number?, note: string?}[]
+function AutomaticPointsTable:parseDeduction(args, tournament, tournamentIndex)
+	local deduction = args['deduction' .. tournamentIndex]
+	if String.isEmpty(deduction) then
+		return {}
+	elseif not Logic.isNumeric(deduction) then
+		return {}
 	end
-
-	return deductions
-end
-
-function AutomaticPointsTable:parseManualPoints(team, tournamentCount)
-	local manualPoints = {}
-	for index = 1, tournamentCount do
-		if String.isNotEmpty(team['points' .. index]) then
-			manualPoints[index] = tonumber(team['points' .. index])
-		end
-	end
-	return manualPoints
-end
-
-function AutomaticPointsTable:generateReverseAliases(teams, tournaments)
-	local reverseAliases = {}
-	local shouldResolveRedirect = self.parsedInput.shouldResolveRedirect
-	for tournamentIndex = 1, #tournaments do
-		reverseAliases[tournamentIndex] = {}
-		Array.forEach(teams,
-			function(team, index)
-				local alias
-				if shouldResolveRedirect then
-					alias = mw.ext.TeamLiquidIntegration.resolve_redirect(team.aliases[tournamentIndex])
-				else
-					alias = team.aliases[tournamentIndex]
-				end
-				reverseAliases[tournamentIndex][alias] = index
-			end
-		)
-	end
-	return reverseAliases
-end
-
-
-function AutomaticPointsTable:queryPlacements(teams, tournaments)
-	-- to get a team index, use reverseAliases[tournamentIndex][alias]
-	local reverseAliases = self:generateReverseAliases(teams, tournaments)
-
-	local queryParams = {
-		limit = 5000,
-		query = 'tournament, participant, placement, extradata'
+	tournament.extradata.includesDeduction = true
+	return {
+		deduction = tonumber(deduction),
+		note = args['deduction' .. tournamentIndex .. 'note']
 	}
-
-	local tree = ConditionTree(BooleanOperator.any)
-	local columnName = ColumnName('tournament')
-	local tournamentIndices = {}
-	Array.forEach(tournaments,
-		function(t, index)
-			tree:add(ConditionNode(columnName, Comparator.eq, t.name))
-			tournamentIndices[t.name] = index
-			t.placements = {}
-		end
-	)
-	local conditions = tree:toString()
-
-	queryParams.conditions = conditions
-	local allQueryResult = mw.ext.LiquipediaDB.lpdb('placement', queryParams)
-
-	Array.forEach(allQueryResult,
-		function(result)
-			local tournamentIndex = tournamentIndices[result.tournament]
-			local tournament = tournaments[tournamentIndex]
-
-			result.prizePoints = tonumber(result.extradata.prizepoints)
-			result.securedPoints = tonumber(result.extradata.securedpoints)
-			result.extradata = nil
-			table.insert(tournament.placements, result)
-
-			local participant = result.participant
-			local teamIndex = reverseAliases[tournamentIndex][participant]
-			if teamIndex ~= nil then
-				teams[teamIndex].results[tournamentIndex] = result
-			end
-		end
-	)
-
-	return teams, tournaments
 end
 
-function AutomaticPointsTable:getPointsData(teams, tournaments)
-	return Table.mapValues(teams,
-		function(team)
-			local teamPointsData = {}
-			local totalPoints = 0
-			for tournamentIndex = 1, #tournaments do
-				local manualPoints = team.manualPoints[tournamentIndex]
-				local placement = team.results[tournamentIndex]
+---@param aliases string[]
+---@param tournament StandardTournament
+function AutomaticPointsTable:queryPlacement(aliases, tournament)
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('parent'), Comparator.eq, tournament.pageName),
+		ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
+		Condition.Util.anyOf(ColumnName('opponenttemplate'), aliases),
+	}
+	local result = mw.ext.LiquipediaDB.lpdb('placement', {
+		conditions = tostring(conditions),
+		limit = 1,
+		query = 'extradata'
+	})[1]
 
-				local pointsForTournament = self:calculatePointsForTournament(placement, manualPoints)
-				if Table.isNotEmpty(pointsForTournament) then
-					totalPoints = totalPoints + pointsForTournament.amount
-				end
+	if not result then
+		return
+	end
 
-				local deduction = team.deductions[tournamentIndex]
-				if Table.isNotEmpty(deduction) then
-					pointsForTournament.deduction = deduction
-					-- will only show the deductions column if there's atleast one team with
-					-- some deduction for a tournament
-					tournaments[tournamentIndex].shouldDeductionsBeVisible = true
-					totalPoints = totalPoints - (deduction.amount or 0)
-				end
+	local prizePoints = tonumber(result.extradata.prizepoints)
+	local securedPoints = tonumber(result.extradata.securedpoints)
 
-				teamPointsData[tournamentIndex] = pointsForTournament
-			end
-
-			teamPointsData.team = team
-			teamPointsData.totalPoints = totalPoints
-			teamPointsData.tiebreakerPoints = team.tiebreakerPoints
-			return teamPointsData
-		end
-	)
+	if prizePoints then
+		return {
+			amount = prizePoints,
+			type = POINTS_TYPE.PRIZE,
+		}
+	elseif securedPoints then
+		return {
+			amount = securedPoints,
+			type = POINTS_TYPE.SECURED,
+		}
+	end
 end
 
+---@param placement {prizePoints: number?, securedPoints: number?}
+---@param manualPoints number?
+---@return {amount: number?, type: PointsType?}
 function AutomaticPointsTable:calculatePointsForTournament(placement, manualPoints)
 	-- manual points get highest priority
 	if manualPoints ~= nil then
@@ -329,44 +302,68 @@ function AutomaticPointsTable:calculatePointsForTournament(placement, manualPoin
 end
 
 --- sort by total points (desc) then by name (asc)
-function AutomaticPointsTable:sortData(pointsData, teams)
-	table.sort(pointsData,
-		function(a, b)
-			if a.totalPoints ~= b.totalPoints then
-				return a.totalPoints > b.totalPoints
+---@param opponents AutomaticPointsTableOpponent[]
+---@return AutomaticPointsTableOpponent[]
+function AutomaticPointsTable:sortData(opponents)
+	return Array.sortBy(opponents, FnUtil.identity,
+		---@param opp1 AutomaticPointsTableOpponent
+		---@param opp2 AutomaticPointsTableOpponent
+		function (opp1, opp2)
+			if opp1.qualified then
+				if not opp2.qualified then
+					return true
+				end
+			elseif opp2.qualified then
+				return false
 			end
-			if a.tiebreakerPoints ~= b.tiebreakerPoints then
-				return a.tiebreakerPoints > b.tiebreakerPoints
+			local totalPoints1 = opp1.totalPoints
+			local totalPoints2 = opp2.totalPoints
+			if totalPoints1 ~= totalPoints2 then
+				return totalPoints1 > totalPoints2
+			elseif opp1.tiebreakerPoints ~= opp2.tiebreakerPoints then
+				return opp1.tiebreakerPoints > opp2.tiebreakerPoints
 			end
-			local aName = a.team.aliases[#a.team.aliases]
-			local bName = b.team.aliases[#b.team.aliases]
-			return aName < bName
+			return Opponent.toName(opp1.opponent) < Opponent.toName(opp2.opponent)
 		end
 	)
-
-	return pointsData
 end
 
-function AutomaticPointsTable:addPositionData(pointsData)
-	local teamPosition = 0
-	local previousTotalPoints = pointsData[1].totalPoints + 1
-	local previousTiebreakerPoints = pointsData[1].tiebreakerPoints + 1
-
-	return Table.map(pointsData,
-		function(index, dataPoint)
-			local lessTotalPoints = dataPoint.totalPoints < previousTotalPoints
-			local equalTotalPoints = dataPoint.totalPoints == previousTotalPoints
-			local lessTiebreakerPoints = dataPoint.tiebreakerPoints < previousTiebreakerPoints
-			if lessTotalPoints or (equalTotalPoints and lessTiebreakerPoints) then
-				teamPosition = index
-			end
-			dataPoint.position = teamPosition
-			previousTotalPoints = dataPoint.totalPoints
-			previousTiebreakerPoints = dataPoint.tiebreakerPoints
-
-			return index, dataPoint
+---@param opponents AutomaticPointsTableOpponent[]
+---@return AutomaticPointsTableOpponent[]
+function AutomaticPointsTable:addPlacements(opponents)
+	Array.forEach(opponents, function (opponent, index)
+		if index == 1 then
+			opponent.placement = index
+		elseif opponent.qualified ~= opponents[index - 1].qualified then
+			opponent.placement = index
+		elseif opponent.totalPoints ~= opponents[index - 1].totalPoints then
+			opponent.placement = index
+		elseif opponent.tiebreakerPoints ~= opponents[index - 1].tiebreakerPoints then
+			opponent.placement = index
+		else
+			opponent.placement = opponents[index - 1].placement
 		end
-	)
+	end)
+	return opponents
+end
+
+---@return self
+function AutomaticPointsTable:process()
+	self.opponents = self:addPlacements(self:sortData(self.parsedInput.opponents))
+	if Lpdb.isStorageEnabled() then
+		self:storeLPDB(self.opponents)
+	end
+	return self
+end
+
+---@return Widget
+function AutomaticPointsTable:display()
+	return AutomaticPointsTableWidget{
+		opponents = self.opponents,
+		tournaments = self.parsedInput.tournaments,
+		limit = self.parsedInput.limit,
+		positionBackgrounds = self.parsedInput.positionBackgrounds,
+	}
 end
 
 return AutomaticPointsTable
