@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
 local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
@@ -66,9 +67,7 @@ end
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function MatchFunctions.calculateMatchScore(maps)
-	return function(opponentIndex)
-		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-	end
+	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
 ---@param match table

@@ -41,9 +41,7 @@ end
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
 function MatchFunctions.calculateMatchScore(maps)
-	return function(opponentIndex)
-		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-	end
+	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
 ---@param map table
