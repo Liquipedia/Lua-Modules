@@ -28,6 +28,9 @@ local function determineTranslateString(startDate, endDate, showYear)
 	end
 
 	if not startDate.month then
+		if not showYear then
+			return 'date-unknown'
+		end
 		if not endDate or not endDate.year then
 			return 'date-range-year--unknown'
 		elseif startDate.year == endDate.year then
