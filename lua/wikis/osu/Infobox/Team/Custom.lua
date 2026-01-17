@@ -13,7 +13,6 @@ local PlacementStats = Lua.import('Module:InfoboxPlacementStats')
 local Team = Lua.import('Module:Infobox/Team')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class OsuInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
