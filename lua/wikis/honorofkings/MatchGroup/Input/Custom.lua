@@ -15,7 +15,11 @@ local Variables = Lua.import('Module:Variables')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
+
+---@class HoKMatchParser: MatchParserInterface
 local MatchFunctions = {}
+
+---@class HoKMapParser: MapParserInterface
 local MapFunctions = {}
 
 MatchFunctions.DEFAULT_MODE = 'team'
