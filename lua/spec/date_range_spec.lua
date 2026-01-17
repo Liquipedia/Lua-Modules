@@ -49,9 +49,9 @@ describe('DateRange Widget', function()
 		end
 	)
 
-	it('should return "date-range-month-day--month" if end day is unknown', function()
+	it('should return "date-range-month-day--month-unknown_day" if end day is unknown', function()
 		local widget = DateRange{startDate = {year = 2023, month = 10, day = 1}, endDate = {year = 2023, month = 11}}
-		assert.are.equal(I18n.translate('date-range-month-day--month', {
+		assert.are.equal(I18n.translate('date-range-month-day--month-unknown_day', {
 			startMonth = 'Oct', startDate = '01', endMonth = 'Nov'
 		}), widget:render())
 	end)
@@ -120,14 +120,14 @@ describe('DateRange Widget', function()
 
 		it('known startYear, different endYear, known endMonth', function()
 			local widget = DateRange{startDate = {year = 2024}, endDate = {year = 2025, month = 10}, showYear = true}
-			assert.are.equal(I18n.translate('date-range-year--year-month', {
+			assert.are.equal(I18n.translate('date-range-year--year', {
 				startYear = '2024', endYear = '2025', endMonth = 'Oct'
 			}), widget:render())
 		end)
 
 		it('known startYear, different endYear, known endMonth, known endDay', function()
 			local widget = DateRange{startDate = {year = 2024}, endDate = {year = 2025, month = 10, day = 3}, showYear = true}
-			assert.are.equal(I18n.translate('date-range-year--year-month-day', {
+			assert.are.equal(I18n.translate('date-range-year--year', {
 				startYear = '2024', endYear = '2025', endMonth = 'Oct', endDate = '03'
 			}), widget:render())
 		end)
@@ -141,15 +141,29 @@ describe('DateRange Widget', function()
 
 		it('known startYear, same endYear, known endMonth', function()
 			local widget = DateRange{startDate = {year = 2024}, endDate = {year = 2024, month = 10}, showYear = true}
-			assert.are.equal(I18n.translate('date-range-year--month', {
+			assert.are.equal(I18n.translate('date-range-year', {
 				startYear = '2024', endYear = '2024', endMonth = 'Oct'
 			}), widget:render())
 		end)
 
 		it('known startYear, same endYear, known endMonth, known endDay', function()
 			local widget = DateRange{startDate = {year = 2024}, endDate = {year = 2024, month = 10, day = 3}, showYear = true}
-			assert.are.equal(I18n.translate('date-range-year--month-day', {
+			assert.are.equal(I18n.translate('date-range-year', {
 				startYear = '2024', endYear = '2024', endMonth = 'Oct', endDate = '03'
+			}), widget:render())
+		end)
+
+		it('known startYear, startMonth, different endYear', function()
+			local widget = DateRange{startDate = {year = 2024, month = 10}, endDate = {year = 2025}, showYear = true}
+			assert.are.equal(I18n.translate('date-range-year-month--year-unknown_month', {
+				startYear = '2024', startMonth = 'Oct', endYear = '2025'
+			}), widget:render())
+		end)
+
+		it('known startYear, startMonth, same endYear', function()
+			local widget = DateRange{startDate = {year = 2024, month = 10}, endDate = {year = 2024}, showYear = true}
+			assert.are.equal(I18n.translate('date-range-year-month--unknown_month', {
+				startYear = '2024', startMonth = 'Oct', endYear = '2024'
 			}), widget:render())
 		end)
 	end)
