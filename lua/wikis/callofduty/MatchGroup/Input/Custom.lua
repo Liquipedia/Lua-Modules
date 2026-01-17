@@ -18,13 +18,21 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local DEFAULT_BESTOF = 3
 
 local CustomMatchGroupInput = {}
+
+---@class CallofdutyMatchParser: MatchParserInterface
 local MatchFunctions = {
 	DEFAULT_MODE = 'team',
 }
+
+---@class CallofdutyMapParser: MapParserInterface
 local MapFunctions = {}
+
+---@class CallofdutyFfaMatchParser: FfaMatchParserInterface
 local FfaMatchFunctions = {
 	DEFAULT_MODE = 'team',
 }
+
+---@class CallofdutyFfaMapParser: FfaMapParserInterface
 local FfaMapFunctions = {}
 
 ---@param match table
