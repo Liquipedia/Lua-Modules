@@ -56,7 +56,10 @@ describe('i18n', function ()
 			assert.are.equal('Oct 03, 2024', I18n.translate('date-range-year-month-day', data))
 			assert.are.equal('Oct 03, 2024 - TBA', I18n.translate('date-range-year-month-day--unknown', data))
 			assert.are.equal('Oct 03, 2024 - TBA, 2025', I18n.translate('date-range-year-month-day--year-unknown_month', data))
-			assert.are.equal('Oct 03, 2024 - Nov TBA, 2025', I18n.translate('date-range-year-month-day--year-month-unknown_day', data))
+			assert.are.equal(
+				'Oct 03, 2024 - Nv TBA, 2025',
+				I18n.translate('date-range-year-month-day--year-month-unknown_day', data)
+			)
 			assert.are.equal('Oct 03, 2024 - Nov 04, 2025', I18n.translate('date-range-year-month-day--year-month-day', data))
 			assert.are.equal('Oct 03 - Nov 04, 2024', I18n.translate('date-range-year-month-day--month-day', data))
 			assert.are.equal('Oct 03 - Nov TBA, 2024', I18n.translate('date-range-year-month-day--month-unknown_day', data))
