@@ -43,7 +43,7 @@ local ADDITIONAL_UNIT_RACES = {
 }
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomUnit.run(frame)
 	local unit = CustomUnit(frame)
 	unit:setWidgetInjector(CustomInjector(unit))

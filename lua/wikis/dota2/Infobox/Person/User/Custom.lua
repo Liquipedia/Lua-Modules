@@ -29,7 +29,7 @@ local CustomUser = Class.new(User)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomUser.run(frame)
 	local user = CustomUser(frame)
 	user:setWidgetInjector(CustomInjector(user))

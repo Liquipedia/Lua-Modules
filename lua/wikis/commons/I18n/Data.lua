@@ -97,5 +97,8 @@ return {
 
 		-- MatchSummary Map Veto
 		['matchsummary-mapveto-start'] = 'Start Map Veto',
+
+		-- MatchTicker
+		['matchticker-upcoming-matches'] = 'Upcoming Matches',
 	}
 }

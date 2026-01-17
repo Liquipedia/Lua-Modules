@@ -15,7 +15,7 @@ local Website = Lua.import('Module:Infobox/Website')
 local CustomWebsite = Class.new(Website)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomWebsite.run(frame)
 	local website = CustomWebsite(frame)
 	return website:createInfobox()

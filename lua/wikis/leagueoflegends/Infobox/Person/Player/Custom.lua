@@ -25,6 +25,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 
 ---@class LeagueoflegendsInfoboxPlayer: Person
+---@operator call(Frame): LeagueoflegendsInfoboxPlayer
 local CustomPlayer = Class.new(Player)
 
 ---@class LeagueoflegendsInfoboxPlayerWidgetInjector: WidgetInjector
@@ -32,7 +33,7 @@ local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	local args = player.args
@@ -66,9 +67,10 @@ function CustomPlayer.run(frame)
 		}
 	end
 
-	return mw.html.create()
-		:node(builtInfobox)
-		:node(autoPlayerIntro)
+	return HtmlWidgets.Fragment{children = {
+		builtInfobox,
+		autoPlayerIntro,
+	}}
 end
 
 ---@param id string
@@ -123,7 +125,7 @@ function CustomPlayer:createBottomContent()
 		---@cast teamPage -nil
 		return HtmlWidgets.Fragment{
 			children = {
-				MatchTicker.participant{team = teamPage},
+				MatchTicker.recent{team = teamPage},
 				UpcomingTournaments.team{name = teamPage},
 			}
 		}

@@ -34,5 +34,8 @@ return {
 		match2 = {
 			status = 2,
 		},
+		participants = {
+			defaultPlayerNumber = 6,
+		},
 	},
 }

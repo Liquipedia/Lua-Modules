@@ -50,7 +50,7 @@ end
 ---@return string
 function Image._make(image, options, themeClass)
 	local class = table.concat(Array.append({String.nilIfEmpty(options.class)}, themeClass), ' ')
-	local parts = Array.append({'File:' .. image},
+	local parts = Array.extend('File:' .. image,
 		String.nilIfEmpty(options.type),
 		String.nilIfEmpty(options.border),
 		String.nilIfEmpty(options.location),

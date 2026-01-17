@@ -160,9 +160,14 @@ return {
 			},
 		},
 		{
-			file = 'Clash_Royale_Illustration_Merge_Tactics.png',
-			title = 'Merge Tactics',
-			link = 'Portal:Merge Tactics',
+			file = 'Clash_Royale_Illustration_Heroes_3D_KeyArt.png',
+			title = 'Hero Cards',
+			link = 'Portal:Hero Cards',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[extradata_type::Hero Troop]]',
+			},
 		},
 		{
 			file = 'RuneGiant RunicMountain Banner.png',

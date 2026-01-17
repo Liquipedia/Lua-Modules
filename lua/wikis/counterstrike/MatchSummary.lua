@@ -86,11 +86,6 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 			label = label .. ' for Game ' .. index
 		end
 
-		icon = 'File:' .. icon
-		if iconDark then
-			iconDark = 'File:' .. iconDark
-		end
-
 		footer:addLink(url, icon, iconDark, label)
 	end
 

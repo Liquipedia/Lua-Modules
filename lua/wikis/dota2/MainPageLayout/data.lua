@@ -19,6 +19,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
+local PartnerWikis = Lua.import('Module:Widget/MainPage/PartnerWikis')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
@@ -38,7 +39,7 @@ local function createHubButton(link, displayName, hubIcon)
 	return Button{
 		link = link,
 		title = 'Click here to get to the ' .. displayName:lower(),
-		variant = 'tertiary',
+		variant = 'secondary',
 		children = {
 			IconFa{
 				iconName = hubIcon,
@@ -148,6 +149,12 @@ local CONTENT = {
 		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
+	},
+	partnerWikis = {
+		heading = 'Partner Wikis',
+		body = PartnerWikis{},
+		padding = true,
+		boxid = 1518,
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -262,6 +269,10 @@ local LAYOUT_MAIN = {
 			{
 				mobileOrder = 8,
 				content = CONTENT.usefulArticles,
+			},
+			{
+				mobileOrder = 9,
+				content = CONTENT.partnerWikis
 			},
 		}
 	}

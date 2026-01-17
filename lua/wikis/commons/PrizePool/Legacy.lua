@@ -39,7 +39,7 @@ local IS_SOLO = false
 LegacyPrizePool.BASE_CURRENCY = 'USD'
 
 ---@param dependency table<string, function>?
----@return Html
+---@return Widget
 function LegacyPrizePool.run(dependency)
 	local args = Template.retrieveReturnValues('LegacyPrizePool')
 	---@type table

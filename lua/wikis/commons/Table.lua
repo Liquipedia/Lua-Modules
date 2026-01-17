@@ -137,9 +137,10 @@ end
 ---options.reuseRef
 ---If a table reference exists at two locations in the input, then this option
 ---will allow the locations to share a reference in the output. Enabled by default.
----@param tbl_ table
+---@generic T:table
+---@param tbl_ T
 ---@param options? {copyMetatable: boolean, reuseRef: boolean}
----@return table
+---@return T
 function Table.deepCopy(tbl_, options)
 	options = options or {}
 	assert(type(tbl_) == 'table', 'Table.deepCopy: Input must be a table')

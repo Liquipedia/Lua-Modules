@@ -25,7 +25,7 @@ local NON_TIER_TYPE_INPUT = 'none'
 local TournamentsListingConditions = {}
 
 ---@param args table
----@return string
+---@return ConditionTree
 function TournamentsListingConditions.base(args)
 	local startDate = args.startdate or args.sdate
 	local endDate = args.enddate or args.edate
@@ -149,7 +149,7 @@ function TournamentsListingConditions.base(args)
 		conditions:add{excludeTiertypeConditions}
 	end
 
-	return conditions:toString()
+	return conditions
 end
 
 ---@param tournamentData table

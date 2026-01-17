@@ -130,7 +130,14 @@ Author(s): Elysienna, Nadox
 
 		&:hover {
 			color: #ffffff;
-			background-color: var( --clr-wiki-theme-primary, #1f3d7a );
+
+			.theme--light & {
+				background-color: var( --clr-wiki-theme-30, #0a558f );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-wiki-theme-40, #1f73c1 );
+			}
 
 			&::after {
 				opacity: 0.24;
