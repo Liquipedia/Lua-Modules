@@ -35,8 +35,8 @@ return {
 		-- Dates: Only startYear, startMonth known
 		['date-range-year-month'] = '${startMonth}, ${startYear}',
 		['date-range-year-month--unknown'] = '${startMonth}, ${startYear} - TBA',
-		['date-range-year-month--year-unkown_month'] = '${startMonth}, ${startYear} - TBA, ${endYear}',
-		['date-range-year-month--month'] = '${startMonth} - ${endYear}, ${startYear}',
+		['date-range-year-month--year-unknown_month'] = '${startMonth}, ${startYear} - TBA, ${endYear}',
+		['date-range-year-month--month'] = '${startMonth} - ${endMonth}, ${startYear}',
 		['date-range-year-month--year-month'] = '${startMonth}, ${startYear} - ${endMonth}, ${endYear}',
 
 		['date-range-year-month--unknown_month'] = '${startMonth} - TBA, ${startYear}',
