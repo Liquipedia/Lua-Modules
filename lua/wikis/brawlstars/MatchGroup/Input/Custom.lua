@@ -27,8 +27,10 @@ local FIRST_PICK_CONVERSION = {
 local DEFAULT_BESTOF_MATCH = 5
 local DEFAULT_BESTOF_MAP = 3
 
--- containers for process helper functions
+---@class BrawlstarsMatchParser: MatchParserInterface
 local MatchFunctions = {}
+
+---@class BrawlstarsMapParser: MapParserInterface
 local MapFunctions = {
 	BREAK_ON_EMPTY = true,
 }
