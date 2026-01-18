@@ -31,6 +31,7 @@ local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Tier = Lua.import('Module:Tier/Custom')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local DateRange = Lua.import('Module:Widget/Misc/DateRange')
 
 local DEFAULT_START_YEAR = Info.startYear
 local DEFAULT_END_YEAR = DateExt.getYearOf()
@@ -487,22 +488,7 @@ function BaseTournamentsListing._dateDisplay(startDate, endDate, status)
 		return 'Postponed'
 	end
 
-	if startDate == endDate then
-		return LANG:formatDate('M j, Y', startDate) --[[@as string]]
-	end
-
-	local startYear, startMonth = startDate:match('(%d+)-(%d+)-%d+')
-	local endYear, endMonth = endDate:match('(%d+)-(%d+)-%d+')
-
-	if startYear ~= endYear then
-		return LANG:formatDate('M j, Y', startDate) .. ' - ' .. LANG:formatDate('M j, Y', endDate)
-	end
-
-	if startMonth == endMonth then
-		return LANG:formatDate('M j', startDate) .. ' - ' .. LANG:formatDate('j, Y', endDate)
-	end
-
-	return LANG:formatDate('M j', startDate) .. ' - ' .. LANG:formatDate('M j, Y', endDate)
+	return tostring(DateRange{startDate = startDate, endDate = endDate, showYear = true})
 end
 
 ---@private
