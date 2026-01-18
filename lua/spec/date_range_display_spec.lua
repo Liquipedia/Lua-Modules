@@ -42,8 +42,8 @@ insulate('DateRange', function()
             'date range display',
             tostring(HtmlWidgets.Table{children=Array.map(data, function (entry)
                 return HtmlWidgets.Tr{children={
-                    HtmlWidgets.Td{children=mw.dumpObject(entry[1])},
-                    HtmlWidgets.Td{children=mw.dumpObject(entry[2])},
+                    HtmlWidgets.Td{children=mw.dumpObject(entry[1] or {})},
+                    HtmlWidgets.Td{children=mw.dumpObject(entry[2] or {})},
                     HtmlWidgets.Td{children=DateRange{startDate = entry[1], endDate = entry[2]}},
                 }}
             end)})
