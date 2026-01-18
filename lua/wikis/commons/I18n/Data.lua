@@ -66,6 +66,7 @@ return {
 		['date-range-month-day--day'] = '${startMonth} ${startDate} - ${endDate}',
 
 		['date-range-month-day--unknown'] = '${startMonth} ${startDate} - TBA',
+		['date-range-month-day--unknown_month'] = '${startMonth} ${startDate} - TBA',
 		['date-range-month-day--month-unknown_day'] = '${startMonth} ${startDate} - ${endMonth} TBA',
 		['date-range-month-day--month-day'] = '${startMonth} ${startDate} - ${endMonth} ${endDate}',
 
