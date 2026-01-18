@@ -57,6 +57,7 @@ return {
 		-- Dates: ticker variant (hidden years)
 		-- startMonth known
 		['date-range-month'] = '${startMonth}',
+		['date-range-month--unknown'] = '${startMonth} - TBA',
 		['date-range-month--unknown_month'] = '${startMonth} - TBA',
 		['date-range-month--month'] = '${startMonth} - ${endMonth}',
 

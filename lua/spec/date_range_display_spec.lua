@@ -1,6 +1,7 @@
 --- Triple Comment to Enable our LLS Plugin
 insulate('DateRange', function()
 	it('DateRange display test', function()
+        local Array = require('Module:Array')
 		local DateRange = require('Module:Widget/Misc/DateRange')
 		local HtmlWidgets = require('Module:Widget/Html/All')
 
@@ -12,31 +13,40 @@ insulate('DateRange', function()
         local end_ym = {year = 2024, month = 11}
         local end_ymd = {year = 2024, month = 11, day = 4}
 
-        local widgets = {
+        local data = {
             -- hideYear
-
             -- TBA display
-            DateRange{},
-            DateRange{startDate = start_y},
-            DateRange{startDate = start_y, endDate = end_y},
-            DateRange{endDate = end_ymd},
+            {},
+            {start_y, },
+            {start_y, end_y},
+            {nil, end_ymd},
 
             -- Month display
-            DateRange{startDate = start_ym},
-            DateRange{startDate = start_ym, endDate = end_ymd},
-            DateRange{startDate = start_ym, endDate = start_ym},
+            {start_ym},
+            {start_ym, end_ymd},
+            {start_ym, start_ym},
 
             -- Day display
-            DateRange{startDate = start_ymd},
-            DateRange{startDate = start_ymd, endDate = end_ym},
-            DateRange{startDate = start_ymd, endDate = {year = 2023, month = 10}},
-            DateRange{startDate = start_ymd, endDate = {year = 2023, month = 10, day = 04}},
-            DateRange{startDate = start_ymd, endDate = end_ymd},
-            DateRange{startDate = start_ymd, endDate = start_ymd},
+            {start_ymd},
+            {start_ymd, end_ym},
+            {start_ymd, {year = 2023, month = 10}},
+            {start_ymd, {year = 2023, month = 10, day = 04}},
+            {start_ymd, end_ymd},
+            {start_ymd, start_ymd},
 
             -- showYear
         }
 
-		GoldenTest('date range display', tostring(HtmlWidgets.Div{children=widgets}))
+
+		GoldenTest(
+            'date range display',
+            tostring(HtmlWidgets.Table{children=Array.map(data, function (entry)
+                return HtmlWidgets.Tr{children={
+                    HtmlWidgets.Td{children=mw.dumpObject(entry[1])},
+                    HtmlWidgets.Td{children=mw.dumpObject(entry[2])},
+                    HtmlWidgets.Td{children=DateRange{startDate = entry[1], endDate = entry[2]}},
+                }}
+            end)})
+        )
 	end)
 end)
