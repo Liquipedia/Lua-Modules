@@ -54,6 +54,9 @@ insulate('DateRange', function()
 		GoldenTest('date range display',
             tostring(HtmlWidgets.Table{
                 classes={'wikitable wikitable-striped'},
+                css={
+                    ['margin-top'] = '-80px'
+                },
                 children=Array.extend(
                     {
                         HtmlWidgets.Tr{children={
