@@ -63,7 +63,7 @@ insulate('DateRange', function()
                             HtmlWidgets.Tr{children={
                                 HtmlWidgets.Th{children="startDate"},
                                 HtmlWidgets.Th{children="endDate"},
-                                HtmlWidgets.Th{children="DateRange display"},
+                                HtmlWidgets.Th{children="DateRange (showYear)"},
                             }}
                         },
                         Array.map(dataShowYear, function (entry)
@@ -72,9 +72,9 @@ insulate('DateRange', function()
                                 HtmlWidgets.Td{children=dateDisplay(entry[2])},
                                 HtmlWidgets.Td{children=DateRange{
                                     startDate = entry[1],
-                                    endDate = entry[2]},
+                                    endDate = entry[2],
                                     showYear = true
-                                },
+                                }},
                             }}
                         end)
                     )
@@ -86,7 +86,7 @@ insulate('DateRange', function()
                             HtmlWidgets.Tr{children={
                                 HtmlWidgets.Th{children="startDate"},
                                 HtmlWidgets.Th{children="endDate"},
-                                HtmlWidgets.Th{children="DateRange display"},
+                                HtmlWidgets.Th{children="DateRange (!showYear)"},
                             }}
                         },
                         Array.map(dataHideYear, function (entry)
