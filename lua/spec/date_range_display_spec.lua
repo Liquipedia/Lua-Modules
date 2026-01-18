@@ -17,20 +17,26 @@ insulate('DateRange', function()
             -- TBA display
             {},
             {start_y, },
+            {start_ym, },
+            {start_ymd, },
+
+            {nil, end_y},
             {start_y, end_y},
-            {nil, end_ymd},
+            {start_ym, end_y},
+            {start_ymd, end_y},
 
-            -- Month display
-            {start_ym},
-            {start_ym, end_ymd},
-            {start_ym, start_ym},
-
-            -- Day display
-            {start_ymd},
+            {nil, end_ym},
+            {start_y, end_ym},
+            {start_ym, end_ym},
             {start_ymd, end_ym},
+
+            {nil, end_ymd},
+            {start_y, end_ymd},
+            {start_ym, end_ymd},
+            {start_ymd, end_ymd},
+
             {start_ymd, {year = 2023, month = 10}},
             {start_ymd, {year = 2023, month = 10, day = 04}},
-            {start_ymd, end_ymd},
             {start_ymd, start_ymd},
         }
 
@@ -40,11 +46,12 @@ insulate('DateRange', function()
             end
             return (date.year or '????') .. '-'
                 .. (date.month or '??') .. '-'
-                .. (date.day or '??')
+                .. (date.day and (
+                    (date.day < 10 and 0 or '') .. date.day
+                ) or '??')
         end
 
-		GoldenTest(
-            'date range display',
+		GoldenTest('date range display',
             tostring(HtmlWidgets.Table{
                 classes={'wikitable wikitable-striped'},
                 children=Array.extend(
