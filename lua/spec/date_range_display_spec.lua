@@ -52,41 +52,39 @@ insulate('DateRange', function()
         end
 
 		GoldenTest('date range display',
-            tostring(
-                -- Use the full size of the page for this
-                '<style>#top {padding: unset}</style>' ..
-                HtmlWidgets.Table{
-                    classes={'wikitable wikitable-striped'},
-                    css={
-                        ['margin-top'] = '-80px'
+            -- Use the full size of the page for this
+            '<style>#top {padding: unset}</style>' ..
+            tostring(HtmlWidgets.Table{
+                classes={'wikitable wikitable-striped'},
+                css={
+                    ['margin-top'] = '-80px'
+                },
+                children=Array.extend(
+                    {
+                        HtmlWidgets.Tr{children={
+                            HtmlWidgets.Th{children="startDate"},
+                            HtmlWidgets.Th{children="endDate"},
+                            HtmlWidgets.Th{children="DateRange (showYear)"},
+                            HtmlWidgets.Th{children="DateRange (not showYear)"},
+                        }}
                     },
-                    children=Array.extend(
-                        {
-                            HtmlWidgets.Tr{children={
-                                HtmlWidgets.Th{children="startDate"},
-                                HtmlWidgets.Th{children="endDate"},
-                                HtmlWidgets.Th{children="DateRange (showYear)"},
-                                HtmlWidgets.Th{children="DateRange (not showYear)"},
-                            }}
-                        },
-                        Array.map(data, function (entry)
-                            return HtmlWidgets.Tr{children={
-                                HtmlWidgets.Td{children=dateDisplay(entry[1])},
-                                HtmlWidgets.Td{children=dateDisplay(entry[2])},
-                                HtmlWidgets.Td{children=DateRange{
-                                    startDate = entry[1],
-                                    endDate = entry[2],
-                                    showYear = true
-                                }},
-                                HtmlWidgets.Td{children=DateRange{
-                                    startDate = entry[1],
-                                    endDate = entry[2],
-                                }},
-                            }}
-                        end)
-                    )
-                }
-            )
+                    Array.map(data, function (entry)
+                        return HtmlWidgets.Tr{children={
+                            HtmlWidgets.Td{children=dateDisplay(entry[1])},
+                            HtmlWidgets.Td{children=dateDisplay(entry[2])},
+                            HtmlWidgets.Td{children=DateRange{
+                                startDate = entry[1],
+                                endDate = entry[2],
+                                showYear = true
+                            }},
+                            HtmlWidgets.Td{children=DateRange{
+                                startDate = entry[1],
+                                endDate = entry[2],
+                            }},
+                        }}
+                    end)
+                )
+            })
         )
 	end)
 end)
