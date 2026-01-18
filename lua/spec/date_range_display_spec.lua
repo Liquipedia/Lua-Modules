@@ -70,7 +70,11 @@ insulate('DateRange', function()
                             return HtmlWidgets.Tr{children={
                                 HtmlWidgets.Td{children=dateDisplay(entry[1])},
                                 HtmlWidgets.Td{children=dateDisplay(entry[2])},
-                                HtmlWidgets.Td{children=DateRange{startDate = entry[1], endDate = entry[2]}, showYear = true},
+                                HtmlWidgets.Td{children=DateRange{
+                                    startDate = entry[1],
+                                    endDate = entry[2]},
+                                    showYear = true
+                                },
                             }}
                         end)
                     )
@@ -89,7 +93,10 @@ insulate('DateRange', function()
                             return HtmlWidgets.Tr{children={
                                 HtmlWidgets.Td{children=dateDisplay(entry[1])},
                                 HtmlWidgets.Td{children=dateDisplay(entry[2])},
-                                HtmlWidgets.Td{children=DateRange{startDate = entry[1], endDate = entry[2]}},
+                                HtmlWidgets.Td{children=DateRange{
+                                    startDate = entry[1],
+                                    endDate = entry[2]
+                                }},
                             }}
                         end)
                     )
