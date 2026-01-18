@@ -13,15 +13,7 @@ insulate('DateRange', function()
         local end_ym = {year = 2024, month = 11}
         local end_ymd = {year = 2024, month = 11, day = 4}
 
-        local dataShowYear = {
-            {},
-            {start_y, },
-            {start_y, end_y},
-            {nil, end_y},
-        }
-
-        local dataHideYear = {
-            -- hideYear
+        local data = {
             -- TBA display
             {},
             {start_y, },
@@ -40,8 +32,6 @@ insulate('DateRange', function()
             {start_ymd, {year = 2023, month = 10, day = 04}},
             {start_ymd, end_ymd},
             {start_ymd, start_ymd},
-
-            -- showYear
         }
 
         local function dateDisplay(date)
@@ -55,54 +45,34 @@ insulate('DateRange', function()
 
 		GoldenTest(
             'date range display',
-            tostring(HtmlWidgets.Div{children={
-                HtmlWidgets.Table{
-                    classes={'wikitable wikitable-striped'},
-                    children=Array.extend(
-                        {
-                            HtmlWidgets.Tr{children={
-                                HtmlWidgets.Th{children="startDate"},
-                                HtmlWidgets.Th{children="endDate"},
-                                HtmlWidgets.Th{children="DateRange (showYear)"},
-                            }}
-                        },
-                        Array.map(dataShowYear, function (entry)
-                            return HtmlWidgets.Tr{children={
-                                HtmlWidgets.Td{children=dateDisplay(entry[1])},
-                                HtmlWidgets.Td{children=dateDisplay(entry[2])},
-                                HtmlWidgets.Td{children=DateRange{
-                                    startDate = entry[1],
-                                    endDate = entry[2],
-                                    showYear = true
-                                }},
-                            }}
-                        end)
-                    )
-                },
-                HtmlWidgets.Table{
-                    classes={'wikitable wikitable-striped'},
-                    children=Array.extend(
-                        {
-                            HtmlWidgets.Tr{children={
-                                HtmlWidgets.Th{children="startDate"},
-                                HtmlWidgets.Th{children="endDate"},
-                                HtmlWidgets.Th{children="DateRange (!showYear)"},
-                            }}
-                        },
-                        Array.map(dataHideYear, function (entry)
-                            return HtmlWidgets.Tr{children={
-                                HtmlWidgets.Td{children=dateDisplay(entry[1])},
-                                HtmlWidgets.Td{children=dateDisplay(entry[2])},
-                                HtmlWidgets.Td{children=DateRange{
-                                    startDate = entry[1],
-                                    endDate = entry[2]
-                                }},
-                            }}
-                        end)
-                    )
-                },
-            }}
-            )
+            tostring(HtmlWidgets.Table{
+                classes={'wikitable wikitable-striped'},
+                children=Array.extend(
+                    {
+                        HtmlWidgets.Tr{children={
+                            HtmlWidgets.Th{children="startDate"},
+                            HtmlWidgets.Th{children="endDate"},
+                            HtmlWidgets.Th{children="DateRange (showYear)"},
+                            HtmlWidgets.Th{children="DateRange (not showYear)"},
+                        }}
+                    },
+                    Array.map(data, function (entry)
+                        return HtmlWidgets.Tr{children={
+                            HtmlWidgets.Td{children=dateDisplay(entry[1])},
+                            HtmlWidgets.Td{children=dateDisplay(entry[2])},
+                            HtmlWidgets.Td{children=DateRange{
+                                startDate = entry[1],
+                                endDate = entry[2],
+                                showYear = true
+                            }},
+                            HtmlWidgets.Td{children=DateRange{
+                                startDate = entry[1],
+                                endDate = entry[2],
+                            }},
+                        }}
+                    end)
+                )
+            })
         )
 	end)
 end)
