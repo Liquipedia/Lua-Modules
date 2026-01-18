@@ -56,9 +56,6 @@ insulate('DateRange', function()
 			'<style>#top {padding: unset}</style>' ..
 			tostring(HtmlWidgets.Table{
 				classes={'wikitable wikitable-striped'},
-				css={
-					['margin-top'] = '-80px'
-				},
 				children=Array.extend(
 					{
 						HtmlWidgets.Tr{children={
