@@ -13,7 +13,14 @@ insulate('DateRange', function()
         local end_ym = {year = 2024, month = 11}
         local end_ymd = {year = 2024, month = 11, day = 4}
 
-        local data = {
+        local dataShowYear = {
+            {},
+            {start_y, },
+            {start_y, end_y},
+            {nil, end_y},
+        }
+
+        local dataHideYear = {
             -- hideYear
             -- TBA display
             {},
@@ -37,28 +44,58 @@ insulate('DateRange', function()
             -- showYear
         }
 
+        local function dateDisplay(date)
+            if not date then
+                return ''
+            end
+            return (date.year or '????') .. '-'
+                .. (date.month or '??') .. '-'
+                .. (date.day or '??')
+        end
 
 		GoldenTest(
             'date range display',
-            tostring(HtmlWidgets.Table{
-                classes={'wikitable wikitable-striped'},
-                children=Array.extend(
-                    {
-                        HtmlWidgets.Tr{children={
-                            HtmlWidgets.Th{children="startDate"},
-                            HtmlWidgets.Th{children="endDate"},
-                            HtmlWidgets.Th{children="DateRange display"},
-                        }}
-                    },
-                    Array.map(data, function (entry)
-                        return HtmlWidgets.Tr{children={
-                            HtmlWidgets.Td{children=mw.dumpObject(entry[1] or {})},
-                            HtmlWidgets.Td{children=mw.dumpObject(entry[2] or {})},
-                            HtmlWidgets.Td{children=DateRange{startDate = entry[1], endDate = entry[2]}},
-                        }}
-                    end)
-                )
-            })
+            tostring(HtmlWidgets.Div{children={
+                HtmlWidgets.Table{
+                    classes={'wikitable wikitable-striped'},
+                    children=Array.extend(
+                        {
+                            HtmlWidgets.Tr{children={
+                                HtmlWidgets.Th{children="startDate"},
+                                HtmlWidgets.Th{children="endDate"},
+                                HtmlWidgets.Th{children="DateRange display"},
+                            }}
+                        },
+                        Array.map(dataShowYear, function (entry)
+                            return HtmlWidgets.Tr{children={
+                                HtmlWidgets.Td{children=dateDisplay(entry[1])},
+                                HtmlWidgets.Td{children=dateDisplay(entry[2])},
+                                HtmlWidgets.Td{children=DateRange{startDate = entry[1], endDate = entry[2]}, showYear = true},
+                            }}
+                        end)
+                    )
+                },
+                HtmlWidgets.Table{
+                    classes={'wikitable wikitable-striped'},
+                    children=Array.extend(
+                        {
+                            HtmlWidgets.Tr{children={
+                                HtmlWidgets.Th{children="startDate"},
+                                HtmlWidgets.Th{children="endDate"},
+                                HtmlWidgets.Th{children="DateRange display"},
+                            }}
+                        },
+                        Array.map(dataHideYear, function (entry)
+                            return HtmlWidgets.Tr{children={
+                                HtmlWidgets.Td{children=dateDisplay(entry[1])},
+                                HtmlWidgets.Td{children=dateDisplay(entry[2])},
+                                HtmlWidgets.Td{children=DateRange{startDate = entry[1], endDate = entry[2]}},
+                            }}
+                        end)
+                    )
+                },
+            }}
+            )
         )
 	end)
 end)
