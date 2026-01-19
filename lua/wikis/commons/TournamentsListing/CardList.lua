@@ -313,7 +313,7 @@ function BaseTournamentsListing:_row(tournamentData)
 
 	local dateCell = row:tag('div')
 		:addClass('gridCell EventDetails Date Header')
-		:wikitext(BaseTournamentsListing._dateDisplay(tournamentData.startdate, tournamentData.enddate, status))
+		:node(BaseTournamentsListing._dateDisplay(tournamentData.startdate, tournamentData.enddate, status))
 
 	if status == POSTPONED or status == DELAYED then
 		dateCell
@@ -482,13 +482,13 @@ end
 ---@param startDate string
 ---@param endDate string
 ---@param status string?
----@return string
+---@return Widget|string
 function BaseTournamentsListing._dateDisplay(startDate, endDate, status)
 	if status == POSTPONED or status == DELAYED then
 		return 'Postponed'
 	end
 
-	return tostring(DateRange{startDate = startDate, endDate = endDate, showYear = true})
+	return DateRange{startDate = startDate, endDate = endDate, showYear = true}
 end
 
 ---@private
