@@ -50,20 +50,21 @@ local function normalizeAndValidateShopLink(shopLink)
 	end
 	---@cast shopLink -nil
 
-	assert(#shopLink <= MAX_URL_LENGTH, 'shoplink too long')
-
 	shopLink = shopLink:gsub('^/+', '')
 
 	-- Security: Reject anything that looks like a full URL or contains forbidden characters.
 	assert(not shopLink:find('://'), 'shoplink should only be a slug, not a full URL')
-	assert(not shopLink:find('^//'), 'shoplink should only be a slug, not a protocol-relative URL')
 	assert(not shopLink:find('[%[%]%s<>\"]'), 'shoplink contains forbidden characters')
 	assert(
 		not shopLink:find(TARGET_HOST, 1, true),
 		'shoplink should only be a slug, do not include "' .. TARGET_HOST .. '"'
 	)
 
-	return 'https://' .. TARGET_HOST .. '/' .. shopLink
+	local uri = mw.uri.new('https://' .. TARGET_HOST .. '/' .. shopLink)
+	local url = tostring(uri)
+	assert(#url <= MAX_URL_LENGTH, 'shoplink too long')
+
+	return url
 end
 
 ---@return Widget[]?
