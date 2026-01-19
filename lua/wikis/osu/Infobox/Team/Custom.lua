@@ -28,7 +28,7 @@ end
 
 ---@return Html|string
 function CustomTeam:createBottomContent()
-	return PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}
+	return PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}}
 end
 
 return CustomTeam
