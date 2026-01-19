@@ -9,6 +9,7 @@ return {
 	team_tbd = 'far fa-users',
 	notification = 'fas fa-info-circle',
 	external_link = 'fas fa-external-link-alt',
+	internal_link = 'fad fa-link',
 
 	-- Usage: Different ways to see data
 	schedule = 'far fa-table',
