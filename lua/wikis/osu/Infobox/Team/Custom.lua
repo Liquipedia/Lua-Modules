@@ -12,8 +12,6 @@ local PlacementStats = Lua.import('Module:InfoboxPlacementStats')
 
 local Team = Lua.import('Module:Infobox/Team')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-
 ---@class OsuInfoboxTeam: InfoboxTeam
 ---@operator call(Frame): OsuInfoboxTeam
 local CustomTeam = Class.new(Team)
