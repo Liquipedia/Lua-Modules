@@ -272,7 +272,7 @@ end
 ---Default getByMatchId function for usage in Custom MatchSummary
 ---@param CustomMatchSummary table
 ---@param args table
----@param options {teamStyle:teamStyle?, width: fun(MatchGroupUtilMatch):string?|string?, noScore:boolean?}?
+---@param options {teamStyle:teamStyle?, width: (fun(match: MatchGroupUtilMatch):string?)|string?, noScore:boolean?}?
 ---@return Widget
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(
@@ -285,7 +285,7 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	local match, bracketResetMatch = MatchGroupUtil.fetchMatchForBracketDisplay(
 		args.bracketId, args.matchId)
 
-	---@type fun(MatchGroupUtilMatch):string?|string|integer?
+	---@type (fun(match: MatchGroupUtilMatch):string?)|string|integer?
 	local width = options.width or args.width
 	if type(width) == 'function' then
 		width = width(match)
