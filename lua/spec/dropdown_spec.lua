@@ -40,7 +40,6 @@ describe('Dropdown', function()
 			}
 		}
 		local html = tostring(widget)
-		assert.truthy(html:find('dropdown%-widget__item%-icon'))
 		assert.truthy(html:find('fa%-home'))
 	end)
 

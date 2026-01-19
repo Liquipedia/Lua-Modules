@@ -12,7 +12,6 @@ local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Span = HtmlWidgets.Span
 local Div = HtmlWidgets.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
@@ -42,15 +41,9 @@ function DropdownItem:render()
 		else
 			iconWidget = self.props.icon
 		end
-		table.insert(content, Span{
-			classes = {'dropdown-widget__item-icon'},
-			children = {iconWidget}
-		})
+		table.insert(content, iconWidget)
 	end
-	table.insert(content, Span{
-		classes = {'dropdown-widget__item-text'},
-		children = {self.props.text}
-	})
+	table.insert(content, self.props.text)
 
 	local item = Div{
 		classes = Array.extend({'dropdown-widget__item'}, self.props.classes or {}),
