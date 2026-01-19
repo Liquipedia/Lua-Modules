@@ -26,13 +26,9 @@ function CustomTeam.run(frame)
 	return team:createInfobox()
 end
 
----@return Widget
+---@return Html|string
 function CustomTeam:createBottomContent()
-	if not self.args.disbanded then
-		return HtmlWidgets.Fragment{children = {
-			PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}}
-		}}
-	end
+	return PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}
 end
 
 return CustomTeam
