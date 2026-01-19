@@ -17,6 +17,8 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 ---@class OsuInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
 
+---@param frame Frame
+---@return Widget
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 
