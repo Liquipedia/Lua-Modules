@@ -104,7 +104,7 @@ local function parseQualifier(input)
 	end
 
 	if (qualificationType == 'external' or qualificationType == 'other') and not qualificationStructure.text then
-		error('External qualifier must have text')
+		error('External or non-tournament qualifier must have text')
 	end
 
 	if input.placement then
