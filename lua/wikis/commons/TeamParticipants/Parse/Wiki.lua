@@ -95,6 +95,7 @@ local function parseQualifier(input)
 		local tournament = Tournament.getTournament(tournamentPage)
 		if not tournament then
 			qualificationStructure.type = 'other'
+			qualificationStructure.page = input.page
 		else
 			qualificationStructure.tournament = tournament
 		end
