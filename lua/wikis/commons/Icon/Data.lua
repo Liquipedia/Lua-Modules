@@ -238,6 +238,7 @@ return {
 	finished_race = 'fas fa-flag-checkered',
 
 	-- Usage: Export functions
-	copy = 'fas fa-copy',
+	share = 'fas fa-share-nodes',
+	copy = 'fas fa-clone',
 	download = 'fas fa-download'
 }

@@ -16,9 +16,9 @@ local Button = Lua.import('Module:Widget/Basic/Button')
 local Div = HtmlWidgets.Div
 
 ---@class DropdownWidgetParameters
----@field button any -- The content of the toggle button
----@field content Widget|string|table -- The dropdown content
----@field classes table? -- Custom classes for the wrapper
+---@field button any
+---@field content Widget|string|table
+---@field classes table?
 
 ---@class DropdownWidget: Widget
 ---@operator call(DropdownWidgetParameters): DropdownWidget
