@@ -1,13 +1,10 @@
 /*******************************************************************************
  * Template(s): Dropdown
- * Author(s): Liquipedia
  ******************************************************************************/
 liquipedia.dropdown = {
 	init: function() {
 		document.addEventListener( 'click', ( e ) => {
-			const isDropdownButton =
-				e.target.matches( '[data-dropdown-toggle]' ) ||
-				e.target.closest( '[data-dropdown-toggle]' );
+			const isDropdownButton = e.target.closest( '[data-dropdown-toggle]' );
 			const dropdownWidget = isDropdownButton ? isDropdownButton.closest( '.dropdown-widget' ) : null;
 			let currentMenu;
 

@@ -14,25 +14,37 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Span = HtmlWidgets.Span
 local Div = HtmlWidgets.Div
+local Link = Lua.import('Module:Widget/Basic/Link')
+local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class DropdownItemWidgetParameters
----@field icon string?
+---@field icon string|Widget?
 ---@field text string
 ---@field link string?
+---@field linktype 'internal'|'external'|nil
 ---@field classes table?
 ---@field attributes table?
 
 ---@class DropdownItemWidget: Widget
 ---@operator call(DropdownItemWidgetParameters): DropdownItemWidget
 local DropdownItem = Class.new(Widget)
+DropdownItem.defaultProps = {
+	linktype = 'internal',
+}
 
 ---@return Widget
 function DropdownItem:render()
 	local content = {}
 	if self.props.icon then
+		local iconWidget
+		if type(self.props.icon) == 'string' then
+			iconWidget = Icon{iconName = self.props.icon, size = 'sm'}
+		else
+			iconWidget = self.props.icon
+		end
 		table.insert(content, Span{
 			classes = {'dropdown-widget__item-icon'},
-			children = {self.props.icon}
+			children = {iconWidget}
 		})
 	end
 	table.insert(content, Span{
@@ -47,10 +59,14 @@ function DropdownItem:render()
 	}
 
 	if self.props.link then
-		local Link = Lua.import('Module:Widget/Basic/Link')
-		return Link{
-			link = self.props.link,
-			children = {item}
+		return Div{
+			children = {
+				Link{
+					link = self.props.link,
+					linktype = self.props.linktype,
+					children = {item}
+				}
+			}
 		}
 	end
 

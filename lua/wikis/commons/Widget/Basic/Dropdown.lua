@@ -27,6 +27,7 @@ local Dropdown = Class.new(Widget)
 ---@return Widget
 function Dropdown:render()
 	local toggleButton = Button{
+		size = 'xs',
 		variant = 'ghost',
 		classes = {'dropdown-widget__toggle'},
 		attributes = {['data-dropdown-toggle'] = 'true'},
