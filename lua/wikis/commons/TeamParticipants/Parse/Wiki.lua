@@ -103,7 +103,7 @@ local function parseQualifier(input)
 		qualificationStructure.url = input.url
 	end
 
-	if qualificationType == 'external' and not qualificationStructure.text then
+	if (qualificationType == 'external' or qualificationType == 'other') and not qualificationStructure.text then
 		error('External qualifier must have text')
 	end
 
