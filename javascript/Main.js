@@ -16,6 +16,7 @@ const jsModules = [
 	'Countdown',
 	'Crosstable',
 	'Dropdown',
+	'Dialog',
 	'FilterButtons',
 	'Liquipedia_links',
 	'Mainpage',

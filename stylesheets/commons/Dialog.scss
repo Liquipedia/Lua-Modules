@@ -1,0 +1,42 @@
+/*******************************************************************************
+Template(s): General dialog
+*******************************************************************************/
+
+.general-dialog {
+	display: inline-block;
+
+	&-trigger {
+		display: inline-block;
+	}
+
+	&-wrapper,
+	&-title {
+		display: none;
+	}
+}
+
+div.general-dialog-container {
+	display: flex;
+	flex-flow: column nowrap;
+	border: 1px solid #bbbbbb;
+	background-color: #ffffff;
+	border-radius: 0.5rem;
+	box-shadow: 0 0.0625rem 0.25rem 0 var( --clr-on-surface-dark-primary-12 );
+	width: fit-content !important;
+	max-width: 100vw;
+	max-height: 100vh;
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+		border-color: var( --clr-on-surface-dark-primary-8 );
+		color-scheme: dark;
+	}
+
+	@media ( max-width: 435px ) {
+		max-height: 80vh;
+	}
+
+	@media ( min-width: 1320px ) {
+		max-width: calc( min( 2160px, 100vw ) - 320px - 1rem );
+	}
+}
