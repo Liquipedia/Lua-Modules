@@ -20,7 +20,7 @@ local Div = HtmlWidgets.Div
 ---@field analyticsProperties table<string, string>?
 ---@field classes string[]?
 ---@field children (Widget|Html|string|number|nil)[]|(Widget|Html|string|number|nil)?
----@field css table<string, string|integer?>
+---@field css table<string, string|integer?>?
 
 ---@class AnalyticsWidget: Widget
 ---@operator call(AnalyticsWidgetParameters): AnalyticsWidget
