@@ -119,12 +119,12 @@ function DateRange:render()
 	} or nil
 
 	local dateData = {
-		startYear = calculatingStartDate and DateExt.getYearOf(calculatingStartDate) or nil,
-		startMonth = calculatingStartDate and DateExt.getMonthOf(calculatingStartDate) or nil,
-		startDate = calculatingStartDate and DateExt.getDayOf(calculatingStartDate) or nil,
-		endYear = calculatingEndDate and DateExt.getYearOf(calculatingEndDate) or nil,
-		endMonth = calculatingEndDate and DateExt.getMonthOf(calculatingEndDate) or nil,
-		endDate = calculatingEndDate and DateExt.getDayOf(calculatingEndDate) or nil,
+		startYear = calculatingStartDate and os.date('%Y', os.time(calculatingStartDate)) or nil,
+		startMonth = calculatingStartDate and os.date('%b', os.time(calculatingStartDate)) or nil,
+		startDate = calculatingStartDate and os.date('%d', os.time(calculatingStartDate)) or nil,
+		endYear = calculatingEndDate and os.date('%Y', os.time(calculatingEndDate)) or nil,
+		endMonth = calculatingEndDate and os.date('%b', os.time(calculatingEndDate)) or nil,
+		endDate = calculatingEndDate and os.date('%d', os.time(calculatingEndDate)) or nil,
 	}
 
 	local translateString = determineTranslateString(startDate, endDate, self.props.showYear)
