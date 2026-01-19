@@ -37,45 +37,33 @@ local SHOP_DEFAULT_ICON = 'shopping_bag'
 local SHOP_DEFAULT_TEXT = 'Shop Official Team Liquid Gear'
 
 
----Only allow `https://links.liquipedia.net/...` (and scheme-less `links.liquipedia.net/...` inputs).
----Allows query parameters (e.g. UTM) and fragments.
+---Only allow slugs for `https://links.liquipedia.net/...`.
 ---@param shopLink string?
 ---@return string? normalizedUrl
 local function normalizeAndValidateShopLink(shopLink)
 	if String.isEmpty(shopLink) then
 		return nil
 	end
+
+	if Logic.readBool(shopLink) then
+		return SHOP_DEFAULT_LINK
+	end
 	---@cast shopLink -nil
 
-	shopLink = String.trim(shopLink)
+	assert(#shopLink <= MAX_URL_LENGTH, 'shoplink too long')
 
-	if #shopLink > MAX_URL_LENGTH then
-		return nil
-	end
+	shopLink = shopLink:gsub('^/+', '')
 
-	if not shopLink:find('^https://') then
-		if shopLink:find('^' .. TARGET_HOST:gsub('%.', '%%.')) then
-			shopLink = 'https://' .. shopLink
-		else
-			return nil
-		end
-	end
+	-- Security: Reject anything that looks like a full URL or contains forbidden characters.
+	assert(not shopLink:find('://'), 'shoplink should only be a slug, not a full URL')
+	assert(not shopLink:find('^//'), 'shoplink should only be a slug, not a protocol-relative URL')
+	assert(not shopLink:find('[%[%]%s<>\"]'), 'shoplink contains forbidden characters')
+	assert(
+		not shopLink:find(TARGET_HOST, 1, true),
+		'shoplink should only be a slug, do not include "' .. TARGET_HOST .. '"'
+	)
 
-	local uri = mw.uri.new(shopLink)
-
-	if not mw.uri.validate(uri) then
-		return nil
-	end
-
-	if uri.protocol ~= 'https' then
-		return nil
-	end
-
-	if uri.host ~= TARGET_HOST then
-		return nil
-	end
-
-	return tostring(uri)
+	return 'https://' .. TARGET_HOST .. '/' .. shopLink
 end
 
 ---@return Widget[]?
@@ -87,7 +75,7 @@ function ShopMerch:render()
 		return
 	end
 
-	local shopLink = normalizeAndValidateShopLink(Logic.readBool(rawShopLink) and SHOP_DEFAULT_LINK or rawShopLink)
+	local shopLink = normalizeAndValidateShopLink(rawShopLink)
 	if not shopLink then
 		return
 	end
