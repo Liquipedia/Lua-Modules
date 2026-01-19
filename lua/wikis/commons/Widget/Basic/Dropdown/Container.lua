@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Basic/Dropdown
+-- page=Module:Widget/Basic/Dropdown/Container
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -15,17 +15,17 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local Div = HtmlWidgets.Div
 
----@class DropdownWidgetParameters
+---@class DropdownContainerWidgetParameters
 ---@field button any
 ---@field content Widget|string|table
 ---@field classes table?
 
----@class DropdownWidget: Widget
----@operator call(DropdownWidgetParameters): DropdownWidget
-local Dropdown = Class.new(Widget)
+---@class DropdownContainerWidget: Widget
+---@operator call(DropdownContainerWidgetParameters): DropdownContainerWidget
+local DropdownContainer = Class.new(Widget)
 
 ---@return Widget
-function Dropdown:render()
+function DropdownContainer:render()
 	local toggleButton = Button{
 		size = 'xs',
 		variant = 'ghost',
@@ -46,4 +46,4 @@ function Dropdown:render()
 	}
 end
 
-return Dropdown
+return DropdownContainer

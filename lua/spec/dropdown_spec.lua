@@ -1,6 +1,6 @@
 local Lua = require('Module:Lua')
-local Dropdown = Lua.import('Module:Widget/Basic/Dropdown')
-local DropdownItem = Lua.import('Module:Widget/Basic/DropdownItem')
+local Dropdown = Lua.import('Module:Widget/Basic/Dropdown/Container')
+local DropdownItem = Lua.import('Module:Widget/Basic/Dropdown/Item')
 
 describe('Dropdown', function()
 	it('should render a basic dropdown wrapper', function()
