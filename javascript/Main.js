@@ -15,6 +15,7 @@ const jsModules = [
 	'CopyToClipboard',
 	'Countdown',
 	'Crosstable',
+	'Dropdown',
 	'FilterButtons',
 	'Liquipedia_links',
 	'Mainpage',
