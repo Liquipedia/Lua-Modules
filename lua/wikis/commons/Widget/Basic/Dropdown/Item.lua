@@ -26,6 +26,7 @@ local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class DropdownItemWidget: Widget
 ---@operator call(DropdownItemWidgetParameters): DropdownItemWidget
+---@field props DropdownItemWidgetParameters
 local DropdownItem = Class.new(Widget)
 DropdownItem.defaultProps = {
 	linktype = 'internal',
