@@ -44,7 +44,9 @@ function TeamParticipantsController.fromTemplate(frame)
 	end
 	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
 	return TeamParticipantsDisplay{
-		participants = parsedData.participants
+		participants = parsedData.participants,
+		-- only allow true to disallow input from wiki
+		suppressSwitch = args.suppressSwitch == true,
 	}
 end
 

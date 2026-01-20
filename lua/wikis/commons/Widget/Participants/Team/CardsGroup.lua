@@ -15,7 +15,8 @@ local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local ParticipantsTeamCard = Lua.import('Module:Widget/Participants/Team/Card')
-local Switch = Lua.import('Module:Widget/Switch')
+local ParticipantsTeamCardSwitch = Lua.import('Module:Widget/Participants/Team/Switch')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ParticipantsTeamCardsGroup: Widget
 ---@operator call(table): ParticipantsTeamCardsGroup
@@ -30,35 +31,8 @@ function ParticipantsTeamCardsGroup:render()
 
 	return Div{
 		classes = { 'team-participant' },
-		children = {
-			Div{
-				classes = { 'team-participant__switches' },
-				children = {
-					AnalyticsWidget{
-						analyticsName = 'ParticipantsShowRostersSwitch',
-						analyticsProperties = {
-							['track-value-as'] = 'participants show rosters',
-						},
-						children = Switch{
-							label = 'Show rosters',
-							switchGroup = 'team-cards-show-rosters',
-							defaultActive = false,
-							collapsibleSelector = '.team-participant-card',
-						},
-					},
-					AnalyticsWidget{
-						analyticsName = 'ParticipantsCompactSwitch',
-						analyticsProperties = {
-							['track-value-as'] = 'participants compact',
-						},
-						children = Switch{
-							label = 'Compact view',
-							switchGroup = 'team-cards-compact',
-							defaultActive = true,
-						},
-					}
-				}
-			},
+		children = WidgetUtil.collect(
+			(not self.props.suppressSwitch) and ParticipantsTeamCardSwitch() or nil,
 			AnalyticsWidget{
 				analyticsName = 'Team participants card',
 				children = Div{
@@ -70,7 +44,7 @@ function ParticipantsTeamCardsGroup:render()
 					end),
 				}
 			}
-		}
+		)
 	}
 end
 
