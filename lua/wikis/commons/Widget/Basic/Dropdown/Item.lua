@@ -51,19 +51,19 @@ function DropdownItem:render()
 		children = content
 	}
 
-	if self.props.link then
-		return Div{
-			children = {
-				Link{
-					link = self.props.link,
-					linktype = self.props.linktype,
-					children = {item}
-				}
-			}
-		}
+	if not self.props.link then
+		return item
 	end
 
-	return item
+	return Div{
+		children = {
+			Link{
+				link = self.props.link,
+				linktype = self.props.linktype,
+				children = {item}
+			}
+		}
+	}
 end
 
 return DropdownItem

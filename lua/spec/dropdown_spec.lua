@@ -6,7 +6,7 @@ describe('Dropdown', function()
 	it('should render a basic dropdown wrapper', function()
 		local widget = Dropdown{
 			button = 'Click me',
-			content = 'Menu content'
+			children = 'Menu children'
 		}
 		local html = tostring(widget)
 		assert.truthy(html:find('dropdown%-widget'))
@@ -18,7 +18,7 @@ describe('Dropdown', function()
 	it('should render dropdown items', function()
 		local widget = Dropdown{
 			button = 'Actions',
-			content = {
+			children = {
 				DropdownItem{text = 'Option 1'},
 				DropdownItem{text = 'Option 2', link = 'TargetPage'}
 			}
@@ -32,7 +32,7 @@ describe('Dropdown', function()
 	it('should render dropdown items with icons using fontawesome icon names', function()
 		local widget = Dropdown{
 			button = 'Menu',
-			content = {
+			children = {
 				DropdownItem{
 					text = 'Home',
 					icon = 'projecthome'
@@ -46,7 +46,7 @@ describe('Dropdown', function()
 	it('should render dropdown items with external links', function()
 		local widget = Dropdown{
 			button = 'External',
-			content = {
+			children = {
 				DropdownItem{
 					text = 'External Link',
 					link = 'https://liquipedia.net',
@@ -62,7 +62,7 @@ describe('Dropdown', function()
 	it('should render dropdown items with attributes', function()
 		local widget = Dropdown{
 			button = 'Actions',
-			content = {
+			children = {
 				DropdownItem{
 					text = 'Action',
 					attributes = {['data-action'] = 'test'}
