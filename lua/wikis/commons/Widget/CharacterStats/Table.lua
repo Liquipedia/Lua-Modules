@@ -159,7 +159,7 @@ function CharacterStatsTable:_buildCharacterRow(characterData, characterIndex)
 				trigger = Button{
 					children = 'Show',
 					variant = 'secondary',
-					size = 'sm',
+					size = 'xs',
 				},
 				title = CharacterIcon.Icon{
 					character = characterData.name,
