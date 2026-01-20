@@ -8,7 +8,9 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local String = Lua.import('Module:StringUtils')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Widget = Lua.import('Module:Widget')
@@ -21,21 +23,47 @@ local Div = HtmlWidgets.Div
 ---@operator call(table): ParticipantsTeamHeader
 local ParticipantsTeamHeader = Class.new(Widget)
 
+---@return Widget
 function ParticipantsTeamHeader:render()
-    local participant = self.props.participant
+	local participant = self.props.participant
 	local labelDiv = self:_renderLabel(participant)
 
-	local opponentDisplay = OpponentDisplay.BlockOpponent{
-		opponent = participant.opponent,
-		teamStyle = 'standard',
-		additionalClasses = {'team-participant-card-header-opponent', 'team-participant-card-square-icon'}
-	}
+	local isTbdOpponent = Opponent.isTbd(participant.opponent)
+	local isQualificationTournament = participant.qualification and participant.qualification.type == 'tournament'
+
+	local opponentClasses = {'team-participant-card__opponent', 'team-participant-card__opponent--square-icon'}
+	local opponentDisplay
+
+	if isTbdOpponent and isQualificationTournament then
+		opponentDisplay = Div{
+			classes = opponentClasses,
+			children = WidgetUtil.collect(
+				LeagueIcon.display{
+					icon = participant.qualification.tournament.icon,
+					iconDark = participant.qualification.tournament.iconDark,
+					options = {
+						noTemplate = true,
+						noLink = true,
+						defaultLink = participant.qualification.tournament.pageName,
+					},
+				},
+				'TBD'
+			)
+		}
+	else
+		opponentDisplay = OpponentDisplay.BlockOpponent{
+			opponent = participant.opponent,
+			teamStyle = 'standard',
+			additionalClasses = opponentClasses
+		}
+	end
 
 	return Div{
-		classes = { 'team-participant-card-header' },
+		classes = { 'team-participant-card__header' },
+		attributes = {['data-collapsible-click-region'] = 'true'},
 		children = {
 			Div{
-				classes = {'team-participant-card-header__main'},
+				classes = {'team-participant-card__header-main'},
 				children = WidgetUtil.collect(
 					opponentDisplay,
 					labelDiv
@@ -51,18 +79,25 @@ end
 ---@return Widget?
 function ParticipantsTeamHeader:_renderLabel(participant)
 	local labelText
-	if String.isNotEmpty(participant.qualifierPage) or String.isNotEmpty(participant.qualifierUrl) then
-		labelText = 'Qualifier'
-	elseif String.isNotEmpty(participant.qualifierText) then
-		labelText = 'Invited'
+	local isTbd = Logic.isNotEmpty(participant.potentialQualifiers) or Opponent.isTbd(participant.opponent);
+	local qualificationData = participant.qualification
+	if not qualificationData then
+		return
 	end
 
-	if not labelText then
+	if qualificationData.method == 'qual' then
+		labelText = 'Qualifier'
+	elseif qualificationData.method == 'invite' then
+		labelText = 'Invited'
+	else
 		return
 	end
 
 	return Div{
-		classes = { 'team-participant-card-header-label' },
+		classes = {
+			'team-participant-card__label',
+			isTbd and 'team-participant-card__label--tbd' or nil
+		},
 		children = {
 			HtmlWidgets.Span{
 				children = { labelText }

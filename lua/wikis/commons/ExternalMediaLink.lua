@@ -11,9 +11,9 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
-local Variables = Lua.import('Module:Variables')
 
 local ExternalMediaLinkDisplay = Lua.import('Module:Widget/ExternalMedia/Link')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -37,8 +37,7 @@ function ExternalMediaLink.run(args)
 	ExternalMediaLink._fallBackArgs(args)
 	local parsedData = ExternalMediaLink._readArgs(args)
 
-	if Logic.nilOr(Logic.readBoolOrNil(args.storage), true)
-		and not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
+	if Logic.nilOr(Logic.readBoolOrNil(args.storage), true) and Lpdb.isStorageEnabled() then
 
 		mw.ext.LiquipediaDB.lpdb_externalmedialink(
 			ExternalMediaLink._objectName(args), Json.stringifySubTables(parsedData)
@@ -73,7 +72,7 @@ function ExternalMediaLink._readArgs(args)
 	local lpdbData = {
 		date = args.date,
 		language = args.language or DEFAULT_LANGUAGE,
-		title = args.title,
+		title = mw.text.unstripNoWiki(args.title),
 		translatedtitle = args.trans_title,
 		link = args.link,
 		publisher = args.of,

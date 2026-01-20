@@ -50,7 +50,7 @@ function ContentSwitch:render()
 	local switchGroup = self:assertExistsAndCopy(self.props.switchGroup)
 
 	if #tabs < 2 then
-		return HtmlWidgets.fragment{children = (tabs[1] or {}).content}
+		return HtmlWidgets.Fragment{children = (tabs[1] or {}).content}
 	end
 
 	local tabOptions = Array.map(tabs, function(tab, index)

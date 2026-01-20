@@ -11,6 +11,7 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -212,7 +213,7 @@ end
 
 ---@return boolean
 function StandingsStorage.shouldStoreLpdb()
-	return Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+	return Namespace.isMain() and Lpdb.isStorageEnabled()
 end
 
 ---@param data table

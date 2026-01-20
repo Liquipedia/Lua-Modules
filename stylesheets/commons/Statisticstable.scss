@@ -18,49 +18,6 @@ Author(s): Clubfan
 }
 
 /*******************************************************************************
-Template(s): Champion statistics table
-Deprecated; to be replaced by character statistics table
-Author(s): Inflicted
-*******************************************************************************/
-
-tr.dota-stat-row > td {
-	vertical-align: top !important;
-	width: 30px;
-}
-
-.dota-stat-popup {
-	border: 1px solid #a9a9a9;
-	width: calc( 100% - 5px );
-	min-width: 1150px;
-	background: var( --clr-background, #f8f9fa );
-	position: absolute;
-	left: 5px;
-	margin-top: 12px;
-	box-shadow: 5px 5px 20px rgba( 0, 0, 0, 0.3 );
-}
-
-.dota-stat-popup-header {
-	font-size: 20px;
-	font-weight: bold;
-	margin-top: 10px;
-}
-
-.dota-stat-popup-info > div {
-	display: inline-block;
-	vertical-align: top;
-}
-
-.dota-stat-popup-button {
-	background: #d3d3d3;
-	background-color: #d3d3d3 !important;
-	border: 0 !important;
-	box-shadow: 2px 2px 2px rgba( 0, 0, 0, 0.1 );
-	font-size: 10px;
-	overflow: hidden;
-	height: 15px !important;
-}
-
-/*******************************************************************************
 Template(s): Character statistics table
 *******************************************************************************/
 
@@ -68,48 +25,15 @@ tr.character-stats-row > td {
 	width: 30px;
 }
 
-.character-stats-popup {
-	border: 1px solid #bbbbbb;
-	width: calc( 100% - 1rem );
-	background-color: #ffffff;
-	position: absolute;
-	left: 0.5rem;
-	margin-top: 1.5rem;
-	border-radius: 0.5rem;
-	box-shadow: 0 0.0625rem 0.25rem 0 var( --clr-on-surface-dark-primary-12 );
-	padding: 0.5rem;
+.character-stats-popup-info {
+	display: flex;
+	gap: 0.5rem;
+	justify-content: center;
+	flex-wrap: wrap;
 
-	.theme--dark & {
-		background-color: var( --clr-secondary-16 );
-		border-color: var( --clr-on-surface-dark-primary-8 );
-	}
-
-	&-header {
-		font-size: 20px;
-		font-weight: bold;
-	}
-
-	&-info {
-		display: flex;
-		gap: 0.5rem;
-		justify-content: center;
-		flex-wrap: wrap;
-		margin-top: 0.5rem;
-
-		> div {
-			display: inline-block;
-			flex: auto;
-			vertical-align: top;
-		}
-	}
-
-	&-button {
-		background: #d3d3d3;
-		background-color: #d3d3d3 !important;
-		border: 0 !important;
-		box-shadow: 2px 2px 2px rgba( 0, 0, 0, 0.1 );
-		font-size: 10px;
-		overflow: hidden;
-		height: 15px !important;
+	> div {
+		display: inline-block;
+		flex: auto;
+		vertical-align: top;
 	}
 }

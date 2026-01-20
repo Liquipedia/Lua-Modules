@@ -13,6 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -40,10 +41,9 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return boolean
 function CustomMatchSummary._isSolo(match)
-	if type(match.opponents[1]) ~= 'table' or type(match.opponents[2]) ~= 'table' then
-		return false
-	end
-	return match.opponents[1].type == Opponent.solo and match.opponents[2].type == Opponent.solo
+	return Array.all(match.opponents, function (opponent)
+		return Opponent.isOpponent(opponent) and opponent.type == Opponent.solo
+	end)
 end
 
 ---@param match MatchGroupUtilMatch
@@ -63,7 +63,7 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param game MatchGroupUtilGame
----@param matchOpponents table[]
+---@param matchOpponents standardOpponent[]
 ---@param teamIdx integer
 ---@return {player: standardPlayer, characters: string[]}[]
 function CustomMatchSummary.fetchCharactersOfPlayers(game, matchOpponents, teamIdx)
@@ -91,21 +91,25 @@ function CustomMatchSummary._createStandardGame(game, props)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
+		css = {
+			['align-items'] = 'center',
+			gap = '0.5rem',
+		},
 		children = WidgetUtil.collect(
 			CustomMatchSummary._createCharacterDisplay(
 				CustomMatchSummary.fetchCharactersOfPlayers(game, props.opponents, 1),
 				props.game,
-				false,
-				not props.soloMode
+				true,
+				props.soloMode
 			),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.GameCenter{children = scoreDisplay, css = {['flex-grow'] = 1}},
+			MatchSummaryWidgets.GameCenter{children = scoreDisplay, css = {flex = 'auto'}},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			CustomMatchSummary._createCharacterDisplay(
 				CustomMatchSummary.fetchCharactersOfPlayers(game, props.opponents, 2),
 				props.game,
-				true,
-				not props.soloMode
+				false,
+				props.soloMode
 			)
 		)
 	}
@@ -114,55 +118,66 @@ end
 ---@param players {player: standardPlayer, characters: string[]}[]
 ---@param game string?
 ---@param reverse boolean?
----@param displayPlayerNames boolean?
----@return Html
-function CustomMatchSummary._createCharacterDisplay(players, game, reverse, displayPlayerNames)
+---@param soloMode boolean?
+---@return Widget
+function CustomMatchSummary._createCharacterDisplay(players, game, reverse, soloMode)
 	local CharacterIcons = Lua.import('Module:CharacterIcons/' .. (game or ''), {loadData = true})
-	local wrapper = mw.html.create('div'):css('flex-basis', '40%')
 
-	if Logic.isDeepEmpty(players) then
-		return wrapper
+	---@param showCharacterName boolean
+	---@param character string
+	---@return Widget
+	local function createCharacterDisplay(showCharacterName, character)
+		local children = WidgetUtil.collect(
+			CharacterIcons[character],
+			showCharacterName and {
+				'&nbsp;',
+				character
+			} or nil
+		)
+		return HtmlWidgets.Div{
+			classes = {'brkts-popup-body-element-thumbs'},
+			children = reverse and Array.reverse(children) or children
+		}
 	end
 
-	local playerDisplays = Array.map(players, function (player)
-		local characters = player.characters
-		if #characters == 0 then
+	---@return Widget|Widget[]?
+	local function buildPlayerDisplay()
+		if Logic.isDeepEmpty(players) then
 			return
+		elseif soloMode then
+			local player = players[1]
+			return Array.map(player.characters, FnUtil.curry(createCharacterDisplay, true))
 		end
-		local playerWrapper = mw.html.create('div')
-			:css('display', 'flex')
-			:css('flex-direction', reverse and 'row' or 'row-reverse')
-		local playerNode = PlayerDisplay.BlockPlayer{player = player.player, flip = not reverse}
-
-		if #characters == 1 and not displayPlayerNames then
-			local characterDisplay = mw.html.create('div'):addClass('brkts-popup-body-element-thumbs')
-			local character = characters[1]
-			if reverse then
-				characterDisplay:wikitext(CharacterIcons[character]):wikitext('&nbsp;'):wikitext(character)
-			else
-				characterDisplay:wikitext(character):wikitext('&nbsp;'):wikitext(CharacterIcons[character])
+		return Array.map(players, function (player)
+			if Logic.isEmpty(player.characters) then
+				return
 			end
-			playerWrapper:node(characterDisplay)
-			return playerWrapper
-		end
-
-		local characterDisplays = Array.map(characters, function (character)
-			local characterDisplay = mw.html.create('div'):addClass('brkts-popup-body-element-thumbs')
-			characterDisplay:wikitext(CharacterIcons[character])
-			return characterDisplay
+			return HtmlWidgets.Div{
+				css = {
+					display = 'flex',
+					['flex-direction'] = 'row' .. (reverse and '-reverse' or ''),
+				},
+				children = Array.interleave(
+					WidgetUtil.collect(
+						Array.map(player.characters, FnUtil.curry(createCharacterDisplay, false)),
+						PlayerDisplay.BlockPlayer{player = player.player, flip = reverse}
+					),
+					'&nbsp;'
+				)
+			}
 		end)
-		if displayPlayerNames then
-			table.insert(characterDisplays, '&nbsp;')
-			table.insert(characterDisplays, playerNode)
-		end
+	end
 
-		Array.forEach(characterDisplays, FnUtil.curry(playerWrapper.node, playerWrapper))
-		return playerWrapper
-	end)
-
-	Array.forEach(playerDisplays, FnUtil.curry(wrapper.node, wrapper))
-
-	return wrapper
+	return HtmlWidgets.Div{
+		css = {
+			display = 'inline-flex',
+			flex = '2 1 30%',
+			['flex-direction'] = 'column',
+			gap = '0.25rem',
+			['align-items'] = reverse and 'flex-end' or nil,
+		},
+		children = buildPlayerDisplay()
+	}
 end
 
 return CustomMatchSummary

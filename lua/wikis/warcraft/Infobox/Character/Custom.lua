@@ -51,7 +51,7 @@ local HP_REGEN_NIGHT = 'night'
 local FACTION_TO_HP_REGEN_TYPE = {u = HP_REGEN_BLIGHT, n = HP_REGEN_NIGHT}
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))

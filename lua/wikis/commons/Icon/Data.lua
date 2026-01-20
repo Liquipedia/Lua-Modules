@@ -8,6 +8,7 @@ return {
 	-- Usage: Team information
 	team_tbd = 'far fa-users',
 	notification = 'fas fa-info-circle',
+	external_link = 'fas fa-external-link-alt',
 
 	-- Usage: Different ways to see data
 	schedule = 'far fa-table',
@@ -34,6 +35,8 @@ return {
 	explosion_valorant = 'fas fa-fire-alt',
 	defuse = 'fas fa-wrench',
 	outoftime = 'fas fa-hourglass',
+	ace_valorant = 'fas fa-dagger',
+	round_winner = 'far fa-trophy-alt',
 
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',
@@ -155,7 +158,7 @@ return {
 	acs = 'far fa-abacus',
 	kast = 'fas fa-hands-helping',
 	headshot = 'far fa-crosshairs',
-	firstkill = 'far fa-dagger',
+	firstkill = 'liquipedia-custom-icon liquipedia-custom-icon-fk-kd-icon',
 	team_firstkills = 'fas fa-swords fa-flip-vertical',
 
 	dota2_gpm = 'fas fa-coin',
@@ -203,6 +206,11 @@ return {
 	file_standards_guide = 'far fa-file-check',
 	find_images = 'fad fa-file-search',
 	clipboard = 'fad fa-clipboard-list',
+
+	-- Usage: Main Pages navcards
+	player = 'fas fa-user',
+	statistics = 'fad fa-chart-bar',
+	maps = 'fad fa-map',
 
 	-- Streams and Vods
 	youtube = 'fab fa-youtube',

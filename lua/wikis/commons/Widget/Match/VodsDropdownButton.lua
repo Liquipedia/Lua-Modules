@@ -40,7 +40,7 @@ function VodsDropdownButton:render()
 			},
 		},
 		size = 'sm',
-		variant = 'tertiary',
+		variant = 'secondary',
 	}
 	local hideButton = Button{
 		classes = {'general-collapsible-collapse-button', 'btn--active'},
@@ -54,7 +54,7 @@ function VodsDropdownButton:render()
 			},
 		},
 		size = 'sm',
-		variant = 'tertiary',
+		variant = 'secondary',
 	}
 
 	return Span{

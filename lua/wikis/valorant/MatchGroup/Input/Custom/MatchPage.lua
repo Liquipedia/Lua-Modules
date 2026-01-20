@@ -14,6 +14,7 @@ local Table = Lua.import('Module:Table')
 
 local MapData = mw.loadJsonData('MediaWiki:Valorantdb-maps.json')
 
+---@class ValorantMatchPageMapParser: ValorantMapParserInterface
 local CustomMatchGroupInputMatchPage = {}
 
 ---@class valorantMatchApiTeamExtended: valorantMatchApiTeam

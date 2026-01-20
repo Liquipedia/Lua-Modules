@@ -18,6 +18,8 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local CustomMatchGroupInput = {}
+
+---@class ValorantMatchParser: MatchParserInterface
 local MatchFunctions = {
 	getBestOf = MatchGroupInputUtil.getBestOf,
 	DEFAULT_MODE = 'team',
@@ -140,7 +142,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
@@ -297,7 +299,7 @@ end
 ---@param MapParser ValorantMapParserInterface
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table<string, any>
 function MapFunctions.getExtraData(MapParser, match, map, opponents)
 	local publisherId, publisherRegion = MapParser.getMatchId(map)
@@ -339,7 +341,7 @@ end
 
 ---@param MapParser ValorantMapParserInterface
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponentIndex)

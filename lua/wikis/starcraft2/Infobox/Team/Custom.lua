@@ -51,7 +51,7 @@ local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = Info.config.defaultMaxPlayersPer
 local PLAYER_EARNINGS_ABBREVIATION = '<abbr title="Earnings of players while on the team">Player earnings</abbr>'
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
