@@ -22,7 +22,7 @@ div.general-dialog-container {
 	background-color: #ffffff;
 	border-radius: 0.5rem;
 	box-shadow: 0 0.0625rem 0.25rem 0 var( --clr-on-surface-dark-primary-12 );
-	width: fit-content !important;
+	width: max-content !important;
 	max-width: 100vw;
 	max-height: 100vh;
 
