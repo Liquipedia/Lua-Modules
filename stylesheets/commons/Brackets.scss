@@ -255,23 +255,23 @@
 		padding-left: 3px;
 		color: var( --clr-on-background, #373737 );
 	}
+
+	@media ( max-width: 768px ) {
+		.block-player > .flag {
+			display: none;
+		}
+	}
 }
 
 .brkts-opponent-win {
 	font-weight: bold;
-}
 
-.brkts-opponent-win .flag + .name {
-	margin-left: -1px;
-}
+	.flag + .name {
+		margin-left: -1px;
+	}
 
-.brkts-opponent-win .block-team > .name {
-	margin-left: -1px;
-}
-
-@media ( max-width: 768px ) {
-	.brkts-opponent-entry .block-player > .flag {
-		display: none;
+	.block-team > .name {
+		margin-left: -1px;
 	}
 }
 
