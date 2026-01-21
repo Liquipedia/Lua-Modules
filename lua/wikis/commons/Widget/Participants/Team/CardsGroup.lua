@@ -80,7 +80,7 @@ end
 ---@private
 ---@param participantGroup TeamParticipant[]
 function ParticipantsTeamCardsGroup._createParticipantGroup(participantGroup)
-	AnalyticsWidget{
+	return AnalyticsWidget{
 		analyticsName = 'Team participants card',
 		children = Div{
 			classes = { 'team-participant__grid' },
