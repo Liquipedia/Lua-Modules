@@ -406,14 +406,11 @@ class DOMUtils {
 
 		while ( walker.previousNode() ) {
 			const currentNode = walker.currentNode;
-			const headingElement = currentNode.matches( 'h1,h2,h3,h4,h5,h6' ) ?
-				currentNode :
-				currentNode.querySelector( 'h1,h2,h3,h4,h5,h6' );
 
-			if ( headingElement ) {
-				const headingText = this.extractHeadingText( headingElement );
+			if ( currentNode.matches( 'h1,h2,h3,h4,h5,h6' ) ) {
+				const headingText = this.extractHeadingText( currentNode );
 				if ( headingText ) {
-					return { node: headingElement, text: headingText };
+					return { node: currentNode, text: headingText };
 				}
 			}
 		}
@@ -545,10 +542,28 @@ class DropdownWidget {
 					const item = visibleElements[ i ];
 					const typeLabel = hasSingleElement ? '' :
 						` ${ this.getTypeLabel( visibleElements, item.typeName, i ) }`;
-					const copyButton = this.createMenuButton( 'copy', `Copy${ typeLabel } to clipboard`,
-						item, sectionTitle, typeLabel, 'copy', menuElement, menuItems, loadingElement );
-					const downloadButton = this.createMenuButton( 'download', `Download${ typeLabel } as image`,
-						item, sectionTitle, typeLabel, 'download', menuElement, menuItems, loadingElement );
+					const copyButton = this.createMenuButton( {
+						icon: 'copy',
+						buttonText: `Copy${ typeLabel } to clipboard`,
+						item,
+						sectionTitle,
+						typeLabel,
+						exportMode: 'copy',
+						menuElement,
+						menuItems,
+						loadingElement
+					} );
+					const downloadButton = this.createMenuButton( {
+						icon: 'download',
+						buttonText: `Download${ typeLabel } as image`,
+						item,
+						sectionTitle,
+						typeLabel,
+						exportMode: 'download',
+						menuElement,
+						menuItems,
+						loadingElement
+					} );
 					menuItems.push( copyButton, downloadButton );
 				}
 
@@ -592,8 +607,19 @@ class DropdownWidget {
 		}, [ loadingElement ] );
 	}
 
-	createMenuButton( icon, buttonText, item, sectionTitle, typeLabel, exportMode,
-		menuElement, menuItems, loadingElement ) {
+	createMenuButton( options ) {
+		const {
+			icon,
+			buttonText,
+			item,
+			sectionTitle,
+			typeLabel,
+			exportMode,
+			menuElement,
+			menuItems,
+			loadingElement
+		} = options;
+
 		const button = this.createElement( 'div', {
 			class: 'dropdown-widget__item',
 			tabindex: '0',
@@ -773,7 +799,7 @@ class DropdownWidget {
 
 	getTypeLabel( elements, typeName, currentIndex ) {
 		const previousCount = elements.slice( 0, currentIndex ).filter( ( item ) => item.typeName === typeName ).length;
-		return previousCount === 0 ? typeName : `${ typeName } ${ previousCount + 1 }`;
+		return `${ typeName } ${ previousCount + 1 }`;
 	}
 
 	createElement( tag, attributes = {}, children = [] ) {
