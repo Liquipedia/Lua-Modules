@@ -18,7 +18,7 @@ const jsModules = [
 	'Dialog',
 	'Dropdown',
 	'ExportImage',
-  'FilterButtons',
+	'FilterButtons',
 	'Liquipedia_links',
 	'Mainpage',
 	'Miscellaneous',
