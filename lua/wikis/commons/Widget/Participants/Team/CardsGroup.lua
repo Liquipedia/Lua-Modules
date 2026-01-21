@@ -40,6 +40,7 @@ function ParticipantsTeamCardsGroup:render()
 		tabArgs['name' .. groupIndex] = Logic.emptyOr(group[1].participantGroup, 'Unnamed')
 		tabArgs['content' .. groupIndex] = ParticipantsTeamCardsGroup._createParticipantGroup(group)
 	end)
+	tabArgs.suppressHeader = true
 
 	return Div{
 		classes = { 'team-participant' },
