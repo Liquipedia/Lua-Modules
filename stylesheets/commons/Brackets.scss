@@ -20,11 +20,10 @@
 .brkts-opponent-block-literal {
 	font-style: italic;
 	padding-right: 2px;
-}
 
-.block-literal.flipped,
-.brkts-opponent-block-literal.flipped {
-	text-align: right;
+	&.flipped {
+		text-align: right;
+	}
 }
 
 .block-literal > .name {
