@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Operator = Lua.import('Module:Operator')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Template = Lua.import('Module:Template')
 
 ---@class RatingsDisplayList: RatingsDisplayInterface
@@ -63,7 +64,7 @@ function RatingsDisplayList.build(teamRankings)
 
 		local popup = Template.expandTemplate(mw.getCurrentFrame(), 'Popup', {
 			label = 'show',
-			title = 'Details for ' .. mw.ext.TeamTemplate.team(team.name),
+			title = 'Details for ' .. tostring(OpponentDisplay.InlineTeamContainer{template = team.name}),
 			content = chart,
 		})
 
@@ -74,7 +75,7 @@ function RatingsDisplayList.build(teamRankings)
 
 		htmlTable:tag('tr')
 			:tag('td'):css('font-weight', 'bold'):wikitext(rank):done()
-			:tag('td'):css('text-align', 'left'):wikitext(mw.ext.TeamTemplate.team(team.name)):done()
+			:tag('td'):css('text-align', 'left'):node(OpponentDisplay.InlineTeamContainer{template = team.name}):done()
 			:tag('td'):wikitext(math.floor(team.rating + 0.5)):done()
 			:tag('td'):wikitext(string.upper(team.region or '')):done()
 			:tag('td'):wikitext(team.matches):done()

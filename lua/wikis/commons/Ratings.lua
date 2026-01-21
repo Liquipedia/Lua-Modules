@@ -14,6 +14,7 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Lpdb = Lua.import('Module:Lpdb')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local String = Lua.import('Module:StringUtils')
 
 --- Liquipedia Ratings (LPR)
@@ -409,16 +410,10 @@ end
 function Ratings.transfer(frame)
 	local args = Arguments.getArgs(frame)
 	local date = os.time(Date.parseIsoDate(args.date))
-	local from = mw.ext.TeamTemplate.teampage(args.from, args.date)
-	local to = String.isNotEmpty(args.to) and mw.ext.TeamTemplate.teampage(args.to, args.date) or ''
-	if String.startsWith(from, '<div class=') then
-		return from
-	elseif String.startsWith(to, '<div class=') then
-		return to
-	else
-		Ratings._storeTransfer(from, to, date, tonumber(args.mod))
-	end
-	return '<code>' .. args.date .. ': ' .. from .. ' --> ' .. to .. '</code><br>'
+	local from = TeamTemplate.getRaw(args.from, args.date)
+	local to = String.isNotEmpty(args.to) and TeamTemplate.getRaw(args.to, args.date) or {}
+	Ratings._storeTransfer(from.page, to.page, date, tonumber(args.mod))
+	return '<code>' .. args.date .. ': ' .. from.page .. ' --> ' .. to.page .. '</code><br>'
 end
 
 return Ratings

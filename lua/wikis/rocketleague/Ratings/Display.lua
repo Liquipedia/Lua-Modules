@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local RatingsStorageLpdb = Lua.import('Module:Ratings/Storage/Lpdb')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local RatingsDisplay = {}
 
@@ -78,8 +79,8 @@ function RatingsDisplay._getTeamInfo(teamName)
 
 	return {
 		region = teamInfo.region or '???',
-		shortName = mw.ext.TeamTemplate.teamexists(teamInfo.template or '')
-			and mw.ext.TeamTemplate.raw(teamInfo.template).shortname or teamName
+		shortName = TeamTemplate.exists(teamInfo.template)
+			and TeamTemplate.getRaw(teamInfo.template).shortname or teamName
 	}
 end
 

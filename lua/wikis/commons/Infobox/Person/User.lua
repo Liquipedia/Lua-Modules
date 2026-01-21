@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Person = Lua.import('Module:Infobox/Person')
 
@@ -22,7 +23,7 @@ function User:_getFavouriteTeams()
 	local display = ''
 	for _, item in ipairs(foundArgs) do
 		local team = item:lower():gsub('_', ' ')
-		display = display .. mw.ext.TeamTemplate.teamicon(team)
+		display = display .. OpponentDisplay.InlineTeamContainer{template = team, style = 'icon'}
 	end
 
 	return display
