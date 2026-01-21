@@ -433,18 +433,18 @@
 	min-width: 0;
 }
 
-.theme--dark .brkts-matchlist-slot-winner {
-	background-color: var( --table-green-background-color, #ddf4dd );
-	box-shadow: inset 0 0 0 2px var( --table-green-border-color, transparent );
-}
-
 .brkts-matchlist-slot-winner {
 	font-weight: bold;
 	background-color: #ddf4dd;
-}
 
-.brkts-matchlist-slot-winner .flag + .name {
-	margin-left: -1px;
+	.theme--dark & {
+		background-color: var( --table-green-background-color, #ddf4dd );
+		box-shadow: inset 0 0 0 2px var( --table-green-border-color, transparent );
+	}
+
+	.flag + .name {
+		margin-left: -1px;
+	}
 }
 
 .brkts-matchlist .brkts-opponent-block-literal {
