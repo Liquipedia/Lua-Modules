@@ -159,62 +159,10 @@ function Match:create()
 end
 
 ---@class MatchSummary
----@operator call(string?):MatchSummary
----@field Footer MatchSummaryFooter
----@field Match MatchSummaryMatch
----@field matches Html[]?
----@field headerElement Widget?
----@field root Html?
-local MatchSummary = Class.new()
-MatchSummary.Footer = Footer
-MatchSummary.Match = Match
-
---- TODO: Instead of attaching data-analytics-name here, use Analytics Widget
----@param width string?
----@return MatchSummary
-function MatchSummary:init(width)
-	self.matches = {}
-	self.root = mw.html.create('div')
-		:addClass('brkts-popup')
-		:css('width', width)
-		:attr('data-analytics-name', 'Match popup')
-	return self
-end
-
----@param cssClass string?
----@return MatchSummary
-function MatchSummary:addClass(cssClass)
-	self.root:addClass(cssClass)
-	return self
-end
-
----@param header Widget?
----@return MatchSummary
-function MatchSummary:header(header)
-	self.headerElement = header
-	return self
-end
-
----@param match MatchSummaryMatch?
----@return MatchSummary
-function MatchSummary:addMatch(match)
-	if not match then return self end
-
-	table.insert(self.matches, match:create())
-
-	return self
-end
-
----@return Html
-function MatchSummary:create()
-	self.root:node(self.headerElement)
-
-	for _, match in ipairs(self.matches) do
-		self.root:node(match)
-	end
-
-	return self.root
-end
+local MatchSummary = {
+	Footer = Footer,
+	Match = Match,
+}
 
 ---Default header function
 ---@param match table
@@ -324,8 +272,8 @@ end
 ---Default getByMatchId function for usage in Custom MatchSummary
 ---@param CustomMatchSummary table
 ---@param args table
----@param options {teamStyle:teamStyle?, width: fun(MatchGroupUtilMatch):string?|string?, noScore:boolean?}?
----@return Html
+---@param options {teamStyle:teamStyle?, width: (fun(match: MatchGroupUtilMatch):string?)|string?, noScore:boolean?}?
+---@return Widget
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(
 		(type(CustomMatchSummary.createBody) == 'function' or type(CustomMatchSummary.createGame) == 'function'),
@@ -337,27 +285,21 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	local match, bracketResetMatch = MatchGroupUtil.fetchMatchForBracketDisplay(
 		args.bracketId, args.matchId)
 
-	local width = options.width
+	---@type (fun(match: MatchGroupUtilMatch):string?)|string|integer?
+	local width = options.width or args.width
 	if type(width) == 'function' then
 		width = width(match)
 	end
 
-	local matchSummary = MatchSummary():init(width)
-
-	--additional header for when martin adds the the css and buttons for switching between match and reset match
-	--if bracketResetMatch then
-		--local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
-		--matchSummary:header(createHeader(match, {noScore = true, teamStyle = options.teamStyle}))
-		--here martin can add the buttons for switching between match and reset match
-	--end
-
-	local createMatch = CustomMatchSummary.createMatch or function(matchData)
-		return MatchSummary.createMatch(matchData, CustomMatchSummary, options)
-	end
-	matchSummary:addMatch(createMatch(match))
-	matchSummary:addMatch(createMatch(bracketResetMatch))
-
-	return matchSummary:create()
+	return MatchSummaryWidgets.Container{
+		classes = args.classes,
+		width = width,
+		createMatch = CustomMatchSummary.createMatch or function(matchData)
+			return MatchSummary.createMatch(matchData, CustomMatchSummary, options)
+		end,
+		match = match,
+		resetMatch = bracketResetMatch,
+	}
 end
 
 ---@param mapVetoes table
