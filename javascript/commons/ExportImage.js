@@ -366,8 +366,8 @@ class ExportService {
 
 	async downloadImage( canvas, filename ) {
 		const link = document.createElement( 'a' );
-		link.download = `${ filename }.jpeg`;
-		link.href = canvas.toDataURL( 'image/jpeg' );
+		link.download = `${ filename }.png`;
+		link.href = canvas.toDataURL( 'image/png' );
 		link.click();
 	}
 
