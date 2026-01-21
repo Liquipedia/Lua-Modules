@@ -9,19 +9,21 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class DropdownItemWidgetParameters
 ---@field icon string|Widget?
----@field text string
+---@field children string|number|Widget|Html|(string|number|Widget|Html)[]
 ---@field link string?
 ---@field linktype 'internal'|'external'|nil
----@field classes table?
+---@field classes string[]?
 ---@field attributes table?
 
 ---@class DropdownItemWidget: Widget
@@ -34,22 +36,15 @@ DropdownItem.defaultProps = {
 
 ---@return Widget
 function DropdownItem:render()
-	local content = {}
-	if self.props.icon then
-		local iconWidget
-		if type(self.props.icon) == 'string' then
-			iconWidget = Icon{iconName = self.props.icon, size = 'sm'}
-		else
-			iconWidget = self.props.icon
-		end
-		table.insert(content, iconWidget)
-	end
-	table.insert(content, self.props.text)
+	local icon = not Logic.isEmpty(self.props.icon) and
+		(type(self.props.icon) == 'string' and Icon{iconName = self.props.icon, size = 'sm'} or self.props.icon)
+
+	local children = WidgetUtil.collect(icon, self.props.children)
 
 	local item = Div{
-		classes = Array.extend({'dropdown-widget__item'}, self.props.classes or {}),
+		classes = Array.extend('dropdown-widget__item', self.props.classes),
 		attributes = self.props.attributes,
-		children = content
+		children = children
 	}
 
 	if not self.props.link then

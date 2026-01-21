@@ -15,12 +15,12 @@ describe('Dropdown', function()
 		assert.truthy(html:find('dropdown%-widget__menu'))
 	end)
 
-	it('should render dropdown items', function()
+		it('should render dropdown items', function()
 		local widget = Dropdown{
 			button = 'Actions',
 			children = {
-				DropdownItem{text = 'Option 1'},
-				DropdownItem{text = 'Option 2', link = 'TargetPage'}
+				DropdownItem{children = 'Option 1'},
+				DropdownItem{children = 'Option 2', link = 'TargetPage'}
 			}
 		}
 		local html = tostring(widget)
@@ -34,7 +34,7 @@ describe('Dropdown', function()
 			button = 'Menu',
 			children = {
 				DropdownItem{
-					text = 'Home',
+					children = 'Home',
 					icon = 'projecthome'
 				}
 			}
@@ -48,7 +48,7 @@ describe('Dropdown', function()
 			button = 'External',
 			children = {
 				DropdownItem{
-					text = 'External Link',
+					children = 'External Link',
 					link = 'https://liquipedia.net',
 					linktype = 'external'
 				}
@@ -64,7 +64,7 @@ describe('Dropdown', function()
 			button = 'Actions',
 			children = {
 				DropdownItem{
-					text = 'Action',
+					children = 'Action',
 					attributes = {['data-action'] = 'test'}
 				}
 			}
