@@ -13,6 +13,7 @@
 		margin-top: 0.5rem;
 		border: 1px solid;
 		border-radius: 0.25rem;
+		z-index: 10;
 
 		.theme--light & {
 			background-color: var( --clr-secondary-100 );
