@@ -19,6 +19,7 @@ local Switch = Lua.import('Module:Widget/Switch')
 
 ---@class ParticipantsTeamCardsGroup: Widget
 ---@operator call(table): ParticipantsTeamCardsGroup
+---@field props {participants: TeamParticipant[]}
 local ParticipantsTeamCardsGroup = Class.new(Widget)
 
 ---@return Widget?
