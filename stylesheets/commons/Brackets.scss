@@ -171,93 +171,95 @@
 	font-size: 11px;
 	line-height: 1.55;
 	position: relative;
-}
 
-.brkts-opponent-entry:first-child {
-	margin-top: -1px;
-}
+	&:first-child {
+		margin-top: -1px;
+	}
 
-.brkts-opponent-entry.brkts-opponent-entry-last {
-	margin-bottom: -1px;
+	&.brkts-opponent-entry-last {
+		margin-bottom: -1px;
+	}
+
+	&.brkts-opponent-hover {
+		transition: 0.5s;
+		transition-property: border-color;
+
+		&-active {
+			border-color: transparent;
+		}
+	}
+
+	&-left {
+		align-items: center;
+		display: flex;
+		flex: 1 1;
+		min-width: 0;
+
+		> * {
+			flex: 1 1;
+			margin-left: 4px;
+			min-width: 0;
+		}
+
+		> .block-team {
+			gap: 2px;
+			margin-left: 0;
+		}
+	}
+
+	.team-template-image-icon,
+	.team-template-image-legacy {
+		display: inline-flex;
+		justify-content: center;
+		height: 18px;
+
+		img,
+		i {
+			align-self: center;
+		}
+	}
+
+	.visible-xs {
+		.team-template-image-icon,
+		.team-template-image-legacy {
+			height: 12px;
+		}
+
+		img {
+			max-height: 12px;
+			max-width: 30px;
+		}
+
+		.team-template-image-icon {
+			height: 12px;
+			width: 30px;
+		}
+
+		> .name {
+			margin-left: -1px;
+		}
+	}
+
+	.hidden-xs {
+		img {
+			max-height: 18px;
+			max-width: 44px;
+		}
+
+		.team-template-image-icon {
+			height: 18px;
+			width: 44px;
+		}
+	}
+
+	.brkts-opponent-block-literal {
+		padding-left: 3px;
+		color: var( --clr-on-background, #373737 );
+	}
 }
 
 .brkts-opponent-win {
 	font-weight: bold;
-}
-
-.brkts-opponent-entry.brkts-opponent-hover {
-	transition: 0.5s;
-	transition-property: border-color;
-}
-
-.brkts-opponent-entry.brkts-opponent-hover-active {
-	border-color: transparent;
-}
-
-.brkts-opponent-entry-left {
-	align-items: center;
-	display: flex;
-	flex: 1 1;
-	min-width: 0;
-
-	> * {
-		flex: 1 1;
-		margin-left: 4px;
-		min-width: 0;
-	}
-
-	> .block-team {
-		gap: 2px;
-		margin-left: 0;
-	}
-}
-
-.brkts-opponent-entry .team-template-image-icon,
-.brkts-opponent-entry .team-template-image-legacy {
-	display: inline-flex;
-	justify-content: center;
-	height: 18px;
-}
-
-.brkts-opponent-entry .visible-xs .team-template-image-icon,
-.brkts-opponent-entry .visible-xs .team-template-image-legacy {
-	height: 12px;
-}
-
-.brkts-opponent-entry .team-template-image-icon img,
-.brkts-opponent-entry .team-template-image-legacy img,
-.brkts-opponent-entry .team-template-image-icon i,
-.brkts-opponent-entry .team-template-image-legacy i {
-	align-self: center;
-}
-
-.brkts-opponent-entry .hidden-xs img {
-	max-height: 18px;
-	max-width: 44px;
-}
-
-.brkts-opponent-entry .hidden-xs .team-template-image-icon {
-	height: 18px;
-	width: 44px;
-}
-
-.brkts-opponent-entry .visible-xs img {
-	max-height: 12px;
-	max-width: 30px;
-}
-
-.brkts-opponent-entry .visible-xs .team-template-image-icon {
-	height: 12px;
-	width: 30px;
-}
-
-.brkts-opponent-entry .visible-xs > .name {
-	margin-left: -1px;
-}
-
-.brkts-opponent-entry .brkts-opponent-block-literal {
-	padding-left: 3px;
-	color: var( --clr-on-background, #373737 );
 }
 
 .brkts-opponent-win .flag + .name {
