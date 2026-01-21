@@ -184,7 +184,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 		potentialQualifiers = potentialQualifiers,
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
-		participantGroup = String.nilIfEmpty(input.group) or '',
+		participantGroup = input.group or '',
 		date = date,
 	}
 end
