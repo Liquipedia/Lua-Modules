@@ -53,7 +53,13 @@ const CONSTANTS = {
 			FOOTER_END: 'rgba(0,0,0,0)',
 			TEXT: '#181818'
 		}
-	}
+	},
+	SELECTORS: [
+		{ selector: '.brkts-bracket-wrapper', targetSelector: '.brkts-bracket', typeName: 'Bracket' },
+		{ selector: '.group-table', targetSelector: null, typeName: 'Group Table' },
+		{ selector: '.crosstable', targetSelector: 'tbody', typeName: 'Crosstable' },
+		{ selector: '.brkts-matchlist', targetSelector: '.brkts-matchlist-collapse-area', typeName: 'Match List' }
+	]
 };
 
 /**
@@ -287,6 +293,10 @@ class ExportService {
 			const capturedCanvas = await html2canvas( element );
 			element.style.background = originalBackground;
 
+			if ( capturedCanvas.width === 0 || capturedCanvas.height === 0 ) {
+				throw new Error( 'Canvas capture resulted in zero dimensions' );
+			}
+
 			const composedCanvas = await this.canvasComposer.compose( capturedCanvas, title, isDarkTheme );
 			await this.outputResult( composedCanvas, mode, this.generateFilename( title ) );
 
@@ -362,6 +372,118 @@ class ExportService {
 }
 
 /**
+ * Utilities for finding elements and headings in the DOM
+ */
+class DOMUtils {
+	static findPreviousHeading( startElement ) {
+		const walker = document.createTreeWalker( document.body, NodeFilter.SHOW_ELEMENT, null, false );
+		walker.currentNode = startElement;
+
+		while ( walker.previousNode() ) {
+			const currentNode = walker.currentNode;
+			const headingElement = currentNode.matches( 'h1,h2,h3,h4,h5,h6' ) ?
+				currentNode :
+				currentNode.querySelector( 'h1,h2,h3,h4,h5,h6' );
+
+			if ( headingElement ) {
+				const headingText = this.extractHeadingText( headingElement );
+				if ( headingText ) {
+					return { node: headingElement, text: headingText };
+				}
+			}
+		}
+
+		return null;
+	}
+
+	static isElementVisible( element ) {
+		if ( !element ) {
+			return false;
+		}
+
+		const computedStyle = window.getComputedStyle( element );
+		if ( computedStyle.display === 'none' ||
+			computedStyle.visibility === 'hidden' ) {
+			return false;
+		}
+
+		let parent = element.parentElement;
+		while ( parent && parent !== document.body ) {
+			const parentStyle = window.getComputedStyle( parent );
+			if ( parentStyle.display === 'none' ||
+				parentStyle.visibility === 'hidden' ) {
+				return false;
+			}
+
+			if ( parent.classList.contains( 'collapsed' ) ||
+				parent.classList.contains( 'is--collapsed' ) ) {
+				return false;
+			}
+
+			if ( parent.dataset.collapsibleState === 'collapsed' ) {
+				return false;
+			}
+
+			const inactiveTab = parent.closest( '.tabs-content > div:not(.active)' );
+			if ( inactiveTab ) {
+				return false;
+			}
+
+			parent = parent.parentElement;
+		}
+
+		return true;
+	}
+
+	static extractHeadingText( headingElement ) {
+		const clonedHeading = headingElement.cloneNode( true );
+		clonedHeading.querySelector( '.mw-editsection' )?.remove();
+		const headlineElement = clonedHeading.querySelector( '.mw-headline' );
+		return ( headlineElement || clonedHeading ).textContent.trim();
+	}
+
+	static findExportableElements() {
+		const configs = CONSTANTS.SELECTORS;
+
+		const headingsToElements = new Map();
+
+		for ( const config of configs ) {
+			const elements = document.querySelectorAll( config.selector );
+			for ( const element of elements ) {
+				const targetElement = config.targetSelector ?
+					element.querySelector( config.targetSelector ) :
+					element;
+
+				if ( !targetElement ) {
+					continue;
+				}
+
+				const headingInfo = this.findPreviousHeading( element );
+				if ( !headingInfo ) {
+					continue;
+				}
+
+				if ( !headingsToElements.has( headingInfo.text ) ) {
+					headingsToElements.set( headingInfo.text, {
+						headingNode: headingInfo.node,
+						headingText: headingInfo.text,
+						elements: []
+					} );
+				}
+
+				headingsToElements.get( headingInfo.text ).elements.push( {
+					element: targetElement,
+					typeName: config.typeName,
+					isVisible: this.isElementVisible( targetElement )
+				} );
+			}
+		}
+
+		return headingsToElements;
+	}
+}
+
+/**
  * Creates and manages dropdown UI components
  */
 class DropdownWidget {
@@ -371,29 +493,61 @@ class DropdownWidget {
 	}
 
 	create( elements, sectionTitle ) {
-		const hasSingleElement = elements.length === 1;
-		const menuItems = [];
 		const loadingElement = this.createLoadingElement();
 		const menuElement = this.createMenuElement( loadingElement );
+		let menuItems = [];
 
-		for ( let i = 0; i < elements.length; i++ ) {
-			const item = elements[ i ];
-			const typeLabel = hasSingleElement ? '' : ` ${ this.getTypeLabel( elements, item.typeName, i ) }`;
-			const copyButton = this.createMenuButton( 'copy', `Copy${ typeLabel } to clipboard`,
-				item, sectionTitle, typeLabel, 'copy', menuElement, menuItems, loadingElement );
-			const downloadButton = this.createMenuButton( 'download', `Download${ typeLabel } as image`,
-				item, sectionTitle, typeLabel, 'download', menuElement, menuItems, loadingElement );
-			menuItems.push( copyButton, downloadButton );
-		}
+		const populateMenu = () => {
+			while ( menuElement.firstChild && menuElement.firstChild !== loadingElement ) {
+				menuElement.removeChild( menuElement.firstChild );
+			}
+			// Ensure loadingElement is at the end if it was removed or moved
+			if ( !menuElement.contains( loadingElement ) ) {
+				menuElement.appendChild( loadingElement );
+			}
 
-		menuItems.forEach( ( item ) => menuElement.insertBefore( item, loadingElement ) );
+			const visibleElements = elements.filter( ( item ) => DOMUtils.isElementVisible( item.element ) );
+			const hasSingleElement = visibleElements.length === 1;
+			menuItems = [];
 
-		const toggleButton = this.createToggleButton( menuElement );
+			if ( visibleElements.length === 0 ) {
+				const disabledButton = this.createDisabledMenuItem(
+					'<i class="fas fa-fw fa-eye-slash"></i> Content not visible'
+				);
+				menuElement.insertBefore( disabledButton, loadingElement );
+			} else {
+				for ( let i = 0; i < visibleElements.length; i++ ) {
+					const item = visibleElements[ i ];
+					const typeLabel = hasSingleElement ? '' :
+						` ${ this.getTypeLabel( visibleElements, item.typeName, i ) }`;
+					const copyButton = this.createMenuButton( 'copy', `Copy${ typeLabel } to clipboard`,
+						item, sectionTitle, typeLabel, 'copy', menuElement, menuItems, loadingElement );
+					const downloadButton = this.createMenuButton( 'download', `Download${ typeLabel } as image`,
+						item, sectionTitle, typeLabel, 'download', menuElement, menuItems, loadingElement );
+					menuItems.push( copyButton, downloadButton );
+				}
+
+				menuItems.forEach( ( item ) => menuElement.insertBefore( item, loadingElement ) );
+			}
+		};
+
+		// Initial population
+		populateMenu();
+
+		const toggleButton = this.createToggleButton( menuElement, populateMenu );
 		const wrapper = this.createWrapper( toggleButton, menuElement );
 
 		this.setupEventListeners( wrapper, menuElement, toggleButton );
 
 		return wrapper;
+	}
+
+	createDisabledMenuItem( buttonText ) {
+		return this.createElement( 'div', {
+			class: 'dropdown-widget__item',
+			style: { color: '#999', cursor: 'not-allowed' },
+			title: 'Please switch to the tab or expand the section to export this content'
+		}, buttonText );
 	}
 
 	createLoadingElement() {
@@ -430,7 +584,7 @@ class DropdownWidget {
 		return button;
 	}
 
-	createToggleButton( menuElement ) {
+	createToggleButton( menuElement, onOpen ) {
 		const iconMargin = CONSTANTS.SPACING.ICON_MARGIN;
 		const buttonContent = `<i class="fas fa-share-alt" style="margin-right: ${ iconMargin };"></i>` +
 			'<span style="line-height: 1">Share</span>';
@@ -443,7 +597,12 @@ class DropdownWidget {
 			'aria-haspopup': 'true'
 		}, buttonContent );
 
-		button.addEventListener( 'click', () => this.toggleMenu( menuElement, button ) );
+		button.addEventListener( 'click', () => {
+			if ( menuElement.style.display === 'none' && onOpen ) {
+				onOpen();
+			}
+			this.toggleMenu( menuElement, button );
+		} );
 
 		return button;
 	}
@@ -522,6 +681,8 @@ class DropdownWidget {
 			userMessage = 'Export timed out. Please try again.';
 		} else if ( error.message?.includes( 'in progress' ) ) {
 			userMessage = 'An export is already in progress.';
+		} else if ( error.message?.includes( 'zero dimensions' ) ) {
+			userMessage = 'The content is not visible. Please ensure the tab/section is expanded and try again.';
 		}
 
 		mw.notify( userMessage, { type: 'error' } );
@@ -615,83 +776,6 @@ class DropdownWidget {
 			cleanupFn();
 			this.eventCleanupFunctions.delete( wrapper );
 		}
-	}
-}
-
-/**
- * Utilities for finding elements and headings in the DOM
- */
-class DOMUtils {
-	static findPreviousHeading( startElement ) {
-		const walker = document.createTreeWalker( document.body, NodeFilter.SHOW_ELEMENT, null, false );
-		walker.currentNode = startElement;
-
-		while ( walker.previousNode() ) {
-			const currentNode = walker.currentNode;
-			const headingElement = currentNode.matches( 'h1,h2,h3,h4,h5,h6' ) ?
-				currentNode :
-				currentNode.querySelector( 'h1,h2,h3,h4,h5,h6' );
-
-			if ( headingElement ) {
-				const headingText = this.extractHeadingText( headingElement );
-				if ( headingText ) {
-					return { node: headingElement, text: headingText };
-				}
-			}
-		}
-
-		return null;
-	}
-
-	static extractHeadingText( headingElement ) {
-		const clonedHeading = headingElement.cloneNode( true );
-		clonedHeading.querySelector( '.mw-editsection' )?.remove();
-		const headlineElement = clonedHeading.querySelector( '.mw-headline' );
-		return ( headlineElement || clonedHeading ).textContent.trim();
-	}
-
-	static findExportableElements() {
-		const configs = [
-			{ selector: '.brkts-bracket-wrapper', targetSelector: '.brkts-bracket', typeName: 'Bracket' },
-			{ selector: '.group-table', targetSelector: null, typeName: 'Group Table' },
-			{ selector: '.crosstable', targetSelector: 'tbody', typeName: 'Crosstable' },
-			{ selector: '.brkts-matchlist', targetSelector: '.brkts-matchlist-collapse-area', typeName: 'Match List' }
-		];
-
-		const headingsToElements = new Map();
-
-		for ( const config of configs ) {
-			const elements = document.querySelectorAll( config.selector );
-			for ( const element of elements ) {
-				const targetElement = config.targetSelector ?
-					element.querySelector( config.targetSelector ) :
-					element;
-
-				if ( !targetElement ) {
-					continue;
-				}
-
-				const headingInfo = this.findPreviousHeading( element );
-				if ( !headingInfo ) {
-					continue;
-				}
-
-				if ( !headingsToElements.has( headingInfo.text ) ) {
-					headingsToElements.set( headingInfo.text, {
-						headingNode: headingInfo.node,
-						headingText: headingInfo.text,
-						elements: []
-					} );
-				}
-
-				headingsToElements.get( headingInfo.text ).elements.push( {
-					element: targetElement,
-					typeName: config.typeName
-				} );
-			}
-		}
-
-		return headingsToElements;
 	}
 }
 
