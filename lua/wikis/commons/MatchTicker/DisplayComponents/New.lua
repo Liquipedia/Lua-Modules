@@ -12,10 +12,8 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local MatchCard = Lua.import('Module:Widget/Match/Card')
 
----@class NewMatchTickerMatch
+---@class NewMatchTickerMatch: MatchTickerMatchInterface
 ---@operator call({config: MatchTickerConfig, match: table}): NewMatchTickerMatch
----@field config MatchTickerConfig
----@field match table
 local Match = Class.new(
 	function(self, args)
 		self.config = args.config

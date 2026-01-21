@@ -63,5 +63,11 @@ return {
 
 		-- MatchSummary Map Veto
 		['matchsummary-mapveto-start'] = 'Start Map Veto',
+
+		-- MatchTicker
+		['matchticker-upcoming-matches'] = 'Upcoming Matches',
+
+		-- Shop Merch
+		['shop-merch-support-text'] = 'Purchases through this link support Liquipedia.',
 	}
 }

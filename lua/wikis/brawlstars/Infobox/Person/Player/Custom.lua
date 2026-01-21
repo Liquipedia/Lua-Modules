@@ -29,7 +29,7 @@ local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPlayer.run(frame)
 	---@type BrawlstarsInfoboxPlayer
 	local player = CustomPlayer(frame)
@@ -116,7 +116,7 @@ function CustomPlayer:createBottomContent()
 
 		return HtmlWidgets.Fragment{
 			children = {
-				MatchTicker.participant{team = teamPage},
+				MatchTicker.recent{team = teamPage},
 				UpcomingTournaments.team{name = teamPage}
 			}
 		}

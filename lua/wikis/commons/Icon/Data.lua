@@ -35,6 +35,8 @@ return {
 	explosion_valorant = 'fas fa-fire-alt',
 	defuse = 'fas fa-wrench',
 	outoftime = 'fas fa-hourglass',
+	ace_valorant = 'fas fa-dagger',
+	round_winner = 'far fa-trophy-alt',
 
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',
@@ -114,6 +116,9 @@ return {
 
 	-- Usage: Accommodations
 	accommodation = 'far fa-home-alt',
+
+	-- Usage: Shop merchandise
+	shopping_bag = 'fas fa-shopping-bag',
 
 	-- Usage: Matches etc
 	firstplace = 'fas fa-trophy',
@@ -204,6 +209,11 @@ return {
 	file_standards_guide = 'far fa-file-check',
 	find_images = 'fad fa-file-search',
 	clipboard = 'fad fa-clipboard-list',
+
+	-- Usage: Main Pages navcards
+	player = 'fas fa-user',
+	statistics = 'fad fa-chart-bar',
+	maps = 'fad fa-map',
 
 	-- Streams and Vods
 	youtube = 'fab fa-youtube',

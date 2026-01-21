@@ -481,7 +481,7 @@ end
 ---@return standardPlayer
 function Opponent.readPlayerArgs(args, playerIndex)
 	local playerTeam = args['p' .. playerIndex .. 'team']
-	return {
+	local player = {
 		displayName = args[playerIndex] or args['p' .. playerIndex] or '',
 		flag = String.nilIfEmpty(Flags.CountryName{flag = args['p' .. playerIndex .. 'flag']}),
 		pageName = Page.applyUnderScoresIfEnforced(args['p' .. playerIndex .. 'link']),
@@ -489,6 +489,9 @@ function Opponent.readPlayerArgs(args, playerIndex)
 		faction = Logic.nilIfEmpty(Faction.read(args['p' .. playerIndex .. 'faction']
 			or args['p' .. playerIndex .. 'race'])),
 	}
+	assert(not player.displayName:find('|'), 'Invalid character "|" in player name')
+	assert(not player.pageName or not player.pageName:find('|'), 'Invalid character "|" in player pagename')
+	return player
 end
 
 --[[
@@ -604,7 +607,27 @@ end
 ---@param playerIndex integer
 ---@return standardPlayer
 function Opponent.playerFromLpdbStruct(players, playerIndex)
-	local prefix = 'p' .. playerIndex
+	return Opponent._personFromLpdbStruct('p', players, playerIndex)
+end
+
+---@param players table
+---@param staffIndex integer
+---@return standardPlayer
+function Opponent.staffFromLpdbStruct(players, staffIndex)
+	local parsed = Opponent._personFromLpdbStruct('c', players, staffIndex)
+	if Logic.isNotEmpty(parsed) then
+		parsed.extradata = {type = 'staff'}
+	end
+	return parsed
+end
+
+---@private
+---@param roleIndicator 'p'|'c'
+---@param players table
+---@param playerIndex integer
+---@return standardPlayer
+function Opponent._personFromLpdbStruct(roleIndicator, players, playerIndex)
+	local prefix = roleIndicator .. playerIndex
 	return {
 		displayName = players[prefix .. 'dn'],
 		flag = String.nilIfEmpty(Flags.CountryName{flag = players[prefix .. 'flag']}),

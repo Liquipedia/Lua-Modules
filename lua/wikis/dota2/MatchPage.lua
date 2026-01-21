@@ -22,6 +22,7 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
+local PlayerStatContainer = Lua.import('Module:Widget/Match/Page/PlayerStat/Container')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local TeamVeto = Lua.import('Module:Widget/Match/Page/TeamVeto')
 local VetoItem = Lua.import('Module:Widget/Match/Page/VetoItem')
@@ -52,7 +53,7 @@ function MatchPage:populateGames()
 
 			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
 			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
-			team.players = Array.map(game.opponents[teamIdx].players or {}, function(player)
+			team.players = Array.map(Array.filter(game.opponents[teamIdx].players or {}, Table.isNotEmpty), function(player)
 				local newPlayer = Table.mergeInto(player, {
 					displayName = player.name or player.player,
 					link = player.player,
@@ -355,8 +356,8 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 					}
 				}
 			},
-			Div{
-				classes = {'match-bm-players-player-stats'},
+			PlayerStatContainer{
+				columns = 5,
 				children = {
 					PlayerStat{
 						title = {KDA_ICON, 'KDA'},

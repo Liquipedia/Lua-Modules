@@ -15,7 +15,7 @@ local Player = Lua.import('Module:Infobox/Person')
 local CustomPlayer = Class.new(Player)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPlayer.run(frame)
 	return CustomPlayer(frame):createInfobox()
 end

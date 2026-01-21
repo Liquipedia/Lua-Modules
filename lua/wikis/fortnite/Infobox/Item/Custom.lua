@@ -26,7 +26,7 @@ local CustomItem = Class.new(Item)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomItem.run(frame)
 	local item = CustomItem(frame)
 	local args = item.args

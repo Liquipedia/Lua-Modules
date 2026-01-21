@@ -24,9 +24,10 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
 ---@class RoleInfobox: BasicInfobox
+---@operator call(Frame): RoleInfobox
 local Role = Class.new(BasicInfobox)
 
----@return string
+---@return Widget
 function Role:createInfobox()
 	local args = self.args
 

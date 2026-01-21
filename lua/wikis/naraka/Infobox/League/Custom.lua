@@ -30,7 +30,7 @@ MODES.solos = MODES.solo
 MODES.trios = MODES.trio
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))

@@ -12,7 +12,9 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local Placement = Lua.import('Module:Placement')
 local RoleUtil = Lua.import('Module:Role/Util')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tournament = Lua.import('Module:Tournament')
@@ -27,7 +29,7 @@ local TeamParticipantsWikiParser = {}
 ---@alias QualificationType 'tournament'|'external'|'other'
 
 ---@alias QualificationStructure {method: QualificationMethod, type: QualificationType,
----tournament?: StandardTournament, url?: string, text?: string, placement?: number}
+---tournament?: StandardTournament, url?: string, text?: string, placement?: string}
 
 ---@param args table
 ---@return {participants: TeamParticipant[], expectedPlayerCount: integer?}
@@ -46,19 +48,13 @@ function TeamParticipantsWikiParser.parseWikiInput(args)
 end
 
 ---@param input string|number
----@return number
+---@return string
 local function validatePlacement(input)
-	local placement = tonumber(input)
-	assert(placement, 'Invalid placement: must be a number (got: ' .. input .. ')')
+	local placement = Placement.raw(input)
 
-	assert(
-		placement == math.floor(placement),
-		'Invalid placement: must be a whole number (got: ' .. input .. ')'
-	)
+	assert(not placement.unknown, 'Invalid placement: ' .. input)
 
-	assert(placement > 0, 'Invalid placement: must be a positive number (got: ' .. input .. ')')
-
-	return placement
+	return table.concat(placement.placement, '-')
 end
 
 ---@param input table?
@@ -89,7 +85,14 @@ local function parseQualifier(input)
 	}
 
 	if qualificationType == 'tournament' then
-		local tournament = Tournament.getTournament(input.page)
+		local tournamentPage = input.page
+		if not tournamentPage then
+			error('Tournament qualifier must have a page')
+		end
+		if String.startsWith(tournamentPage, '/') then
+			tournamentPage = mw.title.getCurrentTitle().text .. tournamentPage
+		end
+		local tournament = Tournament.getTournament(tournamentPage)
 		if not tournament then
 			qualificationStructure.type = 'other'
 		else
@@ -122,12 +125,14 @@ end
 
 --- Parse a single participant from input
 ---@param input table
----@param date osdateparam
+---@param defaultDate osdateparam
 ---@return TeamParticipant
-function TeamParticipantsWikiParser.parseParticipant(input, date)
+function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 	local potentialQualifiers = {}
 	local opponent
 	local warnings = {}
+
+	local date = DateExt.parseIsoDate(input.date) or defaultDate -- TODO: fetch from wiki var too
 
 	if input.contenders then
 		opponent = Opponent.tbd(Opponent.team)
@@ -178,7 +183,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, date)
 		potentialQualifiers = potentialQualifiers,
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
-		date = DateExt.parseIsoDate(input.date) or date, -- TODO: fetch from wiki var too
+		date = date,
 	}
 end
 
@@ -192,12 +197,24 @@ end
 ---@return standardPlayer
 function TeamParticipantsWikiParser.parsePlayer(playerInput)
 	local player = Opponent.readSinglePlayerArgs(playerInput)
+
 	local playedInput = Logic.readBoolOrNil(playerInput.played)
+	local resultsInput = Logic.readBoolOrNil(playerInput.results)
+	local roles = RoleUtil.readRoleArgs(playerInput.role)
+	local playerType = playerInput.type or 'player'
+
+	local hasNoStaffRoles = Array.all(roles, function(role) return role.type ~= RoleUtil.ROLE_TYPE.STAFF end)
+
+	if playerType ~= 'staff' and not hasNoStaffRoles then
+		playerType = 'staff'
+	end
+
 	player.extradata = {
-		roles = RoleUtil.readRoleArgs(playerInput.role),
+		roles = roles,
 		trophies = tonumber(playerInput.trophies),
-		type = playerInput.type or 'player',
-		played = Logic.nilOr(playedInput, playerInput.type ~= 'sub' and playerInput.type ~= 'staff' ),
+		type = playerType,
+		played = Logic.nilOr(playedInput, true),
+		results = Logic.nilOr(resultsInput, playedInput, true),
 	}
 	return player
 end

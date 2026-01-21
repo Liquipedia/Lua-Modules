@@ -9,7 +9,7 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
-local Ordinal = Lua.import('Module:Ordinal')
+local Placement = Lua.import('Module:Placement')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -92,16 +92,22 @@ function ParticipantsTeamQualifierInfo:render()
 	return content
 end
 
----@param placement number?
+---@param placement string|integer?
 ---@return Widget?
 function ParticipantsTeamQualifierInfo:createPlacementBadge(placement)
 	if not placement then
 		return nil
 	end
 
+	local placementData = Placement.raw(placement)
+
 	return Span{
-		classes = {'team-participant-card__qualifier-placement'},
-		children = {Ordinal.toOrdinal(placement)}
+		classes = {
+			'team-participant-card__qualifier-placement',
+			'placement-text',
+			placementData.backgroundClass
+		},
+		children = placementData.display
 	}
 end
 

@@ -73,7 +73,7 @@ local CustomPlayer = Class.new(CustomPerson)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -166,7 +166,10 @@ end
 ---@return Html?
 function CustomPlayer:createBottomContent()
 	if self.shouldQueryData then
-		return MatchTicker.participant({player = self.pagename}, self.recentMatches)
+		return MatchTicker.recent({
+			player = self.pagename,
+			limit = NUMBER_OF_RECENT_MATCHES
+		})
 	end
 end
 

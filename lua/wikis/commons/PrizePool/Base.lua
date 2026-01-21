@@ -13,6 +13,7 @@ local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -36,6 +37,9 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local pageVars = PageVariableNamespace('PrizePool')
 
 --- @class BasePrizePool
+--- @operator call(...): BasePrizePool
+--- @field options table
+--- @field _lpdbInjector LpdbInjector?
 local BasePrizePool = Class.new(function(self, ...) self:init(...) end)
 
 ---@class BasePrizePoolPrize
@@ -87,16 +91,23 @@ BasePrizePool.config = {
 			return tonumber(args.cutafter)
 		end
 	},
+	hideafter = {
+		default = math.huge,
+		read = function(args)
+			local hideAfter = tonumber(args.hideafter)
+			local cutAfter = tonumber(args.cutafter) or 4
+			if not hideAfter then
+				return
+			end
+			return math.max(cutAfter, hideAfter)
+		end
+	},
 	storeLpdb = {
 		default = true,
 		read = function(args)
-			local disabledVariable = Logic.readBoolOrNil(Variables.varDefault('disable_LPDB_storage'))
-			if disabledVariable ~= nil then
-				disabledVariable = not disabledVariable
-			end
 			return Logic.nilOr(
 				Logic.readBoolOrNil(args.storelpdb),
-				disabledVariable
+				Lpdb.isStorageEnabled()
 			)
 		end
 	},
@@ -436,6 +447,7 @@ function BasePrizePool:create()
 	return self
 end
 
+---@protected
 ---@param args table
 function BasePrizePool:readPlacements(args)
 	error('Function readPlacements needs to be implemented by a child class of "Module:PrizePool/Base"')
@@ -620,6 +632,10 @@ function BasePrizePool:_buildRows()
 	for _, placement in ipairs(self.placements) do
 		local previousOpponent = {}
 
+		if self:applyHideAfter(placement) then
+			break
+		end
+
 		self:applyToggleExpand(previousPlacement, placement, rows)
 
 		local cells = {}
@@ -689,17 +705,27 @@ function BasePrizePool:_buildRows()
 	return rows
 end
 
+---@protected
 ---@param placement BasePlacement
 function BasePrizePool:placeOrAwardCell(placement)
 	error('Function placeOrAwardCell needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
+---@protected
+---@param placement BasePlacement
+---@return boolean
+function BasePrizePool:applyHideAfter(placement)
+	return false
+end
+
+---@protected
 ---@param placement BasePlacement
 ---@return boolean
 function BasePrizePool:applyCutAfter(placement)
 	error('Function applyCutAfter needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
+---@protected
 ---@param placement BasePlacement?
 ---@param nextPlacement BasePlacement
 ---@param row WidgetTableRow

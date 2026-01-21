@@ -17,7 +17,7 @@ local CustomSeries = Class.new(Series)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomSeries.run(frame)
 	local series = CustomSeries(frame)
 	series:setWidgetInjector(CustomInjector(series))

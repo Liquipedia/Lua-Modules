@@ -303,6 +303,10 @@ function BaseMatchPage:renderGames()
 	local overallStats = self:renderOverallStats()
 
 	return ContentSwitch{
+		css = {
+			['margin-top'] = '0.5rem',
+			['margin-bottom'] = '0.5rem',
+		},
 		tabs = WidgetUtil.collect(
 			overallStats and {
 				label = {
@@ -416,8 +420,8 @@ function BaseMatchPage:footer()
 				bodyClasses = { 'vodlink' },
 				children = Array.map(parsedLinks, function (parsedLink)
 					return HtmlWidgets.Span{children = IconImage{
-						imageLight = parsedLink.icon:sub(6),
-						imageDark = (parsedLink.iconDark or parsedLink.icon):sub(6),
+						imageLight = parsedLink.icon,
+						imageDark = (parsedLink.iconDark or parsedLink.icon),
 						link = parsedLink.link
 					}}
 				end)

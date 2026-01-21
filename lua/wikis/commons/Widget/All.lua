@@ -24,6 +24,7 @@ Widgets.Highlights = Lua.import('Module:Widget/Infobox/Highlights')
 Widgets.Links = Lua.import('Module:Widget/Infobox/Links')
 Widgets.Location = Lua.import('Module:Widget/Infobox/Location')
 Widgets.Organizers = Lua.import('Module:Widget/Infobox/Organizers')
+Widgets.ShopMerch = Lua.import('Module:Widget/Infobox/ShopMerch')
 Widgets.Title = Lua.import('Module:Widget/Infobox/Title')
 Widgets.Venue = Lua.import('Module:Widget/Infobox/Venue')
 
