@@ -155,17 +155,42 @@ class CanvasComposer {
 		);
 		context.fill();
 
-		const verticalCenter = dims.PADDING + ( dims.HEADER_HEIGHT / 2 );
+		const mainTitle = mw.config.get( 'wgTitle' );
+		context.font = CONSTANTS.FONTS.HEADER;
+		const mainTitleWidth = context.measureText( mainTitle ).width;
+
+		context.font = CONSTANTS.FONTS.SUBHEADER;
+		const sectionTitleWidth = context.measureText( sectionTitle ).width;
+
+		const totalTextWidth = mainTitleWidth + sectionTitleWidth + ( dims.HEADER_TEXT_OFFSET * 2 );
+		const availableWidth = canvasWidth - ( dims.PADDING * 2 ) - dims.TEXT_OFFSET_X;
+
 		context.fillStyle = '#ffffff';
 		context.textBaseline = 'middle';
 
-		context.textAlign = 'left';
-		context.font = CONSTANTS.FONTS.HEADER;
-		context.fillText( mw.config.get( 'wgTitle' ), dims.PADDING + dims.HEADER_TEXT_OFFSET, verticalCenter );
+		if ( totalTextWidth > availableWidth ) {
+			// Stack vertically
+			const topY = dims.PADDING + ( dims.HEADER_HEIGHT / 3 );
+			const bottomY = dims.PADDING + ( dims.HEADER_HEIGHT * 2 / 3 );
 
-		context.textAlign = 'right';
-		context.font = CONSTANTS.FONTS.SUBHEADER;
-		context.fillText( sectionTitle, canvasWidth - dims.PADDING - dims.HEADER_TEXT_OFFSET, verticalCenter );
+			context.textAlign = 'left';
+			context.font = CONSTANTS.FONTS.HEADER;
+			context.fillText( mainTitle, dims.PADDING + dims.HEADER_TEXT_OFFSET, topY );
+
+			context.font = CONSTANTS.FONTS.SUBHEADER;
+			context.fillText( sectionTitle, dims.PADDING + dims.HEADER_TEXT_OFFSET, bottomY );
+		} else {
+			// Default horizontal layout
+			const verticalCenter = dims.PADDING + ( dims.HEADER_HEIGHT / 2 );
+
+			context.textAlign = 'left';
+			context.font = CONSTANTS.FONTS.HEADER;
+			context.fillText( mainTitle, dims.PADDING + dims.HEADER_TEXT_OFFSET, verticalCenter );
+
+			context.textAlign = 'right';
+			context.font = CONSTANTS.FONTS.SUBHEADER;
+			context.fillText( sectionTitle, canvasWidth - dims.PADDING - dims.HEADER_TEXT_OFFSET, verticalCenter );
+		}
 	}
 
 	drawContent( context, sourceCanvas ) {
