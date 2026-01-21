@@ -66,5 +66,8 @@ return {
 
 		-- MatchTicker
 		['matchticker-upcoming-matches'] = 'Upcoming Matches',
+
+		-- Shop Merch
+		['shop-merch-support-text'] = 'Purchases through this link support Liquipedia.',
 	}
 }
