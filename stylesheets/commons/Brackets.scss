@@ -199,17 +199,17 @@
 	display: flex;
 	flex: 1 1;
 	min-width: 0;
-}
 
-.brkts-opponent-entry-left > * {
-	flex: 1 1;
-	margin-left: 4px;
-	min-width: 0;
-}
+	> * {
+		flex: 1 1;
+		margin-left: 4px;
+		min-width: 0;
+	}
 
-.brkts-opponent-entry-left > .block-team {
-	gap: 2px;
-	margin-left: 0;
+	> .block-team {
+		gap: 2px;
+		margin-left: 0;
+	}
 }
 
 .brkts-opponent-entry .team-template-image-icon,
