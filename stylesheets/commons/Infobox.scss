@@ -21,6 +21,86 @@ $infobox-padding: 10px;
 
 	@media ( max-width: 600px ) {
 		order: 2;
+		width: 100%;
+		margin-left: 0;
+		float: none;
+
+		.infobox-image > div > div {
+			text-align: center;
+		}
+	}
+
+	.infobox-header {
+		padding: 5px;
+		font-weight: bold;
+		text-align: center;
+		font-size: 155%;
+		background-color: var( --infobox-header-background-color, var( --wiki-color-light ) );
+
+		&-2 {
+			font-size: 130%;
+		}
+
+		&-3 {
+			font-size: 115%;
+		}
+	}
+
+	.infobox-header .infobox-buttons {
+		float: right;
+		font-size: 60%;
+		font-weight: 500;
+
+		a {
+			background: none repeat scroll 0% 0% transparent !important;
+			padding: 0 !important;
+		}
+	}
+
+	.infobox-icons {
+		padding-top: 2px;
+
+		a {
+			background: none repeat scroll 0% 0% transparent !important;
+			padding: 0 !important;
+		}
+
+		.lp-icon {
+			margin-top: 3px;
+		}
+	}
+
+	.infobox-text-left {
+		text-align: left;
+	}
+
+	.infobox-text-right {
+		text-align: right;
+	}
+
+	.infobox-float-left {
+		float: left;
+	}
+
+	.infobox-float-right {
+		float: right;
+	}
+
+	.infobox-gold {
+		font-size: 11pt;
+		color: #f5c433;
+		text-shadow: -1px 0 #555555, 0 1px #555555, 1px 0 #555555, 0 -1px #555555;
+	}
+
+	.infobox-gradient {
+		background: linear-gradient( to right, #ffcccc, #ffddaa, #ffff99, #eeffaa, #ccffcc ) repeat scroll 0% 0% transparent;
+		line-height: 0.1px;
+	}
+
+	&.popout {
+		position: absolute;
+		top: 0;
+		left: 990px;
 	}
 }
 
@@ -45,6 +125,10 @@ $infobox-padding: 10px;
 	overflow: hidden;
 	text-align: center;
 
+	@media ( max-width: 600px ) {
+		width: 100%;
+	}
+
 	> * {
 		margin: 0 auto;
 	}
@@ -56,6 +140,10 @@ $infobox-padding: 10px;
 	padding-bottom: $infobox-padding;
 	border-top: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
 	border-bottom: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
+
+	@media ( max-width: 600px ) {
+		width: 100%;
+	}
 
 	> div {
 		display: table;
@@ -128,25 +216,7 @@ $infobox-padding: 10px;
 	div.infobox-cell-12 {
 		width: 8.3333%;
 	}
-}
 
-.fo-nttax-infobox-wrapper .infobox-header {
-	padding: 5px;
-	font-weight: bold;
-	text-align: center;
-	font-size: 155%;
-	background-color: var( --infobox-header-background-color, var( --wiki-color-light ) );
-
-	&-2 {
-		font-size: 130%;
-	}
-
-	&-3 {
-		font-size: 115%;
-	}
-}
-
-.fo-nttax-infobox {
 	div.infobox-description {
 		font-weight: bold;
 		text-align: right;
@@ -191,92 +261,11 @@ $infobox-padding: 10px;
 	div.infobox-bold {
 		font-weight: bold;
 	}
-}
 
-.fo-nttax-infobox-wrapper {
-	.infobox-header .infobox-buttons {
-		float: right;
-		font-size: 60%;
-		font-weight: 500;
-
-		a {
-			background: none repeat scroll 0% 0% transparent !important;
-			padding: 0 !important;
-		}
-	}
-
-	.infobox-icons {
-		padding-top: 2px;
-
-		a {
-			background: none repeat scroll 0% 0% transparent !important;
-			padding: 0 !important;
-		}
-
-		.lp-icon {
-			margin-top: 3px;
-		}
-	}
-
-	.infobox-text-left {
-		text-align: left;
-	}
-
-	.infobox-text-right {
-		text-align: right;
-	}
-
-	.infobox-float-left {
+	div.infobox-slider > div > div {
+		padding: 5px;
 		float: left;
 	}
-
-	.infobox-float-right {
-		float: right;
-	}
-}
-
-@media ( max-width: 600px ) {
-	.fo-nttax-infobox-wrapper {
-		width: 100%;
-		margin-left: 0;
-		float: none;
-	}
-
-	.fo-nttax-infobox {
-		width: 100%;
-	}
-
-	.fo-nttax-infobox-adbox {
-		width: 100%;
-	}
-
-	.fo-nttax-infobox-wrapper .infobox-image > div > div {
-		text-align: center;
-	}
-}
-
-.fo-nttax-infobox-wrapper {
-	.infobox-gold {
-		font-size: 11pt;
-		color: #f5c433;
-		text-shadow: -1px 0 #555555, 0 1px #555555, 1px 0 #555555, 0 -1px #555555;
-	}
-
-	.infobox-gradient {
-		background: linear-gradient( to right, #ffcccc, #ffddaa, #ffff99, #eeffaa, #ccffcc ) repeat scroll 0% 0% transparent;
-		line-height: 0.1px;
-	}
-
-	&.popout {
-		position: absolute;
-		top: 0;
-		left: 990px;
-	}
-}
-
-.fo-nttax-infobox div.infobox-slider > div > div {
-	padding: 5px;
-	float: left;
 }
 
 /** Game colors **/
