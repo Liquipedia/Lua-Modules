@@ -34,7 +34,7 @@ local MANUAL_SERIES_ICON = 1
 local UNKNOWN_DATE_PART = '??'
 
 --- @class SmashLeagueInfobox: InfoboxLeague
---- @field _base InfoboxLeague
+--- @field super fun(self: SmashLeagueInfobox): InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
@@ -125,7 +125,7 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 		return nil
 	end
 
-	return self._base.createLiquipediaTierDisplay(self, args)
+	return self:super():createLiquipediaTierDisplay(args)
 end
 
 --- @param args table
