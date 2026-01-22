@@ -1006,11 +1006,11 @@ div.brkts-popup-body-element-thumbs {
 .brkts-popup-side-shade-out {
 	opacity: 0.5;
 	padding-left: 4px;
-}
 
-.brkts-popup-side-shade-out-flipped {
-	opacity: 0.5;
-	padding-right: 4px;
+	&-flipped {
+		opacity: 0.5;
+		padding-right: 4px;
+	}
 }
 
 /**
