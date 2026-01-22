@@ -6,7 +6,7 @@
  *              match lists as images.
  ******************************************************************************/
 
-const CONSTANTS = {
+const EXPORT_IMAGE_CONFIG = {
 	LOGOS: {
 		DARK: 'https://liquipedia.net/commons/images/f/ff/Liquipedia_default_darkmode_export.png',
 		LIGHT: 'https://liquipedia.net/commons/images/9/9a/Liquipedia_default_lightmode_export.png'
@@ -70,7 +70,7 @@ class ImageCache {
 		this.cache = new Map();
 	}
 
-	async load( url, key, timeout = CONSTANTS.TIMEOUTS.IMAGE_LOAD ) {
+	async load( url, key, timeout = EXPORT_IMAGE_CONFIG.TIMEOUTS.IMAGE_LOAD ) {
 		if ( this.cache.has( key ) ) {
 			return this.cache.get( key );
 		}
@@ -115,7 +115,7 @@ class CanvasComposer {
 	async compose( sourceCanvas, sectionTitle, isDarkTheme ) {
 		const canvas = this.createCanvas( sourceCanvas );
 		const context = canvas.getContext( '2d' );
-		const theme = isDarkTheme ? CONSTANTS.COLORS.DARK : CONSTANTS.COLORS.LIGHT;
+		const theme = isDarkTheme ? EXPORT_IMAGE_CONFIG.COLORS.DARK : EXPORT_IMAGE_CONFIG.COLORS.LIGHT;
 
 		this.drawBackground( context, canvas.width, canvas.height, theme );
 		this.drawHeader( context, canvas.width, sectionTitle, theme );
@@ -126,7 +126,7 @@ class CanvasComposer {
 	}
 
 	createCanvas( sourceCanvas ) {
-		const dims = CONSTANTS.DIMENSIONS;
+		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
 		const canvas = document.createElement( 'canvas' );
 		canvas.width = sourceCanvas.width + ( dims.PADDING * 2 );
 		canvas.height = sourceCanvas.height + dims.HEADER_HEIGHT + dims.FOOTER_HEIGHT + ( dims.PADDING * 4 );
@@ -139,7 +139,7 @@ class CanvasComposer {
 	}
 
 	drawHeader( context, canvasWidth, sectionTitle, theme ) {
-		const dims = CONSTANTS.DIMENSIONS;
+		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
 		const gradient = context.createLinearGradient( dims.PADDING, 0, canvasWidth - dims.PADDING, 0 );
 		gradient.addColorStop( 0, theme.HEADER_START );
 		gradient.addColorStop( 1, theme.HEADER_END );
@@ -156,10 +156,10 @@ class CanvasComposer {
 		context.fill();
 
 		const mainTitle = mw.config.get( 'wgTitle' );
-		context.font = CONSTANTS.FONTS.HEADER;
+		context.font = EXPORT_IMAGE_CONFIG.FONTS.HEADER;
 		const mainTitleWidth = context.measureText( mainTitle ).width;
 
-		context.font = CONSTANTS.FONTS.SUBHEADER;
+		context.font = EXPORT_IMAGE_CONFIG.FONTS.SUBHEADER;
 		const sectionTitleWidth = context.measureText( sectionTitle ).width;
 
 		const totalTextWidth = mainTitleWidth + sectionTitleWidth + ( dims.HEADER_TEXT_OFFSET * 2 );
@@ -174,27 +174,27 @@ class CanvasComposer {
 			const bottomY = dims.PADDING + ( dims.HEADER_HEIGHT * 2 / 3 );
 
 			context.textAlign = 'left';
-			context.font = CONSTANTS.FONTS.HEADER;
+			context.font = EXPORT_IMAGE_CONFIG.FONTS.HEADER;
 			context.fillText( mainTitle, dims.PADDING + dims.HEADER_TEXT_OFFSET, topY );
 
-			context.font = CONSTANTS.FONTS.SUBHEADER;
+			context.font = EXPORT_IMAGE_CONFIG.FONTS.SUBHEADER;
 			context.fillText( sectionTitle, dims.PADDING + dims.HEADER_TEXT_OFFSET, bottomY );
 		} else {
 			// Default horizontal layout
 			const verticalCenter = dims.PADDING + ( dims.HEADER_HEIGHT / 2 );
 
 			context.textAlign = 'left';
-			context.font = CONSTANTS.FONTS.HEADER;
+			context.font = EXPORT_IMAGE_CONFIG.FONTS.HEADER;
 			context.fillText( mainTitle, dims.PADDING + dims.HEADER_TEXT_OFFSET, verticalCenter );
 
 			context.textAlign = 'right';
-			context.font = CONSTANTS.FONTS.SUBHEADER;
+			context.font = EXPORT_IMAGE_CONFIG.FONTS.SUBHEADER;
 			context.fillText( sectionTitle, canvasWidth - dims.PADDING - dims.HEADER_TEXT_OFFSET, verticalCenter );
 		}
 	}
 
 	drawContent( context, sourceCanvas ) {
-		const dims = CONSTANTS.DIMENSIONS;
+		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
 		context.drawImage(
 			sourceCanvas,
 			dims.PADDING,
@@ -203,7 +203,7 @@ class CanvasComposer {
 	}
 
 	async drawFooter( context, canvasWidth, sourceHeight, theme, isDarkTheme ) {
-		const dims = CONSTANTS.DIMENSIONS;
+		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
 		const footerY = dims.PADDING + dims.HEADER_HEIGHT + dims.PADDING + sourceHeight + dims.PADDING;
 
 		const gradient = context.createLinearGradient( dims.PADDING, 0, canvasWidth - dims.PADDING, 0 );
@@ -222,7 +222,7 @@ class CanvasComposer {
 		context.fill();
 
 		context.fillStyle = theme.TEXT;
-		context.font = CONSTANTS.FONTS.FOOTER;
+		context.font = EXPORT_IMAGE_CONFIG.FONTS.FOOTER;
 		context.textAlign = 'left';
 		const textY = footerY + ( dims.FOOTER_HEIGHT / 2 );
 
@@ -231,7 +231,7 @@ class CanvasComposer {
 			'POWERED BY LIQUIPEDIA',
 			dims.PADDING + dims.TEXT_OFFSET_X,
 			textY,
-			CONSTANTS.SPACING.LETTER_SPACING
+			EXPORT_IMAGE_CONFIG.SPACING.LETTER_SPACING
 		);
 
 		try {
@@ -243,8 +243,8 @@ class CanvasComposer {
 	}
 
 	async drawLogo( context, footerY, isDarkTheme ) {
-		const dims = CONSTANTS.DIMENSIONS;
-		const logoUrl = isDarkTheme ? CONSTANTS.LOGOS.DARK : CONSTANTS.LOGOS.LIGHT;
+		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
+		const logoUrl = isDarkTheme ? EXPORT_IMAGE_CONFIG.LOGOS.DARK : EXPORT_IMAGE_CONFIG.LOGOS.LIGHT;
 		const cacheKey = isDarkTheme ? 'dark' : 'light';
 		const logoImage = await this.imageCache.load( logoUrl, cacheKey );
 		const logoY = footerY + ( dims.FOOTER_HEIGHT - dims.LOGO_HEIGHT ) / 2;
@@ -351,7 +351,18 @@ class ExportService {
 
 	generateFilename( title ) {
 		const pageTitle = mw.config.get( 'wgTitle' );
-		return `Liquipedia ${ pageTitle } ${ title }`;
+		return `Liquipedia ${ pageTitle } ${ title } ${ this.generateTimestamp() }`;
+	}
+
+	generateTimestamp() {
+		const now = new Date();
+		const year = now.getFullYear();
+		const month = String( now.getMonth() + 1 ).padStart( 2, '0' );
+		const day = String( now.getDate() ).padStart( 2, '0' );
+		const hour = String( now.getHours() ).padStart( 2, '0' );
+		const min = String( now.getMinutes() ).padStart( 2, '0' );
+		const sec = String( now.getSeconds() ).padStart( 2, '0' );
+		return `${ year }${ month }${ day }_${ hour }${ min }${ sec }`;
 	}
 
 	async outputResult( canvas, mode, filename ) {
@@ -465,7 +476,7 @@ class DOMUtils {
 	}
 
 	static findExportableElements() {
-		const configs = CONSTANTS.SELECTORS;
+		const configs = EXPORT_IMAGE_CONFIG.SELECTORS;
 
 		const headingsToElements = new Map();
 
@@ -636,7 +647,7 @@ class DropdownWidget {
 	}
 
 	createToggleButton( menuElement, onOpen ) {
-		const iconMargin = CONSTANTS.SPACING.ICON_MARGIN;
+		const iconMargin = EXPORT_IMAGE_CONFIG.SPACING.ICON_MARGIN;
 		const buttonContent = `<i class="fas fa-share-alt" style="margin-right: ${ iconMargin };"></i>` +
 			'<span style="line-height: 1">Share</span>';
 		const button = this.createElement( 'button', {
@@ -663,7 +674,7 @@ class DropdownWidget {
 			class: 'dropdown-widget',
 			style: {
 				display: 'inline-block',
-				marginLeft: CONSTANTS.SPACING.DROPDOWN_MARGIN,
+				marginLeft: EXPORT_IMAGE_CONFIG.SPACING.DROPDOWN_MARGIN,
 				verticalAlign: 'middle',
 				fontSize: '14px'
 			}
