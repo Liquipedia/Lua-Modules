@@ -56,6 +56,9 @@ function Class.new(base, init)
 		local proxy = {}
 		local proxyMT = {
 			__index = function (obj, param)
+				if param == 'super' then
+					error('Cannot create proxy from a super proxy')
+				end
 				local objVal = rawget(object, param)
 				if objVal then
 					return objVal
@@ -63,6 +66,7 @@ function Class.new(base, init)
 				return base and base[param]
 			end,
 			_base = base,
+			_isSuperProxy = true,
 			__newindex = object,
 			__add = base and base.__add,
 			__sub = base and base.__sub,
