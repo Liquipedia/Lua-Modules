@@ -1064,41 +1064,37 @@ div.brkts-popup-body-element-thumbs {
 	display: flex;
 	gap: 4px;
 	width: 100%;
-}
 
-@media ( max-width: 768px ) {
-	.block-team {
+	@media ( max-width: 768px ) {
 		gap: 2px;
 	}
-}
 
-.block-team > .name {
-	flex: 1 1;
-	min-width: 0;
-}
-
-.block-team > .team-template-team-icon {
-	display: contents;
-	flex: 0 0;
-}
-
-@supports not ( display: contents ) {
-	.block-team > .team-template-team-icon {
-		display: block;
+	> .name {
+		flex: 1 1;
+		min-width: 0;
 	}
-}
 
-.block-team.flipped {
-	flex-direction: row-reverse;
-}
+	> .team-template-team-icon {
+		display: contents;
+		flex: 0 0;
 
-.block-team.flipped > .name {
-	text-align: right;
-}
+		@supports not ( display: contents ) {
+			display: block;
+		}
+	}
 
-.block-team-hide-link {
-	cursor: default;
-	pointer-events: none;
+	&.flipped {
+		flex-direction: row-reverse;
+
+		> .name {
+			text-align: right;
+		}
+	}
+
+	&-hide-link {
+		cursor: default;
+		pointer-events: none;
+	}
 }
 
 @media ( max-width: 767px ) {
