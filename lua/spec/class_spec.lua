@@ -58,7 +58,7 @@ describe('class', function()
 			assert.error(function() return c1:super():numLegs() end)
 		end)
 
-		it('access instance value from super', function ()
+		it('access instance variable from super', function ()
 			local c1 = Cat(5)
 
 			assert.equal(5, c1:super()._size)
