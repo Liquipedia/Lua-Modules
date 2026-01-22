@@ -44,10 +44,10 @@ $infobox-padding: 10px;
 	border-bottom: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
 	overflow: hidden;
 	text-align: center;
-}
 
-.fo-nttax-infobox-adbox > * {
-	margin: 0 auto;
+	> * {
+		margin: 0 auto;
+	}
 }
 
 .fo-nttax-infobox {
@@ -56,78 +56,78 @@ $infobox-padding: 10px;
 	padding-bottom: $infobox-padding;
 	border-top: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
 	border-bottom: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
-}
 
-.fo-nttax-infobox > div {
-	display: table;
-	width: 100%;
-}
+	> div {
+		display: table;
+		width: 100%;
 
-.fo-nttax-infobox > div:nth-child( 2n+1 ) {
-	background-color: var( --clr-surface-2, #eeeeee );
-}
+		&:nth-child( 2n+1 ) {
+			background-color: var( --clr-surface-2, #eeeeee );
+		}
 
-.fo-nttax-infobox > div:nth-child( 2n ) {
-	background-color: var( --clr-surface-1, #f5f5f5 );
-}
+		&:nth-child( 2n ) {
+			background-color: var( --clr-surface-1, #f5f5f5 );
+		}
 
-.fo-nttax-infobox > div::after {
-	clear: both;
-}
+		&::after {
+			clear: both;
+		}
 
-.fo-nttax-infobox > div > div {
-	width: 100%;
-	float: left;
-	height: inherit;
-	padding: 5px;
-}
+		> div {
+			width: 100%;
+			float: left;
+			height: inherit;
+			padding: 5px;
+		}
+	}
 
-.fo-nttax-infobox div.infobox-cell-2 {
-	width: 50%;
-}
+	div.infobox-cell-2 {
+		width: 50%;
+	}
 
-.fo-nttax-infobox div.infobox-cell-3 {
-	width: 33.3333%;
-}
+	div.infobox-cell-3 {
+		width: 33.3333%;
+	}
 
-.fo-nttax-infobox div.infobox-cell-4 {
-	width: 25%;
-}
+	div.infobox-cell-4 {
+		width: 25%;
+	}
 
-.fo-nttax-infobox div.infobox-cell-4-5 {
-	width: 22.2222%;
-}
+	div.infobox-cell-4-5 {
+		width: 22.2222%;
+	}
 
-.fo-nttax-infobox div.infobox-cell-5 {
-	width: 20%;
-}
+	div.infobox-cell-5 {
+		width: 20%;
+	}
 
-.fo-nttax-infobox div.infobox-cell-6 {
-	width: 16.6666%;
-}
+	div.infobox-cell-6 {
+		width: 16.6666%;
+	}
 
-.fo-nttax-infobox div.infobox-cell-7 {
-	width: 14.2857%;
-}
+	div.infobox-cell-7 {
+		width: 14.2857%;
+	}
 
-.fo-nttax-infobox div.infobox-cell-8 {
-	width: 12.5%;
-}
+	div.infobox-cell-8 {
+		width: 12.5%;
+	}
 
-.fo-nttax-infobox div.infobox-cell-9 {
-	width: 11.1111%;
-}
+	div.infobox-cell-9 {
+		width: 11.1111%;
+	}
 
-.fo-nttax-infobox div.infobox-cell-10 {
-	width: 10%;
-}
+	div.infobox-cell-10 {
+		width: 10%;
+	}
 
-.fo-nttax-infobox div.infobox-cell-11 {
-	width: 9.0909%;
-}
+	div.infobox-cell-11 {
+		width: 9.0909%;
+	}
 
-.fo-nttax-infobox div.infobox-cell-12 {
-	width: 8.3333%;
+	div.infobox-cell-12 {
+		width: 8.3333%;
+	}
 }
 
 .fo-nttax-infobox-wrapper .infobox-header {
@@ -136,99 +136,103 @@ $infobox-padding: 10px;
 	text-align: center;
 	font-size: 155%;
 	background-color: var( --infobox-header-background-color, var( --wiki-color-light ) );
+
+	&-2 {
+		font-size: 130%;
+	}
+
+	&-3 {
+		font-size: 115%;
+	}
 }
 
-.fo-nttax-infobox-wrapper .infobox-header-2 {
-	font-size: 130%;
+.fo-nttax-infobox {
+	div.infobox-description {
+		font-weight: bold;
+		text-align: right;
+	}
+
+	> div.infobox-image-wrapper {
+		position: relative;
+	}
+
+	div.infobox-image {
+		padding: 0;
+		width: 100%;
+
+		&:not( .infobox-fixed-size-image ) img {
+			width: 100%;
+			height: auto;
+		}
+	}
+
+	div.infobox-fixed-size-image img {
+		width: auto;
+		height: auto;
+	}
+
+	div.infobox-image-text {
+		position: absolute;
+		bottom: 4px;
+		right: 8px;
+		padding: 0;
+		text-align: right;
+		font-weight: bold;
+	}
+
+	div.infobox-center {
+		text-align: center;
+	}
+
+	div.infobox-size-20 {
+		font-size: 200%;
+	}
+
+	div.infobox-bold {
+		font-weight: bold;
+	}
 }
 
-.fo-nttax-infobox-wrapper .infobox-header-3 {
-	font-size: 115%;
-}
+.fo-nttax-infobox-wrapper {
+	.infobox-header .infobox-buttons {
+		float: right;
+		font-size: 60%;
+		font-weight: 500;
 
-.fo-nttax-infobox div.infobox-description {
-	font-weight: bold;
-	text-align: right;
-}
+		a {
+			background: none repeat scroll 0% 0% transparent !important;
+			padding: 0 !important;
+		}
+	}
 
-.fo-nttax-infobox > div.infobox-image-wrapper {
-	position: relative;
-}
+	.infobox-icons {
+		padding-top: 2px;
 
-.fo-nttax-infobox div.infobox-image {
-	padding: 0;
-	width: 100%;
-}
+		a {
+			background: none repeat scroll 0% 0% transparent !important;
+			padding: 0 !important;
+		}
 
-.fo-nttax-infobox div.infobox-image:not( .infobox-fixed-size-image ) img {
-	width: 100%;
-	height: auto;
-}
+		.lp-icon {
+			margin-top: 3px;
+		}
+	}
 
-.fo-nttax-infobox div.infobox-fixed-size-image img {
-	width: auto;
-	height: auto;
-}
+	.infobox-text-left {
+		text-align: left;
+	}
 
-.fo-nttax-infobox div.infobox-image-text {
-	position: absolute;
-	bottom: 4px;
-	right: 8px;
-	padding: 0;
-	text-align: right;
-	font-weight: bold;
-}
+	.infobox-text-right {
+		text-align: right;
+	}
 
-.fo-nttax-infobox div.infobox-center {
-	text-align: center;
-}
+	.infobox-float-left {
+		float: left;
+	}
 
-.fo-nttax-infobox div.infobox-size-20 {
-	font-size: 200%;
-}
-
-.fo-nttax-infobox div.infobox-bold {
-	font-weight: bold;
-}
-
-.fo-nttax-infobox-wrapper .infobox-header .infobox-buttons {
-	float: right;
-	font-size: 60%;
-	font-weight: 500;
-}
-
-.fo-nttax-infobox-wrapper .infobox-header .infobox-buttons a {
-	background: none repeat scroll 0% 0% transparent !important;
-	padding: 0 !important;
-}
-
-.fo-nttax-infobox-wrapper .infobox-icons a {
-	background: none repeat scroll 0% 0% transparent !important;
-	padding: 0 !important;
-}
-
-.fo-nttax-infobox-wrapper .infobox-icons {
-	padding-top: 2px;
-}
-
-.fo-nttax-infobox-wrapper .infobox-icons .lp-icon {
-	margin-top: 3px;
-}
-
-.fo-nttax-infobox-wrapper .infobox-text-left {
-	text-align: left;
-}
-
-.fo-nttax-infobox-wrapper .infobox-text-right {
-	text-align: right;
-}
-
-.fo-nttax-infobox-wrapper .infobox-float-left {
-	float: left;
-}
-
-.fo-nttax-infobox-wrapper .infobox-float-right {
-	float: right;
+	.infobox-float-right {
+		float: right;
+	}
 }
 
 @media ( max-width: 600px ) {
@@ -251,21 +255,23 @@ $infobox-padding: 10px;
 	}
 }
 
-.fo-nttax-infobox-wrapper .infobox-gold {
-	font-size: 11pt;
-	color: #f5c433;
-	text-shadow: -1px 0 #555555, 0 1px #555555, 1px 0 #555555, 0 -1px #555555;
-}
+.fo-nttax-infobox-wrapper {
+	.infobox-gold {
+		font-size: 11pt;
+		color: #f5c433;
+		text-shadow: -1px 0 #555555, 0 1px #555555, 1px 0 #555555, 0 -1px #555555;
+	}
 
-.fo-nttax-infobox-wrapper .infobox-gradient {
-	background: linear-gradient( to right, #ffcccc, #ffddaa, #ffff99, #eeffaa, #ccffcc ) repeat scroll 0% 0% transparent;
-	line-height: 0.1px;
-}
+	.infobox-gradient {
+		background: linear-gradient( to right, #ffcccc, #ffddaa, #ffff99, #eeffaa, #ccffcc ) repeat scroll 0% 0% transparent;
+		line-height: 0.1px;
+	}
 
-.fo-nttax-infobox-wrapper.popout {
-	position: absolute;
-	top: 0;
-	left: 990px;
+	&.popout {
+		position: absolute;
+		top: 0;
+		left: 990px;
+	}
 }
 
 .fo-nttax-infobox div.infobox-slider > div > div {
@@ -276,39 +282,47 @@ $infobox-padding: 10px;
 /** Game colors **/
 
 /* StarCraft II - Wings of Liberty */
-.theme--light .fo-nttax-infobox-wrapper.infobox-wol .infobox-header {
-	background-color: var( --clr-sapphire-90 );
-}
+.fo-nttax-infobox-wrapper.infobox-wol .infobox-header {
+	.theme--light & {
+		background-color: var( --clr-sapphire-90 );
+	}
 
-.theme--dark .fo-nttax-infobox-wrapper.infobox-wol .infobox-header {
-	background-color: var( --clr-sapphire-20 );
+	.theme--dark & {
+		background-color: var( --clr-sapphire-20 );
+	}
 }
 
 /* StarCraft II - Heart of the Swarm */
-.theme--light .fo-nttax-infobox-wrapper.infobox-hots .infobox-header {
-	background-color: var( --clr-cinnabar-90 );
-}
+.fo-nttax-infobox-wrapper.infobox-hots .infobox-header {
+	.theme--light & {
+		background-color: var( --clr-cinnabar-90 );
+	}
 
-.theme--dark .fo-nttax-infobox-wrapper.infobox-hots .infobox-header {
-	background-color: var( --clr-cinnabar-20 );
+	.theme--dark & {
+		background-color: var( --clr-cinnabar-20 );
+	}
 }
 
 /* Starcraft II - Legacy of the Void */
-.theme--light .fo-nttax-infobox-wrapper.infobox-lotv .infobox-header {
-	background-color: var( --clr-forest-90 );
-}
+.fo-nttax-infobox-wrapper.infobox-lotv .infobox-header {
+	.theme--light & {
+		background-color: var( --clr-forest-90 );
+	}
 
-.theme--dark .fo-nttax-infobox-wrapper.infobox-lotv .infobox-header {
-	background-color: var( --clr-forest-20 );
+	.theme--dark & {
+		background-color: var( --clr-forest-20 );
+	}
 }
 
 /* Starcraft II - Custom mods */
-.theme--light .fo-nttax-infobox-wrapper.infobox-mod .infobox-header {
-	background-color: var( --clr-sun-80 );
-}
+.fo-nttax-infobox-wrapper.infobox-mod .infobox-header {
+	.theme--light & {
+		background-color: var( --clr-sun-80 );
+	}
 
-.theme--dark .fo-nttax-infobox-wrapper.infobox-mod .infobox-header {
-	background-color: var( --clr-sun-20 );
+	.theme--dark & {
+		background-color: var( --clr-sun-20 );
+	}
 }
 
 /* Smash */
@@ -354,10 +368,8 @@ Author(s): salle, Ricci
 	overflow-x: scroll;
 	width: $infobox-width;
 	white-space: nowrap;
-}
 
-@media ( max-width: 600px ) {
-	.fo-nttax-infobox div.infobox-image.infobox-double-image > div {
+	@media ( max-width: 600px ) {
 		width: 100%;
 	}
 }
@@ -365,16 +377,16 @@ Author(s): salle, Ricci
 .infobox-double-image div .center {
 	display: inline-block;
 	width: auto;
-}
 
-.infobox-double-image div .center:first-child .floatnone a img {
-	margin-left: 40px;
-	margin-right: 10px;
-}
+	&:first-child .floatnone a img {
+		margin-left: 40px;
+		margin-right: 10px;
+	}
 
-.infobox-double-image div .center:last-child .floatnone a img {
-	margin-left: 10px;
-	margin-right: 40px;
+	&:last-child .floatnone a img {
+		margin-left: 10px;
+		margin-right: 40px;
+	}
 }
 
 /*******************************************************************************
