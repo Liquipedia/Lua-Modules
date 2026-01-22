@@ -155,7 +155,7 @@ class CanvasComposer {
 		);
 		context.fill();
 
-		const mainTitle = mw.config.get( 'wgTitle' );
+		const mainTitle = mw.config.get( 'wgDisplayTitle' );
 		context.font = EXPORT_IMAGE_CONFIG.FONTS.HEADER;
 		const mainTitleWidth = context.measureText( mainTitle ).width;
 
@@ -350,7 +350,7 @@ class ExportService {
 	}
 
 	generateFilename( title ) {
-		const pageTitle = mw.config.get( 'wgTitle' );
+		const pageTitle = mw.config.get( 'wgDisplayTitle' );
 		return `Liquipedia ${ pageTitle } ${ title } ${ this.generateTimestamp() }`;
 	}
 
