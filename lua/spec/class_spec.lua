@@ -58,6 +58,13 @@ describe('class', function()
 			assert.error(function() return c1:super():numLegs() end)
 		end)
 
+		it('call super metamethods', function ()
+			local c1 = Cat(5)
+
+			assert.equal('Cat', tostring(c1))
+			assert.equal('Animal', tostring(c1:super()))
+		end)
+
 		it('access instance variable from super', function ()
 			local c1 = Cat(5)
 
