@@ -8,7 +8,9 @@ describe('class', function()
 		return 'Animal'
 	end
 
-	Animal.__tostring = Animal.type
+	function Animal:__tostring()
+		return self:type()
+	end
 
 	function Animal:size()
 		error('abstract')
