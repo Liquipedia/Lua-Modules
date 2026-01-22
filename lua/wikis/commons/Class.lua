@@ -55,7 +55,7 @@ function Class.new(base, init)
 		local proxy = {}
 		local proxyMT = {
 			__index = function (obj, param)
-				local objVal = rawget(obj, param)
+				local objVal = rawget(object, param)
 				if objVal then
 					return objVal
 				end
