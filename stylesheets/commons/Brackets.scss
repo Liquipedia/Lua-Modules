@@ -1020,37 +1020,37 @@ div.brkts-popup-body-element-thumbs {
 .block-player {
 	display: flex;
 	align-items: center;
-}
 
-.block-player.has-team {
-	width: 100%;
+	&.has-team {
+		width: 100%;
+	}
+
+	&.flipped {
+		flex-direction: row-reverse;
+
+		> .name {
+			text-align: right;
+		}
+
+		> .flag {
+			margin-left: 4px;
+			margin-right: 0;
+		}
+	}
+
+	& > .name {
+		flex: 1 1;
+		min-width: 0;
+	}
+
+	> .flag {
+		margin-right: 4px;
+		flex: 0 0;
+	}
 }
 
 .block-players-wrapper {
 	width: 100%;
-}
-
-.block-player.flipped {
-	flex-direction: row-reverse;
-}
-
-.block-player > .name {
-	flex: 1 1;
-	min-width: 0;
-}
-
-.block-player.flipped > .name {
-	text-align: right;
-}
-
-.block-player > .flag {
-	margin-right: 4px;
-	flex: 0 0;
-}
-
-.block-player.flipped > .flag {
-	margin-left: 4px;
-	margin-right: 0;
 }
 
 .note {
