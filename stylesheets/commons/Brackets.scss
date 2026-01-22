@@ -1292,10 +1292,10 @@ div.brkts-opponent-hover {
 	&-race {
 		flex: 0 0;
 		padding: 0 2px 0 0;
-	}
 
-	.flipped > & {
-		padding: 0 0 0 2px;
+		.flipped > & {
+			padding: 0 0 0 2px;
+		}
 	}
 }
 
