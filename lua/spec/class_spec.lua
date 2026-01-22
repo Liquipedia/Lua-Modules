@@ -80,7 +80,7 @@ describe('class', function()
 
 			assert.are_not_equal(5, c1._size)
 			assert.equal(20, c1._size)
-			assert.equal(20, c1.size())
+			assert.equal(20, c1:size())
 		end)
 	end)
 
