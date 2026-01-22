@@ -119,15 +119,15 @@
 	border: 1px solid var( --brackets-border-color, #aaaaaa );
 	position: relative;
 	color: var( --clr-on-background );
-}
 
-.brkts-match.brkts-hover {
-	box-shadow: 0 0 2px rgba( 0, 0, 0, 0.5 );
-	border: 1px solid rgba( 0, 0, 0, 0.5 );
+	&.brkts-hover {
+		box-shadow: 0 0 2px rgba( 0, 0, 0, 0.5 );
+		border: 1px solid rgba( 0, 0, 0, 0.5 );
 
-	.theme--dark & {
-		box-shadow: 0 0 2px rgba( 255, 255, 255, 0.5 );
-		border: 1px solid rgba( 255, 255, 255, 0.5 );
+		.theme--dark & {
+			box-shadow: 0 0 2px rgba( 255, 255, 255, 0.5 );
+			border: 1px solid rgba( 255, 255, 255, 0.5 );
+		}
 	}
 }
 
