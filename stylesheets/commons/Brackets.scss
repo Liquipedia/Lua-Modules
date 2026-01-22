@@ -1134,10 +1134,10 @@ div.brkts-opponent-hover {
 
 .brkts-designer {
 	margin-bottom: 40px;
-}
 
-.brkts-designer > * {
-	margin: 10px 0;
+	> * {
+		margin: 10px 0;
+	}
 }
 
 .brkts-designer-template-code {
@@ -1145,11 +1145,11 @@ div.brkts-opponent-hover {
 	resize: none;
 	width: 100%;
 	display: none !important;
-}
 
-.user-is-sysop .brkts-designer-template-code,
-.user-is-reviewer .brkts-designer-template-code {
-	display: unset !important;
+	.user-is-sysop &,
+	.user-is-reviewer & {
+		display: unset !important;
+	}
 }
 
 .brkts-designer-bracket-name-row {
@@ -1158,10 +1158,10 @@ div.brkts-opponent-hover {
 
 .brkts-designer-action-row > button {
 	margin-left: 10px;
-}
 
-.brkts-designer-action-row > button:first-child {
-	margin-left: 0;
+	&:first-child {
+		margin-left: 0;
+	}
 }
 
 .brkts-designer-bracket-name {
@@ -1179,15 +1179,15 @@ div.brkts-opponent-hover {
 	margin-top: 10px;
 	padding: 10px;
 	width: 400px;
-}
 
-.brkts-designer-import-bracket > input {
-	flex: 1 1;
-	min-width: 0;
-}
+	> input {
+		flex: 1 1;
+		min-width: 0;
+	}
 
-.brkts-designer-import-bracket > button {
-	margin-left: 10px;
+	> button {
+		margin-left: 10px;
+	}
 }
 
 .brkts-designer-match-row {
@@ -1196,7 +1196,7 @@ div.brkts-opponent-hover {
 	height: 22px;
 }
 
-.brkts-designer-small-button.brkts-designer-small-button.brkts-designer-small-button {
+.brkts-designer-small-button {
 	background-color: #e0e0e0;
 	border: solid 1px #c0c0c0;
 	display: block;
@@ -1214,7 +1214,7 @@ div.brkts-opponent-hover {
 	grid-gap: 4px 10px;
 }
 
-.brkts-designer-gallery-entry.brkts-designer-gallery-entry.brkts-designer-gallery-entry {
+.brkts-designer-gallery-entry {
 	font-size: 0.9rem;
 }
 
