@@ -1297,11 +1297,11 @@ div.brkts-opponent-hover {
 			padding: 0 0 0 2px;
 		}
 	}
-}
 
-.starcraft-block-archon-players {
-	flex: 1 1;
-	min-width: 0;
+	&-players {
+		flex: 1 1;
+		min-width: 0;
+	}
 }
 
 /**
