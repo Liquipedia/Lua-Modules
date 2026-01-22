@@ -1105,26 +1105,26 @@ div.brkts-popup-body-element-thumbs {
 
 div.brkts-opponent-hover {
 	position: relative;
-}
 
-div.brkts-opponent-hover::after {
-	content: "";
-	height: 100%;
-	left: 0;
-	pointer-events: none;
-	position: absolute;
-	top: 0;
-	transition: 0.5s;
-	transition-property: box-shadow;
-	width: 100%;
-	z-index: 5;
-}
+	&::after {
+		content: "";
+		height: 100%;
+		left: 0;
+		pointer-events: none;
+		position: absolute;
+		top: 0;
+		transition: 0.5s;
+		transition-property: box-shadow;
+		width: 100%;
+		z-index: 5;
+	}
 
-div.brkts-opponent-hover-active::after {
-	box-shadow: -1px 0 2px rgba( 0, 0, 0, 0.7 ), 1px 0 2px rgba( 0, 0, 0, 0.7 ), 0 -1px 2px rgba( 0, 0, 0, 0.7 ), 0 1px 2px rgba( 0, 0, 0, 0.7 );
+	&-active::after {
+		box-shadow: -1px 0 2px rgba( 0, 0, 0, 0.7 ), 1px 0 2px rgba( 0, 0, 0, 0.7 ), 0 -1px 2px rgba( 0, 0, 0, 0.7 ), 0 1px 2px rgba( 0, 0, 0, 0.7 );
 
-	.theme--dark & {
-		box-shadow: -1px 0 2px rgba( 255, 255, 255, 0.7 ), 1px 0 2px rgba( 255, 255, 255, 0.7 ), 0 -1px 2px rgba( 255, 255, 255, 0.7 ), 0 1px 2px rgba( 255, 255, 255, 0.7 );
+		.theme--dark & {
+			box-shadow: -1px 0 2px rgba( 255, 255, 255, 0.7 ), 1px 0 2px rgba( 255, 255, 255, 0.7 ), 0 -1px 2px rgba( 255, 255, 255, 0.7 ), 0 1px 2px rgba( 255, 255, 255, 0.7 );
+		}
 	}
 }
 
