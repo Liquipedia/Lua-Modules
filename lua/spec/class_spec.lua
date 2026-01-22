@@ -61,7 +61,7 @@ describe('class', function()
 		it('access instance value from super', function ()
 			local c1 = Cat(5)
 
-			assert.equal(4, c1:super()._size)
+			assert.equal(5, c1:super()._size)
 		end)
 	end)
 
