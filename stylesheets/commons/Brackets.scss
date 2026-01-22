@@ -1230,11 +1230,11 @@ div.brkts-opponent-hover {
 
 .brkts-template-container-button-wrapper {
 	margin-bottom: 10px;
-}
 
-.brkts-template-container-button-wrapper > * {
-	display: inline-block;
-	margin-right: 10px;
+	> * {
+		display: inline-block;
+		margin-right: 10px;
+	}
 }
 
 .brkts-dropdown-wrapper {
@@ -1246,20 +1246,20 @@ div.brkts-opponent-hover {
 	position: absolute;
 	background: #cfcfcf;
 	min-width: 150px;
-}
 
-.brkts-dropdown-show {
-	display: block;
-}
+	&-show {
+		display: block;
+	}
 
-.brkts-dropdown > * {
-	padding: 12px 16px;
-	text-decoration: none;
-	cursor: pointer;
-}
+	> * {
+		padding: 12px 16px;
+		text-decoration: none;
+		cursor: pointer;
 
-.brkts-dropdown > *:hover {
-	background: rgba( 0, 0, 0, 0.1 );
+		&:hover {
+			background: rgba( 0, 0, 0, 0.1 );
+		}
+	}
 }
 
 /**
