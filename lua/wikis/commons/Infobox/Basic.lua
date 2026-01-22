@@ -16,7 +16,7 @@ local Table = Lua.import('Module:Table')
 local Info = Lua.import('Module:Info')
 local Infobox = Lua.import('Module:Widget/Infobox/Core')
 
----@class BasicInfobox
+---@class BasicInfobox: BaseClass
 ---@operator call(Frame): BasicInfobox
 ---@field args table
 ---@field pagename string

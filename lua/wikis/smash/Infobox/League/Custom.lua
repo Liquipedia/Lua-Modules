@@ -33,13 +33,18 @@ local DEFAULT_TYPE = 'offline'
 local MANUAL_SERIES_ICON = 1
 local UNKNOWN_DATE_PART = '??'
 
---- @class SmashLeagueInfobox: InfoboxLeague
---- @field _base InfoboxLeague
+---@class SmashLeagueInfobox: InfoboxLeague
+---@operator call(Frame): SmashLeagueInfobox
+---@field super fun(self: SmashLeagueInfobox): InfoboxLeague
 local CustomLeague = Class.new(League)
+
+---@class SmashLeagueInfoboxWidgetInjector: WidgetInjector
+---@operator call(SmashLeagueInfobox): SmashLeagueInfoboxWidgetInjector
+---@field caller SmashLeagueInfobox
 local CustomInjector = Class.new(Injector)
 
 --- @param frame Frame
---- @return Html
+--- @return Widget
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -125,7 +130,7 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 		return nil
 	end
 
-	return self._base.createLiquipediaTierDisplay(self, args)
+	return self:super():createLiquipediaTierDisplay(args)
 end
 
 --- @param args table
