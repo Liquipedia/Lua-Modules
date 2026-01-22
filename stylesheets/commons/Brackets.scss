@@ -1375,14 +1375,14 @@ div.brkts-opponent-hover {
 .bracket-popup-wrapper div.matchpage-button {
 	padding: 5px 10px 10px 10px;
 	align-items: center;
-}
 
-.bracket-popup-wrapper div.matchpage-button button {
-	width: 100%;
-	font-size: 100%;
-	font-weight: bold;
-	background-color: #426ccf;
-	color: #ffffff;
+	button {
+		width: 100%;
+		font-size: 100%;
+		font-weight: bold;
+		background-color: #426ccf;
+		color: #ffffff;
+	}
 }
 
 /**
