@@ -1283,19 +1283,19 @@ div.brkts-opponent-hover {
 .starcraft-block-archon {
 	display: flex;
 	align-items: center;
-}
 
-.starcraft-block-archon.flipped {
-	flex-direction: row-reverse;
-}
+	&.flipped {
+		flex-direction: row-reverse;
+	}
 
-.starcraft-block-archon-race {
-	flex: 0 0;
-	padding: 0 2px 0 0;
-}
+	&-race {
+		flex: 0 0;
+		padding: 0 2px 0 0;
+	}
 
-.flipped > .starcraft-block-archon-race {
-	padding: 0 0 0 2px;
+	.flipped > & {
+		padding: 0 0 0 2px;
+	}
 }
 
 .starcraft-block-archon-players {
