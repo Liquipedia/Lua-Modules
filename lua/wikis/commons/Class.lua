@@ -51,6 +51,36 @@ function Class.new(base, init)
 
 	instance.__index = instance
 
+	instance.super = function(object)
+		local proxy = {}
+		local proxyMT = {
+			__index = function (obj, param)
+				local objVal = rawget(obj, param)
+				if objVal  then
+					return objVal
+				end
+				return base and base[param]
+			end,
+			__newindex = object,
+			__add = base and base.__add,
+			__sub = base and base.__sub,
+			__mul = base and base.__mul,
+			__div = base and base.__div,
+			__mod = base and base.__mod,
+			__pow = base and base.__pow,
+			__unm = base and base.__unm,
+			__concat = base and base.__concat,
+			__eq = base and base.__eq,
+			__lt = base and base.__lt,
+			__le = base and base.__le,
+			__pairs = base and base.__pairs,
+			__ipairs = base and base.__ipairs,
+			__tostring = base and base.__tostring,
+		}
+		setmetatable(proxy, proxyMT)
+		return proxy
+	end
+
 	local metatable = {}
 
 	metatable.__call = function(class_tbl, ...)
