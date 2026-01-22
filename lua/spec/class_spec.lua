@@ -76,7 +76,7 @@ describe('class', function()
 		it('set instance variable from super', function ()
 			local c1 = Cat(5)
 
-			c1.super()._size = 20
+			c1:super()._size = 20
 
 			assert.are_not_equal(5, c1._size)
 			assert.equal(20, c1._size)
