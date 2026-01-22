@@ -705,11 +705,10 @@ div.brkts-popup-body-element-thumbs {
 	padding: 0.25rem 0;
 	flex-basis: 100%;
 	text-align: center;
-}
 
-.brkts-popup-footer a img,
-.brkts-popup-comment a img {
-	background-color: transparent;
+	a img {
+		background-color: transparent;
+	}
 }
 
 .brkts-summary-opponent-roster {
