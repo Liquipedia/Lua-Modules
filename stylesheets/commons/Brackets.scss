@@ -928,15 +928,15 @@ div.brkts-popup-body-element-thumbs {
 	line-height: 11px;
 	width: 10px;
 	font-weight: 800;
-}
 
-.brkts-popup-body-match-sidewins-icon {
-	width: 24px;
+	&-icon {
+		width: 24px;
 
-	& img {
-		[ data-darkreader-scheme="dark" ] &,
-		.theme--dark & {
-			filter: invert( 1 );
+		img {
+			[ data-darkreader-scheme="dark" ] &,
+			.theme--dark & {
+				filter: invert( 1 );
+			}
 		}
 	}
 }
