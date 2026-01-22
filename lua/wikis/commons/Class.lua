@@ -53,6 +53,9 @@ function Class.new(base, init)
 	instance.__index = instance
 
 	instance.super = function(object)
+		if object._superProxy then
+			return object._superProxy
+		end
 		local proxy = {}
 		local proxyMT = {
 			__index = function (obj, param)
@@ -84,6 +87,7 @@ function Class.new(base, init)
 			__tostring = base and base.__tostring,
 		}
 		setmetatable(proxy, proxyMT)
+		object._superProxy = proxy
 		return proxy
 	end
 
