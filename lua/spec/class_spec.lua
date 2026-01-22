@@ -36,6 +36,12 @@ describe('class', function()
 		return 4
 	end
 
+	local SpecialCat = Class.new(Cat)
+
+	function SpecialCat:makeSound()
+		return 'Meow'
+	end
+
 	describe('class operations', function()
 		it('base class', function ()
 			local a1 = Animal()
@@ -53,11 +59,23 @@ describe('class', function()
 	end)
 
 	describe('super', function()
+		it('assert single proxy', function ()
+			local sc1 = SpecialCat(5)
+
+			assert.is_true(sc1:super() == sc1:super())
+		end)
+
 		it('access super methods', function ()
 			local c1 = Cat(5)
 
 			assert.equal('Animal', c1:super():type())
 			assert.error(function() return c1:super():numLegs() end)
+
+			local sc1 = SpecialCat(5)
+
+			assert.equal('Cat', sc1:super():type())
+			assert.equal(4, sc1:super():numLegs())
+			assert.error(function() return sc1:super():makeSound() end)
 		end)
 
 		it('call super metamethods', function ()
@@ -82,6 +100,12 @@ describe('class', function()
 			assert.equal(20, c1._size)
 			assert.equal(20, c1:size())
 		end)
+
+		it('error if getting grandparent class', function ()
+			local sc1 = SpecialCat(5)
+
+			assert.error(function() return sc1:super():super() end, 'Cannot create proxy from a super proxy')
+		end)
 	end)
 
 	describe('instanceOf', function()
@@ -103,6 +127,15 @@ describe('class', function()
 			local c1 = Cat(5)
 			assert.is_true(Class.instanceOf(c1:super(), Animal))
 			assert.is_false(Class.instanceOf(c1:super(), Cat))
+		end)
+
+		it('with super of grandchild', function ()
+			local sc1 = SpecialCat(5)
+
+			local superSc1 = sc1:super()
+
+			assert.is_true(Class.instanceOf(superSc1, Cat))
+			assert.is_true(Class.instanceOf(superSc1, Animal))
 		end)
 	end)
 end)
