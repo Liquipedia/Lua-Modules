@@ -8,6 +8,8 @@ describe('class', function()
 		return 'Animal'
 	end
 
+	Animal.__tostring = Animal.type
+
 	function Animal:size()
 		error('abstract')
 	end
@@ -48,6 +50,21 @@ describe('class', function()
 		end)
 	end)
 
+	describe('super', function()
+		it('access super methods', function ()
+			local c1 = Cat(5)
+
+			assert.equal('Animal', c1:super():type())
+			assert.error(function() return c1:super():numLegs() end)
+		end)
+
+		it('access instance value from super', function ()
+			local c1 = Cat(5)
+
+			assert.equal(4, c1:super()._size)
+		end)
+	end)
+
 	describe('instanceOf', function()
 		it('with same class', function ()
 			local c1 = Cat(5)
@@ -61,6 +78,12 @@ describe('class', function()
 
 			local a1 = Animal()
 			assert.is_false(Class.instanceOf(a1, Cat))
+		end)
+
+		it('with super', function ()
+			local c1 = Cat(5)
+			assert.is_true(Class.instanceOf(c1:super(), Animal))
+			assert.is_false(Class.instanceOf(c1:super(), Cat))
 		end)
 	end)
 end)
