@@ -61,6 +61,7 @@ function Class.new(base, init)
 				end
 				return base and base[param]
 			end,
+			_base = base,
 			__newindex = object,
 			__add = base and base.__add,
 			__sub = base and base.__sub,
