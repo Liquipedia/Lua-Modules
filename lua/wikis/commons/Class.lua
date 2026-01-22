@@ -30,6 +30,7 @@ Class.PRIVATE_FUNCTION_SPECIFIER = '_'
 ---@class BaseClass
 ---@operator call:self
 ---@field init fun(self, ...)
+---@field super fun(self: self): table
 
 ---@param base? table
 ---@param init? fun(self, ...)
