@@ -5,7 +5,7 @@ Author(s): FO-nTTaX
 
 // Variables
 $tabs-border-radius: 0.25rem;
-$tabs-active-indicator-height: 4px;
+$tabs-active-indicator-height: 3px;
 $tabs-nav-padding: 12px;
 $tabs-nav-padding-nested: 8px 12px;
 $tabs-arrow-width: 32px;
@@ -98,20 +98,16 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			margin: 0;
 			border: unset !important;
 			padding: 0;
-			font-weight: bold;
-			cursor: pointer;
-			position: relative;
-			display: flex;
-			align-items: center;
-			justify-content: center;
 			background-color: transparent !important;
-			border-radius: $tabs-border-radius $tabs-border-radius 0 0;
+			height: 2.75rem;
 
 			a {
 				display: flex;
 				align-items: center;
+				gap: 8px;
 				padding: $tabs-nav-padding;
 				font-size: 14px;
+				font-weight: bold;
 				line-height: 20px;
 				text-decoration: none !important;
 				transition: all 0.2s ease;
@@ -119,14 +115,16 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				border: unset !important;
 				white-space: nowrap;
 				background-color: transparent !important;
-				border-radius: 0 !important;
+				border-radius: $tabs-border-radius $tabs-border-radius 0 0;
+				cursor: pointer;
+				position: relative;
+				height: 2.75rem;
 
 				// Icons within tabs
 				i,
 				.fad,
 				.fas,
 				.far {
-					margin-right: 8px;
 					font-size: 16px;
 				}
 
@@ -140,7 +138,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 					color: $tabs-text-light;
 
 					&:hover {
-						color: $tabs-text-active-light;
+						color: $tabs-text-light !important;
 						background-color: $tabs-bg-hover-light !important;
 					}
 				}
@@ -149,13 +147,13 @@ html.client-nojs .tabs-content > div:not( .active ) {
 					color: $tabs-text-dark;
 
 					&:hover {
-						color: $tabs-text-active-dark;
+						color: $tabs-text-dark !important;
 						background-color: $tabs-bg-hover-dark !important;
 					}
 				}
 			}
 
-			&.active {
+			&.active a {
 				&::after {
 					content: "";
 					position: absolute;
@@ -168,22 +166,16 @@ html.client-nojs .tabs-content > div:not( .active ) {
 
 				.theme--light & {
 					background-color: $tabs-bg-active-light !important;
-
-					a {
-						color: $tabs-text-active-light;
-					}
+					color: $tabs-text-active-light;
 				}
 
 				.theme--dark & {
 					background-color: $tabs-bg-active-dark !important;
-
-					a {
-						color: $tabs-text-active-dark;
-					}
+					color: $tabs-text-active-dark;
 				}
 			}
 
-			&.hover {
+			&.hover a {
 				.theme--light & {
 					background-color: $tabs-bg-hover-light !important;
 				}
