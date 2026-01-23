@@ -383,6 +383,9 @@ end
 ---@param puuid string
 ---@return {player: string, displayName: string}?
 function MatchPage._findPlayerByPuuid(game, puuid)
+	if Logic.isEmpty(puuid) then
+		return
+	end
 	for _, opponent in ipairs(game.opponents) do
 		for _, player in ipairs(opponent.players) do
 			if player.puuid == puuid then
@@ -460,6 +463,7 @@ end
 ---@return Widget
 function MatchPage:_renderRoundDetail(findPlayer, round, roundIndex)
 	local firstKillPlayer = findPlayer(round.firstKill.killer) or {}
+	local ceremonyPlayer = findPlayer(round.ceremonyFor)
 	local roundWinType = WIN_TYPES[round.winBy] or {}
 
 	return Div{
@@ -504,7 +508,13 @@ function MatchPage:_renderRoundDetail(findPlayer, round, roundIndex)
 						' ',
 						Link{link = firstKillPlayer.player, children = firstKillPlayer.displayName}
 					}},
-					MatchPage._displayCeremony(round.ceremony)
+					Span{children = WidgetUtil.collect(
+						MatchPage._displayCeremony(Logic.emptyOr(round.ceremony, round.flawless and 'Flawless' or nil)),
+						ceremonyPlayer and {
+							' ',
+							Link{link = ceremonyPlayer.player, children = ceremonyPlayer.displayName}
+						} or nil
+					)}
 				}
 
 			}
