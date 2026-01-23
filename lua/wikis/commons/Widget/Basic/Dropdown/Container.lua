@@ -19,10 +19,11 @@ local Div = HtmlWidgets.Div
 ---@class DropdownContainerWidgetParameters
 ---@field button string|Widget|(string|Widget)[]
 ---@field children string|number|Widget|Html|(string|number|Widget|Html)[]
----@field classes table?
+---@field classes string[]?
 
 ---@class DropdownContainerWidget: Widget
 ---@operator call(DropdownContainerWidgetParameters): DropdownContainerWidget
+---@field props DropdownContainerWidgetParameters
 local DropdownContainer = Class.new(Widget)
 
 ---@return Widget|nil
