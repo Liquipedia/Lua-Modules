@@ -409,6 +409,8 @@ MatchPage._displayCeremony = FnUtil.memoize(function (ceremony)
 				imageDark = 'VALORANT Creds darkmode.png',
 				size = '16px',
 			}
+		elseif ceremony == 'Flawless' then
+			return IconFa{iconName = 'flawless_valorant'}
 		end
 	end
 
