@@ -213,19 +213,9 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 	end
 
 	---@param ceremonyCode string?
-	---@param roundKills valorantMatchApiRoundKill[]
-	---@param winningTeam integer
 	---@return string
-	local function mapCeremonyCodes(ceremonyCode, roundKills, winningTeam)
+	local function mapCeremonyCodes(ceremonyCode)
 		if Logic.isEmpty(ceremonyCode) then
-			if Array.all(
-				roundKills,
-				function (roundKill)
-					return Table.includes(map.teams[winningTeam].puuids, roundKill.killer)
-				end
-			) then
-				return 'Flawless'
-			end
 			return ''
 		end
 		---@cast ceremonyCode -nil
@@ -293,7 +283,13 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 		)
 
 		local winningTeam = (t1side == makeShortSideName(round.winning_team_role)) and 1 or 2
-		local ceremony = mapCeremonyCodes(round.round_ceremony, roundKills, winningTeam)
+		local ceremony = mapCeremonyCodes(round.round_ceremony)
+		local flawless = Array.all(
+			roundKills,
+			function (roundKill)
+				return Table.includes(map.teams[winningTeam].puuids, roundKill.killer)
+			end
+		)
 
 		---@type valorantMatchApiRoundKill
 		local firstKill = roundKills[1]
@@ -309,6 +305,7 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 			} or {},
 			planted = round.plant_round_time > 0,
 			defused = round.defuse_round_time > 0,
+			flawless = flawless,
 			round = roundNumber,
 			t1side = t1side,
 			t2side = t2side,
@@ -351,7 +348,9 @@ function CustomMatchGroupInputMatchPage.extendMapOpponent(map, opponentIndex)
 
 	return {
 		thrifties = countCeremonies('Thrifty'),
-		flawless = countCeremonies('Flawless'),
+		flawless = #Array.filter(rounds, function (round)
+			return round[teamSideKey] == round.winningSide and round.flawless
+		end),
 		firstKills = #Array.filter(rounds, function (round)
 			return round.firstKill.byTeam == opponentIndex
 		end),

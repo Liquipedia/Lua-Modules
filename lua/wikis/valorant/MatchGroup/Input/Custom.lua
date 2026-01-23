@@ -42,6 +42,7 @@ local VALORANT_REGIONS = {'eu', 'na', 'ap', 'kr', 'latam', 'br', 'pbe1', 'esport
 ---@field t1side ValorantSides
 ---@field t2side ValorantSides
 ---@field winningSide ValorantSides
+---@field flawless boolean
 ---@field ceremony string
 ---@field ceremonyFor string?
 
