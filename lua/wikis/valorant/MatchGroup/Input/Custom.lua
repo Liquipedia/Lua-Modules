@@ -208,6 +208,7 @@ function MatchFunctions.calculateOverallStatsForOpponent(maps, opponentIndex)
 
 	return {
 		firstKills = getSumOf('firstKills'),
+		flawless = getSumOf('flawless'),
 		thrifties = getSumOf('thrifties'),
 		clutches = getSumOf('clutches'),
 		postPlant = postPlant,

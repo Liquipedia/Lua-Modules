@@ -347,6 +347,12 @@ function MatchPage:_renderTeamStats(game)
 							team2Value = game.teams[2].thrifties
 						},
 						{
+							icon = IconFa{iconName = 'flawless_valorant'},
+							name = 'Flawless',
+							team1Value = game.teams[1].flawless,
+							team2Value = game.teams[2].flawless,
+						},
+						{
 							icon = IconImage{
 								imageLight = 'VALORANT Spike lightmode.png',
 								imageDark = 'VALORANT Spike darkmode.png',

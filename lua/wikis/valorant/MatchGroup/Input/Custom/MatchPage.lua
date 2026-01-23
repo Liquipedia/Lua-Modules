@@ -341,16 +341,21 @@ function CustomMatchGroupInputMatchPage.extendMapOpponent(map, opponentIndex)
 		return round[teamSideKey] == 'atk' and round.planted
 	end)
 
+	---@param ceremony string
+	---@return integer
+	local function countCeremonies(ceremony)
+		return #Array.filter(rounds, function (round)
+			return round[teamSideKey] == round.winningSide and round.ceremony == ceremony
+		end)
+	end
+
 	return {
-		thrifties = #Array.filter(rounds, function (round)
-			return round[teamSideKey] == round.winningSide and round.ceremony == 'Thrifty'
-		end),
+		thrifties = countCeremonies('Thrifty'),
+		flawless = countCeremonies('Flawless'),
 		firstKills = #Array.filter(rounds, function (round)
 			return round.firstKill.byTeam == opponentIndex
 		end),
-		clutches = #Array.filter(rounds, function (round)
-			return round[teamSideKey] == round.winningSide and round.ceremony == 'Clutch'
-		end),
+		clutches = countCeremonies('Clutch'),
 		postPlant = {
 			#Array.filter(plantedRounds, function (round)
 				return round.winningSide == 'atk'
