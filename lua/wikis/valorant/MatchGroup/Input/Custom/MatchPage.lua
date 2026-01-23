@@ -213,21 +213,30 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 	end
 
 	---@param ceremonyCode string?
+	---@param roundKills valorantMatchApiRoundKill[]
+	---@param winningTeam integer
 	---@return string
-	local function mapCeremonyCodes(ceremonyCode)
+	local function mapCeremonyCodes(ceremonyCode, roundKills, winningTeam)
 		if Logic.isEmpty(ceremonyCode) then
+			if Array.all(
+				roundKills,
+				function (roundKill)
+					return Table.includes(map.teams[winningTeam].puuids, roundKill.killer)
+				end
+			) then
+				return 'Flawless'
+			end
 			return ''
 		end
 		---@cast ceremonyCode -nil
 		return ceremonyCode:sub(9)
 	end
 
-	---@param ceremonyCode string?
+	---@param ceremony string?
 	---@param roundKills valorantMatchApiRoundKill[]
 	---@param winningTeam integer
 	---@return string?
-	local function processCeremony(ceremonyCode, roundKills, winningTeam)
-		local ceremony = mapCeremonyCodes(ceremonyCode)
+	local function processCeremony(ceremony, roundKills, winningTeam)
 		if ceremony == 'Clutch' then
 			local killsFromWinningTeam = Array.filter(
 				roundKills,
@@ -283,17 +292,16 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 			Operator.property('time_since_round_start_millis')
 		)
 
+		local winningTeam = (t1side == makeShortSideName(round.winning_team_role)) and 1 or 2
+		local ceremony = mapCeremonyCodes(round.round_ceremony, roundKills, winningTeam)
+
 		---@type valorantMatchApiRoundKill
 		local firstKill = roundKills[1]
 
 		---@type ValorantRoundData
 		return {
-			ceremony = mapCeremonyCodes(round.round_ceremony),
-			ceremonyFor = processCeremony(
-				round.round_ceremony,
-				roundKills,
-				(t1side == makeShortSideName(round.winning_team_role)) and 1 or 2
-			),
+			ceremony = ceremony,
+			ceremonyFor = processCeremony(ceremony, roundKills, winningTeam),
 			firstKill = Logic.isNotEmpty(firstKill) and {
 				killer = firstKill.killer,
 				victim = firstKill.victim,
