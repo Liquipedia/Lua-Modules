@@ -351,8 +351,14 @@ class ExportService {
 
 	generateFilename( title ) {
 		const pageTitle = mw.config.get( 'wgDisplayTitle' ) || mw.config.get( 'wgTitle' );
-		const filename = `Liquipedia ${ pageTitle } ${ title } ${ this.generateTimestamp() }`;
-		return filename.replace( /[\\/:*?"<>|]/g, '_' );
+		let filename = `Liquipedia ${ pageTitle } ${ title } ${ this.generateTimestamp() }`;
+		filename = filename.replace( /[\\/:*?"<>|]/g, '_' ).trim();
+
+		if ( filename.length > 215 ) {
+			filename = filename.slice( 0, 215 ).trim();
+		}
+
+		return filename;
 	}
 
 	generateTimestamp() {
