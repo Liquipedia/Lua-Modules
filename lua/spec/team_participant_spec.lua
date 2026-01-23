@@ -8,7 +8,9 @@ insulate('Team Participant', function()
 
 		local TeamParticipantsController = require('Module:TeamParticipants/Controller')
 
-		GoldenTest('team_participant', tostring(TeamParticipantsController.fromTemplate{
+		GoldenTest('team_participant', 
+			'<script>liquipedia.switchButtons.switchGroups["team-cards-show-rosters"].nodes[0].click()</script>'
+			.. tostring(TeamParticipantsController.fromTemplate{
 			{
 				'Team Liquid',
 				players = {
