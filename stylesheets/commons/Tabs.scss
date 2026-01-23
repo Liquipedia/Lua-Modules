@@ -6,9 +6,9 @@ Author(s): FO-nTTaX
 // Variables
 $tabs-border-radius: 0.25rem;
 $tabs-active-indicator-height: 3px;
-$tabs-nav-padding: 12px;
-$tabs-nav-padding-nested: 8px 12px;
-$tabs-arrow-width: 32px;
+$tabs-nav-padding: 0.75rem;
+$tabs-nav-padding-nested: 0.5rem 0.75rem;
+$tabs-arrow-width: 2rem;
 
 // Theme Colors - Light
 $tabs-border-light: var( --clr-secondary-90 );
@@ -28,7 +28,7 @@ $tabs-bg-hover-dark: var( --clr-on-surface-dark-primary-8 );
 .tabs-content {
 	border: 2px solid;
 	border-top: 0;
-	padding: 5px;
+	padding: 0.3125rem;
 
 	.theme--light & {
 		border-color: inherit;
@@ -105,11 +105,11 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			a {
 				display: flex;
 				align-items: center;
-				gap: 8px;
+				gap: 0.5rem;
 				padding: $tabs-nav-padding;
-				font-size: 14px;
+				font-size: 0.875rem;
 				font-weight: bold;
-				line-height: 20px;
+				line-height: 1.25rem;
 				text-decoration: none !important;
 				transition: all 0.2s ease;
 				outline: 0;
@@ -127,7 +127,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				.fad,
 				.fas,
 				.far {
-					font-size: 16px;
+					font-size: 1rem;
 				}
 
 				// Icon-only support
@@ -193,17 +193,60 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		.nav-tabs li a {
 			flex-direction: column;
 			justify-content: center;
-			gap: 4px;
-			padding: 10px 12px;
+			gap: 0.25rem;
+			padding: 0.625rem 0.75rem;
+			min-height: 4.25rem;
 		}
 	}
 
 	&.tabs-variant-icon-only {
-		.nav-tabs li a {
-			justify-content: center;
+		.nav-tabs li {
+			width: 2.75rem;
 
-			span {
-				display: none;
+			a {
+				justify-content: center;
+				width: 2.75rem;
+				padding: 0;
+
+				span {
+					display: none;
+				}
+			}
+		}
+	}
+
+	// Nested Variation (inside .tabs-content)
+	.tabs-content & {
+		.tabs-nav-wrapper {
+			margin-left: 0.75rem;
+		}
+
+		.nav-tabs li {
+			min-height: 2.25rem;
+
+			a {
+				padding: $tabs-nav-padding-nested;
+				min-height: 2.25rem;
+			}
+		}
+
+		// Nested tabs cannot be vertical - force them to horizontal
+		&.tabs-variant-vertical {
+			.nav-tabs li a {
+				flex-direction: row;
+				gap: 0.5rem;
+				padding: $tabs-nav-padding-nested;
+			}
+		}
+
+		&.tabs-variant-icon-only {
+			.nav-tabs li {
+				width: 2.25rem;
+
+				a {
+					width: 2.25rem;
+					padding: 0;
+				}
 			}
 		}
 	}
@@ -228,8 +271,8 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		&::before {
 			content: "";
 			display: inline-block;
-			width: 8px;
-			height: 8px;
+			width: 0.5rem;
+			height: 0.5rem;
 			border-top: 2px solid;
 			border-right: 2px solid;
 		}
@@ -239,7 +282,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 
 			&::before {
 				transform: rotate( -135deg );
-				margin-left: 4px;
+				margin-left: 0.25rem;
 			}
 		}
 
@@ -248,7 +291,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 
 			&::before {
 				transform: rotate( 45deg );
-				margin-right: 4px;
+				margin-right: 0.25rem;
 			}
 		}
 
@@ -262,17 +305,6 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			&::before {
 				border-color: $tabs-text-dark;
 			}
-		}
-	}
-
-	/* Nested Variation */
-	.tabs-content & {
-		.tabs-nav-wrapper {
-			margin-left: 12px;
-		}
-
-		.nav-tabs li a {
-			padding: $tabs-nav-padding-nested;
 		}
 	}
 }
@@ -296,7 +328,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 
 			a {
 				display: block;
-				padding: 5px 10px;
+				padding: 0.3125rem 0.625rem;
 				line-height: 1.42857143;
 				border: 1px solid transparent;
 				outline: 0;
@@ -333,7 +365,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 	& > .tabs {
 		border: 0;
 		margin-bottom: 0;
-		margin-left: 12px;
+		margin-left: 0.75rem;
 
 		li {
 			border-bottom: 0;
@@ -351,8 +383,8 @@ html.client-nojs .tabs-content > div:not( .active ) {
 
 	.tabs-portal-content-wrapper {
 		border: 2px solid;
-		padding: 5px;
-		margin-top: -7px;
+		padding: 0.3125rem;
+		margin-top: -0.4375rem;
 		z-index: 2;
 		position: relative;
 	}
@@ -360,7 +392,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 	.tabs-portal-content {
 		border: 2px solid;
 		background-color: #ffffff;
-		padding: 5px;
+		padding: 0.3125rem;
 		overflow: auto hidden;
 	}
 }
@@ -372,6 +404,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 	}
 
 	&:last-of-type {
-		margin-right: 2px;
+		margin-right: 0.125rem;
 	}
 }
+
