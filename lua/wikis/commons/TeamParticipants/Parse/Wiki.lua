@@ -95,6 +95,7 @@ local function parseQualifier(input)
 		local tournament = Tournament.getTournament(tournamentPage)
 		if not tournament then
 			qualificationStructure.type = 'other'
+			qualificationStructure.page = input.page
 		else
 			qualificationStructure.tournament = tournament
 		end
@@ -102,8 +103,8 @@ local function parseQualifier(input)
 		qualificationStructure.url = input.url
 	end
 
-	if qualificationType == 'external' and not qualificationStructure.text then
-		error('External qualifier must have text')
+	if (qualificationType == 'external' or qualificationType == 'other') and not qualificationStructure.text then
+		error('External or non-tournament qualifier must have text')
 	end
 
 	if input.placement then
