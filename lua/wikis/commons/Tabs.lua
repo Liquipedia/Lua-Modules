@@ -62,7 +62,7 @@ end
 ---Creates dynamic tabs.
 ---Entry point of Template:Tabs dynamic
 ---@param args table
----@return Html|string?
+---@return Widget|string?
 function Tabs.dynamic(args)
 	args = args or {}
 
@@ -81,39 +81,26 @@ function Tabs.dynamic(args)
 		return Tabs._single(tabArgs[1], not Logic.readBool(args.suppressHeader))
 	end
 
-	local tabs = mw.html.create('ul')
-		:addClass('nav nav-tabs tabs tabs' .. tabCount)
-
 	if not Array.any(tabArgs, Operator.property('this')) then
 		tabArgs[1].this = true
 	end
 
-	---@param obj Html
-	---@param elementType string
-	---@param content string|Html|?
-	---@param class string
-	---@param isActive boolean
-	local build = function(obj, elementType, content, class, isActive)
-		local element = mw.html.create(elementType)
-			:addClass(class)
-			:addClass(isActive and 'active' or nil)
-			:newline()
-			:node(content)
-
-		obj:newline():node(element)
-	end
-
-	Array.forEach(tabArgs, function(tabData, tabIndex)
-		build(tabs, 'li', tabData.name, 'tab' .. tabIndex, tabData.this)
-	end)
+	local navTabs = HtmlWidgets.Ul{
+		classes = {'nav', 'nav-tabs', 'tabs', 'tabs' .. tabCount},
+		children = Array.map(tabArgs, function(tabData, tabIndex)
+			return HtmlWidgets.Li{
+				classes = {'tab' .. tabIndex, tabData.this and 'active' or nil},
+				children = {tabData.name}
+			}
+		end)
+	}
 
 	if not Logic.nilOr(Logic.readBoolOrNil(args['hide-showall']), isSingular) then
-		tabs:tag('li')
-			:addClass('show-all')
-			:wikitext('Show All')
+		table.insert(navTabs.props.children, HtmlWidgets.Li{
+			classes = {'show-all'},
+			children = {'Show All'}
+		})
 	end
-
-	tabs:newline()
 
 	local contents = Tabs._buildContentDiv(
 		hasContent,
@@ -121,22 +108,41 @@ function Tabs.dynamic(args)
 		Logic.readBool(args['no-padding'])
 	)
 
-	if not hasContent then
-		return '<div class="tabs-dynamic navigation-not-searchable" data-nosnippet>\n'
-			.. tostring(tabs) .. contents
+	if hasContent then
+		---@cast contents Widget
+		Array.forEach(tabArgs, function(tabData, tabIndex)
+			table.insert(contents.props.children, HtmlWidgets.Div{
+				classes = {'content' .. tabIndex, tabData.this and 'active' or nil},
+				children = {tabData.content}
+			})
+		end)
 	end
-	---@cast contents -string
 
-	Array.forEach(tabArgs, function(tabData, tabIndex)
-		build(contents, 'div', tabData.content, 'content' .. tabIndex, tabData.this)
-	end)
+	local navWrapper = HtmlWidgets.Div{
+		classes = {'tabs-nav-wrapper'},
+		children = {
+			HtmlWidgets.Div{classes = {'tabs-scroll-arrow', 'left'}},
+			navTabs,
+			HtmlWidgets.Div{classes = {'tabs-scroll-arrow', 'right'}},
+		}
+	}
 
-	return mw.html.create('div')
-		:addClass('tabs-dynamic navigation-not-searchable')
-		:attr('data-nosnippet')
-		:node(tabs)
-		:newline()
-		:node(contents)
+	if not hasContent then
+		local startTag = '<div class="tabs-dynamic navigation-not-searchable" data-nosnippet>\n'
+		return startTag .. tostring(navWrapper) .. (contents --[[@as string]])
+	end
+
+	return AnalyticsWidgets{
+		analyticsName = 'Dynamic Navigation tab',
+		children = HtmlWidgets.Div{
+			classes = {'tabs-dynamic', 'navigation-not-searchable'},
+			attributes = {['data-nosnippet'] = ''},
+			children = {
+				navWrapper,
+				contents
+			}
+		}
+	}
 end
 
 ---@param args table
@@ -209,20 +215,17 @@ end
 ---@param hasContent boolean
 ---@param hybridTabs boolean
 ---@param noPadding boolean
----@return Html|string
+---@return Widget|string
 function Tabs._buildContentDiv(hasContent, hybridTabs, noPadding)
 	if hasContent then
-		local contentDiv = mw.html.create('div')
-			:addClass('tabs-content')
-		if hybridTabs then
-			contentDiv
-				:css('border-style', 'none !important')
-				:css('padding', '0 !important')
-		elseif noPadding then
-			contentDiv
-				:css('padding', '0 !important')
-		end
-		return contentDiv
+		return HtmlWidgets.Div{
+			classes = {'tabs-content'},
+			css = {
+				['border-style'] = hybridTabs and 'none !important' or nil,
+				['padding'] = (hybridTabs or noPadding) and '0 !important' or nil,
+			},
+			children = {}
+		}
 	end
 
 	local style = ''
@@ -236,17 +239,14 @@ end
 
 ---@param tab {name: string?, link: string?, content: string|Html?, tabs: string|Html?, this: boolean}
 ---@param showHeader boolean
----@return Html
+---@return Widget
 function Tabs._single(tab, showHeader)
-	local header
-	if showHeader then
-		header = mw.html.create()
-			:tag('h6'):wikitext(tab.name):done()
-			:newline()
-	end
-	return mw.html.create()
-		:node(header)
-		:node(tab.content)
+	return HtmlWidgets.Fragment{
+		children = {
+			showHeader and HtmlWidgets.H6{children = {tab.name}} or nil,
+			tab.content
+		}
+	}
 end
 
 ---@param link string
