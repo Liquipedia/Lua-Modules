@@ -238,5 +238,10 @@ return {
 	-- Usage: Formula 1
 	ongoing_series = 'fas fa-hourglass-half ',
 	season_history = 'fas fa-landmark',
-	finished_race = 'fas fa-flag-checkered'
+	finished_race = 'fas fa-flag-checkered',
+
+	-- Usage: Export functions
+	share = 'fas fa-share-alt',
+	copy = 'fas fa-clone',
+	download = 'fas fa-download'
 }
