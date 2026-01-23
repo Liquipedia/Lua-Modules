@@ -99,7 +99,8 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			border: unset !important;
 			padding: 0;
 			background-color: transparent !important;
-			height: 2.75rem;
+			height: auto;
+			min-height: 2.75rem;
 
 			a {
 				display: flex;
@@ -118,7 +119,8 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				border-radius: $tabs-border-radius $tabs-border-radius 0 0;
 				cursor: pointer;
 				position: relative;
-				height: 2.75rem;
+				height: 100%;
+				min-height: 2.75rem;
 
 				// Icons within tabs
 				i,
@@ -183,6 +185,25 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				.theme--dark & {
 					background-color: $tabs-bg-hover-dark !important;
 				}
+			}
+		}
+	}
+
+	&.tabs-variant-vertical {
+		.nav-tabs li a {
+			flex-direction: column;
+			justify-content: center;
+			gap: 4px;
+			padding: 10px 12px;
+		}
+	}
+
+	&.tabs-variant-icon-only {
+		.nav-tabs li a {
+			justify-content: center;
+
+			span {
+				display: none;
 			}
 		}
 	}

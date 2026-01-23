@@ -16,6 +16,7 @@ local Table = Lua.import('Module:Table')
 
 local AnalyticsWidgets = Lua.import('Module:Widget/Analytics')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 local Tabs = {}
 
@@ -85,12 +86,32 @@ function Tabs.dynamic(args)
 		tabArgs[1].this = true
 	end
 
+	local variant = args.variant or 'horizontal'
+	local validVariants = {horizontal = true, vertical = true, ['icon-only'] = true}
+	assert(validVariants[variant], 'Invalid variant "' .. variant .. '". Allowed values are: horizontal, vertical, icon-only')
+
+	local hasIcon = Array.any(tabArgs, function(tab) return Logic.isNotEmpty(tab.icon) end)
+	local allHaveIcon = Array.all(tabArgs, function(tab) return Logic.isNotEmpty(tab.icon) end)
+
+	assert(not hasIcon or allHaveIcon, 'If one tab has an icon, all tabs must have icons')
+	if variant == 'icon-only' then
+		assert(allHaveIcon, 'The "icon-only" variant requires all tabs to have icons')
+	end
+
+	local variantClass = 'tabs-variant-' .. variant
+
 	local navTabs = HtmlWidgets.Ul{
 		classes = {'nav', 'nav-tabs', 'tabs', 'tabs' .. tabCount},
 		children = Array.map(tabArgs, function(tabData, tabIndex)
+			local children = {}
+			if tabData.icon then
+				table.insert(children, Icon{iconName = tabData.icon})
+			end
+			table.insert(children, HtmlWidgets.Span{children = {tabData.name}})
+
 			return HtmlWidgets.Li{
 				classes = {'tab' .. tabIndex, tabData.this and 'active' or nil},
-				children = {tabData.name}
+				children = children
 			}
 		end)
 	}
@@ -98,7 +119,7 @@ function Tabs.dynamic(args)
 	if not Logic.nilOr(Logic.readBoolOrNil(args['hide-showall']), isSingular) then
 		table.insert(navTabs.props.children, HtmlWidgets.Li{
 			classes = {'show-all'},
-			children = {'Show All'}
+			children = {HtmlWidgets.Span{children = {'Show All'}}}
 		})
 	end
 
@@ -128,14 +149,14 @@ function Tabs.dynamic(args)
 	}
 
 	if not hasContent then
-		local startTag = '<div class="tabs-dynamic navigation-not-searchable" data-nosnippet>\n'
+		local startTag = '<div class="tabs-dynamic navigation-not-searchable ' .. variantClass .. '" data-nosnippet>\n'
 		return startTag .. tostring(navWrapper) .. (contents --[[@as string]])
 	end
 
 	return AnalyticsWidgets{
 		analyticsName = 'Dynamic Navigation tab',
 		children = HtmlWidgets.Div{
-			classes = {'tabs-dynamic', 'navigation-not-searchable'},
+			classes = {'tabs-dynamic', 'navigation-not-searchable', variantClass},
 			attributes = {['data-nosnippet'] = ''},
 			children = {
 				navWrapper,
@@ -147,7 +168,7 @@ end
 
 ---@param args table
 ---@param options {allowThis2: boolean?, removeEmptyTabs: boolean?}
----@return {name: string?, link: string?, content: string|Html?, tabs: string|Html?, this: boolean}[]
+---@return {name: string?, link: string?, content: string|Html?, tabs: string|Html?, this: boolean, icon: string?}[]
 function Tabs._readArguments(args, options)
 	local tabArgs = {}
 	local tabIndex = 1
@@ -161,6 +182,7 @@ function Tabs._readArguments(args, options)
 				link = Table.extract(args, 'link' .. tabIndex),
 				content = Table.extract(args, 'content' .. tabIndex),
 				tabs = Table.extract(args, 'tabs' .. tabIndex),
+				icon = Table.extract(args, 'icon' .. tabIndex),
 				this = this == tabIndex or (options.allowThis2 and this2 == tabIndex),
 			})
 		end
