@@ -240,7 +240,7 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 				return roundKill.killer
 			end)
 			for killer, kills in pairs(killsByPlayer) do
-				if #kills == 5 then
+				if #kills >= 5 then
 					return killer
 				end
 			end
