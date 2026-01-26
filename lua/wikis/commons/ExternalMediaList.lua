@@ -45,7 +45,7 @@ function MediaList.get(args)
 	--if we do not get any results from the query return empty string
 	if type(data[1]) ~= 'table' then return end
 
-	---@return string|Widget|Html?
+	---@return string|Widget|Widget[]|Html?
 	local function createDisplay()
 		if args.separateByYears and args.dynamic and not args.year then
 			return MediaList._displayDynamic(data, args)
@@ -175,14 +175,12 @@ end
 ---Builds the display for the per year option (without tabs)
 ---@param data externalmedialink[]
 ---@param args table
----@return Html
+---@return Widget[]
 function MediaList._displayByYear(data, args)
-	local display = mw.html.create()
+	local display = {}
 
 	for year, yearItems in Table.iter.spairs(MediaList._groupByYear(data), MediaList._sortInYear) do
-		display
-			:wikitext('\n====' .. year .. '====\n')
-			:node(MediaList._displayYear(yearItems, args))
+		Array.appendWith(display, HtmlWidgets.H4{children = year}, MediaList._displayYear(yearItems, args))
 	end
 
 	return display
