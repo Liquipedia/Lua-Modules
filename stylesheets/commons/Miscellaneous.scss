@@ -199,46 +199,44 @@ Author(s): FO-nTTaX, Elysienna
 	animation-duration: 0.4s;
 	animation-fill-mode: forwards;
 	transform: scale( 0 );
-}
 
-.liquipedia-links-badge--tooltip {
-	background-color: #ffffff;
-	position: absolute;
-	color: #676767;
-	border-radius: 0.25rem;
-	font-size: 0.75rem;
-	font-family: "Open Sans", sans-serif;
-	font-weight: bold;
-	padding: 0.125rem 0.25rem;
-	top: 0.0625rem;
-	right: -0.5rem;
-	z-index: 1;
-	opacity: 0;
-	box-shadow: 0 0 0.625rem 0 rgba( 0, 0, 0, 0.5 );
-	animation-name: badgePopAnimation;
-	animation-delay: 2s;
-	animation-duration: 4s;
-	animation-fill-mode: forwards;
-	line-height: 1.2;
-}
+	&--tooltip {
+		background-color: #ffffff;
+		position: absolute;
+		color: #676767;
+		border-radius: 0.25rem;
+		font-size: 0.75rem;
+		font-family: "Open Sans", sans-serif;
+		font-weight: bold;
+		padding: 0.125rem 0.25rem;
+		top: 0.0625rem;
+		right: -0.5rem;
+		z-index: 1;
+		opacity: 0;
+		box-shadow: 0 0 0.625rem 0 rgba( 0, 0, 0, 0.5 );
+		animation-name: badgePopAnimation;
+		animation-delay: 2s;
+		animation-duration: 4s;
+		animation-fill-mode: forwards;
+		line-height: 1.2;
 
-@media screen and ( max-width: 767px ) {
-	.liquipedia-links-badge--tooltip {
-		width: 30vw;
-		white-space: normal;
+		@media screen and ( max-width: 767px ) {
+			width: 30vw;
+			white-space: normal;
+		}
+
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0.25rem;
+			left: -0.3125rem;
+			width: 0;
+			height: 0;
+			border-top: 4px solid transparent;
+			border-bottom: 4px solid transparent;
+			border-right: 5px solid #ffffff;
+		}
 	}
-}
-
-.liquipedia-links-badge--tooltip::before {
-	content: "";
-	position: absolute;
-	top: 0.25rem;
-	left: -0.3125rem;
-	width: 0;
-	height: 0;
-	border-top: 4px solid transparent;
-	border-bottom: 4px solid transparent;
-	border-right: 5px solid #ffffff;
 }
 
 .menu-italic {
