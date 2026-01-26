@@ -228,7 +228,10 @@ end
 function MediaList._formLink(show)
 	if not show then return end
 
-	assert(Page.exists('\'Form:' .. FORM_NAME), 'Form:' .. FORM_NAME .. '\' does not exist')
+	if not Page.exists('\'Form:' .. FORM_NAME) then
+		mw.addWarning('Form:' .. FORM_NAME .. '\' does not exist')
+		return
+	end
 
 	return HtmlWidgets.Div{
 		css = {
