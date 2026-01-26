@@ -655,7 +655,7 @@ class DropdownWidget {
 
 					const copyButton = this.createMenuButton( {
 						icon: 'copy',
-						buttonText: `Copy${ typeLabel } image to clipboard`,
+						buttonText: `Copy ${ typeLabel } image to clipboard`,
 						item,
 						exportTitle,
 						exportMode: 'copy',
@@ -665,7 +665,7 @@ class DropdownWidget {
 					} );
 					const downloadButton = this.createMenuButton( {
 						icon: 'download',
-						buttonText: `Download${ typeLabel } as image`,
+						buttonText: `Download ${ typeLabel } as image`,
 						item,
 						exportTitle,
 						exportMode: 'download',
