@@ -7,6 +7,13 @@
 
 local Lua = require('Module:Lua')
 
+local DateExt = Lua.import('Module:Date/Ext')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
+
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
@@ -18,6 +25,21 @@ local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
+
+local function getCurrentTransferPage()
+	local basePage = 'Player Transfers/' .. DateExt.getYearOf() .. '/' .. os.date('%B')
+	local queryData = mw.ext.LiquipediaDB.lpdb('transfer', {
+		conditions = tostring(ConditionNode(ColumnName('pagename'), Comparator.ge, basePage)),
+		query = 'pagename',
+		order = 'date desc',
+		groupby = 'pagename asc',
+		limit = 5000,
+	})
+	if #queryData == 0 then
+		return basePage
+	end
+	return queryData[1].pagename
+end
 
 local CONTENT = {
 	usefulArticles = {
@@ -40,7 +62,10 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{rumours = true},
+		body = TransfersList{
+			transferPage = getCurrentTransferPage(),
+			rumours = true
+		},
 		boxid = 1509,
 	},
 	thisDay = {
