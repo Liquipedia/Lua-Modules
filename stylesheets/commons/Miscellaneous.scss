@@ -255,22 +255,20 @@ Author(s): FO-nTTaX, Elysienna
 Template(s): Box
 Author(s): FO-nTTaX
 *******************************************************************************/
-@media ( min-width: 601px ) {
-	.template-box {
+.template-box {
+	@media ( min-width: 601px ) {
 		display: inline-block;
 		vertical-align: top;
 		margin: 0 0 0 0;
 		box-sizing: content-box;
 		max-width: 100%;
+
+		> * {
+			box-sizing: border-box;
+		}
 	}
 
-	.template-box > * {
-		box-sizing: border-box;
-	}
-}
-
-@media ( max-width: 600px ) {
-	.template-box {
+	@media ( max-width: 600px ) {
 		padding-right: 0 !important;
 	}
 }
