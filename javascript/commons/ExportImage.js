@@ -562,7 +562,7 @@ class DropdownWidget {
 						` ${ this.getTypeLabel( visibleElements, item.typeName, i ) }`;
 					const copyButton = this.createMenuButton( {
 						icon: 'copy',
-						buttonText: `Copy${ typeLabel } to clipboard`,
+						buttonText: `Copy${ typeLabel } image to clipboard`,
 						item,
 						sectionTitle,
 						typeLabel,
@@ -767,7 +767,16 @@ class DropdownWidget {
 	}
 
 	openMenu( menuElement, buttonElement ) {
+		menuElement.style.left = '';
+		menuElement.style.right = '';
 		menuElement.style.display = 'block';
+
+		const menuRect = menuElement.getBoundingClientRect();
+		if ( menuRect.right > window.innerWidth ) {
+			menuElement.style.left = 'auto';
+			menuElement.style.right = '0';
+		}
+
 		buttonElement.setAttribute( 'aria-expanded', 'true' );
 		const firstFocusable = menuElement.querySelector( '[tabindex="0"]' );
 		if ( firstFocusable ) {
