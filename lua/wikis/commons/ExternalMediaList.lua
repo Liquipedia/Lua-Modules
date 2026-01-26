@@ -189,7 +189,7 @@ end
 
 ---Groups provided data by year
 ---@param data externalmedialink[]
----@return table[][]
+---@return table<string, externalmedialink[]>
 function MediaList._groupByYear(data)
 	local _, groupedData = Array.groupBy(data, function(item)
 		return item.date:sub(1, 4)
@@ -199,7 +199,7 @@ function MediaList._groupByYear(data)
 end
 
 ---Sort function to sort External Media Links within a year
----@param _ table?
+---@param _ string[]?
 ---@param key1 string
 ---@param key2 string
 ---@return boolean
