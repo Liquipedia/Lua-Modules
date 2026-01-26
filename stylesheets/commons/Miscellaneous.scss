@@ -70,11 +70,12 @@ Author(s): FO-nTTaX, salle
 	height: 12px;
 	vertical-align: -1px;
 	image-rendering: -webkit-optimize-contrast;
+
+	.bracket-game & {
+		vertical-align: -3px;
+	}
 }
 
-.bracket-game .flag img {
-	vertical-align: -3px;
-}
 /*******************************************************************************
 Template(s): Flag/, FlagNoLink/
 Author(s): salle
