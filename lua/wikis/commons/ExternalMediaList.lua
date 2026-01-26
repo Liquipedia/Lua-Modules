@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 
@@ -69,7 +68,7 @@ function MediaList._parseArgs(args)
 	end)
 
 	return {
-		types = args.type and Array.map(Array.map(mw.text.split(args.type, ','), String.trim), string.lower) or nil,
+		types = args.type and Array.map(Array.parseCommaSeparatedString(args.type), string.lower) or nil,
 		author = args.author and mw.ext.TeamLiquidIntegration.resolve_redirect(args.author) or nil,
 		subjects = subjects,
 		org = args.organization and mw.ext.TeamLiquidIntegration.resolve_redirect(args.organization) or nil,
