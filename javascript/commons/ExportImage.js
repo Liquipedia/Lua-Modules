@@ -56,7 +56,12 @@ const EXPORT_IMAGE_CONFIG = {
 	},
 	SELECTORS: [
 		{ selector: '.brkts-bracket-wrapper', targetSelector: '.brkts-bracket', typeName: 'Bracket' },
-		{ selector: '.group-table', targetSelector: null, typeName: 'Group Table' },
+		{
+			selector: '.group-table',
+			targetSelector: null,
+			typeName: 'Group Table',
+			titleSelector: '.group-table-title'
+		},
 		{ selector: '.crosstable', targetSelector: 'tbody', typeName: 'Crosstable' },
 		{ selector: '.brkts-matchlist', targetSelector: '.brkts-matchlist-collapse-area', typeName: 'Match List' }
 	]
@@ -593,9 +598,13 @@ class DOMUtils {
 					} );
 				}
 
+				const titleElement = config.titleSelector ? element.querySelector( config.titleSelector ) : null;
+				const title = titleElement ? titleElement.textContent.trim() : null;
+
 				headingsToElements.get( headingInfo.text ).elements.push( {
 					element: targetElement,
 					typeName: config.typeName,
+					title: title,
 					isVisible: this.isElementVisible( targetElement )
 				} );
 			}
@@ -640,14 +649,15 @@ class DropdownWidget {
 			} else {
 				for ( let i = 0; i < visibleElements.length; i++ ) {
 					const item = visibleElements[ i ];
-					const typeLabel = hasSingleElement ? '' :
-						` ${ this.getTypeLabel( visibleElements, item.typeName, i ) }`;
+					const elementLabel = this.getElementLabel( visibleElements, i );
+					const typeLabel = hasSingleElement ? '' : ` ${ elementLabel }`;
+					const exportTitle = item.title || sectionTitle;
+
 					const copyButton = this.createMenuButton( {
 						icon: 'copy',
-						buttonText: `Copy ${ typeLabel } image to clipboard`,
+						buttonText: `Copy${ typeLabel } image to clipboard`,
 						item,
-						sectionTitle,
-						typeLabel,
+						exportTitle,
 						exportMode: 'copy',
 						menuElement,
 						menuItems,
@@ -655,10 +665,9 @@ class DropdownWidget {
 					} );
 					const downloadButton = this.createMenuButton( {
 						icon: 'download',
-						buttonText: `Download ${ typeLabel } as image`,
+						buttonText: `Download${ typeLabel } as image`,
 						item,
-						sectionTitle,
-						typeLabel,
+						exportTitle,
 						exportMode: 'download',
 						menuElement,
 						menuItems,
@@ -712,8 +721,7 @@ class DropdownWidget {
 			icon,
 			buttonText,
 			item,
-			sectionTitle,
-			typeLabel,
+			exportTitle,
 			exportMode,
 			menuElement,
 			menuItems,
@@ -728,8 +736,7 @@ class DropdownWidget {
 
 		button.addEventListener( 'click', async ( event ) => {
 			event.stopPropagation();
-			const fullTitle = `${ sectionTitle }${ typeLabel }`;
-			await this.handleExport( item.element, fullTitle, exportMode, menuElement, menuItems, loadingElement );
+			await this.handleExport( item.element, exportTitle, exportMode, menuElement, menuItems, loadingElement );
 		} );
 
 		return button;
@@ -906,9 +913,19 @@ class DropdownWidget {
 		}
 	}
 
-	getTypeLabel( elements, typeName, currentIndex ) {
-		const previousCount = elements.slice( 0, currentIndex ).filter( ( item ) => item.typeName === typeName ).length;
-		return `${ typeName } ${ previousCount + 1 }`;
+	getElementLabel( elements, index ) {
+		const item = elements[ index ];
+		if ( item.title ) {
+			return item.title;
+		}
+		const sameTypeElements = elements.filter( ( it ) => it.typeName === item.typeName );
+		const sameTypeWithoutTitle = sameTypeElements.filter( ( it ) => !it.title );
+
+		if ( sameTypeWithoutTitle.length > 1 ) {
+			const indexInType = sameTypeWithoutTitle.indexOf( item );
+			return `${ item.typeName } ${ indexInType + 1 }`;
+		}
+		return item.typeName;
 	}
 
 	createElement( tag, attributes = {}, children = [] ) {
