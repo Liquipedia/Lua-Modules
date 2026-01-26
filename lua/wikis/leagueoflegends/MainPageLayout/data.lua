@@ -26,6 +26,7 @@ local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
+---@return string
 local function getCurrentTransferPage()
 	local basePage = 'Player Transfers/' .. DateExt.getYearOf() .. '/' .. os.date('%B')
 	local queryData = mw.ext.LiquipediaDB.lpdb('transfer', {
