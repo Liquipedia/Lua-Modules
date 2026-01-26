@@ -13,11 +13,6 @@ local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 
-local ExternalMediaListDisplay = Lua.import('Module:Widget/ExternalMedia/List')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Link = Lua.import('Module:Widget/Basic/Link')
-local WidgetUtil = Lua.import('Module:Widget/Util')
-
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
@@ -25,6 +20,11 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
+
+local ExternalMediaListDisplay = Lua.import('Module:Widget/ExternalMedia/List')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MediaList = {}
 
