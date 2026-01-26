@@ -17,6 +17,14 @@ local Tabs = Lua.import('Module:Tabs')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local ExternalMediaLinkDisplay = Lua.import('Module:Widget/ExternalMedia/Link')
 
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
+
 local MediaList = {}
 
 local NON_BREAKING_SPACE = '&nbsp;'
@@ -30,7 +38,7 @@ function MediaList.get(args)
 	args = MediaList._parseArgs(args)
 
 	local data = mw.ext.LiquipediaDB.lpdb('externalmedialink', {
-		conditions = MediaList._buildConditions(args),
+		conditions = tostring(MediaList._buildConditions(args)),
 		order = 'date desc',
 		limit = args.limit
 	})
@@ -78,7 +86,7 @@ function MediaList._parseArgs(args)
 		separateByYears = Logic.readBool(args.seperate_years or args.separate_years),
 		dynamic = Logic.emptyOr(Logic.readBoolOrNil(args.dynamic), true),
 		linkToForm = Logic.readBool(args.linkToForm),
-		booleanOperator = Logic.readBool(args['and']) and ' AND ' or ' OR ',
+		booleanOperator = Logic.readBool(args['and']) and BooleanOperator.all or BooleanOperator.any,
 		isEventPage = Logic.readBool(args.event),
 		event = Logic.readBool(args.event)
 			and mw.title.getCurrentTitle().prefixedText
@@ -90,71 +98,60 @@ end
 
 ---Builds the query conditions for the given arguments
 ---@param args table
----@return string
+---@return ConditionTree
 function MediaList._buildConditions(args)
-	local conditions = {
-		'[[namespace::136]]'
-	}
+	local conditions = ConditionTree(BooleanOperator.all):add(
+		ConditionNode(ColumnName('namespace'), Comparator.eq, 136)
+	)
 
 	if Table.isNotEmpty(args.types) then
-		table.insert(conditions, '(' .. table.concat(Array.map(args.types, function(typeValue)
-			return '[[type::' .. typeValue .. ']]'
-		end), ' OR ' ) .. ')')
+		conditions:add(ConditionUtil.anyOf(ColumnName('type'), args.types))
 	end
 
 	if args.year then
-		table.insert(conditions, '[[date_year::' .. args.year.. ']]')
+		conditions:add(ConditionNode(ColumnName('year', 'date'), Comparator.eq, args.year))
 	end
 
-	local additionalConditions = {}
-	for _, subject in pairs(args.subjects) do
-		table.insert(additionalConditions, MediaList._buildMultiKeyCondition(subject, 'extradata_subject', 20))
-	end
+	local additionalConditions = ConditionTree(args.booleanOperator)
+
+	additionalConditions:add(Array.map(args.subjects, function (subject)
+		return MediaList._buildMultiKeyCondition(subject, 'extradata_subject', 20)
+	end))
 
 	if args.org then
-		table.insert(
-			additionalConditions,
-			'([[extradata_subject_organization::'
-				.. args.org
-				.. ']] OR [[extradata_subject_organization::'
-				.. args.org:gsub(' ', '_')
-				.. ']])'
-		)
-		table.insert(additionalConditions, MediaList._buildMultiKeyCondition(args.org, 'extradata_subject_organization', 5))
+		additionalConditions:add{
+			ConditionUtil.anyOf(ColumnName('extradata_subject_organization'), {args.org, args.org:gsub(' ', '_')}),
+			MediaList._buildMultiKeyCondition(args.org, 'extradata_subject_organization', 5)
+		}
 	end
 
-	if args.author then
-		table.insert(additionalConditions, MediaList._buildMultiKeyCondition(args.author, 'authors_author', 5))
-	end
+	additionalConditions:add(MediaList._buildMultiKeyCondition(args.author, 'authors_author', 5))
 
 	if args.event then
-		table.insert(
-			additionalConditions,
-			'([[extradata_event_link::'
-				.. args.event
-				.. ']] OR [[extradata_event_link::'
-				.. args.event:gsub(' ', '_')
-				.. ']])'
+		additionalConditions:add(
+			ConditionUtil.anyOf(ColumnName('extradata_event_link'), {args.event, args.event:gsub(' ', '_')})
 		)
 	end
 
-	if Logic.isNotEmpty(additionalConditions) then
-		table.insert(conditions, '(' .. table.concat(additionalConditions, args.booleanOperator) .. ')')
-	end
+	conditions:add(additionalConditions)
 
-	return table.concat(conditions, ' AND ')
+	return conditions
 end
 
 ---Builds a multi key condition for a given prefix and value
 ---@param value string|number
 ---@param prefix string
 ---@param limit integer
----@return string
+---@return ConditionTree?
 function MediaList._buildMultiKeyCondition(value, prefix, limit)
-	return table.concat(Array.map(Array.range(1, limit), function(index)
-		return '([[' .. prefix .. index .. '::' .. value .. ']]'
-			.. ' OR [['.. prefix .. index .. '::' .. value:gsub(' ', '_') .. ']])'
-	end), ' OR ')
+	if Logic.isEmpty(value) then
+		return
+	end
+	return ConditionTree(BooleanOperator.any):add(
+		Array.map(Array.range(1, limit), function (index)
+			return ConditionUtil.anyOf(ColumnName(prefix .. index), {value, value:gsub(' ', '_')})
+		end)
+	)
 end
 
 ---Builds the display for the dynamic tabs per year option
