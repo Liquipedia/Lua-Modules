@@ -10,12 +10,10 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
-local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
-local ExternalMediaLinkDisplay = Lua.import('Module:Widget/ExternalMedia/Link')
+local ExternalMediaListDisplay = Lua.import('Module:Widget/ExternalMedia/List')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -211,47 +209,14 @@ end
 ---Displays the External Media Links for a given data set (usually of a year)
 ---@param data externalmedialink[]
 ---@param args table
----@return Html
+---@return Widget
 function MediaList._displayYear(data, args)
-	local yearDisplay = mw.html.create('ul')
-
-	for _, item in ipairs(data) do
-		yearDisplay:node(MediaList._row(item, args))
-	end
-
-	return yearDisplay
-end
-
----Displays a single External Media Link
----@param item externalmedialink
----@param args table
----@return Html
-function MediaList._row(item, args)
-	local row = mw.html.create('li')
-		:node(MediaList._editButton(item.pagename))
-		:node(args.showSubjectTeam and MediaList._displayTeam(args.subjects[1], item.date) or '')
-		:node(ExternalMediaLinkDisplay{data = item, showUsUk = args.showUsUk})
-
-	return row
-end
-
----Display for the edit button in front of External Medial Link rows
----@param page string
----@return string
-function MediaList._editButton(page)
-	return mw.text.nowiki('[') .. '[[Data:' .. page .. '|e]]' .. mw.text.nowiki(']') .. NON_BREAKING_SPACE
-end
-
----Displays the subject's team for a given External Media Link
----@param subject string
----@param date string
----@return Widget?
-function MediaList._displayTeam(subject, date)
-	local _, team = PlayerExt.syncTeam(subject, nil, {date = date})
-	if not team then
-		return
-	end
-	return OpponentDisplay.InlineTeamContainer{template = team, date = date, style = 'icon'}
+	return ExternalMediaListDisplay{
+		data = data,
+		subject = args.subjects[1],
+		showSubjectTeam = args.showSubjectTeam,
+		showUsUk = args.showUsUk,
+	}
 end
 
 ---Displays the link to the Form with which External Media Links are to be created.
