@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
@@ -32,9 +33,7 @@ function ExternalMediaListDisplay:render()
 	if Logic.isEmpty(data) then
 		return
 	end
-	return UnorderedList{children = Array.map(data, function (item)
-		return self:_createListElement(item)
-	end)}
+	return UnorderedList{children = Array.map(data, FnUtil.curry(ExternalMediaListDisplay._createListElement, self))}
 end
 
 ---@private
