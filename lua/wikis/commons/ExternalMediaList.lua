@@ -159,7 +159,7 @@ function MediaList._buildMultiKeyCondition(value, prefix, limit)
 end
 
 ---Builds the display for the dynamic tabs per year option
----@param data table[]
+---@param data externalmedialink[]
 ---@param args table
 ---@return Html|string?
 function MediaList._displayDynamic(data, args)
@@ -177,7 +177,7 @@ function MediaList._displayDynamic(data, args)
 end
 
 ---Builds the display for the per year option (without tabs)
----@param data table[]
+---@param data externalmedialink[]
 ---@param args table
 ---@return Html
 function MediaList._displayByYear(data, args)
@@ -193,7 +193,7 @@ function MediaList._displayByYear(data, args)
 end
 
 ---Groups provided data by year
----@param data table[]
+---@param data externalmedialink[]
 ---@return table[][]
 function MediaList._groupByYear(data)
 	local _, groupedData = Array.groupBy(data, function(item)
@@ -213,7 +213,7 @@ function MediaList._sortInYear(_, key1, key2)
 end
 
 ---Displays the External Media Links for a given data set (usually of a year)
----@param data table[]
+---@param data externalmedialink[]
 ---@param args table
 ---@return Html
 function MediaList._displayYear(data, args)
