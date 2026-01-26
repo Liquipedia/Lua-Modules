@@ -21,7 +21,8 @@ const EXPORT_IMAGE_CONFIG = {
 		LOGO_OFFSET_X: 12,
 		LOGO_OFFSET_Y_ADJUST: 2,
 		TEXT_OFFSET_X: 40,
-		HEADER_TEXT_OFFSET: 16
+		HEADER_TEXT_OFFSET: 16,
+		MIN_WIDTH: 300
 	},
 	FONTS: {
 		HEADER: 'bold 14px Open Sans, sans-serif',
@@ -56,7 +57,12 @@ const EXPORT_IMAGE_CONFIG = {
 	},
 	SELECTORS: [
 		{ selector: '.brkts-bracket-wrapper', targetSelector: '.brkts-bracket', typeName: 'Bracket' },
-		{ selector: '.group-table', targetSelector: null, typeName: 'Group Table' },
+		{
+			selector: '.group-table',
+			targetSelector: null,
+			typeName: 'Group Table',
+			titleSelector: '.group-table-title'
+		},
 		{ selector: '.crosstable', targetSelector: 'tbody', typeName: 'Crosstable' },
 		{ selector: '.brkts-matchlist', targetSelector: '.brkts-matchlist-collapse-area', typeName: 'Match List' }
 	]
@@ -113,23 +119,31 @@ class CanvasComposer {
 	}
 
 	async compose( sourceCanvas, sectionTitle, isDarkTheme ) {
-		const canvas = this.createCanvas( sourceCanvas );
+		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
+		const contentWidth = sourceCanvas.width + ( dims.PADDING * 2 );
+		const canvasWidth = Math.max( contentWidth, dims.MIN_WIDTH );
+
+		const headerLayout = this.calculateHeaderLayout(
+			canvasWidth,
+			sectionTitle
+		);
+		const canvas = this.createCanvas( sourceCanvas, headerLayout.height, canvasWidth );
 		const context = canvas.getContext( '2d' );
 		const theme = isDarkTheme ? EXPORT_IMAGE_CONFIG.COLORS.DARK : EXPORT_IMAGE_CONFIG.COLORS.LIGHT;
 
 		this.drawBackground( context, canvas.width, canvas.height, theme );
-		this.drawHeader( context, canvas.width, sectionTitle, theme );
-		this.drawContent( context, sourceCanvas );
-		await this.drawFooter( context, canvas.width, sourceCanvas.height, theme, isDarkTheme );
+		this.drawHeader( context, canvas.width, theme, headerLayout );
+		this.drawContent( context, sourceCanvas, headerLayout.height );
+		await this.drawFooter( context, canvas.width, sourceCanvas.height, theme, isDarkTheme, headerLayout.height );
 
 		return canvas;
 	}
 
-	createCanvas( sourceCanvas ) {
+	createCanvas( sourceCanvas, headerHeight, width ) {
 		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
 		const canvas = document.createElement( 'canvas' );
-		canvas.width = sourceCanvas.width + ( dims.PADDING * 2 );
-		canvas.height = sourceCanvas.height + dims.HEADER_HEIGHT + dims.FOOTER_HEIGHT + ( dims.PADDING * 4 );
+		canvas.width = width;
+		canvas.height = sourceCanvas.height + headerHeight + dims.FOOTER_HEIGHT + ( dims.PADDING * 4 );
 		return canvas;
 	}
 
@@ -138,7 +152,7 @@ class CanvasComposer {
 		context.fillRect( 0, 0, width, height );
 	}
 
-	drawHeader( context, canvasWidth, sectionTitle, theme ) {
+	drawHeader( context, canvasWidth, theme, headerLayout ) {
 		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
 		const gradient = context.createLinearGradient( dims.PADDING, 0, canvasWidth - dims.PADDING, 0 );
 		gradient.addColorStop( 0, theme.HEADER_START );
@@ -150,61 +164,66 @@ class CanvasComposer {
 			dims.PADDING,
 			dims.PADDING,
 			canvasWidth - ( dims.PADDING * 2 ),
-			dims.HEADER_HEIGHT,
+			headerLayout.height,
 			dims.BORDER_RADIUS
 		);
 		context.fill();
 
-		const mainTitle = mw.config.get( 'wgDisplayTitle' ) || mw.config.get( 'wgTitle' );
-		context.font = EXPORT_IMAGE_CONFIG.FONTS.HEADER;
-		const mainTitleWidth = context.measureText( mainTitle ).width;
-
-		context.font = EXPORT_IMAGE_CONFIG.FONTS.SUBHEADER;
-		const sectionTitleWidth = context.measureText( sectionTitle ).width;
-
-		const totalTextWidth = mainTitleWidth + sectionTitleWidth + ( dims.HEADER_TEXT_OFFSET * 2 );
-		const availableWidth = canvasWidth - ( dims.PADDING * 2 ) - dims.TEXT_OFFSET_X;
-
 		context.fillStyle = '#ffffff';
 		context.textBaseline = 'middle';
 
-		if ( totalTextWidth > availableWidth ) {
-			// Stack vertically
-			const topY = dims.PADDING + ( dims.HEADER_HEIGHT / 3 );
-			const bottomY = dims.PADDING + ( dims.HEADER_HEIGHT * 2 / 3 );
-
+		if ( headerLayout.isStacked ) {
 			context.textAlign = 'left';
+			const lineHeight = 18;
+			const totalLines = headerLayout.mainTitleLines.length + headerLayout.sectionTitleLines.length;
+			const startY = dims.PADDING + ( headerLayout.height - ( ( totalLines - 1 ) * lineHeight ) ) / 2;
+
+			let currentY = startY;
 			context.font = EXPORT_IMAGE_CONFIG.FONTS.HEADER;
-			context.fillText( mainTitle, dims.PADDING + dims.HEADER_TEXT_OFFSET, topY );
+			for ( const line of headerLayout.mainTitleLines ) {
+				context.fillText( line, dims.PADDING + dims.HEADER_TEXT_OFFSET, currentY );
+				currentY += lineHeight;
+			}
 
 			context.font = EXPORT_IMAGE_CONFIG.FONTS.SUBHEADER;
-			context.fillText( sectionTitle, dims.PADDING + dims.HEADER_TEXT_OFFSET, bottomY );
+			for ( const line of headerLayout.sectionTitleLines ) {
+				context.fillText( line, dims.PADDING + dims.HEADER_TEXT_OFFSET, currentY );
+				currentY += lineHeight;
+			}
 		} else {
 			// Default horizontal layout
-			const verticalCenter = dims.PADDING + ( dims.HEADER_HEIGHT / 2 );
+			const verticalCenter = dims.PADDING + ( headerLayout.height / 2 );
 
 			context.textAlign = 'left';
 			context.font = EXPORT_IMAGE_CONFIG.FONTS.HEADER;
-			context.fillText( mainTitle, dims.PADDING + dims.HEADER_TEXT_OFFSET, verticalCenter );
+			context.fillText(
+				headerLayout.mainTitleLines[ 0 ],
+				dims.PADDING + dims.HEADER_TEXT_OFFSET,
+				verticalCenter
+			);
 
 			context.textAlign = 'right';
 			context.font = EXPORT_IMAGE_CONFIG.FONTS.SUBHEADER;
-			context.fillText( sectionTitle, canvasWidth - dims.PADDING - dims.HEADER_TEXT_OFFSET, verticalCenter );
+			context.fillText(
+				headerLayout.sectionTitleLines[ 0 ],
+				canvasWidth - dims.PADDING - dims.HEADER_TEXT_OFFSET,
+				verticalCenter
+			);
 		}
 	}
 
-	drawContent( context, sourceCanvas ) {
+	drawContent( context, sourceCanvas, headerHeight ) {
 		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
 		context.drawImage(
 			sourceCanvas,
 			dims.PADDING,
-			dims.PADDING + dims.HEADER_HEIGHT + dims.PADDING
+			dims.PADDING + headerHeight + dims.PADDING
 		);
 	}
 
-	async drawFooter( context, canvasWidth, sourceHeight, theme, isDarkTheme ) {
+	async drawFooter( context, canvasWidth, sourceHeight, theme, isDarkTheme, headerHeight ) {
 		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
-		const footerY = dims.PADDING + dims.HEADER_HEIGHT + dims.PADDING + sourceHeight + dims.PADDING;
+		const footerY = dims.PADDING + headerHeight + dims.PADDING + sourceHeight + dims.PADDING;
 
 		const gradient = context.createLinearGradient( dims.PADDING, 0, canvasWidth - dims.PADDING, 0 );
 		gradient.addColorStop( 0, theme.FOOTER_START );
@@ -240,6 +259,79 @@ class CanvasComposer {
 			// eslint-disable-next-line no-console
 			console.warn( 'Logo rendering failed:', error );
 		}
+	}
+
+	calculateHeaderLayout( canvasWidth, sectionTitle ) {
+		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
+		const availableWidth = canvasWidth - ( dims.PADDING * 2 ) - ( dims.HEADER_TEXT_OFFSET * 2 );
+		const mainTitle = mw.config.get( 'wgDisplayTitle' ) || mw.config.get( 'wgTitle' );
+
+		const dummyCanvas = document.createElement( 'canvas' );
+		const context = dummyCanvas.getContext( '2d' );
+
+		context.font = EXPORT_IMAGE_CONFIG.FONTS.HEADER;
+		const mainTitleWidth = context.measureText( mainTitle ).width;
+
+		context.font = EXPORT_IMAGE_CONFIG.FONTS.SUBHEADER;
+		const sectionTitleWidth = context.measureText( sectionTitle ).width;
+
+		const totalTextWidth = mainTitleWidth + sectionTitleWidth + ( dims.HEADER_TEXT_OFFSET * 2 );
+		const sideBySideAvailableWidth = canvasWidth - ( dims.PADDING * 2 ) - dims.TEXT_OFFSET_X;
+
+		if ( totalTextWidth <= sideBySideAvailableWidth ) {
+			return {
+				height: dims.HEADER_HEIGHT,
+				isStacked: false,
+				mainTitleLines: [ mainTitle ],
+				sectionTitleLines: [ sectionTitle ]
+			};
+		}
+
+		const mainTitleLines = this.wrapText( context, mainTitle, availableWidth, EXPORT_IMAGE_CONFIG.FONTS.HEADER );
+		const sectionTitleLines = this.wrapText(
+			context,
+			sectionTitle,
+			availableWidth,
+			EXPORT_IMAGE_CONFIG.FONTS.SUBHEADER
+		);
+
+		const lineHeight = 18;
+		const verticalPadding = 12;
+		const calculatedHeight = Math.max(
+			dims.HEADER_HEIGHT,
+			( ( mainTitleLines.length + sectionTitleLines.length ) * lineHeight ) + verticalPadding
+		);
+
+		return {
+			height: calculatedHeight,
+			isStacked: true,
+			mainTitleLines,
+			sectionTitleLines
+		};
+	}
+
+	wrapText( context, text, maxWidth, font ) {
+		context.font = font;
+		const words = text.split( ' ' );
+		if ( words.length === 0 ) {
+			return [];
+		}
+
+		const lines = [];
+		let currentLine = words[ 0 ];
+
+		for ( let i = 1; i < words.length; i++ ) {
+			const word = words[ i ];
+			const width = context.measureText( currentLine + ' ' + word ).width;
+			if ( width <= maxWidth ) {
+				currentLine += ' ' + word;
+			} else {
+				lines.push( currentLine );
+				currentLine = word;
+			}
+		}
+		lines.push( currentLine );
+		return lines;
 	}
 
 	async drawLogo( context, footerY, isDarkTheme ) {
@@ -511,9 +603,13 @@ class DOMUtils {
 					} );
 				}
 
+				const titleElement = config.titleSelector ? element.querySelector( config.titleSelector ) : null;
+				const title = titleElement ? titleElement.textContent.trim() : null;
+
 				headingsToElements.get( headingInfo.text ).elements.push( {
 					element: targetElement,
 					typeName: config.typeName,
+					title: title,
 					isVisible: this.isElementVisible( targetElement )
 				} );
 			}
@@ -558,14 +654,15 @@ class DropdownWidget {
 			} else {
 				for ( let i = 0; i < visibleElements.length; i++ ) {
 					const item = visibleElements[ i ];
-					const typeLabel = hasSingleElement ? '' :
-						` ${ this.getTypeLabel( visibleElements, item.typeName, i ) }`;
+					const elementLabel = this.getElementLabel( visibleElements, i );
+					const typeLabel = hasSingleElement ? '' : ` ${ elementLabel }`;
+					const exportTitle = item.title || sectionTitle;
+
 					const copyButton = this.createMenuButton( {
 						icon: 'copy',
-						buttonText: `Copy${ typeLabel } to clipboard`,
+						buttonText: `Copy ${ typeLabel } image to clipboard`,
 						item,
-						sectionTitle,
-						typeLabel,
+						exportTitle,
 						exportMode: 'copy',
 						menuElement,
 						menuItems,
@@ -573,10 +670,9 @@ class DropdownWidget {
 					} );
 					const downloadButton = this.createMenuButton( {
 						icon: 'download',
-						buttonText: `Download${ typeLabel } as image`,
+						buttonText: `Download ${ typeLabel } as image`,
 						item,
-						sectionTitle,
-						typeLabel,
+						exportTitle,
 						exportMode: 'download',
 						menuElement,
 						menuItems,
@@ -630,8 +726,7 @@ class DropdownWidget {
 			icon,
 			buttonText,
 			item,
-			sectionTitle,
-			typeLabel,
+			exportTitle,
 			exportMode,
 			menuElement,
 			menuItems,
@@ -646,8 +741,7 @@ class DropdownWidget {
 
 		button.addEventListener( 'click', async ( event ) => {
 			event.stopPropagation();
-			const fullTitle = `${ sectionTitle }${ typeLabel }`;
-			await this.handleExport( item.element, fullTitle, exportMode, menuElement, menuItems, loadingElement );
+			await this.handleExport( item.element, exportTitle, exportMode, menuElement, menuItems, loadingElement );
 		} );
 
 		return button;
@@ -767,7 +861,26 @@ class DropdownWidget {
 	}
 
 	openMenu( menuElement, buttonElement ) {
+		menuElement.style.left = '';
+		menuElement.style.right = '';
 		menuElement.style.display = 'block';
+
+		const viewportWidth = window.innerWidth;
+		const menuRect = menuElement.getBoundingClientRect();
+
+		if ( menuRect.right > viewportWidth ) {
+			const parentRect = buttonElement.parentElement.getBoundingClientRect();
+
+			let newLeft = viewportWidth - menuRect.width - parentRect.left;
+
+			if ( newLeft < -parentRect.left ) {
+				newLeft = -parentRect.left;
+			}
+
+			menuElement.style.left = `${ newLeft }px`;
+			menuElement.style.right = 'auto';
+		}
+
 		buttonElement.setAttribute( 'aria-expanded', 'true' );
 		const firstFocusable = menuElement.querySelector( '[tabindex="0"]' );
 		if ( firstFocusable ) {
@@ -815,9 +928,19 @@ class DropdownWidget {
 		}
 	}
 
-	getTypeLabel( elements, typeName, currentIndex ) {
-		const previousCount = elements.slice( 0, currentIndex ).filter( ( item ) => item.typeName === typeName ).length;
-		return `${ typeName } ${ previousCount + 1 }`;
+	getElementLabel( elements, index ) {
+		const item = elements[ index ];
+		if ( item.title ) {
+			return item.title;
+		}
+		const sameTypeElements = elements.filter( ( it ) => it.typeName === item.typeName );
+		const sameTypeWithoutTitle = sameTypeElements.filter( ( it ) => !it.title );
+
+		if ( sameTypeWithoutTitle.length > 1 ) {
+			const indexInType = sameTypeWithoutTitle.indexOf( item );
+			return `${ item.typeName } ${ indexInType + 1 }`;
+		}
+		return item.typeName;
 	}
 
 	createElement( tag, attributes = {}, children = [] ) {
