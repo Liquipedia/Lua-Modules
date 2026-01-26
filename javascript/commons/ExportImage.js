@@ -644,7 +644,7 @@ class DropdownWidget {
 						` ${ this.getTypeLabel( visibleElements, item.typeName, i ) }`;
 					const copyButton = this.createMenuButton( {
 						icon: 'copy',
-						buttonText: `Copy${ typeLabel } image to clipboard`,
+						buttonText: `Copy ${ typeLabel } image to clipboard`,
 						item,
 						sectionTitle,
 						typeLabel,
@@ -655,7 +655,7 @@ class DropdownWidget {
 					} );
 					const downloadButton = this.createMenuButton( {
 						icon: 'download',
-						buttonText: `Download${ typeLabel } as image`,
+						buttonText: `Download ${ typeLabel } as image`,
 						item,
 						sectionTitle,
 						typeLabel,
