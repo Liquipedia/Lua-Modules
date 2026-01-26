@@ -13,6 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 
+local ExternalMediaFormLink = Lua.import('Module:Widget/ExternalMedia/FormLink')
 local ExternalMediaListDisplay = Lua.import('Module:Widget/ExternalMedia/List')
 
 local Condition = Lua.import('Module:Condition')
@@ -221,22 +222,11 @@ end
 
 ---Displays the link to the Form with which External Media Links are to be created.
 ---@param show boolean defines if the link is to be displayed or not
----@return Html?
+---@return Widget?
 function MediaList._formLink(show)
 	if not show then return end
 
-	return mw.html.create('div')
-		:css('display', 'block')
-		:css('text-align', 'center')
-		:css('padding', '0.5em')
-		:node(mw.html.create('div')
-			:css('display', 'inline')
-			:css('white-space', 'nowrap')
-			:wikitext(mw.text.nowiki('[')
-				.. '[[Special:FormEdit/ExternalMediaLinks|Add an external media link]]'
-				.. mw.text.nowiki(']')
-			)
-		)
+	return ExternalMediaFormLink()
 end
 
 return Class.export(MediaList, {exports = {'get'}})
