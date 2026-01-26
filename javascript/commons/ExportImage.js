@@ -860,10 +860,20 @@ class DropdownWidget {
 		menuElement.style.right = '';
 		menuElement.style.display = 'block';
 
+		const viewportWidth = window.innerWidth;
 		const menuRect = menuElement.getBoundingClientRect();
-		if ( menuRect.right > window.innerWidth ) {
-			menuElement.style.left = 'auto';
-			menuElement.style.right = '0';
+
+		if ( menuRect.right > viewportWidth ) {
+			const parentRect = buttonElement.parentElement.getBoundingClientRect();
+
+			let newLeft = viewportWidth - menuRect.width - parentRect.left;
+
+			if ( newLeft < -parentRect.left ) {
+				newLeft = -parentRect.left;
+			}
+
+			menuElement.style.left = `${ newLeft }px`;
+			menuElement.style.right = 'auto';
 		}
 
 		buttonElement.setAttribute( 'aria-expanded', 'true' );
