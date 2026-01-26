@@ -15,6 +15,8 @@ local Tabs = Lua.import('Module:Tabs')
 
 local ExternalMediaFormLink = Lua.import('Module:Widget/ExternalMedia/FormLink')
 local ExternalMediaListDisplay = Lua.import('Module:Widget/ExternalMedia/List')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -25,8 +27,6 @@ local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
 local MediaList = {}
-
-local NON_BREAKING_SPACE = '&nbsp;'
 
 ---Main function for ExternalMediaList.
 ---Queries External Media Links for the given conditions (via arguments).
@@ -45,19 +45,20 @@ function MediaList.get(args)
 	--if we do not get any results from the query return empty string
 	if type(data[1]) ~= 'table' then return end
 
-	if args.separateByYears and args.dynamic and not args.year then
-		return mw.html.create()
-			:node(MediaList._displayDynamic(data, args))
-			:node(MediaList._formLink(args.linkToForm))
-	elseif args.separateByYears and not args.year then
-		return mw.html.create()
-			:node(MediaList._displayByYear(data, args))
-			:node(MediaList._formLink(args.linkToForm))
+	---@return string|Widget|Html?
+	local function createDisplay()
+		if args.separateByYears and args.dynamic and not args.year then
+			return MediaList._displayDynamic(data, args)
+		elseif args.separateByYears and not args.year then
+			return MediaList._displayByYear(data, args)
+		end
+		return MediaList._displayYear(data, args)
 	end
 
-	return mw.html.create()
-		:node(MediaList._displayYear(data, args))
-		:node(MediaList._formLink(args.linkToForm))
+	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+		createDisplay(),
+		MediaList._formLink(args.linkToForm)
+	)}
 end
 
 ---Parses the arguments for further usage in this module.
