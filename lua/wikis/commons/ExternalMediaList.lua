@@ -10,12 +10,13 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 
-local ExternalMediaFormLink = Lua.import('Module:Widget/ExternalMedia/FormLink')
 local ExternalMediaListDisplay = Lua.import('Module:Widget/ExternalMedia/List')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Condition = Lua.import('Module:Condition')
@@ -25,6 +26,8 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
+
+local FORM_NAME = 'ExternalMediaLinks'
 
 local MediaList = {}
 
@@ -225,7 +228,26 @@ end
 function MediaList._formLink(show)
 	if not show then return end
 
-	return ExternalMediaFormLink()
+	assert(Page.exists('\'Form:' .. FORM_NAME), 'Form:' .. FORM_NAME .. '\' does not exist')
+
+	return HtmlWidgets.Div{
+		css = {
+			display = 'block',
+			['text-align'] = 'center',
+			padding = '0.5em',
+		},
+		children = HtmlWidgets.Div{
+			css = {
+				display = 'inline',
+				['white-space'] = 'nowrap',
+			},
+			children = {
+				mw.text.nowiki('['),
+				Link{link = 'Special:FormEdit/' .. FORM_NAME, children = 'Add an external media link'},
+				mw.text.nowiki(']'),
+			}
+		}
+	}
 end
 
 return Class.export(MediaList, {exports = {'get'}})
