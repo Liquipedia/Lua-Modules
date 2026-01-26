@@ -42,7 +42,7 @@ function MediaList.get(args)
 		limit = args.limit
 	})
 
-	--if we do not get any results from the query return empty string
+	--if we do not get any results from the query return empty
 	if type(data[1]) ~= 'table' then return end
 
 	---@return string|Widget|Widget[]|Html?
