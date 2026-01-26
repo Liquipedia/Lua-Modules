@@ -21,7 +21,8 @@ const EXPORT_IMAGE_CONFIG = {
 		LOGO_OFFSET_X: 12,
 		LOGO_OFFSET_Y_ADJUST: 2,
 		TEXT_OFFSET_X: 40,
-		HEADER_TEXT_OFFSET: 16
+		HEADER_TEXT_OFFSET: 16,
+		MIN_WIDTH: 300
 	},
 	FONTS: {
 		HEADER: 'bold 14px Open Sans, sans-serif',
@@ -118,11 +119,15 @@ class CanvasComposer {
 	}
 
 	async compose( sourceCanvas, sectionTitle, isDarkTheme ) {
+		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
+		const contentWidth = sourceCanvas.width + ( dims.PADDING * 2 );
+		const canvasWidth = Math.max( contentWidth, dims.MIN_WIDTH );
+
 		const headerLayout = this.calculateHeaderLayout(
-			sourceCanvas.width + ( EXPORT_IMAGE_CONFIG.DIMENSIONS.PADDING * 2 ),
+			canvasWidth,
 			sectionTitle
 		);
-		const canvas = this.createCanvas( sourceCanvas, headerLayout.height );
+		const canvas = this.createCanvas( sourceCanvas, headerLayout.height, canvasWidth );
 		const context = canvas.getContext( '2d' );
 		const theme = isDarkTheme ? EXPORT_IMAGE_CONFIG.COLORS.DARK : EXPORT_IMAGE_CONFIG.COLORS.LIGHT;
 
@@ -134,10 +139,10 @@ class CanvasComposer {
 		return canvas;
 	}
 
-	createCanvas( sourceCanvas, headerHeight ) {
+	createCanvas( sourceCanvas, headerHeight, width ) {
 		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
 		const canvas = document.createElement( 'canvas' );
-		canvas.width = sourceCanvas.width + ( dims.PADDING * 2 );
+		canvas.width = width;
 		canvas.height = sourceCanvas.height + headerHeight + dims.FOOTER_HEIGHT + ( dims.PADDING * 4 );
 		return canvas;
 	}
