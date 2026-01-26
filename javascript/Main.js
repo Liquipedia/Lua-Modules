@@ -17,6 +17,7 @@ const jsModules = [
 	'Crosstable',
 	'Dialog',
 	'Dropdown',
+	'ExportImage',
 	'FilterButtons',
 	'Liquipedia_links',
 	'Mainpage',
