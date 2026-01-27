@@ -754,7 +754,7 @@ local factionPropsAoM = {
 		faction = 'freyr',
 	},
 	fuxi = {
-		index = 1,
+		index = 10,
 		name = 'Fuxi',
 		faction = 'fuxi',
 	},
