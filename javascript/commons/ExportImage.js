@@ -1029,6 +1029,38 @@ class DropdownWidget {
 }
 
 /**
+ * Manages zoom detection and page reload on zoom changes
+ */
+class ZoomManager {
+	constructor() {
+		this.currentZoom = this.getZoomLevel();
+		this.setupZoomListener();
+	}
+
+	getZoomLevel() {
+		return window.devicePixelRatio || 1;
+	}
+
+	setupZoomListener() {
+		let resizeTimeout;
+		window.addEventListener( 'resize', () => {
+			clearTimeout( resizeTimeout );
+			resizeTimeout = setTimeout( () => {
+				this.handleZoomChange();
+			}, 250 );
+		} );
+	}
+
+	handleZoomChange() {
+		const newZoom = this.getZoomLevel();
+		if ( Math.abs( newZoom - this.currentZoom ) > 0.01 ) {
+			this.currentZoom = newZoom;
+			window.location.reload();
+		}
+	}
+}
+
+/**
  * Main module class that coordinates all components
  */
 class ExportImageModule {
@@ -1037,6 +1069,7 @@ class ExportImageModule {
 		this.canvasComposer = new CanvasComposer( this.imageCache );
 		this.exportService = new ExportService( this.canvasComposer );
 		this.dropdownWidget = new DropdownWidget( this.exportService );
+		this.zoomManager = new ZoomManager();
 	}
 
 	init() {
