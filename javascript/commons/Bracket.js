@@ -6,6 +6,34 @@ liquipedia.bracket = {
 	init: function() {
 		liquipedia.bracket.popup.init();
 		liquipedia.bracket.highlighting.init();
+		liquipedia.bracket.headers.init();
+	},
+	headers: {
+		init: function() {
+			liquipedia.bracket.headers.updateAll();
+			window.addEventListener( 'resize', liquipedia.bracket.headers.updateAll );
+		},
+		updateAll: function() {
+			document.querySelectorAll( '.brkts-header-div' ).forEach( ( element ) => {
+				const optionsDivs = Array.from( element.querySelectorAll( '.brkts-header-option' ) );
+				if ( optionsDivs.length === 0 ) {
+					return;
+				}
+				const options = optionsDivs.map( ( div ) => div.textContent );
+				for ( const option of options ) {
+					// Remove existing text/tags (all children that are not .brkts-header-option)
+					Array.from( element.childNodes ).forEach( ( child ) => {
+						if ( !optionsDivs.includes( child ) ) {
+							element.removeChild( child );
+						}
+					} );
+					element.insertBefore( document.createTextNode( option ), element.firstChild );
+					if ( element.scrollWidth <= element.clientWidth ) {
+						break;
+					}
+				}
+			} );
+		}
 	},
 	highlighting: {
 		standardIcons: [
