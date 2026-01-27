@@ -58,7 +58,7 @@ const EXPORT_IMAGE_CONFIG = {
 	SELECTORS: [
 		{ selector: '.brkts-bracket-wrapper', targetSelector: '.brkts-bracket', typeName: 'Bracket' },
 		{
-			selector: '.group-table',
+			selector: '.group-table, .grouptable',
 			targetSelector: null,
 			typeName: 'Group Table',
 			titleSelector: '.group-table-title'
@@ -578,6 +578,7 @@ class DOMUtils {
 		const configs = EXPORT_IMAGE_CONFIG.SELECTORS;
 
 		const headingsToElements = new Map();
+		const processedElements = new Set();
 
 		for ( const config of configs ) {
 			const elements = document.querySelectorAll( config.selector );
@@ -586,9 +587,11 @@ class DOMUtils {
 					element.querySelector( config.targetSelector ) :
 					element;
 
-				if ( !targetElement ) {
+				if ( !targetElement || processedElements.has( targetElement ) ) {
 					continue;
 				}
+
+				processedElements.add( targetElement );
 
 				const headingInfo = this.findPreviousHeading( element );
 				if ( !headingInfo ) {
