@@ -390,6 +390,24 @@ class ExportService {
 		this.activeExports = new Set();
 	}
 
+	// Fixes info icon used in match lists and brackets rendering
+	// by replacing the icon with a SVG instead of backgroundImage for the exported image
+	applyCloneFixes( clonedDoc ) {
+		const infoSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" width="12" height="12">' +
+			'<circle fill="#616161" cx="6" cy="6" r="6"/>' +
+			'<polygon fill="#fff" points="4 5 4 6 5 6 5 9 4 9 4 10 8 10 8 9 7 9 7 2 5 2 5 4 7 4 7 5 4 5"/>' +
+			'</svg>';
+		const infoIcons = clonedDoc.querySelectorAll( '.brkts-match-info-icon' );
+		infoIcons.forEach( ( icon ) => {
+			icon.style.backgroundImage = 'none';
+			icon.innerHTML = infoSvg;
+			icon.style.display = 'inline-flex';
+			icon.style.alignItems = 'center';
+			icon.style.justifyContent = 'center';
+			icon.style.verticalAlign = 'middle';
+		} );
+	}
+
 	async export( element, title, mode ) {
 		const exportId = Symbol( 'export' );
 
@@ -430,7 +448,8 @@ class ExportService {
 				windowHeight: document.documentElement.scrollHeight,
 				scrollX: 0,
 				scrollY: 0,
-				backgroundColor: backgroundColor
+				backgroundColor: backgroundColor,
+				onclone: ( clonedDoc ) => this.applyCloneFixes( clonedDoc )
 			} );
 
 			element.style.background = originalBackground;
@@ -1050,6 +1069,5 @@ class ExportImageModule {
 	}
 }
 
-// Export for liquipedia integration
 liquipedia.exportImage = new ExportImageModule();
 liquipedia.core.modules.push( 'exportImage' );
