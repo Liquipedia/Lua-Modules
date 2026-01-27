@@ -761,8 +761,11 @@ class DropdownWidget {
 		}, buttonContent );
 
 		button.addEventListener( 'click', () => {
-			if ( menuElement.style.display === 'none' && onOpen ) {
-				onOpen();
+			if ( menuElement.style.display === 'none' ) {
+				this.exportService.ensureHtml2CanvasLoaded();
+				if ( onOpen ) {
+					onOpen();
+				}
 			}
 			this.toggleMenu( menuElement, button );
 		} );
