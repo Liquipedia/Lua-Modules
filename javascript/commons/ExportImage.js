@@ -58,7 +58,7 @@ const EXPORT_IMAGE_CONFIG = {
 	SELECTORS: [
 		{ selector: '.brkts-bracket-wrapper', targetSelector: '.brkts-bracket', typeName: 'Bracket' },
 		{
-			selector: '.group-table',
+			selector: '.group-table, .grouptable',
 			targetSelector: null,
 			typeName: 'Group Table',
 			titleSelector: '.group-table-title'
@@ -390,6 +390,18 @@ class ExportService {
 		this.activeExports = new Set();
 	}
 
+	// Applies fixes to cloned document for proper rendering in exported images
+	applyCloneFixes( clonedDoc ) {
+		this.hideInfoIcons( clonedDoc );
+	}
+
+	hideInfoIcons( clonedDoc ) {
+		const infoIcons = clonedDoc.querySelectorAll( '.brkts-match-info-icon' );
+		infoIcons.forEach( ( icon ) => {
+			icon.style.display = 'none';
+		} );
+	}
+
 	async export( element, title, mode ) {
 		const exportId = Symbol( 'export' );
 
@@ -398,16 +410,42 @@ class ExportService {
 		}
 
 		this.activeExports.add( exportId );
-		const originalBackground = element.style.background;
 
 		try {
 			await this.ensureHtml2CanvasLoaded();
 
-			const isDarkTheme = document.documentElement.classList.contains( 'theme--dark' );
-			const backgroundColor = this.getBackgroundColor();
+			if ( mode === 'copy' ) {
+				await this.copyToClipboard( element, title );
+			} else if ( mode === 'download' ) {
+				const blob = await this.generateImageBlob( element, title );
+				await this.downloadBlob( blob, this.generateFilename( title ) );
+			} else {
+				throw new Error( `Unknown export mode: ${ mode }` );
+			}
+
+		} finally {
+			this.activeExports.delete( exportId );
+		}
+	}
+
+	async generateImageBlob( element, title ) {
+		const originalBackground = element.style.background;
+		const isDarkTheme = document.documentElement.classList.contains( 'theme--dark' );
+		const backgroundColor = this.getBackgroundColor();
+
+		try {
 			element.style.background = backgroundColor;
 
-			const capturedCanvas = await html2canvas( element );
+			const capturedCanvas = await html2canvas( element, {
+				scale: 1,
+				windowWidth: document.documentElement.scrollWidth,
+				windowHeight: document.documentElement.scrollHeight,
+				scrollX: 0,
+				scrollY: 0,
+				backgroundColor: backgroundColor,
+				onclone: ( clonedDoc ) => this.applyCloneFixes( clonedDoc )
+			} );
+
 			element.style.background = originalBackground;
 
 			if ( capturedCanvas.width === 0 || capturedCanvas.height === 0 ) {
@@ -415,12 +453,62 @@ class ExportService {
 			}
 
 			const composedCanvas = await this.canvasComposer.compose( capturedCanvas, title, isDarkTheme );
-			await this.outputResult( composedCanvas, mode, this.generateFilename( title ) );
 
-		} finally {
+			return new Promise( ( resolve, reject ) => {
+				composedCanvas.toBlob( ( blob ) => {
+					if ( blob ) {
+						resolve( blob );
+					} else {
+						reject( new Error( 'Failed to create image blob' ) );
+					}
+				}, 'image/png' );
+			} );
+
+		} catch ( error ) {
 			element.style.background = originalBackground;
-			this.activeExports.delete( exportId );
+			throw error;
 		}
+	}
+
+	async copyToClipboard( element, title ) {
+
+		if ( !window.ClipboardItem || !navigator.clipboard || !navigator.clipboard.write ) {
+			mw.notify( 'This browser does not support copying images to the clipboard.', { type: 'error' } );
+			return;
+		}
+
+		try {
+			const blobPromise = this.generateImageBlob( element, title );
+
+			// eslint-disable-next-line compat/compat
+			const clipboardItem = new ClipboardItem( {
+				'image/png': blobPromise
+			} );
+
+			// eslint-disable-next-line compat/compat
+			await navigator.clipboard.write( [ clipboardItem ] );
+			mw.notify( 'Image copied to clipboard!' );
+
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.error( 'Clipboard write failed:', error );
+			mw.notify( 'Failed to copy image to clipboard. Please try the Download option.', { type: 'error' } );
+		}
+	}
+
+	async downloadBlob( blob, filename ) {
+		const url = URL.createObjectURL( blob );
+		const link = document.createElement( 'a' );
+		link.download = `${ filename }.png`;
+		link.href = url;
+		link.click();
+
+		// Delay revoking the object URL to ensure the download has time to start reliably in all browsers.
+		const URL_REVOKE_OBJECT_URL_DELAY_MS = 100;
+
+		setTimeout( () => {
+			URL.revokeObjectURL( url );
+		}, URL_REVOKE_OBJECT_URL_DELAY_MS );
 	}
 
 	async ensureHtml2CanvasLoaded() {
@@ -462,43 +550,6 @@ class ExportService {
 		const min = String( now.getMinutes() ).padStart( 2, '0' );
 		const sec = String( now.getSeconds() ).padStart( 2, '0' );
 		return `${ year }${ month }${ day }_${ hour }${ min }${ sec }`;
-	}
-
-	async outputResult( canvas, mode, filename ) {
-		if ( mode === 'download' ) {
-			await this.downloadImage( canvas, filename );
-		} else if ( mode === 'copy' ) {
-			await this.copyToClipboard( canvas );
-		} else {
-			throw new Error( `Unknown export mode: ${ mode }` );
-		}
-	}
-
-	async downloadImage( canvas, filename ) {
-		const link = document.createElement( 'a' );
-		link.download = `${ filename }.png`;
-		link.href = canvas.toDataURL( 'image/png' );
-		link.click();
-	}
-
-	async copyToClipboard( canvas ) {
-		if ( !window.ClipboardItem ) {
-			throw new Error( 'Clipboard API not supported in this browser' );
-		}
-
-		const blob = await new Promise( ( resolve, reject ) => {
-			canvas.toBlob( ( result ) => {
-				if ( result ) {
-					resolve( result );
-				} else {
-					reject( new Error( 'Failed to create image blob' ) );
-				}
-			}, 'image/png' );
-		} );
-
-		// eslint-disable-next-line compat/compat
-		await navigator.clipboard.write( [ new ClipboardItem( { 'image/png': blob } ) ] );
-		mw.notify( 'Image copied to clipboard!' );
 	}
 
 	isExporting() {
@@ -578,6 +629,7 @@ class DOMUtils {
 		const configs = EXPORT_IMAGE_CONFIG.SELECTORS;
 
 		const headingsToElements = new Map();
+		const processedElements = new Set();
 
 		for ( const config of configs ) {
 			const elements = document.querySelectorAll( config.selector );
@@ -586,9 +638,11 @@ class DOMUtils {
 					element.querySelector( config.targetSelector ) :
 					element;
 
-				if ( !targetElement ) {
+				if ( !targetElement || processedElements.has( targetElement ) ) {
 					continue;
 				}
+
+				processedElements.add( targetElement );
 
 				const headingInfo = this.findPreviousHeading( element );
 				if ( !headingInfo ) {
@@ -761,8 +815,11 @@ class DropdownWidget {
 		}, buttonContent );
 
 		button.addEventListener( 'click', () => {
-			if ( menuElement.style.display === 'none' && onOpen ) {
-				onOpen();
+			if ( menuElement.style.display === 'none' ) {
+				this.exportService.ensureHtml2CanvasLoaded();
+				if ( onOpen ) {
+					onOpen();
+				}
 			}
 			this.toggleMenu( menuElement, button );
 		} );
@@ -1009,6 +1066,5 @@ class ExportImageModule {
 	}
 }
 
-// Export for liquipedia integration
 liquipedia.exportImage = new ExportImageModule();
 liquipedia.core.modules.push( 'exportImage' );
