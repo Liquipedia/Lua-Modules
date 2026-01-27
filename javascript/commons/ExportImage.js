@@ -398,13 +398,30 @@ class ExportService {
 		}
 
 		this.activeExports.add( exportId );
-		const originalBackground = element.style.background;
 
 		try {
 			await this.ensureHtml2CanvasLoaded();
 
-			const isDarkTheme = document.documentElement.classList.contains( 'theme--dark' );
-			const backgroundColor = this.getBackgroundColor();
+			if ( mode === 'copy' ) {
+				await this.copyToClipboard( element, title );
+			} else if ( mode === 'download' ) {
+				const blob = await this.generateImageBlob( element, title );
+				await this.downloadBlob( blob, this.generateFilename( title ) );
+			} else {
+				throw new Error( `Unknown export mode: ${ mode }` );
+			}
+
+		} finally {
+			this.activeExports.delete( exportId );
+		}
+	}
+
+	async generateImageBlob( element, title ) {
+		const originalBackground = element.style.background;
+		const isDarkTheme = document.documentElement.classList.contains( 'theme--dark' );
+		const backgroundColor = this.getBackgroundColor();
+
+		try {
 			element.style.background = backgroundColor;
 
 			const capturedCanvas = await html2canvas( element, {
@@ -423,12 +440,59 @@ class ExportService {
 			}
 
 			const composedCanvas = await this.canvasComposer.compose( capturedCanvas, title, isDarkTheme );
-			await this.outputResult( composedCanvas, mode, this.generateFilename( title ) );
 
-		} finally {
+			return new Promise( ( resolve, reject ) => {
+				composedCanvas.toBlob( ( blob ) => {
+					if ( blob ) {
+						resolve( blob );
+					} else {
+						reject( new Error( 'Failed to create image blob' ) );
+					}
+				}, 'image/png' );
+			} );
+
+		} catch ( error ) {
 			element.style.background = originalBackground;
-			this.activeExports.delete( exportId );
+			throw error;
 		}
+	}
+
+	async copyToClipboard( element, title ) {
+
+		if ( !window.ClipboardItem || !navigator.clipboard || !navigator.clipboard.write ) {
+			mw.notify( 'This browser does not support copying images to the clipboard.', { type: 'error' } );
+			return;
+		}
+
+		try {
+			const blobPromise = this.generateImageBlob( element, title );
+
+			// eslint-disable-next-line compat/compat
+			const clipboardItem = new ClipboardItem( {
+				'image/png': blobPromise
+			} );
+
+			// eslint-disable-next-line compat/compat
+			await navigator.clipboard.write( [ clipboardItem ] );
+			mw.notify( 'Image copied to clipboard!' );
+
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.error( 'Clipboard write failed:', error );
+			mw.notify( 'Failed to copy image to clipboard. Please try the Download option.', { type: 'error' } );
+		}
+	}
+
+	async downloadBlob( blob, filename ) {
+		const url = URL.createObjectURL( blob );
+		const link = document.createElement( 'a' );
+		link.download = `${ filename }.png`;
+		link.href = url;
+		link.click();
+
+		setTimeout( () => {
+			URL.revokeObjectURL( url );
+		}, 100 );
 	}
 
 	async ensureHtml2CanvasLoaded() {
@@ -470,43 +534,6 @@ class ExportService {
 		const min = String( now.getMinutes() ).padStart( 2, '0' );
 		const sec = String( now.getSeconds() ).padStart( 2, '0' );
 		return `${ year }${ month }${ day }_${ hour }${ min }${ sec }`;
-	}
-
-	async outputResult( canvas, mode, filename ) {
-		if ( mode === 'download' ) {
-			await this.downloadImage( canvas, filename );
-		} else if ( mode === 'copy' ) {
-			await this.copyToClipboard( canvas );
-		} else {
-			throw new Error( `Unknown export mode: ${ mode }` );
-		}
-	}
-
-	async downloadImage( canvas, filename ) {
-		const link = document.createElement( 'a' );
-		link.download = `${ filename }.png`;
-		link.href = canvas.toDataURL( 'image/png' );
-		link.click();
-	}
-
-	async copyToClipboard( canvas ) {
-		if ( !window.ClipboardItem ) {
-			throw new Error( 'Clipboard API not supported in this browser' );
-		}
-
-		const blob = await new Promise( ( resolve, reject ) => {
-			canvas.toBlob( ( result ) => {
-				if ( result ) {
-					resolve( result );
-				} else {
-					reject( new Error( 'Failed to create image blob' ) );
-				}
-			}, 'image/png' );
-		} );
-
-		// eslint-disable-next-line compat/compat
-		await navigator.clipboard.write( [ new ClipboardItem( { 'image/png': blob } ) ] );
-		mw.notify( 'Image copied to clipboard!' );
 	}
 
 	isExporting() {
