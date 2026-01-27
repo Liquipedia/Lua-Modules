@@ -36,7 +36,7 @@ return {
 	defuse = 'fas fa-wrench',
 	outoftime = 'fas fa-hourglass',
 	ace_valorant = 'fas fa-dagger',
-	flawless_valorant = 'fas fa-skull-cow',
+	flawless_valorant = 'fas fa-gem',
 
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',
