@@ -55,6 +55,12 @@ const EXPORT_IMAGE_CONFIG = {
 			TEXT: '#181818'
 		}
 	},
+	SVG_ICONS: {
+		INFO: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" width="12" height="12">' +
+			'<circle fill="#616161" cx="6" cy="6" r="6"/>' +
+			'<polygon fill="#fff" points="4 5 4 6 5 6 5 9 4 9 4 10 8 10 8 9 7 9 7 2 5 2 5 4 7 4 7 5 4 5"/>' +
+			'</svg>'
+	},
 	SELECTORS: [
 		{ selector: '.brkts-bracket-wrapper', targetSelector: '.brkts-bracket', typeName: 'Bracket' },
 		{
@@ -390,17 +396,18 @@ class ExportService {
 		this.activeExports = new Set();
 	}
 
+	// Applies fixes to cloned document for proper rendering in exported images
+	applyCloneFixes( clonedDoc ) {
+		this.fixInfoIcons( clonedDoc );
+	}
+
 	// Fixes info icon used in match lists and brackets rendering
 	// by replacing the icon with a SVG instead of backgroundImage for the exported image
-	applyCloneFixes( clonedDoc ) {
-		const infoSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" width="12" height="12">' +
-			'<circle fill="#616161" cx="6" cy="6" r="6"/>' +
-			'<polygon fill="#fff" points="4 5 4 6 5 6 5 9 4 9 4 10 8 10 8 9 7 9 7 2 5 2 5 4 7 4 7 5 4 5"/>' +
-			'</svg>';
+	fixInfoIcons( clonedDoc ) {
 		const infoIcons = clonedDoc.querySelectorAll( '.brkts-match-info-icon' );
 		infoIcons.forEach( ( icon ) => {
 			icon.style.backgroundImage = 'none';
-			icon.innerHTML = infoSvg;
+			icon.innerHTML = EXPORT_IMAGE_CONFIG.SVG_ICONS.INFO;
 			icon.style.display = 'inline-flex';
 			icon.style.alignItems = 'center';
 			icon.style.justifyContent = 'center';
