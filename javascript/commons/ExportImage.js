@@ -516,9 +516,12 @@ class ExportService {
 		link.href = url;
 		link.click();
 
+		// Delay revoking the object URL to ensure the download has time to start reliably in all browsers.
+		const URL_REVOKE_OBJECT_URL_DELAY_MS = 100;
+
 		setTimeout( () => {
 			URL.revokeObjectURL( url );
-		}, 100 );
+		}, URL_REVOKE_OBJECT_URL_DELAY_MS );
 	}
 
 	async ensureHtml2CanvasLoaded() {
