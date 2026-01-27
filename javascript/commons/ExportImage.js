@@ -437,7 +437,7 @@ class ExportService {
 			element.style.background = backgroundColor;
 
 			const capturedCanvas = await html2canvas( element, {
-				scale: 1,
+				scale: window.devicePixelRatio || 1,
 				windowWidth: document.documentElement.scrollWidth,
 				windowHeight: document.documentElement.scrollHeight,
 				scrollX: 0,
