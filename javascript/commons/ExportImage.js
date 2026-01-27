@@ -407,7 +407,15 @@ class ExportService {
 			const backgroundColor = this.getBackgroundColor();
 			element.style.background = backgroundColor;
 
-			const capturedCanvas = await html2canvas( element );
+			const capturedCanvas = await html2canvas( element, {
+				scale: 1,
+				windowWidth: document.documentElement.scrollWidth,
+				windowHeight: document.documentElement.scrollHeight,
+				scrollX: 0,
+				scrollY: 0,
+				backgroundColor: backgroundColor
+			} );
+
 			element.style.background = originalBackground;
 
 			if ( capturedCanvas.width === 0 || capturedCanvas.height === 0 ) {
