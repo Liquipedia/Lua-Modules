@@ -35,11 +35,12 @@ const EXPORT_IMAGE_CONFIG = {
 		LETTER_SPACING: 1.8
 	},
 	TIMEOUTS: {
-		IMAGE_LOAD: 5000
+		IMAGE_LOAD: 5000,
+		URL_REVOKE_DELAY: 100
 	},
 	COLORS: {
 		DARK: {
-			BACKGROUND: '#181818',
+			BACKGROUND: '#121212',
 			HEADER_START: '#1b63a3',
 			HEADER_END: '#0a253d',
 			FOOTER_START: 'rgba(255,255,255,0.08)',
@@ -77,6 +78,7 @@ class ImageCache {
 	}
 
 	async load( url, key, timeout = EXPORT_IMAGE_CONFIG.TIMEOUTS.IMAGE_LOAD ) {
+		// Return cached image if available
 		if ( this.cache.has( key ) ) {
 			return this.cache.get( key );
 		}
@@ -86,18 +88,20 @@ class ImageCache {
 			image.crossOrigin = 'Anonymous';
 
 			const timeoutId = setTimeout( () => {
-				image.src = '';
+				image.src = ''; // Cancel image load
 				reject( new Error( `Image load timeout: ${ url }` ) );
 			}, timeout );
 
+			const cleanup = () => clearTimeout( timeoutId );
+
 			image.onload = () => {
-				clearTimeout( timeoutId );
+				cleanup();
 				this.cache.set( key, image );
 				resolve( image );
 			};
 
 			image.onerror = () => {
-				clearTimeout( timeoutId );
+				cleanup();
 				reject( new Error( `Image load failed: ${ url }` ) );
 			};
 
@@ -116,31 +120,68 @@ class ImageCache {
 class CanvasComposer {
 	constructor( imageCache ) {
 		this.imageCache = imageCache;
+		this.offscreenContext = null; // Reusable context for text measurement
 	}
 
-	async compose( sourceCanvas, sectionTitle, isDarkTheme ) {
-		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
+	async compose( sourceCanvas, sectionTitle, isDarkTheme, scale = 1 ) {
+		// Create scaled dimensions object
+		const dims = this.getScaledDimensions( scale );
+		const fonts = this.getScaledFonts( scale );
+
 		const contentWidth = sourceCanvas.width + ( dims.PADDING * 2 );
 		const canvasWidth = Math.max( contentWidth, dims.MIN_WIDTH );
 
-		const headerLayout = this.calculateHeaderLayout(
-			canvasWidth,
-			sectionTitle
-		);
-		const canvas = this.createCanvas( sourceCanvas, headerLayout.height, canvasWidth );
+		const headerLayout = this.calculateHeaderLayout( canvasWidth, sectionTitle, scale, fonts, dims );
+		const canvas = this.createCanvas( sourceCanvas, headerLayout.height, canvasWidth, dims );
 		const context = canvas.getContext( '2d' );
 		const theme = isDarkTheme ? EXPORT_IMAGE_CONFIG.COLORS.DARK : EXPORT_IMAGE_CONFIG.COLORS.LIGHT;
 
 		this.drawBackground( context, canvas.width, canvas.height, theme );
-		this.drawHeader( context, canvas.width, theme, headerLayout );
-		this.drawContent( context, sourceCanvas, headerLayout.height );
-		await this.drawFooter( context, canvas.width, sourceCanvas.height, theme, isDarkTheme, headerLayout.height );
+		this.drawHeader( context, canvas.width, theme, headerLayout, fonts, dims );
+		this.drawContent( context, sourceCanvas, headerLayout.height, dims );
+		await this.drawFooter(
+			context, canvas.width, sourceCanvas.height, theme, isDarkTheme, headerLayout.height, fonts, dims
+		);
 
 		return canvas;
 	}
 
-	createCanvas( sourceCanvas, headerHeight, width ) {
-		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
+	// Creates scaled dimensions object
+	getScaledDimensions( scale ) {
+		const dims = {};
+		for ( const [ key, value ] of Object.entries( EXPORT_IMAGE_CONFIG.DIMENSIONS ) ) {
+			dims[ key ] = typeof value === 'number' ? value * scale : value;
+		}
+		return dims;
+	}
+
+	// Creates scaled fonts object
+	getScaledFonts( scale ) {
+		const fonts = {};
+		for ( const [ key, fontString ] of Object.entries( EXPORT_IMAGE_CONFIG.FONTS ) ) {
+			fonts[ key ] = this.scaleFontSize( fontString, scale );
+		}
+		return fonts;
+	}
+
+	// Scales the pixel size in a font string
+	scaleFontSize( fontString, scale ) {
+		return fontString.replace( /(\d+)px/, ( _match, pixels ) => {
+			const scaledPixels = parseInt( pixels ) * scale;
+			return `${ scaledPixels }px`;
+		} );
+	}
+
+	// Gets or creates reusable offscreen context for text measurements
+	getOffscreenContext() {
+		if ( !this.offscreenContext ) {
+			const canvas = document.createElement( 'canvas' );
+			this.offscreenContext = canvas.getContext( '2d' );
+		}
+		return this.offscreenContext;
+	}
+
+	createCanvas( sourceCanvas, headerHeight, width, dims ) {
 		const canvas = document.createElement( 'canvas' );
 		canvas.width = width;
 		canvas.height = sourceCanvas.height + headerHeight + dims.FOOTER_HEIGHT + ( dims.PADDING * 4 );
@@ -152,8 +193,8 @@ class CanvasComposer {
 		context.fillRect( 0, 0, width, height );
 	}
 
-	drawHeader( context, canvasWidth, theme, headerLayout ) {
-		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
+	drawHeader( context, canvasWidth, theme, headerLayout, fonts, dims ) {
+		// Draw header background with gradient
 		const gradient = context.createLinearGradient( dims.PADDING, 0, canvasWidth - dims.PADDING, 0 );
 		gradient.addColorStop( 0, theme.HEADER_START );
 		gradient.addColorStop( 1, theme.HEADER_END );
@@ -169,51 +210,57 @@ class CanvasComposer {
 		);
 		context.fill();
 
+		// Draw header text
 		context.fillStyle = '#ffffff';
 		context.textBaseline = 'middle';
 
 		if ( headerLayout.isStacked ) {
-			context.textAlign = 'left';
-			const lineHeight = 18;
-			const totalLines = headerLayout.mainTitleLines.length + headerLayout.sectionTitleLines.length;
-			const startY = dims.PADDING + ( headerLayout.height - ( ( totalLines - 1 ) * lineHeight ) ) / 2;
-
-			let currentY = startY;
-			context.font = EXPORT_IMAGE_CONFIG.FONTS.HEADER;
-			for ( const line of headerLayout.mainTitleLines ) {
-				context.fillText( line, dims.PADDING + dims.HEADER_TEXT_OFFSET, currentY );
-				currentY += lineHeight;
-			}
-
-			context.font = EXPORT_IMAGE_CONFIG.FONTS.SUBHEADER;
-			for ( const line of headerLayout.sectionTitleLines ) {
-				context.fillText( line, dims.PADDING + dims.HEADER_TEXT_OFFSET, currentY );
-				currentY += lineHeight;
-			}
+			this.drawStackedHeader( context, headerLayout, fonts, dims );
 		} else {
-			// Default horizontal layout
-			const verticalCenter = dims.PADDING + ( headerLayout.height / 2 );
-
-			context.textAlign = 'left';
-			context.font = EXPORT_IMAGE_CONFIG.FONTS.HEADER;
-			context.fillText(
-				headerLayout.mainTitleLines[ 0 ],
-				dims.PADDING + dims.HEADER_TEXT_OFFSET,
-				verticalCenter
-			);
-
-			context.textAlign = 'right';
-			context.font = EXPORT_IMAGE_CONFIG.FONTS.SUBHEADER;
-			context.fillText(
-				headerLayout.sectionTitleLines[ 0 ],
-				canvasWidth - dims.PADDING - dims.HEADER_TEXT_OFFSET,
-				verticalCenter
-			);
+			this.drawHorizontalHeader( context, headerLayout, canvasWidth, fonts, dims );
 		}
 	}
 
-	drawContent( context, sourceCanvas, headerHeight ) {
-		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
+	drawStackedHeader( context, headerLayout, fonts, dims ) {
+		context.textAlign = 'left';
+		const lineHeight = 18 * ( dims.PADDING / 12 ); // Scale lineHeight with dims
+		const totalLines = headerLayout.mainTitleLines.length + headerLayout.sectionTitleLines.length;
+		let currentY = dims.PADDING + ( headerLayout.height - ( ( totalLines - 1 ) * lineHeight ) ) / 2;
+
+		context.font = fonts.HEADER;
+		for ( const line of headerLayout.mainTitleLines ) {
+			context.fillText( line, dims.PADDING + dims.HEADER_TEXT_OFFSET, currentY );
+			currentY += lineHeight;
+		}
+
+		context.font = fonts.SUBHEADER;
+		for ( const line of headerLayout.sectionTitleLines ) {
+			context.fillText( line, dims.PADDING + dims.HEADER_TEXT_OFFSET, currentY );
+			currentY += lineHeight;
+		}
+	}
+
+	drawHorizontalHeader( context, headerLayout, canvasWidth, fonts, dims ) {
+		const verticalCenter = dims.PADDING + ( headerLayout.height / 2 );
+
+		context.textAlign = 'left';
+		context.font = fonts.HEADER;
+		context.fillText(
+			headerLayout.mainTitleLines[ 0 ],
+			dims.PADDING + dims.HEADER_TEXT_OFFSET,
+			verticalCenter
+		);
+
+		context.textAlign = 'right';
+		context.font = fonts.SUBHEADER;
+		context.fillText(
+			headerLayout.sectionTitleLines[ 0 ],
+			canvasWidth - dims.PADDING - dims.HEADER_TEXT_OFFSET,
+			verticalCenter
+		);
+	}
+
+	drawContent( context, sourceCanvas, headerHeight, dims ) {
 		context.drawImage(
 			sourceCanvas,
 			dims.PADDING,
@@ -221,10 +268,10 @@ class CanvasComposer {
 		);
 	}
 
-	async drawFooter( context, canvasWidth, sourceHeight, theme, isDarkTheme, headerHeight ) {
-		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
+	async drawFooter( context, canvasWidth, sourceHeight, theme, isDarkTheme, headerHeight, fonts, dims ) {
 		const footerY = dims.PADDING + headerHeight + dims.PADDING + sourceHeight + dims.PADDING;
 
+		// Draw footer background
 		const gradient = context.createLinearGradient( dims.PADDING, 0, canvasWidth - dims.PADDING, 0 );
 		gradient.addColorStop( 0, theme.FOOTER_START );
 		gradient.addColorStop( 1, theme.FOOTER_END );
@@ -240,8 +287,9 @@ class CanvasComposer {
 		);
 		context.fill();
 
+		// Draw footer text
 		context.fillStyle = theme.TEXT;
-		context.font = EXPORT_IMAGE_CONFIG.FONTS.FOOTER;
+		context.font = fonts.FOOTER;
 		context.textAlign = 'left';
 		const textY = footerY + ( dims.FOOTER_HEIGHT / 2 );
 
@@ -250,34 +298,35 @@ class CanvasComposer {
 			'POWERED BY LIQUIPEDIA',
 			dims.PADDING + dims.TEXT_OFFSET_X,
 			textY,
-			EXPORT_IMAGE_CONFIG.SPACING.LETTER_SPACING
+			EXPORT_IMAGE_CONFIG.SPACING.LETTER_SPACING * ( dims.LOGO_WIDTH / 22 )
 		);
 
+		// Draw logo (non-critical, catch errors silently)
 		try {
-			await this.drawLogo( context, footerY, isDarkTheme );
+			await this.drawLogo( context, footerY, isDarkTheme, dims );
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.warn( 'Logo rendering failed:', error );
 		}
 	}
 
-	calculateHeaderLayout( canvasWidth, sectionTitle ) {
-		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
+	calculateHeaderLayout( canvasWidth, sectionTitle, scale, fonts, dims ) {
 		const availableWidth = canvasWidth - ( dims.PADDING * 2 ) - ( dims.HEADER_TEXT_OFFSET * 2 );
 		const mainTitle = mw.config.get( 'wgDisplayTitle' ) || mw.config.get( 'wgTitle' );
 
-		const dummyCanvas = document.createElement( 'canvas' );
-		const context = dummyCanvas.getContext( '2d' );
+		const context = this.getOffscreenContext();
 
-		context.font = EXPORT_IMAGE_CONFIG.FONTS.HEADER;
+		// Measure text widths
+		context.font = fonts.HEADER;
 		const mainTitleWidth = context.measureText( mainTitle ).width;
 
-		context.font = EXPORT_IMAGE_CONFIG.FONTS.SUBHEADER;
+		context.font = fonts.SUBHEADER;
 		const sectionTitleWidth = context.measureText( sectionTitle ).width;
 
 		const totalTextWidth = mainTitleWidth + sectionTitleWidth + ( dims.HEADER_TEXT_OFFSET * 2 );
 		const sideBySideAvailableWidth = canvasWidth - ( dims.PADDING * 2 ) - dims.TEXT_OFFSET_X;
 
+		// Check if text fits side-by-side
 		if ( totalTextWidth <= sideBySideAvailableWidth ) {
 			return {
 				height: dims.HEADER_HEIGHT,
@@ -287,16 +336,12 @@ class CanvasComposer {
 			};
 		}
 
-		const mainTitleLines = this.wrapText( context, mainTitle, availableWidth, EXPORT_IMAGE_CONFIG.FONTS.HEADER );
-		const sectionTitleLines = this.wrapText(
-			context,
-			sectionTitle,
-			availableWidth,
-			EXPORT_IMAGE_CONFIG.FONTS.SUBHEADER
-		);
+		// Calculate stacked layout
+		const mainTitleLines = this.wrapText( context, mainTitle, availableWidth, fonts.HEADER );
+		const sectionTitleLines = this.wrapText( context, sectionTitle, availableWidth, fonts.SUBHEADER );
 
-		const lineHeight = 18;
-		const verticalPadding = 12;
+		const lineHeight = 18 * scale;
+		const verticalPadding = 12 * scale;
 		const calculatedHeight = Math.max(
 			dims.HEADER_HEIGHT,
 			( ( mainTitleLines.length + sectionTitleLines.length ) * lineHeight ) + verticalPadding
@@ -313,6 +358,7 @@ class CanvasComposer {
 	wrapText( context, text, maxWidth, font ) {
 		context.font = font;
 		const words = text.split( ' ' );
+
 		if ( words.length === 0 ) {
 			return [];
 		}
@@ -321,25 +367,27 @@ class CanvasComposer {
 		let currentLine = words[ 0 ];
 
 		for ( let i = 1; i < words.length; i++ ) {
-			const word = words[ i ];
-			const width = context.measureText( currentLine + ' ' + word ).width;
+			const testLine = `${ currentLine } ${ words[ i ] }`;
+			const width = context.measureText( testLine ).width;
+
 			if ( width <= maxWidth ) {
-				currentLine += ' ' + word;
+				currentLine = testLine;
 			} else {
 				lines.push( currentLine );
-				currentLine = word;
+				currentLine = words[ i ];
 			}
 		}
 		lines.push( currentLine );
+
 		return lines;
 	}
 
-	async drawLogo( context, footerY, isDarkTheme ) {
-		const dims = EXPORT_IMAGE_CONFIG.DIMENSIONS;
+	async drawLogo( context, footerY, isDarkTheme, dims ) {
 		const logoUrl = isDarkTheme ? EXPORT_IMAGE_CONFIG.LOGOS.DARK : EXPORT_IMAGE_CONFIG.LOGOS.LIGHT;
 		const cacheKey = isDarkTheme ? 'dark' : 'light';
 		const logoImage = await this.imageCache.load( logoUrl, cacheKey );
 		const logoY = footerY + ( dims.FOOTER_HEIGHT - dims.LOGO_HEIGHT ) / 2;
+
 		context.drawImage(
 			logoImage,
 			dims.PADDING + dims.LOGO_OFFSET_X,
@@ -351,11 +399,13 @@ class CanvasComposer {
 
 	drawRoundedRect( context, x, y, width, height, radius ) {
 		context.beginPath();
+
 		if ( context.roundRect ) {
 			context.roundRect( x, y, width, height, radius );
 		} else {
 			this.drawRoundRectFallback( context, x, y, width, height, radius );
 		}
+
 		context.closePath();
 	}
 
@@ -390,25 +440,25 @@ class ExportService {
 		this.activeExports = new Set();
 	}
 
-	// Applies fixes to cloned document for proper rendering in exported images
 	applyCloneFixes( clonedDoc ) {
 		this.hideInfoIcons( clonedDoc );
 	}
 
+	// Hides info icons that shouldn't appear in exports
 	hideInfoIcons( clonedDoc ) {
 		const infoIcons = clonedDoc.querySelectorAll( '.brkts-match-info-icon' );
-		infoIcons.forEach( ( icon ) => {
-			icon.style.display = 'none';
-		} );
+		for ( const icon of infoIcons ) {
+			icon.style.opacity = '0';
+		}
 	}
 
 	async export( element, title, mode ) {
-		const exportId = Symbol( 'export' );
-
+		// Prevent concurrent exports
 		if ( this.activeExports.size > 0 ) {
 			throw new Error( 'An export is already in progress' );
 		}
 
+		const exportId = Symbol( 'export' );
 		this.activeExports.add( exportId );
 
 		try {
@@ -418,11 +468,10 @@ class ExportService {
 				await this.copyToClipboard( element, title );
 			} else if ( mode === 'download' ) {
 				const blob = await this.generateImageBlob( element, title );
-				await this.downloadBlob( blob, this.generateFilename( title ) );
+				this.downloadBlob( blob, this.generateFilename( title ) );
 			} else {
 				throw new Error( `Unknown export mode: ${ mode }` );
 			}
-
 		} finally {
 			this.activeExports.delete( exportId );
 		}
@@ -432,13 +481,14 @@ class ExportService {
 		const originalBackground = element.style.background;
 		const isDarkTheme = document.documentElement.classList.contains( 'theme--dark' );
 		const backgroundColor = this.getBackgroundColor();
+		const scale = window.devicePixelRatio || 1;
 
 		try {
 			element.style.background = backgroundColor;
 
 			const capturedCanvas = await html2canvas( element, {
-				scale: window.devicePixelRatio || 1,
-				windowWidth: document.documentElement.scrollWidth,
+				scale: scale,
+				windowWidth: 1440,
 				windowHeight: document.documentElement.scrollHeight,
 				scrollX: 0,
 				scrollY: 0,
@@ -446,13 +496,16 @@ class ExportService {
 				onclone: ( clonedDoc ) => this.applyCloneFixes( clonedDoc )
 			} );
 
-			element.style.background = originalBackground;
-
 			if ( capturedCanvas.width === 0 || capturedCanvas.height === 0 ) {
 				throw new Error( 'Canvas capture resulted in zero dimensions' );
 			}
 
-			const composedCanvas = await this.canvasComposer.compose( capturedCanvas, title, isDarkTheme );
+			const composedCanvas = await this.canvasComposer.compose(
+				capturedCanvas,
+				title,
+				isDarkTheme,
+				scale
+			);
 
 			return new Promise( ( resolve, reject ) => {
 				composedCanvas.toBlob( ( blob ) => {
@@ -463,15 +516,13 @@ class ExportService {
 					}
 				}, 'image/png' );
 			} );
-
-		} catch ( error ) {
+		} finally {
 			element.style.background = originalBackground;
-			throw error;
 		}
 	}
 
 	async copyToClipboard( element, title ) {
-
+		// Check browser support
 		if ( !window.ClipboardItem || !navigator.clipboard || !navigator.clipboard.write ) {
 			mw.notify( 'This browser does not support copying images to the clipboard.', { type: 'error' } );
 			return;
@@ -481,14 +532,11 @@ class ExportService {
 			const blobPromise = this.generateImageBlob( element, title );
 
 			// eslint-disable-next-line compat/compat
-			const clipboardItem = new ClipboardItem( {
-				'image/png': blobPromise
-			} );
+			const clipboardItem = new ClipboardItem( { 'image/png': blobPromise } );
 
 			// eslint-disable-next-line compat/compat
 			await navigator.clipboard.write( [ clipboardItem ] );
 			mw.notify( 'Image copied to clipboard!' );
-
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error( 'Clipboard write failed:', error );
@@ -496,19 +544,17 @@ class ExportService {
 		}
 	}
 
-	async downloadBlob( blob, filename ) {
+	downloadBlob( blob, filename ) {
 		const url = URL.createObjectURL( blob );
 		const link = document.createElement( 'a' );
 		link.download = `${ filename }.png`;
 		link.href = url;
 		link.click();
 
-		// Delay revoking the object URL to ensure the download has time to start reliably in all browsers.
-		const URL_REVOKE_OBJECT_URL_DELAY_MS = 100;
-
+		// Clean up object URL after short delay
 		setTimeout( () => {
 			URL.revokeObjectURL( url );
-		}, URL_REVOKE_OBJECT_URL_DELAY_MS );
+		}, EXPORT_IMAGE_CONFIG.TIMEOUTS.URL_REVOKE_DELAY );
 	}
 
 	async ensureHtml2CanvasLoaded() {
@@ -532,10 +578,14 @@ class ExportService {
 	generateFilename( title ) {
 		const pageTitle = mw.config.get( 'wgDisplayTitle' ) || mw.config.get( 'wgTitle' );
 		let filename = `Liquipedia ${ pageTitle } ${ title } ${ this.generateTimestamp() }`;
+
+		// Remove invalid filename characters
 		filename = filename.replace( /[\\/:*?"<>|]/g, '_' ).trim();
 
-		if ( filename.length > 215 ) {
-			filename = filename.slice( 0, 215 ).trim();
+		// Limit filename length (with buffer for extension)
+		const MAX_FILENAME_LENGTH = 215;
+		if ( filename.length > MAX_FILENAME_LENGTH ) {
+			filename = filename.slice( 0, MAX_FILENAME_LENGTH ).trim();
 		}
 
 		return filename;
@@ -543,13 +593,10 @@ class ExportService {
 
 	generateTimestamp() {
 		const now = new Date();
-		const year = now.getFullYear();
-		const month = String( now.getMonth() + 1 ).padStart( 2, '0' );
-		const day = String( now.getDate() ).padStart( 2, '0' );
-		const hour = String( now.getHours() ).padStart( 2, '0' );
-		const min = String( now.getMinutes() ).padStart( 2, '0' );
-		const sec = String( now.getSeconds() ).padStart( 2, '0' );
-		return `${ year }${ month }${ day }_${ hour }${ min }${ sec }`;
+		const pad = ( num ) => String( num ).padStart( 2, '0' );
+
+		return `${ now.getFullYear() }${ pad( now.getMonth() + 1 ) }${ pad( now.getDate() ) }_` +
+			`${ pad( now.getHours() ) }${ pad( now.getMinutes() ) }${ pad( now.getSeconds() ) }`;
 	}
 
 	isExporting() {
@@ -562,7 +609,12 @@ class ExportService {
  */
 class DOMUtils {
 	static findPreviousHeading( startElement ) {
-		const walker = document.createTreeWalker( document.body, NodeFilter.SHOW_ELEMENT, null, false );
+		const walker = document.createTreeWalker(
+			document.body,
+			NodeFilter.SHOW_ELEMENT,
+			null,
+			false
+		);
 		walker.currentNode = startElement;
 
 		while ( walker.previousNode() ) {
@@ -584,31 +636,30 @@ class DOMUtils {
 			return false;
 		}
 
-		const computedStyle = window.getComputedStyle( element );
-		if ( computedStyle.display === 'none' ||
-			computedStyle.visibility === 'hidden' ) {
+		// Check element itself
+		const style = window.getComputedStyle( element );
+		if ( style.display === 'none' || style.visibility === 'hidden' ) {
 			return false;
 		}
 
+		// Check parent chain
 		let parent = element.parentElement;
 		while ( parent && parent !== document.body ) {
 			const parentStyle = window.getComputedStyle( parent );
-			if ( parentStyle.display === 'none' ||
-				parentStyle.visibility === 'hidden' ) {
+
+			if ( parentStyle.display === 'none' || parentStyle.visibility === 'hidden' ) {
 				return false;
 			}
 
+			// Check for collapsed state
 			if ( parent.classList.contains( 'collapsed' ) ||
-				parent.classList.contains( 'is--collapsed' ) ) {
+				parent.classList.contains( 'is--collapsed' ) ||
+				parent.dataset.collapsibleState === 'collapsed' ) {
 				return false;
 			}
 
-			if ( parent.dataset.collapsibleState === 'collapsed' ) {
-				return false;
-			}
-
-			const inactiveTab = parent.closest( '.tabs-content > div:not(.active)' );
-			if ( inactiveTab ) {
+			// Check for inactive tabs
+			if ( parent.closest( '.tabs-content > div:not(.active)' ) ) {
 				return false;
 			}
 
@@ -626,13 +677,12 @@ class DOMUtils {
 	}
 
 	static findExportableElements() {
-		const configs = EXPORT_IMAGE_CONFIG.SELECTORS;
-
 		const headingsToElements = new Map();
 		const processedElements = new Set();
 
-		for ( const config of configs ) {
+		for ( const config of EXPORT_IMAGE_CONFIG.SELECTORS ) {
 			const elements = document.querySelectorAll( config.selector );
+
 			for ( const element of elements ) {
 				const targetElement = config.targetSelector ?
 					element.querySelector( config.targetSelector ) :
@@ -649,6 +699,7 @@ class DOMUtils {
 					continue;
 				}
 
+				// Group by heading
 				if ( !headingsToElements.has( headingInfo.text ) ) {
 					headingsToElements.set( headingInfo.text, {
 						headingNode: headingInfo.node,
@@ -657,7 +708,9 @@ class DOMUtils {
 					} );
 				}
 
-				const titleElement = config.titleSelector ? element.querySelector( config.titleSelector ) : null;
+				const titleElement = config.titleSelector ?
+					element.querySelector( config.titleSelector ) :
+					null;
 				const title = titleElement ? titleElement.textContent.trim() : null;
 
 				headingsToElements.get( headingInfo.text ).elements.push( {
@@ -677,8 +730,9 @@ class DOMUtils {
  * Creates and manages dropdown UI components
  */
 class DropdownWidget {
-	constructor( exportService ) {
+	constructor( exportService, zoomManager ) {
 		this.exportService = exportService;
+		this.zoomManager = zoomManager;
 		this.eventCleanupFunctions = new WeakMap();
 	}
 
@@ -688,18 +742,30 @@ class DropdownWidget {
 		let menuItems = [];
 
 		const populateMenu = () => {
+			// Clear existing items (except loading)
 			while ( menuElement.firstChild && menuElement.firstChild !== loadingElement ) {
 				menuElement.removeChild( menuElement.firstChild );
 			}
-			// Ensure loadingElement is at the end if it was removed or moved
+
+			// Ensure loading element is present
 			if ( !menuElement.contains( loadingElement ) ) {
 				menuElement.appendChild( loadingElement );
 			}
 
-			const visibleElements = elements.filter( ( item ) => DOMUtils.isElementVisible( item.element ) );
+			// Show refresh prompt if zoom changed
+			if ( this.zoomManager.hasZoomed ) {
+				const refreshItem = this.createRefreshMenuItem();
+				menuElement.insertBefore( refreshItem, loadingElement );
+				return;
+			}
+
+			// Filter visible elements
+			const visibleElements = elements.filter( ( item ) => DOMUtils.isElementVisible( item.element )
+			);
 			const hasSingleElement = visibleElements.length === 1;
 			menuItems = [];
 
+			// Create menu items
 			if ( visibleElements.length === 0 ) {
 				const disabledButton = this.createDisabledMenuItem(
 					'<i class="fas fa-fw fa-eye-slash"></i> Content not visible'
@@ -714,24 +780,26 @@ class DropdownWidget {
 
 					const copyButton = this.createMenuButton( {
 						icon: 'copy',
-						buttonText: `Copy ${ typeLabel } image to clipboard`,
-						item,
-						exportTitle,
+						buttonText: `Copy${ typeLabel } image to clipboard`,
+						item: item,
+						exportTitle: exportTitle,
 						exportMode: 'copy',
-						menuElement,
-						menuItems,
-						loadingElement
+						menuElement: menuElement,
+						menuItems: menuItems,
+						loadingElement: loadingElement
 					} );
+
 					const downloadButton = this.createMenuButton( {
 						icon: 'download',
-						buttonText: `Download ${ typeLabel } as image`,
-						item,
-						exportTitle,
+						buttonText: `Download${ typeLabel } as image`,
+						item: item,
+						exportTitle: exportTitle,
 						exportMode: 'download',
-						menuElement,
-						menuItems,
-						loadingElement
+						menuElement: menuElement,
+						menuItems: menuItems,
+						loadingElement: loadingElement
 					} );
+
 					menuItems.push( copyButton, downloadButton );
 				}
 
@@ -739,7 +807,6 @@ class DropdownWidget {
 			}
 		};
 
-		// Initial population
 		populateMenu();
 
 		const toggleButton = this.createToggleButton( menuElement, populateMenu );
@@ -748,6 +815,19 @@ class DropdownWidget {
 		this.setupEventListeners( wrapper, menuElement, toggleButton );
 
 		return wrapper;
+	}
+
+	createRefreshMenuItem() {
+		const item = this.createElement( 'div', {
+			class: 'dropdown-widget__item',
+			tabindex: '0',
+			role: 'menuitem',
+			style: { fontWeight: 'bold' }
+		}, '<i class="fas fa-fw fa-sync-alt"></i> Refresh the page to export images' );
+
+		item.addEventListener( 'click', () => window.location.reload() );
+
+		return item;
 	}
 
 	createDisabledMenuItem( buttonText ) {
@@ -795,7 +875,14 @@ class DropdownWidget {
 
 		button.addEventListener( 'click', async ( event ) => {
 			event.stopPropagation();
-			await this.handleExport( item.element, exportTitle, exportMode, menuElement, menuItems, loadingElement );
+			await this.handleExport(
+				item.element,
+				exportTitle,
+				exportMode,
+				menuElement,
+				menuItems,
+				loadingElement
+			);
 		} );
 
 		return button;
@@ -803,8 +890,10 @@ class DropdownWidget {
 
 	createToggleButton( menuElement, onOpen ) {
 		const iconMargin = EXPORT_IMAGE_CONFIG.SPACING.ICON_MARGIN;
-		const buttonContent = `<i class="fas fa-share-alt" style="margin-right: ${ iconMargin };"></i>` +
+		const buttonContent =
+			`<i class="fas fa-share-alt" style="margin-right: ${ iconMargin };"></i>` +
 			'<span style="line-height: 1">Share</span>';
+
 		const button = this.createElement( 'button', {
 			class: 'btn btn-ghost btn-extrasmall dropdown-widget__toggle',
 			type: 'button',
@@ -853,6 +942,7 @@ class DropdownWidget {
 		document.addEventListener( 'click', outsideClickHandler );
 		menuElement.addEventListener( 'keydown', keydownHandler );
 
+		// Store cleanup function
 		this.eventCleanupFunctions.set( wrapper, () => {
 			document.removeEventListener( 'click', outsideClickHandler );
 			menuElement.removeEventListener( 'keydown', keydownHandler );
@@ -878,31 +968,36 @@ class DropdownWidget {
 
 	showLoading( menuItems, loadingElement ) {
 		loadingElement.style.display = 'block';
-		menuItems.forEach( ( item ) => {
+		for ( const item of menuItems ) {
 			item.style.display = 'none';
-		} );
+		}
 	}
 
 	hideLoading( menuItems, loadingElement ) {
 		loadingElement.style.display = 'none';
-		menuItems.forEach( ( item ) => {
+		for ( const item of menuItems ) {
 			item.style.display = '';
-		} );
+		}
 	}
 
 	handleExportError( error ) {
 		// eslint-disable-next-line no-console
 		console.error( 'Export error:', error );
 
+		const errorMessages = {
+			clipboard: 'Clipboard access denied. Please check your browser permissions.',
+			timeout: 'Export timed out. Please try again.',
+			'in progress': 'An export is already in progress.',
+			'zero dimensions': 'The content is not visible. Please ensure the tab/section is expanded and try again.'
+		};
+
 		let userMessage = 'Export failed. Please try again.';
-		if ( error.message?.includes( 'Clipboard' ) ) {
-			userMessage = 'Clipboard access denied. Please check your browser permissions.';
-		} else if ( error.message?.includes( 'timeout' ) ) {
-			userMessage = 'Export timed out. Please try again.';
-		} else if ( error.message?.includes( 'in progress' ) ) {
-			userMessage = 'An export is already in progress.';
-		} else if ( error.message?.includes( 'zero dimensions' ) ) {
-			userMessage = 'The content is not visible. Please ensure the tab/section is expanded and try again.';
+
+		for ( const [ key, message ] of Object.entries( errorMessages ) ) {
+			if ( error.message && error.message.toLowerCase().includes( key ) ) {
+				userMessage = message;
+				break;
+			}
 		}
 
 		mw.notify( userMessage, { type: 'error' } );
@@ -918,27 +1013,29 @@ class DropdownWidget {
 	}
 
 	openMenu( menuElement, buttonElement ) {
+		// Reset positioning
 		menuElement.style.left = '';
 		menuElement.style.right = '';
 		menuElement.style.display = 'block';
 
+		// Adjust for viewport overflow
 		const viewportWidth = window.innerWidth;
 		const menuRect = menuElement.getBoundingClientRect();
 
 		if ( menuRect.right > viewportWidth ) {
 			const parentRect = buttonElement.parentElement.getBoundingClientRect();
-
 			let newLeft = viewportWidth - menuRect.width - parentRect.left;
 
-			if ( newLeft < -parentRect.left ) {
-				newLeft = -parentRect.left;
-			}
+			// Ensure menu doesn't overflow left edge
+			newLeft = Math.max( newLeft, -parentRect.left );
 
 			menuElement.style.left = `${ newLeft }px`;
 			menuElement.style.right = 'auto';
 		}
 
 		buttonElement.setAttribute( 'aria-expanded', 'true' );
+
+		// Focus first focusable item
 		const firstFocusable = menuElement.querySelector( '[tabindex="0"]' );
 		if ( firstFocusable ) {
 			firstFocusable.focus();
@@ -955,41 +1052,60 @@ class DropdownWidget {
 		const focusableItems = Array.from( menuElement.querySelectorAll( visibleSelector ) );
 		const currentIndex = focusableItems.indexOf( document.activeElement );
 
-		switch ( event.key ) {
-			case 'Escape':
-				event.preventDefault();
+		const actions = {
+			Escape: () => {
 				this.closeMenu( menuElement, buttonElement );
 				buttonElement.focus();
-				break;
-			case 'ArrowDown':
-				event.preventDefault();
-				focusableItems[ ( currentIndex + 1 ) % focusableItems.length ]?.focus();
-				break;
-			case 'ArrowUp':
-				event.preventDefault();
-				focusableItems[ ( currentIndex - 1 + focusableItems.length ) % focusableItems.length ]?.focus();
-				break;
-			case 'Home':
-				event.preventDefault();
-				focusableItems[ 0 ]?.focus();
-				break;
-			case 'End':
-				event.preventDefault();
-				focusableItems[ focusableItems.length - 1 ]?.focus();
-				break;
-			case 'Enter':
-			case ' ':
-				event.preventDefault();
-				document.activeElement?.click();
-				break;
+			},
+			ArrowDown: () => {
+				const nextItem = focusableItems[ ( currentIndex + 1 ) % focusableItems.length ];
+				if ( nextItem ) {
+					nextItem.focus();
+				}
+			},
+			ArrowUp: () => {
+				const prevItem = focusableItems[ ( currentIndex - 1 + focusableItems.length ) % focusableItems.length ];
+				if ( prevItem ) {
+					prevItem.focus();
+				}
+			},
+			Home: () => {
+				if ( focusableItems[ 0 ] ) {
+					focusableItems[ 0 ].focus();
+				}
+			},
+			End: () => {
+				const lastItem = focusableItems[ focusableItems.length - 1 ];
+				if ( lastItem ) {
+					lastItem.focus();
+				}
+			},
+			Enter: () => {
+				if ( document.activeElement ) {
+					document.activeElement.click();
+				}
+			},
+			' ': () => {
+				if ( document.activeElement ) {
+					document.activeElement.click();
+				}
+			}
+		};
+
+		const action = actions[ event.key ];
+		if ( action ) {
+			event.preventDefault();
+			action();
 		}
 	}
 
 	getElementLabel( elements, index ) {
 		const item = elements[ index ];
+
 		if ( item.title ) {
 			return item.title;
 		}
+
 		const sameTypeElements = elements.filter( ( it ) => it.typeName === item.typeName );
 		const sameTypeWithoutTitle = sameTypeElements.filter( ( it ) => !it.title );
 
@@ -997,12 +1113,15 @@ class DropdownWidget {
 			const indexInType = sameTypeWithoutTitle.indexOf( item );
 			return `${ item.typeName } ${ indexInType + 1 }`;
 		}
+
 		return item.typeName;
 	}
 
 	createElement( tag, attributes = {}, children = [] ) {
 		const element = document.createElement( tag );
-		Object.entries( attributes ).forEach( ( [ key, value ] ) => {
+
+		// Set attributes
+		for ( const [ key, value ] of Object.entries( attributes ) ) {
 			if ( key === 'style' && typeof value === 'object' ) {
 				Object.assign( element.style, value );
 			} else if ( key === 'dataset' && typeof value === 'object' ) {
@@ -1010,12 +1129,19 @@ class DropdownWidget {
 			} else {
 				element.setAttribute( key, value );
 			}
-		} );
+		}
+
+		// Add children
 		if ( typeof children === 'string' ) {
 			element.innerHTML = children;
 		} else if ( Array.isArray( children ) ) {
-			children.forEach( ( child ) => child && element.appendChild( child ) );
+			for ( const child of children ) {
+				if ( child ) {
+					element.appendChild( child );
+				}
+			}
 		}
+
 		return element;
 	}
 
@@ -1029,11 +1155,13 @@ class DropdownWidget {
 }
 
 /**
- * Manages zoom detection and page reload on zoom changes
+ * Manages zoom detection
  */
 class ZoomManager {
 	constructor() {
-		this.currentZoom = this.getZoomLevel();
+		this.initialZoom = this.getZoomLevel();
+		this.hasZoomed = false;
+		this.resizeTimeout = null;
 		this.setupZoomListener();
 	}
 
@@ -1042,10 +1170,9 @@ class ZoomManager {
 	}
 
 	setupZoomListener() {
-		let resizeTimeout;
 		window.addEventListener( 'resize', () => {
-			clearTimeout( resizeTimeout );
-			resizeTimeout = setTimeout( () => {
+			clearTimeout( this.resizeTimeout );
+			this.resizeTimeout = setTimeout( () => {
 				this.handleZoomChange();
 			}, 250 );
 		} );
@@ -1053,9 +1180,10 @@ class ZoomManager {
 
 	handleZoomChange() {
 		const newZoom = this.getZoomLevel();
-		if ( Math.abs( newZoom - this.currentZoom ) > 0.01 ) {
-			this.currentZoom = newZoom;
-			window.location.reload();
+		const ZOOM_THRESHOLD = 0.01;
+
+		if ( Math.abs( newZoom - this.initialZoom ) > ZOOM_THRESHOLD ) {
+			this.hasZoomed = true;
 		}
 	}
 }
@@ -1068,8 +1196,8 @@ class ExportImageModule {
 		this.imageCache = new ImageCache();
 		this.canvasComposer = new CanvasComposer( this.imageCache );
 		this.exportService = new ExportService( this.canvasComposer );
-		this.dropdownWidget = new DropdownWidget( this.exportService );
 		this.zoomManager = new ZoomManager();
+		this.dropdownWidget = new DropdownWidget( this.exportService, this.zoomManager );
 	}
 
 	init() {
@@ -1081,10 +1209,13 @@ class ExportImageModule {
 
 		for ( const data of headingsToElements.values() ) {
 			let targetNode = data.headingNode;
-			if ( targetNode.parentNode?.classList.contains( 'mw-heading' ) ) {
+
+			// Use parent if it's a heading wrapper
+			if ( targetNode.parentNode && targetNode.parentNode.classList.contains( 'mw-heading' ) ) {
 				targetNode = targetNode.parentNode;
 			}
 
+			// Avoid duplicate dropdowns
 			if ( !targetNode.querySelector( '.dropdown-widget' ) ) {
 				const dropdown = this.dropdownWidget.create( data.elements, data.headingText );
 				targetNode.appendChild( dropdown );
@@ -1095,9 +1226,12 @@ class ExportImageModule {
 	cleanup() {
 		this.imageCache.clear();
 		const dropdowns = document.querySelectorAll( '.dropdown-widget' );
-		dropdowns.forEach( ( dropdown ) => this.dropdownWidget.cleanup( dropdown ) );
+		for ( const dropdown of dropdowns ) {
+			this.dropdownWidget.cleanup( dropdown );
+		}
 	}
 }
 
+// Initialize module
 liquipedia.exportImage = new ExportImageModule();
 liquipedia.core.modules.push( 'exportImage' );
