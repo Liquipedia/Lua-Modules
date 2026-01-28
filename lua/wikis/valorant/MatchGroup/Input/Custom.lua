@@ -42,7 +42,9 @@ local VALORANT_REGIONS = {'eu', 'na', 'ap', 'kr', 'latam', 'br', 'pbe1', 'esport
 ---@field t1side ValorantSides
 ---@field t2side ValorantSides
 ---@field winningSide ValorantSides
+---@field flawless boolean
 ---@field ceremony string
+---@field ceremonyFor string?
 
 ---@class ValorantMapParserInterface
 ---@field getMap fun(mapInput: table): table
@@ -207,6 +209,7 @@ function MatchFunctions.calculateOverallStatsForOpponent(maps, opponentIndex)
 
 	return {
 		firstKills = getSumOf('firstKills'),
+		flawless = getSumOf('flawless'),
 		thrifties = getSumOf('thrifties'),
 		clutches = getSumOf('clutches'),
 		postPlant = postPlant,
