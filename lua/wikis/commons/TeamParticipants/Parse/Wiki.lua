@@ -26,10 +26,10 @@ local TeamParticipantsWikiParser = {}
 ---potentialQualifiers: standardOpponent[]?, warnings: string[]?}
 
 ---@alias QualificationMethod 'invite'|'qual'
----@alias QualificationType 'tournament'|'external'|'other'
+---@alias QualificationType 'tournament'|'internal'|'external'|'other'
 
 ---@alias QualificationStructure {method: QualificationMethod, type: QualificationType,
----tournament?: StandardTournament, url?: string, text?: string, placement?: string}
+---page?: string, tournament?: StandardTournament, url?: string, text?: string, placement?: string}
 
 ---@param args table
 ---@return {participants: TeamParticipant[], expectedPlayerCount: integer?}
@@ -94,7 +94,7 @@ local function parseQualifier(input)
 		end
 		local tournament = Tournament.getTournament(tournamentPage)
 		if not tournament then
-			qualificationStructure.type = 'other'
+			qualificationStructure.type = 'internal'
 			qualificationStructure.page = input.page
 		else
 			qualificationStructure.tournament = tournament
@@ -103,7 +103,7 @@ local function parseQualifier(input)
 		qualificationStructure.url = input.url
 	end
 
-	if qualificationType == 'external' or (qualificationType == 'other' and qualificationStructure.page) then
+	if qualificationType == 'external' or qualificationType == 'internal' then
 		assert(qualificationStructure.text, 'External or non-tournament qualifier must have text')
 	end
 
