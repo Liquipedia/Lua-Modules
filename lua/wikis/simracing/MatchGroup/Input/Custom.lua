@@ -41,7 +41,7 @@ function FfaMatchFunctions.switchToFfa(match, opponents)
 	return true
 end
 
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function FfaMatchFunctions.calculateMatchScore(opponents, maps)

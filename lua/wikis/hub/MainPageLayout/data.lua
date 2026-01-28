@@ -28,6 +28,10 @@ local CONTENT = {
 				linktype = 'external',
 			}},
 			Li{children = Link{
+				link = 'lpcommons:Main Page',
+				children = 'Liquipedia Commons',
+			}},
+			Li{children = Link{
 				link = 'Support',
 			}},
 			Li{children = Link{

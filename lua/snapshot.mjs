@@ -30,7 +30,7 @@ const PIXELMATCH_OPTIONS = { threshold: 0.1 };
 		args: ['--disable-web-security']
 	});
 	const page = await browser.newPage({ viewport: VIEWPORT });
-	await page.goto(`file://${htmlPath}`);
+	await page.goto(`file://${htmlPath}`, {waitUntil: "networkidle"});
 	const newScreenshotBuffer = await page.screenshot({ animations: 'disabled' });
 	await browser.close();
 

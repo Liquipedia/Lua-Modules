@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup lua
         # Workaround until https://github.com/leafo/gh-actions-lua/issues/57 is resolved
@@ -30,7 +30,7 @@ jobs:
           luacheck lua --config lua/.luacheckrc --formatter=JUnit > report.xml
 
       - name: Report lint
-        uses: mikepenz/action-junit-report@v5
+        uses: mikepenz/action-junit-report@v6
         if: always()
         with:
           report_paths: 'report.xml'
@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup lua
         # Workaround until https://github.com/leafo/gh-actions-lua/issues/57 is resolved
@@ -63,7 +63,7 @@ jobs:
           busted -C lua -v --run=ci --output=junit > busted.xml
 
       - name: Report test
-        uses: mikepenz/action-junit-report@v5
+        uses: mikepenz/action-junit-report@v6
         if: always()
         with:
           report_paths: 'busted.xml'

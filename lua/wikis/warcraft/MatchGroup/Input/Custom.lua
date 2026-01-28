@@ -113,7 +113,7 @@ function MatchFunctions.adjustOpponent(opponent, opponentIndex)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
@@ -168,7 +168,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	local extradata = {}
@@ -224,7 +224,7 @@ function MapFunctions.calculateMapScore(map)
 end
 
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]?
 function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
@@ -237,7 +237,7 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return WarcraftParticipant[]
 function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
@@ -296,7 +296,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return WarcraftParticipant[]
 function MapFunctions.getPartyMapPlayers(mapInput, opponent, opponentIndex)
@@ -326,7 +326,7 @@ end
 
 ---@param match table
 ---@param map table # has map.opponents as the games opponents
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return string
 function MapFunctions.getMapMode(match, map, opponents)
 	local playerCounts = Array.map(map.opponents or {}, MapFunctions.getMapOpponentSize)
@@ -345,7 +345,7 @@ FfaMapFunctions.getMapMode = MapFunctions.getMapMode
 
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
@@ -436,7 +436,7 @@ function FfaMatchFunctions.parseSettings(match, numberOfOpponents)
 	return settings
 end
 
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@param match table
 function FfaMatchFunctions.adjustOpponent(opponent, opponentIndex, match)
@@ -447,7 +447,7 @@ function FfaMatchFunctions.adjustOpponent(opponent, opponentIndex, match)
 	end
 end
 
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param games table[]
 ---@return fun(opponentIndex: integer): integer?
 function FfaMatchFunctions.calculateMatchScore(opponents, games)
@@ -463,7 +463,7 @@ function FfaMatchFunctions.calculateMatchScore(opponents, games)
 end
 
 ---@param match table
----@param opponents {score: integer?}[]
+---@param opponents MGIParsedOpponent[]
 ---@return boolean
 function FfaMatchFunctions.matchIsFinished(match, opponents)
 	if MatchGroupInputUtil.isNotPlayed(match.winner, match.finished) then
@@ -489,7 +489,7 @@ function FfaMatchFunctions.matchIsFinished(match, opponents)
 	return FfaMatchFunctions.placementHasBeenSet(opponents)
 end
 
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return boolean
 function FfaMatchFunctions.placementHasBeenSet(opponents)
 	return Array.all(opponents, function(opponent) return Logic.isNumeric(opponent.placement) end)
@@ -497,7 +497,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param settings table
 ---@return table
 function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
@@ -509,7 +509,7 @@ function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param scoreSettings table
 ---@return table[]
 function FfaMatchFunctions.extractMaps(match, opponents, scoreSettings)
@@ -550,7 +550,7 @@ function FfaMapFunctions.getExtraData(match, map, opponents)
 end
 
 ---@param map table
----@param matchOpponent table
+---@param matchOpponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table
 function FfaMapFunctions.readMapOpponent(map, matchOpponent, opponentIndex)

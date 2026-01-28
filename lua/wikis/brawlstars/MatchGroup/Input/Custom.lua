@@ -27,8 +27,10 @@ local FIRST_PICK_CONVERSION = {
 local DEFAULT_BESTOF_MATCH = 5
 local DEFAULT_BESTOF_MAP = 3
 
--- containers for process helper functions
+---@class BrawlstarsMatchParser: MatchParserInterface
 local MatchFunctions = {}
+
+---@class BrawlstarsMapParser: MapParserInterface
 local MapFunctions = {
 	BREAK_ON_EMPTY = true,
 }
@@ -48,7 +50,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	local games = MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
@@ -65,9 +67,7 @@ end
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function MatchFunctions.calculateMatchScore(maps)
-	return function(opponentIndex)
-		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-	end
+	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
 ---@param bestofInput string|integer?
@@ -80,7 +80,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
@@ -103,7 +103,7 @@ end
 
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
@@ -128,7 +128,7 @@ function MapFunctions.getExtraData(match, map, opponents)
 end
 
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)

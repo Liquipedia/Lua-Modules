@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
@@ -218,7 +219,7 @@ function TransferRow._shiftDate(dateInput)
 
 	local year, month, day = dateInput:match('(%d+)-(%d+)-(%d+)')
 	local date = os.time{day=day, month=month, year=year}
-	date = date - 86400
+	date = date - DateExt.daysToSeconds(1)
 	return os.date( "%Y-%m-%d", date) --[[@as string]]
 end
 

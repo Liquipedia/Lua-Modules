@@ -361,9 +361,10 @@ function BracketDisplay.computeHeaderRows(bracket, config)
 			local headerRow = getHeaderRow(matchId)
 			local roundIx = coords.roundIndex + 1 + bracketData.qualSkip
 			headerRow[roundIx] = headerRow[roundIx] or {
-				header = bracketData.qualifiedHeader or config.qualifiedHeader or '!q',
+				header = config.qualifiedHeader or '!q',
 				roundIx = roundIx,
 			}
+			headerRow[roundIx].header = bracketData.qualifiedHeader or headerRow[roundIx].header
 		end
 	end
 

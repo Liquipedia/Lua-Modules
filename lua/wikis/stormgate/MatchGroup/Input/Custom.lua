@@ -83,7 +83,7 @@ function MatchFunctions.adjustOpponent(opponent, opponentIndex)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
@@ -110,13 +110,13 @@ function MatchFunctions.getOpponentExtradata(opponent)
 	}
 end
 
----@param player table
+---@param player MGIParsedPlayer
 ---@return string
 function MatchFunctions.getPlayerFaction(player)
 	return Faction.read(player.extradata.faction) or Faction.defaultFaction
 end
 
----@param opponents {type: OpponentType}
+---@param opponents MGIParsedOpponent[]
 ---@return string
 function MatchFunctions.getMode(opponents)
 	local opponentTypes = Array.map(opponents, Operator.property('type'))
@@ -137,7 +137,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	---@type table<string, string|table|nil>
@@ -182,7 +182,7 @@ function MapFunctions.calculateMapScore(map)
 end
 
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]?
 function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
@@ -195,7 +195,7 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return StormgateParticipant[]
 function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
@@ -252,7 +252,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return StormgateParticipant[]
 function MapFunctions.getPartyMapPlayers(mapInput, opponent, opponentIndex)
@@ -279,7 +279,7 @@ end
 
 ---@param match table
 ---@param map table # has map.opponents as the games opponents
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return string
 function MapFunctions.getMapMode(match, map, opponents)
 	local playerCounts = Array.map(map.opponents or {}, MapFunctions.getMapOpponentSize)
@@ -297,7 +297,7 @@ end
 
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {

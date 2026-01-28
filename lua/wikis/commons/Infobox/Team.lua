@@ -137,6 +137,7 @@ function Team:createInfobox()
 		},
 		Customizable{id = 'custom', children = {}},
 		Widgets.Links{links = links, variant = LINK_VARIANT},
+		Widgets.ShopMerch{args = args},
 		Customizable{
 			id = 'achievements',
 			children = {

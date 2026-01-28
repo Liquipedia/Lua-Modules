@@ -25,14 +25,14 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@field props TournamentTitleProps
 local TournamentTitleWidget = Class.new(Widget)
 
----@return Widget?
+---@return Widget[]?
 function TournamentTitleWidget:render()
 	local tournament = self.props.tournament
 	if not tournament then
 		return
 	end
 
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+	return WidgetUtil.collect(
 		self.props.displayGameIcon and Game.icon{
 			game = tournament.game,
 			noLink = true,
@@ -62,7 +62,7 @@ function TournamentTitleWidget:render()
 				},
 			}
 		}
-	)}
+	)
 end
 
 return TournamentTitleWidget

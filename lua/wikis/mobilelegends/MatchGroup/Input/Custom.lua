@@ -53,9 +53,7 @@ end
 ---@param bestOf integer
 ---@return fun(opponentIndex: integer): integer?
 function MatchFunctions.calculateMatchScore(maps, bestOf)
-	return function(opponentIndex)
-		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-	end
+	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
 ---@param bestofInput string|integer?

@@ -46,11 +46,9 @@ function TournamentsTickerLabelWidget:render()
 				css = {
 					['padding-left'] = self.props.displayGameIcon and '50px' or '25px',
 				},
-				children = {
-					Title{
-						tournament = tournament,
-						displayGameIcon = self.props.displayGameIcon
-					}
+				children = Title{
+					tournament = tournament,
+					displayGameIcon = self.props.displayGameIcon
 				},
 			},
 			HtmlWidgets.Small{
