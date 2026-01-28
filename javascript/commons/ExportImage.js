@@ -481,7 +481,7 @@ class ExportService {
 		const originalBackground = element.style.background;
 		const isDarkTheme = document.documentElement.classList.contains( 'theme--dark' );
 		const backgroundColor = this.getBackgroundColor();
-		const scale = window.devicePixelRatio || 1;
+		const scale = Math.max( window.devicePixelRatio || 1, 2 );
 
 		try {
 			element.style.background = backgroundColor;
