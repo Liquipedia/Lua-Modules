@@ -59,7 +59,7 @@ function ParticipantsTeamQualifierInfo:render()
 			additionalClasses = { 'team-participant-card__qualifier-icon' }
 		}
 		linktype = 'external'
-	elseif qualification.type == 'other' then
+	elseif qualification.type == 'internal' then
 		link = qualification.page
 		icon = Icon{
 			iconName = 'internal_link',
