@@ -688,13 +688,23 @@ Author(s): FO-nTTaX, Rapture
 	showing ==headings== and ===headings=== but no further
 	( as long as there are no =headings= on the page, which
 	there shouldn't be according to the MoS ).
+
+    MediaWiki may render the TOC outside of the wrapper that contains __TOC__
+	(e.g. when __TOC__ is emitted by a module). Use :has() so the presence of the
+	toclimit wrapper anywhere on the page limits the actual TOC.
 */
 .toclimit-2 .toclevel-1 ul,
 .toclimit-3 .toclevel-2 ul,
 .toclimit-4 .toclevel-3 ul,
 .toclimit-5 .toclevel-4 ul,
 .toclimit-6 .toclevel-5 ul,
-.toclimit-7 .toclevel-6 ul {
+.toclimit-7 .toclevel-6 ul,
+body:has( .toclimit-2 ) #toc .toclevel-1 ul,
+body:has( .toclimit-3 ) #toc .toclevel-2 ul,
+body:has( .toclimit-4 ) #toc .toclevel-3 ul,
+body:has( .toclimit-5 ) #toc .toclevel-4 ul,
+body:has( .toclimit-6 ) #toc .toclevel-5 ul,
+body:has( .toclimit-7 ) #toc .toclevel-6 ul {
 	display: none !important;
 }
 
@@ -1362,6 +1372,14 @@ Author(s): spazer, Lafungo
 
 .placement-4 {
 	background-color: var( --achievement-placement-4, #f8996b );
+}
+
+.placement-5 {
+	background-color: var( --achievement-placement-5, #27a4a4 );
+}
+
+.placement-6 {
+	background-color: var( --achievement-placement-6, #1e7d7d );
 }
 
 .placement-lightblue {

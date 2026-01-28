@@ -29,7 +29,13 @@ local Cell = Widgets.Cell
 
 local SIZE_CHAMPION = '25x25px'
 
+---@class WildriftPlayerInfobox: Person
+---@operator call(Frame): WildriftPlayerInfobox
 local CustomPlayer = Class.new(Player)
+
+---@class WildriftPlayerInfoboxWidgetInjector: WidgetInjector
+---@operator call(WildriftPlayerInfobox): WildriftPlayerInfoboxWidgetInjector
+---@field caller WildriftPlayerInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -67,9 +73,10 @@ function CustomPlayer.run(frame)
 		}
 	end
 
-	return mw.html.create()
-		:node(builtInfobox)
-		:node(autoPlayerIntro)
+	return HtmlWidgets.Fragment{children = {
+		builtInfobox,
+		autoPlayerIntro,
+	}}
 end
 
 ---@param id string
@@ -89,7 +96,7 @@ function CustomInjector:parse(id, widgets)
 			children = {table.concat(championIcons, '&nbsp;')},
 		}}
 	elseif id == 'status' then
-		local status = args.status and mw.getContentLanguage():ucfirst(args.status) or nil
+		local status = args.status and String.upperCaseFirst(args.status) or nil
 
 		return {
 			Cell{name = 'Status', children = {Page.makeInternalLink({onlyIfExists = true}, status) or status}},

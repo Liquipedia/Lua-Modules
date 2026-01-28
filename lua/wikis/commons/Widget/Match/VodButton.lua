@@ -37,7 +37,7 @@ function VodButton:render()
 	return Button{
 		linktype = 'external',
 		title = VodLink.getTitle(gameNumber),
-		variant = 'tertiary',
+		variant = 'secondary',
 		link = vodLink,
 		size = 'sm',
 		grow = useGrow,

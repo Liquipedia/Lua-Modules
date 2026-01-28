@@ -96,7 +96,7 @@ MatchGroupInputUtil.WINNER_DRAW = 0
 
 local ASSUME_FINISHED_AFTER = {
 	EXACT = 30800,
-	ESTIMATE = 86400,
+	ESTIMATE = DateExt.daysToSeconds(1),
 }
 MatchGroupInputUtil.ASSUME_FINISHED_AFTER = ASSUME_FINISHED_AFTER
 

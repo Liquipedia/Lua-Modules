@@ -135,6 +135,7 @@ function TeamParticipantsRepository.setPageVars(participant)
 				globalVars:set(combinedPrefix .. 'flag', player.flag)
 				globalVars:set(combinedPrefix .. 'dn', player.displayName)
 				globalVars:set(combinedPrefix .. 'id', player.apiId)
+				globalVars:set(combinedPrefix .. 'faction', player.faction)
 				-- TODO: joindate, leavedate
 			end)
 		end)

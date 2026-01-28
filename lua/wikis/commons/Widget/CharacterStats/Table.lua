@@ -20,9 +20,9 @@ local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Button = Lua.import('Module:Widget/Basic/Button')
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
-local DetailsPopup = Lua.import('Module:Widget/CharacterStats/DetailsPopup')
-local DetailsPopupContainer = Lua.import('Module:Widget/CharacterStats/DetailsPopup/Container')
+local Dialog = Lua.import('Module:Widget/Basic/Dialog')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -155,20 +155,23 @@ function CharacterStatsTable:_buildCharacterRow(characterData, characterIndex)
 					characterData.total.pick + characterData.bans, self.props.numGames
 				)}
 			} or nil,
-			HtmlWidgets.Td{children = DetailsPopupContainer{
-				children = DetailsPopup{
-					header = CharacterIcon.Icon{
-						character = characterData.name,
-						size = self.props.characterSize,
-						addTextLink = true
-					} .. ' Detailed Statistics',
-					children = HtmlWidgets.Div{
-						classes = {'character-stats-popup-info'},
-						children = {
-							CharacterStatsTable._buildPlayedByTeamTable(characterData.playedBy),
-							self:_buildPlayedTable('with', characterData.playedWith),
-							self:_buildPlayedTable('against', characterData.playedVs)
-						}
+			HtmlWidgets.Td{children = Dialog{
+				trigger = Button{
+					children = 'Show',
+					variant = 'secondary',
+					size = 'xs',
+				},
+				title = CharacterIcon.Icon{
+					character = characterData.name,
+					size = self.props.characterSize,
+					addTextLink = true
+				} .. ' Detailed Statistics',
+				children = HtmlWidgets.Div{
+					classes = {'character-stats-popup-info'},
+					children = {
+						CharacterStatsTable._buildPlayedByTeamTable(characterData.playedBy),
+						self:_buildPlayedTable('with', characterData.playedWith),
+						self:_buildPlayedTable('against', characterData.playedVs)
 					}
 				}
 			}}

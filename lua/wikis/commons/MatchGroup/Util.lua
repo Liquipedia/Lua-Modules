@@ -77,7 +77,7 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 ---@field upperMatchId string?
 ---@field matchId string?
 ---@field matchPage string?
----@field qualifiedHeader boolean?
+---@field qualifiedHeader string?
 
 MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
@@ -91,7 +91,7 @@ MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	qualLoseLiteral = 'string?',
 	qualSkip = 'number?',
 	qualWin = 'boolean?',
-	qualifiedHeader = 'boolean?',
+	qualifiedHeader = 'string?',
 	qualWinLiteral = 'string?',
 	skipRound = 'number?',
 	thirdPlaceMatchId = 'string?',
