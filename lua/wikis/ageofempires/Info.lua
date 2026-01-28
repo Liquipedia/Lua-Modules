@@ -121,5 +121,8 @@ return {
 				storeFromWikiCode = true,
 			},
 		},
+		participants = {
+			syncTeam = true,
+		},
 	},
 }
