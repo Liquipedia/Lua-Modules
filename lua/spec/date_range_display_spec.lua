@@ -52,8 +52,6 @@ insulate('DateRange', function()
 		end
 
 		GoldenTest('date range display',
-			-- Use the full size of the page for this
-			'<style>#top {padding: unset}</style>' ..
 			tostring(HtmlWidgets.Table{
 				classes={'wikitable wikitable-striped'},
 				children=Array.extend(
@@ -81,7 +79,9 @@ insulate('DateRange', function()
 						}}
 					end)
 				)
-			})
+			}),
+			-- Use the full size of the page for this
+			'<style>#top {padding: unset}</style>'
 		)
 	end)
 end)
