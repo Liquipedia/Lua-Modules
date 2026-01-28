@@ -172,11 +172,17 @@ local byFactionAoE2 = {
 	malians = {
 		icon = 'File:Malians AoE2 icon.png'
 	},
+	mapuche = {
+		icon = 'File:Mapuche AoE2 icon.png'
+	},
 	maya = {
 		icon = 'File:Mayans AoE2 icon.png'
 	},
 	mongols = {
 		icon = 'File:Mongols AoE2 icon.png'
+	},
+	muisca = {
+		icon = 'File:Muisca AoE2 icon.png'
 	},
 	persians = {
 		icon = 'File:Persians AoE2 icon.png'
@@ -222,6 +228,9 @@ local byFactionAoE2 = {
 	},
 	turks = {
 		icon = 'File:Turks AoE2 icon.png'
+	},
+	tupi = {
+		icon = 'File:Tupi AoE2 icon.png'
 	},
 	vietnamese = {
 		icon = 'File:Vietnamese AoE2 icon.png'
@@ -410,6 +419,9 @@ local byFactionAoM = {
 	},
 	amaterasu = {
 		icon = 'File:Amaterasu AoM R icon.png',
+	},
+	demeter = {
+		icon = 'File:Demeter AoM R icon.png',
 	},
 	fuxi = {
 		icon = 'File:Fuxi AoM R icon.png',
