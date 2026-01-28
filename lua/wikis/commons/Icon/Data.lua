@@ -9,6 +9,7 @@ return {
 	team_tbd = 'far fa-users',
 	notification = 'fas fa-info-circle',
 	external_link = 'fas fa-external-link-alt',
+	internal_link = 'fas fa-link',
 
 	-- Usage: Different ways to see data
 	schedule = 'far fa-table',
@@ -36,7 +37,7 @@ return {
 	defuse = 'fas fa-wrench',
 	outoftime = 'fas fa-hourglass',
 	ace_valorant = 'fas fa-dagger',
-	round_winner = 'far fa-trophy-alt',
+	flawless_valorant = 'fas fa-gem',
 
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',
@@ -116,6 +117,9 @@ return {
 
 	-- Usage: Accommodations
 	accommodation = 'far fa-home-alt',
+
+	-- Usage: Shop merchandise
+	shopping_bag = 'fas fa-shopping-bag',
 
 	-- Usage: Matches etc
 	firstplace = 'fas fa-trophy',
@@ -235,5 +239,10 @@ return {
 	-- Usage: Formula 1
 	ongoing_series = 'fas fa-hourglass-half ',
 	season_history = 'fas fa-landmark',
-	finished_race = 'fas fa-flag-checkered'
+	finished_race = 'fas fa-flag-checkered',
+
+	-- Usage: Export functions
+	share = 'fas fa-share-alt',
+	copy = 'fas fa-clone',
+	download = 'fas fa-download'
 }
