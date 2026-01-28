@@ -31,6 +31,7 @@ local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Tier = Lua.import('Module:Tier/Custom')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local DateRange = Lua.import('Module:Widget/Misc/DateRange')
 
 local DEFAULT_START_YEAR = Info.startYear
 local DEFAULT_END_YEAR = DateExt.getYearOf()
@@ -312,7 +313,7 @@ function BaseTournamentsListing:_row(tournamentData)
 
 	local dateCell = row:tag('div')
 		:addClass('gridCell EventDetails Date Header')
-		:wikitext(BaseTournamentsListing._dateDisplay(tournamentData.startdate, tournamentData.enddate, status))
+		:node(BaseTournamentsListing._dateDisplay(tournamentData.startdate, tournamentData.enddate, status))
 
 	if status == POSTPONED or status == DELAYED then
 		dateCell
@@ -481,28 +482,13 @@ end
 ---@param startDate string
 ---@param endDate string
 ---@param status string?
----@return string
+---@return Widget|string
 function BaseTournamentsListing._dateDisplay(startDate, endDate, status)
 	if status == POSTPONED or status == DELAYED then
 		return 'Postponed'
 	end
 
-	if startDate == endDate then
-		return LANG:formatDate('M j, Y', startDate) --[[@as string]]
-	end
-
-	local startYear, startMonth = startDate:match('(%d+)-(%d+)-%d+')
-	local endYear, endMonth = endDate:match('(%d+)-(%d+)-%d+')
-
-	if startYear ~= endYear then
-		return LANG:formatDate('M j, Y', startDate) .. ' - ' .. LANG:formatDate('M j, Y', endDate)
-	end
-
-	if startMonth == endMonth then
-		return LANG:formatDate('M j', startDate) .. ' - ' .. LANG:formatDate('j, Y', endDate)
-	end
-
-	return LANG:formatDate('M j', startDate) .. ' - ' .. LANG:formatDate('M j, Y', endDate)
+	return DateRange{startDate = startDate, endDate = endDate, showYear = true}
 end
 
 ---@private
