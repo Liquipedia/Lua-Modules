@@ -2155,21 +2155,20 @@ Author(s): FO-nTTaX
 	border: 1px solid #000000;
 	color: #ffffff;
 	font-size: 18px;
-	margin-bottom: 10px;
 	text-align: center;
 	border-radius: 0.5rem;
 	overflow: hidden;
-}
 
-.sadbox a {
-	background-color: #464646;
-	color: #ffffff !important;
-	display: block;
-	padding: 10px;
-}
+	a {
+		background-color: #464646;
+		color: #ffffff !important;
+		display: block;
+		padding: 10px;
 
-.sadbox a:hover {
-	background-color: #232323;
+		&:hover {
+			background-color: #232323;
+		}
+	}
 }
 
 /*******************************************************************************

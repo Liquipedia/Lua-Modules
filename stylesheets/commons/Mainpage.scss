@@ -2,6 +2,12 @@
 Template(s): Main Page
 Author(s): FO-nTTaX, salle
 *******************************************************************************/
+.mainpage-v2 {
+	display: flex;
+	flex-flow: column nowrap;
+	gap: 1.5rem;
+}
+
 body.page-Main_Page.action-view h1.firstHeading,
 body.page-Main_Page.action-view #contentSub {
 	display: none;
