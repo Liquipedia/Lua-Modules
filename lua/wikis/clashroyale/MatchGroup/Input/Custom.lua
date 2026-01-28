@@ -40,7 +40,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
@@ -72,7 +72,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	local extradata = {
@@ -106,7 +106,7 @@ function MapFunctions.calculateMapScore(map)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]?
 function MapFunctions.getPlayersOfMapOpponent(mapInput, opponent, opponentIndex)
@@ -119,7 +119,7 @@ function MapFunctions.getPlayersOfMapOpponent(mapInput, opponent, opponentIndex)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return {player: string, played: boolean, cards: table}[]
 function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
@@ -149,7 +149,7 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return {player: string, played: boolean, cards: table}[]
 function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
@@ -168,7 +168,7 @@ end
 
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	return MapFunctions.getCardsExtradata(map.opponents)
