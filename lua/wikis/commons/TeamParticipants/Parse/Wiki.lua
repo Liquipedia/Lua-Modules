@@ -22,7 +22,7 @@ local Tournament = Lua.import('Module:Tournament')
 local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
----qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer,
+---qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer, autoPlayed: boolean,
 ---potentialQualifiers: standardOpponent[]?, warnings: string[]?}
 
 ---@alias QualificationMethod 'invite'|'qual'
@@ -184,6 +184,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 		potentialQualifiers = potentialQualifiers,
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
+		autoPlayed = Logic.readBool(input.autoplayed),
 		date = date,
 	}
 end
@@ -214,8 +215,8 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 		roles = roles,
 		trophies = tonumber(playerInput.trophies),
 		type = playerType,
-		played = Logic.nilOr(playedInput, true),
-		results = Logic.nilOr(resultsInput, playedInput, true),
+		played = playedInput,
+		results = resultsInput,
 	}
 	return player
 end
