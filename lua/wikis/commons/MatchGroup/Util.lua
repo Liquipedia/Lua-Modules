@@ -151,6 +151,7 @@ MatchGroupUtil.types.BracketData = TypeUtil.union(
 ---@field extradata table?
 ---@field pageIsResolved boolean?
 ---@field faction string?
+---@field apiId string?
 
 MatchGroupUtil.types.Player = TypeUtil.struct({
 	displayName = 'string?',

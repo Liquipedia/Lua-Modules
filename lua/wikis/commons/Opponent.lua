@@ -74,6 +74,7 @@ Opponent.types.Player = TypeUtil.struct({
 	pageName = 'string?',
 	team = 'string?',
 	faction = 'string?',
+	apiId = 'string?',
 })
 
 Opponent.types.TeamOpponent = TypeUtil.struct({
@@ -472,6 +473,7 @@ function Opponent.readSinglePlayerArgs(args)
 		p1link = args.link or args.p1link,
 		p1team = args.team or args.p1team,
 		p1faction = args.faction or args.race or args.p1race,
+		p1id = args.id or args.p1id,
 	}, 1)
 end
 
@@ -488,6 +490,7 @@ function Opponent.readPlayerArgs(args, playerIndex)
 		team = playerTeam,
 		faction = Logic.nilIfEmpty(Faction.read(args['p' .. playerIndex .. 'faction']
 			or args['p' .. playerIndex .. 'race'])),
+		apiId = args['p' .. playerIndex .. 'id'],
 	}
 	assert(not player.displayName:find('|'), 'Invalid character "|" in player name')
 	assert(not player.pageName or not player.pageName:find('|'), 'Invalid character "|" in player pagename')
@@ -563,6 +566,7 @@ function Opponent.toLpdbStruct(opponent, options)
 				nil
 			players[prefix .. 'template'] = player.team
 			players[prefix .. 'faction'] = Logic.nilIfEmpty(player.faction)
+			players[prefix .. 'id'] = Logic.nilIfEmpty(player.apiId)
 		end
 		storageStruct.opponentplayers = players
 	end
@@ -634,6 +638,7 @@ function Opponent._personFromLpdbStruct(roleIndicator, players, playerIndex)
 		pageName = players[prefix],
 		team = players[prefix .. 'template'] or players[prefix .. 'team'],
 		faction = Logic.nilIfEmpty(players[prefix .. 'faction']),
+		apiId = Logic.nilIfEmpty(players[prefix .. 'id']),
 	}
 end
 
