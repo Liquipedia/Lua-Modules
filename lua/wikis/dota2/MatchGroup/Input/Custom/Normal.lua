@@ -35,9 +35,10 @@ function CustomMatchGroupInputNormal.getSide(map, opponentIndex)
 end
 
 ---@param map table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]?
-function CustomMatchGroupInputNormal.getParticipants(map, opponentIndex)
+function CustomMatchGroupInputNormal.getParticipants(map, opponent, opponentIndex)
 	return
 end
 
