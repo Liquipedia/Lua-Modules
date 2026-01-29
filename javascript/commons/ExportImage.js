@@ -70,7 +70,7 @@ const EXPORT_IMAGE_CONFIG = {
 			selector: '.prizepooltable',
 			targetSelector: null,
 			typeName: 'Prize Pool',
-			classFilter: 'background-color-first-place'
+			classFilter: 'prizepooltable-place'
 		}
 	]
 };
