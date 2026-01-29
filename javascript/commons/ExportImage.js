@@ -65,7 +65,8 @@ const EXPORT_IMAGE_CONFIG = {
 			titleSelector: '.group-table-title'
 		},
 		{ selector: '.crosstable', targetSelector: 'tbody', typeName: 'Crosstable' },
-		{ selector: '.brkts-matchlist', targetSelector: '.brkts-matchlist-collapse-area', typeName: 'Match List' }
+		{ selector: '.brkts-matchlist', targetSelector: '.brkts-matchlist-collapse-area', typeName: 'Match List' },
+		{ selector: '.prizepooltable', targetSelector: null, typeName: 'Prize Pool' }
 	]
 };
 
