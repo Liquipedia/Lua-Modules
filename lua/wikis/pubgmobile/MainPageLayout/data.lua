@@ -77,7 +77,7 @@ local CONTENT = {
 		heading = 'Headlines',
 		body = Headlines{ limit = 5 },
 		padding = true,
-		boxid = 1511,
+		boxid = MainPageLayoutUtil.BoxId.HEADLINES,
 	},
 }
 
