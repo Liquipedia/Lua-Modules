@@ -30,6 +30,7 @@ Class.PRIVATE_FUNCTION_SPECIFIER = '_'
 ---@class BaseClass
 ---@operator call:self
 ---@field init fun(self, ...)
+---@field super fun(self: self): table
 
 ---@param base? table
 ---@param init? fun(self, ...)
@@ -50,6 +51,45 @@ function Class.new(base, init)
 	end
 
 	instance.__index = instance
+
+	instance.super = function(object)
+		if object._superProxy then
+			return object._superProxy
+		end
+		local proxy = {}
+		local proxyMT = {
+			__index = function (obj, param)
+				if param == 'super' then
+					error('Cannot create proxy from a super proxy')
+				end
+				local objVal = rawget(object, param)
+				if objVal then
+					return objVal
+				end
+				return base and base[param]
+			end,
+			_base = base,
+			_isSuperProxy = true,
+			__newindex = object,
+			__add = base and base.__add,
+			__sub = base and base.__sub,
+			__mul = base and base.__mul,
+			__div = base and base.__div,
+			__mod = base and base.__mod,
+			__pow = base and base.__pow,
+			__unm = base and base.__unm,
+			__concat = base and base.__concat,
+			__eq = base and base.__eq,
+			__lt = base and base.__lt,
+			__le = base and base.__le,
+			__pairs = base and base.__pairs,
+			__ipairs = base and base.__ipairs,
+			__tostring = base and base.__tostring,
+		}
+		setmetatable(proxy, proxyMT)
+		object._superProxy = proxy
+		return proxy
+	end
 
 	local metatable = {}
 
