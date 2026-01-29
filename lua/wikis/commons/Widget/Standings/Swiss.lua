@@ -35,7 +35,7 @@ function StandingsSwissWidget:render()
 	local lastRound = standings.rounds[#standings.rounds]
 
 	return DataTable{
-		wrapperClasses = {'standings-ffa'},
+		wrapperClasses = {'standings-swiss'},
 		classes = {'wikitable-bordered', 'wikitable-striped'},
 		children = WidgetUtil.collect(
 			-- Outer header
