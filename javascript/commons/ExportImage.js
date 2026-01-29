@@ -67,7 +67,7 @@ const EXPORT_IMAGE_CONFIG = {
 		{ selector: '.crosstable', targetSelector: 'tbody', typeName: 'Crosstable' },
 		{ selector: '.brkts-matchlist', targetSelector: '.brkts-matchlist-collapse-area', typeName: 'Match List' },
 		{
-			selector: '.team-participant__grid, [class*="teamcard-columns"], .participantTable',
+			selector: '.team-participant__grid, [class*="teamcard-columns"], .participantTable, .rts-team-list',
 			targetSelector: null,
 			typeName: 'Participants'
 		}
