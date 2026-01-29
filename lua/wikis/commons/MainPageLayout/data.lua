@@ -7,6 +7,8 @@
 
 local Lua = require('Module:Lua')
 
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
+
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
@@ -15,7 +17,7 @@ local CONTENT = {
 		heading = 'About This Wiki',
 		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
-		boxid = 1503,
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
 	},
 	latestUploads = {
 		heading = 'Latest Uploads',

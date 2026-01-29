@@ -7,6 +7,8 @@
 
 local Lua = require('Module:Lua')
 
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
+
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
@@ -21,7 +23,7 @@ local CONTENT = {
 		heading = 'The Game',
 		body = '{{Liquipedia:The Game}}',
 		padding = true,
-		boxid = 1503,
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
 	},
 	starCraftNews = {
 		heading = 'The Game',
@@ -33,24 +35,24 @@ local CONTENT = {
 		heading = 'Want To Help?',
 		body = WantToHelp{},
 		padding = true,
-		boxid = 1504,
+		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP,
 	},
 	liquipediaApp = {
 		heading = 'Download the Liquipedia App',
 		padding = true,
 		body = '{{Liquipedia:App}}',
-		boxid = 1505,
+		boxid = MainPageLayoutUtil.BoxId.MOBILE_APP,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
 		body = ThisDayWidgets.Content(),
 		padding = true,
-		boxid = 1510,
+		boxid = MainPageLayoutUtil.BoxId.THIS_DAY,
 	},
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
-		boxid = 1516,
+		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -63,7 +65,7 @@ local CONTENT = {
 		heading = 'Matches',
 		body = MatchTickerContainer{},
 		padding = true,
-		boxid = 1507,
+		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 		panelAttributes = {
 			['data-switch-group-container'] = "countdown"
 		},
@@ -75,7 +77,7 @@ local CONTENT = {
 			completedDays = 7,
 		},
 		padding = true,
-		boxid = 1508,
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 }
 

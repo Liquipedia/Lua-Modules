@@ -7,7 +7,7 @@
 
 local Lua = require('Module:Lua')
 
-local DateExt = Lua.import('Module:Date/Ext')
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
@@ -23,20 +23,20 @@ local CONTENT = {
 		heading = 'Useful Articles',
 		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
-		boxid = 1503,
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
 		body = WantToHelp{},
 		padding = true,
-		boxid = 1504,
+		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP,
 	},
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferPage = 'Player Transfers/' .. DateExt.getYearOf() .. '/' .. os.date('%B')
+			transferPage = MainPageLayoutUtil.getYearlyTransferPage() .. '/' .. os.date('%B')
 		},
-		boxid = 1509,
+		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
@@ -44,12 +44,12 @@ local CONTENT = {
 			birthdayListPage = 'Birthday list'
 		},
 		padding = true,
-		boxid = 1510,
+		boxid = MainPageLayoutUtil.BoxId.THIS_DAY,
 	},
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
-		boxid = 1516,
+		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -65,7 +65,7 @@ local CONTENT = {
 			completedDays = 7
 		},
 		padding = true,
-		boxid = 1508,
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 }
 
