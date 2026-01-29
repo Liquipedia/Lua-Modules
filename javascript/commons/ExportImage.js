@@ -66,7 +66,12 @@ const EXPORT_IMAGE_CONFIG = {
 		},
 		{ selector: '.crosstable', targetSelector: 'tbody', typeName: 'Crosstable' },
 		{ selector: '.brkts-matchlist', targetSelector: '.brkts-matchlist-collapse-area', typeName: 'Match List' },
-		{ selector: '.prizepooltable', targetSelector: null, typeName: 'Prize Pool', textFilter: '1st' }
+		{
+			selector: '.prizepooltable',
+			targetSelector: null,
+			typeName: 'Prize Pool',
+			classFilter: 'background-color-first-place'
+		}
 	]
 };
 
@@ -694,8 +699,12 @@ class DOMUtils {
 					continue;
 				}
 
-				if ( config.textFilter && !targetElement.textContent.includes( config.textFilter ) ) {
-					continue;
+				if ( config.classFilter ) {
+					const hasClass = targetElement.classList.contains( config.classFilter ) ||
+						targetElement.querySelector( `.${ config.classFilter }` ) !== null;
+					if ( !hasClass ) {
+						continue;
+					}
 				}
 
 				processedElements.add( targetElement );
