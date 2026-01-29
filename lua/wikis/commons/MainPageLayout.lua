@@ -9,17 +9,28 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local Condition = Lua.import('Module:Condition')
+local DateExt = Lua.import('Module:Date/Ext')
 local Count = Lua.import('Module:Count')
 local Image = Lua.import('Module:Image')
+local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
+
+local ConditionNode = Condition.Node
+local ConditionTree = Condition.Tree
+local BooleanOperator = Condition.BooleanOperator
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
 
 local AnalyticsMapping = Lua.import('Module:MainPageLayout/AnalyticsMapping', {loadData = true})
 local WikiData = Lua.import('Module:MainPageLayout/data')
 local GridWidgets = Lua.import('Module:Widget/Grid')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local InMemoryOf = Lua.import('Module:Widget/MainPage/InMemoryOf')
 local NavigationCard = Lua.import('Module:Widget/MainPage/NavigationCard')
 local PanelWidget = Lua.import('Module:Widget/Panel')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MainPageLayout = {}
 
@@ -41,7 +52,7 @@ function MainPageLayout.make(frame)
 
 	return HtmlWidgets.Div{
 		classes = {'mainpage-v2'},
-		children = {
+		children = WidgetUtil.collect(
 			NO_TABLE_OF_CONTENTS,
 			frame:callParserFunction('DISPLAYTITLE', WikiData.title),
 			HtmlWidgets.Div{
@@ -63,6 +74,7 @@ function MainPageLayout.make(frame)
 					frame:callParserFunction('#searchbox', ''),
 				}
 			},
+			MainPageLayout._makeInMemoryOfDisplay(),
 			AnalyticsWidget{
 				analyticsName = 'Quick navigation',
 				children = {
@@ -72,9 +84,28 @@ function MainPageLayout.make(frame)
 					}
 				}
 			},
-			MainPageLayout._makeCells(layout),
-		},
+			MainPageLayout._makeCells(layout)
+		),
 	}
+end
+
+---@return Widget[]?
+function MainPageLayout._makeInMemoryOfDisplay()
+	local passedAwayPlayers = mw.ext.LiquipediaDB.lpdb('player', {
+		conditions = tostring(ConditionTree(BooleanOperator.all):add{
+			ConditionNode(ColumnName('deathdate'), Comparator.neq, DateExt.defaultDate),
+			ConditionNode(ColumnName('deathdate'), Comparator.ge, DateExt.toYmdInUtc(
+				DateExt.getCurrentTimestamp() - DateExt.daysToSeconds(14)
+			))
+		}),
+		query = 'pagename'
+	})
+	if Logic.isEmpty(passedAwayPlayers) then
+		return
+	end
+	return Array.map(passedAwayPlayers, function (player)
+		return InMemoryOf{pageLink = player.pagename}
+	end)
 end
 
 ---@param body (string|Widget|Html|nil)|(string|Widget|Html|nil)[]
