@@ -65,6 +65,8 @@ const EXPORT_IMAGE_CONFIG = {
 			titleSelector: '.group-table-title'
 		},
 		{ selector: '.crosstable', targetSelector: 'tbody', typeName: 'Crosstable' },
+		{ selector: '.standings-ffa', targetSelector: 'tbody', typeName: 'BR/FFA Standings Table' },
+		{ selector: '.standings-swiss', targetSelector: 'tbody', typeName: 'Swiss Standings Table' },
 		{ selector: '.brkts-matchlist', targetSelector: '.brkts-matchlist-collapse-area', typeName: 'Match List' }
 	]
 };
