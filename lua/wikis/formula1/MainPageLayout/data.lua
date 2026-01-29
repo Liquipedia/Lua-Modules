@@ -115,7 +115,7 @@ local CONTENT = {
 	previousRace = {
 		heading =HtmlWidgets.Fragment{children = {FINISHED_RACE, '&nbsp;Previous Race Weekend'}},
 		body = '{{Liquipedia:Previous Race Weekend}}',
-		boxid = 1511
+		boxid = 1515
 	},
 	allF1Seasons = {
 		heading =HtmlWidgets.Fragment{children = {HISTORY, '&nbsp;Formula 1 Seasons'}},
