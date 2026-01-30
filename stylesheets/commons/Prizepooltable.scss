@@ -22,12 +22,12 @@ table.prizepooltable.collapsed .prizepooltablehide {
 }
 
 @media ( max-width: 600px ) {
-	.prizepooltable-col-team a:nth-child( 2 ) {
-		display: none;
-	}
-
 	.prizepooltable-col-team {
 		min-width: 65px;
+
+		a:nth-child( 2 ) {
+			display: none;
+		}
 	}
 }
 
@@ -73,15 +73,15 @@ html.client-js .prizepooltable.collapsed[ data-cutafter="32" ] tr:nth-child( n+3
 
 .csstable-widget.prizepooltable {
 	border: 0.125rem solid var( --prize-pool-header-background-color );
-}
 
-.csstable-widget.prizepooltable .csstable-widget-row,
-.csstable-widget.prizepooltable .csstable-widget-cell {
-	border: 0;
-}
+	.csstable-widget-row,
+	.csstable-widget-cell {
+		border: 0;
+	}
 
-.csstable-widget.prizepooltable .csstable-widget-row:nth-child( odd ):not( .prizepooltable-header ):not( .ppt-toggle-expand ) {
-	background-color: var( --prize-pool-alt-background-color );
+	.csstable-widget-row:nth-child( odd ):not( .prizepooltable-header ):not( .ppt-toggle-expand ) {
+		background-color: var( --prize-pool-alt-background-color );
+	}
 }
 
 /* Background colours */
@@ -226,13 +226,15 @@ div.background-color-fourth-place > *.prizepooltable-place {
 	color: #ffffff;
 }
 
-div.prizepooltable > div.csstable-widget-row.bg-win {
-	/* need the `!important` due to bg-win ( sadly ) having an important in one of its definitions ... */
-	background-color: inherit !important;
-}
+div.csstable-widget-row.bg-win {
+	div.prizepooltable > & {
+		/* need the `!important` due to bg-win ( sadly ) having an important in one of its definitions ... */
+		background-color: inherit !important;
+	}
 
-div.csstable-widget-row.bg-win > .csstable-widget-cell {
-	border-bottom: 0.125rem solid var( --clr-forest-background-color, transparent );
+	> .csstable-widget-cell {
+		border-bottom: 0.125rem solid var( --clr-forest-background-color, transparent );
+	}
 }
 
 div.bg-win > *.prizepooltable-place {
@@ -241,10 +243,10 @@ div.bg-win > *.prizepooltable-place {
 
 div.csstable-widget-row.bg-lose {
 	background-color: inherit;
-}
 
-div.csstable-widget-row.bg-lose > .csstable-widget-cell {
-	border-bottom: 0.125rem solid var( --clr-cinnabar-background-color, transparent );
+	> .csstable-widget-cell {
+		border-bottom: 0.125rem solid var( --clr-cinnabar-background-color, transparent );
+	}
 }
 
 div.bg-lose > *.prizepooltable-place {
@@ -293,30 +295,30 @@ Author: Rathoz
 	border-right: 1px solid var( --table-border-color, #bbbbbb );
 	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
 	display: inline-grid;
-}
 
-.csstable-widget-row:not( .ppt-toggle-expand ) {
-	display: contents;
-}
+	&-row:not( .ppt-toggle-expand ) {
+		display: contents;
+	}
 
-.csstable-widget-cell {
-	border-left: 1px solid var( --table-border-color, #bbbbbb );
-	border-top: 1px solid var( --table-border-color, #bbbbbb );
-	background: inherit;
-	padding: 4px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-wrap: wrap;
-}
-
-.ppt-toggle-expand.ppt-toggle-expand.ppt-toggle-expand.ppt-toggle-expand > * {
-	color: unset;
-	text-decoration: none;
+	&-cell {
+		border-left: 1px solid var( --table-border-color, #bbbbbb );
+		border-top: 1px solid var( --table-border-color, #bbbbbb );
+		background: inherit;
+		padding: 4px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-wrap: wrap;
+	}
 }
 
 .ppt-toggle-expand {
 	grid-column: 1 / -1;
+
+	> * {
+		color: unset;
+		text-decoration: none;
+	}
 }
 
 /*******************************************************************************
@@ -334,10 +336,10 @@ Author: iMarbot
 	display: flex;
 	flex-flow: row wrap;
 	gap: 1em;
-}
 
-@media ( max-width: 600px ) {
-	.prizepool-section-tables > div {
-		min-width: 100%;
+	@media ( max-width: 600px ) {
+		> div {
+			min-width: 100%;
+		}
 	}
 }
