@@ -74,7 +74,8 @@ const EXPORT_IMAGE_CONFIG = {
 		{
 			selector: '.prizepooltable.prizepooltable-award',
 			targetSelector: null,
-			typeName: 'Awards'
+			typeName: 'Awards',
+			manualSubtitle: 'Awards'
 		}
 	]
 };
@@ -732,10 +733,13 @@ class DOMUtils {
 					null;
 				const title = titleElement ? titleElement.textContent.trim() : null;
 
+				const subtitle = config.manualSubtitle || headingInfo.text;
+
 				headingsToElements.get( headingInfo.text ).elements.push( {
 					element: targetElement,
 					typeName: config.typeName,
 					title: title,
+					subtitle: subtitle,
 					isVisible: this.isElementVisible( targetElement )
 				} );
 			}
@@ -795,7 +799,7 @@ class DropdownWidget {
 					const item = visibleElements[ i ];
 					const elementLabel = this.getElementLabel( visibleElements, i );
 					const typeLabel = hasSingleElement ? '' : ` ${ elementLabel }`;
-					const exportTitle = item.title || sectionTitle;
+					const exportTitle = item.title || item.subtitle || sectionTitle;
 
 					const copyButton = this.createMenuButton( {
 						icon: 'copy',
