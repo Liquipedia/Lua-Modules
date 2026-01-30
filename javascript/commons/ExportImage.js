@@ -67,10 +67,14 @@ const EXPORT_IMAGE_CONFIG = {
 		{ selector: '.crosstable', targetSelector: 'tbody', typeName: 'Crosstable' },
 		{ selector: '.brkts-matchlist', targetSelector: '.brkts-matchlist-collapse-area', typeName: 'Match List' },
 		{
-			selector: '.prizepooltable',
+			selector: '.prizepooltable.prizepooltable-placement',
 			targetSelector: null,
-			typeName: 'Prize Pool',
-			classFilter: 'prizepooltable-place'
+			typeName: 'Prize Pool'
+		},
+		{
+			selector: '.prizepooltable.prizepooltable-award',
+			targetSelector: null,
+			typeName: 'Awards'
 		}
 	]
 };

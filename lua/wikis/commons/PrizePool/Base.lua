@@ -593,7 +593,12 @@ function BasePrizePool:_buildTable(isAward)
 	return Div{
 		css = {['overflow-x'] = 'auto'},
 		children = {WidgetTable{
-			classes = {'collapsed', 'general-collapsible', 'prizepooltable'},
+			classes = {
+				'collapsed',
+				'general-collapsible',
+				'prizepooltable',
+				'prizepooltable-' .. (isAward and 'award' or 'placement')
+			},
 			css = {width = 'max-content'},
 			columns = headerRow:getCellCount(),
 			children = WidgetUtil.collect(headerRow, unpack(self:_buildRows()))
