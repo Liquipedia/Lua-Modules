@@ -31,44 +31,10 @@ table.prizepooltable.collapsed .prizepooltablehide {
 	}
 }
 
-@function prizepooltable-cutafter($cut) {
-	@return "html.client-js .prizepooltable.collapsed[ data-cutafter=\"" + $cut + "\"] tr:nth-child(n + " + ($cut + 3) + ")";
-}
-
-#{prizepooltable-cutafter(0)},
-#{prizepooltable-cutafter(1)},
-#{prizepooltable-cutafter(2)},
-#{prizepooltable-cutafter(3)},
-#{prizepooltable-cutafter(4)},
-#{prizepooltable-cutafter(5)},
-#{prizepooltable-cutafter(6)},
-#{prizepooltable-cutafter(7)},
-#{prizepooltable-cutafter(8)},
-#{prizepooltable-cutafter(9)},
-#{prizepooltable-cutafter(10)},
-#{prizepooltable-cutafter(11)},
-#{prizepooltable-cutafter(12)},
-#{prizepooltable-cutafter(13)},
-#{prizepooltable-cutafter(14)},
-#{prizepooltable-cutafter(15)},
-#{prizepooltable-cutafter(16)},
-#{prizepooltable-cutafter(17)},
-#{prizepooltable-cutafter(18)},
-#{prizepooltable-cutafter(19)},
-#{prizepooltable-cutafter(20)},
-#{prizepooltable-cutafter(21)},
-#{prizepooltable-cutafter(22)},
-#{prizepooltable-cutafter(23)},
-#{prizepooltable-cutafter(24)},
-#{prizepooltable-cutafter(25)},
-#{prizepooltable-cutafter(26)},
-#{prizepooltable-cutafter(27)},
-#{prizepooltable-cutafter(28)},
-#{prizepooltable-cutafter(29)},
-#{prizepooltable-cutafter(30)},
-#{prizepooltable-cutafter(31)},
-#{prizepooltable-cutafter(32)} {
-	display: none;
+@for $i from 0 through 32 {
+	html.client-js .prizepooltable.collapsed[ data-cutafter="#{$i}" ] tr:nth-child( n + #{ $i + 3 } ) {
+		display: none;
+	}
 }
 
 .prizepooltable-header {

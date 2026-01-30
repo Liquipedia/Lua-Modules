@@ -19,7 +19,8 @@
 					"function",
 					"return",
 					"debug",
-					"at-root"
+					"at-root",
+					"for"
 				]
 			}
 		],
