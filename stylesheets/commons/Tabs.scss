@@ -8,7 +8,7 @@ $tabs-border-radius: 0.25rem;
 $tabs-active-indicator-height: 3px;
 $tabs-nav-padding: 0.75rem;
 $tabs-nav-padding-nested: 0.5rem 0.75rem;
-$tabs-arrow-width: 2rem;
+$tabs-arrow-width: 2.75rem;
 
 // Theme Colors - Light
 $tabs-border-light: var( --clr-secondary-90 );
@@ -169,11 +169,19 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				.theme--light & {
 					background-color: $tabs-bg-active-light !important;
 					color: $tabs-text-active-light;
+
+					&:hover {
+						color: $tabs-text-active-light !important;
+					}
 				}
 
 				.theme--dark & {
 					background-color: $tabs-bg-active-dark !important;
 					color: $tabs-text-active-dark;
+
+					&:hover {
+						color: $tabs-text-active-dark !important;
+					}
 				}
 			}
 
@@ -262,7 +270,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		cursor: pointer;
 		align-items: center;
 		justify-content: center;
-		background: var( --clr-on-background );
+		background: var( --clr-background );
 
 		&.visible {
 			display: flex;
@@ -407,4 +415,3 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		margin-right: 0.125rem;
 	}
 }
-
