@@ -123,21 +123,23 @@ function Tabs.dynamic(args)
 		})
 	end
 
+	local contentChildren = {}
+
+	if hasContent then
+		contentChildren = Array.map(tabArgs, function(tabData, tabIndex)
+			return HtmlWidgets.Div{
+				classes = {'content' .. tabIndex, tabData.this and 'active' or nil},
+				children = {tabData.content}
+			}
+		end)
+	end
+
 	local contents = Tabs._buildContentDiv(
 		hasContent,
 		Logic.readBool(args['hybrid-tabs']),
-		Logic.readBool(args['no-padding'])
+		Logic.readBool(args['no-padding']),
+		contentChildren
 	)
-
-	if hasContent then
-		---@cast contents Widget
-		Array.forEach(tabArgs, function(tabData, tabIndex)
-			table.insert(contents.props.children, HtmlWidgets.Div{
-				classes = {'content' .. tabIndex, tabData.this and 'active' or nil},
-				children = {tabData.content}
-			})
-		end)
-	end
 
 	local navWrapper = HtmlWidgets.Div{
 		classes = {'tabs-nav-wrapper'},
@@ -237,8 +239,9 @@ end
 ---@param hasContent boolean
 ---@param hybridTabs boolean
 ---@param noPadding boolean
+---@param children table?
 ---@return Widget|string
-function Tabs._buildContentDiv(hasContent, hybridTabs, noPadding)
+function Tabs._buildContentDiv(hasContent, hybridTabs, noPadding, children)
 	if hasContent then
 		return HtmlWidgets.Div{
 			classes = {'tabs-content'},
@@ -246,7 +249,7 @@ function Tabs._buildContentDiv(hasContent, hybridTabs, noPadding)
 				['border-style'] = hybridTabs and 'none !important' or nil,
 				['padding'] = (hybridTabs or noPadding) and '0 !important' or nil,
 			},
-			children = {}
+			children = children
 		}
 	end
 
