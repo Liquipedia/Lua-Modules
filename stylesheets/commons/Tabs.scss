@@ -255,44 +255,31 @@ html.client-nojs .tabs-content > div:not( .active ) {
 	}
 
 	/* Scroll Arrows */
-	.tabs-scroll-arrow {
-		display: none;
+	.tabs-scroll-arrow-wrapper {
 		position: absolute;
-		top: 50%;
-		transform: translateY( -50% );
+		top: 0;
+		bottom: 0;
+		width: $tabs-arrow-width;
 		z-index: 10;
-		min-width: unset;
-		padding: 0.25rem;
-		background-color: var( --clr-surface-2 );
-
-		&.visible {
-			display: flex;
-		}
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: var( --clr-background );
 
 		&--left {
 			left: 0;
-
-			@media ( min-width: 1024px ) {
-				left: 1.25rem;
-			}
 		}
 
 		&--right {
 			right: 0;
+		}
 
-			@media ( min-width: 1024px ) {
-				right: 1.25rem;
+		.tabs-scroll-arrow {
+			display: none;
+
+			&.visible {
+				display: flex;
 			}
-		}
-
-		.theme--light & {
-			color: $tabs-text-light;
-			border-color: $tabs-border-light;
-		}
-
-		.theme--dark & {
-			color: $tabs-text-dark;
-			border-color: $tabs-border-dark;
 		}
 	}
 }

@@ -10,8 +10,8 @@ const TABS_CONFIG = {
 		NAV_WRAPPER: '.tabs-nav-wrapper',
 		NAV_TABS: '.nav-tabs',
 		CONTENT_CONTAINER: '.tabs-content',
-		ARROW_LEFT: '.tabs-scroll-arrow--left',
-		ARROW_RIGHT: '.tabs-scroll-arrow--right',
+		ARROW_LEFT: '.tabs-scroll-arrow-wrapper--left .tabs-scroll-arrow',
+		ARROW_RIGHT: '.tabs-scroll-arrow-wrapper--right .tabs-scroll-arrow',
 		ACTIVE_TAB: 'li.active',
 		TAB_ITEMS: 'li'
 	},

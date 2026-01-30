@@ -146,28 +146,40 @@ function Tabs.dynamic(args)
 	local navWrapper = HtmlWidgets.Div{
 		classes = {'tabs-nav-wrapper'},
 		children = {
-			Button{
-				classes = {'tabs-scroll-arrow', 'tabs-scroll-arrow--left'},
-				title = 'Previous',
-				size = 'xs',
+			HtmlWidgets.Div{
+				classes = {'tabs-scroll-arrow-wrapper', 'tabs-scroll-arrow-wrapper--left'},
 				children = {
-					HtmlWidgets.Span{
-						css = {display = 'inline-flex'},
-						children = {Icon{iconName = 'previous', size = 'xs'}}
-					},
-				},
+					Button{
+						classes = {'tabs-scroll-arrow', 'tabs-scroll-arrow--left'},
+						title = 'Previous',
+						variant = 'ghost',
+						size = 'md',
+						children = {
+							HtmlWidgets.Span{
+								css = {display = 'inline-flex'},
+								children = {Icon{iconName = 'previous', size = 'xs'}}
+							},
+						},
+					}
+				}
 			},
 			navTabs,
-			Button{
-				classes = {'tabs-scroll-arrow', 'tabs-scroll-arrow--right'},
-				title = 'Next',
-				size = 'xs',
+			HtmlWidgets.Div{
+				classes = {'tabs-scroll-arrow-wrapper', 'tabs-scroll-arrow-wrapper--right'},
 				children = {
-					HtmlWidgets.Span{
-						css = {display = 'inline-flex'},
-						children = {Icon{iconName = 'next', size = 'xs'}}
-					},
-				},
+					Button{
+						classes = {'tabs-scroll-arrow', 'tabs-scroll-arrow--right'},
+						title = 'Next',
+						variant = 'ghost',
+						size = 'md',
+						children = {
+							HtmlWidgets.Span{
+								css = {display = 'inline-flex'},
+								children = {Icon{iconName = 'next', size = 'xs'}}
+							},
+						},
+					}
+				}
 			},
 		}
 	}
