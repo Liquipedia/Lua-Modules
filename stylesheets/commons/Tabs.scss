@@ -261,10 +261,14 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		bottom: 0;
 		width: $tabs-arrow-width;
 		z-index: 10;
-		display: flex;
+		display: none;
 		align-items: center;
 		justify-content: center;
 		background-color: var( --clr-background );
+
+		&.visible {
+			display: flex;
+		}
 
 		&--left {
 			left: 0;
@@ -275,10 +279,15 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		}
 
 		.tabs-scroll-arrow {
-			display: none;
+			outline: 0;
+			border-radius: 0;
 
-			&.visible {
-				display: flex;
+			.theme--light & {
+				color: $tabs-text-light;
+			}
+
+			.theme--dark & {
+				color: $tabs-text-dark;
 			}
 		}
 	}
