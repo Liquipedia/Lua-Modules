@@ -112,7 +112,7 @@ function MainPageLayout._makeInMemoryOfDisplay(args)
 		return
 	end
 	return Array.map(passedAwayPlayers, function (player)
-		return InMemoryOf{pageLink = player}
+		return InMemoryOf{pageLink = player.pagename}
 	end)
 end
 
