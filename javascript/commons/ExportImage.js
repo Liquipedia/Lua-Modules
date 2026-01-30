@@ -131,11 +131,10 @@ class ImageCache {
 class CanvasComposer {
 	constructor( imageCache ) {
 		this.imageCache = imageCache;
-		this.offscreenContext = null; // Reusable context for text measurement
+		this.offscreenContext = null;
 	}
 
 	async compose( sourceCanvas, sectionTitle, isDarkTheme, scale = 1 ) {
-		// Create scaled dimensions object
 		const dims = this.getScaledDimensions( scale );
 		const fonts = this.getScaledFonts( scale );
 
@@ -157,7 +156,6 @@ class CanvasComposer {
 		return canvas;
 	}
 
-	// Creates scaled dimensions object
 	getScaledDimensions( scale ) {
 		const dims = {};
 		for ( const [ key, value ] of Object.entries( EXPORT_IMAGE_CONFIG.DIMENSIONS ) ) {
@@ -166,7 +164,6 @@ class CanvasComposer {
 		return dims;
 	}
 
-	// Creates scaled fonts object
 	getScaledFonts( scale ) {
 		const fonts = {};
 		for ( const [ key, fontString ] of Object.entries( EXPORT_IMAGE_CONFIG.FONTS ) ) {
@@ -175,7 +172,6 @@ class CanvasComposer {
 		return fonts;
 	}
 
-	// Scales the pixel size in a font string
 	scaleFontSize( fontString, scale ) {
 		return fontString.replace( /(\d+)px/, ( _match, pixels ) => {
 			const scaledPixels = parseInt( pixels ) * scale;
@@ -183,7 +179,6 @@ class CanvasComposer {
 		} );
 	}
 
-	// Gets or creates reusable offscreen context for text measurements
 	getOffscreenContext() {
 		if ( !this.offscreenContext ) {
 			const canvas = document.createElement( 'canvas' );
@@ -591,10 +586,8 @@ class ExportService {
 		const pageTitle = mw.config.get( 'wgDisplayTitle' ) || mw.config.get( 'wgTitle' );
 		let filename = `Liquipedia ${ pageTitle } ${ title } ${ this.generateTimestamp() }`;
 
-		// Remove invalid filename characters
 		filename = filename.replace( /[\\/:*?"<>|]/g, '_' ).trim();
 
-		// Limit filename length (with buffer for extension)
 		const MAX_FILENAME_LENGTH = 215;
 		if ( filename.length > MAX_FILENAME_LENGTH ) {
 			filename = filename.slice( 0, MAX_FILENAME_LENGTH ).trim();
@@ -648,13 +641,11 @@ class DOMUtils {
 			return false;
 		}
 
-		// Check element itself
 		const style = window.getComputedStyle( element );
 		if ( style.display === 'none' || style.visibility === 'hidden' ) {
 			return false;
 		}
 
-		// Check parent chain
 		let parent = element.parentElement;
 		while ( parent && parent !== document.body ) {
 			const parentStyle = window.getComputedStyle( parent );
@@ -663,14 +654,12 @@ class DOMUtils {
 				return false;
 			}
 
-			// Check for collapsed state
 			if ( parent.classList.contains( 'collapsed' ) ||
 				parent.classList.contains( 'is--collapsed' ) ||
 				parent.dataset.collapsibleState === 'collapsed' ) {
 				return false;
 			}
 
-			// Check for inactive tabs
 			if ( parent.closest( '.tabs-content > div:not(.active)' ) ) {
 				return false;
 			}
@@ -704,14 +693,6 @@ class DOMUtils {
 					continue;
 				}
 
-				if ( config.classFilter ) {
-					const hasClass = targetElement.classList.contains( config.classFilter ) ||
-						targetElement.querySelector( `.${ config.classFilter }` ) !== null;
-					if ( !hasClass ) {
-						continue;
-					}
-				}
-
 				processedElements.add( targetElement );
 
 				const headingInfo = this.findPreviousHeading( element );
@@ -719,7 +700,6 @@ class DOMUtils {
 					continue;
 				}
 
-				// Group by heading
 				if ( !headingsToElements.has( headingInfo.text ) ) {
 					headingsToElements.set( headingInfo.text, {
 						headingNode: headingInfo.node,
@@ -765,30 +745,25 @@ class DropdownWidget {
 		let menuItems = [];
 
 		const populateMenu = () => {
-			// Clear existing items (except loading)
 			while ( menuElement.firstChild && menuElement.firstChild !== loadingElement ) {
 				menuElement.removeChild( menuElement.firstChild );
 			}
 
-			// Ensure loading element is present
 			if ( !menuElement.contains( loadingElement ) ) {
 				menuElement.appendChild( loadingElement );
 			}
 
-			// Show refresh prompt if zoom changed
 			if ( this.zoomManager.hasZoomed ) {
 				const refreshItem = this.createRefreshMenuItem();
 				menuElement.insertBefore( refreshItem, loadingElement );
 				return;
 			}
 
-			// Filter visible elements
 			const visibleElements = elements.filter( ( item ) => DOMUtils.isElementVisible( item.element )
 			);
 			const hasSingleElement = visibleElements.length === 1;
 			menuItems = [];
 
-			// Create menu items
 			if ( visibleElements.length === 0 ) {
 				const disabledButton = this.createDisabledMenuItem(
 					'<i class="fas fa-fw fa-eye-slash"></i> Content not visible'
@@ -965,7 +940,6 @@ class DropdownWidget {
 		document.addEventListener( 'click', outsideClickHandler );
 		menuElement.addEventListener( 'keydown', keydownHandler );
 
-		// Store cleanup function
 		this.eventCleanupFunctions.set( wrapper, () => {
 			document.removeEventListener( 'click', outsideClickHandler );
 			menuElement.removeEventListener( 'keydown', keydownHandler );
@@ -1036,12 +1010,10 @@ class DropdownWidget {
 	}
 
 	openMenu( menuElement, buttonElement ) {
-		// Reset positioning
 		menuElement.style.left = '';
 		menuElement.style.right = '';
 		menuElement.style.display = 'block';
 
-		// Adjust for viewport overflow
 		const viewportWidth = window.innerWidth;
 		const menuRect = menuElement.getBoundingClientRect();
 
@@ -1049,7 +1021,6 @@ class DropdownWidget {
 			const parentRect = buttonElement.parentElement.getBoundingClientRect();
 			let newLeft = viewportWidth - menuRect.width - parentRect.left;
 
-			// Ensure menu doesn't overflow left edge
 			newLeft = Math.max( newLeft, -parentRect.left );
 
 			menuElement.style.left = `${ newLeft }px`;
@@ -1058,7 +1029,6 @@ class DropdownWidget {
 
 		buttonElement.setAttribute( 'aria-expanded', 'true' );
 
-		// Focus first focusable item
 		const firstFocusable = menuElement.querySelector( '[tabindex="0"]' );
 		if ( firstFocusable ) {
 			firstFocusable.focus();
@@ -1143,7 +1113,6 @@ class DropdownWidget {
 	createElement( tag, attributes = {}, children = [] ) {
 		const element = document.createElement( tag );
 
-		// Set attributes
 		for ( const [ key, value ] of Object.entries( attributes ) ) {
 			if ( key === 'style' && typeof value === 'object' ) {
 				Object.assign( element.style, value );
@@ -1154,7 +1123,6 @@ class DropdownWidget {
 			}
 		}
 
-		// Add children
 		if ( typeof children === 'string' ) {
 			element.innerHTML = children;
 		} else if ( Array.isArray( children ) ) {
@@ -1255,6 +1223,5 @@ class ExportImageModule {
 	}
 }
 
-// Initialize module
 liquipedia.exportImage = new ExportImageModule();
 liquipedia.core.modules.push( 'exportImage' );
