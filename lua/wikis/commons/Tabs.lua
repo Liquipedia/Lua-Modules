@@ -129,7 +129,10 @@ function Tabs.dynamic(args)
 		contentChildren = Array.map(tabArgs, function(tabData, tabIndex)
 			return HtmlWidgets.Div{
 				classes = {'content' .. tabIndex, tabData.this and 'active' or nil},
-				children = {tabData.content}
+				dataset = {count = tabIndex},
+				-- The '\n' here is critical. Without it, wikitext lists (*) will
+				-- not parse correctly because they won't be on a new line.
+				children = {'\n', tabData.content}
 			}
 		end)
 	end
@@ -209,12 +212,12 @@ function Tabs._setThis(tabArgs)
 
 	-- Finds the link that is a prefix of the current page. If there are more than one, choose the longest, then first.
 	-- For example, if the current page is ab/cd/e3, then among
-	--   ab/cd/e1
-	--   ab/cd/e2
-	--   ab/cd/e
-	--   ab/cd
-	--   ab/cg
-	--   ab
+	--   ab/cd/e1
+	--   ab/cd/e2
+	--   ab/cd/e
+	--   ab/cd
+	--   ab/cg
+	--   ab
 	-- it will pick ab/cd.
 	local maxLinkLength = -1
 
@@ -269,6 +272,7 @@ function Tabs._single(tab, showHeader)
 	return HtmlWidgets.Fragment{
 		children = {
 			showHeader and HtmlWidgets.H6{children = {tab.name}} or nil,
+			'\n', -- Newline added here as well for safety
 			tab.content
 		}
 	}
