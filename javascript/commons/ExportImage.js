@@ -608,7 +608,7 @@ class ExportService {
 /**
  * Utilities for finding elements and headings in the DOM
  */
-class DOMUtils {
+class ExportImageDOMUtils {
 	static findPreviousHeading( startElement ) {
 		const walker = document.createTreeWalker(
 			document.body,
@@ -761,7 +761,7 @@ class DropdownWidget {
 			}
 
 			// Filter visible elements
-			const visibleElements = elements.filter( ( item ) => DOMUtils.isElementVisible( item.element )
+			const visibleElements = elements.filter( ( item ) => ExportImageDOMUtils.isElementVisible( item.element )
 			);
 			const hasSingleElement = visibleElements.length === 1;
 			menuItems = [];
@@ -1206,7 +1206,7 @@ class ExportImageModule {
 	}
 
 	injectDropdowns() {
-		const headingsToElements = DOMUtils.findExportableElements();
+		const headingsToElements = ExportImageDOMUtils.findExportableElements();
 
 		for ( const data of headingsToElements.values() ) {
 			let targetNode = data.headingNode;
