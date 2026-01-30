@@ -130,9 +130,7 @@ function Tabs.dynamic(args)
 			return HtmlWidgets.Div{
 				classes = {'content' .. tabIndex, tabData.this and 'active' or nil},
 				dataset = {count = tabIndex},
-				-- The '\n' here is critical. Without it, wikitext lists (*) will
-				-- not parse correctly because they won't be on a new line.
-				children = {'\n', tabData.content}
+				children = {'\n\n', tabData.content}
 			}
 		end)
 	end
