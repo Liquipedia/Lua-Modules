@@ -14,6 +14,7 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Count = Lua.import('Module:Count')
 local Image = Lua.import('Module:Image')
 local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 
 local ConditionNode = Condition.Node
@@ -21,6 +22,7 @@ local ConditionTree = Condition.Tree
 local BooleanOperator = Condition.BooleanOperator
 local Comparator = Condition.Comparator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local AnalyticsMapping = Lua.import('Module:MainPageLayout/AnalyticsMapping', {loadData = true})
 local WikiData = Lua.import('Module:MainPageLayout/data')
@@ -74,7 +76,7 @@ function MainPageLayout.make(frame)
 					frame:callParserFunction('#searchbox', ''),
 				}
 			},
-			MainPageLayout._makeInMemoryOfDisplay(),
+			MainPageLayout._makeInMemoryOfDisplay(args),
 			AnalyticsWidget{
 				analyticsName = 'Quick navigation',
 				children = {
@@ -89,14 +91,20 @@ function MainPageLayout.make(frame)
 	}
 end
 
+---@param args table
 ---@return Widget[]?
-function MainPageLayout._makeInMemoryOfDisplay()
+function MainPageLayout._makeInMemoryOfDisplay(args)
+	local passedAwayInput = Array.parseCommaSeparatedString(args.passedAway)
+	if Logic.isEmpty(passedAwayInput) then
+		return
+	end
 	local passedAwayPlayers = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = tostring(ConditionTree(BooleanOperator.all):add{
 			ConditionNode(ColumnName('deathdate'), Comparator.neq, DateExt.defaultDate),
 			ConditionNode(ColumnName('deathdate'), Comparator.ge, DateExt.toYmdInUtc(
 				DateExt.getCurrentTimestamp() - DateExt.daysToSeconds(14)
-			))
+			)),
+			ConditionUtil.anyOf(ColumnName('pagename'), Array.map(passedAwayInput, Page.pageifyLink))
 		}),
 		query = 'pagename'
 	})
@@ -104,7 +112,7 @@ function MainPageLayout._makeInMemoryOfDisplay()
 		return
 	end
 	return Array.map(passedAwayPlayers, function (player)
-		return InMemoryOf{pageLink = player.pagename}
+		return InMemoryOf{pageLink = player}
 	end)
 end
 
