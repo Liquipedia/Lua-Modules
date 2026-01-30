@@ -15,6 +15,7 @@ local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 
 local AnalyticsWidgets = Lua.import('Module:Widget/Analytics')
+local Button = Lua.import('Module:Widget/Basic/Button')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
@@ -145,9 +146,29 @@ function Tabs.dynamic(args)
 	local navWrapper = HtmlWidgets.Div{
 		classes = {'tabs-nav-wrapper'},
 		children = {
-			HtmlWidgets.Div{classes = {'tabs-scroll-arrow', 'left'}},
+			Button{
+				classes = {'tabs-scroll-arrow', 'tabs-scroll-arrow--left'},
+				title = 'Previous',
+				size = 'xs',
+				children = {
+					HtmlWidgets.Span{
+						css = {display = 'inline-flex'},
+						children = {Icon{iconName = 'previous', size = 'xs'}}
+					},
+				},
+			},
 			navTabs,
-			HtmlWidgets.Div{classes = {'tabs-scroll-arrow', 'right'}},
+			Button{
+				classes = {'tabs-scroll-arrow', 'tabs-scroll-arrow--right'},
+				title = 'Next',
+				size = 'xs',
+				children = {
+					HtmlWidgets.Span{
+						css = {display = 'inline-flex'},
+						children = {Icon{iconName = 'next', size = 'xs'}}
+					},
+				},
+			},
 		}
 	}
 
