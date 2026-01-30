@@ -89,7 +89,10 @@ function Tabs.dynamic(args)
 
 	local variant = args.variant or 'horizontal'
 	local validVariants = {horizontal = true, vertical = true, ['icon-only'] = true}
-	assert(validVariants[variant], 'Invalid variant "' .. variant .. '". Allowed values are: horizontal, vertical, icon-only')
+	assert(
+		validVariants[variant],
+		'Invalid variant "' .. variant .. '". Allowed values are: horizontal, vertical, icon-only'
+	)
 
 	local hasIcon = Array.any(tabArgs, function(tab) return Logic.isNotEmpty(tab.icon) end)
 	local allHaveIcon = Array.all(tabArgs, function(tab) return Logic.isNotEmpty(tab.icon) end)
