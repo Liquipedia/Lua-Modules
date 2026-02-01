@@ -164,7 +164,7 @@ function MatchPage:_renderTeamStats(game)
 						HtmlWidgets.H4{
 							classes = {'match-bm-team-stats-header-title'},
 							children = game.finished
-								and self.opponents[game.winner].name .. ' Victory'
+								and self.opponents[game.winner].teamTemplateData.name .. ' Victory'
 								or 'No winner determined yet'
 						},
 						game.length and Div{children = game.length} or nil
