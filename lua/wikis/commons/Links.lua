@@ -147,7 +147,7 @@ local PREFIXES = {
 		player = 'https://ratings.fide.com/profile/',
 	},
 	fpschallenge = {
-		'https://fpschallenge.eu',
+		'https://fpschallenge.eu/tournament/',
 		player = 'https://fpschallenge.eu/user/',
 		team = 'https://fpschallenge.eu/team/',
 	},
