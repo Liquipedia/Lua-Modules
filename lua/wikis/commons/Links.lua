@@ -146,6 +146,11 @@ local PREFIXES = {
 		'https://ratings.fide.com/tournament_information.phtml?event=',
 		player = 'https://ratings.fide.com/profile/',
 	},
+	fpschallenge = {
+		'https://fpschallenge.eu',
+		player = 'https://fpschallenge.eu/user/',
+		team = 'https://fpschallenge.eu/team/',
+	},
 	geoguessr = {'https://www.geoguessr.com/'},
 	gol = {match = 'https://gol.gg/game/stats/'},
 	gosugamers = {''},
