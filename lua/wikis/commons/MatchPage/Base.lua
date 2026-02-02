@@ -12,15 +12,16 @@ local CharacterIcon = Lua.import('Module:CharacterIcon')
 local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Links = Lua.import('Module:Links')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Tournament = Lua.import('Module:Tournament')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
-local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
@@ -239,7 +240,7 @@ end
 function BaseMatchPage:makeDisplayTitle()
 	local team1data = (self.opponents[1] or {}).teamTemplateData
 	local team2data = (self.opponents[2] or {}).teamTemplateData
-	local tournamentName = self.matchData.tickername
+	local tournamentName = self:getMatchContext().displayName
 
 	if Logic.isEmpty(team1data) and Logic.isEmpty(team2data) then
 		return String.isNotEmpty(tournamentName) and 'Match in ' .. tournamentName or ''
@@ -346,17 +347,18 @@ function BaseMatchPage:renderGame(game)
 end
 
 ---@protected
----@return table
-function BaseMatchPage:getMatchContext()
-	return MatchGroupInputUtil.getTournamentContext(self.matchData)
-end
+---@param self BaseMatchPage
+---@return StandardTournamentPartial
+BaseMatchPage.getMatchContext = FnUtil.memoize(function (self)
+	return Tournament.partialTournamentFromMatch(self.matchData)
+end)
 
 ---@protected
 ---@return Widget
 function BaseMatchPage:getTournamentIcon()
 	return IconImage{
 		imageLight = self:getMatchContext().icon,
-		imageDark = self:getMatchContext().icondark,
+		imageDark = self:getMatchContext().iconDark,
 		size = '50x32px',
 	}
 end
