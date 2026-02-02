@@ -280,14 +280,24 @@ end
 ---@param children table?
 ---@return Widget|string
 function Tabs._buildContentDiv(hasContent, hybridTabs, noPadding, children)
-	return HtmlWidgets.Div{
-		classes = {'tabs-content'},
-		css = {
-			['border-style'] = hybridTabs and 'none !important' or nil,
-			['padding'] = (hybridTabs or noPadding) and '0 !important' or nil,
-		},
-		children = hasContent and children or nil
-	}
+	if hasContent then
+		return HtmlWidgets.Div{
+			classes = {'tabs-content'},
+			css = {
+				['border-style'] = hybridTabs and 'none !important' or nil,
+				['padding'] = (hybridTabs or noPadding) and '0 !important' or nil,
+			},
+			children = children
+		}
+	end
+
+	local style = ''
+	if hybridTabs then
+		style = 'border-style:none !important; padding:0 !important;'
+	elseif noPadding then
+		style = 'padding:0 !important;'
+	end
+	return '\n<div class="tabs-content" style="' .. style .. '">'
 end
 
 ---@param tab {name: string?, link: string?, content: string|Html?, tabs: string|Html?, this: boolean}
