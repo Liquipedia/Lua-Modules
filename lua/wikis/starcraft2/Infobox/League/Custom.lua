@@ -16,6 +16,7 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
@@ -331,7 +332,7 @@ function CustomLeague:shouldStore(args)
 	return Namespace.isMain() and
 		not Logic.readBool(args.disable_lpdb) and
 		not Logic.readBool(args.disable_storage) and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage', 'false'))
+		Lpdb.isStorageEnabled()
 end
 
 ---@param args table

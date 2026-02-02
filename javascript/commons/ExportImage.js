@@ -76,7 +76,14 @@ const EXPORT_IMAGE_CONFIG = {
 			targetSelector: null,
 			typeName: 'Awards',
 			manualSubtitle: 'Awards'
-		}
+		},
+    {
+			selector: '.team-participant__grid, [class*="teamcard-columns"], .participantTable, .rts-team-list',
+			targetSelector: null,
+			typeName: 'Participants'
+		},
+		{ selector: '.standings-ffa', targetSelector: 'tbody', typeName: 'BR/FFA Standings Table' },
+		{ selector: '.standings-swiss', targetSelector: 'tbody', typeName: 'Swiss Standings Table' }
 	]
 };
 
@@ -448,6 +455,7 @@ class ExportService {
 
 	applyCloneFixes( clonedDoc ) {
 		this.hideInfoIcons( clonedDoc );
+		this.removeContentSwitchers( clonedDoc );
 	}
 
 	// Hides info icons that shouldn't appear in exports
@@ -455,6 +463,15 @@ class ExportService {
 		const infoIcons = clonedDoc.querySelectorAll( '.brkts-match-info-icon' );
 		for ( const icon of infoIcons ) {
 			icon.style.opacity = '0';
+		}
+	}
+
+	// Remove toggle switches
+	removeContentSwitchers( clonedDoc ) {
+		const contentSwitches = clonedDoc.querySelectorAll( '.switch-pill-container' );
+
+		for ( const contentSwitch of contentSwitches ) {
+			contentSwitch.remove();
 		}
 	}
 
