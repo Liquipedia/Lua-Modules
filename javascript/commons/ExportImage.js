@@ -77,7 +77,7 @@ const EXPORT_IMAGE_CONFIG = {
 			typeName: 'Awards',
 			manualSubtitle: 'Awards'
 		},
-    {
+		{
 			selector: '.team-participant__grid, [class*="teamcard-columns"], .participantTable, .rts-team-list',
 			targetSelector: null,
 			typeName: 'Participants'
