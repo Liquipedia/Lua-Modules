@@ -55,9 +55,6 @@ function MatchStandingsLegacy.readOpponents(args)
 		local teamResults = Array.map(
 			Array.parseCommaSeparatedString(Table.extract(args, prefix .. 'results')),
 			function (teamResult)
-				if String.isEmpty(teamResult) then
-					return
-				end
 				return Array.parseCommaSeparatedString(teamResult, '-')
 			end
 		)
