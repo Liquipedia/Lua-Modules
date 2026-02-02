@@ -18,6 +18,7 @@ local AnalyticsWidgets = Lua.import('Module:Widget/Analytics')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Tabs = {}
 
@@ -133,8 +134,8 @@ function Tabs.dynamic(args)
 		contentChildren = Array.map(tabArgs, function(tabData, tabIndex)
 			return HtmlWidgets.Div{
 				classes = {'content' .. tabIndex, tabData.this and 'active' or nil},
-				dataset = {count = tabIndex},
-				children = {'\n\n', tabData.content}
+				attributes = {['data-count'] = tabIndex},
+				children = WidgetUtil.collect('\n\n', tabData.content)
 			}
 		end)
 	end
@@ -279,24 +280,14 @@ end
 ---@param children table?
 ---@return Widget|string
 function Tabs._buildContentDiv(hasContent, hybridTabs, noPadding, children)
-	if hasContent then
-		return HtmlWidgets.Div{
-			classes = {'tabs-content'},
-			css = {
-				['border-style'] = hybridTabs and 'none !important' or nil,
-				['padding'] = (hybridTabs or noPadding) and '0 !important' or nil,
-			},
-			children = children
-		}
-	end
-
-	local style = ''
-	if hybridTabs then
-		style = 'border-style:none !important; padding:0 !important;'
-	elseif noPadding then
-		style = 'padding:0 !important;'
-	end
-	return '\n<div class="tabs-content" style="' .. style .. '">'
+	return HtmlWidgets.Div{
+		classes = {'tabs-content'},
+		css = {
+			['border-style'] = hybridTabs and 'none !important' or nil,
+			['padding'] = (hybridTabs or noPadding) and '0 !important' or nil,
+		},
+		children = hasContent and children or nil
+	}
 end
 
 ---@param tab {name: string?, link: string?, content: string|Html?, tabs: string|Html?, this: boolean}
@@ -306,7 +297,7 @@ function Tabs._single(tab, showHeader)
 	return HtmlWidgets.Fragment{
 		children = {
 			showHeader and HtmlWidgets.H6{children = {tab.name}} or nil,
-			'\n', -- Newline added here as well for safety
+			'\n',
 			tab.content
 		}
 	}

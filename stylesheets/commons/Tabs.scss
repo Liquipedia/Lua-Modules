@@ -87,6 +87,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 	.nav-tabs {
 		flex-wrap: nowrap;
 		overflow-x: auto;
+		scrollbar-width: none;
 		border: unset !important;
 		margin: 0 !important;
 
