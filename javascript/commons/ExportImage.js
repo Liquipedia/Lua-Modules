@@ -72,8 +72,7 @@ const EXPORT_IMAGE_CONFIG = {
 			typeName: 'Participants'
 		},
 		{ selector: '.standings-ffa', targetSelector: 'tbody', typeName: 'BR/FFA Standings Table' },
-		{ selector: '.standings-swiss', targetSelector: 'tbody', typeName: 'Swiss Standings Table' },
-		{ selector: '.brkts-matchlist', targetSelector: '.brkts-matchlist-collapse-area', typeName: 'Match List' }
+		{ selector: '.standings-swiss', targetSelector: 'tbody', typeName: 'Swiss Standings Table' }
 	]
 };
 
