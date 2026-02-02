@@ -131,7 +131,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				}
 
 				.theme--light & {
-					color: $tabs-text-light;
+					color: $tabs-text-light !important;
 
 					&:hover {
 						color: $tabs-text-light !important;
@@ -140,7 +140,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				}
 
 				.theme--dark & {
-					color: $tabs-text-dark;
+					color: $tabs-text-dark !important;
 
 					&:hover {
 						color: $tabs-text-dark !important;
