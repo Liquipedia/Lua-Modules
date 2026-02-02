@@ -213,6 +213,19 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				}
 			}
 		}
+
+		.nav-tabs li.show-all {
+			width: auto;
+
+			a {
+				justify-content: flex-start;
+				padding: $tabs-nav-padding;
+
+				span {
+					display: inline;
+				}
+			}
+		}
 	}
 
 	// Nested Variation (inside .tabs-content)
