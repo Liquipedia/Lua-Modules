@@ -456,6 +456,7 @@ class ExportService {
 	applyCloneFixes( clonedDoc ) {
 		this.hideInfoIcons( clonedDoc );
 		this.removeContentSwitchers( clonedDoc );
+		this.removePrizepoolToggles( clonedDoc );
 	}
 
 	// Hides info icons that shouldn't appear in exports
@@ -472,6 +473,14 @@ class ExportService {
 
 		for ( const contentSwitch of contentSwitches ) {
 			contentSwitch.remove();
+		}
+	}
+
+	removePrizepoolToggles( clonedDoc ) {
+		const prizepoolToggles = clonedDoc.querySelectorAll( '.ppt-toggle-expand' );
+
+		for ( const prizepoolToggle of prizepoolToggles ) {
+			prizepoolToggle.remove();
 		}
 	}
 
