@@ -307,7 +307,7 @@ function BaseTournamentsListing:_row(tournamentData)
 			date = tournamentData.enddate,
 		})
 		:wikitext(NONBREAKING_SPACE .. NONBREAKING_SPACE)
-		:wikitext('[[' .. tournamentData.pagename .. '|' ..  config.compactDisplay and tournamentData.shortname or tournamentData.name .. ']]')
+		:wikitext('[[' .. tournamentData.pagename .. '|' ..  (config.compactDisplay and tournamentData.shortname or tournamentData.name) .. ']]')
 		:cssText(status == CANCELLED and 'text-decoration:line-through;' or nil)
 
 	if config.showOrganizer then
