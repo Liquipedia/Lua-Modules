@@ -11,6 +11,9 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Game = Lua.import('Module:Game')
+local Info = Lua.import('Module:Info', {loadData = true})
+local MatchTicker = Lua.import('Module:MatchTicker')
+local MatchTickerEntityDisplay = Lua.import('Module:MatchTicker/DisplayComponents/Entity')
 local Namespace = Lua.import('Module:Namespace')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local String = Lua.import('Module:StringUtils')
@@ -19,7 +22,12 @@ local TextSanitizer = Lua.import('Module:TextSanitizer')
 local Tier = Lua.import('Module:Tier/Custom')
 local Variables = Lua.import('Module:Variables')
 
+local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+local Fragment = HtmlWidgets.Fragment
 local WarningBoxGroup = Lua.import('Module:Widget/WarningBox/Group')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local HiddenDataBox = {}
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
@@ -108,7 +116,10 @@ function HiddenDataBox.run(args)
 
 	HiddenDataBox.addCustomVariables(args, queryResult)
 
-	return WarningBoxGroup{data = warnings}
+	return Fragment{children = WidgetUtil.collect(
+		HiddenDataBox._matchTicker(Logic.readBool(args.matchticker)),
+		WarningBoxGroup{data = warnings}
+	)}
 end
 
 ---Cleans date input
@@ -120,7 +131,7 @@ function HiddenDataBox.cleanDate(primaryDate, secondaryDate)
 		String.nilIfEmpty(ReferenceCleaner.clean{input = secondaryDate})
 end
 
----Assigns the wiki Variables according to given input, wiki variable and queryResults
+---Assigns the wiki Variables accordng to given input, wiki variable and queryResults
 ---@param variableName string
 ---@param valueFromArgs string|number|nil
 ---@param valueFromQuery string|number|nil
@@ -213,6 +224,50 @@ function HiddenDataBox.validateTier(tier, tierType)
 	end
 
 	return tierValue, tierTypeValue, warnings
+end
+
+---@param showMatchTicker boolean
+---@return Widget?
+function HiddenDataBox._matchTicker(showMatchTicker)
+	if not showMatchTicker or Info.config.match2.status == 0 then
+		return nil
+	end
+
+	local result = Logic.tryCatch(
+		function()
+			local matchTicker = MatchTicker{
+				tournament = mw.title.getCurrentTitle().prefixedText,
+				limit = 5,
+				upcoming = true,
+				ongoing = true,
+				hideTournament = true,
+				queryByParent = false,
+			}
+			matchTicker:query()
+			return matchTicker
+		end,
+		function()
+			return nil
+		end
+	)
+
+	if not result or not result.matches or #result.matches == 0 then
+		return nil
+	end
+
+	return Div{
+		classes = {'fo-nttax-infobox-topcontent'},
+		children = AnalyticsWidget{
+			analyticsName = 'HiddenDataBoxMatchTicker',
+			--classes = {'fo-nttax-infobox-container'},
+			children = {
+				MatchTickerEntityDisplay.Container{
+					config = result.config,
+					matches = result.matches,
+				}:create()
+			}
+		}
+	}
 end
 
 return Class.export(HiddenDataBox, {exports = {'run'}})
