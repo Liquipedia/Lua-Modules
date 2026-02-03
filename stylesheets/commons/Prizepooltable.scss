@@ -286,8 +286,8 @@ Author: Rathoz
 	grid-column: 1 / -1;
 
 	> * {
-		color: unset;
-		text-decoration: none;
+		color: unset !important;
+		text-decoration: none !important;
 	}
 }
 

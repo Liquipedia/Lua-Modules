@@ -74,6 +74,10 @@ return {
 		name = 'Brunei Darussalam Time',
 		offset = {8, 0},
 	},
+	BDST = {
+		name = 'Bangladesh Standard Time',
+		offset = {6, 0},
+	},
 	BST = {
 		name = 'British Summer Time',
 		offset = {1, 0},
