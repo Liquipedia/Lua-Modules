@@ -56,6 +56,7 @@ local DEFAULT_LIMIT = 5000
 ---@field allowedPlacements string[]
 ---@field dynamicPlacements boolean
 ---@field onlyHighlightOnValue string?
+---@field compactDisplay boolean
 
 --- @class BaseTournamentsListing
 --- @field config BaseTournamentsListingConfig
@@ -123,6 +124,7 @@ function BaseTournamentsListing:readConfig()
 		allowedPlacements = self:_allowedPlacements(),
 		dynamicPlacements = Logic.readBool(args.dynamicPlacements),
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
+		compactDisplay = Logic.readBool(args.compactDisplay),
 	}
 end
 
@@ -240,8 +242,12 @@ function BaseTournamentsListing:_header()
 	header
 		:tag('div'):addClass('gridCell'):wikitext('Date'):done()
 		:tag('div'):addClass('gridCell Prize'):wikitext('Prize' .. NONBREAKING_SPACE .. 'Pool'):done()
-		:tag('div'):addClass('gridCell'):wikitext('Location'):done()
-		:tag('div'):addClass('gridCell'):wikitext(Abbreviation.make{text = 'P#', title = 'Number of Participants'})
+
+	if not config.compactDisplay then
+		header
+			:tag('div'):addClass('gridCell'):wikitext('Location'):done()
+			:tag('div'):addClass('gridCell'):wikitext(Abbreviation.make{text = 'P#', title = 'Number of Participants'})
+	end
 
 	if config.showQualifierColumnOverWinnerRunnerup then
 		header:tag('div'):addClass('gridCell'):wikitext('Qualified')
@@ -301,7 +307,7 @@ function BaseTournamentsListing:_row(tournamentData)
 			date = tournamentData.enddate,
 		})
 		:wikitext(NONBREAKING_SPACE .. NONBREAKING_SPACE)
-		:wikitext('[[' .. tournamentData.pagename .. '|' .. tournamentData.name .. ']]')
+		:wikitext('[[' .. tournamentData.pagename .. '|' ..  config.compactDisplay and tournamentData.shortname or tournamentData.name .. ']]')
 		:cssText(status == CANCELLED and 'text-decoration:line-through;' or nil)
 
 	if config.showOrganizer then
@@ -336,19 +342,22 @@ function BaseTournamentsListing:_row(tournamentData)
 			:addClass('Blank')
 	end
 
-	row:tag('div')
-		:addClass('gridCell EventDetails Location Header')
-		:wikitext(BaseTournamentsListing._displayLocations(tournamentData.locations or {}, tournamentData.type))
+	if not config.compactDisplay then
+		row:tag('div')
+			:addClass('gridCell EventDetails Location Header')
+			:wikitext(BaseTournamentsListing._displayLocations(tournamentData.locations or {}, tournamentData.type))
 
-	local participantsNumberCell = row:tag('div')
-		:addClass('gridCell EventDetails PlayerNumber Header')
-	if participantNumber ~= -1 then
-		participantsNumberCell:node(BaseTournamentsListing.participantsNumber(participantNumber))
-	else
-		participantsNumberCell
-			:wikitext('-')
-			:addClass(not config.showTier and prizeValue == 0 and 'Blank' or nil)
+		local participantsNumberCell = row:tag('div')
+			:addClass('gridCell EventDetails PlayerNumber Header')
+		if participantNumber ~= -1 then
+			participantsNumberCell:node(BaseTournamentsListing.participantsNumber(participantNumber))
+		else
+			participantsNumberCell
+				:wikitext('-')
+				:addClass(not config.showTier and prizeValue == 0 and 'Blank' or nil)
+		end
 	end
+
 
 	if status == CANCELLED then
 		row:tag('div')
