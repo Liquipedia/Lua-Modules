@@ -21,6 +21,11 @@ local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Tabs = {}
+local VALID_VARIANTS = {
+	'horizontal',
+	'vertical',
+	'icon-only',
+}
 
 ---Creates static tabs.
 ---Entry point of Template:Tabs static
@@ -89,15 +94,15 @@ function Tabs.dynamic(args)
 	end
 
 	local variant = args.variant or 'horizontal'
-	local validVariants = {horizontal = true, vertical = true, ['icon-only'] = true}
 	assert(
-		validVariants[variant],
-		'Invalid variant "' .. variant .. '". Allowed values are: horizontal, vertical, icon-only'
+		Table.includes(VALID_VARIANTS, variant),
+		'Invalid variant "' .. variant .. '". Allowed values are: ' .. table.concat(VALID_VARIANTS, ', ')
 	)
 
 	local hasIcon = Array.any(tabArgs, function(tab) return Logic.isNotEmpty(tab.icon) end)
 	local allHaveIcon = Array.all(tabArgs, function(tab) return Logic.isNotEmpty(tab.icon) end)
 
+	-- Design decision: mixed icon and non-icon tab toggles are not supported.
 	assert(not hasIcon or allHaveIcon, 'If one tab has an icon, all tabs must have icons')
 	if variant == 'icon-only' then
 		assert(allHaveIcon, 'The "icon-only" variant requires all tabs to have icons')
@@ -107,26 +112,22 @@ function Tabs.dynamic(args)
 
 	local navTabs = HtmlWidgets.Ul{
 		classes = {'nav', 'nav-tabs', 'tabs', 'tabs' .. tabCount},
-		children = Array.map(tabArgs, function(tabData, tabIndex)
-			local children = {}
-			if tabData.icon then
-				table.insert(children, Icon{iconName = tabData.icon})
-			end
-			table.insert(children, HtmlWidgets.Span{children = {tabData.name}})
-
-			return HtmlWidgets.Li{
-				classes = {'tab' .. tabIndex, tabData.this and 'active' or nil},
-				children = children
-			}
-		end)
+		children = WidgetUtil.collect(
+			Array.map(tabArgs, function(tabData, tabIndex)
+				return HtmlWidgets.Li{
+					classes = {'tab' .. tabIndex, tabData.this and 'active' or nil},
+					children = WidgetUtil.collect(
+						tabData.icon and Icon{iconName = tabData.icon} or nil,
+						HtmlWidgets.Span{children = {tabData.name}}
+					)
+				}
+			end),
+			not Logic.nilOr(Logic.readBoolOrNil(args['hide-showall']), isSingular) and HtmlWidgets.Li{
+				classes = {'show-all'},
+				children = {HtmlWidgets.Span{children = {'Show All'}}}
+			} or nil
+		)
 	}
-
-	if not Logic.nilOr(Logic.readBoolOrNil(args['hide-showall']), isSingular) then
-		table.insert(navTabs.props.children, HtmlWidgets.Li{
-			classes = {'show-all'},
-			children = {HtmlWidgets.Span{children = {'Show All'}}}
-		})
-	end
 
 	local contentChildren = {}
 
@@ -307,7 +308,7 @@ function Tabs._single(tab, showHeader)
 	return HtmlWidgets.Fragment{
 		children = {
 			showHeader and HtmlWidgets.H6{children = {tab.name}} or nil,
-			'\n',
+			showHeader and '\n' or nil,
 			tab.content
 		}
 	}
