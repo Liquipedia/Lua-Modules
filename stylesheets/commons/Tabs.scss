@@ -84,7 +84,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		}
 	}
 
-	.nav-tabs {
+	.tabs-nav-wrapper .nav-tabs {
 		flex-wrap: nowrap;
 		overflow-x: auto;
 		scrollbar-width: none;
@@ -192,7 +192,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 	}
 
 	&.tabs-variant-vertical {
-		.nav-tabs li a {
+		.tabs-nav-wrapper .nav-tabs li a {
 			flex-direction: column;
 			justify-content: center;
 			gap: 0.25rem;
@@ -202,7 +202,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 	}
 
 	&.tabs-variant-icon-only {
-		.nav-tabs li {
+		.tabs-nav-wrapper .nav-tabs li {
 			width: 2.75rem;
 
 			a {
@@ -214,7 +214,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			}
 		}
 
-		.nav-tabs li.show-all {
+		.tabs-nav-wrapper .nav-tabs li.show-all {
 			width: auto;
 
 			a {
@@ -234,7 +234,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			margin-left: 0.75rem;
 		}
 
-		.nav-tabs li {
+		.tabs-nav-wrapper .nav-tabs li {
 			min-height: 2.25rem;
 
 			a {
@@ -245,7 +245,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 
 		// Nested tabs cannot be vertical - force them to horizontal
 		&.tabs-variant-vertical {
-			.nav-tabs li a {
+			.tabs-nav-wrapper .nav-tabs li a {
 				flex-direction: row;
 				gap: 0.5rem;
 				padding: $tabs-nav-padding-nested;
@@ -253,7 +253,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		}
 
 		&.tabs-variant-icon-only {
-			.nav-tabs li {
+			.tabs-nav-wrapper .nav-tabs li {
 				width: 2.25rem;
 
 				a {
@@ -262,7 +262,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				}
 			}
 
-			.nav-tabs li.show-all {
+			.tabs-nav-wrapper .nav-tabs li.show-all {
 				width: auto;
 				height: 2.25rem;
 
