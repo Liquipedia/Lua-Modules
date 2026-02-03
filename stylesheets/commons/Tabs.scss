@@ -365,7 +365,11 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				background-color: var( --clr-background );
 
 				.selflink {
-					background-color: var( --clr-background ) !important;
+					background-color: unset !important;
+				}
+
+				a {
+					background-color: unset !important;
 				}
 			}
 		}
