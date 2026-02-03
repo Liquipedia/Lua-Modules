@@ -261,6 +261,16 @@ html.client-nojs .tabs-content > div:not( .active ) {
 					padding: 0;
 				}
 			}
+
+			.nav-tabs li.show-all {
+				width: auto;
+				height: 2.25rem;
+
+				a {
+					width: auto;
+					padding: $tabs-nav-padding;
+				}
+			}
 		}
 
 		.tabs-content {
