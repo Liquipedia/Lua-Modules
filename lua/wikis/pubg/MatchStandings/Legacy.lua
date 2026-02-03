@@ -27,11 +27,12 @@ function MatchStandingsLegacy.run(frame)
 	MatchStandingsLegacy.readBackground(args)
 
 	Variables.varDefine('islegacy', '')
-	return MatchGroup.MatchList(Json.stringifySubTables{
+	return MatchGroup.Bracket(Json.stringifySubTables{
+		[1] = 'Bracket/2',
 		isLegacy = true,
 		id = Table.extract(args, 'id'),
-		M1header = Table.extract(args, 'title'),
-		M1 = args
+		R1M1header = Table.extract(args, 'title'),
+		R1M1 = args
 	})
 end
 
