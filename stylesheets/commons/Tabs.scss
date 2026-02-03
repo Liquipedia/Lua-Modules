@@ -65,6 +65,58 @@ html.client-nojs .tabs-content > div:not( .active ) {
 .tabs-dynamic {
 	overflow: visible;
 
+	&.tabs-hybrid {
+		& > .tabs-content {
+			border: 2px solid;
+			border-top: 0;
+			padding: 0.3125rem;
+		}
+
+		.tabs-nav-wrapper {
+			border-bottom: 0;
+		}
+
+		.nav-tabs {
+			border: 0 !important;
+			overflow-x: visible;
+		}
+
+		.tabs-scroll-arrow-wrapper {
+			display: none !important;
+		}
+
+		.nav-tabs li {
+			border: 2px solid !important;
+			border-bottom: 0 !important;
+			min-height: 0;
+		}
+
+		.nav-tabs li a {
+			display: block;
+			padding: 0.3125rem 0.625rem;
+			line-height: 1.42857143;
+			border: 1px solid transparent !important;
+			border-radius: 0;
+			font-weight: normal;
+		}
+
+		.nav-tabs li.active a {
+			&::after {
+				content: none;
+			}
+
+			.theme--light & {
+				background-color: #ffffff !important;
+				color: $tabs-text-active-light !important;
+			}
+
+			.theme--dark & {
+				background-color: $tabs-bg-active-dark !important;
+				color: $tabs-text-active-dark !important;
+			}
+		}
+	}
+
 	& > .tabs-content {
 		border: unset !important;
 		padding: 0.5rem 0 0 0.5rem;

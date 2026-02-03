@@ -78,6 +78,8 @@ function Tabs.dynamic(args)
 	local tabCount = #tabArgs
 	if tabCount == 0 then return end
 
+	local hybridTabs = Logic.readBool(args['hybrid-tabs'])
+
 	local hasContent = Array.all(tabArgs, function(tab)
 		return Logic.isNotEmpty(tab.content) end)
 	local allEmpty = Array.all(tabArgs, function(tab)
@@ -143,7 +145,7 @@ function Tabs.dynamic(args)
 
 	local contents = Tabs._buildContentDiv(
 		hasContent,
-		Logic.readBool(args['hybrid-tabs']),
+		hybridTabs,
 		Logic.readBool(args['no-padding']),
 		contentChildren
 	)
@@ -190,14 +192,15 @@ function Tabs.dynamic(args)
 	}
 
 	if not hasContent then
-		local startTag = '<div class="tabs-dynamic navigation-not-searchable ' .. variantClass .. '" data-nosnippet>\n'
+		local startTag = '<div class="tabs-dynamic navigation-not-searchable ' .. variantClass
+			.. (hybridTabs and ' tabs-hybrid' or '') .. '" data-nosnippet>\n'
 		return startTag .. tostring(navWrapper) .. (contents --[[@as string]])
 	end
 
 	return AnalyticsWidgets{
 		analyticsName = 'Dynamic Navigation tab',
 		children = HtmlWidgets.Div{
-			classes = {'tabs-dynamic', 'navigation-not-searchable', variantClass},
+			classes = {'tabs-dynamic', 'navigation-not-searchable', variantClass, hybridTabs and 'tabs-hybrid' or nil},
 			attributes = {['data-nosnippet'] = ''},
 			children = {
 				navWrapper,
