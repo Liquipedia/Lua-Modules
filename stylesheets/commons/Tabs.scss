@@ -42,7 +42,7 @@ $tabs-bg-hover-dark: var( --clr-on-surface-dark-primary-8 );
 		display: none;
 	}
 
-	div {
+	& > div {
 		overflow: auto hidden;
 	}
 
