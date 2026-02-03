@@ -362,7 +362,11 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			}
 
 			&.active {
-				background-color: #ffffff;
+				background-color: var( --clr-background );
+
+				.selflink {
+					background-color: var( --clr-background ) !important;
+				}
 			}
 		}
 	}
