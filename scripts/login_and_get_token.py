@@ -3,6 +3,8 @@ import os
 
 import aiohttp
 
+__all__ = ["USER_AGENT", "WIKI_BASE_URL" "get_token"]
+
 USER_AGENT = f"GitHub Autodeploy Bot/1.1.0 ({ os.getenv("WIKI_UA_EMAIL") })"
 WIKI_BASE_URL = os.getenv("WIKI_BASE_URL")
 WIKI_USER = os.getenv("WIKI_USER")
@@ -23,7 +25,7 @@ async def login(wiki: str):
             cookie_jar.load(ckf)
         print(f"...logging in on { wiki }")
         async with aiohttp.ClientSession(
-            WIKI_BASE_URL + "/",
+            f"{WIKI_BASE_URL}/{wiki}/",
             headers={"User-Agent": USER_AGENT, "Accept-Encoding": "gzip"},
             cookie_jar=cookie_jar,
         ) as session:
@@ -54,7 +56,7 @@ async def login(wiki: str):
         loggedin_lock.release()
 
 
-async def get_token(wiki: str):
+async def get_token(wiki: str) -> str:
     await login(wiki)
 
     ckf = f"cookie_{wiki}.ck"
@@ -62,7 +64,7 @@ async def get_token(wiki: str):
     if os.path.exists(ckf):
         cookie_jar.load(ckf)
     async with aiohttp.ClientSession(
-        WIKI_BASE_URL + "/",
+        f"{WIKI_BASE_URL}/{wiki}/",
         headers={"User-Agent": USER_AGENT, "Accept-Encoding": "gzip"},
         cookie_jar=cookie_jar,
     ) as session:
