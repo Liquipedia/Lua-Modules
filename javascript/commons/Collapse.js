@@ -3,6 +3,7 @@
  * Author(s): FO-nTTaX
  ******************************************************************************/
 liquipedia.collapse = {
+	layoutUpdateScheduled: false,
 	init: function() {
 		document.querySelectorAll( '#mw-content-text .collapsible' ).forEach( ( table, index ) => {
 			if ( table.classList.contains( 'autocollapse' ) && index >= 1 ) {
@@ -16,6 +17,21 @@ liquipedia.collapse = {
 		liquipedia.collapse.setupDropdownBox();
 		liquipedia.collapse.setupCollapsibleNavFrameButtons();
 		liquipedia.collapse.setupSwitchToggleCollapsibles();
+	},
+
+	scheduleLayoutUpdate: function() {
+		if ( liquipedia.collapse.layoutUpdateScheduled ) {
+			return;
+		}
+		liquipedia.collapse.layoutUpdateScheduled = true;
+
+		const requestFrame = window.requestAnimationFrame || ( ( cb ) => setTimeout( cb, 0 ) );
+		requestFrame( () => {
+			liquipedia.collapse.layoutUpdateScheduled = false;
+			if ( liquipedia.carousel && typeof liquipedia.carousel.handleResize === 'function' ) {
+				liquipedia.carousel.handleResize();
+			}
+		} );
 	},
 	makeIcon: function( isShow ) {
 		return isShow ? '<span class="far fa-eye"></span>' : '<span class="far fa-eye-slash"></span>';
@@ -91,6 +107,7 @@ liquipedia.collapse = {
 				const anchor = replaceWithAnchor( expandButton );
 				anchor.addEventListener( 'click', ( event ) => {
 					collapsible.classList.remove( 'collapsed' );
+					liquipedia.collapse.scheduleLayoutUpdate();
 					event.preventDefault();
 				} );
 			}
@@ -99,6 +116,7 @@ liquipedia.collapse = {
 				const anchor = replaceWithAnchor( collapseButton );
 				anchor.addEventListener( 'click', ( event ) => {
 					collapsible.classList.add( 'collapsed' );
+					liquipedia.collapse.scheduleLayoutUpdate();
 					event.preventDefault();
 				} );
 			}
@@ -125,6 +143,7 @@ liquipedia.collapse = {
 				if ( collapsible ) {
 					event.preventDefault();
 					collapsible.classList.toggle( 'collapsed' );
+					liquipedia.collapse.scheduleLayoutUpdate();
 				}
 			} );
 		} );
@@ -254,6 +273,8 @@ liquipedia.collapse = {
 		elements.forEach( ( element ) => {
 			element.classList.toggle( 'collapsed', !show );
 		} );
+
+		liquipedia.collapse.scheduleLayoutUpdate();
 	}
 };
 
