@@ -31,7 +31,7 @@ jobs:
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
           DEPLOY_TRIGGER: ${{ github.event_name }}
-        run: python3 scripts/deploy_res.py
+        run: python3 ./scripts/deploy_res.py
 
       - name: Lua Deploy
         env:
@@ -40,4 +40,4 @@ jobs:
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
           DEPLOY_TRIGGER: ${{ github.event_name }}
-        run: python3 scripts/deploy.py
+        run: python3 ./scripts/deploy.py

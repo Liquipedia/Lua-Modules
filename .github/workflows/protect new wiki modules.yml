@@ -32,4 +32,4 @@ jobs:
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
           WIKI_TO_PROTECT: ${{ github.event.inputs.wiki }}
-        run: python3 scripts/protect.py
+        run: python3 ./scripts/protect.py
