@@ -1,3 +1,4 @@
+import functools
 import http.cookiejar
 import os
 import time
@@ -53,6 +54,7 @@ def login(wiki: str):
         time.sleep(4)
 
 
+@functools.cache
 def get_token(wiki: str) -> str:
     login(wiki)
 
