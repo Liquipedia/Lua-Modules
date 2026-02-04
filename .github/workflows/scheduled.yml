@@ -15,6 +15,15 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+          cache: 'pip'
+
+      - name: Install Python Dependency
+        run: pip install requests
+
       - name: Resource Deploy
         env:
           WIKI_USER: ${{ secrets.LP_BOTUSER }}
@@ -22,7 +31,7 @@ jobs:
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
           DEPLOY_TRIGGER: ${{ github.event_name }}
-        run: bash scripts/deploy_res.sh
+        run: python3 scripts/deploy_res.py
 
       - name: Lua Deploy
         env:
@@ -31,4 +40,4 @@ jobs:
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
           DEPLOY_TRIGGER: ${{ github.event_name }}
-        run: bash scripts/deploy.sh
+        run: python3 scripts/deploy.py
