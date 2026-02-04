@@ -29,46 +29,46 @@ return {
 
 		-- Dates: Only startYear known
 		['date-range-year'] = '${startYear}',
-		['date-range-year--unknown'] = '${startYear} - TBA',
-		['date-range-year--year'] = '${startYear} - ${endYear}',
+		['date-range-year--unknown'] = '${startYear} – TBA',
+		['date-range-year--year'] = '${startYear}–${endYear}',
 
 		-- Dates: Only startYear, startMonth known
 		['date-range-year-month'] = '${startMonth}, ${startYear}',
-		['date-range-year-month--unknown'] = '${startMonth}, ${startYear} - TBA',
-		['date-range-year-month--year-unknown_month'] = '${startMonth}, ${startYear} - TBA, ${endYear}',
-		['date-range-year-month--month'] = '${startMonth} - ${endMonth}, ${startYear}',
-		['date-range-year-month--year-month'] = '${startMonth}, ${startYear} - ${endMonth}, ${endYear}',
+		['date-range-year-month--unknown'] = '${startMonth}, ${startYear} – TBA',
+		['date-range-year-month--year-unknown_month'] = '${startMonth}, ${startYear} – TBA, ${endYear}',
+		['date-range-year-month--month'] = '${startMonth} – ${endMonth}, ${startYear}',
+		['date-range-year-month--year-month'] = '${startMonth}, ${startYear} – ${endMonth}, ${endYear}',
 
-		['date-range-year-month--unknown_month'] = '${startMonth} - TBA, ${startYear}',
+		['date-range-year-month--unknown_month'] = '${startMonth} – TBA, ${startYear}',
 
 		-- Dates: Full startdate known
 		['date-range-year-month-day'] = '${startMonth} ${startDate}, ${startYear}',
-		['date-range-year-month-day--unknown'] = '${startMonth} ${startDate}, ${startYear} - TBA',
-		['date-range-year-month-day--year-unknown_month'] = '${startMonth} ${startDate}, ${startYear} - TBA, ${endYear}',
+		['date-range-year-month-day--unknown'] = '${startMonth} ${startDate}, ${startYear} – TBA',
+		['date-range-year-month-day--year-unknown_month'] = '${startMonth} ${startDate}, ${startYear} – TBA, ${endYear}',
 		['date-range-year-month-day--year-month-unknown_day']
-				= '${startMonth} ${startDate}, ${startYear} - ${endMonth} TBA, ${endYear}',
+				= '${startMonth} ${startDate}, ${startYear} – ${endMonth} TBA, ${endYear}',
 		['date-range-year-month-day--year-month-day']
-				= '${startMonth} ${startDate}, ${startYear} - ${endMonth} ${endDate}, ${endYear}',
+				= '${startMonth} ${startDate}, ${startYear} – ${endMonth} ${endDate}, ${endYear}',
 
-		['date-range-year-month-day--month-day'] = '${startMonth} ${startDate} - ${endMonth} ${endDate}, ${startYear}',
-		['date-range-year-month-day--month-unknown_day'] = '${startMonth} ${startDate} - ${endMonth} TBA, ${startYear}',
-		['date-range-year-month-day--day'] = '${startMonth} ${startDate} - ${endDate}, ${startYear}',
+		['date-range-year-month-day--month-day'] = '${startMonth} ${startDate} – ${endMonth} ${endDate}, ${startYear}',
+		['date-range-year-month-day--month-unknown_day'] = '${startMonth} ${startDate} – ${endMonth} TBA, ${startYear}',
+		['date-range-year-month-day--day'] = '${startMonth} ${startDate}–${endDate}, ${startYear}',
 
 		-- Dates: ticker variant (hidden years)
 		-- startMonth known
 		['date-range-month'] = '${startMonth}',
-		['date-range-month--unknown'] = '${startMonth} - TBA',
-		['date-range-month--unknown_month'] = '${startMonth} - TBA',
-		['date-range-month--month'] = '${startMonth} - ${endMonth}',
+		['date-range-month--unknown'] = '${startMonth} – TBA',
+		['date-range-month--unknown_month'] = '${startMonth} – TBA',
+		['date-range-month--month'] = '${startMonth} – ${endMonth}',
 
 		-- startMonth and startDay known
 		['date-range-month-day'] = '${startMonth} ${startDate}',
-		['date-range-month-day--day'] = '${startMonth} ${startDate} - ${endDate}',
+		['date-range-month-day--day'] = '${startMonth} ${startDate}–${endDate}',
 
-		['date-range-month-day--unknown'] = '${startMonth} ${startDate} - TBA',
-		['date-range-month-day--unknown_month'] = '${startMonth} ${startDate} - TBA',
-		['date-range-month-day--month-unknown_day'] = '${startMonth} ${startDate} - ${endMonth} TBA',
-		['date-range-month-day--month-day'] = '${startMonth} ${startDate} - ${endMonth} ${endDate}',
+		['date-range-month-day--unknown'] = '${startMonth} ${startDate} – TBA',
+		['date-range-month-day--unknown_month'] = '${startMonth} ${startDate} – TBA',
+		['date-range-month-day--month-unknown_day'] = '${startMonth} ${startDate} – ${endMonth} TBA',
+		['date-range-month-day--month-day'] = '${startMonth} ${startDate} – ${endMonth} ${endDate}',
 
 		-- Bracket Headers
 		['brkts-header-r1'] = 'Grand Final,Final,GF',
