@@ -1,52 +1,31 @@
-import http.cookiejar
 import itertools
 import os
 import pathlib
 import re
 import sys
-import subprocess
 import time
 
 from typing import Iterable
 
 import requests
 
+from deploy_util import *
 from login_and_get_token import *
 
-DEPLOY_TRIGGER = os.getenv("DEPLOY_TRIGGER")
 HEADER_PATTERN = re.compile(
     r"\A---\n" r"-- @Liquipedia\n" r"-- page=(?P<pageName>[^\n]*)\n"
 )
-GITHUB_STEP_SUMMARY_FILE = os.getenv("GITHUB_STEP_SUMMARY")
 
 
 all_modules_deployed: bool = True
-
-
-def write_to_github_summary_file(text: str):
-    if not GITHUB_STEP_SUMMARY_FILE:
-        return
-    with open(GITHUB_STEP_SUMMARY_FILE, "a") as summary:
-        summary.write(f"{text}\n")
-
-
-def read_file_from_path(file_path: pathlib.Path) -> str:
-    with file_path.open("r") as file:
-        return file.read()
 
 
 def deploy_all_files_for_wiki(
     wiki: str, file_paths: Iterable[pathlib.Path], deploy_reason: str
 ):
     token = get_token(wiki)
-    ckf = f"cookie_{wiki}.ck"
-    cookie_jar = http.cookiejar.LWPCookieJar(filename=ckf)
-    try:
-        cookie_jar.load(ignore_discard=True)
-    except:
-        pass
     with requests.Session() as session:
-        session.cookies = cookie_jar
+        session.cookies = read_cookie_jar(wiki)
         for file_path in file_paths:
             print(f"::group::Checking {str(file_path)}")
             file_content = read_file_from_path(file_path)
@@ -59,17 +38,13 @@ def deploy_all_files_for_wiki(
                     os.getenv("LUA_DEV_ENV_NAME") or ""
                 )
                 response = session.post(
-                    f"{WIKI_BASE_URL}/{wiki}/api.php",
-                    headers={
-                        "User-Agent": USER_AGENT,
-                        "accept": "application/json",
-                        "Accept-Encoding": "gzip",
-                    },
+                    get_wiki_api_url(wiki),
+                    headers=HEADER,
                     params={"format": "json", "action": "edit"},
                     data={
                         "title": page,
                         "text": file_content,
-                        "summary": f"Git: {deploy_reason.strip()}",
+                        "summary": f"Git: {deploy_reason}",
                         "bot": "true",
                         "recreate": "true",
                         "token": token,
@@ -104,9 +79,7 @@ def main():
         git_deploy_reason = "Automated Weekly Re-Sync"
     else:
         lua_files = [pathlib.Path(arg) for arg in sys.argv[1:]]
-        git_deploy_reason = subprocess.check_output(
-            ["git", "log", "-1", "--pretty='%h %s'"]
-        ).decode()
+        git_deploy_reason = get_git_deploy_reason()
 
     for wiki, files in itertools.groupby(lua_files, lambda path: path.parts[2]):
         deploy_all_files_for_wiki(wiki, list(files), git_deploy_reason)

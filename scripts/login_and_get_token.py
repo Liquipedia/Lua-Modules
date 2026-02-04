@@ -1,14 +1,13 @@
 import functools
-import http.cookiejar
 import os
 import time
 
 import requests
 
-__all__ = ["USER_AGENT", "WIKI_BASE_URL", "get_token"]
+from deploy_util import *
 
-USER_AGENT = f"GitHub Autodeploy Bot/1.1.0 ({ os.getenv("WIKI_UA_EMAIL") })"
-WIKI_BASE_URL = os.getenv("WIKI_BASE_URL")
+__all__ = ["get_token"]
+
 WIKI_USER = os.getenv("WIKI_USER")
 WIKI_PASSWORD = os.getenv("WIKI_PASSWORD")
 
@@ -18,19 +17,13 @@ loggedin: set[str] = set()
 def login(wiki: str):
     if wiki in loggedin:
         return
-    ckf = f"cookie_{wiki}.ck"
-    cookie_jar = http.cookiejar.LWPCookieJar(filename=ckf)
-    try:
-        cookie_jar.load(ignore_discard=True)
-    except:
-        pass
+    cookie_jar = read_cookie_jar(wiki)
     print(f"...logging in on { wiki }")
     with requests.Session() as session:
         session.cookies = cookie_jar
         token_response = session.post(
-            f"{WIKI_BASE_URL}/{wiki}/api.php",
-            headers={"User-Agent": USER_AGENT, "Accept-Encoding": "gzip"},
-            cookies=cookie_jar,
+            get_wiki_api_url(wiki),
+            headers=HEADER,
             params={
                 "format": "json",
                 "action": "query",
@@ -39,9 +32,8 @@ def login(wiki: str):
             },
         ).json()
         session.post(
-            f"{WIKI_BASE_URL}/{wiki}/api.php",
-            headers={"User-Agent": USER_AGENT, "Accept-Encoding": "gzip"},
-            cookies=cookie_jar,
+            get_wiki_api_url(wiki),
+            headers=HEADER,
             data={
                 "lgname": WIKI_USER,
                 "lgpassword": WIKI_PASSWORD,
@@ -58,18 +50,11 @@ def login(wiki: str):
 def get_token(wiki: str) -> str:
     login(wiki)
 
-    ckf = f"cookie_{wiki}.ck"
-    cookie_jar = http.cookiejar.LWPCookieJar(filename=ckf)
-    try:
-        cookie_jar.load(ignore_discard=True)
-    except:
-        pass
     with requests.Session() as session:
-        session.cookies = cookie_jar
+        session.cookies = read_cookie_jar(wiki)
         token_response = session.post(
-            f"{WIKI_BASE_URL}/{wiki}/api.php",
-            headers={"User-Agent": USER_AGENT, "Accept-Encoding": "gzip"},
-            cookies=cookie_jar,
+            get_wiki_api_url(wiki),
+            headers=HEADER,
             params={
                 "format": "json",
                 "action": "query",
