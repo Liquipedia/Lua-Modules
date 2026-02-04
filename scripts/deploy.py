@@ -106,16 +106,19 @@ async def async_main():
             ["git", "log", "-1", "--pretty='%h %s'"]
         ).decode()
 
-    deploy_tasks: list[asyncio.Task] = list()
+    # # Asynchronous deploy is disabled due to rate limit
+    # deploy_tasks: list[asyncio.Task] = list()
+    # for wiki, files in itertools.groupby(lua_files, lambda path: path.parts[2]):
+    #     deploy_tasks.append(
+    #         asyncio.Task(
+    #             deploy_all_files_for_wiki(wiki, list(files), git_deploy_reason)
+    #         )
+    #     )
+    # await asyncio.wait(deploy_tasks)
 
     for wiki, files in itertools.groupby(lua_files, lambda path: path.parts[2]):
-        deploy_tasks.append(
-            asyncio.Task(
-                deploy_all_files_for_wiki(wiki, list(files), git_deploy_reason)
-            )
-        )
+        await deploy_all_files_for_wiki(wiki, list(files), git_deploy_reason)
 
-    await asyncio.wait(deploy_tasks)
     if not all_modules_deployed:
         print("::warning::Some modules were not deployed!")
         sys.exit(1)
