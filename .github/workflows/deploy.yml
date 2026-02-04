@@ -34,7 +34,7 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: '3.14'
-          cache: 'pip'
+
 
       - name: Install Python Dependency
         if: steps.res-changed-files.outputs.any_changed == 'true' || steps.lua-changed-files.outputs.any_changed == 'true'
