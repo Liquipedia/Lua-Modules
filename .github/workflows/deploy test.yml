@@ -46,4 +46,4 @@ jobs:
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
           LUA_DEV_ENV_NAME: "/dev/${{ github.event.inputs.luadevenv }}"
-        run: python3 scripts/deploy.py ${{ steps.changed-files.outputs.all_changed_files }}
+        run: python3 ./scripts/deploy.py ${{ steps.changed-files.outputs.all_changed_files }}
