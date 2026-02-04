@@ -361,8 +361,10 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 				.team-template-image-icon,
 				.league-icon-small-image {
 					& > a {
+						height: 100%;
 						display: flex;
 						justify-content: center;
+						align-items: center;
 					}
 
 					@include set-participant-icon-size(
