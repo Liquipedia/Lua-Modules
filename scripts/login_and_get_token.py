@@ -1,7 +1,8 @@
-import asyncio
+import http.cookiejar
 import os
+import time
 
-import aiohttp
+import requests
 
 __all__ = ["USER_AGENT", "WIKI_BASE_URL", "get_token"]
 
@@ -11,70 +12,66 @@ WIKI_USER = os.getenv("WIKI_USER")
 WIKI_PASSWORD = os.getenv("WIKI_PASSWORD")
 
 loggedin: set[str] = set()
-loggedin_lock = asyncio.Lock()
 
 
-async def login(wiki: str):
-    await loggedin_lock.acquire()
+def login(wiki: str):
+    if wiki in loggedin:
+        return
+    ckf = f"cookie_{wiki}.ck"
+    cookie_jar = http.cookiejar.LWPCookieJar(filename=ckf)
     try:
-        if wiki in loggedin:
-            return
-        ckf = f"cookie_{wiki}.ck"
-        cookie_jar = aiohttp.CookieJar()
-        if os.path.exists(ckf):
-            cookie_jar.load(ckf)
-        print(f"...logging in on { wiki }")
-        async with aiohttp.ClientSession(
-            f"{WIKI_BASE_URL}/{wiki}/",
+        cookie_jar.load(ignore_discard=True)
+    except:
+        pass
+    print(f"...logging in on { wiki }")
+    with requests.Session() as session:
+        session.cookies = cookie_jar
+        token_response = session.post(
+            f"{WIKI_BASE_URL}/{wiki}/api.php",
             headers={"User-Agent": USER_AGENT, "Accept-Encoding": "gzip"},
-            cookie_jar=cookie_jar,
-        ) as session:
-            token_response = await session.post(
-                "api.php",
-                params={
-                    "format": "json",
-                    "action": "query",
-                    "meta": "tokens",
-                    "type": "login",
-                },
-            )
-            response = await token_response.json()
-            await session.post(
-                "api.php",
-                data={
-                    "lgname": WIKI_USER,
-                    "lgpassword": WIKI_PASSWORD,
-                    "lgtoken": response["query"]["tokens"]["logintoken"],
-                },
-                params={"format": "json", "action": "login"},
-            )
-            loggedin.add(wiki)
-            cookie_jar.save(ckf)
-            await asyncio.sleep(4)
-
-    finally:
-        loggedin_lock.release()
+            cookies=cookie_jar,
+            params={
+                "format": "json",
+                "action": "query",
+                "meta": "tokens",
+                "type": "login",
+            },
+        ).json()
+        session.post(
+            f"{WIKI_BASE_URL}/{wiki}/api.php",
+            headers={"User-Agent": USER_AGENT, "Accept-Encoding": "gzip"},
+            cookies=cookie_jar,
+            data={
+                "lgname": WIKI_USER,
+                "lgpassword": WIKI_PASSWORD,
+                "lgtoken": token_response["query"]["tokens"]["logintoken"],
+            },
+            params={"format": "json", "action": "login"},
+        )
+        loggedin.add(wiki)
+        cookie_jar.save(ignore_discard=True)
+        time.sleep(4)
 
 
-async def get_token(wiki: str) -> str:
-    await login(wiki)
+def get_token(wiki: str) -> str:
+    login(wiki)
 
     ckf = f"cookie_{wiki}.ck"
-    cookie_jar = aiohttp.CookieJar()
-    if os.path.exists(ckf):
-        cookie_jar.load(ckf)
-    async with aiohttp.ClientSession(
-        f"{WIKI_BASE_URL}/{wiki}/",
-        headers={"User-Agent": USER_AGENT, "Accept-Encoding": "gzip"},
-        cookie_jar=cookie_jar,
-    ) as session:
-        token_response = await session.post(
-            "api.php",
+    cookie_jar = http.cookiejar.LWPCookieJar(filename=ckf)
+    try:
+        cookie_jar.load(ignore_discard=True)
+    except:
+        pass
+    with requests.Session() as session:
+        session.cookies = cookie_jar
+        token_response = session.post(
+            f"{WIKI_BASE_URL}/{wiki}/api.php",
+            headers={"User-Agent": USER_AGENT, "Accept-Encoding": "gzip"},
+            cookies=cookie_jar,
             params={
                 "format": "json",
                 "action": "query",
                 "meta": "tokens",
             },
-        )
-        response = await token_response.json()
-        return response["query"]["tokens"]["csrftoken"]
+        ).json()
+        return token_response["query"]["tokens"]["csrftoken"]
