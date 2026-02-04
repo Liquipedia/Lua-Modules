@@ -91,6 +91,7 @@ async def deploy_all_files_for_wiki(
                 await asyncio.sleep(4)
             output.append("::endgroup::")
             print("\n".join(output))
+    await session.close()
 
 
 async def async_main():
