@@ -17,7 +17,6 @@ liquipedia.collapse = {
 		liquipedia.collapse.setupCollapsibleNavFrameButtons();
 		liquipedia.collapse.setupSwitchToggleCollapsibles();
 	},
-
 	makeIcon: function( isShow ) {
 		return isShow ? '<span class="far fa-eye"></span>' : '<span class="far fa-eye-slash"></span>';
 	},
