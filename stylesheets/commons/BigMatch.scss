@@ -334,6 +334,7 @@ span.slash {
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-on-surface-dark-primary-8 );
 		color-scheme: dark;
+		--carousel-fade-color: var( --clr-secondary-16, var( --clr-background, #121212 ) );
 	}
 
 	&-content {
