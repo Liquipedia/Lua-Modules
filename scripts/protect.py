@@ -52,4 +52,5 @@ def main():
     handle_protect_errors()
 
 
-main()
+if __name__ == "__main__":
+    main()
