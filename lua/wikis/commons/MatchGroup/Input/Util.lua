@@ -89,6 +89,7 @@ MatchGroupInputUtil.STATUS.SCORE = 'S'
 
 MatchGroupInputUtil.MATCH_STATUS = {
 	NOT_PLAYED = 'notplayed',
+	POSTPONED = 'postponed',
 }
 
 MatchGroupInputUtil.SCORE_NOT_PLAYED = -1
@@ -618,11 +619,20 @@ end
 
 ---@param winnerInput integer|string|nil
 ---@param finishedInput string?
+---@return boolean
+function MatchGroupInputUtil.isPostponed(winnerInput, finishedInput)
+	return winnerInput == 'postponed' or finishedInput == 'postponed'
+end
+
+---@param winnerInput integer|string|nil
+---@param finishedInput string?
 ---@param opponents MGIParsedOpponent[]?
 ---@return string? #Match Status
 function MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput, opponents)
 	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
 		return MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
+	elseif MatchGroupInputUtil.isPostponed(winnerInput, finishedInput) then
+		return MatchGroupInputUtil.MATCH_STATUS.POSTPONED
 	elseif winnerInput or (not opponents) or MatchGroupInputUtil.hasSpecialStatus(opponents) then
 		return
 	elseif not MatchGroupInputUtil.hasScore(opponents) then
@@ -832,6 +842,8 @@ end
 function MatchGroupInputUtil.matchIsFinished(match, maps, opponents)
 	if MatchGroupInputUtil.isNotPlayed(match.winner, match.finished) then
 		return true
+	elseif MatchGroupInputUtil.isPostponed(match.winner, match.finished) then
+		return false
 	end
 
 	local finished = Logic.readBoolOrNil(match.finished)
@@ -1177,6 +1189,9 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
 		end)
+	elseif MatchGroupInputUtil.isPostponed(matchInput.winner, matchInput.finished) then
+		match.status = MatchGroupInputUtil.MATCH_STATUS.POSTPONED
+		match.dateexact = false
 	end
 
 	match.mode = Parser.getMode and Parser.getMode(opponents)
@@ -1426,6 +1441,9 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 		if Parser.extendOpponentIfFinished then
 			Array.forEach(opponents, FnUtil.curry(Parser.extendOpponentIfFinished, match))
 		end
+	elseif MatchGroupInputUtil.isPostponed(winnerInput, finishedInput) then
+		match.status = MatchGroupInputUtil.MATCH_STATUS.POSTPONED
+		match.dateexact = false
 	end
 
 	match.mode = Parser.getMode and Parser.getMode(opponents)
