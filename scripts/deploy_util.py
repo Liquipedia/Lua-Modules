@@ -3,12 +3,16 @@ import http.cookiejar
 import os
 import pathlib
 import subprocess
+import time
+
+import requests
 
 __all__ = [
     "DEPLOY_TRIGGER",
     "HEADER",
     "get_git_deploy_reason",
     "get_wiki_api_url",
+    "get_wikis",
     "read_cookie_jar",
     "read_file_from_path",
     "write_to_github_summary_file",
@@ -23,6 +27,16 @@ HEADER = {
     "accept": "application/json",
     "Accept-Encoding": "gzip",
 }
+
+
+def get_wikis() -> set[str]:
+    response = requests.get(
+        "https://liquipedia.net/api.php",
+        headers=HEADER,
+    )
+    wikis = response.json()
+    time.sleep(4)
+    return set(wikis["allwikis"].keys())
 
 
 @functools.cache
