@@ -1,14 +1,15 @@
-import asyncio
+import http.cookiejar
 import itertools
 import os
 import pathlib
 import re
 import sys
 import subprocess
+import time
 
 from typing import Iterable
 
-import aiohttp
+import requests
 
 from login_and_get_token import *
 
@@ -18,48 +19,52 @@ HEADER_PATTERN = re.compile(
 )
 GITHUB_STEP_SUMMARY_FILE = os.getenv("GITHUB_STEP_SUMMARY")
 
+
 all_modules_deployed: bool = True
-gh_summary_write_lock = asyncio.Lock()
 
 
-async def write_to_github_summary_file(text: str):
+def write_to_github_summary_file(text: str):
     if not GITHUB_STEP_SUMMARY_FILE:
         return
-    await gh_summary_write_lock.acquire()
-    try:
-        with open(GITHUB_STEP_SUMMARY_FILE, "a") as summary:
-            summary.write(f"{text}\n")
-    finally:
-        gh_summary_write_lock.release()
+    with open(GITHUB_STEP_SUMMARY_FILE, "a") as summary:
+        summary.write(f"{text}\n")
 
 
-async def deploy_all_files_for_wiki(
+def read_file_from_path(file_path: pathlib.Path) -> str:
+    with file_path.open("r") as file:
+        return file.read()
+
+
+def deploy_all_files_for_wiki(
     wiki: str, file_paths: Iterable[pathlib.Path], deploy_reason: str
 ):
-    token = await get_token(wiki)
+    token = get_token(wiki)
     ckf = f"cookie_{wiki}.ck"
-    cookie_jar = aiohttp.CookieJar()
-    if os.path.exists(ckf):
-        cookie_jar.load(ckf)
-    session = aiohttp.ClientSession(
-        f"{WIKI_BASE_URL}/{wiki}/",
-        headers={"User-Agent": USER_AGENT, "Accept-Encoding": "gzip"},
-        cookie_jar=cookie_jar,
-    )
-    for file_path in file_paths:
-        output: list[str] = [f"::group::Checking {str(file_path)}"]
-        with file_path.open("r") as file:
-            file_content = file.read()
+    cookie_jar = http.cookiejar.LWPCookieJar(filename=ckf)
+    try:
+        cookie_jar.load(ignore_discard=True)
+    except:
+        pass
+    with requests.Session() as session:
+        session.cookies = cookie_jar
+        for file_path in file_paths:
+            print(f"::group::Checking {str(file_path)}")
+            file_content = read_file_from_path(file_path)
             header_match = HEADER_PATTERN.match(file_content)
             if not header_match:
-                output.append("...skipping - no magic comment found")
-                await write_to_github_summary_file(f"{str(file_path)} skipped")
+                print("...skipping - no magic comment found")
+                write_to_github_summary_file(f"{str(file_path)} skipped")
             else:
                 page = header_match.groupdict()["pageName"] + (
                     os.getenv("LUA_DEV_ENV_NAME") or ""
                 )
-                response = await session.post(
-                    "api.php",
+                response = session.post(
+                    f"{WIKI_BASE_URL}/{wiki}/api.php",
+                    headers={
+                        "User-Agent": USER_AGENT,
+                        "accept": "application/json",
+                        "Accept-Encoding": "gzip",
+                    },
                     params={"format": "json", "action": "edit"},
                     data={
                         "title": page,
@@ -69,32 +74,29 @@ async def deploy_all_files_for_wiki(
                         "recreate": "true",
                         "token": token,
                     },
-                )
-                parsed_response = await response.json()
-                result = parsed_response["edit"]["result"]
+                ).json()
+                result = response["edit"]["result"]
                 if result == "Success":
-                    no_change = parsed_response["edit"]["nochange"]
+                    no_change = response["edit"]["nochange"]
                     if len(no_change) == 0 and DEPLOY_TRIGGER == "push":
-                        output.append(f"::notice file={str(file_path)}::No change made")
+                        print(f"::notice file={str(file_path)}::No change made")
                     elif len(no_change) != 0 and DEPLOY_TRIGGER != "push":
-                        output.append(f"::warning file={str(file_path)}::File changed")
-                    output.append("...done")
-                    await write_to_github_summary_file(
+                        print(f"::warning file={str(file_path)}::File changed")
+                    print("...done")
+                    write_to_github_summary_file(
                         f":information_source: {str(file_path)} successfully deployed"
                     )
                 else:
                     all_modules_deployed = False
-                    output.append(f"::warning file={str(file_path)}::failed to deploy")
-                    await write_to_github_summary_file(
+                    print(f"::warning file={str(file_path)}::failed to deploy")
+                    write_to_github_summary_file(
                         f":warning: {str(file_path)} failed to deploy"
                     )
-                await asyncio.sleep(4)
-            output.append("::endgroup::")
-            print("\n".join(output))
-    await session.close()
+                time.sleep(4)
+            print("::endgroup::")
 
 
-async def async_main():
+def main():
     lua_files: Iterable[pathlib.Path]
     git_deploy_reason: str
     if len(sys.argv[1:]) == 0:
@@ -106,22 +108,12 @@ async def async_main():
             ["git", "log", "-1", "--pretty='%h %s'"]
         ).decode()
 
-    # # Asynchronous deploy is disabled due to rate limit
-    # deploy_tasks: list[asyncio.Task] = list()
-    # for wiki, files in itertools.groupby(lua_files, lambda path: path.parts[2]):
-    #     deploy_tasks.append(
-    #         asyncio.Task(
-    #             deploy_all_files_for_wiki(wiki, list(files), git_deploy_reason)
-    #         )
-    #     )
-    # await asyncio.wait(deploy_tasks)
-
     for wiki, files in itertools.groupby(lua_files, lambda path: path.parts[2]):
-        await deploy_all_files_for_wiki(wiki, list(files), git_deploy_reason)
+        deploy_all_files_for_wiki(wiki, list(files), git_deploy_reason)
 
     if not all_modules_deployed:
         print("::warning::Some modules were not deployed!")
         sys.exit(1)
 
 
-asyncio.run(async_main())
+main()
