@@ -3,7 +3,7 @@ import os
 
 import aiohttp
 
-__all__ = ["USER_AGENT", "WIKI_BASE_URL" "get_token"]
+__all__ = ["USER_AGENT", "WIKI_BASE_URL", "get_token"]
 
 USER_AGENT = f"GitHub Autodeploy Bot/1.1.0 ({ os.getenv("WIKI_UA_EMAIL") })"
 WIKI_BASE_URL = os.getenv("WIKI_BASE_URL")
