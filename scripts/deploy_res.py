@@ -12,13 +12,11 @@ from deploy_util import *
 from login_and_get_token import *
 
 
-all_deployed: bool = True
-changes_made: bool = False
-
-
 def deploy_resources(
     res_type: str, file_paths: Iterable[pathlib.Path], deploy_reason: str
-):
+) -> tuple[bool, bool]:
+    all_deployed = True
+    changes_made = False
     token = get_token("commons")
     with requests.Session() as session:
         session.cookies = read_cookie_jar("commons")
@@ -64,6 +62,7 @@ def deploy_resources(
                 all_deployed = False
             print("::endgroup::")
             time.sleep(4)
+    return (all_deployed, changes_made)
 
 
 def update_cache():
@@ -91,6 +90,8 @@ def update_cache():
 
 
 def main():
+    all_deployed: bool = True
+    changes_made: bool = False
     resource_files: Iterable[pathlib.Path]
     git_deploy_reason: str
     if len(sys.argv[1:]) == 0:
@@ -104,7 +105,9 @@ def main():
         git_deploy_reason = get_git_deploy_reason()
 
     for res_type, files in itertools.groupby(resource_files, lambda path: path.suffix):
-        deploy_resources(res_type, list(files), git_deploy_reason)
+        all_deployed, changes_made = deploy_resources(
+            res_type, list(files), git_deploy_reason
+        )
 
     if not all_deployed:
         print(
