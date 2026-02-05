@@ -112,7 +112,9 @@ def main():
         resource_files = [pathlib.Path(arg) for arg in sys.argv[1:]]
         git_deploy_reason = get_git_deploy_reason()
 
-    for res_type, files in itertools.groupby(resource_files, lambda path: path.suffix):
+    for res_type, files in itertools.groupby(
+        sorted(resource_files), lambda path: path.suffix
+    ):
         all_deployed, changes_made = deploy_resources(
             res_type, list(files), git_deploy_reason
         )
