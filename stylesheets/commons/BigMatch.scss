@@ -1626,14 +1626,4 @@ $valorant-def: #01654c;
 			}
 		}
 	}
-
-	&-container {
-		display: flex;
-		flex-flow: row nowrap;
-		overflow-x: auto;
-		scroll-snap-type: x mandatory;
-		scrollbar-width: thin;
-		gap: 0.5rem;
-		align-items: stretch;
-	}
 }

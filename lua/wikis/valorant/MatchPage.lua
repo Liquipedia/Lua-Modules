@@ -19,6 +19,7 @@ local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Carousel = Lua.import('Module:Widget/Basic/Carousel')
 local Div = HtmlWidgets.Div
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
@@ -445,14 +446,10 @@ function MatchPage:_renderRoundDetails(game)
 		title = 'Round Details',
 		classes = {'match-bm-match-collapsible'},
 		shouldCollapse = true,
-		collapseAreaClasses = {
-			'match-bm-match-collapsible-content',
-			-- TODO: Replace container class with Carousel widget after #6951
-			'match-bm-match-round-detail-container',
-		},
-		children = Array.map(game.extradata.rounds or {}, function (round, roundIndex)
-			return self:_renderRoundDetail(findPlayer, round, roundIndex)
-		end)
+		collapseAreaClasses = {'match-bm-match-collapsible-content'},
+		children = Carousel{children = Array.map(game.extradata.rounds or {}, function (round, roundIndex)
+				return self:_renderRoundDetail(findPlayer, round, roundIndex)
+		end)}
 	}
 end
 
