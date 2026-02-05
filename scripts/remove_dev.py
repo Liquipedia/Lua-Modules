@@ -12,7 +12,6 @@ from deploy_util import (
 )
 from login_and_get_token import get_token
 
-
 LUA_DEV_ENV_NAME = os.getenv("LUA_DEV_ENV_NAME")
 
 remove_errors: list[str] = list()
