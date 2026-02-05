@@ -10,8 +10,7 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
-local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Table2Section = Lua.import('Module:Widget/Table2/Section')
 
 ---@class Table2FooterProps
 ---@field children (Widget|Html|string|number|nil)[]?
@@ -28,10 +27,8 @@ Table2Footer.defaultProps = {
 
 ---@return Widget
 function Table2Footer:render()
-	return HtmlWidgets.Tfoot{
-		classes = WidgetUtil.collect('table2__foot', self.props.classes),
-		css = self.props.css,
-		attributes = self.props.attributes,
+	return Table2Section{
+		value = 'foot',
 		children = self.props.children,
 	}
 end

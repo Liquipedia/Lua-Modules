@@ -8,16 +8,18 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
-local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Table2Row = Lua.import('Module:Widget/Table2/Row')
+local Table2Section = Lua.import('Module:Widget/Table2/Section')
 
 ---@class Table2BodyProps
 ---@field children (Widget|Html|string|number|nil)[]?
 ---@field classes string[]?
 ---@field css {[string]: string|number|nil}?
 ---@field attributes {[string]: any}?
+---@field striped (string|number|boolean)?
 
 ---@class Table2Body: Widget
 ---@operator call(Table2BodyProps): Table2Body
@@ -28,11 +30,23 @@ Table2Body.defaultProps = {
 
 ---@return Widget
 function Table2Body:render()
-	return HtmlWidgets.Tbody{
-		classes = WidgetUtil.collect('table2__body', self.props.classes),
-		css = self.props.css,
-		attributes = self.props.attributes,
-		children = self.props.children,
+	local children = self.props.children
+	if Logic.readBool(self.props.striped) then
+		children = {}
+		for index, child in ipairs(self.props.children or {}) do
+			if Class.instanceOf(child, Table2Row) then
+				child.props.classes = child.props.classes or {}
+				if index % 2 == 0 then
+					table.insert(child.props.classes, 'table2__row--striped')
+				end
+			end
+			table.insert(children, child)
+		end
+	end
+
+	return Table2Section{
+		value = 'body',
+		children = children,
 	}
 end
 

@@ -40,7 +40,7 @@ $table2-cell-padding-x: 0.75rem;
 		border: 0;
 	}
 
-	&__head {
+	&__row--head {
 		.table2__cell {
 			font-weight: bold;
 			white-space: nowrap;
@@ -77,15 +77,13 @@ $table2-cell-padding-x: 0.75rem;
 		}
 	}
 
-	&__body {
-		.table2__row:last-child {
-			.table2__cell {
-				border-bottom: 0;
-			}
+	&__row--body:last-child {
+		.table2__cell {
+			border-bottom: 0;
 		}
 	}
 
-	&__foot {
+	&__row--foot {
 		.table2__cell {
 			text-align: center;
 			border-bottom: 0;
@@ -93,29 +91,25 @@ $table2-cell-padding-x: 0.75rem;
 	}
 
 	&--striped {
-		.table2__body {
-			.table2__row:nth-child( 2n ) {
-				.theme--light & {
-					background-color: var( --table-striped-background-color, var( --clr-on-surface-light-primary-4 ) );
-				}
+		.table2__row--body.table2__row--striped {
+			.theme--light & {
+				background-color: var( --table-striped-background-color, var( --clr-on-surface-light-primary-4 ) );
+			}
 
-				.theme--dark & {
-					background-color: var( --table-striped-background-color, var( --clr-on-surface-dark-primary-4 ) );
-				}
+			.theme--dark & {
+				background-color: var( --table-striped-background-color, var( --clr-on-surface-dark-primary-4 ) );
 			}
 		}
 	}
 
 	&--hover {
-		.table2__body {
-			.table2__row:hover {
-				.theme--light & {
-					background-color: var( --clr-on-surface-light-primary-4 );
-				}
+		.table2__row--body:hover {
+			.theme--light & {
+				background-color: var( --clr-on-surface-light-primary-4 );
+			}
 
-				.theme--dark & {
-					background-color: var( --clr-on-surface-dark-primary-4 );
-				}
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
 			}
 		}
 	}
@@ -127,7 +121,7 @@ $table2-cell-padding-x: 0.75rem;
 	}
 
 	&--themed {
-		.table2__head {
+		.table2__row--head {
 			.table2__cell {
 				.theme--light & {
 					background-color: var( --clr-wiki-theme-40, var( --clr-wiki-theme-primary, #1f3d7a ) );
@@ -146,7 +140,7 @@ $table2-cell-padding-x: 0.75rem;
 	}
 
 	&--generic {
-		.table2__head {
+		.table2__row--head {
 			.table2__cell {
 				.theme--light & {
 					background-color: var( --table-header-variant-background-color, var( --clr-on-surface-light-primary-4 ) );

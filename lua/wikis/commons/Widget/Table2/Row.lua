@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
+local Table2Section = Lua.import('Module:Widget/Table2/Section')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
@@ -28,8 +29,16 @@ Table2Row.defaultProps = {
 
 ---@return Widget
 function Table2Row:render()
+	local section = self:useContext(Table2Section)
+	local sectionClass = 'table2__row--body'
+	if section == 'head' then
+		sectionClass = 'table2__row--head'
+	elseif section == 'foot' then
+		sectionClass = 'table2__row--foot'
+	end
+
 	return HtmlWidgets.Tr{
-		classes = WidgetUtil.collect('table2__row', self.props.classes),
+		classes = WidgetUtil.collect('table2__row', sectionClass, self.props.classes),
 		css = self.props.css,
 		attributes = self.props.attributes,
 		children = self.props.children,
