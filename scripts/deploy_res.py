@@ -30,10 +30,10 @@ def deploy_resources(
             print(f"::group::Checking {str(file_path)}")
             file_content = read_file_from_path(file_path)
             page = (
-                f"MediaWiki:Common.{ "js" if res_type == ".js" else "css" }/"
+                f"MediaWiki:Common.{'js' if res_type == '.js' else 'css'}/"
                 + file_path.name
             )
-            print(f"...page = { page }")
+            print(f"...page = {page}")
             deploy_result = deploy_file_to_wiki(
                 session, file_path, file_content, "commons", page, token, deploy_reason
             )
