@@ -62,6 +62,7 @@ local PREFIXES = {
 	breakingpoint = {match = 'https://www.breakingpoint.gg/match/'},
 	cc = {'https://cc.163.com/'},
 	cdl = {match = 'https://callofdutyleague.com/en-us/match/'},
+	clarioncorp = {'https://clarioncorp.net/pilot/'},
 	challengermode = {
 		'https://www.challengermode.com/tournaments/',
 		player = 'https://www.challengermode.com/users/',
@@ -86,7 +87,6 @@ local PREFIXES = {
 	chzzk = {'https://chzzk.naver.com/'},
 	civdraft = {match = 'https://aoe2cm.net/draft/'},
 	cntft = {'https://lol.qq.com/tft/#/masterDetail/'},
-	corestrike = {'https://corestrike.gg/lookup/'},
 	cfs = {'https://www.crossfirestars.com/'},
 	datdota = {
 		'https://www.datdota.com/leagues/',
@@ -384,6 +384,7 @@ SUFFIXES = Table.merge(SUFFIXES, CustomData.suffixes or {})
 local ALIASES = {
 	['ask-fm'] = {'afk.fm', 'askfm'},
 	douyu = {'douyutv'},
+	corestrike = {'clarioncorp'},
 	esl = {'eslgaming'},
 	['facebook-gaming'] = {'fbgg'},
 	home = {'website', 'web', 'site', 'url'},
