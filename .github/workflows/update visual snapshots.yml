@@ -5,6 +5,8 @@ on: [pull_request]
 jobs:
   update-snapshots:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.58.0-noble
 
     permissions:
       contents: write
@@ -18,9 +20,7 @@ jobs:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
 
       - name: Setup lua
-        # Workaround until https://github.com/leafo/gh-actions-lua/issues/57 is resolved
-        # uses: leafo/gh-actions-lua@v11
-        uses: lewis6991/gh-actions-lua@01aab24c4de9555717b685f9b142a2abbe12ef14
+        uses: Liquipedia/gh-actions-lua@803881da1a1e619ada27db3440a917e87e85aaa2
         with:
           luaVersion: '5.1'
 
