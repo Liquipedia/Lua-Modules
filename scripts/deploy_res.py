@@ -49,7 +49,7 @@ def deploy_resources(
                     "token": token,
                 },
             ).json()
-            result = response["edit"]["result"]
+            result = response["edit"].get("result")
             new_rev_id = response["edit"].get("newrevid")
             if result == "Success":
                 if new_rev_id is not None:

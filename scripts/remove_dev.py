@@ -59,7 +59,7 @@ def search_and_remove(wiki: str):
             },
         ).json()
         time.sleep(4)
-        pages = search_result["query"]["search"]
+        pages = search_result["query"].get("search")
 
         if len(pages) == 0:
             return

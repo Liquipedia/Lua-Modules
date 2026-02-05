@@ -49,7 +49,7 @@ def protect_page(page: str, wiki: str, protect_mode: Literal["edit", "create"]):
         ).json()
 
         time.sleep(4)
-        protections = response["protect"]["protections"]
+        protections = response["protect"].get("protections")
         for protection in protections:
             if protection[protect_mode] == "allow-only-sysop":
                 return
