@@ -18,7 +18,7 @@ def login(wiki: str):
     if wiki in loggedin:
         return
     cookie_jar = read_cookie_jar(wiki)
-    print(f"...logging in on { wiki }")
+    print(f"...logging in on {wiki}")
     with requests.Session() as session:
         session.cookies = cookie_jar
         token_response = session.post(

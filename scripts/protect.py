@@ -37,7 +37,7 @@ def main():
         exit(0)
 
     for file_to_protect in sorted(lua_files):
-        print(f"::group::Checking { str(file_to_protect) }")
+        print(f"::group::Checking {str(file_to_protect)}")
         wiki = file_to_protect.parts[2]
         module = "/".join(file_to_protect.parts[3:])[:-4]
         page = "Module:" + module

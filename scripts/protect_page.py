@@ -30,8 +30,8 @@ def protect_page(page: str, wiki: str, protect_mode: Literal["edit", "create"]):
         protect_options = "create=allow-only-sysop"
     else:
         raise ValueError(f"invalid protect mode: {protect_mode}")
-    print(f"...wiki = { wiki }")
-    print(f"...page = { page }")
+    print(f"...wiki = {wiki}")
+    print(f"...page = {page}")
     token = get_token(wiki)
     with requests.Session() as session:
         session.cookies = read_cookie_jar(wiki)

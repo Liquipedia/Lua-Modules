@@ -22,7 +22,7 @@ __all__ = [
 
 DEPLOY_TRIGGER = os.getenv("DEPLOY_TRIGGER")
 GITHUB_STEP_SUMMARY_FILE = os.getenv("GITHUB_STEP_SUMMARY")
-USER_AGENT = f"GitHub Autodeploy Bot/2.0.0 ({ os.getenv("WIKI_UA_EMAIL") })"
+USER_AGENT = f"GitHub Autodeploy Bot/2.0.0 ({os.getenv('WIKI_UA_EMAIL')})"
 WIKI_BASE_URL = os.getenv("WIKI_BASE_URL")
 HEADER = {
     "User-Agent": USER_AGENT,
