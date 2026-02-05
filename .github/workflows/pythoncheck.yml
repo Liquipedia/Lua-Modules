@@ -14,4 +14,4 @@ jobs:
         with:
           src: scripts/
       - name: Check styling
-        run: ruff format scripts/
+        run: ruff format --check --diff scripts/
