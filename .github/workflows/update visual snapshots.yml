@@ -19,6 +19,9 @@ jobs:
           # Support runs of this action in forks
           repository: ${{ github.event.pull_request.head.repo.full_name }}
 
+      - name: Update apt cache
+        run: apt-get update
+
       - name: Setup lua
         uses: Liquipedia/gh-actions-lua@c9b8bf3a560c064a3ec00703f1a7b6ecff90e105
         with:
