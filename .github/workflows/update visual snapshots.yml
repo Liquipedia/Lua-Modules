@@ -42,7 +42,9 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Update snapshots
-        run: UPDATE_SNAPSHOTS=true npm run lua-test
+        run: npm run lua-test
+        env:
+          UPDATE_SNAPSHOTS: true
 
       - name: Commit and push if snapshots changed
         uses: stefanzweifel/git-auto-commit-action@v6
