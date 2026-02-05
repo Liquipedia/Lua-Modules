@@ -1,0 +1,163 @@
+$table2-radius: 0.5rem;
+$table2-cell-padding-y: 0.5rem;
+$table2-cell-padding-x: 0.75rem;
+
+@mixin table2-surface-colors() {
+	.theme--light & {
+		background-color: var( --table-background-color, var( --clr-surface-5, #ffffff ) );
+		border-color: var( --table-border-color, var( --clr-on-surface-light-primary-8 ) );
+		color: var( --clr-on-background );
+	}
+
+	.theme--dark & {
+		background-color: var( --table-background-color, var( --clr-on-surface-dark-primary-4 ) );
+		border-color: var( --table-border-color, var( --clr-on-surface-dark-primary-8 ) );
+		color: var( --clr-on-background );
+	}
+}
+
+.table2 {
+	display: block;
+	max-width: 100%;
+	border: 1px solid;
+	border-radius: $table2-radius;
+	overflow: hidden;
+
+	@include table2-surface-colors();
+
+	&__scroll {
+		overflow: auto hidden;
+		max-width: 100%;
+		-webkit-overflow-scrolling: touch;
+		touch-action: pan-x;
+		overscroll-behavior-x: contain;
+	}
+
+	&__table {
+		width: 100%;
+		border-spacing: 0;
+		border-collapse: separate;
+		border: 0;
+	}
+
+	&__head {
+		.table2__cell {
+			font-weight: bold;
+			white-space: nowrap;
+		}
+	}
+
+	&__cell {
+		padding: $table2-cell-padding-y $table2-cell-padding-x;
+		vertical-align: middle;
+		border-bottom: 1px solid;
+
+		.theme--light & {
+			border-bottom-color: var( --table-border-color, var( --clr-on-surface-light-primary-8 ) );
+		}
+
+		.theme--dark & {
+			border-bottom-color: var( --table-border-color, var( --clr-on-surface-dark-primary-8 ) );
+		}
+
+		&--left {
+			text-align: left;
+		}
+
+		&--right {
+			text-align: right;
+		}
+
+		&--center {
+			text-align: center;
+		}
+
+		&--nowrap {
+			white-space: nowrap;
+		}
+	}
+
+	&__body {
+		.table2__row:last-child {
+			.table2__cell {
+				border-bottom: 0;
+			}
+		}
+	}
+
+	&__foot {
+		.table2__cell {
+			text-align: center;
+			border-bottom: 0;
+		}
+	}
+
+	&--striped {
+		.table2__body {
+			.table2__row:nth-child( 2n ) {
+				.theme--light & {
+					background-color: var( --table-striped-background-color, var( --clr-on-surface-light-primary-4 ) );
+				}
+
+				.theme--dark & {
+					background-color: var( --table-striped-background-color, var( --clr-on-surface-dark-primary-4 ) );
+				}
+			}
+		}
+	}
+
+	&--hover {
+		.table2__body {
+			.table2__row:hover {
+				.theme--light & {
+					background-color: var( --clr-on-surface-light-primary-4 );
+				}
+
+				.theme--dark & {
+					background-color: var( --clr-on-surface-dark-primary-4 );
+				}
+			}
+		}
+	}
+
+	&--compact {
+		.table2__cell {
+			padding: 0.375rem 0.5rem;
+		}
+	}
+
+	&--themed {
+		.table2__head {
+			.table2__cell {
+				.theme--light & {
+					background-color: var( --clr-wiki-theme-40, var( --clr-wiki-theme-primary, #1f3d7a ) );
+				}
+
+				.theme--dark & {
+					background-color: var( --clr-wiki-theme-20, var( --clr-wiki-theme-primary, #1f3d7a ) );
+				}
+				color: #ffffff;
+			}
+
+			a {
+				color: inherit;
+			}
+		}
+	}
+
+	&--generic {
+		.table2__head {
+			.table2__cell {
+				.theme--light & {
+					background-color: var( --table-header-variant-background-color, var( --clr-on-surface-light-primary-4 ) );
+					color: var( --clr-secondary-25 );
+				}
+
+				.theme--dark & {
+					background-color: var( --table-header-variant-background-color, var( --clr-on-surface-dark-primary-4 ) );
+					color: var( --clr-secondary-90 );
+				}
+			}
+		}
+	}
+}
