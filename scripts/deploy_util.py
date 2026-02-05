@@ -10,6 +10,7 @@ import requests
 __all__ = [
     "DEPLOY_TRIGGER",
     "HEADER",
+    "SLEEP_DURATION",
     "deploy_file_to_wiki",
     "get_git_deploy_reason",
     "get_wiki_api_url",
@@ -28,6 +29,7 @@ HEADER = {
     "accept": "application/json",
     "Accept-Encoding": "gzip",
 }
+SLEEP_DURATION = 4
 
 
 def get_wikis() -> set[str]:
@@ -36,7 +38,7 @@ def get_wikis() -> set[str]:
         headers=HEADER,
     )
     wikis = response.json()
-    time.sleep(4)
+    time.sleep(SLEEP_DURATION)
     return set(wikis["allwikis"].keys())
 
 
@@ -94,6 +96,7 @@ def deploy_file_to_wiki(
         print(f"::warning file={str(file_path)}::failed to deploy")
         write_to_github_summary_file(f":warning: {str(file_path)} failed to deploy")
         deployed = False
+    time.sleep(SLEEP_DURATION)
     return deployed, change_made
 
 

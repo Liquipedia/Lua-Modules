@@ -4,7 +4,7 @@ import time
 
 import requests
 
-from deploy_util import HEADER, get_wiki_api_url, read_cookie_jar
+from deploy_util import HEADER, SLEEP_DURATION, get_wiki_api_url, read_cookie_jar
 
 __all__ = ["get_token"]
 
@@ -43,7 +43,7 @@ def login(wiki: str):
         )
         loggedin.add(wiki)
         cookie_jar.save(ignore_discard=True)
-        time.sleep(4)
+        time.sleep(SLEEP_DURATION)
 
 
 @functools.cache

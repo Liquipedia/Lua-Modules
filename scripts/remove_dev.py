@@ -5,6 +5,7 @@ import requests
 
 from deploy_util import (
     HEADER,
+    SLEEP_DURATION,
     get_wiki_api_url,
     get_wikis,
     read_cookie_jar,
@@ -34,7 +35,7 @@ def remove_page(session: requests.Session, page: str, wiki: str):
             "token": token,
         },
     ).text
-    time.sleep(8)
+    time.sleep(SLEEP_DURATION)
 
     if '"delete"' not in result:
         print(f"::warning::could not delete {page} on {wiki}")
@@ -57,7 +58,7 @@ def search_and_remove(wiki: str):
                 "srprop": "",
             },
         ).json()
-        time.sleep(4)
+        time.sleep(SLEEP_DURATION)
         pages = search_result["query"].get("search")
 
         if len(pages) == 0:

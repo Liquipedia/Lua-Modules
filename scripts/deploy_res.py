@@ -2,7 +2,6 @@ import itertools
 import pathlib
 import sys
 import subprocess
-import time
 
 from typing import Iterable
 
@@ -41,7 +40,6 @@ def deploy_resources(
             all_deployed = all_deployed and deploy_result[0]
             changes_made = changes_made or deploy_result[1]
             print("::endgroup::")
-            time.sleep(4)
     return (all_deployed, changes_made)
 
 
