@@ -37,10 +37,6 @@ jobs:
           npm install
           luarocks install --lua-version=5.1 busted
 
-      # Very slow (3mins) - can probably be made faster using http://github.com/microsoft/playwright/issues/23388
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-
       - name: Update snapshots
         run: npm run lua-test
         env:
