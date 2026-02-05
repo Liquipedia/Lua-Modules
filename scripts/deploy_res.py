@@ -9,13 +9,12 @@ from typing import Iterable
 import requests
 
 from deploy_util import (
-    DEPLOY_TRIGGER,
     HEADER,
     get_git_deploy_reason,
     get_wiki_api_url,
+    deploy_file_to_wiki,
     read_cookie_jar,
     read_file_from_path,
-    write_to_github_summary_file,
 )
 from login_and_get_token import get_token
 
@@ -36,38 +35,11 @@ def deploy_resources(
                 + file_path.name
             )
             print(f"...page = { page }")
-            response = session.post(
-                get_wiki_api_url("commons"),
-                headers=HEADER,
-                params={"format": "json", "action": "edit"},
-                data={
-                    "title": page,
-                    "text": file_content,
-                    "summary": f"Git: {deploy_reason}",
-                    "bot": "true",
-                    "recreate": "true",
-                    "token": token,
-                },
-            ).json()
-            result = response["edit"].get("result")
-            new_rev_id = response["edit"].get("newrevid")
-            if result == "Success":
-                if new_rev_id is not None:
-                    changes_made = True
-                    if DEPLOY_TRIGGER != "push":
-                        print(f"::warning file={str(file_path)}::File changed")
-                print(f"...{result}")
-                print("...done")
-                write_to_github_summary_file(
-                    f":information_source: {str(file_path)} successfully deployed"
-                )
-
-            else:
-                print(f"::warning file={str(file_path)}::failed to deploy")
-                write_to_github_summary_file(
-                    f":warning: {str(file_path)} failed to deploy"
-                )
-                all_deployed = False
+            deploy_result = deploy_file_to_wiki(
+                session, file_path, file_content, "commons", page, token, deploy_reason
+            )
+            all_deployed = all_deployed and deploy_result[0]
+            changes_made = changes_made or deploy_result[1]
             print("::endgroup::")
             time.sleep(4)
     return (all_deployed, changes_made)

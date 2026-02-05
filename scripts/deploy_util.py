@@ -10,6 +10,7 @@ import requests
 __all__ = [
     "DEPLOY_TRIGGER",
     "HEADER",
+    "deploy_file_to_wiki",
     "get_git_deploy_reason",
     "get_wiki_api_url",
     "get_wikis",
@@ -50,6 +51,50 @@ def get_git_deploy_reason():
         .decode()
         .strip()
     )
+
+
+def deploy_file_to_wiki(
+    session: requests.Session,
+    file_path: pathlib.Path,
+    file_content: str,
+    wiki: str,
+    target_page: str,
+    token: str,
+    deploy_reason: str,
+) -> tuple[bool, bool]:
+    change_made = False
+    deployed = True
+    response = session.post(
+        get_wiki_api_url(wiki),
+        headers=HEADER,
+        params={"format": "json", "action": "edit"},
+        data={
+            "title": target_page,
+            "text": file_content,
+            "summary": f"Git: {deploy_reason}",
+            "bot": "true",
+            "recreate": "true",
+            "token": token,
+        },
+    ).json()
+    result = response["edit"].get("result")
+    new_rev_id = response["edit"].get("newrevid")
+    if result == "Success":
+        if new_rev_id is not None:
+            change_made = True
+            if DEPLOY_TRIGGER != "push":
+                print(f"::warning file={str(file_path)}::File changed")
+        print(f"...{result}")
+        print("...done")
+        write_to_github_summary_file(
+            f":information_source: {str(file_path)} successfully deployed"
+        )
+
+    else:
+        print(f"::warning file={str(file_path)}::failed to deploy")
+        write_to_github_summary_file(f":warning: {str(file_path)} failed to deploy")
+        deployed = False
+    return deployed, change_made
 
 
 def read_cookie_jar(wiki: str) -> http.cookiejar.FileCookieJar:
