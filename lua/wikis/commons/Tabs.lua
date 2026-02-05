@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
@@ -109,6 +110,8 @@ function Tabs.dynamic(args)
 	end
 
 	local variantClass = 'tabs-variant-' .. variant
+	local wraps = Logic.readBool(args.wrapping) and Info.wikiName == 'fighters'
+	local wrapsClass = wraps and 'wraps' or nil
 
 	local navTabs = HtmlWidgets.Ul{
 		classes = {'nav', 'nav-tabs', 'tabs', 'tabs' .. tabCount},
@@ -190,14 +193,15 @@ function Tabs.dynamic(args)
 	}
 
 	if not hasContent then
-		local startTag = '<div class="tabs-dynamic navigation-not-searchable ' .. variantClass .. '" data-nosnippet>\n'
+		local startTag = '<div class="tabs-dynamic navigation-not-searchable ' .. variantClass ..
+			(wraps and ' wraps' or '') .. '" data-nosnippet>\n'
 		return startTag .. tostring(navWrapper) .. (contents --[[@as string]])
 	end
 
 	return AnalyticsWidgets{
 		analyticsName = 'Dynamic Navigation tab',
 		children = HtmlWidgets.Div{
-			classes = {'tabs-dynamic', 'navigation-not-searchable', variantClass},
+			classes = {'tabs-dynamic', 'navigation-not-searchable', variantClass, wrapsClass},
 			attributes = {['data-nosnippet'] = ''},
 			children = {
 				navWrapper,

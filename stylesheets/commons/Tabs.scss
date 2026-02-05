@@ -191,6 +191,26 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		}
 	}
 
+	&.wraps {
+		.tabs-nav-wrapper {
+			flex-wrap: wrap;
+		}
+
+		.tabs-nav-wrapper .nav-tabs {
+			flex-wrap: wrap;
+			overflow-x: visible;
+			scrollbar-width: auto;
+		}
+
+		.tabs-nav-wrapper .nav-tabs::-webkit-scrollbar {
+			display: initial;
+		}
+
+		.tabs-scroll-arrow-wrapper {
+			display: none !important;
+		}
+	}
+
 	&.tabs-variant-vertical {
 		.tabs-nav-wrapper .nav-tabs li a {
 			flex-direction: column;

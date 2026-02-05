@@ -71,6 +71,7 @@ class TabsDOMUtils {
 class TabContainer {
 	constructor( containerElement ) {
 		this.container = containerElement;
+		this.wraps = containerElement.classList.contains( 'wraps' );
 		this.navWrapper = containerElement.querySelector( TABS_CONFIG.SELECTORS.NAV_WRAPPER );
 		this.navTabs = containerElement.querySelector( TABS_CONFIG.SELECTORS.NAV_TABS );
 		this.contentContainer = containerElement.querySelector( TABS_CONFIG.SELECTORS.CONTENT_CONTAINER );
@@ -98,9 +99,12 @@ class TabContainer {
 		this.createMobileHeadings();
 		this.setupClickHandlers();
 		this.setupKeyboardNavigation();
-		this.setupDragToScroll();
-		this.setupArrows();
-		this.scrollToActiveTab( true );
+
+		if ( !this.wraps ) {
+			this.setupDragToScroll();
+			this.setupArrows();
+			this.scrollToActiveTab( true );
+		}
 	}
 
 	findTabContents() {
@@ -281,6 +285,10 @@ class TabContainer {
 	}
 
 	setupDragToScroll() {
+		if ( this.wraps ) {
+			return;
+		}
+
 		if ( !this.navTabs ) {
 			return;
 		}
@@ -342,6 +350,10 @@ class TabContainer {
 	}
 
 	setupArrows() {
+		if ( this.wraps ) {
+			return;
+		}
+
 		if ( !this.navWrapper || !this.navTabs ) {
 			return;
 		}
@@ -405,6 +417,10 @@ class TabContainer {
 	}
 
 	scrollToActiveTab( instant = false ) {
+		if ( this.wraps ) {
+			return;
+		}
+
 		const activeTab = this.navTabs.querySelector( TABS_CONFIG.SELECTORS.ACTIVE_TAB );
 		if ( !activeTab ) {
 			return;
