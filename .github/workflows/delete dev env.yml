@@ -33,4 +33,5 @@ jobs:
           LUA_DEV_ENV_NAME: "dev/${{ github.event.inputs.luadevenv }}"
           INCLUDE_COMMONS: ${{ github.event.inputs.includecommons }}
           INCLUDE_SUB_ENVS: ${{ github.event.inputs.includesubenvs }}
+          PYTHONUNBUFFERED: 1
         run: python3 ./scripts/remove_dev.py

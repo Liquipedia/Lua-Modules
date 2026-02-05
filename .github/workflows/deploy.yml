@@ -48,6 +48,7 @@ jobs:
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
           DEPLOY_TRIGGER: ${{ github.event_name }}
+          PYTHONUNBUFFERED: 1
         run: python3 ./scripts/deploy_res.py ${{ steps.res-changed-files.outputs.all_changed_files }}
 
       - name: Lua Deploy
@@ -58,6 +59,7 @@ jobs:
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
           DEPLOY_TRIGGER: ${{ github.event_name }}
+          PYTHONUNBUFFERED: 1
         run: python3 ./scripts/deploy.py ${{ steps.lua-changed-files.outputs.all_changed_files }}
 
       - name: Lua Protect
@@ -67,4 +69,5 @@ jobs:
           WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+          PYTHONUNBUFFERED: 1
         run: python3 ./scripts/protect.py ${{ steps.lua-changed-files.outputs.added_files }} ${{ steps.lua-changed-files.outputs.renamed_files }}
