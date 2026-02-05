@@ -12,6 +12,13 @@ local Logic = Lua.import('Module:Logic')
 local PlacementStats = Lua.import('Module:InfoboxPlacementStats')
 local RoleOf = Lua.import('Module:RoleOf')
 
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
+
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Region = Lua.import('Module:Region')
 local Team = Lua.import('Module:Infobox/Team')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
@@ -36,6 +43,12 @@ local REGION_REMAPPINGS = {
 	['japan'] = 'asia',
 }
 
+local ACHIEVEMENTS_BASE_CONDITIONS = {
+	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Showmatch', 'Qualifier'}),
+	ConditionUtil.anyOf(ColumnName('liquipediatier'), {1, 2}),
+	ConditionNode(ColumnName('placement'), Comparator.eq, 1),
+}
+
 ---@class HonorofkingsInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
 
@@ -43,6 +56,11 @@ local CustomTeam = Class.new(Team)
 ---@return Widget
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
+
+	-- Automatic achievements
+	team.args.achievements = Achievements.team{
+		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS
+	}
 
 	-- Automatic org people
 	team.args.coach = RoleOf.get{role = 'Coach'}
