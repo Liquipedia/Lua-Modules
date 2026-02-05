@@ -89,7 +89,7 @@ def main():
         lua_files = [pathlib.Path(arg) for arg in sys.argv[1:]]
         git_deploy_reason = get_git_deploy_reason()
 
-    for wiki, files in itertools.groupby(lua_files, lambda path: path.parts[2]):
+    for wiki, files in itertools.groupby(sorted(lua_files), lambda path: path.parts[2]):
         all_modules_deployed = deploy_all_files_for_wiki(
             wiki, list(files), git_deploy_reason
         )
