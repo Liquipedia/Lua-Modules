@@ -12,8 +12,8 @@ jobs:
       - name: Run linter
         uses: astral-sh/ruff-action@v3
         with:
-          src: scripts/*.py
+          src: scripts/
       - name: Check styling
         uses: psf/black@stable
         with:
-          src: scripts/*.py
+          src: scripts/
