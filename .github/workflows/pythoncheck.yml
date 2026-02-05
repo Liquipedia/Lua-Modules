@@ -1,0 +1,19 @@
+name: Python Code Style
+
+on: [pull_request, workflow_dispatch]
+
+jobs:
+  python-code-style:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Run linter
+        uses: astral-sh/ruff-action@v3
+        with:
+          src: scripts/*.py
+      - name: Check styling
+        uses: psf/black@stable
+        with:
+          src: scripts/*.py
