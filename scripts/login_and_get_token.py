@@ -4,7 +4,7 @@ import time
 
 import requests
 
-from deploy_util import *
+from deploy_util import HEADER, get_wiki_api_url, read_cookie_jar
 
 __all__ = ["get_token"]
 

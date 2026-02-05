@@ -1,6 +1,10 @@
 import os
 
-from protect_page import *
+from protect_page import (
+    protect_non_existing_page,
+    protect_existing_page,
+    handle_protect_errors,
+)
 
 WIKI_TO_PROTECT = os.getenv("WIKI_TO_PROTECT")
 

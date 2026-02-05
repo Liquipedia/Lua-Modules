@@ -4,8 +4,13 @@ from typing import Literal
 
 import requests
 
-from deploy_util import *
-from login_and_get_token import *
+from deploy_util import (
+    HEADER,
+    get_wiki_api_url,
+    read_cookie_jar,
+    write_to_github_summary_file,
+)
+from login_and_get_token import get_token
 
 __all__ = [
     "protect_non_existing_page",
