@@ -58,10 +58,10 @@ def deploy_all_files_for_wiki(
                 ).json()
                 result = response["edit"].get("result")
                 if result == "Success":
-                    no_change = response["edit"].get("nochange")
-                    if len(no_change) == 0 and DEPLOY_TRIGGER == "push":
+                    new_rev_id = response["edit"].get("newrevid")
+                    if new_rev_id is None and DEPLOY_TRIGGER == "push":
                         print(f"::notice file={str(file_path)}::No change made")
-                    elif len(no_change) != 0 and DEPLOY_TRIGGER != "push":
+                    elif new_rev_id is not None and DEPLOY_TRIGGER != "push":
                         print(f"::warning file={str(file_path)}::File changed")
                     print("...done")
                     write_to_github_summary_file(
