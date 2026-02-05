@@ -95,8 +95,8 @@ def main():
     git_deploy_reason: str
     if len(sys.argv[1:]) == 0:
         resource_files = itertools.chain(
-            pathlib.Path("./").glob("javascript/**/*.js"),
-            pathlib.Path("./").glob("stylesheets/**/*.scss"),
+            pathlib.Path("./javascript/").rglob("*.js"),
+            pathlib.Path("./stylesheets/").rglob("*.scss"),
         )
         git_deploy_reason = "Automated Weekly Re-Sync"
     else:

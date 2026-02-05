@@ -75,7 +75,7 @@ def main():
     lua_files: Iterable[pathlib.Path]
     git_deploy_reason: str
     if len(sys.argv[1:]) == 0:
-        lua_files = pathlib.Path("./").glob("lua/wikis/**/*.lua")
+        lua_files = pathlib.Path("./lua/wikis/").rglob("*.lua")
         git_deploy_reason = "Automated Weekly Re-Sync"
     else:
         lua_files = [pathlib.Path(arg) for arg in sys.argv[1:]]
