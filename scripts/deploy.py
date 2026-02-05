@@ -17,12 +17,10 @@ HEADER_PATTERN = re.compile(
 )
 
 
-all_modules_deployed: bool = True
-
-
 def deploy_all_files_for_wiki(
     wiki: str, file_paths: Iterable[pathlib.Path], deploy_reason: str
-):
+) -> bool:
+    all_modules_deployed = True
     token = get_token(wiki)
     with requests.Session() as session:
         session.cookies = read_cookie_jar(wiki)
@@ -69,9 +67,11 @@ def deploy_all_files_for_wiki(
                     )
                 time.sleep(4)
             print("::endgroup::")
+    return all_modules_deployed
 
 
 def main():
+    all_modules_deployed = True
     lua_files: Iterable[pathlib.Path]
     git_deploy_reason: str
     if len(sys.argv[1:]) == 0:
@@ -82,7 +82,9 @@ def main():
         git_deploy_reason = get_git_deploy_reason()
 
     for wiki, files in itertools.groupby(lua_files, lambda path: path.parts[2]):
-        deploy_all_files_for_wiki(wiki, list(files), git_deploy_reason)
+        all_modules_deployed = deploy_all_files_for_wiki(
+            wiki, list(files), git_deploy_reason
+        )
 
     if not all_modules_deployed:
         print("::warning::Some modules were not deployed!")
