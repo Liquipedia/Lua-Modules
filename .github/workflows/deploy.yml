@@ -35,7 +35,6 @@ jobs:
         with:
           python-version: '3.14'
 
-
       - name: Install Python Dependency
         if: steps.res-changed-files.outputs.any_changed == 'true' || steps.lua-changed-files.outputs.any_changed == 'true'
         run: pip install requests
