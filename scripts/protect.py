@@ -27,7 +27,7 @@ def main():
     if len(sys.argv[1:]) > 0:
         lua_files = [pathlib.Path(arg) for arg in sys.argv[1:]]
     elif WIKI_TO_PROTECT:
-        lua_files = pathlib.Path("./").glob("lua/wikis/**/*.lua")
+        lua_files = pathlib.Path("./lua/wikis/").rglob("*.lua")
     else:
         print("Nothing to protect")
         exit(0)
