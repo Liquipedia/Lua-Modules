@@ -288,10 +288,6 @@ class TabContainer {
 	}
 
 	setupDragToScroll() {
-		if ( this.wraps ) {
-			return;
-		}
-
 		if ( !this.navTabs ) {
 			return;
 		}
@@ -353,10 +349,6 @@ class TabContainer {
 	}
 
 	setupArrows() {
-		if ( this.wraps ) {
-			return;
-		}
-
 		if ( !this.navWrapper || !this.navTabs ) {
 			return;
 		}
@@ -420,10 +412,6 @@ class TabContainer {
 	}
 
 	scrollToActiveTab( instant = false ) {
-		if ( this.wraps ) {
-			return;
-		}
-
 		const activeTab = this.navTabs.querySelector( TABS_CONFIG.SELECTORS.ACTIVE_TAB );
 		if ( !activeTab ) {
 			return;
