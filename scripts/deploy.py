@@ -56,9 +56,9 @@ def deploy_all_files_for_wiki(
                         "token": token,
                     },
                 ).json()
-                result = response["edit"]["result"]
+                result = response["edit"].get("result")
                 if result == "Success":
-                    no_change = response["edit"]["nochange"]
+                    no_change = response["edit"].get("nochange")
                     if len(no_change) == 0 and DEPLOY_TRIGGER == "push":
                         print(f"::notice file={str(file_path)}::No change made")
                     elif len(no_change) != 0 and DEPLOY_TRIGGER != "push":
