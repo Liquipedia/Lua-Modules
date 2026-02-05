@@ -3,7 +3,6 @@ import os
 import pathlib
 import re
 import sys
-import time
 
 from typing import Iterable
 
@@ -45,7 +44,6 @@ def deploy_all_files_for_wiki(
                     session, file_path, file_content, wiki, page, token, deploy_reason
                 )
                 all_modules_deployed = all_modules_deployed and module_deployed
-                time.sleep(4)
             print("::endgroup::")
     return all_modules_deployed
 

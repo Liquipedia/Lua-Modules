@@ -6,6 +6,7 @@ import requests
 
 from deploy_util import (
     HEADER,
+    SLEEP_DURATION,
     get_wiki_api_url,
     read_cookie_jar,
     write_to_github_summary_file,
@@ -48,7 +49,7 @@ def protect_page(page: str, wiki: str, protect_mode: Literal["edit", "create"]):
             },
         ).json()
 
-        time.sleep(4)
+        time.sleep(SLEEP_DURATION)
         protections = response["protect"].get("protections")
         for protection in protections:
             if protection[protect_mode] == "allow-only-sysop":
@@ -68,7 +69,7 @@ def check_if_page_exists(page: str, wiki: str) -> bool:
             data={"titles": page, "prop": "info"},
         ).text
 
-        time.sleep(4)
+        time.sleep(SLEEP_DURATION)
         return 'missing":"' in result
 
 
