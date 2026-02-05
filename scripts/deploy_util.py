@@ -57,7 +57,7 @@ def read_cookie_jar(wiki: str) -> http.cookiejar.FileCookieJar:
     cookie_jar = http.cookiejar.LWPCookieJar(filename=ckf)
     try:
         cookie_jar.load(ignore_discard=True)
-    except:
+    except OSError:
         pass
     return cookie_jar
 

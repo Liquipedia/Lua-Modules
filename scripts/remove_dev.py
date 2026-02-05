@@ -3,8 +3,14 @@ import time
 
 import requests
 
-from deploy_util import *
-from login_and_get_token import *
+from deploy_util import (
+    HEADER,
+    get_wiki_api_url,
+    get_wikis,
+    read_cookie_jar,
+    write_to_github_summary_file,
+)
+from login_and_get_token import get_token
 
 
 LUA_DEV_ENV_NAME = os.getenv("LUA_DEV_ENV_NAME")

@@ -8,8 +8,16 @@ from typing import Iterable
 
 import requests
 
-from deploy_util import *
-from login_and_get_token import *
+from deploy_util import (
+    DEPLOY_TRIGGER,
+    HEADER,
+    get_git_deploy_reason,
+    get_wiki_api_url,
+    read_cookie_jar,
+    read_file_from_path,
+    write_to_github_summary_file,
+)
+from login_and_get_token import get_token
 
 
 def deploy_resources(
