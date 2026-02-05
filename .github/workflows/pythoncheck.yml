@@ -14,6 +14,4 @@ jobs:
         with:
           src: scripts/
       - name: Check styling
-        uses: psf/black@stable
-        with:
-          src: scripts/
+        run: ruff format scripts/
