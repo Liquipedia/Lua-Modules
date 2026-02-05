@@ -10,10 +10,8 @@ from typing import Iterable
 import requests
 
 from deploy_util import (
-    DEPLOY_TRIGGER,
-    HEADER,
     get_git_deploy_reason,
-    get_wiki_api_url,
+    deploy_file_to_wiki,
     read_cookie_jar,
     read_file_from_path,
     write_to_github_summary_file,
@@ -43,36 +41,10 @@ def deploy_all_files_for_wiki(
                 page = header_match.groupdict()["pageName"] + (
                     os.getenv("LUA_DEV_ENV_NAME") or ""
                 )
-                response = session.post(
-                    get_wiki_api_url(wiki),
-                    headers=HEADER,
-                    params={"format": "json", "action": "edit"},
-                    data={
-                        "title": page,
-                        "text": file_content,
-                        "summary": f"Git: {deploy_reason}",
-                        "bot": "true",
-                        "recreate": "true",
-                        "token": token,
-                    },
-                ).json()
-                result = response["edit"].get("result")
-                if result == "Success":
-                    new_rev_id = response["edit"].get("newrevid")
-                    if new_rev_id is None and DEPLOY_TRIGGER == "push":
-                        print(f"::notice file={str(file_path)}::No change made")
-                    elif new_rev_id is not None and DEPLOY_TRIGGER != "push":
-                        print(f"::warning file={str(file_path)}::File changed")
-                    print("...done")
-                    write_to_github_summary_file(
-                        f":information_source: {str(file_path)} successfully deployed"
-                    )
-                else:
-                    all_modules_deployed = False
-                    print(f"::warning file={str(file_path)}::failed to deploy")
-                    write_to_github_summary_file(
-                        f":warning: {str(file_path)} failed to deploy"
-                    )
+                module_deployed, _ = deploy_file_to_wiki(
+                    session, file_path, file_content, wiki, page, token, deploy_reason
+                )
+                all_modules_deployed = all_modules_deployed and module_deployed
                 time.sleep(4)
             print("::endgroup::")
     return all_modules_deployed
