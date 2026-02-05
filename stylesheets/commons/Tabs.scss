@@ -191,6 +191,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		}
 	}
 
+	/* Temporary solution for fighters */
 	&.wraps {
 		.tabs-nav-wrapper {
 			flex-wrap: wrap;

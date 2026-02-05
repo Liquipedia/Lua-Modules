@@ -110,6 +110,8 @@ function Tabs.dynamic(args)
 	end
 
 	local variantClass = 'tabs-variant-' .. variant
+
+	-- Temporary solution for fighters
 	local wraps = Logic.readBool(args.wrapping) and Info.wikiName == 'fighters'
 	local wrapsClass = wraps and 'wraps' or nil
 

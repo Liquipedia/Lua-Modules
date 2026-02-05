@@ -71,7 +71,10 @@ class TabsDOMUtils {
 class TabContainer {
 	constructor( containerElement ) {
 		this.container = containerElement;
+
+		// Temporary solution for fighters
 		this.wraps = containerElement.classList.contains( 'wraps' );
+
 		this.navWrapper = containerElement.querySelector( TABS_CONFIG.SELECTORS.NAV_WRAPPER );
 		this.navTabs = containerElement.querySelector( TABS_CONFIG.SELECTORS.NAV_TABS );
 		this.contentContainer = containerElement.querySelector( TABS_CONFIG.SELECTORS.CONTENT_CONTAINER );
