@@ -85,11 +85,13 @@ html.client-nojs .tabs-content > div:not( .active ) {
 	}
 
 	.tabs-nav-wrapper .nav-tabs {
+		display: flex;
 		flex-wrap: nowrap;
 		overflow-x: auto;
 		scrollbar-width: none;
 		border: unset !important;
 		margin: 0 !important;
+		list-style: none;
 
 		&::-webkit-scrollbar {
 			display: none;
@@ -101,6 +103,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			border: unset !important;
 			height: auto;
 			min-height: 2.75rem;
+			background-color: unset !important;
 
 			a {
 				display: flex;
