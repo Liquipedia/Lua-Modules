@@ -114,8 +114,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(self:getAllArgsForBase(args, 'map'), ';')
 
 	lpdbData.extradata.region = Template.safeExpand(mw.getCurrentFrame(), 'Template:Player region', {args.country})
-	lpdbData.extradata.startdate_raw = args.sdate or args.date
-	lpdbData.extradata.enddate_raw = args.edate or args.date
 	lpdbData.extradata.gamechangers = tostring(self.data.gameChangers)
 
 	return lpdbData
