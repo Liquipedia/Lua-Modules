@@ -8,9 +8,9 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local PlacementStats = Lua.import('Module:InfoboxPlacementStats')
 
 local Team = Lua.import('Module:Infobox/Team')
+local PlacementStats = Lua.import('Module:Infobox/Extension/PlacementStats')
 local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
