@@ -75,7 +75,7 @@ def search_and_remove(wiki: str):
 
 def main():
     for wiki in get_wikis():
-        if wiki == "commons" and os.getenv("INCLUDE_COMMONS") == "true":
+        if wiki == "commons" and os.getenv("INCLUDE_COMMONS") != "true":
             continue
         search_and_remove(wiki)
 
