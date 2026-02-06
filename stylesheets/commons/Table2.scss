@@ -96,9 +96,16 @@ $table2-cell-padding-x: 0.75rem;
 	}
 
 	&__caption {
-		padding: 0 0.75rem 0.5rem;
-		text-align: left;
+		margin-bottom: 0.75rem;
 		font-weight: bold;
+
+		.theme--light & {
+			color: var( --clr-secondary-39 );
+		}
+
+		.theme--dark & {
+			color: var( --clr-secondary-80 );
+		}
 	}
 
 	&__row--head {
@@ -161,21 +168,15 @@ $table2-cell-padding-x: 0.75rem;
 	}
 
 	&--themed {
-		.table2__row--head {
-			.table2__cell {
-				.theme--light & {
-					background-color: var( --clr-wiki-theme-40, var( --clr-wiki-theme-primary, #1f3d7a ) );
-				}
-
-				.theme--dark & {
-					background-color: var( --clr-wiki-theme-20, var( --clr-wiki-theme-primary, #1f3d7a ) );
-				}
-				color: #ffffff;
+		.table2__title {
+			.theme--light & {
+				background-color: var( --clr-wiki-theme-40, var( --clr-wiki-theme-primary, #1f3d7a ) );
 			}
 
-			a {
-				color: inherit;
+			.theme--dark & {
+				background-color: var( --clr-wiki-theme-20, var( --clr-wiki-theme-primary, #1f3d7a ) );
 			}
+			color: #ffffff;
 		}
 	}
 }
