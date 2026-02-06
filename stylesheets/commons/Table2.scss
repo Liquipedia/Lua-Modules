@@ -5,13 +5,13 @@ $table2-cell-padding-x: 0.75rem;
 @mixin table2-surface-colors() {
 	.theme--light & {
 		background-color: var( --clr-background, #ffffff );
-		border-color: var( --clr-secondary-90 );
+		border-color: var( --clr-on-surface-light-primary-12 );
 		color: var( --clr-secondary-16 );
 	}
 
 	.theme--dark & {
 		background-color: var( --clr-background, #121212 );
-		border-color: var( --clr-secondary-25 );
+		border-color: var( --clr-on-surface-dark-primary-12 );
 		color: var( --clr-secondary-100 );
 	}
 }
@@ -38,23 +38,28 @@ $table2-cell-padding-x: 0.75rem;
 		border-spacing: 0;
 		border-collapse: separate;
 		border: 0;
+
+		& caption {
+			padding: 0.5rem 0.75rem;
+			color: var( --clr-secondary-16 );
+			font-weight: bold;
+			border-bottom: 1px solid;
+
+			.theme--light & {
+				background-color: var( --clr-on-surface-light-primary-4 );
+				border-color: var( --clr-on-surface-light-primary-12 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+				border-color: var( --clr-on-surface-dark-primary-12 );
+			}
+		}
 	}
 
 	&__row--head {
 		.table2__cell {
 			font-weight: bold;
-		}
-	}
-
-	&__row--head-title {
-		.table2__cell {
-			.theme--light & {
-				background-color: var( --clr-on-surface-light-primary-4 );
-			}
-
-			.theme--dark & {
-				background-color: var( --clr-on-surface-dark-primary-4 );
-			}
 		}
 	}
 
@@ -128,11 +133,11 @@ $table2-cell-padding-x: 0.75rem;
 	&--hover {
 		.table2__row--body:hover {
 			.theme--light & {
-				background-color: var( --clr-on-surface-light-primary-4 );
+				background-color: var( --clr-on-surface-light-primary-8 );
 			}
 
 			.theme--dark & {
-				background-color: var( --clr-on-surface-dark-primary-4 );
+				background-color: var( --clr-on-surface-dark-primary-8 );
 			}
 		}
 	}
