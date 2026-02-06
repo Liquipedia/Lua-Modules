@@ -11,7 +11,7 @@ from deploy_util import (
     read_cookie_jar,
     write_to_github_summary_file,
 )
-from login_and_get_token import get_token
+from login_and_get_token import get_token, login
 
 LUA_DEV_ENV_NAME = os.getenv("LUA_DEV_ENV_NAME")
 
@@ -34,10 +34,10 @@ def remove_page(session: requests.Session, page: str, wiki: str):
             "reason": f"Remove {LUA_DEV_ENV_NAME}",
             "token": token,
         },
-    ).text
+    ).json()
     time.sleep(SLEEP_DURATION)
 
-    if '"delete"' not in result:
+    if "delete" not in result.keys():
         print(f"::warning::could not delete {page} on {wiki}")
         write_to_github_summary_file(f":warning: could not delete {page} on {wiki}")
         remove_errors.append(f"{wiki}:{page}")
@@ -45,7 +45,6 @@ def remove_page(session: requests.Session, page: str, wiki: str):
 
 def search_and_remove(wiki: str):
     with requests.Session() as session:
-        session.cookies = read_cookie_jar(wiki)
         search_result = session.post(
             get_wiki_api_url(wiki),
             headers=HEADER,
@@ -63,6 +62,9 @@ def search_and_remove(wiki: str):
 
         if len(pages) == 0:
             return
+
+        login(wiki)
+        session.cookies = read_cookie_jar(wiki)
 
         for page in pages:
             if os.getenv("INCLUDE_SUB_ENVS") == "true" or page["title"].endswith(
