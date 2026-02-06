@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
+local Table2Row = Lua.import('Module:Widget/Table2/Row')
 local Table2Section = Lua.import('Module:Widget/Table2/Section')
 
 ---@class Table2HeaderProps
@@ -27,9 +28,25 @@ Table2Header.defaultProps = {
 
 ---@return Widget
 function Table2Header:render()
+	local children = self.props.children
+	if children ~= nil then
+		children = {}
+		for index, child in ipairs(self.props.children or {}) do
+			if Class.instanceOf(child, Table2Row) then
+				child.props.classes = child.props.classes or {}
+				if index == 1 then
+					table.insert(child.props.classes, 'table2__row--head-title')
+				else
+					table.insert(child.props.classes, 'table2__row--head-columns')
+				end
+			end
+			table.insert(children, child)
+		end
+	end
+
 	return Table2Section{
 		value = 'head',
-		children = self.props.children,
+		children = children,
 	}
 end
 
