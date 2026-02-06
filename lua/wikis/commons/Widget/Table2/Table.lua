@@ -19,7 +19,6 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 ---@field classes string[]?
 ---@field css {[string]: string|number|nil}?
 ---@field attributes {[string]: any}?
----@field scroll (string|number|boolean)?
 ---@field sortable (string|number|boolean)?
 ---@field variant ('generic'|'themed')?
 ---@field variants ('generic'|'themed')?
@@ -41,7 +40,6 @@ Table2.defaultProps = {
 	classes = {},
 	variant = 'generic',
 	modifiers = {},
-	scroll = false,
 	sortable = false,
 	wrapperClasses = {},
 	tableClasses = {},
@@ -68,7 +66,6 @@ function Table2:render()
 		self.props.tableClasses
 	)
 
-	local scroll = Logic.readBool(self.props.scroll)
 	local captionNode = self.props.caption and HtmlWidgets.Div{
 		classes = {'table2__caption'},
 		children = {self.props.caption},
@@ -78,16 +75,13 @@ function Table2:render()
 		classes = tableClasses,
 		css = self.props.tableCss,
 		attributes = self.props.tableAttributes,
-		children = WidgetUtil.collect(
-			not scroll and self.props.caption and HtmlWidgets.Caption{children = self.props.caption} or nil,
-			self.props.children
-		)
+		children = self.props.children
 	}
 
-	local content = scroll and HtmlWidgets.Div{
+	local content = HtmlWidgets.Div{
 		classes = {'table2__scroll'},
 		children = {tableNode},
-	} or tableNode
+	}
 
 	local footer = self.props.footer and HtmlWidgets.Div{
 		classes = {'table2__footer'},
