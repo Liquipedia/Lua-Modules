@@ -17,20 +17,19 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 ---@class Table2Props
 ---@field children (Widget|Html|string|number|nil)[]?
 ---@field classes string[]?
+---@field variant 'generic'|'themed'?
+---@field sortable (string|number|boolean)?
+---@field caption Widget|Html|string|number?
+---@field title Widget|Html|string|number?
+---@field footer Widget|Html|string|number?
 ---@field css {[string]: string|number|nil}?
 ---@field attributes {[string]: any}?
----@field sortable (string|number|boolean)?
----@field variant ('generic'|'themed')?
----@field variants ('generic'|'themed')?
----@field modifiers string[]?
 ---@field wrapperClasses string[]?
 ---@field wrapperCss {[string]: string|number|nil}?
 ---@field wrapperAttributes {[string]: any}?
 ---@field tableClasses string[]?
 ---@field tableCss {[string]: string|number|nil}?
 ---@field tableAttributes {[string]: any}?
----@field caption (Widget|Html|string|number)?
----@field footer (Widget|Html|string|number)?
 
 ---@class Table2: Widget
 ---@operator call(Table2Props): Table2
@@ -39,7 +38,6 @@ local Table2 = Class.new(Widget)
 Table2.defaultProps = {
 	classes = {},
 	variant = 'generic',
-	modifiers = {},
 	sortable = false,
 	wrapperClasses = {},
 	tableClasses = {},
@@ -52,14 +50,8 @@ function Table2:render()
 	local wrapperCss = props.wrapperCss or props.css
 	local wrapperAttributes = props.wrapperAttributes or props.attributes
 
-	local variant = props.variant or props.variants or 'generic'
+	local variant = props.variant
 	local wrapperClasses = WidgetUtil.collect('table2', props.classes, props.wrapperClasses, 'table2--' .. variant)
-
-	for _, modifier in ipairs(props.modifiers or {}) do
-		if modifier ~= 'themed' and modifier ~= 'generic' then
-			table.insert(wrapperClasses, 'table2--' .. modifier)
-		end
-	end
 
 	local tableClasses = WidgetUtil.collect(
 		'table2__table',
@@ -70,6 +62,11 @@ function Table2:render()
 	local captionNode = props.caption and HtmlWidgets.Div{
 		classes = {'table2__caption'},
 		children = {props.caption},
+	} or nil
+
+	local titleNode = props.title and HtmlWidgets.Div{
+		classes = {'table2__title'},
+		children = {props.title},
 	} or nil
 
 	local tableNode = HtmlWidgets.Table{
@@ -89,11 +86,15 @@ function Table2:render()
 		children = {props.footer},
 	} or nil
 
-	return HtmlWidgets.Div{
+	local tableWrapperNode = HtmlWidgets.Div{
 		classes = wrapperClasses,
 		css = wrapperCss,
 		attributes = wrapperAttributes,
-		children = WidgetUtil.collect(captionNode, containerNode, footerNode),
+		children = WidgetUtil.collect(titleNode, containerNode, footerNode),
+	}
+
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(captionNode, tableWrapperNode),
 	}
 end
 
