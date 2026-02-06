@@ -95,7 +95,7 @@ end
 ---@param args table
 ---@return self
 function BaseTournamentsListing:init(args)
-	self.args = args
+	self.args = Table.merge(Info.config.tournamentsListing, args)
 
 	self:readConfig()
 
