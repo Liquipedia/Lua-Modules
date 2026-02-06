@@ -504,7 +504,7 @@ unsuccessful.
 Wikis sometimes provide variants of this function that include wiki specific
 transformations.
 ]]
----@param record table
+---@param record match2opponent|MGIParsedOpponent
 ---@return standardOpponent
 function Opponent.fromMatch2Record(record)
 	if record.type == Opponent.team then
