@@ -47,14 +47,15 @@ Table2.defaultProps = {
 
 ---@return Widget
 function Table2:render()
-	local wrapperClasses = WidgetUtil.collect('table2', self.props.classes, self.props.wrapperClasses)
-	local wrapperCss = self.props.wrapperCss or self.props.css
-	local wrapperAttributes = self.props.wrapperAttributes or self.props.attributes
+	local props = self.props
 
-	local variant = self.props.variant or self.props.variants or 'generic'
-	table.insert(wrapperClasses, 'table2--' .. variant)
+	local wrapperCss = props.wrapperCss or props.css
+	local wrapperAttributes = props.wrapperAttributes or props.attributes
 
-	for _, modifier in ipairs(self.props.modifiers or {}) do
+	local variant = props.variant or props.variants or 'generic'
+	local wrapperClasses = WidgetUtil.collect('table2', props.classes, props.wrapperClasses, 'table2--' .. variant)
+
+	for _, modifier in ipairs(props.modifiers or {}) do
 		if modifier ~= 'themed' and modifier ~= 'generic' then
 			table.insert(wrapperClasses, 'table2--' .. modifier)
 		end
@@ -62,37 +63,37 @@ function Table2:render()
 
 	local tableClasses = WidgetUtil.collect(
 		'table2__table',
-		Logic.readBool(self.props.sortable) and 'sortable' or nil,
-		self.props.tableClasses
+		Logic.readBool(props.sortable) and 'sortable' or nil,
+		props.tableClasses
 	)
 
-	local captionNode = self.props.caption and HtmlWidgets.Div{
+	local captionNode = props.caption and HtmlWidgets.Div{
 		classes = {'table2__caption'},
-		children = {self.props.caption},
+		children = {props.caption},
 	} or nil
 
 	local tableNode = HtmlWidgets.Table{
 		classes = tableClasses,
-		css = self.props.tableCss,
-		attributes = self.props.tableAttributes,
-		children = self.props.children
+		css = props.tableCss,
+		attributes = props.tableAttributes,
+		children = props.children,
 	}
 
-	local content = HtmlWidgets.Div{
-		classes = {'table2__scroll'},
+	local containerNode = HtmlWidgets.Div{
+		classes = {'table2__container'},
 		children = {tableNode},
 	}
 
-	local footer = self.props.footer and HtmlWidgets.Div{
+	local footerNode = props.footer and HtmlWidgets.Div{
 		classes = {'table2__footer'},
-		children = {self.props.footer},
+		children = {props.footer},
 	} or nil
 
 	return HtmlWidgets.Div{
 		classes = wrapperClasses,
 		css = wrapperCss,
 		attributes = wrapperAttributes,
-		children = WidgetUtil.collect(captionNode, content, footer),
+		children = WidgetUtil.collect(captionNode, containerNode, footerNode),
 	}
 end
 

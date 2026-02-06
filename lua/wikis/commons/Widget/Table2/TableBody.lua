@@ -27,9 +27,10 @@ Table2Body.defaultProps = {
 
 ---@return Widget
 function Table2Body:render()
+	local props = self.props
 	return Table2Section{
 		value = 'body',
-		children = self.props.children,
+		children = props.children,
 	}
 end
 

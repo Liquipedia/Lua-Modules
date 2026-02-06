@@ -27,9 +27,10 @@ Table2Footer.defaultProps = {
 
 ---@return Widget
 function Table2Footer:render()
+	local props = self.props
 	return Table2Section{
 		value = 'foot',
-		children = self.props.children,
+		children = props.children,
 	}
 end
 

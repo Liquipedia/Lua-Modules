@@ -46,24 +46,26 @@ end
 
 ---@return Widget
 function Table2Cell:render()
-	local attributes = Table.copy(self.props.attributes or {})
-	if self.props.colspan ~= nil then
-		attributes.colspan = self.props.colspan
+	local props = self.props
+
+	local attributes = Table.copy(props.attributes or {})
+	if props.colspan ~= nil then
+		attributes.colspan = props.colspan
 	end
-	if self.props.rowspan ~= nil then
-		attributes.rowspan = self.props.rowspan
+	if props.rowspan ~= nil then
+		attributes.rowspan = props.rowspan
 	end
 
 	return HtmlWidgets.Td{
 		classes = WidgetUtil.collect(
 			'table2__cell',
-			alignClass(self.props.align),
-			Logic.readBool(self.props.nowrap) and 'table2__cell--nowrap' or nil,
-			self.props.classes
+			alignClass(props.align),
+			Logic.readBool(props.nowrap) and 'table2__cell--nowrap' or nil,
+			props.classes
 		),
-		css = self.props.css,
+		css = props.css,
 		attributes = attributes,
-		children = self.props.children,
+		children = props.children,
 	}
 end
 

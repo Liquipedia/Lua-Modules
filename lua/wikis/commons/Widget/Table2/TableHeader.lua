@@ -28,20 +28,18 @@ Table2Header.defaultProps = {
 
 ---@return Widget
 function Table2Header:render()
-	local children = self.props.children
-	if children ~= nil then
-		children = {}
-		for index, child in ipairs(self.props.children or {}) do
-			if Class.instanceOf(child, Table2Row) then
-				child.props.classes = child.props.classes or {}
-				if index == 1 then
-					table.insert(child.props.classes, 'table2__row--head-title')
-				else
-					table.insert(child.props.classes, 'table2__row--head-columns')
-				end
+	local props = self.props
+	local children = {}
+	for index, child in ipairs(props.children or {}) do
+		if Class.instanceOf(child, Table2Row) then
+			child.props.classes = child.props.classes or {}
+			if index == 1 then
+				table.insert(child.props.classes, 'table2__row--head-title')
+			else
+				table.insert(child.props.classes, 'table2__row--head-columns')
 			end
-			table.insert(children, child)
 		end
+		table.insert(children, child)
 	end
 
 	return Table2Section{

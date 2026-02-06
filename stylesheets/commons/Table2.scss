@@ -25,7 +25,7 @@ $table2-cell-padding-x: 0.75rem;
 
 	@include table2-surface-colors();
 
-	&__scroll {
+	&__container {
 		overflow: auto hidden;
 		max-width: 100%;
 		-webkit-overflow-scrolling: touch;

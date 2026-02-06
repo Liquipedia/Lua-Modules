@@ -29,22 +29,24 @@ Table2Row.defaultProps = {
 
 ---@return Widget
 function Table2Row:render()
+	local props = self.props
 	local section = self:useContext(Table2Section)
+
 	local sectionClass = 'table2__row--body'
-	local sectionSortClass
+	local sortClass
 	if section == 'head' then
 		sectionClass = 'table2__row--head'
 	elseif section == 'foot' then
 		sectionClass = 'table2__row--foot'
 		-- MediaWiki sortable tables keep rows with this class at the bottom
-		sectionSortClass = 'sortbottom'
+		sortClass = 'sortbottom'
 	end
 
 	return HtmlWidgets.Tr{
-		classes = WidgetUtil.collect('table2__row', sectionClass, sectionSortClass, self.props.classes),
-		css = self.props.css,
-		attributes = self.props.attributes,
-		children = self.props.children,
+		classes = WidgetUtil.collect('table2__row', sectionClass, sortClass, props.classes),
+		css = props.css,
+		attributes = props.attributes,
+		children = props.children,
 	}
 end
 
