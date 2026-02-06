@@ -68,17 +68,23 @@ function Table2:render()
 		self.props.tableClasses
 	)
 
+	local scroll = Logic.readBool(self.props.scroll)
+	local captionNode = self.props.caption and HtmlWidgets.Div{
+		classes = {'table2__caption'},
+		children = {self.props.caption},
+	} or nil
+
 	local tableNode = HtmlWidgets.Table{
 		classes = tableClasses,
 		css = self.props.tableCss,
 		attributes = self.props.tableAttributes,
 		children = WidgetUtil.collect(
-			self.props.caption and HtmlWidgets.Caption{children = self.props.caption} or nil,
+			not scroll and self.props.caption and HtmlWidgets.Caption{children = self.props.caption} or nil,
 			self.props.children
 		)
 	}
 
-	local content = Logic.readBool(self.props.scroll) and HtmlWidgets.Div{
+	local content = scroll and HtmlWidgets.Div{
 		classes = {'table2__scroll'},
 		children = {tableNode},
 	} or tableNode
@@ -92,7 +98,7 @@ function Table2:render()
 		classes = wrapperClasses,
 		css = wrapperCss,
 		attributes = wrapperAttributes,
-		children = WidgetUtil.collect(content, footer),
+		children = WidgetUtil.collect(captionNode, content, footer),
 	}
 end
 

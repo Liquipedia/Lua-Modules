@@ -64,20 +64,21 @@ $table2-cell-padding-x: 0.75rem;
 				}
 			}
 		}
+	}
 
-		& caption {
-			padding: 0.5rem 0.75rem;
-			font-weight: bold;
+	&__caption,
+	&__table caption {
+		padding: 0.5rem 0.75rem;
+		font-weight: bold;
 
-			.theme--light & {
-				background-color: var( --clr-on-surface-light-primary-4 );
-				color: var( --clr-secondary-16 );
-			}
+		.theme--light & {
+			background-color: var( --clr-on-surface-light-primary-4 );
+			color: var( --clr-secondary-16 );
+		}
 
-			.theme--dark & {
-				background-color: var( --clr-on-surface-dark-primary-4 );
-				color: var( --clr-secondary-100 );
-			}
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+			color: var( --clr-secondary-100 );
 		}
 	}
 
