@@ -33,6 +33,20 @@ $table2-cell-padding-x: 0.75rem;
 		overscroll-behavior-x: contain;
 	}
 
+	&__footer {
+		padding: 0.5rem 0.75rem;
+		text-align: center;
+		border-top: 1px solid;
+
+		.theme--light & {
+			border-top-color: var( --clr-on-surface-light-primary-12 );
+		}
+
+		.theme--dark & {
+			border-top-color: var( --clr-on-surface-dark-primary-12 );
+		}
+	}
+
 	&__table {
 		width: 100%;
 		border-spacing: 0;

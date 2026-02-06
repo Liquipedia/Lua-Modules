@@ -31,6 +31,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 ---@field tableCss {[string]: string|number|nil}?
 ---@field tableAttributes {[string]: any}?
 ---@field caption (Widget|Html|string|number)?
+---@field footer (Widget|Html|string|number)?
 
 ---@class Table2: Widget
 ---@operator call(Table2Props): Table2
@@ -82,11 +83,16 @@ function Table2:render()
 		children = {tableNode},
 	} or tableNode
 
+	local footer = self.props.footer and HtmlWidgets.Div{
+		classes = {'table2__footer'},
+		children = {self.props.footer},
+	} or nil
+
 	return HtmlWidgets.Div{
 		classes = wrapperClasses,
 		css = wrapperCss,
 		attributes = wrapperAttributes,
-		children = {content},
+		children = WidgetUtil.collect(content, footer),
 	}
 end
 
