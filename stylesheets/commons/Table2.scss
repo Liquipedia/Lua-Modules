@@ -39,25 +39,48 @@ $table2-cell-padding-x: 0.75rem;
 		border-collapse: separate;
 		border: 0;
 
+		tbody {
+			.table2__row--body:nth-child( even ) {
+				.theme--light & {
+					background-color: var( --clr-on-surface-light-primary-4 );
+				}
+
+				.theme--dark & {
+					background-color: var( --clr-on-surface-dark-primary-4 );
+				}
+			}
+		}
+
 		& caption {
 			padding: 0.5rem 0.75rem;
-			color: var( --clr-secondary-16 );
 			font-weight: bold;
-			border-bottom: 1px solid;
 
 			.theme--light & {
 				background-color: var( --clr-on-surface-light-primary-4 );
-				border-color: var( --clr-on-surface-light-primary-12 );
+				color: var( --clr-secondary-16 );
 			}
 
 			.theme--dark & {
 				background-color: var( --clr-on-surface-dark-primary-4 );
-				border-color: var( --clr-on-surface-dark-primary-12 );
+				color: var( --clr-secondary-100 );
 			}
 		}
 	}
 
 	&__row--head {
+		outline: 1px solid;
+		text-wrap: nowrap;
+
+		.theme--light & {
+			outline-color: var( --clr-on-surface-light-primary-12 );
+			color: var( --clr-secondary-25 );
+		}
+
+		.theme--dark & {
+			outline-color: var( --clr-on-surface-dark-primary-12 );
+			color: var( --clr-secondary-80 );
+		}
+
 		.table2__cell {
 			font-weight: bold;
 		}
@@ -78,15 +101,6 @@ $table2-cell-padding-x: 0.75rem;
 	&__cell {
 		padding: $table2-cell-padding-y $table2-cell-padding-x;
 		vertical-align: middle;
-		border-bottom: 1px solid;
-
-		.theme--light & {
-			border-bottom-color: var( --clr-on-surface-light-primary-8 );
-		}
-
-		.theme--dark & {
-			border-bottom-color: var( --clr-on-surface-dark-primary-8 );
-		}
 
 		&--left {
 			text-align: left;
@@ -105,28 +119,10 @@ $table2-cell-padding-x: 0.75rem;
 		}
 	}
 
-	&__row--body:last-child {
-		.table2__cell {
-			border-bottom: 0;
-		}
-	}
-
 	&__row--foot {
 		.table2__cell {
 			text-align: center;
 			border-bottom: 0;
-		}
-	}
-
-	&--striped {
-		.table2__row--body.table2__row--striped {
-			.theme--light & {
-				background-color: var( --clr-on-surface-light-primary-4 );
-			}
-
-			.theme--dark & {
-				background-color: var( --clr-on-surface-dark-primary-4 );
-			}
 		}
 	}
 
@@ -163,20 +159,6 @@ $table2-cell-padding-x: 0.75rem;
 
 			a {
 				color: inherit;
-			}
-		}
-	}
-
-	&--generic {
-		.table2__row--head {
-			.table2__cell {
-				.theme--light & {
-					color: var( --clr-secondary-25 );
-				}
-
-				.theme--dark & {
-					color: var( --clr-secondary-90 );
-				}
 			}
 		}
 	}
