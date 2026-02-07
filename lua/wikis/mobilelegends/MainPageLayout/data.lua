@@ -41,7 +41,7 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{rumours = true},
+		body = TransfersList{},
 		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
 	thisDay = {
@@ -123,11 +123,6 @@ return {
 				method = 'LPDB',
 				table = 'transfer',
 			},
-		},
-		{
-			file = 'BG Shadow at M5.jpg',
-			title = 'Rumours',
-			link = 'Portal:Rumours',
 		},
 		{
 			file = 'NPFL Zarate at M6 Knockout Stage.jpg',
