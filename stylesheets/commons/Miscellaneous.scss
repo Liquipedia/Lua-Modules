@@ -37,12 +37,9 @@ Author(s): FO-nTTaX
 	font-weight: bold;
 }
 
+.timer-object:has(.timer-object-countdown-time:empty),
 .timer-object-countdown-only .timer-object-date,
-.timer-object-countdown-only .timer-object-separator {
-	display: none;
-}
-
-.timer-object-countdown-finished,
+.timer-object-countdown-only .timer-object-separator,
 .timer-object-datetime-only .timer-object-countdown,
 .timer-object-datetime-only .timer-object-separator {
 	display: none;

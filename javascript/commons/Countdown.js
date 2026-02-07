@@ -148,7 +148,7 @@ liquipedia.countdown = {
 		if ( differenceInSeconds <= -43200 || timerObjectNode.dataset.finished === 'finished' ) {
 			return {
 				text: '',
-				className: 'timer-object-countdown-finished'
+				className: ''
 			};
 		}
 
