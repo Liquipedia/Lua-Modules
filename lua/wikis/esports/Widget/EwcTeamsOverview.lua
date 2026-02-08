@@ -78,7 +78,7 @@ local GAMES = {
 		{lis = 'tft', wiki = 'tft'},
 		{lis = 'valorant', wiki = 'valorant'},
 		{lis = 't8', wiki = 'fighters'},
-		{lis = 'fornite', wiki = 'fortnite'},
+		{lis = 'fortnite', wiki = 'fortnite'},
 	}
 }
 
