@@ -19,7 +19,7 @@ local PrizePoolCurrency = {}
 
 local NOW = os.date('!%F') --[[@as string]]
 local USD = 'USD'
-local CATEGRORY = '[[Category:Tournaments with invalid prize pool]]'
+local CATEGRORY = 'Tournaments with invalid prize pool'
 
 ---@class InfoboxExtensionsPrizePoolArgs
 ---@field currency string?
@@ -52,11 +52,9 @@ function PrizePoolCurrency.display(args)
 
 	if not prizepool and not prizepoolUsd then
 		if Namespace.isMain() then
-			return (args.prizepool or args.prizepoolusd or '')
-				.. '[[Category:Tournaments with invalid prize pool]]'
-		else
-			return args.prizepool or args.prizepoolusd or ''
+			mw.ext.TeamLiquidIntegration.add_category(CATEGRORY)
 		end
+		return args.prizepool or args.prizepoolusd or ''
 	end
 
 	if not date then
