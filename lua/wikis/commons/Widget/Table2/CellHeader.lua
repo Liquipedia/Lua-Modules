@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
-local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -17,15 +16,13 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class Table2CellHeaderProps
 ---@field children (Widget|Html|string|number|nil)[]?
----@field classes string[]?
----@field css {[string]: string|number|nil}?
----@field attributes {[string]: any}?
 ---@field align ('left'|'right'|'center')?
 ---@field nowrap (string|number|boolean)?
 ---@field unsortable (string|number|boolean)?
 ---@field sortType string?
----@field colspan integer?
----@field rowspan integer?
+---@field classes string[]?
+---@field css {[string]: string|number|nil}?
+---@field attributes {[string]: any}?
 
 ---@class Table2CellHeader: Widget
 ---@operator call(Table2CellHeaderProps): Table2CellHeader
@@ -33,7 +30,6 @@ local Table2CellHeader = Class.new(Widget)
 
 Table2CellHeader.defaultProps = {
 	classes = {},
-	attributes = {},
 }
 
 ---@return string
@@ -56,15 +52,9 @@ function Table2CellHeader:render()
 		classes = WidgetUtil.collect(classes, 'unsortable')
 	end
 
-	local attributes = Table.copy(props.attributes or {})
+	local attributes = props.attributes or {}
 	if props.sortType ~= nil then
-		attributes['data-sort-type'] = props.sortType
-	end
-	if props.colspan ~= nil then
-		attributes.colspan = props.colspan
-	end
-	if props.rowspan ~= nil then
-		attributes.rowspan = props.rowspan
+		attributes = WidgetUtil.collect(attributes, {['data-sort-type'] = props.sortType})
 	end
 
 	return HtmlWidgets.Th{
