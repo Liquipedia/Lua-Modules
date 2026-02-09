@@ -127,7 +127,7 @@ function CustomPrizePool.addPointsDatapoint(data, index, prize)
 	local player = opponentData.players[1]
 	local prefix = 'circuit' .. (index > 1 and index or '')
 	local pointsDataPoint = Lpdb.DataPoint:new{
-		objectname = 'Points_' .. player.pageName,
+		objectname = 'Points' .. index .. '_' .. player.pageName,
 		type = 'points',
 		name = mw.ext.TeamLiquidIntegration.resolve_redirect(data.extradata[prefix]),
 		information = player.pageName,
