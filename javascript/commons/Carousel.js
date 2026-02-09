@@ -94,13 +94,11 @@ liquipedia.carousel = {
 
 		// If the carousel is initialized while hidden (e.g. inside a collapsible or content switch),
 		// its measurements are 0. Observe size changes so it self-heals once it becomes visible.
-		if ( typeof ResizeObserver === 'function' ) {
-			const ro = new ResizeObserver( () => {
-				liquipedia.carousel.scheduleRefresh();
-			} );
-			ro.observe( carouselData.content );
-			carouselData.resizeObserver = ro;
-		}
+		const ro = new ResizeObserver( () => {
+			liquipedia.carousel.scheduleRefresh();
+		} );
+		ro.observe( carouselData.content );
+		carouselData.resizeObserver = ro;
 	},
 
 	scroll: function( carouselData, direction ) {
