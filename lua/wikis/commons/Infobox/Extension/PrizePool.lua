@@ -19,7 +19,7 @@ local PrizePoolCurrency = {}
 
 local NOW = os.date('!%F') --[[@as string]]
 local USD = 'USD'
-local CATEGRORY = 'Tournaments with invalid prize pool'
+local ERROR_CATEGORY = 'Tournaments with invalid prize pool'
 
 ---@class InfoboxExtensionsPrizePoolArgs
 ---@field currency string?
@@ -52,7 +52,7 @@ function PrizePoolCurrency.display(args)
 
 	if not prizepool and not prizepoolUsd then
 		if Namespace.isMain() then
-			mw.ext.TeamLiquidIntegration.add_category(CATEGRORY)
+			mw.ext.TeamLiquidIntegration.add_category(ERROR_CATEGORY)
 		end
 		return args.prizepool or args.prizepoolusd or ''
 	end
@@ -172,7 +172,7 @@ end
 ---@return string
 function PrizePoolCurrency._errorMessage(message)
 	if Namespace.isMain() then
-		mw.ext.TeamLiquidIntegration.add_category(CATEGRORY)
+		mw.ext.TeamLiquidIntegration.add_category(ERROR_CATEGORY)
 	end
 	return tostring(mw.html.create('strong')
 		:addClass('error')
