@@ -55,7 +55,7 @@ function Table2CellHeader:render()
 
 	local attributes = props.attributes or {}
 	if props.sortType ~= nil then
-		attributes = WidgetUtil.collect(attributes, {['data-sort-type'] = props.sortType})
+		attributes['data-sort-type'] = props.sortType
 	end
 
 	return HtmlWidgets.Th{
