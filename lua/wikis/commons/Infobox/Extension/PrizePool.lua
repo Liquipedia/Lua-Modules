@@ -19,7 +19,7 @@ local PrizePoolCurrency = {}
 
 local NOW = os.date('!%F') --[[@as string]]
 local USD = 'USD'
-local CATEGRORY = '[[Category:Tournaments with invalid prize pool]]'
+local ERROR_CATEGORY = 'Tournaments with invalid prize pool'
 
 ---@class InfoboxExtensionsPrizePoolArgs
 ---@field currency string?
@@ -47,16 +47,14 @@ function PrizePoolCurrency.display(args)
 	local displayRoundPrecision = tonumber(args.displayRoundPrecision) or 0
 
 	if (varRoundPrecision ~= -1) and (varRoundPrecision < displayRoundPrecision) then
-		return PrizePoolCurrency._errorMessage('Display precision cannot be higher than Variable precious')
+		return PrizePoolCurrency._errorMessage('Display precision cannot be higher than Variable precision')
 	end
 
 	if not prizepool and not prizepoolUsd then
 		if Namespace.isMain() then
-			return (args.prizepool or args.prizepoolusd or '')
-				.. '[[Category:Tournaments with invalid prize pool]]'
-		else
-			return args.prizepool or args.prizepoolusd or ''
+			mw.ext.TeamLiquidIntegration.add_category(ERROR_CATEGORY)
 		end
+		return args.prizepool or args.prizepoolusd or ''
 	end
 
 	if not date then
@@ -173,15 +171,13 @@ end
 ---@param message string
 ---@return string
 function PrizePoolCurrency._errorMessage(message)
-	local category = ''
 	if Namespace.isMain() then
-		category = CATEGRORY
+		mw.ext.TeamLiquidIntegration.add_category(ERROR_CATEGORY)
 	end
 	return tostring(mw.html.create('strong')
 		:addClass('error')
 		:wikitext('Error: ')
-		:wikitext(mw.text.nowiki(message))
-		:wikitext(category))
+		:wikitext(mw.text.nowiki(message)))
 end
 
 return Class.export(PrizePoolCurrency, {exports = {'display'}})
