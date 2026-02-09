@@ -190,6 +190,7 @@ function MatchlistDisplay.DateHeader(match)
 			children = Countdown.create(Table.merge(match.stream, {
 				date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
 				finished = match.finished,
+				rawdatetime = (not match.dateIsExact) or match.finished,
 			}))
 		}
 	}
