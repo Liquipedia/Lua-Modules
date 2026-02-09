@@ -171,15 +171,13 @@ end
 ---@param message string
 ---@return string
 function PrizePoolCurrency._errorMessage(message)
-	local category = ''
 	if Namespace.isMain() then
-		category = CATEGRORY
+		mw.ext.TeamLiquidIntegration.add_category(CATEGRORY)
 	end
 	return tostring(mw.html.create('strong')
 		:addClass('error')
 		:wikitext('Error: ')
-		:wikitext(mw.text.nowiki(message))
-		:wikitext(category))
+		:wikitext(mw.text.nowiki(message)))
 end
 
 return Class.export(PrizePoolCurrency, {exports = {'display'}})
