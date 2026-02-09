@@ -47,7 +47,7 @@ function PrizePoolCurrency.display(args)
 	local displayRoundPrecision = tonumber(args.displayRoundPrecision) or 0
 
 	if (varRoundPrecision ~= -1) and (varRoundPrecision < displayRoundPrecision) then
-		return PrizePoolCurrency._errorMessage('Display precision cannot be higher than Variable precious')
+		return PrizePoolCurrency._errorMessage('Display precision cannot be higher than Variable precision')
 	end
 
 	if not prizepool and not prizepoolUsd then
