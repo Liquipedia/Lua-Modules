@@ -11,7 +11,7 @@ local Class = Lua.import('Module:Class')
 
 local WidgetContext = Lua.import('Module:Widget/Context')
 
----@alias Table2SectionName 'head'|'body'|'foot'
+---@alias Table2SectionName 'head'|'body'
 
 ---@class Table2Section: WidgetContext
 ---@operator call(table): Table2Section

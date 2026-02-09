@@ -33,17 +33,12 @@ function Table2Row:render()
 	local section = self:useContext(Table2Section)
 
 	local sectionClass = 'table2__row--body'
-	local sortClass
 	if section == 'head' then
 		sectionClass = 'table2__row--head'
-	elseif section == 'foot' then
-		sectionClass = 'table2__row--foot'
-		-- MediaWiki sortable tables keep rows with this class at the bottom
-		sortClass = 'sortbottom'
 	end
 
 	return HtmlWidgets.Tr{
-		classes = WidgetUtil.collect('table2__row', sectionClass, sortClass, props.classes),
+		classes = WidgetUtil.collect('table2__row', sectionClass, props.classes),
 		css = props.css,
 		attributes = props.attributes,
 		children = props.children,
