@@ -309,7 +309,7 @@ function Appearances:_buildQueryLink()
 		attributes = {colspan = #self.tournaments + 3},
 		css = {['font-size'] = 'small'},
 		children = LinkWidget{
-			link = tostring(mw.uri.fullUrl('Special:RunQuery/Player_tournament_appearances', queryTable)),
+			link = tostring(mw.uri.fullUrl('Special:RunQuery/Player tournament appearances', queryTable)),
 			children = 'Click here to modify this table',
 			linktype = 'external',
 		}
