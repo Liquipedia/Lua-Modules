@@ -35,7 +35,12 @@ local Center = Widgets.Center
 local Title = Widgets.Title
 
 ---@class WarcraftLeagueInfobox: InfoboxLeague
+---@operator call(Frame): WarcraftLeagueInfobox
 local CustomLeague = Class.new(League)
+
+---@class WarcraftLeagueInfoboxWidgetInjector: WidgetInjector
+---@operator call(WarcraftLeagueInfobox): WarcraftLeagueInfoboxWidgetInjector
+---@field caller WarcraftLeagueInfobox
 local CustomInjector = Class.new(Injector)
 
 local CANCELLED = 'cancelled'
