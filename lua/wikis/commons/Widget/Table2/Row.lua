@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local Widget = Lua.import('Module:Widget')
 local Table2Section = Lua.import('Module:Widget/Table2/Section')
 local Table2HeaderRowKind = Lua.import('Module:Widget/Table2/HeaderRowKind')
+local Table2BodyStripe = Lua.import('Module:Widget/Table2/BodyStripe')
 local Table2CellIndexer = Lua.import('Module:Widget/Table2/CellIndexer')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -34,6 +35,7 @@ function Table2Row:render()
 	local props = self.props
 	local section = self:useContext(Table2Section)
 	local headerRowKind = self:useContext(Table2HeaderRowKind)
+	local bodyStripe = self:useContext(Table2BodyStripe)
 
 	local sectionClass = 'table2__row--body'
 	if section == 'head' then
@@ -49,12 +51,21 @@ function Table2Row:render()
 		end
 	end
 
+	local stripeClass = nil
+	if section == 'body' then
+		if bodyStripe == 'odd' then
+			stripeClass = 'table2__row--odd'
+		elseif bodyStripe == 'even' then
+			stripeClass = 'table2__row--even'
+		end
+	end
+
 	local indexedChildren = {Table2CellIndexer{
 		children = props.children,
 	}}
 
 	return HtmlWidgets.Tr{
-		classes = WidgetUtil.collect('table2__row', sectionClass, kindClass, props.classes),
+		classes = WidgetUtil.collect('table2__row', sectionClass, kindClass, stripeClass, props.classes),
 		css = props.css,
 		attributes = props.attributes,
 		children = indexedChildren,
