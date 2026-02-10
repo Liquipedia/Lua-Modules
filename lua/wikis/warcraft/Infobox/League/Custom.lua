@@ -330,6 +330,7 @@ function CustomLeague:_displayStartDateTime()
 	return Countdown.create{
 		date = self.data.startTime.raw,
 		finished = self.data.isFinished,
+		rawdatetime = self.data.isFinished,
 	}
 end
 
