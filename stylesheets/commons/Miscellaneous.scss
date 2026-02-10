@@ -2277,15 +2277,15 @@ Author: warnull
 }
 
 /*******************************************************************************
-Usage: Only dispaly for admins
+Usage: Only display for admins
 Author: hjpalpha
 *******************************************************************************/
 .show-when-admin {
 	display: none !important;
-}
 
-.user-is-sysop .show-when-admin {
-	display: unset !important;
+	.user-is-sysop & {
+		display: unset !important;
+	}
 }
 
 /*******************************************************************************
