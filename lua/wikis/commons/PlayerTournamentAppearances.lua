@@ -298,18 +298,17 @@ end
 ---@return Html
 function Appearances:_buildQueryLink()
 	local queryTable = {
-		['PTAdev[series]'] = self.plainArgs.series or '',
-		['PTAdev[pages]'] = self.plainArgs.pages or '',
-		['PTAdev[tiers]'] = self.plainArgs.tiers or '',
-		['PTAdev[limit]'] = self.plainArgs.limit or '',
-		['PTAdev[playerspage]'] = self.plainArgs.playerspage or '',
-		['PTAdev[query]'] = 'true',
+		['PTA[series]'] = self.plainArgs.series or '',
+		['PTA[pages]'] = table.concat(self.args.pages, ','),
+		['PTA[tiers]'] = self.plainArgs.tiers,
+		['PTA[limit]'] = self.plainArgs.limit or '',
+		['PTA[playerspage]'] = self.plainArgs.playerspage or '',
+		['PTA[query]'] = 'true',
+		pfRunQueryFormName = 'Player tournament appearances',
+		wpRunQuery = 'Run query',
 	}
 
-	self:_toQuerySubTable(queryTable, 'pages')
-	self:_toQuerySubTable(queryTable, 'tiers')
-
-	local queryString = tostring(mw.uri.fullUrl('Special:RunQuery/Player_tournament_appearances')) .. '?pfRunQueryFormName=Player+tournament+appearances&' .. mw.uri.buildQueryString(queryTable) .. '&wpRunQuery=Run+query'
+	local queryString = tostring(mw.uri.fullUrl('Special:RunQuery/Player_tournament_appearances', queryTable))
 
 	return mw.html.create('tr')
 		:tag('th')
@@ -317,16 +316,6 @@ function Appearances:_buildQueryLink()
 			:css('font-size', 'small')
 			:wikitext('[' .. queryString .. ' Click here to modify this table]')
 			:done()
-end
-
----@private
----@param queryTable table
----@param key string
-function Appearances:_toQuerySubTable(queryTable, key)
-	local prefix = 'PTAdev[' .. key .. ']'
-	for index, value in ipairs(self.args[key] or {''}) do
-		queryTable[prefix .. '[' .. index .. ']'] = value
-	end
 end
 
 return Appearances
