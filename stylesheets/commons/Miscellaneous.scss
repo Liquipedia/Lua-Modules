@@ -232,18 +232,18 @@ Author(s): FO-nTTaX, Elysienna
 			border-right: 5px solid #ffffff;
 		}
 	}
+
+	&-mobile {
+		position: relative;
+		top: -5px;
+		padding: 2px 4px;
+		left: 0;
+		margin-right: 3px;
+	}
 }
 
 .menu-italic {
 	font-style: italic;
-}
-
-.liquipedia-links-badge-mobile {
-	position: relative;
-	top: -5px;
-	padding: 2px 4px;
-	left: 0;
-	margin-right: 3px;
 }
 
 /*******************************************************************************
@@ -743,12 +743,14 @@ td.bold-white-text {
 Template(s): WC3 Creep Spots
 Author(s): FO-nTTaX, turbosau
 *******************************************************************************/
-.creep-spot img {
-	cursor: pointer;
-}
+.creep-spot {
+	img {
+		cursor: pointer;
+	}
 
-.creep-spot-popup {
-	display: none;
+	&-popup {
+		display: none;
+	}
 }
 
 /*******************************************************************************
@@ -767,59 +769,59 @@ Author(s): spazer
 		display: inline-block;
 		padding: 10px 0;
 	}
-}
 
-.player-info-card-title {
-	font-size: 150%;
-	font-weight: bold;
-	text-align: center;
-}
+	&-title {
+		font-size: 150%;
+		font-weight: bold;
+		text-align: center;
+	}
 
-.player-info-card-realname {
-	font-style: italic;
-	text-align: center;
-	padding-bottom: 5px;
-}
-
-.player-info-card-main {
-	background-color: #eeeeee;
-	width: 100%;
-
-	&-top {
-		display: inline-block;
-		border-width: 0 0 2px 0;
-		border-style: solid;
-		padding-left: 2px;
-		margin: 5px 0 0 5px;
-		width: calc( 100% - 10px );
+	&-realname {
+		font-style: italic;
 		text-align: center;
 		padding-bottom: 5px;
 	}
 
-	&-bottom {
-		display: inline-block;
-		margin: 5px 5px 5px 5px;
-		padding-right: 5px;
+	&-main {
+		background-color: #eeeeee;
+		width: 100%;
 
-		> table {
-			width: 100%;
+		&-top {
+			display: inline-block;
+			border-width: 0 0 2px 0;
+			border-style: solid;
+			padding-left: 2px;
+			margin: 5px 0 0 5px;
+			width: calc( 100% - 10px );
+			text-align: center;
+			padding-bottom: 5px;
+		}
+
+		&-bottom {
+			display: inline-block;
 			margin: 5px 5px 5px 5px;
+			padding-right: 5px;
 
-			> tbody > tr > th {
-				text-align: right;
-				padding-right: 10px;
-				vertical-align: middle;
-				max-width: 175px;
-				white-space: nowrap;
-				padding-bottom: 5px;
-				margin-bottom: 5px;
-				height: 30px;
-			}
+			> table {
+				width: 100%;
+				margin: 5px 5px 5px 5px;
 
-			> tbody > tr > td {
-				vertical-align: middle;
-				padding-bottom: 5px;
-				height: 30px;
+				> tbody > tr > th {
+					text-align: right;
+					padding-right: 10px;
+					vertical-align: middle;
+					max-width: 175px;
+					white-space: nowrap;
+					padding-bottom: 5px;
+					margin-bottom: 5px;
+					height: 30px;
+				}
+
+				> tbody > tr > td {
+					vertical-align: middle;
+					padding-bottom: 5px;
+					height: 30px;
+				}
 			}
 		}
 	}
