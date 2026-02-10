@@ -24,6 +24,7 @@ local Page = Lua.import('Module:Page')
 local Placement = Lua.import('Module:Placement')
 local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
+local Tournament = Lua.import('Module:Tournament')
 
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
@@ -37,6 +38,7 @@ local DEFAULT_TIERTYPES = {'General', 'School', ''}
 
 ---@class PlayerTournamentAppearances: BaseClass
 ---@operator call(Frame): PlayerTournamentAppearances
+---@field tournaments StandardTournament[]
 local Appearances = Class.new(function(self, frame) self:init(frame) end)
 
 ---@param frame Frame
@@ -83,12 +85,7 @@ end
 
 ---@return self
 function Appearances:create()
-	self.tournaments = mw.ext.LiquipediaDB.lpdb('tournament', {
-			conditions = tostring(self.args.conditions or self:_buildConditions()),
-			limit = 5000,
-			order = 'enddate asc',
-			query = 'pagename, name, shortname, icon, icondark',
-	})
+	self.tournaments = Tournament.getAllTournaments(self.args.conditions or self:_buildConditions())
 
 	if Table.isEmpty(self.tournaments) then
 		return self
