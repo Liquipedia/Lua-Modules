@@ -41,6 +41,7 @@ local Tr = HtmlWidgets.Tr
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local DEFAULT_TIERTYPES = {'General', 'School', ''}
+local FORM_NAME = 'Player tournament appearances'
 
 ---@class PlayerTournamentAppearances: BaseClass
 ---@operator call(Frame): PlayerTournamentAppearances
@@ -292,8 +293,11 @@ function Appearances:_row(playerIndex)
 end
 
 ---@private
----@return Widget
+---@return Widget?
 function Appearances:_buildQueryLink()
+	if not Page.exists('Form:' .. FORM_NAME) then
+		return
+	end
 	local queryTable = {
 		['PTA[series]'] = self.plainArgs.series or '',
 		['PTA[pages]'] = table.concat(self.args.pages, ','),
@@ -301,7 +305,7 @@ function Appearances:_buildQueryLink()
 		['PTA[limit]'] = self.plainArgs.limit or '',
 		['PTA[playerspage]'] = self.plainArgs.playerspage or '',
 		['PTA[query]'] = 'true',
-		pfRunQueryFormName = 'Player tournament appearances',
+		pfRunQueryFormName = FORM_NAME,
 		wpRunQuery = 'Run query',
 	}
 
@@ -309,7 +313,7 @@ function Appearances:_buildQueryLink()
 		attributes = {colspan = #self.tournaments + 3},
 		css = {['font-size'] = 'small'},
 		children = LinkWidget{
-			link = tostring(mw.uri.fullUrl('Special:RunQuery/Player tournament appearances', queryTable)),
+			link = tostring(mw.uri.fullUrl('Special:RunQuery/' .. FORM_NAME, queryTable)),
 			children = 'Click here to modify this table',
 			linktype = 'external',
 		}
