@@ -206,33 +206,6 @@ function Appearances:_placementConditions(pageNames)
 	return conditions
 end
 
----@private
----@param parent ConditionTree
----@param arr string[]
----@param key string
----@param key2 string?
----@param toUnderScore boolean?
-function Appearances._buildOrConditionsFromArray(parent, arr, key, key2, toUnderScore)
-	if Table.isEmpty(arr) then return end
-
-	local orConditions = ConditionTree(BooleanOperator.any)
-	for _, value in ipairs(arr) do
-		orConditions:add{ConditionNode(ColumnName(key), Comparator.eq, value)}
-		if key2 then
-			orConditions:add{ConditionNode(ColumnName(key2), Comparator.eq, value)}
-		end
-		local underScoreValue = value:gsub(' ', '_')
-		if toUnderScore then
-			orConditions:add{ConditionNode(ColumnName(key), Comparator.eq, underScoreValue)}
-		end
-		if key2 and toUnderScore then
-			orConditions:add{ConditionNode(ColumnName(key2), Comparator.eq, underScoreValue)}
-		end
-	end
-
-	parent:add(orConditions)
-end
-
 ---@return string|Html
 function Appearances:build()
 	if not self.players then return 'No results found.' end
