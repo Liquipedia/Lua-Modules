@@ -190,23 +190,20 @@ end
 
 ---@private
 ---@param pageNames string[]
----@return string
+---@return ConditionTree
 function Appearances:_placementConditions(pageNames)
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('opponentplayers'), Comparator.neq, '')}
-		:add{ConditionNode(ColumnName('opponentplayers'), Comparator.neq, '[]')}
-		:add{ConditionNode(ColumnName('opponentname'), Comparator.neq, 'TBD')}
-		:add{ConditionNode(ColumnName('opponentname'), Comparator.neq, 'Definitions')}
-		:add{ConditionNode(ColumnName('opponentname'), Comparator.neq, '')}
-		:add{ConditionNode(ColumnName('mode'), Comparator.neq, 'award_individual')}
-
-	Appearances._buildOrConditionsFromArray(conditions, pageNames, 'pagename')
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionUtil.noneOf(ColumnName('opponentplayers'), {'', '[]'}),
+		ConditionUtil.noneOf(ColumnName('opponentname'), {'TBD', 'Definitions', ''}),
+		ConditionNode(ColumnName('mode'), Comparator.neq, 'award_individual'),
+		ConditionUtil.anyOf(ColumnName('pagename'), pageNames)
+	}
 
 	if self.config.restrictToFirstPrizePool then
-		conditions:add{ConditionNode(ColumnName('prizepoolindex'), Comparator.eq, 1)}
+		conditions:add(ConditionNode(ColumnName('prizepoolindex'), Comparator.eq, 1))
 	end
 
-	return conditions:toString()
+	return conditions
 end
 
 ---@private
