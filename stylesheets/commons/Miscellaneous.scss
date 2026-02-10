@@ -2717,11 +2717,11 @@ Author(s): Scribunto developer( s )
 *******************************************************************************/
 .scribunto-error {
 	cursor: pointer;
-}
 
-.scribunto-error:hover,
-.scribunto-error:focus {
-	text-decoration: underline;
+	&:hover,
+	&:focus {
+		text-decoration: underline;
+	}
 }
 
 /*******************************************************************************
