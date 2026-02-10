@@ -100,6 +100,7 @@ function Appearances:create()
 	return self
 end
 
+---@private
 ---@return ConditionTree
 function Appearances:_buildConditions()
 	local args = self.args
@@ -131,6 +132,9 @@ function Appearances:_buildConditions()
 	return conditions
 end
 
+---@private
+---@param pageNames string[]
+---@return table[]
 function Appearances:_fetchPlayers(pageNames)
 	local players = {}
 
@@ -187,6 +191,7 @@ function Appearances:_fetchPlayers(pageNames)
 	return playersArray
 end
 
+---@private
 ---@param pageNames string[]
 ---@return string
 function Appearances:_placementConditions(pageNames)
@@ -207,6 +212,7 @@ function Appearances:_placementConditions(pageNames)
 	return conditions:toString()
 end
 
+---@private
 ---@param parent ConditionTree
 ---@param arr string[]
 ---@param key string
