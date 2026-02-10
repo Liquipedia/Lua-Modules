@@ -34,7 +34,10 @@ local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
+local Th = HtmlWidgets.Th
+local Tr = HtmlWidgets.Tr
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local DEFAULT_TIERTYPES = {'General', 'School', ''}
@@ -238,20 +241,16 @@ function Appearances:build()
 end
 
 ---@private
----@return Html
+---@return Widget
 function Appearances:_header()
-	local header = mw.html.create('tr')
-		:tag('th'):done()
-
-	header
-		:tag('th'):wikitext('Player'):done()
-		:tag('th'):wikitext(Abbreviation.make{text = 'TA.', title = 'Total appearances'})
-
-	for _, tournament in ipairs(self.tournaments) do
-		header:tag('th'):node(TournamentTitle{tournament = tournament})
-	end
-
-	return header
+	return Tr{children = WidgetUtil.collect(
+		Th{},
+		Th{children = 'Player'},
+		Th{children = HtmlWidgets.Abbr{children = 'TA.', title = 'Total appearances'}},
+		Array.map(self.tournaments, function (tournament)
+			return Th{children = TournamentTitle{tournament = tournament}}
+		end)
+	)}
 end
 
 ---@private
