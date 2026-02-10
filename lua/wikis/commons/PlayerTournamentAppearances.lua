@@ -13,19 +13,17 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Condition = Lua.import('Module:Condition')
 local DateExt = Lua.import('Module:Date/Ext')
+local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Operator = Lua.import('Module:Operator')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local Placement = Lua.import('Module:Placement')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
-
-local FACTION
-
-local Opponent = Lua.import('Module:Opponent/Custom')
 
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
@@ -271,7 +269,6 @@ function Appearances:_header()
 		:tag('th'):done()
 
 	if self.config.displayFactionColumn then
-		FACTION = Lua.import('Module:Faction')
 		header:tag('th')
 	end
 
@@ -310,7 +307,7 @@ function Appearances:_row(playerIndex)
 		:tag('td'):wikitext(Flags.Icon{flag = player.flag}):done()
 
 	if self.config.displayFactionColumn then
-		row:tag('td'):wikitext(FACTION.Icon{faction = player.faction})
+		row:tag('td'):wikitext(Faction.Icon{faction = player.faction})
 	end
 
 	row
