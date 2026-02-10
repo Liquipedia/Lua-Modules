@@ -351,36 +351,34 @@ span.icon-small {
 	align-items: center;
 	min-height: 25px;
 	min-width: 25px;
+
+	[ data-darkreader-scheme="dark" ] &.lightmode,
+	.theme--dark &.lightmode {
+		display: none;
+	}
 }
 
-.league-icon-small-image img,
-.icon-small img {
-	max-width: 25px;
-	max-height: 25px;
-	height: auto;
-	width: auto;
-}
+.league-icon-small-image,
+.icon-small {
+	img {
+		max-width: 25px;
+		max-height: 25px;
+		height: auto;
+		width: auto;
+	}
 
-.league-icon-small-image a,
-.icon-small a {
-	display: contents;
+	a {
+		display: contents;
+	}
 }
 
 /* LeagueIconSmall dark mode support */
 span.league-icon-small-image.darkmode,
 span.icon-small.darkmode {
 	display: none;
-}
 
-[ data-darkreader-scheme="dark" ],
-.theme--dark {
-	span.league-icon-small-image.lightmode,
-	span.icon-small.lightmode {
-		display: none;
-	}
-
-	span.league-icon-small-image.darkmode,
-	span.icon-small.darkmode {
+	[ data-darkreader-scheme="dark" ] &,
+	.theme--dark & {
 		display: inline-flex;
 	}
 }
