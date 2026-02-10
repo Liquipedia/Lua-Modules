@@ -56,7 +56,7 @@ function Tournament.getAllTournaments(conditions, filterTournament)
 	Lpdb.executeMassQuery(
 		'tournament',
 		{
-			conditions = tostring(conditions),
+			conditions = conditions and tostring(conditions),
 			order = 'sortdate desc',
 			limit = 1000,
 		},
