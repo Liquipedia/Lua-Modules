@@ -36,12 +36,18 @@ local ColumnName = Condition.ColumnName
 local ICON_HEADER_TYPES = {'icons', 'icon'}
 local DEFAULT_TIERTYPES = {'General', 'School', ''}
 
+---@class PlayerTournamentAppearances: BaseClass
+---@operator call(Frame): PlayerTournamentAppearances
 local Appearances = Class.new(function(self, frame) self:init(frame) end)
 
+---@param frame Frame
+---@return string|Html
 function Appearances.run(frame)
 	return Appearances(frame):create():build()
 end
 
+---@param frame Frame
+---@return self
 function Appearances:init(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -75,11 +81,14 @@ function Appearances:init(frame)
 	return self
 end
 
+---@param input string?
+---@return string[]?
 function Appearances._readCommaSep(input)
 	return input and Array.map(mw.text.split(input, ','), String.trim)
 		or nil
 end
 
+---@return self
 function Appearances:create()
 	self.tournaments = mw.ext.LiquipediaDB.lpdb('tournament', {
 			conditions = self.args.conditions or self:_buildConditions(),
@@ -98,6 +107,7 @@ function Appearances:create()
 	return self
 end
 
+---@return string
 function Appearances:_buildConditions()
 	local args = self.args
 
@@ -182,6 +192,8 @@ function Appearances:_fetchPlayers(pageNames)
 	return playersArray
 end
 
+---@param pageNames string[]
+---@return string
 function Appearances:_placementConditions(pageNames)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('opponentplayers'), Comparator.neq, '')}
@@ -200,6 +212,11 @@ function Appearances:_placementConditions(pageNames)
 	return conditions:toString()
 end
 
+---@param parent ConditionTree
+---@param arr string[]
+---@param key string
+---@param key2 string?
+---@param toUnderScore boolean?
 function Appearances._buildOrConditionsFromArray(parent, arr, key, key2, toUnderScore)
 	if Table.isEmpty(arr) then return end
 
@@ -221,6 +238,7 @@ function Appearances._buildOrConditionsFromArray(parent, arr, key, key2, toUnder
 	parent:add(orConditions)
 end
 
+---@return string|Html
 function Appearances:build()
 	if not self.players then return 'No results found.' end
 
@@ -246,6 +264,8 @@ function Appearances:build()
 		:node(display)
 end
 
+---@private
+---@return Html
 function Appearances:_header()
 	local header = mw.html.create('tr')
 		:tag('th'):done()
@@ -280,6 +300,9 @@ function Appearances:_header()
 	return header
 end
 
+---@private
+---@param playerIndex integer
+---@return Html
 function Appearances:_row(playerIndex)
 	local player = self.players[playerIndex]
 
@@ -315,6 +338,8 @@ function Appearances:_row(playerIndex)
 	return row
 end
 
+---@private
+---@return Html
 function Appearances:_buildQueryLink()
 	local queryTable = {
 		['PTAdev[series]'] = self.plainArgs.series or '',
@@ -338,6 +363,9 @@ function Appearances:_buildQueryLink()
 			:done()
 end
 
+---@private
+---@param queryTable table
+---@param key string
 function Appearances:_toQuerySubTable(queryTable, key)
 	local prefix = 'PTAdev[' .. key .. ']'
 	for index, value in ipairs(self.args[key] or {''}) do
