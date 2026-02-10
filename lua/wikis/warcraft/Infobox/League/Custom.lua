@@ -95,7 +95,7 @@ function CustomLeague.run(frame)
 		args.prizepool = nil
 	end
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 ---@param args table
