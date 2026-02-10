@@ -62,7 +62,9 @@ function Table2:render()
 	if props.columns and #props.columns > 0 then
 		Array.forEach(props.columns, function(columnDef, i)
 			local valid, errorMsg = ColumnUtil.validateColumnDef(columnDef)
-			assert(valid, 'Table2: Column ' .. i .. ' - ' .. errorMsg)
+			if not valid then
+				assert(false, 'Table2: Column ' .. i .. ' - ' .. errorMsg)
+			end
 		end)
 	end
 
