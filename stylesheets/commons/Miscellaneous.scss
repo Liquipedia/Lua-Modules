@@ -594,9 +594,9 @@ Author(s): FO-nTTaX, Rapture
 		max-width: none;
 	}
 
-	/* spazer's test changes */
-	/* Make spellcards wider for wide screens */
 	@media ( min-width: 2560px ) {
+		/* spazer's test changes */
+		/* Make spellcards wider for wide screens */
 		max-width: 700px;
 	}
 }
