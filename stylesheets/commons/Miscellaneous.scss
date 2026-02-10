@@ -892,14 +892,14 @@ Author(s): Vogan
 	display: table-row;
 	width: auto;
 	line-height: 1.42857143;
-}
 
-.RumourRow:nth-child( 2n+1 ) {
-	background-color: var( --table-striped-background-color, #f9f9f9 );
-}
+	&:nth-child( 2n+1 ) {
+		background-color: var( --table-striped-background-color, #f9f9f9 );
+	}
 
-.RumourRow .divCell {
-	border-top: 1px solid var( --clr-border, #bbbbbb );
+	.divCell {
+		border-top: 1px solid var( --clr-border, #bbbbbb );
+	}
 }
 
 @media ( max-width: 560px ) {
