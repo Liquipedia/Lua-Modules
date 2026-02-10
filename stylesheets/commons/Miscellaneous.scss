@@ -2012,11 +2012,11 @@ Author(s): Vogan, salle
 .esports-team-game-list {
 	display: flex;
 	flex-wrap: wrap;
-}
 
-.esports-team-game-list > p {
-	margin-bottom: 20px !important;
-	margin-top: 10px !important;
+	> p {
+		margin-bottom: 20px !important;
+		margin-top: 10px !important;
+	}
 }
 
 .esports-team-game {
