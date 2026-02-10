@@ -83,7 +83,7 @@ end
 
 ---@return self
 function Appearances:create()
-	self.tournaments = Tournament.getAllTournaments(self.args.conditions or self:_buildConditions())
+	self.tournaments = Array.reverse(Tournament.getAllTournaments(self.args.conditions or self:_buildConditions()))
 
 	if Table.isEmpty(self.tournaments) then
 		return self
