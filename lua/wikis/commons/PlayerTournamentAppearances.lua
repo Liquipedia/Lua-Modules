@@ -35,6 +35,7 @@ local ConditionUtil = Condition.Util
 
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
 local Th = HtmlWidgets.Th
 local Tr = HtmlWidgets.Tr
@@ -292,7 +293,7 @@ function Appearances:_row(playerIndex)
 end
 
 ---@private
----@return Html
+---@return Widget
 function Appearances:_buildQueryLink()
 	local queryTable = {
 		['PTA[series]'] = self.plainArgs.series or '',
@@ -305,14 +306,15 @@ function Appearances:_buildQueryLink()
 		wpRunQuery = 'Run query',
 	}
 
-	local queryString = tostring(mw.uri.fullUrl('Special:RunQuery/Player_tournament_appearances', queryTable))
-
-	return mw.html.create('tr')
-		:tag('th')
-			:attr('colspan', #self.tournaments + 3)
-			:css('font-size', 'small')
-			:wikitext('[' .. queryString .. ' Click here to modify this table]')
-			:done()
+	return Tr{children = Th{
+		attributes = {colspan = #self.tournaments + 3},
+		css = {['font-size'] = 'small'},
+		children = LinkWidget{
+			link = tostring(mw.uri.fullUrl('Special:RunQuery/Player_tournament_appearances', queryTable)),
+			children = 'Click here to modify this table',
+			linktype = 'external',
+		}
+	}}
 end
 
 return Appearances
