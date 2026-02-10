@@ -158,6 +158,10 @@ $table2-cell-padding-x: 0.75rem;
 		&--nowrap {
 			white-space: nowrap;
 		}
+
+		&--shrink {
+			width: fit-content;
+		}
 	}
 
 	&__row--foot {

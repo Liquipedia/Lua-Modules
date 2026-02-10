@@ -11,6 +11,7 @@ local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
 local Table2Section = Lua.import('Module:Widget/Table2/Section')
+local Table2CellIndexer = Lua.import('Module:Widget/Table2/CellIndexer')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
@@ -37,11 +38,15 @@ function Table2Row:render()
 		sectionClass = 'table2__row--head'
 	end
 
+	local indexedChildren = {Table2CellIndexer{
+		children = props.children,
+	}}
+
 	return HtmlWidgets.Tr{
 		classes = WidgetUtil.collect('table2__row', sectionClass, props.classes),
 		css = props.css,
 		attributes = props.attributes,
-		children = props.children,
+		children = indexedChildren,
 	}
 end
 
