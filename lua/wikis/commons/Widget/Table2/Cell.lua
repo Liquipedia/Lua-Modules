@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
@@ -65,13 +64,7 @@ function Table2Cell:render()
 		attributes.rowspan = mergedProps.rowspan
 	end
 
-	local css = ColumnUtil.buildCss(
-		Logic.readBool(mergedProps.shrink),
-		mergedProps.width,
-		mergedProps.minWidth,
-		mergedProps.maxWidth,
-		mergedProps.css
-	)
+	local css = ColumnUtil.buildCss(mergedProps.width, mergedProps.minWidth, mergedProps.maxWidth, mergedProps.css)
 
 	local classes = ColumnUtil.buildClasses(
 		mergedProps.align,

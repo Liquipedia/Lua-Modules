@@ -67,7 +67,7 @@ $table2-cell-padding-x: 0.75rem;
 	}
 
 	&__row--body.table2__row--highlighted {
-		background-color: var( --publisher-premier-highlight-background-color );
+		background-color: var( --publisher-premier-highlight-background-color ) !important;
 	}
 
 	&__row--body:hover {
@@ -81,7 +81,7 @@ $table2-cell-padding-x: 0.75rem;
 	}
 
 	&__row--body.table2__row--highlighted:hover {
-		background-color: var( --publisher-premier-highlight-background-color );
+		background-color: var( --publisher-premier-highlight-background-color ) !important;
 	}
 
 	&__title,

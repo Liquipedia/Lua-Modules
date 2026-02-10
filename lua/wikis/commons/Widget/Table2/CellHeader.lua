@@ -75,13 +75,7 @@ function Table2CellHeader:render()
 		attributes.rowspan = mergedProps.rowspan
 	end
 
-	local css = ColumnUtil.buildCss(
-		Logic.readBool(mergedProps.shrink),
-		mergedProps.width,
-		mergedProps.minWidth,
-		mergedProps.maxWidth,
-		mergedProps.css
-	)
+	local css = ColumnUtil.buildCss(mergedProps.width, mergedProps.minWidth, mergedProps.maxWidth, mergedProps.css)
 
 	local headerClasses = ColumnUtil.buildClasses(
 		mergedProps.align,

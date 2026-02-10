@@ -71,19 +71,16 @@ function ColumnUtil.mergeProps(cellProps, columnDef)
 	return merged
 end
 
----Builds CSS rules for shrink behavior and sizing
----@param shrink boolean|nil
+---Builds CSS rules for sizing
 ---@param width string|nil
 ---@param minWidth string|nil
 ---@param maxWidth string|nil
 ---@param existingCss table|nil
 ---@return table css
-function ColumnUtil.buildCss(shrink, width, minWidth, maxWidth, existingCss)
+function ColumnUtil.buildCss(width, minWidth, maxWidth, existingCss)
 	local css = Table.copy(existingCss or {})
 
-	if shrink then
-		css['width'] = 'fit-content'
-	elseif width then
+	if width then
 		css['width'] = width
 	end
 
