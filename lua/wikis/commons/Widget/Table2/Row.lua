@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local Table2Section = Lua.import('Module:Widget/Table2/Section')
@@ -22,6 +23,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 ---@field classes string[]?
 ---@field css {[string]: string|number|nil}?
 ---@field attributes {[string]: any}?
+---@field highlighted (string|number|boolean)?
 
 ---@class Table2Row: Widget
 ---@operator call(Table2RowProps): Table2Row
@@ -60,12 +62,17 @@ function Table2Row:render()
 		end
 	end
 
+	local highlightClass = nil
+	if section == 'body' and Logic.readBool(props.highlighted) then
+		highlightClass = 'table2__row--highlighted'
+	end
+
 	local indexedChildren = {Table2CellIndexer{
 		children = props.children,
 	}}
 
 	return HtmlWidgets.Tr{
-		classes = WidgetUtil.collect('table2__row', sectionClass, kindClass, stripeClass, props.classes),
+		classes = WidgetUtil.collect('table2__row', sectionClass, kindClass, stripeClass, highlightClass, props.classes),
 		css = props.css,
 		attributes = props.attributes,
 		children = indexedChildren,

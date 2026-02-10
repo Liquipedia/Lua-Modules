@@ -66,6 +66,10 @@ $table2-cell-padding-x: 0.75rem;
 		}
 	}
 
+	&__row--body.table2__row--highlighted {
+		background-color: var( --publisher-premier-highlight-background-color );
+	}
+
 	&__row--body:hover {
 		.theme--light & {
 			background-color: var( --clr-on-surface-light-primary-8 );
@@ -74,6 +78,10 @@ $table2-cell-padding-x: 0.75rem;
 		.theme--dark & {
 			background-color: var( --clr-on-surface-dark-primary-8 );
 		}
+	}
+
+	&__row--body.table2__row--highlighted:hover {
+		background-color: var( --publisher-premier-highlight-background-color );
 	}
 
 	&__title,
