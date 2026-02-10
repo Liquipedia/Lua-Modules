@@ -21,7 +21,6 @@ local Lpdb = Lua.import('Module:Lpdb')
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Placement = Lua.import('Module:Placement')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
 
@@ -66,24 +65,17 @@ function Appearances:init(frame)
 
 	self.args = {
 		conditions = args.conditions,
-		tierTypes = Appearances._readCommaSep(args.tierTypes) or DEFAULT_TIERTYPES,
-		tiers = Appearances._readCommaSep(args.tiers),
+		tierTypes = Logic.emptyOr(Array.parseCommaSeparatedString(args.tierTypes), DEFAULT_TIERTYPES),
+		tiers = Array.parseCommaSeparatedString(args.tiers),
 		startDate = Logic.nilIfEmpty(args.sdate),
 		endDate = Logic.nilIfEmpty(args.edate),
-		pages = Appearances._readCommaSep(args.pages),
+		pages = Array.parseCommaSeparatedString(args.pages),
 		series = args.series and
 			Array.extractValues(Table.filterByKey(args, function(key) return key:find('^series%d-$') end))
 			or nil,
 	}
 
 	return self
-end
-
----@param input string?
----@return string[]?
-function Appearances._readCommaSep(input)
-	return input and Array.map(mw.text.split(input, ','), String.trim)
-		or nil
 end
 
 ---@return self
