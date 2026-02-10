@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
+local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local Game = Lua.import('Module:Game')
 local Json = Lua.import('Module:Json')
@@ -330,7 +331,7 @@ function CustomLeague:_displayStartDateTime()
 	return Countdown.create{
 		date = self.data.startTime.raw,
 		finished = self.data.isFinished,
-		rawdatetime = self.data.isFinished,
+		rawdatetime = DateExt.getCurrentTimestamp() > DateExt.readTimestamp(self.data.startTime.raw),
 	}
 end
 
