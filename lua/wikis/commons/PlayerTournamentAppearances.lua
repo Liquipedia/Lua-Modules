@@ -145,9 +145,9 @@ function Appearances:_fetchPlayers(pageNames)
 		limit = 1000,
 		order = 'date asc',
 		query = 'opponentplayers, opponenttype, opponentname, parent, date, placement, opponenttemplate',
-	}, function(placement)
+	}, function (placement)
 		local opponent = Opponent.fromLpdbStruct(placement)
-		Array.forEach(opponent.players, function (player, playerIndex)
+		Array.forEach(opponent.players, function (player)
 			if Opponent.playerIsTbd(player) then
 				return
 			end
