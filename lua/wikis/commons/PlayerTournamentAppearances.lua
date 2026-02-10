@@ -249,7 +249,9 @@ function Appearances:_header()
 		Th{children = 'Player'},
 		Th{children = HtmlWidgets.Abbr{children = 'TA.', title = 'Total appearances'}},
 		Array.map(self.tournaments, function (tournament)
-			return Th{children = TournamentTitle{tournament = tournament}}
+			return Th{children = TournamentTitle{
+				tournament = tournament, useShortName = true
+			}}
 		end)
 	)}
 end
