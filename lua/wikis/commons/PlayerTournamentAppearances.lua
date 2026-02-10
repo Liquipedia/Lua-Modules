@@ -61,7 +61,10 @@ function Appearances:init(frame)
 
 	self.plainArgs = args
 
-	assert(args.series or args.pages or args.conditions, 'Either "series", "pages" or "conditions" input has to be specified')
+	assert(
+		args.series or args.pages or args.conditions,
+		'Either "series", "pages" or "conditions" input has to be specified'
+	)
 
 	self.config = {
 		showPlacementInsteadOfTeam = Logic.readBool(args.showPlacementInsteadOfTeam),
