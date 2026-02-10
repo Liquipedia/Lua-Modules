@@ -970,98 +970,96 @@ Author(s): Rapture
 .stand-in-card {
 	margin: 0 0 10px 0;
 	white-space: nowrap;
-}
 
-.stand-in-card > tbody > tr > th {
-	background-color: var( --clr-surface-4, #f5f5f5 );
-	font-weight: bold;
-	padding: 5px;
-}
+	> tbody > tr > th {
+		background-color: var( --clr-surface-4, #f5f5f5 );
+		font-weight: bold;
+		padding: 5px;
 
-.stand-in-card > tbody > tr > th.large-only[ colspan="1" ] {
-	display: none;
-}
+		&.large-only[ colspan="1" ] {
+			display: none;
+		}
+	}
 
-.stand-in-card > tbody > tr.Players {
-	display: table-row;
-	border-top: 1px solid #bbbbbb;
-}
+	> tbody > tr.Players {
+		display: table-row;
+		border-top: 1px solid #bbbbbb;
 
-.stand-in-card > tbody > tr.Players > td {
-	display: table-cell;
-	line-height: 1.42857143;
-	padding: 5px;
-}
+		> td {
+			display: table-cell;
+			line-height: 1.42857143;
+			padding: 5px;
 
-.stand-in-card > tbody > tr.Players > td.TeamPlayerIn {
-	padding: 2px 0 0 0;
-}
+			&.TeamPlayerIn {
+				padding: 2px 0 0 0;
+			}
 
-.stand-in-card > tbody > tr.Players > td > .MobileStuff {
-	display: none;
-}
+			> .MobileStuff {
+				display: none;
+			}
+		}
+	}
 
-@media screen and ( max-width: 750px ) {
-	.stand-in-card {
+	@media screen and ( max-width: 750px ) {
 		width: 100% !important;
 		max-width: 425px;
 		border: 1px solid var( --clr-border, #bbbbbb );
-	}
 
-	.stand-in-card > tbody > tr > th.large-only[ colspan="10" ] {
-		display: none;
-	}
+		> tbody > tr > th.large-only[ colspan="10" ] {
+			display: none;
+		}
 
-	.stand-in-card > tbody > tr > th.large-only[ colspan="1" ] {
-		display: table-cell;
-	}
+		> tbody > tr > th.large-only[ colspan="1" ] {
+			display: table-cell;
+		}
 
-	.stand-in-card > tbody > tr.HeaderRow {
-		display: none;
-	}
+		> tbody > tr.HeaderRow {
+			display: none;
+		}
 
-	.stand-in-card > tbody > tr.Players {
-		display: block;
-		padding: 5px;
-	}
+		> tbody > tr.Players {
+			display: block;
+			padding: 5px;
 
-	.stand-in-card > tbody > tr.Players > td {
-		display: inline-block;
-		line-height: 1.42857143;
-		border: 0;
-		padding: 0;
-	}
+			> td {
+				display: inline-block;
+				line-height: 1.42857143;
+				border: 0;
+				padding: 0;
 
-	.stand-in-card > tbody > tr.Players > td.Player {
-		clear: left;
-		float: left;
-		padding: 0 5px 5px 0;
-	}
+				&.Player {
+					clear: left;
+					float: left;
+					padding: 0 5px 5px 0;
+				}
 
-	.stand-in-card > tbody > tr.Players > td.PlayerName {
-		font-style: italic;
-		font-size: small;
-		float: left;
-		margin-top: 1px;
-		padding-bottom: 5px;
-	}
+				&.PlayerName {
+					font-style: italic;
+					font-size: small;
+					float: left;
+					margin-top: 1px;
+					padding-bottom: 5px;
+				}
 
-	.stand-in-card > tbody > tr.Players > td.PlayerTeam {
-		float: right;
-	}
+				&.PlayerTeam {
+					float: right;
+				}
 
-	.stand-in-card > tbody > tr.Players > td.Tournaments {
-		display: block;
-		width: auto;
-		text-align: left;
-		padding: 5px 0 0 10px;
-		margin: 0 5px;
-		border-top: 1px solid var( --clr-border, #bbbbbb );
-		clear: both;
-	}
+				&.Tournaments {
+					display: block;
+					width: auto;
+					text-align: left;
+					padding: 5px 0 0 10px;
+					margin: 0 5px;
+					border-top: 1px solid var( --clr-border, #bbbbbb );
+					clear: both;
+				}
 
-	.stand-in-card > tbody > tr.Players > td > .MobileStuff {
-		display: inline-block;
+				> .MobileStuff {
+					display: inline-block;
+				}
+			}
+		}
 	}
 }
 
