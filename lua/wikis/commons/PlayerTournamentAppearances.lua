@@ -91,7 +91,7 @@ function Appearances:create()
 		return self
 	end
 
-	local pageNames = Array.map(self.tournaments, Operator.property('pagename'))
+	local pageNames = Array.map(self.tournaments, Operator.property('pageName'))
 	self.players = self:_fetchPlayers(pageNames)
 
 	return self
