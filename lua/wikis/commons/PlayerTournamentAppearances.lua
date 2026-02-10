@@ -15,6 +15,7 @@ local Condition = Lua.import('Module:Condition')
 local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
@@ -133,59 +134,68 @@ end
 ---@param pageNames string[]
 ---@return table[]
 function Appearances:_fetchPlayers(pageNames)
+	---@type table<string, standardPlayer>
 	local players = {}
 
 	Lpdb.executeMassQuery('placement', {
 		conditions = self:_placementConditions(pageNames),
 		limit = 1000,
 		order = 'date asc',
-		query = 'opponentplayers, opponenttype, pagename, date, placement, opponenttemplate',
+		query = 'opponentplayers, opponenttype, opponentname, parent, date, placement, opponenttemplate',
 	}, function(placement)
-		for prefix, playerPage in Table.iter.pairsByPrefix(placement.opponentplayers or {}, self.config.prefix) do
-			if not players[playerPage] then
-				players[playerPage] = {
-					link = playerPage,
-					appearances = 0,
-					placementSum = 0,
-					results = {},
-				}
+		local opponent = Opponent.fromLpdbStruct(placement)
+		Array.forEach(opponent.players, function (player, playerIndex)
+			if Opponent.playerIsTbd(player) then
+				return
+			end
+			local pageName = player.pageName
+			---@cast pageName -nil
+			if not players[pageName] then
+				players[pageName] = player
+				player.extradata = player.extradata or {}
+				player.extradata.appearances = 0
+				player.extradata.placementSum = 0
+				player.extradata.results = {}
 			end
 
-			players[playerPage].appearances = players[playerPage].appearances + 1
-			players[playerPage].flag = Logic.emptyOr(placement.opponentplayers[prefix .. 'flag'], players[playerPage].flag)
-			players[playerPage].name = Logic.emptyOr(placement.opponentplayers[prefix .. 'dn'], players[playerPage].name)
-			players[playerPage].faction = Logic.emptyOr(placement.opponentplayers[prefix .. 'faction'], players[playerPage].faction)
-			players[playerPage].results[placement.pagename] = {
+			local extradata = players[pageName].extradata --[[ @as table ]]
+
+			extradata.appearances = extradata.appearances + 1
+			extradata.results[placement.parent] = {
 				placement = placement.placement,
 				date = placement.date,
-				team = placement.opponenttype == Opponent.team and placement.opponenttemplate
-					or placement.opponentplayers[prefix .. 'template']
-					or placement.opponentplayers[prefix .. 'team'],
+				team = placement.opponenttype == Opponent.team and placement.opponenttemplate or player.team
 			}
-			local placementParts = mw.text.split(string.lower(placement.placement or ''), '-', true)
-			players[playerPage].placementSum = players[playerPage].placementSum + (tonumber(placementParts[1]) or 1000)
-		end
+			local rawPlacement = Placement.raw(placement.placement)
+			extradata.placementSum = extradata.placementSum + (tonumber(rawPlacement.placement[1]) or 1000)
+		end)
 	end)
 
 	local playersArray = Array.extractValues(players)
 
 	if self.config.restrictToPlayersParticipatingIn then
 		playersArray = Array.filter(playersArray, function(player)
-			return player.results[self.config.restrictToPlayersParticipatingIn]
+			return player.extradata.results[self.config.restrictToPlayersParticipatingIn]
 		end)
 	end
 
-	table.sort(playersArray, function(a, b)
-		if a.appearances ~= b.appearances then
-			return a.appearances > b.appearances
+	return Array.sortBy(
+		playersArray,
+		FnUtil.identity,
+		---@param a standardPlayer
+		---@param b standardPlayer
+		---@return boolean
+		function (a, b)
+			local aData = a.extradata or {}
+			local bData = b.extradata or {}
+			if aData.appearances ~= bData.appearances then
+				return aData.appearances > bData.appearances
+			elseif aData.placementSum ~= bData.placementSum then
+				return aData.placementSum < bData.placementSum
+			end
+			return a.pageName < b.pageName
 		end
-		if a.placementSum ~= b.placementSum then
-			return a.placementSum < b.placementSum
-		end
-		return a.link < b.link
-	end)
-
-	return playersArray
+	)
 end
 
 ---@private
