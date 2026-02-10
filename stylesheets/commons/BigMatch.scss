@@ -1049,6 +1049,7 @@ span.slash {
 		display: flex;
 		flex-flow: column;
 		padding: 0.5rem;
+		width: 100%;
 
 		.theme--dark & {
 			background-color: var( --clr-on-surface-dark-primary-8 );
@@ -1081,6 +1082,22 @@ span.slash {
 			.theme--dark & {
 				background-color: var( --clr-secondary-16 );
 				border-color: var( --clr-on-surface-dark-primary-8 );
+			}
+
+			&.match-table-wrapper {
+				display: block;
+				padding: unset;
+
+				@media ( max-width: 767px ) {
+					overflow-x: auto;
+				}
+
+				& > table.wikitable {
+					border-radius: 0.5rem;
+					overflow: hidden;
+					height: 100%;
+					width: 100%;
+				}
 			}
 		}
 	}
