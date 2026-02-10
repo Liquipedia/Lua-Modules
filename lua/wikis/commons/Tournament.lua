@@ -48,7 +48,7 @@ local TOURNAMENT_PHASE = {
 ---@field isHighlighted fun(self: StandardTournament, options?: table): boolean
 
 ---@param conditions string|AbstractConditionNode?
----@param filterTournament fun(tournament: StandardTournament): boolean
+---@param filterTournament? fun(tournament: StandardTournament): boolean
 ---@return StandardTournament[]
 function Tournament.getAllTournaments(conditions, filterTournament)
 	local tournaments = {}
