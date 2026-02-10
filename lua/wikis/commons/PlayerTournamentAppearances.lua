@@ -34,6 +34,8 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
+local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
+
 local ICON_HEADER_TYPES = {'icons', 'icon'}
 local DEFAULT_TIERTYPES = {'General', 'School', ''}
 
@@ -256,21 +258,7 @@ function Appearances:_header()
 		:tag('th'):wikitext(Abbreviation.make{text = 'TA.', title = 'Total appearances'})
 
 	for _, tournament in ipairs(self.tournaments) do
-		if self.config.displayIconInsteadOfShortName then
-			header:tag('th'):node(LeagueIcon.display{
-				icon = tournament.icon,
-				iconDark = tournament.icondark,
-				link = tournament.pagename,
-				name = tournament.name,
-				options = {noTemplate = true},
-			})
-		else
-			header:tag('th'):wikitext('[[' .. tournament.pagename .. '|' .. Logic.emptyOr(
-				tournament.shortname,
-				tournament.name,
-				(tournament.pagename:gsub('_', ' '))
-			) .. ']]')
-		end
+		header:tag('th'):node(TournamentTitle{tournament = tournament})
 	end
 
 	return header
