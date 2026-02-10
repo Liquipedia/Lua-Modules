@@ -196,7 +196,7 @@ function Appearances:_placementConditions(pageNames)
 		ConditionUtil.noneOf(ColumnName('opponentplayers'), {'', '[]'}),
 		ConditionUtil.noneOf(ColumnName('opponentname'), {'TBD', 'Definitions', ''}),
 		ConditionNode(ColumnName('mode'), Comparator.neq, 'award_individual'),
-		ConditionUtil.anyOf(ColumnName('pagename'), pageNames)
+		ConditionUtil.anyOf(ColumnName('parent'), pageNames)
 	}
 
 	if self.config.restrictToFirstPrizePool then
