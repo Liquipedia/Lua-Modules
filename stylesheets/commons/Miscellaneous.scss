@@ -2403,21 +2403,21 @@ Author(s): Elysienna
 	border-style: solid;
 	border-width: 2px;
 	border-color: #00005d;
-}
 
-[ data-darkreader-scheme="dark" ],
-.theme--dark {
-	.portal-map {
+	[ data-darkreader-scheme="dark" ] &,
+	.theme--dark & {
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-secondary-25 );
-	}
 
-	.portal-map .dynamicmap > div:first-child {
-		background-color: #000000;
-	}
+		.dynamicmap > div {
+			&:first-child {
+				background-color: #000000;
+			}
 
-	.portal-map .dynamicmap > div > img {
-		filter: invert( 1 );
+			> img {
+				filter: invert( 1 );
+			}
+		}
 	}
 }
 
