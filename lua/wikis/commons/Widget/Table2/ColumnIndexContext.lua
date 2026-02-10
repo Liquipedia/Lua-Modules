@@ -17,7 +17,8 @@ local Table2ColumnIndexContext = Class.new(WidgetContext)
 ---@param default any
 ---@return integer|any
 function Table2ColumnIndexContext:getValue(default)
-	return self.props.value or default
+	assert(self.props.value ~= nil, 'Table2ColumnIndexContext: expected value')
+	return self.props.value
 end
 
 return Table2ColumnIndexContext

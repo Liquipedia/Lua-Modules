@@ -20,7 +20,8 @@ local Table2Section = Class.new(WidgetContext)
 ---@param default any
 ---@return Table2SectionName|any
 function Table2Section:getValue(default)
-	return self.props.value or default
+	assert(self.props.value ~= nil, 'Table2Section: expected value')
+	return self.props.value
 end
 
 return Table2Section

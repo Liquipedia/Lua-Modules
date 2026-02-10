@@ -34,6 +34,11 @@ function Table2CellIndexer:render()
 	local columnIndex = 1
 	local indexedChildren = Array.map(children, function(child)
 		if Class.instanceOf(child, Table2Cell) or Class.instanceOf(child, Table2CellHeader) then
+			local explicitIndex = child.props.columnIndex
+			if explicitIndex then
+				columnIndex = math.max(columnIndex, explicitIndex)
+			end
+
 			local wrappedChild = child
 			if not child.props.columnIndex then
 				wrappedChild = Table2ColumnIndexContext{
@@ -41,7 +46,12 @@ function Table2CellIndexer:render()
 					children = {child},
 				}
 			end
-			columnIndex = columnIndex + 1
+
+			local span = tonumber(child.props.colspan) or 1
+			if span < 1 then
+				span = 1
+			end
+			columnIndex = columnIndex + span
 			return wrappedChild
 		end
 		return child

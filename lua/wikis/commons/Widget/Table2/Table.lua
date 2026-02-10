@@ -15,7 +15,7 @@ local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Table2ColumnContext = Lua.import('Module:Widget/Table2/ColumnContext')
-local ColumnUtil = Lua.import('Module:Widget/Util/ColumnUtil')
+local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
 ---@class Table2ColumnDef
 ---@field align 'left'|'right'|'center'?
@@ -26,8 +26,6 @@ local ColumnUtil = Lua.import('Module:Widget/Util/ColumnUtil')
 ---@field maxWidth string?
 ---@field sortType string?
 ---@field unsortable (string|number|boolean)?
----@field colspan integer?
----@field rowspan integer?
 ---@field css {[string]: string|number|nil}?
 ---@field classes string[]?
 ---@field attributes {[string]: any}?

@@ -19,7 +19,8 @@ local Table2HeaderRowKind = Class.new(WidgetContext)
 ---@param default any
 ---@return Table2HeaderRowKindName|any
 function Table2HeaderRowKind:getValue(default)
-	return self.props.value or default
+	assert(self.props.value ~= nil, 'Table2HeaderRowKind: expected value')
+	return self.props.value
 end
 
 return Table2HeaderRowKind

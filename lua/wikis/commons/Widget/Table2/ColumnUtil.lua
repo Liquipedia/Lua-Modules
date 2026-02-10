@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Util/ColumnUtil
+-- page=Module:Widget/Table2/ColumnUtil
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -25,6 +25,14 @@ function ColumnUtil.validateColumnDef(columnDef)
 	return true, nil
 end
 
+---Gets the column index for this cell
+---@param columnIndexProp integer|nil - explicit column index from props
+---@param columnIndexContext integer|nil - implicit column index from context
+---@return integer
+function ColumnUtil.getColumnIndex(columnIndexProp, columnIndexContext)
+	return columnIndexProp or columnIndexContext or 1
+end
+
 ---Merges column definition properties with cell properties
 ---Cell props take precedence over column props
 ---@param cellProps table
@@ -39,7 +47,7 @@ function ColumnUtil.mergeProps(cellProps, columnDef)
 
 	local inheritableProps = {
 		'align', 'shrink', 'nowrap', 'width', 'minWidth', 'maxWidth',
-		'sortType', 'unsortable', 'colspan', 'rowspan',
+		'sortType', 'unsortable',
 	}
 
 	Array.forEach(inheritableProps, function(prop)

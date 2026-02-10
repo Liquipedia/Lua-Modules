@@ -111,14 +111,16 @@ $table2-cell-padding-x: 0.75rem;
 
 	&__row--head {
 		outline: 1px solid;
-		text-wrap: nowrap;
+		white-space: nowrap;
 
 		.theme--light & {
+			background-color: var( --clr-on-surface-light-primary-4 );
 			outline-color: var( --clr-on-surface-light-primary-12 );
 			color: var( --clr-secondary-25 );
 		}
 
 		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
 			outline-color: var( --clr-on-surface-dark-primary-12 );
 			color: var( --clr-secondary-80 );
 		}

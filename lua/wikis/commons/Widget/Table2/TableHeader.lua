@@ -26,9 +26,11 @@ Table2Header.defaultProps = {}
 function Table2Header:render()
 	local props = self.props
 	local children = {}
-	for index, child in ipairs(props.children or {}) do
+	local rowCount = 0
+	for _, child in ipairs(props.children or {}) do
 		if Class.instanceOf(child, Table2Row) then
-			local kind = index == 1 and 'title' or 'columns'
+			rowCount = rowCount + 1
+			local kind = rowCount == 1 and 'title' or 'columns'
 			child = Table2HeaderRowKind{
 				value = kind,
 				children = {child},
