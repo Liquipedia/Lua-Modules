@@ -33,7 +33,9 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
+local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local DEFAULT_TIERTYPES = {'General', 'School', ''}
 
@@ -43,7 +45,7 @@ local DEFAULT_TIERTYPES = {'General', 'School', ''}
 local Appearances = Class.new(function(self, frame) self:init(frame) end)
 
 ---@param frame Frame
----@return string|Html
+---@return string|Widget
 function Appearances.run(frame)
 	return Appearances(frame):create():build()
 end
@@ -213,30 +215,26 @@ function Appearances:_placementConditions(pageNames)
 	return conditions
 end
 
----@return string|Html
+---@return string|Widget
 function Appearances:build()
 	if not self.players then return 'No results found.' end
 
-	local display = mw.html.create('table')
-		:addClass('wikitable sortable wikitable-striped')
-		:css('text-align', 'center')
-		:css('margin', '0')
-		:node(self:_header())
-
 	local limit = math.min(self.config.limit or #self.players, #self.players)
 
-	for playerIndex = 1, limit do
-		display:node(self:_row(playerIndex))
-	end
-
-	if self.config.restrictToPlayersParticipatingIn and not self.config.isFormQuery then
-		display:node(self:_buildQueryLink())
-	end
-
-	return mw.html.create('div')
-		:addClass('table-responsive')
-		:css('margin-bottom', '10px')
-		:node(display)
+	return DataTable{
+		classes = {'wikitable-striped'},
+		sortable = true,
+		css = {['margin-bottom'] = '10px'},
+		tableCss = {
+			['text-align'] = 'center',
+			margin = 0,
+		},
+		children = WidgetUtil.collect(
+			self:_header(),
+			Array.map(Array.range(1, limit), FnUtil.curry(Appearances._row, self)),
+			(self.config.restrictToPlayersParticipatingIn and not self.config.isFormQuery) and self:_buildQueryLink() or nil
+		)
+	}
 end
 
 ---@private
