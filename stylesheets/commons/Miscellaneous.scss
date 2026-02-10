@@ -321,22 +321,20 @@ Author(s): FO-nTTaX
 *******************************************************************************/
 .infobox-upcoming-ongoing-matches {
 	width: 100%;
-}
 
-@media ( min-width: 601px ) {
-	.infobox-upcoming-ongoing-matches {
+	@media ( min-width: 601px ) {
 		float: right;
 		clear: right;
 		max-width: 300px;
 		margin: 0 0 10px 10px;
 	}
-}
 
-.infobox-upcoming-ongoing-matches .infobox-upcoming-ongoing-matches-header {
-	font-size: 130%;
-	font-weight: bold;
-	text-align: center;
-	padding: 2px;
+	#{&}-header {
+		font-size: 130%;
+		font-weight: bold;
+		text-align: center;
+		padding: 2px;
+	}
 }
 
 /*******************************************************************************
