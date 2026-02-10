@@ -1,3 +1,10 @@
+---
+-- @Liquipedia
+-- page=Module:PlayerTournamentAppearances
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Abbreviation = require('Module:Abbreviation')
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
