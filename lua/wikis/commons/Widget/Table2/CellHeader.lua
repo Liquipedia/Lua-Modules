@@ -50,7 +50,7 @@ end
 function Table2CellHeader:render()
 	local props = self.props
 
-	local columnContext = self:useContext(Table2ColumnContext.contextKey)
+	local columnContext = self:useContext(Table2ColumnContext)
 	local columnDef = nil
 	local columnIndex = getColumnIndex(props.columnIndex)
 

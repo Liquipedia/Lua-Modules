@@ -8,15 +8,11 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetContext = Lua.import('Module:Widget/Context')
 
----@class Table2ColumnContext: Widget
----@field columnDefinitions table[]
+---@class Table2ColumnContext: WidgetContext
 ---@operator call(Table2ColumnContextProps): Table2ColumnContext
-local Table2ColumnContext = Class.new(Widget)
-
-Table2ColumnContext.contextKey = 'Table2ColumnContext'
+local Table2ColumnContext = Class.new(WidgetContext)
 
 ---@class Table2ColumnContextProps
 ---@field children (Widget|Html|string|number|nil)[]?
@@ -27,11 +23,10 @@ Table2ColumnContext.defaultProps = {
 	columns = {},
 }
 
----@return Widget
-function Table2ColumnContext:render()
-	local props = self.props
-	return HtmlWidgets.Fragment{
-		children = props.children,
+---@return {columns: table[]?}
+function Table2ColumnContext:getValue(default)
+	return {
+		columns = self.props.columns,
 	}
 end
 
