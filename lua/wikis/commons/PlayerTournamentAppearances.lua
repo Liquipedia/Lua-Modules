@@ -58,7 +58,6 @@ function Appearances:init(frame)
 	assert(args.series or args.pages or args.conditions, 'Either "series", "pages" or "conditions" input has to be specified')
 
 	self.config = {
-		prefix = args.prefix or 'p',
 		displayIconInsteadOfShortName = Table.includes(ICON_HEADER_TYPES, args.headerType),
 		displayFactionColumn = Logic.readBool(args.displayFactionColumn),
 		showPlacementInsteadOfTeam = Logic.readBool(args.showPlacementInsteadOfTeam),
