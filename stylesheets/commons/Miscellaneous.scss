@@ -854,10 +854,7 @@ span.vodlink.darkmode {
 	span.vodlink.lightmode {
 		display: none;
 	}
-}
 
-[ data-darkreader-scheme="dark" ],
-.theme--dark {
 	span.vodlink.darkmode {
 		display: inline-block;
 	}
@@ -872,10 +869,7 @@ span.vodlink.darkmode {
 	.vodlink span.lightmode {
 		display: none;
 	}
-}
 
-[ data-darkreader-scheme="dark" ],
-.theme--dark {
 	.vodlink span.darkmode {
 		display: inline;
 	}
