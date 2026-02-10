@@ -90,13 +90,6 @@ Author(s): salle
 Template(s): Toggle button
 Author(s): FO-nTTaX
 *******************************************************************************/
-@mixin toggle-area-loop( $counter ) {
-	@if $counter > 0 {
-		@include toggle-area-loop( ($counter - 1 ));
-		@include toggle-area-func( $counter );
-	}
-}
-
 @mixin toggle-area-func( $no ) {
 	&:not( .toggle-area-#{$no} ) {
 		[data-toggle-area-content='#{$no}'] {
@@ -106,7 +99,9 @@ Author(s): FO-nTTaX
 }
 
 .toggle-area {
-	@include toggle-area-loop( 50 );
+	@for $i from 1 through 50 {
+		@include toggle-area-func( $i );
+	}
 
 	.toggle-area-button {
 		cursor: pointer;
