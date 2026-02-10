@@ -19,6 +19,7 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@class TournamentTitleProps
 ---@field tournament StandardTournamentPartial
 ---@field displayGameIcon boolean?
+---@field useShortName boolean?
 
 ---@class TournamentTitleWidget: Widget
 ---@operator call(TournamentTitleProps): TournamentTitleWidget
@@ -56,9 +57,7 @@ function TournamentTitleWidget:render()
 			children = {
 				Link{
 					link = tournament.pageName,
-					children = {
-						tournament.displayName,
-					},
+					children = self.props.useShortName and tournament.shortName or tournament.displayName,
 				},
 			}
 		}
