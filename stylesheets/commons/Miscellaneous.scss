@@ -1960,27 +1960,27 @@ ul.halfbox {
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
-}
 
-ul.halfbox > li {
-	background: none repeat scroll 0 0 var( --clr-surface-1, #f2f2f2 );
-	border: 1px solid #aaaaaa;
-	display: block;
-	float: left;
-	font-weight: bold;
-	height: 70px;
-	margin: 5px;
-	width: 125px;
-}
+	> li {
+		background: none repeat scroll 0 0 var( --clr-surface-1, #f2f2f2 );
+		border: 1px solid #aaaaaa;
+		display: block;
+		float: left;
+		font-weight: bold;
+		height: 70px;
+		margin: 5px;
+		width: 125px;
 
-.wiki-counterstrike ul.halfbox > li {
-	height: 150px;
-	width: 200px;
-}
+		.wiki-counterstrike & {
+			height: 150px;
+			width: 200px;
+		}
 
-.wiki-leagueoflegends ul.halfbox > li {
-	height: 120px;
-	width: 120px;
+		.wiki-leagueoflegends & {
+			height: 120px;
+			width: 120px;
+		}
+	}
 }
 
 .halfbox li img {
@@ -1995,14 +1995,14 @@ ul.halfbox > li {
 	min-width: 121px;
 	text-align: center;
 	margin: -19px 0 0 1px;
-}
 
-.wiki-leagueoflegends .halfbox li span a {
-	min-width: 116px;
-}
+	.wiki-leagueoflegends & {
+		min-width: 116px;
+	}
 
-.halfbox li span a.new {
-	color: #dd0000;
+	&.new {
+		color: #dd0000;
+	}
 }
 
 /*******************************************************************************
