@@ -1095,14 +1095,14 @@ Author(s): Inflicted
 	overflow: hidden;
 	text-overflow: clip;
 	margin: -5px;
-}
 
-.match-history img {
-	width: 28px;
-	height: 28px;
-	border: 2px solid transparent;
-	margin-top: -2px;
-	image-rendering: -webkit-optimize-contrast;
+	img {
+		width: 28px;
+		height: 28px;
+		border: 2px solid transparent;
+		margin-top: -2px;
+		image-rendering: -webkit-optimize-contrast;
+	}
 }
 
 /*******************************************************************************
