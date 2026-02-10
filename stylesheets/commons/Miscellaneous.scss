@@ -2457,6 +2457,25 @@ Author(s): salle
 .next-circuit-image {
 	display: flex;
 	font-size: 14px;
+
+	@media ( max-width: 569px ) {
+		flex-direction: column;
+
+		> div:first-child {
+			display: flex;
+			justify-content: center;
+			padding: 0;
+		}
+	}
+
+	@media ( min-width: 570px ) {
+		flex-direction: row;
+
+		> div:first-child {
+			padding: 12px;
+			display: block;
+		}
+	}
 }
 
 .next-circuit-boxes {
@@ -2470,55 +2489,32 @@ Author(s): salle
 
 		> div {
 			padding: 8px 12px;
+
+			&:only-child {
+				width: 100%;
+			}
+
+			&:not( :only-child ) {
+				width: 50%;
+				border-bottom: 1px solid #bbbbbb;
+			}
+
+			&:nth-child( n+2 ) {
+				border-left: 1px solid #bbbbbb;
+			}
 		}
 
 		&:first-child > div {
 			border-bottom: 1px solid #bbbbbb;
 		}
-
-		> div:only-child {
-			width: 100%;
-		}
-
-		> div:not( :only-child ) {
-			width: 50%;
-			border-bottom: 1px solid #bbbbbb;
-		}
-
-		> div:nth-child( n+2 ) {
-			border-left: 1px solid #bbbbbb;
-		}
-	}
-}
-
-@media ( max-width: 569px ) {
-	.next-circuit-image {
-		flex-direction: column;
-
-		> div:first-child {
-			display: flex;
-			justify-content: center;
-			padding: 0;
-		}
 	}
 
-	.next-circuit-boxes {
+	@media ( max-width: 569px ) {
 		border-top: 1px solid #bbbbbb;
 		border-left: 0;
 	}
-}
 
-@media ( min-width: 570px ) {
-	.next-circuit-image {
-		flex-direction: row;
-
-		> div:first-child {
-			padding: 12px;
-			display: block;
-		}
-	}
-
-	.next-circuit-boxes {
+	@media ( min-width: 570px ) {
 		border-left: 1px solid #bbbbbb;
 		border-top: 0;
 	}
