@@ -47,7 +47,7 @@ local TOURNAMENT_PHASE = {
 ---@field extradata table
 ---@field isHighlighted fun(self: StandardTournament, options?: table): boolean
 
----@param conditions ConditionTree?
+---@param conditions string|AbstractConditionNode?
 ---@param filterTournament fun(tournament: StandardTournament): boolean
 ---@return StandardTournament[]
 function Tournament.getAllTournaments(conditions, filterTournament)
@@ -55,7 +55,7 @@ function Tournament.getAllTournaments(conditions, filterTournament)
 	Lpdb.executeMassQuery(
 		'tournament',
 		{
-			conditions = conditions and conditions:toString() or nil,
+			conditions = tostring(conditions),
 			order = 'sortdate desc',
 			limit = 1000,
 		},
