@@ -20,6 +20,7 @@ local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local Page = Lua.import('Module:Page')
 local Placement = Lua.import('Module:Placement')
 local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
@@ -29,6 +30,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local ICON_HEADER_TYPES = {'icons', 'icon'}
 local DEFAULT_TIERTYPES = {'General', 'School', ''}
@@ -70,9 +72,10 @@ function Appearances:init(frame)
 		startDate = Logic.nilIfEmpty(args.sdate),
 		endDate = Logic.nilIfEmpty(args.edate),
 		pages = Array.parseCommaSeparatedString(args.pages),
-		series = args.series and
-			Array.extractValues(Table.filterByKey(args, function(key) return key:find('^series%d-$') end))
-			or nil,
+		series = args.series and Array.map(
+			Array.extractValues(Table.filterByKey(args, function(key) return key:find('^series%d-$') end)),
+			Page.pageifyLink
+		) or nil,
 	}
 
 	return self
@@ -81,7 +84,7 @@ end
 ---@return self
 function Appearances:create()
 	self.tournaments = mw.ext.LiquipediaDB.lpdb('tournament', {
-			conditions = self.args.conditions or self:_buildConditions(),
+			conditions = tostring(self.args.conditions or self:_buildConditions()),
 			limit = 5000,
 			order = 'enddate asc',
 			query = 'pagename, name, shortname, icon, icondark',
@@ -97,33 +100,35 @@ function Appearances:create()
 	return self
 end
 
----@return string
+---@return ConditionTree
 function Appearances:_buildConditions()
 	local args = self.args
 
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('enddate'), Comparator.gt, DateExt.defaultDate)}
 
-	Appearances._buildOrConditionsFromArray(conditions, {'finished', ''}, 'status')
-	Appearances._buildOrConditionsFromArray(conditions, args.tiers, 'liquipediatier')
-	Appearances._buildOrConditionsFromArray(conditions, args.tierTypes, 'liquipediatiertype')
+	conditions:add(ConditionUtil.anyOf(ColumnName('status'), {'finished', ''}))
+	conditions:add(ConditionUtil.anyOf(ColumnName('liquipediatier'), args.tiers))
+	conditions:add(ConditionUtil.anyOf(ColumnName('liquipediatiertype'), args.tierTypes))
 
 	if Table.isNotEmpty(args.series) then
-		Appearances._buildOrConditionsFromArray(conditions, args.series, 'seriespage', 'extradata_series2', true)
+		conditions:add{
+			ConditionUtil.anyOf(ColumnName('seriespage'), args.series),
+			ConditionUtil.anyOf(ColumnName('series2', 'extradata'), args.series),
+		}
 	else
-		args.pages = Array.map(args.pages, function(page) return (page:gsub(' ', '_')) end)
-		Appearances._buildOrConditionsFromArray(conditions, args.pages, 'pagename')
+		conditions:add(ConditionUtil.anyOf(ColumnName('pagename'), Array.map(args.pages, Page.pageifyLink)))
 	end
 
 	if args.startDate then
-		conditions:add{ConditionNode(ColumnName('startdate'), Comparator.ge, args.startDate)}
+		conditions:add(ConditionNode(ColumnName('startdate'), Comparator.ge, args.startDate))
 	end
 
 	if args.endDate then
-		conditions:add{ConditionNode(ColumnName('enddate'), Comparator.le, args.endDate)}
+		conditions:add(ConditionNode(ColumnName('enddate'), Comparator.le, args.endDate))
 	end
 
-	return conditions:toString()
+	return conditions
 end
 
 function Appearances:_fetchPlayers(pageNames)
