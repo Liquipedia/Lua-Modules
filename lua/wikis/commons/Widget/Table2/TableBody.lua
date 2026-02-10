@@ -14,16 +14,11 @@ local Table2Section = Lua.import('Module:Widget/Table2/Section')
 
 ---@class Table2BodyProps
 ---@field children (Widget|Html|string|number|nil)[]?
----@field classes string[]?
----@field css {[string]: string|number|nil}?
----@field attributes {[string]: any}?
 
 ---@class Table2Body: Widget
 ---@operator call(Table2BodyProps): Table2Body
 local Table2Body = Class.new(Widget)
-Table2Body.defaultProps = {
-	classes = {},
-}
+Table2Body.defaultProps = {}
 
 ---@return Widget
 function Table2Body:render()

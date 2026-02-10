@@ -12,19 +12,15 @@ local Class = Lua.import('Module:Class')
 local Widget = Lua.import('Module:Widget')
 local Table2Row = Lua.import('Module:Widget/Table2/Row')
 local Table2Section = Lua.import('Module:Widget/Table2/Section')
+local Table2HeaderRowKind = Lua.import('Module:Widget/Table2/HeaderRowKind')
 
 ---@class Table2HeaderProps
 ---@field children (Widget|Html|string|number|nil)[]?
----@field classes string[]?
----@field css {[string]: string|number|nil}?
----@field attributes {[string]: any}?
 
 ---@class Table2Header: Widget
 ---@operator call(Table2HeaderProps): Table2Header
 local Table2Header = Class.new(Widget)
-Table2Header.defaultProps = {
-	classes = {},
-}
+Table2Header.defaultProps = {}
 
 ---@return Widget
 function Table2Header:render()
@@ -32,12 +28,11 @@ function Table2Header:render()
 	local children = {}
 	for index, child in ipairs(props.children or {}) do
 		if Class.instanceOf(child, Table2Row) then
-			child.props.classes = child.props.classes or {}
-			if index == 1 then
-				table.insert(child.props.classes, 'table2__row--head-title')
-			else
-				table.insert(child.props.classes, 'table2__row--head-columns')
-			end
+			local kind = index == 1 and 'title' or 'columns'
+			child = Table2HeaderRowKind{
+				value = kind,
+				children = {child},
+			}
 		end
 		table.insert(children, child)
 	end

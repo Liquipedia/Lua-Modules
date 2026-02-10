@@ -2,7 +2,7 @@
 -- @Liquipedia
 -- page=Module:Widget/Table2/CellIndexer
 --
--- Internal component to automatically assign column indices to cells
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
@@ -11,6 +11,9 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Table2Cell = Lua.import('Module:Widget/Table2/Cell')
+local Table2CellHeader = Lua.import('Module:Widget/Table2/CellHeader')
+local Table2ColumnIndexContext = Lua.import('Module:Widget/Table2/ColumnIndexContext')
 
 ---@class Table2CellIndexer: Widget
 ---@operator call(Table2CellIndexerProps): Table2CellIndexer
@@ -30,11 +33,16 @@ function Table2CellIndexer:render()
 
 	local columnIndex = 1
 	local indexedChildren = Array.map(children, function(child)
-		if child and type(child) == 'table' and child.props then
+		if Class.instanceOf(child, Table2Cell) or Class.instanceOf(child, Table2CellHeader) then
+			local wrappedChild = child
 			if not child.props.columnIndex then
-				child.props.columnIndex = columnIndex
+				wrappedChild = Table2ColumnIndexContext{
+					value = columnIndex,
+					children = {child},
+				}
 			end
 			columnIndex = columnIndex + 1
+			return wrappedChild
 		end
 		return child
 	end)

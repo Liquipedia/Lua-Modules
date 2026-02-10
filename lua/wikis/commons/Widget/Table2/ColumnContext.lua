@@ -24,7 +24,7 @@ Table2ColumnContext.defaultProps = {
 }
 
 ---@return {columns: table[]?}
-function Table2ColumnContext:getValue(default)
+function Table2ColumnContext:getValue()
 	return {
 		columns = self.props.columns,
 	}

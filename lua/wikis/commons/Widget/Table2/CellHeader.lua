@@ -15,12 +15,17 @@ local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Table2ColumnContext = Lua.import('Module:Widget/Table2/ColumnContext')
-local ColumnUtil = Lua.import('Module:Widget/util/ColumnUtil')
+local Table2ColumnIndexContext = Lua.import('Module:Widget/Table2/ColumnIndexContext')
+local ColumnUtil = Lua.import('Module:Widget/Util/ColumnUtil')
 
 ---@class Table2CellHeaderProps
 ---@field children (Widget|Html|string|number|nil)[]?
 ---@field align ('left'|'right'|'center')?
+---@field shrink (string|number|boolean)?
 ---@field nowrap (string|number|boolean)?
+---@field width string?
+---@field minWidth string?
+---@field maxWidth string?
 ---@field unsortable (string|number|boolean)?
 ---@field sortType string?
 ---@field classes string[]?
@@ -41,9 +46,10 @@ Table2CellHeader.defaultProps = {
 
 ---Gets the column index for this cell
 ---@param columnIndexProp integer|nil - explicit column index from props
+---@param columnIndexContext integer|nil - implicit column index from context
 ---@return integer
-local function getColumnIndex(columnIndexProp)
-	return columnIndexProp or 1
+local function getColumnIndex(columnIndexProp, columnIndexContext)
+	return columnIndexProp or columnIndexContext or 1
 end
 
 ---@return Widget
@@ -51,8 +57,9 @@ function Table2CellHeader:render()
 	local props = self.props
 
 	local columnContext = self:useContext(Table2ColumnContext)
+	local columnIndexContext = self:useContext(Table2ColumnIndexContext)
 	local columnDef = nil
-	local columnIndex = getColumnIndex(props.columnIndex)
+	local columnIndex = getColumnIndex(props.columnIndex, columnIndexContext)
 
 	if columnContext and columnContext.columns and columnContext.columns[columnIndex] then
 		columnDef = columnContext.columns[columnIndex]

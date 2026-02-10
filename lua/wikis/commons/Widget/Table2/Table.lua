@@ -15,7 +15,7 @@ local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Table2ColumnContext = Lua.import('Module:Widget/Table2/ColumnContext')
-local ColumnUtil = Lua.import('Module:Widget/util/ColumnUtil')
+local ColumnUtil = Lua.import('Module:Widget/Util/ColumnUtil')
 
 ---@class Table2ColumnDef
 ---@field align 'left'|'right'|'center'?

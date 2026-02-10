@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/util/ColumnUtil
+-- page=Module:Widget/Util/ColumnUtil
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -19,7 +19,7 @@ local ColumnUtil = {}
 ---@return boolean valid
 ---@return string|nil errorMsg
 function ColumnUtil.validateColumnDef(columnDef)
-	if columnDef.shrink and columnDef.width then
+	if Logic.readBool(columnDef.shrink) and columnDef.width then
 		return false, 'Column definition cannot have both shrink and width properties'
 	end
 	return true, nil
