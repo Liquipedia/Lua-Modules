@@ -583,10 +583,8 @@ Author(s): FO-nTTaX, Rapture
 	.hr {
 		height: 0.125rem;
 	}
-}
 
-@media ( max-width: 600px ) {
-	.spellcard-wrapper {
+	@media ( max-width: 600px ) {
 		display: block;
 	}
 }
@@ -599,18 +597,15 @@ Author(s): FO-nTTaX, Rapture
 	border-style: solid;
 	background-color: var( --clr-surface-2, #eeeeee );
 	margin-right: 1em;
-}
 
-@media ( max-width: 600px ) {
-	.spellcard {
+	@media ( max-width: 600px ) {
 		margin-right: 0;
 		max-width: none;
 	}
-}
-/* spazer's test changes */
-/* Make spellcards wider for wide screens */
-@media ( min-width: 2560px ) {
-	.spellcard {
+
+	/* spazer's test changes */
+	/* Make spellcards wider for wide screens */
+	@media ( min-width: 2560px ) {
 		max-width: 700px;
 	}
 }
@@ -622,10 +617,8 @@ Author(s): FO-nTTaX, Rapture
 	border-style: solid;
 	padding: 5px 0;
 	margin: 0 5px;
-}
 
-@media ( max-width: 600px ) {
-	.spellcard-description {
+	@media ( max-width: 600px ) {
 		width: auto;
 	}
 }
@@ -636,33 +629,33 @@ Author(s): FO-nTTaX, Rapture
 	vertical-align: top;
 	padding-bottom: 5px;
 	margin: 5px 5px 0 5px;
-}
 
-.spellcard-infotable th {
-	display: inline;
-	padding-right: 5px;
-	vertical-align: top;
-	white-space: nowrap;
-}
+	th {
+		display: inline;
+		padding-right: 5px;
+		vertical-align: top;
+		white-space: nowrap;
+	}
 
-.spellcard-infotable td {
-	display: inline-block;
-	vertical-align: top;
+	td {
+		display: inline-block;
+		vertical-align: top;
+	}
 }
 
 .spellcard-interactions {
 	display: block;
 	vertical-align: top;
-}
 
-.spellcard-interactions th {
-	padding: 3px 5px 0 0;
-	vertical-align: top;
-}
+	th {
+		padding: 3px 5px 0 0;
+		vertical-align: top;
+	}
 
-.spellcard-interactions td {
-	padding-top: 3px;
-	vertical-align: top;
+	td {
+		padding-top: 3px;
+		vertical-align: top;
+	}
 }
 
 .spellcard-notes {
@@ -670,10 +663,8 @@ Author(s): FO-nTTaX, Rapture
 	vertical-align: top;
 	flex: 1 0 400px;
 	padding-top: 5px;
-}
 
-@media ( max-width: 600px ) {
-	.spellcard-notes {
+	@media ( max-width: 600px ) {
 		flex: none;
 	}
 }
