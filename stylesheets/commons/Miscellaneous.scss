@@ -1848,16 +1848,16 @@ div.battleground-banner {
 	text-align: left;
 	overflow: hidden;
 	border: 1px solid #000000;
-}
 
-.wiki-valorant div.battleground-banner {
-	position: relative;
-	height: 100px;
-	width: 456px;
-	background-color: #040006;
-	text-align: left;
-	overflow: hidden;
-	border: 1px solid #000000;
+	.wiki-valorant & {
+		position: relative;
+		height: 100px;
+		width: 456px;
+		background-color: #040006;
+		text-align: left;
+		overflow: hidden;
+		border: 1px solid #000000;
+	}
 }
 
 .battleground-banner > div {
@@ -1878,42 +1878,36 @@ div.battleground-banner {
 	font-size: 390%;
 	font-weight: 600;
 	text-shadow: 0 0 25px #3622f2;
-}
 
-.wiki-valorant .block-link > a {
-	position: absolute;
-	display: block;
-	height: 100%;
-	width: 100%;
-	padding-left: 26px;
-	line-height: 104px;
-	color: #f8f8f9 !important;
-	font-family: "Exo", "Trebuchet MS", "Helvetica", sans-serif;
-	font-size: 390%;
-	font-weight: 600;
-	text-shadow: 0 0 25px #b12a2a;
-}
+	.wiki-valorant & {
+		position: absolute;
+		display: block;
+		height: 100%;
+		width: 100%;
+		padding-left: 26px;
+		line-height: 104px;
+		color: #f8f8f9 !important;
+		font-family: "Exo", "Trebuchet MS", "Helvetica", sans-serif;
+		font-size: 390%;
+		font-weight: 600;
+		text-shadow: 0 0 25px #b12a2a;
+	}
 
-.block-link > a:active,
-.block-link > a:hover {
-	text-decoration: none;
-	text-shadow: 0 0 25px #fffec8;
-}
+	&:active,
+	&:hover {
+		text-decoration: none;
+		text-shadow: 0 0 25px #fffec8;
+	}
 
-@media ( max-width: 750px ) {
-	.block-link > a {
+	@media ( max-width: 750px ) {
 		font-size: 300%;
 	}
-}
 
-@media ( max-width: 570px ) {
-	.block-link > a {
+	@media ( max-width: 570px ) {
 		font-size: 200%;
 	}
-}
 
-@media ( max-width: 400px ) {
-	.block-link > a {
+	@media ( max-width: 400px ) {
 		font-size: 150%;
 	}
 }
