@@ -2463,43 +2463,43 @@ Author(s): salle
 	display: flex;
 	flex-direction: column;
 	width: 100%;
-}
 
-.next-circuit-boxes > div {
-	display: flex;
-	height: 25%;
-}
+	> div {
+		display: flex;
+		height: 25%;
 
-.next-circuit-boxes > div > div {
-	padding: 8px 12px;
-}
+		> div {
+			padding: 8px 12px;
+		}
 
-.next-circuit-boxes > div:first-child > div {
-	border-bottom: 1px solid #bbbbbb;
-}
+		&:first-child > div {
+			border-bottom: 1px solid #bbbbbb;
+		}
 
-.next-circuit-boxes > div > div:only-child {
-	width: 100%;
-}
+		> div:only-child {
+			width: 100%;
+		}
 
-.next-circuit-boxes > div > div:not( :only-child ) {
-	width: 50%;
-	border-bottom: 1px solid #bbbbbb;
-}
+		> div:not( :only-child ) {
+			width: 50%;
+			border-bottom: 1px solid #bbbbbb;
+		}
 
-.next-circuit-boxes > div > div:nth-child( n+2 ) {
-	border-left: 1px solid #bbbbbb;
+		> div:nth-child( n+2 ) {
+			border-left: 1px solid #bbbbbb;
+		}
+	}
 }
 
 @media ( max-width: 569px ) {
 	.next-circuit-image {
 		flex-direction: column;
-	}
 
-	.next-circuit-image > div:first-child {
-		display: flex;
-		justify-content: center;
-		padding: 0;
+		> div:first-child {
+			display: flex;
+			justify-content: center;
+			padding: 0;
+		}
 	}
 
 	.next-circuit-boxes {
@@ -2511,11 +2511,11 @@ Author(s): salle
 @media ( min-width: 570px ) {
 	.next-circuit-image {
 		flex-direction: row;
-	}
 
-	.next-circuit-image > div:first-child {
-		padding: 12px;
-		display: block;
+		> div:first-child {
+			padding: 12px;
+			display: block;
+		}
 	}
 
 	.next-circuit-boxes {
