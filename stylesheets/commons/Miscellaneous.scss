@@ -735,10 +735,10 @@ td.bold-white-text {
 .broadcast-talent-partner-list {
 	margin-left: -0.5em;
 	text-align: left;
-}
 
-.broadcast-talent-partner-list-frame {
-	border: 0 !important;
+	&-frame {
+		border: 0 !important;
+	}
 }
 
 /* tournament overview page boxes */
