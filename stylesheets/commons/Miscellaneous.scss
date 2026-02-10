@@ -103,7 +103,7 @@ Author(s): FO-nTTaX
 		@include toggle-area-func( $i );
 	}
 
-	.toggle-area-button {
+	#{&}-button {
 		cursor: pointer;
 	}
 }
