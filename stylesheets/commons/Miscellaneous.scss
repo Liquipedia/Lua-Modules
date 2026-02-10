@@ -2427,25 +2427,27 @@ Use case: Moving styling from inline to css file.
 Author(s): salle
 *******************************************************************************/
 
-table.f1-driver-standings-table > tbody > tr > td:nth-child( n+3 ) {
-	text-align: center;
-	white-space: pre;
-}
+table.f1-driver-standings-table > tbody > tr {
+	> td:nth-child( n+3 ) {
+		text-align: center;
+		white-space: pre;
+	}
 
-table.f1-driver-standings-table > tbody > tr > th:nth-child( n+3 ) {
-	width: 41px;
-}
+	> th:nth-child( n+3 ) {
+		width: 41px;
+	}
 
-table.f1-driver-standings-table > tbody > tr:nth-child( n+3 ) {
-	height: 40px;
-}
+	&:nth-child( n+3 ) {
+		height: 40px;
 
-table.f1-driver-standings-table > tbody > tr:nth-child( n+3 ) > th:first-child {
-	width: 28px;
-}
+		> th:first-child {
+			width: 28px;
+		}
 
-table.f1-driver-standings-table > tbody > tr:nth-child( n+3 ) > td:nth-child( 3 ) {
-	font-weight: bold;
+		> td:nth-child( 3 ) {
+			font-weight: bold;
+		}
+	}
 }
 
 /*******************************************************************************
