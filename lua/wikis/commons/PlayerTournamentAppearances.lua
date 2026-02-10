@@ -13,18 +13,17 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Condition = Lua.import('Module:Condition')
 local DateExt = Lua.import('Module:Date/Ext')
-local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
 local FnUtil = Lua.import('Module:FnUtil')
-local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Page = Lua.import('Module:Page')
 local Placement = Lua.import('Module:Placement')
+local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team')
 local Tournament = Lua.import('Module:Tournament')
 
 local ConditionTree = Condition.Tree
@@ -36,7 +35,6 @@ local ConditionUtil = Condition.Util
 
 local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
 
-local ICON_HEADER_TYPES = {'icons', 'icon'}
 local DEFAULT_TIERTYPES = {'General', 'School', ''}
 
 ---@class PlayerTournamentAppearances: BaseClass
@@ -60,8 +58,6 @@ function Appearances:init(frame)
 	assert(args.series or args.pages or args.conditions, 'Either "series", "pages" or "conditions" input has to be specified')
 
 	self.config = {
-		displayIconInsteadOfShortName = Table.includes(ICON_HEADER_TYPES, args.headerType),
-		displayFactionColumn = Logic.readBool(args.displayFactionColumn),
 		showPlacementInsteadOfTeam = Logic.readBool(args.showPlacementInsteadOfTeam),
 		limit = tonumber(args.limit),
 		isFormQuery = Logic.readBool(args.query),
@@ -112,10 +108,10 @@ function Appearances:_buildConditions()
 	conditions:add(ConditionUtil.anyOf(ColumnName('liquipediatiertype'), args.tierTypes))
 
 	if Table.isNotEmpty(args.series) then
-		conditions:add{
+		conditions:add(ConditionTree(BooleanOperator.any):add{
 			ConditionUtil.anyOf(ColumnName('seriespage'), args.series),
 			ConditionUtil.anyOf(ColumnName('series2', 'extradata'), args.series),
-		}
+		})
 	else
 		conditions:add(ConditionUtil.anyOf(ColumnName('pagename'), Array.map(args.pages, Page.pageifyLink)))
 	end
@@ -133,13 +129,13 @@ end
 
 ---@private
 ---@param pageNames string[]
----@return table[]
+---@return standardPlayer[]
 function Appearances:_fetchPlayers(pageNames)
 	---@type table<string, standardPlayer>
 	local players = {}
 
 	Lpdb.executeMassQuery('placement', {
-		conditions = self:_placementConditions(pageNames),
+		conditions = tostring(self:_placementConditions(pageNames)),
 		limit = 1000,
 		order = 'date asc',
 		query = 'opponentplayers, opponenttype, opponentname, parent, date, placement, opponenttemplate',
@@ -249,10 +245,6 @@ function Appearances:_header()
 	local header = mw.html.create('tr')
 		:tag('th'):done()
 
-	if self.config.displayFactionColumn then
-		header:tag('th')
-	end
-
 	header
 		:tag('th'):wikitext('Player'):done()
 		:tag('th'):wikitext(Abbreviation.make{text = 'TA.', title = 'Total appearances'})
@@ -273,16 +265,14 @@ function Appearances:_row(playerIndex)
 	local row = mw.html.create('tr')
 		:tag('td'):wikitext(Flags.Icon{flag = player.flag}):done()
 
-	if self.config.displayFactionColumn then
-		row:tag('td'):wikitext(Faction.Icon{faction = player.faction})
-	end
-
 	row
-		:tag('td'):css('text-align', 'left'):wikitext('[[' .. player.link .. '|' .. player.name .. ']]'):done()
-		:tag('td'):wikitext(player.appearances)
+		:tag('td'):css('text-align', 'left'):node(PlayerDisplay.InlinePlayer{
+			player = player, showFlag = false
+		}):done()
+		:tag('td'):wikitext(player.extradata.appearances)
 
 	for _, tournament in ipairs(self.tournaments) do
-		local result = player.results[tournament.pagename]
+		local result = player.extradata.results[tournament.pageName]
 		local cell = row:tag('td')
 
 		if self.config.showPlacementInsteadOfTeam then
@@ -291,7 +281,9 @@ function Appearances:_row(playerIndex)
 		elseif result then
 			cell
 				:attr('data-sort-value', result.team)
-				:wikitext(result.team and Team.icon(nil, result.team, result.date) or nil)
+				:node(result.team and OpponentDisplay.InlineTeamContainer{
+					template = result.team, date = result.date, style = 'icon'
+				} or nil)
 
 			if tonumber(result.placement) == 1 then
 				cell:addClass('tournament-highlighted-bg')
@@ -321,7 +313,7 @@ function Appearances:_buildQueryLink()
 
 	return mw.html.create('tr')
 		:tag('th')
-			:attr('colspan', #self.tournaments + 3 + (self.config.displayFactionColumn and 1 or 0))
+			:attr('colspan', #self.tournaments + 3)
 			:css('font-size', 'small')
 			:wikitext('[' .. queryString .. ' Click here to modify this table]')
 			:done()
