@@ -268,7 +268,7 @@ function Appearances:_row(playerIndex)
 		}):done()
 		:tag('td'):wikitext(player.extradata.appearances)
 
-	for _, tournament in ipairs(self.tournaments) do
+	Array.forEach(self.tournaments, function (tournament)
 		local result = player.extradata.results[tournament.pageName]
 		local cell = row:tag('td')
 
@@ -286,7 +286,7 @@ function Appearances:_row(playerIndex)
 				cell:addClass('tournament-highlighted-bg')
 			end
 		end
-	end
+	end)
 
 	return row
 end
