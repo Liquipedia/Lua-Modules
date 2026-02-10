@@ -964,31 +964,87 @@ Author(s): Rapture
 	margin: 0 0 10px 0;
 	white-space: nowrap;
 
-	> tbody > tr > th {
-		background-color: var( --clr-surface-4, #f5f5f5 );
-		font-weight: bold;
-		padding: 5px;
-
-		&.large-only[ colspan="1" ] {
-			display: none;
-		}
-	}
-
-	> tbody > tr.Players {
-		display: table-row;
-		border-top: 1px solid #bbbbbb;
-
-		> td {
-			display: table-cell;
-			line-height: 1.42857143;
+	> tbody {
+		> tr > th {
+			background-color: var( --clr-surface-4, #f5f5f5 );
+			font-weight: bold;
 			padding: 5px;
 
-			&.TeamPlayerIn {
-				padding: 2px 0 0 0;
+			&.large-only[ colspan="1" ] {
+				display: none;
+
+				@media screen and ( max-width: 750px ) {
+					display: table-cell;
+				}
 			}
 
-			> .MobileStuff {
-				display: none;
+			@media screen and ( max-width: 750px ) {
+				&.large-only[ colspan="10" ] {
+					display: none;
+				}
+			}
+		}
+
+		> tr.Players {
+			display: table-row;
+			border-top: 1px solid #bbbbbb;
+
+			@media screen and ( max-width: 750px ) {
+				display: block;
+				padding: 5px;
+			}
+
+			> td {
+				display: table-cell;
+				line-height: 1.42857143;
+				padding: 5px;
+
+				@media screen and ( max-width: 750px ) {
+					display: inline-block;
+					line-height: 1.42857143;
+					border: 0;
+					padding: 0;
+
+					&.Player {
+						clear: left;
+						float: left;
+						padding: 0 5px 5px 0;
+					}
+
+					&.PlayerName {
+						font-style: italic;
+						font-size: small;
+						float: left;
+						margin-top: 1px;
+						padding-bottom: 5px;
+					}
+
+					&.PlayerTeam {
+						float: right;
+					}
+
+					&.Tournaments {
+						display: block;
+						width: auto;
+						text-align: left;
+						padding: 5px 0 0 10px;
+						margin: 0 5px;
+						border-top: 1px solid var( --clr-border, #bbbbbb );
+						clear: both;
+					}
+				}
+
+				&.TeamPlayerIn {
+					padding: 2px 0 0 0;
+				}
+
+				> .MobileStuff {
+					display: none;
+
+					@media screen and ( max-width: 750px ) {
+						display: inline-block;
+					}
+				}
 			}
 		}
 	}
@@ -998,60 +1054,8 @@ Author(s): Rapture
 		max-width: 425px;
 		border: 1px solid var( --clr-border, #bbbbbb );
 
-		> tbody > tr > th.large-only[ colspan="10" ] {
-			display: none;
-		}
-
-		> tbody > tr > th.large-only[ colspan="1" ] {
-			display: table-cell;
-		}
-
 		> tbody > tr.HeaderRow {
 			display: none;
-		}
-
-		> tbody > tr.Players {
-			display: block;
-			padding: 5px;
-
-			> td {
-				display: inline-block;
-				line-height: 1.42857143;
-				border: 0;
-				padding: 0;
-
-				&.Player {
-					clear: left;
-					float: left;
-					padding: 0 5px 5px 0;
-				}
-
-				&.PlayerName {
-					font-style: italic;
-					font-size: small;
-					float: left;
-					margin-top: 1px;
-					padding-bottom: 5px;
-				}
-
-				&.PlayerTeam {
-					float: right;
-				}
-
-				&.Tournaments {
-					display: block;
-					width: auto;
-					text-align: left;
-					padding: 5px 0 0 10px;
-					margin: 0 5px;
-					border-top: 1px solid var( --clr-border, #bbbbbb );
-					clear: both;
-				}
-
-				> .MobileStuff {
-					display: inline-block;
-				}
-			}
 		}
 	}
 }
