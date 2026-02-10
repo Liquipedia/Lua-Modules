@@ -416,28 +416,28 @@ Author(s): FO-nTTaX
 
 .timeline-row {
 	vertical-align: middle;
-}
 
-.timeline-row:nth-of-type( 2n ) {
-	background-color: #eeeeee;
-}
+	&:nth-of-type( 2n ) {
+		background-color: #eeeeee;
+	}
 
-.timeline-row > div {
-	vertical-align: middle;
-	display: inline-block;
-	position: relative;
-	height: 35px;
-	padding: 4px;
-}
+	> div {
+		vertical-align: middle;
+		display: inline-block;
+		position: relative;
+		height: 35px;
+		padding: 4px;
 
-.timeline-row > div:nth-of-type( 1 ) {
-	width: 150px;
-	line-height: 27px;
-	font-weight: bold;
-}
+		&:nth-of-type( 1 ) {
+			width: 150px;
+			line-height: 27px;
+			font-weight: bold;
+		}
 
-.timeline-row > div:nth-of-type( 2 ) {
-	width: calc( 100% - 150px );
+		&:nth-of-type( 2 ) {
+			width: calc( 100% - 150px );
+		}
+	}
 }
 
 .timeline-period {
@@ -468,16 +468,16 @@ Author(s): FO-nTTaX
 	height: 92px;
 	padding-left: 150px;
 	border-top: 1px solid var( --table-border-color, #dddddd );
-}
 
-.timeline-footer-date {
-	width: 24px;
-}
+	&-date {
+		width: 24px;
 
-.timeline-footer-date-inner {
-	padding: 4px;
-	transform: rotate( 90deg );
-	margin-top: 0;
+		&-inner {
+			padding: 4px;
+			transform: rotate( 90deg );
+			margin-top: 0;
+		}
+	}
 }
 
 .timeline-header-sc {
