@@ -5,25 +5,25 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Condition = require('Module:Condition')
-local DateExt = require('Module:Date/Ext')
-local Flags = require('Module:Flags')
-local LeagueIcon = require('Module:LeagueIcon')
-local Logic = require('Module:Logic')
-local Lpdb = require('Module:Lpdb')
-local Operator = require('Module:Operator')
-local Placement = require('Module:Placement')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Team = require('Module:Team')
+local Lua = require('Module:Lua')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Condition = Lua.import('Module:Condition')
+local DateExt = Lua.import('Module:Date/Ext')
+local Flags = Lua.import('Module:Flags')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Operator = Lua.import('Module:Operator')
+local Placement = Lua.import('Module:Placement')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Team = Lua.import('Module:Team')
 
 local FACTION
-
-local Lua = require('Module:Lua')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
@@ -251,7 +251,7 @@ function Appearances:_header()
 		:tag('th'):done()
 
 	if self.config.displayFactionColumn then
-		FACTION = require('Module:Faction')
+		FACTION = Lua.import('Module:Faction')
 		header:tag('th')
 	end
 
