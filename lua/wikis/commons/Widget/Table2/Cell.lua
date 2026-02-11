@@ -38,7 +38,6 @@ local Table2Cell = Class.new(Widget)
 
 Table2Cell.defaultProps = {
 	classes = {},
-	attributes = {},
 }
 
 ---@return Widget

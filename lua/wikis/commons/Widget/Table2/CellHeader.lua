@@ -41,7 +41,6 @@ local Table2CellHeader = Class.new(Widget)
 
 Table2CellHeader.defaultProps = {
 	classes = {},
-	attributes = {},
 }
 
 ---@return Widget

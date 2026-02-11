@@ -16,9 +16,8 @@ local WidgetContext = Lua.import('Module:Widget/Context')
 ---@operator call(table): Table2HeaderRowKind
 local Table2HeaderRowKind = Class.new(WidgetContext)
 
----@param default any
----@return Table2HeaderRowKindName|any
-function Table2HeaderRowKind:getValue(default)
+---@return Table2HeaderRowKindName
+function Table2HeaderRowKind:getValue()
 	assert(self.props.value ~= nil, 'Table2HeaderRowKind: expected value')
 	return self.props.value
 end

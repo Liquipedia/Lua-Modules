@@ -23,7 +23,6 @@ local Table2Section = Lua.import('Module:Widget/Table2/Section')
 ---@class Table2Body: Widget
 ---@operator call(Table2BodyProps): Table2Body
 local Table2Body = Class.new(Widget)
-Table2Body.defaultProps = {}
 
 ---@return Widget
 function Table2Body:render()

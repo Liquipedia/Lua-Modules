@@ -14,9 +14,8 @@ local WidgetContext = Lua.import('Module:Widget/Context')
 ---@operator call(table): Table2ColumnIndexContext
 local Table2ColumnIndexContext = Class.new(WidgetContext)
 
----@param default any
----@return integer|any
-function Table2ColumnIndexContext:getValue(default)
+---@return integer
+function Table2ColumnIndexContext:getValue()
 	assert(self.props.value ~= nil, 'Table2ColumnIndexContext: expected value')
 	return self.props.value
 end

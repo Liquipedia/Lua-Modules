@@ -17,9 +17,8 @@ local WidgetContext = Lua.import('Module:Widget/Context')
 ---@operator call(table): Table2Section
 local Table2Section = Class.new(WidgetContext)
 
----@param default any
----@return Table2SectionName|any
-function Table2Section:getValue(default)
+---@return Table2SectionName
+function Table2Section:getValue()
 	assert(self.props.value ~= nil, 'Table2Section: expected value')
 	return self.props.value
 end

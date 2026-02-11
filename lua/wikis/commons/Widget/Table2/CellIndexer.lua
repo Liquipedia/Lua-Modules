@@ -22,10 +22,6 @@ local Table2CellIndexer = Class.new(Widget)
 ---@class Table2CellIndexerProps
 ---@field children (Widget|Html|string|number|nil)[]?
 
-Table2CellIndexer.defaultProps = {
-	children = {},
-}
-
 ---@return Widget
 function Table2CellIndexer:render()
 	local props = self.props
