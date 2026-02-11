@@ -52,19 +52,27 @@ function ParticipantsTeamHeader:render()
 		}
 	else
 		opponentDisplay = Div{
-			classes = opponentClasses,
-			children = WidgetUtil.collect(
-				OpponentDisplay.BlockOpponent{
-					opponent = participant.opponent,
-					teamStyle = 'bracket',
-					additionalClasses = {'team-participant-card__opponent-compact'}
+			classes = {'team-participant-card__opponent', 'team-participant-card__opponent--square-icon'},
+			children = {
+				Div{
+					classes = {'team-participant-card__opponent-compact'},
+					children = {
+						OpponentDisplay.BlockOpponent{
+							opponent = participant.opponent,
+							teamStyle = 'bracket',
+						}
+					}
 				},
-				OpponentDisplay.BlockOpponent{
-					opponent = participant.opponent,
-					teamStyle = 'standard',
-					additionalClasses = {'team-participant-card__opponent-full'}
+				Div{
+					classes = {'team-participant-card__opponent-full'},
+					children = {
+						OpponentDisplay.BlockOpponent{
+							opponent = participant.opponent,
+							teamStyle = 'standard',
+						}
+					}
 				}
-			)
+			}
 		}
 	end
 

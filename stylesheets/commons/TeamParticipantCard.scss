@@ -130,14 +130,6 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 			opacity: 0.3;
 		}
 
-		&--compact {
-			display: flex;
-		}
-
-		&--full {
-			display: none;
-		}
-
 		&--square-icon {
 			.team-template-image-icon,
 			.league-icon-small-image {
@@ -154,6 +146,14 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 				}
 			}
 		}
+	}
+
+	&__opponent-compact {
+		display: flex;
+	}
+
+	&__opponent-full {
+		display: none;
 	}
 
 	&__label {
@@ -476,11 +476,11 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 
 .team-participant:not(:has( .switch-toggle-active#{ $compact-selector } )) {
 	.team-participant-card {
-		&__opponent--compact {
+		&__opponent-compact {
 			display: none;
 		}
 
-		&__opponent--full {
+		&__opponent-full {
 			display: flex;
 		}
 	}
@@ -505,11 +505,11 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 			}
 		}
 
-		&__opponent--compact {
+		&__opponent-compact {
 			display: flex;
 		}
 
-		&__opponent--full {
+		&__opponent-full {
 			display: none;
 		}
 
