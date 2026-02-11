@@ -149,11 +149,11 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 	}
 
 	&__opponent-compact {
-		display: flex;
+		display: none;
 	}
 
 	&__opponent-full {
-		display: none;
+		display: flex;
 	}
 
 	&__label {
