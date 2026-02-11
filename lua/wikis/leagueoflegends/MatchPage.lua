@@ -40,7 +40,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LoLMatchPage: BaseMatchPage
 ---@field games LoLMatchPageGame[]
----@operator call(MatchGroupUtilMatch): BaseMatchPage
+---@operator call(MatchGroupUtilMatch): LoLMatchPage
 local MatchPage = Class.new(BaseMatchPage)
 
 local KEYSTONES = Table.map({

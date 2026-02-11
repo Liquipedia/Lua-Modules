@@ -30,6 +30,7 @@ local VetoRow = Lua.import('Module:Widget/Match/Page/VetoRow')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class Dota2MatchPage: BaseMatchPage
+---@operator call(MatchGroupUtilMatch): Dota2MatchPage
 local MatchPage = Class.new(BaseMatchPage)
 
 local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
