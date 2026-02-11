@@ -26,11 +26,12 @@ function ColumnUtil.validateColumnDef(columnDef)
 end
 
 ---Gets the column index for this cell
----@param columnIndexProp integer|nil - explicit column index from props
----@param columnIndexContext integer|nil - implicit column index from context
+---@param columnIndexProp integer|string|nil - explicit column index from props
+---@param columnIndexContext integer|string|nil - implicit column index from context
 ---@return integer
 function ColumnUtil.getColumnIndex(columnIndexProp, columnIndexContext)
-	return columnIndexProp or columnIndexContext or 1
+	local index = tonumber(columnIndexProp) or tonumber(columnIndexContext)
+	return index or 1
 end
 
 ---Merges column definition properties with cell properties

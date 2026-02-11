@@ -31,9 +31,9 @@ local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 ---@field classes string[]?
 ---@field css {[string]: string|number|nil}?
 ---@field attributes {[string]: any}?
----@field colspan integer?
----@field rowspan integer?
----@field columnIndex integer?
+---@field colspan integer|string?
+---@field rowspan integer|string?
+---@field columnIndex integer|string?
 
 ---@class Table2CellHeader: Widget
 ---@operator call(Table2CellHeaderProps): Table2CellHeader
@@ -68,10 +68,10 @@ function Table2CellHeader:render()
 		attributes['data-sort-type'] = mergedProps.sortType
 	end
 	if mergedProps.colspan ~= nil then
-		attributes.colspan = mergedProps.colspan
+		attributes.colspan = tonumber(mergedProps.colspan) or mergedProps.colspan
 	end
 	if mergedProps.rowspan ~= nil then
-		attributes.rowspan = mergedProps.rowspan
+		attributes.rowspan = tonumber(mergedProps.rowspan) or mergedProps.rowspan
 	end
 
 	local css = ColumnUtil.buildCss(mergedProps.width, mergedProps.minWidth, mergedProps.maxWidth, mergedProps.css)

@@ -30,7 +30,7 @@ function Table2CellIndexer:render()
 	local columnIndex = 1
 	local indexedChildren = Array.map(children, function(child)
 		if Class.instanceOf(child, Table2Cell) or Class.instanceOf(child, Table2CellHeader) then
-			local explicitIndex = child.props.columnIndex
+			local explicitIndex = tonumber(child.props.columnIndex)
 			if explicitIndex then
 				columnIndex = math.max(columnIndex, explicitIndex)
 			end

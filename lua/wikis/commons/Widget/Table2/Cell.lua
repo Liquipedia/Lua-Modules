@@ -25,9 +25,9 @@ local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 ---@field width string?
 ---@field minWidth string?
 ---@field maxWidth string?
----@field colspan integer?
----@field rowspan integer?
----@field columnIndex integer?
+---@field colspan integer|string?
+---@field rowspan integer|string?
+---@field columnIndex integer|string?
 ---@field classes string[]?
 ---@field css {[string]: string|number|nil}?
 ---@field attributes {[string]: any}?
@@ -57,10 +57,10 @@ function Table2Cell:render()
 
 	local attributes = Table.copy(mergedProps.attributes or {})
 	if mergedProps.colspan ~= nil then
-		attributes.colspan = mergedProps.colspan
+		attributes.colspan = tonumber(mergedProps.colspan) or mergedProps.colspan
 	end
 	if mergedProps.rowspan ~= nil then
-		attributes.rowspan = mergedProps.rowspan
+		attributes.rowspan = tonumber(mergedProps.rowspan) or mergedProps.rowspan
 	end
 
 	local css = ColumnUtil.buildCss(mergedProps.width, mergedProps.minWidth, mergedProps.maxWidth, mergedProps.css)
