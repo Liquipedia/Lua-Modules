@@ -61,8 +61,8 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field teamTemplateData teamTemplateData
 ---@field seriesDots string[]
 
----@class BaseMatchPage
----@operator call(MatchPageMatch): BaseMatchPage
+---@class BaseMatchPage: BaseClass
+---@operator call(MatchGroupUtilMatch): BaseMatchPage
 ---@field matchData MatchPageMatch
 ---@field games MatchPageGame[]
 ---@field opponents MatchPageOpponent[]
