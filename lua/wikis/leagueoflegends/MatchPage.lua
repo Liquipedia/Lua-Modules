@@ -97,14 +97,6 @@ local KP_ICON = IconFa{iconName = 'leagueoflegends_killparticipation', hover = '
 local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local SPAN_SLASH = Html.Span{classes = {'slash'}, children = '/'}
 
----@param props {match: MatchGroupUtilMatch}
----@return VNode
-function MatchPage.getByMatchId(props)
-	local matchPage = MatchPage(props.match)
-
-	return matchPage:render()
-end
-
 function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)
 		local vetoPhase = game.extradata.vetophase or {}
