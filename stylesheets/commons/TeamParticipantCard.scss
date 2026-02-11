@@ -474,18 +474,6 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 	}
 }
 
-.team-participant:not(:has( .switch-toggle-active#{ $compact-selector } )) {
-	.team-participant-card {
-		&__opponent-compact {
-			display: none;
-		}
-
-		&__opponent-full {
-			display: flex;
-		}
-	}
-}
-
 .team-participant:has( .switch-toggle-active#{ $compact-selector } ) {
 	.team-participant-card {
 		&__opponent--square-icon {
