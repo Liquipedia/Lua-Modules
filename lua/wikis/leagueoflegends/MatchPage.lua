@@ -82,14 +82,6 @@ local KDA_ICON = IconFa{iconName = 'leagueoflegends_kda', hover = 'KDA'}
 local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
----@param props {match: MatchGroupUtilMatch}
----@return Widget
-function MatchPage.getByMatchId(props)
-	local matchPage = MatchPage(props.match)
-
-	return matchPage:render()
-end
-
 function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)
 		local vetoPhase = game.extradata.vetophase or {}

@@ -82,13 +82,6 @@ local BaseMatchPage = Class.new(
 BaseMatchPage.NOT_PLAYED = 'notplayed'
 BaseMatchPage.NO_CHARACTER = 'default'
 
----@param props {match: MatchGroupUtilMatch}
----@return Widget
-function BaseMatchPage.getByMatchId(props)
-	local matchPage = BaseMatchPage(props.match)
-	return matchPage:render()
-end
-
 function BaseMatchPage:addCategories()
 	local matchPhase = MatchGroupUtil.computeMatchPhase(self.matchData)
 

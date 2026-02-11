@@ -38,14 +38,6 @@ local ITEM_IMAGE_SIZE = '64px'
 local KDA_ICON = IconFa{iconName = 'kda', hover = 'KDA'}
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
----@param props {match: MatchGroupUtilMatch}
----@return Widget
-function MatchPage.getByMatchId(props)
-	local matchPage = MatchPage(props.match)
-
-	return matchPage:render()
-end
-
 function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1

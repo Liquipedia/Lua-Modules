@@ -60,14 +60,6 @@ local WIN_TYPES = {
 	}
 }
 
----@param props {match: MatchGroupUtilMatch}
----@return Widget
-function MatchPage.getByMatchId(props)
-	local matchPage = MatchPage(props.match)
-
-	return matchPage:render()
-end
-
 function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
