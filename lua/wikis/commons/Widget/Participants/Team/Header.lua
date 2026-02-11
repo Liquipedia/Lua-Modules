@@ -51,10 +51,20 @@ function ParticipantsTeamHeader:render()
 			)
 		}
 	else
-		opponentDisplay = OpponentDisplay.BlockOpponent{
-			opponent = participant.opponent,
-			teamStyle = 'standard',
-			additionalClasses = opponentClasses
+		opponentDisplay = Div{
+			classes = opponentClasses,
+			children = WidgetUtil.collect(
+				OpponentDisplay.BlockOpponent{
+					opponent = participant.opponent,
+					teamStyle = 'bracket',
+					additionalClasses = {'team-participant-card__opponent-compact'}
+				},
+				OpponentDisplay.BlockOpponent{
+					opponent = participant.opponent,
+					teamStyle = 'standard',
+					additionalClasses = {'team-participant-card__opponent-full'}
+				}
+			)
 		}
 	end
 
