@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
@@ -68,10 +69,10 @@ function Table2CellHeader:render()
 		attributes['data-sort-type'] = mergedProps.sortType
 	end
 	if mergedProps.colspan ~= nil then
-		attributes.colspan = tonumber(mergedProps.colspan) or mergedProps.colspan
+		attributes.colspan = MathUtil.toInteger(mergedProps.colspan) or mergedProps.colspan
 	end
 	if mergedProps.rowspan ~= nil then
-		attributes.rowspan = tonumber(mergedProps.rowspan) or mergedProps.rowspan
+		attributes.rowspan = MathUtil.toInteger(mergedProps.rowspan) or mergedProps.rowspan
 	end
 
 	local css = ColumnUtil.buildCss(mergedProps.width, mergedProps.minWidth, mergedProps.maxWidth, mergedProps.css)

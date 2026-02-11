@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Table2Cell = Lua.import('Module:Widget/Table2/Cell')
 local Table2CellHeader = Lua.import('Module:Widget/Table2/CellHeader')
 local Table2ColumnIndexContext = Lua.import('Module:Widget/Table2/ColumnIndexContext')
@@ -22,7 +21,7 @@ local Table2CellIndexer = Class.new(Widget)
 ---@class Table2CellIndexerProps
 ---@field children (Widget|Html|string|number|nil)[]?
 
----@return Widget
+---@return (Widget|Html|string|number|nil)[]
 function Table2CellIndexer:render()
 	local props = self.props
 	local children = props.children or {}
@@ -31,7 +30,7 @@ function Table2CellIndexer:render()
 	local indexedChildren = Array.map(children, function(child)
 		if Class.instanceOf(child, Table2Cell) or Class.instanceOf(child, Table2CellHeader) then
 			local explicitIndex = tonumber(child.props.columnIndex)
-			if explicitIndex then
+			if explicitIndex and explicitIndex >= 1 then
 				columnIndex = math.max(columnIndex, explicitIndex)
 			end
 
@@ -53,9 +52,7 @@ function Table2CellIndexer:render()
 		return child
 	end)
 
-	return HtmlWidgets.Fragment{
-		children = indexedChildren,
-	}
+	return indexedChildren
 end
 
 return Table2CellIndexer

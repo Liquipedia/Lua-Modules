@@ -53,7 +53,7 @@ Table2.defaultProps = {
 	columns = {},
 }
 
----@return Widget
+---@return (Widget|Html|string|number|nil)[]
 function Table2:render()
 	local props = self.props
 
@@ -61,7 +61,7 @@ function Table2:render()
 		Array.forEach(props.columns, function(columnDef, i)
 			local valid, errorMsg = ColumnUtil.validateColumnDef(columnDef)
 			if not valid then
-				assert(false, 'Table2: Column ' .. i .. ' - ' .. errorMsg)
+				error('Table2: Column ' .. i .. ' - ' .. errorMsg)
 			end
 		end)
 	end
@@ -114,9 +114,7 @@ function Table2:render()
 		children = WidgetUtil.collect(titleNode, containerNode, footerNode),
 	}
 
-	return HtmlWidgets.Fragment{
-		children = WidgetUtil.collect(captionNode, tableWrapperNode),
-	}
+	return WidgetUtil.collect(captionNode, tableWrapperNode)
 end
 
 return Table2
