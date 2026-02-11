@@ -13,18 +13,21 @@ local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
+local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local Links = Lua.import('Module:Links')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
+local TextSanitizer = Lua.import('Module:TextSanitizer')
 local Tournament = Lua.import('Module:Tournament')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
+local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -76,6 +79,8 @@ local BaseMatchPage = Class.new(
 		self:populateOpponents()
 
 		self:addCategories()
+
+		self:_setMetadata()
 	end
 )
 
@@ -103,6 +108,69 @@ function BaseMatchPage:addCategories()
 			mw.ext.TeamLiquidIntegration.add_category(phaseToDisplay[matchPhase] .. ' Matches')
 		end
 	end
+end
+
+---@private
+function BaseMatchPage:_setMetadata()
+	local tournament = self:getMatchContext()
+	local icon = Logic.emptyOr(tournament.icon, tournament.iconDark)
+
+	if icon then
+		mw.ext.SearchEngineOptimization.metaimage(icon)
+	end
+
+	local desc = self:seoText()
+	if String.isNotEmpty(desc) then
+		---@cast desc -nil
+		mw.ext.SearchEngineOptimization.metadescl(desc)
+	end
+end
+
+---@protected
+function BaseMatchPage:seoText()
+	local tournament = self:getMatchContext()
+	local matchPhase = MatchGroupUtil.computeMatchPhase(self.matchData)
+
+	---@return string?
+	local function createTenseString()
+		if matchPhase == 'ongoing' then
+			return
+		end
+		return String.interpolate(
+			' that ${tense} place on ${date}',
+			{
+				tense = matchPhase == 'upcoming' and 'will take' or 'took',
+				date = TextSanitizer.stripHTML(DateExt.toCountdownArg(
+					self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact
+				))
+			}
+		)
+	end
+
+	if Opponent.isTbd(self.opponents[1]) and Opponent.isTbd(self.opponents[2]) then
+		return String.interpolate(
+			'Find detailed results about the ${ongoingTense}${game} match in ${tournamentName}${tense}.',
+			{
+				ongoingTense = matchPhase == 'ongoing' and 'ongoing ' or '',
+				game = Game.name{game = self.matchData.game},
+				tournamentName = tournament.displayName,
+				tense = createTenseString()
+			}
+		)
+	end
+
+	return String.interpolate(
+		'Find detailed results about the ${ongoingTense}${game} match between ${opponent1} and ${opponent2} ' ..
+		'in ${tournamentName}${tense}.',
+		{
+			ongoingTense = matchPhase == 'ongoing' and 'ongoing ' or '',
+			game = Game.name{game = self.matchData.game},
+			tournamentName = tournament.displayName,
+			opponent1 = Opponent.toName(self.opponents[1]),
+			opponent2 = Opponent.toName(self.opponents[2]),
+			tense = createTenseString()
+		}
+	)
 end
 
 ---Tests whether this match page is a Bo1
