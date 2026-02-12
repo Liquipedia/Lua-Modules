@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
@@ -70,9 +71,7 @@ function Table2Row:render()
 
 	local children = props.children or {}
 	local columnIndex = 1
-	local indexedChildren = {}
-
-	for child in ipairs(children) do
+	local indexedChildren = Array.map(children, function(child)
 		if Class.instanceOf(child, Table2Cell) or Class.instanceOf(child, Table2CellHeader) then
 			local cellChild = child --[[@as Table2Cell|Table2CellHeader]]
 			local explicitIndex = MathUtil.toInteger(cellChild.props.columnIndex)
@@ -93,11 +92,10 @@ function Table2Row:render()
 				span = 1
 			end
 			columnIndex = columnIndex + span
-			table.insert(indexedChildren, wrappedChild)
-		else
-			table.insert(indexedChildren, child)
+			return wrappedChild
 		end
-	end
+		return child
+	end)
 
 	return HtmlWidgets.Tr{
 		classes = WidgetUtil.collect('table2__row', sectionClass, kindClass, stripeClass, highlightClass, props.classes),
