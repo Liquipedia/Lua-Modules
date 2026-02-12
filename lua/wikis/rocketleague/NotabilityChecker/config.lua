@@ -26,7 +26,7 @@ Config.PLACEMENT_LIMIT = 2000
 Config.MAX_NUMBER_OF_COACHES = 0
 
 -- These are the notability thresholds needed by a team/player
-Config.NOTABILITY_THRESHOLD_MIN = 400
+Config.NOTABILITY_THRESHOLD_MIN = 500
 Config.NOTABILITY_THRESHOLD_NOTABLE = 500
 
 -- These are all the liquipediatiertypes which should be extra "penalised"
