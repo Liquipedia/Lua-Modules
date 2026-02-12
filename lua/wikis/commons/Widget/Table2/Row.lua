@@ -9,12 +9,15 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
 
 local Widget = Lua.import('Module:Widget')
 local Table2Section = Lua.import('Module:Widget/Table2/Section')
 local Table2HeaderRowKind = Lua.import('Module:Widget/Table2/HeaderRowKind')
 local Table2BodyStripe = Lua.import('Module:Widget/Table2/BodyStripe')
-local Table2CellIndexer = Lua.import('Module:Widget/Table2/CellIndexer')
+local Table2Cell = Lua.import('Module:Widget/Table2/Cell')
+local Table2CellHeader = Lua.import('Module:Widget/Table2/CellHeader')
+local Table2ColumnIndexContext = Lua.import('Module:Widget/Table2/ColumnIndexContext')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
@@ -65,9 +68,36 @@ function Table2Row:render()
 		highlightClass = 'table2__row--highlighted'
 	end
 
-	local indexedChildren = {Table2CellIndexer{
-		children = props.children,
-	}}
+	local children = props.children or {}
+	local columnIndex = 1
+	local indexedChildren = {}
+
+	for child in ipairs(children) do
+		if Class.instanceOf(child, Table2Cell) or Class.instanceOf(child, Table2CellHeader) then
+			local cellChild = child --[[@as Table2Cell|Table2CellHeader]]
+			local explicitIndex = MathUtil.toInteger(cellChild.props.columnIndex)
+			if explicitIndex and explicitIndex >= 1 then
+				columnIndex = math.max(columnIndex, explicitIndex)
+			end
+
+			local wrappedChild = cellChild --[[@as Table2Cell|Table2CellHeader|Table2ColumnIndexContext]]
+			if not cellChild.props.columnIndex then
+				wrappedChild = Table2ColumnIndexContext{
+					value = columnIndex,
+					children = {cellChild},
+				}
+			end
+
+			local span = MathUtil.toInteger(cellChild.props.colspan) or 1
+			if span < 1 then
+				span = 1
+			end
+			columnIndex = columnIndex + span
+			table.insert(indexedChildren, wrappedChild)
+		else
+			table.insert(indexedChildren, child)
+		end
+	end
 
 	return HtmlWidgets.Tr{
 		classes = WidgetUtil.collect('table2__row', sectionClass, kindClass, stripeClass, highlightClass, props.classes),
