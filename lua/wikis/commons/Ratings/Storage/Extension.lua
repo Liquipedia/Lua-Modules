@@ -32,13 +32,16 @@ end
 ---@param rankings Dota2RankingRecord[]
 ---@return Dota2RankingTeam[]
 function RatingsStorageExtension._mapDataToExpectedFormat(rankings)
-	local dateOfLastEntry = Array.maxBy(rankings, function(rankedDate)
+	local nonProvisionalRankings = Array.filter(rankings, function(ranking)
+		return not ranking.provisional
+	end)
+	local dateOfLastEntry = Array.maxBy(nonProvisionalRankings, function(rankedDate)
 		return Date.readTimestamp(rankedDate.date)
 	end).date
 
 	local teamsData = {}
 
-	for _, datedResults in ipairs(rankings) do
+	for _, datedResults in ipairs(nonProvisionalRankings) do
 		for _, datedEntry in ipairs(datedResults.entries) do
 			if not teamsData[datedEntry.name] then
 				teamsData[datedEntry.name] = {
