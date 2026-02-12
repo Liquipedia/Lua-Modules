@@ -153,7 +153,7 @@ function ColumnUtil.buildAttributes(mergedProps, additionalAttributeBuilders)
 	end
 
 	if additionalAttributeBuilders then
-		Table.iter.forEachPair(additionalAttributeBuilders, function(builder)
+		Table.iter.forEachPair(additionalAttributeBuilders, function(key, builder)
 			builder(attributes, mergedProps)
 		end)
 	end
