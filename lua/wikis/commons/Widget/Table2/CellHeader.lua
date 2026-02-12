@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
-local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
