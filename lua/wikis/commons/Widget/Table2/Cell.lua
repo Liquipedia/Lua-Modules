@@ -62,23 +62,7 @@ function Table2Cell:render()
 
 	local mergedProps = ColumnUtil.mergeProps(props, columnDef)
 
-	local attributes = mergedProps.attributes
-	if attributes then
-		if mergedProps.colspan then
-			attributes.colspan = MathUtil.toInteger(mergedProps.colspan) or mergedProps.colspan
-		end
-		if mergedProps.rowspan then
-			attributes.rowspan = MathUtil.toInteger(mergedProps.rowspan) or mergedProps.rowspan
-		end
-	else
-		attributes = {}
-		if mergedProps.colspan then
-			attributes.colspan = MathUtil.toInteger(mergedProps.colspan) or mergedProps.colspan
-		end
-		if mergedProps.rowspan then
-			attributes.rowspan = MathUtil.toInteger(mergedProps.rowspan) or mergedProps.rowspan
-		end
-	end
+	local attributes = ColumnUtil.buildAttributes(mergedProps)
 
 	local css = ColumnUtil.buildCss(mergedProps.width, mergedProps.minWidth, mergedProps.maxWidth, mergedProps.css)
 

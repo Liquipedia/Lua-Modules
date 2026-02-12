@@ -75,29 +75,13 @@ function Table2CellHeader:render()
 		classes = WidgetUtil.collect(classes, 'unsortable')
 	end
 
-	local attributes = mergedProps.attributes
-	if attributes then
-		if mergedProps.sortType then
-			attributes['data-sort-type'] = mergedProps.sortType
-		end
-		if mergedProps.colspan then
-			attributes.colspan = MathUtil.toInteger(mergedProps.colspan) or mergedProps.colspan
-		end
-		if mergedProps.rowspan then
-			attributes.rowspan = MathUtil.toInteger(mergedProps.rowspan) or mergedProps.rowspan
-		end
-	else
-		attributes = {}
-		if mergedProps.sortType then
-			attributes['data-sort-type'] = mergedProps.sortType
-		end
-		if mergedProps.colspan then
-			attributes.colspan = MathUtil.toInteger(mergedProps.colspan) or mergedProps.colspan
-		end
-		if mergedProps.rowspan then
-			attributes.rowspan = MathUtil.toInteger(mergedProps.rowspan) or mergedProps.rowspan
-		end
-	end
+	local attributes = ColumnUtil.buildAttributes(mergedProps, {
+		sortType = function(attrs, props)
+			if props.sortType then
+				attrs['data-sort-type'] = props.sortType
+			end
+		end,
+	})
 
 	local css = ColumnUtil.buildCss(mergedProps.width, mergedProps.minWidth, mergedProps.maxWidth, mergedProps.css)
 

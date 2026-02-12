@@ -104,4 +104,28 @@ function ColumnUtil.buildClasses(align, nowrap, shrink, existingClasses)
 	return Array.extendWith(classes, existingClasses)
 end
 
+---Builds HTML attributes for cells and headers
+---@param mergedProps table - merged cell/header properties
+---@param additionalAttributeBuilders {[string]: function}? - optional callbacks for additional attributes
+---@return table attributes
+function ColumnUtil.buildAttributes(mergedProps, additionalAttributeBuilders)
+	local attributes = mergedProps.attributes or {}
+
+	if mergedProps.colspan then
+		attributes.colspan = MathUtil.toInteger(mergedProps.colspan) or mergedProps.colspan
+	end
+
+	if mergedProps.rowspan then
+		attributes.rowspan = MathUtil.toInteger(mergedProps.rowspan) or mergedProps.rowspan
+	end
+
+	if additionalAttributeBuilders then
+		for key, builder in pairs(additionalAttributeBuilders) do
+			builder(attributes, mergedProps)
+		end
+	end
+
+	return attributes
+end
+
 return ColumnUtil
