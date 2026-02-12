@@ -259,7 +259,6 @@ function HiddenDataBox._matchTicker(showMatchTicker)
 		classes = {'fo-nttax-infobox-topcontent'},
 		children = AnalyticsWidget{
 			analyticsName = 'HiddenDataBoxMatchTicker',
-			--classes = {'fo-nttax-infobox-container'},
 			children = {
 				MatchTickerEntityDisplay.Container{
 					config = result.config,
