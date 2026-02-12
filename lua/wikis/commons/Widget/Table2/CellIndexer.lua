@@ -30,20 +30,21 @@ function Table2CellIndexer:render()
 	local children = props.children or {}
 
 	local columnIndex = 1
-	local indexedChildren = Array.map(children, function(child)
+	local wrappedCells = {}
+	local hasWrappedCells = false
+
+	for i, child in ipairs(children) do
 		if Class.instanceOf(child, Table2Cell) or Class.instanceOf(child, Table2CellHeader) then
 			local cellChild = child --[[@as Table2Cell|Table2CellHeader]]
 			local explicitIndex = MathUtil.toInteger(cellChild.props.columnIndex)
+
 			if explicitIndex and explicitIndex >= 1 then
 				columnIndex = math.max(columnIndex, explicitIndex)
 			end
 
-			local wrappedChild = cellChild --[[@as Table2Cell|Table2CellHeader|Table2ColumnIndexContext]]
 			if not cellChild.props.columnIndex then
-				wrappedChild = Table2ColumnIndexContext{
-					value = columnIndex,
-					children = {cellChild},
-				}
+				wrappedCells[i] = columnIndex
+				hasWrappedCells = true
 			end
 
 			local span = MathUtil.toInteger(cellChild.props.colspan) or 1
@@ -51,10 +52,24 @@ function Table2CellIndexer:render()
 				span = 1
 			end
 			columnIndex = columnIndex + span
-			return wrappedChild
 		end
-		return child
-	end)
+	end
+
+	if not hasWrappedCells then
+		return children
+	end
+
+	local indexedChildren = {}
+	for i, child in ipairs(children) do
+		if wrappedCells[i] then
+			table.insert(indexedChildren, Table2ColumnIndexContext{
+				value = wrappedCells[i],
+				children = {child},
+			})
+		else
+			table.insert(indexedChildren, child)
+		end
+	end
 
 	return indexedChildren
 end
