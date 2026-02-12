@@ -4,10 +4,8 @@ Author(s): FO-nTTaX
 *******************************************************************************/
 .ambox-wrapper {
 	overflow: hidden;
-}
 
-@media ( max-width: 600px ) {
-	.ambox-wrapper {
+	@media ( max-width: 600px ) {
 		clear: both;
 	}
 }
@@ -21,12 +19,12 @@ Author(s): FO-nTTaX
 	padding: 4px;
 	border-style: solid;
 	overflow: hidden;
-}
 
-.ambox-fa-icon {
-	font-size: 40px;
-}
+	&-fa-icon {
+		font-size: 40px;
+	}
 
-.ambox-text {
-	padding: 5px;
+	&-text {
+		padding: 5px;
+	}
 }

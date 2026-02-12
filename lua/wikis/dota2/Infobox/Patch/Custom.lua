@@ -7,14 +7,23 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local String = Lua.import('Module:StringUtils')
 
-local Patch = Lua.import('Module:Infobox/Patch')
+local PatchInfobox = Lua.import('Module:Infobox/Patch')
 local Injector = Lua.import('Module:Widget/Injector')
 local Widgets = Lua.import('Module:Widget/All')
+local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 
 ---@class Dota2PatchInfobox: PatchInfobox
-local CustomPatch = Class.new(Patch)
+---@operator call(Frame): Dota2PatchInfobox
+local CustomPatch = Class.new(PatchInfobox)
+
+---@class Dota2PatchInfoboxWidgetInjector: WidgetInjector
+---@operator call(Dota2PatchInfobox): Dota2PatchInfoboxWidgetInjector
+---@field caller Dota2PatchInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -26,18 +35,82 @@ function CustomPatch.run(frame)
 	return patch:createInfobox()
 end
 
+---@param frame Frame
+---@return Widget
+function CustomPatch.runVersion(frame)
+	local patch = CustomPatch(frame)
+	local args = patch.args
+	args.name = 'Version ' .. args.version
+	args.release = args.dota2
+	args.informationType = 'Version'
+	patch:setWidgetInjector(CustomInjector(patch))
+
+	Array.forEach(
+		Array.filter(Array.parseCommaSeparatedString(args.highlights, '\n?*'), String.isNotEmpty),
+		function (highlight, highlightIndex)
+			args['highlight' .. highlightIndex] = highlight
+		end
+	)
+
+	return patch:createInfobox()
+end
+
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
+		---@param characterInput string
+		---@return string[]
+		local function toCharacterList(characterInput)
+			return Array.map(
+				Array.parseCommaSeparatedString(characterInput),
+				function (character)
+					return CharacterIcon.Icon{
+						character = character,
+						date = args.release,
+						size = '40px',
+						addTextLink = true,
+					}
+				end
+			)
+		end
+
 		return {
-			Widgets.Cell{name = 'New Heroes', children = {args.new}},
-			Widgets.Cell{name = 'Nerfed Heroes', children = {args.nerfed}},
-			Widgets.Cell{name = 'Buffed Heroes', children = {args.buffed}},
-			Widgets.Cell{name = 'Rebalanced Heroes', children = {args.rebalanced}},
-			Widgets.Cell{name = 'Reworked Heroes', children = {args.reworked}},
+			Widgets.Cell{
+				name = 'New Heroes',
+				children = toCharacterList(args.new),
+				options = {columns = 3, suppressColon = true},
+			},
+			Widgets.Cell{
+				name = 'Nerfed Heroes',
+				children = toCharacterList(args.nerfed),
+				options = {columns = 3, suppressColon = true},
+			},
+			Widgets.Cell{
+				name = 'Buffed Heroes',
+				children = toCharacterList(args.buffed),
+				options = {columns = 3, suppressColon = true},
+			},
+			Widgets.Cell{
+				name = 'Rebalanced Heroes',
+				children = toCharacterList(args.rebalanced),
+				options = {columns = 3, suppressColon = true},
+			},
+			Widgets.Cell{
+				name = 'Reworked Heroes',
+				children = toCharacterList(args.reworked),
+				options = {columns = 3, suppressColon = true},
+			},
+		}
+	end
+	if id == 'customcontent' then
+		return {
+			Widgets.Center{children = LinkWidget{
+				link = 'Game Versions',
+				children = 'Full list'
+			}}
 		}
 	end
 	return widgets
@@ -49,8 +122,8 @@ function CustomPatch:getChronologyData(args)
 	local informationType = self:getInformationType(args):lower()
 
 	local data = {
-		previous = CustomPatch:_getChronology('before', args.release, informationType),
-		next = CustomPatch:_getChronology('after', args.release, informationType),
+		previous = self:_getChronology('before', args.release, informationType),
+		next = self:_getChronology('after', args.release, informationType),
 	}
 	return data
 end
@@ -58,25 +131,29 @@ end
 ---@param time 'before' | 'after'
 ---@param date string
 ---@param informationType string
----@return string
+---@return string?
 function CustomPatch:_getChronology(time, date, informationType)
 	local timeModifier = time == 'before' and '<' or '>'
-	return (mw.ext.LiquipediaDB.lpdb('datapoint', {
+	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = '[[type::'.. informationType ..']] and [[date::'.. timeModifier .. date ..']]',
 		order = 'date ' .. (time == 'before' and 'DESC' or 'ASC'),
 		limit = 1,
-	})[1] or {}).name
+	})[1]
+	if not data then
+		return
+	end
+	return data.pagename .. '|' .. data.name
 end
 
 function CustomPatch:addToLpdb(lpdbData, args)
 	lpdbData.date = args.release or args.dota
 
 	lpdbData.extradata.version = args.name or ''
-	lpdbData.extradata.new = args.new or ''
-	lpdbData.extradata.nerfed = args.nerfed or ''
-	lpdbData.extradata.buffed = args.buffed or ''
-	lpdbData.extradata.rebalanced = args.rebalanced or ''
-	lpdbData.extradata.reworked = args.reworked or ''
+	lpdbData.extradata.new = Array.parseCommaSeparatedString(args.new)
+	lpdbData.extradata.nerfed = Array.parseCommaSeparatedString(args.nerfed)
+	lpdbData.extradata.buffed = Array.parseCommaSeparatedString(args.buffed)
+	lpdbData.extradata.rebalanced = Array.parseCommaSeparatedString(args.rebalanced)
+	lpdbData.extradata.reworked = Array.parseCommaSeparatedString(args.reworked)
 	lpdbData.extradata.significant = args.significant or 'no'
 	lpdbData.extradata.dota2 = args.release or ''
 	lpdbData.extradata.dota = args.dota or ''

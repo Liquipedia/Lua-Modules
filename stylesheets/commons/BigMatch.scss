@@ -393,23 +393,11 @@ span.slash {
 	}
 
 	&-order {
-		padding: 0.5rem;
-		background: #ffffff;
-		border: 1px solid #bbbbbb;
-		border-radius: 0.5rem;
-		width: 100%;
-
-		.theme--dark & {
-			background-color: var( --clr-secondary-16 );
-			border-color: var( --clr-on-surface-dark-primary-8 );
-		}
-
 		&-list {
 			display: flex;
 			flex-direction: row;
 			align-items: flex-start;
 			align-self: stretch;
-			padding-top: 0.5rem;
 			gap: 0.5rem;
 
 			@media ( min-width: 768px ) {
