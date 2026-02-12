@@ -244,5 +244,11 @@ return {
 	-- Usage: Export functions
 	share = 'fas fa-share-alt',
 	copy = 'fas fa-clone',
-	download = 'fas fa-download'
+	download = 'fas fa-download',
+
+	-- Usage: Dota2 Spellcard
+	dota2_spl_mechanics = 'fas fa-cog',
+	dota2_spl_interactions = 'fad fa-atom-alt',
+	dota2_spl_status = 'fas fa-hourglass-half',
+	dota2_spl_misc = 'fad fa-list-ul'
 }

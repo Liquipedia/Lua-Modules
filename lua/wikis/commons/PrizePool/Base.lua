@@ -17,6 +17,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local Tournament = Lua.import('Module:Tournament')
 local Variables = Lua.import('Module:Variables')
 
 local Currency = Lua.import('Module:Currency')
@@ -255,20 +256,18 @@ BasePrizePool.prizeTypes = {
 
 		header = 'qualifies',
 		headerParse = function (prizePool, input, context, index)
-			local link = mw.ext.TeamLiquidIntegration.resolve_redirect(input):gsub(' ', '_')
-
 			-- Automatically retrieve information from the Tournament
-			local tournamentData = BasePrizePool._getTournamentInfo(link) or {}
+			local tournamentData = Tournament.getTournament(input) or {}
 			local prefix = 'qualifies' .. index
 			return {
-				link = link,
-				title = context[prefix .. 'name'] or Logic.emptyOr(
-					tournamentData.tickername,
-					tournamentData.name,
-					(tournamentData.pagename or link):gsub('_', ' '):gsub('/', ' ')
+				link = tournamentData.pageName or input:gsub(' ', '_'),
+				title = Logic.emptyOr(
+					context[prefix .. 'name'],
+					tournamentData.displayName,
+					input:gsub('_', ' '):gsub('/', ' ')
 				),
 				icon = tournamentData.icon or context[prefix .. 'icon'],
-				iconDark = tournamentData.icondark or context[prefix .. 'icondark']
+				iconDark = tournamentData.iconDark or context[prefix .. 'icondark']
 			}
 		end,
 		headerDisplay = function (data)
@@ -845,16 +844,6 @@ function BasePrizePool:assertOpponentStructType(typeStruct)
 	elseif not Opponent.isType(typeStruct.type) then
 		error('Not a valid type!')
 	end
-end
-
---- Fetches the LPDB object of a tournament
----@param pageName string
----@return tournament
-function BasePrizePool._getTournamentInfo(pageName)
-	return mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = '[[pagename::' .. pageName .. ']]',
-		limit = 1,
-	})[1]
 end
 
 --- Returns the default date based on wiki-variables set in the Infobox League

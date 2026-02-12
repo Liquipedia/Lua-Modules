@@ -12,7 +12,7 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {teamStyle = 'short'})
 end

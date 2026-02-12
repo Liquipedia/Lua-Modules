@@ -67,5 +67,5 @@ jobs:
         if: always()
         with:
           report_paths: 'busted.xml'
-          check_name: 'Test Report'
+          check_name: 'Lua Test Report'
           annotate_only: ${{ (github.event.pull_request.head.repo.full_name != github.repository) }}
