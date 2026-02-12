@@ -83,7 +83,7 @@ end
 ---@param existingClasses string[]?
 ---@return string[] classes
 function ColumnUtil.buildClasses(align, nowrap, shrink, existingClasses)
-	local classes = Array.appendWith({}, existingClasses or {})
+	local classes = {}
 
 	if align == 'right' then
 		Array.appendWith(classes, 'table2__cell--right')
@@ -101,7 +101,7 @@ function ColumnUtil.buildClasses(align, nowrap, shrink, existingClasses)
 		Array.appendWith(classes, 'table2__cell--shrink')
 	end
 
-	return classes
+	return Array.extendWith(classes, existingClasses)
 end
 
 return ColumnUtil

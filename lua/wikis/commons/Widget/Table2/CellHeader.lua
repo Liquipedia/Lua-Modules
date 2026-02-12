@@ -41,10 +41,6 @@ local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 ---@field props Table2CellHeaderProps
 local Table2CellHeader = Class.new(Widget)
 
-Table2CellHeader.defaultProps = {
-	classes = {},
-}
-
 ---@return Widget
 function Table2CellHeader:render()
 	local props = self.props

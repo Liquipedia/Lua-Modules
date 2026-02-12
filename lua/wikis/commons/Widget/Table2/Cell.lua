@@ -38,10 +38,6 @@ local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 ---@field props Table2CellProps
 local Table2Cell = Class.new(Widget)
 
-Table2Cell.defaultProps = {
-	classes = {},
-}
-
 ---@return Widget
 function Table2Cell:render()
 	local props = self.props

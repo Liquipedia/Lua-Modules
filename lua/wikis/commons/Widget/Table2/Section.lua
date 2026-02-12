@@ -19,8 +19,7 @@ local Table2Section = Class.new(WidgetContext)
 
 ---@return Table2SectionName
 function Table2Section:getValue()
-	assert(self.props.value, 'Table2Section: expected value')
-	return self.props.value
+	return assert(self.props.value, 'Table2Section: expected value')
 end
 
 return Table2Section
