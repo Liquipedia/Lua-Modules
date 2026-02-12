@@ -29,15 +29,19 @@ function RatingsStorageExtension.getRankings(teamLimit)
 	return Array.map(teams, RatingsStorageExtension._createTeamEntry)
 end
 
----@param rankings Dota2RankingRecord[]
+---@param allRankings Dota2RankingRecord[]
 ---@return Dota2RankingTeam[]
-function RatingsStorageExtension._mapDataToExpectedFormat(rankings)
-	local nonProvisionalRankings = Array.filter(rankings, function(ranking)
+function RatingsStorageExtension._mapDataToExpectedFormat(allRankings)
+	local nonProvisionalRankings = Array.filter(allRankings, function(ranking)
 		return not ranking.provisional
 	end)
-	local dateOfLastEntry = Array.maxBy(nonProvisionalRankings, function(rankedDate)
+	local newestEntry = Array.maxBy(nonProvisionalRankings, function(rankedDate)
 		return Date.readTimestamp(rankedDate.date)
-	end).date
+	end)
+	if not newestEntry then
+		return {}
+	end
+	local dateOfNewestEntry = newestEntry.date
 
 	local teamsData = {}
 
@@ -51,7 +55,7 @@ function RatingsStorageExtension._mapDataToExpectedFormat(rankings)
 			end
 			local teamData = teamsData[datedEntry.name]
 
-			if datedResults.date == dateOfLastEntry then
+			if datedResults.date == dateOfNewestEntry then
 				teamData.rank = datedEntry.rank
 				teamData.rating = datedEntry.rating
 			end
