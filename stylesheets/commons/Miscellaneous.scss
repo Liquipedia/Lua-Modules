@@ -70,11 +70,12 @@ Author(s): FO-nTTaX, salle
 	height: 12px;
 	vertical-align: -1px;
 	image-rendering: -webkit-optimize-contrast;
+
+	.bracket-game & {
+		vertical-align: -3px;
+	}
 }
 
-.bracket-game .flag img {
-	vertical-align: -3px;
-}
 /*******************************************************************************
 Template(s): Flag/, FlagNoLink/
 Author(s): salle
@@ -89,13 +90,6 @@ Author(s): salle
 Template(s): Toggle button
 Author(s): FO-nTTaX
 *******************************************************************************/
-@mixin toggle-area-loop( $counter ) {
-	@if $counter > 0 {
-		@include toggle-area-loop( ($counter - 1 ));
-		@include toggle-area-func( $counter );
-	}
-}
-
 @mixin toggle-area-func( $no ) {
 	&:not( .toggle-area-#{$no} ) {
 		[data-toggle-area-content='#{$no}'] {
@@ -105,9 +99,11 @@ Author(s): FO-nTTaX
 }
 
 .toggle-area {
-	@include toggle-area-loop( 50 );
+	@for $i from 1 through 50 {
+		@include toggle-area-func( $i );
+	}
 
-	.toggle-area-button {
+	#{&}-button {
 		cursor: pointer;
 	}
 }
@@ -198,80 +194,76 @@ Author(s): FO-nTTaX, Elysienna
 	animation-duration: 0.4s;
 	animation-fill-mode: forwards;
 	transform: scale( 0 );
-}
 
-.liquipedia-links-badge--tooltip {
-	background-color: #ffffff;
-	position: absolute;
-	color: #676767;
-	border-radius: 0.25rem;
-	font-size: 0.75rem;
-	font-family: "Open Sans", sans-serif;
-	font-weight: bold;
-	padding: 0.125rem 0.25rem;
-	top: 0.0625rem;
-	right: -0.5rem;
-	z-index: 1;
-	opacity: 0;
-	box-shadow: 0 0 0.625rem 0 rgba( 0, 0, 0, 0.5 );
-	animation-name: badgePopAnimation;
-	animation-delay: 2s;
-	animation-duration: 4s;
-	animation-fill-mode: forwards;
-	line-height: 1.2;
-}
+	&--tooltip {
+		background-color: #ffffff;
+		position: absolute;
+		color: #676767;
+		border-radius: 0.25rem;
+		font-size: 0.75rem;
+		font-family: "Open Sans", sans-serif;
+		font-weight: bold;
+		padding: 0.125rem 0.25rem;
+		top: 0.0625rem;
+		right: -0.5rem;
+		z-index: 1;
+		opacity: 0;
+		box-shadow: 0 0 0.625rem 0 rgba( 0, 0, 0, 0.5 );
+		animation-name: badgePopAnimation;
+		animation-delay: 2s;
+		animation-duration: 4s;
+		animation-fill-mode: forwards;
+		line-height: 1.2;
 
-@media screen and ( max-width: 767px ) {
-	.liquipedia-links-badge--tooltip {
-		width: 30vw;
-		white-space: normal;
+		@media screen and ( max-width: 767px ) {
+			width: 30vw;
+			white-space: normal;
+		}
+
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0.25rem;
+			left: -0.3125rem;
+			width: 0;
+			height: 0;
+			border-top: 4px solid transparent;
+			border-bottom: 4px solid transparent;
+			border-right: 5px solid #ffffff;
+		}
 	}
-}
 
-.liquipedia-links-badge--tooltip::before {
-	content: "";
-	position: absolute;
-	top: 0.25rem;
-	left: -0.3125rem;
-	width: 0;
-	height: 0;
-	border-top: 4px solid transparent;
-	border-bottom: 4px solid transparent;
-	border-right: 5px solid #ffffff;
+	&-mobile {
+		position: relative;
+		top: -5px;
+		padding: 2px 4px;
+		left: 0;
+		margin-right: 3px;
+	}
 }
 
 .menu-italic {
 	font-style: italic;
 }
 
-.liquipedia-links-badge-mobile {
-	position: relative;
-	top: -5px;
-	padding: 2px 4px;
-	left: 0;
-	margin-right: 3px;
-}
-
 /*******************************************************************************
 Template(s): Box
 Author(s): FO-nTTaX
 *******************************************************************************/
-@media ( min-width: 601px ) {
-	.template-box {
+.template-box {
+	@media ( min-width: 601px ) {
 		display: inline-block;
 		vertical-align: top;
 		margin: 0 0 0 0;
 		box-sizing: content-box;
 		max-width: 100%;
+
+		> * {
+			box-sizing: border-box;
+		}
 	}
 
-	.template-box > * {
-		box-sizing: border-box;
-	}
-}
-
-@media ( max-width: 600px ) {
-	.template-box {
+	@media ( max-width: 600px ) {
 		padding-right: 0 !important;
 	}
 }
@@ -324,22 +316,20 @@ Author(s): FO-nTTaX
 *******************************************************************************/
 .infobox-upcoming-ongoing-matches {
 	width: 100%;
-}
 
-@media ( min-width: 601px ) {
-	.infobox-upcoming-ongoing-matches {
+	@media ( min-width: 601px ) {
 		float: right;
 		clear: right;
 		max-width: 300px;
 		margin: 0 0 10px 10px;
 	}
-}
 
-.infobox-upcoming-ongoing-matches .infobox-upcoming-ongoing-matches-header {
-	font-size: 130%;
-	font-weight: bold;
-	text-align: center;
-	padding: 2px;
+	#{&}-header {
+		font-size: 130%;
+		font-weight: bold;
+		text-align: center;
+		padding: 2px;
+	}
 }
 
 /*******************************************************************************
@@ -354,36 +344,34 @@ span.icon-small {
 	align-items: center;
 	min-height: 25px;
 	min-width: 25px;
+
+	[ data-darkreader-scheme="dark" ] &.lightmode,
+	.theme--dark &.lightmode {
+		display: none;
+	}
 }
 
-.league-icon-small-image img,
-.icon-small img {
-	max-width: 25px;
-	max-height: 25px;
-	height: auto;
-	width: auto;
-}
+.league-icon-small-image,
+.icon-small {
+	img {
+		max-width: 25px;
+		max-height: 25px;
+		height: auto;
+		width: auto;
+	}
 
-.league-icon-small-image a,
-.icon-small a {
-	display: contents;
+	a {
+		display: contents;
+	}
 }
 
 /* LeagueIconSmall dark mode support */
 span.league-icon-small-image.darkmode,
 span.icon-small.darkmode {
 	display: none;
-}
 
-[ data-darkreader-scheme="dark" ],
-.theme--dark {
-	span.league-icon-small-image.lightmode,
-	span.icon-small.lightmode {
-		display: none;
-	}
-
-	span.league-icon-small-image.darkmode,
-	span.icon-small.darkmode {
+	[ data-darkreader-scheme="dark" ] &,
+	.theme--dark & {
 		display: inline-flex;
 	}
 }
@@ -419,28 +407,28 @@ Author(s): FO-nTTaX
 
 .timeline-row {
 	vertical-align: middle;
-}
 
-.timeline-row:nth-of-type( 2n ) {
-	background-color: #eeeeee;
-}
+	&:nth-of-type( 2n ) {
+		background-color: #eeeeee;
+	}
 
-.timeline-row > div {
-	vertical-align: middle;
-	display: inline-block;
-	position: relative;
-	height: 35px;
-	padding: 4px;
-}
+	> div {
+		vertical-align: middle;
+		display: inline-block;
+		position: relative;
+		height: 35px;
+		padding: 4px;
 
-.timeline-row > div:nth-of-type( 1 ) {
-	width: 150px;
-	line-height: 27px;
-	font-weight: bold;
-}
+		&:nth-of-type( 1 ) {
+			width: 150px;
+			line-height: 27px;
+			font-weight: bold;
+		}
 
-.timeline-row > div:nth-of-type( 2 ) {
-	width: calc( 100% - 150px );
+		&:nth-of-type( 2 ) {
+			width: calc( 100% - 150px );
+		}
+	}
 }
 
 .timeline-period {
@@ -471,16 +459,16 @@ Author(s): FO-nTTaX
 	height: 92px;
 	padding-left: 150px;
 	border-top: 1px solid var( --table-border-color, #dddddd );
-}
 
-.timeline-footer-date {
-	width: 24px;
-}
+	&-date {
+		width: 24px;
 
-.timeline-footer-date-inner {
-	padding: 4px;
-	transform: rotate( 90deg );
-	margin-top: 0;
+		&-inner {
+			padding: 4px;
+			transform: rotate( 90deg );
+			margin-top: 0;
+		}
+	}
 }
 
 .timeline-header-sc {
@@ -518,36 +506,36 @@ Author(s): FO-nTTaX
 	position: relative;
 	text-align: center;
 	margin-bottom: 0;
-}
 
-.progress > div.bar {
-	height: 22px;
-	border-radius: 4px;
-	float: left;
-	line-height: 17px;
-}
+	> div.bar {
+		height: 22px;
+		border-radius: 4px;
+		float: left;
+		line-height: 17px;
 
-.progress > div.bar.bg-color {
-	background-color: var( --clr-surface-variant, #e5b6c0 );
-}
+		&.bg-color {
+			background-color: var( --clr-surface-variant, #e5b6c0 );
+		}
 
-.progress > div.bar-text {
-	height: 22px;
-	width: 100%;
-	border-radius: 5px;
-	position: absolute;
-	top: 0;
-	left: 0;
-}
+		&-text {
+			height: 22px;
+			width: 100%;
+			border-radius: 5px;
+			position: absolute;
+			top: 0;
+			left: 0;
 
-.progress > div.bar-text.bar-text-left {
-	text-align: left;
-	padding-left: 5px;
-}
+			&.bar-text-left {
+				text-align: left;
+				padding-left: 5px;
+			}
 
-.progress > div.bar-text.bar-text-right {
-	text-align: right;
-	padding-right: 5px;
+			&.bar-text-right {
+				text-align: right;
+				padding-right: 5px;
+			}
+		}
+	}
 }
 
 /*******************************************************************************
@@ -586,10 +574,8 @@ Author(s): FO-nTTaX, Rapture
 	.hr {
 		height: 0.125rem;
 	}
-}
 
-@media ( max-width: 600px ) {
-	.spellcard-wrapper {
+	@media ( max-width: 600px ) {
 		display: block;
 	}
 }
@@ -602,18 +588,15 @@ Author(s): FO-nTTaX, Rapture
 	border-style: solid;
 	background-color: var( --clr-surface-2, #eeeeee );
 	margin-right: 1em;
-}
 
-@media ( max-width: 600px ) {
-	.spellcard {
+	@media ( max-width: 600px ) {
 		margin-right: 0;
 		max-width: none;
 	}
-}
-/* spazer's test changes */
-/* Make spellcards wider for wide screens */
-@media ( min-width: 2560px ) {
-	.spellcard {
+
+	@media ( min-width: 2560px ) {
+		/* spazer's test changes */
+		/* Make spellcards wider for wide screens */
 		max-width: 700px;
 	}
 }
@@ -625,10 +608,8 @@ Author(s): FO-nTTaX, Rapture
 	border-style: solid;
 	padding: 5px 0;
 	margin: 0 5px;
-}
 
-@media ( max-width: 600px ) {
-	.spellcard-description {
+	@media ( max-width: 600px ) {
 		width: auto;
 	}
 }
@@ -639,33 +620,33 @@ Author(s): FO-nTTaX, Rapture
 	vertical-align: top;
 	padding-bottom: 5px;
 	margin: 5px 5px 0 5px;
-}
 
-.spellcard-infotable th {
-	display: inline;
-	padding-right: 5px;
-	vertical-align: top;
-	white-space: nowrap;
-}
+	th {
+		display: inline;
+		padding-right: 5px;
+		vertical-align: top;
+		white-space: nowrap;
+	}
 
-.spellcard-infotable td {
-	display: inline-block;
-	vertical-align: top;
+	td {
+		display: inline-block;
+		vertical-align: top;
+	}
 }
 
 .spellcard-interactions {
 	display: block;
 	vertical-align: top;
-}
 
-.spellcard-interactions th {
-	padding: 3px 5px 0 0;
-	vertical-align: top;
-}
+	th {
+		padding: 3px 5px 0 0;
+		vertical-align: top;
+	}
 
-.spellcard-interactions td {
-	padding-top: 3px;
-	vertical-align: top;
+	td {
+		padding-top: 3px;
+		vertical-align: top;
+	}
 }
 
 .spellcard-notes {
@@ -673,10 +654,8 @@ Author(s): FO-nTTaX, Rapture
 	vertical-align: top;
 	flex: 1 0 400px;
 	padding-top: 5px;
-}
 
-@media ( max-width: 600px ) {
-	.spellcard-notes {
+	@media ( max-width: 600px ) {
 		flex: none;
 	}
 }
@@ -747,10 +726,10 @@ td.bold-white-text {
 .broadcast-talent-partner-list {
 	margin-left: -0.5em;
 	text-align: left;
-}
 
-.broadcast-talent-partner-list-frame {
-	border: 0 !important;
+	&-frame {
+		border: 0 !important;
+	}
 }
 
 /* tournament overview page boxes */
@@ -764,12 +743,14 @@ td.bold-white-text {
 Template(s): WC3 Creep Spots
 Author(s): FO-nTTaX, turbosau
 *******************************************************************************/
-.creep-spot img {
-	cursor: pointer;
-}
+.creep-spot {
+	img {
+		cursor: pointer;
+	}
 
-.creep-spot-popup {
-	display: none;
+	&-popup {
+		display: none;
+	}
 }
 
 /*******************************************************************************
@@ -781,73 +762,68 @@ Author(s): spazer
 	display: inline-block;
 	min-width: 200px;
 	padding: 10px 0;
-}
 
-.player-info-card-title {
-	font-size: 150%;
-	font-weight: bold;
-	text-align: center;
-}
-
-.player-info-card-realname {
-	font-style: italic;
-	text-align: center;
-	padding-bottom: 5px;
-}
-
-.player-info-card-main {
-	background-color: #eeeeee;
-	width: 100%;
-}
-
-.player-info-card-main-top {
-	display: inline-block;
-	border-width: 0 0 2px 0;
-	border-style: solid;
-	padding-left: 2px;
-	margin: 5px 0 0 5px;
-	width: calc( 100% - 10px );
-	text-align: center;
-}
-
-.player-info-card-main-bottom {
-	display: inline-block;
-	margin: 5px 5px 5px 5px;
-	padding-right: 5px;
-}
-
-.player-info-card-main-top {
-	padding-bottom: 5px;
-}
-
-.player-info-card-main-bottom > table {
-	width: 100%;
-	margin: 5px 5px 5px 5px;
-}
-
-.player-info-card-main-bottom > table > tbody > tr > th {
-	text-align: right;
-	padding-right: 10px;
-	vertical-align: middle;
-	max-width: 175px;
-	white-space: nowrap;
-	padding-bottom: 5px;
-	margin-bottom: 5px;
-	height: 30px;
-}
-
-.player-info-card-main-bottom > table > tbody > tr > td {
-	vertical-align: middle;
-	padding-bottom: 5px;
-	height: 30px;
-}
-
-@media ( max-width: 601px ) {
-	.player-info-card {
+	@media ( max-width: 601px ) {
 		width: 100% !important;
 		max-width: 100% !important;
 		display: inline-block;
 		padding: 10px 0;
+	}
+
+	&-title {
+		font-size: 150%;
+		font-weight: bold;
+		text-align: center;
+	}
+
+	&-realname {
+		font-style: italic;
+		text-align: center;
+		padding-bottom: 5px;
+	}
+
+	&-main {
+		background-color: #eeeeee;
+		width: 100%;
+
+		&-top {
+			display: inline-block;
+			border-width: 0 0 2px 0;
+			border-style: solid;
+			padding-left: 2px;
+			margin: 5px 0 0 5px;
+			width: calc( 100% - 10px );
+			text-align: center;
+			padding-bottom: 5px;
+		}
+
+		&-bottom {
+			display: inline-block;
+			margin: 5px 5px 5px 5px;
+			padding-right: 5px;
+
+			> table {
+				width: 100%;
+				margin: 5px 5px 5px 5px;
+
+				> tbody > tr > th {
+					text-align: right;
+					padding-right: 10px;
+					vertical-align: middle;
+					max-width: 175px;
+					white-space: nowrap;
+					padding-bottom: 5px;
+					margin-bottom: 5px;
+					height: 30px;
+				}
+
+				> tbody > tr > td {
+					vertical-align: middle;
+					padding-bottom: 5px;
+					height: 30px;
+				}
+			}
+		}
 	}
 }
 
@@ -871,10 +847,7 @@ span.vodlink.darkmode {
 	span.vodlink.lightmode {
 		display: none;
 	}
-}
 
-[ data-darkreader-scheme="dark" ],
-.theme--dark {
 	span.vodlink.darkmode {
 		display: inline-block;
 	}
@@ -889,10 +862,7 @@ span.vodlink.darkmode {
 	.vodlink span.lightmode {
 		display: none;
 	}
-}
 
-[ data-darkreader-scheme="dark" ],
-.theme--dark {
 	.vodlink span.darkmode {
 		display: inline;
 	}
@@ -915,14 +885,14 @@ Author(s): Vogan
 	display: table-row;
 	width: auto;
 	line-height: 1.42857143;
-}
 
-.RumourRow:nth-child( 2n+1 ) {
-	background-color: var( --table-striped-background-color, #f9f9f9 );
-}
+	&:nth-child( 2n+1 ) {
+		background-color: var( --table-striped-background-color, #f9f9f9 );
+	}
 
-.RumourRow .divCell {
-	border-top: 1px solid var( --clr-border, #bbbbbb );
+	.divCell {
+		border-top: 1px solid var( --clr-border, #bbbbbb );
+	}
 }
 
 @media ( max-width: 560px ) {
@@ -944,10 +914,8 @@ Author(s): Vogan
 	margin: 0;
 	width: 70%;
 	margin-bottom: -1px;
-}
 
-@media ( max-width: 560px ) {
-	.OffSeasonOverview {
+	@media ( max-width: 560px ) {
 		padding: 0;
 		margin: 0;
 		width: 100%;
@@ -995,98 +963,100 @@ Author(s): Rapture
 .stand-in-card {
 	margin: 0 0 10px 0;
 	white-space: nowrap;
-}
 
-.stand-in-card > tbody > tr > th {
-	background-color: var( --clr-surface-4, #f5f5f5 );
-	font-weight: bold;
-	padding: 5px;
-}
+	> tbody {
+		> tr > th {
+			background-color: var( --clr-surface-4, #f5f5f5 );
+			font-weight: bold;
+			padding: 5px;
 
-.stand-in-card > tbody > tr > th.large-only[ colspan="1" ] {
-	display: none;
-}
+			&.large-only[ colspan="1" ] {
+				display: none;
 
-.stand-in-card > tbody > tr.Players {
-	display: table-row;
-	border-top: 1px solid #bbbbbb;
-}
+				@media screen and ( max-width: 750px ) {
+					display: table-cell;
+				}
+			}
 
-.stand-in-card > tbody > tr.Players > td {
-	display: table-cell;
-	line-height: 1.42857143;
-	padding: 5px;
-}
+			@media screen and ( max-width: 750px ) {
+				&.large-only[ colspan="10" ] {
+					display: none;
+				}
+			}
+		}
 
-.stand-in-card > tbody > tr.Players > td.TeamPlayerIn {
-	padding: 2px 0 0 0;
-}
+		> tr.Players {
+			display: table-row;
+			border-top: 1px solid #bbbbbb;
 
-.stand-in-card > tbody > tr.Players > td > .MobileStuff {
-	display: none;
-}
+			@media screen and ( max-width: 750px ) {
+				display: block;
+				padding: 5px;
+			}
 
-@media screen and ( max-width: 750px ) {
-	.stand-in-card {
+			> td {
+				display: table-cell;
+				line-height: 1.42857143;
+				padding: 5px;
+
+				@media screen and ( max-width: 750px ) {
+					display: inline-block;
+					line-height: 1.42857143;
+					border: 0;
+					padding: 0;
+
+					&.Player {
+						clear: left;
+						float: left;
+						padding: 0 5px 5px 0;
+					}
+
+					&.PlayerName {
+						font-style: italic;
+						font-size: small;
+						float: left;
+						margin-top: 1px;
+						padding-bottom: 5px;
+					}
+
+					&.PlayerTeam {
+						float: right;
+					}
+
+					&.Tournaments {
+						display: block;
+						width: auto;
+						text-align: left;
+						padding: 5px 0 0 10px;
+						margin: 0 5px;
+						border-top: 1px solid var( --clr-border, #bbbbbb );
+						clear: both;
+					}
+				}
+
+				&.TeamPlayerIn {
+					padding: 2px 0 0 0;
+				}
+
+				> .MobileStuff {
+					display: none;
+
+					@media screen and ( max-width: 750px ) {
+						display: inline-block;
+					}
+				}
+			}
+		}
+	}
+
+	@media screen and ( max-width: 750px ) {
 		width: 100% !important;
 		max-width: 425px;
 		border: 1px solid var( --clr-border, #bbbbbb );
-	}
 
-	.stand-in-card > tbody > tr > th.large-only[ colspan="10" ] {
-		display: none;
-	}
-
-	.stand-in-card > tbody > tr > th.large-only[ colspan="1" ] {
-		display: table-cell;
-	}
-
-	.stand-in-card > tbody > tr.HeaderRow {
-		display: none;
-	}
-
-	.stand-in-card > tbody > tr.Players {
-		display: block;
-		padding: 5px;
-	}
-
-	.stand-in-card > tbody > tr.Players > td {
-		display: inline-block;
-		line-height: 1.42857143;
-		border: 0;
-		padding: 0;
-	}
-
-	.stand-in-card > tbody > tr.Players > td.Player {
-		clear: left;
-		float: left;
-		padding: 0 5px 5px 0;
-	}
-
-	.stand-in-card > tbody > tr.Players > td.PlayerName {
-		font-style: italic;
-		font-size: small;
-		float: left;
-		margin-top: 1px;
-		padding-bottom: 5px;
-	}
-
-	.stand-in-card > tbody > tr.Players > td.PlayerTeam {
-		float: right;
-	}
-
-	.stand-in-card > tbody > tr.Players > td.Tournaments {
-		display: block;
-		width: auto;
-		text-align: left;
-		padding: 5px 0 0 10px;
-		margin: 0 5px;
-		border-top: 1px solid var( --clr-border, #bbbbbb );
-		clear: both;
-	}
-
-	.stand-in-card > tbody > tr.Players > td > .MobileStuff {
-		display: inline-block;
+		> tbody > tr.HeaderRow {
+			display: none;
+		}
 	}
 }
 
@@ -1122,14 +1092,14 @@ Author(s): Inflicted
 	overflow: hidden;
 	text-overflow: clip;
 	margin: -5px;
-}
 
-.match-history img {
-	width: 28px;
-	height: 28px;
-	border: 2px solid transparent;
-	margin-top: -2px;
-	image-rendering: -webkit-optimize-contrast;
+	img {
+		width: 28px;
+		height: 28px;
+		border: 2px solid transparent;
+		margin-top: -2px;
+		image-rendering: -webkit-optimize-contrast;
+	}
 }
 
 /*******************************************************************************
@@ -1437,20 +1407,20 @@ Author(s): iMarbot
 @media ( max-width: 600px ) {
 	.teamcard.leaguecard {
 		width: 100% !important;
-	}
 
-	.teamcard.leaguecard .table.table.table-bordered.logo {
-		width: 100% !important;
-	}
+		.table.table.table-bordered.logo {
+			width: 100% !important;
+		}
 
-	.teamcard.leaguecard:not( .teamcard-nomobile ) table.logo div.center {
-		width: 100% !important;
-	}
+		&:not( .teamcard-nomobile ) table.logo div.center {
+			width: 100% !important;
+		}
 
-	.teamcard.leaguecard:not( .teamcard-nomobile ) table.list {
-		background-color: rgba( 249, 249, 249, 0.95 );
-		width: 100% !important;
-		left: 0% !important;
+		&:not( .teamcard-nomobile ) table.list {
+			background-color: rgba( 249, 249, 249, 0.95 );
+			width: 100% !important;
+			left: 0% !important;
+		}
 	}
 
 	.leaguecard .template-box {
@@ -1459,15 +1429,12 @@ Author(s): iMarbot
 		margin: 0 0 0 0;
 		box-sizing: content-box;
 		max-width: 100%;
-	}
-
-	.leaguecard .template-box > * {
-		box-sizing: border-box;
-	}
-
-	.leaguecard .template-box {
 		padding-right: 0.5em !important;
 		padding-bottom: 0.25em !important;
+
+		> * {
+			box-sizing: border-box;
+		}
 	}
 }
 
@@ -1878,16 +1845,16 @@ div.battleground-banner {
 	text-align: left;
 	overflow: hidden;
 	border: 1px solid #000000;
-}
 
-.wiki-valorant div.battleground-banner {
-	position: relative;
-	height: 100px;
-	width: 456px;
-	background-color: #040006;
-	text-align: left;
-	overflow: hidden;
-	border: 1px solid #000000;
+	.wiki-valorant & {
+		position: relative;
+		height: 100px;
+		width: 456px;
+		background-color: #040006;
+		text-align: left;
+		overflow: hidden;
+		border: 1px solid #000000;
+	}
 }
 
 .battleground-banner > div {
@@ -1908,42 +1875,36 @@ div.battleground-banner {
 	font-size: 390%;
 	font-weight: 600;
 	text-shadow: 0 0 25px #3622f2;
-}
 
-.wiki-valorant .block-link > a {
-	position: absolute;
-	display: block;
-	height: 100%;
-	width: 100%;
-	padding-left: 26px;
-	line-height: 104px;
-	color: #f8f8f9 !important;
-	font-family: "Exo", "Trebuchet MS", "Helvetica", sans-serif;
-	font-size: 390%;
-	font-weight: 600;
-	text-shadow: 0 0 25px #b12a2a;
-}
+	.wiki-valorant & {
+		position: absolute;
+		display: block;
+		height: 100%;
+		width: 100%;
+		padding-left: 26px;
+		line-height: 104px;
+		color: #f8f8f9 !important;
+		font-family: "Exo", "Trebuchet MS", "Helvetica", sans-serif;
+		font-size: 390%;
+		font-weight: 600;
+		text-shadow: 0 0 25px #b12a2a;
+	}
 
-.block-link > a:active,
-.block-link > a:hover {
-	text-decoration: none;
-	text-shadow: 0 0 25px #fffec8;
-}
+	&:active,
+	&:hover {
+		text-decoration: none;
+		text-shadow: 0 0 25px #fffec8;
+	}
 
-@media ( max-width: 750px ) {
-	.block-link > a {
+	@media ( max-width: 750px ) {
 		font-size: 300%;
 	}
-}
 
-@media ( max-width: 570px ) {
-	.block-link > a {
+	@media ( max-width: 570px ) {
 		font-size: 200%;
 	}
-}
 
-@media ( max-width: 400px ) {
-	.block-link > a {
+	@media ( max-width: 400px ) {
 		font-size: 150%;
 	}
 }
@@ -1996,27 +1957,27 @@ ul.halfbox {
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
-}
 
-ul.halfbox > li {
-	background: none repeat scroll 0 0 var( --clr-surface-1, #f2f2f2 );
-	border: 1px solid #aaaaaa;
-	display: block;
-	float: left;
-	font-weight: bold;
-	height: 70px;
-	margin: 5px;
-	width: 125px;
-}
+	> li {
+		background: none repeat scroll 0 0 var( --clr-surface-1, #f2f2f2 );
+		border: 1px solid #aaaaaa;
+		display: block;
+		float: left;
+		font-weight: bold;
+		height: 70px;
+		margin: 5px;
+		width: 125px;
 
-.wiki-counterstrike ul.halfbox > li {
-	height: 150px;
-	width: 200px;
-}
+		.wiki-counterstrike & {
+			height: 150px;
+			width: 200px;
+		}
 
-.wiki-leagueoflegends ul.halfbox > li {
-	height: 120px;
-	width: 120px;
+		.wiki-leagueoflegends & {
+			height: 120px;
+			width: 120px;
+		}
+	}
 }
 
 .halfbox li img {
@@ -2031,14 +1992,14 @@ ul.halfbox > li {
 	min-width: 121px;
 	text-align: center;
 	margin: -19px 0 0 1px;
-}
 
-.wiki-leagueoflegends .halfbox li span a {
-	min-width: 116px;
-}
+	.wiki-leagueoflegends & {
+		min-width: 116px;
+	}
 
-.halfbox li span a.new {
-	color: #dd0000;
+	&.new {
+		color: #dd0000;
+	}
 }
 
 /*******************************************************************************
@@ -2048,11 +2009,11 @@ Author(s): Vogan, salle
 .esports-team-game-list {
 	display: flex;
 	flex-wrap: wrap;
-}
 
-.esports-team-game-list > p {
-	margin-bottom: 20px !important;
-	margin-top: 10px !important;
+	> p {
+		margin-bottom: 20px !important;
+		margin-top: 10px !important;
+	}
 }
 
 .esports-team-game {
@@ -2313,15 +2274,15 @@ Author: warnull
 }
 
 /*******************************************************************************
-Usage: Only dispaly for admins
+Usage: Only display for admins
 Author: hjpalpha
 *******************************************************************************/
 .show-when-admin {
 	display: none !important;
-}
 
-.user-is-sysop .show-when-admin {
-	display: unset !important;
+	.user-is-sysop & {
+		display: unset !important;
+	}
 }
 
 /*******************************************************************************
@@ -2439,21 +2400,21 @@ Author(s): Elysienna
 	border-style: solid;
 	border-width: 2px;
 	border-color: #00005d;
-}
 
-[ data-darkreader-scheme="dark" ],
-.theme--dark {
-	.portal-map {
+	[ data-darkreader-scheme="dark" ] &,
+	.theme--dark & {
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-secondary-25 );
-	}
 
-	.portal-map .dynamicmap > div:first-child {
-		background-color: #000000;
-	}
+		.dynamicmap > div {
+			&:first-child {
+				background-color: #000000;
+			}
 
-	.portal-map .dynamicmap > div > img {
-		filter: invert( 1 );
+			> img {
+				filter: invert( 1 );
+			}
+		}
 	}
 }
 
@@ -2463,25 +2424,27 @@ Use case: Moving styling from inline to css file.
 Author(s): salle
 *******************************************************************************/
 
-table.f1-driver-standings-table > tbody > tr > td:nth-child( n+3 ) {
-	text-align: center;
-	white-space: pre;
-}
+table.f1-driver-standings-table > tbody > tr {
+	> td:nth-child( n+3 ) {
+		text-align: center;
+		white-space: pre;
+	}
 
-table.f1-driver-standings-table > tbody > tr > th:nth-child( n+3 ) {
-	width: 41px;
-}
+	> th:nth-child( n+3 ) {
+		width: 41px;
+	}
 
-table.f1-driver-standings-table > tbody > tr:nth-child( n+3 ) {
-	height: 40px;
-}
+	&:nth-child( n+3 ) {
+		height: 40px;
 
-table.f1-driver-standings-table > tbody > tr:nth-child( n+3 ) > th:first-child {
-	width: 28px;
-}
+		> th:first-child {
+			width: 28px;
+		}
 
-table.f1-driver-standings-table > tbody > tr:nth-child( n+3 ) > td:nth-child( 3 ) {
-	font-weight: bold;
+		> td:nth-child( 3 ) {
+			font-weight: bold;
+		}
+	}
 }
 
 /*******************************************************************************
@@ -2493,68 +2456,64 @@ Author(s): salle
 .next-circuit-image {
 	display: flex;
 	font-size: 14px;
+
+	@media ( max-width: 569px ) {
+		flex-direction: column;
+
+		> div:first-child {
+			display: flex;
+			justify-content: center;
+			padding: 0;
+		}
+	}
+
+	@media ( min-width: 570px ) {
+		flex-direction: row;
+
+		> div:first-child {
+			padding: 12px;
+			display: block;
+		}
+	}
 }
 
 .next-circuit-boxes {
 	display: flex;
 	flex-direction: column;
 	width: 100%;
-}
 
-.next-circuit-boxes > div {
-	display: flex;
-	height: 25%;
-}
-
-.next-circuit-boxes > div > div {
-	padding: 8px 12px;
-}
-
-.next-circuit-boxes > div:first-child > div {
-	border-bottom: 1px solid #bbbbbb;
-}
-
-.next-circuit-boxes > div > div:only-child {
-	width: 100%;
-}
-
-.next-circuit-boxes > div > div:not( :only-child ) {
-	width: 50%;
-	border-bottom: 1px solid #bbbbbb;
-}
-
-.next-circuit-boxes > div > div:nth-child( n+2 ) {
-	border-left: 1px solid #bbbbbb;
-}
-
-@media ( max-width: 569px ) {
-	.next-circuit-image {
-		flex-direction: column;
-	}
-
-	.next-circuit-image > div:first-child {
+	> div {
 		display: flex;
-		justify-content: center;
-		padding: 0;
+		height: 25%;
+
+		> div {
+			padding: 8px 12px;
+
+			&:only-child {
+				width: 100%;
+			}
+
+			&:not( :only-child ) {
+				width: 50%;
+				border-bottom: 1px solid #bbbbbb;
+			}
+
+			&:nth-child( n+2 ) {
+				border-left: 1px solid #bbbbbb;
+			}
+		}
+
+		&:first-child > div {
+			border-bottom: 1px solid #bbbbbb;
+		}
 	}
 
-	.next-circuit-boxes {
+	@media ( max-width: 569px ) {
 		border-top: 1px solid #bbbbbb;
 		border-left: 0;
 	}
-}
 
-@media ( min-width: 570px ) {
-	.next-circuit-image {
-		flex-direction: row;
-	}
-
-	.next-circuit-image > div:first-child {
-		padding: 12px;
-		display: block;
-	}
-
-	.next-circuit-boxes {
+	@media ( min-width: 570px ) {
 		border-left: 1px solid #bbbbbb;
 		border-top: 0;
 	}
@@ -2755,11 +2714,11 @@ Author(s): Scribunto developer( s )
 *******************************************************************************/
 .scribunto-error {
 	cursor: pointer;
-}
 
-.scribunto-error:hover,
-.scribunto-error:focus {
-	text-decoration: underline;
+	&:hover,
+	&:focus {
+		text-decoration: underline;
+	}
 }
 
 /*******************************************************************************
@@ -2770,28 +2729,28 @@ Template: Sfrac
 	display: inline-block;
 	font-size: 85%;
 	text-align: center;
-}
 
-.sfrac .numerator {
-	display: block;
-	line-height: 1em;
-	margin: 0 0.1em;
-}
+	.numerator {
+		display: block;
+		line-height: 1em;
+		margin: 0 0.1em;
+	}
 
-.sfrac .denominator {
-	display: block;
-	line-height: 1em;
-	margin: 0 0.1em;
-	border-top: 1px solid;
-}
+	.denominator {
+		display: block;
+		line-height: 1em;
+		margin: 0 0.1em;
+		border-top: 1px solid;
+	}
 
-.sfrac .frac {
-	position: absolute;
-	left: -10000px;
-	top: auto;
-	width: 1px;
-	height: 1px;
-	overflow: hidden;
+	.frac {
+		position: absolute;
+		left: -10000px;
+		top: auto;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+	}
 }
 
 /*******************************************************************************
@@ -2803,19 +2762,19 @@ div.dl-spirit-x-box {
 	position: relative;
 	width: 100px;
 	height: 24px;
-}
 
-div.dl-spirit-x-box > div.dl-spirit-x-box-ratio {
-	font-weight: bold;
-	padding: 0 8px 0 12px;
-	position: absolute;
-	left: 28px;
-	top: 3px;
-}
+	> div.dl-spirit-x-box-ratio {
+		font-weight: bold;
+		padding: 0 8px 0 12px;
+		position: absolute;
+		left: 28px;
+		top: 3px;
+	}
 
-div.dl-spirit-x-box > div.dl-spirit-x-box-image {
-	position: absolute;
-	top: 0;
+	> div.dl-spirit-x-box-image {
+		position: absolute;
+		top: 0;
+	}
 }
 
 /*******************************************************************************
