@@ -62,13 +62,13 @@ function Table2CellHeader:render()
 	end
 
 	local attributes = Table.copy(mergedProps.attributes or {})
-	if mergedProps.sortType ~= nil then
+	if mergedProps.sortType then
 		attributes['data-sort-type'] = mergedProps.sortType
 	end
-	if mergedProps.colspan ~= nil then
+	if mergedProps.colspan then
 		attributes.colspan = MathUtil.toInteger(mergedProps.colspan) or mergedProps.colspan
 	end
-	if mergedProps.rowspan ~= nil then
+	if mergedProps.rowspan then
 		attributes.rowspan = MathUtil.toInteger(mergedProps.rowspan) or mergedProps.rowspan
 	end
 

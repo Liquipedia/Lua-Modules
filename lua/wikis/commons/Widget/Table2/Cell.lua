@@ -54,10 +54,10 @@ function Table2Cell:render()
 	local mergedProps = ColumnUtil.mergeProps(props, columnDef)
 
 	local attributes = Table.copy(mergedProps.attributes or {})
-	if mergedProps.colspan ~= nil then
+	if mergedProps.colspan then
 		attributes.colspan = MathUtil.toInteger(mergedProps.colspan) or mergedProps.colspan
 	end
-	if mergedProps.rowspan ~= nil then
+	if mergedProps.rowspan then
 		attributes.rowspan = MathUtil.toInteger(mergedProps.rowspan) or mergedProps.rowspan
 	end
 

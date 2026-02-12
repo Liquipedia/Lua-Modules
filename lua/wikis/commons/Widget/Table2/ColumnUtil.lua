@@ -16,8 +16,8 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local ColumnUtil = {}
 
 ---Gets the column index for this cell
----@param columnIndexProp integer|string|nil - explicit column index from props
----@param columnIndexContext integer|string|nil - implicit column index from context
+---@param columnIndexProp integer|string? - explicit column index from props
+---@param columnIndexContext integer|string? - implicit column index from context
 ---@return integer
 function ColumnUtil.getColumnIndex(columnIndexProp, columnIndexContext)
 	local index = MathUtil.toInteger(columnIndexProp) or MathUtil.toInteger(columnIndexContext)
@@ -27,7 +27,7 @@ end
 ---Merges column definition properties with cell properties
 ---Cell props take precedence over column props
 ---@param cellProps table
----@param columnDef table|nil
+---@param columnDef table?
 ---@return table mergedProps
 function ColumnUtil.mergeProps(cellProps, columnDef)
 	if not columnDef then
@@ -69,28 +69,18 @@ end
 ---@param existingCss table?
 ---@return table css
 function ColumnUtil.buildCss(width, minWidth, maxWidth, existingCss)
-	local css = Table.copy(existingCss or {})
-
-	if width then
-		css['width'] = width
-	end
-
-	if minWidth then
-		css['min-width'] = minWidth
-	end
-
-	if maxWidth then
-		css['max-width'] = maxWidth
-	end
-
-	return css
+	return Table.merge(existingCss or {}, {
+		width = width,
+		['min-width'] = minWidth,
+		['max-width'] = maxWidth,
+	})
 end
 
 ---Builds CSS classes for column styling
----@param align string|nil
+---@param align string?
 ---@param nowrap (string|number|boolean)?
 ---@param shrink (string|number|boolean)?
----@param existingClasses string[]|nil
+---@param existingClasses string[]?
 ---@return string[] classes
 function ColumnUtil.buildClasses(align, nowrap, shrink, existingClasses)
 	local classes = Array.appendWith({}, existingClasses or {})
