@@ -117,7 +117,7 @@ function HiddenDataBox.run(args)
 	HiddenDataBox.addCustomVariables(args, queryResult)
 
 	return Fragment{children = WidgetUtil.collect(
-		HiddenDataBox._matchTicker(Logic.readBool(args.matchticker)),
+		HiddenDataBox._matchTicker(),
 		WarningBoxGroup{data = warnings}
 	)}
 end
@@ -226,10 +226,9 @@ function HiddenDataBox.validateTier(tier, tierType)
 	return tierValue, tierTypeValue, warnings
 end
 
----@param showMatchTicker boolean
 ---@return Widget?
-function HiddenDataBox._matchTicker(showMatchTicker)
-	if not showMatchTicker or Info.config.match2.status == 0 then
+function HiddenDataBox._matchTicker()
+	if Info.config.match2.status == 0 then
 		return nil
 	end
 
