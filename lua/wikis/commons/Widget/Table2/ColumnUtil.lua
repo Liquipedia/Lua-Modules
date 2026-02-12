@@ -26,6 +26,7 @@ end
 
 ---Merges column definition properties with cell properties
 ---Cell props take precedence over column props
+---Uses lazy merging: only creates merged table when column def has inheritable properties
 ---@param cellProps table
 ---@param columnDef table?
 ---@return table mergedProps
@@ -34,28 +35,46 @@ function ColumnUtil.mergeProps(cellProps, columnDef)
 		return cellProps
 	end
 
-	local merged = Table.copy(cellProps or {})
-
 	local inheritableProps = {
 		'align', 'shrink', 'nowrap', 'width', 'minWidth', 'maxWidth',
 		'sortType', 'unsortable',
 	}
 
-	Array.forEach(inheritableProps, function(prop)
-		if merged[prop] == nil and columnDef[prop] ~= nil then
-			merged[prop] = columnDef[prop]
+	local hasInheritableProps = false
+	for _, prop in ipairs(inheritableProps) do
+		if columnDef[prop] ~= nil then
+			hasInheritableProps = true
+			break
 		end
-	end)
+	end
 
-	if columnDef.css then
+	local hasCss = columnDef.css ~= nil
+	local hasClasses = columnDef.classes ~= nil
+	local hasAttributes = columnDef.attributes ~= nil
+
+	if not hasInheritableProps and not hasCss and not hasClasses and not hasAttributes then
+		return cellProps
+	end
+
+	local merged = Table.copy(cellProps or {})
+
+	if hasInheritableProps then
+		Array.forEach(inheritableProps, function(prop)
+			if merged[prop] == nil and columnDef[prop] ~= nil then
+				merged[prop] = columnDef[prop]
+			end
+		end)
+	end
+
+	if hasCss then
 		merged.css = Table.merge(columnDef.css, merged.css or {})
 	end
 
-	if columnDef.classes then
+	if hasClasses then
 		merged.classes = WidgetUtil.collect(columnDef.classes, merged.classes)
 	end
 
-	if columnDef.attributes then
+	if hasAttributes then
 		merged.attributes = Table.merge(columnDef.attributes, merged.attributes or {})
 	end
 
