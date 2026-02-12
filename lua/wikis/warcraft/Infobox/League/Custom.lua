@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
+local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local Game = Lua.import('Module:Game')
 local Json = Lua.import('Module:Json')
@@ -34,7 +35,12 @@ local Center = Widgets.Center
 local Title = Widgets.Title
 
 ---@class WarcraftLeagueInfobox: InfoboxLeague
+---@operator call(Frame): WarcraftLeagueInfobox
 local CustomLeague = Class.new(League)
+
+---@class WarcraftLeagueInfoboxWidgetInjector: WidgetInjector
+---@operator call(WarcraftLeagueInfobox): WarcraftLeagueInfoboxWidgetInjector
+---@field caller WarcraftLeagueInfobox
 local CustomInjector = Class.new(Injector)
 
 local CANCELLED = 'cancelled'
@@ -89,7 +95,7 @@ function CustomLeague.run(frame)
 		args.prizepool = nil
 	end
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 ---@param args table
@@ -330,6 +336,7 @@ function CustomLeague:_displayStartDateTime()
 	return Countdown.create{
 		date = self.data.startTime.raw,
 		finished = self.data.isFinished,
+		rawdatetime = DateExt.getCurrentTimestamp() > DateExt.readTimestamp(self.data.startTime.raw),
 	}
 end
 
