@@ -155,11 +155,11 @@ function BaseMatchPage:seoText()
 		),
 		{
 			ongoingTense = matchPhase == 'ongoing' and 'ongoing ' or '',
-			game = Game.name{game = self.matchData.game},
+			game = (Game.name{game = self.matchData.game}) --[[@as string]],
 			tournamentName = tournament.displayName,
 			opponent1 = Opponent.toName(self.opponents[1]),
 			opponent2 = Opponent.toName(self.opponents[2]),
-			tense = createTenseString()
+			tense = createTenseString() or ''
 		}
 	)
 end
