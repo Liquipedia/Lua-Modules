@@ -14,6 +14,7 @@ local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Game = Lua.import('Module:Game')
+local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
 local Links = Lua.import('Module:Links')
 local Operator = Lua.import('Module:Operator')
@@ -147,21 +148,11 @@ function BaseMatchPage:seoText()
 		)
 	end
 
-	if Opponent.isTbd(self.opponents[1]) and Opponent.isTbd(self.opponents[2]) then
-		return String.interpolate(
-			'Find detailed results about the ${ongoingTense}${game} match in ${tournamentName}${tense}.',
-			{
-				ongoingTense = matchPhase == 'ongoing' and 'ongoing ' or '',
-				game = Game.name{game = self.matchData.game},
-				tournamentName = tournament.displayName,
-				tense = createTenseString()
-			}
-		)
-	end
-
-	return String.interpolate(
-		'Find detailed results about the ${ongoingTense}${game} match between ${opponent1} and ${opponent2} ' ..
-		'in ${tournamentName}${tense}.',
+	return I18n.translate(
+		'matchpage-meta-desc' .. (
+			not (Opponent.isTbd(self.opponents[1]) and Opponent.isTbd(self.opponents[2]))
+			and '-no-opponent' or ''
+		),
 		{
 			ongoingTense = matchPhase == 'ongoing' and 'ongoing ' or '',
 			game = Game.name{game = self.matchData.game},

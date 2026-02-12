@@ -20,7 +20,7 @@ end)
 ---Interpolates an i18n string with data
 ---TODO Add pluralization support (https://cldr.unicode.org/index/cldr-spec/plural-rules)
 ---@param key string
----@param data table<string, string|number>?
+---@param data table<string, string|number?>?
 ---@return string
 function I18n.translate(key, data)
 	local language = getLanguage()
