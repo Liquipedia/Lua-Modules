@@ -88,6 +88,10 @@ end
 ---@param existingCss table?
 ---@return table css
 function ColumnUtil.buildCss(width, minWidth, maxWidth, existingCss)
+	if not width and not minWidth and not maxWidth then
+		return existingCss or {}
+	end
+
 	return Table.merge(existingCss or {}, {
 		width = width,
 		['min-width'] = minWidth,
@@ -102,25 +106,35 @@ end
 ---@param existingClasses string[]?
 ---@return string[] classes
 function ColumnUtil.buildClasses(align, nowrap, shrink, existingClasses)
-	local classes = {}
-
+	local alignClass = 'table2__cell--left'
 	if align == 'right' then
-		Array.appendWith(classes, 'table2__cell--right')
+		alignClass = 'table2__cell--right'
 	elseif align == 'center' then
-		Array.appendWith(classes, 'table2__cell--center')
-	else
-		Array.appendWith(classes, 'table2__cell--left')
+		alignClass = 'table2__cell--center'
 	end
 
-	if Logic.readBool(nowrap) then
+	local hasNowrap = Logic.readBool(nowrap)
+	local hasShrink = Logic.readBool(shrink)
+
+	if not hasNowrap and not hasShrink and not existingClasses then
+		return {alignClass}
+	end
+
+	local classes = {alignClass}
+
+	if hasNowrap then
 		Array.appendWith(classes, 'table2__cell--nowrap')
 	end
 
-	if Logic.readBool(shrink) then
+	if hasShrink then
 		Array.appendWith(classes, 'table2__cell--shrink')
 	end
 
-	return Array.extendWith(classes, existingClasses)
+	if existingClasses then
+		Array.extendWith(classes, existingClasses)
+	end
+
+	return classes
 end
 
 ---Builds HTML attributes for cells and headers
