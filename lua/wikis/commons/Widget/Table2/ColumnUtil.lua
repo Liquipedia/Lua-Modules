@@ -120,9 +120,9 @@ function ColumnUtil.buildAttributes(mergedProps, additionalAttributeBuilders)
 	end
 
 	if additionalAttributeBuilders then
-		for key, builder in pairs(additionalAttributeBuilders) do
+		Table.iter.forEachPair(additionalAttributeBuilders, function(builder)
 			builder(attributes, mergedProps)
-		end
+		end)
 	end
 
 	return attributes

@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
-local MathUtil = Lua.import('Module:MathUtil')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -76,9 +75,9 @@ function Table2CellHeader:render()
 	end
 
 	local attributes = ColumnUtil.buildAttributes(mergedProps, {
-		sortType = function(attrs, props)
-			if props.sortType then
-				attrs['data-sort-type'] = props.sortType
+		sortType = function(attrs, cellProps)
+			if cellProps.sortType then
+				attrs['data-sort-type'] = cellProps.sortType
 			end
 		end,
 	})
