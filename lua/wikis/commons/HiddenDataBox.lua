@@ -131,7 +131,7 @@ function HiddenDataBox.cleanDate(primaryDate, secondaryDate)
 		String.nilIfEmpty(ReferenceCleaner.clean{input = secondaryDate})
 end
 
----Assigns the wiki Variables accordng to given input, wiki variable and queryResults
+---Assigns the wiki Variables according to given input, wiki variable and queryResults
 ---@param variableName string
 ---@param valueFromArgs string|number|nil
 ---@param valueFromQuery string|number|nil
