@@ -149,10 +149,8 @@ function BaseMatchPage:seoText()
 	end
 
 	return I18n.translate(
-		'matchpage-meta-desc' .. (
-			not (Opponent.isTbd(self.opponents[1]) and Opponent.isTbd(self.opponents[2]))
-			and '-no-opponent' or ''
-		),
+		(Opponent.isTbd(self.opponents[1]) and Opponent.isTbd(self.opponents[2]))
+			and 'matchpage-meta-desc-no-opponent' or 'matchpage-meta-desc',
 		{
 			ongoingTense = matchPhase == 'ongoing' and 'ongoing ' or '',
 			game = (Game.name{game = self.matchData.game}) --[[@as string]],
