@@ -40,6 +40,10 @@ function Table2Body:render()
 	end
 
 	local function getRowMaxRowspan(row)
+		if row and row._cachedMaxRowspan then
+			return row._cachedMaxRowspan
+		end
+
 		local rowChildren = (row and row.props and row.props.children) or {}
 		local maxRowspan = 1
 		Array.forEach(rowChildren, function(child)
@@ -49,6 +53,11 @@ function Table2Body:render()
 				maxRowspan = math.max(maxRowspan, rowspan)
 			end
 		end)
+
+		if row then
+			row._cachedMaxRowspan = maxRowspan
+		end
+
 		return maxRowspan
 	end
 
