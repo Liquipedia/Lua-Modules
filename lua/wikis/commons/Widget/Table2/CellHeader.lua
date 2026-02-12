@@ -46,11 +46,26 @@ function Table2CellHeader:render()
 	local props = self.props
 
 	local columnContext = self:useContext(Table2ColumnContext)
+
+	-- Skip context lookups and property merging if there are no column definitions
+	if not columnContext or not columnContext.columns then
+		local classes = {'table2__cell--left'}
+		if Logic.readBool(props.unsortable) then
+			classes = WidgetUtil.collect(classes, 'unsortable')
+		end
+
+		return HtmlWidgets.Th{
+			classes = WidgetUtil.collect('table2__cell', classes),
+			attributes = props.attributes,
+			children = props.children,
+		}
+	end
+
 	local columnIndexContext = self:useContext(Table2ColumnIndexContext)
 	local columnDef
 	local columnIndex = ColumnUtil.getColumnIndex(props.columnIndex, columnIndexContext)
 
-	if columnContext and columnContext.columns and columnContext.columns[columnIndex] then
+	if columnContext.columns[columnIndex] then
 		columnDef = columnContext.columns[columnIndex]
 	end
 
@@ -61,15 +76,28 @@ function Table2CellHeader:render()
 		classes = WidgetUtil.collect(classes, 'unsortable')
 	end
 
-	local attributes = Table.copy(mergedProps.attributes or {})
-	if mergedProps.sortType then
-		attributes['data-sort-type'] = mergedProps.sortType
-	end
-	if mergedProps.colspan then
-		attributes.colspan = MathUtil.toInteger(mergedProps.colspan) or mergedProps.colspan
-	end
-	if mergedProps.rowspan then
-		attributes.rowspan = MathUtil.toInteger(mergedProps.rowspan) or mergedProps.rowspan
+	local attributes = mergedProps.attributes
+	if attributes then
+		if mergedProps.sortType then
+			attributes['data-sort-type'] = mergedProps.sortType
+		end
+		if mergedProps.colspan then
+			attributes.colspan = MathUtil.toInteger(mergedProps.colspan) or mergedProps.colspan
+		end
+		if mergedProps.rowspan then
+			attributes.rowspan = MathUtil.toInteger(mergedProps.rowspan) or mergedProps.rowspan
+		end
+	else
+		attributes = {}
+		if mergedProps.sortType then
+			attributes['data-sort-type'] = mergedProps.sortType
+		end
+		if mergedProps.colspan then
+			attributes.colspan = MathUtil.toInteger(mergedProps.colspan) or mergedProps.colspan
+		end
+		if mergedProps.rowspan then
+			attributes.rowspan = MathUtil.toInteger(mergedProps.rowspan) or mergedProps.rowspan
+		end
 	end
 
 	local css = ColumnUtil.buildCss(mergedProps.width, mergedProps.minWidth, mergedProps.maxWidth, mergedProps.css)
