@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local MathUtil = Lua.import('Module:MathUtil')
 local WidgetContext = Lua.import('Module:Widget/Context')
 
 ---@class Table2ColumnIndexContext: WidgetContext
@@ -16,7 +17,7 @@ local Table2ColumnIndexContext = Class.new(WidgetContext)
 
 ---@return integer
 function Table2ColumnIndexContext:getValue()
-	assert(self.props.value ~= nil, 'Table2ColumnIndexContext: expected value')
+	assert(MathUtil.isInteger(self.props.value), 'Table2ColumnIndexContext: expected integer')
 	return self.props.value
 end
 

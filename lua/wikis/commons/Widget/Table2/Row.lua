@@ -27,10 +27,8 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class Table2Row: Widget
 ---@operator call(Table2RowProps): Table2Row
+---@field props Table2RowProps
 local Table2Row = Class.new(Widget)
-Table2Row.defaultProps = {
-	classes = {},
-}
 
 ---@return Widget
 function Table2Row:render()
@@ -44,7 +42,7 @@ function Table2Row:render()
 		sectionClass = 'table2__row--head'
 	end
 
-	local kindClass = nil
+	local kindClass
 	if section == 'head' then
 		if headerRowKind == 'title' then
 			kindClass = 'table2__row--head-title'
@@ -53,7 +51,7 @@ function Table2Row:render()
 		end
 	end
 
-	local stripeClass = nil
+	local stripeClass
 	if section == 'body' then
 		if bodyStripe == 'odd' then
 			stripeClass = 'table2__row--odd'
@@ -62,7 +60,7 @@ function Table2Row:render()
 		end
 	end
 
-	local highlightClass = nil
+	local highlightClass
 	if section == 'body' and Logic.readBool(props.highlighted) then
 		highlightClass = 'table2__row--highlighted'
 	end

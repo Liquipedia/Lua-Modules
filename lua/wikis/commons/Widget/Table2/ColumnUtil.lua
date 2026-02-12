@@ -9,28 +9,18 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local ColumnUtil = {}
-
----Validates that shrink and width are not both specified
----@param columnDef table
----@return boolean valid
----@return string|nil errorMsg
-function ColumnUtil.validateColumnDef(columnDef)
-	if Logic.readBool(columnDef.shrink) and columnDef.width then
-		return false, 'Column definition cannot have both shrink and width properties'
-	end
-	return true, nil
-end
 
 ---Gets the column index for this cell
 ---@param columnIndexProp integer|string|nil - explicit column index from props
 ---@param columnIndexContext integer|string|nil - implicit column index from context
 ---@return integer
 function ColumnUtil.getColumnIndex(columnIndexProp, columnIndexContext)
-	local index = tonumber(columnIndexProp) or tonumber(columnIndexContext)
+	local index = MathUtil.toInteger(columnIndexProp) or MathUtil.toInteger(columnIndexContext)
 	return index or 1
 end
 
@@ -73,10 +63,10 @@ function ColumnUtil.mergeProps(cellProps, columnDef)
 end
 
 ---Builds CSS rules for sizing
----@param width string|nil
----@param minWidth string|nil
----@param maxWidth string|nil
----@param existingCss table|nil
+---@param width string?
+---@param minWidth string?
+---@param maxWidth string?
+---@param existingCss table?
 ---@return table css
 function ColumnUtil.buildCss(width, minWidth, maxWidth, existingCss)
 	local css = Table.copy(existingCss or {})
@@ -98,27 +88,27 @@ end
 
 ---Builds CSS classes for column styling
 ---@param align string|nil
----@param nowrap boolean|nil
----@param shrink boolean|nil
+---@param nowrap (string|number|boolean)?
+---@param shrink (string|number|boolean)?
 ---@param existingClasses string[]|nil
 ---@return string[] classes
 function ColumnUtil.buildClasses(align, nowrap, shrink, existingClasses)
-	local classes = Table.copy(existingClasses or {})
+	local classes = Array.appendWith({}, existingClasses or {})
 
 	if align == 'right' then
-		table.insert(classes, 'table2__cell--right')
+		Array.appendWith(classes, 'table2__cell--right')
 	elseif align == 'center' then
-		table.insert(classes, 'table2__cell--center')
+		Array.appendWith(classes, 'table2__cell--center')
 	else
-		table.insert(classes, 'table2__cell--left')
+		Array.appendWith(classes, 'table2__cell--left')
 	end
 
 	if Logic.readBool(nowrap) then
-		table.insert(classes, 'table2__cell--nowrap')
+		Array.appendWith(classes, 'table2__cell--nowrap')
 	end
 
 	if Logic.readBool(shrink) then
-		table.insert(classes, 'table2__cell--shrink')
+		Array.appendWith(classes, 'table2__cell--shrink')
 	end
 
 	return classes

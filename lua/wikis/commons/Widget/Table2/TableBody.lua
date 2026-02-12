@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local MathUtil = Lua.import('Module:MathUtil')
 
 local Widget = Lua.import('Module:Widget')
 local Table2BodyStripe = Lua.import('Module:Widget/Table2/BodyStripe')
@@ -22,6 +23,7 @@ local Table2Section = Lua.import('Module:Widget/Table2/Section')
 
 ---@class Table2Body: Widget
 ---@operator call(Table2BodyProps): Table2Body
+---@field props Table2BodyProps
 local Table2Body = Class.new(Widget)
 
 ---@return Widget
@@ -42,7 +44,7 @@ function Table2Body:render()
 		local maxRowspan = 1
 		Array.forEach(rowChildren, function(child)
 			if Class.instanceOf(child, Table2Cell) or Class.instanceOf(child, Table2CellHeader) then
-				local rowspan = tonumber(child.props.rowspan) or 1
+				local rowspan = MathUtil.toInteger(child.props.rowspan) or 1
 				rowspan = math.max(rowspan, 1)
 				maxRowspan = math.max(maxRowspan, rowspan)
 			end

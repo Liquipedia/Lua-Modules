@@ -38,11 +38,8 @@ local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
 ---@class Table2CellHeader: Widget
 ---@operator call(Table2CellHeaderProps): Table2CellHeader
+---@field props Table2CellHeaderProps
 local Table2CellHeader = Class.new(Widget)
-
-Table2CellHeader.defaultProps = {
-	classes = {},
-}
 
 ---@return Widget
 function Table2CellHeader:render()
@@ -50,7 +47,7 @@ function Table2CellHeader:render()
 
 	local columnContext = self:useContext(Table2ColumnContext)
 	local columnIndexContext = self:useContext(Table2ColumnIndexContext)
-	local columnDef = nil
+	local columnDef
 	local columnIndex = ColumnUtil.getColumnIndex(props.columnIndex, columnIndexContext)
 
 	if columnContext and columnContext.columns and columnContext.columns[columnIndex] then

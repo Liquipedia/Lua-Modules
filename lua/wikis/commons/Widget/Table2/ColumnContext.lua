@@ -18,11 +18,6 @@ local Table2ColumnContext = Class.new(WidgetContext)
 ---@field children (Widget|Html|string|number|nil)[]?
 ---@field columns table[]?
 
-Table2ColumnContext.defaultProps = {
-	children = {},
-	columns = {},
-}
-
 ---@return {columns: table[]?}
 function Table2ColumnContext:getValue()
 	return {

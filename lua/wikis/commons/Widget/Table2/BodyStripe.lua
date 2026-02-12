@@ -18,8 +18,7 @@ local Table2BodyStripe = Class.new(WidgetContext)
 
 ---@return Table2BodyStripeName|any
 function Table2BodyStripe:getValue()
-	assert(self.props.value ~= nil, 'Table2BodyStripe: expected value')
-	return self.props.value
+	return assert(self.props.value, 'Table2BodyStripe: expected value')
 end
 
 return Table2BodyStripe

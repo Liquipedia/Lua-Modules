@@ -15,7 +15,6 @@ local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Table2ColumnContext = Lua.import('Module:Widget/Table2/ColumnContext')
-local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
 ---@class Table2ColumnDef
 ---@field align 'left'|'right'|'center'?
@@ -44,6 +43,7 @@ local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
 ---@class Table2: Widget
 ---@operator call(Table2Props): Table2
+---@field props Table2Props
 local Table2 = Class.new(Widget)
 
 Table2.defaultProps = {
@@ -58,11 +58,9 @@ function Table2:render()
 	local props = self.props
 
 	if props.columns and #props.columns > 0 then
-		Array.forEach(props.columns, function(columnDef, i)
-			local valid, errorMsg = ColumnUtil.validateColumnDef(columnDef)
-			if not valid then
-				error('Table2: Column ' .. i .. ' - ' .. errorMsg)
-			end
+		Array.forEach(props.columns, function(columnDef, columnIndex)
+			assert(not (Logic.readBool(columnDef.shrink) and columnDef.width),
+				'Table2: Column ' .. columnIndex .. ' - Column definition cannot have both shrink and width properties')
 		end)
 	end
 

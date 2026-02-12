@@ -20,6 +20,7 @@ local Table2HeaderRowKind = Lua.import('Module:Widget/Table2/HeaderRowKind')
 
 ---@class Table2Header: Widget
 ---@operator call(Table2HeaderProps): Table2Header
+---@field props Table2HeaderProps
 local Table2Header = Class.new(Widget)
 
 ---@return Widget

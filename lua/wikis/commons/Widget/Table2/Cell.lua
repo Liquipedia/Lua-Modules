@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local MathUtil = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
@@ -34,11 +35,8 @@ local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
 ---@class Table2Cell: Widget
 ---@operator call(Table2CellProps): Table2Cell
+---@field props Table2CellProps
 local Table2Cell = Class.new(Widget)
-
-Table2Cell.defaultProps = {
-	classes = {},
-}
 
 ---@return Widget
 function Table2Cell:render()
@@ -57,10 +55,10 @@ function Table2Cell:render()
 
 	local attributes = Table.copy(mergedProps.attributes or {})
 	if mergedProps.colspan ~= nil then
-		attributes.colspan = tonumber(mergedProps.colspan) or mergedProps.colspan
+		attributes.colspan = MathUtil.toInteger(mergedProps.colspan) or mergedProps.colspan
 	end
 	if mergedProps.rowspan ~= nil then
-		attributes.rowspan = tonumber(mergedProps.rowspan) or mergedProps.rowspan
+		attributes.rowspan = MathUtil.toInteger(mergedProps.rowspan) or mergedProps.rowspan
 	end
 
 	local css = ColumnUtil.buildCss(mergedProps.width, mergedProps.minWidth, mergedProps.maxWidth, mergedProps.css)
