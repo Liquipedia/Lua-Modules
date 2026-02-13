@@ -52,6 +52,7 @@ function ParticipantsTeamHeader:render()
 		}
 	else
 		opponentDisplay = Div{
+			classes = {'team-participant-card__opponent'},
 			children = {
 				Div{
 					classes = {'team-participant-card__opponent-compact'},
