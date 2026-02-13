@@ -52,7 +52,6 @@ function ParticipantsTeamHeader:render()
 		}
 	else
 		opponentDisplay = Div{
-			classes = opponentClasses,
 			children = {
 				Div{
 					classes = {'team-participant-card__opponent-compact'},
@@ -60,6 +59,7 @@ function ParticipantsTeamHeader:render()
 						OpponentDisplay.BlockOpponent{
 							opponent = participant.opponent,
 							teamStyle = 'bracket',
+							additionalClasses = opponentClasses,
 						}
 					}
 				},
@@ -69,6 +69,7 @@ function ParticipantsTeamHeader:render()
 						OpponentDisplay.BlockOpponent{
 							opponent = participant.opponent,
 							teamStyle = 'standard',
+							additionalClasses = opponentClasses,
 						}
 					}
 				}
