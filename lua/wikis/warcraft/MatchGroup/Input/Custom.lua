@@ -550,10 +550,12 @@ function FfaMapFunctions.getExtraData(match, map, opponents)
 end
 
 ---@param map table
+---@param mapIndex integer
+---@param scoreSettings table
 ---@param matchOpponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table
-function FfaMapFunctions.readMapOpponent(map, matchOpponent, opponentIndex)
+function FfaMapFunctions.readMapOpponent(map, mapIndex, scoreSettings, matchOpponent, opponentIndex)
 	local score, status = MatchGroupInputUtil.computeOpponentScore{
 		walkover = map.walkover,
 		winner = map.winner,

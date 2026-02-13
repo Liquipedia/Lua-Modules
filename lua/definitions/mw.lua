@@ -1341,6 +1341,56 @@ mw.ext.Dota2DB = {}
 ---@return dota2MatchData
 function mw.ext.Dota2DB.getBigMatch(matchId, reversed) end
 
+mw.ext.PUBGDB = {}
+
+---@class PUBGDBMatchPlayer
+---@field pubgdbm_assists string
+---@field pubgdbm_boosts string
+---@field pubgdbm_damage_dealt string
+---@field pubgdbm_dbnos string
+---@field pubgdbm_death_type string
+---@field pubgdbm_headshot_kills string
+---@field pubgdbm_heals string
+---@field pubgdbm_id string
+---@field pubgdbm_kill_place string
+---@field pubgdbm_kill_streaks string
+---@field pubgdbm_kills string
+---@field pubgdbm_longest_kill string
+---@field pubgdbm_match_id string
+---@field pubgdbm_name string
+---@field pubgdbm_participant string
+---@field pubgdbm_player_id string
+---@field pubgdbm_revives string
+---@field pubgdbm_ride_distance string
+---@field pubgdbm_road_kills string
+---@field pubgdbm_swim_distance string
+---@field pubgdbm_team_kills string
+---@field pubgdbm_time_survived string
+---@field pubgdbm_vehicle_destroys string
+---@field pubgdbm_walk_distance string
+---@field pubgdbm_weapons_acquired string
+---@field pubgdbm_win_place string
+---@field pubgdbmr_id string
+---@field pubgdbmr_match_id string
+---@field pubgdbmr_name string
+---@field pubgdbmr_participant_id string
+---@field pubgdbmr_roster_id string
+
+---@return {pubgdbtl_name: string, pubgdbtl_id: string, pubgdbtl_date: string}[]
+function mw.ext.PUBGDB.tournamentlist() end
+
+---@param tournamentid string
+---@return string|{pubgdbt_id: string, pubgdbt_match_id: string, pubgdbt_match_timestamp: string, pubgdbt_name: string}[]
+function mw.ext.PUBGDB.tournament(tournamentid) end
+
+---@param matchid string
+---@return string|PUBGDBMatchPlayer[]
+function mw.ext.PUBGDB.match(matchid) end
+
+---@param playerid string
+---@return PUBGDBMatchPlayer[]
+function mw.ext.PUBGDB.player(playerid) end
+
 mw.ext.valorantdb = {}
 
 ---@class valorantMatchApiPlayerStats
