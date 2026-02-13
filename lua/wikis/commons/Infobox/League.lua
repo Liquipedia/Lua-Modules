@@ -332,6 +332,23 @@ function League:_createUpcomingMatches()
 		return nil
 	end
 
+	---@return boolean
+	local isFinished = function()
+		if DateExt.isDefaultTimestamp(self.data.endDate) or not self.data.endDate then
+			return false
+		end
+		local endDate = DateExt.readTimestamp(self.data.endDate)
+		-- assume an event is finished 2 days after the enddate latest
+		-- 1 day for finishing the day of the enddate
+		-- 1 day for potential timezone offsets plus events reaching into the next day from time to time (i.e. over midnight)
+		return endDate + DateExt.daysToSeconds(2) < DateExt.getCurrentTimestamp()
+	end
+
+	-- avoid the query for finished events
+	if isFinished() then
+		return nil
+	end
+
 	local result = Logic.tryCatch(
 		function()
 			local matchTicker = MatchTicker{
