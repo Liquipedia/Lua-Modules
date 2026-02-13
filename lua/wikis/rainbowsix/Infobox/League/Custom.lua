@@ -105,10 +105,7 @@ end
 ---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(self:getAllArgsForBase(args, 'map'), ';')
-
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
-	lpdbData.extradata.startdatetext = self:_standardiseRawDate(args.sdate or args.date)
-	lpdbData.extradata.enddatetext = self:_standardiseRawDate(args.edate or args.date)
 
 	return lpdbData
 end
@@ -119,21 +116,6 @@ function CustomLeague:_validPublisherTier(publishertier)
 	return UBISOFT_TIERS[string.lower(publishertier or '')]
 end
 
----@param dateString string
----@return string
-function CustomLeague:_standardiseRawDate(dateString)
-	-- Length 7 = YYYY-MM
-	-- Length 10 = YYYY-MM-??
-	if String.isEmpty(dateString) or (#dateString ~= 7 and #dateString ~= 10) then
-		return ''
-	end
-
-	if #dateString == 7 then
-		dateString = dateString .. '-??'
-	end
-	dateString = dateString:gsub('%-XX', '-??')
-	return dateString
-end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
