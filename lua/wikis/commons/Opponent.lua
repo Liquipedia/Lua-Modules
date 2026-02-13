@@ -359,7 +359,7 @@ options.syncPlayer: Whether to fetch player information from variables or LPDB. 
 ]]
 ---@param opponent standardOpponent
 ---@param date string|number|nil
----@param options {syncPlayer: boolean?, overwritePageVars: boolean?}?
+---@param options {syncPlayer: boolean?, overwritePageVars: boolean?, syncTeam: boolean?}?
 ---@return standardOpponent
 function Opponent.resolve(opponent, date, options)
 	options = options or {}
@@ -381,11 +381,11 @@ function Opponent.resolve(opponent, date, options)
 				savePageVar = savePageVar,
 				overwritePageVars = options.overwritePageVars,
 			})
-			player.team = PlayerExt.syncTeam(
+			player.team = Logic.nilOr(options.syncTeam, true) and PlayerExt.syncTeam(
 				player.pageName:gsub(' ', '_'),
 				player.team,
 				{date = date, savePageVar = savePageVar}
-			)
+			) or player.team
 			player.faction = (hasFaction or player.faction ~= Faction.defaultFaction) and player.faction or nil
 		else
 			PlayerExt.populatePageName(player)
