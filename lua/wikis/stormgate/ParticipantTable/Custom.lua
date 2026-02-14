@@ -11,6 +11,8 @@ local Array = Lua.import('Module:Array')
 local Json = Lua.import('Module:Json')
 local Faction = Lua.import('Module:Faction')
 local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
@@ -36,10 +38,6 @@ local Variables = Lua.import('Module:Variables')
 ---@field _displaySoloFactionTableSection function
 ---@field _displayHeader function
 ---@field _getFactionNumbers function
-
-local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
-
-local Opponent = Lua.import('Module:Opponent/Custom')
 
 local StormgateParticipantTable = {}
 
