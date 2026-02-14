@@ -43,15 +43,7 @@ local StarcraftParticipantTable = Class.new(ParticipantTable)
 ---@param frame Frame
 ---@return Html?
 function StarcraftParticipantTable.run(frame)
-	local participantTable = StarcraftParticipantTable(frame)
-
-	participantTable:read():store()
-
-	if participantTable:isPureSolo() and participantTable.config.soloAsFactionTable then
-		participantTable.create = StarcraftParticipantTable.createSoloFactionTable
-	end
-
-	return participantTable:create()
+	return StarcraftParticipantTable(frame):read():store():create()
 end
 
 ---@param args table
