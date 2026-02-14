@@ -46,10 +46,6 @@ function StormgateParticipantTable.run(frame)
 
 	participantTable:read():store()
 
-	if participantTable:isPureSolo() and participantTable.config.soloAsFactionTable then
-		participantTable.create = StormgateParticipantTable.createSoloFactionTable
-	end
-
 	return participantTable:create()
 end
 
@@ -149,6 +145,14 @@ function StormgateParticipantTable:isPureSolo()
 	return Array.all(self.sections, function(section) return Array.all(section.entries, function(entry)
 		return entry.opponent.type == Opponent.solo
 	end) end)
+end
+
+---@return Html?
+function StormgateParticipantTable:create()
+	if self:isPureSolo() and self.config.soloAsFactionTable then
+		return self:createSoloFactionTable()
+	end
+	return ParticipantTable.create(self)
 end
 
 ---@return Html?
