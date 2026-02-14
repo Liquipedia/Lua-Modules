@@ -47,7 +47,7 @@ function StarcraftParticipantTable.run(frame)
 
 	participantTable:read():store()
 
-	if StarcraftParticipantTable.isPureSolo(participantTable.sections) and participantTable.config.soloAsFactionTable then
+	if participantTable:isPureSolo() and participantTable.config.soloAsFactionTable then
 		participantTable.create = StarcraftParticipantTable.createSoloFactionTable
 	end
 
@@ -147,10 +147,9 @@ function StarcraftParticipantTable:adjustLpdbData(lpdbData, entry, config)
 	lpdbData.qualified = isQualified and 1 or nil
 end
 
----@param sections StarcraftParticipantTableSection[]
 ---@return boolean
-function StarcraftParticipantTable.isPureSolo(sections)
-	return Array.all(sections, function(section) return Array.all(section.entries, function(entry)
+function StarcraftParticipantTable:isPureSolo()
+	return Array.all(self.sections, function(section) return Array.all(section.entries, function(entry)
 		return entry.opponent.type == Opponent.solo
 	end) end)
 end
