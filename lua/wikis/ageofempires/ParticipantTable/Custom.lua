@@ -11,6 +11,8 @@ local Array = Lua.import('Module:Array')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
 ---@class AoEParticipantTableEntry: ParticipantTableEntry
 ---@field seed integer?
@@ -22,10 +24,6 @@ local Operator = Lua.import('Module:Operator')
 ---@field hasSeeds boolean
 ---@field _createSeedList function
 ---@field _createTitle function
-
-local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
-
-local Opponent = Lua.import('Module:Opponent/Custom')
 
 local AoEParticipantTable = {}
 
