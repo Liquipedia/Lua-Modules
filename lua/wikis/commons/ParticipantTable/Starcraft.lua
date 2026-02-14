@@ -155,6 +155,14 @@ function StarcraftParticipantTable:isPureSolo()
 end
 
 ---@return Html?
+function StarcraftParticipantTable:create()
+	if self:isPureSolo() and self.config.soloAsFactionTable then
+		return self:createSoloFactionTable()
+	end
+	return ParticipantTable.create(self)
+end
+
+---@return Html?
 function StarcraftParticipantTable:createSoloFactionTable()
 	local config = self.config
 
