@@ -12,7 +12,6 @@ local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
-local Opponent = Lua.import('Module:Opponent/Custom')
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
 ---@class AoEParticipantTableEntry: ParticipantTableEntry
@@ -47,41 +46,16 @@ function AoEParticipantTable:readEntry(sectionArgs, key, index, config)
 		return sectionArgs[key .. postfix] or sectionArgs[prefix .. postfix]
 	end
 
-	--if not a json assume it is a solo opponent
-	local opponentArgs = Json.parseIfTable(sectionArgs[key]) or {
-		type = Opponent.solo,
-		name = sectionArgs[key],
-		link = valueFromArgs('link'),
-		flag = valueFromArgs('flag'),
-		team = valueFromArgs('team'),
-		dq = valueFromArgs('dq'),
-		note = valueFromArgs('note'),
-		seed = valueFromArgs('seed'),
-	}
+	local entry = ParticipantTable.readEntry(self, sectionArgs, key, index, config) --[[ @as AoEParticipantTableEntry ]]
 
-	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
+	local seed = (Json.parseIfTable(sectionArgs[key]) or {}).seed or valueFromArgs('seed')
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs)
-
-	if config.sortPlayers and opponent.players then
-		table.sort(opponent.players, function (player1, player2)
-			local name1 = (player1.displayName or player1.pageName):lower()
-			local name2 = (player2.displayName or player2.pageName):lower()
-			return name1 < name2
-		end)
-	end
-
-	if tonumber(opponentArgs.seed) then
+	if Logic.isNumeric(seed) then
+		entry.seed = tonumber(seed)
 		self.hasSeeds = true
 	end
 
-	return {
-		dq = Logic.readBool(opponentArgs.dq),
-		note = opponentArgs.note,
-		opponent = opponent,
-		inputIndex = index,
-		seed = tonumber(opponentArgs.seed)
-	}
+	return entry
 end
 
 ---@return Html?
