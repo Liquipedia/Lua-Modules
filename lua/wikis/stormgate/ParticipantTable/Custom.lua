@@ -42,11 +42,7 @@ local StormgateParticipantTable = Class.new(ParticipantTable)
 ---@param frame Frame
 ---@return Html?
 function StormgateParticipantTable.run(frame)
-	local participantTable = StormgateParticipantTable(frame)
-
-	participantTable:read():store()
-
-	return participantTable:create()
+	return StormgateParticipantTable(frame):read():store():create()
 end
 
 ---@param args table
