@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local Faction = Lua.import('Module:Faction')
 local Logic = Lua.import('Module:Logic')
@@ -34,26 +35,15 @@ local Variables = Lua.import('Module:Variables')
 ---@field entries StarcraftParticipantTableEntry[]
 
 ---@class StarcraftParticipantTable: ParticipantTable
+---@operator call(Frame): StarcraftParticipantTable
 ---@field config StarcraftParticipantTableConfig
----@field isPureSolo boolean
----@field _displaySoloFactionTableSection function
----@field _displayHeader function
----@field _getFactionNumbers function
-
-local StarcraftParticipantTable = {}
+---@field sections StarcraftParticipantTableSection[]
+local StarcraftParticipantTable = Class.new(ParticipantTable)
 
 ---@param frame Frame
 ---@return Html?
 function StarcraftParticipantTable.run(frame)
-	local participantTable = ParticipantTable(frame) --[[@as StarcraftParticipantTable]]
-
-	participantTable.readConfig = StarcraftParticipantTable.readConfig
-	participantTable.readEntry = StarcraftParticipantTable.readEntry
-	participantTable.adjustLpdbData = StarcraftParticipantTable.adjustLpdbData
-	participantTable._displaySoloFactionTableSection = StarcraftParticipantTable._displaySoloFactionTableSection
-	participantTable._displayHeader = StarcraftParticipantTable._displayHeader
-	participantTable._getFactionNumbers = StarcraftParticipantTable._getFactionNumbers
-	participantTable.setCustomPageVariables = StarcraftParticipantTable.setCustomPageVariables
+	local participantTable = StarcraftParticipantTable(frame)
 
 	participantTable:read():store()
 
