@@ -46,7 +46,7 @@ function StormgateParticipantTable.run(frame)
 
 	participantTable:read():store()
 
-	if StormgateParticipantTable.isPureSolo(participantTable.sections) and participantTable.config.soloAsFactionTable then
+	if participantTable:isPureSolo() and participantTable.config.soloAsFactionTable then
 		participantTable.create = StormgateParticipantTable.createSoloFactionTable
 	end
 
@@ -144,10 +144,9 @@ function StormgateParticipantTable:adjustLpdbData(lpdbData, entry, config)
 	lpdbData.qualified = isQualified and 1 or nil
 end
 
----@param sections StormgateParticipantTableSection[]
 ---@return boolean
-function StormgateParticipantTable.isPureSolo(sections)
-	return Array.all(sections, function(section) return Array.all(section.entries, function(entry)
+function StormgateParticipantTable:isPureSolo()
+	return Array.all(self.sections, function(section) return Array.all(section.entries, function(entry)
 		return entry.opponent.type == Opponent.solo
 	end) end)
 end
