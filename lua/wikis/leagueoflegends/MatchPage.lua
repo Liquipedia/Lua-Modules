@@ -40,7 +40,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LoLMatchPage: BaseMatchPage
 ---@field games LoLMatchPageGame[]
----@operator call(MatchGroupUtilMatch): BaseMatchPage
+---@operator call(MatchGroupUtilMatch): LoLMatchPage
 local MatchPage = Class.new(BaseMatchPage)
 
 local KEYSTONES = Table.map({
@@ -81,14 +81,6 @@ local ITEMS_TO_SHOW = 6
 local KDA_ICON = IconFa{iconName = 'leagueoflegends_kda', hover = 'KDA'}
 local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
-
----@param props {match: MatchGroupUtilMatch}
----@return Widget
-function MatchPage.getByMatchId(props)
-	local matchPage = MatchPage(props.match)
-
-	return matchPage:render()
-end
 
 function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)

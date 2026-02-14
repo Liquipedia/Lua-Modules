@@ -35,7 +35,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 ---@class ValorantMatchPage: BaseMatchPage
----@operator call(MatchPageMatch): ValorantMatchPage
+---@operator call(MatchGroupUtilMatch): ValorantMatchPage
 local MatchPage = Class.new(BaseMatchPage)
 
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
@@ -59,14 +59,6 @@ local WIN_TYPES = {
 		description = 'Timer expired',
 	}
 }
-
----@param props {match: MatchGroupUtilMatch}
----@return Widget
-function MatchPage.getByMatchId(props)
-	local matchPage = MatchPage(props.match)
-
-	return matchPage:render()
-end
 
 function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)
