@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
@@ -21,24 +22,15 @@ local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 ---@field entries AoEParticipantTableEntry[]
 
 ---@class AoEParticipantTable: ParticipantTable
+---@operator call(Frame): AoEParticipantTable
 ---@field hasSeeds boolean
----@field _createSeedList function
----@field _createTitle function
-
-local AoEParticipantTable = {}
+local AoEParticipantTable = Class.new(ParticipantTable)
 
 ---@param frame Frame
 ---@return Html?
 function AoEParticipantTable.run(frame)
-	local participantTable = ParticipantTable(frame) --[[@as AoEParticipantTable]]
-	participantTable.readEntry = AoEParticipantTable.readEntry
+	local participantTable = AoEParticipantTable(frame)
 	participantTable:read():store()
-
-	if participantTable.hasSeeds then
-		participantTable._createSeedList = AoEParticipantTable._createSeedList
-		participantTable._createTitle = AoEParticipantTable._createTitle
-		participantTable.create = AoEParticipantTable._createSeedTable
-	end
 
 	return participantTable:create()
 end
@@ -89,6 +81,14 @@ function AoEParticipantTable:readEntry(sectionArgs, key, index, config)
 		inputIndex = index,
 		seed = tonumber(opponentArgs.seed)
 	}
+end
+
+---@return Html?
+function AoEParticipantTable:create()
+	if self.hasSeeds then
+		return self:_createSeedTable()
+	end
+	return ParticipantTable.create(self)
 end
 
 ---@return Html?
