@@ -94,7 +94,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Race',
-				children = {CustomPlayer._getRaceDisplay(args.race)}
+				children = {CustomPlayer._getRaceDisplay(args.race or args.faction)}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -148,7 +148,7 @@ end
 ---@param args table
 ---@return string
 function CustomPlayer:nameDisplay(args)
-	local factions = Faction.readMultiFaction(args.race or Faction.defaultFaction, {alias = false})
+	local factions = Faction.readMultiFaction(args.race or args.faction or Faction.defaultFaction, {alias = false})
 
 	local raceIcons = table.concat(Array.map(factions, function(faction)
 		return Faction.Icon{faction = faction, size = 'medium'}
@@ -176,7 +176,7 @@ end
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	local extradata = lpdbData.extradata or {}
 
-	local factions = Faction.readMultiFaction(args.race, {alias = false})
+	local factions = Faction.readMultiFaction(args.race or args.faction, {alias = false})
 
 	extradata.race = factions[1]
 	extradata.faction = Faction.toName(factions[1])
@@ -517,7 +517,7 @@ function CustomPlayer:getWikiCategories(categories)
 		table.insert(categories, 'Foreign Players')
 	end
 
-	for _, faction in pairs(Faction.readMultiFaction(args.race, {alias = false})) do
+	for _, faction in pairs(Faction.readMultiFaction(args.race or args.faction, {alias = false})) do
 		table.insert(categories, Faction.toName(faction) .. ' Players')
 	end
 

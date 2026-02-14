@@ -119,7 +119,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Race',
-				children = {caller:getRaceData(args.race, RACE_FIELD_AS_CATEGORY_LINK)}
+				children = {caller:getRaceData(args.race or args.faction, RACE_FIELD_AS_CATEGORY_LINK)}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -502,7 +502,7 @@ end
 ---@param categories string[]
 ---@return string[]
 function CustomPlayer:getWikiCategories(categories)
-	for _, faction in pairs(self:readFactions(self.args.race).factions) do
+	for _, faction in pairs(self:readFactions(self.args.race or self.args.faction).factions) do
 		table.insert(categories, faction .. ' Players')
 	end
 
