@@ -24,6 +24,7 @@ local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 ---@class AoEParticipantTable: ParticipantTable
 ---@operator call(Frame): AoEParticipantTable
 ---@field hasSeeds boolean
+---@field sections AoEParticipantTableSection[]
 local AoEParticipantTable = Class.new(ParticipantTable)
 
 ---@param frame Frame
