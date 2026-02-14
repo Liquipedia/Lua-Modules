@@ -312,11 +312,11 @@ end
 ---@return Widget
 function Tabs._single(tab, showHeader)
 	return HtmlWidgets.Fragment{
-		children = {
+		children = WidgetUtil.collect(
 			showHeader and HtmlWidgets.H6{children = {tab.name}} or nil,
 			showHeader and '\n' or nil,
 			tab.content
-		}
+		)
 	}
 end
 
