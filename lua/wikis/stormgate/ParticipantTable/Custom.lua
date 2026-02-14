@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local Faction = Lua.import('Module:Faction')
 local Logic = Lua.import('Module:Logic')
@@ -33,26 +34,15 @@ local Variables = Lua.import('Module:Variables')
 ---@field entries StormgateParticipantTableEntry[]
 
 ---@class StormgateParticipantTable: ParticipantTable
+---@operator call(Frame): StormgateParticipantTable
 ---@field config StormgateParticipantTableConfig
----@field isPureSolo boolean
----@field _displaySoloFactionTableSection function
----@field _displayHeader function
----@field _getFactionNumbers function
-
-local StormgateParticipantTable = {}
+---@field sections StormgateParticipantTableSection[]
+local StormgateParticipantTable = Class.new(ParticipantTable)
 
 ---@param frame Frame
 ---@return Html?
 function StormgateParticipantTable.run(frame)
-	local participantTable = ParticipantTable(frame) --[[@as StormgateParticipantTable]]
-
-	participantTable.readConfig = StormgateParticipantTable.readConfig
-	participantTable.readEntry = StormgateParticipantTable.readEntry
-	participantTable.adjustLpdbData = StormgateParticipantTable.adjustLpdbData
-	participantTable._displaySoloFactionTableSection = StormgateParticipantTable._displaySoloFactionTableSection
-	participantTable._displayHeader = StormgateParticipantTable._displayHeader
-	participantTable._getFactionNumbers = StormgateParticipantTable._getFactionNumbers
-	participantTable.setCustomPageVariables = StormgateParticipantTable.setCustomPageVariables
+	local participantTable = StormgateParticipantTable(frame)
 
 	participantTable:read():store()
 
