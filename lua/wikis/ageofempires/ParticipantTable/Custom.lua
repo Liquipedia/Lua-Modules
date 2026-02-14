@@ -29,10 +29,7 @@ local AoEParticipantTable = Class.new(ParticipantTable)
 ---@param frame Frame
 ---@return Html?
 function AoEParticipantTable.run(frame)
-	local participantTable = AoEParticipantTable(frame)
-	participantTable:read():store()
-
-	return participantTable:create()
+	return AoEParticipantTable(frame):read():store():create()
 end
 
 ---@param sectionArgs table
