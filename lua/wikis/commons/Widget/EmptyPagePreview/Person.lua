@@ -128,8 +128,7 @@ function EmptyPersonPagePreview:_results()
 			gameIcons = true,
 			awards = false,
 			achievements = true,
-			playerResultsOfTeam = false,
-			querytype = 'team',
+			querytype = 'solo',
 		})
 	}
 	local index = 2
