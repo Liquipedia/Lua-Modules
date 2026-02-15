@@ -7,13 +7,13 @@
 
 local Lua = require('Module:Lua')
 
-local Class = require('Module:Class')
+local Class = Lua.import('Module:Class')
 local Namespace = Lua.import('Module:Namespace')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local EmptyTeamPagePreview = Lua.import('Module:Widget/EmptyPagePreview/Team')
 local EmptyPersonPagePreview = Lua.import('Module:Widget/EmptyPagePreview/Person')
-local Widget = require('Module:Widget')
+local Widget = Lua.import('Module:Widget')
 
 ---@class EmptyPagePreview: Widget
 ---@operator call(table): EmptyPagePreview
