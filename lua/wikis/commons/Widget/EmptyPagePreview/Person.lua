@@ -11,12 +11,14 @@ local Array = Lua.import('Module:Array')
 local BroadcasterTable = Lua.import('Module:BroadcastTalentTable')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
 local Game = Lua.import('Module:Game')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Infobox = Lua.import('Module:Infobox/Person/Player/Custom')
 local Logic = Lua.import('Module:Logic')
 local MatchTable = Lua.import('Module:MatchTable/Custom')
 local Namespace = Lua.import('Module:Namespace')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local Page = Lua.import('Module:Page')
 local ResultsTable = Lua.import('Module:ResultsTable/Custom')
 local Table = Lua.import('Module:Table')
@@ -201,33 +203,32 @@ function EmptyPersonPagePreview:_backfillInformationFromPlacements()
 	end
 
 	---@param personData table<string, string>
-	---@return string?
-	local getPersonPrefix = function(personData)
+	---@return standardPlayer?
+	local getPerson = function(personData)
 		local index = 1
 		while personData['p' .. index] or personData['c' .. index] do
 			if personData['p' .. index] == self.person then
-				return 'p' .. index
+				return Opponent.playerFromLpdbStruct(personData, index)
 			end
 			if personData['c' .. index] == self.person then
-				return 'c' .. index
+				return Opponent.staffFromLpdbStruct(personData, index)
 			end
 			index = index + 1
 		end
 	end
 
 	Array.forEach(Array.reverse(placements), function(placement)
-		-- can not use Opponent.fromLpdbStruct because it only converts players not coaches
-		local prefix = getPersonPrefix(placement.opponentplayers)
-		if not prefix then
+		local person = getPerson(placement.opponentplayers)
+		if not person then
 			return
 		end
 
-		local id = Logic.nilIfEmpty(placement.opponentplayers[prefix .. 'dn'])
+		local id = Logic.nilIfEmpty(person.displayName)
 		table.insert(infoboxArgs.idsArray, id)
 		Table.mergeInto(infoboxArgs, {
 			id = id,
-			country = Logic.nilIfEmpty(placement.opponentplayers[prefix .. 'flag']),
-			faction = Logic.nilIfEmpty(placement.opponentplayers[prefix .. 'faction']),
+			country = person.flag,
+			faction = person.faction,
 		})
 	end)
 
