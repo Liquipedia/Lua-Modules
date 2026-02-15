@@ -93,7 +93,7 @@ end
 ---@return string?
 function EmptyPersonPagePreview:_getWiki()
 	if Logic.isNotEmpty(self.props.wiki) then
-	return self.props.wiki
+		return self.props.wiki
 	end
 	if Logic.isNotEmpty(self.props.game) then
 		return Game.toIdentifier{game = self.props.game} or self.props.game
