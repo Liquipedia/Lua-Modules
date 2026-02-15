@@ -140,8 +140,7 @@ function EmptyPersonPagePreview:_results()
 		gameIcons = true,
 		awards = true,
 		achievements = true,
-		playerResultsOfTeam = false,
-		querytype = 'team',
+		querytype = 'solo',
 	}
 	if Logic.isNotEmpty(awardsAchievements) then
 		tabArgs['name' .. index] = 'Awards Achievements'
