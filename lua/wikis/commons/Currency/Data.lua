@@ -780,6 +780,15 @@ return {
 			text = '₩',
 		},
 	},
+	syp = {
+		code = 'SYP',
+		name = 'Syrian pound',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'SP',
+		},
+	},
 	thb = {
 		code = 'THB',
 		name = 'Thai Baht',
