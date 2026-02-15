@@ -161,7 +161,7 @@ function EmptyPersonPagePreview:_results()
 
 	return {
 		HtmlWidgets.H3{children = 'Achievements'},
-		tostring(Tabs.dynamic(tabArgs))
+		Tabs.dynamic(tabArgs)
 	}
 end
 
