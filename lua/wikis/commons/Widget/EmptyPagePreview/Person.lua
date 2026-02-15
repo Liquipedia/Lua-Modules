@@ -149,8 +149,7 @@ function EmptyPersonPagePreview:_results()
 
 	local talentAchievements = BroadcasterTable.run{
 		broadcaster = self.person,
-		achievements = 1,
-		aboutAchievementsLink = 'Template:Broadcast talent achievements table/doc',
+		achievements = true,
 		useTickerNames = true,
 	}
 	if Logic.isNotEmpty(talentAchievements) then
