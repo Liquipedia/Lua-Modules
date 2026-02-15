@@ -55,7 +55,7 @@ end
 ---@param args table
 ---@return string
 function CustomPerson:nameDisplay(args)
-	local raceData = self:readFactions(args.race or Faction.defaultFaction)
+	local raceData = self:readFactions(args.race or args.faction or Faction.defaultFaction)
 
 	local raceIcons
 	if raceData.isAll then
@@ -109,7 +109,7 @@ end
 function CustomPerson:adjustLPDB(lpdbData, args, personType)
 	local extradata = lpdbData.extradata or {}
 
-	local raceData = self:readFactions(args.race)
+	local raceData = self:readFactions(args.race or args.faction)
 
 	extradata.race = raceData.isAll and RACE_ALL_SHORT or raceData.factions[1]
 	extradata.faction = raceData.isAll and RACE_ALL or raceData.factions[1]

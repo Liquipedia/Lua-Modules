@@ -45,7 +45,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Race',
-				children = {self.caller:getRaceData(args.race)}
+				children = {self.caller:getRaceData(args.race or args.faction)}
 			}
 		}
 	elseif id == 'role' then return {}
