@@ -86,7 +86,7 @@ function EmptyPersonPagePreview:_infobox()
 		return id ~= infoboxArgs.id
 	end)
 	infoboxArgs.ids = table.concat(infoboxArgs.idsArray, ', ')
-	infoboxArgs.id = infoboxArgs.id or self.person:gsub('_', ' ')
+	infoboxArgs.id = infoboxArgs.id or self.props.pageName
 
 	return Infobox.run(infoboxArgs)
 end
