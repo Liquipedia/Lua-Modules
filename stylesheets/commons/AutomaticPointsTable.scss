@@ -40,7 +40,7 @@ Author(s): XtratoS
 	white-space: nowrap;
 	margin-left: -5px;
 	padding-top: 6px;
-	background-color: #f5f5f5;
+	background-color: var( --table-header-variant-background-color );
 }
 
 .automatic-points-table .divCell.border-top-right {
