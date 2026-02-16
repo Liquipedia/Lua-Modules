@@ -53,7 +53,8 @@ function CustomMatchTicker.newMainPage(frame)
 	args.games = args['filterbuttons-game']
 
 	if args.type == 'upcoming' then
-		return CustomMatchTicker(Table.merge(args, {ongoing = true, upcoming = true})):query():create():addClass('new-match-style')
+		return CustomMatchTicker(Table.merge(args, {ongoing = true, upcoming = true}))
+			:query():create():addClass('new-match-style')
 	elseif args.type == 'recent' then
 		return CustomMatchTicker(Table.merge(args, {recent = true})):query():create():addClass('new-match-style')
 	end
