@@ -24,7 +24,7 @@ function CustomMatchTicker:expandGamesOfMatch(match)
 	if (match.match2bracketdata or {}).matchpage then
 		return {match}
 	end
-	return CustomMatchTicker.expandGamesOfMatch(self, match)
+	return MatchTicker.expandGamesOfMatch(self, match)
 end
 
 ---Entry point for display on the main page
