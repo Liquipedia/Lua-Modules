@@ -26,17 +26,20 @@
  * ```html
  * <span data-filter-group="group1" data-filter-category="cat1">cat1</span>
  * <span data-filter-group="group1" data-filter-category="cat2">cat2</span>
+ * <span data-filter-group="group1" data-filter-categories="cat1,cat2">cat1 and cat2</span>
  * ```
  *
  * - `data-filter-group` (encouraged): group identifier for which the button group can interact with the item.
  *     Note: See data-filter-group in Filter buttons above as to why it is encouraged to always provide.
- * - `data-filter-category` (required): identifier for 'data-filter-on'
+ * - `data-filter-category` (required†): single identifier for 'data-filter-on'
+ * - `data-filter-categories` (required†): comma-separated list of identifiers for 'data-filter-on'
+ *
+ * † either one of these are required, but not both, though both can be used and will be appended together.
  *
  * #### Replacement by template with filter options
  * ```html
  * <div data-filter-expansion-template="TemplateName" data-filter-groups="group1,group2">Default content</div>
  * ```
- *
  * - `data-filter-expansion-template` (required): The template to expand with the current filter options.
  *   Expanded template will replace default content.
  * - `data-filter-groups` (required): Identify which filter groups the template will receive current parameters from.
@@ -49,12 +52,34 @@
  * items. Optionally can also add an effect type as with items which will be used on the whole group as well. The groups
  * can also be nested, but, this will still check filterable items and not whether child groups themselves are hidden.
  * Can also add a fallback item as a direct child of the group using `data-filter-hideable-group-fallback`; this item
- * will instead be shown when the group is determined to be hidden instead of hiding the actual group element.
+ * will instead be shown when the group is determined to be hidden instead of hiding the actual group element. Finally,
+ * optionally, can set a custom class to use when the group is hidden with `data-filter-hidden-class`; defaults to class
+ * `filter-category--hidden-group` otherwise.
  * ```html
- * <div data-filter-hideable-group data-filter-effect="fade">
+ * <div data-filter-hideable-group data-filter-effect="fade" data-filter-hidden-class="filter-category--hidden-group">
  *   <span data-filter-group="group1" data-filter-category="cat1">cat1</span>
  *   <span data-filter-group="group1" data-filter-category="cat2">cat2</span>
  *   <span data-filter-hideable-group-fallback>DEFAULT CONTENT</span>
+ * </div>
+ * ```
+ *
+ * #### Filterable items counters
+ * Filterable items can be counted and the value updated in a separate counter location.
+ *
+ * Counting can be done using a hideable group where only top-level hidable items will be counted.
+ * ```html
+ * <span data-filter-counter="counter1">0</span>
+ * <div data-filter-hideable-group data-filter-effect="fade" data-filter-count="counter1">
+ *   <span data-filter-group="group1" data-filter-category="cat1">cat1</span>
+ *   <span data-filter-group="group1" data-filter-category="cat2">cat2</span>
+ * </div>
+ * ```
+ * Counting can also be done on a per-item level where any item is tied to a counter.
+ * ```html
+ * <span data-filter-counter="counter2">0</span>
+ * <div>
+ *   <span data-filter-group="group1" data-filter-category="cat1" data-filter-count="counter2">cat1</span>
+ *   <span data-filter-group="group1" data-filter-category="cat2" data-filter-count="counter2">cat2</span>
  * </div>
  * ```
  */
@@ -63,11 +88,13 @@ liquipedia.filterButtons = {
 	fallbackFilterEffect: 'none',
 	activeButtonClass: 'filter-button--active',
 	hiddenCategoryClass: 'filter-category--hidden',
+	hiddenGroupClass: 'filter-category--hidden-group',
 	fallbackFilterGroup: 'filter-group-fallback-common',
 
 	filterGroups: {},
 	templateExpansions: [],
 	hideableGroups: [],
+	filterCounters: {},
 
 	init: function() {
 		const filterButtonGroups = Array.from( document.querySelectorAll( '.filter-buttons[data-filter]' ) );
@@ -135,14 +162,32 @@ liquipedia.filterButtons = {
 	},
 
 	generateFilterableObjects: function() {
-		Array.from( document.querySelectorAll( '[data-filter-category]' ) ).forEach(
+		Array.from( document.querySelectorAll( '[data-filter-counter]' ) ).forEach(
+			/** @param {HTMLElement} filterCounter */
+			( filterCounter ) => {
+				const counterName = filterCounter.dataset.filterCounter;
+				const countableElements = document.querySelectorAll( '[data-filter-count="' + counterName + '"]' );
+				this.filterCounters[ counterName ] = {
+					element: filterCounter,
+					name: counterName,
+					count: countableElements.length
+				};
+			}
+		);
+
+		Array.from( document.querySelectorAll( '[data-filter-category], [data-filter-categories]' ) ).forEach(
 			/** @param {HTMLElement} filterableItem */
 			( filterableItem ) => {
 				const filterGroup = this.filterGroups[ filterableItem.dataset.filterGroup ?? this.fallbackFilterGroup ];
+				const filterCategories = filterableItem.dataset.filterCategories?.split( ',' ) ?? [];
+				if ( filterableItem.dataset.filterCategory ) {
+					filterCategories.push( filterableItem.dataset.filterCategory );
+				}
 				filterGroup.filterableItems.push( {
 					element: filterableItem,
-					value: filterableItem.dataset.filterCategory,
+					categories: filterCategories,
 					curated: filterableItem.dataset.curated !== undefined,
+					counter: filterableItem.dataset.filterCount,
 					hidden: false
 				} );
 			}
@@ -166,8 +211,10 @@ liquipedia.filterButtons = {
 			/** @param {HTMLElement} hideableGroup */
 			( hideableGroup ) => ( {
 				element: hideableGroup,
+				hiddenClass: hideableGroup.dataset.filterHiddenClass ?? this.hiddenGroupClass,
 				effectClass: 'filter-effect-' + ( hideableGroup.dataset.filterEffect ?? this.fallbackFilterEffect ),
-				fallbackItem: hideableGroup.querySelector( ':scope > [data-filter-hideable-group-fallback]' )
+				fallbackItem: hideableGroup.querySelector( ':scope > [data-filter-hideable-group-fallback]' ),
+				counter: hideableGroup.dataset.filterCount
 			} )
 		);
 	},
@@ -218,6 +265,10 @@ liquipedia.filterButtons = {
 	},
 
 	updateFromFilterStates: function() {
+		Object.values( this.filterCounters ).forEach( ( filterCounter ) => {
+			filterCounter.count = 0;
+		} );
+
 		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
 			let allState = true;
 
@@ -239,10 +290,13 @@ liquipedia.filterButtons = {
 			filterGroup.filterableItems.forEach( ( filterableItem ) => {
 				if ( filterGroup.curated ) {
 					filterableItem.hidden = !filterableItem.curated;
-				} else if ( filterableItem.value in filterGroup.filterStates ) {
-					filterableItem.hidden = !filterGroup.filterStates[ filterableItem.value ];
 				} else {
-					filterableItem.hidden = false;
+					filterableItem.hidden = !filterableItem.categories.every(
+						( category ) => filterGroup.filterStates[ category ]
+					);
+				}
+				if ( filterableItem.counter && !filterableItem.hidden ) {
+					this.filterCounters[ filterableItem.counter ].count += 1;
 				}
 			} );
 		} );
@@ -279,12 +333,19 @@ liquipedia.filterButtons = {
 			const filterableItems = this.getTopLevelFilterableItems( groupElement );
 			if ( !filterableItems.some( this.isFilterableVisible, this ) ) {
 				groupElement.classList.remove( hideableGroup.effectClass );
-				groupElement.classList.add( 'filter-category--hidden-group' );
+				groupElement.classList.add( hideableGroup.hiddenClass );
 				hideableGroup.fallbackItem?.classList.add( hideableGroup.effectClass );
 			} else {
-				groupElement.classList.replace( 'filter-category--hidden-group', hideableGroup.effectClass );
+				groupElement.classList.replace( hideableGroup.hiddenClass, hideableGroup.effectClass );
 				hideableGroup.fallbackItem?.classList.remove( hideableGroup.effectClass );
 			}
+			if ( hideableGroup.counter && !groupElement.classList.contains( hideableGroup.hiddenClass ) ) {
+				this.filterCounters[ hideableGroup.counter ].count += 1;
+			}
+		} );
+
+		Object.values( this.filterCounters ).forEach( ( filterCounter ) => {
+			filterCounter.element.innerHTML = filterCounter.count;
 		} );
 
 		this.templateExpansions.forEach( ( templateExpansion ) => {
@@ -377,7 +438,10 @@ liquipedia.filterButtons = {
 	getTopLevelFilterableItems: function ( element ) {
 		return Array.from(
 			element.querySelectorAll(
-				':scope [data-filter-category]:not(:scope [data-filter-category] [data-filter-category])'
+				':scope [data-filter-category]:not(:scope [data-filter-category] [data-filter-category])' +
+					':not(:scope [data-filter-categories] [data-filter-categories]),' +
+				':scope [data-filter-categories]:not(:scope [data-filter-category] [data-filter-category])' +
+					':not(:scope [data-filter-categories] [data-filter-categories])'
 			)
 		);
 	},
