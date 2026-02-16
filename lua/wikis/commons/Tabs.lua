@@ -206,10 +206,10 @@ function Tabs.dynamic(args)
 		children = HtmlWidgets.Div{
 			classes = {'tabs-dynamic', 'navigation-not-searchable', variantClass, wrapsClass},
 			attributes = {['data-nosnippet'] = ''},
-			children = {
+			children = WidgetUtil.collect(
 				navWrapper,
 				contents
-			}
+			)
 		}
 	}
 end
