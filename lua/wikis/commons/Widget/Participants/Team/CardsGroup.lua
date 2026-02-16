@@ -34,10 +34,16 @@ function ParticipantsTeamCardsGroup:render()
 
 	local participantGroups = Array.groupBy(participants, Operator.property('participantGroup'))
 
+	if #participantGroups > 1 and Array.any(participantGroups, function (participantGroup)
+		return Logic.isEmpty(participantGroup[1].participantGroup)
+	end) then
+		error('Participant group must be named')
+	end
+
 	local tabArgs = {}
 
 	Array.forEach(participantGroups, function (group, groupIndex)
-		tabArgs['name' .. groupIndex] = Logic.emptyOr(group[1].participantGroup, 'Unnamed')
+		tabArgs['name' .. groupIndex] = group[1].participantGroup
 		tabArgs['content' .. groupIndex] = ParticipantsTeamCardsGroup._createParticipantGroup(group)
 	end)
 	tabArgs.suppressHeader = true
