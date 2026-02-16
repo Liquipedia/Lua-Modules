@@ -281,7 +281,7 @@ local LAYOUT_MAIN = {
 
 local LAYOUT_ESPORTS = {
 	{ -- Left
-		size = 6,
+		sizes = {xxl = 5, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 1,
@@ -306,7 +306,7 @@ local LAYOUT_ESPORTS = {
 		}
 	},
 	{ -- Right
-		size = 6,
+		sizes = {xxl = 7, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 3,
@@ -355,7 +355,7 @@ local LAYOUT_ESPORTS = {
 
 local LAYOUT_GAME = {
 	{ -- Left
-		size = 6,
+		sizes = {xxl = 5, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 1,
@@ -372,7 +372,7 @@ local LAYOUT_GAME = {
 		},
 	},
 	{ -- Right
-		size = 6,
+		sizes = {xxl = 7, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 3,
