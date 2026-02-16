@@ -70,7 +70,7 @@ end
 ---Called from Template:InlinePlayer
 ---Only for non git usage!
 ---@param frame Frame
----@return Html
+---@return Widget
 function StarcraftPlayerDisplay.TemplateInlinePlayer(frame)
 	local args = Lua.import('Module:Arguments').getArgs(frame)
 

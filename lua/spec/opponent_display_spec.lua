@@ -1,10 +1,11 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('Opponent Display', function()
+	local Opponent = require('Module:Opponent')
 	local OpponentDisplay = require('Module:OpponentDisplay')
 
 	describe('Inline Opponent', function()
 		describe('Solo', function()
-			local opponent = {type = 'solo', players = {{displayName = 'test', pageName = 'link', flag = 'de'}}}
+			local opponent = Opponent.readOpponentArgs{type = 'solo', 'test', link = 'link', flag = 'de'}
 			it('default display', function()
 				assert.are_equal(
 					'<span><span class="inline-player" style="white-space:pre">'
