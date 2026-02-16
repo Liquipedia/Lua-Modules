@@ -17,6 +17,7 @@ local Game = Lua.import('Module:Game')
 local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
 local Links = Lua.import('Module:Links')
+local MatchTable = Lua.import('Module:MatchTable')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -340,7 +341,8 @@ function BaseMatchPage:render()
 			},
 			self:renderMapVeto(),
 			self:renderGames(),
-			self:footer()
+			self:footer(),
+			self:previousMatches()
 		)
 	}
 end
@@ -490,6 +492,94 @@ function BaseMatchPage:footer()
 				children = patchLink
 			} or nil
 		)
+	}
+end
+
+---@protected
+---@return Widget[]?
+function BaseMatchPage:previousMatches()
+	if Array.all(self.opponents, Opponent.isTbd) then
+		return
+	end
+
+	local headToHead = self:_buildHeadToHeadMatchTable()
+
+	return WidgetUtil.collect(
+		HtmlWidgets.H3{children = 'Match History'},
+		Div{
+			classes = {'match-bm-match-additional'},
+			children = WidgetUtil.collect(
+				headToHead and AdditionalSection{
+					css = {flex = '2 0 100%'},
+					header = 'Head to Head',
+					bodyClasses = {'match-table-wrapper'},
+					children = headToHead,
+				} or nil,
+				Array.map(self.opponents, function (opponent)
+					local matchTable = self:_buildMatchTable(opponent)
+					return AdditionalSection{
+						header = OpponentDisplay.InlineOpponent{opponent = opponent, teamStyle = 'hybrid'},
+						bodyClasses = matchTable and {'match-table-wrapper'} or nil,
+						children = matchTable or self:getTournamentIcon()
+					}
+				end)
+			)
+		}
+	)
+end
+
+---@private
+---@param opponent standardOpponent
+---@return boolean
+function BaseMatchPage._isTeamOpponent(opponent)
+	return not Opponent.isTbd(opponent) and opponent.type == Opponent.team
+end
+
+---@private
+---@param props table
+---@return Html
+function BaseMatchPage:_createMatchTable(props)
+	return MatchTable(Table.mergeInto({
+		addCategory = false,
+		edate = self.matchData.timestamp - DateExt.daysToSeconds(1) --[[ MatchTable adds 1-day offset to make edate
+																		inclusive, and we don't want that here ]],
+		limit = 5,
+		stats = false,
+		tableMode = Opponent.team,
+		vod = false,
+		matchPageButtonText = 'short',
+	}, props)):readConfig():query():buildDisplay()
+end
+
+---@private
+---@param opponent standardOpponent
+---@return Html?
+function BaseMatchPage:_buildMatchTable(opponent)
+	if not BaseMatchPage._isTeamOpponent(opponent) then
+		return
+	end
+	return self:_createMatchTable{
+		['hide_tier'] = true,
+		limit = 5,
+		stats = false,
+		tableMode = Opponent.team,
+		team = opponent.name,
+		useTickerName = true,
+	}
+end
+
+---@private
+---@return Html?
+function BaseMatchPage:_buildHeadToHeadMatchTable()
+	if not Array.all(self.opponents, BaseMatchPage._isTeamOpponent) then
+		return
+	end
+	return self:_createMatchTable{
+		team = self.opponents[1].name,
+		vsteam = self.opponents[2].name,
+		showOpponent = true,
+		teamStyle = 'hybrid',
+		useTickerName = true,
 	}
 end
 
