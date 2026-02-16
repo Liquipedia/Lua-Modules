@@ -38,8 +38,6 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local EPT_SEASON = Lua.import('Module:Series/EPT/config', {loadData = true}).currentSeason
-
 local ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
 local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = Info.config.defaultMaxPlayersPerPlacement
@@ -95,7 +93,6 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'custom' then
-		local ranks = caller:_getRank()
 		local currentYearEarnings = caller.earningsPerYear[CURRENT_YEAR] or 0
 
 		return {
@@ -103,8 +100,6 @@ function CustomInjector:parse(id, widgets)
 				name = 'Approx. Winnings ' .. CURRENT_YEAR,
 				children = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
 			},
-			Cell{name = ranks[1].name or 'Rank', children = {ranks[1].rank}},
-			Cell{name = ranks[2].name or 'Rank', children = {ranks[2].rank}},
 			Cell{name = 'Military Service', children = {args.military}},
 			Cell{
 				name = Abbreviation.make{text = 'Years Active', title = 'Years active as a player'},
@@ -447,42 +442,6 @@ function CustomPlayer:_isAchievement(placement, tier, place)
 			tier == 3 and place <= 2 or
 			tier == 4 and place <= 1
 		)
-end
-
----@return {name:string?, rank: string?}[]
-function CustomPlayer:_getRank()
-	if not self.shouldQueryData then return {{}, {}} end
-
-	local rankRegion = Lua.import('Module:EPT player region ' .. EPT_SEASON)[self.pagename]
-		or {'noregion'}
-	local typeCond = '([[type::EPT ' ..
-		table.concat(rankRegion, ' ranking ' .. EPT_SEASON .. ']] OR [[type::EPT ')
-		.. ' ranking ' .. EPT_SEASON .. ']])'
-
-	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = '[[name::' .. self.pagename .. ']] AND ' .. typeCond,
-		query = 'extradata, information, pagename',
-		limit = 10
-	})
-
-	if type(data[1]) ~= 'table' then return {{}, {}} end
-
-	---@param dataSet datapoint
-	---@return {name:string?, rank: string?}
-	local getRankDisplay = function(dataSet)
-		local extradata = (dataSet or {}).extradata or {}
-		if not extradata.rank then return {} end
-
-		return {
-			name = 'EPT ' .. (dataSet.information or '') .. ' rank',
-			rank = '[[' .. dataSet.pagename .. '|#' .. extradata.rank .. ' (' .. extradata.points .. ' points)]]'
-		}
-	end
-
-	return {
-		getRankDisplay(data[1]),
-		getRankDisplay(data[2]),
-	}
 end
 
 ---@return number?
