@@ -10,10 +10,8 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Game = Lua.import('Module:Game')
 local Class = Lua.import('Module:Class')
-local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
-local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
@@ -23,8 +21,6 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 local Chronology = Widgets.Chronology
-
-local DEFAULT_MODE = 'solo'
 
 ---@class TrackmaniaLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -47,13 +43,7 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
-	if id == 'sponsors' then
-		local partners = self.caller:getAllArgsForBase(args, 'partner')
-		table.insert(widgets, Cell{
-			name = 'Partner' .. (#partners > 1 and 's' or ''),
-			children = Array.map(partners, Page.makeInternalLink)
-		})
-	elseif id == 'gamesettings' then
+	if id == 'gamesettings' then
 		local games = self.caller:getAllArgsForBase(args, 'game')
 		table.insert(widgets, Cell{
 			name = 'Game' .. (#games > 1 and 's' or ''),
@@ -94,29 +84,10 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.mode = Logic.emptyOr(
-		args.mode,
-		(String.isNotEmpty(args.team_number) and 'team' or nil),
-		DEFAULT_MODE
-	)
 	self.data.publishertier = self.data.publishertier or Array.any(self:getAllArgsForBase(args, 'organizer'),
 		function(organizer)
 			return organizer:find('Nadeo', 1, true) or organizer:find('Ubisoft', 1, true)
 		end)
-end
-
----@param args table
-function CustomLeague:defineCustomPageVariables(args)
-	-- legacy variables, to be removed
-	Variables.varDefine('tournament_tier', self.data.liquipediatier)
-	Variables.varDefine('tournament_tier_type', self.data.liquipediatiertype)
-
-	Variables.varDefine('tournament_sdate', self.data.startDate)
-	Variables.varDefine('tournament_edate', self.data.endDate)
-	Variables.varDefine('tournament_date', self.data.endDate)
-	Variables.varDefine('date', self.data.endDate)
-	Variables.varDefine('sdate', self.data.startDate)
-	Variables.varDefine('edate', self.data.endDate)
 end
 
 ---@param args table
@@ -135,17 +106,10 @@ end
 ---@param args table
 ---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
-	if String.isEmpty(args.tickername) then
-		lpdbData.tickername = args.name
-	end
-
 	lpdbData.maps = table.concat(self:getAllArgsForBase(args, 'map'), ';')
 
 	lpdbData.extradata.circuit = args.circuit
 	lpdbData.extradata.circuittier = args.circuittier
-
-	-- Legacy, can be superseeded by lpdbData.mode
-	lpdbData.extradata.individual = self.data.mode == DEFAULT_MODE
 
 	return lpdbData
 end
