@@ -13,6 +13,7 @@ local inGameRoles = {
 	['side lane'] = {category = 'Side Laners', display = 'Side Laner', sortOrder = 2},
 	['jungler'] = {category = 'Junglers', display = 'Jungler', sortOrder = 3},
 	['roamer'] = {category = 'Roamers', display = 'Roamer', sortOrder = 6},
+	['flex'] = {category = 'Flex', display = 'Flex', sortOrder = 7},
 }
 
 inGameRoles['jgl'] = inGameRoles.jungler
@@ -33,5 +34,7 @@ inGameRoles['ds lane'] = inGameRoles.top
 inGameRoles['dsl'] = inGameRoles.top
 inGameRoles['dark slayer lane'] = inGameRoles.top
 inGameRoles['confront'] = inGameRoles.top
+inGameRoles['clash'] = inGameRoles.top
+inGameRoles['fill'] = inGameRoles.flex
 
 return inGameRoles
