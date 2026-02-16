@@ -21,7 +21,7 @@ local CONTENT = {
 		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP,
 	},
 	specialEvents = {
-		heading = 'Feature Event',
+		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
 		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
 	},
