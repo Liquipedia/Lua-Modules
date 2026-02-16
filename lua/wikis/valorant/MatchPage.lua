@@ -57,6 +57,10 @@ local WIN_TYPES = {
 	['time'] = {
 		icon = 'outoftime',
 		description = 'Timer expired',
+	},
+	surrendered = {
+		icon = 'surrendered',
+		description = 'Surrendered'
 	}
 }
 
