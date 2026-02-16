@@ -46,7 +46,6 @@ local PERSON_TYPE_TO_TAB = {
 	staff = TAB_ENUM.STAFF,
 }
 
-
 -- The biz logic behind the role display is somewhat complicated.
 -- There's 2 areas we show the role, left-role and right-role
 -- * Right-role:
@@ -150,7 +149,12 @@ function ParticipantsTeamRoster:render()
 	tabs = Array.filter(tabs, function(tab)
 		return #tab.players > 0
 	end)
-	if #tabs == 2 and tabs[1].type == TAB_ENUM.MAIN and tabs[2].type == TAB_ENUM.STAFF and #tabs[2].players == 1 then
+	if self.props.mergeStaffTabIfOnlyOneStaff
+		and #tabs == 2
+		and tabs[1].type == TAB_ENUM.MAIN
+		and tabs[2].type == TAB_ENUM.STAFF
+		and #tabs[2].players == 1
+	then
 		-- If we only have main and staff, and exactly one staff, just show both rosters without a switch
 		return makeRostersDisplay(Array.extend(tabs[1].players, tabs[2].players))
 	end
