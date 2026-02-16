@@ -486,7 +486,7 @@ function MatchPage:_renderRoundDetail(findPlayer, round, roundIndex)
 				children = {
 					Div{
 						classes = {'match-bm-match-round-detail-body-result'},
-						children = {
+						children = WidgetUtil.collect(
 							MatchPage._renderRoundOutcomeIcon(round.winningSide, round.winBy),
 							Span{
 								classes = {'match-bm-match-round-detail-body-result-desc'},
@@ -499,7 +499,7 @@ function MatchPage:_renderRoundDetail(findPlayer, round, roundIndex)
 									HtmlWidgets.B{children = 'Winner'},
 								}
 							}
-						}
+						)
 					},
 					HtmlWidgets.Hr{},
 					Span{children = {
