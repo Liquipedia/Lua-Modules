@@ -71,7 +71,8 @@ function CustomInjector:parse(id, widgets)
 		Cell{name = 'Teams', children = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
 		Cell{name = 'Game', children = {Game.name{game = args.game}}},
 		Cell{name = 'Platform', children = {caller:_createPlatformCell(args)}},
-		Cell{name = 'Players', children = {args.player_number}}
+		Cell{name = 'Players', children = {args.player_number}},
+		Cell{name = 'Mode', children = {args.mode or '5v5'}}
 	)
 	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.map1) then
