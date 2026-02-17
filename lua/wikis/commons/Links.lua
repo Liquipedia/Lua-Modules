@@ -198,6 +198,11 @@ local PREFIXES = {
 	},
 	loco = {'https://loco.gg/streamers/'},
 	lolchess = {'https://lolchess.gg/profile/'},
+	loltv = {
+		team = 'https://loltv.gg/team/',
+		player = 'https://loltv.gg/player/',
+		match = 'https://loltv.gg/match/',
+	},
 	lrthread = {'', match = ''},
 	mapdraft = {match = 'https://aoe2cm.net/draft/'},
 	matcherino = {
@@ -530,6 +535,10 @@ local MATCH_ICONS = {
 	logstfgold = {
 		icon = 'Logstf_gold_icon.png',
 		text = 'logs.tf Match Page (Golden Cap) '
+	},
+	loltv = {
+		icon = 'LOLTV.gg allmode.png',
+		text = 'LOLTV.gg Match Stats'
 	},
 	lpl = {
 		icon = 'LPL_Logo_lightmode.png',
