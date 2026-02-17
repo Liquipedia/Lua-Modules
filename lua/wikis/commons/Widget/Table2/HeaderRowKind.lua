@@ -10,15 +10,8 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local WidgetContext = Lua.import('Module:Widget/Context')
 
----@alias Table2HeaderRowKindName 'title'|'columns'
-
 ---@class Table2HeaderRowKind: WidgetContext
 ---@operator call(table): Table2HeaderRowKind
 local Table2HeaderRowKind = Class.new(WidgetContext)
-
----@return Table2HeaderRowKindName
-function Table2HeaderRowKind:getValue()
-	return self.props.value
-end
 
 return Table2HeaderRowKind
