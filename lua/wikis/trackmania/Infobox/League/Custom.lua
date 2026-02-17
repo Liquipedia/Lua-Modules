@@ -57,15 +57,15 @@ function CustomInjector:parse(id, widgets)
 					end)
 		})
 	elseif id == 'customcontent' then
-		table.insert(widgets, Title{children = String.isNotEmpty(args.team_number) and 'Teams' or 'Players'})
-		table.insert(widgets, Cell{
-			name = 'Number of Teams',
-			children = {args.team_number}
-		})
-		table.insert(widgets, Cell{
-			name = 'Number of Players',
-			children = {args.player_number}
-		})
+		if args.player_number then
+			table.insert(widgets, Title{children = 'Players'})
+			table.insert(widgets, Cell{name = 'Number of Players', children = {args.player_number}})
+		end
+
+		if args.team_number then
+			table.insert(widgets, Title{children = 'Teams'})
+			table.insert(widgets, Cell{name = 'Number of Teams', children = {args.team_number}})
+		end
 
 		local maps = self.caller:getAllArgsForBase(args, 'map')
 		if #maps > 0 then
