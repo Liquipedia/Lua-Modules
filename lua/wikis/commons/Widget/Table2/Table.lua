@@ -14,7 +14,7 @@ local Logic = Lua.import('Module:Logic')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Table2ColumnContext = Lua.import('Module:Widget/Table2/ColumnContext')
+local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 
 ---@class Table2ColumnDef
 ---@field align 'left'|'right'|'center'?
@@ -84,8 +84,8 @@ function Table2:render()
 
 	local tableChildren = props.children
 	if props.columns and #props.columns > 0 then
-		tableChildren = {Table2ColumnContext{
-			columns = props.columns,
+		tableChildren = {Table2Contexts.ColumnContext{
+			value = props.columns,
 			children = props.children,
 		}}
 	end

@@ -11,7 +11,7 @@ local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Table2ColumnContext = Lua.import('Module:Widget/Table2/ColumnContext')
+local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
 ---@class Table2CellProps
@@ -38,7 +38,7 @@ local Table2Cell = Class.new(Widget)
 function Table2Cell:render()
 	local props = self.props
 
-	local columns = self:useContext(Table2ColumnContext)
+	local columns = self:useContext(Table2Contexts.ColumnContext)
 
 	-- Skip context lookups and property merging if there are no column definitions
 	if not columns then

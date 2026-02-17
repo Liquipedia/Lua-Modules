@@ -12,6 +12,7 @@ local Context = Lua.import('Module:Widget/Context')
 
 return {
 	BodyStripe = Class.new(Context),
+	ColumnContext = Class.new(Context),
 	HeaderRowKind = Class.new(Context),
 	Section = Class.new(Context),
 }
