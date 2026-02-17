@@ -131,7 +131,7 @@ $table2-cell-padding-x: 0.75rem;
 	}
 
 	&__title {
-		padding: 0.5rem 0.75rem;
+		padding: $table2-cell-padding-y $table2-cell-padding-x;
 		font-weight: bold;
 		border-bottom: 1px solid;
 
