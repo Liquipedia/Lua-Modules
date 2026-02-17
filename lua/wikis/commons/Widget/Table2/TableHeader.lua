@@ -12,8 +12,7 @@ local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
 local Table2Row = Lua.import('Module:Widget/Table2/Row')
-local Table2Section = Lua.import('Module:Widget/Table2/Section')
-local Table2HeaderRowKind = Lua.import('Module:Widget/Table2/HeaderRowKind')
+local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 
 ---@class Table2HeaderProps
 ---@field children (Widget|Html|string|number|nil)[]?
@@ -31,7 +30,7 @@ function Table2Header:render()
 		if Class.instanceOf(child, Table2Row) then
 			rowCount = rowCount + 1
 			local kind = rowCount == 1 and 'title' or 'columns'
-			child = Table2HeaderRowKind{
+			child = Table2Contexts.HeaderRowKind{
 				value = kind,
 				children = {child},
 			}
@@ -39,7 +38,7 @@ function Table2Header:render()
 		return child
 	end)
 
-	return Table2Section{
+	return Table2Contexts.Section{
 		value = 'head',
 		children = children,
 	}

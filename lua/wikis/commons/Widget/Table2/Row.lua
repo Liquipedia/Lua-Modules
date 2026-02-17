@@ -13,9 +13,7 @@ local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 
 local Widget = Lua.import('Module:Widget')
-local Table2Section = Lua.import('Module:Widget/Table2/Section')
-local Table2HeaderRowKind = Lua.import('Module:Widget/Table2/HeaderRowKind')
-local Table2BodyStripe = Lua.import('Module:Widget/Table2/BodyStripe')
+local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 local Table2Cell = Lua.import('Module:Widget/Table2/Cell')
 local Table2CellHeader = Lua.import('Module:Widget/Table2/CellHeader')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -36,9 +34,9 @@ local Table2Row = Class.new(Widget)
 ---@return Widget
 function Table2Row:render()
 	local props = self.props
-	local section = self:useContext(Table2Section)
-	local headerRowKind = self:useContext(Table2HeaderRowKind)
-	local bodyStripe = self:useContext(Table2BodyStripe)
+	local section = self:useContext(Table2Contexts.Section)
+	local headerRowKind = self:useContext(Table2Contexts.HeaderRowKind)
+	local bodyStripe = self:useContext(Table2Contexts.BodyStripe)
 
 	local sectionClass = 'table2__row--body'
 	if section == 'head' then

@@ -12,11 +12,10 @@ local Class = Lua.import('Module:Class')
 local MathUtil = Lua.import('Module:MathUtil')
 
 local Widget = Lua.import('Module:Widget')
-local Table2BodyStripe = Lua.import('Module:Widget/Table2/BodyStripe')
+local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 local Table2Cell = Lua.import('Module:Widget/Table2/Cell')
 local Table2CellHeader = Lua.import('Module:Widget/Table2/CellHeader')
 local Table2Row = Lua.import('Module:Widget/Table2/Row')
-local Table2Section = Lua.import('Module:Widget/Table2/Section')
 
 ---@class Table2BodyProps
 ---@field children (Widget|Html|string|number|nil)[]?
@@ -70,7 +69,7 @@ function Table2Body:render()
 			local maxRowspan = getRowMaxRowspan(child)
 			groupRemaining = math.max(groupRemaining, maxRowspan)
 
-			table.insert(stripedChildren, Table2BodyStripe{
+			table.insert(stripedChildren, Table2Contexts.BodyStripe{
 				value = stripe,
 				children = {child},
 			})
@@ -81,7 +80,7 @@ function Table2Body:render()
 		end
 	end)
 
-	return Table2Section{
+	return Table2Contexts.Section{
 		value = 'body',
 		children = stripedChildren,
 	}
