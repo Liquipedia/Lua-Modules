@@ -42,6 +42,8 @@ local function createHtmlTag(tag, specialMapping)
 		htmlNode:attr(self.props.attributes)
 
 		Array.forEach(self.props.children, function(child)
+			-- This is largely duplicated code from Widget.lua
+			-- In the future we should investigate how to refactor this
 			if Class.instanceOf(child, WidgetContext) then
 				---@cast child WidgetContext
 				child.contextStack = self:_pushToContextList(self.contextStack, child)
