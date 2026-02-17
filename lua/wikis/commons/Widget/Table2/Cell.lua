@@ -38,10 +38,10 @@ local Table2Cell = Class.new(Widget)
 function Table2Cell:render()
 	local props = self.props
 
-	local columnContext = self:useContext(Table2ColumnContext)
+	local columns = self:useContext(Table2ColumnContext)
 
 	-- Skip context lookups and property merging if there are no column definitions
-	if not columnContext or not columnContext.columns then
+	if not columns then
 		return HtmlWidgets.Td{
 			attributes = props.attributes,
 			children = props.children,
@@ -51,8 +51,8 @@ function Table2Cell:render()
 	local columnDef
 	local columnIndex = ColumnUtil.getColumnIndex(props.columnIndex, nil)
 
-	if columnContext.columns[columnIndex] then
-		columnDef = columnContext.columns[columnIndex]
+	if columns[columnIndex] then
+		columnDef = columns[columnIndex]
 	end
 
 	local mergedProps = ColumnUtil.mergeProps(props, columnDef)
