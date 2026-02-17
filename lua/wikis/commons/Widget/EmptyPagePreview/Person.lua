@@ -73,7 +73,6 @@ function EmptyPersonPagePreview:_infobox()
 
 	local infoboxArgs = Table.merge(
 		{
-			wiki = self:_getWiki(),
 			default = 'Infobox player NoImage.png',
 			defaultDark = 'Infobox player NoImage darkmode.png',
 		},
@@ -89,16 +88,6 @@ function EmptyPersonPagePreview:_infobox()
 	infoboxArgs.id = infoboxArgs.id or self.props.pageName
 
 	return Infobox.run(infoboxArgs)
-end
-
----@return string?
-function EmptyPersonPagePreview:_getWiki()
-	if Logic.isNotEmpty(self.props.wiki) then
-		return self.props.wiki
-	end
-	if Logic.isNotEmpty(self.props.game) then
-		return Game.toIdentifier{game = self.props.game} or self.props.game
-	end
 end
 
 ---@private
