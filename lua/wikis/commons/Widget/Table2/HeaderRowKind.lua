@@ -18,7 +18,7 @@ local Table2HeaderRowKind = Class.new(WidgetContext)
 
 ---@return Table2HeaderRowKindName
 function Table2HeaderRowKind:getValue()
-	return assert(self.props.value, 'Table2HeaderRowKind: expected value')
+	return self.props.value
 end
 
 return Table2HeaderRowKind

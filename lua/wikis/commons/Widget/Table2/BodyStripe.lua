@@ -16,9 +16,9 @@ local WidgetContext = Lua.import('Module:Widget/Context')
 ---@operator call(table): Table2BodyStripe
 local Table2BodyStripe = Class.new(WidgetContext)
 
----@return Table2BodyStripeName|any
+---@return Table2BodyStripeName
 function Table2BodyStripe:getValue()
-	return assert(self.props.value, 'Table2BodyStripe: expected value')
+	return self.props.value
 end
 
 return Table2BodyStripe
