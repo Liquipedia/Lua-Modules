@@ -54,9 +54,55 @@ $table2-cell-padding-x: 0.75rem;
 		border-spacing: 0;
 		border-collapse: separate;
 		border: 0;
+
+		td,
+		th {
+			padding: $table2-cell-padding-y $table2-cell-padding-x;
+			vertical-align: middle;
+			text-align: left;
+
+			&[ data-align="right" ] {
+				text-align: right;
+			}
+
+			&[ data-align="center" ] {
+				text-align: center;
+			}
+
+			&[ data-nowrap ] {
+				white-space: nowrap;
+			}
+
+			&[ data-shrink ] {
+				width: fit-content;
+				white-space: nowrap;
+			}
+		}
+
+		thead tr,
+		tr:has( th ):not( :has( td ) ) {
+			outline: 1px solid;
+			white-space: nowrap;
+
+			.theme--light & {
+				background-color: var( --clr-on-surface-light-primary-4 );
+				outline-color: var( --clr-on-surface-light-primary-12 );
+				color: var( --clr-secondary-25 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+				outline-color: var( --clr-on-surface-dark-primary-12 );
+				color: var( --clr-secondary-80 );
+			}
+
+			th {
+				font-weight: bold;
+			}
+		}
 	}
 
-	&__row--body.table2__row--even {
+	tr.table2__row--body.table2__row--even {
 		.theme--light & {
 			background-color: var( --clr-on-surface-light-primary-4 );
 		}
@@ -66,11 +112,11 @@ $table2-cell-padding-x: 0.75rem;
 		}
 	}
 
-	&__row--body.table2__row--highlighted {
+	tr.table2__row--body.table2__row--highlighted {
 		background-color: var( --publisher-premier-highlight-background-color ) !important;
 	}
 
-	&__row--body:hover {
+	tr.table2__row--body:hover {
 		.theme--light & {
 			background-color: var( --clr-on-surface-light-primary-8 );
 		}
@@ -80,12 +126,11 @@ $table2-cell-padding-x: 0.75rem;
 		}
 	}
 
-	&__row--body.table2__row--highlighted:hover {
+	tr.table2__row--body.table2__row--highlighted:hover {
 		background-color: var( --publisher-premier-highlight-background-color ) !important;
 	}
 
-	&__title,
-	&__table caption {
+	&__title {
 		padding: 0.5rem 0.75rem;
 		font-weight: bold;
 		border-bottom: 1px solid;
@@ -116,7 +161,7 @@ $table2-cell-padding-x: 0.75rem;
 		}
 	}
 
-	&__row--head {
+	tr.table2__row--head {
 		outline: 1px solid;
 		white-space: nowrap;
 
@@ -132,53 +177,8 @@ $table2-cell-padding-x: 0.75rem;
 			color: var( --clr-secondary-80 );
 		}
 
-		.table2__cell {
+		th {
 			font-weight: bold;
-		}
-	}
-
-	&__row--head-columns {
-		.table2__cell {
-			.theme--light & {
-				background-color: var( --clr-surface-5, #ffffff );
-			}
-
-			.theme--dark & {
-				background-color: var( --clr-on-surface-dark-primary-4 );
-			}
-		}
-	}
-
-	&__cell {
-		padding: $table2-cell-padding-y $table2-cell-padding-x;
-		vertical-align: middle;
-
-		&--left {
-			text-align: left;
-		}
-
-		&--right {
-			text-align: right;
-		}
-
-		&--center {
-			text-align: center;
-		}
-
-		&--nowrap {
-			white-space: nowrap;
-		}
-
-		&--shrink {
-			width: fit-content;
-			white-space: nowrap;
-		}
-	}
-
-	&__row--foot {
-		.table2__cell {
-			text-align: center;
-			border-bottom: 0;
 		}
 	}
 
@@ -192,6 +192,36 @@ $table2-cell-padding-x: 0.75rem;
 				background-color: var( --clr-wiki-theme-20, var( --clr-wiki-theme-primary, #1f3d7a ) );
 			}
 			color: #ffffff;
+		}
+	}
+}
+
+// Standalone table2__table for MediaWiki usage (without .table2 wrapper)
+.table2__table:not( .table2 .table2__table ) {
+	width: auto;
+	border: 1px solid;
+	border-radius: $table2-radius;
+	overflow: hidden;
+
+	@include table2-surface-colors();
+
+	tbody tr:not( :has( th ):not( :has( td ) ) ):nth-child( odd ) {
+		.theme--light & {
+			background-color: var( --clr-on-surface-light-primary-4 );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+		}
+	}
+
+	tbody tr:not( :has( th ):not( :has( td ) ) ):hover {
+		.theme--light & {
+			background-color: var( --clr-on-surface-light-primary-8 );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-8 );
 		}
 	}
 }

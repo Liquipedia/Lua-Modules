@@ -91,7 +91,7 @@ function Table2Row:render()
 	end)
 
 	return HtmlWidgets.Tr{
-		classes = WidgetUtil.collect('table2__row', sectionClass, kindClass, stripeClass, highlightClass, props.classes),
+		classes = WidgetUtil.collect(sectionClass, kindClass, stripeClass, highlightClass, props.classes),
 		css = props.css,
 		attributes = props.attributes,
 		children = indexedChildren,

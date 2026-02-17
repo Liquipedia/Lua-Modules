@@ -11,7 +11,6 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Table2ColumnContext = Lua.import('Module:Widget/Table2/ColumnContext')
 local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
@@ -46,14 +45,13 @@ function Table2CellHeader:render()
 
 	-- Skip context lookups and property merging if there are no column definitions
 	if not columnContext or not columnContext.columns then
-		local classes = {'table2__cell--left'}
+		local attributes = props.attributes or {}
 		if Logic.readBool(props.unsortable) then
-			classes = WidgetUtil.collect(classes, 'unsortable')
+			attributes.class = 'unsortable'
 		end
 
 		return HtmlWidgets.Th{
-			classes = WidgetUtil.collect('table2__cell', classes),
-			attributes = props.attributes,
+			attributes = attributes,
 			children = props.children,
 		}
 	end
@@ -67,11 +65,6 @@ function Table2CellHeader:render()
 
 	local mergedProps = ColumnUtil.mergeProps(props, columnDef)
 
-	local classes = mergedProps.classes
-	if Logic.readBool(mergedProps.unsortable) then
-		classes = WidgetUtil.collect(classes, 'unsortable')
-	end
-
 	local attributes = ColumnUtil.buildAttributes(mergedProps, {
 		sortType = function(attrs, cellProps)
 			if cellProps.sortType then
@@ -80,17 +73,21 @@ function Table2CellHeader:render()
 		end,
 	})
 
+	if Logic.readBool(mergedProps.unsortable) then
+		attributes.class = 'unsortable'
+	end
+
 	local css = ColumnUtil.buildCss(mergedProps.width, mergedProps.minWidth, mergedProps.maxWidth, mergedProps.css)
 
-	local headerClasses = ColumnUtil.buildClasses(
+	attributes = ColumnUtil.buildCellAttributes(
 		mergedProps.align,
 		mergedProps.nowrap,
 		mergedProps.shrink,
-		classes
+		attributes
 	)
 
 	return HtmlWidgets.Th{
-		classes = WidgetUtil.collect('table2__cell', headerClasses),
+		classes = mergedProps.classes,
 		css = css,
 		attributes = attributes,
 		children = mergedProps.children,

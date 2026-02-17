@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Table2ColumnContext = Lua.import('Module:Widget/Table2/ColumnContext')
 local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
@@ -44,7 +43,6 @@ function Table2Cell:render()
 	-- Skip context lookups and property merging if there are no column definitions
 	if not columnContext or not columnContext.columns then
 		return HtmlWidgets.Td{
-			classes = WidgetUtil.collect('table2__cell', 'table2__cell--left'),
 			attributes = props.attributes,
 			children = props.children,
 		}
@@ -59,19 +57,17 @@ function Table2Cell:render()
 
 	local mergedProps = ColumnUtil.mergeProps(props, columnDef)
 
-	local attributes = ColumnUtil.buildAttributes(mergedProps)
-
 	local css = ColumnUtil.buildCss(mergedProps.width, mergedProps.minWidth, mergedProps.maxWidth, mergedProps.css)
 
-	local classes = ColumnUtil.buildClasses(
+	local attributes = ColumnUtil.buildCellAttributes(
 		mergedProps.align,
 		mergedProps.nowrap,
 		mergedProps.shrink,
-		mergedProps.classes
+		ColumnUtil.buildAttributes(mergedProps)
 	)
 
 	return HtmlWidgets.Td{
-		classes = WidgetUtil.collect('table2__cell', classes),
+		classes = mergedProps.classes,
 		css = css,
 		attributes = attributes,
 		children = mergedProps.children,

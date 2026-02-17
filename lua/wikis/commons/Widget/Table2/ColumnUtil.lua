@@ -99,42 +99,28 @@ function ColumnUtil.buildCss(width, minWidth, maxWidth, existingCss)
 	})
 end
 
----Builds CSS classes for column styling
+---Builds data attributes for cell styling (align, nowrap, shrink)
 ---@param align string?
 ---@param nowrap (string|number|boolean)?
 ---@param shrink (string|number|boolean)?
----@param existingClasses string[]?
----@return string[] classes
-function ColumnUtil.buildClasses(align, nowrap, shrink, existingClasses)
-	local alignClass = 'table2__cell--left'
-	if align == 'right' then
-		alignClass = 'table2__cell--right'
-	elseif align == 'center' then
-		alignClass = 'table2__cell--center'
+---@param existingAttributes table?
+---@return table attributes
+function ColumnUtil.buildCellAttributes(align, nowrap, shrink, existingAttributes)
+	local attrs = existingAttributes or {}
+
+	if align == 'right' or align == 'center' then
+		attrs['data-align'] = align
 	end
 
-	local hasNowrap = Logic.readBool(nowrap)
-	local hasShrink = Logic.readBool(shrink)
-
-	if not hasNowrap and not hasShrink and not existingClasses then
-		return {alignClass}
+	if Logic.readBool(nowrap) then
+		attrs['data-nowrap'] = ''
 	end
 
-	local classes = {alignClass}
-
-	if hasNowrap then
-		Array.appendWith(classes, 'table2__cell--nowrap')
+	if Logic.readBool(shrink) then
+		attrs['data-shrink'] = ''
 	end
 
-	if hasShrink then
-		Array.appendWith(classes, 'table2__cell--shrink')
-	end
-
-	if existingClasses then
-		Array.extendWith(classes, existingClasses)
-	end
-
-	return classes
+	return attrs
 end
 
 ---Builds HTML attributes for cells and headers
