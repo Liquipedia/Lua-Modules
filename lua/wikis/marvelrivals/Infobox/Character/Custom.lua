@@ -94,28 +94,15 @@ end
 ---@param roleInput string?
 ---@return Widget?
 function CustomHero:_getRole(roleInput)
-    if type(roleInput) ~= 'string' then
-        return nil
-    end
-
-    local roleNames = mw.text.split(roleInput, ',%s*')
-    local children = {}
-
-    for _, name in ipairs(roleNames) do
-        local widget = ROLE_LOOKUP[name:lower()]
-        if widget then
-            if #children > 0 then
-                table.insert(children, '<br>') 
-            end
-            table.insert(children, widget)
-        end
-    end
-
-    if #children > 0 then
-        return HtmlWidgets.Fragment{children = children}
-    end
-
-    return nil
+	if type(roleInput) ~= 'string' then
+		return nil
+	end
+	
+	local roles = Array.map(Array.parseCommaSeparatedString(roleInput), function(role)
+		return ROLE_LOOKUP[role:lower()]
+	end)
+	
+	return Array.interleave(roles, HtmlWidgets.Br{})
 end
 
 ---@param args table
