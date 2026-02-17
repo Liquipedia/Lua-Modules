@@ -123,8 +123,8 @@ end
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		isfeatured = MatchFunctions.isFeatured(opponents, tonumber(match.liquipediatier)),
-		hasopponent1 = not Opponent.isTbd(Opponent.fromMatch2Record(opponents[1])),
-		hasopponent2 = not Opponent.isTbd(Opponent.fromMatch2Record(opponents[2])),
+		hasopponent1 = not Opponent.isTbd(Opponent.fromMatchParsedOpponent(opponents[1])),
+		hasopponent2 = not Opponent.isTbd(Opponent.fromMatchParsedOpponent(opponents[2])),
 		liquipediatiertype2 = Variables.varDefault('tournament_tiertype2'),
 	}
 end
