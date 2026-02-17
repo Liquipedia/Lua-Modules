@@ -71,7 +71,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Role',
-				children = {self.caller:_getRole(args) or DEFAULT_ROLE}
+				children = {self.caller:_getRole(args.role) or DEFAULT_ROLE}
 			}
 		}
 	elseif id == 'custom' then
@@ -94,10 +94,28 @@ end
 ---@param roleInput string?
 ---@return Widget?
 function CustomHero:_getRole(roleInput)
-	if type(roleInput) ~= 'string' then
-		return nil
-	end
-	return ROLE_LOOKUP[roleInput:lower()]
+    if type(roleInput) ~= 'string' then
+        return nil
+    end
+
+    local roleNames = mw.text.split(roleInput, ',%s*')
+    local children = {}
+
+    for _, name in ipairs(roleNames) do
+        local widget = ROLE_LOOKUP[name:lower()]
+        if widget then
+            if #children > 0 then
+                table.insert(children, '<br>') 
+            end
+            table.insert(children, widget)
+        end
+    end
+
+    if #children > 0 then
+        return HtmlWidgets.Fragment{children = children}
+    end
+
+    return nil
 end
 
 ---@param args table
