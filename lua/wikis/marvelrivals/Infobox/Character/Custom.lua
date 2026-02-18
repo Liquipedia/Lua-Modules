@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
@@ -71,7 +72,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Role',
-				children = {self.caller:_getRole(args) or DEFAULT_ROLE}
+				children = self.caller:_getRole(args.role) or DEFAULT_ROLE
 			}
 		}
 	elseif id == 'custom' then
@@ -92,12 +93,17 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param roleInput string?
----@return Widget?
+---@return (string|Widget)[]?
 function CustomHero:_getRole(roleInput)
 	if type(roleInput) ~= 'string' then
 		return nil
 	end
-	return ROLE_LOOKUP[roleInput:lower()]
+
+	local roles = Array.map(Array.parseCommaSeparatedString(roleInput), function(role)
+		return ROLE_LOOKUP[role:lower()]
+	end)
+
+	return Logic.nilIfEmpty(roles)
 end
 
 ---@param args table
