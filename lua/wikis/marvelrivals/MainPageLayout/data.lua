@@ -40,7 +40,8 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{rumours = true,
+		body = TransfersList{
+			rumours = true,
 			transferPage = MainPageLayoutUtil.getQuarterlyTransferPage()
 		},
 		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
