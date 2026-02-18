@@ -42,8 +42,8 @@ jobs:
 
       - name: Check LuaLS
         run: |
-          ./bin/lua-language-server --check --logpath=luals-report.txt
-          cat luals-report.txt
+          ./bin/lua-language-server --check --logpath=luals-logs
+          cat luals-logs/*
 
   lua-unit-test:
     runs-on: ubuntu-latest
