@@ -43,6 +43,13 @@ jobs:
         run: |
           ./bin/lua-language-server --configpath ${{ github.workspace }}/.luarc.json --check lua/ --logpath luals-logs
 
+      - name: Report LuaLS
+        uses: actions/upload-artifact@v6.0.0
+        if: failure()
+        with:
+          name: LuaLS-Result
+          path: luals-logs
+          
   lua-unit-test:
     runs-on: ubuntu-latest
 
