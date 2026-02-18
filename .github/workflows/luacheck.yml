@@ -74,9 +74,9 @@ jobs:
 
       - name: Setup LuaLS
         run: |
-          mkdir -p /usr/bin/luals
-          curl -L https://github.com/LuaLS/lua-language-server/releases/download/3.17.1/lua-language-server-3.17.1-linux-x64.tar.gz | tar -xzv -C /usr/bin/luals
+          mkdir -p ~/.local/bin/luals
+          curl -L https://github.com/LuaLS/lua-language-server/releases/download/3.17.1/lua-language-server-3.17.1-linux-x64.tar.gz | tar -xzv -C ~/.local/bin/luals
 
       - name: Check
         run: |
-          /usr/bin/luals/bin/lua-language-server --check ./
+          ~/.local/bin/luals/bin/lua-language-server --check ./
