@@ -17,8 +17,8 @@
 		"name-style-check": "None"
 	},
 	"workspace.library": [
-		"${3rd}/busted/library",
-		"${3rd}/luassert/library"
+		"lua/3rd/busted/library",
+		"lua/3rd/luassert/library"
 	],
 	"workspace.ignoreDir": [
 		".vscode",
