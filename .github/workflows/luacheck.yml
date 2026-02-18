@@ -34,21 +34,6 @@ jobs:
           report_paths: 'report.xml'
           check_name: 'Lint Report'
           annotate_only: ${{ (github.event.pull_request.head.repo.full_name != github.repository) }}
-
-      - name: Setup LuaLS
-        run: |
-          curl -L https://github.com/LuaLS/lua-language-server/releases/download/3.17.1/lua-language-server-3.17.1-linux-x64.tar.gz | tar -xzv
-
-      - name: Check LuaLS
-        run: |
-          ./bin/lua-language-server --configpath ${{ github.workspace }}/.luarc.json --check lua/ --logpath luals-logs
-
-      - name: Report LuaLS
-        uses: actions/upload-artifact@v6.0.0
-        if: failure()
-        with:
-          name: LuaLS-Result
-          path: luals-logs
           
   lua-unit-test:
     runs-on: ubuntu-latest
@@ -80,3 +65,14 @@ jobs:
           report_paths: 'busted.xml'
           check_name: 'Lua Test Report'
           annotate_only: ${{ (github.event.pull_request.head.repo.full_name != github.repository) }}
+
+  luals-code-style:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup LuaLS
+        run: |
+          curl -L https://github.com/LuaLS/lua-language-server/releases/download/3.17.1/lua-language-server-3.17.1-linux-x64.tar.gz | tar -xzv
+
+      - name: Check
+        run: |
+          ./bin/lua-language-server --configpath ${{ github.workspace }}/.luarc.json --check lua/
