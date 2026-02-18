@@ -1,9 +1,12 @@
 {
 	"private": true,
 	"devDependencies": {
+		"@eslint/js": "^10.0.1",
+		"@eslint/eslintrc": "^3.3.3",
 		"@playwright/test": "^1.45.0",
 		"@stylistic/stylelint-plugin": "^2.1.2",
 		"eslint-config-wikimedia": "0.28.1",
+		"globals": "^17.3.0",
 		"grunt": "*",
 		"grunt-eslint": "26.0.0",
 		"grunt-stylelint": "^0.20.x",
