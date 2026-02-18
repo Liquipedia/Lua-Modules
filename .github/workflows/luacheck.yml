@@ -78,4 +78,4 @@ jobs:
 
       - name: Check
         run: |
-          ./bin/lua-language-server --configpath ${{ github.workspace }}/.luarc.json --check lua/
+          ./bin/lua-language-server --configpath ${{ github.workspace }}/.luarc.json --check ./
