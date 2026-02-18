@@ -103,7 +103,7 @@ function CustomHero:_getRole(roleInput)
 		return ROLE_LOOKUP[role:lower()]
 	end)
 
-	return Logic.nilIfEmpty(Array.interleave(roles, HtmlWidgets.Br{}))
+	return Logic.nilIfEmpty(roles)
 end
 
 ---@param args table
