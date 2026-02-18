@@ -41,7 +41,7 @@ jobs:
 
       - name: Check LuaLS
         run: |
-          ./bin/lua-language-server --check lua/ --logpath luals-logs
+          ./bin/lua-language-server --configpath ${{ github.workspace }}/.luarc.json --check lua/ --logpath luals-logs
 
   lua-unit-test:
     runs-on: ubuntu-latest
