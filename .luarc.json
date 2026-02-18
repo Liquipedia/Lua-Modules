@@ -20,8 +20,8 @@
 		"${3rd}/busted/library",
 		"${3rd}/luassert/library",
 
-		"meta/3rd/busted/library",
-		"meta/3rd/luassert/library"
+		"./meta/3rd/busted/library",
+		"./meta/3rd/luassert/library"
 	],
 	"workspace.ignoreDir": [
 		".vscode",
