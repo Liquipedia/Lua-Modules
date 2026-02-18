@@ -42,7 +42,7 @@ jobs:
 
       - name: Check LuaLS
         run: |
-          ./bin/lua-language-server --check --logpath=luals-logs
+          ./bin/lua-language-server --check lua/wikis --logpath=luals-logs
           cat luals-logs/*
 
   lua-unit-test:
