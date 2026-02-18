@@ -98,11 +98,11 @@ function CustomHero:_getRole(roleInput)
 	if type(roleInput) ~= 'string' then
 		return nil
 	end
-	
+
 	local roles = Array.map(Array.parseCommaSeparatedString(roleInput), function(role)
 		return ROLE_LOOKUP[role:lower()]
 	end)
-	
+
 	return Logic.nilIfEmpty(Array.interleave(roles, HtmlWidgets.Br{}))
 end
 
