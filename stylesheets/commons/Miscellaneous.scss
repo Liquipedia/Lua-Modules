@@ -2148,6 +2148,14 @@ Author(s): hjpalpha
 }
 
 /*******************************************************************************
+Invert colors for dark theme - moved here from Fountain.scss
+*******************************************************************************/
+
+html.theme--dark .componentsinvert {
+	filter: invert( 1 );
+}
+
+/*******************************************************************************
 Template: GroupTableLeague
 Use case: up/down arrows to indicate a ranking change between rounds
 Author(s): hjpalpha
