@@ -38,11 +38,11 @@ jobs:
 
       - name: Setup LuaLS
         run: |
-          curl -L https://github.com/LuaLS/lua-language-server/releases/download/3.17.1/lua-language-server-3.17.1-linux-x64.tar.gz | tar -xzvf
+          curl -L https://github.com/LuaLS/lua-language-server/releases/download/3.17.1/lua-language-server-3.17.1-linux-x64.tar.gz | tar -xzv
 
       - name: Check LuaLS
         env:
-          3rd: /usr/lib/luarocks/rocks-5.1
+          3rd: ${{ github.workspace }}/.luarocks
         run: |
           ./bin/lua-language-server --configpath .luarc.json --check lua/ --logpath luals-logs
 
