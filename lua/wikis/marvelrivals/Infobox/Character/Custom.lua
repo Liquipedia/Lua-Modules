@@ -71,7 +71,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Role',
-				children = {self.caller:_getRole(args.role) or DEFAULT_ROLE}
+				children = self.caller:_getRole(args.role) or DEFAULT_ROLE
 			}
 		}
 	elseif id == 'custom' then
@@ -92,7 +92,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param roleInput string?
----@return Widget?
+---@return (string|Widget)[]?
 function CustomHero:_getRole(roleInput)
 	if type(roleInput) ~= 'string' then
 		return nil
@@ -102,7 +102,7 @@ function CustomHero:_getRole(roleInput)
 		return ROLE_LOOKUP[role:lower()]
 	end)
 	
-	return Array.interleave(roles, HtmlWidgets.Br{})
+	return Logic.nilIfEmpty(Array.interleave(roles, HtmlWidgets.Br{}))
 end
 
 ---@param args table
