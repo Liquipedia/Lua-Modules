@@ -74,8 +74,9 @@ jobs:
 
       - name: Setup LuaLS
         run: |
-          curl -L https://github.com/LuaLS/lua-language-server/releases/download/3.17.1/lua-language-server-3.17.1-linux-x64.tar.gz | tar -xzv
+          mkdir -p /usr/bin/luals
+          curl -L https://github.com/LuaLS/lua-language-server/releases/download/3.17.1/lua-language-server-3.17.1-linux-x64.tar.gz | tar -xzv -C /usr/bin/luals
 
       - name: Check
         run: |
-          ./bin/lua-language-server --configpath ${{ github.workspace }}/.luarc.json --check ./
+          /usr/bin/luals/bin/lua-language-server --check ./
