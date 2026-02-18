@@ -25,6 +25,7 @@
 	],
 	"workspace.ignoreDir": [
 		".vscode",
-		"lua/3rd"
+		"lua/3rd",
+		"lua/spec"
 	]
 }
