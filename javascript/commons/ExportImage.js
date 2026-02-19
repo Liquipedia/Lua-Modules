@@ -495,6 +495,7 @@ class ExportService {
 		}
 	}
 
+	// html2canvas doesn't support svgs in img tags
 	replaceTBDFlags( clonedDoc ) {
 		const flags = clonedDoc.querySelectorAll( '.flag > img' );
 
