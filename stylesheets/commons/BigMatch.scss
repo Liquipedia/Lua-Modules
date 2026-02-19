@@ -38,7 +38,7 @@ span.slash {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	padding: 16px;
+	padding: 16px 0;
 }
 
 .match-bm-match-header-opponent {
@@ -156,6 +156,10 @@ span.slash {
 .match-bm-match-header-party {
 	align-items: flex-start;
 	font-size: 1.25rem;
+
+	&:first-child {
+		align-items: flex-end;
+	}
 }
 
 .match-bm-match-header-round {
