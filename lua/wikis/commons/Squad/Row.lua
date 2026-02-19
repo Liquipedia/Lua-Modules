@@ -14,7 +14,8 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local String = Lua.import('Module:StringUtils')
 local Template = Lua.import('Module:Template')
 
-local Widget = Lua.import('Module:Widget/All')
+local Table2Widgets = Lua.import('Module:Widget/Table2/All')
+local Row, Cell = Table2Widgets.Row, Table2Widgets.Cell
 
 local RoleIcons = {
 	captain = Icon.makeIcon{iconName = 'captain', hover = 'Captain'},
@@ -52,16 +53,14 @@ function SquadRow:id()
 		table.insert(content, '&nbsp;' .. roleIcon)
 	end
 
-	local cell = Widget.Td{
-		classes = {'ID'},
+	local cell = Cell{
 		children = content,
 	}
 
 	local date = self.model.leavedate or self.model.inactivedate
 	local hasTeam = self.model.extradata.loanedto and mw.ext.TeamTemplate.teamexists(self.model.extradata.loanedto)
 	local hasTeamRole = hasTeam and self.model.extradata.loanedtorole
-	local teamNode = Widget.Td{
-		css = hasTeamRole and {'text-align', 'center'} or nil,
+	local teamNode = Cell{
 		children = {
 			hasTeam and mw.ext.TeamTemplate.teamicon(self.model.extradata.loanedto, date) or nil,
 			hasTeamRole and mw.html.create('small'):tag('i'):wikitext(self.model.extradata.loanedtorole) or nil,
@@ -76,12 +75,8 @@ end
 
 ---@return self
 function SquadRow:name()
-	table.insert(self.children, Widget.Td{
-		classes = {'Name'},
-		children = String.isNotEmpty(self.model.name) and {
-			mw.html.create('div'):addClass('MobileStuff'):wikitext('(', self.model.name, ')'),
-			mw.html.create('div'):addClass('LargeStuff'):wikitext(self.model.name),
-		} or nil
+	table.insert(self.children, Cell{
+		children = String.isNotEmpty(self.model.name) and {self.model.name} or nil,
 	})
 
 	return self
@@ -91,12 +86,8 @@ end
 function SquadRow:role()
 	local display = String.isNotEmpty(self.model.role) and not RoleIcons[self.model.role:lower()]
 
-	table.insert(self.children, Widget.Td{
-		classes = {'Position'},
-		children = display and {
-			mw.html.create('div'):addClass('MobileStuff'):wikitext('Role:&nbsp;'),
-			mw.html.create('i'):wikitext('(' .. self.model.role .. ')'),
-		} or nil,
+	table.insert(self.children, Cell{
+		children = display and {self.model.role} or nil,
 	})
 
 	return self
@@ -110,20 +101,17 @@ function SquadRow:position()
 	local content = {}
 
 	if String.isNotEmpty(self.model.position) or String.isNotEmpty(self.model.role) then
-		table.insert(content, mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
-
 		if String.isNotEmpty(self.model.position) then
 			table.insert(content, self.model.position)
 			if displayRole then
-				table.insert(content, '&nbsp;(' .. self.model.role .. ')')
+				table.insert(content, ' (' .. self.model.role .. ')')
 			end
 		elseif displayRole then
 			table.insert(content, self.model.role)
 		end
 	end
 
-	table.insert(self.children, Widget.Td{
-		classes = {'Position'},
+	table.insert(self.children, Cell{
 		children = content,
 	})
 
@@ -134,13 +122,10 @@ end
 ---@param cellTitle string?
 ---@return self
 function SquadRow:date(field, cellTitle)
-	table.insert(self.children, Widget.Td{
-		classes = {'Date'},
+	table.insert(self.children, Cell{
 		children = self.model[field] and {
-			mw.html.create('div'):addClass('MobileStuffDate'):wikitext(cellTitle),
-			mw.html.create('div'):addClass('Date')
-				:tag('i'):wikitext(self.model.extradata[field .. 'display'] or self.model[field])
-		} or nil
+			mw.html.create('i'):wikitext(self.model.extradata[field .. 'display'] or self.model[field]),
+		} or nil,
 	})
 
 	return self
@@ -158,16 +143,13 @@ function SquadRow:newteam()
 			return content
 		end
 
-		table.insert(content, mw.html.create('div'):addClass('MobileStuff')
-			:tag('i'):addClass('fa fa-long-arrow-right'):attr('aria-hidden', 'true'):done():wikitext('&nbsp;'))
-
 		if hasNewTeamSpecial then
 			table.insert(content, Template.safeExpand(mw.getCurrentFrame(), newTeamSpecial))
 			return content
 		end
 
 		if not hasNewTeam then
-			table.insert(content, mw.html.create('div'):addClass('NewTeamRole'):wikitext(newTeamRole))
+			table.insert(content, newTeamRole)
 			return content
 		end
 
@@ -175,14 +157,12 @@ function SquadRow:newteam()
 		table.insert(content, mw.ext.TeamTemplate.team(newTeam, date))
 
 		if hasNewTeamRole then
-			table.insert(content, '&nbsp;')
-			table.insert(content, mw.html.create('i'):tag('small'):wikitext('(' .. newTeamRole .. ')'))
+			table.insert(content, ' (' .. newTeamRole .. ')')
 		end
 		return content
 	end
 
-	table.insert(self.children, Widget.Td{
-		classes = {'NewTeam'},
+	table.insert(self.children, Cell{
 		children = createContent(),
 	})
 
@@ -202,7 +182,7 @@ function SquadRow:create()
 		table.insert(backgrounds, 'roster-coach')
 	end
 
-	return Widget.Tr{
+	return Row{
 		classes = backgrounds,
 		children = self.children,
 	}
