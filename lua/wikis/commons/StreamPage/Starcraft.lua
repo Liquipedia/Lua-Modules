@@ -26,6 +26,7 @@ local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
+local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -159,74 +160,81 @@ function StarcraftStreamPage:_mapPool()
 		{'TBA'}
 	) --[[ @as any[] ]]
 
-	local race1 = ((match.opponents[1].players)[1] or {}).faction
-	local race2 = ((match.opponents[2].players)[1] or {}).faction
+	local race1 = ((match.opponents[1].players)[1] or {}).faction --[[ @as string ]]
+	local race2 = ((match.opponents[2].players)[1] or {}).faction --[[ @as string ]]
 
-	local skipMapWinRate = match.opponents[1].type ~= Opponent.solo
+	local skipMapWinRate = not Array.all(match.opponents, function (opponent) return opponent.type == Opponent.solo end)
 		or not race1
 		or not race2
-		or match.opponents[2].type ~= Opponent.solo
 		or race1 == Faction.defaultFaction
 		or race1 == RANDOM_RACE
 		or race2 == Faction.defaultFaction
 		or race1 ~= race2
 
-	local mapTable = mw.html.create('table')
-		:addClass('wikitable')
-		:css('text-align', 'center')
-		:css('margin', '0 0 10px 0')
-		:css('width', '100%')
-		mapTable:tag('tr')
-			:addClass('wiki-color-dark wiki-backgroundcolor-light')
-			:css('font-size', '130%')
-			:css('padding', '5px 10px')
-			:tag('th')
-				:attr('colspan', '2')
-				:css('padding', '5px')
-				:wikitext('Map Pool')
-
-	if not skipMapWinRate then
-		---@cast race1 -nil
-		---@cast race2 -nil
-		mapTable:tag('tr')
-			:tag('th'):wikitext('Map')
-			:tag('th'):wikitext(string.upper(race1) .. 'v' .. string.upper(race2))
-	end
-
 	local currentMap = self:_getCurrentMap()
 	local matchup = skipMapWinRate and '' or race1 .. race2
 
-	for _, map in ipairs(maps) do
-		local mapRow = mapTable:tag('tr')
-			:addClass('stats-row')
-
+	---@param map 'TBA'|{link: string, displayname: string}
+	---@return Widget
+	local function createMapRow(map)
 		if map == 'TBA' then
-			mapRow:tag('td')
-				:attr('colspan', '2')
-				:node(mw.html.create('span')
-					:css('text-align', 'center')
-					:css('font-style', 'italic')
-					:wikitext('To be announced')
-				)
-		else
-			if map.link == currentMap then
-				mapRow:addClass('tournament-highlighted-bg')
-			end
-			mapRow:tag('td')
-				:wikitext('[[' .. map.link .. '|' .. map.displayname .. ']]')
-			if not skipMapWinRate then
-				local winRate = StarcraftStreamPage._queryMapWinrate(map.link, matchup)
-				if String.isNotEmpty(winRate) then
-					mapRow:tag('td')
-						:wikitext(winRate)
-				end
-			end
+			return HtmlWidgets.Tr{
+				classes = {'stats-row'},
+				children = HtmlWidgets.Td{
+					attributes = {colspan = 2},
+					children = HtmlWidgets.Span{
+						css = {
+							['text-align'] = 'center',
+							['font-style'] = 'italic',
+						},
+						children = 'To be announced'
+					}
+				}
+			}
 		end
+		return HtmlWidgets.Tr{
+			classes = {
+				'stats-row',
+				map.link == currentMap and 'tournament-highlighted-bg' or nil
+			},
+			children = WidgetUtil.collect(
+				HtmlWidgets.Td{children = Link{link = map.link, children = map.displayname}},
+				not skipMapWinRate and HtmlWidgets.Td{
+					children = StarcraftStreamPage._queryMapWinrate(map.link, matchup)
+				} or nil
+			),
+		}
 	end
 
-	return mw.html.create('div')
-		:addClass('sc2-stream-page-middle-column1')
-		:node(mapTable)
+	return DataTable{
+		tableCss = {
+			['text-align'] = 'center',
+			margin = '0 0 10px 0',
+		},
+		children = WidgetUtil.collect(
+			HtmlWidgets.Tr{
+				classes = {'wiki-color-dark', 'wiki-backgroundcolor-light'},
+				css = {
+					['font-size'] = '130%',
+					padding = '5px 10px',
+				},
+				children = {HtmlWidgets.Th{
+					attributes = {colspan = 2},
+					css = {padding = '5px'},
+					children = 'Map Pool'
+				}}
+			},
+			not skipMapWinRate and HtmlWidgets.Tr{children = {
+				HtmlWidgets.Th{children = 'Map'},
+				HtmlWidgets.Th{children = {
+					race1:upper(),
+					'v',
+					race2:upper()
+				}}
+			}} or nil,
+			Array.map(maps, createMapRow)
+		)
+	}
 end
 
 ---@param map string
