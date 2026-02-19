@@ -145,6 +145,8 @@ function StarcraftStreamPage._playerDisplay(player)
 	}
 end
 
+---@private
+---@return Html
 function StarcraftStreamPage:_mapPool()
 	local match = self.matches[1]
 
@@ -227,14 +229,9 @@ function StarcraftStreamPage:_mapPool()
 		:node(mapTable)
 end
 
-function StarcraftStreamPage._getMaps(mapsInput)
-	if String.isEmpty(mapsInput) then
-		return {'TBA'}
-	end
-
-	return Json.parse(mapsInput)
-end
-
+---@param map string
+---@param matchup string
+---@return string?
 function StarcraftStreamPage._queryMapWinrate(map, matchup)
 	local conditions = '[[pagename::' .. string.gsub(map, ' ', '_') .. ']] AND [[type::map_winrates]]'
 	local LPDBoutput = mw.ext.LiquipediaDB.lpdb('datapoint', {
@@ -253,6 +250,8 @@ function StarcraftStreamPage._queryMapWinrate(map, matchup)
 	end
 end
 
+---@private
+---@return string?
 function StarcraftStreamPage:_getCurrentMap()
 	local games = self.matches[1].games
 	for _, game in ipairs(games) do
