@@ -44,6 +44,7 @@ end
 function TeamStreamPage:renderPlayerInformation()
 	return HtmlWidgets.Div{
 		classes = {'match-bm-players-wrapper'},
+		css = {width = '100%'},
 		children = Array.map(self.matches[1].opponents, TeamStreamPage._teamDisplay)
 	}
 end
