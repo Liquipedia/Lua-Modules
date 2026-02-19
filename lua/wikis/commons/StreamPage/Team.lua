@@ -12,6 +12,7 @@ local Array = Lua.import('Module:Array')
 local BaseStreamPage = Lua.import('Module:StreamPage/Base')
 local Class = Lua.import('Module:Class')
 local Image = Lua.import('Module:Image')
+local Logic = Lua.import('Module:Logic')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Page = Lua.import('Module:Page')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
@@ -73,18 +74,11 @@ function TeamStreamPage._playerDisplay(player)
 		limit = 1
 	})[1]
 
-	local playerData = {}
-	local image
-	if lpdbData then
-		playerData = lpdbData
-		image = playerData.image
-		if String.isEmpty(image) then
-			image = (playerData.extradata or {}).image
-		end
-	end
+	local image  = lpdbData.image
 	if String.isEmpty(image) then
-		image = 'Blank Player Image.png'
+		image = Logic.emptyOr((lpdbData.extradata or {}).image, 'Blank Player Image.png') --[[@as string]]
 	end
+
 	local imageDisplay = Image.display(image, nil, {class = 'img-fluid', size = '600px'})
 
 	local nameDisplay = PlayerDisplay.InlinePlayer{

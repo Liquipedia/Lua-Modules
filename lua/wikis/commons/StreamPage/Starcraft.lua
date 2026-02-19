@@ -86,20 +86,13 @@ function StarcraftStreamPage._playerDisplay(player)
 	local lpdbData = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = '[[pagename::' .. (Page.pageifyLink(player.pageName) or '') .. ']]',
 		limit = 1
-	})[1]
+	})[1] or {}
 
-	local playerData = {}
-	local image
-	if lpdbData then
-		playerData = lpdbData
-		image = playerData.image
-		if String.isEmpty(image) then
-			image = (playerData.extradata or {}).image
-		end
-	end
+	local image  = lpdbData.image
 	if String.isEmpty(image) then
-		image = 'Blank Player Image.png'
+		image = Logic.emptyOr((lpdbData.extradata or {}).image, 'Blank Player Image.png') --[[@as string]]
 	end
+
 	local imageDisplay = Image.display(image, nil, {class = 'img-fluid', size = '600px'})
 
 	local nameDisplay = PlayerDisplay.InlinePlayer{
