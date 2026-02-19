@@ -57,7 +57,8 @@ local StreamPage = Class.new(function (self, args)
 	self:_fetchMatches()
 end)
 
-
+---@param frame Frame
+---@return Widget?
 function StreamPage.run(frame)
 	local args = Arguments.getArgs(frame)
 	return StreamPage(args):create()
