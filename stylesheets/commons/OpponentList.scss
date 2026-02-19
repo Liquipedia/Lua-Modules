@@ -175,15 +175,15 @@ Author(s): FO-nTTaX
 	width: 200px;
 }
 
-.participants-table-buttons::after {
-	clear: both;
-	content: " ";
-	display: block;
-}
-
 .participants-table-buttons {
 	display: none;
 	font-size: 200%;
+
+	&::after {
+		clear: both;
+		content: " ";
+		display: block;
+	}
 }
 
 .participants-table-button-left {
@@ -249,13 +249,13 @@ Author(s): Rapture
 	.wiki-ageofempires .participanttable .player-row {
 		display: flex;
 		flex-wrap: wrap;
-	}
 
-	.wiki-ageofempires .participanttable .player-row > td {
-		flex: 1 0 auto;
-		width: unset !important;
-		min-width: 50%;
-		min-height: 35px;
-		border-width: 1px 1px 0 0 !important;
+		> td {
+			flex: 1 0 auto;
+			width: unset !important;
+			min-width: 50%;
+			min-height: 35px;
+			border-width: 1px 1px 0 0 !important;
+		}
 	}
 }
