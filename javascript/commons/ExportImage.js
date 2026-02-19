@@ -11,6 +11,16 @@ const EXPORT_IMAGE_CONFIG = {
 		DARK: 'https://liquipedia.net/commons/images/f/ff/Liquipedia_default_darkmode_export.png',
 		LIGHT: 'https://liquipedia.net/commons/images/9/9a/Liquipedia_default_lightmode_export.png'
 	},
+	SVG: {
+		FLAG_UNKNOWN:
+			'<defs><style>.st0 {fill: #B3B3B3;}</style></defs>' +
+			'<path class="st0" d="M16.58,0H1.42C.64,0,0,.67,0,1.5v9c0,.83.63,1.5,1.42,1.5h15.16c.78,0,' +
+			'1.42-.67,1.42-1.5V1.5C18,.67,17.37,0,16.58,0ZM8.87,10.06c-.56,0-1.02-.49-1.02-1.1s.46-1.1,1.02-1.1,' +
+			'1.02.49,1.02,1.1-.46,1.1-1.02,1.1ZM9.74,6.93v.1c0,.21-.15.38-.35.38h-1.06c-.19,0-.35-.17-.35-.38v-.15' +
+			'c0-.97.68-1.36,1.2-1.68.45-.26.71-.46.71-.81,0-.47-.56-.79-1-.79-.57,0-.85.29-1.21.78-.13.17-.33.19-' +
+			'.49.07l-.63-.51c-.15-.13-.18-.35-.07-.51.6-.92,1.35-1.45,2.52-1.45h-.01c1.24-.01,2.56,1.03,2.56,2.42' +
+			',0,1.84-1.82,1.86-1.82,2.55Z"/>'
+	},
 	DIMENSIONS: {
 		HEADER_HEIGHT: 43,
 		FOOTER_HEIGHT: 33,
@@ -457,6 +467,7 @@ class ExportService {
 		this.hideInfoIcons( clonedDoc );
 		this.removeContentSwitchers( clonedDoc );
 		this.removePrizepoolToggles( clonedDoc );
+		this.replaceTBDFlags( clonedDoc );
 	}
 
 	// Hides info icons that shouldn't appear in exports
@@ -481,6 +492,29 @@ class ExportService {
 
 		for ( const prizepoolToggle of prizepoolToggles ) {
 			prizepoolToggle.remove();
+		}
+	}
+
+	replaceTBDFlags( clonedDoc ) {
+		const flags = clonedDoc.querySelectorAll( '.flag > img' );
+
+		for ( const flag of flags ) {
+			if ( !flag.src.includes( '/commons/images/d/d5/Flag_Unknown.svg' ) ) {
+				continue;
+			}
+
+			const svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
+			svg.setAttribute( 'viewBox', '0 0 18 12' );
+			svg.innerHTML = EXPORT_IMAGE_CONFIG.SVG.FLAG_UNKNOWN;
+
+			if ( flag.width ) {
+				svg.setAttribute( 'width', flag.width );
+			}
+			if ( flag.height ) {
+				svg.setAttribute( 'height', flag.height );
+			}
+
+			flag.parentNode.replaceChild( svg, flag );
 		}
 	}
 
