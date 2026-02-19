@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
@@ -56,6 +57,12 @@ local StreamPage = Class.new(function (self, args)
 	self:_fetchMatches()
 end)
 
+
+function StreamPage.run(frame)
+	local args = Arguments.getArgs(frame)
+	return StreamPage(args):create()
+end
+
 ---@private
 ---@return ConditionTree
 function StreamPage:_createMatchQueryCondition()
@@ -66,7 +73,7 @@ function StreamPage:_createMatchQueryCondition()
 		},
 		ConditionNode(ColumnName('finished'), Comparator.eq, 0),
 		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
-		ConditionNode(ColumnName('dateexact', Comparator.eq, 1))
+		ConditionNode(ColumnName('dateexact'), Comparator.eq, 1)
 	}
 
 	conditions:add(StreamPage:addMatchConditions())
@@ -144,10 +151,16 @@ function StreamPage:create()
 	if Logic.isEmpty(self.matches) then
 		return
 	elseif self.matches[1].bracketData.matchPage then
-		return MatchPage{match = self.matches[1]}:render()
+		return HtmlWidgets.Fragment{children = {
+			'__NOTOC__',
+			MatchPage(self.matches[1]):render(),
+			HtmlWidgets.H3{children = 'Channel Schedule'},
+			self:_createMatchTicker():query():create()
+		}}
 	end
 
 	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+		'__NOTOC__',
 		self:_header(),
 		GridWidgets.Container{gridCells = {
 			GridWidgets.Cell{
@@ -160,7 +173,10 @@ function StreamPage:create()
 				xxxl = 9,
 			},
 			GridWidgets.Cell{
-				cellContent = self:_createMatchTicker(),
+				cellContent = MatchPageAdditionalSection{
+					header = 'Channel Schedule',
+					children = self:_createMatchTicker():query():create()
+				},
 				xs = 'ignore',
 				sm = 'ignore',
 				lg = 4,
@@ -174,19 +190,14 @@ function StreamPage:create()
 end
 
 ---@private
----@return string|Widget|Html|(string|Widget|Html)[]?
+---@return MatchTicker
 function StreamPage:_createMatchTicker()
-	local ticker = MatchTicker{
-		additionalConditions = 'AND (' .. self:_createMatchQueryCondition() .. ')',
+	return MatchTicker{
+		additionalConditions = 'AND (' .. tostring(self:_createMatchQueryCondition()) .. ')',
 		limit = 5,
 		newStyle = true,
 		ongoing = true,
 		upcoming = true,
-		wrapperClasses = {'new-match-style'},
-	}
-	return MatchPageAdditionalSection{
-		header = 'Channel Schedule',
-		children = ticker:query():create()
 	}
 end
 
