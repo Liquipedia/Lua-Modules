@@ -24,6 +24,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Page = Lua.import('Module:Page')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tournament = Lua.import('Module:Tournament')
 
@@ -37,6 +38,7 @@ local ConditionUtil = Condition.Util
 
 local GridWidgets = Lua.import('Module:Widget/Grid')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local MatchPageAdditionalSection = Lua.import('Module:Widget/Match/Page/AdditionalSection')
 local MatchPageHeader = Lua.import('Module:Widget/Match/Page/Header')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -194,8 +196,100 @@ function StreamPage:render()
 end
 
 ---@protected
----@return string|Widget|Html|(string|Widget|Html)[]?
+---@return Widget[]?
 function StreamPage:createBottomContent()
+	local match = self.matches[1]
+
+	if Array.all(match.opponents, Opponent.isTbd) then
+		return
+	end
+
+	local headToHead = self:_buildHeadToHeadMatchTable()
+
+	return WidgetUtil.collect(
+		HtmlWidgets.H3{children = 'Match History'},
+		HtmlWidgets.Div{
+			classes = {'match-bm-match-additional'},
+			children = WidgetUtil.collect(
+				headToHead and MatchPageAdditionalSection{
+					css = {flex = '2 0 100%'},
+					header = 'Head to Head',
+					bodyClasses = {'match-table-wrapper'},
+					children = headToHead,
+				} or nil,
+				Array.map(match.opponents, function (opponent)
+					local matchTable = self:_buildMatchTable(opponent)
+					return MatchPageAdditionalSection{
+						header = OpponentDisplay.InlineOpponent{opponent = opponent, teamStyle = 'hybrid'},
+						bodyClasses = matchTable and {'match-table-wrapper'} or nil,
+						children = matchTable or IconImage{
+							imageLight = match.icon,
+							imageDark = match.iconDark,
+							size = '50x32px',
+						}
+					}
+				end)
+			)
+		}
+	)
+end
+
+---@private
+---@param props table
+---@return Html
+function StreamPage:_createMatchTable(props)
+	local match = self.matches[1]
+	return MatchTable(Table.mergeInto({
+		addCategory = false,
+		edate = match.timestamp - DateExt.daysToSeconds(1) --[[ MatchTable adds 1-day offset to make edate
+																inclusive, and we don't want that here ]],
+		limit = 5,
+		stats = false,
+		vod = false,
+		matchPageButtonText = 'short',
+	}, props)):readConfig():query():buildDisplay()
+end
+
+---@private
+---@param opponent standardOpponent
+---@return Html?
+function StreamPage:_buildMatchTable(opponent)
+	if opponent.type ~= Opponent.solo and opponent.type ~= Opponent.team then
+		return
+	end
+	local base = opponent.type == Opponent.team and Opponent.team or 'player'
+	return self:_createMatchTable{
+		['hide_tier'] = true,
+		limit = 5,
+		stats = false,
+		tableMode = opponent.type,
+		[base] = Opponent.toName(opponent),
+		useTickerName = true,
+	}
+end
+
+---@private
+---@return Html?
+function StreamPage:_buildHeadToHeadMatchTable()
+	local match = self.matches[1]
+	if Array.any(match.opponents, Opponent.isTbd) then
+		return
+	elseif match.opponents[1].type ~= match.opponents[2].type then
+		return
+	elseif match.opponents[1].type ~= Opponent.solo and match.opponents[1].type ~= Opponent.team then
+		return
+	end
+
+	local base = match.opponents[1].type == Opponent.team and Opponent.team or 'player'
+
+	return self:_createMatchTable{
+		[base] = Opponent.toName(match.opponents[1]),
+		['vs' .. base] = Opponent.toName(match.opponents[2]),
+		tableMode = match.opponents[1].type,
+		showOpponent = true,
+		teamStyle = 'hybrid',
+		useTickerName = true,
+	}
 end
 
 return StreamPage
