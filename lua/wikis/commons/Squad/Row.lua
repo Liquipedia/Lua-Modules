@@ -15,6 +15,7 @@ local String = Lua.import('Module:StringUtils')
 local Template = Lua.import('Module:Template')
 
 local Table2Widgets = Lua.import('Module:Widget/Table2/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Row, Cell = Table2Widgets.Row, Table2Widgets.Cell
 
 local RoleIcons = {
@@ -35,7 +36,6 @@ local SquadRow = Class.new(
 
 ---@return self
 function SquadRow:id()
-	local content = {}
 	local opponent = Opponent.resolve(
 		Opponent.readOpponentArgs{
 			self.model.id,
@@ -46,15 +46,17 @@ function SquadRow:id()
 		},
 		nil, {syncPlayer = true}
 	)
-	table.insert(content, mw.html.create('b'):node(OpponentDisplay.InlineOpponent{opponent = opponent}))
+	local idContent = {
+		HtmlWidgets.B{children = {OpponentDisplay.InlineOpponent{opponent = opponent}}},
+	}
 
 	local roleIcon = RoleIcons[(self.model.role or ''):lower()]
 	if roleIcon then
-		table.insert(content, '&nbsp;' .. roleIcon)
+		table.insert(idContent, '&nbsp;' .. roleIcon)
 	end
 
 	local cell = Cell{
-		children = content,
+		children = idContent,
 	}
 
 	local date = self.model.leavedate or self.model.inactivedate
@@ -63,7 +65,7 @@ function SquadRow:id()
 	local teamNode = Cell{
 		children = {
 			hasTeam and mw.ext.TeamTemplate.teamicon(self.model.extradata.loanedto, date) or nil,
-			hasTeamRole and mw.html.create('small'):tag('i'):wikitext(self.model.extradata.loanedtorole) or nil,
+			hasTeamRole and HtmlWidgets.Small{children = {HtmlWidgets.I{children = {self.model.extradata.loanedtorole}}}} or nil,
 		}
 	}
 
@@ -124,7 +126,7 @@ end
 function SquadRow:date(field, cellTitle)
 	table.insert(self.children, Cell{
 		children = self.model[field] and {
-			mw.html.create('i'):wikitext(self.model.extradata[field .. 'display'] or self.model[field]),
+			HtmlWidgets.I{children = {self.model.extradata[field .. 'display'] or self.model[field]}},
 		} or nil,
 	})
 
