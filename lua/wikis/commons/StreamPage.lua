@@ -1,0 +1,201 @@
+---
+-- @Liquipedia
+-- page=Module:StreamPage
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Countdown = Lua.import('Module:Countdown')
+local DateExt = Lua.import('Module:Date/Ext')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
+local Image = Lua.import('Module:Image')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
+local MatchPage = Lua.requireIfExists('Module:MatchPage')
+local MatchTable = Lua.import('Module:MatchTable/Custom')
+local MatchTicker = Lua.import('Module:MatchTicker')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local Page = Lua.import('Module:Page')
+local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
+local String = Lua.import('Module:StringUtils')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Tournament = Lua.import('Module:Tournament')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
+
+local GridWidgets = Lua.import('Module:Widget/Grid')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local MatchPageAdditionalSection = Lua.import('Module:Widget/Match/Page/AdditionalSection')
+local MatchPageHeader = Lua.import('Module:Widget/Match/Page/Header')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
+---@class BaseStreamPage: BaseClass
+---@operator call(table): BaseStreamPage
+---@field channel string
+---@field provider string
+---@field matches MatchGroupUtilMatch[]
+local StreamPage = Class.new(function (self, args)
+	self.channel = assert(Logic.nilIfEmpty(args.channel))
+	self.provider = assert(Logic.nilIfEmpty(args.provider))
+	self.matches = {}
+
+	self:_fetchMatches()
+end)
+
+---@private
+---@return ConditionTree
+function StreamPage:_createMatchQueryCondition()
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName(self.provider, 'stream'), Comparator.eq, self.channel),
+			ConditionNode(ColumnName(self.provider .. '_en_1', 'stream'), Comparator.eq, self.channel)
+		},
+		ConditionNode(ColumnName('finished'), Comparator.eq, 0),
+		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
+		ConditionNode(ColumnName('dateexact', Comparator.eq, 1))
+	}
+
+	conditions:add(StreamPage:addMatchConditions())
+	return conditions
+end
+
+---@private
+function StreamPage:_fetchMatches()
+	local conditions = self:_createMatchQueryCondition()
+
+	Lpdb.executeMassQuery('match2', {
+		conditions = tostring(conditions),
+		order = 'date asc',
+		limit = 25,
+	}, function (record)
+		local match = MatchGroupUtil.matchFromRecord(record)
+		if Array.any(match.opponents, Opponent.isBye) then
+			return
+		elseif #self.matches == 5 then
+			return false
+		end
+		Array.appendWith(self.matches, match)
+	end)
+end
+
+---@protected
+---@return AbstractConditionNode|AbstractConditionNode[]?
+function StreamPage:addMatchConditions()
+end
+
+---@private
+---@return Widget
+function StreamPage:_header()
+	local match = self.matches[1]
+	local countdownBlock = HtmlWidgets.Div{
+		css = {
+			display = 'block',
+			['text-align'] = 'center'
+		},
+		children = Countdown.create{
+			date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
+			finished = match.finished,
+			rawdatetime = Logic.readBool(match.finished),
+		}
+	} or nil
+	local tournament = Tournament.partialTournamentFromMatch(match)
+	Array.forEach(match.opponents, function (opponent, opponentIndex)
+		if opponent.type ~= Opponent.team then
+			return
+		end
+		---@cast opponent MatchPageOpponent
+		opponent.iconDisplay = OpponentDisplay.InlineTeamContainer{
+			style = 'icon',
+			template = opponent.template,
+		}
+		opponent.teamTemplateData = TeamTemplate.getRaw(opponent.template)
+		opponent.seriesDots = {}
+	end)
+	return MatchPageHeader{
+		countdownBlock = countdownBlock,
+		isBestOfOne = match.bestof == 1,
+		mvp = match.extradata.mvp,
+		opponent1 = match.opponents[1],
+		opponent2 = match.opponents[2],
+		parent = tournament.pageName,
+		phase = MatchGroupUtil.computeMatchPhase(match),
+		stream = match.stream,
+		tournamentName = tournament.fullName,
+		highlighted = HighlightConditions.tournament(tournament)
+	}
+end
+
+---@return Widget?
+function StreamPage:create()
+	if Logic.isEmpty(self.matches) then
+		return
+	elseif self.matches[1].bracketData.matchPage then
+		return MatchPage{match = self.matches[1]}:render()
+	end
+
+	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+		self:_header(),
+		GridWidgets.Container{gridCells = {
+			GridWidgets.Cell{
+				cellContent = self:render(),
+				xs = 'ignore',
+				sm = 'ignore',
+				lg = 8,
+				xl = 8,
+				xxl = 9,
+				xxxl = 9,
+			},
+			GridWidgets.Cell{
+				cellContent = self:_createMatchTicker(),
+				xs = 'ignore',
+				sm = 'ignore',
+				lg = 4,
+				xl = 4,
+				xxl = 3,
+				xxxl = 3,
+			}
+		}},
+		self:createBottomContent()
+	)}
+end
+
+---@private
+---@return string|Widget|Html|(string|Widget|Html)[]?
+function StreamPage:_createMatchTicker()
+	local ticker = MatchTicker{
+		additionalConditions = 'AND (' .. self:_createMatchQueryCondition() .. ')',
+		limit = 5,
+		newStyle = true,
+		ongoing = true,
+		upcoming = true,
+		wrapperClasses = {'new-match-style'},
+	}
+	return MatchPageAdditionalSection{
+		header = 'Channel Schedule',
+		children = ticker:query():create()
+	}
+end
+
+---@protected
+---@return string|Widget|Html|(string|Widget|Html)[]?
+function StreamPage:render()
+end
+
+---@protected
+---@return string|Widget|Html|(string|Widget|Html)[]?
+function StreamPage:createBottomContent()
+end
+
+return StreamPage
