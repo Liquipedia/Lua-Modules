@@ -24,7 +24,6 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Page = Lua.import('Module:Page')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
