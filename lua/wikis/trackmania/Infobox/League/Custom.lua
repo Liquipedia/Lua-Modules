@@ -55,17 +55,12 @@ function CustomInjector:parse(id, widgets)
 						return Page.makeInternalLink(info.name, info.link)
 					end)
 		})
+	elseif id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Number of Players', children = {args.player_number}},
+			Cell{name = 'Number of Teams', children = {args.team_number}}
+		)
 	elseif id == 'customcontent' then
-		if args.player_number then
-			table.insert(widgets, Title{children = 'Players'})
-			table.insert(widgets, Cell{name = 'Number of Players', children = {args.player_number}})
-		end
-
-		if args.team_number then
-			table.insert(widgets, Title{children = 'Teams'})
-			table.insert(widgets, Cell{name = 'Number of Teams', children = {args.team_number}})
-		end
-
 		local maps = self.caller:getAllArgsForBase(args, 'map')
 		if #maps > 0 then
 			table.insert(widgets, Title{children = 'Maps'})
