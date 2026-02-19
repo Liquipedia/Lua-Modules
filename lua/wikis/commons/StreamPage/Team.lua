@@ -39,7 +39,8 @@ function TeamStreamPage:render()
 	}
 end
 
----@return Html
+---@protected
+---@return Widget
 function TeamStreamPage:renderPlayerInformation()
 	return HtmlWidgets.Div{
 		classes = {'match-bm-players-wrapper'},
