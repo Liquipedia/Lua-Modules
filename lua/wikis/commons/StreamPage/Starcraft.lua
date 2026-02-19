@@ -15,6 +15,7 @@ local Class = Lua.import('Module:Class')
 local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
+local FnUtil = Lua.import('Module:FnUtil')
 local Image = Lua.import('Module:Image')
 local Json = Lua.import('Module:Json')
 local Links = Lua.import('Module:Links')
@@ -60,14 +61,14 @@ function StarcraftStreamPage:renderPlayerInformation()
 	return HtmlWidgets.Div{
 		classes = {'match-bm-players-wrapper'},
 		css = {width = '100%'},
-		children = Array.map(self.matches[1].opponents, StarcraftStreamPage._teamDisplay)
+		children = Array.map(self.matches[1].opponents, StarcraftStreamPage._opponentDisplay)
 	}
 end
 
 ---@private
 ---@param opponent standardOpponent
 ---@return Widget
-function StarcraftStreamPage._teamDisplay(opponent)
+function StarcraftStreamPage._opponentDisplay(opponent)
 	return HtmlWidgets.Div{
 		classes = {'match-bm-players-team'},
 		children = WidgetUtil.collect(
@@ -75,24 +76,21 @@ function StarcraftStreamPage._teamDisplay(opponent)
 				classes = {'match-bm-players-team-header'},
 				children = OpponentDisplay.InlineOpponent{opponent = opponent, teamStyle = 'icon'}
 			},
-			Array.map(opponent.players, StarcraftStreamPage._playerDisplay)
+			Array.map(opponent.players, FnUtil.curry(StarcraftStreamPage._playerDisplay, opponent.type))
 		)
 	}
 end
 
+---@param opponentType OpponentType
 ---@param player standardPlayer
 ---@return Widget
-function StarcraftStreamPage._playerDisplay(player)
+function StarcraftStreamPage._playerDisplay(opponentType, player)
 	local lpdbData = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = '[[pagename::' .. (Page.pageifyLink(player.pageName) or '') .. ']]',
 		limit = 1
-	})[1] or {}
+	})[1]
 
-	local image  = lpdbData.image
-	if String.isEmpty(image) then
-		image = Logic.emptyOr((lpdbData.extradata or {}).image, 'Blank Player Image.png') --[[@as string]]
-	end
-
+	local image = Logic.nilIfEmpty(lpdbData.image) or 'Blank Player Image.png'
 	local imageDisplay = Image.display(image, nil, {class = 'img-fluid', size = '600px'})
 
 	local nameDisplay = PlayerDisplay.InlinePlayer{
@@ -114,7 +112,14 @@ function StarcraftStreamPage._playerDisplay(player)
 						HtmlWidgets.B{children = 'Name: '},
 						lpdbData.name
 					}} or nil,
-					lpdbData.birthdate ~= DateExt.defaultDate and HtmlWidgets.Span{children = {
+					Opponent.typeIsParty(opponentType) and Logic.isNotEmpty(lpdbData.team) and HtmlWidgets.Span{children = {
+						HtmlWidgets.B{children = 'Team: '},
+						OpponentDisplay.InlineTeamContainer{
+							template = lpdbData.team,
+							style = 'standard'
+						}
+					}} or nil,
+					not DateExt.isDefaultTimestamp(lpdbData.birthdate) and HtmlWidgets.Span{children = {
 						HtmlWidgets.B{children = 'Birth: '},
 						mw.getContentLanguage():formatDate('F j, Y', lpdbData.birthdate),
 						' (' .. DateExt.calculateAge(DateExt.getCurrentTimestamp(), lpdbData.birthdate) .. ')'
