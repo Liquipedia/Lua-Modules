@@ -209,16 +209,17 @@ Author: warnull
 		grid-column: 1 / -1;
 		grid-template-columns: 50% 50%;
 	}
-
-	.swiss-table-header-row > .group-table-header-row,
-	.swiss-table-body-row > .group-table-result-row {
-		grid-column-end: 1;
-	}
 }
 
-.swiss-table-header-row > .group-table-header-row > .group-table-cell:last-child,
-.swiss-table-body-row > .group-table-result-row > .group-table-cell:last-child {
-	border-right: 1px solid var( --table-border-color, #bbbbbb );
+.swiss-table-header-row > .group-table-header-row,
+.swiss-table-body-row > .group-table-result-row {
+	@supports not ( display: contents ) {
+		grid-column-end: 1;
+	}
+
+	> .group-table-cell:last-child {
+		border-right: 1px solid var( --table-border-color, #bbbbbb );
+	}
 }
 
 .swiss-table-match {
