@@ -29,6 +29,7 @@ local Table = Lua.import('Module:Table')
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local RANDOM_RACE = 'r'
@@ -169,16 +170,16 @@ function StarcraftStreamPage:_mapPool()
 		or race1 ~= race2
 
 	local currentMap = self:_getCurrentMap()
-	local matchup = skipMapWinRate and '' or race1 .. race2
+	local matchup = skipMapWinRate and '' or (race1 .. race2)
 
 	---@param map 'TBA'|{link: string, displayname: string}
 	---@return Widget
 	local function createMapRow(map)
 		if map == 'TBA' then
-			return HtmlWidgets.Tr{
+			return TableWidgets.Row{
 				classes = {'stats-row'},
-				children = HtmlWidgets.Td{
-					attributes = {colspan = 2},
+				children = TableWidgets.Cell{
+					colspan = 2,
 					children = HtmlWidgets.Span{
 						css = {
 							['text-align'] = 'center',
@@ -189,48 +190,49 @@ function StarcraftStreamPage:_mapPool()
 				}
 			}
 		end
-		return HtmlWidgets.Tr{
+		return TableWidgets.Row{
 			classes = {
 				'stats-row',
 				map.link == currentMap and 'tournament-highlighted-bg' or nil
 			},
 			children = WidgetUtil.collect(
-				HtmlWidgets.Td{children = Link{link = map.link, children = map.displayname}},
-				not skipMapWinRate and HtmlWidgets.Td{
+				TableWidgets.Cell{children = Link{link = map.link, children = map.displayname}},
+				not skipMapWinRate and TableWidgets.Cell{
 					children = StarcraftStreamPage._queryMapWinrate(map.link, matchup)
 				} or nil
 			),
 		}
 	end
 
-	return DataTable{
-		tableCss = {
-			['text-align'] = 'center',
-			margin = '0 0 10px 0',
+	return TableWidgets.Table{
+		variant = 'themed',
+		css = {
+			['font-size'] = '130%',
 		},
-		children = WidgetUtil.collect(
-			HtmlWidgets.Tr{
-				classes = {'wiki-color-dark', 'wiki-backgroundcolor-light'},
-				css = {
-					['font-size'] = '130%',
-					padding = '5px 10px',
-				},
-				children = {HtmlWidgets.Th{
-					attributes = {colspan = 2},
-					css = {padding = '5px'},
-					children = 'Map Pool'
+		columns = {
+			{align = 'center'},
+			not skipMapWinRate and {align = 'center'} or nil,
+		},
+		children = {
+			TableWidgets.TableHeader{children = {
+				TableWidgets.Row{children = {
+					TableWidgets.CellHeader{
+						colspan = 2,
+						unsortable = true,
+						children = 'Map Pool'
+					}
+				}},
+				TableWidgets.Row{children = {
+					TableWidgets.CellHeader{children = 'Map'},
+					TableWidgets.CellHeader{children = {
+						race1:upper(),
+						'v',
+						race2:upper()
+					}}
 				}}
-			},
-			not skipMapWinRate and HtmlWidgets.Tr{children = {
-				HtmlWidgets.Th{children = 'Map'},
-				HtmlWidgets.Th{children = {
-					race1:upper(),
-					'v',
-					race2:upper()
-				}}
-			}} or nil,
-			Array.map(maps, createMapRow)
-		)
+			}},
+			TableWidgets.TableBody{children = Array.map(maps, createMapRow)}
+		}
 	}
 end
 
