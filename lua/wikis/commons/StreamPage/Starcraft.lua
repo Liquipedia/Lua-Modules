@@ -7,14 +7,19 @@
 
 local Lua = require('Module:Lua')
 
+local Abbreviation = Lua.import('Module:Abbreviation')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local BaseStreamPage = Lua.import('Module:StreamPage/Base')
 local Class = Lua.import('Module:Class')
 local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
+local Faction = Lua.import('Module:Faction')
 local Image = Lua.import('Module:Image')
+local Json = Lua.import('Module:Json')
 local Links = Lua.import('Module:Links')
+local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Page = Lua.import('Module:Page')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
@@ -24,6 +29,9 @@ local Table = Lua.import('Module:Table')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
+
+local RANDOM_RACE = 'r'
+local TBD = Abbreviation.make{title = 'To be determined (or to be decided)', text = 'TBD'}
 
 ---@class StarcraftStreamPage: BaseStreamPage
 ---@operator call(table): StarcraftStreamPage
@@ -40,7 +48,8 @@ end
 function StarcraftStreamPage:render()
 	return {
 		HtmlWidgets.H3{children = 'Player Information'},
-		self:renderPlayerInformation()
+		self:renderPlayerInformation(),
+		self:_mapPool()
 	}
 end
 
@@ -134,6 +143,123 @@ function StarcraftStreamPage._playerDisplay(player)
 			}
 		}
 	}
+end
+
+function StarcraftStreamPage:_mapPool()
+	local match = self.matches[1]
+
+	local maps = Logic.emptyOr(
+		Json.parse(mw.ext.LiquipediaDB.lpdb('tournament', {
+			conditions = '[[pagename::' .. match.parent .. ']]',
+			query = 'maps',
+			limit = 1,
+		})[1].maps),
+		{'TBA'}
+	) --[[ @as any[] ]]
+
+	local race1 = ((match.opponents[1].players)[1] or {}).faction
+	local race2 = ((match.opponents[2].players)[1] or {}).faction
+
+	local skipMapWinRate = match.opponents[1].type ~= Opponent.solo
+		or not race1
+		or not race2
+		or match.opponents[2].type ~= Opponent.solo
+		or race1 == Faction.defaultFaction
+		or race1 == RANDOM_RACE
+		or race2 == Faction.defaultFaction
+		or race1 ~= race2
+
+	local mapTable = mw.html.create('table')
+		:addClass('wikitable')
+		:css('text-align', 'center')
+		:css('margin', '0 0 10px 0')
+		:css('width', '100%')
+		mapTable:tag('tr')
+			:addClass('wiki-color-dark wiki-backgroundcolor-light')
+			:css('font-size', '130%')
+			:css('padding', '5px 10px')
+			:tag('th')
+				:attr('colspan', '2')
+				:css('padding', '5px')
+				:wikitext('Map Pool')
+
+	if not skipMapWinRate then
+		---@cast race1 -nil
+		---@cast race2 -nil
+		mapTable:tag('tr')
+			:tag('th'):wikitext('Map')
+			:tag('th'):wikitext(string.upper(race1) .. 'v' .. string.upper(race2))
+	end
+
+	local currentMap = self:_getCurrentMap()
+	local matchup = skipMapWinRate and '' or race1 .. race2
+
+	for _, map in ipairs(maps) do
+		local mapRow = mapTable:tag('tr')
+			:addClass('stats-row')
+
+		if map == 'TBA' then
+			mapRow:tag('td')
+				:attr('colspan', '2')
+				:node(mw.html.create('span')
+					:css('text-align', 'center')
+					:css('font-style', 'italic')
+					:wikitext('To be announced')
+				)
+		else
+			if map.link == currentMap then
+				mapRow:addClass('tournament-highlighted-bg')
+			end
+			mapRow:tag('td')
+				:wikitext('[[' .. map.link .. '|' .. map.displayname .. ']]')
+			if not skipMapWinRate then
+				local winRate = StarcraftStreamPage._queryMapWinrate(map.link, matchup)
+				if String.isNotEmpty(winRate) then
+					mapRow:tag('td')
+						:wikitext(winRate)
+				end
+			end
+		end
+	end
+
+	return mw.html.create('div')
+		:addClass('sc2-stream-page-middle-column1')
+		:node(mapTable)
+end
+
+function StarcraftStreamPage._getMaps(mapsInput)
+	if String.isEmpty(mapsInput) then
+		return {'TBA'}
+	end
+
+	return Json.parse(mapsInput)
+end
+
+function StarcraftStreamPage._queryMapWinrate(map, matchup)
+	local conditions = '[[pagename::' .. string.gsub(map, ' ', '_') .. ']] AND [[type::map_winrates]]'
+	local LPDBoutput = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		conditions = conditions,
+		query = 'extradata',
+	})
+
+	if type(LPDBoutput[1]) == 'table' then
+		if LPDBoutput[1]['extradata'][matchup] == '-' then
+			return TBD
+		else
+			return math.floor(LPDBoutput[1]['extradata'][matchup]*100 + 0.5) .. '%'
+		end
+	else
+		return TBD
+	end
+end
+
+function StarcraftStreamPage:_getCurrentMap()
+	local games = self.matches[1].games
+	for _, game in ipairs(games) do
+		if Logic.isEmpty(game.winner) then
+			return game.map
+		end
+	end
 end
 
 return StarcraftStreamPage
