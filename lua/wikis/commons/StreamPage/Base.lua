@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:StreamPage
+-- page=Module:StreamPage/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -18,7 +18,7 @@ local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local MatchPage = Lua.requireIfExists('Module:MatchPage')
-local MatchTable = Lua.import('Module:MatchTable/Custom')
+local MatchTable = Lua.import('Module:MatchTable')
 local MatchTicker = Lua.import('Module:MatchTicker')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
