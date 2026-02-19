@@ -175,7 +175,7 @@ function StreamPage:create()
 			GridWidgets.Cell{
 				cellContent = MatchPageAdditionalSection{
 					header = 'Channel Schedule',
-					children = self:_createMatchTicker():query():create()
+					children = self:_createMatchTicker():query():create():css('width', '100%')
 				},
 				xs = 'ignore',
 				sm = 'ignore',
