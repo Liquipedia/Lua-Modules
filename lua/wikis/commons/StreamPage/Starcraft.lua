@@ -201,9 +201,6 @@ function StarcraftStreamPage:_mapPool()
 
 	return TableWidgets.Table{
 		variant = 'themed',
-		css = {
-			['font-size'] = '130%',
-		},
 		columns = {
 			{align = 'center'},
 			not skipMapWinRate and {align = 'center'} or nil,
