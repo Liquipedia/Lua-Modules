@@ -175,7 +175,6 @@ function CountryRepresentation:create()
 	}}
 
 	return TableWidgets.Table{
-		variant = 'themed',
 		sortable = true,
 		columns = {
 			{
