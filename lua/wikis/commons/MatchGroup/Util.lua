@@ -256,6 +256,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 
 ---@class MatchGroupUtilMatch
 ---@field bracketData MatchGroupUtilBracketData
+---@field bracketId string
 ---@field comment string?
 ---@field date string
 ---@field dateIsExact boolean
@@ -565,6 +566,7 @@ function MatchGroupUtil.matchFromRecord(record)
 	local match = {
 		bestof = tonumber(record.bestof) or 0,
 		bracketData = bracketData,
+		bracketId = record.match2bracketid,
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		extradata = extradata,
 		date = record.date,
