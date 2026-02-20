@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Operator = Lua.import('Module:Operator')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local RoleUtil = Lua.import('Module:Role/Util')
@@ -98,8 +99,12 @@ function ParticipantsTeamRoster:render()
 		-- Used for making the sorting stable
 		local playerToIndex = Table.map(players, function(index, player) return player, index end)
 		-- Sort the players based on their roles first, then by their original order
+		local sortOrder = (Info.config.participants or {}).playerSortOrder
 		players = Array.sortBy(players, FnUtil.identity, function (a, b)
 			local function getPlayerSortOrder(player)
+				if sortOrder == 'alphabetical' then
+					return player.displayName or ''
+				end
 				local roles = player.extradata.roles or {}
 				return roles[1] and roles[1].sortOrder or math.huge
 			end
