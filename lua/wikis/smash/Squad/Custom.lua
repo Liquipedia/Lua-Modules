@@ -54,6 +54,7 @@ function CustomSquad.run(frame)
 	local tableGame = args.game
 
 	local players = SquadUtils.parsePlayers(args)
+	local columnVisibility = SquadUtils.analyzeColumnVisibility(players, props.status)
 
 	props.children = Array.map(players, function(person)
 		local game = person.game and mw.text.split(person.game:lower(), ',')[1] or tableGame
@@ -66,17 +67,17 @@ function CustomSquad.run(frame)
 		squadPerson.extradata.mains = mains
 		SquadUtils.storeSquadPerson(squadPerson)
 
-		local row = ExtendedSquadRow(squadPerson) ---@type SmashSquadRow
+		local row = ExtendedSquadRow(squadPerson, columnVisibility) ---@type SmashSquadRow
 
 		row:id():name()
-		row:mains():date('joindate', 'Join Date:&nbsp;')
+		row:mains():date('joindate')
 
 		if props.status == SquadUtils.SquadStatus.INACTIVE or props.status == SquadUtils.SquadStatus.FORMER_INACTIVE then
-			row:date('inactivedate', 'Inactive Date:&nbsp;')
+			row:date('inactivedate')
 		end
 
 		if props.status == SquadUtils.SquadStatus.FORMER or props.status == SquadUtils.SquadStatus.FORMER_INACTIVE then
-			row:date('leavedate', 'Leave Date:&nbsp;')
+			row:date('leavedate')
 			row:newteam()
 		end
 
@@ -87,9 +88,12 @@ function CustomSquad.run(frame)
 
 	end)
 
-	return SquadContexts.RoleTitle{
-		value = 'Main',
-		children = {Squad(props)}
+	return SquadContexts.ColumnVisibility{
+		value = columnVisibility,
+		children = {SquadContexts.RoleTitle{
+			value = 'Main',
+			children = {Squad(props)}
+		}}
 	}
 end
 

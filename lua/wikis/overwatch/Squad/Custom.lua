@@ -50,12 +50,14 @@ function CustomSquad.run(frame)
 	local players = SquadUtils.parsePlayers(args)
 
 	local showNumber = Array.any(players, Operator.property('number'))
+	local columnVisibility = SquadUtils.analyzeColumnVisibility(players, props.status)
 
 	props.children = Array.map(players, function(player)
-		return CustomSquad._playerRow(player, props.status, props.type, showNumber)
+		return CustomSquad._playerRow(player, props.status, props.type, showNumber, columnVisibility)
 	end)
 
 	local root = SquadContexts.RoleTitle{value = SquadUtils.positionTitle(), children = {Squad(props)}}
+	root = SquadContexts.ColumnVisibility{value = columnVisibility, children = {root}}
 	if not showNumber then
 		return root
 	end
@@ -82,26 +84,27 @@ end
 ---@param squadStatus SquadStatus
 ---@param squadType SquadType
 ---@param showNumber boolean
+---@param columnVisibility table?
 ---@return Widget
-function CustomSquad._playerRow(person, squadStatus, squadType, showNumber)
+function CustomSquad._playerRow(person, squadStatus, squadType, showNumber, columnVisibility)
 	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
 	squadPerson.extradata.number = person.number
 	SquadUtils.storeSquadPerson(squadPerson)
 
-	local row = ExtendedSquadRow(squadPerson)
+	local row = ExtendedSquadRow(squadPerson, columnVisibility)
 
 	row:id()
 	if showNumber then
 		row:number()
 	end
-	row:name():position():date('joindate', 'Join Date:&nbsp;')
+	row:name():position():date('joindate')
 
 	if squadStatus == SquadUtils.SquadStatus.INACTIVE or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
-		row:date('inactivedate', 'Inactive Date:&nbsp;')
+		row:date('inactivedate')
 	end
 
 	if squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
-		row:date('leavedate', 'Leave Date:&nbsp;')
+		row:date('leavedate')
 		row:newteam()
 	end
 

@@ -12,12 +12,10 @@ local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 
 local SquadUtils = Lua.import('Module:Squad/Utils')
-local Widgets = Lua.import('Module:Widget/All')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
-
-local DataTable, Tr, Th = Widgets.DataTable, Widgets.Tr, Widgets.Th
 
 ---@class SquadWidget: Widget
 ---@operator call(table): SquadWidget
@@ -39,24 +37,28 @@ local SquadTypeToDisplay = {
 	[SquadUtils.SquadType.STAFF] = 'Organization',
 }
 
----@return WidgetDataTable
+---@return Table2
 function Squad:render()
 	local title = self:_title(self.props.status, self.props.title, self.props.type)
 	local header = self:_header(self.props.status)
 
-	local allChildren = WidgetUtil.collect(title, header, unpack(self.props.children))
-
-	return DataTable{
-		classes = {'wikitable-striped', 'roster-card'},
-		wrapperClasses = {'roster-card-wrapper'},
-		children = allChildren,
+	return TableWidgets.Table{
+		title = title,
+		children = {
+			TableWidgets.TableHeader{
+				children = {header},
+			},
+			TableWidgets.TableBody{
+				children = self.props.children,
+			},
+		},
 	}
 end
 
 ---@param squadStatus SquadStatus
 ---@param title string?
 ---@param squadType SquadType
----@return Widget?
+---@return string?
 function Squad:_title(squadStatus, title, squadType)
 	local defaultTitle
 	-- TODO: Work away this special case
@@ -64,7 +66,6 @@ function Squad:_title(squadStatus, title, squadType)
 		(squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE) then
 
 		defaultTitle = 'Former Squad'
-	-- No default title for Active tables
 	elseif squadStatus ~= SquadUtils.SquadStatus.ACTIVE then
 		defaultTitle = SquadStatusToDisplay[squadStatus]  .. ' ' .. SquadTypeToDisplay[squadType]
 	end
@@ -75,35 +76,41 @@ function Squad:_title(squadStatus, title, squadType)
 		return
 	end
 
-	return Tr{
-		children = {Th{children = {titleText}, attributes={colspan = 10}}}
-	}
+	return titleText
 end
 
 ---@param status SquadStatus
 ---@return Widget
 function Squad:_header(status)
+	local visibility = self:useContext(SquadContexts.ColumnVisibility)
+
+	local function show(col)
+		return visibility == nil or visibility[col] == nil or visibility[col] == true
+	end
+
 	local isInactive = status == SquadUtils.SquadStatus.INACTIVE or status == SquadUtils.SquadStatus.FORMER_INACTIVE
 	local isFormer = status == SquadUtils.SquadStatus.FORMER or status == SquadUtils.SquadStatus.FORMER_INACTIVE
 
-	local name = self:useContext(SquadContexts.NameSection, {Th{children = {'Name'}}})
-	local inactive = isInactive and self:useContext(SquadContexts.InactiveSection, {
-		Th{children = {'Inactive Date'}}
+	local name = show('name') and self:useContext(
+		SquadContexts.NameSection,
+		{TableWidgets.CellHeader{children = {'Name'}}}
+	) or nil
+	local inactive = isInactive and show('inactivedate') and self:useContext(SquadContexts.InactiveSection, {
+		TableWidgets.CellHeader{children = {'Inactive Date'}}
 	}) or nil
-	local former = isFormer and self:useContext(SquadContexts.FormerSection, {
-		Th{children = {'Leave Date'}},
-		Th{children = {'New Team'}},
-	}) or nil
-	local role = {Th{children = {self:useContext(SquadContexts.RoleTitle)}}}
+	local former = isFormer and WidgetUtil.collect(
+		show('leavedate') and TableWidgets.CellHeader{children = {'Leave Date'}} or nil,
+		show('newteam') and TableWidgets.CellHeader{children = {'New Team'}} or nil
+	) or nil
+	local role = show('role') and {TableWidgets.CellHeader{children = {self:useContext(SquadContexts.RoleTitle)}}} or nil
 
-	return Tr{
-		classes = {'HeaderRow'},
+	return TableWidgets.Row{
 		children = WidgetUtil.collect(
-			Th{children = {'ID'}},
-			Th{}, -- "Team Icon" (most commmonly used for loans)
+			TableWidgets.CellHeader{children = {'ID'}},
+			show('teamIcon') and TableWidgets.CellHeader{} or nil,
 			name,
 			role,
-			Th{children = {'Join Date'}},
+			show('joindate') and TableWidgets.CellHeader{children = {'Join Date'}} or nil,
 			inactive,
 			former
 		)

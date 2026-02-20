@@ -50,6 +50,13 @@ function Table2CellHeader:render()
 			attributes.class = 'unsortable'
 		end
 
+		attributes = ColumnUtil.buildCellAttributes(
+			props.align,
+			props.nowrap,
+			props.shrink,
+			attributes
+		)
+
 		return HtmlWidgets.Th{
 			attributes = attributes,
 			children = props.children,
