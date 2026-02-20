@@ -188,6 +188,7 @@ function CountryRepresentation:create()
 			},
 			{
 				align = 'left',
+				minWidth = '15rem',
 				unsortable = true,
 			},
 		},
