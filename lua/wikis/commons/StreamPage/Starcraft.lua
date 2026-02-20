@@ -36,7 +36,10 @@ local TBD = Abbreviation.make{title = 'To be determined (or to be decided)', tex
 
 ---@class StarcraftStreamPage: BaseStreamPage
 ---@operator call(table): StarcraftStreamPage
-local StarcraftStreamPage = Class.new(BaseStreamPage)
+---@field suppressMapTable boolean
+local StarcraftStreamPage = Class.new(BaseStreamPage, function (self, args)
+	self.suppressMapTable = Logic.readBool(args.suppressMapTable)
+end)
 
 ---@param frame Frame
 ---@return Widget?
@@ -45,13 +48,13 @@ function StarcraftStreamPage.run(frame)
 	return StarcraftStreamPage(args):create()
 end
 
----@return Widget|Widget[]?
+---@return Widget[]
 function StarcraftStreamPage:render()
-	return {
+	return WidgetUtil.collect(
 		HtmlWidgets.H3{children = 'Player Information'},
 		self:renderPlayerInformation(),
 		self:_mapPool()
-	}
+	)
 end
 
 ---@protected
@@ -144,8 +147,12 @@ function StarcraftStreamPage._playerDisplay(opponentType, player)
 end
 
 ---@private
----@return Html
+---@return Widget?
 function StarcraftStreamPage:_mapPool()
+	if self.suppressMapTable then
+		return
+	end
+
 	local match = self.matches[1]
 
 	local maps = Logic.emptyOr(
