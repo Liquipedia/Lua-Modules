@@ -196,6 +196,23 @@ function League:createInfobox()
 end
 
 ---@private
+---@param dateString string
+---@return string
+function League:_standardiseRawDate(dateString)
+	-- Length 7 = YYYY-MM
+	-- Length 10 = YYYY-MM-??
+	if String.isEmpty(dateString) or (#dateString ~= 7 and #dateString ~= 10) then
+		return ''
+	end
+
+	if #dateString == 7 then
+		dateString = dateString .. '-??'
+	end
+	dateString = dateString:gsub('%-XX', '-??')
+	return dateString
+end
+
+---@private
 function League:_parseArgs()
 	local args = self.args
 
@@ -230,8 +247,10 @@ function League:_parseArgs()
 		parent = (args.parent or mw.title.getCurrentTitle().prefixedText):gsub(' ', '_'),
 		startDate = ReferenceCleaner.cleanDateIfKnown{date = args.sdate}
 			or ReferenceCleaner.cleanDateIfKnown{date = args.date},
+		startDateDisplay = self:_standardiseRawDate(args.sdate or args.date),
 		endDate = ReferenceCleaner.cleanDateIfKnown{date = args.edate}
-			or ReferenceCleaner.cleanDateIfKnown{date = args.date},
+		or ReferenceCleaner.cleanDateIfKnown{date = args.date},
+		endDateDisplay = self:_standardiseRawDate(args.edate or args.date),
 		mode = args.mode,
 		patch = args.patch,
 		endPatch = args.endpatch or args.epatch or args.patch,
@@ -550,6 +569,8 @@ function League:_setLpdbData(args, links)
 		summary = self:seoText(args),
 		extradata = {
 			series2 = args.series2 and mw.ext.TeamLiquidIntegration.resolve_redirect(args.series2) or nil,
+			startdatetext = self.data.startDateDisplay,
+			enddatetext = self.data.endDateDisplay,
 		},
 	}
 

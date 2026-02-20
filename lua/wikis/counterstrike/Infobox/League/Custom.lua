@@ -312,8 +312,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.sortdate = args.sort_date or lpdbData.enddate
 
 	lpdbData.extradata.prizepoollocal = self.data.localPrizePool
-	lpdbData.extradata.startdate_raw = args.sdate or args.date
-	lpdbData.extradata.enddate_raw = args.edate or args.date
 	lpdbData.extradata.shortname2 = args.shortname2
 
 	Array.forEach(CustomLeague.getRestrictions(args.restrictions),
