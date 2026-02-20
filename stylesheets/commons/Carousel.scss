@@ -3,6 +3,14 @@
 
 	--carousel-face-width: 3rem;
 
+	.theme--light & {
+		--carousel-fade-color-default: var( --clr-background, #ffffff );
+	}
+
+	.theme--dark & {
+		--carousel-fade-color-default: var( --clr-background, #121212 );
+	}
+
 	@media ( min-width: 1024px ) {
 		--carousel-face-width: 5rem;
 	}
@@ -62,26 +70,12 @@
 
 		&--left {
 			left: 0;
-
-			.theme--light & {
-				background: linear-gradient( to right, #ffffff, transparent );
-			}
-
-			.theme--dark & {
-				background: linear-gradient( to right, #121212, transparent );
-			}
+			background: linear-gradient( to right, var( --carousel-fade-color, var( --carousel-fade-color-default ) ), transparent );
 		}
 
 		&--right {
 			right: 0;
-
-			.theme--light & {
-				background: linear-gradient( to left, #ffffff, transparent );
-			}
-
-			.theme--dark & {
-				background: linear-gradient( to left, #121212, transparent );
-			}
+			background: linear-gradient( to left, var( --carousel-fade-color, var( --carousel-fade-color-default ) ), transparent );
 		}
 	}
 }
