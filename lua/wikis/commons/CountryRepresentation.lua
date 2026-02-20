@@ -150,9 +150,9 @@ function CountryRepresentation:create()
 		end
 		cache.lastCount = #players
 		table.insert(rows, TableWidgets.Row{children = {
-			TableWidgets.Cell{css = {['text-align'] = 'right'}, children = {cache.rank}},
+			TableWidgets.Cell{children = {cache.rank}},
 			TableWidgets.Cell{children = {Flags.Icon{flag = country}, '&nbsp;', country}},
-			TableWidgets.Cell{css = {['text-align'] = 'right'}, children = {self:_ratioDisplay(#players)}},
+			TableWidgets.Cell{children = {self:_ratioDisplay(#players)}},
 			TableWidgets.Cell{children = Array.interleave(Array.map(players, function (player)
 				return PlayerDisplay.InlinePlayer{player = player, showFlag = false}
 			end), ', ')},
@@ -161,22 +161,31 @@ function CountryRepresentation:create()
 
 	local headerRow = TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = {
-			TableWidgets.CellHeader{classes = {'unsortable'}, children = {'#'}},
+			TableWidgets.CellHeader{children = {'#'}},
 			TableWidgets.CellHeader{children = {'Country / Region'}},
 			TableWidgets.CellHeader{children = {'Representation'}},
-			TableWidgets.CellHeader{
-				classes = {'unsortable'},
-				children = Array.interleave(WidgetUtil.collect(
-					self.config.player and 'Players' or nil,
-					self.config.staff and 'Staff' or nil
-				), ' & ')
-			},
+			TableWidgets.CellHeader{children = Array.interleave(WidgetUtil.collect(
+				self.config.player and 'Players' or nil,
+				self.config.staff and 'Staff' or nil
+			), ' & ')},
 		}}
 	}}
 
 	return TableWidgets.Table{
 		variant = 'themed',
 		sortable = true,
+		columns = {
+			{
+				align = 'right',
+				unsortable = true,
+			},
+			{align = 'left'},
+			{align = 'right'},
+			{
+				align = 'left',
+				unsortable = true,
+			},
+		},
 		children = {
 			headerRow,
 			TableWidgets.TableBody{children = rows}
