@@ -56,6 +56,7 @@ local SECONDS_ONE_DAY = 3600 * 24
 ---@class MatchTableConfig
 ---@field mode MatchTableMode
 ---@field limit number?
+---@field dateFormat ('full'|'compact')?
 ---@field displayGameIcons boolean
 ---@field showResult boolean
 ---@field aliases table<string, true>
@@ -148,6 +149,7 @@ function MatchTable:_readDefaultConfig()
 		addCategory = Logic.nilOr(Logic.readBoolOrNil(args.addCategory), true),
 		mode = args.tableMode,
 		limit = tonumber(args.limit),
+		dateFormat = args.dateFormat,
 		displayGameIcons = Logic.readBool(args.gameIcons),
 		showResult = Logic.nilOr(Logic.readBoolOrNil(args.showResult), true),
 		timeRange = self:readTimeRange(),
@@ -688,6 +690,7 @@ function MatchTable:_displayDate(match)
 		finished = match.finished,
 		date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
 		rawdatetime = true,
+		format = self.config.dateFormat
 	} or nil)
 end
 
