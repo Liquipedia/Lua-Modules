@@ -58,7 +58,6 @@ function MvpTable.run(args)
 	end
 
 	return TableWidgets.Table{
-		variant = 'themed',
 		tableClasses = {'prizepooltable', 'collapsed'},
 		title = String.nilIfEmpty(args.title),
 		columns = {
