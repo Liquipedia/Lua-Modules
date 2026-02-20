@@ -12,7 +12,7 @@ local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 
 local SquadUtils = Lua.import('Module:Squad/Utils')
-local Table2Widgets = Lua.import('Module:Widget/Table2/All')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
@@ -42,13 +42,13 @@ function Squad:render()
 	local title = self:_title(self.props.status, self.props.title, self.props.type)
 	local header = self:_header(self.props.status)
 
-	return Table2Widgets.Table{
+	return TableWidgets.Table{
 		title = title,
 		children = {
-			Table2Widgets.TableHeader{
+			TableWidgets.TableHeader{
 				children = {header},
 			},
-			Table2Widgets.TableBody{
+			TableWidgets.TableBody{
 				children = self.props.children,
 			},
 		},
@@ -85,23 +85,23 @@ function Squad:_header(status)
 	local isInactive = status == SquadUtils.SquadStatus.INACTIVE or status == SquadUtils.SquadStatus.FORMER_INACTIVE
 	local isFormer = status == SquadUtils.SquadStatus.FORMER or status == SquadUtils.SquadStatus.FORMER_INACTIVE
 
-	local name = self:useContext(SquadContexts.NameSection, {Table2Widgets.CellHeader{children = {'Name'}}})
+	local name = self:useContext(SquadContexts.NameSection, {TableWidgets.CellHeader{children = {'Name'}}})
 	local inactive = isInactive and self:useContext(SquadContexts.InactiveSection, {
-		Table2Widgets.CellHeader{children = {'Inactive Date'}}
+		TableWidgets.CellHeader{children = {'Inactive Date'}}
 	}) or nil
 	local former = isFormer and self:useContext(SquadContexts.FormerSection, {
-		Table2Widgets.CellHeader{children = {'Leave Date'}},
-		Table2Widgets.CellHeader{children = {'New Team'}},
+		TableWidgets.CellHeader{children = {'Leave Date'}},
+		TableWidgets.CellHeader{children = {'New Team'}},
 	}) or nil
-	local role = {Table2Widgets.CellHeader{children = {self:useContext(SquadContexts.RoleTitle)}}}
+	local role = {TableWidgets.CellHeader{children = {self:useContext(SquadContexts.RoleTitle)}}}
 
-	return Table2Widgets.Row{
+	return TableWidgets.Row{
 		children = WidgetUtil.collect(
-			Table2Widgets.CellHeader{children = {'ID'}},
-			Table2Widgets.CellHeader{}, -- "Team Icon" (most commmonly used for loans)
+			TableWidgets.CellHeader{children = {'ID'}},
+			TableWidgets.CellHeader{}, -- "Team Icon" (most commmonly used for loans)
 			name,
 			role,
-			Table2Widgets.CellHeader{children = {'Join Date'}},
+			TableWidgets.CellHeader{children = {'Join Date'}},
 			inactive,
 			former
 		)
