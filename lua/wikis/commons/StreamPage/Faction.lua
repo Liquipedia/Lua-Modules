@@ -21,10 +21,12 @@ local Json = Lua.import('Module:Json')
 local Links = Lua.import('Module:Links')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
+local MatchGroup = Lua.import('Module:MatchGroup')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Page = Lua.import('Module:Page')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
+local Tabs = Lua.import('Module:Tabs')
 local Table = Lua.import('Module:Table')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -48,13 +50,14 @@ function FactionStreamPage.run(frame)
 	return FactionStreamPage(args):create()
 end
 
----@return Widget[]
+---@return string|Widget?
 function FactionStreamPage:render()
-	return WidgetUtil.collect(
-		HtmlWidgets.H3{children = 'Player Information'},
-		self:renderPlayerInformation(),
-		self:_mapPool()
-	)
+	return Tabs.dynamic{
+		name1 = 'Player Information',
+		content1 = self:renderPlayerInformation(),
+		name2 = 'Tournament Information',
+		content2 = self:renderTournamentInformation()
+	}
 end
 
 ---@protected
@@ -144,6 +147,24 @@ function FactionStreamPage._playerDisplay(opponentType, player)
 			}
 		}
 	}
+end
+
+---@param props table
+---@return Widget
+local function createTemplateBox(props)
+	return HtmlWidgets.Div{
+		classes = Array.extend('template-box', props.classes),
+		css = {['padding-right'] = Logic.emptyOr(props.padding, '2em')},
+		children = props.children
+	}
+end
+
+function FactionStreamPage:renderTournamentInformation()
+	local match = self.matches[1]
+	return HtmlWidgets.Div{children = {
+		createTemplateBox{children = self:_mapPool()},
+		createTemplateBox{children = MatchGroup.MatchGroupById{id = match.bracketId}}
+	}}
 end
 
 ---@private
