@@ -541,6 +541,7 @@ end
 function BaseMatchPage:_createMatchTable(props)
 	return MatchTable(Table.mergeInto({
 		addCategory = false,
+		dateFormat = 'compact',
 		edate = self.matchData.timestamp - DateExt.daysToSeconds(1) --[[ MatchTable adds 1-day offset to make edate
 																		inclusive, and we don't want that here ]],
 		limit = 5,
