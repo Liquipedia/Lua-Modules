@@ -821,7 +821,7 @@ function MatchTable:_displayScore(match)
 		end
 
 		return mw.html.create(tonumber(opponentRecord.placement) == 1 and 'b' or nil)
-			:wikitext(status == SCORE_STATUS and (score or '–') or status)
+			:wikitext(status == SCORE_STATUS and (score or '&ndash;') or status)
 	end
 
 	return mw.html.create('td')
