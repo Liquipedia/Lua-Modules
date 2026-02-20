@@ -17,9 +17,6 @@ local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
 
-local Table2, TableHeader, TableBody, Row, CellHeader =
-	Table2Widgets.Table, Table2Widgets.TableHeader, Table2Widgets.TableBody, Table2Widgets.Row, Table2Widgets.CellHeader
-
 ---@class SquadWidget: Widget
 ---@operator call(table): SquadWidget
 local Squad = Class.new(Widget)
@@ -45,13 +42,13 @@ function Squad:render()
 	local title = self:_title(self.props.status, self.props.title, self.props.type)
 	local header = self:_header(self.props.status)
 
-	return Table2{
+	return Table2Widgets.Table{
 		title = title,
 		children = {
-			TableHeader{
+			Table2Widgets.TableHeader{
 				children = {header},
 			},
-			TableBody{
+			Table2Widgets.TableBody{
 				children = self.props.children,
 			},
 		},
@@ -69,7 +66,6 @@ function Squad:_title(squadStatus, title, squadType)
 		(squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE) then
 
 		defaultTitle = 'Former Squad'
-	-- No default title for Active tables
 	elseif squadStatus ~= SquadUtils.SquadStatus.ACTIVE then
 		defaultTitle = SquadStatusToDisplay[squadStatus]  .. ' ' .. SquadTypeToDisplay[squadType]
 	end
@@ -89,23 +85,23 @@ function Squad:_header(status)
 	local isInactive = status == SquadUtils.SquadStatus.INACTIVE or status == SquadUtils.SquadStatus.FORMER_INACTIVE
 	local isFormer = status == SquadUtils.SquadStatus.FORMER or status == SquadUtils.SquadStatus.FORMER_INACTIVE
 
-	local name = self:useContext(SquadContexts.NameSection, {CellHeader{children = {'Name'}}})
+	local name = self:useContext(SquadContexts.NameSection, {Table2Widgets.CellHeader{children = {'Name'}}})
 	local inactive = isInactive and self:useContext(SquadContexts.InactiveSection, {
-		CellHeader{children = {'Inactive Date'}}
+		Table2Widgets.CellHeader{children = {'Inactive Date'}}
 	}) or nil
 	local former = isFormer and self:useContext(SquadContexts.FormerSection, {
-		CellHeader{children = {'Leave Date'}},
-		CellHeader{children = {'New Team'}},
+		Table2Widgets.CellHeader{children = {'Leave Date'}},
+		Table2Widgets.CellHeader{children = {'New Team'}},
 	}) or nil
-	local role = {CellHeader{children = {self:useContext(SquadContexts.RoleTitle)}}}
+	local role = {Table2Widgets.CellHeader{children = {self:useContext(SquadContexts.RoleTitle)}}}
 
-	return Row{
+	return Table2Widgets.Row{
 		children = WidgetUtil.collect(
-			CellHeader{children = {'ID'}},
-			CellHeader{}, -- "Team Icon" (most commmonly used for loans)
+			Table2Widgets.CellHeader{children = {'ID'}},
+			Table2Widgets.CellHeader{}, -- "Team Icon" (most commmonly used for loans)
 			name,
 			role,
-			CellHeader{children = {'Join Date'}},
+			Table2Widgets.CellHeader{children = {'Join Date'}},
 			inactive,
 			former
 		)
