@@ -826,6 +826,7 @@ function MatchTable:_displayScore(match)
 
 	return mw.html.create('td')
 		:addClass('match-table-score')
+		:css('white-space', 'nowrap')
 		:node(toScore(result.opponent, result.gameOpponents))
 		:node(bestof1Score and BO1_SCORE_CONCAT or SCORE_CONCAT)
 		:node(toScore(result.vs, result.gameVsOpponents))
