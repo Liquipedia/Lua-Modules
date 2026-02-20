@@ -20,6 +20,7 @@ local Image = Lua.import('Module:Image')
 local Json = Lua.import('Module:Json')
 local Links = Lua.import('Module:Links')
 local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Page = Lua.import('Module:Page')
@@ -247,7 +248,7 @@ function StarcraftStreamPage._queryMapWinrate(map, matchup)
 	if Logic.isEmpty(data) or data == '-' then
 		return TBD
 	end
-	return math.floor(data * 100 + 0.5) .. '%'
+	return MathUtil.formatPercentage(data)
 end
 
 ---@private
