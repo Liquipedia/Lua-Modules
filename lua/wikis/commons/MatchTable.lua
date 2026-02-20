@@ -680,6 +680,7 @@ end
 function MatchTable:_displayDate(match)
 	local cell = mw.html.create('td')
 		:css('text-align', 'left')
+		:css('min-width', '5rem')
 		:attr('data-sort-value', match.timestamp)
 
 	if match.timestamp == DateExt.defaultTimestamp then
