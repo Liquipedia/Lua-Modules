@@ -92,9 +92,9 @@ function StarcraftStreamPage._playerDisplay(opponentType, player)
 	local image = Logic.nilIfEmpty(lpdbData.image) or 'Blank Player Image.png'
 	local imageDisplay = Image.display(image, nil, {class = 'img-fluid', size = '600px'})
 
-	local nameDisplay = PlayerDisplay.InlinePlayer{
+	local nameDisplay = opponentType ~= Opponent.solo and PlayerDisplay.InlinePlayer{
 		player = player
-	}
+	} or nil
 
 	return HtmlWidgets.Div{
 		classes = {'match-bm-players-player', 'match-bm-players-player--col-2'},
