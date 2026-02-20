@@ -152,7 +152,10 @@ function CountryRepresentation:create()
 		table.insert(rows, TableWidgets.Row{children = {
 			TableWidgets.Cell{children = {cache.rank}},
 			TableWidgets.Cell{children = {Flags.Icon{flag = country}, '&nbsp;', country}},
-			TableWidgets.Cell{children = {self:_ratioDisplay(#players)}},
+			TableWidgets.Cell{
+				attributes = {['data-sort-value'] = #players},
+				children = self:_ratioDisplay(#players)
+			},
 			TableWidgets.Cell{children = Array.interleave(Array.map(players, function (player)
 				return PlayerDisplay.InlinePlayer{player = player, showFlag = false}
 			end), ', ')},
@@ -180,7 +183,10 @@ function CountryRepresentation:create()
 				unsortable = true,
 			},
 			{align = 'left'},
-			{align = 'right'},
+			{
+				align = 'right',
+				sortType = 'number',
+			},
 			{
 				align = 'left',
 				unsortable = true,
