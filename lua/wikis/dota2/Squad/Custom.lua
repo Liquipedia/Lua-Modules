@@ -75,13 +75,13 @@ function CustomSquad.runAuto(playerList, squadStatus, squadType, customTitle)
 	)
 end
 
-function CustomSquad._playerRow(person, squadStatus, squadType)
+function CustomSquad._playerRow(person, squadStatus, squadType, columnVisibility)
 	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
 	squadPerson.extradata.activeteam = person.activeteam
 	squadPerson.extradata.activeteamrole = person.activeteamrole
 	SquadUtils.storeSquadPerson(squadPerson)
 
-	local row = ExtendedSquadRow(squadPerson)
+	local row = ExtendedSquadRow(squadPerson, columnVisibility)
 	row:id()
 	row:name()
 	row:position()

@@ -23,14 +23,20 @@ local RoleIcons = {
 	sub = Icon.makeIcon{iconName = 'substitute', hover = 'Substitute'},
 }
 
+local function shouldShowColumn(visibility, columnId)
+	return visibility == nil or visibility[columnId] == nil or visibility[columnId] == true
+end
+
 ---@class SquadRow: BaseClass
----@operator call(ModelRow): SquadRow
+---@operator call(ModelRow, table?): SquadRow
 ---@field children Widget[]
 ---@field model ModelRow
+---@field columnVisibility table?
 local SquadRow = Class.new(
-	function(self, squadPerson)
+	function(self, squadPerson, columnVisibility)
 		self.children = {}
 		self.model = assert(squadPerson, 'No Squad Person supplied to the Row')
+		self.columnVisibility = columnVisibility
 	end
 )
 
@@ -55,28 +61,33 @@ function SquadRow:id()
 		table.insert(idContent, '&nbsp;' .. roleIcon)
 	end
 
-	local cell = Cell{
+	table.insert(self.children, Cell{
 		children = idContent,
-	}
+	})
 
-	local date = self.model.leavedate or self.model.inactivedate
-	local hasTeam = self.model.extradata.loanedto and mw.ext.TeamTemplate.teamexists(self.model.extradata.loanedto)
-	local hasTeamRole = hasTeam and self.model.extradata.loanedtorole
-	local teamNode = Cell{
-		children = {
-			hasTeam and mw.ext.TeamTemplate.teamicon(self.model.extradata.loanedto, date) or nil,
-			hasTeamRole and HtmlWidgets.Small{children = {HtmlWidgets.I{children = {self.model.extradata.loanedtorole}}}} or nil,
-		}
-	}
-
-	table.insert(self.children, cell)
-	table.insert(self.children, teamNode)
+	if shouldShowColumn(self.columnVisibility, 'teamIcon') then
+		local date = self.model.leavedate or self.model.inactivedate
+		local hasTeam = self.model.extradata.loanedto and mw.ext.TeamTemplate.teamexists(self.model.extradata.loanedto)
+		local hasTeamRole = hasTeam and self.model.extradata.loanedtorole
+		table.insert(self.children, Cell{
+			children = {
+				hasTeam and mw.ext.TeamTemplate.teamicon(self.model.extradata.loanedto, date) or nil,
+				hasTeamRole and HtmlWidgets.Small{
+					children = {HtmlWidgets.I{children = {self.model.extradata.loanedtorole}}}
+				} or nil,
+			}
+		})
+	end
 
 	return self
 end
 
 ---@return self
 function SquadRow:name()
+	if not shouldShowColumn(self.columnVisibility, 'name') then
+		return self
+	end
+
 	table.insert(self.children, Cell{
 		children = String.isNotEmpty(self.model.name) and {self.model.name} or nil,
 	})
@@ -86,6 +97,10 @@ end
 
 ---@return self
 function SquadRow:role()
+	if not shouldShowColumn(self.columnVisibility, 'role') then
+		return self
+	end
+
 	local display = String.isNotEmpty(self.model.role) and not RoleIcons[self.model.role:lower()]
 
 	table.insert(self.children, Cell{
@@ -95,9 +110,12 @@ function SquadRow:role()
 	return self
 end
 
----Display Position and Role in a single cell
 ---@return self
 function SquadRow:position()
+	if not shouldShowColumn(self.columnVisibility, 'role') then
+		return self
+	end
+
 	local displayRole = String.isNotEmpty(self.model.role) and not RoleIcons[self.model.role:lower()]
 
 	local content = {}
@@ -123,6 +141,10 @@ end
 ---@param field string
 ---@return self
 function SquadRow:date(field)
+	if not shouldShowColumn(self.columnVisibility, field) then
+		return self
+	end
+
 	table.insert(self.children, Cell{
 		children = self.model[field] and {
 			HtmlWidgets.I{children = {self.model.extradata[field .. 'display'] or self.model[field]}},
@@ -134,6 +156,10 @@ end
 
 ---@return self
 function SquadRow:newteam()
+	if not shouldShowColumn(self.columnVisibility, 'newteam') then
+		return self
+	end
+
 	local function createContent()
 		local content = {}
 		local newTeam, newTeamRole, newTeamSpecial = self.model.newteam, self.model.newteamrole, self.model.newteamspecial

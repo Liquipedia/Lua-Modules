@@ -44,7 +44,7 @@ function CustomSquad.run(frame)
 	local tlpd = Logic.readBool(args.tlpd)
 	local SquadClass = tlpd and SquadTldb or Squad
 
-	return SquadUtils.defaultRunManual(frame, SquadClass, function(person, squadStatus, squadType)
+	return SquadUtils.defaultRunManual(frame, SquadClass, function(person, squadStatus, squadType, columnVisibility)
 		local inputId = person.id --[[@as number]]
 		person.race = CustomSquad._queryTLPD(inputId, 'race') or person.race
 		person.id = CustomSquad._queryTLPD(inputId, 'name') or person.id
@@ -58,7 +58,7 @@ function CustomSquad.run(frame)
 		squadPerson.extradata.eloPeak = CustomSquad._queryTLPD(inputId, 'peak_elo')
 		SquadUtils.storeSquadPerson(squadPerson)
 
-		local row = ExtendedSquadRow(squadPerson)
+		local row = ExtendedSquadRow(squadPerson, columnVisibility)
 
 		row:id():name()
 

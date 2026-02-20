@@ -82,26 +82,35 @@ end
 ---@param status SquadStatus
 ---@return Widget
 function Squad:_header(status)
+	local visibility = self:useContext(SquadContexts.ColumnVisibility)
+
+	local function show(col)
+		return visibility == nil or visibility[col] == nil or visibility[col] == true
+	end
+
 	local isInactive = status == SquadUtils.SquadStatus.INACTIVE or status == SquadUtils.SquadStatus.FORMER_INACTIVE
 	local isFormer = status == SquadUtils.SquadStatus.FORMER or status == SquadUtils.SquadStatus.FORMER_INACTIVE
 
-	local name = self:useContext(SquadContexts.NameSection, {TableWidgets.CellHeader{children = {'Name'}}})
-	local inactive = isInactive and self:useContext(SquadContexts.InactiveSection, {
+	local name = show('name') and self:useContext(
+		SquadContexts.NameSection,
+		{TableWidgets.CellHeader{children = {'Name'}}}
+	) or nil
+	local inactive = isInactive and show('inactivedate') and self:useContext(SquadContexts.InactiveSection, {
 		TableWidgets.CellHeader{children = {'Inactive Date'}}
 	}) or nil
-	local former = isFormer and self:useContext(SquadContexts.FormerSection, {
-		TableWidgets.CellHeader{children = {'Leave Date'}},
-		TableWidgets.CellHeader{children = {'New Team'}},
-	}) or nil
-	local role = {TableWidgets.CellHeader{children = {self:useContext(SquadContexts.RoleTitle)}}}
+	local former = isFormer and WidgetUtil.collect(
+		show('leavedate') and TableWidgets.CellHeader{children = {'Leave Date'}} or nil,
+		show('newteam') and TableWidgets.CellHeader{children = {'New Team'}} or nil
+	) or nil
+	local role = show('role') and {TableWidgets.CellHeader{children = {self:useContext(SquadContexts.RoleTitle)}}} or nil
 
 	return TableWidgets.Row{
 		children = WidgetUtil.collect(
 			TableWidgets.CellHeader{children = {'ID'}},
-			TableWidgets.CellHeader{}, -- "Team Icon" (most commmonly used for loans)
+			show('teamIcon') and TableWidgets.CellHeader{} or nil,
 			name,
 			role,
-			TableWidgets.CellHeader{children = {'Join Date'}},
+			show('joindate') and TableWidgets.CellHeader{children = {'Join Date'}} or nil,
 			inactive,
 			former
 		)
