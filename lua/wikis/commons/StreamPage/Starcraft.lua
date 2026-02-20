@@ -208,15 +208,9 @@ function StarcraftStreamPage:_mapPool()
 			{align = 'center'},
 			not skipMapWinRate and {align = 'center'} or nil,
 		},
+		title = 'Map Pool',
 		children = {
 			TableWidgets.TableHeader{children = {
-				TableWidgets.Row{children = {
-					TableWidgets.CellHeader{
-						colspan = skipMapWinRate and 1 or 2,
-						unsortable = true,
-						children = 'Map Pool'
-					}
-				}},
 				TableWidgets.Row{children = {
 					TableWidgets.CellHeader{children = 'Map'},
 					not skipMapWinRate and TableWidgets.CellHeader{children = {
