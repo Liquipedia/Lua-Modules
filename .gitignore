@@ -5,3 +5,6 @@
 /package-lock.json
 /luacov.report.out
 /luacov.stats.out
+**/__pycache__/
+.env
+*.ck
