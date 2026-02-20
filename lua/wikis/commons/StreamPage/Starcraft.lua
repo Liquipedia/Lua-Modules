@@ -166,7 +166,8 @@ function StarcraftStreamPage:_mapPool()
 		or race1 == Faction.defaultFaction
 		or race1 == RANDOM_RACE
 		or race2 == Faction.defaultFaction
-		or race1 ~= race2
+		or race2 == RANDOM_RACE
+		or race1 == race2
 
 	local currentMap = self:_getCurrentMap()
 	local matchup = skipMapWinRate and '' or (race1 .. race2)
@@ -178,7 +179,7 @@ function StarcraftStreamPage:_mapPool()
 			return TableWidgets.Row{
 				classes = {'stats-row'},
 				children = TableWidgets.Cell{
-					colspan = 2,
+					colspan = skipMapWinRate and 1 or 2,
 					children = HtmlWidgets.Span{
 						css = {
 							['text-align'] = 'center',
@@ -216,18 +217,18 @@ function StarcraftStreamPage:_mapPool()
 			TableWidgets.TableHeader{children = {
 				TableWidgets.Row{children = {
 					TableWidgets.CellHeader{
-						colspan = 2,
+						colspan = skipMapWinRate and 1 or 2,
 						unsortable = true,
 						children = 'Map Pool'
 					}
 				}},
 				TableWidgets.Row{children = {
 					TableWidgets.CellHeader{children = 'Map'},
-					TableWidgets.CellHeader{children = {
+					not skipMapWinRate and TableWidgets.CellHeader{children = {
 						race1:upper(),
 						'v',
 						race2:upper()
-					}}
+					}} or nil
 				}}
 			}},
 			TableWidgets.TableBody{children = Array.map(maps, createMapRow)}
@@ -243,17 +244,16 @@ function StarcraftStreamPage._queryMapWinrate(map, matchup)
 	local LPDBoutput = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = conditions,
 		query = 'extradata',
-	})
+	})[1]
 
-	if type(LPDBoutput[1]) == 'table' then
-		if LPDBoutput[1]['extradata'][matchup] == '-' then
-			return TBD
-		else
-			return math.floor(LPDBoutput[1]['extradata'][matchup]*100 + 0.5) .. '%'
-		end
-	else
+	if type(LPDBoutput) ~= 'table' or Logic.isEmpty(LPDBoutput) then
 		return TBD
 	end
+	local data = (LPDBoutput.extradata or {})[matchup]
+	if Logic.isEmpty(data) or data == '-' then
+		return TBD
+	end
+	return math.floor(data * 100 + 0.5) .. '%'
 end
 
 ---@private
