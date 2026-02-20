@@ -30,7 +30,7 @@ $table2-cell-padding-x: 0.75rem;
 		overflow: auto hidden;
 		max-width: 100%;
 		-webkit-overflow-scrolling: touch;
-		touch-action: pan-x;
+		touch-action: pan-x pan-y;
 		overscroll-behavior-x: contain;
 	}
 
