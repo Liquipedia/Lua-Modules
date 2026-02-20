@@ -121,9 +121,8 @@ function SquadRow:position()
 end
 
 ---@param field string
----@param cellTitle string?
 ---@return self
-function SquadRow:date(field, cellTitle)
+function SquadRow:date(field)
 	table.insert(self.children, Cell{
 		children = self.model[field] and {
 			HtmlWidgets.I{children = {self.model.extradata[field .. 'display'] or self.model[field]}},
@@ -173,19 +172,7 @@ end
 
 ---@return Widget
 function SquadRow:create()
-	-- Set row background for certain roles
-	local backgrounds = {'Player'}
-	local role = string.lower(self.model.role or '')
-
-	if role == 'sub' then
-		table.insert(backgrounds, 'sub')
-	elseif role:find('coach') then
-		table.insert(backgrounds, role)
-		table.insert(backgrounds, 'roster-coach')
-	end
-
 	return Row{
-		classes = backgrounds,
 		children = self.children,
 	}
 end

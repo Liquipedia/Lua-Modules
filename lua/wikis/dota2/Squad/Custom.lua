@@ -85,14 +85,14 @@ function CustomSquad._playerRow(person, squadStatus, squadType)
 	row:id()
 	row:name()
 	row:position()
-	row:date('joindate', 'Join Date:&nbsp;')
+	row:date('joindate')
 
 	if squadStatus == SquadUtils.SquadStatus.INACTIVE or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
-		row:date('inactivedate', 'Inactive Date:&nbsp;')
+		row:date('inactivedate')
 		row:activeteam()
 	end
 	if squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
-		row:date('leavedate', 'Leave Date:&nbsp;')
+		row:date('leavedate')
 		row:newteam()
 	end
 

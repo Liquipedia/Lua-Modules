@@ -66,13 +66,13 @@ function CustomSquad.run(frame)
 			row:elo()
 		else
 			row:role()
-			row:date('joindate', 'Join Date:&nbsp;')
+			row:date('joindate')
 
 			if squadStatus == SquadUtils.SquadStatus.FORMER then
-				row:date('leavedate', 'Leave Date:&nbsp;')
+				row:date('leavedate')
 				row:newteam()
 			elseif squadStatus == SquadUtils.SquadStatus.INACTIVE then
-				row:date('inactivedate', 'Inactive Date:&nbsp;')
+				row:date('inactivedate')
 			end
 		end
 

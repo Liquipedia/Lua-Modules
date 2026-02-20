@@ -69,14 +69,14 @@ function CustomSquad.run(frame)
 		local row = ExtendedSquadRow(squadPerson) ---@type SmashSquadRow
 
 		row:id():name()
-		row:mains():date('joindate', 'Join Date:&nbsp;')
+		row:mains():date('joindate')
 
 		if props.status == SquadUtils.SquadStatus.INACTIVE or props.status == SquadUtils.SquadStatus.FORMER_INACTIVE then
-			row:date('inactivedate', 'Inactive Date:&nbsp;')
+			row:date('inactivedate')
 		end
 
 		if props.status == SquadUtils.SquadStatus.FORMER or props.status == SquadUtils.SquadStatus.FORMER_INACTIVE then
-			row:date('leavedate', 'Leave Date:&nbsp;')
+			row:date('leavedate')
 			row:newteam()
 		end
 
