@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:StreamPage/Starcraft
+-- page=Module:StreamPage/Faction
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -34,22 +34,22 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local TBD = Abbreviation.make{title = 'To be determined (or to be decided)', text = 'TBD'}
 
----@class StarcraftStreamPage: BaseStreamPage
----@operator call(table): StarcraftStreamPage
+---@class FactionStreamPage: BaseStreamPage
+---@operator call(table): FactionStreamPage
 ---@field suppressMapTable boolean
-local StarcraftStreamPage = Class.new(BaseStreamPage, function (self, args)
+local FactionStreamPage = Class.new(BaseStreamPage, function (self, args)
 	self.suppressMapTable = Logic.readBool(args.suppressMapTable)
 end)
 
 ---@param frame Frame
 ---@return Widget?
-function StarcraftStreamPage.run(frame)
+function FactionStreamPage.run(frame)
 	local args = Arguments.getArgs(frame)
-	return StarcraftStreamPage(args):create()
+	return FactionStreamPage(args):create()
 end
 
 ---@return Widget[]
-function StarcraftStreamPage:render()
+function FactionStreamPage:render()
 	return WidgetUtil.collect(
 		HtmlWidgets.H3{children = 'Player Information'},
 		self:renderPlayerInformation(),
@@ -59,18 +59,18 @@ end
 
 ---@protected
 ---@return Widget
-function StarcraftStreamPage:renderPlayerInformation()
+function FactionStreamPage:renderPlayerInformation()
 	return HtmlWidgets.Div{
 		classes = {'match-bm-players-wrapper'},
 		css = {width = '100%'},
-		children = Array.map(self.matches[1].opponents, StarcraftStreamPage._opponentDisplay)
+		children = Array.map(self.matches[1].opponents, FactionStreamPage._opponentDisplay)
 	}
 end
 
 ---@private
 ---@param opponent standardOpponent
 ---@return Widget
-function StarcraftStreamPage._opponentDisplay(opponent)
+function FactionStreamPage._opponentDisplay(opponent)
 	return HtmlWidgets.Div{
 		classes = {'match-bm-players-team'},
 		children = WidgetUtil.collect(
@@ -78,7 +78,7 @@ function StarcraftStreamPage._opponentDisplay(opponent)
 				classes = {'match-bm-players-team-header'},
 				children = OpponentDisplay.InlineOpponent{opponent = opponent, teamStyle = 'icon'}
 			},
-			Array.map(opponent.players, FnUtil.curry(StarcraftStreamPage._playerDisplay, opponent.type))
+			Array.map(opponent.players, FnUtil.curry(FactionStreamPage._playerDisplay, opponent.type))
 		)
 	}
 end
@@ -86,7 +86,7 @@ end
 ---@param opponentType OpponentType
 ---@param player standardPlayer
 ---@return Widget
-function StarcraftStreamPage._playerDisplay(opponentType, player)
+function FactionStreamPage._playerDisplay(opponentType, player)
 	local lpdbData = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = '[[pagename::' .. (Page.pageifyLink(player.pageName) or '') .. ']]',
 		limit = 1
@@ -148,7 +148,7 @@ end
 
 ---@private
 ---@return Widget?
-function StarcraftStreamPage:_mapPool()
+function FactionStreamPage:_mapPool()
 	if self.suppressMapTable then
 		return
 	end
@@ -200,7 +200,7 @@ function StarcraftStreamPage:_mapPool()
 			children = WidgetUtil.collect(
 				TableWidgets.Cell{children = Link{link = map.link, children = map.displayname}},
 				not skipMapWinRate and TableWidgets.Cell{
-					children = StarcraftStreamPage._queryMapWinrate(map.link, matchup)
+					children = FactionStreamPage._queryMapWinrate(map.link, matchup)
 				} or nil
 			),
 		}
@@ -232,7 +232,7 @@ end
 ---@param map string
 ---@param matchup string
 ---@return string?
-function StarcraftStreamPage._queryMapWinrate(map, matchup)
+function FactionStreamPage._queryMapWinrate(map, matchup)
 	local conditions = '[[pagename::' .. string.gsub(map, ' ', '_') .. ']] AND [[type::map_winrates]]'
 	local LPDBoutput = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = conditions,
@@ -251,7 +251,7 @@ end
 
 ---@private
 ---@return string?
-function StarcraftStreamPage:_getCurrentMap()
+function FactionStreamPage:_getCurrentMap()
 	local games = self.matches[1].games
 	for _, game in ipairs(games) do
 		if Logic.isEmpty(game.winner) then
@@ -260,4 +260,4 @@ function StarcraftStreamPage:_getCurrentMap()
 	end
 end
 
-return StarcraftStreamPage
+return FactionStreamPage
