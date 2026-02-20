@@ -109,6 +109,16 @@ function Game.listGames(options)
 	return gamesList
 end
 
+---Fetches all unlisted game identifiers
+---@return string[]
+function Game.unlistedGames()
+	local gamesList = Array.extractKeys(GamesData)
+
+	return Array.filter(gamesList, function(gameIdentifier)
+		return GamesData[gameIdentifier].unlisted
+	end)
+end
+
 ---Fetches the abbreviation for a given game
 ---@param options? {game: string?, useDefault: boolean?}
 ---@return string?
