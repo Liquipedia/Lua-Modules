@@ -31,7 +31,6 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local RANDOM_RACE = 'r'
 local TBD = Abbreviation.make{title = 'To be determined (or to be decided)', text = 'TBD'}
 
 ---@class StarcraftStreamPage: BaseStreamPage
@@ -161,13 +160,8 @@ function StarcraftStreamPage:_mapPool()
 	local race2 = ((match.opponents[2].players)[1] or {}).faction --[[ @as string ]]
 
 	local skipMapWinRate = not Array.all(match.opponents, function (opponent) return opponent.type == Opponent.solo end)
-		or not race1
-		or not race2
-		or race1 == Faction.defaultFaction
-		or race1 == RANDOM_RACE
-		or race2 == Faction.defaultFaction
-		or race2 == RANDOM_RACE
-		or race1 == race2
+		or not Table.includes(Faction.coreFactions, race1)
+		or not Table.includes(Faction.coreFactions, race2)
 
 	local currentMap = self:_getCurrentMap()
 	local matchup = skipMapWinRate and '' or (race1 .. race2)
