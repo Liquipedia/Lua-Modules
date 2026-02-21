@@ -387,8 +387,7 @@ function MatchTable:buildAdditionalConditions()
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('status'), Comparator.neq, 'notplayed'),
 		ConditionUtil.anyOf(ColumnName('liquipediatier'), Array.parseCommaSeparatedString(args.tier)),
-		ConditionUtil.anyOf(ColumnName('game'), Array.parseCommaSeparatedString(args.game)),
-	}
+	}:add(ConditionUtil.anyOf(ColumnName('game'), Array.parseCommaSeparatedString(args.game)))
 
 	if Logic.isNotEmpty(args.bestof) then
 		conditions:add(ConditionNode(ColumnName('bestof'), Comparator.eq, args.bestof))
