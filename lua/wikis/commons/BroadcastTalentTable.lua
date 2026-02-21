@@ -357,39 +357,32 @@ function BroadcastTalentTable:_partnerList(tournament)
 end
 
 ---@private
----@param tournament table
----@return table
-function BroadcastTalentTable:_getPartners(tournament)
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{
-			ConditionNode(ColumnName('parent'), Comparator.eq, tournament.parent),
-		}
+---@param broadcast EnrichedBroadcast
+---@return {id: string, page: string, flag: string}[]
+function BroadcastTalentTable:_getPartners(broadcast)
+	local conditions = ConditionTree(BooleanOperator.all):add(
+		ConditionNode(ColumnName('parent'), Comparator.eq, broadcast.parent)
+	)
 
-	local positionConditions = ConditionTree(BooleanOperator.any)
-	for _, position in pairs(tournament.positions) do
-		positionConditions:add{ConditionNode(ColumnName('position'), Comparator.eq, position)}
-	end
-	conditions:add(positionConditions)
+	conditions:add(ConditionUtil.anyOf(ColumnName('position'), broadcast.positions))
 
-	for _, caster in pairs(self.aliases) do
-		conditions:add{ConditionNode(ColumnName('page'), Comparator.neq, caster)}
+	conditions:add(ConditionUtil.noneOf(ColumnName('page'), self.aliases))
+
+	if String.isNotEmpty(broadcast.language) then
+		conditions:add(ConditionNode(ColumnName('language'), Comparator.eq, broadcast.language))
 	end
 
-	if String.isNotEmpty(tournament.language) then
-		conditions:add{ConditionNode(ColumnName('language'), Comparator.eq, tournament.language)}
-	end
-
-	local extradata = tournament.extradata or {}
+	local extradata = broadcast.extradata or {}
 	if Logic.readBool(extradata.showmatch) then
-		conditions:add{ConditionNode(ColumnName('extradata_showmatch'), Comparator.eq, 'true')}
+		conditions:add(ConditionNode(ColumnName('extradata_showmatch'), Comparator.eq, 'true'))
 		if String.isNotEmpty(extradata.showmatchname) then
-			conditions:add{ConditionNode(ColumnName('extradata_showmatchname'), Comparator.eq, extradata.showmatchname)}
+			conditions:add(ConditionNode(ColumnName('extradata_showmatchname'), Comparator.eq, extradata.showmatchname))
 		end
 	end
 
 	return mw.ext.LiquipediaDB.lpdb('broadcasters', {
 		query = 'id, page, flag',
-		conditions = conditions:toString(),
+		conditions = tostring(conditions),
 	})
 end
 
