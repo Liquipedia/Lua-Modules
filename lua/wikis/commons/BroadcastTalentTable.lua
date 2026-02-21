@@ -44,7 +44,7 @@ local RESULTS_SORT_ORDER = 'date desc'
 ---@operator call(table): BroadcastTalentTable
 local BroadcastTalentTable = Class.new(function(self, args) self:init(args) end)
 
----@class argsValues
+---@class BroadcastTalentTableArgs
 ---@field broadcaster string?
 ---@field aliases string?
 ---@field showtiertype string|boolean|nil
@@ -60,7 +60,7 @@ local BroadcastTalentTable = Class.new(function(self, args) self:init(args) end)
 ---@field displayPartnerLists string|boolean|nil
 
 --- Init function for BroadcastTalentTable
----@param args argsValues
+---@param args BroadcastTalentTableArgs
 ---@return self
 function BroadcastTalentTable:init(args)
 	self:_readArgs(args)
@@ -80,7 +80,7 @@ function BroadcastTalentTable.run(frame)
 end
 
 ---@private
----@param args table
+---@param args BroadcastTalentTableArgs
 function BroadcastTalentTable:_readArgs(args)
 	local isAchievementsTable = Logic.readBool(args.achievements)
 
