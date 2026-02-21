@@ -102,8 +102,8 @@ function BroadcastTalentTable:_readArgs(args)
 	local broadcaster = String.isNotEmpty(args.broadcaster) and args.broadcaster or self:_getBroadcaster()
 	self.broadcaster = Page.pageifyLink(broadcaster)
 
-	self.aliases = args.aliases and Array.map(mw.text.split(args.aliases:gsub(' ', '_'), ','), String.trim) or {}
-	table.insert(self.aliases, self.broadcaster)
+	self.aliases = Array.map(Array.parseCommaSeparatedString(args.aliases), Page.pageifyLink)
+	Array.appendWith(self.aliases, self.broadcaster)
 end
 
 ---@private
