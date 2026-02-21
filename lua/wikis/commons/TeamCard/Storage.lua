@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Json = Lua.import('Module:Json')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -136,7 +137,7 @@ function TeamCardStorage._parseQualifier(rawQualifier)
 	local cleanQualifier = rawQualifier:gsub('%[', ''):gsub('%]', '')
 	if cleanQualifier:find('|') then
 		-- Internal link
-		local qualifier = mw.text.split(cleanQualifier, '|', true)
+		local qualifier = Array.parseCommaSeparatedString(cleanQualifier, '|')
 		local qualifierLink, qualifierText = qualifier[1], qualifier[2]
 
 		if qualifierLink:sub(1, 1) == '/' then

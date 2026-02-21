@@ -341,19 +341,13 @@ function CustomLeague:_getServer(args)
 	if String.isEmpty(args.server) then
 		return nil
 	end
-	local server = args.server
-	local servers = mw.text.split(server, '/')
 
-	local output = ''
-	for key, item in ipairs(servers or {}) do
-		item = string.lower(item)
-		if key ~= 1 then
-			output = output .. ' / '
-		end
-		item = mw.text.trim(item)
-		output = output .. (AllowedServers[string.lower(item)] or ('[[Category:Server Unknown|' .. item .. ']]'))
-	end
-	return output
+	local serversDisplay = Array.map(Array.parseCommaSeparatedString(args.server, '/'), function(server)
+		return AllowedServers[string.lower(server)] or ('[[Category:Server Unknown|' .. server .. ']]')
+	end)
+	serversDisplay = Array.interleave(serversDisplay, ' / ')
+
+	return table.concat(serversDisplay)
 end
 
 ---@param args table
@@ -372,7 +366,7 @@ function CustomLeague:_getMaps(prefix, args)
 	local mapArgs = self:getAllArgsForBase(args, prefix)
 
 	return Table.map(mapArgs, function(mapIndex, map)
-		local mapArray = mw.text.split(map, '|')
+		local mapArray = Array.parseCommaSeparatedString(map, '|')
 		return mapIndex, {
 			link = mw.ext.TeamLiquidIntegration.resolve_redirect(mapArray[1]),
 			displayname = args[prefix .. mapIndex .. 'display'] or mapArray[#mapArray],

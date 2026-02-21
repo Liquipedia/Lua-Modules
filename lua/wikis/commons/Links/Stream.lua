@@ -202,7 +202,7 @@ function StreamLinks.filterStreams(streamsInput)
 
 	local streams = {}
 	for rawHost, stream in Table.iter.spairs(streamsInput) do
-		if #(mw.text.split(rawHost, '_', true)) == 3 then
+		if #(Array.parseCommaSeparatedString(rawHost, '_')) == 3 then
 			local streamKey = StreamLinks.StreamKey(rawHost)
 			local platform = streamKey.platform
 			if not streams[platform] then
@@ -251,7 +251,7 @@ function StreamKey:new(tbl, languageCode, index)
 		---@cast tbl -StreamKey
 		platform = tbl
 	elseif type(tbl) == 'string' then
-		local components = mw.text.split(tbl, '_', true)
+		local components = Array.parseCommaSeparatedString(tbl, '_')
 		-- Input is in legacy format (eg. twitch2)
 		if #components == 1 then
 			platform, index = self:_fromLegacy(tbl)

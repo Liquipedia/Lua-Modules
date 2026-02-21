@@ -66,10 +66,7 @@ function BroadcasterCard.create(frame)
 		title = Abbreviation.make{text = TBD, title = 'To Be Determined'}
 	else
 		-- Create a title from the position.
-		local positions = Array.map(
-			mw.text.split(position, '/'),
-			String.trim
-		)
+		local positions = Array.parseCommaSeparatedString(position, '/')
 		if args.b2 then
 			positions = Array.map(positions, BroadcasterCard._pluralisePosition)
 		end

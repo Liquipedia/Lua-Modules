@@ -67,11 +67,11 @@ end
 function CustomTeam:_getGames()
 	local games = self:_queryGames()
 
-	local manualGames = self.args.games and Array.map(
-		mw.text.split(self.args.games, ','),
+	local manualGames = Array.map(
+		Array.parseCommaSeparatedString(self.args.games),
 		function(game)
-			return {game = GameLookup.getName(mw.text.trim(game))}
-		end) or {}
+			return {game = GameLookup.getName(game)}
+		end)
 
 	Array.extendWith(games, Array.filter(manualGames,
 		function(entry)

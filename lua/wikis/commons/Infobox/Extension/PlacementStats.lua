@@ -114,7 +114,7 @@ function PlacementStats._fetchForTier(tier, baseConditions, placementData)
 
 	for _, placement in pairs(queryData) do
 		local count = tonumber(placement.count_placement)
-		local place = tonumber(mw.text.split(placement.placement or '', '-', true)[1])
+		local place = tonumber(Array.parseCommaSeparatedString(placement.placement, '-')[1])
 
 		placementData.tiers[tier].all = placementData.tiers[tier].all + count
 		placementData.totals.all = placementData.totals.all + count

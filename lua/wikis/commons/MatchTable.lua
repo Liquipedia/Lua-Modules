@@ -42,6 +42,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local DRAW_WINNER = 0
 local INVALID_TIER_DISPLAY = 'Undefined'
@@ -199,7 +200,7 @@ function MatchTable:_readOpponentInputsFromBase(base)
 
 	if Logic.isNotEmpty(inputs) or Logic.isEmpty(self.args[base .. 's']) then return inputs end
 
-	return Array.map(mw.text.split(self.args[base .. 's'], ',', true), String.trim)
+	return Array.parseCommaSeparatedString(self.args[base .. 's'])
 end
 
 ---@param mode MatchTableMode
@@ -221,7 +222,7 @@ function MatchTable:readAliases(mode)
 	local aliases = {}
 	if String.isEmpty(self.args.aliases) then return aliases end
 
-	local aliasInput = Array.map(mw.text.split(self.args.aliases, ','), String.trim)
+	local aliasInput = Array.parseCommaSeparatedString(self.args.aliases)
 
 	Array.forEach(aliasInput, function(alias)
 		alias = alias:gsub(' ', '_')
@@ -280,10 +281,10 @@ function MatchTable:readTimeRange()
 	end
 
 	--build year range from subpage name (or input)
-	local yearRange = Array.map(mw.text.split(yearsString, '-'), String.trim)
-	yearRange = {
-		tonumber(yearRange[1]),
-		tonumber(yearRange[2] or yearRange[1]),
+	local rawYearRange = Array.parseCommaSeparatedString(yearsString, '-')
+	local yearRange = {
+		tonumber(rawYearRange[1]),
+		tonumber(rawYearRange[2] or rawYearRange[1]),
 	}
 
 	--sort
@@ -383,21 +384,10 @@ end
 ---@return ConditionTree?
 function MatchTable:buildAdditionalConditions()
 	local args = self.args
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'notplayed')}
-
-	local getOrCondition = function(lpdbKey, input)
-		if Logic.isEmpty(input) then return end
-
-		local orConditions = ConditionTree(BooleanOperator.any)
-		Array.forEach(mw.text.split(input, ','), function(value)
-			orConditions:add{ConditionNode(ColumnName(lpdbKey), Comparator.eq, String.trim(value))}
-		end)
-		conditions:add(orConditions)
-	end
-
-	getOrCondition('liquipediatier', args.tier)
-	getOrCondition('game', args.game)
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('status'), Comparator.neq, 'notplayed'),
+		ConditionUtil.anyOf(ColumnName('liquipediatier'), Array.parseCommaSeparatedString(args.tier)),
+	}:add(ConditionUtil.anyOf(ColumnName('game'), Array.parseCommaSeparatedString(args.game)))
 
 	if Logic.isNotEmpty(args.bestof) then
 		conditions:add(ConditionNode(ColumnName('bestof'), Comparator.eq, args.bestof))

@@ -174,7 +174,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'status' then
 		table.insert(widgets, Cell{
 			name = 'Years Active',
-			children = args.years_active and mw.text.split(args.years_active, ',') or {}
+			children = Array.parseCommaSeparatedString(args.years_active)
 		})
 	elseif id == 'region' then
 		return {}
@@ -256,9 +256,9 @@ function CustomPlayer:_getGames()
 
 	-- Games entered manually
 	local manualGames = args.games and Array.map(
-		mw.text.split(args.games, ','),
+		Array.parseCommaSeparatedString(args.games),
 		function(game)
-			return {game = Game.name{game = mw.text.trim(game), useDefault = false}}
+			return {game = Game.name{game = game, useDefault = false}}
 		end
 	) or {}
 	Array.extendWith(games, Array.filter(manualGames,
@@ -269,9 +269,9 @@ function CustomPlayer:_getGames()
 
 	-- Games entered manually as inactive
 	local manualInactiveGames = args.games_inactive and Array.map(
-		mw.text.split(args.games_inactive, ','),
+		Array.parseCommaSeparatedString(args.games_inactive),
 		function(game)
-			return {game = Game.name{game = mw.text.trim(game), useDefault = false}}
+			return {game = Game.name{game = game, useDefault = false}}
 		end
 	) or {}
 	Array.extendWith(games, Array.filter(manualInactiveGames,

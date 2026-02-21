@@ -400,7 +400,7 @@ end
 ---@param fallBackAchievements placement[]
 function CustomPlayer:_setAchievements(placement, fallBackAchievements)
 	local tier = tonumber(placement.liquipediatier)
-	local place = tonumber(mw.text.split(placement.placement, '-')[1])
+	local place = tonumber(Array.parseCommaSeparatedString(placement.placement, '-')[1])
 	local hasNoTierType = String.isEmpty(placement.liquipediatiertype)
 
 	if tier == 1 and place == 1 and placement.opponenttype == Opponent.solo and hasNoTierType then

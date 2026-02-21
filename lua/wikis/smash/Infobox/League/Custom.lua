@@ -427,7 +427,7 @@ end
 ---@return string
 function CustomLeague:_formatDate(date)
 	-- Assume there are three date parts, and assume the year is known
-	local dateParts = mw.text.split(date, '-', true)
+	local dateParts = Array.parseCommaSeparatedString(date, '-')
 
 	-- Only year is known
 	if dateParts[2] == UNKNOWN_DATE_PART and dateParts[3] == UNKNOWN_DATE_PART then

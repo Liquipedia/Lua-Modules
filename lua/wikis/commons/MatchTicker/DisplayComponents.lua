@@ -421,7 +421,7 @@ function Match:_expandHeader(inheritedHeader)
 		return
 	end
 
-	local headerArray = mw.text.split(inheritedHeader, '!')
+	local headerArray = Array.parseCommaSeparatedString(inheritedHeader, '!')
 
 	local index = 1
 	if String.isEmpty(headerArray[1]) then

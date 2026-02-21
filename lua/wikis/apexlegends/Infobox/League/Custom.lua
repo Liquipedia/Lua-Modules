@@ -163,7 +163,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		String.isEmpty(args.sponsor3) and
 		String.isNotEmpty(args.sponsor)
 	then
-		local sponsors = Table.map(mw.text.split(args.sponsor, '<br>', true), function(index, value)
+		local sponsors = Table.map(Array.parseCommaSeparatedString(args.sponsor, '<br>'), function(index, value)
 			return 'sponsor' .. index, value
 		end)
 		lpdbData.sponsors = mw.ext.LiquipediaDB.lpdb_create_json(sponsors)

@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
@@ -110,7 +111,7 @@ end
 ---@return integer
 function ThisDay._readDate(args)
 	local date = Logic.emptyOr(args.date, os.date('%Y-%m-%d')) --[[@as string]]
-	local dateArray = mw.text.split(date, '-', true)
+	local dateArray = Array.parseCommaSeparatedString(date, '-')
 
 	-- Supported formats: YYYY-MM-DD, MM-DD
 	return tonumber(args.month or dateArray[#dateArray - 1]) --[[@as integer]],

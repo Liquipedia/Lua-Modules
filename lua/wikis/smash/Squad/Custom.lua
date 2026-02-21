@@ -29,7 +29,7 @@ local ExtendedSquadRow = Class.new(SquadRow)
 ---@return self
 function ExtendedSquadRow:mains()
 	local characters = {}
-	Array.forEach(mw.text.split(self.model.extradata.mains or '', ','), function(main)
+	Array.forEach(Array.parseCommaSeparatedString(self.model.extradata.mains), function(main)
 		table.insert(characters, Characters.GetIconAndName{main, game = self.model.extradata.game, large = true})
 	end)
 
@@ -56,7 +56,7 @@ function CustomSquad.run(frame)
 	local players = SquadUtils.parsePlayers(args)
 
 	props.children = Array.map(players, function(person)
-		local game = person.game and mw.text.split(person.game:lower(), ',')[1] or tableGame
+		local game = person.game and Array.parseCommaSeparatedString(person.game:lower())[1] or tableGame
 		local mains = SquadPlayerData.get{link = person.link, player = person.id, game = game} or person.mains
 		person.flag = Variables.varDefault('nationality') or person.flag
 		person.name = Variables.varDefault('name') or person.name

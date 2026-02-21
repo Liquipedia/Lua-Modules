@@ -73,7 +73,7 @@ function BaseTournamentsListing.byYear(args)
 	local subPageName = mw.title.getCurrentTitle().subpageText
 	local fallbackYearData = {}
 	if subPageName:find('%d%-%d') then
-		fallbackYearData = mw.text.split(subPageName, '-')
+		fallbackYearData = Array.parseCommaSeparatedString(subPageName, '-')
 	end
 
 	local startYear = tonumber(args.startYear) or tonumber(fallbackYearData[1]) or DEFAULT_START_YEAR
@@ -129,9 +129,7 @@ end
 
 ---@return string[]
 function BaseTournamentsListing:_allowedPlacements()
-	local placeConditions = self.args.placeConditions or DEFAULT_ALLOWED_PLACES
-
-	return Array.map(mw.text.split(placeConditions, ','), String.trim)
+	return Array.parseCommaSeparatedString(self.args.placeConditions or DEFAULT_ALLOWED_PLACES)
 end
 
 ---@return self
@@ -515,7 +513,7 @@ function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 	end
 
 	for _, item in ipairs(queryData) do
-		local place = tonumber(mw.text.split(item.placement, '-')[1])
+		local place = tonumber(Array.parseCommaSeparatedString(item.placement, '-')[1])
 		if not place and item.placement == 'W' then
 			place = 1
 		elseif not place and item.placement == 'L' then
