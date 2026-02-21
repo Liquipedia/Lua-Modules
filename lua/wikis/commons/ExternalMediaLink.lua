@@ -238,15 +238,15 @@ function ExternalMediaLink._wrapperDisplay(parsedArgs)
 		columns = {{}, {}},
 		children = {TableWidgets.TableBody{children = WidgetUtil.collect(
 			rowIfNotEmpty('Title', parsedArgs.title),
-			rowIfNotEmpty('Date', parsedArgs.date),
-			rowIfNotEmpty('URL', parsedArgs.link),
 			rowIfNotEmpty('Author(s)', makeLinkList('by', 'by_link')),
+			rowIfNotEmpty('Date', parsedArgs.date),
 			rowIfNotEmpty('Subject(s)', makeLinkList('subject')),
 			rowIfNotEmpty('Org Subject(s)', makeLinkList('subject_organization')),
 			rowIfNotEmpty('Event', parsedArgs.event and Link{
 				link = parsedArgs['event-link'] or parsedArgs.event,
 				children = parsedArgs.event,
-			} or nil)
+			} or nil),
+			rowIfNotEmpty('URL', parsedArgs.link)
 		)}},
 	}
 end
