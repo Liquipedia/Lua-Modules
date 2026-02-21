@@ -42,6 +42,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local DRAW_WINNER = 0
 local INVALID_TIER_DISPLAY = 'Undefined'
@@ -383,21 +384,11 @@ end
 ---@return ConditionTree?
 function MatchTable:buildAdditionalConditions()
 	local args = self.args
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'notplayed')}
-
-	local getOrCondition = function(lpdbKey, input)
-		if Logic.isEmpty(input) then return end
-
-		local orConditions = ConditionTree(BooleanOperator.any)
-		Array.forEach(Array.parseCommaSeparatedString(input), function(value)
-			orConditions:add{ConditionNode(ColumnName(lpdbKey), Comparator.eq, value)}
-		end)
-		conditions:add(orConditions)
-	end
-
-	getOrCondition('liquipediatier', args.tier)
-	getOrCondition('game', args.game)
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('status'), Comparator.neq, 'notplayed'),
+		ConditionUtil.anyOf(ColumnName('liquipediatier'), Array.parseCommaSeparatedString(args.tier)),
+		ConditionUtil.anyOf(ColumnName('game'), Array.parseCommaSeparatedString(args.game)),
+	}
 
 	if Logic.isNotEmpty(args.bestof) then
 		conditions:add(ConditionNode(ColumnName('bestof'), Comparator.eq, args.bestof))
