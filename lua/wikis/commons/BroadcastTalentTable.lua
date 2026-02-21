@@ -147,7 +147,7 @@ function BroadcastTalentTable:_fetchTournaments()
 		conditions:add(ConditionUtil.noneOf(ColumnName('extradata_status'), ACHIEVEMENTS_IGNORED_STATUSES))
 	end
 
-	-- double the limit for the query due to potentional merging of results further down the line
+	-- double the limit for the query due to potential merging of results further down the line
 	local queryLimit = args.limit * 2
 
 	local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
