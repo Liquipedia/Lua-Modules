@@ -40,9 +40,9 @@ local ACHIEVEMENTS_SORT_ORDER = 'weight desc, date desc'
 local ACHIEVEMENTS_IGNORED_STATUSES = {'cancelled', 'postponed'}
 local RESULTS_SORT_ORDER = 'date desc'
 
----@class BroadcastTalentTable
----@operator call():BroadcastTalentTable
-local BroadcastTalentTable = Class.new(function(self, ...) self:init(...) end)
+---@class BroadcastTalentTable: BaseClass
+---@operator call(table): BroadcastTalentTable
+local BroadcastTalentTable = Class.new(function(self, args) self:init(args) end)
 
 ---@class argsValues
 ---@field broadcaster string?
