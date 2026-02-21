@@ -163,18 +163,18 @@ function BroadcastTalentTable:_fetchTournaments()
 
 	local tournaments = {}
 	local pageNames = {}
-	for _, tournament in pairs(queryData) do
-		tournament.extradata = tournament.extradata or {}
-		if not pageNames[tournament.pagename] or Logic.readBool(tournament.extradata.showmatch) then
-			tournament.positions = {tournament.position}
-			table.insert(tournaments, tournament)
-			if not Logic.readBool(tournament.extradata.showmatch) then
-				pageNames[tournament.pagename] = tournament
+	Array.forEach(queryData, function (record)
+		record.extradata = record.extradata or {}
+		if not pageNames[record.pagename] or Logic.readBool(record.extradata.showmatch) then
+			record.positions = {record.position}
+			table.insert(tournaments, record)
+			if not Logic.readBool(record.extradata.showmatch) then
+				pageNames[record.pagename] = record
 			end
 		else
-			table.insert(pageNames[tournament.pagename].positions, tournament.position)
+			table.insert(pageNames[record.pagename].positions, record.position)
 		end
-	end
+	end)
 
 	tournaments = Array.sub(tournaments, 1, args.limit)
 
