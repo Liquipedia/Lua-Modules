@@ -137,7 +137,7 @@ function TeamCardStorage._parseQualifier(rawQualifier)
 	local cleanQualifier = rawQualifier:gsub('%[', ''):gsub('%]', '')
 	if cleanQualifier:find('|') then
 		-- Internal link
-		local qualifier = Array.parseCommaSeparatedString(cleanQualifier, '|', true)
+		local qualifier = Array.parseCommaSeparatedString(cleanQualifier, '|')
 		local qualifierLink, qualifierText = qualifier[1], qualifier[2]
 
 		if qualifierLink:sub(1, 1) == '/' then

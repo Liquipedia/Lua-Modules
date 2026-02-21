@@ -298,7 +298,7 @@ function CustomLeague:_getMaps()
 	for prefix, rawMapInput in Table.iter.pairsByPrefix(args, 'map', {strict = true}) do
 		local mode = String.isNotEmpty(args[prefix .. 'mode']) and MapMode.get({args[prefix .. 'mode']}) or nil
 
-		local mapInput = Array.parseCommaSeparatedString(rawMapInput)
+		local mapInput = Array.parseCommaSeparatedString(rawMapInput, '|')
 		local display, link
 
 		if String.isNotEmpty(args[prefix .. 'link']) then

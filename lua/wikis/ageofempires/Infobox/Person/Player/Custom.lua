@@ -258,7 +258,7 @@ function CustomPlayer:_getGames()
 	local manualGames = args.games and Array.map(
 		Array.parseCommaSeparatedString(args.games),
 		function(game)
-			return {game = Game.name{game = mw.text.trim(game), useDefault = false}}
+			return {game = Game.name{game = game, useDefault = false}}
 		end
 	) or {}
 	Array.extendWith(games, Array.filter(manualGames,
@@ -271,7 +271,7 @@ function CustomPlayer:_getGames()
 	local manualInactiveGames = args.games_inactive and Array.map(
 		Array.parseCommaSeparatedString(args.games_inactive),
 		function(game)
-			return {game = Game.name{game = mw.text.trim(game), useDefault = false}}
+			return {game = Game.name{game = game, useDefault = false}}
 		end
 	) or {}
 	Array.extendWith(games, Array.filter(manualInactiveGames,

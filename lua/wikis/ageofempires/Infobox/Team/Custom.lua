@@ -70,7 +70,7 @@ function CustomTeam:_getGames()
 	local manualGames = Array.map(
 		Array.parseCommaSeparatedString(self.args.games),
 		function(game)
-			return {game = GameLookup.getName(mw.text.trim(game))}
+			return {game = GameLookup.getName(game)}
 		end)
 
 	Array.extendWith(games, Array.filter(manualGames,
