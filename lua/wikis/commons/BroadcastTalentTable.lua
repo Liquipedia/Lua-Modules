@@ -387,7 +387,7 @@ function BroadcastTalentTable:_getPartners(broadcast)
 end
 
 ---@private
----@param partners table
+---@param partners {id: string, page: string, flag: string}[]
 ---@return {id: string, page: string, flag: string}[]
 function BroadcastTalentTable._removeDuplicatePartners(partners)
 	local uniquePartners = Table.map(partners, function(_, partner) return partner.page, partner end)
