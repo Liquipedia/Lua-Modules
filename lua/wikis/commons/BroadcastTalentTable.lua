@@ -29,6 +29,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local DEFAULT_LIMIT = 500
 local DEFAULT_ACHIEVEMENTS_LIMIT = 10
@@ -127,11 +128,7 @@ function BroadcastTalentTable:_fetchTournaments()
 
 	local conditions = ConditionTree(BooleanOperator.all)
 
-	local broadCasterConditions = ConditionTree(BooleanOperator.any)
-	for _, broadcaster in pairs(self.aliases) do
-		broadCasterConditions:add{ConditionNode(ColumnName('page'), Comparator.eq, broadcaster)}
-	end
-	conditions:add(broadCasterConditions)
+	conditions:add(ConditionUtil.anyOf(ColumnName('page'), self.aliases))
 
 	if args.year then
 		conditions:add{ConditionNode(ColumnName('date_year'), Comparator.eq, args.year)}
