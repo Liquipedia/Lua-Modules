@@ -33,7 +33,7 @@ local TOURNAMENT_PHASE = {
 ---@field iconDark string?
 ---@field series string?
 ---@field liquipediaTier integer|string|nil
----@field liquipediaTierType integer|string|nil
+---@field liquipediaTierType string?
 ---@field game string?
 ---@field publisherTier string?
 
@@ -105,7 +105,7 @@ function Tournament.partialTournamentFromMatch(match)
 		fullName = match.tournament,
 		pageName = match.parent,
 		liquipediaTier = Tier.toIdentifier(match.liquipediatier),
-		liquipediaTierType = Tier.toIdentifier(match.liquipediatiertype),
+		liquipediaTierType = Tier.toIdentifier(match.liquipediatiertype) --[[ @as string? ]],
 		icon = match.icon,
 		iconDark = match.iconDark,
 		series = match.series,
@@ -129,7 +129,7 @@ function Tournament.tournamentFromRecord(record)
 		startDate = startDate,
 		endDate = endDate,
 		liquipediaTier = Tier.toIdentifier(tier),
-		liquipediaTierType = Tier.toIdentifier(tierType),
+		liquipediaTierType = Tier.toIdentifier(tierType) --[[ @as string? ]],
 		publisherTier = record.publishertier,
 		region = (record.locations or {}).region1,
 		status = record.status,
