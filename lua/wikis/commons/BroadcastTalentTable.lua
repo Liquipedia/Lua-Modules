@@ -42,6 +42,8 @@ local RESULTS_SORT_ORDER = 'date desc'
 
 ---@class BroadcastTalentTable: BaseClass
 ---@operator call(table): BroadcastTalentTable
+---@field broadcaster string?
+---@field aliases string[]
 local BroadcastTalentTable = Class.new(function(self, args) self:init(args) end)
 
 ---@class BroadcastTalentTableArgs
