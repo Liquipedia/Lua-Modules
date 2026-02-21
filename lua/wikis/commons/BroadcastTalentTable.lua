@@ -131,15 +131,15 @@ function BroadcastTalentTable:_fetchTournaments()
 	conditions:add(ConditionUtil.anyOf(ColumnName('page'), self.aliases))
 
 	if args.year then
-		conditions:add{ConditionNode(ColumnName('date_year'), Comparator.eq, args.year)}
+		conditions:add(ConditionNode(ColumnName('date_year'), Comparator.eq, args.year))
 	else
 		-- mirrors current implementation
 		-- should we change it to use <= instead of < ? (same for >)
 		if args.startDate then
-			conditions:add{ConditionNode(ColumnName('date'), Comparator.gt, args.startDate)}
+			conditions:add(ConditionNode(ColumnName('date'), Comparator.gt, args.startDate))
 		end
 		if args.endDate then
-			conditions:add{ConditionNode(ColumnName('date'), Comparator.lt, args.endDate)}
+			conditions:add(ConditionNode(ColumnName('date'), Comparator.lt, args.endDate))
 		end
 	end
 
