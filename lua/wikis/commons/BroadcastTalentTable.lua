@@ -41,6 +41,15 @@ local ACHIEVEMENTS_SORT_ORDER = 'weight desc, date desc'
 local ACHIEVEMENTS_IGNORED_STATUSES = {'cancelled', 'postponed'}
 local RESULTS_SORT_ORDER = 'date desc'
 
+---@class EnrichedBroadcast
+---@field date string
+---@field pagename string
+---@field parent string
+---@field position string
+---@field positions string[]
+---@field language string
+---@field extradata table
+
 ---@class BroadcastTalentTable: BaseClass
 ---@operator call(table): BroadcastTalentTable
 ---@field broadcaster string?
@@ -161,9 +170,14 @@ function BroadcastTalentTable:_fetchTournaments()
 		return
 	end
 
+	---@type EnrichedBroadcast[]
 	local tournaments = {}
+
+	---@type table<string, EnrichedBroadcast>
 	local pageNames = {}
+
 	Array.forEach(queryData, function (record)
+		---@cast record EnrichedBroadcast
 		record.extradata = record.extradata or {}
 		if not pageNames[record.pagename] or Logic.readBool(record.extradata.showmatch) then
 			record.positions = {record.position}
