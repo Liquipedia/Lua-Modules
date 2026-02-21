@@ -238,7 +238,10 @@ function BroadcastTalentTable:create()
 			{align = 'center'},
 			{align = 'center'},
 			{align = 'center'},
-			self.args.displayPartnerListColumn and {align = 'center'} or nil
+			self.args.displayPartnerListColumn and {
+				align = 'center',
+				unsortable = true,
+			} or nil
 		),
 		children = WidgetUtil.collect(
 			self:_header(),
