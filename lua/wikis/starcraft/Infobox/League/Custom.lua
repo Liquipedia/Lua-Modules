@@ -62,7 +62,7 @@ function CustomLeague:_getMaps(prefix, args)
 	local mapArgs = self:getAllArgsForBase(args, prefix)
 
 	return Table.map(mapArgs, function(mapIndex, map)
-		local mapArray = mw.text.split(map, '|')
+		local mapArray = Array.parseCommaSeparatedString(map, '|')
 		return mapIndex, {
 			link = mw.ext.TeamLiquidIntegration.resolve_redirect(mapArray[1]),
 			displayname = args[prefix .. mapIndex .. 'display'] or mapArray[#mapArray],

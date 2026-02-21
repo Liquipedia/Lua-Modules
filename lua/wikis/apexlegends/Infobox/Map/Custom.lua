@@ -97,11 +97,9 @@ end
 ---@param ringData string
 ---@return WidgetTableRow
 function CustomMap:_createRingTableRow(ringData)
-	local cells = {}
-	for _, item in ipairs(mw.text.split(ringData, ',')) do
-		table.insert(cells, TableCell{children = {item}})
-	end
-	return TableRow{children = cells}
+	return TableRow{children = Array.map(Array.parseCommaSeparatedString(ringData), function(item)
+		return TableCell{children = {item}}
+	end)}
 end
 
 ---@param args table

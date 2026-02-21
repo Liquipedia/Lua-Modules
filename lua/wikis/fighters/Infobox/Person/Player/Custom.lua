@@ -30,7 +30,7 @@ function CustomPlayer.run(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	local gamesText = GamesPlayed.get{game = player.args.game, player = mw.title.getCurrentTitle().baseText}
-	player.games = mw.text.split(gamesText, '</br>', true)
+	player.games = Array.parseCommaSeparatedString(gamesText, '</br>')
 
 	return player:createInfobox()
 end

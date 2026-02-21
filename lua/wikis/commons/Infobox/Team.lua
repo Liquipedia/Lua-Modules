@@ -207,7 +207,7 @@ function Team:processCreateDates()
 	local earliestGameTimestamp = Team._parseDate(ReferenceCleaner.clean{input = self.args.created}) or Date.maxTimestamp
 
 	local created = Array.map(self:getAllArgsForBase(self.args, 'created'), function (creation)
-		local splitInput = Array.map(mw.text.split(creation, ':'), String.trim)
+		local splitInput = Array.parseCommaSeparatedString(creation, ':')
 		if #splitInput ~= 2 then
 			-- Legacy Input
 			return creation

@@ -266,7 +266,7 @@ function StarcraftLegacyPrizePool._slotSize(slot)
 		return
 	end
 
-	local placeRange = mw.text.split(slot.place, '-')
+	local placeRange = Array.parseCommaSeparatedString(slot.place, '-')
 	return tonumber(placeRange[#placeRange]) - tonumber(placeRange[1]) + 1
 end
 
@@ -413,16 +413,16 @@ function StarcraftLegacyPrizePool._readOpponentArgs(props)
 		or CACHED_DATA.defaultOpponentType == Opponent.solo
 		or CACHED_DATA.defaultOpponentType == Opponent.literal then
 
-		local nameInput
+		local rawNameInput
 		if props.prefix then
-			nameInput = slot[prefix .. opponentIndex]
+			rawNameInput = slot[prefix .. opponentIndex]
 		else
-			nameInput = slot[argsIndex]
+			rawNameInput = slot[argsIndex]
 		end
-		if not nameInput then
+		if not rawNameInput then
 			return nil, argsIndex
 		end
-		nameInput = mw.text.split(nameInput, '|')
+		local nameInput = Array.parseCommaSeparatedString(rawNameInput, '|')
 		return {
 			type = CACHED_DATA.defaultOpponentType,
 			isarchon = CACHED_DATA.defaultIsArchon,
@@ -442,17 +442,17 @@ function StarcraftLegacyPrizePool._readOpponentArgs(props)
 		isarchon = CACHED_DATA.defaultIsArchon,
 	}
 	for playerIndex = 1, defaultPartySize do
-		local nameInput
+		local rawNameInput
 		if props.prefix then
-			nameInput = slot[prefix .. opponentIndex .. 'p' .. playerIndex]
+			rawNameInput = slot[prefix .. opponentIndex .. 'p' .. playerIndex]
 		else
-			nameInput = slot[argsIndex]
+			rawNameInput = slot[argsIndex]
 			argsIndex = argsIndex + 1
 		end
-		if not nameInput then
+		if not rawNameInput then
 			return nil, newArgsIndex
 		end
-		nameInput = mw.text.split(nameInput, '|')
+		local nameInput = Array.parseCommaSeparatedString(rawNameInput, '|')
 
 		opponentData['p' .. playerIndex] = nameInput[#nameInput]
 		opponentData['p' .. playerIndex .. 'link'] = slot[prefix .. 'link' .. opponentIndex .. 'p' .. playerIndex]

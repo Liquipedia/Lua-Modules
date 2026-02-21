@@ -37,8 +37,8 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local mapDetails = Logic.readBool(args.detailedMap)
 	local mapDetailsOT = Logic.readBool(args.detailedMapOT)
 	local hltv = Logic.readBool(args.hltv)
-	local mapStats = args.mapStats and Array.unique(mw.text.split(args.mapStats, ', ')) or {}
-	local matchMatchpages = args.matchMatchpages and Array.unique(mw.text.split(args.matchMatchpages, ', ')) or {}
+	local mapStats = Array.unique(Array.parseCommaSeparatedString(args.mapStats))
+	local matchMatchpages = Array.unique(Array.parseCommaSeparatedString(args.matchMatchpages))
 
 	if hltv then
 		table.insert(mapStats, 'Stats')

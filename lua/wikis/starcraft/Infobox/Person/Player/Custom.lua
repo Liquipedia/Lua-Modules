@@ -476,7 +476,7 @@ end
 ---@return number?
 function CustomPlayer._getPlacement(value)
 	if String.isNotEmpty(value) then
-		value = mw.text.split(value, '-')[1]
+		value = Array.parseCommaSeparatedString(value, '-')[1]
 		if Table.includes(ALLOWED_PLACES, value) then
 			return tonumber(value)
 		end

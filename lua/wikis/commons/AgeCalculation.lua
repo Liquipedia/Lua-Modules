@@ -55,7 +55,7 @@ local Date = Class.new(
 		self.location = location
 		self.isEmpty = false
 		self.isExact = true
-		local fields = mw.text.split(dateString, '-')
+		local fields = Array.parseCommaSeparatedString(dateString, '-')
 
 		self.year = tonumber(fields[1])
 		self.month = tonumber(fields[2])

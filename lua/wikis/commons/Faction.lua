@@ -140,10 +140,7 @@ function Faction.readMultiFaction(input, options)
 	local singleFaction = Faction.read(input, options)
 	if singleFaction then return {singleFaction} end
 
-	local inputArray = Array.map(
-		mw.text.split(input, options.sep or '', true),
-		String.trim
-	)
+	local inputArray = Array.parseCommaSeparatedString(input, options.sep or '')
 
 	local factions = Array.map(inputArray, function(faction) return Faction.read(faction, options) end)
 

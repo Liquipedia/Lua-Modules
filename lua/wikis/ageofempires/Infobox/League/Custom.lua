@@ -103,7 +103,7 @@ function CustomInjector:parse(id, widgets)
 		end
 	elseif id == 'sponsors' then
 		if not String.isEmpty(args.sponsors) then
-			local sponsors = mw.text.split(args.sponsors, ',', true)
+			local sponsors = Array.parseCommaSeparatedString(args.sponsors)
 			table.insert(widgets, Cell{
 				name = 'Sponsor(s)',
 				children = {table.concat(sponsors, '&nbsp;• ')}
@@ -275,7 +275,7 @@ function CustomLeague:_getGameModes(args)
 		return {default}
 	end
 
-	local gameModes = mw.text.split(args.gamemode, ',', true)
+	local gameModes = Array.parseCommaSeparatedString(args.gamemode)
 	Array.forEach(gameModes,
 		function(mode, index)
 			gameModes[index] = GameModeLookup.getName(mode) or ''
@@ -295,10 +295,10 @@ function CustomLeague:_getMaps()
 	local args = self.args
 
 	local maps = {}
-	for prefix, mapInput in Table.iter.pairsByPrefix(args, 'map', {strict = true}) do
+	for prefix, rawMapInput in Table.iter.pairsByPrefix(args, 'map', {strict = true}) do
 		local mode = String.isNotEmpty(args[prefix .. 'mode']) and MapMode.get({args[prefix .. 'mode']}) or nil
 
-		mapInput = mw.text.split(mapInput, '|', true)
+		local mapInput = Array.parseCommaSeparatedString(rawMapInput)
 		local display, link
 
 		if String.isNotEmpty(args[prefix .. 'link']) then

@@ -132,7 +132,7 @@ Placement.additionalData = {
 			end
 
 			-- split the lastvsscore entry by '-', but allow negative scores
-			local rawScores = Array.map(mw.text.split(input, '-'), String.trim)
+			local rawScores = Array.parseCommaSeparatedString(input, '-')
 			local scores = {}
 			for index, rawScore in ipairs(rawScores) do
 				if Logic.isEmpty(rawScore) and Logic.isNotEmpty(rawScores[index + 1]) then
@@ -184,7 +184,7 @@ function Placement:_parseArgs()
 
 	-- Explicit place range has been given
 	if args.place then
-		local places = Table.mapValues(mw.text.split(args.place, '-'), tonumber)
+		local places = Table.mapValues(Array.parseCommaSeparatedString(args.place, '-'), tonumber)
 		self.placeStart = places[1]
 		self.placeEnd = places[2] or places[1]
 		assert(self.placeStart and self.placeEnd, 'Placement: Invalid |place= provided.')

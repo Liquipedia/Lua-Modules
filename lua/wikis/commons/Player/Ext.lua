@@ -65,7 +65,7 @@ function PlayerExt.extractFromLink(name)
 		:gsub('%b[]', '')
 	name = mw.text.trim(name)
 
-	local pageName, displayName = unpack(mw.text.split(name, '|', true))
+	local pageName, displayName = unpack(Array.parseCommaSeparatedString(name, '|'))
 	pageName = Page.applyUnderScoresIfEnforced(pageName)
 	if displayName and displayName ~= '' then
 		return String.nilIfEmpty(pageName), displayName

@@ -334,7 +334,7 @@ end
 ---@param value string
 ---@return string?
 function CustomTeam._placements(value)
-	value = mw.text.split(value or '', '-')[1]
+	value = Array.parseCommaSeparatedString(value, '-')[1]
 	if value == '1' or value == '2' then
 		return value
 	elseif value == '3' then

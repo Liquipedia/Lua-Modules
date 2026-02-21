@@ -75,7 +75,7 @@ function CustomTournamentsListing.byYear(args)
 	local subPageName = mw.title.getCurrentTitle().subpageText
 	local fallbackYearData = {}
 	if subPageName:find('%d%-%d') then
-		fallbackYearData = mw.text.split(subPageName, '-')
+		fallbackYearData = Array.parseCommaSeparatedString(subPageName, '-')
 	end
 
 	local startYear = tonumber(args.startYear) or tonumber(fallbackYearData[1]) or DEFAULT_START_YEAR

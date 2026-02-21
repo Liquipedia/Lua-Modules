@@ -199,7 +199,7 @@ function MatchTable:_readOpponentInputsFromBase(base)
 
 	if Logic.isNotEmpty(inputs) or Logic.isEmpty(self.args[base .. 's']) then return inputs end
 
-	return Array.map(mw.text.split(self.args[base .. 's'], ',', true), String.trim)
+	return Array.parseCommaSeparatedString(self.args[base .. 's'])
 end
 
 ---@param mode MatchTableMode
@@ -221,7 +221,7 @@ function MatchTable:readAliases(mode)
 	local aliases = {}
 	if String.isEmpty(self.args.aliases) then return aliases end
 
-	local aliasInput = Array.map(mw.text.split(self.args.aliases, ','), String.trim)
+	local aliasInput = Array.parseCommaSeparatedString(self.args.aliases)
 
 	Array.forEach(aliasInput, function(alias)
 		alias = alias:gsub(' ', '_')
@@ -280,10 +280,10 @@ function MatchTable:readTimeRange()
 	end
 
 	--build year range from subpage name (or input)
-	local yearRange = Array.map(mw.text.split(yearsString, '-'), String.trim)
-	yearRange = {
-		tonumber(yearRange[1]),
-		tonumber(yearRange[2] or yearRange[1]),
+	local rawYearRange = Array.parseCommaSeparatedString(yearsString, '-')
+	local yearRange = {
+		tonumber(rawYearRange[1]),
+		tonumber(rawYearRange[2] or rawYearRange[1]),
 	}
 
 	--sort
@@ -390,8 +390,8 @@ function MatchTable:buildAdditionalConditions()
 		if Logic.isEmpty(input) then return end
 
 		local orConditions = ConditionTree(BooleanOperator.any)
-		Array.forEach(mw.text.split(input, ','), function(value)
-			orConditions:add{ConditionNode(ColumnName(lpdbKey), Comparator.eq, String.trim(value))}
+		Array.forEach(Array.parseCommaSeparatedString(input), function(value)
+			orConditions:add{ConditionNode(ColumnName(lpdbKey), Comparator.eq, value)}
 		end)
 		conditions:add(orConditions)
 	end
