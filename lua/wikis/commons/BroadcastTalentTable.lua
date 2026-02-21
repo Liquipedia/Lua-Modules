@@ -12,14 +12,15 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
 local Game = Lua.import('Module:Game')
-local HighlightConditions = Lua.import('Module:HighlightConditions')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local Tournament = Lua.import('Module:Tournament')
 
 local Tier = Lua.import('Module:Tier/Custom')
 
@@ -29,22 +30,38 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local LinkWidget = Lua.import('Module:Widget/Basic/Link')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local DEFAULT_LIMIT = 500
 local DEFAULT_ACHIEVEMENTS_LIMIT = 10
 local NONBREAKING_SPACE = '&nbsp;'
 local DASH = '&#8211;'
-local DEFAULT_TIERTYPE = 'General'
 local DEFAULT_ABOUT_LINK = 'Template:Weight/doc'
 local ACHIEVEMENTS_SORT_ORDER = 'weight desc, date desc'
 local ACHIEVEMENTS_IGNORED_STATUSES = {'cancelled', 'postponed'}
 local RESULTS_SORT_ORDER = 'date desc'
 
----@class BroadcastTalentTable
----@operator call():BroadcastTalentTable
-local BroadcastTalentTable = Class.new(function(self, ...) self:init(...) end)
+---@class EnrichedBroadcast
+---@field date string
+---@field pagename string
+---@field parent string
+---@field position string
+---@field positions string[]
+---@field language string
+---@field extradata table
 
----@class argsValues
+---@class BroadcastTalentTable: BaseClass
+---@operator call(table): BroadcastTalentTable
+---@field broadcaster string?
+---@field aliases string[]
+local BroadcastTalentTable = Class.new(function(self, args) self:init(args) end)
+
+---@class BroadcastTalentTableArgs
 ---@field broadcaster string?
 ---@field aliases string?
 ---@field showtiertype string|boolean|nil
@@ -55,12 +72,12 @@ local BroadcastTalentTable = Class.new(function(self, ...) self:init(...) end)
 ---@field displayGameIcon string|boolean|nil
 ---@field useTickerNames string|boolean|nil
 ---@field limit string|number|nil
----@field aboutAchievementsLink string|boolean|nil
+---@field aboutAchievementsLink string?
 ---@field onlyHighlightOnValue string?
 ---@field displayPartnerLists string|boolean|nil
 
 --- Init function for BroadcastTalentTable
----@param args argsValues
+---@param args BroadcastTalentTableArgs
 ---@return self
 function BroadcastTalentTable:init(args)
 	self:_readArgs(args)
@@ -79,12 +96,13 @@ function BroadcastTalentTable.run(frame)
 	return BroadcastTalentTable(Arguments.getArgs(frame)):create()
 end
 
----@param args table
+---@private
+---@param args BroadcastTalentTableArgs
 function BroadcastTalentTable:_readArgs(args)
 	local isAchievementsTable = Logic.readBool(args.achievements)
 
 	self.args = {
-		aboutAchievementsLink = args.aboutAchievementsLink or DEFAULT_ABOUT_LINK,
+		aboutAchievementsLink = Logic.emptyOr(args.aboutAchievementsLink, DEFAULT_ABOUT_LINK),
 		showTierType = Logic.nilOr(Logic.readBoolOrNil(args.showtiertype), true),
 		displayGameIcon = Logic.readBool(args.displayGameIcon),
 		useTickerNames = Logic.readBool(args.useTickerNames),
@@ -99,12 +117,13 @@ function BroadcastTalentTable:_readArgs(args)
 	}
 
 	local broadcaster = String.isNotEmpty(args.broadcaster) and args.broadcaster or self:_getBroadcaster()
-	self.broadcaster = broadcaster and mw.ext.TeamLiquidIntegration.resolve_redirect(broadcaster):gsub(' ', '_') or nil
+	self.broadcaster = Page.pageifyLink(broadcaster)
 
-	self.aliases = args.aliases and Array.map(mw.text.split(args.aliases:gsub(' ', '_'), ','), String.trim) or {}
-	table.insert(self.aliases, self.broadcaster)
+	self.aliases = Array.map(Array.parseCommaSeparatedString(args.aliases), Page.pageifyLink)
+	Array.appendWith(self.aliases, self.broadcaster)
 end
 
+---@private
 ---@return string?
 function BroadcastTalentTable:_getBroadcaster()
 	local title = mw.title.getCurrentTitle()
@@ -116,67 +135,62 @@ function BroadcastTalentTable:_getBroadcaster()
 	return title.baseText
 end
 
----@return table[]?
+---@private
+---@return table<string, EnrichedBroadcast[]>?
 function BroadcastTalentTable:_fetchTournaments()
 	local args = self.args
 
 	local conditions = ConditionTree(BooleanOperator.all)
 
-	local broadCasterConditions = ConditionTree(BooleanOperator.any)
-	for _, broadcaster in pairs(self.aliases) do
-		broadCasterConditions:add{ConditionNode(ColumnName('page'), Comparator.eq, broadcaster)}
-	end
-	conditions:add(broadCasterConditions)
+	conditions:add(ConditionUtil.anyOf(ColumnName('page'), self.aliases))
 
 	if args.year then
-		conditions:add{ConditionNode(ColumnName('date_year'), Comparator.eq, args.year)}
+		conditions:add(ConditionNode(ColumnName('date_year'), Comparator.eq, args.year))
 	else
 		-- mirrors current implementation
 		-- should we change it to use <= instead of < ? (same for >)
 		if args.startDate then
-			conditions:add{ConditionNode(ColumnName('date'), Comparator.gt, args.startDate)}
+			conditions:add(ConditionNode(ColumnName('date'), Comparator.gt, args.startDate))
 		end
 		if args.endDate then
-			conditions:add{ConditionNode(ColumnName('date'), Comparator.lt, args.endDate)}
+			conditions:add(ConditionNode(ColumnName('date'), Comparator.lt, args.endDate))
 		end
 	end
 
 	if args.isAchievementsTable then
-		Array.forEach(ACHIEVEMENTS_IGNORED_STATUSES, function(ignoredStatus)
-			conditions:add{ConditionNode(ColumnName('extradata_status'), Comparator.neq, ignoredStatus)}
-		end)
+		conditions:add(ConditionUtil.noneOf(ColumnName('extradata_status'), ACHIEVEMENTS_IGNORED_STATUSES))
 	end
 
-	-- double the limit for the query due to potentional merging of results further down the line
-	local queryLimit = args.limit * 2
+	---@type EnrichedBroadcast[]
+	local tournaments = {}
 
-	local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
+	---@type table<string, EnrichedBroadcast>
+	local pageNames = {}
+
+	Lpdb.executeMassQuery('broadcasters', {
 		query = 'pagename, parent, date, extradata, language, position',
 		conditions = conditions:toString(),
 		order = args.sortBy,
-		limit = queryLimit,
-	})
-
-	if not queryData[1] then
-		return
-	end
-
-	local tournaments = {}
-	local pageNames = {}
-	for _, tournament in pairs(queryData) do
-		tournament.extradata = tournament.extradata or {}
-		if not pageNames[tournament.pagename] or Logic.readBool(tournament.extradata.showmatch) then
-			tournament.positions = {tournament.position}
-			table.insert(tournaments, tournament)
-			if not Logic.readBool(tournament.extradata.showmatch) then
-				pageNames[tournament.pagename] = tournament
+	}, function (record)
+		if #tournaments == args.limit then
+			return false
+		end
+		---@cast record EnrichedBroadcast
+		record.extradata = record.extradata or {}
+		if not pageNames[record.pagename] or Logic.readBool(record.extradata.showmatch) then
+			record.positions = {record.position}
+			table.insert(tournaments, record)
+			if not Logic.readBool(record.extradata.showmatch) then
+				pageNames[record.pagename] = record
 			end
 		else
-			table.insert(pageNames[tournament.pagename].positions, tournament.position)
+			table.insert(pageNames[record.pagename].positions, record.position)
 		end
-	end
+	end)
 
-	tournaments = Array.sub(tournaments, 1, args.limit)
+	if Logic.isEmpty(tournaments) then
+		return
+	end
 
 	if args.isAchievementsTable then
 		table.sort(tournaments, function(item1, item2)
@@ -185,10 +199,9 @@ function BroadcastTalentTable:_fetchTournaments()
 		return {[''] = tournaments}
 	end
 
-	local _
-	_, tournaments = Array.groupBy(tournaments, function(tournament) return tournament.date:sub(1, 4) end)
+	local _, tournamentsByYear = Array.groupBy(tournaments, function(tournament) return tournament.date:sub(1, 4) end)
 
-	return tournaments
+	return tournamentsByYear
 end
 
 --- Creates the display
@@ -198,138 +211,144 @@ function BroadcastTalentTable:create()
 		return
 	end
 
-	local display = mw.html.create('table')
-		:addClass('wikitable wikitable-striped sortable')
-		:css('text-align', 'center')
-		:node(self:_header())
+	local bodyElements = {}
 
-	for seperatorTitle, sectionData in Table.iter.spairs(self.tournaments, function (_, key1, key2)
-		return tonumber(key1) > tonumber(key2) end) do
-
-		if String.isNotEmpty(seperatorTitle) then
-			display:node(BroadcastTalentTable._seperator(seperatorTitle))
-		end
-
-		for _, tournament in ipairs(sectionData) do
-			display:node(self:_row(tournament))
-		end
+	for separatorTitle, sectionData in Table.iter.spairs(self.tournaments, function (_, key1, key2)
+		return tonumber(key1) > tonumber(key2)
+	end) do
+		Array.extendWith(bodyElements, BroadcastTalentTable._separator(separatorTitle), Array.map(sectionData, function (broadcast)
+			return self:_row(broadcast)
+		end))
 	end
 
-	if self.args.isAchievementsTable then
-		display:node(self:_footer())
-	end
-
-	return mw.html.create('div')
-		:addClass('table-responsive')
-		:node(display)
+	return TableWidgets.Table{
+		sortable = true,
+		columns = WidgetUtil.collect(
+			{
+				align = 'center',
+				minWidth = '120px',
+				sortType = 'isoDate'
+			},
+			{
+				align = 'center',
+				shrink = true,
+			},
+			self.args.displayGameIcon and {align = 'center'} or nil,
+			{align = 'center'},
+			{align = 'center'},
+			{align = 'center'},
+			{align = 'center'},
+			self.args.displayPartnerListColumn and {
+				align = 'center',
+				unsortable = true,
+			} or nil
+		),
+		children = WidgetUtil.collect(
+			self:_header(),
+			TableWidgets.TableBody{children = bodyElements}
+		),
+		footer = self.args.isAchievementsTable and self:_footer() or nil
+	}
 end
 
----@return Html
+---@private
+---@return Widget
 function BroadcastTalentTable:_header()
-	local header = mw.html.create('tr')
-		:tag('th'):wikitext('Date'):css('width', '120px'):done()
-		:tag('th'):wikitext('Tier'):css('width', '50px'):done()
-		:tag('th'):wikitext('Tournament')
-			:attr('colspan', self.args.displayGameIcon and 3 or 2)
-			:css('width', self.args.displayGameIcon and '350px' or '300px'):done()
-		:tag('th'):wikitext('Position'):css('width', '130px'):done()
-
-	if not self.args.displayPartnerListColumn then
-		return header
-	end
-
-	return header:tag('th'):wikitext('Partner List'):css('width', '160px'):done()
+	return TableWidgets.TableHeader{children = {
+		TableWidgets.Row{children = WidgetUtil.collect(
+			TableWidgets.CellHeader{children = {'Date'}},
+			TableWidgets.CellHeader{children = {'Tier'}},
+			TableWidgets.CellHeader{
+				colspan = self.args.displayGameIcon and 3 or 2,
+				children = {'Tournament'}
+			},
+			TableWidgets.CellHeader{children = {'Position'}},
+			self.args.displayPartnerListColumn and TableWidgets.CellHeader{children = {'Partner List'}} or nil
+		)}
+	}}
 end
 
----@param seperatorTitle string|number
+---@private
+---@param separatorTitle string|number?
+---@return Widget?
+function BroadcastTalentTable._separator(separatorTitle)
+	if Logic.isEmpty(separatorTitle) then
+		return
+	end
+	return TableWidgets.Row{
+		classes = {'sortbottom'},
+		css = {['font-weight'] = 'bold'},
+		children = TableWidgets.Cell{
+			align = 'center',
+			colspan = 42,
+			children = separatorTitle
+		}
+	}
+end
+
+---@private
+---@param broadcast EnrichedBroadcast
 ---@return Html
-function BroadcastTalentTable._seperator(seperatorTitle)
-	return mw.html.create('tr'):addClass('sortbottom'):css('font-weight', 'bold')
-		:tag('td'):attr('colspan', 42):wikitext(seperatorTitle):done()
+function BroadcastTalentTable:_row(broadcast)
+	local tournament = Tournament.getTournament(broadcast.parent)
+	---@cast tournament -nil
+
+	local tierDisplay = Tier.display(tournament.liquipediaTier, tournament.liquipediaTierType, Table.merge(
+		tournament.tierOptions,
+		{
+			link = true,
+			shortIfBoth = true,
+			onlyTierTypeIfBoth = self.args.showTierType and String.isNotEmpty(tournament.liquipediaTierType)
+		}
+	))
+
+	return TableWidgets.Row{
+		highlighted = tournament:isHighlighted(self.args),
+		children = WidgetUtil.collect(
+			TableWidgets.Cell{children = broadcast.date},
+			TableWidgets.Cell{
+				attributes = {
+					['data-sort-value'] = Tier.toSortValue(tournament.liquipediaTier, tournament.liquipediaTierType)
+				},
+				children = tierDisplay
+			},
+			self.args.displayGameIcon and TableWidgets.Cell{
+				children = Game.icon{game = tournament.game}
+			} or nil,
+			TableWidgets.Cell{children = LeagueIcon.display{
+				icon = tournament.icon,
+				iconDark = tournament.iconDark,
+				series = tournament.series,
+				date = broadcast.date,
+				link = tournament.pageName,
+				name = tournament.fullName,
+			}},
+			TableWidgets.Cell{
+				align = 'left',
+				children = LinkWidget{
+					link = tournament.pageName,
+					children = self:_tournamentDisplayName(broadcast, tournament)
+				}
+			},
+			TableWidgets.Cell{children = Array.interleave(broadcast.positions, HtmlWidgets.Br{})},
+			self.args.displayPartnerListColumn and TableWidgets.Cell{
+				children = self:_partnerList(broadcast)
+			} or nil
+		)
+	}
 end
 
----@param tournament table
----@return Html
-function BroadcastTalentTable:_row(tournament)
-	local row = mw.html.create('tr')
-
-	tournament = BroadcastTalentTable._fetchTournamentData(tournament)
-
-	if HighlightConditions.tournament(tournament, self.args) then
-		row:addClass('tournament-highlighted-bg')
-	end
-
-	local tierDisplay, tierSortValue = self:_tierDisplay(tournament)
-
-	row
-		:tag('td'):wikitext(tournament.date):done()
-		:tag('td'):wikitext(tierDisplay):attr('data-sort-value', tierSortValue):done()
-
-	if self.args.displayGameIcon then
-		row:tag('td'):node(Game.icon{game = tournament.game})
-	end
-
-	row
-		:tag('td'):wikitext(LeagueIcon.display{
-			icon = tournament.icon,
-			iconDark = tournament.icondark,
-			series = tournament.series,
-			date = tournament.date,
-			link = tournament.pagename,
-			name = tournament.name,
-		}):done()
-		:tag('td'):css('text-align', 'left'):wikitext(Page.makeInternalLink({},
-			self:_tournamentDisplayName(tournament),
-			tournament.pagename
-		)):done()
-		:tag('td'):wikitext(table.concat(tournament.positions, '<br>')):done()
-
-	if not self.args.displayPartnerListColumn then
-		return row
-	end
-
-	return row:tag('td'):node(self:_partnerList(tournament)):done()
-end
-
----@param tournament table
----@return table
-function BroadcastTalentTable._fetchTournamentData(tournament)
-	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = '[[pagename::' .. tournament.parent .. ']] OR [[pagename::' .. tournament.pagename .. ']]',
-		query = 'name, tickername, icon, icondark, series, game, '
-			.. 'liquipediatier, liquipediatiertype, publishertier, extradata',
-	})
-
-	local extradata = tournament.extradata or {}
-	if String.isNotEmpty(extradata.liquipediatier) then
-		tournament.liquipediatier = extradata.liquipediatier
-	end
-	if String.isNotEmpty(extradata.liquipediatiertype) then
-		tournament.liquipediatiertype = extradata.liquipediatiertype
-	end
-
-	if type(queryData[1]) ~= 'table' then
-		return tournament
-	end
-
-	queryData[1].tournamentExtradata = queryData[1].extradata
-
-	return Table.merge(queryData[1], tournament)
-end
-
----@param tournament table
+---@private
+---@param broadcast EnrichedBroadcast
+---@param tournament StandardTournament
 ---@return string
-function BroadcastTalentTable:_tournamentDisplayName(tournament)
-	-- this is not the extradata of the tournament but of the broadcaster (they got merged together)
-	local extradata = tournament.extradata or {}
+function BroadcastTalentTable:_tournamentDisplayName(broadcast, tournament)
+	local extradata = broadcast.extradata or {}
 	if Logic.readBool(extradata.showmatch) and String.isNotEmpty(extradata.showmatchname) then
 		return extradata.showmatchname
 	end
 
-	local displayName = String.isNotEmpty(tournament.tickername)
-			and self.args.useTickerNames and tournament.tickername
-		or String.isNotEmpty(tournament.name) and tournament.name
-		or tournament.parent:gsub('_', ' ')
+	local displayName = self.args.useTickerNames and tournament.displayName or tournament.fullName
 
 	if not Logic.readBool(extradata.showmatch) then
 		return displayName
@@ -338,19 +357,7 @@ function BroadcastTalentTable:_tournamentDisplayName(tournament)
 	return displayName .. ' - Showmatch'
 end
 
----@param tournament table
----@return string?, string
-function BroadcastTalentTable:_tierDisplay(tournament)
-	local tier, tierType, options = Tier.parseFromQueryData(tournament)
-	assert(Tier.isValid(tier, tierType), 'Broadcaster event with unset or invalid tier/tiertype: ' .. tournament.pagename)
-
-	options.link = true
-	options.shortIfBoth = true
-	options.onlyTierTypeIfBoth = self.args.showTierType and tournament.liquipediatiertype ~= DEFAULT_TIERTYPE
-
-	return Tier.display(tier, tierType, options), Tier.toSortValue(tier, tierType)
-end
-
+---@private
 ---@param tournament table
 ---@return Html|string
 function BroadcastTalentTable:_partnerList(tournament)
@@ -375,43 +382,38 @@ function BroadcastTalentTable:_partnerList(tournament)
 		:tag('div'):addClass('NavContent broadcast-talent-partner-list'):node(list):done()
 end
 
----@param tournament table
----@return table
-function BroadcastTalentTable:_getPartners(tournament)
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{
-			ConditionNode(ColumnName('parent'), Comparator.eq, tournament.parent),
-		}
+---@private
+---@param broadcast EnrichedBroadcast
+---@return {id: string, page: string, flag: string}[]
+function BroadcastTalentTable:_getPartners(broadcast)
+	local conditions = ConditionTree(BooleanOperator.all):add(
+		ConditionNode(ColumnName('parent'), Comparator.eq, broadcast.parent)
+	)
 
-	local positionConditions = ConditionTree(BooleanOperator.any)
-	for _, position in pairs(tournament.positions) do
-		positionConditions:add{ConditionNode(ColumnName('position'), Comparator.eq, position)}
-	end
-	conditions:add(positionConditions)
+	conditions:add(ConditionUtil.anyOf(ColumnName('position'), broadcast.positions))
 
-	for _, caster in pairs(self.aliases) do
-		conditions:add{ConditionNode(ColumnName('page'), Comparator.neq, caster)}
+	conditions:add(ConditionUtil.noneOf(ColumnName('page'), self.aliases))
+
+	if String.isNotEmpty(broadcast.language) then
+		conditions:add(ConditionNode(ColumnName('language'), Comparator.eq, broadcast.language))
 	end
 
-	if String.isNotEmpty(tournament.language) then
-		conditions:add{ConditionNode(ColumnName('language'), Comparator.eq, tournament.language)}
-	end
-
-	local extradata = tournament.extradata or {}
+	local extradata = broadcast.extradata or {}
 	if Logic.readBool(extradata.showmatch) then
-		conditions:add{ConditionNode(ColumnName('extradata_showmatch'), Comparator.eq, 'true')}
+		conditions:add(ConditionNode(ColumnName('extradata_showmatch'), Comparator.eq, 'true'))
 		if String.isNotEmpty(extradata.showmatchname) then
-			conditions:add{ConditionNode(ColumnName('extradata_showmatchname'), Comparator.eq, extradata.showmatchname)}
+			conditions:add(ConditionNode(ColumnName('extradata_showmatchname'), Comparator.eq, extradata.showmatchname))
 		end
 	end
 
 	return mw.ext.LiquipediaDB.lpdb('broadcasters', {
 		query = 'id, page, flag',
-		conditions = conditions:toString(),
+		conditions = tostring(conditions),
 	})
 end
 
----@param partners table
+---@private
+---@param partners {id: string, page: string, flag: string}[]
 ---@return {id: string, page: string, flag: string}[]
 function BroadcastTalentTable._removeDuplicatePartners(partners)
 	local uniquePartners = Table.map(partners, function(_, partner) return partner.page, partner end)
@@ -419,6 +421,7 @@ function BroadcastTalentTable._removeDuplicatePartners(partners)
 	return Array.extractValues(uniquePartners)
 end
 
+---@private
 ---@return Html
 function BroadcastTalentTable:_footer()
 	local footer = mw.html.create('small')
@@ -433,9 +436,7 @@ function BroadcastTalentTable:_footer()
 			)):done()
 		:done()
 
-	return mw.html.create('tr')
-		:tag('th'):attr('colspan', 42)
-		:node(footer)
+	return footer
 end
 
 return BroadcastTalentTable
