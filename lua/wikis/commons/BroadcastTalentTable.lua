@@ -21,6 +21,7 @@ local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local Tournament = Lua.import('Module:Tournament')
 
 local Tier = Lua.import('Module:Tier/Custom')
 
@@ -36,7 +37,6 @@ local DEFAULT_LIMIT = 500
 local DEFAULT_ACHIEVEMENTS_LIMIT = 10
 local NONBREAKING_SPACE = '&nbsp;'
 local DASH = '&#8211;'
-local DEFAULT_TIERTYPE = 'General'
 local DEFAULT_ABOUT_LINK = 'Template:Weight/doc'
 local ACHIEVEMENTS_SORT_ORDER = 'weight desc, date desc'
 local ACHIEVEMENTS_IGNORED_STATUSES = {'cancelled', 'postponed'}
@@ -265,34 +265,43 @@ end
 function BroadcastTalentTable:_row(broadcast)
 	local row = mw.html.create('tr')
 
-	broadcast = BroadcastTalentTable._fetchTournamentData(broadcast)
+	local tournament = Tournament.getTournament(broadcast.parent)
+	---@cast tournament -nil
 
-	if HighlightConditions.tournament(broadcast, self.args) then
+	if tournament:isHighlighted(self.args) then
 		row:addClass('tournament-highlighted-bg')
 	end
 
-	local tierDisplay, tierSortValue = self:_tierDisplay(broadcast)
+	local tierDisplay = Tier.display(tournament.liquipediaTier, tournament.liquipediaTierType, Table.merge(
+		tournament.tierOptions,
+		{
+			link = true,
+			shortIfBoth = true,
+			onlyTierTypeIfBoth = self.args.showTierType and String.isNotEmpty(tournament.liquipediaTierType)
+		}
+	))
+	local tierSortValue = Tier.toSortValue(tournament.liquipediaTier, tournament.liquipediaTierType)
 
 	row
 		:tag('td'):wikitext(broadcast.date):done()
 		:tag('td'):wikitext(tierDisplay):attr('data-sort-value', tierSortValue):done()
 
 	if self.args.displayGameIcon then
-		row:tag('td'):node(Game.icon{game = broadcast.game})
+		row:tag('td'):node(Game.icon{game = tournament.game})
 	end
 
 	row
 		:tag('td'):wikitext(LeagueIcon.display{
-			icon = broadcast.icon,
-			iconDark = broadcast.icondark,
-			series = broadcast.series,
+			icon = tournament.icon,
+			iconDark = tournament.iconDark,
+			series = tournament.series,
 			date = broadcast.date,
-			link = broadcast.pagename,
-			name = broadcast.name,
+			link = tournament.pageName,
+			name = tournament.fullName,
 		}):done()
 		:tag('td'):css('text-align', 'left'):wikitext(Page.makeInternalLink({},
-			self:_tournamentDisplayName(broadcast),
-			broadcast.pagename
+			self:_tournamentDisplayName(broadcast, tournament),
+			tournament.pageName
 		)):done()
 		:tag('td'):wikitext(table.concat(broadcast.positions, '<br>')):done()
 
@@ -304,66 +313,22 @@ function BroadcastTalentTable:_row(broadcast)
 end
 
 ---@private
----@param tournament table
----@return table
-function BroadcastTalentTable._fetchTournamentData(tournament)
-	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = '[[pagename::' .. tournament.parent .. ']] OR [[pagename::' .. tournament.pagename .. ']]',
-		query = 'name, tickername, icon, icondark, series, game, '
-			.. 'liquipediatier, liquipediatiertype, publishertier, extradata',
-	})
-
-	local extradata = tournament.extradata or {}
-	if String.isNotEmpty(extradata.liquipediatier) then
-		tournament.liquipediatier = extradata.liquipediatier
-	end
-	if String.isNotEmpty(extradata.liquipediatiertype) then
-		tournament.liquipediatiertype = extradata.liquipediatiertype
-	end
-
-	if type(queryData[1]) ~= 'table' then
-		return tournament
-	end
-
-	queryData[1].tournamentExtradata = queryData[1].extradata
-
-	return Table.merge(queryData[1], tournament)
-end
-
----@private
----@param tournament table
+---@param broadcast EnrichedBroadcast
+---@param tournament StandardTournament
 ---@return string
-function BroadcastTalentTable:_tournamentDisplayName(tournament)
-	-- this is not the extradata of the tournament but of the broadcaster (they got merged together)
-	local extradata = tournament.extradata or {}
+function BroadcastTalentTable:_tournamentDisplayName(broadcast, tournament)
+	local extradata = broadcast.extradata or {}
 	if Logic.readBool(extradata.showmatch) and String.isNotEmpty(extradata.showmatchname) then
 		return extradata.showmatchname
 	end
 
-	local displayName = String.isNotEmpty(tournament.tickername)
-			and self.args.useTickerNames and tournament.tickername
-		or String.isNotEmpty(tournament.name) and tournament.name
-		or tournament.parent:gsub('_', ' ')
+	local displayName = self.args.useTickerNames and tournament.displayName or tournament.fullName
 
 	if not Logic.readBool(extradata.showmatch) then
 		return displayName
 	end
 
 	return displayName .. ' - Showmatch'
-end
-
----@private
----@param tournament table
----@return string?, string
-function BroadcastTalentTable:_tierDisplay(tournament)
-	local tier, tierType, options = Tier.parseFromQueryData(tournament)
-	assert(Tier.isValid(tier, tierType), 'Broadcaster event with unset or invalid tier/tiertype: ' .. tournament.pagename)
-
-	options.link = true
-	options.shortIfBoth = true
-	options.onlyTierTypeIfBoth = self.args.showTierType and tournament.liquipediatiertype ~= DEFAULT_TIERTYPE
-
-	return Tier.display(tier, tierType, options), Tier.toSortValue(tier, tierType)
 end
 
 ---@private
