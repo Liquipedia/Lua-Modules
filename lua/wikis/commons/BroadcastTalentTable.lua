@@ -15,6 +15,7 @@ local Game = Lua.import('Module:Game')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
@@ -156,27 +157,20 @@ function BroadcastTalentTable:_fetchTournaments()
 		conditions:add(ConditionUtil.noneOf(ColumnName('extradata_status'), ACHIEVEMENTS_IGNORED_STATUSES))
 	end
 
-	-- double the limit for the query due to potential merging of results further down the line
-	local queryLimit = args.limit * 2
-
-	local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
-		query = 'pagename, parent, date, extradata, language, position',
-		conditions = conditions:toString(),
-		order = args.sortBy,
-		limit = queryLimit,
-	})
-
-	if not queryData[1] then
-		return
-	end
-
 	---@type EnrichedBroadcast[]
 	local tournaments = {}
 
 	---@type table<string, EnrichedBroadcast>
 	local pageNames = {}
 
-	Array.forEach(queryData, function (record)
+	Lpdb.executeMassQuery('broadcasters', {
+		query = 'pagename, parent, date, extradata, language, position',
+		conditions = conditions:toString(),
+		order = args.sortBy,
+	}, function (record)
+		if #tournaments == args.limit then
+			return false
+		end
 		---@cast record EnrichedBroadcast
 		record.extradata = record.extradata or {}
 		if not pageNames[record.pagename] or Logic.readBool(record.extradata.showmatch) then
@@ -190,7 +184,9 @@ function BroadcastTalentTable:_fetchTournaments()
 		end
 	end)
 
-	tournaments = Array.sub(tournaments, 1, args.limit)
+	if Logic.isEmpty(tournaments) then
+		return
+	end
 
 	if args.isAchievementsTable then
 		table.sort(tournaments, function(item1, item2)
