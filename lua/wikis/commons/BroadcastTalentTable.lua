@@ -213,10 +213,10 @@ function BroadcastTalentTable:create()
 
 	local bodyElements = {}
 
-	for seperatorTitle, sectionData in Table.iter.spairs(self.tournaments, function (_, key1, key2)
+	for separatorTitle, sectionData in Table.iter.spairs(self.tournaments, function (_, key1, key2)
 		return tonumber(key1) > tonumber(key2)
 	end) do
-		Array.extendWith(bodyElements, BroadcastTalentTable._seperator(seperatorTitle), Array.map(sectionData, function (broadcast)
+		Array.extendWith(bodyElements, BroadcastTalentTable._separator(separatorTitle), Array.map(sectionData, function (broadcast)
 			return self:_row(broadcast)
 		end))
 	end
@@ -268,7 +268,7 @@ end
 ---@private
 ---@param separatorTitle string|number?
 ---@return Widget?
-function BroadcastTalentTable._seperator(separatorTitle)
+function BroadcastTalentTable._separator(separatorTitle)
 	if Logic.isEmpty(separatorTitle) then
 		return
 	end
