@@ -32,6 +32,11 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local LinkWidget = Lua.import('Module:Widget/Basic/Link')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
 local DEFAULT_LIMIT = 500
 local DEFAULT_ACHIEVEMENTS_LIMIT = 10
 local NONBREAKING_SPACE = '&nbsp;'
@@ -206,70 +211,87 @@ function BroadcastTalentTable:create()
 		return
 	end
 
-	local display = mw.html.create('table')
-		:addClass('wikitable wikitable-striped sortable')
-		:css('text-align', 'center')
-		:node(self:_header())
+	local bodyElements = {}
 
 	for seperatorTitle, sectionData in Table.iter.spairs(self.tournaments, function (_, key1, key2)
-		return tonumber(key1) > tonumber(key2) end) do
-
-		if String.isNotEmpty(seperatorTitle) then
-			display:node(BroadcastTalentTable._seperator(seperatorTitle))
-		end
-
-		for _, tournament in ipairs(sectionData) do
-			display:node(self:_row(tournament))
-		end
+		return tonumber(key1) > tonumber(key2)
+	end) do
+		Array.extendWith(bodyElements, BroadcastTalentTable._seperator(seperatorTitle), Array.map(sectionData, function (broadcast)
+			return self:_row(broadcast)
+		end))
 	end
 
 	if self.args.isAchievementsTable then
-		display:node(self:_footer())
+		self:_footer()
 	end
 
-	return mw.html.create('div')
-		:addClass('table-responsive')
-		:node(display)
+	return TableWidgets.Table{
+		sortable = true,
+		columns = WidgetUtil.collect(
+			{
+				align = 'center',
+				minWidth = '120px',
+				sortType = 'isoDate'
+			},
+			{
+				align = 'center',
+				shrink = true,
+			},
+			self.args.displayGameIcon and {align = 'center'} or nil,
+			{align = 'center'},
+			{align = 'center'},
+			{align = 'center'},
+			{align = 'center'},
+			self.args.displayPartnerListColumn and {align = 'center'} or nil
+		),
+		children = WidgetUtil.collect(
+			self:_header(),
+			TableWidgets.TableBody{children = bodyElements}
+		)
+	}
 end
 
 ---@private
----@return Html
+---@return Widget
 function BroadcastTalentTable:_header()
-	local header = mw.html.create('tr')
-		:tag('th'):wikitext('Date'):css('width', '120px'):done()
-		:tag('th'):wikitext('Tier'):css('width', '50px'):done()
-		:tag('th'):wikitext('Tournament')
-			:attr('colspan', self.args.displayGameIcon and 3 or 2)
-			:css('width', self.args.displayGameIcon and '350px' or '300px'):done()
-		:tag('th'):wikitext('Position'):css('width', '130px'):done()
-
-	if not self.args.displayPartnerListColumn then
-		return header
-	end
-
-	return header:tag('th'):wikitext('Partner List'):css('width', '160px'):done()
+	return TableWidgets.TableHeader{children = {
+		TableWidgets.Row{children = WidgetUtil.collect(
+			TableWidgets.CellHeader{children = {'Date'}},
+			TableWidgets.CellHeader{children = {'Tier'}},
+			TableWidgets.CellHeader{
+				colspan = self.args.displayGameIcon and 3 or 2,
+				children = {'Tournament'}
+			},
+			TableWidgets.CellHeader{children = {'Position'}},
+			self.args.displayPartnerListColumn and TableWidgets.CellHeader{children = {'Partner List'}} or nil
+		)}
+	}}
 end
 
 ---@private
----@param seperatorTitle string|number
----@return Html
-function BroadcastTalentTable._seperator(seperatorTitle)
-	return mw.html.create('tr'):addClass('sortbottom'):css('font-weight', 'bold')
-		:tag('td'):attr('colspan', 42):wikitext(seperatorTitle):done()
+---@param separatorTitle string|number?
+---@return Widget?
+function BroadcastTalentTable._seperator(separatorTitle)
+	if Logic.isEmpty(separatorTitle) then
+		return
+	end
+	return TableWidgets.Row{
+		classes = {'sortbottom'},
+		css = {['font-weight'] = 'bold'},
+		children = TableWidgets.Cell{
+			align = 'center',
+			colspan = 42,
+			children = separatorTitle
+		}
+	}
 end
 
 ---@private
 ---@param broadcast EnrichedBroadcast
 ---@return Html
 function BroadcastTalentTable:_row(broadcast)
-	local row = mw.html.create('tr')
-
 	local tournament = Tournament.getTournament(broadcast.parent)
 	---@cast tournament -nil
-
-	if tournament:isHighlighted(self.args) then
-		row:addClass('tournament-highlighted-bg')
-	end
 
 	local tierDisplay = Tier.display(tournament.liquipediaTier, tournament.liquipediaTierType, Table.merge(
 		tournament.tierOptions,
@@ -279,36 +301,41 @@ function BroadcastTalentTable:_row(broadcast)
 			onlyTierTypeIfBoth = self.args.showTierType and String.isNotEmpty(tournament.liquipediaTierType)
 		}
 	))
-	local tierSortValue = Tier.toSortValue(tournament.liquipediaTier, tournament.liquipediaTierType)
 
-	row
-		:tag('td'):wikitext(broadcast.date):done()
-		:tag('td'):wikitext(tierDisplay):attr('data-sort-value', tierSortValue):done()
-
-	if self.args.displayGameIcon then
-		row:tag('td'):node(Game.icon{game = tournament.game})
-	end
-
-	row
-		:tag('td'):wikitext(LeagueIcon.display{
-			icon = tournament.icon,
-			iconDark = tournament.iconDark,
-			series = tournament.series,
-			date = broadcast.date,
-			link = tournament.pageName,
-			name = tournament.fullName,
-		}):done()
-		:tag('td'):css('text-align', 'left'):wikitext(Page.makeInternalLink({},
-			self:_tournamentDisplayName(broadcast, tournament),
-			tournament.pageName
-		)):done()
-		:tag('td'):wikitext(table.concat(broadcast.positions, '<br>')):done()
-
-	if not self.args.displayPartnerListColumn then
-		return row
-	end
-
-	return row:tag('td'):node(self:_partnerList(broadcast)):done()
+	return TableWidgets.Row{
+		highlighted = tournament:isHighlighted(self.args),
+		children = WidgetUtil.collect(
+			TableWidgets.Cell{children = broadcast.date},
+			TableWidgets.Cell{
+				attributes = {
+					['data-sort-value'] = Tier.toSortValue(tournament.liquipediaTier, tournament.liquipediaTierType)
+				},
+				children = tierDisplay
+			},
+			self.args.displayGameIcon and TableWidgets.Cell{
+				children = Game.icon{game = tournament.game}
+			} or nil,
+			TableWidgets.Cell{children = LeagueIcon.display{
+				icon = tournament.icon,
+				iconDark = tournament.iconDark,
+				series = tournament.series,
+				date = broadcast.date,
+				link = tournament.pageName,
+				name = tournament.fullName,
+			}},
+			TableWidgets.Cell{
+				align = 'left',
+				children = LinkWidget{
+					link = tournament.pageName,
+					children = self:_tournamentDisplayName(broadcast, tournament)
+				}
+			},
+			TableWidgets.Cell{children = Array.interleave(broadcast.positions, HtmlWidgets.Br{})},
+			self.args.displayPartnerListColumn and TableWidgets.Cell{
+				children = self:_partnerList(broadcast)
+			} or nil
+		)
+	}
 end
 
 ---@private
