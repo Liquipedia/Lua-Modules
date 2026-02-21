@@ -260,47 +260,47 @@ function BroadcastTalentTable._seperator(seperatorTitle)
 end
 
 ---@private
----@param tournament EnrichedBroadcast
+---@param broadcast EnrichedBroadcast
 ---@return Html
-function BroadcastTalentTable:_row(tournament)
+function BroadcastTalentTable:_row(broadcast)
 	local row = mw.html.create('tr')
 
-	tournament = BroadcastTalentTable._fetchTournamentData(tournament)
+	broadcast = BroadcastTalentTable._fetchTournamentData(broadcast)
 
-	if HighlightConditions.tournament(tournament, self.args) then
+	if HighlightConditions.tournament(broadcast, self.args) then
 		row:addClass('tournament-highlighted-bg')
 	end
 
-	local tierDisplay, tierSortValue = self:_tierDisplay(tournament)
+	local tierDisplay, tierSortValue = self:_tierDisplay(broadcast)
 
 	row
-		:tag('td'):wikitext(tournament.date):done()
+		:tag('td'):wikitext(broadcast.date):done()
 		:tag('td'):wikitext(tierDisplay):attr('data-sort-value', tierSortValue):done()
 
 	if self.args.displayGameIcon then
-		row:tag('td'):node(Game.icon{game = tournament.game})
+		row:tag('td'):node(Game.icon{game = broadcast.game})
 	end
 
 	row
 		:tag('td'):wikitext(LeagueIcon.display{
-			icon = tournament.icon,
-			iconDark = tournament.icondark,
-			series = tournament.series,
-			date = tournament.date,
-			link = tournament.pagename,
-			name = tournament.name,
+			icon = broadcast.icon,
+			iconDark = broadcast.icondark,
+			series = broadcast.series,
+			date = broadcast.date,
+			link = broadcast.pagename,
+			name = broadcast.name,
 		}):done()
 		:tag('td'):css('text-align', 'left'):wikitext(Page.makeInternalLink({},
-			self:_tournamentDisplayName(tournament),
-			tournament.pagename
+			self:_tournamentDisplayName(broadcast),
+			broadcast.pagename
 		)):done()
-		:tag('td'):wikitext(table.concat(tournament.positions, '<br>')):done()
+		:tag('td'):wikitext(table.concat(broadcast.positions, '<br>')):done()
 
 	if not self.args.displayPartnerListColumn then
 		return row
 	end
 
-	return row:tag('td'):node(self:_partnerList(tournament)):done()
+	return row:tag('td'):node(self:_partnerList(broadcast)):done()
 end
 
 ---@private
