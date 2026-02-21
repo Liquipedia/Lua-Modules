@@ -260,7 +260,7 @@ function BroadcastTalentTable._seperator(seperatorTitle)
 end
 
 ---@private
----@param tournament table
+---@param tournament EnrichedBroadcast
 ---@return Html
 function BroadcastTalentTable:_row(tournament)
 	local row = mw.html.create('tr')
