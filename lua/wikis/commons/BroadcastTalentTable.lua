@@ -195,10 +195,9 @@ function BroadcastTalentTable:_fetchTournaments()
 		return {[''] = tournaments}
 	end
 
-	local _
-	_, tournaments = Array.groupBy(tournaments, function(tournament) return tournament.date:sub(1, 4) end)
+	local _, tournamentsByYear = Array.groupBy(tournaments, function(tournament) return tournament.date:sub(1, 4) end)
 
-	return tournaments
+	return tournamentsByYear
 end
 
 --- Creates the display
