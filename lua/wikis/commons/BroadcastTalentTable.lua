@@ -98,7 +98,7 @@ function BroadcastTalentTable:_readArgs(args)
 	local isAchievementsTable = Logic.readBool(args.achievements)
 
 	self.args = {
-		aboutAchievementsLink = args.aboutAchievementsLink or DEFAULT_ABOUT_LINK,
+		aboutAchievementsLink = Logic.emptyOr(args.aboutAchievementsLink, DEFAULT_ABOUT_LINK),
 		showTierType = Logic.nilOr(Logic.readBoolOrNil(args.showtiertype), true),
 		displayGameIcon = Logic.readBool(args.displayGameIcon),
 		useTickerNames = Logic.readBool(args.useTickerNames),
