@@ -132,7 +132,7 @@ function BroadcastTalentTable:_getBroadcaster()
 end
 
 ---@private
----@return table[]?
+---@return table<string, EnrichedBroadcast[]>?
 function BroadcastTalentTable:_fetchTournaments()
 	local args = self.args
 
