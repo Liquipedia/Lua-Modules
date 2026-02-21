@@ -174,7 +174,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'status' then
 		table.insert(widgets, Cell{
 			name = 'Years Active',
-			children = args.years_active and Array.parseCommaSeparatedString(args.years_active)
+			children = Array.parseCommaSeparatedString(args.years_active)
 		})
 	elseif id == 'region' then
 		return {}

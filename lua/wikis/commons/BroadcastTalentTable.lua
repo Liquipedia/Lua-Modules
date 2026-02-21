@@ -101,7 +101,7 @@ function BroadcastTalentTable:_readArgs(args)
 	local broadcaster = String.isNotEmpty(args.broadcaster) and args.broadcaster or self:_getBroadcaster()
 	self.broadcaster = broadcaster and mw.ext.TeamLiquidIntegration.resolve_redirect(broadcaster):gsub(' ', '_') or nil
 
-	self.aliases = args.aliases and Array.parseCommaSeparatedString(args.aliases:gsub(' ', '_'))
+	self.aliases = args.aliases and Array.parseCommaSeparatedString(args.aliases:gsub(' ', '_')) or {}
 	table.insert(self.aliases, self.broadcaster)
 end
 
