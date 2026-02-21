@@ -14,7 +14,6 @@ local Logic = Lua.import('Module:Logic')
 local Medals = Lua.import('Module:Medals')
 local Ordinal = Lua.import('Module:Ordinal')
 local PlacementInfo = Lua.import('Module:Placement')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
