@@ -79,6 +79,7 @@ function BroadcastTalentTable.run(frame)
 	return BroadcastTalentTable(Arguments.getArgs(frame)):create()
 end
 
+---@private
 ---@param args table
 function BroadcastTalentTable:_readArgs(args)
 	local isAchievementsTable = Logic.readBool(args.achievements)
@@ -105,6 +106,7 @@ function BroadcastTalentTable:_readArgs(args)
 	table.insert(self.aliases, self.broadcaster)
 end
 
+---@private
 ---@return string?
 function BroadcastTalentTable:_getBroadcaster()
 	local title = mw.title.getCurrentTitle()
@@ -116,6 +118,7 @@ function BroadcastTalentTable:_getBroadcaster()
 	return title.baseText
 end
 
+---@private
 ---@return table[]?
 function BroadcastTalentTable:_fetchTournaments()
 	local args = self.args
@@ -224,6 +227,7 @@ function BroadcastTalentTable:create()
 		:node(display)
 end
 
+---@private
 ---@return Html
 function BroadcastTalentTable:_header()
 	local header = mw.html.create('tr')
@@ -241,6 +245,7 @@ function BroadcastTalentTable:_header()
 	return header:tag('th'):wikitext('Partner List'):css('width', '160px'):done()
 end
 
+---@private
 ---@param seperatorTitle string|number
 ---@return Html
 function BroadcastTalentTable._seperator(seperatorTitle)
@@ -248,6 +253,7 @@ function BroadcastTalentTable._seperator(seperatorTitle)
 		:tag('td'):attr('colspan', 42):wikitext(seperatorTitle):done()
 end
 
+---@private
 ---@param tournament table
 ---@return Html
 function BroadcastTalentTable:_row(tournament)
@@ -291,6 +297,7 @@ function BroadcastTalentTable:_row(tournament)
 	return row:tag('td'):node(self:_partnerList(tournament)):done()
 end
 
+---@private
 ---@param tournament table
 ---@return table
 function BroadcastTalentTable._fetchTournamentData(tournament)
@@ -317,6 +324,7 @@ function BroadcastTalentTable._fetchTournamentData(tournament)
 	return Table.merge(queryData[1], tournament)
 end
 
+---@private
 ---@param tournament table
 ---@return string
 function BroadcastTalentTable:_tournamentDisplayName(tournament)
@@ -338,6 +346,7 @@ function BroadcastTalentTable:_tournamentDisplayName(tournament)
 	return displayName .. ' - Showmatch'
 end
 
+---@private
 ---@param tournament table
 ---@return string?, string
 function BroadcastTalentTable:_tierDisplay(tournament)
@@ -351,6 +360,7 @@ function BroadcastTalentTable:_tierDisplay(tournament)
 	return Tier.display(tier, tierType, options), Tier.toSortValue(tier, tierType)
 end
 
+---@private
 ---@param tournament table
 ---@return Html|string
 function BroadcastTalentTable:_partnerList(tournament)
@@ -375,6 +385,7 @@ function BroadcastTalentTable:_partnerList(tournament)
 		:tag('div'):addClass('NavContent broadcast-talent-partner-list'):node(list):done()
 end
 
+---@private
 ---@param tournament table
 ---@return table
 function BroadcastTalentTable:_getPartners(tournament)
@@ -411,6 +422,7 @@ function BroadcastTalentTable:_getPartners(tournament)
 	})
 end
 
+---@private
 ---@param partners table
 ---@return {id: string, page: string, flag: string}[]
 function BroadcastTalentTable._removeDuplicatePartners(partners)
@@ -419,6 +431,7 @@ function BroadcastTalentTable._removeDuplicatePartners(partners)
 	return Array.extractValues(uniquePartners)
 end
 
+---@private
 ---@return Html
 function BroadcastTalentTable:_footer()
 	local footer = mw.html.create('small')
