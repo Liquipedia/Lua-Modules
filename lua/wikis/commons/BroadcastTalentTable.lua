@@ -144,9 +144,7 @@ function BroadcastTalentTable:_fetchTournaments()
 	end
 
 	if args.isAchievementsTable then
-		Array.forEach(ACHIEVEMENTS_IGNORED_STATUSES, function(ignoredStatus)
-			conditions:add{ConditionNode(ColumnName('extradata_status'), Comparator.neq, ignoredStatus)}
-		end)
+		conditions:add(ConditionUtil.noneOf(ColumnName('extradata_status'), ACHIEVEMENTS_IGNORED_STATUSES))
 	end
 
 	-- double the limit for the query due to potentional merging of results further down the line
