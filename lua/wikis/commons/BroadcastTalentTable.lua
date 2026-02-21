@@ -68,7 +68,7 @@ local BroadcastTalentTable = Class.new(function(self, args) self:init(args) end)
 ---@field displayGameIcon string|boolean|nil
 ---@field useTickerNames string|boolean|nil
 ---@field limit string|number|nil
----@field aboutAchievementsLink string|boolean|nil
+---@field aboutAchievementsLink string?
 ---@field onlyHighlightOnValue string?
 ---@field displayPartnerLists string|boolean|nil
 
