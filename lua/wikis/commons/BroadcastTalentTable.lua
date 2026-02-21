@@ -221,10 +221,6 @@ function BroadcastTalentTable:create()
 		end))
 	end
 
-	if self.args.isAchievementsTable then
-		self:_footer()
-	end
-
 	return TableWidgets.Table{
 		sortable = true,
 		columns = WidgetUtil.collect(
@@ -247,7 +243,8 @@ function BroadcastTalentTable:create()
 		children = WidgetUtil.collect(
 			self:_header(),
 			TableWidgets.TableBody{children = bodyElements}
-		)
+		),
+		footer = self.args.isAchievementsTable and self:_footer() or nil
 	}
 end
 
@@ -436,9 +433,7 @@ function BroadcastTalentTable:_footer()
 			)):done()
 		:done()
 
-	return mw.html.create('tr')
-		:tag('th'):attr('colspan', 42)
-		:node(footer)
+	return footer
 end
 
 return BroadcastTalentTable
