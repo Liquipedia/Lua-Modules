@@ -34,6 +34,7 @@ Config.categories = {
 		name = 'game',
 		property = 'game',
 		items = {'fc 26', 'fc mobile', 'fc online'},
+		expandable = true,
 		transform = function(game)
 			return HtmlWidgets.Fragment{
 				children = {
