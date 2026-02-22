@@ -12,8 +12,16 @@ local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
+local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
 
 local ExternalMediaLinkDisplay = Lua.import('Module:Widget/ExternalMedia/Link')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -169,6 +177,8 @@ function ExternalMediaLink.wrapper(args)
 		trans_title = args.trans_title,
 	}
 
+	ExternalMediaLink._assertUnique(parsedArgs.link)
+
 	if args.authors then
 		local authors = Array.parseCommaSeparatedString(args.authors)
 		args.by_link1 = args.by_link1 or args.by_link
@@ -249,6 +259,23 @@ function ExternalMediaLink._wrapperDisplay(parsedArgs)
 			rowIfNotEmpty('URL', parsedArgs.link)
 		)}},
 	}
+end
+
+---@param link string
+function ExternalMediaLink._assertUnique(link)
+	local pagename = (mw.ext.LiquipediaDB.lpdb('externalmedialink', {
+		conditions = tostring(ConditionTree(BooleanOperator.all):add{
+			ConditionNode(ColumnName('namespace'), Comparator.eq, Namespace.idFromName('Data')),
+			ConditionNode(ColumnName('link'), Comparator.eq, link),
+			ConditionNode(ColumnName('pagename'), Comparator.neq, mw.title.getCurrentTitle().text:gsub(' ', '_')),
+		}),
+		limit = 1,
+	})[1] or {}).pagename
+
+	assert(
+		not pagename,
+		'There already exists an ExternalMediaLink with the specified url at "Data:' .. (pagename or '') .. '"'
+	)
 end
 
 return Class.export(ExternalMediaLink, {exports = {'run', 'wrapper'}})
