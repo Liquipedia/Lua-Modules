@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
@@ -71,7 +72,7 @@ end
 ---@return table
 function ExternalMediaLink._readArgs(args)
 	local lpdbData = {
-		date = args.date,
+		date = DateExt.toYmdInUtc(args.date),
 		language = args.language or DEFAULT_LANGUAGE,
 		title = mw.text.unstripNoWiki(args.title),
 		translatedtitle = args.trans_title,
@@ -156,7 +157,7 @@ end
 ---@return Widget
 function ExternalMediaLink.wrapper(args)
 	local parsedArgs = {
-		date = args.date,
+		date = DateExt.toYmdInUtc(args.date),
 		link = args.link,
 		title = args.title,
 		type = args.type and args.type:lower() or nil,
