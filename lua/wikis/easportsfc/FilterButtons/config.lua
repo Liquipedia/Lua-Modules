@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Game = Lua.import('Module:Game')
 local Tier = Lua.import('Module:Tier/Utils')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 local Config = {}
 
@@ -32,10 +33,20 @@ Config.categories = {
 	{
 		name = 'game',
 		property = 'game',
-		expandable = true,
 		items = {'fc 26', 'fc mobile', 'fc online'},
 		transform = function(game)
-			return Game.icon({game = game, noSpan = true, noLink = true, size = '20x20px'})
+			return HtmlWidgets.Fragment{
+				children = {
+					Game.icon{game = game, noSpan = true, noLink = true, size = '20x20px'},
+					HtmlWidgets.Span{
+						classes = {'mobile-hide'},
+						children = {
+							'&nbsp;',
+							Game.text{game = game, noLink = true, useAbbreviation = true},
+						}
+					}
+				}
+			}
 		end
 	}
 }
