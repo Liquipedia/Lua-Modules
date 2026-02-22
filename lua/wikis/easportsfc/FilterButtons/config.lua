@@ -33,7 +33,7 @@ Config.categories = {
 		name = 'game',
 		property = 'game',
 		expandable = true,
-		items = {'fc 26', 'fcm', 'fco'},
+		items = {'fc 26', 'fc mobile', 'fc online'},
 		transform = function(game)
 			return Game.icon({game = game, noSpan = true, noLink = true, size = '20x20px'})
 		end
