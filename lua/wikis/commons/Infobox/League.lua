@@ -191,7 +191,8 @@ function League:createInfobox()
 
 	return HtmlWidgets.Fragment{children = Array.interleave({
 		self:build(widgets, 'Tournament'),
-		Logic.readBool(args.autointro) and self:seoText(args) or nil
+		Logic.readBool(args.autointro) and self:seoText(args) or nil,
+		'<!--' .. args.shortname .. ' ' .. args.tickername '-->'
 	}, HtmlWidgets.Br{})}
 end
 
