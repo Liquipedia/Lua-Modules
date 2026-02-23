@@ -19,9 +19,12 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tier = Lua.import('Module:Tier/Custom')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -360,52 +363,60 @@ function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTempl
 end
 
 ---Builds the results/achievements/awards table
----@return Html
+---@return Widget
 function BaseResultsTable:build()
-	local displayTable = mw.html.create('table')
-		:addClass('wikitable wikitable-striped sortable')
-		:css('text-align', 'center')
-		:node(self:buildHeader())
+	local columns = self:getColumns()
+	local columnCount = #columns
+
+	local bodyChildren = {}
 
 	if Table.isEmpty(self.data) or Table.isEmpty(self.data[1]) then
-		return displayTable:node(mw.html.create('tr')
-			:tag('td'):attr('colspan', 42):wikitext('No recorded results found.'))
+		return TableWidgets.Table{
+			sortable = true,
+			columns = columns,
+			children = WidgetUtil.collect(
+				self:buildHeader(),
+				TableWidgets.TableBody{children = {
+					TableWidgets.Row{children = {
+						TableWidgets.Cell{colspan = columnCount, children = 'No recorded results found.'}
+					}}
+				}}
+			)
+		}
 	end
 
-	-- Hidden tr that contains a td to prevent the first yearHeader from being inside thead
-	displayTable:node(mw.html.create('tr'):css('display', 'none'):tag('td'):allDone())
-
 	for _, dataSet in ipairs(self.data) do
-		for _, row in ipairs(self:_buildRows(dataSet)) do
-			displayTable:node(row)
+		for _, row in ipairs(self:_buildRows(dataSet, columnCount)) do
+			table.insert(bodyChildren, row)
 		end
 	end
 
+	local footer
 	if self.config.onlyAchievements then
-		displayTable:tag('tr')
-			:tag('th')
-				:attr('colspan', 42)
-				:css('font-style', 'italic')
-				:wikitext('[[' .. self.config.opponent .. '/' .. self.config.resultsSubPage .. '|Extended list of results]]')
+		footer = '[[' .. self.config.opponent .. '/' .. self.config.resultsSubPage .. '|Extended list of results]]'
 	end
 
-	displayTable:node(self.args.manualContent)
-
-	return mw.html.create('div')
-		:addClass('table-responsive')
-		:node(displayTable)
+	return TableWidgets.Table{
+		sortable = true,
+		columns = columns,
+		footer = footer,
+		children = WidgetUtil.collect(
+			self:buildHeader(),
+			TableWidgets.TableBody{children = bodyChildren}
+		)
+	}
 end
 
----comment
 ---@param placementData table
----@return Html[]
-function BaseResultsTable:_buildRows(placementData)
+---@param columnCount integer
+---@return Widget[]
+function BaseResultsTable:_buildRows(placementData, columnCount)
 	local rows = {}
 
 	if placementData.header then
-		table.insert(rows, mw.html.create('tr'):addClass('sortbottom')
-			:tag('th'):attr('colspan', 42):wikitext(placementData.header):done()
-			:done())
+		table.insert(rows, TableWidgets.Row{children = {
+			TableWidgets.CellHeader{colspan = columnCount, children = placementData.header}
+		}})
 	end
 
 	for _, placement in ipairs(placementData) do
@@ -413,16 +424,6 @@ function BaseResultsTable:_buildRows(placementData)
 	end
 
 	return rows
-end
-
--- overwritable
----Applies the row highlight
----@param placement table
----@return string?
-function BaseResultsTable:rowHighlight(placement)
-	if HighlightConditions.tournament(placement, self.config) then
-		return 'tournament-highlighted-bg'
-	end
 end
 
 -- overwritable
@@ -556,11 +557,20 @@ function BaseResultsTable:processVsData(placement)
 	return score, vsDisplay
 end
 
+---Returns column definitions for the table
+---Must be implemented by child classes
+---@return Table2ColumnDef[]
+function BaseResultsTable:getColumns()
+	error('Function "getColumns" needs to be implemented by child class')
+end
+
+---@return Widget
 function BaseResultsTable:buildHeader()
 	error('Function "buildHeader" needs to be set via the module that requires "Module:BaseResultsTable/Base"')
 end
 
 ---@param placement table
+---@return Widget
 function BaseResultsTable:buildRow(placement)
 	error('Function "buildRow" needs to be set via the module that requires "Module:BaseResultsTable/Base"')
 end

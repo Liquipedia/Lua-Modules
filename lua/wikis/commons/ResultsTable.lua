@@ -8,121 +8,142 @@
 local Lua = require('Module:Lua')
 
 local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Page = Lua.import('Module:Page')
 local Placement = Lua.import('Module:Placement')
 local Table = Lua.import('Module:Table')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local BaseResultsTable = Lua.import('Module:ResultsTable/Base')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+
 ---@class ResultsTable: BaseResultsTable
 ---@operator call(table): ResultsTable
 local ResultsTable = Class.new(BaseResultsTable)
 
----Builds the Header of the results/achievements table
----@return Html
-function ResultsTable:buildHeader()
-	local header = mw.html.create('tr')
-		:tag('th'):css('width', '100px'):wikitext('Date'):done()
-		:tag('th'):css('min-width', '80px'):wikitext('Place'):done()
-		:tag('th'):css('min-width', '75px'):wikitext('Tier'):done()
+---@return Table2ColumnDef[]
+function ResultsTable:getColumns()
+	local config = self.config
 
-	if self.config.showType then
-		header:tag('th'):css('min-width', '50px'):wikitext('Type')
-	end
-
-	if self.config.displayGameIcons then
-		header:tag('th'):node(Abbreviation.make{text = 'G.', title = 'Game'})
-	end
-
-	header:tag('th'):css('width', '420px'):attr('colspan', 2):wikitext('Tournament')
-
-	if self.config.queryType ~= Opponent.team or Table.isNotEmpty(self.config.aliases) then
-		header:tag('th'):css('min-width', '70px'):wikitext('Team')
-	elseif self.config.playerResultsOfTeam then
-		header:tag('th'):css('min-width', '105px'):wikitext('Player')
-	end
-
-	if not self.config.hideResult then
-		header:tag('th'):css('min-width', '105px'):attr('colspan', 2):addClass('unsortable'):wikitext('Result')
-	end
-
-	header:tag('th'):attr('data-sort-type', 'currency'):wikitext('Prize')
-
-	return header
+	return WidgetUtil.collect(
+		{width = '100px'},
+		{minWidth = '80px'},
+		{minWidth = '75px'},
+		config.showType and {minWidth = '50px'} or nil,
+		config.displayGameIcons and {minWidth = '50px'} or nil,
+		{width = '30px'},
+		{minWidth = '390px', align = 'left'},
+		(config.playerResultsOfTeam or config.queryType ~= Opponent.team or Table.isNotEmpty(config.aliases))
+			and {minWidth = '70px', align = 'right'} or nil,
+		not config.hideResult and {minWidth = '52px'} or nil,
+		not config.hideResult and {minWidth = '52px', align = 'left'} or nil,
+		{sortType = 'currency'}
+	)
 end
 
----Builds a placement row of the results/achievements table
+---@return Widget
+function ResultsTable:buildHeader()
+	local config = self.config
+
+	return TableWidgets.TableHeader{children = {
+		TableWidgets.Row{children = WidgetUtil.collect(
+			TableWidgets.CellHeader{children = 'Date', width = '100px'},
+			TableWidgets.CellHeader{children = 'Place', minWidth = '80px'},
+			TableWidgets.CellHeader{children = 'Tier', minWidth = '75px'},
+			config.showType and TableWidgets.CellHeader{children = 'Type', minWidth = '50px'} or nil,
+			config.displayGameIcons and TableWidgets.CellHeader{
+				children = Abbreviation.make{text = 'G.', title = 'Game'},
+				minWidth = '50px'
+			} or nil,
+			TableWidgets.CellHeader{colspan = 2, children = 'Tournament', width = '420px'},
+			(config.playerResultsOfTeam or config.queryType ~= Opponent.team or Table.isNotEmpty(config.aliases))
+				and TableWidgets.CellHeader{
+					children = config.playerResultsOfTeam and 'Player' or 'Team',
+					minWidth = '70px'
+				} or nil,
+			not config.hideResult and TableWidgets.CellHeader{
+				colspan = 2,
+				children = 'Result',
+				minWidth = '105px',
+				unsortable = true
+			} or nil,
+			TableWidgets.CellHeader{children = 'Prize', sortType = 'currency'}
+		)}
+	}}
+end
+
 ---@param placement table
----@return Html
+---@return Widget
 function ResultsTable:buildRow(placement)
-	local placementCell = mw.html.create('td')
-	Placement._placement{parent = placementCell, placement = placement.placement}
+	local config = self.config
 
-	local row = mw.html.create('tr')
-		:addClass(self:rowHighlight(placement))
-		:tag('td'):wikitext(DateExt.toYmdInUtc(placement.date)):done()
-		:node(placementCell)
-
+	local placementDisplay = Placement._placement{placement = placement.placement}
 	local tierDisplay, tierSortValue = self:tierDisplay(placement)
-
-	row:tag('td'):attr('data-sort-value', tierSortValue):wikitext(tierDisplay)
-
-	if self.config.showType then
-		row:tag('td'):wikitext(placement.type)
-	end
-
-	if self.config.displayGameIcons then
-		row:tag('td'):node(Game.icon{game = placement.game})
-	end
-
 	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)
 
-	row
-		:tag('td'):css('width', '30px'):attr('data-sort-value', tournamentDisplayName):wikitext(LeagueIcon.display{
-			icon = placement.icon,
-			iconDark = placement.icondark,
-			link = placement.parent,
-			name = tournamentDisplayName,
-			options = {noTemplate = true},
-		}):done()
-		:tag('td'):attr('data-sort-value', tournamentDisplayName):css('text-align', 'left'):wikitext(Page.makeInternalLink(
-			{},
-			tournamentDisplayName,
-			placement.pagename
-		))
+	local cells = WidgetUtil.collect(
+		TableWidgets.Cell{children = DateExt.toYmdInUtc(placement.date)},
+		TableWidgets.Cell{children = placementDisplay},
+		TableWidgets.Cell{
+			children = tierDisplay,
+			attributes = {['data-sort-value'] = tierSortValue}
+		},
+		config.showType and TableWidgets.Cell{children = placement.type} or nil,
+		config.displayGameIcons and TableWidgets.Cell{children = Game.icon{game = placement.game}} or nil,
+		TableWidgets.Cell{
+			children = LeagueIcon.display{
+				icon = placement.icon,
+				iconDark = placement.icondark,
+				link = placement.parent,
+				name = tournamentDisplayName,
+				options = {noTemplate = true},
+			},
+			attributes = {['data-sort-value'] = tournamentDisplayName}
+		},
+		TableWidgets.Cell{
+			children = Page.makeInternalLink({}, tournamentDisplayName, placement.pagename),
+			attributes = {['data-sort-value'] = tournamentDisplayName}
+		},
+		(config.playerResultsOfTeam or config.queryType ~= Opponent.team or Table.isNotEmpty(config.aliases))
+			and TableWidgets.Cell{
+				children = self:opponentDisplay(placement, {
+					teamForSolo = not config.playerResultsOfTeam,
+					flip = not config.hideResult
+				}),
+				attributes = {['data-sort-value'] = placement.opponentname}
+			} or nil
+	)
 
-	if self.config.playerResultsOfTeam or
-		self.config.queryType ~= Opponent.team or
-		Table.isNotEmpty(self.config.aliases) then
-
-		row:tag('td'):css('text-align', self.config.hideResult and 'left' or 'right')
-			:attr('data-sort-value', placement.opponentname)
-			:node(self:opponentDisplay(placement,
-			{teamForSolo = not self.config.playerResultsOfTeam, flip = not self.config.hideResult}
-		))
-	end
-
-	if not self.config.hideResult then
+	if not config.hideResult then
 		local score, vsDisplay, groupAbbr = self:processVsData(placement)
-		row
-			:tag('td'):wikitext(score):done()
-			:tag('td'):css('text-align', 'left'):cssText(groupAbbr and 'padding-left:14px' or nil):node(vsDisplay or groupAbbr)
+		Array.extendWith(cells, {
+			TableWidgets.Cell{children = score},
+			TableWidgets.Cell{
+				children = vsDisplay or groupAbbr,
+				css = groupAbbr and {['padding-left'] = '14px'} or nil
+			}
+		})
 	end
 
-	local useIndivPrize = self.config.useIndivPrize and self.config.queryType ~= Opponent.team
-	row:tag('td'):wikitext(Currency.display('USD',
-			useIndivPrize and placement.individualprizemoney or placement.prizemoney,
-			{dashIfZero = true, displayCurrencyCode = false, formatValue = true}
-		))
+	local useIndivPrize = config.useIndivPrize and config.queryType ~= Opponent.team
+	Array.appendWith(cells, TableWidgets.Cell{children = Currency.display('USD',
+		useIndivPrize and placement.individualprizemoney or placement.prizemoney,
+		{dashIfZero = true, displayCurrencyCode = false, formatValue = true}
+	)})
 
-	return row
+	return TableWidgets.Row{
+		highlighted = HighlightConditions.tournament(placement, config),
+		children = cells
+	}
 end
 
 return ResultsTable
