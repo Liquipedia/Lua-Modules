@@ -63,7 +63,7 @@ function MvpTable.run(args)
 		columns = {
 			{align = 'left'},
 			{align = 'center'},
-			parsedArgs.points and {align = 'center'} or nil,
+			parsedArgs.points and {align = 'right'} or nil,
 		},
 		css = {
 			['margin-top'] = parsedArgs.margin .. 'px'
