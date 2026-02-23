@@ -71,7 +71,7 @@ function MvpTable.run(args)
 		tableAttributes = {
 			['data-opentext'] = 'place ' .. (parsedArgs.cutafter + 1) .. ' to ' .. #mvpList,
 			['data-closetext'] = 'place ' .. (parsedArgs.cutafter + 1) .. ' to ' .. #mvpList,
-			['data-cutafter'] = parsedArgs.cutafter + (String.isNotEmpty(args.title) and 1 or 0),
+			['data-cutafter'] = parsedArgs.cutafter,
 			['data-definedcutafter'] = ''
 		},
 		children = WidgetUtil.collect(
