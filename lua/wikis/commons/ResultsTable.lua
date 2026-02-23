@@ -36,7 +36,7 @@ function ResultsTable:getColumns()
 
 	return WidgetUtil.collect(
 		{},
-		{align = 'center'},
+		{},
 		{},
 		config.showType and {} or nil,
 		config.displayGameIcons and {} or nil,
@@ -44,9 +44,9 @@ function ResultsTable:getColumns()
 		{},
 		(config.playerResultsOfTeam or config.queryType ~= Opponent.team or Table.isNotEmpty(config.aliases))
 			and {} or nil,
-		not config.hideResult and {align = 'center'} or nil,
-		not config.hideResult and {align = 'center'} or nil,
-		{sortType = 'currency', align = 'right'}
+		not config.hideResult and {} or nil,
+		not config.hideResult and {} or nil,
+		{sortType = 'currency'}
 	)
 end
 
@@ -57,7 +57,7 @@ function ResultsTable:buildHeader()
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
 			TableWidgets.CellHeader{children = 'Date'},
-			TableWidgets.CellHeader{children = 'Place'},
+			TableWidgets.CellHeader{children = 'Place', align = 'center'},
 			TableWidgets.CellHeader{children = 'Tier'},
 			config.showType and TableWidgets.CellHeader{children = 'Type'} or nil,
 			config.displayGameIcons and TableWidgets.CellHeader{
@@ -70,9 +70,10 @@ function ResultsTable:buildHeader()
 			not config.hideResult and TableWidgets.CellHeader{
 				colspan = 2,
 				children = 'Result',
+				align = 'center',
 				unsortable = true
 			} or nil,
-			TableWidgets.CellHeader{children = 'Prize', sortType = 'currency'}
+			TableWidgets.CellHeader{children = 'Prize', sortType = 'currency', align = 'right'}
 		)}
 	}}
 end
@@ -90,6 +91,7 @@ function ResultsTable:buildRow(placement)
 		TableWidgets.Cell{children = DateExt.toYmdInUtc(placement.date)},
 		TableWidgets.Cell{
 			children = placementData.display,
+			align = 'center',
 			attributes = {['data-sort-value'] = placementData.sort},
 			classes = placementData.blackText
 				and {placementData.backgroundClass}
@@ -128,9 +130,10 @@ function ResultsTable:buildRow(placement)
 	if not config.hideResult then
 		local score, vsDisplay, groupAbbr = self:processVsData(placement)
 		Array.extendWith(cells, {
-			TableWidgets.Cell{children = score},
+			TableWidgets.Cell{children = score, align = 'center'},
 			TableWidgets.Cell{
 				children = vsDisplay or groupAbbr,
+				align = 'center',
 				css = groupAbbr and {['padding-left'] = '14px'} or nil
 			}
 		})
@@ -140,7 +143,7 @@ function ResultsTable:buildRow(placement)
 	Array.appendWith(cells, TableWidgets.Cell{children = Currency.display('USD',
 		useIndivPrize and placement.individualprizemoney or placement.prizemoney,
 		{dashIfZero = true, displayCurrencyCode = false, formatValue = true}
-	)})
+	), align = 'right'})
 
 	return TableWidgets.Row{
 		highlighted = HighlightConditions.tournament(placement, config),
