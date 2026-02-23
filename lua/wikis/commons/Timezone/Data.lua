@@ -79,7 +79,7 @@ return {
 		offset = {8, 0},
 	},
 	BDST = {
-		abbr = 'BST'
+		abbr = 'BST',
 		name = 'Bangladesh Standard Time',
 		offset = {6, 0},
 	},
