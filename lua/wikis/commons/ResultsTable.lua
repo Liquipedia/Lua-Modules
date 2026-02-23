@@ -38,14 +38,14 @@ function ResultsTable:getColumns()
 		{},
 		{},
 		{},
-		config.showType and {},
-		config.displayGameIcons and {},
+		config.showType and {} or nil,
+		config.displayGameIcons and {} or nil,
 		{},
 		{},
 		(config.playerResultsOfTeam or config.queryType ~= Opponent.team or Table.isNotEmpty(config.aliases))
-			and {},
-		not config.hideResult and {},
-		not config.hideResult and {},
+			and {} or nil,
+		not config.hideResult and {} or nil,
+		not config.hideResult and {} or nil,
 		{sortType = 'currency'}
 	)
 end

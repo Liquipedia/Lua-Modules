@@ -32,12 +32,12 @@ function AwardsTable:getColumns()
 	return WidgetUtil.collect(
 		{},
 		{},
-		config.showType and {},
+		config.showType and {} or nil,
 		{},
 		{},
 		{},
 		(config.playerResultsOfTeam or config.queryType ~= Opponent.team)
-			and {},
+			and {} or nil,
 		{sortType = 'currency'}
 	)
 end
