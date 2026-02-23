@@ -37,9 +37,11 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 ---@field title Widget|Html|string|number?
 ---@field footer Widget|Html|string|number?
 ---@field classes string[]?
+---@field tableClasses string[]?
 ---@field columns Table2ColumnDef[]?
 ---@field css {[string]: string|number|nil}?
 ---@field attributes {[string]: any}?
+---@field tableAttributes {[string]: any}?
 
 ---@class Table2: Widget
 ---@operator call(Table2Props): Table2
@@ -69,7 +71,8 @@ function Table2:render()
 
 	local tableClasses = WidgetUtil.collect(
 		'table2__table',
-		Logic.readBool(props.sortable) and 'sortable' or nil
+		Logic.readBool(props.sortable) and 'sortable' or nil,
+		props.tableClasses
 	)
 
 	local captionNode = props.caption and HtmlWidgets.Div{
@@ -91,6 +94,7 @@ function Table2:render()
 	end
 
 	local tableNode = HtmlWidgets.Table{
+		attributes = props.tableAttributes,
 		classes = tableClasses,
 		children = tableChildren,
 	}

@@ -56,6 +56,7 @@ local SECONDS_ONE_DAY = 3600 * 24
 ---@class MatchTableConfig
 ---@field mode MatchTableMode
 ---@field limit number?
+---@field dateFormat ('full'|'compact')?
 ---@field displayGameIcons boolean
 ---@field showResult boolean
 ---@field aliases table<string, true>
@@ -148,6 +149,7 @@ function MatchTable:_readDefaultConfig()
 		addCategory = Logic.nilOr(Logic.readBoolOrNil(args.addCategory), true),
 		mode = args.tableMode,
 		limit = tonumber(args.limit),
+		dateFormat = args.dateFormat,
 		displayGameIcons = Logic.readBool(args.gameIcons),
 		showResult = Logic.nilOr(Logic.readBoolOrNil(args.showResult), true),
 		timeRange = self:readTimeRange(),
@@ -678,6 +680,7 @@ end
 function MatchTable:_displayDate(match)
 	local cell = mw.html.create('td')
 		:css('text-align', 'left')
+		:css('min-width', '5rem')
 		:attr('data-sort-value', match.timestamp)
 
 	if match.timestamp == DateExt.defaultTimestamp then
@@ -688,6 +691,7 @@ function MatchTable:_displayDate(match)
 		finished = match.finished,
 		date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
 		rawdatetime = true,
+		format = self.config.dateFormat
 	} or nil)
 end
 
@@ -818,11 +822,12 @@ function MatchTable:_displayScore(match)
 		end
 
 		return mw.html.create(tonumber(opponentRecord.placement) == 1 and 'b' or nil)
-			:wikitext(status == SCORE_STATUS and (score or '–') or status)
+			:wikitext(status == SCORE_STATUS and (score or '&ndash;') or status)
 	end
 
 	return mw.html.create('td')
 		:addClass('match-table-score')
+		:css('white-space', 'nowrap')
 		:node(toScore(result.opponent, result.gameOpponents))
 		:node(bestof1Score and BO1_SCORE_CONCAT or SCORE_CONCAT)
 		:node(toScore(result.vs, result.gameVsOpponents))
