@@ -72,7 +72,11 @@ function SquadRow:id()
 		local hasTeamRole = hasTeam and self.model.extradata.loanedtorole
 		table.insert(self.children, Cell{
 			children = {
-				hasTeam and OpponentDisplay.InlineTeamContainer{template = self.model.extradata.loanedto, date = date, style = 'icon'} or nil,
+				hasTeam and OpponentDisplay.InlineTeamContainer{
+					template = self.model.extradata.loanedto,
+					date = date,
+					style = 'icon',
+				} or nil,
 				hasTeamRole and HtmlWidgets.Small{
 					children = {HtmlWidgets.I{children = {self.model.extradata.loanedtorole}}}
 				} or nil,
