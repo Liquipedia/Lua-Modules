@@ -186,7 +186,7 @@ function SquadUtils.readSquadPersonArgs(args)
 	return person
 end
 
----@param person ModelRow
+---@param squadPerson ModelRow
 function SquadUtils.storeSquadPerson(squadPerson)
 	squadPerson:save()
 end
@@ -230,7 +230,7 @@ end
 
 ---@param frame table
 ---@param squadWidget SquadWidget
----@param rowCreator fun(player: table, squadStatus: SquadStatus, squadType: SquadType):Widget
+---@param rowCreator fun(player: table, squadStatus: SquadStatus, squadType: SquadType, columnVisibility: table):Widget
 ---@return Widget
 function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator)
 	local args = Arguments.getArgs(frame)
