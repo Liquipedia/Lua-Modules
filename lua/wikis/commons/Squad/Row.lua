@@ -12,6 +12,7 @@ local Icon = Lua.import('Module:Icon')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local String = Lua.import('Module:StringUtils')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Template = Lua.import('Module:Template')
 
 local Table2Widgets = Lua.import('Module:Widget/Table2/All')
@@ -67,11 +68,11 @@ function SquadRow:id()
 
 	if shouldShowColumn(self.columnVisibility, 'teamIcon') then
 		local date = self.model.leavedate or self.model.inactivedate
-		local hasTeam = self.model.extradata.loanedto and mw.ext.TeamTemplate.teamexists(self.model.extradata.loanedto)
+		local hasTeam = self.model.extradata.loanedto and TeamTemplate.exists(self.model.extradata.loanedto)
 		local hasTeamRole = hasTeam and self.model.extradata.loanedtorole
 		table.insert(self.children, Cell{
 			children = {
-				hasTeam and mw.ext.TeamTemplate.teamicon(self.model.extradata.loanedto, date) or nil,
+				hasTeam and OpponentDisplay.InlineTeamContainer{template = self.model.extradata.loanedto, date = date, style = 'icon'} or nil,
 				hasTeamRole and HtmlWidgets.Small{
 					children = {HtmlWidgets.I{children = {self.model.extradata.loanedtorole}}}
 				} or nil,
@@ -181,7 +182,7 @@ function SquadRow:newteam()
 		end
 
 		local date = self.model.extradata.newteamdate or self.model.leavedate
-		table.insert(content, mw.ext.TeamTemplate.team(newTeam, date))
+		table.insert(content, OpponentDisplay.InlineTeamContainer{template = newTeam, date = date})
 
 		if hasNewTeamRole then
 			table.insert(content, ' (' .. newTeamRole .. ')')

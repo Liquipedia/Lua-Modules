@@ -16,6 +16,7 @@ local Logic = Lua.import('Module:Logic')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Lpdb = Lua.import('Module:Lpdb')
 local Faction = Lua.import('Module:Faction')
@@ -125,10 +126,10 @@ end
 ---@return ModelRow
 function SquadUtils.readSquadPersonArgs(args)
 	local function getTeamInfo(page, property)
-		if not page or not mw.ext.TeamTemplate.teamexists(page) then
+		if not page or not TeamTemplate.exists(page) then
 			return
 		end
-		return mw.ext.TeamTemplate.raw(page)[property]
+		return TeamTemplate.getRawOrNil(page)[property]
 	end
 
 	local name = String.nilIfEmpty(args.name)
@@ -202,7 +203,7 @@ function SquadUtils.analyzeColumnVisibility(players, squadStatus)
 	return {
 		teamIcon = Array.any(players, function(p)
 			local loanedTo = p.extradata and p.extradata.loanedto or p.loanedto
-			return loanedTo and mw.ext.TeamTemplate.teamexists(loanedTo)
+			return loanedTo and TeamTemplate.exists(loanedTo)
 		end),
 		name = Array.any(players, function(p)
 			return String.isNotEmpty(p.name)
@@ -215,15 +216,15 @@ function SquadUtils.analyzeColumnVisibility(players, squadStatus)
 		end),
 		inactivedate = isInactive and Array.any(players, function(p)
 			return String.isNotEmpty(p.inactivedate)
-		end) or false,
+		end),
 		leavedate = isFormer and Array.any(players, function(p)
 			return String.isNotEmpty(p.leavedate)
-		end) or false,
+		end),
 		newteam = isFormer and Array.any(players, function(p)
 			return String.isNotEmpty(p.newteam)
 				or String.isNotEmpty(p.newteamrole)
 				or String.isNotEmpty(p.newteamspecial)
-		end) or false,
+		end),
 	}
 end
 
