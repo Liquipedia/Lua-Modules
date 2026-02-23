@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
@@ -31,14 +30,14 @@ function AwardsTable:getColumns()
 	local config = self.config
 
 	return WidgetUtil.collect(
-		{width = '100px'},
-		{minWidth = '75px'},
-		config.showType and {minWidth = '50px'} or nil,
-		{width = '30px'},
-		{minWidth = '245px', align = 'left'},
-		{minWidth = '225px', align = 'left'},
+		{},
+		{},
+		config.showType and {},
+		{},
+		{},
+		{},
 		(config.playerResultsOfTeam or config.queryType ~= Opponent.team)
-			and {minWidth = '70px', align = 'left'} or nil,
+			and {},
 		{sortType = 'currency'}
 	)
 end
@@ -49,16 +48,14 @@ function AwardsTable:buildHeader()
 
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
-			TableWidgets.CellHeader{children = 'Date', width = '100px'},
-			TableWidgets.CellHeader{children = 'Tier', minWidth = '75px'},
-			config.showType and TableWidgets.CellHeader{children = 'Type', minWidth = '50px'} or nil,
-			TableWidgets.CellHeader{colspan = 2, children = 'Tournament', width = '275px'},
-			TableWidgets.CellHeader{children = 'Award', minWidth = '225px'},
+			TableWidgets.CellHeader{children = 'Date'},
+			TableWidgets.CellHeader{children = 'Tier'},
+			config.showType and TableWidgets.CellHeader{children = 'Type'} or nil,
+			TableWidgets.CellHeader{colspan = 2, children = 'Tournament'},
+			TableWidgets.CellHeader{children = 'Award'},
 			(config.playerResultsOfTeam or config.queryType ~= Opponent.team)
-				and TableWidgets.CellHeader{
-					children = config.playerResultsOfTeam and 'Player' or 'Team',
-					minWidth = '70px'
-				} or nil,
+				and TableWidgets.CellHeader{children = config.playerResultsOfTeam and 'Player' or 'Team'}
+				or nil,
 			TableWidgets.CellHeader{children = 'Prize', sortType = 'currency'}
 		)}
 	}}

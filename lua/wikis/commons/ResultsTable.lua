@@ -35,17 +35,17 @@ function ResultsTable:getColumns()
 	local config = self.config
 
 	return WidgetUtil.collect(
-		{width = '100px'},
-		{minWidth = '80px'},
-		{minWidth = '75px'},
-		config.showType and {minWidth = '50px'} or nil,
-		config.displayGameIcons and {minWidth = '50px'} or nil,
-		{width = '30px'},
-		{minWidth = '390px', align = 'left'},
+		{},
+		{},
+		{},
+		config.showType and {},
+		config.displayGameIcons and {},
+		{},
+		{},
 		(config.playerResultsOfTeam or config.queryType ~= Opponent.team or Table.isNotEmpty(config.aliases))
-			and {minWidth = '70px', align = 'right'} or nil,
-		not config.hideResult and {minWidth = '52px'} or nil,
-		not config.hideResult and {minWidth = '52px', align = 'left'} or nil,
+			and {},
+		not config.hideResult and {},
+		not config.hideResult and {},
 		{sortType = 'currency'}
 	)
 end
@@ -56,24 +56,20 @@ function ResultsTable:buildHeader()
 
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
-			TableWidgets.CellHeader{children = 'Date', width = '100px'},
-			TableWidgets.CellHeader{children = 'Place', minWidth = '80px'},
-			TableWidgets.CellHeader{children = 'Tier', minWidth = '75px'},
-			config.showType and TableWidgets.CellHeader{children = 'Type', minWidth = '50px'} or nil,
+			TableWidgets.CellHeader{children = 'Date'},
+			TableWidgets.CellHeader{children = 'Place'},
+			TableWidgets.CellHeader{children = 'Tier'},
+			config.showType and TableWidgets.CellHeader{children = 'Type'} or nil,
 			config.displayGameIcons and TableWidgets.CellHeader{
-				children = Abbreviation.make{text = 'G.', title = 'Game'},
-				minWidth = '50px'
+				children = Abbreviation.make{text = 'G.', title = 'Game'}
 			} or nil,
-			TableWidgets.CellHeader{colspan = 2, children = 'Tournament', width = '420px'},
+			TableWidgets.CellHeader{colspan = 2, children = 'Tournament'},
 			(config.playerResultsOfTeam or config.queryType ~= Opponent.team or Table.isNotEmpty(config.aliases))
-				and TableWidgets.CellHeader{
-					children = config.playerResultsOfTeam and 'Player' or 'Team',
-					minWidth = '70px'
-				} or nil,
+				and TableWidgets.CellHeader{children = config.playerResultsOfTeam and 'Player' or 'Team'}
+				or nil,
 			not config.hideResult and TableWidgets.CellHeader{
 				colspan = 2,
 				children = 'Result',
-				minWidth = '105px',
 				unsortable = true
 			} or nil,
 			TableWidgets.CellHeader{children = 'Prize', sortType = 'currency'}
@@ -86,19 +82,13 @@ end
 function ResultsTable:buildRow(placement)
 	local config = self.config
 
-	local placementData = Placement.raw(placement.placement)
+	local placementDisplay = Placement._placement{placement = placement.placement}
 	local tierDisplay, tierSortValue = self:tierDisplay(placement)
 	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)
 
 	local cells = WidgetUtil.collect(
 		TableWidgets.Cell{children = DateExt.toYmdInUtc(placement.date)},
-		TableWidgets.Cell{
-			children = placementData.display,
-			attributes = {['data-sort-value'] = placementData.sort},
-			classes = placementData.blackText
-				and {placementData.backgroundClass}
-				or {placementData.backgroundClass, 'placement-text'}
-		},
+		TableWidgets.Cell{children = placementDisplay},
 		TableWidgets.Cell{
 			children = tierDisplay,
 			attributes = {['data-sort-value'] = tierSortValue}
