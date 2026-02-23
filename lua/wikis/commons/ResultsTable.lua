@@ -36,7 +36,7 @@ function ResultsTable:getColumns()
 
 	return WidgetUtil.collect(
 		{},
-		{},
+		{align = 'center'},
 		{},
 		config.showType and {} or nil,
 		config.displayGameIcons and {} or nil,
@@ -44,9 +44,9 @@ function ResultsTable:getColumns()
 		{},
 		(config.playerResultsOfTeam or config.queryType ~= Opponent.team or Table.isNotEmpty(config.aliases))
 			and {} or nil,
-		not config.hideResult and {} or nil,
-		not config.hideResult and {} or nil,
-		{sortType = 'currency'}
+		not config.hideResult and {align = 'center'} or nil,
+		not config.hideResult and {align = 'center'} or nil,
+		{sortType = 'currency', align = 'right'}
 	)
 end
 
