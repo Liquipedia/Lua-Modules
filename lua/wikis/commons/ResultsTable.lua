@@ -82,13 +82,19 @@ end
 function ResultsTable:buildRow(placement)
 	local config = self.config
 
-	local placementDisplay = Placement._placement{placement = placement.placement}
+	local placementData = Placement.raw(placement.placement)
 	local tierDisplay, tierSortValue = self:tierDisplay(placement)
 	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)
 
 	local cells = WidgetUtil.collect(
 		TableWidgets.Cell{children = DateExt.toYmdInUtc(placement.date)},
-		TableWidgets.Cell{children = placementDisplay},
+		TableWidgets.Cell{
+			children = placementData.display,
+			attributes = {['data-sort-value'] = placementData.sort},
+			classes = placementData.blackText
+				and {placementData.backgroundClass}
+				or {placementData.backgroundClass, 'placement-text'}
+		},
 		TableWidgets.Cell{
 			children = tierDisplay,
 			attributes = {['data-sort-value'] = tierSortValue}
