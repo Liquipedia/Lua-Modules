@@ -32,7 +32,6 @@ $table2-cell-padding-x: 0.75rem;
 		-webkit-overflow-scrolling: touch;
 		touch-action: pan-x pan-y;
 		overscroll-behavior-x: contain;
-		container-type: scroll-state;
 	}
 
 	&__footer {
@@ -47,29 +46,6 @@ $table2-cell-padding-x: 0.75rem;
 
 		.theme--dark & {
 			border-top-color: var( --clr-on-surface-dark-primary-12 );
-		}
-	}
-
-	&__subheader {
-		th {
-			text-align: center;
-
-			@supports (container-type: scroll-state) {
-				@container scroll-state(scrollable: inline) {
-					position: sticky;
-					left: 50%;
-					transform: translateX(-50%);
-					z-index: 1;
-				}
-			}
-
-			@supports not (container-type: scroll-state) {
-				@media (overflow-inline: scroll) {
-					position: sticky;
-					left: 0;
-					z-index: 1;
-				}
-			}
 		}
 	}
 
@@ -222,6 +198,14 @@ $table2-cell-padding-x: 0.75rem;
 
 		th {
 			font-weight: bold;
+		}
+	}
+
+	tr.table2__row--subhead {
+		.table2__subheader-cell {
+			position: sticky;
+			left: 0.75rem;
+			width: min-content;
 		}
 	}
 
