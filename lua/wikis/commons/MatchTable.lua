@@ -568,8 +568,16 @@ function MatchTable:buildDisplay()
 		:node(self:headerRow())
 
 	if Table.isEmpty(self.matches) then
-		local text = 'This ' .. (self.config.mode == Opponent.solo and Opponent.solo or Opponent.team)
-			.. ' has not played any matches yet.'
+		local isH2H = Logic.isNotEmpty(self.config.vs)
+		local text = String.interpolate(
+			'${pronoun} ${mode} ${verb} not played any matches ${explanation}yet.',
+			{
+				pronoun = isH2H and 'These' or 'This',
+				mode = self.config.mode == Opponent.solo and 'player' or 'team',
+				verb = isH2H and 'have' or 'has',
+				explanation = isH2H and 'against each other ' or ''
+			}
+		)
 
 		return display:tag('tr')
 			:tag('td')
