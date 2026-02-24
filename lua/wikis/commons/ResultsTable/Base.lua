@@ -430,11 +430,9 @@ end
 ---Applies the row highlight
 ---@protected
 ---@param placement placement
----@return string?
+---@return boolean
 function BaseResultsTable:rowHighlight(placement)
-	if HighlightConditions.tournament(placement, self.config) then
-		return 'tournament-highlighted-bg'
-	end
+	return HighlightConditions.tournament(placement, self.config)
 end
 
 ---Builds the tier display
