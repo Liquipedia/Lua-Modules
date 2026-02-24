@@ -282,7 +282,7 @@ function BroadcastTalentTable._separator(separatorTitle)
 	return TableWidgets.Row{
 		classes = {'sortbottom'},
 		css = {['font-weight'] = 'bold'},
-		children = TableWidgets.Cell{
+		children = TableWidgets.CellHeader{
 			align = 'center',
 			colspan = 42,
 			children = separatorTitle
