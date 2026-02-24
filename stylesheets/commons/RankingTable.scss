@@ -54,27 +54,12 @@
 	}
 
 	&__header-row {
-		background-color: var( --_background-color );
-		border-bottom: var( --_border );
-
 		th {
 			padding: 0.5rem 1rem;
-
-			&:not( :first-child ) {
-				border-left: var( --_border );
-			}
 		}
 	}
 
 	&__row {
-		&:not( :first-child ) {
-			border-top: var( --_border );
-		}
-
-		&:not( :last-child ) {
-			border-bottom: var( --_border );
-		}
-
 		&--even {
 			background-color: var( --clr-on-surface-light-primary-4 );
 		}
@@ -92,13 +77,15 @@
 				padding: 0.5rem 0.75rem;
 			}
 
-			&:not( :first-child ) {
-				border-left: var( --_border );
-			}
-
 			.flag {
 				margin-right: 0.5rem;
 			}
+		}
+	}
+
+	&__graph-row {
+		&:hover {
+			background-color: transparent !important;
 		}
 	}
 
@@ -144,6 +131,7 @@
 
 	&--small {
 		width: 100%;
+		border-radius: 0 0 0.5rem 0.5rem;
 
 		[ data-ranking-table-cell="region" ] {
 			display: none;
@@ -155,15 +143,9 @@
 		display: flex;
 		align-items: center;
 		gap: 1rem;
-
-		& > select.ranking-table__select {
-			border-color: var( --_border-color );
-			background-color: var( --_background-color );
-		}
 	}
 
 	&__patch-label {
-		color: var( --_patch-label-color );
 		opacity: 0.7;
 	}
 }

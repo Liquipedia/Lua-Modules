@@ -248,8 +248,9 @@ function RatingsList:render()
 			striped = false,
 			title = title,
 			footer = isSmallerVersion and footer or nil,
+			classes = { isSmallerVersion and 'ranking-table--small' or nil },
 			tableAttributes = { ['data-ranking-table'] = 'table' },
-			tableClasses = { 'ranking-table', isSmallerVersion and 'ranking-table--small' or nil },
+			tableClasses = { 'ranking-table' },
 			children = WidgetUtil.collect(
 				TableWidgets.TableHeader {
 					children = { columnHeaderRow }
