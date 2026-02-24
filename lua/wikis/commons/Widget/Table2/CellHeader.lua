@@ -17,6 +17,7 @@ local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
 ---@class Table2CellHeaderProps
 ---@field children (Widget|Html|string|number|nil)[]?
+---@field section 'head'|'body'|'subhead'?
 ---@field align ('left'|'right'|'center')?
 ---@field shrink (string|number|boolean)?
 ---@field nowrap (string|number|boolean)?
@@ -42,7 +43,7 @@ function Table2CellHeader:render()
 	local props = self.props
 
 	local columns = self:useContext(Table2Contexts.ColumnContext)
-	local section = self:useContext(Table2Contexts.Section)
+	local section = props.section or self:useContext(Table2Contexts.Section)
 
 	local defaultAlign = (section == 'subhead' and 'center') or nil
 

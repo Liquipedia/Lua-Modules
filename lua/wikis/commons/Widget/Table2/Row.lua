@@ -21,6 +21,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class Table2RowProps
 ---@field children (Widget|Html|string|number|nil)[]?
+---@field section 'head'|'body'|'subhead'?
 ---@field classes string[]?
 ---@field css {[string]: string|number|nil}?
 ---@field attributes {[string]: any}?
@@ -34,7 +35,7 @@ local Table2Row = Class.new(Widget)
 ---@return Widget
 function Table2Row:render()
 	local props = self.props
-	local section = self:useContext(Table2Contexts.Section)
+	local section = props.section or self:useContext(Table2Contexts.Section)
 	local headerRowKind = self:useContext(Table2Contexts.HeaderRowKind)
 	local bodyStripe = self:useContext(Table2Contexts.BodyStripe)
 
