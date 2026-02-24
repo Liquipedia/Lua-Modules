@@ -556,18 +556,18 @@ end
 ---@protected
 ---@return table[]
 function BaseResultsTable:buildColumnDefinitions()
-	error('Function "buildColumnDefinitions" needs to be set via the module that requires "Module:BaseResultsTable/Base"')
+	error('BaseResultsTable:buildColumnDefinitions() cannot be called directly and must be overridden.')
 end
 
 ---@protected
 function BaseResultsTable:buildHeader()
-	error('Function "buildHeader" needs to be set via the module that requires "Module:BaseResultsTable/Base"')
+	error('BaseResultsTable:buildHeader() cannot be called directly and must be overridden.')
 end
 
 ---@protected
 ---@param placement table
 function BaseResultsTable:buildRow(placement)
-	error('Function "buildRow" needs to be set via the module that requires "Module:BaseResultsTable/Base"')
+	error('BaseResultsTable:buildRow() cannot be called directly and must be overridden.')
 end
 
 return BaseResultsTable
