@@ -19,6 +19,7 @@ return {
 		offset = {-3, 0},
 	},
 	ATST = {
+		abbr = 'AST',
 		name ='Atlantic Standard Time',
 		offset = {-4, 0},
 	},
