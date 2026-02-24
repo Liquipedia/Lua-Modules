@@ -554,6 +554,12 @@ function BaseResultsTable:processVsData(placement)
 end
 
 ---@protected
+---@return table[]
+function BaseResultsTable:buildColumnDefinitions()
+	error('Function "buildColumnDefinitions" needs to be set via the module that requires "Module:BaseResultsTable/Base"')
+end
+
+---@protected
 function BaseResultsTable:buildHeader()
 	error('Function "buildHeader" needs to be set via the module that requires "Module:BaseResultsTable/Base"')
 end
