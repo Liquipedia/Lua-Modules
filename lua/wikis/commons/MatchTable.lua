@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
+local I18n = Lua.import('Module:I18n')
 local Info = Lua.import('Module:Info', {loadData = true})
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
@@ -569,8 +570,8 @@ function MatchTable:buildDisplay()
 
 	if Table.isEmpty(self.matches) then
 		local isH2H = Logic.isNotEmpty(self.config.vs)
-		local text = String.interpolate(
-			'${pronoun} ${mode} ${verb} not played any matches ${explanation}yet.',
+		local text = I18n.translate(
+			'matchtable-no-match-results',
 			{
 				pronoun = isH2H and 'These' or 'This',
 				mode = self.config.mode == Opponent.solo and 'player' or 'team',
