@@ -438,7 +438,7 @@ function BroadcastTalentTable:_footer()
 		HtmlWidgets.Span{
 			css = {
 				float = 'left',
-				['padding-left'] = '20px',
+				['padding-left'] = '1rem',
 				['font-style'] = 'italic',
 			},
 			children = LinkWidget{children = 'About achievements', link = self.args.aboutAchievementsLink}
