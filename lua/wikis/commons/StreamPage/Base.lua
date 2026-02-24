@@ -251,6 +251,7 @@ function StreamPage:_createMatchTable(props)
 	local match = self.matches[1]
 	return MatchTable(Table.mergeInto({
 		addCategory = false,
+		dateFormat = 'compact',
 		edate = match.timestamp - DateExt.daysToSeconds(1) --[[ MatchTable adds 1-day offset to make edate
 																inclusive, and we don't want that here ]],
 		limit = 5,
