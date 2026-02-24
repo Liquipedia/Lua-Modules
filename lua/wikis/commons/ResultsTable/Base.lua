@@ -638,7 +638,6 @@ function BaseResultsTable:createTournamentCells(placement)
 			attributes = {
 				['data-sort-value'] = tournamentDisplayName
 			},
-			css = {width = '30px'},
 			children = LeagueIcon.display{
 				icon = placement.icon,
 				iconDark = placement.icondark,
@@ -651,7 +650,6 @@ function BaseResultsTable:createTournamentCells(placement)
 			attributes = {
 				['data-sort-value'] = tournamentDisplayName
 			},
-			align = 'left',
 			children = LinkWidget{
 				children = tournamentDisplayName,
 				link = placement.pagename,
