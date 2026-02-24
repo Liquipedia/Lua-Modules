@@ -21,7 +21,7 @@ local CustomResultsTable = {}
 
 -- Template entry point
 ---@param args table
----@return Html
+---@return Widget
 function CustomResultsTable.results(args)
 	local resultsTable = ResultsTable(args)
 
@@ -33,7 +33,7 @@ function CustomResultsTable.results(args)
 end
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomResultsTable.awards(args)
 	return AwardsTable(args):create():build()
 end
