@@ -26,7 +26,8 @@ describe('placement', function()
 		it('check', function()
 			local DASH = NON_BREAKING_SPACE .. '-' .. NON_BREAKING_SPACE
 			assert.are_equal(
-				'class="text-center" data-sort-value="1"|<span class="placement-box placement-1"><b class="placement-text">1st</b></span>',
+				'class="text-center" data-sort-value="1"|<span class="placement-box placement-1">' ..
+				'<b class="placement-text">1st</b></span>',
 				Placement.get{placement = '1'}
 			)
 			assert.are_equal(
