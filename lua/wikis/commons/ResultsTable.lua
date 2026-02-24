@@ -44,7 +44,7 @@ function ResultsTable:buildColumnDefinitions()
 		} or nil,
 		not self.config.hideResult and {
 			{
-				align = 'left',
+				align = 'center',
 				unsortable = true,
 			},
 			{
