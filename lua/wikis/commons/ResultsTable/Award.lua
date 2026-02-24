@@ -7,14 +7,12 @@
 
 local Lua = require('Module:Lua')
 
+local BaseResultsTable = Lua.import('Module:ResultsTable/Base')
 local Class = Lua.import('Module:Class')
 local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
-
 local Opponent = Lua.import('Module:Opponent/Custom')
-
-local BaseResultsTable = Lua.import('Module:ResultsTable/Base')
 
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
