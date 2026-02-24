@@ -32,6 +32,8 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
+local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
@@ -380,10 +382,11 @@ function BroadcastTalentTable:_partnerList(tournament)
 			.. Page.makeInternalLink({}, partner.id, partner.page))
 	end
 
-	return mw.html.create('div')
-		:addClass('NavFrame collapsible broadcast-talent-partner-list-frame collapsed')
-		:tag('div'):addClass('NavHead'):addClass('transparent-bg'):done()
-		:tag('div'):addClass('NavContent broadcast-talent-partner-list'):node(list):done()
+	return GeneralCollapsible{
+		titleWidget = CollapsibleToggle{},
+		shouldCollapse = true,
+		children = list,
+	}
 end
 
 ---@private
