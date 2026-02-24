@@ -368,9 +368,9 @@ function BaseResultsTable:_isDataEmpty()
 end
 
 ---Builds the results/achievements/awards table
----@return Html
+---@return Widget
 function BaseResultsTable:build()
-	return TableWidgets{
+	return TableWidgets.Table{
 		columns = self:buildColumnDefinitions(),
 		children = {
 			TableWidgets.TableHeader{children = {self:buildHeader()}},
