@@ -207,7 +207,7 @@ function RatingsList:render()
 		children = HtmlWidgets.Th {
 			attributes = { colspan = '7' },
 			children = Link {
-				link = 'Portal:Rating',
+				link = 'Portal:Rankings',
 				linktype = 'internal',
 				children = { buttonDiv },
 			},
