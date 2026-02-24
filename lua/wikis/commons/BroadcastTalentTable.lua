@@ -216,9 +216,13 @@ function BroadcastTalentTable:create()
 	for separatorTitle, sectionData in Table.iter.spairs(self.tournaments, function (_, key1, key2)
 		return tonumber(key1) > tonumber(key2)
 	end) do
-		Array.extendWith(bodyElements, BroadcastTalentTable._separator(separatorTitle), Array.map(sectionData, function (broadcast)
-			return self:_row(broadcast)
-		end))
+		Array.extendWith(
+			bodyElements,
+			{BroadcastTalentTable._separator(separatorTitle)},
+			Array.map(sectionData, function (broadcast)
+				return self:_row(broadcast)
+			end)
+		)
 	end
 
 	return TableWidgets.Table{
