@@ -22,20 +22,28 @@ function AwardsTable:buildColumnDefinitions()
 	return WidgetUtil.collect(
 		{
 			align = 'center',
+			nowrap = true,
+			shrink = true,
 			sortType = 'isoDate',
 		},
 		{
-			align = 'center',
-			minWidth = '75px',
+			align = 'left',
+			minWidth = '4.5rem',
+			nowrap = true,
+			shrink = true,
 		},
 		self.config.showType and {
 			align = 'center',
 			minWidth = '50px',
 		} or nil,
-		{align = 'center'},
-		{align = 'center'},
+		{align = 'left'},
 		{
-			align = 'center',
+			align = 'left',
+			shrink = true,
+			nowrap = true,
+		},
+		{
+			align = 'left',
 			minWidth = '225px',
 		},
 		self.config.queryType ~= Opponent.team and {
@@ -46,7 +54,7 @@ function AwardsTable:buildColumnDefinitions()
 			minWidth = '105px',
 		} or nil,
 		{
-			align = 'center',
+			align = 'right',
 			sortType = 'currency',
 		}
 	)

@@ -27,6 +27,8 @@ function ResultsTable:buildColumnDefinitions()
 	return WidgetUtil.collect(
 		{
 			align = 'center',
+			nowrap = true,
+			shrink = true,
 			sortType = 'isoDate',
 		},
 		{
@@ -34,8 +36,10 @@ function ResultsTable:buildColumnDefinitions()
 			minWidth = '80px',
 		},
 		{
-			align = 'center',
-			minWidth = '75px',
+			align = 'left',
+			minWidth = '4.5rem',
+			nowrap = true,
+			shrink = true,
 		},
 		self.config.showType and {
 			align = 'center',
@@ -44,8 +48,12 @@ function ResultsTable:buildColumnDefinitions()
 		self.config.displayGameIcons and {
 			align = 'center'
 		} or nil,
-		{align = 'center'},
-		{align = 'center'},
+		{align = 'left'},
+		{
+			align = 'left',
+			shrink = true,
+			nowrap = true,
+		},
 		(self.config.queryType ~= Opponent.team or Table.isNotEmpty(self.config.aliases)) and {
 			align = 'center',
 			minWidth = '70px',
@@ -64,7 +72,7 @@ function ResultsTable:buildColumnDefinitions()
 			},
 		} or nil,
 		{
-			align = 'center',
+			align = 'right',
 			sortType = 'currency',
 		}
 	)
