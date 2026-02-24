@@ -429,7 +429,7 @@ end
 
 ---Applies the row highlight
 ---@protected
----@param placement table
+---@param placement placement
 ---@return string?
 function BaseResultsTable:rowHighlight(placement)
 	if HighlightConditions.tournament(placement, self.config) then
@@ -439,7 +439,7 @@ end
 
 ---Builds the tier display
 ---@protected
----@param placement table
+---@param placement placement
 ---@return string?, string?
 function BaseResultsTable:tierDisplay(placement)
 	local tier, tierType, options = Tier.parseFromQueryData(placement)
@@ -455,7 +455,7 @@ end
 
 ---Builds the opponent display
 ---@protected
----@param data table
+---@param data placement
 ---@param options table?
 ---@return string|Widget?
 function BaseResultsTable:opponentDisplay(data, options)
@@ -546,7 +546,7 @@ function BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, 
 end
 
 ---Builds the tournament display name
----@param placement table
+---@param placement placement
 ---@return string
 function BaseResultsTable.tournamentDisplayName(placement)
 	if String.isNotEmpty(placement.tournament) then
@@ -557,7 +557,7 @@ function BaseResultsTable.tournamentDisplayName(placement)
 end
 
 ---Converts the lastvsdata to display components
----@param placement table
+---@param placement placement
 ---@return string, string|Widget?, string?
 function BaseResultsTable:processVsData(placement)
 	local lastVs = placement.lastvsdata or {}
@@ -589,7 +589,7 @@ function BaseResultsTable:buildHeader()
 end
 
 ---@protected
----@param placement table
+---@param placement placement
 ---@return Widget
 function BaseResultsTable:buildRow(placement)
 	error('BaseResultsTable:buildRow() cannot be called directly and must be overridden.')
