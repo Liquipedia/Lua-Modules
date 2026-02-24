@@ -31,6 +31,11 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local LinkWidget = Lua.import('Module:Widget/Basic/Link')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
 local DEFAULT_VALUES = {
 	order = 'desc',
 	resolveOpponent = true,
@@ -356,41 +361,45 @@ function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTempl
 	}
 end
 
+---@private
+---@return boolean
+function BaseResultsTable:_isDataEmpty()
+	return Table.isEmpty(self.data) or Table.isEmpty(self.data[1])
+end
+
 ---Builds the results/achievements/awards table
 ---@return Html
 function BaseResultsTable:build()
-	local displayTable = mw.html.create('table')
-		:addClass('wikitable wikitable-striped sortable')
-		:css('text-align', 'center')
-		:node(self:buildHeader())
+	return TableWidgets{
+		columns = self:buildColumnDefinitions(),
+		children = {
+			TableWidgets.TableHeader{children = {self:buildHeader()}},
+			-- Hidden tr that contains a td to prevent the first yearHeader from being inside thead
+			self:_isDataEmpty() and HtmlWidgets.Tr{
+				css = {display = 'none'},
+				children = HtmlWidgets.Td{}
+			} or nil,
+			TableWidgets.TableBody{children = WidgetUtil.collect(self:_buildTableBody(), self.args.manualContent)}
+		},
+		footer = self.config.onlyAchievements and HtmlWidgets.I{children = LinkWidget{
+			link = self.config.opponent .. '/' .. self.config.resultsSubPage,
+			children = 'Extended list of results',
+		}} or nil
+	}
+end
 
-	if Table.isEmpty(self.data) or Table.isEmpty(self.data[1]) then
-		return displayTable:node(mw.html.create('tr')
-			:tag('td'):attr('colspan', 42):wikitext('No recorded results found.'))
+---@private
+---@return Widget[]
+function BaseResultsTable:_buildTableBody()
+	if self:_isDataEmpty() then
+		return {TableWidgets.Row{children = TableWidgets.Cell{
+			colspan = 42,
+			children = 'No recorded results found.'
+		}}}
 	end
-
-	-- Hidden tr that contains a td to prevent the first yearHeader from being inside thead
-	displayTable:node(mw.html.create('tr'):css('display', 'none'):tag('td'):allDone())
-
-	for _, dataSet in ipairs(self.data) do
-		for _, row in ipairs(self:_buildRows(dataSet)) do
-			displayTable:node(row)
-		end
-	end
-
-	if self.config.onlyAchievements then
-		displayTable:tag('tr')
-			:tag('th')
-				:attr('colspan', 42)
-				:css('font-style', 'italic')
-				:wikitext('[[' .. self.config.opponent .. '/' .. self.config.resultsSubPage .. '|Extended list of results]]')
-	end
-
-	displayTable:node(self.args.manualContent)
-
-	return mw.html.create('div')
-		:addClass('table-responsive')
-		:node(displayTable)
+	return Array.flatMap(self.data, function (dataSet)
+		return self:_buildRows(dataSet)
+	end)
 end
 
 ---@private
@@ -400,9 +409,15 @@ function BaseResultsTable:_buildRows(placementData)
 	local rows = {}
 
 	if placementData.header then
-		table.insert(rows, mw.html.create('tr'):addClass('sortbottom')
-			:tag('th'):attr('colspan', 42):wikitext(placementData.header):done()
-			:done())
+		table.insert(rows, TableWidgets.Row{
+			classes = {'sortbottom'},
+			css = {['font-weight'] = 'bold'},
+			children = TableWidgets.CellHeader{
+				align = 'center',
+				colspan = 42,
+				children = placementData.header
+			}
+		})
 	end
 
 	for _, placement in ipairs(placementData) do
@@ -442,12 +457,12 @@ end
 ---@protected
 ---@param data table
 ---@param options table?
----@return Widget|Html?
+---@return string|Widget?
 function BaseResultsTable:opponentDisplay(data, options)
 	options = options or {}
 
 	if not data.opponenttype then
-		return mw.html.create():wikitext('-')
+		return '-'
 	elseif data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
 		return OpponentDisplay.BlockOpponent{
 			opponent = Opponent.fromLpdbStruct(data) --[[@as standardOpponent]],
@@ -505,21 +520,29 @@ end
 ---@param teamDisplay Widget
 ---@param rawTeamTemplate teamTemplateData
 ---@param flip boolean?
----@return Html
+---@return Widget
 function BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, flip)
-	return mw.html.create()
-		:node(teamDisplay)
-		:node(mw.html.create('div')
-			:css('width', '60px')
-			:css('float', flip and 'right' or 'left')
-			:node(
-				mw.html.create('div')
-					:css('line-height', '1')
-					:css('font-size', '80%')
-					:css('text-align', 'center')
-					:wikitext('([[' .. rawTeamTemplate.page .. '|' .. rawTeamTemplate.shortname .. ']])')
-			)
-		)
+	return HtmlWidgets.Fragment{children = {
+		teamDisplay,
+		HtmlWidgets.Div{
+			css = {
+				width = '60px',
+				float = flip and 'right' or 'left',
+			},
+			children = HtmlWidgets.Div{
+				css = {
+					['line-height'] = 1,
+					['font-size'] = '80%',
+					['text-align'] = 'center',
+				},
+				children = {
+					'(',
+					LinkWidget{link = rawTeamTemplate.page, children = rawTeamTemplate.shortname},
+					')'
+				}
+			}
+		}
+	}}
 end
 
 ---Builds the tournament display name
@@ -535,7 +558,7 @@ end
 
 ---Converts the lastvsdata to display components
 ---@param placement table
----@return string, Widget|Html?, string?
+---@return string, string|Widget?, string?
 function BaseResultsTable:processVsData(placement)
 	local lastVs = placement.lastvsdata or {}
 
@@ -560,12 +583,14 @@ function BaseResultsTable:buildColumnDefinitions()
 end
 
 ---@protected
+---@return Widget
 function BaseResultsTable:buildHeader()
 	error('BaseResultsTable:buildHeader() cannot be called directly and must be overridden.')
 end
 
 ---@protected
 ---@param placement table
+---@return Widget
 function BaseResultsTable:buildRow(placement)
 	error('BaseResultsTable:buildRow() cannot be called directly and must be overridden.')
 end
