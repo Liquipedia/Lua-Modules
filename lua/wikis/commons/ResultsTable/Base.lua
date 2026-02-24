@@ -393,7 +393,7 @@ function BaseResultsTable:build()
 		:node(displayTable)
 end
 
----comment
+---@private
 ---@param placementData table
 ---@return Html[]
 function BaseResultsTable:_buildRows(placementData)
@@ -412,8 +412,8 @@ function BaseResultsTable:_buildRows(placementData)
 	return rows
 end
 
--- overwritable
 ---Applies the row highlight
+---@protected
 ---@param placement table
 ---@return string?
 function BaseResultsTable:rowHighlight(placement)
@@ -422,8 +422,8 @@ function BaseResultsTable:rowHighlight(placement)
 	end
 end
 
--- overwritable
 ---Builds the tier display
+---@protected
 ---@param placement table
 ---@return string?, string?
 function BaseResultsTable:tierDisplay(placement)
@@ -438,8 +438,8 @@ function BaseResultsTable:tierDisplay(placement)
 	return Tier.display(tier, tierType, options), Tier.toSortValue(tier, tierType)
 end
 
--- overwritable
 ---Builds the opponent display
+---@protected
 ---@param data table
 ---@param options table?
 ---@return Widget|Html?
@@ -503,7 +503,7 @@ end
 
 ---Builds team icon display with text below it
 ---@param teamDisplay Widget
----@param rawTeamTemplate table
+---@param rawTeamTemplate teamTemplateData
 ---@param flip boolean?
 ---@return Html
 function BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, flip)
@@ -553,10 +553,12 @@ function BaseResultsTable:processVsData(placement)
 	return score, vsDisplay
 end
 
+---@protected
 function BaseResultsTable:buildHeader()
 	error('Function "buildHeader" needs to be set via the module that requires "Module:BaseResultsTable/Base"')
 end
 
+---@protected
 ---@param placement table
 function BaseResultsTable:buildRow(placement)
 	error('Function "buildRow" needs to be set via the module that requires "Module:BaseResultsTable/Base"')
