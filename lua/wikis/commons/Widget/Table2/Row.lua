@@ -98,11 +98,24 @@ function Table2Row:render()
 		return child
 	end)
 
+	local trChildren = indexedChildren
+	if section == 'subhead' then
+		trChildren = Array.map(trChildren, function(child)
+			if Class.instanceOf(child, Table2CellHeader) then
+				return Table2Contexts.Section{
+					value = 'subhead',
+					children = {child},
+				}
+			end
+			return child
+		end)
+	end
+
 	return HtmlWidgets.Tr{
 		classes = WidgetUtil.collect(sectionClass, kindClass, stripeClass, highlightClass, props.classes),
 		css = props.css,
 		attributes = props.attributes,
-		children = indexedChildren,
+		children = trChildren,
 	}
 end
 
