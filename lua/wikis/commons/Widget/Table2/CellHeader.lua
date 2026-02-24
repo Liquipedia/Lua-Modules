@@ -42,10 +42,17 @@ function Table2CellHeader:render()
 	local props = self.props
 
 	local columns = self:useContext(Table2Contexts.ColumnContext)
+	local section = self:useContext(Table2Contexts.Section)
+
+	local defaultAlign = (section == 'subhead' and 'center') or nil
 
 	-- Skip context lookups and property merging if there are no column definitions
 	if not columns then
+		local align = props.align or defaultAlign
 		local attributes = props.attributes or {}
+		if align == 'right' or align == 'center' then
+			attributes['data-align'] = align
+		end
 		if Logic.readBool(props.unsortable) then
 			attributes.class = 'unsortable'
 		end
@@ -64,6 +71,10 @@ function Table2CellHeader:render()
 	end
 
 	local mergedProps = ColumnUtil.mergeProps(props, columnDef)
+
+	if defaultAlign and not mergedProps.align then
+		mergedProps.align = defaultAlign
+	end
 
 	local attributes = ColumnUtil.buildAttributes(mergedProps, {
 		sortType = function(attrs, cellProps)

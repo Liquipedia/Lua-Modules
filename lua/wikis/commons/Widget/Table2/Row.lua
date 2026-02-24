@@ -39,8 +39,13 @@ function Table2Row:render()
 	local bodyStripe = self:useContext(Table2Contexts.BodyStripe)
 
 	local sectionClass = 'table2__row--body'
-	if section == 'head' then
+	if section == 'head' or section == 'subhead' then
 		sectionClass = 'table2__row--head'
+	end
+
+	local subheadClass
+	if section == 'subhead' then
+		subheadClass = 'table2__row--subhead'
 	end
 
 	local kindClass
@@ -67,6 +72,15 @@ function Table2Row:render()
 	end
 
 	local children = props.children or {}
+
+	local columns = self:useContext(Table2Contexts.ColumnContext)
+	if section == 'subhead' and columns and #children == 1 and Class.instanceOf(children[1], Table2CellHeader) then
+		local singleCell = children[1] --[[@as Table2CellHeader]]
+		if singleCell.props.colspan == nil then
+			singleCell.props.colspan = #columns
+		end
+	end
+
 	local columnIndex = 1
 	local indexedChildren = Array.map(children, function(child)
 		if Class.instanceOf(child, Table2Cell) or Class.instanceOf(child, Table2CellHeader) then
@@ -89,7 +103,7 @@ function Table2Row:render()
 	end)
 
 	return HtmlWidgets.Tr{
-		classes = WidgetUtil.collect(sectionClass, kindClass, stripeClass, highlightClass, props.classes),
+		classes = WidgetUtil.collect(sectionClass, subheadClass, kindClass, stripeClass, highlightClass, props.classes),
 		css = props.css,
 		attributes = props.attributes,
 		children = indexedChildren,
