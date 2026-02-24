@@ -44,11 +44,6 @@ function Table2Row:render()
 		sectionClass = 'table2__row--head'
 	end
 
-	local subheadClass
-	if section == 'subhead' then
-		subheadClass = 'table2__row--subhead'
-	end
-
 	local kindClass
 	if section == 'head' then
 		if headerRowKind == 'title' then
@@ -103,20 +98,8 @@ function Table2Row:render()
 		return child
 	end)
 
-	if section == 'subhead' then
-		indexedChildren = Array.map(indexedChildren, function(child)
-			if Class.instanceOf(child, Table2CellHeader) then
-				return Table2Contexts.Section{
-					value = 'subhead',
-					children = {child},
-				}
-			end
-			return child
-		end)
-	end
-
 	return HtmlWidgets.Tr{
-		classes = WidgetUtil.collect(sectionClass, subheadClass, kindClass, stripeClass, highlightClass, props.classes),
+		classes = WidgetUtil.collect(sectionClass, kindClass, stripeClass, highlightClass, props.classes),
 		css = props.css,
 		attributes = props.attributes,
 		children = indexedChildren,

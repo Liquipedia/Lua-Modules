@@ -201,12 +201,10 @@ $table2-cell-padding-x: 0.75rem;
 		}
 	}
 
-	tr.table2__row--subhead {
-		.table2__subheader-cell {
-			position: sticky;
-			left: 0.75rem;
-			width: min-content;
-		}
+	.table2__subheader-cell {
+		position: sticky;
+		left: 0.75rem;
+		width: min-content;
 	}
 
 	&--themed {
