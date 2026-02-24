@@ -379,8 +379,8 @@ function BroadcastTalentTable:_partnerList(tournament)
 	return GeneralCollapsible{
 		titleWidget = CollapsibleToggle{},
 		shouldCollapse = true,
+		collapseAreaClasses = {'broadcast-talent-partner-list'},
 		children = UnorderedList{
-			css = {['text-align'] = 'left'},
 			children = Array.map(partners, function (partner)
 				return {
 					Flags.Icon{flag = partner.flag},

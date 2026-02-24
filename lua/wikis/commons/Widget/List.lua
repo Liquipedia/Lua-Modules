@@ -17,7 +17,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ListWidget: Widget
 ---@operator call(table): ListWidget
----@field props {css: table<string, any>?, children: (Renderable|Renderable[])[]}
+---@field props {children: (Renderable|Renderable[])[]}
 local ListWidget = Class.new(Widget)
 
 ---@return Widget?
@@ -25,7 +25,6 @@ function ListWidget:render()
 	local children = self.props.children
 	if Logic.isEmpty(children) then return end
 	return self:getType(){
-		css = self.props.css,
 		children = Array.map(children, function (item)
 			return HtmlWidgets.Li{
 				children = WidgetUtil.collect(item)
