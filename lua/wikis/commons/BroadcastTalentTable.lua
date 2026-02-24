@@ -380,6 +380,7 @@ function BroadcastTalentTable:_partnerList(tournament)
 		titleWidget = CollapsibleToggle{},
 		shouldCollapse = true,
 		children = UnorderedList{
+			css = {['text-align'] = 'left'},
 			children = Array.map(partners, function (partner)
 				return {
 					Flags.Icon{flag = partner.flag},
