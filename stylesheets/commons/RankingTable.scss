@@ -1,28 +1,11 @@
 .ranking-table {
-	&__wrapper {
-		--_border-color: rgba( 0, 0, 0, 0.16 );
-		--_background-color: rgba( 0, 0, 0, 0.08 );
-		--_background-color-even: rgba( 0, 0, 0, 0.04 );
-		--_border: 0.0625rem solid var( --_border-color );
-		--_patch-label-color: var( --clr-secondary-16 );
-
-		.theme--dark & {
-			--_border-color: rgba( 255, 255, 255, 0.16 );
-			--_background-color: rgba( 255, 255, 255, 0.08 );
-			--_background-color-even: rgba( 255, 255, 255, 0.04 );
-			--_patch-label-color: #ffffff;
-		}
-	}
-	border: var( --_border );
-
 	@media ( max-width: 768px ) {
 		font-size: 0.875rem;
 	}
 
 	&__top-row {
-		background-color: var( --_background-color );
-		padding: 1rem 0.75rem;
-		border-bottom: var( --_border );
+		display: flex;
+		justify-content: space-between;
 		font-weight: normal;
 
 		&-text {

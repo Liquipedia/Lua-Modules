@@ -150,6 +150,10 @@ function RatingsList:render()
 		local changeText = (not team.change and 'NEW') or PlacementChange { change = team.change }
 
 		local rowClasses = {}
+		local isEven = team.rank % 2 == 0
+		if isEven then
+			table.insert(rowClasses, 'ranking-table__row--even')
+		end
 		if team.rank > 5 and isSmallerVersion then
 			table.insert(rowClasses, 'ranking-table__row--overfive')
 		end
