@@ -118,10 +118,23 @@ $table2-cell-padding-x: 0.75rem;
 		}
 
 		&.table2__row--highlighted {
-			background-color: var( --publisher-premier-highlight-background-color ) !important;
+			position: relative;
 
-			&:hover {
-				background-color: var( --publisher-premier-highlight-background-color ) !important;
+			&::after {
+				content: "";
+				position: absolute;
+				left: 0;
+				top: 0;
+				bottom: 0;
+				width: 6px;
+
+				.theme--light & {
+					background-color: var( --clr-semantic-gold-40 );
+				}
+
+				.theme--dark & {
+					background-color: var( --clr-semantic-gold-30 );
+				}
 			}
 		}
 
