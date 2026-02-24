@@ -270,7 +270,7 @@ function BaseResultsTable:buildNonTeamOpponentConditions()
 
 	local opponents = Array.append(config.aliases, config.opponent)
 
-	for _, opponent in pairs(opponents) do
+	Array.forEach(opponents, function (opponent)
 		opponent = config.resolveOpponent
 			and mw.ext.TeamLiquidIntegration.resolve_redirect(opponent)
 			or opponent
@@ -295,7 +295,7 @@ function BaseResultsTable:buildNonTeamOpponentConditions()
 				ConditionNode(playerColumnName, Comparator.eq, opponentWithUnderscore),
 			}
 		end)
-	end
+	end)
 
 	return opponentConditions
 end
@@ -342,13 +342,13 @@ function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTempl
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 
 	local prefix = PLAYER_PREFIX
-	for _, teamTemplate in pairs(opponentTeamTemplates) do
+	Array.forEach(opponentTeamTemplates, function (teamTemplate)
 		for playerIndex = 1, config.playerLimit do
 			opponentConditions:add{
 				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex .. 'template'), Comparator.eq, teamTemplate),
 			}
 		end
-	end
+	end)
 
 	return ConditionTree(BooleanOperator.all):add{
 		opponentConditions,
