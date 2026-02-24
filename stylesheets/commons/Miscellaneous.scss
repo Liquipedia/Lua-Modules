@@ -1326,6 +1326,12 @@ Author(s): spazer, Lafungo
 	color: #ffffff;
 }
 
+.placement-box {
+	display: inline-block;
+	border-radius: 0.25rem;
+	padding: 0.125rem 0.5rem;
+}
+
 .placement-1 {
 	background-color: var( --achievement-placement-1, #ffd739 ); //rgb( 255, 221, 60 );
 }
