@@ -79,6 +79,8 @@ end
 -- map related functions
 --
 
+local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, CharacterNames)
+
 -- Parse extradata information, particularally info about halfs and operator bans and picks
 ---@param match table
 ---@param map table
@@ -94,8 +96,6 @@ function MapFunctions.getExtraData(match, map, opponents)
 		t1halfs = {hunter = map.t1hunter, survivor = map.t1survivor},
 		t2halfs = {hunter = map.t2hunter, survivor = map.t2survivor},
 	}
-
-	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, CharacterNames)
 
 	Array.forEach(opponents, function(_, opponentIndex)
 		local prefix = 't' .. opponentIndex
