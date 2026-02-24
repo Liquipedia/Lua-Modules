@@ -16,7 +16,6 @@
 		> div {
 			display: flex;
 			justify-content: space-between;
-			align-items: center;
 
 			@media ( max-width: 768px ) {
 				flex-direction: column;
@@ -77,7 +76,7 @@
 		}
 
 		&--even {
-			background-color: var( --_background-color-even );
+			background-color: var( --clr-on-surface-light-primary-4 );
 		}
 
 		&--overfive {

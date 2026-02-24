@@ -245,6 +245,7 @@ function RatingsList:render()
 		},
 		children = TableWidgets.Table {
 			columns = columns,
+			striped = false,
 			title = title,
 			footer = isSmallerVersion and footer or nil,
 			tableAttributes = { ['data-ranking-table'] = 'table' },

@@ -33,6 +33,7 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 ---@field children (Widget|Html|string|number|nil)[]?
 ---@field variant 'generic'|'themed'?
 ---@field sortable (string|number|boolean)?
+---@field striped (string|number|boolean)?
 ---@field caption Widget|Html|string|number?
 ---@field title Widget|Html|string|number?
 ---@field footer Widget|Html|string|number?
@@ -51,6 +52,7 @@ local Table2 = Class.new(Widget)
 Table2.defaultProps = {
 	variant = 'generic',
 	sortable = false,
+	striped = true,
 	classes = {},
 	columns = {},
 }
@@ -89,7 +91,14 @@ function Table2:render()
 	if props.columns and #props.columns > 0 then
 		tableChildren = {Table2Contexts.ColumnContext{
 			value = props.columns,
-			children = props.children,
+			children = tableChildren,
+		}}
+	end
+
+	if Logic.readBool(props.striped) then
+		tableChildren = {Table2Contexts.BodyStripe{
+			value = true,
+			children = tableChildren,
 		}}
 	end
 
