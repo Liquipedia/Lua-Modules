@@ -432,21 +432,22 @@ function BroadcastTalentTable._removeDuplicatePartners(partners)
 end
 
 ---@private
----@return Html
+---@return Widget
 function BroadcastTalentTable:_footer()
-	local footer = mw.html.create('small')
-		:tag('span')
-			:css('float', 'left'):css('padding-left', '20px'):css('font-style', 'italic')
-			:wikitext(Page.makeInternalLink({}, 'About achievements', self.args.aboutAchievementsLink))
-			:done()
-		:tag('b')
-			:wikitext(Page.makeInternalLink({},
-				'Broadcasts from any Tournament',
-				self.broadcaster .. '/Broadcasts#Detailed Broadcasts'
-			)):done()
-		:done()
-
-	return footer
+	return HtmlWidgets.Small{children = {
+		HtmlWidgets.Span{
+			css = {
+				float = 'left',
+				['padding-left'] = '20px',
+				['font-style'] = 'italic',
+			},
+			children = LinkWidget{children = 'About achievements', link = self.args.aboutAchievementsLink}
+		},
+		HtmlWidgets.B{children = LinkWidget{
+			children = 'Broadcasts from any Tournament',
+			link = self.broadcaster .. '/Broadcasts#Detailed Broadcasts'
+		}}
+	}}
 end
 
 return BroadcastTalentTable
