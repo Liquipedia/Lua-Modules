@@ -55,7 +55,7 @@ local QUERY_TYPES = {
 	team = 'team',
 	coach = 'coach',
 }
-local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
+local SCORE_CONCAT = '&nbsp;&colon;&nbsp;'
 local DEFAULT_RESULTS_SUB_PAGE = 'Results'
 local INVALID_TIER_DISPLAY = 'Undefined'
 local INVALID_TIER_SORT = 'ZZ'
