@@ -9,10 +9,9 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
-local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local Table = Lua.import('Module:Table')
-local Variables = Lua.import('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
@@ -27,16 +26,17 @@ local Customizable = Widgets.Customizable
 local Highlights = Widgets.Highlights
 
 ---@class PatchInfobox: BasicInfobox
+---@operator call(Frame): PatchInfobox
 local Patch = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function Patch.run(frame)
 	local patch = Patch(frame)
 	return patch:createInfobox()
 end
 
----@return string
+---@return Widget
 function Patch:createInfobox()
 	local args = self.args
 
@@ -74,7 +74,7 @@ function Patch:createInfobox()
 		Center{children = {args.footnotes}},
 	}
 
-	if Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
+	if Namespace.isMain() and Lpdb.isStorageEnabled() then
 		self:categories(self:getInformationType(args))
 		self:categories(unpack(self:getWikiCategories(args)))
 		self:setLpdbData(args)

@@ -15,7 +15,7 @@ local Character = Lua.import('Module:Infobox/Character')
 local CustomCharacter = Class.new(Character)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomCharacter.run(frame)
 	return CustomCharacter(frame):createInfobox()
 end

@@ -35,6 +35,8 @@ DateExt.defaultYear = '0000'
 
 DateExt.defaultTimezone = 'UTC'
 
+local SECONDS_PER_DAY = 86400
+
 --- Parses a date string into a timestamp, returning the number of seconds since UNIX epoch.
 --- The timezone offset is incorporated into the timestamp, and the timezone is discarded.
 --- If the timezone is not specified, then the date is assumed to be in UTC.
@@ -95,14 +97,32 @@ end
 ---@param dateOrTimestamp string|integer|osdate|osdateparam
 ---@param timezoneId string?
 ---@param showTime boolean? #default to true
+---@param format ('full'|'compact')? #default to 'full'
 ---@return string
-function DateExt.toCountdownArg(dateOrTimestamp, timezoneId, showTime)
+function DateExt.toCountdownArg(dateOrTimestamp, timezoneId, showTime, format)
 	local baseTimestamp = DateExt.readTimestamp(dateOrTimestamp)
+	format = format or 'full'
+
 	if showTime ~= false then
 		local timestamp = baseTimestamp + (Timezone.getOffset{timezone = timezoneId or DateExt.defaultTimezone})
 		local timezoneString = Timezone.getTimezoneString{timezone = timezoneId or DateExt.defaultTimezone}
-		return DateExt.formatTimestamp('F j, Y - H:i', timestamp) .. ' ' .. timezoneString
+
+		local dateFormat
+		if format == 'compact' then
+			local currentYear = DateExt.formatTimestamp('Y', DateExt.getCurrentTimestamp())
+			local dateYear = DateExt.formatTimestamp('Y', timestamp)
+			if currentYear == dateYear then
+				dateFormat = 'M j - H:i'
+			else
+				dateFormat = 'M j, Y - H:i'
+			end
+		else
+			dateFormat = 'F j, Y - H:i'
+		end
+
+		return DateExt.formatTimestamp(dateFormat, timestamp) .. ' ' .. timezoneString
 	end
+
 	return DateExt.formatTimestamp('F j, Y', baseTimestamp or '')
 end
 
@@ -137,6 +157,13 @@ end
 ---@return string
 function DateExt.getContextualDateOrNow()
 	return DateExt.getContextualDate()
+		or os.date('%F') --[[@as string]]
+end
+
+--- Fetches startDate on a tournament page with fallback to now.
+---@return string
+function DateExt.getStartDateOrNow()
+	return Variables.varDefault('tournament_startdate')
 		or os.date('%F') --[[@as string]]
 end
 
@@ -227,6 +254,14 @@ function DateExt.calculateAge(to, from)
 		return age
 	end
 	return age - 1
+end
+
+---@param days number
+---@return number
+---@nodiscard
+function DateExt.daysToSeconds(days)
+	assert(days >= 0, 'Invalid number of days')
+	return days * SECONDS_PER_DAY
 end
 
 return DateExt

@@ -52,7 +52,8 @@ local DEFAULT_RESULTS_SUB_PAGE = 'Results'
 local INVALID_TIER_DISPLAY = 'Undefined'
 local INVALID_TIER_SORT = 'ZZ'
 
---- @class BaseResultsTable
+---@class BaseResultsTable
+---@operator call(table): BaseResultsTable
 local BaseResultsTable = Class.new(function(self, ...) self:init(...) end)
 
 ---Init function of the BaseResultsTable
@@ -170,7 +171,7 @@ function BaseResultsTable:create()
 end
 
 ---Fetches data from Lpdb
----@return table[]
+---@return placement[]
 function BaseResultsTable:queryData()
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = self.config.limit,

@@ -28,7 +28,7 @@ liquipedia.slider = {
 	initSlider: function ( container ) {
 		const makeButton = ( faIcon ) => {
 			const button = document.createElement( 'div' );
-			button.className = `btn btn-tertiary btn-extrasmall fas fa-${ faIcon }`;
+			button.className = `btn btn-secondary btn-extrasmall fas fa-${ faIcon }`;
 			return button;
 		};
 

@@ -15,7 +15,7 @@ local Company = Lua.import('Module:Infobox/Company')
 local CustomCompany = Class.new(Company)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomCompany.run(frame)
 	local company = CustomCompany(frame)
 	return company:createInfobox()

@@ -31,6 +31,7 @@ local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Tier = Lua.import('Module:Tier/Custom')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local DateRange = Lua.import('Module:Widget/Misc/DateRange')
 
 local DEFAULT_START_YEAR = Info.startYear
 local DEFAULT_END_YEAR = DateExt.getYearOf()
@@ -146,7 +147,7 @@ end
 ---@return table
 function BaseTournamentsListing:_query()
 	return mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = self:_buildConditions(),
+		conditions = self:buildConditions(),
 		query = 'pagename, name, icon, icondark, organizers, startdate, enddate, status, locations, series, '
 			.. 'prizepool, participantsnumber, game, liquipediatier, liquipediatiertype, extradata, publishertier, type',
 		order = self.args.order,
@@ -155,10 +156,11 @@ function BaseTournamentsListing:_query()
 	})
 end
 
+---@protected
 ---@return string
-function BaseTournamentsListing:_buildConditions()
+function BaseTournamentsListing:buildConditions()
 
-	local conditions = Conditions.base(self.args)
+	local conditions = tostring(Conditions.base(self.args))
 
 	if self.args.additionalConditions then
 		return conditions .. self.args.additionalConditions
@@ -208,6 +210,7 @@ function BaseTournamentsListing:build()
 	return self.display
 end
 
+---@private
 ---@return Html
 function BaseTournamentsListing:_header()
 	local config = self.config
@@ -252,6 +255,7 @@ function BaseTournamentsListing:_header()
 	return header
 end
 
+---@private
 ---@param tournamentData table
 function BaseTournamentsListing:_row(tournamentData)
 	local config = self.config
@@ -309,7 +313,7 @@ function BaseTournamentsListing:_row(tournamentData)
 
 	local dateCell = row:tag('div')
 		:addClass('gridCell EventDetails Date Header')
-		:wikitext(BaseTournamentsListing._dateDisplay(tournamentData.startdate, tournamentData.enddate, status))
+		:node(BaseTournamentsListing._dateDisplay(tournamentData.startdate, tournamentData.enddate, status))
 
 	if status == POSTPONED or status == DELAYED then
 		dateCell
@@ -387,6 +391,7 @@ function BaseTournamentsListing:_row(tournamentData)
 	self.display:node(row)
 end
 
+---@private
 ---@param opponents table[]
 ---@return Html
 function BaseTournamentsListing:_buildParticipantsSpan(opponents)
@@ -399,6 +404,7 @@ function BaseTournamentsListing:_buildParticipantsSpan(opponents)
 	return participantsSpan
 end
 
+---@private
 ---@param prize number
 function BaseTournamentsListing:_calculateRank(prize)
 
@@ -414,6 +420,7 @@ function BaseTournamentsListing:_calculateRank(prize)
 	}
 end
 
+---@private
 ---@param tournamentData table
 ---@return Html
 function BaseTournamentsListing._organizerDisplay(tournamentData)
@@ -450,6 +457,7 @@ function BaseTournamentsListing._displayLocations(locationData, tournamentType)
 	return table.concat(locations)
 end
 
+---@private
 ---@param locationData table
 ---@param locationIndex integer
 ---@return string?
@@ -470,33 +478,20 @@ function BaseTournamentsListing._displayLocation(locationData, locationIndex)
 	return String.nilIfEmpty(display .. (city or Flags.CountryName{flag = country}))
 end
 
+---@private
 ---@param startDate string
 ---@param endDate string
 ---@param status string?
----@return string
+---@return Widget|string
 function BaseTournamentsListing._dateDisplay(startDate, endDate, status)
 	if status == POSTPONED or status == DELAYED then
 		return 'Postponed'
 	end
 
-	if startDate == endDate then
-		return LANG:formatDate('M j, Y', startDate) --[[@as string]]
-	end
-
-	local startYear, startMonth = startDate:match('(%d+)-(%d+)-%d+')
-	local endYear, endMonth = endDate:match('(%d+)-(%d+)-%d+')
-
-	if startYear ~= endYear then
-		return LANG:formatDate('M j, Y', startDate) .. ' - ' .. LANG:formatDate('M j, Y', endDate)
-	end
-
-	if startMonth == endMonth then
-		return LANG:formatDate('M j', startDate) .. ' - ' .. LANG:formatDate('j, Y', endDate)
-	end
-
-	return LANG:formatDate('M j', startDate) .. ' - ' .. LANG:formatDate('M j, Y', endDate)
+	return DateRange{startDate = startDate, endDate = endDate, showYear = true}
 end
 
+---@private
 ---@param tournamentData table
 ---@return {qualified: table[]?, [1]: table[]?, [2]: table[]?}
 function BaseTournamentsListing:_fetchPlacementData(tournamentData)
@@ -572,6 +567,7 @@ function BaseTournamentsListing.participantsNumber(number)
 end
 
 -- overwritable in case wikis want several highlight options
+---@protected
 ---@param tournamentData table
 ---@return string?
 function BaseTournamentsListing:getHighlightClass(tournamentData)

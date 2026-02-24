@@ -361,9 +361,10 @@ function BracketDisplay.computeHeaderRows(bracket, config)
 			local headerRow = getHeaderRow(matchId)
 			local roundIx = coords.roundIndex + 1 + bracketData.qualSkip
 			headerRow[roundIx] = headerRow[roundIx] or {
-				header = bracketData.qualifiedHeader or config.qualifiedHeader or '!q',
+				header = config.qualifiedHeader or '!q',
 				roundIx = roundIx,
 			}
+			headerRow[roundIx].header = bracketData.qualifiedHeader or headerRow[roundIx].header
 		end
 	end
 
@@ -585,10 +586,10 @@ function BracketDisplay.Match(props)
 	if props.matchHasDetails(props.match) then
 		local bracketId = MatchGroupUtil.splitMatchId(props.match.matchId)
 		local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
+			classes = {'brkts-match-info-popup'},
 			bracketId = bracketId,
 			matchId = props.match.matchId,
 		}, Lua.import('Module:Error/Display').ErrorDetails)
-			:addClass('brkts-match-info-popup')
 
 		local matchInfoIconNode = mw.html.create('div'):addClass('brkts-match-info-icon')
 			-- Vertically align the middle of the match with the middle

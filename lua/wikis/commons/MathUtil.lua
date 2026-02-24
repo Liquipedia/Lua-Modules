@@ -8,6 +8,33 @@
 local MathUtil = {}
 
 --[[
+Converts the argument to an integer.
+]]
+---@param x any
+---@return integer?
+---@nodiscard
+function MathUtil.toInteger(x)
+	if MathUtil.isInteger(x) then
+		return tonumber(x) --[[@as integer]]
+	end
+end
+
+--[[
+Returns true if argument is an integer.
+]]
+---@param x any
+---@return boolean
+function MathUtil.isInteger(x)
+	local parsed = tonumber(x)
+	if not parsed then
+		return false
+	elseif parsed == math.huge or parsed == -math.huge then
+		return false
+	end
+	return parsed == math.floor(parsed)
+end
+
+--[[
 Returns the base 2 log of the input number, rounded down.
 
 Example:
