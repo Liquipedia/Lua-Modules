@@ -117,6 +117,7 @@ function AwardsTable:buildRow(placement)
 				attributes = {
 					['data-sort-value'] = tournamentDisplayName
 				},
+				align = 'left',
 				children = LinkWidget{
 					children = tournamentDisplayName,
 					link = placement.pagename,

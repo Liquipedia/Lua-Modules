@@ -371,16 +371,17 @@ end
 ---@return Widget
 function BaseResultsTable:build()
 	return TableWidgets.Table{
+		sortable = true,
 		columns = self:buildColumnDefinitions(),
-		children = {
+		children = WidgetUtil.collect(
 			TableWidgets.TableHeader{children = {self:buildHeader()}},
 			-- Hidden tr that contains a td to prevent the first yearHeader from being inside thead
-			self:_isDataEmpty() and HtmlWidgets.Tr{
+			not self:_isDataEmpty() and HtmlWidgets.Tr{
 				css = {display = 'none'},
 				children = HtmlWidgets.Td{}
 			} or nil,
 			TableWidgets.TableBody{children = WidgetUtil.collect(self:_buildTableBody(), self.args.manualContent)}
-		},
+		),
 		footer = self.config.onlyAchievements and HtmlWidgets.I{children = LinkWidget{
 			link = self.config.opponent .. '/' .. self.config.resultsSubPage,
 			children = 'Extended list of results',
