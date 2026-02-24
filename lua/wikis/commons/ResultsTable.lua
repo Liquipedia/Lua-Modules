@@ -99,7 +99,7 @@ function ResultsTable:buildHeader()
 end
 
 ---Builds a placement row of the results/achievements table
----@param placement table
+---@param placement placement
 ---@return Html
 function ResultsTable:buildRow(placement)
 	return TableWidgets.Row{
