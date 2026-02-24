@@ -74,10 +74,7 @@ function TeamStreamPage._playerDisplay(player)
 		limit = 1
 	})[1]
 
-	local image  = lpdbData.image
-	if String.isEmpty(image) then
-		image = Logic.emptyOr((lpdbData.extradata or {}).image, 'Blank Player Image.png') --[[@as string]]
-	end
+	local image = Logic.emptyOr(lpdbData.image, (lpdbData.extradata or {}).image, 'Blank Player Image.png')--[[@as string]]
 
 	local imageDisplay = Image.display(image, nil, {class = 'img-fluid', size = '600px'})
 
