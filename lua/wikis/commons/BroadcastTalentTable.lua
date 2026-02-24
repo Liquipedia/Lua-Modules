@@ -251,6 +251,11 @@ function BroadcastTalentTable:create()
 		),
 		children = WidgetUtil.collect(
 			self:_header(),
+			-- Hidden tr that contains a td to prevent the first yearHeader from being inside thead
+			Logic.isNotEmpty(bodyElements) and HtmlWidgets.Tr{
+				css = {display = 'none'},
+				children = HtmlWidgets.Td{}
+			} or nil,
 			TableWidgets.TableBody{children = bodyElements}
 		),
 		footer = self.args.isAchievementsTable and self:_footer() or nil
