@@ -106,6 +106,9 @@ return {
 		-- MatchSummary Map Veto
 		['matchsummary-mapveto-start'] = 'Start Map Veto',
 
+		-- MatchTable
+		['matchtable-no-match-results'] = '${pronoun} ${mode} ${verb} not played any matches ${explanation}yet.',
+
 		-- MatchTicker
 		['matchticker-upcoming-matches'] = 'Upcoming Matches',
 
