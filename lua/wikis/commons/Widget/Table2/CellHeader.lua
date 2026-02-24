@@ -16,7 +16,7 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
 ---@class Table2CellHeaderProps
----@field children (Widget|Html|string|number|nil)[]?
+---@field children Renderable[]?
 ---@field align ('left'|'right'|'center')?
 ---@field shrink (string|number|boolean)?
 ---@field nowrap (string|number|boolean)?
