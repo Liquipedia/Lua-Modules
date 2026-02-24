@@ -18,6 +18,8 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@operator call(table): AwardsTable
 local AwardsTable = Class.new(BaseResultsTable)
 
+---@protected
+---@return table[]
 function AwardsTable:buildColumnDefinitions()
 	return WidgetUtil.collect(
 		{

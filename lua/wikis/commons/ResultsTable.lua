@@ -23,6 +23,8 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@operator call(table): ResultsTable
 local ResultsTable = Class.new(BaseResultsTable)
 
+---@protected
+---@return table[]
 function ResultsTable:buildColumnDefinitions()
 	return WidgetUtil.collect(
 		{
