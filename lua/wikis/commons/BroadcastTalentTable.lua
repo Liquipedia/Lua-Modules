@@ -37,6 +37,7 @@ local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default'
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local DEFAULT_LIMIT = 500
@@ -365,7 +366,7 @@ end
 
 ---@private
 ---@param tournament table
----@return Html|string
+---@return string|Widget
 function BroadcastTalentTable:_partnerList(tournament)
 	local partners = self:_getPartners(tournament)
 
@@ -376,16 +377,18 @@ function BroadcastTalentTable:_partnerList(tournament)
 	partners = BroadcastTalentTable._removeDuplicatePartners(partners)
 	Array.sortInPlaceBy(partners, Operator.property('page'))
 
-	local list = mw.html.create('ul')
-	for _, partner in ipairs(partners) do
-		list:tag('li'):wikitext(Flags.Icon{flag = partner.flag} .. NONBREAKING_SPACE
-			.. Page.makeInternalLink({}, partner.id, partner.page))
-	end
-
 	return GeneralCollapsible{
 		titleWidget = CollapsibleToggle{},
 		shouldCollapse = true,
-		children = list,
+		children = UnorderedList{
+			children = Array.map(partners, function (partner)
+				return {
+					Flags.Icon{flag = partner.flag},
+					NONBREAKING_SPACE,
+					LinkWidget{link = partner.page, children = partner.id}
+				}
+			end)
+		},
 	}
 end
 
