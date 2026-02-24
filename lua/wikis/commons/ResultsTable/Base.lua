@@ -10,9 +10,12 @@ local Lua = require('Module:Lua')
 local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Currency = Lua.import('Module:Currency')
+local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Info = Lua.import('Module:Info', {loadData = true})
+local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local String = Lua.import('Module:StringUtils')
@@ -592,6 +595,83 @@ end
 ---@return Widget
 function BaseResultsTable:buildRow(placement)
 	error('BaseResultsTable:buildRow() cannot be called directly and must be overridden.')
+end
+
+---@protected
+---@param placement placement
+---@return Widget
+function BaseResultsTable:createDateCell(placement)
+	return TableWidgets.Cell{children = DateExt.toYmdInUtc(placement.date)}
+end
+
+---@protected
+---@param placement placement
+---@return Widget
+function BaseResultsTable:createTierCell(placement)
+	local tierDisplay, tierSortValue = self:tierDisplay(placement)
+	return TableWidgets.Cell{
+		attributes = {
+			['data-sort-value'] = tierSortValue
+		},
+		children = tierDisplay
+	}
+end
+
+---@protected
+---@param placement placement
+---@return Widget?
+function BaseResultsTable:createTypeCell(placement)
+	if not self.config.showType then
+		return
+	end
+	return TableWidgets.Cell{
+		children = placement.type
+	}
+end
+
+---@protected
+---@param placement placement
+---@return Widget[]
+function BaseResultsTable:createTournamentCells(placement)
+	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)
+	return {
+		TableWidgets.Cell{
+			attributes = {
+				['data-sort-value'] = tournamentDisplayName
+			},
+			css = {width = '30px'},
+			children = LeagueIcon.display{
+				icon = placement.icon,
+				iconDark = placement.icondark,
+				link = placement.parent,
+				name = tournamentDisplayName,
+				options = {noTemplate = true},
+			}
+		},
+		TableWidgets.Cell{
+			attributes = {
+				['data-sort-value'] = tournamentDisplayName
+			},
+			align = 'left',
+			children = LinkWidget{
+				children = tournamentDisplayName,
+				link = placement.pagename,
+			}
+		},
+	}
+end
+
+---@protected
+---@param props {useIndivPrize: boolean?, placement: placement}
+---@return Widget
+function BaseResultsTable:createPrizeCell(props)
+	local useIndivPrize = Logic.nilOr(props.useIndivPrize, self.config.queryType ~= Opponent.team)
+	local placement = props.placement
+	return TableWidgets.Cell{children = Currency.display(
+		'USD',
+		useIndivPrize and placement.individualprizemoney or placement.prizemoney,
+		{dashIfZero = true, displayCurrencyCode = false, formatValue = true}
+	)}
 end
 
 return BaseResultsTable

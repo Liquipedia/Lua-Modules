@@ -9,17 +9,13 @@ local Lua = require('Module:Lua')
 
 local BaseResultsTable = Lua.import('Module:ResultsTable/Base')
 local Class = Lua.import('Module:Class')
-local Currency = Lua.import('Module:Currency')
-local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Game = Lua.import('Module:Game')
-local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Placement = Lua.import('Module:Placement')
 local Table = Lua.import('Module:Table')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -106,52 +102,17 @@ end
 ---@param placement table
 ---@return Html
 function ResultsTable:buildRow(placement)
-	local tierDisplay, tierSortValue = self:tierDisplay(placement)
-
-	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)
-
-	local useIndivPrize = self.config.useIndivPrize and self.config.queryType ~= Opponent.team
-
 	return TableWidgets.Row{
 		highlighted = self:rowHighlight(placement),
 		children = WidgetUtil.collect(
-			TableWidgets.Cell{children = DateExt.toYmdInUtc(placement.date)},
+			self:createDateCell(placement),
 			ResultsTable._placementToTableCell(placement),
-			TableWidgets.Cell{
-				attributes = {
-					['data-sort-value'] = tierSortValue
-				},
-				children = tierDisplay
-			},
-			self.config.showType and TableWidgets.Cell{
-				children = placement.type
-			} or nil,
+			self:createTierCell(placement),
+			self:createTypeCell(placement),
 			self.config.displayGameIcons and TableWidgets.Cell{
 				children = Game.icon{game = placement.game}
 			} or nil,
-			TableWidgets.Cell{
-				attributes = {
-					['data-sort-value'] = tournamentDisplayName
-				},
-				css = {width = '30px'},
-				children = LeagueIcon.display{
-					icon = placement.icon,
-					iconDark = placement.icondark,
-					link = placement.parent,
-					name = tournamentDisplayName,
-					options = {noTemplate = true},
-				}
-			},
-			TableWidgets.Cell{
-				attributes = {
-					['data-sort-value'] = tournamentDisplayName
-				},
-				align = 'left',
-				children = LinkWidget{
-					children = tournamentDisplayName,
-					link = placement.pagename,
-				}
-			},
+			self:createTournamentCells(placement),
 			(
 				self.config.playerResultsOfTeam or
 				self.config.queryType ~= Opponent.team or
@@ -167,11 +128,10 @@ function ResultsTable:buildRow(placement)
 				)
 			} or nil,
 			self:_buildResultCells(placement),
-			TableWidgets.Cell{children = Currency.display(
-				'USD',
-				useIndivPrize and placement.individualprizemoney or placement.prizemoney,
-				{dashIfZero = true, displayCurrencyCode = false, formatValue = true}
-			)}
+			self:createPrizeCell{
+				useIndivPrize = self.config.useIndivPrize and self.config.queryType ~= Opponent.team,
+				placement = placement
+			}
 		)
 	}
 end
