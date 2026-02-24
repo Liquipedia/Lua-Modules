@@ -280,26 +280,21 @@ function BaseResultsTable:buildNonTeamOpponentConditions()
 		local prefix
 		if config.queryType == QUERY_TYPES.solo then
 			prefix = PLAYER_PREFIX
-			opponentConditions:add{
-				ConditionTree(BooleanOperator.all):add{
-					ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
-					ConditionNode(ColumnName('opponentname'), Comparator.eq, opponent),
-				},
-				ConditionTree(BooleanOperator.all):add{
-					ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
-					ConditionNode(ColumnName('opponentname'), Comparator.eq, opponentWithUnderscore),
-				},
-			}
+			opponentConditions:add(ConditionTree(BooleanOperator.all):add{
+				ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
+				ConditionUtil.anyOf(ColumnName('opponentname'), {opponent, opponentWithUnderscore})
+			})
 		else
 			prefix = COACH_PREFIX
 		end
 
-		for playerIndex = 1, config.playerLimit do
+		Array.forEach(Array.range(1, config.playerLimit), function (playerIndex)
+			local playerColumnName = ColumnName('opponentplayers_' .. prefix .. playerIndex)
 			opponentConditions:add{
-				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, opponent),
-				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, opponentWithUnderscore),
+				ConditionNode(playerColumnName, Comparator.eq, opponent),
+				ConditionNode(playerColumnName, Comparator.eq, opponentWithUnderscore),
 			}
-		end
+		end)
 	end
 
 	return opponentConditions
