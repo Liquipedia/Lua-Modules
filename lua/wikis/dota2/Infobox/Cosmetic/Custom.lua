@@ -20,6 +20,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Cosmetic = Lua.import('Module:Infobox/Cosmetic')
 
 local Widgets = Lua.import('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Builder = Widgets.Builder
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -42,14 +43,14 @@ local CustomCosmetic = Class.new(Cosmetic)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomCosmetic.run(frame)
 	local cosmetic = CustomCosmetic(frame)
 	cosmetic:setWidgetInjector(CustomInjector(cosmetic))
 	cosmetic.args.subHeader = cosmetic.args.prefab
 	cosmetic.args.imageText = 'ID: ' .. (cosmetic.args.defindex or 'N/A')
 
-	return mw.html.create():node(cosmetic:createInfobox()):node(cosmetic:_createIntroText())
+	return HtmlWidgets.Fragment{children = {cosmetic:createInfobox(), cosmetic:_createIntroText()}}
 end
 
 ---@param id string
@@ -213,6 +214,30 @@ function CustomCosmetic:_createIntroText()
 		output:node(CosmeticIcon._main{item, '130px'})
 	end
 
+	local thirdSet = CustomCosmetic._createSet(self.args.setname3)
+
+	if not thirdSet then
+		return output
+	end
+
+	output:newline():wikitext('Also part of the following set:'):newline()
+	output:node(CosmeticIcon._main{args.setname3, '170px'})
+	for _, item in ipairs(thirdSet) do
+		output:node(CosmeticIcon._main{item, '130px'})
+	end
+
+	local fourthSet = CustomCosmetic._createSet(self.args.setname4)
+
+	if not fourthSet then
+		return output
+	end
+
+	output:newline():wikitext('Also part of the following set:'):newline()
+	output:node(CosmeticIcon._main{args.setname4, '170px'})
+	for _, item in ipairs(fourthSet) do
+		output:node(CosmeticIcon._main{item, '130px'})
+	end
+
 	return output
 end
 
@@ -245,6 +270,8 @@ function CustomCosmetic:setLpdbData(args)
 			marketlock = args.marketlock or '',
 			setname = args.setname or '',
 			setname2 = args.setname2 or '',
+			setname3 = args.setname3 or '',
+			setname4 = args.setname4 or '',
 			setitems = self:getAllArgsForBase(args, 'setitem'),
 			releasedate = args.releasedate or '',
 			expiredate = args.expiredate or '',

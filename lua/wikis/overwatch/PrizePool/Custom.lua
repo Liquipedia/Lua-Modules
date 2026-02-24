@@ -26,7 +26,7 @@ local TIER_TYPE_MODIFIER = {Qualifier = 0.001}
 
 -- Template entry point
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	local prizePool = PrizePool(args):create()
@@ -53,7 +53,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	Variables.varDefine(participantLower .. '_prizepoints', lpdbData.extradata.prizepoints)
 	Variables.varDefine(participantLower .. '_prizepoints2', lpdbData.extradata.prizepoints2)
-	lpdbData.qualified = placement:getPrizeRewardForOpponent(opponent, 'QUALIFIES1') and 1 or 0
 
 	if Opponent.isTbd(opponent.opponentData) then
 		Variables.varDefine('minimum_secured', lpdbData.extradata.prizepoints)

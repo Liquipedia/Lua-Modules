@@ -20,17 +20,18 @@ local Customizable = Widgets.Customizable
 local Breakdown = Widgets.Breakdown
 
 ---@class CampaignMissionInfobox: BasicInfobox
+---@operator call(Frame): CampaignMissionInfobox
 local Mission = Class.new(BasicInfobox)
 
 ---Entry point
 ---@param frame Frame
----@return Html
+---@return Widget
 function Mission.run(frame)
 	local mission = Mission(frame)
 	return mission:createInfobox()
 end
 
----@return string
+---@return Widget
 function Mission:createInfobox()
 	local args = self.args
 

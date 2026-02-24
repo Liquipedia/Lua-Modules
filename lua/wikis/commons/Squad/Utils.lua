@@ -10,13 +10,12 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Flags = Lua.import('Module:Flags')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Variables = Lua.import('Module:Variables')
 
 local Lpdb = Lua.import('Module:Lpdb')
 local Faction = Lua.import('Module:Faction')
@@ -188,9 +187,7 @@ end
 
 ---@param squadPerson ModelRow
 function SquadUtils.storeSquadPerson(squadPerson)
-	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
-		squadPerson:save()
-	end
+	squadPerson:save()
 end
 
 ---@param frame table

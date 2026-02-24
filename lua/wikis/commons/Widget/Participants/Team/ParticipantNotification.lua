@@ -30,18 +30,18 @@ function ParticipantNotification:render()
 
 	return Div{
 		classes = {
-			'participant-notification',
-			highlighted and 'participant-notification-highlighted' or nil,
+			'team-participant-card__notification',
+			highlighted and 'team-participant-card__notification--highlighted' or nil,
 		},
 		children = {
 			Div{
-				classes = {'participant-notification-icon'},
+				classes = {'team-participant-card__notification-icon'},
 				children = {
 					Icon{iconName = 'notification'},
 				}
 			},
 			Div{
-				classes = {'participant-notification-text'},
+				classes = {'team-participant-card__notification-text'},
 				children = {text}
 			}
 		}

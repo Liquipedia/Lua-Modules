@@ -50,7 +50,7 @@ PERSPECTIVES.first = PERSPECTIVES.fpp
 PERSPECTIVES.third = PERSPECTIVES.tpp
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))

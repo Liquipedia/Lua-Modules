@@ -56,5 +56,8 @@ return {
 				mode = 'automatic',
 			},
 		},
+		participants = {
+			defaultPlayerNumber = 5,
+		},
 	},
 }

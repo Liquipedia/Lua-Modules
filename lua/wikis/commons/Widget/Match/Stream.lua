@@ -23,6 +23,7 @@ local TLNET_STREAM = 'stream'
 local MatchStream = Class.new(Widget)
 MatchStream.defaultProps = {
 	matchIsLive = true,
+	buttonSize = 'sm',
 }
 
 ---@return Widget?
@@ -62,8 +63,8 @@ function MatchStream:render()
 				children = CTA_Text,
 			},
 		}},
-		variant = 'tertiary',
-		size = 'sm',
+		variant = 'secondary',
+		size = self.props.buttonSize,
 		grow = self.props.grow,
 	}
 end

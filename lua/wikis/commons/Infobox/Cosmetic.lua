@@ -19,9 +19,10 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
 ---@class CosmeticInfobox: BasicInfobox
+---@operator call(Frame): CosmeticInfobox
 local Cosmetic = Class.new(BasicInfobox)
 
----@return string
+---@return Widget
 function Cosmetic:createInfobox()
 	local args = self.args
 	self:customParseArguments(args)

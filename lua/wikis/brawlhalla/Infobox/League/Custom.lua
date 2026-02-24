@@ -25,7 +25,7 @@ local CustomInjector = Class.new(Injector)
 local TODAY = os.date('%Y-%m-%d') --[[@as string]]
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))

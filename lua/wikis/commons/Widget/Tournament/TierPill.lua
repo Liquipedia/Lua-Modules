@@ -15,7 +15,6 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class TournamentsTickerPillWidget: Widget
 ---@operator call(table): TournamentsTickerPillWidget
-
 local TournamentsTickerPillWidget = Class.new(Widget)
 
 local COLOR_CLASSES = {

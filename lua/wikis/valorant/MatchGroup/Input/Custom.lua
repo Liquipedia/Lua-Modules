@@ -18,6 +18,8 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local CustomMatchGroupInput = {}
+
+---@class ValorantMatchParser: MatchParserInterface
 local MatchFunctions = {
 	getBestOf = MatchGroupInputUtil.getBestOf,
 	DEFAULT_MODE = 'team',
@@ -40,7 +42,9 @@ local VALORANT_REGIONS = {'eu', 'na', 'ap', 'kr', 'latam', 'br', 'pbe1', 'esport
 ---@field t1side ValorantSides
 ---@field t2side ValorantSides
 ---@field winningSide ValorantSides
+---@field flawless boolean
 ---@field ceremony string
+---@field ceremonyFor string?
 
 ---@class ValorantMapParserInterface
 ---@field getMap fun(mapInput: table): table
@@ -133,14 +137,12 @@ end
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function MatchFunctions.calculateMatchScore(maps)
-	return function(opponentIndex)
-		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-	end
+	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
@@ -205,6 +207,7 @@ function MatchFunctions.calculateOverallStatsForOpponent(maps, opponentIndex)
 
 	return {
 		firstKills = getSumOf('firstKills'),
+		flawless = getSumOf('flawless'),
 		thrifties = getSumOf('thrifties'),
 		clutches = getSumOf('clutches'),
 		postPlant = postPlant,
@@ -297,7 +300,7 @@ end
 ---@param MapParser ValorantMapParserInterface
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table<string, any>
 function MapFunctions.getExtraData(MapParser, match, map, opponents)
 	local publisherId, publisherRegion = MapParser.getMatchId(map)
@@ -339,7 +342,7 @@ end
 
 ---@param MapParser ValorantMapParserInterface
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponentIndex)

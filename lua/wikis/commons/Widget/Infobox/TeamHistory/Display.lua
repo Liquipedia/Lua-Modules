@@ -300,7 +300,7 @@ end
 ---@param roleLength integer
 ---@return string
 function TeamHistoryDisplay._getTeamDisplayName(teamData, roleLength)
-	local maxLength = 23 - (POSITION_ICON_DATA and 4 or 0) - (HAS_REFS and 4 or 0) - roleLength
+	local maxLength = 22 - (POSITION_ICON_DATA and 4 or 0) - (HAS_REFS and 4 or 0) - roleLength
 	if string.len(teamData.name) <= maxLength then
 		return teamData.name
 	elseif string.len(teamData.bracketname) <= maxLength then

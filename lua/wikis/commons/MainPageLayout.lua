@@ -11,7 +11,6 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Count = Lua.import('Module:Count')
 local Image = Lua.import('Module:Image')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local AnalyticsMapping = Lua.import('Module:MainPageLayout/AnalyticsMapping', {loadData = true})
@@ -25,7 +24,6 @@ local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local MainPageLayout = {}
 
 local NO_TABLE_OF_CONTENTS = '__NOTOC__'
-local METADESC = '<metadesc>${metadesc}</metadesc>'
 
 ---@param frame Frame
 ---@return WidgetHtml
@@ -39,11 +37,12 @@ function MainPageLayout.make(frame)
 	local args = Arguments.getArgs(frame)
 	local layout = WikiData.layouts[args.layout] or WikiData.layouts.main
 
+	mw.ext.SearchEngineOptimization.metadesc(WikiData.metadesc)
+
 	return HtmlWidgets.Div{
 		classes = {'mainpage-v2'},
 		children = {
 			NO_TABLE_OF_CONTENTS,
-			frame:preprocess(String.interpolate(METADESC, {metadesc = WikiData.metadesc})),
 			frame:callParserFunction('DISPLAYTITLE', WikiData.title),
 			HtmlWidgets.Div{
 				classes = {'header-banner'},

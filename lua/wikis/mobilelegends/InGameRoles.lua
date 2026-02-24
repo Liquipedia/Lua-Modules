@@ -7,20 +7,23 @@
 
 ---@type table<string, RoleBaseData>
 local inGameRoles = {
-	['igl'] = {category = 'In-game leaders', display = 'In-game Leader'},
-	['exp'] = {category = 'EXP Laner', display = 'EXP Laner'},
-	['gold'] = {category = 'Gold Laner', display = 'Gold Laner'},
-	['mid'] = {category = 'Mid Laner', display = 'Mid Laner'},
-	['jungler'] = {category = 'Jungler', display = 'Jungler'},
-	['roamer'] = {category = 'Roamer', display = 'Roamer'},
+	['exp lane'] = {category = 'EXP Laner', display = 'EXP Laner', sortOrder = 1},
+	['gold lane'] = {category = 'Gold Laner', display = 'Gold Laner', sortOrder = 4},
+	['middle'] = {category = 'Mid Laner', display = 'Mid Laner', sortOrder = 3},
+	['jungler'] = {category = 'Jungler', display = 'Jungler', sortOrder = 2},
+	['roamer'] = {category = 'Roamer', display = 'Roamer', sortOrder = 5},
+	['flex'] = {category = 'Flex', display = 'Flex', sortOrder = 6},
 }
 
 inGameRoles['jgl'] = inGameRoles.jungler
 inGameRoles['jungle'] = inGameRoles.jungler
 inGameRoles['roam'] = inGameRoles.roamer
 inGameRoles['support'] = inGameRoles.roamer
-inGameRoles['top'] = inGameRoles.exp
-inGameRoles['mid laner'] = inGameRoles.mid
-inGameRoles['bottom'] = inGameRoles.gold
+inGameRoles['top'] = inGameRoles['exp lane']
+inGameRoles['exp'] = inGameRoles['exp lane']
+inGameRoles['mid laner'] = inGameRoles.middle
+inGameRoles['mid'] = inGameRoles.middle
+inGameRoles['bottom'] = inGameRoles['gold lane']
+inGameRoles['gold'] = inGameRoles['gold lane']
 
 return inGameRoles
