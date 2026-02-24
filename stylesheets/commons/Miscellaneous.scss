@@ -1324,12 +1324,19 @@ Author(s): spazer, Lafungo
 	text-shadow: 1px 1px rgba( 64, 64, 64, 0.4 ), 1px -1px rgba( 64, 64, 64, 0.4 ), -1px -1px rgba( 64, 64, 64, 0.4 ), -1px 1px rgba( 64, 64, 64, 0.4 );
 	font-weight: bold;
 	color: #ffffff;
+	font-size: 0.6875rem;
+	line-height: 1.25;
 }
 
 .placement-box {
-	display: inline-block;
+	display: flex;
+	justify-self: center;
+	justify-content: center;
+	align-items: center;
 	border-radius: 0.25rem;
-	padding: 0.125rem 0.5rem;
+	padding: 0 0.5rem;
+	min-width: 2.75rem;
+	height: 1.25rem;
 }
 
 .placement-1 {
