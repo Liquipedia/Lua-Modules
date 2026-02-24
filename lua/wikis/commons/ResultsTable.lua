@@ -80,6 +80,7 @@ function ResultsTable:buildHeader()
 			children = 'Player'
 		} or nil,
 		not self.config.hideResult and TableWidgets.CellHeader{
+			align = 'left',
 			colspan = 2,
 			children = 'Result'
 		} or nil,
