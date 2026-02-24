@@ -250,7 +250,7 @@ function BaseResultsTable:buildBaseConditions()
 end
 
 ---Builds Lpdb conditions for the given opponent
----@return table?
+---@return ConditionTree?
 function BaseResultsTable:buildOpponentConditions()
 	local config = self.config
 
@@ -263,7 +263,7 @@ end
 
 -- todo: adjust once #1802 is done
 ---Builds Lpdb conditions for the non team opponent case
----@return table
+---@return ConditionTree
 function BaseResultsTable:buildNonTeamOpponentConditions()
 	local config = self.config
 	local opponentConditions = ConditionTree(BooleanOperator.any)
@@ -306,7 +306,7 @@ function BaseResultsTable:buildNonTeamOpponentConditions()
 end
 
 ---Builds Lpdb conditions for a team
----@return table
+---@return ConditionTree
 function BaseResultsTable:buildTeamOpponentConditions()
 	local config = self.config
 
