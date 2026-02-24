@@ -121,7 +121,11 @@ $table2-cell-padding-x: 0.75rem;
 			background-color: var( --publisher-premier-highlight-background-color ) !important;
 
 			&:hover {
-				background-color: var( --publisher-premier-highlight-background-color ) !important;
+				background-color: hsl( from var( --publisher-premier-highlight-background-color ) h calc( s - 5 ) calc( l - 5 ) ) !important;
+
+				.theme--dark & {
+					background-color: hsl( from var( --publisher-premier-highlight-background-color ) h calc( s + 5 ) calc( l + 5 ) ) !important;
+				}
 			}
 		}
 
