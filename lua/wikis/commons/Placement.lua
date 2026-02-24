@@ -205,7 +205,9 @@ end
 function Placement.get(args)
 	local raw = Placement.raw(args.placement)
 	return 'class="text-center" data-sort-value="' .. raw.sort .. '"' ..
-		'|<span class="placement-box ' .. (raw.backgroundClass or '') .. '"><b' .. (raw.blackText and '' or ' class="placement-text"') .. '>' .. (args.customText or raw.display) .. '</b></span>'
+		'|<span class="placement-box ' .. (raw.backgroundClass or '') ..
+		'"><b' .. (raw.blackText and '' or ' class="placement-text"') ..
+		'>' .. (args.customText or raw.display) .. '</b></span>'
 end
 
 return Class.export(Placement, {exports = {'getBgClass', 'get', 'RangeLabel'}})
