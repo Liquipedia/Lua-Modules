@@ -212,30 +212,32 @@ function BaseResultsTable:buildBaseConditions()
 		:add{self:buildOpponentConditions()}
 
 	if args.game then
-		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, args.game)}
+		conditions:add(ConditionNode(ColumnName('game'), Comparator.eq, args.game))
 	end
 
 	local startDate = args.startdate or args.sdate
 	if startDate then
 		-- intentional > here to keep it as is in current modules
 		-- possibly change to >= later
-		conditions:add{ConditionNode(ColumnName('date'), Comparator.gt, startDate)}
+		conditions:add(ConditionNode(ColumnName('date'), Comparator.gt, startDate))
 	end
 
 	local endDate = args.enddate or args.edate
 	if endDate then
 		-- intentional < here to keep it as is in current modules
 		-- possibly change to <= later
-		conditions:add{ConditionNode(ColumnName('date'), Comparator.lt, endDate)}
+		conditions:add(ConditionNode(ColumnName('date'), Comparator.lt, endDate))
 	end
 
 	if args.placement then
-		conditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, args.placement)}
+		conditions:add(ConditionNode(ColumnName('placement'), Comparator.eq, args.placement))
 	elseif Logic.readBool(args.awards) then
-		conditions:add{ConditionNode(ColumnName('mode'), Comparator.eq, 'award_individual')}
+		conditions:add(ConditionNode(ColumnName('mode'), Comparator.eq, 'award_individual'))
 	else
-		conditions:add{ConditionNode(ColumnName('mode'), Comparator.neq, 'award_individual')}
-		conditions:add{ConditionNode(ColumnName('placement'), Comparator.neq, '')}
+		conditions:add{
+			ConditionNode(ColumnName('mode'), Comparator.neq, 'award_individual'),
+			ConditionNode(ColumnName('placement'), Comparator.neq, '')
+		}
 	end
 
 	if args.tier then
