@@ -244,7 +244,6 @@ function BroadcastTalentTable:create()
 			{align = 'center'},
 			{align = 'center'},
 			{align = 'center'},
-			{align = 'center'},
 			self.args.displayPartnerListColumn and {
 				align = 'center',
 				unsortable = true,
