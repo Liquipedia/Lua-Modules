@@ -23,37 +23,20 @@ local AwardsTable = Class.new(BaseResultsTable)
 function AwardsTable:buildColumnDefinitions()
 	return WidgetUtil.collect(
 		{
-			align = 'center',
-			nowrap = true,
-			shrink = true,
+			align = 'left',
 			sortType = 'isoDate',
 		},
-		{
-			align = 'left',
-			minWidth = '4.5rem',
-			nowrap = true,
-			shrink = true,
-		},
+		{align = 'left'},
 		self.config.showType and {
 			align = 'center',
-			minWidth = '50px',
 		} or nil,
 		{align = 'left'},
-		{
-			align = 'left',
-			shrink = true,
-			nowrap = true,
-		},
-		{
-			align = 'left',
-			minWidth = '225px',
-		},
+		{align = 'left'},
+		{align = 'left'},
 		self.config.queryType ~= Opponent.team and {
 			align = 'center',
-			minWidth = '70px',
 		} or self.config.playerResultsOfTeam and {
 			align = 'center',
-			minWidth = '105px',
 		} or nil,
 		{
 			align = 'right',

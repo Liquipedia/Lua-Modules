@@ -28,49 +28,28 @@ local ResultsTable = Class.new(BaseResultsTable)
 function ResultsTable:buildColumnDefinitions()
 	return WidgetUtil.collect(
 		{
-			align = 'center',
-			nowrap = true,
-			shrink = true,
+			align = 'left',
 			sortType = 'isoDate',
 		},
-		{
-			align = 'center',
-			minWidth = '80px',
-		},
-		{
-			align = 'left',
-			minWidth = '4.5rem',
-			nowrap = true,
-			shrink = true,
-		},
-		self.config.showType and {
-			align = 'center',
-			minWidth = '50px',
-		} or nil,
-		self.config.displayGameIcons and {
-			align = 'center'
-		} or nil,
+		{align = 'center'},
 		{align = 'left'},
-		{
-			align = 'left',
-			shrink = true,
-			nowrap = true,
-		},
+		self.config.showType and {align = 'center'} or nil,
+		self.config.displayGameIcons and {align = 'center'} or nil,
+		{align = 'left'},
+		{align = 'left'},
 		(self.config.queryType ~= Opponent.team or Table.isNotEmpty(self.config.aliases)) and {
 			align = 'center',
-			minWidth = '70px',
 		} or self.config.playerResultsOfTeam and {
 			align = 'center',
-			minWidth = '105px',
 		} or nil,
 		not self.config.hideResult and {
 			{
-				align = 'center',
-				sortable = false,
+				align = 'left',
+				unsortable = true,
 			},
 			{
 				align = 'center',
-				sortable = false,
+				unsortable = true,
 			},
 		} or nil,
 		{
