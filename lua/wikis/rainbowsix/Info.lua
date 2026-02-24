@@ -6,12 +6,12 @@
 --
 
 return {
-	startYear = 2006, --vegas from 2006; vegas2 from 2008; siege from 2015; mobile from 2022; siegex/siege-2026 from 2025
+	startYear = 2006, --vegas from 2006; vegas2 from 2008; siege from 2015; mobile from 2022; siegeX/siege-2025 from 2025
 	wikiName = 'rainbowsix',
 	name = 'Rainbow Six',
 	defaultGame = 'siege',
 	games = {
-		-- Name update since 2026 back to "Siege", removing the "X", but using the new game-build and ban-system from the start with SiegeX
+		-- Name update, since 2026 back to "Siege", removing the "X", but using the new game-build and ban-system from the start with SiegeX (2025)
 		siegex = {
 			abbreviation = 'R6S',
 			name = 'Tom Clancy\'s Rainbow Six Siege (2025)',
