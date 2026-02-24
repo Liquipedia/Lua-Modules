@@ -47,16 +47,20 @@ end)
 ---@return Widget?
 function FactionStreamPage.run(frame)
 	local args = Arguments.getArgs(frame)
-	return FactionStreamPage(args):create()
+	args.suppressBottomContent = true
+	local factionStreamPage = FactionStreamPage(args)
+	return factionStreamPage:create()
 end
 
 ---@return string|Widget?
 function FactionStreamPage:render()
 	return Tabs.dynamic{
-		name1 = 'Player Information',
+		name1 = 'Players',
 		content1 = self:renderPlayerInformation(),
-		name2 = 'Tournament Information',
-		content2 = self:renderTournamentInformation()
+		name2 = 'Head to Head',
+		content2 = self:createBottomContent(),
+		name3 = 'Tournament Stage',
+		content3 = self:renderTournamentInformation()
 	}
 end
 
@@ -163,6 +167,7 @@ function FactionStreamPage:renderTournamentInformation()
 	local match = self.matches[1]
 	return HtmlWidgets.Div{children = {
 		createTemplateBox{children = self:_mapPool()},
+		-- todo after we have standardized standings: make it display the group table where applicable too
 		createTemplateBox{children = MatchGroup.MatchGroupById{id = match.bracketId}}
 	}}
 end
@@ -228,7 +233,6 @@ function FactionStreamPage:_mapPool()
 	end
 
 	return TableWidgets.Table{
-		variant = 'themed',
 		columns = {
 			{align = 'center'},
 			not skipMapWinRate and {align = 'center'} or nil,

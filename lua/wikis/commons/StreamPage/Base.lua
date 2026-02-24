@@ -43,10 +43,12 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@operator call(table): BaseStreamPage
 ---@field channel string
 ---@field provider string
+---@field suppressBottomContent boolean
 ---@field matches MatchGroupUtilMatch[]
 local StreamPage = Class.new(function (self, args)
 	self.channel = assert(Logic.nilIfEmpty(args.channel))
 	self.provider = assert(Logic.nilIfEmpty(args.provider))
+	self.suppressBottomContent = Logic.readBool(args.suppressBottomContent)
 	self.matches = {}
 
 	self:_fetchMatches()
@@ -128,6 +130,7 @@ function StreamPage:_header()
 		opponent.teamTemplateData = TeamTemplate.getRaw(opponent.template)
 		opponent.seriesDots = {}
 	end)
+
 	return MatchPageHeader{
 		countdownBlock = countdownBlock,
 		isBestOfOne = match.bestof == 1,
@@ -136,7 +139,7 @@ function StreamPage:_header()
 		opponent2 = match.opponents[2],
 		parent = tournament.pageName,
 		phase = MatchGroupUtil.computeMatchPhase(match),
-		stream = match.stream,
+		stream = {},
 		tournamentName = tournament.fullName,
 		highlighted = HighlightConditions.tournament(tournament)
 	}
@@ -181,7 +184,7 @@ function StreamPage:create()
 				xxxl = 3,
 			}
 		}},
-		self:createBottomContent()
+		not self.suppressBottomContent and self:createBottomContent() or nil
 	)}
 end
 
@@ -214,7 +217,7 @@ function StreamPage:createBottomContent()
 	local headToHead = self:_buildHeadToHeadMatchTable()
 
 	return WidgetUtil.collect(
-		HtmlWidgets.H3{children = 'Match History'},
+		not self.suppressBottomContent and HtmlWidgets.H3{children = 'Match History'} or nil,
 		HtmlWidgets.Div{
 			classes = {'match-bm-match-additional'},
 			children = WidgetUtil.collect(
