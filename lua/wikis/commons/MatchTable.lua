@@ -576,7 +576,7 @@ function MatchTable:buildDisplay()
 				pronoun = isH2H and 'These' or 'This',
 				mode = self.config.mode == Opponent.solo
 					and (isH2H and 'players' or 'player)
-					or (isH2H and'teams' or 'team),
+					or (isH2H and'teams' or 'team'),
 				verb = isH2H and 'have' or 'has',
 				explanation = isH2H and 'against each other ' or ''
 			}
