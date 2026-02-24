@@ -150,10 +150,12 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 
 	&__opponent-compact {
 		display: none;
+		width: 100%;
 	}
 
 	&__opponent-full {
 		display: flex;
+		width: 100%;
 	}
 
 	&__label {
