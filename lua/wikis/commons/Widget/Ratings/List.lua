@@ -229,6 +229,7 @@ function RatingsList:render()
 
 	local buttonDiv = HtmlWidgets.Div {
 		children = { 'See Rankings Page', Icon.makeIcon { iconName = 'goto' } },
+		classes = { 'ranking-table__footer-button' },
 	}
 
 	local footer = Link {
