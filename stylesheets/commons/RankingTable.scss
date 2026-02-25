@@ -7,20 +7,25 @@
 		display: flex;
 		justify-content: space-between;
 		font-weight: normal;
+		gap: 0.5rem;
+
+		@media ( max-width: 768px ) {
+			flex-direction: column;
+		}
 
 		&-text {
 			display: flex;
 			flex-direction: column;
+
+			@media ( max-width: 768px ) {
+				flex-direction: row;
+				justify-content: space-between;
+			}
 		}
 
 		> div {
 			display: flex;
 			justify-content: space-between;
-
-			@media ( max-width: 768px ) {
-				flex-direction: column;
-				align-items: flex-start;
-			}
 		}
 
 		&-logo-container {
@@ -41,24 +46,6 @@
 		}
 	}
 
-	&__footer-row {
-		padding: 1rem 0.75rem;
-		font-weight: bold;
-
-		div {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			gap: 0.5rem;
-		}
-	}
-
-	&__header-row {
-		th {
-			padding: 0.5rem 1rem;
-		}
-	}
-
 	&__row {
 		&--even {
 			background-color: var( --clr-on-surface-light-primary-4 );
@@ -69,14 +56,10 @@
 				display: none;
 			}
 		}
+	}
 
+	tr {
 		> td {
-			padding: 0.5rem 1rem;
-
-			@media ( max-width: 768px ) {
-				padding: 0.5rem 0.75rem;
-			}
-
 			.flag {
 				margin-right: 0.5rem;
 			}
@@ -86,6 +69,10 @@
 	&__graph-row {
 		&:hover {
 			background-color: transparent !important;
+		}
+
+		> td {
+			padding: 0 !important;
 		}
 	}
 
@@ -113,7 +100,7 @@
 	}
 
 	&__graph-row-container {
-		padding: 1.5rem;
+		padding: 1.5rem 0;
 
 		.team-template-team-standard {
 			display: flex;

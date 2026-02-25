@@ -142,7 +142,6 @@ function RatingsList:render()
 				children = Icon.makeIcon { iconName = 'chart' }
 			} or nil
 		),
-		classes = { 'ranking-table__header-row' },
 	}
 
 	local teamRows = Array.map(teams, function(team, index)
@@ -210,8 +209,7 @@ function RatingsList:render()
 								function() return makeTeamChart(team, teamLimit) end,
 								function() return 'Failed to make graph for team' end
 							)
-						},
-						classes = { 'ranking-table__graph-row-container' }
+						}
 					}
 				},
 				classes = { 'ranking-table__graph-row d-none' },
