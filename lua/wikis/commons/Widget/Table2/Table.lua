@@ -30,7 +30,7 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 ---@field attributes {[string]: any}?
 
 ---@class Table2Props
----@field children (Widget|Html|string|number|nil)[]?
+---@field children Renderable[]?
 ---@field variant 'generic'|'themed'?
 ---@field sortable (string|number|boolean)?
 ---@field caption Widget|Html|string|number?
@@ -55,7 +55,7 @@ Table2.defaultProps = {
 	columns = {},
 }
 
----@return (Widget|Html|string|number|nil)[]
+---@return Widget[]
 function Table2:render()
 	local props = self.props
 

@@ -156,9 +156,12 @@ function CountryRepresentation:create()
 				attributes = {['data-sort-value'] = #players},
 				children = self:_ratioDisplay(#players)
 			},
-			TableWidgets.Cell{children = Array.interleave(Array.map(players, function (player)
-				return PlayerDisplay.InlinePlayer{player = player, showFlag = false}
-			end), ', ')},
+			TableWidgets.Cell{
+				nowrap = false,
+				children = Array.interleave(Array.map(players, function (player)
+					return PlayerDisplay.InlinePlayer{player = player, showFlag = false}
+				end), ', ')
+			},
 		}})
 	end
 

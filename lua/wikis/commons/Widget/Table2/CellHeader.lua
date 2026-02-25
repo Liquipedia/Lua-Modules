@@ -16,7 +16,7 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
 ---@class Table2CellHeaderProps
----@field children (Widget|Html|string|number|nil)[]?
+---@field children Renderable[]?
 ---@field section 'head'|'body'|'subhead'?
 ---@field align ('left'|'right'|'center')?
 ---@field shrink (string|number|boolean)?
@@ -64,6 +64,13 @@ function Table2CellHeader:render()
 		if Logic.readBool(props.unsortable) then
 			attributes.class = 'unsortable'
 		end
+
+		attributes = ColumnUtil.buildCellAttributes(
+			props.align,
+			props.nowrap,
+			props.shrink,
+			attributes
+		)
 
 		return HtmlWidgets.Th{
 			attributes = attributes,

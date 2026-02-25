@@ -16,9 +16,9 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
 ---@class ContentSwitchTab
----@field label string|Widget|Html|(string|Widget|Html)[]
+---@field label Renderable|Renderable[]
 ---@field value string
----@field content string|Widget|Html|(string|Widget|Html)[]
+---@field content Renderable|Renderable[]
 
 ---@class ContentSwitchParameters
 ---@field tabs ContentSwitchTab[]

@@ -15,7 +15,7 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
 ---@class Table2CellProps
----@field children (Widget|Html|string|number|nil)[]?
+---@field children Renderable[]?
 ---@field align ('left'|'right'|'center')?
 ---@field shrink (string|number|boolean)?
 ---@field nowrap (string|number|boolean)?
@@ -34,6 +34,10 @@ local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 ---@field props Table2CellProps
 local Table2Cell = Class.new(Widget)
 
+Table2Cell.defaultProps = {
+	nowrap = true,
+}
+
 ---@return Widget
 function Table2Cell:render()
 	local props = self.props
@@ -43,7 +47,12 @@ function Table2Cell:render()
 	-- Skip context lookups and property merging if there are no column definitions
 	if not columns then
 		return HtmlWidgets.Td{
-			attributes = props.attributes,
+			attributes = ColumnUtil.buildCellAttributes(
+				props.align,
+				props.nowrap,
+				props.shrink,
+				props.attributes
+			),
 			children = props.children,
 		}
 	end
