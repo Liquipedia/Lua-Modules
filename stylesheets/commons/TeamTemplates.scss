@@ -149,22 +149,24 @@ Author(s): iMarbot, Darkrai
 Template(s): Group Table Hybrid
 Author(s): iMarbot
 *******************************************************************************/
-@media ( max-width: 399px ) {
-	.grouptableslot .team-template-text.mobile-hide {
-		display: none !important;
+.grouptableslot .team-template-text {
+	&.mobile-hide {
+		@media ( max-width: 399px ) {
+			display: none !important;
+		}
+
+		@media ( min-width: 400px ) {
+			display: unset !important;
+		}
 	}
 
-	.grouptableslot .team-template-text.mobile-only {
-		display: unset !important;
-	}
-}
+	&.mobile-only {
+		@media ( max-width: 399px ) {
+			display: unset !important;
+		}
 
-@media ( min-width: 400px ) {
-	.grouptableslot .team-template-text.mobile-hide {
-		display: unset !important;
-	}
-
-	.grouptableslot .team-template-text.mobile-only {
-		display: none !important;
+		@media ( min-width: 400px ) {
+			display: none !important;
+		}
 	}
 }
