@@ -413,6 +413,7 @@ function BaseResultsTable:_buildRows(placementData)
 
 	if placementData.header then
 		table.insert(rows, TableWidgets.Row{
+			section = 'subhead',
 			classes = {'sortbottom'},
 			css = {['font-weight'] = 'bold'},
 			children = TableWidgets.CellHeader{
