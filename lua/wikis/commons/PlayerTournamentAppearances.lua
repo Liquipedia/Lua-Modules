@@ -35,6 +35,7 @@ local ConditionUtil = Condition.Util
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
 local Th = HtmlWidgets.Th
 local Tr = HtmlWidgets.Tr
@@ -228,35 +229,33 @@ function Appearances:build()
 
 	local limit = math.min(self.config.limit or #self.players, #self.players)
 
-	return DataTable{
-		classes = {'wikitable-striped'},
+	return TableWidgets.Table{
 		sortable = true,
-		css = {['margin-bottom'] = '10px'},
-		tableCss = {
-			['text-align'] = 'center',
-			margin = 0,
-		},
 		children = WidgetUtil.collect(
 			self:_header(),
-			Array.map(Array.range(1, limit), FnUtil.curry(Appearances._row, self)),
-			(self.config.restrictToPlayersParticipatingIn and not self.config.isFormQuery) and self:_buildQueryLink() or nil
-		)
+			TableWidgets.TableBody{
+				children = Array.map(Array.range(1, limit), FnUtil.curry(Appearances._row, self))
+			}
+		),
+		footer = self:_buildQueryLink()
 	}
 end
 
 ---@private
 ---@return Widget
 function Appearances:_header()
-	return Tr{children = WidgetUtil.collect(
-		Th{},
-		Th{children = 'Player'},
-		Th{children = HtmlWidgets.Abbr{children = 'TA.', title = 'Total appearances'}},
-		Array.map(self.tournaments, function (tournament)
-			return Th{children = TournamentTitle{
-				tournament = tournament, useShortName = true
-			}}
-		end)
-	)}
+	return TableWidgets.TableHeader{children = {
+		TableWidgets.Row{children = WidgetUtil.collect(
+			TableWidgets.CellHeader{},
+			TableWidgets.CellHeader{children = 'Player'},
+			TableWidgets.CellHeader{children = HtmlWidgets.Abbr{children = 'TA.', title = 'Total appearances'}},
+			Array.map(self.tournaments, function (tournament)
+				return TableWidgets.CellHeader{children = TournamentTitle{
+					tournament = tournament, useShortName = true
+				}}
+			end)
+		)}
+	}}
 end
 
 ---@private
@@ -265,42 +264,47 @@ end
 function Appearances:_row(playerIndex)
 	local player = self.players[playerIndex]
 
-	local row = mw.html.create('tr')
-		:tag('td'):wikitext(Flags.Icon{flag = player.flag}):done()
-
-	row
-		:tag('td'):css('text-align', 'left'):node(PlayerDisplay.InlinePlayer{
+	return TableWidgets.Row{children = WidgetUtil.collect(
+		TableWidgets.Cell{children = Flags.Icon{flag = player.flag}},
+		TableWidgets.Cell{children = PlayerDisplay.InlinePlayer{
 			player = player, showFlag = false
-		}):done()
-		:tag('td'):wikitext(player.extradata.appearances)
-
-	Array.forEach(self.tournaments, function (tournament)
-		local result = player.extradata.results[tournament.pageName]
-		local cell = row:tag('td')
-
-		if self.config.showPlacementInsteadOfTeam then
-			-- Default to empty string to use data-sort-value
-			Placement._placement{parent = cell, placement = (result or {}).placement or ''}
-		elseif result then
-			cell
-				:attr('data-sort-value', result.team)
-				:node(result.team and OpponentDisplay.InlineTeamContainer{
-					template = result.team, date = result.date, style = 'icon'
-				} or nil)
-
-			if tonumber(result.placement) == 1 then
-				cell:addClass('tournament-highlighted-bg')
+		}},
+		TableWidgets.Cell{children = player.extradata.appearances},
+		Array.map(self.tournaments, function (tournament)
+			local result = player.extradata.results[tournament.pageName] or {}
+			if self.config.showPlacementInsteadOfTeam then
+				local rawPlacement = Placement.raw(result.placement or '')
+				return TableWidgets.Cell{
+					attributes = {
+						['data-sort-value'] = rawPlacement.sort
+					},
+					classes = {rawPlacement.backgroundClass},
+					children = HtmlWidgets.B{
+						classes = not rawPlacement.blackText and {'placement-text'} or nil,
+						children = rawPlacement.display
+					}
+				}
+			elseif Logic.isNotEmpty(result) then
+				return TableWidgets.Cell{
+					align = 'center',
+					classes = tonumber(result.placement) == 1 and {'tournament-highlighted-bg'} or nil,
+					attributes = {['data-sort-value'] = result.team},
+					children = result.team and OpponentDisplay.InlineTeamContainer{
+						template = result.team, date = result.date, style = 'icon'
+					} or nil
+				}
 			end
-		end
-	end)
-
-	return row
+			return TableWidgets.Cell{}
+		end)
+	)}
 end
 
 ---@private
 ---@return Widget?
 function Appearances:_buildQueryLink()
-	if not Page.exists('Form:' .. FORM_NAME) then
+	if not self.config.restrictToPlayersParticipatingIn or self.config.isFormQuery then
+		return
+	elseif not Page.exists('Form:' .. FORM_NAME) then
 		return
 	end
 	local queryTable = {
