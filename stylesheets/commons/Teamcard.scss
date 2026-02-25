@@ -140,22 +140,20 @@ Author(s): ???
 
 .teamcard-toggle-button {
 	display: flow-root;
-}
 
-.teamcard-toggle-button button {
-	margin: 0 0 10px 10px;
-	width: fit-content;
-	float: right;
-}
-
-.teamcard-toggle-button-left button {
-	margin: 0 10px 10px 0;
-	float: left;
-}
-
-@media ( max-width: 600px ) {
-	.teamcard-toggle-button {
+	@media ( max-width: 600px ) {
 		display: none !important;
+	}
+
+	button {
+		margin: 0 0 10px 10px;
+		width: fit-content;
+		float: right;
+	}
+
+	&-left button {
+		margin: 0 10px 10px 0;
+		float: left;
 	}
 }
 
@@ -172,12 +170,14 @@ Author(s): ???
 	min-height: unset !important;
 }
 
-.wiki-apexlegends .teamcard-former-toggle-button button {
-	width: 121px;
-}
+.teamcard-former-toggle-button button {
+	.wiki-apexlegends & {
+		width: 121px;
+	}
 
-.wiki-teamfortress .teamcard-former-toggle-button button {
-	width: 181px;
+	.wiki-teamfortress & {
+		width: 181px;
+	}
 }
 
 .teamcard {
