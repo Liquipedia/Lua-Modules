@@ -5,28 +5,28 @@ Author(s): ???
 .teamcard {
 	position: relative;
 	width: 200px;
-}
 
-.teamcard > center {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
+	> center {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
 
-.teamcard table.list,
-.teamcard table.logo {
-	height: 121px;
-	margin-top: 0;
-	width: 200px;
-}
+	table.list,
+	table.logo {
+		height: 121px;
+		margin-top: 0;
+		width: 200px;
+	}
 
-.teamcard table.list,
-.teamcard.teamcard-opened table.list.former,
-.teamcard.teamcard-opened table.list.subs {
-	opacity: 0 !important;
-	position: absolute;
-	z-index: 2;
-	table-layout: fixed;
+	table.list,
+	&.teamcard-opened table.list.former,
+	&.teamcard-opened table.list.subs {
+		opacity: 0 !important;
+		position: absolute;
+		z-index: 2;
+		table-layout: fixed;
+	}
 }
 
 @media ( min-width: 601px ) {
