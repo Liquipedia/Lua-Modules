@@ -476,19 +476,21 @@ Author(s): iMarbot
 	margin-left: 0 !important;
 	position: absolute;
 	z-index: 17;
+
+	.template-box & {
+		background-color: var( --clr-background, #f8f9fa );
+		border-color: var( --table-border-color, #a2a9b1 );
+	}
 }
 
-.inotes-inner dl {
-	margin-bottom: 0;
-}
+.inotes-inner {
+	dl {
+		margin-bottom: 0;
+	}
 
-.inotes-inner dd {
-	margin-left: 0;
-}
-
-.template-box .inotes-box {
-	background-color: var( --clr-background, #f8f9fa );
-	border-color: var( --table-border-color, #a2a9b1 );
+	dd {
+		margin-left: 0;
+	}
 }
 
 /*******************************************************************************
