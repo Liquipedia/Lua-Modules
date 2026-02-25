@@ -14,7 +14,24 @@ Author(s): FO-nTTaX
 }
 
 .team-template-image-icon {
+	width: 60px;
+	height: 25px;
+	display: inline-block;
+	text-align: center;
 	vertical-align: 2px;
+
+	img {
+		max-width: 50px;
+		max-height: 25px;
+		width: auto;
+		height: auto;
+	}
+
+	i {
+		font-size: 25px;
+		vertical-align: middle;
+		color: var( --clr-secondary-70 );
+	}
 }
 
 .team-template-image-legacy {
@@ -32,26 +49,6 @@ Author(s): FO-nTTaX
 
 .bind-highlighting {
 	display: none;
-}
-
-.team-template-image-icon {
-	width: 60px;
-	height: 25px;
-	display: inline-block;
-	text-align: center;
-
-	img {
-		max-width: 50px;
-		max-height: 25px;
-		width: auto;
-		height: auto;
-	}
-
-	i {
-		font-size: 25px;
-		vertical-align: middle;
-		color: var( --clr-secondary-70 );
-	}
 }
 
 .tabs .team-template-image img {
