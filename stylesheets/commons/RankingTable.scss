@@ -123,6 +123,18 @@
 		[ data-ranking-table-cell="region" ] {
 			display: none;
 		}
+
+		& > select.ranking-table__select {
+			.theme--light & {
+				border-color: var( --clr-on-surface-light-primary-16 );
+				background-color: var( --clr-on-surface-light-primary-8 );
+			}
+
+			.theme--dark & {
+				border-color: var( --clr-on-surface-dark-primary-16 );
+				background-color: var( --clr-on-surface-dark-primary-8 );
+			}
+		}
 	}
 
 	&__select-container {
@@ -133,6 +145,13 @@
 	}
 
 	&__patch-label {
+		.theme--light & {
+			color: var( --clr-secondary-16 );
+		}
+
+		.theme--dark & {
+			color: #ffffff;
+		}
 		opacity: 0.7;
 	}
 }
