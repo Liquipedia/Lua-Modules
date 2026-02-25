@@ -201,6 +201,12 @@ $table2-cell-padding-x: 0.75rem;
 		}
 	}
 
+	.table2__subheader-cell {
+		position: sticky;
+		left: 0.75rem;
+		width: min-content;
+	}
+
 	&--themed {
 		.table2__title {
 			.theme--light & {

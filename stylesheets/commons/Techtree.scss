@@ -5,11 +5,18 @@ Author(s): FO-nTTaX, based on http://thecodeplayer.com/walkthrough/css3-family-t
 .techtree ul {
 	line-height: 0 !important;
 	margin: 0 !important;
-}
-
-.techtree ul {
 	padding-top: 20px;
 	position: relative;
+
+	ul::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 50%;
+		border-left: 1px solid #aaaaaa;
+		width: 0;
+		height: 20px;
+	}
 }
 
 .techtree li {
@@ -19,61 +26,51 @@ Author(s): FO-nTTaX, based on http://thecodeplayer.com/walkthrough/css3-family-t
 	list-style-image: none !important;
 	position: relative;
 	padding: 20px 5px 0 5px;
-}
 
-.techtree li::before,
-.techtree li::after {
-	content: "";
-	position: absolute;
-	top: 0;
-	right: 50%;
-	border-top: 1px solid #aaaaaa;
-	width: 50%;
-	height: 20px;
-}
+	&::before,
+	&::after {
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 50%;
+		border-top: 1px solid #aaaaaa;
+		width: 50%;
+		height: 20px;
+	}
 
-.techtree li::after {
-	right: auto;
-	left: 50%;
-	border-left: 1px solid #aaaaaa;
-}
+	&::after {
+		right: auto;
+		left: 50%;
+		border-left: 1px solid #aaaaaa;
+	}
 
-.techtree li:only-child::after,
-.techtree li:only-child::before {
-	display: none;
-}
+	&:only-child::after,
+	&:only-child::before {
+		display: none;
+	}
 
-.techtree li:first-child::before,
-.techtree li:last-child::after {
-	border: 0 none;
-}
+	&:first-child::before,
+	&:last-child::after {
+		border: 0 none;
+	}
 
-.techtree li:last-child::before {
-	border-right: 1px solid #aaaaaa;
-	border-radius: 0 5px 0 0;
-	-webkit-border-radius: 0 5px 0 0;
-	-moz-border-radius: 0 5px 0 0;
-}
+	&:last-child::before {
+		border-right: 1px solid #aaaaaa;
+		border-radius: 0 5px 0 0;
+		-webkit-border-radius: 0 5px 0 0;
+		-moz-border-radius: 0 5px 0 0;
+	}
 
-.techtree li:first-child::after {
-	border-radius: 5px 0 0 0;
-	-webkit-border-radius: 5px 0 0 0;
-	-moz-border-radius: 5px 0 0 0;
-}
+	&:first-child::after {
+		border-radius: 5px 0 0 0;
+		-webkit-border-radius: 5px 0 0 0;
+		-moz-border-radius: 5px 0 0 0;
+	}
 
-.techtree ul ul::before {
-	content: "";
-	position: absolute;
-	top: 0;
-	left: 50%;
-	border-left: 1px solid #aaaaaa;
-	width: 0;
-	height: 20px;
-}
-
-.techtree li span {
-	text-decoration: none;
-	display: inline-block;
+	span {
+		text-decoration: none;
+		display: inline-block;
+	}
 }
 
 .techtree ul.techtreeonechild::before {
@@ -90,16 +87,16 @@ Author(s): FO-nTTaX, based on http://thecodeplayer.com/walkthrough/css3-family-t
 	border: 1px solid #aaaaaa;
 	border-radius: 7px;
 	padding: 2px;
-}
 
-.techtree-building .techtreename {
-	display: table-cell;
-	color: #ffffff;
-	font-size: 16px;
-	font-weight: bold;
-	text-align: left;
-	vertical-align: middle;
-	white-space: nowrap;
+	.techtreename {
+		display: table-cell;
+		color: #ffffff;
+		font-size: 16px;
+		font-weight: bold;
+		text-align: left;
+		vertical-align: middle;
+		white-space: nowrap;
+	}
 }
 
 /*******************************************************************************
@@ -117,62 +114,62 @@ Author(s): sentihs, hjpalpha
 	width: 200px;
 	text-align: center;
 	font-size: 0.875rem;
-}
 
-.sg-techtree .sg-techtree-building > tbody > tr > th,
-.sg-techtree .sg-techtree-building > tbody > tr > td {
-	padding: 4px;
+	.sg-techtree & > tbody > tr > th,
+	.sg-techtree & > tbody > tr > td {
+		padding: 4px;
+	}
 }
 
 .sg-techtree-left-branch {
 	width: 24px;
-}
 
-.sg-techtree .sg-techtree-left-branch > tbody > tr,
-.sg-techtree .sg-techtree-left-branch > tbody > tr > td {
-	height: 50%;
-}
+	.sg-techtree & > tbody > tr,
+	.sg-techtree & > tbody > tr > td {
+		height: 50%;
+	}
 
-.sg-techtree-left-branch > tbody > tr > td {
-	width: 24px;
-	vertical-align: bottom;
-	text-align: center;
-}
+	> tbody > tr > td {
+		width: 24px;
+		vertical-align: bottom;
+		text-align: center;
+	}
 
-.sg-techtree-left-branch-one-child-border {
-	border-top: 1px dashed;
-}
+	&-one-child-border {
+		border-top: 1px dashed;
+	}
 
-.sg-techtree-left-branch-first-child-border {
-	border-left: 1px dashed;
-	border-top: 1px dashed;
-}
+	&-first-child-border {
+		border-left: 1px dashed;
+		border-top: 1px dashed;
+	}
 
-.sg-techtree-left-branch-last-child-border {
-	border-left: 1px dashed;
-	border-bottom: 1px dashed;
-}
+	&-last-child-border {
+		border-left: 1px dashed;
+		border-bottom: 1px dashed;
+	}
 
-.sg-techtree-left-branch-middle-child-border-top {
-	border-left: 1px dashed;
-}
+	&-middle-child-border-top {
+		border-left: 1px dashed;
+	}
 
-.sg-techtree-left-branch-middle-child-border-bottom {
-	border-left: 1px dashed;
-	border-top: 1px dashed;
+	&-middle-child-border-bottom {
+		border-left: 1px dashed;
+		border-top: 1px dashed;
+	}
 }
 
 .sg-techtree-right-branch {
 	padding: 0;
 	margin: 0;
-}
 
-.sg-techtree .sg-techtree-right-branch > tbody > tr,
-.sg-techtree .sg-techtree-right-branch > tbody > tr > td {
-	height: 50%;
-	width: 24px;
-}
+	.sg-techtree & > tbody > tr,
+	.sg-techtree & > tbody > tr > td {
+		height: 50%;
+		width: 24px;
+	}
 
-.sg-techtree-right-branch-div-border {
-	border-top: 1px dashed;
+	&-div-border {
+		border-top: 1px dashed;
+	}
 }

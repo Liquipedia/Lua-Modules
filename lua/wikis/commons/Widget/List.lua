@@ -17,7 +17,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ListWidget: Widget
 ---@operator call(table): ListWidget
----@field props {children: ((string|Widget|Html|nil)|(string|Widget|Html|nil)[])[]}
+---@field props {children: (Renderable|Renderable[])[]}
 local ListWidget = Class.new(Widget)
 
 ---@return Widget?
