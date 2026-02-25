@@ -302,33 +302,31 @@ Author: warnull
 	flex-wrap: wrap;
 	gap: 8px;
 	margin: 12px 0;
-}
 
-.rts-team-list-section-header {
-	font-weight: bold;
-	width: 100%;
+	&-header {
+		font-weight: bold;
+		width: 100%;
+	}
 }
 
 .rts-team-list-card {
 	border: 1px solid var( --clr-border, #bbbbbb );
-}
 
-@media ( max-width: 435px ) {
-	.rts-team-list-card {
+	@media ( max-width: 435px ) {
 		width: 100% !important;
 	}
-}
 
-.rts-team-list-card-header {
-	padding: 4px 8px;
+	&-header {
+		padding: 4px 8px;
+
+		> .rts-team-list-team-title {
+			font-weight: bold;
+		}
+	}
 }
 
 .rts-team-list-team-title {
 	margin: 0 -4px;
-}
-
-.rts-team-list-card-header > .rts-team-list-team-title {
-	font-weight: bold;
 }
 
 .rts-team-list-team-subtitle {
@@ -340,10 +338,10 @@ Author: warnull
 	background-color: var( --clr-surface-2, #eaecf0 );
 	border-top: 1px solid var( --clr-border, #bbbbbb );
 	padding: 5px;
-}
 
-.rts-team-list-entries-header-text {
-	font-weight: bold;
+	&-text {
+		font-weight: bold;
+	}
 }
 
 .rts-team-list-tbd-entry {
@@ -358,29 +356,29 @@ Author: warnull
 	display: flex;
 	justify-content: space-between;
 	padding: 5px;
-}
 
-.rts-team-list-entry > .block-team,
-.rts-team-list-entry > .block-player,
-.rts-team-list-entry > .block-literal {
-	flex: 1 1 auto;
-	min-width: 0;
-}
+	> .block-team,
+	> .block-player,
+	> .block-literal {
+		flex: 1 1 auto;
+		min-width: 0;
+	}
 
-.rts-team-list-entry:nth-of-type( 2n ) {
-	background: var( --clr-surface-2, #f5f5f5 );
-}
+	&:nth-of-type( 2n ) {
+		background: var( --clr-surface-2, #f5f5f5 );
+	}
 
-.collapsed > .rts-team-list-entry {
-	display: none;
-}
+	.collapsed > & {
+		display: none;
+	}
 
-.rts-team-list-entry-right {
-	display: flex;
-}
+	&-right {
+		display: flex;
+	}
 
-.rts-team-list-entry-tags {
-	margin-left: 2px;
+	&-tags {
+		margin-left: 2px;
+	}
 }
 
 .rts-team-list-icon-tag {
