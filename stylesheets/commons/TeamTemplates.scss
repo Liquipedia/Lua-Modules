@@ -5,6 +5,12 @@ Author(s): FO-nTTaX
 
 .team-template-image {
 	vertical-align: 2px;
+
+	img {
+		width: 60px;
+		height: 25px;
+		image-rendering: -webkit-optimize-contrast;
+	}
 }
 
 .team-template-image-icon {
@@ -13,6 +19,11 @@ Author(s): FO-nTTaX
 
 .team-template-image-legacy {
 	vertical-align: 2px;
+
+	img {
+		width: 60px;
+		height: 25px;
+	}
 }
 
 .team-template-team-part {
@@ -23,35 +34,24 @@ Author(s): FO-nTTaX
 	display: none;
 }
 
-.team-template-image img {
-	width: 60px;
-	height: 25px;
-	image-rendering: -webkit-optimize-contrast;
-}
-
 .team-template-image-icon {
 	width: 60px;
 	height: 25px;
 	display: inline-block;
 	text-align: center;
-}
 
-.team-template-image-icon img {
-	max-width: 50px;
-	max-height: 25px;
-	width: auto;
-	height: auto;
-}
+	img {
+		max-width: 50px;
+		max-height: 25px;
+		width: auto;
+		height: auto;
+	}
 
-.team-template-image-icon i {
-	font-size: 25px;
-	vertical-align: middle;
-	color: var( --clr-secondary-70 );
-}
-
-.team-template-image-legacy img {
-	width: 60px;
-	height: 25px;
+	i {
+		font-size: 25px;
+		vertical-align: middle;
+		color: var( --clr-secondary-70 );
+	}
 }
 
 .tabs .team-template-image img {
@@ -64,17 +64,17 @@ Author(s): FO-nTTaX
 	height: 17px;
 }
 
-.tabs .team-template-image-icon img {
-	max-width: 40px;
-	max-height: 17px;
-	width: auto;
-	height: auto;
-	margin-right: 9px;
-}
-
 .tabs .team-template-image-icon {
 	width: auto;
 	height: 17px;
+
+	img {
+		max-width: 40px;
+		max-height: 17px;
+		width: auto;
+		height: auto;
+		margin-right: 9px;
+	}
 }
 
 /* Improved match1 display by iMarbot */
