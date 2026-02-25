@@ -45,6 +45,10 @@ Author(s): XtratoS
 	transform-origin: bottom center;
 }
 
+.automatic-points-table .diagonal-header-div-cell .content > * {
+	margin-right: 6px;
+}
+
 .automatic-points-table .divCell.border-top-right {
 	border-style: solid;
 	border-width: 1px 1px 0 0;
