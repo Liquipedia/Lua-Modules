@@ -89,54 +89,54 @@ Author(s): ???
 	.teamcard-preview {
 		text-align: center;
 	}
-}
 
-@media ( max-width: 600px ) {
-	.teamcard:not( .teamcard-nomobile ) {
-		position: relative;
-		width: 100%;
-
-		table.logo {
+	@media ( max-width: 600px ) {
+		&:not( .teamcard-nomobile ) {
+			position: relative;
 			width: 100%;
 
-			img:not( [ src$=".svg" ] ) {
-				width: auto;
-				height: auto;
-				max-width: 90%;
-				max-height: 90%;
+			table.logo {
+				width: 100%;
+
+				img:not( [ src$=".svg" ] ) {
+					width: auto;
+					height: auto;
+					max-width: 90%;
+					max-height: 90%;
+				}
+
+				div.center {
+					width: 40% !important;
+				}
 			}
 
-			div.center {
-				width: 40% !important;
+			.teamcard-inner {
+				position: relative;
+			}
+
+			table.list {
+				opacity: 1 !important;
+				table-layout: fixed;
+				position: absolute;
+				top: 0;
+				width: 60% !important;
+				left: 40%;
+			}
+
+			.league-icon-small-image img {
+				max-width: 25px !important;
+				max-height: 25px !important;
 			}
 		}
 
-		.teamcard-inner {
-			position: relative;
+		&:not( .teamcard-former-opened ) table.list.former,
+		&:not( .teamcard-subs-opened ) table.list.subs,
+		&.teamcard-former-opened table.list.active,
+		&.teamcard-former-opened table.list.subs,
+		&.teamcard-subs-opened table.list.active,
+		&.teamcard-subs-opened table.list.former {
+			display: none !important;
 		}
-
-		table.list {
-			opacity: 1 !important;
-			table-layout: fixed;
-			position: absolute;
-			top: 0;
-			width: 60% !important;
-			left: 40%;
-		}
-
-		.league-icon-small-image img {
-			max-width: 25px !important;
-			max-height: 25px !important;
-		}
-	}
-
-	.teamcard:not( .teamcard-former-opened ) table.list.former,
-	.teamcard:not( .teamcard-subs-opened ) table.list.subs,
-	.teamcard.teamcard-former-opened table.list.active,
-	.teamcard.teamcard-former-opened table.list.subs,
-	.teamcard.teamcard-subs-opened table.list.active,
-	.teamcard.teamcard-subs-opened table.list.former {
-		display: none !important;
 	}
 }
 
