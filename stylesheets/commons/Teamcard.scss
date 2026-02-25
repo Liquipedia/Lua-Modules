@@ -90,37 +90,42 @@ Author(s): ???
 }
 
 @media ( max-width: 600px ) {
-	.teamcard:not( .teamcard-nomobile ) table.logo {
-		width: 100%;
-	}
-
-	.teamcard:not( .teamcard-nomobile ) table.logo img:not( [ src$=".svg" ] ) {
-		width: auto;
-		height: auto;
-		max-width: 90%;
-		max-height: 90%;
-	}
-
 	.teamcard:not( .teamcard-nomobile ) {
 		position: relative;
 		width: 100%;
-	}
 
-	.teamcard:not( .teamcard-nomobile ) .teamcard-inner {
-		position: relative;
-	}
+		table.logo {
+			width: 100%;
 
-	.teamcard:not( .teamcard-nomobile ) table.logo div.center {
-		width: 40% !important;
-	}
+			img:not( [ src$=".svg" ] ) {
+				width: auto;
+				height: auto;
+				max-width: 90%;
+				max-height: 90%;
+			}
 
-	.teamcard:not( .teamcard-nomobile ) table.list {
-		opacity: 1 !important;
-		table-layout: fixed;
-		position: absolute;
-		top: 0;
-		width: 60% !important;
-		left: 40%;
+			div.center {
+				width: 40% !important;
+			}
+		}
+
+		.teamcard-inner {
+			position: relative;
+		}
+
+		table.list {
+			opacity: 1 !important;
+			table-layout: fixed;
+			position: absolute;
+			top: 0;
+			width: 60% !important;
+			left: 40%;
+		}
+
+		.league-icon-small-image img {
+			max-width: 25px !important;
+			max-height: 25px !important;
+		}
 	}
 
 	.teamcard:not( .teamcard-former-opened ) table.list.former,
@@ -130,11 +135,6 @@ Author(s): ???
 	.teamcard.teamcard-subs-opened table.list.active,
 	.teamcard.teamcard-subs-opened table.list.former {
 		display: none !important;
-	}
-
-	.teamcard:not( .teamcard-nomobile ) .league-icon-small-image img {
-		max-width: 25px !important;
-		max-height: 25px !important;
 	}
 }
 
