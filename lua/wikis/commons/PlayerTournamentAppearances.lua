@@ -276,10 +276,7 @@ function Appearances:_row(playerIndex)
 						['data-sort-value'] = rawPlacement.sort
 					},
 					classes = {rawPlacement.backgroundClass},
-					children = HtmlWidgets.B{
-						classes = not rawPlacement.blackText and {'placement-text'} or nil,
-						children = rawPlacement.display
-					}
+					children = Placement.renderInWidget{placement = result.placement}
 				}
 			elseif Logic.isNotEmpty(result) then
 				return TableWidgets.Cell{
