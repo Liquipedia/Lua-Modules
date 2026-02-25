@@ -32,13 +32,10 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local TournamentTitle = Lua.import('Module:Widget/Tournament/Title')
-local Th = HtmlWidgets.Th
-local Tr = HtmlWidgets.Tr
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local DEFAULT_TIERTYPES = {'General', 'School', ''}
@@ -318,15 +315,11 @@ function Appearances:_buildQueryLink()
 		wpRunQuery = 'Run query',
 	}
 
-	return Tr{children = Th{
-		attributes = {colspan = #self.tournaments + 3},
-		css = {['font-size'] = 'small'},
-		children = LinkWidget{
-			link = tostring(mw.uri.fullUrl('Special:RunQuery/' .. FORM_NAME, queryTable)),
-			children = 'Click here to modify this table',
-			linktype = 'external',
-		}
-	}}
+	return LinkWidget{
+		link = tostring(mw.uri.fullUrl('Special:RunQuery/' .. FORM_NAME, queryTable)),
+		children = 'Click here to modify this table',
+		linktype = 'external',
+	}
 end
 
 return Appearances
