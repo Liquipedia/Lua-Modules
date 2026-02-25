@@ -86,7 +86,7 @@ function AutomaticPointsTableWidget:createHeader()
 		classes = {'divHeaderRow', 'diagonal'},
 		children = WidgetUtil.collect(
 			AutomaticPointsTableWidget._createHeaderCell('Ranking','ranking'),
-			AutomaticPointsTableWidget._createHeaderCell('Team', 'team'),
+			AutomaticPointsTableWidget._createHeaderCell('Participant', 'participant'),
 			AutomaticPointsTableWidget._createHeaderCell('Total Points'),
 			Array.flatMap(tournaments, function (tournament)
 				return {
@@ -137,7 +137,7 @@ function AutomaticPointsTableWidget:createRow(opponent, opponentIndex)
 			AutomaticPointsTableWidget._createRowCell{
 				additionalClasses = {'name-cell'},
 				background = opponent.background,
-				children = OpponentDisplay.BlockOpponent{opponent = opponent.opponent, note = opponent.note},
+ 				children = OpponentDisplay.BlockOpponent{opponent = opponent.opponent, note = opponent.note, showPlayerTeam = true},
 			},
 			self:_createTotalPointsCell(opponent),
 			Array.flatMap(opponent.results, function (result, resultIndex)
