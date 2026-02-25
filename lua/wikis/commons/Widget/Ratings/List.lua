@@ -123,7 +123,7 @@ function RatingsList:render()
 			HtmlWidgets.Div {
 				children = {
 					HtmlWidgets.Span { children = 'Data provided by ' },
-					IconImage { imageLight = 'SAP_logo.svg' }
+					IconImage { imageLight = 'SAP_logo.svg', size = '90px' }
 				},
 				classes = { 'ranking-table__top-row-logo-container' }
 			}

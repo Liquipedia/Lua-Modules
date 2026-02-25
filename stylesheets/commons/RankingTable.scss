@@ -76,10 +76,6 @@
 		&:hover {
 			background-color: transparent !important;
 		}
-
-		> td {
-			padding: 0 !important;
-		}
 	}
 
 	&__toggle-graph {
@@ -106,7 +102,7 @@
 	}
 
 	&__graph-row-container {
-		padding: 1.5rem 0;
+		padding: 1.5rem 0 !important;
 
 		.team-template-team-standard {
 			display: flex;
