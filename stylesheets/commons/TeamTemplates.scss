@@ -81,27 +81,29 @@ span.team-template-team-bracket {
 	height: var( --team-template-bracket-height, 21px );
 }
 
-.team-template-team-bracket .team-template-image-icon,
-.team-template-team-bracket .team-template-image-legacy {
-	vertical-align: 0;
-	height: var( --team-template-bracket-height, 21px );
-	width: calc( var( --team-template-bracket-height, 21px ) * 2.4 );
-}
+.team-template-team-bracket {
+	.team-template-image-icon,
+	.team-template-image-legacy {
+		vertical-align: 0;
+		height: var( --team-template-bracket-height, 21px );
+		width: calc( var( --team-template-bracket-height, 21px ) * 2.4 );
+	}
 
-.team-template-team-bracket .team-template-image-icon img {
-	max-width: 90%;
-	max-height: 100%;
-}
+	.team-template-image-icon img {
+		max-width: 90%;
+		max-height: 100%;
+	}
 
-.team-template-team-bracket .team-template-image-legacy img {
-	max-width: 100%;
-	max-height: 100%;
-	width: auto;
-	height: auto;
-}
+	.team-template-image-legacy img {
+		max-width: 100%;
+		max-height: 100%;
+		width: auto;
+		height: auto;
+	}
 
-.team-template-team-bracket > .team-template-text {
-	vertical-align: middle;
+	> .team-template-text {
+		vertical-align: middle;
+	}
 }
 
 /* fix for timeline by FO-nTTaX */
