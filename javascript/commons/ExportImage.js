@@ -483,7 +483,7 @@ class ExportService {
 	}
 
 	removePrizepoolToggles( clonedDoc ) {
-		const prizepoolToggles = clonedDoc.querySelectorAll( '.ppt-toggle-expand' );
+		const prizepoolToggles = clonedDoc.querySelectorAll( '.ppt-toggle-expand, .prizepooltabletoggle' );
 
 		for ( const prizepoolToggle of prizepoolToggles ) {
 			prizepoolToggle.remove();
