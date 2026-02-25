@@ -413,33 +413,33 @@ Author: warnull
 	border-left: 1px solid var( --clr-border, #bbbbbb );
 	border-right: 1px solid var( --clr-border, #bbbbbb );
 	display: inline-grid;
-}
 
-.rts-team-table-section {
-	display: contents;
+	&-section {
+		display: contents;
+	}
 }
 
 .rts-team-table-header-row {
 	background-color: #d0d0d0;
 	display: contents;
-}
 
-.rts-team-table-header-row > .opponent-list-cell {
-	font-weight: bold;
-	text-align: center;
-}
+	> .opponent-list-cell {
+		font-weight: bold;
+		text-align: center;
+	}
 
-.rts-team-table-header-row-players {
-	grid-column: entry 1 / -1;
-	min-width: 100px;
+	&-players {
+		grid-column: entry 1 / -1;
+		min-width: 100px;
+	}
 }
 
 .rts-team-table-team-row {
 	display: contents;
-}
 
-.rts-team-table-team-row:nth-of-type( 2n+1 ) {
-	background: var( --clr-surface-2, #f5f5f5 );
+	&:nth-of-type( 2n+1 ) {
+		background: var( --clr-surface-2, #f5f5f5 );
+	}
 }
 
 .rts-team-table-team-cell {
@@ -459,10 +459,10 @@ Author: warnull
 .rts-team-table-player {
 	justify-content: space-between;
 	min-width: 100px;
-}
 
-.rts-team-list-adhoc .rts-team-table-player {
-	min-width: 160px;
+	.rts-team-list-adhoc & {
+		min-width: 160px;
+	}
 }
 
 /*******************************************************************************
