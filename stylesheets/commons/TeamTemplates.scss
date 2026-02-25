@@ -152,22 +152,22 @@ Template(s): Group Table Hybrid
 Author(s): iMarbot
 *******************************************************************************/
 .grouptableslot .team-template-text {
-	&.mobile-hide {
-		@media ( max-width: 399px ) {
+	@media ( max-width: 399px ) {
+		&.mobile-hide {
 			display: none !important;
 		}
 
-		@media ( min-width: 400px ) {
+		&.mobile-only {
 			display: unset !important;
 		}
 	}
 
-	&.mobile-only {
-		@media ( max-width: 399px ) {
+	@media ( min-width: 400px ) {
+		&.mobile-hide {
 			display: unset !important;
 		}
 
-		@media ( min-width: 400px ) {
+		&.mobile-only {
 			display: none !important;
 		}
 	}
