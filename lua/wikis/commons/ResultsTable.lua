@@ -96,7 +96,7 @@ function ResultsTable:buildRow(placement)
 		highlighted = self:rowHighlight(placement),
 		children = WidgetUtil.collect(
 			self:createDateCell(placement),
-			ResultsTable._placementToTableCell(placement),
+			ResultsTable._placementToTableCell(placement.placement),
 			self:createTierCell(placement),
 			self:createTypeCell(placement),
 			self.config.displayGameIcons and TableWidgets.Cell{
@@ -127,19 +127,15 @@ function ResultsTable:buildRow(placement)
 end
 
 ---@private
----@param placement placement
+---@param placement string
 ---@return Widget
 ResultsTable._placementToTableCell = FnUtil.memoize(function (placement)
-	local rawPlacement = Placement.raw(placement.placement or '')
+	local rawPlacement = Placement.raw(placement or '')
 	return TableWidgets.Cell{
 		attributes = {
 			['data-sort-value'] = rawPlacement.sort
 		},
-		classes = {rawPlacement.backgroundClass},
-		children = HtmlWidgets.B{
-			classes = not rawPlacement.blackText and {'placement-text'} or nil,
-			children = rawPlacement.display
-		}
+		children = Placement.renderInWidget{placement = placement}
 	}
 end)
 
