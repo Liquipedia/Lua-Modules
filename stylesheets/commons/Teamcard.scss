@@ -27,66 +27,68 @@ Author(s): ???
 		z-index: 2;
 		table-layout: fixed;
 	}
-}
 
-@media ( min-width: 601px ) {
-	.teamcard table.list:hover,
-	.teamcard table.list.active:hover,
-	.teamcard.teamcard-opened table.list,
-	.teamcard.teamcard-opened.teamcard-former-opened table.list.former,
-	.teamcard.teamcard-opened.teamcard-subs-opened table.list.subs,
-	.teamcard.teamcard-former-opened:hover table.list.former,
-	.teamcard.teamcard-subs-opened:hover table.list.subs {
-		opacity: 1 !important;
-		background-color: var( --clr-surface-3, rgba( 249, 249, 249, 0.95 ) ) !important;
+	@media ( min-width: 601px ) {
+		table.list:hover,
+		table.list.active:hover,
+		&.teamcard-opened table.list,
+		&.teamcard-opened.teamcard-former-opened table.list.former,
+		&.teamcard-opened.teamcard-subs-opened table.list.subs,
+		&.teamcard-former-opened:hover table.list.former,
+		&.teamcard-subs-opened:hover table.list.subs {
+			opacity: 1 !important;
+			background-color: var( --clr-surface-3, rgba( 249, 249, 249, 0.95 ) ) !important;
+		}
+
+		&.teamcard-former-opened table.list.active,
+		&.teamcard-former-opened table.list.subs,
+		&.teamcard-subs-opened table.list.active,
+		&.teamcard-subs-opened table.list.former {
+			display: none !important;
+			opacity: 0 !important;
+		}
 	}
 
-	.teamcard.teamcard-former-opened table.list.active,
-	.teamcard.teamcard-former-opened table.list.subs,
-	.teamcard.teamcard-subs-opened table.list.active,
-	.teamcard.teamcard-subs-opened table.list.former {
-		display: none !important;
-		opacity: 0 !important;
+	table.logo td {
+		padding: 0;
 	}
-}
 
-.teamcard table.logo td {
-	padding: 0;
-}
+	table.list {
+		td,
+		th {
+			padding: 2px;
+		}
 
-.teamcard table.list td,
-.teamcard table.list th {
-	padding: 2px;
-}
+		th {
+			width: 20px;
+		}
 
-.teamcard table.list th {
-	width: 20px;
-}
+		td {
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			overflow: hidden;
+		}
+	}
 
-.teamcard table.list td {
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	overflow: hidden;
-}
+	.teamcard-placement {
+		padding: 0 !important;
 
-.teamcard .teamcard-placement {
-	padding: 0 !important;
-}
+		table.teamcard-placement-table {
+			width: 100%;
+			text-align: center;
+			height: 29px;
+		}
+	}
 
-.teamcard .teamcard-placement table.teamcard-placement-table {
-	width: 100%;
-	text-align: center;
-	height: 29px;
-}
+	.teamcard-qualifier {
+		text-align: center;
+		font-weight: bold;
+		height: 25px;
+	}
 
-.teamcard .teamcard-qualifier {
-	text-align: center;
-	font-weight: bold;
-	height: 25px;
-}
-
-.teamcard .teamcard-preview {
-	text-align: center;
+	.teamcard-preview {
+		text-align: center;
+	}
 }
 
 @media ( max-width: 600px ) {
