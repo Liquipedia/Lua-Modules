@@ -53,6 +53,7 @@ function Table2Cell:render()
 				props.shrink,
 				props.attributes
 			),
+			classes = props.classes,
 			children = props.children,
 		}
 	end
