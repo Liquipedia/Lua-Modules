@@ -48,7 +48,13 @@
 
 	&__row {
 		&--even {
-			background-color: var( --clr-on-surface-light-primary-4 );
+			.theme--light & {
+				background-color: var( --clr-on-surface-light-primary-4 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+			}
 		}
 
 		&--overfive {

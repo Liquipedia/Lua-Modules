@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local Date = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
 local Icon = Lua.import('Module:Icon')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
@@ -122,7 +123,7 @@ function RatingsList:render()
 			HtmlWidgets.Div {
 				children = {
 					HtmlWidgets.Span { children = 'Data provided by ' },
-					HtmlWidgets.Div { children = '[[File:SAP_logo.svg|link=|SAP]]' }
+					IconImage { imageLight = 'SAP_logo.svg' }
 				},
 				classes = { 'ranking-table__top-row-logo-container' }
 			}
@@ -199,7 +200,7 @@ function RatingsList:render()
 			graphRow = TableWidgets.Row {
 				children = TableWidgets.Cell {
 					attributes = {
-						colspan = '7',
+						colspan = '6',
 						['data-ranking-table-cell'] = 'graph'
 					},
 					children = HtmlWidgets.Div {
@@ -210,7 +211,8 @@ function RatingsList:render()
 								function() return 'Failed to make graph for team' end
 							)
 						}
-					}
+					},
+					classes = { 'ranking-table__graph-row-container' }
 				},
 				classes = { 'ranking-table__graph-row d-none' },
 				attributes = {
