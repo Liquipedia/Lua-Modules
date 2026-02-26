@@ -562,7 +562,7 @@ function MatchTable:statsFromMatches()
 	}
 end
 
----@return Html
+---@return Widget
 function MatchTable:buildDisplay()
 	local display = mw.html.create('table')
 		:addClass('wikitable wikitable-striped sortable')
@@ -592,16 +592,12 @@ function MatchTable:buildDisplay()
 	}
 end
 
----@return Html
+---@return Widget
 function MatchTable:build()
-	local wrappedTableNode = mw.html.create('div')
-		:addClass('match-table-wrapper')
-		:addClass('table-responsive')
-		:node(self:buildDisplay())
-
-	return mw.html.create('div')
-		:node(self:displayStats())
-		:node(wrappedTableNode)
+	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+		self:displayStats(),
+		self:buildDisplay()
+	)}
 end
 
 ---@param title string
