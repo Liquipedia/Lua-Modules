@@ -798,12 +798,11 @@ function MatchTable:nonStandardMatch(match)
 		:wikitext('')
 end
 
----@param opponentRecord match2opponent
+---@param opponent standardOpponent
 ---@param flipped boolean?
 ---@return Html
-function MatchTable:_displayOpponent(opponentRecord, flipped)
+function MatchTable:_displayOpponent(opponent, flipped)
 	local cell = mw.html.create('td')
-	local opponent = Opponent.fromMatch2Record(opponentRecord)
 	if Logic.isEmpty(opponent) then return cell:wikitext('Unknown') end
 
 	return cell
@@ -824,13 +823,13 @@ function MatchTable:_displayScore(match)
 		return opponent.status == 'S' end)
 	local bestof1Score = match.bestof == 1 and Info.config.match2.gameScoresIfBo1 and hasOnlyScores
 
-	---@param opponentRecord match2opponent
+	---@param opponent standardOpponent
 	---@param gameOpponents table[]
 	---@return Html|string
-	local toScore = function(opponentRecord, gameOpponents)
-		if Table.isEmpty(opponentRecord) or not opponentRecord.status then return 'Unkn' end
-		local score = OpponentDisplay.InlineScore(opponentRecord)
-		local status = opponentRecord.status
+	local toScore = function(opponent, gameOpponents)
+		if Table.isEmpty(opponent) or not opponent.status then return 'Unkn' end
+		local score = OpponentDisplay.InlineScore(opponent)
+		local status = opponent.status
 
 		local game1Opponent = gameOpponents[1]
 		if bestof1Score and game1Opponent then
@@ -838,7 +837,7 @@ function MatchTable:_displayScore(match)
 			status = game1Opponent.status
 		end
 
-		return mw.html.create(tonumber(opponentRecord.placement) == 1 and 'b' or nil)
+		return mw.html.create(tonumber(opponent.placement) == 1 and 'b' or nil)
 			:wikitext(status == SCORE_STATUS and (score or '&ndash;') or status)
 	end
 
