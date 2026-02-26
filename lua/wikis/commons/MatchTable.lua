@@ -699,7 +699,7 @@ function MatchTable:headerRow()
 					align = 'center',
 					children = 'vs. Opponent'
 				}
-	 		) or nil,
+			) or nil,
 			config.showVod and TableWidgets.CellHeader{
 				align = 'center',
 				children = 'VOD(s)'
