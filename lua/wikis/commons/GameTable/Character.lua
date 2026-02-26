@@ -45,6 +45,7 @@ local SCORE_CONCAT = '&nbsp;&colon;&nbsp;'
 ---@field pickedByplayer number?
 
 ---@class CharacterGameTable: GameTable
+---@operator call(table): CharacterGameTable
 ---@field character string
 ---@field isCharacterTable boolean
 ---@field isPickedByRequired boolean
