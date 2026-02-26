@@ -17,30 +17,36 @@ Author(s): XtratoS
 .automatic-points-table .diagonal-header-div-cell {
 	min-width: 50px;
 	max-width: 50px;
-	transform: translate( 63.5px, 74px ) rotate( -45deg );
+	transform: translate( 9.5px );
 }
 
 .automatic-points-table .diagonal-header-div-cell.ranking {
 	min-width: 35px;
 	max-width: 35px;
-	transform: translate( 50.5px, 79px ) rotate( -45deg );
+	transform: translate( -5.5px );
 }
 
 .automatic-points-table .diagonal-header-div-cell.team {
 	min-width: 225px;
 	max-width: 225px;
-	transform: translate( 212px, 12.5px ) rotate( -45deg );
+	transform: translate( 184px );
 }
 
 .automatic-points-table .diagonal-header-div-cell .content {
 	border-bottom-style: solid;
 	border-bottom-width: 1px;
-	width: 201px;
+	width: 281px;
 	height: 35.3px;
 	white-space: nowrap;
 	margin-left: -5px;
 	padding-top: 6px;
 	background-color: var( --table-header-variant-background-color );
+	transform: rotate( -45deg );
+	transform-origin: bottom center;
+}
+
+.automatic-points-table .diagonal-header-div-cell .content > * {
+	margin-right: 6px;
 }
 
 .automatic-points-table .divCell.border-top-right {
