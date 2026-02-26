@@ -54,6 +54,7 @@ local BO1_SCORE_CONCAT = '&nbsp;-&nbsp;'
 local SECONDS_ONE_DAY = 3600 * 24
 
 ---@alias MatchTableMode `Opponent.solo` | `Opponent.team`
+---@alias WDLCount {w: number, d: number, l: number}
 
 ---@class MatchTableConfig
 ---@field mode MatchTableMode
@@ -510,7 +511,7 @@ end
 function MatchTable:resultFromNonStandardRecord(record)
 end
 
----@return {matches: {w: number, d: number, l: number}, games: {w: number, d: number, l: number}}
+---@return {matches: WDLCount, games: WDLCount, rounds: WDLCount}
 function MatchTable:statsFromMatches()
 	local totalMatches = {w = 0, d = 0, l = 0}
 	local totalGames = {w = 0, d = 0, l = 0}
