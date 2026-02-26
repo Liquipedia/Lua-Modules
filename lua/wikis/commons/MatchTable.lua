@@ -36,6 +36,8 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -568,34 +570,6 @@ function MatchTable:buildDisplay()
 		:node(self:_titleRow(self.config.title))
 		:node(self:headerRow())
 
-	if Table.isEmpty(self.matches) then
-		---@return string
-		local function getNoResultText()
-			local isH2H = Logic.isNotEmpty(self.config.vs)
-			if isH2H then
-				return I18n.translate(
-					'matchtable-no-h2h-match-results',
-					{
-						mode = self.config.mode == Opponent.solo and 'players' or 'teams',
-					}
-				)
-			end
-			return I18n.translate(
-				'matchtable-no-match-results',
-				{
-					mode = self.config.mode == Opponent.solo and 'player' or 'team',
-				}
-			)
-		end
-
-		return display:tag('tr')
-			:tag('td')
-				:attr('colspan', '100')
-				:css('font-style', 'italic')
-				:wikitext(getNoResultText())
-				:allDone()
-	end
-
 	local currentYear
 	Array.forEach(self.matches, function(match)
 		local year = tonumber(match.date:sub(1, 4))
@@ -606,16 +580,16 @@ function MatchTable:buildDisplay()
 		display:node(self:matchRow(match))
 	end)
 
-	if self.config.linkSubPage then
-		local pagename = self.title.text .. '/Matches'
-		display:tag('tr')
-			:tag('th')
-				:attr('colspan', 42)
-				:css('font-style', 'italic')
-				:wikitext('[[' .. pagename .. '|Extended list of matches]]')
-	end
-
-	return display
+	return TableWidgets.Table{
+		sortable = true,
+		columns = self:_buildColumnDefinitions(),
+		title = String.nilIfEmpty(self.config.title),
+		children = WidgetUtil.collect(
+			self:headerRow(),
+			TableWidgets.TableBody{children = self:buildBody()}
+		),
+		footer = self:buildFooter()
+	}
 end
 
 ---@return Html
@@ -641,79 +615,193 @@ function MatchTable:_titleRow(title)
 			:done()
 end
 
+---@private
+---@return table[]
+function MatchTable:_buildColumnDefinitions()
+	local config = self.config
+	return WidgetUtil.collect(
+		{
+			-- Date column
+			align = 'left',
+			sortType = 'number',
+		},
+		config.showTier and {align = 'left'} or nil,
+		config.showType and {align = 'center'} or nil,
+		config.displayGameIcons and {align = 'center'} or nil,
+		config.showIcon and {
+			align = 'center',
+			unsortable = true,
+		} or nil,
+		{
+			-- Tournament column
+			align = 'left',
+		},
+		config.showResult and WidgetUtil.collect(
+			config.showOpponent and {align = 'center'} or nil,
+			{
+				-- Score column
+				align = 'center',
+			},
+			{
+				-- vs Opponent column
+				align = 'left'
+			}
+		) or nil,
+		config.showVod and {
+			align = 'left',
+			unsortable = true,
+		} or nil,
+		config.showMatchPage and {
+			align = 'center',
+			unsortable = true,
+		} or nil
+	)
+end
+
 ---@param year number?
----@return Html?
+---@return Widget?
 function MatchTable:_yearRow(year)
 	if not year then return end
-	return mw.html.create('tr')
-		:addClass('sortbottom')
-		:tag('td')
-			:attr('colspan', '100')
-			:addClass('match-table-year-header')
-			:wikitext(year)
-			:done()
+	return TableWidgets.Row{
+		section = 'subhead',
+		classes = {'sortbottom'},
+		css = {['font-weight'] = 'bold'},
+		children = TableWidgets.CellHeader{
+			align = 'center',
+			colspan = 100,
+			children = year
+		}
+	}
 end
 
 ---@return Html
 function MatchTable:headerRow()
-	local makeHeaderCell = function(text, width)
-		return mw.html.create('th'):css('max-width', width):node(text)
+	---@param text string?
+	---@return Widget
+	local makeHeaderCell = function(text)
+		return TableWidgets.CellHeader{children = text}
 	end
 
 	local config = self.config
 
-	return mw.html.create('tr')
-		:node(makeHeaderCell('Date', '100px'))
-		:node(config.showTier and makeHeaderCell('Tier', '70px') or nil)
-		:node(config.showType and makeHeaderCell('Type', '70px') or nil)
-		:node(config.displayGameIcons and makeHeaderCell(nil, '25px') or nil)
-		:node(config.showIcon and makeHeaderCell(nil, '25px'):addClass('unsortable') or nil)
-		:node(makeHeaderCell('Tournament'))
-		:node(config.showResult and config.showOpponent and makeHeaderCell('Participant', '120px') or nil)
-		:node(config.showResult and makeHeaderCell('Score', '68px'):addClass('unsortable') or nil)
-		:node(config.showResult and makeHeaderCell('vs. Opponent', '120px') or nil)
-		:node(config.showVod and makeHeaderCell('VOD(s)', '80px'):addClass('unsortable') or nil)
-		:node(config.showMatchPage and makeHeaderCell(''):addClass('unsortable') or nil)
+	return TableWidgets.TableHeader{children = {
+		TableWidgets.Row{children = WidgetUtil.collect(
+			makeHeaderCell('Date'),
+			config.showTier and makeHeaderCell('Tier') or nil,
+			config.showType and makeHeaderCell('Type') or nil,
+			config.displayGameIcons and makeHeaderCell() or nil,
+			config.showIcon and makeHeaderCell() or nil,
+			makeHeaderCell('Tournament'),
+			config.showResult and WidgetUtil.collect(
+				config.showOpponent and makeHeaderCell('Participant') or nil,
+				makeHeaderCell('Score'),
+				TableWidgets.CellHeader{
+					align = 'center',
+					children = 'vs. Opponent'
+				}
+	 		) or nil,
+			config.showVod and TableWidgets.CellHeader{
+				align = 'center',
+				children = 'VOD(s)'
+			} or nil,
+			config.showMatchPage and makeHeaderCell() or nil
+		)}
+	}}
 end
 
----@param match MatchTableMatch
----@return Html?
-function MatchTable:matchRow(match)
-	return mw.html.create('tr')
-		:addClass(self:_getBackgroundClass(match.result.winner))
-		:node(self:_displayDate(match))
-		:node(self:_displayTier(match))
-		:node(self:_displayType(match))
-		:node(self:_displayGameIcon(match))
-		:node(self:_displayIcon(match))
-		:node(self:_displayTournament(match))
-		:node(self:_displayMatch(match))
-		:node(self:_displayVods(match))
-		:node(self:_displayMatchPage(match))
-end
+---@return Widget[]
+function MatchTable:buildBody()
+	if Table.isEmpty(self.matches) then
+		---@return string
+		local function getNoResultText()
+			local isH2H = Logic.isNotEmpty(self.config.vs)
+			if isH2H then
+				return I18n.translate(
+					'matchtable-no-h2h-match-results',
+					{
+						mode = self.config.mode == Opponent.solo and 'players' or 'teams',
+					}
+				)
+			end
+			return I18n.translate(
+				'matchtable-no-match-results',
+				{
+					mode = self.config.mode == Opponent.solo and 'player' or 'team',
+				}
+			)
+		end
 
----@param match MatchTableMatch
----@return Html
-function MatchTable:_displayDate(match)
-	local cell = mw.html.create('td')
-		:css('text-align', 'left')
-		:css('min-width', '5rem')
-		:attr('data-sort-value', match.timestamp)
-
-	if match.timestamp == DateExt.defaultTimestamp then
-		return cell
+		return {TableWidgets.Row{
+			css = {['font-style'] = 'italic'},
+			children = TableWidgets.Cell{
+				colspan = 100,
+				children = getNoResultText(),
+			}
+		}}
 	end
 
-	return cell:node(Countdown.create{
-		finished = match.finished,
-		date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
-		rawdatetime = true,
-		format = self.config.dateFormat
-	} or nil)
+	---@type Widget[]
+	local rows = {}
+
+	local currentYear = math.huge
+	Array.forEach(self.matches, function(match)
+		local year = DateExt.getYearOf(match.date)
+		if self.config.showYearHeaders and year ~= currentYear then
+			currentYear = year
+			table.insert(rows, self:_yearRow(year))
+		end
+		table.insert(rows, self:matchRow(match))
+	end)
+
+	return rows
+end
+
+---@return Widget?
+function MatchTable:buildFooter()
+	if not self.config.linkSubPage then
+		return
+	end
+	return Link{
+		link = self.title.text .. '/Matches',
+		children = 'Extended list of matches'
+	}
 end
 
 ---@param match MatchTableMatch
----@return Html?
+---@return Widget
+function MatchTable:matchRow(match)
+	return TableWidgets.Row{
+		classes = {self:_getBackgroundClass(match.result.winner)},
+		children = WidgetUtil.collect(
+			self:_displayDate(match),
+			self:_displayTier(match),
+			self:_displayType(match),
+			self:_displayGameIcon(match),
+			self:_displayIcon(match),
+			self:_displayTournament(match),
+			self:_displayMatch(match),
+			self:_displayVods(match),
+			self:_displayMatchPage(match)
+		)
+	}
+end
+
+---@param match MatchTableMatch
+---@return Widget
+function MatchTable:_displayDate(match)
+	return TableWidgets.Cell{
+		attributes = {['data-sort-value'] = match.timestamp},
+		children = not DateExt.isDefaultTimestamp(match.timestamp) and Countdown.create{
+			finished = match.finished,
+			date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
+			rawdatetime = true,
+			format = self.config.dateFormat
+		} or nil
+	}
+end
+
+---@param match MatchTableMatch
+---@return Widget?
 function MatchTable:_displayTier(match)
 	if not self.config.showTier then return end
 
@@ -722,60 +810,64 @@ function MatchTable:_displayTier(match)
 	options.onlyTierTypeIfBoth = true
 
 	if not Tier.isValid(tier, tierType) then
-		return mw.html.create('td')
-			:attr('data-sort-value', INVALID_TIER_SORT)
-			:wikitext(INVALID_TIER_DISPLAY)
+		return TableWidgets.Cell{
+			attributes = {['data-sort-value'] = INVALID_TIER_SORT},
+			children = INVALID_TIER_DISPLAY
+		}
 	end
 
-	return mw.html.create('td')
-		:attr('data-sort-value', Tier.toSortValue(tier, tierType))
-		:wikitext(Tier.display(tier, tierType, options))
+	return TableWidgets.Cell{
+		attributes = {['data-sort-value'] = Tier.toSortValue(tier, tierType)},
+		children = Tier.display(tier, tierType, options)
+	}
 end
 
 ---@param match MatchTableMatch
----@return Html?
+---@return Widget?
 function MatchTable:_displayType(match)
 	if not self.config.showType then return end
 
-	return mw.html.create('td')
-		:wikitext(match.type and mw.getContentLanguage():ucfirst(match.type) or nil)
+	return TableWidgets.Cell{
+		children = match.type and String.upperCaseFirst(match.type) or nil
+	}
 end
 
 ---@param match MatchTableMatch
----@return Html?
+---@return Widget?
 function MatchTable:_displayGameIcon(match)
 	if not self.config.displayGameIcons then return end
 
-	return mw.html.create('td')
-		:node(Game.icon{game = match.game})
+	return TableWidgets.Cell{
+		children = Game.icon{game = match.game}
+	}
 end
 
 ---@param match MatchTableMatch
----@return Html?
+---@return Widget?
 function MatchTable:_displayIcon(match)
 	if not self.config.showIcon then return end
 
-	return mw.html.create('td')
-		:node(LeagueIcon.display{
+	return TableWidgets.Cell{
+		children = LeagueIcon.display{
 			icon = match.icon,
 			iconDark = match.iconDark,
 			link = match.pageName,
 			name = match.displayName,
 			options = {noTemplate = true},
-		})
+		}
+	}
 end
 
 ---@param match MatchTableMatch
 ---@return Widget
 function MatchTable:_displayTournament(match)
-	return HtmlWidgets.Td{
-		css = {['text-align'] = 'left'},
+	return TableWidgets.Cell{
 		children = Link{children = match.displayName, link = match.pageName}
 	}
 end
 
 ---@param match MatchTableMatch
----@return Html?
+---@return Widget|Widget[]?
 function MatchTable:_displayMatch(match)
 	if not self.config.showResult then
 		return
@@ -783,36 +875,36 @@ function MatchTable:_displayMatch(match)
 		return self:nonStandardMatch(match)
 	end
 
-	return mw.html.create()
-		:node(self.config.showOpponent and self:_displayOpponent(match.result.opponent, true) or nil)
-		:node(self:_displayScore(match))
-		:node(self:_displayOpponent(match.result.vs):css('text-align', 'left'))
+	return WidgetUtil.collect(
+		self.config.showOpponent and self:_displayOpponent(match.result.opponent, true) or nil,
+		self:_displayScore(match),
+		self:_displayOpponent(match.result.vs)
+	)
 end
 
 ---overwritable for wikis that have BR/FFA matches
 ---@param match MatchTableMatch
----@return Html
+---@return Widget
 function MatchTable:nonStandardMatch(match)
-	return mw.html.create('td')
-		:attr('colspan', self.config.showOpponent and 3 or 2)
-		:wikitext('')
+	return TableWidgets.Cell{
+		colspan = self.config.showOpponent and 3 or 2,
+		children = '',
+	}
 end
 
 ---@param opponent standardOpponent
 ---@param flipped boolean?
----@return Html
+---@return Widget
 function MatchTable:_displayOpponent(opponent, flipped)
-	local cell = mw.html.create('td')
-	if Logic.isEmpty(opponent) then return cell:wikitext('Unknown') end
-
-	return cell
-		:node(OpponentDisplay.BlockOpponent{
+	return TableWidgets.Cell{
+		attributes = {['data-sort-value'] = Opponent.toName(opponent)},
+		children = OpponentDisplay.BlockOpponent{
 			opponent = opponent,
 			flip = flipped,
 			overflow = 'wrap',
 			teamStyle = self.config.teamStyle,
-		})
-		:attr('data-sort-value', opponent.name)
+		}
+	}
 end
 
 ---@param match MatchTableMatch
@@ -825,7 +917,7 @@ function MatchTable:_displayScore(match)
 
 	---@param opponent standardOpponent
 	---@param gameOpponents table[]
-	---@return Html|string
+	---@return string|Widget
 	local toScore = function(opponent, gameOpponents)
 		if Table.isEmpty(opponent) or not opponent.status then return 'Unkn' end
 		local score = OpponentDisplay.InlineScore(opponent)
@@ -837,16 +929,17 @@ function MatchTable:_displayScore(match)
 			status = game1Opponent.status
 		end
 
-		return mw.html.create(tonumber(opponent.placement) == 1 and 'b' or nil)
-			:wikitext(status == SCORE_STATUS and (score or '&ndash;') or status)
+		return HtmlWidgets.Span{
+			css = {['font-weight'] = tonumber(opponent.placement) == 1 and 'bold' or nil},
+			children = status == SCORE_STATUS and (score or '&ndash;') or status,
+		}
 	end
 
-	return mw.html.create('td')
-		:addClass('match-table-score')
-		:css('white-space', 'nowrap')
-		:node(toScore(result.opponent, result.gameOpponents))
-		:node(bestof1Score and BO1_SCORE_CONCAT or SCORE_CONCAT)
-		:node(toScore(result.vs, result.gameVsOpponents))
+	return TableWidgets.Cell{children = {
+		toScore(result.opponent, result.gameOpponents),
+		bestof1Score and BO1_SCORE_CONCAT or SCORE_CONCAT,
+		toScore(result.vs, result.gameVsOpponents)
+	}}
 end
 
 ---@param match MatchTableMatch
@@ -854,15 +947,11 @@ end
 function MatchTable:_displayVods(match)
 	if not self.config.showVod then return end
 
-	local vodsNode = mw.html.create('td'):css('text-align', 'left')
-	Array.forEach(match.vods, function(vod, vodIndex)
-		if vodIndex ~= 1 then
-			vodsNode:node(' ')
-		end
-		vodsNode:node(VodLink.display{vod = vod.link, gamenum = vod.index ~= 0 and vod.index or nil})
-	end)
-
-	return vodsNode
+	return TableWidgets.Cell{
+		children = Array.interleave(Array.map(match.vods, function (vod)
+			return VodLink.display{vod = vod.link, gamenum = vod.index ~= 0 and vod.index or nil}
+		end), ' ')
+	}
 end
 
 ---@param match MatchTableMatch
@@ -870,7 +959,9 @@ end
 function MatchTable:_displayMatchPage(match)
 	if not self.config.showMatchPage then return end
 
-	return mw.html.create('td'):node(MatchPageButton{match = match, buttonText = self.config.matchPageButtonText})
+	return TableWidgets.Cell{
+		children = MatchPageButton{match = match, buttonText = self.config.matchPageButtonText}
+	}
 end
 
 ---@param winner any
