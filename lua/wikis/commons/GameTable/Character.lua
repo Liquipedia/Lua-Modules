@@ -26,7 +26,7 @@ local ColumnName = Condition.ColumnName
 
 local DRAW_WINNER = 0
 local CHARACTER_MODE = 'character'
-local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
+local SCORE_CONCAT = '&nbsp;&colon;&nbsp;'
 
 ---@class CharacterGameTableConfig: MatchTableConfig
 ---@field showGameWithoutCharacters boolean
