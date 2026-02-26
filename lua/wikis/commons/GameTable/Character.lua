@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
-local CharacterIcon = Lua.import('Module:CharacterIcon')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
