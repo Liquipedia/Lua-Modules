@@ -42,17 +42,19 @@ function GameTable:matchFromRecord(record)
 		return nil
 	end
 
-	---@param game MatchGroupUtilGame
-	---@return boolean
-	local function gameIsFinished(game)
-		return game.status ~= NOT_PLAYED and Logic.isNotEmpty(game.winner)
-	end
-
-	matchRecord.games = Array.filter(matchRecord.games, gameIsFinished)
+	matchRecord.games = Array.filter(matchRecord.games, function (game)
+		return self:filterGame(game)
+	end)
 
 	self.countGames = self.countGames + #matchRecord.games
 
 	return matchRecord
+end
+
+---@param game MatchGroupUtilGame
+---@return boolean
+function GameTable:filterGame(game)
+	return game.status ~= NOT_PLAYED and Logic.isNotEmpty(game.winner)
 end
 
 ---@param vod string?

@@ -25,6 +25,11 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local MatchSummaryCharacters = Lua.import('Module:Widget/Match/Summary/Characters')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
 local DRAW_WINNER = 0
 local CHARACTER_MODE = 'character'
 local SCORE_CONCAT = '&nbsp;&colon;&nbsp;'
@@ -39,11 +44,14 @@ local SCORE_CONCAT = '&nbsp;&colon;&nbsp;'
 ---@field iconSize string
 ---@field iconSeparator string
 
----@class CharacterGameTableGame: match2game
+---@class CharacterGameTableGame: MatchGroupUtilGame
 ---@field picks string[][]
 ---@field bans string[][]?
 ---@field pickedBy number?
 ---@field pickedByplayer number?
+
+---@class CharacterGameTableMatch: MatchTableMatch
+---@field games CharacterGameTableGame[]
 
 ---@class CharacterGameTable: GameTable
 ---@operator call(table): CharacterGameTable
@@ -51,6 +59,7 @@ local SCORE_CONCAT = '&nbsp;&colon;&nbsp;'
 ---@field isCharacterTable boolean
 ---@field isPickedByRequired boolean
 ---@field config CharacterGameTableConfig
+---@field matches CharacterGameTableMatch[]
 local CharacterGameTable = Class.new(GameTable, function (self)
 	self.isCharacterTable = self.args.tableMode == CHARACTER_MODE
 	self.isPickedByRequired = self.isCharacterTable
@@ -221,26 +230,21 @@ function CharacterGameTable:getCharacterPick(game)
 	return findCharacter(1) or findCharacter(2)
 end
 
----@param game match2game
----@return match2game?
-function CharacterGameTable:gameFromRecord(game)
-	local gameRecord = GameTable.gameFromRecord(self, game)
-	if not gameRecord then
-		return nil
-	end
-
-	---@cast gameRecord CharacterGameTableGame
-	gameRecord.picks = self:getCharacters(gameRecord, self.config.numPicks, self.getCharacterKey)
-	gameRecord.bans = self.config.showBans and
-		self:getCharacters(gameRecord, self.config.numBans,self.getCharacterBanKey) or nil
-	gameRecord.pickedBy = self.isPickedByRequired and self:getCharacterPick(gameRecord) or nil
+---@param game MatchGroupUtilGame
+---@return boolean
+function CharacterGameTable:filterGame(game)
+	---@cast game CharacterGameTableGame
+	game.picks = self:getCharacters(game, self.config.numPicks, self.getCharacterKey)
+	game.bans = self.config.showBans and
+		self:getCharacters(game, self.config.numBans,self.getCharacterBanKey) or nil
+	game.pickedBy = self.isPickedByRequired and self:getCharacterPick(game) or nil
 
 	if self.isPickedByRequired then
-		return Logic.isNotEmpty(gameRecord.pickedBy) and gameRecord or nil
+		return Logic.isNotEmpty(game.pickedBy)
 	end
 
-	local foundPicks = Table.isNotEmpty(gameRecord.picks[1]) or Table.isNotEmpty(gameRecord.picks[2])
-	return (foundPicks or self.config.showGameWithoutCharacters) and gameRecord or nil
+	local foundPicks = Table.isNotEmpty(game.picks[1]) or Table.isNotEmpty(game.picks[2])
+	return foundPicks or self.config.showGameWithoutCharacters
 end
 
 ---@param record table
@@ -259,7 +263,6 @@ function CharacterGameTable:statsFromMatches()
 	local totalGames = {w = 0, d = 0, l = 0}
 
 	Array.forEach(self.matches, function(match)
-		---@cast match GameTableMatch
 		Array.forEach(match.games, function (game, index)
 			local winner = tonumber(game.winner)
 
@@ -278,71 +281,125 @@ function CharacterGameTable:statsFromMatches()
 	}
 end
 
----@return Html
+---@protected
+---@return table[]
+function CharacterGameTable:buildColumnDefinitions()
+	local config = self.config
+	local isCharTable = self.isCharacterTable
+	return WidgetUtil.collect(
+		{
+			-- Date column
+			align = 'left',
+			sortType = 'number',
+		},
+		config.showTier and {align = 'left'} or nil,
+		config.showType and {align = 'center'} or nil,
+		config.displayGameIcons and {align = 'center'} or nil,
+		config.showIcon and {
+			align = 'center',
+			unsortable = true,
+		} or nil,
+		{
+			-- Tournament column
+			align = 'left',
+		},
+		config.showResult and WidgetUtil.collect(
+			not isCharTable and {align = 'center'} or nil,
+			{
+				align = 'center',
+				unsortable = true,
+			},
+			config.showBans and {
+				align = 'center',
+				unsortable = true
+			} or nil,
+			isCharTable and {
+				{align = 'center'},
+				{align = 'center'},
+				{align = 'center'},
+			} or nil,
+			{
+				align = 'center',
+				unsortable = true,
+			},
+			config.showBans and {
+				align = 'center',
+				unsortable = true
+			} or nil
+		) or nil,
+		config.showLength and {
+			align = 'left',
+			unsortable = true,
+		} or nil,
+		config.showVod and {
+			align = 'left',
+			unsortable = true,
+		} or nil,
+		config.showMatchPage and {
+			align = 'center',
+			unsortable = true,
+		} or nil
+	)
+end
+
+---@return Widget
 function CharacterGameTable:headerRow()
-	local makeHeaderCell = function(text, width)
-		return mw.html.create('th'):css('max-width', width):node(text)
+	---@param text string?
+	---@return Widget
+	local makeHeaderCell = function(text)
+		return TableWidgets.CellHeader{children = text}
 	end
 
 	local config = self.config
+	local isCharTable = self.isCharacterTable
 
-	local nodes = Array.append({},
-		makeHeaderCell('Date', '100px'),
-		config.showTier and makeHeaderCell('Tier', '70px') or nil,
-		config.showType and makeHeaderCell('Type', '70px') or nil,
-		config.displayGameIcons and makeHeaderCell(nil, '25px') or nil,
-		config.showIcon and makeHeaderCell(nil, '25px'):addClass('unsortable') or nil,
-		makeHeaderCell('Tournament')
-	)
-
-	if config.showResult then
-		local isCharTable = self.isCharacterTable
-		nodes = Array.appendWith(nodes,
-			not isCharTable and makeHeaderCell('vs.', '80px') or nil,
-			makeHeaderCell('Picks'):addClass('unsortable'),
-			config.showBans and makeHeaderCell('Bans'):addClass('unsortable') or nil,
-			isCharTable and makeHeaderCell(nil, '80px') or nil,
-			isCharTable and makeHeaderCell('Score') or nil,
-			isCharTable and makeHeaderCell(nil, '80px') or nil,
-			makeHeaderCell('vs. Picks'):addClass('unsortable'),
-			config.showBans and makeHeaderCell('vs. Bans'):addClass('unsortable') or nil
-		)
-	end
-
-	nodes = Array.append(nodes,
+	return TableWidgets.TableHeader{children = {
+		TableWidgets.Row{children = WidgetUtil.collect(
+			makeHeaderCell('Date'),
+			config.showTier and makeHeaderCell('Tier') or nil,
+			config.showType and makeHeaderCell('Type') or nil,
+			config.displayGameIcons and makeHeaderCell() or nil,
+			config.showIcon and makeHeaderCell() or nil,
+			makeHeaderCell('Tournament'),
+			config.showResult and WidgetUtil.collect(
+			not isCharTable and makeHeaderCell('vs.') or nil,
+			makeHeaderCell('Picks'),
+			config.showBans and makeHeaderCell('Bans') or nil,
+			isCharTable and {
+				makeHeaderCell(),
+				makeHeaderCell('Score'),
+				makeHeaderCell(),
+			} or nil,
+			makeHeaderCell('vs. Picks'),
+			config.showBans and makeHeaderCell('vs. Bans') or nil
+		) or nil,
 		config.showLength and makeHeaderCell('Length') or nil,
-		config.showVod and makeHeaderCell('VOD', '60px') or nil,
-		config.showMatchPage and makeHeaderCell('') or nil
-	)
-
-	local header = mw.html.create('tr')
-	Array.forEach(nodes, function (node)
-		header:node(node)
-	end)
-
-	return header
+			config.showVod and TableWidgets.CellHeader{
+				align = 'center',
+				children = 'VOD'
+			} or nil,
+			config.showMatchPage and makeHeaderCell() or nil
+		)}
+	}}
 end
 
 ---@param game CharacterGameTableGame
 ---@param opponentIndex number
 ---@param key string
----@return Html?
+---@return Widget?
 function CharacterGameTable:_displayCharacters(game, opponentIndex, key)
 	local config = self.config
-	local makeIcon = function(character)
-		return CharacterIcon.Icon{character = character, size = config.iconSize, date = game.date}
-	end
 
-	local icons = Array.map(game[key][opponentIndex] or {}, makeIcon)
-
-	return mw.html.create('td')
-		:addClass(config.showSideClass and self:getSideClass(game.extradata, opponentIndex) or nil)
-		:node(#icons > 0 and table.concat(icons, config.iconSeparator) or nil)
+	return TableWidgets.Cell{children = MatchSummaryCharacters{
+		bg = config.showSideClass and self:getSideClass(game.extradata, opponentIndex) or nil,
+		characters = game[key][opponentIndex] or {},
+		date = game.date,
+	}}
 end
 
----@param match GameTableMatch
+---@param match CharacterGameTableMatch
 ---@param game CharacterGameTableGame
----@return Html?
+---@return Widget[]?
 function CharacterGameTable:displayGame(match, game)
 	if not self.config.showResult then
 		return
@@ -353,35 +410,36 @@ function CharacterGameTable:displayGame(match, game)
 		---@cast pickedBy -nil
 		local pickedVs = pickedBy == 1 and 2 or 1
 		local opponentRecords = {match.result.opponent, match.result.vs}
-		return mw.html.create()
-			:node(self:_displayDraft(game, opponentRecords[pickedBy], false))
-			:node(self:_displayScore(game, pickedBy, pickedVs))
-			:node(self:_displayDraft(game, opponentRecords[pickedVs], true))
+		return WidgetUtil.collect(
+			self:_displayDraft(game, opponentRecords[pickedBy], pickedBy, false),
+			self:_displayScore(game, pickedBy, pickedVs),
+			self:_displayDraft(game, opponentRecords[pickedVs], pickedVs, true)
+		)
 
 	else
-		return mw.html.create()
-			:node(self:_displayOpponent(match.result.vs):css('text-align', 'left'))
-			:node(self:_displayDraft(game, match.result.opponent))
-			:node(self:_displayDraft(game, match.result.vs))
+		local indexes = match.result.flipped and {2, 1} or {1, 2}
+		return WidgetUtil.collect(
+			self:_displayOpponent(match.result.vs),
+			self:_displayDraft(game, match.result.opponent, indexes[1]),
+			self:_displayDraft(game, match.result.vs, indexes[2])
+		)
 	end
 end
 
 ---@param game CharacterGameTableGame
----@param opponentRecord match2opponent
+---@param opponentRecord standardOpponent
+---@param opponentIndex integer
 ---@param flipped boolean?
----@return Html?
-function CharacterGameTable:_displayDraft(game, opponentRecord, flipped)
-	local opponentIndex = opponentRecord.id
-
+---@return Widget[]?
+function CharacterGameTable:_displayDraft(game, opponentRecord, opponentIndex, flipped)
 	local isCharTable = self.isCharacterTable
 	local opponent = self:_displayOpponent(opponentRecord, flipped)
-	return mw.html.create()
-		:node((flipped and isCharTable) and opponent or nil)
-		:node(self:_displayCharacters(game, opponentIndex, 'picks'))
-		:node(self.config.showBans and
-			self:_displayCharacters(game, opponentIndex, 'bans'):addClass('lor-graycard') or nil
-		)
-		:node((not flipped and isCharTable) and opponent or nil)
+	return WidgetUtil.collect(
+		(flipped and isCharTable) and opponent or nil,
+		self:_displayCharacters(game, opponentIndex, 'picks'),
+		self.config.showBans and self:_displayCharacters(game, opponentIndex, 'bans') or nil,
+		(not flipped and isCharTable) and opponent or nil
+	)
 end
 
 ---@param game CharacterGameTableGame
@@ -394,15 +452,17 @@ function CharacterGameTable:_displayScore(game, pickedBy, pickedVs)
 
 	local toScore = function(opponentId)
 		local isWinner = winner == opponentId
-		return mw.html.create(isWinner and 'b' or nil)
-			:wikitext(scores[opponentId] or (isWinner and 'W' or 'L'))
+		return HtmlWidgets.Span{
+			css = {['font-weight'] = isWinner and 'bold' or nil},
+			children = scores[opponentId] or (isWinner and 'W' or 'L')
+		}
 	end
 
-	return mw.html.create('td')
-		:addClass('match-table-score')
-		:node(toScore(pickedBy))
-		:node(SCORE_CONCAT)
-		:node(toScore(pickedVs))
+	return TableWidgets.Cell{children = {
+		toScore(pickedBy),
+		SCORE_CONCAT,
+		toScore(pickedVs),
+	}}
 end
 
 ---@param game CharacterGameTableGame
@@ -410,33 +470,34 @@ end
 function CharacterGameTable:_displayLength(game)
 	if not self.config.showLength then return end
 
-	return mw.html.create('td')
-		:node(game.length)
+	return TableWidgets.Cell{children = game.length}
 end
 
----@param match GameTableMatch
+---@param match CharacterGameTableMatch
 ---@param game CharacterGameTableGame
----@return Html?
+---@return Widget
 function CharacterGameTable:gameRow(match, game)
-	local winner = (self.isCharacterTable and game.pickedBy or
-		match.result.opponent.id) == tonumber(game.winner) and 1 or 2
+	local indexes = ((self.isCharacterTable and game.pickedBy == game.winner) or match.result.flipped) and {2, 1} or {1, 2}
+	local winner = game.winner == indexes[1]
 
-	return mw.html.create('tr')
-		:addClass(self:_getBackgroundClass(winner))
-		:node(self:_displayDate(match))
-		:node(self:displayTier(match))
-		:node(self:_displayType(match))
-		:node(self:_displayGameIconForGame(game))
-		:node(self:_displayIcon(match))
-		:node(self:_displayTournament(match))
-		:node(self:displayGame(match, game))
-		:node(self:_displayLength(game))
-		:node(self:_displayGameVod(game.vod))
-		:node(self:_displayMatchPage(match))
+	return TableWidgets.Row{
+		classes = {self:_getBackgroundClass(winner)},
+		children = WidgetUtil.collect(
+			self:_displayDate(match),
+			self:displayTier(match),
+			self:_displayType(match),
+			self:_displayGameIconForGame(game),
+			self:_displayIcon(match),
+			self:_displayTournament(match),
+			self:displayGame(match, game),
+			self:_displayGameVod(game.vod),
+			self:_displayMatchPage(match)
+		)
+	}
 end
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CharacterGameTable.results(frame)
 	local args = Arguments.getArgs(frame)
 

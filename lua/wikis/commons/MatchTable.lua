@@ -586,7 +586,7 @@ function MatchTable:buildDisplay()
 
 	return TableWidgets.Table{
 		sortable = true,
-		columns = self:_buildColumnDefinitions(),
+		columns = self:buildColumnDefinitions(),
 		title = String.nilIfEmpty(self.config.title),
 		children = WidgetUtil.collect(
 			self:headerRow(),
@@ -615,9 +615,9 @@ function MatchTable:_titleRow(title)
 			:done()
 end
 
----@private
+---@protected
 ---@return table[]
-function MatchTable:_buildColumnDefinitions()
+function MatchTable:buildColumnDefinitions()
 	local config = self.config
 	return WidgetUtil.collect(
 		{
