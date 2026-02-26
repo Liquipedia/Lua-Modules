@@ -97,6 +97,7 @@ local SECONDS_ONE_DAY = 3600 * 24
 ---@field vs standardOpponent
 ---@field gameVsOpponents table[]
 ---@field winner number?
+---@field flipped boolean
 ---@field countGames boolean
 ---@field countRounds boolean
 
@@ -479,11 +480,13 @@ function MatchTable:resultFromRecord(record)
 	end
 
 	local winner = record.winner
+	local flipped = false
 	local indexes
 	if foundInAlias(record.opponents[1]) then
 		indexes = {1, 2}
 	elseif foundInAlias(record.opponents[2]) then
 		indexes = {2, 1}
+		flipped = true
 		winner = winner == 2 and 1 or winner == 1 and 2 or winner
 	else
 		mw.ext.TeamLiquidIntegration.add_category('MatchesTables with invalid matches')
@@ -498,6 +501,7 @@ function MatchTable:resultFromRecord(record)
 		opponent = record.opponents[indexes[1]],
 		vs = record.opponents[indexes[2]],
 		winner = winner,
+		flipped = flipped,
 		countGames = countGames,
 		countRounds = countRounds,
 		gameOpponents = Array.map(gameOpponents, Operator.property(indexes[1])),
