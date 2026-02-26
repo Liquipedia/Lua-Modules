@@ -306,7 +306,7 @@ function MatchTable:query()
 	self.matches = {}
 
 	Lpdb.executeMassQuery('match2', {
-		conditions = self:buildConditions(),
+		conditions = tostring(self:buildConditions()),
 		order = 'date desc',
 		query = 'match2id, match2opponents, match2games, date, dateexact, icon, icondark, liquipediatier, game, type,'
 			.. 'liquipediatiertype, tournament, pagename, parent, section, tickername, vod, winner, match2bracketdata,'
@@ -328,14 +328,13 @@ function MatchTable:query()
 	return self
 end
 
----@return string
+---@return ConditionTree
 function MatchTable:buildConditions()
 	return ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('finished'), Comparator.eq, 1)}
-		:add{self:buildDateConditions()}
-		:add{self:buildOpponentConditions()}
-		:add{self:buildAdditionalConditions()}
-		:toString()
+		:add(ConditionNode(ColumnName('finished'), Comparator.eq, 1))
+		:add(self:buildDateConditions())
+		:add(self:buildOpponentConditions())
+		:add(self:buildAdditionalConditions())
 end
 
 ---@return ConditionTree?
