@@ -13,27 +13,28 @@ local Tier = Lua.import('Module:Tier/Custom')
 
 local MatchTable = Lua.import('Module:MatchTable')
 
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+
 local INVALID_TIER_DISPLAY = 'Undefined'
 local INVALID_TIER_SORT = 'ZZ'
 
-local CustomMatchTable = {}
+---@class CounterstrikeMatchTable: MatchTable
+---@operator call(table): CounterstrikeMatchTable
+local CustomMatchTable = Class.new(MatchTable)
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomMatchTable.results(args)
 	args.showRoundStats = Logic.nilOr(Logic.readBoolOrNil(args.showRoundStats), true)
 	args.gameIcons = Logic.nilOr(Logic.readBoolOrNil(args.gameIcons), true)
 	args.vod = Logic.nilOr(Logic.readBoolOrNil(args.vod), true)
 	args.showType = Logic.nilOr(Logic.readBoolOrNil(args.showType), true)
 
-	local matchtable = MatchTable(args)
-	matchtable._displayTier = CustomMatchTable._displayTier
-
-	return matchtable:readConfig():query():build()
+	return CustomMatchTable(args):readConfig():query():build()
 end
 
 ---@param match MatchTableMatch
----@return Html?
+---@return Widget?
 function CustomMatchTable:_displayTier(match)
 	if not self.config.showTier then return end
 
@@ -42,14 +43,16 @@ function CustomMatchTable:_displayTier(match)
 	options.onlyDisplayPrioritized = true
 
 	if not Tier.isValid(tier, tierType) then
-		return mw.html.create('td')
-			:attr('data-sort-value', INVALID_TIER_DISPLAY)
-			:wikitext(INVALID_TIER_SORT)
+		return TableWidgets.Cell{
+			attributes = {['data-sort-value'] = INVALID_TIER_SORT},
+			children = INVALID_TIER_DISPLAY
+		}
 	end
 
-	return mw.html.create('td')
-		:attr('data-sort-value', Tier.toSortValue(tier, tierType))
-		:wikitext(Tier.display(tier, tierType, options))
+	return TableWidgets.Cell{
+		attributes = {['data-sort-value'] = Tier.toSortValue(tier, tierType)},
+		children = Tier.display(tier, tierType, options)
+	}
 end
 
 return Class.export(CustomMatchTable, {exports = {'results'}})
