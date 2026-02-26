@@ -21,8 +21,8 @@ local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local Widget = Lua.import('Module:Widget')
-local Widgets = Lua.import('Module:Widget/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local BASE_CURRENCY = 'USD'
@@ -103,70 +103,51 @@ function StageWinnings:render()
 		}
 	end
 
-	return Widgets.DataTable{
-		classes = {'prizepooltable', 'collapsed'},
-		tableCss = {
-			['text-align'] = 'center',
-			['margin-top'] = 0,
-			['margin-bottom'] = 0,
-			width = 'auto',
-		},
+	return TableWidgets.Table{
+		caption = 'Group Stage Winnings',
+		tableClasses = {'prizepooltable', 'collapsed'},
 		tableAttributes = {
-			['data-cutafter'] = (tonumber(props.cutafter) or 5) + 1, -- +1 due to 2nd headerRow
+			['data-cutafter'] = (tonumber(props.cutafter) or 5),
 			['data-opentext'] = 'Show remaining participants',
 			['data-closetext'] = 'Hide remaining participants',
 		},
-		children = WidgetUtil.collect(
-			-- first header
-			HtmlWidgets.Tr{
-				children = {
-					HtmlWidgets.Th{
-						attributes = {colspan = '100%'},
-						children = {props.title or 'Group Stage Winnings'},
-					},
-				},
-			},
-			-- second header
-			self:_headerRow(),
-			-- rows
-			Array.map(opponentList, FnUtil.curry(self._row, self))
+		columns = WidgetUtil.collect(
+			{align = 'left'},
+			(Logic.readBool(props.showMatchWL) or props.prizeMode == 'matchWins') and {align = 'center'} or nil,
+			(Logic.readBool(props.showGameWL) or props.prizeMode == 'gameWins') and {align = 'center'} or nil,
+			Logic.readBool(props.showScore) and {align = 'center'} or nil,
+			Logic.isNotEmpty(props.localcurrency) and {align = 'center'} or nil,
+			(Logic.readBool(props.autoexchange) or Logic.isEmpty(props.localcurrency)) and {align = 'center'} or nil
 		),
+		children = {
+			self:_headerRow(),
+			TableWidgets.TableBody{children = Array.map(opponentList, FnUtil.curry(self._row, self))}
+		},
 	}
 end
 
+---@private
 ---@return Widget
 function StageWinnings:_headerRow()
 	local props = self.props
-	return HtmlWidgets.Tr{
-		children = WidgetUtil.collect(
-			HtmlWidgets.Th{
-				css = {width = 'auto'},
-				children = {'Participants'},
-			},
-			(Logic.readBool(props.showMatchWL) or props.prizeMode == 'matchWins') and HtmlWidgets.Th{
-				css = {width = 'auto'},
-				children = {'Matches'},
-			} or nil,
-			(Logic.readBool(props.showGameWL) or props.prizeMode == 'gameWins') and HtmlWidgets.Th{
-				css = {width = 'auto'},
-				children = {'Games'},
-			} or nil,
-			Logic.readBool(props.showScore) and HtmlWidgets.Th{
-				css = {width = 'auto'},
-				children = {'Score Details'},
-			} or nil,
-			Logic.isNotEmpty(props.localcurrency) and HtmlWidgets.Th{
-				css = {width = 'auto'},
-				children = {Currency.display(props.localcurrency)},
-			} or nil,
-			(Logic.readBool(props.autoexchange) or Logic.isEmpty(props.localcurrency)) and HtmlWidgets.Th{
-				css = {width = 'auto'},
-				children = {Currency.display(BASE_CURRENCY)},
-			} or nil
-		),
-	}
+
+	return TableWidgets.TableHeader{children = {
+		TableWidgets.Row{children = WidgetUtil.collect(
+			TableWidgets.CellHeader{children = 'Participants'},
+			(Logic.readBool(props.showMatchWL) or props.prizeMode == 'matchWins')
+				and TableWidgets.CellHeader{children = 'Matches'} or nil,
+			(Logic.readBool(props.showGameWL) or props.prizeMode == 'gameWins')
+				and TableWidgets.CellHeader{children = 'Games'} or nil,
+			Logic.readBool(props.showScore) and TableWidgets.CellHeader{children = 'Score Details'} or nil,
+			Logic.isNotEmpty(props.localcurrency)
+				and TableWidgets.CellHeader{children = Currency.display(props.localcurrency)} or nil,
+			(Logic.readBool(props.autoexchange) or Logic.isEmpty(props.localcurrency))
+				and TableWidgets.CellHeader{children = Currency.display(BASE_CURRENCY)} or nil
+		)}
+	}}
 end
 
+---@private
 ---@param data {opponent: standardOpponent, matchWins: integer, matchLosses: integer, gameWins: integer,
 ---gameLosses: integer, winnings: number, scoreDetails: table<string, integer>}
 ---@return Widget
@@ -182,45 +163,37 @@ function StageWinnings:_row(data)
 
 	return HtmlWidgets.Tr{
 		children = WidgetUtil.collect(
-			HtmlWidgets.Td{
-				css = {['text-align'] = 'left'},
-				children = {OpponentDisplay.InlineOpponent{opponent = data.opponent}},
-			},
-			(Logic.readBool(props.showMatchWL) or props.prizeMode == 'matchWins') and HtmlWidgets.Td{
-				css = {width = 'auto'},
+			TableWidgets.Cell{children = OpponentDisplay.InlineOpponent{opponent = data.opponent}},
+			(Logic.readBool(props.showMatchWL) or props.prizeMode == 'matchWins') and TableWidgets.Cell{
 				children = {
 					data.matchWins,
 					'-',
 					data.matchLosses
 				},
 			} or nil,
-			(Logic.readBool(props.showGameWL) or props.prizeMode == 'gameWins') and HtmlWidgets.Td{
-				css = {width = 'auto'},
+			(Logic.readBool(props.showGameWL) or props.prizeMode == 'gameWins') and TableWidgets.Cell{
 				children = {
 					data.gameWins,
 					'-',
 					data.gameLosses
 				},
 			} or nil,
-			Logic.readBool(props.showScore) and HtmlWidgets.Td{
-				css = {['text-align'] = 'left', width = 'auto'},
+			Logic.readBool(props.showScore) and TableWidgets.Cell{
 				children = StageWinnings._detailedScores(data.scoreDetails),
 			} or nil,
-			Logic.isNotEmpty(props.localcurrency) and HtmlWidgets.Td{
-				css = {width = 'auto'},
-				children = {Currency.display(
+			Logic.isNotEmpty(props.localcurrency) and TableWidgets.Cell{
+				children = Currency.display(
 					props.localcurrency,
 					data.winnings,
 					currencyDisplayConfig
-				)},
+				),
 			} or nil,
-			(Logic.readBool(props.autoexchange) or Logic.isEmpty(props.localcurrency)) and HtmlWidgets.Td{
-				css = {width = 'auto'},
-				children = {Currency.display(
+			(Logic.readBool(props.autoexchange) or Logic.isEmpty(props.localcurrency)) and TableWidgets.Cell{
+				children = Currency.display(
 					BASE_CURRENCY,
 					data.winnings * (self.currencyRate or 1),
 					currencyDisplayConfig
-				)},
+				),
 			} or nil
 		),
 	}
