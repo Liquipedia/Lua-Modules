@@ -161,7 +161,7 @@ function StageWinnings:_row(data)
 		formatPrecision = tonumber(props.precision) or 0,
 	}
 
-	return HtmlWidgets.Tr{
+	return TableWidgets.Row{
 		children = WidgetUtil.collect(
 			TableWidgets.Cell{children = OpponentDisplay.InlineOpponent{opponent = data.opponent}},
 			(Logic.readBool(props.showMatchWL) or props.prizeMode == 'matchWins') and TableWidgets.Cell{
