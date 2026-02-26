@@ -718,6 +718,11 @@ function MatchTable:buildBody()
 		}}
 	end
 
+	return self:buildRows()
+end
+
+---@return Widget[]
+function MatchTable:buildRows()
 	---@type Widget[]
 	local rows = {}
 
