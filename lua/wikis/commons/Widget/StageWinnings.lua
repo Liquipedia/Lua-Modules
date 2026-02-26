@@ -115,9 +115,9 @@ function StageWinnings:render()
 			{align = 'left'},
 			(Logic.readBool(props.showMatchWL) or props.prizeMode == 'matchWins') and {align = 'center'} or nil,
 			(Logic.readBool(props.showGameWL) or props.prizeMode == 'gameWins') and {align = 'center'} or nil,
-			Logic.readBool(props.showScore) and {align = 'center'} or nil,
-			Logic.isNotEmpty(props.localcurrency) and {align = 'center'} or nil,
-			(Logic.readBool(props.autoexchange) or Logic.isEmpty(props.localcurrency)) and {align = 'center'} or nil
+			Logic.readBool(props.showScore) and {align = 'left'} or nil,
+			Logic.isNotEmpty(props.localcurrency) and {align = 'right'} or nil,
+			(Logic.readBool(props.autoexchange) or Logic.isEmpty(props.localcurrency)) and {align = 'right'} or nil
 		),
 		children = {
 			self:_headerRow(),
