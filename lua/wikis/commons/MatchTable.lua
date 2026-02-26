@@ -89,11 +89,11 @@ local SECONDS_ONE_DAY = 3600 * 24
 ---@field result MatchTableMatchResult
 
 ---@class MatchTableMatchResult
----@field opponent match2opponent
+---@field opponent standardOpponent
 ---@field gameOpponents table[]
----@field vs match2opponent
+---@field vs standardOpponent
 ---@field gameVsOpponents table[]
----@field winner number
+---@field winner number?
 ---@field countGames boolean
 ---@field countRounds boolean
 
@@ -410,21 +410,17 @@ function MatchTable:buildAdditionalConditions()
 	return conditions
 end
 
----@param record table
+---@param record match2
 ---@return MatchTableMatch?
 function MatchTable:matchFromRecord(record)
-	local result = self:resultFromRecord(record)
+	local match = MatchGroupUtil.matchFromRecord(record) --[[@as MatchTableMatch]]
+	local result = self:resultFromRecord(match)
 	if not result then
 		return
 	end
 
-	record.extradata = record.extradata or {}
-
-	---@type MatchTableMatch
-	local match = Table.merge({
-		vods = self:vodsFromRecord(record),
-		result = result,
-	}, MatchGroupUtil.matchFromRecord(record))
+	match.result = result
+	match.vods = self:vodsFromRecord(match)
 
 	local tournament = Tournament.partialTournamentFromMatch(match)
 
@@ -438,16 +434,16 @@ function MatchTable:matchFromRecord(record)
 	return match
 end
 
----@param record table
+---@param record MatchGroupUtilMatch
 ---@return {index: number, link: string}[]
 function MatchTable:vodsFromRecord(record)
 	local vods = {}
 	if String.nilIfEmpty(record.vod) then
-		vods = {{index = 0, link = record.vod}}
+		vods[1] = {index = 0, link = record.vod}
 	end
 
-	Array.forEach(record.match2games, function(game, gameIndex)
-		if String.nilIfEmpty(game.vod) then
+	Array.forEach(record.games, function(game, gameIndex)
+		if String.isNotEmpty(game.vod) then
 			table.insert(vods, {link = game.vod, index = gameIndex})
 		end
 	end)
@@ -455,10 +451,10 @@ function MatchTable:vodsFromRecord(record)
 	return vods
 end
 
----@param record table
+---@param record MatchGroupUtilMatch
 ---@return MatchTableMatchResult?
 function MatchTable:resultFromRecord(record)
-	if #record.match2opponents ~= 2 then
+	if #record.opponents ~= 2 then
 		return self:resultFromNonStandardRecord(record)
 	end
 
@@ -466,22 +462,24 @@ function MatchTable:resultFromRecord(record)
 	local countGames = false
 	local countRounds = false
 
+	---@param opponentRecord standardOpponent
+	---@return boolean
 	local foundInAlias = function(opponentRecord)
 		if aliases[opponentRecord.name] then
 			countGames = true
 			countRounds = self.config.showRoundStats
 			return true
 		end
-		return self.config.mode == Opponent.solo and Array.any(opponentRecord.match2players, function(player)
-			return aliases[player.name] or false
+		return self.config.mode == Opponent.solo and Array.any(opponentRecord.players, function(player)
+			return aliases[player.pageName] or false
 		end)
 	end
 
-	local winner = tonumber(record.winner)
+	local winner = record.winner
 	local indexes
-	if foundInAlias(record.match2opponents[1]) then
+	if foundInAlias(record.opponents[1]) then
 		indexes = {1, 2}
-	elseif foundInAlias(record.match2opponents[2]) then
+	elseif foundInAlias(record.opponents[2]) then
 		indexes = {2, 1}
 		winner = winner == 2 and 1 or winner == 1 and 2 or winner
 	else
@@ -490,10 +488,12 @@ function MatchTable:resultFromRecord(record)
 		return
 	end
 
-	local gameOpponents = Array.map(record.match2games, Operator.property('opponents'))
+	local gameOpponents = Array.map(record.games, Operator.property('opponents'))
+
+	---@type MatchTableMatchResult
 	local result = {
-		opponent = record.match2opponents[indexes[1]],
-		vs = record.match2opponents[indexes[2]],
+		opponent = record.opponents[indexes[1]],
+		vs = record.opponents[indexes[2]],
 		winner = winner,
 		countGames = countGames,
 		countRounds = countRounds,
@@ -505,7 +505,7 @@ function MatchTable:resultFromRecord(record)
 end
 
 ---overwritable for wikis that have BR/FFA matches
----@param record table
+---@param record MatchGroupUtilMatch
 ---@return table?
 function MatchTable:resultFromNonStandardRecord(record)
 end
