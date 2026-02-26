@@ -33,9 +33,10 @@ function CustomMatchTable.results(args)
 	return CustomMatchTable(args):readConfig():query():build()
 end
 
+---@protected
 ---@param match MatchTableMatch
 ---@return Widget?
-function CustomMatchTable:_displayTier(match)
+function CustomMatchTable:displayTier(match)
 	if not self.config.showTier then return end
 
 	local tier, tierType, options = Tier.parseFromQueryData(match)
