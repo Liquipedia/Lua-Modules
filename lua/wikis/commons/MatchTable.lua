@@ -521,6 +521,8 @@ function MatchTable:statsFromMatches()
 		return math.max(tonumber(value) or 0, 0)
 	end
 
+	---@param opponent standardOpponent
+	---@return boolean
 	local hasWalkoverStatus = function(opponent)
 		return Logic.isNotEmpty(opponent.status) and opponent.status ~= 'S'
 	end
