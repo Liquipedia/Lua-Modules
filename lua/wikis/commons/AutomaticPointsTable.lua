@@ -155,9 +155,10 @@ function AutomaticPointsTable:parseOpponents(args, tournaments)
 			background = parsedArgs.bg,
 			note = parsedArgs.note,
 		}
-		assert(parsedOpponent.opponent.type == Opponent.team)
 		assert(not Opponent.isTbd(parsedOpponent.opponent))
 		local aliases = self:parseAliases(parsedArgs, parsedOpponent.opponent, #tournaments)
+		local resolveDate = DateExt.readTimestamp(args.date) or DateExt.getContextualDateOrNow()
+		parsedOpponent.opponent = Opponent.resolve(parsedOpponent.opponent, resolveDate, {syncPlayer = true})
 
 		parsedOpponent.results = Array.map(tournaments, function (tournament, tournamentIndex)
 			local manualPoints = parsedArgs['points' .. tournamentIndex]
@@ -172,7 +173,7 @@ function AutomaticPointsTable:parseOpponents(args, tournaments)
 				}, self:parseDeduction(parsedArgs, tournament, tournamentIndex))
 			end
 
-			local queriedPoints = self:queryPlacement(aliases[tournamentIndex], tournament)
+			local queriedPoints = self:queryPlacement(aliases[tournamentIndex], parsedOpponent.opponent, tournament)
 
 			if not queriedPoints then
 				return {}
@@ -203,14 +204,21 @@ end
 ---@return string[][]
 function AutomaticPointsTable:parseAliases(args, opponent, tournamentCount)
 	local aliases = {}
-	local lastAliases = TeamTemplate.queryHistoricalNames(Opponent.toName(opponent))
-
-	for index = 1, tournamentCount do
-		if String.isNotEmpty(args['alias' .. index]) then
-			lastAliases = TeamTemplate.queryHistoricalNames(args['alias' .. index])
+	local name = Opponent.toName(opponent)
+	if (opponent.type == Opponent.team) then
+		local lastAliases = TeamTemplate.queryHistoricalNames(name)
+		for index = 1, tournamentCount do
+			if String.isNotEmpty(args['alias' .. index]) then
+				lastAliases = TeamTemplate.queryHistoricalNames(args['alias' .. index])
+			end
+			aliases[index] = lastAliases
 		end
-		aliases[index] = lastAliases
+	else
+		for index = 1, tournamentCount do
+			aliases[index] = {name}
+		end
 	end
+
 	return aliases
 end
 
@@ -236,12 +244,13 @@ function AutomaticPointsTable:parseDeduction(args, tournament, tournamentIndex)
 end
 
 ---@param aliases string[]
+---@param opponent standardOpponent
 ---@param tournament StandardTournament
-function AutomaticPointsTable:queryPlacement(aliases, tournament)
+function AutomaticPointsTable:queryPlacement(aliases, opponent, tournament)
+	local conditionType = (opponent.type == 'team') and 'opponenttemplate' or 'opponentname'
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('parent'), Comparator.eq, tournament.pageName),
-		ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
-		Condition.Util.anyOf(ColumnName('opponenttemplate'), aliases),
+		Condition.Util.anyOf(ColumnName(conditionType), aliases),
 	}
 	local result = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = tostring(conditions),
