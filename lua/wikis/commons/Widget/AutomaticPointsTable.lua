@@ -137,7 +137,10 @@ function AutomaticPointsTableWidget:createRow(opponent, opponentIndex)
 			AutomaticPointsTableWidget._createRowCell{
 				additionalClasses = {'name-cell'},
 				background = opponent.background,
- 				children = OpponentDisplay.BlockOpponent{opponent = opponent.opponent, note = opponent.note, showPlayerTeam = true},
+				children = OpponentDisplay.BlockOpponent{opponent = opponent.opponent,
+				note = opponent.note,
+				showPlayerTeam = true
+			},
 			},
 			self:_createTotalPointsCell(opponent),
 			Array.flatMap(opponent.results, function (result, resultIndex)
