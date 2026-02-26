@@ -68,7 +68,7 @@ function ResultsTable:buildHeader()
 		TableWidgets.CellHeader{children = 'Tier'},
 		self.config.showType and TableWidgets.CellHeader{children = 'Type'} or nil,
 		self.config.displayGameIcons and TableWidgets.CellHeader{
-			children = HtmlWidgets.Abbreviation{children = 'G.', title = 'Game'}
+			children = HtmlWidgets.Abbr{children = 'G.', title = 'Game'}
 		} or nil,
 		TableWidgets.CellHeader{
 			colspan = 2,
