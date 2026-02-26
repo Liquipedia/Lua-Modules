@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local Faction = Lua.import('Module:Faction')
 local Logic = Lua.import('Module:Logic')
@@ -31,17 +32,12 @@ local Variables = Lua.import('Module:Variables')
 ---@field entries WarcraftParticipantTableEntry[]
 
 ---@class WarcraftParticipantTable: ParticipantTable
----@field isPureSolo boolean
----@field _displaySoloFactionTableSection function
----@field _displayHeader function
----@field _getFactionNumbers function
-
-local CustomParticipantTable = {}
+local CustomParticipantTable = Class.new(ParticipantTable)
 
 ---@param frame Frame
 ---@return Html?
 function CustomParticipantTable.run(frame)
-	local participantTable = ParticipantTable(frame) --[[@as WarcraftParticipantTable]]
+	local participantTable = CustomParticipantTable(frame)
 
 	participantTable.readConfig = CustomParticipantTable.readConfig
 	participantTable.readEntry = CustomParticipantTable.readEntry
