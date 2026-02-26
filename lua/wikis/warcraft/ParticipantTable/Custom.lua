@@ -136,22 +136,22 @@ function CustomParticipantTable:createSoloFactionTable()
 
 	if not config.display then return end
 
-	local factioNumbers = self:_getFactionNumbers()
+	local factionNumbers = self:_getFactionNumbers()
 
 	local factionColumns = Array.copy(Faction.coreFactions)
 
-	if config.displayRandomColumn or config.displayRandomColumn == nil and factioNumbers.r > 0 then
+	if config.displayRandomColumn or config.displayRandomColumn == nil and factionNumbers.r > 0 then
 		table.insert(factionColumns, Faction.read('r'))
 	end
 
 	if config.displayUnknownColumn or
-		config.displayUnknownColumn == nil and factioNumbers[Faction.defaultFaction] > 0 then
+		config.displayUnknownColumn == nil and factionNumbers[Faction.defaultFaction] > 0 then
 
 		table.insert(factionColumns, Faction.defaultFaction)
 	end
 
 	if config.displayMultipleFactionColumn or
-		config.displayMultipleFactionColumn == nil and factioNumbers.m > 0 then
+		config.displayMultipleFactionColumn == nil and factionNumbers.m > 0 then
 
 		table.insert(factionColumns, Faction.read('m'))
 	end
@@ -162,7 +162,7 @@ function CustomParticipantTable:createSoloFactionTable()
 		:addClass('participantTable participantTable-faction')
 		:css('grid-template-columns', 'repeat(' .. colSpan .. ', 1fr)')
 		:css('width', (colSpan * config.soloColumnWidth) .. 'px')
-		:node(self:_displayHeader(factionColumns, factioNumbers))
+		:node(self:_displayHeader(factionColumns, factionNumbers))
 
 	Array.forEach(self.sections, function(section) self:_displaySoloFactionTableSection(section, factionColumns) end)
 
