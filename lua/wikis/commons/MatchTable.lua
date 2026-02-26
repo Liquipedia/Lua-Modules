@@ -284,10 +284,10 @@ function MatchTable:readTimeRange()
 	end
 
 	--build year range from subpage name (or input)
-	local yearRange = Array.map(mw.text.split(yearsString, '-'), String.trim)
-	yearRange = {
-		tonumber(yearRange[1]),
-		tonumber(yearRange[2] or yearRange[1]),
+	local yearInput = Array.parseCommaSeparatedString(yearsString, '-')
+	local yearRange = {
+		tonumber(yearInput[1]),
+		tonumber(yearInput[2] or yearInput[1]),
 	}
 
 	--sort
@@ -387,8 +387,9 @@ end
 ---@return ConditionTree?
 function MatchTable:buildAdditionalConditions()
 	local args = self.args
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'notplayed')}
+	local conditions = ConditionTree(BooleanOperator.all):add(
+		ConditionNode(ColumnName('status'), Comparator.neq, 'notplayed')
+	)
 
 	local getOrCondition = function(lpdbKey, input)
 		if Logic.isEmpty(input) then return end
