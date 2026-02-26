@@ -50,7 +50,7 @@ local KING_ICONS = {
 }
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
@@ -165,6 +165,10 @@ function CustomMatchSummary._linksTable(match)
 			Td{classes = {'brkts-popup-spaced', 'vodlink'}, children = Array.map(linksFooter.elements, tostring)}
 		}}
 	end)
+
+	if Logic.isEmpty(rows) then
+		return
+	end
 
 	return Collapsible{
 		tableClasses = {'wikitable-striped'},

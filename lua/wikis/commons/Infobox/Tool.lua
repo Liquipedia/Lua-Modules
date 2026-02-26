@@ -21,17 +21,18 @@ local Center = Widgets.Center
 local UNKNOWN = 'Unknown'
 
 ---@class ToolInfobox:BasicInfobox
+---@operator call(Frame): ToolInfobox
 local Tool = Class.new(BasicInfobox)
 
 ---Entry point of tool infobox
 ---@param frame Frame
----@return Html
+---@return Widget
 function Tool.run(frame)
 	local tool = Tool(frame)
 	return tool:createInfobox()
 end
 
----@return string
+---@return Widget
 function Tool:createInfobox()
 	local args = self.args
 
@@ -57,7 +58,7 @@ function Tool:createInfobox()
 		self:categories('Tools', unpack(self:getWikiCategories(args)))
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Tool')
 end
 
 --- Allows for overriding this functionality

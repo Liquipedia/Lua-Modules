@@ -33,7 +33,7 @@ local FAVOR_ICON = '[[File:Smite Currency Favor.png|x20px|Favor|link=Favor]]'
 local GEMS_ICON = '[[File:Smite Currency Gems.png|x20px|Gems|link=Gems]]'
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomGod.run(frame)
 	local unit = CustomGod(frame)
 	unit:setWidgetInjector(CustomInjector(unit))

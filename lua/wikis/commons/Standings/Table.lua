@@ -85,7 +85,7 @@ function StandingsTable.mergeOpponentsData(manualOpponents, importedOpponents, a
 	Array.forEach(importedOpponents, function(importedOpponent)
 		--- Find the matching manual opponent
 		local manualOpponentId = Array.indexOf(newOpponents, function(manualOpponent)
-			return Opponent.toName(manualOpponent.opponent) == Opponent.toName(importedOpponent.opponent)
+			return Opponent.same(manualOpponent.opponent, importedOpponent.opponent)
 		end)
 		--- If there isn't one, means this is a new opponent
 		if manualOpponentId == 0 then

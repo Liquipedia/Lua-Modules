@@ -8,7 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Condition = Lua.import('Module:Condition')
-local DateExt = Lua.import('Module:Date/Ext')
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
@@ -28,31 +28,31 @@ local CONTENT = {
 		heading = 'Useful Articles',
 		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
-		boxid = 1503,
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
 		body = WantToHelp{},
 		padding = true,
-		boxid = 1504,
+		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP,
 	},
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferPage = 'Player Transfers/' .. DateExt.getYearOf()
+			transferPage = MainPageLayoutUtil.getYearlyTransferPage()
 		},
-		boxid = 1509,
+		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
 		body = ThisDayWidgets.Content(),
 		padding = true,
-		boxid = 1510,
+		boxid = MainPageLayoutUtil.BoxId.THIS_DAY,
 	},
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
-		boxid = 1516,
+		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -65,7 +65,7 @@ local CONTENT = {
 		heading = 'Matches',
 		body = MatchTicker{},
 		padding = true,
-		boxid = 1507,
+		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -74,7 +74,7 @@ local CONTENT = {
 			completedDays = 60,
 		},
 		padding = true,
-		boxid = 1508,
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 }
 
@@ -88,7 +88,7 @@ return {
 	title = 'Clash Royale',
 	navigation = {
 		{
-			file = 'Mohamed_Light_CRL_2024_World_Finals.jpg',
+			file = 'SuperCardCompDraft RunicMountain Banner.png',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -97,7 +97,7 @@ return {
 			},
 		},
 		{
-			file = 'TL_Crl_World_Finals-2019.png',
+			file = 'HolidayFeast CozyClashmas Banner.png',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -106,7 +106,7 @@ return {
 			},
 		},
 		{
-			file = 'Mugi_CRL_2023_World_Finals.jpeg ',
+			file = 'Touchdown LumberLove Banner.png',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -160,12 +160,17 @@ return {
 			},
 		},
 		{
-			file = 'Clash_Royale_Illustration_Merge_Tactics.png',
-			title = 'Merge Tactics',
-			link = 'Portal:Merge Tactics',
+			file = 'Clash_Royale_Illustration_Heroes_3D_KeyArt.png',
+			title = 'Hero Cards',
+			link = 'Portal:Hero Cards',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[extradata_type::Hero Troop]]',
+			},
 		},
 		{
-			file = 'Nova_Crl_2018_World_Finals.jpg',
+			file = 'RuneGiant RunicMountain Banner.png',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
@@ -173,7 +178,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				sizes = {xxl = 5, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
@@ -190,7 +195,7 @@ return {
 				}
 			},
 			{ -- Right
-				size = 6,
+				sizes = {xxl = 7, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 2,

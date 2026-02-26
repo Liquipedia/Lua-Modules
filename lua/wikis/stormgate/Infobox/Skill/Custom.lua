@@ -46,7 +46,7 @@ local GAME_MODE_ICON = {
 }
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomSkill.run(frame)
 	local skill = CustomSkill(frame)
 

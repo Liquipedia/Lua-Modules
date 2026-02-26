@@ -5,7 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----@type table<string, PersonRoleData>
+---@type table<string, RoleBaseData>
 local inGameRoles = {
 	['igl'] = {category = 'In-game leaders', display = 'In-game Leader'},
 	['rifler'] = {category = 'Riflers', display = 'Rifler'},

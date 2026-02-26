@@ -23,9 +23,10 @@ local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
 ---@class ManufacturerInfobox: BasicInfobox
+---@operator call(Frame): ManufacturerInfobox
 local Manufacturer = Class.new(BasicInfobox)
 
----@return string
+---@return Widget
 function Manufacturer:createInfobox()
 	local args = self.args
 
@@ -78,7 +79,7 @@ function Manufacturer:createInfobox()
 		self:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Manufacturer')
 end
 
 ---@param args table

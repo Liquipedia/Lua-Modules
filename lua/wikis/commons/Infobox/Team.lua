@@ -13,13 +13,15 @@ local Class = Lua.import('Module:Class')
 local Date = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
 local Image = Lua.import('Module:Image')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
-local MatchTicker = Lua.import('Module:MatchTicker/Custom')
+local MatchTicker = Lua.import('Module:MatchTicker')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Variables = Lua.import('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
@@ -39,6 +41,7 @@ local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
 ---@class InfoboxTeam : BasicInfobox
+---@operator call(Frame): InfoboxTeam
 local Team = Class.new(BasicInfobox)
 
 local LINK_VARIANT = 'team'
@@ -54,13 +57,13 @@ local Status = {
 }
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function Team.run(frame)
 	local team = Team(frame)
 	return team:createInfobox()
 end
 
----@return string
+---@return Widget
 function Team:createInfobox()
 	local args = self.args
 
@@ -73,7 +76,7 @@ function Team:createInfobox()
 
 	-- Team Information
 	local team = args.teamtemplate or self.pagename
-	self.teamTemplate = mw.ext.TeamTemplate.raw(team) or {}
+	self.teamTemplate = TeamTemplate.getRaw(team)
 
 	args.imagedark = args.imagedark or args.imagedarkmode or args.image or self.teamTemplate.imagedark
 	args.image = args.image or self.teamTemplate.image
@@ -135,6 +138,7 @@ function Team:createInfobox()
 		},
 		Customizable{id = 'custom', children = {}},
 		Widgets.Links{links = links, variant = LINK_VARIANT},
+		Widgets.ShopMerch{args = args},
 		Customizable{
 			id = 'achievements',
 			children = {
@@ -178,7 +182,7 @@ function Team:createInfobox()
 		Customizable{id = 'customcontent', children = {}},
 		Center{children = {args.footnotes}},
 	}
-	self:bottom(self:_createUpcomingMatches())
+	self:top(self:_createUpcomingMatches())
 	self:bottom(self:createBottomContent())
 
 	-- Categories
@@ -195,7 +199,7 @@ function Team:createInfobox()
 	-- Store Wiki-variables
 	self:_definePageVariables(args)
 
-	return self:build(widgets)
+	return self:build(widgets, 'Team')
 end
 
 ---@return string|number|nil # storage date
@@ -204,7 +208,7 @@ function Team:processCreateDates()
 	local earliestGameTimestamp = Team._parseDate(ReferenceCleaner.clean{input = self.args.created}) or Date.maxTimestamp
 
 	local created = Array.map(self:getAllArgsForBase(self.args, 'created'), function (creation)
-		local splitInput = Array.map(mw.text.split(creation, ':'), String.trim)
+		local splitInput = Array.parseCommaSeparatedString(creation, ':')
 		if #splitInput ~= 2 then
 			-- Legacy Input
 			return creation
@@ -236,17 +240,12 @@ end
 ---@return string?
 ---@return string?
 function Team:_getTeamIcon(date)
-	if not self.teamTemplate then
-		return
-	end
+	local historicalTeamTemplateData = self.teamTemplate.historicaltemplate
+		and TeamTemplate.getRawOrNil(self.teamTemplate.historicaltemplate, date)
+		or {}
 
-	local icon = self.teamTemplate.historicaltemplate
-		and mw.ext.TeamTemplate.raw(self.teamTemplate.historicaltemplate, date).image
-		or self.teamTemplate.image
-
-	local iconDark = self.teamTemplate.historicaltemplate
-		and mw.ext.TeamTemplate.raw(self.teamTemplate.historicaltemplate, date).imagedark
-		or self.teamTemplate.imagedark
+	local icon = historicalTeamTemplateData.image or self.teamTemplate.image
+	local iconDark = historicalTeamTemplateData.imagedark or self.teamTemplate.imagedark
 
 	return icon, iconDark
 end
@@ -299,12 +298,42 @@ function Team:_createLocation(location)
 			(locationDisplay or '')
 end
 
----@return Html?
+---@return Widget?
 function Team:_createUpcomingMatches()
-	if self:shouldStore(self.args) and Info.config.match2.status > 0 then
-		local frame = {short = true} ---@type Frame
-		return MatchTicker.team(frame)
+	if not self:shouldStore(self.args) then
+		return nil
 	end
+
+	if Info.config.match2.status == 0 then
+		return nil
+	end
+
+	local result = Logic.tryCatch(
+		function()
+			local matchTicker = MatchTicker{
+				team = self.pagename,
+				limit = 5,
+				upcoming = true,
+				ongoing = true,
+				hideTournament = false,
+			}
+			matchTicker:query()
+			return matchTicker
+		end,
+		function()
+			return nil
+		end
+	)
+
+	if not result or not result.matches or #result.matches == 0 then
+		return nil
+	end
+
+	local EntityDisplay = Lua.import('Module:MatchTicker/DisplayComponents/Entity')
+	return EntityDisplay.Container{
+		config = result.config,
+		matches = result.matches,
+	}:create()
 end
 
 ---@param location string?
@@ -348,7 +377,7 @@ function Team:_setLpdbData(args, links)
 		disbanddate = ReferenceCleaner.clean{input = args.disbanded},
 		template = self.teamTemplate.historicaltemplate or self.teamTemplate.templatename,
 		status = args.disbanded and Status.DISBANDED or Status.ACTIVE,
-		links = mw.ext.LiquipediaDB.lpdb_create_json(
+		links = Json.stringify(
 			Links.makeFullLinksForTableItems(links or {}, 'team')
 		),
 		extradata = {}
@@ -382,8 +411,7 @@ end
 ---@param args table
 ---@return boolean
 function Team:shouldStore(args)
-	return Namespace.isMain() and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+	return Namespace.isMain() and Lpdb.isStorageEnabled()
 end
 
 ---@param args table

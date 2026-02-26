@@ -251,7 +251,9 @@ Author(s): iMarbot
 }
 
 .gridTable.tournamentCard .gridCell.Placement.Qualified > .Participants {
-	flex-direction: row;
+	display: inline-grid;
+	grid-template-columns: repeat( auto-fit, minmax( 150px, 1fr ) );
+	min-width: 15vw;
 }
 
 @media ( max-width: 1100px ) {

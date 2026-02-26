@@ -33,7 +33,7 @@ local BLUE_MOTES_ICON = '[[File:Blue Motes icon.png|20px|Blue Motes|link=Blue Mo
 local WILD_CORES_ICON = '[[File:Wild Cores icon.png|20px|Wild Cores|link=Wild Cores]]'
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomChampion.run(frame)
 	local unit = CustomChampion(frame)
 	unit:setWidgetInjector(CustomInjector(unit))

@@ -18,12 +18,13 @@ local Placement = Lua.import('Module:PrizePool/Award/Placement')
 local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Widgets = Lua.import('Module:Widget/All')
+local Div = Widgets.Div
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local TableRow = Widgets.TableRow
 local TableCell = Widgets.TableCell
 
---- @class AwardPrizePool
---- @field options table
---- @field _lpdbInjector LpdbInjector?
+--- @class AwardPrizePool: BasePrizePool
+--- @operator call(...): AwardPrizePool
 local AwardPrizePool = Class.new(BasePrizePool)
 
 ---@param args table
@@ -86,11 +87,17 @@ end
 ---@return WidgetTableRow
 function AwardPrizePool:_toggleExpand()
 	local expandButton = TableCell{
-		children = {'<div>Show more Awards&nbsp;<i class="fa fa-chevron-down"></i></div>'},
+		children = Div{children = {
+			'Show more Awards&nbsp;',
+			IconFa{iconName = 'expand'},
+		}},
 		classes = {'general-collapsible-expand-button'},
 	}
 	local collapseButton = TableCell{
-		children = {'<div>Show less Awards&nbsp;<i class="fa fa-chevron-up"></i></div>'},
+		children = Div{children = {
+			'Show less Awards&nbsp;',
+			IconFa{iconName = 'collapse'},
+		}},
 		classes = {'general-collapsible-collapse-button'},
 	}
 

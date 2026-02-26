@@ -5,14 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----@type table<string, PersonRoleData>
+---@type table<string, RoleBaseData>
 local inGameRoles = {
-	['top'] = {category = 'Top Laners', display = 'Top Lane'},
-	['bottom'] = {category = 'Bottom Laners', display = 'Bottom Laner'},
-	['mid'] = {category = 'Mid Laners', display = 'Mid Laner'},
-	['side lane'] = {category = 'Side Laners', display = 'Side Laner'},
-	['jungler'] = {category = 'Junglers', display = 'Jungler'},
-	['roamer'] = {category = 'Roamers', display = 'Roamer'},
+	['top'] = {category = 'Top Laners', display = 'Top Lane', sortOrder = 1},
+	['bottom'] = {category = 'Bottom Laners', display = 'Bottom Laner', sortOrder = 5},
+	['mid'] = {category = 'Mid Laners', display = 'Mid Laner', sortOrder = 4},
+	['side lane'] = {category = 'Side Laners', display = 'Side Laner', sortOrder = 2},
+	['jungler'] = {category = 'Junglers', display = 'Jungler', sortOrder = 3},
+	['roamer'] = {category = 'Roamers', display = 'Roamer', sortOrder = 6},
+	['flex'] = {category = 'Flex', display = 'Flex', sortOrder = 7},
 }
 
 inGameRoles['jgl'] = inGameRoles.jungler
@@ -33,5 +34,7 @@ inGameRoles['ds lane'] = inGameRoles.top
 inGameRoles['dsl'] = inGameRoles.top
 inGameRoles['dark slayer lane'] = inGameRoles.top
 inGameRoles['confront'] = inGameRoles.top
+inGameRoles['clash'] = inGameRoles.top
+inGameRoles['fill'] = inGameRoles.flex
 
 return inGameRoles

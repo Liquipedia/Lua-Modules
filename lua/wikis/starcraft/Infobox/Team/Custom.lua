@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
@@ -51,7 +51,7 @@ local ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local PLAYER_EARNINGS_ABBREVIATION = '<abbr title="Earnings of players while on the team">Player earnings</abbr>'
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 
@@ -156,7 +156,7 @@ function CustomTeam:shouldStore(args)
 	return Namespace.isMain() and
 		not Logic.readBool(args.disable_lpdb) and
 		not Logic.readBool(args.disable_storage) and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+		Lpdb.isStorageEnabled()
 end
 
 ---@param args table

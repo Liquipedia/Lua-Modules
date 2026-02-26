@@ -38,6 +38,7 @@ function DataTable:render()
 		},
 		classes = WidgetUtil.collect('table-responsive', self.props.wrapperClasses),
 		attributes = self.props.attributes,
+		css = self.props.css,
 	}
 end
 

@@ -52,6 +52,27 @@ function Array.copy(tbl)
 	return copy
 end
 
+---Returns true if two arrays are equal to each other.
+---@param arr1 any[]
+---@param arr2 any[]
+---@return boolean
+---@nodiscard
+function Array.equals(arr1, arr2)
+	assert(Array.isArray(arr1), 'arr1 is not an array')
+	assert(Array.isArray(arr2), 'arr2 is not an array')
+	if arr1 == arr2 then
+		return true
+	elseif #arr1 ~= #arr2 then
+		return false
+	end
+	for index = 1, #arr1 do
+		if arr1[index] ~= arr2[index] then
+			return false
+		end
+	end
+	return true
+end
+
 --[[
 Returns a subarray given by its indexes.
 

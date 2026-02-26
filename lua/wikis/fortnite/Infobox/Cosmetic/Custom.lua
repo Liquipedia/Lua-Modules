@@ -24,7 +24,7 @@ local CustomCosmetic = Class.new(Cosmetic)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomCosmetic.run(frame)
 	local cosmetic = CustomCosmetic(frame)
 	cosmetic.args.image = cosmetic.args.image or ('Fortnite ' .. cosmetic.name .. '.png')

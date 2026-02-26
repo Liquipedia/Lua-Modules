@@ -47,6 +47,8 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 		end
 	end
 
+	BasicHiddenDataBox.checkAndAssign('tournament_mod', args.modname, (queryResult.extradata or {}).mod)
+
 	--if specified also store in lpdb (custom for sc2)
 	if Logic.readBool(args.storage) then
 		local prizepool = CustomHiddenDataBox.cleanPrizePool(args.prizepool) or queryResult.prizepool

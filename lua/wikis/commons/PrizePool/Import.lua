@@ -39,6 +39,9 @@ local GSL_STYLE_SCORES = {
 local BYE_OPPONENT_NAME = 'bye'
 
 ---@class PrizePoolImport
+---@operator call(PrizePool): PrizePoolImport
+---@field parent PrizePool
+---@field config PrizePoolImportConfig
 local Import = Class.new(function(self, ...) self:init(...) end)
 
 ---@class PrizePoolImportConfig

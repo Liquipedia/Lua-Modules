@@ -166,7 +166,7 @@ function Age:calculate()
 
 	if self.birthDate.isExact and (self.deathDate.isExact or self.deathDate.isEmpty) then
 		---@cast endDate -nil
-		return self:_secondsToAge(os.difftime(endDate, self.birthDate.time))
+		return DateExt.calculateAge(endDate, self.birthDate.time)
 	elseif self.birthDate.year and (self.deathDate.year or self.deathDate.isEmpty) then
 		local minEndDate
 		local maxEndDate
@@ -178,8 +178,8 @@ function Age:calculate()
 			maxEndDate = self.deathDate:getLatestPossible()
 		end
 
-		local minAge = self:_secondsToAge(os.difftime(minEndDate, self.birthDate:getLatestPossible()))
-		local maxAge = self:_secondsToAge(os.difftime(maxEndDate, self.birthDate:getEarliestPossible()))
+		local minAge = DateExt.calculateAge(minEndDate, self.birthDate:getLatestPossible())
+		local maxAge = DateExt.calculateAge(maxEndDate, self.birthDate:getEarliestPossible())
 
 		-- If our min and max age values are identical, then we can just display that value. Else,
 		-- we have to display a range of ages
@@ -214,12 +214,6 @@ function Age:makeDisplay()
 	end
 
 	return result
-end
-
----@param seconds integer
----@return integer
-function Age:_secondsToAge(seconds)
-	return math.floor(seconds / 60 / 60 / 24 / 365.2425)
 end
 
 ---@param args table

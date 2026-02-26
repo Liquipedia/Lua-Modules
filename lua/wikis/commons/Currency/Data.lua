@@ -780,6 +780,15 @@ return {
 			text = '₩',
 		},
 	},
+	syp = {
+		code = 'SYP',
+		name = 'Syrian pound',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'SP',
+		},
+	},
 	thb = {
 		code = 'THB',
 		name = 'Thai Baht',
@@ -846,6 +855,15 @@ return {
 	usd = {
 		code = 'USD',
 		name = 'United States Dollar',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '$',
+		},
+	},
+	uyu = {
+		code = 'UYU',
+		name = 'Uruguayan Peso',
 		symbol = {
 			hasSpace = false,
 			isAfter = false,

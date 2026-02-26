@@ -16,16 +16,17 @@ local Header = Widgets.Header
 local Center = Widgets.Center
 
 ---@class CampaignInfobox: BasicInfobox
+---@operator call(Frame): CampaignInfobox
 local Campaign = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function Campaign.run(frame)
 	local campaign = Campaign(frame)
 	return campaign:createInfobox()
 end
 
----@return string
+---@return Widget
 function Campaign:createInfobox()
 	local args = self.args
 
@@ -41,7 +42,7 @@ function Campaign:createInfobox()
 
 	self:categories('Campaign')
 
-	return self:build(widgets)
+	return self:build(widgets, 'Campaign')
 end
 
 

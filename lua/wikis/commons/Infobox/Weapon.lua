@@ -24,16 +24,17 @@ local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 
 ---@class WeaponInfobox: BasicInfobox
+---@operator call(Frame): WeaponInfobox
 local Weapon = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function Weapon.run(frame)
 	local weapon = Weapon(frame)
 	return weapon:createInfobox()
 end
 
----@return string
+---@return Widget
 function Weapon:createInfobox()
 	local args = self.args
 
@@ -151,7 +152,7 @@ function Weapon:createInfobox()
 		self:setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Weapon')
 end
 
 ---@param location string?

@@ -11,9 +11,10 @@ local Array = Lua.import('Module:Array')
 local Date = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local FnUtil = Lua.import('Module:FnUtil')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TypeUtil = Lua.import('Module:TypeUtil')
@@ -37,6 +38,7 @@ local MatchGroupUtil = {types = {}}
 ---@class MatchGroupUtilLowerEdge
 ---@field lowerMatchIndex number
 ---@field opponentIndex number
+
 MatchGroupUtil.types.LowerEdge = TypeUtil.struct({
 	lowerMatchIndex = 'number',
 	opponentIndex = 'number',
@@ -47,6 +49,7 @@ MatchGroupUtil.types.AdvanceBg = TypeUtil.literalUnion('up', 'stayup', 'stay', '
 ---@field bg AdvanceBg
 ---@field matchId string?
 ---@field type string?
+
 MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 	bg = MatchGroupUtil.types.AdvanceBg,
 	matchId = 'string?',
@@ -74,7 +77,8 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 ---@field upperMatchId string?
 ---@field matchId string?
 ---@field matchPage string?
----@field qualifiedHeader boolean?
+---@field qualifiedHeader string?
+
 MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
 	bracketResetMatchId = 'string?',
@@ -87,7 +91,7 @@ MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	qualLoseLiteral = 'string?',
 	qualSkip = 'number?',
 	qualWin = 'boolean?',
-	qualifiedHeader = 'boolean?',
+	qualifiedHeader = 'string?',
 	qualWinLiteral = 'string?',
 	skipRound = 'number?',
 	thirdPlaceMatchId = 'string?',
@@ -106,6 +110,7 @@ MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 ---@field sectionIndex number
 ---@field semanticDepth number
 ---@field semanticRoundIndex number
+
 MatchGroupUtil.types.MatchCoordinates = TypeUtil.struct({
 	depth = 'number',
 	depthCount = 'number',
@@ -125,6 +130,7 @@ MatchGroupUtil.types.MatchCoordinates = TypeUtil.struct({
 ---@field type 'matchlist'
 ---@field matchId string?
 ---@field matchPage string?
+
 MatchGroupUtil.types.MatchlistBracketData = TypeUtil.struct({
 	header = 'string?',
 	title = 'string?',
@@ -145,6 +151,8 @@ MatchGroupUtil.types.BracketData = TypeUtil.union(
 ---@field extradata table?
 ---@field pageIsResolved boolean?
 ---@field faction string?
+---@field apiId string?
+
 MatchGroupUtil.types.Player = TypeUtil.struct({
 	displayName = 'string?',
 	flag = 'string?',
@@ -172,6 +180,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 ---@field type OpponentType
 ---@field team string?
 ---@field extradata table
+
 MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	advanceBg = 'string?',
 	advances = 'boolean?',
@@ -194,6 +203,7 @@ MatchGroupUtil.types.Opponent = TypeUtil.struct({
 ---@field players standardPlayer[]
 ---@field template string?
 ---@field type string
+
 MatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 	name = 'string?',
 	players = TypeUtil.optional(TypeUtil.array(MatchGroupUtil.types.Player)),
@@ -216,6 +226,7 @@ MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed
 ---@field mode string?
 ---@field opponents {players: table[], score: number?, status: string?}[]
 ---@field patch string?
+---@field resultType string?
 ---@field scores number[]
 ---@field subgroup number?
 ---@field type string?
@@ -223,6 +234,7 @@ MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed
 ---@field winner integer?
 ---@field status string?
 ---@field extradata table?
+
 MatchGroupUtil.types.Game = TypeUtil.struct({
 	comment = 'string?',
 	date = 'string?',
@@ -233,6 +245,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 	mapDisplayName = 'string?',
 	mode = 'string?',
 	patch = 'string?',
+	resultType = 'string?',
 	scores = TypeUtil.array('number'),
 	subgroup = 'number?',
 	type = 'string?',
@@ -262,6 +275,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field patch string?
 ---@field phase 'upcoming'|'ongoing'|'finished'
 ---@field publisherTier string?
+---@field resultType string?
 ---@field section string?
 ---@field series string?
 ---@field status MatchStatus
@@ -275,6 +289,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field timestamp number
 ---@field timezoneId string?
 ---@field bestof number?
+
 MatchGroupUtil.types.Match = TypeUtil.struct({
 	bracketData = MatchGroupUtil.types.BracketData,
 	comment = 'string?',
@@ -295,6 +310,7 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	parent = 'string?',
 	patch = 'string?',
 	publisherTier = 'string?',
+	resultType = 'string?',
 	section = 'string?',
 	series = 'string?',
 	status = MatchGroupUtil.types.Status,
@@ -319,6 +335,7 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 ---@field matches MatchGroupUtilMatch[]
 ---@field matchesById table<string, MatchGroupUtilMatch>
 ---@field type 'matchlist'
+
 MatchGroupUtil.types.Matchlist = TypeUtil.struct({
 	bracketDatasById = TypeUtil.table('string', MatchGroupUtil.types.BracketData),
 	matches = TypeUtil.array(MatchGroupUtil.types.Match),
@@ -335,6 +352,7 @@ MatchGroupUtil.types.Matchlist = TypeUtil.struct({
 ---@field rounds string[][]
 ---@field sections string[][]
 ---@field type 'bracket'
+
 MatchGroupUtil.types.Bracket = TypeUtil.struct({
 	bracketDatasById = TypeUtil.table('string', MatchGroupUtil.types.BracketData),
 	coordinatesByMatchId = TypeUtil.table('string', MatchGroupUtil.types.MatchCoordinates),
@@ -351,6 +369,19 @@ MatchGroupUtil.types.MatchGroup = TypeUtil.union(
 	MatchGroupUtil.types.Matchlist,
 	MatchGroupUtil.types.Bracket
 )
+
+---Fetches all match ids of matches that satisfy the supplied condition
+---@param props {conditions: string|AbstractConditionNode, limit: string|integer?, order: string?}
+---@return string[]
+function MatchGroupUtil.fetchMatchIds(props)
+	---@type string[]
+	return Array.map(mw.ext.LiquipediaDB.lpdb('match2', {
+		limit = tonumber(props.limit) or 1000,
+		query = 'match2id',
+		conditions = tostring(props.conditions),
+		order = props.order
+	}), Operator.property('match2id'))
+end
 
 ---Fetches all matches in a matchlist or bracket. Tries to read from page variables before fetching from LPDB.
 ---Returns a list of records ordered lexicographically by matchId.

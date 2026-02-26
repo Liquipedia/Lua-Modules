@@ -22,7 +22,7 @@ local _cache
 local TBD = 'TBD'
 
 -- Template entry point
----@return Html
+---@return Widget
 function CustomLegacyPrizePool.run()
 	return LegacyPrizePool.run(CustomLegacyPrizePool)
 end

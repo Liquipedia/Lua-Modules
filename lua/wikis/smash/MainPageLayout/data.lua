@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 local TournamentsList = Lua.import('Module:TournamentsList')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -20,24 +21,26 @@ local CONTENT = {
 		heading = 'Useful Articles',
 		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
-		boxid = 1503,
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
 		body = WantToHelp{},
 		padding = true,
-		boxid = 1504,
+		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP,
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{limit = 10},
-		boxid = 1509,
+		body = TransfersList{
+			transferPage = MainPageLayoutUtil.getYearlyTransferPage()
+		},
+		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
 		body = ThisDayWidgets.Content(),
 		padding = true,
-		boxid = 1510,
+		boxid = MainPageLayoutUtil.BoxId.THIS_DAY,
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -53,7 +56,7 @@ local CONTENT = {
 			}
 		}},
 		padding = true,
-		boxid = 1508,
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 }
 
@@ -121,7 +124,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 7,
+				sizes = {xxl = 5, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 2,
@@ -138,7 +141,7 @@ return {
 				}
 			},
 			{ -- Right
-				size = 5,
+				sizes = {xxl = 7, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,

@@ -37,6 +37,9 @@ return {
 		infoboxPlayer = {
 			autoTeam = true,
 		},
+		participants = {
+			defaultPlayerNumber = 4,
+		},
 	},
 	defaultRoundPrecision = 0,
 }

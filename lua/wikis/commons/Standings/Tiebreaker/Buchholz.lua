@@ -22,6 +22,9 @@ local TiebreakerBuchholz = Class.new(TiebreakerInterface)
 ---@return integer
 function TiebreakerBuchholz:valueOf(state, opponent)
 	local enemies = Array.flatMap(opponent.matches, function(match)
+		if not match.finished then
+			return {}
+		end
 		return Array.filter(match.opponents, function (opp)
 			return not Opponent.same(opp, opponent.opponent)
 		end)

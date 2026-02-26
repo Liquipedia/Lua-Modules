@@ -21,16 +21,17 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
 ---@class StrategyInfobox: BasicInfobox
+---@operator call(Frame): StrategyInfobox
 local Strategy = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function Strategy.run(frame)
 	local strategy = Strategy(frame)
 	return strategy:createInfobox()
 end
 
----@return string
+---@return Widget
 function Strategy:createInfobox()
 	local args = self.args
 
@@ -63,7 +64,7 @@ function Strategy:createInfobox()
 		self:categories('Strategies')
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Strategy')
 end
 
 return Strategy

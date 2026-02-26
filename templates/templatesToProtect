@@ -257,8 +257,11 @@ NavBoxChild
 Opponent
 Patches_calendar
 Patches_list
+Person
+Persons
 Placement
 QuadOpponent
+Qualification
 Round
 ShowBracket
 ShowSingleMatch
@@ -272,8 +275,10 @@ SwissStandings
 Tabs_dynamic
 Tabs_static
 TeamOpponent
+TeamParticipants
 TeamPrizePool
 TournamentVariables
+TournamentsList
 Transfer_List
 Transfer_Row
 TRef

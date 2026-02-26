@@ -15,7 +15,7 @@ local Strategy = Lua.import('Module:Infobox/Strategy')
 local CustomStrategy = Class.new(Strategy)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomStrategy.run(frame)
 	local customStrategy = CustomStrategy(frame)
 	return customStrategy:createInfobox()
