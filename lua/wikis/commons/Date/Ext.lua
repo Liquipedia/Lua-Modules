@@ -90,6 +90,7 @@ end)
 ---@param timestamp string|integer
 ---@return string
 function DateExt.formatTimestamp(format, timestamp)
+	assert(Logic.isNumeric(timestamp), 'Timestamp must be numeric')
 	return mw.getContentLanguage():formatDate(format, '@' .. timestamp)
 end
 
