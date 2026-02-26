@@ -17,10 +17,7 @@ local VodLink = Lua.import('Module:VodLink')
 local MatchTable = Lua.import('Module:MatchTable')
 
 local NOT_PLAYED = 'notplayed'
-local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
-
----@class GameTableMatch: MatchTableMatch
----@field games match2game[]
+local SCORE_CONCAT = '&nbsp;&colon;&nbsp;'
 
 ---@class GameTable: MatchTable
 ---@field countGames number
@@ -40,11 +37,10 @@ function GameTable:gameFromRecord(game)
 end
 
 ---@param record table
----@return GameTableMatch?
+---@return MatchTableMatch?
 function GameTable:matchFromRecord(record)
 	if self.countGames == self.config.limit then return nil end
 	local matchRecord = MatchTable.matchFromRecord(self, record)
-	---@cast matchRecord GameTableMatch
 	if Logic.isEmpty(record.match2games) then
 		return nil
 	end
