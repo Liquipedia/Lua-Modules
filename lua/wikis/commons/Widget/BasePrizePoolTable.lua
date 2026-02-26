@@ -46,14 +46,14 @@ function BasePrizePoolTable:render()
 		sortable = true,
 		columns = WidgetUtil.collect(
 			{
-				align = 'center',
+				align = 'left',
 			},
 			{
-				align = 'center',
+				align = 'right',
 				sortType = 'number',
 			},
 			settings.showPoints and {
-				align = 'center',
+				align = 'right',
 				sortType = 'number',
 			} or nil
 		),
