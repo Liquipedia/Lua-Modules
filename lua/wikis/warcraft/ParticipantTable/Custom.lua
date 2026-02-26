@@ -32,27 +32,15 @@ local Variables = Lua.import('Module:Variables')
 ---@field entries WarcraftParticipantTableEntry[]
 
 ---@class WarcraftParticipantTable: ParticipantTable
+---@operator call(Frame): WarcraftParticipantTable
+---@field config WarcraftParticipantTableConfig
+---@field sections WarcraftParticipantTableSection[]
 local CustomParticipantTable = Class.new(ParticipantTable)
 
 ---@param frame Frame
 ---@return Html?
 function CustomParticipantTable.run(frame)
-	local participantTable = CustomParticipantTable(frame)
-
-	participantTable.readConfig = CustomParticipantTable.readConfig
-	participantTable.readEntry = CustomParticipantTable.readEntry
-	participantTable.adjustLpdbData = CustomParticipantTable.adjustLpdbData
-	participantTable._displaySoloFactionTableSection = CustomParticipantTable._displaySoloFactionTableSection
-	participantTable._displayHeader = CustomParticipantTable._displayHeader
-	participantTable._getFactionNumbers = CustomParticipantTable._getFactionNumbers
-
-	participantTable:read():store()
-
-	if CustomParticipantTable.isPureSolo(participantTable.sections) then
-		participantTable.create = CustomParticipantTable.createSoloFactionTable
-	end
-
-	return participantTable:create()
+	return CustomParticipantTable(frame):read():store():create()
 end
 
 ---@param args table
@@ -127,12 +115,19 @@ function CustomParticipantTable:adjustLpdbData(lpdbData, entry, config)
 	lpdbData.extradata.seriesnumber = seriesNumber and string.format('%05d', seriesNumber) or nil
 end
 
----@param sections WarcraftParticipantTableSection[]
 ---@return boolean
-function CustomParticipantTable.isPureSolo(sections)
-	return Array.all(sections, function(section) return Array.all(section.entries, function(entry)
+function CustomParticipantTable:isPureSolo()
+	return Array.all(self.sections, function(section) return Array.all(section.entries, function(entry)
 		return entry.opponent.type == Opponent.solo
 	end) end)
+end
+
+---@return Html?
+function CustomParticipantTable:create()
+	if self:isPureSolo() then
+		return self:createSoloFactionTable()
+	end
+	return ParticipantTable.create(self)
 end
 
 ---@return Html?
