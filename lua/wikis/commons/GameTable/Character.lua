@@ -12,6 +12,7 @@ local Array = Lua.import('Module:Array')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
 local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
@@ -76,7 +77,7 @@ function CharacterGameTable:readCharacter()
 	if Logic.isNotEmpty(self.args.character) then
 		self.character = self.args.character
 	else
-		assert(self.title.namespace == 0, 'Lua.importd character= argument')
+		assert(Namespace.isMain(self.title), 'Lua.importd character= argument')
 		self.character = self.title.rootText
 	end
 
