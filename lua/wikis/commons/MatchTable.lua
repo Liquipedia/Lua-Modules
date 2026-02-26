@@ -770,7 +770,7 @@ function MatchTable:matchRow(match)
 		classes = {self:_getBackgroundClass(match.result.winner)},
 		children = WidgetUtil.collect(
 			self:_displayDate(match),
-			self:_displayTier(match),
+			self:displayTier(match),
 			self:_displayType(match),
 			self:_displayGameIcon(match),
 			self:_displayIcon(match),
@@ -796,9 +796,10 @@ function MatchTable:_displayDate(match)
 	}
 end
 
+---@protected
 ---@param match MatchTableMatch
 ---@return Widget?
-function MatchTable:_displayTier(match)
+function MatchTable:displayTier(match)
 	if not self.config.showTier then return end
 
 	local tier, tierType, options = Tier.parseFromQueryData(match)
