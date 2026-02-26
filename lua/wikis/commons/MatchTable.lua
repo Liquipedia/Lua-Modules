@@ -973,7 +973,7 @@ function MatchTable:_getBackgroundClass(winner)
 		nil
 end
 
----@return Html?
+---@return Widget?
 function MatchTable:displayStats()
 	if not self.config.showStats or Table.isEmpty(self.matches) then return end
 
@@ -1017,9 +1017,10 @@ function MatchTable:displayStats()
 		return 'For matches between ' .. startDate .. ' and ' .. endDate .. ':'
 	end
 
-	local titleNode = mw.html.create('div')
-		:css('font-weight', 'bold')
-		:wikitext(makeStatsTitle())
+	local titleNode = HtmlWidgets.Div{
+		css = {['font-weight'] = 'bold'},
+		children = makeStatsTitle(),
+	}
 
 	local stats = Array.append({},
 		self.config.showOnlyGameStats and '' or displayScores(self.stats.matches, 'matches'),
@@ -1027,12 +1028,10 @@ function MatchTable:displayStats()
 		self.config.showOnlyGameStats and '' or displayScores(self.stats.rounds, 'rounds')
 	)
 
-	return mw.html.create('div')
-		:node(titleNode)
-		:tag('div')
-			:wikitext(table.concat(stats, self.config.showOnlyGameStats and '' or ' and '))
-			:wikitext()
-			:done()
+	return HtmlWidgets.Div{children = {
+		titleNode,
+		HtmlWidgets.Div{children = Array.interleave(stats, self.config.showOnlyGameStats and '' or ' and ')}
+	}}
 end
 
 return MatchTable
