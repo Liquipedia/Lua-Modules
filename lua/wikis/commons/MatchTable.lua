@@ -1006,9 +1006,9 @@ function MatchTable:displayStats()
 	end
 
 	local makeStatsTitle = function()
-		if startTimeStamp == DateExt.defaultTimestamp and endTimeStamp == DateExt.defaultTimestamp then
+		if DateExt.isDefaultTimestamp(startTimeStamp) and DateExt.isDefaultTimestamp(endTimeStamp) then
 			return 'For all matches:'
-		elseif startTimeStamp == DateExt.defaultTimestamp then
+		elseif DateExt.isDefaultTimestamp(startTimeStamp) then
 			return 'For all matches before '.. DateExt.formatTimestamp('M d, Y', endTimeStamp) .. ':'
 		end
 
