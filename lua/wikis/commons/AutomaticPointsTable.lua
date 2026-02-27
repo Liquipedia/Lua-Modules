@@ -258,7 +258,7 @@ function AutomaticPointsTable:queryPlacement(aliases, tournament)
 	end
 
 	local prizePoints = tournament.usePoints2 and tonumber(result.extradata.prizepoints2) or tonumber(result.extradata.prizepoints)
-	local securedPoints = tonumber(result.extradata.securedpoints)
+	local securedPoints = AutomaticPointsTable._getSecuredPoints(tournament)
 
 	if prizePoints then
 		return {
@@ -271,6 +271,28 @@ function AutomaticPointsTable:queryPlacement(aliases, tournament)
 			type = POINTS_TYPE.SECURED,
 		}
 	end
+end
+
+---@private
+---@param tournament {tournament: StandardTournament, usePoints2: boolean}
+---@return number?
+function AutomaticPointsTable._getSecuredPoints(tournament)
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('parent'), Comparator.eq, tournament.tournament.pageName),
+		ConditionNode(ColumnName('opponentname'), Comparator.eq, 'TBD'),
+		ConditionNode(ColumnName('mode'), Comparator.neq, 'award_individual')
+	}
+	local results = mw.ext.LiquipediaDB.lpdb('placement', {
+		conditions = tostring(conditions),
+		limit = 5000,
+		query = 'extradata'
+	})
+	return Array.min(Array.map(results, function (result)
+		if tournament.usePoints2 then
+			return tonumber(result.extradata.prizepoints2)
+		end
+		return tonumber(result.extradata.prizepoints)
+	end))
 end
 
 ---@param placement {prizePoints: number?, securedPoints: number?}
