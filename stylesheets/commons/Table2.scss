@@ -20,13 +20,18 @@ $table2-cell-padding-x: 0.75rem;
 
 .table2 {
 	display: block;
-	width: stretch;
+	width: fit-content;
+	max-width: stretch;
 	border: 1px solid;
 	border-radius: $table2-radius;
 	overflow: hidden;
 
-	@supports not ( width: stretch ) {
-		width: -webkit-fill-available;
+	@supports not ( max-width: stretch ) {
+		max-width: -webkit-fill-available;
+
+		@supports not ( max-width: -webkit-fill-available ) {
+			max-width: 100%;
+		}
 	}
 
 	@include table2-surface-colors();
