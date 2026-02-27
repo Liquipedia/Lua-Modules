@@ -386,7 +386,7 @@ end
 function AutomaticPointsTable:display()
 	return AutomaticPointsTableWidget{
 		opponents = self.opponents,
-		tournaments = self.parsedInput.tournaments,
+		tournaments = Array.map(self.parsedInput.tournaments, Operator.property('tournament')),
 		limit = self.parsedInput.limit,
 		positionBackgrounds = self.parsedInput.positionBackgrounds,
 	}
