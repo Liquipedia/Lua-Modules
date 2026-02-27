@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 
@@ -34,46 +35,55 @@ function ParticipantsTeamParticipantControls:render()
 		pfRunQueryFormName = 'Tournament player information',
 		['TPI[page]'] = pageName,
 		wpRunQuery = 'Run query'
-	}))
+	})
+
+	local playerInfoButton
+	if self.props.playerinfo then
+		playerInfoButton = Button{
+			title = 'Click for additional player information',
+			variant = 'secondary',
+			size = 'sm',
+			linktype = 'external',
+			link = link,
+			children = WidgetUtil.collect(
+				Icon{iconName = 'internal_link'},
+				'Player Info'
+			)
+		}
+	end
+
+	local children = {
+		playerInfoButton,
+		AnalyticsWidget{
+			analyticsName = 'ParticipantsShowRostersSwitch',
+			analyticsProperties = {
+				['track-value-as'] = 'participants show rosters',
+			},
+			children = Switch{
+				label = 'Show rosters',
+				switchGroup = 'team-cards-show-rosters',
+				defaultActive = false,
+				collapsibleSelector = '.team-participant-card',
+			},
+		},
+		AnalyticsWidget{
+			analyticsName = 'ParticipantsCompactSwitch',
+			analyticsProperties = {
+				['track-value-as'] = 'participants compact',
+			},
+			children = Switch{
+				label = 'Compact view',
+				switchGroup = 'team-cards-compact',
+				defaultActive = true,
+			},
+		}
+	}
+
+	children = Array.filter(children, function(child) return child ~= nil end)
 
 	return Div{
 		classes = { 'team-participant__controls' },
-		children = {
-			Button{
-				title = 'Click for additional player information',
-				variant = 'secondary',
-				size = 'sm',
-				linktype = 'external',
-				link = link,
-				children = WidgetUtil.collect(
-					Icon{iconName = 'internal_link'},
-					'Player Info'
-				)
-			},
-			AnalyticsWidget{
-				analyticsName = 'ParticipantsShowRostersSwitch',
-				analyticsProperties = {
-					['track-value-as'] = 'participants show rosters',
-				},
-				children = Switch{
-					label = 'Show rosters',
-					switchGroup = 'team-cards-show-rosters',
-					defaultActive = false,
-					collapsibleSelector = '.team-participant-card',
-				},
-			},
-			AnalyticsWidget{
-				analyticsName = 'ParticipantsCompactSwitch',
-				analyticsProperties = {
-					['track-value-as'] = 'participants compact',
-				},
-				children = Switch{
-					label = 'Compact view',
-					switchGroup = 'team-cards-compact',
-					defaultActive = true,
-				},
-			}
-		}
+		children = children
 	}
 end
 
