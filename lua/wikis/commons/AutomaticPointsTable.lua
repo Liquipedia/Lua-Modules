@@ -257,7 +257,8 @@ function AutomaticPointsTable:queryPlacement(aliases, tournament)
 		return
 	end
 
-	local prizePoints = tournament.usePoints2 and tonumber(result.extradata.prizepoints2) or tonumber(result.extradata.prizepoints)
+	local prizePoints = tournament.usePoints2 and tonumber(result.extradata.prizepoints2)
+						or tonumber(result.extradata.prizepoints)
 	local securedPoints = AutomaticPointsTable._getSecuredPoints(tournament)
 
 	if prizePoints then
