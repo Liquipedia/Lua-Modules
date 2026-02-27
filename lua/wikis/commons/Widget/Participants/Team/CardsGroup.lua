@@ -36,7 +36,7 @@ function ParticipantsTeamCardsGroup:render()
 	local children = {}
 	if showSwitches then
 		table.insert(children, Div{
-			classes = { 'team-participant__switches' },
+			classes = { 'team-participant__controls' },
 			children = {
 				AnalyticsWidget{
 					analyticsName = 'ParticipantsShowRostersSwitch',
