@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 
 local Widget = Lua.import('Module:Widget')
@@ -38,7 +39,7 @@ function ParticipantsTeamParticipantControls:render()
 	}))
 
 	local playerInfoButton
-	if self.props.playerinfo then
+	if Logic.isNotEmpty(self.props.playerinfo) then
 		playerInfoButton = Button{
 			title = 'Click for additional player information',
 			variant = 'secondary',
