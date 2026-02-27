@@ -35,7 +35,7 @@ function ParticipantsTeamParticipantControls:render()
 		pfRunQueryFormName = 'Tournament player information',
 		['TPI[page]'] = pageName,
 		wpRunQuery = 'Run query'
-	})
+	}))
 
 	local playerInfoButton
 	if self.props.playerinfo then
