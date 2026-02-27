@@ -33,49 +33,58 @@ function ParticipantsTeamCardsGroup:render()
 
 	local showSwitches = not globalVars:get('teamParticipantControlsRendered')
 
-	return Div{
-		classes = { 'team-participant' },
-		children = {
-			showSwitches and Div{
-				classes = { 'team-participant__switches' },
-				children = {
-					AnalyticsWidget{
-						analyticsName = 'ParticipantsShowRostersSwitch',
-						analyticsProperties = {
-							['track-value-as'] = 'participants show rosters',
-						},
-						children = Switch{
-							label = 'Show rosters',
-							switchGroup = 'team-cards-show-rosters',
-							defaultActive = false,
-							collapsibleSelector = '.team-participant-card',
-						},
+	local switches
+	if showSwitches then
+		switches = Div{
+			classes = { 'team-participant__switches' },
+			children = {
+				AnalyticsWidget{
+					analyticsName = 'ParticipantsShowRostersSwitch',
+					analyticsProperties = {
+						['track-value-as'] = 'participants show rosters',
 					},
-					AnalyticsWidget{
-						analyticsName = 'ParticipantsCompactSwitch',
-						analyticsProperties = {
-							['track-value-as'] = 'participants compact',
-						},
-						children = Switch{
-							label = 'Compact view',
-							switchGroup = 'team-cards-compact',
-							defaultActive = true,
-						},
-					}
-				}
-			} or nil,
-			AnalyticsWidget{
-				analyticsName = 'Team participants card',
-				children = Div{
-					classes = { 'team-participant__grid' },
-					children = Array.map(participants, function(participant)
-						return ParticipantsTeamCard{
-							participant = participant,
-						}
-					end),
+					children = Switch{
+						label = 'Show rosters',
+						switchGroup = 'team-cards-show-rosters',
+						defaultActive = false,
+						collapsibleSelector = '.team-participant-card',
+					},
+				},
+				AnalyticsWidget{
+					analyticsName = 'ParticipantsCompactSwitch',
+					analyticsProperties = {
+						['track-value-as'] = 'participants compact',
+					},
+					children = Switch{
+						label = 'Compact view',
+						switchGroup = 'team-cards-compact',
+						defaultActive = true,
+					},
 				}
 			}
 		}
+	end
+
+	local children = {
+		switches,
+		AnalyticsWidget{
+			analyticsName = 'Team participants card',
+			children = Div{
+				classes = { 'team-participant__grid' },
+				children = Array.map(participants, function(participant)
+					return ParticipantsTeamCard{
+						participant = participant,
+					}
+				end),
+			}
+		}
+	}
+
+	children = Array.filter(children, function(child) return child ~= nil end)
+
+	return Div{
+		classes = { 'team-participant' },
+		children = children
 	}
 end
 
