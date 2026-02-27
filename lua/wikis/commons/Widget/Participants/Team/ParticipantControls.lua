@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
@@ -39,7 +38,7 @@ function ParticipantsTeamParticipantControls:render()
 	}))
 
 	local playerInfoButton
-	if Logic.isNotEmpty(self.props.playerinfo) then
+	if Logic.readBool(self.props.playerinfo) then
 		playerInfoButton = Button{
 			title = 'Click for additional player information',
 			variant = 'secondary',
@@ -53,7 +52,7 @@ function ParticipantsTeamParticipantControls:render()
 		}
 	end
 
-	local children = {
+	local children = WidgetUtil.collect(
 		playerInfoButton,
 		AnalyticsWidget{
 			analyticsName = 'ParticipantsShowRostersSwitch',
@@ -78,9 +77,7 @@ function ParticipantsTeamParticipantControls:render()
 				defaultActive = true,
 			},
 		}
-	}
-
-	children = Array.filter(children, function(child) return child ~= nil end)
+	)
 
 	return Div{
 		classes = { 'team-participant__controls' },
