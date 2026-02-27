@@ -31,14 +31,11 @@ function ParticipantsTeamCardsGroup:render()
 		return
 	end
 
-	local controlsRendered = globalVars:get('teamParticipantControlsRendered')
-	mw.log('CardsGroup DEBUG: teamParticipantControlsRendered =', controlsRendered)
-	local showSwitches = not controlsRendered
-	mw.log('CardsGroup DEBUG: showSwitches =', showSwitches)
+	local showSwitches = not globalVars:get('teamParticipantControlsRendered')
 
-	local switches
+	local children = {}
 	if showSwitches then
-		switches = Div{
+		table.insert(children, Div{
 			classes = { 'team-participant__switches' },
 			children = {
 				AnalyticsWidget{
@@ -65,36 +62,25 @@ function ParticipantsTeamCardsGroup:render()
 					},
 				}
 			}
-		}
+		})
 	end
 
-	local children = {
-		switches,
-		AnalyticsWidget{
-			analyticsName = 'Team participants card',
-			children = Div{
-				classes = { 'team-participant__grid' },
-				children = Array.map(participants, function(participant)
-					return ParticipantsTeamCard{
-						participant = participant,
-					}
-				end),
-			}
+	table.insert(children, AnalyticsWidget{
+		analyticsName = 'Team participants card',
+		children = Div{
+			classes = { 'team-participant__grid' },
+			children = Array.map(participants, function(participant)
+				return ParticipantsTeamCard{
+					participant = participant,
+				}
+			end),
 		}
-	}
+	})
 
-	children = Array.filter(children, function(child) return child ~= nil end)
-
-	mw.log('CardsGroup DEBUG: children count =', #children)
-	mw.log('CardsGroup DEBUG: children[1] =', children[1])
-	mw.log('CardsGroup DEBUG: children[2] =', children[2])
-
-	local result = Div{
+	return Div{
 		classes = { 'team-participant' },
 		children = children
 	}
-	mw.log('CardsGroup DEBUG: Div returned successfully')
-	return result
 end
 
 return ParticipantsTeamCardsGroup

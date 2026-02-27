@@ -24,11 +24,7 @@ local ParticipantsTeamParticipantControls = Class.new(Widget)
 
 ---@return Widget?
 function ParticipantsTeamParticipantControls:render()
-	local title = mw.title.getCurrentTitle().fullText
-	mw.log('ParticipantControls DEBUG: rendering on page:', title)
 	globalVars:set('teamParticipantControlsRendered', 'true')
-	mw.log('ParticipantControls DEBUG: set teamParticipantControlsRendered = true')
-	mw.log('ParticipantControls DEBUG: verifying:', globalVars:get('teamParticipantControlsRendered'))
 
 	return Div{
 		classes = { 'team-participant__controls' },
