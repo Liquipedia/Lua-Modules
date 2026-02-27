@@ -32,8 +32,8 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
-local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
+local Button = Lua.import('Module:Widget/Basic/Button')
+local Dialog = Lua.import('Module:Widget/Basic/Dialog')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
@@ -344,7 +344,7 @@ function BroadcastTalentTable:_row(broadcast)
 			},
 			TableWidgets.Cell{children = Array.interleave(broadcast.positions, HtmlWidgets.Br{})},
 			self.args.displayPartnerListColumn and TableWidgets.Cell{
-				children = self:_partnerList(broadcast)
+				children = self:_partnerList(broadcast, tournament)
 			} or nil
 		)
 	}
@@ -370,10 +370,11 @@ function BroadcastTalentTable:_tournamentDisplayName(broadcast, tournament)
 end
 
 ---@private
----@param tournament table
+---@param broadcast EnrichedBroadcast
+---@param tournament StandardTournament
 ---@return string|Widget
-function BroadcastTalentTable:_partnerList(tournament)
-	local partners = self:_getPartners(tournament)
+function BroadcastTalentTable:_partnerList(broadcast, tournament)
+	local partners = self:_getPartners(broadcast)
 
 	if Table.isEmpty(partners) then
 		return DASH
@@ -382,10 +383,16 @@ function BroadcastTalentTable:_partnerList(tournament)
 	partners = BroadcastTalentTable._removeDuplicatePartners(partners)
 	Array.sortInPlaceBy(partners, Operator.property('page'))
 
-	return GeneralCollapsible{
-		titleWidget = CollapsibleToggle{},
-		shouldCollapse = true,
-		collapseAreaClasses = {'broadcast-talent-partner-list'},
+	return Dialog{
+		trigger = Button{
+			children = 'Show',
+			variant = 'secondary',
+			size = 'xs',
+		},
+		title = LinkWidget{
+			link = tournament.pageName,
+			children = self:_tournamentDisplayName(broadcast, tournament)
+		},
 		children = UnorderedList{
 			children = Array.map(partners, function (partner)
 				return {
