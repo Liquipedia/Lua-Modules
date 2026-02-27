@@ -85,10 +85,16 @@ function ParticipantsTeamCardsGroup:render()
 
 	children = Array.filter(children, function(child) return child ~= nil end)
 
-	return Div{
+	mw.log('CardsGroup DEBUG: children count =', #children)
+	mw.log('CardsGroup DEBUG: children[1] =', children[1])
+	mw.log('CardsGroup DEBUG: children[2] =', children[2])
+
+	local result = Div{
 		classes = { 'team-participant' },
 		children = children
 	}
+	mw.log('CardsGroup DEBUG: Div returned successfully')
+	return result
 end
 
 return ParticipantsTeamCardsGroup
