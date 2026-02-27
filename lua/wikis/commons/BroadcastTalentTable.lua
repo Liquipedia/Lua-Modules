@@ -244,7 +244,7 @@ function BroadcastTalentTable:create()
 			{align = 'left'},
 			{align = 'left'},
 			self.args.displayPartnerListColumn and {
-				align = 'center',
+				align = 'right',
 				unsortable = true,
 			} or nil
 		),
@@ -274,7 +274,7 @@ function BroadcastTalentTable:_header()
 				children = {'Tournament'}
 			},
 			TableWidgets.CellHeader{children = {'Position'}},
-			self.args.displayPartnerListColumn and TableWidgets.CellHeader{children = {'Partner List'}} or nil
+			self.args.displayPartnerListColumn and TableWidgets.CellHeader{children = {'Partners'}} or nil
 		)}
 	}}
 end
