@@ -19,6 +19,7 @@ export default {
 		"function-url-no-scheme-relative": null,
 		"declaration-no-important": null,
 		"function-no-unknown": null,
+    	"scss/function-no-unknown": true,
 		"@stylistic/string-quotes": "double"
 	}
 };
