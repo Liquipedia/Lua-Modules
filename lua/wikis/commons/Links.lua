@@ -107,7 +107,6 @@ local PREFIXES = {
 	douyin_page = {'https://v.douyin.com/'},
 	douyu = {'https://www.douyu.com/'},
 	ebattle = {match = 'https://www.ebattle.gg/turnier/match/'},
-	eec = {'https://eternalesports.club/player/'},
 	esea = {
 		'https://play.esea.net/events/',
 		player = 'https://play.esea.net/users/',
