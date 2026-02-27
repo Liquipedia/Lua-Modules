@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Currency = Lua.import('Module:Currency')
@@ -19,7 +18,6 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
-local Medals = Lua.import('Module:Medals')
 local Region = Lua.import('Module:Region')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -300,7 +298,9 @@ function BaseTournamentsListing:_row(tournamentData)
 					link = tournamentData.pagename,
 				}
 			},
-			config.showOrganizer and TableWidgets.Cell{children = BaseTournamentsListing._organizerDisplay(tournamentData)} or nil,
+			config.showOrganizer
+				and TableWidgets.Cell{children = BaseTournamentsListing._organizerDisplay(tournamentData)}
+				or nil,
 			TableWidgets.Cell{
 				classes = {
 					status == POSTPONED or status == DELAYED and 'bg-second' or nil
@@ -316,8 +316,14 @@ function BaseTournamentsListing:_row(tournamentData)
 						dashIfZero = true, displayCurrencyCode = false, formatValue = true
 					}) or nil
 			},
-			TableWidgets.Cell{children = BaseTournamentsListing._displayLocations(tournamentData.locations or {}, tournamentData.type)},
-			TableWidgets.Cell{children = participantNumber ~= -1 and BaseTournamentsListing.participantsNumber(participantNumber) or '-'},
+			TableWidgets.Cell{
+				children = BaseTournamentsListing._displayLocations(tournamentData.locations or {}, tournamentData.type)
+			},
+			TableWidgets.Cell{
+				children = participantNumber ~= -1
+					and BaseTournamentsListing.participantsNumber(participantNumber)
+					or '-'
+			},
 			status == CANCELLED
 				and TableWidgets.Cell{
 					colspan = config.showQualifierColumnOverWinnerRunnerup and 1 or 2,
