@@ -51,7 +51,7 @@ $table2-cell-padding-x: 0.75rem;
 
 	&__table {
 		width: 100%;
-		border-spacing: 0;
+		border-spacing: 0 1px;
 		border-collapse: separate;
 		border: 0;
 
@@ -120,6 +120,16 @@ $table2-cell-padding-x: 0.75rem;
 		&.table2__row--highlighted {
 			position: relative;
 
+			.theme--light & {
+				background-color: var( --clr-semantic-gold-98 );
+				box-shadow: 0 1px 0 var( --clr-semantic-gold-80 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-semantic-gold-16 );
+				box-shadow: 0 1px 0 var( --clr-semantic-gold-20 );
+			}
+
 			&::after {
 				content: "";
 				position: absolute;
@@ -145,6 +155,16 @@ $table2-cell-padding-x: 0.75rem;
 
 			.theme--dark & {
 				background-color: var( --clr-on-surface-dark-primary-8 );
+			}
+		}
+
+		&.table2__row--highlighted:hover {
+			.theme--light & {
+				background-color: var( --clr-semantic-gold-90 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-semantic-gold-18 );
 			}
 		}
 	}

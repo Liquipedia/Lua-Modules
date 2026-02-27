@@ -1,31 +1,42 @@
 {
 	"private": true,
 	"devDependencies": {
-		"@playwright/test": "^1.45.0",
+		"@csstools/stylelint-formatter-github": "^2.0.0",
+		"@eslint/eslintrc": "3.x.x",
+		"@eslint/js": "9.x.x",
+		"@playwright/test": "^1.58.2",
 		"@stylistic/stylelint-plugin": "^2.1.2",
-		"eslint-config-wikimedia": "0.28.1",
-		"grunt": "*",
-		"grunt-eslint": "24.x.x",
-		"grunt-stylelint": "^0.20.x",
+		"@typescript-eslint/eslint-plugin": "^8.56.1",
+		"eslint": "9.x.x",
+		"eslint-config-wikimedia": "0.32.3",
+		"eslint-plugin-jsdoc": "^62.6.0",
+		"eslint-plugin-vue": "10.x.x",
+		"globals": "^17.3.0",
 		"jest": "^30.2.0",
 		"jest-environment-jsdom": "^30.2.0",
 		"jest-junit": "^16.0.0",
 		"jquery": "*",
 		"pixelmatch": "^7.1.0",
-		"playwright": "^1.54.2",
+		"playwright": "^1.58.2",
 		"pngjs": "^7.0.0",
 		"postcss-scss": "^4.x.x",
-		"sass": "^1.90.0",
-		"stylelint": "^16.6.1",
-		"stylelint-config-wikimedia": "^0.17.0",
-		"stylelint-scss": "^6.x.x"
+		"sass": "^1.97.3",
+		"stylelint": "^17.4.0",
+		"stylelint-config-wikimedia": "^0.18.0",
+		"stylelint-scss": "^7.x.x"
 	},
 	"jest": {
-		"reporters": [ "default", "jest-junit" ]
+		"reporters": [
+			"default",
+			"jest-junit"
+		]
 	},
 	"scripts": {
-		"test": "grunt main",
-		"fix": "grunt main --fix",
+		"lint": "npm run lint:js & npm run lint:scss",
+		"lint:ci": "npm run lint:js & npm run lint:scss:ci",
+		"lint:js": "eslint --fix",
+		"lint:scss": "stylelint \"stylesheets/**/*.scss\"",
+		"lint:scss:ci": "stylelint \"stylesheets/**/*.scss\" --custom-formatter @csstools/stylelint-formatter-github",
 		"test:js": "jest",
 		"compile:scss": "sass stylesheets/Main.scss lua/output/css/main.css",
 		"build:css": "npm run compile:scss",
