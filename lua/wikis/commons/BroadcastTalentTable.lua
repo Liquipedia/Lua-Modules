@@ -442,12 +442,20 @@ end
 function BroadcastTalentTable:_footer()
 	return HtmlWidgets.Small{children = {
 		HtmlWidgets.Span{
+			classes = {'mobile-hide'},
 			css = {
 				float = 'left',
 				['padding-left'] = '1rem',
 				['font-style'] = 'italic',
 			},
 			children = LinkWidget{children = 'About achievements', link = self.args.aboutAchievementsLink}
+		},
+		HtmlWidgets.Span{
+			classes = {'mobile-only'},
+			children = LinkWidget{children = 'About achievements', link = self.args.aboutAchievementsLink}
+		},
+		HtmlWidgets.Br{
+			classes = {'mobile-only'}
 		},
 		HtmlWidgets.B{children = LinkWidget{
 			children = 'Broadcasts from any Tournament',
