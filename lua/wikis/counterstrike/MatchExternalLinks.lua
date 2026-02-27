@@ -221,7 +221,7 @@ return {
 		name = 'fastcup',
 		icon = 'FASTCUP icon lightmode.png',
 		iconDark = 'FASTCUP icon darkmode.png',
-		prefixLink = 'https://cs2.fastcup.net/matches',
+		prefixLink = 'https://cs2.fastcup.net/matches/',
 		label = 'Matchpage and Stats on FASTCUP',
 		isMapStats = true
 	},
