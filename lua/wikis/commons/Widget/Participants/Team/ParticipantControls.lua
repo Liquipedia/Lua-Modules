@@ -12,9 +12,12 @@ local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 
 local Widget = Lua.import('Module:Widget')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
+local Button = Lua.import('Module:Widget/Basic/Button')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Switch = Lua.import('Module:Widget/Switch')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local globalVars = PageVariableNamespace()
 
@@ -26,9 +29,26 @@ local ParticipantsTeamParticipantControls = Class.new(Widget)
 function ParticipantsTeamParticipantControls:render()
 	globalVars:set('teamParticipantControlsRendered', 'true')
 
+	local pageName = mw.title.getCurrentTitle().fullText
+	local link = mw.uri.fullUrl('Special:RunQuery/Tournament_player_information', {
+		pfRunQueryFormName = 'Tournament player information',
+		['TPI[page]'] = pageName,
+		wpRunQuery = 'Run query'
+	})
+
 	return Div{
 		classes = { 'team-participant__controls' },
 		children = {
+			Button{
+				title = 'Click for additional player information',
+				variant = 'secondary',
+				size = 'sm',
+				link = link,
+				children = WidgetUtil.collect(
+					Icon{iconName = 'link'},
+					'Player Info'
+				)
+			},
 			AnalyticsWidget{
 				analyticsName = 'ParticipantsShowRostersSwitch',
 				analyticsProperties = {
