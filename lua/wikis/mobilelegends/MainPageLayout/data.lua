@@ -41,7 +41,7 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{rumours = true},
+		body = TransfersList{},
 		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
 	thisDay = {
@@ -125,11 +125,6 @@ return {
 			},
 		},
 		{
-			file = 'BG Shadow at M5.jpg',
-			title = 'Rumours',
-			link = 'Portal:Rumours',
-		},
-		{
 			file = 'NPFL Zarate at M6 Knockout Stage.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
@@ -168,7 +163,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				sizes = {xxl = 5, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
@@ -189,7 +184,7 @@ return {
 				}
 			},
 			{ -- Right
-				size = 6,
+				sizes = {xxl = 7, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 2,

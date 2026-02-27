@@ -504,9 +504,22 @@ unsuccessful.
 Wikis sometimes provide variants of this function that include wiki specific
 transformations.
 ]]
----@param record table
+---@param record match2opponent
 ---@return standardOpponent
 function Opponent.fromMatch2Record(record)
+	return Opponent._fromMatchRecord(record)
+end
+
+---@param record MGIParsedOpponent
+---@return standardOpponent
+function Opponent.fromMatchParsedOpponent(record)
+	return Opponent._fromMatchRecord(record)
+end
+
+---@private
+---@param record {type: OpponentType, template: string?, match2players: match2player[]|MGIParsedPlayer[], name: string?}
+---@return standardOpponent
+function Opponent._fromMatchRecord(record)
 	if record.type == Opponent.team then
 		return {type = Opponent.team, template = record.template, extradata = {}}
 

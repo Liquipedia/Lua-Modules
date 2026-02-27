@@ -36,6 +36,7 @@ return {
 	explosion_valorant = 'fas fa-fire-alt',
 	defuse = 'fas fa-wrench',
 	outoftime = 'fas fa-hourglass',
+	surrendered = 'far fa-flag',
 	ace_valorant = 'fas fa-dagger',
 	flawless_valorant = 'fas fa-gem',
 

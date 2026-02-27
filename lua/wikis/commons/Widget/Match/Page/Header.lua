@@ -20,8 +20,8 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
+local MatchPageOpponentDisplay = Lua.import('Module:Widget/Match/Page/OpponentDisplay')
 local StreamsContainer = Lua.import('Module:Widget/Match/StreamsContainer')
-local TeamDisplay = Lua.import('Module:Widget/Match/Page/TeamDisplay')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageHeaderParameters
@@ -133,9 +133,14 @@ function MatchPageHeader:render()
 			Div{
 				classes = { 'match-bm-match-header-overview' },
 				children = {
-					TeamDisplay{ opponent = opponent1 },
+					MatchPageOpponentDisplay{
+						opponent = opponent1,
+						flip = true
+					},
 					self:_makeResultDisplay(),
-					TeamDisplay{ opponent = opponent2 }
+					MatchPageOpponentDisplay{
+						opponent = opponent2
+					},
 				}
 			},
 			Div{

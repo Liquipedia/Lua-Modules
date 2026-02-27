@@ -7,93 +7,89 @@
 
 local Lua = require('Module:Lua')
 
+local BaseResultsTable = Lua.import('Module:ResultsTable/Base')
 local Class = Lua.import('Module:Class')
-local Currency = Lua.import('Module:Currency')
-local DateExt = Lua.import('Module:Date/Ext')
-local LeagueIcon = Lua.import('Module:LeagueIcon')
-local Page = Lua.import('Module:Page')
-
 local Opponent = Lua.import('Module:Opponent/Custom')
 
-local BaseResultsTable = Lua.import('Module:ResultsTable/Base')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class AwardsTable: BaseResultsTable
 ---@operator call(table): AwardsTable
 local AwardsTable = Class.new(BaseResultsTable)
 
+---@protected
+---@return table[]
+function AwardsTable:buildColumnDefinitions()
+	return WidgetUtil.collect(
+		{
+			align = 'left',
+			sortType = 'isoDate',
+		},
+		{align = 'left'},
+		self.config.showType and {
+			align = 'center',
+		} or nil,
+		{align = 'left'},
+		{align = 'left'},
+		{align = 'left'},
+		self.config.queryType ~= Opponent.team and {
+			align = 'center',
+		} or self.config.playerResultsOfTeam and {
+			align = 'center',
+		} or nil,
+		{
+			align = 'right',
+			sortType = 'currency',
+		}
+	)
+end
+
 ---Builds the Header of the award table
----@return Html
+---@return Widget
 function AwardsTable:buildHeader()
-	local header = mw.html.create('tr')
-		:tag('th'):css('width', '100px'):wikitext('Date'):done()
-		:tag('th'):css('min-width', '75px'):wikitext('Tier'):done()
-
-	if self.config.showType then
-		header:tag('th'):css('min-width', '50px'):wikitext('Type')
-	end
-
-	header
-		:tag('th'):css('width', '275px'):attr('colspan', 2):wikitext('Tournament'):done()
-		:tag('th'):css('min-width', '225px'):wikitext('Award')
-
-	if self.config.queryType ~= Opponent.team then
-		header:tag('th'):css('min-width', '70px'):wikitext('Team')
-	elseif self.config.playerResultsOfTeam then
-		header:tag('th'):css('min-width', '105px'):wikitext('Player')
-	end
-
-	header:tag('th'):attr('data-sort-type', 'currency'):wikitext('Prize')
-
-	return header
+	return TableWidgets.Row{children = WidgetUtil.collect(
+		TableWidgets.CellHeader{children = 'Date'},
+		TableWidgets.CellHeader{children = 'Tier'},
+		self.config.showType and TableWidgets.CellHeader{children = 'Type'} or nil,
+		TableWidgets.CellHeader{
+			colspan = 2,
+			children = 'Tournament'
+		},
+		TableWidgets.CellHeader{children = 'Award'},
+		self.config.queryType ~= Opponent.team and TableWidgets.CellHeader{
+			children = 'Team'
+		} or self.config.playerResultsOfTeam and TableWidgets.CellHeader{
+			children = 'Player'
+		} or nil,
+		TableWidgets.CellHeader{children = 'Prize'}
+	)}
 end
 
 ---Builds a row of the award table
----@param placement table
----@return Html
+---@param placement placement
+---@return Widget
 function AwardsTable:buildRow(placement)
-	local row = mw.html.create('tr')
-		:addClass(self:rowHighlight(placement))
-		:tag('td'):wikitext(DateExt.toYmdInUtc(placement.date)):done()
-
-	local tierDisplay, tierSortValue = self:tierDisplay(placement)
-
-	row:tag('td'):attr('data-sort-value', tierSortValue):wikitext(tierDisplay)
-
-	if self.config.showType then
-		row:tag('td'):wikitext(placement.type)
-	end
-
-	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)
-
-	row
-		:tag('td'):css('width', '30px'):attr('data-sort-value', tournamentDisplayName):wikitext(LeagueIcon.display{
-			icon = placement.icon,
-			iconDark = placement.icondark,
-			link = placement.parent,
-			name = tournamentDisplayName,
-			options = {noTemplate = true},
-		}):done()
-		:tag('td'):attr('data-sort-value', tournamentDisplayName):css('text-align', 'left'):wikitext(Page.makeInternalLink(
-			{},
-			tournamentDisplayName,
-			placement.pagename
-		))
-
-	row:tag('td'):wikitext(placement.extradata.award)
-
-	if self.config.playerResultsOfTeam or self.config.queryType ~= Opponent.team then
-		row:tag('td'):css('text-align', 'left'):attr('data-sort-value', placement.opponentname):node(self:opponentDisplay(
-			placement,
-			{teamForSolo = not self.config.playerResultsOfTeam}
-		))
-	end
-
-	row:tag('td'):wikitext(Currency.display('USD',
-			self.config.queryType ~= Opponent.team and placement.individualprizemoney or placement.prizemoney,
-			{dashIfZero = true, displayCurrencyCode = false, formatValue = true}
-		))
-
-	return row
+	return TableWidgets.Row{
+		highlighted = self:rowHighlight(placement),
+		children = WidgetUtil.collect(
+			self:createDateCell(placement),
+			self:createTierCell(placement),
+			self:createTypeCell(placement),
+			self:createTournamentCells(placement),
+			TableWidgets.Cell{children = placement.extradata.award},
+			(self.config.playerResultsOfTeam or self.config.queryType ~= Opponent.team) and TableWidgets.Cell{
+				attributes = {
+					['data-sort-value'] = placement.opponentname
+				},
+				children = self:opponentDisplay(
+					placement,
+					{teamForSolo = not self.config.playerResultsOfTeam}
+				)
+			} or nil,
+			self:createPrizeCell{placement = placement}
+		)
+	}
 end
 
 return AwardsTable

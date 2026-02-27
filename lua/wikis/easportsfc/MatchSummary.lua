@@ -23,7 +23,7 @@ local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end

@@ -21,7 +21,7 @@ local MAX_NUM_BANS = 5
 local NUM_CHAMPIONS_PICK = 5
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px', teamStyle = 'bracket'})
 end

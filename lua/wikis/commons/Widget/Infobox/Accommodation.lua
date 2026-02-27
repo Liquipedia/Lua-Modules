@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Locale = Lua.import('Module:Locale')
 local String = Lua.import('Module:StringUtils')
 

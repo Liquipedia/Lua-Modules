@@ -14,7 +14,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Span = HtmlWidgets.Span
 
 ---@class CopyToClipboardProps
----@field children string|Widget|Html|(string|Widget|Html)[]?
+---@field children Renderable|Renderable[]?
 ---@field textToCopy string? text to be copied to clipboard
 ---@field successText string?
 

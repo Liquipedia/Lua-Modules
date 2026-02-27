@@ -12,7 +12,7 @@ local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
@@ -56,9 +56,11 @@ local SECONDS_ONE_DAY = 3600 * 24
 ---@class MatchTableConfig
 ---@field mode MatchTableMode
 ---@field limit number?
+---@field dateFormat ('full'|'compact')?
 ---@field displayGameIcons boolean
 ---@field showResult boolean
 ---@field aliases table<string, true>
+---@field addCategory boolean
 ---@field vs table<string, true>
 ---@field timeRange {startDate: number, endDate: number}
 ---@field title string?
@@ -66,6 +68,7 @@ local SECONDS_ONE_DAY = 3600 * 24
 ---@field showIcon boolean
 ---@field showVod boolean
 ---@field showMatchPage boolean
+---@field matchPageButtonText 'full'|'short'|'hide'
 ---@field showStats boolean
 ---@field showOnlyGameStats boolean
 ---@field showRoundStats boolean
@@ -143,8 +146,10 @@ function MatchTable:_readDefaultConfig()
 	local args = self.args
 
 	return {
+		addCategory = Logic.nilOr(Logic.readBoolOrNil(args.addCategory), true),
 		mode = args.tableMode,
 		limit = tonumber(args.limit),
+		dateFormat = args.dateFormat,
 		displayGameIcons = Logic.readBool(args.gameIcons),
 		showResult = Logic.nilOr(Logic.readBoolOrNil(args.showResult), true),
 		timeRange = self:readTimeRange(),
@@ -161,6 +166,7 @@ function MatchTable:_readDefaultConfig()
 		teamStyle = String.nilIfEmpty(args.teamStyle) or 'short',
 		linkSubPage = Logic.readBool(args.linkSubPage),
 		showMatchPage = Info.config.match2.matchPage,
+		matchPageButtonText = args.matchPageButtonText,
 	}
 end
 
@@ -308,7 +314,10 @@ function MatchTable:query()
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
 	end, self.config.limit)
 
-	if self.config.limit and self.config.limit == #self.matches and not self.config.linkSubPage then
+	if (
+		self.config.limit and self.config.limit == #self.matches and
+		not self.config.linkSubPage and self.config.addCategory
+	) then
 		mw.ext.TeamLiquidIntegration.add_category('Limited match pages')
 	end
 
@@ -551,7 +560,7 @@ function MatchTable:statsFromMatches()
 end
 
 ---@return Html
-function MatchTable:build()
+function MatchTable:buildDisplay()
 	local display = mw.html.create('table')
 		:addClass('wikitable wikitable-striped sortable')
 		:css('text-align', 'center')
@@ -589,10 +598,15 @@ function MatchTable:build()
 				:wikitext('[[' .. pagename .. '|Extended list of matches]]')
 	end
 
+	return display
+end
+
+---@return Html
+function MatchTable:build()
 	local wrappedTableNode = mw.html.create('div')
 		:addClass('match-table-wrapper')
 		:addClass('table-responsive')
-		:node(display)
+		:node(self:buildDisplay())
 
 	return mw.html.create('div')
 		:node(self:displayStats())
@@ -666,6 +680,7 @@ end
 function MatchTable:_displayDate(match)
 	local cell = mw.html.create('td')
 		:css('text-align', 'left')
+		:css('min-width', '5rem')
 		:attr('data-sort-value', match.timestamp)
 
 	if match.timestamp == DateExt.defaultTimestamp then
@@ -676,6 +691,7 @@ function MatchTable:_displayDate(match)
 		finished = match.finished,
 		date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
 		rawdatetime = true,
+		format = self.config.dateFormat
 	} or nil)
 end
 
@@ -806,11 +822,12 @@ function MatchTable:_displayScore(match)
 		end
 
 		return mw.html.create(tonumber(opponentRecord.placement) == 1 and 'b' or nil)
-			:wikitext(status == SCORE_STATUS and (score or '–') or status)
+			:wikitext(status == SCORE_STATUS and (score or '&ndash;') or status)
 	end
 
 	return mw.html.create('td')
 		:addClass('match-table-score')
+		:css('white-space', 'nowrap')
 		:node(toScore(result.opponent, result.gameOpponents))
 		:node(bestof1Score and BO1_SCORE_CONCAT or SCORE_CONCAT)
 		:node(toScore(result.vs, result.gameVsOpponents))
@@ -837,7 +854,7 @@ end
 function MatchTable:_displayMatchPage(match)
 	if not self.config.showMatchPage then return end
 
-	return mw.html.create('td'):node(MatchPageButton{match = match})
+	return mw.html.create('td'):node(MatchPageButton{match = match, buttonText = self.config.matchPageButtonText})
 end
 
 ---@param winner any
