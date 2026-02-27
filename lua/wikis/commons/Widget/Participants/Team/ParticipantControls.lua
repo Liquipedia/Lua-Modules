@@ -30,11 +30,11 @@ function ParticipantsTeamParticipantControls:render()
 	globalVars:set('teamParticipantControlsRendered', 'true')
 
 	local pageName = mw.title.getCurrentTitle().fullText
-	local link = mw.uri.fullUrl('Special:RunQuery/Tournament_player_information', {
+	local link = tostring(mw.uri.fullUrl('Special:RunQuery/Tournament_player_information', {
 		pfRunQueryFormName = 'Tournament player information',
 		['TPI[page]'] = pageName,
 		wpRunQuery = 'Run query'
-	})
+	}))
 
 	return Div{
 		classes = { 'team-participant__controls' },
