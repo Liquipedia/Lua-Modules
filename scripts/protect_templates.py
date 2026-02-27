@@ -12,6 +12,8 @@ WIKI_TO_PROTECT = os.getenv("WIKI_TO_PROTECT")
 def main():
     with open("./templates/templatesToProtect", "r") as templates_to_protect:
         for template_name in templates_to_protect.readlines():
+            if len(template_name.strip()) == 0:
+                continue
             template = "Template:" + template_name
             print(f"::group::Checking {WIKI_TO_PROTECT}:{template}")
             if WIKI_TO_PROTECT == "commons":
