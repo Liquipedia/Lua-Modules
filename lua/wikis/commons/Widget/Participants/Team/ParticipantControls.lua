@@ -43,6 +43,7 @@ function ParticipantsTeamParticipantControls:render()
 				title = 'Click for additional player information',
 				variant = 'secondary',
 				size = 'sm',
+				linktype = 'external',
 				link = link,
 				children = WidgetUtil.collect(
 					Icon{iconName = 'link'},
