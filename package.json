@@ -32,8 +32,8 @@
 		]
 	},
 	"scripts": {
-		"lint": "npm run lint:js & npm run lint:scss",
-		"lint:ci": "npm run lint:js & npm run lint:scss:ci",
+		"lint": "npm run lint:js && npm run lint:scss",
+		"lint:ci": "npm run lint:js && npm run lint:scss:ci",
 		"lint:js": "eslint --fix",
 		"lint:scss": "stylelint \"stylesheets/**/*.scss\"",
 		"lint:scss:ci": "stylelint \"stylesheets/**/*.scss\" --custom-formatter @csstools/stylelint-formatter-github",
