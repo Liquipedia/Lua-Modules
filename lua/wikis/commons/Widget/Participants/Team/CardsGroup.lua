@@ -31,7 +31,10 @@ function ParticipantsTeamCardsGroup:render()
 		return
 	end
 
-	local showSwitches = not globalVars:get('teamParticipantControlsRendered')
+	local controlsRendered = globalVars:get('teamParticipantControlsRendered')
+	mw.log('CardsGroup DEBUG: teamParticipantControlsRendered =', controlsRendered)
+	local showSwitches = not controlsRendered
+	mw.log('CardsGroup DEBUG: showSwitches =', showSwitches)
 
 	local switches
 	if showSwitches then
