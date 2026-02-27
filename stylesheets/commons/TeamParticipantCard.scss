@@ -46,6 +46,7 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 .team-participant__controls {
 	display: flex;
 	gap: 0.5rem;
+	align-items: center;
 }
 
 .team-participant__grid {
@@ -138,12 +139,12 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 					$participant-icon-size-expanded
 				);
 
-					@media ( max-width: 767px ) {
-						@include set-participant-icon-size(
-							$participant-icon-wrapper-size-mobile,
+				@media ( max-width: 767px ) {
+					@include set-participant-icon-size(
+						$participant-icon-wrapper-size-mobile,
 							$participant-icon-size-mobile
 						);
-					}
+				}
 			}
 		}
 	}

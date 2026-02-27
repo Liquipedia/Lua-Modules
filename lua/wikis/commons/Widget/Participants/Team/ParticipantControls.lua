@@ -46,7 +46,7 @@ function ParticipantsTeamParticipantControls:render()
 				linktype = 'external',
 				link = link,
 				children = WidgetUtil.collect(
-					Icon{iconName = 'link'},
+					Icon{iconName = 'internal_link'},
 					'Player Info'
 				)
 			},
