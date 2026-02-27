@@ -72,10 +72,10 @@ def check_if_page_exists(page: str, wiki: str) -> bool:
             headers=HEADER,
             params={"format": "json", "action": "query"},
             data={"titles": page, "prop": "info"},
-        ).text
+        ).json()
 
         time.sleep(SLEEP_DURATION)
-        return 'missing":"' in result
+        return "-1" not in result["query"]["pages"]
 
 
 def protect_non_existing_page(page: str, wiki: str):
