@@ -292,14 +292,12 @@ function DisplayHelper.DefaultGameSummaryContainer(props)
 	return GameSummaryModule.getGameByMatchId(props)
 end
 
----@param props table
----@return Html
+---@param props {match: MatchGroupUtilMatch}
+---@return Widget
 function DisplayHelper.DefaultMatchPageContainer(props)
 	local MatchPageModule = Lua.import('Module:MatchPage')
 
-	assert(MatchPageModule.getByMatchId, 'Expected MatchPage.getByMatchId to be a function')
-
-	return MatchPageModule.getByMatchId(props)
+	return MatchPageModule(props.match):render()
 end
 
 ---Retrieves the wiki specific global bracket config.

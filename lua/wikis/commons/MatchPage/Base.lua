@@ -61,8 +61,8 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field teamTemplateData teamTemplateData
 ---@field seriesDots string[]
 
----@class BaseMatchPage
----@operator call(MatchPageMatch): BaseMatchPage
+---@class BaseMatchPage: BaseClass
+---@operator call(MatchGroupUtilMatch): BaseMatchPage
 ---@field matchData MatchPageMatch
 ---@field games MatchPageGame[]
 ---@field opponents MatchPageOpponent[]
@@ -88,13 +88,6 @@ local BaseMatchPage = Class.new(
 
 BaseMatchPage.NOT_PLAYED = 'notplayed'
 BaseMatchPage.NO_CHARACTER = 'default'
-
----@param props {match: MatchGroupUtilMatch}
----@return Widget
-function BaseMatchPage.getByMatchId(props)
-	local matchPage = BaseMatchPage(props.match)
-	return matchPage:render()
-end
 
 function BaseMatchPage:addCategories()
 	local matchPhase = MatchGroupUtil.computeMatchPhase(self.matchData)
