@@ -510,14 +510,12 @@ function BaseMatchPage:previousMatches()
 				headToHead and AdditionalSection{
 					css = {flex = '2 0 100%'},
 					header = 'Head to Head',
-					bodyClasses = {'match-table-wrapper'},
 					children = headToHead,
 				} or nil,
 				Array.map(self.opponents, function (opponent)
 					local matchTable = self:_buildMatchTable(opponent)
 					return AdditionalSection{
 						header = OpponentDisplay.InlineOpponent{opponent = opponent, teamStyle = 'hybrid'},
-						bodyClasses = matchTable and {'match-table-wrapper'} or nil,
 						children = matchTable or self:getTournamentIcon()
 					}
 				end)
@@ -535,7 +533,7 @@ end
 
 ---@private
 ---@param props table
----@return Html
+---@return Widget
 function BaseMatchPage:_createMatchTable(props)
 	return MatchTable(Table.mergeInto({
 		addCategory = false,
@@ -552,7 +550,7 @@ end
 
 ---@private
 ---@param opponent standardOpponent
----@return Html?
+---@return Widget?
 function BaseMatchPage:_buildMatchTable(opponent)
 	if not BaseMatchPage._isTeamOpponent(opponent) then
 		return
@@ -568,7 +566,7 @@ function BaseMatchPage:_buildMatchTable(opponent)
 end
 
 ---@private
----@return Html?
+---@return Widget?
 function BaseMatchPage:_buildHeadToHeadMatchTable()
 	if not Array.all(self.opponents, BaseMatchPage._isTeamOpponent) then
 		return

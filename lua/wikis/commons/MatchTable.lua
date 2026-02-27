@@ -585,6 +585,7 @@ function MatchTable:buildDisplay()
 	end)
 
 	return TableWidgets.Table{
+		classes = {'match-table-wrapper'},
 		sortable = true,
 		columns = self:buildColumnDefinitions(),
 		title = String.nilIfEmpty(self.config.title),
