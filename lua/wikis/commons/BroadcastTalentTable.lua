@@ -232,18 +232,17 @@ function BroadcastTalentTable:create()
 		sortable = true,
 		columns = WidgetUtil.collect(
 			{
-				align = 'center',
-				minWidth = '120px',
+				align = 'left',
 				sortType = 'isoDate'
 			},
 			{
-				align = 'center',
+				align = 'left',
 				shrink = true,
 			},
 			self.args.displayGameIcon and {align = 'center'} or nil,
 			{align = 'center'},
-			{align = 'center'},
-			{align = 'center'},
+			{align = 'left'},
+			{align = 'left'},
 			self.args.displayPartnerListColumn and {
 				align = 'center',
 				unsortable = true,
@@ -270,6 +269,7 @@ function BroadcastTalentTable:_header()
 			TableWidgets.CellHeader{children = {'Date'}},
 			TableWidgets.CellHeader{children = {'Tier'}},
 			TableWidgets.CellHeader{
+				align = 'left',
 				colspan = self.args.displayGameIcon and 3 or 2,
 				children = {'Tournament'}
 			},
