@@ -227,6 +227,7 @@ Box
 Bracket
 BroadcasterCard
 Button
+Country_representation
 Currency
 Deletion
 DuoOpponent
@@ -280,6 +281,8 @@ TeamParticipants
 TeamPrizePool
 TournamentVariables
 TournamentsList
+Tournament_player_information
+TPI
 Transfer_List
 Transfer_Row
 TRef
