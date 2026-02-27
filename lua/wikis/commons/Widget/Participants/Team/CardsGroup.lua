@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 
 local Widget = Lua.import('Module:Widget')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
@@ -16,6 +17,8 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local ParticipantsTeamCard = Lua.import('Module:Widget/Participants/Team/Card')
 local Switch = Lua.import('Module:Widget/Switch')
+
+local globalVars = PageVariableNamespace()
 
 ---@class ParticipantsTeamCardsGroup: Widget
 ---@operator call(table): ParticipantsTeamCardsGroup
@@ -28,10 +31,12 @@ function ParticipantsTeamCardsGroup:render()
 		return
 	end
 
+	local showSwitches = not globalVars:get('teamParticipantControlsRendered')
+
 	return Div{
 		classes = { 'team-participant' },
 		children = {
-			Div{
+			showSwitches and Div{
 				classes = { 'team-participant__switches' },
 				children = {
 					AnalyticsWidget{
@@ -58,7 +63,7 @@ function ParticipantsTeamCardsGroup:render()
 						},
 					}
 				}
-			},
+			} or nil,
 			AnalyticsWidget{
 				analyticsName = 'Team participants card',
 				children = Div{
