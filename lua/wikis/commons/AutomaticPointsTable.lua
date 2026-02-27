@@ -289,9 +289,9 @@ function AutomaticPointsTable._getSecuredPoints(tournament)
 	})
 	return Array.min(Array.map(results, function (result)
 		if tournament.usePoints2 then
-			return tonumber(result.extradata.prizepoints2)
+			return tonumber(result.extradata.prizepoints2) or 0
 		end
-		return tonumber(result.extradata.prizepoints)
+		return tonumber(result.extradata.prizepoints) or 0
 	end))
 end
 
