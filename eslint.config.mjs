@@ -21,6 +21,8 @@ export default defineConfig([{
         "wikimedia/jquery",
     ),
 
+    files: ["javascript/**/*.js"],
+
     languageOptions: {
         globals: {
             ...globals.jquery,
