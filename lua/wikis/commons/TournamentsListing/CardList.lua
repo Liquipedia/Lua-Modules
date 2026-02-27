@@ -318,8 +318,8 @@ function BaseTournamentsListing:_row(tournamentData)
 			},
 			TableWidgets.Cell{children = BaseTournamentsListing._displayLocations(tournamentData.locations or {}, tournamentData.type)},
 			TableWidgets.Cell{children = participantNumber ~= -1 and BaseTournamentsListing.participantsNumber(participantNumber) or '-'},
-			status == CANCELLED and
-				TableWidgets.Cell{
+			status == CANCELLED
+				and TableWidgets.Cell{
 					colspan = config.showQualifierColumnOverWinnerRunnerup and 1 or 2,
 					classes = {'bg-down'},
 					css = {
@@ -327,13 +327,13 @@ function BaseTournamentsListing:_row(tournamentData)
 						['font-style'] = 'italic',
 					},
 					children = 'Cancelled'
-				} or nil,
-			(status ~= CANCELLED and config.showQualifierColumnOverWinnerRunnerup)
-				and TableWidgets.Cell{children = self:_buildParticipants(placements.qualified)}
-				or WidgetUtil.collect(
-					TableWidgets.Cell{children = self:_buildParticipants(placements[1])},
-					TableWidgets.Cell{children = self:_buildParticipants(placements[2])}
-				) or nil
+				}
+				or config.showQualifierColumnOverWinnerRunnerup
+					and TableWidgets.Cell{children = self:_buildParticipants(placements.qualified)}
+					or WidgetUtil.collect(
+						TableWidgets.Cell{children = self:_buildParticipants(placements[1])},
+						TableWidgets.Cell{children = self:_buildParticipants(placements[2])}
+					) or nil
 		)
 }
 end
