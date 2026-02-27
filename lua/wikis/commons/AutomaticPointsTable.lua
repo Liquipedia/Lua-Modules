@@ -133,17 +133,21 @@ function AutomaticPointsTable:parsePositionBackgroundData(args)
 end
 
 ---@param args table
----@return StandardTournament[]
+---@return {tournament: StandardTournament, usePoints2: boolean}[]
 function AutomaticPointsTable:parseTournaments(args)
 	local tournaments = {}
-	for _, tournament in Table.iter.pairsByPrefix(args, 'tournament') do
-		Array.appendWith(tournaments, Tournament.getTournament(tournament))
+	for key, tournament in Table.iter.pairsByPrefix(args, 'tournament') do
+		local tournamentData = Tournament.getTournament(tournament)
+		Array.appendWith(tournaments, {
+			tournament = tournamentData,
+			usePoints2 = Logic.readBool(args[key .. 'Points2'])
+		})
 	end
 	return tournaments
 end
 
 ---@param args table
----@param tournaments StandardTournament[]
+---@param tournaments {tournament: StandardTournament, usePoints2: boolean}[]
 ---@return AutomaticPointsTableOpponent[]
 function AutomaticPointsTable:parseOpponents(args, tournaments)
 	local opponents = {}
@@ -179,7 +183,7 @@ function AutomaticPointsTable:parseOpponents(args, tournaments)
 			end
 
 			return Table.merge(
-				queriedPoints, {qualified = qualified}, self:parseDeduction(parsedArgs, tournament, tournamentIndex)
+				queriedPoints, {qualified = qualified}, self:parseDeduction(parsedArgs, tournament.tournament, tournamentIndex)
 			)
 		end)
 
@@ -236,10 +240,10 @@ function AutomaticPointsTable:parseDeduction(args, tournament, tournamentIndex)
 end
 
 ---@param aliases string[]
----@param tournament StandardTournament
+---@param tournament {tournament: StandardTournament, usePoints2: boolean}
 function AutomaticPointsTable:queryPlacement(aliases, tournament)
 	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionNode(ColumnName('parent'), Comparator.eq, tournament.pageName),
+		ConditionNode(ColumnName('parent'), Comparator.eq, tournament.tournament.pageName),
 		ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
 		Condition.Util.anyOf(ColumnName('opponenttemplate'), aliases),
 	}
@@ -253,7 +257,7 @@ function AutomaticPointsTable:queryPlacement(aliases, tournament)
 		return
 	end
 
-	local prizePoints = tonumber(result.extradata.prizepoints)
+	local prizePoints = tournament.usePoints2 and tonumber(result.extradata.prizepoints2) or tonumber(result.extradata.prizepoints)
 	local securedPoints = tonumber(result.extradata.securedpoints)
 
 	if prizePoints then
