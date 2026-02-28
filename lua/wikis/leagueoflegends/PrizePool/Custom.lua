@@ -11,6 +11,7 @@ local Arguments = Lua.import('Module:Arguments')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Variables = Lua.import('Module:Variables')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 
 local PrizePool = Lua.import('Module:PrizePool')
 
@@ -40,10 +41,12 @@ end
 ---@param opponent BasePlacementOpponent
 ---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
+	lpdbData.publishertier = Variables.varDefault('tournament_publishertier', '')
 	lpdbData.weight = CustomPrizePool.calculateWeight(
 		Variables.varDefault('tournament_liquipediatier'),
 		placement.placeStart,
-		Variables.varDefault('tournament_liquipediatiertype')
+		Variables.varDefault('tournament_liquipediatiertype'),
+		HighlightConditions.tournament(lpdbData)
 	)
 
 	local team = lpdbData.participant or ''
@@ -61,15 +64,16 @@ end
 ---@param tier string?
 ---@param place integer
 ---@param tierType string?
+---@param isHighlighted boolean
 ---@return integer
-function CustomPrizePool.calculateWeight(tier, place, tierType)
+function CustomPrizePool.calculateWeight(tier, place, tierType, isHighlighted)
 	if Logic.isEmpty(tier) then
 		return 0
 	end
 
 	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier) or ''] or 1
 
-	return tierValue * (TIER_TYPE_MODIFIER[tierType] or 1) / place
+	return tierValue * (TIER_TYPE_MODIFIER[tierType] or 1) * (isHighlighted and 2 or 1) / place
 end
 
 return CustomPrizePool
