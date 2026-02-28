@@ -9,11 +9,9 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
-local CharacterIcon = Lua.import('Module:CharacterIcon')
 local Class = Lua.import('Module:Class')
 local MathUtil = Lua.import('Module:MathUtil')
 local Opponent = Lua.import('Module:Opponent/Custom')
-local Page = Lua.import('Module:Page')
 
 local CharacterGameTable = Lua.import('Module:GameTable/Character')
 
