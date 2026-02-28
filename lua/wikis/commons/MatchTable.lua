@@ -975,9 +975,9 @@ end
 ---@param winner integer
 ---@return string?
 function MatchTable:getBackgroundClass(winner)
-	return winner == 1 and 'recent-matches-bg-win' or
-		winner == 0 and 'recent-matches-bg-tie' or
-		winner == 2 and 'recent-matches-bg-lose' or
+	return winner == 1 and 'match-table-row__win' or
+		winner == 0 and 'match-table-row__draw' or
+		winner == 2 and 'match-table-row__loss' or
 		nil
 end
 

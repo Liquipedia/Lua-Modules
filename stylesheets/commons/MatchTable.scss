@@ -12,3 +12,53 @@ Template(s): MatchTable
 .recent-matches-bg-lose {
 	background-color: var( --table-red-background-color, #f9f0f2 ) !important;
 }
+
+.match-table-wrapper table.table2__table tr.table2__row--body {
+	&.match-table-row__win {
+		background-color: var( --clr-semantic-positive-90 );
+
+		&:hover {
+			background-color: var( --clr-semantic-positive-80 );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-semantic-positive-10 );
+
+			&:hover {
+				background-color: var( --clr-semantic-positive-20 );
+			}
+		}
+	}
+
+	&.match-table-row__draw {
+		background-color: var( --clr-semantic-gold-90 );
+
+		&:hover {
+			background-color: var( --clr-semantic-gold-80 );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-semantic-gold-10 );
+
+			&:hover {
+				background-color: var( --clr-semantic-gold-20 );
+			}
+		}
+	}
+
+	&.match-table-row__loss {
+		background-color: var( --clr-semantic-negative-90 );
+
+		&:hover {
+			background-color: var( --clr-semantic-negative-80 );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-semantic-negative-10 );
+
+			&:hover {
+				background-color: var( --clr-semantic-negative-20 );
+			}
+		}
+	}
+}
