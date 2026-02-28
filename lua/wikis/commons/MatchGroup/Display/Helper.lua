@@ -33,10 +33,10 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@param opponent standardOpponent
 ---@return boolean
 function DisplayHelper.opponentIsHighlightable(opponent)
-	if opponent.type == 'literal' then
-		return opponent.name and opponent.name ~= '' and opponent.name ~= 'TBD' or false
+	if Opponent.isTbd(opponent) then
+		return false
 	elseif opponent.type == 'team' then
-		return opponent.template and opponent.template ~= 'tbd' or false
+		return Logic.isNotEmpty(opponent.template)
 	else
 		return 0 < #opponent.players
 			and Array.all(opponent.players, function(player)
