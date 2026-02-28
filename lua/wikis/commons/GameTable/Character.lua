@@ -65,12 +65,6 @@ local SCORE_CONCAT = '&nbsp;&colon;&nbsp;'
 local CharacterGameTable = Class.new(GameTable, function (self)
 	self.isCharacterTable = self.args.tableMode == CHARACTER_MODE
 	self.isPickedByRequired = self.isCharacterTable
-
-	if not self.isCharacterTable then
-		self.resultFromRecord = GameTable.resultFromRecord
-		self.buildConditions = GameTable.buildConditions
-		self.statsFromMatches = GameTable.statsFromMatches
-	end
 end)
 
 ---@return integer
@@ -175,8 +169,11 @@ function CharacterGameTable:_buildCharacterConditions()
 	return characterConditions
 end
 
----@return string
+---@return ConditionTree
 function CharacterGameTable:buildConditions()
+	if not self.isCharacterTable then
+		return GameTable.buildConditions(self)
+	end
 	local lpdbData = mw.ext.LiquipediaDB.lpdb('match2game', {
 		conditions = self:_buildMatchConditions(),
 		query = 'match2id',
@@ -190,7 +187,7 @@ function CharacterGameTable:buildConditions()
 		conditions:add(ConditionNode(ColumnName('match2id'), Comparator.eq, game.match2id))
 	end)
 
-	return conditions:toString()
+	return conditions
 end
 
 ---@param game CharacterGameTableGame
@@ -253,19 +250,25 @@ function CharacterGameTable:filterGame(game)
 	return foundPicks or self.config.showGameWithoutCharacters
 end
 
----@param record table
+---@param record MatchGroupUtilMatch
 ---@return MatchTableMatchResult?
 function CharacterGameTable:resultFromRecord(record)
-	return {
-		opponent = record.match2opponents[1],
-		vs = record.match2opponents[2],
-		winner = tonumber(record.winner),
-		countGames = true,
-	}
+	if self.isCharacterTable then
+		return {
+			opponent = record.opponents[1],
+			vs = record.opponents[2],
+			winner = tonumber(record.winner),
+			countGames = true,
+		}
+	end
+	return GameTable.resultFromRecord(self, record)
 end
 
 ---@return {games: {w: number, d: number, l: number}}
 function CharacterGameTable:statsFromMatches()
+	if not self.isCharacterTable then
+		return GameTable.statsFromMatches(self)
+	end
 	local totalGames = {w = 0, d = 0, l = 0}
 
 	Array.forEach(self.matches, function(match)
