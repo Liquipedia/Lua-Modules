@@ -20,6 +20,7 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 local CustomPrizePool = {}
 
 local TIER_VALUE = {8, 4, 2}
+local TIER_TYPE_MODIFIER = {Showmatch = 0,  Qualifier = 0.25, Monthly = 0.4, Weekly = 0.1}
 
 -- Template entry point
 ---@param frame Frame
@@ -40,9 +41,9 @@ end
 ---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.weight = CustomPrizePool.calculateWeight(
-		lpdbData.prizemoney,
 		Variables.varDefault('tournament_liquipediatier'),
-		placement.placeStart
+		placement.placeStart,
+		Variables.varDefault('tournament_liquipediatiertype')
 	)
 
 	local team = lpdbData.participant or ''
@@ -57,18 +58,18 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	return lpdbData
 end
 
----@param prizeMoney number
 ---@param tier string?
 ---@param place integer
+---@param tierType string?
 ---@return integer
-function CustomPrizePool.calculateWeight(prizeMoney, tier, place)
+function CustomPrizePool.calculateWeight(tier, place, tierType)
 	if Logic.isEmpty(tier) then
 		return 0
 	end
 
 	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier) or ''] or 1
 
-	return tierValue * math.max(prizeMoney, 1) / place
+	return tierValue * (TIER_TYPE_MODIFIER[tierType] or 1) / place
 end
 
 return CustomPrizePool
