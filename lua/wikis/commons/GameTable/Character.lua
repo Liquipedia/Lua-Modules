@@ -404,11 +404,14 @@ end
 function CharacterGameTable:_displayCharacters(game, opponentIndex, key)
 	local config = self.config
 
-	return TableWidgets.Cell{children = MatchSummaryCharacters{
-		bg = config.showSideClass and self:getSideClass(game.extradata, opponentIndex) or nil,
-		characters = game[key][opponentIndex] or {},
-		date = game.date,
-	}}
+	return TableWidgets.Cell{
+		classes = key == 'bans' and {'lor-graycard'} or nil,
+		children = MatchSummaryCharacters{
+			bg = config.showSideClass and self:getSideClass(game.extradata, opponentIndex) or nil,
+			characters = game[key][opponentIndex] or {},
+			date = game.date,
+		}
+	}
 end
 
 ---@param match CharacterGameTableMatch
