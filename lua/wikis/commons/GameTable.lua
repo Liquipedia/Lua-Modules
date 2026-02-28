@@ -126,10 +126,10 @@ end
 ---@return Widget
 function GameTable:gameRow(match, game)
 	local indexes = match.result.flipped and {2, 1} or {1, 2}
-	local winner = game.winner == indexes[1]
+	local winner = indexes[game.winner]
 
 	return TableWidgets.Row{
-		classes = {self:_getBackgroundClass(winner)},
+		classes = {self:getBackgroundClass(winner)},
 		children = WidgetUtil.collect(
 			self:_displayDate(match),
 			self:displayTier(match),
