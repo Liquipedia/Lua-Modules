@@ -13,7 +13,7 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Infobox = Lua.import('Module:Widget/Infobox/Core')
 
 ---@class BasicInfobox

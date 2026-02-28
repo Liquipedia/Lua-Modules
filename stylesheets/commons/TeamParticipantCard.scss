@@ -150,10 +150,12 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 
 	&__opponent-compact {
 		display: none;
+		width: 100%;
 	}
 
 	&__opponent-full {
 		display: flex;
+		width: 100%;
 	}
 
 	&__label {
@@ -246,14 +248,6 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 		.theme--dark & {
 			color: var( --clr-primary-80 );
 		}
-	}
-
-	&__qualifier-placement {
-		align-self: center;
-		padding: 0.125rem 0.5rem;
-		border-radius: 0.25rem;
-		font-weight: bold;
-		font-size: 0.6875rem;
 	}
 
 	@media ( min-width: 768px ) {

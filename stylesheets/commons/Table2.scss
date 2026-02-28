@@ -51,7 +51,7 @@ $table2-cell-padding-x: 0.75rem;
 
 	&__table {
 		width: 100%;
-		border-spacing: 0;
+		border-spacing: 0 1px;
 		border-collapse: separate;
 		border: 0;
 
@@ -100,34 +100,73 @@ $table2-cell-padding-x: 0.75rem;
 				font-weight: bold;
 			}
 		}
-	}
 
-	tr.table2__row--body.table2__row--even {
-		.theme--light & {
-			background-color: var( --clr-on-surface-light-primary-4 );
-		}
-
-		.theme--dark & {
-			background-color: var( --clr-on-surface-dark-primary-4 );
+		.prizepooltabletoggle {
+			text-align: center;
 		}
 	}
 
-	tr.table2__row--body.table2__row--highlighted {
-		background-color: var( --publisher-premier-highlight-background-color ) !important;
-	}
+	tr.table2__row--body {
+		&.table2__row--even {
+			.theme--light & {
+				background-color: var( --clr-on-surface-light-primary-4 );
+			}
 
-	tr.table2__row--body:hover {
-		.theme--light & {
-			background-color: var( --clr-on-surface-light-primary-8 );
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+			}
 		}
 
-		.theme--dark & {
-			background-color: var( --clr-on-surface-dark-primary-8 );
-		}
-	}
+		&.table2__row--highlighted {
+			position: relative;
 
-	tr.table2__row--body.table2__row--highlighted:hover {
-		background-color: var( --publisher-premier-highlight-background-color ) !important;
+			.theme--light & {
+				background-color: var( --clr-semantic-gold-98 );
+				box-shadow: 0 1px 0 var( --clr-semantic-gold-80 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-semantic-gold-16 );
+				box-shadow: 0 1px 0 var( --clr-semantic-gold-20 );
+			}
+
+			&::after {
+				content: "";
+				position: absolute;
+				left: 0;
+				top: 0;
+				bottom: 0;
+				width: 6px;
+
+				.theme--light & {
+					background-color: var( --clr-semantic-gold-40 );
+				}
+
+				.theme--dark & {
+					background-color: var( --clr-semantic-gold-30 );
+				}
+			}
+		}
+
+		&:hover {
+			.theme--light & {
+				background-color: var( --clr-on-surface-light-primary-8 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-8 );
+			}
+		}
+
+		&.table2__row--highlighted:hover {
+			.theme--light & {
+				background-color: var( --clr-semantic-gold-90 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-semantic-gold-18 );
+			}
+		}
 	}
 
 	&__title {
@@ -180,6 +219,12 @@ $table2-cell-padding-x: 0.75rem;
 		th {
 			font-weight: bold;
 		}
+	}
+
+	.table2__subheader-cell {
+		position: sticky;
+		left: 0.75rem;
+		width: min-content;
 	}
 
 	&--themed {
