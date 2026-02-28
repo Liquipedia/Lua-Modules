@@ -20,13 +20,15 @@ local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local BASE_CURRENCY = 'USD'
+
 ---@class BasePrizePoolTable: Widget
 ---@operator call(table): BasePrizePoolTable
 ---@field props table<string|number, string>
 local BasePrizePoolTable = Class.new(Widget)
 BasePrizePoolTable.defaultProps = {
 	title = 'Base prize money',
-	currency = 'USD',
+	currency = BASE_CURRENCY,
 }
 
 ---@return Widget?
@@ -46,7 +48,7 @@ function BasePrizePoolTable:render()
 		sortable = true,
 		columns = WidgetUtil.collect(
 			{
-				align = 'left',
+				align = 'center',
 			},
 			{
 				align = 'right',
@@ -85,11 +87,11 @@ function BasePrizePoolTable:_parse()
 		if not sortValue then
 			return
 		end
-		local prizeString = value:gsub(',', '')
+		local prizeString = mw.getContentLanguage():parseFormattedNumber(value)
 		local prize = tonumber(prizeString)
 		assert(prize, 'Invalid entry "|' .. key .. '=' .. value .. '"')
 
-		local pointsString = (props[key .. '_points'] or ''):gsub(',', '')
+		local pointsString = mw.getContentLanguage():parseFormattedNumber(props[key .. '_points'] or '')
 
 		table.insert(placements, {
 			place = key,
