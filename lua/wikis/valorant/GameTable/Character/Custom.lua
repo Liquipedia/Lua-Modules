@@ -95,7 +95,7 @@ function CustomCharacterGameTable:buildColumnDefinitions()
 			align = 'left',
 		},
 		config.showResult and WidgetUtil.collect(
-			config.mode == Opponent.solo and {align = 'center'} or nil,
+			config.mode == Opponent.solo and {align = 'left'} or nil,
 			config.mode ~= Opponent.team and {
 				{align = 'right'}, -- Kills
 				{align = 'right'}, -- Deaths
@@ -160,14 +160,14 @@ function CustomCharacterGameTable:headerRow()
 			makeHeaderCell('Tournament'),
 			makeHeaderCell('Map'),
 			config.showResult and WidgetUtil.collect(
-				config.mode == Opponent.solo and makeHeaderCell() or nil,
+				config.mode == Opponent.solo and makeHeaderCell('Pick') or nil,
 				config.mode ~= Opponent.team and {
 					makeHeaderCell('K'),
 					makeHeaderCell('D'),
 					makeHeaderCell('A'),
 					makeHeaderCell('Ratio'),
 				} or nil,
-				makeHeaderCell('Picks'),
+				makeHeaderCell(config.mode == Opponent.solo and 'Team Picks' or 'Picks'),
 				makeHeaderCell(),
 				makeHeaderCell('Score'),
 				makeHeaderCell(),
