@@ -65,7 +65,7 @@ end
 ---@param place integer
 ---@param tierType string?
 ---@param isHighlighted boolean
----@return integer
+---@return number
 function CustomPrizePool.calculateWeight(tier, place, tierType, isHighlighted)
 	if Logic.isEmpty(tier) then
 		return 0
