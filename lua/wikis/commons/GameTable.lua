@@ -158,7 +158,7 @@ function GameTable:buildRows()
 		end
 		Array.extendWith(rows, Array.reverse(
 			Array.map(match.games, function (game)
-				self:gameRow(match, game)
+				return self:gameRow(match, game)
 			end)
 		))
 	end)
