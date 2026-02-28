@@ -40,7 +40,7 @@ function DisplayHelper.opponentIsHighlightable(opponent)
 	else
 		return 0 < #opponent.players
 			and Array.all(opponent.players, function(player)
-				return Logic.isNotEmpty(player.pageName) and Logic.isNotEmpty(player.displayName) and player.displayName ~= 'TBD'
+				return Logic.isNotEmpty(player.pageName) and not Opponent.playerIsTbd(player)
 			end)
 	end
 end
