@@ -185,7 +185,7 @@ function CustomCharacterGameTable:headerRow()
 end
 
 ---@param participant table
----@return number?
+---@return string?
 function CustomCharacterGameTable:_getRatio(participant)
 	local kills = tonumber(participant.kills) or 0
 	local deaths = tonumber(participant.deaths) or 0
@@ -193,7 +193,7 @@ function CustomCharacterGameTable:_getRatio(participant)
 		return nil
 	end
 
-	return MathUtil.round(kills / deaths, 1)
+	return MathUtil.formatRounded{value = kills / deaths, precision = 1}
 end
 
 ---@param match CharacterGameTableMatch
