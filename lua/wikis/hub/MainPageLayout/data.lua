@@ -28,6 +28,10 @@ local CONTENT = {
 				linktype = 'external',
 			}},
 			Li{children = Link{
+				link = 'lpcommons:Main Page',
+				children = 'Liquipedia Commons',
+			}},
+			Li{children = Link{
 				link = 'Support',
 			}},
 			Li{children = Link{
@@ -52,6 +56,10 @@ local CONTENT = {
 				Li{children = Link{
 					link = 'Liquipedia:Policy',
 					children = 'Policies',
+				}},
+				Li{children = Link{
+					link = 'Community Showcase',
+					children = 'Community Showcase',
 				}},
 			}},
 			HtmlWidgets.Br{classes = {'mobile-hide'}},

@@ -61,8 +61,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		Variables.varDefault('tournament_type')
 	)
 
-	lpdbData.qualified = placement:getPrizeRewardForOpponent(opponent, 'QUALIFIES1') and 1 or 0
-
 	Variables.varDefine(mw.ustring.lower(lpdbData.participant) .. '_prizepoints', lpdbData.extradata.prizepoints)
 	Variables.varDefine(mw.ustring.lower(lpdbData.participant) .. '_prizepoints2', lpdbData.extradata.prizepoints2)
 

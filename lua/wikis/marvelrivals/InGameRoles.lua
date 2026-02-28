@@ -13,4 +13,8 @@ local inGameRoles = {
 	['vanguard'] = {category = 'Vanguard Players', display = 'Vanguard', sortOrder = 2},
 }
 
+inGameRoles['dps'] = inGameRoles.duelist
+inGameRoles['tank'] = inGameRoles.vanguard
+inGameRoles['sup'] = inGameRoles.strategist
+
 return inGameRoles

@@ -11,7 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
@@ -79,9 +79,7 @@ end
 ---@param args table
 ---@return boolean
 function CustomPlayer:shouldStoreData(args)
-	return Namespace.isMain() and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
-		and args.informationType ~= BOT_INFORMATION_TYPE
+	return Namespace.isMain() and Lpdb.isStorageEnabled() and args.informationType ~= BOT_INFORMATION_TYPE
 end
 
 ---@param id string

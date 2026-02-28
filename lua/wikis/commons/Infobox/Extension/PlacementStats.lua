@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:InfoboxPlacementStats
+-- page=Module:Infobox/Extension/PlacementStats
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

@@ -15,11 +15,6 @@ local MatchTicker = Lua.import('Module:MatchTicker')
 
 local CustomMatchTicker = {}
 
----@deprecated Upcoming matches are now automatically displayed in the league infobox.
----Remove this template invocation from the page.
-function CustomMatchTicker.tournament()
-end
-
 ---Entry point for display on the main page
 ---@param frame Frame|table|nil
 ---@return Html
@@ -60,10 +55,6 @@ function CustomMatchTicker.player(frame)
 	local args = Arguments.getArgs(frame)
 	args.player = args.player or mw.title.getCurrentTitle().text
 	return CustomMatchTicker.recent(args)
-end
-
----@deprecated Upcoming matches are now automatically displayed in the team infobox.
-function CustomMatchTicker.team()
 end
 
 ---Displays recent matches for a player or team.

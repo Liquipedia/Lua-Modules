@@ -35,7 +35,7 @@ function CustomPrizePool.run(frame)
 	args.syncPlayers = true
 	args.import = true
 
-	local prizePool = PrizePool(args) ---@type PrizePool
+	local prizePool = PrizePool(args)
 
 	local output = prizePool:create():setLpdbInjector(CustomLpdbInjector()):build()
 
@@ -101,7 +101,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		if Opponent.isTbd(opponent.opponentData) then
 			return
 		end
-		CustomPrizePool.addPointsDatapoint(lpdbData, placement:getPrizeRewardForOpponent(opponent, prize.id))
+		CustomPrizePool.addPointsDatapoint(lpdbData, prize.index, placement:getPrizeRewardForOpponent(opponent, prize.id))
 	end)
 
 	return lpdbData
@@ -118,16 +118,18 @@ function CustomPrizePool.calculateWeight(prizeMoney, tier, place)
 end
 
 ---@param data placement
+---@param index integer
 ---@param prize string|number|boolean?
-function CustomPrizePool.addPointsDatapoint(data, prize)
+function CustomPrizePool.addPointsDatapoint(data, index, prize)
 	local opponentData = Opponent.fromLpdbStruct(data)
 	if opponentData.type ~= Opponent.solo then return
 	elseif Logic.isEmpty(prize) then return end
 	local player = opponentData.players[1]
+	local prefix = 'circuit' .. (index > 1 and index or '')
 	local pointsDataPoint = Lpdb.DataPoint:new{
-		objectname = 'Points_' .. player.pageName,
+		objectname = 'Points' .. index .. '_' .. player.pageName,
 		type = 'points',
-		name = mw.ext.TeamLiquidIntegration.resolve_redirect(data.extradata.circuit),
+		name = mw.ext.TeamLiquidIntegration.resolve_redirect(data.extradata[prefix]),
 		information = player.pageName,
 		date = data.date,
 		extradata = {
@@ -141,8 +143,8 @@ function CustomPrizePool.addPointsDatapoint(data, prize)
 			type = Variables.varDefault('tournament_type'),
 			participantname = player.displayName,
 			participantflag = player.flag,
-			publishertier = data.extradata.circuit_tier or Variables.varDefault('circuittier'),
-			region = Variables.varDefault('circuitregion'),
+			publishertier = data.extradata[prefix .. '_tier'] or Variables.varDefault(prefix .. 'tier'),
+			region = Variables.varDefault(prefix .. 'region'),
 		}
 	}
 	pointsDataPoint:save()

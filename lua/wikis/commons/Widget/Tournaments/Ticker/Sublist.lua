@@ -15,9 +15,14 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local TournamentLabel = Lua.import('Module:Widget/Tournament/Label')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
 
----@class TournamentsTickerSublistWidget: Widget
----@operator call(table): TournamentsTickerSublistWidget
+---@class TournamentsTickerSublistWidgetProps
+---@field title string
+---@field tournaments StandardTournament[]
+---@field displayGameIcons boolean
 
+---@class TournamentsTickerSublistWidget: Widget
+---@operator call(TournamentsTickerSublistWidgetProps): TournamentsTickerSublistWidget
+---@field props TournamentsTickerSublistWidgetProps
 local TournamentsTickerSublistWidget = Class.new(Widget)
 
 ---@return Widget?
@@ -26,6 +31,9 @@ function TournamentsTickerSublistWidget:render()
 		return
 	end
 
+	---@param tournament StandardTournament
+	---@param child Widget
+	---@return Widget
 	local createFilterWrapper = function(tournament, child)
 		return Array.reduce(FilterConfig.categories, function(prev, filterCategory)
 			local itemIsValid = filterCategory.itemIsValid or function(item) return true end

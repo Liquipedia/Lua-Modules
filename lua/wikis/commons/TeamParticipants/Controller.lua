@@ -11,6 +11,7 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
@@ -39,6 +40,8 @@ local AUTO_IMPORTED_STAFF_ROLES = {
 	'head coach',
 }
 
+local Config = Info.config.participants or {}
+
 ---@param frame Frame
 ---@return Widget
 function TeamParticipantsController.fromTemplate(frame)
@@ -56,7 +59,10 @@ function TeamParticipantsController.fromTemplate(frame)
 	end
 	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
 	return TeamParticipantsDisplay{
-		participants = parsedData.participants
+		participants = parsedData.participants,
+		mergeStaffTabIfOnlyOneStaff = Logic.nilOr(
+			Logic.readBoolOrNil(args.mergeStaffTabIfOnlyOneStaff), Logic.readBool(Config.mergeStaffTabIfOnlyOneStaff)
+		)
 	}
 end
 

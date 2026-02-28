@@ -15,12 +15,16 @@ local AwardsTable = Lua.import('Module:ResultsTable/Award')
 local CustomResultsTable = {}
 
 -- Template entry point for results and achievements tables
+---@param args table
+---@return Widget
 function CustomResultsTable.results(args)
 	args.hideresult = true
 	return ResultsTable(args):create():build()
 end
 
 -- Template entry point for awards tables
+---@param args table
+---@return Widget
 function CustomResultsTable.awards(args)
 	return AwardsTable(args):create():build()
 end

@@ -43,12 +43,12 @@ return {
 			name = 'Honor of Kings',
 			link = 'Honor of Kings',
 			logo = {
-				darkMode = 'Honor of Kings Icon.png',
-				lightMode = 'Honor of Kings Icon.png',
+				darkMode = 'Honor of Kings 2026 allmode.png',
+				lightMode = 'Honor of Kings 2026 allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Honor of Kings 2018-12-24 Logo.png',
-				lightMode = 'Honor of Kings 2018-12-24 Logo.png',
+				darkMode = 'Honor of Kings 2026 allmode.png',
+				lightMode = 'Honor of Kings 2026 allmode.png',
 			},
 		},
 		hokic = {

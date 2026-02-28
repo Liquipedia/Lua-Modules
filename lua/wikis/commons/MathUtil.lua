@@ -28,6 +28,8 @@ function MathUtil.isInteger(x)
 	local parsed = tonumber(x)
 	if not parsed then
 		return false
+	elseif parsed == math.huge or parsed == -math.huge then
+		return false
 	end
 	return parsed == math.floor(parsed)
 end

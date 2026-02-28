@@ -62,6 +62,7 @@ local PREFIXES = {
 	breakingpoint = {match = 'https://www.breakingpoint.gg/match/'},
 	cc = {'https://cc.163.com/'},
 	cdl = {match = 'https://callofdutyleague.com/en-us/match/'},
+	clarioncorp = {'https://clarioncorp.net/pilot/'},
 	challengermode = {
 		'https://www.challengermode.com/tournaments/',
 		player = 'https://www.challengermode.com/users/',
@@ -86,7 +87,6 @@ local PREFIXES = {
 	chzzk = {'https://chzzk.naver.com/'},
 	civdraft = {match = 'https://aoe2cm.net/draft/'},
 	cntft = {'https://lol.qq.com/tft/#/masterDetail/'},
-	corestrike = {'https://corestrike.gg/lookup/'},
 	cfs = {'https://www.crossfirestars.com/'},
 	datdota = {
 		'https://www.datdota.com/leagues/',
@@ -146,6 +146,11 @@ local PREFIXES = {
 		'https://ratings.fide.com/tournament_information.phtml?event=',
 		player = 'https://ratings.fide.com/profile/',
 	},
+	fpschallenge = {
+		'https://fpschallenge.eu/tournament/',
+		player = 'https://fpschallenge.eu/user/',
+		team = 'https://fpschallenge.eu/team/',
+	},
 	geoguessr = {'https://www.geoguessr.com/'},
 	gol = {match = 'https://gol.gg/game/stats/'},
 	gosugamers = {''},
@@ -200,6 +205,7 @@ local PREFIXES = {
 		player = 'https://matcherino.com/',
 	},
 	matcherinolink = {'https://matcherino.com/t/'},
+	metafy = {'https://metafy.gg/@'},
 	mildom = {'https://www.mildom.com/'},
 	mplink = {match = 'https://osu.ppy.sh/community/matches/'}, -- Should this key be renamed?
 	lazermplink = {match = 'https://osu.ppy.sh/multiplayer/rooms/'},
@@ -361,11 +367,12 @@ local SUFFIXES = {
 		'',
 		stream = '/live',
 	},
-	gol = {match = '/page-game/'},
-	lazermplink = {match = '/events'},
-	iccup = {'.html'},
 	['faceit-c'] = {'/'},
 	['faceit-hub'] = {'/'},
+	gol = {match = '/page-game/'},
+	iccup = {'.html'},
+	lazermplink = {match = '/events'},
+	metafy = {'?utm_source=liquipedia&campaign=infoblock'},
 	vk = {
 		'',
 		stream = '/live',
@@ -377,6 +384,7 @@ SUFFIXES = Table.merge(SUFFIXES, CustomData.suffixes or {})
 local ALIASES = {
 	['ask-fm'] = {'afk.fm', 'askfm'},
 	douyu = {'douyutv'},
+	clarioncorp = {'corestrike'},
 	esl = {'eslgaming'},
 	['facebook-gaming'] = {'fbgg'},
 	home = {'website', 'web', 'site', 'url'},

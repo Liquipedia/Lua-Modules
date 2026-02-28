@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Lpdb = Lua.import('Module:Lpdb')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
@@ -44,6 +45,7 @@ local TOURNAMENT_PHASE = {
 ---@field status string?
 ---@field phase TournamentPhase
 ---@field extradata table
+---@field isHighlighted fun(self: StandardTournament, options?: table): boolean
 
 ---@param conditions ConditionTree?
 ---@param filterTournament fun(tournament: StandardTournament): boolean
@@ -84,9 +86,10 @@ local TournamentMT = {
 	__index = function(tournament, property)
 		if property == 'featured' then
 			tournament[property] = Tournament.isFeatured(tournament)
-		end
-		if property == 'phase' then
+		elseif property == 'phase' then
 			tournament[property] = Tournament.calculatePhase(tournament)
+		elseif property == 'isHighlighted' then
+			return HighlightConditions.tournament
 		end
 		return rawget(tournament, property)
 	end
@@ -106,6 +109,7 @@ function Tournament.partialTournamentFromMatch(match)
 		iconDark = match.iconDark,
 		series = match.series,
 		game = match.game,
+		publisherTier = match.publisherTier,
 	}
 end
 
@@ -124,6 +128,7 @@ function Tournament.tournamentFromRecord(record)
 		endDate = endDate,
 		liquipediaTier = Tier.toIdentifier(record.liquipediatier),
 		liquipediaTierType = Tier.toIdentifier(record.liquipediatiertype),
+		publisherTier = record.publishertier,
 		region = (record.locations or {}).region1,
 		status = record.status,
 		icon = record.icon,
@@ -133,7 +138,7 @@ function Tournament.tournamentFromRecord(record)
 		extradata = extradata,
 	}
 
-	-- Some properties are derived from other properies and we can calculate them when accessed.
+	-- Some properties are derived from other properties and we can calculate them when accessed.
 	setmetatable(tournament, TournamentMT)
 
 	return tournament

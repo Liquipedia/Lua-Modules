@@ -64,9 +64,21 @@ local DEFAULT_ORDER = 'date asc, liquipediatier asc, tournament asc'
 local DEFAULT_RECENT_ORDER = 'date desc, liquipediatier asc, tournament asc'
 local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
 
+---@class MatchTickerMatchInterface
+---@operator call({config: MatchTickerConfig, match: table}): MatchTickerMatchInterface
+---@field config MatchTickerConfig
+---@field match table
+---@field create fun(self: MatchTickerMatchInterface): Widget|Html?
+
+---@class MatchTickerContainerInterface
+---@operator call({config: MatchTickerConfig, matches: table[]}): MatchTickerContainerInterface
+---@field config MatchTickerConfig
+---@field matches table[]
+---@field create fun(self: MatchTickerContainerInterface): Widget|Html?
+
 --- Extract externally if it grows
 ---@param matchTickerConfig MatchTickerConfig
----@return unknown # Todo: Add interface for MatchTickerDisplay
+---@return {Container?: MatchTickerContainerInterface, Match: MatchTickerMatchInterface}
 local MatchTickerDisplayFactory = function (matchTickerConfig)
 	assert(not (matchTickerConfig.entityStyle and matchTickerConfig.newStyle),
 		"Invalid MatchTicker configuration: 'entityStyle' and 'newStyle' are mutually exclusive. " ..

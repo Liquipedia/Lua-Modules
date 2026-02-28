@@ -11,7 +11,7 @@ local Array = Lua.import('Module:Array')
 local Date = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local FnUtil = Lua.import('Module:FnUtil')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
@@ -77,7 +77,7 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 ---@field upperMatchId string?
 ---@field matchId string?
 ---@field matchPage string?
----@field qualifiedHeader boolean?
+---@field qualifiedHeader string?
 
 MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
@@ -91,7 +91,7 @@ MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	qualLoseLiteral = 'string?',
 	qualSkip = 'number?',
 	qualWin = 'boolean?',
-	qualifiedHeader = 'boolean?',
+	qualifiedHeader = 'string?',
 	qualWinLiteral = 'string?',
 	skipRound = 'number?',
 	thirdPlaceMatchId = 'string?',
@@ -151,6 +151,7 @@ MatchGroupUtil.types.BracketData = TypeUtil.union(
 ---@field extradata table?
 ---@field pageIsResolved boolean?
 ---@field faction string?
+---@field apiId string?
 
 MatchGroupUtil.types.Player = TypeUtil.struct({
 	displayName = 'string?',
