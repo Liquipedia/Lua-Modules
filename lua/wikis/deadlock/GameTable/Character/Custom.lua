@@ -12,6 +12,8 @@ local Class = Lua.import('Module:Class')
 
 local GameTableCharacter = Lua.import('Module:GameTable/Character')
 
+---@class DeadlockCharacterGameTable: CharacterGameTable
+---@operator call(table): CharacterGameTable
 local CustomGameTableCharacter = Class.new(GameTableCharacter)
 
 ---@return integer
@@ -27,7 +29,7 @@ function CustomGameTableCharacter:getCharacterKey(opponentIndex, playerIndex)
 end
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomGameTableCharacter.results(frame)
 	local args = Arguments.getArgs(frame)
 
