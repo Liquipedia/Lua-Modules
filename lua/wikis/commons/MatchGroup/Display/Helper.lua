@@ -29,14 +29,6 @@ local NONBREAKING_SPACE = '&nbsp;'
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
--- Whether to allow highlighting an opponent via mouseover
----@param opponent standardOpponent
----@return boolean
----@deprecated Use Opponent.isTbd() instead
-function DisplayHelper.opponentIsHighlightable(opponent)
-	return not Opponent.isTbd(opponent)
-end
-
 ---@param node Html
 ---@param opponent standardOpponent
 ---@return Html
