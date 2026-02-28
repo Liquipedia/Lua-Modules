@@ -504,6 +504,7 @@ end
 ---@return Widget
 function CharacterGameTable.results(frame)
 	local args = Arguments.getArgs(frame)
+	args.dateFormat = Logic.emptyOr(args.dateFormat, 'compact')
 
 	return CharacterGameTable(args):readConfig():query():build()
 end
