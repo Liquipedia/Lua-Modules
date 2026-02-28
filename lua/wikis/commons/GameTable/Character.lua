@@ -31,6 +31,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local DRAW_WINNER = 0
 local CHARACTER_MODE = 'character'
+local NOT_PLAYED = 'notplayed'
 local SCORE_CONCAT = '&nbsp;&colon;&nbsp;'
 
 ---@class CharacterGameTableConfig: MatchTableConfig
@@ -232,6 +233,9 @@ end
 ---@param game MatchGroupUtilGame
 ---@return boolean
 function CharacterGameTable:filterGame(game)
+	if game.status == NOT_PLAYED or Logic.isEmpty(game.winner) then
+		return false
+	end
 	---@cast game CharacterGameTableGame
 	game.picks = self:getCharacters(game, self.config.numPicks, self.getCharacterKey)
 	game.bans = self.config.showBans and
