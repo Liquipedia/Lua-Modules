@@ -64,6 +64,7 @@ local SCORE_CONCAT = '&nbsp;&colon;&nbsp;'
 ---@field matches CharacterGameTableMatch[]
 local CharacterGameTable = Class.new(GameTable, function (self)
 	self.args.dateFormat = Logic.emptyOr(self.args.dateFormat, 'compact')
+	self.args.matchPageButtonText = Logic.emptyOr(self.args.matchPageButtonText, 'short')
 	self.isCharacterTable = self.args.tableMode == CHARACTER_MODE
 	self.isPickedByRequired = self.isCharacterTable
 end)
