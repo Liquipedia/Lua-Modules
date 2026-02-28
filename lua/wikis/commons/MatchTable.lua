@@ -777,7 +777,7 @@ end
 ---@return Widget
 function MatchTable:matchRow(match)
 	return TableWidgets.Row{
-		classes = {self:_getBackgroundClass(match.result.winner)},
+		classes = {self:getBackgroundClass(match.result.winner)},
 		children = WidgetUtil.collect(
 			self:_displayDate(match),
 			self:displayTier(match),
@@ -971,9 +971,10 @@ function MatchTable:_displayMatchPage(match)
 	}
 end
 
----@param winner any
+---@protected
+---@param winner integer
 ---@return string?
-function MatchTable:_getBackgroundClass(winner)
+function MatchTable:getBackgroundClass(winner)
 	return winner == 1 and 'recent-matches-bg-win' or
 		winner == 0 and 'recent-matches-bg-tie' or
 		winner == 2 and 'recent-matches-bg-lose' or
