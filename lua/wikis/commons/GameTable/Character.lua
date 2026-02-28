@@ -25,6 +25,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchSummaryCharacters = Lua.import('Module:Widget/Match/Summary/Characters')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -39,6 +40,7 @@ local SCORE_CONCAT = '&nbsp;&colon;&nbsp;'
 ---@field showSideClass boolean
 ---@field showBans boolean
 ---@field showLength boolean
+---@field showPatch boolean
 ---@field numPicks number
 ---@field numBans number
 ---@field iconSize string
@@ -109,6 +111,7 @@ function CharacterGameTable:readConfig()
 		showSideClass = Logic.nilOr(Logic.readBoolOrNil(args.showSideClass), true),
 		showBans = Logic.nilOr(Logic.readBoolOrNil(args.showBans), true),
 		showLength = Logic.readBool(args.length),
+		showPatch = Logic.nilOr(Logic.readBoolOrNil(args.showPatch), true),
 		numPicks = self:getNumberOfPicks(),
 		numBans = self:getNumberOfBans(),
 		iconSize = Logic.nilIfEmpty(self.args.iconSize) or '27px',
@@ -333,6 +336,9 @@ function CharacterGameTable:buildColumnDefinitions()
 		config.showLength and {
 			align = 'left',
 		} or nil,
+		config.showPatch and {
+			align = 'left',
+		} or nil,
 		config.showVod and {
 			align = 'left',
 			unsortable = true,
@@ -376,6 +382,7 @@ function CharacterGameTable:headerRow()
 				config.showBans and makeHeaderCell('vs. Bans') or nil
 			) or nil,
 			config.showLength and makeHeaderCell('Length') or nil,
+			config.showPatch and makeHeaderCell('Patch') or nil,
 			config.showVod and TableWidgets.CellHeader{
 				align = 'center',
 				children = 'VOD'
@@ -475,6 +482,26 @@ function CharacterGameTable:_displayLength(game)
 	return TableWidgets.Cell{children = game.length}
 end
 
+---@private
+---@param game CharacterGameTableGame
+---@return Widget?
+function CharacterGameTable:_displayPatch(game)
+	if not self.config.showPatch then return end
+
+	if Logic.isEmpty(game.patch) then
+		return TableWidgets.Cell{}
+	end
+
+	return TableWidgets.Cell{children = self:getPatchLink(game)}
+end
+
+---@protected
+---@param game CharacterGameTableGame
+---@return Widget?
+function CharacterGameTable:getPatchLink(game)
+	return Link{link = 'Patch ' .. game.patch, children = game.patch}
+end
+
 ---@param match CharacterGameTableMatch
 ---@param game CharacterGameTableGame
 ---@return Widget
@@ -493,6 +520,7 @@ function CharacterGameTable:gameRow(match, game)
 			self:_displayTournament(match),
 			self:displayGame(match, game),
 			self:_displayLength(game),
+			self:_displayPatch(game),
 			self:_displayGameVod(game.vod),
 			self:_displayMatchPage(match)
 		)
