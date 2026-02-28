@@ -361,18 +361,18 @@ function CharacterGameTable:headerRow()
 			config.showIcon and makeHeaderCell() or nil,
 			makeHeaderCell('Tournament'),
 			config.showResult and WidgetUtil.collect(
-			not isCharTable and makeHeaderCell('vs.') or nil,
-			makeHeaderCell('Picks'),
-			config.showBans and makeHeaderCell('Bans') or nil,
-			isCharTable and {
-				makeHeaderCell(),
-				makeHeaderCell('Score'),
-				makeHeaderCell(),
-			} or nil,
-			makeHeaderCell('vs. Picks'),
-			config.showBans and makeHeaderCell('vs. Bans') or nil
-		) or nil,
-		config.showLength and makeHeaderCell('Length') or nil,
+				not isCharTable and makeHeaderCell('vs.') or nil,
+				makeHeaderCell('Picks'),
+				config.showBans and makeHeaderCell('Bans') or nil,
+				isCharTable and {
+					makeHeaderCell(),
+					makeHeaderCell('Score'),
+					makeHeaderCell(),
+				} or nil,
+				makeHeaderCell('vs. Picks'),
+				config.showBans and makeHeaderCell('vs. Bans') or nil
+			) or nil,
+			config.showLength and makeHeaderCell('Length') or nil,
 			config.showVod and TableWidgets.CellHeader{
 				align = 'center',
 				children = 'VOD'
