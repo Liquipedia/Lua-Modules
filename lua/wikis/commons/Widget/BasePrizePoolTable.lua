@@ -45,7 +45,13 @@ function BasePrizePoolTable:render()
 
 	return TableWidgets.Table{
 		caption = settings.title,
-		sortable = true,
+		tableClasses = settings.cutAfter and {'prizepooltable', 'collapsed'} or nil,
+		tableAttributes = settings.cutAfter and {
+			['data-cutafter'] = settings.cutAfter,
+			['data-opentext'] = 'Show more',
+			['data-closetext'] = 'Show less',
+		} or nil,
+		sortable = not settings.cutAfter,
 		columns = WidgetUtil.collect(
 			{
 				align = 'center',
@@ -68,13 +74,14 @@ end
 
 ---@private
 ---@return {place: string, prize: number, points: number, sort: integer}[]
----@return {showPoints: boolean, currency: string, title: string}
+---@return {showPoints: boolean, currency: string, title: string, cutAfter: integer?}
 function BasePrizePoolTable:_parse()
 	local props = self.props
 	local settings = {
 		showPoints = Logic.readBool(props.points),
 		currency = props.currency,
 		title = props.title,
+		cutAfter = tonumber(props.cutafter),
 	}
 
 	---@type {place: string, prize: number, points: number, sort: integer}[]
@@ -107,7 +114,7 @@ function BasePrizePoolTable:_parse()
 end
 
 ---@private
----@param settings {showPoints: boolean, currency: string, title: string}
+---@param settings {showPoints: boolean, currency: string, title: string, cutAfter: integer?}
 ---@param placementInfo {place: string, prize: number, points: number, sort: integer}
 ---@return Widget
 function BasePrizePoolTable._row(settings, placementInfo)
