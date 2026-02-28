@@ -332,7 +332,6 @@ function CharacterGameTable:buildColumnDefinitions()
 		) or nil,
 		config.showLength and {
 			align = 'left',
-			unsortable = true,
 		} or nil,
 		config.showVod and {
 			align = 'left',
