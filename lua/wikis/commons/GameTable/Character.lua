@@ -63,6 +63,7 @@ local SCORE_CONCAT = '&nbsp;&colon;&nbsp;'
 ---@field config CharacterGameTableConfig
 ---@field matches CharacterGameTableMatch[]
 local CharacterGameTable = Class.new(GameTable, function (self)
+	self.args.dateFormat = Logic.emptyOr(self.args.dateFormat, 'compact')
 	self.isCharacterTable = self.args.tableMode == CHARACTER_MODE
 	self.isPickedByRequired = self.isCharacterTable
 end)
@@ -534,7 +535,6 @@ end
 ---@return Widget
 function CharacterGameTable.results(frame)
 	local args = Arguments.getArgs(frame)
-	args.dateFormat = Logic.emptyOr(args.dateFormat, 'compact')
 
 	return CharacterGameTable(args):readConfig():query():build()
 end
