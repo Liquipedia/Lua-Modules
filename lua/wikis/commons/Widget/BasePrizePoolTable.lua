@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Currency = Lua.import('Module:Currency')
+local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
@@ -37,9 +38,10 @@ function BasePrizePoolTable:render()
 
 	local headerRow = TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
-			TableWidgets.CellHeader{children = {'Place'}},
-			TableWidgets.CellHeader{children = {'Prize'}},
-			settings.showPoints and TableWidgets.CellHeader{children = {'Points'}} or nil
+			TableWidgets.CellHeader{children = 'Place'},
+			settings.autoExchange and TableWidgets.CellHeader{children = Currency.display(BASE_CURRENCY)} or nil,
+			TableWidgets.CellHeader{children = Currency.display(settings.currency)},
+			settings.showPoints and TableWidgets.CellHeader{children = 'Points'} or nil
 		)}
 	}}
 
@@ -56,6 +58,10 @@ function BasePrizePoolTable:render()
 			{
 				align = 'center',
 			},
+			settings.autoExchange and {
+				align = 'right',
+				sortType = 'number',
+			} or nil,
 			{
 				align = 'right',
 				sortType = 'number',
@@ -73,18 +79,25 @@ function BasePrizePoolTable:render()
 end
 
 ---@private
----@return {place: string, prize: number, points: number, sort: integer}[]
----@return {showPoints: boolean, currency: string, title: string, cutAfter: integer?}
+---@return {place: string, prize: number, usdPrize: number, points: number, sort: integer}[]
+---@return {showPoints: boolean, currency: string, title: string, autoExchange: boolean, cutAfter: integer?}
 function BasePrizePoolTable:_parse()
 	local props = self.props
+	local currency = props.currency:upper()
 	local settings = {
 		showPoints = Logic.readBool(props.points),
-		currency = props.currency,
+		currency = currency,
 		title = props.title,
+		autoExchange = Logic.nilOr(Logic.readBoolOrNil(props.autoexchange), currency),
 		cutAfter = tonumber(props.cutafter),
 	}
+	local currencyRate = settings.autoExchange and Currency.getExchangeRate{
+		currency = currency,
+		date = DateExt.toYmdInUtc(props.edate or DateExt.getContextualDateOrNow()),
+		setVariables = false
+	} or 1
 
-	---@type {place: string, prize: number, points: number, sort: integer}[]
+	---@type {place: string, prize: number, usdPrize: number, points: number, sort: integer}[]
 	local placements = {}
 	Table.iter.forEachPair(self.props, function(key, value)
 		if not string.match(key, '^%d+%-?%d*$') then
@@ -103,6 +116,7 @@ function BasePrizePoolTable:_parse()
 		table.insert(placements, {
 			place = key,
 			prize = prize,
+			usdPrize = prize * currencyRate,
 			points = tonumber(pointsString) or 0,
 			sort = sortValue,
 		})
@@ -114,23 +128,30 @@ function BasePrizePoolTable:_parse()
 end
 
 ---@private
----@param settings {showPoints: boolean, currency: string, title: string, cutAfter: integer?}
----@param placementInfo {place: string, prize: number, points: number, sort: integer}
+---@param settings {showPoints: boolean, currency: string, title: string, autoExchange: boolean, cutAfter: integer?}
+---@param placementInfo {place: string, prize: number, usdPrize: number, points: number, sort: integer}
 ---@return Widget
 function BasePrizePoolTable._row(settings, placementInfo)
 	local rawPlacement = Placement.raw(placementInfo.place or '')
+
+	local currencyDisplayConfig = {
+		displaySymbol = true,
+		formatValue = true,
+		displayCurrencyCode = false,
+		dashIfZero = true,
+	}
 
 	return TableWidgets.Row{children = WidgetUtil.collect(
 		TableWidgets.Cell{
 			children = Placement.renderInWidget{placement = placementInfo.place},
 			['data-sort-value'] = rawPlacement.sort,
 		},
+		settings.autoExchange and TableWidgets.Cell{
+			children = Currency.display(BASE_CURRENCY, placementInfo.usdPrize, currencyDisplayConfig),
+			['data-sort-value'] = placementInfo.usdPrize,
+		} or nil,
 		TableWidgets.Cell{
-			children = Currency.display(settings.currency, placementInfo.prize, {
-				formatValue = true,
-				dashIfZero = true,
-				displaySymbol = true,
-			}),
+			children = Currency.display(settings.currency, placementInfo.prize, currencyDisplayConfig),
 			['data-sort-value'] = placementInfo.prize,
 		},
 		settings.showPoints and TableWidgets.Cell{
