@@ -14,7 +14,7 @@ local GameTable = Lua.import('Module:GameTable')
 local CustomGameTable = {}
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomGameTable.results(args)
 	return GameTable(args):readConfig():query():build()
 end
