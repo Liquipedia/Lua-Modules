@@ -19,6 +19,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local CharacterGameTable = Lua.import('Module:GameTable/Character')
 
 ---@class ValorantCharacterGameTable: CharacterGameTable
+---@operator call(table): ValorantCharacterGameTable
 local CustomCharacterGameTable = Class.new(CharacterGameTable, function (self)
 	self.args.showBans = false
 
@@ -115,7 +116,7 @@ function CustomCharacterGameTable:_getRatio(participant)
 	return MathUtil.round(kills / deaths, 1)
 end
 
----@param match GameTableMatch
+---@param match CharacterGameTableMatch
 ---@param game CharacterGameTableGame
 ---@return Html?
 function CustomCharacterGameTable:displayGame(match, game)
@@ -166,7 +167,7 @@ function CustomCharacterGameTable:displayGame(match, game)
 end
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomCharacterGameTable.results(frame)
 	local args = Arguments.getArgs(frame)
 
