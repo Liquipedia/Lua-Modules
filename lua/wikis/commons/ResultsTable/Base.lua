@@ -459,7 +459,7 @@ end
 ---@protected
 ---@param data placement
 ---@param options table?
----@return string|Widget?
+---@return string|Widget|Widget[]?
 function BaseResultsTable:opponentDisplay(data, options)
 	options = options or {}
 
@@ -498,7 +498,7 @@ function BaseResultsTable:opponentDisplay(data, options)
 	}
 
 	if self:shouldDisplayAdditionalText(rawTeamTemplate, not options.isLastVs) then
-		return BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, options.flip)
+		return BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate)
 	end
 
 	return teamDisplay
@@ -521,30 +521,23 @@ end
 ---Builds team icon display with text below it
 ---@param teamDisplay Widget
 ---@param rawTeamTemplate teamTemplateData
----@param flip boolean?
----@return Widget
-function BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, flip)
-	return HtmlWidgets.Fragment{children = {
+---@return Widget[]
+function BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate)
+	return {
 		teamDisplay,
 		HtmlWidgets.Div{
 			css = {
-				width = '60px',
-				float = flip and 'right' or 'left',
+				['line-height'] = 1,
+				['font-size'] = '80%',
+				['text-align'] = 'center',
 			},
-			children = HtmlWidgets.Div{
-				css = {
-					['line-height'] = 1,
-					['font-size'] = '80%',
-					['text-align'] = 'center',
-				},
-				children = {
-					'(',
-					LinkWidget{link = rawTeamTemplate.page, children = rawTeamTemplate.shortname},
-					')'
-				}
+			children = {
+				'(',
+				LinkWidget{link = rawTeamTemplate.page, children = rawTeamTemplate.shortname},
+				')'
 			}
 		}
-	}}
+	}
 end
 
 ---Builds the tournament display name
