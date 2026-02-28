@@ -489,6 +489,7 @@ function CharacterGameTable:gameRow(match, game)
 			self:_displayIcon(match),
 			self:_displayTournament(match),
 			self:displayGame(match, game),
+			self:_displayLength(game),
 			self:_displayGameVod(game.vod),
 			self:_displayMatchPage(match)
 		)
