@@ -398,7 +398,7 @@ end
 ---@param game CharacterGameTableGame
 ---@param opponentIndex number
 ---@param key string
----@return Widget?
+---@return Widget
 function CharacterGameTable:_displayCharacters(game, opponentIndex, key)
 	local config = self.config
 
@@ -457,7 +457,7 @@ end
 ---@param game CharacterGameTableGame
 ---@param pickedBy number
 ---@param pickedVs number
----@return Html
+---@return Widget
 function CharacterGameTable:_displayScore(game, pickedBy, pickedVs)
 	local winner = tonumber(game.winner)
 	local scores = Array.map(game.opponents, Operator.property('score'))
@@ -478,7 +478,7 @@ function CharacterGameTable:_displayScore(game, pickedBy, pickedVs)
 end
 
 ---@param game CharacterGameTableGame
----@return Html?
+---@return Widget?
 function CharacterGameTable:_displayLength(game)
 	if not self.config.showLength then return end
 
