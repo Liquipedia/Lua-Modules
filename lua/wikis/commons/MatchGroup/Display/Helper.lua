@@ -35,12 +35,10 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 function DisplayHelper.opponentIsHighlightable(opponent)
 	if Opponent.isTbd(opponent) then
 		return false
-	else
-		return 0 < #opponent.players
-			and Array.all(opponent.players, function(player)
-				return Logic.isNotEmpty(player.pageName) and not Opponent.playerIsTbd(player)
-			end)
 	end
+	return 0 < #opponent.players and Array.all(opponent.players, function(player)
+		return Logic.isNotEmpty(player.pageName) and not Opponent.playerIsTbd(player)
+	end)
 end
 
 ---@param node Html
