@@ -89,22 +89,16 @@ $crosstable-red: var( --table-red-background-color, #fbdfdf );
 }
 
 @mixin crosstable($min, $max) {
-	@include crosstable-outer($min, $max, $min);
-}
-
-@mixin crosstable-outer($min, $max, $current) {
-	@if $current <= $max {
-		@include crosstable-inner($min, $max, $min, $current);
-		@include crosstable-outer($min, $max, $current + 1);
+	@for $current from $min through $max {
+		@include crosstable-inner($min, $max, $current);
 	}
 }
 
-@mixin crosstable-inner($min, $max, $current, $outer) {
-	@if $current <= $max {
+@mixin crosstable-inner($min, $max, $outer) {
+	@for $current from $min through $max {
 		@include crosstable-gray($current, $outer);
 		@include crosstable-green($current, $outer);
 		@include crosstable-red($current, $outer);
-		@include crosstable-inner($min, $max, $current + 1, $outer);
 	}
 }
 
