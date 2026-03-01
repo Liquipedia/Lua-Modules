@@ -379,7 +379,7 @@ end
 
 ---@private
 ---@param tournamentData table
----@return Html
+---@return string[]
 function BaseTournamentsListing._organizerDisplay(tournamentData)
 	local organizers = Logic.emptyOr(tournamentData.organizers) or {}
 	if type(organizers) == 'string' then
@@ -391,9 +391,7 @@ function BaseTournamentsListing._organizerDisplay(tournamentData)
 		table.insert(organizerArray, organizer)
 	end
 
-	return HtmlWidgets.Fragment{
-		children = table.concat(organizerArray, ', ')
-	}
+	return Array.interleave(organizerArray, ', ')
 end
 
 ---@param locationData table
