@@ -16,6 +16,15 @@ local Table = Lua.import('Module:Table')
 
 local Span = HtmlWidgets.Span
 
+---@class rawPlacement
+---@field backgroundClass string?
+---@field blackText boolean
+---@field display string
+---@field ordinal string[]
+---@field placement string[]
+---@field sort string
+---@field unknown boolean?
+
 local Placement = {}
 
 local ZERO_WIDTH_SPACE = '&#8203;'
@@ -105,7 +114,7 @@ local USE_BLACK_TEXT = {
 ---Processes a placement text input into raw data.
 ---Returned table will not always contain every key.
 ---@param placement string|integer?
----@return table
+---@return rawPlacement
 function Placement.raw(placement)
 	local raw = {}
 
@@ -214,7 +223,7 @@ function Placement.get(args)
 end
 
 ---Returns a Widget span for placement display in the Widget system.
----@param raw table
+---@param raw rawPlacement
 ---@param text string?
 ---@return Widget
 function Placement.renderRawInWidget(raw, text)
