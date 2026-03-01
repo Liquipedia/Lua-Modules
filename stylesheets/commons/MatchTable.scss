@@ -13,52 +13,26 @@ Template(s): MatchTable
 	background-color: var( --table-red-background-color, #f9f0f2 ) !important;
 }
 
+@mixin match-table-colors($row-type, $color-type) {
+	&.match-table-row__#{$row-type} {
+		background-color: var( --clr-#{$color-type}-90 );
+
+		&:hover {
+			background-color: var( --clr-#{$color-type}-80 );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-#{$color-type}-10 );
+
+			&:hover {
+				background-color: var( --clr-#{$color-type}-20 );
+			}
+		}
+	}
+}
+
 .match-table-wrapper table.table2__table tr.table2__row--body {
-	&.match-table-row__win {
-		background-color: var( --clr-semantic-positive-90 );
-
-		&:hover {
-			background-color: var( --clr-semantic-positive-80 );
-		}
-
-		.theme--dark & {
-			background-color: var( --clr-semantic-positive-10 );
-
-			&:hover {
-				background-color: var( --clr-semantic-positive-20 );
-			}
-		}
-	}
-
-	&.match-table-row__draw {
-		background-color: var( --clr-semantic-gold-90 );
-
-		&:hover {
-			background-color: var( --clr-semantic-gold-80 );
-		}
-
-		.theme--dark & {
-			background-color: var( --clr-semantic-gold-10 );
-
-			&:hover {
-				background-color: var( --clr-semantic-gold-20 );
-			}
-		}
-	}
-
-	&.match-table-row__loss {
-		background-color: var( --clr-semantic-negative-90 );
-
-		&:hover {
-			background-color: var( --clr-semantic-negative-80 );
-		}
-
-		.theme--dark & {
-			background-color: var( --clr-semantic-negative-10 );
-
-			&:hover {
-				background-color: var( --clr-semantic-negative-20 );
-			}
-		}
-	}
+	@include match-table-colors( win, semantic-positive );
+	@include match-table-colors( draw, semantic-gold );
+	@include match-table-colors( loss, semantic-negative );
 }
