@@ -74,8 +74,11 @@ function CustomPrizePool.calculateWeight(prizeMoney, tier, place, tierType, isHi
 	end
 
 	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier) or ''] or 1
+	local prizeFactor = (1000000 + prizeMoney) / 1000000
+	local tierTypeFactor = TIER_TYPE_MODIFIER[tierType] or 1
+	local highlightedFactor = isHighlighted and 2 or 1
 
-	return (1000000 + prizeMoney) / 1000000 * tierValue * (TIER_TYPE_MODIFIER[tierType] or 1) * (isHighlighted and 2 or 1) / place
+	return prizeFactor * tierValue * tierTypeFactor * highlightedFactor / place
 end
 
 return CustomPrizePool
