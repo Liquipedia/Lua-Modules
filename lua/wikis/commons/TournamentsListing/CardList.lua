@@ -249,8 +249,6 @@ end
 
 ---@private
 ---@param tournamentData table
----@private
----@param tournamentData table
 ---@return Widget
 function BaseTournamentsListing:_row(tournamentData)
 	local config = self.config
@@ -525,7 +523,6 @@ function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 end
 
 ---@param number number|string|nil
----@return Html|string
 ---@return string
 function BaseTournamentsListing.participantsNumber(number)
 	number = tonumber(number)
