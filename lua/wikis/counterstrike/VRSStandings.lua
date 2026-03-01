@@ -79,18 +79,18 @@ function VRSStandings:render()
 		columns = WidgetUtil.collect(
 			{
 				align = 'right',
-                sortType = 'number'
+				sortType = 'number'
 			},
 			{
 				align = 'right',
 				sortType = 'number',
 			},
-            {
-                align = 'left'
-            },
-            {
-                align = 'left'
-            }
+			{
+				align = 'left'
+			},
+			{
+				align = 'left'
+			}
 		),
 		children = {
 			headerRow,
