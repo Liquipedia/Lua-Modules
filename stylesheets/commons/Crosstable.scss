@@ -110,7 +110,7 @@ $crosstable-red: var( --table-red-background-color, #fbdfdf );
 			background-color: $crosstable-green;
 		}
 
-		@else if $s1 < $s2 {
+		@else {
 			background-color: $crosstable-red;
 		}
 	}
