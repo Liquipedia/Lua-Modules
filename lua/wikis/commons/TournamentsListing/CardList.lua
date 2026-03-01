@@ -220,7 +220,7 @@ function BaseTournamentsListing:buildColumnDefinitions()
 	)
 end
 ---@private
----@return Html
+---@return Widget
 function BaseTournamentsListing:_header()
 	local config = self.config
 
@@ -249,6 +249,9 @@ end
 
 ---@private
 ---@param tournamentData table
+---@private
+---@param tournamentData table
+---@return Widget
 function BaseTournamentsListing:_row(tournamentData)
 	local config = self.config
 
@@ -346,7 +349,7 @@ end
 
 ---@private
 ---@param opponents table[]
----@return Html[]
+---@return Widget
 function BaseTournamentsListing:_buildParticipants(opponents)
 	return HtmlWidgets.Div{
 		css = {
@@ -397,7 +400,7 @@ end
 
 ---@param locationData table
 ---@param tournamentType string?
----@return string|string[]?
+---@return string|Widget?
 function BaseTournamentsListing._displayLocations(locationData, tournamentType)
 	local locations = Array.mapIndexes(function(locationIndex)
 		return BaseTournamentsListing._displayLocation(locationData, locationIndex)
@@ -418,7 +421,7 @@ end
 ---@private
 ---@param locationData table
 ---@param locationIndex integer
----@return Html|string?
+---@return Widget?
 function BaseTournamentsListing._displayLocation(locationData, locationIndex)
 	local icon = ''
 	local region = locationData['region' .. locationIndex]
@@ -523,6 +526,7 @@ end
 
 ---@param number number|string|nil
 ---@return Html|string
+---@return string
 function BaseTournamentsListing.participantsNumber(number)
 	number = tonumber(number)
 	if not number or number <= 0 then
