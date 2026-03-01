@@ -4,18 +4,19 @@ Use case: Hexagon shaped portraits originally created for /heroes/Portal:Heroes
 Author(s): PhiLtheFisH, FO-nTTaX, salle
 *******************************************************************************/
 .hexagon-container {
-	.wiki-heroes & {
-		height: 1200px;
+	.wiki-heroes &,
+	.wiki-illuvium & {
 		position: relative;
 		margin-bottom: 24px;
 		z-index: 1;
 	}
 
+	.wiki-heroes & {
+		height: 1200px;
+	}
+
 	.wiki-illuvium & {
 		height: 2500px;
-		position: relative;
-		margin-bottom: 24px;
-		z-index: 1;
 	}
 }
 
