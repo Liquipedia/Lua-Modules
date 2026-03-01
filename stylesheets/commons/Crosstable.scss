@@ -177,24 +177,24 @@ $crosstable-red: var( --table-red-background-color, #fbdfdf );
 	text-align: center;
 }
 
-.crosstable .crosstable-tr {
-	height: 30px;
-}
-
 .crosstable {
 	text-align: center;
 	margin: 0;
 	line-height: 14px;
-}
 
-.crosstable th,
-.crosstable td {
-	padding: 1px;
-}
+	.crosstable-tr {
+		height: 30px;
+	}
 
-/* fix for i icon in crosstables */
-.crosstable .bracket-game .icon {
-	margin-top: 2px !important;
-	margin-right: -6px !important;
-	opacity: 0.6;
+	th,
+	td {
+		padding: 1px;
+	}
+
+	/* fix for i icon in crosstables */
+	.bracket-game .icon {
+		margin-top: 2px !important;
+		margin-right: -6px !important;
+		opacity: 0.6;
+	}
 }
