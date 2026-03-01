@@ -13,6 +13,7 @@ local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
 local Placement = Lua.import('Module:Placement')
 local Table = Lua.import('Module:Table')
@@ -100,8 +101,9 @@ function BasePrizePoolTable:_parse()
 		pointsHeader = props.pointsheader,
 		points2Header = props.points2header,
 		autoExchange = Logic.nilOr(Logic.readBoolOrNil(props.autoexchange), currency),
-		cutAfter = tonumber(props.cutafter),
+		cutAfter = MathUtil.toInteger(props.cutafter),
 	}
+	assert(not settings.cutAfter or settings.cutAfter > 0, 'Invalid |cutafter=')
 	local currencyRate = settings.autoExchange and Currency.getExchangeRate{
 		currency = currency,
 		date = DateExt.toYmdInUtc(props.edate or DateExt.getContextualDateOrNow()),
