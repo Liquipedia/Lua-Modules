@@ -47,10 +47,10 @@ function VRSStandings:render()
 
 	local headerRow = TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
-			TableWidgets.CellHeader{children = {'Rank'}},
-			TableWidgets.CellHeader{children = {'Points'}},
-			TableWidgets.CellHeader{children = {HtmlWidgets.Span{children = 'Team', css = {['text-align'] = 'center', display = 'block'}}}},
-			TableWidgets.CellHeader{children = {HtmlWidgets.Span{children = 'Roster', css = {['text-align'] = 'center', display = 'block'}}}}
+			TableWidgets.CellHeader{children = 'Rank'},
+			TableWidgets.CellHeader{children = 'Points'},
+			TableWidgets.CellHeader{children = 'Team'},
+			TableWidgets.CellHeader{children = 'Roster'}
 		)}
 	}}
 
