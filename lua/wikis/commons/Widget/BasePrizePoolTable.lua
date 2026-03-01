@@ -100,7 +100,7 @@ function BasePrizePoolTable:_parse()
 		title = props.title,
 		pointsHeader = props.pointsheader,
 		points2Header = props.points2header,
-		autoExchange = Logic.nilOr(Logic.readBoolOrNil(props.autoexchange), currency),
+		autoExchange = Logic.nilOr(Logic.readBoolOrNil(props.autoexchange), currency ~= BASE_CURRENCY),
 		cutAfter = MathUtil.toInteger(props.cutafter),
 	}
 	assert(not settings.cutAfter or settings.cutAfter > 0, 'Invalid |cutafter=')
