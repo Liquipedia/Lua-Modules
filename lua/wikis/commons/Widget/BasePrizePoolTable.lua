@@ -87,7 +87,7 @@ function BasePrizePoolTable:render()
 end
 
 ---@private
----@return {place: string, prize: number, usdPrize: number, points: number, points2: number, sort: integer}[]
+---@return {place: table, prize: number, usdPrize: number, points: number, points2: number, sort: integer}[]
 ---@return {showPoints: boolean, showPoints2: boolean, pointsHeader: string, points2Header: string,
 ---currency: string, title: string, autoExchange: boolean, cutAfter: integer?}
 function BasePrizePoolTable:_parse()
@@ -116,8 +116,8 @@ function BasePrizePoolTable:_parse()
 		if not string.match(key, '^%d+%-?%d*$') then
 			return
 		end
-		local sortValue = tonumber(Array.parseCommaSeparatedString(tostring(key), '-')[1])
-		if not sortValue then
+		local place = Placement.raw(key)
+		if place.unknown == true then
 			return
 		end
 		local prizeString = mw.getContentLanguage():parseFormattedNumber(value)
@@ -129,16 +129,15 @@ function BasePrizePoolTable:_parse()
 		local points2String = mw.getContentLanguage():parseFormattedNumber(props[key .. '_points2'] or '')
 
 		table.insert(placements, {
-			place = key,
+			place = place,
 			prize = prize,
 			usdPrize = prize * currencyRate,
 			points = tonumber(pointsString) or 0,
 			points2 = tonumber(points2String) or 0,
-			sort = sortValue,
 		})
 	end)
 
-	Array.sortInPlaceBy(placements, Operator.property('sort'))
+	Array.sortInPlaceBy(placements, Operator.property('place.sort'))
 
 	return placements, settings
 end
@@ -146,11 +145,9 @@ end
 ---@private
 ---@param settings {showPoints: boolean, showPoints2: boolean, pointsHeader: string, points2Header: string,
 ---currency: string, title: string, autoExchange: boolean, cutAfter: integer?}
----@param placementInfo {place: string, prize: number, usdPrize: number, points: number, points2: number, sort: integer}
+---@param placementInfo {place: table, prize: number, usdPrize: number, points: number, points2: number, sort: integer}
 ---@return Widget
 function BasePrizePoolTable._row(settings, placementInfo)
-	local rawPlacement = Placement.raw(placementInfo.place or '')
-
 	local currencyDisplayConfig = {
 		displaySymbol = true,
 		formatValue = true,
@@ -160,8 +157,8 @@ function BasePrizePoolTable._row(settings, placementInfo)
 
 	return TableWidgets.Row{children = WidgetUtil.collect(
 		TableWidgets.Cell{
-			children = Placement.renderInWidget{placement = placementInfo.place},
-			['data-sort-value'] = rawPlacement.sort,
+			children = Placement.renderRawInWidget{placement = placementInfo.place},
+			['data-sort-value'] = placementInfo.place.sort,
 		},
 		settings.autoExchange and TableWidgets.Cell{
 			children = Currency.display(BASE_CURRENCY, placementInfo.usdPrize, currencyDisplayConfig),
