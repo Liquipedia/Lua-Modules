@@ -146,7 +146,8 @@ end
 ---@private
 ---@param settings {showPoints: boolean, showPoints2: boolean, pointsHeader: string, points2Header: string,
 ---currency: string, title: string, autoExchange: boolean, cutAfter: integer?}
----@param placementInfo {place: rawPlacement, prize: number, usdPrize: number, points: number, points2: number, sort: integer}
+---@param placementInfo {place: rawPlacement, prize: number, usdPrize: number,
+---points: number, points2: number, sort: integer}
 ---@return Widget
 function BasePrizePoolTable._row(settings, placementInfo)
 	local currencyDisplayConfig = {
