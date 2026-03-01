@@ -87,7 +87,7 @@ function BasePrizePoolTable:render()
 end
 
 ---@private
----@return {place: table, prize: number, usdPrize: number, points: number, points2: number, sort: integer}[]
+---@return {place: rawPlacement, prize: number, usdPrize: number, points: number, points2: number, sort: integer}[]
 ---@return {showPoints: boolean, showPoints2: boolean, pointsHeader: string, points2Header: string,
 ---currency: string, title: string, autoExchange: boolean, cutAfter: integer?}
 function BasePrizePoolTable:_parse()
@@ -110,7 +110,7 @@ function BasePrizePoolTable:_parse()
 		setVariables = false
 	} or 1
 
-	---@type {place: string, prize: number, usdPrize: number, points: number, sort: integer}[]
+	---@type {place: rawPlacement, prize: number, usdPrize: number, points: number, points2: number, sort: integer}[]
 	local placements = {}
 	Table.iter.forEachPair(self.props, function(key, value)
 		if not string.match(key, '^%d+%-?%d*$') then
@@ -146,7 +146,7 @@ end
 ---@private
 ---@param settings {showPoints: boolean, showPoints2: boolean, pointsHeader: string, points2Header: string,
 ---currency: string, title: string, autoExchange: boolean, cutAfter: integer?}
----@param placementInfo {place: table, prize: number, usdPrize: number, points: number, points2: number, sort: integer}
+---@param placementInfo {place: rawPlacement, prize: number, usdPrize: number, points: number, points2: number, sort: integer}
 ---@return Widget
 function BasePrizePoolTable._row(settings, placementInfo)
 	local currencyDisplayConfig = {
