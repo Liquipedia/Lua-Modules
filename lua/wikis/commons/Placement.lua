@@ -214,11 +214,11 @@ function Placement.get(args)
 end
 
 ---Returns a Widget span for placement display in the Widget system.
----@param args {placement: string|integer?, text: string?}
+---@param raw table
+---@param text string?
 ---@return Widget
-function Placement.renderInWidget(args)
-	local raw = Placement.raw(args.placement or '')
-	local content = raw.display .. (Logic.isNotEmpty(args.text) and (' ' .. args.text) or '')
+function Placement.renderRawInWidget(raw, text)
+	local content = raw.display .. (Logic.isNotEmpty(text) and (' ' .. text) or '')
 
 	return Span{
 		classes = {'placement-box', raw.backgroundClass},
@@ -231,4 +231,13 @@ function Placement.renderInWidget(args)
 	}
 end
 
-return Class.export(Placement, {exports = {'getBgClass', 'get', 'RangeLabel', 'renderInWidget'}})
+---Returns a Widget span for placement display in the Widget system.
+---@param args {placement: string|integer?, text: string?}
+---@return Widget
+function Placement.renderInWidget(args)
+	local raw = Placement.raw(args.placement or '')
+
+	return Placement.renderRaaInWidget(raw, args.text)
+end
+
+return Class.export(Placement, {exports = {'getBgClass', 'get', 'RangeLabel', 'renderRawInWidget', 'renderInWidget'}})
