@@ -43,8 +43,6 @@ local SCORE_CONCAT = '&nbsp;&colon;&nbsp;'
 ---@field showPatch boolean
 ---@field numPicks number
 ---@field numBans number
----@field iconSize string
----@field iconSeparator string
 
 ---@class CharacterGameTableGame: MatchGroupUtilGame
 ---@field picks string[][]
@@ -110,8 +108,6 @@ function CharacterGameTable:readConfig()
 		showPatch = Logic.nilOr(Logic.readBoolOrNil(args.showPatch), true),
 		numPicks = self:getNumberOfPicks(),
 		numBans = self:getNumberOfBans(),
-		iconSize = Logic.nilIfEmpty(self.args.iconSize) or '27px',
-		iconSeparator = Logic.nilIfEmpty(args.iconSeparator) or ''
 	})
 
 	return self
