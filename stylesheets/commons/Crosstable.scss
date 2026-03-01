@@ -55,36 +55,32 @@ $crosstable-red: var( --table-red-background-color, #fbdfdf );
 }
 
 @mixin crosstable-col($id, $max) {
-	@if $id <= $max {
-		$idp1: $id + 1;
-		.crosstable.crosstable-col-#{$idp1} td:nth-child(#{$id}) {
+	@for $i from $id through $max {
+		$idp1: $i + 1;
+		.crosstable.crosstable-col-#{$idp1} td:nth-child(#{$i}) {
 			@include crosstable-row-left();
 		}
-		.crosstable.crosstable-col-#{$id} td:nth-child(#{$idp1}) {
+		.crosstable.crosstable-col-#{$i} td:nth-child(#{$idp1}) {
 			@include crosstable-row-right();
 		}
-		.crosstable.crosstable-col-#{$id} td:nth-child(#{$id}) {
+		.crosstable.crosstable-col-#{$i} td:nth-child(#{$i}) {
 			@include crosstable-row-standard();
 		}
-
-		@include crosstable-col($id + 1, $max);
 	}
 }
 
 @mixin crosstable-row($id, $max) {
-	@if $id <= $max {
-		$idp1: $id + 1;
-		.crosstable.crosstable-row-#{$idp1} tr:nth-child(#{$id}) td {
+	@for $i from $id through $max {
+		$idp1: $i + 1;
+		.crosstable.crosstable-row-#{$idp1} tr:nth-child(#{$i}) td {
 			@include crosstable-row-over();
 		}
-		.crosstable.crosstable-row-#{$id} tr:nth-child(#{$idp1}) td {
+		.crosstable.crosstable-row-#{$i} tr:nth-child(#{$idp1}) td {
 			@include crosstable-row-under();
 		}
-		.crosstable.crosstable-row-#{$id} tr:nth-child(#{$id}) td {
+		.crosstable.crosstable-row-#{$i} tr:nth-child(#{$i}) td {
 			@include crosstable-row-standard();
 		}
-
-		@include crosstable-row($id + 1, $max);
 	}
 }
 
