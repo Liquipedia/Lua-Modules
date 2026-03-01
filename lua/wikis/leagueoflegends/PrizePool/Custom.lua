@@ -43,6 +43,7 @@ end
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.publishertier = Variables.varDefault('tournament_publishertier', '')
 	lpdbData.weight = CustomPrizePool.calculateWeight(
+		lpdbData.prizemoney,
 		Variables.varDefault('tournament_liquipediatier'),
 		placement.placeStart,
 		Variables.varDefault('tournament_liquipediatiertype'),
@@ -61,19 +62,20 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	return lpdbData
 end
 
+---@param prizeMoney number
 ---@param tier string?
 ---@param place integer
 ---@param tierType string?
 ---@param isHighlighted boolean
 ---@return number
-function CustomPrizePool.calculateWeight(tier, place, tierType, isHighlighted)
+function CustomPrizePool.calculateWeight(prizeMoney, tier, place, tierType, isHighlighted)
 	if Logic.isEmpty(tier) then
 		return 0
 	end
 
 	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier) or ''] or 1
 
-	return tierValue * (TIER_TYPE_MODIFIER[tierType] or 1) * (isHighlighted and 2 or 1) / place
+	return (1000000 + prizeMoney) / 1000000 * tierValue * (TIER_TYPE_MODIFIER[tierType] or 1) * (isHighlighted and 2 or 1) / place
 end
 
 return CustomPrizePool
