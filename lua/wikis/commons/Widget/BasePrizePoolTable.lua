@@ -134,10 +134,11 @@ function BasePrizePoolTable:_parse()
 			usdPrize = prize * currencyRate,
 			points = tonumber(pointsString) or 0,
 			points2 = tonumber(points2String) or 0,
+			sort = tonumber(place.placement[1]),
 		})
 	end)
 
-	Array.sortInPlaceBy(placements, Operator.property('place.sort'))
+	Array.sortInPlaceBy(placements, Operator.property('sort'))
 
 	return placements, settings
 end
