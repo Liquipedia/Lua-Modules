@@ -157,7 +157,7 @@ function BasePrizePoolTable._row(settings, placementInfo)
 
 	return TableWidgets.Row{children = WidgetUtil.collect(
 		TableWidgets.Cell{
-			children = Placement.renderRawInWidget{placement = placementInfo.place},
+			children = Placement.renderRawInWidget(placementInfo.place),
 			['data-sort-value'] = placementInfo.place.sort,
 		},
 		settings.autoExchange and TableWidgets.Cell{
