@@ -78,7 +78,7 @@ function VRSStandings:render()
 		sortable = false,
 		columns = WidgetUtil.collect(
 			{
-				align = 'center',
+				align = 'right',
                 sortType = 'number'
 			},
 			{
