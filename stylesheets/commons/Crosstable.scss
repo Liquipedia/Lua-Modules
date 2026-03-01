@@ -96,31 +96,21 @@ $crosstable-red: var( --table-red-background-color, #fbdfdf );
 
 @mixin crosstable-inner($min, $max, $outer) {
 	@for $current from $min through $max {
-		@include crosstable-gray($current, $outer);
-		@include crosstable-green($current, $outer);
-		@include crosstable-red($current, $outer);
+		@include crosstable-color($current, $outer);
 	}
 }
 
-@mixin crosstable-gray($s1, $s2) {
-	@if $s1 == $s2 {
-		td.crosstable-bgc-r#{$s1}-r#{$s2} {
+@mixin crosstable-color($s1, $s2) {
+	td.crosstable-bgc-r#{$s1}-r#{$s2} {
+		@if $s1 == $s2 {
 			background-color: $crosstable-yellow;
 		}
-	}
-}
 
-@mixin crosstable-green($s1, $s2) {
-	@if $s1 > $s2 {
-		td.crosstable-bgc-r#{$s1}-r#{$s2} {
+		@else if $s1 > $s2 {
 			background-color: $crosstable-green;
 		}
-	}
-}
 
-@mixin crosstable-red($s1, $s2) {
-	@if $s1 < $s2 {
-		td.crosstable-bgc-r#{$s1}-r#{$s2} {
+		@else if $s1 < $s2 {
 			background-color: $crosstable-red;
 		}
 	}
