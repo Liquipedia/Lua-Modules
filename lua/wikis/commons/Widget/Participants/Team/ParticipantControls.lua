@@ -45,15 +45,14 @@ end
 
 ---@return Widget?
 function ParticipantsTeamParticipantControls:render()
-	local pageName = mw.title.getCurrentTitle().fullText
-	local link = tostring(mw.uri.fullUrl('Special:RunQuery/Tournament_player_information', {
-		pfRunQueryFormName = 'Tournament player information',
-		['TPI[page]'] = pageName,
-		wpRunQuery = 'Run query'
-	}))
-
 	local playerInfoButton
 	if Logic.readBool(self.props.playerinfo) then
+		local pageName = mw.title.getCurrentTitle().fullText
+		local link = tostring(mw.uri.fullUrl('Special:RunQuery/Tournament_player_information', {
+			pfRunQueryFormName = 'Tournament player information',
+			['TPI[page]'] = pageName,
+			wpRunQuery = 'Run query'
+		}))
 		playerInfoButton = Button{
 			title = 'Click for additional player information',
 			variant = 'secondary',
