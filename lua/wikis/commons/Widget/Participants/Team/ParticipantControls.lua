@@ -36,7 +36,7 @@ ParticipantsTeamParticipantControls.defaultProps = {
 
 ---@return Widget?
 function ParticipantsTeamParticipantControls:render()
-	teamParticipantsVars:set('controlsRendered', 'true')
+	teamParticipantsVars:set('externalControlsRendered', 'true')
 
 	local pageName = mw.title.getCurrentTitle().fullText
 	local link = tostring(mw.uri.fullUrl('Special:RunQuery/Tournament_player_information', {
