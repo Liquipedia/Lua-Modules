@@ -53,8 +53,8 @@ def update_cache():
             data={
                 "messagename": "Resourceloaderarticles-cacheversion",
                 "value": subprocess.check_output(
-                    ["git", "log", "-1", "--pretty='%h'"]
-                ).decode(),
+                    ["git", "log", "-1", "--pretty=%h"]
+                ).decode().strip(),
             },
         ).json()
         if (
