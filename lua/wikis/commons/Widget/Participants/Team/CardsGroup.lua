@@ -20,7 +20,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ParticipantsTeamCardsGroupProps
 ---@field participants TeamParticipant[]|nil
----@field playerinfo boolean|string|nil
+---@field showPlayerInfo boolean
 ---@field showControls boolean|nil
 ---@field mergeStaffTabIfOnlyOneStaff boolean|nil
 
@@ -39,7 +39,7 @@ function ParticipantsTeamCardsGroup:render()
 	local showControls = self.props.showControls ~= false
 
 	local children = WidgetUtil.collect(
-		showControls and ParticipantControls{playerinfo = self.props.playerinfo} or nil,
+		showControls and ParticipantControls{showPlayerInfo = self.props.showPlayerInfo} or nil,
 		AnalyticsWidget{
 			analyticsName = 'Team participants card',
 			children = Div{

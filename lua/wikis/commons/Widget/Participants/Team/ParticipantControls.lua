@@ -24,7 +24,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
 
 ---@class ParticipantsTeamParticipantControlsProps
----@field playerinfo boolean|string|nil
+---@field showPlayerInfo boolean
 
 ---@class ParticipantsTeamParticipantControls: Widget
 ---@operator call(ParticipantsTeamParticipantControlsProps): ParticipantsTeamParticipantControls
@@ -32,7 +32,7 @@ local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
 local ParticipantsTeamParticipantControls = Class.new(Widget)
 
 ParticipantsTeamParticipantControls.defaultProps = {
-	playerinfo = false,
+	showPlayerInfo = false,
 }
 
 ---@param frame Frame
@@ -46,7 +46,7 @@ end
 ---@return Widget?
 function ParticipantsTeamParticipantControls:render()
 	local playerInfoButton
-	if Logic.readBool(self.props.playerinfo) then
+	if Logic.readBool(self.props.showPlayerInfo) then
 		local pageName = mw.title.getCurrentTitle().fullText
 		local link = tostring(mw.uri.fullUrl('Special:RunQuery/Tournament_player_information', {
 			pfRunQueryFormName = 'Tournament player information',
