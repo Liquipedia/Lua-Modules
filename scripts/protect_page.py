@@ -54,6 +54,7 @@ def protect_page(page: str, wiki: str, protect_mode: Literal["edit", "create"]):
             print(
                 f"::warning::could not ({protect_mode}) protect {page} on {wiki}: {response['error']['info']}"
             )
+            protect_errors.append(f"{protect_mode}:{wiki}:{page}")
             return
         protections = response["protect"].get("protections")
         for protection in protections:
