@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Arguments = Lua.import('Module:Arguments')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
@@ -34,9 +35,10 @@ ParticipantsTeamParticipantControls.defaultProps = {
 	playerinfo = false,
 }
 
----@param args ParticipantsTeamParticipantControlsProps
+---@param frame Frame
 ---@return ParticipantsTeamParticipantControls
-function ParticipantsTeamParticipantControls.fromTemplate(args)
+function ParticipantsTeamParticipantControls.fromTemplate(frame)
+	local args = Arguments.getArgs(frame)
 	teamParticipantsVars:set('externalControlsRendered', 'true')
 	return ParticipantsTeamParticipantControls(args)
 end
