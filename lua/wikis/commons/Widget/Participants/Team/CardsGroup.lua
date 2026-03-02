@@ -21,7 +21,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@class ParticipantsTeamCardsGroupProps
 ---@field participants TeamParticipant[]|nil
 ---@field showPlayerInfo boolean
----@field showControls boolean|nil
+---@field showControls boolean
 ---@field mergeStaffTabIfOnlyOneStaff boolean|nil
 
 ---@class ParticipantsTeamCardsGroup: Widget
@@ -36,7 +36,7 @@ function ParticipantsTeamCardsGroup:render()
 		return
 	end
 
-	local showControls = self.props.showControls ~= false
+	local showControls = self.props.showControls
 
 	local children = WidgetUtil.collect(
 		showControls and ParticipantControls{showPlayerInfo = self.props.showPlayerInfo} or nil,
