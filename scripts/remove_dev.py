@@ -78,6 +78,14 @@ def main():
         if wiki == "commons" and os.getenv("INCLUDE_COMMONS") != "true":
             continue
         search_and_remove(wiki)
+    if len(remove_errors) == 0:
+        return
+    print("::warning::Could not delete some pages on some wikis")
+    write_to_github_summary_file("::warning::Could not delete some pages on some wikis")
+    print("::group::Failed protections")
+    for remove_error in remove_errors:
+        print(remove_error)
+    print("endgroup")
 
 
 if __name__ == "__main__":
