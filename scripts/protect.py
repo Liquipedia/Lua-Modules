@@ -22,7 +22,7 @@ def check_for_local_version(module: str, wiki: str):
 
 def protect_if_has_no_local_version(module: str, wiki: str):
     page = "Module:" + module
-    if check_for_local_version(module, wiki):
+    if not check_for_local_version(module, wiki):
         protect_non_existing_page(page, wiki)
 
 
