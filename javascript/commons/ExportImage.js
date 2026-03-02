@@ -564,10 +564,8 @@ class ExportService {
 		try {
 			const blobPromise = this.generateImageBlob( element, title );
 
-			// eslint-disable-next-line compat/compat
 			const clipboardItem = new ClipboardItem( { 'image/png': blobPromise } );
 
-			// eslint-disable-next-line compat/compat
 			await navigator.clipboard.write( [ clipboardItem ] );
 			mw.notify( 'Image copied to clipboard!' );
 		} catch ( error ) {
