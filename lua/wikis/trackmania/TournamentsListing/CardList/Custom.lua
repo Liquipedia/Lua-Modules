@@ -32,14 +32,14 @@ function CustomTournamentsListing:buildConditions()
 	local conditions = ListingConditions.base(self.args)
 
 	if Logic.isNotEmpty(self.args.circuit) then
-		conditions:add(ConditionTree(BooleanOperator.any):add{
+		conditions:add(
 			ConditionTree(BooleanOperator.all):add{
 				ConditionNode(ColumnName('circuit', 'extradata'), Comparator.eq, self.args.circuit),
 				ConditionUtil.anyOf(
 					ColumnName('circuittier', 'extradata'), Array.parseCommaSeparatedString(self.args.circuittier)
 				)
 			}
-		})
+		)
 	end
 
 	if self.args.additionalConditions then
