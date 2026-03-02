@@ -52,9 +52,9 @@ def update_cache():
             params={"format": "json", "action": "updatelpmwmessageapi"},
             data={
                 "messagename": "Resourceloaderarticles-cacheversion",
-                "value": subprocess.check_output(
-                    ["git", "log", "-1", "--pretty=%h"]
-                ).decode().strip(),
+                "value": subprocess.check_output(["git", "log", "-1", "--pretty=%h"])
+                .decode()
+                .strip(),
             },
         ).json()
         if (
