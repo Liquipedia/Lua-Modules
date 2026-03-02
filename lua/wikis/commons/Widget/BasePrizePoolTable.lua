@@ -41,7 +41,8 @@ function BasePrizePoolTable:render()
 	local headerRow = TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
 			TableWidgets.CellHeader{children = 'Place'},
-			settings.showPrizes and settings.autoExchange and TableWidgets.CellHeader{children = Currency.display(BASE_CURRENCY)} or nil,
+			settings.showPrizes and settings.autoExchange
+				and TableWidgets.CellHeader{children = Currency.display(BASE_CURRENCY)} or nil,
 			settings.showPrizes and TableWidgets.CellHeader{children = Currency.display(settings.currency)} or nil,
 			settings.showPoints and TableWidgets.CellHeader{children = settings.pointsHeader} or nil,
 			settings.showPoints2 and TableWidgets.CellHeader{children = settings.points2Header} or nil
@@ -137,8 +138,8 @@ function BasePrizePoolTable:_parse()
 end
 
 ---@private
----@param settings {showPrizes: boolean, showPoints: boolean, showPoints2: boolean, pointsHeader: string, points2Header: string,
----currency: string, title: string, autoExchange: boolean, cutAfter: integer?}
+---@param settings {showPrizes: boolean, showPoints: boolean, showPoints2: boolean, pointsHeader: string,
+---points2Header: string, currency: string, title: string, autoExchange: boolean, cutAfter: integer?}
 ---@param placementInfo {place: rawPlacement, prize: number, usdPrize: number,
 ---points: number, points2: number, sort: integer}
 ---@return Widget
