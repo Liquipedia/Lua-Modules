@@ -38,12 +38,6 @@ function CustomTournamentsListing:buildConditions()
 				ConditionUtil.anyOf(
 					ColumnName('circuittier', 'extradata'), Array.parseCommaSeparatedString(self.args.circuittier)
 				)
-			},
-			ConditionTree(BooleanOperator.all):add{
-				ConditionNode(ColumnName('circuit2', 'extradata'), Comparator.eq, self.args.circuit),
-				ConditionUtil.anyOf(
-					ColumnName('circuit2tier', 'extradata'), Array.parseCommaSeparatedString(self.args.circuittier)
-				)
 			}
 		})
 	end
