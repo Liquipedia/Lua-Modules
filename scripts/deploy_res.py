@@ -85,9 +85,11 @@ def main():
     for res_type, files in itertools.groupby(
         sorted(resource_files), lambda path: path.suffix
     ):
-        all_deployed, changes_made = deploy_resources(
+        group_all_deployed, group_changes_made = deploy_resources(
             res_type, list(files), git_deploy_reason
         )
+        all_deployed = all_deployed and group_all_deployed
+        changes_made = changes_made or group_changes_made
 
     if not all_deployed:
         print(
