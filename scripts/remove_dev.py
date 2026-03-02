@@ -58,8 +58,17 @@ def search_and_remove(wiki: str):
             },
         ).json()
         time.sleep(SLEEP_DURATION)
-        pages = search_result["query"].get("search")
 
+        # Handle API error responses and missing or empty search results safely.
+        if "error" in search_result:
+            error_info = search_result.get("error")
+            print(f"::warning::search API error on {wiki}: {error_info}")
+            write_to_github_summary_file(
+                f":warning: search API error on {wiki}: {error_info}"
+            )
+            return
+
+        pages = search_result.get("query", {}).get("search") or []
         if len(pages) == 0:
             return
 

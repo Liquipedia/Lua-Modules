@@ -79,8 +79,32 @@ def deploy_file_to_wiki(
             "token": token,
         },
     ).json()
-    result = response["edit"].get("result")
-    new_rev_id = response["edit"].get("newrevid")
+    edit_info = response.get("edit")
+    error_info = response.get("error")
+
+    # Handle API errors or unexpected response structure
+    if error_info is not None or edit_info is None:
+        print(f"::warning file={str(file_path)}::failed to deploy (API error)")
+        details = ""
+        if isinstance(error_info, dict):
+            code = error_info.get("code")
+            info = error_info.get("info")
+            detail_parts = []
+            if code:
+                detail_parts.append(f"code={code}")
+            if info:
+                detail_parts.append(f"info={info}")
+            if detail_parts:
+                details = " (" + ", ".join(detail_parts) + ")"
+        write_to_github_summary_file(
+            f":warning: {str(file_path)} failed to deploy due to API error{details}"
+        )
+        deployed = False
+        time.sleep(SLEEP_DURATION)
+        return deployed, change_made
+
+    result = edit_info.get("result")
+    new_rev_id = edit_info.get("newrevid")
     if result == "Success":
         if new_rev_id is not None:
             change_made = True
