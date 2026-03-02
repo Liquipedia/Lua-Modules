@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
+local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
@@ -96,6 +97,7 @@ function BasePrizePoolTable:_parse()
 	local settings = {
 		showPoints = Logic.readBool(props.points),
 		showPoints2 = Logic.readBool(props.points2),
+		showPrizes = Logic.nilOr(Logic.readBoolOrNil(props.prizes), true),
 		currency = currency,
 		title = props.title,
 		pointsHeader = props.pointsheader,
@@ -111,34 +113,27 @@ function BasePrizePoolTable:_parse()
 	} or 1
 
 	---@type {place: rawPlacement, prize: number, usdPrize: number, points: number, points2: number, sort: integer}[]
-	local placements = {}
-	Table.iter.forEachPair(self.props, function(key, value)
-		if not string.match(key, '^%d+%-?%d*$') then
-			return
-		end
-		local place = Placement.raw(key)
-		if place.unknown == true then
-			return
-		end
-		local prizeString = mw.getContentLanguage():parseFormattedNumber(value)
-		local prize = tonumber(prizeString)
-		assert(prize, 'Invalid entry "|' .. key .. '=' .. value .. '"')
+	local placements = Array.mapIndexes(function(index)
+		if Logic.isEmpty( props[index]) then return end
 
-		local pointsString = mw.getContentLanguage():parseFormattedNumber(props[key .. '_points'] or '')
+		local input = Json.parseIfTable(props[index])
+		if Logic.isEmpty(input) then return end
+		---@cast input -nil
 
-		local points2String = mw.getContentLanguage():parseFormattedNumber(props[key .. '_points2'] or '')
+		local place = Placement.raw(input.place)
+		if place.unknown == true then return end
 
-		table.insert(placements, {
+		local prize = mw.getContentLanguage():parseFormattedNumber(input.prize) or 0
+
+		return {
 			place = place,
 			prize = prize,
 			usdPrize = prize * currencyRate,
-			points = tonumber(pointsString) or 0,
-			points2 = tonumber(points2String) or 0,
+			points = mw.getContentLanguage():parseFormattedNumber(input.points) or 0,
+			points2 = mw.getContentLanguage():parseFormattedNumber(input.points2) or 0,
 			sort = tonumber(place.placement[1]),
-		})
+		}
 	end)
-
-	Array.sortInPlaceBy(placements, Operator.property('sort'))
 
 	return placements, settings
 end
