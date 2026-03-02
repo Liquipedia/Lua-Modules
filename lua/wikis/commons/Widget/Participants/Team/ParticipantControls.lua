@@ -20,15 +20,23 @@ local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Switch = Lua.import('Module:Widget/Switch')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local globalVars = PageVariableNamespace()
+local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
+
+---@class ParticipantsTeamParticipantControlsProps
+---@field playerinfo boolean|string|nil
 
 ---@class ParticipantsTeamParticipantControls: Widget
----@operator call(table): ParticipantsTeamParticipantControls
+---@operator call(ParticipantsTeamParticipantControlsProps): ParticipantsTeamParticipantControls
+---@field props ParticipantsTeamParticipantControlsProps
 local ParticipantsTeamParticipantControls = Class.new(Widget)
+
+ParticipantsTeamParticipantControls.defaultProps = {
+	playerinfo = false,
+}
 
 ---@return Widget?
 function ParticipantsTeamParticipantControls:render()
-	globalVars:set('teamParticipantControlsRendered', 'true')
+	teamParticipantsVars:set('controlsRendered', 'true')
 
 	local pageName = mw.title.getCurrentTitle().fullText
 	local link = tostring(mw.uri.fullUrl('Special:RunQuery/Tournament_player_information', {
