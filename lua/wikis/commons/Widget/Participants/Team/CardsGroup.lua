@@ -41,7 +41,7 @@ function ParticipantsTeamCardsGroup:render()
 	local showSwitches = not teamParticipantsVars:get('externalControlsRendered')
 
 	local children = WidgetUtil.collect(
-		showSwitches and ParticipantControls{playerinfo = self.props.playerinfo} or nil,
+		showSwitches and ParticipantControls{playerinfo = self.props.playerinfo, external = false} or nil,
 		AnalyticsWidget{
 			analyticsName = 'Team participants card',
 			children = Div{
