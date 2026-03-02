@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 
 local Widget = Lua.import('Module:Widget')
 local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
@@ -19,11 +18,10 @@ local ParticipantsTeamCard = Lua.import('Module:Widget/Participants/Team/Card')
 local ParticipantControls = Lua.import('Module:Widget/Participants/Team/ParticipantControls')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
-
 ---@class ParticipantsTeamCardsGroupProps
 ---@field participants TeamParticipant[]|nil
 ---@field playerinfo boolean|string|nil
+---@field showControls boolean|nil
 ---@field mergeStaffTabIfOnlyOneStaff boolean|nil
 
 ---@class ParticipantsTeamCardsGroup: Widget
@@ -38,10 +36,10 @@ function ParticipantsTeamCardsGroup:render()
 		return
 	end
 
-	local showSwitches = not teamParticipantsVars:get('externalControlsRendered')
+	local showControls = self.props.showControls ~= false
 
 	local children = WidgetUtil.collect(
-		showSwitches and ParticipantControls{playerinfo = self.props.playerinfo, external = false} or nil,
+		showControls and ParticipantControls{playerinfo = self.props.playerinfo} or nil,
 		AnalyticsWidget{
 			analyticsName = 'Team participants card',
 			children = Div{

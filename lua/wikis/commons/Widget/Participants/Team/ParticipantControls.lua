@@ -24,7 +24,6 @@ local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
 
 ---@class ParticipantsTeamParticipantControlsProps
 ---@field playerinfo boolean|string|nil
----@field external boolean|nil
 
 ---@class ParticipantsTeamParticipantControls: Widget
 ---@operator call(ParticipantsTeamParticipantControlsProps): ParticipantsTeamParticipantControls
@@ -33,15 +32,17 @@ local ParticipantsTeamParticipantControls = Class.new(Widget)
 
 ParticipantsTeamParticipantControls.defaultProps = {
 	playerinfo = false,
-	external = false,
 }
+
+---@param args ParticipantsTeamParticipantControlsProps
+---@return ParticipantsTeamParticipantControls
+function ParticipantsTeamParticipantControls.fromTemplate(args)
+	teamParticipantsVars:set('externalControlsRendered', 'true')
+	return ParticipantsTeamParticipantControls(args)
+end
 
 ---@return Widget?
 function ParticipantsTeamParticipantControls:render()
-	if Logic.readBool(self.props.external) then
-		teamParticipantsVars:set('externalControlsRendered', 'true')
-	end
-
 	local pageName = mw.title.getCurrentTitle().fullText
 	local link = tostring(mw.uri.fullUrl('Special:RunQuery/Tournament_player_information', {
 		pfRunQueryFormName = 'Tournament player information',
