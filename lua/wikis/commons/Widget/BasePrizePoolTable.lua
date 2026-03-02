@@ -41,8 +41,8 @@ function BasePrizePoolTable:render()
 	local headerRow = TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
 			TableWidgets.CellHeader{children = 'Place'},
-			settings.autoExchange and TableWidgets.CellHeader{children = Currency.display(BASE_CURRENCY)} or nil,
-			TableWidgets.CellHeader{children = Currency.display(settings.currency)},
+			settings.showPrizes and settings.autoExchange and TableWidgets.CellHeader{children = Currency.display(BASE_CURRENCY)} or nil,
+			settings.showPrizes and TableWidgets.CellHeader{children = Currency.display(settings.currency)} or nil,
 			settings.showPoints and TableWidgets.CellHeader{children = settings.pointsHeader} or nil,
 			settings.showPoints2 and TableWidgets.CellHeader{children = settings.points2Header} or nil
 		)}
@@ -61,14 +61,14 @@ function BasePrizePoolTable:render()
 			{
 				align = 'center',
 			},
-			settings.autoExchange and {
+			settings.showPrizes and settings.autoExchange and {
 				align = 'right',
 				sortType = 'number',
 			} or nil,
-			{
+			settings.showPrizes and {
 				align = 'right',
 				sortType = 'number',
-			},
+			} or nil,
 			settings.showPoints and {
 				align = 'right',
 				sortType = 'number',
@@ -87,7 +87,7 @@ end
 
 ---@private
 ---@return {place: rawPlacement, prize: number, usdPrize: number, points: number, points2: number, sort: integer}[]
----@return {showPoints: boolean, showPoints2: boolean, pointsHeader: string, points2Header: string,
+---@return {showPrizes: boolean, showPoints: boolean, showPoints2: boolean, pointsHeader: string, points2Header: string,
 ---currency: string, title: string, autoExchange: boolean, cutAfter: integer?}
 function BasePrizePoolTable:_parse()
 	local props = self.props
@@ -137,7 +137,7 @@ function BasePrizePoolTable:_parse()
 end
 
 ---@private
----@param settings {showPoints: boolean, showPoints2: boolean, pointsHeader: string, points2Header: string,
+---@param settings {showPrizes: boolean, showPoints: boolean, showPoints2: boolean, pointsHeader: string, points2Header: string,
 ---currency: string, title: string, autoExchange: boolean, cutAfter: integer?}
 ---@param placementInfo {place: rawPlacement, prize: number, usdPrize: number,
 ---points: number, points2: number, sort: integer}
@@ -155,14 +155,14 @@ function BasePrizePoolTable._row(settings, placementInfo)
 			children = Placement.renderRawInWidget(placementInfo.place),
 			['data-sort-value'] = placementInfo.place.sort,
 		},
-		settings.autoExchange and TableWidgets.Cell{
+		settings.showPrizes and settings.autoExchange and TableWidgets.Cell{
 			children = Currency.display(BASE_CURRENCY, placementInfo.usdPrize, currencyDisplayConfig),
 			['data-sort-value'] = placementInfo.usdPrize,
 		} or nil,
-		TableWidgets.Cell{
+		settings.showPrizes and TableWidgets.Cell{
 			children = Currency.display(settings.currency, placementInfo.prize, currencyDisplayConfig),
 			['data-sort-value'] = placementInfo.prize,
-		},
+		} or nil,
 		settings.showPoints and TableWidgets.Cell{
 			children = Currency.formatMoney(placementInfo.points, 2, false, true),
 			['data-sort-value'] = placementInfo.points,
