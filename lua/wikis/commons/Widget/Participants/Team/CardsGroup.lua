@@ -38,13 +38,7 @@ function ParticipantsTeamCardsGroup:render()
 		return
 	end
 
-	local externalControlsRendered = teamParticipantsVars:get('externalControlsRendered')
-	local cardsGroupControlsRendered = teamParticipantsVars:get('cardsGroupControlsRendered')
-	local showSwitches = not externalControlsRendered and not cardsGroupControlsRendered
-
-	if showSwitches then
-		teamParticipantsVars:set('cardsGroupControlsRendered', 'true')
-	end
+	local showSwitches = not teamParticipantsVars:get('externalControlsRendered')
 
 	local children = WidgetUtil.collect(
 		showSwitches and ParticipantControls{playerinfo = self.props.playerinfo} or nil,
