@@ -21,6 +21,7 @@ Abbr/AQTT
 Abbr/ARS
 Abbr/ART
 Abbr/AST
+Abbr/ATST
 Abbr/AUD
 Abbr/AZN
 Abbr/AZT
@@ -226,6 +227,7 @@ Box
 Bracket
 BroadcasterCard
 Button
+Country_representation
 Currency
 Deletion
 DuoOpponent
@@ -279,6 +281,8 @@ TeamParticipants
 TeamPrizePool
 TournamentVariables
 TournamentsList
+Tournament_player_information
+TPI
 Transfer_List
 Transfer_Row
 TRef

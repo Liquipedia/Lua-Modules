@@ -58,6 +58,16 @@ function MatchFunctions.getBestOf(bestofInput)
 	return bestof or DEFAULT_BESTOF_MATCH
 end
 
+---@param match table
+---@param games table[]
+---@param opponents MGIParsedOpponent[]
+---@return table
+function MatchFunctions.getExtraData(match, games, opponents)
+	return {
+		mvp = MatchGroupInputUtil.readMvp(match, opponents),
+	}
+end
+
 --
 -- map related functions
 --
