@@ -11,7 +11,7 @@ WIKI_TO_PROTECT = os.getenv("WIKI_TO_PROTECT")
 
 def main():
     with open("./templates/templatesToProtect", "r") as templates_to_protect:
-        for template_name in templates_to_protect.readlines():
+        for template_name in templates_to_protect.read().splitlines():
             if len(template_name.strip()) == 0:
                 continue
             template = "Template:" + template_name
