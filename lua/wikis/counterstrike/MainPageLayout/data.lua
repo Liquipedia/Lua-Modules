@@ -136,6 +136,11 @@ return {
 				conditions = '[[type::map]]',
 			},
 		},
+		{
+			iconName = 'chart',
+			title = 'Valve Regional Standings',
+			link = 'Valve_Regional_Standings',
+		},
 	},
 	layouts = {
 		main = {

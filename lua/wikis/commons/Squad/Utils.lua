@@ -202,8 +202,7 @@ function SquadUtils.analyzeColumnVisibility(players, squadStatus)
 
 	return {
 		teamIcon = Array.any(players, function(p)
-			local loanedTo = p.extradata and p.extradata.loanedto or p.loanedto
-			return loanedTo and TeamTemplate.exists(loanedTo)
+			return p.team and TeamTemplate.exists(p.team)
 		end),
 		name = Array.any(players, function(p)
 			return String.isNotEmpty(p.name)

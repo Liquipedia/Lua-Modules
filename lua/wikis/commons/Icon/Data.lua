@@ -247,6 +247,9 @@ return {
 	copy = 'fas fa-clone',
 	download = 'fas fa-download',
 
+	-- Usage: Github links
+	github = 'fab fa-github',
+
 	-- Usage: Dota2 Spellcard
 	dota2_spl_mechanics = 'fas fa-cog',
 	dota2_spl_interactions = 'fad fa-atom-alt',

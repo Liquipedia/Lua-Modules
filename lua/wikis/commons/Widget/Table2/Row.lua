@@ -20,7 +20,8 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class Table2RowProps
----@field children (Widget|Html|string|number|nil)[]?
+---@field children Renderable[]?
+---@field section 'head'|'body'|'subhead'?
 ---@field classes string[]?
 ---@field css {[string]: string|number|nil}?
 ---@field attributes {[string]: any}?
@@ -34,12 +35,12 @@ local Table2Row = Class.new(Widget)
 ---@return Widget
 function Table2Row:render()
 	local props = self.props
-	local section = self:useContext(Table2Contexts.Section)
+	local section = props.section or self:useContext(Table2Contexts.Section)
 	local headerRowKind = self:useContext(Table2Contexts.HeaderRowKind)
 	local bodyStripe = self:useContext(Table2Contexts.BodyStripe)
 
 	local sectionClass = 'table2__row--body'
-	if section == 'head' then
+	if section == 'head' or section == 'subhead' then
 		sectionClass = 'table2__row--head'
 	end
 
@@ -67,6 +68,15 @@ function Table2Row:render()
 	end
 
 	local children = props.children or {}
+
+	local columns = self:useContext(Table2Contexts.ColumnContext)
+	if section == 'subhead' and columns and #children == 1 and Class.instanceOf(children[1], Table2CellHeader) then
+		local singleCell = children[1] --[[@as Table2CellHeader]]
+		if singleCell.props.colspan == nil then
+			singleCell.props.colspan = #columns
+		end
+	end
+
 	local columnIndex = 1
 	local indexedChildren = Array.map(children, function(child)
 		if Class.instanceOf(child, Table2Cell) or Class.instanceOf(child, Table2CellHeader) then
@@ -88,11 +98,24 @@ function Table2Row:render()
 		return child
 	end)
 
+	local trChildren = indexedChildren
+	if section == 'subhead' then
+		trChildren = Array.map(trChildren, function(child)
+			if Class.instanceOf(child, Table2CellHeader) then
+				return Table2Contexts.Section{
+					value = 'subhead',
+					children = {child},
+				}
+			end
+			return child
+		end)
+	end
+
 	return HtmlWidgets.Tr{
 		classes = WidgetUtil.collect(sectionClass, kindClass, stripeClass, highlightClass, props.classes),
 		css = props.css,
 		attributes = props.attributes,
-		children = indexedChildren,
+		children = trChildren,
 	}
 end
 

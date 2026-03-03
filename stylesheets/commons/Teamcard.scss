@@ -5,157 +5,157 @@ Author(s): ???
 .teamcard {
 	position: relative;
 	width: 200px;
-}
 
-.teamcard > center {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-.teamcard table.list,
-.teamcard table.logo {
-	height: 121px;
-	margin-top: 0;
-	width: 200px;
-}
-
-.teamcard table.list,
-.teamcard.teamcard-opened table.list.former,
-.teamcard.teamcard-opened table.list.subs {
-	opacity: 0 !important;
-	position: absolute;
-	z-index: 2;
-	table-layout: fixed;
-}
-
-@media ( min-width: 601px ) {
-	.teamcard table.list:hover,
-	.teamcard table.list.active:hover,
-	.teamcard.teamcard-opened table.list,
-	.teamcard.teamcard-opened.teamcard-former-opened table.list.former,
-	.teamcard.teamcard-opened.teamcard-subs-opened table.list.subs,
-	.teamcard.teamcard-former-opened:hover table.list.former,
-	.teamcard.teamcard-subs-opened:hover table.list.subs {
-		opacity: 1 !important;
-		background-color: var( --clr-surface-3, rgba( 249, 249, 249, 0.95 ) ) !important;
+	> center {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
-	.teamcard.teamcard-former-opened table.list.active,
-	.teamcard.teamcard-former-opened table.list.subs,
-	.teamcard.teamcard-subs-opened table.list.active,
-	.teamcard.teamcard-subs-opened table.list.former {
-		display: none !important;
+	table.list,
+	table.logo {
+		height: 121px;
+		margin-top: 0;
+		width: 200px;
+	}
+
+	table.list,
+	&.teamcard-opened table.list.former,
+	&.teamcard-opened table.list.subs {
 		opacity: 0 !important;
-	}
-}
-
-.teamcard table.logo td {
-	padding: 0;
-}
-
-.teamcard table.list td,
-.teamcard table.list th {
-	padding: 2px;
-}
-
-.teamcard table.list th {
-	width: 20px;
-}
-
-.teamcard table.list td {
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	overflow: hidden;
-}
-
-.teamcard .teamcard-placement {
-	padding: 0 !important;
-}
-
-.teamcard .teamcard-placement table.teamcard-placement-table {
-	width: 100%;
-	text-align: center;
-	height: 29px;
-}
-
-.teamcard .teamcard-qualifier {
-	text-align: center;
-	font-weight: bold;
-	height: 25px;
-}
-
-.teamcard .teamcard-preview {
-	text-align: center;
-}
-
-@media ( max-width: 600px ) {
-	.teamcard:not( .teamcard-nomobile ) table.logo {
-		width: 100%;
-	}
-
-	.teamcard:not( .teamcard-nomobile ) table.logo img:not( [ src$=".svg" ] ) {
-		width: auto;
-		height: auto;
-		max-width: 90%;
-		max-height: 90%;
-	}
-
-	.teamcard:not( .teamcard-nomobile ) {
-		position: relative;
-		width: 100%;
-	}
-
-	.teamcard:not( .teamcard-nomobile ) .teamcard-inner {
-		position: relative;
-	}
-
-	.teamcard:not( .teamcard-nomobile ) table.logo div.center {
-		width: 40% !important;
-	}
-
-	.teamcard:not( .teamcard-nomobile ) table.list {
-		opacity: 1 !important;
-		table-layout: fixed;
 		position: absolute;
-		top: 0;
-		width: 60% !important;
-		left: 40%;
+		z-index: 2;
+		table-layout: fixed;
 	}
 
-	.teamcard:not( .teamcard-former-opened ) table.list.former,
-	.teamcard:not( .teamcard-subs-opened ) table.list.subs,
-	.teamcard.teamcard-former-opened table.list.active,
-	.teamcard.teamcard-former-opened table.list.subs,
-	.teamcard.teamcard-subs-opened table.list.active,
-	.teamcard.teamcard-subs-opened table.list.former {
-		display: none !important;
+	@media ( min-width: 601px ) {
+		table.list:hover,
+		table.list.active:hover,
+		&.teamcard-opened table.list,
+		&.teamcard-opened.teamcard-former-opened table.list.former,
+		&.teamcard-opened.teamcard-subs-opened table.list.subs,
+		&.teamcard-former-opened:hover table.list.former,
+		&.teamcard-subs-opened:hover table.list.subs {
+			opacity: 1 !important;
+			background-color: var( --clr-surface-3, rgba( 249, 249, 249, 0.95 ) ) !important;
+		}
+
+		&.teamcard-former-opened table.list.active,
+		&.teamcard-former-opened table.list.subs,
+		&.teamcard-subs-opened table.list.active,
+		&.teamcard-subs-opened table.list.former {
+			display: none !important;
+			opacity: 0 !important;
+		}
 	}
 
-	.teamcard:not( .teamcard-nomobile ) .league-icon-small-image img {
-		max-width: 25px !important;
-		max-height: 25px !important;
+	table.logo td {
+		padding: 0;
+	}
+
+	table.list {
+		td,
+		th {
+			padding: 2px;
+		}
+
+		th {
+			width: 20px;
+		}
+
+		td {
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			overflow: hidden;
+		}
+	}
+
+	.teamcard-placement {
+		padding: 0 !important;
+
+		table.teamcard-placement-table {
+			width: 100%;
+			text-align: center;
+			height: 29px;
+		}
+	}
+
+	.teamcard-qualifier {
+		text-align: center;
+		font-weight: bold;
+		height: 25px;
+	}
+
+	.teamcard-preview {
+		text-align: center;
+	}
+
+	@media ( max-width: 600px ) {
+		&:not( .teamcard-nomobile ) {
+			position: relative;
+			width: 100%;
+
+			table.logo {
+				width: 100%;
+
+				img:not( [ src$=".svg" ] ) {
+					width: auto;
+					height: auto;
+					max-width: 90%;
+					max-height: 90%;
+				}
+
+				div.center {
+					width: 40% !important;
+				}
+			}
+
+			.teamcard-inner {
+				position: relative;
+			}
+
+			table.list {
+				opacity: 1 !important;
+				table-layout: fixed;
+				position: absolute;
+				top: 0;
+				width: 60% !important;
+				left: 40%;
+			}
+
+			.league-icon-small-image img {
+				max-width: 25px !important;
+				max-height: 25px !important;
+			}
+		}
+
+		&:not( .teamcard-former-opened ) table.list.former,
+		&:not( .teamcard-subs-opened ) table.list.subs,
+		&.teamcard-former-opened table.list.active,
+		&.teamcard-former-opened table.list.subs,
+		&.teamcard-subs-opened table.list.active,
+		&.teamcard-subs-opened table.list.former {
+			display: none !important;
+		}
 	}
 }
 
 .teamcard-toggle-button {
 	display: flow-root;
-}
 
-.teamcard-toggle-button button {
-	margin: 0 0 10px 10px;
-	width: fit-content;
-	float: right;
-}
-
-.teamcard-toggle-button-left button {
-	margin: 0 10px 10px 0;
-	float: left;
-}
-
-@media ( max-width: 600px ) {
-	.teamcard-toggle-button {
+	@media ( max-width: 600px ) {
 		display: none !important;
+	}
+
+	button {
+		margin: 0 0 10px 10px;
+		width: fit-content;
+		float: right;
+	}
+
+	&-left button {
+		margin: 0 10px 10px 0;
+		float: left;
 	}
 }
 
@@ -172,12 +172,14 @@ Author(s): ???
 	min-height: unset !important;
 }
 
-.wiki-apexlegends .teamcard-former-toggle-button button {
-	width: 121px;
-}
+.teamcard-former-toggle-button button {
+	.wiki-apexlegends & {
+		width: 121px;
+	}
 
-.wiki-teamfortress .teamcard-former-toggle-button button {
-	width: 181px;
+	.wiki-teamfortress & {
+		width: 181px;
+	}
 }
 
 .teamcard {
@@ -302,33 +304,31 @@ Author: warnull
 	flex-wrap: wrap;
 	gap: 8px;
 	margin: 12px 0;
-}
 
-.rts-team-list-section-header {
-	font-weight: bold;
-	width: 100%;
+	&-header {
+		font-weight: bold;
+		width: 100%;
+	}
 }
 
 .rts-team-list-card {
 	border: 1px solid var( --clr-border, #bbbbbb );
-}
 
-@media ( max-width: 435px ) {
-	.rts-team-list-card {
+	@media ( max-width: 435px ) {
 		width: 100% !important;
 	}
-}
 
-.rts-team-list-card-header {
-	padding: 4px 8px;
+	&-header {
+		padding: 4px 8px;
+
+		> .rts-team-list-team-title {
+			font-weight: bold;
+		}
+	}
 }
 
 .rts-team-list-team-title {
 	margin: 0 -4px;
-}
-
-.rts-team-list-card-header > .rts-team-list-team-title {
-	font-weight: bold;
 }
 
 .rts-team-list-team-subtitle {
@@ -340,10 +340,10 @@ Author: warnull
 	background-color: var( --clr-surface-2, #eaecf0 );
 	border-top: 1px solid var( --clr-border, #bbbbbb );
 	padding: 5px;
-}
 
-.rts-team-list-entries-header-text {
-	font-weight: bold;
+	&-text {
+		font-weight: bold;
+	}
 }
 
 .rts-team-list-tbd-entry {
@@ -358,29 +358,29 @@ Author: warnull
 	display: flex;
 	justify-content: space-between;
 	padding: 5px;
-}
 
-.rts-team-list-entry > .block-team,
-.rts-team-list-entry > .block-player,
-.rts-team-list-entry > .block-literal {
-	flex: 1 1 auto;
-	min-width: 0;
-}
+	> .block-team,
+	> .block-player,
+	> .block-literal {
+		flex: 1 1 auto;
+		min-width: 0;
+	}
 
-.rts-team-list-entry:nth-of-type( 2n ) {
-	background: var( --clr-surface-2, #f5f5f5 );
-}
+	&:nth-of-type( 2n ) {
+		background: var( --clr-surface-2, #f5f5f5 );
+	}
 
-.collapsed > .rts-team-list-entry {
-	display: none;
-}
+	.collapsed > & {
+		display: none;
+	}
 
-.rts-team-list-entry-right {
-	display: flex;
-}
+	&-right {
+		display: flex;
+	}
 
-.rts-team-list-entry-tags {
-	margin-left: 2px;
+	&-tags {
+		margin-left: 2px;
+	}
 }
 
 .rts-team-list-icon-tag {
@@ -413,33 +413,33 @@ Author: warnull
 	border-left: 1px solid var( --clr-border, #bbbbbb );
 	border-right: 1px solid var( --clr-border, #bbbbbb );
 	display: inline-grid;
-}
 
-.rts-team-table-section {
-	display: contents;
+	&-section {
+		display: contents;
+	}
 }
 
 .rts-team-table-header-row {
 	background-color: #d0d0d0;
 	display: contents;
-}
 
-.rts-team-table-header-row > .opponent-list-cell {
-	font-weight: bold;
-	text-align: center;
-}
+	> .opponent-list-cell {
+		font-weight: bold;
+		text-align: center;
+	}
 
-.rts-team-table-header-row-players {
-	grid-column: entry 1 / -1;
-	min-width: 100px;
+	&-players {
+		grid-column: entry 1 / -1;
+		min-width: 100px;
+	}
 }
 
 .rts-team-table-team-row {
 	display: contents;
-}
 
-.rts-team-table-team-row:nth-of-type( 2n+1 ) {
-	background: var( --clr-surface-2, #f5f5f5 );
+	&:nth-of-type( 2n+1 ) {
+		background: var( --clr-surface-2, #f5f5f5 );
+	}
 }
 
 .rts-team-table-team-cell {
@@ -459,10 +459,10 @@ Author: warnull
 .rts-team-table-player {
 	justify-content: space-between;
 	min-width: 100px;
-}
 
-.rts-team-list-adhoc .rts-team-table-player {
-	min-width: 160px;
+	.rts-team-list-adhoc & {
+		min-width: 160px;
+	}
 }
 
 /*******************************************************************************
@@ -476,19 +476,21 @@ Author(s): iMarbot
 	margin-left: 0 !important;
 	position: absolute;
 	z-index: 17;
+
+	.template-box & {
+		background-color: var( --clr-background, #f8f9fa );
+		border-color: var( --table-border-color, #a2a9b1 );
+	}
 }
 
-.inotes-inner dl {
-	margin-bottom: 0;
-}
+.inotes-inner {
+	dl {
+		margin-bottom: 0;
+	}
 
-.inotes-inner dd {
-	margin-left: 0;
-}
-
-.template-box .inotes-box {
-	background-color: var( --clr-background, #f8f9fa );
-	border-color: var( --table-border-color, #a2a9b1 );
+	dd {
+		margin-left: 0;
+	}
 }
 
 /*******************************************************************************
