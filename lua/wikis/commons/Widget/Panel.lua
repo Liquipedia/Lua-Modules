@@ -21,7 +21,7 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 ---@field bodyClass string[]?
 ---@field bodyStyle table<string, any>?
 ---@field boxId integer?
----@field children (Widget|string|Html|nil)|(Widget|string|Html|nil)[]
+---@field children Renderable|Renderable[]
 ---@field classes string[]?
 ---@field heading string|Html|Widget
 ---@field headingAttributes table<string, any>?

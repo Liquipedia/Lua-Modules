@@ -8,10 +8,13 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Ordinal = Lua.import('Module:Ordinal')
 local Table = Lua.import('Module:Table')
+
+local Span = HtmlWidgets.Span
 
 local Placement = {}
 
@@ -171,6 +174,8 @@ function Placement._placement(args)
 	local raw = Placement.raw(args.placement or '')
 	args.parent:css('text-align', 'center')
 				:attr('data-sort-value', raw.sort)
+				:tag('span')
+				:addClass('placement-box')
 				:addClass(raw.backgroundClass)
 				:tag('b')
 				:addClass(not raw.blackText and 'placement-text' or nil)
@@ -202,8 +207,28 @@ end
 ---@return string
 function Placement.get(args)
 	local raw = Placement.raw(args.placement)
-	return 'class="text-center ' .. (raw.backgroundClass or '') .. '" data-sort-value="' .. raw.sort .. '"' ..
-		'|<b' .. (raw.blackText and '' or ' class="placement-text"') .. '>' .. (args.customText or raw.display) .. '</b>'
+	return 'class="text-center" data-sort-value="' .. raw.sort .. '"' ..
+		'|<span class="placement-box ' .. (raw.backgroundClass or '') ..
+		'"><b' .. (raw.blackText and '' or ' class="placement-text"') ..
+		'>' .. (args.customText or raw.display) .. '</b></span>'
 end
 
-return Class.export(Placement, {exports = {'getBgClass', 'get', 'RangeLabel'}})
+---Returns a Widget span for placement display in the Widget system.
+---@param args {placement: string|integer?, text: string?}
+---@return Widget
+function Placement.renderInWidget(args)
+	local raw = Placement.raw(args.placement or '')
+	local content = raw.display .. (Logic.isNotEmpty(args.text) and (' ' .. args.text) or '')
+
+	return Span{
+		classes = {'placement-box', raw.backgroundClass},
+		children = raw.blackText and {content} or {
+			Span{
+				classes = {'placement-text'},
+				children = content
+			}
+		}
+	}
+end
+
+return Class.export(Placement, {exports = {'getBgClass', 'get', 'RangeLabel', 'renderInWidget'}})

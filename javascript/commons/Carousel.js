@@ -1,6 +1,19 @@
 liquipedia.carousel = {
 	carousels: [],
 	resizeListenerAdded: false,
+	refreshScheduled: false,
+
+	scheduleRefresh: function() {
+		if ( liquipedia.carousel.refreshScheduled ) {
+			return;
+		}
+		liquipedia.carousel.refreshScheduled = true;
+		const requestFrame = window.requestAnimationFrame || ( ( cb ) => setTimeout( cb, 0 ) );
+		requestFrame( () => {
+			liquipedia.carousel.refreshScheduled = false;
+			liquipedia.carousel.handleResize();
+		} );
+	},
 
 	init: function() {
 		const carouselElements = document.querySelectorAll( '.carousel' );
@@ -23,6 +36,10 @@ liquipedia.carousel = {
 	},
 
 	initCarousel: function( carousel ) {
+		if ( carousel.dataset.carouselInitialized === 'true' ) {
+			return;
+		}
+
 		const content = carousel.querySelector( '.carousel-content' );
 		const items = carousel.querySelectorAll( '.carousel-item' );
 
@@ -40,6 +57,8 @@ liquipedia.carousel = {
 		if ( !content || !items.length || !controls.left[ 0 ] || !controls.right[ 0 ] ) {
 			return;
 		}
+
+		carousel.dataset.carouselInitialized = 'true';
 
 		// Single item carousels don't need scroll tracking or button handlers
 		if ( items.length === 1 ) {
@@ -72,9 +91,25 @@ liquipedia.carousel = {
 				liquipedia.carousel.updateButtonVisibility( carouselData );
 			}, 50 );
 		} );
+
+		// If the carousel is initialized while hidden (e.g. inside a collapsible or content switch),
+		// its measurements are 0. Observe size changes so it self-heals once it becomes visible.
+		const ro = new ResizeObserver( () => {
+			liquipedia.carousel.scheduleRefresh();
+		} );
+		ro.observe( carouselData.content );
+		carouselData.resizeObserver = ro;
 	},
 
 	scroll: function( carouselData, direction ) {
+		if ( !carouselData.itemWidth && carouselData.items.length > 0 ) {
+			carouselData.itemWidth = carouselData.items[ 0 ].offsetWidth;
+			liquipedia.carousel.updateButtonVisibility( carouselData );
+		}
+		if ( !carouselData.itemWidth ) {
+			return;
+		}
+
 		const offset = carouselData.itemWidth * direction;
 
 		carouselData.content.scrollBy( {
