@@ -44,30 +44,32 @@ function ParticipantsTeamParticipantControls.fromTemplate(frame)
 end
 
 ---@return Widget?
-function ParticipantsTeamParticipantControls:render()
-	local playerInfoButton
-	if Logic.readBool(self.props.showPlayerInfo) then
-		local pageName = mw.title.getCurrentTitle().fullText
-		local link = tostring(mw.uri.fullUrl('Special:RunQuery/Tournament_player_information', {
-			pfRunQueryFormName = 'Tournament player information',
-			['TPI[page]'] = pageName,
-			wpRunQuery = 'Run query'
-		}))
-		playerInfoButton = Button{
-			title = 'Click for additional player information',
-			variant = 'secondary',
-			size = 'sm',
-			linktype = 'external',
-			link = link,
-			children = WidgetUtil.collect(
-				Icon{iconName = 'internal_link'},
-				'Player Info'
-			)
-		}
+function ParticipantsTeamParticipantControls:_buildPlayerInfoButton()
+	if not Logic.readBool(self.props.showPlayerInfo) then
+		return nil
 	end
 
+	local pageName = mw.title.getCurrentTitle().fullText
+	local link = tostring(mw.uri.fullUrl('Special:RunQuery/Tournament_player_information', {
+		pfRunQueryFormName = 'Tournament player information',
+		['TPI[page]'] = pageName,
+		wpRunQuery = 'Run query'
+	}))
+
+	return Button{
+		title = 'Click for additional player information',
+		variant = 'secondary',
+		size = 'sm',
+		linktype = 'external',
+		link = link,
+		children = { Icon{iconName = 'internal_link'}, 'Player Info' }
+	}
+end
+
+---@return Widget?
+function ParticipantsTeamParticipantControls:render()
 	local children = WidgetUtil.collect(
-		playerInfoButton,
+		self:_buildPlayerInfoButton(),
 		AnalyticsWidget{
 			analyticsName = 'ParticipantsShowRostersSwitch',
 			analyticsProperties = {
