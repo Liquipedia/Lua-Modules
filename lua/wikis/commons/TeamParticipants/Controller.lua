@@ -54,7 +54,7 @@ function TeamParticipantsController.fromTemplate(frame)
 
 	return TeamParticipantsDisplay{
 		participants = parsedData.participants,
-		showPlayerInfo = Logic.readBool(args.playerinfo),
+		showPlayerInfo = Logic.readBool(args.showplayerinfo),
 		showControls = showControls,
 		mergeStaffTabIfOnlyOneStaff = Logic.nilOr(
 			Logic.readBoolOrNil(args.mergeStaffTabIfOnlyOneStaff), Logic.readBool(Config.mergeStaffTabIfOnlyOneStaff)

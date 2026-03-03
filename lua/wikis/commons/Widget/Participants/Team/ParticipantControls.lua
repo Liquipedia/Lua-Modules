@@ -33,6 +33,7 @@ local ParticipantsTeamParticipantControls = Class.new(Widget, function(self, pro
 	if Logic.readBool(props.externalUsage) then
 		teamParticipantsVars:set('externalControlsRendered', 'true')
 	end
+	self.props.showPlayerInfo = Logic.readBool(self.props.showPlayerInfo or self.props.showplayerinfo)
 end)
 
 ParticipantsTeamParticipantControls.defaultProps = {
