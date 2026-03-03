@@ -361,6 +361,9 @@ end
 ---@private
 ---@return string?
 function BaseMatchPage:_queryBracketPage()
+	if mw.title.getCurrentTitle().namespace ~= Namespace.matchNamespaceId() then
+		return
+	end
 	local bracketId = Array.sub(Array.parseCommaSeparatedString(self.matchData.matchId, '_'), 2, -2)
 	if Logic.isEmpty(bracketId) then
 		return
