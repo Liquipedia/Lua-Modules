@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Arguments = Lua.import('Module:Arguments')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
@@ -25,23 +24,21 @@ local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
 
 ---@class ParticipantsTeamParticipantControlsProps
 ---@field showPlayerInfo boolean
+---@field externalUsage boolean
 
 ---@class ParticipantsTeamParticipantControls: Widget
 ---@operator call(ParticipantsTeamParticipantControlsProps): ParticipantsTeamParticipantControls
 ---@field props ParticipantsTeamParticipantControlsProps
-local ParticipantsTeamParticipantControls = Class.new(Widget)
+local ParticipantsTeamParticipantControls = Class.new(Widget, function(self, props)
+	if Logic.readBool(props.externalUsage) then
+		teamParticipantsVars:set('externalControlsRendered', 'true')
+	end
+end)
 
 ParticipantsTeamParticipantControls.defaultProps = {
 	showPlayerInfo = false,
+	externalUsage = false,
 }
-
----@param frame Frame
----@return ParticipantsTeamParticipantControls
-function ParticipantsTeamParticipantControls.fromTemplate(frame)
-	local args = Arguments.getArgs(frame)
-	teamParticipantsVars:set('externalControlsRendered', 'true')
-	return ParticipantsTeamParticipantControls(args)
-end
 
 ---@return Widget?
 function ParticipantsTeamParticipantControls:_buildPlayerInfoButton()
