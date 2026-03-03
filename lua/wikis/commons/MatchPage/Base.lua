@@ -414,9 +414,9 @@ function BaseMatchPage:renderGames()
 				local mapName = self.games[gameIndex].map
 				return {
 					label = 'Game&nbsp;' .. gameIndex .. (
-						Logic.isNotEmpty(mapName) and (': ' .. apName) or ''
+						Logic.isNotEmpty(mapName) and (': ' .. mapName) or ''
 					),
-					content = gam
+					content = game
 				}
 			end)
 		),
