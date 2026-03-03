@@ -74,7 +74,7 @@ function CustomMatchSummary._createGame(date, game, gameIndex)
 				},
 				children = {
 					MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-					MatchSummaryWidgets.GameCenter{children = Logic.nilIfEmpty(game.length) or ('Game ' .. gameIndex)},
+					MatchSummaryWidgets.GameCenter{children = Logic.emptyOr(game.length, 'Game ' .. gameIndex)},
 					MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 				}
 			},
