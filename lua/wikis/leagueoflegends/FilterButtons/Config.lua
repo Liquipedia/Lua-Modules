@@ -63,7 +63,7 @@ Config.categories = {
 		name = 'region',
 		property = 'region',
 		expandable = true,
-		items = { 'Korea', 'China', 'EMEA', 'Americas', 'APAC', 'Other', },
+		items = { 'Korea', 'China', 'EMEA', 'North America', 'South America', 'APAC', 'Other', },
 		defaultItem = 'Other',
 		itemToPropertyValues = function(region)
 			-- Input is a region
