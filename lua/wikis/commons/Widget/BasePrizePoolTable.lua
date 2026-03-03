@@ -13,15 +13,32 @@ local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Placement = Lua.import('Module:Placement')
+local Points = Lua.import('Module:Points/data', {loadData = true})
+local Table = Lua.import('Module:Table')
 
+local Link = Lua.import('Module:Widget/Basic/Link')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local BASE_CURRENCY = 'USD'
+local NON_BREAKING_SPACE = '&nbsp;'
+
+---@class BasePrizePoolWidgetSettings
+---@field showPrizes boolean
+---@field points {title: string, icon: string?, iconDark: string?, link: string?, titleLong: string?}?
+---@field points2 {title: string, icon: string?, iconDark: string?, link: string?, titleLong: string?}?
+---@field pointsHeader string
+---@field points2Header string
+---@field currency string
+---@field title string
+---@field autoExchange boolean
+---@field cutAfter integer?
 
 ---@class BasePrizePoolTable: Widget
 ---@operator call(table): BasePrizePoolTable
@@ -44,8 +61,8 @@ function BasePrizePoolTable:render()
 			settings.showPrizes and settings.autoExchange
 				and TableWidgets.CellHeader{children = Currency.display(BASE_CURRENCY)} or nil,
 			settings.showPrizes and TableWidgets.CellHeader{children = Currency.display(settings.currency)} or nil,
-			settings.showPoints and TableWidgets.CellHeader{children = settings.pointsHeader} or nil,
-			settings.showPoints2 and TableWidgets.CellHeader{children = settings.points2Header} or nil
+			self:_pointsHeader(settings.points),
+			self:_pointsHeader(settings.points2)
 		)}
 	}}
 
@@ -70,11 +87,11 @@ function BasePrizePoolTable:render()
 				align = 'right',
 				sortType = 'number',
 			} or nil,
-			settings.showPoints and {
+			settings.points and {
 				align = 'right',
 				sortType = 'number',
 			} or nil,
-			settings.showPoints2 and {
+			settings.points2 and {
 				align = 'right',
 				sortType = 'number',
 			} or nil
@@ -88,19 +105,31 @@ end
 
 ---@private
 ---@return {place: rawPlacement, prize: number, usdPrize: number, points: number, points2: number, sort: integer}[]
----@return {showPrizes: boolean, showPoints: boolean, showPoints2: boolean, pointsHeader: string, points2Header: string,
----currency: string, title: string, autoExchange: boolean, cutAfter: integer?}
+---@return BasePrizePoolWidgetSettings
 function BasePrizePoolTable:_parse()
 	local props = self.props
+
+	---@param prefix string
+	---@return {title: string, icon: string?, iconDark: string?, link: string?, titleLong: string?}?
+	local parsePoints = function(prefix)
+		if Logic.isEmpty(props[prefix]) then
+			return
+		end
+
+		local pointsData = Table.copy(Points[props[prefix]] or {})
+		pointsData.title = pointsData.title or props[prefix]
+		pointsData.link = props[prefix .. 'link']
+
+		return pointsData
+	end
+
 	local currency = props.currency:upper()
 	local settings = {
-		showPoints = Logic.readBool(props.points),
-		showPoints2 = Logic.readBool(props.points2),
+		points = parsePoints('points'),
+		points2 = parsePoints('points2'),
 		showPrizes = Logic.nilOr(Logic.readBoolOrNil(props.prizes), true),
 		currency = currency,
 		title = props.title,
-		pointsHeader = props.pointsheader,
-		points2Header = props.points2header,
 		autoExchange = Logic.nilOr(Logic.readBoolOrNil(props.autoexchange), currency ~= BASE_CURRENCY),
 		cutAfter = MathUtil.toInteger(props.cutafter),
 	}
@@ -138,8 +167,7 @@ function BasePrizePoolTable:_parse()
 end
 
 ---@private
----@param settings {showPrizes: boolean, showPoints: boolean, showPoints2: boolean, pointsHeader: string,
----points2Header: string, currency: string, title: string, autoExchange: boolean, cutAfter: integer?}
+---@param settings BasePrizePoolWidgetSettings
 ---@param placementInfo {place: rawPlacement, prize: number, usdPrize: number,
 ---points: number, points2: number, sort: integer}
 ---@return Widget
@@ -164,14 +192,35 @@ function BasePrizePoolTable._row(settings, placementInfo)
 			children = Currency.display(settings.currency, placementInfo.prize, currencyDisplayConfig),
 			['data-sort-value'] = placementInfo.prize,
 		} or nil,
-		settings.showPoints and TableWidgets.Cell{
+		settings.points and TableWidgets.Cell{
 			children = Currency.formatMoney(placementInfo.points, 2, false, true),
 			['data-sort-value'] = placementInfo.points,
 		} or nil,
-		settings.showPoints2 and TableWidgets.Cell{
+		settings.points2 and TableWidgets.Cell{
 			children = Currency.formatMoney(placementInfo.points2, 2, false, true),
 			['data-sort-value'] = placementInfo.points2,
 		} or nil
+	)}
+end
+
+---@private
+---@param data {title: string, icon: string?, iconDark: string?, link: string?, titleLong: string?}?
+---@return Widget?
+function BasePrizePoolTable:_pointsHeader(data)
+	if not data then
+		return
+	end
+
+	local titleText = Logic.isNotEmpty(data.titleLong) and HtmlWidgets.Abbr{
+		children = data.title, title = data.titleLong
+	} or data.title
+
+	return TableWidgets.CellHeader{children = WidgetUtil.collect(
+		Logic.isNotEmpty(data.icon) and {
+			LeagueIcon.display{link = data.link, icon = data.icon, iconDark = data.iconDark, name = data.title},
+			NON_BREAKING_SPACE,
+		} or nil,
+		Logic.isNotEmpty(data.link) and Link{link = data.link, children = titleText} or titleText
 	)}
 end
 
