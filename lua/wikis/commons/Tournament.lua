@@ -14,7 +14,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
-local Tier = Lua.import('Module:Tier/Utils')
+local Tier = Lua.import('Module:Tier/Custom')
 
 local Tournament = {}
 
@@ -34,7 +34,7 @@ local TOURNAMENT_PHASE = {
 ---@field iconDark string?
 ---@field series string?
 ---@field liquipediaTier integer|string|nil
----@field liquipediaTierType integer|string|nil
+---@field liquipediaTierType string?
 ---@field game string?
 ---@field publisherTier string?
 
@@ -45,6 +45,7 @@ local TOURNAMENT_PHASE = {
 ---@field featured boolean
 ---@field status string?
 ---@field phase TournamentPhase
+---@field tierOptions table
 ---@field extradata table
 ---@field isHighlighted fun(self: StandardTournament, options?: table): boolean
 
@@ -106,7 +107,7 @@ function Tournament.partialTournamentFromMatch(match)
 		fullName = match.tournament,
 		pageName = match.parent,
 		liquipediaTier = Tier.toIdentifier(match.liquipediatier),
-		liquipediaTierType = Tier.toIdentifier(match.liquipediatiertype),
+		liquipediaTierType = Tier.toIdentifier(match.liquipediatiertype) --[[ @as string? ]],
 		icon = match.icon,
 		iconDark = match.iconDark,
 		series = match.series,
@@ -121,6 +122,7 @@ function Tournament.tournamentFromRecord(record)
 	local extradata = record.extradata or {}
 	local startDate = Tournament.parseDateRecord(Logic.nilOr(extradata.startdatetext, record.startdate))
 	local endDate = Tournament.parseDateRecord(Logic.nilOr(extradata.enddatetext, record.sortdate, record.enddate))
+	local tier, tierType, tierOptions = Tier.parseFromQueryData(record)
 
 	local tournament = {
 		displayName = Logic.emptyOr(record.tickername, record.name) or record.pagename:gsub('_', ' '),
@@ -129,8 +131,8 @@ function Tournament.tournamentFromRecord(record)
 		pageName = record.pagename,
 		startDate = startDate,
 		endDate = endDate,
-		liquipediaTier = Tier.toIdentifier(record.liquipediatier),
-		liquipediaTierType = Tier.toIdentifier(record.liquipediatiertype),
+		liquipediaTier = Tier.toIdentifier(tier),
+		liquipediaTierType = Tier.toIdentifier(tierType) --[[ @as string? ]],
 		publisherTier = record.publishertier,
 		region = (record.locations or {}).region1,
 		status = record.status,
@@ -138,6 +140,7 @@ function Tournament.tournamentFromRecord(record)
 		iconDark = record.icondark,
 		series = record.series,
 		game = record.game,
+		tierOptions = tierOptions,
 		extradata = extradata,
 	}
 
