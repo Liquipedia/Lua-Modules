@@ -112,6 +112,8 @@ function Table2Row:render()
 			end
 			return child
 		end)
+	end
+
 	local attributes = props.attributes or {}
 	if section == 'body' then
 		local maxRowspan = getMaxRowspan(children)
@@ -121,7 +123,7 @@ function Table2Row:render()
 	return HtmlWidgets.Tr{
 		classes = WidgetUtil.collect(sectionClass, kindClass, highlightClass, props.classes),
 		css = props.css,
-		attributes = props.attributes,
+		attributes = attributes,
 		children = trChildren,
 	}
 end
