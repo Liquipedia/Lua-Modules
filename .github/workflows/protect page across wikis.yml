@@ -1,10 +1,10 @@
-name: Protect newly set up wiki
+name: Protect page across wikis
 
 on:
   workflow_dispatch:
     inputs:
-      wiki:
-        description: 'Wiki to set up'
+      page:
+        description: 'Page to protect (prefix with namespace and use underscores!)'
         required: true
 
 jobs:
@@ -30,6 +30,6 @@ jobs:
           WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
-          WIKI_TO_PROTECT: ${{ github.event.inputs.wiki }}
+          PAGE_TO_PROTECT: ${{ github.event.inputs.page }}
           PYTHONUNBUFFERED: 1
-        run: python3 ./scripts/protect_templates.py
+        run: python3 ./scripts/protect_page_across_wikis.py
