@@ -6,10 +6,12 @@
 const TABLE2_CONFIG = {
 	SELECTORS: {
 		TABLE: '.table2__table',
-		BODY_ROW: 'tbody tr.table2__row--body'
+		BODY_ROW: 'tbody tr.table2__row--body',
+		ALL_ROWS: 'tbody tr'
 	},
 	CLASSES: {
-		EVEN: 'table2__row--even'
+		EVEN: 'table2__row--even',
+		HEAD: 'table2__row--head'
 	}
 };
 
@@ -37,11 +39,24 @@ class Table2Striper {
 	}
 
 	restripe() {
-		const rows = this.table.querySelectorAll( TABLE2_CONFIG.SELECTORS.BODY_ROW );
-		let isEven = false;
+		const rows = this.table.querySelectorAll( TABLE2_CONFIG.SELECTORS.ALL_ROWS );
+		let isEven = true;
 		let groupRemaining = 0;
 
 		rows.forEach( ( row ) => {
+			const isBodyRow = row.classList.contains( 'table2__row--body' );
+			const isSubheader = row.classList.contains( TABLE2_CONFIG.CLASSES.HEAD );
+
+			if ( isSubheader ) {
+				isEven = true;
+				groupRemaining = 0;
+				return;
+			}
+
+			if ( !isBodyRow || row.style.display === 'none' ) {
+				return;
+			}
+
 			if ( groupRemaining === 0 ) {
 				isEven = !isEven;
 			}
