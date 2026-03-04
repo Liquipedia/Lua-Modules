@@ -9,7 +9,6 @@ const TABLE2_CONFIG = {
 		BODY_ROW: 'tbody tr.table2__row--body'
 	},
 	CLASSES: {
-		ODD: 'table2__row--odd',
 		EVEN: 'table2__row--even'
 	}
 };
@@ -36,19 +35,18 @@ class Table2Striper {
 
 	restripe() {
 		const rows = this.table.querySelectorAll( TABLE2_CONFIG.SELECTORS.BODY_ROW );
-		let stripe = 'even';
+		let isEven = false;
 		let groupRemaining = 0;
 
 		rows.forEach( ( row ) => {
 			if ( groupRemaining === 0 ) {
-				stripe = ( stripe === 'even' ) ? 'odd' : 'even';
+				isEven = !isEven;
 			}
 
 			const rowspanCount = parseInt( row.dataset.rowspanCount, 10 ) || 1;
 			groupRemaining = Math.max( groupRemaining, rowspanCount );
 
-			row.classList.remove( TABLE2_CONFIG.CLASSES.ODD, TABLE2_CONFIG.CLASSES.EVEN );
-			row.classList.add( `table2__row--${ stripe }` );
+			row.classList.toggle( TABLE2_CONFIG.CLASSES.EVEN, isEven );
 
 			groupRemaining--;
 		} );
