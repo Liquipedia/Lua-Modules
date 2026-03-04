@@ -26,18 +26,7 @@ jobs:
         id: dependencies
         run: pip install requests
 
-      - name: Lua Protect
-        env:
-          WIKI_USER: ${{ secrets.LP_BOTUSER }}
-          WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
-          WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
-          WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
-          WIKI_TO_PROTECT: ${{ github.event.inputs.wiki }}
-          PYTHONUNBUFFERED: 1
-        run: python3 ./scripts/protect.py
-
       - name: Template Protect
-        if: steps.setup.outcome == 'success' && steps.dependencies.outcome == 'success'
         env:
           WIKI_USER: ${{ secrets.LP_BOTUSER }}
           WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
@@ -46,3 +35,14 @@ jobs:
           WIKI_TO_PROTECT: ${{ github.event.inputs.wiki }}
           PYTHONUNBUFFERED: 1
         run: python3 ./scripts/protect_templates.py
+
+      - name: Lua Protect
+        #if: steps.setup.outcome == 'success' && steps.dependencies.outcome == 'success'
+        env:
+          WIKI_USER: ${{ secrets.LP_BOTUSER }}
+          WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
+          WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
+          WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+          WIKI_TO_PROTECT: ${{ github.event.inputs.wiki }}
+          PYTHONUNBUFFERED: 1
+        run: python3 ./scripts/protect.py
