@@ -17,13 +17,16 @@ class Table2Striper {
 	constructor( table ) {
 		this.table = table;
 		this.isSortable = table.classList.contains( 'sortable' );
+		this.shouldStripe = table.getAttribute( 'data-striped' ) !== 'false';
 	}
 
 	init() {
-		this.restripe();
+		if ( this.shouldStripe ) {
+			this.restripe();
 
-		if ( this.isSortable ) {
-			this.setupSortListener();
+			if ( this.isSortable ) {
+				this.setupSortListener();
+			}
 		}
 	}
 
