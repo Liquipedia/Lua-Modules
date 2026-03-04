@@ -17,11 +17,13 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Setup Python
+        id: setup
         uses: actions/setup-python@v6
         with:
           python-version: '3.14'
 
       - name: Install Python Dependency
+        id: dependencies
         run: pip install requests
 
       - name: Lua Protect
@@ -33,3 +35,14 @@ jobs:
           WIKI_TO_PROTECT: ${{ github.event.inputs.wiki }}
           PYTHONUNBUFFERED: 1
         run: python3 ./scripts/protect.py
+
+      - name: Template Protect
+        if: steps.setup.outcome == 'success' && steps.dependencies.outcome == 'success'
+        env:
+          WIKI_USER: ${{ secrets.LP_BOTUSER }}
+          WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
+          WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
+          WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+          WIKI_TO_PROTECT: ${{ github.event.inputs.wiki }}
+          PYTHONUNBUFFERED: 1
+        run: python3 ./scripts/protect_templates.py
