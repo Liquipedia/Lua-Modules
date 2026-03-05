@@ -1,8 +1,9 @@
 import os
 
+from mediawiki_session import MediaWikiSession
 from protect_page import (
-    protect_non_existing_page,
-    protect_existing_page,
+    protect_non_existing_pages,
+    protect_existing_pages,
     handle_protect_errors,
 )
 
@@ -11,15 +12,19 @@ WIKI_TO_PROTECT = os.getenv("WIKI_TO_PROTECT")
 
 def main():
     with open("./templates/templatesToProtect", "r") as templates_to_protect:
-        for template_name in templates_to_protect.read().splitlines():
-            if len(template_name.strip()) == 0:
-                continue
-            template = "Template:" + template_name
-            print(f"::group::Checking {WIKI_TO_PROTECT}:{template}")
+        templates = [
+            "Template:" + template_name
+            for template_name in filter(
+                lambda template: len(template.strip()) > 0,
+                templates_to_protect.read().splitlines(),
+            )
+        ]
+        with MediaWikiSession(WIKI_TO_PROTECT) as session:
+            print(f"::group::Protecting {WIKI_TO_PROTECT}")
             if WIKI_TO_PROTECT == "commons":
-                protect_existing_page(template, WIKI_TO_PROTECT)
+                protect_existing_pages(session, templates)
             else:
-                protect_non_existing_page(template, WIKI_TO_PROTECT)
+                protect_non_existing_pages(session, templates)
             print("::endgroup::")
     handle_protect_errors()
 
