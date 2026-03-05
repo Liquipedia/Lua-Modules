@@ -20,6 +20,7 @@ class Table2Striper {
 		this.table = table;
 		this.isSortable = table.classList.contains( 'sortable' );
 		this.shouldStripe = table.getAttribute( 'data-striped' ) !== 'false';
+		this.groupCounter = 0;
 	}
 
 	init() {
@@ -30,6 +31,7 @@ class Table2Striper {
 				this.setupSortListener();
 			}
 		}
+		this.setupHoverListeners();
 	}
 
 	setupSortListener() {
@@ -42,6 +44,7 @@ class Table2Striper {
 		const rows = this.table.querySelectorAll( TABLE2_CONFIG.SELECTORS.ALL_ROWS );
 		let isEven = true;
 		let groupRemaining = 0;
+		this.groupCounter = 0;
 
 		rows.forEach( ( row ) => {
 			const isBodyRow = row.classList.contains( 'table2__row--body' );
@@ -50,6 +53,7 @@ class Table2Striper {
 			if ( isSubheader ) {
 				isEven = true;
 				groupRemaining = 0;
+				row.removeAttribute( 'data-group-id' );
 				return;
 			}
 
@@ -59,15 +63,60 @@ class Table2Striper {
 
 			if ( groupRemaining === 0 ) {
 				isEven = !isEven;
+				this.groupCounter++;
 			}
 
 			const rowspanCount = parseInt( row.dataset.rowspanCount, 10 ) || 1;
 			groupRemaining = Math.max( groupRemaining, rowspanCount );
 
 			row.classList.toggle( TABLE2_CONFIG.CLASSES.EVEN, isEven );
+			row.setAttribute( 'data-group-id', this.groupCounter );
 
 			groupRemaining--;
 		} );
+	}
+
+	setupHoverListeners() {
+		const bodyRows = this.table.querySelectorAll( TABLE2_CONFIG.SELECTORS.BODY_ROW );
+
+		bodyRows.forEach( ( row ) => {
+			row.addEventListener( 'mouseenter', ( e ) => this.onRowHoverEnter( e ) );
+			row.addEventListener( 'mouseleave', ( e ) => this.onRowHoverLeave( e ) );
+		} );
+	}
+
+	onRowHoverEnter( event ) {
+		const row = event.target.closest( TABLE2_CONFIG.SELECTORS.BODY_ROW );
+		if ( !row ) {
+			return;
+		}
+
+		const groupId = row.getAttribute( 'data-group-id' );
+		if ( !groupId ) {
+			return;
+		}
+
+		const groupRows = this.table.querySelectorAll(
+			`${ TABLE2_CONFIG.SELECTORS.BODY_ROW }[data-group-id="${ groupId }"]`
+		);
+		groupRows.forEach( ( r ) => r.classList.add( 'table2__row--group-hover' ) );
+	}
+
+	onRowHoverLeave( event ) {
+		const row = event.target.closest( TABLE2_CONFIG.SELECTORS.BODY_ROW );
+		if ( !row ) {
+			return;
+		}
+
+		const groupId = row.getAttribute( 'data-group-id' );
+		if ( !groupId ) {
+			return;
+		}
+
+		const groupRows = this.table.querySelectorAll(
+			`${ TABLE2_CONFIG.SELECTORS.BODY_ROW }[data-group-id="${ groupId }"]`
+		);
+		groupRows.forEach( ( r ) => r.classList.remove( 'table2__row--group-hover' ) );
 	}
 }
 
