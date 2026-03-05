@@ -44,7 +44,8 @@ def protect_pages(
                     "bot": "true",
                     "token": session.token,
                 },
-            )
+            )["protections"]
+            
             for protection in protections:
                 if protection[protect_mode] == "allow-only-sysop":
                     return
