@@ -259,14 +259,4 @@ $table2-cell-padding-x: 0.75rem;
 	overflow: hidden;
 
 	@include table2-surface-colors();
-
-	tbody tr:not( :has( th ):not( :has( td ) ) ):hover {
-		.theme--light & {
-			background-color: var( --clr-on-surface-light-primary-8 );
-		}
-
-		.theme--dark & {
-			background-color: var( --clr-on-surface-dark-primary-8 );
-		}
-	}
 }
