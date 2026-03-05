@@ -132,12 +132,10 @@ return {
 				table = 'datapoint',
 				conditions = Condition.Tree(BooleanOperator.all):add{
 					Condition.Node(Condition.ColumnName('type'), Comparator.eq, 'card'),
-					Condition.Tree(BooleanOperator.any):add{
-						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Troop'),
-						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Tower Troop'),
-						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Spell'),
-						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Building'),
-					}
+					Condition.Util.anyOf(
+						Condition.ColumnName('type', 'extradata'),
+						{'Troop', 'Tower Troop', 'Spell', 'Building'}
+					)
 				}
 			},
 		},
@@ -150,12 +148,10 @@ return {
 				table = 'datapoint',
 				conditions = Condition.Tree(BooleanOperator.all):add{
 					Condition.Node(Condition.ColumnName('type'), Comparator.eq, 'card'),
-					Condition.Tree(BooleanOperator.any):add{
-						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Evolved Troop'),
-						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Evolved Tower Troop'),
-						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Evolved Spell'),
-						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Evolved Building'),
-					}
+					Condition.Util.anyOf(
+						Condition.ColumnName('type', 'extradata'),
+						{'Evolved Troop', 'Evolved Tower Troop', 'Evolved Spell', 'Evolved Building'}
+					)
 				}
 			},
 		},
@@ -168,10 +164,10 @@ return {
 				table = 'datapoint',
 				conditions = Condition.Tree(BooleanOperator.all):add{
 					Condition.Node(Condition.ColumnName('type'), Comparator.eq, 'card'),
-					Condition.Tree(BooleanOperator.any):add{
-						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Hero Troop'),
-						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Hero Spell'),
-					}
+					Condition.Util.anyOf(
+						Condition.ColumnName('type', 'extradata'),
+						{'Hero Troop', 'Hero Spell'}
+					)
 				}
 			},
 		},
