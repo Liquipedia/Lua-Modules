@@ -10,7 +10,7 @@ on:
 jobs:
   protect:
     if: github.ref_name == github.event.repository.default_branch
-    name: Protect modules on newly set up wiki
+    name: Protect modules and templates on newly set up wiki
     runs-on: ubuntu-latest
 
     steps:
@@ -22,6 +22,7 @@ jobs:
           python-version: '3.14'
 
       - name: Install Python Dependency
+        id: dependencies
         run: pip install requests
 
       - name: Template Protect
@@ -33,3 +34,15 @@ jobs:
           WIKI_TO_PROTECT: ${{ github.event.inputs.wiki }}
           PYTHONUNBUFFERED: 1
         run: python3 ./scripts/protect_templates.py
+
+      - name: Lua Protect
+        #if condition is needed this way to ensure it runs even if template protect fails
+        if: always() && steps.dependencies.outcome == 'success'
+        env:
+          WIKI_USER: ${{ secrets.LP_BOTUSER }}
+          WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
+          WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
+          WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+          WIKI_TO_PROTECT: ${{ github.event.inputs.wiki }}
+          PYTHONUNBUFFERED: 1
+        run: python3 ./scripts/protect.py
