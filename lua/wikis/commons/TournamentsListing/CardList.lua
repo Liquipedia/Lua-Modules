@@ -347,18 +347,11 @@ end
 
 ---@private
 ---@param opponents table[]
----@return Widget
+---@return Widget[]
 function BaseTournamentsListing:_buildParticipants(opponents)
-	return HtmlWidgets.Div{
-		css = {
-			display = 'inline-grid',
-			['grid-template-columns'] = 'repeat( auto-fit, minmax( 150px, 1fr ) )',
-			['min-width'] = '15vw'
-		},
-		children = Array.map(opponents, function (opponent)
-			return OpponentDisplay.BlockOpponent{opponent = opponent}
-		end)
-	}
+	return Array.map(opponents, function (opponent)
+		return OpponentDisplay.BlockOpponent{opponent = opponent}
+	end)
 end
 
 ---@private
