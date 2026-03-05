@@ -15,7 +15,7 @@ def remove_page(session: MediaWikiSession, page: str):
     print(f"deleting {session.wiki}:{page}")
 
     try:
-        session.post(
+        session.make_action(
             "delete",
             data={
                 "title": page,
