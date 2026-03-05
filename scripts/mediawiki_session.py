@@ -20,6 +20,7 @@ __all__ = [
     "MediaWikiSessionError",
 ]
 
+ACTIONS_STEP_DEBUG = os.getenv("ACTIONS_STEP_DEBUG") == "true"
 DEPLOY_TRIGGER = os.getenv("DEPLOY_TRIGGER")
 WIKI_BASE_URL = os.getenv("WIKI_BASE_URL")
 WIKI_USER = os.getenv("WIKI_USER")
@@ -71,9 +72,12 @@ class MediaWikiSession(contextlib.AbstractContextManager):
     @functools.cached_property
     def token(self) -> str:
         self._login()
-        return self.make_action("query", params={"meta": "tokens"})["tokens"][
+        token = self.make_action("query", params={"meta": "tokens"})["tokens"][
             "csrftoken"
         ]
+        if ACTIONS_STEP_DEBUG:
+            print(f"::add-mask::{token}")
+        return token
 
     @property
     def wiki(self) -> str:
@@ -85,12 +89,18 @@ class MediaWikiSession(contextlib.AbstractContextManager):
         merged_params = {"format": "json", "action": action}
         if params is not None:
             merged_params = merged_params | params
-        response: dict = self.__session.post(
+        response = self.__session.post(
             self.__get_wiki_api_url(), params=merged_params, data=data
-        ).json()
-        if "error" in response.keys():
-            raise MediaWikiSessionError(response["error"]["info"])
-        return response[action]
+        )
+        if ACTIONS_STEP_DEBUG:
+            print(f"params: {merged_params}")
+            print(f"data: {data}")
+            print(f"HTTP Status: {response.status_code}")
+            print(f"Raw response: \"{response}\"")
+        parsed_response: dict[str, Any] = response.json()
+        if "error" in parsed_response.keys():
+            raise MediaWikiSessionError(parsed_response["error"]["info"])
+        return parsed_response[action]
 
     def cooldown(self):
         time.sleep(SLEEP_DURATION)
