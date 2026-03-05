@@ -2,13 +2,19 @@ import contextlib
 import functools
 import http.cookiejar
 import os
+import pathlib
 import time
 
 import requests
 
 from typing import Any, Optional
 
-from deploy_util import HEADER, SLEEP_DURATION
+from deploy_util import (
+    DEPLOY_TRIGGER,
+    HEADER,
+    SLEEP_DURATION,
+    write_to_github_summary_file,
+)
 
 __all__ = [
     "MediaWikiSession",
@@ -90,6 +96,57 @@ class MediaWikiSession(contextlib.AbstractContextManager):
 
     def cooldown(self):
         time.sleep(SLEEP_DURATION)
+
+    def deploy_file(
+        self,
+        file_path: pathlib.Path,
+        file_content: str,
+        target_page: str,
+        deploy_reason: str,
+    ) -> tuple[bool, bool]:
+        try:
+            change_made = False
+            deployed = True
+            response = self.make_action(
+                "edit",
+                data={
+                    "title": target_page,
+                    "text": file_content,
+                    "summary": f"Git: {deploy_reason}",
+                    "bot": "true",
+                    "recreate": "true",
+                    "token": self.token,
+                },
+            )
+            result = response.get("result")
+            new_rev_id = response.get("newrevid")
+            if result == "Success":
+                if new_rev_id is not None:
+                    change_made = True
+                    if DEPLOY_TRIGGER != "push":
+                        print(f"::warning file={str(file_path)}::File changed")
+                print(f"...{result}")
+                print("...done")
+                write_to_github_summary_file(
+                    f":information_source: {str(file_path)} successfully deployed"
+                )
+
+            else:
+                print(f"::warning file={str(file_path)}::failed to deploy")
+                write_to_github_summary_file(
+                    f":warning: {str(file_path)} failed to deploy"
+                )
+                deployed = False
+            time.sleep(SLEEP_DURATION)
+            return deployed, change_made
+        except MediaWikiSessionError as e:
+            print(f"::warning file={str(file_path)}::failed to deploy (API error)")
+            write_to_github_summary_file(
+                f":warning: {str(file_path)} failed to deploy due to API error: {str(e)}"
+            )
+            deployed = False
+            time.sleep(SLEEP_DURATION)
+            return deployed, change_made
 
     def close(self):
         self.__cookie_jar.save(ignore_discard=True)
