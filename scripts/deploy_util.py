@@ -32,14 +32,15 @@ HEADER = {
 SLEEP_DURATION = 4
 
 
-def get_wikis() -> set[str]:
+@functools.cache
+def get_wikis() -> frozenset[str]:
     response = requests.get(
         "https://liquipedia.net/api.php",
         headers=HEADER,
     )
     wikis = response.json()
     time.sleep(SLEEP_DURATION)
-    return set(wikis["allwikis"].keys())
+    return frozenset(wikis["allwikis"].keys())
 
 
 @functools.cache
