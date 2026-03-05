@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       page:
-        description: 'Page to protect (prefix with namespace and use underscores!)'
+        description: 'Page to protect (prefix with namespace!)'
         required: true
 
 jobs:
