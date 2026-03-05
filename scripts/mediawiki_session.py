@@ -63,7 +63,7 @@ class MediaWikiSession(contextlib.AbstractContextManager):
             data={
                 "lgname": WIKI_USER,
                 "lgpassword": WIKI_PASSWORD,
-                "lgtoken": token_response["query"]["tokens"]["logintoken"],
+                "lgtoken": token_response["tokens"]["logintoken"],
             },
         )
         self.__cookie_jar.save(ignore_discard=True)
