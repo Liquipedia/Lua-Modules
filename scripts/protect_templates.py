@@ -20,7 +20,7 @@ def main():
             )
         ]
         with MediaWikiSession(WIKI_TO_PROTECT) as session:
-            print(f"::group::Checking {WIKI_TO_PROTECT}")
+            print(f"::group::Protecting {WIKI_TO_PROTECT}")
             if WIKI_TO_PROTECT == "commons":
                 protect_existing_pages(session, templates)
             else:

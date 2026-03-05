@@ -34,8 +34,10 @@ def protect_new_wiki(wiki_to_protect: str):
             commons_modules.add(page)
 
     with MediaWikiSession(wiki_to_protect) as session:
+        print(f"::group::Protecting {WIKI_TO_PROTECT}")
         protect_non_existing_pages(session, commons_modules - local_modules)
         protect_existing_pages(session, local_modules)
+        print("::endgroup::")
 
     handle_protect_errors()
 
