@@ -166,7 +166,13 @@ return {
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[extradata_type::Hero Troop]]',
+				conditions = Condition.Tree(BooleanOperator.all):add{
+					Condition.Node(Condition.ColumnName('type'), Comparator.eq, 'card'),
+					Condition.Tree(BooleanOperator.any):add{
+						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Hero Troop'),
+						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Hero Spell'),
+					}
+				}:toString()
 			},
 		},
 		{
