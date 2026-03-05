@@ -64,7 +64,7 @@ def protect_pages(
 def protect_non_existing_pages(session: MediaWikiSession, pages: Iterable[str]):
     def filter_non_existing_pages(page: str) -> bool:
         try:
-            result = session.post(
+            result = session.make_action(
                 "query",
                 data={"titles": page, "prop": "info"},
             )
