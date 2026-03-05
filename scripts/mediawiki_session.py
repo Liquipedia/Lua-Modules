@@ -10,9 +10,10 @@ import requests
 from typing import Any, Optional
 
 from deploy_util import (
-    DEPLOY_TRIGGER,
     HEADER,
     SLEEP_DURATION,
+    WIKI_BASE_URL,
+    read_cookie_jar,
     write_to_github_summary_file,
 )
 
@@ -21,15 +22,9 @@ __all__ = [
     "MediaWikiSessionError",
 ]
 
-USER_AGENT = f"GitHub Autodeploy Bot/2.0.0 ({os.getenv('WIKI_UA_EMAIL')})"
-WIKI_BASE_URL = os.getenv("WIKI_BASE_URL")
+DEPLOY_TRIGGER = os.getenv("DEPLOY_TRIGGER")
 WIKI_USER = os.getenv("WIKI_USER")
 WIKI_PASSWORD = os.getenv("WIKI_PASSWORD")
-HEADER = {
-    "User-Agent": USER_AGENT,
-    "accept": "application/json",
-    "Accept-Encoding": "gzip",
-}
 
 
 class MediaWikiSessionError(IOError):
@@ -49,15 +44,11 @@ class MediaWikiSession(contextlib.AbstractContextManager):
         self.__session.headers.update(HEADER)
 
     def __read_cookie_jar(self) -> http.cookiejar.FileCookieJar:
-        ckf = f"cookie_{self.__wiki}.ck"
-        cookie_jar = http.cookiejar.LWPCookieJar(filename=ckf)
-        with contextlib.suppress(OSError):
-            cookie_jar.load(ignore_discard=True)
-        return cookie_jar
+        return read_cookie_jar(self.wiki)
 
     @functools.cache
     def __get_wiki_api_url(self):
-        return f"{WIKI_BASE_URL}/{self.__wiki}/api.php"
+        return f"{WIKI_BASE_URL}/{self.wiki}/api.php"
 
     def _login(self):
         token_response = self.make_action(
