@@ -94,8 +94,8 @@ def protect_existing_page(page: str, wiki: str):
 def handle_protect_errors():
     if len(protect_errors) == 0:
         return
-    print("::warning::Some templates could not be protected")
-    write_to_github_summary_file(":warning: Some templates could not be protected")
+    print("::warning::Some pages could not be protected")
+    write_to_github_summary_file(":warning: Some pages could not be protected")
     print("::group::Failed protections")
     for protect_error in protect_errors:
         print(f"... {protect_error}")
