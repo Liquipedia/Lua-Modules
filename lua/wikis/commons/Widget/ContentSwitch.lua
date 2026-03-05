@@ -57,12 +57,12 @@ function ContentSwitch:render()
 		local isActive = index == defaultActive
 		local classes = {'switch-pill-option', 'toggle-area-button'}
 		if self.props.size == 'small' then
-			table.insert(classes, 'switch-pill-small')
+			table.insert(classes, 'switch-pill-option-small')
 		elseif self.props.size == 'extrasmall' then
-			table.insert(classes, 'switch-pill-extrasmall')
+			table.insert(classes, 'switch-pill-option-extrasmall')
 		end
 		if isActive then
-			table.insert(classes, 'switch-pill-active')
+			table.insert(classes, 'switch-pill-option-active')
 		end
 
 		return Div{
@@ -90,6 +90,10 @@ function ContentSwitch:render()
 	if variant == 'generic' then
 		table.insert(switchPillClasses, 'switch-pill-generic')
 	end
+	if self.props.size == 'extrasmall' then
+		table.insert(switchPillClasses, 'switch-pill-extrasmall')
+	end
+
 
 	return Div{
 		classes = {'toggle-area', 'toggle-area-' .. tostring(defaultActive)},
