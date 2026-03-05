@@ -81,6 +81,10 @@ class MediaWikiSession(contextlib.AbstractContextManager):
             "csrftoken"
         ]
 
+    @property
+    def wiki(self) -> str:
+        return self.__wiki
+
     def make_action(
         self, action: str, params: Optional[dict] = None, data: Optional[dict] = None
     ) -> dict[str, Any]:
