@@ -104,6 +104,12 @@ return {
 		participants = {
 			defaultPlayerNumber = 5,
 		},
+		tournamentsListing = {
+			showTier = true,
+			showGameIcon = true,
+			useParent = false,
+			onlyTierTypeIfBoth = false,
+		},
 	},
 	defaultRoundPrecision = 0,
 }
