@@ -33,16 +33,17 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Table2Row = Class.new(Widget)
 
 ---@param rowChildren (Widget|Html|string|number|nil)[]
----@return integer
+---@return integer|nil
 local function getMaxRowspan(rowChildren)
-	return Array.reduce(rowChildren, function(maxRowspan, child)
+	local maxRowspan = Array.reduce(rowChildren, function(max, child)
 		if Class.instanceOf(child, Table2Cell) or Class.instanceOf(child, Table2CellHeader) then
 			local cellChild = child --[[@as Table2Cell|Table2CellHeader]]
 			local rowspan = MathUtil.toInteger(cellChild.props.rowspan) or 1
-			return math.max(maxRowspan, math.max(rowspan, 1))
+			return math.max(max, math.max(rowspan, 1))
 		end
-		return maxRowspan
+		return max
 	end, 1)
+	return maxRowspan > 1 and maxRowspan or nil
 end
 
 ---@return Widget
@@ -117,7 +118,9 @@ function Table2Row:render()
 	local attributes = props.attributes or {}
 	if section == 'body' then
 		local maxRowspan = getMaxRowspan(children)
-		attributes['data-rowspan-count'] = maxRowspan
+		if maxRowspan then
+			attributes['data-rowspan-count'] = maxRowspan
+		end
 	end
 
 	return HtmlWidgets.Tr{
