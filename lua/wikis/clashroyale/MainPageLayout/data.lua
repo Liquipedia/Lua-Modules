@@ -138,7 +138,7 @@ return {
 						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Spell'),
 						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Building'),
 					}
-				}:toString()
+				}
 			},
 		},
 		{
@@ -156,7 +156,7 @@ return {
 						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Evolved Spell'),
 						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Evolved Building'),
 					}
-				}:toString()
+				}
 			},
 		},
 		{
@@ -172,7 +172,7 @@ return {
 						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Hero Troop'),
 						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Hero Spell'),
 					}
-				}:toString()
+				}
 			},
 		},
 		{
