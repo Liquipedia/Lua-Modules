@@ -392,7 +392,7 @@ function CustomLeague:_createValveTierCell()
 			},
 			showInfoIcon and Link{
 				children = {IconFontawesome{
-					faName = 'info-circle',
+					iconName = 'general-info',
 					hover = 'Click for further details',
 				}},
 				link = '#Valve Operational Requirements'
