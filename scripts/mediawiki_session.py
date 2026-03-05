@@ -95,5 +95,8 @@ class MediaWikiSession(contextlib.AbstractContextManager):
         self.__cookie_jar.save(ignore_discard=True)
         self.__session.close()
 
+    def __enter__(self):
+        return self
+
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
