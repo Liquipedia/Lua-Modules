@@ -1,7 +1,3 @@
-/* eslint-env node */
-/* eslint-disable no-console */
-/* eslint-disable security/detect-non-literal-fs-filename */
-
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 
