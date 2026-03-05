@@ -133,10 +133,10 @@ return {
 				conditions = Condition.Tree(BooleanOperator.all):add{
 					Condition.Node(Condition.ColumnName('type'), Comparator.eq, 'card'),
 					Condition.Tree(BooleanOperator.any):add{
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Tower Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Spell'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Building'),
+						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Troop'),
+						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Tower Troop'),
+						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Spell'),
+						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Building'),
 					}
 				}:toString()
 			},
@@ -151,10 +151,10 @@ return {
 				conditions = Condition.Tree(BooleanOperator.all):add{
 					Condition.Node(Condition.ColumnName('type'), Comparator.eq, 'card'),
 					Condition.Tree(BooleanOperator.any):add{
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Tower Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Spell'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Building'),
+						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Evolved Troop'),
+						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Evolved Tower Troop'),
+						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Evolved Spell'),
+						Condition.Node(Condition.ColumnName('type', 'extradata'), Comparator.eq, 'Evolved Building'),
 					}
 				}:toString()
 			},
