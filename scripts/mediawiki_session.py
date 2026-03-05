@@ -10,6 +10,11 @@ from typing import Any, Optional
 
 from deploy_util import HEADER, SLEEP_DURATION
 
+__all__ = [
+    "MediaWikiSession",
+    "MediaWikiSessionError",
+]
+
 USER_AGENT = f"GitHub Autodeploy Bot/2.0.0 ({os.getenv('WIKI_UA_EMAIL')})"
 WIKI_BASE_URL = os.getenv("WIKI_BASE_URL")
 WIKI_USER = os.getenv("WIKI_USER")
@@ -66,7 +71,9 @@ class MediaWikiSession(contextlib.AbstractContextManager):
     @functools.cached_property
     def token(self) -> str:
         self._login()
-        return self.make_action("query", params={"meta": "tokens"})["tokens"]["csrftoken"]
+        return self.make_action("query", params={"meta": "tokens"})["tokens"][
+            "csrftoken"
+        ]
 
     def make_action(
         self, action: str, params: Optional[dict] = None, data: Optional[dict] = None
