@@ -26,7 +26,7 @@ local Div = HtmlWidgets.Div
 ---@field defaultActive integer
 ---@field switchGroup string
 ---@field classes string[]?
----@field size 'small'|'medium'
+---@field size 'extrasmall'|'small'|'medium'
 ---@field storeValue boolean
 ---@field css table?
 
@@ -36,9 +36,9 @@ local Div = HtmlWidgets.Div
 local ContentSwitch = Class.new(Widget)
 ContentSwitch.defaultProps = {
 	tabs = {},
-	variant = 'themed',
+	variant = 'generic',
 	defaultActive = 1,
-	size = 'medium',
+	size = 'extrasmall',
 	storeValue = true,
 }
 
@@ -58,6 +58,8 @@ function ContentSwitch:render()
 		local classes = {'switch-pill-option', 'toggle-area-button'}
 		if self.props.size == 'small' then
 			table.insert(classes, 'switch-pill-small')
+		elseif self.props.size == 'extrasmall' then
+			table.insert(classes, 'switch-pill-extrasmall')
 		end
 		if isActive then
 			table.insert(classes, 'switch-pill-active')
