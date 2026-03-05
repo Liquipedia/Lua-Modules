@@ -45,14 +45,15 @@ def protect_pages(
                     "token": session.token,
                 },
             )["protections"]
-            
+
             for protection in protections:
                 if protection[protect_mode] == "allow-only-sysop":
-                    return
-            print(
-                f"::warning::could not ({protect_mode}) protect {page} on {session.wiki}"
-            )
-            protect_errors.append(f"{protect_mode}:{session.wiki}:{page}")
+                    break
+            else:
+                print(
+                    f"::warning::could not ({protect_mode}) protect {page} on {session.wiki}"
+                )
+                protect_errors.append(f"{protect_mode}:{session.wiki}:{page}")
         except MediaWikiSessionError as e:
             print(
                 f"::warning::could not ({protect_mode}) protect {page} on {session.wiki}: {str(e)}"
