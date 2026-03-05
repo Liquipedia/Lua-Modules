@@ -779,7 +779,7 @@ liquipedia.customLuaErrors = {
 					$newError.on( 'click', ( e ) => {
 						$dialog.dialog( 'close' ).html( $errorDiv ).dialog( 'option', 'position', [ e.clientX + 5, e.clientY + 5 ] ).dialog( 'open' );
 					} );
-				} catch ( ignored ) {}
+				} catch {}
 			} );
 		} );
 	}

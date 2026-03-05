@@ -57,6 +57,10 @@ local CONTENT = {
 					link = 'Liquipedia:Policy',
 					children = 'Policies',
 				}},
+				Li{children = Link{
+					link = 'Community Showcase',
+					children = 'Community Showcase',
+				}},
 			}},
 			HtmlWidgets.Br{classes = {'mobile-hide'}},
 		}},

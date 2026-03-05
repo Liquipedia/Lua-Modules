@@ -30,16 +30,19 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 ---@field attributes {[string]: any}?
 
 ---@class Table2Props
----@field children (Widget|Html|string|number|nil)[]?
+---@field children Renderable[]?
 ---@field variant 'generic'|'themed'?
 ---@field sortable (string|number|boolean)?
----@field caption Widget|Html|string|number?
----@field title Widget|Html|string|number?
----@field footer Widget|Html|string|number?
+---@field striped (string|number|boolean)?
+---@field caption Renderable|Renderable[]?
+---@field title Renderable|Renderable[]?
+---@field footer Renderable|Renderable[]?
 ---@field classes string[]?
+---@field tableClasses string[]?
 ---@field columns Table2ColumnDef[]?
 ---@field css {[string]: string|number|nil}?
 ---@field attributes {[string]: any}?
+---@field tableAttributes {[string]: any}?
 
 ---@class Table2: Widget
 ---@operator call(Table2Props): Table2
@@ -49,11 +52,12 @@ local Table2 = Class.new(Widget)
 Table2.defaultProps = {
 	variant = 'generic',
 	sortable = false,
+	striped = true,
 	classes = {},
 	columns = {},
 }
 
----@return (Widget|Html|string|number|nil)[]
+---@return Widget[]
 function Table2:render()
 	local props = self.props
 
@@ -69,28 +73,37 @@ function Table2:render()
 
 	local tableClasses = WidgetUtil.collect(
 		'table2__table',
-		Logic.readBool(props.sortable) and 'sortable' or nil
+		Logic.readBool(props.sortable) and 'sortable' or nil,
+		props.tableClasses
 	)
 
 	local captionNode = props.caption and HtmlWidgets.Div{
 		classes = {'table2__caption'},
-		children = {props.caption},
+		children = props.caption,
 	} or nil
 
 	local titleNode = props.title and HtmlWidgets.Div{
 		classes = {'table2__title'},
-		children = {props.title},
+		children = props.title,
 	} or nil
 
 	local tableChildren = props.children
 	if props.columns and #props.columns > 0 then
 		tableChildren = {Table2Contexts.ColumnContext{
 			value = props.columns,
-			children = props.children,
+			children = tableChildren,
+		}}
+	end
+
+	if Logic.readBool(props.striped) then
+		tableChildren = {Table2Contexts.BodyStripe{
+			value = true,
+			children = tableChildren,
 		}}
 	end
 
 	local tableNode = HtmlWidgets.Table{
+		attributes = props.tableAttributes,
 		classes = tableClasses,
 		children = tableChildren,
 	}
@@ -102,7 +115,7 @@ function Table2:render()
 
 	local footerNode = props.footer and HtmlWidgets.Div{
 		classes = {'table2__footer'},
-		children = {props.footer},
+		children = props.footer,
 	} or nil
 
 	local tableWrapperNode = HtmlWidgets.Div{

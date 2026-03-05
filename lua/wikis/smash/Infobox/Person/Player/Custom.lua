@@ -12,7 +12,7 @@ local Array = Lua.import('Module:Array')
 local Characters = Lua.import('Module:Characters')
 local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local String = Lua.import('Module:StringUtils')
 local Template = Lua.import('Module:Template')
 local YearsActive = Lua.import('Module:YearsActive') -- TODO Convert to use the commons YearsActive
