@@ -91,7 +91,7 @@ class MediaWikiSession(contextlib.AbstractContextManager):
     ) -> dict[str, Any]:
         merged_params = {"format": "json", "action": action}
         if params is not None:
-            merged_params = merged_params | params
+            merged_params |= params
         response = self.__session.post(
             self.__get_wiki_api_url(), params=merged_params, data=data
         )
