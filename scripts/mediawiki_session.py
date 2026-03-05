@@ -12,8 +12,6 @@ from typing import Any, Optional
 from deploy_util import (
     HEADER,
     SLEEP_DURATION,
-    WIKI_BASE_URL,
-    read_cookie_jar,
     write_to_github_summary_file,
 )
 
@@ -24,6 +22,7 @@ __all__ = [
 
 DEPLOY_TRIGGER = os.getenv("DEPLOY_TRIGGER")
 DRY_RUN = bool(int(os.getenv("DRY_RUN", 0)))
+WIKI_BASE_URL = os.getenv("WIKI_BASE_URL")
 WIKI_USER = os.getenv("WIKI_USER")
 WIKI_PASSWORD = os.getenv("WIKI_PASSWORD")
 
@@ -45,7 +44,11 @@ class MediaWikiSession(contextlib.AbstractContextManager):
         self.__session.headers.update(HEADER)
 
     def __read_cookie_jar(self) -> http.cookiejar.FileCookieJar:
-        return read_cookie_jar(self.wiki)
+        ckf = f"cookie_{self.wiki}.ck"
+        cookie_jar = http.cookiejar.LWPCookieJar(filename=ckf)
+        with contextlib.suppress(OSError):
+            cookie_jar.load(ignore_discard=True)
+        return cookie_jar
 
     @functools.cache
     def __get_wiki_api_url(self):
