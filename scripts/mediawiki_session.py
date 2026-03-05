@@ -141,7 +141,6 @@ class MediaWikiSession(contextlib.AbstractContextManager):
                     f":warning: {str(file_path)} failed to deploy"
                 )
                 deployed = False
-            time.sleep(SLEEP_DURATION)
             return deployed, change_made
         except MediaWikiSessionError as e:
             print(f"::warning file={str(file_path)}::failed to deploy (API error)")
@@ -149,8 +148,9 @@ class MediaWikiSession(contextlib.AbstractContextManager):
                 f":warning: {str(file_path)} failed to deploy due to API error: {str(e)}"
             )
             deployed = False
-            time.sleep(SLEEP_DURATION)
             return deployed, change_made
+        finally:
+            self.cooldown()
 
     def close(self):
         self.__cookie_jar.save(ignore_discard=True)
