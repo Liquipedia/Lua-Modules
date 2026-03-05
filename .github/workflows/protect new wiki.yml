@@ -17,7 +17,6 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Setup Python
-        id: setup
         uses: actions/setup-python@v6
         with:
           python-version: '3.14'
@@ -38,7 +37,7 @@ jobs:
 
       - name: Lua Protect
         #if condition is needed this way to ensure it runs even if template protect fails
-        if: always() && steps.setup.outcome == 'success' && steps.dependencies.outcome == 'success'
+        if: always() && steps.dependencies.outcome == 'success'
         env:
           WIKI_USER: ${{ secrets.LP_BOTUSER }}
           WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
