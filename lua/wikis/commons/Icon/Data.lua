@@ -126,4 +126,7 @@ return {
 
 	-- Usage: Charts
 	chart = 'far fa-chart-line',
+
+	-- Usage: Info button
+	['general-info'] = 'fas fa-info-circle'
 }
