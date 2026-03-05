@@ -5,7 +5,7 @@
 
 const TABLE2_CONFIG = {
 	SELECTORS: {
-		TABLE: '.table2__table',
+		TABLE: '.table2 .table2__table',
 		BODY_ROW: 'tbody tr.table2__row--body',
 		ALL_ROWS: 'tbody tr'
 	},

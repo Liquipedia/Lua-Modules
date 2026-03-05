@@ -158,6 +158,16 @@ $table2-cell-padding-x: 0.75rem;
 			}
 		}
 
+		&.table2__row--highlighted:hover {
+			.theme--light & {
+				background-color: var( --clr-semantic-gold-85 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-semantic-gold-18 );
+			}
+		}
+
 		&.table2__row--group-hover {
 			.theme--light & {
 				background-color: var( --clr-on-surface-light-primary-8 );
@@ -168,7 +178,7 @@ $table2-cell-padding-x: 0.75rem;
 			}
 		}
 
-		&.table2__row--highlighted:hover {
+		&.table2__row--highlighted.table2__row--group-hover {
 			.theme--light & {
 				background-color: var( --clr-semantic-gold-85 );
 			}
