@@ -304,10 +304,10 @@ function BaseTournamentsListing:_row(tournamentData)
 				or nil,
 			TableWidgets.Cell{
 				classes = {
-					status == POSTPONED or status == DELAYED and 'bg-second' or nil
+					(status == POSTPONED or status == DELAYED) and 'bg-second' or nil
 				},
 				css = {
-					['font-style'] = status == POSTPONED or status == DELAYED and 'italic' or nil,
+					['font-style'] = (status == POSTPONED or status == DELAYED) and 'italic' or nil,
 				},
 				children = BaseTournamentsListing._dateDisplay(tournamentData.startdate, tournamentData.enddate, status)
 			},
