@@ -11,7 +11,8 @@ return {
 	name = 'Rainbow Six',
 	defaultGame = 'siege',
 	games = {
-		-- Name update, since 2026 back to "Siege", removing the "X", but using the new game-build and ban-system from the start with SiegeX (2025)
+		-- Name update, since 2026 back to "Siege", removing the "X", 
+		-- but using the new game-build and ban-system from the start with SiegeX (2025)
 		siegex = {
 			abbreviation = 'R6S',
 			name = 'Tom Clancy\'s Rainbow Six Siege (2025)',
