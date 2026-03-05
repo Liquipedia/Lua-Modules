@@ -1,22 +1,24 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:BroadcasterCard
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Flags = require('Module:Flags')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
-local Variables = require('Module:Variables')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Flags = Lua.import('Module:Flags')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
+local Variables = Lua.import('Module:Variables')
 
 local Weight = Lua.requireIfExists('Module:BroadCasterWeight')
 
@@ -62,7 +64,7 @@ function BroadcasterCard.create(frame)
 	if args.title then
 		title = args.title
 	elseif position == TBD then
-		title = Abbreviation.make(TBD, 'To Be Determined')
+		title = Abbreviation.make{text = TBD, title = 'To Be Determined'}
 	else
 		-- Create a title from the position.
 		local positions = Array.map(
@@ -87,7 +89,7 @@ function BroadcasterCard.create(frame)
 	local casters = {}
 	for prefix, caster, casterIndex in Table.iter.pairsByPrefix(args, 'b') do
 		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(args[prefix .. 'link'] or caster):gsub(' ','_')
-		args[prefix .. 'flag' ] = Flags.CountryName(args[prefix .. 'flag' ])
+		args[prefix .. 'flag' ] = Flags.CountryName{flag = args[prefix .. 'flag' ]}
 
 		local name, nationality = BroadcasterCard.getData(args, prefix, link, restrictedQuery)
 		local date = Variables.varDefault('tournament_enddate')
@@ -115,7 +117,7 @@ function BroadcasterCard.create(frame)
 	end
 
 	if Table.isEmpty(casters) then
-		return outputList .. '\n**' .. Abbreviation.make('TBA', 'To Be Announced')
+		return outputList .. '\n**' .. Abbreviation.make{text = 'TBA', title = 'To Be Announced'}
 	end
 
 	table.sort(casters, function(a, b) return a.sort < b.sort or (a.sort == b.sort and a.id:lower() < b.id:lower()) end)
@@ -233,6 +235,9 @@ end
 ---@param caster broadCasterData
 ---@param status string?
 function BroadcasterCard.setLPDB(caster, status)
+	if Lpdb.isStorageDisabled() then
+		return
+	end
 	local smName = Variables.varDefault('show_match_name') or ''
 	local extradata = {status = '', manualinput = tostring(caster.isManualInput)}
 	if Logic.readBool(Variables.varDefault('show_match')) then
@@ -260,7 +265,7 @@ function BroadcasterCard.setLPDB(caster, status)
 			weight = caster.weight,
 			date = caster.date,
 			parent = Variables.varDefault('tournament_parent'),
-			extradata = mw.ext.LiquipediaDB.lpdb_create_json(extradata)
+			extradata = Json.stringify(extradata)
 		}
 	)
 end

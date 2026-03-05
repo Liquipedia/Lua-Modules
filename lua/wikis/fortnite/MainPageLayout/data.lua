@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=fortnite
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
+
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
@@ -16,28 +16,27 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
+local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 local CONTENT = {
 	usefulArticles = {
 		heading = 'Useful Articles',
 		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
-		boxid = 1503,
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
-		body = '{{Liquipedia:Want_to_help}}',
+		body = WantToHelp{},
 		padding = true,
-		boxid = 1504,
+		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP,
 	},
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferPage = function ()
-				return 'Player Transfers/' .. os.date('%Y') .. '/' .. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
-			end
+			transferPage = MainPageLayoutUtil.getYearlyTransferPage() .. '/' .. os.date('%B')
 		},
-		boxid = 1509,
+		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
@@ -45,11 +44,12 @@ local CONTENT = {
 			birthdayListPage = 'Birthday list'
 		},
 		padding = true,
-		boxid = 1510,
+		boxid = MainPageLayoutUtil.BoxId.THIS_DAY,
 	},
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
+		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -65,7 +65,7 @@ local CONTENT = {
 			completedDays = 7
 		},
 		padding = true,
-		boxid = 1508,
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 }
 
@@ -75,11 +75,11 @@ return {
 		darkmode = 'Fortnite-logo-darkmode.svg',
 	},
 	metadesc = 'The Fortnite esports wiki covering everything from players, teams and transfers, ' ..
-		'to tournaments and results, maps, and weapons.',
+		'to tournaments and results, and maps.',
 	title = 'Fortnite',
 	navigation = {
 		{
-			file = 'XSET Fortnite at the 2024 Esports World Cup.jpg',
+			file = 'Queasy SwizzY Merstach at the FNCS 2025 Global Championship.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -88,7 +88,7 @@ return {
 			},
 		},
 		{
-			file = 'Dignitas Khanada at the 2024 Esports World Cup.jpg',
+			file = 'HavoK Pixie at the FNCS 2025 Global Championship.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -97,7 +97,7 @@ return {
 			},
 		},
 		{
-			file = 'Fortnite Trophy at the 2024 Esports World Cup.jpg',
+			file = 'FNCS Trophy at the FNCS 2025 Global Championship.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -118,21 +118,12 @@ return {
 			file = 'Karmine Corp Oslo at the 2024 Esports World Cup.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
-		},
-		{
-			file = 'Fortnite Heavy Sniper Rifle.png',
-			title = 'Weapons',
-			link = 'Portal:Weapons',
-			count = {
-				method = 'CATEGORY',
-				category = 'Weapons',
-			},
-		},
+		}
 	},
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				sizes = {xxl = 5, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
@@ -149,7 +140,7 @@ return {
 				}
 			},
 			{ -- Right
-				size = 6,
+				sizes = {xxl = 7, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 2,

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=smash
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -100,6 +99,14 @@ return {
 		match2 = {
 			status = 1,
 		},
+		teamRosterNavbox = {
+			hideOrg = true,
+			hideOverview = true,
+		},
+		infoboxPlayer = {
+			automatedHistory = {
+				storeFromWikiCode = true,
+			},
+		},
 	},
-	opponentLibrary = 'Opponent/Custom',
 }

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Links/Stream
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -11,13 +10,18 @@ Module containing utility functions for streaming platforms.
 ]]
 local StreamLinks = {}
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
+
+local streamVars = PageVariableNamespace('StreamCache')
 
 local TLNET_STREAM = 'stream'
 
@@ -71,9 +75,17 @@ end
 ---@return string
 function StreamLinks.resolve(platformName, streamValue)
 	platformName = StreamLinks.resolvePlatform(platformName)
-	local streamLink = mw.ext.StreamPage.resolve_stream(platformName, streamValue)
 
-	return (string.gsub(streamLink, 'Special:Stream/' .. platformName, ''))
+	local cachedLink = streamVars:get(platformName .. '_' .. streamValue)
+	if cachedLink then
+		return cachedLink
+	end
+
+	local streamLink = mw.ext.StreamPage.resolve_stream(platformName, streamValue)
+	local cleanedStreamLink = string.gsub(streamLink, 'Special:Stream/' .. platformName, '')
+	streamVars:set(platformName .. '_' .. streamValue, cleanedStreamLink)
+
+	return cleanedStreamLink
 end
 
 ---@param platform string
@@ -149,6 +161,7 @@ function StreamLinks._processStreamsOfPlatform(streamValues, platformName)
 	return platformStreams
 end
 
+---@deprecated Widget/Match/Stream
 ---@param platform string
 ---@param streamValue string
 ---@return string?
@@ -166,6 +179,7 @@ function StreamLinks.displaySingle(platform, streamValue)
 	return Page.makeInternalLink({}, icon, 'Special:Stream/' .. platform .. '/' .. streamValue)
 end
 
+---@deprecated Widget/Match/StreamsContainer
 ---@param streams {string: string[]}
 ---@return string[]?
 function StreamLinks.buildDisplays(streams)

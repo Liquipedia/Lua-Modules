@@ -1,16 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:LeagueIcon
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Lua = require('Module:Lua')
+
 local LeagueIcon = {}
-local Class = require('Module:Class')
-local Template = require('Module:Template')
-local Logic = require('Module:Logic')
-local String = require('Module:StringUtils')
+local Class = Lua.import('Module:Class')
+local Template = Lua.import('Module:Template')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
 
 local FILLER = '<span class="league-icon-small-image">[[File:Logo filler event.png|link=]]</span>'
 local NO_ICON_BUT_ICONDARK_TRACKING_CATEGORY = '[[Category:Pages with only icondark]]'
@@ -287,4 +288,10 @@ function LeagueIcon._buildLinkToTemplate(args)
 		':Template:LeagueIconSmall/' .. args.templateName:lower() .. ']]'
 end
 
-return Class.export(LeagueIcon, { frameOnly = true })
+return Class.export(LeagueIcon, {frameOnly = true, exports = {
+	'display',
+	'getIconFromTemplate',
+	'getTemplate',
+	'generate',
+	'generateHistorical',
+}})

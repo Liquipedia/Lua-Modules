@@ -1,26 +1,25 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Standings
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Condition = require('Module:Condition')
-local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
-local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Condition = Lua.import('Module:Condition')
+local FnUtil = Lua.import('Module:FnUtil')
+local Json = Lua.import('Module:Json')
+local Lpdb = Lua.import('Module:Lpdb')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Tournament = Lua.import('Module:Tournament')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Standings = {}
 
@@ -34,6 +33,7 @@ local Standings = {}
 ---@field matches MatchGroupUtilMatch[]
 ---@field config table
 ---@field rounds StandingsRound[]
+---@field tiebreakers {id: string, title: string?}[]
 ---@field private record standingstable
 ---@field private entryRecords standingsentry[]
 
@@ -57,6 +57,7 @@ local Standings = {}
 ---@field positionChangeFromPreviousRound integer
 ---@field pointsChangeFromPreviousRound number
 ---@field specialStatus 'dq'|'nc'|'' # nc = non-competing (not in the round)
+---@field tiebreakerValues table<string, {value: integer?, display: string?}>
 ---@field private record standingstable
 
 ---Fetches a standings table from a page. Tries to read from page variables before fetching from LPDB.
@@ -65,7 +66,7 @@ local Standings = {}
 ---@return StandingsModel?
 function Standings.getStandingsTable(pagename, standingsIndex)
 	local pageNameInCorrectFormat = string.gsub(pagename, ' ', '_')
-	local myPageName = string.gsub(mw.title.getCurrentTitle().text , ' ', '_')
+	local myPageName = string.gsub(mw.title.getCurrentTitle().text, ' ', '_')
 
 	if pageNameInCorrectFormat == myPageName then
 		local varData = Variables.varDefault('standings2_' .. standingsIndex)
@@ -120,6 +121,7 @@ function Standings.standingsFromRecord(record, entries)
 		section = record.section,
 		type = record.type,
 		config = record.config,
+		tiebreakers = record.extradata.tiebreakers,
 		record = record,
 		entryRecords = entries,
 	}
@@ -145,6 +147,7 @@ function Standings.entryFromRecord(record)
 		pointsChangeFromPreviousRound = record.extradata.pointschange,
 		specialStatus = record.extradata.specialstatus or '',
 		positionChangeFromPreviousRound = tonumber(record.placementchange),
+		tiebreakerValues = record.extradata.tiebreakerValues or {},
 		record = record,
 	}
 
@@ -217,7 +220,8 @@ function Standings.makeRounds(standings)
 	---@diagnostic disable-next-line: invisible
 	local standingsEntries = standings.entryRecords
 
-	local roundCount = Array.maxBy(Array.map(standingsEntries, Operator.property('roundindex')), FnUtil.identity)
+	local roundCount = Array.maxBy(Array.map(standingsEntries, function(entry)
+		return tonumber(entry.roundindex) or 1 end), FnUtil.identity)
 
 	return Array.map(Array.range(1, roundCount or 1), function(roundIndex)
 		local roundEntries = Array.filter(standingsEntries, function(entry)

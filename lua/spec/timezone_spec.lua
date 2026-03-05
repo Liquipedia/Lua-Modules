@@ -6,14 +6,14 @@ describe('timezone', function()
 		it('check', function()
 			assert.are_equal(
 				'<abbr data-tz="+05:30" title="Indian Standard Time (UTC+5:30)">IST</abbr>',
-				Timezone.getTimezoneString('IST')
+				Timezone.getTimezoneString{timezone = 'IST'}
 			)
 			assert.are_equal(
 				'<abbr data-tz="+02:00" title="Central European Summer Time (UTC+2)">CEST</abbr>',
-				Timezone.getTimezoneString('CEST')
+				Timezone.getTimezoneString{timezone = 'CEST'}
 			)
 			assert.is_nil(
-				Timezone.getTimezoneString('DUMMY')
+				Timezone.getTimezoneString{timezone = 'DUMMY'}
 			)
 		end)
 	end)
@@ -22,14 +22,14 @@ describe('timezone', function()
 		it('check', function()
 			assert.are_equal(
 				5 * 60 * 60 + 30 * 60,
-				Timezone.getOffset('IST')
+				Timezone.getOffset{timezone = 'IST'}
 			)
 			assert.are_equal(
 				2 * 60 * 60,
-				Timezone.getOffset('CEST')
+				Timezone.getOffset{timezone = 'CEST'}
 			)
 			assert.is_nil(
-				Timezone.getOffset('DUMMY')
+				Timezone.getOffset{timezone = 'DUMMY'}
 			)
 		end)
 	end)

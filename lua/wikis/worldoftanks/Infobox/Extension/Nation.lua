@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=worldoftanks
 -- page=Module:Infobox/Extension/Nation
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

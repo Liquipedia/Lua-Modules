@@ -1,18 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:ParticipantTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Json = require('Module:Json')
-local Faction = require('Module:Faction')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Faction = Lua.import('Module:Faction')
+local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 ---@class StormgateParticipantTableConfig: ParticipantTableConfig
 ---@field displayUnknownColumn boolean?
@@ -26,45 +29,20 @@ local Variables = require('Module:Variables')
 
 ---@class StormgateParticipantTableEntry: ParticipantTableEntry
 ---@field isQualified boolean?
----@field opponent StormgateStandardOpponent
 
 ---@class StormgateParticipantTableSection: ParticipantTableSection
 ---@field entries StormgateParticipantTableEntry[]
 
 ---@class StormgateParticipantTable: ParticipantTable
+---@operator call(Frame): StormgateParticipantTable
 ---@field config StormgateParticipantTableConfig
----@field isPureSolo boolean
----@field _displaySoloFactionTableSection function
----@field _displayHeader function
----@field _getFactionNumbers function
-
-local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
-
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
-
-local StormgateParticipantTable = {}
+---@field sections StormgateParticipantTableSection[]
+local StormgateParticipantTable = Class.new(ParticipantTable)
 
 ---@param frame Frame
 ---@return Html?
 function StormgateParticipantTable.run(frame)
-	local participantTable = ParticipantTable(frame) --[[@as StormgateParticipantTable]]
-
-	participantTable.readConfig = StormgateParticipantTable.readConfig
-	participantTable.readEntry = StormgateParticipantTable.readEntry
-	participantTable.adjustLpdbData = StormgateParticipantTable.adjustLpdbData
-	participantTable._displaySoloFactionTableSection = StormgateParticipantTable._displaySoloFactionTableSection
-	participantTable._displayHeader = StormgateParticipantTable._displayHeader
-	participantTable._getFactionNumbers = StormgateParticipantTable._getFactionNumbers
-	participantTable.setCustomPageVariables = StormgateParticipantTable.setCustomPageVariables
-
-	participantTable:read():store()
-
-	if StormgateParticipantTable.isPureSolo(participantTable.sections) and participantTable.config.soloAsFactionTable then
-		participantTable.create = StormgateParticipantTable.createSoloFactionTable
-	end
-
-	return participantTable:create()
+	return StormgateParticipantTable(frame):read():store():create()
 end
 
 ---@param args table
@@ -116,15 +94,14 @@ function StormgateParticipantTable:readEntry(sectionArgs, key, index, config)
 		faction = valueFromArgs('faction'),
 	}
 
-	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
-		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
+	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
 
 	--unset wiki var for random events to not read players as random if prize pool already sets them as random
 	if config.isRandomEvent and opponentArgs.type == Opponent.solo then
 		Variables.varDefine(opponentArgs.name .. '_faction', '')
 	end
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
+	local opponent = Opponent.readOpponentArgs(opponentArgs)
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)
@@ -159,12 +136,19 @@ function StormgateParticipantTable:adjustLpdbData(lpdbData, entry, config)
 	lpdbData.qualified = isQualified and 1 or nil
 end
 
----@param sections StormgateParticipantTableSection[]
 ---@return boolean
-function StormgateParticipantTable.isPureSolo(sections)
-	return Array.all(sections, function(section) return Array.all(section.entries, function(entry)
+function StormgateParticipantTable:isPureSolo()
+	return Array.all(self.sections, function(section) return Array.all(section.entries, function(entry)
 		return entry.opponent.type == Opponent.solo
 	end) end)
+end
+
+---@return Html?
+function StormgateParticipantTable:create()
+	if self:isPureSolo() and self.config.soloAsFactionTable then
+		return self:createSoloFactionTable()
+	end
+	return ParticipantTable.create(self)
 end
 
 ---@return Html?
@@ -284,7 +268,7 @@ function StormgateParticipantTable:_displaySoloFactionTableSection(section, fact
 		Array.forEach(factionColumns, function(faction)
 			local entry = byFaction[faction] and byFaction[faction][rowIndex]
 			sectionNode:node(
-				entry and self:displayEntry(entry, {hideFaction = true}) or
+				entry and self:displayEntry(entry, {showFaction = false}) or
 				mw.html.create('div'):addClass('participantTable-entry')
 			)
 		end)

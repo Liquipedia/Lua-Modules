@@ -1,13 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:Ratings/Storage/Lpdb
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Date = require('Module:Date/Ext')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Date = Lua.import('Module:Date/Ext')
 
 local RatingsStorageLpdb = {}
 

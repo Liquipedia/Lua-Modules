@@ -1,14 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=apexlegends
 -- page=Module:Tier/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
+local Table = Lua.import('Module:Table')
 local Tier = Lua.import('Module:Tier/Utils')
 
 ---@class ApexTierUtils: TierUtils

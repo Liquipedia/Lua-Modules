@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=heroes
 -- page=Module:Match/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,11 +7,12 @@
 
 local MatchLegacy = {}
 
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Opponent = require('Module:Opponent')
+
+local Json = Lua.import('Module:Json')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Opponent = Lua.import('Module:Opponent')
 
 local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
 

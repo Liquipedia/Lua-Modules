@@ -1,18 +1,18 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/CampaignMission
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
+
+local Class = Lua.import('Module:Class')
+local Namespace = Lua.import('Module:Namespace')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -20,17 +20,18 @@ local Customizable = Widgets.Customizable
 local Breakdown = Widgets.Breakdown
 
 ---@class CampaignMissionInfobox: BasicInfobox
+---@operator call(Frame): CampaignMissionInfobox
 local Mission = Class.new(BasicInfobox)
 
 ---Entry point
 ---@param frame Frame
----@return Html
+---@return Widget
 function Mission.run(frame)
 	local mission = Mission(frame)
 	return mission:createInfobox()
 end
 
----@return string
+---@return Widget
 function Mission:createInfobox()
 	local args = self.args
 
@@ -60,7 +61,7 @@ function Mission:createInfobox()
 		self:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'CampaignMission')
 end
 
 return Mission

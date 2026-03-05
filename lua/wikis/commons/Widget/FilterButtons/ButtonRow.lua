@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/FilterButtons/ButtonRow
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local I18n = require('Module:I18n')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Class = Lua.import('Module:Class')
+local I18n = Lua.import('Module:I18n')
+local String = Lua.import('Module:StringUtils')
 
 local Widget = Lua.import('Module:Widget')
 local FilterButton = Lua.import('Module:Widget/FilterButtons/Button')

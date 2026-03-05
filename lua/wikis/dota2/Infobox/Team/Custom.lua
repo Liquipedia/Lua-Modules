@@ -1,24 +1,29 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:Infobox/Team/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local RoleOf = require('Module:RoleOf')
+
+local Class = Lua.import('Module:Class')
+local RoleOf = Lua.import('Module:RoleOf')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 local Team = Lua.import('Module:Infobox/Team')
 
 local ACHIEVEMENTS_BASE_CONDITIONS = {
-	'[[liquipediatiertype::!Showmatch]]',
-	'[[liquipediatiertype::!Qualifier]]',
-	'[[liquipediatiertype::!Charity]]',
-	'[[liquipediatier::1]]',
-	'[[placement::1]]',
+	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Showmatch', 'Qualifier', 'Charity'}),
+	ConditionNode(ColumnName('liquipediatier'), Comparator.eq, 1),
+	ConditionNode(ColumnName('placement'), Comparator.eq, 1),
 }
 
 ---@class Dota2InfoboxTeam: InfoboxTeam
@@ -46,25 +51,11 @@ function CustomTeam.run(frame)
 	return team:createInfobox()
 end
 
----@return string?
+---@return Widget?
 function CustomTeam:createBottomContent()
---[[
-	if not _team.args.disbanded then
-		TODO:
-		Leaving this out for now, will be a follow-up PR,
-		as both the templates needs to be removed from team pages plus the templates also requires some div changes
-
-		return Template.expandTemplate(
-			mw.getCurrentFrame(),
-			'Upcoming and ongoing matches of',
-			{team = _team.name or _team.pagename}
-		) .. Template.expandTemplate(
-			mw.getCurrentFrame(),
-			'Upcoming and ongoing tournaments of',
-			{team = _team.name or _team.pagename}
-		)
+	if not self.args.disbanded then
+		return UpcomingTournaments.team{name = self.teamTemplate.templatename}
 	end
---]]
 end
 
 ---@param lpdbData table

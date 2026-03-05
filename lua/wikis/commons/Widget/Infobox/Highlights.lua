@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Infobox/Highlights
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -18,7 +18,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 ---@operator call(table):HighlightsWidget
 local Highlights = Class.new(Widget)
 
----@return string?
+---@return Widget?
 function Highlights:render()
 	if Table.isEmpty(self.props.children) then
 		return nil
@@ -27,7 +27,9 @@ function Highlights:render()
 		return HtmlWidgets.Li{children = {child}}
 	end)
 	return HtmlWidgets.Div{
-		children = {HtmlWidgets.Ul{children = listItems}},
+		children = HtmlWidgets.Div{
+			children = {HtmlWidgets.Ul{children = listItems}},
+		}
 	}
 end
 

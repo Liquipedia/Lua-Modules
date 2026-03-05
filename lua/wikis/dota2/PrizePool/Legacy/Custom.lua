@@ -1,20 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:PrizePool/Legacy/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
+local Variables = Lua.import('Module:Variables')
 
 local PrizePoolLegacy = Lua.import('Module:PrizePool/Legacy')
 
 local CustomLegacyPrizePool = {}
 
 -- Template entry point
----@return Html
+---@return Widget
 function CustomLegacyPrizePool.run()
 	return PrizePoolLegacy.run(CustomLegacyPrizePool)
 end

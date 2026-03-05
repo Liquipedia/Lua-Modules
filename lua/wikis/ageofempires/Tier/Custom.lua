@@ -1,16 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:Tier/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Tier = Lua.import('Module:Tier/Utils')
 
@@ -27,7 +27,7 @@ function TierCustom.parseFromQueryData(queryData)
 end
 
 --- Builds the display for a given (tier, tierType) tuple
----@param tier integer
+---@param tier string|integer
 ---@param tierType string?
 ---@param options table?
 ---@return string?

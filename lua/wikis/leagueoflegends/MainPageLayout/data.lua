@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,49 +7,79 @@
 
 local Lua = require('Module:Lua')
 
+local DateExt = Lua.import('Module:Date/Ext')
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
+
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Headlines = Lua.import('Module:Widget/MainPage/Headlines')
+local LiquipediaApp = Lua.import('Module:Widget/MainPage/LiquipediaApp')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
+local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
+
+---@return string
+local function getCurrentTransferPage()
+	local basePage = 'Player Transfers/' .. DateExt.getYearOf() .. '/' .. os.date('%B')
+	local queryData = mw.ext.LiquipediaDB.lpdb('transfer', {
+		conditions = tostring(ConditionNode(ColumnName('pagename'), Comparator.ge, basePage)),
+		query = 'pagename',
+		order = 'date desc',
+		groupby = 'pagename asc',
+		limit = 5000,
+	})
+	if #queryData == 0 then
+		return basePage
+	end
+	return queryData[1].pagename
+end
 
 local CONTENT = {
 	usefulArticles = {
 		heading = 'Useful Articles',
 		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
-		boxid = 1503,
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
-		body = '{{Liquipedia:Want_to_help}}',
+		body = WantToHelp{},
 		padding = true,
-		boxid = 1504,
+		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP,
 	},
 	liquipediaApp = {
 		heading = 'Download the Liquipedia App',
 		padding = true,
-		body = '{{Liquipedia:App}}',
-		boxid = 1505,
+		body = LiquipediaApp{},
+		boxid = MainPageLayoutUtil.BoxId.MOBILE_APP,
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{rumours = true},
-		boxid = 1509,
+		body = TransfersList{
+			transferPage = getCurrentTransferPage(),
+			rumours = true
+		},
+		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
 		body = ThisDayWidgets.Content(),
 		padding = true,
-		boxid = 1510,
+		boxid = MainPageLayoutUtil.BoxId.THIS_DAY,
 	},
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Eventbox}}',
+		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -63,10 +92,7 @@ local CONTENT = {
 		heading = 'Matches',
 		body = MatchTicker{},
 		padding = true,
-		boxid = 1507,
-		panelAttributes = {
-			['data-switch-group-container'] = 'countdown',
-		},
+		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -79,13 +105,13 @@ local CONTENT = {
 			modifierTier3 = 10
 		},
 		padding = true,
-		boxid = 1508,
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 	headlines = {
 		heading = 'Headlines',
 		body = Headlines{},
 		padding = true,
-		boxid = 1511,
+		boxid = MainPageLayoutUtil.BoxId.HEADLINES,
 	},
 	references = {
 		heading = 'References',
@@ -141,7 +167,7 @@ return {
 			},
 		},
 		{
-			file = 'T1 Worlds23 Skins Splash Art.jpg',
+			file = 'T1 Worlds24 Skins Splash Art.jpg',
 			title = 'Champions',
 			link = 'Champions',
 			count = {
@@ -151,7 +177,7 @@ return {
 			},
 		},
 		{
-			file = 'LoL Patch 14.24 Art.jpg',
+			file = 'LoL Patch 25.19 Art.jpg',
 			title = 'Patches',
 			link = 'Patches',
 			count = {
@@ -178,7 +204,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				sizes = {xxl = 5, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
@@ -207,7 +233,7 @@ return {
 				}
 			},
 			{ -- Right
-				size = 6,
+				sizes = {xxl = 7, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 3,

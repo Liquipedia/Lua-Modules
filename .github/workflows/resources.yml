@@ -7,8 +7,17 @@ jobs:
   test-resources:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install modules
         run: npm install
-      - name: Run test
-        run: npm run test
+      - name: Run lint check
+        run: npm run lint:ci
+      - name: Run unit test
+        run: npm run test:js
+      - name: Report test
+        uses: mikepenz/action-junit-report@v6
+        if: always()
+        with:
+          report_paths: 'junit.xml'
+          check_name: 'Resources Test Report'
+          annotate_only: ${{ (github.event.pull_request.head.repo.full_name != github.repository) }}

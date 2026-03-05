@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/MapVetoRound
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -56,15 +56,33 @@ function MatchSummaryMapVetoRound:render()
 	local children
 	if vetoType == VETO_DECIDER then
 		children = {
-			HtmlWidgets.Td{children = createVetoTypeElement()},
-			HtmlWidgets.Td{children = displayMap(self.props.map1)},
-			HtmlWidgets.Td{children = createVetoTypeElement()},
+			HtmlWidgets.Td{
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-left'},
+				children = createVetoTypeElement()
+			},
+			HtmlWidgets.Td{
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-center'},
+				children = displayMap(self.props.map1)
+			},
+			HtmlWidgets.Td{
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-right'},
+				children = createVetoTypeElement()
+			},
 		}
 	else
 		children = {
-			HtmlWidgets.Td{children = displayMap(self.props.map1)},
-			HtmlWidgets.Td{children = createVetoTypeElement()},
-			HtmlWidgets.Td{children = displayMap(self.props.map2)},
+			HtmlWidgets.Td{
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-left'},
+				children = displayMap(self.props.map1)
+			},
+			HtmlWidgets.Td{
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-center'},
+				children = createVetoTypeElement()
+			},
+			HtmlWidgets.Td{
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-right'},
+				children = displayMap(self.props.map2)
+			},
 		}
 	end
 

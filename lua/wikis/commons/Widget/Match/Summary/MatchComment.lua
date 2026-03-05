@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/MatchComment
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -27,7 +27,6 @@ function MatchSummaryMatchMatchComment:render()
 
 	return HtmlWidgets.Div{
 		classes = {'brkts-popup-comment'},
-		css = {['font-size'] = '85%', ['white-space'] = 'normal'},
 		children = Array.flatMap(self.props.children, function (child)
 			return {child, Break{}}
 		end)

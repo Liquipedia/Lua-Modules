@@ -1,18 +1,20 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Tournament
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Lpdb = require('Module:Lpdb')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Tier = require('Module:Tier/Utils')
+
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
+local Lpdb = Lua.import('Module:Lpdb')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local Table = Lua.import('Module:Table')
+local Tier = Lua.import('Module:Tier/Custom')
 
 local Tournament = {}
 
@@ -23,32 +25,39 @@ local TOURNAMENT_PHASE = {
 	FINISHED = 'FINISHED',
 }
 
----@class StandardTournament
+---@class StandardTournamentPartial
 ---@field displayName string
+---@field shortName string?
 ---@field fullName string
 ---@field pageName string
+---@field icon string?
+---@field iconDark string?
+---@field series string?
+---@field liquipediaTier integer|string|nil
+---@field liquipediaTierType string?
+---@field game string?
+---@field publisherTier string?
+
+---@class StandardTournament: StandardTournamentPartial
 ---@field startDate {year: integer, month: integer?, day: integer?, timestamp: integer?}?
 ---@field endDate {year: integer, month: integer?, day: integer?, timestamp: integer?}?
----@field liquipediaTier string
----@field liquipediaTierType string
 ---@field region string?
 ---@field featured boolean
 ---@field status string?
 ---@field phase TournamentPhase
----@field icon string?
----@field iconDark string?
----@field abbreviation string?
----@field series string?
+---@field tierOptions table
+---@field extradata table
+---@field isHighlighted fun(self: StandardTournament, options?: table): boolean
 
----@param conditions ConditionTree?
----@param filterTournament fun(tournament: StandardTournament): boolean
+---@param conditions string|AbstractConditionNode?
+---@param filterTournament? fun(tournament: StandardTournament): boolean
 ---@return StandardTournament[]
 function Tournament.getAllTournaments(conditions, filterTournament)
 	local tournaments = {}
 	Lpdb.executeMassQuery(
 		'tournament',
 		{
-			conditions = conditions and conditions:toString() or nil,
+			conditions = conditions and tostring(conditions),
 			order = 'sortdate desc',
 			limit = 1000,
 		},
@@ -66,7 +75,7 @@ end
 ---@return StandardTournament?
 function Tournament.getTournament(pagename)
 	local record = mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = '[[pagename::' .. pagename .. ']]',
+		conditions = '[[pagename::' .. Page.pageifyLink(pagename) .. ']]',
 		limit = 1,
 	})[1]
 	if not record then
@@ -75,17 +84,37 @@ function Tournament.getTournament(pagename)
 	return Tournament.tournamentFromRecord(record)
 end
 
-local TouranmentMT = {
+local TournamentMT = {
 	__index = function(tournament, property)
 		if property == 'featured' then
 			tournament[property] = Tournament.isFeatured(tournament)
-		end
-		if property == 'phase' then
+		elseif property == 'phase' then
 			tournament[property] = Tournament.calculatePhase(tournament)
+		elseif property == 'isHighlighted' then
+			return HighlightConditions.tournament
 		end
 		return rawget(tournament, property)
 	end
 }
+
+---@param match MatchGroupUtilMatch
+---@return StandardTournamentPartial
+function Tournament.partialTournamentFromMatch(match)
+	---@type StandardTournamentPartial
+	return {
+		displayName = Logic.emptyOr(match.tickername, match.tournament) or (match.parent or ''):gsub('_', ' '),
+		shortName = match.shortname,
+		fullName = match.tournament,
+		pageName = match.parent,
+		liquipediaTier = Tier.toIdentifier(match.liquipediatier),
+		liquipediaTierType = Tier.toIdentifier(match.liquipediatiertype) --[[ @as string? ]],
+		icon = match.icon,
+		iconDark = match.iconDark,
+		series = match.series,
+		game = match.game,
+		publisherTier = match.publisherTier,
+	}
+end
 
 ---@param record tournament
 ---@return StandardTournament
@@ -93,26 +122,30 @@ function Tournament.tournamentFromRecord(record)
 	local extradata = record.extradata or {}
 	local startDate = Tournament.parseDateRecord(Logic.nilOr(extradata.startdatetext, record.startdate))
 	local endDate = Tournament.parseDateRecord(Logic.nilOr(extradata.enddatetext, record.sortdate, record.enddate))
+	local tier, tierType, tierOptions = Tier.parseFromQueryData(record)
 
 	local tournament = {
 		displayName = Logic.emptyOr(record.tickername, record.name) or record.pagename:gsub('_', ' '),
+		shortName = Logic.nilIfEmpty(record.shortname),
 		fullName = record.name,
 		pageName = record.pagename,
 		startDate = startDate,
 		endDate = endDate,
-		liquipediaTier = Tier.toIdentifier(record.liquipediatier),
-		liquipediaTierType = Tier.toIdentifier(record.liquipediatiertype),
+		liquipediaTier = Tier.toIdentifier(tier),
+		liquipediaTierType = Tier.toIdentifier(tierType) --[[ @as string? ]],
+		publisherTier = record.publishertier,
 		region = (record.locations or {}).region1,
 		status = record.status,
 		icon = record.icon,
 		iconDark = record.icondark,
-		abbreviation = record.abbreviation,
 		series = record.series,
-		game = record.game
+		game = record.game,
+		tierOptions = tierOptions,
+		extradata = extradata,
 	}
 
-	-- Some properties are derived from other properies and we can calculate them when accessed.
-	setmetatable(tournament, TouranmentMT)
+	-- Some properties are derived from other properties and we can calculate them when accessed.
+	setmetatable(tournament, TournamentMT)
 
 	return tournament
 end
@@ -192,6 +225,9 @@ function Tournament.isFeatured(record)
 
 		local parentPage = table.concat(Array.sub(mw.text.split(page, '/'), 1, -2), '/')
 		if Logic.isEmpty(parentPage) then
+			return nil
+		-- Avoid infinite loops
+		elseif page == Page.pageifyLink(parentPage) then
 			return nil
 		end
 

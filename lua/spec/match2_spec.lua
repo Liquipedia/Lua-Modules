@@ -23,8 +23,11 @@ describe('match2', function()
 				table.insert(dataSavedGame, data)
 				return objName
 			end)
-			stub(mw.ext.LiquipediaDB, 'lpdb', function(tbl)
+			stub(mw.ext.LiquipediaDB, 'lpdb', function(tbl, options)
 				if tbl == 'match2' then
+					if options.query == 'pageid' then
+						return {} -- Simulate no duplicate found
+					end
 					dataSaved.extradata = Json.parse(dataSaved.extradata)
 					dataSaved.match2bracketdata = Json.parse(dataSaved.match2bracketdata)
 					dataSaved.match2opponents = dataSavedOpponent

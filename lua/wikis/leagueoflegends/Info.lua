@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -39,6 +38,21 @@ return {
 		},
 		transfers = {
 			showTeamName = true,
+			contractDatabase = {
+				link = 'https://docs.google.com/spreadsheets/d/1Y7k5kQ2AegbuyiGwEPsa62e883FYVtHqr6UVut9RC4o/pubhtml',
+				display = 'LoL Esports League-Recognized Contract Database'
+			},
+		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'manualPrio',
+				showRole = false,
+				storeFromWikiCode = true,
+			},
+		},
+		participants = {
+			defaultPlayerNumber = 5,
 		},
 	},
 	defaultRoundPrecision = 0,

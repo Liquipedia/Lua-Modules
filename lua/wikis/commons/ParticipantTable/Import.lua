@@ -1,18 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:ParticipantTable/Import
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
@@ -38,7 +37,7 @@ end
 ---@return table[]
 function ParticipantTableImport._fetchMatchRecords(matchGroupSpec)
 	return mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = TournamentStructure.getMatch2Filter(matchGroupSpec),
+		conditions = tostring(TournamentStructure.getMatch2Filter(matchGroupSpec)),
 		query = 'pagename, match2bracketdata, match2opponents, winner',
 		order = 'date asc',
 		limit = 5000,

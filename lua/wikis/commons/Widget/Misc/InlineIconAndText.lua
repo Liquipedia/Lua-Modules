@@ -1,14 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Misc/InlineIconAndText
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -34,11 +35,11 @@ function InlineIconAndText:render()
 	local children = {
 		self.props.icon,
 		' ',
-		Link{
+		Logic.isNotEmpty(self.props.link) and Link{
 			link = self.props.link,
 			linktype = 'internal',
 			children = {self.props.text}
-		},
+		} or self.props.text,
 	}
 
 	return Span{

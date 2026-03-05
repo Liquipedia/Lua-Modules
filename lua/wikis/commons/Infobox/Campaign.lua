@@ -1,31 +1,32 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Campaign
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Header = Widgets.Header
 local Center = Widgets.Center
 
 ---@class CampaignInfobox: BasicInfobox
+---@operator call(Frame): CampaignInfobox
 local Campaign = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function Campaign.run(frame)
 	local campaign = Campaign(frame)
 	return campaign:createInfobox()
 end
 
----@return string
+---@return Widget
 function Campaign:createInfobox()
 	local args = self.args
 
@@ -41,7 +42,7 @@ function Campaign:createInfobox()
 
 	self:categories('Campaign')
 
-	return self:build(widgets)
+	return self:build(widgets, 'Campaign')
 end
 
 

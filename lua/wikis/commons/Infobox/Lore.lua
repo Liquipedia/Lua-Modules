@@ -1,27 +1,28 @@
 
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Lore
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
+
+local Class = Lua.import('Module:Class')
+local Namespace = Lua.import('Module:Namespace')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Header = Widgets.Header
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
 ---@class LoreInfobox: BasicInfobox
+---@operator call(Frame): LoreInfobox
 local Cosmetic = Class.new(BasicInfobox)
 
----@return string
+---@return Widget
 function Cosmetic:createInfobox()
 	local args = self.args
 	self:customParseArguments(args)
@@ -58,7 +59,7 @@ function Cosmetic:createInfobox()
 		self:setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Lore')
 end
 
 ---@param args table

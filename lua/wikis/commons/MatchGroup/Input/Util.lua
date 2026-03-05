@@ -1,33 +1,41 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Input/Util
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Faction = require('Module:Faction')
-local Flags = require('Module:Flags')
-local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Page = require('Module:Page')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local Streams = require('Module:Links/Stream')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local Faction = Lua.import('Module:Faction')
+local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local Streams = Lua.import('Module:Links/Stream')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+
+local Info = Lua.import('Module:Info', {loadData = true})
 local Links = Lua.import('Module:Links')
 -- can not use /Custom here to avoid dependency loop on sc(2)
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local globalVars = PageVariableNamespace{cached = true}
 
@@ -53,6 +61,13 @@ local MatchGroupInputUtil = {}
 ---@field match2players MGIParsedPlayer[]
 ---@field startingpoints number?
 ---@field extradata table
+
+---@class MGIParsedDate
+---@field date string
+---@field dateexact boolean
+---@field timestamp integer
+---@field timezoneId string?
+---@field timezoneOffset string?
 
 local NOT_PLAYED_INPUTS = {
 	'skip',
@@ -88,14 +103,14 @@ MatchGroupInputUtil.WINNER_DRAW = 0
 
 local ASSUME_FINISHED_AFTER = {
 	EXACT = 30800,
-	ESTIMATE = 86400,
+	ESTIMATE = DateExt.daysToSeconds(1),
 }
 MatchGroupInputUtil.ASSUME_FINISHED_AFTER = ASSUME_FINISHED_AFTER
 
 local NOW = os.time()
 local contentLanguage = mw.getContentLanguage()
 
----@class MatchGroupMvpPlayer
+---@class MatchGroupMvpPlayer: MGIParsedPlayer
 ---@field displayname string
 ---@field name string
 ---@field comment string?
@@ -116,7 +131,7 @@ local contentLanguage = mw.getContentLanguage()
 
 ---@param dateString string?
 ---@param dateFallbacks string[]?
----@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
+---@return MGIParsedDate
 function MatchGroupInputUtil.readDate(dateString, dateFallbacks)
 	if dateString then
 		-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
@@ -167,7 +182,10 @@ end
 ---@return match2[]
 MatchGroupInputUtil.fetchStandaloneMatchGroup = FnUtil.memoize(function(bracketId)
 	return mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = '[[namespace::130]] AND [[match2bracketid::' .. bracketId .. ']]',
+		conditions = tostring(ConditionTree(BooleanOperator.all):add{
+			ConditionNode(ColumnName('namespace'), Comparator.eq, Namespace.matchNamespaceId()),
+			ConditionNode(ColumnName('match2bracketid'), Comparator.eq, bracketId)
+		}),
 		limit = 5000,
 	})
 end)
@@ -198,8 +216,7 @@ function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 		return opponentIndex <= 2 and MatchGroupInputUtil.mergeRecordWithOpponent({}, Opponent.blank()) or nil
 	end
 
-	--- or Opponent.blank() is only needed because readOpponentArg can return nil for team opponents
-	local opponent = Opponent.readOpponentArgs(opponentInput) or Opponent.blank()
+	local opponent = Opponent.readOpponentArgs(opponentInput)
 	if Opponent.isBye(opponent) then
 		local byeOpponent = Opponent.blank()
 		byeOpponent.name = 'BYE'
@@ -252,7 +269,7 @@ The opponent struct is retrieved programmatically via Module:Opponent, by using 
 Using the team template extension, the opponent struct is standardised and not user input dependant, unlike the record.
 ]]
 ---@param record table
----@param opponent standardOpponent|StarcraftStandardOpponent|StormgateStandardOpponent|WarcraftStandardOpponent
+---@param opponent standardOpponent|StarcraftStandardOpponent
 ---@param substitutions MatchGroupInputSubstituteInformation[]?
 ---@return MGIParsedOpponent
 function MatchGroupInputUtil.mergeRecordWithOpponent(record, opponent, substitutions)
@@ -320,7 +337,7 @@ function MatchGroupInputUtil.getTournamentContext(obj, parent)
 end
 
 ---@param match table
----@param opponents? table[]
+---@param opponents? MGIParsedOpponent[]
 ---@return {players: MatchGroupMvpPlayer[], points: integer}?
 function MatchGroupInputUtil.readMvp(match, opponents)
 	if not match.mvp then return end
@@ -432,7 +449,7 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 		playersIndex = playersIndex + 1
 		players[normalizedPageName] = Table.merge(players[normalizedPageName] or {}, {
 			pageName = pageName,
-			flag = Flags.CountryName(player.flag),
+			flag = Flags.CountryName{flag = player.flag},
 			displayName = player.displayName,
 			faction = player.faction and Faction.read(player.faction) or nil,
 			index = playersIndex,
@@ -504,7 +521,7 @@ end
 
 ---reads the caster input of a match
 ---@param match table
----@param options {noSort: boolean?}?
+---@param options {sortCasters: boolean?}?
 ---@return table[]?
 function MatchGroupInputUtil.readCasters(match, options)
 	options = options or {}
@@ -517,7 +534,7 @@ function MatchGroupInputUtil.readCasters(match, options)
 		))
 	end
 
-	if not options.noSort then
+	if options.sortCasters then
 		table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
 	end
 
@@ -608,16 +625,21 @@ end
 
 ---@param winnerInput integer|string|nil
 ---@param finishedInput string?
+---@param opponents MGIParsedOpponent[]?
 ---@return string? #Match Status
-function MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+function MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput, opponents)
 	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
+		return MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
+	elseif winnerInput or (not opponents) or MatchGroupInputUtil.hasSpecialStatus(opponents) then
+		return
+	elseif not MatchGroupInputUtil.hasScore(opponents) then
 		return MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
 	end
 end
 
 ---@param status string
 ---@param winnerInput integer|string|nil
----@param opponents {score: number, status: string, placement: integer?}[]
+---@param opponents MGIParsedOpponent[]
 ---@return integer? # Winner
 function MatchGroupInputUtil.getWinner(status, winnerInput, opponents)
 	if status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
@@ -637,7 +659,7 @@ end
 
 ---Find the opponent with placement 1
 ---If multiple opponents share this placement, the first one is returned
----@param opponents {placement: integer?}[]
+---@param opponents MGIParsedOpponent[]
 ---@return integer?
 function MatchGroupInputUtil.findOpponentWithFirstPlace(opponents)
 	local firstPlace = Array.indexOf(opponents, function(opponent)
@@ -741,7 +763,7 @@ function MatchGroupInputUtil.isNotPlayedInput(input)
 	return Table.includes(NOT_PLAYED_INPUTS, input)
 end
 
----@param opponents {status: string, score: number?}[]
+---@param opponents MGIParsedOpponent[]
 ---@param winnerInput integer|string|nil
 ---@return boolean
 function MatchGroupInputUtil.isDraw(opponents, winnerInput)
@@ -760,14 +782,14 @@ function MatchGroupInputUtil.isDraw(opponents, winnerInput)
 end
 
 -- Check if any opponent has a none-standard status
----@param opponents {status: string}[]
+---@param opponents MGIParsedOpponent[]
 ---@return boolean
 function MatchGroupInputUtil.hasSpecialStatus(opponents)
 	return Array.any(opponents, function (opponent)
-			return opponent.status and opponent.status ~= MatchGroupInputUtil.STATUS.SCORE end)
+			return opponent.status ~= nil and opponent.status ~= MatchGroupInputUtil.STATUS.SCORE end)
 end
 
----@param opponents {status: string?}[]
+---@param opponents MGIParsedOpponent[]
 ---@param status string
 ---@return integer
 function MatchGroupInputUtil._opponentWithStatus(opponents, status)
@@ -775,14 +797,14 @@ function MatchGroupInputUtil._opponentWithStatus(opponents, status)
 end
 
 -- function to check for Normal Scores
----@param opponents {status: string?}[]
+---@param opponents MGIParsedOpponent[]
 ---@return boolean
 function MatchGroupInputUtil.hasScore(opponents)
 	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.SCORE) ~= 0
 end
 
 -- Get the winner when letter results (W/L etc)
----@param opponents {status: string?}[]
+---@param opponents MGIParsedOpponent[]
 ---@return integer
 function MatchGroupInputUtil.getDefaultWinner(opponents)
 	local idx = MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.DEFAULT_WIN)
@@ -812,7 +834,7 @@ end
 
 ---@param match table
 ---@param maps table[]
----@param opponents {score: integer?}[]
+---@param opponents MGIParsedOpponent[]
 ---@return boolean
 function MatchGroupInputUtil.matchIsFinished(match, maps, opponents)
 	if MatchGroupInputUtil.isNotPlayed(match.winner, match.finished) then
@@ -834,10 +856,6 @@ function MatchGroupInputUtil.matchIsFinished(match, maps, opponents)
 		return true
 	end
 
-	if not MatchGroupInputUtil.hasScore(opponents) then
-		return false
-	end
-
 	-- If enough time has passed since match started, it should be marked as finished
 	local function recordLiveLongEnough(record)
 		if not record.timestamp or record.timestamp == DateExt.defaultTimestamp then
@@ -851,10 +869,9 @@ function MatchGroupInputUtil.matchIsFinished(match, maps, opponents)
 	end
 
 	local bestof = match.bestof
-	if not bestof then
+	if not bestof or bestof == 0 then
 		return false
 	end
-	-- TODO: Investigate if bestof = 0 needs to be handled
 
 	return MatchGroupInputUtil.majorityHasBeenWon(bestof, opponents)
 end
@@ -1023,6 +1040,9 @@ end
 ---@param standaloneMatch table
 ---@return table
 function MatchGroupInputUtil.mergeStandaloneIntoMatch(match, standaloneMatch)
+	---@param input table
+	---@return table
+	---@overload fun(input: string): table?
 	local function ensureTable(input)
 		if type(input) == 'table' then
 			return input
@@ -1056,24 +1076,19 @@ function MatchGroupInputUtil.mergeStandaloneIntoMatch(match, standaloneMatch)
 	return match
 end
 
----@alias readDateFunction fun(match: table): {
----date: string,
----dateexact: boolean,
----timestamp: integer,
----timezoneId: string?,
----timezoneOffset:string?,
----}
+---@alias readDateFunction fun(match: table): MGIParsedDate
 
 ---@class MatchParserInterface
----@field extractMaps fun(match: table, opponents: table[], mapProps: any?): table[]
+---@field extractMaps fun(match: table, opponents: MGIParsedOpponent[], mapProps: any?): table[]
 ---@field getBestOf fun(bestOfInput: string|integer|nil, maps: table[]): integer?
 ---@field switchToFfa? fun(match: table, opponents: table[]): boolean
----@field calculateMatchScore? fun(maps: table[], opponents: table[]): fun(opponentIndex: integer): integer?
+---@field calculateMatchScore? fun(maps: table[], opponents: MGIParsedOpponent[]): fun(opponentIndex: integer): integer?
 ---@field removeUnsetMaps? fun(maps: table[]): table[]
----@field getExtraData? fun(match: table, games: table[], opponents: table[]): table?
+---@field getExtraData? fun(match: table, games: table[], opponents: MGIParsedOpponent[]): table?
 ---@field adjustOpponent? fun(opponent: MGIParsedOpponent, opponentIndex: integer)
 ---@field getLinks? fun(match: table, games: table[]): table
----@field getHeadToHeadLink? fun(match: table, opponents: table[]): string?
+---@field getHeadToHeadLink? fun(match: table, opponents: MGIParsedOpponent[]): string?
+---@field getPatch? fun(match: table, games: table[]): string?
 ---@field readDate? readDateFunction
 ---@field getMode? fun(opponents: table[]): string
 ---@field readOpponent? fun(match: table, opponentIndex: integer, opponentConfig: readOpponentOptions?):
@@ -1096,6 +1111,7 @@ end
 --- - adjustOpponent(opponent, opponentIndex)
 --- - getLinks(match, games): table?
 --- - getHeadToHeadLink(match, opponents): string?
+--- - getPatch(match, games): string?
 --- - readDate(match): table
 --- - getMode(opponents): string?
 --- - readOpponent(match, opponentIndex, opponentConfig): MGIParsedOpponent
@@ -1157,7 +1173,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 	match.finished = MatchGroupInputUtil.matchIsFinished(match, games, opponents)
 
 	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished)
+		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished, opponents)
 		match.winner = MatchGroupInputUtil.getWinner(match.status, matchInput.winner, opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
@@ -1166,10 +1182,16 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 
 	match.mode = Parser.getMode and Parser.getMode(opponents)
 		or Logic.emptyOr(match.mode, globalVars:get('tournament_mode'), Parser.DEFAULT_MODE)
+	if Parser.getPatch then
+		match.patch = Parser.getPatch(match, games)
+	end
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.extradata = Parser.getExtraData and Parser.getExtraData(match, games, opponents) or {}
+	match.extradata = Table.merge(
+		{casters = MatchGroupInputUtil.readCasters(match, {sortCasters = Info.config.match2.sortCasters})},
+		Parser.getExtraData and Parser.getExtraData(match, games, opponents) or {}
+	)
 
 	match.games = games
 	match.opponents = opponents
@@ -1179,24 +1201,30 @@ end
 
 ---@class MapParserInterface
 ---@field calculateMapScore? fun(map: table): fun(opponentIndex: integer): integer?
----@field getExtraData? fun(match: table, game: table, opponents: table[]): table?
+---@field getExtraData? fun(match: table, game: table, opponents: MGIParsedOpponent[]): table?
+---@field getLength? fun(map: table): string
+---@field getMap? fun(mapInput: table): table
 ---@field getMapName? fun(game: table, mapIndex: integer, match: table): string?, string?
----@field getMapMode? fun(match: table, game: table, opponents: table[]): string?
----@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
+---@field getMapMode? fun(match: table, game: table, opponents: MGIParsedOpponent[]): string?
+---@field getPlayersOfMapOpponent? fun(game: table, opponent:MGIParsedOpponent, opponentIndex: integer): table[]
 ---@field getPatch? fun(game: table): string?
----@field mapIsFinished? fun(map: table, opponents: table[], finishedInput: string?, winnerInput: string?): boolean
+---@field mapIsFinished? fun(map: table, opponents: MGIParsedOpponent[],
+---finishedInput: string?, winnerInput: string?): boolean
 ---@field extendMapOpponent? fun(map: table, opponentIndex: integer): table
 ---@field getMapBestOf? fun(map: table): integer?
 ---@field computeOpponentScore? fun(props: table, autoScore?: fun(opponentIndex: integer):integer?): integer?, string?
 ---@field getGame? fun(match: table, map:table): string?
 ---@field ADD_SUB_GROUP? boolean
 ---@field BREAK_ON_EMPTY? boolean
+---@field INHERIT_MAP_DATES? boolean
 
 --- The standard way to process a map input.
 ---
 --- The Parser injection may optionally have the following functions:
 --- - calculateMapScore(map): fun(opponentIndex): integer?
 --- - getExtraData(match, map, opponents): table?
+--- - getLength(map: table): string
+--- - getMap(mapInput: table): table
 --- - getMapName(map, mapIndex, match): string?, string?
 --- - getMapMode(match, map, opponents): string?
 --- - getPlayersOfMapOpponent(map, opponent, opponentIndex): table[]?
@@ -1211,13 +1239,16 @@ end
 --- - ADD_SUB_GROUP boolean?
 --- - BREAK_ON_EMPTY boolean?
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param Parser MapParserInterface
----@return table
+---@return table[]
 function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 	local maps = {}
 	local subGroup = 0
-	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+	local lastDate = match.date
+
+	for key, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		local map = Parser.getMap and Parser.getMap(mapInput) or mapInput
 		if Parser.BREAK_ON_EMPTY and Logic.isDeepEmpty(map) then
 			break
 		end
@@ -1225,6 +1256,11 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 		local winnerInput = map.winner --[[@as string?]]
 
 		local dateToUse = map.date or match.date
+		if Parser.INHERIT_MAP_DATES then
+			dateToUse = map.date or lastDate
+			lastDate = dateToUse
+		end
+
 		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
 
 		if Parser.ADD_SUB_GROUP then
@@ -1246,6 +1282,10 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 
 		if Parser.getGame then
 			map.game = Parser.getGame(match, map)
+		end
+
+		if Parser.getLength then
+			map.length = Parser.getLength(map)
 		end
 
 		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
@@ -1297,16 +1337,16 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 end
 
 ---@class FfaMatchParserInterface
----@field extractMaps fun(match: table, opponents: table[], mapProps: any?): table[]
+---@field extractMaps fun(match: table, opponents: MGIParsedOpponent[], mapProps: any?): table[]
 ---@field parseSettings? fun(match: table, opponentCount: integer): table
----@field calculateMatchScore? fun(maps: table[], opponents: table[]): fun(opponentIndex: integer): integer?
----@field getExtraData? fun(match: table, games: table[], opponents: table[], settings: table): table?
----@field getMode? fun(opponents: table[]): string
+---@field calculateMatchScore? fun(opponents: MGIParsedOpponent[], maps: table[]): fun(opponentIndex: integer): integer?
+---@field getExtraData? fun(match: table, games: table[], opponents: MGIParsedOpponent[], settings: table): table?
+---@field getMode? fun(opponents: MGIParsedOpponent[]): string
 ---@field readDate? readDateFunction
----@field adjustOpponent? fun(opponent: table[], opponentIndex: integer, match: table)
----@field matchIsFinished? fun(match: table, opponents: table[]): boolean
----@field getMatchWinner? fun(status: string, winnerInput: integer|string|nil, opponents: table[]): integer?
----@field extendOpponentIfFinished? fun(match: table, opponent:table)
+---@field adjustOpponent? fun(opponent: MGIParsedOpponent[], opponentIndex: integer, match: table)
+---@field matchIsFinished? fun(match: table, opponents: MGIParsedOpponent[]): boolean
+---@field getMatchWinner? fun(status: string, winnerInput: integer|string|nil, opponents: MGIParsedOpponent[]): integer?
+---@field extendOpponentIfFinished? fun(match: table, opponent: MGIParsedOpponent)
 ---@field DEFAULT_MODE? string
 ---@field DATE_FALLBACKS? string[]
 ---@field OPPONENT_CONFIG? readOpponentOptions
@@ -1318,7 +1358,7 @@ end
 ---
 --- It may optionally have the following functions:
 --- - parseSettings(match, opponentCount): table
---- - calculateMatchScore(maps, opponents): fun(opponentIndex): integer?
+--- - calculateMatchScore(opponents, maps): fun(opponentIndex): integer?
 --- - getExtraData(match, games, opponents, settings): table?
 --- - getMode(opponents): string?
 --- - readDate(match): table
@@ -1373,7 +1413,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 		or MatchGroupInputUtil.matchIsFinished(match, games, opponents)
 
 	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput, opponents)
 
 		local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
@@ -1397,6 +1437,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	match.links = MatchGroupInputUtil.getLinks(match)
 	match.extradata = Table.merge({
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
+		casters = MatchGroupInputUtil.readCasters(match)
 	}, Parser.getExtraData and Parser.getExtraData(match, games, opponents, settings) or {
 		placementinfo = settings.placementInfo,
 		settings = settings.settings,
@@ -1411,12 +1452,13 @@ end
 ---@class FfaMapParserInterface
 ---@field getMapName? fun(game: table, mapIndex: integer, match: table): string?, string?
 ---@field getPatch? fun(game: table): string?
----@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
----@field getMapMode? fun(match: table, game: table, opponents: table[]): string?
----@field getExtraData? fun(match: table, game: table, opponents: table[]): table?
----@field readMapOpponent? fun(map: table, matchOpponent: table, opponentIndex: integer): table
+---@field getPlayersOfMapOpponent? fun(game: table, opponent: MGIParsedOpponent, opponentIndex: integer): table[]
+---@field getMapMode? fun(match: table, game: table, opponents: MGIParsedOpponent[]): string?
+---@field getExtraData? fun(match: table, game: table, opponents: MGIParsedOpponent[]): table?
+---@field readMapOpponent? fun(map: table, matchOpponent: MGIParsedOpponent, opponentIndex: integer): table
 ---@field getMapWinner? fun(status: string?, winnerInput: integer|string?, mapOpponents: table[]): integer?
 ---@field mapIsFinished? fun(match: table, map: table): boolean
+---@field getGame? fun(match: table, map:table): string?
 
 --- The standard way to process a ffa map input.
 ---
@@ -1430,10 +1472,10 @@ end
 --- - getPlayersOfMapOpponent(map, opponent, opponentMapInput): table[]?
 ---
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param scoreSettings table
 ---@param Parser FfaMapParserInterface
----@return table
+---@return table[]
 function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, Parser)
 	local maps = {}
 	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
@@ -1446,6 +1488,10 @@ function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSetti
 
 		if Parser.getPatch then
 			map.patch = Parser.getPatch(map)
+		end
+
+		if Parser.getGame then
+			map.game = Parser.getGame(match, map)
 		end
 
 		local dateToUse = map.date or match.date
@@ -1477,7 +1523,9 @@ function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSetti
 		end
 
 		map.extradata = Table.merge({
+			displayname = map.mapDisplayName,
 			mvp = MatchGroupInputUtil.readMvp(map, opponents),
+			casters = MatchGroupInputUtil.readCasters(map)
 		}, Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil)
 
 		table.insert(maps, map)
@@ -1487,7 +1535,7 @@ function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSetti
 	return maps
 end
 
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return integer[]
 function MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 
@@ -1660,7 +1708,7 @@ end
 
 ---@param matchParser {readDate?: readDateFunction, DATE_FALLBACKS?: string[]}
 ---@param matchInput table
----@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
+---@return MGIParsedDate
 function MatchGroupInputUtil.getMatchDate(matchParser, matchInput)
 	local defaultDateParser = function(record)
 		return MatchGroupInputUtil.readDate(record.date, matchParser.DATE_FALLBACKS)

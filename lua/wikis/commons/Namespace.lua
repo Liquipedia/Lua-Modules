@@ -1,13 +1,11 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Namespace
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local FnUtil = require('Module:FnUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -17,12 +15,13 @@ local NS_USER = 2
 local NS_PROJECT = 4 -- "Liquipedia" namespace
 local NS_TEMPLATE = 10
 local NS_HELP = 12
+local NS_MATCH = 130
 local NS_MODULE = 828
 local NS_MODULE_TALK = 829
 
 local Namespace = {}
 
----Determins whether a given title object is in the given namespaces, and optionally their talk namespaces.
+---Determines whether a given title object is in the given namespaces, and optionally their talk namespaces.
 ---@param title Title
 ---@param namespaces (string|integer)[]
 ---@param includeTalk boolean?
@@ -47,7 +46,7 @@ function Namespace.isMain(title)
 end
 
 ---Determines if a title object is in the User namespace, also considers
----the User Talk namespace (unless excluded using the `excludeTalk` paramater).
+---the User Talk namespace (unless excluded using the `excludeTalk` parameter).
 ---Will use the title object of the page this module is invoked on if no title is provided.
 ---@param title Title?
 ---@param excludeTalk boolean?
@@ -59,7 +58,7 @@ end
 
 ---Determines if a title object is in a namespace used for documentation purposes (`NS_PROJECT`,
 ---`NS_TEMPLATE`, `NS_HELP`, and `NS_MODULE`), also considers their talk pages (unless excluded
----using the `excludeTalk` paramater). Will use the title object of the page this module is
+---using the `excludeTalk` parameter). Will use the title object of the page this module is
 ---invoked on if no title is provided.
 ---@param title Title?
 ---@param excludeTalk boolean?
@@ -77,6 +76,7 @@ end)
 ---@param name string?
 ---@return integer?
 function Namespace.idFromName(name)
+	name = (name or ''):gsub('_', ' ')
 	return Namespace.getIdsByName()[name]
 end
 
@@ -99,4 +99,10 @@ function Namespace.prefixFromId(id)
 	return name
 end
 
-return Class.export(Namespace, {frameOnly = true})
+---can not use Namespace.idFromName because the NS does not exist on all wikis
+---@return integer
+function Namespace.matchNamespaceId()
+	return NS_MATCH
+end
+
+return Namespace

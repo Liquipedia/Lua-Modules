@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warthunder
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=starcraft
 -- page=Module:Brkts/WikiSpecific
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local FnUtil = Lua.import('Module:FnUtil')
+local Table = Lua.import('Module:Table')
 
 local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
 

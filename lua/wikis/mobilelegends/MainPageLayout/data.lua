@@ -1,0 +1,232 @@
+---
+-- @Liquipedia
+-- page=Module:MainPageLayout/data
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
+
+local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
+local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+local LiquipediaApp = Lua.import('Module:Widget/MainPage/LiquipediaApp')
+local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
+local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
+local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
+local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
+
+local CONTENT = {
+	usefulArticles = {
+		heading = 'Useful Articles',
+		body = '{{Liquipedia:Useful Articles}}',
+		padding = true,
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
+	},
+	wantToHelp = {
+		heading = 'Want To Help?',
+		body = WantToHelp{},
+		padding = true,
+		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP,
+	},
+	liquipediaApp = {
+		heading = 'Download the Liquipedia App',
+		padding = true,
+		body = LiquipediaApp{},
+		boxid = MainPageLayoutUtil.BoxId.MOBILE_APP,
+	},
+	transfers = {
+		heading = 'Transfers',
+		body = TransfersList{},
+		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
+	},
+	thisDay = {
+		heading = ThisDayWidgets.Title(),
+		body = ThisDayWidgets.Content(),
+		padding = true,
+		boxid = MainPageLayoutUtil.BoxId.THIS_DAY,
+	},
+	specialEvents = {
+		noPanel = true,
+		body = '{{Liquipedia:Special Event}}',
+		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
+	},
+	filterButtons = {
+		noPanel = true,
+		body = Div{
+			css = { width = '100%', ['margin-bottom'] = '8px' },
+			children = { FilterButtonsWidget() }
+		},
+	},
+	matches = {
+		heading = 'Matches',
+		body = MatchTicker{},
+		padding = true,
+		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
+	},
+	tournaments = {
+		heading = 'Tournaments',
+		body = TournamentsTicker{
+			upcomingDays = 75,
+			completedDays = 45
+		},
+		padding = true,
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
+	},
+}
+
+return {
+	banner = {
+		lightmode = 'Mobile Legends 2025 full lightmode.svg',
+		darkmode = 'Mobile Legends 2025 full darkmode.svg',
+	},
+	metadesc = 'The Mobile Legends: Bang Bang (MLBB) esports wiki covering everything from players, teams & transfers, ' ..
+		'to tournaments and results, heroes, equipment, & patches.',
+	title = 'Mobile Legends',
+	navigation = {
+		{
+			file = 'RRQ Hoshi at M6 Knockout Stage.jpg',
+			title = 'Teams',
+			link = 'Portal:Teams',
+			count = {
+				method = 'LPDB',
+				table = 'team',
+			},
+		},
+		{
+			file = 'TLID Aran at M6 Knockout Stage.jpg',
+			title = 'Players',
+			link = 'Portal:Players',
+			count = {
+				method = 'LPDB',
+				table = 'player',
+			},
+		},
+		{
+			file = 'M6 World Championship Trophy.jpg',
+			title = 'Tournaments',
+			link = 'Portal:Tournaments',
+			count = {
+				method = 'LPDB',
+				table = 'tournament',
+			},
+		},
+		{
+			file = 'RRQ at M6 World Championship.jpg',
+			title = 'Transfers',
+			link = 'Portal:Transfers',
+			count = {
+				method = 'LPDB',
+				table = 'transfer',
+			},
+		},
+		{
+			file = 'NPFL Zarate at M6 Knockout Stage.jpg',
+			title = 'Statistics',
+			link = 'Portal:Statistics',
+		},
+		{
+			file = 'Layla Energy Gunner Revamp.png',
+			title = 'Heroes',
+			link = 'Portal:Heroes',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::character]]',
+			},
+		},
+		{
+			file = 'Item Immortality ML.png',
+			title = 'Equipment',
+			link = 'Portal:Equipment',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::item]]',
+			},
+		},
+		{
+			file = 'Estes Moon Elf King Skin.jpg',
+			title = 'Patches',
+			link = 'Portal:Patches',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::patch]]',
+			},
+		},
+	},
+	layouts = {
+		main = {
+			{ -- Left
+				sizes = {xxl = 5, xxxl = 6},
+				children = {
+					{
+						mobileOrder = 1,
+						content = CONTENT.specialEvents,
+					},
+					{
+						mobileOrder = 3,
+						content = CONTENT.transfers,
+					},
+					{
+						mobileOrder = 6,
+						content = CONTENT.wantToHelp,
+					},
+					{
+						mobileOrder = 7,
+						content = CONTENT.liquipediaApp,
+					},
+				}
+			},
+			{ -- Right
+				sizes = {xxl = 7, xxxl = 6},
+				children = {
+					{
+						mobileOrder = 2,
+						children = {
+							{
+								children = {
+									{
+										noPanel = true,
+										content = CONTENT.filterButtons,
+									},
+								},
+							},
+							{
+								size = 6,
+								children = {
+									{
+										noPanel = true,
+										content = CONTENT.matches,
+									},
+								},
+							},
+							{
+								size = 6,
+								children = {
+									{
+										noPanel = true,
+										content = CONTENT.tournaments,
+									},
+								},
+							},
+						},
+					},
+					{
+						mobileOrder = 5,
+						content = CONTENT.thisDay,
+					},
+					{
+						mobileOrder = 4,
+						content = CONTENT.usefulArticles,
+					},
+				},
+			},
+		},
+	},
+}

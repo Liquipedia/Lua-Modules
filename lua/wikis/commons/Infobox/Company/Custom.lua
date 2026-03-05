@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Company/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Company = Lua.import('Module:Infobox/Company')
 
@@ -15,7 +15,7 @@ local Company = Lua.import('Module:Infobox/Company')
 local CustomCompany = Class.new(Company)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomCompany.run(frame)
 	local company = CustomCompany(frame)
 	return company:createInfobox()

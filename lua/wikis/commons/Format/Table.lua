@@ -1,26 +1,30 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Format/Table
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Logic = require('Module:Logic')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local TableFormatter = {}
 
 ---Converts a lua table to html display of the table for easy copy paste
 ---@param inputTable table
----@return Html
-function TableFormatter.toLuaCode(inputTable)
+---@param options {asText: boolean?}?
+---@return Html|string
+function TableFormatter.toLuaCode(inputTable, options)
 	if type(inputTable) ~= 'table' then
 		error('TableFormatter.toLuaCode needs a table as input')
 	end
 
+	local asText = (options or {}).asText
+
 	if Table.isEmpty(inputTable) then
-		return mw.html.create('pre')
+		return asText and '' or mw.html.create('pre')
 			:addClass('selectall')
 			:wikitext('{}')
 	end
@@ -84,6 +88,10 @@ function TableFormatter.toLuaCode(inputTable)
 		end
 
 		return luaString .. '\n' .. string.rep('\t', indentNumber - 1) .. '}'
+	end
+
+	if asText then
+		return toLuaString(inputTable, 1)
 	end
 
 	return mw.html.create('pre')

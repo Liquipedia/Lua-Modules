@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:Squad/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local Squad = Lua.import('Module:Widget/Squad/Core')
 local SquadRow = Lua.import('Module:Squad/Row')
@@ -50,8 +50,9 @@ end
 ---@param person table
 ---@param squadStatus SquadStatus
 ---@param squadType SquadType
+---@param columnVisibility table?
 ---@return Widget
-function CustomSquad._playerRow(person, squadStatus, squadType)
+function CustomSquad._playerRow(person, squadStatus, squadType, columnVisibility)
 	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
 	if Logic.isEmpty(squadPerson.newteam) then
 		if Logic.readBool(person.retired) then
@@ -62,17 +63,17 @@ function CustomSquad._playerRow(person, squadStatus, squadType)
 	end
 	SquadUtils.storeSquadPerson(squadPerson)
 
-	local row = SquadRow(squadPerson)
+	local row = SquadRow(squadPerson, columnVisibility)
 	row:id()
 	row:name()
 	row:role()
-	row:date('joindate', 'Join Date:&nbsp;')
+	row:date('joindate')
 
 	if squadStatus == SquadUtils.SquadStatus.FORMER then
-		row:date('leavedate', 'Leave Date:&nbsp;')
+		row:date('leavedate')
 		row:newteam()
 	elseif squadStatus == SquadUtils.SquadStatus.INACTIVE then
-		row:date('inactivedate', 'Inactive Date:&nbsp;')
+		row:date('inactivedate')
 	end
 
 	return row:create()

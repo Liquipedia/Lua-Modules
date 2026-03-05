@@ -1,18 +1,18 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/FilterButtons
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Variables = Lua.import('Module:Variables')
+local Table = Lua.import('Module:Table')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -32,7 +32,7 @@ local FilterButtons = Class.new(Widget)
 ---@field defaultItem string?
 ---@field itemToPropertyValues? fun(item: string): string?
 ---@field itemIsValid? fun(item: string): boolean
----@field transform? fun(item: string): string?
+---@field transform? fun(item: string): string|Widget|Html|nil
 ---@field expandKey string?
 ---@field expandable boolean?
 ---@field order? fun(a: string, b: string): boolean

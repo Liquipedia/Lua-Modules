@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=tetris
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
+
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local CustomMatchGroupInput = {}
 local MapFunctions = {
@@ -51,9 +51,7 @@ end
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
 function CustomMatchGroupInput.calculateMatchScore(maps)
-	return function(opponentIndex)
-		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-	end
+	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
 ---@param bestofInput string|integer?
@@ -62,14 +60,6 @@ function CustomMatchGroupInput.getBestOf(bestofInput)
 	local bestOf = tonumber(Logic.emptyOr(bestofInput, Variables.varDefault('match_bestof')))
 	Variables.varDefine('match_bestof', bestOf)
 	return bestOf or DEFAULT_BESTOF
-end
-
----@param match table
----@return table
-function CustomMatchGroupInput.getExtraData(match)
-	return {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-	}
 end
 
 ---@param match table

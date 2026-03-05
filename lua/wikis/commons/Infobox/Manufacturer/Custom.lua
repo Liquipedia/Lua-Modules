@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Manufacturer/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Manufacturer = Lua.import('Module:Infobox/Manufacturer')
 
@@ -15,7 +15,7 @@ local Manufacturer = Lua.import('Module:Infobox/Manufacturer')
 local CustomManufacturer = Class.new(Manufacturer)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomManufacturer.run(frame)
 	local manufacturer = CustomManufacturer(frame)
 

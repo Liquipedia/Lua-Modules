@@ -1,18 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local VodLink = require('Module:VodLink')
+
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local VodLink = Lua.import('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -22,7 +21,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
@@ -54,7 +53,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 end
 
 ---@param match MatchGroupUtilMatch
----@return MatchSummaryBody
+---@return Widget[]
 function CustomMatchSummary.createBody(match)
 	if Logic.isNotEmpty(match.extradata.status) then
 		match.stream = {rawdatetime = true}
@@ -63,14 +62,11 @@ function CustomMatchSummary.createBody(match)
 	if match.extradata.status then
 		matchStatusText = '<b>Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '</b>'
 	end
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+	return WidgetUtil.collect(
 		Array.map(match.games, CustomMatchSummary._createMap),
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
 		MatchSummaryWidgets.MatchComment{children = matchStatusText} or nil
-	)}
+	)
 end
 
 ---@param match MatchGroupUtilMatch
@@ -88,11 +84,6 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 		end
 		if index > 0 then
 			label = label .. ' for Game ' .. index
-		end
-
-		icon = 'File:' .. icon
-		if iconDark then
-			iconDark = 'File:' .. iconDark
 		end
 
 		footer:addLink(url, icon, iconDark, label)
@@ -148,7 +139,7 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 	end
 
 	--- Platforms is used to keep the order of the links in footer
-	local platforms = mw.loadData('Module:MatchExternalLinks')
+	local platforms = Lua.import('Module:MatchExternalLinks', {loadData = true})
 	local links = match.links
 
 	local insertDotNext = false
@@ -226,7 +217,6 @@ function CustomMatchSummary._createMap(game)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '85%'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			MatchSummaryWidgets.DetailedScore{score = score(1), partialScores = team1Scores, flipped = false},

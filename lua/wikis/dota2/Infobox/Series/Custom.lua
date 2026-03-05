@@ -1,29 +1,32 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:Infobox/Series/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Series = Lua.import('Module:Infobox/Series')
 local Flags = Lua.import('Module:Flags')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class DotaSeriesInfobox: SeriesInfobox
+---@operator call(Frame): DotaSeriesInfobox
 local CustomSeries = Class.new(Series)
 
+---@class DotaSeriesInfoboxWidgetInjector: WidgetInjector
+---@field caller DotaSeriesInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomSeries.run(frame)
 	local series = CustomSeries(frame)
 	series:setWidgetInjector(CustomInjector(series))
@@ -49,7 +52,7 @@ function CustomInjector:parse(id, widgets)
 			end
 			table.insert(locations, text)
 		end
-		return {Cell{name = 'Location', content = locations}}
+		return {Cell{name = 'Location', children = locations}}
 	end
 	return widgets
 end

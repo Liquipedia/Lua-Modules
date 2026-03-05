@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
 -- page=Module:Tier/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -52,7 +51,7 @@ return {
 			value = '-1',
 			sort = 'C1',
 			name = 'Misc',
-			short = 'Misc',
+			short = 'M.',
 			link = 'Miscellaneous Tournaments',
 			category = 'Misc Tournaments',
 		},
@@ -89,14 +88,6 @@ return {
 			link = 'Qualifier Tournaments',
 			category = 'Qualifier Tournaments',
 		},
-		misc = {
-			value = 'Misc',
-			sort = 'A9',
-			name = 'Misc',
-			short = 'Misc',
-			link = 'Miscellaneous Tournaments',
-			category = 'Miscellaneous Tournaments',
-		},
 		showmatch = {
 			value = 'Showmatch',
 			sort = 'B1',
@@ -104,6 +95,22 @@ return {
 			short = 'Showm.',
 			link = 'Showmatches',
 			category = 'Showmatch Tournaments',
+		},
+		points = {
+			value = 'Points',
+			sort = 'B3',
+			name = 'Points',
+			short = 'Pts.',
+			link = 'Point Rankings',
+			category = 'Point Rankings',
+		},
+		awards = {
+			value = 'Awards',
+			sort = 'B4',
+			name = 'Awards',
+			short = 'Awards',
+			link = 'Award Shows',
+			category = 'Award Shows',
 		},
 	},
 }

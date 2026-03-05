@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=marvelrivals
 -- page=Module:NotabilityChecker/config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -12,17 +11,16 @@ Config.TIER_TYPE_GENERAL = 'general'
 Config.TIER_TYPE_QUALIFIER = 'qualifier'
 Config.TIER_TYPE_WEEKLY = 'weekly'
 Config.TIER_TYPE_MONTHLY = 'monthly'
-Config.TIER_TYPE_SHOW_MATCH = 'show match'
+Config.TIER_TYPE_SHOW_MATCH = 'showmatch'
 Config.TIER_TYPE_MISC = 'misc'
-Config.MAX_NUMBER_OF_PARTICIPANTS = 12
 Config.MAX_NUMBER_OF_COACHES = 6
 
 -- How many placements should we retrieve from LPDB for a team/player?
 Config.PLACEMENT_LIMIT = 2000
 
 -- These are the notability thresholds needed by a team/player
-Config.NOTABILITY_THRESHOLD_MIN = 13
-Config.NOTABILITY_THRESHOLD_NOTABLE = 15
+Config.NOTABILITY_THRESHOLD_MIN = 10
+Config.NOTABILITY_THRESHOLD_NOTABLE = 22
 
 -- Weights used for tournaments
 Config.weights = {
@@ -38,27 +36,23 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 5,
+				points = 3,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 0,
-			},
-			{
-				name = Config.TIER_TYPE_SHOWMATCH,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_MISC,
-				points = 0,
+				points = 0.5,
 			},
 		},
 	},
@@ -74,27 +68,23 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 2,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 0,
-			},
-			{
-				name = Config.TIER_TYPE_SHOWMATCH,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_MISC,
-				points = 0,
+				points = 0.5,
 			},
 		},
 	},
@@ -110,27 +100,23 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 1,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 0,
-			},
-			{
-				name = Config.TIER_TYPE_SHOWMATCH,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_MISC,
-				points = 0,
+				points = 0.5,
 			},
 		},
 	},
@@ -146,27 +132,23 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 0,
-			},
-			{
-				name = Config.TIER_TYPE_SHOWMATCH,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_MISC,
-				points = 0,
+				points = 0.5,
 			},
 		},
 	},
@@ -182,34 +164,33 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 0,
-			},
-			{
-				name = Config.TIER_TYPE_SHOWMATCH,
-				points = 0,
+				points = 0.5,
 			},
 			{
 				name = Config.TIER_TYPE_MISC,
-				points = 0,
+				points = 0.5,
 			},
 		},
 	},
 }
 
--- This function adjusts the score for the placement, e.g.
--- a first placement should score more than a 10th placement.
+--- This function adjusts the score for the placement, e.g.
+--- a first placement should score more than a 10th placement.
+---@param tier string|integer
+---@param tierType string
+---@return fun(number, number): number
 function Config.placementDropOffFunction(tier, tierType)
 
 		return function(score, placement)
@@ -217,6 +198,11 @@ function Config.placementDropOffFunction(tier, tierType)
 				if ((tier == 1 or tier == 2 or tier == 3) and placement == 1) then
 					return score
 				end
+			elseif (tierType == Config.TIER_TYPE_MISC
+					or tierType == Config.TIER_TYPE_WEEKLY
+					or tierType == Config.TIER_TYPE_MONTHLY
+					or tierType == Config.TIER_TYPE_SHOW_MATCH) then
+				return score
 			else
 				if (tier == 1 and placement <= 16) or placement == 1 then
 					return score

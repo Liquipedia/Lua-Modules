@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=callofduty
 -- page=Module:Infobox/Team/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
 
 local Team = Lua.import('Module:Infobox/Team')
 
@@ -16,7 +16,7 @@ local Team = Lua.import('Module:Infobox/Team')
 local CustomTeam = Class.new(Team)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 

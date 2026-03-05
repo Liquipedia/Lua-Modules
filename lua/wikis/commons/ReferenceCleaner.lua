@@ -1,18 +1,20 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:ReferenceCleaner
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local ReferenceCleaner = {}
 
----@param dateWithRef string?
+---@param args {input: string?}
 ---@return string
-function ReferenceCleaner.clean(dateWithRef)
+function ReferenceCleaner.clean(args)
+	local dateWithRef = args.input
 	if dateWithRef == nil then
 		return ''
 	end
@@ -29,9 +31,22 @@ function ReferenceCleaner.clean(dateWithRef)
 	return ''
 end
 
----@param numberWithRef string?
+---@param args {date: string?}
+---@return string?
+function ReferenceCleaner.cleanDateIfKnown(args)
+	local date = args.date
+	local isUnknownDate = function()
+		return date == nil or string.lower(date) == 'tba' or string.lower(date) == 'tbd'
+	end
+	if isUnknownDate() then return end
+	return ReferenceCleaner.clean{input = date}
+end
+
+---@param args {input: string?}
 ---@return string
-function ReferenceCleaner.cleanNumber(numberWithRef)
+---@overload fun(dateWithRef: table): string
+function ReferenceCleaner.cleanNumber(args)
+	local numberWithRef = args.input
 	if numberWithRef == nil then
 		return ''
 	end
@@ -44,4 +59,4 @@ function ReferenceCleaner.cleanNumber(numberWithRef)
 	return ''
 end
 
-return Class.export(ReferenceCleaner, {frameOnly = true})
+return Class.export(ReferenceCleaner, {frameOnly = true, exports = {'clean', 'cleanNumber'}})

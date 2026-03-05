@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Mock/TeamTemplate
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -10,8 +9,9 @@
 -- and never uses legacyimage/legacyimagedark for that reason
 
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local MockDatas = Lua.import('test_assets.team_template_data')
 local MockData = MockDatas.data

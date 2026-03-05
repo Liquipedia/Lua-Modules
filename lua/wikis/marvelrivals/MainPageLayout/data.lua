@@ -1,12 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=marvelrivals
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
+
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
@@ -16,6 +17,7 @@ local Div = HtmlWidgets.Div
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
+local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 local CONTENT = {
 	updates = {
@@ -28,22 +30,21 @@ local CONTENT = {
 		heading = 'Useful Articles',
 		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
-		boxid = 1503,
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
-		body = '{{Liquipedia:Want_to_help}}',
+		body = WantToHelp{},
 		padding = true,
-		boxid = 1504,
+		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP,
 	},
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferPage = function ()
-				return 'Player Transfers/' .. os.date('%Y')
-			end
+			rumours = true,
+			transferPage = MainPageLayoutUtil.getQuarterlyTransferPage()
 		},
-		boxid = 1509,
+		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
@@ -51,17 +52,12 @@ local CONTENT = {
 			birthdayListPage = 'Birthday list'
 		},
 		padding = true,
-		boxid = 1510,
+		boxid = MainPageLayoutUtil.BoxId.THIS_DAY,
 	},
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
-	},
-	heroes = {
-		heading = 'Heroes',
-		body = '{{Liquipedia:HeroTable}}',
-		padding = true,
-		boxid = 1501,
+		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -74,10 +70,7 @@ local CONTENT = {
 		heading = 'Matches',
 		body = MatchTicker{},
 		padding = true,
-		boxid = 1507,
-		panelAttributes = {
-			['data-switch-group-container'] = 'countdown',
-		},
+		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -86,7 +79,7 @@ local CONTENT = {
 			completedDays = 20
 		},
 		padding = true,
-		boxid = 1508,
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 }
 
@@ -100,7 +93,7 @@ return {
 	title = 'The Marvel Rivals Wiki',
 	navigation = {
 		{
-			file = 'SparkR OWCS Major 2024.jpg',
+			file = '100T at MRIG Mid Season Finals 2025.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -109,7 +102,7 @@ return {
 			},
 		},
 		{
-			file = 'Crazy Raccoon 2024 Esports World Cup Champions.jpg',
+			file = 'Rad EU MRIG Mid Season Finals 2025 Champions.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -118,7 +111,7 @@ return {
 			},
 		},
 		{
-			file = 'NTMR Infekted at OWCS 2024 Finals.jpg',
+			file = 'Cozy & Coluge at MRIG Mid Season Finals 2025.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -127,7 +120,7 @@ return {
 			},
 		},
 		{
-			file = 'OWCS Stockholm 2024 Trophy.jpg',
+			file = 'Ignite 2025 Mid Season Finals Trophy.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -136,7 +129,7 @@ return {
 			},
 		},
 		{
-			file = 'Marvel_Rivals_teamup_banner_Planet_X_Pals.png',
+			file = 'Season 0 Heroes Marvel Rivals.jpg',
 			title = 'Heroes',
 			link = 'Portal:Heroes',
 			count = {
@@ -146,7 +139,7 @@ return {
 			},
 		},
 		{
-			file = 'Marvel_Rivals_icon_Planet_x_Pals.png',
+			file = 'Marvel Rivals Old Hulk and Iron Man Team-Up.png',
 			title = 'Mechanics',
 			link = 'Mechanics',
 			count = {
@@ -155,7 +148,7 @@ return {
 			},
 		},
 		{
-			file = 'Marvel_Rivals_map_Royal_Palace.jpg',
+			file = 'Marvel Rivals map Celestial Husk.jpg',
 			title = 'Maps',
 			link = 'Portal:Maps',
 			count = {
@@ -175,7 +168,7 @@ return {
 			},
 		},
 		{
-			file = 'NRG hodsic at the ALGS Mannheim Split 2 Playoffs.jpg',
+			file = 'Gator at the MRIG Mid Season Finals 2025.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
@@ -183,16 +176,12 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				sizes = {xxl = 5, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
 						noPanel = true,
 						content = CONTENT.specialEvents,
-					},
-					{
-						mobileOrder = 2,
-						content = CONTENT.heroes,
 					},
 					{
 						mobileOrder = 4,
@@ -205,7 +194,7 @@ return {
 				}
 			},
 			{ -- Right
-				size = 6,
+				sizes = {xxl = 7, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 3,

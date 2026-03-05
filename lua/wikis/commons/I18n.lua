@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:I18n
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local FnUtil = Lua.import('Module:FnUtil')
+local String = Lua.import('Module:StringUtils')
 
 local I18nData = Lua.import('Module:I18n/Data', {loadData = true})
 local I18n = {}

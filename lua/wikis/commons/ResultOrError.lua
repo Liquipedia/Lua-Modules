@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:ResultOrError
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -116,7 +115,7 @@ end
 ---Errors with a JSON string for use by `liquipedia.customLuaErrors` JS module.
 ---@return any
 function ResultOrError.Error:get()
-	error(self.error)
+	error(tostring(self.error))
 end
 
 --[[

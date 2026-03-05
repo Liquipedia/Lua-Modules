@@ -7,6 +7,7 @@ describe('LPDB Condition Builder', function()
 	local Comparator = Condition.Comparator
 	local BooleanOperator = Condition.BooleanOperator
 	local ColumnName = Condition.ColumnName
+	local ConditionUtil = Condition.Util
 
 	describe('test ConditionNode', function ()
 		it('test basic comparator', function ()
@@ -15,7 +16,8 @@ describe('LPDB Condition Builder', function()
 			)
 			assert.are_equal(
 				'[[date::<2020-03-02T00:00:00.000]]',
-				conditionNode1:toString()
+				conditionNode1:toString(),
+				tostring(conditionNode1)
 			)
 		end)
 
@@ -25,7 +27,8 @@ describe('LPDB Condition Builder', function()
 			)
 			assert.are_equal(
 				'([[date::>2020-03-02T00:00:00.000]] OR [[date::2020-03-02T00:00:00.000]])',
-				conditionNode2:toString()
+				conditionNode2:toString(),
+				tostring(conditionNode2)
 			)
 		end)
 
@@ -35,7 +38,8 @@ describe('LPDB Condition Builder', function()
 			)
 			assert.are_equal(
 				'([[date::<2020-03-02T00:00:00.000]] OR [[date::2020-03-02T00:00:00.000]])',
-				conditionNode3:toString()
+				conditionNode3:toString(),
+				tostring(conditionNode3)
 			)
 		end)
 	end)
@@ -60,7 +64,8 @@ describe('LPDB Condition Builder', function()
 			assert.are_equal(
 				'[[date::<2020-03-02T00:00:00.000]] AND ([[opponent::Team Liquid]] OR [[opponent::Team Secret]]) ' ..
 				'AND [[extradata_region::Europe]]',
-				tree:toString()
+				tree:toString(),
+				tostring(tree)
 			)
 		end)
 		it('with empty trees', function()
@@ -93,24 +98,63 @@ describe('LPDB Condition Builder', function()
 
 			assert.are_equal(
 				'[[game::commons1]]',
-				cond1:toString()
+				cond1:toString(),
+				tostring(cond1)
 			)
 			assert.are_equal(
 				'[[game::commons1]] OR [[game::commons2]]',
-				cond2:toString()
+				cond2:toString(),
+				tostring(cond2)
 			)
 			assert.are_equal(
 				'([[game::commons1]] OR [[game::commons2]])',
-				cond3:toString()
+				cond3:toString(),
+				tostring(cond3)
 			)
 			assert.are_equal(
 				'([[game::commons1]]) AND ([[game::commons1]] OR [[game::commons2]]) AND '..
 					'(([[game::commons1]] OR [[game::commons2]]))',
-				cond4:toString()
+				cond4:toString(),
+				tostring(cond4)
 			)
 			assert.are_equal(
 				'[[game::commons1]]',
-				cond5:toString()
+				cond5:toString(),
+				tostring(cond5)
+			)
+		end)
+	end)
+
+	describe('Condition utilities test', function ()
+		it('anyOf', function ()
+			local tierColumnName = ColumnName('liquipediatier')
+
+			assert.is_nil(ConditionUtil.anyOf(tierColumnName, {}))
+
+			assert.are_equal(
+				'[[liquipediatier::1]] OR [[liquipediatier::2]]',
+				tostring(ConditionUtil.anyOf(tierColumnName, {1, 2}))
+			)
+
+			assert.are_equal(
+				'[[liquipediatier::1]] OR [[liquipediatier::2]] OR [[liquipediatier::3]]',
+				tostring(ConditionUtil.anyOf(tierColumnName, {1, 2, 3}))
+			)
+
+			assert.are_equal(
+				'[[liquipediatier::1]] OR [[liquipediatier::2]] OR [[liquipediatier::3]]',
+				tostring(ConditionUtil.anyOf(tierColumnName, {1, 2, 3, 2}))
+			)
+		end)
+
+		it('noneOf', function ()
+			local tierTypeColumnName = ColumnName('liquipediatiertype')
+
+			assert.is_nil(ConditionUtil.noneOf(tierTypeColumnName, {}))
+
+			assert.are_equal(
+				'[[liquipediatiertype::!Qualifier]] AND [[liquipediatiertype::!Misc]]',
+				tostring(ConditionUtil.noneOf(tierTypeColumnName, {'Qualifier', 'Misc'}))
 			)
 		end)
 	end)

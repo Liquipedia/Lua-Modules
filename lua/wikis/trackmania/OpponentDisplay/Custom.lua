@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=trackmania
 -- page=Module:OpponentDisplay/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
@@ -76,4 +76,4 @@ function OpponentDisplayCustom.InlineScore(opponent, scoreIndex)
 	return score
 end
 
-return Class.export(OpponentDisplayCustom)
+return OpponentDisplayCustom

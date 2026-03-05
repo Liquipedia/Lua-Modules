@@ -1,13 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Icon
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local IconData = Lua.import('Module:Icon/Data')
 local Icon = {}
@@ -29,19 +30,26 @@ function Icon.makeIcon(props)
 		return
 	end
 
+	local iconHtml = mw.html.create('i')
+		:addClass(icon)
+		:addClass(props.color)
+		:addClass(Logic.isNotEmpty(props.additionalClasses) and table.concat(props.additionalClasses, ' ') or nil)
+		:attr('title', props.hover)
+		:attr('aria-hidden', props.screenReaderHidden and 'true' or nil)
+		:attr(props.attributes and props.attributes or {})
+
 	local size = props.size
-	if Logic.isNumeric(size) then
-		size = size .. 'px'
+	if Table.includes({'2xs', 'xs', 'sm', 'lg', 'xl', '2xl'}, size) then
+		iconHtml:addClass('fa-' .. size)
+	else
+		if Logic.isNumeric(size) then
+			size = size .. 'px'
+		end
+		iconHtml:css('font-size', size)
 	end
-	return tostring(mw.html.create('i')
-			:addClass(icon)
-			:addClass(props.color)
-			:addClass(Logic.isNotEmpty(props.additionalClasses) and table.concat(props.additionalClasses, ' ') or nil)
-			:attr('title', props.hover)
-			:css('font-size', size)
-			:attr('aria-hidden', props.screenReaderHidden and 'true' or nil)
-			:attr(props.attributes and props.attributes or {})
-	)
+
+	return tostring(iconHtml)
 end
 
-return Class.export(Icon)
+return Class.export(Icon, {exports = {'makeIcon'}}
+)

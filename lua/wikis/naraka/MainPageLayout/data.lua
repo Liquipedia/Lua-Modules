@@ -1,0 +1,195 @@
+---
+-- @Liquipedia
+-- page=Module:MainPageLayout/data
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
+
+local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
+local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
+local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
+local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
+local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
+
+local CONTENT = {
+	theGame = {
+		heading = 'The Game',
+		body = '{{Liquipedia:The Game}}',
+		padding = true,
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
+	},
+	wantToHelp = {
+		heading = 'Want To Help?',
+		body = WantToHelp{},
+		padding = true,
+		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP,
+	},
+	transfers = {
+		heading = 'Transfers',
+		body = TransfersList{rumours = false},
+		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
+	},
+	thisDay = {
+		heading = ThisDayWidgets.Title(),
+		body = ThisDayWidgets.Content(),
+		padding = true,
+		boxid = MainPageLayoutUtil.BoxId.THIS_DAY,
+	},
+	specialEvents = {
+		noPanel = true,
+		body = '{{Liquipedia:Special Event}}',
+	},
+	filterButtons = {
+		noPanel = true,
+		body = Div{
+			css = { width = '100%', ['margin-bottom'] = '8px' },
+			children = { FilterButtonsWidget() }
+		},
+	},
+	matches = {
+		heading = 'Matches',
+		body = MatchTicker{},
+		padding = true,
+		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
+	},
+	tournaments = {
+		heading = 'Tournaments',
+		body = TournamentsTicker{
+			upcomingDays = 100,
+			completedDays = 200,
+		},
+		padding = true,
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
+	},
+}
+
+return {
+	banner = {
+		lightmode = 'NARAKA lightmode.png',
+		darkmode = 'NARAKA darkmode.png',
+	},
+	metadesc = 'Comprehensive NARAKA: BLADEPOINT wiki with articles covering everything from heroes, to weapons, '..
+		'to strategies, to tournaments, to competitive players and teams.',
+	title = 'NARAKA: BLADEPOINT',
+	navigation = {
+		{
+			file = 'KPL Dream Team at HoK Midseason Invitational 2024.jpg',
+			title = 'Teams',
+			link = 'Portal:Teams',
+			count = {
+				method = 'LPDB',
+				table = 'team',
+			},
+		},
+		{
+			file = 'TOP Tian at the 2024 Esports World Cup.jpg',
+			title = 'Players',
+			link = 'Portal:Players',
+			count = {
+				method = 'LPDB',
+				table = 'player',
+			},
+		},
+		{
+			file = 'Naraka J Cup banner.png',
+			title = 'Tournaments',
+			link = 'Portal:Tournaments',
+			count = {
+				method = 'LPDB',
+				table = 'tournament',
+			},
+		},
+		{
+			file = 'PVX ShunMi at the ALGS Birmingham Championship.jpg',
+			title = 'Transfers',
+			link = 'Portal:Transfers',
+			count = {
+				method = 'LPDB',
+				table = 'transfer',
+			},
+		},
+		{
+			file = 'Jenn_Lee_poses_with_Trophy_at_VCT_Master_Shanghai.jpg',
+			title = 'Statistics',
+			link = 'Portal:Statistics',
+		},
+		{
+			file = 'NARAKA Heroe banner.jpg',
+			title = 'Heroes',
+			link = 'Portal:Heroes',
+		},
+	},
+	layouts = {
+		main = {
+			{ -- Left
+				sizes = {xxl = 5, xxxl = 6},
+				children = {
+					{
+						mobileOrder = 2,
+						content = CONTENT.thisDay,
+					},
+					{
+						mobileOrder = 3,
+						content = CONTENT.transfers,
+					},
+					{
+						mobileOrder = 4,
+						content = CONTENT.wantToHelp,
+					},
+				}
+			},
+			{ -- Right
+				sizes = {xxl = 7, xxxl = 6},
+				children = {
+					{
+						mobileOrder = 1,
+						children = {
+							{
+								children = {
+									{
+										noPanel = true,
+										content = CONTENT.filterButtons,
+									},
+								},
+							},
+							{
+								size = 6,
+								children = {
+									{
+										noPanel = true,
+										content = CONTENT.matches,
+									},
+								},
+							},
+							{
+								size = 6,
+								children = {
+									{
+										noPanel = true,
+										content = CONTENT.tournaments,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			{
+				children = {
+					{
+						mobileOrder = 5,
+						content = CONTENT.theGame,
+					},
+				},
+			},
+		},
+	},
+}

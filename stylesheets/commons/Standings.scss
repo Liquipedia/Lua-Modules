@@ -1,0 +1,20 @@
+div.standings-ffa,
+div.standings-swiss {
+	& > table > * > tr > th {
+		padding: 12px;
+	}
+
+	& > table > * > tr > td {
+		padding: 8px;
+	}
+
+	& .btn {
+		width: 120%;
+	}
+
+	& .tableHeaderRow {
+		display: flex;
+		gap: 32px;
+		align-items: center;
+	}
+}

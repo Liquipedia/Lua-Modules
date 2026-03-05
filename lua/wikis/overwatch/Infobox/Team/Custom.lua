@@ -1,36 +1,32 @@
 ---
 -- @Liquipedia
--- wiki=overwatch
 -- page=Module:Infobox/Team/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Template = require('Module:Template')
+
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
 
 local Team = Lua.import('Module:Infobox/Team')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 ---@class OverwatchInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 
 	return team:createInfobox()
 end
 
----@return string?
+---@return Widget?
 function CustomTeam:createBottomContent()
-	return Template.expandTemplate(
-		mw.getCurrentFrame(),
-		'Upcoming and ongoing tournaments of',
-		{team = self.name}
-	)
+	return UpcomingTournaments.team{name = self.teamTemplate.templatename}
 end
 
 ---@param lpdbData table
