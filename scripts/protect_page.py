@@ -3,10 +3,7 @@ import time
 from typing import Iterable, Literal
 
 
-from deploy_util import (
-    SLEEP_DURATION,
-    write_to_github_summary_file,
-)
+from deploy_util import write_to_github_summary_file
 from mediawiki_session import MediaWikiSession, MediaWikiSessionError
 
 __all__ = [
@@ -76,7 +73,7 @@ def protect_non_existing_pages(session: MediaWikiSession, pages: Iterable[str]):
             protect_errors.append(f"create:{session.wiki}:{page}")
             return False
         finally:
-            time.sleep(SLEEP_DURATION)
+            session.cooldown()
 
     protect_pages(session, filter(filter_non_existing_pages, pages), "create")
 
