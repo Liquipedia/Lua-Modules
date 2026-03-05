@@ -46,6 +46,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field currentTeam string?
 ---@field links table?
 ---@field role string?
+---@field fromOpponentType OpponentType
 
 ---@class TournamentPlayerInfo
 ---@operator call(table): TournamentPlayerInfo
@@ -128,7 +129,7 @@ function TournamentPlayerInfo:_parseRecords(records)
 				player.team = opponent.template
 			end
 
-			return self:queryPlayerInfo(player)
+			return Table.merge(self:queryPlayerInfo(player), {fromOpponentType = opponent.type})
 		end)
 	end)
 
@@ -311,6 +312,9 @@ end
 ---@protected
 ---@return Widget?
 function TournamentPlayerInfo:buildTeamAgeTable()
+	if Array.all(self.data, function(player) return player.fromOpponentType ~= Opponent.team end) then
+		return
+	end
 	local _, teamPlayers = Array.groupBy(self.data, function (player) return player.team end)
 	local ageDataByTeam = Table.mapValues(teamPlayers, function (players) return self:_calculateAgeData(players) end)
 
