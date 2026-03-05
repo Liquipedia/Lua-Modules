@@ -23,7 +23,7 @@ def remove_page(session: MediaWikiSession, page: str):
                 "token": session.token,
             },
         )
-    except MediaWikiSessionError as e:
+    except MediaWikiSessionError:
         print(f"::warning::could not delete {page} on {session.wiki}")
         write_to_github_summary_file(
             f":warning: could not delete {page} on {session.wiki}"
