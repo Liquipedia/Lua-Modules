@@ -316,6 +316,18 @@
 	color: #c04845;
 }
 
+.brkts-identityv-score-color-survivor {
+	color: var( --clr-primary, #0000ff );
+}
+
+.brkts-identityv-score-color-hunter {
+	color: #c04845;
+
+	.theme--dark & {
+		color: #e47c7c;
+	}
+}
+
 /**
 * MatchlistDisplay
 */

@@ -32,19 +32,45 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local opponent = WikiCopyPaste.getOpponent(mode, showScore)
 
 	local lines = Array.extendWith({},
-		'{{Match',
-		index == 1 and (INDENT .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
+		'{{Match|finished=',
+		INDENT .. '|bestof=' .. (bestof ~= 0 and bestof or ''),
 		Logic.readBool(args.needsWinner) and (INDENT .. '|winner=') or nil,
 		INDENT .. '|date=',
 		Logic.readBool(args.streams) and (INDENT .. '|twitch=|youtube=|vod=') or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
 		end),
-		bestof ~= 0 and Array.map(Array.range(1, bestof), function(mapIndex)
-			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|score1=|score2=|winner=}}'
-		end) or nil,
+		bestof ~= 0 and Array.map(Array.range(1, bestof), WikiCopyPaste._getMapCode) or nil,
 		INDENT .. '}}'
 	)
+
+	return table.concat(lines, '\n')
+end
+
+---@param mapIndex integer
+---@return string
+function WikiCopyPaste._getMapCode(mapIndex)
+	---@param opponentIndex integer
+	---@param charType string
+	---@param limit integer
+	---@return string
+	local charsCode = function(opponentIndex, charType, limit)
+		local params = Array.map(Array.range(1, limit), function(runIndex)
+				return '|t' .. opponentIndex .. charType .. runIndex .. '='
+		end)
+		return table.concat(params)
+	end
+
+	local lines = {
+		INDENT .. '|map' .. mapIndex .. '={{Map|map=|finished=|t1firstside=',
+		INDENT .. INDENT .. '|t1hunter=|t1survivor=',
+		INDENT .. INDENT .. charsCode(1, 'p', 5),
+		INDENT .. INDENT .. charsCode(1, 'b', 6),
+		INDENT .. INDENT .. '|t2hunter=|t2survivor=',
+		INDENT .. INDENT .. charsCode(2, 'p', 5),
+		INDENT .. INDENT .. charsCode(2, 'b', 6),
+		INDENT .. INDENT .. '}}',
+	}
 
 	return table.concat(lines, '\n')
 end
