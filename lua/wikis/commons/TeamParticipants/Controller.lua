@@ -63,7 +63,7 @@ function TeamParticipantsController.fromTemplate(frame)
 		showPlayerInfo = Logic.readBool(args.showplayerinfo),
 		showControls = showControls,
 		mergeStaffTabIfOnlyOneStaff = Logic.nilOr(
-			Logic.readBoolOrNil(args.mergeStaffTabIfOnlyOneStff), Logic.readBool(Config.mergeStaffTabIfOnlyOneStaff)
+			Logic.readBoolOrNil(args.mergeStaffTabIfOnlyOneStaff), Logic.readBool(Config.mergeStaffTabIfOnlyOneStaff)
 		)
 	}
 end
