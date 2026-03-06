@@ -42,6 +42,7 @@ local Center = Widgets.Center
 local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 local TeamHistoryWidget = Lua.import('Module:Widget/Infobox/TeamHistory')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class Person: BasicInfobox
 ---@operator call(Frame): Person
@@ -468,27 +469,23 @@ end
 --- Allows for overriding this functionality
 --- e.g. to add faction icons to the display for SC2, SC, WC
 ---@param args table
----@return string
+---@return (string|Widget)[]
 function Person:nameDisplay(args)
 	local team = string.lower(args.teamicon or args.ttlink or args.teamlink or args.team or '')
 	local icon = TeamTemplate.exists(team)
-		and OpponentDisplay.InlineTeamContainer{template = team, style = 'icon'} or ''
+		and OpponentDisplay.InlineTeamContainer{template = team, style = 'icon'} or nil
 
 	local team2 = string.lower(args.team2icon or args.ttlink2 or args.team2link or args.team2 or '')
 	local icon2 = TeamTemplate.exists(team2)
-		and OpponentDisplay.InlineTeamContainer{template = team2, style = 'icon'} or ''
+		and OpponentDisplay.InlineTeamContainer{template = team2, style = 'icon'} or nil
 
 	local name = args.id or mw.title.getCurrentTitle().text
 
-	local display = name
-	if Logic.isNotEmpty(icon) then
-		display = tostring(icon) .. '&nbsp;' .. name
-	end
-	if Logic.isNotEmpty(icon2) then
-		display = display .. ' ' .. tostring(icon2)
-	end
 
-	return display
+	return Array.interleave(
+		WidgetUtil.collect(icon, name, icon2),
+		'&nbsp;'
+	)
 end
 
 --- Allows for overriding this functionality
