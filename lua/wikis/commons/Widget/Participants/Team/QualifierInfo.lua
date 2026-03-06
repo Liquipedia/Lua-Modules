@@ -59,6 +59,12 @@ function ParticipantsTeamQualifierInfo:render()
 			additionalClasses = { 'team-participant-card__qualifier-icon' }
 		}
 		linktype = 'external'
+	elseif qualification.type == 'internal' then
+		link = qualification.page
+		icon = Icon{
+			iconName = 'internal_link',
+			additionalClasses = { 'team-participant-card__qualifier-icon' }
+		}
 	end
 
 	local textChildren = {text}
@@ -85,30 +91,11 @@ function ParticipantsTeamQualifierInfo:render()
 					}
 				)
 			},
-			self:createPlacementBadge(qualification.placement)
+			Placement.renderInWidget{placement = qualification.placement}
 		}
 	}
 
 	return content
-end
-
----@param placement string|integer?
----@return Widget?
-function ParticipantsTeamQualifierInfo:createPlacementBadge(placement)
-	if not placement then
-		return nil
-	end
-
-	local placementData = Placement.raw(placement)
-
-	return Span{
-		classes = {
-			'team-participant-card__qualifier-placement',
-			'placement-text',
-			placementData.backgroundClass
-		},
-		children = placementData.display
-	}
 end
 
 return ParticipantsTeamQualifierInfo

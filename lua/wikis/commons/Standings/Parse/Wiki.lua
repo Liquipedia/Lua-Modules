@@ -12,18 +12,11 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
-local Namespace = Lua.import('Module:Namespace')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
+local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
-
-local Condition = Lua.import('Module:Condition')
-local ConditionTree = Condition.Tree
-local ConditionNode = Condition.Node
-local Comparator = Condition.Comparator
-local BooleanOperator = Condition.BooleanOperator
-local ColumnName = Condition.ColumnName
 
 local StandingsParseWiki = {}
 
@@ -78,21 +71,19 @@ end
 
 ---@param roundInput string|table
 ---@param roundIndex integer
----@return {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}[]
+---@return {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}
 function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 	local roundData = Json.parseIfString(roundInput)
 	local matches = Array.parseCommaSeparatedString(roundData.matches)
-	local matchGroups = Array.parseCommaSeparatedString(roundData.matchgroups)
-	local stages = Array.parseCommaSeparatedString(roundData.stages)
-	if Logic.isNotEmpty(matchGroups) then
-		Array.extendWith(matches, Array.flatMap(matchGroups, function(matchGroupId)
-			return StandingsParseWiki.getMatchIdsOfMatchGroup(matchGroupId)
-		end))
-	end
-	if Logic.isNotEmpty(stages) then
-		Array.extendWith(matches, Array.flatMap(stages, function(stage)
-			return StandingsParseWiki.getMatchIdsFromStage(stage)
-		end))
+	local matchGroupsSpec = {
+		matchGroupIds = Array.parseCommaSeparatedString(roundData.matchgroups),
+		pageNames = {Array.parseCommaSeparatedString(roundData.stages)},
+	}
+	if Logic.isNotDeepEmpty(matchGroupsSpec) then
+		Array.extendWith(matches, MatchGroupUtil.fetchMatchIds{
+			conditions = TournamentStructure.getMatch2Filter(matchGroupsSpec),
+			limit = 1000,
+		})
 	end
 	return {
 		roundNumber = roundIndex,
@@ -100,36 +91,6 @@ function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 		finished = Logic.readBool(roundData.finished),
 		title = roundData.title,
 		matches = Array.unique(matches),
-	}
-end
-
----@param matchGroupId string
----@return string[]
-function StandingsParseWiki.getMatchIdsOfMatchGroup(matchGroupId)
-	return MatchGroupUtil.fetchMatchIds{
-		conditions = ConditionTree(BooleanOperator.all):add{
-			ConditionNode(ColumnName('namespace'), Comparator.neq, Namespace.matchNamespaceId()),
-			ConditionNode(ColumnName('match2bracketid'), Comparator.eq, matchGroupId),
-		},
-		limit = 1000,
-	}
-end
-
----@param rawStage string
----@return string[]
-function StandingsParseWiki.getMatchIdsFromStage(rawStage)
-	local title = mw.title.new(rawStage)
-	assert(title, 'Invalid pagename "' .. rawStage .. '"')
-	local namespace, basePage, stage = Logic.nilIfEmpty(title.nsText), title.text, Logic.nilIfEmpty(title.fragment)
-	basePage = basePage:gsub(' ', '_')
-
-	return MatchGroupUtil.fetchMatchIds{
-		conditions = ConditionTree(BooleanOperator.all):add(Array.append(
-			{ConditionNode(ColumnName('pagename'), Comparator.eq, basePage)},
-			namespace and ConditionNode(ColumnName('namespace'), Comparator.eq, Namespace.idFromName(namespace)) or nil,
-			stage and ConditionNode(ColumnName('match2bracketdata_sectionheader'), Comparator.eq, stage) or nil
-		)),
-		limit = 1000
 	}
 end
 

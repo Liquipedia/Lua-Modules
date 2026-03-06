@@ -34,7 +34,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
@@ -47,9 +47,7 @@ end
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function MatchFunctions.calculateMatchScore(maps)
-	return function(opponentIndex)
-		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-	end
+	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
 ---@param bestofInput string|integer?
@@ -58,6 +56,16 @@ function MatchFunctions.getBestOf(bestofInput)
 	local bestof = tonumber(Logic.emptyOr(bestofInput, Variables.varDefault('bestof')))
 	Variables.varDefine('bestof', bestof)
 	return bestof or DEFAULT_BESTOF_MATCH
+end
+
+---@param match table
+---@param games table[]
+---@param opponents MGIParsedOpponent[]
+---@return table
+function MatchFunctions.getExtraData(match, games, opponents)
+	return {
+		mvp = MatchGroupInputUtil.readMvp(match, opponents),
+	}
 end
 
 --
@@ -74,7 +82,7 @@ end
 
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
@@ -97,7 +105,7 @@ function MapFunctions.getExtraData(match, map, opponents)
 end
 
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)

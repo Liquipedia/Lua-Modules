@@ -21,7 +21,7 @@ local CustomResultsTable = {}
 
 -- Template entry point for results and achievements tables
 ---@param args table
----@return Html
+---@return Widget
 function CustomResultsTable.results(args)
 	args.gameIcons = true
 	args.showType = true
@@ -34,7 +34,7 @@ end
 
 -- Template entry point for awards tables
 ---@param args table
----@return Html
+---@return Widget
 function CustomResultsTable.awards(args)
 	args.gameIcons = true
 	args.showType = true

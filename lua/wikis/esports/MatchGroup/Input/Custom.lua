@@ -7,6 +7,8 @@
 
 local Lua = require('Module:Lua')
 
+local FnUtil = Lua.import('Module:FnUtil')
+
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
@@ -27,7 +29,7 @@ end
 --
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
@@ -36,9 +38,7 @@ end
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function MatchFunctions.calculateMatchScore(maps)
-	return function(opponentIndex)
-		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-	end
+	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
 function MapFunctions.getExtraData(match, map, opponents)

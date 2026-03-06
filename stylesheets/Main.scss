@@ -15,7 +15,9 @@
 @use "commons/Carousel";
 @use "commons/Colours";
 @use "commons/Crosstable";
+@use "commons/Dialog";
 @use "commons/DivTable";
+@use "commons/Dropdown";
 @use "commons/FilterButtons";
 @use "commons/Fountain";
 @use "commons/Grid";
@@ -32,7 +34,6 @@
 @use "commons/Faction";
 @use "commons/HexagonPortraits";
 @use "commons/ResponsiveTable";
-@use "commons/RosterCard";
 @use "commons/TeamPortal";
 @use "commons/TournamentCard";
 @use "commons/NavFrame";
@@ -44,6 +45,7 @@
 @use "commons/Selectall";
 @use "commons/Statisticstable";
 @use "commons/Standings";
+@use "commons/Table2";
 @use "commons/Tables";
 @use "commons/Tabs";
 @use "commons/TeamParticipantCard";

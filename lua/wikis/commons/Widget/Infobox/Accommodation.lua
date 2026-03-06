@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Locale = Lua.import('Module:Locale')
 local String = Lua.import('Module:StringUtils')
 
@@ -110,17 +110,17 @@ function Accommodation:render()
 		Center{children = {
 			Button{
 				linktype = 'external',
-				variant = 'primary',
+				variant = 'themed',
 				size = 'md',
 				link = buildStay22Link(
-		table.concat(addressParts, ', '),
-		DateExt.toYmdInUtc(osdateStart),
-		DateExt.toYmdInUtc(osdateEnd)
+					table.concat(addressParts, ', '),
+					DateExt.toYmdInUtc(osdateStart),
+					DateExt.toYmdInUtc(osdateEnd)
 				),
 				children = {
-		IconFa{iconName = 'accommodation'},
-		' ',
-		'Find My Accommodation',
+					IconFa{iconName = 'accommodation'},
+					' ',
+					'Find My Accommodation',
 				}
 			},
 			Center{children = 'Bookings earn Liquipedia a small commission.'}

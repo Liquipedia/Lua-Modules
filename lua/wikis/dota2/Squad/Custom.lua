@@ -75,24 +75,24 @@ function CustomSquad.runAuto(playerList, squadStatus, squadType, customTitle)
 	)
 end
 
-function CustomSquad._playerRow(person, squadStatus, squadType)
+function CustomSquad._playerRow(person, squadStatus, squadType, columnVisibility)
 	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
 	squadPerson.extradata.activeteam = person.activeteam
 	squadPerson.extradata.activeteamrole = person.activeteamrole
 	SquadUtils.storeSquadPerson(squadPerson)
 
-	local row = ExtendedSquadRow(squadPerson)
+	local row = ExtendedSquadRow(squadPerson, columnVisibility)
 	row:id()
 	row:name()
 	row:position()
-	row:date('joindate', 'Join Date:&nbsp;')
+	row:date('joindate')
 
 	if squadStatus == SquadUtils.SquadStatus.INACTIVE or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
-		row:date('inactivedate', 'Inactive Date:&nbsp;')
+		row:date('inactivedate')
 		row:activeteam()
 	end
 	if squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
-		row:date('leavedate', 'Leave Date:&nbsp;')
+		row:date('leavedate')
 		row:newteam()
 	end
 

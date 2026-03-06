@@ -17,10 +17,10 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchCard = Lua.import('Module:Widget/Match/Card')
 local Switch = Lua.import('Module:Widget/Switch')
 
----@class EntityMatchTickerMatch
+local TABLE_OF_CONTENTS = '__TOC__'
+
+---@class EntityMatchTickerMatch: MatchTickerMatchInterface
 ---@operator call({config: MatchTickerConfig, match: table}): EntityMatchTickerMatch
----@field config MatchTickerConfig
----@field match table
 local MatchCardEntity = Class.new(
 	function(self, args)
 		self.config = args.config
@@ -45,10 +45,8 @@ function MatchCardEntity:create()
 	}
 end
 
----@class EntityMatchTickerContainer
+---@class EntityMatchTickerContainer: MatchTickerContainerInterface
 ---@operator call({config: MatchTickerConfig, matches: table[]}): EntityMatchTickerContainer
----@field config MatchTickerConfig
----@field matches table[]
 local Container = Class.new(
 	function(self, args)
 		self.config = args.config
@@ -73,9 +71,14 @@ function Container:create()
 	return HtmlWidgets.Div{
 		css = {['margin-bottom'] = '1rem'},
 		children = {
-			HtmlWidgets.H2{
-				css = {border = 'unset'},
-				children = I18n.translate('matchticker-upcoming-matches'),
+			HtmlWidgets.Div{
+				classes = {'mw-heading', 'mw-heading2'},
+				children = {
+					HtmlWidgets.H2{
+						css = {border = 'unset'},
+						children = I18n.translate('matchticker-upcoming-matches'),
+					},
+				},
 			},
 			Switch{
 				label = 'Show countdown',
@@ -84,6 +87,12 @@ function Container:create()
 				defaultActive = true,
 				css = {margin = '0.75rem 0 1rem'},
 				content = carousel,
+			},
+			HtmlWidgets.Div{
+				css = {['margin-top'] = '1rem'},
+				children = {
+					TABLE_OF_CONTENTS,
+				},
 			},
 		},
 	}
