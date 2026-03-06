@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
@@ -16,94 +17,96 @@ local VodLink = Lua.import('Module:VodLink')
 
 local MatchTable = Lua.import('Module:MatchTable')
 
-local NOT_PLAYED = 'notplayed'
-local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class GameTableMatch: MatchTableMatch
----@field games match2game[]
+local NOT_PLAYED = 'notplayed'
+local SCORE_CONCAT = '&nbsp;&colon;&nbsp;'
 
 ---@class GameTable: MatchTable
----@field countGames number
+---@operator call(table): GameTable
+---@field countGames integer
 local GameTable = Class.new(MatchTable, function (self)
 	self.countGames = 0
 end)
 
----@param game match2game
----@return match2game?
-function GameTable:gameFromRecord(game)
-	if self.countGames == self.config.limit then return nil end
-	if game.status == NOT_PLAYED or Logic.isEmpty(game.winner) then
-		return nil
-	end
-
-	return game
-end
-
----@param record table
----@return GameTableMatch?
+---@param record match2
+---@return MatchTableMatch?
 function GameTable:matchFromRecord(record)
-	if self.countGames == self.config.limit then return nil end
+	if self.countGames >= self.config.limit then return nil end
 	local matchRecord = MatchTable.matchFromRecord(self, record)
-	---@cast matchRecord GameTableMatch
-	if Logic.isEmpty(record.match2games) then
+	if not matchRecord then
+		return
+	elseif Logic.isEmpty(record.match2games) then
 		return nil
 	end
 
-	matchRecord.games = {}
-	--order games from last played to first
-	Array.forEach(Array.reverse(record.match2games), function (game)
-		local gameRecord = self:gameFromRecord(game)
-		if gameRecord then self.countGames = self.countGames + 1 end
-		table.insert(matchRecord.games, gameRecord)
+	matchRecord.games = Array.filter(matchRecord.games, function (game)
+		return self:filterGame(game)
 	end)
+
+	self.countGames = self.countGames + #matchRecord.games
 
 	return matchRecord
 end
 
----@param vod string?
----@return Html?
-function GameTable:_displayGameVod(vod)
-	if not self.config.showVod then return end
+---@param game MatchGroupUtilGame
+---@return boolean
+function GameTable:filterGame(game)
+	return game.status ~= NOT_PLAYED and Logic.isNotEmpty(game.winner)
+end
 
-	local vodNode = mw.html.create('td')
-	if Logic.isEmpty(vod) then
-		return vodNode:wikitext('')
+---@param vod string?
+---@return Widget?
+function GameTable:_displayGameVod(vod)
+	if not self.config.showVod then
+		return
+	elseif Logic.isEmpty(vod) then
+		return TableWidgets.Cell{}
 	end
 	---@cast vod -nil
-	return vodNode:node(VodLink.display{vod = vod})
+	return TableWidgets.Cell{children = VodLink.display{vod = vod}}
 end
 
 ---@param result MatchTableMatchResult
----@param game match2game
+---@param game MatchGroupUtilGame
 ---@return Html?
 function GameTable:_displayGameScore(result, game)
 	local scores = Array.map(game.opponents, Operator.property('score'))
-	local toScore = function(opponentRecord)
-		local isWinner = opponentRecord.id == tonumber(game.winner)
-		local score = scores[opponentRecord.id] or (isWinner and 1) or 0
-		return mw.html.create(isWinner and 'b' or nil)
-			:wikitext(score)
+	local indexes = result.flipped and {2, 1} or {1, 2}
+
+	---@param opponentIndex integer
+	---@return Widget
+	local toScore = function(opponentIndex)
+		local isWinner = opponentIndex == tonumber(game.winner)
+		local score = scores[opponentIndex] or (isWinner and 1) or 0
+		return HtmlWidgets.Span{
+			css = {['font-weight'] = isWinner and 'bold' or nil},
+			children = score
+		}
 	end
 
-	return mw.html.create('td')
-		:addClass('match-table-score')
-		:node(toScore(result.opponent))
-		:node(SCORE_CONCAT)
-		:node(toScore(result.vs))
+	return TableWidgets.Cell{children = {
+		toScore(indexes[1]),
+		SCORE_CONCAT,
+		toScore(indexes[2]),
+	}}
 end
 
----@param game match2game
+---@param game MatchGroupUtilGame
 ---@return Html?
 function GameTable:_displayGameIconForGame(game)
 	if not self.config.displayGameIcons then return end
 
-	return mw.html.create('td')
-		:node(Game.icon{game = game.game})
+	return TableWidgets.Cell{
+		children = Game.icon{game = game.game}
+	}
 end
 
----@param match GameTableMatch
----@param game match2game
----@return Html?
+---@param match MatchTableMatch
+---@param game MatchGroupUtilGame
+---@return Widget|Widget[]?
 function GameTable:displayGame(match, game)
 	if not self.config.showResult then
 		return
@@ -111,41 +114,56 @@ function GameTable:displayGame(match, game)
 		return self:nonStandardMatch(match)
 	end
 
-	return mw.html.create()
-		:node(self.config.showOpponent and self:_displayOpponent(match.result.opponent, true) or nil)
-		:node(self:_displayGameScore(match.result, game))
-		:node(self:_displayOpponent(match.result.vs):css('text-align', 'left'))
+	return WidgetUtil.collect(
+		self.config.showOpponent and self:_displayOpponent(match.result.opponent, true) or nil,
+		self:_displayGameScore(match.result, game),
+		self:_displayOpponent(match.result.vs)
+	)
 end
 
----@param match GameTableMatch
----@param game match2game
----@return Html?
+---@param match MatchTableMatch
+---@param game MatchGroupUtilGame
+---@return Widget
 function GameTable:gameRow(match, game)
-	local winner = match.result.opponent.id == tonumber(game.winner) and 1 or 2
+	local indexes = match.result.flipped and {2, 1} or {1, 2}
+	local winner = indexes[game.winner]
 
-	return mw.html.create('tr')
-		:addClass(self:_getBackgroundClass(winner))
-		:node(self:_displayDate(match))
-		:node(self:_displayTier(match))
-		:node(self:_displayType(match))
-		:node(self:_displayGameIconForGame(game))
-		:node(self:_displayIcon(match))
-		:node(self:_displayTournament(match))
-		:node(self:displayGame(match, game))
-		:node(self:_displayGameVod(game.vod))
-		:node(self:_displayMatchPage(match))
+	return TableWidgets.Row{
+		classes = {self:getBackgroundClass(winner)},
+		children = WidgetUtil.collect(
+			self:_displayDate(match),
+			self:displayTier(match),
+			self:_displayType(match),
+			self:_displayGameIconForGame(game),
+			self:_displayIcon(match),
+			self:_displayTournament(match),
+			self:displayGame(match, game),
+			self:_displayGameVod(game.vod),
+			self:_displayMatchPage(match)
+		)
+	}
 end
 
----@param match GameTableMatch
----@return Html?
-function GameTable:matchRow(match)
-	local display = mw.html.create()
+---@return Widget[]
+function GameTable:buildRows()
+	---@type Widget[]
+	local rows = {}
 
-	Array.forEach(match.games, function(game)
-		display:node(self:gameRow(match, game))
+	local currentYear = math.huge
+	Array.forEach(self.matches, function(match)
+		local year = DateExt.getYearOf(match.date)
+		if self.config.showYearHeaders and year ~= currentYear then
+			currentYear = year
+			table.insert(rows, self:_yearRow(year))
+		end
+		Array.extendWith(rows, Array.reverse(
+			Array.map(match.games, function (game)
+				return self:gameRow(match, game)
+			end)
+		))
 	end)
 
-	return display
+	return rows
 end
 
 return GameTable
