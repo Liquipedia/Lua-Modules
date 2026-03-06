@@ -28,7 +28,7 @@ local AUTOMATION_START_DATE = '2023-10-16'
 
 -- Template entry point
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 

@@ -191,7 +191,7 @@ function MatchHeader:_renderVertical(match)
 								'match-info-opponent-score',
 								isWinner and 'match-info-opponent-score-winner' or nil
 							),
-							children = matchPhase == 'upcoming' and '-' or score
+							children = matchPhase ~= 'upcoming' and score or nil
 						}
 					}
 				}

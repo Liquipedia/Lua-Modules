@@ -119,7 +119,7 @@ function TransferNavBox._checkForCurrentQuarterOrMonth(children, firstEntry)
 	local quarter = tonumber((firstEntry.abbreviation:match('Q(%d)')))
 	local origMonthAbbreviation = firstEntry.abbreviation:gsub('#.*', '')
 	local monthTimeStamp = (not quarter) and DateExt.readTimestamp(origMonthAbbreviation .. ' 1970') or nil
-	local month = monthTimeStamp and DateExt.formatTimestamp('n', monthTimeStamp) or nil
+	local month = monthTimeStamp and DateExt.getMonthOf(monthTimeStamp) or nil
 
 	local addCurrent = function()
 		if not month and not quarter then return children end
@@ -136,10 +136,15 @@ function TransferNavBox._checkForCurrentQuarterOrMonth(children, firstEntry)
 			return children
 		end
 
-		local monthAbbreviation = TransferNavBox._getMonthAbbreviation(month)
+		local monthAbbreviation = TransferNavBox._getMonthAbbreviation(currentMonth)
 		if not monthAbbreviation then return children end
 
-		pageName = pageName:gsub('/[^/]*/?%d?$', '/' .. monthAbbreviation)
+		local currentMonthTimeStamp = DateExt.readTimestamp(monthAbbreviation .. ' 1970')
+		--can not be nil since it is a valid timestamp as per above nil check
+		---@cast currentMonthTimeStamp -nil
+		local monthName = DateExt.formatTimestamp('F', currentMonthTimeStamp)
+		pageName = pageName:gsub('/[^/]*/?%d?$', '/' .. monthName)
+
 		table.insert(children.child0, 1, Link{
 			link = pageName,
 			children = {monthAbbreviation},
@@ -156,7 +161,7 @@ function TransferNavBox._checkForCurrentQuarterOrMonth(children, firstEntry)
 		return children
 	end
 	children = Table.map(children, function(key, child)
-		local index = tonumber((key:match('child(%d)')))
+		local index = tonumber((key:match('child(%d+)')))
 		return 'child' .. (index + 1), child
 	end)
 	children.child0 = {name = currentYear}
@@ -243,7 +248,7 @@ function TransferNavBox._readQuarterOrMonth(pageName)
 end
 
 ---@private
----@param month string?
+---@param month string|integer?
 ---@return string?
 function TransferNavBox._getMonthAbbreviation(month)
 	if Logic.isEmpty(month) then return end
@@ -251,7 +256,10 @@ function TransferNavBox._getMonthAbbreviation(month)
 	-- we have to account for transfer pages not fitting the format we will ignore those and throw them away
 	-- but since the date functions would error on them rather pcall the date functions
 	local formatMonth = function()
-		local timestamp = DateExt.readTimestamp(month .. ' 1970')
+		local date = Logic.isNumeric(month)
+			and ('1970-' .. string.format('%02d', month) .. '-01')
+			or (month .. ' 1970')
+		local timestamp = DateExt.readTimestamp(date)
 		assert(timestamp)
 		return DateExt.formatTimestamp('M', timestamp)
 	end

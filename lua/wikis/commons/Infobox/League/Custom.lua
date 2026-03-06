@@ -15,7 +15,7 @@ local League = Lua.import('Module:Infobox/League')
 local CustomLeague = Class.new(League)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	return league:createInfobox()

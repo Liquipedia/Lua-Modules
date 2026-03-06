@@ -1054,6 +1054,11 @@ function mw.ustring.upper(s) return string.upper(s) end
 ---@field fragment string?
 mw.uri = {}
 
+---Creates a new URI object from a string.
+---@param str string
+---@return URI
+function mw.uri.new(str) end
+
 ---Returns a URI object for the local URL for a page, with optional query string/table
 ---@param page string
 ---@param query string|table?

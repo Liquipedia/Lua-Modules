@@ -882,6 +882,19 @@ return {
 				lightMode = 'NFS default lightmode.png',
 			},
 		},
+		shift2 = {
+			abbreviation = 'Shift 2',
+			name = 'Need for Speed: Shift 2 – Unleashed',
+			link = 'Need for Speed: Shift 2 – Unleashed',
+			logo = {
+				darkMode = 'NFS default darkmode.png',
+				lightMode = 'NFS default lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'NFS default darkmode.png',
+				lightMode = 'NFS default lightmode.png',
+			},
+		},
 	},
 	config = {
 		squads = {

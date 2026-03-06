@@ -30,13 +30,16 @@ local GAME_MOD = 'mod'
 local GAME_LOTV = Game.toIdentifier{game = 'lotv'}
 local TODAY = os.date('%Y-%m-%d', os.time())
 
+---@class Starcraft2SeriesInfoboxWidgetInjector: WidgetInjector
+---@field caller Starcraft2SeriesInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@class Starcraft2SeriesInfobox: SeriesInfobox
+---@operator call(Frame): Starcraft2SeriesInfobox
 local CustomSeries = Class.new(Series)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomSeries.run(frame)
 	local series = CustomSeries(frame)
 	series:setWidgetInjector(CustomInjector(series))

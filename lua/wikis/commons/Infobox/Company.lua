@@ -28,19 +28,20 @@ local Builder = Widgets.Builder
 local Language = mw.getContentLanguage()
 
 ---@class CompanyInfobox: BasicInfobox
+---@operator call(Frame): CompanyInfobox
 local Company = Class.new(BasicInfobox)
 
 local COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
 local LINK_VARIANT = 'company'
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function Company.run(frame)
 	local company = Company(frame)
 	return company:createInfobox()
 end
 
----@return string
+---@return Widget
 function Company:createInfobox()
 	local args = self.args
 

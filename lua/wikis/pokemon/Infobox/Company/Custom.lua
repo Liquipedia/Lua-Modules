@@ -23,7 +23,7 @@ local CustomCompany = Class.new(Company)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomCompany.run(frame)
 	local company = CustomCompany(frame)
 	company:setWidgetInjector(CustomInjector(company))

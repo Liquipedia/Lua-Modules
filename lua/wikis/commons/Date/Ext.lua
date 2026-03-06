@@ -35,6 +35,8 @@ DateExt.defaultYear = '0000'
 
 DateExt.defaultTimezone = 'UTC'
 
+local SECONDS_PER_DAY = 86400
+
 --- Parses a date string into a timestamp, returning the number of seconds since UNIX epoch.
 --- The timezone offset is incorporated into the timestamp, and the timezone is discarded.
 --- If the timezone is not specified, then the date is assumed to be in UTC.
@@ -252,6 +254,14 @@ function DateExt.calculateAge(to, from)
 		return age
 	end
 	return age - 1
+end
+
+---@param days number
+---@return number
+---@nodiscard
+function DateExt.daysToSeconds(days)
+	assert(days >= 0, 'Invalid number of days')
+	return days * SECONDS_PER_DAY
 end
 
 return DateExt

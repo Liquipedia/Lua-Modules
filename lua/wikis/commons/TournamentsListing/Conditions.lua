@@ -190,21 +190,25 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 		table.insert(allowedPlacements, firstPlacement.placement)
 
 		local parts = Array.parseCommaSeparatedString(firstPlacement.placement, '-')
-		local runnerupPlacementStart = tonumber(parts[2] or parts[1]) + 1
-		local placeConditions = ConditionTree(BooleanOperator.all):add(conditions)
-		placeConditions:add(ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('placement'), Comparator.gt, runnerupPlacementStart .. '-'),
-			ConditionNode(ColumnName('placement'), Comparator.eq, runnerupPlacementStart),
-		})
-		queryResult = mw.ext.LiquipediaDB.lpdb('placement', {
-			conditions = placeConditions:toString(),
-			query = 'placement',
-			order = 'placement asc',
-			groupby = 'placement asc',
-			limit = 1,
-		})[1]
-		if queryResult then
-			table.insert(allowedPlacements, queryResult.placement)
+		local upperBound = tonumber(parts[2] or parts[1])
+		-- Avoid non-numeric placements (W/L)
+		if upperBound then
+			local runnerupPlacementStart = upperBound + 1
+			local placeConditions = ConditionTree(BooleanOperator.all):add(conditions)
+			placeConditions:add(ConditionTree(BooleanOperator.any):add{
+				ConditionNode(ColumnName('placement'), Comparator.gt, runnerupPlacementStart .. '-'),
+				ConditionNode(ColumnName('placement'), Comparator.eq, runnerupPlacementStart),
+			})
+			queryResult = mw.ext.LiquipediaDB.lpdb('placement', {
+				conditions = placeConditions:toString(),
+				query = 'placement',
+				order = 'placement asc',
+				groupby = 'placement asc',
+				limit = 1,
+			})[1]
+			if queryResult then
+				table.insert(allowedPlacements, queryResult.placement)
+			end
 		end
 	end
 

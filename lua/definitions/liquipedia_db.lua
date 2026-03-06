@@ -91,6 +91,7 @@ local lpdb = {}
 ---@field newteam string
 ---@field teamtemplate string
 ---@field newteamtemplate string
+---@field status string
 ---@field joindate string
 ---@field leavedate string
 ---@field inactivedate string

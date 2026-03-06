@@ -21,6 +21,7 @@ local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local MatchTicker = Lua.import('Module:MatchTicker')
 local MetadataGenerator = Lua.import('Module:MetadataGenerator')
 local Namespace = Lua.import('Module:Namespace')
@@ -36,6 +37,7 @@ local Variables = Lua.import('Module:Variables')
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 
 local Widgets = Lua.import('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Accommodation = Widgets.Accommodation
 local Builder = Widgets.Builder
 local Cell = Widgets.Cell
@@ -49,16 +51,17 @@ local Title = Widgets.Title
 local Venue = Widgets.Venue
 
 ---@class InfoboxLeague: BasicInfobox
+---@operator call(Frame): InfoboxLeague
 local League = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function League.run(frame)
 	local league = League(frame)
 	return league:createInfobox()
 end
 
----@return Html
+---@return Widget
 function League:createInfobox()
 	local args = self.args
 	self:_parseArgs()
@@ -186,9 +189,10 @@ function League:createInfobox()
 		self:_setSeoTags(args)
 	end
 
-	return mw.html.create()
-		:node(self:build(widgets, 'Tournament'))
-		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
+	return HtmlWidgets.Fragment{children = Array.interleave({
+		self:build(widgets, 'Tournament'),
+		Logic.readBool(args.autointro) and self:seoText(args) or nil
+	}, HtmlWidgets.Br{})}
 end
 
 ---@private
@@ -336,7 +340,6 @@ function League:_createUpcomingMatches()
 				upcoming = true,
 				ongoing = true,
 				hideTournament = true,
-				entityStyle = true,
 				queryByParent = true,
 			}
 			matchTicker:query()
@@ -401,8 +404,7 @@ end
 ---@param args table
 ---@return boolean
 function League:shouldStore(args)
-	return Namespace.isMain() and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+	return Namespace.isMain() and Lpdb.isStorageEnabled()
 end
 
 --- Allows for overriding this functionality

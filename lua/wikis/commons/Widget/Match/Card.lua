@@ -62,7 +62,7 @@ function MatchCard:render()
 	local highlight = highlightCondition(match, {onlyHighlightOnValue = self.props.onlyHighlightOnValue})
 
 	if self.props.variant == 'vertical' then
-		return self:_renderVertical(match, gameData, highlight)
+		return self:_renderVertical(match, gameData)
 	end
 
 	return self:_renderHorizontal(match, gameData, highlight)
@@ -96,16 +96,32 @@ end
 
 ---@param match MatchGroupUtilMatch
 ---@param gameData MatchTickerGameData?
----@param highlight boolean
 ---@return Widget
-function MatchCard:_renderVertical(match, gameData, highlight)
+function MatchCard:_renderVertical(match, gameData)
 	local isFfa = #match.opponents > 2
+
+	local tournamentLink = TournamentBar{
+		match = match,
+		gameData = not isFfa and gameData or nil,
+		displayIcon = false,
+	}
+
+	local stageName = self:_renderStageName(match, 3)
 
 	return HtmlWidgets.Div{
 		classes = {'match-info', 'match-info--vertical'},
 		children = WidgetUtil.collect(
 			self:_renderVerticalTopRow(match),
-			self:_renderStageName(match),
+			self.props.hideTournament
+				and self:_renderStageName(match, 1)
+				or HtmlWidgets.Div{
+					classes = {'match-info-tournament'},
+					children = WidgetUtil.collect(
+						tournamentLink,
+						stageName and '-' or nil,
+						stageName
+					),
+				},
 			not isFfa and MatchHeader{
 				match = match,
 				variant = 'vertical'
@@ -149,11 +165,18 @@ function MatchCard:_renderStreamButtons(match)
 end
 
 ---@param match MatchGroupUtilMatch
+---@param variantIndex number? 1 for full name (default), 2 for medium, 3 for short
 ---@return Widget?
-function MatchCard:_renderStageName(match)
+function MatchCard:_renderStageName(match, variantIndex)
+	variantIndex = variantIndex or 1
 	local stageName
 	if match.bracketData and match.bracketData.inheritedHeader then
-		stageName = DisplayHelper.expandHeader(match.bracketData.inheritedHeader)[1]
+		stageName = DisplayHelper.expandHeader(match.bracketData.inheritedHeader)[variantIndex]
+		if String.isEmpty(stageName) then
+			stageName = DisplayHelper.expandHeader(match.bracketData.inheritedHeader)[1]
+		end
+	else
+		stageName = match.section
 	end
 
 	if not stageName then

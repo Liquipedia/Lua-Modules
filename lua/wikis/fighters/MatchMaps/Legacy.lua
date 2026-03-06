@@ -12,6 +12,7 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Json = Lua.import('Module:Json')
 local MatchGroup = Lua.import('Module:MatchGroup')
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -196,10 +197,7 @@ end
 function MatchMapsLegacy.matchListStart(frame)
 	local args = Arguments.getArgs(frame)
 
-	local store = Logic.nilOr(
-		Logic.readBoolOrNil(args.store),
-		not Logic.readBool(globalVars:get('disable_LPDB_storage'))
-	)
+	local store = Logic.nilOr(Logic.readBoolOrNil(args.store), Lpdb.isStorageEnabled())
 	local matchsection = Logic.nilOr(args.lpdb_title, args.title)
 	if Logic.readBoolOrNil(matchsection) ~= false then
 		matchlistVars:set('matchsection', matchsection)

@@ -9,7 +9,7 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
-local Ordinal = Lua.import('Module:Ordinal')
+local Placement = Lua.import('Module:Placement')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -59,6 +59,12 @@ function ParticipantsTeamQualifierInfo:render()
 			additionalClasses = { 'team-participant-card__qualifier-icon' }
 		}
 		linktype = 'external'
+	elseif qualification.type == 'internal' then
+		link = qualification.page
+		icon = Icon{
+			iconName = 'internal_link',
+			additionalClasses = { 'team-participant-card__qualifier-icon' }
+		}
 	end
 
 	local textChildren = {text}
@@ -85,24 +91,11 @@ function ParticipantsTeamQualifierInfo:render()
 					}
 				)
 			},
-			self:createPlacementBadge(qualification.placement)
+			Placement.renderInWidget{placement = qualification.placement}
 		}
 	}
 
 	return content
-end
-
----@param placement number?
----@return Widget?
-function ParticipantsTeamQualifierInfo:createPlacementBadge(placement)
-	if not placement then
-		return nil
-	end
-
-	return Span{
-		classes = {'team-participant-card__qualifier-placement'},
-		children = {Ordinal.toOrdinal(placement)}
-	}
 end
 
 return ParticipantsTeamQualifierInfo

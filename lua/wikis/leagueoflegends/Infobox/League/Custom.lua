@@ -21,13 +21,15 @@ local Cell = Widgets.Cell
 local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Premier Tournament held by Riot Games]]'
 
 ---@class LeagueoflegendsLeagueInfobox: InfoboxLeague
+---@operator call(Frame): LeagueoflegendsLeagueInfobox
 local CustomLeague = Class.new(League)
+
 ---@class LeagueoflegendsLeagueInfoboxWidgetInjector: WidgetInjector
 ---@field caller LeagueoflegendsLeagueInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))

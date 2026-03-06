@@ -15,7 +15,7 @@ local Effect = Lua.import('Module:Infobox/Effect')
 local CustomEffect = Class.new(Effect)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomEffect.run(frame)
 	return CustomEffect(frame):createInfobox()
 end

@@ -17,11 +17,15 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class Formula1SeriesInfobox: SeriesInfobox
+---@operator call(Frame): Formula1SeriesInfobox
 local CustomSeries = Class.new(Series)
+
+---@class Formula1SeriesInfoboxWidgetInjector: WidgetInjector
+---@field caller Formula1SeriesInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomSeries.run(frame)
 	local series = CustomSeries(frame)
 	series:setWidgetInjector(CustomInjector(series))

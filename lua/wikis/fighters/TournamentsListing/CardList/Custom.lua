@@ -16,8 +16,10 @@ local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
 local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
@@ -40,10 +42,20 @@ function CustomTournamentsListing:buildConditions()
 	local conditions = ListingConditions.base(self.args)
 
 	if Logic.isNotEmpty(self.args.circuit) then
-		conditions:add(ConditionNode(ColumnName('circuit', 'extradata'), Comparator.eq, self.args.circuit))
-		conditions:add(ConditionUtil.anyOf(
-			ColumnName('circuit_tier', 'extradata'), Array.parseCommaSeparatedString(self.args.circuittier)
-		))
+		conditions:add(ConditionTree(BooleanOperator.any):add{
+			ConditionTree(BooleanOperator.all):add{
+				ConditionNode(ColumnName('circuit', 'extradata'), Comparator.eq, self.args.circuit),
+				ConditionUtil.anyOf(
+					ColumnName('circuit_tier', 'extradata'), Array.parseCommaSeparatedString(self.args.circuittier)
+				)
+			},
+			ConditionTree(BooleanOperator.all):add{
+				ConditionNode(ColumnName('circuit2', 'extradata'), Comparator.eq, self.args.circuit),
+				ConditionUtil.anyOf(
+					ColumnName('circuit2_tier', 'extradata'), Array.parseCommaSeparatedString(self.args.circuittier)
+				)
+			}
+		})
 	end
 
 	if self.args.additionalConditions then
@@ -87,7 +99,7 @@ end
 function CustomTournamentsListing.run(frame)
 	local args = Arguments.getArgs(frame)
 
-	args.showGameIcon = Logic.nilOr(Logic.readBoolOrNil(args.showGameIcon), true)
+	args.showGameIcon = Logic.nilOr(Logic.readBoolOrNil(args.showGameIcon), Logic.isEmpty(args.game))
 
 	if Logic.readBool(args.byYear) then
 		return CustomTournamentsListing.byYear(args)

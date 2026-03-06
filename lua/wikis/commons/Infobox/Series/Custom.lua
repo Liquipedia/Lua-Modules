@@ -12,10 +12,11 @@ local Class = Lua.import('Module:Class')
 local Series = Lua.import('Module:Infobox/Series')
 
 ---@class CustomSeriesInfobox: SeriesInfobox
+---@operator call(Frame): CustomSeriesInfobox
 local CustomSeries = Class.new(Series)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomSeries.run(frame)
 	local series = CustomSeries(frame)
 	return series:createInfobox()

@@ -74,6 +74,7 @@ Opponent.types.Player = TypeUtil.struct({
 	pageName = 'string?',
 	team = 'string?',
 	faction = 'string?',
+	apiId = 'string?',
 })
 
 Opponent.types.TeamOpponent = TypeUtil.struct({
@@ -472,6 +473,7 @@ function Opponent.readSinglePlayerArgs(args)
 		p1link = args.link or args.p1link,
 		p1team = args.team or args.p1team,
 		p1faction = args.faction or args.race or args.p1race,
+		p1id = args.id or args.p1id,
 	}, 1)
 end
 
@@ -488,6 +490,7 @@ function Opponent.readPlayerArgs(args, playerIndex)
 		team = playerTeam,
 		faction = Logic.nilIfEmpty(Faction.read(args['p' .. playerIndex .. 'faction']
 			or args['p' .. playerIndex .. 'race'])),
+		apiId = args['p' .. playerIndex .. 'id'],
 	}
 	assert(not player.displayName:find('|'), 'Invalid character "|" in player name')
 	assert(not player.pageName or not player.pageName:find('|'), 'Invalid character "|" in player pagename')
@@ -501,9 +504,22 @@ unsuccessful.
 Wikis sometimes provide variants of this function that include wiki specific
 transformations.
 ]]
----@param record table
+---@param record match2opponent
 ---@return standardOpponent
 function Opponent.fromMatch2Record(record)
+	return Opponent._fromMatchRecord(record)
+end
+
+---@param record MGIParsedOpponent
+---@return standardOpponent
+function Opponent.fromMatchParsedOpponent(record)
+	return Opponent._fromMatchRecord(record)
+end
+
+---@private
+---@param record {type: OpponentType, template: string?, match2players: match2player[]|MGIParsedPlayer[], name: string?}
+---@return standardOpponent
+function Opponent._fromMatchRecord(record)
 	if record.type == Opponent.team then
 		return {type = Opponent.team, template = record.template, extradata = {}}
 
@@ -563,6 +579,7 @@ function Opponent.toLpdbStruct(opponent, options)
 				nil
 			players[prefix .. 'template'] = player.team
 			players[prefix .. 'faction'] = Logic.nilIfEmpty(player.faction)
+			players[prefix .. 'id'] = Logic.nilIfEmpty(player.apiId)
 		end
 		storageStruct.opponentplayers = players
 	end
@@ -607,13 +624,34 @@ end
 ---@param playerIndex integer
 ---@return standardPlayer
 function Opponent.playerFromLpdbStruct(players, playerIndex)
-	local prefix = 'p' .. playerIndex
+	return Opponent._personFromLpdbStruct('p', players, playerIndex)
+end
+
+---@param players table
+---@param staffIndex integer
+---@return standardPlayer
+function Opponent.staffFromLpdbStruct(players, staffIndex)
+	local parsed = Opponent._personFromLpdbStruct('c', players, staffIndex)
+	if Logic.isNotEmpty(parsed) then
+		parsed.extradata = {type = 'staff'}
+	end
+	return parsed
+end
+
+---@private
+---@param roleIndicator 'p'|'c'
+---@param players table
+---@param playerIndex integer
+---@return standardPlayer
+function Opponent._personFromLpdbStruct(roleIndicator, players, playerIndex)
+	local prefix = roleIndicator .. playerIndex
 	return {
 		displayName = players[prefix .. 'dn'],
 		flag = String.nilIfEmpty(Flags.CountryName{flag = players[prefix .. 'flag']}),
 		pageName = players[prefix],
 		team = players[prefix .. 'template'] or players[prefix .. 'team'],
 		faction = Logic.nilIfEmpty(players[prefix .. 'faction']),
+		apiId = Logic.nilIfEmpty(players[prefix .. 'id']),
 	}
 end
 

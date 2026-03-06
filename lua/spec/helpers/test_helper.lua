@@ -12,7 +12,8 @@ function allwikis(name, funcToRun, wikiArgs) error('SOMETHING WENT WRONG') end
 
 --- @param testname string
 --- @param actual string
-function GoldenTest(testname, actual) error('SOMETHING WENT WRONG') end
+--- @param extraHTML string?
+function GoldenTest(testname, actual, extraHTML) error('SOMETHING WENT WRONG') end
 
 return function(busted, helper, options)
 	-- Copy from commons/lua.lua
@@ -145,13 +146,14 @@ return function(busted, helper, options)
 		return text
 	end
 
-	local function GoldenTest(testName, actual)
+	local function GoldenTest(testName, actual, extraHTML)
 		-- Currently we're only running snapshots tests while updating them too
 		if os.getenv('UPDATE_SNAPSHOTS') ~= 'true' then
 			return
 		end
 
 		local generatedHtml = simpleMediaWikiParser(tostring(actual))
+			.. (extraHTML or '')
 
 		local template = readFile('spec/helpers/template.html')
 		assert(template, 'Could not read template.html')

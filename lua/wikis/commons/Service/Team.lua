@@ -22,7 +22,22 @@ local TeamService = {}
 ---@field shortName string?
 ---@field image string?
 ---@field imageDark string?
----@field members table[]
+---@field members StandardTeamMember[]
+
+---@class StandardTeamMember
+---@field displayName string
+---@field pageName string
+---@field realName string?
+---@field nationality string?
+---@field role string?
+---@field type string
+---@field status string
+---@field joindate string?
+---@field leavedate string?
+---@field inactivedate string?
+---@field faction string?
+---@field group string
+---@field hasLeft boolean
 
 --- TODO: Add the rest and implement the lazy loading
 local LPDB_TEAM_FIELDS = {
@@ -49,7 +64,7 @@ end
 ---@param team StandardTeam
 ---@param startDate string|number
 ---@param endDate string|number
----@return table[]
+---@return StandardTeamMember[]
 function TeamService.getSquadBetween(team, startDate, endDate)
 	assert(startDate and endDate, 'TeamService.getSquadBetween: Start date and end date are required')
 
@@ -113,7 +128,7 @@ function TeamService.getSquadBetween(team, startDate, endDate)
 end
 
 ---@param team StandardTeam
----@return table[]
+---@return StandardTeamMember[]
 function TeamService.getMembers(team)
 	local records = mw.ext.LiquipediaDB.lpdb('squadplayer', {
 		conditions = '[[pagename::' .. team.pageName .. ']]',
@@ -121,6 +136,7 @@ function TeamService.getMembers(team)
 	})
 	return Array.map(records, function(record)
 		local extradata = record.extradata or {}
+		---@type StandardTeamMember
 		return {
 			displayName = record.id,
 			pageName = record.link,
@@ -133,6 +149,7 @@ function TeamService.getMembers(team)
 			joindate = record.joindate,
 			leavedate = record.leavedate,
 			inactivedate = record.inactivedate,
+			hasLeft = Logic.isNotEmpty(record.leavedate) and record.leavedate ~= DateExt.defaultDate,
 
 			faction = extradata.faction,
 			group = extradata.group or 'main',

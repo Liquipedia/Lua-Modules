@@ -52,7 +52,9 @@ end
 function UpcomingTournamentsWidget:_getTournaments()
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add(self.props.opponentConditions)
-		:add(ConditionNode(ColumnName('date'), Comparator.gt, DateExt.getCurrentTimestamp() - 86400))
+		:add(ConditionNode(
+			ColumnName('date'), Comparator.gt, DateExt.getCurrentTimestamp() - DateExt.daysToSeconds(1)
+		))
 		:add(ConditionNode(ColumnName('placement'), Comparator.eq, ''))
 
 	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
