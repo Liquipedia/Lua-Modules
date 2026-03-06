@@ -68,7 +68,7 @@ function TournamentsListingConditions.base(args)
 	if Logic.isNotEmpty(args.game) then
 		local game = assert(Game.toIdentifier{game = args.game, useDefault = false},
 			'Invalid game input "' .. args.game .. '"')
-		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, game)}
+		conditions:add(ConditionNode(ColumnName('game'), Comparator.eq, game))
 	end
 
 	if args.series1 or args.series then
