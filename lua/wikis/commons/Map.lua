@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 
 local Condition = Lua.import('Module:Condition')
@@ -73,7 +74,7 @@ function Map.getMapByPageName(pageName)
 	---@cast pageName -nil
 
 	return Map.queryMaps{
-		additionalConditions = ConditionNode(ColumnName('pagename'), Comparator.eq, pageName:gsub(' ', '_')),
+		additionalConditions = ConditionNode(ColumnName('pagename'), Comparator.eq, Page.pageifyLink(pageName)),
 		limit = 1,
 		order = 'date desc'
 	}[1]
