@@ -122,7 +122,7 @@ return {
 			},
 		},
 		participants = {
-			syncTeam = true,
+			syncPlayerTeam = true,
 		},
 		tournamentsListing = {
 			showTier = true,
