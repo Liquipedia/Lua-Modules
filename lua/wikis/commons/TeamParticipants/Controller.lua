@@ -51,7 +51,10 @@ function TeamParticipantsController.fromTemplate(frame)
 	end
 	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
 
-	parsedData.participants = TeamParticipantsController.sortParticipants(parsedData.participants)
+	parsedData.participants = TeamParticipantsController.sortParticipants(
+		parsedData.participants,
+		args.participantsSortOrder
+	)
 
 	local showControls = not teamParticipantsVars:get('externalControlsRendered')
 
@@ -60,7 +63,7 @@ function TeamParticipantsController.fromTemplate(frame)
 		showPlayerInfo = Logic.readBool(args.showplayerinfo),
 		showControls = showControls,
 		mergeStaffTabIfOnlyOneStaff = Logic.nilOr(
-			Logic.readBoolOrNil(args.mergeStaffTabIfOnlyOneStaff), Logic.readBool(Config.mergeStaffTabIfOnlyOneStaff)
+			Logic.readBoolOrNil(args.mergeStaffTabIfOnlyOneStff), Logic.readBool(Config.mergeStaffTabIfOnlyOneStaff)
 		)
 	}
 end
@@ -158,9 +161,9 @@ function TeamParticipantsController.fillIncompleteRosters(parsedData)
 end
 
 ---@param participants TeamParticipant[]
+---@param sortOrder 'alphabetical'?
 ---@return TeamParticipant[]
-function TeamParticipantsController.sortParticipants(participants)
-	local sortOrder = (Info.config.participants or {}).participantsSortOrder
+function TeamParticipantsController.sortParticipants(participants, sortOrder)
 	if sortOrder ~= 'alphabetical' or Logic.isEmpty(participants) then
 		return participants
 	end
