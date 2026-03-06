@@ -37,18 +37,10 @@ function TournamentsListingConditions.base(args)
 		conditions:add{ConditionNode(ColumnName('enddate_year'), Comparator.eq, args.year)}
 	else
 		if startDate then
-			conditions:add{ConditionTree(BooleanOperator.any):add{
-				ConditionNode(ColumnName('startdate'), Comparator.gt, startDate),
-				ConditionNode(ColumnName('startdate'), Comparator.eq, startDate)
-				},
-			}
+			conditions:add(ConditionNode(ColumnName('startdate'), Comparator.ge, startDate))
 		end
 		if endDate then
-			conditions:add{ConditionTree(BooleanOperator.any):add{
-				ConditionNode(ColumnName('startdate'), Comparator.lt, endDate),
-				ConditionNode(ColumnName('startdate'), Comparator.eq, endDate)
-				},
-			}
+			conditions:add(ConditionNode(ColumnName('startdate'), Comparator.le, endDate))
 		end
 	end
 
