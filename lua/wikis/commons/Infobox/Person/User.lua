@@ -16,17 +16,13 @@ local Person = Lua.import('Module:Infobox/Person')
 ---@class InfoboxUser: Person
 local User = Class.new(Person)
 
----@return string
+---@return Widget[]
 function User:_getFavouriteTeams()
 	local foundArgs = self:getAllArgsForBase(self.args, 'fav-team-')
 
-	local display = ''
-	for _, item in ipairs(foundArgs) do
-		local team = item:lower():gsub('_', ' ')
-		display = display .. OpponentDisplay.InlineTeamContainer{template = team, style = 'icon'}
-	end
-
-	return display
+	return Array.map(foundArgs, function (favouriteTeam)
+		return OpponentDisplay.InlineTeamContainer{template = favouriteTeam, style = 'icon'}
+	end)
 end
 
 ---@param base string
