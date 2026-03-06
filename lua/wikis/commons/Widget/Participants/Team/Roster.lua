@@ -102,7 +102,7 @@ function ParticipantsTeamRoster:render()
 		players = Array.sortBy(players, FnUtil.identity, function (a, b)
 			local function getPlayerSortOrder(player)
 				if sortOrder == 'alphabetical' then
-					return player.displayName or ''
+					return (player.displayName or ''):lower()
 				end
 				local roles = player.extradata.roles or {}
 				return roles[1] and roles[1].sortOrder or math.huge

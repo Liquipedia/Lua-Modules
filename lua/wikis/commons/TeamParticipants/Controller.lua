@@ -169,7 +169,7 @@ function TeamParticipantsController.sortParticipants(participants, sortOrder)
 	end
 
 	return Array.sortBy(participants, function(participant)
-		return Opponent.toName(participant.opponent)
+		return Opponent.toName(participant.opponent):lower()
 	end)
 end
 
