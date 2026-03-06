@@ -66,8 +66,8 @@ function TournamentsListingConditions.base(args)
 	end
 
 	if Logic.isNotEmpty(args.game) then
-		-- need the fallback to args.game to be able to use it for e.g. mod on sc2
-		local game = Game.toIdentifier{game = args.game} or args.game
+		local game = assert(Game.toIdentifier{game = args.game, useDefault = false},
+			'Invalid game input "' .. args.game .. '"')
 		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, game)}
 	end
 
