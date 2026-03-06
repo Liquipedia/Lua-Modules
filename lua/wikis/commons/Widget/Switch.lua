@@ -18,6 +18,7 @@ local Div = HtmlWidgets.Div
 ---@field switchGroup string
 ---@field storeValue boolean
 ---@field defaultActive boolean
+---@field syncLevel 'page'|'wiki'|'site'
 ---@field css table?
 ---@field content Renderable|Renderable[]?
 ---@field collapsibleSelector string?
@@ -31,6 +32,7 @@ SwitchWidget.defaultProps = {
 	switchGroup = 'switch',
 	storeValue = true,
 	defaultActive = false,
+	syncLevel = 'site',
 }
 
 ---@return Widget
@@ -39,6 +41,7 @@ function SwitchWidget:render()
 	local switchGroup = self.props.switchGroup
 	local storeValue = self.props.storeValue
 	local defaultActive = self.props.defaultActive
+	local syncLevel = self.props.syncLevel
 	local content = self.props.content
 
 	local switchToggleClasses = {'switch-toggle-container'}
@@ -51,6 +54,7 @@ function SwitchWidget:render()
 	local toggleAttributes = {
 		['data-switch-group'] = switchGroup,
 		['data-store-value'] = tostring(storeValue),
+		['data-sync-level'] = syncLevel,
 	}
 
 	if self.props.collapsibleSelector then
