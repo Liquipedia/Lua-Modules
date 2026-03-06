@@ -56,11 +56,6 @@ function ContentSwitch:render()
 	local tabOptions = Array.map(tabs, function(tab, index)
 		local isActive = index == defaultActive
 		local classes = {'switch-pill-option', 'toggle-area-button'}
-		if self.props.size == 'small' then
-			table.insert(classes, 'switch-pill-option-small')
-		elseif self.props.size == 'extrasmall' then
-			table.insert(classes, 'switch-pill-option-extrasmall')
-		end
 		if isActive then
 			table.insert(classes, 'switch-pill-option-active')
 		end
@@ -90,7 +85,9 @@ function ContentSwitch:render()
 	if variant == 'generic' then
 		table.insert(switchPillClasses, 'switch-pill-generic')
 	end
-	if self.props.size == 'extrasmall' then
+	if self.props.size == 'small' then
+		table.insert(switchPillClasses, 'switch-pill-small')
+	elseif self.props.size == 'extrasmall' then
 		table.insert(switchPillClasses, 'switch-pill-extrasmall')
 	end
 
