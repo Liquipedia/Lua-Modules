@@ -28,6 +28,7 @@ const jsModules = [
 	'Selectall',
 	'Slider',
 	'SwitchButtons',
+	'Table2',
 	'Tabs'
 ];
 

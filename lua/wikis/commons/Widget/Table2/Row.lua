@@ -32,12 +32,25 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 ---@field props Table2RowProps
 local Table2Row = Class.new(Widget)
 
+---@param rowChildren (Widget|Html|string|number|nil)[]
+---@return integer|nil
+local function getMaxRowspan(rowChildren)
+	local maxRowspan = Array.reduce(rowChildren, function(max, child)
+		if Class.instanceOf(child, Table2Cell) or Class.instanceOf(child, Table2CellHeader) then
+			local cellChild = child --[[@as Table2Cell|Table2CellHeader]]
+			local rowspan = MathUtil.toInteger(cellChild.props.rowspan) or 1
+			return math.max(max, math.max(rowspan, 1))
+		end
+		return max
+	end, 1)
+	return maxRowspan > 1 and maxRowspan or nil
+end
+
 ---@return Widget
 function Table2Row:render()
 	local props = self.props
 	local section = props.section or self:useContext(Table2Contexts.Section)
 	local headerRowKind = self:useContext(Table2Contexts.HeaderRowKind)
-	local bodyStripe = self:useContext(Table2Contexts.BodyStripe)
 
 	local sectionClass = 'table2__row--body'
 	if section == 'head' or section == 'subhead' then
@@ -50,15 +63,6 @@ function Table2Row:render()
 			kindClass = 'table2__row--head-title'
 		elseif headerRowKind == 'columns' then
 			kindClass = 'table2__row--head-columns'
-		end
-	end
-
-	local stripeClass
-	if section == 'body' then
-		if bodyStripe == 'odd' then
-			stripeClass = 'table2__row--odd'
-		elseif bodyStripe == 'even' then
-			stripeClass = 'table2__row--even'
 		end
 	end
 
@@ -111,10 +115,18 @@ function Table2Row:render()
 		end)
 	end
 
+	local attributes = props.attributes or {}
+	if section == 'body' then
+		local maxRowspan = getMaxRowspan(children)
+		if maxRowspan then
+			attributes['data-rowspan-count'] = maxRowspan
+		end
+	end
+
 	return HtmlWidgets.Tr{
-		classes = WidgetUtil.collect(sectionClass, kindClass, stripeClass, highlightClass, props.classes),
+		classes = WidgetUtil.collect(sectionClass, kindClass, highlightClass, props.classes),
 		css = props.css,
-		attributes = props.attributes,
+		attributes = attributes,
 		children = trChildren,
 	}
 end

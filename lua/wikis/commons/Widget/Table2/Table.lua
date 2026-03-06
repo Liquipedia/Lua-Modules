@@ -95,15 +95,13 @@ function Table2:render()
 		}}
 	end
 
-	if Logic.readBool(props.striped) then
-		tableChildren = {Table2Contexts.BodyStripe{
-			value = true,
-			children = tableChildren,
-		}}
+	local tableAttributes = props.tableAttributes or {}
+	if not Logic.readBool(props.striped) then
+		tableAttributes['data-striped'] = 'false'
 	end
 
 	local tableNode = HtmlWidgets.Table{
-		attributes = props.tableAttributes,
+		attributes = tableAttributes,
 		classes = tableClasses,
 		children = tableChildren,
 	}
