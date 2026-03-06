@@ -17,7 +17,7 @@ local Table = Lua.import('Module:Table')
 
 ---@class Widget: BaseClass
 ---@operator call(table): self
----@field context Widget[]
+---@field contextStack {parent: WidgetContext?, context: WidgetContext?}
 ---@field props table<string, any>
 local Widget = Class.new(function(self, props)
 	self.props = Table.deepMerge(Table.deepCopy(self.defaultProps), props)
@@ -26,7 +26,7 @@ local Widget = Class.new(function(self, props)
 		self.props.children = {self.props.children}
 	end
 
-	self.context = {} -- Populated by the parent
+	self.contextStack = {}
 end)
 
 ---@alias Renderable string|Html|Widget|number
@@ -47,6 +47,7 @@ end
 
 ---@return string
 function Widget:tryMake()
+	local WidgetContext = Lua.import('Module:Widget/Context')
 	local function renderComponent()
 		local ret = self:render()
 		if not Array.isArray(ret) then
@@ -55,9 +56,14 @@ function Widget:tryMake()
 		---@cast ret Renderable[]
 
 		return table.concat(Array.map(ret, function(val)
+			if Class.instanceOf(val, WidgetContext) then
+				---@cast val WidgetContext
+				val.contextStack = self:_pushToContextList(self.contextStack, val)
+				return nil
+			end
 			if Class.instanceOf(val, Widget) then
 				---@cast val Widget
-				val.context = self:_nextContext()
+				val.contextStack = self.contextStack
 				return val:tryMake()
 			end
 			if val ~= nil then
@@ -78,12 +84,12 @@ end
 ---@param default any
 ---@return any
 function Widget:useContext(widget, default)
-	local context = Array.find(self.context, function(node)
-		return Class.instanceOf(node, widget)
-	end)
-	if context then
-		---@cast context WidgetContext
-		return context:getValue(default)
+	local stack = self.contextStack
+	while stack do
+		if Class.instanceOf(stack.context, widget) then
+			return stack.context:getValue(default)
+		end
+		stack = stack.parent
 	end
 	return default
 end
@@ -95,8 +101,11 @@ function Widget:getDerivedStateFromError(error)
 end
 
 ---@return Widget[]
-function Widget:_nextContext()
-	return {self, unpack(self.context)}
+function Widget:_pushToContextList(currentContext, context)
+	return {
+		parent = currentContext,
+		context = context,
+	}
 end
 
 ---@param error Error
