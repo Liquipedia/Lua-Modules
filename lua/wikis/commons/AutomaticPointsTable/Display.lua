@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
@@ -144,7 +145,7 @@ end
 
 function TableRow:nameCell(team)
 	local lastAlias = team.aliases[#team.aliases]
-	local teamDisplay = team.display and team.display or mw.ext.TeamTemplate.team(lastAlias)
+	local teamDisplay = team.display and team.display or OpponentDisplay.InlineTeamContainer{template = lastAlias}
 	local nameCell = self:baseCell(teamDisplay, team.bg):addClass('name-cell')
 	table.insert(self.cells, nameCell)
 	return self

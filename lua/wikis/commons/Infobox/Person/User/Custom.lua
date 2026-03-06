@@ -20,8 +20,12 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 
 ---@class CustomInfoboxUser: InfoboxUser
+---@operator call(Frame): CustomInfoboxUser
 local CustomUser = Class.new(User)
 
+---@class CustomInfoboxUserWidgetInjector: WidgetInjector
+---@operator call(CustomInfoboxUser): CustomInfoboxUserWidgetInjector
+---@field caller CustomInfoboxUser
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -52,7 +56,7 @@ function CustomInjector:parse(id, widgets)
 		if not String.isEmpty(args['fav-team-1']) then
 			Array.appendWith(widgets,
 				Title{children = 'Favorite Teams'},
-				Center{children = {self.caller:_getFavouriteTeams()}}
+				Center{children = self.caller:_getFavouriteTeams()}
 			)
 		end
 	elseif
