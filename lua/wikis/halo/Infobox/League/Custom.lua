@@ -72,7 +72,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	while not String.isEmpty(args['map' .. index]) do
 		local modes = {}
 		if not String.isEmpty(args['map' .. index .. 'modes']) then
-			local tempModesList = mw.text.split(args['map' .. index .. 'modes'], ',')
+			local tempModesList = Array.parseCommaSeparatedString(args['map' .. index .. 'modes'])
 			for _, item in ipairs(tempModesList) do
 				local currentMode = MapModes.clean({mode = item or ''})
 				if not String.isEmpty(currentMode) then
@@ -144,7 +144,7 @@ function CustomLeague:_getMapModes(modesString, date)
 	---@cast modesString -nil
 
 	local display = ''
-	local tempModesList = mw.text.split(modesString, ',')
+	local tempModesList = Array.parseCommaSeparatedString(modesString)
 	for _, item in ipairs(tempModesList) do
 		local mode = MapModes.clean(item)
 		if not String.isEmpty(mode) then

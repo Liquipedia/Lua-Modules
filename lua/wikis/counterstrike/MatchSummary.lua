@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local VodLink = Lua.import('Module:VodLink')
 
@@ -35,7 +34,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 	if Logic.isNotEmpty(match.links.vod2) then
 		for _, vod2 in ipairs(match.links.vod2) do
 			local link, gameIndex = unpack(vod2)
-			secondVods[gameIndex] = Array.map(mw.text.split(link, ','), String.trim)
+			secondVods[gameIndex] = Array.parseCommaSeparatedString(link)
 		end
 		match.links.vod2 = nil
 	end

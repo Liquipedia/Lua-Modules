@@ -56,7 +56,7 @@ end
 function CustomLegacyPrizePool.opponentsInSlot(slot)
 	local slotInputSize
 	if slot.place and not SPECIAL_PLACES[string.lower(slot.place)] then
-		local placeRange = mw.text.split(slot.place, '-')
+		local placeRange = Array.parseCommaSeparatedString(slot.place, '-')
 		slotInputSize = tonumber(placeRange[#placeRange]) - tonumber(placeRange[1]) + 1
 	end
 
@@ -111,7 +111,7 @@ function CustomLegacyPrizePool._readOpponentArgs(props)
 	local previousOpponentArgsIndex = (opponentIndex - 1) * Opponent.partySize(_opponent_type)
 	for playerIndex = 1, Opponent.partySize(_opponent_type) do
 		local argsPlayerIndex = previousOpponentArgsIndex + playerIndex
-		local nameInput = mw.text.split(slot[argsPlayerIndex] or TBD, '|')
+		local nameInput = Array.parseCommaSeparatedString(slot[argsPlayerIndex] or TBD, '|')
 
 		opponentData['p' .. playerIndex] = nameInput[#nameInput]
 		opponentData['p' .. playerIndex .. 'link'] = slot['link' .. opponentIndex .. 'p' .. playerIndex] or nameInput[1]

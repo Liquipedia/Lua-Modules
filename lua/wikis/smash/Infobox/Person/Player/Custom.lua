@@ -51,8 +51,8 @@ function CustomPlayer.inputToCharacterIconList(input, game, fn)
 	if type(input) ~= 'string' then
 		return nil
 	end
-	return Array.map(mw.text.split(input, ','), function(character)
-		return Characters[fn]{mw.text.trim(character), game}
+	return Array.map(Array.parseCommaSeparatedString(input), function(character)
+		return Characters[fn]{character, game}
 	end)
 end
 
