@@ -356,6 +356,9 @@ party opponents, this fills in players' pageNames using their displayNames,
 using data stored in page variables if present.
 
 options.syncPlayer: Whether to fetch player information from variables or LPDB. Disabled by default.
+
+options.syncPlayerTeam: Whether to fetch a players team from variables or LPDB. Requires options.syncPlayer to be enabled too.
+Disabled by default.
 ]]
 ---@param opponent standardOpponent
 ---@param date string|number|nil
