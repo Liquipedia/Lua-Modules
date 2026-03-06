@@ -24,8 +24,12 @@ local Center = Widgets.Center
 local SIZE_HERO = '25x25px'
 
 ---@class OverwatchInfoboxUser: InfoboxUser
+---@operator call(Frame): OverwatchInfoboxUser
 local CustomUser = Class.new(User)
 
+---@class OverwatchInfoboxUserWidgetInjector: WidgetInjector
+---@operator call(OverwatchInfoboxUser): OverwatchInfoboxUserWidgetInjector
+---@field caller OverwatchInfoboxUser
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame

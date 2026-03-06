@@ -20,8 +20,12 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 
 ---@class CustomInfoboxUser: InfoboxUser
+---@operator call(Frame): CustomInfoboxUser
 local CustomUser = Class.new(User)
 
+---@class CustomInfoboxUserWidgetInjector: WidgetInjector
+---@operator call(CustomInfoboxUser): CustomInfoboxUserWidgetInjector
+---@field caller CustomInfoboxUser
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
