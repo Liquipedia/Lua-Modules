@@ -60,7 +60,7 @@ liquipedia.switchButtons = {
 	init: function () {
 		this.baseLocalStorageKey = this.buildLocalStorageKey();
 		this.initSwitchElements( 'toggle', '.switch-toggle', 'switch-toggle-active' );
-		this.initSwitchElements( 'pill', '.switch-pill', 'switch-pill-active' );
+		this.initSwitchElements( 'pill', '.switch-pill', 'switch-pill-option-active' );
 		this.isInitialized = true;
 	},
 
