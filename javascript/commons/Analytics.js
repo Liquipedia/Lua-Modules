@@ -10,12 +10,28 @@ const WIKI_SWITCHED = 'Wiki switched';
 const SEARCH_PERFORMED = 'Page searched';
 const BUTTON_CLICKED = 'Button clicked';
 const MATCH_POPUP_OPENED = 'Match popup opened';
+const INFO_BANNER_CLOSED = 'Info banner closed';
+const USER_SETTINGS_ADDED = 'User settings added';
+const TOGGLE_CLICKED = 'Toggle clicked';
 
 // Constants
 const IGNORE_CATEGORY_PREFIX = 'Pages ';
 const TOC = 'ToC';
 const SIDEBAR = 'sidebar';
 const INLINE = 'inline';
+const INFOBANNER = 'InfoBanner';
+
+// Mapping from category name to page type
+const categoryToPageTypeMap = {
+	Players: 'player',
+	Teams: 'team',
+	Tournaments: 'tournament',
+	Matches: 'match',
+	'Tournament series': 'series',
+	Maps: 'map',
+	Characters: 'character',
+	Units: 'unit'
+};
 
 // Statically defined properties
 const getPageDomain = () => window.location.origin;
@@ -33,6 +49,12 @@ liquipedia.analytics = {
 		 * A registry of functions to find component-specific properties.
 		 * Each key matches a `data-analytics-name` value.
 		 *******************************************************************/
+		InfoBanner: function( element ) {
+			return {
+				'info banner id': element.dataset.id
+			};
+		},
+
 		Infobox: function( element, analyticsElement ) {
 			const parentDiv = element.parentElement;
 			if ( !parentDiv ) {
@@ -76,6 +98,7 @@ liquipedia.analytics = {
 				};
 			}
 		}
+
 	},
 
 	clickTrackers: [],
@@ -89,6 +112,9 @@ liquipedia.analytics = {
 		liquipedia.analytics.setupSearchAnalytics();
 		liquipedia.analytics.setupSearchFormSubmitAnalytics();
 		liquipedia.analytics.setupMatchPopupAnalytics();
+		liquipedia.analytics.setupInfoBannerAnalytics();
+		liquipedia.analytics.setupSwitchButtonAnalytics();
+		liquipedia.analytics.setupToggleClickAnalytics();
 
 		document.body.addEventListener( 'click', ( event ) => {
 			for ( const tracker of liquipedia.analytics.clickTrackers ) {
@@ -103,6 +129,10 @@ liquipedia.analytics = {
 	},
 
 	track: function( eventName, properties ) {
+		// amplitude is blocked, either by user choice or by an adblocker
+		if ( !window.amplitude ) {
+			return;
+		}
 		window.amplitude.track( eventName, {
 			'page domain': getPageDomain(),
 			'page location': getPageLocation(),
@@ -116,20 +146,24 @@ liquipedia.analytics = {
 
 	sendPageViewEvent: function() {
 		const categories = mw.config.get( 'wgCategories' ) || [];
+		const pageTypes = categories.map( ( category ) => categoryToPageTypeMap[ category ] ).filter( Boolean );
 		liquipedia.analytics.track( PAGE_VIEW, {
 			referrer: getReferrerUrl(),
 			'referring domain': getReferrerDomain(),
-			categories: categories.filter( ( category ) => !category.startsWith( IGNORE_CATEGORY_PREFIX ) )
+			categories: categories.filter( ( category ) => !category.startsWith( IGNORE_CATEGORY_PREFIX ) ),
+			'page type': pageTypes.length === 1 ? pageTypes[ 0 ] : null
 		} );
 	},
 
 	getAnalyticsContextElement: function( element ) {
 		const analyticsElement = element.closest( '[data-analytics-name]' );
 		if ( analyticsElement ) {
+			const name = analyticsElement.dataset.analyticsName;
 			return {
 				type: 'component',
 				element: analyticsElement,
-				name: analyticsElement.dataset.analyticsName
+				name,
+				position: name
 			};
 		}
 
@@ -140,7 +174,20 @@ liquipedia.analytics = {
 			return {
 				type: 'toc',
 				element: tocElement,
-				name: TOC
+				name: TOC,
+				position: TOC
+			};
+		}
+
+		// check if element is inside info banner, as we don't have a clean way
+		// to set the data-analytics-name attribute for info banners
+		const infoBannerElement = element.closest( '.network-notice' );
+		if ( infoBannerElement ) {
+			return {
+				type: 'infobanner',
+				element: infoBannerElement,
+				name: INFOBANNER,
+				position: 'info banner'
 			};
 		}
 
@@ -157,19 +204,21 @@ liquipedia.analytics = {
 		if ( headingNode ) {
 			const clone = headingNode.cloneNode( true );
 			clone.querySelector( '.mw-editsection' )?.remove();
+			const name = clone.textContent.trim();
 			return {
 				type: 'heading',
 				element: headingNode,
-				name: clone.textContent.trim()
+				name,
+				position: name
 			};
 		}
 
-		return { type: 'none', element: null, name: null };
+		return { type: 'none', element: null, name: null, position: null };
 	},
 
 	findLinkPosition: function( element ) {
 		const context = liquipedia.analytics.getAnalyticsContextElement( element );
-		return context.name;
+		return context.position;
 	},
 
 	// Converts a camelCase dataset key into a human-readable property name like
@@ -189,7 +238,10 @@ liquipedia.analytics = {
 	getDatasetAnalyticsProperties: function( dataset ) {
 		const properties = {};
 		Object.entries( dataset )
-			.filter( ( [ key ] ) => key.startsWith( 'analytics' ) && key !== 'analyticsName' )
+			.filter( ( [ key ] ) => key.startsWith( 'analytics' ) &&
+				key !== 'analyticsName' &&
+				key !== 'analyticsTrackValueAs'
+			)
 			.forEach( ( [ key, value ] ) => {
 				const propertyName = liquipedia.analytics.formatAnalyticsKey( key );
 				properties[ propertyName ] = value || null;
@@ -329,6 +381,48 @@ liquipedia.analytics = {
 					type: containerType
 				};
 			}
+		} );
+	},
+
+	setupInfoBannerAnalytics: function() {
+		liquipedia.analytics.clickTrackers.push( {
+			selector: '.network-notice__close-button',
+			trackerName: INFO_BANNER_CLOSED,
+			propertiesBuilder: ( closeButton ) => {
+				const infoBannerElement = closeButton.closest( '.network-notice' );
+				return liquipedia.analytics.customPropertyFinders.InfoBanner( infoBannerElement );
+			}
+		} );
+	},
+
+	setupToggleClickAnalytics: function() {
+		liquipedia.analytics.clickTrackers.push( {
+			selector: '.switch-toggle',
+			trackerName: TOGGLE_CLICKED,
+			propertiesBuilder: ( toggle ) => {
+				const position = liquipedia.analytics.findLinkPosition( toggle );
+				return {
+					position: liquipedia.analytics.formatAnalyticsKey( position )
+				};
+			}
+		} );
+	},
+
+	setupSwitchButtonAnalytics: function() {
+		document.body.addEventListener( 'switchButtonChanged', ( event ) => {
+			const switchElement = event.target;
+			const switchGroup = event.detail.data;
+
+			const customProperties = liquipedia.analytics.addCustomProperties( switchElement );
+			const context = liquipedia.analytics.getAnalyticsContextElement( switchElement );
+
+			const propertyToTrack = context.element?.dataset.analyticsTrackValueAs;
+
+			if ( propertyToTrack ) {
+				customProperties[ propertyToTrack ] = switchGroup.value;
+			}
+
+			liquipedia.analytics.track( USER_SETTINGS_ADDED, customProperties );
 		} );
 	}
 };

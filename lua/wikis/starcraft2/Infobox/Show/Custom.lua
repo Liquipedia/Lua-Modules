@@ -23,7 +23,7 @@ local CustomShow = Class.new(Show)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomShow.run(frame)
 	local show = CustomShow(frame)
 	show:setWidgetInjector(CustomInjector(show))

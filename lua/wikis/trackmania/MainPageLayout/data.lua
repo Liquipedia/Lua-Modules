@@ -7,6 +7,8 @@
 
 local Lua = require('Module:Lua')
 
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
+
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
@@ -21,29 +23,32 @@ local CONTENT = {
 		heading = 'The Game',
 		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
-		boxid = 1503,
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
 		body = '{{Liquipedia:Want_to_help}}',
 		padding = true,
-		boxid = 1504,
+		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP,
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{limit = 10},
-		boxid = 1509,
+		body = TransfersList{
+			limit = 10,
+			transferPage = MainPageLayoutUtil.getQuarterlyTransferPage()
+		},
+		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
 		body = ThisDayWidgets.Content{},
 		padding = true,
-		boxid = 1510,
+		boxid = MainPageLayoutUtil.BoxId.THIS_DAY,
 	},
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special_Event}}',
-		boxid = 1516,
+		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -56,7 +61,7 @@ local CONTENT = {
 		heading = 'Matches',
 		body = MatchTicker{},
 		padding = true,
-		boxid = 1507,
+		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 		panelAttributes = {
 			['data-switch-group-container'] = 'countdown',
 		},
@@ -69,7 +74,7 @@ local CONTENT = {
 			completedDays = 20,
 		},
 		padding = true,
-		boxid = 1508,
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 }
 
@@ -131,7 +136,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				sizes = {xxl = 5, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
@@ -148,7 +153,7 @@ return {
 				}
 			},
 			{ -- Right
-				size = 6,
+				sizes = {xxl = 7, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 2,

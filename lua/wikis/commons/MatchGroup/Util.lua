@@ -11,7 +11,7 @@ local Array = Lua.import('Module:Array')
 local Date = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local FnUtil = Lua.import('Module:FnUtil')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
@@ -38,6 +38,7 @@ local MatchGroupUtil = {types = {}}
 ---@class MatchGroupUtilLowerEdge
 ---@field lowerMatchIndex number
 ---@field opponentIndex number
+
 MatchGroupUtil.types.LowerEdge = TypeUtil.struct({
 	lowerMatchIndex = 'number',
 	opponentIndex = 'number',
@@ -48,6 +49,7 @@ MatchGroupUtil.types.AdvanceBg = TypeUtil.literalUnion('up', 'stayup', 'stay', '
 ---@field bg AdvanceBg
 ---@field matchId string?
 ---@field type string?
+
 MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 	bg = MatchGroupUtil.types.AdvanceBg,
 	matchId = 'string?',
@@ -75,7 +77,8 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 ---@field upperMatchId string?
 ---@field matchId string?
 ---@field matchPage string?
----@field qualifiedHeader boolean?
+---@field qualifiedHeader string?
+
 MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
 	bracketResetMatchId = 'string?',
@@ -88,7 +91,7 @@ MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	qualLoseLiteral = 'string?',
 	qualSkip = 'number?',
 	qualWin = 'boolean?',
-	qualifiedHeader = 'boolean?',
+	qualifiedHeader = 'string?',
 	qualWinLiteral = 'string?',
 	skipRound = 'number?',
 	thirdPlaceMatchId = 'string?',
@@ -107,6 +110,7 @@ MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 ---@field sectionIndex number
 ---@field semanticDepth number
 ---@field semanticRoundIndex number
+
 MatchGroupUtil.types.MatchCoordinates = TypeUtil.struct({
 	depth = 'number',
 	depthCount = 'number',
@@ -126,6 +130,7 @@ MatchGroupUtil.types.MatchCoordinates = TypeUtil.struct({
 ---@field type 'matchlist'
 ---@field matchId string?
 ---@field matchPage string?
+
 MatchGroupUtil.types.MatchlistBracketData = TypeUtil.struct({
 	header = 'string?',
 	title = 'string?',
@@ -146,6 +151,8 @@ MatchGroupUtil.types.BracketData = TypeUtil.union(
 ---@field extradata table?
 ---@field pageIsResolved boolean?
 ---@field faction string?
+---@field apiId string?
+
 MatchGroupUtil.types.Player = TypeUtil.struct({
 	displayName = 'string?',
 	flag = 'string?',
@@ -173,6 +180,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 ---@field type OpponentType
 ---@field team string?
 ---@field extradata table
+
 MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	advanceBg = 'string?',
 	advances = 'boolean?',
@@ -195,6 +203,7 @@ MatchGroupUtil.types.Opponent = TypeUtil.struct({
 ---@field players standardPlayer[]
 ---@field template string?
 ---@field type string
+
 MatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 	name = 'string?',
 	players = TypeUtil.optional(TypeUtil.array(MatchGroupUtil.types.Player)),
@@ -225,6 +234,7 @@ MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed
 ---@field winner integer?
 ---@field status string?
 ---@field extradata table?
+
 MatchGroupUtil.types.Game = TypeUtil.struct({
 	comment = 'string?',
 	date = 'string?',
@@ -268,6 +278,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field resultType string?
 ---@field section string?
 ---@field series string?
+---@field shortname string?
 ---@field status MatchStatus
 ---@field stream table
 ---@field tickername string?
@@ -279,6 +290,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field timestamp number
 ---@field timezoneId string?
 ---@field bestof number?
+
 MatchGroupUtil.types.Match = TypeUtil.struct({
 	bracketData = MatchGroupUtil.types.BracketData,
 	comment = 'string?',
@@ -302,6 +314,7 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	resultType = 'string?',
 	section = 'string?',
 	series = 'string?',
+	shortname = 'string?',
 	status = MatchGroupUtil.types.Status,
 	stream = 'table',
 	tickername = 'string?',
@@ -324,6 +337,7 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 ---@field matches MatchGroupUtilMatch[]
 ---@field matchesById table<string, MatchGroupUtilMatch>
 ---@field type 'matchlist'
+
 MatchGroupUtil.types.Matchlist = TypeUtil.struct({
 	bracketDatasById = TypeUtil.table('string', MatchGroupUtil.types.BracketData),
 	matches = TypeUtil.array(MatchGroupUtil.types.Match),
@@ -340,6 +354,7 @@ MatchGroupUtil.types.Matchlist = TypeUtil.struct({
 ---@field rounds string[][]
 ---@field sections string[][]
 ---@field type 'bracket'
+
 MatchGroupUtil.types.Bracket = TypeUtil.struct({
 	bracketDatasById = TypeUtil.table('string', MatchGroupUtil.types.BracketData),
 	coordinatesByMatchId = TypeUtil.table('string', MatchGroupUtil.types.MatchCoordinates),
@@ -574,6 +589,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		resultType = nilIfEmpty(record.resulttype),
 		section = nilIfEmpty(record.section),
 		series = nilIfEmpty(record.series),
+		shortname = nilIfEmpty(record.shortname),
 		status = nilIfEmpty(record.status),
 		stream = Json.parseIfString(record.stream) or {},
 		tickername = record.tickername,

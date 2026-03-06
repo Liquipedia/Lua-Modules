@@ -43,6 +43,9 @@ return {
 				mode = 'merge',
 			},
 		},
+		participants = {
+			defaultPlayerNumber = 4,
+		},
 	},
 	defaultRoundPrecision = 0,
 }

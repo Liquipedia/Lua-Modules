@@ -50,7 +50,7 @@ local KING_ICONS = {
 }
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end

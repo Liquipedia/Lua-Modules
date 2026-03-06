@@ -16,7 +16,7 @@ local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 
 ---@class GameData
 ---@field abbreviation string

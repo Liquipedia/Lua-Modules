@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Logic = Lua.import('Module:Logic')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
@@ -19,20 +20,21 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@class TournamentTitleProps
 ---@field tournament StandardTournamentPartial
 ---@field displayGameIcon boolean?
+---@field useShortName boolean?
 
 ---@class TournamentTitleWidget: Widget
 ---@operator call(TournamentTitleProps): TournamentTitleWidget
 ---@field props TournamentTitleProps
 local TournamentTitleWidget = Class.new(Widget)
 
----@return Widget?
+---@return Widget[]?
 function TournamentTitleWidget:render()
 	local tournament = self.props.tournament
 	if not tournament then
 		return
 	end
 
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+	return WidgetUtil.collect(
 		self.props.displayGameIcon and Game.icon{
 			game = tournament.game,
 			noLink = true,
@@ -56,13 +58,11 @@ function TournamentTitleWidget:render()
 			children = {
 				Link{
 					link = tournament.pageName,
-					children = {
-						tournament.displayName,
-					},
+					children = Logic.readBool(self.props.useShortName) and tournament.shortName or tournament.displayName,
 				},
 			}
 		}
-	)}
+	)
 end
 
 return TournamentTitleWidget

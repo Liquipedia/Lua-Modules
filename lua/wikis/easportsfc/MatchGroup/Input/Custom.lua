@@ -109,7 +109,7 @@ function CustomMatchGroupInput._submatchPenaltyScores(map, opponents, hasSubmatc
 end
 
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
@@ -157,7 +157,7 @@ end
 
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	return {

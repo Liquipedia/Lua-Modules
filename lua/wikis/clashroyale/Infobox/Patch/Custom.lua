@@ -14,7 +14,7 @@ local Patch = Lua.import('Module:Infobox/Patch')
 local CustomPatch = Class.new()
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPatch.run(frame)
 	local patch = Patch(frame)
 	patch.args.informationType = 'Version'

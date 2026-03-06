@@ -35,7 +35,7 @@ local VALID_ITEMS = {
 }
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomItem.run(frame)
 	local item = CustomItem(frame)
 

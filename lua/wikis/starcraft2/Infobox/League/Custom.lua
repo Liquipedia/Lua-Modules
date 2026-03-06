@@ -16,7 +16,9 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -48,7 +50,7 @@ local GAME_MOD = 'mod'
 local GAME_LOTV = Game.toIdentifier{game = 'lotv'}
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -63,7 +65,7 @@ function CustomLeague:customParseArguments(args)
 	args.raceBreakDown = RaceBreakdown.run(args) or {}
 	args.player_number = args.raceBreakDown.total
 	args.maps = self:_getMaps('map', args)
-	args.number = tonumber(args.number)
+	self.data.number = tonumber(args.number)
 	self.data.mode = args.mode or DEFAULT_MODE
 	self.data.game = (args.game or ''):lower() == GAME_MOD and GAME_MOD or self.data.game
 	self.data.mod = self.data.game == GAME_MOD and args.modname or nil
@@ -148,13 +150,15 @@ function CustomLeague:_isFinished(args)
 		return false
 	end
 
-	return mw.ext.LiquipediaDB.lpdb('placement', {
+	local winner = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = '[[pagename::' .. string.gsub(self.pagename, ' ', '_') .. ']] '
 			.. 'AND [[opponentname::!TBD]] AND [[opponentname::!]] AND [[placement::1]]',
-		query = 'date',
+		query = 'opponenttype, opponentplayers, opponenttemplate, opponentname',
 		order = 'date asc',
 		limit = 1
-	})[1] ~= nil
+	})[1]
+
+	return winner and not Opponent.isTbd(Opponent.fromLpdbStruct(winner))
 end
 
 -- Automatically fill in next/previous for touranaments that are part of a series
@@ -169,7 +173,7 @@ function CustomLeague:_computeChronology(args)
 	local number = tonumber(title.subpageText)
 	local automateChronology = String.isNotEmpty(args.series)
 		and number
-		and args.number == number
+		and self.data.number == number
 		and title.subpageText ~= title.text
 		and Logic.readBool(args.auto_chronology or true)
 		and (String.isEmpty(args.next) or String.isEmpty(args.previous))
@@ -331,7 +335,7 @@ function CustomLeague:shouldStore(args)
 	return Namespace.isMain() and
 		not Logic.readBool(args.disable_lpdb) and
 		not Logic.readBool(args.disable_storage) and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage', 'false'))
+		Lpdb.isStorageEnabled()
 end
 
 ---@param args table
@@ -360,7 +364,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_mod', self.data.mod)
 	Variables.varDefine('headtohead', args.headtohead or 'true')
 	Variables.varDefine('tournament_maps', Json.stringify(args.maps))
-	Variables.varDefine('tournament_series_number', args.number and string.format('%05i', args.number) or nil)
+	Variables.varDefine('tournament_series_number', self.data.number and string.format('%05i', self.data.number) or nil)
 	Variables.varDefine('match_date', self.data.startTime.storage)
 end
 
@@ -386,7 +390,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
 	lpdbData.maps = Json.stringify(args.maps)
 
-	lpdbData.extradata.seriesnumber = args.number and string.format('%05i', args.number) or nil
+	lpdbData.extradata.seriesnumber = self.data.number and string.format('%05i', self.data.number) or nil
 	lpdbData.extradata.starttime = self.data.startTime.storage
 	lpdbData.extradata.mod = self.data.mod
 

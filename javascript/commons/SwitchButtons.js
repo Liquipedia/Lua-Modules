@@ -84,25 +84,44 @@ liquipedia.switchButtons = {
 				name: groupName,
 				activeClassName,
 				nodes: [],
+				nodeSet: new Set(),
+				boundNodes: new WeakSet(),
 				isStoredInLocalStorage: element.dataset.storeValue === 'true',
 				value: null // Default value
 			};
 
-			if ( type === 'toggle' ) {
-				switchGroup.nodes.push( element );
-			} else {
-				element.querySelectorAll( '.switch-pill-option' ).forEach( ( optionNode ) => {
-					switchGroup.nodes.push( optionNode );
-				} );
-			}
+			this.addNodesToSwitchGroup( switchGroup, element );
 
 			this.switchGroups[ groupName ] = switchGroup;
+		} else {
+			this.addNodesToSwitchGroup( this.switchGroups[ groupName ], element );
 		}
 
 		return this.switchGroups[ groupName ];
 	},
 
+	addNodesToSwitchGroup: function ( switchGroup, element ) {
+		const addNode = ( node ) => {
+			if ( !switchGroup.nodeSet.has( node ) ) {
+				switchGroup.nodeSet.add( node );
+				switchGroup.nodes.push( node );
+			}
+		};
+
+		if ( switchGroup.type === 'toggle' ) {
+			addNode( element );
+			return;
+		}
+
+		element.querySelectorAll( '.switch-pill-option' ).forEach( addNode );
+	},
+
 	setupSwitchGroupValueAndDOM: function ( switchGroup ) {
+		if ( switchGroup.value !== null ) {
+			this.updateDOM( switchGroup, switchGroup.value );
+			return;
+		}
+
 		const localStorageValue = this.getLocalStorageValue( switchGroup );
 
 		if ( localStorageValue !== null ) {
@@ -130,20 +149,24 @@ liquipedia.switchButtons = {
 		}
 	},
 
-	getValueFromDOM: function ( switchGroup, activeClassName ) {
+	getValueFromDOM: function ( switchGroup ) {
 		if ( switchGroup.type === 'toggle' ) {
-			return switchGroup.nodes[ 0 ]?.classList.contains( activeClassName ) ?? false;
+			return switchGroup.nodes[ 0 ]?.classList.contains( switchGroup.activeClassName ) ?? false;
 		} else {
-			switchGroup.nodes.forEach( ( pillNode ) => {
-				if ( pillNode.classList.contains( activeClassName ) ) {
-					return pillNode.dataset.switchValue;
-				}
-			} );
+			const activeNode = switchGroup.nodes.find( ( pillNode ) => (
+				pillNode.classList.contains( switchGroup.activeClassName )
+			) );
+			return activeNode?.dataset.switchValue;
 		}
 	},
 
 	attachEventListener: function ( switchGroup, activeClassName ) {
 		switchGroup.nodes.forEach( ( node ) => {
+			if ( switchGroup.boundNodes.has( node ) ) {
+				return;
+			}
+			switchGroup.boundNodes.add( node );
+
 			node.addEventListener( 'click', () => {
 				const newValue = this.getNewValue( node, switchGroup.type, activeClassName );
 
@@ -180,6 +203,10 @@ liquipedia.switchButtons = {
 		const localStorageKey = `${ this.baseLocalStorageKey }_${ groupName }`;
 		const storageValue = window.localStorage.getItem( localStorageKey );
 
+		if ( storageValue === null ) {
+			return null;
+		}
+
 		if ( switchGroup.type === 'toggle' ) {
 			return storageValue === 'true';
 		} else {
@@ -193,7 +220,10 @@ liquipedia.switchButtons = {
 	},
 
 	triggerCustomEvent: function ( node, data ) {
-		const customEvent = new CustomEvent( this.triggerEventName, { detail: { data } } );
+		const customEvent = new CustomEvent( this.triggerEventName, {
+			detail: { data },
+			bubbles: true
+		} );
 		node.dispatchEvent( customEvent );
 	},
 

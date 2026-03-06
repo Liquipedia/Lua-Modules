@@ -3,18 +3,21 @@ Hexagon portraits
 Use case: Hexagon shaped portraits originally created for /heroes/Portal:Heroes
 Author(s): PhiLtheFisH, FO-nTTaX, salle
 *******************************************************************************/
-.wiki-heroes .hexagon-container {
-	height: 1200px;
-	position: relative;
-	margin-bottom: 24px;
-	z-index: 1;
-}
+.hexagon-container {
+	.wiki-heroes &,
+	.wiki-illuvium & {
+		position: relative;
+		margin-bottom: 24px;
+		z-index: 1;
+	}
 
-.wiki-illuvium .hexagon-container {
-	height: 2500px;
-	position: relative;
-	margin-bottom: 24px;
-	z-index: 1;
+	.wiki-heroes & {
+		height: 1200px;
+	}
+
+	.wiki-illuvium & {
+		height: 2500px;
+	}
 }
 
 .wiki-heroes .hexagon-row,
@@ -22,12 +25,11 @@ Author(s): PhiLtheFisH, FO-nTTaX, salle
 	line-height: 240px;
 	margin-bottom: -24px;
 	position: absolute;
-}
 
-.wiki-heroes .hexagon-row:nth-child( 2 ),
-.wiki-illuvium .hexagon-row:nth-child( 2 ) {
-	margin-left: 69px;
-	top: 120px;
+	&:nth-child( 2 ) {
+		margin-left: 69px;
+		top: 120px;
+	}
 }
 
 .wiki-heroes .hexagon-tile,
@@ -40,6 +42,31 @@ Author(s): PhiLtheFisH, FO-nTTaX, salle
 	position: relative;
 	transition: 1s;
 	z-index: 100;
+
+	&:hover {
+		opacity: 0.75;
+		transition: 1s;
+	}
+
+	a img {
+		margin-top: -100px;
+	}
+
+	&-clear {
+		visibility: hidden;
+	}
+
+	&-name {
+		color: #ffffff;
+		font-weight: bold;
+		left: 10px;
+		line-height: 12px;
+		position: absolute;
+		text-shadow: -1px 1px #000000;
+		top: 98px;
+		transform: rotate( -30deg );
+		transform-origin: -115px -35px 0;
+	}
 }
 
 .wiki-heroes .hexagon-buttons-class,
@@ -55,6 +82,11 @@ Author(s): PhiLtheFisH, FO-nTTaX, salle
 .wiki-heroes .hexagon-button,
 .wiki-illuvium .hexagon-button {
 	cursor: pointer;
+
+	img {
+		background-color: initial;
+		transition: 1s;
+	}
 }
 
 .wiki-heroes .hexagon:not( .show-bruiser ) .hexagon-tile-bruiser,
@@ -172,12 +204,6 @@ Author(s): PhiLtheFisH, FO-nTTaX, salle
 	transition: 1s;
 }
 
-.wiki-heroes .hexagon-button img,
-.wiki-illuvium .hexagon-button img {
-	background-color: initial;
-	transition: 1s;
-}
-
 .wiki-heroes .hexagon.show-bruiser .hexagon-button[ data-show="bruiser" ] img,
 .wiki-heroes .hexagon.show-healer .hexagon-button[ data-show="healer" ] img,
 .wiki-heroes .hexagon.show-support .hexagon-button[ data-show="support" ] img,
@@ -232,57 +258,25 @@ Author(s): PhiLtheFisH, FO-nTTaX, salle
 	transition: 1s;
 }
 
-.wiki-heroes .hexagon-tile:hover,
-.wiki-illuvium .hexagon-tile:hover {
-	opacity: 0.75;
-	transition: 1s;
-}
-
-.wiki-heroes .hexagon-tile a img,
-.wiki-illuvium .hexagon-tile a img {
-	margin-top: -100px;
-}
-
-.wiki-heroes .hexagon-tile-clear,
-.wiki-illuvium .hexagon-tile-clear {
-	visibility: hidden;
-}
-
-.wiki-heroes .hexagon-tile-name,
-.wiki-illuvium .hexagon-tile-name {
-	color: #ffffff;
-	font-weight: bold;
-	left: 10px;
-	line-height: 12px;
-	position: absolute;
-	text-shadow: -1px 1px #000000;
-	top: 98px;
-	transform: rotate( -30deg );
-	transform-origin: -115px -35px 0;
-}
-
 .wiki-heroes .hexagon label,
 .wiki-illuvium .hexagon label {
 	cursor: pointer;
-}
 
-.wiki-heroes .hexagon label > input,
-.wiki-illuvium .hexagon label > input {
-	display: none;
-}
+	> input {
+		display: none;
 
-.wiki-heroes .hexagon label > span,
-.wiki-illuvium .hexagon label > span {
-	background-color: #aaaaaa;
-	border: 1px solid #aaaaaa;
-	border-radius: 5px;
-	margin: 5px;
-	padding: 5px;
-	transition: 0.5s;
-}
+		&:checked + span {
+			background-color: #cccccc;
+			transition: 0.5s;
+		}
+	}
 
-.wiki-heroes .hexagon label > input:checked + span,
-.wiki-illuvium .hexagon label > input:checked + span {
-	background-color: #cccccc;
-	transition: 0.5s;
+	> span {
+		background-color: #aaaaaa;
+		border: 1px solid #aaaaaa;
+		border-radius: 5px;
+		margin: 5px;
+		padding: 5px;
+		transition: 0.5s;
+	}
 }

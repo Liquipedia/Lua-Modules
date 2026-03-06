@@ -25,7 +25,7 @@ local TYPE_MODIFIER = {Online = 0.65}
 
 -- Template entry point
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	local prizePool = PrizePool(args):create()
@@ -53,8 +53,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	Variables.varDefine(participantLower .. '_prizepoints2', lpdbData.extradata.prizepoints2)
 	Variables.varDefine('enddate_'.. lpdbData.participant .. '_date', lpdbData.date)
 	Variables.varDefine('status'.. lpdbData.participant .. '_date', lpdbData.date)
-
-	lpdbData.qualified = placement:getPrizeRewardForOpponent(opponent, 'QUALIFIES1') and 1 or 0
 
 	if Opponent.isTbd(opponent.opponentData) then
 		Variables.varDefine('minimum_secured', lpdbData.extradata.prizepoints)

@@ -23,6 +23,7 @@ local StreamLinks = Lua.import('Module:Links/Stream')
 ---@field nostreams boolean?
 ---@field text string?
 ---@field separator string?
+---@field format ('full'|'compact')?
 
 local Countdown = {}
 
@@ -36,6 +37,7 @@ function Countdown.create(args)
 
 	local wrapper = mw.html.create('span')
 		:addClass('timer-object')
+		:attr('data-format', args.format or 'full')
 
 	if Logic.readBool(args.rawcountdown) then
 		wrapper:addClass('timer-object-countdown-only')

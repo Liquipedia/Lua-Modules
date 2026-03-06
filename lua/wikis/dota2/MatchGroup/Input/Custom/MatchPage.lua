@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
+---@class Dota2MatchPageMapParser: Dota2MapParserInterface
 local CustomMatchGroupInputMatchPage = {}
 
 ---@class dota2MatchDataExtended: dota2MatchData
@@ -59,9 +60,10 @@ function CustomMatchGroupInputMatchPage.getSide(map, opponentIndex)
 end
 
 ---@param map dota2MatchDataExtended
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]?
-function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
+function CustomMatchGroupInputMatchPage.getParticipants(map, opponent, opponentIndex)
 	local team = map['team' .. opponentIndex] ---@type dota2MatchTeam?
 	if not team then return end
 	if not team.players then return end
@@ -72,18 +74,41 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 			image = item.image,
 		}
 	end
-	local function fetchLpdbPlayer(playerId)
-		if not playerId then return end
-		return mw.ext.LiquipediaDB.lpdb('player', {
+
+	---@param players MGIParsedPlayer[]
+	---@param playerId integer
+	---@return {pageName: string, displayName: string}?
+	local function fetchPlayerName(players, playerId)
+		if not playerId then
+			return
+		end
+		local lpdbData = mw.ext.LiquipediaDB.lpdb('player', {
 			conditions = '[[extradata_playerid::' .. playerId .. ']]',
 			query = 'pagename, id',
 		})[1]
-	end
-	local players = Array.map(team.players, function(player)
-		local playerData = fetchLpdbPlayer(player.id) or {}
+		if lpdbData then
+			return {
+				pageName = lpdbData.pagename,
+				displayName = lpdbData.id,
+			}
+		end
+		local parsedPlayer = Array.find(players, function (player)
+			return (player.extradata or {}).publisherId == playerId
+		end)
+		if not parsedPlayer then
+			return
+		end
 		return {
-			player = playerData.pagename or player.name,
-			name = playerData.id,
+			pageName = parsedPlayer.name,
+			displayName = parsedPlayer.displayname,
+		}
+	end
+
+	local players = Array.map(team.players, function(player)
+		local playerData = fetchPlayerName(opponent.match2players, player.id) or {}
+		return {
+			player = playerData.pageName or player.name,
+			name = playerData.displayName,
 			role = player.position,
 			facet = player.facet,
 			character = player.heroName,

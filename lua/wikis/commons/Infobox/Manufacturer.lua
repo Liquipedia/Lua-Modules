@@ -23,9 +23,10 @@ local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
 ---@class ManufacturerInfobox: BasicInfobox
+---@operator call(Frame): ManufacturerInfobox
 local Manufacturer = Class.new(BasicInfobox)
 
----@return string
+---@return Widget
 function Manufacturer:createInfobox()
 	local args = self.args
 

@@ -3,11 +3,6 @@
 	display: none;
 }
 
-/* Invert colors for dark theme */
-html.theme--dark .componentsinvert {
-	filter: invert( 1 );
-}
-
 // Default text-shadow
 .txtshd {
 	text-shadow: 0.0625em 0.0625em 0.125em var( --clr-moon-base ); // #000000

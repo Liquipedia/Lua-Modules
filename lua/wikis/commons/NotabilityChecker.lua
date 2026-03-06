@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Config = Lua.import('Module:NotabilityChecker/config')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
@@ -19,7 +20,7 @@ local NotabilityChecker = {}
 
 local LANG = mw.getContentLanguage()
 local NOW = os.time()
-local SECONDS_IN_YEAR = 365.2425 * 86400
+local SECONDS_IN_YEAR = DateExt.daysToSeconds(365.2425)
 local MAX_NUMBER_OF_PARTICIPANTS = Config.MAX_NUMBER_OF_PARTICIPANTS or Info.config.defaultMaxPlayersPerPlacement or 10
 
 NotabilityChecker.LOGGING = true

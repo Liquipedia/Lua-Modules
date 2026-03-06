@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local HeroNames = Lua.import('Module:HeroNames', {loadData = true})
 local Logic = Lua.import('Module:Logic')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
@@ -20,7 +21,11 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
+local globalVars = PageVariableNamespace{cached = true}
+
 local CustomMatchGroupInput = {}
+
+---@class Dota2MatchParser: MatchParserInterface
 local MatchFunctions = {}
 local MapFunctions = {}
 
@@ -37,11 +42,11 @@ MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 ---@field getMap fun(mapInput: table): table
 ---@field getLength fun(map: table): string?
 ---@field getSide fun(map: table, opponentIndex: integer): string?
----@field getObjectives fun(map: table, opponentIndex: integer): string?
+---@field getObjectives fun(map: table, opponentIndex: integer): table?
 ---@field getHeroPicks fun(map: table, opponentIndex: integer): string[]?
 ---@field getHeroBans fun(map: table, opponentIndex: integer): string[]?
----@field getParticipants fun(map: table, opponentIndex: integer): table[]?
----@field getVetoPhase fun(map: table): table?
+---@field getParticipants fun(map: table, opponent: MGIParsedOpponent, opponentIndex: integer): table[]?
+---@field getVetoPhase fun(map: table): table[]?
 
 ---@param match table
 ---@param options? {isMatchPage: boolean?}
@@ -68,8 +73,24 @@ function CustomMatchGroupInput.processMatch(match, options)
 	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
 end
 
+---@param opponent MGIParsedOpponent
+---@param opponentIndex integer
+function MatchFunctions.adjustOpponent(opponent, opponentIndex)
+	if opponent.type ~= Opponent.team then
+		return
+	end
+	local prefix = opponent.name .. '_p'
+	Array.forEach(opponent.match2players, function (player, playerIndex)
+		local publisherId = globalVars:get(prefix .. playerIndex .. 'id')
+		if Logic.isNotEmpty(publisherId) then
+			player.extradata = player.extradata or {}
+			player.extradata.publisherId = tonumber(publisherId)
+		end
+	end)
+end
+
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param MapParser Dota2MapParserInterface
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents, MapParser)
@@ -95,9 +116,7 @@ end
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
 function MatchFunctions.calculateMatchScore(maps)
-	return function(opponentIndex)
-		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-	end
+	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
 ---@param match table
@@ -123,7 +142,7 @@ function MatchFunctions.getLinks(match, games)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return string?
 function MatchFunctions.getHeadToHeadLink(match, opponents)
 	local isTeamGame = Array.all(opponents, function(opponent)
@@ -144,7 +163,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
@@ -164,7 +183,7 @@ end
 ---@param MapParser Dota2MapParserInterface
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(MapParser, match, map, opponents)
 	local extraData = {
@@ -205,13 +224,13 @@ end
 
 ---@param MapParser Dota2MapParserInterface
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponentIndex)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
 
-	local participantList = MapParser.getParticipants(map, opponentIndex) or {}
+	local participantList = MapParser.getParticipants(map, opponent, opponentIndex) or {}
 	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		participantList,

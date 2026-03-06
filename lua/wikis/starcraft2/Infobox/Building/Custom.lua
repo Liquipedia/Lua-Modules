@@ -33,7 +33,7 @@ local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local GAME_LOTV = Game.name{game = 'lotv'}
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomBuilding.run(frame)
 	local building = CustomBuilding(frame)
 	building:setWidgetInjector(CustomInjector(building))

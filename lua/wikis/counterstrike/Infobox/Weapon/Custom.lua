@@ -28,7 +28,7 @@ local CustomWeapon = Class.new(Weapon)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomWeapon.run(frame)
 	local weapon = CustomWeapon(frame)
 	weapon:setWidgetInjector(CustomInjector(weapon))

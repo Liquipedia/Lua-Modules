@@ -22,7 +22,7 @@ local NUM_HEROES_PICK = 5
 local STATUS_NOT_PLAYED = 'notplayed'
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', teamStyle = 'bracket'})
 end
@@ -59,15 +59,29 @@ function CustomMatchSummary._createGame(date, game, gameIndex)
 		classes = {'brkts-popup-body-game'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.Characters{
+				css = {
+					flex = '1 1 33%',
+				},
 				flipped = false,
 				characters = characterData[1],
 				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team1side or ''),
 				date = date,
 			},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.GameCenter{children = Logic.nilIfEmpty(game.length) or ('Game ' .. gameIndex)},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+			MatchSummaryWidgets.GameCenter{
+				css = {
+					flex = '1 1 fit-content',
+					gap = '0.5rem',
+				},
+				children = {
+					MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+					MatchSummaryWidgets.GameCenter{children = Logic.emptyOr(game.length, 'Game ' .. gameIndex)},
+					MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+				}
+			},
 			MatchSummaryWidgets.Characters{
+				css = {
+					flex = '1 1 33%',
+				},
 				flipped = true,
 				characters = characterData[2],
 				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team2side or ''),

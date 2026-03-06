@@ -35,6 +35,9 @@ return {
 			status = 2,
 			matchWidth = 180,
 		},
+		participants = {
+			defaultPlayerNumber = 6,
+		},
 		defaultMaxPlayersPerPlacement = 12,
 	},
 	defaultRoundPrecision = 0,
