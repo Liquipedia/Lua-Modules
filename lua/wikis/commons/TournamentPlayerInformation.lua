@@ -55,6 +55,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local TournamentPlayerInfo = Class.new(function(self, ...) self:init(...) end)
 
 ---@param frame Frame
+---@return Widget|string
 function TournamentPlayerInfo.create(frame)
 	local args = Arguments.getArgs(frame)
 	local tournamentPlayerInfo = TournamentPlayerInfo(args)
@@ -134,8 +135,8 @@ function TournamentPlayerInfo:_parseRecords(records)
 	self.data = Array.sortBy(players, function(x) return x end, function (a, b)
 		if Logic.isEmpty(a.team) then
 			return Logic.isEmpty(b.team)
-		elseif Logic.isEmpty(a.team) then
-			return Logic.isEmpty(b.team)
+		elseif Logic.isEmpty(b.team) then
+			return Logic.isEmpty(a.team)
 		elseif a.team ~= b.team then
 			return a.team < b.team
 		end

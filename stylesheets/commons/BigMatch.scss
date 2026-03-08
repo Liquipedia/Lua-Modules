@@ -355,6 +355,7 @@ span.slash {
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-on-surface-dark-primary-8 );
 		color-scheme: dark;
+		--carousel-fade-color: var( --clr-secondary-16, var( --clr-background, #121212 ) );
 	}
 
 	&-content {
@@ -1651,15 +1652,5 @@ $valorant-def: #01654c;
 				}
 			}
 		}
-	}
-
-	&-container {
-		display: flex;
-		flex-flow: row nowrap;
-		overflow-x: auto;
-		scroll-snap-type: x mandatory;
-		scrollbar-width: thin;
-		gap: 0.5rem;
-		align-items: stretch;
 	}
 }

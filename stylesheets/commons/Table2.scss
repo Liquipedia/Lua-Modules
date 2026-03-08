@@ -121,7 +121,7 @@ $table2-cell-padding-x: 0.75rem;
 			position: relative;
 
 			.theme--light & {
-				background-color: var( --clr-semantic-gold-98 );
+				background-color: var( --clr-semantic-gold-90 );
 				box-shadow: 0 1px 0 var( --clr-semantic-gold-80 );
 			}
 
@@ -160,7 +160,7 @@ $table2-cell-padding-x: 0.75rem;
 
 		&.table2__row--highlighted:hover {
 			.theme--light & {
-				background-color: var( --clr-semantic-gold-90 );
+				background-color: var( --clr-semantic-gold-85 );
 			}
 
 			.theme--dark & {

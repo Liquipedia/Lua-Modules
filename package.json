@@ -40,6 +40,8 @@
 		"test:js": "jest",
 		"compile:scss": "sass stylesheets/Main.scss lua/output/css/main.css",
 		"build:css": "npm run compile:scss",
+		"build:js": "node build-js.js",
+		"build": "npm run build:css && npm run build:js",
 		"lua-test": "npm run build:css && busted -C lua",
 		"update-snapshots": "UPDATE_SNAPSHOTS=true npm run lua-test"
 	}
