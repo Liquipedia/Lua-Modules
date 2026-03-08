@@ -101,7 +101,7 @@ function StandingsFfaWidget:render()
 						children = WidgetUtil.collect(
 							HtmlWidgets.Td{
 								children = {slot.placement, '.'},
-								css = {['font-weight'] = 'bold'},
+								css = {['font-weight'] = 'bold', ['text-align'] = 'center'},
 								classes = {positionBackground},
 							},
 							HtmlWidgets.Td{
