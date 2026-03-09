@@ -67,7 +67,7 @@ def main():
     new_commons_modules = files_to_protect_by_wiki.get("commons")
 
     if new_commons_modules:
-        for wiki in get_wikis():
+        for wiki in sorted(get_wikis()):
             with MediaWikiSession(wiki) as session:
                 if wiki == "commons":
                     protect_existing_pages(session, new_commons_modules)
