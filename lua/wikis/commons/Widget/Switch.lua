@@ -8,10 +8,17 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+
+local VALID_SYNC_LEVELS = {
+	'page',
+	'wiki',
+	'site',
+}
 
 ---@class SwitchParameters
 ---@field label string
@@ -41,8 +48,11 @@ function SwitchWidget:render()
 	local switchGroup = self.props.switchGroup
 	local storeValue = self.props.storeValue
 	local defaultActive = self.props.defaultActive
-	local syncLevel = self.props.syncLevel
+	local syncLevelInput = self.props.syncLevel
 	local content = self.props.content
+
+	assert(Table.includes(VALID_SYNC_LEVELS, syncLevelInput), 'Invalid syncLevel: ' .. tostring(syncLevelInput))
+	local syncLevel = syncLevelInput
 
 	local switchToggleClasses = {'switch-toggle-container'}
 
