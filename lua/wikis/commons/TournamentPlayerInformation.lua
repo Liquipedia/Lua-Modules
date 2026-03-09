@@ -37,6 +37,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class EnrichedStandardPlayer: standardPlayer
@@ -289,20 +290,21 @@ function TournamentPlayerInfo:buildOverallAgeTable()
 	end
 	return createTemplateBox{
 		padding = '2em',
-		children = HtmlWidgets.Table{
-			classes = {'wikitable', 'wikitable-striped'},
+		children = TableWidgets.Table{
 			css = {margin = '1em 0'},
 			children = {
-				HtmlWidgets.Tr{children = {
-					HtmlWidgets.Th{children = 'Average Age'},
-					HtmlWidgets.Th{children = 'Youngest'},
-					HtmlWidgets.Th{children = 'Oldest'},
+				TableWidgets.TableHeader{children = TableWidgets.Row{
+					children = {
+						TableWidgets.CellHeader{children = 'Average Age'},
+						TableWidgets.CellHeader{children = 'Youngest'},
+						TableWidgets.CellHeader{children = 'Oldest'},
+					}
 				}},
-				HtmlWidgets.Tr{children = {
+				TableWidgets.TableBody{children = TableWidgets.Row{children = {
 					HtmlWidgets.Td{children = self:_formatAge(overallData.averageAge)},
 					HtmlWidgets.Td{children = self:_displayPlayerWithAge(overallData.youngest)},
 					HtmlWidgets.Td{children = self:_displayPlayerWithAge(overallData.oldest)},
-				}}
+				}}}
 			}
 		}
 	}
