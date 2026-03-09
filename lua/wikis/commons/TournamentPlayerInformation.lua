@@ -329,33 +329,34 @@ function TournamentPlayerInfo:buildTeamAgeTable()
 		end
 		return a < b
 	end) do
-		Array.appendWith(teamTableRows, HtmlWidgets.Tr{children = {
-			HtmlWidgets.Td{children = OpponentDisplay.InlineTeamContainer{template = team, style = 'hybrid'}},
-			HtmlWidgets.Td{children = self:_formatAge(teamData.averageAge)},
-			HtmlWidgets.Td{children = self:_displayPlayerWithAge(teamData.youngest)},
-			HtmlWidgets.Td{children = self:_displayPlayerWithAge(teamData.oldest)},
+		Array.appendWith(teamTableRows, TableWidgets.Row{children = {
+			TableWidgets.Cell{children = OpponentDisplay.InlineTeamContainer{template = team, style = 'hybrid'}},
+			TableWidgets.Cell{children = self:_formatAge(teamData.averageAge)},
+			TableWidgets.Cell{children = self:_displayPlayerWithAge(teamData.youngest)},
+			TableWidgets.Cell{children = self:_displayPlayerWithAge(teamData.oldest)},
 		}})
 	end
 
-	return createTemplateBox{children = HtmlWidgets.Table{
-		classes = {'wikitable', 'wikitable-striped', 'prizepooltable', 'collapsed'},
-		attributes = {
+	return createTemplateBox{children = TableWidgets.Table{
+		tableClasses = {'prizepooltable', 'collapsed'},
+		tableAttributes = {
 			['data-cutafter'] = 3,
 			['data-opentext'] = '4 to ' .. #teamTableRows,
 			['data-closetext'] = '4 to ' .. #teamTableRows
 		},
 		css = {
 			margin =  '1em 0',
-			['text-align'] = 'center'
 		},
 		children = WidgetUtil.collect(
-			HtmlWidgets.Tr{children = {
-				HtmlWidgets.Th{children = 'Team'},
-				HtmlWidgets.Th{children = 'Average Age'},
-				HtmlWidgets.Th{children = 'Youngest'},
-				HtmlWidgets.Th{children = 'Oldest'}
-			}},
-			teamTableRows
+			TableWidgets.TableHeader{
+				children = TableWidgets.Row{children = {
+					TableWidgets.CellHeader{children = 'Team'},
+					TableWidgets.CellHeader{children = 'Average Age'},
+					TableWidgets.CellHeader{children = 'Youngest'},
+					TableWidgets.CellHeader{children = 'Oldest'}
+				}}
+			},
+			TableWidgets.TableBody{children = teamTableRows}
 		)
 	}}
 end
