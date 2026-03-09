@@ -2902,3 +2902,9 @@ Styling moved from skin lakesideview
     background-color: transparent;
     border: 0.0625rem solid var( --clr-border );
 }
+
+body {
+    .mw-changeslist-legend {
+        background-color: var( --clr-surface );
+    }
+}
