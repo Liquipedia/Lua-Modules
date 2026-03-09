@@ -29,9 +29,9 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local Button = Lua.import('Module:Widget/Basic/Button')
 local CopyToClipboard = Lua.import('Module:Widget/Basic/CopyToClipboard')
-local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
-local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
+local Dialog = Lua.import('Module:Widget/Basic/Dialog')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
@@ -449,13 +449,20 @@ function TournamentPlayerInfo:buildPlayerRow(player)
 				} or nil
 			)
 		},
-		TableWidgets.Cell{children = Logic.isNotEmpty(player.image) and GeneralCollapsible{
-			shouldCollapse = true,
-			titleWidget = CollapsibleToggle{},
+		TableWidgets.Cell{children = Logic.isNotEmpty(player.image) and Dialog{
+			trigger = Button{
+				children = 'Show photo',
+				variant = 'secondary',
+				size = 'xs',
+			},
+			title = {
+				'Photo of ',
+				PlayerDisplay.InlinePlayer{player = player}
+			},
 			children = Image{
 				imageLight = player.image,
 				size = '400x200px'
-			}
+			},
 		} or nil},
 		TableWidgets.Cell{
 			attributes = {
