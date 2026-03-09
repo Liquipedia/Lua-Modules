@@ -476,11 +476,13 @@ function TournamentPlayerInfo:buildPlayerRow(player)
 			},
 			children = displayBirthDateWithAge()
 		},
-		TableWidgets.Cell{
-			children = Logic.isNotEmpty(player.team) and OpponentDisplay.InlineTeamContainer{template = player.team} or nil
-		},
+		TableWidgets.Cell{children = Logic.isNotEmpty(player.team) and OpponentDisplay.InlineTeamContainer{
+			style = 'hybrid',
+			template = player.team
+		} or nil},
 		self:tournamentIsFinished() and {
 			TableWidgets.Cell{children = Logic.isNotEmpty(player.currentTeam) and OpponentDisplay.InlineTeamContainer{
+				style = 'hybrid',
 				template = player.currentTeam
 			} or nil}
 		} or nil,
