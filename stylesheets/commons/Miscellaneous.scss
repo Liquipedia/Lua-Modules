@@ -726,10 +726,6 @@ td.bold-white-text {
 .broadcast-talent-partner-list {
 	margin-left: -0.5em;
 	text-align: left;
-
-	&-frame {
-		border: 0 !important;
-	}
 }
 
 /* tournament overview page boxes */
@@ -1324,6 +1320,19 @@ Author(s): spazer, Lafungo
 	text-shadow: 1px 1px rgba( 64, 64, 64, 0.4 ), 1px -1px rgba( 64, 64, 64, 0.4 ), -1px -1px rgba( 64, 64, 64, 0.4 ), -1px 1px rgba( 64, 64, 64, 0.4 );
 	font-weight: bold;
 	color: #ffffff;
+}
+
+.placement-box {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	align-self: center;
+	border-radius: 0.25rem;
+	padding: 0 0.5rem;
+	min-width: 2.75rem;
+	height: 1.5rem;
+	font-size: 0.8125rem;
+	line-height: 1.25;
 }
 
 .placement-1 {

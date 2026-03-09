@@ -14,6 +14,7 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
 
 local TeamParticipantsWikiParser = Lua.import('Module:TeamParticipants/Parse/Wiki')
@@ -21,6 +22,8 @@ local TeamParticipantsRepository = Lua.import('Module:TeamParticipants/Repositor
 local TeamService = Lua.import('Module:Service/Team')
 
 local TeamParticipantsDisplay = Lua.import('Module:Widget/Participants/Team/CardsGroup')
+
+local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
 
 local TeamParticipantsController = {}
 
@@ -46,8 +49,13 @@ function TeamParticipantsController.fromTemplate(frame)
 		Array.forEach(parsedData.participants, TeamParticipantsRepository.save)
 	end
 	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
+
+	local showControls = not teamParticipantsVars:get('externalControlsRendered')
+
 	return TeamParticipantsDisplay{
 		participants = parsedData.participants,
+		showPlayerInfo = Logic.readBool(args.showplayerinfo),
+		showControls = showControls,
 		mergeStaffTabIfOnlyOneStaff = Logic.nilOr(
 			Logic.readBoolOrNil(args.mergeStaffTabIfOnlyOneStaff), Logic.readBool(Config.mergeStaffTabIfOnlyOneStaff)
 		)

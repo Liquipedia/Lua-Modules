@@ -19,7 +19,7 @@ local Div = HtmlWidgets.Div
 ---@field storeValue boolean
 ---@field defaultActive boolean
 ---@field css table?
----@field content string|Widget|Html|(string|Widget|Html)[]?
+---@field content Renderable|Renderable[]?
 ---@field collapsibleSelector string?
 
 ---@class SwitchWidget: Widget

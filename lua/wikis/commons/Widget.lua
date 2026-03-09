@@ -29,7 +29,7 @@ local Widget = Class.new(function(self, props)
 	self.context = {} -- Populated by the parent
 end)
 
----@alias Renderable string|Html|Widget|number|nil
+---@alias Renderable string|Html|Widget|number
 
 Widget.defaultProps = {}
 

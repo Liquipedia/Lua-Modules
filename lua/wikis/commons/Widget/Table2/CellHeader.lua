@@ -16,7 +16,8 @@ local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
 ---@class Table2CellHeaderProps
----@field children (Widget|Html|string|number|nil)[]?
+---@field children Renderable[]?
+---@field section 'head'|'body'|'subhead'?
 ---@field align ('left'|'right'|'center')?
 ---@field shrink (string|number|boolean)?
 ---@field nowrap (string|number|boolean)?
@@ -42,17 +43,38 @@ function Table2CellHeader:render()
 	local props = self.props
 
 	local columns = self:useContext(Table2Contexts.ColumnContext)
+	local section = props.section or self:useContext(Table2Contexts.Section)
+
+	local children = props.children
+
+	if section == 'subhead' then
+		children = {HtmlWidgets.Div{
+			classes = {'table2__subheader-cell'},
+			children = props.children,
+		}}
+	end
 
 	-- Skip context lookups and property merging if there are no column definitions
 	if not columns then
+		local align = props.align
 		local attributes = props.attributes or {}
+		if align == 'right' or align == 'center' then
+			attributes['data-align'] = align
+		end
 		if Logic.readBool(props.unsortable) then
 			attributes.class = 'unsortable'
 		end
 
+		attributes = ColumnUtil.buildCellAttributes(
+			props.align,
+			props.nowrap,
+			props.shrink,
+			attributes
+		)
+
 		return HtmlWidgets.Th{
 			attributes = attributes,
-			children = props.children,
+			children = children,
 		}
 	end
 
@@ -90,7 +112,7 @@ function Table2CellHeader:render()
 		classes = mergedProps.classes,
 		css = css,
 		attributes = attributes,
-		children = mergedProps.children,
+		children = children,
 	}
 end
 
