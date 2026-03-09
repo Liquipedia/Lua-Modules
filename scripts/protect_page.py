@@ -25,7 +25,7 @@ def protect_pages(
         protect_options = "create=allow-only-sysop"
     else:
         raise ValueError(f"invalid protect mode: {protect_mode}")
-    print(f"...wiki = {session.wiki}")
+    print(f"::group::Protecting {session.wiki}")
     for page in sorted(pages):
         print(f"...page = {page}")
         try:
@@ -56,6 +56,7 @@ def protect_pages(
             protect_errors.append(f"{protect_mode}:{session.wiki}:{page}")
         finally:
             session.cooldown()
+    print("::endgroup::")
 
 
 def protect_non_existing_pages(session: MediaWikiSession, pages: Iterable[str]):
