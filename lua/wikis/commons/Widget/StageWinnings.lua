@@ -104,7 +104,7 @@ function StageWinnings:render()
 	end
 
 	return TableWidgets.Table{
-		caption = 'Group Stage Winnings',
+		caption = props.title or 'Group Stage Winnings',
 		tableClasses = {'prizepooltable', 'collapsed'},
 		tableAttributes = {
 			['data-cutafter'] = (tonumber(props.cutafter) or 5),
