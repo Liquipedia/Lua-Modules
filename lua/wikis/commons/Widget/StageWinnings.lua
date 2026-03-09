@@ -54,7 +54,8 @@ StageWinnings.defaultProps = {
 	tournaments = mw.title.getCurrentTitle().text,
 	delimiter = ',',
 	autoexchange = true,
-	prizeMode = 'matchWins'
+	prizeMode = 'matchWins',
+	title = 'Group Stage Winnings',
 }
 
 ---@return Widget?
