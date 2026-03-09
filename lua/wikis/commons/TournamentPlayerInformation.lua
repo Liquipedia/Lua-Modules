@@ -30,7 +30,6 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local CopyToClipboard = Lua.import('Module:Widget/Basic/CopyToClipboard')
-local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -301,9 +300,9 @@ function TournamentPlayerInfo:buildOverallAgeTable()
 					}
 				}},
 				TableWidgets.TableBody{children = TableWidgets.Row{children = {
-					HtmlWidgets.Td{children = self:_formatAge(overallData.averageAge)},
-					HtmlWidgets.Td{children = self:_displayPlayerWithAge(overallData.youngest)},
-					HtmlWidgets.Td{children = self:_displayPlayerWithAge(overallData.oldest)},
+					TableWidgets.Cell{children = self:_formatAge(overallData.averageAge)},
+					TableWidgets.Cell{children = self:_displayPlayerWithAge(overallData.youngest)},
+					TableWidgets.Cell{children = self:_displayPlayerWithAge(overallData.oldest)},
 				}}}
 			}
 		}
@@ -364,33 +363,51 @@ end
 ---@protected
 ---@return Widget
 function TournamentPlayerInfo:buildPlayersTable()
-	return DataTable{
+	return TableWidgets.Table{
 		css = {margin = '10px 0'},
 		sortable = true,
-		classes = {'wikitable-striped'},
-		tableCss = {['white-space'] = 'nowrap'},
-		children = WidgetUtil.collect(
-			HtmlWidgets.Tr{children = WidgetUtil.collect(
-				HtmlWidgets.Th{},
-				HtmlWidgets.Th{children = 'Player'},
-				HtmlWidgets.Th{
-					classes = {'unsortable'},
-					children = 'Photo',
-				},
-				HtmlWidgets.Th{children = 'Born'},
-				HtmlWidgets.Th{children = 'Team'},
-				self:tournamentIsFinished() and {
-					HtmlWidgets.Th{children = 'Current Team'}
-				} or nil,
-				HtmlWidgets.Th{
-					classes = {'unsortable'},
-					children = 'Links'
-				}
-			)},
-			Array.map(self.data, function (player)
+		columns = WidgetUtil.collect(
+			{align = 'center'},
+			{align = 'left'},
+			{
+				align = 'left',
+				unsortable = true,
+			},
+			{
+				align = 'left',
+				sortType = 'isoDate',
+			},
+			{align = 'left'},
+			self:tournamentIsFinished() and {align = 'left'} or nil,
+			{
+				align = 'left',
+				unsortable = true,
+			}
+		),
+		children = {
+			TableWidgets.TableHeader{children = TableWidgets.Row{
+				children = WidgetUtil.collect(
+					TableWidgets.CellHeader{},
+					TableWidgets.CellHeader{children = 'Player'},
+					TableWidgets.CellHeader{children = 'Photo'},
+					TableWidgets.CellHeader{children = 'Born'},
+					TableWidgets.CellHeader{
+						align = 'left',
+						children = 'Team'
+					},
+					self:tournamentIsFinished() and {
+						TableWidgets.CellHeader{
+							align = 'left',
+							children = 'Current Team'
+						}
+					} or nil,
+					TableWidgets.CellHeader{children = 'Links'}
+				)
+			}},
+			TableWidgets.TableBody{children = Array.map(self.data, function (player)
 				return self:buildPlayerRow(player)
-			end)
-		)
+			end)}
+		}
 	}
 end
 
@@ -414,20 +431,25 @@ function TournamentPlayerInfo:buildPlayerRow(player)
 		}
 	end
 
-	return HtmlWidgets.Tr{children = WidgetUtil.collect(
-		HtmlWidgets.Td{children = Flags.Icon{flag = Logic.emptyOr(player.flag, 'unknown'), shouldLink = false}},
-		HtmlWidgets.Td{children = WidgetUtil.collect(
-			Link{link = player.pageName, children = player.displayName},
-			Logic.isNotEmpty(player.name) and HtmlWidgets.Span{
-				css = {
-					display = 'block',
-					['font-size'] = 'small',
-					['line-height'] = 1
-				},
-				children = player.name
-			} or nil
-		)},
-		HtmlWidgets.Td{children = Logic.isNotEmpty(player.image) and GeneralCollapsible{
+	return TableWidgets.Row{children = WidgetUtil.collect(
+		TableWidgets.Cell{children = Flags.Icon{flag = Logic.emptyOr(player.flag, 'unknown'), shouldLink = false}},
+		TableWidgets.Cell{
+			attributes = {
+				['data-sort-value'] = player.displayName
+			},
+			children = WidgetUtil.collect(
+				Link{link = player.pageName, children = player.displayName},
+				Logic.isNotEmpty(player.name) and HtmlWidgets.Span{
+					css = {
+						display = 'block',
+						['font-size'] = 'small',
+						['line-height'] = 1
+					},
+					children = player.name
+				} or nil
+			)
+		},
+		TableWidgets.Cell{children = Logic.isNotEmpty(player.image) and GeneralCollapsible{
 			shouldCollapse = true,
 			titleWidget = CollapsibleToggle{},
 			children = Image{
@@ -435,16 +457,21 @@ function TournamentPlayerInfo:buildPlayerRow(player)
 				size = '400x200px'
 			}
 		} or nil},
-		HtmlWidgets.Td{children = displayBirthDateWithAge()},
-		HtmlWidgets.Td{
+		TableWidgets.Cell{
+			attributes = {
+				['data-sort-value'] = (player.birthDate ~= DateExt.defaultDate) and player.birthDate or nil
+			},
+			children = displayBirthDateWithAge()
+		},
+		TableWidgets.Cell{
 			children = Logic.isNotEmpty(player.team) and OpponentDisplay.InlineTeamContainer{template = player.team} or nil
 		},
 		self:tournamentIsFinished() and {
-			HtmlWidgets.Td{children = Logic.isNotEmpty(player.currentTeam) and OpponentDisplay.InlineTeamContainer{
+			TableWidgets.Cell{children = Logic.isNotEmpty(player.currentTeam) and OpponentDisplay.InlineTeamContainer{
 				template = player.currentTeam
 			} or nil}
 		} or nil,
-		HtmlWidgets.Td{children = Array.interleave(
+		TableWidgets.Cell{children = Array.interleave(
 			Array.extractValues(Table.map(player.links or {}, function(key, link)
 				return key, Link{
 					link = link,
