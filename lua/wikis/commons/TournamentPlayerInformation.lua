@@ -451,7 +451,13 @@ function TournamentPlayerInfo:buildPlayerRow(player)
 		},
 		TableWidgets.Cell{children = Logic.isNotEmpty(player.image) and Dialog{
 			trigger = Button{
-				children = 'Show photo',
+				children = {
+					'Show',
+					HtmlWidgets.Span{
+						classes = {'mobile-hide'},
+						children = ' photo'
+					}
+				},
 				variant = 'secondary',
 				size = 'xs',
 			},
