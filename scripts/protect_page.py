@@ -26,7 +26,7 @@ def protect_pages(
     else:
         raise ValueError(f"invalid protect mode: {protect_mode}")
     print(f"...wiki = {session.wiki}")
-    for page in pages:
+    for page in sorted(pages):
         print(f"...page = {page}")
         try:
             protections = session.make_action(
