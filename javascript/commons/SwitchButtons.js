@@ -34,6 +34,8 @@
  * HTML Attributes:
  * - data-switch-group (required): The name of the switch group. Elements with the same switch group name are connected.
  * - data-store-value (optional): If set to true, the state of the switch button will be stored in the local storage.
+ * - data-sync-level (optional): Defines storage scope - 'site' (default, shared across all wikis),
+ *   'wiki' (shared within a wiki), or 'page' (unique per page).
  * - data-switch-value (only for pill): The value that the switch button will have when it is active.
  *
  * Events:
