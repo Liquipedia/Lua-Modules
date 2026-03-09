@@ -28,8 +28,13 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local BASE_CURRENCY = 'USD'
 
 ---@class StageWinningProps
----@field tournaments string
----@field ids string?
+---@field tournament string?
+---@field tournament1 string?
+---@field tournament2 string?
+---@field tournament3 string?
+---@field matchGroupId1 string?
+---@field matchGroupId2 string?
+---@field matchGroupId3 string?
 ---@field sdate string|number|osdate|osdateparam?
 ---@field edate string|number|osdate|osdateparam?
 ---@field prizeMode 'matchWins'|'gameWins'|'scores'
@@ -37,7 +42,6 @@ local BASE_CURRENCY = 'USD'
 ---@field valuePerWin number?
 ---@field n-m number? # n amd m integers
 ---@field localcurrency string?
----@field width integer?
 ---@field cutafter integer?
 ---@field title string?
 ---@field precision integer?
@@ -51,7 +55,7 @@ local BASE_CURRENCY = 'USD'
 ---@field props StageWinningProps
 local StageWinnings = Class.new(Widget)
 StageWinnings.defaultProps = {
-	tournaments = mw.title.getCurrentTitle().text,
+	tournament = mw.title.getCurrentTitle().text,
 	delimiter = ',',
 	autoexchange = true,
 	prizeMode = 'matchWins'
