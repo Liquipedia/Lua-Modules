@@ -55,7 +55,7 @@ StageWinnings.defaultProps = {
 	delimiter = ',',
 	autoexchange = true,
 	prizeMode = 'matchWins',
-	title = 'Group Stage Winnings',
+	title = 'Group Stage Winnings'
 }
 
 ---@return Widget?
