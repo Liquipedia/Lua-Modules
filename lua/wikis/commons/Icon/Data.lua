@@ -172,6 +172,7 @@ return {
 	dota2_barrack = 'fas fa-warehouse',
 
 	leagueoflegends_kda = 'fas fa-swords fa-flip-vertical',
+	leagueoflegends_killparticipation = 'fas fa-dagger',
 
 	-- Usage: Day night cycle information
 	day = 'fas fa-sun',
