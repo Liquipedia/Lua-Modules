@@ -218,7 +218,7 @@ function MatchPage:renderOverallStats()
 									size = 'x16px',
 									link = ''
 								},
-								'CSM'
+								'CSPM'
 							},
 							data = calculateStatPerMinute(player.extradata.creepscore, player.extradata.gameLength)
 						},
@@ -637,7 +637,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 						}, SPAN_SLASH)
 					},
 					PlayerStat{
-						title = {KP_ICON, 'KP'},
+						title = {KP_ICON, 'KP%'},
 						data = MathUtil.formatPercentage(player.killparticipation, 1)
 					},
 					PlayerStat{
