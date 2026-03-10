@@ -53,10 +53,6 @@ local function isStaffMember(player)
 	if playerType == 'staff' then
 		return true
 	end
-	if playerType == 'former' then
-		local roles = player.extradata.roles or {}
-		return not Array.all(roles, function(role) return role.type ~= RoleUtil.ROLE_TYPE.STAFF end)
-	end
 	return false
 end
 
@@ -127,10 +123,10 @@ function ParticipantsTeamRoster:render()
 
 		-- Split into former players and former staff
 		local formerPlayers = Array.filter(players, function(player)
-			return player.extradata.type == 'former' and not isStaffMember(player)
+			return player.extradata.isFormer and not isStaffMember(player)
 		end)
 		local formerStaff = Array.filter(players, function(player)
-			return player.extradata.type == 'former' and isStaffMember(player)
+			return player.extradata.isFormer and isStaffMember(player)
 		end)
 
 		-- If we have former players or staff, render with subheaders
@@ -208,7 +204,7 @@ function ParticipantsTeamRoster:render()
 			if tabTypeEnum == TAB_ENUM.STAFF then
 				return personType == 'staff'
 			elseif tabTypeEnum == TAB_ENUM.FORMER then
-				return PERSON_TYPE_TO_TAB[personType] == tabTypeEnum or (personType == 'former' and isStaffMember(player))
+				return player.extradata.isFormer
 			else
 				return PERSON_TYPE_TO_TAB[personType] == tabTypeEnum
 			end
