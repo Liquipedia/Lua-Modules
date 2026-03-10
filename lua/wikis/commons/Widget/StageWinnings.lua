@@ -133,6 +133,22 @@ function StageWinnings:render()
 		}
 	end
 
+	---@param prefix string
+	---@return {title: string, icon: string?, iconDark: string?, link: string?, titleLong: string?}?
+	local parsePoints = function(prefix)
+		if Logic.isEmpty(props[prefix]) then
+			return
+		end
+
+		local pointsData = Table.copy(Points[props[prefix]] or {})
+		pointsData.title = pointsData.title or props[prefix]
+		pointsData.link = props[prefix .. 'link']
+
+		return pointsData
+	end
+	self.points = parsePoints('points')
+	self.points2 = parsePoints('points2')
+
 	return TableWidgets.Table{
 		caption = props.title,
 		tableClasses = {'prizepooltable', 'collapsed'},
