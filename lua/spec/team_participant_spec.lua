@@ -19,7 +19,7 @@ insulate('Team Participant', function()
 						{'Noia'},
 						{'sarah'},
 						{'effys', role = 'Head Coach', type = 'staff'},
-						{'Veer', role = 'Coach', type = 'staff'},
+						{'Veer', role = 'Coach', type = 'staff', played = false}
 					},
 					qualification = {
 						method = 'qual',
