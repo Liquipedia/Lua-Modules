@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
@@ -48,8 +49,6 @@ local BasePrizePool = Class.new(function(self, ...) self:init(...) end)
 ---@field type string
 ---@field index integer
 ---@field data table
-
-local TODAY = os.date('%Y-%m-%d') --[[@as string]]
 
 local LANG = mw.language.getContentLanguage()
 local DASH = '&#045;'
@@ -386,7 +385,7 @@ function BasePrizePool:init(args)
 	self.args = self:_parseArgs(args)
 
 	self.pagename = mw.title.getCurrentTitle().text
-	self.date = BasePrizePool._getTournamentDate()
+	self.date = DateExt.getContextualDateOrNow()
 	self.opponentType = self.args.type
 
 	self.options = {}
@@ -773,12 +772,9 @@ function BasePrizePool:_currencyExchangeInfo()
 		end
 
 		-- The exchange date display should not be in the future, as the extension uses current date for those.
-		local exchangeDate = self.date
-		if exchangeDate > TODAY then
-			exchangeDate = TODAY
-		end
-
-		local exchangeDateText = LANG:formatDate('M j, Y', exchangeDate)
+		local exchangeDateText = DateExt.formatTimestamp(
+			'M j, Y', math.min(DateExt.getCurrentTimestamp(), DateExt.readTimestamp(self.date))
+		)
 
 		local wrapper = mw.html.create('small')
 
@@ -798,7 +794,7 @@ end
 ---@return string
 function BasePrizePool._CurrencyConvertionText(prize)
 	local exchangeRate = BasePrizePool.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToBaseCurrency(
-		prize.data, 1, BasePrizePool._getTournamentDate()
+		prize.data, 1, DateExt.getContextualDateOrNow()
 	)
 
 	return Currency.display(prize.data.currency, 1) .. ' ≃ ' ..
@@ -844,12 +840,6 @@ function BasePrizePool:assertOpponentStructType(typeStruct)
 	elseif not Opponent.isType(typeStruct.type) then
 		error('Not a valid type!')
 	end
-end
-
---- Returns the default date based on wiki-variables set in the Infobox League
----@return string
-function BasePrizePool._getTournamentDate()
-	return Variables.varDefault('tournament_enddate', TODAY)
 end
 
 ---@return self
