@@ -246,7 +246,7 @@ end
 function Placement.renderInWidget(args)
 	local raw = Placement.raw(args.placement or '')
 
-	return Placement.renderRaaInWidget(raw, args.text)
+	return Placement.renderRawInWidget(raw, args.text)
 end
 
 return Class.export(Placement, {exports = {'getBgClass', 'get', 'RangeLabel', 'renderRawInWidget', 'renderInWidget'}})
