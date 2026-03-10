@@ -33,8 +33,6 @@ local NON_BREAKING_SPACE = '&nbsp;'
 ---@field showPrizes boolean
 ---@field points {title: string, icon: string?, iconDark: string?, link: string?, titleLong: string?}?
 ---@field points2 {title: string, icon: string?, iconDark: string?, link: string?, titleLong: string?}?
----@field pointsHeader string
----@field points2Header string
 ---@field currency string
 ---@field title string
 ---@field autoExchange boolean
