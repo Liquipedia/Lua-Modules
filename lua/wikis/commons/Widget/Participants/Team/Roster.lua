@@ -46,6 +46,20 @@ local PERSON_TYPE_TO_TAB = {
 	staff = TAB_ENUM.STAFF,
 }
 
+---@param player table
+---@return boolean
+local function isStaffMember(player)
+	local playerType = player.extradata.type
+	if playerType == 'staff' then
+		return true
+	end
+	if playerType == 'former' then
+		local roles = player.extradata.roles or {}
+		return not Array.all(roles, function(role) return role.type ~= RoleUtil.ROLE_TYPE.STAFF end)
+	end
+	return false
+end
+
 -- The biz logic behind the role display is somewhat complicated.
 -- There's 2 areas we show the role, left-role and right-role
 -- * Right-role:
@@ -136,7 +150,16 @@ function ParticipantsTeamRoster:render()
 		local tabTypeEnum, tabData = tabTuple[1], tabTuple[2]
 		local tabPlayers = Array.filter(participant.opponent.players or {}, function(player)
 			local personType = player.extradata.type
-			return PERSON_TYPE_TO_TAB[personType] == tabTypeEnum
+			if tabTypeEnum == TAB_ENUM.STAFF then
+				return personType == 'staff' or isStaffMember(player)
+			elseif tabTypeEnum == TAB_ENUM.FORMER then
+				return PERSON_TYPE_TO_TAB[personType] == tabTypeEnum and not isStaffMember(player)
+			else
+				return PERSON_TYPE_TO_TAB[personType] == tabTypeEnum
+			end
+		end)
+		tabPlayers = Array.sortBy(tabPlayers, function(player)
+			return player.extradata.type == 'former' and 1 or 0
 		end)
 		return {
 			order = tabData.order,
