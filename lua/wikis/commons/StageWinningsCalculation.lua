@@ -22,9 +22,11 @@ local ColumnName = Condition.ColumnName
 local StageWinningsCalculation = {}
 
 ---@param props {matchGroupsSpecProps: table<string, string>, startDate: integer?, endDate: integer?, mode: string,
----startValue: number, valuePerWin: number, valueByScore: table<string, number>?}
+---startValue: number, valuePerWin: number, valueByScore: table<string, number>?,
+---pointsStart: number, pointsPerWin: number, pointsByScore: table<string, number>?,
+---points2Start: number, points2PerWin: number, points2ByScore: table<string, number>?, hideWinnings: boolean}
 ---@return {opponent: standardOpponent, matchWins: integer, matchLosses: integer, gameWins: integer,
----gameLosses: integer, winnings: number, scoreDetails: table<string, integer>}[]
+---gameLosses: integer, winnings: number, scoreDetails: table<string, integer>, points: number, points2: number}[]
 function StageWinningsCalculation.run(props)
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = StageWinningsCalculation._buildConditions(props),
@@ -52,6 +54,8 @@ function StageWinningsCalculation.run(props)
 				gameWins = 0,
 				gameLosses = 0,
 				winnings = 0,
+				points = 0,
+				points2 = 0,
 			}
 		end)
 
@@ -85,22 +89,38 @@ function StageWinningsCalculation.run(props)
 	Array.forEach(opponents, function(opponent)
 		if props.mode == 'matchWins' then
 			opponent.winnings = props.startValue + opponent.matchWins * props.valuePerWin
+			opponent.points = props.pointsStart + opponent.matchWins * props.pointsPerWin
+			opponent.points2 = props.points2Start + opponent.matchWins * props.points2PerWin
 			return
 		elseif props.mode == 'gameWins' then
 			opponent.winnings = props.startValue + opponent.gameWins * props.valuePerWin
+			opponent.points = props.pointsStart + opponent.gameWins * props.pointsPerWin
+			opponent.points2 = props.points2Start + opponent.gameWins * props.points2PerWin
 			return
 		end
 		-- case: props.mode == 'scores'
 		local winnings = props.startValue
+		local points = props.pointsStart
+		local points2 = props.points2Start
 		for score, count in pairs(opponent.scoreDetails) do
 			winnings = winnings + (props.valueByScore[score] or 0) * count
+			points = points + (props.pointsByScore[score] or 0) * count
+			points2 = points2 + (props.points2ByScore[score] or 0) * count
 		end
 		opponent.winnings = winnings
+		opponent.points = points
+		opponent.points2 = points2
 	end)
 
-	Array.sortInPlaceBy(opponents, function(opponent)
-		return {- opponent.winnings, - opponent.matchWins, - opponent.gameWins, Opponent.toName(opponent)}
-	end)
+	if props.hideWinnings then
+		Array.sortInPlaceBy(opponents, function(opponent)
+			return {- opponent.points, - opponent.points, - opponent.matchWins, - opponent.gameWins, Opponent.toName(opponent)}
+		end)
+	else
+		Array.sortInPlaceBy(opponents, function(opponent)
+			return {- opponent.winnings, - opponent.matchWins, - opponent.gameWins, Opponent.toName(opponent)}
+		end)
+	end
 
 	return opponents
 
