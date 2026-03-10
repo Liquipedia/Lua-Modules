@@ -205,10 +205,15 @@ end
 function StageWinnings._detailedScores(scoresTable)
 	---@type {wins: integer, losses: integer, count: integer}
 	local scoreInfos = Array.extractValues(Table.map(scoresTable, function(score, count)
-		local wins, losses = score:match('(%d+)%-(%d+)')
-		return score, {wins = tonumber(wins), losses = tonumber(losses), count = count}
+		local wins, losses = unpack(Array.parseCommaSeparatedString(score, '-'))
+		return score, {wins = tonumber(wins) or wins, losses = tonumber(losses) or losses, count = count}
 	end))
 	table.sort(scoreInfos, function(a, b)
+		if (not Logic.isNumeric(a.wins)) or (not Logic.isNumeric(a.losses)) then
+			return false
+		elseif (not Logic.isNumeric(b.wins)) or (not Logic.isNumeric(b.losses)) then
+			return true
+		end
 		local diffA = a.wins - a.losses
 		local diffB = b.wins - b.losses
 		if diffA ~= diffB then
