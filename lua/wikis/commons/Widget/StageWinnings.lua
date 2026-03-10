@@ -31,7 +31,6 @@ local BASE_CURRENCY = 'USD'
 local NON_BREAKING_SPACE = '&nbsp;'
 
 ---@class StageWinningProps
----@field tournament string?
 ---@field tournament1 string?
 ---@field tournament2 string?
 ---@field tournament3 string?
@@ -69,8 +68,6 @@ local NON_BREAKING_SPACE = '&nbsp;'
 ---@field points2 {title: string, icon: string?, iconDark: string?, link: string?, titleLong: string?}?
 local StageWinnings = Class.new(Widget)
 StageWinnings.defaultProps = {
-	tournament = mw.title.getCurrentTitle().text,
-	delimiter = ',',
 	autoexchange = true,
 	prizeMode = 'matchWins',
 	title = 'Group Stage Winnings'
