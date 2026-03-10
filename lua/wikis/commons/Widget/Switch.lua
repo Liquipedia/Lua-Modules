@@ -14,10 +14,11 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
-local VALID_SYNC_LEVELS = {
-	'page',
-	'wiki',
-	'site',
+---@enum SwitchSyncLevel
+local SwitchSyncLevel = {
+	page = 'page',
+	wiki = 'wiki',
+	site = 'site',
 }
 
 ---@class SwitchParameters
@@ -51,7 +52,7 @@ function SwitchWidget:render()
 	local syncLevelInput = self.props.syncLevel
 	local content = self.props.content
 
-	assert(Table.includes(VALID_SYNC_LEVELS, syncLevelInput), 'Invalid syncLevel: ' .. tostring(syncLevelInput))
+	assert(Table.includes(SwitchSyncLevel, syncLevelInput), 'Invalid syncLevel: ' .. tostring(syncLevelInput))
 	local syncLevel = syncLevelInput
 
 	local switchToggleClasses = {'switch-toggle-container'}
