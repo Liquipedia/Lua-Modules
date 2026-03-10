@@ -54,7 +54,8 @@ StageWinnings.defaultProps = {
 	tournaments = mw.title.getCurrentTitle().text,
 	delimiter = ',',
 	autoexchange = true,
-	prizeMode = 'matchWins'
+	prizeMode = 'matchWins',
+	title = 'Group Stage Winnings'
 }
 
 ---@return Widget?
@@ -104,7 +105,7 @@ function StageWinnings:render()
 	end
 
 	return TableWidgets.Table{
-		caption = 'Group Stage Winnings',
+		caption = props.title,
 		tableClasses = {'prizepooltable', 'collapsed'},
 		tableAttributes = {
 			['data-cutafter'] = (tonumber(props.cutafter) or 5),
