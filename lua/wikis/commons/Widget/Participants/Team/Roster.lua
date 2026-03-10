@@ -124,6 +124,62 @@ function ParticipantsTeamRoster:render()
 			end
 			return orderA < orderB
 		end)
+
+		-- Split into former players and former staff
+		local formerPlayers = Array.filter(players, function(player)
+			return player.extradata.type == 'former' and not isStaffMember(player)
+		end)
+		local formerStaff = Array.filter(players, function(player)
+			return player.extradata.type == 'former' and isStaffMember(player)
+		end)
+
+		-- If we have former players or staff, render with subheaders
+		if #formerPlayers > 0 or #formerStaff > 0 then
+			local function makeRosterSection(sectionPlayers)
+				return Div{
+					classes = { 'team-participant-roster' },
+					children = Array.map(sectionPlayers, function(player, index)
+						local playerTeam = participant.opponent.template ~= player.team and player.team or nil
+						local playerTeamAsOpponent = playerTeam and Opponent.readOpponentArgs{
+							type = Opponent.team,
+							template = playerTeam,
+						} or nil
+						local roleLeft, roleRight = getRoleDisplays(player)
+						return ParticipantsTeamMember{
+							player = player,
+							team = playerTeamAsOpponent,
+							even = index % 2 == 0,
+							roleLeft = roleLeft,
+							roleRight = roleRight,
+							trophies = player.extradata.trophies or 0,
+						}
+					end)
+				}
+			end
+
+			local children = {}
+			if #formerPlayers > 0 then
+				table.insert(children, Div{
+					classes = {'team-participant-card__subheader'},
+					children = 'Players'
+				})
+				table.insert(children, makeRosterSection(formerPlayers))
+			end
+			if #formerStaff > 0 then
+				table.insert(children, Div{
+					classes = {'team-participant-card__subheader'},
+					children = 'Staff'
+				})
+				table.insert(children, makeRosterSection(formerStaff))
+			end
+
+			return Div{
+				classes = { 'team-participant-roster' },
+				children = children
+			}
+		end
+
+		-- Otherwise render as a single roster (for non-former tabs)
 		return Div{
 			classes = { 'team-participant-roster' },
 			children = Array.map(players, function(player, index)
@@ -140,7 +196,6 @@ function ParticipantsTeamRoster:render()
 					roleLeft = roleLeft,
 					roleRight = roleRight,
 					trophies = player.extradata.trophies or 0,
-					strikethrough = player.extradata.type == 'former',
 				}
 			end)
 		}
@@ -151,15 +206,12 @@ function ParticipantsTeamRoster:render()
 		local tabPlayers = Array.filter(participant.opponent.players or {}, function(player)
 			local personType = player.extradata.type
 			if tabTypeEnum == TAB_ENUM.STAFF then
-				return personType == 'staff' or isStaffMember(player)
+				return personType == 'staff'
 			elseif tabTypeEnum == TAB_ENUM.FORMER then
-				return PERSON_TYPE_TO_TAB[personType] == tabTypeEnum and not isStaffMember(player)
+				return PERSON_TYPE_TO_TAB[personType] == tabTypeEnum or (personType == 'former' and isStaffMember(player))
 			else
 				return PERSON_TYPE_TO_TAB[personType] == tabTypeEnum
 			end
-		end)
-		tabPlayers = Array.sortBy(tabPlayers, function(player)
-			return player.extradata.type == 'former' and 1 or 0
 		end)
 		return {
 			order = tabData.order,
