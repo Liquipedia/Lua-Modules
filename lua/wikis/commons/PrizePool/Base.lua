@@ -50,8 +50,6 @@ local BasePrizePool = Class.new(function(self, ...) self:init(...) end)
 ---@field index integer
 ---@field data table
 
-local TODAY = os.date('%Y-%m-%d') --[[@as string]]
-
 local LANG = mw.language.getContentLanguage()
 local DASH = '&#045;'
 local NON_BREAKING_SPACE = '&nbsp;'
@@ -774,12 +772,9 @@ function BasePrizePool:_currencyExchangeInfo()
 		end
 
 		-- The exchange date display should not be in the future, as the extension uses current date for those.
-		local exchangeDate = self.date
-		if exchangeDate > TODAY then
-			exchangeDate = TODAY
-		end
-
-		local exchangeDateText = LANG:formatDate('M j, Y', exchangeDate)
+		local exchangeDateText = DateExt.formatTimestamp(
+			'M j, Y', math.min(DateExt.getCurrentTimestamp(), DateExt.readTimestamp(self.date))
+		)
 
 		local wrapper = mw.html.create('small')
 
