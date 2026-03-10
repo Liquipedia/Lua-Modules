@@ -16,6 +16,15 @@ local Table = Lua.import('Module:Table')
 
 local Span = HtmlWidgets.Span
 
+---@class rawPlacement
+---@field backgroundClass string?
+---@field blackText boolean
+---@field display string
+---@field ordinal string[]
+---@field placement string[]
+---@field sort string
+---@field unknown boolean?
+
 local Placement = {}
 
 local ZERO_WIDTH_SPACE = '&#8203;'
@@ -105,7 +114,7 @@ local USE_BLACK_TEXT = {
 ---Processes a placement text input into raw data.
 ---Returned table will not always contain every key.
 ---@param placement string|integer?
----@return table
+---@return rawPlacement
 function Placement.raw(placement)
 	local raw = {}
 
@@ -214,11 +223,11 @@ function Placement.get(args)
 end
 
 ---Returns a Widget span for placement display in the Widget system.
----@param args {placement: string|integer?, text: string?}
+---@param raw rawPlacement
+---@param text string?
 ---@return Widget
-function Placement.renderInWidget(args)
-	local raw = Placement.raw(args.placement or '')
-	local content = raw.display .. (Logic.isNotEmpty(args.text) and (' ' .. args.text) or '')
+function Placement.renderRawInWidget(raw, text)
+	local content = raw.display .. (Logic.isNotEmpty(text) and (' ' .. text) or '')
 
 	return Span{
 		classes = {'placement-box', raw.backgroundClass},
@@ -231,4 +240,13 @@ function Placement.renderInWidget(args)
 	}
 end
 
-return Class.export(Placement, {exports = {'getBgClass', 'get', 'RangeLabel', 'renderInWidget'}})
+---Returns a Widget span for placement display in the Widget system.
+---@param args {placement: string|integer?, text: string?}
+---@return Widget
+function Placement.renderInWidget(args)
+	local raw = Placement.raw(args.placement or '')
+
+	return Placement.renderRawInWidget(raw, args.text)
+end
+
+return Class.export(Placement, {exports = {'getBgClass', 'get', 'RangeLabel', 'renderRawInWidget', 'renderInWidget'}})
