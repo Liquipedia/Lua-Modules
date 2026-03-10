@@ -15,6 +15,7 @@ local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
+local MathUtil = Lua.import('Module:MathUtil')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -88,14 +89,14 @@ BasePrizePool.config = {
 	cutafter = {
 		default = 4,
 		read = function(args)
-			return tonumber(args.cutafter)
+			return MathUtil.toInteger(args.cutafter)
 		end
 	},
 	hideafter = {
 		default = math.huge,
 		read = function(args)
-			local hideAfter = tonumber(args.hideafter)
-			local cutAfter = tonumber(args.cutafter) or 4
+			local hideAfter = MathUtil.toInteger(args.hideafter)
+			local cutAfter = MathUtil.toInteger(args.cutafter) or 4
 			if not hideAfter then
 				return
 			end
