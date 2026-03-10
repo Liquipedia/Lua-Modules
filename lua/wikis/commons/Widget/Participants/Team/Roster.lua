@@ -46,16 +46,6 @@ local PERSON_TYPE_TO_TAB = {
 	staff = TAB_ENUM.STAFF,
 }
 
----@param player table
----@return boolean
-local function isStaffMember(player)
-	local playerType = player.extradata.type
-	if playerType == 'staff' then
-		return true
-	end
-	return false
-end
-
 -- The biz logic behind the role display is somewhat complicated.
 -- There's 2 areas we show the role, left-role and right-role
 -- * Right-role:
@@ -123,10 +113,10 @@ function ParticipantsTeamRoster:render()
 
 		-- Split into former players and former staff
 		local formerPlayers = Array.filter(players, function(player)
-			return player.extradata.isFormer and not isStaffMember(player)
+			return player.extradata.isFormer and player.extradata.type ~= 'staff'
 		end)
 		local formerStaff = Array.filter(players, function(player)
-			return player.extradata.isFormer and isStaffMember(player)
+			return player.extradata.isFormer and player.extradata.type == 'staff'
 		end)
 
 		-- If we have former players or staff, render with subheaders
