@@ -5,6 +5,8 @@
 
 // List of JavaScript modules to include
 const jsModules = [
+	'UseStrict',
+	'Core',
 	'Analytics',
 	'BattleRoyale',
 	'Bracket',
@@ -28,7 +30,8 @@ const jsModules = [
 	'Selectall',
 	'Slider',
 	'SwitchButtons',
-	'Tabs'
+	'Tabs',
+	'CoreEnd'
 ];
 
 // Dynamically load JavaScript modules
@@ -38,13 +41,6 @@ jsModules.forEach( ( module ) => {
 	script.async = false; // Ensure scripts load in order
 	document.head.appendChild( script );
 } );
-
-// Initialize liquipedia global object
-window.liquipedia = window.liquipedia || {
-	core: {
-		modules: []
-	}
-};
 
 // Mock MediaWiki APIs for testing
 window.mw = window.mw || {
@@ -81,19 +77,4 @@ window.mw = window.mw || {
 			}
 		};
 	}
-};
-
-// Auto-initialize all loaded modules
-onload = () => {
-	liquipedia.core.modules.forEach( ( module ) => {
-		if ( !liquipedia[ module ] || typeof liquipedia[ module ].init !== 'function' ) {
-			return;
-		}
-		try {
-			liquipedia[ module ].init();
-		} catch ( e ) {
-			// eslint-disable-next-line no-console
-			console.error( `Failed to initialize module: ${ module }. Error: ${ e }` );
-		}
-	} );
 };
