@@ -569,24 +569,30 @@ function MatchTable:buildDisplay()
 		:node(self:headerRow())
 
 	if Table.isEmpty(self.matches) then
-		local isH2H = Logic.isNotEmpty(self.config.vs)
-		local text = I18n.translate(
-			'matchtable-no-match-results',
-			{
-				pronoun = isH2H and 'These' or 'This',
-				mode = self.config.mode == Opponent.solo
-					and (isH2H and 'players' or 'player')
-					or (isH2H and 'teams' or 'team'),
-				verb = isH2H and 'have' or 'has',
-				explanation = isH2H and 'against each other ' or ''
-			}
-		)
+		---@return string
+		local function getNoResultText()
+			local isH2H = Logic.isNotEmpty(self.config.vs)
+			if isH2H then
+				I18n.translate(
+					'matchtable-no-h2h-match-results',
+					{
+						mode = self.config.mode == Opponent.solo and 'players' or 'teams',
+					}
+				)
+			end
+			return I18n.translate(
+				'matchtable-no-match-results',
+				{
+					mode = self.config.mode == Opponent.solo and 'player' or 'team',
+				}
+			)
+		end
 
 		return display:tag('tr')
 			:tag('td')
 				:attr('colspan', '100')
 				:css('font-style', 'italic')
-				:wikitext(text)
+				:wikitext(getNoResultText())
 				:allDone()
 	end
 
