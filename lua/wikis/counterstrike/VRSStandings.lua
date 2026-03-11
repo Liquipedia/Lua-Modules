@@ -9,7 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Date = Lua.import('Module:Date/Ext')
+local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
@@ -106,7 +106,7 @@ function VRSStandings:_parse()
 	local props = self.props
 	local settings = {
 		title = props.title,
-		updated = Date.toYmdInUtc(props.updated or DateExt.getCurrentTimestamp()),
+		updated = DateExt.toYmdInUtc(props.updated or DateExt.getCurrentTimestamp()),
 		shouldFetch = Logic.readBool(props.shouldFetch),
 		fetchLimit = tonumber(props.fetchLimit)
 	}
