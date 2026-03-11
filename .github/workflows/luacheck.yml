@@ -79,7 +79,7 @@ jobs:
 
       - name: Check
         env:
-          PATTERN: '([^:]+):([0-9]+):([0-9]+)(.*?)\[Warning\](.*?) (.*)'
+          PATTERN: '.*?(lua[^:]+):([0-9]+):([0-9]+).*?\[Warning\][^ ]*? (.*)'
         shell: bash
         run: |
           ~/.local/bin/luals/bin/lua-language-server --check ./ \
