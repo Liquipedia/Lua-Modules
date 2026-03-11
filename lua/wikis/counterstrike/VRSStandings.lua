@@ -106,7 +106,7 @@ function VRSStandings:_parse()
 	local props = self.props
 	local settings = {
 		title = props.title,
-		updated = Date.toYmdInUtc(Date.parseIsoDate(props.updated) or os.date('%F')),
+		updated = Date.toYmdInUtc(props.updated or DateExt.getCurrentTimestamp()),
 		shouldFetch = Logic.readBool(props.shouldFetch),
 		fetchLimit = tonumber(props.fetchLimit)
 	}
