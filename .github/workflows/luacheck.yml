@@ -78,16 +78,7 @@ jobs:
           curl -L https://github.com/LuaLS/lua-language-server/releases/download/3.17.1/lua-language-server-3.17.1-linux-x64.tar.gz | tar -xzv -C ~/.local/bin/luals
 
       - name: Check
-        env:
-          PATTERN: '.*?(lua[^:]+):([0-9]+):([0-9]+).*?\[Warning\][^ ]*? (.*)'
         shell: bash
         run: |
           ~/.local/bin/luals/bin/lua-language-server --check ./ \
-          | while read line; do \
-            echo $line; \
-            if [[ $line =~ ${PATTERN} ]]; then \
-              echo "::warning file=${BASH_REMATCH[1]},line=${BASH_REMATCH[2]}::${BASH_REMATCH[4]}"; \
-            else
-              echo "Does not match ${PATTERN}, ${BASH_REMATCH}"
-            fi; \
-          done
+          | sed -n 'p;s/\(lua[^:]\+\):\([[:digit:]]*\):[[:digit:]]*/::warning file=\1,line=\2::/p'
