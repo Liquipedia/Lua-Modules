@@ -79,7 +79,7 @@ jobs:
 
       - name: Check
         run: |
-          pattern='([^:]+):([0-9]+):([0-9]+) \[Warning\] (.*)'
+          pattern='([^:]+):([0-9]+):([0-9]+) \[Warning\] (.*)';
           ~/.local/bin/luals/bin/lua-language-server --check ./ \
           | tee \
           | while read line; do \
