@@ -79,4 +79,11 @@ jobs:
 
       - name: Check
         run: |
-          ~/.local/bin/luals/bin/lua-language-server --check ./ | while read line; do if [[ $line =~ $pattern ]]; then echo "::warning file=${BASH_REMATCH[1]},line=${BASH_REMATCH[2]}::${BASH_REMATCH[4]}"; fi; done
+          pattern='([^:]+):([0-9]+):([0-9]+) \[Warning\] (.*)'
+          ~/.local/bin/luals/bin/lua-language-server --check ./ \
+          | tee \
+          | while read line; do \
+            if [[ $line =~ $pattern ]]; then \
+              echo "::warning file=${BASH_REMATCH[1]},line=${BASH_REMATCH[2]}::${BASH_REMATCH[4]}"; \
+            fi; \
+          done
