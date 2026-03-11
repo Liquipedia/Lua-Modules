@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
+local I18n = Lua.import('Module:I18n')
 local Info = Lua.import('Module:Info', {loadData = true})
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
@@ -568,14 +569,30 @@ function MatchTable:buildDisplay()
 		:node(self:headerRow())
 
 	if Table.isEmpty(self.matches) then
-		local text = 'This ' .. (self.config.mode == Opponent.solo and Opponent.solo or Opponent.team)
-			.. ' has not played any matches yet.'
+		---@return string
+		local function getNoResultText()
+			local isH2H = Logic.isNotEmpty(self.config.vs)
+			if isH2H then
+				return I18n.translate(
+					'matchtable-no-h2h-match-results',
+					{
+						mode = self.config.mode == Opponent.solo and 'players' or 'teams',
+					}
+				)
+			end
+			return I18n.translate(
+				'matchtable-no-match-results',
+				{
+					mode = self.config.mode == Opponent.solo and 'player' or 'team',
+				}
+			)
+		end
 
 		return display:tag('tr')
 			:tag('td')
 				:attr('colspan', '100')
 				:css('font-style', 'italic')
-				:wikitext(text)
+				:wikitext(getNoResultText())
 				:allDone()
 	end
 
