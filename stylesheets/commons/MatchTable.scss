@@ -12,27 +12,3 @@ Template(s): MatchTable
 .recent-matches-bg-lose {
 	background-color: var( --table-red-background-color, #f9f0f2 ) !important;
 }
-
-@mixin match-table-colors($row-type, $color-type) {
-	&.match-table-row__#{$row-type} {
-		background-color: var( --clr-#{$color-type}-90 );
-
-		&:hover {
-			background-color: var( --clr-#{$color-type}-80 );
-		}
-
-		.theme--dark & {
-			background-color: var( --clr-#{$color-type}-10 );
-
-			&:hover {
-				background-color: var( --clr-#{$color-type}-20 );
-			}
-		}
-	}
-}
-
-.match-table-wrapper table.table2__table tr.table2__row--body {
-	@include match-table-colors( win, semantic-positive );
-	@include match-table-colors( draw, semantic-gold );
-	@include match-table-colors( loss, semantic-negative );
-}
