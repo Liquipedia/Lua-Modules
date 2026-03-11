@@ -568,27 +568,11 @@ end
 
 ---@return Widget
 function MatchTable:buildDisplay()
-	local display = mw.html.create('table')
-		:addClass('wikitable wikitable-striped sortable')
-		:css('text-align', 'center')
-		:node(self:_titleRow(self.config.title))
-		:node(self:headerRow())
-
-	local currentYear
-	Array.forEach(self.matches, function(match)
-		local year = tonumber(match.date:sub(1, 4))
-		if self.config.showYearHeaders and year ~= currentYear then
-			currentYear = year
-			display:node(self:_yearRow(year))
-		end
-		display:node(self:matchRow(match))
-	end)
-
 	return TableWidgets.Table{
 		classes = {'match-table-wrapper'},
 		sortable = true,
 		columns = self:buildColumnDefinitions(),
-		title = String.nilIfEmpty(self.config.title),
+		title = Logic.nilIfEmpty(self.config.title),
 		children = WidgetUtil.collect(
 			self:headerRow(),
 			TableWidgets.TableBody{children = self:buildBody()}
@@ -603,17 +587,6 @@ function MatchTable:build()
 		self:displayStats(),
 		self:buildDisplay()
 	)}
-end
-
----@param title string
----@return Html?
-function MatchTable:_titleRow(title)
-	if not title then return end
-	return mw.html.create('tr')
-		:tag('th')
-			:attr('colspan', '100')
-			:wikitext(title)
-			:done()
 end
 
 ---@protected
