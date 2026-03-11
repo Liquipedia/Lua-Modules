@@ -3,6 +3,43 @@
  The equivalent to this file on production is Special:RLA, and should be kept in sync with it.
 */
 
+// Mock MediaWiki APIs for testing
+window.mw = window.mw || {
+	config: {
+		get: function ( key ) {
+			const mockConfig = {
+				wgPageName: 'Test_Page',
+				wgNamespaceNumber: 0,
+				wgServer: 'https://liquipedia.net',
+				wgScriptPath: ''
+			};
+			return mockConfig[ key ];
+		}
+	},
+	user: {
+		isAnon: function () {
+			return false;
+		}
+	},
+	loader: {
+		using: function () {
+			return Promise.resolve();
+		}
+	},
+	Api: function () {
+		return {
+			get: function () {
+				return Promise.resolve( {
+					query: {
+						logevents: [],
+						pages: {}
+					}
+				} );
+			}
+		};
+	}
+};
+
 // List of JavaScript modules to include
 const jsModules = [
 	'UseStrict',
@@ -41,40 +78,3 @@ jsModules.forEach( ( module ) => {
 	script.async = false; // Ensure scripts load in order
 	document.head.appendChild( script );
 } );
-
-// Mock MediaWiki APIs for testing
-window.mw = window.mw || {
-	config: {
-		get: function ( key ) {
-			const mockConfig = {
-				wgPageName: 'Test_Page',
-				wgNamespaceNumber: 0,
-				wgServer: 'https://liquipedia.net',
-				wgScriptPath: ''
-			};
-			return mockConfig[ key ];
-		}
-	},
-	user: {
-		isAnon: function () {
-			return false;
-		}
-	},
-	loader: {
-		using: function () {
-			return Promise.resolve();
-		}
-	},
-	Api: function () {
-		return {
-			get: function () {
-				return Promise.resolve( {
-					query: {
-						logevents: [],
-						pages: {}
-					}
-				} );
-			}
-		};
-	}
-};
