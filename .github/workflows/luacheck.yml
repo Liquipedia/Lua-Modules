@@ -87,5 +87,7 @@ jobs:
             echo $line; \
             if [[ $line =~ ${PATTERN} ]]; then \
               echo "::warning file=${BASH_REMATCH[1]},line=${BASH_REMATCH[2]}::${BASH_REMATCH[4]}"; \
+            else
+              echo "Does not match ${PATTERN}, ${BASH_REMATCH}"
             fi; \
           done
