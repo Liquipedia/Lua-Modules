@@ -81,8 +81,8 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'HoK_AoV_allmode.png',
-		darkmode = 'HoK_AoV_allmode.png',
+		lightmode = 'HoK_AoV_Header 2026 lightmode.png',
+		darkmode = 'HoK_AoV_Header 2026 darkmode.png',
 	},
 	metadesc = 'Comprehensive Honor of Kings & Arena of Valor wiki with articles covering everything from heroes, '..
 		'to strategies, to tournaments, to competitive players and teams.',

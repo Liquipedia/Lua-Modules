@@ -12,7 +12,8 @@ local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
-local Info = Lua.import('Module:Info')
+local I18n = Lua.import('Module:I18n')
+local Info = Lua.import('Module:Info', {loadData = true})
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
@@ -56,6 +57,7 @@ local SECONDS_ONE_DAY = 3600 * 24
 ---@class MatchTableConfig
 ---@field mode MatchTableMode
 ---@field limit number?
+---@field dateFormat ('full'|'compact')?
 ---@field displayGameIcons boolean
 ---@field showResult boolean
 ---@field aliases table<string, true>
@@ -148,6 +150,7 @@ function MatchTable:_readDefaultConfig()
 		addCategory = Logic.nilOr(Logic.readBoolOrNil(args.addCategory), true),
 		mode = args.tableMode,
 		limit = tonumber(args.limit),
+		dateFormat = args.dateFormat,
 		displayGameIcons = Logic.readBool(args.gameIcons),
 		showResult = Logic.nilOr(Logic.readBoolOrNil(args.showResult), true),
 		timeRange = self:readTimeRange(),
@@ -566,14 +569,30 @@ function MatchTable:buildDisplay()
 		:node(self:headerRow())
 
 	if Table.isEmpty(self.matches) then
-		local text = 'This ' .. (self.config.mode == Opponent.solo and Opponent.solo or Opponent.team)
-			.. ' has not played any matches yet.'
+		---@return string
+		local function getNoResultText()
+			local isH2H = Logic.isNotEmpty(self.config.vs)
+			if isH2H then
+				return I18n.translate(
+					'matchtable-no-h2h-match-results',
+					{
+						mode = self.config.mode == Opponent.solo and 'players' or 'teams',
+					}
+				)
+			end
+			return I18n.translate(
+				'matchtable-no-match-results',
+				{
+					mode = self.config.mode == Opponent.solo and 'player' or 'team',
+				}
+			)
+		end
 
 		return display:tag('tr')
 			:tag('td')
 				:attr('colspan', '100')
 				:css('font-style', 'italic')
-				:wikitext(text)
+				:wikitext(getNoResultText())
 				:allDone()
 	end
 
@@ -678,6 +697,7 @@ end
 function MatchTable:_displayDate(match)
 	local cell = mw.html.create('td')
 		:css('text-align', 'left')
+		:css('min-width', '5rem')
 		:attr('data-sort-value', match.timestamp)
 
 	if match.timestamp == DateExt.defaultTimestamp then
@@ -688,6 +708,7 @@ function MatchTable:_displayDate(match)
 		finished = match.finished,
 		date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
 		rawdatetime = true,
+		format = self.config.dateFormat
 	} or nil)
 end
 
@@ -818,11 +839,12 @@ function MatchTable:_displayScore(match)
 		end
 
 		return mw.html.create(tonumber(opponentRecord.placement) == 1 and 'b' or nil)
-			:wikitext(status == SCORE_STATUS and (score or '–') or status)
+			:wikitext(status == SCORE_STATUS and (score or '&ndash;') or status)
 	end
 
 	return mw.html.create('td')
 		:addClass('match-table-score')
+		:css('white-space', 'nowrap')
 		:node(toScore(result.opponent, result.gameOpponents))
 		:node(bestof1Score and BO1_SCORE_CONCAT or SCORE_CONCAT)
 		:node(toScore(result.vs, result.gameVsOpponents))

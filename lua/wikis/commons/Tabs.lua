@@ -202,6 +202,7 @@ function Tabs.dynamic(args)
 
 	return AnalyticsWidgets{
 		analyticsName = 'Dynamic Navigation tab',
+		css = {width = '-webkit-fill-available'},
 		children = HtmlWidgets.Div{
 			classes = {'tabs-dynamic', 'navigation-not-searchable', variantClass, wrapsClass},
 			attributes = {['data-nosnippet'] = ''},

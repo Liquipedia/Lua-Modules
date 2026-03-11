@@ -29,6 +29,8 @@ local Widget = Class.new(function(self, props)
 	self.context = {} -- Populated by the parent
 end)
 
+---@alias Renderable string|Html|Widget|number
+
 Widget.defaultProps = {}
 
 ---Asserts the existence of a value and copies it
@@ -38,7 +40,7 @@ function Widget:assertExistsAndCopy(value)
 	return assert(String.nilIfEmpty(value), 'Tried to set a nil value to a mandatory property')
 end
 
----@return (string|Widget|Html|nil)[]|(string|Widget|Html|nil)
+---@return Renderable|Renderable[]?
 function Widget:render()
 	error('A Widget must override the render() function!')
 end
@@ -50,7 +52,7 @@ function Widget:tryMake()
 		if not Array.isArray(ret) then
 			ret = {ret}
 		end
-		---@cast ret (string|Widget|Html|nil)[]
+		---@cast ret Renderable[]
 
 		return table.concat(Array.map(ret, function(val)
 			if Class.instanceOf(val, Widget) then

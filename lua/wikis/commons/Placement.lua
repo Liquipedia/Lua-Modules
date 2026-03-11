@@ -8,10 +8,22 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Ordinal = Lua.import('Module:Ordinal')
 local Table = Lua.import('Module:Table')
+
+local Span = HtmlWidgets.Span
+
+---@class rawPlacement
+---@field backgroundClass string?
+---@field blackText boolean
+---@field display string
+---@field ordinal string[]
+---@field placement string[]
+---@field sort string
+---@field unknown boolean?
 
 local Placement = {}
 
@@ -102,7 +114,7 @@ local USE_BLACK_TEXT = {
 ---Processes a placement text input into raw data.
 ---Returned table will not always contain every key.
 ---@param placement string|integer?
----@return table
+---@return rawPlacement
 function Placement.raw(placement)
 	local raw = {}
 
@@ -171,6 +183,8 @@ function Placement._placement(args)
 	local raw = Placement.raw(args.placement or '')
 	args.parent:css('text-align', 'center')
 				:attr('data-sort-value', raw.sort)
+				:tag('span')
+				:addClass('placement-box')
 				:addClass(raw.backgroundClass)
 				:tag('b')
 				:addClass(not raw.blackText and 'placement-text' or nil)
@@ -202,8 +216,37 @@ end
 ---@return string
 function Placement.get(args)
 	local raw = Placement.raw(args.placement)
-	return 'class="text-center ' .. (raw.backgroundClass or '') .. '" data-sort-value="' .. raw.sort .. '"' ..
-		'|<b' .. (raw.blackText and '' or ' class="placement-text"') .. '>' .. (args.customText or raw.display) .. '</b>'
+	return 'class="text-center" data-sort-value="' .. raw.sort .. '"' ..
+		'|<span class="placement-box ' .. (raw.backgroundClass or '') ..
+		'"><b' .. (raw.blackText and '' or ' class="placement-text"') ..
+		'>' .. (args.customText or raw.display) .. '</b></span>'
 end
 
-return Class.export(Placement, {exports = {'getBgClass', 'get', 'RangeLabel'}})
+---Returns a Widget span for placement display in the Widget system.
+---@param raw rawPlacement
+---@param text string?
+---@return Widget
+function Placement.renderRawInWidget(raw, text)
+	local content = raw.display .. (Logic.isNotEmpty(text) and (' ' .. text) or '')
+
+	return Span{
+		classes = {'placement-box', raw.backgroundClass},
+		children = raw.blackText and {content} or {
+			Span{
+				classes = {'placement-text'},
+				children = content
+			}
+		}
+	}
+end
+
+---Returns a Widget span for placement display in the Widget system.
+---@param args {placement: string|integer?, text: string?}
+---@return Widget
+function Placement.renderInWidget(args)
+	local raw = Placement.raw(args.placement or '')
+
+	return Placement.renderRawInWidget(raw, args.text)
+end
+
+return Class.export(Placement, {exports = {'getBgClass', 'get', 'RangeLabel', 'renderRawInWidget', 'renderInWidget'}})

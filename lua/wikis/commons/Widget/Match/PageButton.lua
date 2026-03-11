@@ -11,7 +11,7 @@ local Class = Lua.import('Module:Class')
 local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
 
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Widget = Lua.import('Module:Widget')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')

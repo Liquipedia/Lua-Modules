@@ -172,6 +172,7 @@ return {
 	dota2_barrack = 'fas fa-warehouse',
 
 	leagueoflegends_kda = 'fas fa-swords fa-flip-vertical',
+	leagueoflegends_killparticipation = 'fas fa-dagger',
 
 	-- Usage: Day night cycle information
 	day = 'fas fa-sun',
@@ -246,6 +247,9 @@ return {
 	share = 'fas fa-share-alt',
 	copy = 'fas fa-clone',
 	download = 'fas fa-download',
+
+	-- Usage: Github links
+	github = 'fab fa-github',
 
 	-- Usage: Dota2 Spellcard
 	dota2_spl_mechanics = 'fas fa-cog',

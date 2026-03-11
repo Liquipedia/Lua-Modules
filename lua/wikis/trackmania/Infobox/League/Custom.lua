@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local Game = Lua.import('Module:Game')
 local Class = Lua.import('Module:Class')
 local Page = Lua.import('Module:Page')
-local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
@@ -56,17 +55,12 @@ function CustomInjector:parse(id, widgets)
 						return Page.makeInternalLink(info.name, info.link)
 					end)
 		})
+	elseif id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Number of Players', children = {args.player_number}},
+			Cell{name = 'Number of Teams', children = {args.team_number}}
+		)
 	elseif id == 'customcontent' then
-		table.insert(widgets, Title{children = String.isNotEmpty(args.team_number) and 'Teams' or 'Players'})
-		table.insert(widgets, Cell{
-			name = 'Number of Teams',
-			children = {args.team_number}
-		})
-		table.insert(widgets, Cell{
-			name = 'Number of Players',
-			children = {args.player_number}
-		})
-
 		local maps = self.caller:getAllArgsForBase(args, 'map')
 		if #maps > 0 then
 			table.insert(widgets, Title{children = 'Maps'})

@@ -31,7 +31,7 @@ local CustomResultsTable = {}
 
 -- Template entry point
 ---@param frame Frame
----@return Html?
+---@return Widget?
 function CustomResultsTable.results(frame)
 	local args = Arguments.getArgs(frame)
 	args.useIndivPrize = true
@@ -54,7 +54,7 @@ end
 
 -- Template entry point for awards
 ---@param frame Frame
----@return Html?
+---@return Widget?
 function CustomResultsTable.awards(frame)
 	local args = Arguments.getArgs(frame)
 	args.useIndivPrize = true

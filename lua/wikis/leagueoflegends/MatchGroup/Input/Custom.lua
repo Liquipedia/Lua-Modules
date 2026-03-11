@@ -126,6 +126,10 @@ function CustomMatchGroupInput.aggregateStats(match)
 					player.extradata.gameLength = Operator.nilSafeAdd(player.extradata.gameLength, gameLength)
 				end
 			)
+			local killsParticipated = Operator.nilSafeAdd(player.extradata.kills, player.extradata.assists)
+			player.extradata.killparticipation = (
+				(opponent.extradata.kills or 0) > 0 and killsParticipated
+			) and (killsParticipated / opponent.extradata.kills) or nil
 			player.extradata.characters = Logic.nilIfEmpty(player.extradata.characters)
 		end)
 	end)

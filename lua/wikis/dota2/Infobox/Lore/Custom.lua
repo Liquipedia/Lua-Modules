@@ -26,7 +26,6 @@ local CustomInjector = Class.new(Injector)
 function CustomCosmetic.run(frame)
 	local lore = CustomCosmetic(frame)
 	lore:setWidgetInjector(CustomInjector(lore))
-	lore.args.caption = lore.args.others
 
 	return mw.html.create():node(lore:createInfobox())
 end
@@ -65,7 +64,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Traditions', children = {args.traditions}},
 			Cell{name = 'Events', children = {args.events}},
 			Cell{name = 'Resources', children = {args.resources}},
-			Cell{name = 'Others', children = {args.otherlinks}},
+			Cell{name = 'Others', children = {args.others}},
 			Cell{name = '[[File:Artifact_allmode.png|16px]] Artifact', children = {
 				args.artifactwiki and '[[artifact:'.. args.artifactwiki ..'|'.. args.artifactwiki .. ' card]]' or nil
 			}}
