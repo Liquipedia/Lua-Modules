@@ -82,3 +82,8 @@ jobs:
         run: |
           ~/.local/bin/luals/bin/lua-language-server --check ./ | tee luals-check && true
           cat luals-check | (sed -e 's/\x1b\[[0-9;]*m//g'| sed -n 's/\(lua[^:]\+\):\([[:digit:]]*\):[[:digit:]]* \[Warning\] /::warning file=\1,line=\2::/p')
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v4
+        with:
+          path: luals-check
