@@ -573,7 +573,7 @@ function MatchTable:buildDisplay()
 		local function getNoResultText()
 			local isH2H = Logic.isNotEmpty(self.config.vs)
 			if isH2H then
-				I18n.translate(
+				return I18n.translate(
 					'matchtable-no-h2h-match-results',
 					{
 						mode = self.config.mode == Opponent.solo and 'players' or 'teams',
