@@ -81,6 +81,7 @@ local SECONDS_ONE_DAY = 3600 * 24
 ---@field queryHistoricalAliases boolean
 ---@field showType boolean
 ---@field showYearHeaders boolean
+---@field sortableResults boolean
 ---@field useTickerName boolean
 ---@field teamStyle teamStyle
 ---@field linkSubPage boolean
@@ -168,6 +169,7 @@ function MatchTable:_readDefaultConfig()
 		showRoundStats = Logic.readBool(args.showRoundStats),
 		showType = Logic.readBool(args.showType),
 		showYearHeaders = Logic.readBool(args.showYearHeaders),
+		sortableResults = Logic.nilOr(Logic.readBoolOrNil(args.sortableResults), true),
 		useTickerName = Logic.readBool(args.useTickerName),
 		teamStyle = String.nilIfEmpty(args.teamStyle) or 'short',
 		linkSubPage = Logic.readBool(args.linkSubPage),
@@ -570,7 +572,7 @@ end
 function MatchTable:buildDisplay()
 	return TableWidgets.Table{
 		classes = {'match-table-wrapper'},
-		sortable = true,
+		sortable = self.config.sortableResults,
 		columns = self:buildColumnDefinitions(),
 		title = Logic.nilIfEmpty(self.config.title),
 		children = WidgetUtil.collect(

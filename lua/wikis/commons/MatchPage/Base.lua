@@ -542,6 +542,7 @@ function BaseMatchPage:_createMatchTable(props)
 																		inclusive, and we don't want that here ]],
 		limit = 5,
 		stats = false,
+		sortableResults = false,
 		tableMode = Opponent.team,
 		vod = false,
 		matchPageButtonText = 'short',
