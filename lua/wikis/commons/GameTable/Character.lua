@@ -324,6 +324,7 @@ function CharacterGameTable:buildColumnDefinitions()
 				{align = 'center'},
 				{align = 'center'},
 				{align = 'center'},
+				{align = 'center'},
 			} or nil,
 			{
 				align = 'center',
@@ -376,7 +377,10 @@ function CharacterGameTable:headerRow()
 				config.showBans and makeHeaderCell('Bans') or nil,
 				isCharTable and {
 					makeHeaderCell(),
-					makeHeaderCell('Score'),
+					TableWidgets.CellHeader{
+						colspan = 2,
+						children = 'Score'
+					},
 					makeHeaderCell(),
 				} or nil,
 				makeHeaderCell('vs. Picks'),
@@ -458,7 +462,7 @@ end
 ---@param game CharacterGameTableGame
 ---@param pickedBy number
 ---@param pickedVs number
----@return Widget
+---@return Widget[]
 function CharacterGameTable:_displayScore(game, pickedBy, pickedVs)
 	local winner = tonumber(game.winner)
 	local scores = Array.map(game.opponents, Operator.property('score'))
@@ -471,11 +475,14 @@ function CharacterGameTable:_displayScore(game, pickedBy, pickedVs)
 		}
 	end
 
-	return TableWidgets.Cell{children = {
-		toScore(pickedBy),
-		SCORE_CONCAT,
-		toScore(pickedVs),
-	}}
+	return {
+		TableWidgets.Cell{children = CharacterGameTable.getResultIndicator((winner == pickedBy) and 1 or 2)},
+		TableWidgets.Cell{children = {
+			toScore(pickedBy),
+			SCORE_CONCAT,
+			toScore(pickedVs),
+		}}
+	}
 end
 
 ---@param game CharacterGameTableGame
@@ -514,7 +521,6 @@ function CharacterGameTable:gameRow(match, game)
 	local winner = indexes[game.winner]
 
 	return TableWidgets.Row{
-		classes = {self:getBackgroundClass(winner)},
 		children = WidgetUtil.collect(
 			self:_displayDate(match),
 			self:displayTier(match),

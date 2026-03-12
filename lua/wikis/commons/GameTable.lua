@@ -71,7 +71,7 @@ end
 
 ---@param result MatchTableMatchResult
 ---@param game MatchGroupUtilGame
----@return Html?
+---@return Widget[]
 function GameTable:_displayGameScore(result, game)
 	local scores = Array.map(game.opponents, Operator.property('score'))
 	local indexes = result.flipped and {2, 1} or {1, 2}
@@ -87,11 +87,14 @@ function GameTable:_displayGameScore(result, game)
 		}
 	end
 
-	return TableWidgets.Cell{children = {
-		toScore(indexes[1]),
-		SCORE_CONCAT,
-		toScore(indexes[2]),
-	}}
+	return {
+		TableWidgets.Cell{children = MatchTable.getResultIndicator(indexes[game.winner])},
+		TableWidgets.Cell{children = {
+			toScore(indexes[1]),
+			SCORE_CONCAT,
+			toScore(indexes[2]),
+		}}
+	}
 end
 
 ---@param game MatchGroupUtilGame
@@ -129,7 +132,6 @@ function GameTable:gameRow(match, game)
 	local winner = indexes[game.winner]
 
 	return TableWidgets.Row{
-		classes = {self:getBackgroundClass(winner)},
 		children = WidgetUtil.collect(
 			self:_displayDate(match),
 			self:displayTier(match),

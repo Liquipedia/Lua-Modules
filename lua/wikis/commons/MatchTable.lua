@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
 local Game = Lua.import('Module:Game')
 local I18n = Lua.import('Module:I18n')
 local Info = Lua.import('Module:Info', {loadData = true})
@@ -37,6 +38,7 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLossIndicator')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Condition = Lua.import('Module:Condition')
@@ -615,6 +617,10 @@ function MatchTable:buildColumnDefinitions()
 		config.showResult and WidgetUtil.collect(
 			config.showOpponent and {align = 'center'} or nil,
 			{
+				-- Result indicator column
+				align = 'center',
+			},
+			{
 				-- Score column
 				align = 'center',
 			},
@@ -670,7 +676,10 @@ function MatchTable:headerRow()
 			makeHeaderCell('Tournament'),
 			config.showResult and WidgetUtil.collect(
 				config.showOpponent and makeHeaderCell('Participant') or nil,
-				makeHeaderCell('Score'),
+				TableWidgets.CellHeader{
+					colspan = 2,
+					children = 'Score'
+				},
 				TableWidgets.CellHeader{
 					align = 'center',
 					children = 'vs. Opponent'
@@ -752,7 +761,6 @@ end
 ---@return Widget
 function MatchTable:matchRow(match)
 	return TableWidgets.Row{
-		classes = {self:getBackgroundClass(match.result.winner)},
 		children = WidgetUtil.collect(
 			self:_displayDate(match),
 			self:displayTier(match),
@@ -917,11 +925,14 @@ function MatchTable:_displayScore(match)
 		}
 	end
 
-	return TableWidgets.Cell{children = {
-		toScore(result.opponent, result.gameOpponents),
-		bestof1Score and BO1_SCORE_CONCAT or SCORE_CONCAT,
-		toScore(result.vs, result.gameVsOpponents)
-	}}
+	return {
+		TableWidgets.Cell{children = MatchTable.getResultIndicator(match.result.winner)},
+		TableWidgets.Cell{children = {
+			toScore(result.opponent, result.gameOpponents),
+			bestof1Score and BO1_SCORE_CONCAT or SCORE_CONCAT,
+			toScore(result.vs, result.gameVsOpponents)
+		}}
+	}
 end
 
 ---@param match MatchTableMatch
@@ -948,13 +959,13 @@ end
 
 ---@protected
 ---@param winner integer
----@return string?
-function MatchTable:getBackgroundClass(winner)
-	return winner == 1 and 'match-table-row__win' or
-		winner == 0 and 'match-table-row__draw' or
-		winner == 2 and 'match-table-row__loss' or
-		nil
-end
+---@return Widget?
+MatchTable.getResultIndicator = FnUtil.memoize(function (winner)
+	return WinLossIndicator{
+		opponentIndex = 1,
+		winner = winner,
+	}
+end)
 
 ---@return Widget?
 function MatchTable:displayStats()
