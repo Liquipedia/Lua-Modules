@@ -339,13 +339,13 @@ function CharacterGameTable:buildColumnDefinitions()
 			} or nil
 		) or nil,
 		config.showLength and {
-			align = 'left',
+			align = 'right',
 		} or nil,
 		config.showPatch and {
-			align = 'left',
+			align = 'center',
 		} or nil,
 		config.showVod and {
-			align = 'left',
+			align = 'center',
 			unsortable = true,
 		} or nil,
 		config.showMatchPage and {
