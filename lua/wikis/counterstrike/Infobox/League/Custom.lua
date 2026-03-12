@@ -96,6 +96,12 @@ local VALVE_TIERS = {
 }
 
 local VALVE_TOR_START_DATE = '2025-01-01'
+local VALVE_TOR_ENABLED_TIERS = {
+	VALVE_TIERS.major,
+	VALVE_TIERS['tier 1'],
+	VALVE_TIERS['tier 1 qualifier'],
+	VALVE_TIERS['tier 1 wildcard']
+}
 
 local RESTRICTIONS = {
 	female = {
@@ -385,6 +391,7 @@ end
 function CustomLeague:_createValveTierCell()
 	if self.valveTier then
 		local showInfoIcon = self.data.endDate >= VALVE_TOR_START_DATE
+			and Array.find(VALVE_TOR_ENABLED_TIERS, FnUtil.curry(Operator.eq, self.valveTier))
 		return WidgetUtil.collect(
 			Link{
 				children = {self.valveTier.name},
