@@ -128,9 +128,6 @@ end
 ---@param game MatchGroupUtilGame
 ---@return Widget
 function GameTable:gameRow(match, game)
-	local indexes = match.result.flipped and {2, 1} or {1, 2}
-	local winner = indexes[game.winner]
-
 	return TableWidgets.Row{
 		children = WidgetUtil.collect(
 			self:_displayDate(match),

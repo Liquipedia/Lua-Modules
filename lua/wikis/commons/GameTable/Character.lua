@@ -524,9 +524,6 @@ end
 ---@param game CharacterGameTableGame
 ---@return Widget
 function CharacterGameTable:gameRow(match, game)
-	local indexes = ((self.isCharacterTable and game.pickedBy == game.winner) or match.result.flipped) and {2, 1} or {1, 2}
-	local winner = indexes[game.winner]
-
 	return TableWidgets.Row{
 		children = WidgetUtil.collect(
 			self:_displayDate(match),
