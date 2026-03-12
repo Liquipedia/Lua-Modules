@@ -619,6 +619,7 @@ function MatchTable:buildColumnDefinitions()
 			{
 				-- Result indicator column
 				align = 'center',
+				maxWidth = '1.5rem',
 			},
 			{
 				-- Score column
