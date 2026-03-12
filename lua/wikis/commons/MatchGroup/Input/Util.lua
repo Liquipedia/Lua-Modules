@@ -957,6 +957,7 @@ function MatchGroupInputUtil.findPlayerId(players, playerInput, playerLink)
 	if playerIndex > 0 then
 		return playerIndex
 	end
+	mw.ext.TeamLiquidIntegration.add_category('Pages with unknown player input in matches')
 	mw.log('Player with id ' .. playerInput .. ' not found in opponent data')
 end
 
