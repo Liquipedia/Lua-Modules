@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Infobox/Extension/GameApperances
+-- page=Module:Infobox/Extension/GameAppearances
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
