@@ -311,7 +311,10 @@ function CharacterGameTable:buildColumnDefinitions()
 			align = 'left',
 		},
 		config.showResult and WidgetUtil.collect(
-			not isCharTable and {align = 'center'} or nil,
+			not isCharTable and {
+				{align = 'center'},
+				{align = 'center'}
+			} or nil,
 			{
 				align = 'center',
 				unsortable = true,
@@ -372,7 +375,10 @@ function CharacterGameTable:headerRow()
 			config.showIcon and makeHeaderCell() or nil,
 			makeHeaderCell('Tournament'),
 			config.showResult and WidgetUtil.collect(
-				not isCharTable and makeHeaderCell('vs.') or nil,
+				not isCharTable and {
+					TableWidgets.CellHeader{unsortable = true},
+					makeHeaderCell('vs.'),
+				} or nil,
 				makeHeaderCell('Picks'),
 				config.showBans and makeHeaderCell('Bans') or nil,
 				isCharTable and {
@@ -436,6 +442,7 @@ function CharacterGameTable:displayGame(match, game)
 	else
 		local indexes = match.result.flipped and {2, 1} or {1, 2}
 		return WidgetUtil.collect(
+			TableWidgets.Cell{children = GameTable.getResultIndicator(indexes[game.winner])},
 			self:_displayOpponent(match.result.vs),
 			self:_displayDraft(game, match.result.opponent, indexes[1]),
 			self:_displayDraft(game, match.result.vs, indexes[2])
