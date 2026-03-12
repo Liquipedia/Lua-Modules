@@ -21,6 +21,7 @@ const jsModules = [
 	'FilterButtons',
 	'Liquipedia_links',
 	'Mainpage',
+	'MatchPage',
 	'Miscellaneous',
 	'PanelBoxCollapsible',
 	'Prizepooltable',

@@ -18,6 +18,7 @@ local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
 local Links = Lua.import('Module:Links')
 local MatchTable = Lua.import('Module:MatchTable')
+local Namespace = Lua.import('Module:Namespace')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -28,6 +29,13 @@ local Tournament = Lua.import('Module:Tournament')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
@@ -325,6 +333,9 @@ function BaseMatchPage:render()
 	local tournamentContext = self:getMatchContext()
 	return Div{
 		classes = {'match-bm'},
+		attributes = {
+			['data-matchPage-bracket-page'] = self:_queryBracketPage()
+		},
 		children = WidgetUtil.collect(
 			Header {
 				countdownBlock = self:getCountdownBlock(),
@@ -345,6 +356,33 @@ function BaseMatchPage:render()
 			self:previousMatches()
 		)
 	}
+end
+
+---@private
+---@return string?
+function BaseMatchPage:_queryBracketPage()
+	if mw.title.getCurrentTitle().namespace ~= Namespace.matchNamespaceId() then
+		return
+	end
+	local bracketId = Array.sub(Array.parseCommaSeparatedString(self.matchData.matchId, '_'), 2, -2)
+	if Logic.isEmpty(bracketId) then
+		return
+	end
+
+	local namespaceName = Array.sub(bracketId, 1, -1)[1]
+
+	local conditions = ConditionTree(BooleanOperator.all)
+		:add(ConditionNode(ColumnName('match2bracketid'), Comparator.eq, table.concat(bracketId, '_')))
+		:add(namespaceName and ConditionNode(
+				ColumnName('namespace'), Comparator.eq, Namespace.idFromName(namespaceName)
+		) or nil)
+
+	local data = mw.ext.LiquipediaDB.lpdb('match2', {
+		conditions = tostring(conditions),
+		count = 1,
+		query = 'pagename'
+	})[1]
+	return (namespaceName and (namespaceName .. ':') or '') .. data.pagename
 end
 
 ---@protected
