@@ -164,7 +164,7 @@ function StarcraftParticipantTable:createSoloFactionTable()
 
 	local factionColumns
 	if config.displayRandomColumn or
-		not config.isRandomEvent and config.displayRandomColumn == nil and factioNumbers.rDisplay > 0) then
+		not config.isRandomEvent and config.displayRandomColumn == nil and factioNumbers.rDisplay > 0 then
 
 		factionColumns = Array.copy(Faction.knownFactions)
 	else
