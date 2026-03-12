@@ -16,7 +16,7 @@ liquipedia.core = {
 		liquipedia.core.modules.forEach( ( module ) => {
 			// Usage of setTimeout to make scripts asynchronous
 			window.setTimeout( () => {
-				window.liquipedia[ module ].init();
+				liquipedia[ module ].init();
 			}, 0 );
 		} );
 	}
