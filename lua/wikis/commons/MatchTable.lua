@@ -675,7 +675,7 @@ function MatchTable:headerRow()
 			config.showIcon and makeHeaderCell() or nil,
 			makeHeaderCell('Tournament'),
 			config.showResult and WidgetUtil.collect(
-				config.showOpponent and makeHeaderCell('Participant') or nil,
+				config.showOpponent and makeHeaderCell('Opponent') or nil,
 				TableWidgets.CellHeader{
 					colspan = 2,
 					children = 'Score'
