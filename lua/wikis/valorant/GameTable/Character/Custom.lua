@@ -110,6 +110,10 @@ function CustomCharacterGameTable:buildColumnDefinitions()
 				align = 'center',
 			},
 			{
+				-- Result indicator column
+				align = 'center',
+			},
+			{
 				-- Score column
 				align = 'center',
 			},
@@ -167,7 +171,10 @@ function CustomCharacterGameTable:headerRow()
 				} or nil,
 				makeHeaderCell(config.mode == Opponent.solo and 'Team Picks' or 'Picks'),
 				makeHeaderCell(),
-				makeHeaderCell('Score'),
+				TableWidgets.CellHeader{
+					colspan = 2,
+					children = 'Score'
+				},
 				makeHeaderCell(),
 				makeHeaderCell('vs. Picks')
 			) or nil,
@@ -235,7 +242,7 @@ function CustomCharacterGameTable:displayGame(match, game)
 
 	addCell(self:_displayCharacters(game, indexes[1], 'picks'))
 	addCell(self:_displayOpponent(opponent, false))
-	addCell(self:_displayScore(game, indexes[1], indexes[2]))
+	Array.forEach(self:_displayScore(game, indexes[1], indexes[2]), addCell)
 	addCell(self:_displayOpponent(opponentVs, true))
 	addCell(self:_displayCharacters(game, indexes[2], 'picks'))
 
