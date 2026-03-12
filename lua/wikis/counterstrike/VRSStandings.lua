@@ -202,7 +202,6 @@ function VRSStandings._fetch(updated, fetchLimit)
 		conditions = Condition.Tree(BooleanOperator.all):add{
 			Condition.Node(Condition.ColumnName('type'), Comparator.eq, DATAPOINT_TYPE),
 			Condition.Node(Condition.ColumnName('date'), Comparator.eq, updated),
-			Condition.Node(Condition.ColumnName('namespace'), Comparator.eq, 2), -- TODO: Remove before release
 		}:toString(),
 		query = 'extradata',
 		limit = 1,
