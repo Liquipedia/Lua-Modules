@@ -1448,16 +1448,18 @@ div.brkts-opponent-hover {
 */
 
 .brkts-result-label {
-	height: calc( var( --result-label-scale, 1 ) * 1.25rem );
-	width: calc( var( --result-label-scale, 1 ) * 1.25rem );
-	border-radius: calc( var( --result-label-scale, 1 ) * 0.25rem );
-	font-size: calc( var( --result-label-scale, 1 ) * 0.6875rem );
-	line-height: calc( var( --result-label-scale, 1 ) * 1rem );
+	height: calc( var( --result-label-scale ) * 1.25rem );
+	width: calc( var( --result-label-scale ) * 1.25rem );
+	border-radius: calc( var( --result-label-scale ) * 0.25rem );
+	font-size: calc( var( --result-label-scale ) * 0.6875rem );
+	line-height: calc( var( --result-label-scale ) * 1rem );
 	font-weight: bold;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	align-self: center;
+
+	--result-label-scale: 1;
 
 	&.result--win {
 		.theme--light & {
