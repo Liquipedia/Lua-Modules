@@ -576,6 +576,7 @@ function BaseMatchPage:_buildHeadToHeadMatchTable()
 		team = self.opponents[1].name,
 		vsteam = self.opponents[2].name,
 		showOpponent = true,
+		opponentHeader = 'Opponent',
 		teamStyle = 'hybrid',
 		useTickerName = true,
 	}

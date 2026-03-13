@@ -65,6 +65,7 @@ local SECONDS_ONE_DAY = 3600 * 24
 ---@field limit number?
 ---@field dateFormat ('full'|'compact')?
 ---@field displayGameIcons boolean
+---@field opponentHeader string?
 ---@field showResult boolean
 ---@field aliases table<string, true>
 ---@field addCategory boolean
@@ -160,6 +161,7 @@ function MatchTable:_readDefaultConfig()
 		limit = tonumber(args.limit),
 		dateFormat = args.dateFormat,
 		displayGameIcons = Logic.readBool(args.gameIcons),
+		opponentHeader = Logic.nilIfEmpty(args.opponentHeader),
 		showResult = Logic.nilOr(Logic.readBoolOrNil(args.showResult), true),
 		timeRange = self:readTimeRange(),
 		title = args.title,
@@ -676,7 +678,7 @@ function MatchTable:headerRow()
 			config.showIcon and makeHeaderCell() or nil,
 			makeHeaderCell('Tournament'),
 			config.showResult and WidgetUtil.collect(
-				config.showOpponent and makeHeaderCell('Opponent') or nil,
+				config.showOpponent and makeHeaderCell(self.config.opponentHeader or 'Participant') or nil,
 				TableWidgets.CellHeader{
 					colspan = 2,
 					children = 'Score'
