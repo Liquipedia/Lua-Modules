@@ -52,6 +52,7 @@ local KING_ICONS = {
 local PLAYER_WRAPPER_CSS = {
 	display = 'flex',
 	gap = '0.25rem',
+	flex = '1',
 }
 
 ---@param args table
