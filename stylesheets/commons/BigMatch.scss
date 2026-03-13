@@ -166,6 +166,10 @@ span.slash {
 .match-bm-match-header-round-results {
 	display: flex;
 	gap: 0.25rem;
+
+	@media ( min-width: 768px ) {
+		--result-label-scale: 1.2;
+	}
 }
 
 .match-bm-match-header-result {
