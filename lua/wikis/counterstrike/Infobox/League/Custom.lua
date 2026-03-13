@@ -392,7 +392,8 @@ end
 ---@return Widget[]?
 function CustomLeague:_createValveTierCell()
 	if self.valveTier then
-		local showInfoIcon = self.data.endDate >= VALVE_TOR_START_DATE
+		local showInfoIcon = self.data.endDate
+			and self.data.endDate >= VALVE_TOR_START_DATE
 			and Array.find(VALVE_TOR_ENABLED_TIERS, FnUtil.curry(Operator.eq, self.valveTier))
 		return WidgetUtil.collect(
 			Link{
