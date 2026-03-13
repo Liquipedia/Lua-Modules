@@ -1,59 +1,74 @@
 /*******************************************************************************
  * Template(s): Select all for pre elements
- * Author(s): FO-nTTaX
  ******************************************************************************/
+
+class SelectAllContainer {
+	/**
+	 * @param {HTMLElement} selectAllElement
+	 */
+	constructor( selectAllElement ) {
+		this.element = selectAllElement;
+	}
+
+	createWrapper() {
+		const wrapper = document.createElement( 'div' );
+		wrapper.classList.add( 'selectall-wrapper' );
+		const buttonWrapper = document.createElement( 'div' );
+		buttonWrapper.classList.add( 'selectall-buttons' );
+		wrapper.appendChild( buttonWrapper );
+		this.element.parentNode.replaceChild( wrapper, this.element );
+		wrapper.appendChild( this.element );
+		buttonWrapper.append( this.createSelectButton(), this.createSelectAllButton() );
+	}
+
+	createSelectButton() {
+		const selectButton = document.createElement( 'button' );
+		selectButton.classList.add( 'btn' );
+		selectButton.classList.add( 'btn-secondary' );
+		selectButton.innerHTML = 'Select';
+		selectButton.addEventListener( 'click', () => this.selectElementText() );
+		return selectButton;
+	}
+
+	createSelectAllButton() {
+		const selectCopyButton = document.createElement( 'button' );
+		selectCopyButton.classList.add( 'btn' );
+		selectCopyButton.classList.add( 'btn-primary' );
+		selectCopyButton.innerHTML = 'Select and copy';
+
+		selectCopyButton.addEventListener( 'click', async () => {
+			if ( !window.ClipboardItem || !navigator.clipboard || !navigator.clipboard.write ) {
+				mw.notify( 'This browser does not support copying text to the clipboard.', { type: 'error' } );
+				return;
+			}
+
+			this.selectElementText();
+
+			const type = 'text/plain';
+			const clipboardItemData = {
+				[ type ]: this.element.innerText
+			};
+			const clipboardItem = new ClipboardItem( clipboardItemData );
+			await navigator.clipboard.write( [ clipboardItem ] );
+		} );
+		return selectCopyButton;
+	}
+
+	selectElementText() {
+		const range = document.createRange();
+		range.selectNodeContents( this.element );
+		const selection = window.getSelection();
+		selection.removeAllRanges();
+		selection.addRange( range );
+	}
+}
+
 liquipedia.selectall = {
 	init: function() {
 		document.querySelectorAll( '.selectall' ).forEach( ( selectall ) => {
-			const wrapper = document.createElement( 'div' );
-			wrapper.classList.add( 'selectall-wrapper' );
-			const buttonwrapper = document.createElement( 'div' );
-			buttonwrapper.classList.add( 'selectall-buttons' );
-			wrapper.appendChild( buttonwrapper );
-			const relative = document.createElement( 'div' );
-			relative.classList.add( 'selectall-relative' );
-			wrapper.appendChild( relative );
-			selectall.parentNode.replaceChild( wrapper, selectall );
-			relative.appendChild( selectall );
-			const selectbutton = document.createElement( 'button' );
-			selectbutton.classList.add( 'btn' );
-			selectbutton.classList.add( 'btn-secondary' );
-			selectbutton.innerHTML = 'Select';
-			selectbutton.onclick = function() {
-				liquipedia.selectall.selectText( this );
-			};
-			buttonwrapper.appendChild( selectbutton );
-			buttonwrapper.appendChild( document.createTextNode( ' ' ) );
-			const selectcopybutton = document.createElement( 'button' );
-			selectcopybutton.classList.add( 'btn' );
-			selectcopybutton.classList.add( 'btn-primary' );
-			selectcopybutton.innerHTML = 'Select and copy';
-			selectcopybutton.onclick = function() {
-				liquipedia.selectall.selectText( this );
-				document.execCommand( 'copy' );
-			};
-			buttonwrapper.appendChild( selectcopybutton );
+			new SelectAllContainer( selectall ).createWrapper();
 		} );
-	},
-	removeTextarea: function() {
-		this.parentNode.removeChild( this );
-	},
-	selectText: function( button ) {
-		const wrapper = button.closest( '.selectall-wrapper' );
-		const selectall = wrapper.querySelector( '.selectall' );
-		const textarea = document.createElement( 'textarea' );
-		textarea.readOnly = true;
-		textarea.classList.add( 'selectall-duplicate' );
-		textarea.innerHTML = selectall.innerHTML;
-		textarea.style.padding = window.getComputedStyle( selectall ).padding;
-		textarea.style.lineHeight = window.getComputedStyle( selectall ).lineHeight;
-		textarea.style.fontFamily = window.getComputedStyle( selectall ).fontFamily;
-		textarea.style.fontSize = window.getComputedStyle( selectall ).fontSize;
-		textarea.style.height = window.getComputedStyle( selectall ).height;
-		textarea.onblur = liquipedia.selectall.removeTextarea;
-		wrapper.querySelector( '.selectall-relative' ).appendChild( textarea );
-		textarea.focus();
-		textarea.select();
 	}
 };
+
 liquipedia.core.modules.push( 'selectall' );
