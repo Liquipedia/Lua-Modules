@@ -103,11 +103,11 @@ function CopyPaste._getHeader(headerCode, customHeader)
 		return '', false
 	end
 
-	local headerCodeArray = mw.text.split(string.gsub(headerCode, '$', '!'), '!')
+	local headerCodeArray = Array.parseCommaSeparatedString(string.gsub(headerCode, '$', '!'), '!')
 	local index = Logic.isEmpty(headerCodeArray[1]) and 2 or 1
 
 	local headerMessage = I18n.translate('brkts-header-' .. headerCodeArray[index], {round = headerCodeArray[index + 1]})
-	local header = mw.text.split(headerMessage, ',')[1]
+	local header = Array.parseCommaSeparatedString(headerMessage)[1]
 	header = '\n' .. '<!-- ' .. header .. ' -->'
 
 	return header, customHeader

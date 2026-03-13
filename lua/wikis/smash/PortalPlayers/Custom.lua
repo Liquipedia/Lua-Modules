@@ -128,7 +128,7 @@ function CustomPortalPlayers._getMainCharIcons(player)
 	local CharacterIcons = Lua.import('Module:CharacterIcons/' .. activeGame, {loadData = true})
 
 	local display = mw.html.create()
-	for _, character in ipairs(mw.text.split(player.extradata['main' .. activeGame], ',', true)) do
+	for _, character in ipairs(Array.parseCommaSeparatedString(player.extradata['main' .. activeGame])) do
 		display
 			:wikitext(' ')
 			:wikitext(Characters._GetIconAndName(CharacterIcons, character, false) or '')

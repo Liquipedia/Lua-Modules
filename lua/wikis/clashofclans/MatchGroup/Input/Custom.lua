@@ -116,7 +116,7 @@ function MapFunctions.readTimes(map)
 
 	for _, timeInput in Table.iter.pairsByPrefix(map, 'time') do
 		local timeFragments = Array.map(
-			Array.reverse(mw.text.split(timeInput, ':', true)),
+			Array.reverse(Array.parseCommaSeparatedString(timeInput, ':')),
 			function(number, index)
 				number = tonumber(number)
 				return number and ((60 ^ (index - 1)) * number) or number

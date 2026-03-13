@@ -200,7 +200,7 @@ end
 ---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
-	local timeouts = Array.extractValues(Table.mapValues(mw.text.split(map.timeout or '', ','), tonumber))
+	local timeouts = Array.extractValues(Table.mapValues(Array.parseCommaSeparatedString(map.timeout), tonumber))
 
 	return {
 		ot = map.ot,
