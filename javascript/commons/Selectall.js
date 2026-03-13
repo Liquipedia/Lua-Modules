@@ -37,19 +37,13 @@ class SelectAllContainer {
 		selectCopyButton.innerHTML = 'Select and copy';
 
 		selectCopyButton.addEventListener( 'click', async () => {
-			if ( !window.ClipboardItem || !navigator.clipboard || !navigator.clipboard.write ) {
+			if ( !navigator.clipboard || !navigator.clipboard.writeText ) {
 				mw.notify( 'This browser does not support copying text to the clipboard.', { type: 'error' } );
 				return;
 			}
 
 			this.selectElementText();
-
-			const type = 'text/plain';
-			const clipboardItemData = {
-				[ type ]: this.element.innerText
-			};
-			const clipboardItem = new ClipboardItem( clipboardItemData );
-			await navigator.clipboard.write( [ clipboardItem ] );
+			await navigator.clipboard.writeText( this.element.innerText );
 		} );
 		return selectCopyButton;
 	}
