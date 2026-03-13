@@ -11,38 +11,18 @@ liquipedia.copytoclipboard = {
 			}
 		} );
 	},
-	buttonEventListener: function( e ) {
+	buttonEventListener: async function( e ) {
 		const parent = e.target.closest( '.copy-to-clipboard' );
 		const text = parent.querySelector( '.copy-this' );
 		if ( text !== null ) {
-			const rawText = text.textContent;
-			if ( navigator.clipboard && navigator.clipboard.writeText ) {
-				navigator.clipboard.writeText( rawText );
-			} else {
-				liquipedia.copytoclipboard.createInputBox( parent, rawText );
-				liquipedia.copytoclipboard.selectAndCopy();
-				liquipedia.copytoclipboard.removeInputBox();
+			if ( !navigator.clipboard || !navigator.clipboard.writeText ) {
+				mw.notify( 'This browser does not support copying text to the clipboard.', { type: 'error' } );
+				return;
 			}
+			const rawText = text.textContent;
+			await navigator.clipboard.writeText( rawText );
 			liquipedia.copytoclipboard.showNotification( parent );
 		}
-	},
-	inputBox: null,
-	createInputBox: function( parent, text ) {
-		const input = document.createElement( 'input' );
-		input.value = text;
-		liquipedia.copytoclipboard.inputBox = input;
-		parent.appendChild( input );
-	},
-	removeInputBox: function() {
-		const input = liquipedia.copytoclipboard.inputBox;
-		liquipedia.copytoclipboard.inputBox = null;
-		input.parentNode.removeChild( input );
-	},
-	selectAndCopy: function() {
-		const input = liquipedia.copytoclipboard.inputBox;
-		input.focus();
-		input.select();
-		document.execCommand( 'copy' );
 	},
 	showNotification: function( copy ) {
 		const timeout = 2000;
