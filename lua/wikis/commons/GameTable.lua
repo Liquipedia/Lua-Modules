@@ -19,6 +19,7 @@ local MatchTable = Lua.import('Module:MatchTable')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLossIndicator')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local NOT_PLAYED = 'notplayed'
@@ -93,7 +94,11 @@ function GameTable:_displayGameScore(result, game)
 			toScore(indexes[1]),
 			SCORE_CONCAT,
 			toScore(indexes[2]),
-		}}
+		}},
+		self.config.showOpponent and TableWidgets.Cell{children = WinLossIndicator{
+			opponentIndex = indexes[2],
+			winner = game.winner,
+		}} or nil,
 	}
 end
 

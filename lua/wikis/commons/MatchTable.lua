@@ -621,12 +621,17 @@ function MatchTable:buildColumnDefinitions()
 			{
 				-- Result indicator column
 				align = 'center',
-				maxWidth = '1.5rem',
+				width = '1.25rem',
 			},
 			{
 				-- Score column
 				align = 'center',
 			},
+			config.showOpponent and {
+				-- Result indicator column
+				align = 'center',
+				width = '1.25rem',
+			} or nil,
 			{
 				-- vs Opponent column
 				align = 'left'
@@ -680,7 +685,7 @@ function MatchTable:headerRow()
 			config.showResult and WidgetUtil.collect(
 				config.showOpponent and makeHeaderCell(self.config.opponentHeader or 'Participant') or nil,
 				TableWidgets.CellHeader{
-					colspan = 2,
+					colspan = config.showOpponent and 3 or 2,
 					children = 'Score'
 				},
 				TableWidgets.CellHeader{
@@ -934,7 +939,15 @@ function MatchTable:_displayScore(match)
 			toScore(result.opponent, result.gameOpponents),
 			bestof1Score and BO1_SCORE_CONCAT or SCORE_CONCAT,
 			toScore(result.vs, result.gameVsOpponents)
-		}}
+		}},
+		self.config.showOpponent and TableWidgets.Cell{
+			children = WinLossIndicator{
+				opponentIndex = Array.indexOf(match.opponents, function (opponent)
+					return Opponent.same(result.vs, opponent)
+				end),
+				winner = match.winner,
+			}
+		} or nil,
 	}
 end
 
