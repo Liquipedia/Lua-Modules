@@ -59,7 +59,7 @@ class SelectAllContainer {
 
 liquipedia.selectall = {
 	init: function() {
-		document.querySelectorAll( '.selectall' ).forEach( ( selectall ) => {
+		document.querySelectorAll( 'pre.selectall' ).forEach( ( selectall ) => {
 			new SelectAllContainer( selectall ).createWrapper();
 		} );
 	}
