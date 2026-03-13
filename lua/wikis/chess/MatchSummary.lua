@@ -49,12 +49,6 @@ local KING_ICONS = {
 	},
 }
 
-local PLAYER_WRAPPER_CSS = {
-	display = 'flex',
-	gap = '0.25rem',
-	flex = '1',
-}
-
 ---@param args table
 ---@return Widget
 function CustomMatchSummary.getByMatchId(args)
@@ -82,8 +76,8 @@ function CustomMatchSummary.createGame(game, gameIndex)
 			CustomMatchSummary._getHeader(game),
 
 			-- Player 1
-			Div{
-				css = PLAYER_WRAPPER_CSS,
+			MatchSummaryWidgets.GameCenter{
+				css = {flex = 1},
 				children = {
 					CustomMatchSummary._getSideIcon(game.opponents[1]),
 					MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
@@ -97,8 +91,8 @@ function CustomMatchSummary.createGame(game, gameIndex)
 			},
 
 			-- Player 2
-			Div{
-				css = PLAYER_WRAPPER_CSS,
+			MatchSummaryWidgets.GameCenter{
+				css = {flex = 1},
 				children = {
 					MatchSummaryWidgets.GameTeamWrapper{flipped = true},
 					MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
