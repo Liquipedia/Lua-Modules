@@ -98,8 +98,12 @@ function ParticipantsTeamRoster:render()
 		-- Used for making the sorting stable
 		local playerToIndex = Table.map(players, function(index, player) return player, index end)
 		-- Sort the players based on their roles first, then by their original order
+		local sortOrder = participant.playerSortOrder
 		players = Array.sortBy(players, FnUtil.identity, function (a, b)
 			local function getPlayerSortOrder(player)
+				if sortOrder == 'alphabetical' then
+					return (player.displayName or ''):lower()
+				end
 				local roles = player.extradata.roles or {}
 				return roles[1] and roles[1].sortOrder or math.huge
 			end

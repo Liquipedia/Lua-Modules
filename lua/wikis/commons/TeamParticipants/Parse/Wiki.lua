@@ -38,7 +38,7 @@ function TeamParticipantsWikiParser.parseWikiInput(args)
 	local minimumPlayers = tonumber(args.minimumplayers)
 
 	local participants = Array.map(args, function (input)
-		return TeamParticipantsWikiParser.parseParticipant(input, date)
+		return TeamParticipantsWikiParser.parseParticipant(input, date, args.playerSortOrder)
 	end)
 
 	return {
@@ -127,8 +127,9 @@ end
 --- Parse a single participant from input
 ---@param input table
 ---@param defaultDate osdateparam
+---@param playerSortOrder 'alphabetical'?
 ---@return TeamParticipant
-function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
+function TeamParticipantsWikiParser.parseParticipant(input, defaultDate, playerSortOrder)
 	local potentialQualifiers = {}
 	local opponent
 	local warnings = {}
@@ -185,6 +186,7 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
 		date = date,
+		playerSortOrder = input.playerSortOrder or playerSortOrder,
 	}
 end
 
