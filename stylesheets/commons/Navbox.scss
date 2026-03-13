@@ -65,10 +65,8 @@ tr + tr > .navbox-list {
 	font-weight: bold;
 	padding-left: 1em;
 	padding-right: 1em;
-}
 
-@media ( max-width: 767px ) {
-	.navbox-group {
+	@media ( max-width: 767px ) {
 		padding-left: 0.25em;
 		padding-right: 0.25em;
 	}
