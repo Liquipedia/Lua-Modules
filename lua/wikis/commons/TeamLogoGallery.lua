@@ -25,7 +25,7 @@ function TeamLogoGallery.run(args)
 	args = args or {}
 	local name = (args.name or mw.title.getCurrentTitle().prefixedText):gsub('_', ' '):lower()
 
-	assert(mw.ext.TeamTemplate.teamexists(name), 'Missing team template "' .. name .. '"')
+	assert(TeamTemplate.exists(name), TeamTemplate.noTeamMessage(name))
 
 	local imageData = TeamLogoGallery._getImageData(name, Logic.readBool(args.showPresentLogo))
 
@@ -42,7 +42,7 @@ function TeamLogoGallery._getImageData(name, showPresentLogo)
 	for startDate, teamTemplate in Table.iter.spairs(historicalTeamTemplates) do
 		table.insert(imageDatas, {
 			startDate = startDate,
-			raw = mw.ext.TeamTemplate.raw(teamTemplate)
+			raw = TeamTemplate.getRaw(teamTemplate)
 		})
 	end
 
