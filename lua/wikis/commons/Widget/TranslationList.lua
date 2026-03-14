@@ -45,7 +45,7 @@ end
 function TranslationList._getTranslations()
 	return mw.ext.LiquipediaDB.lpdb('datapoint', {
 		limit = 5000,
-		conditions = '[[type::trans]]'
+		conditions = '[[type::translation]]'
 	})
 end
 
