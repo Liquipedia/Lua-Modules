@@ -21,7 +21,7 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 local CustomPrizePool = {}
 
 local TIER_VALUE = {8, 4, 2}
-local TIER_TYPE_MODIFIER = {Showmatch = 0,  Qualifier = 0.25, Monthly = 0.4, Weekly = 0.1}
+local TIER_TYPE_MODIFIER = {Showmatch = 0,  Misc = 0.1, Qualifier = 0.25, Monthly = 0.4, Weekly = 0.1}
 
 -- Template entry point
 ---@param frame Frame
