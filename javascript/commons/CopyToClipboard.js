@@ -20,7 +20,12 @@ liquipedia.copytoclipboard = {
 				return;
 			}
 			const rawText = text.textContent;
-			await navigator.clipboard.writeText( rawText );
+			try {
+				await navigator.clipboard.writeText( rawText );
+			} catch {
+				mw.notify( 'Failed to copy text to the clipboard.', { type: 'error' } );
+				return;
+			}
 			liquipedia.copytoclipboard.showNotification( parent );
 		}
 	},
