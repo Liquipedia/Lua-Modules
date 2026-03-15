@@ -203,6 +203,7 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 	local resultsInput = Logic.readBoolOrNil(playerInput.results)
 	local roles = RoleUtil.readRoleArgs(playerInput.role)
 	local playerType = playerInput.type or 'player'
+	local isFormer = playerType == 'former'
 
 	local hasNoStaffRoles = Array.all(roles, function(role) return role.type ~= RoleUtil.ROLE_TYPE.STAFF end)
 
@@ -214,6 +215,7 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 		roles = roles,
 		trophies = tonumber(playerInput.trophies),
 		type = playerType,
+		isFormer = isFormer,
 		played = Logic.nilOr(playedInput, true),
 		results = Logic.nilOr(resultsInput, playedInput, true),
 	}
