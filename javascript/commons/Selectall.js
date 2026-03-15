@@ -44,7 +44,7 @@ class SelectAllContainer {
 
 			this.selectElementText();
 			try {
-				await navigator.clipboard.writeText( this.element.innerText );
+				await navigator.clipboard.writeText( this.element.textContent );
 			} catch {
 				mw.notify( 'Failed to copy text to the clipboard.', { type: 'error' } );
 			}
