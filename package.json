@@ -23,7 +23,8 @@
 		"sass": "^1.97.3",
 		"stylelint": "^17.4.0",
 		"stylelint-config-wikimedia": "^0.18.0",
-		"stylelint-scss": "^7.x.x"
+		"stylelint-scss": "^7.x.x",
+		"types-mediawiki": "^2.0.0"
 	},
 	"jest": {
 		"reporters": [
