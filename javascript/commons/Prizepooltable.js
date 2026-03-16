@@ -39,6 +39,9 @@ liquipedia.prizepooltable = {
 						prizepooltable.querySelectorAll( 'tr:nth-child(2) th, tr:nth-child(2) td' ).length )
 					);
 					cellNode.classList.add( 'prizepooltabletoggle' );
+					cellNode.addEventListener( 'click', () => {
+						prizepooltable.classList.toggle( 'collapsed' );
+					} );
 
 					const showNode = document.createElement( 'small' );
 					showNode.classList.add( 'prizepooltableshow' );
@@ -53,11 +56,6 @@ liquipedia.prizepooltable = {
 					row.parentNode.insertBefore( rowNode, row );
 				}
 			}
-		} );
-		document.querySelectorAll( '.prizepooltabletoggle' ).forEach( ( prizepooltabletogglebutton ) => {
-			prizepooltabletogglebutton.onclick = function() {
-				this.closest( '.prizepooltable' ).classList.toggle( 'collapsed' );
-			};
 		} );
 	}
 };
