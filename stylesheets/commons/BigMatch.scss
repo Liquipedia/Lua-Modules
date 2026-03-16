@@ -1324,22 +1324,8 @@ span.slash {
 		&-map-info {
 			display: flex;
 			flex-direction: column;
+			gap: 0.5rem;
 			padding-top: 0.5rem;
-		}
-
-		&--ban &-map-action {
-			color: var( --clr-semantic-negative-40 );
-			font-weight: bold;
-		}
-
-		&--pick &-map-action {
-			color: var( --clr-semantic-positive-40 );
-			font-weight: bold;
-		}
-
-		&--decider &-map-action {
-			color: var( --clr-semantic-positive-40 );
-			font-weight: bold;
 		}
 	}
 }
