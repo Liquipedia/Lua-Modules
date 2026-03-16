@@ -901,48 +901,6 @@ div.brkts-popup-body-element-thumbs {
 			text-align: right;
 		}
 	}
-
-	#{&}-vetotype {
-		font-weight: bold;
-		color: var( --clr-primary-100 );
-		border: 0;
-		border-radius: 0.875rem;
-		letter-spacing: 0.1em;
-		font-family: "Source Code Pro", monospace;
-		padding: 0 0.5rem;
-	}
-
-	#{&}-pick {
-		.theme--light & {
-			background-color: var( --clr-semantic-positive-40, #27a527 ) !important;
-		}
-
-		.theme--dark & {
-			background-color: var( --clr-semantic-positive-20, #145214 ) !important;
-		}
-	}
-
-	#{&}-ban {
-		.theme--light & {
-			background-color: var( --clr-semantic-negative-40, #b81414 ) !important;
-		}
-
-		.theme--dark & {
-			background-color: var( --clr-semantic-negative-20, #5c0a0a ) !important;
-		}
-	}
-
-	#{&}-defaultban {
-		background-color: var( --clr-sapphire-background-color, #c4c5d3 ) !important;
-	}
-
-	#{&}-decider {
-		background-color: var( --clr-sun-10, #332b00 ) !important;
-	}
-
-	#{&}-protect {
-		background-color: var( --clr-vividviolet-background-color, #f1d2fa ) !important;
-	}
 }
 
 .brkts-popup-mvp {
