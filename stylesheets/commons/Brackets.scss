@@ -1525,3 +1525,47 @@ div.brkts-opponent-hover {
 		}
 	}
 }
+
+.brkts-veto-label {
+	display: inline-flex;
+	align-items: center;
+	align-self: center;
+	justify-content: center;
+	gap: 0.25rem;
+	padding: 0.25rem 0.5rem;
+	border-radius: 0.25rem;
+	font-size: 0.6875rem;
+	font-weight: bold;
+	line-height: 1rem;
+	text-transform: uppercase;
+
+	&.veto--pick {
+		color: var( --clr-semantic-positive-20 );
+		background-color: var( --clr-semantic-positive-90 );
+
+		.theme--dark & {
+			color: var( --clr-semantic-positive-90 );
+			background-color: var( --clr-semantic-positive-30 );
+		}
+	}
+
+	&.veto--ban {
+		color: var( --clr-semantic-negative-40 );
+		background-color: var( --clr-semantic-negative-96 );
+
+		.theme--dark & {
+			color: var( --clr-semantic-negative-90 );
+			background-color: var( --clr-semantic-negative-30 );
+		}
+	}
+
+	&.veto--decider {
+		color: var( --clr-semantic-gold-20 );
+		background-color: var( --clr-semantic-gold-90 );
+
+		.theme--dark & {
+			color: var( --clr-semantic-gold-90 );
+			background-color: var( --clr-semantic-gold-30 );
+		}
+	}
+}

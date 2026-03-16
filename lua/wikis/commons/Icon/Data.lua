@@ -40,6 +40,11 @@ return {
 	ace_valorant = 'fas fa-dagger',
 	flawless_valorant = 'fas fa-gem',
 
+	-- Usage: Veto labels
+	veto_pick = 'fas fa-check',
+	veto_ban = 'fas fa-times',
+	veto_decider = 'fas fa-flag-checkered',
+
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',
 	uncertain = 'fas fa-question',
