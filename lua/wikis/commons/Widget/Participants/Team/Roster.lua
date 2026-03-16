@@ -75,11 +75,11 @@ local function getRoleDisplays(player)
 	end
 	local function roleRightDisplay()
 		local rightRoles = {}
-		-- Add status label first (DNP or Left)
-		if not played then
-			table.insert(rightRoles, 'DNP')
-		elseif playerType == 'former' then
+		-- Add status label first (Left or DNP)
+		if playerType == 'former' then
 			table.insert(rightRoles, 'Left')
+		elseif not played then
+			table.insert(rightRoles, 'DNP')
 		end
 		-- Add non-ingame role if present
 		for _, role in ipairs(roles) do
