@@ -33,7 +33,23 @@ liquipedia.prizepooltable = {
 				const row = prizepooltable.querySelector( 'tr:nth-child(' + ( cutAfter + 2 ) + ')' );
 				if ( row !== null ) {
 					const rowNode = document.createElement( 'tr' );
-					rowNode.innerHTML = '<td colspan="' + Math.max( prizepooltable.querySelectorAll( 'tr:nth-child(1) th, tr:nth-child(1) td' ).length, prizepooltable.querySelectorAll( 'tr:nth-child(2) th, tr:nth-child(2) td' ).length ) + '" class="prizepooltabletoggle"><small class="prizepooltableshow">' + openText + '</small><small class="prizepooltablehide">' + closeText + '</small></td>';
+					const cellNode = document.createElement( 'td' );
+					cellNode.setAttribute( 'colspan', Math.max(
+						prizepooltable.querySelectorAll( 'tr:nth-child(1) th, tr:nth-child(1) td' ).length,
+						prizepooltable.querySelectorAll( 'tr:nth-child(2) th, tr:nth-child(2) td' ).length )
+					);
+					cellNode.classList.add( 'prizepooltabletoggle' );
+
+					const showNode = document.createElement( 'small' );
+					showNode.classList.add( 'prizepooltableshow' );
+					showNode.innerHTML = openText;
+
+					const closeNode = document.createElement( 'small' );
+					closeNode.classList.add( 'prizepooltablehide' );
+					closeNode.innerHTML = closeText;
+
+					cellNode.append( showNode, closeNode );
+					rowNode.appendChild( cellNode );
 					row.parentNode.insertBefore( rowNode, row );
 				}
 			}
