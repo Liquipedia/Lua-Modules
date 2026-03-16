@@ -222,12 +222,16 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 		return ceremonyCode:sub(9)
 	end
 
+	---@param round valorantMatchApiRound
 	---@param ceremony string?
 	---@param roundKills valorantMatchApiRoundKill[]
 	---@param winningTeam integer
 	---@return string?
-	local function processCeremony(ceremony, roundKills, winningTeam)
+	local function processCeremony(round, ceremony, roundKills, winningTeam)
 		if ceremony == 'Clutch' then
+			if Logic.isNotEmpty(round.bomb_defuser) then
+				return round.bomb_defuser
+			end
 			local killsFromWinningTeam = Array.filter(
 				roundKills,
 				function (roundKill)
@@ -300,7 +304,7 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 		---@type ValorantRoundData
 		return {
 			ceremony = ceremony,
-			ceremonyFor = processCeremony(ceremony, roundKills, winningTeam),
+			ceremonyFor = processCeremony(round, ceremony, roundKills, winningTeam),
 			firstKill = Logic.isNotEmpty(firstKill) and {
 				killer = firstKill.killer,
 				victim = firstKill.victim,
