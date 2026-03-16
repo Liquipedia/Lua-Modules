@@ -1099,15 +1099,6 @@ Author(s): Inflicted
 }
 
 /*******************************************************************************
-Module( s ): MatchTable
-Author(s): hjpalpha
-*******************************************************************************/
-.match-table-year-header {
-	font-weight: bold;
-	background-color: var( --table-striped-background-color, var( --clr-surface-2, #f5f5f5 ) );
-}
-
-/*******************************************************************************
 Template(s): Page Form Checkboxes
 Author(s): Inflicted
 *******************************************************************************/
@@ -2316,22 +2307,6 @@ Author(s): iMarbot
 
 .color-darkred {
 	color: #8b0000;
-}
-
-/*******************************************************************************
-Template(s): Template:Team matches table
-Author(s): iMarbot via ???
-*******************************************************************************/
-.recent-matches-bg-win {
-	background-color: var( --table-green-background-color, #f0fff0 ) !important;
-}
-
-.recent-matches-bg-tie {
-	background-color: var( --table-yellow-background-color, #f9f9c7 ) !important;
-}
-
-.recent-matches-bg-lose {
-	background-color: var( --table-red-background-color, #f9f0f2 ) !important;
 }
 
 /*******************************************************************************
