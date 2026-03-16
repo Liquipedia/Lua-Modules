@@ -26,7 +26,7 @@ local SwitchSyncLevel = {
 ---@field switchGroup string
 ---@field storeValue boolean
 ---@field defaultActive boolean
----@field syncLevel 'page'|'wiki'|'site'
+---@field syncLevel SwitchSyncLevel
 ---@field css table?
 ---@field content Renderable|Renderable[]?
 ---@field collapsibleSelector string?
@@ -40,7 +40,7 @@ SwitchWidget.defaultProps = {
 	switchGroup = 'switch',
 	storeValue = true,
 	defaultActive = false,
-	syncLevel = 'site',
+	syncLevel = SwitchSyncLevel.site,
 }
 
 ---@return Widget
