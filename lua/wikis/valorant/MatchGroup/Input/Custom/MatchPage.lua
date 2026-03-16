@@ -234,6 +234,9 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 					return Table.includes(map.teams[winningTeam].puuids, roundKill.killer)
 				end
 			)
+			if #killsFromWinningTeam == 0 then
+				return
+			end
 			return killsFromWinningTeam[#killsFromWinningTeam].killer
 		elseif ceremony == 'Ace' then
 			local _, killsByPlayer = Array.groupBy(roundKills, function (roundKill)
