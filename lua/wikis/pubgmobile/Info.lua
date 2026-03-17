@@ -29,8 +29,8 @@ return {
 			name = 'Game for Peace',
 			link = 'Game for Peace',
 			logo = {
-				darkMode = 'Game_for_Peace_alt darkmode.png',
-				lightMode = 'Game_for_Peace_alt lightmode.png',
+				darkMode = 'Game for Peace alt darkmode.png',
+				lightMode = 'Game for Peace alt lightmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'PUBG Default logo.png',
@@ -42,8 +42,8 @@ return {
 			name = 'Battlegrounds Mobile India',
 			link = 'Battlegrounds Mobile India',
 			logo = {
-				darkMode = 'Battlegrounds_Mobile_India_2022 darkmode.png',
-				lightMode = 'Battlegrounds_Mobile_India_2022 lightmode.png',
+				darkMode = 'Battlegrounds Mobile India 2022 darkmode.png',
+				lightMode = 'Battlegrounds Mobile India 2022 lightmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'PUBG Default logo.png',
