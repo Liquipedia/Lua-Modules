@@ -490,8 +490,8 @@ span.slash {
 .match-bm-players-player {
 	display: grid;
 	align-items: center;
-	grid-template-columns: 9.375rem auto max-content; /* set as default */
-	padding: 1rem;
+	grid-template-columns: 10.5rem auto max-content; /* set as default */
+	padding: 0.75rem 0.5rem;
 	background: var( --clr-on-surface-light-primary-8 );
 	border-radius: 0.5rem;
 	flex-wrap: wrap;
@@ -503,14 +503,14 @@ span.slash {
 	}
 
 	&.match-bm-players-player--col-2 {
-		grid-template-columns: 9.375rem auto;
+		grid-template-columns: 10.5rem auto;
 	}
 
 	&.match-bm-players-player--col-3 {
 		grid-template-columns: repeat( 2, 1fr );
 
 		@container players-team ( min-width: 560px ) {
-			grid-template-columns: 9.375rem auto max-content;
+			grid-template-columns: 10.5rem auto max-content;
 		}
 	}
 
