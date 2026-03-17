@@ -24,10 +24,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
-local ICONS = {
-	veto = VetoLabel{vetoType = 'ban'},
-	noCheck = '[[File:NoCheck.png|link=|16px]]',
-}
+local MAP_VETO_LABEL = VetoLabel{vetoType = 'ban'}
 
 local UNIFORM_MATCH = 'uniform'
 local TBD = 'TBD'
@@ -250,7 +247,7 @@ end
 ---@return MatchSummaryRow
 function StarcraftMatchSummary.Veto(veto)
 	local statusIcon = function(opponentIndex)
-		return opponentIndex == veto.by and ICONS.veto or ICONS.noCheck
+		return opponentIndex == veto.by and MAP_VETO_LABEL or nil
 	end
 
 	local map = veto.map or TBD
@@ -262,18 +259,23 @@ function StarcraftMatchSummary.Veto(veto)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
+		css = {
+			display = 'grid',
+			['grid-template-columns'] = 'repeat(3, 1fr)',
+			['align-items'] = 'center',
+		},
 		children = {
 			HtmlWidgets.Div{
-				classes = {'brkts-popup-spaced brkts-popup-winloss-icon'},
-				children = {statusIcon(1)},
+				css = {['text-align'] = 'left'},
+				children = statusIcon(1),
 			},
 			HtmlWidgets.Div{
 				css = {['text-align'] = 'center'},
 				children = {map},
 			},
 			HtmlWidgets.Div{
-				classes = {'brkts-popup-spaced brkts-popup-winloss-icon'},
-				children = {statusIcon(2)},
+				css = {['text-align'] = 'right'},
+				children = statusIcon(2),
 			}
 		},
 	}
