@@ -26,7 +26,6 @@ return {
 	matchpagelink = 'far fa-swords',
 	matchpopup = 'fas fa-info-circle',
 	timeout = 'far fa-clock',
-	veto = 'fas fa-times',
 	casters = 'fas fa-microphone-alt',
 	comment = 'far fa-comment',
 	mvp = 'fas fa-medal',

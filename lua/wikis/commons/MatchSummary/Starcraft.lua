@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Faction = Lua.import('Module:Faction')
 local FnUtil = Lua.import('Module:FnUtil')
-local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 
@@ -19,13 +18,14 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Custom')
+local VetoLabel = Lua.import('Module:Widget/Match/Summary/VetoLabel')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local ICONS = {
-	veto = Icon.makeIcon{iconName = 'veto', color = 'cinnabar-text', size = '110%'},
+	veto = VetoLabel{vetoType = 'ban'},
 	noCheck = '[[File:NoCheck.png|link=|16px]]',
 }
 
