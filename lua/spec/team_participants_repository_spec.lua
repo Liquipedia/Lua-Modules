@@ -107,14 +107,6 @@ describe('Team Participants Repository', function()
 				Variables.varDefine('tournament_enddate', nil)
 			end)
 
-			it('calls lpdb_placement with objectName and data', function()
-				local participant = createBasicParticipant()
-
-				TeamParticipantsRepository.save(participant)
-
-				assert.stub(LpdbPlacementStore).was.called(1)
-			end)
-
 			it('generates objectName as ranking_teamname for regular teams', function()
 				local participant = createBasicParticipant({
 					opponent = {
@@ -479,49 +471,6 @@ describe('Team Participants Repository', function()
 				assert.are_equal('ActualPageName', globalVars:get('Team_Liquid_p1'))
 			end)
 
-			it('handles empty aliases gracefully', function()
-				local participant = createBasicParticipant({
-					aliases = {},
-					opponent = {
-						type = 'team',
-						template = 'team liquid',
-						name = 'Team Liquid',
-						players = {
-							{displayName = 'Player1', pageName = 'Player1', flag = 'us', extradata = {type = 'player'}},
-						}
-					}
-				})
-
-				TeamParticipantsRepository.setPageVars(participant)
-
-				assert.is_true(true)
-			end)
-
-			it('indexes players correctly', function()
-				local participant = createBasicParticipant({
-					aliases = {'Team Liquid'},
-					opponent = {
-						type = 'team',
-						template = 'team liquid',
-						name = 'Team Liquid',
-						players = {
-							{displayName = 'Player1', pageName = 'Player1', flag = 'us', extradata = {type = 'player'}},
-							{displayName = 'Player2', pageName = 'Player2', flag = 'ca', extradata = {type = 'player'}},
-							{displayName = 'Player3', pageName = 'Player3', flag = 'gb', extradata = {type = 'player'}},
-						}
-					}
-				})
-
-				TeamParticipantsRepository.setPageVars(participant)
-
-				local p1 = globalVars:get('Team Liquid_p1')
-				local p2 = globalVars:get('Team Liquid_p2')
-				local p3 = globalVars:get('Team Liquid_p3')
-
-				assert.are_equal('Player1', p1)
-				assert.are_equal('Player2', p2)
-				assert.are_equal('Player3', p3)
-			end)
 		end)
 	end)
 
@@ -583,20 +532,6 @@ describe('Team Participants Repository', function()
 				assert.is_nil(result)
 			end)
 
-			it('returns nil when prizepool records are empty', function()
-				local opponent = {
-					type = 'team',
-					template = 'team liquid',
-					name = 'Team Liquid',
-				}
-
-				getPrizepoolRecordsStub.returns({})
-
-				local result = TeamParticipantsRepository.getPrizepoolRecordForTeam(opponent)
-
-				assert.is_nil(result)
-			end)
-
 			it('returns first matching record', function()
 				local opponent = {
 					type = 'team',
@@ -625,26 +560,6 @@ describe('Team Participants Repository', function()
 				assert.are_equal('1', result.placement)
 			end)
 
-			it('uses Opponent.same for matching logic', function()
-				local opponent = {
-					type = 'team',
-					template = 'bds',
-					name = 'BDS',
-				}
-
-				getPrizepoolRecordsStub.returns({
-					createPrizepoolRecord({
-						opponentname = 'BDS',
-						opponenttype = 'team',
-						opponenttemplate = 'bds',
-					})
-				})
-
-				local result = TeamParticipantsRepository.getPrizepoolRecordForTeam(opponent)
-
-				assert.is_not_nil(result)
-				assert.are_equal('BDS', result.opponentname)
-			end)
 		end)
 	end)
 

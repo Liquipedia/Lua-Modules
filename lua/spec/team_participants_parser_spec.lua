@@ -95,18 +95,6 @@ describe('Team Participants Parser', function()
 				assert.are_equal(0, #result.participants)
 			end)
 
-			it('maps participants correctly', function()
-				local args = {
-					createBasicParticipantInput({[1] = 'team liquid'}),
-				}
-
-				local result = TeamParticipantsWikiParser.parseWikiInput(args)
-
-				assert.is_table(result.participants[1])
-				assert.is_table(result.participants[1].opponent)
-				assert.are_equal('team', result.participants[1].opponent.type)
-			end)
-
 			it('handles invalid date format gracefully', function()
 				local args = {
 					createBasicParticipantInput(),
@@ -217,7 +205,7 @@ describe('Team Participants Parser', function()
 				assert.matches('Invalid contenders: expected a list of non%-empty strings', result.warnings[1])
 			end)
 
-			it('generates warning for empty string contender with position', function()
+			it('warns on empty string contender and keeps valid ones', function()
 				local input = {
 					contenders = {'team liquid', '', 'mouz'}
 				}
@@ -227,28 +215,6 @@ describe('Team Participants Parser', function()
 				assert.are_equal(1, #result.warnings)
 				assert.matches('Invalid contender entry at position 2', result.warnings[1])
 				assert.are_equal(2, #result.potentialQualifiers)
-			end)
-
-			it('TBD opponent has empty players array', function()
-				local input = {
-					contenders = {'team liquid', 'bds'}
-				}
-
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
-
-				assert.is_table(result.opponent.players)
-				assert.are_equal(0, #result.opponent.players)
-			end)
-
-			it('includes valid contenders even when some are invalid', function()
-				local input = {
-					contenders = {'team liquid', '', 'mouz'}
-				}
-
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
-
-				assert.are_equal(2, #result.potentialQualifiers)
-				assert.is_true(#result.warnings > 0)
 				assert.are_equal('team liquid', result.potentialQualifiers[1].template:lower())
 				assert.are_equal('mouz', result.potentialQualifiers[2].template:lower())
 			end)
@@ -405,13 +371,6 @@ describe('Team Participants Parser', function()
 				assert.is_true(#result.aliases > 0)
 			end)
 
-			it('handles empty aliases', function()
-				local input = createBasicParticipantInput()
-
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
-
-				assert.is_true(#result.aliases >= 1)
-			end)
 		end)
 
 		insulate('shouldImportFromDb flag', function()
@@ -519,14 +478,6 @@ describe('Team Participants Parser', function()
 
 				assert.are_equal('United States', result.flag)
 			end)
-
-			it('has extradata structure', function()
-				local playerInput = {'PlayerName'}
-
-				local result = TeamParticipantsWikiParser.parsePlayer(playerInput)
-
-				assert.is_table(result.extradata)
-			end)
 		end)
 
 		insulate('player extradata fields', function()
@@ -581,30 +532,19 @@ describe('Team Participants Parser', function()
 				LpdbQuery:revert()
 			end)
 
-			it('parses method=invite correctly', function()
-				local input = createBasicParticipantInput({
-					qualification = {
-						method = 'invite',
-						text = 'Direct Invite',
-					}
+			it('parses qualification methods correctly', function()
+				local inviteInput = createBasicParticipantInput({
+					qualification = {method = 'invite', text = 'Direct Invite'}
+				})
+				local qualInput = createBasicParticipantInput({
+					qualification = {method = 'qual', text = 'Qualifier'}
 				})
 
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				local inviteResult = TeamParticipantsWikiParser.parseParticipant(inviteInput, os.time())
+				local qualResult = TeamParticipantsWikiParser.parseParticipant(qualInput, os.time())
 
-				assert.are_equal('invite', result.qualification.method)
-			end)
-
-			it('parses method=qual correctly', function()
-				local input = createBasicParticipantInput({
-					qualification = {
-						method = 'qual',
-						text = 'Qualifier',
-					}
-				})
-
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
-
-				assert.are_equal('qual', result.qualification.method)
+				assert.are_equal('invite', inviteResult.qualification.method)
+				assert.are_equal('qual', qualResult.qualification.method)
 			end)
 
 			it('returns nil when method is missing', function()

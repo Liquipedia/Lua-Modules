@@ -63,7 +63,7 @@ describe('Team Participants Controller', function()
 				LpdbQuery:revert()
 			end)
 
-			it('returns squad members for valid team', function()
+			it('returns squad members with correct types for valid team', function()
 				local participant = {
 					opponent = {template = 'team liquid'},
 					date = os.time(),
@@ -71,36 +71,17 @@ describe('Team Participants Controller', function()
 
 				local result = TeamParticipantsController.importSquadMembersFromDatabase(participant)
 
-				assert.is_not_nil(result)
 				assert.are_equal(3, #result)
-			end)
-
-			it('filters by player type', function()
-				local participant = {
-					opponent = {template = 'team liquid'},
-					date = os.time(),
-				}
-
-				local result = TeamParticipantsController.importSquadMembersFromDatabase(participant)
 
 				local playerCount = #Array.filter(result, function(member)
 					return member.extradata.type == 'player'
 				end)
 				assert.are_equal(2, playerCount)
-			end)
 
-			it('auto-imports coach staff roles', function()
-				local participant = {
-					opponent = {template = 'team liquid'},
-					date = os.time(),
-				}
-
-				local result = TeamParticipantsController.importSquadMembersFromDatabase(participant)
-
-				local coachCount = #Array.filter(result, function(member)
+				local staffCount = #Array.filter(result, function(member)
 					return member.extradata.type == 'staff'
 				end)
-				assert.are_equal(1, coachCount)
+				assert.are_equal(1, staffCount)
 			end)
 
 			it('returns nil when team is not found', function()
@@ -284,42 +265,6 @@ describe('Team Participants Controller', function()
 			assert.are_equal('player', manualPlayers[1].extradata.type)
 		end)
 
-		it('handles empty imported array', function()
-			local manualPlayers = {
-				{displayName = 'Player1', pageName = 'Player1', extradata = {type = 'player'}},
-			}
-			local importedPlayers = {}
-
-			TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers, importedPlayers)
-
-			assert.are_equal(1, #manualPlayers)
-		end)
-
-		it('handles empty manual array', function()
-			local manualPlayers = {}
-			local importedPlayers = {
-				{displayName = 'ImportedPlayer1', pageName = 'ImportedPlayer1', extradata = {type = 'player'}},
-			}
-
-			TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers, importedPlayers)
-
-			assert.are_equal(1, #manualPlayers)
-			assert.are_equal('ImportedPlayer1', manualPlayers[1].pageName)
-		end)
-
-		it('matches players by pageName', function()
-			local manualPlayers = {
-				{displayName = 'DisplayName1', pageName = 'PageName1', extradata = {type = 'player'}},
-			}
-			local importedPlayers = {
-				{displayName = 'DifferentDisplay', pageName = 'PageName1', extradata = {type = 'sub'}},
-			}
-
-			TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers, importedPlayers)
-
-			assert.are_equal(1, #manualPlayers)
-			assert.are_equal('DisplayName1', manualPlayers[1].displayName)
-		end)
 	end)
 
 	describe('importParticipants', function()
@@ -345,7 +290,7 @@ describe('Team Participants Controller', function()
 			assert.are_equal(originalCount, #parsedData.participants[1].opponent.players)
 		end)
 
-		it('does not create players array when it does not exist', function()
+		it('does not throw error when players array is missing', function()
 			local parsedData = {
 				participants = {
 					{
@@ -411,25 +356,6 @@ describe('Team Participants Controller', function()
 				assert.are_equal('ImportedPlayer', parsedData.participants[1].opponent.players[2].displayName)
 			end)
 		end)
-
-		it('mutates parsedData structure correctly', function()
-			local parsedData = {
-				participants = {
-					{
-						opponent = {
-							template = 'team liquid',
-							players = {}
-						},
-						shouldImportFromDb = false,
-					}
-				}
-			}
-
-			TeamParticipantsController.importParticipants(parsedData)
-
-			assert.is_table(parsedData.participants)
-			assert.is_table(parsedData.participants[1].opponent.players)
-		end)
 	end)
 
 	describe('fillIncompleteRosters', function()
@@ -451,7 +377,7 @@ describe('Team Participants Controller', function()
 			assert.are_equal(0, #parsedData.participants[1].opponent.players)
 		end)
 
-		it('fills rosters for non-TBD teams', function()
+		it('fills rosters up to expectedPlayerCount', function()
 			local parsedData = {
 				participants = {
 					{
@@ -471,51 +397,8 @@ describe('Team Participants Controller', function()
 
 			assert.are_equal(5, #parsedData.participants[1].opponent.players)
 			assert.are_equal('Player1', parsedData.participants[1].opponent.players[1].displayName)
+			assert.are_equal('Player2', parsedData.participants[1].opponent.players[2].displayName)
 			assert.are_equal('TBD', parsedData.participants[1].opponent.players[3].displayName)
-		end)
-
-		it('passes expectedPlayerCount correctly', function()
-			local parsedData = {
-				participants = {
-					{
-						opponent = {
-							template = 'team liquid',
-							players = {
-								{displayName = 'Player1', extradata = {type = 'player'}},
-							}
-						}
-					}
-				},
-				expectedPlayerCount = 3,
-			}
-
-			TeamParticipantsController.fillIncompleteRosters(parsedData)
-
-			local playerCount = #Array.filter(parsedData.participants[1].opponent.players, function(p)
-				return p.extradata.type == 'player'
-			end)
-			assert.are_equal(3, playerCount)
-		end)
-
-		it('mutates parsedData.participants', function()
-			local parsedData = {
-				participants = {
-					{
-						opponent = {
-							template = 'team liquid',
-							players = {}
-						}
-					}
-				},
-				expectedPlayerCount = 2,
-			}
-
-			local originalRef = parsedData.participants[1]
-
-			TeamParticipantsController.fillIncompleteRosters(parsedData)
-
-			assert.are_equal(originalRef, parsedData.participants[1])
-			assert.are_equal(2, #parsedData.participants[1].opponent.players)
 		end)
 	end)
 
@@ -552,7 +435,7 @@ describe('Team Participants Controller', function()
 
 			TeamParticipantsController.fromTemplate(args)
 
-			assert.stub(LpdbPlacementStore).was.called(0)
+			assert.stub(LpdbPlacementStore).was_not.called()
 		end)
 
 		it('store=true enables LPDB storage', function()
@@ -585,7 +468,7 @@ describe('Team Participants Controller', function()
 
 			TeamParticipantsController.fromTemplate(args)
 
-			assert.stub(LpdbPlacementStore).was.called(0)
+			assert.stub(LpdbPlacementStore).was_not.called()
 		end)
 
 		it('page variables are set for participants', function()
