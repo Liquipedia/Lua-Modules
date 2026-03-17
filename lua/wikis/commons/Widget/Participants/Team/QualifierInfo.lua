@@ -79,23 +79,36 @@ function ParticipantsTeamQualifierInfo:render()
 	end
 
 	local content = Div{
-		classes = {'team-participant-card__qualifier', 'team-participant-card__qualifier--' .. location},
+		classes = {'team-participant-card-qualifier', 'team-participant-card-qualifier--' .. location},
 		children = {
 			Div{
-				classes = {'team-participant-card__qualifier-content'},
+				classes = {'team-participant-card-qualifier-content'},
 				children = WidgetUtil.collect(
 					icon,
 					Span{
-						classes = {'team-participant-card__qualifier-details'},
+						classes = {'team-participant-card-qualifier-details'},
 						children = textChildren
 					}
 				)
 			},
-			Placement.renderInWidget{placement = qualification.placement}
+			self:createPlacementBadge(qualification.placement)
 		}
 	}
 
 	return content
+end
+
+---@param placement number?
+---@return Widget?
+function ParticipantsTeamQualifierInfo:createPlacementBadge(placement)
+	if not placement then
+		return nil
+	end
+
+	return Span{
+		classes = {'team-participant-card-qualifier-placement'},
+		children = {'#' .. placement}
+	}
 end
 
 return ParticipantsTeamQualifierInfo
