@@ -933,12 +933,18 @@ span.slash {
 	}
 
 	&-faction {
+		display: flex;
 		width: 20px;
 		height: 20px;
 
 		@media ( max-width: 435px ) {
 			width: 16px;
 			height: 16px;
+		}
+
+		> img {
+			max-width: 100%;
+			height: auto;
 		}
 	}
 
