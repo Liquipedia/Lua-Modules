@@ -490,12 +490,12 @@ span.slash {
 .match-bm-players-player {
 	display: grid;
 	align-items: center;
-	grid-template-columns: 9.375rem calc( 100% - 21rem ) 9.5rem; /* set as default */
+	grid-template-columns: 9.375rem auto max-content; /* set as default */
 	padding: 1rem;
 	background: var( --clr-on-surface-light-primary-8 );
 	border-radius: 0.5rem;
 	flex-wrap: wrap;
-	justify-content: space-between;
+	justify-content: stretch;
 	gap: 0.5rem;
 
 	&.match-bm-players-player--col-1 {
@@ -503,14 +503,14 @@ span.slash {
 	}
 
 	&.match-bm-players-player--col-2 {
-		grid-template-columns: 9.375rem calc( 100% - 9.375rem );
+		grid-template-columns: 9.375rem auto;
 	}
 
 	&.match-bm-players-player--col-3 {
 		grid-template-columns: repeat( 2, 1fr );
 
 		@container players-team ( min-width: 560px ) {
-			grid-template-columns: 9.375rem calc( 100% - 21rem ) 9.5rem;
+			grid-template-columns: 9.375rem auto max-content;
 		}
 	}
 
