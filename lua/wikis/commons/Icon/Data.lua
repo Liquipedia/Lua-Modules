@@ -172,6 +172,7 @@ return {
 	dota2_barrack = 'fas fa-warehouse',
 
 	leagueoflegends_kda = 'fas fa-swords fa-flip-vertical',
+	leagueoflegends_killparticipation = 'fas fa-dagger',
 
 	-- Usage: Day night cycle information
 	day = 'fas fa-sun',
@@ -254,5 +255,8 @@ return {
 	dota2_spl_mechanics = 'fas fa-cog',
 	dota2_spl_interactions = 'fad fa-atom-alt',
 	dota2_spl_status = 'fas fa-hourglass-half',
-	dota2_spl_misc = 'fad fa-list-ul'
+	dota2_spl_misc = 'fad fa-list-ul',
+
+	-- Usage: Info button
+	['general-info'] = 'fas fa-info-circle',
 }

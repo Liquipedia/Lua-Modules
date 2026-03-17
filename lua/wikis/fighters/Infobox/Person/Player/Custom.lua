@@ -58,4 +58,13 @@ function CustomPlayer:getWikiCategories(categories)
 	end))
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args)
+	lpdbData.extradata.games = self.games
+
+	return lpdbData
+end
+
 return CustomPlayer
