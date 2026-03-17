@@ -36,8 +36,8 @@ liquipedia.prizepooltable = {
 					const cellNode = document.createElement( 'td' );
 					cellNode.setAttribute( 'colspan', Math.max(
 						prizepooltable.querySelectorAll( 'tr:nth-child(1) th, tr:nth-child(1) td' ).length,
-						prizepooltable.querySelectorAll( 'tr:nth-child(2) th, tr:nth-child(2) td' ).length )
-					);
+						prizepooltable.querySelectorAll( 'tr:nth-child(2) th, tr:nth-child(2) td' ).length
+					) );
 					cellNode.classList.add( 'prizepooltabletoggle' );
 					cellNode.addEventListener( 'click', () => {
 						prizepooltable.classList.toggle( 'collapsed' );
