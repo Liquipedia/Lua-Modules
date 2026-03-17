@@ -220,8 +220,6 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 			status = 'former'
 		elseif inputType == 'sub' then
 			status = 'sub'
-		else
-			status = 'active'
 		end
 	end
 
@@ -254,7 +252,7 @@ function TeamParticipantsWikiParser.fillIncompleteRoster(opponent, minimumPlayer
 	end
 
 	local actualPlayers = Array.filter(opponent.players, function(player)
-		return player.extradata.type == 'player' and player.extradata.status == 'active'
+		return player.extradata.type == 'player' and not player.extradata.status
 	end)
 
 	local actualPlayerCount = #actualPlayers

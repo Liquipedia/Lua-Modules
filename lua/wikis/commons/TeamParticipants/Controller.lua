@@ -105,7 +105,7 @@ function TeamParticipantsController.importSquadMembersFromDatabase(participant)
 	end)
 
 	return Array.map(membersToImport, function (member)
-		local status = 'active'
+		local status
 		if member.hasLeft then
 			status = 'former'
 		elseif member.role and member.role:lower() == 'substitute' then
