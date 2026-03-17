@@ -51,10 +51,9 @@ function TeamParticipantsController.fromTemplate(frame)
 	end
 	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
 
-	parsedData.participants = TeamParticipantsController.sortParticipants(
-		parsedData.participants,
-		args.participantsSortOrder
-	)
+	if args.participantsSortOrder == 'alphabetical' then
+		parsedData.participants = TeamParticipantsController.sortAlphabetically(parsedData.participants)
+	end
 
 	local showControls = not teamParticipantsVars:get('externalControlsRendered')
 
@@ -161,12 +160,18 @@ function TeamParticipantsController.fillIncompleteRosters(parsedData)
 end
 
 ---@param participants TeamParticipant[]
----@param sortOrder 'alphabetical'?
 ---@return TeamParticipant[]
-function TeamParticipantsController.sortParticipants(participants, sortOrder)
-	if sortOrder ~= 'alphabetical' or Logic.isEmpty(participants) then
+function TeamParticipantsController.sortAlphabetically(participants)
+	if Logic.isEmpty(participants) then
 		return participants
 	end
+
+	Array.forEach(participants, function(participant)
+		Array.sortInPlace(participant.opponent.players, function(player)
+			return (player.displayName or ''):lower()
+		end)
+		participant.playersAreSorted = true
+	end)
 
 	return Array.sortBy(participants, function(participant)
 		return Opponent.toName(participant.opponent):lower()

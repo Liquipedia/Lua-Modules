@@ -94,26 +94,11 @@ local ParticipantsTeamRoster = Class.new(Widget)
 ---@return Widget
 function ParticipantsTeamRoster:render()
 	local participant = self.props.participant
+
+	---@param players standardPlayer[]
+	---@return Widget
 	local makeRostersDisplay = function(players)
-		-- Used for making the sorting stable
-		local playerToIndex = Table.map(players, function(index, player) return player, index end)
-		-- Sort the players based on their roles first, then by their original order
-		local sortOrder = participant.playerSortOrder
-		players = Array.sortBy(players, FnUtil.identity, function (a, b)
-			local function getPlayerSortOrder(player)
-				if sortOrder == 'alphabetical' then
-					return (player.displayName or ''):lower()
-				end
-				local roles = player.extradata.roles or {}
-				return roles[1] and roles[1].sortOrder or math.huge
-			end
-			local orderA = getPlayerSortOrder(a)
-			local orderB = getPlayerSortOrder(b)
-			if orderA == orderB then
-				return playerToIndex[a] < playerToIndex[b]
-			end
-			return orderA < orderB
-		end)
+		players = participant.playersAreSorted and players or ParticipantsTeamRoster._sortPlayersForDisplay(players)
 		return Div{
 			classes = { 'team-participant-roster' },
 			children = Array.map(players, function(player, index)
@@ -179,6 +164,26 @@ function ParticipantsTeamRoster:render()
 			}
 		end),
 	}
+end
+
+---@param players standardPlayer[]
+---@return standardPlayer[]
+function ParticipantsTeamRoster._sortPlayersForDisplay(players)
+	-- Used for making the sorting stable
+	local playerToIndex = Table.map(players, function(index, player) return player, index end)
+	-- Sort the players based on their roles first, then by their original order
+	return Array.sortBy(players, FnUtil.identity, function (a, b)
+		local function getPlayerSortOrder(player)
+			local roles = player.extradata.roles or {}
+			return roles[1] and roles[1].sortOrder or math.huge
+		end
+		local orderA = getPlayerSortOrder(a)
+		local orderB = getPlayerSortOrder(b)
+		if orderA == orderB then
+			return playerToIndex[a] < playerToIndex[b]
+		end
+		return orderA < orderB
+	end)
 end
 
 return ParticipantsTeamRoster

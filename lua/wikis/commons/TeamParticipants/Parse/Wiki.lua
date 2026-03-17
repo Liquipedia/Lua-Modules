@@ -23,7 +23,7 @@ local TeamParticipantsWikiParser = {}
 
 ---@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
 ---qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer,
----potentialQualifiers: standardOpponent[]?, warnings: string[]?}
+---potentialQualifiers: standardOpponent[]?, warnings: string[]?, playersAreSorted: boolean?}
 
 ---@alias QualificationMethod 'invite'|'qual'
 ---@alias QualificationType 'tournament'|'internal'|'external'|'other'
@@ -38,7 +38,7 @@ function TeamParticipantsWikiParser.parseWikiInput(args)
 	local minimumPlayers = tonumber(args.minimumplayers)
 
 	local participants = Array.map(args, function (input)
-		return TeamParticipantsWikiParser.parseParticipant(input, date, args.playerSortOrder)
+		return TeamParticipantsWikiParser.parseParticipant(input, date)
 	end)
 
 	return {
@@ -127,9 +127,8 @@ end
 --- Parse a single participant from input
 ---@param input table
 ---@param defaultDate osdateparam
----@param playerSortOrder 'alphabetical'?
 ---@return TeamParticipant
-function TeamParticipantsWikiParser.parseParticipant(input, defaultDate, playerSortOrder)
+function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 	local potentialQualifiers = {}
 	local opponent
 	local warnings = {}
@@ -195,7 +194,6 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate, playerS
 		warnings = warnings,
 		shouldImportFromDb = Logic.readBool(input.import),
 		date = date,
-		playerSortOrder = input.playerSortOrder or playerSortOrder,
 	}
 end
 
