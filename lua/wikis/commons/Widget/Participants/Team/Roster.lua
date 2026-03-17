@@ -121,48 +121,48 @@ function ParticipantsTeamRoster:render()
 			end)
 
 			if #formerPlayers > 0 and #formerStaff > 0 then
-			local function makeRosterSection(sectionPlayers)
+				local function makeRosterSection(sectionPlayers)
+					return Div{
+						classes = { 'team-participant-roster' },
+						children = Array.map(sectionPlayers, function(player, index)
+							local playerTeam = participant.opponent.template ~= player.team and player.team or nil
+							local playerTeamAsOpponent = playerTeam and Opponent.readOpponentArgs{
+								type = Opponent.team,
+								template = playerTeam,
+							} or nil
+							local roleLeft, roleRight = getRoleDisplays(player)
+							return ParticipantsTeamMember{
+								player = player,
+								team = playerTeamAsOpponent,
+								even = index % 2 == 0,
+								roleLeft = roleLeft,
+								roleRight = roleRight,
+								trophies = player.extradata.trophies or 0,
+							}
+						end)
+					}
+				end
+
+				local children = {}
+				if #formerPlayers > 0 then
+					table.insert(children, Div{
+						classes = {'team-participant-card__subheader'},
+						children = 'Players'
+					})
+					table.insert(children, makeRosterSection(formerPlayers))
+				end
+				if #formerStaff > 0 then
+					table.insert(children, Div{
+						classes = {'team-participant-card__subheader'},
+						children = 'Staff'
+					})
+					table.insert(children, makeRosterSection(formerStaff))
+				end
+
 				return Div{
 					classes = { 'team-participant-roster' },
-					children = Array.map(sectionPlayers, function(player, index)
-						local playerTeam = participant.opponent.template ~= player.team and player.team or nil
-						local playerTeamAsOpponent = playerTeam and Opponent.readOpponentArgs{
-							type = Opponent.team,
-							template = playerTeam,
-						} or nil
-						local roleLeft, roleRight = getRoleDisplays(player)
-						return ParticipantsTeamMember{
-							player = player,
-							team = playerTeamAsOpponent,
-							even = index % 2 == 0,
-							roleLeft = roleLeft,
-							roleRight = roleRight,
-							trophies = player.extradata.trophies or 0,
-						}
-					end)
+					children = children
 				}
-			end
-
-			local children = {}
-			if #formerPlayers > 0 then
-				table.insert(children, Div{
-					classes = {'team-participant-card__subheader'},
-					children = 'Players'
-				})
-				table.insert(children, makeRosterSection(formerPlayers))
-			end
-			if #formerStaff > 0 then
-				table.insert(children, Div{
-					classes = {'team-participant-card__subheader'},
-					children = 'Staff'
-				})
-				table.insert(children, makeRosterSection(formerStaff))
-			end
-
-			return Div{
-				classes = { 'team-participant-roster' },
-				children = children
-			}
 			end
 		end
 
