@@ -51,7 +51,7 @@ function TeamParticipantsController.fromTemplate(frame)
 	end
 	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
 
-	if args.participantsSortOrder == 'alphabetical' then
+	if Logic.readBool(args.sortAlphabetically) then
 		parsedData.participants = TeamParticipantsController.sortAlphabetically(parsedData.participants)
 	end
 
@@ -167,7 +167,7 @@ function TeamParticipantsController.sortAlphabetically(participants)
 	end
 
 	Array.forEach(participants, function(participant)
-		Array.sortInPlace(participant.opponent.players, function(player)
+		Array.sortInPlaceBy(participant.opponent.players, function(player)
 			return (player.displayName or ''):lower()
 		end)
 		participant.playersAreSorted = true
