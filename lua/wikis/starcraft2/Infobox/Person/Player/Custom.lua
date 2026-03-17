@@ -42,7 +42,6 @@ local ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
 local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = Info.config.defaultMaxPlayersPerPlacement
 local MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS = 10
-local MAXIMUM_NUMBER_OF_ACHIEVEMENTS = 15
 local NUMBER_OF_RECENT_MATCHES = 10
 
 --race stuff
@@ -437,11 +436,6 @@ function CustomPlayer:_isAchievement(placement, tier, place)
 
 	return tier == 1 and place <= 2
 		or tier == 2 and place == 1
-		or #self.achievements < MAXIMUM_NUMBER_OF_ACHIEVEMENTS and (
-			tier == 1 and place <= 4 or
-			tier == 2 and place <= 2 or
-			tier == 3 and place <= 1
-		)
 end
 
 ---@return number?
