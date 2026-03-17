@@ -92,7 +92,6 @@ function MatchSummaryContainer:_buildChildren()
 				content = createMatchContainer(resetMatch),
 			},
 		},
-		size = 'small',
 		storeValue = false,
 		switchGroup = self.props.match.matchId .. '_resetSelector',
 	}

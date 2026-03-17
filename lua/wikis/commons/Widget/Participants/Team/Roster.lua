@@ -170,9 +170,7 @@ function ParticipantsTeamRoster:render()
 
 	return ContentSwitch{
 		switchGroup = 'team-participant-rosters-'.. switchGroupUniqueId,
-		variant = 'generic',
 		storeValue = false,
-		size = 'small',
 		css = {margin = '0.25rem 0.5rem'},
 		tabs = Array.map(tabs, function(tab)
 			return {
