@@ -19,7 +19,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
 ---@class ParticipantsTeamMember: Widget
----@field props {even: boolean?, roleLeft: string?, roleRight: string|string[]?, trophies: integer?,
+---@field props {even: boolean?, roleLeft: string?, roleRight: string[]?, trophies: integer?,
 ---strikethrough: boolean?, player: standardPlayer, team: standardOpponent?}
 ---@operator call(table): ParticipantsTeamMember
 local ParticipantsTeamMember = Class.new(Widget)
@@ -39,7 +39,7 @@ function ParticipantsTeamMember:render()
 		if not roleRight then
 			return nil
 		end
-		local labels = type(roleRight) == 'table' and roleRight or {roleRight}
+		local labels = roleRight
 		if #labels == 0 then
 			return nil
 		end
