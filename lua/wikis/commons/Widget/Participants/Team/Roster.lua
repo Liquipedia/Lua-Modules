@@ -166,6 +166,7 @@ function ParticipantsTeamRoster:render()
 	}
 end
 
+---@private
 ---@param players standardPlayer[]
 ---@return standardPlayer[]
 function ParticipantsTeamRoster._sortPlayersForDisplay(players)
