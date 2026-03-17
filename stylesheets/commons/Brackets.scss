@@ -1500,6 +1500,7 @@ div.brkts-opponent-hover {
 	font-weight: bold;
 	line-height: 1rem;
 	text-transform: uppercase;
+	white-space: nowrap;
 
 	&.veto--pick {
 		color: var( --clr-semantic-positive-20 );
