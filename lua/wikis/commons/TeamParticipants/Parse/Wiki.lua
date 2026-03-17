@@ -202,20 +202,32 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 	local playedInput = Logic.readBoolOrNil(playerInput.played)
 	local resultsInput = Logic.readBoolOrNil(playerInput.results)
 	local roles = RoleUtil.readRoleArgs(playerInput.role)
-	local playerType = playerInput.type or 'player'
-	local isFormer = playerType == 'former'
+	local inputType = playerInput.type or 'player'
+	local hasStaffRoles = Array.any(roles, function(role) return role.type == RoleUtil.ROLE_TYPE.STAFF end)
 
-	local hasNoStaffRoles = Array.all(roles, function(role) return role.type ~= RoleUtil.ROLE_TYPE.STAFF end)
+	local status = playerInput.status
+	if not status then
+		if inputType == 'former' then
+			status = 'former'
+		elseif inputType == 'sub' then
+			status = 'sub'
+		else
+			status = 'active'
+		end
+	end
 
-	if playerType ~= 'staff' and not hasNoStaffRoles then
+	local playerType
+	if inputType == 'staff' or hasStaffRoles then
 		playerType = 'staff'
+	else
+		playerType = 'player'
 	end
 
 	player.extradata = {
 		roles = roles,
 		trophies = tonumber(playerInput.trophies),
 		type = playerType,
-		isFormer = isFormer,
+		status = status,
 		played = Logic.nilOr(playedInput, true),
 		results = Logic.nilOr(resultsInput, playedInput, true),
 	}
@@ -233,7 +245,7 @@ function TeamParticipantsWikiParser.fillIncompleteRoster(opponent, minimumPlayer
 	end
 
 	local actualPlayers = Array.filter(opponent.players, function(player)
-		return player.extradata.type == 'player'
+		return player.extradata.type == 'player' and player.extradata.status == 'active'
 	end)
 
 	local actualPlayerCount = #actualPlayers

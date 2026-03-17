@@ -26,9 +26,9 @@ describe('Team Participants TBD Functionality', function()
 		it('fills roster when player count is below expected', function()
 			local opponent = {
 				players = {
-					{displayName = 'Player1', extradata = {type = 'player'}},
-					{displayName = 'Player2', extradata = {type = 'player'}},
-					{displayName = 'Player3', extradata = {type = 'player'}},
+					{displayName = 'Player1', extradata = {type = 'player', status = 'active'}},
+					{displayName = 'Player2', extradata = {type = 'player', status = 'active'}},
+					{displayName = 'Player3', extradata = {type = 'player', status = 'active'}},
 				}
 			}
 
@@ -43,11 +43,11 @@ describe('Team Participants TBD Functionality', function()
 		it('does not fill when roster is complete', function()
 			local opponent = {
 				players = {
-					{displayName = 'Player1', extradata = {type = 'player'}},
-					{displayName = 'Player2', extradata = {type = 'player'}},
-					{displayName = 'Player3', extradata = {type = 'player'}},
-					{displayName = 'Player4', extradata = {type = 'player'}},
-					{displayName = 'Player5', extradata = {type = 'player'}},
+					{displayName = 'Player1', extradata = {type = 'player', status = 'active'}},
+					{displayName = 'Player2', extradata = {type = 'player', status = 'active'}},
+					{displayName = 'Player3', extradata = {type = 'player', status = 'active'}},
+					{displayName = 'Player4', extradata = {type = 'player', status = 'active'}},
+					{displayName = 'Player5', extradata = {type = 'player', status = 'active'}},
 				}
 			}
 
@@ -60,13 +60,13 @@ describe('Team Participants TBD Functionality', function()
 		it('does not fill when roster exceeds expected', function()
 			local opponent = {
 				players = {
-					{displayName = 'Player1', extradata = {type = 'player'}},
-					{displayName = 'Player2', extradata = {type = 'player'}},
-					{displayName = 'Player3', extradata = {type = 'player'}},
-					{displayName = 'Player4', extradata = {type = 'player'}},
-					{displayName = 'Player5', extradata = {type = 'player'}},
-					{displayName = 'Player6', extradata = {type = 'player'}},
-					{displayName = 'Player7', extradata = {type = 'player'}},
+					{displayName = 'Player1', extradata = {type = 'player', status = 'active'}},
+					{displayName = 'Player2', extradata = {type = 'player', status = 'active'}},
+					{displayName = 'Player3', extradata = {type = 'player', status = 'active'}},
+					{displayName = 'Player4', extradata = {type = 'player', status = 'active'}},
+					{displayName = 'Player5', extradata = {type = 'player', status = 'active'}},
+					{displayName = 'Player6', extradata = {type = 'player', status = 'active'}},
+					{displayName = 'Player7', extradata = {type = 'player', status = 'active'}},
 				}
 			}
 
@@ -78,9 +78,9 @@ describe('Team Participants TBD Functionality', function()
 		it('only counts type=player when checking roster size', function()
 			local opponent = {
 				players = {
-					{displayName = 'Player1', extradata = {type = 'player'}},
-					{displayName = 'Player2', extradata = {type = 'player'}},
-					{displayName = 'Player3', extradata = {type = 'player'}},
+					{displayName = 'Player1', extradata = {type = 'player', status = 'active'}},
+					{displayName = 'Player2', extradata = {type = 'player', status = 'active'}},
+					{displayName = 'Player3', extradata = {type = 'player', status = 'active'}},
 					{displayName = 'Coach1', extradata = {type = 'staff'}},
 					{displayName = 'Coach2', extradata = {type = 'staff'}},
 				}
@@ -98,7 +98,7 @@ describe('Team Participants TBD Functionality', function()
 		it('handles missing data gracefully', function()
 			local opponent1 = {
 				players = {
-					{displayName = 'Player1', extradata = {type = 'player'}},
+					{displayName = 'Player1', extradata = {type = 'player', status = 'active'}},
 				}
 			}
 			TeamParticipantsWikiParser.fillIncompleteRoster(opponent1, nil)
