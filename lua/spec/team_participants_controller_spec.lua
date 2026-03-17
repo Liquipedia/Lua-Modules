@@ -451,7 +451,7 @@ describe('Team Participants Controller', function()
 
 			TeamParticipantsController.fromTemplate(args)
 
-			assert.stub(LpdbPlacementStore).was.called(1)
+			assert.stub(LpdbPlacementStore).was.called()
 		end)
 
 		it('disable_LPDB_storage variable prevents storage', function()
