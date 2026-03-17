@@ -618,7 +618,7 @@ describe('Team Participants Parser', function()
 
 				assert.has_error(function()
 					TeamParticipantsWikiParser.parseParticipant(input, os.time())
-				end, 'External qualifier must have text')
+				end, 'External or non-tournament qualifier must have text')
 			end)
 		end)
 
@@ -648,7 +648,7 @@ describe('Team Participants Parser', function()
 
 				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
 
-				assert.are_equal(3, result.qualification.placement)
+				assert.are_equal('3', result.qualification.placement)
 			end)
 
 			it('handles missing placement', function()

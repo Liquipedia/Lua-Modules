@@ -295,11 +295,11 @@ describe('Team Participants Repository', function()
 						template = 'team liquid',
 						name = 'Team Liquid',
 						players = {
-							{displayName = 'P1', pageName = 'P1', extradata = {type = 'player'}},
-							{displayName = 'P2', pageName = 'P2', extradata = {type = 'player'}},
-							{displayName = 'P3', pageName = 'P3', extradata = {type = 'player'}},
-							{displayName = 'P4', pageName = 'P4', extradata = {type = 'player'}},
-							{displayName = 'P5', pageName = 'P5', extradata = {type = 'player'}},
+							{displayName = 'P1', pageName = 'P1', extradata = {type = 'player', results = true}},
+							{displayName = 'P2', pageName = 'P2', extradata = {type = 'player', results = true}},
+							{displayName = 'P3', pageName = 'P3', extradata = {type = 'player', results = true}},
+							{displayName = 'P4', pageName = 'P4', extradata = {type = 'player', results = true}},
+							{displayName = 'P5', pageName = 'P5', extradata = {type = 'player', results = true}},
 						}
 					}
 				})
@@ -314,10 +314,10 @@ describe('Team Participants Repository', function()
 						template = 'bds',
 						name = 'BDS',
 						players = {
-							{displayName = 'P1', pageName = 'P1', extradata = {type = 'player'}},
-							{displayName = 'P2', pageName = 'P2', extradata = {type = 'player'}},
-							{displayName = 'Sub1', pageName = 'Sub1', extradata = {type = 'sub'}},
-							{displayName = 'Coach', pageName = 'Coach', extradata = {type = 'staff'}},
+							{displayName = 'P1', pageName = 'P1', extradata = {type = 'player', results = true}},
+							{displayName = 'P2', pageName = 'P2', extradata = {type = 'player', results = true}},
+							{displayName = 'Sub1', pageName = 'Sub1', extradata = {type = 'sub', results = true}},
+							{displayName = 'Coach', pageName = 'Coach', extradata = {type = 'staff', results = true}},
 						}
 					}
 				})
@@ -467,7 +467,7 @@ describe('Team Participants Repository', function()
 				assert.are_equal('DisplayName', globalVars:get('Team Liquid_p1dn'))
 				assert.are_equal('us', globalVars:get('Team Liquid_p1flag'))
 				assert.are_equal('Player2', globalVars:get('Team Liquid_p2'))
-				assert.are_equal('Coach1', globalVars:get('Team Liquid_c3'))
+				assert.are_equal('Coach1', globalVars:get('Team Liquid_c1'))
 				assert.are_equal('ActualPageName', globalVars:get('Team_Liquid_p1'))
 			end)
 
