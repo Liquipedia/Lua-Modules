@@ -41,6 +41,8 @@ local BASE_CURRENCY = 'USD'
 ---@field cutafter integer?
 ---@field title string?
 ---@field precision integer?
+---@field legendTitle string?
+---@field showLegend boolean
 ---@field autoexchange boolean
 ---@field showMatchWL boolean
 ---@field showGameWL boolean
@@ -55,7 +57,7 @@ StageWinnings.defaultProps = {
 	delimiter = ',',
 	autoexchange = true,
 	prizeMode = 'matchWins',
-	title = 'Group Stage Winnings'
+	title = 'Group Stage Winnings',
 }
 
 ---@return Widget?
@@ -104,26 +106,30 @@ function StageWinnings:render()
 		}
 	end
 
-	return TableWidgets.Table{
-		caption = props.title,
-		tableClasses = {'prizepooltable', 'collapsed'},
-		tableAttributes = {
-			['data-cutafter'] = (tonumber(props.cutafter) or 5),
-			['data-opentext'] = 'Show remaining participants',
-			['data-closetext'] = 'Hide remaining participants',
+	return HtmlWidgets.Div{children = {
+		TableWidgets.Table{
+			caption = props.title,
+			tableClasses = {'prizepooltable', 'collapsed'},
+			tableAttributes = {
+				['data-cutafter'] = (tonumber(props.cutafter) or 5),
+				['data-opentext'] = 'Show remaining participants',
+				['data-closetext'] = 'Hide remaining participants',
+			},
+			columns = WidgetUtil.collect(
+				{align = 'left'},
+				(Logic.readBool(props.showMatchWL) or props.prizeMode == 'matchWins') and {align = 'center'} or nil,
+				(Logic.readBool(props.showGameWL) or props.prizeMode == 'gameWins') and {align = 'center'} or nil,
+				Logic.readBool(props.showScore) and {align = 'left'} or nil,
+				Logic.isNotEmpty(props.localcurrency) and {align = 'right'} or nil,
+				(Logic.readBool(props.autoexchange) or Logic.isEmpty(props.localcurrency)) and {align = 'right'} or nil
+			),
+			children = {
+				self:_headerRow(),
+				TableWidgets.TableBody{children = Array.map(opponentList, FnUtil.curry(self._row, self))}
+			},
 		},
-		columns = WidgetUtil.collect(
-			{align = 'left'},
-			(Logic.readBool(props.showMatchWL) or props.prizeMode == 'matchWins') and {align = 'center'} or nil,
-			(Logic.readBool(props.showGameWL) or props.prizeMode == 'gameWins') and {align = 'center'} or nil,
-			Logic.readBool(props.showScore) and {align = 'left'} or nil,
-			Logic.isNotEmpty(props.localcurrency) and {align = 'right'} or nil,
-			(Logic.readBool(props.autoexchange) or Logic.isEmpty(props.localcurrency)) and {align = 'right'} or nil
-		),
-		children = {
-			self:_headerRow(),
-			TableWidgets.TableBody{children = Array.map(opponentList, FnUtil.curry(self._row, self))}
-		},
+		Logic.readBool(props.showLegend) and self:_getLegendTable(valueByScore) or nil
+		}
 	}
 end
 
@@ -223,6 +229,114 @@ function StageWinnings._detailedScores(scoresTable)
 		end),
 		HtmlWidgets.Br{}
 	)
+end
+
+---@param valueByScore table<string, integer>?
+---@return Widget
+function StageWinnings:_getLegendTable(valueByScore)
+	local props = self.props
+
+	local currencyDisplayConfig = {
+		displaySymbol = true,
+		formatValue = true,
+		displayCurrencyCode = false,
+		formatPrecision = tonumber(props.precision) or 0,
+	}
+	local showLocalCurrency = Logic.isNotEmpty(props.localcurrency)
+	local showBaseCurrency = Logic.readBool(props.autoexchange) or Logic.isEmpty(props.localcurrency)
+	local currencyRate = self.currencyRate or 1
+
+	---@param currency string
+	---@param amount string?
+	local function currencyCell(currency, amount)
+		return TableWidgets.Cell{children = Currency.display(currency, tonumber(amount) or 0, currencyDisplayConfig)}
+	end
+
+	---@param amount string?
+	local function localCurrencyCell(amount)
+		return showLocalCurrency and currencyCell(props.localcurrency, amount) or nil
+	end
+
+	---@param amount string?
+	local function baseCurrencyCell(amount)
+		return showBaseCurrency and currencyCell(BASE_CURRENCY, amount * currencyRate) or nil
+	end
+
+	local sortedScoreEntries = Array.extractValues(Table.map(valueByScore or {}, function(scoreline, prize)
+		local wins, losses = scoreline:match('^(%d+)%-(%d+)$')
+		return scoreline, {
+			scoreline = scoreline,
+			prize = prize,
+			wins = tonumber(wins),
+			losses = tonumber(losses),
+		}
+	end))
+	table.sort(sortedScoreEntries, function(a, b)
+		if a.wins ~= nil and b.wins ~= nil then
+			local diffA = a.wins - a.losses
+			local diffB = b.wins - b.losses
+			if diffA ~= diffB then
+				return diffA > diffB
+			end
+			if a.wins ~= b.wins then
+				return a.wins > b.wins
+			end
+			if a.losses ~= b.losses then
+				return a.losses < b.losses
+			end
+			return a.scoreline < b.scoreline
+		end
+		if a.wins ~= nil then
+			return true
+		end
+		if b.wins ~= nil then
+			return false
+		end
+		return a.scoreline < b.scoreline
+	end)
+
+	return TableWidgets.Table{
+		caption = props.legendTitle or 'Prize Distribution',
+		columns = WidgetUtil.collect(
+			{align = 'left'},
+			showLocalCurrency and {align = 'right'} or nil,
+			showBaseCurrency and {align = 'right'} or nil
+		),
+		children = {
+			TableWidgets.TableHeader{children = {
+				TableWidgets.Row{children = WidgetUtil.collect(
+					TableWidgets.CellHeader{children = 'Score'},
+					showLocalCurrency
+						and TableWidgets.CellHeader{children = Currency.display(props.localcurrency)} or nil,
+					showBaseCurrency
+						and TableWidgets.CellHeader{children = Currency.display(BASE_CURRENCY)} or nil
+				)}
+			}},
+			TableWidgets.TableBody{children = WidgetUtil.collect(
+				tonumber(props.valueStart) and TableWidgets.Row{
+					children = WidgetUtil.collect(
+						TableWidgets.Cell{children = 'Starting Prize'},
+						localCurrencyCell(props.valueStart),
+						baseCurrencyCell(props.valueStart)
+					)
+				} or nil,
+				(props.prizeMode == 'matchWins' or props.prizeMode == 'gameWins') and TableWidgets.Row{
+					children = WidgetUtil.collect(
+						TableWidgets.Cell{children = props.prizeMode == 'matchWins' and 'Match Win' or 'Game Win'},
+						localCurrencyCell(props.valuePerWin),
+						baseCurrencyCell(props.valuePerWin)
+					)
+				} or nil,
+				props.prizeMode == 'scores' and WidgetUtil.collect(Array.map(sortedScoreEntries, function(scoreEntry)
+					return TableWidgets.Row{children = WidgetUtil.collect(
+						TableWidgets.Cell{children = scoreEntry.scoreline},
+						localCurrencyCell(scoreEntry.prize),
+						baseCurrencyCell(scoreEntry.prize)
+					)}
+				end)) or nil
+			)}
+		}
+	}
 end
 
 return StageWinnings
