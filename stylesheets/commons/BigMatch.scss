@@ -446,10 +446,6 @@ span.slash {
 	grid-gap: 1rem;
 	align-items: flex-start;
 
-	@media ( min-width: 414px ) {
-		font-size: 0.9375rem;
-	}
-
 	@media ( max-width: 435px ) {
 		font-size: 0.75rem;
 	}
@@ -490,7 +486,7 @@ span.slash {
 .match-bm-players-player {
 	display: grid;
 	align-items: center;
-	grid-template-columns: 10.5rem auto max-content; /* set as default */
+	grid-template-columns: 10rem auto max-content; /* set as default */
 	padding: 0.75rem 0.5rem;
 	background: var( --clr-on-surface-light-primary-8 );
 	border-radius: 0.5rem;
@@ -580,7 +576,6 @@ span.slash {
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
-		font-size: 0.9375rem;
 		word-wrap: anywhere;
 		word-break: normal;
 
@@ -726,7 +721,6 @@ span.slash {
 
 		&-data {
 			font-weight: bold;
-			font-size: 0.9375rem;
 
 			.wiki-leagueoflegends & {
 				@media ( max-width: 413px ) {
