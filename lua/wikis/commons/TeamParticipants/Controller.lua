@@ -52,7 +52,7 @@ function TeamParticipantsController.fromTemplate(frame)
 	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
 
 	if Logic.readBool(args.sortAlphabetically) then
-		parsedData.participants = TeamParticipantsController.sortAlphabetically(parsedData.participants)
+		parsedData.participants = TeamParticipantsController._sortAlphabetically(parsedData.participants)
 	end
 
 	local showControls = not teamParticipantsVars:get('externalControlsRendered')
@@ -159,9 +159,10 @@ function TeamParticipantsController.fillIncompleteRosters(parsedData)
 	end)
 end
 
+---@private
 ---@param participants TeamParticipant[]
 ---@return TeamParticipant[]
-function TeamParticipantsController.sortAlphabetically(participants)
+function TeamParticipantsController._sortAlphabetically(participants)
 	if Logic.isEmpty(participants) then
 		return participants
 	end
