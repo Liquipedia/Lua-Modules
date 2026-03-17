@@ -1511,7 +1511,8 @@ div.brkts-opponent-hover {
 		}
 	}
 
-	&.veto--ban {
+	&.veto--ban,
+	&.veto--defaultban {
 		color: var( --clr-semantic-negative-40 );
 		background-color: var( --clr-semantic-negative-96 );
 
@@ -1528,6 +1529,16 @@ div.brkts-opponent-hover {
 		.theme--dark & {
 			color: var( --clr-semantic-gold-90 );
 			background-color: var( --clr-semantic-gold-30 );
+		}
+	}
+
+	&.veto--protect {
+		color: var( --clr-semantic-silver-20 );
+		background-color: var( --clr-semantic-silver-90 );
+
+		.theme--dark & {
+			color: var( --clr-semantic-silver-90 );
+			background-color: var( --clr-semantic-silver-30 );
 		}
 	}
 }

@@ -43,7 +43,9 @@ return {
 	-- Usage: Veto labels
 	veto_pick = 'fas fa-check',
 	veto_ban = 'fas fa-times',
+	veto_defaultban = 'fas fa-times',
 	veto_decider = 'fas fa-flag-checkered',
+	veto_protect = 'fas fa-lock',
 
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',
