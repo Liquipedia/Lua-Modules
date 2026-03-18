@@ -54,7 +54,15 @@ async function build() {
 		const processedMainContent = removeOriginalCode( mainJsContent );
 
 		const warningMessage = "console.warn('Browser is using locally compiled JavaScript, and cannot be fully trusted to match the production counterpart.')";
-		const finalContent = warningMessage + processedMainContent + '\n\n' + concatenatedModules;
+		// Expose liquipedia on window so the dev proxy can detect and re-initialize modules.
+		// Core.js uses `const liquipedia` (correct for production), but `const` is not
+		// accessible as window.liquipedia, which the dev proxy requires.
+		const exposeOnWindow = 'window.liquipedia = liquipedia;';
+		const concatenatedModulesWithExpose = concatenatedModules.replace(
+			/(const liquipedia\s*=\s*(?:window\.liquipedia\s*\|\|\s*)?\{[^}]*\};)/,
+			`$1\n${ exposeOnWindow }`
+		);
+		const finalContent = warningMessage + processedMainContent + '\n\n' + concatenatedModulesWithExpose;
 
 		await fs.mkdir( path.dirname( outFile ), { recursive: true } );
 		await fs.writeFile( outFile, finalContent );
