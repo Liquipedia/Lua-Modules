@@ -313,7 +313,7 @@ function StageWinnings:_getLegendTable(valueByScore)
 				)}
 			}},
 			TableWidgets.TableBody{children = WidgetUtil.collect(
-				tonumber(props.valueStart) and TableWidgets.Row{
+				(tonumber(props.valueStart) or 0) > 0 and TableWidgets.Row{
 					children = WidgetUtil.collect(
 						TableWidgets.Cell{children = 'Starting Prize'},
 						localCurrencyCell(props.valueStart),
