@@ -42,7 +42,7 @@ local BASE_CURRENCY = 'USD'
 ---@field title string?
 ---@field precision integer?
 ---@field legendTitle string?
----@field showLegend boolean
+---@field showLegend boolean?
 ---@field autoexchange boolean
 ---@field showMatchWL boolean
 ---@field showGameWL boolean
