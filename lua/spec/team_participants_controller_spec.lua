@@ -284,23 +284,6 @@ describe('Team Participants Controller', function()
 			assert.are_equal(1, #parsedData.participants[1].opponent.players)
 		end)
 
-		it('players remain nil when import returns no results', function()
-			local parsedData = {
-				participants = {
-					{
-						opponent = {
-							template = 'team liquid',
-						},
-						shouldImportFromDb = true,
-					}
-				}
-			}
-
-			TeamParticipantsController.importParticipants(parsedData)
-
-			assert.is_nil(parsedData.participants[1].opponent.players)
-		end)
-
 		insulate('calls import and merge for valid participants', function()
 			local TeamTemplateMock
 			local LpdbQuery

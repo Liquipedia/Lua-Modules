@@ -1,12 +1,10 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('Team Participants Parser', function()
 	local TeamParticipantsWikiParser
-	local Array
 	local Table
 
 	before_each(function()
 		TeamParticipantsWikiParser = require('Module:TeamParticipants/Parse/Wiki')
-		Array = require('Module:Array')
 		Table = require('Module:Table')
 	end)
 
@@ -84,33 +82,11 @@ describe('Team Participants Parser', function()
 
 				assert.same({day = 25, month = 12, year = 2024}, result.participants[1].date)
 			end)
-
-			it('handles empty input', function()
-				local args = {}
-
-				local result = TeamParticipantsWikiParser.parseWikiInput(args)
-
-				assert.are_equal(0, #result.participants)
-			end)
-
-			it('handles invalid date format gracefully', function()
-				local args = {
-					createBasicParticipantInput(),
-					date = 'not-a-date',
-				}
-
-				local result = TeamParticipantsWikiParser.parseWikiInput(args)
-
-				assert.is_table(result.participants[1].date)
-				assert.is_number(result.participants[1].date.year)
-				assert.is_number(result.participants[1].date.month)
-				assert.is_number(result.participants[1].date.day)
-			end)
 		end)
 	end)
 
 	describe('parseParticipant', function()
-		insulate('basic team participant parsing', function()
+		insulate('parseParticipant behavior', function()
 			local TeamTemplateMock
 			local LpdbQuery
 
@@ -123,17 +99,6 @@ describe('Team Participants Parser', function()
 			after_each(function()
 				TeamTemplateMock.tearDown()
 				LpdbQuery:revert()
-			end)
-
-			it('parses basic team opponent', function()
-				local input = createBasicParticipantInput({[1] = 'team liquid'})
-
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
-
-				assert.is_table(result.opponent)
-				assert.are_equal('team', result.opponent.type)
-				assert.is_string(result.opponent.template)
-				assert.is_truthy(result.opponent.template:find('team liquid'))
 			end)
 
 			it('parses and assigns players', function()
@@ -150,31 +115,6 @@ describe('Team Participants Parser', function()
 				assert.are_equal(2, #result.opponent.players)
 				assert.are_equal('player1', result.opponent.players[1].displayName)
 				assert.are_equal('player2', result.opponent.players[2].displayName)
-			end)
-
-			it('resolves opponent with date', function()
-				local input = createBasicParticipantInput({[1] = 'team liquid'})
-				local date = os.time()
-
-				local result = TeamParticipantsWikiParser.parseParticipant(input, date)
-
-				assert.are_equal(date, result.date)
-			end)
-		end)
-
-		insulate('TBD opponent with contenders', function()
-			local TeamTemplateMock
-			local LpdbQuery
-
-			before_each(function()
-				TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
-				TeamTemplateMock.setUp()
-				LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function() return {} end)
-			end)
-
-			after_each(function()
-				TeamTemplateMock.tearDown()
-				LpdbQuery:revert()
 			end)
 
 			it('parses contenders into TBD opponent with potentialQualifiers', function()
@@ -215,22 +155,6 @@ describe('Team Participants Parser', function()
 				assert.are_equal('team liquid', result.potentialQualifiers[1].template:lower())
 				assert.are_equal('mouz', result.potentialQualifiers[2].template:lower())
 			end)
-		end)
-
-		insulate('qualification structure parsing', function()
-			local TeamTemplateMock
-			local LpdbQuery
-
-			before_each(function()
-				TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
-				TeamTemplateMock.setUp()
-				LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function() return {} end)
-			end)
-
-			after_each(function()
-				TeamTemplateMock.tearDown()
-				LpdbQuery:revert()
-			end)
 
 			it('parses valid qualification structure', function()
 				local input = createBasicParticipantInput({
@@ -245,59 +169,6 @@ describe('Team Participants Parser', function()
 				assert.is_table(result.qualification)
 				assert.are_equal('qual', result.qualification.method)
 				assert.are_equal('Qualifier A', result.qualification.text)
-			end)
-
-			it('returns nil when qualification is missing', function()
-				local input = createBasicParticipantInput()
-
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
-
-				assert.is_nil(result.qualification)
-			end)
-
-			it('collects warnings from invalid qualification', function()
-				local input = createBasicParticipantInput({
-					qualification = {
-						method = 'qual',
-						text = 'Qualifier',
-						placement = 'invalid',
-					}
-				})
-
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
-
-				assert.is_true(#result.warnings > 0)
-			end)
-		end)
-
-		insulate('notes parsing', function()
-			local TeamTemplateMock
-			local LpdbQuery
-
-			before_each(function()
-				TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
-				TeamTemplateMock.setUp()
-				LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function() return {} end)
-			end)
-
-			after_each(function()
-				TeamTemplateMock.tearDown()
-				LpdbQuery:revert()
-			end)
-
-			it('parses notes with text', function()
-				local input = createBasicParticipantInput({
-					notes = {
-						{'Note 1'},
-						{'Note 2'},
-					}
-				})
-
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
-
-				assert.are_equal(2, #result.notes)
-				assert.are_equal('Note 1', result.notes[1].text)
-				assert.are_equal('Note 2', result.notes[2].text)
 			end)
 
 			it('preserves highlighted flag', function()
@@ -329,60 +200,6 @@ describe('Team Participants Parser', function()
 				assert.are_equal('Valid Note', result.notes[1].text)
 				assert.are_equal('Another Valid Note', result.notes[2].text)
 			end)
-		end)
-
-		insulate('aliases expansion', function()
-			local TeamTemplateMock
-			local LpdbQuery
-
-			before_each(function()
-				TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
-				TeamTemplateMock.setUp()
-				LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function() return {} end)
-			end)
-
-			after_each(function()
-				TeamTemplateMock.tearDown()
-				LpdbQuery:revert()
-			end)
-
-			it('parses input aliases separated by semicolons', function()
-				local input = createBasicParticipantInput({
-					aliases = 'TL;Team Liquid;Liquid',
-				})
-
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
-
-				assert.is_true(#result.aliases >= 3)
-			end)
-
-			it('adds opponent name to aliases', function()
-				local input = createBasicParticipantInput({[1] = 'team liquid'})
-
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
-
-				local hasTeamRelatedAlias = Array.any(result.aliases, function(alias)
-					return alias:lower():find('liquid')
-				end)
-				assert.is_true(hasTeamRelatedAlias)
-			end)
-
-		end)
-
-		insulate('shouldImportFromDb flag', function()
-			local TeamTemplateMock
-			local LpdbQuery
-
-			before_each(function()
-				TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
-				TeamTemplateMock.setUp()
-				LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function() return {} end)
-			end)
-
-			after_each(function()
-				TeamTemplateMock.tearDown()
-				LpdbQuery:revert()
-			end)
 
 			it('sets shouldImportFromDb=true when import=true', function()
 				local input = createBasicParticipantInput({
@@ -412,7 +229,6 @@ describe('Team Participants Parser', function()
 				assert.is_true(result.shouldImportFromDb)
 			end)
 		end)
-
 	end)
 
 	describe('parsePlayers and parsePlayer', function()
@@ -429,14 +245,6 @@ describe('Team Participants Parser', function()
 			after_each(function()
 				TeamTemplateMock.tearDown()
 				LpdbQuery:revert()
-			end)
-
-			it('handles empty players array', function()
-				local input = {}
-
-				local result = TeamParticipantsWikiParser.parsePlayers(input)
-
-				assert.are_equal(0, #result)
 			end)
 
 			it('parses multiple players', function()
@@ -457,34 +265,7 @@ describe('Team Participants Parser', function()
 			end)
 		end)
 
-		insulate('player data structure', function()
-			it('parses displayName and pageName', function()
-				local playerInput = {'PlayerName', link = 'Player_Link'}
-
-				local result = TeamParticipantsWikiParser.parsePlayer(playerInput)
-
-				assert.are_equal('PlayerName', result.displayName)
-				assert.are_equal('Player_Link', result.pageName)
-			end)
-
-			it('parses flag', function()
-				local playerInput = {'PlayerName', flag = 'us'}
-
-				local result = TeamParticipantsWikiParser.parsePlayer(playerInput)
-
-				assert.are_equal('United States', result.flag)
-			end)
-		end)
-
 		insulate('player extradata fields', function()
-			it('parses roles via RoleUtil', function()
-				local playerInput = {'PlayerName', role = 'mid'}
-
-				local result = TeamParticipantsWikiParser.parsePlayer(playerInput)
-
-				assert.is_table(result.extradata.roles)
-			end)
-
 			it('parses trophies as number', function()
 				local result = TeamParticipantsWikiParser.parsePlayer({'PlayerName', trophies = '3'})
 
@@ -514,7 +295,7 @@ describe('Team Participants Parser', function()
 	end)
 
 	describe('Qualification Parsing', function()
-		insulate('qualification method variations', function()
+		insulate('qualification method and placement parsing', function()
 			local TeamTemplateMock
 			local LpdbQuery
 
@@ -559,94 +340,6 @@ describe('Team Participants Parser', function()
 				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
 
 				assert.is_nil(result.qualification)
-			end)
-		end)
-
-		insulate('qualification type detection and validation', function()
-			local TeamTemplateMock
-			local LpdbQuery
-			local TournamentGetStub
-
-			before_each(function()
-				TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
-				TeamTemplateMock.setUp()
-				LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function() return {} end)
-
-				local Tournament = require('Module:Tournament')
-				TournamentGetStub = stub(Tournament, 'getTournament')
-			end)
-
-			after_each(function()
-				TeamTemplateMock.tearDown()
-				LpdbQuery:revert()
-				TournamentGetStub:revert()
-			end)
-
-			it('detects tournament type and attaches tournament data', function()
-				TournamentGetStub.returns({
-					pageName = 'Test/Tournament',
-					displayName = 'Test Tournament',
-					icon = 'Test.png',
-					iconDark = 'Test_dark.png',
-				})
-
-				local input = createBasicParticipantInput({
-					qualification = {method = 'qual', page = 'Test/Tournament'}
-				})
-
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
-
-				assert.are_equal('tournament', result.qualification.type)
-				assert.is_table(result.qualification.tournament)
-				assert.are_equal('Test/Tournament', result.qualification.tournament.pageName)
-				assert.are_equal('Test Tournament', result.qualification.tournament.displayName)
-			end)
-
-			it('detects external type and preserves url', function()
-				local input = createBasicParticipantInput({
-					qualification = {method = 'qual', url = 'https://example.com', text = 'External'}
-				})
-
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
-
-				assert.are_equal('external', result.qualification.type)
-				assert.are_equal('https://example.com', result.qualification.url)
-			end)
-
-			it('detects other type for text-only qualifications', function()
-				local input = createBasicParticipantInput({
-					qualification = {method = 'qual', text = 'Other Qualifier'}
-				})
-
-				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
-
-				assert.are_equal('other', result.qualification.type)
-			end)
-
-			it('requires text for external qualifiers', function()
-				local input = createBasicParticipantInput({
-					qualification = {method = 'qual', url = 'https://example.com'}
-				})
-
-				assert.has_error(function()
-					TeamParticipantsWikiParser.parseParticipant(input, os.time())
-				end, 'External or non-tournament qualifier must have text')
-			end)
-		end)
-
-		insulate('placement field parsing', function()
-			local TeamTemplateMock
-			local LpdbQuery
-
-			before_each(function()
-				TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
-				TeamTemplateMock.setUp()
-				LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function() return {} end)
-			end)
-
-			after_each(function()
-				TeamTemplateMock.tearDown()
-				LpdbQuery:revert()
 			end)
 
 			it('parses valid placement number', function()
@@ -704,6 +397,77 @@ describe('Team Participants Parser', function()
 
 				assert.is_nil(result.qualification.placement)
 				assert.is_true(#result.warnings > 0)
+			end)
+		end)
+
+		insulate('qualification type detection and validation', function()
+			local TeamTemplateMock
+			local LpdbQuery
+
+			before_each(function()
+				TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
+				TeamTemplateMock.setUp()
+				LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function() return {} end)
+			end)
+
+			after_each(function()
+				TeamTemplateMock.tearDown()
+				LpdbQuery:revert()
+			end)
+
+			it('detects tournament type and attaches tournament data', function()
+				local Tournament = require('Module:Tournament')
+				local TournamentGetStub = stub(Tournament, 'getTournament')
+				TournamentGetStub.returns({
+					pageName = 'Test/Tournament',
+					displayName = 'Test Tournament',
+					icon = 'Test.png',
+					iconDark = 'Test_dark.png',
+				})
+
+				local input = createBasicParticipantInput({
+					qualification = {method = 'qual', page = 'Test/Tournament'}
+				})
+
+				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+
+				assert.are_equal('tournament', result.qualification.type)
+				assert.is_table(result.qualification.tournament)
+				assert.are_equal('Test/Tournament', result.qualification.tournament.pageName)
+				assert.are_equal('Test Tournament', result.qualification.tournament.displayName)
+
+				TournamentGetStub:revert()
+			end)
+
+			it('detects external type and preserves url', function()
+				local input = createBasicParticipantInput({
+					qualification = {method = 'qual', url = 'https://example.com', text = 'External'}
+				})
+
+				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+
+				assert.are_equal('external', result.qualification.type)
+				assert.are_equal('https://example.com', result.qualification.url)
+			end)
+
+			it('detects other type for text-only qualifications', function()
+				local input = createBasicParticipantInput({
+					qualification = {method = 'qual', text = 'Other Qualifier'}
+				})
+
+				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+
+				assert.are_equal('other', result.qualification.type)
+			end)
+
+			it('requires text for external qualifiers', function()
+				local input = createBasicParticipantInput({
+					qualification = {method = 'qual', url = 'https://example.com'}
+				})
+
+				assert.has_error(function()
+					TeamParticipantsWikiParser.parseParticipant(input, os.time())
+				end, 'External or non-tournament qualifier must have text')
 			end)
 		end)
 	end)

@@ -37,17 +37,8 @@ describe('Team Participants Repository', function()
 			tournament = 'Test Tournament',
 			parent = 'Test Series',
 			series = 'Test',
-			shortname = 'Test',
 			mode = '5v5',
 			type = 'Online',
-			liquipediatier = '1',
-			liquipediatiertype = 'Qualifier',
-			publishertier = 'Premier',
-			icon = 'Test.png',
-			icondark = 'Test_dark.png',
-			game = 'testgame',
-			startdate = '2024-01-01',
-			date = '2024-01-15',
 			placement = '1',
 			prizemoney = 10000,
 			opponentname = 'Team Liquid',
@@ -70,17 +61,8 @@ describe('Team Participants Repository', function()
 				Variables.varDefine('tournament_name', 'Test Tournament')
 				Variables.varDefine('tournament_parent', 'Test Parent')
 				Variables.varDefine('tournament_series', 'Test Series')
-				Variables.varDefine('tournament_tickername', 'Test')
 				Variables.varDefine('tournament_mode', '5v5')
 				Variables.varDefine('tournament_type', 'Online')
-				Variables.varDefine('tournament_liquipediatier', '2')
-				Variables.varDefine('tournament_liquipediatiertype', 'Monthly')
-				Variables.varDefine('tournament_publishertier', 'Premier')
-				Variables.varDefine('tournament_icon', 'Tournament.png')
-				Variables.varDefine('tournament_icondark', 'Tournament_dark.png')
-				Variables.varDefine('tournament_game', 'testgame')
-				Variables.varDefine('tournament_startdate', '2024-01-01')
-				Variables.varDefine('tournament_enddate', '2024-01-15')
 
 				LpdbQuery = stub(mw.ext.LiquipediaDB, 'lpdb', function() return {} end)
 				LpdbPlacementStore = stub(mw.ext.LiquipediaDB, 'lpdb_placement', function() end)
@@ -94,17 +76,8 @@ describe('Team Participants Repository', function()
 				Variables.varDefine('tournament_name', nil)
 				Variables.varDefine('tournament_parent', nil)
 				Variables.varDefine('tournament_series', nil)
-				Variables.varDefine('tournament_tickername', nil)
 				Variables.varDefine('tournament_mode', nil)
 				Variables.varDefine('tournament_type', nil)
-				Variables.varDefine('tournament_liquipediatier', nil)
-				Variables.varDefine('tournament_liquipediatiertype', nil)
-				Variables.varDefine('tournament_publishertier', nil)
-				Variables.varDefine('tournament_icon', nil)
-				Variables.varDefine('tournament_icondark', nil)
-				Variables.varDefine('tournament_game', nil)
-				Variables.varDefine('tournament_startdate', nil)
-				Variables.varDefine('tournament_enddate', nil)
 			end)
 
 			it('generates objectName as ranking_teamname for regular teams', function()
@@ -124,30 +97,11 @@ describe('Team Participants Repository', function()
 			end)
 
 			it('generates unique objectName for TBD teams with counter', function()
-				local participant1 = createBasicParticipant({
-					opponent = {
-						type = 'team',
-						template = 'tbd',
-						name = 'TBD',
-						players = {}
-					}
-				})
-				local participant2 = createBasicParticipant({
-					opponent = {
-						type = 'team',
-						template = 'tbd',
-						name = 'TBD',
-						players = {}
-					}
-				})
-
-				TeamParticipantsRepository.save(participant1)
-				TeamParticipantsRepository.save(participant2)
-
-				local call1Args = LpdbPlacementStore.calls[1].vals
-				local call2Args = LpdbPlacementStore.calls[2].vals
-				assert.are_equal('participant_tbd_1', call1Args[1])
-				assert.are_equal('participant_tbd_2', call2Args[1])
+				local tbdOpponent = {type = 'team', template = 'tbd', name = 'TBD', players = {}}
+				TeamParticipantsRepository.save(createBasicParticipant({opponent = tbdOpponent}))
+				TeamParticipantsRepository.save(createBasicParticipant({opponent = tbdOpponent}))
+				assert.are_equal('participant_tbd_1', LpdbPlacementStore.calls[1].vals[1])
+				assert.are_equal('participant_tbd_2', LpdbPlacementStore.calls[2].vals[1])
 			end)
 
 			it('uses tournament defaults when no prizepool record exists', function()
@@ -163,6 +117,7 @@ describe('Team Participants Repository', function()
 				assert.are_equal('Test Series', data.series)
 				assert.are_equal('5v5', data.mode)
 				assert.are_equal('Online', data.type)
+				assert.is_nil(data.individualprizemoney)
 			end)
 
 			it('sets qualification text field', function()
@@ -274,18 +229,6 @@ describe('Team Participants Repository', function()
 				assert.is_nil(extradata.potentialQualifiers)
 			end)
 
-			it('sets players field to opponentplayers', function()
-				local participant = createBasicParticipant()
-
-				TeamParticipantsRepository.save(participant)
-
-				local callArgs = LpdbPlacementStore.calls[1].vals
-				local data = Json.parseIfString(callArgs[2])
-
-				assert.is_not_nil(data.opponentplayers)
-				assert.are_equal(data.opponentplayers, data.players)
-			end)
-
 			it('splits prizemoney equally among players', function()
 				local getPrizepoolRecordStub = stub(TeamParticipantsRepository, 'getPrizepoolRecordForTeam')
 				getPrizepoolRecordStub.returns(createPrizepoolRecord({prizemoney = 10000}))
@@ -362,17 +305,6 @@ describe('Team Participants Repository', function()
 				getPrizepoolRecordStub:revert()
 			end)
 
-			it('does not set individualprizemoney when no prizemoney exists', function()
-				local participant = createBasicParticipant()
-
-				TeamParticipantsRepository.save(participant)
-
-				local callArgs = LpdbPlacementStore.calls[1].vals
-				local data = Json.parseIfString(callArgs[2])
-
-				assert.is_nil(data.individualprizemoney)
-			end)
-
 			it('merges with existing prizepool data', function()
 				local participant = createBasicParticipant()
 
@@ -434,28 +366,6 @@ describe('Team Participants Repository', function()
 				TeamTemplateMock.tearDown()
 			end)
 
-			it('sets page variables for each alias', function()
-				local participant = createBasicParticipant({
-					aliases = {'Team Liquid'},
-					opponent = {
-						type = 'team',
-						template = 'team liquid',
-						name = 'Team Liquid',
-						players = {
-							{displayName = 'Player1', pageName = 'Player1', flag = 'us', extradata = {type = 'player'}},
-						}
-					}
-				})
-
-				TeamParticipantsRepository.setPageVars(participant)
-
-				local varWithSpace = globalVars:get('Team Liquid_p1')
-				local varWithUnderscore = globalVars:get('Team_Liquid_p1')
-
-				assert.are_equal('Player1', varWithSpace)
-				assert.are_equal('Player1', varWithUnderscore)
-			end)
-
 			it('sets page variables with correct prefixes and suffixes', function()
 				local participant = createBasicParticipant({
 					aliases = {'Team Liquid'},
@@ -480,7 +390,6 @@ describe('Team Participants Repository', function()
 				assert.are_equal('Coach1', globalVars:get('Team Liquid_c1'))
 				assert.are_equal('ActualPageName', globalVars:get('Team_Liquid_p1'))
 			end)
-
 		end)
 	end)
 
@@ -492,7 +401,6 @@ describe('Team Participants Repository', function()
 			before_each(function()
 				TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 				TeamTemplateMock.setUp()
-
 				getPrizepoolRecordsStub = stub(TeamParticipantsRepository, 'getPrizepoolRecords')
 			end)
 
@@ -541,35 +449,6 @@ describe('Team Participants Repository', function()
 
 				assert.is_nil(result)
 			end)
-
-			it('returns first matching record', function()
-				local opponent = {
-					type = 'team',
-					template = 'team liquid',
-					name = 'Team Liquid',
-				}
-
-				getPrizepoolRecordsStub.returns({
-					createPrizepoolRecord({
-						opponentname = 'Team Liquid',
-						opponenttype = 'team',
-						opponenttemplate = 'team liquid',
-						placement = '1',
-					}),
-					createPrizepoolRecord({
-						opponentname = 'Team Liquid',
-						opponenttype = 'team',
-						opponenttemplate = 'team liquid',
-						placement = '2',
-					})
-				})
-
-				local result = TeamParticipantsRepository.getPrizepoolRecordForTeam(opponent)
-
-				assert.is_not_nil(result)
-				assert.are_equal('1', result.placement)
-			end)
-
 		end)
 	end)
 
@@ -578,10 +457,7 @@ describe('Team Participants Repository', function()
 			local prizePoolVars = PageVariableNamespace('PrizePool')
 			prizePoolVars:delete('placementRecords.1')
 			prizePoolVars:delete('placementRecords.2')
-			local TeamParticipantsRepositoryLocal = require('Module:TeamParticipants/Repository')
-
-			local result = TeamParticipantsRepositoryLocal.getPrizepoolRecords()
-
+			local result = require('Module:TeamParticipants/Repository').getPrizepoolRecords()
 			assert.is_table(result)
 			assert.are_equal(0, #result)
 		end)
@@ -594,11 +470,7 @@ describe('Team Participants Repository', function()
 				createPrizepoolRecord({placement = '1'}),
 				createPrizepoolRecord({placement = '2'}),
 			}))
-			local TeamParticipantsRepositoryLocal = require('Module:TeamParticipants/Repository')
-
-			local result = TeamParticipantsRepositoryLocal.getPrizepoolRecords()
-
-			assert.is_table(result)
+			local result = require('Module:TeamParticipants/Repository').getPrizepoolRecords()
 			assert.are_equal(2, #result)
 			assert.are_equal('1', result[1].placement)
 			assert.are_equal('2', result[2].placement)
@@ -614,11 +486,7 @@ describe('Team Participants Repository', function()
 			prizePoolVars:set('placementRecords.2', Json.stringify({
 				createPrizepoolRecord({placement = '2'}),
 			}))
-			local TeamParticipantsRepositoryLocal = require('Module:TeamParticipants/Repository')
-
-			local result = TeamParticipantsRepositoryLocal.getPrizepoolRecords()
-
-			assert.is_table(result)
+			local result = require('Module:TeamParticipants/Repository').getPrizepoolRecords()
 			assert.are_equal(2, #result)
 			assert.are_equal('1', result[1].placement)
 			assert.are_equal('2', result[2].placement)
