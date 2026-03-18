@@ -34,6 +34,8 @@
  * HTML Attributes:
  * - data-switch-group (required): The name of the switch group. Elements with the same switch group name are connected.
  * - data-store-value (optional): If set to true, the state of the switch button will be stored in the local storage.
+ * - data-sync-level (optional): Defines storage scope - 'site' (default, shared across all wikis),
+ *   'wiki' (shared within a wiki), or 'page' (unique per page).
  * - data-switch-value (only for pill): The value that the switch button will have when it is active.
  *
  * Events:
@@ -52,13 +54,17 @@
  */
 
 liquipedia.switchButtons = {
-	baseLocalStorageKey: null,
 	triggerEventName: 'switchButtonChanged',
 	switchGroups: {},
 	isInitialized: false,
+	syncLevels: {
+		PAGE: 'page',
+		WIKI: 'wiki',
+		SITE: 'site'
+	},
+	baseLocalStorageKey: 'LiquipediaSwitchButtons',
 
 	init: function () {
-		this.baseLocalStorageKey = this.buildLocalStorageKey();
 		this.initSwitchElements( 'toggle', '.switch-toggle', 'switch-toggle-active' );
 		this.initSwitchElements( 'pill', '.switch-pill', 'switch-pill-option-active' );
 		this.isInitialized = true;
@@ -77,6 +83,47 @@ liquipedia.switchButtons = {
 		} );
 	},
 
+	buildLocalStorageKey: function ( groupName, syncLevel ) {
+		const base = this.baseLocalStorageKey;
+
+		if ( syncLevel === this.syncLevels.SITE ) {
+			return `${ base }_${ groupName }`;
+		}
+
+		const scriptPath = mw.config.get( 'wgScriptPath' ).replace( /[\W]/g, '' );
+		const pageName = mw.config.get( 'wgPageName' );
+
+		if ( syncLevel === this.syncLevels.WIKI ) {
+			return `${ base }-${ scriptPath }_${ groupName }`;
+		}
+
+		return `${ base }-${ scriptPath }-${ pageName }_${ groupName }`;
+	},
+
+	getLocalStorageValue: function ( switchGroup ) {
+		const groupName = switchGroup.name;
+		const syncLevel = switchGroup.syncLevel;
+		const localStorageKey = this.buildLocalStorageKey( groupName, syncLevel );
+		const storageValue = window.localStorage.getItem( localStorageKey );
+
+		if ( storageValue === null ) {
+			return null;
+		}
+
+		if ( switchGroup.type === 'toggle' ) {
+			return storageValue === 'true';
+		} else {
+			return storageValue;
+		}
+	},
+
+	setLocalStorageValue: function ( switchGroup, value ) {
+		const groupName = switchGroup.name;
+		const syncLevel = switchGroup.syncLevel;
+		const localStorageKey = this.buildLocalStorageKey( groupName, syncLevel );
+		window.localStorage.setItem( localStorageKey, value );
+	},
+
 	getOrCreateSwitchGroup: function ( type, groupName, element, activeClassName ) {
 		if ( !this.switchGroups[ groupName ] ) {
 			const switchGroup = {
@@ -87,6 +134,7 @@ liquipedia.switchButtons = {
 				nodeSet: new Set(),
 				boundNodes: new WeakSet(),
 				isStoredInLocalStorage: element.dataset.storeValue === 'true',
+				syncLevel: element.dataset.syncLevel || this.syncLevels.SITE,
 				value: null // Default value
 			};
 
@@ -174,7 +222,7 @@ liquipedia.switchButtons = {
 					switchGroup.value = newValue;
 
 					if ( switchGroup.isStoredInLocalStorage ) {
-						this.setLocalStorageValue( switchGroup.name, newValue );
+						this.setLocalStorageValue( switchGroup, newValue );
 					}
 					this.updateDOM( switchGroup, newValue );
 					this.triggerCustomEvent( node, switchGroup );
@@ -189,34 +237,6 @@ liquipedia.switchButtons = {
 		} else {
 			return element.dataset.switchValue;
 		}
-	},
-
-	buildLocalStorageKey: function () {
-		const base = 'LiquipediaSwitchButtons';
-		const scriptPath = mw.config.get( 'wgScriptPath' ).replace( /[\W]/g, '' );
-		const pageName = mw.config.get( 'wgPageName' );
-		return `${ base }-${ scriptPath }-${ pageName }`;
-	},
-
-	getLocalStorageValue: function ( switchGroup ) {
-		const groupName = switchGroup.name;
-		const localStorageKey = `${ this.baseLocalStorageKey }_${ groupName }`;
-		const storageValue = window.localStorage.getItem( localStorageKey );
-
-		if ( storageValue === null ) {
-			return null;
-		}
-
-		if ( switchGroup.type === 'toggle' ) {
-			return storageValue === 'true';
-		} else {
-			return storageValue;
-		}
-	},
-
-	setLocalStorageValue: function ( groupName, value ) {
-		const localStorageKey = `${ this.baseLocalStorageKey }_${ groupName }`;
-		window.localStorage.setItem( localStorageKey, value );
 	},
 
 	triggerCustomEvent: function ( node, data ) {
