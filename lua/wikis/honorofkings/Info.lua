@@ -17,12 +17,12 @@ return {
 			name = 'Arena of Valor',
 			link = 'Arena of Valor',
 			logo = {
-				darkMode = 'Arena of Valor 2022 lightmode.png',
-				lightMode = 'Arena of Valor 2022 darkmode.png',
+				darkMode = 'Arena of Valor 2022 darkmode.png',
+				lightMode = 'Arena of Valor 2022 lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Arena of Valor 2022 lightmode.png',
-				lightMode = 'Arena of Valor 2022 darkmode.png',
+				darkMode = 'Arena of Valor 2022 darkmode.png',
+				lightMode = 'Arena of Valor 2022 lightmode.png',
 			},
 		},
 		aovas = {
