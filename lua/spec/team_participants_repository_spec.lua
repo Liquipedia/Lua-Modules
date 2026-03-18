@@ -282,14 +282,15 @@ describe('Team Participants Repository', function()
 				local callArgs = LpdbPlacementStore.calls[1].vals
 				local data = Json.parseIfString(callArgs[2])
 
-				assert.is_not_nil(data.players)
+				assert.is_not_nil(data.opponentplayers)
 				assert.are_equal(data.opponentplayers, data.players)
 			end)
 
-			it('calculates individualprizemoney correctly based on player types', function()
+			it('splits prizemoney equally among players', function()
 				local getPrizepoolRecordStub = stub(TeamParticipantsRepository, 'getPrizepoolRecordForTeam')
+				getPrizepoolRecordStub.returns(createPrizepoolRecord({prizemoney = 10000}))
 
-				local fivePlayers = createBasicParticipant({
+				local participant = createBasicParticipant({
 					opponent = {
 						type = 'team',
 						template = 'team liquid',
@@ -303,12 +304,20 @@ describe('Team Participants Repository', function()
 						}
 					}
 				})
-				getPrizepoolRecordStub.returns(createPrizepoolRecord({prizemoney = 10000}))
-				TeamParticipantsRepository.save(fivePlayers)
-				local data1 = Json.parseIfString(LpdbPlacementStore.calls[1].vals[2])
-				assert.are_equal(2000, data1.individualprizemoney)
 
-				local withSubAndStaff = createBasicParticipant({
+				TeamParticipantsRepository.save(participant)
+
+				local data = Json.parseIfString(LpdbPlacementStore.calls[1].vals[2])
+				assert.are_equal(2000, data.individualprizemoney)
+
+				getPrizepoolRecordStub:revert()
+			end)
+
+			it('excludes subs and staff when splitting prizemoney', function()
+				local getPrizepoolRecordStub = stub(TeamParticipantsRepository, 'getPrizepoolRecordForTeam')
+				getPrizepoolRecordStub.returns(createPrizepoolRecord({prizemoney = 6000, opponenttemplate = 'bds'}))
+
+				local participant = createBasicParticipant({
 					opponent = {
 						type = 'team',
 						template = 'bds',
@@ -321,10 +330,11 @@ describe('Team Participants Repository', function()
 						}
 					}
 				})
-				getPrizepoolRecordStub.returns(createPrizepoolRecord({prizemoney = 6000, opponenttemplate = 'bds'}))
-				TeamParticipantsRepository.save(withSubAndStaff)
-				local data2 = Json.parseIfString(LpdbPlacementStore.calls[2].vals[2])
-				assert.are_equal(2000, data2.individualprizemoney)
+
+				TeamParticipantsRepository.save(participant)
+
+				local data = Json.parseIfString(LpdbPlacementStore.calls[1].vals[2])
+				assert.are_equal(2000, data.individualprizemoney)
 
 				getPrizepoolRecordStub:revert()
 			end)
@@ -426,7 +436,7 @@ describe('Team Participants Repository', function()
 
 			it('sets page variables for each alias', function()
 				local participant = createBasicParticipant({
-					aliases = {'Team Liquid', 'TL'},
+					aliases = {'Team Liquid'},
 					opponent = {
 						type = 'team',
 						template = 'team liquid',
