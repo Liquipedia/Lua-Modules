@@ -42,7 +42,7 @@ local ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
 local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = Info.config.defaultMaxPlayersPerPlacement
 local MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS = 10
-local NUMBER_OF_RECENT_MATCHES = 10
+local NUMBER_OF_RECENT_MATCHES = 5
 
 --race stuff
 local RACE_FIELD_AS_CATEGORY_LINK = true
