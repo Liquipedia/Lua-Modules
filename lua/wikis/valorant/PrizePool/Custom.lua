@@ -9,9 +9,9 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Class = Lua.import('Module:Class')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Logic = Lua.import('Module:Logic')
 local Variables = Lua.import('Module:Variables')
-local HighlightConditions = Lua.import('Module:HighlightConditions')
 
 local PrizePool = Lua.import('Module:PrizePool')
 local Opponent = Lua.import('Module:Opponent')
