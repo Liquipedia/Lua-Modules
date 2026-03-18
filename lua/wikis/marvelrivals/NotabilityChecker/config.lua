@@ -19,7 +19,7 @@ Config.MAX_NUMBER_OF_COACHES = 6
 Config.PLACEMENT_LIMIT = 2000
 
 -- These are the notability thresholds needed by a team/player
-Config.NOTABILITY_THRESHOLD_MIN = 10
+Config.NOTABILITY_THRESHOLD_MIN = 22
 Config.NOTABILITY_THRESHOLD_NOTABLE = 22
 
 -- Weights used for tournaments

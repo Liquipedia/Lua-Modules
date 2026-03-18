@@ -44,5 +44,8 @@ return {
 				storeFromWikiCode = true,
 			},
 		},
+		participants = {
+			defaultPlayerNumber = 3,
+		},
 	},
 }

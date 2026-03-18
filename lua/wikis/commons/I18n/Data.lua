@@ -25,14 +25,50 @@ return {
 
 		-- Dates
 		['date-unknown'] = 'TBA',
-		['date-range-different-months'] = '${startMonth} ${startDate} - ${endMonth} ${endDate}',
-		['date-range-same-month'] = '${startMonth} ${startDate} - ${endDate}',
-		['date-range-same-day'] = '${startMonth} ${startDate}',
-		['date-range-different-months-unknown-end'] = '${startMonth} ${startDate} - TBA',
-		['date-range-different-months-unknown-end-day'] = '${startMonth} ${startDate} - ${endMonth} TBA',
-		['date-range-different-months-unknown-days'] = '${startMonth} - ${endMonth}',
-		['date-range-different-months-unknown-days-and-end-month'] = '${startMonth} - TBA',
-		['date-range-same-month-unknown-days'] = '${startMonth}',
+		['date-range-unknown'] = 'TBA',
+
+		-- Dates: Only startYear known
+		['date-range-year'] = '${startYear}',
+		['date-range-year--unknown'] = '${startYear} – TBA',
+		['date-range-year--year'] = '${startYear}–${endYear}',
+
+		-- Dates: Only startYear, startMonth known
+		['date-range-year-month'] = '${startMonth}, ${startYear}',
+		['date-range-year-month--unknown'] = '${startMonth}, ${startYear} – TBA',
+		['date-range-year-month--year-unknown_month'] = '${startMonth}, ${startYear} – TBA, ${endYear}',
+		['date-range-year-month--month'] = '${startMonth} – ${endMonth}, ${startYear}',
+		['date-range-year-month--year-month'] = '${startMonth}, ${startYear} – ${endMonth}, ${endYear}',
+
+		['date-range-year-month--unknown_month'] = '${startMonth} – TBA, ${startYear}',
+
+		-- Dates: Full startdate known
+		['date-range-year-month-day'] = '${startMonth} ${startDate}, ${startYear}',
+		['date-range-year-month-day--unknown'] = '${startMonth} ${startDate}, ${startYear} – TBA',
+		['date-range-year-month-day--year-unknown_month'] = '${startMonth} ${startDate}, ${startYear} – TBA, ${endYear}',
+		['date-range-year-month-day--year-month-unknown_day']
+				= '${startMonth} ${startDate}, ${startYear} – ${endMonth} TBA, ${endYear}',
+		['date-range-year-month-day--year-month-day']
+				= '${startMonth} ${startDate}, ${startYear} – ${endMonth} ${endDate}, ${endYear}',
+
+		['date-range-year-month-day--month-day'] = '${startMonth} ${startDate} – ${endMonth} ${endDate}, ${startYear}',
+		['date-range-year-month-day--month-unknown_day'] = '${startMonth} ${startDate} – ${endMonth} TBA, ${startYear}',
+		['date-range-year-month-day--day'] = '${startMonth} ${startDate}–${endDate}, ${startYear}',
+
+		-- Dates: ticker variant (hidden years)
+		-- startMonth known
+		['date-range-month'] = '${startMonth}',
+		['date-range-month--unknown'] = '${startMonth} – TBA',
+		['date-range-month--unknown_month'] = '${startMonth} – TBA',
+		['date-range-month--month'] = '${startMonth} – ${endMonth}',
+
+		-- startMonth and startDay known
+		['date-range-month-day'] = '${startMonth} ${startDate}',
+		['date-range-month-day--day'] = '${startMonth} ${startDate}–${endDate}',
+
+		['date-range-month-day--unknown'] = '${startMonth} ${startDate} – TBA',
+		['date-range-month-day--unknown_month'] = '${startMonth} ${startDate} – TBA',
+		['date-range-month-day--month-unknown_day'] = '${startMonth} ${startDate} – ${endMonth} TBA',
+		['date-range-month-day--month-day'] = '${startMonth} ${startDate} – ${endMonth} ${endDate}',
 
 		-- Bracket Headers
 		['brkts-header-r1'] = 'Grand Final,Final,GF',
@@ -61,7 +97,23 @@ return {
 		['brkts-header-q'] = 'Qualified,Qual.,Q',
 		['brkts-header-tp'] = 'Third Place Match,3rd Place,3rd',
 
+		-- MatchPage meta description
+		['matchpage-meta-desc'] = 'Find detailed results about the ${ongoingTense}${game} match ' ..
+									'between ${opponent1} and ${opponent2} in ${tournamentName}${tense}.',
+		['matchpage-meta-desc-no-opponent']
+				= 'Find detailed results about the ${ongoingTense}${game} match in ${tournamentName}${tense}.',
+
 		-- MatchSummary Map Veto
 		['matchsummary-mapveto-start'] = 'Start Map Veto',
+
+		-- MatchTable
+		['matchtable-no-match-results'] = 'This ${mode} has not played any matches yet.',
+		['matchtable-no-h2h-match-results'] = 'These ${mode} have not played any matches against each other yet.',
+
+		-- MatchTicker
+		['matchticker-upcoming-matches'] = 'Upcoming Matches',
+
+		-- Shop Merch
+		['shop-merch-support-text'] = 'Purchases through this link support Liquipedia.',
 	}
 }

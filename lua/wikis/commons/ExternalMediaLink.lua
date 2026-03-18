@@ -9,15 +9,25 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
-local Variables = Lua.import('Module:Variables')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
 
 local ExternalMediaLinkDisplay = Lua.import('Module:Widget/ExternalMedia/Link')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local ExternalMediaLink = {}
@@ -37,8 +47,7 @@ function ExternalMediaLink.run(args)
 	ExternalMediaLink._fallBackArgs(args)
 	local parsedData = ExternalMediaLink._readArgs(args)
 
-	if Logic.nilOr(Logic.readBoolOrNil(args.storage), true)
-		and not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
+	if Logic.nilOr(Logic.readBoolOrNil(args.storage), true) and Lpdb.isStorageEnabled() then
 
 		mw.ext.LiquipediaDB.lpdb_externalmedialink(
 			ExternalMediaLink._objectName(args), Json.stringifySubTables(parsedData)
@@ -71,9 +80,9 @@ end
 ---@return table
 function ExternalMediaLink._readArgs(args)
 	local lpdbData = {
-		date = args.date,
+		date = DateExt.toYmdInUtc(args.date),
 		language = args.language or DEFAULT_LANGUAGE,
-		title = args.title,
+		title = mw.text.unstripNoWiki(args.title),
 		translatedtitle = args.trans_title,
 		link = args.link,
 		publisher = args.of,
@@ -155,28 +164,8 @@ end
 ---@param args table
 ---@return Widget
 function ExternalMediaLink.wrapper(args)
-	local wrapperInfoDisplay = mw.html.create('table')
-		:attr('border', 0)
-		:attr('cellpadding', 4)
-		:attr('cellspacing', 4)
-		:css('margin-bottom', '5px')
-
-	wrapperInfoDisplay
-		:tag('tr')
-			:tag('th'):wikitext('Author(s)'):done()
-			:tag('td'):wikitext(args.authors or ''):done():done()
-		:tag('tr')
-			:tag('th'):wikitext('Title'):done()
-			:tag('td'):wikitext(args.title or ''):done():done()
-		:tag('tr')
-			:tag('th'):wikitext('Date'):done()
-			:tag('td'):wikitext(args.date or ''):done():done()
-		:tag('tr')
-			:tag('th'):wikitext('URL'):done()
-			:tag('td'):wikitext(args.link or '')
-
 	local parsedArgs = {
-		date = args.date,
+		date = DateExt.toYmdInUtc(args.date),
 		link = args.link,
 		title = args.title,
 		type = args.type and args.type:lower() or nil,
@@ -188,6 +177,8 @@ function ExternalMediaLink.wrapper(args)
 		translator = args.translator,
 		trans_title = args.trans_title,
 	}
+
+	ExternalMediaLink._assertUnique(parsedArgs.link)
 
 	if args.authors then
 		local authors = Array.parseCommaSeparatedString(args.authors)
@@ -216,8 +207,77 @@ function ExternalMediaLink.wrapper(args)
 		Link{link = 'Special:FormEdit/ExternalMediaLinks', children = 'Go back to the form'},
 		HtmlWidgets.Br{},
 		ExternalMediaLink.run(parsedArgs),
-		wrapperInfoDisplay
+		ExternalMediaLink._wrapperDisplay(parsedArgs)
 	)}
+end
+
+---@private
+---@param parsedArgs table
+---@return Widget
+function ExternalMediaLink._wrapperDisplay(parsedArgs)
+	---@param prefix string
+	---@param linkPrefix string?
+	---@return Widget[]
+	local makeLinkList = function(prefix, linkPrefix)
+		local list = Array.mapIndexes(function(index)
+			if Logic.isEmpty(parsedArgs[prefix .. index]) then
+				return
+			end
+			return Link{
+				link = linkPrefix and parsedArgs[linkPrefix .. index] or parsedArgs[prefix .. index],
+				children = parsedArgs[prefix .. index],
+			}
+		end)
+		return Array.interleave(list, ', ')
+	end
+
+	---@param desc string
+	---@param data Widget[]|Widget?
+	---@return Widget?
+	local rowIfNotEmpty = function(desc, data)
+		if Logic.isEmpty(data) then
+			return
+		end
+		return TableWidgets.Row{children = {
+			TableWidgets.CellHeader{children = desc},
+			TableWidgets.Cell{children = data},
+		}}
+	end
+
+	return TableWidgets.Table{
+		sortable = false,
+		columns = {{}, {}},
+		children = {TableWidgets.TableBody{children = WidgetUtil.collect(
+			rowIfNotEmpty('Title', parsedArgs.title),
+			rowIfNotEmpty('Author(s)', makeLinkList('by', 'by_link')),
+			rowIfNotEmpty('Date', parsedArgs.date),
+			rowIfNotEmpty('Subject(s)', makeLinkList('subject')),
+			rowIfNotEmpty('Org Subject(s)', makeLinkList('subject_organization')),
+			rowIfNotEmpty('Event', parsedArgs.event and Link{
+				link = parsedArgs['event-link'] or parsedArgs.event,
+				children = parsedArgs.event,
+			} or nil),
+			rowIfNotEmpty('URL', parsedArgs.link)
+		)}},
+	}
+end
+
+---@private
+---@param link string
+function ExternalMediaLink._assertUnique(link)
+	local pagename = (mw.ext.LiquipediaDB.lpdb('externalmedialink', {
+		conditions = tostring(ConditionTree(BooleanOperator.all):add{
+			ConditionNode(ColumnName('namespace'), Comparator.eq, Namespace.idFromName('Data')),
+			ConditionNode(ColumnName('link'), Comparator.eq, link),
+			ConditionNode(ColumnName('pagename'), Comparator.neq, mw.title.getCurrentTitle().text:gsub(' ', '_')),
+		}),
+		limit = 1,
+	})[1] or {}).pagename
+
+	assert(
+		not pagename,
+		'There already exists an ExternalMediaLink with the specified url at "Data:' .. (pagename or '') .. '"'
+	)
 end
 
 return Class.export(ExternalMediaLink, {exports = {'run', 'wrapper'}})

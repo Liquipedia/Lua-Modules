@@ -20,12 +20,15 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class CounterstrikeSeriesInfobox: SeriesInfobox
+---@operator call(Frame): CounterstrikeSeriesInfobox
 local CustomSeries = Class.new(Series)
 
+---@class CounterstrikeSeriesInfoboxWidgetInjector: WidgetInjector
+---@field caller CounterstrikeSeriesInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomSeries.run(frame)
 	local series = CustomSeries(frame)
 	series:setWidgetInjector(CustomInjector(series))

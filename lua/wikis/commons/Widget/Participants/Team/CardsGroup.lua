@@ -15,10 +15,18 @@ local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local ParticipantsTeamCard = Lua.import('Module:Widget/Participants/Team/Card')
-local Switch = Lua.import('Module:Widget/Switch')
+local ParticipantControls = Lua.import('Module:Widget/Participants/Team/ParticipantControls')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
+---@class ParticipantsTeamCardsGroupProps
+---@field participants TeamParticipant[]|nil
+---@field showPlayerInfo boolean
+---@field showControls boolean
+---@field mergeStaffTabIfOnlyOneStaff boolean|nil
 
 ---@class ParticipantsTeamCardsGroup: Widget
----@operator call(table): ParticipantsTeamCardsGroup
+---@operator call(ParticipantsTeamCardsGroupProps): ParticipantsTeamCardsGroup
+---@field props ParticipantsTeamCardsGroupProps
 local ParticipantsTeamCardsGroup = Class.new(Widget)
 
 ---@return Widget?
@@ -28,27 +36,26 @@ function ParticipantsTeamCardsGroup:render()
 		return
 	end
 
-	return AnalyticsWidget{
-		analyticsName = 'ParticipantsCompactSwitch',
-		analyticsProperties = {
-			['track-value-as'] = 'participants compact',
-		},
-		children = Switch{
-			label = 'Compact view',
-			switchGroup = 'team-cards-compact',
-			defaultActive = true,
-			content = AnalyticsWidget{
-				analyticsName = 'Team participants card',
-				children = Div{
-					classes = { 'team-participant-cards' },
-					children = Array.map(participants, function(participant)
-						return ParticipantsTeamCard{
-							participant = participant,
-						}
-					end),
-				}
+	local showControls = self.props.showControls
+
+	local children = WidgetUtil.collect(
+		showControls and ParticipantControls{showPlayerInfo = self.props.showPlayerInfo} or nil,
+		AnalyticsWidget{
+			analyticsName = 'Team participants card',
+			children = Div{
+				classes = { 'team-participant__grid' },
+				children = Array.map(participants, function(participant)
+					return ParticipantsTeamCard{
+						participant = participant,
+					}
+				end),
 			}
 		}
+	)
+
+	return Div{
+		classes = { 'team-participant' },
+		children = children
 	}
 end
 

@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local Arguments = Lua.import('Module:Arguments')
 local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
@@ -23,7 +22,6 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
-local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 local QUALIFIER = 'Qualifier'
 local TIER_VALUE = {10, 6, 4, 2}
 
@@ -71,14 +69,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	Variables.varDefine(lpdbData.objectName .. '_pointprize', lpdbData.extradata.prizepoints)
 	Variables.varDefine(lpdbData.objectName .. '_pointprize2', lpdbData.extradata.prizepoints2)
 
-	local prizeIsQualifier = function(prize)
-		return prize.type == PRIZE_TYPE_QUALIFIES
-	end
-	local opponentHasPrize = function (prize)
-		return placement:getPrizeRewardForOpponent(opponent, prize.id)
-	end
-
-	lpdbData.qualified = Array.any(Array.filter(placement.parent.prizes, prizeIsQualifier), opponentHasPrize) and 1 or 0
 	if Variables.varDefault('tournament_liquipediatiertype') == QUALIFIER and lpdbData.qualified == 1 then
 		lpdbData.extradata.notabilitymod = '0'
 	end

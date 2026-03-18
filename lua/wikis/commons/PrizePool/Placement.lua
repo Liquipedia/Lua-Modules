@@ -17,8 +17,6 @@ local PlacementInfo = Lua.import('Module:Placement')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
----@class PrizePoolPlacement: BasePlacement
----@field opponents BasePlacementOpponent[]
 local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -27,17 +25,19 @@ local DASH = '&#045;'
 
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_POINTS = 'POINTS'
+local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 
 -- Allowed none-numeric score values.
 local SPECIAL_SCORES = {'W', 'FF' , 'L', 'DQ', 'D'}
 
 local _tbd_index = 0
 
---- @class PrizePoolPlacement: BasePlacement
 --- A Placement is a set of opponents who all share the same final place in the tournament.
 --- Its input is generally a table created by `Template:Slot`.
 --- It has a range from placeStart to placeEnd, for example 5 to 8, or count (slotSize)
 --- and is expected to have at maximum the same amount of opponents as the range allows (4 in the 5-8 example).
+--- @class PrizePoolPlacement: BasePlacement
+--- @operator call(...): PrizePoolPlacement
 --- @field parent PrizePool
 --- @field args table
 local Placement = Class.new(BasePlacement)
@@ -234,6 +234,8 @@ function Placement:_getLpdbData(...)
 		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_BASE_CURRENCY .. 1)) or 0
 		local pointsReward = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
 		local pointsReward2 = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
+		local isQualified = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_QUALIFIES .. '1')
+
 		local lpdbData = {
 			image = image,
 			imagedark = imageDark,
@@ -260,7 +262,8 @@ function Placement:_getLpdbData(...)
 				participantteam = (opponentType == Opponent.solo and players.p1team)
 									and Opponent.toName{template = players.p1team, type = 'team', extradata = {}}
 									or nil,
-			}
+			},
+			qualified = isQualified and 1 or 0
 			-- TODO: We need to create additional LPDB Fields
 			-- Qualified To struct (json?)
 			-- Points struct (json?)

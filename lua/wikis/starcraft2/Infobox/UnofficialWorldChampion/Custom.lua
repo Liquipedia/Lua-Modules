@@ -27,7 +27,7 @@ local CustomUnofficialWorldChampion = Class.new(UnofficialWorldChampion)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomUnofficialWorldChampion.run(frame)
 	local unofficialWorldChampion = CustomUnofficialWorldChampion(frame)
 	unofficialWorldChampion:setWidgetInjector(CustomInjector(unofficialWorldChampion))

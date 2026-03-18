@@ -16,12 +16,11 @@ local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
-local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local String = Lua.import('Module:StringUtils')
 local Tier = Lua.import('Module:Tier/Custom')
-local Variables = Lua.import('Module:Variables')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 
@@ -37,16 +36,17 @@ local Title = Widgets.Title
 local Venue = Widgets.Venue
 
 ---@class SeriesInfobox: BasicInfobox
+---@operator call(Frame): SeriesInfobox
 local Series = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function Series.run(frame)
 	local series = Series(frame)
 	return series:createInfobox()
 end
 
----@return string
+---@return Widget
 function Series:createInfobox()
 	local args = self.args
 
@@ -208,8 +208,7 @@ end
 ---@param args table
 ---@return boolean
 function Series:shouldStore(args)
-	return Namespace.isMain() and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+	return Namespace.isMain() and Lpdb.isStorageEnabled()
 end
 
 ---@param args table

@@ -121,5 +121,8 @@ return {
 				mode = 'merge',
 			},
 		},
+		participants = {
+			defaultPlayerNumber = 4,
+		},
 	},
 }

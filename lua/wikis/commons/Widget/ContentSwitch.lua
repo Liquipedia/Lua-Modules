@@ -16,9 +16,9 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
 ---@class ContentSwitchTab
----@field label string|Widget|Html|(string|Widget|Html)[]
+---@field label Renderable|Renderable[]
 ---@field value string
----@field content string|Widget|Html|(string|Widget|Html)[]
+---@field content Renderable|Renderable[]
 
 ---@class ContentSwitchParameters
 ---@field tabs ContentSwitchTab[]
@@ -26,7 +26,7 @@ local Div = HtmlWidgets.Div
 ---@field defaultActive integer
 ---@field switchGroup string
 ---@field classes string[]?
----@field size 'small'|'medium'
+---@field size 'extrasmall'|'small'|'medium'
 ---@field storeValue boolean
 ---@field css table?
 
@@ -36,9 +36,9 @@ local Div = HtmlWidgets.Div
 local ContentSwitch = Class.new(Widget)
 ContentSwitch.defaultProps = {
 	tabs = {},
-	variant = 'themed',
+	variant = 'generic',
 	defaultActive = 1,
-	size = 'medium',
+	size = 'extrasmall',
 	storeValue = true,
 }
 
@@ -50,17 +50,14 @@ function ContentSwitch:render()
 	local switchGroup = self:assertExistsAndCopy(self.props.switchGroup)
 
 	if #tabs < 2 then
-		return HtmlWidgets.fragment{children = (tabs[1] or {}).content}
+		return HtmlWidgets.Fragment{children = (tabs[1] or {}).content}
 	end
 
 	local tabOptions = Array.map(tabs, function(tab, index)
 		local isActive = index == defaultActive
 		local classes = {'switch-pill-option', 'toggle-area-button'}
-		if self.props.size == 'small' then
-			table.insert(classes, 'switch-pill-small')
-		end
 		if isActive then
-			table.insert(classes, 'switch-pill-active')
+			table.insert(classes, 'switch-pill-option-active')
 		end
 
 		return Div{
@@ -88,6 +85,12 @@ function ContentSwitch:render()
 	if variant == 'generic' then
 		table.insert(switchPillClasses, 'switch-pill-generic')
 	end
+	if self.props.size == 'small' then
+		table.insert(switchPillClasses, 'switch-pill-small')
+	elseif self.props.size == 'extrasmall' then
+		table.insert(switchPillClasses, 'switch-pill-extrasmall')
+	end
+
 
 	return Div{
 		classes = {'toggle-area', 'toggle-area-' .. tostring(defaultActive)},

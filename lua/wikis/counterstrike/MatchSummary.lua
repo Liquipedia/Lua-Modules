@@ -21,7 +21,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
@@ -84,11 +84,6 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 		end
 		if index > 0 then
 			label = label .. ' for Game ' .. index
-		end
-
-		icon = 'File:' .. icon
-		if iconDark then
-			iconDark = 'File:' .. iconDark
 		end
 
 		footer:addLink(url, icon, iconDark, label)

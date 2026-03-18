@@ -9,6 +9,7 @@ return {
 	team_tbd = 'far fa-users',
 	notification = 'fas fa-info-circle',
 	external_link = 'fas fa-external-link-alt',
+	internal_link = 'fas fa-link',
 
 	-- Usage: Different ways to see data
 	schedule = 'far fa-table',
@@ -35,6 +36,9 @@ return {
 	explosion_valorant = 'fas fa-fire-alt',
 	defuse = 'fas fa-wrench',
 	outoftime = 'fas fa-hourglass',
+	surrendered = 'far fa-flag',
+	ace_valorant = 'fas fa-dagger',
+	flawless_valorant = 'fas fa-gem',
 
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',
@@ -115,6 +119,9 @@ return {
 	-- Usage: Accommodations
 	accommodation = 'far fa-home-alt',
 
+	-- Usage: Shop merchandise
+	shopping_bag = 'fas fa-shopping-bag',
+
 	-- Usage: Matches etc
 	firstplace = 'fas fa-trophy',
 	map = 'far fa-map',
@@ -156,7 +163,7 @@ return {
 	acs = 'far fa-abacus',
 	kast = 'fas fa-hands-helping',
 	headshot = 'far fa-crosshairs',
-	firstkill = 'far fa-dagger',
+	firstkill = 'liquipedia-custom-icon liquipedia-custom-icon-fk-kd-icon',
 	team_firstkills = 'fas fa-swords fa-flip-vertical',
 
 	dota2_gpm = 'fas fa-coin',
@@ -165,6 +172,7 @@ return {
 	dota2_barrack = 'fas fa-warehouse',
 
 	leagueoflegends_kda = 'fas fa-swords fa-flip-vertical',
+	leagueoflegends_killparticipation = 'fas fa-dagger',
 
 	-- Usage: Day night cycle information
 	day = 'fas fa-sun',
@@ -205,6 +213,11 @@ return {
 	find_images = 'fad fa-file-search',
 	clipboard = 'fad fa-clipboard-list',
 
+	-- Usage: Main Pages navcards
+	player = 'fas fa-user',
+	statistics = 'fad fa-chart-bar',
+	maps = 'fad fa-map',
+
 	-- Streams and Vods
 	youtube = 'fab fa-youtube',
 	twitch = 'fab fa-twitch',
@@ -228,5 +241,22 @@ return {
 	-- Usage: Formula 1
 	ongoing_series = 'fas fa-hourglass-half ',
 	season_history = 'fas fa-landmark',
-	finished_race = 'fas fa-flag-checkered'
+	finished_race = 'fas fa-flag-checkered',
+
+	-- Usage: Export functions
+	share = 'fas fa-share-alt',
+	copy = 'fas fa-clone',
+	download = 'fas fa-download',
+
+	-- Usage: Github links
+	github = 'fab fa-github',
+
+	-- Usage: Dota2 Spellcard
+	dota2_spl_mechanics = 'fas fa-cog',
+	dota2_spl_interactions = 'fad fa-atom-alt',
+	dota2_spl_status = 'fas fa-hourglass-half',
+	dota2_spl_misc = 'fad fa-list-ul',
+
+	-- Usage: Info button
+	['general-info'] = 'fas fa-info-circle',
 }

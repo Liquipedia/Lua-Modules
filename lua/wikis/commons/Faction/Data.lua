@@ -7,7 +7,7 @@
 
 local Lua = require('Module:Lua')
 
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 
 return {
 	defaultGame = Info.defaultGame,

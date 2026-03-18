@@ -21,9 +21,10 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
 ---@class FactionInfobox: BasicInfobox
+---@operator call(Frame): FactionInfobox
 local FactionInfobox = Class.new(BasicInfobox)
 
----@return string
+---@return Widget
 function FactionInfobox:createInfobox()
 	local args = self.args
 

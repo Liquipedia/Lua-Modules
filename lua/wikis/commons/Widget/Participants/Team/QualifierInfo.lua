@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Placement = Lua.import('Module:Placement')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -55,9 +56,15 @@ function ParticipantsTeamQualifierInfo:render()
 		link = qualification.url
 		icon = Icon{
 			iconName = 'external_link',
-			additionalClasses = { 'team-participant-card-qualifier-external-link-icon' }
+			additionalClasses = { 'team-participant-card__qualifier-icon' }
 		}
 		linktype = 'external'
+	elseif qualification.type == 'internal' then
+		link = qualification.page
+		icon = Icon{
+			iconName = 'internal_link',
+			additionalClasses = { 'team-participant-card__qualifier-icon' }
+		}
 	end
 
 	local textChildren = {text}
@@ -72,14 +79,20 @@ function ParticipantsTeamQualifierInfo:render()
 	end
 
 	local content = Div{
-		classes = {'team-participant-card-qualifier', 'team-participant-card-qualifier--' .. location},
-		children = WidgetUtil.collect(
-			icon,
-			Span{
-				classes = {'team-participant-card-qualifier-details'},
-				children = textChildren
-			}
-		)
+		classes = {'team-participant-card__qualifier', 'team-participant-card__qualifier--' .. location},
+		children = {
+			Div{
+				classes = {'team-participant-card__qualifier-content'},
+				children = WidgetUtil.collect(
+					icon,
+					Span{
+						classes = {'team-participant-card__qualifier-details'},
+						children = textChildren
+					}
+				)
+			},
+			Placement.renderInWidget{placement = qualification.placement}
+		}
 	}
 
 	return content

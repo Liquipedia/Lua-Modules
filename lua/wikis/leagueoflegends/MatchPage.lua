@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
 local InGameRoles = Lua.import('Module:InGameRoles', {loadData = true})
 local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -26,6 +27,7 @@ local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchSummaryCharacters = Lua.import('Module:Widget/Match/Summary/Characters')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
+local PlayerStatContainer = Lua.import('Module:Widget/Match/Page/PlayerStat/Container')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local VetoItem = Lua.import('Module:Widget/Match/Page/VetoItem')
@@ -73,10 +75,11 @@ local KEYSTONES = Table.map({
 end)
 
 local DEFAULT_ITEM = 'EmptyIcon'
-local LOADOUT_ICON_SIZE = '24px'
+local LOADOUT_ICON_SIZE = '64px'
 local ITEMS_TO_SHOW = 6
 
 local KDA_ICON = IconFa{iconName = 'leagueoflegends_kda', hover = 'KDA'}
+local KP_ICON = IconFa{iconName = 'leagueoflegends_killparticipation', hover = 'KP'}
 local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
@@ -122,17 +125,8 @@ function MatchPage:populateGames()
 		end)
 
 		local _, vetoByTeam = Array.groupBy(vetoPhase, Operator.property('team'))
-		game.vetoGroups = {}
-
-		Array.forEach(vetoByTeam, function(team, teamIndex)
-			local groupIndex = 1
-			local lastType = 'ban'
-			Array.forEach(team, function(veto)
-				if lastType ~= veto.type then groupIndex = groupIndex + 1 end
-				veto.groupIndex = groupIndex
-				lastType = veto.type
-			end)
-			_, game.vetoGroups[teamIndex] = Array.groupBy(team, Operator.property('groupIndex'))
+		game.vetoGroups = Array.map(vetoByTeam, function (team)
+			return Array.groupAdjacentBy(team, Operator.property('type'))
 		end)
 	end)
 end
@@ -182,7 +176,7 @@ function MatchPage:renderOverallStats()
 		if gameLength <= 0 then
 			return
 		end
-		return string.format('%.2f', stat / gameLength * 60)
+		return MathUtil.formatRounded{precision = 2, value = stat / gameLength * 60}
 	end
 
 	---@param player standardPlayer
@@ -201,8 +195,8 @@ function MatchPage:renderOverallStats()
 						MatchSummaryCharacters{characters = player.extradata.characters, date = self.matchData.date},
 					}
 				},
-				Div{
-					classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-4'},
+				PlayerStatContainer{
+					columns = 5,
 					children = {
 						PlayerStat{
 							title = {KDA_ICON, 'KDA'},
@@ -213,6 +207,10 @@ function MatchPage:renderOverallStats()
 							}, SPAN_SLASH)
 						},
 						PlayerStat{
+							title = {KP_ICON, 'KP%'},
+							data = MathUtil.formatPercentage(player.extradata.killparticipation, 1)
+						},
+						PlayerStat{
 							title = {
 								IconImage{
 									imageLight = 'Lol stat icon cs.png',
@@ -220,7 +218,7 @@ function MatchPage:renderOverallStats()
 									size = 'x16px',
 									link = ''
 								},
-								'CSM'
+								'CSPM'
 							},
 							data = calculateStatPerMinute(player.extradata.creepscore, player.extradata.gameLength)
 						},
@@ -451,9 +449,12 @@ function MatchPage:_renderDraft(game)
 				},
 				GeneralCollapsible{
 					title = 'Draft Order',
-					classes = {'match-bm-lol-game-veto-order'},
+					classes = {'match-bm-match-collapsible'},
 					shouldCollapse = true,
-					collapseAreaClasses = {'match-bm-lol-game-veto-order-list'},
+					collapseAreaClasses = {
+						'match-bm-match-collapsible-content',
+						'match-bm-lol-game-veto-order-list',
+					},
 					children = {
 						self:_renderGameTeamVetoOrder(game, 1),
 						self:_renderGameTeamVetoOrder(game, 2),
@@ -611,34 +612,33 @@ end
 ---@return Widget
 function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 	return Div{
-		classes = {'match-bm-players-player match-bm-players-player--col-1'},
+		classes = {'match-bm-players-player match-bm-players-player--col-3'},
 		children = {
-			Div{
-				classes = {'match-bm-lol-players-player-details'},
-				children = {
-					PlayerDisplay{
-						characterIcon = self:getCharacterIcon(player.character),
-						characterName = player.character,
-						side = game.teams[teamIndex].side,
-						roleIcon = IconImage{
-							imageLight = 'Lol role ' .. player.role .. ' icon darkmode.svg',
-							caption = String.upperCaseFirst(player.role),
-							link = ''
-						},
-						playerLink = player.player,
-						playerName = player.displayName or player.player
-					},
-					MatchPage._buildPlayerLoadout(player)
-				}
+			PlayerDisplay{
+				characterIcon = self:getCharacterIcon(player.character),
+				characterName = player.character,
+				side = game.teams[teamIndex].side,
+				roleIcon = IconImage{
+					imageLight = 'Lol role ' .. player.role .. ' icon darkmode.svg',
+					caption = String.upperCaseFirst(player.role),
+					link = ''
+				},
+				playerLink = player.player,
+				playerName = player.displayName or player.player
 			},
-			Div{
-				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-4'},
+			MatchPage._buildPlayerLoadout(player),
+			PlayerStatContainer{
+				columns = 5,
 				children = {
 					PlayerStat{
 						title = {KDA_ICON, 'KDA'},
 						data = Array.interleave({
 							player.kills, player.deaths, player.assists
 						}, SPAN_SLASH)
+					},
+					PlayerStat{
+						title = {KP_ICON, 'KP%'},
+						data = MathUtil.formatPercentage(player.killparticipation, 1)
 					},
 					PlayerStat{
 						title = {
@@ -700,10 +700,13 @@ end)
 ---@return Widget
 MatchPage._generateItemImage = FnUtil.memoize(function (itemName)
 	local isDefaultItem = itemName == DEFAULT_ITEM
-	return MatchPage._generateLoadoutImage{
-		prefix = 'Lol item',
-		name = itemName,
-		caption = isDefaultItem and 'Empty' or itemName,
+	return Div{
+		classes = {'match-bm-players-player-loadout-item'},
+		children = MatchPage._generateLoadoutImage{
+			prefix = 'Lol item',
+			name = itemName,
+			caption = isDefaultItem and 'Empty' or itemName,
+		}
 	}
 end)
 
@@ -712,7 +715,7 @@ end)
 ---@return Widget
 function MatchPage._buildPlayerLoadout(player)
 	return Div{
-		classes = {'match-bm-lol-players-player-loadout'},
+		classes = {'match-bm-players-player-loadout'},
 		children = {
 			Div{
 				classes = {'match-bm-lol-players-player-loadout-rs-wrap'},
@@ -731,17 +734,8 @@ function MatchPage._buildPlayerLoadout(player)
 				}
 			},
 			Div{
-				classes = {'match-bm-lol-players-player-loadout-items'},
-				children = {
-					Div{
-						classes = {'match-bm-lol-players-player-loadout-item'},
-						children = Array.map(Array.sub(player.items, 1, 3), MatchPage._generateItemImage)
-					},
-					Div{
-						classes = {'match-bm-lol-players-player-loadout-item'},
-						children = Array.map(Array.sub(player.items, 4, 6), MatchPage._generateItemImage)
-					}
-				}
+				classes = {'match-bm-players-player-loadout-items'},
+				children = Array.map(player.items, MatchPage._generateItemImage)
 			}
 		}
 	}

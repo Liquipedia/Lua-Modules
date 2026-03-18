@@ -14,6 +14,7 @@ local Table = Lua.import('Module:Table')
 
 local MapData = mw.loadJsonData('MediaWiki:Valorantdb-maps.json')
 
+---@class ValorantMatchPageMapParser: ValorantMapParserInterface
 local CustomMatchGroupInputMatchPage = {}
 
 ---@class valorantMatchApiTeamExtended: valorantMatchApiTeam
@@ -221,6 +222,38 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 		return ceremonyCode:sub(9)
 	end
 
+	---@param round valorantMatchApiRound
+	---@param ceremony string?
+	---@param roundKills valorantMatchApiRoundKill[]
+	---@param winningTeam integer
+	---@return string?
+	local function processCeremony(round, ceremony, roundKills, winningTeam)
+		if ceremony == 'Clutch' then
+			if Logic.isNotEmpty(round.bomb_defuser) then
+				return round.bomb_defuser
+			end
+			local killsFromWinningTeam = Array.filter(
+				roundKills,
+				function (roundKill)
+					return Table.includes(map.teams[winningTeam].puuids, roundKill.killer)
+				end
+			)
+			if #killsFromWinningTeam == 0 then
+				return
+			end
+			return killsFromWinningTeam[#killsFromWinningTeam].killer
+		elseif ceremony == 'Ace' then
+			local _, killsByPlayer = Array.groupBy(roundKills, function (roundKill)
+				return roundKill.killer
+			end)
+			for killer, kills in pairs(killsByPlayer) do
+				if #kills >= 5 then
+					return killer
+				end
+			end
+		end
+	end
+
 	local t1start = CustomMatchGroupInputMatchPage.getFirstSide(map, 1, 'normal')
 	local t1startot = CustomMatchGroupInputMatchPage.getFirstSide(map, 1, 'ot')
 	local nextOvertimeSide = t1startot
@@ -248,20 +281,30 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 			return nil
 		end
 
-		---@type valorantMatchApiRoundKill
-		local firstKill = Array.min(
+		---@type valorantMatchApiRoundKill[]
+		local roundKills = Array.sortBy(
 			Array.flatMap(round.player_stats, function (player)
 				return player.kills or {}
 			end),
-			function (kill, fastestKill)
-				return (kill.time_since_round_start_millis or math.huge) < (
-					fastestKill.time_since_round_start_millis or math.huge)
+			Operator.property('time_since_round_start_millis')
+		)
+
+		local winningTeam = (t1side == makeShortSideName(round.winning_team_role)) and 1 or 2
+		local ceremony = mapCeremonyCodes(round.round_ceremony)
+		local flawless = Array.all(
+			roundKills,
+			function (roundKill)
+				return Table.includes(map.teams[winningTeam].puuids, roundKill.killer)
 			end
 		)
 
+		---@type valorantMatchApiRoundKill
+		local firstKill = roundKills[1]
+
 		---@type ValorantRoundData
 		return {
-			ceremony = mapCeremonyCodes(round.round_ceremony),
+			ceremony = ceremony,
+			ceremonyFor = processCeremony(round, ceremony, roundKills, winningTeam),
 			firstKill = Logic.isNotEmpty(firstKill) and {
 				killer = firstKill.killer,
 				victim = firstKill.victim,
@@ -269,6 +312,7 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 			} or {},
 			planted = round.plant_round_time > 0,
 			defused = round.defuse_round_time > 0,
+			flawless = flawless,
 			round = roundNumber,
 			t1side = t1side,
 			t2side = t2side,
@@ -301,16 +345,23 @@ function CustomMatchGroupInputMatchPage.extendMapOpponent(map, opponentIndex)
 		return round[teamSideKey] == 'atk' and round.planted
 	end)
 
+	---@param ceremony string
+	---@return integer
+	local function countCeremonies(ceremony)
+		return #Array.filter(rounds, function (round)
+			return round[teamSideKey] == round.winningSide and round.ceremony == ceremony
+		end)
+	end
+
 	return {
-		thrifties = #Array.filter(rounds, function (round)
-			return round[teamSideKey] == round.winningSide and round.ceremony == 'Thrifty'
+		thrifties = countCeremonies('Thrifty'),
+		flawless = #Array.filter(rounds, function (round)
+			return round[teamSideKey] == round.winningSide and round.flawless
 		end),
 		firstKills = #Array.filter(rounds, function (round)
 			return round.firstKill.byTeam == opponentIndex
 		end),
-		clutches = #Array.filter(rounds, function (round)
-			return round[teamSideKey] == round.winningSide and round.ceremony == 'Clutch'
-		end),
+		clutches = countCeremonies('Clutch'),
 		postPlant = {
 			#Array.filter(plantedRounds, function (round)
 				return round.winningSide == 'atk'

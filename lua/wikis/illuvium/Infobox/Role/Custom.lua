@@ -21,7 +21,7 @@ local CustomRole = Class.new(Role)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomRole.run(frame)
 	local role = CustomRole(frame)
 	role:setWidgetInjector(CustomInjector(role))
