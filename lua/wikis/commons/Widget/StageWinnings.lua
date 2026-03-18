@@ -128,7 +128,7 @@ function StageWinnings:render()
 				TableWidgets.TableBody{children = Array.map(opponentList, FnUtil.curry(self._row, self))}
 			},
 		},
-		Logic.readBool(props.showLegend) and self:_getLegendTable(valueByScore) or nil
+		Logic.readBool(props.showLegend) and Logic.isNotEmpty(valueByScore) and self:_getLegendTable(valueByScore) or nil
 		}
 	}
 end
