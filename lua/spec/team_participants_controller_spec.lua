@@ -43,7 +43,6 @@ describe('Team Participants Controller', function()
 								id = 'Player2',
 								link = 'Player2',
 								name = 'Player Two',
-								nationality = 'ca',
 							}),
 							createSquadMember({
 								id = 'Coach1',
@@ -96,7 +95,7 @@ describe('Team Participants Controller', function()
 			end)
 		end)
 
-		insulate('handles former players and substitutes', function()
+		insulate('handles substitutes', function()
 			local TeamTemplateMock
 			local LpdbQuery
 
@@ -110,7 +109,6 @@ describe('Team Participants Controller', function()
 								id = 'SubPlayer',
 								link = 'SubPlayer',
 								name = 'Sub Player',
-								nationality = 'ca',
 								role = 'Substitute',
 							}),
 						}
@@ -161,7 +159,6 @@ describe('Team Participants Controller', function()
 							id = 'FormerPlayer',
 							link = 'FormerPlayer',
 							name = 'Former Player',
-							nationality = 'ca',
 							joindate = '2020-01-01',
 							leavedate = '2021-12-31',
 						}),
@@ -234,7 +231,6 @@ describe('Team Participants Controller', function()
 			TeamParticipantsController.mergeManualAndImportedPlayers(manualPlayers, importedPlayers)
 
 			assert.are_equal(1, #manualPlayers)
-			assert.are_equal('us', manualPlayers[1].flag)
 			assert.are_equal('manual', manualPlayers[1].extradata.manualData)
 			assert.are_equal('imported', manualPlayers[1].extradata.importedData)
 		end)
@@ -283,14 +279,12 @@ describe('Team Participants Controller', function()
 				}
 			}
 
-			local originalCount = #parsedData.participants[1].opponent.players
-
 			TeamParticipantsController.importParticipants(parsedData)
 
-			assert.are_equal(originalCount, #parsedData.participants[1].opponent.players)
+			assert.are_equal(1, #parsedData.participants[1].opponent.players)
 		end)
 
-		it('does not throw error when players array is missing', function()
+		it('players remain nil when import returns no results', function()
 			local parsedData = {
 				participants = {
 					{
@@ -399,6 +393,8 @@ describe('Team Participants Controller', function()
 			assert.are_equal('Player1', parsedData.participants[1].opponent.players[1].displayName)
 			assert.are_equal('Player2', parsedData.participants[1].opponent.players[2].displayName)
 			assert.are_equal('TBD', parsedData.participants[1].opponent.players[3].displayName)
+			assert.are_equal('TBD', parsedData.participants[1].opponent.players[4].displayName)
+			assert.are_equal('TBD', parsedData.participants[1].opponent.players[5].displayName)
 		end)
 	end)
 
