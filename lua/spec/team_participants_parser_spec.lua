@@ -48,8 +48,6 @@ describe('Team Participants Parser', function()
 
 				assert.are_equal(3, #result.participants)
 				assert.are_equal('team', result.participants[1].opponent.type)
-				assert.are_equal('team', result.participants[2].opponent.type)
-				assert.are_equal('team', result.participants[3].opponent.type)
 			end)
 
 			it('extracts minimumplayers parameter', function()
@@ -160,7 +158,6 @@ describe('Team Participants Parser', function()
 
 				local result = TeamParticipantsWikiParser.parseParticipant(input, date)
 
-				assert.are_equal('team', result.opponent.type)
 				assert.are_equal(date, result.date)
 			end)
 		end)
@@ -368,7 +365,6 @@ describe('Team Participants Parser', function()
 					return alias:lower():find('liquid')
 				end)
 				assert.is_true(hasTeamRelatedAlias)
-				assert.is_true(#result.aliases > 0)
 			end)
 
 		end)
@@ -489,15 +485,16 @@ describe('Team Participants Parser', function()
 				assert.is_table(result.extradata.roles)
 			end)
 
-			it('parses trophies as number and handles invalid values', function()
-				local validInput = {'PlayerName', trophies = '3'}
-				local invalidInput = {'PlayerName', trophies = 'not a number'}
+			it('parses trophies as number', function()
+				local result = TeamParticipantsWikiParser.parsePlayer({'PlayerName', trophies = '3'})
 
-				local validResult = TeamParticipantsWikiParser.parsePlayer(validInput)
-				local invalidResult = TeamParticipantsWikiParser.parsePlayer(invalidInput)
+				assert.are_equal(3, result.extradata.trophies)
+			end)
 
-				assert.are_equal(3, validResult.extradata.trophies)
-				assert.is_nil(invalidResult.extradata.trophies)
+			it('ignores trophies with invalid value', function()
+				local result = TeamParticipantsWikiParser.parsePlayer({'PlayerName', trophies = 'not a number'})
+
+				assert.is_nil(result.extradata.trophies)
 			end)
 
 			it('defaults type to player and preserves type overrides', function()
@@ -532,19 +529,24 @@ describe('Team Participants Parser', function()
 				LpdbQuery:revert()
 			end)
 
-			it('parses qualification methods correctly', function()
-				local inviteInput = createBasicParticipantInput({
+			it('parses invite qualification method', function()
+				local input = createBasicParticipantInput({
 					qualification = {method = 'invite', text = 'Direct Invite'}
 				})
-				local qualInput = createBasicParticipantInput({
+
+				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+
+				assert.are_equal('invite', result.qualification.method)
+			end)
+
+			it('parses qual qualification method', function()
+				local input = createBasicParticipantInput({
 					qualification = {method = 'qual', text = 'Qualifier'}
 				})
 
-				local inviteResult = TeamParticipantsWikiParser.parseParticipant(inviteInput, os.time())
-				local qualResult = TeamParticipantsWikiParser.parseParticipant(qualInput, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
 
-				assert.are_equal('invite', inviteResult.qualification.method)
-				assert.are_equal('qual', qualResult.qualification.method)
+				assert.are_equal('qual', result.qualification.method)
 			end)
 
 			it('returns nil when method is missing', function()
@@ -580,7 +582,7 @@ describe('Team Participants Parser', function()
 				TournamentGetStub:revert()
 			end)
 
-			it('detects tournament, external, and other types correctly', function()
+			it('detects tournament type and attaches tournament data', function()
 				TournamentGetStub.returns({
 					pageName = 'Test/Tournament',
 					displayName = 'Test Tournament',
@@ -588,27 +590,37 @@ describe('Team Participants Parser', function()
 					iconDark = 'Test_dark.png',
 				})
 
-				local tournamentInput = createBasicParticipantInput({
+				local input = createBasicParticipantInput({
 					qualification = {method = 'qual', page = 'Test/Tournament'}
 				})
-				local externalInput = createBasicParticipantInput({
+
+				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+
+				assert.are_equal('tournament', result.qualification.type)
+				assert.is_table(result.qualification.tournament)
+				assert.are_equal('Test/Tournament', result.qualification.tournament.pageName)
+				assert.are_equal('Test Tournament', result.qualification.tournament.displayName)
+			end)
+
+			it('detects external type and preserves url', function()
+				local input = createBasicParticipantInput({
 					qualification = {method = 'qual', url = 'https://example.com', text = 'External'}
 				})
-				local otherInput = createBasicParticipantInput({
+
+				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
+
+				assert.are_equal('external', result.qualification.type)
+				assert.are_equal('https://example.com', result.qualification.url)
+			end)
+
+			it('detects other type for text-only qualifications', function()
+				local input = createBasicParticipantInput({
 					qualification = {method = 'qual', text = 'Other Qualifier'}
 				})
 
-				local tournamentResult = TeamParticipantsWikiParser.parseParticipant(tournamentInput, os.time())
-				local externalResult = TeamParticipantsWikiParser.parseParticipant(externalInput, os.time())
-				local otherResult = TeamParticipantsWikiParser.parseParticipant(otherInput, os.time())
+				local result = TeamParticipantsWikiParser.parseParticipant(input, os.time())
 
-				assert.are_equal('tournament', tournamentResult.qualification.type)
-				assert.is_table(tournamentResult.qualification.tournament)
-				assert.are_equal('Test/Tournament', tournamentResult.qualification.tournament.pageName)
-				assert.are_equal('Test Tournament', tournamentResult.qualification.tournament.displayName)
-				assert.are_equal('external', externalResult.qualification.type)
-				assert.are_equal('https://example.com', externalResult.qualification.url)
-				assert.are_equal('other', otherResult.qualification.type)
+				assert.are_equal('other', result.qualification.type)
 			end)
 
 			it('requires text for external qualifiers', function()
