@@ -62,6 +62,7 @@ dbStructure.placement = {
 	placement = 'number|string|nil',
 	prizemoney = 'number?',
 	individualprizemoney = 'number?',
+	playershare = 'number?',
 	prizepoolindex = 'number?',
 	weight = 'number?',
 	mode = 'string?',

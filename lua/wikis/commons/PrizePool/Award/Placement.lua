@@ -18,6 +18,7 @@ local _tbd_index = 0
 
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_POINTS = 'POINTS'
+local PRIZE_TYPE_PLAYER_SHARE = 'PLAYER_SHARE'
 
 --- An AwardPlacement is a set of opponents who all share the same award in the tournament.
 --- Its input is generally a table created by `Template:Slot`.
@@ -75,10 +76,12 @@ function AwardPlacement:_getLpdbData(...)
 		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_BASE_CURRENCY .. 1)) or 0
 		local pointsReward = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
 		local pointsReward2 = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
+		local playerShare = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_PLAYER_SHARE .. 1))
 		local lpdbData = {
 			date = opponent.date,
 			prizemoney = prizeMoney,
-			individualprizemoney = Opponent.typeIsParty(opponentType) and (prizeMoney / Opponent.partySize(opponentType)) or 0,
+			individualprizemoney = Opponent.typeIsParty(opponentType) and ((playerShare or prizeMoney) / Opponent.partySize(opponentType)) or 0,
+			playerShare = not Opponent.typeIsParty(opponentType) and playerShare or nil,
 			mode = 'award_individual',
 			weight = 0,
 			extradata = {

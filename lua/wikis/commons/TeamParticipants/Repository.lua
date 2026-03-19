@@ -101,6 +101,13 @@ function TeamParticipantsRepository.save(participant)
 		lpdbData.individualprizemoney = lpdbData.prizemoney / numberOfPlayersOnTeam
 	end
 
+	-- Calculate individual playerShare
+	if lpdbData.playershare then
+		if activeOpponent.type ~= Opponent.team then
+			lpdbData.individualprizemoney = lpdbData.playershare
+		end
+	end
+
 	mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, Json.stringifySubTables(lpdbData))
 end
 

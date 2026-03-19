@@ -63,6 +63,7 @@ local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 local PRIZE_TYPE_POINTS = 'POINTS'
 local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
 local PRIZE_TYPE_FREETEXT = 'FREETEXT'
+local PRIZE_TYPE_PLAYER_SHARE = 'PLAYER_SHARE'
 
 BasePrizePool.config = {
 	showBaseCurrency = {
@@ -354,6 +355,30 @@ BasePrizePool.prizeTypes = {
 		rowDisplay = function (headerData, data)
 			if data > 0 then
 				return TableCell{children = {LANG:formatNum(data)}}
+			end
+		end,
+	},
+	[PRIZE_TYPE_PLAYER_SHARE] = {
+		sortOrder = 55,
+
+		header = 'playershare',
+		headerParse = function (prizePool, input, context, index)
+			return {title = 'Player Share'}
+		end,
+		headerDisplay = function (data)
+			return TableCell{children = {data.title}}
+		end,
+
+		row = 'playershare',
+		rowParse = function (placement, input, context, index)
+			return BasePrizePool._parseInteger(input)
+		end,
+		rowDisplay = function (headerData, data)
+			if data > 0 then
+				return TableCell{children = {
+					Currency.display(BASE_CURRENCY, data,
+						{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
+				}}
 			end
 		end,
 	},
