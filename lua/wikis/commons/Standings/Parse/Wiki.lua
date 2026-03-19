@@ -194,9 +194,9 @@ end
 
 ---@param args table
 ---@param tableType StandingsTableTypes
----@return StandingsTiebreaker[]
+---@return ParsedTiebreaker[]
 function StandingsParseWiki.parseTiebreakers(args, tableType)
-	local tiebreakerInput = Json.parseIfString(args.tiebreakers) or {}
+	local tiebreakerInput = Json.parseStringified(args.tiebreakers) or {}
 	local tiebreakers = Array.map(tiebreakerInput, TiebreakerFactory.validateAndNormalizeInput)
 	if #tiebreakers == 0 then
 		if tableType == 'ffa' then
