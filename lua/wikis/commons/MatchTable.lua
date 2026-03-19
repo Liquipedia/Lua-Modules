@@ -321,7 +321,7 @@ function MatchTable:query()
 		order = 'date desc',
 		query = 'match2id, match2opponents, match2games, date, dateexact, icon, icondark, liquipediatier, game, type,'
 			.. 'liquipediatiertype, tournament, pagename, parent, section, tickername, vod, winner, match2bracketdata,'
-			.. 'extradata, bestof',
+			.. 'extradata, bestof, publishertier',
 		limit = 50,
 	}, function(match)
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
@@ -769,6 +769,7 @@ end
 ---@param match MatchTableMatch
 ---@return Widget
 function MatchTable:matchRow(match)
+	mw.log(HighlightConditions.tournament(Tournament.partialTournamentFromMatch(match), self.args))
 	return TableWidgets.Row{
 		highlighted = HighlightConditions.tournament(Tournament.partialTournamentFromMatch(match), self.args),
 		children = WidgetUtil.collect(
