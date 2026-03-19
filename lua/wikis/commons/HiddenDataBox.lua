@@ -255,18 +255,10 @@ function HiddenDataBox._matchTicker(supressMatchTicker)
 		return nil
 	end
 
-	return Div{
-		classes = {'fo-nttax-infobox-topcontent'},
-		children = AnalyticsWidget{
-			analyticsName = 'HiddenDataBoxMatchTicker',
-			children = {
-				MatchTickerEntityDisplay.Container{
-					config = result.config,
-					matches = result.matches,
-				}:create()
-			}
-		}
-	}
+	return MatchTickerEntityDisplay.Container{
+		config = result.config,
+		matches = result.matches,
+	}:create()
 end
 
 return Class.export(HiddenDataBox, {exports = {'run'}})
