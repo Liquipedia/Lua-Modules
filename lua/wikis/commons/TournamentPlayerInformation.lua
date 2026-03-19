@@ -46,6 +46,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field currentTeam string?
 ---@field links table?
 ---@field role string?
+---@field fromOpponentType OpponentType
 
 ---@class TournamentPlayerInfo
 ---@operator call(table): TournamentPlayerInfo
@@ -128,9 +129,17 @@ function TournamentPlayerInfo:_parseRecords(records)
 				player.team = opponent.template
 			end
 
-			return self:queryPlayerInfo(player)
+			return Table.merge(self:queryPlayerInfo(player), {fromOpponentType = opponent.type})
 		end)
 	end)
+
+	-- sort by displayName if we have no team opponents
+	if self:_hasNoTeamOpponents(players) then
+		self.data = Array.sortBy(players, function(x) return x end, function(a, b)
+			return (a.displayName or ''):lower() < (b.displayName or ''):lower()
+		end)
+		return self
+	end
 
 	self.data = Array.sortBy(players, function(x) return x end, function (a, b)
 		if Logic.isEmpty(a.team) then
@@ -312,6 +321,9 @@ end
 ---@protected
 ---@return Widget?
 function TournamentPlayerInfo:buildTeamAgeTable()
+	if self:_hasNoTeamOpponents(self.data) then
+		return
+	end
 	local _, teamPlayers = Array.groupBy(self.data, function (player) return player.team end)
 	local ageDataByTeam = Table.mapValues(teamPlayers, function (players) return self:_calculateAgeData(players) end)
 
@@ -497,6 +509,13 @@ function TournamentPlayerInfo:buildPlayerRow(player)
 			' '
 		)}
 	)}
+end
+
+---@private
+---@param players EnrichedStandardPlayer[]
+---@return boolean
+function TournamentPlayerInfo:_hasNoTeamOpponents(players)
+	return Array.all(players, function(player) return player.fromOpponentType ~= Opponent.team end)
 end
 
 return TournamentPlayerInfo
