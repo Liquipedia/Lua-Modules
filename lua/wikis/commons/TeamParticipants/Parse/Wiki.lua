@@ -251,16 +251,16 @@ function TeamParticipantsWikiParser.fillIncompleteRoster(opponent, minimumPlayer
 		return
 	end
 
-	local actualPlayers = Array.filter(opponent.players, function(player)
+	local activePlayers = Array.filter(opponent.players, function(player)
 		return player.extradata.type == 'player' and not player.extradata.status
 	end)
 
-	local actualPlayerCount = #actualPlayers
-	if actualPlayerCount >= expectedPlayerCount then
+	local activePlayerCount = #activePlayers
+	if activePlayerCount >= expectedPlayerCount then
 		return
 	end
 
-	local tbdPlayers = TeamParticipantsWikiParser.createTBDPlayers(expectedPlayerCount - actualPlayerCount)
+	local tbdPlayers = TeamParticipantsWikiParser.createTBDPlayers(expectedPlayerCount - activePlayerCount)
 	Array.extendWith(opponent.players, tbdPlayers)
 end
 
