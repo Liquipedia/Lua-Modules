@@ -123,7 +123,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 			tiebreakers = Array.map(parsedTiebreakers, function(parsedTiebreaker, tiebreakerIndex)
 				local tiebreakerName = parsedTiebreaker.name
 				local tiebreakerContextType = parsedTiebreaker.context
-				local tiebreakerId = tiebreakerContextType .. tiebreakerName
+				local tiebreakerId = parsedTiebreaker.id
 				local tiebreaker = tiebreakers[tiebreakerIndex]
 				if tiebreakerContextType ~= 'full' then
 					return {
