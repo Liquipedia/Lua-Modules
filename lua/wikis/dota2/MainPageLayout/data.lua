@@ -12,7 +12,7 @@ local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 local Template = Lua.import('Module:Template')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
-local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
 local Rankings = Lua.import('Module:Widget/Ratings')
 
 local Button = Lua.import('Module:Widget/Basic/Button')
