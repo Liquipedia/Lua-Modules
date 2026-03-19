@@ -114,7 +114,7 @@ function StageWinningsCalculation.run(props)
 
 	if props.hideWinnings then
 		Array.sortInPlaceBy(opponents, function(opponent)
-			return {- opponent.points, - opponent.points, - opponent.matchWins, - opponent.gameWins, Opponent.toName(opponent)}
+			return {- opponent.points, - opponent.points2, - opponent.matchWins, - opponent.gameWins, Opponent.toName(opponent)}
 		end)
 	else
 		Array.sortInPlaceBy(opponents, function(opponent)
