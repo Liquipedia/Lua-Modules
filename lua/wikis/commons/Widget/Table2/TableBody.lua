@@ -30,6 +30,14 @@ function Table2Body:render()
 	local props = self.props
 	local children = props.children or {}
 
+	local stripeEnabled = self:useContext(Table2Contexts.BodyStripe)
+	if stripeEnabled == nil then
+		return Table2Contexts.Section{
+			value = 'body',
+			children = children,
+		}
+	end
+
 	local stripedChildren = {}
 	local stripe = 'even'
 	local groupRemaining = 0

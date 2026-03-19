@@ -11,7 +11,7 @@ jobs:
       - name: Install modules
         run: npm install
       - name: Run lint check
-        run: npm run test
+        run: npm run lint:ci
       - name: Run unit test
         run: npm run test:js
       - name: Report test

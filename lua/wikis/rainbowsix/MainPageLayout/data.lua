@@ -76,8 +76,8 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Rainbow Six Siege X full lightmode.svg',
-		darkmode = 'Rainbow Six Siege X full darkmode.svg',
+		lightmode = 'Rainbow Six Siege 2026 full lightmode.svg',
+		darkmode = 'Rainbow Six Siege 2026 full darkmode.svg',
 	},
 	metadesc = 'The Rainbow Six (R6) esports wiki covering everything from players, teams and transfers, ' ..
 		'to tournaments and results, maps, weapons, and operators.',

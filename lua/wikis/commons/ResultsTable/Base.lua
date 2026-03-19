@@ -10,18 +10,20 @@ local Lua = require('Module:Lua')
 local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Currency = Lua.import('Module:Currency')
+local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Info = Lua.import('Module:Info', {loadData = true})
+local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tier = Lua.import('Module:Tier/Custom')
-
-local Opponent = Lua.import('Module:Opponent/Custom')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -30,6 +32,11 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local LinkWidget = Lua.import('Module:Widget/Basic/Link')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local DEFAULT_VALUES = {
 	order = 'desc',
@@ -47,7 +54,7 @@ local QUERY_TYPES = {
 	team = 'team',
 	coach = 'coach',
 }
-local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
+local SCORE_CONCAT = '&nbsp;&colon;&nbsp;'
 local DEFAULT_RESULTS_SUB_PAGE = 'Results'
 local INVALID_TIER_DISPLAY = 'Undefined'
 local INVALID_TIER_SORT = 'ZZ'
@@ -212,30 +219,32 @@ function BaseResultsTable:buildBaseConditions()
 		:add{self:buildOpponentConditions()}
 
 	if args.game then
-		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, args.game)}
+		conditions:add(ConditionNode(ColumnName('game'), Comparator.eq, args.game))
 	end
 
 	local startDate = args.startdate or args.sdate
 	if startDate then
 		-- intentional > here to keep it as is in current modules
 		-- possibly change to >= later
-		conditions:add{ConditionNode(ColumnName('date'), Comparator.gt, startDate)}
+		conditions:add(ConditionNode(ColumnName('date'), Comparator.gt, startDate))
 	end
 
 	local endDate = args.enddate or args.edate
 	if endDate then
 		-- intentional < here to keep it as is in current modules
 		-- possibly change to <= later
-		conditions:add{ConditionNode(ColumnName('date'), Comparator.lt, endDate)}
+		conditions:add(ConditionNode(ColumnName('date'), Comparator.lt, endDate))
 	end
 
 	if args.placement then
-		conditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, args.placement)}
+		conditions:add(ConditionNode(ColumnName('placement'), Comparator.eq, args.placement))
 	elseif Logic.readBool(args.awards) then
-		conditions:add{ConditionNode(ColumnName('mode'), Comparator.eq, 'award_individual')}
+		conditions:add(ConditionNode(ColumnName('mode'), Comparator.eq, 'award_individual'))
 	else
-		conditions:add{ConditionNode(ColumnName('mode'), Comparator.neq, 'award_individual')}
-		conditions:add{ConditionNode(ColumnName('placement'), Comparator.neq, '')}
+		conditions:add{
+			ConditionNode(ColumnName('mode'), Comparator.neq, 'award_individual'),
+			ConditionNode(ColumnName('placement'), Comparator.neq, '')
+		}
 	end
 
 	if args.tier then
@@ -248,7 +257,7 @@ function BaseResultsTable:buildBaseConditions()
 end
 
 ---Builds Lpdb conditions for the given opponent
----@return table?
+---@return ConditionTree?
 function BaseResultsTable:buildOpponentConditions()
 	local config = self.config
 
@@ -261,14 +270,14 @@ end
 
 -- todo: adjust once #1802 is done
 ---Builds Lpdb conditions for the non team opponent case
----@return table
+---@return ConditionTree
 function BaseResultsTable:buildNonTeamOpponentConditions()
 	local config = self.config
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 
 	local opponents = Array.append(config.aliases, config.opponent)
 
-	for _, opponent in pairs(opponents) do
+	Array.forEach(opponents, function (opponent)
 		opponent = config.resolveOpponent
 			and mw.ext.TeamLiquidIntegration.resolve_redirect(opponent)
 			or opponent
@@ -278,33 +287,28 @@ function BaseResultsTable:buildNonTeamOpponentConditions()
 		local prefix
 		if config.queryType == QUERY_TYPES.solo then
 			prefix = PLAYER_PREFIX
-			opponentConditions:add{
-				ConditionTree(BooleanOperator.all):add{
-					ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
-					ConditionNode(ColumnName('opponentname'), Comparator.eq, opponent),
-				},
-				ConditionTree(BooleanOperator.all):add{
-					ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
-					ConditionNode(ColumnName('opponentname'), Comparator.eq, opponentWithUnderscore),
-				},
-			}
+			opponentConditions:add(ConditionTree(BooleanOperator.all):add{
+				ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
+				ConditionUtil.anyOf(ColumnName('opponentname'), {opponent, opponentWithUnderscore})
+			})
 		else
 			prefix = COACH_PREFIX
 		end
 
-		for playerIndex = 1, config.playerLimit do
+		Array.forEach(Array.range(1, config.playerLimit), function (playerIndex)
+			local playerColumnName = ColumnName('opponentplayers_' .. prefix .. playerIndex)
 			opponentConditions:add{
-				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, opponent),
-				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, opponentWithUnderscore),
+				ConditionNode(playerColumnName, Comparator.eq, opponent),
+				ConditionNode(playerColumnName, Comparator.eq, opponentWithUnderscore),
 			}
-		end
-	end
+		end)
+	end)
 
 	return opponentConditions
 end
 
 ---Builds Lpdb conditions for a team
----@return table
+---@return ConditionTree
 function BaseResultsTable:buildTeamOpponentConditions()
 	local config = self.config
 
@@ -345,13 +349,13 @@ function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTempl
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 
 	local prefix = PLAYER_PREFIX
-	for _, teamTemplate in pairs(opponentTeamTemplates) do
+	Array.forEach(opponentTeamTemplates, function (teamTemplate)
 		for playerIndex = 1, config.playerLimit do
 			opponentConditions:add{
 				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex .. 'template'), Comparator.eq, teamTemplate),
 			}
 		end
-	end
+	end)
 
 	return ConditionTree(BooleanOperator.all):add{
 		opponentConditions,
@@ -359,53 +363,65 @@ function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTempl
 	}
 end
 
----Builds the results/achievements/awards table
----@return Html
-function BaseResultsTable:build()
-	local displayTable = mw.html.create('table')
-		:addClass('wikitable wikitable-striped sortable')
-		:css('text-align', 'center')
-		:node(self:buildHeader())
-
-	if Table.isEmpty(self.data) or Table.isEmpty(self.data[1]) then
-		return displayTable:node(mw.html.create('tr')
-			:tag('td'):attr('colspan', 42):wikitext('No recorded results found.'))
-	end
-
-	-- Hidden tr that contains a td to prevent the first yearHeader from being inside thead
-	displayTable:node(mw.html.create('tr'):css('display', 'none'):tag('td'):allDone())
-
-	for _, dataSet in ipairs(self.data) do
-		for _, row in ipairs(self:_buildRows(dataSet)) do
-			displayTable:node(row)
-		end
-	end
-
-	if self.config.onlyAchievements then
-		displayTable:tag('tr')
-			:tag('th')
-				:attr('colspan', 42)
-				:css('font-style', 'italic')
-				:wikitext('[[' .. self.config.opponent .. '/' .. self.config.resultsSubPage .. '|Extended list of results]]')
-	end
-
-	displayTable:node(self.args.manualContent)
-
-	return mw.html.create('div')
-		:addClass('table-responsive')
-		:node(displayTable)
+---@private
+---@return boolean
+function BaseResultsTable:_isDataEmpty()
+	return Table.isEmpty(self.data) or Table.isEmpty(self.data[1])
 end
 
----comment
+---Builds the results/achievements/awards table
+---@return Widget
+function BaseResultsTable:build()
+	return TableWidgets.Table{
+		sortable = true,
+		columns = self:buildColumnDefinitions(),
+		children = WidgetUtil.collect(
+			TableWidgets.TableHeader{children = {self:buildHeader()}},
+			-- Hidden tr that contains a td to prevent the first yearHeader from being inside thead
+			not self:_isDataEmpty() and HtmlWidgets.Tr{
+				css = {display = 'none'},
+				children = HtmlWidgets.Td{}
+			} or nil,
+			TableWidgets.TableBody{children = WidgetUtil.collect(self:_buildTableBody(), self.args.manualContent)}
+		),
+		footer = self.config.onlyAchievements and LinkWidget{
+			link = self.config.opponent .. '/' .. self.config.resultsSubPage,
+			children = 'Extended list of results',
+		} or nil
+	}
+end
+
+---@private
+---@return Widget[]
+function BaseResultsTable:_buildTableBody()
+	if self:_isDataEmpty() then
+		return {TableWidgets.Row{children = TableWidgets.Cell{
+			colspan = 42,
+			children = 'No recorded results found.'
+		}}}
+	end
+	return Array.flatMap(self.data, function (dataSet)
+		return self:_buildRows(dataSet)
+	end)
+end
+
+---@private
 ---@param placementData table
 ---@return Html[]
 function BaseResultsTable:_buildRows(placementData)
 	local rows = {}
 
 	if placementData.header then
-		table.insert(rows, mw.html.create('tr'):addClass('sortbottom')
-			:tag('th'):attr('colspan', 42):wikitext(placementData.header):done()
-			:done())
+		table.insert(rows, TableWidgets.Row{
+			section = 'subhead',
+			classes = {'sortbottom'},
+			css = {['font-weight'] = 'bold'},
+			children = TableWidgets.CellHeader{
+				align = 'center',
+				colspan = 42,
+				children = placementData.header
+			}
+		})
 	end
 
 	for _, placement in ipairs(placementData) do
@@ -415,19 +431,17 @@ function BaseResultsTable:_buildRows(placementData)
 	return rows
 end
 
--- overwritable
 ---Applies the row highlight
----@param placement table
----@return string?
+---@protected
+---@param placement placement
+---@return boolean
 function BaseResultsTable:rowHighlight(placement)
-	if HighlightConditions.tournament(placement, self.config) then
-		return 'tournament-highlighted-bg'
-	end
+	return HighlightConditions.tournament(placement, self.config)
 end
 
--- overwritable
 ---Builds the tier display
----@param placement table
+---@protected
+---@param placement placement
 ---@return string?, string?
 function BaseResultsTable:tierDisplay(placement)
 	local tier, tierType, options = Tier.parseFromQueryData(placement)
@@ -441,16 +455,16 @@ function BaseResultsTable:tierDisplay(placement)
 	return Tier.display(tier, tierType, options), Tier.toSortValue(tier, tierType)
 end
 
--- overwritable
 ---Builds the opponent display
----@param data table
+---@protected
+---@param data placement
 ---@param options table?
----@return Widget|Html?
+---@return string|Widget?
 function BaseResultsTable:opponentDisplay(data, options)
 	options = options or {}
 
-	if not data.opponenttype then
-		return mw.html.create():wikitext('-')
+	if not Opponent.isType(data.opponenttype) then
+		return '-'
 	elseif data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
 		return OpponentDisplay.BlockOpponent{
 			opponent = Opponent.fromLpdbStruct(data) --[[@as standardOpponent]],
@@ -506,27 +520,35 @@ end
 
 ---Builds team icon display with text below it
 ---@param teamDisplay Widget
----@param rawTeamTemplate table
+---@param rawTeamTemplate teamTemplateData
 ---@param flip boolean?
----@return Html
+---@return Widget
 function BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, flip)
-	return mw.html.create()
-		:node(teamDisplay)
-		:node(mw.html.create('div')
-			:css('width', '60px')
-			:css('float', flip and 'right' or 'left')
-			:node(
-				mw.html.create('div')
-					:css('line-height', '1')
-					:css('font-size', '80%')
-					:css('text-align', 'center')
-					:wikitext('([[' .. rawTeamTemplate.page .. '|' .. rawTeamTemplate.shortname .. ']])')
-			)
-		)
+	return HtmlWidgets.Fragment{children = {
+		teamDisplay,
+		HtmlWidgets.Div{
+			css = {
+				width = '60px',
+				float = flip and 'right' or 'left',
+			},
+			children = HtmlWidgets.Div{
+				css = {
+					['line-height'] = 1,
+					['font-size'] = '80%',
+					['text-align'] = 'center',
+				},
+				children = {
+					'(',
+					LinkWidget{link = rawTeamTemplate.page, children = rawTeamTemplate.shortname},
+					')'
+				}
+			}
+		}
+	}}
 end
 
 ---Builds the tournament display name
----@param placement table
+---@param placement placement
 ---@return string
 function BaseResultsTable.tournamentDisplayName(placement)
 	if String.isNotEmpty(placement.tournament) then
@@ -537,8 +559,8 @@ function BaseResultsTable.tournamentDisplayName(placement)
 end
 
 ---Converts the lastvsdata to display components
----@param placement table
----@return string, Widget|Html?, string?
+---@param placement placement
+---@return string, string|Widget?, string?
 function BaseResultsTable:processVsData(placement)
 	local lastVs = placement.lastvsdata or {}
 
@@ -556,13 +578,98 @@ function BaseResultsTable:processVsData(placement)
 	return score, vsDisplay
 end
 
-function BaseResultsTable:buildHeader()
-	error('Function "buildHeader" needs to be set via the module that requires "Module:BaseResultsTable/Base"')
+---@protected
+---@return table[]
+function BaseResultsTable:buildColumnDefinitions()
+	error('BaseResultsTable:buildColumnDefinitions() cannot be called directly and must be overridden.')
 end
 
----@param placement table
+---@protected
+---@return Widget
+function BaseResultsTable:buildHeader()
+	error('BaseResultsTable:buildHeader() cannot be called directly and must be overridden.')
+end
+
+---@protected
+---@param placement placement
+---@return Widget
 function BaseResultsTable:buildRow(placement)
-	error('Function "buildRow" needs to be set via the module that requires "Module:BaseResultsTable/Base"')
+	error('BaseResultsTable:buildRow() cannot be called directly and must be overridden.')
+end
+
+---@protected
+---@param placement placement
+---@return Widget
+function BaseResultsTable:createDateCell(placement)
+	return TableWidgets.Cell{children = DateExt.toYmdInUtc(placement.date)}
+end
+
+---@protected
+---@param placement placement
+---@return Widget
+function BaseResultsTable:createTierCell(placement)
+	local tierDisplay, tierSortValue = self:tierDisplay(placement)
+	return TableWidgets.Cell{
+		attributes = {
+			['data-sort-value'] = tierSortValue
+		},
+		children = tierDisplay
+	}
+end
+
+---@protected
+---@param placement placement
+---@return Widget?
+function BaseResultsTable:createTypeCell(placement)
+	if not self.config.showType then
+		return
+	end
+	return TableWidgets.Cell{
+		children = placement.type
+	}
+end
+
+---@protected
+---@param placement placement
+---@return Widget[]
+function BaseResultsTable:createTournamentCells(placement)
+	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)
+	return {
+		TableWidgets.Cell{
+			attributes = {
+				['data-sort-value'] = tournamentDisplayName
+			},
+			children = LeagueIcon.display{
+				icon = placement.icon,
+				iconDark = placement.icondark,
+				link = placement.parent,
+				name = tournamentDisplayName,
+				options = {noTemplate = true},
+			}
+		},
+		TableWidgets.Cell{
+			attributes = {
+				['data-sort-value'] = tournamentDisplayName
+			},
+			children = LinkWidget{
+				children = tournamentDisplayName,
+				link = placement.pagename,
+			}
+		},
+	}
+end
+
+---@protected
+---@param props {useIndivPrize: boolean?, placement: placement}
+---@return Widget
+function BaseResultsTable:createPrizeCell(props)
+	local useIndivPrize = Logic.nilOr(props.useIndivPrize, self.config.queryType ~= Opponent.team)
+	local placement = props.placement
+	return TableWidgets.Cell{children = Currency.display(
+		'USD',
+		useIndivPrize and placement.individualprizemoney or placement.prizemoney,
+		{dashIfZero = true, displayCurrencyCode = false, formatValue = true}
+	)}
 end
 
 return BaseResultsTable
