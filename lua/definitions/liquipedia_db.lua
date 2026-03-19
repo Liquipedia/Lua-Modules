@@ -39,7 +39,6 @@ local lpdb = {}
 ---@field placement string
 ---@field prizemoney number
 ---@field individualprizemoney number
----@field playershare number
 ---@field prizepoolindex integer
 ---@field weight number
 ---@field mode string
