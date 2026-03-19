@@ -194,9 +194,8 @@ function TournamentsTickerListWidget:render()
 
 	return ContentSwitch{
 		switchGroup = 'tournament-list-phase',
-		syncLevel = 'page',
 		defaultActive = 2,
-		storeValue = true,
+		storeValue = false,
 		size = 'extrasmall',
 		variant = 'generic',
 		tabs = {
