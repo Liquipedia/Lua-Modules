@@ -44,7 +44,7 @@ function TiebreakerFactory._parseTiebreakerInput(input)
 		return {
 			name = tiebreakerName,
 			context = tiebreakerContext,
-			id = tiebreakerContext .. tiebreakerName,
+			id = tiebreakerContext .. '.' .. tiebreakerName,
 			config = Logic.nilIfEmpty(input)
 		}
 	end
@@ -56,7 +56,7 @@ function TiebreakerFactory._parseTiebreakerInput(input)
 	return {
 		name = name,
 		context = context,
-		id = context .. name,
+		id = context .. '.' .. name,
 	}
 end
 
