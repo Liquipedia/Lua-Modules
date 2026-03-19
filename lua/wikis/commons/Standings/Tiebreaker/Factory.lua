@@ -43,7 +43,7 @@ function TiebreakerFactory._parseTiebreakerInput(input)
 		return {
 			name = tiebreakerName,
 			context = Logic.emptyOr(tiebreakerContext, 'full'),
-			config = input
+			config = Logic.nilIfEmpty(input)
 		}
 	end
 	local context, name = unpack(String.split(input, '%.'))
