@@ -63,6 +63,8 @@ local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 local PRIZE_TYPE_POINTS = 'POINTS'
 local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
 local PRIZE_TYPE_FREETEXT = 'FREETEXT'
+local PRIZE_TYPE_PLAYER_SHARE = 'PLAYER_SHARE'
+local PRIZE_TYPE_CLUB_SHARE = 'CLUB_SHARE'
 
 BasePrizePool.config = {
 	showBaseCurrency = {
@@ -357,6 +359,52 @@ BasePrizePool.prizeTypes = {
 			end
 		end,
 	},
+	[PRIZE_TYPE_PLAYER_SHARE] = {
+		sortOrder = 55,
+
+		header = 'playershare',
+		headerParse = function (prizePool, input, context, index)
+			return {title = 'Player Share'}
+		end,
+		headerDisplay = function (data)
+			return TableCell{children = {data.title}}
+		end,
+
+		row = 'playershare',
+		rowParse = function (placement, input, context, index)
+			return BasePrizePool._parseInteger(input)
+		end,
+		rowDisplay = function (headerData, data)
+			if data > 0 then
+				return TableCell{children = {
+					Currency.display(BASE_CURRENCY, data,
+						{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
+				}}
+			end
+		end,
+	},
+	[PRIZE_TYPE_CLUB_SHARE] = {
+		sortOrder = 56,
+		header = 'clubshare',
+		headerParse = function(prizePool, input, context, index)
+			return {title = 'Club Share'}
+		end,
+		headerDisplay = function(data)
+			return TableCell{children = {data.title}}
+		end,
+		row = 'clubshare',
+		rowParse = function(placement, input, context, index)
+			return input
+		end,
+		rowDisplay = function(headerData, data)
+			if data and tonumber(data) > 0 then
+				return TableCell{children = {
+					Currency.display(BASE_CURRENCY, data,
+						{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
+				}}
+			end
+		end,
+	},
 	[PRIZE_TYPE_FREETEXT] = {
 		sortOrder = 60,
 
@@ -512,6 +560,17 @@ function BasePrizePool:_readPrizes(args)
 		end
 	end
 
+	-- club share addition if both playershare and base local prize is present
+	local hasBase = false
+	local hasPlayerShare = false
+	for _, prize in ipairs(self.prizes) do
+		if prize.type == PRIZE_TYPE_BASE_CURRENCY then hasBase = true end
+		if prize.type == PRIZE_TYPE_PLAYER_SHARE then hasPlayerShare = true end
+	end
+	if hasBase and hasPlayerShare then
+		self:addPrize(PRIZE_TYPE_CLUB_SHARE, 1, {title = 'Club Share', roundPrecision = self.options.currencyRoundPrecision})
+	end
+
 	return self.prizes
 end
 
@@ -642,6 +701,24 @@ function BasePrizePool:_buildRows()
 
 		self:applyToggleExpand(previousPlacement, placement, rows)
 
+		-- Calculate club share for the placement
+		for _, opponent in ipairs(placement.opponents) do
+			local basePrize = nil
+			local playerShare = nil
+			for _, prize in ipairs(self.prizes) do
+				if prize.type == PRIZE_TYPE_BASE_CURRENCY then
+					basePrize = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
+				elseif prize.type == PRIZE_TYPE_PLAYER_SHARE then
+					playerShare = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
+				end
+			end
+			if basePrize and playerShare then
+				local clubShare = tonumber(basePrize) - tonumber(playerShare)
+				if not opponent.prizeRewards then opponent.prizeRewards = {} end
+				opponent.prizeRewards[PRIZE_TYPE_CLUB_SHARE .. '1'] = clubShare
+			end
+		end
+
 		local cells = {}
 		table.insert(cells, self:placeOrAwardCell(placement))
 
@@ -670,6 +747,21 @@ function BasePrizePool:_buildRows()
 				previousOfPrizeType[prize.type] = cell
 				return cell
 			end)
+
+			-- Add club share cell if both base and player share exist
+			local clubSharePrize = nil
+			for _, prize in ipairs(self.prizes) do
+				if prize.type == PRIZE_TYPE_CLUB_SHARE then
+					clubSharePrize = prize
+					break
+				end
+			end
+			if clubSharePrize then
+				local prizeTypeData = self.prizeTypes[PRIZE_TYPE_CLUB_SHARE]
+				local reward = opponent.prizeRewards[PRIZE_TYPE_CLUB_SHARE .. '1']
+				local cell = reward and prizeTypeData.rowDisplay(clubSharePrize.data, reward) or TableCell{}
+				table.insert(prizeCells, cell)
+			end
 
 			Array.forEach(prizeCells, function (prizeCell, columnIndex)
 				local lastInColumn = previousOpponent[columnIndex]
