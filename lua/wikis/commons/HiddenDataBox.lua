@@ -22,9 +22,7 @@ local TextSanitizer = Lua.import('Module:TextSanitizer')
 local Tier = Lua.import('Module:Tier/Custom')
 local Variables = Lua.import('Module:Variables')
 
-local AnalyticsWidget = Lua.import('Module:Widget/Analytics')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
 local Fragment = HtmlWidgets.Fragment
 local WarningBoxGroup = Lua.import('Module:Widget/WarningBox/Group')
 local WidgetUtil = Lua.import('Module:Widget/Util')
