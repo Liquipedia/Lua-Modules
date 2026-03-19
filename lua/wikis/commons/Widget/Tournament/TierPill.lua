@@ -17,6 +17,10 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 ---@operator call(table): TournamentsTickerPillWidget
 local TournamentsTickerPillWidget = Class.new(Widget)
 
+TournamentsTickerPillWidget.defaultProps = {
+	variant = 'solid',
+}
+
 local COLOR_CLASSES = {
 	[1] = 'tier1',
 	[2] = 'tier2',
@@ -41,11 +45,37 @@ function TournamentsTickerPillWidget:render()
 		return
 	end
 
-	local tierShort, tierTypeShort = Tier.toShortName(tournament.liquipediaTier,tournament.liquipediaTierType)
+	local tierShort, tierTypeShort = Tier.toShortName(tournament.liquipediaTier, tournament.liquipediaTierType)
 
-	local tierNode, tierTypeNode, colorClass
+	local colorClass
 	if tierTypeShort then
 		colorClass = COLOR_CLASSES[tournament.liquipediaTierType]
+	else
+		colorClass = COLOR_CLASSES[tournament.liquipediaTier]
+	end
+	colorClass = colorClass or COLOR_CLASSES.default
+
+	if self.props.variant == 'subtle' then
+		local children = {
+			HtmlWidgets.Div{
+				classes = {'tournament-badge__text'},
+				children = Tier.toName(tournament.liquipediaTier),
+			}
+		}
+		if tierTypeShort then
+			table.insert(children, HtmlWidgets.Div{
+				classes = {'tournament-badge__text'},
+				children = tierTypeShort,
+			})
+		end
+		return HtmlWidgets.Div{
+			classes = {'tournament-badge', 'tournament-badge--subtle', 'badge--' .. colorClass},
+			children = children,
+		}
+	end
+
+	local tierNode, tierTypeNode
+	if tierTypeShort then
 		tierNode = HtmlWidgets.Div{
 			classes = {'tournament-badge__chip', 'chip--' .. COLOR_CLASSES[tournament.liquipediaTier]},
 			children = tierShort,
@@ -55,14 +85,11 @@ function TournamentsTickerPillWidget:render()
 			children = tierTypeShort,
 		}
 	else
-		colorClass = COLOR_CLASSES[tournament.liquipediaTier]
 		tierNode = HtmlWidgets.Div{
 			classes = {'tournament-badge__text'},
 			children = Tier.toName(tournament.liquipediaTier),
 		}
 	end
-
-	colorClass = colorClass or COLOR_CLASSES.default
 
 	return HtmlWidgets.Div{
 		classes = {'tournament-badge', 'badge--' .. colorClass},
