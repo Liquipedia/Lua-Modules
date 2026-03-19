@@ -196,8 +196,6 @@ function TournamentsTickerListWidget:render()
 		switchGroup = 'tournament-list-phase',
 		defaultActive = 2,
 		storeValue = false,
-		size = 'extrasmall',
-		variant = 'generic',
 		tabs = {
 			{label = 'Upcoming', value = 'upcoming', content = buildTabContent(upcomingTournaments)},
 			{label = 'Ongoing', value = 'ongoing', content = buildTabContent(ongoingTournaments)},
