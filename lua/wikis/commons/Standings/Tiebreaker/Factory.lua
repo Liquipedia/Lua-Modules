@@ -7,9 +7,16 @@
 
 local Lua = require('Module:Lua')
 
+local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local TiebreakerFactory = {}
+
+---@class ParsedTiebreaker
+---@field name string
+---@field context string
+---@field config table?
 
 local NAME_TO_CLASS = {
 	buchholz = 'Buchholz',
@@ -27,23 +34,42 @@ local NAME_TO_CLASS = {
 	gamewinrate = 'Game/WinRate',
 }
 
---- Validates and normalizes the name of a tiebreaker input.
----@param input string
----@return string
-function TiebreakerFactory.validateAndNormalizeInput(input)
+---@param input string|table
+---@return ParsedTiebreaker
+function TiebreakerFactory._parseTiebreakerInput(input)
+	if type(input) == 'table' then
+		local tiebreakerName = Table.extract(input, 'name')
+		local tiebreakerContext = Table.extract(input, 'context')
+		return {
+			name = tiebreakerName,
+			context = Logic.emptyOr(tiebreakerContext, 'full'),
+			config = input
+		}
+	end
 	local context, name = unpack(String.split(input, '%.'))
 	if name == nil then
 		name = context
 		context = 'full'
 	end
+	return {
+		name = name,
+		context = context
+	}
+end
+
+--- Validates and normalizes the name of a tiebreaker input.
+---@param input string|table
+---@return ParsedTiebreaker
+function TiebreakerFactory.validateAndNormalizeInput(input)
+	local parsedInput = TiebreakerFactory._parseTiebreakerInput(input)
 	assert(
-		context == 'full' or context == 'ml' or context == 'h2h',
-		'Invalid tie breaker context: ' .. context
+		parsedInput.context == 'full' or parsedInput.context == 'ml' or parsedInput.context == 'h2h',
+		'Invalid tie breaker context: ' .. parsedInput.context
 	)
 
-	local tiebreakerClassName = NAME_TO_CLASS[name]
+	local tiebreakerClassName = NAME_TO_CLASS[parsedInput.name]
 	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(input))
-	return table.concat({context, name}, '.')
+	return parsedInput
 end
 
 ---@param tiebreakerId string
