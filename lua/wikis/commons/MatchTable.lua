@@ -769,7 +769,6 @@ end
 ---@param match MatchTableMatch
 ---@return Widget
 function MatchTable:matchRow(match)
-	mw.log(HighlightConditions.tournament(Tournament.partialTournamentFromMatch(match), self.args))
 	return TableWidgets.Row{
 		highlighted = HighlightConditions.tournament(Tournament.partialTournamentFromMatch(match), self.args),
 		children = WidgetUtil.collect(
