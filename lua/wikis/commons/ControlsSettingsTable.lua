@@ -8,27 +8,27 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Class = Lua.import('Module:Class')
+local Info = Lua.import('Module:Info')
 
 local ControlsSettingsTableWidget = Lua.import('Module:Widget/ControlsSettingsTable')
 
 local ControlsSettingsTable = Class.new()
 
----@param lpdbConfig string[]
----@param columnConfig ColumnConfig[]
 ---@param frame table
----@return Widget?
-function ControlsSettingsTable.create(lpdbConfig, columnConfig, frame)
+---@return Widget
+function ControlsSettingsTable.create(frame)
 	local args = Arguments.getArgs(frame)
+	local columnConfig = Info.controlsSettingsTable
 	local widget = ControlsSettingsTableWidget(columnConfig, args)
-	ControlsSettingsTable.saveToLpdb(lpdbConfig, args)
-	return widget:tryMake()
+	ControlsSettingsTable.saveToLpdb(columnConfig, args)
+	return widget:render()
 end
 
----@param lpdbConfig string[]
+---@param columnConfig {keys: string[], title: string}
 ---@param args {[string]: string?}
-function ControlsSettingsTable.saveToLpdb(lpdbConfig, args)
+function ControlsSettingsTable.saveToLpdb(columnConfig, args)
 	local title = mw.title.getCurrentTitle().text
-	local extradata = ControlsSettingsTable.generateLpdbExtradata(lpdbConfig, args)
+	local extradata = ControlsSettingsTable.generateLpdbExtradata(columnConfig, args)
 	mw.ext.LiquipediaDB.lpdb_settings(title, {
 		name = 'movement',
 		reference = args.ref,
@@ -38,15 +38,17 @@ function ControlsSettingsTable.saveToLpdb(lpdbConfig, args)
 	})
 end
 
----@param lpdbConfig string[]
+---@param columnConfig {keys: string[], title: string}
 ---@param args {[string]: string?}
 ---@return {[string]: string?}
-function ControlsSettingsTable.generateLpdbExtradata(lpdbConfig, args)
-	local result = {}
-	for _, key in ipairs(lpdbConfig) do
-		result[key:lower()] = args[key:lower()]
+function ControlsSettingsTable.generateLpdbExtradata(columnConfig, args)
+	local lpdbData = {}
+	for _, item in ipairs(columnConfig) do
+		for _, key in ipairs(item.keys) do
+			lpdbData[key:lower()] = args[key:lower()]
+		end
 	end
-	return result
+	return lpdbData
 end
 
 return ControlsSettingsTable
