@@ -8,11 +8,8 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local Game = Lua.import('Module:Game')
 local PageLink = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
-local Template = Lua.import('Module:Template')
-local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
