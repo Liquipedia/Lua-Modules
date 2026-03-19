@@ -16,6 +16,7 @@ local TiebreakerFactory = {}
 ---@class ParsedTiebreaker
 ---@field name string
 ---@field context string
+---@field id string
 ---@field config table?
 
 local NAME_TO_CLASS = {
@@ -39,10 +40,11 @@ local NAME_TO_CLASS = {
 function TiebreakerFactory._parseTiebreakerInput(input)
 	if type(input) == 'table' then
 		local tiebreakerName = Table.extract(input, 'name')
-		local tiebreakerContext = Table.extract(input, 'context')
+		local tiebreakerContext = Logic.emptyOr(Table.extract(input, 'context'), 'full')
 		return {
 			name = tiebreakerName,
-			context = Logic.emptyOr(tiebreakerContext, 'full'),
+			context = tiebreakerContext,
+			id = tiebreakerContext .. tiebreakerName,
 			config = Logic.nilIfEmpty(input)
 		}
 	end
@@ -53,7 +55,8 @@ function TiebreakerFactory._parseTiebreakerInput(input)
 	end
 	return {
 		name = name,
-		context = context
+		context = context,
+		id = context .. name,
 	}
 end
 
@@ -72,6 +75,7 @@ function TiebreakerFactory.validateAndNormalizeInput(input)
 	return parsedInput
 end
 
+---@deprecated
 ---@param tiebreakerId string
 ---@return StandingsTiebreaker
 function TiebreakerFactory.tiebreakerFromId(tiebreakerId)
@@ -83,5 +87,17 @@ function TiebreakerFactory.tiebreakerFromId(tiebreakerId)
 
 	return TiebreakerClass(context)
 end
+
+---@param parsedTiebreaker ParsedTiebreaker
+---@return StandingsTiebreaker
+function TiebreakerFactory.getTiebreaker(parsedTiebreaker)
+	local tiebreakerClassName = NAME_TO_CLASS[parsedTiebreaker.name]
+	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(parsedTiebreaker.name))
+	---@type StandingsTiebreaker
+	local TiebreakerClass = Lua.import('Module:Standings/Tiebreaker/' .. tiebreakerClassName)
+
+	return TiebreakerClass(parsedTiebreaker.context, parsedTiebreaker.config)
+end
+
 
 return TiebreakerFactory
