@@ -28,6 +28,7 @@ local Div = HtmlWidgets.Div
 ---@field classes string[]?
 ---@field size 'extrasmall'|'small'|'medium'
 ---@field storeValue boolean
+---@field syncLevel 'site'|'wiki'|'page'?
 ---@field css table?
 
 ---@class ContentSwitch: Widget
@@ -105,6 +106,7 @@ function ContentSwitch:render()
 						attributes = {
 							['data-switch-group'] = switchGroup,
 							['data-store-value'] = Logic.readBool(self.props.storeValue) and 'true' or nil,
+							['data-sync-level'] = self.props.syncLevel,
 						},
 						children = tabOptions,
 					},
