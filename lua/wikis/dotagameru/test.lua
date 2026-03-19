@@ -1,0 +1,6 @@
+---
+-- @Liquipedia
+-- page=Module:Test
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
