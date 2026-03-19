@@ -22,16 +22,17 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 ---@class StandingsSwissWidget: Widget
 ---@operator call(table): StandingsSwissWidget
+---@field props {standings: StandingsModel?}
 local StandingsSwissWidget = Class.new(Widget)
 
 ---@return Widget?
 function StandingsSwissWidget:render()
-	if not self.props.standings then
+	local standings = self.props.standings
+
+	if not standings then
 		return
 	end
 
-	---@type StandingsModel
-	local standings = self.props.standings
 	local lastRound = standings.rounds[#standings.rounds]
 
 	return DataTable{
