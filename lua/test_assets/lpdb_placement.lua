@@ -5,6 +5,7 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['playershare'] = 0,
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -102,6 +103,7 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['playershare'] = 0,
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -163,6 +165,7 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['playershare'] = 0,
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -256,6 +259,7 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['playershare'] = 0,
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -347,6 +351,7 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['playershare'] = 0,
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -450,6 +455,7 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['playershare'] = 0,
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -553,6 +559,7 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['playershare'] = 0,
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -644,6 +651,7 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['playershare'] = 0,
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -735,6 +743,7 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['playershare'] = 0,
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -832,6 +841,7 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['playershare'] = 0,
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -923,6 +933,7 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['playershare'] = 0,
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -1014,6 +1025,7 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['playershare'] = 0,
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -1123,6 +1135,7 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['playershare'] = 0,
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -1214,6 +1227,7 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['playershare'] = 0,
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -1311,6 +1325,7 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['playershare'] = 0,
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
@@ -1402,6 +1417,7 @@ return {
 		['extradata'] = {
 			['prizepoints'] = '',
 			['prizepoints2'] = '',
+			['playershare'] = 0,
 		},
 		['game'] = 'siege',
 		['groupscore'] = '',
