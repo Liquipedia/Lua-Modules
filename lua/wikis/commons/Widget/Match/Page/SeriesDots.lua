@@ -20,11 +20,11 @@ local Div = HtmlWidgets.Div
 ---@field seriesDots string[]?
 
 local RESULT_DISPLAY_TYPES = {
-	['w'] = 'winner',
-	['l'] = 'loser',
-	['winner'] = 'winner',
-	['loser'] = 'loser',
-	['-'] = 'notplayed'
+	['w'] = 'win',
+	['l'] = 'loss',
+	['winner'] = 'win',
+	['loser'] = 'loss',
+	['-'] = 'default'
 }
 
 ---@class MatchPageSeriesDots: Widget
@@ -37,7 +37,7 @@ local MatchPageSeriesDots = Class.new(Widget)
 ---@return Widget
 MatchPageSeriesDots._makeGameResultIcon = FnUtil.memoize(function (result)
 	return Div{classes = {
-		'match-bm-match-header-round-result',
+		'brkts-result-label',
 		'result--' .. RESULT_DISPLAY_TYPES[result:lower()]
 	}}
 end)

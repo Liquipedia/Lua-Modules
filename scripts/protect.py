@@ -50,7 +50,7 @@ def main():
             protect_existing_page(page, wiki)
         else:  # commons case
             protect_existing_page(page, wiki)
-            for deploy_wiki in get_wikis():
+            for deploy_wiki in get_wikis() - {"commons"}:
                 protect_if_has_no_local_version(module, deploy_wiki)
         print("::endgroup::")
     handle_protect_errors()

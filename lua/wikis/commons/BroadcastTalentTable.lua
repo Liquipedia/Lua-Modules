@@ -94,7 +94,7 @@ end
 
 -- template entry point
 ---@param frame Frame
----@return Html?
+---@return Widget?
 function BroadcastTalentTable.run(frame)
 	return BroadcastTalentTable(Arguments.getArgs(frame)):create()
 end
@@ -210,7 +210,7 @@ function BroadcastTalentTable:_fetchTournaments()
 end
 
 --- Creates the display
----@return Html?
+---@return Widget?
 function BroadcastTalentTable:create()
 	if not self.tournaments then
 		return
@@ -302,10 +302,14 @@ end
 
 ---@private
 ---@param broadcast EnrichedBroadcast
----@return Html
+---@return Widget?
 function BroadcastTalentTable:_row(broadcast)
 	local tournament = Tournament.getTournament(broadcast.parent)
-	---@cast tournament -nil
+	if not tournament then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with invalid parent in queried broadcast events')
+		mw.logObject(broadcast, 'broadcasterEntryWithIssues')
+		return
+	end
 
 	local tierDisplay = Tier.display(tournament.liquipediaTier, tournament.liquipediaTierType, Table.merge(
 		tournament.tierOptions,

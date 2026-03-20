@@ -49,13 +49,14 @@ local PERSON_TYPE_TO_TAB = {
 -- The biz logic behind the role display is somewhat complicated.
 -- There's 2 areas we show the role, left-role and right-role
 -- * Right-role:
---   * If there's a non-ingame role assigned. It will use the first one provided
---   * Otherwise, If the person has a specific other data (former/did not play), we will use that
+--   * If the person has a specific status (did not play/former), display it first
+--   * If there's a non-ingame role assigned, display it after the status
+--   * Returns an array of labels to display (can be multiple)
 -- * Left-role:
 --   * If the first role has an icon, we use that to render the left-role
 --   * If not then we instead display the icon or text of the first ingame role
 ---@param player table
----@return string?, string?
+---@return string?, string[]?
 local function getRoleDisplays(player)
 	local roles = player.extradata.roles or {}
 	local playerType = player.extradata.type
@@ -73,16 +74,21 @@ local function getRoleDisplays(player)
 		end
 	end
 	local function roleRightDisplay()
+		local rightRoles = {}
+		-- Add status label first (Left or DNP)
+		if playerType == 'former' then
+			table.insert(rightRoles, 'Left')
+		elseif not played then
+			table.insert(rightRoles, 'DNP')
+		end
+		-- Add non-ingame role if present
 		for _, role in ipairs(roles) do
 			if role.type ~= RoleUtil.ROLE_TYPE.INGAME then
-				return role.display
+				table.insert(rightRoles, role.display)
+				break
 			end
 		end
-		if playerType == 'former' then
-			return 'Left'
-		elseif not played then
-			return 'DNP'
-		end
+		return #rightRoles > 0 and rightRoles or nil
 	end
 	return roleLeftDisplay(), roleRightDisplay()
 end
@@ -166,9 +172,7 @@ function ParticipantsTeamRoster:render()
 
 	return ContentSwitch{
 		switchGroup = 'team-participant-rosters-'.. switchGroupUniqueId,
-		variant = 'generic',
 		storeValue = false,
-		size = 'small',
 		css = {margin = '0.25rem 0.5rem'},
 		tabs = Array.map(tabs, function(tab)
 			return {

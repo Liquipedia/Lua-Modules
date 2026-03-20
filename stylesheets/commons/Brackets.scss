@@ -316,6 +316,18 @@
 	color: #c04845;
 }
 
+.brkts-identityv-score-color-survivor {
+	color: var( --clr-primary, #0000ff );
+}
+
+.brkts-identityv-score-color-hunter {
+	color: #c04845;
+
+	.theme--dark & {
+		color: #e47c7c;
+	}
+}
+
 /**
 * MatchlistDisplay
 */
@@ -1429,4 +1441,87 @@ div.brkts-opponent-hover {
 	max-width: 100%;
 	height: auto;
 	width: auto;
+}
+
+/**
+* Result labels
+*/
+
+.brkts-result-label {
+	height: calc( var( --result-label-scale ) * 1.25rem );
+	width: calc( var( --result-label-scale ) * 1.25rem );
+	border-radius: calc( var( --result-label-scale ) * 0.25rem );
+	font-size: calc( var( --result-label-scale ) * 0.6875rem );
+	line-height: calc( var( --result-label-scale ) * 1rem );
+	font-weight: bold;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	align-self: center;
+
+	--result-label-scale: 1;
+
+	&.result--win {
+		.theme--light & {
+			color: var( --clr-semantic-positive-20 );
+			background-color: var( --clr-semantic-positive-90 );
+		}
+
+		.theme--dark & {
+			color: var( --clr-semantic-positive-90 );
+			background-color: var( --clr-semantic-positive-30 );
+		}
+
+		&::before {
+			content: "W";
+		}
+	}
+
+	&.result--draw {
+		.theme--light & {
+			color: var( --clr-semantic-gold-20 );
+			background-color: var( --clr-semantic-gold-90 );
+		}
+
+		.theme--dark & {
+			color: var( --clr-semantic-gold-90 );
+			background-color: var( --clr-semantic-gold-30 );
+		}
+
+		&::before {
+			content: "D";
+		}
+	}
+
+	&.result--loss {
+		.theme--light & {
+			color: var( --clr-semantic-negative-40 );
+			background-color: var( --clr-semantic-negative-96 );
+		}
+
+		.theme--dark & {
+			color: var( --clr-semantic-negative-90 );
+			background-color: var( --clr-semantic-negative-30 );
+		}
+
+		&::before {
+			content: "L";
+		}
+	}
+
+	&.result--default {
+		.theme--light & {
+			color: var( --clr-secondary-44 );
+			background-color: var( --clr-on-surface-light-primary-8 );
+		}
+
+		.theme--dark & {
+			color: var( --clr-secondary-90 );
+			background-color: var( --clr-on-surface-dark-primary-8 );
+		}
+
+		&::before {
+			content: "-";
+		}
+	}
 }

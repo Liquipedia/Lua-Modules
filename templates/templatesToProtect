@@ -223,6 +223,7 @@ Abbr/WITA
 Abbr/YEKT
 Abbr/ZAR
 ApiMap
+BasePrizePoolTable
 Box
 Bracket
 BroadcasterCard
@@ -272,6 +273,7 @@ SingleMatch
 SoloOpponent
 SoloPrizePool
 Stage
+StageWinnings
 Streams
 SwissStandings
 Tabs_dynamic
