@@ -1967,5 +1967,8 @@ return {
 				storeFromWikiCode = true,
 			},
 		},
+		participants = {
+			syncPlayerTeam = true,
+		},
 	},
 }
