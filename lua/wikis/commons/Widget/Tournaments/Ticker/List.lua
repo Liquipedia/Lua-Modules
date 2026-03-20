@@ -88,7 +88,7 @@ function TournamentsTickerListWidget:render()
 	end
 
 	return ContentSwitch{
-		css = { padding = '1rem 0'},
+		css = { margin = '0.75rem'},
 		switchGroup = 'tournament-list-phase',
 		defaultActive = 2,
 		storeValue = false,
