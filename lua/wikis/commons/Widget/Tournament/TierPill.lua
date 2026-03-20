@@ -69,13 +69,12 @@ function TournamentsTickerPillWidget:render()
 				children = tierTypeShort,
 			})
 		end
+		local classes = {'tournament-badge', 'tournament-badge--subtle', 'badge--' .. colorClass}
+		if self.props.colorScheme == 'top3' then
+			table.insert(classes, 3, 'tournament-badge--top3')
+		end
 		return HtmlWidgets.Div{
-			classes = {
-				'tournament-badge',
-				'tournament-badge--subtle',
-				self.props.colorScheme == 'top3' and 'tournament-badge--top3' or nil,
-				'badge--' .. colorClass,
-			},
+			classes = classes,
 			children = children,
 		}
 	end
