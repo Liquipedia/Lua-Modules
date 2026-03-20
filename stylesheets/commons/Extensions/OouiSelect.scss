@@ -1,0 +1,290 @@
+body .oo-ui-menuSelectWidget {
+    background-color: var( --clr-surface-2 );
+    box-shadow: var( --box-shadow-elevation-2 );
+    color: var( --clr-on-surface );
+    z-index: 22;
+
+    .theme--light & {
+        border-color: var( --clr-on-surface-light-primary-8 );
+    }
+
+    .theme--dark & {
+        border-color: var( --clr-on-surface-dark-primary-8 );
+    }
+}
+
+body .oo-ui-menuOptionWidget.oo-ui-optionWidget-highlighted {
+    color: var( --clr-on-surface );
+
+    .theme--light & {
+        background-color: var( --clr-on-surface-light-primary-12 );
+    }
+
+    .theme--dark & {
+        background-color: var( --clr-on-surface-dark-primary-12 );
+    }
+}
+
+body .oo-ui-menuOptionWidget.oo-ui-optionWidget-selected {
+    color: var( --clr-on-surface );
+
+    .theme--light & {
+        background-color: var( --clr-on-surface-light-primary-12 );
+    }
+
+    .theme--dark & {
+        background-color: var( --clr-on-surface-dark-primary-12 );
+    }
+}
+
+body .oo-ui-menuOptionWidget.oo-ui-widget-enabled.oo-ui-optionWidget {
+    color: var( --clr-on-surface );
+}
+
+/**
+ * Dropdown widget
+ */
+
+body .oo-ui-dropdownInputWidget.oo-ui-widget-enabled,
+body .oo-ui-dropdownInputWidget.oo-ui-widget-enabled:hover {
+    background-color: transparent;
+}
+
+body .oo-ui-dropdownWidget.oo-ui-widget-enabled .oo-ui-dropdownWidget-handle {
+    background-color: var( --clr-surface );
+    color: var( --clr-on-surface );
+    border-radius: 0.25rem;
+}
+
+body .oo-ui-dropdownWidget.oo-ui-widget-enabled.oo-ui-dropdownWidget-open .oo-ui-dropdownWidget-handle,
+body .oo-ui-dropdownWidget.oo-ui-widget-enabled .oo-ui-dropdownWidget-handle:hover {
+    color: var( --clr-on-surface );
+
+    .theme--light & {
+        background-color: var( --clr-on-surface-light-primary-12 );
+    }
+
+    .theme--dark & {
+        background-color: var( --clr-on-surface-dark-primary-12 );
+    }
+}
+
+/**
+ * Saved links
+ */
+
+body .mw-rcfilters-ui-savedLinksListWidget-placeholder span.oo-ui-iconElement-icon {
+    .theme--light & {
+        filter: brightness( 0 ) saturate( 100% ) invert( 28% ) sepia( 77% ) saturate( 1826% ) hue-rotate( 188deg ) brightness( 80% ) contrast( 90% );
+    }
+
+    .theme--dark & {
+        filter: brightness( 0 ) saturate( 100% ) invert( 72% ) sepia( 31% ) saturate( 628% ) hue-rotate( 185deg ) brightness( 101% ) contrast( 102% );
+    }
+}
+
+body .mw-rcfilters-ui-savedLinksListWidget-placeholder.oo-ui-optionWidget .oo-ui-labelElement-label {
+    color: var( --clr-on-surface );
+}
+
+/**
+ * MultiTagSelectWidget
+ */
+
+body .oo-ui-tagMultiselectWidget.oo-ui-widget-enabled.oo-ui-tagMultiselectWidget-outlined {
+    background-color: transparent;
+    color: var( --clr-on-surface );
+
+    .oo-ui-iconElement-icon {
+        .theme--light & {
+            filter: brightness( 0 ) saturate( 100% ) invert( 28% ) sepia( 77% ) saturate( 1826% ) hue-rotate( 188deg ) brightness( 80% ) contrast( 90% );
+        }
+
+        .theme--dark & {
+            filter: brightness( 0 ) saturate( 100% ) invert( 72% ) sepia( 31% ) saturate( 628% ) hue-rotate( 185deg ) brightness( 101% ) contrast( 102% );
+        }
+    }
+}
+
+body .mw-rcfilters-ui-filterTagMultiselectWidget.oo-ui-widget-enabled .oo-ui-tagMultiselectWidget-handle {
+    background-color: var( --clr-surface-2 );
+    border-radius: 0.625rem;
+    color: var( --clr-on-surface );
+    padding: 0 1rem 1rem;
+
+    .theme--light & {
+        border: 0.0625rem solid var( --clr-on-surface-light-primary-8 );
+    }
+
+    .theme--dark & {
+        border: 0.0625rem solid var( --clr-on-surface-dark-primary-8 );
+    }
+}
+
+body .oo-ui-tagMultiselectWidget.oo-ui-widget-enabled.oo-ui-tagMultiselectWidget-outlined .oo-ui-inputWidget-input {
+    background-color: var( --clr-surface-2 );
+
+    .theme--light & {
+        border-color: var( --clr-on-surface-light-primary-8 );
+    }
+
+    .theme--dark & {
+        border-color: var( --clr-on-surface-dark-primary-8 );
+    }
+}
+
+body .oo-ui-tagMultiselectWidget .mw-rcfilters-ui-filterTagMultiselectWidget-views-select-widget.oo-ui-widget {
+    background-color: var( --clr-surface-2 );
+
+    .theme--light & {
+        border: 0.0625rem solid var( --clr-on-surface-light-primary-8 );
+    }
+
+    .theme--dark & {
+        border: 0.0625rem solid var( --clr-on-surface-dark-primary-8 );
+    }
+}
+
+body .mw-rcfilters-ui-filterMenuHeaderWidget-title {
+    color: var( --clr-on-surface-variant );
+}
+
+body .mw-rcfilters-ui-filterTagMultiselectWidget-wrapper-content-title {
+    color: var( --clr-on-surface );
+}
+
+body .oo-ui-tagMultiselectWidget.oo-ui-widget-enabled.oo-ui-tagMultiselectWidget-outlined .oo-ui-tagItemWidget.oo-ui-widget-enabled {
+    background-color: var( --clr-secondary-container );
+    color: var( --clr-on-secondary-container );
+}
+
+body .oo-ui-tagMultiselectWidget.oo-ui-widget-enabled.oo-ui-tagMultiselectWidget-outlined .mw-rcfilters-ui-tagItemWidget-selected.oo-ui-tagItemWidget.oo-ui-widget-enabled {
+    background-color: var( --clr-secondary-container );
+    color: var( --clr-on-secondary-container );
+}
+
+body .mw-rcfilters-ui-tagItemWidget.oo-ui-flaggedElement-muted.oo-ui-tagItemWidget.oo-ui-widget-enabled .oo-ui-labelElement-label {
+    color: var( --clr-on-secondary-container );
+}
+
+body .oo-ui-tagItemWidget {
+    min-height: 2rem;
+    border-radius: 0.5rem;
+    border: 0;
+    display: inline-flex;
+    align-items: center;
+
+    &.oo-ui-widget-enabled:not( .oo-ui-tagItemWidget-fixed ) {
+        padding-right: 1.75rem;
+    }
+
+    &.oo-ui-widget-enabled > .oo-ui-buttonElement {
+        top: 50%;
+        transform: translateY( -50% );
+        right: 0.25rem;
+
+        &:hover {
+            background-color: var( --clr-surface );
+        }
+    }
+}
+
+body .mw-rcfilters-ui-filterMenuHeaderWidget-header {
+    background-color: transparent;
+
+    .theme--light & {
+        border-bottom: 0.0625rem solid var( --clr-on-surface-light-primary-8 );
+    }
+
+    .theme--dark & {
+        border-bottom: 0.0625rem solid var( --clr-on-surface-dark-primary-8 );
+    }
+}
+
+body .mw-rcfilters-ui-menuSelectWidget-footer {
+    background-color: transparent;
+
+    .theme--light & {
+        border-top: 0.0625rem solid var( --clr-on-surface-light-primary-8 );
+    }
+
+    .theme--dark & {
+        border-top: 0.0625rem solid var( --clr-on-surface-dark-primary-8 );
+    }
+}
+
+body .mw-rcfilters-ui-filterMenuSectionOptionWidget {
+    background-color: transparent;
+}
+
+body .mw-rcfilters-ui-filterMenuSectionOptionWidget-header-title.oo-ui-labelElement-label {
+    color: var( --clr-on-surface-variant );
+}
+
+body .mw-rcfilters-ui-itemMenuOptionWidget:not( :last-child ):not( .mw-rcfilters-ui-itemMenuOptionWidget-identifier-talk ) {
+    .theme--light & {
+        border-bottom: 0.0625rem solid var( --clr-on-surface-light-primary-8 );
+    }
+
+    .theme--dark & {
+        border-bottom: 0.0625rem solid var( --clr-on-surface-dark-primary-8 );
+    }
+}
+
+body .mw-rcfilters-ui-itemMenuOptionWidget.oo-ui-optionWidget-selected {
+    .theme--light & {
+        background-color: var( --clr-on-surface-light-primary-12 );
+    }
+
+    .theme--dark & {
+        background-color: var( --clr-on-surface-dark-primary-12 );
+    }
+}
+
+body .mw-rcfilters-ui-filterMenuOptionWidget.oo-ui-flaggedElement-muted:not( .oo-ui-optionWidget-selected ) {
+    background-color: var( --clr-surface-variant-3 );
+}
+
+body .mw-rcfilters-ui-itemMenuOptionWidget-label-title {
+    color: var( --clr-on-surface );
+}
+
+body .mw-rcfilters-ui-itemMenuOptionWidget-label-desc {
+    color: var( --clr-on-surface-variant );
+}
+
+body .mw-rcfilters-ui-viewSwitchWidget label.oo-ui-labelWidget {
+    color: var( --clr-on-surface-variant );
+}
+
+/**
+ * Labels
+ */
+
+body .select2-dropdown {
+    background-color: var( --clr-surface-2 );
+    box-shadow: var( --box-shadow-elevation-2 );
+    color: var( --clr-on-surface );
+
+    .theme--light & {
+        border-color: var( --clr-on-surface-light-primary-8 );
+    }
+
+    .theme--dark & {
+        border-color: var( --clr-on-surface-dark-primary-8 );
+    }
+}
+
+body .select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: var( --clr-secondary-container );
+    border: 0.0625rem solid var( --clr-secondary-container );
+    color: var( --clr-on-secondary-container );
+}
+
+body .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: var( --clr-primary );
+
+    &:hover {
+        color: var( --clr-on-surface );
+    }
+}

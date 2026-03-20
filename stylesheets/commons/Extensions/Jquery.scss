@@ -1,0 +1,128 @@
+div.ui-widget {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    font-size: 0.9375rem;
+}
+
+.theme--dark div.ui-widget-header span.ui-icon {
+    filter: invert( 100% ) sepia( 100% ) saturate( 0% ) hue-rotate( 47deg ) brightness( 103% );
+}
+
+div.ui-widget-header {
+    background: transparent;
+    border: 0;
+    color: var( --clr-on-surface );
+
+    .ui-state-hover,
+    .ui-widget-content .ui-state-hover,
+    .ui-widget-header .ui-state-hover,
+    .ui-state-focus,
+    .ui-widget-content .ui-state-focus,
+    .ui-widget-header .ui-state-focus {
+        background: transparent;
+
+        .theme--light & {
+            border-color: var( --clr-secondary-44 );
+        }
+
+        .theme--dark & {
+            border-color: var( --clr-secondary-70 );
+        }
+    }
+}
+
+div.ui-widget-content {
+    background-color: var( --clr-surface-3 );
+    color: var( --clr-on-surface );
+    background-image: none;
+
+    .theme--light & {
+        border-color: var( --clr-on-surface-light-primary-8 );
+    }
+
+    .theme--dark & {
+        border-color: var( --clr-on-surface-dark-primary-8 );
+    }
+
+    div.ui-dialog-buttonpane {
+        /* stylelint-disable-next-line declaration-no-important */
+        .theme--light & {
+            border-color: var( --clr-on-surface-light-primary-8 ) !important;
+        }
+
+        .theme--dark & {
+            border-color: var( --clr-on-surface-dark-primary-8 ) !important;
+        }
+    }
+
+    input {
+        background-color: var( --clr-surface );
+        color: var( --clr-on-surface );
+        border-radius: 0.25rem;
+        min-height: 2rem;
+
+        .theme--light & {
+            border: 0.0625rem solid var( --clr-secondary-44 );
+        }
+
+        .theme--dark & {
+            border: 0.0625rem solid var( --clr-secondary-70 );
+        }
+    }
+
+    select {
+        background-color: var( --clr-surface );
+        color: var( --clr-on-surface );
+        border-radius: 0.25rem;
+        min-height: 2rem;
+    }
+
+    button.ui-button {
+        border-radius: 6.25rem;
+        font-size: 0.875rem;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+        border-width: 0.0625rem;
+        background: transparent;
+        color: var( --clr-primary );
+        min-height: 2.5rem;
+
+        .theme--light & {
+            border-color: var( --clr-secondary-44 );
+        }
+
+        .theme--dark & {
+            border-color: var( --clr-secondary-70 );
+        }
+
+        &:hover {
+            color: var( --clr-primary );
+
+            .theme--light & {
+                background-color: var( --clr-on-surface-light-primary-8 );
+            }
+
+            .theme--dark & {
+                background-color: var( --clr-on-surface-dark-primary-8 );
+            }
+        }
+    }
+}
+
+.client-js .sortable:not( .jquery-tablesorter ) > * > tr:first-child > th:not( .unsortable ),
+.jquery-tablesorter th.headerSort {
+    .theme--dark & {
+        background-image: url( data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMjEiIGhlaWdodD0iOSIgdmlld0JveD0iMCAwIDIxIDkiPg0KCTxwYXRoIGQ9Im0xNC41IDUtNCA0LTQtNHptMC0xLTQtNC00IDR6IiBmaWxsPSIjZmZmZmZmIi8+DQo8L3N2Zz4= );
+    }
+}
+
+.jquery-tablesorter th.headerSortUp {
+    .theme--dark & {
+        background-image: url( data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMjEiIGhlaWdodD0iNCIgdmlld0JveD0iMCAwIDIxIDQiPg0KCTxwYXRoIGQ9Im02LjUgNCA0LTQgNCA0eiIgZmlsbD0iI2ZmZmZmZiIvPg0KPC9zdmc+ );
+    }
+}
+
+.jquery-tablesorter th.headerSortDown {
+    .theme--dark & {
+        background-image: url( data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMjEiIGhlaWdodD0iNCIgdmlld0JveD0iMCAwIDIxIDQiPg0KCTxwYXRoIGQ9Im0xNC41IDAtNCA0LTQtNHoiIGZpbGw9IiNmZmZmZmYiLz4NCjwvc3ZnPg== );
+    }
+}

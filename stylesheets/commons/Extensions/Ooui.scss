@@ -1,0 +1,71 @@
+.oo-ui-textInputWidget.oo-ui-indicatorElement input,
+.oo-ui-textInputWidget.oo-ui-indicatorElement textarea {
+    /* stylelint-disable-next-line declaration-no-important */
+    padding-right: 2.4875em !important;
+}
+
+.oo-ui-textInputWidget.oo-ui-iconElement input,
+.oo-ui-textInputWidget.oo-ui-iconElement textarea {
+    /* stylelint-disable-next-line declaration-no-important */
+    padding-left: 2.875em !important;
+}
+
+.mw-widgets-datetime-dateTimeInputWidget-editField {
+    /* stylelint-disable-next-line declaration-no-important */
+    width: auto !important;
+}
+
+// OOUI Tabs
+div.mw-prefs-tabs-wrapper.oo-ui-panelLayout-framed,
+div.mw-prefs-tabs > .oo-ui-menuLayout-content > .oo-ui-indexLayout-stackLayout > .oo-ui-tabPanelLayout {
+    border-color: var( --clr-border );
+}
+
+div.oo-ui-tabSelectWidget-framed {
+    background-color: var( --clr-surface-2 );
+    color: var( --clr-on-surface );
+}
+
+div.oo-ui-tabOptionWidget {
+    color: var( --clr-on-surface );
+}
+
+div.oo-ui-tabSelectWidget-framed .oo-ui-tabOptionWidget.oo-ui-optionWidget-selected {
+    color: var( --clr-on-surface );
+
+    .theme--light & {
+        background-color: rgba( #0d61a4, 12% );
+    }
+
+    .theme--dark & {
+        background-color: rgba( #9fc9ff, 12% );
+    }
+}
+
+div.oo-ui-tabSelectWidget-framed .oo-ui-tabOptionWidget.oo-ui-widget-enabled:hover {
+    color: var( --clr-on-surface );
+
+    .theme--light & {
+        background-color: rgba( #0d61a4, 12% );
+    }
+
+    .theme--dark & {
+        background-color: rgba( #9fc9ff, 12% );
+    }
+}
+
+label.oo-ui-labelWidget.oo-ui-inline-help {
+    .theme--light & {
+        background-color: rgba( #1b1b1b, 70% );
+    }
+
+    .theme--dark & {
+        background-color: rgba( #e2e2e6, 70% );
+    }
+}
+
+div.mw-prefs-buttons {
+    background-color: var( --clr-surface-2 );
+    color: var( --clr-on-surface );
+    border-color: var( --clr-border );
+}
