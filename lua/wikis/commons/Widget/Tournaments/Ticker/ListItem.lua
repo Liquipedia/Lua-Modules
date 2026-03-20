@@ -34,6 +34,23 @@ function TournamentsTickerListItemWidget:render()
 		return
 	end
 
+	local badgeChildren = {}
+	if self.props.displayGameIcon then
+		table.insert(badgeChildren, HtmlWidgets.Div{
+			classes = {'tournaments-list-item__game-icon'},
+			children = Game.icon{
+				game = tournament.game,
+				noLink = true,
+				size = '16px',
+			},
+		})
+	end
+	table.insert(badgeChildren, TierPill{
+		tournament = tournament,
+		variant = 'subtle',
+		colorScheme = self.props.tierColorScheme,
+	})
+
 	return HtmlWidgets.Div{
 		classes = {'tournaments-list-item'},
 		children = {
@@ -62,21 +79,7 @@ function TournamentsTickerListItemWidget:render()
 						children = {
 							HtmlWidgets.Div{
 								classes = {'tournaments-list-item__badges'},
-								children = {
-									self.props.displayGameIcon and HtmlWidgets.Div{
-										classes = {'tournaments-list-item__game-icon'},
-										children = Game.icon{
-											game = tournament.game,
-											noLink = true,
-											size = '16px',
-										},
-									} or nil,
-									TierPill{
-										tournament = tournament,
-										variant = 'subtle',
-										colorScheme = self.props.tierColorScheme,
-									},
-								},
+								children = badgeChildren,
 							},
 							HtmlWidgets.Div{
 								classes = {'tournaments-list-item__date'},
