@@ -471,6 +471,13 @@ function BasePrizePool:create()
 		self:setConfig('showBaseCurrency', true)
 		self:addPrize(PRIZE_TYPE_BASE_CURRENCY, 1, {roundPrecision = self.options.currencyRoundPrecision})
 
+		local hasPlayerShare = Array.any(self.prizes, function(prize)
+			return prize.type == PRIZE_TYPE_PLAYER_SHARE
+		end)
+		if hasPlayerShare then
+			self:addPrize(PRIZE_TYPE_CLUB_SHARE, 1, {title = 'Club Share', roundPrecision = self.options.currencyRoundPrecision})
+		end
+
 		if self.options.autoExchange then
 			local canConvertCurrency = function(prize)
 				return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
@@ -558,17 +565,6 @@ function BasePrizePool:_readPrizes(args)
 				self:addPrize(name, index, data)
 			end
 		end
-	end
-
-	-- club share addition if both playershare and base local prize is present
-	local hasBase = false
-	local hasPlayerShare = false
-	for _, prize in ipairs(self.prizes) do
-		if prize.type == PRIZE_TYPE_BASE_CURRENCY then hasBase = true end
-		if prize.type == PRIZE_TYPE_PLAYER_SHARE then hasPlayerShare = true end
-	end
-	if hasBase and hasPlayerShare then
-		self:addPrize(PRIZE_TYPE_CLUB_SHARE, 1, {title = 'Club Share', roundPrecision = self.options.currencyRoundPrecision})
 	end
 
 	return self.prizes
@@ -747,21 +743,6 @@ function BasePrizePool:_buildRows()
 				previousOfPrizeType[prize.type] = cell
 				return cell
 			end)
-
-			-- Add club share cell if both base and player share exist
-			local clubSharePrize = nil
-			for _, prize in ipairs(self.prizes) do
-				if prize.type == PRIZE_TYPE_CLUB_SHARE then
-					clubSharePrize = prize
-					break
-				end
-			end
-			if clubSharePrize then
-				local prizeTypeData = self.prizeTypes[PRIZE_TYPE_CLUB_SHARE]
-				local reward = opponent.prizeRewards[PRIZE_TYPE_CLUB_SHARE .. '1']
-				local cell = reward and prizeTypeData.rowDisplay(clubSharePrize.data, reward) or TableCell{}
-				table.insert(prizeCells, cell)
-			end
 
 			Array.forEach(prizeCells, function (prizeCell, columnIndex)
 				local lastInColumn = previousOpponent[columnIndex]
