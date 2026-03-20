@@ -488,6 +488,19 @@ Author(s): FO-nTTaX, salle
 				overflow: hidden;
 				text-overflow: clip;
 			}
+
+			.bracket-popup-header-center {
+				width: calc( 100% - 2px );
+				padding: 2.5px;
+				display: inline-block;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: clip;
+				height: 25px;
+				text-align: center;
+				font-weight: bold;
+				font-size: 150%;
+			}
 		}
 	}
 }
@@ -555,34 +568,38 @@ Author(s): FO-nTTaX, salle
 	display: block;
 }
 
-.bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-match {
-	text-align: center;
-	padding: 2px 0;
-	vertical-align: initial;
-}
+.bracket-popup-body .bracket-popup-body-match {
+	.bracket-popup-wrapper .bracket-popup & {
+		text-align: center;
+		padding: 2px 0;
+		vertical-align: initial;
+	}
 
-.wiki-ageofempires .bracket-popup-body .bracket-popup-body-match .leftTeam, {
-	display: inline-block;
-	text-align: right;
-	border-radius: 0 10px 10px 0;
-	vertical-align: middle;
-	width: 37%;
-	padding: 0 7px 0 5px;
-}
+	.wiki-ageofempires & {
+		.leftTeam, {
+			display: inline-block;
+			text-align: right;
+			border-radius: 0 10px 10px 0;
+			vertical-align: middle;
+			width: 37%;
+			padding: 0 7px 0 5px;
+		}
 
-.wiki-ageofempires .bracket-popup-body .bracket-popup-body-match .lengthTeam, {
-	display: inline-block;
-	vertical-align: middle;
-	width: 26%;
-}
+		.lengthTeam, {
+			display: inline-block;
+			vertical-align: middle;
+			width: 26%;
+		}
 
-.wiki-ageofempires .bracket-popup-body .bracket-popup-body-match .rightTeam, {
-	display: inline-block;
-	text-align: left;
-	border-radius: 10px 0 0 10px;
-	vertical-align: middle;
-	width: 37%;
-	padding: 0 5px 0 7px;
+		.rightTeam, {
+			display: inline-block;
+			text-align: left;
+			border-radius: 10px 0 0 10px;
+			vertical-align: middle;
+			width: 37%;
+			padding: 0 5px 0 7px;
+		}
+	}
 }
 
 .bracket-popup-body-mvp {
@@ -615,6 +632,40 @@ Author(s): FO-nTTaX, salle
 			background-color: #ebebeb;
 		}
 	}
+
+	.bracket-popup-body-bans {
+		border-top: 1px dotted #dddddd;
+		font-weight: bold;
+
+		&::after {
+			clear: both;
+			content: " ";
+			width: 100%;
+			display: block;
+		}
+	}
+
+	.bracket-popup-body-comment {
+		border-top: 1px dotted #dddddd;
+		padding: 5px;
+		font-size: 85%;
+		line-height: 12.5px;
+		text-align: center;
+
+		&::after {
+			clear: both;
+			content: " ";
+			width: 100%;
+			display: block;
+		}
+	}
+
+	&::after {
+		clear: both;
+		content: " ";
+		width: 100%;
+		display: block;
+	}
 }
 
 .bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-time,
@@ -627,40 +678,6 @@ Author(s): FO-nTTaX, salle
 }
 
 .bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-time::after {
-	clear: both;
-	content: " ";
-	width: 100%;
-	display: block;
-}
-
-.bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-bans {
-	border-top: 1px dotted #dddddd;
-	font-weight: bold;
-
-	&::after {
-		clear: both;
-		content: " ";
-		width: 100%;
-		display: block;
-	}
-}
-
-.bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-comment {
-	border-top: 1px dotted #dddddd;
-	padding: 5px;
-	font-size: 85%;
-	line-height: 12.5px;
-	text-align: center;
-
-	&::after {
-		clear: both;
-		content: " ";
-		width: 100%;
-		display: block;
-	}
-}
-
-.bracket-popup-wrapper .bracket-popup .bracket-popup-body::after {
 	clear: both;
 	content: " ";
 	width: 100%;
@@ -686,19 +703,6 @@ Author(s): FO-nTTaX, salle
 		height: auto;
 		width: auto;
 	}
-}
-
-.bracket-popup-wrapper .bracket-popup .bracket-popup-header .bracket-popup-header-center {
-	width: calc( 100% - 2px );
-	padding: 2.5px;
-	display: inline-block;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: clip;
-	height: 25px;
-	text-align: center;
-	font-weight: bold;
-	font-size: 150%;
 }
 
 .wiki-apexlegends .bracket-popup-wrapper.bracket-popup-player {
@@ -959,6 +963,36 @@ Author(s): FO-nTTaX, salle
 	table td {
 		line-height: 15px;
 	}
+
+	.popup-progress {
+		border-radius: 5px;
+		width: 50px;
+		height: 15px;
+		border: 1px solid #bbbbbb;
+		position: relative;
+		text-align: center;
+		margin-bottom: 0;
+
+		> div.bar {
+			height: 15px;
+			border-radius: 4px;
+			float: left;
+			line-height: 17px;
+
+			&.bg-color {
+				background-color: #e5b6c0;
+			}
+
+			&-text {
+				height: 15px;
+				width: 100%;
+				border-radius: 5px;
+				position: absolute;
+				top: 0;
+				left: 0;
+			}
+		}
+	}
 }
 
 .wiki-battalion .side,
@@ -966,36 +1000,6 @@ Author(s): FO-nTTaX, salle
 .wiki-crossfire .side,
 .wiki-valorant .side {
 	width: 110px;
-}
-
-.bracket-popup div.side .popup-progress {
-	border-radius: 5px;
-	width: 50px;
-	height: 15px;
-	border: 1px solid #bbbbbb;
-	position: relative;
-	text-align: center;
-	margin-bottom: 0;
-
-	> div.bar {
-		height: 15px;
-		border-radius: 4px;
-		float: left;
-		line-height: 17px;
-
-		&.bg-color {
-			background-color: #e5b6c0;
-		}
-
-		&-text {
-			height: 15px;
-			width: 100%;
-			border-radius: 5px;
-			position: absolute;
-			top: 0;
-			left: 0;
-		}
-	}
 }
 
 .bracket-popup .left div.draft {
@@ -1028,6 +1032,16 @@ Author(s): FO-nTTaX, salle
 	.bracket-popup-player & {
 		left: 50px;
 	}
+
+	.wiki-overwatch &,
+	.wiki-teamfortress &,
+	.wiki-worldofwarcraft & {
+		float: left;
+		width: 40px;
+		text-align: center;
+		position: initial;
+		left: initial;
+	}
 }
 
 .bracket-popup .right .check {
@@ -1037,26 +1051,16 @@ Author(s): FO-nTTaX, salle
 	.bracket-popup-player & {
 		right: 50px;
 	}
-}
 
-.wiki-overwatch .bracket-popup .left .check,
-.wiki-teamfortress .bracket-popup .left .check,
-.wiki-worldofwarcraft .bracket-popup .left .check {
-	float: left;
-	width: 40px;
-	text-align: center;
-	position: initial;
-	left: initial;
-}
-
-.wiki-overwatch .bracket-popup .right .check,
-.wiki-teamfortress .bracket-popup .right .check,
-.wiki-worldofwarcraft .bracket-popup .right .check {
-	float: right;
-	width: 40px;
-	text-align: center;
-	position: initial;
-	right: initial;
+	.wiki-overwatch &,
+	.wiki-teamfortress &,
+	.wiki-worldofwarcraft & {
+		float: right;
+		width: 40px;
+		text-align: center;
+		position: initial;
+		right: initial;
+	}
 }
 
 .bracket-popup div.wow-popup-center {
@@ -1149,18 +1153,17 @@ Author(s): FO-nTTaX, salle
 	display: block;
 }
 
-.wiki-honorofkings .bracket-popup-body-match .match-row .draft.blue,
-.wiki-battlerite .bracket-popup-body-match .match-row .draft.blue,
-.wiki-leagueoflegends .bracket-popup-body-match .match-row .draft.blue,
-.wiki-wildrift .bracket-popup-body-match .match-row .draft.blue {
-	background-color: #426ccf;
-}
+.wiki-honorofkings .bracket-popup-body-match .match-row,
+.wiki-battlerite .bracket-popup-body-match .match-row,
+.wiki-leagueoflegends .bracket-popup-body-match .match-row,
+.wiki-wildrift .bracket-popup-body-match .match-row {
+	.draft.blue {
+		background-color: #426ccf;
+	}
 
-.wiki-honorofkings .bracket-popup-body-match .match-row .draft.red,
-.wiki-battlerite .bracket-popup-body-match .match-row .draft.red,
-.wiki-leagueoflegends .bracket-popup-body-match .match-row .draft.red,
-.wiki-wildrift .bracket-popup-body-match .match-row .draft.red {
-	background-color: #ee6767;
+	.draft.red {
+		background-color: #ee6767;
+	}
 }
 
 .wiki-artifact .bracket-popup.bracket-popup-showmatch div.draft img,
@@ -1566,6 +1569,12 @@ Author(s): spazer
 	border-bottom-left-radius: 3px;
 	border: solid #aaaaaa;
 	border-width: 0 0 2px 2px;
+
+	&-red {
+		border-bottom-left-radius: 3px;
+		border: solid #ff0000;
+		border-width: 0 0 2px 2px;
+	}
 }
 
 .bracket-line-bottomright {
@@ -1590,12 +1599,6 @@ Author(s): spazer
 		border: solid #ff0000;
 		border-width: 1px 2px 0 0;
 	}
-}
-
-.bracket-line-bottomleft-red {
-	border-bottom-left-radius: 3px;
-	border: solid #ff0000;
-	border-width: 0 0 2px 2px;
 }
 
 .bracket-line-reset {
