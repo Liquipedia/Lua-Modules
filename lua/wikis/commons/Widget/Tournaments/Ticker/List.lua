@@ -8,20 +8,16 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Condition = Lua.import('Module:Condition')
 local Class = Lua.import('Module:Class')
-local DateExt = Lua.import('Module:Date/Ext')
 local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
-local Operator = Lua.import('Module:Operator')
 
 local Widget = Lua.import('Module:Widget')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local ListItem = Lua.import('Module:Widget/Tournaments/Ticker/ListItem')
+local TickerData = Lua.import('Module:Widget/Tournaments/Ticker/Data')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
-
-local Tournament = Lua.import('Module:Tournament')
 
 ---@class TournamentsTickerListWidget: Widget
 ---@operator call(table): TournamentsTickerListWidget
@@ -33,109 +29,8 @@ TournamentsTickerListWidget.defaultProps = {
 
 ---@return Widget
 function TournamentsTickerListWidget:render()
-	local upcomingDays = self.props.upcomingDays
-	local completedDays = self.props.completedDays
-
-	local tierThresholdModifiers = {
-		[1] = self.props.modifierTier1,
-		[2] = self.props.modifierTier2,
-		[3] = self.props.modifierTier3,
-		[4] = self.props.modifierTier4,
-		[5] = self.props.modifierTier5,
-		[-1] = self.props.modifierTierMisc,
-	}
-
-	local tierTypeThresholdModifiers = {
-		['qualifier'] = self.props.modifierTypeQualifier,
-	}
-
-	local currentTimestamp = DateExt.getCurrentTimestamp()
+	local data = TickerData.get(self.props)
 	local displayGameIcons = Logic.readBool(self.props.displayGameIcons)
-
-	---@param tournament StandardTournament
-	---@return boolean
-	local function isWithinDateRange(tournament)
-		local modifiedThreshold = tierThresholdModifiers[tournament.liquipediaTier] or 0
-		local modifiedCompletedThreshold = tierTypeThresholdModifiers[tournament.liquipediaTierType] or modifiedThreshold
-
-		if not tournament.startDate then
-			return false
-		end
-
-		local startDateThreshold = currentTimestamp + (upcomingDays + modifiedThreshold) * 24 * 60 * 60
-		local endDateThreshold = currentTimestamp - (completedDays + modifiedCompletedThreshold) * 24 * 60 * 60
-
-		if tournament.phase == 'ONGOING' then
-			return true
-		elseif tournament.phase == 'UPCOMING' then
-			return tournament.startDate.timestamp < startDateThreshold
-		elseif tournament.phase == 'FINISHED' then
-			assert(tournament.endDate, 'Tournament without end date: ' .. tournament.pageName)
-			return tournament.endDate.timestamp > endDateThreshold
-		end
-		return false
-	end
-
-	local lpdbFilter = Condition.Tree(Condition.BooleanOperator.all):add{
-		Condition.Util.anyOf(Condition.ColumnName('status'), {'', 'finished'}),
-		Condition.Node(Condition.ColumnName('liquipediatiertype'), Condition.Comparator.neq, 'Points')
-	}
-
-	local allTournaments = Tournament.getAllTournaments(lpdbFilter, function(tournament)
-		return isWithinDateRange(tournament)
-	end)
-
-	---@param phase TournamentPhase
-	---@return fun(tournament: StandardTournament): boolean
-	local function filterByPhase(phase)
-		return function(tournament)
-			return tournament.phase == phase
-		end
-	end
-
-	---@param a StandardTournament
-	---@param b StandardTournament
-	---@param dateProperty 'endDate'|'startDate'
-	---@param operator fun(a: integer, b: integer): boolean
-	---@return boolean?
-	local function sortByDateProperty(a, b, dateProperty, operator)
-		if not a[dateProperty] and not b[dateProperty] then return nil end
-		if not a[dateProperty] then return true end
-		if not b[dateProperty] then return false end
-		if a[dateProperty].timestamp ~= b[dateProperty].timestamp then
-			return operator(a[dateProperty].timestamp, b[dateProperty].timestamp)
-		end
-		return nil
-	end
-
-	---@param a StandardTournament
-	---@param b StandardTournament
-	---@return boolean
-	local function sortByDate(a, b)
-		local endDateSort = sortByDateProperty(a, b, 'endDate', Operator.gt)
-		if endDateSort ~= nil then return endDateSort end
-		local startDateSort = sortByDateProperty(a, b, 'startDate', Operator.gt)
-		if startDateSort ~= nil then return startDateSort end
-		return a.pageName < b.pageName
-	end
-
-	---@param a StandardTournament
-	---@param b StandardTournament
-	---@return boolean
-	local function sortByDateUpcoming(a, b)
-		local startDateSort = sortByDateProperty(a, b, 'startDate', Operator.gt)
-		if startDateSort ~= nil then return startDateSort end
-		local endDateSort = sortByDateProperty(a, b, 'endDate', Operator.gt)
-		if endDateSort ~= nil then return endDateSort end
-		return a.pageName < b.pageName
-	end
-
-	local upcomingTournaments = Array.filter(allTournaments, filterByPhase('UPCOMING'))
-	local ongoingTournaments = Array.filter(allTournaments, filterByPhase('ONGOING'))
-	local completedTournaments = Array.filter(allTournaments, filterByPhase('FINISHED'))
-	table.sort(upcomingTournaments, sortByDateUpcoming)
-	table.sort(ongoingTournaments, sortByDate)
-	table.sort(completedTournaments, sortByDate)
 
 	---@param tournament StandardTournament
 	---@param child Widget
@@ -197,9 +92,9 @@ function TournamentsTickerListWidget:render()
 		defaultActive = 2,
 		storeValue = false,
 		tabs = {
-			{label = 'Upcoming', value = 'upcoming', content = buildTabContent(upcomingTournaments)},
-			{label = 'Ongoing', value = 'ongoing', content = buildTabContent(ongoingTournaments)},
-			{label = 'Completed', value = 'completed', content = buildTabContent(completedTournaments)},
+			{label = 'Upcoming', value = 'upcoming', content = buildTabContent(data.upcoming)},
+			{label = 'Ongoing', value = 'ongoing', content = buildTabContent(data.ongoing)},
+			{label = 'Completed', value = 'completed', content = buildTabContent(data.completed)},
 		},
 	}
 end
