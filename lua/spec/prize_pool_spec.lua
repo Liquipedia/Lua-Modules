@@ -131,7 +131,7 @@ describe('prize pool', function()
 			})
 			assert.stub(LpdbPlacementStub).was.called_with('ranking_abc1_Salt', {
 				date = '2022-10-15',
-				extradata = '{"prizepoints":"","prizepoints2":""}',
+				extradata = '{"playershare":"0","prizepoints":"","prizepoints2":""}',
 				game = 'commons',
 				icon = 'test.png',
 				icondark = 'test dark.png',
