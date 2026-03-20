@@ -57,19 +57,30 @@ function TournamentsTickerPillWidget:render()
 	colorClass = colorClass or COLOR_CLASSES.default
 
 	if self.props.variant == 'subtle' then
-		local children = {
-			HtmlWidgets.Div{
-				classes = {'tournament-badge__text'},
-				children = Tier.toName(tournament.liquipediaTier),
-			}
-		}
+		local subtleColorClass
+		local children
 		if tierTypeShort then
-			table.insert(children, HtmlWidgets.Div{
-				classes = {'tournament-badge__text'},
-				children = tierTypeShort,
-			})
+			subtleColorClass = COLOR_CLASSES[tournament.liquipediaTier] or COLOR_CLASSES.default
+			children = {
+				HtmlWidgets.Div{
+					classes = {'tournament-badge__chip'},
+					children = Tier.toName(tournament.liquipediaTier),
+				},
+				HtmlWidgets.Div{
+					classes = {'tournament-badge__text'},
+					children = tierTypeShort,
+				},
+			}
+		else
+			subtleColorClass = colorClass
+			children = {
+				HtmlWidgets.Div{
+					classes = {'tournament-badge__text'},
+					children = Tier.toName(tournament.liquipediaTier),
+				}
+			}
 		end
-		local classes = {'tournament-badge', 'tournament-badge--subtle', 'badge--' .. colorClass}
+		local classes = {'tournament-badge', 'tournament-badge--subtle', 'badge--' .. subtleColorClass}
 		if self.props.colorScheme == 'top3' then
 			table.insert(classes, 3, 'tournament-badge--top3')
 		end
