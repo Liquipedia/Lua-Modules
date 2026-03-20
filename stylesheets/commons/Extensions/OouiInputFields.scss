@@ -38,3 +38,8 @@ body .oo-ui-actionFieldLayout .oo-ui-actionFieldLayout-input .oo-ui-widget.oo-ui
         border-color: var( --clr-secondary-70 );
     }
 }
+
+body .oo-ui-textInputWidget.oo-ui-widget-disabled .oo-ui-inputWidget-input {
+    background-color: var( --clr-surface-2 );
+    text-shadow: none;
+}

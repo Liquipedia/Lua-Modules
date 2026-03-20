@@ -2893,18 +2893,3 @@ Slightly transparent imagelabel on POIDraft
 		background-color: rgba( 0, 25, 51, 0.75 );
 	}
 }
-
-/*******************************************************************************
-Author(s): Elysienna
-Styling moved from skin lakesideview
-*******************************************************************************/
-.catlinks {
-    background-color: transparent;
-    border: 0.0625rem solid var( --clr-border );
-}
-
-body {
-    .mw-changeslist-legend {
-        background-color: var( --clr-surface );
-    }
-}

@@ -69,3 +69,13 @@ div.mw-prefs-buttons {
     color: var( --clr-on-surface );
     border-color: var( --clr-border );
 }
+
+body {
+    .oo-ui-toggleSwitchWidget {
+        background-color: var( --clr-surface-2 );
+
+        &.oo-ui-widget-enabled:hover {
+            background-color: var( --clr-surface-3 );
+        }
+    }
+}
