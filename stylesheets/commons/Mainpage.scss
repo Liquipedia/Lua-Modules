@@ -86,22 +86,47 @@ div.main-page-banner .main-page-banner-bottom-row {
 
 .tournaments-list-item {
 	display: flex;
-	align-items: center;
-	gap: 0.75rem;
-	padding: 0.625rem 0.75rem;
-	border-bottom: 0.0625rem solid var( --clr-shade-1, #e8e8e8 );
+	align-items: stretch;
+	gap: 0.25rem;
+	padding: 0.5rem;
+	border-bottom: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
+
+	> .tournament-icon {
+		display: flex;
+		align-items: center;
+		flex-shrink: 0;
+	}
 }
 
-.tournaments-list-item__title {
+.tournaments-list-item__content {
 	flex: 1;
 	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 0.125rem;
+}
+
+.tournaments-list-item__meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	row-gap: 0.125rem;
 }
 
 .tournaments-list-item__date {
 	flex-shrink: 0;
 	font-size: 0.6875rem;
-	color: var( --clr-on-surface-muted, #666666 );
+	font-weight: bold;
+	line-height: 1rem;
 	white-space: nowrap;
+	color: var( --clr-on-surface-secondary, #404040 );
+	background-color: rgba( 0, 0, 0, 0.08 );
+	border-radius: 0.25rem;
+	padding: 0.125rem 0.5rem;
+	width: 6rem;
+	text-align: center;
 }
 
 .tournaments-list-dates {
