@@ -155,43 +155,95 @@ $showmatch-border-color: var( --tournament-tag-showmatch-badge-border-color, #00
 	}
 
 	&.badge--tier1 {
-		border-left-color: $tier1-border-color;
+		border-left-color: #ef6532;
+
+		.theme--dark & {
+			border-left-color: #ff4500;
+		}
 	}
 
 	&.badge--tier2 {
-		border-left-color: $tier2-border-color;
+		border-left-color: #b38f00;
+
+		.theme--dark & {
+			border-left-color: #ffcc00;
+		}
 	}
 
 	&.badge--tier3 {
-		border-left-color: $tier3-border-color;
+		border-left-color: #0097ca;
+
+		.theme--dark & {
+			border-left-color: #00bfff;
+		}
 	}
 
 	&.badge--tier4 {
-		border-left-color: $tier4-border-color;
+		border-left-color: #2d712f;
+
+		.theme--dark & {
+			border-left-color: #65c877;
+		}
 	}
 
 	&.badge--tier5 {
-		border-left-color: $tier5-border-color;
+		border-left-color: #9166ff;
+
+		.theme--dark & {
+			border-left-color: #8858ff;
+		}
 	}
 
-	&.badge--misc {
-		border-left-color: $misc-border-color;
-	}
-
-	&.badge--qualifier {
-		border-left-color: $qualifier-border-color;
-	}
-
-	&.badge--monthly {
-		border-left-color: $monthly-border-color;
-	}
-
-	&.badge--weekly {
-		border-left-color: $weekly-border-color;
-	}
-
+	&.badge--misc,
+	&.badge--qualifier,
+	&.badge--monthly,
+	&.badge--weekly,
 	&.badge--showmatch {
-		border-left-color: $showmatch-border-color;
+		border-left-color: #949494;
+
+		.theme--dark & {
+			border-left-color: #707176;
+		}
+	}
+
+	&.tournament-badge--top3 {
+		&.badge--tier1 {
+			border-left-color: #f16c0e;
+
+			.theme--dark & {
+				border-left-color: #ffa500;
+			}
+		}
+
+		&.badge--tier2 {
+			border-left-color: #2563eb;
+
+			.theme--dark & {
+				border-left-color: #3b82f6;
+			}
+		}
+
+		&.badge--tier3 {
+			border-left-color: #262626;
+
+			.theme--dark & {
+				border-left-color: #ffffff;
+			}
+		}
+
+		&.badge--tier4,
+		&.badge--tier5,
+		&.badge--misc,
+		&.badge--qualifier,
+		&.badge--monthly,
+		&.badge--weekly,
+		&.badge--showmatch {
+			border-left-color: #949494;
+
+			.theme--dark & {
+				border-left-color: #8d8d8d;
+			}
+		}
 	}
 
 	.tournament-badge__text {
@@ -200,5 +252,9 @@ $showmatch-border-color: var( --tournament-tag-showmatch-badge-border-color, #00
 		font-weight: bold;
 		line-height: 1rem;
 		justify-content: flex-start;
+
+		.theme--dark & {
+			color: var( --clr-secondary-100 );
+		}
 	}
 }

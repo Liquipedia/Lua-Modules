@@ -20,6 +20,7 @@ local TierPill = Lua.import('Module:Widget/Tournament/TierPill')
 ---@class TournamentsTickerListItemProps
 ---@field tournament StandardTournament
 ---@field displayGameIcon boolean
+---@field tierColorScheme string?
 
 ---@class TournamentsTickerListItemWidget: Widget
 ---@operator call(TournamentsTickerListItemProps): TournamentsTickerListItemWidget
@@ -73,6 +74,7 @@ function TournamentsTickerListItemWidget:render()
 									TierPill{
 										tournament = tournament,
 										variant = 'subtle',
+										colorScheme = self.props.tierColorScheme,
 									},
 								},
 							},

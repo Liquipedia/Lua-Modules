@@ -89,7 +89,12 @@ div.main-page-banner .main-page-banner-bottom-row {
 	align-items: center;
 	gap: 0.25rem;
 	padding: 0.5rem;
-	border-bottom: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
+	border-bottom: 0.0625rem solid;
+	border-color: var( --clr-on-surface-light-primary-8 );
+
+	.theme--dark & {
+		border-color: var( --clr-on-surface-dark-primary-8 );
+	}
 
 	> .tournament-icon {
 		display: flex;
@@ -133,9 +138,13 @@ div.main-page-banner .main-page-banner-bottom-row {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background-color: rgba( 0, 0, 0, 0.04 );
+		background-color: var( --clr-on-surface-light-primary-4 );
 		border-radius: 0.25rem;
 		padding: 0.125rem;
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+		}
 	}
 
 	&__date {
@@ -144,14 +153,15 @@ div.main-page-banner .main-page-banner-bottom-row {
 		font-weight: bold;
 		line-height: 1rem;
 		white-space: nowrap;
-		color: var( --clr-secondary-25 );
 		background-color: var( --clr-on-surface-light-primary-8 );
+		color: var( --clr-secondary-25 );
 		border-radius: 0.25rem;
 		padding: 0.125rem 0.5rem;
 		text-align: center;
 
 		.theme--dark & {
 			background-color: var( --clr-on-surface-dark-primary-8 );
+			color: var( --clr-secondary-100 );
 		}
 	}
 }

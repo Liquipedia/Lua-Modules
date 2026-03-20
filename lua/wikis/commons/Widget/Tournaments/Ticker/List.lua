@@ -73,6 +73,7 @@ function TournamentsTickerListWidget:render()
 					children = createFilterWrapper(tournament, ListItem{
 						tournament = tournament,
 						displayGameIcon = displayGameIcons,
+						tierColorScheme = self.props.tierColorScheme,
 					})
 				}
 			end),

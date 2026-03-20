@@ -19,6 +19,7 @@ local TournamentsTickerPillWidget = Class.new(Widget)
 
 TournamentsTickerPillWidget.defaultProps = {
 	variant = 'solid',
+	colorScheme = 'full',
 }
 
 local COLOR_CLASSES = {
@@ -69,7 +70,12 @@ function TournamentsTickerPillWidget:render()
 			})
 		end
 		return HtmlWidgets.Div{
-			classes = {'tournament-badge', 'tournament-badge--subtle', 'badge--' .. colorClass},
+			classes = {
+				'tournament-badge',
+				'tournament-badge--subtle',
+				self.props.colorScheme == 'top3' and 'tournament-badge--top3' or nil,
+				'badge--' .. colorClass,
+			},
 			children = children,
 		}
 	end

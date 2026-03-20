@@ -74,7 +74,8 @@ local CONTENT = {
 			upcomingDays = 21,
 			modifierTier1 = 42,
 			completedDays = 14,
-			displayGameIcons = true
+			displayGameIcons = true,
+			tierColorScheme = 'top3',
 		},
 		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
