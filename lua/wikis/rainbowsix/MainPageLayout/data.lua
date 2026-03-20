@@ -69,7 +69,7 @@ local CONTENT = {
 			upcomingDays = 30,
 			completedDays = 20
 		},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 }
