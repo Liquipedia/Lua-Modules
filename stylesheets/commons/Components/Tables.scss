@@ -1,161 +1,156 @@
 .table-responsive {
-    width: auto;
+	width: auto;
 }
 
 .table-full-width {
-    width: 100%;
+	width: 100%;
 }
 
 /** Bootstrap overwrite **/
 .table-bordered {
-    th,
-    td {
-        /* stylelint-disable-next-line declaration-no-important */
-        .theme--light & {
-            border: 0.0625rem solid var( --clr-on-surface-light-primary-8 ) !important;
-        }
+	th,
+	td {
+		.theme--light & {
+			border: 0.0625rem solid var( --clr-on-surface-light-primary-8 ) !important;
+		}
 
-        .theme--dark & {
-            border: 0.0625rem solid var( --clr-secondary-25 ) !important;
-        }
-    }
+		.theme--dark & {
+			border: 0.0625rem solid var( --clr-secondary-25 ) !important;
+		}
+	}
 }
 
 .table {
-    width: auto;
-    color: var( --clr-on-background );
+	width: auto;
+	color: var( --clr-on-background );
 
-    .theme--light & {
-        border: 0.0625rem solid var( --clr-on-surface-light-primary-8 );
-    }
+	.theme--light & {
+		border: 0.0625rem solid var( --clr-on-surface-light-primary-8 );
+	}
 
-    .theme--dark & {
-        border: 0.0625rem solid var( --clr-secondary-25 );
-    }
+	.theme--dark & {
+		border: 0.0625rem solid var( --clr-secondary-25 );
+	}
 
-    th {
-        text-align: center;
-    }
+	th {
+		text-align: center;
+	}
 
-    th,
-    td {
-        vertical-align: middle;
-    }
+	th,
+	td {
+		vertical-align: middle;
+	}
 }
 
 .wikitable {
-    margin-bottom: 1rem;
-    color: var( --clr-on-surface );
+	margin-bottom: 1rem;
+	color: var( --clr-on-surface );
 
-    .theme--light & {
-        border: 0.0625rem solid var( --clr-on-surface-light-primary-8 ) !important;
-        background-color: var( --clr-surface-1 );
-    }
+	.theme--light & {
+		border: 0.0625rem solid var( --clr-on-surface-light-primary-8 ) !important;
+		background-color: var( --clr-surface-1 );
+	}
 
-    .theme--dark & {
-        border: 0.0625rem solid var( --clr-secondary-25 ) !important;
-        background-color: var( --clr-secondary-7 );
-    }
+	.theme--dark & {
+		border: 0.0625rem solid var( --clr-secondary-25 ) !important;
+		background-color: var( --clr-secondary-7 );
+	}
 
-    @media ( hover: hover ) {
-        a:visited:hover {
-            .theme--light & {
-                color: var( --clr-primary-30 );
-            }
+	@media ( hover: hover ) {
+		a:visited:hover {
+			.theme--light & {
+				color: var( --clr-primary-30 );
+			}
 
-            .theme--dark & {
-                color: var( --clr-primary-80 );
-            }
-        }
-    }
+			.theme--dark & {
+				color: var( --clr-primary-80 );
+			}
+		}
+	}
 
-    a:visited {
-        .theme--light & {
-            color: var( --clr-primary-30 );
-        }
+	a:visited {
+		.theme--light & {
+			color: var( --clr-primary-30 );
+		}
 
-        .theme--dark & {
-            color: var( --clr-primary-80 );
-        }
-    }
+		.theme--dark & {
+			color: var( --clr-primary-80 );
+		}
+	}
 
-    &,
-    > thead,
-    > tbody {
-        > tr {
-            > th,
-            > td {
-                padding: 0.3125rem;
-                vertical-align: middle;
+	&,
+	> thead,
+	> tbody {
+		> tr {
+			> th,
+			> td {
+				padding: 0.3125rem;
+				vertical-align: middle;
 
-                /* stylelint-disable-next-line declaration-no-important */
-                .theme--light & {
-                    border: 0.0625rem solid var( --clr-on-surface-light-primary-8 ) !important;
-                }
+				.theme--light & {
+					border: 0.0625rem solid var( --clr-on-surface-light-primary-8 ) !important;
+				}
 
-                .theme--dark & {
-                    border: 0.0625rem solid var( --clr-secondary-25 ) !important;
-                }
-            }
-        }
-    }
+				.theme--dark & {
+					border: 0.0625rem solid var( --clr-secondary-25 ) !important;
+				}
+			}
+		}
+	}
 
-    > tr > th,
-    > * > tr > th {
-        @media screen {
-            color: unset;
-        }
+	> tr > th,
+	> * > tr > th {
+		@media screen {
+			color: unset;
+		}
 
-        .theme--light & {
-            background-color: var( --clr-surface-2 );
-        }
+		.theme--light & {
+			background-color: var( --clr-surface-2 );
+		}
 
-        .theme--dark & {
-            background-color: var( --clr-secondary-16 );
-        }
-    }
+		.theme--dark & {
+			background-color: var( --clr-secondary-16 );
+		}
+	}
 
-    > thead > tr > th {
-        vertical-align: middle;
+	> thead > tr > th {
+		vertical-align: middle;
 
-        /* stylelint-disable-next-line declaration-no-important */
-        .theme--light & {
-            border-bottom: 0.125rem solid var( --clr-on-surface-light-primary-8 ) !important;
-        }
+		.theme--light & {
+			border-bottom: 0.125rem solid var( --clr-on-surface-light-primary-8 ) !important;
+		}
 
-        .theme--dark & {
-            border-bottom: 0.125rem solid var( --clr-secondary-25 ) !important;
-        }
-    }
+		.theme--dark & {
+			border-bottom: 0.125rem solid var( --clr-secondary-25 ) !important;
+		}
+	}
 
-    > thead > tr {
-        > th,
-        > td {
-            /* stylelint-disable-next-line declaration-no-important */
-            border-bottom-width: 0.125rem !important;
-        }
-    }
+	> thead > tr {
+		> th,
+		> td {
+			border-bottom-width: 0.125rem !important;
+		}
+	}
 
-    > tbody + tbody {
-        /* stylelint-disable-next-line declaration-no-important */
-        .theme--light & {
-            border-top: 0.125rem solid var( --clr-on-surface-light-primary-8 ) !important;
-        }
+	> tbody + tbody {
+		.theme--light & {
+			border-top: 0.125rem solid var( --clr-on-surface-light-primary-8 ) !important;
+		}
 
-        .theme--dark & {
-            border-top: 0.125rem solid var( --clr-secondary-25 ) !important;
-        }
-    }
+		.theme--dark & {
+			border-top: 0.125rem solid var( --clr-secondary-25 ) !important;
+		}
+	}
 }
 
 caption {
-    caption-side: top;
+	caption-side: top;
 }
 
 // overwrite MW 1.43 new table styles
 // https://github.com/wikimedia/mediawiki/blob/REL1_43/resources/src/mediawiki.skinning/content.tables.less#L14
 @media screen and ( max-width: 639px ) {
-    .mw-parser-output table {
-        display: table;
-    }
+	.mw-parser-output table {
+		display: table;
+	}
 }

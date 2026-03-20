@@ -92,7 +92,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		border: unset !important;
 		margin: 0 !important;
 		list-style: none;
-        gap: 0;
+		gap: 0;
 
 		&::-webkit-scrollbar {
 			display: none;
@@ -348,53 +348,53 @@ html.client-nojs .tabs-content > div:not( .active ) {
 
 	.nav-tabs {
 		margin-bottom: 0;
-        border-bottom: 0.125rem solid;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.125rem;
+		border-bottom: 0.125rem solid;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.125rem;
 
-        .theme--light & {
-            border-bottom-color: var(--clr-secondary-90);
-        }
+		.theme--light & {
+			border-bottom-color: var( --clr-secondary-90 );
+		}
 
-        .theme--dark & {
-            border-bottom-color: var(--clr-secondary-16);
-        }
+		.theme--dark & {
+			border-bottom-color: var( --clr-secondary-16 );
+		}
 
-        @at-root .mw-content-ltr &,
-        .mw-content-rtl .mw-content-ltr & {
-            margin: 0.25rem 0;
-        }
+		@at-root .mw-content-ltr &,
+		.mw-content-rtl .mw-content-ltr & {
+			margin: 0.25rem 0;
+		}
 
 		li {
 			float: left;
 			cursor: pointer;
-            margin: 0.125rem 0 0 0;
-            border: 0.125rem solid;
-            border-bottom: 0 !important;
-            height: 2.125rem;
+			margin: 0.125rem 0 0 0;
+			border: 0.125rem solid;
+			border-bottom: 0 !important;
+			height: 2.125rem;
 
-            .theme--light & {
-                background-color: var(--clr-primary-96);
-                border-color: var(--clr-secondary-90);
-            }
+			.theme--light & {
+				background-color: var( --clr-primary-96 );
+				border-color: var( --clr-secondary-90 );
+			}
 
-            .theme--dark & {
-                background-color: var(--clr-secondary-9);
-                border-color: var(--clr-secondary-16);
-            }
+			.theme--dark & {
+				background-color: var( --clr-secondary-9 );
+				border-color: var( --clr-secondary-16 );
+			}
 
 			&:not( .active ) {
 				cursor: pointer;
 			}
 
-            .tabs-portal & {
-                height: 2.875rem;
-            }
+			.tabs-portal & {
+				height: 2.875rem;
+			}
 
-            &:last-of-type {
-                margin-right: 0;
-            }
+			&:last-of-type {
+				margin-right: 0;
+			}
 
 			a {
 				display: block;
@@ -402,18 +402,18 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				border: 1px solid transparent;
 				outline: 0;
 				position: relative;
-                height: 2rem;
+				height: 2rem;
 
-                &:focus-visible {
-                    text-decoration: underline;
-                }
+				&:focus-visible {
+					text-decoration: underline;
+				}
 
-                @media (hover: hover) {
-                    &:hover,
-                    &:visited:hover {
-                        text-decoration: none;
-                    }
-                }
+				@media ( hover: hover ) {
+					&:hover,
+					&:visited:hover {
+						text-decoration: none;
+					}
+				}
 			}
 
 			// Specific alignment for team templates in static tabs
@@ -435,19 +435,19 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			}
 
 			&.active {
-                margin-bottom: -0.125rem;
-                height: 2.25rem;
-                font-weight: bold;
+				margin-bottom: -0.125rem;
+				height: 2.25rem;
+				font-weight: bold;
 
-                .theme--light & {
-                    background-color: var(--clr-secondary-100);
-                    color: var(--clr-secondary-8);
-                }
+				.theme--light & {
+					background-color: var( --clr-secondary-100 );
+					color: var( --clr-secondary-8 );
+				}
 
-                .theme--dark & {
-                    background-color: var(--clr-secondary-7);
-                    color: var(--clr-secondary-100);
-                }
+				.theme--dark & {
+					background-color: var( --clr-secondary-7 );
+					color: var( --clr-secondary-100 );
+				}
 
 				.selflink {
 					background-color: unset !important;
@@ -455,7 +455,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 
 				a {
 					background-color: unset !important;
-                    color: currentColor;
+					color: currentcolor;
 				}
 			}
 		}

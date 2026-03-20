@@ -1,64 +1,64 @@
 body {
-    .oo-ui-messageWidget.oo-ui-messageWidget-block.oo-ui-flaggedElement-notice {
-        background-color: var( --clr-surface-3 );
-    }
+	.oo-ui-messageWidget.oo-ui-messageWidget-block.oo-ui-flaggedElement-notice {
+		background-color: var( --clr-surface-3 );
+	}
 
-    .oo-ui-icon-infoFilled,
-    .mw-ui-icon-infoFilled:before {
-        background-color: var( --clr-on-surface );
-        background-image: none;
-        mask-image: url( 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22%3E%3Ctitle%3E info %3C/title%3E%3Cpath d=%22M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0M9 5h2v2H9zm0 4h2v6H9z%22/%3E%3C/svg%3E' );
-        -webkit-mask-image: url( 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22%3E%3Ctitle%3E info %3C/title%3E%3Cpath d=%22M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0M9 5h2v2H9zm0 4h2v6H9z%22/%3E%3C/svg%3E' );
-    }
+	.oo-ui-icon-infoFilled,
+	.mw-ui-icon-infoFilled::before {
+		background-color: var( --clr-on-surface );
+		background-image: none;
+		mask-image: url( "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22%3E%3Ctitle%3E info %3C/title%3E%3Cpath d=%22M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0M9 5h2v2H9zm0 4h2v6H9z%22/%3E%3C/svg%3E" );
+		-webkit-mask-image: url( "data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22%3E%3Ctitle%3E info %3C/title%3E%3Cpath d=%22M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0M9 5h2v2H9zm0 4h2v6H9z%22/%3E%3C/svg%3E" );
+	}
 
-    .mw-twocolconflict-split-current-version-header,
-    .mw-twocolconflict-special-your-version-header,
-    .mw-twocolconflict-split-your-version-header {
-        .mw-twocolconflict-revision-label {
-            .theme--light & {
-                background-color: var( --clr-semantic-silver-40 );
-            }
+	.mw-twocolconflict-split-current-version-header,
+	.mw-twocolconflict-special-your-version-header,
+	.mw-twocolconflict-split-your-version-header {
+		.mw-twocolconflict-revision-label {
+			.theme--light & {
+				background-color: var( --clr-semantic-silver-40 );
+			}
 
-            .theme--dark & {
-                background-color: var( --clr-secondary-39 );
-            }
-        }
-    }
+			.theme--dark & {
+				background-color: var( --clr-secondary-39 );
+			}
+		}
+	}
 
-    .mw-twocolconflict-split-current-version-header .mw-twocolconflict-revision-label {
-        .theme--light & {
-            background-color: var( --clr-semantic-gold-40 );
-        }
+	.mw-twocolconflict-split-current-version-header .mw-twocolconflict-revision-label {
+		.theme--light & {
+			background-color: var( --clr-semantic-gold-40 );
+		}
 
-        .theme--dark & {
-            background-color: var( --clr-semantic-gold-30 );
-        }
-    }
+		.theme--dark & {
+			background-color: var( --clr-semantic-gold-30 );
+		}
+	}
 
-    .mw-twocolconflict-single-column,
-    .mw-twocolconflict-split-column {
-        &.mw-twocolconflict-split-copy {
-            background-color: var( --clr-surface-1 );
-            color: var( --clr-on-surface );
-        }
+	.mw-twocolconflict-single-column,
+	.mw-twocolconflict-split-column {
+		&.mw-twocolconflict-split-copy {
+			background-color: var( --clr-surface-1 );
+			color: var( --clr-on-surface );
+		}
 
-        .mw-twocolconflict-split-collapsed .mw-twocolconflict-split-fade {
-            background-image: none;
-        }
+		.mw-twocolconflict-split-collapsed .mw-twocolconflict-split-fade {
+			background-image: none;
+		}
 
-        &.mw-twocolconflict-split-unselected {
-            background-color: var( --clr-surface );
-            color: var( --clr-on-surface );
-        }
-    }
+		&.mw-twocolconflict-split-unselected {
+			background-color: var( --clr-surface );
+			color: var( --clr-on-surface );
+		}
+	}
 
-    div.mw-fr-edit-messages {
-        color: var( --clr-on-surface );
-    }
+	div.mw-fr-edit-messages {
+		color: var( --clr-on-surface );
+	}
 
-    div.oo-ui-labelElement > span.oo-ui-iconElement-icon.oo-ui-icon-infoFilled.oo-ui-image-notice {
-        width: 1.25rem;
-        height: 1.25rem;
-        top: auto;
-    }
+	div.oo-ui-labelElement > span.oo-ui-iconElement-icon.oo-ui-icon-infoFilled.oo-ui-image-notice {
+		width: 1.25rem;
+		height: 1.25rem;
+		top: auto;
+	}
 }

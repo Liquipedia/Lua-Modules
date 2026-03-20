@@ -3,60 +3,60 @@
 .errorbox,
 .warningbox,
 .successbox {
-    color: var( --clr-on-surface );
+	color: var( --clr-on-surface );
 }
 
 .errorbox {
-    background-color: var( --clr-error-container );
-    border-color: var( --clr-on-error );
-    color: var( --clr-on-error-container );
+	background-color: var( --clr-error-container );
+	border-color: var( --clr-on-error );
+	color: var( --clr-on-error-container );
 }
 
 .messagebox {
-    background-color: var( --clr-surface-variant );
-    border-color: var( --clr-border );
-    color: var( --clr-on-surface-variant );
+	background-color: var( --clr-surface-variant );
+	border-color: var( --clr-border );
+	color: var( --clr-on-surface-variant );
 }
 
 .successbox {
-    background-color: var( --clr-confirmed-container );
-    border-color: var( --clr-on-confirmed );
-    color: var( --clr-on-confirmed-container );
+	background-color: var( --clr-confirmed-container );
+	border-color: var( --clr-on-confirmed );
+	color: var( --clr-on-confirmed-container );
 }
 
 /* TODO: Needs a better color in the future */
 .warningbox {
-    background-color: var( --clr-on-gold );
-    color: #000000;
+	background-color: var( --clr-on-gold );
+	color: #000000;
 }
 
 // resources/styles/extensions/_interwiki.scss
 table.mw-interwikitable.body {
-    td.mw-interwikitable-local-yes {
-        background: var( --clr-elm-90 );
+	td.mw-interwikitable-local-yes {
+		background: var( --clr-elm-90 );
 
-        .theme--dark & {
-            background: var( --clr-elm-10 );
-        }
-    }
+		.theme--dark & {
+			background: var( --clr-elm-10 );
+		}
+	}
 }
 
 // resources/styles/extensions/_liquipediaads.scss
 #top-ad {
-    top: calc( 3.125rem + 2.25rem );
+	top: calc( 3.125rem + 2.25rem );
 }
 
 // resources/styles/extensions/_patrol.scss
 /* hide patrolling link */
 .patrollink {
-    display: none;
+	display: none;
 }
 
 // resources/styles/extensions/_scribunto.scss
 .mw-scribunto-input {
-    background: var( --clr-on-surface );
+	background: var( --clr-on-surface );
 
-    .theme--dark & {
-        background: var( --clr-surface );
-    }
+	.theme--dark & {
+		background: var( --clr-surface );
+	}
 }

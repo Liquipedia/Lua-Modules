@@ -1,56 +1,54 @@
-// Add specificity to overwrite default styling
 body div.suggestions {
-    // stylelint-disable-next-line declaration-no-important
-    font-size: 0.875rem !important;
-    box-shadow: var( --box-shadow-elevation-1 );
+	font-size: 0.875rem !important;
+	box-shadow: var( --box-shadow-elevation-1 );
 
-    &-results {
-        background-color: var( --clr-surface-3 );
-        border: 0;
+	&-results {
+		background-color: var( --clr-surface-3 );
+		border: 0;
 
-        .mw-searchSuggest-link {
-            color: var( --clr-primary );
-        }
-    }
+		.mw-searchSuggest-link {
+			color: var( --clr-primary );
+		}
+	}
 
-    &-result {
-        line-height: 1.4;
-        padding: 0.125rem 0.5rem;
-        color: var( --clr-on-surface );
-    }
+	&-result {
+		line-height: 1.4;
+		padding: 0.125rem 0.5rem;
+		color: var( --clr-on-surface );
+	}
 
-    // hover state for a result
-    &-result.suggestions-result-current {
-        color: var( --clr-on-surface );
+	// hover state for a result
+	&-result.suggestions-result-current {
+		color: var( --clr-on-surface );
 
-        .theme--light & {
-            background-color: var( --clr-on-surface-light-primary-12 );
-        }
+		.theme--light & {
+			background-color: var( --clr-on-surface-light-primary-12 );
+		}
 
-        .theme--dark & {
-            background-color: var( --clr-on-surface-dark-primary-12 );
-        }
-    }
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-12 );
+		}
+	}
 
-    &-special {
-        color: var( --clr-on-surface );
-        background-color: var( --clr-surface-2 );
-    }
+	&-special {
+		color: var( --clr-on-surface );
+		background-color: var( --clr-surface-2 );
+	}
 
-    &-special.suggestions-result-current {
-        &,
-        .special-label,
-        .special-query {
-            color: var( --clr-primary );
-        }
-    }
+	&-special.suggestions-result-current {
+		&,
+		.special-label,
+		.special-query {
+			color: var( --clr-primary );
+		}
+	}
 
-    .special-label {
-        color: var( --clr-on-surface );
-        font-size: 0.875rem;
-    }
+	.special-label {
+		color: var( --clr-on-surface );
+		font-size: 0.875rem;
+	}
 
-    .special-query {
-        color: var( --clr-on-surface );
-    }
+	.special-query {
+		color: var( --clr-on-surface );
+	}
 }

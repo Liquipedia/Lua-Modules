@@ -1,23 +1,23 @@
 .documentation {
-    border: 0.0625rem solid;
+	border: 0.0625rem solid;
 
-    .theme--light & {
-        background-color: var( --clr-atlantis-90 );
-        border-color: var( --clr-atlantis-10 );
-    }
+	.theme--light & {
+		background-color: var( --clr-atlantis-90 );
+		border-color: var( --clr-atlantis-10 );
+	}
 
-    .theme--dark & {
-        background-color: var( --clr-atlantis-80 );
-        border-color: var( --clr-atlantis-20 );
-    }
+	.theme--dark & {
+		background-color: var( --clr-atlantis-80 );
+		border-color: var( --clr-atlantis-20 );
+	}
 
-    h2 {
-        .theme--light & {
-            border-color: var( --clr-atlantis-10 );
-        }
+	h2 {
+		.theme--light & {
+			border-color: var( --clr-atlantis-10 );
+		}
 
-        .theme--dark & {
-            border-color: var( --clr-atlantis-20 );
-        }
-    }
+		.theme--dark & {
+			border-color: var( --clr-atlantis-20 );
+		}
+	}
 }
