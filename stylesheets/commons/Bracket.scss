@@ -955,6 +955,10 @@ Author(s): FO-nTTaX, salle
 .bracket-popup div.side {
 	text-align: center;
 	letter-spacing: 0;
+
+	table td {
+		line-height: 15px;
+	}
 }
 
 .wiki-battalion .side,
@@ -962,10 +966,6 @@ Author(s): FO-nTTaX, salle
 .wiki-crossfire .side,
 .wiki-valorant .side {
 	width: 110px;
-}
-
-.bracket-popup div.side table td {
-	line-height: 15px;
 }
 
 .bracket-popup div.side .popup-progress {
@@ -1110,6 +1110,22 @@ Author(s): FO-nTTaX, salle
 		height: 18px;
 		width: 18px;
 	}
+
+	.wiki-artifact &,
+	.wiki-honorofkings &,
+	.wiki-paladins &,
+	.wiki-leagueoflegends &,
+	.wiki-runeterra &,
+	.wiki-wildrift & {
+		margin-top: -4px;
+		height: 25px;
+		width: 25px;
+	}
+
+	.wiki-dota2 & {
+		height: 16px;
+		width: 29px;
+	}
 }
 
 .bracket-popup div.draft.dire img {
@@ -1177,17 +1193,6 @@ Author(s): FO-nTTaX, salle
 	background-color: #ee6767;
 }
 
-.wiki-artifact .bracket-popup div.draft img,
-.wiki-honorofkings .bracket-popup div.draft img,
-.wiki-paladins .bracket-popup div.draft img,
-.wiki-leagueoflegends .bracket-popup div.draft img,
-.wiki-runeterra .bracket-popup div.draft img,
-.wiki-wildrift .bracket-popup div.draft img {
-	margin-top: -4px;
-	height: 25px;
-	width: 25px;
-}
-
 .wiki-artifact .bracket-popup.bracket-popup-showmatch div.draft img,
 .wiki-honorofkings .bracket-popup.bracket-popup-showmatch div.draft img,
 .wiki-paladins .bracket-popup.bracket-popup-showmatch div.draft img,
@@ -1197,11 +1202,6 @@ Author(s): FO-nTTaX, salle
 	margin-top: -4px;
 	height: 35px;
 	width: 35px;
-}
-
-.wiki-dota2 .bracket-popup div.draft img {
-	height: 16px;
-	width: 29px;
 }
 
 .draft:not( .no-hover ) > a > img:hover {
@@ -1242,22 +1242,18 @@ Author(s): FO-nTTaX
 		display: none !important;
 	}
 
-	.bracket-wrapper.bracket-player .bracket-player-top img,
-	.bracket-wrapper.bracket-player .bracket-player-bottom img,
-	.bracket-wrapper.bracket-player .bracket-player-middle img {
-		display: none !important;
-	}
-
-	.bracket-wrapper.bracket-player .bracket-player-top .bracket-score img,
-	.bracket-wrapper.bracket-player .bracket-player-bottom .bracket-score img,
-	.bracket-wrapper.bracket-player .bracket-player-middle .bracket-score img {
-		display: initial !important;
-	}
-
 	.bracket-wrapper.bracket-player .bracket-player-top,
 	.bracket-wrapper.bracket-player .bracket-player-bottom,
 	.bracket-wrapper.bracket-player .bracket-player-middle {
 		overflow: hidden;
+
+		img {
+			display: none !important;
+		}
+
+		.bracket-score img {
+			display: initial !important;
+		}
 	}
 
 	.bracket-archon-mode .bracket-score,
