@@ -1136,36 +1136,6 @@ Author(s): FO-nTTaX, salle
 	border-color: #bcd985;
 }
 
-.bracket-popup div.side .popup-progress {
-	border-radius: 5px;
-	width: 50px;
-	height: 15px;
-	border: 1px solid #bbbbbb;
-	position: relative;
-	text-align: center;
-	margin-bottom: 0;
-
-	> div.bar {
-		height: 15px;
-		border-radius: 4px;
-		float: left;
-		line-height: 17px;
-	}
-
-	> div.bar.bg-color {
-		background-color: #e5b6c0;
-	}
-
-	> div.bar-text {
-		height: 15px;
-		width: 100%;
-		border-radius: 5px;
-		position: absolute;
-		top: 0;
-		left: 0;
-	}
-}
-
 .grouptable-start-date {
 	background-color: #f2f2f2;
 	font-size: 85%;
