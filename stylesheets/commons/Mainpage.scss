@@ -129,14 +129,14 @@ div.main-page-banner .main-page-banner-bottom-row {
 	font-weight: bold;
 	line-height: 1rem;
 	white-space: nowrap;
-	color: var( --clr-on-surface-secondary, #404040 );
-	background-color: var( --clr-on-surface-primary-light-8 );
+	color: var( --clr-secondary-25 );
+	background-color: var( --clr-on-surface-light-primary-8 );
 	border-radius: 0.25rem;
 	padding: 0.125rem 0.5rem;
 	text-align: center;
 
 	.theme--dark & {
-		background-color: var( --clr-on-surface-primary-dark-8 );
+		background-color: var( --clr-on-surface-dark-primary-8 );
 	}
 }
 
