@@ -1,0 +1,69 @@
+body {
+    table.jexcel {
+        > thead > tr > td {
+            background-color: var( --clr-surface );
+
+            &.selected {
+                background-color: var( --clr-surface-2 );
+            }
+        }
+
+        > tbody > tr {
+            > td {
+                background-color: var( --clr-surface );
+
+                &:first-child {
+                    background-color: var( --clr-surface );
+                }
+            }
+
+            &.selected > td:first-child {
+                background-color: var( --clr-surface-2 );
+            }
+        }
+    }
+
+    .jexcel {
+        .highlight-selected {
+            background-color: var( --clr-surface-2 );
+        }
+
+        .highlight {
+            background-color: var( --clr-surface-2 );
+        }
+    }
+
+    .jexcel_page_selected {
+        background: var( --clr-surface );
+    }
+
+    .jexcel_pagination > div > div {
+        background-color: var( --clr-surface );
+        /* stylelint-disable-next-line declaration-no-important */
+        color: var( --clr-on-surface ) !important; // needed to override !important in jexcel on existing rules
+    }
+
+    .oo-ui-icon-add,
+    .mw-ui-icon-add:before {
+        -webkit-mask-image: url( 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22%3E%3Ctitle%3E add %3C/title%3E%3Cpath d=%22M11 9V4H9v5H4v2h5v5h2v-5h5V9z%22/%3E%3C/svg%3E' );
+        mask-image: url( 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22%3E%3Ctitle%3E add %3C/title%3E%3Cpath d=%22M11 9V4H9v5H4v2h5v5h2v-5h5V9z%22/%3E%3C/svg%3E' );
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: var( --clr-on-surface );
+        background-image: none;
+    }
+
+    .oo-ui-icon-close,
+    .mw-ui-icon-close:before {
+        -webkit-mask-image: url( 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22%3E%3Ctitle%3E close %3C/title%3E%3Cpath d=%22m4.3 2.9 12.8 12.8-1.4 1.4L2.9 4.3z%22/%3E%3Cpath d=%22M17.1 4.3 4.3 17.1l-1.4-1.4L15.7 2.9z%22/%3E%3C/svg%3E' );
+        mask-image: url( 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22%3E%3Ctitle%3E close %3C/title%3E%3Cpath d=%22m4.3 2.9 12.8 12.8-1.4 1.4L2.9 4.3z%22/%3E%3Cpath d=%22M17.1 4.3 4.3 17.1l-1.4-1.4L15.7 2.9z%22/%3E%3C/svg%3E' );
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: var( --clr-on-surface );
+        background-image: none;
+    }
+}

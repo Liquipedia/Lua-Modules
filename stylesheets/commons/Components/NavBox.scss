@@ -1,0 +1,43 @@
+.navbox {
+    .theme--light & {
+        background-color: var( --clr-surface-4 );
+    }
+
+    .theme--dark & {
+        background-color: var( --clr-secondary-16 );
+    }
+
+    &-title {
+        .theme--light & {
+            background-color: var( --clr-wiki-primary-container );
+        }
+
+        .theme--dark & {
+            background-color: var( --clr-wiki-theme-20 );
+        }
+    }
+
+    &-group {
+        .theme--light & {
+            background-color: var( --clr-wiki-primary-container );
+        }
+
+        .theme--dark & {
+            background-color: var( --clr-wiki-theme-20 );
+        }
+    }
+
+    &-list {
+        .theme--light & {
+            border-top-color: var( --clr-on-surface-light-primary-8 );
+            border-left-color: var( --clr-on-surface-light-primary-8 );
+            background-color: var( --clr-surface-4 );
+        }
+
+        .theme--dark & {
+            border-top-color: var( --clr-secondary-25 );
+            border-left-color: var( --clr-secondary-25 );
+            background-color: var( --clr-secondary-16 );
+        }
+    }
+}

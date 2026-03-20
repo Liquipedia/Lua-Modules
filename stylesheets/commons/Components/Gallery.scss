@@ -1,0 +1,64 @@
+/* enables additional gallery modes */
+ul.mw-gallery-packed li.gallerybox div.thumb,
+ul.mw-gallery-packed-overlay li.gallerybox div.thumb,
+ul.mw-gallery-packed-hover li.gallerybox div.thumb {
+    background-color: transparent;
+    border: 0 solid var( --clr-on-surface );
+}
+
+ul.mw-gallery-packed li.gallerybox div.thumb img,
+ul.mw-gallery-packed-overlay li.gallerybox div.thumb img,
+ul.mw-gallery-packed-hover li.gallerybox div.thumb img {
+    margin: 0 auto;
+}
+
+ul.mw-gallery-packed-hover li.gallerybox,
+ul.mw-gallery-packed-overlay li.gallerybox {
+    position: relative;
+}
+
+ul.mw-gallery-packed-hover div.gallerytextwrapper {
+    overflow: hidden;
+    height: 0;
+}
+
+ul.mw-gallery-packed-overlay li.gallerybox div.gallerytextwrapper,
+ul.mw-gallery-packed-hover li.gallerybox:hover div.gallerytextwrapper,
+ul.mw-gallery-packed-hover li.gallerybox.mw-gallery-focused div.gallerytextwrapper {
+    position: absolute;
+    opacity: 0.8;
+    filter: alpha( opacity=80 );
+    zoom: 1;
+    background-color: var( --clr-surface );
+    padding: 0.3125rem 0.625rem;
+    bottom: 0;
+    left: 0; /* Needed for IE */
+    height: auto;
+    font-weight: bold;
+    margin: 0.125rem; /* correspond to style on div.thumb */
+    /* stylelint-disable-next-line declaration-no-important */
+    width: 100% !important;
+}
+
+ul.mw-gallery-packed-hover,
+ul.mw-gallery-packed-overlay,
+ul.mw-gallery-packed {
+    text-align: center;
+}
+
+ul.mw-gallery-packed-hover div.gallerytext,
+ul.mw-gallery-packed-overlay div.gallerytext {
+    opacity: 1;
+    position: relative; /* Resets opacity in old IE */
+}
+
+ul.gallery li.gallerybox,
+ul.gallery li.gallerybox > div,
+ul.gallery li.gallerybox .thumb {
+    max-width: 100%;
+}
+
+li.gallerybox div.thumb {
+    background-color: var( --clr-surface );
+    border: 0.0625rem solid var( --clr-surface-variant );
+}

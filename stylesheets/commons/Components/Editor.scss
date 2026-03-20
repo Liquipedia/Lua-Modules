@@ -1,0 +1,225 @@
+form#editform {
+    box-shadow: var( --box-shadow-elevation-1 );
+
+    .templatesUsed,
+    .hiddencats {
+        padding-left: 1rem;
+    }
+}
+
+.editOptions {
+    background-color: var( --clr-surface-2 );
+    color: var( --clr-on-surface );
+    border: 0;
+}
+
+div.wikiEditor-ui .wikiEditor-ui-view {
+    .theme--light & {
+        border-color: var( --clr-on-surface-light-primary-8 );
+    }
+
+    .theme--dark & {
+        border-color: var( --clr-on-surface-dark-primary-8 );
+    }
+}
+
+div.wikiEditor-ui .wikiEditor-ui-top {
+    .theme--light & {
+        border-color: var( --clr-on-surface-light-primary-8 );
+    }
+
+    .theme--dark & {
+        border-color: var( --clr-on-surface-dark-primary-8 );
+    }
+}
+
+textarea#wpTextbox1,
+textarea#wpTextbox2 {
+    border: 0;
+
+    &:focus {
+        background-color: var( --clr-surface );
+        color: var( --clr-on-surface );
+        box-shadow: none;
+    }
+}
+
+div.wikiEditor-ui-toolbar {
+    background-color: var( --clr-surface-3, #f8f9fa );
+    color: var( --clr-on-surface, #212529 );
+}
+
+div.wikiEditor-ui-toolbar .oo-ui-buttonElement-frameless.oo-ui-widget-enabled > .oo-ui-buttonElement-button {
+    color: var( --clr-primary );
+
+    &:hover {
+        .theme--light & {
+            background-color: var( --clr-on-surface-light-primary-12 );
+        }
+
+        .theme--dark & {
+            background-color: var( --clr-on-surface-dark-primary-12 );
+        }
+    }
+}
+
+div.wikiEditor-ui-toolbar .sections .section {
+    .theme--light & {
+        border-color: var( --clr-on-surface-light-primary-8 );
+    }
+
+    .theme--dark & {
+        border-color: var( --clr-on-surface-dark-primary-8 );
+    }
+}
+
+@each $tool in $wiki-editor-tool-icons {
+    .theme--dark .wikiEditor-ui-toolbar .oo-ui-icon-#{$tool}, .mw-ui-icon-#{$tool}:before {
+        filter: invert( 100% ) sepia( 100% ) saturate( 0% ) hue-rotate( 47deg ) brightness( 103% );
+    }
+}
+
+div.wikiEditor-ui-toolbar .group {
+    /* stylelint-disable-next-line declaration-no-important */
+    .theme--light & {
+        border-color: var( --clr-on-surface-light-primary-8 ) !important;
+    }
+
+    .theme--dark & {
+        border-color: var( --clr-on-surface-dark-primary-8 ) !important;
+    }
+}
+
+div.wikiEditor-ui-toolbar .tabs span.tab a {
+    color: var( --clr-primary );
+
+    &:hover {
+        .theme--light & {
+            background-color: var( --clr-on-surface-light-primary-12 );
+        }
+
+        .theme--dark & {
+            background-color: var( --clr-on-surface-dark-primary-12 );
+        }
+    }
+
+    &.current,
+    &.current:visited {
+        color: var( --clr-on-surface );
+    }
+}
+
+.theme--dark div.wikiEditor-ui-toolbar .tabs span.tab a:before {
+    filter: invert( 100% ) sepia( 100% ) saturate( 0% ) hue-rotate( 47deg ) brightness( 103% );
+}
+
+/**
+ * Toolbar: Advanced
+ */
+
+div.wikiEditor-ui-toolbar .group .tool-select .label {
+    color: var( --clr-primary );
+}
+
+div.wikiEditor-ui-toolbar .group .tool-select .options {
+    background-color: var( --clr-surface-4 );
+    color: var( --clr-on-surface );
+
+    .theme--light & {
+        border-color: var( --clr-on-surface-light-primary-8 );
+    }
+
+    .theme--dark & {
+        border-color: var( --clr-on-surface-dark-primary-8 );
+    }
+}
+
+div.wikiEditor-ui-toolbar .group .tool-select .options .option {
+    color: var( --clr-on-surface );
+
+    &:hover {
+        color: var( --clr-on-surface );
+
+        .theme--light & {
+            background-color: var( --clr-on-surface-light-primary-12 );
+        }
+
+        .theme--dark & {
+            background-color: var( --clr-on-surface-dark-primary-12 );
+        }
+    }
+}
+
+.theme--dark .wikiEditor-ui-toolbar .group .tool-select .label:after {
+    filter: invert( 100% ) sepia( 100% ) saturate( 0% ) hue-rotate( 47deg ) brightness( 103% );
+}
+
+.theme--dark span.oo-ui-iconElement-icon.oo-ui-icon-listBullet,
+.theme--dark span.oo-ui-iconElement-icon.oo-ui-icon-listNumbered,
+.theme--dark span.oo-ui-iconElement-icon.oo-ui-icon-newline,
+.theme--dark span.oo-ui-iconElement-icon.oo-ui-icon-noWikiText,
+.theme--dark span.oo-ui-iconElement-icon.oo-ui-icon-bigger,
+.theme--dark span.oo-ui-iconElement-icon.oo-ui-icon-smaller,
+.theme--dark span.oo-ui-iconElement-icon.oo-ui-icon-superscript,
+.theme--dark span.oo-ui-iconElement-icon.oo-ui-icon-subscript,
+.theme--dark span.oo-ui-iconElement-icon.oo-ui-icon-imageGallery,
+.theme--dark span.oo-ui-iconElement-icon.oo-ui-icon-articleRedirect,
+.theme--dark span.oo-ui-iconElement-icon.oo-ui-icon-table,
+.theme--dark span.oo-ui-iconElement-icon.oo-ui-icon-die,
+.theme--dark span.oo-ui-iconElement-icon.oo-ui-icon-articleSearch {
+    filter: invert( 100% ) sepia( 100% ) saturate( 0% ) hue-rotate( 47deg ) brightness( 103% );
+}
+
+.theme--dark .group.group-leagueoflegends-insert-match-details .tool.tool-button,
+.theme--dark .group.group-valorant-insert-match-details .tool.tool-button,
+.theme--dark .group.group-insert-match-details .tool.tool-button {
+    filter: invert( 100% ) sepia( 100% ) saturate( 0% ) hue-rotate( 47deg ) brightness( 103% );
+}
+
+div.wikiEditor-ui-toolbar .group .label {
+    color: var( --clr-on-surface );
+}
+
+/**
+ * Toolbar: Special characters
+ */
+
+div.wikiEditor-ui-toolbar .page-characters div span {
+    color: var( --clr-on-surface );
+    border-color: var( --clr-surface-variant );
+
+    &:hover {
+        background-color: var( --clr-on-primary );
+
+        .theme--light & {
+            border-color: var( --clr-on-surface-light-primary-8 );
+        }
+
+        .theme--dark & {
+            border-color: var( --clr-on-surface-dark-primary-8 );
+        }
+    }
+}
+
+div.wikiEditor-ui-toolbar .booklet > .index > .current,
+div.wikiEditor-ui-toolbar .booklet > .index > :hover {
+    background-color: var( --clr-primary-container );
+    color: var( --clr-on-primary-container );
+}
+
+/**
+ * Toolbar: Help
+ */
+
+div.wikiEditor-ui-toolbar .page-table th {
+    color: var( --clr-on-surface-variant );
+}
+
+div.wikiEditor-ui-toolbar .page-table td {
+    color: var( --clr-on-surface );
+}
+
+div.wikiEditor-ui-toolbar .page-link {
+    background-color: var( --clr-surface-4 );
+    color: var( --clr-on-surface );
+}
