@@ -163,6 +163,7 @@ $showmatch-border-color: var( --tournament-tag-showmatch-badge-border-color, #00
 		font-size: 0.6875rem;
 		font-weight: bold;
 		line-height: 1rem;
+		margin-left: -0.25rem;
 
 		.theme--dark & {
 			background-color: var( --clr-on-surface-dark-primary-8 );
