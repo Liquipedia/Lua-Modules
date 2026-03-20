@@ -80,7 +80,8 @@ function AwardPlacement:_getLpdbData(...)
 		local lpdbData = {
 			date = opponent.date,
 			prizemoney = prizeMoney,
-			individualprizemoney = Opponent.typeIsParty(opponentType) and ((playerShare or prizeMoney) / Opponent.partySize(opponentType)) or 0,
+			individualprizemoney = Opponent.typeIsParty(opponentType)
+    			and ((playerShare or prizeMoney) / Opponent.partySize(opponentType)) or 0,
 			mode = 'award_individual',
 			weight = 0,
 			extradata = {
