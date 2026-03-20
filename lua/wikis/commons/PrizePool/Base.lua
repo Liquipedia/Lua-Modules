@@ -699,6 +699,7 @@ function BasePrizePool:_buildRows()
 
 		-- Calculate club share for the placement
 		Array.forEach(placement.opponents, function(opponent)
+			local basePrize
 			local playerShare = nil
 			Array.forEach(self.prizes, function(prize)
 				if prize.type == PRIZE_TYPE_BASE_CURRENCY then
