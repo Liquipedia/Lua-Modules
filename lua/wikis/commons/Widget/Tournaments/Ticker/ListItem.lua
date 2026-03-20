@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 
 local Widget = Lua.import('Module:Widget')
@@ -58,9 +59,22 @@ function TournamentsTickerListItemWidget:render()
 					HtmlWidgets.Div{
 						classes = {'tournaments-list-item__meta'},
 						children = {
-							TierPill{
-								tournament = tournament,
-								variant = 'subtle',
+							HtmlWidgets.Div{
+								classes = {'tournaments-list-item__badges'},
+								children = {
+									self.props.displayGameIcon and HtmlWidgets.Div{
+										classes = {'tournaments-list-item__game-icon'},
+										children = Game.icon{
+											game = tournament.game,
+											noLink = true,
+											size = '16px',
+										},
+									} or nil,
+									TierPill{
+										tournament = tournament,
+										variant = 'subtle',
+									},
+								},
 							},
 							HtmlWidgets.Div{
 								classes = {'tournaments-list-item__date'},
