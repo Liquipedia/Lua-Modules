@@ -15,13 +15,26 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local ROUND_ICONS = {
-	atk = '[[File:R6S Para Bellum atk logo.png|14px|link=]]',
-	def = '[[File:R6S Para Bellum def logo.png|14px|link=]]',
-	otatk = '[[File:R6S Para Bellum atk logo ot rounds.png|11px|link=]]',
-	otdef = '[[File:R6S Para Bellum def logo ot rounds.png|11px|link=]]',
+	atk = IconImage{
+		imageLight = 'R6S Para Bellum atk logo.png',
+		size = '14px',
+	},
+	def = IconImage{
+		imageLight = 'R6S Para Bellum def logo.png',
+		size = '14px',
+	},
+	otatk = IconImage{
+		imageLight = 'R6S Para Bellum atk logo ot rounds.png',
+		size = '11px',
+	},
+	otdef = IconImage{
+		imageLight = 'R6S Para Bellum def logo ot rounds.png',
+		size = '11px',
+	},
 }
 
 ---@class RainbowsixMatchSummary: CustomMatchSummaryInterface
