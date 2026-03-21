@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Logic = Lua.import('Module:Logic')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
@@ -71,7 +70,7 @@ function LoLMatchSummaryGameRow:createGameDetail()
 			bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team1side or ''),
 			date = game.date,
 		},
-		Logic.emptyOr(game.length, 'Game ' .. props.gameIndex),
+		self:lengthDisplay(),
 		MatchSummaryWidgets.Characters{
 			flipped = true,
 			characters = characterData[2],

@@ -58,6 +58,13 @@ function MatchSummaryGameRow:createGameDetail()
 end
 
 ---@protected
+---@return Widget
+function MatchSummaryGameRow:lengthDisplay()
+	local game = self.props.game
+	return GameCenter{children = Logic.emptyOr(game.length, 'Game ' .. self.props.gameIndex)}
+end
+
+---@protected
 ---@param config {noLink: boolean?}?
 ---@return Widget
 function MatchSummaryGameRow:mapDisplay(config)
