@@ -638,6 +638,54 @@ div.brkts-popup-body-element-thumbs {
 	}
 }
 
+.brkts-popup-body-grid {
+	display: grid;
+	grid-template-columns: min-content auto min-content;
+	align-items: center;
+	margin: 0 -0.5rem;
+
+	&[ data-grid-layout="standard" ] {
+		grid-template-columns: min-content 1fr auto 1fr min-content;
+	}
+
+	&-row {
+		display: grid;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
+		gap: 0.5rem;
+		padding: 0.5rem;
+
+		&:nth-of-type( even ) {
+			background-color: var( --clr-on-surface-light-primary-4 );
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+			}
+		}
+
+		> .brkts-popup-comment {
+			padding: unset;
+			grid-column: 1 / -1;
+		}
+	}
+
+	&-detail {
+		display: contents;
+		white-space: nowrap;
+
+		> div:only-child {
+			display: grid;
+			grid-column: 2 / -2;
+			grid-template-columns: subgrid;
+		}
+
+		&:empty {
+			display: block;
+			grid-column: 2 / -2;
+		}
+	}
+}
+
 .brkts-champion-icon {
 	gap: 0.125rem;
 	display: flex;
