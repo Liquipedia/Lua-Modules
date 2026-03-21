@@ -81,6 +81,7 @@ function MatchSummaryGameRow:scoreDisplay(opponentIndex)
 end
 
 ---@private
+---@return Widget?
 function MatchSummaryGameRow:_renderGameComment()
 	local game = self.props.game
 	if Logic.isEmpty(game.comment) then
