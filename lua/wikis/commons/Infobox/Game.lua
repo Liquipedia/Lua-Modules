@@ -24,16 +24,17 @@ local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
 ---@class GameInfobox: BasicInfobox
+---@operator call(Frame): GameInfobox
 local Game = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function Game.run(frame)
 	local game = Game(frame)
 	return game:createInfobox()
 end
 
----@return string
+---@return Widget
 function Game:createInfobox()
 	local args = self.args
 	local links = Links.transform(args)

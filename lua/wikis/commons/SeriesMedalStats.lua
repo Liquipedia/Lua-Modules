@@ -137,7 +137,7 @@ function MedalStats:query()
 	self.rawData = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = self:_getConditions(),
 		query = 'opponentplayers, placement, extradata, date, opponentname, opponenttype, opponenttemplate',
-		sort = 'date desc',
+		order = 'date asc',
 		limit = 5000,
 	})
 

@@ -19,13 +19,15 @@ local Cell = Widgets.Cell
 local Chronology = Widgets.Chronology
 
 ---@class ValorantSeriesInfobox: SeriesInfobox
+---@operator call(Frame): ValorantSeriesInfobox
 local CustomSeries = Class.new(Series)
+
 ---@class ValorantSeriesInfoboxWidgetInjector: WidgetInjector
 ---@field caller ValorantSeriesInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomSeries.run(frame)
 	local series = CustomSeries(frame)
 	series:setWidgetInjector(CustomInjector(series))

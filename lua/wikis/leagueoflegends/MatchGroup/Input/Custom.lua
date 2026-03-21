@@ -19,6 +19,8 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local CustomMatchGroupInput = {}
+
+---@class LeagueOfLegendsMatchParser: MatchParserInterface
 local MatchFunctions = {
 	OPPONENT_CONFIG = {
 		resolveRedirect = true,
@@ -124,6 +126,10 @@ function CustomMatchGroupInput.aggregateStats(match)
 					player.extradata.gameLength = Operator.nilSafeAdd(player.extradata.gameLength, gameLength)
 				end
 			)
+			local killsParticipated = Operator.nilSafeAdd(player.extradata.kills, player.extradata.assists)
+			player.extradata.killparticipation = (
+				(opponent.extradata.kills or 0) > 0 and killsParticipated
+			) and (killsParticipated / opponent.extradata.kills) or nil
 			player.extradata.characters = Logic.nilIfEmpty(player.extradata.characters)
 		end)
 	end)
@@ -156,9 +162,7 @@ end
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
 function MatchFunctions.calculateMatchScore(maps)
-	return function(opponentIndex)
-		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-	end
+	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
 ---@param match table

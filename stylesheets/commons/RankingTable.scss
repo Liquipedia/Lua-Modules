@@ -1,44 +1,31 @@
 .ranking-table {
-	&__wrapper {
-		--_border-color: rgba( 0, 0, 0, 0.16 );
-		--_background-color: rgba( 0, 0, 0, 0.08 );
-		--_background-color-even: rgba( 0, 0, 0, 0.04 );
-		--_border: 0.0625rem solid var( --_border-color );
-		--_patch-label-color: var( --clr-secondary-16 );
-
-		.theme--dark & {
-			--_border-color: rgba( 255, 255, 255, 0.16 );
-			--_background-color: rgba( 255, 255, 255, 0.08 );
-			--_background-color-even: rgba( 255, 255, 255, 0.04 );
-			--_patch-label-color: #ffffff;
-		}
-	}
-	border: var( --_border );
-
 	@media ( max-width: 768px ) {
 		font-size: 0.875rem;
 	}
 
 	&__top-row {
-		background-color: var( --_background-color );
-		padding: 1rem 0.75rem;
-		border-bottom: var( --_border );
+		display: flex;
+		justify-content: space-between;
 		font-weight: normal;
+		gap: 0.5rem;
+
+		@media ( max-width: 768px ) {
+			flex-direction: column;
+		}
 
 		&-text {
 			display: flex;
 			flex-direction: column;
+
+			@media ( max-width: 768px ) {
+				flex-direction: row;
+				justify-content: space-between;
+			}
 		}
 
 		> div {
 			display: flex;
 			justify-content: space-between;
-			align-items: center;
-
-			@media ( max-width: 768px ) {
-				flex-direction: column;
-				align-items: flex-start;
-			}
 		}
 
 		&-logo-container {
@@ -47,54 +34,21 @@
 			gap: 0.5rem;
 			align-items: center;
 
-			> div {
-				height: 100%;
-
-				> img {
-					height: 100%;
-					width: 100%;
-					object-fit: contain;
-				}
-			}
-		}
-	}
-
-	&__footer-row {
-		padding: 1rem 0.75rem;
-		font-weight: bold;
-
-		div {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			gap: 0.5rem;
-		}
-	}
-
-	&__header-row {
-		background-color: var( --_background-color );
-		border-bottom: var( --_border );
-
-		th {
-			padding: 0.5rem 1rem;
-
-			&:not( :first-child ) {
-				border-left: var( --_border );
+			> img {
+				object-fit: contain;
 			}
 		}
 	}
 
 	&__row {
-		&:not( :first-child ) {
-			border-top: var( --_border );
-		}
-
-		&:not( :last-child ) {
-			border-bottom: var( --_border );
-		}
-
 		&--even {
-			background-color: var( --_background-color-even );
+			.theme--light & {
+				background-color: var( --clr-on-surface-light-primary-4 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+			}
 		}
 
 		&--overfive {
@@ -102,21 +56,19 @@
 				display: none;
 			}
 		}
+	}
 
+	tr {
 		> td {
-			padding: 0.5rem 1rem;
-
-			@media ( max-width: 768px ) {
-				padding: 0.5rem 0.75rem;
-			}
-
-			&:not( :first-child ) {
-				border-left: var( --_border );
-			}
-
 			.flag {
 				margin-right: 0.5rem;
 			}
+		}
+	}
+
+	&__graph-row {
+		&:hover {
+			background-color: transparent !important;
 		}
 	}
 
@@ -144,7 +96,7 @@
 	}
 
 	&__graph-row-container {
-		padding: 1.5rem;
+		padding: 1.5rem 0 !important;
 
 		.team-template-team-standard {
 			display: flex;
@@ -153,20 +105,31 @@
 		}
 	}
 
-	// Hide table cells region and streak on mobile due to limited horizontal space
+	// Hide region on mobile due to limited horizontal space
 	@media ( max-width: 768px ) {
-		[ data-ranking-table-cell="region" ],
-		[ data-ranking-table-cell="streak" ] {
+		[ data-ranking-table-cell="region" ] {
 			display: none;
 		}
 	}
 
 	&--small {
-		width: 100%;
+		width: 100% !important;
+		border-radius: 0 0 0.5rem 0.5rem !important;
 
-		[ data-ranking-table-cell="region" ],
-		[ data-ranking-table-cell="streak" ] {
+		[ data-ranking-table-cell="region" ] {
 			display: none;
+		}
+
+		& > select.ranking-table__select {
+			.theme--light & {
+				border-color: var( --clr-on-surface-light-primary-16 );
+				background-color: var( --clr-on-surface-light-primary-8 );
+			}
+
+			.theme--dark & {
+				border-color: var( --clr-on-surface-dark-primary-16 );
+				background-color: var( --clr-on-surface-dark-primary-8 );
+			}
 		}
 	}
 
@@ -175,15 +138,23 @@
 		display: flex;
 		align-items: center;
 		gap: 1rem;
-
-		& > select.ranking-table__select {
-			border-color: var( --_border-color );
-			background-color: var( --_background-color );
-		}
 	}
 
 	&__patch-label {
-		color: var( --_patch-label-color );
+		.theme--light & {
+			color: var( --clr-secondary-16 );
+		}
+
+		.theme--dark & {
+			color: #ffffff;
+		}
 		opacity: 0.7;
+	}
+
+	&__footer-button {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 0.5rem;
 	}
 }

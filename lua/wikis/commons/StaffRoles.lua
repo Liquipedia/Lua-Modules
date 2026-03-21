@@ -5,7 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----@type table<string, PersonRoleData>
+---@type table<string, RoleBaseData>
 local staffRoles = {
 	['admin'] = {category = 'Admins', display = 'Admin'},
 	['analyst'] = {category = 'Analysts', display = 'Analyst'},
@@ -30,6 +30,7 @@ local staffRoles = {
 	['director'] = {category = 'Production Staff', display = 'Director'},
 	['interpreter'] = {category = 'Production Staff', display = 'Interpreter'},
 	['producer'] = {category = 'Production Staff', display = 'Producer'},
+	['replay operator'] = {category = 'Production Staff', display = 'Replay Operator'},
 	['stats producer'] = {category = 'Production Staff', display = 'Stats Producer'},
 	['translator'] = {category = 'Production Staff', display = 'Translator'},
 	['streamer'] = {category = 'Streamers', display = 'Streamer'},

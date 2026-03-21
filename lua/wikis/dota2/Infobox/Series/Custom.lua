@@ -18,12 +18,15 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class DotaSeriesInfobox: SeriesInfobox
+---@operator call(Frame): DotaSeriesInfobox
 local CustomSeries = Class.new(Series)
 
+---@class DotaSeriesInfoboxWidgetInjector: WidgetInjector
+---@field caller DotaSeriesInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomSeries.run(frame)
 	local series = CustomSeries(frame)
 	series:setWidgetInjector(CustomInjector(series))

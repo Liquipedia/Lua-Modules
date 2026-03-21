@@ -19,7 +19,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 ---@field css table<string,string>?
 ---@field active boolean?
 ---@field value string?
----@field display string|Widget|Html|nil
+---@field display Renderable
 
 ---@class FilterButton: Widget
 ---@operator call(table): FilterButton

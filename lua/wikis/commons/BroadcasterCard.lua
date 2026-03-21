@@ -11,7 +11,9 @@ local Abbreviation = Lua.import('Module:Abbreviation')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Flags = Lua.import('Module:Flags')
+local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -233,6 +235,9 @@ end
 ---@param caster broadCasterData
 ---@param status string?
 function BroadcasterCard.setLPDB(caster, status)
+	if Lpdb.isStorageDisabled() then
+		return
+	end
 	local smName = Variables.varDefault('show_match_name') or ''
 	local extradata = {status = '', manualinput = tostring(caster.isManualInput)}
 	if Logic.readBool(Variables.varDefault('show_match')) then
@@ -260,7 +265,7 @@ function BroadcasterCard.setLPDB(caster, status)
 			weight = caster.weight,
 			date = caster.date,
 			parent = Variables.varDefault('tournament_parent'),
-			extradata = mw.ext.LiquipediaDB.lpdb_create_json(extradata)
+			extradata = Json.stringify(extradata)
 		}
 	)
 end

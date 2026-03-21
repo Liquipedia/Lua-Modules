@@ -21,7 +21,7 @@ local MAX_NUM_BANS = 1
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end

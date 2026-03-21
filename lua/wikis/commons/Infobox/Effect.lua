@@ -19,9 +19,10 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
 ---@class EffectInfobox: BasicInfobox
+---@operator call(Frame): EffectInfobox
 local Effect = Class.new(BasicInfobox)
 
----@return string
+---@return Widget
 function Effect:createInfobox()
 	local args = self.args
 

@@ -12,9 +12,12 @@
 @use "commons/BattleRoyale/PanelTable";
 @use "commons/Bracket";
 @use "commons/Brackets";
+@use "commons/Carousel";
 @use "commons/Colours";
 @use "commons/Crosstable";
+@use "commons/Dialog";
 @use "commons/DivTable";
+@use "commons/Dropdown";
 @use "commons/FilterButtons";
 @use "commons/Fountain";
 @use "commons/Grid";
@@ -23,6 +26,7 @@
 @use "commons/Infobox";
 @use "commons/Mainpage";
 @use "commons/Matchseries";
+@use "commons/MatchTable";
 @use "commons/NavigationCard";
 @use "commons/Miscellaneous";
 @use "commons/BigMatch";
@@ -31,7 +35,6 @@
 @use "commons/Faction";
 @use "commons/HexagonPortraits";
 @use "commons/ResponsiveTable";
-@use "commons/RosterCard";
 @use "commons/TeamPortal";
 @use "commons/TournamentCard";
 @use "commons/NavFrame";
@@ -43,8 +46,10 @@
 @use "commons/Selectall";
 @use "commons/Statisticstable";
 @use "commons/Standings";
+@use "commons/Table2";
 @use "commons/Tables";
 @use "commons/Tabs";
+@use "commons/TeamParticipantCard";
 @use "commons/TeamTemplates";
 @use "commons/PanelBox/Heroes";
 @use "commons/Banner";

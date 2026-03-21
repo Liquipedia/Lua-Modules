@@ -8,7 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
@@ -16,10 +15,10 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
 local ICONS = {
-	win = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text'},
-	draw = Icon.makeIcon{iconName = 'draw', color = 'bright-sun-text'},
-	loss = Icon.makeIcon{iconName = 'loss', color = 'cinnabar-text'},
-	empty = '[[File:NoCheck.png|link=|14px]]',
+	win = Div{classes = {'brkts-result-label', 'result--win'}},
+	draw = Div{classes = {'brkts-result-label', 'result--draw'}},
+	loss = Div{classes = {'brkts-result-label', 'result--loss'}},
+	empty = Div{classes = {'brkts-result-label'}},
 }
 
 ---@class MatchSummaryGameWinLossIndicator: Widget
@@ -30,21 +29,15 @@ local MatchSummaryGameWinLossIndicator = Class.new(Widget)
 function MatchSummaryGameWinLossIndicator:render()
 	local winner = self.props.winner
 
-	local icon
 	if winner == self.props.opponentIndex then
-		icon = ICONS.win
+		return ICONS.win
 	elseif winner == 0 then
-		icon = ICONS.draw
+		return ICONS.draw
 	elseif Logic.isNotEmpty(winner) then
-		icon = ICONS.loss
-	else
-		icon = ICONS.empty
+		return ICONS.loss
 	end
 
-	return Div{
-		classes = {'brkts-popup-spaced brkts-popup-winloss-icon'},
-		children = {icon},
-	}
+	return ICONS.empty
 end
 
 return MatchSummaryGameWinLossIndicator

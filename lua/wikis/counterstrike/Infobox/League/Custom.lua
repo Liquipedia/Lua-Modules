@@ -9,8 +9,10 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Logic = Lua.import('Module:Logic')
+local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -30,6 +32,9 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local IconFontawesome = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class CounterstrikeLeagueInfobox: InfoboxLeague
 ---@field gameData table
@@ -85,9 +90,19 @@ local VALVE_TIERS = {
 	['rmr event'] = {meta = 'Regional Major Rankings event', name = 'RMR Event', link = 'Regional Major Rankings'},
 	['tier 1'] = {meta = 'Valve Tier 1 event', name = 'Tier 1', link = 'Valve Tier 1 Events'},
 	['tier 1 qualifier'] = {meta = 'Valve Tier 1 qualifier', name = 'Tier 1 Qualifier', link = 'Valve Tier 1 Events'},
+	['tier 1 wildcard'] = {meta = 'Valve Tier 1 Wildcard event', name = 'Tier 1 Wildcard', link = 'Valve Wildcard Events'},
 	['tier 2'] = {meta = 'Valve Tier 2 event', name = 'Tier 2', link = 'Valve Tier 2 Events'},
 	['tier 2 qualifier'] = {meta = 'Valve Tier 2 qualifier', name = 'Tier 2 Qualifier', link = 'Valve Tier 2 Events'},
+	['tier 2 wildcard'] = {meta = 'Valve Tier 2 Wildcard event', name = 'Tier 2 Wildcard', link = 'Valve Wildcard Events'},
 	['wildcard'] = {meta = 'Valve Wildcard event', name = 'Wildcard', link = 'Valve Wildcard Events'},
+}
+
+local VALVE_TOR_START_DATE = '2025-01-01'
+local VALVE_TOR_ENABLED_TIERS = {
+	VALVE_TIERS.major,
+	VALVE_TIERS['tier 1'],
+	VALVE_TIERS['tier 1 qualifier'],
+	VALVE_TIERS['tier 1 wildcard']
 }
 
 local RESTRICTIONS = {
@@ -116,7 +131,7 @@ local MODE_TEAM = 'team'
 local PRIZE_POOL_ROUND_PRECISION = 2
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -170,20 +185,17 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
 		end
 	elseif id == 'liquipediatier' then
-		table.insert(
-			widgets,
+		Array.appendWith(widgets,
 			Cell{
 				name = '[[File:ESL 2019 icon.png|20x20px|link=|ESL|alt=ESL]] Pro Tour Tier',
 				children = {self.caller:_createEslProTierCell(args.eslprotier)},
 				classes = {'infobox-icon-small'}
-			}
-		)
-		table.insert(
-			widgets,
+			},
 			Cell{
 				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox') .. ' Tier',
-				children = {self.caller:_createValveTierCell()},
-				classes = {'valvepremier-highlighted'}
+				content = self.caller:_createValveTierCell(),
+				classes = {'valvepremier-highlighted'},
+				options = {separator = '&ensp;'}
 			}
 		)
 	elseif id == 'gamesettings' then
@@ -377,10 +389,25 @@ function CustomLeague:_createEslProTierCell(eslProTier)
 	end
 end
 
----@return string?
+---@return Widget[]?
 function CustomLeague:_createValveTierCell()
 	if self.valveTier then
-		return '[[' .. self.valveTier.link .. '|' .. self.valveTier.name .. ']]'
+		local showInfoIcon = self.data.endDate
+			and self.data.endDate >= VALVE_TOR_START_DATE
+			and Array.find(VALVE_TOR_ENABLED_TIERS, FnUtil.curry(Operator.eq, self.valveTier))
+		return WidgetUtil.collect(
+			Link{
+				children = {self.valveTier.name},
+				link = self.valveTier.link
+			},
+			showInfoIcon and Link{
+				children = {IconFontawesome{
+					iconName = 'general-info',
+					hover = 'Click for further details',
+				}},
+				link = '#Valve Operational Requirements'
+			} or nil
+		)
 	end
 end
 

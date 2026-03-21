@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Count = Lua.import('Module:Count')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
@@ -111,14 +112,13 @@ function ProjectOverview:_generateOverview()
 			{
 				IconFa{iconName = 'contributors', screenReaderHidden = true},
 				' Current Contributors: ',
-				mw.ext.LiquipediaDB.lpdb('datapoint', {
-					conditions = tostring(
-						ConditionTree(BooleanOperator.all)
-							:add(ConditionNode(ColumnName('type'), Comparator.eq, 'project contributor'))
-							:add(ConditionNode(ColumnName('name'), Comparator.eq, self.props.projectUrl))
-					),
-					query = 'count::pageid'
-				})[1].count_pageid,
+				Count.query(
+					'datapoint',
+					ConditionTree(BooleanOperator.all):add{
+						ConditionNode(ColumnName('type'), Comparator.eq, 'project contributor'),
+						ConditionNode(ColumnName('name'), Comparator.eq, self.props.projectUrl)
+					}
+				),
 			},
 			HtmlWidgets.Br{},
 			{

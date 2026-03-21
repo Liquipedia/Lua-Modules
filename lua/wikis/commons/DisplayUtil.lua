@@ -51,10 +51,10 @@ end
 
 ---Attempts to render a display component in the pure function style.
 ---The error is caught and displayed using classic error style.
----@param Component fun(props: table): Html
+---@param Component fun(props: table): Widget|Html
 ---@param props table
----@param other fun(error: Error): Html
----@return Html
+---@param other fun(error: Error): Widget|Html
+---@return Widget|Html
 function DisplayUtil.TryPureComponent(Component, props, other)
 	return Logic.tryOrElseLog(
 		function() return Component(props) end,

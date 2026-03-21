@@ -178,6 +178,7 @@ end
 function StarcraftMatchSummary.TeamSubmatch(submatch)
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
+		css = {gap = '0.25rem'},
 		children = WidgetUtil.collect(
 			submatch.header and {
 				HtmlWidgets.Div{css = {margin = 'auto', ['font-weight'] = 'bold'}, children = {submatch.header}},

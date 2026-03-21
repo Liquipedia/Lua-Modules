@@ -33,6 +33,10 @@ function RatingsDisplayList.build(teamRankings)
 		:allDone()
 
 	Array.forEach(teams, function(team, rank)
+		if (team.streak == nil) or (team.rating == nil) then
+			return
+		end
+
 		local chart = mw.ext.Charts.chart({
 			xAxis = {
 				type = 'category',

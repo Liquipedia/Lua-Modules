@@ -21,7 +21,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '350px', teamStyle = 'bracket'})
 end

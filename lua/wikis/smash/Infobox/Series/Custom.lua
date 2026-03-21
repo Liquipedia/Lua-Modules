@@ -15,13 +15,16 @@ local Series = Lua.import('Module:Infobox/Series')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
+---@class SmashSeriesInfoboxWidgetInjector: WidgetInjector
+---@field caller SmashSeriesInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@class SmashSeriesInfobox: SeriesInfobox
+---@operator call(Frame): SmashSeriesInfobox
 local CustomSeries = Class.new(Series)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomSeries.run(frame)
 	local series = CustomSeries(frame)
 	series:setWidgetInjector(CustomInjector(series))

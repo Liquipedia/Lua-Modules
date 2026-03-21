@@ -58,7 +58,7 @@ liquipedia.panelBoxCollapsible = {
 		const items = window.localStorage.getItem( this.LOCAL_STORAGE_KEY );
 		try {
 			return items ? JSON.parse( items ) : [];
-		} catch ( e ) {
+		} catch {
 			return [ ];
 		}
 	},

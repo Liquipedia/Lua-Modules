@@ -23,7 +23,7 @@ local CustomUnit = Class.new(Unit)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomUnit.run(frame)
 	local unit = CustomUnit(frame)
 	unit.args.informationType = 'Car'

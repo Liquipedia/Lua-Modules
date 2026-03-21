@@ -22,16 +22,17 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
 ---@class CharacterInfobox: BasicInfobox
+---@operator call(Frame): CharacterInfobox
 local Character = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function Character.run(frame)
 	local character = Character(frame)
 	return character:createInfobox()
 end
 
----@return string
+---@return Widget
 function Character:createInfobox()
 	local args = self.args
 
@@ -91,7 +92,8 @@ function Character:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		self:categories(args.informationType or 'Character')
+		self:categories('Characters')
+		self:categories(args.informationType)
 		self:categories(unpack(self:getWikiCategories(args)))
 		self:setLpdbData(args)
 	end

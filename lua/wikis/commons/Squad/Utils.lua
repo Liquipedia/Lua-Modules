@@ -10,13 +10,13 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Flags = Lua.import('Module:Flags')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Variables = Lua.import('Module:Variables')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Lpdb = Lua.import('Module:Lpdb')
 local Faction = Lua.import('Module:Faction')
@@ -149,10 +149,10 @@ end
 ---@return ModelRow
 function SquadUtils.readSquadPersonArgs(args)
 	local function getTeamInfo(page, property)
-		if not page or not mw.ext.TeamTemplate.teamexists(page) then
+		if not page or not TeamTemplate.exists(page) then
 			return
 		end
-		return mw.ext.TeamTemplate.raw(page)[property]
+		return TeamTemplate.getRawOrNil(page)[property]
 	end
 
 	local name = String.nilIfEmpty(args.name)
@@ -211,14 +211,48 @@ end
 
 ---@param squadPerson ModelRow
 function SquadUtils.storeSquadPerson(squadPerson)
-	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
-		squadPerson:save()
-	end
+	squadPerson:save()
+end
+
+---@param players table[]
+---@param squadStatus SquadStatus
+---@return table<string, boolean>
+function SquadUtils.analyzeColumnVisibility(players, squadStatus)
+	local isInactive = squadStatus == SquadUtils.SquadStatus.INACTIVE
+		or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE
+	local isFormer = squadStatus == SquadUtils.SquadStatus.FORMER
+		or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE
+
+	return {
+		teamIcon = Array.any(players, function(p)
+			return p.team and TeamTemplate.exists(p.team)
+		end),
+		name = Array.any(players, function(p)
+			return String.isNotEmpty(p.name)
+		end),
+		role = Array.any(players, function(p)
+			return String.isNotEmpty(p.role) or String.isNotEmpty(p.position)
+		end),
+		joindate = Array.any(players, function(p)
+			return String.isNotEmpty(p.joindate)
+		end),
+		inactivedate = isInactive and Array.any(players, function(p)
+			return String.isNotEmpty(p.inactivedate)
+		end),
+		leavedate = isFormer and Array.any(players, function(p)
+			return String.isNotEmpty(p.leavedate)
+		end),
+		newteam = isFormer and Array.any(players, function(p)
+			return String.isNotEmpty(p.newteam)
+				or String.isNotEmpty(p.newteamrole)
+				or String.isNotEmpty(p.newteamspecial)
+		end),
+	}
 end
 
 ---@param frame table
 ---@param squadWidget SquadWidget
----@param rowCreator fun(player: table, squadStatus: SquadStatus, squadType: SquadType):Widget
+---@param rowCreator fun(player: table, squadStatus: SquadStatus, squadType: SquadType, columnVisibility: table):Widget
 ---@return Widget
 function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator)
 	local args = Arguments.getArgs(frame)
@@ -233,49 +267,54 @@ function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator)
 		props.status = SquadUtils.SquadStatus.FORMER_INACTIVE
 	end
 
+	local columnVisibility = SquadUtils.analyzeColumnVisibility(players, props.status)
 	props.children = Array.map(players, function(player)
-		return rowCreator(player, props.status, props.type)
+		return rowCreator(player, props.status, props.type, columnVisibility)
 	end)
 
+	local output = squadWidget(props)
+	output = SquadContexts.ColumnVisibility{value = columnVisibility, children = {output}}
 	if Info.config.squads.hasPosition then
-		return SquadContexts.RoleTitle{value = SquadUtils.positionTitle(), children = {squadWidget(props)}}
+		output = SquadContexts.RoleTitle{value = SquadUtils.positionTitle(), children = {output}}
 	end
-	return squadWidget(props)
+	return output
 end
 
 ---@param players table[]
 ---@param squadStatus SquadStatus
 ---@param squadType SquadType
 ---@param squadWidget SquadWidget
----@param rowCreator fun(person: table, squadStatus: SquadStatus, squadType: SquadType):Widget
+---@param rowCreator fun(person: table, squadStatus: SquadStatus, squadType: SquadType, columnVisibility: table):Widget
 ---@param customTitle string?
 ---@param personMapper? fun(person: table): table
 ---@return Widget
 function SquadUtils.defaultRunAuto(players, squadStatus, squadType, squadWidget, rowCreator, customTitle, personMapper)
+	local mappedPlayers = Array.map(players, personMapper or SquadUtils.convertAutoParameters)
+	local columnVisibility = SquadUtils.analyzeColumnVisibility(mappedPlayers, squadStatus)
 	local props = {
 		status = squadStatus,
 		title = customTitle,
 		type = squadType,
 	}
-
-	local mappedPlayers = Array.map(players, personMapper or SquadUtils.convertAutoParameters)
 	props.children = Array.map(mappedPlayers, function(player)
-		return rowCreator(player, props.status, props.type)
+		return rowCreator(player, props.status, props.type, columnVisibility)
 	end)
 
+	local output = squadWidget(props)
+	output = SquadContexts.ColumnVisibility{value = columnVisibility, children = {output}}
 	if Info.config.squads.hasPosition then
-		return SquadContexts.RoleTitle{value = SquadUtils.positionTitle(), children = {squadWidget(props)}}
+		output = SquadContexts.RoleTitle{value = SquadUtils.positionTitle(), children = {output}}
 	end
-	return squadWidget(props)
+	return output
 end
 
 ---@param squadRowClass SquadRow
----@return fun(person: table, squadStatus: SquadStatus, squadType: SquadType):Widget
+---@return fun(person: table, squadStatus: SquadStatus, squadType: SquadType, columnVisibility: table?):Widget
 function SquadUtils.defaultRow(squadRowClass)
-	return function(person, squadStatus, squadType)
+	return function(person, squadStatus, squadType, columnVisibility)
 		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
 		SquadUtils.storeSquadPerson(squadPerson)
-		local row = squadRowClass(squadPerson)
+		local row = squadRowClass(squadPerson, columnVisibility)
 
 		row:id():name()
 		if Info.config.squads.hasPosition then
@@ -283,14 +322,14 @@ function SquadUtils.defaultRow(squadRowClass)
 		else
 			row:role()
 		end
-		row:date('joindate', 'Join Date:&nbsp;')
+		row:date('joindate')
 
 		if squadStatus == SquadUtils.SquadStatus.INACTIVE or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
-			row:date('inactivedate', 'Inactive Date:&nbsp;')
+			row:date('inactivedate')
 		end
 
 		if squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
-			row:date('leavedate', 'Leave Date:&nbsp;')
+			row:date('leavedate')
 			row:newteam()
 		end
 

@@ -20,7 +20,7 @@ local TournamentStructure = Lua.import('Module:TournamentStructure')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class mvpTableParsedArgs
@@ -41,7 +41,11 @@ function MvpTable.run(args)
 	args = args or {}
 	local parsedArgs = MvpTable._parseArgs(args)
 
-	local matches = TournamentStructure.fetchMatches(parsedArgs.matchGroupSpec)
+	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
+		conditions = tostring(TournamentStructure.getMatch2Filter(parsedArgs.matchGroupSpec)),
+		query = 'extradata',
+		limit = 5000,
+	})
 
 	if Logic.isEmpty(matches) then
 		return
@@ -53,22 +57,27 @@ function MvpTable.run(args)
 		return
 	end
 
-	return HtmlWidgets.Table{
-		classes = {'wikitable', 'prizepooltable','collapsed'},
+	return TableWidgets.Table{
+		tableClasses = {'prizepooltable', 'collapsed'},
+		title = String.nilIfEmpty(args.title),
+		attributes = {id = 'MvpTable'},
+		columns = {
+			{align = 'left'},
+			{align = 'right'},
+			parsedArgs.points and {align = 'right'} or nil,
+		},
 		css = {
-			['text-align'] = 'center',
 			['margin-top'] = parsedArgs.margin .. 'px'
 		},
-		attributes = {
+		tableAttributes = {
 			['data-opentext'] = 'place ' .. (parsedArgs.cutafter + 1) .. ' to ' .. #mvpList,
 			['data-closetext'] = 'place ' .. (parsedArgs.cutafter + 1) .. ' to ' .. #mvpList,
-			['data-cutafter'] = parsedArgs.cutafter + (String.isNotEmpty(args.title) and 1 or 0),
+			['data-cutafter'] = parsedArgs.cutafter,
 			['data-definedcutafter'] = ''
 		},
 		children = WidgetUtil.collect(
-			MvpTable._mainHeader(args),
-			MvpTable._subHeader(args),
-			Array.map(mvpList, FnUtil.curry(MvpTable._row, parsedArgs))
+			MvpTable._header(args),
+			TableWidgets.TableBody{children = Array.map(mvpList, FnUtil.curry(MvpTable._row, parsedArgs))}
 		)
 	}
 end
@@ -89,32 +98,16 @@ function MvpTable._parseArgs(args)
 	return parsedArgs
 end
 
----Builds the main header of the MvpTable
----@param args mvpTableParsedArgs
----@return Widget?
-function MvpTable._mainHeader(args)
-	if String.isEmpty(args.title) then
-		return
-	end
-
-	return HtmlWidgets.Tr{
-		children = HtmlWidgets.Th{
-			attributes = {colspan = 2 + (args.points and 1 or 0)},
-			children = args.title
-		}
-	}
-end
-
----Builds the sub header of the MvpTable
+---Builds the header of the MvpTable
 ---@param args mvpTableParsedArgs
 ---@return Widget
-function MvpTable._subHeader(args)
-	return HtmlWidgets.Tr{
-		children = Array.map(
+function MvpTable._header(args)
+	return TableWidgets.TableHeader{children = {
+		TableWidgets.Row{children = Array.map(
 			{'Player', '#MVPs', args.points and 'Points' or nil},
-			function (element) return HtmlWidgets.Th{children = element} end
-		)
-	}
+			function (element) return TableWidgets.CellHeader{children = element} end
+		)}
+	}}
 end
 
 ---Builds the display for a mvp row
@@ -122,10 +115,9 @@ end
 ---@param item {points: number, mvp: number, displayName:string?, name:string, flag:string?, team:string?}
 ---@return Widget
 function MvpTable._row(args, item)
-	return HtmlWidgets.Tr{
+	return TableWidgets.Row{
 		children = WidgetUtil.collect(
-			HtmlWidgets.Td{
-				css = {['text-align'] = 'left'},
+			TableWidgets.Cell{
 				children = OpponentDisplay.BlockOpponent{
 					opponent = Opponent.readOpponentArgs{
 						type = Opponent.solo,
@@ -138,8 +130,8 @@ function MvpTable._row(args, item)
 					showPlayerTeam = true,
 				}
 			},
-			HtmlWidgets.Td{children = item.mvp},
-			args.points and HtmlWidgets.Td{children = item.points} or nil
+			TableWidgets.Cell{children = item.mvp},
+			args.points and TableWidgets.Cell{children = item.points} or nil
 		)
 	}
 end
@@ -147,7 +139,7 @@ end
 ---
 -- Processes retrieved data
 -- overwritable function via /Custom
----@param queryData MatchGroupUtilMatch[]
+---@param queryData {extradata: {mvp: {players: MatchGroupMvpPlayer[], points: integer}?}}[]
 ---@return {points: number, mvp: number, displayName:string?, name:string, flag:string?, team:string?}[]
 function MvpTable.processData(queryData)
 	local playerList = {}

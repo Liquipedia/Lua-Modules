@@ -16,6 +16,26 @@ describe('array', function()
 		end)
 	end)
 
+	describe('equals', function()
+		it('Empty arrays are equal', function()
+			assert.is_true(Array.equals({}, {}))
+		end)
+		it('check array equality', function()
+			local a = {0, 1}
+
+			assert.is_true(Array.equals(a, a))
+			assert.is_false(Array.equals({0}, {0, 1}))
+			assert.is_true(Array.equals(a, {0, 1}))
+			assert.is_true(Array.equals(Array.range(1, 5), {1, 2, 3, 4, 5}))
+			assert.is_true(Array.equals({'a', 'b', 'c'}, {'a', 'b', 'c'}))
+		end)
+		it('Error if argument is not an array', function()
+			assert.error(function ()
+				return Array.equals({key = 'value'}, {'key', 'value'})
+			end)
+		end)
+	end)
+
 	describe('Copy', function()
 		it('check', function()
 			local a, b, c = {1, 2, 3}, {}, {{5}}

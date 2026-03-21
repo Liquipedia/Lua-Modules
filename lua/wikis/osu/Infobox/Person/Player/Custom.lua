@@ -23,7 +23,7 @@ local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -33,6 +33,10 @@ end
 
 ---@return Widget?
 function CustomPlayer:createBottomContent()
+	if not self:shouldStoreData(self.args) then
+		return
+	end
+
 	return UpcomingTournaments.player{name = self.pagename}
 end
 

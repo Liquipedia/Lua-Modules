@@ -15,7 +15,7 @@ local Upgrade = Lua.import('Module:Infobox/Upgrade')
 local CustomUpgrade = Class.new(Upgrade)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomUpgrade.run(frame)
 	local customUpgrade = CustomUpgrade(frame)
 	return customUpgrade:createInfobox()

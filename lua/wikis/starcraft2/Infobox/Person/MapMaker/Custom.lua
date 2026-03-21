@@ -23,7 +23,7 @@ local CustomMapMaker = Class.new(CustomPerson)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomMapMaker.run(frame)
 	local mapMaker = CustomMapMaker(frame)
 	mapMaker:setWidgetInjector(CustomInjector(mapMaker))

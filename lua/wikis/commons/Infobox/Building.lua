@@ -22,18 +22,19 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
 ---@class BuildingInfobox: BasicInfobox
+---@operator call(Frame): BuildingInfobox
 local Building = Class.new(BasicInfobox)
 
 ---Entry point
 ---@param frame Frame
----@return Html
+---@return Widget
 function Building.run(frame)
 	local building = Building(frame)
 	return building:createInfobox()
 end
 
 ---creates the infobox
----@return string
+---@return Widget
 function Building:createInfobox()
 	local args = self.args
 

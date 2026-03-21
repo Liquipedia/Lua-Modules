@@ -11,7 +11,7 @@ local Class = Lua.import('Module:Class')
 
 local WidgetFactory = {}
 
----@param args {widget: string, children: ((Widget|Html|string|number)[])|Widget|Html|string|number, [any]:any}
+---@param args {widget: string, children: Renderable|Renderable[], [any]:any}
 ---@return Widget
 function WidgetFactory.fromTemplate(args)
 	local widgetClass = args.widget
