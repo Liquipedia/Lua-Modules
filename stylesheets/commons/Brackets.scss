@@ -652,6 +652,7 @@ div.brkts-popup-body-element-thumbs {
 		display: grid;
 		grid-column: 1 / -1;
 		grid-template-columns: subgrid;
+		align-items: center;
 		gap: 0.5rem;
 		padding: 0.5rem;
 
