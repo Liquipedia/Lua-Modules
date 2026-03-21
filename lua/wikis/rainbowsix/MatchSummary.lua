@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
@@ -83,10 +82,6 @@ function RainbowsixMatchSummaryGameRow:createGameDetail()
 	local game = self.props.game
 	local extradata = game.extradata or {}
 
-	local function scoreDisplay(oppIdx)
-		return DisplayHelper.MapScore(game.opponents[oppIdx], game.status)
-	end
-
 	local function makePartialScores(halves, firstSide, firstSideOt)
 		local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
 		local oppositeSideOt = CustomMatchSummary._getOppositeSide(firstSideOt)
@@ -104,7 +99,7 @@ function RainbowsixMatchSummaryGameRow:createGameDetail()
 
 	return WidgetUtil.collect(
 		MatchSummaryWidgets.DetailedScore{
-			score = scoreDisplay(1),
+			score = self:scoreDisplay(1),
 			flipped = false,
 			partialScores = makePartialScores(
 				extradata.t1halfs or {},
@@ -112,9 +107,9 @@ function RainbowsixMatchSummaryGameRow:createGameDetail()
 				firstSideOt
 			)
 		},
-		MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
+		self:mapDisplay(),
 		MatchSummaryWidgets.DetailedScore{
-			score = scoreDisplay(2),
+			score = self:scoreDisplay(2),
 			flipped = true,
 			partialScores = makePartialScores(
 				extradata.t2halfs or {},

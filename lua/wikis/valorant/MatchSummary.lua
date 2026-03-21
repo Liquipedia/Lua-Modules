@@ -12,7 +12,6 @@ local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
@@ -54,10 +53,6 @@ end
 function ValorantMatchSummaryGameRow:createGameDetail()
 	local game = self.props.game
 
-	local function scoreDisplay(oppIdx)
-		return DisplayHelper.MapScore(game.opponents[oppIdx], game.status)
-	end
-
 	local function makePartialScores(halves, firstSide)
 		local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
 		return {
@@ -79,7 +74,7 @@ function ValorantMatchSummaryGameRow:createGameDetail()
 		return {
 			MatchSummaryWidgets.Characters{characters = characters, flipped = flipped, hideOnMobile = true},
 			MatchSummaryWidgets.DetailedScore{
-				score = scoreDisplay(opponentIndex),
+				score = self:scoreDisplay(opponentIndex),
 				flipped = flipped,
 				partialScores = makePartialScores(
 					extradata['t' .. opponentIndex .. 'halfs'] or {},
@@ -91,7 +86,7 @@ function ValorantMatchSummaryGameRow:createGameDetail()
 
 	return {
 		MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
-		MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
+		self:mapDisplay(),
 		MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true}
 	}
 end

@@ -10,8 +10,11 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local GameCenter = Lua.import('Module:Widget/Match/Summary/GameCenter')
 local GameWinLossIndicator = Lua.import('Module:Widget/Match/Summary/GameWinLossIndicator')
 
 ---@class MatchSummaryGameRowProps
@@ -52,6 +55,22 @@ end
 ---@return Renderable|Renderable[]
 function MatchSummaryGameRow:createGameDetail()
 	error('MatchSummaryGameRow:createGameDetail() cannot be called directly and must be overridden.')
+end
+
+---@protected
+---@param config {noLink: boolean?}?
+---@return Widget
+function MatchSummaryGameRow:mapDisplay(config)
+	local game = self.props.game
+	return GameCenter{children = DisplayHelper.Map(game, config)}
+end
+
+---@protected
+---@param opponentIndex integer
+---@return string
+function MatchSummaryGameRow:scoreDisplay(opponentIndex)
+	local game = self.props.game
+	return DisplayHelper.MapScore(game.opponents[opponentIndex], game.status)
 end
 
 ---@private
