@@ -5,8 +5,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local CustomMatchSummary = {}
-
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
@@ -20,6 +18,9 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local MAX_NUM_BANS = 5
 local NUM_HEROES_PICK = 5
 local STATUS_NOT_PLAYED = 'notplayed'
+
+---@class LoLCustomMatchSummary: CustomMatchSummaryInterface
+local CustomMatchSummary = {}
 
 ---@param args table
 ---@return Widget

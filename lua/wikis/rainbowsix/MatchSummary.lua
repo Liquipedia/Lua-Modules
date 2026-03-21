@@ -21,6 +21,7 @@ local ROUND_ICONS = {
 	otdef = '[[File:R6S Para Bellum def logo ot rounds.png|11px|link=]]',
 }
 
+---@class RainbowsixMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
 ---@param args table

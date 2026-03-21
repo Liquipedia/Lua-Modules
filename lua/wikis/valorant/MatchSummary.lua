@@ -16,6 +16,7 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+---@class ValorantMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
 ---@param args table
