@@ -112,7 +112,7 @@ function RainbowsixMatchSummaryGameRow:createGameDetail()
 				firstSideOt
 			)
 		},
-		MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game), css = {['flex-grow'] = '1'}},
+		MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
 		MatchSummaryWidgets.DetailedScore{
 			score = scoreDisplay(2),
 			flipped = true,
