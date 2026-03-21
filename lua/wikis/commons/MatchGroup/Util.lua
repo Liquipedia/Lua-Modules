@@ -325,6 +325,9 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	extradata = 'table?',
 })
 
+---@class MatchGroupUtilSubgroup
+---@field games MatchGroupUtilGame[]
+---@field subgroup number
 
 ---@class FFAMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games FFAMatchGroupUtilGame[]
@@ -769,6 +772,33 @@ function MatchGroupUtil.gameFromRecord(record, opponentCount)
 		walkover = nilIfEmpty(record.walkover) and record.walkover:lower() or nil,
 		winner = tonumber(record.winner),
 	}
+end
+
+---Group games on the subgroup field to form submatches
+---@param matchGames MatchGroupUtilGame[]
+---@return MatchGroupUtilSubgroup[]
+function MatchGroupUtil.groupBySubmatch(matchGames)
+	local previousSubgroup = nil
+	---@type MatchGroupUtilGame[]?
+	local currentGames = nil
+	---@type MatchGroupUtilGame[][]
+	local submatchGames = {}
+	Array.forEach(matchGames, function (game)
+		if previousSubgroup == nil or previousSubgroup ~= game.subgroup then
+			currentGames = {}
+			Array.appendWith(submatchGames, currentGames)
+			previousSubgroup = game.subgroup
+		end
+		---@cast currentGames -nil
+		Array.appendWith(currentGames, game)
+	end)
+	return Array.map(submatchGames, function (games, groupIndex)
+		---@type MatchGroupUtilSubgroup
+		return {
+			games = games,
+			subgroup = groupIndex
+		}
+	end)
 end
 
 ---@param data table
