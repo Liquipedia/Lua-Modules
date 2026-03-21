@@ -39,7 +39,7 @@ function MatchSummaryGameRow:render()
 				winner = props.game.winner,
 			},
 			HtmlWidgets.Div{
-				classes = {'brkts-popup-body-grid-detail'},
+				classes = {'brkts-popup-body-grid-row-detail'},
 				children = self:createGameDetail(),
 			},
 			GameWinLossIndicator{

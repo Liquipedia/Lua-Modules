@@ -668,19 +668,19 @@ div.brkts-popup-body-element-thumbs {
 			padding: unset;
 			grid-column: 1 / -1;
 		}
-	}
 
-	&-detail {
-		display: contents;
-		white-space: nowrap;
+		&-detail {
+			display: contents;
+			white-space: nowrap;
 
-		> :only-child {
-			grid-column: 2 / -2;
-		}
+			> :only-child {
+				grid-column: 2 / -2;
+			}
 
-		&:empty {
-			display: block;
-			grid-column: 2 / -2;
+			&:empty {
+				display: block;
+				grid-column: 2 / -2;
+			}
 		}
 	}
 }
