@@ -32,7 +32,7 @@ function MatchSummaryGameRow:render()
 	local props = self.props
 	return HtmlWidgets.Div{
 		classes = {'brkts-popup-body-grid-row'},
-		css = self.props.css,
+		css = props.css,
 		children = {
 			GameWinLossIndicator{
 				opponentIndex = 1,
