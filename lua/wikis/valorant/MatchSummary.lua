@@ -15,7 +15,6 @@ local Operator = Lua.import('Module:Operator')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -51,7 +50,7 @@ function CustomMatchSummary.createBody(match)
 	)
 end
 
----@return Widget
+---@return Widget[]
 function ValorantMatchSummaryGameRow:createGameDetail()
 	local game = self.props.game
 
@@ -90,12 +89,10 @@ function ValorantMatchSummaryGameRow:createGameDetail()
 		}
 	end
 
-	return HtmlWidgets.Div{
-		children = {
-			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
-			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true}
-		}
+	return {
+		MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
+		MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
+		MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true}
 	}
 end
 

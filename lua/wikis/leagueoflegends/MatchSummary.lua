@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -53,7 +52,7 @@ function CustomMatchSummary.createBody(match)
 	)
 end
 
----@return Widget
+---@return Widget[]
 function LoLMatchSummaryGameRow:createGameDetail()
 	local props = self.props
 	local game = props.game
@@ -65,7 +64,7 @@ function LoLMatchSummaryGameRow:createGameDetail()
 		MatchSummary.buildCharacterList(extradata, 'team2champion', NUM_HEROES_PICK),
 	}
 
-	return HtmlWidgets.Div{children = {
+	return {
 		MatchSummaryWidgets.Characters{
 			flipped = false,
 			characters = characterData[1],
@@ -79,7 +78,7 @@ function LoLMatchSummaryGameRow:createGameDetail()
 			bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team2side or ''),
 			date = game.date,
 		},
-	}}
+	}
 end
 
 return CustomMatchSummary

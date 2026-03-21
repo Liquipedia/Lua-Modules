@@ -673,10 +673,8 @@ div.brkts-popup-body-element-thumbs {
 		display: contents;
 		white-space: nowrap;
 
-		> div:only-child {
-			display: grid;
+		> :only-child {
 			grid-column: 2 / -2;
-			grid-template-columns: subgrid;
 		}
 
 		&:empty {
