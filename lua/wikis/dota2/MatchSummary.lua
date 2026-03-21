@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -21,6 +22,10 @@ local STATUS_NOT_PLAYED = 'notplayed'
 ---@class Dota2CustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
 
+---@class Dota2MatchSummaryGameRow: MatchSummaryGameRow
+---@operator call(MatchSummaryGameRowProps): Dota2MatchSummaryGameRow
+local Dota2MatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+
 ---@param args table
 ---@return Widget
 function CustomMatchSummary.getByMatchId(args)
@@ -33,19 +38,24 @@ function CustomMatchSummary.createBody(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
 	return WidgetUtil.collect(
-		Array.map(match.games, CustomMatchSummary._createGame),
+		MatchSummaryWidgets.GameContainer{
+			gridLayout = 'standard',
+			children = Array.map(match.games, function (game, gameIndex)
+				if game.status == STATUS_NOT_PLAYED then
+					return
+				end
+				return Dota2MatchSummaryGameRow{game = game, gameIndex = gameIndex}
+			end)
+		},
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
 	)
 end
 
----@param game MatchGroupUtilGame
----@param gameIndex integer
----@return MatchSummaryRow?
-function CustomMatchSummary._createGame(game, gameIndex)
-	if game.status == STATUS_NOT_PLAYED then
-		return
-	end
+---@return Widget[]
+function Dota2MatchSummaryGameRow:createGameDetail()
+	local props = self.props
+	local game = props.game
 	local extradata = game.extradata or {}
 
 	-- TODO: Change to use participant data
@@ -54,25 +64,19 @@ function CustomMatchSummary._createGame(game, gameIndex)
 		MatchSummary.buildCharacterList(extradata, 'team2hero', NUM_HEROES_PICK),
 	}
 
-	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-body-game'},
-		children = WidgetUtil.collect(
-			MatchSummaryWidgets.Characters{
-				flipped = false,
-				characters = characterData[1],
-				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team1side or ''),
-			},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.GameCenter{children = Logic.nilIfEmpty(game.length) or ('Game ' .. gameIndex)},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			MatchSummaryWidgets.Characters{
-				flipped = true,
-				characters = characterData[2],
-				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team2side or ''),
-			},
-			MatchSummaryWidgets.GameComment{children = game.comment}
-		)
-	}
+	return WidgetUtil.collect(
+		MatchSummaryWidgets.Characters{
+			flipped = false,
+			characters = characterData[1],
+			bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team1side or ''),
+		},
+		Logic.nilIfEmpty(game.length) or ('Game ' .. props.gameIndex),
+		MatchSummaryWidgets.Characters{
+			flipped = true,
+			characters = characterData[2],
+			bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team2side or ''),
+		}
+	)
 end
 
 return CustomMatchSummary
