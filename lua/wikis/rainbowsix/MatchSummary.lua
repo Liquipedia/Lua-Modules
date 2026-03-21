@@ -8,7 +8,8 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local FnUtil = Lua.import('Module:FnUtil')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -25,6 +26,10 @@ local ROUND_ICONS = {
 
 ---@class RainbowsixMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
+
+---@class RainbowsixMatchSummaryGameRow: MatchSummaryGameRow
+---@operator call(MatchSummaryGameRowProps): RainbowsixMatchSummaryGameRow
+local RainbowsixMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
 
 ---@param args table
 ---@return Widget
@@ -45,21 +50,24 @@ function CustomMatchSummary.createBody(match)
 	end)
 
 	return WidgetUtil.collect(
-		Array.map(match.games, FnUtil.curry(CustomMatchSummary.createGame, match.date)),
+		MatchSummaryWidgets.GameContainer{
+			gridLayout = 'standard',
+			children = Array.map(match.games, function (game, gameIndex)
+				if Logic.isEmpty(game.map) then
+					return
+				end
+				return RainbowsixMatchSummaryGameRow{game = game, gameIndex = gameIndex}
+			end)
+		},
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
 	)
 end
 
----@param date string
----@param game MatchGroupUtilGame
----@param gameIndex integer
----@return Widget?
-function CustomMatchSummary.createGame(date, game, gameIndex)
-	if not game.map then
-		return
-	end
+---@return Widget[]
+function RainbowsixMatchSummaryGameRow:createGameDetail()
+	local game = self.props.game
 	local extradata = game.extradata or {}
 
 	local function scoreDisplay(oppIdx)
@@ -81,43 +89,27 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 	local firstSide = (firstSides.rt or ''):lower()
 	local firstSideOt = (firstSides.ot or ''):lower()
 
-	-- Winner/Loser backgrounds
-	local gameStatusBackground = 'brkts-popup-body-gradient-default'
-	if game.winner == 1 then
-		gameStatusBackground = 'brkts-popup-body-gradient-left'
-	elseif game.winner == 2 then
-		gameStatusBackground = 'brkts-popup-body-gradient-right'
-	elseif game.winner == 0 then
-		gameStatusBackground = 'brkts-popup-body-gradient-draw'
-	end
-
-	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-body-game', gameStatusBackground},
-		children = WidgetUtil.collect(
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.DetailedScore{
-				score = scoreDisplay(1),
-				flipped = false,
-				partialScores = makePartialScores(
-					extradata.t1halfs or {},
-					firstSide,
-					firstSideOt
-				)
-			},
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game), css = {['flex-grow'] = '1'}},
-			MatchSummaryWidgets.DetailedScore{
-				score = scoreDisplay(2),
-				flipped = true,
-				partialScores = makePartialScores(
-					extradata.t2halfs or {},
-					CustomMatchSummary._getOppositeSide(firstSide),
-					CustomMatchSummary._getOppositeSide(firstSideOt)
-				)
-			},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			MatchSummaryWidgets.GameComment{children = game.comment}
-		)
-	}
+	return WidgetUtil.collect(
+		MatchSummaryWidgets.DetailedScore{
+			score = scoreDisplay(1),
+			flipped = false,
+			partialScores = makePartialScores(
+				extradata.t1halfs or {},
+				firstSide,
+				firstSideOt
+			)
+		},
+		MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game), css = {['flex-grow'] = '1'}},
+		MatchSummaryWidgets.DetailedScore{
+			score = scoreDisplay(2),
+			flipped = true,
+			partialScores = makePartialScores(
+				extradata.t2halfs or {},
+				CustomMatchSummary._getOppositeSide(firstSide),
+				CustomMatchSummary._getOppositeSide(firstSideOt)
+			)
+		}
+	)
 end
 
 ---@param side string
