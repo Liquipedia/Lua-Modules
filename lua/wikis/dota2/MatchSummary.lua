@@ -37,7 +37,7 @@ function CustomMatchSummary.createBody(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
 	return WidgetUtil.collect(
-		MatchSummaryWidgets.GameContainer{
+		MatchSummaryWidgets.GamesContainer{
 			gridLayout = 'standard',
 			children = Array.map(match.games, function (game, gameIndex)
 				if game.status == STATUS_NOT_PLAYED then

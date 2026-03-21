@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Match/Summary/GameContainer
+-- page=Module:Widget/Match/Summary/GamesContainer
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -13,12 +13,12 @@ local Logic = Lua.import('Module:Logic')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
----@class MatchSummaryGameContainer: Widget
----@operator call(table): MatchSummaryGameContainer
-local MatchSummaryGameContainer = Class.new(Widget)
+---@class MatchSummaryGamesContainer: Widget
+---@operator call(table): MatchSummaryGamesContainer
+local MatchSummaryGamesContainer = Class.new(Widget)
 
 ---@return Widget?
-function MatchSummaryGameContainer:render()
+function MatchSummaryGamesContainer:render()
 	if Logic.isEmpty(self.props.children) then
 		return
 	end
@@ -30,4 +30,4 @@ function MatchSummaryGameContainer:render()
 	}
 end
 
-return MatchSummaryGameContainer
+return MatchSummaryGamesContainer
