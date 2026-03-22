@@ -54,7 +54,7 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 
 	-- Compute submatches
 	match.submatches = Array.map(
-		MatchGroupUtil.groupBySubmatch(match.games),
+		MatchGroupUtil.groupBySubgroup(match.games),
 		FnUtil.curry(CustomMatchGroupUtil.constructSubmatch, match)
 	)
 

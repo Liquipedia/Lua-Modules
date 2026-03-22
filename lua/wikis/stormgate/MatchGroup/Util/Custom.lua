@@ -92,7 +92,7 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 	if not match.isUniformMode then
 		-- Compute submatches
 		match.submatches = Array.map(
-			MatchGroupUtil.groupBySubmatch(match.games),
+			MatchGroupUtil.groupBySubgroup(match.games),
 			FnUtil.curry(CustomMatchGroupUtil.constructSubmatch, match)
 		)
 	end
