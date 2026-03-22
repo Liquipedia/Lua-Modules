@@ -194,11 +194,12 @@ Author(s): FO-nTTaX, Elysienna
 	animation-duration: 0.4s;
 	animation-fill-mode: forwards;
 	transform: scale( 0 );
+    border-radius: 0.5rem;
 
 	&--tooltip {
 		background-color: #ffffff;
 		position: absolute;
-		color: #676767;
+		color: var(--clr-secondary-39);
 		border-radius: 0.25rem;
 		font-size: 0.75rem;
 		font-family: "Open Sans", sans-serif;
@@ -229,7 +230,7 @@ Author(s): FO-nTTaX, Elysienna
 			height: 0;
 			border-top: 4px solid transparent;
 			border-bottom: 4px solid transparent;
-			border-right: 5px solid #ffffff;
+			border-right: 5px solid var( --clr-primary-100 );
 		}
 	}
 

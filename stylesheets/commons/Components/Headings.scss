@@ -57,11 +57,11 @@ h1#firstHeading,
 	font-weight: 500;
 
 	.theme--light & {
-		color: var( --clr-wiki-primary );
+		color: var( --clr-wiki-theme-40 );
 	}
 
 	.theme--dark & {
-		color: var( --clr-on-background );
+		color: var( --clr-wiki-theme-90 );
 	}
 }
 

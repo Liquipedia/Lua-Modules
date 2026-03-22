@@ -6,7 +6,7 @@
 	white-space: nowrap;
 	vertical-align: middle;
 	user-select: none;
-	border-radius: 6.25rem;
+	border-radius: 0.5rem;
 	padding: 0 1.5rem;
 	min-height: 2.5rem;
 	font-weight: bold;
@@ -28,7 +28,7 @@
 	@include form-button-style-base;
 
 	@media ( hover: hover ) {
-		&:hover {
+		&:hover:not(.disabled, :disabled) {
 			color: var( --clr-primary-100 );
 			text-decoration: none;
 			background-color: var( --clr-primary-30 );
@@ -46,7 +46,7 @@
 	/* Disabled comes first so active can properly restyle */
 	&.disabled,
 	&:disabled {
-		opacity: 0.65;
+		opacity: 0.4;
 		box-shadow: none;
 	}
 

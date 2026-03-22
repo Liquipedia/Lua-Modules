@@ -119,6 +119,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				background-color: transparent !important;
 				border-radius: $tabs-border-radius $tabs-border-radius 0 0;
 				height: 100%;
+                position: relative;
 
 				// Icons within tabs
 				i,
