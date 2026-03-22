@@ -168,8 +168,8 @@ span.slash {
 	gap: 0.25rem;
 
 	@media ( min-width: 768px ) {
-		.brkts-result-label {
-			--result-label-scale: 1.2;
+		.generic-label {
+			--label-scale: 1.2;
 		}
 	}
 }

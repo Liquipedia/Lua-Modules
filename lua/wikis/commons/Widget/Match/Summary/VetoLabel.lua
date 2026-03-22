@@ -10,8 +10,8 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Label = Lua.import('Module:Widget/Basic/Label')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@enum VetoTypes
@@ -35,8 +35,8 @@ function MatchSummaryVetoLabel:render()
 		return
 	end
 
-	return HtmlWidgets.Span{
-		classes = {'brkts-veto-label', 'veto--' .. vetoType},
+	return Label{
+		labelType = {'veto-' .. vetoType},
 		children = WidgetUtil.collect(
 			IconFa{iconName = 'veto_' .. vetoType},
 			VetoTypes[vetoType]

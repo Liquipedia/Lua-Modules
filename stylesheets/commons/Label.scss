@@ -1,0 +1,102 @@
+/**
+* Generic labels
+*/
+
+.generic-label {
+	border-radius: calc( var( --label-scale ) * 0.25rem );
+	font-size: calc( var( --label-scale ) * 0.6875rem );
+	line-height: calc( var( --label-scale ) * 1rem );
+	padding: calc( var( --label-scale ) * 0.125rem ) calc( var( --label-scale ) * 0.5rem );
+	font-weight: bold;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	align-self: center;
+
+	--label-scale: 1;
+
+	&[ data-label-type="result-win" ],
+	&[ data-label-type="veto-pick" ],
+	&.label--positive {
+		color: var( --clr-semantic-positive-20 );
+		background-color: var( --clr-semantic-positive-90 );
+
+		.theme--dark & {
+			color: var( --clr-semantic-positive-90 );
+			background-color: var( --clr-semantic-positive-30 );
+		}
+	}
+
+	&[ data-label-type="result-draw" ],
+	&[ data-label-type="veto-decider" ],
+	&.label--gold {
+		.theme--light & {
+			color: var( --clr-semantic-gold-20 );
+			background-color: var( --clr-semantic-gold-90 );
+		}
+
+		.theme--dark & {
+			color: var( --clr-semantic-gold-90 );
+			background-color: var( --clr-semantic-gold-30 );
+		}
+	}
+
+	&[ data-label-type="veto-protect" ],
+	&.label--silver {
+		color: var( --clr-semantic-silver-20 );
+		background-color: var( --clr-semantic-silver-90 );
+
+		.theme--dark & {
+			color: var( --clr-semantic-silver-90 );
+			background-color: var( --clr-semantic-silver-30 );
+		}
+	}
+
+	&[ data-label-type="result-loss" ],
+	&[ data-label-type="veto-ban" ],
+	&[ data-label-type="veto-defaultban" ],
+	&.label--negative {
+		.theme--light & {
+			color: var( --clr-semantic-negative-40 );
+			background-color: var( --clr-semantic-negative-96 );
+		}
+
+		.theme--dark & {
+			color: var( --clr-semantic-negative-90 );
+			background-color: var( --clr-semantic-negative-30 );
+		}
+	}
+
+	&[ data-label-type="result-default" ],
+	&.label--default {
+		color: var( --clr-secondary-44 );
+		background-color: var( --clr-on-surface-light-primary-8 );
+
+		.theme--dark & {
+			color: var( --clr-secondary-90 );
+			background-color: var( --clr-on-surface-dark-primary-8 );
+		}
+	}
+
+	&[ data-label-type^="result" ]:empty {
+		height: calc( var( --label-scale ) * 1.25rem );
+		width: calc( var( --label-scale ) * 1.25rem );
+		padding: unset;
+
+		&[ data-label-type="result-win" ]::before {
+			content: "W";
+		}
+
+		&[ data-label-type="result-loss" ]::before {
+			content: "D";
+		}
+
+		&[ data-label-type="result-loss" ]::before {
+			content: "L";
+		}
+
+		&[ data-label-type="result-default" ]::before {
+			content: "-";
+		}
+	}
+}
