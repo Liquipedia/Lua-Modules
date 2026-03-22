@@ -82,7 +82,7 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	if match.opponentMode == 'team' then
 		-- Compute submatches
 		match.submatches = Array.map(
-			StarcraftMatchGroupUtil.groupBySubmatch(match.games),
+			MatchGroupUtil.groupBySubgroup(match.games),
 			FnUtil.curry(StarcraftMatchGroupUtil.constructSubmatch, match)
 		)
 	end
