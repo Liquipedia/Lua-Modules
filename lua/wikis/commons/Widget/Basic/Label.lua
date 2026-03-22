@@ -16,6 +16,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 ---@field css table<string, string|number>?
 ---@field children Renderable|Renderable[]
 ---@field labelScheme string?
+---@field labelScale number?
 ---@field labelType string?
 
 ---@class GenericLabel: Widget
@@ -26,6 +27,10 @@ local GenericLabel = Class.new(Widget)
 ---@return Widget
 function GenericLabel:render()
 	local props = self.props
+	if props.labelScale then
+		props.css = props.css or {}
+		props.css['--label-scale'] = props.labelScale
+	end
 	return HtmlWidgets.Div{
 		attributes = props.labelType and {
 			['data-label-type'] = props.labelType
