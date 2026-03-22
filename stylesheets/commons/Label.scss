@@ -13,6 +13,7 @@
 	justify-content: center;
 	gap: 0.25rem;
 	align-self: center;
+	white-space: nowrap;
 
 	--label-scale: 1;
 
@@ -95,5 +96,9 @@
 		&[ data-label-type="result-default" ]::before {
 			content: "-";
 		}
+	}
+
+	&[ data-label-type^="veto" ] {
+		text-transform: uppercase;
 	}
 }
