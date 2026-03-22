@@ -9,7 +9,7 @@
 	padding: calc( var( --label-scale ) * 0.125rem ) calc( var( --label-scale ) * 0.5rem );
 	display: inline-flex;
 	align-items: center;
-	justify-content: center;
+	place-content: center center;
 	gap: calc( var( --label-scale ) * 0.25rem );
 	align-self: center;
 	white-space: nowrap;
@@ -75,26 +75,30 @@
 		}
 	}
 
-	&[ data-label-type^="result" ]:empty {
+	&[ data-label-type^="result" ] {
 		height: calc( var( --label-scale ) * 1.25rem );
-		width: calc( var( --label-scale ) * 1.25rem );
-		font-weight: bold;
-		padding: unset;
+		gap: unset;
 
-		&[ data-label-type="result-win" ]::before {
-			content: "W";
-		}
+		&:empty {
+			width: calc( var( --label-scale ) * 1.25rem );
+			font-weight: bold;
+			padding: unset;
 
-		&[ data-label-type="result-draw" ]::before {
-			content: "D";
-		}
+			&[ data-label-type="result-win" ]::before {
+				content: "W";
+			}
 
-		&[ data-label-type="result-loss" ]::before {
-			content: "L";
-		}
+			&[ data-label-type="result-draw" ]::before {
+				content: "D";
+			}
 
-		&[ data-label-type="result-default" ]::before {
-			content: "-";
+			&[ data-label-type="result-loss" ]::before {
+				content: "L";
+			}
+
+			&[ data-label-type="result-default" ]::before {
+				content: "-";
+			}
 		}
 	}
 
