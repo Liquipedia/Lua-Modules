@@ -44,10 +44,6 @@ local FOOTER_LINK = 'Valve_Regional_Standings'
 local VRSStandings = Class.new(Widget)
 VRSStandings.defaultProps = {
 	title = 'VRS Standings',
-	filterRegion = nil,
-	filterSubregion = nil,
-	filterCountry = nil,
-	mainpage = nil,
 	rankingType = 'live',
 }
 
