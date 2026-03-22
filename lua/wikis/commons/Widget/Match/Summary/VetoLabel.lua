@@ -36,7 +36,7 @@ function MatchSummaryVetoLabel:render()
 	end
 
 	return Label{
-		labelType = {'veto-' .. vetoType},
+		labelType = 'veto-' .. vetoType,
 		children = WidgetUtil.collect(
 			IconFa{iconName = 'veto_' .. vetoType},
 			VetoTypes[vetoType]
