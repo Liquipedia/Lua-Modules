@@ -25,6 +25,7 @@ local Widget = Lua.import('Module:Widget')
 ---@field titleClasses string[]?
 ---@field titleWidget Renderable?
 ---@field collapseAreaClasses string[]?
+---@field collapseAreaCss table<string, string|number>?
 ---@field children Renderable|Renderable[]?
 
 ---@class DefaultCollapsible: Widget
@@ -53,6 +54,7 @@ function DefaultCollapsible:render()
 			},
 			Div{
 				children = props.children,
+				css = props.collapseAreaCss,
 				classes = Array.extend({},
 					'should-collapse',
 					props.collapseAreaClasses
