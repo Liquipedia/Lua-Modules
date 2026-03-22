@@ -83,7 +83,7 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 	if match.opponentMode == TEAM_DISPLAY_MODE then
 		-- Compute submatches
 		match.submatches = Array.map(
-			MatchGroupUtil.groupBySubmatch(match.games),
+			MatchGroupUtil.groupBySubgroup(match.games),
 			FnUtil.curry(CustomMatchGroupUtil.constructSubmatch, match)
 		)
 	end

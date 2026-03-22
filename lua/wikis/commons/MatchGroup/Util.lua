@@ -777,7 +777,7 @@ end
 ---Group games on the subgroup field to form submatches
 ---@param matchGames MatchGroupUtilGame[]
 ---@return MatchGroupUtilSubgroup[]
-function MatchGroupUtil.groupBySubmatch(matchGames)
+function MatchGroupUtil.groupBySubgroup(matchGames)
 	local previousSubgroup = nil
 	---@type MatchGroupUtilGame[]?
 	local currentGames = nil
