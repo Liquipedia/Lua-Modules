@@ -264,7 +264,7 @@ function Placement:_getLpdbData(...)
 				participantteam = (opponentType == Opponent.solo and players.p1team)
 									and Opponent.toName{template = players.p1team, type = 'team', extradata = {}}
 									or nil,
-				playershare = playerShare and playerShare,
+				playershare = playerShare,
 			},
 			qualified = isQualified and 1 or 0
 			-- TODO: We need to create additional LPDB Fields
