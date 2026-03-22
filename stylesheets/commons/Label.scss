@@ -31,10 +31,8 @@
 	&[ data-label-type="result-draw" ],
 	&[ data-label-type="veto-decider" ],
 	&.label--gold {
-		.theme--light & {
-			color: var( --clr-semantic-gold-20 );
-			background-color: var( --clr-semantic-gold-90 );
-		}
+		color: var( --clr-semantic-gold-20 );
+		background-color: var( --clr-semantic-gold-90 );
 
 		.theme--dark & {
 			color: var( --clr-semantic-gold-90 );
@@ -57,10 +55,8 @@
 	&[ data-label-type="veto-ban" ],
 	&[ data-label-type="veto-defaultban" ],
 	&.label--negative {
-		.theme--light & {
-			color: var( --clr-semantic-negative-40 );
-			background-color: var( --clr-semantic-negative-96 );
-		}
+		color: var( --clr-semantic-negative-40 );
+		background-color: var( --clr-semantic-negative-96 );
 
 		.theme--dark & {
 			color: var( --clr-semantic-negative-90 );
