@@ -78,9 +78,9 @@ local CONTENT = {
 	vrsStandings = {
 		heading = 'Valve Regional Standings',
 		body = VRSStandings{
-			shouldFetch = 1,
+			shouldFetch = true,
 			fetchLimit = 5,
-			mainpage = 1,
+			mainpage = true,
 		},
 		padding = false,
 		boxid = 1521,
