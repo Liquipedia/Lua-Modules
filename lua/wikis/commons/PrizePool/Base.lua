@@ -360,7 +360,7 @@ BasePrizePool.prizeTypes = {
 		end,
 	},
 	[PRIZE_TYPE_PLAYER_SHARE] = {
-		sortOrder = 55,
+		sortOrder = 60,
 
 		header = 'playershare',
 		headerParse = function (prizePool, input, context, index)
@@ -384,7 +384,7 @@ BasePrizePool.prizeTypes = {
 		end,
 	},
 	[PRIZE_TYPE_CLUB_SHARE] = {
-		sortOrder = 56,
+		sortOrder = 70,
 		header = 'clubshare',
 		headerParse = function(prizePool, input, context, index)
 			return {title = 'Club Share'}
@@ -406,7 +406,7 @@ BasePrizePool.prizeTypes = {
 		end,
 	},
 	[PRIZE_TYPE_FREETEXT] = {
-		sortOrder = 60,
+		sortOrder = 80,
 
 		header = 'freetext',
 		headerParse = function (prizePool, input, context, index)
@@ -700,7 +700,7 @@ function BasePrizePool:_buildRows()
 		-- Calculate club share for the placement
 		Array.forEach(placement.opponents, function(opponent)
 			local basePrize
-			local playerShare = nil
+			local playerShare
 			Array.forEach(self.prizes, function(prize)
 				if prize.type == PRIZE_TYPE_BASE_CURRENCY then
 					basePrize = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]

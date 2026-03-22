@@ -93,12 +93,14 @@ function TeamParticipantsRepository.save(participant)
 	lpdbData.players = lpdbData.opponentplayers
 
 	-- Calculate individual prize money (prize money per player on team)
-	if lpdbData.prizemoney then
+	-- Opt to use playerShare over prizepool if available
+	local prizevalue = lpdbData.extradata and lpdbData.extradata.playershare or lpdbData.prizemoney
+	if prizevalue then
 		local filteredPlayers = Array.filter(activeOpponent.players, function(player)
 			return player.extradata.type ~= 'staff'
 		end)
 		local numberOfPlayersOnTeam = math.max(#(filteredPlayers), 1)
-		lpdbData.individualprizemoney = lpdbData.prizemoney / numberOfPlayersOnTeam
+		lpdbData.individualprizemoney = prizevalue / numberOfPlayersOnTeam
 	end
 
 	mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, Json.stringifySubTables(lpdbData))
