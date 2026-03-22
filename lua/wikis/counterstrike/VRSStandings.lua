@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/VRSStandings.lua
+-- page=Module:Widget/VRSStandings
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -16,9 +16,9 @@ local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
-local Opponent = Lua.import('Module:Opponent')
-local PlayerDisplay = Lua.import('Module:Player/Display')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Table = Lua.import('Module:Table')
 
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
@@ -185,7 +185,21 @@ function VRSStandings:render()
 	end
 end
 
+---@class VRSStandingsStanding
+---@field place number
+---@field points number
+---@field local_place number?
+---@field opponent standardOpponent
+
+---@class VRSStandingsSettings
+---@field title string
+---@field shouldFetch boolean
+---@field mainpage boolean
+---@field rankingType 'main' | 'live'
+
 ---@private
+---@return VRSStandingsStanding[]
+---@return VRSStandingsSettings
 function VRSStandings:_parse()
 	local props = self.props
 	local rankingType = (props.rankingType == 'main') and 'main' or 'live'
@@ -197,16 +211,16 @@ function VRSStandings:_parse()
 		fetchLimit = tonumber(props.fetchLimit),
 		filterRegion = props.filterRegion,
 		filterSubregion = props.filterSubregion,
-		filterCountry = props.filterCountry,
+		filterCountry = Array.parseCommaSeparatedString(props.filterCountry),
 		mainpage = Logic.readBool(props.mainpage),
 		rankingType = rankingType,
 		datapointType = datapointType,
 	}
 
-	if props.updated == 'latest' or not props.updated then
-		settings.updated = VRSStandings._fetchLatestDate(datapointType)
-	else
+	if props.updated ~= 'latest' then
 		settings.updated = DateExt.toYmdInUtc(props.updated)
+	else
+		assert(settings.shouldFetch, '\'Latest\' can only be used for fetching data')
 	end
 
 	-- Only one filter can be applied at once
@@ -220,22 +234,8 @@ function VRSStandings:_parse()
 		settings.filterType = 'country'
 	end
 
-	settings.filterCountries = nil
-	settings.filterCountryDisplay = 'Filtered'
 
-	if settings.filterCountry then
-		local rawList = mw.text.split(settings.filterCountry, ',')
-		local countrySet = {}
-
-		for _, raw in ipairs(rawList) do
-			countrySet[mw.text.trim(raw)] = true
-		end
-
-		settings.filterCountries = countrySet
-		settings.filterCountryDisplay = #rawList > 1 and 'Filtered' or mw.text.trim(rawList[1])
-	end
-
-	---@type {points: number, opponent: standardOpponent}[]
+	---@type VRSStandingsStanding[]
 	local standings = {}
 
 	if settings.shouldFetch then
@@ -272,11 +272,6 @@ function VRSStandings:_parse()
 
 	Array.sortInPlaceBy(standings, Operator.property('place'))
 
-	if settings.filterType ~= 'none' then
-		for i, entry in ipairs(standings) do
-			entry.global_place = i
-		end
-	end
 	-- filtering
 	standings = Array.filter(standings, function(entry)
 		local extradata = entry.opponent.extradata or {}
@@ -305,14 +300,17 @@ function VRSStandings:_parse()
 		standings = Array.sub(standings, 1, settings.fetchLimit)
 	end
 
-	for i, entry in ipairs(standings) do
-		entry.place = i
-	end
+	Array.forEach(standings, function(entry, index) do
+		entry.local_place = index
+	end)
 
 	return standings, settings
 end
 
 ---@private
+---@param standing VRSStandingsStanding
+---@param mainpage boolean
+---@return Widget
 function VRSStandings._row(standing, mainpage)
 	local extradata = standing.opponent.extradata or {}
 
@@ -348,7 +346,7 @@ function VRSStandings._row(standing, mainpage)
 	if not mainpage then
 		table.insert(cells,
 			TableWidgets.Cell{
-				children = Array.map(standing.opponent.players,function(player)
+				children = Array.map(standing.opponent.players, function(player)
 					return HtmlWidgets.Span{
 						css = {display="inline-block", width="160px"},
 						children = PlayerDisplay.InlinePlayer({player = player})
@@ -362,6 +360,9 @@ function VRSStandings._row(standing, mainpage)
 end
 
 ---@private
+---@param updated string
+---@param datapointType string
+---@param standings VRSStandingsStanding[]
 function VRSStandings._store(updated, datapointType, standings)
 	if Lpdb.isStorageDisabled() then
 		return
@@ -370,7 +371,7 @@ function VRSStandings._store(updated, datapointType, standings)
 	local dataPoint = Lpdb.DataPoint:new{
 		objectname = datapointType .. '_' .. updated,
 		type = datapointType,
-		name = 'Inofficial VRS (' .. updated .. ')',
+		name = 'Unofficial VRS (' .. updated .. ')',
 		date = updated,
 		extradata = standings
 	}
@@ -379,16 +380,22 @@ function VRSStandings._store(updated, datapointType, standings)
 end
 
 ---@private
+---@param updated string
+---@param datapointType string
+---@return VRSStandingsStanding[]
 function VRSStandings._fetch(updated, datapointType)
 	local conditions = Condition.Tree(BooleanOperator.all):add{
-		Condition.Node(Condition.ColumnName('date'), Comparator.eq, updated),
 		Condition.Node(Condition.ColumnName('namespace'), Comparator.eq, 0),
 	}
+	
+	if updated == 'latest' then
+		conditions.add(Condition.Node(Condition.ColumnName('date'), Comparator.eq, updated))
+	end
 
 	if datapointType == DATAPOINT_TYPE_MAIN then
-		conditions:add{
+		conditions:add(
 			Condition.Node(Condition.ColumnName('type'), Comparator.eq, DATAPOINT_TYPE_MAIN),
-		}
+		)
 	else
 		conditions:add{
 			Condition.Tree(BooleanOperator.any):add{
@@ -401,6 +408,7 @@ function VRSStandings._fetch(updated, datapointType)
 	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = conditions:toString(),
 		query = 'extradata',
+		order = 'date desc',
 		limit = 1,
 	})
 
@@ -409,33 +417,5 @@ function VRSStandings._fetch(updated, datapointType)
 end
 
 ---@private
-function VRSStandings._fetchLatestDate(datapointType)
-	local conditions = Condition.Tree(BooleanOperator.all):add{
-		Condition.Node(Condition.ColumnName('namespace'), Comparator.eq, 0),
-	}
-
-	if datapointType == DATAPOINT_TYPE_MAIN then
-		conditions:add{
-			Condition.Node(Condition.ColumnName('type'), Comparator.eq, DATAPOINT_TYPE_MAIN),
-		}
-	else
-		conditions:add{
-			Condition.Tree(BooleanOperator.any):add{
-				Condition.Node(Condition.ColumnName('type'), Comparator.eq, DATAPOINT_TYPE_LIVE),
-				Condition.Node(Condition.ColumnName('type'), Comparator.eq, DATAPOINT_TYPE_MAIN),
-			}
-		}
-	end
-
-	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = conditions:toString(),
-		query = 'date',
-		order = 'date desc',
-		limit = 1,
-	})
-
-	assert(data[1], 'No VRS data found for type "' .. datapointType .. '"')
-	return DateExt.toYmdInUtc(DateExt.parseIsoDate(data[1].date))
-end
 
 return VRSStandings
