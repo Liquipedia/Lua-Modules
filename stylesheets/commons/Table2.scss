@@ -61,7 +61,7 @@ $table2-cell-padding-x: 0.75rem;
 
 	&__table {
 		width: 100%;
-		border-spacing: 0 1px;
+		border-spacing: unset;
 		border-collapse: separate;
 		border: 0;
 
