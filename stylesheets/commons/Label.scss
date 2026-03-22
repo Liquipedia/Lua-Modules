@@ -7,7 +7,6 @@
 	font-size: calc( var( --label-scale ) * 0.6875rem );
 	line-height: calc( var( --label-scale ) * 1rem );
 	padding: calc( var( --label-scale ) * 0.125rem ) calc( var( --label-scale ) * 0.5rem );
-	font-weight: bold;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -79,6 +78,7 @@
 	&[ data-label-type^="result" ]:empty {
 		height: calc( var( --label-scale ) * 1.25rem );
 		width: calc( var( --label-scale ) * 1.25rem );
+		font-weight: bold;
 		padding: unset;
 
 		&[ data-label-type="result-win" ]::before {
@@ -100,5 +100,6 @@
 
 	&[ data-label-type^="veto" ] {
 		text-transform: uppercase;
+		font-weight: bold;
 	}
 }
