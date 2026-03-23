@@ -52,6 +52,41 @@ function Array.copy(tbl)
 	return copy
 end
 
+---Creates an array that contains `count` copies of the specified element.
+---
+---If `count == 0`, then an empty array is returned.
+---
+---If `element` is a table and `copyFunction` is not specified,
+---then all elements in the returned array are reference equal.
+---
+---This function is expensive if called with `copyFunction`.
+---@generic T
+---@param element T
+---@param count integer
+---@param copyFunction? fun(origElement: T): T
+---@return T[]
+---@nodiscard
+function Array.createRepeatedElementArray(element, count, copyFunction)
+	assert(element ~= nil, 'element must not be nil')
+	if count < 0 then
+		error('count must be non-negative')
+	elseif count == 0 then
+		return {}
+	end
+	if copyFunction then
+		mw.incrementExpensiveFunctionCount()
+	end
+	local arr = {}
+	for _ = 1, count do
+		if copyFunction then
+			table.insert(arr, copyFunction(element))
+		else
+			table.insert(arr, element)
+		end
+	end
+	return arr
+end
+
 ---Returns true if two arrays are equal to each other.
 ---@param arr1 any[]
 ---@param arr2 any[]
