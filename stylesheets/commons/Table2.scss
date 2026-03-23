@@ -132,12 +132,12 @@ $table2-cell-padding-x: 0.75rem;
 
 			.theme--light & {
 				background-color: var( --clr-semantic-gold-90 );
-				box-shadow: 0 1px 0 var( --clr-semantic-gold-80 );
+				box-shadow: inset 0 -1px 0 var( --clr-semantic-gold-80 );
 			}
 
 			.theme--dark & {
 				background-color: var( --clr-semantic-gold-16 );
-				box-shadow: 0 1px 0 var( --clr-semantic-gold-20 );
+				box-shadow: inset 0 -1px 0 var( --clr-semantic-gold-20 );
 			}
 
 			&::after {
