@@ -48,7 +48,7 @@ describe('prize pool', function()
 		lpdb_prefix = 'abc',
 		import = false,
 		playershare = true,
-		[1] = {usdprize = '400000', playershare= '200000', [1] = {'mouz'}},
+		[1] = {usdprize = '400000', playershare = '200000', [1] = {'mouz'}},
 		[2] = {usdprize = '1,000', [1] = {'t1'}},
 	}
 
@@ -182,12 +182,14 @@ describe('prize pool', function()
 			})
 
 			PrizePool(prizePool2Args):create():build()
-			assert.stub(LpdbPlacementStub).was.called_with('ranking_abc2_mouz', {
+			assert.stub(LpdbPlacementStub).was.called_with('ranking_abc_mouz', {
 				date = '2022-10-15',
 				extradata = '{"playershare":200000,"prizepoints":"","prizepoints2":""}',
 				game = 'commons',
 				icon = 'test.png',
 				icondark = 'test dark.png',
+				image = 'MOUZ allmode.png',
+				imagedark = 'MOUZ allmode.png',
 				individualprizemoney = 0,
 				lastvsdata = '[]',
 				liquipediatier = '1',
@@ -199,6 +201,7 @@ describe('prize pool', function()
 				parent = 'FakePage',
 				participant = 'MOUZ', -- Legacy
 				participantlink = 'MOUZ', -- Legacy
+				participanttemplate = 'mouz 2021',
 				placement = 1,
 				players = '[]', -- Legacy
 				prizemoney = 400000,
@@ -210,12 +213,14 @@ describe('prize pool', function()
 				type = 'Offline',
 				qualified = 0,
 			})
-			assert.stub(LpdbPlacementStub).was.called_with('ranking_abc2_t1', {
+			assert.stub(LpdbPlacementStub).was.called_with('ranking_abc_t1', {
 				date = '2022-10-15',
 				extradata = '{"prizepoints":"","prizepoints2":""}',
 				game = 'commons',
 				icon = 'test.png',
 				icondark = 'test dark.png',
+				image = 'T1 2019 allmode.png',
+				imagedark = 'T1 2019 allmode.png',
 				individualprizemoney = 0,
 				lastvsdata = '[]',
 				liquipediatier = '1',
@@ -227,6 +232,7 @@ describe('prize pool', function()
 				parent = 'FakePage',
 				participant = 'T1', -- Legacy
 				participantlink = 'T1', -- Legacy
+				participanttemplate = 't1 2019',
 				placement = 2,
 				players = '[]', -- Legacy
 				prizemoney = 1000,
