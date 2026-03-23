@@ -18,6 +18,7 @@ export default {
 		"no-duplicate-selectors": null,
 		"function-url-no-scheme-relative": null,
 		"declaration-no-important": null,
+		"function-disallowed-list": null,
 		"function-no-unknown": null,
 		"scss/function-no-unknown": true,
 		"@stylistic/string-quotes": "double"
