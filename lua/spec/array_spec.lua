@@ -45,6 +45,47 @@ describe('array', function()
 		end)
 	end)
 
+	describe('createRepeatedArray', function()
+		it('check', function()
+			assert.is_true(Array.equals({1}, Array.createRepeatedElementArray(1, 1)))
+			assert.is_true(Array.equals({2, 2}, Array.createRepeatedElementArray(2, 2)))
+			assert.is_true(Array.equals({3, 3, 3}, Array.createRepeatedElementArray(3, 3)))
+			assert.is_true(Array.equals(
+				{
+					'The quick brown fox jumps over the lazy dog',
+					'The quick brown fox jumps over the lazy dog',
+					'The quick brown fox jumps over the lazy dog',
+					'The quick brown fox jumps over the lazy dog',
+					'The quick brown fox jumps over the lazy dog'
+				},
+				Array.createRepeatedElementArray('The quick brown fox jumps over the lazy dog', 5)
+			))
+			assert.is_true(Table.deepEquals(
+				{
+					{1, 2, 3},
+					{1, 2, 3},
+				},
+				Array.createRepeatedElementArray(Array.range(1, 3), 2)
+			))
+		end)
+
+		it('check count==0', function ()
+			assert.is_true(Array.equals({}, Array.createRepeatedElementArray('Lorem ipsum', 0)))
+		end)
+
+		it('Error if illegal arguments are passed in', function()
+			assert.error(function ()
+				return Array.createRepeatedElementArray(nil, 1)
+			end)
+			assert.error(function ()
+				return Array.createRepeatedElementArray('nil', -3)
+			end)
+			assert.error(function ()
+				return Array.createRepeatedElementArray(nil, 1)
+			end)
+		end)
+	end)
+
 	describe('Sub', function()
 		it('check', function()
 			local a = {3, 5, 7, 11}
