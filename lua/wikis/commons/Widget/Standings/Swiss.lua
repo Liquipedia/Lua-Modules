@@ -41,6 +41,7 @@ function StandingsSwissWidget:render()
 	return TableWidgets.Table{
 		classes = {'standings-swiss'},
 		title = Logic.nilIfEmpty(standings.title),
+		columns = self:_buildColumnDefinitions(),
 		children = WidgetUtil.collect(
 			-- Column Header
 			self:_headerRow(),
@@ -50,6 +51,25 @@ function StandingsSwissWidget:render()
 			end)}
 		)
 	}
+end
+
+---@private
+---@return table[]
+function StandingsSwissWidget:_buildColumnDefinitions()
+	local standings = self.props.standings
+	return WidgetUtil.collect(
+		{align = 'left'},
+		{align = 'left'},
+		Array.map(standings.tiebreakers, function(tiebreaker)
+			if not tiebreaker.title then
+				return
+			end
+			return {align = 'center'}
+		end),
+		Array.map(standings.rounds, function(round)
+			return {align = 'center'}
+		end)
+	)
 end
 
 ---@private
@@ -108,7 +128,7 @@ function StandingsSwissWidget:_createRow(slot)
 					return
 				end
 				return TableWidgets.Cell{
-					css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil, ['text-align'] = 'center'},
+					css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil},
 					children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
 				}
 			end),
