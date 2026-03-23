@@ -152,6 +152,7 @@ function MatchPage:renderOverallStats()
 							},
 							Div{
 								classes = {'match-bm-team-stats-list-cell'},
+								css = {flex = 1},
 								children = self:getTournamentIcon()
 							},
 							Div{
@@ -553,6 +554,7 @@ function MatchPage:_renderTeamStats(game)
 						},
 						Div{
 							classes = {'match-bm-team-stats-list-cell'},
+							css = {flex = 1},
 							children = self:isBestOfOne() and self:_buildGameResultSummary(game) or self:getTournamentIcon()
 						},
 						Div{
