@@ -53,11 +53,11 @@ div.oo-ui-tabSelectWidget-framed .oo-ui-tabOptionWidget.oo-ui-widget-enabled:hov
 
 label.oo-ui-labelWidget.oo-ui-inline-help {
 	.theme--light & {
-        color: var(--clr-secondary-25);
+		color: var( --clr-secondary-25 );
 	}
 
 	.theme--dark & {
-        color: var(--clr-secondary-90);
+		color: var( --clr-secondary-90 );
 	}
 }
 

@@ -73,7 +73,8 @@ div.wikiEditor-ui-toolbar .sections .section {
 	}
 }
 
-$wiki-editor-tool-icons: [ 'bold', 'italic', 'link', 'image', 'reference'];
+$wiki-editor-tool-icons: [ "bold", "italic", "link", "image", "reference"];
+
 @each $tool in $wiki-editor-tool-icons {
 	.theme--dark .wikiEditor-ui-toolbar .oo-ui-icon-#{$tool}, .mw-ui-icon-#{$tool}:before {
 		filter: invert( 100% ) sepia( 100% ) saturate( 0% ) hue-rotate( 47deg ) brightness( 103% );

@@ -28,7 +28,7 @@
 	@include form-button-style-base;
 
 	@media ( hover: hover ) {
-		&:hover:not(.disabled, :disabled) {
+		&:hover:not( .disabled, :disabled ) {
 			color: var( --clr-primary-100 );
 			text-decoration: none;
 			background-color: var( --clr-primary-30 );

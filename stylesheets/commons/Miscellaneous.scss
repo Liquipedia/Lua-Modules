@@ -194,12 +194,12 @@ Author(s): FO-nTTaX, Elysienna
 	animation-duration: 0.4s;
 	animation-fill-mode: forwards;
 	transform: scale( 0 );
-    border-radius: 0.5rem;
+	border-radius: 0.5rem;
 
 	&--tooltip {
 		background-color: #ffffff;
 		position: absolute;
-		color: var(--clr-secondary-39);
+		color: var( --clr-secondary-39 );
 		border-radius: 0.25rem;
 		font-size: 0.75rem;
 		font-family: "Open Sans", sans-serif;
