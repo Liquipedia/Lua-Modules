@@ -20,8 +20,12 @@ local MatchOverview = Lua.import('Module:Widget/Standings/MatchOverview')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
+---@class StandingsSwissWidgetProps
+---@field standings StandingsModel
+
 ---@class StandingsSwissWidget: Widget
----@operator call(table): StandingsSwissWidget
+---@operator call(StandingsSwissWidgetProps): StandingsSwissWidget
+---@field props StandingsSwissWidgetProps
 local StandingsSwissWidget = Class.new(Widget)
 
 ---@return Widget?
@@ -30,7 +34,6 @@ function StandingsSwissWidget:render()
 		return
 	end
 
-	---@type StandingsModel
 	local standings = self.props.standings
 	local lastRound = standings.rounds[#standings.rounds]
 
