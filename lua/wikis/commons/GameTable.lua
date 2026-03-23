@@ -11,8 +11,10 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Game = Lua.import('Module:Game')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
+local Tournament = Lua.import('Module:Tournament')
 local VodLink = Lua.import('Module:VodLink')
 
 local MatchTable = Lua.import('Module:MatchTable')
@@ -134,6 +136,7 @@ end
 ---@return Widget
 function GameTable:gameRow(match, game)
 	return TableWidgets.Row{
+		highlighted = HighlightConditions.tournament(Tournament.partialTournamentFromMatch(match), self.args),
 		children = WidgetUtil.collect(
 			self:_displayDate(match),
 			self:displayTier(match),
