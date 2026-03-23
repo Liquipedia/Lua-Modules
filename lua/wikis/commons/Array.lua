@@ -64,7 +64,7 @@ end
 ---@param copyFunction? fun(origElement: T): T
 ---@return T[]
 ---@nodiscard
-function Array.createRepeatedElementArray(element, count, copyFunction)
+function Array.rep(element, count, copyFunction)
 	assert(element ~= nil, 'element must not be nil')
 	if count < 0 then
 		error('count must be non-negative')

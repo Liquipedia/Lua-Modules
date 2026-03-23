@@ -47,9 +47,9 @@ describe('array', function()
 
 	describe('createRepeatedArray', function()
 		it('check', function()
-			assert.are_same({1}, Array.createRepeatedElementArray(1, 1))
-			assert.are_same({2, 2}, Array.createRepeatedElementArray(2, 2))
-			assert.are_same({3, 3, 3}, Array.createRepeatedElementArray(3, 3))
+			assert.are_same({1}, Array.rep(1, 1))
+			assert.are_same({2, 2}, Array.rep(2, 2))
+			assert.are_same({3, 3, 3}, Array.rep(3, 3))
 			assert.are_same(
 				{
 					'The quick brown fox jumps over the lazy dog',
@@ -58,37 +58,37 @@ describe('array', function()
 					'The quick brown fox jumps over the lazy dog',
 					'The quick brown fox jumps over the lazy dog'
 				},
-				Array.createRepeatedElementArray('The quick brown fox jumps over the lazy dog', 5)
+				Array.rep('The quick brown fox jumps over the lazy dog', 5)
 			)
 			assert.are_same(
 				{
 					{1, 2, 3},
 					{1, 2, 3},
 				},
-				Array.createRepeatedElementArray(Array.range(1, 3), 2)
+				Array.rep(Array.range(1, 3), 2)
 			)
 			assert.are_same(
 				{
 					{1, 2, 3},
 					{1, 2, 3},
 				},
-				Array.createRepeatedElementArray(Array.range(1, 3), 2, Array.copy)
+				Array.rep(Array.range(1, 3), 2, Array.copy)
 			)
 		end)
 
 		it('check count==0', function ()
-			assert.is_true(Array.equals({}, Array.createRepeatedElementArray('Lorem ipsum', 0)))
+			assert.is_true(Array.equals({}, Array.rep('Lorem ipsum', 0)))
 		end)
 
 		it('Error if illegal arguments are passed in', function()
 			assert.error(function ()
-				return Array.createRepeatedElementArray(nil, 1)
+				return Array.rep(nil, 1)
 			end)
 			assert.error(function ()
-				return Array.createRepeatedElementArray('nil', -3)
+				return Array.rep('nil', -3)
 			end)
 			assert.error(function ()
-				return Array.createRepeatedElementArray(nil, 1)
+				return Array.rep(nil, 1)
 			end)
 		end)
 	end)
