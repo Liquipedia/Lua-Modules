@@ -47,10 +47,10 @@ describe('array', function()
 
 	describe('createRepeatedArray', function()
 		it('check', function()
-			assert.is_true(Array.equals({1}, Array.createRepeatedElementArray(1, 1)))
-			assert.is_true(Array.equals({2, 2}, Array.createRepeatedElementArray(2, 2)))
-			assert.is_true(Array.equals({3, 3, 3}, Array.createRepeatedElementArray(3, 3)))
-			assert.is_true(Array.equals(
+			assert.are_same({1}, Array.createRepeatedElementArray(1, 1))
+			assert.are_same({2, 2}, Array.createRepeatedElementArray(2, 2))
+			assert.are_same({3, 3, 3}, Array.createRepeatedElementArray(3, 3))
+			assert.are_same(
 				{
 					'The quick brown fox jumps over the lazy dog',
 					'The quick brown fox jumps over the lazy dog',
@@ -59,21 +59,21 @@ describe('array', function()
 					'The quick brown fox jumps over the lazy dog'
 				},
 				Array.createRepeatedElementArray('The quick brown fox jumps over the lazy dog', 5)
-			))
-			assert.is_true(Table.deepEquals(
+			)
+			assert.are_same(
 				{
 					{1, 2, 3},
 					{1, 2, 3},
 				},
 				Array.createRepeatedElementArray(Array.range(1, 3), 2)
-			))
-			assert.is_true(Table.deepEquals(
+			)
+			assert.are_same(
 				{
 					{1, 2, 3},
 					{1, 2, 3},
 				},
 				Array.createRepeatedElementArray(Array.range(1, 3), 2, Array.copy)
-			))
+			)
 		end)
 
 		it('check count==0', function ()
