@@ -67,6 +67,13 @@ describe('array', function()
 				},
 				Array.createRepeatedElementArray(Array.range(1, 3), 2)
 			))
+			assert.is_true(Table.deepEquals(
+				{
+					{1, 2, 3},
+					{1, 2, 3},
+				},
+				Array.createRepeatedElementArray(Array.range(1, 3), 2, Array.copy)
+			))
 		end)
 
 		it('check count==0', function ()
