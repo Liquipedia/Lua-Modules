@@ -88,6 +88,7 @@ describe('prize pool', function()
 			{
 				{id = 'BASE_CURRENCY1', type = 'BASE_CURRENCY', index = 1, data = {roundPrecision = 2}},
 				{id = 'PLAYER_SHARE1', type = 'PLAYER_SHARE', index = 1, data = {title = 'Player Share'}},
+				{id = 'CLUB_SHARE1', type = 'CLUB_SHARE', index = 1, data = {title = 'Club Share', roundPrecision = 2}},
 			},
 			ppt2.prizes
 		)
