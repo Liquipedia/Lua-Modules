@@ -1,4 +1,5 @@
 --- Triple Comment to Enable our LLS Plugin
+local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 describe('prize pool', function()
 	local PrizePool = require('Module:PrizePool')
 	local InfoboxLeague = require('Module:Infobox/League/Custom')
@@ -13,6 +14,7 @@ describe('prize pool', function()
 		stub(mw.ext.LiquipediaDB, "lpdb_tournament")
 		LpdbPlacementStub = stub(mw.ext.LiquipediaDB, "lpdb_placement")
 		InfoboxLeague.run(tournamentData)
+		TeamTemplateMock.setUp()
 	end)
 
 	after_each(function ()
@@ -20,9 +22,10 @@ describe('prize pool', function()
 		---@diagnostic disable-next-line: undefined-field
 		mw.ext.LiquipediaDB.lpdb:revert()
 		mw.ext.LiquipediaDB.lpdb_tournament:revert()
+		TeamTemplateMock.tearDown()
 	end)
 
-	local prizePoolArgs = {
+	local prizePool1Args = {
 		type = {type = 'solo'},
 		currencyroundprecision = 3,
 		lpdb_prefix = 'abc',
@@ -39,8 +42,19 @@ describe('prize pool', function()
 		[2] = {qualified1 = true, [1] = {'Salt'}},
 	}
 
+	local prizePool2Args = {
+		type = {type = 'team'},
+		currencyroundprecision = 2,
+		lpdb_prefix = 'abc',
+		import = false,
+		playershare = true,
+		[1] = {usdprize = '400000', playershare = '200000', [1] = {'mouz'}},
+		[2] = {usdprize = '1,000', [1] = {'t1'}},
+	}
+
 	it('parameters are correctly parsed', function()
-		local ppt = PrizePool(prizePoolArgs):create()
+		local ppt = PrizePool(prizePool1Args):create()
+		local ppt2 = PrizePool(prizePool2Args):create()
 
 		assert.are_same(
 			{
@@ -73,6 +87,14 @@ describe('prize pool', function()
 			},
 			ppt.prizes
 		)
+		assert.are_same(
+			{
+				{id = 'BASE_CURRENCY1', type = 'BASE_CURRENCY', index = 1, data = {roundPrecision = 2}},
+				{id = 'PLAYER_SHARE1', type = 'PLAYER_SHARE', index = 1, data = {title = 'Player Share'}},
+				{id = 'CLUB_SHARE1', type = 'CLUB_SHARE', index = 1, data = {title = 'Club Share', roundPrecision = 2}},
+			},
+			ppt2.prizes
+		)
 
 		assert.are_same(
 			{
@@ -96,11 +118,12 @@ describe('prize pool', function()
 
 	describe('prize pool is correct', function()
 		it('display', function()
-			GoldenTest('prize_pool', tostring(PrizePool(prizePoolArgs):create():build()))
+			GoldenTest('prize_pool', tostring(PrizePool(prizePool1Args):create():build()))
+			GoldenTest('prize_pool_player_share', tostring(PrizePool(prizePool2Args):create():build()))
 		end)
 
 		it('lpdb storage', function()
-			PrizePool(prizePoolArgs):create():build()
+			PrizePool(prizePool1Args):create():build()
 			assert.stub(LpdbPlacementStub).was.called_with('ranking_abc1_Rathoz', {
 				date = '2022-10-15',
 				extradata = '{"prizepoints":"","prizepoints2":""}',
@@ -157,42 +180,106 @@ describe('prize pool', function()
 				type = 'Offline',
 				qualified = 1,
 			})
+
+			PrizePool(prizePool2Args):create():build()
+			assert.stub(LpdbPlacementStub).was.called_with('ranking_abc_mouz', {
+				date = '2022-10-15',
+				extradata = '{"playershare":200000,"prizepoints":"","prizepoints2":""}',
+				game = 'commons',
+				icon = 'test.png',
+				icondark = 'test dark.png',
+				image = 'MOUZ allmode.png',
+				imagedark = 'MOUZ allmode.png',
+				individualprizemoney = 0,
+				lastvsdata = '[]',
+				liquipediatier = '1',
+				liquipediatiertype = 'Qualifier',
+				opponentname = 'MOUZ',
+				opponentplayers = '[]',
+				opponenttype = 'team',
+				opponenttemplate = 'mouz 2021',
+				parent = 'FakePage',
+				participant = 'MOUZ', -- Legacy
+				participantlink = 'MOUZ', -- Legacy
+				participanttemplate = 'mouz 2021',
+				placement = 1,
+				players = '[]', -- Legacy
+				prizemoney = 400000,
+				prizepoolindex = 2,
+				series = 'Test Series',
+				shortname = 'Test Tourney',
+				startdate = '2022-10-13',
+				tournament = 'Test Tournament',
+				type = 'Offline',
+				qualified = 0,
+			})
+			assert.stub(LpdbPlacementStub).was.called_with('ranking_abc_t1', {
+				date = '2022-10-15',
+				extradata = '{"prizepoints":"","prizepoints2":""}',
+				game = 'commons',
+				icon = 'test.png',
+				icondark = 'test dark.png',
+				image = 'T1 2019 allmode.png',
+				imagedark = 'T1 2019 allmode.png',
+				individualprizemoney = 0,
+				lastvsdata = '[]',
+				liquipediatier = '1',
+				liquipediatiertype = 'Qualifier',
+				opponentname = 'T1',
+				opponentplayers = '[]',
+				opponenttype = 'team',
+				opponenttemplate = 't1 2019',
+				parent = 'FakePage',
+				participant = 'T1', -- Legacy
+				participantlink = 'T1', -- Legacy
+				participanttemplate = 't1 2019',
+				placement = 2,
+				players = '[]', -- Legacy
+				prizemoney = 1000,
+				prizepoolindex = 2,
+				series = 'Test Series',
+				shortname = 'Test Tourney',
+				startdate = '2022-10-13',
+				tournament = 'Test Tournament',
+				type = 'Offline',
+				qualified = 0,
+			})
 		end)
 	end)
 
 	describe('enabling/disabling lpdb storage', function()
 		it('normal behavior', function()
-			PrizePool(prizePoolArgs):create():build()
+			PrizePool(prizePool1Args):create():build()
 			assert.stub(LpdbPlacementStub).called(2)
 		end)
 
 		it('disabled', function()
-			PrizePool(Table.merge(prizePoolArgs, {storelpdb = false})):create():build()
+			PrizePool(Table.merge(prizePool1Args, {storelpdb = false})):create():build()
 			assert.stub(LpdbPlacementStub).called(0)
 		end)
 
 		it('wiki-var enabled', function()
 			Variables.varDefine('disable_LPDB_storage', 'false')
-			PrizePool(prizePoolArgs):create():build()
+			PrizePool(prizePool1Args):create():build()
 			assert.stub(LpdbPlacementStub).called(2)
 		end)
 
 		it('wiki-var enabled with override', function()
 			Variables.varDefine('disable_LPDB_storage', 'false')
-			PrizePool(Table.merge(prizePoolArgs, {storelpdb = false})):create():build()
+			PrizePool(Table.merge(prizePool1Args, {storelpdb = false})):create():build()
 			assert.stub(LpdbPlacementStub).called(0)
 		end)
 
 
 		it('wiki-var disable with override', function()
 			Variables.varDefine('disable_LPDB_storage', 'true')
-			PrizePool(Table.merge(prizePoolArgs, {storelpdb = true})):create():build()
+			PrizePool(Table.merge(prizePool1Args, {storelpdb = true})):create():build()
 			assert.stub(LpdbPlacementStub).called(2)
 		end)
 
 		it('wiki-var disable without override', function()
 			Variables.varDefine('disable_LPDB_storage', 'true')
-			PrizePool(prizePoolArgs):create():build()
+			PrizePool(prizePool1Args):create():build()
 			assert.stub(LpdbPlacementStub).called(0)
 		end)
 	end)
