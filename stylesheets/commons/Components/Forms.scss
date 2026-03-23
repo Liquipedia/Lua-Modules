@@ -1,3 +1,46 @@
+// Duplicated from Components/Buttons.scss — kept local so this file is self-contained.
+@mixin button-style-ghost {
+	/* stylelint-disable-next-line declaration-property-value-disallowed-list */
+	outline-style: none;
+
+	.theme--light & {
+		color: var( --clr-primary-44 );
+	}
+
+	.theme--dark & {
+		color: var( --clr-primary-80 );
+	}
+
+	@media ( hover: hover ) {
+		&:hover {
+			.theme--light & {
+				background-color: var( --clr-on-surface-light-primary-4 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+			}
+		}
+	}
+
+	&:active,
+	&.btn--active {
+		.theme--light & {
+			background-color: var( --clr-on-surface-light-primary-8 );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-8 );
+		}
+	}
+
+	&:focus,
+	&:focus-within,
+	&:focus-visible {
+		outline-style: solid;
+	}
+}
+
 /* Common button styles shared in btn-secondary and btn-ghost */
 @mixin form-button-style-base {
 	display: inline-flex;
