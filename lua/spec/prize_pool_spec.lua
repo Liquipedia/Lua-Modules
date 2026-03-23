@@ -1,12 +1,11 @@
 --- Triple Comment to Enable our LLS Plugin
+local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 describe('prize pool', function()
 	local PrizePool = require('Module:PrizePool')
 	local InfoboxLeague = require('Module:Infobox/League/Custom')
 	local Table = require('Module:Table')
 	local Variables = require('Module:Variables')
 	local tournamentData = require('test_assets.tournaments').dummy
-	local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
-	TeamTemplateMock.setUp()
 
 	local LpdbPlacementStub
 
@@ -15,6 +14,7 @@ describe('prize pool', function()
 		stub(mw.ext.LiquipediaDB, "lpdb_tournament")
 		LpdbPlacementStub = stub(mw.ext.LiquipediaDB, "lpdb_placement")
 		InfoboxLeague.run(tournamentData)
+		TeamTemplateMock.setUp()
 	end)
 
 	after_each(function ()
@@ -22,6 +22,7 @@ describe('prize pool', function()
 		---@diagnostic disable-next-line: undefined-field
 		mw.ext.LiquipediaDB.lpdb:revert()
 		mw.ext.LiquipediaDB.lpdb_tournament:revert()
+		TeamTemplateMock.tearDown()
 	end)
 
 	local prizePool1Args = {
@@ -276,6 +277,4 @@ describe('prize pool', function()
 			assert.stub(LpdbPlacementStub).called(0)
 		end)
 	end)
-
-	TeamTemplateMock.tearDown()
 end)
