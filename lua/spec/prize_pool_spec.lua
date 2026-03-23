@@ -5,6 +5,8 @@ describe('prize pool', function()
 	local Table = require('Module:Table')
 	local Variables = require('Module:Variables')
 	local tournamentData = require('test_assets.tournaments').dummy
+	local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
+	TeamTemplateMock.setUp()
 
 	local LpdbPlacementStub
 
@@ -274,4 +276,6 @@ describe('prize pool', function()
 			assert.stub(LpdbPlacementStub).called(0)
 		end)
 	end)
+
+	TeamTemplateMock.tearDown()
 end)
