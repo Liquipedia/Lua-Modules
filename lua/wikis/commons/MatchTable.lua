@@ -13,6 +13,7 @@ local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Game = Lua.import('Module:Game')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 local I18n = Lua.import('Module:I18n')
 local Info = Lua.import('Module:Info', {loadData = true})
 local LeagueIcon = Lua.import('Module:LeagueIcon')
@@ -320,7 +321,7 @@ function MatchTable:query()
 		order = 'date desc',
 		query = 'match2id, match2opponents, match2games, date, dateexact, icon, icondark, liquipediatier, game, type,'
 			.. 'liquipediatiertype, tournament, pagename, parent, section, tickername, vod, winner, match2bracketdata,'
-			.. 'extradata, bestof',
+			.. 'extradata, bestof, publishertier',
 		limit = 50,
 	}, function(match)
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
@@ -769,6 +770,7 @@ end
 ---@return Widget
 function MatchTable:matchRow(match)
 	return TableWidgets.Row{
+		highlighted = HighlightConditions.tournament(Tournament.partialTournamentFromMatch(match), self.args),
 		children = WidgetUtil.collect(
 			self:_displayDate(match),
 			self:displayTier(match),
