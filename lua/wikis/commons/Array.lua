@@ -58,8 +58,6 @@ end
 ---
 ---If `element` is a table and `copyFunction` is not specified,
 ---then all elements in the returned array are reference equal.
----
----This function is expensive if called with `copyFunction`.
 ---@generic T
 ---@param element T
 ---@param count integer
@@ -72,9 +70,6 @@ function Array.createRepeatedElementArray(element, count, copyFunction)
 		error('count must be non-negative')
 	elseif count == 0 then
 		return {}
-	end
-	if copyFunction then
-		mw.incrementExpensiveFunctionCount()
 	end
 	local arr = {}
 	for _ = 1, count do
