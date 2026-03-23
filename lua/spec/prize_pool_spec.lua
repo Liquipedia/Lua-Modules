@@ -242,7 +242,7 @@ describe('prize pool', function()
 				startdate = '2022-10-13',
 				tournament = 'Test Tournament',
 				type = 'Offline',
-				qualified = 1,
+				qualified = 0,
 			})
 		end)
 	end)
