@@ -108,7 +108,6 @@
 	}
 
 	&.label--placement {
-		height: calc( var( --label-scale ) * 1.25rem );
 		width: calc( var( --label-scale ) * 1.25rem );
 		font-weight: bold;
 		color: var( --placement-text-color );
