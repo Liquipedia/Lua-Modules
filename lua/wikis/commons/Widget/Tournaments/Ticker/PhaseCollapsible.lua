@@ -36,7 +36,6 @@ function TournamentsTickerPhaseCollapsible:render()
 				classes = {'tournaments-phase-collapsible__header'},
 				attributes = {
 					['data-collapsible-click-region'] = 'true',
-					['data-collapsible-exclude'] = '.general-collapsible-default-toggle',
 				},
 				children = {
 					HtmlWidgets.Span{
