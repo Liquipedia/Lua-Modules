@@ -103,6 +103,8 @@ div.main-page-banner .main-page-banner-bottom-row {
 		padding: 0.25rem;
 		width: 2.25rem;
 		height: 2.25rem;
+
+		i { font-size: 1.125rem; }
 	}
 
 	&__content {
@@ -134,6 +136,22 @@ div.main-page-banner .main-page-banner-bottom-row {
 		gap: 0.125rem 0.25rem;
 	}
 
+	&__icon-compact {
+		display: none;
+		width: 1.25rem;
+		height: 1.25rem;
+		background-color: var( --clr-on-surface-light-primary-4 );
+		border-radius: 0.25rem;
+		flex-shrink: 0;
+		overflow: hidden;
+
+		i { font-size: 0.75rem; }
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+		}
+	}
+
 	&__game-icon {
 		display: flex;
 		align-items: center;
@@ -162,6 +180,26 @@ div.main-page-banner .main-page-banner-bottom-row {
 		.theme--dark & {
 			background-color: var( --clr-on-surface-dark-primary-8 );
 			color: var( --clr-secondary-100 );
+		}
+	}
+}
+
+@media ( max-width: 359px ) {
+	.tournaments-list-item {
+		> .tournament-icon {
+			display: none;
+		}
+
+		&__name {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		&__icon-compact {
+			display: flex;
+			align-items: center;
+			justify-content: center;
 		}
 	}
 }

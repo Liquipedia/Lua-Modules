@@ -10,10 +10,12 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local DateRange = Lua.import('Module:Widget/Misc/DateRange')
+local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local TierPill = Lua.import('Module:Widget/Tournament/TierPill')
 
@@ -34,7 +36,23 @@ function TournamentsTickerListItemWidget:render()
 		return
 	end
 
-	local badgeChildren = {}
+	local hasIcon = not Logic.isEmpty(tournament.icon) or not Logic.isEmpty(tournament.iconDark)
+	local iconWidget = hasIcon
+		and LeagueIcon.display{
+			icon = tournament.icon,
+			iconDark = tournament.iconDark,
+			series = tournament.series,
+			link = tournament.pageName,
+			options = {noTemplate = true},
+		}
+		or Icon{iconName = 'firstplace'}
+
+	local badgeChildren = {
+		HtmlWidgets.Span{
+			classes = {'tournaments-list-item__icon-compact'},
+			children = iconWidget,
+		},
+	}
 	if self.props.displayGameIcon then
 		table.insert(badgeChildren, HtmlWidgets.Div{
 			classes = {'tournaments-list-item__game-icon'},
@@ -56,13 +74,7 @@ function TournamentsTickerListItemWidget:render()
 		children = {
 			HtmlWidgets.Span{
 				classes = {'tournament-icon'},
-				children = LeagueIcon.display{
-					icon = tournament.icon,
-					iconDark = tournament.iconDark,
-					series = tournament.series,
-					link = tournament.pageName,
-					options = {noTemplate = true},
-				},
+				children = iconWidget,
 			},
 			HtmlWidgets.Div{
 				classes = {'tournaments-list-item__content'},
