@@ -39,7 +39,6 @@ return {
 			autoTeam = true,
 			automatedHistory = {
 				mode = 'automatic',
-				storeFromWikiCode = true,
 			},
 		},
 	},
