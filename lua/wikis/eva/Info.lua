@@ -11,7 +11,7 @@ return {
 	name = 'EVA',
 	defaultGame = 'eva',
 	games = {
-		eva= {
+		eva = {
 			abbreviation = 'EVA',
 			name = 'EVA',
 			link = 'Esports Virtual Arena',
