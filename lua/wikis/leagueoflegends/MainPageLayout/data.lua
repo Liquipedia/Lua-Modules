@@ -16,7 +16,7 @@ local Comparator = Condition.Comparator
 local ColumnName = Condition.ColumnName
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
-local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -102,7 +102,8 @@ local CONTENT = {
 			modifierTypeQualifier = -2,
 			modifierTier1 = 55,
 			modifierTier2 = 55,
-			modifierTier3 = 10
+			modifierTier3 = 10,
+			tierColorScheme = 'top3',
 		},
 		padding = true,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
