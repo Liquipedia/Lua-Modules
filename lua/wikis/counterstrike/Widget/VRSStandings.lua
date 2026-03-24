@@ -195,7 +195,6 @@ end
 ---@private
 ---@return VRSStandingsStanding[]
 ---@return VRSStandingsSettings
-
 function VRSStandings:_parse()
     local props = self.props
     local datapointType = props.datapointType or DATAPOINT_TYPE_LIVE
@@ -293,10 +292,10 @@ function VRSStandings:_parse()
 			for _, flag in ipairs(settings.filterCountry) do
 				filterSet[flag] = true
 			end
-			local matchingPlayers = Array.filter(entry.opponent.players, function(player)
+			local matchingPlayers = Array.filter(entry.opponent.players, function (player)
 				return player ~= nil
 					and player.flag ~= nil
-					and filterSet[player.flag] == true
+					and filterSet[player.flag]
 			end)
 			return #matchingPlayers >= 3
 		end
@@ -428,11 +427,11 @@ function VRSStandings._fetch(updated, datapointType)
 	end
 
 		local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = conditions:toString(),
-		query = 'extradata, date',
-		order = 'date desc',
-		limit = 1,
-	})
+			conditions = conditions:toString(),
+			query = 'extradata, date',
+			order = 'date desc',
+			limit = 1,
+		})
 
 	assert(data[1], 'No VRS data found for type "' .. datapointType .. '" on date "' .. updated .. '"')
 	return data[1].extradata, data[1].date
