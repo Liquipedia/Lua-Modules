@@ -1,0 +1,48 @@
+---
+-- @Liquipedia
+-- page=Module:MatchGroup/Input/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local FnUtil = Lua.import('Module:FnUtil')
+local Operator = Lua.import('Module:Operator')
+
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
+
+local CustomMatchGroupInput = {}
+
+---@class EvaMatchParser: MatchParserInterface
+local MatchFunctions = {
+	DEFAULT_MODE = 'team',
+	getBestOf = MatchGroupInputUtil.getBestOf,
+}
+
+---@class EvaMapParser: MapParserInterface
+local MapFunctions = {}
+
+---@param match table
+---@param options table?
+---@return table
+function CustomMatchGroupInput.processMatch(match, options)
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
+end
+
+-- "Normal" match
+---@param match table
+---@param opponents MGIParsedOpponent[]
+---@return table[]
+function MatchFunctions.extractMaps(match, opponents)
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
+end
+
+---@param maps table[]
+---@return fun(opponentIndex: integer): integer?
+function MatchFunctions.calculateMatchScore(maps)
+	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
+end
+
+return CustomMatchGroupInput
