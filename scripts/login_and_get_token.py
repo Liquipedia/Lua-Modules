@@ -8,7 +8,7 @@ from deploy_util import HEADER, SLEEP_DURATION, get_wiki_api_url, read_cookie_ja
 
 __all__ = ["get_token"]
 
-DRY_RUN = bool(int(os.getenv("DRY_RUN") or 0))
+DRY_RUN = bool(int(os.getenv("DRY_RUN", 0)))
 WIKI_USER = os.getenv("WIKI_USER")
 WIKI_PASSWORD = os.getenv("WIKI_PASSWORD")
 

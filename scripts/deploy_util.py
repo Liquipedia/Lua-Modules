@@ -21,7 +21,7 @@ __all__ = [
 ]
 
 DEPLOY_TRIGGER = os.getenv("DEPLOY_TRIGGER")
-DRY_RUN = bool(int(os.getenv("DRY_RUN") or 0))
+DRY_RUN = bool(int(os.getenv("DRY_RUN", 0)))
 GITHUB_STEP_SUMMARY_FILE = os.getenv("GITHUB_STEP_SUMMARY")
 USER_AGENT = f"GitHub Autodeploy Bot/2.0.0 ({os.getenv('WIKI_UA_EMAIL')})"
 WIKI_BASE_URL = os.getenv("WIKI_BASE_URL")
