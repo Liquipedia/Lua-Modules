@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
-local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
+local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -74,11 +74,9 @@ local CONTENT = {
 			upcomingDays = 21,
 			modifierTier1 = 42,
 			completedDays = 14,
-			displayGameIcons = true,
-			tierColorScheme = 'top3',
-			variant = 'collapsible',
+			displayGameIcons = true
 		},
-		padding = false,
+		padding = true,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 }
