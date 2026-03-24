@@ -21,6 +21,7 @@ __all__ = [
 ]
 
 DEPLOY_TRIGGER = os.getenv("DEPLOY_TRIGGER")
+DRY_RUN = bool(int(os.getenv("DRY_RUN") or 0))
 GITHUB_STEP_SUMMARY_FILE = os.getenv("GITHUB_STEP_SUMMARY")
 USER_AGENT = f"GitHub Autodeploy Bot/2.0.0 ({os.getenv('WIKI_UA_EMAIL')})"
 WIKI_BASE_URL = os.getenv("WIKI_BASE_URL")
@@ -64,20 +65,27 @@ def deploy_file_to_wiki(
     token: str,
     deploy_reason: str,
 ) -> tuple[bool, bool]:
-    change_made = False
-    deployed = True
-    response = session.post(
-        get_wiki_api_url(wiki),
-        headers=HEADER,
-        params={"format": "json", "action": "edit"},
-        data={
+    payload = {
             "title": target_page,
             "text": file_content,
             "summary": f"Git: {deploy_reason}",
             "bot": "true",
             "recreate": "true",
             "token": token,
-        },
+        }
+    if DRY_RUN:
+        print(f"HEADER: {HEADER}")
+        print(f"PARAM: { {"format": "json", "action": "edit"} }")
+        print(f"DATA: {payload}")
+        return True, False
+
+    change_made = False
+    deployed = True
+    response = session.post(
+        get_wiki_api_url(wiki),
+        headers=HEADER,
+        params={"format": "json", "action": "edit"},
+        data=payload,
     ).json()
     edit_info = response.get("edit")
     error_info = response.get("error")
