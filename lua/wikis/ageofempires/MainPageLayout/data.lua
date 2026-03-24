@@ -76,6 +76,7 @@ local CONTENT = {
 			completedDays = 14,
 			displayGameIcons = true,
 			tierColorScheme = 'top3',
+			variant = 'collapsible',
 		},
 		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
