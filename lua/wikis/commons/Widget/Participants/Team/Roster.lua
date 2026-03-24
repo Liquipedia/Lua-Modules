@@ -138,12 +138,6 @@ function ParticipantsTeamRoster:render()
 
 	---@param groups {label: string?, players: table[]}[]
 	local makeRostersDisplay = function(groups)
-		if #groups == 1 then
-			return Div{
-				classes = { 'team-participant-roster' },
-				children = Array.map(groups[1].players, makePlayerWidget),
-			}
-		end
 		local children = {}
 		for _, group in ipairs(groups) do
 			if group.label then
@@ -185,7 +179,7 @@ function ParticipantsTeamRoster:render()
 			end
 		end
 		if not groups then
-			groups = { { label = nil, players = tabPlayers } }
+			groups = { { players = tabPlayers } }
 		end
 
 		return {
@@ -208,7 +202,7 @@ function ParticipantsTeamRoster:render()
 	then
 		-- If we only have main and staff, and exactly one staff, just show both rosters without a switch
 		local mergedPlayers = sortPlayers(Array.extend(tabs[1].players, tabs[2].players))
-		return makeRostersDisplay({ { label = nil, players = mergedPlayers } })
+		return makeRostersDisplay({ { players = mergedPlayers } })
 	end
 	tabs = Array.sortBy(tabs, Operator.property('order'))
 
