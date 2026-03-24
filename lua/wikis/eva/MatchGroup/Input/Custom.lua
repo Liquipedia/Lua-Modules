@@ -45,4 +45,12 @@ function MatchFunctions.calculateMatchScore(maps)
 	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
+---@param match table
+---@return table
+function MatchFunctions.getExtraData(match)
+	return {
+		mapveto = MatchGroupInputUtil.getMapVeto(match),
+	}
+end
+
 return CustomMatchGroupInput
