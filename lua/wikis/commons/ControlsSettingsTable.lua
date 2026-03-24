@@ -7,6 +7,7 @@
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Info = Lua.import('Module:Info')
 
@@ -18,17 +19,17 @@ local ControlsSettingsTable = Class.new()
 ---@return Widget
 function ControlsSettingsTable.create(frame)
 	local args = Arguments.getArgs(frame)
-	local columnConfig = Info.controlsSettingsTable
-	local widget = ControlsSettingsTableWidget(columnConfig, args)
-	ControlsSettingsTable.saveToLpdb(columnConfig, args)
+	local config = Info.controlsSettingsTable
+	local widget = ControlsSettingsTableWidget(config, args)
+	ControlsSettingsTable.saveToLpdb(config, args)
 	return widget:render()
 end
 
----@param columnConfig {keys: string[], title: string}
+---@param config {keys: string[], title: string}
 ---@param args {[string]: string?}
-function ControlsSettingsTable.saveToLpdb(columnConfig, args)
+function ControlsSettingsTable.saveToLpdb(config, args)
 	local title = mw.title.getCurrentTitle().text
-	local extradata = ControlsSettingsTable.generateLpdbExtradata(columnConfig, args)
+	local extradata = ControlsSettingsTable.generateLpdbExtradata(config, args)
 	mw.ext.LiquipediaDB.lpdb_settings(title, {
 		name = 'movement',
 		reference = args.ref,
@@ -38,16 +39,16 @@ function ControlsSettingsTable.saveToLpdb(columnConfig, args)
 	})
 end
 
----@param columnConfig {keys: string[], title: string}
+---@param config {keys: string[], title: string}
 ---@param args {[string]: string?}
 ---@return {[string]: string?}
-function ControlsSettingsTable.generateLpdbExtradata(columnConfig, args)
+function ControlsSettingsTable.generateLpdbExtradata(config, args)
 	local lpdbData = {}
-	for _, item in ipairs(columnConfig) do
-		for _, key in ipairs(item.keys) do
+	Array.forEach(config, function(item)
+		Array.forEach(item.keys, function(key)
 			lpdbData[key:lower()] = args[key:lower()]
-		end
-	end
+		end)
+	end)
 	return lpdbData
 end
 

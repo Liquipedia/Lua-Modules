@@ -1,42 +1,7 @@
 /*******************************************************************************
-Template(s): Responsive Table
-Author(s): QuadratClown, SobakaPirat
+Template(s): Rocket League Responsive Table
+Author(s): QuadratClown
 *******************************************************************************/
-.controls-responsive-table {
-	margin: 0;
-
-	td {
-		text-align: center;
-	}
-
-	@media screen and ( max-width: 947px ) {
-		width: 100%;
-
-		tr {
-			display: block;
-		}
-
-		tr:nth-child( 2 ) {
-			display: none;
-		}
-
-		th,
-		td {
-			display: block;
-			width: 100%;
-			font-size: 0.8em;
-			text-align: right;
-			border-left: 0;
-
-			&::before {
-				content: attr( data-label );
-				float: left;
-				font-weight: bold;
-			}
-		}
-	}
-}
-
 .rl-responsive-table {
 	border-collapse: collapse;
 	margin: 0;

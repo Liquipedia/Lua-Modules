@@ -11,165 +11,184 @@ local Array = Lua.import('Module:Array')
 local ButtonTranslation = Lua.import('Module:Links/ButtonTranslation')
 local Class = Lua.import('Module:Class')
 local Date = Lua.import('Module:Date/Ext')
+local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
-local Template = Lua.import('Module:Template')
 
-local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
+local Dialog = Lua.import('Module:Widget/Basic/Dialog')
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Image = Lua.import('Module:Widget/Image/Icon/Image')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local Widget = Lua.import('Module:Widget')
+
+-- table2 aliases
+local Row = TableWidgets.Row
+local Cell = TableWidgets.Cell
+local CellHeader = TableWidgets.CellHeader
+local Table2 = TableWidgets.Table
+local TableBody = TableWidgets.TableBody
 
 ---@class ControlsSettingsTableWidget: Widget
----@field columnConfig {keys: string[], title: string}
+---@field config {keys: string[], title: string}
 ---@field args {[string]: string?}
----@field frame table
 local ControlsSettingsTableWidget = Class.new(Widget,
-	function(self, columnConfig, args, frame)
-		self.columnConfig = columnConfig
+	function(self, config, args)
+		self.config = config
 		self.args = args
-		self.frame = frame or mw.getCurrentFrame()
 	end
 )
 
 ---@return Widget
 function ControlsSettingsTableWidget:render()
-	return HtmlWidgets.Div{children = {self:renderTable()}}
-end
-
----@return Widget
-function ControlsSettingsTableWidget:renderTable()
-	local columns = self:getColumns()
-	local columnsNumber = #columns
-	return HtmlWidgets.Table{
-		classes = {'wikitable', 'controls-responsive-table'},
-		children = WidgetUtil.collect(
-			self:renderHeader(columnsNumber),
-			self:renderColumnHeaders(columns),
-			self:renderDataRow(columns),
-			self:renderFooter(columnsNumber)
-		)
+	local rows = self:getRows()
+	return Table2{
+		title = self:makeHeaderDisplay(),
+		children = TableBody{children = rows},
+		footer = self:makeWarningDisplay(),
 	}
 end
 
----@return {title: string, value: string}
-function ControlsSettingsTableWidget:getColumns()
-    return Array.map(self.columnConfig, function(column)
-        local buttons = Array.map(column.keys, function(key)
-            return self:formatToImage(self.args, key) or '-'
+---@return Widget[]
+function ControlsSettingsTableWidget:getRows()
+	local nonEmptyRows = Array.filter(self.config, function(configRow)
+        return Array.any(configRow.keys, function(key)
+            return String.isNotEmpty(self.args[key:lower()])
         end)
-        local argsEmpty = Array.all(buttons, function(value)
-            return value == '-'
+    end)
+    return Array.map(nonEmptyRows, function(configRow)
+        local buttons = Array.map(configRow.keys, function(key)
+            return self:makeButtonIcon(self.args, key) or self:makeButtonStubIcon()
         end)
-        if argsEmpty then
-            return nil
-        end
-        return {
-            title = column.title,
-            value = table.concat(buttons, ' / ')
-        }
+        return ControlsSettingsTableWidget:makeRow(configRow.title, buttons)
     end)
 end
 
 ---@param args {[string]: string?}
 ---@param key string
----@return string?
-function ControlsSettingsTableWidget:formatToImage(args, key)
-	local buttonText = '[[File: ${image} | ${button} | link=]]'
+---@return Widget?
+function ControlsSettingsTableWidget:makeButtonIcon(args, key)
 	local button = args[key:lower()]
 	if String.isEmpty(button) then
 		return nil
 	end
+	---@cast button string
 	if args.controller and args.controller:lower() == 'kbm' then
-		return '<kbd>' .. button .. '</kbd>'
+		return HtmlWidgets.Kbd{children = button}
 	end
-	return String.interpolate(buttonText, {image = self:getImageName(args.controller, button), button = key})
+	local imageName = self:getImageName(args.controller, button)
+	return self:makeImageWidget(imageName, button)
 end
 
 ---@param device string?
----@param key string?
+---@param button string?
 ---@return string
-function ControlsSettingsTableWidget:getImageName(device, key)
-	device = (device or ''):lower()
-    key = (key or ''):lower():gsub(' ', '_')
-	return ButtonTranslation[device][key] or 'ImageNotFound'
+function ControlsSettingsTableWidget:getImageName(device, button)
+	device = Logic.nilOr(device, ''):lower()
+    button = Logic.nilOr(button, ''):lower():gsub(' ', '_')
+	return ButtonTranslation[device][button] or 'ImageNotFound'
 end
 
----@param columnsNumber integer
+---@param imageName string
+---@param button string
 ---@return Widget
-function ControlsSettingsTableWidget:renderHeader(columnsNumber)
-	return HtmlWidgets.Tr{children = {
-		HtmlWidgets.Th{
-			attributes = {colspan = columnsNumber},
-			children = {
-				self:makeHeaderText(),
-				' ',
-				HtmlWidgets.Small{children = '([[List of player control settings|list of]])'}
+function ControlsSettingsTableWidget:makeImageWidget(imageName, button)
+	return Image{
+			imageLight = imageName,
+			size = 'md',
+			caption = button,
+			alt = button,
+		}
+end
+
+---@return Widget
+function ControlsSettingsTableWidget:makeButtonStubIcon()
+	return IconFa{iconName = 'no', size = 'sm'}
+end
+
+---@private
+---@param title string
+---@param value Widget
+---@return Widget
+function ControlsSettingsTableWidget:makeRow(title, value)
+	return Row{
+		children = {
+			CellHeader{children = title, align = 'right'},
+			Cell{
+				children = HtmlWidgets.Div{
+					children = value,
+					css = {display = 'flex', gap = '6px', ['align-items'] = 'center'}
+				},
+				align = 'left'
 			}
 		}
-	}}
+	}
 end
 
----@return string
-function ControlsSettingsTableWidget:makeHeaderText()
-	local headerText = 'Control settings ${ref}'
+---@return Widget
+function ControlsSettingsTableWidget:makeHeaderDisplay()
+	return HtmlWidgets.Div{
+		css = {['text-align'] = 'center'},
+		children = {
+			'Control settings',
+			HtmlWidgets.Span{
+				children = self:makeReferenceDisplay(),
+				css = {['margin-left'] = '10px'}
+			}
+		}
+	}
+end
+
+function ControlsSettingsTableWidget:makeReferenceDisplay()
+	local timestamp = Date.readTimestamp(self.args.date)
+	local date = timestamp and Date.formatTimestamp('M j, Y', timestamp) or '?'
+	return Dialog{
+			trigger =  IconFa{
+				iconName = 'reference',
+				size = 'sm',
+			},
+			title = 'Reference',
+			children = HtmlWidgets.Div{
+				children = {
+					self:makeReferenceSource(),
+					HtmlWidgets.Br{},
+					HtmlWidgets.I{
+						children = 'Last updated on ' .. date
+					}
+				}
+		}
+	}
+end
+
+---@return string|Widget
+function ControlsSettingsTableWidget:makeReferenceSource()
 	local args = self.args
-	local frame = self.frame
-	local reference = ''
-	if args.ref == 'insidesource' then
-		reference = frame:extensionTag('ref', Template.safeExpand(frame, 'inside source'))
-	elseif args.ref then
-		reference = frame:extensionTag('ref', args['ref'])
+	if args.ref and args.ref:lower():gsub(' ', '') == 'insidesource' then
+		return HtmlWidgets.Abbr{
+			children = 'Inside source',
+			attributes = {title = 'Liquipedia has gained this information from a trusted inside source'}
+		}
 	end
-	return String.interpolate(headerText, {ref = reference})
+	return Logic.nilOr(self.args.ref, '?')
 end
 
----@param columns {title: string, value: string}
----@return Widget
-function ControlsSettingsTableWidget:renderColumnHeaders(columns)
-	return HtmlWidgets.Tr{children = Array.map(columns, function(column)
-		return HtmlWidgets.Th{children = column.title}
-	end)}
-end
-
----@param columns {title: string, value: string}
----@return Widget
-function ControlsSettingsTableWidget:renderDataRow(columns)
-	return HtmlWidgets.Tr{children = Array.map(columns, function(column)
-		return HtmlWidgets.Td{
-			attributes = {['data-label'] = column.title},
-			children = column.value
-		}
-	end)}
-end
-
----@param columnsNumber integer
----@return Widget
-function ControlsSettingsTableWidget:renderFooter(columnsNumber)
-	local footerText = self:makeFooterText()
-	return HtmlWidgets.Tr{children = {
-		HtmlWidgets.Th{
-			attributes = {colspan = columnsNumber},
-			css = {['font-size'] = '85%'},
-			children = String.isNotEmpty(footerText)
-				and {HtmlWidgets.I{children = footerText}}
-				or {HtmlWidgets.Span{
-					classes = {'cinnabar-text'},
-					children = {HtmlWidgets.I{children = 'No date of last update specified!'}}
-				}}
-		}
-	}}
-end
-
----@return string?
-function ControlsSettingsTableWidget:makeFooterText()
-	local footerText = 'Last updated on ${date} (${daysAgo} days ago).'
-	local args = self.args
-	if args.date then
-		local currentTimestamp = Date.getCurrentTimestamp()
-		local targetTimestamp = Date.readTimestamp(args.date)
-		local daysAgo = math.floor((currentTimestamp - targetTimestamp) / 86400)
-		return String.interpolate(footerText, {date = args.date, daysAgo = daysAgo})
+---@return Widget?
+function ControlsSettingsTableWidget:makeWarningDisplay()
+	if Logic.isEmpty(self.args.ref) then
+		return self:makeWarning('No reference specified!')
+	elseif Logic.isEmpty(self.args.date) then
+		return self:makeWarning('No date of last update specified!')
 	end
 	return nil
+end
+
+---@param text string
+---@return Widget
+function ControlsSettingsTableWidget:makeWarning(text)
+	return {HtmlWidgets.Span{
+		classes = {'cinnabar-text'},
+		children = {HtmlWidgets.I{children = text}},
+		css = {['font-size'] = '90%'}
+	}}
 end
 
 return ControlsSettingsTableWidget
