@@ -54,7 +54,7 @@ def get_token(wiki: str) -> str:
     login(wiki)
 
     if DRY_RUN:
-        return 'DRY_RUN_DUMMY_TOKEN'
+        return "DRY_RUN_DUMMY_TOKEN"
 
     with requests.Session() as session:
         session.cookies = read_cookie_jar(wiki)

@@ -66,16 +66,16 @@ def deploy_file_to_wiki(
     deploy_reason: str,
 ) -> tuple[bool, bool]:
     payload = {
-            "title": target_page,
-            "text": file_content,
-            "summary": f"Git: {deploy_reason}",
-            "bot": "true",
-            "recreate": "true",
-            "token": token,
-        }
+        "title": target_page,
+        "text": file_content,
+        "summary": f"Git: {deploy_reason}",
+        "bot": "true",
+        "recreate": "true",
+        "token": token,
+    }
     if DRY_RUN:
         print(f"HEADER: {HEADER}")
-        print(f"PARAM: { {"format": "json", "action": "edit"} }")
+        print(f"PARAM: { {'format': 'json', 'action': 'edit'} }")
         print(f"DATA: {payload}")
         return True, False
 
