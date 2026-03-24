@@ -221,6 +221,10 @@ div.main-page-banner .main-page-banner-bottom-row {
 .tournaments-phase-collapsible {
 	padding: 0.75rem 0.75rem 0.25rem;
 
+	& + & {
+		padding-top: 0;
+	}
+
 	&__header {
 		background-color: var( --clr-on-surface-light-primary-4 );
 		border-radius: 0.625rem;
