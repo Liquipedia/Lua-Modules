@@ -6,13 +6,8 @@
 --
 
 local Lua = require('Module:Lua')
-
-local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
-local Operator = Lua.import('Module:Operator')
-
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-
 local CustomMatchGroupInput = {}
 
 ---@class EvaMatchParser: MatchParserInterface
