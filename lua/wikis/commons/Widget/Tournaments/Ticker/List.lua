@@ -16,6 +16,7 @@ local Widget = Lua.import('Module:Widget')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local ListItem = Lua.import('Module:Widget/Tournaments/Ticker/ListItem')
+local PhaseCollapsible = Lua.import('Module:Widget/Tournaments/Ticker/PhaseCollapsible')
 local TickerData = Lua.import('Module:Widget/Tournaments/Ticker/Data')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
 
@@ -25,6 +26,7 @@ local TournamentsTickerListWidget = Class.new(Widget)
 TournamentsTickerListWidget.defaultProps = {
 	upcomingDays = 5,
 	completedDays = 5,
+	variant = 'tabs',
 }
 
 ---@return Widget
@@ -88,7 +90,7 @@ function TournamentsTickerListWidget:render()
 		}
 	end
 
-	return ContentSwitch{
+	local tabsWidget = ContentSwitch{
 		css = { margin = '0.75rem'},
 		switchGroup = 'tournament-list-phase',
 		defaultActive = 2,
@@ -97,6 +99,27 @@ function TournamentsTickerListWidget:render()
 			{label = 'Upcoming', value = 'upcoming', content = buildTabContent(data.upcoming)},
 			{label = 'Ongoing', value = 'ongoing', content = buildTabContent(data.ongoing)},
 			{label = 'Completed', value = 'completed', content = buildTabContent(data.completed)},
+		},
+	}
+
+	if self.props.variant ~= 'collapsible' then
+		return tabsWidget
+	end
+
+	return HtmlWidgets.Div{
+		children = {
+			HtmlWidgets.Div{
+				classes = {'tournaments-list--tabs'},
+				children = tabsWidget,
+			},
+			HtmlWidgets.Div{
+				classes = {'tournaments-list--collapsible'},
+				children = {
+					PhaseCollapsible{label = 'Ongoing', children = buildTabContent(data.ongoing)},
+					PhaseCollapsible{label = 'Upcoming', children = buildTabContent(data.upcoming)},
+					PhaseCollapsible{label = 'Completed', children = buildTabContent(data.completed)},
+				},
+			},
 		},
 	}
 end

@@ -166,6 +166,49 @@ div.main-page-banner .main-page-banner-bottom-row {
 	}
 }
 
+.tournaments-list--collapsible {
+	display: none;
+}
+
+@media ( min-width: 1024px ) {
+	.tournaments-list--collapsible {
+		display: block;
+	}
+
+	.tournaments-list--tabs {
+		display: none;
+	}
+}
+
+.tournaments-phase-collapsible {
+	padding: 0.75rem 0.75rem 0.25rem;
+
+	&__header {
+		background-color: var( --clr-on-surface-light-primary-4 );
+		border-radius: 0.625rem;
+		padding: 0.625rem 0.75rem;
+		display: flex;
+		align-items: center;
+		cursor: pointer;
+		user-select: none;
+
+		.theme--dark & {
+			background-color: var( --clr-on-surface-dark-primary-4 );
+		}
+	}
+
+	&__label {
+		flex: 1;
+		font-size: 0.875rem;
+		font-weight: bold;
+		color: var( --clr-secondary-25 );
+
+		.theme--dark & {
+			color: var( --clr-secondary-100 );
+		}
+	}
+}
+
 .tournaments-list-dates {
 	float: right;
 	padding-right: 10px;
