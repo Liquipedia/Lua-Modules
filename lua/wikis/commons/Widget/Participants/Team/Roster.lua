@@ -101,11 +101,11 @@ local ParticipantsTeamRoster = Class.new(Widget)
 ---@return Widget
 function ParticipantsTeamRoster:render()
 	local participant = self.props.participant
-	local makeRostersDisplay = function(players, tabType)
-		-- Used for making the sorting stable
+
+	-- Used for making the sorting stable
+	local sortPlayers = function(players)
 		local playerToIndex = Table.map(players, function(index, player) return player, index end)
-		-- Sort the players based on their roles first, then by their original order
-		players = Array.sortBy(players, FnUtil.identity, function (a, b)
+		return Array.sortBy(players, FnUtil.identity, function(a, b)
 			local function getPlayerSortOrder(player)
 				local roles = player.extradata.roles or {}
 				return roles[1] and roles[1].sortOrder or math.huge
@@ -117,92 +117,82 @@ function ParticipantsTeamRoster:render()
 			end
 			return orderA < orderB
 		end)
+	end
 
-		if tabType == TAB_ENUM.FORMER then
-			local formerPlayers = Array.filter(players, function(player)
-				return player.extradata.type ~= 'staff'
-			end)
-			local formerStaff = Array.filter(players, function(player)
-				return player.extradata.type == 'staff'
-			end)
+	local makePlayerWidget = function(player, index)
+		local playerTeam = participant.opponent.template ~= player.team and player.team or nil
+		local playerTeamAsOpponent = playerTeam and Opponent.readOpponentArgs{
+			type = Opponent.team,
+			template = playerTeam,
+		} or nil
+		local roleLeft, roleRight = getRoleDisplays(player)
+		return ParticipantsTeamMember{
+			player = player,
+			team = playerTeamAsOpponent,
+			even = index % 2 == 0,
+			roleLeft = roleLeft,
+			roleRight = roleRight,
+			trophies = player.extradata.trophies or 0,
+		}
+	end
 
-			if #formerPlayers > 0 and #formerStaff > 0 then
-				local function makeRosterSection(sectionPlayers)
-					return Div{
-						classes = { 'team-participant-roster' },
-						children = Array.map(sectionPlayers, function(player, index)
-							local playerTeam = participant.opponent.template ~= player.team and player.team or nil
-							local playerTeamAsOpponent = playerTeam and Opponent.readOpponentArgs{
-								type = Opponent.team,
-								template = playerTeam,
-							} or nil
-							local roleLeft, roleRight = getRoleDisplays(player)
-							return ParticipantsTeamMember{
-								player = player,
-								team = playerTeamAsOpponent,
-								even = index % 2 == 0,
-								roleLeft = roleLeft,
-								roleRight = roleRight,
-								trophies = player.extradata.trophies or 0,
-							}
-						end)
-					}
-				end
-
-				local children = {}
-				if #formerPlayers > 0 then
-					table.insert(children, Div{
-						classes = {'team-participant-card__subheader'},
-						children = 'Players'
-					})
-					table.insert(children, makeRosterSection(formerPlayers))
-				end
-				if #formerStaff > 0 then
-					table.insert(children, Div{
-						classes = {'team-participant-card__subheader'},
-						children = 'Staff'
-					})
-					table.insert(children, makeRosterSection(formerStaff))
-				end
-
-				return Div{
-					classes = { 'team-participant-roster' },
-					children = children
-				}
-			end
+	---@param groups {label: string?, players: table[]}[]
+	local makeRostersDisplay = function(groups)
+		if #groups == 1 then
+			return Div{
+				classes = { 'team-participant-roster' },
+				children = Array.map(groups[1].players, makePlayerWidget),
+			}
 		end
-
-		-- Render as a single roster
+		local children = {}
+		for _, group in ipairs(groups) do
+			if group.label then
+				table.insert(children, Div{
+					classes = {'team-participant-card__subheader'},
+					children = group.label,
+				})
+			end
+			table.insert(children, Div{
+				classes = { 'team-participant-roster' },
+				children = Array.map(group.players, makePlayerWidget),
+			})
+		end
 		return Div{
 			classes = { 'team-participant-roster' },
-			children = Array.map(players, function(player, index)
-				local playerTeam = participant.opponent.template ~= player.team and player.team or nil
-				local playerTeamAsOpponent = playerTeam and Opponent.readOpponentArgs{
-					type = Opponent.team,
-					template = playerTeam,
-				} or nil
-				local roleLeft, roleRight = getRoleDisplays(player)
-				return ParticipantsTeamMember{
-					player = player,
-					team = playerTeamAsOpponent,
-					even = index % 2 == 0,
-					roleLeft = roleLeft,
-					roleRight = roleRight,
-					trophies = player.extradata.trophies or 0,
-				}
-			end)
+			children = children,
 		}
 	end
 
 	local tabs = Array.map(Table.entries(TAB_DATA), function(tabTuple)
 		local tabTypeEnum, tabData = tabTuple[1], tabTuple[2]
-		local tabPlayers = Array.filter(participant.opponent.players or {}, function(player)
+		local tabPlayers = sortPlayers(Array.filter(participant.opponent.players or {}, function(player)
 			return getPlayerTab(player) == tabTypeEnum
-		end)
+		end))
+
+		local groups
+		if tabTypeEnum == TAB_ENUM.FORMER then
+			local formerPlayers = Array.filter(tabPlayers, function(player)
+				return player.extradata.type ~= 'staff'
+			end)
+			local formerStaff = Array.filter(tabPlayers, function(player)
+				return player.extradata.type == 'staff'
+			end)
+			if #formerPlayers > 0 and #formerStaff > 0 then
+				groups = {
+					{ label = 'Players', players = formerPlayers },
+					{ label = 'Staff', players = formerStaff },
+				}
+			end
+		end
+		if not groups then
+			groups = { { label = nil, players = tabPlayers } }
+		end
+
 		return {
 			order = tabData.order,
 			title = tabData.title,
 			type = tabTypeEnum,
+			groups = groups,
 			players = tabPlayers,
 		}
 	end)
@@ -217,7 +207,8 @@ function ParticipantsTeamRoster:render()
 		and #tabs[2].players == 1
 	then
 		-- If we only have main and staff, and exactly one staff, just show both rosters without a switch
-		return makeRostersDisplay(Array.extend(tabs[1].players, tabs[2].players))
+		local mergedPlayers = sortPlayers(Array.extend(tabs[1].players, tabs[2].players))
+		return makeRostersDisplay({ { label = nil, players = mergedPlayers } })
 	end
 	tabs = Array.sortBy(tabs, Operator.property('order'))
 
@@ -232,7 +223,7 @@ function ParticipantsTeamRoster:render()
 		tabs = Array.map(tabs, function(tab)
 			return {
 				label = tab.title,
-				content = makeRostersDisplay(tab.players, tab.type),
+				content = makeRostersDisplay(tab.groups),
 			}
 		end),
 	}
