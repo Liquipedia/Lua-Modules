@@ -358,8 +358,8 @@ function VRSStandings._row(standing, mainpage)
 				children = MathUtil.formatRounded{value = standing.points, precision = 1}
 			},
 			TableWidgets.Cell{
-				children = OpponentDisplay.InlineTeamContainer{
-					template = standing.opponent.template
+				children = OpponentDisplay.InlineOpponent{
+					opponent = standing.opponent
 				}
 			}
 		)
@@ -370,8 +370,8 @@ function VRSStandings._row(standing, mainpage)
 				children = MathUtil.formatRounded{value = standing.points, precision = 1}
 			},
 			TableWidgets.Cell{
-				children = OpponentDisplay.InlineTeamContainer{
-					template = standing.opponent.template
+				children = OpponentDisplay.InlineOpponent{
+					opponent = standing.opponent
 				}
 			},
 			TableWidgets.Cell{children = extradata.region or ''}
