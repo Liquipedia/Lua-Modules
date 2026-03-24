@@ -117,7 +117,7 @@ function TournamentsTickerListWidget:render()
 				children = {
 					PhaseCollapsible{label = 'Ongoing', children = buildTabContent(data.ongoing)},
 					PhaseCollapsible{label = 'Upcoming', children = buildTabContent(data.upcoming)},
-					PhaseCollapsible{label = 'Completed', children = buildTabContent(data.completed)},
+					PhaseCollapsible{label = 'Completed', collapsed = true, children = buildTabContent(data.completed)},
 				},
 			},
 		},
