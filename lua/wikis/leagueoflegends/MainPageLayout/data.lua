@@ -105,7 +105,7 @@ local CONTENT = {
 			modifierTier3 = 10,
 			tierColorScheme = 'top3',
 		},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 	headlines = {
