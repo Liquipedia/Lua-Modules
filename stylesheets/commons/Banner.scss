@@ -86,6 +86,10 @@
 			@include banner-background( "4/46/Esports-banner.png" );
 		}
 
+		.wiki-eva & {
+			@include banner-background( "0/07/Eva-banner.png" );
+		}
+		
 		.wiki-freefire & {
 			@include banner-background( "5/51/Freefire-banner.png" );
 		}
