@@ -50,29 +50,15 @@ VRSStandings.defaultProps = {
 
 ---@return Widget?
 local function buildHeaderCells(settings)
-	if settings.filterType ~= 'none' then
-		local cells = WidgetUtil.collect(
-			TableWidgets.CellHeader{children = 'Rank'},
-			TableWidgets.CellHeader{children = 'Global Rank'},
-			TableWidgets.CellHeader{children = 'Points'},
-			TableWidgets.CellHeader{children = 'Team'}
-		)
-		if not settings.mainpage then
-			table.insert(cells, TableWidgets.CellHeader{children = 'Roster'})
-		end
-		return cells
-	else
-		local cells = WidgetUtil.collect(
-			TableWidgets.CellHeader{children = 'Rank'},
-			TableWidgets.CellHeader{children = 'Points'},
-			TableWidgets.CellHeader{children = 'Team'},
-			TableWidgets.CellHeader{children = 'Region'}
-		)
-		if not settings.mainpage then
-			table.insert(cells, TableWidgets.CellHeader{children = 'Roster'})
-		end
-		return cells
-	end
+	local filtered = settings.filterType ~= 'none'
+	return WidgetUtil.collect(
+		TableWidgets.CellHeader{children = 'Rank'},
+		filtered and TableWidgets.CellHeader{children = 'Global Rank'} or nil,
+		TableWidgets.CellHeader{children = 'Points'},
+		TableWidgets.CellHeader{children = 'Team'},
+		not filtered and TableWidgets.CellHeader{children = 'Region'} or nil,
+		not settings.mainpage and TableWidgets.CellHeader{children = 'Roster'} or nil
+	)
 end
 
 local function buildHeaderRow(settings)
@@ -84,29 +70,19 @@ local function buildHeaderRow(settings)
 end
 
 local function buildColumns(settings)
-	local columns
-	if settings.filterType ~= 'none' then
-		columns = WidgetUtil.collect(
-			{align = 'center', sortType = 'number'},
-			{align = 'center', sortType = 'number'},
-			{align = 'center', sortType = 'number'},
-			{align = 'left'}
-		)
-	else
-		columns = WidgetUtil.collect(
-			{align = 'center', sortType = 'number'},
-			{align = 'center', sortType = 'number'},
-			{align = 'left'},
-			{align = 'center'}
-		)
-	end
+	local filtered = settings.filterType ~= 'none'
+	local columns = WidgetUtil.collect(
+		{align = 'center', sortType = 'number'},
+		filtered and {align = 'center', sortType = 'number'} or nil,
+		{align = 'center', sortType = 'number'},
+		{align = 'left'},
+		not filtered and {align = 'center'} or nil,
+		not settings.mainpage and {align = 'left'} or nil
+	)
 	if settings.mainpage then
-		for _, col in ipairs(columns) do
+		Array.forEach(columns, function(col)
 			col.width = (100 / #columns) .. '%'
-		end
-	end
-	if not settings.mainpage then
-		table.insert(columns, {align = 'left'})
+		end)
 	end
 	return columns
 end
