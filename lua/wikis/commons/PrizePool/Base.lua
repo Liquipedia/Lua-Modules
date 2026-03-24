@@ -387,7 +387,7 @@ BasePrizePool.prizeTypes = {
 		sortOrder = 70,
 		header = 'clubshare',
 		headerParse = function(prizePool, input, context, index)
-			return {title = 'Club Share'}
+			return {title = String.isNotEmpty(input) and input or 'Club Share'}
 		end,
 		headerDisplay = function(data)
 			return TableCell{children = {data.title}}
@@ -475,7 +475,16 @@ function BasePrizePool:create()
 			return prize.type == PRIZE_TYPE_PLAYER_SHARE
 		end)
 		if hasPlayerShare then
-			self:addPrize(PRIZE_TYPE_CLUB_SHARE, 1, {title = 'Club Share', roundPrecision = self.options.currencyRoundPrecision})
+			local alreadyHasClubShare = Array.any(self.prizes, function(prize)
+				return prize.type == PRIZE_TYPE_CLUB_SHARE
+			end)
+			if not alreadyHasClubShare then
+				local clubShareTitle = self.args.clubshare
+				self:addPrize(PRIZE_TYPE_CLUB_SHARE, 1, {
+					title = String.isNotEmpty(clubShareTitle) and clubShareTitle or 'Club Share',
+					roundPrecision = self.options.currencyRoundPrecision
+				})
+			end
 		end
 
 		if self.options.autoExchange then
