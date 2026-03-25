@@ -155,11 +155,11 @@ return {
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 5,
+						mobileOrder = 4,
 						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 5,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -203,7 +203,7 @@ return {
 			{ -- Bottom
 				children = {
 					{
-						mobileOrder = 7,
+						mobileOrder = 6,
 						content = CONTENT.usefulArticles,
 					},
 				},
