@@ -226,11 +226,6 @@ div.wikitext-quote {
 	overflow: auto;
 }
 
-/* quotes should not overflow infoboxes or other floating stuff */
-blockquote.quote {
-	overflow: hidden;
-}
-
 // resources/styles/components/_styles.scss
 .lakesideview-icon-spinner {
 	padding-bottom: 0.125rem;
