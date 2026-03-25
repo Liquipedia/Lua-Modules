@@ -640,13 +640,9 @@ div.brkts-popup-body-element-thumbs {
 
 .brkts-popup-body-grid {
 	display: grid;
-	grid-template-columns: min-content auto min-content;
+	grid-template-columns: min-content 1fr auto 1fr min-content;
 	align-items: center;
 	margin: 0 -0.5rem;
-
-	&[ data-grid-layout="standard" ] {
-		grid-template-columns: min-content 1fr auto 1fr min-content;
-	}
 
 	&-row {
 		display: grid;
@@ -673,8 +669,14 @@ div.brkts-popup-body-element-thumbs {
 			display: contents;
 			white-space: nowrap;
 
-			> :only-child {
-				grid-column: 2 / -2;
+			> .brkts-popup-spaced:nth-of-type( 1 ) {
+				flex-direction: row;
+				justify-content: flex-start;
+			}
+
+			> .brkts-popup-spaced:nth-last-of-type( 1 ) {
+				flex-direction: row-reverse;
+				justify-content: flex-start;
 			}
 
 			&:empty {

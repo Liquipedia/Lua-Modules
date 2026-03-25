@@ -49,45 +49,44 @@ function CustomMatchSummary.createBody(match)
 	)
 end
 
----@return Widget[]
-function ValorantMatchSummaryGameRow:createGameDetail()
+---@return string
+function ValorantMatchSummaryGameRow:createGameOverview()
+	return self:mapDisplay()
+end
+
+---@private
+---@param opponentIndex integer
+---@return table[]
+function ValorantMatchSummaryGameRow:_makePartialScores(opponentIndex)
 	local game = self.props.game
-
-	local function makePartialScores(halves, firstSide)
-		local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
-		return {
-			{style = 'brkts-valorant-score-color-' .. firstSide, score = halves[firstSide]},
-			{style = 'brkts-valorant-score-color-' .. oppositeSide, score = halves[oppositeSide]},
-			{style = 'brkts-valorant-score-color-' .. firstSide, score = halves['ot' .. firstSide]},
-			{style = 'brkts-valorant-score-color-' .. oppositeSide, score = halves['ot' .. oppositeSide]},
-		}
-	end
-
 	local extradata = game.extradata or {}
-
-	---@param opponentIndex integer
-	---@return Widget[]
-	local function makeTeamSection(opponentIndex)
-		local flipped = opponentIndex == 2
-		local firstSide = flipped and CustomMatchSummary._getOppositeSide(extradata.t1firstside) or extradata.t1firstside
-		local characters = Array.map((game.opponents[opponentIndex] or {}).players or {}, Operator.property('agent'))
-		return {
-			MatchSummaryWidgets.Characters{characters = characters, flipped = flipped, hideOnMobile = true},
-			MatchSummaryWidgets.DetailedScore{
-				score = self:scoreDisplay(opponentIndex),
-				flipped = flipped,
-				partialScores = makePartialScores(
-					extradata['t' .. opponentIndex .. 'halfs'] or {},
-					firstSide or ''
-				)
-			}
-		}
+	local firstSide = extradata.t1firstside
+	local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
+	local halves = extradata['t' .. opponentIndex .. 'halfs'] or {}
+	if opponentIndex == 2 then
+		firstSide, oppositeSide = oppositeSide, firstSide
 	end
-
 	return {
-		MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
-		self:mapDisplay(),
-		MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true}
+		{style = 'brkts-valorant-score-color-' .. firstSide, score = halves[firstSide]},
+		{style = 'brkts-valorant-score-color-' .. oppositeSide, score = halves[oppositeSide]},
+		{style = 'brkts-valorant-score-color-' .. firstSide, score = halves['ot' .. firstSide]},
+		{style = 'brkts-valorant-score-color-' .. oppositeSide, score = halves['ot' .. oppositeSide]},
+	}
+end
+
+---@param opponentIndex integer
+---@return Widget[]
+function ValorantMatchSummaryGameRow:createGameOpponentView(opponentIndex)
+	local game = self.props.game
+	local flipped = opponentIndex == 2
+	local characters = Array.map((game.opponents[opponentIndex] or {}).players or {}, Operator.property('agent'))
+	return {
+		MatchSummaryWidgets.Characters{characters = characters, flipped = flipped, hideOnMobile = true},
+		MatchSummaryWidgets.DetailedScore{
+			score = self:scoreDisplay(opponentIndex),
+			flipped = flipped,
+			partialScores = self:_makePartialScores(opponentIndex)
+		}
 	}
 end
 

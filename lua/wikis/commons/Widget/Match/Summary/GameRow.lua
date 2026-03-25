@@ -40,7 +40,11 @@ function MatchSummaryGameRow:render()
 			},
 			HtmlWidgets.Div{
 				classes = {'brkts-popup-body-grid-row-detail'},
-				children = self:createGameDetail(),
+				children = {
+					GameCenter{children = self:createGameOpponentView(1)},
+					GameCenter{children = self:createGameOverview()},
+					GameCenter{children = self:createGameOpponentView(2)}
+				},
 			},
 			GameWinLossIndicator{
 				opponentIndex = 2,
@@ -52,24 +56,31 @@ function MatchSummaryGameRow:render()
 end
 
 ---@protected
+---@param opponentIndex integer
 ---@return Renderable|Renderable[]
-function MatchSummaryGameRow:createGameDetail()
-	error('MatchSummaryGameRow:createGameDetail() cannot be called directly and must be overridden.')
+function MatchSummaryGameRow:createGameOpponentView(opponentIndex)
+	error('MatchSummaryGameRow:createGameOpponentView() cannot be called directly and must be overridden.')
 end
 
 ---@protected
----@return Widget
+---@return Renderable|Renderable[]
+function MatchSummaryGameRow:createGameOverview()
+	error('MatchSummaryGameRow:createGameOverview() cannot be called directly and must be overridden.')
+end
+
+---@protected
+---@return Renderable?
 function MatchSummaryGameRow:lengthDisplay()
 	local game = self.props.game
-	return GameCenter{children = Logic.emptyOr(game.length, 'Game ' .. self.props.gameIndex)}
+	return Logic.emptyOr(game.length, 'Game ' .. self.props.gameIndex)
 end
 
 ---@protected
 ---@param config {noLink: boolean?}?
----@return Widget
+---@return string
 function MatchSummaryGameRow:mapDisplay(config)
 	local game = self.props.game
-	return GameCenter{children = DisplayHelper.Map(game, config)}
+	return DisplayHelper.Map(game, config)
 end
 
 ---@protected

@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
@@ -77,47 +78,49 @@ function CustomMatchSummary.createBody(match)
 	)
 end
 
----@return Widget[]
-function RainbowsixMatchSummaryGameRow:createGameDetail()
+---@private
+---@param opponentIndex integer
+---@return table[]
+function RainbowsixMatchSummaryGameRow:_makePartialScores(opponentIndex)
 	local game = self.props.game
 	local extradata = game.extradata or {}
+	local halves = extradata['t' .. opponentIndex .. 'halfs']
 
-	local function makePartialScores(halves, firstSide, firstSideOt)
-		local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
-		local oppositeSideOt = CustomMatchSummary._getOppositeSide(firstSideOt)
-		return {
-			{score = halves[firstSide], icon = ROUND_ICONS[firstSide]},
-			{score = halves[oppositeSide], icon = ROUND_ICONS[oppositeSide]},
-			{score = halves['ot' .. firstSideOt], icon = ROUND_ICONS['ot' .. firstSideOt]},
-			{score = halves['ot' .. oppositeSideOt], icon = ROUND_ICONS['ot' .. oppositeSideOt]},
-		}
-	end
-
-	local firstSides = extradata.t1firstside or {}
-	local firstSide = (firstSides.rt or ''):lower()
-	local firstSideOt = (firstSides.ot or ''):lower()
-
-	return WidgetUtil.collect(
-		MatchSummaryWidgets.DetailedScore{
-			score = self:scoreDisplay(1),
-			flipped = false,
-			partialScores = makePartialScores(
-				extradata.t1halfs or {},
-				firstSide,
-				firstSideOt
-			)
-		},
-		self:mapDisplay(),
-		MatchSummaryWidgets.DetailedScore{
-			score = self:scoreDisplay(2),
-			flipped = true,
-			partialScores = makePartialScores(
-				extradata.t2halfs or {},
-				CustomMatchSummary._getOppositeSide(firstSide),
-				CustomMatchSummary._getOppositeSide(firstSideOt)
-			)
-		}
+	---@type table
+	local firstSides = Table.mapValues(
+		extradata.t1firstside or {},
+		function (side)
+			if opponentIndex == 1 then
+				return side
+			end
+			return CustomMatchSummary._getOppositeSide(side:lower())
+		end
 	)
+	local firstSide = (firstSides.rt or '')
+	local firstSideOt = (firstSides.ot or '')
+	local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
+	local oppositeSideOt = CustomMatchSummary._getOppositeSide(firstSideOt)
+	return {
+		{score = halves[firstSide], icon = ROUND_ICONS[firstSide]},
+		{score = halves[oppositeSide], icon = ROUND_ICONS[oppositeSide]},
+		{score = halves['ot' .. firstSideOt], icon = ROUND_ICONS['ot' .. firstSideOt]},
+		{score = halves['ot' .. oppositeSideOt], icon = ROUND_ICONS['ot' .. oppositeSideOt]},
+	}
+end
+
+---@param opponentIndex integer
+---@return Widget
+function RainbowsixMatchSummaryGameRow:createGameOpponentView(opponentIndex)
+	return MatchSummaryWidgets.DetailedScore{
+		score = self:scoreDisplay(opponentIndex),
+		flipped = opponentIndex,
+		partialScores = self:_makePartialScores(opponentIndex)
+	}
+end
+
+---@return string
+function RainbowsixMatchSummaryGameRow:createGameOverview()
+	return self:mapDisplay()
 end
 
 ---@param side string

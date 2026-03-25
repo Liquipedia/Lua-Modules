@@ -51,31 +51,26 @@ function CustomMatchSummary.createBody(match)
 	)
 end
 
----@return Widget[]
-function Dota2MatchSummaryGameRow:createGameDetail()
+---@param opponentIndex integer
+---@return Widget
+function Dota2MatchSummaryGameRow:createGameOpponentView(opponentIndex)
 	local props = self.props
 	local game = props.game
 	local extradata = game.extradata or {}
 
-	-- TODO: Change to use participant data
-	local characterData = {
-		MatchSummary.buildCharacterList(extradata, 'team1hero', NUM_HEROES_PICK),
-		MatchSummary.buildCharacterList(extradata, 'team2hero', NUM_HEROES_PICK),
+	return MatchSummaryWidgets.Characters{
+		flipped = opponentIndex == 2,
+		characters = MatchSummary.buildCharacterList(
+			extradata, 'team' .. opponentIndex .. 'hero', NUM_HEROES_PICK
+		),
+		bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata['team' .. opponentIndex .. 'side'] or ''),
+		date = game.date,
 	}
+end
 
-	return WidgetUtil.collect(
-		MatchSummaryWidgets.Characters{
-			flipped = false,
-			characters = characterData[1],
-			bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team1side or ''),
-		},
-		self:lengthDisplay(),
-		MatchSummaryWidgets.Characters{
-			flipped = true,
-			characters = characterData[2],
-			bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team2side or ''),
-		}
-	)
+---@return Renderable?
+function Dota2MatchSummaryGameRow:createGameOverview()
+	return self:lengthDisplay()
 end
 
 return CustomMatchSummary
