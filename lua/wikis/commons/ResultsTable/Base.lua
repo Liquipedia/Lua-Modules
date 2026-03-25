@@ -187,7 +187,6 @@ function BaseResultsTable:_getQueryOrder()
 	end), ',')
 end
 
-
 ---Fetches data from Lpdb
 ---@return placement[]
 function BaseResultsTable:queryData()
