@@ -2914,28 +2914,21 @@ Slightly transparent imagelabel on POIDraft
 	}
 }
 
-// resources/styles/browsers/_chrome.scss
-/* since chrome feels like it needs to change things that were the same for 20 years... */
-body {
-	text-decoration-skip-ink: none;
-}
+// resources/styles/components/_catlinks.scss
+.catlinks {
+	background-color: transparent;
 
-/* "fix" chrome image rendering */
-img {
-	image-rendering: -webkit-optimize-contrast;
-}
-
-/* chrome does weird things with <hr> tags next to floating content */
-hr {
-	overflow: auto;
-}
-
-// resources/styles/browsers/_general-old.scss
-/* Underlining for abbreviations */
-@supports ( text-decoration: underline dotted ) {
-	abbr[ title ],
-	.explain[ title ] {
-		border-bottom: 0 solid #000000;
-		text-decoration: underline dotted;
+	.theme--light & {
+		border: 0.0625rem solid var( --clr-on-surface-light-primary-8 );
 	}
+
+	.theme--dark & {
+		border: 0.0625rem solid var( --clr-on-surface-dark-primary-8 );
+	}
+}
+
+// resources/styles/components/_fieldbox.scss
+body .fieldBox {
+	background: var( --clr-surface-2 );
+	color: var( --clr-on-surface );
 }

@@ -12,6 +12,7 @@
 @use "commons/BattleRoyale/PanelTable";
 @use "commons/Bracket";
 @use "commons/Brackets";
+@use "commons/BreadCrumbs";
 @use "commons/Carousel";
 @use "commons/Colours";
 @use "commons/Crosstable";
@@ -22,7 +23,9 @@
 @use "commons/Fountain";
 @use "commons/Grid";
 @use "commons/GroupTableLeague";
+@use "commons/Headings";
 @use "commons/Icons";
+@use "commons/Images";
 @use "commons/Infobox";
 @use "commons/Jquery";
 @use "commons/Mainpage";
@@ -60,18 +63,6 @@
 @use "commons/MatchTicker";
 @use "commons/Slider";
 @use "commons/SwitchButtons";
-@use "commons/Components/BreadCrumbs";
-@use "commons/Components/Buttons";
-@use "commons/Components/ComponentsMisc";
-@use "commons/Components/Editor";
-@use "commons/Components/Forms";
-@use "commons/Components/Gallery";
-@use "commons/Components/Headings";
-@use "commons/Components/Images";
-@use "commons/Components/Popup";
-@use "commons/Components/SearchSuggestions";
-@use "commons/Pages/EditConflict";
-@use "commons/Pages/Search";
 
 /* Very basic styling, so that things look a bit more realistic */
 body {
