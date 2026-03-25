@@ -48,8 +48,8 @@ local CONTENT = {
 	},
 	specialEvents = {
 		noPanel = true,
-		body = '{{Liquipedia:Special_Event}}',
-		boxid = 1516,
+		body = '{{Liquipedia:Special Event}}',
+		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -203,7 +203,7 @@ return {
 			{ -- Bottom
 				children = {
 					{
-						mobileOrder = 5,
+						mobileOrder = 7,
 						content = CONTENT.usefulArticles,
 					},
 				},
