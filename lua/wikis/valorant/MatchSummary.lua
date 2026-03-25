@@ -60,7 +60,7 @@ end
 function ValorantMatchSummaryGameRow:_makePartialScores(opponentIndex)
 	local game = self.props.game
 	local extradata = game.extradata or {}
-	local firstSide = extradata.t1firstside
+	local firstSide = extradata.t1firstside or ''
 	local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
 	local halves = extradata['t' .. opponentIndex .. 'halfs'] or {}
 	if opponentIndex == 2 then
@@ -93,7 +93,9 @@ end
 ---@param side string?
 ---@return string
 function CustomMatchSummary._getOppositeSide(side)
-	if side == 'atk' then
+	if Logic.isEmpty(side) then
+		return ''
+	elseif side == 'atk' then
 		return 'def'
 	end
 	return 'atk'
