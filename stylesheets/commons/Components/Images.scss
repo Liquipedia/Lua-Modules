@@ -5,17 +5,6 @@
 	height: auto;
 }
 
-.filehistory a img,
-#file img:hover {
-	.theme--light & {
-		background: url( /commons/resources/src/mediawiki.action/images/checker.svg?ff513 ) repeat;
-	}
-
-	.theme--dark & {
-		background: url( "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Cpath d='M0 0h8v16h8V8H0z' opacity='0.7' fill='%23424242'/%3E%3C/svg%3E" ) repeat;
-	}
-}
-
 /* thumbnails */
 .thumbcaption {
 	border: 0 solid var( --clr-on-surface );
