@@ -64,26 +64,13 @@
 @use "commons/Components/Buttons";
 @use "commons/Components/ComponentsMisc";
 @use "commons/Components/DatePicker";
-@use "commons/Components/DiffView";
 @use "commons/Components/Editor";
 @use "commons/Components/Forms";
 @use "commons/Components/Gallery";
 @use "commons/Components/Headings";
 @use "commons/Components/Images";
-@use "commons/Components/MobileSearch";
 @use "commons/Components/Popup";
 @use "commons/Components/SearchSuggestions";
-@use "commons/Extensions/ExtensionsMisc";
-@use "commons/Extensions/Flaggedrevs";
-@use "commons/Extensions/Jquery";
-@use "commons/Extensions/Ooui";
-@use "commons/Extensions/OouiButtons";
-@use "commons/Extensions/OouiCheckboxes";
-@use "commons/Extensions/OouiInputFields";
-@use "commons/Extensions/OouiModal";
-@use "commons/Extensions/OouiMultiSelectWidget";
-@use "commons/Extensions/OouiPopup";
-@use "commons/Extensions/OouiSelect";
 @use "commons/Pages/EditConflict";
 @use "commons/Pages/Search";
 
