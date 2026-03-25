@@ -45,7 +45,7 @@ function TournamentsTickerListItemWidget:render()
 			link = tournament.pageName,
 			options = {noTemplate = true},
 		}
-		or Icon{iconName = 'firstplace'}
+		or Icon{iconName = 'firstplace', size = '1.125rem'}
 
 	local badgeChildren = {
 		HtmlWidgets.Span{
