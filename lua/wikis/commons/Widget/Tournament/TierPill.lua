@@ -13,8 +13,14 @@ local Tier = Lua.import('Module:Tier/Utils')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
+---@class TournamentsTickerPillWidgetProps
+---@field tournament StandardTournament
+---@field variant 'solid'|'subtle'?
+---@field colorScheme 'full'|'top3'?
+
 ---@class TournamentsTickerPillWidget: Widget
----@operator call(table): TournamentsTickerPillWidget
+---@operator call(TournamentsTickerPillWidgetProps): TournamentsTickerPillWidget
+---@field props TournamentsTickerPillWidgetProps
 local TournamentsTickerPillWidget = Class.new(Widget)
 
 TournamentsTickerPillWidget.defaultProps = {

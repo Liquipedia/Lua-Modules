@@ -20,8 +20,14 @@ local PhaseCollapsible = Lua.import('Module:Widget/Tournaments/Ticker/PhaseColla
 local TickerData = Lua.import('Module:Widget/Tournaments/Ticker/Data')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
 
+---@class TournamentsTickerListWidgetProps: TournamentsTickerDataProps
+---@field variant 'tabs'|'collapsible'?
+---@field displayGameIcons boolean?
+---@field tierColorScheme string?
+
 ---@class TournamentsTickerListWidget: Widget
----@operator call(table): TournamentsTickerListWidget
+---@operator call(TournamentsTickerListWidgetProps): TournamentsTickerListWidget
+---@field props TournamentsTickerListWidgetProps
 local TournamentsTickerListWidget = Class.new(Widget)
 TournamentsTickerListWidget.defaultProps = {
 	upcomingDays = 5,
