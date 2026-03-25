@@ -211,18 +211,30 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 	local playedInput = Logic.readBoolOrNil(playerInput.played)
 	local resultsInput = Logic.readBoolOrNil(playerInput.results)
 	local roles = RoleUtil.readRoleArgs(playerInput.role)
-	local playerType = playerInput.type or 'player'
+	local inputType = playerInput.type or 'player'
+	local hasStaffRoles = Array.any(roles, function(role) return role.type == RoleUtil.ROLE_TYPE.STAFF end)
 
-	local hasNoStaffRoles = Array.all(roles, function(role) return role.type ~= RoleUtil.ROLE_TYPE.STAFF end)
+	local status = playerInput.status
+	if not status then
+		if inputType == 'former' then
+			status = 'former'
+		elseif inputType == 'sub' then
+			status = 'sub'
+		end
+	end
 
-	if playerType ~= 'staff' and not hasNoStaffRoles then
+	local playerType
+	if inputType == 'staff' or hasStaffRoles then
 		playerType = 'staff'
+	else
+		playerType = 'player'
 	end
 
 	player.extradata = {
 		roles = roles,
 		trophies = tonumber(playerInput.trophies),
 		type = playerType,
+		status = status,
 		played = Logic.nilOr(playedInput, true),
 		results = Logic.nilOr(resultsInput, playedInput, true),
 	}
@@ -239,16 +251,16 @@ function TeamParticipantsWikiParser.fillIncompleteRoster(opponent, minimumPlayer
 		return
 	end
 
-	local actualPlayers = Array.filter(opponent.players, function(player)
-		return player.extradata.type == 'player'
+	local activePlayers = Array.filter(opponent.players, function(player)
+		return player.extradata.type == 'player' and not player.extradata.status
 	end)
 
-	local actualPlayerCount = #actualPlayers
-	if actualPlayerCount >= expectedPlayerCount then
+	local activePlayerCount = #activePlayers
+	if activePlayerCount >= expectedPlayerCount then
 		return
 	end
 
-	local tbdPlayers = TeamParticipantsWikiParser.createTBDPlayers(expectedPlayerCount - actualPlayerCount)
+	local tbdPlayers = TeamParticipantsWikiParser.createTBDPlayers(expectedPlayerCount - activePlayerCount)
 	Array.extendWith(opponent.players, tbdPlayers)
 end
 

@@ -105,11 +105,11 @@ function TeamParticipantsController.importSquadMembersFromDatabase(participant)
 	end)
 
 	return Array.map(membersToImport, function (member)
-		local memberType = member.type
+		local status
 		if member.hasLeft then
-			memberType = 'former'
+			status = 'former'
 		elseif member.role and member.role:lower() == 'substitute' then
-			memberType = 'sub'
+			status = 'sub'
 		end
 		return TeamParticipantsWikiParser.parsePlayer{
 			member.displayName,
@@ -117,7 +117,8 @@ function TeamParticipantsController.importSquadMembersFromDatabase(participant)
 			flag = member.nationality,
 			faction = member.faction,
 			role = member.role,
-			type = memberType,
+			type = member.type,
+			status = status,
 		}
 	end)
 end
