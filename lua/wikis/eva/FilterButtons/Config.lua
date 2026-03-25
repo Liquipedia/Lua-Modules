@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Tier = Lua.import('Module:Tier/Utils')
 local Config = {}
 
+---@type FilterButtonCategory[]
 Config.categories = {
 	{
 		name = 'liquipediatier',
