@@ -23,7 +23,6 @@ function MatchSummaryGamesContainer:render()
 		return
 	end
 	return HtmlWidgets.Div{
-		attributes = Logic.isNotEmpty(self.props.gridLayout) and {['data-grid-layout'] = self.props.gridLayout} or nil,
 		classes = {'brkts-popup-body-grid'},
 		css = self.props.css,
 		children = self.props.children,
