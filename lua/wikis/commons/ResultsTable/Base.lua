@@ -179,14 +179,6 @@ function BaseResultsTable:create()
 	return self
 end
 
----@private
----@return string
-function BaseResultsTable:_getQueryOrder()
-	return table.concat(Array.map(self.config.sort, function (sort)
-		return sort .. ' ' .. self.config.order
-	end), ',')
-end
-
 ---Fetches data from Lpdb
 ---@return placement[]
 function BaseResultsTable:queryData()
@@ -202,6 +194,14 @@ function BaseResultsTable:queryData()
 	end
 
 	return data
+end
+
+---@private
+---@return string
+function BaseResultsTable:_getQueryOrder()
+	return table.concat(Array.map(self.config.sort, function (sort)
+		return sort .. ' ' .. self.config.order
+	end), ',')
 end
 
 ---Builds the conditions for the results, achievements, awards table
