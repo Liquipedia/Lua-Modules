@@ -31,7 +31,7 @@ def deploy_resources(
             file_content = read_file_from_path(file_path)
             page = (
                 f"MediaWiki:Common.{'js' if res_type == '.js' else 'css'}/"
-                + file_path.name
+                + "/".join(file_path.parts[2:])
             )
             print(f"...page = {page}")
             deploy_result = deploy_file_to_wiki(
@@ -74,8 +74,8 @@ def main():
     git_deploy_reason: str
     if len(sys.argv[1:]) == 0:
         resource_files = itertools.chain(
-            pathlib.Path("./javascript/").rglob("*.js"),
-            pathlib.Path("./stylesheets/").rglob("*.scss"),
+            pathlib.Path("./javascript/commons/").rglob("*.js"),
+            pathlib.Path("./stylesheets/commons/").rglob("*.scss"),
         )
         git_deploy_reason = "Automated Weekly Re-Sync"
     else:
