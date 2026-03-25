@@ -33,7 +33,6 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return Widget[]
 function CustomMatchSummary.createBody(match)
-
 	return WidgetUtil.collect(
 		MatchSummaryWidgets.GamesContainer{
 			gridLayout = 'standard',
