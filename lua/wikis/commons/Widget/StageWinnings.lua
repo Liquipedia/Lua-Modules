@@ -90,7 +90,8 @@ function StageWinnings:render()
 				Array.all(keyParts, function(keyPart) return Table.includes(MatchGroupInputUtil.STATUS, keyPart) end)
 		end)
 		return Table.map(valueByScore, function(key, value)
-			return key, tonumber(value)
+			local newKey = key:gsub(postFix, '')
+			return newKey, tonumber(value)
 		end)
 	end
 
