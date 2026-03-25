@@ -389,11 +389,3 @@ div.table-responsive + div.table-responsive > table.matchlist {
 caption {
 	caption-side: top;
 }
-
-// overwrite MW 1.43 new table styles
-// https://github.com/wikimedia/mediawiki/blob/REL1_43/resources/src/mediawiki.skinning/content.tables.less#L14
-@media screen and ( max-width: 639px ) {
-	.mw-parser-output table {
-		display: table;
-	}
-}
