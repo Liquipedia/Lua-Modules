@@ -24,6 +24,7 @@
 @use "commons/GroupTableLeague";
 @use "commons/Icons";
 @use "commons/Infobox";
+@use "commons/Jquery";
 @use "commons/Mainpage";
 @use "commons/Matchseries";
 @use "commons/NavigationCard";
@@ -58,7 +59,6 @@
 @use "commons/Match";
 @use "commons/MatchTicker";
 @use "commons/Slider";
-@use "commons/Specials";
 @use "commons/SwitchButtons";
 @use "commons/Components/BreadCrumbs";
 @use "commons/Components/Buttons";
