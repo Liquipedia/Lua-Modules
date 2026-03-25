@@ -22,10 +22,29 @@ Template(s): Documentation
 Author(s): FO-nTTaX
 *******************************************************************************/
 .documentation {
+	border: 0.0625rem solid;
 	clear: both;
-	border: 1px solid #aaaaaa;
-	background-color: #ecfcf4;
-	padding: 5px;
+	padding: 0.3125rem;
+
+	.theme--light & {
+		background-color: var( --clr-atlantis-90 );
+		border-color: var( --clr-atlantis-10 );
+	}
+
+	.theme--dark & {
+		background-color: var( --clr-atlantis-80 );
+		border-color: var( --clr-atlantis-20 );
+	}
+
+	h2 {
+		.theme--light & {
+			border-color: var( --clr-atlantis-10 );
+		}
+
+		.theme--dark & {
+			border-color: var( --clr-atlantis-20 );
+		}
+	}
 }
 
 /*******************************************************************************
