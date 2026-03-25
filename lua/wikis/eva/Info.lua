@@ -16,12 +16,12 @@ return {
 			name = 'EVA',
 			link = 'Esports Virtual Arena',
 			logo = {
-				lightMode = 'EVA darkmode.png',
-				darkMode = 'EVA lightmode.png',
+				lightMode = 'EVA lightmode.png',
+				darkMode = 'EVA darkmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'EVA lightmode.png',
-				lightMode = 'EVA darkmode.png',
+				lightMode = 'EVA lightmode.png',
+				darkMode = 'EVA darkmode.png',
 			},
 		},
 	},
