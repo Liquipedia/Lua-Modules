@@ -21,7 +21,8 @@ local Tournament = Lua.import('Module:Tournament')
 
 local TeamParticipantsWikiParser = {}
 
----@alias TeamParticipant {opponent: standardOpponent, notes: {text: string, highlighted: boolean}[], aliases: string[],
+---@alias TeamParticipant {opponent: standardOpponent, image: string?, imagedark: string?,
+---notes: {text: string, highlighted: boolean}[], aliases: string[],
 ---qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer,
 ---potentialQualifiers: standardOpponent[]?, warnings: string[]?}
 
@@ -176,6 +177,8 @@ function TeamParticipantsWikiParser.parseParticipant(input, defaultDate)
 
 	return {
 		opponent = opponent,
+		image = input.image,
+		imagedark = input.imagedark,
 		qualification = qualification,
 		aliases = Array.flatMap(aliases, function(alias)
 			return TeamTemplate.queryHistoricalNames(alias)

@@ -196,6 +196,8 @@ end
 ---@field showFaction boolean?
 ---@field showTbd boolean?
 ---@field additionalClasses string[]?
+---@field image string?
+---@field imagedark string?
 
 --[[
 Displays an opponent as a block element. The width of the component is
@@ -221,6 +223,8 @@ function OpponentDisplay.BlockOpponent(props)
 			template = opponent.template or 'tbd',
 			additionalClasses = props.additionalClasses,
 			note = props.note,
+			image = props.image,
+			imagedark = props.imagedark,
 		})
 	elseif opponent.type == Opponent.literal then
 		return OpponentDisplay.BlockLiteral({
@@ -277,7 +281,8 @@ Displays a team as a block element. The width of the component is determined by
 its layout context, and not of the team name. The team is specified by template.
 ]]
 ---@param props {flip: boolean?, overflow: OverflowModes?, showLink: boolean?,
----style: teamStyle?, template: string, additionalClasses: string[]?, note: string|number?}
+---style: teamStyle?, template: string, additionalClasses: string[]?, note: string|number?,
+---image: string?, imagedark: string?}
 ---@return Widget
 function OpponentDisplay.BlockTeamContainer(props)
 	local style = props.style or 'standard'
@@ -290,6 +295,8 @@ function OpponentDisplay.BlockTeamContainer(props)
 		noLink = not props.showLink,
 		additionalClasses = props.additionalClasses,
 		note = props.note,
+		image = props.image,
+		imagedark = props.imagedark,
 	}
 end
 
