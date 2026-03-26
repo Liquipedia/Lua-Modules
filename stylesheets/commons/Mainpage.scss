@@ -103,6 +103,10 @@ div.main-page-banner .main-page-banner-bottom-row {
 		padding: 0.25rem;
 		width: 2.25rem;
 		height: 2.25rem;
+
+		@media ( max-width: 359px ) {
+			display: none;
+		}
 	}
 
 	&__content {
@@ -142,6 +146,10 @@ div.main-page-banner .main-page-banner-bottom-row {
 		border-radius: 0.25rem;
 		flex-shrink: 0;
 		overflow: hidden;
+
+		@media ( max-width: 359px ) {
+			display: flex;
+		}
 
 		.league-icon-small-image img,
 		.icon-small img {
@@ -186,27 +194,16 @@ div.main-page-banner .main-page-banner-bottom-row {
 	}
 }
 
-@media ( max-width: 359px ) {
-	.tournaments-list-item {
-		> .tournament-icon {
-			display: none;
-		}
-
-		&__icon-compact {
-			display: flex;
-		}
-	}
-}
 
 .tournaments-list--collapsible {
 	display: none;
+
+	@media ( min-width: 1024px ) {
+		display: block;
+	}
 }
 
 @media ( min-width: 1024px ) {
-	.tournaments-list--collapsible {
-		display: block;
-	}
-
 	.tournaments-list--tabs {
 		display: none;
 	}
@@ -258,10 +255,7 @@ div.main-page-banner .main-page-banner-bottom-row {
 	.general-collapsible-expand-button,
 	.general-collapsible-collapse-button {
 		outline: unset;
-
-		.theme--light & {
-			color: var( --clr-secondary-25 );
-		}
+		color: var( --clr-secondary-25 );
 
 		.theme--dark & {
 			color: var( --clr-secondary-100 );
