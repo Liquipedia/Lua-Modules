@@ -982,8 +982,8 @@ div.brkts-popup-body-element-thumbs {
 		}
 	}
 
-	.flipped > &,
-	.brkts-popup-spaced:nth-last-of-type( 1 ) & {
+	&-container.flipped > &,
+	.brkts-popup-body-grid-row-detail > .brkts-popup-spaced:nth-last-of-type( 1 ) &-container > & {
 		direction: rtl;
 	}
 
