@@ -113,7 +113,6 @@ end
 function RainbowsixMatchSummaryGameRow:createGameOpponentView(opponentIndex)
 	return MatchSummaryWidgets.DetailedScore{
 		score = self:scoreDisplay(opponentIndex),
-		flipped = opponentIndex == 2,
 		partialScores = self:_makePartialScores(opponentIndex)
 	}
 end

@@ -977,12 +977,13 @@ div.brkts-popup-body-element-thumbs {
 			flex-direction: row-reverse;
 		}
 
-		@at-root .brkts-popup-spaced > & {
+		.brkts-popup-spaced > & {
 			display: contents;
 		}
 	}
 
-	@at-root .flipped > & {
+	.flipped > &,
+	.brkts-popup-spaced:nth-last-of-type( 1 ) > & {
 		direction: rtl;
 	}
 

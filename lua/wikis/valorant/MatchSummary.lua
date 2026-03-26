@@ -83,7 +83,6 @@ function ValorantMatchSummaryGameRow:createGameOpponentView(opponentIndex)
 		MatchSummaryWidgets.Characters{characters = characters, flipped = flipped, hideOnMobile = true},
 		MatchSummaryWidgets.DetailedScore{
 			score = self:scoreDisplay(opponentIndex),
-			flipped = flipped,
 			partialScores = self:_makePartialScores(opponentIndex)
 		}
 	}
