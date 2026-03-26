@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local Tier = Lua.import('Module:Tier/Utils')
 
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
@@ -52,69 +53,40 @@ function TournamentsTickerPillWidget:render()
 		return
 	end
 
+	local subtle = self.props.variant == 'subtle'
 	local tierShort, tierTypeShort = Tier.toShortName(tournament.liquipediaTier, tournament.liquipediaTierType)
 
 	local colorClass
-	if tierTypeShort then
+	if tierTypeShort and not subtle then
 		colorClass = COLOR_CLASSES[tournament.liquipediaTierType]
 	else
 		colorClass = COLOR_CLASSES[tournament.liquipediaTier]
 	end
 	colorClass = colorClass or COLOR_CLASSES.default
 
-	local classes
-	local children
-	if self.props.variant == 'subtle' then
-		local subtleColorClass
-		if tierTypeShort then
-			subtleColorClass = COLOR_CLASSES[tournament.liquipediaTier] or COLOR_CLASSES.default
-			children = {
-				HtmlWidgets.Div{
-					classes = {'tournament-badge__chip'},
-					children = Tier.toName(tournament.liquipediaTier),
-				},
-				HtmlWidgets.Div{
-					classes = {'tournament-badge__text'},
-					children = tierTypeShort,
-				},
-			}
-		else
-			subtleColorClass = colorClass
-			children = {
-				HtmlWidgets.Div{
-					classes = {'tournament-badge__text'},
-					children = Tier.toName(tournament.liquipediaTier),
-				}
-			}
-		end
-		classes = {'tournament-badge', 'tournament-badge--subtle', 'badge--' .. subtleColorClass}
-		if self.props.colorScheme == 'top3' then
-			table.insert(classes, 3, 'tournament-badge--top3')
-		end
-	else
-		local tierNode, tierTypeNode
-		if tierTypeShort then
-			tierNode = HtmlWidgets.Div{
-				classes = {'tournament-badge__chip', 'chip--' .. COLOR_CLASSES[tournament.liquipediaTier]},
-				children = tierShort,
-			}
-			tierTypeNode = HtmlWidgets.Div{
-				classes = {'tournament-badge__text'},
-				children = tierTypeShort,
-			}
-		else
-			tierNode = HtmlWidgets.Div{
-				classes = {'tournament-badge__text'},
-				children = Tier.toName(tournament.liquipediaTier),
-			}
-		end
-		classes = {'tournament-badge', 'badge--' .. colorClass}
-		children = {tierNode, tierTypeNode}
-	end
+	local chipText = subtle and Tier.toName(tournament.liquipediaTier) or tierShort
+	local textContent = tierTypeShort and tierTypeShort or Tier.toName(tournament.liquipediaTier)
 
 	return HtmlWidgets.Div{
-		classes = classes,
-		children = children,
+		classes = WidgetUtil.collect(
+			'tournament-badge',
+			'badge--' .. colorClass,
+			subtle and 'tournament-badge--subtle' or nil,
+			self.props.colorScheme == 'top3' and 'tournament-badge--top3' or nil
+		),
+		children = WidgetUtil.collect(
+			tierTypeShort and HtmlWidgets.Div{
+				classes = WidgetUtil.collect(
+					'tournament-badge__chip',
+					not subtle and 'chip--' .. COLOR_CLASSES[tournament.liquipediaTier] or nil
+				),
+				children = chipText,
+			} or nil,
+			HtmlWidgets.Div{
+				classes = {'tournament-badge__text'},
+				children = textContent,
+			}
+		),
 	}
 end
 
