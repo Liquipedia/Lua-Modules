@@ -983,7 +983,7 @@ div.brkts-popup-body-element-thumbs {
 	}
 
 	.flipped > &,
-	.brkts-popup-spaced:nth-last-of-type( 1 ) > & {
+	.brkts-popup-spaced:nth-last-of-type( 1 ) & {
 		direction: rtl;
 	}
 
