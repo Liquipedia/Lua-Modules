@@ -64,8 +64,8 @@ function TournamentsTickerData.get(props)
 			return false
 		end
 
-		local startDateThreshold = currentTimestamp + (upcomingDays + modifiedThreshold) * 24 * 60 * 60
-		local endDateThreshold = currentTimestamp - (completedDays + modifiedCompletedThreshold) * 24 * 60 * 60
+		local startDateThreshold = currentTimestamp + DateExt.daysToSeconds(upcomingDays + modifiedThreshold)
+		local endDateThreshold = currentTimestamp - DateExt.daysToSeconds(completedDays + modifiedCompletedThreshold)
 
 		if tournament.phase == 'ONGOING' then
 			return true
@@ -124,9 +124,17 @@ function TournamentsTickerData.get(props)
 		return a.pageName < b.pageName
 	end
 
-	local upcomingTournaments = Array.filter(allTournaments, function(t) return t.phase == 'UPCOMING' end)
-	local ongoingTournaments = Array.filter(allTournaments, function(t) return t.phase == 'ONGOING' end)
-	local completedTournaments = Array.filter(allTournaments, function(t) return t.phase == 'FINISHED' end)
+	---@param phase TournamentPhase
+	---@return fun(tournament: StandardTournament): boolean
+	local function filterByPhase(phase)
+		return function(tournament)
+			return tournament.phase == phase
+		end
+	end
+
+	local upcomingTournaments = Array.filter(allTournaments, filterByPhase('UPCOMING'))
+	local ongoingTournaments = Array.filter(allTournaments, filterByPhase('ONGOING'))
+	local completedTournaments = Array.filter(allTournaments, filterByPhase('FINISHED'))
 	table.sort(upcomingTournaments, sortByDateUpcoming)
 	table.sort(ongoingTournaments, sortByDate)
 	table.sort(completedTournaments, sortByDate)
