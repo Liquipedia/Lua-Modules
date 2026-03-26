@@ -666,7 +666,9 @@ div.brkts-popup-body-element-thumbs {
 		}
 
 		&-detail {
-			display: contents;
+			display: grid;
+			grid-column: 2 / -2;
+			grid-template-columns: subgrid;
 			white-space: nowrap;
 
 			> .brkts-popup-spaced:nth-of-type( 1 ) {
@@ -677,11 +679,6 @@ div.brkts-popup-body-element-thumbs {
 			> .brkts-popup-spaced:nth-last-of-type( 1 ) {
 				flex-direction: row-reverse;
 				justify-content: flex-start;
-			}
-
-			&:empty {
-				display: block;
-				grid-column: 2 / -2;
 			}
 		}
 	}
