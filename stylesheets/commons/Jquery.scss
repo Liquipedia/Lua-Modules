@@ -30,7 +30,7 @@ div.ui-widget-header {
 	}
 }
 
-div.ui-widget-content {
+div.ui-widget-content:not( .general-dialog-container ) {
 	background-color: var( --clr-surface-3 );
 	color: var( --clr-on-surface );
 	background-image: none;
