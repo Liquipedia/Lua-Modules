@@ -292,7 +292,7 @@ function MatchGroupInput._fetchBracketDatas(bracketType, bracketId)
 
 	-- Convert 0 based array to 1 based array
 	local function shiftArrayIndex(elems)
-		return Array.extend(elems[0], elems)
+		return Array.extend(Table.extract(elems, 0), elems)
 	end
 
 	return Table.map(matches, function(_, match)
