@@ -459,6 +459,7 @@ function mw.language:formatDuration(seconds, chosenIntervals) end
 ---This takes a number as formatted by lang:formatNum() and returns the actual number. In other words, this is basically a language-aware version of tonumber().
 ---@param str string
 ---@return number
+---@overload fun(str: string?): nil
 function mw.language:parseFormattedNumber(str) end
 
 ---This chooses the appropriate grammatical form from forms (which must be a sequence table) or ... based on the number n.

@@ -128,6 +128,19 @@ return {
 				lightMode = 'Aquapazza Aquaplus Dream Match allmode.png',
 			},
 		},
+		al = {
+			abbreviation = 'AL',
+			name = 'Avatar Legends',
+			link = 'Avatar Legends',
+			logo = {
+				darkMode = 'Avatar Legends icon darkmode.png',
+				lightMode = 'Avatar Legends icon lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Avatar Legends darkmode.png',
+				lightMode = 'Avatar Legends lightmode.png',
+			},
+		},
 		arms = {
 			abbreviation = 'ARMS',
 			name = 'ARMS',
@@ -750,6 +763,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'Injustice 2 default darkmode.png',
 				lightMode = 'Injustice 2 default lightmode.png',
+			},
+		},
+		ivs = {
+			abbreviation = 'IVS',
+			name = 'Invincible VS',
+			link = 'Invincible VS',
+			logo = {
+				darkMode = 'Invincible VS darkmode.png',
+				lightMode = 'Invincible VS lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Invincible VS darkmode.png',
+				lightMode = 'Invincible VS lightmode.png',
 			},
 		},
 		ki = {
@@ -1779,6 +1805,19 @@ return {
 				lightMode = 'TH123 Logo.png',
 			},
 		},
+		tokon = {
+			abbreviation = 'Tokon',
+			name = 'MARVEL Tōkon: Fighting Souls',
+			link = 'MARVEL Tokon: Fighting Souls',
+			logo = {
+				darkMode = 'Marvel Tokon allmode.png',
+				lightMode = 'Marvel Tokon allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Marvel Tokon allmode.png',
+				lightMode = 'Marvel Tokon allmode.png',
+			},
+		},
 		vsav = {
 			abbreviation = 'VS',
 			name = 'Vampire Savior',
@@ -1966,6 +2005,9 @@ return {
 			automatedHistory = {
 				storeFromWikiCode = true,
 			},
+		},
+		participants = {
+			syncPlayerTeam = true,
 		},
 	},
 }

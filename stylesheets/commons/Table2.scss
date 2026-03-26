@@ -7,22 +7,32 @@ $table2-cell-padding-x: 0.75rem;
 		background-color: var( --clr-background, #ffffff );
 		border-color: var( --clr-on-surface-light-primary-12 );
 		color: var( --clr-secondary-16 );
+		color-scheme: light;
 	}
 
 	.theme--dark & {
 		background-color: var( --clr-background, #121212 );
 		border-color: var( --clr-on-surface-dark-primary-12 );
 		color: var( --clr-secondary-100 );
+		color-scheme: dark;
 	}
 }
 
 .table2 {
 	display: block;
 	width: fit-content;
-	max-width: 100%;
+	max-width: stretch;
 	border: 1px solid;
 	border-radius: $table2-radius;
 	overflow: hidden;
+
+	@supports not ( max-width: stretch ) {
+		max-width: -webkit-fill-available;
+
+		@supports not ( max-width: -webkit-fill-available ) {
+			max-width: 100%;
+		}
+	}
 
 	@include table2-surface-colors();
 
@@ -51,7 +61,7 @@ $table2-cell-padding-x: 0.75rem;
 
 	&__table {
 		width: 100%;
-		border-spacing: 0 1px;
+		border-spacing: unset;
 		border-collapse: separate;
 		border: 0;
 
@@ -122,12 +132,12 @@ $table2-cell-padding-x: 0.75rem;
 
 			.theme--light & {
 				background-color: var( --clr-semantic-gold-90 );
-				box-shadow: 0 1px 0 var( --clr-semantic-gold-80 );
+				box-shadow: inset 0 -1px 0 var( --clr-semantic-gold-80 );
 			}
 
 			.theme--dark & {
 				background-color: var( --clr-semantic-gold-16 );
-				box-shadow: 0 1px 0 var( --clr-semantic-gold-20 );
+				box-shadow: inset 0 -1px 0 var( --clr-semantic-gold-20 );
 			}
 
 			&::after {
