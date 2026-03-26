@@ -80,8 +80,7 @@ div.standings-ffa {
 			}
 		}
 
-		&[ data-position-status="down" ],
-		&[ data-position-status="drop" ] {
+		&[ data-position-status="down" ] {
 			--placement-row-color: var( --clr-semantic-negative-40 );
 
 			.theme--dark & {
