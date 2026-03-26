@@ -8,6 +8,7 @@ from deploy_util import HEADER, SLEEP_DURATION, get_wiki_api_url, read_cookie_ja
 
 __all__ = ["get_token"]
 
+DRY_RUN = bool(int(os.getenv("DRY_RUN", 0)))
 WIKI_USER = os.getenv("WIKI_USER")
 WIKI_PASSWORD = os.getenv("WIKI_PASSWORD")
 
@@ -19,6 +20,8 @@ def login(wiki: str):
         return
     cookie_jar = read_cookie_jar(wiki)
     print(f"...logging in on {wiki}")
+    if DRY_RUN:
+        return
     with requests.Session() as session:
         session.cookies = cookie_jar
         token_response = session.post(
@@ -49,6 +52,9 @@ def login(wiki: str):
 @functools.cache
 def get_token(wiki: str) -> str:
     login(wiki)
+
+    if DRY_RUN:
+        return "DRY_RUN_DUMMY_TOKEN"
 
     with requests.Session() as session:
         session.cookies = read_cookie_jar(wiki)

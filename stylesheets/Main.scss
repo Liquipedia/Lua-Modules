@@ -16,6 +16,7 @@
 @use "commons/Carousel";
 @use "commons/Colours";
 @use "commons/Crosstable";
+@use "commons/Dialog";
 @use "commons/DivTable";
 @use "commons/Dropdown";
 @use "commons/FilterButtons";
@@ -27,9 +28,10 @@
 @use "commons/Images";
 @use "commons/Infobox";
 @use "commons/Jquery";
-@use "commons/Dialog";
+@use "commons/Label";
 @use "commons/Mainpage";
 @use "commons/Matchseries";
+@use "commons/MatchTable";
 @use "commons/NavigationCard";
 @use "commons/Miscellaneous";
 @use "commons/BigMatch";

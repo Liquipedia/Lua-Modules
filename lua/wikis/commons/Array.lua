@@ -138,13 +138,13 @@ end
 
 ---Flattens an array of arrays into an array.
 ---@generic T
----@param tbl T[]
+---@param tbl (T|T[])[]
 ---@return T[]
 ---@nodiscard
 function Array.flatten(tbl)
 	local flattenedArray = {}
 	for _, x in ipairs(tbl) do
-		if type(x) == 'table' then
+		if Array.isArray(x) then
 			for _, y in ipairs(x) do
 				table.insert(flattenedArray, y)
 			end
@@ -438,7 +438,7 @@ array is mutated in the process.
 function Array.extendWith(tbl, ...)
 	local arrays = Table.pack(...)
 	for index = 1, arrays.n do
-		if type(arrays[index]) == 'table' then
+		if Array.isArray(arrays[index]) then
 			for _, element in ipairs(arrays[index]) do
 				table.insert(tbl, element)
 			end

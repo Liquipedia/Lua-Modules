@@ -15,16 +15,17 @@ local Logic = Lua.import('Module:Logic')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local Label = Lua.import('Module:Widget/Basic/Label')
 
 ---@class MatchPageSeriesDotsParameters
 ---@field seriesDots string[]?
 
 local RESULT_DISPLAY_TYPES = {
-	['w'] = 'winner',
-	['l'] = 'loser',
-	['winner'] = 'winner',
-	['loser'] = 'loser',
-	['-'] = 'notplayed'
+	['w'] = 'win',
+	['l'] = 'loss',
+	['winner'] = 'win',
+	['loser'] = 'loss',
+	['-'] = 'default'
 }
 
 ---@class MatchPageSeriesDots: Widget
@@ -36,10 +37,7 @@ local MatchPageSeriesDots = Class.new(Widget)
 ---@param result string
 ---@return Widget
 MatchPageSeriesDots._makeGameResultIcon = FnUtil.memoize(function (result)
-	return Div{classes = {
-		'match-bm-match-header-round-result',
-		'result--' .. RESULT_DISPLAY_TYPES[result:lower()]
-	}}
+	return Label{labelType = 'result-' .. RESULT_DISPLAY_TYPES[result:lower()]}
 end)
 
 ---@return Widget?
