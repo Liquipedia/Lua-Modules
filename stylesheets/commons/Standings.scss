@@ -18,8 +18,8 @@ div.standings-ffa {
 	}
 }
 
-.table2.standings-swiss {
-	tr.table2__row--body[ data-position-status ] {
+.standings-swiss {
+	tr[ data-position-status ] {
 		position: relative;
 
 		&::after {
