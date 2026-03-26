@@ -1,12 +1,12 @@
 ---
 -- @Liquipedia
--- page=Module:Links/ButtonTranslation
+-- page=Module:Icon/ButtonTranslation
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 return {
-    playstation = {
+        playstation = {
         cross = 'PlayStation_button_X.svg',
         triangle = 'PlayStation_button_T.svg',
         circle = 'PlayStation_button_C.svg',

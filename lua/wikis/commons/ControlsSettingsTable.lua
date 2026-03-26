@@ -8,7 +8,7 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
-local ButtonTranslation = Lua.import('Module:Links/ButtonTranslation')
+local ButtonTranslation = Lua.import('Module:Icon/ButtonTranslation')
 local Class = Lua.import('Module:Class')
 local Date = Lua.import('Module:Date/Ext')
 local Info = Lua.import('Module:Info')
