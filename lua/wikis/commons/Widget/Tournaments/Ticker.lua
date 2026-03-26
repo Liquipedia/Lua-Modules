@@ -14,7 +14,7 @@ local Logic = Lua.import('Module:Logic')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Sublist = Lua.import('Module:Widget/Tournaments/Ticker/Sublist')
-local TickerData = Lua.import('Module:Widget/Tournaments/Ticker/Data')
+local TickerData = Lua.import('Module:TournamentsTicker/Data')
 
 ---@class TournamentsTickerWidget: Widget
 ---@operator call(table): TournamentsTickerWidget

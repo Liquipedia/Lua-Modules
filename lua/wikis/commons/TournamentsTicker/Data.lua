@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Tournaments/Ticker/Data
+-- page=Module:TournamentsTicker/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

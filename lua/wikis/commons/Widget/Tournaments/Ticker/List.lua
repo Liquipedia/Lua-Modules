@@ -17,7 +17,7 @@ local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local ListItem = Lua.import('Module:Widget/Tournaments/Ticker/ListItem')
 local PhaseCollapsible = Lua.import('Module:Widget/Tournaments/Ticker/PhaseCollapsible')
-local TickerData = Lua.import('Module:Widget/Tournaments/Ticker/Data')
+local TickerData = Lua.import('Module:TournamentsTicker/Data')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
 
 ---@class TournamentsTickerListWidgetProps: TournamentsTickerDataProps
