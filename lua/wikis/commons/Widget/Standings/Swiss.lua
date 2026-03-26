@@ -13,7 +13,6 @@ local Logic = Lua.import('Module:Logic')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Label = Lua.import('Module:Widget/Basic/Label')
 local MatchOverview = Lua.import('Module:Widget/Standings/MatchOverview')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
@@ -91,10 +90,10 @@ function StandingsSwissWidget:_headerRow()
 				if not tiebreaker.title then
 					return
 				end
-				return HtmlWidgets.Th{children = tiebreaker.title}
+				return makeHeaderCell(tiebreaker.title)
 			end),
 			Array.map(standings.rounds, function(round)
-				return HtmlWidgets.Th{children = round.title}
+				return makeHeaderCell(round.title)
 			end)
 		)}
 	}}
