@@ -12,6 +12,7 @@ local Game = Lua.import('Module:Game')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local DateRange = Lua.import('Module:Widget/Misc/DateRange')
@@ -47,27 +48,25 @@ function TournamentsTickerListItemWidget:render()
 		}
 		or Icon{iconName = 'firstplace', size = '1.125rem'}
 
-	local badgeChildren = {
+	local badgeChildren = WidgetUtil.collect(
 		HtmlWidgets.Span{
 			classes = {'tournaments-list-item__icon-compact'},
 			children = iconWidget,
 		},
-	}
-	if self.props.displayGameIcon then
-		table.insert(badgeChildren, HtmlWidgets.Div{
+		self.props.displayGameIcon and HtmlWidgets.Div{
 			classes = {'tournaments-list-item__game-icon'},
 			children = Game.icon{
 				game = tournament.game,
 				noLink = true,
 				size = '16px',
 			},
-		})
-	end
-	table.insert(badgeChildren, TierPill{
-		tournament = tournament,
-		variant = 'subtle',
-		colorScheme = self.props.tierColorScheme,
-	})
+		} or nil,
+		TierPill{
+			tournament = tournament,
+			variant = 'subtle',
+			colorScheme = self.props.tierColorScheme,
+		}
+	)
 
 	return HtmlWidgets.Div{
 		classes = {'tournaments-list-item'},
