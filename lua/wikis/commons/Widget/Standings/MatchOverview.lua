@@ -109,12 +109,7 @@ function MatchOverviewWidget:_createResultDisplay(leftScore, rightScore)
 	end
 	local resultType = self:_getMatchResultType()
 	return Label{
-		css = {
-			display = 'grid',
-			['grid-template-columns'] = '1fr auto 1fr',
-			['justify-items'] = 'center',
-			padding = '0.25rem',
-		},
+		labelScheme = 'standings-result',
 		labelType = 'result-' .. resultType,
 		children = self:_createScoreContainer(leftScore, rightScore)
 	}
