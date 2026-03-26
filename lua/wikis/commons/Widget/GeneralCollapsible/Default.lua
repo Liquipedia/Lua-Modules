@@ -16,8 +16,20 @@ local B = HtmlWidgets.B
 local Div = HtmlWidgets.Div
 local Widget = Lua.import('Module:Widget')
 
+---@class DefaultCollapsibleProps
+---@field attributes table<string, string>?
+---@field classes string[]?
+---@field css table<string, string|number>?
+---@field shouldCollapse boolean?
+---@field title Renderable?
+---@field titleClasses string[]?
+---@field titleWidget Renderable?
+---@field collapseAreaClasses string[]?
+---@field children Renderable|Renderable[]?
+
 ---@class DefaultCollapsible: Widget
----@operator call(table?): DefaultCollapsible
+---@operator call(DefaultCollapsibleProps?): DefaultCollapsible
+---@field props DefaultCollapsibleProps
 local DefaultCollapsible = Class.new(Widget)
 
 ---@return Widget
