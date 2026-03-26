@@ -46,7 +46,7 @@ function TournamentsTickerWidget:render()
 
 	return HtmlWidgets.Div{
 		children = {
-			HtmlWidgets.Ul{
+			HtmlWidgets.Div{
 				classes = {'tournaments-list'},
 				attributes = {
 					['data-filter-hideable-group'] = '',
