@@ -62,9 +62,10 @@ function TournamentsTickerPillWidget:render()
 	end
 	colorClass = colorClass or COLOR_CLASSES.default
 
+	local classes
+	local children
 	if self.props.variant == 'subtle' then
 		local subtleColorClass
-		local children
 		if tierTypeShort then
 			subtleColorClass = COLOR_CLASSES[tournament.liquipediaTier] or COLOR_CLASSES.default
 			children = {
@@ -86,36 +87,34 @@ function TournamentsTickerPillWidget:render()
 				}
 			}
 		end
-		local classes = {'tournament-badge', 'tournament-badge--subtle', 'badge--' .. subtleColorClass}
+		classes = {'tournament-badge', 'tournament-badge--subtle', 'badge--' .. subtleColorClass}
 		if self.props.colorScheme == 'top3' then
 			table.insert(classes, 3, 'tournament-badge--top3')
 		end
-		return HtmlWidgets.Div{
-			classes = classes,
-			children = children,
-		}
-	end
-
-	local tierNode, tierTypeNode
-	if tierTypeShort then
-		tierNode = HtmlWidgets.Div{
-			classes = {'tournament-badge__chip', 'chip--' .. COLOR_CLASSES[tournament.liquipediaTier]},
-			children = tierShort,
-		}
-		tierTypeNode = HtmlWidgets.Div{
-			classes = {'tournament-badge__text'},
-			children = tierTypeShort,
-		}
 	else
-		tierNode = HtmlWidgets.Div{
-			classes = {'tournament-badge__text'},
-			children = Tier.toName(tournament.liquipediaTier),
-		}
+		local tierNode, tierTypeNode
+		if tierTypeShort then
+			tierNode = HtmlWidgets.Div{
+				classes = {'tournament-badge__chip', 'chip--' .. COLOR_CLASSES[tournament.liquipediaTier]},
+				children = tierShort,
+			}
+			tierTypeNode = HtmlWidgets.Div{
+				classes = {'tournament-badge__text'},
+				children = tierTypeShort,
+			}
+		else
+			tierNode = HtmlWidgets.Div{
+				classes = {'tournament-badge__text'},
+				children = Tier.toName(tournament.liquipediaTier),
+			}
+		end
+		classes = {'tournament-badge', 'badge--' .. colorClass}
+		children = {tierNode, tierTypeNode}
 	end
 
 	return HtmlWidgets.Div{
-		classes = {'tournament-badge', 'badge--' .. colorClass},
-		children = {tierNode, tierTypeNode},
+		classes = classes,
+		children = children,
 	}
 end
 
