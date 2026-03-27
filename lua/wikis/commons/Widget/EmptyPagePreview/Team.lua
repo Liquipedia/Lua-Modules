@@ -246,7 +246,7 @@ function EmptyTeamPagePreview:_rosterFromTransfers()
 end
 
 ---@private
----@return (Widget|Html)[]
+---@return Widget[]
 function EmptyTeamPagePreview:_matches()
 	return {
 		HtmlWidgets.H3{children = 'Most Recent Matches'},
@@ -260,7 +260,7 @@ function EmptyTeamPagePreview:_matches()
 end
 
 ---@private
----@return (Widget|Html)[]
+---@return Widget[]
 function EmptyTeamPagePreview:_results()
 	return {
 		HtmlWidgets.H3{children = 'Achievements'},

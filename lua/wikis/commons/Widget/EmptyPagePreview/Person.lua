@@ -90,7 +90,7 @@ function EmptyPersonPagePreview:_infobox()
 end
 
 ---@private
----@return (Widget|Html)[]
+---@return Widget[]
 function EmptyPersonPagePreview:_matches()
 	return {
 		HtmlWidgets.H3{children = 'Most Recent Matches'},

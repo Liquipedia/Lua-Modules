@@ -33,4 +33,4 @@ function EmptyPagePreview:render()
 	return EmptyPersonPagePreview(self.props)
 end
 
-return EmptyTeamPagePreview
+return EmptyPagePreview
