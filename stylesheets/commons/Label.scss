@@ -183,8 +183,7 @@
 			}
 		}
 
-		&[ data-placement-type="down" ],
-		&[ data-placement-type="drop" ] {
+		&[ data-placement-type="down" ] {
 			--placement-solid-color: var( --clr-semantic-negative-40 );
 
 			.theme--dark & {
