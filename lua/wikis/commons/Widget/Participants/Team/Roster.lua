@@ -38,13 +38,15 @@ local TAB_DATA = {
 	[TAB_ENUM.STAFF] = {title = 'Staff', order = 4},
 }
 
----@type table<string, ParticipantsTeamCardTabs>
-local PERSON_TYPE_TO_TAB = {
-	player = TAB_ENUM.MAIN,
-	sub = TAB_ENUM.SUB,
-	former = TAB_ENUM.FORMER,
-	staff = TAB_ENUM.STAFF,
-}
+---@param player table
+---@return ParticipantsTeamCardTabs
+local function getPlayerTab(player)
+	local status = player.extradata.status
+	if status == 'former' then return TAB_ENUM.FORMER end
+	if status == 'sub' then return TAB_ENUM.SUB end
+	if player.extradata.type == 'staff' then return TAB_ENUM.STAFF end
+	return TAB_ENUM.MAIN
+end
 
 -- The biz logic behind the role display is somewhat complicated.
 -- There's 2 areas we show the role, left-role and right-role
@@ -59,7 +61,6 @@ local PERSON_TYPE_TO_TAB = {
 ---@return string?, string[]?
 local function getRoleDisplays(player)
 	local roles = player.extradata.roles or {}
-	local playerType = player.extradata.type
 	local played = player.extradata.played
 
 	local function roleLeftDisplay()
@@ -76,7 +77,7 @@ local function getRoleDisplays(player)
 	local function roleRightDisplay()
 		local rightRoles = {}
 		-- Add status label first (Left or DNP)
-		if playerType == 'former' then
+		if player.extradata.status == 'former' then
 			table.insert(rightRoles, 'Left')
 		elseif not played then
 			table.insert(rightRoles, 'DNP')
@@ -100,11 +101,11 @@ local ParticipantsTeamRoster = Class.new(Widget)
 ---@return Widget
 function ParticipantsTeamRoster:render()
 	local participant = self.props.participant
-	local makeRostersDisplay = function(players)
-		-- Used for making the sorting stable
+
+	-- Used for making the sorting stable
+	local sortPlayers = function(players)
 		local playerToIndex = Table.map(players, function(index, player) return player, index end)
-		-- Sort the players based on their roles first, then by their original order
-		players = Array.sortBy(players, FnUtil.identity, function (a, b)
+		return Array.sortBy(players, FnUtil.identity, function(a, b)
 			local function getPlayerSortOrder(player)
 				local roles = player.extradata.roles or {}
 				return roles[1] and roles[1].sortOrder or math.huge
@@ -116,38 +117,76 @@ function ParticipantsTeamRoster:render()
 			end
 			return orderA < orderB
 		end)
+	end
+
+	local makePlayerWidget = function(player, index)
+		local playerTeam = participant.opponent.template ~= player.team and player.team or nil
+		local playerTeamAsOpponent = playerTeam and Opponent.readOpponentArgs{
+			type = Opponent.team,
+			template = playerTeam,
+		} or nil
+		local roleLeft, roleRight = getRoleDisplays(player)
+		return ParticipantsTeamMember{
+			player = player,
+			team = playerTeamAsOpponent,
+			even = index % 2 == 0,
+			roleLeft = roleLeft,
+			roleRight = roleRight,
+			trophies = player.extradata.trophies or 0,
+		}
+	end
+
+	---@param groups {label: string?, players: table[]}[]
+	local makeRostersDisplay = function(groups)
+		local children = {}
+		for _, group in ipairs(groups) do
+			if group.label then
+				table.insert(children, Div{
+					classes = {'team-participant-card__subheader'},
+					children = group.label,
+				})
+			end
+			table.insert(children, Div{
+				classes = { 'team-participant-roster' },
+				children = Array.map(group.players, makePlayerWidget),
+			})
+		end
 		return Div{
 			classes = { 'team-participant-roster' },
-			children = Array.map(players, function(player, index)
-				local playerTeam = participant.opponent.template ~= player.team and player.team or nil
-				local playerTeamAsOpponent = playerTeam and Opponent.readOpponentArgs{
-					type = Opponent.team,
-					template = playerTeam,
-				} or nil
-				local roleLeft, roleRight = getRoleDisplays(player)
-				return ParticipantsTeamMember{
-					player = player,
-					team = playerTeamAsOpponent,
-					even = index % 2 == 0,
-					roleLeft = roleLeft,
-					roleRight = roleRight,
-					trophies = player.extradata.trophies or 0,
-					strikethrough = player.extradata.type == 'former',
-				}
-			end)
+			children = children,
 		}
 	end
 
 	local tabs = Array.map(Table.entries(TAB_DATA), function(tabTuple)
 		local tabTypeEnum, tabData = tabTuple[1], tabTuple[2]
-		local tabPlayers = Array.filter(participant.opponent.players or {}, function(player)
-			local personType = player.extradata.type
-			return PERSON_TYPE_TO_TAB[personType] == tabTypeEnum
-		end)
+		local tabPlayers = sortPlayers(Array.filter(participant.opponent.players or {}, function(player)
+			return getPlayerTab(player) == tabTypeEnum
+		end))
+
+		local groups
+		if tabTypeEnum == TAB_ENUM.FORMER then
+			local formerPlayers = Array.filter(tabPlayers, function(player)
+				return player.extradata.type ~= 'staff'
+			end)
+			local formerStaff = Array.filter(tabPlayers, function(player)
+				return player.extradata.type == 'staff'
+			end)
+			if #formerPlayers > 0 and #formerStaff > 0 then
+				groups = {
+					{ label = 'Players', players = formerPlayers },
+					{ label = 'Staff', players = formerStaff },
+				}
+			end
+		end
+		if not groups then
+			groups = { { players = tabPlayers } }
+		end
+
 		return {
 			order = tabData.order,
 			title = tabData.title,
 			type = tabTypeEnum,
+			groups = groups,
 			players = tabPlayers,
 		}
 	end)
@@ -162,7 +201,8 @@ function ParticipantsTeamRoster:render()
 		and #tabs[2].players == 1
 	then
 		-- If we only have main and staff, and exactly one staff, just show both rosters without a switch
-		return makeRostersDisplay(Array.extend(tabs[1].players, tabs[2].players))
+		local mergedPlayers = sortPlayers(Array.extend(tabs[1].players, tabs[2].players))
+		return makeRostersDisplay({ { players = mergedPlayers } })
 	end
 	tabs = Array.sortBy(tabs, Operator.property('order'))
 
@@ -177,7 +217,7 @@ function ParticipantsTeamRoster:render()
 		tabs = Array.map(tabs, function(tab)
 			return {
 				label = tab.title,
-				content = makeRostersDisplay(tab.players),
+				content = makeRostersDisplay(tab.groups),
 			}
 		end),
 	}
