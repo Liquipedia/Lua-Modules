@@ -9,8 +9,6 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local I18n = Lua.import('Module:I18n')
-local Logic = Lua.import('Module:Logic')
-
 local Widget = Lua.import('Module:Widget')
 local ContentSwitch = Lua.import('Module:Widget/ContentSwitch')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -37,7 +35,7 @@ TournamentsTickerListWidget.defaultProps = {
 ---@return Widget
 function TournamentsTickerListWidget:render()
 	local data = TickerData.get(self.props)
-	local displayGameIcons = Logic.readBool(self.props.displayGameIcons)
+	local displayGameIcons = self.props.displayGameIcons
 
 	---@param tournament StandardTournament
 	---@return Widget
