@@ -614,6 +614,12 @@ label[ for="tournaments-list-filter-ultimate" ]::before {
 	transition: 0.5s;
 }
 
+.match-section-header {
+	.match-info {
+		padding: 0.5rem;
+	}
+}
+
 /* icon list */
 .mainpage-icons-10 img {
 	width: calc( 10% - 3.45px );
