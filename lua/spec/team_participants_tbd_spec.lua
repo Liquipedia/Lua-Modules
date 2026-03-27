@@ -89,10 +89,10 @@ describe('Team Participants TBD Functionality', function()
 			TeamParticipantsWikiParser.fillIncompleteRoster(opponent, 5)
 
 			assert.are_equal(7, #opponent.players)
-			local actualPlayers = Array.filter(opponent.players, function(p)
-				return p.extradata.type == 'player'
+			local activePlayers = Array.filter(opponent.players, function(p)
+				return p.extradata.type == 'player' and not p.extradata.status
 			end)
-			assert.are_equal(5, #actualPlayers)
+			assert.are_equal(5, #activePlayers)
 		end)
 
 		it('handles missing data gracefully', function()
@@ -184,14 +184,14 @@ describe('Team Participants TBD Functionality', function()
 		TeamParticipantsController.fillIncompleteRosters(parsedData)
 
 		local opponent = parsedData.participants[1].opponent
-		local actualPlayers = Array.filter(opponent.players, function(p)
-			return p.extradata.type == 'player'
+		local activePlayers = Array.filter(opponent.players, function(p)
+			return p.extradata.type == 'player' and not p.extradata.status
 		end)
 
-		assert.are_equal(5, #actualPlayers)
-			assert.are_equal('alexis', actualPlayers[1].displayName)
-			assert.are_equal('TBD', actualPlayers[4].displayName)
-			assert.are_equal('TBD', actualPlayers[5].displayName)
+		assert.are_equal(5, #activePlayers)
+			assert.are_equal('alexis', activePlayers[1].displayName)
+			assert.are_equal('TBD', activePlayers[4].displayName)
+			assert.are_equal('TBD', activePlayers[5].displayName)
 
 			LpdbQuery:revert()
 			TeamTemplateMock.tearDown()
