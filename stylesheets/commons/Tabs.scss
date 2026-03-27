@@ -441,8 +441,8 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				font-weight: bold;
 
 				.theme--light & {
-					background-color: var( --clr-secondary-100 );
-					color: var( --clr-secondary-8 );
+					background-color: var( --clr-background );
+					color: var( --clr-secondary-9 );
 				}
 
 				.theme--dark & {
