@@ -71,7 +71,7 @@ local CONTENT = {
 				}
 			}
 		}},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	tournaments = {

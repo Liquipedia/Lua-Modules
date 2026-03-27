@@ -82,6 +82,7 @@ function MatchTickerContainer:render()
 		classes = {'match-section-header'},
 		children = {
 			ContentSwitch{
+				css = {margin = '0.75rem'},
 				tabs = {
 					{
 						label = 'Upcoming',
