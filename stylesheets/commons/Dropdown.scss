@@ -1,3 +1,30 @@
+/*******************************************************************************
+Template(s): Dropdown box
+Author(s): Rapture
+*******************************************************************************/
+.dropdown-box-wrapper {
+	position: relative;
+	display: inline-block;
+}
+
+.dropdown-box {
+	display: none;
+	position: absolute;
+	top: 100%;
+	left: 0;
+	z-index: 1000;
+	float: left;
+	margin: 0;
+	padding: 5px;
+}
+
+.dropdown-box-visible {
+	display: block;
+}
+
+/*******************************************************************************
+Template(s): Dropdown Widget
+*******************************************************************************/
 .dropdown-widget {
 	position: relative;
 
