@@ -106,18 +106,18 @@ end
 ---@private
 ---@return (Widget|Html)[]
 function EmptyPersonPagePreview:_results()
-	---@type table<string, string|boolean>
+	---@type table<string, string|boolean|Widget>
 	local tabArgs = {
 		suppressHeader = true,
 		name1 = 'Achievements',
-		content1 = tostring(ResultsTable.results{
+		content1 = ResultsTable.results{
 			player = self.person,
 			showType = true,
 			gameIcons = true,
 			awards = false,
 			achievements = true,
 			querytype = 'solo',
-		})
+		}
 	}
 	local index = 2
 
@@ -131,7 +131,7 @@ function EmptyPersonPagePreview:_results()
 	}
 	if Logic.isNotEmpty(awardsAchievements) then
 		tabArgs['name' .. index] = 'Awards Achievements'
-		tabArgs['content' .. index] = tostring(awardsAchievements)
+		tabArgs['content' .. index] = awardsAchievements
 		index = index + 1
 	end
 
@@ -142,7 +142,7 @@ function EmptyPersonPagePreview:_results()
 	}
 	if Logic.isNotEmpty(talentAchievements) then
 		tabArgs['name' .. index] = 'Talent Achievements'
-		tabArgs['content' .. index] = tostring(talentAchievements)
+		tabArgs['content' .. index] = talentAchievements
 	end
 
 	return {
