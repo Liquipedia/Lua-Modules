@@ -15,7 +15,7 @@ local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LinkWidgetParameters
----@field children (Widget|Html|string|number)[]
+---@field children Renderable|Renderable[]
 ---@field link string
 ---@field linktype 'internal'|'external'|nil
 

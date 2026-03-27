@@ -17,9 +17,9 @@ local Div = HtmlWidgets.Div
 
 ---@class DialogWidgetProps
 ---@field dialogClasses? string[]
----@field title? string|number|Widget|Html|(string|number|Widget|Html)[]
----@field trigger? string|number|Widget|Html|(string|number|Widget|Html)[]
----@field children? string|number|Widget|Html|(string|number|Widget|Html)[]
+---@field title? Renderable|Renderable[]
+---@field trigger? Renderable|Renderable[]
+---@field children? Renderable|Renderable[]
 
 ---@class DialogWidget: Widget
 ---@operator call(DialogWidgetProps): DialogWidget

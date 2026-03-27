@@ -202,6 +202,7 @@ function Tabs.dynamic(args)
 
 	return AnalyticsWidgets{
 		analyticsName = 'Dynamic Navigation tab',
+		css = {width = '-webkit-fill-available'},
 		children = HtmlWidgets.Div{
 			classes = {'tabs-dynamic', 'navigation-not-searchable', variantClass, wrapsClass},
 			attributes = {['data-nosnippet'] = ''},
@@ -312,11 +313,11 @@ end
 ---@return Widget
 function Tabs._single(tab, showHeader)
 	return HtmlWidgets.Fragment{
-		children = {
+		children = WidgetUtil.collect(
 			showHeader and HtmlWidgets.H6{children = {tab.name}} or nil,
 			showHeader and '\n' or nil,
 			tab.content
-		}
+		)
 	}
 end
 

@@ -132,13 +132,11 @@ return {
 				table = 'datapoint',
 				conditions = Condition.Tree(BooleanOperator.all):add{
 					Condition.Node(Condition.ColumnName('type'), Comparator.eq, 'card'),
-					Condition.Tree(BooleanOperator.any):add{
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Tower Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Spell'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Building'),
-					}
-				}:toString()
+					Condition.Util.anyOf(
+						Condition.ColumnName('type', 'extradata'),
+						{'Troop', 'Tower Troop', 'Spell', 'Building'}
+					)
+				}
 			},
 		},
 		{
@@ -150,13 +148,11 @@ return {
 				table = 'datapoint',
 				conditions = Condition.Tree(BooleanOperator.all):add{
 					Condition.Node(Condition.ColumnName('type'), Comparator.eq, 'card'),
-					Condition.Tree(BooleanOperator.any):add{
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Tower Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Spell'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Building'),
-					}
-				}:toString()
+					Condition.Util.anyOf(
+						Condition.ColumnName('type', 'extradata'),
+						{'Evolved Troop', 'Evolved Tower Troop', 'Evolved Spell', 'Evolved Building'}
+					)
+				}
 			},
 		},
 		{
@@ -166,7 +162,13 @@ return {
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[extradata_type::Hero Troop]]',
+				conditions = Condition.Tree(BooleanOperator.all):add{
+					Condition.Node(Condition.ColumnName('type'), Comparator.eq, 'card'),
+					Condition.Util.anyOf(
+						Condition.ColumnName('type', 'extradata'),
+						{'Hero Troop', 'Hero Spell'}
+					)
+				}
 			},
 		},
 		{
@@ -178,7 +180,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				sizes = {xxl = 5, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
@@ -195,7 +197,7 @@ return {
 				}
 			},
 			{ -- Right
-				size = 6,
+				sizes = {xxl = 7, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 2,

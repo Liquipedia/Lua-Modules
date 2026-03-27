@@ -97,8 +97,18 @@ return {
 		['brkts-header-q'] = 'Qualified,Qual.,Q',
 		['brkts-header-tp'] = 'Third Place Match,3rd Place,3rd',
 
+		-- MatchPage meta description
+		['matchpage-meta-desc'] = 'Find detailed results about the ${ongoingTense}${game} match ' ..
+									'between ${opponent1} and ${opponent2} in ${tournamentName}${tense}.',
+		['matchpage-meta-desc-no-opponent']
+				= 'Find detailed results about the ${ongoingTense}${game} match in ${tournamentName}${tense}.',
+
 		-- MatchSummary Map Veto
 		['matchsummary-mapveto-start'] = 'Start Map Veto',
+
+		-- MatchTable
+		['matchtable-no-match-results'] = 'This ${mode} has not played any matches yet.',
+		['matchtable-no-h2h-match-results'] = 'These ${mode} have not played any matches against each other yet.',
 
 		-- MatchTicker
 		['matchticker-upcoming-matches'] = 'Upcoming Matches',

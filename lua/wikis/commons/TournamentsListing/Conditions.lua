@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
+local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
@@ -37,18 +38,10 @@ function TournamentsListingConditions.base(args)
 		conditions:add{ConditionNode(ColumnName('enddate_year'), Comparator.eq, args.year)}
 	else
 		if startDate then
-			conditions:add{ConditionTree(BooleanOperator.any):add{
-				ConditionNode(ColumnName('startdate'), Comparator.gt, startDate),
-				ConditionNode(ColumnName('startdate'), Comparator.eq, startDate)
-				},
-			}
+			conditions:add(ConditionNode(ColumnName('startdate'), Comparator.ge, startDate))
 		end
 		if endDate then
-			conditions:add{ConditionTree(BooleanOperator.any):add{
-				ConditionNode(ColumnName('startdate'), Comparator.lt, endDate),
-				ConditionNode(ColumnName('startdate'), Comparator.eq, endDate)
-				},
-			}
+			conditions:add(ConditionNode(ColumnName('startdate'), Comparator.le, endDate))
 		end
 	end
 
@@ -64,8 +57,10 @@ function TournamentsListingConditions.base(args)
 		conditions:add{ConditionNode(ColumnName('mode'), Comparator.eq, args.mode)}
 	end
 
-	if args.game then
-		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, args.game)}
+	if Logic.isNotEmpty(args.game) then
+		local game = assert(Game.toIdentifier{game = args.game, useDefault = false},
+			'Invalid game input "' .. args.game .. '"')
+		conditions:add(ConditionNode(ColumnName('game'), Comparator.eq, game))
 	end
 
 	if args.series1 or args.series then

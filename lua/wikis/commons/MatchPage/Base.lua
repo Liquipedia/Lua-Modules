@@ -13,18 +13,23 @@ local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
+local Game = Lua.import('Module:Game')
+local I18n = Lua.import('Module:I18n')
 local Logic = Lua.import('Module:Logic')
 local Links = Lua.import('Module:Links')
+local MatchTable = Lua.import('Module:MatchTable')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
+local TextSanitizer = Lua.import('Module:TextSanitizer')
 local Tournament = Lua.import('Module:Tournament')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
+local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -76,6 +81,8 @@ local BaseMatchPage = Class.new(
 		self:populateOpponents()
 
 		self:addCategories()
+
+		self:_setMetadata()
 	end
 )
 
@@ -103,6 +110,57 @@ function BaseMatchPage:addCategories()
 			mw.ext.TeamLiquidIntegration.add_category(phaseToDisplay[matchPhase] .. ' Matches')
 		end
 	end
+end
+
+---@private
+function BaseMatchPage:_setMetadata()
+	local tournament = self:getMatchContext()
+	local icon = Logic.emptyOr(tournament.icon, tournament.iconDark)
+
+	if icon then
+		mw.ext.SearchEngineOptimization.metaimage(icon)
+	end
+
+	local desc = self:seoText()
+	if String.isNotEmpty(desc) then
+		---@cast desc -nil
+		mw.ext.SearchEngineOptimization.metadescl(desc)
+	end
+end
+
+---@protected
+function BaseMatchPage:seoText()
+	local tournament = self:getMatchContext()
+	local matchPhase = MatchGroupUtil.computeMatchPhase(self.matchData)
+
+	---@return string?
+	local function createTenseString()
+		if matchPhase == 'ongoing' then
+			return
+		end
+		return String.interpolate(
+			' that ${tense} place on ${date}',
+			{
+				tense = matchPhase == 'upcoming' and 'will take' or 'took',
+				date = TextSanitizer.stripHTML(DateExt.toCountdownArg(
+					self.matchData.timestamp, self.matchData.timezoneId, self.matchData.dateIsExact
+				))
+			}
+		)
+	end
+
+	return I18n.translate(
+		(Opponent.isTbd(self.opponents[1]) and Opponent.isTbd(self.opponents[2]))
+			and 'matchpage-meta-desc-no-opponent' or 'matchpage-meta-desc',
+		{
+			ongoingTense = matchPhase == 'ongoing' and 'ongoing ' or '',
+			game = (Game.name{game = self.matchData.game}) --[[@as string]],
+			tournamentName = tournament.displayName,
+			opponent1 = Opponent.toName(self.opponents[1]),
+			opponent2 = Opponent.toName(self.opponents[2]),
+			tense = createTenseString() or ''
+		}
+	)
 end
 
 ---Tests whether this match page is a Bo1
@@ -283,7 +341,8 @@ function BaseMatchPage:render()
 			},
 			self:renderMapVeto(),
 			self:renderGames(),
-			self:footer()
+			self:footer(),
+			self:previousMatches()
 		)
 	}
 end
@@ -326,10 +385,8 @@ function BaseMatchPage:renderGames()
 				}
 			end)
 		),
-		size = 'small',
 		storeValue = false,
-		switchGroup = 'matchPageGameSelector',
-		variant = 'generic'
+		switchGroup = 'matchPageGameSelector'
 	}
 end
 
@@ -433,6 +490,95 @@ function BaseMatchPage:footer()
 				children = patchLink
 			} or nil
 		)
+	}
+end
+
+---@protected
+---@return Widget[]?
+function BaseMatchPage:previousMatches()
+	if Array.all(self.opponents, Opponent.isTbd) then
+		return
+	end
+
+	local headToHead = self:_buildHeadToHeadMatchTable()
+
+	return WidgetUtil.collect(
+		HtmlWidgets.H3{children = 'Match History'},
+		Div{
+			classes = {'match-bm-match-additional'},
+			children = WidgetUtil.collect(
+				headToHead and AdditionalSection{
+					css = {flex = '2 0 100%'},
+					header = 'Head to Head',
+					children = headToHead,
+				} or nil,
+				Array.map(self.opponents, function (opponent)
+					local matchTable = self:_buildMatchTable(opponent)
+					return AdditionalSection{
+						header = OpponentDisplay.InlineOpponent{opponent = opponent, teamStyle = 'hybrid'},
+						children = matchTable or self:getTournamentIcon()
+					}
+				end)
+			)
+		}
+	)
+end
+
+---@private
+---@param opponent standardOpponent
+---@return boolean
+function BaseMatchPage._isTeamOpponent(opponent)
+	return not Opponent.isTbd(opponent) and opponent.type == Opponent.team
+end
+
+---@private
+---@param props table
+---@return Widget
+function BaseMatchPage:_createMatchTable(props)
+	return MatchTable(Table.mergeInto({
+		addCategory = false,
+		dateFormat = 'compact',
+		edate = self.matchData.timestamp - DateExt.daysToSeconds(1) --[[ MatchTable adds 1-day offset to make edate
+																		inclusive, and we don't want that here ]],
+		limit = 5,
+		stats = false,
+		sortableResults = false,
+		tableMode = Opponent.team,
+		vod = false,
+		matchPageButtonText = 'short',
+	}, props)):readConfig():query():buildDisplay()
+end
+
+---@private
+---@param opponent standardOpponent
+---@return Widget?
+function BaseMatchPage:_buildMatchTable(opponent)
+	if not BaseMatchPage._isTeamOpponent(opponent) then
+		return
+	end
+	return self:_createMatchTable{
+		['hide_tier'] = true,
+		limit = 5,
+		stats = false,
+		tableMode = Opponent.team,
+		team = opponent.name,
+		useTickerName = true,
+	}
+end
+
+---@private
+---@return Widget?
+function BaseMatchPage:_buildHeadToHeadMatchTable()
+	if not Array.all(self.opponents, BaseMatchPage._isTeamOpponent) then
+		return
+	end
+	return self:_createMatchTable{
+		team = self.opponents[1].name,
+		vsteam = self.opponents[2].name,
+		showOpponent = true,
+		opponentHeader = 'Opponent',
+		teamStyle = 'hybrid',
+		useTickerName = true,
 	}
 end
 

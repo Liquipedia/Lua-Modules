@@ -19,7 +19,7 @@ local Div = HtmlWidgets.Div
 ---@field analyticsName string?
 ---@field analyticsProperties table<string, string>?
 ---@field classes string[]?
----@field children (Widget|Html|string|number|nil)[]|(Widget|Html|string|number|nil)?
+---@field children Renderable|Renderable[]?
 ---@field css table<string, string|integer?>?
 
 ---@class AnalyticsWidget: Widget
@@ -27,7 +27,7 @@ local Div = HtmlWidgets.Div
 ---@field props AnalyticsWidgetParameters
 local AnalyticsWidget = Class.new(Widget)
 
----@return (string|number|Widget|Html|nil)[]|(string|number|Widget|Html|nil)
+---@return Renderable|Renderable[]?
 function AnalyticsWidget:render()
 	local analyticsName = self.props.analyticsName
 

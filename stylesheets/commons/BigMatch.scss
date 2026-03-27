@@ -38,20 +38,18 @@ span.slash {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	padding: 16px;
+	padding: 1rem 0;
 }
 
-.match-bm-match-header-team {
+.match-bm-match-header-opponent {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
 	gap: 0.5rem;
 	width: 100%;
 	font-weight: bold;
 
-	@media ( min-width: 768px ) {
-		flex-direction: row;
-		gap: 1.5rem;
+	@media ( max-width: 767px ) {
+		align-items: center;
 	}
 
 	&:first-child {
@@ -59,7 +57,7 @@ span.slash {
 			flex-direction: row-reverse;
 		}
 
-		.match-bm-match-header-team-group {
+		.match-bm-match-header-opponent-group {
 			@media ( min-width: 768px ) {
 				align-items: flex-end;
 				text-align: end;
@@ -70,10 +68,30 @@ span.slash {
 	&-group {
 		display: flex;
 		flex-direction: column;
+		gap: 0.5rem;
 
 		@media ( max-width: 768px ) {
 			align-items: center;
 		}
+
+		&-container {
+			display: flex;
+			flex-direction: column;
+		}
+	}
+
+	&-literal {
+		font-style: italic;
+		font-weight: normal;
+	}
+}
+
+.match-bm-match-header-team {
+	align-items: center;
+
+	@media ( min-width: 768px ) {
+		flex-direction: row;
+		gap: 1.5rem;
 	}
 
 	&-long {
@@ -88,11 +106,6 @@ span.slash {
 		@media ( min-width: 768px ) {
 			display: none !important;
 		}
-	}
-
-	&-literal {
-		font-style: italic;
-		font-weight: normal;
 	}
 
 	.team-template-team-icon {
@@ -141,51 +154,22 @@ span.slash {
 	}
 }
 
-.match-bm-match-header-round {
-	&-results {
-		display: flex;
-		gap: 0.25rem;
+.match-bm-match-header-party {
+	align-items: flex-start;
+	font-size: 1.25rem;
+
+	&:first-child {
+		align-items: flex-end;
 	}
+}
 
-	&-result {
-		color: #ffffff;
-		height: 1.25rem;
-		width: 1.25rem;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border-radius: 100%;
-		text-transform: uppercase;
-		font-size: 0.875rem;
-		margin-top: 0.75rem;
+.match-bm-match-header-round-results {
+	display: flex;
+	gap: 0.25rem;
 
-		@media ( min-width: 768px ) {
-			height: 1.5rem;
-			width: 1.5rem;
-		}
-
-		&.result--winner {
-			background-color: var( --clr-semantic-positive-40, #27a527 );
-
-			&::before {
-				content: "W";
-			}
-		}
-
-		&.result--loser {
-			background-color: var( --clr-semantic-negative-40, #b81414 );
-
-			&::before {
-				content: "L";
-			}
-		}
-
-		&.result--notplayed {
-			background-color: var( --clr-secondary-25, #404040 );
-
-			&::before {
-				content: "-";
-			}
+	@media ( min-width: 768px ) {
+		.generic-label {
+			--label-scale: 1.2;
 		}
 	}
 }
@@ -239,7 +223,7 @@ span.slash {
 .match-bm-match-header-tournament {
 	display: flex;
 	justify-content: center;
-	padding: 8px;
+	padding: 0.5rem;
 	background-color: var( --clr-on-surface-light-primary-8 );
 	border-radius: 0.5rem;
 
@@ -313,8 +297,8 @@ span.slash {
 .match-bm-match-mvp {
 	display: flex;
 	justify-content: center;
-	padding: 8px;
-	gap: 4px;
+	padding: 0.5rem;
+	gap: 0.25rem;
 	background-color: var( --clr-on-surface-light-primary-8 );
 	border-radius: 0.5rem;
 
@@ -334,6 +318,7 @@ span.slash {
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-on-surface-dark-primary-8 );
 		color-scheme: dark;
+		--carousel-fade-color: var( --clr-secondary-16, var( --clr-background, #121212 ) );
 	}
 
 	&-content {
@@ -461,12 +446,8 @@ span.slash {
 	grid-gap: 1rem;
 	align-items: flex-start;
 
-	@media ( min-width: 414px ) {
-		font-size: 15px;
-	}
-
 	@media ( max-width: 435px ) {
-		font-size: 12px;
+		font-size: 0.75rem;
 	}
 
 	@media ( min-width: 768px ) {
@@ -505,12 +486,12 @@ span.slash {
 .match-bm-players-player {
 	display: grid;
 	align-items: center;
-	grid-template-columns: 9.375rem calc( 100% - 21rem ) 9.5rem; /* set as default */
-	padding: 1rem;
+	grid-template-columns: 10rem auto max-content; /* set as default */
+	padding: 0.75rem 0.5rem;
 	background: var( --clr-on-surface-light-primary-8 );
 	border-radius: 0.5rem;
 	flex-wrap: wrap;
-	justify-content: space-between;
+	justify-content: stretch;
 	gap: 0.5rem;
 
 	&.match-bm-players-player--col-1 {
@@ -518,14 +499,14 @@ span.slash {
 	}
 
 	&.match-bm-players-player--col-2 {
-		grid-template-columns: 9.375rem calc( 100% - 9.375rem );
+		grid-template-columns: 10.5rem auto;
 	}
 
 	&.match-bm-players-player--col-3 {
 		grid-template-columns: repeat( 2, 1fr );
 
 		@container players-team ( min-width: 560px ) {
-			grid-template-columns: 9.375rem calc( 100% - 21rem ) 9.5rem;
+			grid-template-columns: 10.5rem auto max-content;
 		}
 	}
 
@@ -595,7 +576,6 @@ span.slash {
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
-		font-size: 0.9375rem;
 		word-wrap: anywhere;
 		word-break: normal;
 
@@ -741,7 +721,6 @@ span.slash {
 
 		&-data {
 			font-weight: bold;
-			font-size: 0.9375rem;
 
 			.wiki-leagueoflegends & {
 				@media ( max-width: 413px ) {
@@ -909,7 +888,7 @@ span.slash {
 		display: flex;
 		flex-direction: row;
 		align-items: flex-start;
-		gap: 4px;
+		gap: 0.25rem;
 	}
 
 	img {
@@ -939,7 +918,7 @@ span.slash {
 	&-team {
 		display: flex;
 		align-items: center;
-		gap: 4px;
+		gap: 0.25rem;
 	}
 
 	&-center {
@@ -948,12 +927,18 @@ span.slash {
 	}
 
 	&-faction {
-		width: 20px;
-		height: 20px;
+		display: flex;
+		width: 1.25rem;
+		height: 1.25rem;
 
 		@media ( max-width: 435px ) {
-			width: 16px;
-			height: 16px;
+			width: 1rem;
+			height: 1rem;
+		}
+
+		> img {
+			max-width: 100%;
+			height: auto;
 		}
 	}
 
@@ -972,7 +957,7 @@ span.slash {
 			justify-content: center;
 			align-items: center;
 			padding: 0 0.5rem;
-			gap: 4px;
+			gap: 0.25rem;
 			text-align: center;
 		}
 	}
@@ -1026,7 +1011,7 @@ span.slash {
 		flex: 3 0 100%;
 		flex-direction: column;
 		padding: 0.5rem;
-		gap: 4px;
+		gap: 0.25rem;
 		border-radius: 0.5rem;
 		background: var( --clr-on-surface-light-primary-8 );
 
@@ -1049,6 +1034,7 @@ span.slash {
 		display: flex;
 		flex-flow: column;
 		padding: 0.5rem;
+		width: 100%;
 
 		.theme--dark & {
 			background-color: var( --clr-on-surface-dark-primary-8 );
@@ -1081,6 +1067,15 @@ span.slash {
 			.theme--dark & {
 				background-color: var( --clr-secondary-16 );
 				border-color: var( --clr-on-surface-dark-primary-8 );
+			}
+
+			&:has( > .match-table-wrapper ) {
+				display: contents;
+				padding: unset;
+
+				> .match-table-wrapper {
+					width: unset;
+				}
 			}
 		}
 	}
@@ -1173,8 +1168,8 @@ span.slash {
 
 	&-list {
 		flex: auto;
-		display: flex;
-		flex-direction: column;
+		display: grid;
+		grid-template-columns: repeat( 3, 1fr );
 
 		.wiki-dota2 & {
 			@media ( min-width: 768px ) {
@@ -1203,7 +1198,10 @@ span.slash {
 		}
 
 		&-row {
-			display: flex;
+			display: grid;
+			grid-column: 1 / 4;
+			grid-template-columns: subgrid;
+			min-height: 2.75rem;
 
 			&:not( :last-child ) {
 				border-bottom: 0.0625rem solid #bbbbbb;
@@ -1217,9 +1215,7 @@ span.slash {
 		&-cell {
 			display: flex;
 			justify-content: center;
-			flex: 1;
 			align-items: center;
-			min-height: 2.75rem;
 			gap: 0.5rem;
 			font-weight: bold;
 
@@ -1251,7 +1247,7 @@ span.slash {
 		flex-direction: row;
 		justify-content: center;
 		align-items: center;
-		padding: 16px;
+		padding: 1rem;
 		flex: 1;
 	}
 
@@ -1314,10 +1310,13 @@ span.slash {
 		}
 
 		&-title {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
 			padding-top: 0.5rem;
-			text-align: center;
+			gap: 0.5rem;
 
-			& > a {
+			> a {
 				color: inherit !important;
 			}
 		}
@@ -1327,24 +1326,7 @@ span.slash {
 		}
 
 		&-map-info {
-			display: flex;
-			flex-direction: column;
-			padding-top: 0.5rem;
-		}
-
-		&--ban &-map-action {
-			color: var( --clr-semantic-negative-40 );
-			font-weight: bold;
-		}
-
-		&--pick &-map-action {
-			color: var( --clr-semantic-positive-40 );
-			font-weight: bold;
-		}
-
-		&--decider &-map-action {
-			color: var( --clr-semantic-positive-40 );
-			font-weight: bold;
+			display: contents;
 		}
 	}
 }
@@ -1518,7 +1500,7 @@ $valorant-def: #01654c;
 	flex-flow: column nowrap;
 	background: var( --clr-on-surface-light-primary-8 );
 	border-radius: 0.5rem;
-	min-width: 200px;
+	min-width: 12.5rem;
 	overflow: hidden;
 	font-size: 90%;
 
@@ -1613,15 +1595,5 @@ $valorant-def: #01654c;
 				}
 			}
 		}
-	}
-
-	&-container {
-		display: flex;
-		flex-flow: row nowrap;
-		overflow-x: auto;
-		scroll-snap-type: x mandatory;
-		scrollbar-width: thin;
-		gap: 0.5rem;
-		align-items: stretch;
 	}
 }

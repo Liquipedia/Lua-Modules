@@ -41,6 +41,7 @@ function MatchSummaryCharacters:render()
 			flipped and 'brkts-popup-body-element-thumbs-right' or nil,
 			self.props.hideOnMobile and 'mobile-hide' or nil
 		),
+		css = self.props.css,
 		children = Array.map(self.props.characters, function(character)
 			return Character{
 				character = character,

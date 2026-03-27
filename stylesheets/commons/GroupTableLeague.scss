@@ -6,11 +6,14 @@ Author: warnull
 .group-table {
 	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
 	border-right: 1px solid var( --table-border-color, #bbbbbb );
-}
 
-@media ( max-width: 435px ) {
-	.group-table {
+	@media ( max-width: 435px ) {
 		width: 100% !important;
+	}
+
+	.dropdown-box {
+		border: 0;
+		padding: 0;
 	}
 }
 
@@ -29,10 +32,16 @@ Author: warnull
 	justify-content: space-between;
 	padding: 5px;
 	background-color: var( --clr-surface-2 );
-}
 
-.group-table-header * + .general-collapsible-default-toggle {
-	margin-left: 1px;
+	* + .general-collapsible-default-toggle {
+		margin-left: 1px;
+	}
+
+	&-right {
+		flex: 0 1 auto;
+		min-width: 0;
+		text-align: right;
+	}
 }
 
 .group-table-title {
@@ -40,12 +49,6 @@ Author: warnull
 	font-weight: bold;
 	min-width: 0;
 	text-align: center;
-}
-
-.group-table-header-right {
-	flex: 0 1 auto;
-	min-width: 0;
-	text-align: right;
 }
 
 .group-table-countdown {
@@ -58,28 +61,16 @@ Author: warnull
 	text-align: center;
 }
 
-.group-table .dropdown-box {
-	border: 0;
-	padding: 0;
-}
-
 .group-table-header-row,
 .group-table-result-row {
 	background-color: inherit;
 	display: contents;
-}
 
-@supports not ( display: contents ) {
-	.group-table-header-row,
-	.group-table-result-row {
+	@supports not ( display: contents ) {
 		display: grid;
 		grid-column: 1 / -1;
 		grid-template-columns: 36px 1fr repeat( 8, auto );
 	}
-}
-
-.group-table-header-row > .group-table-cell {
-	padding: 3px 2px;
 }
 
 .group-table-results {
@@ -96,38 +87,54 @@ Author: warnull
 	min-width: 0;
 	padding: 5px;
 	text-align: center;
-}
 
-.group-table-cell.brkts-opponent-hover {
-	transition: 0.5s;
-	transition-property: border-color;
-}
+	.group-table-header-row > & {
+		padding: 3px 2px;
+	}
 
-.group-table-cell.brkts-opponent-hover-active {
-	border-color: transparent;
-}
+	&.brkts-opponent-hover {
+		transition: 0.5s;
+		transition-property: border-color;
 
-.group-table-cell-content {
-	flex: 1 1;
-	min-width: 0;
+		&-active {
+			border-color: transparent;
+		}
+	}
+
+	&-content {
+		flex: 1 1;
+		min-width: 0;
+	}
 }
 
 .group-table-entry {
 	justify-content: space-between;
 	text-align: left;
-}
 
-.group-table-entry-left {
-	min-width: 0;
-}
-
-.group-table-rank-change {
-	font-size: 90%;
+	&-left {
+		min-width: 0;
+	}
 }
 
 .group-table-rank {
 	font-weight: bold;
 	min-width: 28px;
+
+	&-change {
+		font-size: 90%;
+
+		&-up {
+			color: #008000 !important;
+		}
+
+		&-down {
+			color: #ff0000 !important;
+		}
+
+		&-same {
+			color: #ff00ff !important;
+		}
+	}
 }
 
 .group-table-match-score {
@@ -149,18 +156,6 @@ Author: warnull
 .group-table-points {
 	font-weight: bold;
 	white-space: pre;
-}
-
-.group-table-rank-change-up {
-	color: #008000 !important;
-}
-
-.group-table-rank-change-down {
-	color: #ff0000 !important;
-}
-
-.group-table-rank-change-same {
-	color: #ff00ff !important;
 }
 
 /**
@@ -192,10 +187,19 @@ Author: warnull
 .swiss-table-match-row {
 	background: inherit;
 	display: contents;
+
+	@supports not ( display: contents ) {
+		display: grid;
+		grid-template-columns: repeat( 100, auto );
+	}
 }
 
 .swiss-table-body-row {
 	display: contents;
+
+	&:nth-of-type( 2n ) {
+		background: var( --table-striped-background-color, #f5f5f5 );
+	}
 }
 
 @supports not ( display: contents ) {
@@ -205,36 +209,27 @@ Author: warnull
 		grid-column: 1 / -1;
 		grid-template-columns: 50% 50%;
 	}
+}
 
-	.swiss-table-header-row > .group-table-header-row,
-	.swiss-table-body-row > .group-table-result-row {
+.swiss-table-header-row > .group-table-header-row,
+.swiss-table-body-row > .group-table-result-row {
+	@supports not ( display: contents ) {
 		grid-column-end: 1;
 	}
 
-	.swiss-table-match-header-row,
-	.swiss-table-match-row {
-		display: grid;
-		grid-template-columns: repeat( 100, auto );
+	> .group-table-cell:last-child {
+		border-right: 1px solid var( --table-border-color, #bbbbbb );
 	}
-}
-
-.swiss-table-body-row:nth-of-type( 2n ) {
-	background: var( --table-striped-background-color, #f5f5f5 );
-}
-
-.swiss-table-header-row > .group-table-header-row > .group-table-cell:last-child,
-.swiss-table-body-row > .group-table-result-row > .group-table-cell:last-child {
-	border-right: 1px solid var( --table-border-color, #bbbbbb );
 }
 
 .swiss-table-match {
 	flex-direction: column;
 	padding: 3px;
-}
 
-.swiss-table-match-score {
-	font-size: 80%;
-	margin-bottom: -3px;
+	&-score {
+		font-size: 80%;
+		margin-bottom: -3px;
+	}
 }
 
 .swiss-table-live-text {

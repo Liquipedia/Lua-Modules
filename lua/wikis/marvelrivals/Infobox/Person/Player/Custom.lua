@@ -60,8 +60,9 @@ function CustomInjector:parse(id, widgets)
 				children = {table.concat(heroIcons, '&nbsp;')},
 			}
 		)
+	elseif id == 'region' then
+		return {}
 	end
-
 	return widgets
 end
 

@@ -145,6 +145,9 @@ end
 ---@param opponent standardOpponent
 ---@return placement?
 function TeamParticipantsRepository.getPrizepoolRecordForTeam(opponent)
+	if Opponent.isTbd(opponent) then
+		return
+	end
 	local prizepoolRecords = TeamParticipantsRepository.getPrizepoolRecords()
 	return Array.find(prizepoolRecords, function(record)
 		return Opponent.same(opponent, Opponent.fromLpdbStruct(record))

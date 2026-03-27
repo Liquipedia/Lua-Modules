@@ -8,6 +8,14 @@ Author: hjpalpha
 	border-left: 1px solid var( --table-border-color, #bbbbbb );
 	margin-bottom: 8px;
 	overflow-x: auto;
+
+	@media ( max-width: 900px ) {
+		min-width: 100% !important;
+
+		&:not( .participantTable-faction ) {
+			width: 100% !important;
+		}
+	}
 }
 
 .participantTable-title {
@@ -22,12 +30,12 @@ Author: hjpalpha
 
 .participantTable-row {
 	width: 100% !important;
-}
 
-.participantTable-row:not( .participantTable-faction ) {
-	width: 100% !important;
-	display: flex;
-	flex-wrap: wrap;
+	&:not( .participantTable-faction ) {
+		width: 100% !important;
+		display: flex;
+		flex-wrap: wrap;
+	}
 }
 
 .participantTable-seeding {
@@ -43,6 +51,71 @@ Author: hjpalpha
 	text-align: left;
 	transition: 0.5s;
 	transition-property: border-color;
+
+	@media ( max-width: 900px ) {
+		&:not( .participantTable-faction ) {
+			flex: 1 0 auto;
+			width: unset !important;
+			min-width: 50%;
+			min-height: 36px;
+		}
+	}
+
+	&.brkts-opponent-hover-active {
+		box-shadow: -1px 0 2px rgba( 0, 0, 0, 0.7 ) inset, 1px 0 2px rgba( 0, 0, 0, 0.7 ) inset, 0 -1px 2px rgba( 0, 0, 0, 0.7 ) inset, 0 1px 2px rgba( 0, 0, 0, 0.7 ) inset;
+
+		.theme--dark & {
+			box-shadow: -1px 0 2px rgba( 255, 255, 255, 0.7 ) inset, 1px 0 2px rgba( 255, 255, 255, 0.7 ) inset, 0 -1px 2px rgba( 255, 255, 255, 0.7 ) inset, 0 1px 2px rgba( 255, 255, 255, 0.7 ) inset;
+		}
+	}
+
+	&.brkts-opponent-hover::after {
+		content: none;
+	}
+
+	.brkts-opponent-hover > & {
+		position: relative;
+		transition: 0.5s;
+		transition-property: border-color;
+
+		&::after {
+			clip-path: inset( -4px 0 -4px -1px );
+			content: "";
+			height: 100%;
+			left: 0;
+			pointer-events: none;
+			position: absolute;
+			top: 0;
+			transition: 0.5s;
+			transition-property: box-shadow;
+			width: 100%;
+			z-index: 5;
+		}
+
+		&:first-child::after {
+			clip-path: inset( -4px 0 -4px -4px );
+		}
+
+		&:last-child::after {
+			clip-path: inset( -4px -4px -4px -1px );
+		}
+
+		&:only-child::after {
+			clip-path: inset( -4px );
+		}
+	}
+
+	.brkts-opponent-hover-active > & {
+		border-color: transparent;
+
+		&::after {
+			box-shadow: -1px 0 2px rgba( 0, 0, 0, 0.7 ) inset, 1px 0 2px rgba( 0, 0, 0, 0.7 ) inset, 0 -1px 2px rgba( 0, 0, 0, 0.7 ) inset, 0 1px 2px rgba( 0, 0, 0, 0.7 ) inset;
+
+			.theme--dark & {
+				box-shadow: -1px 0 2px rgba( 255, 255, 255, 0.7 ) inset, 1px 0 2px rgba( 255, 255, 255, 0.7 ) inset, 0 -1px 2px rgba( 255, 255, 255, 0.7 ) inset, 0 1px 2px rgba( 255, 255, 255, 0.7 ) inset;
+			}
+		}
+	}
 }
 
 .participantTable-tbd {
@@ -65,82 +138,9 @@ Author: hjpalpha
 
 .participantTable-empty {
 	flex: 1 0 auto;
-}
 
-@media ( max-width: 900px ) {
-	.participantTable:not( .participantTable-faction ) {
-		width: 100% !important;
-	}
-
-	.participantTable {
-		min-width: 100% !important;
-	}
-
-	.participantTable-empty {
+	@media ( max-width: 900px ) {
 		display: none;
-	}
-
-	.participantTable-entry:not( .participantTable-faction ) {
-		flex: 1 0 auto;
-		width: unset !important;
-		min-width: 50%;
-		min-height: 36px;
-	}
-}
-
-.participantTable-entry.brkts-opponent-hover-active {
-	box-shadow: -1px 0 2px rgba( 0, 0, 0, 0.7 ) inset, 1px 0 2px rgba( 0, 0, 0, 0.7 ) inset, 0 -1px 2px rgba( 0, 0, 0, 0.7 ) inset, 0 1px 2px rgba( 0, 0, 0, 0.7 ) inset;
-
-	.theme--dark & {
-		box-shadow: -1px 0 2px rgba( 255, 255, 255, 0.7 ) inset, 1px 0 2px rgba( 255, 255, 255, 0.7 ) inset, 0 -1px 2px rgba( 255, 255, 255, 0.7 ) inset, 0 1px 2px rgba( 255, 255, 255, 0.7 ) inset;
-	}
-}
-
-.participantTable-entry.brkts-opponent-hover::after {
-	content: none;
-}
-
-.brkts-opponent-hover > .participantTable-entry {
-	position: relative;
-	transition: 0.5s;
-	transition-property: border-color;
-}
-
-.brkts-opponent-hover-active > .participantTable-entry {
-	border-color: transparent;
-}
-
-.brkts-opponent-hover > .participantTable-entry::after {
-	clip-path: inset( -4px 0 -4px -1px );
-	content: "";
-	height: 100%;
-	left: 0;
-	pointer-events: none;
-	position: absolute;
-	top: 0;
-	transition: 0.5s;
-	transition-property: box-shadow;
-	width: 100%;
-	z-index: 5;
-}
-
-.brkts-opponent-hover > .participantTable-entry:first-child::after {
-	clip-path: inset( -4px 0 -4px -4px );
-}
-
-.brkts-opponent-hover > .participantTable-entry:last-child::after {
-	clip-path: inset( -4px -4px -4px -1px );
-}
-
-.brkts-opponent-hover > .participantTable-entry:only-child::after {
-	clip-path: inset( -4px );
-}
-
-.brkts-opponent-hover-active > .participantTable-entry::after {
-	box-shadow: -1px 0 2px rgba( 0, 0, 0, 0.7 ) inset, 1px 0 2px rgba( 0, 0, 0, 0.7 ) inset, 0 -1px 2px rgba( 0, 0, 0, 0.7 ) inset, 0 1px 2px rgba( 0, 0, 0, 0.7 ) inset;
-
-	.theme--dark & {
-		box-shadow: -1px 0 2px rgba( 255, 255, 255, 0.7 ) inset, 1px 0 2px rgba( 255, 255, 255, 0.7 ) inset, 0 -1px 2px rgba( 255, 255, 255, 0.7 ) inset, 0 1px 2px rgba( 255, 255, 255, 0.7 ) inset;
 	}
 }
 
@@ -149,13 +149,13 @@ Author: hjpalpha
 	display: inline-grid;
 }
 
-.participantTable-faction > .participantTable-row > .participantTable-tbd,
-.participantTable-faction > .participantTable-row > .participantTable-title {
-	grid-column: 1 / -1;
-}
-
 .participantTable-faction > .participantTable-row {
 	display: contents;
+
+	> .participantTable-tbd,
+	> .participantTable-title {
+		grid-column: 1 / -1;
+	}
 }
 
 .participantTable-faction-header {
@@ -175,15 +175,15 @@ Author(s): FO-nTTaX
 	width: 200px;
 }
 
-.participants-table-buttons::after {
-	clear: both;
-	content: " ";
-	display: block;
-}
-
 .participants-table-buttons {
 	display: none;
 	font-size: 200%;
+
+	&::after {
+		clear: both;
+		content: " ";
+		display: block;
+	}
 }
 
 .participants-table-button-left {
@@ -249,13 +249,13 @@ Author(s): Rapture
 	.wiki-ageofempires .participanttable .player-row {
 		display: flex;
 		flex-wrap: wrap;
-	}
 
-	.wiki-ageofempires .participanttable .player-row > td {
-		flex: 1 0 auto;
-		width: unset !important;
-		min-width: 50%;
-		min-height: 35px;
-		border-width: 1px 1px 0 0 !important;
+		> td {
+			flex: 1 0 auto;
+			width: unset !important;
+			min-width: 50%;
+			min-height: 35px;
+			border-width: 1px 1px 0 0 !important;
+		}
 	}
 }

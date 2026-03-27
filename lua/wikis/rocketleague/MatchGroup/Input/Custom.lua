@@ -8,24 +8,28 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
-local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local Opponent = Lua.import('Module:Opponent')
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local CustomMatchGroupInput = {}
-local MatchFunctions = {}
+
+---@class RocketLeagueMatchParser: MatchParserInterface
+local MatchFunctions = {
+	DEFAULT_MODE = '3v3',
+	DATE_FALLBACKS = {'tournament_enddate'},
+}
+
+---@class RocketLeagueMapParser: MapParserInterface
 local MapFunctions = {}
 
 local EARNINGS_LIMIT_FOR_FEATURED = 10000
-local CURRENT_YEAR = os.date('%Y')
-MatchFunctions.DEFAULT_MODE = '3v3'
-MatchFunctions.DATE_FALLBACKS = {'tournament_enddate'}
-MatchFunctions.getBestOf = function (bestOfInput, maps) return tonumber(bestOfInput) end
+local CURRENT_YEAR = DateExt.getYearOf()
 
 ---@param match table
 ---@param options table?
@@ -47,46 +51,15 @@ end
 ---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
-	local maps = {}
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		if map.map == nil then
-			break
-		end
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
+end
 
-		local dateToUse = map.date or match.date
-		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
-
-		map.extradata = MapFunctions.getExtraData(map)
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-
-		map.opponents = Array.map(opponents, function(_, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			})
-			return {score = score, status = status}
-		end)
-
-		map.scores = Array.map(map.opponents, Operator.property('score'))
-
-		if Logic.readBoolOrNil(finishedInput) == nil and Logic.isNotEmpty(map.scores) then
-			map.finished = true
-		end
-
-		if map.finished then
-			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
-		end
-
-		table.insert(maps, map)
-		match[key] = nil
-	end
-
-	return maps
+---@param games table[]
+---@return table[]
+function MatchFunctions.removeUnsetMaps(games)
+	return Array.filter(games, function(map)
+		return map.map ~= nil
+	end)
 end
 
 ---@param opponent table
@@ -107,7 +80,7 @@ function CustomMatchGroupInput.getOpponentExtradata(opponent)
 	}
 end
 
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@return integer
 function CustomMatchGroupInput._getSetWins(opponent)
 	local extradata = opponent.extradata
@@ -122,7 +95,7 @@ end
 --
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return string?
 function MatchFunctions.getHeadToHeadLink(match, opponents)
 	if not Logic.readBool(Logic.emptyOr(match.showh2h, Variables.varDefault('showh2h'))) or
@@ -132,10 +105,15 @@ function MatchFunctions.getHeadToHeadLink(match, opponents)
 		return nil
 	end
 
-	local team1, team2 = mw.uri.encode(opponents[1].name), mw.uri.encode(opponents[2].name)
-	return tostring(mw.uri.fullUrl('Special:RunQuery/Head2head'))
-		.. '?RunQuery=Run&pfRunQueryFormName=Head2head&Headtohead%5Bteam1%5D='
-		.. team1 .. '&Headtohead%5Bteam2%5D=' .. team2
+	return tostring(mw.uri.fullUrl(
+		'Special:RunQuery/Head2head',
+		{
+			RunQuery = 'Run',
+			pfRunQueryFormName = 'Head2head',
+			['Headtohead[team1]'] = opponents[1].name,
+			['Headtohead[team2]'] = opponents[2].name,
+		}
+	))
 end
 
 ---@param match table
@@ -145,26 +123,13 @@ end
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		isfeatured = MatchFunctions.isFeatured(opponents, tonumber(match.liquipediatier)),
-		hasopponent1 = MatchFunctions._checkForNonEmptyOpponent(opponents[1]),
-		hasopponent2 = MatchFunctions._checkForNonEmptyOpponent(opponents[2]),
+		hasopponent1 = not Opponent.isTbd(Opponent.fromMatchParsedOpponent(opponents[1])),
+		hasopponent2 = not Opponent.isTbd(Opponent.fromMatchParsedOpponent(opponents[2])),
 		liquipediatiertype2 = Variables.varDefault('tournament_tiertype2'),
 	}
 end
 
----@param opponent table
----@return boolean
-function MatchFunctions._checkForNonEmptyOpponent(opponent)
-	if Opponent.typeIsParty(opponent.type) then
-		local playerIsTbd = function (player)
-			return String.isEmpty(player.displayname) or player.displayname:upper() == 'TBD'
-		end
-		return not Array.all(opponent.match2players, playerIsTbd)
-	end
-	-- Literal and Teams can use the default function, player's can not because of match2player vs player list names
-	return not Opponent.isTbd(opponent)
-end
-
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param tier integer?
 ---@return boolean
 function MatchFunctions.isFeatured(opponents, tier)
@@ -205,13 +170,36 @@ function MatchFunctions.currentEarnings(name)
 	return data.earningsbyyear[tonumber(CURRENT_YEAR)] or 0
 end
 
+---@param bestOfInput string|integer?
+---@param maps table[]
+---@return integer?
+function MatchFunctions.getBestOf(bestOfInput, maps)
+	return tonumber(bestOfInput)
+end
+
 --
 -- map related functions
 --
 
 ---@param map table
+---@param opponents MGIParsedOpponent[]
+---@param finishedInput string?
+---@param winnerInput string?
+---@return boolean
+function MapFunctions.mapIsFinished(map, opponents, finishedInput, winnerInput)
+	if MatchGroupInputUtil.mapIsFinished(map) then
+		return true
+	end
+	return Logic.readBoolOrNil(finishedInput) == nil and Array.any(
+		map.opponents, function (mapOpponent) return mapOpponent.score ~= nil end
+	)
+end
+
+---@param match table
+---@param map table
+---@param opponents MGIParsedOpponent[]
 ---@return table
-function MapFunctions.getExtraData(map)
+function MapFunctions.getExtraData(match, map, opponents)
 	local timeouts = Array.extractValues(Table.mapValues(mw.text.split(map.timeout or '', ','), tonumber))
 
 	return {
@@ -221,7 +209,7 @@ function MapFunctions.getExtraData(map)
 		--the following is used to store 'mapXtYgoals' from LegacyMatchLists
 		t1goals = map.t1goals,
 		t2goals = map.t2goals,
-		timeout = Table.isNotEmpty(timeouts) and timeouts or nil,
+		timeout = Logic.nilIfEmpty(timeouts),
 	}
 end
 

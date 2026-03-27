@@ -10,9 +10,11 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
 
 local TeamParticipantsWikiParser = Lua.import('Module:TeamParticipants/Parse/Wiki')
@@ -21,12 +23,16 @@ local TeamService = Lua.import('Module:Service/Team')
 
 local TeamParticipantsDisplay = Lua.import('Module:Widget/Participants/Team/CardsGroup')
 
+local teamParticipantsVars = PageVariableNamespace('TeamParticipants')
+
 local TeamParticipantsController = {}
 
 local AUTO_IMPORTED_STAFF_ROLES = {
 	'coach',
 	'head coach',
 }
+
+local Config = Info.config.participants or {}
 
 ---@param frame Frame
 ---@return Widget
@@ -43,8 +49,16 @@ function TeamParticipantsController.fromTemplate(frame)
 		Array.forEach(parsedData.participants, TeamParticipantsRepository.save)
 	end
 	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
+
+	local showControls = not teamParticipantsVars:get('externalControlsRendered')
+
 	return TeamParticipantsDisplay{
-		participants = parsedData.participants
+		participants = parsedData.participants,
+		showPlayerInfo = Logic.readBool(args.showplayerinfo),
+		showControls = showControls,
+		mergeStaffTabIfOnlyOneStaff = Logic.nilOr(
+			Logic.readBoolOrNil(args.mergeStaffTabIfOnlyOneStaff), Logic.readBool(Config.mergeStaffTabIfOnlyOneStaff)
+		)
 	}
 end
 
@@ -91,11 +105,11 @@ function TeamParticipantsController.importSquadMembersFromDatabase(participant)
 	end)
 
 	return Array.map(membersToImport, function (member)
-		local memberType = member.type
+		local status
 		if member.hasLeft then
-			memberType = 'former'
+			status = 'former'
 		elseif member.role and member.role:lower() == 'substitute' then
-			memberType = 'sub'
+			status = 'sub'
 		end
 		return TeamParticipantsWikiParser.parsePlayer{
 			member.displayName,
@@ -103,7 +117,8 @@ function TeamParticipantsController.importSquadMembersFromDatabase(participant)
 			flag = member.nationality,
 			faction = member.faction,
 			role = member.role,
-			type = memberType,
+			type = member.type,
+			status = status,
 		}
 	end)
 end
