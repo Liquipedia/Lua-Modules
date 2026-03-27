@@ -23,9 +23,8 @@ def deploy_resources(
     for file_path in file_paths:
         print(f"::group::Checking {str(file_path)}")
         file_content = read_file_from_path(file_path)
-        page = (
-            f"MediaWiki:Common.{'js' if res_type == '.js' else 'css'}/"
-                + "/".join(file_path.parts[2:])
+        page = f"MediaWiki:Common.{'js' if res_type == '.js' else 'css'}/" + "/".join(
+            file_path.parts[2:]
         )
         print(f"...page = {page}")
         deploy_result = session.deploy_file(
