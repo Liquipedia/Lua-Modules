@@ -11,6 +11,10 @@ describe('hidden data box', function()
 		AddCategorySpy = spy.on(mw.ext.TeamLiquidIntegration, 'add_category')
 	end)
 
+	after_each(function()
+		AddCategorySpy:revert()
+	end)
+
 	describe('tier parseing', function()
 		it('empty tier return nil', function()
 			assert.is_nil(Hdb.validateTier())
