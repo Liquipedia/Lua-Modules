@@ -90,9 +90,9 @@ local function buildTitle(settings)
 	if settings.filterType == 'region' then
 		titleName = regionMap[settings.filterRegion] or settings.filterRegion
 	elseif settings.filterType == 'subregion' then
-		titleName = 'Subregion'
+		titleName = settings.filterDisplayName or 'Subregion'
 	elseif settings.filterType == 'country' then
-		titleName = settings.filterCountryDisplay or 'Country'
+		titleName = settings.filterDisplayName or 'Country'
 	end
 	return HtmlWidgets.Div{
 		children = {
@@ -207,15 +207,7 @@ function VRSStandings:render()
 			}
 		},
 	}
-
-	if settings.mainpage then
-		return HtmlWidgets.Div{
-			css = {width = '100%'},
-			children = {tableWidget}
-		}
-	else
-		return tableWidget
-	end
+	return tableWidget
 end
 
 return VRSStandings

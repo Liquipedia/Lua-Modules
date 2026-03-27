@@ -48,7 +48,7 @@ VRSStandingsData.DATAPOINT_TYPE_PREDICTION = DATAPOINT_TYPE_PREDICTION
 ---@field filterRegion string?
 ---@field filterSubregion string?
 ---@field filterCountry string[]?
----@field filterCountryDisplay string?
+---@field filterDisplayName string?
 ---@field filterType 'none' | 'region' | 'subregion' | 'country'
 ---@field mainpage boolean
 ---@field datapointType string
@@ -84,7 +84,7 @@ function VRSStandingsData.getStandings(props)
 		filterRegion = props.filterRegion,
 		filterSubregion = props.filterSubregion,
 		filterCountry = Array.parseCommaSeparatedString(props.filterCountry),
-		filterCountryDisplay = props.filterCountryDisplay,
+		filterDisplayName = props.filterDisplayName,
 		mainpage = Logic.readBool(props.mainpage),
 		datapointType = datapointType,
 		updated = updated,
