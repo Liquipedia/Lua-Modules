@@ -1,7 +1,7 @@
 --- Triple Comment to Enable our LLS Plugin
 local LeagueIcon = require('Module:LeagueIcon')
 
-local FILLER_EXPECT = '<span class="league-icon-small-image">[[File:Logo filler event.png|link=]]</span>'
+local FILLER_EXPECT = '<span class="league-icon-small-image"><i class="fas fa-trophy"></i></span>'
 local ICON_DARK_EXPECT = '<span class="league-icon-small-image">[[File:DarkIcon.png|link=||50x50px]]</span>'
 
 local ICON_BOTH_EXPECT =
