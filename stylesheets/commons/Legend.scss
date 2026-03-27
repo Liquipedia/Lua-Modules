@@ -60,4 +60,8 @@
 			}
 		}
 	}
+
+	&:not( .collapsed ) .should-collapse {
+		display: contents;
+	}
 }
