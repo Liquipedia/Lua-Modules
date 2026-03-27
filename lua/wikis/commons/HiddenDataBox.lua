@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Game = Lua.import('Module:Game')
+local I18n = Lua.import('Module:I18n')
 local Info = Lua.import('Module:Info', {loadData = true})
 local MatchTicker = Lua.import('Module:MatchTicker')
 local MatchTickerEntityDisplay = Lua.import('Module:MatchTicker/DisplayComponents/Entity')
@@ -28,9 +29,6 @@ local WarningBoxGroup = Lua.import('Module:Widget/WarningBox/Group')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local HiddenDataBox = {}
-local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
-	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
-local INVALID_PARENT = '${parent} is not a Liquipedia Tournament[[Category:Pages with invalid parent]]'
 local DEFAULT_TIER_TYPE = 'general'
 
 local Language = mw.getContentLanguage()
@@ -59,7 +57,8 @@ function HiddenDataBox.run(args)
 		})[1] or {}
 
 		if Table.isEmpty(queryResult) and Namespace.isMain() then
-			table.insert(warnings, String.interpolate(INVALID_PARENT, {parent = parent}))
+			mw.ext.TeamLiquidIntegration.add_category('Pages with invalid parent')
+			table.insert(warnings, I18n.translate('hiddendatabox-invalid-parent-warning', {parent = parent}))
 		else
 			local date = HiddenDataBox.cleanDate(args.date, args.sdate) or queryResult.startdate or
 				Variables.varDefault('tournament_startdate') or HiddenDataBox.cleanDate(args.edate) or
@@ -214,11 +213,19 @@ function HiddenDataBox.validateTier(tier, tierType)
 	local tierValue, tierTypeValue = Tier.toValue(tier, tierType)
 
 	if tier and not tierValue then
-		table.insert(warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
+		mw.ext.TeamLiquidIntegration.add_category('Pages with invalid Tier')
+		table.insert(
+			warnings,
+			I18n.translate('hiddendatabox-invalid-tier-warning', {tierString = tier, tierMode = 'Tier'})
+		)
 	end
 
 	if tierType and tierType:lower() ~= DEFAULT_TIER_TYPE and not tierTypeValue then
-		table.insert(warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
+		mw.ext.TeamLiquidIntegration.add_category('Pages with invalid Tiertype')
+		table.insert(
+			warnings,
+			I18n.translate('hiddendatabox-invalid-tier-warning', {tierString = tierType, tierMode = 'Tiertype'})
+		)
 	end
 
 	return tierValue, tierTypeValue, warnings
