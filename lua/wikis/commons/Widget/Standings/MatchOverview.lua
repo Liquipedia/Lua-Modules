@@ -74,7 +74,9 @@ MatchOverviewWidget._getMatchResultType = FnUtil.memoize(function (self)
 	local match = self.props.match
 	local opponentIndexToShow = tonumber(self.props.showOpponent)
 
-	if match.winner == opponentIndexToShow then
+	if match.phase == 'ongoing' then
+		return 'default'
+	elseif match.winner == opponentIndexToShow then
 		return 'loss'
 	elseif match.winner == 0 then
 		return 'draw'
@@ -104,7 +106,7 @@ end
 ---@private
 ---@return Widget?
 function MatchOverviewWidget:_createResultDisplay(leftScore, rightScore)
-	if not self.props.match.finished then
+	if self.props.match.phase == 'upcoming' then
 		return
 	end
 	local resultType = self:_getMatchResultType()
