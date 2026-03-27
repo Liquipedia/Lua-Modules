@@ -14,8 +14,13 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Button = Lua.import('Module:Widget/Basic/Button')
 
+---@class RoundSelectorWidgetProps
+---@field rounds integer?
+---@field hasEnded boolean?
+
 ---@class RoundSelectorWidget: Widget
----@operator call(table): RoundSelectorWidget
+---@operator call(RoundSelectorWidgetProps): RoundSelectorWidget
+---@field props RoundSelectorWidgetProps
 local RoundSelectorWidget = Class.new(Widget)
 
 ---@return Widget?

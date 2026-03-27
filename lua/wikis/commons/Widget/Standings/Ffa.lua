@@ -25,8 +25,12 @@ local STATUS_TO_DISPLAY = {
 	nc = '-',
 }
 
+---@class StandingsFfaWidgetProps
+---@field standings StandingsModel
+
 ---@class StandingsFfaWidget: Widget
----@operator call(table): StandingsFfaWidget
+---@operator call(StandingsFfaWidgetProps): StandingsFfaWidget
+---@field props StandingsFfaWidgetProps
 local StandingsFfaWidget = Class.new(Widget)
 
 ---@return Widget?
@@ -35,7 +39,6 @@ function StandingsFfaWidget:render()
 		return
 	end
 
-	---@type StandingsModel
 	local standings = self.props.standings
 	local activeRounds = (Array.maxBy(
 		Array.filter(standings.rounds, function(round) return round.started end),
