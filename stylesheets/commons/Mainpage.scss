@@ -136,7 +136,7 @@ div.main-page-banner .main-page-banner-bottom-row {
 	}
 
 	&__icon-compact {
-		display: none;
+		display: flex;
 		align-items: center;
 		justify-content: center;
 		padding: 0.125rem;
@@ -147,8 +147,8 @@ div.main-page-banner .main-page-banner-bottom-row {
 		flex-shrink: 0;
 		overflow: hidden;
 
-		@media ( max-width: 359px ) {
-			display: flex;
+		@media ( min-width: 360px ) {
+			display: none;
 		}
 
 		.league-icon-small-image img,
