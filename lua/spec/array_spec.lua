@@ -13,7 +13,7 @@ describe('array', function()
 		it('Tables are array', function()
 			assert.is_false(Array.isArray{a = 1, [3] = 2, c = 3})
 			assert.is_false(Array.isArray{5, 2, c = 3})
-			assert.is_false(Array.isArrayWithGaps{5, nil, 3})
+			assert.is_false(Array.isArray{5, nil, 3})
 		end)
 	end)
 
