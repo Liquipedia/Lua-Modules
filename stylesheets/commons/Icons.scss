@@ -238,3 +238,43 @@ https://liquipedia.net/commons/Infobox_Icons
 	@include icon-make-image( zhangyutv, "//liquipedia.net/commons/images/c/cf/InfoboxIcon_ZhangyuTV.png" );
 	@include icon-make-image( zhanqitv, "//liquipedia.net/commons/images/b/b0/InfoboxIcon_ZhanqiTV.png" );
 }
+
+/*******************************************************************************
+Template(s): 16px Icons
+Author(s): iMarbot
+*******************************************************************************/
+.icon-16px {
+	vertical-align: middle;
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 16px;
+	min-width: 16px;
+}
+
+.icon-16px img {
+	max-width: 16px;
+	max-height: 16px;
+	height: auto;
+	width: auto;
+}
+
+.icon-16px a {
+	display: contents;
+}
+
+/* dark mode support */
+.icon-16px.darkmode {
+	display: none;
+}
+
+[ data-darkreader-scheme="dark" ],
+.theme--dark {
+	.icon-16px.lightmode {
+		display: none;
+	}
+
+	.icon-16px.darkmode {
+		display: inline-flex;
+	}
+}
