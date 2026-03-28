@@ -37,6 +37,16 @@ end
 ---@return boolean
 ---@nodiscard
 function Array.isArray(tbl)
+	return type(tbl) == 'table' and Table.size(tbl) == #tbl
+end
+
+---Return true if the input is a table in array format with nil being potential elements
+---@generic T
+---@param tbl (T|nil)[]
+---@return true
+---@overload fun(tbl: any): false
+---@nodiscard
+function Array.isArrayWithGaps(tbl)
 	return type(tbl) == 'table' and Table.all(tbl, function(key)
 		return MathUtil.isInteger(key) and tonumber(key) > 0
 	end)
@@ -147,7 +157,7 @@ end
 function Array.flatten(tbl)
 	local flattenedArray = {}
 	for _, x in ipairs(tbl) do
-		if Array.isArray(x) then
+		if Array.isArrayWithGaps(x) then
 			for _, y in ipairs(x) do
 				table.insert(flattenedArray, y)
 			end
@@ -441,7 +451,7 @@ array is mutated in the process.
 function Array.extendWith(tbl, ...)
 	local arrays = Table.pack(...)
 	for index = 1, arrays.n do
-		if Array.isArray(arrays[index]) then
+		if Array.isArrayWithGaps(arrays[index]) then
 			for _, element in ipairs(arrays[index]) do
 				table.insert(tbl, element)
 			end
