@@ -35,7 +35,7 @@ function ControlsSettingsTable.saveToLpdb(config, args)
 		reference = args.ref,
 		lastupdated = args.date,
 		gamesettings = mw.ext.LiquipediaDB.lpdb_create_json(extradata),
-		type = (args.controller or ''):lower(),
+		type = (args.controller or ''):lower()
 	})
 end
 

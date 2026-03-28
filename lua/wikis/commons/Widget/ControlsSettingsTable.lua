@@ -43,23 +43,23 @@ function ControlsSettingsTableWidget:render()
 	return Table2{
 		children = TableBody{children = self:makeRows()},
 		title = self:makeHeaderDisplay(),
-		footer = self:makeWarningDisplay(),
+		footer = self:makeWarningDisplay()
 	}
 end
 
 ---@return Widget[]
 function ControlsSettingsTableWidget:makeRows()
 	local nonEmptyRows = Array.filter(self.config, function(configRow)
-        return Array.any(configRow.keys, function(key)
-            return String.isNotEmpty(self.args[key:lower()])
-        end)
-    end)
-    return Array.map(nonEmptyRows, function(configRow)
-        local buttons = Array.map(configRow.keys, function(key)
-            return self:makeButtonIcon(key) or self:makeButtonStubIcon()
-        end)
-        return ControlsSettingsTableWidget:makeRow(configRow.title, buttons)
-    end)
+		return Array.any(configRow.keys, function(key)
+			return String.isNotEmpty(self.args[key:lower()])
+		end)
+	end)
+	return Array.map(nonEmptyRows, function(configRow)
+		local buttons = Array.map(configRow.keys, function(key)
+			return self:makeButtonIcon(key) or self:makeButtonStubIcon()
+		end)
+		return ControlsSettingsTableWidget:makeRow(configRow.title, buttons)
+	end)
 end
 
 ---@param key string
@@ -82,7 +82,7 @@ end
 ---@return string
 function ControlsSettingsTableWidget:getImageName(device, button)
 	device = Logic.nilOr(device, ''):lower()
-    button = Logic.nilOr(button, ''):lower():gsub(' ', '_')
+	button = Logic.nilOr(button, ''):lower():gsub(' ', '_')
 	return ButtonTranslation[device][button] or 'ImageNotFound'
 end
 
@@ -91,11 +91,11 @@ end
 ---@return Widget
 function ControlsSettingsTableWidget:makeButtonDisplay(imageName, button)
 	return Image{
-			imageLight = imageName,
-			size = 'md',
-			caption = button,
-			alt = button,
-		}
+		imageLight = imageName,
+		size = 'md',
+		caption = button,
+		alt = button
+	}
 end
 
 ---@return Widget
@@ -140,19 +140,19 @@ function ControlsSettingsTableWidget:makeReferenceDisplay()
 	local timestamp = Date.readTimestamp(self.args.date)
 	local date = timestamp and Date.formatTimestamp('M j, Y', timestamp) or '?'
 	return Dialog{
-			trigger =  IconFa{
-				iconName = 'reference',
-				size = 'sm',
-			},
-			title = 'Reference',
-			children = HtmlWidgets.Div{
-				children = {
-					self:makeReferenceSource(),
-					HtmlWidgets.Br{},
-					HtmlWidgets.I{
-						children = 'Last updated on ' .. date
-					}
+		trigger = IconFa{
+			iconName = 'reference',
+			size = 'sm'
+		},
+		title = 'Reference',
+		children = HtmlWidgets.Div{
+			children = {
+				self:makeReferenceSource(),
+				HtmlWidgets.Br{},
+				HtmlWidgets.I{
+					children = 'Last updated on ' .. date
 				}
+			}
 		}
 	}
 end
