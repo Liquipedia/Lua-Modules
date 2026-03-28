@@ -19,7 +19,8 @@ local ControlsSettingsTable = Class.new()
 ---@return Widget
 function ControlsSettingsTable.create(frame)
 	local args = Arguments.getArgs(frame)
-	local config = Info.controlsSettingsTable
+	local config = Info.controlsSettingsTable or
+		error('You need to configure controlsSettingsTable in your wiki Module:Info')
 	local widget = ControlsSettingsTableWidget(config, args)
 	ControlsSettingsTable._saveToLpdb(config, args)
 	return widget:render()
