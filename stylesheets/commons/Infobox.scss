@@ -444,3 +444,45 @@ Author(s): iMarbot
 		padding: 15px 15px 0;
 	}
 }
+
+/*******************************************************************************
+Template(s): InfoboxIconSmall
+Author(s): iMarbot
+*******************************************************************************/
+.infobox-icon-small img {
+	max-width: 20px;
+	max-height: 20px;
+	vertical-align: top;
+}
+
+.infobox-icon-small .team-template-image img {
+	max-width: unset;
+	max-height: unset;
+}
+
+.infobox-icon-small span.league-icon-small-image {
+	width: 20px;
+	height: 20px;
+}
+
+/*******************************************************************************
+Template(s): Upcoming and ongoing games of
+Author(s): FO-nTTaX
+*******************************************************************************/
+.infobox-upcoming-ongoing-matches {
+	width: 100%;
+
+	@media ( min-width: 601px ) {
+		float: right;
+		clear: right;
+		max-width: 300px;
+		margin: 0 0 10px 10px;
+	}
+
+	#{&}-header {
+		font-size: 130%;
+		font-weight: bold;
+		text-align: center;
+		padding: 2px;
+	}
+}
