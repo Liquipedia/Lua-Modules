@@ -41,9 +41,9 @@ local TOURNAMENT_PHASE = {
 ---@class StandardTournament: StandardTournamentPartial
 ---@field startDate {year: integer, month: integer?, day: integer?, timestamp: integer?}?
 ---@field endDate {year: integer, month: integer?, day: integer?, timestamp: integer?}?
----@field locations table?
+---@field locations table
 ---@field region string?
----@field type string?
+---@field type string
 ---@field featured boolean
 ---@field status string?
 ---@field phase TournamentPhase
@@ -51,6 +51,7 @@ local TOURNAMENT_PHASE = {
 ---@field prizepool number
 ---@field participantsNumber number
 ---@field extradata table
+---@field organizers table
 ---@field isHighlighted fun(self: StandardTournament, options?: table): boolean
 
 ---@param conditions string|AbstractConditionNode?
@@ -152,6 +153,7 @@ function Tournament.tournamentFromRecord(record)
 		tierOptions = tierOptions,
 		prizepool = record.prizepool,
 		participantsNumber = record.participantsnumber,
+		organizers = record.organizers,
 		extradata = extradata,
 	}
 
