@@ -138,7 +138,6 @@ end
 ---@param args table
 ---@return Widget[]?
 function MainPageSeasonEvents._countdown(tournamentData, args)
-
 	local pages = Array.mapIndexes(function(index)
 		return Logic.nilIfEmpty((args['additional_page' .. index] or ''):gsub(' ', '_'))
 	end)

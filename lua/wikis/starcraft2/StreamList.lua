@@ -10,6 +10,8 @@ local Table = Lua.import('Module:Table')
 
 local HtmlWidgets = require('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local StreamList = {}
 
@@ -71,14 +73,6 @@ end
 ---@param columnBreak integer
 ---@return Widget|(Widget|string)[]
 function StreamList._display(streams, columnBreak)
-	local makeList = function(items)
-		return HtmlWidgets.Ul{children = Array.map(items, StreamList._row)}
-	end
-
-	if #streams <= columnBreak then
-		return makeList(streams)
-	end
-
 	---@type {link: Widget, flag: string}[][]
 	local segments = {}
 	local currentIndex = 0
@@ -91,24 +85,22 @@ function StreamList._display(streams, columnBreak)
 	end)
 
 	---@type (Widget|string)[]
-	local parts = Array.map(segments, makeList)
-	parts = Array.interleave(parts, Box.brk{padding = '2em'})
+	local parts = Array.map(segments, function(group)
+		return UnorderedList{children = Array.map(group, function(data)
+			return {
+				Flags.Icon{flag = data.flag, shouldLink = false},
+				' ',
+				data.link,
+			}
+		end)}
+	end)
 
-	table.insert(parts, 1, Box._template_box_start{padding = '2em'})
-	table.insert(parts, Box.finish())
-
-	return HtmlWidgets.Fragment{children = parts}
-end
-
----@param data {link: Widget, flag: string}
----@return Widget
-function StreamList._row(data)
-	return HtmlWidgets.Li{
-		children = {
-			Flags.Icon{flag = data.flag, shouldLink = false},
-			' ',
-			data.link,
-		},
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(
+			Box._template_box_start{padding = '2em'},
+			Array.interleave(parts, Box.brk{padding = '2em'}),
+			Box.finish()
+		)
 	}
 end
 
