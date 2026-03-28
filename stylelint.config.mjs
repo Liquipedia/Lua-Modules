@@ -12,7 +12,7 @@ export default {
 		"scss/at-rule-no-unknown": true,
 		"color-hex-length": "long",
 		"unit-disallowed-list": null,
-		"declaration-property-unit-disallowed-list": [],
+		"declaration-property-unit-disallowed-list": {},
 		"no-descending-specificity": null,
 		"selector-max-id": null,
 		"no-duplicate-selectors": null,
