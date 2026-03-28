@@ -6,6 +6,7 @@
 --
 
 local Logic = require('Module:Logic')
+local MathUtil = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -36,7 +37,9 @@ end
 ---@return boolean
 ---@nodiscard
 function Array.isArray(tbl)
-	return type(tbl) == 'table' and Table.size(tbl) == #tbl
+	if type(tbl) ~= 'table' then return end
+
+	return Array.all(Array.extractKeys(tbl), MathUtil.isInteger)
 end
 
 -- Creates a copy of an array with the same elements.
