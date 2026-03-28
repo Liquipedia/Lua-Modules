@@ -23,6 +23,7 @@ local MessageBox = Lua.import('Module:Message box')
 local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
@@ -60,9 +61,12 @@ function CustomUnit.run(frame)
 
 	local builtInfobox = unit:createInfobox()
 
-	return mw.html.create()
-		:node(builtInfobox)
-		:node(CustomUnit._deprecatedWarning(unit.args.deprecatedDisplay))
+	return HtmlWidgets.Fragment{
+		children = {
+			builtInfobox,
+			CustomUnit._deprecatedWarning(unit.args.deprecatedDisplay)
+		}
+	}
 end
 
 ---@param id string

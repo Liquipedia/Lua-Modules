@@ -22,6 +22,7 @@ local MessageBox = Lua.import('Module:Message box')
 local Injector = Lua.import('Module:Widget/Injector')
 local Skill = Lua.import('Module:Infobox/Skill')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
@@ -64,9 +65,12 @@ function CustomSkill.run(frame)
 
 	local builtInfobox = skill:createInfobox()
 
-	return mw.html.create()
-		:node(builtInfobox)
-		:node(CustomSkill._deprecatedWarning(skill.args.deprecatedDisplay))
+	return HtmlWidgets.Fragment{
+		children = {
+			builtInfobox,
+			CustomSkill._deprecatedWarning(skill.args.deprecatedDisplay)
+		}
+	}
 end
 
 ---@param args table

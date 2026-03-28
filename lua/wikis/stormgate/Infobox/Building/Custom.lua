@@ -16,14 +16,15 @@ local Faction = Lua.import('Module:Faction')
 local Hotkeys = Lua.import('Module:Hotkey')
 local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
+local MessageBox = Lua.import('Module:Message box')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local MessageBox = Lua.import('Module:Message box')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Building = Lua.import('Module:Infobox/Building')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
@@ -59,9 +60,12 @@ function CustomBuilding.run(frame)
 
 	local builtInfobox = building:createInfobox()
 
-	return mw.html.create()
-		:node(builtInfobox)
-		:node(CustomBuilding._deprecatedWarning(building.args.deprecatedDisplay))
+	return HtmlWidgets.Fragment{
+		children = {
+			builtInfobox,
+			CustomBuilding._deprecatedWarning(building.args.deprecatedDisplay)
+		}
+	}
 end
 
 ---@param id string
@@ -356,7 +360,7 @@ function CustomBuilding:_processPatchFromId(key)
 end
 
 ---@param patch string?
----@return Html? -would need to check what warningbox actually returns ... am on phone ...
+---@return Html?
 function CustomBuilding._deprecatedWarning(patch)
 	if not patch then return end
 
