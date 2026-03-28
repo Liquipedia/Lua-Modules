@@ -164,7 +164,7 @@ describe('array', function()
 			local a, b, c, d = {2, 3}, {5, 7, 11}, {13}, {[2] = 4}
 			assert.are_same({2, 3, 5, 7, 11, 13}, Array.extend(a, b, c))
 			assert.are_same({2, 3}, a)
-			assert.are_same({2, 3, 4}, Array.extend(a, d))
+			assert.are_same({2, 3}, Array.extend(a, d))
 		end)
 	end)
 
