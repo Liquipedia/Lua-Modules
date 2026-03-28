@@ -154,7 +154,7 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{
 			ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tournamentData.liquipediaTier),
-			ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, tournamentData.liquipediaTierType),
+			ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, tournamentData.liquipediaTierType or ''),
 			ConditionNode(ColumnName(config.useParent and 'parent' or 'pagename'), Comparator.eq, tournamentData.pageName),
 			ConditionNode(ColumnName('placement'), Comparator.neq, '')
 		}
