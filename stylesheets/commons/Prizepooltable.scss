@@ -72,6 +72,11 @@ class and the global `bg-*` / `background-color-*-place` placement classes
 (MvpTable, SeriesMedalStats, StageWinnings, TournamentPlayerInformation,
 TournamentsListing, css-grid tables). Do not remove without auditing those.
 *******************************************************************************/
+@media ( max-width: 767px ) {
+	.prizepooltable {
+		min-width: 100%;
+	}
+}
 
 table.prizepooltable:not( .collapsed ) .prizepooltableshow,
 table.prizepooltable.collapsed .prizepooltablehide {
