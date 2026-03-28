@@ -17,13 +17,13 @@ jobs:
           fetch-depth: 2
 
       - id: lua-changed-files
-        uses: tj-actions/changed-files@v42
+        uses: tj-actions/changed-files@v47
         with:
           files: |
             lua/wikis/**/*.lua
 
       - id: res-changed-files
-        uses: tj-actions/changed-files@v42
+        uses: tj-actions/changed-files@v47
         with:
           files: |
             stylesheets/**/*.scss

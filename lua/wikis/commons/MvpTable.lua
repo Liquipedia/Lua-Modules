@@ -60,6 +60,7 @@ function MvpTable.run(args)
 	return TableWidgets.Table{
 		tableClasses = {'prizepooltable', 'collapsed'},
 		title = String.nilIfEmpty(args.title),
+		attributes = {id = 'MvpTable'},
 		columns = {
 			{align = 'left'},
 			{align = 'right'},

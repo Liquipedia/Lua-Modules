@@ -22,10 +22,29 @@ Template(s): Documentation
 Author(s): FO-nTTaX
 *******************************************************************************/
 .documentation {
+	border: 0.0625rem solid;
 	clear: both;
-	border: 1px solid #aaaaaa;
-	background-color: #ecfcf4;
-	padding: 5px;
+	padding: 0.3125rem;
+
+	.theme--light & {
+		background-color: var( --clr-atlantis-90 );
+		border-color: var( --clr-atlantis-10 );
+	}
+
+	.theme--dark & {
+		background-color: var( --clr-atlantis-10 );
+		border-color: var( --clr-atlantis-20 );
+	}
+
+	h2 {
+		.theme--light & {
+			border-color: var( --clr-atlantis-10 );
+		}
+
+		.theme--dark & {
+			border-color: var( --clr-atlantis-20 );
+		}
+	}
 }
 
 /*******************************************************************************
@@ -194,11 +213,12 @@ Author(s): FO-nTTaX, Elysienna
 	animation-duration: 0.4s;
 	animation-fill-mode: forwards;
 	transform: scale( 0 );
+	border-radius: 0.5rem;
 
 	&--tooltip {
 		background-color: #ffffff;
 		position: absolute;
-		color: #676767;
+		color: var( --clr-secondary-39 );
 		border-radius: 0.25rem;
 		font-size: 0.75rem;
 		font-family: "Open Sans", sans-serif;
@@ -229,7 +249,7 @@ Author(s): FO-nTTaX, Elysienna
 			height: 0;
 			border-top: 4px solid transparent;
 			border-bottom: 4px solid transparent;
-			border-right: 5px solid #ffffff;
+			border-right: 5px solid var( --clr-primary-100 );
 		}
 	}
 
@@ -536,30 +556,6 @@ Author(s): FO-nTTaX
 			}
 		}
 	}
-}
-
-/*******************************************************************************
-Template(s): Dropdown box
-Author(s): Rapture
-*******************************************************************************/
-.dropdown-box-wrapper {
-	position: relative;
-	display: inline-block;
-}
-
-.dropdown-box {
-	display: none;
-	position: absolute;
-	top: 100%;
-	left: 0;
-	z-index: 1000;
-	float: left;
-	margin: 0;
-	padding: 5px;
-}
-
-.dropdown-box-visible {
-	display: block;
 }
 
 /*******************************************************************************
@@ -1096,15 +1092,6 @@ Author(s): Inflicted
 		margin-top: -2px;
 		image-rendering: -webkit-optimize-contrast;
 	}
-}
-
-/*******************************************************************************
-Module( s ): MatchTable
-Author(s): hjpalpha
-*******************************************************************************/
-.match-table-year-header {
-	font-weight: bold;
-	background-color: var( --table-striped-background-color, var( --clr-surface-2, #f5f5f5 ) );
 }
 
 /*******************************************************************************
@@ -2319,22 +2306,6 @@ Author(s): iMarbot
 }
 
 /*******************************************************************************
-Template(s): Template:Team matches table
-Author(s): iMarbot via ???
-*******************************************************************************/
-.recent-matches-bg-win {
-	background-color: var( --table-green-background-color, #f0fff0 ) !important;
-}
-
-.recent-matches-bg-tie {
-	background-color: var( --table-yellow-background-color, #f9f9c7 ) !important;
-}
-
-.recent-matches-bg-lose {
-	background-color: var( --table-red-background-color, #f9f0f2 ) !important;
-}
-
-/*******************************************************************************
 Template(s): white-space as classes
 Author(s): iMarbot
 *******************************************************************************/
@@ -2717,15 +2688,6 @@ Author(s): salle
 }
 
 /*******************************************************************************
-"Match Page" font-awesome stacked icon correction
-Author(s): salle
-*******************************************************************************/
-
-span.fa-stack i.fas.fa-info.fa-stack-1x:last-child {
-	padding-top: 0.2em;
-}
-
-/*******************************************************************************
 .scribunto-error when not added via <style> tags
 Author(s): Scribunto developer( s )
 *******************************************************************************/
@@ -2892,4 +2854,23 @@ Slightly transparent imagelabel on POIDraft
 	.theme--dark & {
 		background-color: rgba( 0, 25, 51, 0.75 );
 	}
+}
+
+// resources/styles/components/_catlinks.scss
+.catlinks {
+	background-color: transparent;
+
+	.theme--light & {
+		border: 0.0625rem solid var( --clr-on-surface-light-primary-8 );
+	}
+
+	.theme--dark & {
+		border: 0.0625rem solid var( --clr-on-surface-dark-primary-8 );
+	}
+}
+
+// resources/styles/components/_fieldbox.scss
+body .fieldBox {
+	background: var( --clr-surface-2 );
+	color: var( --clr-on-surface );
 }
