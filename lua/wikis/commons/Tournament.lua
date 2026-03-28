@@ -59,6 +59,7 @@ local TOURNAMENT_PHASE = {
 ---@return StandardTournament[]
 function Tournament.getAllTournaments(conditions, filterTournament, queryProps)
 	local tournaments = {}
+	local limit = queryProps and Table.extract(queryProps, 'limit') or nil
 	Lpdb.executeMassQuery(
 		'tournament',
 		Table.merge({
@@ -71,7 +72,8 @@ function Tournament.getAllTournaments(conditions, filterTournament, queryProps)
 			if not filterTournament or filterTournament(tournament) then
 				table.insert(tournaments, tournament)
 			end
-		end
+		end,
+		limit
 	)
 	return tournaments
 end
