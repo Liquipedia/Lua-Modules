@@ -71,8 +71,11 @@ return {
 	left = 'fas fa-chevron-circle-left',
 
 	-- Usage: Indicate if a team/player went up or down in placement in a league system or in a ranking system
-	rankup = 'fas fa-long-arrow-up',
-	rankdown = 'fas fa-long-arrow-down',
+	rankup = 'fas fa-chevron-up',
+	rankup_double = 'fas fa-chevron-double-up',
+	rankneutral = 'fas fa-minus',
+	rankdown = 'fas fa-chevron-down',
+	rankdown_double = 'fas fa-chevron-double-down',
 
 	-- Usage: Main Page buttons
 	featuredon = 'far fa-star',

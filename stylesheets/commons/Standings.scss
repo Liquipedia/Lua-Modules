@@ -50,3 +50,31 @@
 	align-items: center;
 	gap: 0.25rem;
 }
+
+.standings-position-indicator {
+	display: flex;
+	flex-flow: row nowrap;
+	padding: 0.125rem 0.5rem;
+	gap: 0.125rem;
+	font-weight: bold;
+
+	&.movement-up {
+		color: var( --clr-semantic-positive-30 );
+
+		.theme--dark & {
+			color: var( --clr-semantic-positive-80 );
+		}
+	}
+
+	&.movement-neutral {
+		color: var( --clr-secondary-80 );
+	}
+
+	&.movement-down {
+		color: var( --clr-semantic-negative-40 );
+
+		.theme--dark & {
+			color: var( --clr-semantic-negative-80 );
+		}
+	}
+}
