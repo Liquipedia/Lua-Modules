@@ -21,15 +21,16 @@ function ControlsSettingsTable.create(frame)
 	local args = Arguments.getArgs(frame)
 	local config = Info.controlsSettingsTable
 	local widget = ControlsSettingsTableWidget(config, args)
-	ControlsSettingsTable.saveToLpdb(config, args)
+	ControlsSettingsTable._saveToLpdb(config, args)
 	return widget:render()
 end
 
+---@private
 ---@param config {keys: string[], title: string}
 ---@param args {[string]: string?}
-function ControlsSettingsTable.saveToLpdb(config, args)
+function ControlsSettingsTable._saveToLpdb(config, args)
 	local title = mw.title.getCurrentTitle().text
-	local extradata = ControlsSettingsTable.generateLpdbExtradata(config, args)
+	local extradata = ControlsSettingsTable._generateLpdbExtradata(config, args)
 	mw.ext.LiquipediaDB.lpdb_settings(title, {
 		name = 'movement',
 		reference = args.ref,
@@ -39,10 +40,11 @@ function ControlsSettingsTable.saveToLpdb(config, args)
 	})
 end
 
+---@private
 ---@param config {keys: string[], title: string}
 ---@param args {[string]: string?}
 ---@return {[string]: string?}
-function ControlsSettingsTable.generateLpdbExtradata(config, args)
+function ControlsSettingsTable._generateLpdbExtradata(config, args)
 	local lpdbData = {}
 	Array.forEach(config, function(item)
 		Array.forEach(item.keys, function(key)
