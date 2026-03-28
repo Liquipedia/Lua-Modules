@@ -57,6 +57,7 @@ local DEFAULT_LIMIT = 5000
 ---@field showRank boolean
 ---@field noLis boolean
 ---@field offset number
+---@field limit number
 ---@field allowedPlacements string[]
 ---@field dynamicPlacements boolean
 ---@field onlyHighlightOnValue string?
@@ -124,6 +125,7 @@ function BaseTournamentsListing:readConfig()
 		showRank = Logic.readBool(Logic.nilOr(args.showRank)),
 		noLis = Logic.readBool(args.noLis),
 		offset = tonumber(args.offset) or 0,
+		limit = tonumber(args.limit) or DEFAULT_LIMIT,
 		allowedPlacements = self:_allowedPlacements(),
 		dynamicPlacements = Logic.readBool(args.dynamicPlacements),
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
@@ -151,7 +153,7 @@ end
 function BaseTournamentsListing:_query()
 	return Tournament.getAllTournaments(self:buildConditions(), nil, {
 		order = self.args.order,
-		limit = self.args.limit or DEFAULT_LIMIT,
+		limit = self.config.limit,
 		offset = self.config.offset,
 	})
 end
