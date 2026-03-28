@@ -253,7 +253,7 @@ end
 function BaseTournamentsListing:_row(tournamentData)
 	local config = self.config
 
-	local highlight = config.showHighlight and self:getHighlightClass(tournamentData) or nil
+	local highlight = config.showHighlight and tournamentData:isHighlighted(self.config) or nil
 	local status = tournamentData.status and tournamentData.status:lower()
 
 	if config.showRank then
@@ -378,7 +378,7 @@ function BaseTournamentsListing:_calculateRank(prize)
 end
 
 ---@private
----@param tournamentData table
+---@param tournamentData StandardTournament
 ---@return string[]
 function BaseTournamentsListing._organizerDisplay(tournamentData)
 	local organizers = Logic.emptyOr(tournamentData.organizers) or {}
@@ -531,18 +531,10 @@ function BaseTournamentsListing.participantsNumber(number)
 	return LANG:formatNum(number)
 end
 
--- overwritable in case wikis want several highlight options
----@protected
----@param tournamentData table
----@return boolean
-function BaseTournamentsListing:getHighlightClass(tournamentData)
-	return HighlightConditions.tournament(tournamentData, self.config)
-end
-
----@param tournamentData table
+---@param tournamentData StandardTournament
 ---@return string?
 function BaseTournamentsListing:displayTier(tournamentData)
-	local tier, tierType, options = Tier.parseFromQueryData(tournamentData)
+	local options = tournamentData.tierOptions
 	options.link = true
 	if self.config.onlyTierTypeIfBoth then
 		options.onlyTierTypeIfBoth = true
@@ -550,7 +542,7 @@ function BaseTournamentsListing:displayTier(tournamentData)
 		options.tierTypeShort = true
 	end
 
-	return Tier.display(tier, tierType, options)
+	return Tier.display(tournamentData.liquipediaTier, tournamentData.liquipediaTierType, options)
 end
 
 return BaseTournamentsListing
