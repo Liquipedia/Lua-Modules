@@ -21,6 +21,7 @@ local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Region = Lua.import('Module:Region')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local Tournament = Lua.import('Module:Tournament')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
@@ -138,7 +139,7 @@ end
 
 ---@return self
 function BaseTournamentsListing:create()
-	local data = self.args.data or self:_query()
+	local data = self.args.data and Array.map(self.args.data, Tournament.tournamentFromRecord) or self:_query()
 	if Table.isNotEmpty(data) then
 		self.data = data
 	end
@@ -146,12 +147,9 @@ function BaseTournamentsListing:create()
 	return self
 end
 
----@return table
+---@return StandardTournament[]
 function BaseTournamentsListing:_query()
-	return mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = self:buildConditions(),
-		query = 'pagename, name, icon, icondark, organizers, startdate, enddate, status, locations, series, '
-			.. 'prizepool, participantsnumber, game, liquipediatier, liquipediatiertype, extradata, publishertier, type',
+	return Tournament.getAllTournaments(self:buildConditions(), nil, {
 		order = self.args.order,
 		limit = self.args.limit or DEFAULT_LIMIT,
 		offset = self.config.offset,
@@ -248,7 +246,7 @@ function BaseTournamentsListing:_header()
 end
 
 ---@private
----@param tournamentData table
+---@param tournamentData StandardTournament
 ---@return Widget
 function BaseTournamentsListing:_row(tournamentData)
 	local config = self.config
@@ -261,7 +259,7 @@ function BaseTournamentsListing:_row(tournamentData)
 	end
 
 	local prizeValue = tonumber(tournamentData.prizepool) or 0
-	local participantNumber = tonumber(tournamentData.participantsnumber) or -1
+	local participantNumber = tonumber(tournamentData.participantsNumber) or -1
 
 	local placements = self:_fetchPlacementData(tournamentData)
 
@@ -277,13 +275,13 @@ function BaseTournamentsListing:_row(tournamentData)
 			} or nil,
 			TableWidgets.Cell{
 				attributes = {
-					['data-sort-value'] = tournamentData.name
+					['data-sort-value'] = tournamentData.displayName
 				},
 				children = LeagueIcon.display{
 					icon = tournamentData.icon,
-					iconDark = tournamentData.icondark,
-					link = tournamentData.parent,
-					name = tournamentData.name,
+					iconDark = tournamentData.iconDark,
+					link = tournamentData.pageName,
+					name = tournamentData.displayName,
 					options = {noTemplate = true},
 				}
 			},
@@ -292,11 +290,11 @@ function BaseTournamentsListing:_row(tournamentData)
 					['text-decoration'] = status == CANCELLED and 'line-through' or nil,
 				},
 				attributes = {
-					['data-sort-value'] = tournamentData.name,
+					['data-sort-value'] = tournamentData.displayName,
 				},
 				children = LinkWidget{
-					children = tournamentData.name,
-					link = tournamentData.pagename,
+					children = tournamentData.displayName,
+					link = tournamentData.pageName,
 				}
 			},
 			config.showOrganizer
@@ -309,7 +307,7 @@ function BaseTournamentsListing:_row(tournamentData)
 				css = {
 					['font-style'] = (status == POSTPONED or status == DELAYED) and 'italic' or nil,
 				},
-				children = BaseTournamentsListing._dateDisplay(tournamentData.startdate, tournamentData.enddate, status)
+				children = BaseTournamentsListing._dateDisplay(tournamentData.startDate, tournamentData.endDate, status)
 			},
 			TableWidgets.Cell{
 				children = prizeValue > 0
@@ -446,8 +444,8 @@ function BaseTournamentsListing._displayLocation(locationData, locationIndex)
 end
 
 ---@private
----@param startDate string
----@param endDate string
+---@param startDate DateRecord
+---@param endDate DateRecord
 ---@param status string?
 ---@return Widget|string
 function BaseTournamentsListing._dateDisplay(startDate, endDate, status)
