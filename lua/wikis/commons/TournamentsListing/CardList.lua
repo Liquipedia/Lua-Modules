@@ -275,13 +275,13 @@ function BaseTournamentsListing:_row(tournamentData)
 			} or nil,
 			TableWidgets.Cell{
 				attributes = {
-					['data-sort-value'] = tournamentData.displayName
+					['data-sort-value'] = tournamentData.fullName
 				},
 				children = LeagueIcon.display{
 					icon = tournamentData.icon,
 					iconDark = tournamentData.iconDark,
 					link = tournamentData.pageName,
-					name = tournamentData.displayName,
+					name = tournamentData.fullName,
 					options = {noTemplate = true},
 				}
 			},
@@ -290,10 +290,10 @@ function BaseTournamentsListing:_row(tournamentData)
 					['text-decoration'] = status == CANCELLED and 'line-through' or nil,
 				},
 				attributes = {
-					['data-sort-value'] = tournamentData.displayName,
+					['data-sort-value'] = tournamentData.fullName,
 				},
 				children = LinkWidget{
-					children = tournamentData.displayName,
+					children = tournamentData.fullName,
 					link = tournamentData.pageName,
 				}
 			},
@@ -457,7 +457,7 @@ function BaseTournamentsListing._dateDisplay(startDate, endDate, status)
 end
 
 ---@private
----@param tournamentData table
+---@param tournamentData StandardTournament
 ---@return {qualified: table[]?, [1]: table[]?, [2]: table[]?}
 function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 	local placements = {}
@@ -499,7 +499,7 @@ function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 
 			local opponent = Opponent.fromLpdbStruct(item)
 			if not opponent then
-				mw.logObject({pageName = tournamentData.pagename, place = item.placement}, 'Invalid Prize Pool Data returned from')
+				mw.logObject({pageName = tournamentData.pageName, place = item.placement}, 'Invalid Prize Pool Data returned from')
 			elseif Opponent.isTbd(opponent) then
 				opponent = Opponent.tbd(Opponent.team)
 			end

@@ -147,15 +147,15 @@ function TournamentsListingConditions.base(args)
 	return conditions
 end
 
----@param tournamentData table
+---@param tournamentData StandardTournament
 ---@param config table
 ---@return string
 function TournamentsListingConditions.placeConditions(tournamentData, config)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{
-			ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tournamentData.liquipediatier),
-			ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, tournamentData.liquipediatiertype),
-			ConditionNode(ColumnName(config.useParent and 'parent' or 'pagename'), Comparator.eq, tournamentData.pagename),
+			ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tournamentData.liquipediaTier),
+			ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, tournamentData.liquipediaTierType),
+			ConditionNode(ColumnName(config.useParent and 'parent' or 'pagename'), Comparator.eq, tournamentData.pageName),
 			ConditionNode(ColumnName('placement'), Comparator.neq, '')
 		}
 
