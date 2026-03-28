@@ -37,9 +37,7 @@ end
 ---@return boolean
 ---@nodiscard
 function Array.isArray(tbl)
-	if type(tbl) ~= 'table' then return end
-
-	return Array.all(Array.extractKeys(tbl), MathUtil.isInteger)
+	return type(tbl) == 'table' and Array.all(Array.extractKeys(tbl), MathUtil.isInteger)
 end
 
 -- Creates a copy of an array with the same elements.
