@@ -1992,30 +1992,6 @@ Author(s): hjpalpha
 }
 
 /*******************************************************************************
-Template: Sad box for main page
-Author(s): FO-nTTaX
-*******************************************************************************/
-.sadbox {
-	border: 1px solid #000000;
-	color: #ffffff;
-	font-size: 18px;
-	text-align: center;
-	border-radius: 0.5rem;
-	overflow: hidden;
-
-	a {
-		background-color: #464646;
-		color: #ffffff !important;
-		display: block;
-		padding: 10px;
-
-		&:hover {
-			background-color: #232323;
-		}
-	}
-}
-
-/*******************************************************************************
 Template: LightModeDarkMode
 Use case: Display images, text, ... only in light or only in darkmode
 Author(s): hjpalpha
