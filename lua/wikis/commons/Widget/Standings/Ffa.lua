@@ -101,9 +101,11 @@ function StandingsFfaWidget:_headerRow()
 
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
-			makeHeaderCell('#'),
+			TableWidgets.CellHeader{
+				colspan = self:_showRoundColumns() and 2 or nil,
+				children = '#'
+			},
 			makeHeaderCell('Participant'),
-			self:_showRoundColumns() and makeHeaderCell() or nil,
 			Array.map(standings.tiebreakers, function(tiebreaker)
 				if not tiebreaker.title then
 					return
@@ -134,15 +136,15 @@ function StandingsFfaWidget:_createRoundBody(round)
 					attributes = {['data-placement-type'] = slot.definitiveStatus},
 					labelScheme = 'placement',
 				}},
+				self:_showRoundColumns() and TableWidgets.Cell{
+					children = PlacementChange{change = slot.positionChangeFromPreviousRound}
+				} or nil,
 				TableWidgets.Cell{children = OpponentDisplay.BlockOpponent{
 					opponent = slot.opponent,
 					overflow = 'ellipsis',
 					teamStyle = 'hybrid',
 					showPlayerTeam = true,
 				}},
-				self:_showRoundColumns() and TableWidgets.Cell{
-					children = PlacementChange{change = slot.positionChangeFromPreviousRound}
-				} or nil,
 				Array.map(standings.tiebreakers, function(tiebreaker, tiebreakerIndex)
 					if not tiebreaker.title then
 						return
