@@ -18,7 +18,7 @@ local FindPlayersOnTeamFromPlacements = {}
 
 ---@param frame Frame
 ---@return Widget
-function FindPlayersOnTeamFromPlacements.run(frame)
+function FindPlayersOnTeamFromPlacements.get(frame)
 	local args = Arguments.getArgs(frame)
 	assert(args.team, 'No player(s) specified')
 	local team = mw.ext.TeamLiquidIntegration.resolve_redirect(args.team)
@@ -27,7 +27,7 @@ function FindPlayersOnTeamFromPlacements.run(frame)
 		return ConditionNode(ColumnName('opponentplayers_p' .. index .. 'team'), Comparator.eq, team)
 	end))
 
-	local data = mw.ext.LiquipediaDB.lpdb('match2player', {
+	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = tostring(conditions),
 		query = 'opponentplayers, date',
 		order = 'date desc',
