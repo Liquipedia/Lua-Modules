@@ -28,12 +28,10 @@ function CountryParticipation:render()
 		},
 		children = {
 			TableWidgets.TableHeader{
-				children = {
-					TableWidgets.Row{
-						children = {
-							TableWidgets.CellHeader{children = 'Country'},
-							TableWidgets.CellHeader{children = '#Players'},
-						}
+				children = TableWidgets.Row{
+					children = {
+						TableWidgets.CellHeader{children = 'Country'},
+						TableWidgets.CellHeader{children = '#Players'},
 					}
 				}
 			},
@@ -42,6 +40,7 @@ function CountryParticipation:render()
 	}
 end
 
+---@private
 ---@param data {flag: string, count: integer}
 ---@return Widget
 function CountryParticipation._row(data)
@@ -59,6 +58,7 @@ function CountryParticipation._row(data)
 	}
 end
 
+---@private
 ---@return {flag: string, count: integer}[]
 function CountryParticipation:_fetch()
 	local pageNames = Array.flatten((TournamentStructure.readMatchGroupsSpec(self.props)
