@@ -40,7 +40,7 @@ function AbilityUpgradeCard:render()
 	end
 
 	return TableWidgets.Table{
-		sortable = true,
+		css = {['margin-bottom'] = '0.5rem'},
 		columns = {
 			{align = 'center', width = '75px'},
 			{align = 'left', width = '375px'},
@@ -110,7 +110,7 @@ function AbilityUpgradeCard:_renderData()
 	local makeCell = function(title, input)
 		if Logic.isEmpty(input) then return end
 		return HtmlWidgets.Div{
-			css = {padding = '2px 8px'},
+			css = {padding = '0.125rem 0.5rem'},
 			children = WidgetUtil.collect(
 				HtmlWidgets.B{children = title},
 				' ',
@@ -156,7 +156,9 @@ function AbilityUpgradeCard:_renderData()
 			makeCell(Image{imageLght = 'Minimap research protoss.png', link = ''}, self.props.protoss),
 			makeCell(
 				'Researched from:',
-				Link{link = self.props['researched_from'], children = self.props['alt_researched_from']}
+				self.props['researched_from']
+					and Link{link = self.props['researched_from'], children = self.props['alt_researched_from']}
+					or nil
 			),
 			makeCell('Requires:', self.props.requires)
 		),
