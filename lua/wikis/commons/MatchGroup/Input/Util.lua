@@ -616,7 +616,7 @@ function MatchGroupInputUtil.getMapVeto(match, allowedVetoes)
 end
 
 ---@param winnerInput integer|string|nil
----@param finishedInput string|boolean?
+---@param finishedInput string?
 ---@return boolean
 function MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput)
 	return (type(winnerInput) == 'string' and MatchGroupInputUtil.isNotPlayedInput(winnerInput))
@@ -628,7 +628,7 @@ end
 ---@param opponents MGIParsedOpponent[]?
 ---@return string? #Match Status
 function MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput, opponents)
-	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
+	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput and 'true' or nil) then
 		return MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
 	elseif winnerInput or (not opponents) or MatchGroupInputUtil.hasSpecialStatus(opponents) then
 		return
