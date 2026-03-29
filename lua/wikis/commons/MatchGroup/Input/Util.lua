@@ -628,7 +628,7 @@ end
 ---@param opponents MGIParsedOpponent[]?
 ---@return string? #Match Status
 function MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput, opponents)
-	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput and 'true' or nil) then
+	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput and tostring(finishedInput) or nil) then
 		return MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
 	elseif winnerInput or (not opponents) or MatchGroupInputUtil.hasSpecialStatus(opponents) then
 		return
