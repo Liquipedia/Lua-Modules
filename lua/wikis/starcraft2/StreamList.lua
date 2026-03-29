@@ -8,7 +8,7 @@ local Logic = Lua.import('Module:Logic')
 local StreamLinks = Lua.import('Module:Links/Stream')
 local Table = Lua.import('Module:Table')
 
-local HtmlWidgets = require('Module:Widget/Html/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local WidgetUtil = Lua.import('Module:Widget/Util')

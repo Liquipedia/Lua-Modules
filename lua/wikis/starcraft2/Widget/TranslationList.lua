@@ -1,7 +1,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Box = require('Module:Box')
+local Box = Lua.import('Module:Box')
 local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
 local Logic = Lua.import('Module:Logic')
