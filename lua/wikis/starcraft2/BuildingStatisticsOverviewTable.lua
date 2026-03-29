@@ -1,0 +1,156 @@
+local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Faction = Lua.import('Module:Faction')
+local FnUtil = Lua.import('Module:FnUtil')
+local Game = Lua.import('Module:Game')
+local String = Lua.import('Module:StringUtils')
+local Tabs = Lua.import('Module:Tabs')
+
+local Link = Lua.import('Module:Widget/Basic/Link')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
+local GAS = Lua.import('Module:Gas', {loadData = true})
+local BUILDTIME = Lua.import('Module:Buildtime', {loadData = true})
+local MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
+local ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
+local HEALTH = '[[File:Icon_Hitpoints.png|link=]]'
+local SHIELD = '[[File:Icon_Shields.png|link=Plasma Shield]]'
+local PROTOSS = 'p'
+
+local BuildingStats = {}
+
+---@param frame Frame
+---@return Widget
+function BuildingStats.wrapper(frame)
+	local args = Arguments.getArgs(frame)
+
+	local tabArgs = {}
+	Array.forEach(Faction.coreFactions, function(faction, index)
+		tabArgs['name' .. index] = Faction.Icon{faction = faction} .. ' ' .. Faction.toName(faction)
+		tabArgs['content' .. index] = BuildingStats._build{game = args.game, faction = faction}
+	end)
+
+	return Tabs.dynamic(tabArgs)
+end
+
+---@private
+---@param args {game: string?, faction: string}
+---@return Widget?
+function BuildingStats._build(args)
+	local game = Game.name{game = args.game or 'Legacy of the Void'}
+	local faction = args.faction
+
+	local buildings = BuildingStats._queryBuildings(game, faction)
+	if not buildings or type(buildings[1]) ~= 'table' then
+		return
+	end
+
+	--exclude some Buildings (Campaign)
+	buildings = Array.filter(buildings, function(building)
+		local page = building.pagename:lower()
+		local name = building.name:lower()
+
+		return not string.match(page,'khaydarin_monolith')
+			and not string.match(page,'cut_features')
+			and not string.match(page,'drakken_laser')
+			and not string.match(page,'hive_mind_emulator')
+			and not string.match(page,'merc_compound')
+			and not string.match(page,'campaign')
+			and not string.match(page,'starbase')
+			and not string.match(page,'phase_cannon')
+			and not string.match(page,'monolith')
+			and not string.match(page,'radar_tower')
+			and not string.match(page,'obelisk')
+			and not string.match(name,'supply depot lowered')
+	end)
+
+	return TableWidgets.Table{
+		columns = BuildingStats._columns(faction),
+		children = {
+			BuildingStats._header(faction),
+			TableWidgets.TableBody{children = Array.map(buildings, FnUtil.curry(BuildingStats._row, faction))}
+		}
+	}
+end
+
+---@private
+---@param game string
+---@param faction string
+---@return table[]
+function BuildingStats._queryBuildings(game, faction)
+	local lowercasedGame = game:lower():gsub(' ', '_')
+	local buildingType = 'Building information ' .. faction
+	local buildings = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		conditions = '[[type::' .. buildingType .. ']]',
+		order = 'name asc',
+		query = 'information, name, pagename, extradata',
+		limit = 5000,
+	})
+
+	return Array.filter(buildings, function(building)
+		return building.information == game
+			or String.contains(building.pagename:lower(), lowercasedGame)
+	end)
+end
+
+---@private
+---@param faction string
+---@return {}[]
+function BuildingStats._columns(faction)
+	return WidgetUtil.collect(
+		{align = 'left'}, -- name
+		{align = 'center'}, -- mins
+		{align = 'center'}, -- gas
+		{align = 'center'}, -- time
+		{align = 'center'}, -- helath
+		faction == PROTOSS and {align = 'center'} or nil, -- shield
+		{align = 'center'}, -- armor
+		{align = 'center'} -- sight
+	)
+end
+
+---@private
+---@param faction string
+---@return Widget
+function BuildingStats._header(faction)
+	return TableWidgets.TableHeader{
+		children = TableWidgets.Row{
+			children = WidgetUtil.collect(
+				TableWidgets.CellHeader{children = 'Building'},
+				TableWidgets.CellHeader{children = MINERALS},
+				TableWidgets.CellHeader{children = GAS[faction]},
+				TableWidgets.CellHeader{children = BUILDTIME[faction]},
+				TableWidgets.CellHeader{children = HEALTH},
+				faction == PROTOSS and TableWidgets.CellHeader{children = SHIELD} or nil,
+				TableWidgets.CellHeader{children = ARMOR},
+				TableWidgets.CellHeader{children = Link{link = 'Sight'}}
+			)
+		}
+	}
+end
+
+---@private
+---@param faction string
+---@param building table
+---@return Html
+function BuildingStats._row(faction, building)
+	local extradata = building.extradata or {}
+
+	return TableWidgets.Row{
+		children = WidgetUtil.collect(
+			TableWidgets.Cell{children = Link{link = building.pagename, children = building.name}},
+			TableWidgets.Cell{children = extradata.minerals or '-'},
+			TableWidgets.Cell{children = extradata.gas or '-'},
+			TableWidgets.Cell{children = extradata.buildtime},
+			TableWidgets.Cell{children = extradata.hp},
+			faction == PROTOSS and TableWidgets.CellHeader{children = extradata.shield} or nil,
+			TableWidgets.Cell{children = extradata.armor or 0},
+			TableWidgets.Cell{children = extradata.sight or 9}
+		)
+	}
+end
+
+return BuildingStats
