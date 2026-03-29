@@ -12,7 +12,7 @@ local Widget = Lua.import('Module:Widget')
 ---@operator call(table): MostAllKills
 local MostAllKills = Class.new(Widget)
 
----@return Html
+---@return Widget
 function MostAllKills:render()
 	return TableWidgets.Table{
 		sortable = false,
@@ -40,6 +40,7 @@ function MostAllKills:render()
 	}
 end
 
+---@private
 ---@return Widget[]
 function MostAllKills:_rows()
 	local allKillList = mw.ext.LiquipediaDB.lpdb('datapoint', {
@@ -59,6 +60,7 @@ function MostAllKills:_rows()
 	end)
 end
 
+---@private
 ---@param pageName string
 ---@return Widget
 function MostAllKills:_player(pageName)
