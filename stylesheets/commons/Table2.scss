@@ -280,3 +280,30 @@ $table2-cell-padding-x: 0.75rem;
 		}
 	}
 }
+
+// TournamentsListing variant (Module:TournamentsListing/CardList)
+.tournaments-listing {
+	width: 100%;
+
+	.column {
+		&__tournament {
+			width: 100%;
+			min-width: 15rem;
+			max-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		&__placement > div {
+			display: inline-grid;
+			grid-template-columns: repeat( auto-fit, minmax( 150px, 1fr ) );
+			min-width: 12vw;
+		}
+
+		&__qualified > div {
+			display: inline-grid;
+			grid-template-columns: repeat( auto-fit, minmax( 150px, 1fr ) );
+			min-width: 20vw;
+		}
+	}
+}
