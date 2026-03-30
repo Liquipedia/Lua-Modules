@@ -66,15 +66,20 @@ function TournamentsTickerListWidget:render()
 		}
 	end
 
-	local tabsWidget = ContentSwitch{
-		css = { margin = '0.75rem'},
-		switchGroup = 'tournament-list-phase',
-		defaultActive = 2,
-		storeValue = false,
-		tabs = {
-			{label = 'Upcoming', value = 'upcoming', content = buildSublist(data.upcoming)},
-			{label = 'Ongoing', value = 'ongoing', content = buildSublist(data.ongoing)},
-			{label = 'Completed', value = 'completed', content = buildSublist(data.completed)},
+	local tabsWidget = HtmlWidgets.Div{
+		css = { ['padding-top'] = '0.75rem'},
+		children = {
+			ContentSwitch{
+				css = { margin = '0 0.75rem 0.75rem'},
+				switchGroup = 'tournament-list-phase',
+				defaultActive = 2,
+				storeValue = false,
+				tabs = {
+					{label = 'Upcoming', value = 'upcoming', content = buildSublist(data.upcoming)},
+					{label = 'Ongoing', value = 'ongoing', content = buildSublist(data.ongoing)},
+					{label = 'Completed', value = 'completed', content = buildSublist(data.completed)},
+				},
+			},
 		},
 	}
 
