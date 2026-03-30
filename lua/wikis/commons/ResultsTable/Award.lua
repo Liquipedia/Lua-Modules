@@ -33,10 +33,8 @@ function AwardsTable:buildColumnDefinitions()
 		{align = 'left'},
 		{align = 'left'},
 		{align = 'left'},
-		self.config.queryType ~= Opponent.team and {
-			align = 'center',
-		} or self.config.playerResultsOfTeam and {
-			align = 'center',
+		(self.config.queryType ~= Opponent.team or self.config.playerResultsOfTeam) and {
+			align = 'left',
 		} or nil,
 		{
 			align = 'right',

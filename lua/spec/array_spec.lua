@@ -81,6 +81,15 @@ describe('array', function()
 		it('check', function()
 			local a = {1, 2, 3, {5, 3}, {6, 4}}
 			assert.are_same({1, 2, 3, 5, 3, 6, 4}, Array.flatten(a))
+
+			local b = {
+				{
+					hello = 'world'
+				},
+				2,
+				3
+			}
+			assert.are_same(b, Array.flatten(b))
 		end)
 	end)
 
@@ -155,9 +164,11 @@ describe('array', function()
 
 	describe('ExtendWith', function()
 		it('check', function()
-			local a, b, c = {2, 3}, {5, 7, 11}, {13}
+			local a, b, c, d = {2, 3}, {5, 7, 11}, {13}, {hello = 'world'}
 			assert.are_same({2, 3, 5, 7, 11, 13}, Array.extendWith(a, b, c))
 			assert.are_same({2, 3, 5, 7, 11, 13}, a)
+			assert.are_same({2, 3, 5, 7, 11, 13, {hello = 'world'}}, Array.extendWith(a, d))
+			assert.are_same({2, 3, 5, 7, 11, 13, {hello = 'world'}}, a)
 		end)
 	end)
 

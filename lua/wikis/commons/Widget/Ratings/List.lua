@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local Date = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
 local Icon = Lua.import('Module:Icon')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 local Operator = Lua.import('Module:Operator')
@@ -24,6 +25,8 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
 local RatingsStorageFactory = Lua.import('Module:Ratings/Storage/Factory')
+
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 ---@class RatingsList: Widget
 ---@field _base Widget
@@ -95,23 +98,82 @@ function RatingsList:render()
 	}
 	local teams = getRankings(teamLimit)
 
+	local anyTeam = teams[1]
+	local lastDate = anyTeam.progression[#anyTeam.progression].date
+	local formattedDate = Date.toYmdInUtc(Date.parseIsoDate(lastDate))
+
+	local columns = {
+		{ align = 'right' },
+		{ align = 'left' },
+		{ align = 'left' },
+		{ align = 'right' },
+		{ align = 'left' },
+		{ align = 'center' },
+	}
+
+	local title = HtmlWidgets.Div {
+		children = {
+			HtmlWidgets.Div {
+				children = {
+					HtmlWidgets.B { children = 'BETA' },
+					HtmlWidgets.Span { children = 'Last updated: ' .. formattedDate }
+				},
+				classes = { 'ranking-table__top-row-text' }
+			},
+			HtmlWidgets.Div {
+				children = {
+					HtmlWidgets.Span { children = 'Data provided by ' },
+					IconImage { imageLight = 'SAP_logo.svg', size = '90px' }
+				},
+				classes = { 'ranking-table__top-row-logo-container' }
+			}
+		},
+		classes = { 'ranking-table__top-row' },
+	}
+
+	local columnHeaderRow = TableWidgets.Row {
+		children = WidgetUtil.collect(
+			TableWidgets.CellHeader { attributes = { ['data-ranking-table-cell'] = 'rank' }, children = 'Rank' },
+			TableWidgets.CellHeader { attributes = { ['data-ranking-table-cell'] = 'change' }, children = '+/-' },
+			TableWidgets.CellHeader { attributes = { ['data-ranking-table-cell'] = 'team' }, children = 'Team' },
+			TableWidgets.CellHeader { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = 'Points' },
+			TableWidgets.CellHeader { attributes = { ['data-ranking-table-cell'] = 'region' }, children = 'Region' },
+			showGraph and TableWidgets.CellHeader {
+				attributes = { ['data-ranking-table-cell'] = 'graph' },
+				children = Icon.makeIcon { iconName = 'chart' }
+			} or nil
+		),
+	}
+
 	local teamRows = Array.map(teams, function(team, index)
 		local uniqueId = index
 		local changeText = (not team.change and 'NEW') or PlacementChange { change = team.change }
 
-		local teamRow = WidgetUtil.collect(
-			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'rank' }, children = team.rank },
-			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'change' }, children = changeText },
-			HtmlWidgets.Td {
+		local rowClasses = {}
+		local isEven = team.rank % 2 == 0
+		if isEven then
+			table.insert(rowClasses, 'ranking-table__row--even')
+		end
+		if team.rank > 5 and isSmallerVersion then
+			table.insert(rowClasses, 'ranking-table__row--overfive')
+		end
+
+		local teamRowCells = WidgetUtil.collect(
+			TableWidgets.Cell { attributes = { ['data-ranking-table-cell'] = 'rank' }, children = team.rank },
+			TableWidgets.Cell { attributes = { ['data-ranking-table-cell'] = 'change' }, children = changeText },
+			TableWidgets.Cell {
 				attributes = { ['data-ranking-table-cell'] = 'team' },
 				children = OpponentDisplay.BlockOpponent { opponent = team.opponent, teamStyle = 'hybrid' }
 			},
-			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = MathUtil.round(team.rating) },
-			HtmlWidgets.Td {
+			TableWidgets.Cell {
+				attributes = { ['data-ranking-table-cell'] = 'rating' },
+				children = MathUtil.round(team.rating)
+			},
+			TableWidgets.Cell {
 				attributes = { ['data-ranking-table-cell'] = 'region' },
 				children = Flags.Icon { flag = team.region } .. Flags.CountryName { flag = team.region }
 			},
-			showGraph and (HtmlWidgets.Td {
+			showGraph and TableWidgets.Cell {
 				attributes = {
 					class = 'ranking-table__toggle-graph-cell',
 					['data-ranking-table-cell'] = 'graph'
@@ -125,125 +187,80 @@ function RatingsList:render()
 						tabindex = '1'
 					},
 					children = Icon.makeIcon { iconName = 'expand' }
-				} }) or nil
+				} } or nil
 		)
 
-		local graphRow = showGraph and {
-			HtmlWidgets.Td {
-				attributes = {
-					colspan = '7',
-					['data-ranking-table-cell'] = 'graph'
-				},
-				children = HtmlWidgets.Div {
-					children = {
-						OpponentDisplay.InlineOpponent { opponent = team.opponent },
-						Logic.tryOrElseLog(
-							function() return makeTeamChart(team, teamLimit) end,
-							function() return 'Failed to make graph for team' end
-						)
+		local teamRow = TableWidgets.Row {
+			children = teamRowCells,
+			classes = rowClasses,
+		}
+
+		local graphRow = nil
+		if showGraph then
+			graphRow = TableWidgets.Row {
+				children = TableWidgets.Cell {
+					attributes = {
+						colspan = '6',
+						['data-ranking-table-cell'] = 'graph'
+					},
+					children = HtmlWidgets.Div {
+						children = {
+							OpponentDisplay.InlineOpponent { opponent = team.opponent },
+							Logic.tryOrElseLog(
+								function() return makeTeamChart(team, teamLimit) end,
+								function() return 'Failed to make graph for team' end
+							)
+						}
 					},
 					classes = { 'ranking-table__graph-row-container' }
-				}
-			}
-		} or nil
-
-		local isEven = team.rank % 2 == 0
-		local rowClasses = { 'ranking-table__row' }
-		if isEven then
-			table.insert(rowClasses, 'ranking-table__row--even')
-		end
-		if team.rank > 5 and isSmallerVersion then
-			table.insert(rowClasses, 'ranking-table__row--overfive')
-		end
-
-		return {
-			HtmlWidgets.Tr { children = teamRow, classes = rowClasses },
-			showGraph and HtmlWidgets.Tr {
-				children = graphRow,
+				},
 				classes = { 'ranking-table__graph-row d-none' },
 				attributes = {
 					['data-ranking-table'] = 'graph-row',
 					['aria-expanded'] = 'false',
 					['data-ranking-table-id'] = uniqueId
 				},
-			} or nil
+			}
+		end
+
+		return {
+			teamRow,
+			graphRow
 		}
 	end)
 
-	local anyTeam = teams[1]
-	local lastDate = anyTeam.progression[#anyTeam.progression].date
-	local formattedDate = Date.toYmdInUtc(Date.parseIsoDate(lastDate))
-
-	local tableHeader = HtmlWidgets.Tr {
-		children = HtmlWidgets.Th {
-			attributes = { colspan = '7' },
-			children = HtmlWidgets.Div {
-				children = {
-					HtmlWidgets.Div {
-						children = {
-							HtmlWidgets.B { children = 'BETA' },
-							HtmlWidgets.Span { children = 'Last updated: ' .. formattedDate }
-						},
-						classes = { 'ranking-table__top-row-text' }
-					},
-					HtmlWidgets.Div {
-						children = {
-							HtmlWidgets.Span { children = 'Data provided by ' },
-							HtmlWidgets.Div { children = '[[File:SAP_logo.svg|link=|SAP]]' }
-						},
-						classes = { 'ranking-table__top-row-logo-container' }
-					}
-				}
-			},
-			classes = { 'ranking-table__top-row' },
-		}
-	}
-
 	local buttonDiv = HtmlWidgets.Div {
 		children = { 'See Rankings Page', Icon.makeIcon { iconName = 'goto' } },
+		classes = { 'ranking-table__footer-button' },
 	}
 
-	local tableFooter = HtmlWidgets.Tr {
-		children = HtmlWidgets.Th {
-			attributes = { colspan = '7' },
-			children = Link {
-				link = 'Portal:Rankings',
-				linktype = 'internal',
-				children = { buttonDiv },
-			},
-			classes = { 'ranking-table__footer-row' },
-		}
+	local footer = Link {
+		link = 'Portal:Rankings',
+		linktype = 'internal',
+		children = { buttonDiv },
 	}
 
 	return HtmlWidgets.Div {
 		attributes = {
 			['data-ranking-table'] = 'content',
 		},
-		children = WidgetUtil.collect(
-			HtmlWidgets.Table {
-				attributes = { ['data-ranking-table'] = 'table' },
-				classes = { 'ranking-table', isSmallerVersion and 'ranking-table--small' or nil },
-				children = WidgetUtil.collect(
-					tableHeader,
-					HtmlWidgets.Tr {
-						children = WidgetUtil.collect(
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'rank' }, children = 'Rank' },
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'change' }, children = '+/-' },
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'team' }, children = 'Team' },
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = 'Points' },
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'region' }, children = 'Region' },
-							showGraph and HtmlWidgets.Th {
-								attributes = { ['data-ranking-table-cell'] = 'graph' },
-								children = Icon.makeIcon { iconName = 'chart' }
-							} or nil
-						),
-						classes = { 'ranking-table__header-row' },
-					},
-					Array.flatten(teamRows),
-					isSmallerVersion and tableFooter or nil
-				)
-			}
-		)
+		children = TableWidgets.Table {
+			columns = columns,
+			striped = false,
+			title = title,
+			footer = isSmallerVersion and footer or nil,
+			classes = { isSmallerVersion and 'ranking-table--small' or nil },
+			tableAttributes = { ['data-ranking-table'] = 'table' },
+			tableClasses = { 'ranking-table' },
+			children = WidgetUtil.collect(
+				TableWidgets.TableHeader {
+					children = { columnHeaderRow }
+				},
+				TableWidgets.TableBody {
+					children = Array.flatten(teamRows)
+				}
+			)
+		}
 	}
 end
 

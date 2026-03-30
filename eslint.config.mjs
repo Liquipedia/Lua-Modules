@@ -45,6 +45,10 @@ export default defineConfig([{
         "es-x/no-array-prototype-findindex": "off",
         "es-x/no-spread-elements": "off",
         "es-x/no-property-shorthands": "off",
+        "compat/compat": [
+            "error",
+            "> 0.5% and baseline widely available"
+        ],
 
         "jsdoc/check-tag-names": ["error", {
             definedTags: ["jest-environment"],
