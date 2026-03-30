@@ -9,10 +9,11 @@ local Lua = require('Module:Lua')
 
 local LeagueIcon = {}
 local Class = Lua.import('Module:Class')
-local Icon = Lua.import('Module:Icon')
 local Template = Lua.import('Module:Template')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
+
+local FILLER = '<span class="league-icon-small-image">[[File:Logo filler event.png|link=]]</span>'
 local NO_ICON_BUT_ICONDARK_TRACKING_CATEGORY = '[[Category:Pages with only icondark]]'
 
 ---@class LeagueIconDisplayArgs
@@ -55,9 +56,7 @@ function LeagueIcon.display(args)
 
 	--if icon and iconDark are not given and can not be retrieved return filler icon
 	if String.isEmpty(icon) and String.isEmpty(iconDark) then
-		return tostring(mw.html.create('span')
-			:addClass('league-icon-small-image')
-			:node(Icon.makeIcon{iconName = 'firstplace'}))
+		return FILLER
 	end
 
 	if String.isEmpty(icon) then
