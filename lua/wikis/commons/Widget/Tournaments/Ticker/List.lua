@@ -78,9 +78,9 @@ function TournamentsTickerListWidget:render()
 		},
 	}
 
-	local inner
+	local listContainer
 	if self.props.variant == 'collapsible' then
-		inner = {
+		listContainer = {
 			HtmlWidgets.Div{
 				classes = {'tournaments-list--tabs'},
 				children = tabsWidget,
@@ -95,12 +95,12 @@ function TournamentsTickerListWidget:render()
 			},
 		}
 	else
-		inner = tabsWidget
+		listContainer = tabsWidget
 	end
 
 	return HtmlWidgets.Div{
 		css = {['padding-top'] = '0.75rem'},
-		children = inner,
+		children = listContainer,
 	}
 end
 
