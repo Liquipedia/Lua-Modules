@@ -19,11 +19,11 @@ local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local MessageBox = Lua.import('Module:Message box')
 local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WarningBox = Lua.import('Module:Widget/WarningBox')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
@@ -356,15 +356,11 @@ function CustomUnit:_processPatchFromId(key)
 end
 
 ---@param patch string?
----@return Html?
+---@return Widget?
 function CustomUnit._deprecatedWarning(patch)
 	if not patch then return end
 
-	return MessageBox.main('ambox', {
-		image= ICON_DEPRECATED,
-		class='ambox-red',
-		text= 'This has been removed with Patch ' .. patch,
-	})
+	return WarningBox{text = 'This has been removed with Patch ' .. patch}
 end
 
 return CustomUnit
