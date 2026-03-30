@@ -137,6 +137,7 @@ function ParticipantsTeamRoster:render()
 	end
 
 	---@param groups {label: string?, players: table[]}[]
+	---@return Widget
 	local makeRostersDisplay = function(groups)
 		local children = {}
 		for _, group in ipairs(groups) do
