@@ -23,7 +23,7 @@ function WidgetContext:getValue(default)
 	return self.props.value
 end
 
----@return (Widget|Html|string|number)[]
+---@return Renderable[]
 function WidgetContext:render()
 	return self.props.children
 end

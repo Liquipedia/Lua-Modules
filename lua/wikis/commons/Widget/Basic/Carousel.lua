@@ -19,7 +19,7 @@ local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
 
 ---@class CarouselWidgetParameters
----@field children (Widget|string|number)[]
+---@field children Renderable[]
 ---@field itemWidth string?
 ---@field gap string?
 ---@field classes string[]?

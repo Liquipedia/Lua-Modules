@@ -15,4 +15,5 @@ return {
 	RoleTitle = Class.new(Context),
 	InactiveSection = Class.new(Context),
 	FormerSection = Class.new(Context),
+	ColumnVisibility = Class.new(Context),
 }

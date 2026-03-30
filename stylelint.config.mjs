@@ -1,29 +1,15 @@
-{
-	"extends": "stylelint-config-wikimedia",
+/** @type {import("stylelint").Config} */
+export default {
+	"extends": [
+		"stylelint-config-wikimedia"
+	],
 	"plugins": [
 		"stylelint-scss"
 	],
 	"customSyntax": "postcss-scss",
 	"rules": {
-		"at-rule-no-unknown": [
-			true,
-			{
-				"ignoreAtRules": [
-					"mixin",
-					"if",
-					"else",
-					"include",
-					"use",
-					"extend",
-					"each",
-					"function",
-					"return",
-					"debug",
-					"at-root",
-					"for"
-				]
-			}
-		],
+		"at-rule-no-unknown": null,
+		"scss/at-rule-no-unknown": true,
 		"color-hex-length": "long",
 		"unit-disallowed-list": null,
 		"declaration-property-unit-disallowed-list": {},
@@ -33,7 +19,7 @@
 		"function-url-no-scheme-relative": null,
 		"declaration-no-important": null,
 		"function-no-unknown": null,
+		"scss/function-no-unknown": true,
 		"@stylistic/string-quotes": "double"
 	}
-}
-
+};

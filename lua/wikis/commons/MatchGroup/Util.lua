@@ -11,7 +11,7 @@ local Array = Lua.import('Module:Array')
 local Date = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local FnUtil = Lua.import('Module:FnUtil')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
@@ -279,6 +279,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field resultType string?
 ---@field section string?
 ---@field series string?
+---@field shortname string?
 ---@field status MatchStatus
 ---@field stream table
 ---@field tickername string?
@@ -314,6 +315,7 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	resultType = 'string?',
 	section = 'string?',
 	series = 'string?',
+	shortname = 'string?',
 	status = MatchGroupUtil.types.Status,
 	stream = 'table',
 	tickername = 'string?',
@@ -589,6 +591,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		resultType = nilIfEmpty(record.resulttype),
 		section = nilIfEmpty(record.section),
 		series = nilIfEmpty(record.series),
+		shortname = nilIfEmpty(record.shortname),
 		status = nilIfEmpty(record.status),
 		stream = Json.parseIfString(record.stream) or {},
 		tickername = record.tickername,

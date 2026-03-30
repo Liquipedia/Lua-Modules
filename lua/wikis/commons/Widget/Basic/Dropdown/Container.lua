@@ -18,7 +18,7 @@ local Div = HtmlWidgets.Div
 
 ---@class DropdownContainerWidgetParameters
 ---@field button string|Widget|(string|Widget)[]
----@field children string|number|Widget|Html|(string|number|Widget|Html)[]
+---@field children Renderable|Renderable[]
 ---@field classes string[]?
 
 ---@class DropdownContainerWidget: Widget

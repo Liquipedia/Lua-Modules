@@ -22,6 +22,7 @@ local REGION_TO_SUPERREGION = {
 	['CIS'] = 'EMEA',
 	['Levant'] = 'EMEA',
 	['Africa'] = 'EMEA',
+	['North Africa'] = 'EMEA',
 	['Korea'] = 'Pacific',
 	['China'] = 'CN',
 	['North America'] = 'Americas',

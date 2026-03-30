@@ -7,19 +7,20 @@
 
 return {
 	ACST = {
-		name ='Australian Central Standard Time',
+		name = 'Australian Central Standard Time',
 		offset = {9, 30},
 	},
 	ACDT = {
-		name ='Australian Central Daylight Time',
+		name = 'Australian Central Daylight Time',
 		offset = {10, 30},
 	},
 	ADT = {
-		name ='Atlantic Daylight Time',
+		name = 'Atlantic Daylight Time',
 		offset = {-3, 0},
 	},
 	ATST = {
-		name ='Atlantic Standard Time',
+		abbr = 'AST',
+		name = 'Atlantic Standard Time',
 		offset = {-4, 0},
 	},
 	AEDT = {

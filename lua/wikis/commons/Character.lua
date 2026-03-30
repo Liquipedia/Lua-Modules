@@ -8,7 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Table = Lua.import('Module:Table')
 
 local CharacterIcon = Lua.import('Module:CharacterIcon')

@@ -26,7 +26,6 @@ return {
 	matchpagelink = 'far fa-swords',
 	matchpopup = 'fas fa-info-circle',
 	timeout = 'far fa-clock',
-	veto = 'fas fa-times',
 	casters = 'fas fa-microphone-alt',
 	comment = 'far fa-comment',
 	mvp = 'fas fa-medal',
@@ -39,6 +38,13 @@ return {
 	surrendered = 'far fa-flag',
 	ace_valorant = 'fas fa-dagger',
 	flawless_valorant = 'fas fa-gem',
+
+	-- Usage: Veto labels
+	veto_pick = 'fas fa-check',
+	veto_ban = 'fas fa-times',
+	veto_defaultban = 'fas fa-times',
+	veto_decider = 'fas fa-flag-checkered',
+	veto_protect = 'fas fa-lock',
 
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',
@@ -172,6 +178,7 @@ return {
 	dota2_barrack = 'fas fa-warehouse',
 
 	leagueoflegends_kda = 'fas fa-swords fa-flip-vertical',
+	leagueoflegends_killparticipation = 'fas fa-dagger',
 
 	-- Usage: Day night cycle information
 	day = 'fas fa-sun',
@@ -247,9 +254,15 @@ return {
 	copy = 'fas fa-clone',
 	download = 'fas fa-download',
 
+	-- Usage: Github links
+	github = 'fab fa-github',
+
 	-- Usage: Dota2 Spellcard
 	dota2_spl_mechanics = 'fas fa-cog',
 	dota2_spl_interactions = 'fad fa-atom-alt',
 	dota2_spl_status = 'fas fa-hourglass-half',
-	dota2_spl_misc = 'fad fa-list-ul'
+	dota2_spl_misc = 'fad fa-list-ul',
+
+	-- Usage: Info button
+	['general-info'] = 'fas fa-info-circle',
 }
