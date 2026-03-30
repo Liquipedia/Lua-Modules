@@ -240,6 +240,7 @@ function TeamParticipantsWikiParser.parsePlayer(playerInput)
 		type = playerType,
 		played = playedInput,
 		results = resultsInput,
+		status = status,
 	}
 	return player
 end
