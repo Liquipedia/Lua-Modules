@@ -103,6 +103,8 @@ function ParticipantsTeamRoster:render()
 	local participant = self.props.participant
 
 	-- Used for making the sorting stable
+	---@param players standardPlayer[]
+	---@return standardPlayer[]
 	local sortPlayers = function(players)
 		if participant.playersAreSorted then
 			return players
@@ -123,6 +125,9 @@ function ParticipantsTeamRoster:render()
 		end)
 	end
 
+	---@param player standardPlayer
+	---@param index integer
+	---@return Widget
 	local makePlayerWidget = function(player, index)
 		local playerTeam = participant.opponent.template ~= player.team and player.team or nil
 		local playerTeamAsOpponent = playerTeam and Opponent.readOpponentArgs{
