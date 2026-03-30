@@ -43,7 +43,10 @@ function TournamentsTickerListItemWidget:render()
 	}
 
 	local badgeChildren = WidgetUtil.collect(
-		iconWidget,
+		HtmlWidgets.Span{
+			classes = {'tournaments-list-item__badge-icon'},
+			children = iconWidget,
+		},
 		self.props.displayGameIcon and Game.icon{
 			game = tournament.game,
 			noLink = true,

@@ -134,11 +134,9 @@ div.main-page-banner .main-page-banner-bottom-row {
 		display: flex;
 		gap: 0.25rem;
 
-		> .league-icon-small-image {
+		.tournaments-list-item__badge-icon {
 			width: 1.25rem;
 			height: 1.25rem;
-			min-width: unset;
-			min-height: unset;
 			padding: 0.125rem;
 			background-color: var( --clr-on-surface-light-primary-4 );
 			border-radius: 0.25rem;
