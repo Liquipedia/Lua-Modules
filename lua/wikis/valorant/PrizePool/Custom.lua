@@ -47,8 +47,8 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		lpdbData.prizemoney,
 		Variables.varDefault('tournament_liquipediatier'),
 		placement.placeStart,
-		Variables.varDefault('tournament_liquipediatiertype'),
 		Variables.varDefault('tournament_type'),
+		Variables.varDefault('tournament_liquipediatiertype'),
 		HighlightConditions.tournament(lpdbData)
 	)
 
@@ -69,11 +69,11 @@ end
 ---@param prizeMoney number
 ---@param tier string?
 ---@param place integer
----@param type string?
+---@param tournamentType string?
 ---@param tierType string?
 ---@param isHighlighted boolean
 ---@return number
-function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type, tierType, isHighlighted)
+function CustomPrizePool.calculateWeight(prizeMoney, tier, place, tournamentType, tierType, isHighlighted)
 	if Logic.isEmpty(tier) then
 		return 0
 	end
