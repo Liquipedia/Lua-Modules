@@ -30,7 +30,6 @@ local Title = Widgets.Title
 local CustomItem = Class.new(Item)
 local CustomInjector = Class.new(Injector)
 
-local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
 local VALID_ITEMS = {
 	'Gear',
 }
