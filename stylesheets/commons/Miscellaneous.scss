@@ -622,20 +622,6 @@ Author(s): Ricci
 Template(s): Mobile Group Tables, Match Lists & Showmatches
 Author(s): iMarbot
 *******************************************************************************/
-@media ( min-width: 321px ) {
-	.grouptable-team-mobile,
-	.matchlist-team-mobile {
-		display: none;
-	}
-}
-
-@media ( max-width: 320px ) {
-	.grouptable-team-full,
-	.matchlist-team-full {
-		display: none;
-	}
-}
-
 @media ( max-width: 435px ) {
 	.table.table-bordered.grouptable,
 	.wikitable.matchlist,
@@ -648,24 +634,6 @@ Author(s): iMarbot
 @media ( max-width: 767px ) {
 	.toggle-group .table-responsive {
 		padding-bottom: 0;
-	}
-}
-
-@media ( min-width: 431px ) {
-	.showmatch-team-mobile {
-		display: none;
-	}
-}
-
-@media ( max-width: 435px ) {
-	.showmatch-team-full {
-		display: none;
-	}
-}
-
-@media ( min-width: 300px ) {
-	.popover {
-		min-width: 275px;
 	}
 }
 
