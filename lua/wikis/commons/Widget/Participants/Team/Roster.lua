@@ -104,6 +104,10 @@ function ParticipantsTeamRoster:render()
 
 	-- Used for making the sorting stable
 	local sortPlayers = function(players)
+		if participant.playersAreSorted then
+			return players
+		end
+
 		local playerToIndex = Table.map(players, function(index, player) return player, index end)
 		return Array.sortBy(players, FnUtil.identity, function(a, b)
 			local function getPlayerSortOrder(player)
