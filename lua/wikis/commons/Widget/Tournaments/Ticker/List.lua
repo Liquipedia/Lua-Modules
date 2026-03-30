@@ -66,29 +66,21 @@ function TournamentsTickerListWidget:render()
 		}
 	end
 
-	local tabsWidget = HtmlWidgets.Div{
-		css = { ['padding-top'] = '0.75rem'},
-		children = {
-			ContentSwitch{
-				css = { margin = '0 0.75rem 0.75rem'},
-				switchGroup = 'tournament-list-phase',
-				defaultActive = 2,
-				storeValue = false,
-				tabs = {
-					{label = 'Upcoming', value = 'upcoming', content = buildSublist(data.upcoming)},
-					{label = 'Ongoing', value = 'ongoing', content = buildSublist(data.ongoing)},
-					{label = 'Completed', value = 'completed', content = buildSublist(data.completed)},
-				},
-			},
+	local tabsWidget = ContentSwitch{
+		css = { margin = '0 0.75rem 0.75rem'},
+		switchGroup = 'tournament-list-phase',
+		defaultActive = 2,
+		storeValue = false,
+		tabs = {
+			{label = 'Upcoming', value = 'upcoming', content = buildSublist(data.upcoming)},
+			{label = 'Ongoing', value = 'ongoing', content = buildSublist(data.ongoing)},
+			{label = 'Completed', value = 'completed', content = buildSublist(data.completed)},
 		},
 	}
 
-	if self.props.variant ~= 'collapsible' then
-		return tabsWidget
-	end
-
-	return HtmlWidgets.Div{
-		children = {
+	local inner
+	if self.props.variant == 'collapsible' then
+		inner = {
 			HtmlWidgets.Div{
 				classes = {'tournaments-list--tabs'},
 				children = tabsWidget,
@@ -101,7 +93,14 @@ function TournamentsTickerListWidget:render()
 					PhaseCollapsible{label = 'Completed', collapsed = true, children = buildSublist(data.completed)},
 				},
 			},
-		},
+		}
+	else
+		inner = tabsWidget
+	end
+
+	return HtmlWidgets.Div{
+		css = {['padding-top'] = '0.75rem'},
+		children = inner,
 	}
 end
 
