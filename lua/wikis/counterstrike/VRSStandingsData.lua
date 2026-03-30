@@ -21,18 +21,15 @@ local Condition = Lua.import('Module:Condition')
 local BooleanOperator = Condition.BooleanOperator
 local Comparator = Condition.Comparator
 
-local DATAPOINT_TYPE_MAIN = 'vrs_ranking'
-local DATAPOINT_TYPE_LIVE = 'vrs_ranking_live'
-local DATAPOINT_TYPE_LIQUIPEDIA = 'vrs_ranking_liquipedia'
-local DATAPOINT_TYPE_PREDICTION = 'vrs_ranking_prediction'
-
 ---@class VRSStandingsData
 local VRSStandingsData = {}
-
-VRSStandingsData.DATAPOINT_TYPE_MAIN = DATAPOINT_TYPE_MAIN
-VRSStandingsData.DATAPOINT_TYPE_LIVE = DATAPOINT_TYPE_LIVE
-VRSStandingsData.DATAPOINT_TYPE_LIQUIPEDIA = DATAPOINT_TYPE_LIQUIPEDIA
-VRSStandingsData.DATAPOINT_TYPE_PREDICTION = DATAPOINT_TYPE_PREDICTION
+---@enum VRSStandingsDataType
+VRSStandingsData.DataType = {
+	MAIN = 'vrs_ranking',
+	LIVE = 'vrs_ranking_live',
+	LIQUIPEDIA = 'vrs_ranking_liquipedia',
+	PREDICTION = 'vrs_ranking_prediction',
+}
 
 ---@class VRSStandingsStanding
 ---@field place number
@@ -51,7 +48,7 @@ VRSStandingsData.DATAPOINT_TYPE_PREDICTION = DATAPOINT_TYPE_PREDICTION
 ---@field filterDisplayName string?
 ---@field filterType 'none' | 'region' | 'subregion' | 'country'
 ---@field mainpage boolean
----@field datapointType string
+---@field datapointType VRSStandingsDataType
 ---@field updated string
 
 ---Parses props, fetches or reads inline data, stores if needed, applies
@@ -60,7 +57,7 @@ VRSStandingsData.DATAPOINT_TYPE_PREDICTION = DATAPOINT_TYPE_PREDICTION
 ---@return VRSStandingsStanding[]
 ---@return VRSStandingsSettings
 function VRSStandingsData.getStandings(props)
-	local datapointType = props.datapointType or DATAPOINT_TYPE_LIVE
+	local datapointType = VRSStandingsData.DataType[props.datapointType] or VRSStandingsData.DataType.LIVE
 
 	local updated
 	if props.updated == 'latest' then
@@ -216,25 +213,17 @@ function VRSStandingsData._fetch(updated, datapointType)
 		}
 	end
 
-	if datapointType == DATAPOINT_TYPE_MAIN then
-		conditions:add{
-			Condition.Node(Condition.ColumnName('type'), Comparator.eq, DATAPOINT_TYPE_MAIN)
-		}
-	elseif datapointType == DATAPOINT_TYPE_LIQUIPEDIA then
-		conditions:add{
-			Condition.Node(Condition.ColumnName('type'), Comparator.eq, DATAPOINT_TYPE_LIQUIPEDIA)
-		}
-	elseif datapointType == DATAPOINT_TYPE_PREDICTION then
-		conditions:add{
-			Condition.Node(Condition.ColumnName('type'), Comparator.eq, DATAPOINT_TYPE_PREDICTION)
-		}
-	else
+	if datapointType == VRSStandingsData.DataType.LIVE then
 		conditions:add(
 			Condition.Util.anyOf(
 				Condition.ColumnName('type'),
-				{DATAPOINT_TYPE_LIVE, DATAPOINT_TYPE_MAIN}
+				{VRSStandingsData.DataType.LIVE, VRSStandingsData.DataType.MAIN}
 			)
 		)
+	else
+		conditions:add{
+			Condition.Node(Condition.ColumnName('type'), Comparator.eq, datapointType)
+		}
 	end
 
 	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {

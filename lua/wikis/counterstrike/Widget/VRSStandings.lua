@@ -31,7 +31,7 @@ local FOOTER_LINK = 'Valve_Regional_Standings'
 local VRSStandings = Class.new(Widget)
 VRSStandings.defaultProps = {
 	title = 'VRS Standings',
-	datapointType = VRSStandingsData.DATAPOINT_TYPE_LIVE,
+	datapointType = 'LIVE',
 }
 
 ---@param settings VRSStandingsSettings
@@ -135,33 +135,19 @@ function VRSStandings._row(standing, mainpage)
 	local extradata = standing.opponent.extradata or {}
 
 	local cells
-	if standing.global_place then
-		cells = WidgetUtil.collect(
-			TableWidgets.Cell{children = standing.local_place},
-			TableWidgets.Cell{children = standing.global_place},
-			TableWidgets.Cell{
-				children = MathUtil.formatRounded{value = standing.points, precision = 1}
-			},
-			TableWidgets.Cell{
-				children = OpponentDisplay.InlineOpponent{
-					opponent = standing.opponent
-				}
+	cells = WidgetUtil.collect(
+		TableWidgets.Cell{children = standing.local_place},
+		standing.global_place and TableWidgets.Cell{children = standing.global_place} or nil,
+		TableWidgets.Cell{
+			children = MathUtil.formatRounded{value = standing.points, precision = 1}
+		},
+		TableWidgets.Cell{
+			children = OpponentDisplay.InlineOpponent{
+				opponent = standing.opponent
 			}
-		)
-	else
-		cells = WidgetUtil.collect(
-			TableWidgets.Cell{children = standing.place},
-			TableWidgets.Cell{
-				children = MathUtil.formatRounded{value = standing.points, precision = 1}
-			},
-			TableWidgets.Cell{
-				children = OpponentDisplay.InlineOpponent{
-					opponent = standing.opponent
-				}
-			},
-			TableWidgets.Cell{children = extradata.region or ''}
-		)
-	end
+		},
+		not standing.global_place and TableWidgets.Cell{children = extradata.region or ''} or nil
+	)
 
 	if not mainpage then
 		table.insert(cells,
@@ -169,7 +155,7 @@ function VRSStandings._row(standing, mainpage)
 				children = Array.map(standing.opponent.players, function(player)
 					return HtmlWidgets.Span{
 						css = {display="inline-block", width="160px"},
-						children = PlayerDisplay.InlinePlayer({player = player})
+						children = PlayerDisplay.BlockPlayer({player = player})
 					}
 				end)
 			}
