@@ -67,7 +67,8 @@ function Panel:render()
 	local body = Div{
 		classes = WidgetUtil.collect(
 			hasToggle and 'panel-box-collapsible-content' or nil,
-			Logic.readBool(self.props.padding) and 'panel-box-body' or nil,
+			'panel-box-body',
+			not Logic.readBool(self.props.padding) and 'panel-box-body--no-padding' or nil,
 			self.props.bodyClass
 		),
 		css = self.props.bodyStyle,
