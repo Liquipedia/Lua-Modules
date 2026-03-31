@@ -8,11 +8,6 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-
-local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
-local Injector = Lua.import('Module:Widget/Injector')
-local Logic = Lua.import('Module:Logic')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
