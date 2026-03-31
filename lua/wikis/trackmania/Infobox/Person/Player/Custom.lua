@@ -81,13 +81,13 @@ end
 ---@return string?
 function CustomPlayer:formatInput()
 	local lowercaseInput = self.args.input and self.args.input:lower() or nil
-	return Logic.nilOr(INPUTS[lowercaseInput])
+	return Logic.nilIfEmpty(INPUTS[lowercaseInput])
 end
 
 ---@return string?
 function CustomPlayer:formatCamera()
 	local lowercaseCamera = self.args.camera and self.args.camera:lower() or nil
-	return Logic.nilOr(CAMERAS[lowercaseCamera])
+	return Logic.nilIfEmpty(CAMERAS[lowercaseCamera])
 end
 
 return CustomPlayer
