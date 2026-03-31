@@ -1,15 +1,14 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Box = Lua.import('Module:Box')
 local Class = Lua.import('Module:Class')
 local Flags = Lua.import('Module:Flags')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
+local Box = Lua.import('Module:Widget/Box')
 local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local Widget = Lua.import('Module:Widget')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local COLUMN_BREAK = 6
 
@@ -30,11 +29,7 @@ function TranslationList:render()
 		return UnorderedList{children = Array.map(group, displayItem)}
 	end)
 
-	return WidgetUtil.collect(
-		Box._template_box_start{padding = '2em'},
-		Array.interleave(parts, Box.brk{padding = '2em'}),
-		Box.finish()
-	)
+	return Box{children = parts, paddingRight = '2em'}
 end
 
 ---@private

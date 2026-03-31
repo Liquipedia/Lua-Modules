@@ -2,17 +2,15 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Box = Lua.import('Module:Box')
 local Flags = Lua.import('Module:Flags')
 local Logic = Lua.import('Module:Logic')
 local StreamLinks = Lua.import('Module:Links/Stream')
 local Table = Lua.import('Module:Table')
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Box = Lua.import('Module:Widget/Box')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local Widget = Lua.import('Module:Widget')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class StreamList: Widget
 ---@operator call(table): StreamList
@@ -41,7 +39,7 @@ function StreamList:render()
 		table.insert(segments[currentIndex], item)
 	end)
 
-	---@type (Widget|string)[]
+	---@type Widget[]
 	local parts = Array.map(segments, function(group)
 		return UnorderedList{
 			children = Array.map(group, function(data)
@@ -54,11 +52,7 @@ function StreamList:render()
 		}
 	end)
 
-	return WidgetUtil.collect(
-		Box._template_box_start{padding = '2em'},
-		Array.interleave(parts, Box.brk{padding = '2em'}),
-		Box.finish()
-	)
+	return Box{children = parts, paddingRight = '2em'}
 end
 
 ---@private
