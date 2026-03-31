@@ -37,6 +37,7 @@ function TranslationList:render()
 	)
 end
 
+---@private
 ---@return {flag: string, value: string, postFix: string?}[][]
 function TranslationList:_parse()
 	local data = Array.map(Array.extractKeys(self.props), function(key)

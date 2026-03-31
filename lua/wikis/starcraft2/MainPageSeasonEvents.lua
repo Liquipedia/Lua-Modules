@@ -77,6 +77,7 @@ function MainPageSeasonEvents.run(frame)
 	}
 end
 
+---@private
 ---@param args table
 ---@param pageName string
 ---@return Sc2MainPageSeasonEventsTournamentData
@@ -102,6 +103,7 @@ function MainPageSeasonEvents._fecthTournamentData(args, pageName)
 	}
 end
 
+---@private
 ---@param tournamentData Sc2MainPageSeasonEventsTournamentData
 ---@return Widget[]
 function MainPageSeasonEvents._winnerDisplay(tournamentData)
@@ -134,6 +136,7 @@ function MainPageSeasonEvents._winnerDisplay(tournamentData)
 	)
 end
 
+---@private
 ---@param tournamentData Sc2MainPageSeasonEventsTournamentData
 ---@param args table
 ---@return Widget[]?
