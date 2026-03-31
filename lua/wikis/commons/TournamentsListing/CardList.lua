@@ -27,7 +27,6 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Conditions = Lua.import('Module:TournamentsListing/Conditions')
-local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Tier = Lua.import('Module:Tier/Custom')
 
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
