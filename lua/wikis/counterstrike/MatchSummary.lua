@@ -8,17 +8,22 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local VodLink = Lua.import('Module:VodLink')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+---@class CounterstrikeCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
+
+---@class CounterstrikeMatchSummaryGameRow: MatchSummaryGameRow
+---@operator call(MatchSummaryGameRowProps): CounterstrikeMatchSummaryGameRow
+local CounterstrikeMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
 
 ---@param args table
 ---@return Widget
@@ -63,7 +68,15 @@ function CustomMatchSummary.createBody(match)
 		matchStatusText = '<b>Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '</b>'
 	end
 	return WidgetUtil.collect(
-		Array.map(match.games, CustomMatchSummary._createMap),
+		MatchSummaryWidgets.GamesContainer{
+			gridLayout = 'standard',
+			children = Array.map(match.games, function (game, gameIndex)
+				if Logic.isEmpty(game.map) then
+					return
+				end
+				return CounterstrikeMatchSummaryGameRow{game = game, gameIndex = gameIndex}
+			end)
+		},
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
 		MatchSummaryWidgets.MatchComment{children = matchStatusText} or nil
 	)
@@ -182,49 +195,25 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 	return footer
 end
 
----@param game MatchGroupUtilGame
----@return Widget?
-function CustomMatchSummary._createMap(game)
-	if not game.map then
-		return
-	end
+---@return string
+function CounterstrikeMatchSummaryGameRow:createGameOverview()
+	return self:mapDisplay()
+end
 
-	local function score(oppIdx)
-		return DisplayHelper.MapScore(game.opponents[oppIdx], game.status)
-	end
+---@param opponentIndex integer
+---@return Widget
+function CounterstrikeMatchSummaryGameRow:createGameOpponentView(opponentIndex)
+	local game = self.props.game
 
-	-- Teams scores
-	local extradata = game.extradata or {}
-	local t1sides = extradata.t1sides or {}
-	local t2sides = extradata.t2sides or {}
-	local t1halfs = extradata.t1halfs or {}
-	local t2halfs = extradata.t2halfs or {}
+	local sides = game.extradata['t' .. opponentIndex .. 'sides']
+	local halfs = game.extradata['t' .. opponentIndex .. 'halfs']
+	local scores = Array.map(sides, function (side, sideIndex)
+		return {style = side and ('brkts-cs-score-color-'.. side) or nil, score = halfs[sideIndex]}
+	end)
 
-	local team1Scores = {}
-	local team2Scores = {}
-	for sideIndex in ipairs(t1sides) do
-		local side1, side2 = t1sides[sideIndex], t2sides[sideIndex]
-		local score1, score2 = t1halfs[sideIndex], t2halfs[sideIndex]
-		table.insert(team1Scores, {style = side1 and ('brkts-cs-score-color-'.. side1) or nil, score = score1})
-		table.insert(team2Scores, {style = side2 and ('brkts-cs-score-color-'.. side2) or nil, score = score2})
-	end
-
-	local mapInfo = {
-		mapDisplayName = game.map,
-		map = game.game and (game.map .. '/' .. game.game) or game.map,
-		status = game.status,
-	}
-
-	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-body-game'},
-		children = WidgetUtil.collect(
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.DetailedScore{score = score(1), partialScores = team1Scores, flipped = false},
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(mapInfo), css = {['flex-grow'] = '1'}},
-			MatchSummaryWidgets.DetailedScore{score = score(2), partialScores = team2Scores, flipped = true},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			MatchSummaryWidgets.GameComment{children = game.comment}
-		)
+	return MatchSummaryWidgets.DetailedScore{
+		score = self:scoreDisplay(opponentIndex),
+		partialScores = scores,
 	}
 end
 
