@@ -116,10 +116,10 @@ function TournamentsTickerData.get(props)
 	---@param a StandardTournament
 	---@param b StandardTournament
 	---@return boolean
-	local function sortByDateUpcoming(a, b)
-		local startDateSort = sortByDateProperty(a, b, 'startDate', Operator.gt)
+	local function sortByDateAscending(a, b)
+		local startDateSort = sortByDateProperty(a, b, 'startDate', Operator.lt)
 		if startDateSort ~= nil then return startDateSort end
-		local endDateSort = sortByDateProperty(a, b, 'endDate', Operator.gt)
+		local endDateSort = sortByDateProperty(a, b, 'endDate', Operator.lt)
 		if endDateSort ~= nil then return endDateSort end
 		return a.pageName < b.pageName
 	end
@@ -135,8 +135,8 @@ function TournamentsTickerData.get(props)
 	local upcomingTournaments = Array.filter(allTournaments, filterByPhase('UPCOMING'))
 	local ongoingTournaments = Array.filter(allTournaments, filterByPhase('ONGOING'))
 	local completedTournaments = Array.filter(allTournaments, filterByPhase('FINISHED'))
-	table.sort(upcomingTournaments, sortByDateUpcoming)
-	table.sort(ongoingTournaments, sortByDate)
+	table.sort(upcomingTournaments, sortByDateAscending)
+	table.sort(ongoingTournaments, sortByDateAscending)
 	table.sort(completedTournaments, sortByDate)
 
 	return {
