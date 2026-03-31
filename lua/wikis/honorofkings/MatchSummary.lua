@@ -48,7 +48,6 @@ function CustomMatchSummary.createBody(match)
 
 	return WidgetUtil.collect(
 		MatchSummaryWidgets.GamesContainer{
-			gridLayout = 'standard',
 			children = Array.map(match.games, function (game, gameIndex)
 				if Logic.isEmpty(game.length) and Logic.isEmpty(game.winner) and not hasCharacterData(game) then
 					return
