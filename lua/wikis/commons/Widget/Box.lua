@@ -48,7 +48,7 @@ function Box:render()
 					height = self.props.height,
 					overflow = self.props.height and 'hidden' or nil,
 				},
-				chldren = child,
+				children = child,
 			}
 		end)
 	}
