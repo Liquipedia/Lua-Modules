@@ -113,10 +113,10 @@
 		color: var( --placement-text-color );
 		background-color: var( --placement-solid-color );
 
-		--placement-text-color: var( --clr-secondary-100, #ffffff );
+		--placement-text-color: var( --clr-secondary-100 );
 
 		.theme--dark & {
-			--placement-text-color: var( --clr-secondary-9, #181818 );
+			--placement-text-color: var( --clr-secondary-9 );
 		}
 
 		&:not( [ data-placement-type ] ) {
