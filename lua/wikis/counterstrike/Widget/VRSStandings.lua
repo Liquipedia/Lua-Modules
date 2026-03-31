@@ -136,8 +136,8 @@ function VRSStandings._row(standing, mainpage)
 
 	local cells
 	cells = WidgetUtil.collect(
-		TableWidgets.Cell{children = standing.local_place},
-		standing.global_place and TableWidgets.Cell{children = standing.global_place} or nil,
+		TableWidgets.Cell{children = standing.localPlace},
+		standing.globalPlace and TableWidgets.Cell{children = standing.globalPlace} or nil,
 		TableWidgets.Cell{
 			children = MathUtil.formatRounded{value = standing.points, precision = 1}
 		},
@@ -146,20 +146,20 @@ function VRSStandings._row(standing, mainpage)
 				opponent = standing.opponent
 			}
 		},
-		not standing.global_place and TableWidgets.Cell{children = extradata.region or ''} or nil
+		not standing.globalPlace and TableWidgets.Cell{children = extradata.region or ''} or nil
 	)
 
 	if not mainpage then
-		table.insert(cells,
-			TableWidgets.Cell{
-				children = Array.map(standing.opponent.players, function(player)
-					return HtmlWidgets.Span{
-						css = {display="inline-block", width="160px"},
-						children = PlayerDisplay.BlockPlayer({player = player})
-					}
-				end)
-			}
-		)
+		   table.insert(cells,
+			   TableWidgets.Cell{
+				   children = Array.map(standing.opponent.players, function(player)
+					   return HtmlWidgets.Div{
+						   css = {display="inline-block", width="160px"},
+						   children = PlayerDisplay.BlockPlayer({player = player})
+					   }
+				   end)
+			   }
+		   )
 	end
 
 	return TableWidgets.Row{children = cells}
@@ -171,14 +171,12 @@ function VRSStandings:render()
 
 	if #standings == 0 then
 		return HtmlWidgets.Div{
-			children = {
-				HtmlWidgets.B{children = 'No teams found for the selected filter.'}
-			},
-			css = {padding = '12px'}
+			children = 'No teams found for the selected filter.',
+			css = {['font-weight'] = 'bold', padding = '12px'}
 		}
 	end
 
-	local tableWidget = TableWidgets.Table{
+	return TableWidgets.Table{
 		title = buildTitle(settings),
 		sortable = false,
 		columns = buildColumns(settings),
@@ -193,7 +191,6 @@ function VRSStandings:render()
 			}
 		},
 	}
-	return tableWidget
 end
 
 return VRSStandings

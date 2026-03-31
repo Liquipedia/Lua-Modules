@@ -23,6 +23,7 @@ local Comparator = Condition.Comparator
 
 ---@class VRSStandingsData
 local VRSStandingsData = {}
+
 ---@enum VRSStandingsDataType
 VRSStandingsData.DataType = {
 	MAIN = 'vrs_ranking',
@@ -34,8 +35,8 @@ VRSStandingsData.DataType = {
 ---@class VRSStandingsStanding
 ---@field place number
 ---@field points number
----@field local_place number?
----@field global_place number?
+---@field localPlace number?
+---@field globalPlace number?
 ---@field opponent standardOpponent
 
 ---@class VRSStandingsSettings
@@ -65,12 +66,10 @@ function VRSStandingsData.getStandings(props)
 		updated = 'latest'
 	elseif props.updated then
 		updated = DateExt.toYmdInUtc(props.updated)
+	elseif Logic.readBool(props.shouldFetch) then
+		updated = 'latest'
 	else
-		if Logic.readBool(props.shouldFetch) then
-			updated = 'latest'
-		else
-			error('A date must be provided when not fetching data')
-		end
+		error('A date must be provided when not fetching data')
 	end
 
 	---@type VRSStandingsSettings
@@ -153,7 +152,7 @@ function VRSStandingsData.getStandings(props)
 				filterSet[flag] = true
 			end
 			local matchingPlayers = Array.filter(entry.opponent.players, function(player)
-				return player ~= nil
+				return not Opponent.playerIsTbd(player)
 					and player.flag ~= nil
 					and filterSet[player.flag]
 			end)
@@ -168,9 +167,9 @@ function VRSStandingsData.getStandings(props)
 	end
 
 	Array.forEach(standings, function(entry, index)
-		entry.local_place = index
+		entry.localPlace = index
 		if settings.filterType ~= 'none' then
-			entry.global_place = entry.place
+			entry.globalPlace = entry.place
 		end
 	end)
 
