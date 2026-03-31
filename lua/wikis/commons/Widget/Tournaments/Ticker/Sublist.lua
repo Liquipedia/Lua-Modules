@@ -11,14 +11,17 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 
 local Widget = Lua.import('Module:Widget')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local TournamentLabel = Lua.import('Module:Widget/Tournament/Label')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
 
 ---@class TournamentsTickerSublistWidgetProps
----@field title string
+---@field title string?
 ---@field tournaments StandardTournament[]
 ---@field displayGameIcons boolean
+---@field createItem (fun(tournament: StandardTournament): Widget)?
+---@field fallback Widget?
 
 ---@class TournamentsTickerSublistWidget: Widget
 ---@operator call(TournamentsTickerSublistWidgetProps): TournamentsTickerSublistWidget
@@ -29,6 +32,13 @@ local TournamentsTickerSublistWidget = Class.new(Widget)
 function TournamentsTickerSublistWidget:render()
 	if not self.props.tournaments then
 		return
+	end
+
+	local createItem = self.props.createItem or function(tournament)
+		return TournamentLabel{
+			tournament = tournament,
+			displayGameIcon = self.props.displayGameIcons,
+		}
 	end
 
 	---@param tournament StandardTournament
@@ -54,27 +64,23 @@ function TournamentsTickerSublistWidget:render()
 	local list = HtmlWidgets.Ul{
 		classes = {'tournaments-list-type-list'},
 		children = Array.map(self.props.tournaments, function(tournament)
-			return HtmlWidgets.Li{children = createFilterWrapper(tournament, TournamentLabel{
-				tournament = tournament,
-				displayGameIcon = self.props.displayGameIcons
-			})}
+			return HtmlWidgets.Li{children = createFilterWrapper(tournament, createItem(tournament))}
 		end),
 	}
 
-	return HtmlWidgets.Li{
+	return HtmlWidgets.Div{
 		attributes = {
 			['data-filter-hideable-group'] = '',
 			['data-filter-effect'] = 'fade',
 		},
-		children = {
-			HtmlWidgets.Span{
+		children = WidgetUtil.collect(
+			self.props.title and HtmlWidgets.Span{
 				classes = {'tournaments-list-heading'},
 				children = self.props.title,
-			},
-			HtmlWidgets.Div{
-				children = list,
-			}
-		},
+			} or nil,
+			list,
+			self.props.fallback
+		),
 	}
 end
 
