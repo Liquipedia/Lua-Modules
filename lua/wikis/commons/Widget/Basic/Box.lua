@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Box
+-- page=Module:Widget/Basic/Box
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
