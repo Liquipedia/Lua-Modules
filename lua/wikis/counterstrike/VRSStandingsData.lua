@@ -58,42 +58,7 @@ VRSStandingsData.DataType = {
 ---@return VRSStandingsStanding[]
 ---@return VRSStandingsSettings
 function VRSStandingsData.getStandings(props)
-	local datapointType = VRSStandingsData.DataType[props.datapointType] or VRSStandingsData.DataType.LIVE
-
-	local updated
-	if props.updated == 'latest' then
-		assert(Logic.readBool(props.shouldFetch), '\'Latest\' can only be used for fetching data')
-		updated = 'latest'
-	elseif props.updated then
-		updated = DateExt.toYmdInUtc(props.updated)
-	elseif Logic.readBool(props.shouldFetch) then
-		updated = 'latest'
-	else
-		error('A date must be provided when not fetching data')
-	end
-
-	---@type VRSStandingsSettings
-	local settings = {
-		title = props.title,
-		shouldFetch = Logic.readBool(props.shouldFetch),
-		fetchLimit = tonumber(props.fetchLimit),
-		filterRegion = props.filterRegion,
-		filterSubregion = props.filterSubregion,
-		filterCountry = Array.parseCommaSeparatedString(props.filterCountry),
-		filterDisplayName = props.filterDisplayName,
-		mainpage = Logic.readBool(props.mainpage),
-		datapointType = datapointType,
-		updated = updated,
-		filterType = 'none',
-	}
-
-	if settings.filterRegion then
-		settings.filterType = 'region'
-	elseif settings.filterSubregion then
-		settings.filterType = 'subregion'
-	elseif settings.filterCountry and #settings.filterCountry > 0 then
-		settings.filterType = 'country'
-	end
+	local settings = VRSStandingsData._parseSettings(props)
 
 	---@type VRSStandingsStanding[]
 	local standings = {}
@@ -103,32 +68,7 @@ function VRSStandingsData.getStandings(props)
 		standings = fetchedStandings
 		settings.updated = string.sub(fetchedDate, 1, 10) or settings.updated
 	else
-		Table.iter.forEachPair(props, function(key, value)
-			if not string.match(key, '^%d+$') then
-				return
-			end
-
-			local data = Json.parse(value)
-
-			local opponent = Opponent.readOpponentArgs(Table.merge(data, {
-				type = Opponent.team,
-			}))
-
-			data[1] = nil
-			opponent.players = Array.map(Array.range(1, 5), FnUtil.curry(Opponent.readPlayerArgs, data))
-
-			opponent.extradata = opponent.extradata or {}
-			opponent.extradata.region = data.region
-			opponent.extradata.subregion = data.subregion
-			opponent.extradata.country = data.country
-
-			table.insert(standings, {
-				place = tonumber(key),
-				points = tonumber(data.points),
-				opponent = opponent
-			})
-		end)
-
+		standings = VRSStandingsData._read(props)
 		VRSStandingsData._store(settings.updated, settings.datapointType, standings)
 	end
 
@@ -174,6 +114,84 @@ function VRSStandingsData.getStandings(props)
 	end)
 
 	return standings, settings
+end
+
+---@private
+---@param props table
+---@return VRSStandingsSettings
+function VRSStandingsData._parseSettings(props)
+	local datapointType = VRSStandingsData.DataType[props.datapointType] or VRSStandingsData.DataType.LIVE
+
+	local updated
+	if props.updated == 'latest' then
+		assert(Logic.readBool(props.shouldFetch), '\'Latest\' can only be used for fetching data')
+		updated = 'latest'
+	elseif props.updated then
+		updated = DateExt.toYmdInUtc(props.updated)
+	elseif Logic.readBool(props.shouldFetch) then
+		updated = 'latest'
+	else
+		error('A date must be provided when not fetching data')
+	end
+
+	---@type VRSStandingsSettings
+	local settings = {
+		title = props.title,
+		shouldFetch = Logic.readBool(props.shouldFetch),
+		fetchLimit = tonumber(props.fetchLimit),
+		filterRegion = props.filterRegion,
+		filterSubregion = props.filterSubregion,
+		filterCountry = Array.parseCommaSeparatedString(props.filterCountry),
+		filterDisplayName = props.filterDisplayName,
+		mainpage = Logic.readBool(props.mainpage),
+		datapointType = datapointType,
+		updated = updated,
+		filterType = 'none',
+	}
+
+	if settings.filterRegion then
+		settings.filterType = 'region'
+	elseif settings.filterSubregion then
+		settings.filterType = 'subregion'
+	elseif settings.filterCountry and #settings.filterCountry > 0 then
+		settings.filterType = 'country'
+	end
+
+	return settings
+end
+
+---@private
+---@param props table
+---@return VRSStandingsStanding[]
+function VRSStandingsData._read(props)
+	local standings = {}
+	Table.iter.forEachPair(props, function(key, value)
+		if not string.match(key, '^%d+$') then
+			return
+		end
+
+		local data = Json.parse(value)
+
+		local opponent = Opponent.readOpponentArgs(Table.merge(data, {
+			type = Opponent.team,
+		}))
+
+		-- unset team template input to not conflict with player args
+		data[1] = nil
+		opponent.players = Array.map(Array.range(1, 5), FnUtil.curry(Opponent.readPlayerArgs, data))
+
+		opponent.extradata = opponent.extradata or {}
+		opponent.extradata.region = data.region
+		opponent.extradata.subregion = data.subregion
+		opponent.extradata.country = data.country
+
+		table.insert(standings, {
+			place = tonumber(key),
+			points = tonumber(data.points),
+			opponent = opponent
+		})
+	end)
+	return standings
 end
 
 ---@private
