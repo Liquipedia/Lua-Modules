@@ -41,15 +41,18 @@ function UpcomingTournamentsWidget:render()
 	return Div{
 		classes = {'fo-nttax-infobox', 'wiki-bordercolor-light', 'noincludereddit'},
 		css = {['border-top'] = 'none'},
-		children = WidgetUtil.collect(
-			Header{},
+		children = {
+			Div{children = Div{
+				classes = {'infobox-header', 'wiki-backgroundcolor-light'},
+				children = 'Upcoming Tournaments'
+			}},
 			self:_getTournaments()
-		)
+		}
 	}
 end
 
 ---@private
----@return Widget|Widget[]
+---@return Widget
 function UpcomingTournamentsWidget:_getTournaments()
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add(self.props.opponentConditions)
