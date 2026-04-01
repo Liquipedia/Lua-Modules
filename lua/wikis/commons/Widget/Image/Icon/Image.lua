@@ -9,18 +9,13 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Image = Lua.import('Module:Image')
+local Table = Lua.import('Module:Table')
 
 local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 
----@class IconImageWidgetParameters
+---@class IconImageWidgetParameters: ImageOptions
 ---@field imageLight string?
 ---@field imageDark string?
----@field link string?
----@field size string?
----@field caption string?
----@field alt string?
----@field alignment string?
----@field location string?
 
 ---@class IconImageWidget: IconWidget
 ---@operator call(IconImageWidgetParameters): IconImageWidget
@@ -34,16 +29,9 @@ Icon.defaultProps = {
 ---@return string?
 function Icon:render()
 	return Image.display(
-		self.props.imageLight,
-		self.props.imageDark,
-		{
-			link = self.props.link,
-			size = self.props.size,
-			caption = self.props.caption,
-			alt = self.props.alt,
-			alignment = self.props.alignment,
-			location = self.props.location,
-		}
+		Table.extract(self.props, 'imageLight'),
+		Table.extract(self.props, 'imageDark'),
+		self.props
 	)
 end
 
