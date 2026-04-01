@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:PrizePool/Legacy/Award/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -13,7 +12,7 @@ local LegacyPrizePool = Lua.import('Module:PrizePool/Legacy')
 local CustomLegacyAwardPrizePool = {}
 
 -- Template entry point
----@return Html
+---@return Widget
 function CustomLegacyAwardPrizePool.run()
 	return LegacyPrizePool.run(CustomLegacyAwardPrizePool)
 end

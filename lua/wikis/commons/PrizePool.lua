@@ -1,31 +1,32 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:PrizePool
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
 
 local Import = Lua.import('Module:PrizePool/Import')
 local BasePrizePool = Lua.import('Module:PrizePool/Base')
 local Placement = Lua.import('Module:PrizePool/Placement')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local Widgets = Lua.import('Module:Widget/All')
+local Div = Widgets.Div
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local TableRow = Widgets.TableRow
 local TableCell = Widgets.TableCell
 
 ---@class PrizePool: BasePrizePool
----@field options table
----@field _lpdbInjector LpdbInjector?
+---@operator call(...): PrizePool
 ---@field placements PrizePoolPlacement[]
 local PrizePool = Class.new(BasePrizePool)
 
@@ -65,6 +66,12 @@ end
 
 ---@param placement PrizePoolPlacement
 ---@return boolean
+function PrizePool:applyHideAfter(placement)
+	return placement.placeStart > self.options.hideafter
+end
+
+---@param placement PrizePoolPlacement
+---@return boolean
 function PrizePool:applyCutAfter(placement)
 	if placement.placeStart > self.options.cutafter then
 		return true
@@ -83,21 +90,40 @@ function PrizePool:applyToggleExpand(placement, nextPlacement, rows)
 		and nextPlacement.placeStart ~= placement.placeStart
 		and nextPlacement.placeEnd ~= placement.placeEnd then
 
-		table.insert(rows, self:_toggleExpand(placement.placeEnd + 1, self.placements[#self.placements].placeEnd))
+		table.insert(rows, self:_toggleExpand(placement.placeEnd + 1))
 	end
 end
 
 ---@param placeStart number
----@param placeEnd number
 ---@return WidgetTableRow
-function PrizePool:_toggleExpand(placeStart, placeEnd)
+function PrizePool:_toggleExpand(placeStart)
+	local placeEnd = self.placements[#self.placements].placeEnd
+
+	if self.options.hideafter < math.huge then
+		local lastCut = Array.max(
+			Array.filter(self.placements, function (placement)
+				return placement.placeEnd <= self.options.hideafter
+			end),
+			Operator.property('placeEnd')
+		)
+		placeEnd = lastCut.placeEnd
+	end
+
 	local text = 'place ' .. placeStart .. ' to ' .. placeEnd
 	local expandButton = TableCell{
-		children = {'<div>' .. text .. '&nbsp;<i class="fa fa-chevron-down"></i></div>'},
+		children = Div{children = {
+			text,
+			'&nbsp;',
+			IconFa{iconName = 'expand'},
+		}},
 		classes = {'general-collapsible-expand-button'},
 	}
 	local collapseButton = TableCell{
-		children = {'<div>' .. text .. '&nbsp;<i class="fa fa-chevron-up"></i></div>'},
+		children = Div{children = {
+			text,
+			'&nbsp;',
+			IconFa{iconName = 'collapse'},
+		}},
 		classes = {'general-collapsible-collapse-button'},
 	}
 

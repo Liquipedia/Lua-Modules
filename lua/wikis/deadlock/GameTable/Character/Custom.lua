@@ -1,17 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=deadlock
 -- page=Module:GameTable/Character/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
 
 local GameTableCharacter = Lua.import('Module:GameTable/Character')
 
+---@class DeadlockCharacterGameTable: CharacterGameTable
+---@operator call(table): CharacterGameTable
 local CustomGameTableCharacter = Class.new(GameTableCharacter)
 
 ---@return integer
@@ -27,7 +29,7 @@ function CustomGameTableCharacter:getCharacterKey(opponentIndex, playerIndex)
 end
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomGameTableCharacter.results(frame)
 	local args = Arguments.getArgs(frame)
 

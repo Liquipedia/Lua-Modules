@@ -1,22 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Game
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
-local Info = Lua.import('Module:Info')
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+
+local Info = Lua.import('Module:Info', {loadData = true})
 
 ---@class GameData
 ---@field abbreviation string
@@ -107,6 +107,16 @@ function Game.listGames(options)
 	end
 
 	return gamesList
+end
+
+---Fetches all unlisted game identifiers
+---@return string[]
+function Game.unlistedGames()
+	local gamesList = Array.extractKeys(GamesData)
+
+	return Array.filter(gamesList, function(gameIdentifier)
+		return GamesData[gameIdentifier].unlisted
+	end)
 end
 
 ---Fetches the abbreviation for a given game

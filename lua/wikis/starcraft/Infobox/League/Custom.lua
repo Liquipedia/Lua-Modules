@@ -1,25 +1,26 @@
 ---
 -- @Liquipedia
--- wiki=starcraft
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -34,7 +35,7 @@ local FINISHED = 'finished'
 local DEFAULT_MODE = '1v1'
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -102,13 +103,15 @@ function CustomLeague:_isFinished(args)
 		return false
 	end
 
-	return mw.ext.LiquipediaDB.lpdb('placement', {
-		conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
-			.. 'AND [[opponentname::!TBD]] AND [[placement::1]]',
-		query = 'date',
+	local winner = mw.ext.LiquipediaDB.lpdb('placement', {
+		conditions = '[[pagename::' .. string.gsub(self.pagename, ' ', '_') .. ']] '
+			.. 'AND [[opponentname::!TBD]] AND [[opponentname::!]] AND [[placement::1]]',
+		query = 'opponenttype, opponentplayers, opponenttemplate, opponentname',
 		order = 'date asc',
 		limit = 1
-	})[1] ~= nil
+	})[1]
+
+	return winner and not Opponent.isTbd(Opponent.fromLpdbStruct(winner))
 end
 
 -- Automatically fill in next/previous for touranaments that are part of a series
@@ -148,13 +151,13 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'gamesettings' then
-		table.insert(widgets, Cell{name = 'Patch', content = {CustomLeague._getPatch(args)}})
+		table.insert(widgets, Cell{name = 'Patch', children = {CustomLeague._getPatch(args)}})
 	elseif id == 'customcontent' then
 		if args.player_number and args.player_number > 0 or args.team_number then
 			Array.appendWith(widgets,
 				Title{children = 'Participants'},
-				Cell{name = 'Number of Players', content = {self.caller.data.raceBreakDown.total}},
-				Cell{name = 'Number of Teams', content = {args.team_number}},
+				Cell{name = 'Number of Players', children = {self.caller.data.raceBreakDown.total}},
+				Cell{name = 'Number of Teams', children = {args.team_number}},
 				Breakdown{children = self.caller.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
 		end
@@ -246,6 +249,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	-- BW wiki has several series that are displayed on the same page
 	-- hence they need to not RR them
 	lpdbData.series = args.series
+	lpdbData.extradata.seriesnumber = self.data.number and string.format('%05i', self.data.number) or nil
 
 	lpdbData.extradata.female = Logic.readBool(args.female) or nil
 

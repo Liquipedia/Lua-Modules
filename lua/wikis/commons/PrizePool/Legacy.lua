@@ -1,25 +1,24 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:PrizePool/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Currency = require('Module:Currency')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Points = mw.loadData('Module:Points/data')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
+
+local Array = Lua.import('Module:Array')
+local Currency = Lua.import('Module:Currency')
+local Logic = Lua.import('Module:Logic')
+local Points = Lua.import('Module:Points/data', {loadData = true})
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Template = Lua.import('Module:Template')
 
 local CustomPrizePool = Lua.import('Module:PrizePool/Custom')
 local CustomAwardPrizePool = Lua.import('Module:PrizePool/Award/Custom')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local LegacyPrizePool = {}
 
@@ -40,7 +39,7 @@ local IS_SOLO = false
 LegacyPrizePool.BASE_CURRENCY = 'USD'
 
 ---@param dependency table<string, function>?
----@return Html
+---@return Widget
 function LegacyPrizePool.run(dependency)
 	local args = Template.retrieveReturnValues('LegacyPrizePool')
 	---@type table

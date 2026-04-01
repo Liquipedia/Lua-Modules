@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/GeneralCollapsible/Default
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -26,6 +25,7 @@ function DefaultCollapsible:render()
 	local props = self.props
 	return Div{
 		attributes = props.attributes,
+		css = props.css,
 		classes = Array.extend({},
 			'general-collapsible',
 			props.shouldCollapse and 'collapsed' or nil,
@@ -33,15 +33,18 @@ function DefaultCollapsible:render()
 		),
 		children = {
 			props.titleWidget or Div{
-				classes = props.titleClasses,
+				classes = Array.extend({'general-collapsible-default-header'}, props.titleClasses),
 				children = {
-					B{children = {props.title}},
+					B{children = {props.title}, classes = {'general-collapsible-default-title'}},
 					CollapsibleToggle{css = {float = 'right'}},
 				}
 			},
 			Div{
 				children = props.children,
-				classes = {'should-collapse'},
+				classes = Array.extend({},
+					'should-collapse',
+					props.collapseAreaClasses
+				),
 			},
 		}
 	}

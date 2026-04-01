@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:Squad/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Arguments = Lua.import('Module:Arguments')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local Squad = Lua.import('Module:Widget/Squad/Core')
 local SquadRow = Lua.import('Module:Squad/Row')
@@ -51,14 +51,15 @@ end
 ---@param person table
 ---@param squadStatus SquadStatus
 ---@param squadType SquadType
+---@param columnVisibility table?
 ---@return Widget
-function CustomSquad._playerRow(person, squadStatus, squadType)
+function CustomSquad._playerRow(person, squadStatus, squadType, columnVisibility)
 	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
 	local squadArgs = Arguments.getArgs(mw.getCurrentFrame())
 
 	if squadStatus == SquadUtils.SquadStatus.ACTIVE then
 		local isMain = Logic.readBool(squadArgs.main) or Logic.isEmpty(squadArgs.squad)
-		squadPerson.extradata = Table.merge({ismain = tostring(isMain)}, squadPerson.extradata)
+		squadPerson.extradata = Table.merge({group = isMain and 'main' or 'additional'}, squadPerson.extradata)
 	end
 	squadPerson.newteamspecial = Logic.emptyOr(squadPerson.newteamspecial,
 		Logic.readBool(person.retired) and 'retired' or nil,
@@ -66,15 +67,15 @@ function CustomSquad._playerRow(person, squadStatus, squadType)
 
 	SquadUtils.storeSquadPerson(squadPerson)
 
-	local row = SquadRow(squadPerson)
+	local row = SquadRow(squadPerson, columnVisibility)
 
-	row:id():name():role():date('joindate', 'Join Date:&nbsp;')
+	row:id():name():role():date('joindate')
 
 	if squadStatus == SquadUtils.SquadStatus.INACTIVE or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
-		row:date('inactivedate', 'Inactive Date:&nbsp;')
+		row:date('inactivedate')
 	end
 	if squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
-		row:date('leavedate', 'Leave Date:&nbsp;')
+		row:date('leavedate')
 		row:newteam()
 	end
 

@@ -1,147 +1,51 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchSummary/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local VodLink = require('Module:VodLink')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
+local Image = Lua.import('Module:Image')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+local VodLink = Lua.import('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Links = Lua.import('Module:Links')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local MatchHeader = Lua.import('Module:Widget/Match/Header')
+local MatchCountdown = Lua.import('Module:Widget/Match/Countdown')
+local MatchButtonBar = Lua.import('Module:Widget/Match/ButtonBar')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {loadData = true})
 local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 
----@class MatchSummaryHeader
----@operator call: MatchSummaryHeader
----@field root Html
----@field leftElement string|Html|number|nil
----@field leftScoreElement Html?
----@field rightElement string|Html|number|nil
----@field rightScoreElement Html?
-local Header = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-			:addClass('brkts-popup-header-dev')
-			:css('justify-content', 'center')
-	end
-)
-
----@param content string|Html|number|nil
----@return MatchSummaryHeader
-function Header:leftOpponent(content)
-	self.leftElement = content
-	return self
-end
-
----@param content Html
----@return MatchSummaryHeader
-function Header:leftScore(content)
-	self.leftScoreElement = content:addClass('brkts-popup-header-opponent-score-left')
-	return self
-end
-
----@param content Html
----@return MatchSummaryHeader
-function Header:rightScore(content)
-	self.rightScoreElement = content:addClass('brkts-popup-header-opponent-score-right')
-	return self
-end
-
----@param content string|Html|number|nil
----@return MatchSummaryHeader
-function Header:rightOpponent(content)
-	self.rightElement = content
-	return self
-end
-
----@param opponent standardOpponent
----@param side 'left'|'right'
----@param style teamStyle?
----@return Html
-function Header:createOpponent(opponent, side, style)
-	local showLink = not Opponent.isTbd(opponent) and true or false
-	return OpponentDisplay.BlockOpponent{
-		flip = side == 'left',
-		opponent = opponent,
-		showLink = showLink,
-		overflow = 'ellipsis',
-		teamStyle = style or 'short',
-	}
-end
-
----@param opponent standardOpponent
----@return Html
-function Header:createScore(opponent)
-	local isWinner, scoreText
-	if opponent.placement2 then
-		-- Bracket Reset, show W/L
-		if opponent.placement2 == 1 then
-			isWinner = true
-			scoreText = 'W'
-		else
-			isWinner = false
-			scoreText = 'L'
-		end
-	else
-		isWinner = opponent.placement == 1 or opponent.advances
-		scoreText = OpponentDisplay.InlineScore(opponent)
-	end
-
-	return OpponentDisplay.BlockScore{
-		isWinner = isWinner,
-		scoreText = scoreText,
-	}
-end
-
----@return Html
-function Header:create()
-	return self.root
-		:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
-			:node(self.leftElement)
-			:node(self.leftScoreElement or '')
-			:done()
-		:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-right')
-			:node(self.rightScoreElement or '')
-			:node(self.rightElement)
-			:done()
-end
+---@class CustomMatchSummaryInterface
+---@field createHeader? fun(match: MatchGroupUtilMatch, options: {teamStyle: teamStyle?}?): Widget
+---@field createBody? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
+---@field createGame? fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
+---@field addToFooter? fun(match: MatchGroupUtilMatch, footer: MatchSummaryFooter): MatchSummaryFooter
+---@field createMatch? fun(matchData: MatchGroupUtilMatch): MatchSummaryMatch
 
 ---@class MatchSummaryFooter
 ---@operator call: MatchSummaryFooter
----@field root Html
----@field inner Html
----@field elements (Html|string|number)[]
+---@field elements (Widget|Html|string|number)[]
 local Footer = Class.new(
 	function(self)
-		self.root = mw.html.create('div')
-			:addClass('brkts-popup-footer')
-		self.inner = mw.html.create('div')
-			:addClass('brkts-popup-spaced vodlink')
 		self.elements = {}
 	end
 )
 
----@param element Html|string|number|nil
+---@param element Widget|Html|string|number|nil
 ---@return MatchSummaryFooter
 function Footer:addElement(element)
 	table.insert(self.elements, element)
@@ -154,16 +58,9 @@ end
 ---@param text string
 ---@return MatchSummaryFooter
 function Footer:addLink(link, icon, iconDark, text)
-	local content
-	if String.isEmpty(iconDark) then
-		content = '[[' .. icon .. '|link=' .. link .. '|32px|' .. text .. '|alt=' .. link .. ']]'
-	else
-		---@cast iconDark -nil
-		content = '[[' .. icon .. '|link=' .. link .. '|32px|' .. text .. '|alt=' .. link .. '|class=show-when-light-mode]]'
-			.. '[[' .. iconDark .. '|link=' .. link .. '|32px|' .. text .. '|alt=' .. link .. '|class=show-when-dark-mode]]'
-	end
-
-	table.insert(self.elements, content)
+	table.insert(self.elements, Image.display(icon, iconDark, {
+		link = link, size = '32px', caption = text, alt = link
+	}))
 	return self
 end
 
@@ -193,7 +90,7 @@ function Footer:addLinks(links)
 	end)
 
 	for linkKey, link in Table.iter.spairs(links) do
-	    -- Handle links not already processed via priority list
+		-- Handle links not already processed via priority list
 		if not processedLinks[linkKey] then
 			processLink(linkKey, link)
 		end
@@ -202,46 +99,40 @@ function Footer:addLinks(links)
 	return self
 end
 
----@return Html?
+---@return Widget?
 function Footer:create()
-	if Table.isEmpty(self.elements) then
-		return
-	end
-	for _, element in ipairs(self.elements) do
-		self.inner:node(element)
-	end
-	self.root:node(self.inner)
-	return self.root
+	return MatchSummaryWidgets.Footer{children = self.elements}
 end
 
 ---@class MatchSummaryMatch
 ---@operator call: MatchSummaryMatch
 ---@field root Html
----@field headerElement Html?
----@field bodyElement Widget|Html?
----@field commentElement Widget?
----@field footerElement Html?
+---@field headerElement Renderable?
+---@field bodyElement Renderable|Renderable[]?
+---@field commentElement Renderable|Renderable[]?
+---@field footerElement Widget?
+---@field buttonElement Renderable?
 local Match = Class.new(
 	function(self)
 		self.root = mw.html.create()
 	end
 )
 
----@param header MatchSummaryHeader
+---@param header Renderable
 ---@return MatchSummaryMatch
 function Match:header(header)
-	self.headerElement = header:create()
+	self.headerElement = header
 	return self
 end
 
----@param body Widget
+---@param body Renderable|Renderable[]
 ---@return MatchSummaryMatch
 function Match:body(body)
 	self.bodyElement = body
 	return self
 end
 
----@param comment Widget
+---@param comment Renderable
 ---@return MatchSummaryMatch
 function Match:comment(comment)
 	self.commentElement = comment
@@ -255,113 +146,61 @@ function Match:footer(footer)
 	return self
 end
 
+---@param button Renderable
+---@return MatchSummaryMatch
+function Match:button(button)
+	self.buttonElement = button
+	return self
+end
+
 ---@return Html
 function Match:create()
 	self.root
 		:node(self.headerElement)
-		:node(MatchSummaryWidgets.Break{})
-		:node(self.bodyElement)
-		:node(MatchSummaryWidgets.Break{})
-		:node(self.commentElement)
-		:node(MatchSummaryWidgets.Break{})
-		:node(self.footerElement)
+		:node(
+			MatchSummaryWidgets.Body{children = WidgetUtil.collect(self.bodyElement, self.commentElement, self.footerElement)}
+		)
+		:node(self.buttonElement)
 
 	return self.root
 end
 
 ---@class MatchSummary
----@operator call(string?):MatchSummary
----@field Header MatchSummaryHeader
----@field Footer MatchSummaryFooter
----@field Match MatchSummaryMatch
----@field matches Html[]?
----@field headerElement Html?
----@field root Html?
-local MatchSummary = Class.new()
-MatchSummary.Header = Header
-MatchSummary.Footer = Footer
-MatchSummary.Match = Match
-
----@param width string?
----@return MatchSummary
-function MatchSummary:init(width)
-	self.matches = {}
-	self.root = mw.html.create('div')
-		:addClass('brkts-popup')
-		:css('width', width)
-	return self
-end
-
----@param cssClass string?
----@return MatchSummary
-function MatchSummary:addClass(cssClass)
-	self.root:addClass(cssClass)
-	return self
-end
-
----@param header MatchSummaryHeader
----@return MatchSummary
-function MatchSummary:header(header)
-	self.headerElement = header:create()
-	return self
-end
-
----@param match MatchSummaryMatch?
----@return MatchSummary
-function MatchSummary:addMatch(match)
-	if not match then return self end
-
-	table.insert(self.matches, match:create())
-
-	return self
-end
-
----@return Html
-function MatchSummary:create()
-	self.root:node(self.headerElement)
-
-	for _, match in ipairs(self.matches) do
-		self.root:node(match)
-	end
-
-	return self.root
-end
+local MatchSummary = {
+	Footer = Footer,
+	Match = Match,
+}
 
 ---Default header function
----@param match table
----@param options {teamStyle: teamStyle?, noScore:boolean?}?
----@return MatchSummaryHeader
+---@param match MatchGroupUtilMatch
+---@param options {teamStyle: teamStyle?}?
+---@return Widget
 function MatchSummary.createDefaultHeader(match, options)
 	options = options or {}
-	local teamStyle = options.teamStyle
-	local header = MatchSummary.Header()
 
-	if options.noScore then
-		return header
-			:leftOpponent(header:createOpponent(match.opponents[1], 'left', teamStyle))
-			:rightOpponent(header:createOpponent(match.opponents[2], 'right', teamStyle))
-	end
-
-	return header
-		:leftOpponent(header:createOpponent(match.opponents[1], 'left', teamStyle))
-		:leftScore(header:createScore(match.opponents[1]))
-		:rightScore(header:createScore(match.opponents[2]))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right', teamStyle))
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(
+			MatchCountdown{
+				match = match,
+			},
+			MatchHeader{
+				match = match,
+				teamStyle = options.teamStyle,
+			}
+		)
+	}
 end
 
 -- Default body function
----@param match table
----@param createGame fun(date: string, game: table, gameIndex: integer): Widget
----@return Widget
+---@param match MatchGroupUtilMatch
+---@param createGame fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
+---@return Widget[]
 function MatchSummary.createDefaultBody(match, createGame)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+	return WidgetUtil.collect(
 		Array.map(match.games, FnUtil.curry(createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))
-	)}
+	)
 end
 
 ---Default footer function
@@ -383,21 +222,22 @@ function MatchSummary.addVodsToFooter(match, footer)
 		})
 	end
 
-	for gameIndex, game in ipairs(match.games) do
-		if game.vod then
-			footer:addElement(VodLink.display{
-				gamenum = gameIndex,
-				vod = game.vod,
-			})
+	Array.forEach(match.games, function(game, gameIndex)
+		if not game.vod then
+			return
 		end
-	end
+		footer:addElement(VodLink.display{
+			gamenum = gameIndex,
+			vod = game.vod,
+		})
+	end)
 
 	return footer
 end
 
 ---Default createMatch function for usage in Custom MatchSummary
----@param matchData table?
----@param CustomMatchSummary table
+---@param matchData MatchGroupUtilMatch?
+---@param CustomMatchSummary CustomMatchSummaryInterface
 ---@param options {teamStyle: teamStyle?, noScore: boolean?}?
 ---@return MatchSummaryMatch?
 function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
@@ -430,14 +270,17 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.createDefaultFooter
 	match:footer(createFooter(matchData, MatchSummary.Footer()))
 
+	--- Vods are currently part of the footer, so we don't need them here
+	match:button(MatchButtonBar{match = matchData, showVods = false, variant = 'primary'})
+
 	return match
 end
 
 ---Default getByMatchId function for usage in Custom MatchSummary
----@param CustomMatchSummary table
+---@param CustomMatchSummary CustomMatchSummaryInterface
 ---@param args table
----@param options {teamStyle:teamStyle?, width: fun(MatchGroupUtilMatch):string?|string?, noScore:boolean?}?
----@return Html
+---@param options {teamStyle:teamStyle?, width: (fun(match: MatchGroupUtilMatch):string?)|string?, noScore:boolean?}?
+---@return Widget
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(
 		(type(CustomMatchSummary.createBody) == 'function' or type(CustomMatchSummary.createGame) == 'function'),
@@ -449,27 +292,21 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	local match, bracketResetMatch = MatchGroupUtil.fetchMatchForBracketDisplay(
 		args.bracketId, args.matchId)
 
-	local width = options.width
+	---@type (fun(match: MatchGroupUtilMatch):string?)|string|integer?
+	local width = options.width or args.width
 	if type(width) == 'function' then
 		width = width(match)
 	end
 
-	local matchSummary = MatchSummary():init(width)
-
-	--additional header for when martin adds the the css and buttons for switching between match and reset match
-	--if bracketResetMatch then
-		--local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
-		--matchSummary:header(createHeader(match, {noScore = true, teamStyle = options.teamStyle}))
-		--here martin can add the buttons for switching between match and reset match
-	--end
-
-	local createMatch = CustomMatchSummary.createMatch or function(matchData)
-		return MatchSummary.createMatch(matchData, CustomMatchSummary, options)
-	end
-	matchSummary:addMatch(createMatch(match))
-	matchSummary:addMatch(createMatch(bracketResetMatch))
-
-	return matchSummary:create()
+	return MatchSummaryWidgets.Container{
+		classes = args.classes,
+		width = width,
+		createMatch = CustomMatchSummary.createMatch or function(matchData)
+			return MatchSummary.createMatch(matchData, CustomMatchSummary, options)
+		end,
+		match = match,
+		resetMatch = bracketResetMatch,
+	}
 end
 
 ---@param mapVetoes table

@@ -1,17 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:MatchPage
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 
@@ -22,6 +22,7 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
+local PlayerStatContainer = Lua.import('Module:Widget/Match/Page/PlayerStat/Container')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local TeamVeto = Lua.import('Module:Widget/Match/Page/TeamVeto')
 local VetoItem = Lua.import('Module:Widget/Match/Page/VetoItem')
@@ -41,12 +42,6 @@ local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 function MatchPage.getByMatchId(props)
 	local matchPage = MatchPage(props.match)
 
-	-- Update the view model with game and team data
-	matchPage:populateGames()
-
-	-- Add more opponent data field
-	matchPage:populateOpponents()
-
 	return matchPage:render()
 end
 
@@ -58,7 +53,7 @@ function MatchPage:populateGames()
 
 			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
 			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
-			team.players = Array.map(game.opponents[teamIdx].players or {}, function(player)
+			team.players = Array.map(Array.filter(game.opponents[teamIdx].players or {}, Table.isNotEmpty), function(player)
 				local newPlayer = Table.mergeInto(player, {
 					displayName = player.name or player.player,
 					link = player.player,
@@ -169,7 +164,7 @@ function MatchPage:_renderTeamStats(game)
 						HtmlWidgets.H4{
 							classes = {'match-bm-team-stats-header-title'},
 							children = game.finished
-								and self.opponents[game.winner].name .. ' Victory'
+								and self.opponents[game.winner].teamTemplateData.name .. ' Victory'
 								or 'No winner determined yet'
 						},
 						game.length and Div{children = game.length} or nil
@@ -361,8 +356,8 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 					}
 				}
 			},
-			Div{
-				classes = {'match-bm-players-player-stats'},
+			PlayerStatContainer{
+				columns = 5,
 				children = {
 					PlayerStat{
 						title = {KDA_ICON, 'KDA'},

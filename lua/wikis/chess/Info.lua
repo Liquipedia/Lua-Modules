@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=chess
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -48,6 +47,12 @@ return {
 		match2 = {
 			status = 2,
 			matchWidth = 180,
+		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'automatic',
+			},
 		},
 	},
 	defaultRoundPrecision = 0,

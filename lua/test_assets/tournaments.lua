@@ -1,11 +1,3 @@
----
--- @Liquipedia
--- wiki=commons
--- page=Module:TestAssets/Tournaments
---
--- Please see https://github.com/Liquipedia/Lua-Modules to contribute
---
-
 return {
 	dummy = {
 		name = 'Test Tournament',

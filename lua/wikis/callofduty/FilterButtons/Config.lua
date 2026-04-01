@@ -1,13 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=callofduty
 -- page=Module:FilterButtons/Config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Game = require('Module:Game')
-local Tier = require('Module:Tier/Utils')
+local Lua = require('Module:Lua')
+
+local Game = Lua.import('Module:Game')
+local Tier = Lua.import('Module:Tier/Utils')
 
 local Config = {}
 
@@ -32,7 +33,7 @@ Config.categories = {
 		name = 'game',
 		property = 'game',
 		expandable = true,
-		items = {'bo6', 'wz', 'codm'},
+		items = {'bo7', 'wz', 'codm'},
 		transform = function(game)
 			return Game.icon({game = game, noSpan = true, noLink = true, size = '20x20px'})
 		end

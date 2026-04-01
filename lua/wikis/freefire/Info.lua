@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=freefire
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -37,6 +36,15 @@ return {
 		},
 		transfers = {
 			showTeamName = true,
+		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'merge',
+			},
+		},
+		participants = {
+			defaultPlayerNumber = 4,
 		},
 	},
 	defaultRoundPrecision = 0,

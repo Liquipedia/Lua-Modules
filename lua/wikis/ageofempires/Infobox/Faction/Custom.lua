@@ -1,33 +1,38 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:Infobox/Faction/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local Page = Lua.import('Module:Page')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local FactionInfobox = Lua.import('Module:Infobox/Faction')
 
-local Widgets = require('Module:Widget/All')
-local WidgetsHtml = require('Module:Widget/Html/All')
+local Widgets = Lua.import('Module:Widget/All')
+local WidgetsHtml = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 local Fragment = WidgetsHtml.Fragment
-local Image = require('Module:Widget/Image/Icon/Image')
+local AgeIcon = Lua.import('Module:Widget/Infobox/AgeIcon')
+local Image = Lua.import('Module:Widget/Image/Icon/Image')
 
 ---@class AoECustomFactionInfobox: FactionInfobox
+---@operator call(Frame): AoECustomFactionInfobox
 ---@field game string
 local CustomFactionInfobox = Class.new(FactionInfobox)
+
+---@class AoECustomFactionInfoboxWidgetInjector: WidgetInjector
+---@field caller AoECustomFactionInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomFactionInfobox.run(frame)
 	local infobox = CustomFactionInfobox(frame)
 
@@ -95,13 +100,13 @@ function CustomInjector:parse(id, widgets)
 				children = {
 					Fragment{
 						children = {
-							caller:_makeAgeIcon('Castle'),
+							AgeIcon{age = 'Castle', checkGame = true, game = caller.game},
 							Page.makeInternalLink(args.tech1)
 						}
 					},
 					Fragment{
 						children = {
-							caller:_makeAgeIcon('Imperial'),
+							AgeIcon{age = 'Imperial', checkGame = true, game = caller.game},
 							Page.makeInternalLink(args.tech2)
 						}
 					}
@@ -123,19 +128,6 @@ function CustomFactionInfobox:_makeIntroducedIcon(introduced)
 		imageLight = 'Aoe2 ' .. introduced .. ' Icon.png',
 		size = '18',
 		link = introduced
-	}
-end
-
----@param age string?
----@return Widget
-function CustomFactionInfobox:_makeAgeIcon(age)
-	if self.game ~= 'Age of Empires II' then
-		return Fragment{}
-	end
-	return Image{
-		imageLight = age .. ' Age AoE2 logo.png',
-		size = '18',
-		link = age .. ' Age'
 	}
 end
 

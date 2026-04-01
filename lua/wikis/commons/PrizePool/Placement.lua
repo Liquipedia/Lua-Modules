@@ -1,44 +1,43 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:PrizePool/Placement
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchPlacement = require('Module:Match/Placement')
-local Ordinal = require('Module:Ordinal')
-local PlacementInfo = require('Module:Placement')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
----@class PrizePoolPlacement: BasePlacement
----@field opponents BasePlacementOpponent[]
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Medals = Lua.import('Module:Medals')
+local Ordinal = Lua.import('Module:Ordinal')
+local PlacementInfo = Lua.import('Module:Placement')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+
 local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local DASH = '&#045;'
 
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_POINTS = 'POINTS'
+local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 
 -- Allowed none-numeric score values.
 local SPECIAL_SCORES = {'W', 'FF' , 'L', 'DQ', 'D'}
 
 local _tbd_index = 0
 
---- @class PrizePoolPlacement: BasePlacement
 --- A Placement is a set of opponents who all share the same final place in the tournament.
 --- Its input is generally a table created by `Template:Slot`.
 --- It has a range from placeStart to placeEnd, for example 5 to 8, or count (slotSize)
 --- and is expected to have at maximum the same amount of opponents as the range allows (4 in the 5-8 example).
+--- @class PrizePoolPlacement: BasePlacement
+--- @operator call(...): PrizePoolPlacement
 --- @field parent PrizePool
 --- @field args table
 local Placement = Class.new(BasePlacement)
@@ -220,37 +219,28 @@ end
 function Placement:_getLpdbData(...)
 	local entries = {}
 	for _, opponent in ipairs(self.opponents) do
-		local participant, image, imageDark, players
+		local image, imageDark, players
 		local opponentType = opponent.opponentData.type
 
 		if opponentType == Opponent.team then
 			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template) or {}
-
-			participant = teamTemplate.page or ''
-			if self.parent.options.resolveRedirect then
-				participant = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
-			end
-
 			image = teamTemplate.image
 			imageDark = teamTemplate.imagedark
 		elseif opponentType == Opponent.solo then
-			participant = Opponent.toName(opponent.opponentData)
 			local p1 = opponent.opponentData.players[1]
 			players = {p1 = p1.pageName, p1dn = p1.displayName, p1flag = p1.flag, p1team = p1.team}
-		else
-			participant = Opponent.toName(opponent.opponentData)
 		end
 
 		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_BASE_CURRENCY .. 1)) or 0
 		local pointsReward = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
+		local pointsReward2 = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
+		local isQualified = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_QUALIFIES .. '1')
+
 		local lpdbData = {
 			image = image,
 			imagedark = imageDark,
 			date = opponent.date,
-			participant = participant,
-			participantlink = Opponent.toName(opponent.opponentData),
 			participantflag = opponentType == Opponent.solo and players.p1flag or nil,
-			participanttemplate = opponent.opponentData.template,
 			players = players,
 			placement = self:_lpdbValue(),
 			prizemoney = prizeMoney,
@@ -268,15 +258,21 @@ function Placement:_getLpdbData(...)
 			),
 			extradata = {
 				prizepoints = tostring(pointsReward or ''),
+				prizepoints2 = tostring(pointsReward2 or ''),
 				participantteam = (opponentType == Opponent.solo and players.p1team)
-									and Opponent.toName{template = players.p1team, type = 'team'}
+									and Opponent.toName{template = players.p1team, type = 'team', extradata = {}}
 									or nil,
-			}
+			},
+			qualified = isQualified and 1 or 0
 			-- TODO: We need to create additional LPDB Fields
 			-- Qualified To struct (json?)
 			-- Points struct (json?)
 		}
 
+		lpdbData = Table.mergeInto(
+			lpdbData,
+			Opponent.toLegacyParticipantData(opponent.opponentData, {resolveRedirect = self.parent.options.resolveRedirect})
+		)
 		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(opponent.opponentData))
 		lpdbData.players = lpdbData.players or Table.copy(lpdbData.opponentplayers or {})
 
@@ -344,7 +340,7 @@ function Placement:getMedal()
 		return
 	end
 
-	local medal = MatchPlacement.MedalIcon{range = {self.placeStart, self.placeEnd}}
+	local medal = Medals.display{medal = self:_lpdbValue()}
 	if medal then
 		return tostring(medal)
 	end

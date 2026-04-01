@@ -1,27 +1,26 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Display/Bracket
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DisplayUtil = require('Module:DisplayUtil')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MathUtil = require('Module:MathUtil')
-local StringUtils = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local DisplayUtil = Lua.import('Module:DisplayUtil')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
+local StringUtils = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local NON_BREAKING_SPACE = '&nbsp;'
 local OPPONENT_HEIGHT_PADDING = 4
@@ -362,9 +361,10 @@ function BracketDisplay.computeHeaderRows(bracket, config)
 			local headerRow = getHeaderRow(matchId)
 			local roundIx = coords.roundIndex + 1 + bracketData.qualSkip
 			headerRow[roundIx] = headerRow[roundIx] or {
-				header = bracketData.qualifiedHeader or config.qualifiedHeader or '!q',
+				header = config.qualifiedHeader or '!q',
 				roundIx = roundIx,
 			}
+			headerRow[roundIx].header = bracketData.qualifiedHeader or headerRow[roundIx].header
 		end
 	end
 
@@ -586,10 +586,10 @@ function BracketDisplay.Match(props)
 	if props.matchHasDetails(props.match) then
 		local bracketId = MatchGroupUtil.splitMatchId(props.match.matchId)
 		local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
+			classes = {'brkts-match-info-popup'},
 			bracketId = bracketId,
 			matchId = props.match.matchId,
-		}, require('Module:Error/Display').ErrorDetails)
-			:addClass('brkts-match-info-popup')
+		}, Lua.import('Module:Error/Display').ErrorDetails)
 
 		local matchInfoIconNode = mw.html.create('div'):addClass('brkts-match-info-icon')
 			-- Vertically align the middle of the match with the middle
@@ -821,7 +821,10 @@ by passing in a different props.OpponentEntry in the Bracket component.
 ---@param props {opponent: standardOpponent, displayType: string, forceShortName: boolean?, height: number}
 ---@return Html
 function BracketDisplay.OpponentEntry(props)
-	local opponentEntry = OpponentDisplay.BracketOpponentEntry(props.opponent, {forceShortName = props.forceShortName})
+	local opponentEntry = OpponentDisplay.BracketOpponentEntry(
+		props.opponent,
+		{forceShortName = props.forceShortName, showTbd = false}
+	)
 	if props.displayType == 'bracket' then
 		opponentEntry:addScores(props.opponent)
 	end

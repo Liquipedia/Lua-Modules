@@ -1,14 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
 -- page=Module:FilterButtons/Config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Table = require('Module:Table')
-local Tier = require('Module:Tier/Utils')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Table = Lua.import('Module:Table')
+local Tier = Lua.import('Module:Tier/Utils')
 
 local Config = {}
 
@@ -18,10 +19,12 @@ local REGION_TO_SUPERREGION = {
 	['Arab States'] = 'EMEA',
 	['Korea'] = 'Korea',
 	['China'] = 'China',
-	['North America'] = 'Americas',
-	['Latin America North'] = 'Americas',
-	['Latin America South'] = 'Americas',
-	['Brazil'] = 'Americas',
+	['North America'] = 'NA',
+	['Latin America North'] = 'NA',
+	['Latin America'] = 'SAM',
+	['Latin America South'] = 'SAM',
+	['Brazil'] = 'SAM',
+	['Asia-Pacific'] = 'APAC',
 	['Taiwan'] = 'APAC',
 	['Hong Kong'] = 'APAC',
 	['Macau'] = 'APAC',
@@ -60,7 +63,7 @@ Config.categories = {
 		name = 'region',
 		property = 'region',
 		expandable = true,
-		items = { 'Korea', 'China', 'EMEA', 'Americas', 'APAC', 'Other', },
+		items = { 'Korea', 'China', 'EMEA', 'NA', 'SAM', 'APAC', 'Other', },
 		defaultItem = 'Other',
 		itemToPropertyValues = function(region)
 			-- Input is a region

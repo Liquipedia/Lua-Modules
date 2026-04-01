@@ -1,21 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Series/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Series = Lua.import('Module:Infobox/Series')
 
 ---@class CustomSeriesInfobox: SeriesInfobox
+---@operator call(Frame): CustomSeriesInfobox
 local CustomSeries = Class.new(Series)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomSeries.run(frame)
 	local series = CustomSeries(frame)
 	return series:createInfobox()

@@ -1,14 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=chess
 -- page=Module:ChessOpenings
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 
-local ChessOpening = mw.loadData('Module:ChessOpenings/Data')
+local Logic = Lua.import('Module:Logic')
+
+local ChessOpening = Lua.import('Module:ChessOpenings/Data', {loadData = true})
 
 local ChessOpeningsSetup = {}
 

@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:PrizePool/Award/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
+
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
+local Variables = Lua.import('Module:Variables')
 
 local AwardPrizePool = Lua.import('Module:PrizePool/Award')
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
@@ -22,7 +22,7 @@ local IS_AWARD = true
 
 -- Template entry point
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomAwardPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.localcurrency = args.localcurrency or Variables.varDefault('tournament_currency')

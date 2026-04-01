@@ -1,0 +1,72 @@
+---
+-- @Liquipedia
+-- page=Module:Infobox/Extension/UpcomingTournaments
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Info = Lua.import('Module:Info', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
+
+local UpcomingTournamentsWidget = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
+
+local UpcomingTournaments = {}
+
+---@param args {name: string|string[]?, additionalConditions: AbstractConditionNode?}
+---@return Widget?
+function UpcomingTournaments.team(args)
+	args = args or {}
+	local name = args.name
+	if Logic.isEmpty(name) then
+		return
+	end
+	local templateNames = Array.isArray(name)
+		and Array.map(name --[[@as string[] ]], TeamTemplate.resolve)
+		or {TeamTemplate.resolve(name --[[@as string]] or mw.title.getCurrentTitle().text)}
+	return UpcomingTournamentsWidget{
+		opponentConditions = ConditionTree(BooleanOperator.all):add{
+			ConditionUtil.anyOf(ColumnName('opponenttemplate'), templateNames),
+			ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
+			args.additionalConditions
+		}
+	}
+end
+
+---@param args {name: string, prefix: string?}
+---@return Widget?
+function UpcomingTournaments.player(args)
+	if Logic.isEmpty(args.name) then
+		return
+	end
+	local prefix = args.prefix or 'p'
+	local defaultMaxPlayersPerPlacement = Info.config.defaultMaxPlayersPerPlacement or 10
+
+	local conditions = ConditionTree(BooleanOperator.any):add(Array.map(
+		Array.range(1, defaultMaxPlayersPerPlacement),
+		function (playerIndex)
+			return ConditionUtil.anyOf(
+				ColumnName(prefix .. playerIndex, 'opponentplayers'),
+				{args.name, args.name:gsub(' ', '_')}
+			)
+		end
+	))
+
+	return UpcomingTournamentsWidget{
+		opponentConditions = conditions
+	}
+end
+
+return UpcomingTournaments

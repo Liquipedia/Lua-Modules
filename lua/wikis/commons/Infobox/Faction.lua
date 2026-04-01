@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Faction
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
+
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Namespace = Lua.import('Module:Namespace')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -21,9 +21,10 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
 ---@class FactionInfobox: BasicInfobox
+---@operator call(Frame): FactionInfobox
 local FactionInfobox = Class.new(BasicInfobox)
 
----@return string
+---@return Widget
 function FactionInfobox:createInfobox()
 	local args = self.args
 
@@ -58,7 +59,7 @@ function FactionInfobox:createInfobox()
 		self:setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Faction')
 end
 
 ---@param args table

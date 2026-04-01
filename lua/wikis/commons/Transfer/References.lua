@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Transfer/References
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Icon = require('Module:Icon')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local Variables = require('Module:Variables')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Icon = Lua.import('Module:Icon')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local Variables = Lua.import('Module:Variables')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 

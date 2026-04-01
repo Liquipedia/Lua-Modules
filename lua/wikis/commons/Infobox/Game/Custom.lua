@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Game/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Game = Lua.import('Module:Infobox/Game')
 
@@ -15,7 +15,7 @@ local Game = Lua.import('Module:Infobox/Game')
 local CustomGame = Class.new(Game)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomGame.run(frame)
 	local customGame = CustomGame(frame)
 	return customGame:createInfobox()

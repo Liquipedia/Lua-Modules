@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Display/SingleMatch
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DisplayUtil = require('Module:DisplayUtil')
 local Lua = require('Module:Lua')
+
+local DisplayUtil = Lua.import('Module:DisplayUtil')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
@@ -29,7 +29,7 @@ end
 ---Display component for a singleMatch. The singleMatch is specified by matchID.
 ---The component fetches the match data from LPDB or page variables.
 ---@param props {matchId: string, config: SingleMatchConfigOptions}
----@return Html
+---@return Widget|Html
 function SingleMatchDisplay.SingleMatchContainer(props)
 	local bracketId, _ = MatchGroupUtil.splitMatchId(props.matchId)
 
@@ -46,7 +46,7 @@ end
 
 ---Display component for a singleMatch. Match data is specified in the input.
 ---@param props {config: SingleMatchConfigOptions, match: MatchGroupUtilMatch}
----@return Html
+---@return Widget|Html
 function SingleMatchDisplay.SingleMatch(props)
 	local propsConfig = props.config or {}
 	local config = {
@@ -54,26 +54,25 @@ function SingleMatchDisplay.SingleMatch(props)
 		width = propsConfig.width or 400,
 	}
 
-	local matchNode = SingleMatchDisplay.Match{
+	return SingleMatchDisplay.Match{
 		MatchSummaryContainer = config.MatchSummaryContainer,
 		match = props.match,
+		width = config.width,
 	}
-
-	return matchNode
-		:addClass('brkts-popup brkts-match-info-flat')
-		:css('width', config.width .. 'px')
 end
 
 ---Display component for a match in a singleMatch. Consists of the match summary.
----@param props {MatchSummaryContainer: function, match: MatchGroupUtilMatch}
----@return Html
+---@param props {MatchSummaryContainer: function, match: MatchGroupUtilMatch, width: string|integer?}
+---@return Widget|Html
 function SingleMatchDisplay.Match(props)
 	local bracketId = MatchGroupUtil.splitMatchId(props.match.matchId)
 	return DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 		bracketId = bracketId,
 		matchId = props.match.matchId,
 		config = {showScore = true},
-	}, require('Module:Error/Display').ErrorList)
+		classes = {'brkts-popup', 'brkts-match-info-flat'},
+		width = props.width,
+	}, Lua.import('Module:Error/Display').ErrorList)
 end
 
 return SingleMatchDisplay

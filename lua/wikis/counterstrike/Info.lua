@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -125,6 +124,22 @@ local infoData = {
 			matchWidth = 200,
 			gameScoresIfBo1 = true,
 			gameNoun = 'map',
+		},
+		teamRosterNavbox = {
+			links = {
+				playedMatches = 'Matches',
+			},
+		},
+		thisDay = {
+			tiers = {1, 2},
+			excludeTierTypes = {'Qualifier', 'Points', 'Showmatch'},
+		},
+		participants = {
+			defaultPlayerNumber = 5,
+			mergeStaffTabIfOnlyOneStaff = true,
+		},
+		tournamentsListing = {
+			showGameIcon = true,
 		},
 	},
 }

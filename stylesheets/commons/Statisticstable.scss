@@ -1,0 +1,39 @@
+/*******************************************************************************
+Template(s): Statistics table
+Author(s): Clubfan
+*******************************************************************************/
+.statstable {
+	text-align: center;
+}
+
+.statstable .stats-map-row .stats-map-name {
+	text-align: left;
+}
+
+.statstable .stats-tvz-4,
+.statstable .stats-zvp-4,
+.statstable .stats-pvt-4 {
+	text-align: right;
+	padding-right: 5px;
+}
+
+/*******************************************************************************
+Template(s): Character statistics table
+*******************************************************************************/
+
+tr.character-stats-row > td {
+	width: 30px;
+}
+
+.character-stats-popup-info {
+	display: flex;
+	gap: 0.5rem;
+	justify-content: center;
+	flex-wrap: wrap;
+
+	> div {
+		display: inline-block;
+		flex: auto;
+		vertical-align: top;
+	}
+}

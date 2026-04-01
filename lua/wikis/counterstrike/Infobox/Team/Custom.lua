@@ -1,23 +1,28 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:Infobox/Team/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
 
 local Game = Lua.import('Module:Game')
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class CounterstrikeInfoboxTeam: InfoboxTeam
@@ -44,19 +49,19 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'staff' then
 		return {
-			Cell{name = 'Founders',	content = {args.founders}},
-			Cell{name = 'CEO', content = {args.ceo}},
-			Cell{name = 'Gaming Director', content = {args['gaming director']}},
+			Cell{name = 'Founders',	children = {args.founders}},
+			Cell{name = 'CEO', children = {args.ceo}},
+			Cell{name = 'Gaming Director', children = {args['gaming director']}},
 			widgets[4], -- Manager
 			widgets[5], -- Captain
-			Cell{name = 'In-Game Leader', content = {args.igl}},
+			Cell{name = 'In-Game Leader', children = {args.igl}},
 			widgets[1], -- Coaches
-			Cell{name = 'Analysts', content = {args.analysts}},
+			Cell{name = 'Analysts', children = {args.analysts}},
 		}
 	elseif id == 'custom' then
 		return {Cell {
 			name = 'Games',
-			content = Array.map(self.caller.gamesList, function (gameIdentifier)
+			children = Array.map(self.caller.gamesList, function (gameIdentifier)
 					return Game.text{game = gameIdentifier}
 				end)
 		}}
@@ -64,16 +69,13 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@return string?
+---@return Widget?
 function CustomTeam:createBottomContent()
-	if not self.args.disbanded and mw.ext.TeamTemplate.teamexists(self.pagename) then
-		local teamPage = mw.ext.TeamTemplate.teampage(self.pagename)
-
-		return Template.expandTemplate(
-			mw.getCurrentFrame(),
-			'Upcoming and ongoing tournaments of',
-			{team = self.args.lpdbname or teamPage}
-		)
+	if not self.args.disbanded then
+		return UpcomingTournaments.team{
+			name = self.args.lpdbname or self.teamTemplate.templatename,
+			additionalConditions = ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Points')
+		}
 	end
 end
 

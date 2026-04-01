@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=zula
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -76,6 +75,12 @@ return {
 			matchWidthMobile = 110,
 			matchWidth = 200,
 			gameScoresIfBo1 = true,
+		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'merge',
+			},
 		},
 	},
 }

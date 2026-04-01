@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Links
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local CustomData = Lua.requireIfExists('Module:Links/CustomData', {loadData = true}) or {}
 
@@ -28,6 +28,7 @@ local PREFIXES = {
 	},
 	abiosgaming = {'https://abiosgaming.com/tournaments/'},
 	apexlegendsstatus = {'https://apexlegendsstatus.com/profile/uid/PC/'},
+	apexlegendsstatusalgs = {'https://apexlegendsstatus.com/algs/player-stats/'},
 	['apple-podcasts'] = {'https://podcasts.apple.com/'},
 	afreeca = {
 		'http://afreecatv.com/',
@@ -52,12 +53,17 @@ local PREFIXES = {
 		stream = 'https://live.bilibili.com/',
 	},
 	['bilibili-stream'] = {'https://live.bilibili.com/'},
+	blasttv = {
+		'https://blast.tv/',
+		match = 'https://blast.tv/',
+	},
 	bluesky = {'https://bsky.app/profile/'},
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
 	breakingpoint = {match = 'https://www.breakingpoint.gg/match/'},
 	cc = {'https://cc.163.com/'},
 	cdl = {match = 'https://callofdutyleague.com/en-us/match/'},
+	clarioncorp = {'https://clarioncorp.net/pilot/'},
 	challengermode = {
 		'https://www.challengermode.com/tournaments/',
 		player = 'https://www.challengermode.com/users/',
@@ -79,10 +85,9 @@ local PREFIXES = {
 		match = 'https://www.chessgames.com/perl/chessgame?gid=',
 	},
 	chessresults = {'https://chess-results.com/'},
-	chzzk = {'https://chzzk.naver.com/live/'},
+	chzzk = {'https://chzzk.naver.com/'},
 	civdraft = {match = 'https://aoe2cm.net/draft/'},
 	cntft = {'https://lol.qq.com/tft/#/masterDetail/'},
-	corestrike = {'https://corestrike.gg/lookup/'},
 	cfs = {'https://www.crossfirestars.com/'},
 	datdota = {
 		'https://www.datdota.com/leagues/',
@@ -111,11 +116,11 @@ local PREFIXES = {
 	['esea-d'] = {'https://play.esea.net/league/standings?divisionId='},
 	esl = {
 		'',
-		team = 'https://play.eslgaming.com/team/',
-		player = 'https://play.eslgaming.com/player/',
-		match = 'https://play.eslgaming.com/match/',
+		team = 'https://web.archive.org/web/play.eslgaming.com/team/',
+		player = 'https://web.archive.org/web/play.eslgaming.com/player/',
+		match = 'https://web.archive.org/web/play.eslgaming.com/match/',
 	},
-	esplay = {'https://esplay.com/tournament/'},
+	esplay = {'https://esplay.com/'},
 	esportal = {'https://esportal.com/tournament/'},
 	etf2l = {
 		'',
@@ -133,15 +138,25 @@ local PREFIXES = {
 	['faceit-c'] = {'https://www.faceit.com/en/championship/'},
 	['faceit-hub'] = {'https://www.faceit.com/en/hub/'},
 	['faceit-org'] = {'https://www.faceit.com/en/organizers/'},
+	faceitdb = {
+		'',
+		player = 'https://faceitdb.com/profile/faceit/',
+	},
 	fanclub = {''},
 	fide = {
 		'https://ratings.fide.com/tournament_information.phtml?event=',
 		player = 'https://ratings.fide.com/profile/',
 	},
+	fpschallenge = {
+		'https://fpschallenge.eu/tournament/',
+		player = 'https://fpschallenge.eu/user/',
+		team = 'https://fpschallenge.eu/team/',
+	},
 	geoguessr = {'https://www.geoguessr.com/'},
 	gol = {match = 'https://gol.gg/game/stats/'},
 	gosugamers = {''},
 	gplus = {'http://plus.google.com/-plus'},
+	h3gg = {match = 'https://www.h3.gg/competitions/v2/match/'},
 	halodatahive = {
 		'https://halodatahive.com/Tournament/Detail/',
 		team = 'https://halodatahive.com/Team/Detail/',
@@ -179,16 +194,22 @@ local PREFIXES = {
 	},
 	linkedin = {
 		team = 'https://www.linkedin.com/company/',
+		company = 'https://www.linkedin.com/company/',
 		player = 'https://www.linkedin.com/in/',
 	},
 	loco = {'https://loco.gg/streamers/'},
 	lolchess = {'https://lolchess.gg/profile/'},
 	lrthread = {'', match = ''},
 	mapdraft = {match = 'https://aoe2cm.net/draft/'},
-	matcherino = {'https://matcherino.com/tournaments/'},
+	matcherino = {
+		'https://matcherino.com/tournaments/',
+		player = 'https://matcherino.com/',
+	},
 	matcherinolink = {'https://matcherino.com/t/'},
+	metafy = {'https://metafy.gg/@'},
 	mildom = {'https://www.mildom.com/'},
 	mplink = {match = 'https://osu.ppy.sh/community/matches/'}, -- Should this key be renamed?
+	lazermplink = {match = 'https://osu.ppy.sh/multiplayer/rooms/'},
 	niconico = {'https://www.nicovideo.jp/'},
 	nimotv = {'https://www.nimo.tv/'},
 	['nwc3l'] = {
@@ -198,13 +219,17 @@ local PREFIXES = {
 	},
 	openrec = {'https://www.openrec.tv/live/'},
 	opl = {
-		match = 'https://www.opleague.eu/match/'
+		match = 'https://www.opleague.pro/match/'
 	},
 	osu = {
 		'https://osu.ppy.sh/',
 		player = 'https://osu.ppy.sh/users/',
 	},
 	overgg = {match = 'https://www.over.gg/'},
+	overstat = {
+		'https://overstat.gg/',
+		player = 'https://overstat.gg/player/',
+	},
 	owl = {
 		match = 'https://web.archive.org/web/overwatchleague.com/en-us/match/',
 	},
@@ -237,6 +262,11 @@ local PREFIXES = {
 		match = 'https://royaleapi.com/'
 	},
 	rules = {''},
+	sendou = {
+		'https://sendou.ink/to/',
+		player = 'https://sendou.ink/u/',
+		team = 'https://sendou.ink/t/',
+	},
 	shift = {
 		'https://www.shiftrle.gg/events/',
 		match = 'https://www.shiftrle.gg/matches/',
@@ -256,15 +286,19 @@ local PREFIXES = {
 		'https://start.gg/',
 		player = 'https://start.gg/user/',
 	},
-	steam = {'https://steamcommunity.com/id/'},
+	steam64ID = {'https://steamcommunity.com/profiles/'},
 	steamtv = {'https://steam.tv/'},
 	strikr = {'https://strikr.pro/pilot/'},
 	privsteam = {'https://steamcommunity.com/groups/'},
 	pubsteam = {'https://steamcommunity.com/groups/'},
 	smiteesports = {match = 'https://www.smiteesports.com/matches/'},
 	spotify = {'https://open.spotify.com/'},
-	steamalternative = {'https://steamcommunity.com/profiles/'},
 	stats = {'', match = ''},
+	statshark = {
+		'https://statshark.net/',
+		player = 'https://statshark.net/player/',
+		team = 'https://statshark.net/squadrons/',
+	},
 	stratz = {
 		'https://stratz.com/leagues/',
 		player = 'https://stratz.com/players/',
@@ -273,11 +307,16 @@ local PREFIXES = {
 	stream = {''},
 	telegram = {'https://t.me/'},
 	tespa = {match = 'https://web.archive.org/web/compete.tespa.org/tournament/'},
+	tetrio = {
+		'',
+		player = 'https://ch.tetr.io/u/'
+	},
 	tftv = {
 		'https://www.teamfortress.tv/',
 		player = 'https://www.teamfortress.tv/user/',
 		match = 'http://tf.gg/',
 	},
+	threads = {'https://threads.com/@'},
 	tiktok = {'https://tiktok.com/@'},
 	tlpd = {''},
 	tlpdint = {
@@ -333,10 +372,12 @@ local SUFFIXES = {
 		'',
 		stream = '/live',
 	},
-	gol = {match = '/page-game/'},
-	iccup = {'.html'},
 	['faceit-c'] = {'/'},
 	['faceit-hub'] = {'/'},
+	gol = {match = '/page-game/'},
+	iccup = {'.html'},
+	lazermplink = {match = '/events'},
+	metafy = {'?utm_source=liquipedia&campaign=infoblock'},
 	vk = {
 		'',
 		stream = '/live',
@@ -348,6 +389,7 @@ SUFFIXES = Table.merge(SUFFIXES, CustomData.suffixes or {})
 local ALIASES = {
 	['ask-fm'] = {'afk.fm', 'askfm'},
 	douyu = {'douyutv'},
+	clarioncorp = {'corestrike'},
 	esl = {'eslgaming'},
 	['facebook-gaming'] = {'fbgg'},
 	home = {'website', 'web', 'site', 'url'},
@@ -363,17 +405,19 @@ local ALIASES = {
 local ICON_KEYS_TO_RENAME = {
 	['bilibili-stream'] = 'bilibili',
 	daumcafe = 'cafe-daum',
+	blasttv = 'blast',
 	['esea-d'] = 'esea-league',
 	['faceit-c'] = 'faceit',
 	['faceit-c2'] = 'faceit',
 	['faceit-l'] = 'faceit',
 	['faceit-hub'] = 'faceit',
 	['faceit-org'] = 'faceit',
+	['faceitdb'] = 'faceit',
 	matcherinolink = 'matcherino',
 	playlist = 'music',
 	privsteam = 'steam',
 	pubsteam = 'steam',
-	steamalternative = 'steam',
+	steam64ID = 'steam',
 	tlpdint = 'tlpd',
 	tlpdkr = 'tlpd-wol-korea',
 	tlpdsospa = 'tlpd-sospa',
@@ -382,214 +426,226 @@ local ICON_KEYS_TO_RENAME = {
 
 local MATCH_ICONS = {
 	['365chess'] = {
-		icon = 'File:365chess_allmode.png',
-		iconDark = 'File:365chess_allmode.png',
+		icon = '365chess_allmode.png',
+		iconDark = '365chess_allmode.png',
 		text = '365Chess matchpage'
 	},
 	ballchasing = {
-		icon = 'File:Ballchasing icon.png',
+		icon = 'Ballchasing icon.png',
 		text = 'Ballchasing replays'
 	},
+	blasttv = {
+		icon = 'BLAST icon allmode.png',
+		text = 'BLAST.tv matchpage'
+	},
 	breakingpoint = {
-		icon = 'File:Breaking Point GG icon lightmode.png',
-		iconDark = 'File:Breaking Point GG icon darkmode.png',
+		icon = 'Breaking Point GG icon lightmode.png',
+		iconDark = 'Breaking Point GG icon darkmode.png',
 		text = 'Breaking Point matchpage'
 	},
 	cdl = {
-		icon = 'File:Call of Duty League lightmode.png',
-		iconDark = 'File:Call of Duty League darkmode.png',
+		icon = 'Call of Duty League lightmode.png',
+		iconDark = 'Call of Duty League darkmode.png',
 		text = 'Call of Duty League matchpage'
 	},
 	challengermode = {
-		icon = 'File:Challengermode icon.png',
+		icon = 'Challengermode icon.png',
 		text = 'Match page on Challengermode'
 	},
 	chesscom = {
-		icon = 'File:ChessCom_allmode.png',
-		iconDark = 'File:ChessCom_allmode.png',
+		icon = 'ChessCom_allmode.png',
+		iconDark = 'ChessCom_allmode.png',
 		text = 'Chess.com matchpage'
 	},
 	chessgames = {
-		icon = 'File:Chessgames_allmode.png',
-		iconDark = 'File:Chessgames_allmode.png',
+		icon = 'Chessgames_allmode.png',
+		iconDark = 'Chessgames_allmode.png',
 		text = 'Chessgames matchpage'
 	},
 	civdraft = {
 		text = 'Civ Draft',
-		icon = 'File:Civ Draft Icon.png'
+		icon = 'Civ Draft Icon.png'
 	},
 	datdota = {
-		icon = 'File:DatDota-icon.png',
+		icon = 'DatDota-icon.png',
 		text = 'datDota'
 	},
 	dbstats = {
-		icon = 'File:Diabotical icon.png',
+		icon = 'Diabotical icon.png',
 		text = 'QuakeLife matchpage'
 	},
 	dotabuff = {
-		icon = 'File:DOTABUFF-icon.png',
+		icon = 'DOTABUFF-icon.png',
 		text = 'DOTABUFF'
 	},
 	ebattle = {
-		icon = 'File:Ebattle Series allmode.png',
+		icon = 'Ebattle Series allmode.png',
 		text = 'Match page on ebattle'
 	},
 	esl = {
-		icon = 'File:ESL_2019_icon_lightmode.png',
-		iconDark = 'File:ESL_2019_icon_darkmode.png',
+		icon = 'ESL_2019_icon_lightmode.png',
+		iconDark = 'ESL_2019_icon_darkmode.png',
 		text = 'Match page on ESL'
 	},
 	esea = {
-		icon = 'File:ESEA icon allmode.png',
+		icon = 'ESEA icon allmode.png',
 		text = 'ESEA Match Page'
 	},
 	etf2l = {
-		icon = 'File:ETF2L.png',
+		icon = 'ETF2L.png',
 		text = 'ETF2L Match Page'
 	},
 	faceit = {
-		icon = 'File:FACEIT icon allmode.png',
+		icon = 'FACEIT icon allmode.png',
 		text = 'FACEIT match room'
 	},
 	gol = {
-		icon = 'File:Gol.gg allmode.png',
+		icon = 'Gol.gg allmode.png',
 		text = 'GolGG Match Report',
 	},
+	h3gg = {
+		icon = 'H3gg icon allmode.png',
+		text = 'H3.gg match details',
+	},
 	halodatahive = {
-		icon = 'File:Halo Data Hive allmode.png',
+		icon = 'Halo Data Hive allmode.png',
 		text = 'Match page on Halo Data Hive'
 	},
 	headtohead = {
-		icon = 'File:Match Info Stats.png',
+		icon = 'Match Info Stats.png',
 		text = 'Head-to-head statistics'
 	},
 	interview = {
-		icon = 'File:Interview32.png',
+		icon = 'Interview32.png',
 		text = 'Interview'
 	},
 	jcg = {
-		icon = 'File:JCG-BMS icon.png',
+		icon = 'JCG-BMS icon.png',
 		text = 'JCG matchpage'
 	},
 	lichess = {
-		icon = 'File:Lichess_lightmode.png',
-		iconDark = 'File:Lichess_darkmode.png',
+		icon = 'Lichess_lightmode.png',
+		iconDark = 'Lichess_darkmode.png',
 		text = 'Game page on Lichess'
 	},
 	logstf = {
-		icon = 'File:Logstf_icon.png',
+		icon = 'Logstf_icon.png',
 		text = 'logs.tf Match Page '
 	},
 	logstfgold = {
-		icon = 'File:Logstf_gold_icon.png',
+		icon = 'Logstf_gold_icon.png',
 		text = 'logs.tf Match Page (Golden Cap) '
 	},
 	lpl = {
-		icon = 'File:LPL_Logo_lightmode.png',
-		iconDark = 'File:LPL_Logo_darkmode.png',
+		icon = 'LPL_Logo_lightmode.png',
+		iconDark = 'LPL_Logo_darkmode.png',
 		text = 'Match page on LPL Play'
 	},
 	lrthread = {
-		icon = 'File:LiveReport32.png',
+		icon = 'LiveReport32.png',
 		text = 'Live Report Thread'
 	},
 	mapdraft = {
 		text = 'Map Draft',
-		icon = 'File:Map Draft Icon.png'
+		icon = 'Map Draft Icon.png'
 	},
 	mplink = {
-		icon = 'File:Osu single color allmode.png',
+		icon = 'Osu single color allmode.png',
+		text = 'Match Data'
+	},
+	lazermplink = {
+		icon = 'Osu!lazer allmode.png',
 		text = 'Match Data'
 	},
 	opl = {
-		icon = 'File:OPL Icon 2023 allmode.png',
+		icon = 'OPL Icon 2023 allmode.png',
 		text = 'OPL Match Page'
 	},
 	overgg = {
-		icon = 'File:overgg icon.png',
+		icon = 'overgg icon.png',
 		text = 'over.gg matchpage'
 	},
 	owl = {
-		icon = 'File:Overwatch League 2023 allmode.png',
+		icon = 'Overwatch League 2023 allmode.png',
 		text = 'Overwatch League matchpage'
 	},
 	ozf = {
-		icon = 'File:ozfortress-icon.png',
+		icon = 'ozfortress-icon.png',
 		text = 'ozfortress Match Page'
 	},
 	pf = {
-		icon = 'File:Plus Forward icon.png',
+		icon = 'Plus Forward icon.png',
 		text = 'Plus Forward matchpage'
 	},
 	preview = {
-		icon = 'File:Preview Icon32.png',
+		icon = 'Preview Icon32.png',
 		text = 'Preview'
 	},
 	qrindr = {
-		icon = 'File:Quake Champions icon.png',
+		icon = 'Quake Champions icon.png',
 		text = 'Qrindr matchpage'
 	},
 	r6esports = {
-		icon = 'File:Rainbow 6 Esports 2023 lightmode.png',
-		iconDark = 'File:Rainbow 6 Esports 2023 darkmode.png',
+		icon = 'Rainbow 6 Esports 2023 lightmode.png',
+		iconDark = 'Rainbow 6 Esports 2023 darkmode.png',
 		text = 'R6 Esports Match Page'
 	},
 	recap = {
-		icon = 'File:Reviews32.png',
+		icon = 'Reviews32.png',
 		text = 'Recap'
 	},
 	reddit = {
-		icon = 'File:Reddit-icon.png',
+		icon = 'Reddit-icon.png',
 		text = 'Reddit Thread',
 	},
 	review = {
-		icon = 'File:Reviews32.png',
+		icon = 'Reviews32.png',
 		text = 'Review'
 	},
 	rgl = {
-		icon = 'File:RGL_Logo.png',
+		icon = 'RGL_Logo.png',
 		text = 'RGL Match Page'
 	},
 	royaleapi = {
-		icon = 'File:RoyaleAPI_allmode.png',
+		icon = 'RoyaleAPI_allmode.png',
 		text = 'RoyaleAPI Match Page'
 	},
 	shift = {
-		icon = 'File:ShiftRLE icon.png',
+		icon = 'ShiftRLE icon.png',
 		text = 'ShiftRLE matchpage'
 	},
 	siegegg = {
-		icon = 'File:SiegeGG icon.png',
+		icon = 'SiegeGG icon.png',
 		text = 'SiegeGG Match Page'
 	},
 	smiteesports = {
-		icon = 'File:SMITE default lightmode.png',
-		iconDark = 'File:SMITE default darkmode.png',
+		icon = 'SMITE default lightmode.png',
+		iconDark = 'SMITE default darkmode.png',
 		text = 'Smite Esports Match Page'
 	},
 	stats = {
-		icon = 'File:Match_Info_Stats.png',
+		icon = 'Match_Info_Stats.png',
 		text = 'Match Statistics'
 	},
 	stratz = {
-		icon = 'File:STRATZ_icon_lightmode.svg',
-		iconDark = 'File:STRATZ_icon_darkmode.svg',
+		icon = 'STRATZ_icon_lightmode.svg',
+		iconDark = 'STRATZ_icon_darkmode.svg',
 		text = 'STRATZ'
 	},
 	tespa = {
-		icon = 'File:Tespa icon.png',
+		icon = 'Tespa icon.png',
 		text = 'Tespa matchpage'
 	},
 	tftv = {
-		icon = 'File:Teamfortress.tv.png',
+		icon = 'Teamfortress.tv.png',
 		text = 'TFTV Match Page'
 	},
 	vlr = {
-		icon = 'File:VLR icon.png',
+		icon = 'VLR icon.png',
 		text = 'Matchpage and Stats on VLR'
 	},
 	wl = {
-		icon = 'File:Winstons Lab-icon.png',
+		icon = 'Winstons Lab-icon.png',
 		text = 'Winstons Lab matchpage'
 	},
 }
@@ -689,7 +745,7 @@ function Links.makeFullLinksForTableItems(links, variant, fallbackToBase)
 end
 
 --remove appended number
---needed because the link icons require e.g. 'esl' instead of 'esl2'
+--needed because the link icons require e.g. 'twitch' instead of 'twitch2'
 ---@param key string
 ---@return string
 function Links.removeAppendedNumber(key)

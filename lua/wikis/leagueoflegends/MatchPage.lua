@@ -1,27 +1,33 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
 -- page=Module:MatchPage
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
+local InGameRoles = Lua.import('Module:InGameRoles', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local MatchSummaryCharacters = Lua.import('Module:Widget/Match/Summary/Characters')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
+local PlayerStatContainer = Lua.import('Module:Widget/Match/Page/PlayerStat/Container')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local VetoItem = Lua.import('Module:Widget/Match/Page/VetoItem')
@@ -30,9 +36,11 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LoLMatchPageGame: MatchPageGame
 ---@field vetoGroups {type: 'ban'|'pick', team: integer, character: string, vetoNumber: integer}[][][]
+---@field opponents {players: table[], score: number?, status: string?, [string]: any}[]
 
 ---@class LoLMatchPage: BaseMatchPage
 ---@field games LoLMatchPageGame[]
+---@operator call(MatchGroupUtilMatch): BaseMatchPage
 local MatchPage = Class.new(BaseMatchPage)
 
 local KEYSTONES = Table.map({
@@ -67,10 +75,11 @@ local KEYSTONES = Table.map({
 end)
 
 local DEFAULT_ITEM = 'EmptyIcon'
-local LOADOUT_ICON_SIZE = '24px'
+local LOADOUT_ICON_SIZE = '64px'
 local ITEMS_TO_SHOW = 6
 
 local KDA_ICON = IconFa{iconName = 'leagueoflegends_kda', hover = 'KDA'}
+local KP_ICON = IconFa{iconName = 'leagueoflegends_killparticipation', hover = 'KP'}
 local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
@@ -79,74 +88,266 @@ local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 function MatchPage.getByMatchId(props)
 	local matchPage = MatchPage(props.match)
 
-	-- Update the view model with game and team data
-	matchPage:populateGames()
-
-	-- Add more opponent data field
-	matchPage:populateOpponents()
-
 	return matchPage:render()
 end
 
 function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)
+		local vetoPhase = game.extradata.vetophase or {}
 		game.finished = game.winner ~= nil and game.winner ~= -1
 		game.teams = Array.map(game.opponents, function(opponent, teamIdx)
-			local team = {}
+			opponent.scoreDisplay = game.winner == teamIdx and 'W' or game.finished and 'L' or '-'
 
-			team.scoreDisplay = game.winner == teamIdx and 'W' or game.finished and 'L' or '-'
-			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
-
-			team.players = Array.map(opponent.players, function(player)
-				if Logic.isDeepEmpty(player) then return end
-				return Table.mergeInto(player, {
-					items = Array.map(Array.range(1, ITEMS_TO_SHOW), function(idx)
-						return player.items[idx] or DEFAULT_ITEM
-					end),
-					runeKeystone = Array.filter(player.runes.primary.runes, function(rune)
-						return KEYSTONES[rune]
-					end)[1]
-				})
-			end)
-
-			if game.finished then
-				-- Aggregate stats
-				team.gold = MatchPage.abbreviateNumber(MatchPage.sumItem(team.players, 'gold'))
-				team.kills = MatchPage.sumItem(team.players, 'kills')
-				team.deaths = MatchPage.sumItem(team.players, 'deaths')
-				team.assists = MatchPage.sumItem(team.players, 'assists')
-
-				-- Set fields
-				team.objectives = game.extradata['team' .. teamIdx .. 'objectives'] or {}
-			else
-				team.objectives = {}
-			end
-
-			team.picks = Array.map(team.players, Operator.property('character'))
-			team.pickOrder = Array.filter(game.extradata.vetophase or {}, function(veto)
+			opponent.players = Array.map(
+				Array.sortBy(Array.filter(opponent.players, Logic.isNotEmpty), function(player)
+					return InGameRoles[player.role].sortOrder
+				end),
+				function(player)
+					if Logic.isDeepEmpty(player) then return end
+					return Table.mergeInto(player, {
+						items = Array.map(Array.range(1, ITEMS_TO_SHOW), function(idx)
+							return player.items[idx] or DEFAULT_ITEM
+						end),
+						runeKeystone = Array.filter(player.runes.primary.runes or {}, function(rune)
+							return KEYSTONES[rune]
+						end)[1]
+					})
+				end
+			)
+			opponent.pickOrder = Array.filter(vetoPhase, function(veto)
 				return veto.type == 'pick' and veto.team == teamIdx
 			end)
-			team.bans = Array.filter(game.extradata.vetophase or {}, function(veto)
+			opponent.bans = Array.filter(vetoPhase, function(veto)
 				return veto.type == 'ban' and veto.team == teamIdx
 			end)
 
-			return team
+			return opponent
 		end)
 
-		local _, vetoByTeam = Array.groupBy(game.extradata.vetophase or {}, Operator.property('team'))
-		game.vetoGroups = {}
-
-		Array.forEach(vetoByTeam, function(team, teamIndex)
-			local groupIndex = 1
-			local lastType = 'ban'
-			Array.forEach(team, function(veto)
-				if lastType ~= veto.type then groupIndex = groupIndex + 1 end
-				veto.groupIndex = groupIndex
-				lastType = veto.type
-			end)
-			_, game.vetoGroups[teamIndex] = Array.groupBy(team, Operator.property('groupIndex'))
+		local _, vetoByTeam = Array.groupBy(vetoPhase, Operator.property('team'))
+		game.vetoGroups = Array.map(vetoByTeam, function (team)
+			return Array.groupAdjacentBy(team, Operator.property('type'))
 		end)
 	end)
+end
+
+---@return Widget?
+function MatchPage:renderOverallStats()
+	if self:isBestOfOne() then
+		return
+	end
+
+	local function renderOverallTeamStats()
+		return {
+			HtmlWidgets.H3{children = 'Overall Team Stats'},
+			Div{
+				classes = {'match-bm-team-stats'},
+				children = {
+					Div{
+						classes = {'match-bm-lol-team-stats-header'},
+						children = {
+							Div{
+								classes = {'match-bm-lol-team-stats-header-team'},
+								children = self.opponents[1].iconDisplay
+							},
+							Div{
+								classes = {'match-bm-team-stats-list-cell'},
+								css = {flex = 1},
+								children = self:getTournamentIcon()
+							},
+							Div{
+								classes = {'match-bm-lol-team-stats-header-team'},
+								children = self.opponents[2].iconDisplay
+							}
+						}
+					},
+					MatchPage._buildTeamStatsList{
+						finished = true,
+						data = Array.map(self.matchData.opponents, Operator.property('extradata'))
+					}
+				}
+			}
+		}
+	end
+
+	---@param stat integer
+	---@param gameLength integer
+	---@return string?
+	local function calculateStatPerMinute(stat, gameLength)
+		if gameLength <= 0 then
+			return
+		end
+		return MathUtil.formatRounded{precision = 2, value = stat / gameLength * 60}
+	end
+
+	---@param player standardPlayer
+	---@return Widget?
+	local function renderPlayerOverallPerformance(player)
+		if Logic.isEmpty(player.extradata) then
+			return
+		end
+		return Div{
+			classes = {'match-bm-players-player match-bm-players-player--col-2'},
+			children = WidgetUtil.collect(
+				Div{
+					classes = {'match-bm-players-player-name'},
+					children = {
+						Link{link = player.pageName, children = player.displayName},
+						MatchSummaryCharacters{characters = player.extradata.characters, date = self.matchData.date},
+					}
+				},
+				PlayerStatContainer{
+					columns = 5,
+					children = {
+						PlayerStat{
+							title = {KDA_ICON, 'KDA'},
+							data = Array.interleave({
+								player.extradata.kills,
+								player.extradata.deaths,
+								player.extradata.assists
+							}, SPAN_SLASH)
+						},
+						PlayerStat{
+							title = {KP_ICON, 'KP%'},
+							data = MathUtil.formatPercentage(player.extradata.killparticipation, 1)
+						},
+						PlayerStat{
+							title = {
+								IconImage{
+									imageLight = 'Lol stat icon cs.png',
+									caption = 'CS per minute',
+									size = 'x16px',
+									link = ''
+								},
+								'CSPM'
+							},
+							data = calculateStatPerMinute(player.extradata.creepscore, player.extradata.gameLength)
+						},
+						PlayerStat{
+							title = {GOLD_ICON, 'GPM'},
+							data = calculateStatPerMinute(player.extradata.gold, player.extradata.gameLength)
+						},
+						PlayerStat{
+							title = {
+								IconFa{
+									iconName = 'damage',
+									additionalClasses = {'fa-flip-both'},
+									hover = 'Damage per minute'
+								},
+								'DPM'
+							},
+							data = calculateStatPerMinute(player.extradata.damage, player.extradata.gameLength)
+						}
+					}
+				}
+			)
+		}
+	end
+
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(
+			renderOverallTeamStats(),
+			HtmlWidgets.H3{children = 'Overall Player Performance'},
+			Div{
+				classes = {'match-bm-players-wrapper'},
+				children = Array.map(self.opponents, function (opponent)
+					return Div{
+						classes = {'match-bm-players-team'},
+						children = WidgetUtil.collect(
+							Div{
+								classes = {'match-bm-players-team-header'},
+								children = opponent.iconDisplay
+							},
+							Array.map(
+								Array.sortBy(opponent.players, function (player)
+									if Logic.isEmpty(player.extradata.role) then
+										return -1
+									end
+									return InGameRoles[player.extradata.role].sortOrder
+								end),
+								renderPlayerOverallPerformance
+							)
+						)
+					}
+				end)
+			}
+		)
+	}
+end
+
+---@private
+---@param props {finished: boolean, data: {kills: integer, deaths: integer, assists: integer, gold: number?,
+---towers: integer, inhibitors: integer, grubs: integer?, heralds: integer?, atakhans: integer?, dragons: integer?,
+---barons: integer?}[]}
+---@return MatchPageStatsList
+function MatchPage._buildTeamStatsList(props)
+	return StatsList{
+		finished = props.finished,
+		data = {
+			{
+				icon = KDA_ICON,
+				name = 'KDA',
+				team1Value = Array.interleave({
+					props.data[1].kills,
+					props.data[1].deaths,
+					props.data[1].assists
+				}, SPAN_SLASH),
+				team2Value = Array.interleave({
+					props.data[2].kills,
+					props.data[2].deaths,
+					props.data[2].assists
+				}, SPAN_SLASH)
+			},
+			{
+				icon = GOLD_ICON,
+				name = 'Gold',
+				team1Value = MatchPage.abbreviateNumber(props.data[1].gold),
+				team2Value = MatchPage.abbreviateNumber(props.data[2].gold)
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon tower.png', link = ''},
+				name = 'Towers',
+				team1Value = props.data[1].towers,
+				team2Value = props.data[2].towers
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon inhibitor.png', link = ''},
+				name = 'Inhibitors',
+				team1Value = props.data[1].inhibitors,
+				team2Value = props.data[2].inhibitors
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon grub.png', link = ''},
+				name = 'Void Grubs',
+				team1Value = props.data[1].grubs,
+				team2Value = props.data[2].grubs
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon herald.png', link = ''},
+				name = 'Rift Heralds',
+				team1Value = props.data[1].heralds,
+				team2Value = props.data[2].heralds
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon atakhan.png', link = ''},
+				name = 'Atakhan',
+				team1Value = props.data[1].atakhans,
+				team2Value = props.data[2].atakhans
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon dragon.png', link = ''},
+				name = 'Dragons',
+				team1Value = props.data[1].dragons,
+				team2Value = props.data[2].dragons
+			},
+			{
+				icon = IconImage{imageLight = 'Lol stat icon baron.png', link = ''},
+				name = 'Barons',
+				team1Value = props.data[1].barons,
+				team2Value = props.data[2].barons
+			},
+		}
+	}
 end
 
 ---@param game LoLMatchPageGame
@@ -239,7 +440,7 @@ function MatchPage:_renderDraft(game)
 	return {
 		HtmlWidgets.H3{children = 'Draft'},
 		Div{
-			classes = {'match-bm-lol-game-veto', 'collapsed', 'general-collapsible'},
+			classes = {'match-bm-lol-game-veto'},
 			children = {
 				Div{
 					classes = {'match-bm-lol-game-veto-overview'},
@@ -247,32 +448,19 @@ function MatchPage:_renderDraft(game)
 						return self:_renderGameTeamVetoOverview(game, teamIndex)
 					end)
 				},
-				Div{
-					classes = {'match-bm-lol-game-veto-order-toggle', 'ppt-toggle-expand'},
-					children = {
-						Div{
-							classes = {'general-collapsible-expand-button'},
-							children = Div{children = {
-								'Show Order &nbsp;',
-								IconFa{iconName = 'expand'}
-							}}
-						},
-						Div{
-							classes = {'general-collapsible-collapse-button'},
-							children = Div{children = {
-								'Hide Order &nbsp;',
-								IconFa{iconName = 'collapse'}
-							}}
-						}
-					}
-				},
-				Div{
-					classes = {'match-bm-lol-game-veto-order-list', 'ppt-hide-on-collapse'},
+				GeneralCollapsible{
+					title = 'Draft Order',
+					classes = {'match-bm-match-collapsible'},
+					shouldCollapse = true,
+					collapseAreaClasses = {
+						'match-bm-match-collapsible-content',
+						'match-bm-lol-game-veto-order-list',
+					},
 					children = {
 						self:_renderGameTeamVetoOrder(game, 1),
 						self:_renderGameTeamVetoOrder(game, 2),
 					}
-				}
+				},
 			}
 		}
 	}
@@ -366,7 +554,8 @@ function MatchPage:_renderTeamStats(game)
 						},
 						Div{
 							classes = {'match-bm-team-stats-list-cell'},
-							children = self:isBestOfOne() and self:_buildGameResultSummary(game) or nil
+							css = {flex = 1},
+							children = self:isBestOfOne() and self:_buildGameResultSummary(game) or self:getTournamentIcon()
 						},
 						Div{
 							classes = {'match-bm-lol-team-stats-header-team'},
@@ -374,54 +563,9 @@ function MatchPage:_renderTeamStats(game)
 						}
 					}
 				},
-				StatsList{
+				MatchPage._buildTeamStatsList{
 					finished = game.finished,
-					data = {
-						{
-							icon = KDA_ICON,
-							name = 'KDA',
-							team1Value = Array.interleave({
-								game.teams[1].kills,
-								game.teams[1].deaths,
-								game.teams[1].assists
-							}, SPAN_SLASH),
-							team2Value = Array.interleave({
-								game.teams[2].kills,
-								game.teams[2].deaths,
-								game.teams[2].assists
-							}, SPAN_SLASH)
-						},
-						{
-							icon = GOLD_ICON,
-							name = 'Gold',
-							team1Value = game.teams[1].gold,
-							team2Value = game.teams[2].gold
-						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon tower.png', link = ''},
-							name = 'Towers',
-							team1Value = game.teams[1].objectives.towers,
-							team2Value = game.teams[2].objectives.towers
-						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon inhibitor.png', link = ''},
-							name = 'Inhibitors',
-							team1Value = game.teams[1].objectives.inhibitors,
-							team2Value = game.teams[2].objectives.inhibitors
-						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon baron.png', link = ''},
-							name = 'Barons',
-							team1Value = game.teams[1].objectives.barons,
-							team2Value = game.teams[2].objectives.barons
-						},
-						{
-							icon = IconImage{imageLight = 'Lol stat icon dragon.png', link = ''},
-							name = 'Dragons',
-							team1Value = game.teams[1].objectives.dragons,
-							team2Value = game.teams[2].objectives.dragons
-						}
-					}
+					data = Array.map(game.opponents, Operator.property('stats'))
 				}
 			}
 		}
@@ -470,28 +614,23 @@ end
 ---@return Widget
 function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 	return Div{
-		classes = {'match-bm-players-player match-bm-players-player--col-1'},
+		classes = {'match-bm-players-player match-bm-players-player--col-3'},
 		children = {
-			Div{
-				classes = {'match-bm-lol-players-player-details'},
-				children = {
-					PlayerDisplay{
-						characterIcon = self:getCharacterIcon(player.character),
-						characterName = player.character,
-						side = game.teams[teamIndex].side,
-						roleIcon = IconImage{
-							imageLight = 'Lol role ' .. player.role .. ' icon darkmode.svg',
-							caption = mw.getContentLanguage():ucfirst(player.role),
-							link = ''
-						},
-						playerLink = player.player,
-						playerName = player.displayName or player.player
-					},
-					MatchPage._buildPlayerLoadout(player)
-				}
+			PlayerDisplay{
+				characterIcon = self:getCharacterIcon(player.character),
+				characterName = player.character,
+				side = game.teams[teamIndex].side,
+				roleIcon = IconImage{
+					imageLight = 'Lol role ' .. player.role .. ' icon darkmode.svg',
+					caption = String.upperCaseFirst(player.role),
+					link = ''
+				},
+				playerLink = player.player,
+				playerName = player.displayName or player.player
 			},
-			Div{
-				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-4'},
+			MatchPage._buildPlayerLoadout(player),
+			PlayerStatContainer{
+				columns = 5,
 				children = {
 					PlayerStat{
 						title = {KDA_ICON, 'KDA'},
@@ -500,10 +639,15 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 						}, SPAN_SLASH)
 					},
 					PlayerStat{
+						title = {KP_ICON, 'KP%'},
+						data = player.killparticipation and MathUtil.formatPercentage(player.killparticipation, 1) or '-'
+					},
+					PlayerStat{
 						title = {
 							IconImage{
 								imageLight = 'Lol stat icon cs.png',
 								caption = 'CS',
+								size = 'x16px',
 								link = ''
 							},
 							'CS'
@@ -558,10 +702,13 @@ end)
 ---@return Widget
 MatchPage._generateItemImage = FnUtil.memoize(function (itemName)
 	local isDefaultItem = itemName == DEFAULT_ITEM
-	return MatchPage._generateLoadoutImage{
-		prefix = 'Lol item',
-		name = itemName,
-		caption = isDefaultItem and 'Empty' or itemName,
+	return Div{
+		classes = {'match-bm-players-player-loadout-item'},
+		children = MatchPage._generateLoadoutImage{
+			prefix = 'Lol item',
+			name = itemName,
+			caption = isDefaultItem and 'Empty' or itemName,
+		}
 	}
 end)
 
@@ -570,7 +717,7 @@ end)
 ---@return Widget
 function MatchPage._buildPlayerLoadout(player)
 	return Div{
-		classes = {'match-bm-lol-players-player-loadout'},
+		classes = {'match-bm-players-player-loadout'},
 		children = {
 			Div{
 				classes = {'match-bm-lol-players-player-loadout-rs-wrap'},
@@ -589,17 +736,8 @@ function MatchPage._buildPlayerLoadout(player)
 				}
 			},
 			Div{
-				classes = {'match-bm-lol-players-player-loadout-items'},
-				children = {
-					Div{
-						classes = {'match-bm-lol-players-player-loadout-item'},
-						children = Array.map(Array.sub(player.items, 1, 3), MatchPage._generateItemImage)
-					},
-					Div{
-						classes = {'match-bm-lol-players-player-loadout-item'},
-						children = Array.map(Array.sub(player.items, 4, 6), MatchPage._generateItemImage)
-					}
-				}
+				classes = {'match-bm-players-player-loadout-items'},
+				children = Array.map(player.items, MatchPage._generateItemImage)
 			}
 		}
 	}

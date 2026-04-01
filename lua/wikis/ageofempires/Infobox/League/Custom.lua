@@ -1,32 +1,31 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateClean = require('Module:DateTime')
-local GameLookup = require('Module:GameLookup')
-local GameModeLookup = require('Module:GameModeLookup')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MapMode = require('Module:MapMode')
-local MatchTicker = require('Module:MatchTicker/Custom')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Tier = require('Module:Tier/Custom')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateClean = Lua.import('Module:DateTime')
+local GameLookup = Lua.import('Module:GameLookup')
+local GameModeLookup = Lua.import('Module:GameModeLookup')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local MapMode = Lua.import('Module:MapMode')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Tier = Lua.import('Module:Tier/Custom')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -35,10 +34,8 @@ local Center = Widgets.Center
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
-local SECONDS_PER_DAY = 86400
-
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -68,8 +65,8 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'gamesettings' then
 		Array.appendWith(widgets,
-			Cell{name = 'Game & Version', content = caller:_getGameVersion(args)},
-			Cell{name = 'Game Mode', content = Array.map(caller.data.gameModes, function(gameMode)
+			Cell{name = 'Game & Version', children = caller:_getGameVersion(args)},
+			Cell{name = 'Game Mode', children = Array.map(caller.data.gameModes, function(gameMode)
 				return Page.makeInternalLink(gameMode)
 			end)}
 		)
@@ -78,8 +75,8 @@ function CustomInjector:parse(id, widgets)
 
 		Array.appendWith(widgets,
 			Title{children = playertitle},
-			Cell{name = 'Number of Teams', content = {args.team_number}},
-			Cell{name = 'Number of Players', content = {args.player_number}}
+			Cell{name = 'Number of Teams', children = {args.team_number}},
+			Cell{name = 'Number of Players', children = {args.player_number}}
 		)
 
 		if not String.isEmpty(args.team1) then
@@ -109,27 +106,12 @@ function CustomInjector:parse(id, widgets)
 			local sponsors = mw.text.split(args.sponsors, ',', true)
 			table.insert(widgets, Cell{
 				name = 'Sponsor(s)',
-				content = {table.concat(sponsors, '&nbsp;• ')}
+				children = {table.concat(sponsors, '&nbsp;• ')}
 			})
 		end
 	end
 
 	return widgets
-end
-
----@return Html?
-function CustomLeague:createBottomContent()
-	local yesterday = os.date('%Y-%m-%d', os.time() - SECONDS_PER_DAY)
-
-	if self.data.endDate and yesterday <= self.data.endDate then
-		local matchtickerArgs = {
-			tournament = self.pagename,
-			limit = tonumber(self.args.matchtickerlimit) or 7,
-			infoboxWrapperClass = 'false',
-			infoboxClass = true
-		}
-		return MatchTicker.tournament(matchtickerArgs)
-	end
 end
 
 ---@param args table

@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Grid/Container
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -16,7 +16,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 ---@class GridContainerParameters
 ---@field center boolean?
 ---@field rowGap string?
----@field gridCells (Widget|string|Html|nil)|(Widget|string|Html|nil)[]
+---@field gridCells Renderable|Renderable[]
 
 ---@class GridContainer: Widget
 ---@operator call(GridContainerParameters): GridContainer

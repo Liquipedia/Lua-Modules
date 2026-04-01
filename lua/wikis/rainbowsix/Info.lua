@@ -1,17 +1,31 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 return {
-	startYear = 2006, --vegas from 2006; vegas2 from 2008; siege from 2015; mobile from 2022
+	startYear = 2006, --vegas from 2006; vegas2 from 2008; siege from 2015; mobile from 2022; siegeX/siege-2025 from 2025
 	wikiName = 'rainbowsix',
 	name = 'Rainbow Six',
 	defaultGame = 'siege',
 	games = {
+		-- Name update, since 2026 back to "Siege", removing the "X".
+		-- But using the new game-build and ban-system from the start with SiegeX (2025).
+		siegex = {
+			abbreviation = 'R6S',
+			name = 'Tom Clancy\'s Rainbow Six Siege (2025)',
+			link = 'Rainbow Six Siege (2025)',
+			logo = {
+				darkMode = 'Rainbow Six Siege X default allmode.png',
+				lightMode = 'Rainbow Six Siege X default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Rainbow Six Siege X default allmode.png',
+				lightMode = 'Rainbow Six Siege X default allmode.png',
+			},
+		},
 		mobile = {
 			abbreviation = 'R6M',
 			name = 'Tom Clancy\'s Rainbow Six Mobile',
@@ -75,6 +89,27 @@ return {
 			status = 2,
 			matchWidth = 180,
 			gameScoresIfBo1 = true,
+		},
+		thisDay = {
+			tiers = {1, 2},
+			excludeTierTypes = {'Qualifier'},
+			showPatches = true,
+		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'automatic',
+				hasHeaderAndRefs = true,
+			},
+		},
+		participants = {
+			defaultPlayerNumber = 5,
+		},
+		tournamentsListing = {
+			showTier = true,
+			showGameIcon = true,
+			useParent = false,
+			onlyTierTypeIfBoth = false,
 		},
 	},
 	defaultRoundPrecision = 0,

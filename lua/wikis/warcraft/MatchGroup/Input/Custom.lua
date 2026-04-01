@@ -1,29 +1,28 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Faction = require('Module:Faction')
-local Flags = require('Module:Flags')
-local FnUtil = require('Module:FnUtil')
-local CharacterAliases = mw.loadData('Module:CharacterAliases')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MapsData = mw.loadData('Module:Maps/data')
-local Operator = require('Module:Operator')
-local PatchAuto = require('Module:PatchAuto')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local Faction = Lua.import('Module:Faction')
+local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
+local CharacterAliases = Lua.import('Module:CharacterAliases', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local MapsData = Lua.import('Module:Maps/data', {loadData = true})
+local Operator = Lua.import('Module:Operator')
+local PatchAuto = Lua.import('Module:PatchAuto')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local TBD = 'TBD'
 local NEUTRAL_HERO_FACTION = 'neutral'
@@ -31,6 +30,7 @@ local MODE_MIXED = 'mixed'
 local MODE_FFA = 'FFA'
 local ASSUME_FINISHED_AFTER = MatchGroupInputUtil.ASSUME_FINISHED_AFTER
 local NOW = os.time()
+local RANDOM_FACTION = 'r'
 
 ---@class WarcraftParticipant
 ---@field player string
@@ -113,7 +113,7 @@ function MatchFunctions.adjustOpponent(opponent, opponentIndex)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
@@ -168,7 +168,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	local extradata = {}
@@ -224,7 +224,7 @@ function MapFunctions.calculateMapScore(map)
 end
 
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]?
 function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
@@ -237,7 +237,7 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return WarcraftParticipant[]
 function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
@@ -257,7 +257,9 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 		end,
 		function(playerIndex, playerIdData, playerInputData)
 			local prefix = 't' .. opponentIndex .. 'p' .. playerIndex
+			local isRandom = Logic.readBool(mapInput[prefix .. 'random'])
 			local faction = Faction.read(mapInput[prefix .. 'race'])
+				or (isRandom and Faction.read(RANDOM_FACTION))
 				or (playerIdData.extradata or {}).faction or Faction.defaultFaction
 			local link = playerIdData.name or playerInputData.link or playerInputData.name:gsub(' ', '_')
 			return {
@@ -265,7 +267,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 				player = link,
 				flag = Flags.CountryName{flag = playerIdData.flag},
 				position = playerIndex,
-				random = Logic.readBool(mapInput[prefix .. 'random']),
+				random = isRandom,
 				heroes = MapFunctions.readHeroes(
 					mapInput[prefix .. 'heroes'],
 					faction,
@@ -294,7 +296,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return WarcraftParticipant[]
 function MapFunctions.getPartyMapPlayers(mapInput, opponent, opponentIndex)
@@ -324,7 +326,7 @@ end
 
 ---@param match table
 ---@param map table # has map.opponents as the games opponents
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return string
 function MapFunctions.getMapMode(match, map, opponents)
 	local playerCounts = Array.map(map.opponents or {}, MapFunctions.getMapOpponentSize)
@@ -343,7 +345,7 @@ FfaMapFunctions.getMapMode = MapFunctions.getMapMode
 
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
@@ -434,7 +436,7 @@ function FfaMatchFunctions.parseSettings(match, numberOfOpponents)
 	return settings
 end
 
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@param match table
 function FfaMatchFunctions.adjustOpponent(opponent, opponentIndex, match)
@@ -445,7 +447,7 @@ function FfaMatchFunctions.adjustOpponent(opponent, opponentIndex, match)
 	end
 end
 
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param games table[]
 ---@return fun(opponentIndex: integer): integer?
 function FfaMatchFunctions.calculateMatchScore(opponents, games)
@@ -461,7 +463,7 @@ function FfaMatchFunctions.calculateMatchScore(opponents, games)
 end
 
 ---@param match table
----@param opponents {score: integer?}[]
+---@param opponents MGIParsedOpponent[]
 ---@return boolean
 function FfaMatchFunctions.matchIsFinished(match, opponents)
 	if MatchGroupInputUtil.isNotPlayed(match.winner, match.finished) then
@@ -487,7 +489,7 @@ function FfaMatchFunctions.matchIsFinished(match, opponents)
 	return FfaMatchFunctions.placementHasBeenSet(opponents)
 end
 
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return boolean
 function FfaMatchFunctions.placementHasBeenSet(opponents)
 	return Array.all(opponents, function(opponent) return Logic.isNumeric(opponent.placement) end)
@@ -495,12 +497,11 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param settings table
 ---@return table
 function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
 	return {
-		casters = MatchGroupInputUtil.readCasters(match),
 		ffa = 'true',
 		placementinfo = settings.placementInfo,
 		settings = settings.settings,
@@ -508,7 +509,7 @@ function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param scoreSettings table
 ---@return table[]
 function FfaMatchFunctions.extractMaps(match, opponents, scoreSettings)
@@ -549,7 +550,7 @@ function FfaMapFunctions.getExtraData(match, map, opponents)
 end
 
 ---@param map table
----@param matchOpponent table
+---@param matchOpponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table
 function FfaMapFunctions.readMapOpponent(map, matchOpponent, opponentIndex)

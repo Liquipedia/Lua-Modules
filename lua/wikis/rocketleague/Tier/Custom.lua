@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:Tier/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Tier = Lua.import('Module:Tier/Utils')
 

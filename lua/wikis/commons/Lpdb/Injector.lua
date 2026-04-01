@@ -1,12 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Lpdb/Injector
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 --- @class LpdbInjector: BaseClass
 local Injector = Class.new()

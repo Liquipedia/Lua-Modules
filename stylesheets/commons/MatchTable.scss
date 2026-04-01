@@ -1,0 +1,14 @@
+/*******************************************************************************
+Template(s): MatchTable
+*******************************************************************************/
+.recent-matches-bg-win {
+	background-color: var( --table-green-background-color, #f0fff0 ) !important;
+}
+
+.recent-matches-bg-tie {
+	background-color: var( --table-yellow-background-color, #f9f9c7 ) !important;
+}
+
+.recent-matches-bg-lose {
+	background-color: var( --table-red-background-color, #f9f0f2 ) !important;
+}

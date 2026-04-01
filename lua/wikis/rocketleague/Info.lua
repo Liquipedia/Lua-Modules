@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -52,6 +51,9 @@ return {
 		},
 		transfers = {
 			showTeamName = true,
+		},
+		participants = {
+			defaultPlayerNumber = 3,
 		},
 	},
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',

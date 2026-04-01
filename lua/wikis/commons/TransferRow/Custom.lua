@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:TransferRow/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
 
 local TransferRow = Lua.import('Module:TransferRow')
 

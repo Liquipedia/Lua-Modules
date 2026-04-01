@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Weapon/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Weapon = Lua.import('Module:Infobox/Weapon')
 
@@ -15,7 +15,7 @@ local Weapon = Lua.import('Module:Infobox/Weapon')
 local CustomWeapon = Class.new(Weapon)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomWeapon.run(frame)
 	local weapon = CustomWeapon(frame)
 	return weapon:createInfobox()

@@ -1,22 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=tft
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local VALID_PUBLISHERTIERS = {'sponsored'}
@@ -34,7 +34,7 @@ local DEFAULT_MODE = GAME_MODES.solo
 local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -50,14 +50,14 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Teams', content = {args.team_number}},
-			Cell{name = 'Players', content = {args.participants_number}}
+			Cell{name = 'Teams', children = {args.team_number}},
+			Cell{name = 'Players', children = {args.participants_number}}
 		)
 	elseif id == 'gamesettings' then
 		Array.appendWith(widgets,
-			Cell{name = 'Game', content = {Game.name{game = args.game}}},
-			Cell{name = 'Patch', content = {self.caller:_createPatchCell(args)}},
-			Cell{name = 'Game Mode', content = {args.mode}}
+			Cell{name = 'Game', children = {Game.name{game = args.game}}},
+			Cell{name = 'Patch', children = {self.caller:_createPatchCell(args)}},
+			Cell{name = 'Game Mode', children = {args.mode}}
 		)
 	end
 

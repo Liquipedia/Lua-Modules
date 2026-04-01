@@ -1,21 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=heroes
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Flags = require('Module:Flags')
 local Lua = require('Module:Lua')
-local PageLink = require('Module:Page')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Flags = Lua.import('Module:Flags')
+local PageLink = Lua.import('Module:Page')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
@@ -25,7 +25,7 @@ local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -40,11 +40,11 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
-		table.insert(widgets, Cell{name = 'Teams', content = {(args.team_number)}})
+		table.insert(widgets, Cell{name = 'Teams', children = {(args.team_number)}})
 	elseif id == 'gamesettings' then
 		local server = args.server
 		if server then
-			return {Cell{name = 'Server', content = {
+			return {Cell{name = 'Server', children = {
 				Flags.Icon{flag = server} .. '&nbsp;' .. Flags.CountryName{flag = server}
 			}}}
 		end

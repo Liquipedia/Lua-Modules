@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:ResultsTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Tier = Lua.import('Module:Tier/Custom')
 
@@ -21,8 +21,10 @@ local CustomResultsTable = {}
 
 -- Template entry point for results and achievements tables
 ---@param args table
----@return Html
+---@return Widget
 function CustomResultsTable.results(args)
+	args.gameIcons = true
+	args.showType = true
 	local resultsTable = ResultsTable(args)
 
 	resultsTable.tierDisplay = CustomResultsTable.tierDisplay
@@ -32,8 +34,10 @@ end
 
 -- Template entry point for awards tables
 ---@param args table
----@return Html
+---@return Widget
 function CustomResultsTable.awards(args)
+	args.gameIcons = true
+	args.showType = true
 	local awardsTable = AwardsTable(args)
 
 	awardsTable.tierDisplay = CustomResultsTable.tierDisplay

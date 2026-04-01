@@ -1,27 +1,30 @@
 ---
 -- @Liquipedia
--- wiki=smash
 -- page=Module:Infobox/Series/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Series = Lua.import('Module:Infobox/Series')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
+---@class SmashSeriesInfoboxWidgetInjector: WidgetInjector
+---@field caller SmashSeriesInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@class SmashSeriesInfobox: SeriesInfobox
+---@operator call(Frame): SmashSeriesInfobox
 local CustomSeries = Class.new(Series)
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomSeries.run(frame)
 	local series = CustomSeries(frame)
 	series:setWidgetInjector(CustomInjector(series))
@@ -43,7 +46,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Type',
-				content = {mw.language.getContentLanguage():ucfirst(self.caller.args.type or '')}
+				children = {mw.language.getContentLanguage():ucfirst(self.caller.args.type or '')}
 		}}
 	end
 

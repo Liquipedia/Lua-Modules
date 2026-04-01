@@ -1,18 +1,18 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Tool
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
+
+local Class = Lua.import('Module:Class')
+local Namespace = Lua.import('Module:Namespace')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -21,17 +21,18 @@ local Center = Widgets.Center
 local UNKNOWN = 'Unknown'
 
 ---@class ToolInfobox:BasicInfobox
+---@operator call(Frame): ToolInfobox
 local Tool = Class.new(BasicInfobox)
 
 ---Entry point of tool infobox
 ---@param frame Frame
----@return Html
+---@return Widget
 function Tool.run(frame)
 	local tool = Tool(frame)
 	return tool:createInfobox()
 end
 
----@return string
+---@return Widget
 function Tool:createInfobox()
 	local args = self.args
 
@@ -43,13 +44,13 @@ function Tool:createInfobox()
 		},
 		Center{children = {args.caption}},
 		Title{children = 'Tool Information'},
-		Cell{name = 'Game', content = {
+		Cell{name = 'Game', children = {
 				(args.game or args.defaultGame) .. (args.gameversion and (' ' .. args.gameversion) or '')
 		}},
-		Cell{name = 'Creator', content = {args.creator or UNKNOWN}},
-		Cell{name = 'Current Version', content = {args.version or UNKNOWN}},
-		Cell{name = 'Thread', content = {args.thread and ('[' .. args.thread .. ' Thread]') or nil}},
-		Cell{name = 'Download', content = {args.download}},
+		Cell{name = 'Creator', children = {args.creator or UNKNOWN}},
+		Cell{name = 'Current Version', children = {args.version or UNKNOWN}},
+		Cell{name = 'Thread', children = {args.thread and ('[' .. args.thread .. ' Thread]') or nil}},
+		Cell{name = 'Download', children = {args.download}},
 		Center{children = {args.footnotes and ('<small>' .. args.footnotes .. '</small>') or nil}},
 	}
 
@@ -57,7 +58,7 @@ function Tool:createInfobox()
 		self:categories('Tools', unpack(self:getWikiCategories(args)))
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Tool')
 end
 
 --- Allows for overriding this functionality

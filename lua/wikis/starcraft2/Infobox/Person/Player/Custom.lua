@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,43 +7,42 @@
 
 -- This module is used for both the Player and Commentator infoboxes
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Faction = require('Module:Faction')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Lpdb = require('Module:Lpdb')
-local MatchTicker = require('Module:MatchTicker/Custom')
-local Math = require('Module:MathUtil')
-local Set = require('Module:Set')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
-local YearsActive = require('Module:YearsActive')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Faction = Lua.import('Module:Faction')
+local Info = Lua.import('Module:Info', {loadData = true})
+local Json = Lua.import('Module:Json')
+local Lpdb = Lua.import('Module:Lpdb')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
+local Math = Lua.import('Module:MathUtil')
+local Page = Lua.import('Module:Page')
+local Set = Lua.import('Module:Set')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
+local YearsActive = Lua.import('Module:YearsActive')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local CustomPerson = Lua.import('Module:Infobox/Person/Custom')
-local Opponent = Lua.import('Module:Opponent/Starcraft')
-local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
+local Opponent = Lua.import('Module:Opponent/Custom')
 
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
-
-local EPT_SEASON = mw.loadData('Module:Series/EPT/config').currentSeason
+local ConditionUtil = Condition.Util
 
 local ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
-local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 20
+local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = Info.config.defaultMaxPlayersPerPlacement
 local MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS = 10
-local MAXIMUM_NUMBER_OF_ACHIEVEMENTS = 30
-local NUMBER_OF_RECENT_MATCHES = 10
+local NUMBER_OF_RECENT_MATCHES = 5
 
 --race stuff
 local RACE_FIELD_AS_CATEGORY_LINK = true
@@ -72,22 +70,12 @@ local CustomPlayer = Class.new(CustomPerson)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	player.shouldQueryData = player:shouldStoreData(player.args)
-
-	player.args.autoTeam = Logic.emptyOr(player.args.autoTeam, true)
-
-	player.args.history = Logic.nilIfEmpty(player.args.history) or TeamHistoryAuto.results{
-		player = player.pagename,
-		convertrole = true,
-		addlpdbdata = Logic.emptyOr(player.args.addlpdbdata, true),
-		cleanRoles = 'Module:TeamHistoryAuto/cleanRole',
-		specialRoles = true,
-	}
 
 	if player.shouldQueryData then
 		player:_getMatchupData(player.pagename)
@@ -104,31 +92,28 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'custom' then
-		local ranks = caller:_getRank()
 		local currentYearEarnings = caller.earningsPerYear[CURRENT_YEAR] or 0
 
 		return {
 			Cell{
 				name = 'Approx. Winnings ' .. CURRENT_YEAR,
-				content = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
+				children = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
 			},
-			Cell{name = ranks[1].name or 'Rank', content = {ranks[1].rank}},
-			Cell{name = ranks[2].name or 'Rank', content = {ranks[2].rank}},
-			Cell{name = 'Military Service', content = {args.military}},
+			Cell{name = 'Military Service', children = {args.military}},
 			Cell{
 				name = Abbreviation.make{text = 'Years Active', title = 'Years active as a player'},
-				content = {caller.yearsActive}
+				children = {caller.yearsActive}
 			},
 			Cell{
 				name = Abbreviation.make{text = 'Years Active (caster)', title = 'Years active as a caster'},
-				content = {self.caller:_getActiveCasterYears()}
+				children = {self.caller:_getActiveCasterYears()}
 			},
 		}
 	elseif id == 'status' then
 		return {
 			Cell{
 				name = 'Race',
-				content = {caller:getRaceData(args.race or 'unknown', RACE_FIELD_AS_CATEGORY_LINK)}
+				children = {caller:getRaceData(args.race, RACE_FIELD_AS_CATEGORY_LINK)}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -142,11 +127,11 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Title{children = 'Achievements'},
 			Center{children = {Achievements.display(caller.infoboxAchievements)}},
-			Cell{name = 'All-Kills', content = {allkills > 0 and (ALL_KILL_ICON .. allkills) or nil}}
+			Cell{name = 'All-Kills', children = {allkills > 0 and (ALL_KILL_ICON .. allkills) or nil}}
 		}
 	elseif id == 'achievements' then return {}
 	elseif id == 'history' and string.match(args.retired or '', '%d%d%d%d') then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+		table.insert(widgets, Cell{name = 'Retired', children = {args.retired}})
 	end
 
 	return widgets
@@ -158,7 +143,7 @@ function CustomPlayer:_getActiveCasterYears()
 
 	local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 		query = 'year::date',
-		conditions = '[[page::' .. self.pagename .. ']] OR [[page::' .. self.pagename:gsub(' ', '_') .. ']]',
+		conditions = '[[page::' .. Page.applyUnderScoresIfEnforced(self.pagename) .. ']]',
 		limit = 5000,
 	})
 
@@ -175,7 +160,10 @@ end
 ---@return Html?
 function CustomPlayer:createBottomContent()
 	if self.shouldQueryData then
-		return MatchTicker.participant({player = self.pagename}, self.recentMatches)
+		return MatchTicker.recent({
+			player = self.pagename,
+			limit = NUMBER_OF_RECENT_MATCHES
+		})
 	end
 end
 
@@ -185,8 +173,7 @@ function CustomPlayer:_getMatchupData(player)
 	self.recentMatches = {}
 	self.stats = {total = {}}
 
-	player = player:gsub(' ', '_')
-	local playerWithoutUnderscore = player:gsub('_', ' ')
+	player = Page.applyUnderScoresIfEnforced(player)
 
 	local years = Set{}
 
@@ -203,7 +190,7 @@ function CustomPlayer:_getMatchupData(player)
 			return
 		end
 
-		self:_addToStats(match, player, playerWithoutUnderscore)
+		self:_addToStats(match, player)
 	end
 
 	Lpdb.executeMassQuery('match2', {
@@ -212,7 +199,7 @@ function CustomPlayer:_getMatchupData(player)
 			'[[winner::!]]', -- expect a winner
 			'[[status::!notplayed]]', -- i.e. ignore not played matches
 			'[[date::!' .. DateExt.defaultDate .. ']]', --i.e. wrongly set up
-			'([[opponent::' .. player .. ']] OR [[opponent::' .. playerWithoutUnderscore .. ']])'
+			'([[opponent::' .. player .. ']])'
 		}, ' AND '),
 		order = 'date desc',
 		query = table.concat({
@@ -241,8 +228,7 @@ end
 
 ---@param match match2
 ---@param player string
----@param playerWithoutUnderscore string
-function CustomPlayer:_addToStats(match, player, playerWithoutUnderscore)
+function CustomPlayer:_addToStats(match, player)
 	local opponents = match.match2opponents
 
 	--catch matches vs empty opponents and literals
@@ -250,7 +236,7 @@ function CustomPlayer:_addToStats(match, player, playerWithoutUnderscore)
 		return
 	end
 
-	local playerIndex = (opponents[1].name == player or opponents[1].name == playerWithoutUnderscore) and 1 or 2
+	local playerIndex = opponents[1].name == player and 1 or 2
 	local playerOpponent = opponents[playerIndex]
 	local vsOpponent = opponents[3 - playerIndex]
 
@@ -310,30 +296,17 @@ function CustomPlayer:calculateEarnings(args)
 		self:_addToMedals(placement, fallBackAchievements)
 	end
 
-	local player = self.pagename
-	local playerWithUnderScores = player:gsub(' ', '_')
+	local player = Page.applyUnderScoresIfEnforced(self.pagename)
 
-	local playerConditions = ConditionTree(BooleanOperator.any)
-	Array.forEach(Array.range(1, MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS), function (playerIndex)
-		playerConditions:add({
-			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, player),
-			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, playerWithUnderScores),
-		})
-	end)
-
-	local placementConditions = ConditionTree(BooleanOperator.any)
-	for _, item in pairs(ALLOWED_PLACES) do
-		placementConditions:add({
-			ConditionNode(ColumnName('placement'), Comparator.eq, item),
-		})
-	end
+	local playerConditions = ConditionTree(BooleanOperator.any):add{
+		ConditionNode(ColumnName('opponentname'), Comparator.eq, player),
+		Array.map(Array.range(1, MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS), function (playerIndex)
+			return ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, player)
+		end)
+	}
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('opponentname'), Comparator.eq, player),
-			ConditionNode(ColumnName('opponentname'), Comparator.eq, playerWithUnderScores),
-			playerConditions,
-		},
+		playerConditions,
 		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
 		ConditionNode(ColumnName('liquipediatier'), Comparator.neq, '-1'),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
@@ -342,7 +315,7 @@ function CustomPlayer:calculateEarnings(args)
 			ConditionNode(ColumnName('extradata_award'), Comparator.neq, ''),
 			ConditionTree(BooleanOperator.all):add{
 				ConditionNode(ColumnName('opponenttype'), Comparator.gt, Opponent.solo),
-				placementConditions,
+				ConditionUtil.anyOf(ColumnName('placement'), ALLOWED_PLACES),
 			},
 		},
 	}
@@ -461,49 +434,8 @@ end
 function CustomPlayer:_isAchievement(placement, tier, place)
 	if not Table.includes(ALLOWED_PLACES, placement.placement) or not place then return false end
 
-	return tier == 1 and place <= 4
-		or tier == 2 and place <= 2
-		or #self.achievements < MAXIMUM_NUMBER_OF_ACHIEVEMENTS and (
-			tier == 2 and place <= 4 or
-			tier == 3 and place <= 2 or
-			tier == 4 and place <= 1
-		)
-end
-
----@return {name:string?, rank: string?}[]
-function CustomPlayer:_getRank()
-	if not self.shouldQueryData then return {{}, {}} end
-
-	local rankRegion = require('Module:EPT player region ' .. EPT_SEASON)[self.pagename]
-		or {'noregion'}
-	local typeCond = '([[type::EPT ' ..
-		table.concat(rankRegion, ' ranking ' .. EPT_SEASON .. ']] OR [[type::EPT ')
-		.. ' ranking ' .. EPT_SEASON .. ']])'
-
-	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = '[[name::' .. self.pagename .. ']] AND ' .. typeCond,
-		query = 'extradata, information, pagename',
-		limit = 10
-	})
-
-	if type(data[1]) ~= 'table' then return {{}, {}} end
-
-	---@param dataSet datapoint
-	---@return {name:string?, rank: string?}
-	local getRankDisplay = function(dataSet)
-		local extradata = (dataSet or {}).extradata or {}
-		if not extradata.rank then return {} end
-
-		return {
-			name = 'EPT ' .. (dataSet.information or '') .. ' rank',
-			rank = '[[' .. dataSet.pagename .. '|#' .. extradata.rank .. ' (' .. extradata.points .. ' points)]]'
-		}
-	end
-
-	return {
-		getRankDisplay(data[1]),
-		getRankDisplay(data[2]),
-	}
+	return tier == 1 and place <= 2
+		or tier == 2 and place == 1
 end
 
 ---@return number?
@@ -511,7 +443,7 @@ function CustomPlayer:_getAllkills()
 	if not self.shouldQueryData then return end
 
 	local allkillsData = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = '[[pagename::' .. self.pagename:gsub(' ', '_') .. ']] AND [[type::allkills]]',
+		conditions = '[[pagename::' .. Page.applyUnderScoresIfEnforced(self.pagename) .. ']] AND [[type::allkills]]',
 		query = 'information',
 		limit = 1
 	})

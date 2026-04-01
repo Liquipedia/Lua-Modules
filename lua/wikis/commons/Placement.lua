@@ -1,15 +1,29 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Placement
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
-local Ordinal = require('Module:Ordinal')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
+local Ordinal = Lua.import('Module:Ordinal')
+local Table = Lua.import('Module:Table')
+
+local Span = HtmlWidgets.Span
+
+---@class rawPlacement
+---@field backgroundClass string?
+---@field blackText boolean
+---@field display string
+---@field ordinal string[]
+---@field placement string[]
+---@field sort string
+---@field unknown boolean?
 
 local Placement = {}
 
@@ -21,8 +35,8 @@ local PLACEMENT_CLASSES = {
 	['2'] = 'placement-2',
 	['3'] = 'placement-3',
 	['4'] = 'placement-4',
-	['5'] = 'placement-lightblue',
-	['6'] = 'placement-lightblue',
+	['5'] = 'placement-5',
+	['6'] = 'placement-6',
 	['7'] = 'placement-lightblue',
 	['8'] = 'placement-lightblue',
 	['9'] = 'placement-blue',
@@ -99,8 +113,8 @@ local USE_BLACK_TEXT = {
 
 ---Processes a placement text input into raw data.
 ---Returned table will not always contain every key.
----@param placement string?
----@return table
+---@param placement string|integer?
+---@return rawPlacement
 function Placement.raw(placement)
 	local raw = {}
 
@@ -110,16 +124,21 @@ function Placement.raw(placement)
 	-- Identify appropriate background class
 	if PLACEMENT_CLASSES[raw.placement[1]] then
 		raw.backgroundClass = PLACEMENT_CLASSES[raw.placement[1]]
-	elseif Logic.isNumeric(raw.placement[1]) and tonumber(raw.placement[1]) <= 128 then
-		raw.backgroundClass = PLACEMENT_CLASSES['17']
-	elseif Logic.isNumeric(raw.placement[1]) then
-		raw.backgroundClass = PLACEMENT_CLASSES['129']
+	elseif MathUtil.isInteger(raw.placement[1]) then
+		local parsedPlacement = MathUtil.toInteger(raw.placement[1])
+		if parsedPlacement <= 0 then
+			raw.unknown = true
+		elseif parsedPlacement <= 128 then
+			raw.backgroundClass = PLACEMENT_CLASSES['17']
+		else
+			raw.backgroundClass = PLACEMENT_CLASSES['129']
+		end
 	else
 		raw.unknown = true
 	end
 
 	-- Intercept non-numeric placements for sorting and ordinal creation
-	if not Logic.isNumeric(raw.placement[1]) then
+	if not MathUtil.isInteger(raw.placement[1]) then
 		raw.sort = CUSTOM_SORTS[raw.placement[1]] or CUSTOM_SORTS['']
 		raw.ordinal = mw.text.split(string.upper(placement or ''), '-', true)
 	else
@@ -132,7 +151,8 @@ function Placement.raw(placement)
 		raw.display = raw.ordinal[1] .. (raw.ordinal[2] and ('&nbsp;-&nbsp;' .. raw.ordinal[2]) or '')
 	else
 		mw.log('No placement found in Module:Placement: ' .. placement)
-		raw.display = placement .. '[[Category:Pages with unknown placements]]'
+		mw.ext.TeamLiquidIntegration.add_category('Pages with unknown placements')
+		raw.display = placement
 	end
 
 	-- Determine any black text placements
@@ -143,7 +163,7 @@ end
 
 ---Takes a table of placement numbers and makes them ordinal.
 ---@param placement number[]
----@return table
+---@return table<number, string>
 function Placement._makeOrdinal(placement)
 	return Table.mapValues(placement,
 		function(place)
@@ -155,7 +175,7 @@ end
 
 ---Takes parent mw html object and childs a placement.
 ---Expected args fields are `parent` and `placement`.
----@param args table?
+---@param args {placement: string|integer?, parent: Html, text: string?}
 function Placement._placement(args)
 	if not (type(args) == 'table' and type(args.parent) == 'table') then
 		return
@@ -163,6 +183,8 @@ function Placement._placement(args)
 	local raw = Placement.raw(args.placement or '')
 	args.parent:css('text-align', 'center')
 				:attr('data-sort-value', raw.sort)
+				:tag('span')
+				:addClass('placement-box')
 				:addClass(raw.backgroundClass)
 				:tag('b')
 				:addClass(not raw.blackText and 'placement-text' or nil)
@@ -194,8 +216,37 @@ end
 ---@return string
 function Placement.get(args)
 	local raw = Placement.raw(args.placement)
-	return 'class="text-center ' .. (raw.backgroundClass or '') .. '" data-sort-value="' .. raw.sort .. '"' ..
-		'|<b' .. (raw.blackText and '' or ' class="placement-text"') .. '>' .. (args.customText or raw.display) .. '</b>'
+	return 'class="text-center" data-sort-value="' .. raw.sort .. '"' ..
+		'|<span class="placement-box ' .. (raw.backgroundClass or '') ..
+		'"><b' .. (raw.blackText and '' or ' class="placement-text"') ..
+		'>' .. (args.customText or raw.display) .. '</b></span>'
 end
 
-return Class.export(Placement, {exports = {'getBgClass', 'get', 'RangeLabel'}})
+---Returns a Widget span for placement display in the Widget system.
+---@param raw rawPlacement
+---@param text string?
+---@return Widget
+function Placement.renderRawInWidget(raw, text)
+	local content = raw.display .. (Logic.isNotEmpty(text) and (' ' .. text) or '')
+
+	return Span{
+		classes = {'placement-box', raw.backgroundClass},
+		children = raw.blackText and {content} or {
+			Span{
+				classes = {'placement-text'},
+				children = content
+			}
+		}
+	}
+end
+
+---Returns a Widget span for placement display in the Widget system.
+---@param args {placement: string|integer?, text: string?}
+---@return Widget
+function Placement.renderInWidget(args)
+	local raw = Placement.raw(args.placement or '')
+
+	return Placement.renderRawInWidget(raw, args.text)
+end
+
+return Class.export(Placement, {exports = {'getBgClass', 'get', 'RangeLabel', 'renderRawInWidget', 'renderInWidget'}})

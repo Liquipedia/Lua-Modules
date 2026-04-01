@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -45,6 +44,20 @@ return {
 				-- luacheck: pop
 				display = 'VALORANT Champions Tour Global Contract Database'
 			},
+		},
+		teamRosterNavbox = {
+			links = {
+				playedMatches = 'Matches',
+			},
+		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'automatic',
+			},
+		},
+		participants = {
+			defaultPlayerNumber = 5,
 		},
 	},
 }

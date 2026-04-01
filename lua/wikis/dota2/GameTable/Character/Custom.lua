@@ -1,18 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:GameTable/Character/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
+local Class = Lua.import('Module:Class')
 
 local GameTableCharacter = Lua.import('Module:GameTable/Character')
 
+local Link = Lua.import('Module:Widget/Basic/Link')
+
 ---@class Dota2CharacterGameTable: CharacterGameTable
+---@operator call(table): Dota2CharacterGameTable
 local CustomCharacterGameTable = Class.new(GameTableCharacter)
 
 ---@return integer
@@ -27,8 +30,15 @@ function CustomCharacterGameTable:getCharacterKey(opponentIndex, playerIndex)
 	return 'team' .. opponentIndex .. 'hero' .. playerIndex
 end
 
+---@protected
+---@param game CharacterGameTableGame
+---@return Widget?
+function CustomCharacterGameTable:getPatchLink(game)
+	return Link{link = 'Version ' .. game.patch, children = game.patch}
+end
+
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomCharacterGameTable.results(frame)
 	local args = Arguments.getArgs(frame)
 

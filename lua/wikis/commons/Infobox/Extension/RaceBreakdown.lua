@@ -1,14 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Extension/RaceBreakdown
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Faction = require('Module:Faction')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Faction = Lua.import('Module:Faction')
+local Table = Lua.import('Module:Table')
 
 local RaceBreakdown = {}
 

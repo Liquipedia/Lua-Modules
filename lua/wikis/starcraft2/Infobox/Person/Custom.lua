@@ -1,23 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:Infobox/Person/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
---Extends the Infobox/Person class with shared functions between SC2 person infoboxes
-
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Faction = require('Module:Faction')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Faction = Lua.import('Module:Faction')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local Person = Lua.import('Module:Infobox/Person')
 
@@ -25,22 +24,6 @@ local STATUS_ACTIVE = 'Active'
 local RACE_ALL = 'All'
 local RACE_ALL_SHORT = 'a'
 local RACE_ALL_ICON = '[[File:RaceIcon All.png|30px|link=]]'
-
---role stuff tables
-local ROLES = {
-	['admin'] = 'Admin', ['analyst'] = 'Analyst', ['coach'] = 'Coach',
-	['commentator'] = 'Commentator', ['caster'] = 'Commentator',
-	['expert'] = 'Analyst', ['host'] = 'Host', ['streamer'] = 'Streamer',
-	['interviewer'] = 'Interviewer', ['journalist'] = 'Journalist',
-	['manager'] = 'Manager', ['player'] = 'Player',
-	['map maker'] = 'Map maker', ['mapmaker'] = 'Map maker',
-	['observer'] = 'Observer', ['photographer'] = 'Photographer',
-	['tournament organizer'] = 'Organizer', ['organizer'] = 'Organizer',
-}
-local CLEAN_OTHER_ROLES = {
-	['blizzard'] = 'Blizzard', ['coach'] = 'Coach', ['staff'] = 'false',
-	['content producer'] = 'Content producer', ['streamer'] = 'false',
-}
 
 local MILITARY_DATA = {
 	starting = {category = 'Persons waiting for Military Duty', storeValue = 'pending'},
@@ -60,7 +43,7 @@ local CustomPerson = Class.new(Person)
 function CustomPerson:shouldStoreData(args)
 	if
 		Logic.readBool(args.disable_lpdb) or Logic.readBool(args.disable_storage)
-		or Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+		or Lpdb.isStorageDisabled()
 		or not Namespace.isMain()
 	then
 		Variables.varDefine('disable_LPDB_storage', 'true')
@@ -133,8 +116,6 @@ function CustomPerson:adjustLPDB(lpdbData, args, personType)
 	extradata.faction2 = (not raceData.isAll) and raceData.factions[2] or nil
 	extradata.lc_id = string.lower(self.pagename)
 	extradata.teamname = args.team
-	extradata.role = args.role
-	extradata.role2 = args.role2
 	extradata.militaryservice = self:military(args.military).storeValue
 	extradata.activeplayer = CustomPerson:getStatusToStore(args) == STATUS_ACTIVE
 		and CustomPerson._isPlayer(args)
@@ -169,24 +150,6 @@ function CustomPerson:military(military)
 	end
 
 	return {}
-end
-
----@param args table
----@return {store: string, category: string}
-function CustomPerson:getPersonType(args)
-	if args.isplayer == 'true' then
-		return {store = 'Player', category = 'Player'}
-	end
-
-	local role = args.role or args.occupation or args.defaultPersonType
-	role = string.lower(role or '')
-	local category = ROLES[role]
-	local store = category or CLEAN_OTHER_ROLES[role] or args.defaultPersonType
-	if category == ROLES['map maker'] then
-		category = 'Mapmaker'
-	end
-
-	return {store = store, category = category or args.defaultPersonType}
 end
 
 return CustomPerson

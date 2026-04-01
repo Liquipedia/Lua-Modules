@@ -1,18 +1,18 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Item
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
+
+local Class = Lua.import('Module:Class')
+local Namespace = Lua.import('Module:Namespace')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -20,16 +20,17 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
 ---@class ItemInfobox: BasicInfobox
+---@operator call(Frame): ItemInfobox
 local Item = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function Item.run(frame)
 	local item = Item(frame)
 	return item:createInfobox()
 end
 
----@return string
+---@return Widget
 function Item:createInfobox()
 	local args = self.args
 
@@ -57,44 +58,24 @@ function Item:createInfobox()
 			id = 'info',
 			children = {
 				Title{children = 'Item Information'},
-				Cell{name = 'Type', content = {args.type}},
-				Cell{name = 'Rarity', content = {args.rarity}},
-				Cell{name = 'Level', content = {args.level}},
-				Cell{name = 'Class', content = {args.class}},
-				Cell{name = 'Cost', content = {args.cost}},
-				Cell{name = 'Released', content = {args.release}},
+				Cell{name = 'Type', children = {args.type}},
+				Cell{name = 'Rarity', children = self:getAllArgsForBase(args, 'rarity')},
+				Cell{name = 'Level', children = {args.level}},
+				Cell{name = 'Class', children = {args.class}},
+				Cell{name = 'Cost', children = {args.cost}},
 			}
 		},
 		Customizable{
-			id = 'attributes',
+			id = 'released',
 			children = {
-				Title{children = 'Attributes'},
-			}
+				Cell{name = 'Released', children = {args.release}}
+			},
 		},
-		Customizable{
-			id = 'ability',
-			children = {
-				Title{children = 'Ability'},
-			}
-		},
-		Customizable{
-			id = 'availability',
-			children = {
-				Title{children = 'Availability'},
-			}
-		},
-		Customizable{
-			id = 'maps',
-			children = {
-				Title{children = 'Maps'},
-			}
-		},
-		Customizable{
-			id = 'recipe',
-			children = {
-				Title{children = 'Recipe'},
-			}
-		},
+		Customizable{id = 'attributes', children = {}},
+		Customizable{id = 'ability', children = {}},
+		Customizable{id = 'availability', children = {}},
+		Customizable{id = 'maps', children = {}},
+		Customizable{id = 'recipe', children = {}},
 		Customizable{id = 'custom', children = {}},
 		Center{children = {args.footnotes}},
 	}
@@ -106,7 +87,7 @@ function Item:createInfobox()
 		self:setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Item')
 end
 
 ---@param args table

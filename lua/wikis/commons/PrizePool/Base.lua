@@ -1,29 +1,32 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:PrizePool/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
-local LeagueIcon = require('Module:LeagueIcon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Json = Lua.import('Module:Json')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local MathUtil = Lua.import('Module:MathUtil')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Tournament = Lua.import('Module:Tournament')
+local Variables = Lua.import('Module:Variables')
 
 local Currency = Lua.import('Module:Currency')
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Widgets = Lua.import('Module:Widget/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -37,6 +40,9 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local pageVars = PageVariableNamespace('PrizePool')
 
 --- @class BasePrizePool
+--- @operator call(...): BasePrizePool
+--- @field options table
+--- @field _lpdbInjector LpdbInjector?
 local BasePrizePool = Class.new(function(self, ...) self:init(...) end)
 
 ---@class BasePrizePoolPrize
@@ -44,8 +50,6 @@ local BasePrizePool = Class.new(function(self, ...) self:init(...) end)
 ---@field type string
 ---@field index integer
 ---@field data table
-
-local TODAY = os.date('%Y-%m-%d') --[[@as string]]
 
 local LANG = mw.language.getContentLanguage()
 local DASH = '&#045;'
@@ -85,19 +89,26 @@ BasePrizePool.config = {
 	cutafter = {
 		default = 4,
 		read = function(args)
-			return tonumber(args.cutafter)
+			return MathUtil.toInteger(args.cutafter)
+		end
+	},
+	hideafter = {
+		default = math.huge,
+		read = function(args)
+			local hideAfter = MathUtil.toInteger(args.hideafter)
+			local cutAfter = MathUtil.toInteger(args.cutafter) or 4
+			if not hideAfter then
+				return
+			end
+			return math.max(cutAfter, hideAfter)
 		end
 	},
 	storeLpdb = {
 		default = true,
 		read = function(args)
-			local disabledVariable = Logic.readBoolOrNil(Variables.varDefault('disable_LPDB_storage'))
-			if disabledVariable ~= nil then
-				disabledVariable = not disabledVariable
-			end
 			return Logic.nilOr(
 				Logic.readBoolOrNil(args.storelpdb),
-				disabledVariable
+				Lpdb.isStorageEnabled()
 			)
 		end
 	},
@@ -129,12 +140,6 @@ BasePrizePool.config = {
 		default = '',
 		read = function(args)
 			return args.lpdb_prefix or Variables.varDefault('lpdb_prefix')
-		end
-	},
-	abbreviateTbd = {
-		default = true,
-		read = function(args)
-			return Logic.readBoolOrNil(args.abbreviateTbd)
 		end
 	},
 	fillPlaceRange = {
@@ -251,20 +256,18 @@ BasePrizePool.prizeTypes = {
 
 		header = 'qualifies',
 		headerParse = function (prizePool, input, context, index)
-			local link = mw.ext.TeamLiquidIntegration.resolve_redirect(input):gsub(' ', '_')
-
 			-- Automatically retrieve information from the Tournament
-			local tournamentData = BasePrizePool._getTournamentInfo(link) or {}
+			local tournamentData = Tournament.getTournament(input) or {}
 			local prefix = 'qualifies' .. index
 			return {
-				link = link,
-				title = context[prefix .. 'name'] or Logic.emptyOr(
-					tournamentData.tickername,
-					tournamentData.name,
-					(tournamentData.pagename or link):gsub('_', ' '):gsub('/', ' ')
+				link = tournamentData.pageName or input:gsub(' ', '_'),
+				title = Logic.emptyOr(
+					context[prefix .. 'name'],
+					tournamentData.displayName,
+					input:gsub('_', ' '):gsub('/', ' ')
 				),
 				icon = tournamentData.icon or context[prefix .. 'icon'],
-				iconDark = tournamentData.icondark or context[prefix .. 'icondark']
+				iconDark = tournamentData.iconDark or context[prefix .. 'icondark']
 			}
 		end,
 		headerDisplay = function (data)
@@ -306,7 +309,7 @@ BasePrizePool.prizeTypes = {
 
 		header = 'points',
 		headerParse = function (prizePool, input, context, index)
-			local pointsData = Table.copy(mw.loadData('Module:Points/data')[input] or {})
+			local pointsData = Table.copy(Lua.import('Module:Points/data', {loadData = true})[input] or {})
 			pointsData.title = pointsData.title or 'Points'
 
 			-- Manual overrides
@@ -383,7 +386,7 @@ function BasePrizePool:init(args)
 	self.args = self:_parseArgs(args)
 
 	self.pagename = mw.title.getCurrentTitle().text
-	self.date = BasePrizePool._getTournamentDate()
+	self.date = DateExt.getContextualDateOrNow()
 	self.opponentType = self.args.type
 
 	self.options = {}
@@ -443,6 +446,7 @@ function BasePrizePool:create()
 	return self
 end
 
+---@protected
 ---@param args table
 function BasePrizePool:readPlacements(args)
 	error('Function readPlacements needs to be implemented by a child class of "Module:PrizePool/Base"')
@@ -588,7 +592,12 @@ function BasePrizePool:_buildTable(isAward)
 	return Div{
 		css = {['overflow-x'] = 'auto'},
 		children = {WidgetTable{
-			classes = {'collapsed', 'general-collapsible', 'prizepooltable'},
+			classes = {
+				'collapsed',
+				'general-collapsible',
+				'prizepooltable',
+				'prizepooltable-' .. (isAward and 'award' or 'placement')
+			},
 			css = {width = 'max-content'},
 			columns = headerRow:getCellCount(),
 			children = WidgetUtil.collect(headerRow, unpack(self:_buildRows()))
@@ -626,6 +635,10 @@ function BasePrizePool:_buildRows()
 
 	for _, placement in ipairs(self.placements) do
 		local previousOpponent = {}
+
+		if self:applyHideAfter(placement) then
+			break
+		end
 
 		self:applyToggleExpand(previousPlacement, placement, rows)
 
@@ -677,7 +690,6 @@ function BasePrizePool:_buildRows()
 			local opponentDisplay = tostring(OpponentDisplay.BlockOpponent{
 				opponent = opponent.opponentData,
 				showPlayerTeam = true,
-				abbreviateTbd = self.options.abbreviateTbd,
 			})
 			local opponentCss = {['justify-content'] = 'start'}
 
@@ -697,17 +709,27 @@ function BasePrizePool:_buildRows()
 	return rows
 end
 
+---@protected
 ---@param placement BasePlacement
 function BasePrizePool:placeOrAwardCell(placement)
 	error('Function placeOrAwardCell needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
+---@protected
+---@param placement BasePlacement
+---@return boolean
+function BasePrizePool:applyHideAfter(placement)
+	return false
+end
+
+---@protected
 ---@param placement BasePlacement
 ---@return boolean
 function BasePrizePool:applyCutAfter(placement)
 	error('Function applyCutAfter needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
+---@protected
 ---@param placement BasePlacement?
 ---@param nextPlacement BasePlacement
 ---@param row WidgetTableRow
@@ -751,12 +773,9 @@ function BasePrizePool:_currencyExchangeInfo()
 		end
 
 		-- The exchange date display should not be in the future, as the extension uses current date for those.
-		local exchangeDate = self.date
-		if exchangeDate > TODAY then
-			exchangeDate = TODAY
-		end
-
-		local exchangeDateText = LANG:formatDate('M j, Y', exchangeDate)
+		local exchangeDateText = DateExt.formatTimestamp(
+			'M j, Y', math.min(DateExt.getCurrentTimestamp(), DateExt.readTimestamp(self.date))
+		)
 
 		local wrapper = mw.html.create('small')
 
@@ -776,7 +795,7 @@ end
 ---@return string
 function BasePrizePool._CurrencyConvertionText(prize)
 	local exchangeRate = BasePrizePool.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToBaseCurrency(
-		prize.data, 1, BasePrizePool._getTournamentDate()
+		prize.data, 1, DateExt.getContextualDateOrNow()
 	)
 
 	return Currency.display(prize.data.currency, 1) .. ' ≃ ' ..
@@ -824,22 +843,6 @@ function BasePrizePool:assertOpponentStructType(typeStruct)
 	end
 end
 
---- Fetches the LPDB object of a tournament
----@param pageName string
----@return tournament
-function BasePrizePool._getTournamentInfo(pageName)
-	return mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = '[[pagename::' .. pageName .. ']]',
-		limit = 1,
-	})[1]
-end
-
---- Returns the default date based on wiki-variables set in the Infobox League
----@return string
-function BasePrizePool._getTournamentDate()
-	return Variables.varDefault('tournament_enddate', TODAY)
-end
-
 ---@return self
 function BasePrizePool:storeData()
 	local prizePoolIndex = (tonumber(Variables.varDefault('prizepool_index')) or 0) + 1
@@ -882,6 +885,10 @@ function BasePrizePool:storeData()
 		Array.extendWith(lpdbData, lpdbEntries)
 	end
 
+	if self.options.storeLpdb then
+		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(lpdbData))
+	end
+
 	for _, lpdbEntry in ipairs(lpdbData) do
 		lpdbEntry = Json.stringifySubTables(lpdbEntry)
 		local objectName = Table.extract(lpdbEntry, 'objectName')
@@ -891,10 +898,6 @@ function BasePrizePool:storeData()
 		end
 
 		Variables.varDefine(objectName .. '_placementdate', lpdbEntry.date)
-	end
-
-	if self.options.storeLpdb then
-		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(lpdbData))
 	end
 
 	return self

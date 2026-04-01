@@ -1,16 +1,18 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:ParticipantTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
 ---@class AoEParticipantTableEntry: ParticipantTableEntry
 ---@field seed integer?
@@ -19,31 +21,15 @@ local Operator = require('Module:Operator')
 ---@field entries AoEParticipantTableEntry[]
 
 ---@class AoEParticipantTable: ParticipantTable
+---@operator call(Frame): AoEParticipantTable
 ---@field hasSeeds boolean
----@field _createSeedList function
----@field _createTitle function
-
-local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
-
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
-
-local AoEParticipantTable = {}
+---@field sections AoEParticipantTableSection[]
+local AoEParticipantTable = Class.new(ParticipantTable)
 
 ---@param frame Frame
 ---@return Html?
 function AoEParticipantTable.run(frame)
-	local participantTable = ParticipantTable(frame) --[[@as AoEParticipantTable]]
-	participantTable.readEntry = AoEParticipantTable.readEntry
-	participantTable:read():store()
-
-	if participantTable.hasSeeds then
-		participantTable._createSeedList = AoEParticipantTable._createSeedList
-		participantTable._createTitle = AoEParticipantTable._createTitle
-		participantTable.create = AoEParticipantTable._createSeedTable
-	end
-
-	return participantTable:create()
+	return AoEParticipantTable(frame):read():store():create()
 end
 
 ---@param sectionArgs table
@@ -57,42 +43,24 @@ function AoEParticipantTable:readEntry(sectionArgs, key, index, config)
 		return sectionArgs[key .. postfix] or sectionArgs[prefix .. postfix]
 	end
 
-	--if not a json assume it is a solo opponent
-	local opponentArgs = Json.parseIfTable(sectionArgs[key]) or {
-		type = Opponent.solo,
-		name = sectionArgs[key],
-		link = valueFromArgs('link'),
-		flag = valueFromArgs('flag'),
-		team = valueFromArgs('team'),
-		dq = valueFromArgs('dq'),
-		note = valueFromArgs('note'),
-		seed = valueFromArgs('seed'),
-	}
+	local entry = ParticipantTable.readEntry(self, sectionArgs, key, index, config) --[[ @as AoEParticipantTableEntry ]]
 
-	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
-		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
+	local seed = (Json.parseIfTable(sectionArgs[key]) or {}).seed or valueFromArgs('seed')
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
-
-	if config.sortPlayers and opponent.players then
-		table.sort(opponent.players, function (player1, player2)
-			local name1 = (player1.displayName or player1.pageName):lower()
-			local name2 = (player2.displayName or player2.pageName):lower()
-			return name1 < name2
-		end)
-	end
-
-	if tonumber(opponentArgs.seed) then
+	if Logic.isNumeric(seed) then
+		entry.seed = tonumber(seed)
 		self.hasSeeds = true
 	end
 
-	return {
-		dq = Logic.readBool(opponentArgs.dq),
-		note = opponentArgs.note,
-		opponent = opponent,
-		inputIndex = index,
-		seed = tonumber(opponentArgs.seed)
-	}
+	return entry
+end
+
+---@return Html?
+function AoEParticipantTable:create()
+	if self.hasSeeds then
+		return self:_createSeedTable()
+	end
+	return ParticipantTable.create(self)
 end
 
 ---@return Html?
@@ -113,8 +81,8 @@ end
 
 ---@return Html
 function AoEParticipantTable:_createSeedList()
-	local width = tostring(50 + (self.config.showTeams and 212 or 156)) .. 'px'
-	local display = self:_createTitle('Seeding', self.config.title or 'Participants', 2, 1, width, true)
+	local width = tostring(50 + (self.config.showTeams and 242 or 186)) .. 'px'
+	local display = self:_createTitle('Seeding', self.config.title or 'Participants', 2, 1, width)
 
 	local wrapper = mw.html.create('div')
 		:addClass('participantTable-seeding')
@@ -129,11 +97,11 @@ function AoEParticipantTable:_createSeedList()
 		end
 	)
 
-	Array.forEach(entries, function (entry, index)
+	Array.forEach(entries, function (entry)
 		wrapper
 			:tag('div')
 				:addClass('participantTable-seed')
-				:wikitext(index)
+				:wikitext(entry.seed)
 				:done()
 			:node(self:displayEntry(entry))
 	end)
@@ -146,9 +114,8 @@ end
 ---@param togglearea integer
 ---@param buttonarea integer
 ---@param width string?
----@param float boolean?
 ---@return Html
-function AoEParticipantTable:_createTitle(tabletitle, buttontitle, togglearea, buttonarea, width, float)
+function AoEParticipantTable:_createTitle(tabletitle, buttontitle, togglearea, buttonarea, width)
 	local title = mw.html.create('div')
 			:addClass('participantTable')
 			:attr('data-toggle-area-content', togglearea)
@@ -156,17 +123,10 @@ function AoEParticipantTable:_createTitle(tabletitle, buttontitle, togglearea, b
 			:css('width', width or self.config.width)
 			:css('vertical-align', 'middle')
 			:tag('span')
-				:addClass('toggle-area-button btn btn-primary')
+				:addClass('toggle-area-button btn btn-small btn-primary')
 				:attr('data-toggle-area-btn', buttonarea)
-				:css('padding-top', '2px')
-				:css('padding-bottom', '2px')
+				:css('position', 'absolute')
 				:wikitext(buttontitle)
-
-	if float then
-		title:css('float', 'left')
-	else
-		title:css('position', 'absolute')
-	end
 
 	return title:done()
 			:tag('div')

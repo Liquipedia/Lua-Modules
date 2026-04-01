@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -52,7 +51,15 @@ return {
 		},
 		ratings = {
 			interval = 'weekly',
-		}
+		},
+		thisDay = {
+			tiers = {1, 2},
+			excludeTierTypes = {'Qualifier'},
+			showPatches = true,
+		},
+		participants = {
+			defaultPlayerNumber = 5,
+		},
 	},
 	defaultRoundPrecision = 0,
 }

@@ -1,21 +1,37 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:MatchGroup/Input/Custom/MatchPage
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
+
+local MapData = mw.loadJsonData('MediaWiki:Valorantdb-maps.json')
+
+---@class ValorantMatchPageMapParser: ValorantMapParserInterface
 local CustomMatchGroupInputMatchPage = {}
 
+---@class valorantMatchApiTeamExtended: valorantMatchApiTeam
+---@field players valorantMatchApiPlayer[]
+---@field puuids string[]
+
 ---@class valorantMatchDataExtended: valorantMatchData
+---@field teams valorantMatchApiTeamExtended[]
 ---@field matchid string
 ---@field vod string?
 ---@field finished boolean
 
+local ROUNDS_PER_HALF = 12
+local ROUNDS_IN_GAME = 24
+
+---@param side 'atk'|'def'
+---@return 'atk'|'def'
 local function otherSide(side)
 	if side == 'atk' then
 		return 'def'
@@ -23,77 +39,42 @@ local function otherSide(side)
 	return 'atk'
 end
 
+---@param longName 'Attacker'|'Defender'
+---@return 'atk'|'def'
+local function makeShortSideName(longName)
+	if longName == 'Attacker' then
+		return 'atk'
+	end
+	return 'def'
+end
+
 ---@param mapInput {matchid: string?, reversed: string?, vod: string?, region: string?}
----@return dota2MatchDataExtended|table
+---@return valorantMatchDataExtended|table
 function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	-- If no matchid is provided, assume this as a normal map
 	if not mapInput or not mapInput.matchid then
 		return mapInput
 	end
-	assert(mapInput.region, 'Region is required')
 
-	local map = mw.ext.valorantdb.getDetails(mapInput.matchid, mapInput.region, Logic.readBool(mapInput.reversed))
+	local map = mw.ext.valorantdb.getMatchDetails(mapInput.matchid)
 
-	assert(map and type(map) == 'table' and map.matchInfo, mapInput.matchid .. ' could not be retrieved.')
+	assert(map, mapInput.matchid .. ' could not be retrieved from API.')
 
-	-- Let's shift the array to start from 1
-	-- This is a temporary workaround for the API returning 0-indexed arrays
-	if map.players and type(map.players) == 'table' and map.players[0] then
-		local newTeams = {}
-		for i, team in pairs(map.players) do
-			local newPlayers = {}
-			for j, player in pairs(team) do
-				newPlayers[j + 1] = player
-			end
+	local shouldReverse = Logic.readBool(mapInput.reversed)
 
-			newTeams[i + 1] = team
-			newTeams[i + 1].players = newPlayers
-		end
-		map.players = newTeams
-	end
-	if map.roundDetails and type(map.roundDetails) == 'table' and map.roundDetails[0] then
-		local newRoundDetails = {}
-		for i, roundDetail in pairs(map.roundDetails) do
-			newRoundDetails[i + 1] = roundDetail
-		end
-		map.roundDetails = newRoundDetails
-	end
-	if map.teams and type(map.teams) == 'table' and map.teams[0] then
-		local newTeams = {}
-		for i, team in pairs(map.teams) do
-			newTeams[i + 1] = team
-		end
-		map.teams = newTeams
-	end
-
-	-- Fix round winner
-	-- We are currently getting the side the team started the NEXT round on, but it should be THIS round.
-	-- This is a temporary fix until the API is fixed
-	if map.roundDetails and type(map.roundDetails) == 'table' then
-		Array.forEach(map.roundDetails, function(roundDetail)
-			if roundDetail.round_no % 12 == 0 or roundDetail.round_no > 24 then
-				-- In overtime, the winner is the opposite of the round number
-				-- Same with the last round of each side in normal time (12, 24)
-				roundDetail.round_winner = otherSide(roundDetail.round_winner)
-			else
-				roundDetail.round_winner = roundDetail.round_winner
-			end
-		end)
-	end
-
-	-- Temporary reverse logic until the API has this feature added
-	if Logic.readBool(mapInput.reversed) then
-		map.matchInfo.team1, map.matchInfo.team2 = map.matchInfo.team2, map.matchInfo.team1
-		map.matchInfo.t1firstside = otherSide(map.matchInfo.t1firstside)
-		map.matchInfo.o1t1firstside = otherSide(map.matchInfo.o1t1firstside)
-		Array.forEach(map.roundDetails, function(roundDetail)
-			roundDetail.winningSide = otherSide(roundDetail.winningSide)
-		end)
+	if shouldReverse then
 		map.teams[1], map.teams[2] = map.teams[2], map.teams[1]
-		map.players[1], map.players[2] = map.players[2], map.players[1]
 	end
 
 	---@cast map valorantMatchDataExtended
+	-- Attach players to their teams
+	Array.forEach(map.teams, function(team)
+		team.players = Array.filter(map.players, function(player)
+			return player.team_id == team.team_id
+		end)
+		team.puuids = Array.map(team.players, Operator.property('puuid'))
+	end)
+	map.region = mapInput.region -- Region from the API is not what we want for region
 	map.matchid = mapInput.matchid
 	map.vod = mapInput.vod
 	map.finished = true
@@ -101,125 +82,293 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	return map
 end
 
----@param map table
+---@param map valorantMatchDataExtended|table
 ---@param opponentIndex integer
 ---@return table[]?
 function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
-	if not map.players then return nil end
-	local teamPlayers = map.players[opponentIndex]
-	if not teamPlayers then return end
+	if not map.teams then return nil end
+	local team = map.teams[opponentIndex]
+	local rounds = CustomMatchGroupInputMatchPage.getRounds(map)
+	if not team or not rounds then return end
 
-	local players = Array.map(teamPlayers.players, function(player)
+	return Array.map(team.players, function(player)
+		local lpdbPlayerData = player.lpdb_player
 		return {
-			player = player.riot_id,
-			agent = player.agent,
-			acs = player.acs,
-			adr = nil,
-			kast = nil,
-			hs = nil,
-			kills = player.kills,
-			deaths = player.deaths,
-			assists = player.assists,
+			player = lpdbPlayerData and lpdbPlayerData.page_name or player.game_name,
+			puuid = player.puuid,
+			agent = player.character.name,
+			acs = player.stats.acs,
+			adr = player.stats.adr,
+			kast = player.stats.kast,
+			hs = player.stats.head_shot_percent,
+			kills = player.stats.kills,
+			deaths = player.stats.deaths,
+			assists = player.stats.assists,
+			firstKills = #Array.filter(rounds, function (round)
+				return round.firstKill.killer == player.puuid
+			end),
+			firstDeaths = #Array.filter(rounds, function (round)
+				return round.firstKill.victim == player.puuid
+			end)
 		}
 	end)
-	return Array.reverse(Array.sortBy(players, function(player)
-		return player.acs or player.kills or player.player
-	end))
 end
 
----@param map table
+---@param map valorantMatchDataExtended|table
 ---@param opponentIndex integer
 ---@param phase 'normal'|'ot'
 ---@return 'atk'|'def'|nil
 function CustomMatchGroupInputMatchPage.getFirstSide(map, opponentIndex, phase)
-	if not map.matchInfo then return nil end
-	if phase == 'normal' then
-		return map.matchInfo['t' .. opponentIndex .. 'firstside']
+	if not map.round_results then return nil end
+
+	local teamSide = map.teams[opponentIndex] and map.teams[opponentIndex].team_id
+
+	local roundNumberOfFirstRound = phase == 'normal' and 1 or (ROUNDS_IN_GAME + 1)
+	local firstRound = Array.find(map.round_results, function(round)
+		return round.round_num == roundNumberOfFirstRound
+	end)
+
+	if not firstRound then return nil end
+
+	if firstRound.winning_team == teamSide then
+		return makeShortSideName(firstRound.winning_team_role)
 	else
-		return map.matchInfo['o1t' .. opponentIndex .. 'firstside']
+		return otherSide(makeShortSideName(firstRound.winning_team_role))
 	end
 end
 
----@param map table
+---@param map valorantMatchDataExtended|table
 ---@param side 'atk'|'def'|'otatk'|'otdef'
 ---@param opponentIndex integer
 ---@return integer?
 function CustomMatchGroupInputMatchPage.getScoreFromRounds(map, side, opponentIndex)
-	if not map.matchInfo then return nil end
-	local teamColor = map.matchInfo['team' .. opponentIndex]
-	if not teamColor then
+	if not map.teams then return nil end
+	local team = map.teams[opponentIndex]
+	local firstSide = CustomMatchGroupInputMatchPage.getFirstSide(map, opponentIndex, 'normal')
+	local firstSideOt = CustomMatchGroupInputMatchPage.getFirstSide(map, opponentIndex, 'ot')
+	local condition
+	if firstSide then
+		if side == firstSide then
+			condition = function(round) return round.round_num <= ROUNDS_PER_HALF end
+		elseif side == otherSide(firstSide) then
+			condition = function(round) return round.round_num > ROUNDS_PER_HALF and round.round_num <= ROUNDS_IN_GAME end
+		end
+	end
+	if firstSideOt then
+		if side == 'ot' .. firstSideOt then
+			condition = function(round) return round.round_num > ROUNDS_IN_GAME and round.round_num % 2 == 1 end
+		elseif side == 'ot' .. otherSide(firstSideOt) then
+			condition = function(round) return round.round_num > ROUNDS_IN_GAME and round.round_num % 2 == 0 end
+		end
+	end
+	if not condition then
 		return nil
 	end
-	local sideData = map.matchInfo[teamColor]
-	if not sideData then
-		return nil
-	end
-	return sideData['team' .. side .. 'wins']
+
+	local roundsWon = Array.filter(Array.filter(map.round_results, condition), function(round)
+		return round.winning_team == team.team_id
+	end)
+	return #roundsWon
 end
 
----@param map table
+---@param map valorantMatchDataExtended|table
 ---@return string?
 function CustomMatchGroupInputMatchPage.getMapName(map)
-	if not map.matchInfo then
-		return map.map
-	end
-	return map.matchInfo.mapId
+	return MapData[map.map_id] or map.map
 end
 
----@param map table
+---@param map valorantMatchDataExtended|table
 ---@return string?, string?
 function CustomMatchGroupInputMatchPage.getMatchId(map)
 	return map.matchid, map.region
 end
 
----@param map table
+---@param map valorantMatchDataExtended|table
 ---@return string?
 function CustomMatchGroupInputMatchPage.getLength(map)
-	if not map.matchInfo then return nil end
-	return map.matchInfo.gameLengthMillis -- It's called millis but is in MM:SS format
+	if not map.game_length_millis then return nil end
+	local seconds = map.game_length_millis / 1000
+	return math.floor(seconds / 60) .. ':' .. string.format('%02d', seconds % 60)
 end
 
----@param map table
+---@param map valorantMatchDataExtended|table
 ---@return ValorantRoundData[]?
 function CustomMatchGroupInputMatchPage.getRounds(map)
-	if not map.matchInfo then return nil end
+	if not map.round_results then return nil end
 
-	local t1start = map.matchInfo.t1firstside
-	local t1startot = map.matchInfo.o1t1firstside
+	local function mapResultCodes(resultCode)
+		if resultCode == 'Defuse' then
+			return 'defuse'
+		elseif resultCode == 'Elimination' then
+			return 'elimination'
+		elseif resultCode == 'Detonate' then
+			return 'detonate'
+		elseif resultCode == 'Surrendered' then
+			return 'surrendered'
+		elseif resultCode == '' then
+			return 'time'
+		else
+			return 'unknown'
+		end
+	end
+
+	---@param ceremonyCode string?
+	---@return string
+	local function mapCeremonyCodes(ceremonyCode)
+		if Logic.isEmpty(ceremonyCode) then
+			return ''
+		end
+		---@cast ceremonyCode -nil
+		return ceremonyCode:sub(9)
+	end
+
+	---@param round valorantMatchApiRound
+	---@param ceremony string?
+	---@param roundKills valorantMatchApiRoundKill[]
+	---@param winningTeam integer
+	---@return string?
+	local function processCeremony(round, ceremony, roundKills, winningTeam)
+		if ceremony == 'Clutch' then
+			if Logic.isNotEmpty(round.bomb_defuser) then
+				return round.bomb_defuser
+			end
+			local killsFromWinningTeam = Array.filter(
+				roundKills,
+				function (roundKill)
+					return Table.includes(map.teams[winningTeam].puuids, roundKill.killer)
+				end
+			)
+			if #killsFromWinningTeam == 0 then
+				return
+			end
+			return killsFromWinningTeam[#killsFromWinningTeam].killer
+		elseif ceremony == 'Ace' then
+			local _, killsByPlayer = Array.groupBy(roundKills, function (roundKill)
+				return roundKill.killer
+			end)
+			for killer, kills in pairs(killsByPlayer) do
+				if #kills >= 5 then
+					return killer
+				end
+			end
+		end
+	end
+
+	local t1start = CustomMatchGroupInputMatchPage.getFirstSide(map, 1, 'normal')
+	local t1startot = CustomMatchGroupInputMatchPage.getFirstSide(map, 1, 'ot')
 	local nextOvertimeSide = t1startot
-	return Array.map(map.roundDetails, function(round)
-		local roundNumber = round.round_no
-		-- TODO This is stupid, but it works until the API is improved
+
+	if not t1start then
+		return nil
+	end
+	return Array.map(map.round_results, function(round)
+		local roundNumber = round.round_num
 		local t1side, t2side
-		if roundNumber <= 12 then
+		if roundNumber <= ROUNDS_PER_HALF then
 			t1side = t1start
 			t2side = otherSide(t1start)
-		elseif roundNumber <= 24 then
+		elseif roundNumber <= ROUNDS_IN_GAME then
 			t1side = otherSide(t1start)
 			t2side = t1start
-		else
+		elseif nextOvertimeSide then
 			-- In overtime they switch sides every round
 			t1side = nextOvertimeSide
 			t2side = otherSide(nextOvertimeSide)
 			nextOvertimeSide = otherSide(nextOvertimeSide)
 		end
 
+		if not t1side or not t2side then
+			return nil
+		end
+
+		---@type valorantMatchApiRoundKill[]
+		local roundKills = Array.sortBy(
+			Array.flatMap(round.player_stats, function (player)
+				return player.kills or {}
+			end),
+			Operator.property('time_since_round_start_millis')
+		)
+
+		local winningTeam = (t1side == makeShortSideName(round.winning_team_role)) and 1 or 2
+		local ceremony = mapCeremonyCodes(round.round_ceremony)
+		local flawless = Array.all(
+			roundKills,
+			function (roundKill)
+				return Table.includes(map.teams[winningTeam].puuids, roundKill.killer)
+			end
+		)
+
+		---@type valorantMatchApiRoundKill
+		local firstKill = roundKills[1]
+
 		---@type ValorantRoundData
 		return {
+			ceremony = ceremony,
+			ceremonyFor = processCeremony(round, ceremony, roundKills, winningTeam),
+			firstKill = Logic.isNotEmpty(firstKill) and {
+				killer = firstKill.killer,
+				victim = firstKill.victim,
+				byTeam = Table.includes(map.teams[1].puuids, firstKill.killer) and 1 or 2
+			} or {},
+			planted = round.plant_round_time > 0,
+			defused = round.defuse_round_time > 0,
+			flawless = flawless,
 			round = roundNumber,
 			t1side = t1side,
 			t2side = t2side,
-			winningSide = round.round_winner,
-			winBy = round.win_by,
+			winningSide = makeShortSideName(round.winning_team_role),
+			winBy = mapResultCodes(round.round_result_code),
 		}
 	end)
 end
 
----@param map table
+---@param map valorantMatchDataExtended|table
 ---@return string?
 function CustomMatchGroupInputMatchPage.getPatch(map)
-	if not map.matchInfo then return nil end
-	return map.matchInfo.gameVersion
+	--- input format is "release-10.05-shipping-14-3367018"
+	local versionParts = Array.parseCommaSeparatedString(map.game_version, '-')
+	return versionParts[2]
+end
+
+---@param map table
+---@param opponentIndex integer
+---@return table
+function CustomMatchGroupInputMatchPage.extendMapOpponent(map, opponentIndex)
+	local rounds = CustomMatchGroupInputMatchPage.getRounds(map)
+
+	if not rounds then
+		return {}
+	end
+
+	local teamSideKey = 't' .. opponentIndex .. 'side'
+	local plantedRounds = Array.filter(rounds, function (round)
+		return round[teamSideKey] == 'atk' and round.planted
+	end)
+
+	---@param ceremony string
+	---@return integer
+	local function countCeremonies(ceremony)
+		return #Array.filter(rounds, function (round)
+			return round[teamSideKey] == round.winningSide and round.ceremony == ceremony
+		end)
+	end
+
+	return {
+		thrifties = countCeremonies('Thrifty'),
+		flawless = #Array.filter(rounds, function (round)
+			return round[teamSideKey] == round.winningSide and round.flawless
+		end),
+		firstKills = #Array.filter(rounds, function (round)
+			return round.firstKill.byTeam == opponentIndex
+		end),
+		clutches = countCeremonies('Clutch'),
+		postPlant = {
+			#Array.filter(plantedRounds, function (round)
+				return round.winningSide == 'atk'
+			end),
+			#plantedRounds
+		}
+	}
 end
 
 return CustomMatchGroupInputMatchPage

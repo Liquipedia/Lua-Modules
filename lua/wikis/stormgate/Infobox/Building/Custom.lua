@@ -1,30 +1,31 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:Infobox/Building/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Attack = require('Module:Infobox/Extension/Attack')
-local Class = require('Module:Class')
-local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
-local Faction = require('Module:Faction')
-local Hotkeys = require('Module:Hotkey')
-local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local MessageBox = require('Module:Message box')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Attack = Lua.import('Module:Infobox/Extension/Attack')
+local Class = Lua.import('Module:Class')
+local CostDisplay = Lua.import('Module:Infobox/Extension/CostDisplay')
+local Faction = Lua.import('Module:Faction')
+local Hotkeys = Lua.import('Module:Hotkey')
+local Icon = Lua.import('Module:Icon')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Building = Lua.import('Module:Infobox/Building')
 
-local Widgets = require('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WarningBox = Lua.import('Module:Widget/WarningBox')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -37,7 +38,6 @@ local CustomInjector = Class.new(Injector)
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=Health]]'
 local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local ICON_ENERGY = '[[File:EnergyIcon.gif|link=]]'
-local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
 local HOTKEY_SEPERATOR = '&nbsp;&nbsp;/&nbsp;&nbsp;'
 local CREEP = 'Camp'
 local SORT_TABLE = {'1v1', 'coop', 'mayhem'}
@@ -47,7 +47,7 @@ local GAME_MODE_ICON = {
 }
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomBuilding.run(frame)
 	local building = CustomBuilding(frame)
 	building:setWidgetInjector(CustomInjector(building))
@@ -59,9 +59,12 @@ function CustomBuilding.run(frame)
 
 	local builtInfobox = building:createInfobox()
 
-	return mw.html.create()
-		:node(builtInfobox)
-		:node(CustomBuilding._deprecatedWarning(building.args.deprecatedDisplay))
+	return HtmlWidgets.Fragment{
+		children = {
+			builtInfobox,
+			CustomBuilding._deprecatedWarning(building.args.deprecatedDisplay)
+		}
+	}
 end
 
 ---@param id string
@@ -78,19 +81,19 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Size', content = {args.size}},
-			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
-			Cell{name = 'Speed', content = {args.speed}},
-			Cell{name = 'Sight', content = {args.sight}},
-			Cell{name = 'Upgrades To', content = caller:_csvToPageList(args.upgrades_to)},
-			Cell{name = 'Introduced', content = {args.introducedDisplay}}
+			Cell{name = 'Size', children = {args.size}},
+			Cell{name = 'Energy', children = {caller:_energyDisplay()}},
+			Cell{name = 'Speed', children = {args.speed}},
+			Cell{name = 'Sight', children = {args.sight}},
+			Cell{name = 'Upgrades To', children = caller:_csvToPageList(args.upgrades_to)},
+			Cell{name = 'Introduced', children = {args.introducedDisplay}}
 		)
 		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
 			Array.extendWith(widgets, Attack.run(attackArgs, attackIndex, caller.faction))
 		end
 	elseif id == 'cost' then
 		return {
-			Cell{name = 'Cost', content = {CostDisplay.run{
+			Cell{name = 'Cost', children = {CostDisplay.run{
 				faction = caller.faction,
 				luminite = args.luminite,
 				luminiteTotal = args.totalluminite,
@@ -110,8 +113,8 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Tech. Requirements', content = caller:_csvToPageList(args.tech_requirement)},
-			Cell{name = 'Building Requirements', content = caller:_csvToPageList(args.building_requirement)},
+			Cell{name = 'Tech. Requirements', children = caller:_csvToPageList(args.tech_requirement)},
+			Cell{name = 'Building Requirements', children = caller:_csvToPageList(args.building_requirement)},
 		}
 	elseif id == 'hotkey' then
 		if not args.hotkey and not args.macro_key then return {} end
@@ -122,21 +125,21 @@ function CustomInjector:parse(id, widgets)
 			args.hotkey and CustomBuilding._hotkeys(args.hotkey, args.hotkey2),
 			args.macro_key and CustomBuilding._hotkeys(args.macro_key, args.macro_key2)
 		), HOTKEY_SEPERATOR)
-		return {Cell{name = hotkeyName, content = {hotkeys}}}
+		return {Cell{name = hotkeyName, children = {hotkeys}}}
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Builds', content = caller:_getBuildsOrUnlocksDisplay(args.builds)},
+			Cell{name = 'Builds', children = caller:_getBuildsOrUnlocksDisplay(args.builds)},
 		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocks', content = caller:_getBuildsOrUnlocksDisplay(args.unlocks)},
-			Cell{name = 'Supply Gained', content = Array.parseCommaSeparatedString(args.supply_gained)},
-			Cell{name = 'Power Gained', content = Array.parseCommaSeparatedString(args.power_gained)},
+			Cell{name = 'Unlocks', children = caller:_getBuildsOrUnlocksDisplay(args.unlocks)},
+			Cell{name = 'Supply Gained', children = Array.parseCommaSeparatedString(args.supply_gained)},
+			Cell{name = 'Power Gained', children = Array.parseCommaSeparatedString(args.power_gained)},
 		}
 	elseif id == 'defense' then
 		return {
-			Cell{name = 'Defense', content = {caller:_getDefenseDisplay()}},
-			Cell{name = 'Attributes', content = {caller:_displayCsvAsPageCsv(args.armor_type)}}
+			Cell{name = 'Defense', children = {caller:_getDefenseDisplay()}},
+			Cell{name = 'Attributes', children = {caller:_displayCsvAsPageCsv(args.armor_type)}}
 		}
 	elseif id == 'attack' then return {}
 	end
@@ -356,15 +359,11 @@ function CustomBuilding:_processPatchFromId(key)
 end
 
 ---@param patch string?
----@return Html? -would need to check what warningbox actually returns ... am on phone ...
+---@return Widget?
 function CustomBuilding._deprecatedWarning(patch)
 	if not patch then return end
 
-	return MessageBox.main('ambox', {
-		image= ICON_DEPRECATED,
-		class='ambox-red',
-		text= 'This has been removed with Patch ' .. patch,
-	})
+	return WarningBox{text = 'This has been removed with Patch ' .. patch}
 end
 
 ---@param id string
@@ -386,12 +385,12 @@ function CustomBuilding:_parseForCreeps(id, widgets)
 	if id ~= 'custom' then return {} end
 
 	return {
-		Cell{name = 'Start Level', content = {startLevel}},
-		Cell{name = 'Defenders', content = {self._displayCreepDefenders(creeps)}},
-		Cell{name = 'Respawn', content = {args.respawn and args.respawn .. 's'}},
+		Cell{name = 'Start Level', children = {startLevel}},
+		Cell{name = 'Defenders', children = {self._displayCreepDefenders(creeps)}},
+		Cell{name = 'Respawn', children = {args.respawn and args.respawn .. 's'}},
 		Title{children = 'Tower Rewards'},
-		Cell{name = 'Capture Point', content = {args.capture_point}},
-		Cell{name = 'Global Buff', content = {args.global_buff}},
+		Cell{name = 'Capture Point', children = {args.capture_point}},
+		Cell{name = 'Global Buff', children = {args.global_buff}},
 	}
 end
 

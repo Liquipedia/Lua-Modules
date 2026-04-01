@@ -1,13 +1,13 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:PrizePool/Award/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
 local Lua = require('Module:Lua')
+
+local Arguments = Lua.import('Module:Arguments')
 
 local AwardPrizePool = Lua.import('Module:PrizePool/Award')
 
@@ -17,7 +17,7 @@ local IS_AWARD = true
 
 -- Template entry point
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomAwardPrizePool.run(frame)
 	local awardsPrizePool = AwardPrizePool(Arguments.getArgs(frame))
 

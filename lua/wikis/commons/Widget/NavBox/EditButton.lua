@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/NavBox/EditButton
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -21,16 +20,18 @@ local NavBoxEditButton = Class.new(Widget)
 ---@return Widget?
 function NavBoxEditButton:render()
 	if not self.props.templateLink then return end
-	local editLink = HtmlWidgets.Fragment{children = {
-		mw.text.nowiki('['),
-		Link{link = 'Template:' .. self.props.templateLink, children = {'e'}},
-		mw.text.nowiki(']'),
-	}}
 
 	return HtmlWidgets.Span{
 		classes = {'navigation-not-searchable'},
 		css = {float = 'left', ['font-size'] = 'xx-small', padding = 0},
-		children = {editLink}
+		children = {
+			mw.text.nowiki('['),
+			Link{
+				link = 'Special:EditPage/Template:' .. self.props.templateLink,
+				children = {'e'},
+			},
+			mw.text.nowiki(']'),
+		}
 	}
 end
 

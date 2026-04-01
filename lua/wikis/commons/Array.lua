@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Array
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -51,6 +50,27 @@ function Array.copy(tbl)
 		table.insert(copy, element)
 	end
 	return copy
+end
+
+---Returns true if two arrays are equal to each other.
+---@param arr1 any[]
+---@param arr2 any[]
+---@return boolean
+---@nodiscard
+function Array.equals(arr1, arr2)
+	assert(Array.isArray(arr1), 'arr1 is not an array')
+	assert(Array.isArray(arr2), 'arr2 is not an array')
+	if arr1 == arr2 then
+		return true
+	elseif #arr1 ~= #arr2 then
+		return false
+	end
+	for index = 1, #arr1 do
+		if arr1[index] ~= arr2[index] then
+			return false
+		end
+	end
+	return true
 end
 
 --[[
@@ -118,13 +138,13 @@ end
 
 ---Flattens an array of arrays into an array.
 ---@generic T
----@param tbl T[]
+---@param tbl (T|T[])[]
 ---@return T[]
 ---@nodiscard
 function Array.flatten(tbl)
 	local flattenedArray = {}
 	for _, x in ipairs(tbl) do
-		if type(x) == 'table' then
+		if Array.isArray(x) then
 			for _, y in ipairs(x) do
 				table.insert(flattenedArray, y)
 			end
@@ -418,7 +438,7 @@ array is mutated in the process.
 function Array.extendWith(tbl, ...)
 	local arrays = Table.pack(...)
 	for index = 1, arrays.n do
-		if type(arrays[index]) == 'table' then
+		if Array.isArray(arrays[index]) then
 			for _, element in ipairs(arrays[index]) do
 				table.insert(tbl, element)
 			end

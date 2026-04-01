@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=easportsfc
 -- page=Module:Tier/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

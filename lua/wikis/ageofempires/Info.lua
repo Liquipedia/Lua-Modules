@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -108,6 +107,29 @@ return {
 		match2 = {
 			status = 2,
 			matchWidthMobile = 110,
+		},
+		teamRosterNavbox = {
+			links = {
+				playedMatches = 'Matches',
+			},
+		},
+		defaultMaxPlayersPerPlacement = 15,
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'cleanup',
+				storeFromWikiCode = true,
+			},
+		},
+		participants = {
+			syncPlayerTeam = true,
+		},
+		tournamentsListing = {
+			showTier = true,
+			showGameIcon = true,
+			useParent = false,
+			order = 'enddate desc, pagename desc',
+			onlyTierTypeIfBoth = false,
 		},
 	},
 }

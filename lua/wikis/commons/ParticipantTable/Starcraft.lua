@@ -1,18 +1,21 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:ParticipantTable/Starcraft
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Json = require('Module:Json')
-local Faction = require('Module:Faction')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Faction = Lua.import('Module:Faction')
+local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 ---@class StarcraftParticipantTableConfig: ParticipantTableConfig
 ---@field displayUnknownColumn boolean?
@@ -32,39 +35,15 @@ local Variables = require('Module:Variables')
 ---@field entries StarcraftParticipantTableEntry[]
 
 ---@class StarcraftParticipantTable: ParticipantTable
+---@operator call(Frame): StarcraftParticipantTable
 ---@field config StarcraftParticipantTableConfig
----@field isPureSolo boolean
----@field _displaySoloFactionTableSection function
----@field _displayHeader function
----@field _getFactionNumbers function
-
-local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
-
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
-
-local StarcraftParticipantTable = {}
+---@field sections StarcraftParticipantTableSection[]
+local StarcraftParticipantTable = Class.new(ParticipantTable)
 
 ---@param frame Frame
 ---@return Html?
 function StarcraftParticipantTable.run(frame)
-	local participantTable = ParticipantTable(frame) --[[@as StarcraftParticipantTable]]
-
-	participantTable.readConfig = StarcraftParticipantTable.readConfig
-	participantTable.readEntry = StarcraftParticipantTable.readEntry
-	participantTable.adjustLpdbData = StarcraftParticipantTable.adjustLpdbData
-	participantTable._displaySoloFactionTableSection = StarcraftParticipantTable._displaySoloFactionTableSection
-	participantTable._displayHeader = StarcraftParticipantTable._displayHeader
-	participantTable._getFactionNumbers = StarcraftParticipantTable._getFactionNumbers
-	participantTable.setCustomPageVariables = StarcraftParticipantTable.setCustomPageVariables
-
-	participantTable:read():store()
-
-	if StarcraftParticipantTable.isPureSolo(participantTable.sections) and participantTable.config.soloAsFactionTable then
-		participantTable.create = StarcraftParticipantTable.createSoloFactionTable
-	end
-
-	return participantTable:create()
+	return StarcraftParticipantTable(frame):read():store():create()
 end
 
 ---@param args table
@@ -116,15 +95,14 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
 		faction = valueFromArgs('race'),
 	}
 
-	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
-		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
+	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
 
 	--unset wiki var for random events to not read players as random if prize pool already sets them as random
 	if config.isRandomEvent and opponentArgs.type == Opponent.solo then
 		Variables.varDefine(opponentArgs.name .. '_faction', '')
 	end
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
+	local opponent = Opponent.readOpponentArgs(opponentArgs)
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)
@@ -156,16 +134,24 @@ function StarcraftParticipantTable:adjustLpdbData(lpdbData, entry, config)
 
 	lpdbData.extradata.seriesnumber = seriesNumber and string.format('%05d', seriesNumber) or nil
 	lpdbData.extradata.isqualified = tostring(isQualified)
+	lpdbData.extradata.mod = Variables.varDefault('tournament_mod')
 
 	lpdbData.qualified = isQualified and 1 or nil
 end
 
----@param sections StarcraftParticipantTableSection[]
 ---@return boolean
-function StarcraftParticipantTable.isPureSolo(sections)
-	return Array.all(sections, function(section) return Array.all(section.entries, function(entry)
+function StarcraftParticipantTable:isPureSolo()
+	return Array.all(self.sections, function(section) return Array.all(section.entries, function(entry)
 		return entry.opponent.type == Opponent.solo
 	end) end)
+end
+
+---@return Html?
+function StarcraftParticipantTable:create()
+	if self:isPureSolo() and self.config.soloAsFactionTable then
+		return self:createSoloFactionTable()
+	end
+	return ParticipantTable.create(self)
 end
 
 ---@return Html?
@@ -177,8 +163,8 @@ function StarcraftParticipantTable:createSoloFactionTable()
 	local factioNumbers = self:_getFactionNumbers()
 
 	local factionColumns
-	if not config.isRandomEvent and
-		(config.displayRandomColumn or config.displayRandomColumn == nil and factioNumbers.rDisplay > 0) then
+	if config.displayRandomColumn or
+		not config.isRandomEvent and config.displayRandomColumn == nil and factioNumbers.rDisplay > 0 then
 
 		factionColumns = Array.copy(Faction.knownFactions)
 	else

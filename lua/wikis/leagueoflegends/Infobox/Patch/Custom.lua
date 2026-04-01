@@ -1,22 +1,23 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
 -- page=Module:Infobox/Patch/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Patch = Lua.import('Module:Infobox/Patch')
 
 ---@class LoLPatchInfobox: PatchInfobox
+---@operator call(Frame): LoLPatchInfobox
 local CustomPatch = Class.new(Patch)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPatch.run(frame)
 	local patch = CustomPatch(frame)
 

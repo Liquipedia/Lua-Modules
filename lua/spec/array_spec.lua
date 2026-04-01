@@ -16,6 +16,26 @@ describe('array', function()
 		end)
 	end)
 
+	describe('equals', function()
+		it('Empty arrays are equal', function()
+			assert.is_true(Array.equals({}, {}))
+		end)
+		it('check array equality', function()
+			local a = {0, 1}
+
+			assert.is_true(Array.equals(a, a))
+			assert.is_false(Array.equals({0}, {0, 1}))
+			assert.is_true(Array.equals(a, {0, 1}))
+			assert.is_true(Array.equals(Array.range(1, 5), {1, 2, 3, 4, 5}))
+			assert.is_true(Array.equals({'a', 'b', 'c'}, {'a', 'b', 'c'}))
+		end)
+		it('Error if argument is not an array', function()
+			assert.error(function ()
+				return Array.equals({key = 'value'}, {'key', 'value'})
+			end)
+		end)
+	end)
+
 	describe('Copy', function()
 		it('check', function()
 			local a, b, c = {1, 2, 3}, {}, {{5}}
@@ -61,6 +81,15 @@ describe('array', function()
 		it('check', function()
 			local a = {1, 2, 3, {5, 3}, {6, 4}}
 			assert.are_same({1, 2, 3, 5, 3, 6, 4}, Array.flatten(a))
+
+			local b = {
+				{
+					hello = 'world'
+				},
+				2,
+				3
+			}
+			assert.are_same(b, Array.flatten(b))
 		end)
 	end)
 
@@ -135,9 +164,11 @@ describe('array', function()
 
 	describe('ExtendWith', function()
 		it('check', function()
-			local a, b, c = {2, 3}, {5, 7, 11}, {13}
+			local a, b, c, d = {2, 3}, {5, 7, 11}, {13}, {hello = 'world'}
 			assert.are_same({2, 3, 5, 7, 11, 13}, Array.extendWith(a, b, c))
 			assert.are_same({2, 3, 5, 7, 11, 13}, a)
+			assert.are_same({2, 3, 5, 7, 11, 13, {hello = 'world'}}, Array.extendWith(a, d))
+			assert.are_same({2, 3, 5, 7, 11, 13, {hello = 'world'}}, a)
 		end)
 	end)
 

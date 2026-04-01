@@ -9,46 +9,57 @@ liquipedia.collapse = {
 				table.classList.add( 'collapsed' );
 			}
 		} );
-		liquipedia.collapse.setupCollapsibleMapsButtons();
 		liquipedia.collapse.setupCollapsibleButtons();
 		liquipedia.collapse.setupGeneralCollapsibleButtons();
+		liquipedia.collapse.setupClickableRegionCollapsibles();
 		liquipedia.collapse.setupToggleGroups();
 		liquipedia.collapse.setupDropdownBox();
 		liquipedia.collapse.setupCollapsibleNavFrameButtons();
+		liquipedia.collapse.setupSwitchToggleCollapsibles();
+	},
+	makeIcon: function( isShow ) {
+		return isShow ? '<span class="far fa-eye"></span>' : '<span class="far fa-eye-slash"></span>';
+	},
+	makeDesignButton: function( collapsible, isShow ) {
+		const title = ( isShow ? 'Show' : 'Hide' );
+		const button = document.createElement( 'button' );
+		button.classList.add( 'collapseButton', 'btn', 'btn-secondary', 'btn-extrasmall' );
+		button.classList.add( isShow ? 'collapseButtonShow' : 'collapseButtonHide' );
+		button.setAttribute( 'role', 'button' );
+		button.setAttribute( 'aria-label', title );
+		button.setAttribute( 'title', title );
+		button.setAttribute( 'tabindex', '0' );
+		button.innerHTML = this.makeIcon( isShow ) + ' ' + title;
+		button.onclick = function( ev ) {
+			ev.preventDefault();
+			if ( isShow ) {
+				collapsible.classList.remove( 'collapsed' );
+			} else {
+				collapsible.classList.add( 'collapsed' );
+			}
+		};
+		return button;
 	},
 	setupCollapsibleButtons: function() {
 		document.querySelectorAll( '#mw-content-text .collapsible' ).forEach( ( collapsible ) => {
 			const row = collapsible.querySelector( 'tr' );
-			if ( row !== null ) {
-				const collapseShowButton = document.createElement( 'span' );
-				collapseShowButton.classList.add( 'collapseButton' );
-				collapseShowButton.classList.add( 'collapseButtonShow' );
-				collapseShowButton.appendChild( document.createTextNode( '[' ) );
-				const collapseShowLink = document.createElement( 'a' );
-				collapseShowLink.href = '#';
-				collapseShowLink.innerHTML = 'show';
-				collapseShowLink.onclick = function( ev ) {
-					ev.preventDefault();
-					collapsible.classList.remove( 'collapsed' );
-				};
-				collapseShowButton.appendChild( collapseShowLink );
-				collapseShowButton.appendChild( document.createTextNode( ']' ) );
-				row.lastElementChild.insertBefore( collapseShowButton, row.lastElementChild.firstChild );
-				const collapseHideButton = document.createElement( 'span' );
-				collapseHideButton.classList.add( 'collapseButton' );
-				collapseHideButton.classList.add( 'collapseButtonHide' );
-				collapseHideButton.appendChild( document.createTextNode( '[' ) );
-				const collapseHideLink = document.createElement( 'a' );
-				collapseHideLink.href = '#';
-				collapseHideLink.innerHTML = 'hide';
-				collapseHideLink.onclick = function( ev ) {
-					ev.preventDefault();
-					collapsible.classList.add( 'collapsed' );
-				};
-				collapseHideButton.appendChild( collapseHideLink );
-				collapseHideButton.appendChild( document.createTextNode( ']' ) );
-				row.lastElementChild.insertBefore( collapseHideButton, row.lastElementChild.firstChild );
+			if ( row === null ) {
+				return;
 			}
+
+			if ( row.lastElementChild.querySelector( '.collapseButton' ) ) {
+				// Buttons are already set up, nothing to do
+				return;
+			}
+
+			row.lastElementChild.insertBefore(
+				this.makeDesignButton( collapsible, true ),
+				row.lastElementChild.firstChild
+			);
+			row.lastElementChild.insertBefore(
+				this.makeDesignButton( collapsible, false ),
+				row.lastElementChild.firstChild
+			);
 		} );
 	},
 
@@ -59,7 +70,6 @@ liquipedia.collapse = {
 	// Note that unlike .collapsible, the button is the anchor itself, instead
 	// of a wrapper around the anchor.
 	setupGeneralCollapsibleButtons: function() {
-
 		// Replaces the button (usually a <span>) with <a href="#">...</a>.
 		// For xss safety, only the child nodes and class name are copied over.
 		function replaceWithAnchor( button ) {
@@ -94,73 +104,37 @@ liquipedia.collapse = {
 			}
 		} );
 	},
-	setupCollapsibleMapsButtons: function() {
-		document.querySelectorAll( '#mw-content-text .collapsible' ).forEach( ( collapsible ) => {
-			const row = collapsible.querySelector( 'tr' );
-			if ( row !== null && collapsible.querySelector( '.maprow' ) !== null ) {
-				const collapseShowButton = document.createElement( 'span' );
-				collapseShowButton.classList.add( 'collapseButton' );
-				collapseShowButton.classList.add( 'collapseButtonMapsShow' );
-				collapseShowButton.appendChild( document.createTextNode( '[' ) );
-				const collapseShowLink = document.createElement( 'a' );
-				collapseShowLink.href = '#';
-				collapseShowLink.innerHTML = '+maps';
-				collapseShowLink.onclick = function( ev ) {
-					ev.preventDefault();
-					collapsible.classList.add( 'uncollapsed-maps' );
-				};
-				collapseShowButton.appendChild( collapseShowLink );
-				collapseShowButton.appendChild( document.createTextNode( ']' ) );
-				row.lastElementChild.insertBefore( collapseShowButton, row.lastElementChild.firstChild );
-				const collapseHideButton = document.createElement( 'span' );
-				collapseHideButton.classList.add( 'collapseButton' );
-				collapseHideButton.classList.add( 'collapseButtonMapsHide' );
-				collapseHideButton.appendChild( document.createTextNode( '[' ) );
-				const collapseHideLink = document.createElement( 'a' );
-				collapseHideLink.href = '#';
-				collapseHideLink.innerHTML = '-maps';
-				collapseHideLink.onclick = function( ev ) {
-					ev.preventDefault();
-					collapsible.classList.remove( 'uncollapsed-maps' );
-				};
-				collapseHideButton.appendChild( collapseHideLink );
-				collapseHideButton.appendChild( document.createTextNode( ']' ) );
-				row.lastElementChild.insertBefore( collapseHideButton, row.lastElementChild.firstChild );
-			}
+	setupClickableRegionCollapsibles: function() {
+		const regions = document.querySelectorAll( '[data-collapsible-click-region]' );
+
+		regions.forEach( ( region ) => {
+			// Get exclusion selector from attribute, default to 'a' (links)
+			// Can pass empty string for "no exclusions" (everything toggles collapse)
+			const exclusionSelector = region.getAttribute( 'data-collapsible-exclude' ) || 'a';
+
+			region.addEventListener( 'click', ( event ) => {
+				if ( exclusionSelector ) {
+					const clickedExcluded = event.target.closest( exclusionSelector );
+
+					if ( clickedExcluded ) {
+						return;
+					}
+				}
+
+				const collapsible = region.closest( '.general-collapsible' );
+				if ( collapsible ) {
+					event.preventDefault();
+					collapsible.classList.toggle( 'collapsed' );
+				}
+			} );
 		} );
 	},
 	setupCollapsibleNavFrameButtons: function() {
 		document.querySelectorAll( '#mw-content-text .NavFrame' ).forEach( ( navFrame ) => {
 			const head = navFrame.querySelector( '.NavHead' );
 			if ( head !== null ) {
-				const collapseShowButton = document.createElement( 'span' );
-				collapseShowButton.classList.add( 'collapseButton' );
-				collapseShowButton.classList.add( 'collapseButtonShow' );
-				collapseShowButton.appendChild( document.createTextNode( '[' ) );
-				const collapseShowLink = document.createElement( 'a' );
-				collapseShowLink.href = '#';
-				collapseShowLink.innerHTML = 'show';
-				collapseShowLink.onclick = function( ev ) {
-					ev.preventDefault();
-					navFrame.classList.remove( 'collapsed' );
-				};
-				collapseShowButton.appendChild( collapseShowLink );
-				collapseShowButton.appendChild( document.createTextNode( ']' ) );
-				head.insertBefore( collapseShowButton, head.firstChild );
-				const collapseHideButton = document.createElement( 'span' );
-				collapseHideButton.classList.add( 'collapseButton' );
-				collapseHideButton.classList.add( 'collapseButtonHide' );
-				collapseHideButton.appendChild( document.createTextNode( '[' ) );
-				const collapseHideLink = document.createElement( 'a' );
-				collapseHideLink.href = '#';
-				collapseHideLink.innerHTML = 'hide';
-				collapseHideLink.onclick = function( ev ) {
-					ev.preventDefault();
-					navFrame.classList.add( 'collapsed' );
-				};
-				collapseHideButton.appendChild( collapseHideLink );
-				collapseHideButton.appendChild( document.createTextNode( ']' ) );
-				head.insertBefore( collapseHideButton, head.firstChild );
+				head.insertBefore( this.makeDesignButton( navFrame, true ), head.firstChild );
+				head.insertBefore( this.makeDesignButton( navFrame, false ), head.firstChild );
 			}
 		} );
 	},
@@ -179,32 +153,23 @@ liquipedia.collapse = {
 				hideAllText = 'Hide all';
 			}
 			const button = document.createElement( 'button' );
+			button.classList.add( 'btn', 'btn-secondary', 'btn-small' );
 			if ( toggleGroup.classList.contains( 'toggle-state-hide' ) ) {
-				button.innerHTML = hideAllText;
+				button.innerHTML = this.makeIcon( false ) + ' ' + hideAllText;
 			} else {
-				button.innerHTML = showAllText;
+				button.innerHTML = this.makeIcon( true ) + ' ' + showAllText;
 			}
-			button.onclick = function() {
+			button.onclick = () => {
 				if ( toggleGroup.classList.contains( 'toggle-state-hide' ) ) {
 					toggleGroup.classList.remove( 'toggle-state-hide' );
 					toggleGroup.classList.add( 'toggle-state-show' );
-					this.innerHTML = showAllText;
-					toggleGroup.querySelectorAll( '.collapsible, .general-collapsible' ).forEach( ( collapsible ) => {
-						collapsible.classList.add( 'collapsed' );
-					} );
-					toggleGroup.querySelectorAll( '.brkts-matchlist-collapsible' ).forEach( ( collapsible ) => {
-						collapsible.classList.add( 'brkts-matchlist-collapsed' );
-					} );
+					button.innerHTML = this.makeIcon( true ) + ' ' + showAllText;
+					this.updateCollapsibleElements( '.collapsible, .general-collapsible', false, toggleGroup );
 				} else {
 					toggleGroup.classList.remove( 'toggle-state-show' );
 					toggleGroup.classList.add( 'toggle-state-hide' );
-					this.innerHTML = hideAllText;
-					toggleGroup.querySelectorAll( '.collapsible, .general-collapsible' ).forEach( ( collapsible ) => {
-						collapsible.classList.remove( 'collapsed' );
-					} );
-					toggleGroup.querySelectorAll( '.brkts-matchlist-collapsible' ).forEach( ( collapsible ) => {
-						collapsible.classList.remove( 'brkts-matchlist-collapsed' );
-					} );
+					button.innerHTML = this.makeIcon( false ) + ' ' + hideAllText;
+					this.updateCollapsibleElements( '.collapsible, .general-collapsible', true, toggleGroup );
 				}
 			};
 			toggleGroup.insertBefore( button, toggleGroup.firstChild );
@@ -244,6 +209,52 @@ liquipedia.collapse = {
 				} );
 			};
 		} );
+	},
+
+	setupSwitchToggleCollapsibles: function() {
+		const switchToggleElements = document.querySelectorAll( '[data-switch-group]' );
+		if ( switchToggleElements.length === 0 ) {
+			return;
+		}
+
+		const groupToSelectorMap = new Map();
+
+		switchToggleElements.forEach( ( element ) => {
+			const switchGroupName = element.getAttribute( 'data-switch-group' );
+			const collapsibleSelector = element.getAttribute( 'data-collapsible-selector' );
+
+			if ( collapsibleSelector === undefined ) {
+				return;
+			}
+
+			groupToSelectorMap.set( switchGroupName, collapsibleSelector );
+
+			liquipedia.switchButtons.getSwitchGroup( switchGroupName ).then( ( switchGroup ) => {
+				if ( switchGroup ) {
+					this.updateCollapsibleElements( collapsibleSelector, switchGroup.value, document );
+				}
+			} );
+		} );
+
+		document.addEventListener( 'switchButtonChanged', ( event ) => {
+			const { name, value } = event.detail.data;
+
+			const selector = groupToSelectorMap.get( name );
+
+			if ( selector ) {
+				this.updateCollapsibleElements( selector, value, document );
+			}
+		} );
+	},
+
+	updateCollapsibleElements: function( selector, show, scope ) {
+		const root = ( scope instanceof Element ) ? scope : document;
+		const elements = root.querySelectorAll( selector );
+
+		elements.forEach( ( element ) => {
+			element.classList.toggle( 'collapsed', !show );
+		} );
 	}
 };
+
 liquipedia.core.modules.push( 'collapse' );

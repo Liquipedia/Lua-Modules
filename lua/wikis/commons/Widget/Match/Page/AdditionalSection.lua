@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Page/AdditionalSection
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -18,6 +18,7 @@ local Div = HtmlWidgets.Div
 
 ---@class MatchPageAdditionalSectionParameters
 ---@field header string
+---@field css table<string, (string|number)?>?
 ---@field bodyClasses string[]?
 ---@field children (string|Html|Widget|nil)|(string|Html|Widget|nil)[]
 
@@ -30,7 +31,8 @@ local MatchPageAdditionalSection = Class.new(Widget)
 function MatchPageAdditionalSection:render()
 	if Logic.isDeepEmpty(self.props.children) then return end
 	return Div{
-		classes = { 'match-bm-match-additional-section' },
+		classes = {'match-bm-match-additional-section'},
+		css = self.props.css,
 		children = {
 			Div{
 				classes = { 'match-bm-match-additional-section-header' },

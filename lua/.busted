@@ -1,7 +1,7 @@
 return {
 	_all = {
 		verbose = true,
-		helper = 'spec/test_helper.lua',
+		helper = 'spec/helpers/test_helper.lua',
 	},
 	default = {
 		ROOT = {"spec"},

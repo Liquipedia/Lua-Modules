@@ -1,23 +1,26 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
-local Template = require('Module:Template')
+
+local DateExt = Lua.import('Module:Date/Ext')
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
+local Template = Lua.import('Module:Template')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+local Rankings = Lua.import('Module:Widget/Ratings')
 
 local Button = Lua.import('Module:Widget/Basic/Button')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
+local PartnerWikis = Lua.import('Module:Widget/MainPage/PartnerWikis')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
@@ -31,47 +34,27 @@ local ABOUT_BODY = 'We are the largest Dota 2 wiki that anyone can edit, maintai
 
 ---@param link string
 ---@param displayName string
+---@param hubIcon string
 ---@return Widget
-local function createHubButton(link, displayName)
+local function createHubButton(link, displayName, hubIcon)
 	return Button{
 		link = link,
 		title = 'Click here to get to the ' .. displayName:lower(),
 		variant = 'secondary',
 		children = {
 			IconFa{
-				additionalClasses = { 'wiki-color-dark' },
-				iconName = 'hub'
+				iconName = hubIcon,
 			},
 			' View ' .. displayName
 		}
 	}
 end
 
-local MAIN_PAGE_BUTTON = createHubButton('Main Page', 'Main Page')
-local ESPORTS_HUB_BUTTON = createHubButton('Portal:Esports', 'Esports Hub')
-local GAME_HUB_BUTTON = createHubButton('Portal:Game', 'Game Hub')
+local MAIN_PAGE_BUTTON = createHubButton('Main Page', 'Main Page', 'main_hub')
+local ESPORTS_HUB_BUTTON = createHubButton('Portal:Esports', 'Esports Hub', 'esports_hub')
+local GAME_HUB_BUTTON = createHubButton('Portal:Game', 'Game Hub', 'game_hub')
 
 local CONTENT = {
-	aboutMain = {
-		heading = ABOUT_HEADING,
-		body = WidgetUtil.collect(
-			ABOUT_BODY,
-			Div{
-				css = {
-					display = 'flex',
-					['flex-wrap'] = 'wrap',
-					gap = '12px',
-					['justify-content'] = 'center',
-					['padding-top'] = '12px'
-				},
-				children = {
-					ESPORTS_HUB_BUTTON, GAME_HUB_BUTTON
-				}
-			}
-		),
-		padding = true,
-		boxid = 1500,
-	},
 	aboutEsport = {
 		heading = ABOUT_HEADING,
 		body = WidgetUtil.collect(
@@ -114,11 +97,7 @@ local CONTENT = {
 	},
 	heroes = {
 		heading = 'Heroes',
-		body = Div{
-			classes = { 'heroes-panel' },
-			attributes = { ['data-component'] = 'heroes-panel' },
-			children = { Template.safeExpand(mw.getCurrentFrame(), 'HeroTable') }
-		},
+		body = Template.safeExpand(mw.getCurrentFrame(), 'HeroTable'),
 		padding = true,
 		boxid = 1501,
 	},
@@ -132,32 +111,32 @@ local CONTENT = {
 		heading = 'Useful Articles',
 		body = '{{Main Page Useful Articles}}',
 		padding = true,
-		boxid = 1503,
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
 		body = WantToHelp{},
 		padding = true,
-		boxid = 1504,
+		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP,
 	},
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferPage = 'Transfers/' .. os.date('%Y') .. '/' ..
+			transferPage = 'Transfers/' .. DateExt.getYearOf() .. '/' ..
 				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 		},
-		boxid = 1509,
+		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
 		body = ThisDayWidgets.Content{ birthdayListPage = 'Birthday list' },
 		padding = true,
-		boxid = 1510,
+		boxid = MainPageLayoutUtil.BoxId.THIS_DAY,
 	},
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
-		boxid = 1516,
+		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -170,10 +149,13 @@ local CONTENT = {
 		heading = 'Matches',
 		body = MatchTicker{},
 		padding = true,
-		boxid = 1507,
-		panelAttributes = {
-			['data-switch-group-container'] = 'countdown',
-		},
+		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
+	},
+	partnerWikis = {
+		heading = 'Partner Wikis',
+		body = PartnerWikis{},
+		padding = true,
+		boxid = 1518,
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -182,45 +164,44 @@ local CONTENT = {
 			completedDays = 20
 		},
 		padding = true,
-		boxid = 1508,
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
+	},
+	rankings = {
+		heading = 'Liquipedia Rankings (Beta)',
+		body = Rankings{
+			teamLimit = 5,
+			storageType = 'extension',
+			showGraph = false,
+			isSmallerVersion = true
+		},
+		padding = false,
+		boxid = 1520,
 	},
 }
 
 local LAYOUT_MAIN = {
-	{ -- Left
-		size = 6,
+	{ -- Top Left
+		sizes = {xxl = 5, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 1,
-				content = CONTENT.aboutMain,
-			},
-			{
-				mobileOrder = 4,
-				content = CONTENT.heroes,
-			},
-			{
-				mobileOrder = 5,
-				content = CONTENT.updates,
-			},
-			{
-				mobileOrder = 9,
-				content = CONTENT.usefulArticles,
-			},
-			{
-				mobileOrder = 7,
-				content = CONTENT.wantToHelp,
-			},
-		},
-	},
-	{ -- Right
-		size = 6,
-		children = {
-			{
-				mobileOrder = 2,
-				content = CONTENT.specialEvents
+				content = CONTENT.specialEvents,
 			},
 			{
 				mobileOrder = 3,
+				content = CONTENT.rankings,
+			},
+			{
+				mobileOrder = 4,
+				content = CONTENT.transfers,
+			},
+		},
+	},
+	{ -- Top Right
+		sizes = {xxl = 7, xxxl = 6},
+		children = {
+			{
+				mobileOrder = 2,
 				children = {
 					{
 						children = {
@@ -250,21 +231,58 @@ local LAYOUT_MAIN = {
 					},
 				},
 			},
-			{
-				mobileOrder = 6,
-				content = CONTENT.transfers,
-			},
-			{
-				mobileOrder = 9,
-				content = CONTENT.thisDay,
-			},
 		},
 	},
+	{ -- Heroes
+		sizes = {xxl = 12},
+		children = {
+			{
+				mobileOrder = 5,
+				content = CONTENT.heroes,
+			},
+		}
+	},
+	{ -- Bottom Left
+		sizes = {xxl = 6},
+		children = {
+			{
+				mobileOrder = 6,
+				content = CONTENT.wantToHelp,
+			},
+			{
+				mobileOrder = 7,
+				content = CONTENT.updates,
+			},
+
+		}
+	},
+	{ -- Bottom Right
+		sizes = {xxl = 6},
+		children = {
+			{
+				mobileOrder = 8,
+				content = CONTENT.thisDay,
+			},
+		}
+	},
+	{ -- Useful articles
+		sizes = {xxl = 12},
+		children = {
+			{
+				mobileOrder = 9,
+				content = CONTENT.usefulArticles,
+			},
+			{
+				mobileOrder = 10,
+				content = CONTENT.partnerWikis,
+			},
+		}
+	}
 }
 
 local LAYOUT_ESPORTS = {
 	{ -- Left
-		size = 6,
+		sizes = {xxl = 5, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 1,
@@ -275,21 +293,25 @@ local LAYOUT_ESPORTS = {
 				content = CONTENT.specialEvents,
 			},
 			{
-				mobileOrder = 4,
-				content = CONTENT.transfers,
+				mobileOrder = 5,
+				content = CONTENT.rankings,
 			},
 			{
 				mobileOrder = 6,
-				content = CONTENT.thisDay,
+				content = CONTENT.transfers,
 			},
 			{
 				mobileOrder = 7,
+				content = CONTENT.thisDay,
+			},
+			{
+				mobileOrder = 8,
 				content = CONTENT.wantToHelp,
 			},
 		}
 	},
 	{ -- Right
-		size = 6,
+		sizes = {xxl = 7, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 3,
@@ -323,7 +345,7 @@ local LAYOUT_ESPORTS = {
 				},
 			},
 			{
-				mobileOrder = 5,
+				mobileOrder = 7,
 				content = CONTENT.updates,
 			},
 		},
@@ -332,7 +354,7 @@ local LAYOUT_ESPORTS = {
 
 local LAYOUT_GAME = {
 	{ -- Left
-		size = 6,
+		sizes = {xxl = 5, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 1,
@@ -349,7 +371,7 @@ local LAYOUT_GAME = {
 		},
 	},
 	{ -- Right
-		size = 6,
+		sizes = {xxl = 7, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 3,

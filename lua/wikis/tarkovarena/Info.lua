@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=tarkovarena
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -36,6 +35,12 @@ return {
 			status = 2,
 			matchWidth = 180,
 			gameScoresIfBo1 = true,
+		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'automatic',
+			},
 		},
 	},
 	defaultRoundPrecision = 0,

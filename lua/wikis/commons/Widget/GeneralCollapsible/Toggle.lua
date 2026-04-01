@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/GeneralCollapsible/Toggle
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -9,9 +8,12 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Button = Lua.import('Module:Widget/Basic/Button')
+local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Span = HtmlWidgets.Span
 
 ---@class CollapsibleToggle: Widget
@@ -20,13 +22,29 @@ local CollapsibleToggle = Class.new(Widget)
 
 ---@return Widget
 function CollapsibleToggle:render()
-	local showButton = Span{
+	local showButton = Button{
 		classes = {'general-collapsible-expand-button'},
-		children = {'show'},
+		children = Span{
+			children = Logic.emptyOr(self.props.showButtonChildren, {
+				Icon{iconName = 'show'},
+				' ',
+				'Show'
+			})
+		},
+		size = 'xs',
+		variant = 'secondary',
 	}
-	local hideButton = Span{
+	local hideButton = Button{
 		classes = {'general-collapsible-collapse-button'},
-		children = {'hide'},
+		children = Span{
+			children = Logic.emptyOr(self.props.hideButtonChildren, {
+				Icon{iconName = 'hide'},
+				' ',
+				'Hide'
+			})
+		},
+		size = 'xs',
+		variant = 'secondary',
 	}
 
 	return Span{
@@ -34,10 +52,8 @@ function CollapsibleToggle:render()
 		css = self.props.css,
 		attributes = self.props.attributes,
 		children = {
-			'[',
 			showButton,
 			hideButton,
-			']',
 		}
 	}
 end

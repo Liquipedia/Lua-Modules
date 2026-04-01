@@ -1,29 +1,30 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchTicker
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
-local Game = require('Module:Game')
-local Logic = require('Module:Logic')
-local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local Team = require('Module:Team')
-local Tier = require('Module:Tier/Utils')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
+local Game = Lua.import('Module:Game')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local Tier = Lua.import('Module:Tier/Utils')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
 local MatchUtil = Lua.import('Module:Match/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Tournament = Lua.import('Module:Tournament')
 
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -53,20 +54,40 @@ local DEFAULT_QUERY_COLUMNS = {
 	'match2bracketdata',
 	'match2games',
 	'game',
+	'section',
 }
 local NONE = 'none'
 local INFOBOX_DEFAULT_CLASS = 'fo-nttax-infobox panel'
 local INFOBOX_WRAPPER_CLASS = 'fo-nttax-infobox-wrapper'
 local DEFAULT_LIMIT = 20
-local DEFAULT_ODER = 'date asc, liquipediatier asc, tournament asc'
+local DEFAULT_ORDER = 'date asc, liquipediatier asc, tournament asc'
 local DEFAULT_RECENT_ORDER = 'date desc, liquipediatier asc, tournament asc'
 local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
 
+---@class MatchTickerMatchInterface
+---@operator call({config: MatchTickerConfig, match: table}): MatchTickerMatchInterface
+---@field config MatchTickerConfig
+---@field match table
+---@field create fun(self: MatchTickerMatchInterface): Widget|Html?
+
+---@class MatchTickerContainerInterface
+---@operator call({config: MatchTickerConfig, matches: table[]}): MatchTickerContainerInterface
+---@field config MatchTickerConfig
+---@field matches table[]
+---@field create fun(self: MatchTickerContainerInterface): Widget|Html?
+
 --- Extract externally if it grows
 ---@param matchTickerConfig MatchTickerConfig
----@return unknown # Todo: Add interface for MatchTickerDisplay
+---@return {Container?: MatchTickerContainerInterface, Match: MatchTickerMatchInterface}
 local MatchTickerDisplayFactory = function (matchTickerConfig)
-	if matchTickerConfig.newStyle then
+	assert(not (matchTickerConfig.entityStyle and matchTickerConfig.newStyle),
+		"Invalid MatchTicker configuration: 'entityStyle' and 'newStyle' are mutually exclusive. " ..
+		"Choose one display mode: use 'entityStyle' for carousel-based entity display, " ..
+		"'newStyle' for new-style match cards, or neither for legacy display.")
+
+	if matchTickerConfig.entityStyle then
+		return Lua.import('Module:MatchTicker/DisplayComponents/Entity')
+	elseif matchTickerConfig.newStyle then
 		return Lua.import('Module:MatchTicker/DisplayComponents/New')
 	else
 		return Lua.import('Module:MatchTicker/DisplayComponents')
@@ -97,8 +118,15 @@ end
 ---@field regions string[]?
 ---@field games string[]?
 ---@field newStyle boolean?
----@field featuredTournamentsOnly boolean?
+---@field entityStyle boolean?
+---@field featuredOnly boolean?
 ---@field displayGameIcons boolean?
+
+---@class MatchTickerGameData
+---@field asGame boolean?
+---@field gameIds number[]
+---@field map string?
+---@field mapDisplayName string?
 
 ---@class MatchTicker
 ---@operator call(table): MatchTicker
@@ -122,7 +150,7 @@ function MatchTicker:init(args)
 		end)),
 		queryByParent = Logic.readBool(args.queryByParent),
 		limit = tonumber(args.limit) or DEFAULT_LIMIT,
-		order = args.order or (Logic.readBool(args.recent) and DEFAULT_RECENT_ORDER or DEFAULT_ODER),
+		order = args.order or (Logic.readBool(args.recent) and DEFAULT_RECENT_ORDER or DEFAULT_ORDER),
 		player = args.player and mw.ext.TeamLiquidIntegration.resolve_redirect(args.player):gsub(' ', '_') or nil,
 		queryColumns = args.queryColumns or DEFAULT_QUERY_COLUMNS,
 		additionalConditions = args.additionalConditions or '',
@@ -147,7 +175,7 @@ function MatchTicker:init(args)
 					return Game.toIdentifier{game=game}
 				end) or nil,
 		newStyle = Logic.readBool(args.newStyle),
-		featuredTournamentsOnly = Logic.readBool(args.featuredTournamentsOnly),
+		featuredOnly = Logic.readBool(args.featuredOnly),
 		displayGameIcons = Logic.readBool(args.displayGameIcons)
 	}
 
@@ -156,16 +184,19 @@ function MatchTicker:init(args)
 		not (config.upcoming or config.ongoing)),
 		'Invalid recent, upcoming, ongoing combination')
 
-	local teamPages = args.team and Team.queryHistoricalNames(args.team)
-		or args.team and {args.team} or nil
-	if teamPages then
-		Array.extendWith(teamPages,
-		Array.map(teamPages, function(team) return (team:gsub(' ', '_')) end),
-		Array.map(teamPages, function(team) return mw.getContentLanguage():ucfirst(team) end),
-		Array.map(teamPages, function(team) return (mw.getContentLanguage():ucfirst(team):gsub(' ', '_')) end)
-		)
+	local teamTemplates = args.team and TeamTemplate.queryHistoricalNames(args.team) or nil
+	if teamTemplates then
+		config.teamPages = Array.flatMap(teamTemplates, function (teamTemplate)
+			local teamPage = TeamTemplate.getPageName(teamTemplate)
+			---@cast teamPage -nil
+			return {
+				teamPage,
+				teamPage:gsub(' ', '_'),
+				String.upperCaseFirst(teamPage),
+				String.upperCaseFirst(teamPage:gsub(' ', '_')),
+			}
+		end)
 	end
-	config.teamPages = teamPages
 
 	config.showAllTbdMatches = Logic.readBool(Logic.nilOr(args.showAllTbdMatches,
 		Table.isEmpty(config.tournaments)))
@@ -355,7 +386,7 @@ function MatchTicker:parseMatch(match)
 	match.opponents = Array.map(match.match2opponents, function(opponent, opponentIndex)
 		return MatchGroupUtil.opponentFromRecord(match, opponent, opponentIndex)
 	end)
-	if self.config.regions or self.config.featuredTournamentsOnly then
+	if self.config.regions or self.config.featuredOnly then
 		match.tournamentData = MatchTicker.fetchTournament(match.parent)
 	end
 	return match
@@ -366,6 +397,9 @@ local previousMatchWasTbd
 ---@param match table
 ---@return boolean
 function MatchTicker:keepMatch(match)
+	if match.extradata and match.extradata.hidden then
+		return false
+	end
 	-- Remove matches with wrong region
 	if self.config.regions then
 		if not match.tournamentData then
@@ -376,11 +410,10 @@ function MatchTicker:keepMatch(match)
 		end
 	end
 
-	if self.config.featuredTournamentsOnly then
-		if not match.tournamentData then
-			return false
-		end
-		if not match.tournamentData.featured then
+	if self.config.featuredOnly then
+		local matchIsInFeaturedTournament = match.tournamentData and match.tournamentData.featured
+		local matchIsFeatured = match.extradata and match.extradata.featured
+		if not matchIsInFeaturedTournament and not matchIsFeatured then
 			return false
 		end
 	end
@@ -422,7 +455,7 @@ function MatchTicker:expandGamesOfMatch(match)
 		return {match}
 	end
 
-	return Array.map(match.match2games, function(game, gameIndex)
+	local expandedGames = Array.map(match.match2games, function(game, gameIndex)
 		if config.recent and Logic.isEmpty(game.winner) then
 			return
 		end
@@ -440,18 +473,29 @@ function MatchTicker:expandGamesOfMatch(match)
 		end
 
 		local gameMatch = Table.copy(match)
-		gameMatch.match2games = nil
+		gameMatch.match2games = {}
 		gameMatch.asGame = true
-		gameMatch.asGameIdx = gameIndex
+		gameMatch.asGameIndexes = {gameIndex}
 
 		gameMatch.winner = game.winner
 		gameMatch.date = game.date
 		gameMatch.map = game.map
 		gameMatch.vod = Logic.nilIfEmpty(game.vod) or match.vod
-		gameMatch.opponents = Array.map(match.opponents, function(opponent, opponentIndex)
+		gameMatch.opponents = Array.map(match.match2opponents, function(opponent, opponentIndex)
 			return MatchUtil.enrichGameOpponentFromMatchOpponent(opponent, game.opponents[opponentIndex])
 		end)
+		gameMatch.match2opponents = gameMatch.opponents
+		gameMatch.extradata = Table.merge(gameMatch.extradata, game.extradata)
 		return gameMatch
+	end)
+
+	return Array.map(Array.groupAdjacentBy(expandedGames, Operator.property('date')), function (gameGroup)
+		if #gameGroup > 1 then
+			local lastIndexes = gameGroup[#gameGroup].asGameIndexes
+			table.insert(gameGroup[1].asGameIndexes, lastIndexes[#lastIndexes])
+		end
+
+		return gameGroup[1]
 	end)
 end
 
@@ -470,7 +514,7 @@ function MatchTicker:sortMatches(matches)
 		if a.match2id ~= b.match2id then
 			return a.match2id < b.match2id
 		end
-		return (a.asGameIdx or 0) < (b.asGameIdx or 0)
+		return ((a.asGameIndexes or {})[1] or 0) < ((b.asGameIndexes or {})[1] or 0)
 	end)
 end
 
@@ -542,8 +586,19 @@ function MatchTicker:create(header)
 		return wrapper:css('text-align', 'center'):wikitext('No Results found.')
 	end
 
-	for _, match in ipairs(self.matches or {}) do
-		wrapper:node(MatchTicker.DisplayComponents.Match{config = self.config, match = match}:create())
+	if MatchTicker.DisplayComponents.Container then
+		local container = MatchTicker.DisplayComponents.Container{
+			config = self.config,
+			matches = self.matches
+		}:create()
+
+		if container then
+			wrapper:node(container)
+		end
+	else
+		Array.forEach(self.matches or {}, function(match)
+			wrapper:node(MatchTicker.DisplayComponents.Match{config = self.config, match = match}:create())
+		end)
 	end
 
 	return wrapper

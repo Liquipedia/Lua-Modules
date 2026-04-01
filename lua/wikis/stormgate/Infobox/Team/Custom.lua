@@ -1,22 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:Infobox/Team/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -28,7 +28,7 @@ local CustomTeam = Class.new(Team)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
@@ -59,7 +59,7 @@ function CustomInjector:parse(id, widgets)
 		if raceBreakdown then
 			Array.appendWith(widgets,
 				Title{children = 'Player Breakdown'},
-				Cell{name = 'Number of Players', content = {raceBreakdown.total}},
+				Cell{name = 'Number of Players', children = {raceBreakdown.total}},
 				Breakdown{children = raceBreakdown.display, classes = { 'infobox-center' }}
 			)
 		end

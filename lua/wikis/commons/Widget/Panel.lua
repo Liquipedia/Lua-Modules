@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Panel
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -21,7 +21,7 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 ---@field bodyClass string[]?
 ---@field bodyStyle table<string, any>?
 ---@field boxId integer?
----@field children (Widget|string|Html|nil)|(Widget|string|Html|nil)[]
+---@field children Renderable|Renderable[]
 ---@field classes string[]?
 ---@field heading string|Html|Widget
 ---@field headingAttributes table<string, any>?
@@ -67,7 +67,8 @@ function Panel:render()
 	local body = Div{
 		classes = WidgetUtil.collect(
 			hasToggle and 'panel-box-collapsible-content' or nil,
-			Logic.readBool(self.props.padding) and 'panel-box-body' or nil,
+			'panel-box-body',
+			not Logic.readBool(self.props.padding) and 'panel-box-body--no-padding' or nil,
 			self.props.bodyClass
 		),
 		css = self.props.bodyStyle,

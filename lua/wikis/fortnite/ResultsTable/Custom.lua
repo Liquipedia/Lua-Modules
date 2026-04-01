@@ -1,28 +1,27 @@
 ---
 -- @Liquipedia
--- wiki=fortnite
 -- page=Module:ResultsTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local ResultsTable = Lua.import('Module:ResultsTable')
 local AwardsTable = Lua.import('Module:ResultsTable/Award')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local CustomResultsTable = {}
 
 -- Template entry point
 ---@param args table
----@return Html
+---@return Widget
 function CustomResultsTable.results(args)
 	local resultsTable = ResultsTable(args)
 
@@ -34,7 +33,7 @@ function CustomResultsTable.results(args)
 end
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomResultsTable.awards(args)
 	return AwardsTable(args):create():build()
 end

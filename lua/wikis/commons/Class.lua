@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Class
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -32,6 +31,11 @@ Class.PRIVATE_FUNCTION_SPECIFIER = '_'
 ---@operator call:self
 ---@field init fun(self, ...)
 
+---@param base? table
+---@param init? fun(self, ...)
+---@return table
+---@overload fun(init: fun(self, ...)): table
+---@nodiscard
 function Class.new(base, init)
 	local instance = {}
 

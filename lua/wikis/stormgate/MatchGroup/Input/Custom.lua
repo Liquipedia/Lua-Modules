@@ -1,25 +1,24 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Faction = require('Module:Faction')
-local Flags = require('Module:Flags')
-local CharacterAliases = mw.loadData('Module:CharacterAliases')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Faction = Lua.import('Module:Faction')
+local Flags = Lua.import('Module:Flags')
+local CharacterAliases = Lua.import('Module:CharacterAliases', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local TBD = 'TBD'
 local DEFAULT_HERO_FACTION = CharacterAliases.default.faction
@@ -84,7 +83,7 @@ function MatchFunctions.adjustOpponent(opponent, opponentIndex)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
@@ -111,13 +110,13 @@ function MatchFunctions.getOpponentExtradata(opponent)
 	}
 end
 
----@param player table
+---@param player MGIParsedPlayer
 ---@return string
 function MatchFunctions.getPlayerFaction(player)
 	return Faction.read(player.extradata.faction) or Faction.defaultFaction
 end
 
----@param opponents {type: OpponentType}
+---@param opponents MGIParsedOpponent[]
 ---@return string
 function MatchFunctions.getMode(opponents)
 	local opponentTypes = Array.map(opponents, Operator.property('type'))
@@ -138,7 +137,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	---@type table<string, string|table|nil>
@@ -183,7 +182,7 @@ function MapFunctions.calculateMapScore(map)
 end
 
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]?
 function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
@@ -196,7 +195,7 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return StormgateParticipant[]
 function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
@@ -253,7 +252,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return StormgateParticipant[]
 function MapFunctions.getPartyMapPlayers(mapInput, opponent, opponentIndex)
@@ -280,7 +279,7 @@ end
 
 ---@param match table
 ---@param map table # has map.opponents as the games opponents
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return string
 function MapFunctions.getMapMode(match, map, opponents)
 	local playerCounts = Array.map(map.opponents or {}, MapFunctions.getMapOpponentSize)
@@ -298,7 +297,7 @@ end
 
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {

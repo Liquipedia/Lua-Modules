@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Standings/Ffa
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
@@ -18,8 +18,7 @@ local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local RoundSelector = Lua.import('Module:Widget/Standings/RoundSelector')
 local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local STATUS_TO_DISPLAY = {
 	dq = 'DQ',
@@ -28,7 +27,6 @@ local STATUS_TO_DISPLAY = {
 
 ---@class StandingsFfaWidget: Widget
 ---@operator call(table): StandingsFfaWidget
-
 local StandingsFfaWidget = Class.new(Widget)
 
 ---@return Widget?
@@ -77,8 +75,13 @@ function StandingsFfaWidget:render()
 			HtmlWidgets.Tr{children = WidgetUtil.collect(
 				HtmlWidgets.Th{children = '#'},
 				HtmlWidgets.Th{children = 'Participant'},
-				HtmlWidgets.Th{children = ''},
-				HtmlWidgets.Th{children = 'Points'},
+				showRoundColumns and HtmlWidgets.Th{children = ''} or nil,
+				Array.map(standings.tiebreakers, function(tiebreaker)
+					if not tiebreaker.title then
+						return
+					end
+					return HtmlWidgets.Th{children = tiebreaker.title}
+				end),
 				showRoundColumns and Array.map(standings.rounds, function(round)
 					return HtmlWidgets.Th{children = round.title}
 				end) or nil
@@ -105,32 +108,38 @@ function StandingsFfaWidget:render()
 								classes = {teamBackground},
 								children = OpponentDisplay.BlockOpponent{
 									opponent = slot.opponent,
-									showLink = true,
 									overflow = 'ellipsis',
 									teamStyle = 'hybrid',
 									showPlayerTeam = true,
 								}
 							},
-							HtmlWidgets.Td{
+							showRoundColumns and HtmlWidgets.Td{
 								classes = {teamBackground},
 								children = PlacementChange{change = slot.positionChangeFromPreviousRound}
-							},
-							HtmlWidgets.Td{
-								classes = {teamBackground},
-								children = slot.points,
-								css = {['font-weight'] = 'bold', ['text-align'] = 'center'}
-							},
+							} or nil,
+							Array.map(standings.tiebreakers, function(tiebreaker, tiebreakerIndex)
+								if not tiebreaker.title then
+									return
+								end
+								return HtmlWidgets.Td{
+									classes = {teamBackground},
+								css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil, ['text-align'] = 'center'},
+									children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
+								}
+							end),
 							showRoundColumns and Array.map(standings.rounds, function(columnRound)
 								local text
 								if columnRound.round <= round.round then
 									local opponent = Array.find(columnRound.opponents, function(columnSlot)
 										return Table.deepEquals(columnSlot.opponent, slot.opponent)
 									end)
-									local roundStatus = opponent.specialStatus
-									if roundStatus == '' then
-										text = opponent.pointsChangeFromPreviousRound
-									else
-										text = STATUS_TO_DISPLAY[roundStatus]
+									if opponent then
+										local roundStatus = opponent.specialStatus
+										if roundStatus == '' then
+											text = opponent.pointsChangeFromPreviousRound
+										else
+											text = STATUS_TO_DISPLAY[roundStatus]
+										end
 									end
 								end
 								return HtmlWidgets.Td{children = text, css = {['text-align'] = 'center'}}

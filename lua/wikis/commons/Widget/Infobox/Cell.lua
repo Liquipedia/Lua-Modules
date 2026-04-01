@@ -1,27 +1,39 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Infobox/Cell
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
+local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class CellWidgetOptions
+---@field collapsible boolean?
 ---@field columns number?
 ---@field makeLink boolean?
 ---@field suppressColon boolean?
 ---@field separator Widget|string|Html|nil
 
+---@class CellWidgetProps
+---@field name string|Widget|Html
+---@field classes string[]?
+---@field children (string|Widget|Html)[]
+---@field options CellWidgetOptions
+
 ---@class CellWidget: Widget
----@operator call(table):CellWidget
+---@operator call(CellWidgetProps): CellWidget
+---@field props CellWidgetProps
 local Cell = Class.new(Widget,
 	function(self, input)
 		self.name = self:assertExistsAndCopy(input.name)
@@ -30,6 +42,7 @@ local Cell = Class.new(Widget,
 )
 Cell.defaultProps = {
 	options = {
+		collapsible = false,
 		columns = 2,
 		makeLink = false,
 		suppressColon = false,
@@ -45,17 +58,13 @@ function Cell:render()
 
 	local options = self.props.options
 
-	local mappedChildren = {}
-	for i, child in ipairs(self.props.children) do
-		if i > 1 then
-			table.insert(mappedChildren, options.separator)
-		end
+	local mappedChildren = Array.map(self.props.children, function(child)
 		if options.makeLink then
-			table.insert(mappedChildren, Link{children = {child}, link = child})
+			return Link{children = {child}, link = child}
 		else
-			table.insert(mappedChildren, child)
+			return child
 		end
-	end
+	end)
 
 	if Logic.isEmpty(mappedChildren[1]) then
 		return
@@ -68,12 +77,41 @@ function Cell:render()
 				classes = {'infobox-cell-' .. options.columns, 'infobox-description'},
 				children = {self.props.name, not options.suppressColon and ':' or nil}
 			},
-			HtmlWidgets.Div{
-				css = {width = (100 * (options.columns - 1) / options.columns) .. '%'}, -- 66.66% for col = 3
-				children = mappedChildren,
-			}
+			self:_buildChildrenContainer(mappedChildren)
 		}
 	}
+end
+
+---@private
+---@param mappedChildren (string|Widget|Html)[]
+---@return Widget
+function Cell:_buildChildrenContainer(mappedChildren)
+	local options = self.props.options
+
+	local widgetProps = {
+		css = {width = (100 * (options.columns - 1) / options.columns) .. '%'}, -- 66.66% for col = 3
+		children = Array.interleave(mappedChildren, options.separator)
+	}
+
+	if not options.collapsible then
+		return HtmlWidgets.Div(widgetProps)
+	end
+
+	widgetProps.shouldCollapse = true
+	widgetProps.titleWidget = CollapsibleToggle{
+		showButtonChildren = {
+			'Expand',
+			' ',
+			Icon{iconName = 'expand'}
+		},
+		hideButtonChildren = {
+			'Collapse',
+			' ',
+			Icon{iconName = 'collapse'}
+		}
+	}
+
+	return GeneralCollapsible(widgetProps)
 end
 
 return Cell

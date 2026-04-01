@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=apexlegends
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -34,6 +33,17 @@ return {
 		},
 		match2 = {
 			status = 1,
+		},
+		defaultMaxPlayersPerPlacement = 20,
+		teamRosterNavbox = {
+			hidePlayedMatches = true,
+			excludeStreamers = true,
+		},
+		infoboxPlayer = {
+			autoTeam = true,
+		},
+		participants = {
+			defaultPlayerNumber = 3,
 		},
 	},
 	defaultRoundPrecision = 0,

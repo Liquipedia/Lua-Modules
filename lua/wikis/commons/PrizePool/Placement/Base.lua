@@ -1,20 +1,20 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:PrizePool/Placement/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+local Lua = require('Module:Lua')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
 
 local BASE_CURRENCY = 'USD'
 local LOCAL_CURRENCY_VARIABLE_POST_FIX = 'local'
@@ -22,13 +22,14 @@ local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
 local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
 
---- @class BasePlacement
 --- A BasePlacement is a set of opponents who all share the same final place/award in the tournament.
 --- Its input is generally a table created by `Template:Slot`.
 --- It has a range from placeStart to placeEnd (e.g. 5 to 8) or a slotSize (count) or an award.
+--- @class BasePlacement
+--- @operator call(...): BasePlacement
 --- @field parent BasePrizePool
 --- @field count integer
---- @field opponents BasePlacementOpponent
+--- @field opponents BasePlacementOpponent[]
 local BasePlacement = Class.new(function(self, ...) self:init(...) end)
 
 ---@class BasePlacementOpponent
@@ -90,7 +91,7 @@ function BasePlacement:_readPrizeRewards(args)
 end
 
 ---@param args table
----@return table[]
+---@return BasePlacementOpponent[]
 function BasePlacement:parseOpponents(args)
 	return Array.mapIndexes(function(opponentIndex)
 		local opponentInput = Json.parseIfString(args[opponentIndex])
@@ -144,6 +145,7 @@ function BasePlacement:_shouldAddTbdOpponent(opponentIndex, place)
 	return false
 end
 
+---@protected
 ---@param args table
 function BasePlacement:readAdditionalData(args)
 	error('Function readAdditionalData needs to be implemented by child class of `PrizePool/Placement/Base`')

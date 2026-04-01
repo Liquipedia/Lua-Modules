@@ -1,25 +1,29 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/UnofficialWorldChampion
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Info = Lua.import('Module:Info', {loadData = true})
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local MatchTicker = Lua.import('Module:MatchTicker')
+local Namespace = Lua.import('Module:Namespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -30,22 +34,25 @@ local Breakdown = Widgets.Breakdown
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class UnofficialWorldChampionInfobox: BasicInfobox
+---@operator call(Frame): UnofficialWorldChampionInfobox
 local UnofficialWorldChampion = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function UnofficialWorldChampion.run(frame)
 	local unofficialWorldChampion = UnofficialWorldChampion(frame)
 	return unofficialWorldChampion:createInfobox()
 end
 
----@return string
+---@return Widget
 function UnofficialWorldChampion:createInfobox()
 	local args = self.args
 
 	args.currentChampOpponent = Opponent.readOpponentArgs(
-		Json.parseIfString(args['current champion']) or Opponent.tbd()
+		Json.parseIfString(args['current champion'])
 	)
+
+	self:top(self:_createUpcomingMatches())
 
 	local widgets = {
 		Header{
@@ -72,7 +79,7 @@ function UnofficialWorldChampion:createInfobox()
 						Cell{
 							name = args['gained date'],
 							options = { separator = ' ' },
-							content = WidgetUtil.collect(
+							children = WidgetUtil.collect(
 								String.nilIfEmpty(args['gained against result']),
 								'vs',
 								OpponentDisplay.InlineOpponent{
@@ -88,7 +95,7 @@ function UnofficialWorldChampion:createInfobox()
 		Title{children = 'Most Defences'},
 		Cell{
 			name = (args['most defences no'] or '?') .. ' Matches',
-			content = {
+			children = {
 				OpponentDisplay.InlineOpponent{
 					opponent = self:_parseOpponentArg('most defences')
 				}
@@ -108,7 +115,7 @@ function UnofficialWorldChampion:createInfobox()
 		Title{children = 'Longest Consecutive Time as Champion'},
 		Cell{
 			name = (args['longest consecutive no'] or '?') .. ' days',
-			content = WidgetUtil.collect(
+			children = WidgetUtil.collect(
 				OpponentDisplay.InlineOpponent{
 					opponent = self:_parseOpponentArg('longest consecutive')
 				},
@@ -118,7 +125,7 @@ function UnofficialWorldChampion:createInfobox()
 		Title{children = 'Longest Total Time as Champion'},
 		Cell{
 			name = (args['longest total no'] or '?') .. ' days',
-			content = {
+			children = {
 				OpponentDisplay.InlineOpponent{
 					opponent = self:_parseOpponentArg('longest total')
 				}
@@ -135,7 +142,7 @@ function UnofficialWorldChampion:createInfobox()
 				end
 				return Cell{
 					name = (args['most times held no'] or '?') .. ' times',
-					content = WidgetUtil.collect(
+					children = WidgetUtil.collect(
 						Array.map(opponents, function (opponent)
 							return OpponentDisplay.InlineOpponent{ opponent = opponent }
 						end),
@@ -156,9 +163,10 @@ function UnofficialWorldChampion:createInfobox()
 	}
 
 	self:setLpdbData(args)
-	return self:build(widgets)
+	return self:build(widgets, 'UnofficialWorldChampion')
 end
 
+---@private
 ---@param key string
 ---@return standardOpponent
 function UnofficialWorldChampion:_parseOpponentArg(key)
@@ -167,6 +175,7 @@ function UnofficialWorldChampion:_parseOpponentArg(key)
 	)
 end
 
+---@private
 ---@return Widget[]
 function UnofficialWorldChampion:_parseRegionalDistribution()
 	local args = self.args
@@ -176,12 +185,67 @@ function UnofficialWorldChampion:_parseRegionalDistribution()
 		Array.appendWith(widgets,
 			Cell{
 				name = (args[regionKey .. ' no'] or '') .. ' champions',
-				content = {region}
+				children = {region}
 			},
 			Breakdown{children = {args[regionKey .. ' champions']}}
 		)
 	end
 	return widgets
+end
+
+---@private
+---@return Widget?
+function UnofficialWorldChampion:_createUpcomingMatches()
+	if not self:shouldStore(self.args) then
+		return nil
+	end
+
+	if Info.config.match2.status == 0 then
+		return nil
+	end
+
+	local currentChampion = self.args.currentChampOpponent
+
+	if not currentChampion or currentChampion.type ~= Opponent.team then
+		return nil
+	end
+
+	if Opponent.isTbd(currentChampion) or Opponent.isEmpty(currentChampion) or Opponent.isBye(currentChampion) then
+		return nil
+	end
+
+	local result = Logic.tryCatch(
+		function()
+			local matchTicker = MatchTicker{
+				team = currentChampion.template,
+				limit = 5,
+				upcoming = true,
+				ongoing = true,
+				hideTournament = false,
+			}
+			matchTicker:query()
+			return matchTicker
+		end,
+		function()
+			return nil
+		end
+	)
+
+	if not result or not result.matches or #result.matches == 0 then
+		return nil
+	end
+
+	local EntityDisplay = Lua.import('Module:MatchTicker/DisplayComponents/Entity')
+	return EntityDisplay.Container{
+		config = result.config,
+		matches = result.matches,
+	}:create()
+end
+
+---@param args table
+---@return boolean
+function UnofficialWorldChampion:shouldStore(args)
+	return Namespace.isMain() and Lpdb.isStorageEnabled()
 end
 
 ---@param args table

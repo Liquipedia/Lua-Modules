@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/NavBox/Child
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -14,39 +13,73 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Image = Lua.import('Module:Image')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
-local Widget = Lua.import('Module:Widget')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local Span = HtmlWidgets.Span
 local Tbl = HtmlWidgets.Table
 local Tr = HtmlWidgets.Tr
 local Th = HtmlWidgets.Th
 local Td = HtmlWidgets.Td
 
+local NavBoxTitle = Lua.import('Module:Widget/NavBox/Title')
+local Widget = Lua.import('Module:Widget')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
 local NavBoxList = Lua.import('Module:Widget/NavBox/List')
 
 local EMPTY_CHILD_ERROR = 'Empty child found'
 
+---@class NavBoxChildProps: table<integer, string?>
+---@field name string?
+---@field mobileName string?
+---@field title string?
+---@field mobileTitle string?
+---@field titleLink string?
+---@field collapsed boolean? # from wiki input string?
+---@field center boolean? # from wiki input string?
+---@field allowEmpty boolean? # from wiki input string?
+---@field supressHtmlList boolean? # from wiki input string?
+---@field image string?
+---@field imageleft string?
+---@field imagedark string?
+---@field imageleftdark string?
+---@field imagesize string?
+---@field imageleftsize string?
+---@field imagelink string?
+---@field imagedarklink string?
+---@field imageShowOnMobile boolean? # from wiki input string?
+---@field imageleftShowOnMobile boolean? # from wiki input string?
+---@field child1 string|NavBoxChildProps?
+---@field child2 string|NavBoxChildProps?
+---@field child3 string|NavBoxChildProps? # childX for X >=4 is supported too
+
 ---@class NavBoxChild: Widget
 ---@operator call(table): NavBoxChild
+---@field props NavBoxChildProps
 local NavBoxChild = Class.new(Widget)
 NavBoxChild.defaultProps = {
 	imagesize = '30px',
 	imagelink = '',
 	imageleftsize = '30px',
 	imageleftlink = '',
+	center = false,
 }
 
 ---@return Widget?
 function NavBoxChild:render()
 	local props = self.props
 
-	assert(props[1] or props.child1, EMPTY_CHILD_ERROR)
+	assert(Logic.readBool(props.allowEmpty) or props[1] or props.child1, EMPTY_CHILD_ERROR)
+
+	local listElements = Array.mapIndexes(function(index)
+		return props[index]
+	end)
+	local listCss = {['text-align'] = Logic.readBool(props.center) and 'center' or nil}
+
 	if not props.child1 then
-		return NavBoxList{children = Array.mapIndexes(function(index)
-			return self.props[index]
-		end)}
+		return NavBoxList{children = listElements, css = listCss, supressHtmlList = Logic.readBool(props.supressHtmlList)}
 	end
 
 	local children = Array.mapIndexes(function(rowIndex)
@@ -54,9 +87,11 @@ function NavBoxChild:render()
 	end)
 
 	if props[1] then
-		table.insert(children, {name = props.name, child = NavBoxList{children = Array.mapIndexes(function(index)
-			return self.props[index]
-		end)}})
+		table.insert(children, {
+			name = props.name,
+			mobileName = props.mobileName,
+			child = NavBoxList{children = listElements, css = listCss}
+		})
 	end
 
 	self.rowSpan = #children
@@ -79,20 +114,14 @@ function NavBoxChild:render()
 			shouldCollapse and 'collapsed' or nil,
 		},
 		children = WidgetUtil.collect(
-			(props.title or shouldCollapse) and Tr{children = {Th{
-				attributes = {colspan = colSpan},
-				classes = {'navbox-title'},
-				children = {props.title or 'Click on the "show"/"hide" link on the right to collapse/uncollapse the full list'},
-			}}} or nil,
+			(props.title or shouldCollapse) and NavBoxTitle(Table.merge(props, {colSpan = colSpan})) or nil,
 			Array.map(children, FnUtil.curry(NavBoxChild._toRow, self))
 		)
 	}
 end
 
---Click on the "Show" link on the right to see the full list
-
 ---@param childProps table|string?
----@return {name: string?, child: Widget}?
+---@return {name: string?, mobileName: string?, child: Widget}?
 function NavBoxChild._getChild(childProps)
 	if Logic.isEmpty(childProps) then return end
 	if type(childProps) ~= 'table' then
@@ -101,10 +130,10 @@ function NavBoxChild._getChild(childProps)
 	assert(Logic.isNotEmpty(childProps), EMPTY_CHILD_ERROR)
 	---@cast childProps -nil
 
-	return {name = childProps.name, child = NavBoxChild(childProps)}
+	return {name = childProps.name, mobileName = childProps.mobileName, child = NavBoxChild(childProps)}
 end
 
----@param child {name: string?, child: Widget}
+---@param child {name: string?, mobileName: string?, child: Widget}
 ---@param childIndex integer
 ---@return WidgetHtml
 function NavBoxChild:_toRow(child, childIndex)
@@ -113,7 +142,10 @@ function NavBoxChild:_toRow(child, childIndex)
 			self:_makeImage(childIndex, true),
 			child.name and Th{
 				classes = {'navbox-group'},
-				children = {child.name or ''},
+				children = {
+					child.mobileName and Span{children = child.name, classes = {'mobile-hide'}} or child.name or '',
+					child.mobileName and Span{children = child.mobileName, classes = {'mobile-only'}} or nil,
+				},
 				css = {width = '1%'},
 			} or nil,
 			Td{
@@ -137,6 +169,7 @@ function NavBoxChild:_makeImage(childIndex, isLeft)
 	local lightMode = props[prefix]
 	local darkMode = props[prefix .. 'dark']
 	local padding = isLeft and '0 2px 0 0' or '0 0 0 2px'
+	local hideOnMobile = not Logic.readBool(props[prefix .. 'ShowOnMobile'])
 
 	if childIndex ~= 1 or not (lightMode or darkMode) then
 		return
@@ -144,7 +177,10 @@ function NavBoxChild:_makeImage(childIndex, isLeft)
 
 	return Td{
 		attributes = {rowspan = self.rowSpan},
-		classes = {'navbox-image'},
+		classes = {
+			'navbox-image',
+			hideOnMobile and 'mobile-hide' or nil,
+		},
 		css = {width = '1px', padding = padding},
 		children = Div{children = {
 			Image.display(
