@@ -35,7 +35,13 @@ watcher.on( 'change', ( filePath ) => {
 	console.log( 'Deploying...' );
 
 	const child = spawn( 'python3', [ 'scripts/deploy.py', filePath ], {
-		env: process.env,
+		env: {
+			...process.env,
+			WIKI_USER: process.env.LP_BOTUSER,
+			WIKI_PASSWORD: process.env.LP_BOTPASSWORD,
+			WIKI_BASE_URL: process.env.LP_BASE_URL,
+			WIKI_UA_EMAIL: process.env.LP_UA_EMAIL,
+		},
 		stdio: 'inherit',
 	} );
 
