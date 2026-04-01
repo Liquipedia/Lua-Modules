@@ -70,6 +70,10 @@ return {
 		['date-range-month-day--month-unknown_day'] = '${startMonth} ${startDate} – ${endMonth} TBA',
 		['date-range-month-day--month-day'] = '${startMonth} ${startDate} – ${endMonth} ${endDate}',
 
+		-- HiddenDataBox warnings
+		['hiddendatabox-invalid-parent-warning'] = '${parent} is not a Liquipedia Tournament',
+		['hiddendatabox-invalid-tier-warning'] = '${tierString} is not a known Liquipedia ${tierMode}',
+
 		-- Bracket Headers
 		['brkts-header-r1'] = 'Grand Final,Final,GF',
 		['brkts-header-r2'] = 'Semifinals,Semis,SF',
