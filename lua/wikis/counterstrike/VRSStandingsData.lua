@@ -61,7 +61,7 @@ function VRSStandingsData.getStandings(props)
 	local settings = VRSStandingsData._parseSettings(props)
 
 	---@type VRSStandingsStanding[]
-	local standings = {}
+	local standings
 
 	if settings.shouldFetch then
 		local fetchedStandings, fetchedDate = VRSStandingsData._fetch(settings.updated, settings.datapointType)
