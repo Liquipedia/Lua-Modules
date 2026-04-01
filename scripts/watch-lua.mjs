@@ -11,7 +11,7 @@ if ( !devEnvName ) {
 console.log( `Lua watcher started. Deploying changes to: ${devEnvName}` );
 console.log( 'Watching lua/wikis/**/*.lua ...\n' );
 
-let activeDeployChild = null;
+const deployingFiles = new Set();
 
 const watcher = chokidar.watch( 'lua/wikis/**/*.lua', {
 	awaitWriteFinish: {
@@ -22,10 +22,11 @@ const watcher = chokidar.watch( 'lua/wikis/**/*.lua', {
 } );
 
 watcher.on( 'change', ( filePath ) => {
-	if ( activeDeployChild ) {
+	if ( deployingFiles.has( filePath ) ) {
 		console.log( `[${new Date().toLocaleTimeString()}] Skipping ${filePath} — deploy already in progress.\n` );
 		return;
 	}
+	deployingFiles.add( filePath );
 
 	const time = new Date().toLocaleTimeString();
 	console.log( `[${time}] Changed: ${filePath}` );
@@ -35,7 +36,6 @@ watcher.on( 'change', ( filePath ) => {
 		env: process.env,
 		stdio: 'inherit',
 	} );
-	activeDeployChild = child;
 
 	child.on( 'close', ( code ) => {
 		if ( code === 0 ) {
@@ -43,11 +43,11 @@ watcher.on( 'change', ( filePath ) => {
 		} else {
 			console.error( `Deploy failed (exit code ${code})\n` );
 		}
-		activeDeployChild = null;
+		deployingFiles.delete( filePath );
 	} );
 
 	child.on( 'error', ( err ) => {
 		console.error( `Spawn failed: ${err.message}\n` );
-		activeDeployChild = null;
+		deployingFiles.delete( filePath );
 	} );
 } );
