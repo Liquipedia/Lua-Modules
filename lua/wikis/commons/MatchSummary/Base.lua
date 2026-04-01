@@ -29,6 +29,13 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {loadData = true})
 local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 
+---@class CustomMatchSummaryInterface
+---@field createHeader? fun(match: MatchGroupUtilMatch, options: {teamStyle: teamStyle?}?): Widget
+---@field createBody? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
+---@field createGame? fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
+---@field addToFooter? fun(match: MatchGroupUtilMatch, footer: MatchSummaryFooter): MatchSummaryFooter
+---@field createMatch? fun(matchData: MatchGroupUtilMatch): MatchSummaryMatch
+
 ---@class MatchSummaryFooter
 ---@operator call: MatchSummaryFooter
 ---@field elements (Widget|Html|string|number)[]
@@ -100,32 +107,32 @@ end
 ---@class MatchSummaryMatch
 ---@operator call: MatchSummaryMatch
 ---@field root Html
----@field headerElement Widget?
----@field bodyElement Widget[]?
----@field commentElement Widget?
+---@field headerElement Renderable?
+---@field bodyElement Renderable|Renderable[]?
+---@field commentElement Renderable|Renderable[]?
 ---@field footerElement Widget?
----@field buttonElement Widget?
+---@field buttonElement Renderable?
 local Match = Class.new(
 	function(self)
 		self.root = mw.html.create()
 	end
 )
 
----@param header Widget
+---@param header Renderable
 ---@return MatchSummaryMatch
 function Match:header(header)
 	self.headerElement = header
 	return self
 end
 
----@param body Widget[]
+---@param body Renderable|Renderable[]
 ---@return MatchSummaryMatch
 function Match:body(body)
 	self.bodyElement = body
 	return self
 end
 
----@param comment Widget
+---@param comment Renderable
 ---@return MatchSummaryMatch
 function Match:comment(comment)
 	self.commentElement = comment
@@ -139,7 +146,7 @@ function Match:footer(footer)
 	return self
 end
 
----@param button Widget
+---@param button Renderable
 ---@return MatchSummaryMatch
 function Match:button(button)
 	self.buttonElement = button
@@ -165,7 +172,7 @@ local MatchSummary = {
 }
 
 ---Default header function
----@param match table
+---@param match MatchGroupUtilMatch
 ---@param options {teamStyle: teamStyle?}?
 ---@return Widget
 function MatchSummary.createDefaultHeader(match, options)
@@ -186,7 +193,7 @@ end
 
 -- Default body function
 ---@param match MatchGroupUtilMatch
----@param createGame fun(date: string, game: table, gameIndex: integer): Widget
+---@param createGame fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
 ---@return Widget[]
 function MatchSummary.createDefaultBody(match, createGame)
 	return WidgetUtil.collect(
@@ -230,7 +237,7 @@ end
 
 ---Default createMatch function for usage in Custom MatchSummary
 ---@param matchData MatchGroupUtilMatch?
----@param CustomMatchSummary table
+---@param CustomMatchSummary CustomMatchSummaryInterface
 ---@param options {teamStyle: teamStyle?, noScore: boolean?}?
 ---@return MatchSummaryMatch?
 function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
@@ -270,7 +277,7 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 end
 
 ---Default getByMatchId function for usage in Custom MatchSummary
----@param CustomMatchSummary table
+---@param CustomMatchSummary CustomMatchSummaryInterface
 ---@param args table
 ---@param options {teamStyle:teamStyle?, width: (fun(match: MatchGroupUtilMatch):string?)|string?, noScore:boolean?}?
 ---@return Widget

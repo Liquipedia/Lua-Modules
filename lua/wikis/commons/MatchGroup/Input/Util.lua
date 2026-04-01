@@ -1174,7 +1174,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 	match.finished = MatchGroupInputUtil.matchIsFinished(match, games, opponents)
 
 	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished, opponents)
+		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished --[[@as string?]], opponents)
 		match.winner = MatchGroupInputUtil.getWinner(match.status, matchInput.winner, opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)

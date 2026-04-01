@@ -8,7 +8,8 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local FnUtil = Lua.import('Module:FnUtil')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -18,7 +19,12 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MAX_NUM_BANS = 1
 
+---@class OverwatchCustomMatchSummary: CustomMatchSummaryInterface
 local CustomMatchSummary = {}
+
+---@class OverwatchMatchSummaryGameRow: MatchSummaryGameRow
+---@operator call(MatchSummaryGameRowProps): OverwatchMatchSummaryGameRow
+local OverwatchMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
 
 ---@param args table
 ---@return Widget
@@ -27,56 +33,39 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@param createGame fun(date: string, game: table, gameIndex: integer): Widget
 ---@return Widget[]
-function CustomMatchSummary.createBody(match, createGame)
+function CustomMatchSummary.createBody(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
 	return WidgetUtil.collect(
-		Array.map(match.games, FnUtil.curry(createGame, match.date)),
+		MatchSummaryWidgets.GamesContainer{
+			children = Array.map(match.games, function (game, gameIndex)
+				if Logic.isEmpty(game.map) then
+					return
+				end
+				return OverwatchMatchSummaryGameRow{game = game, gameIndex = gameIndex}
+			end)
+		},
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
 	)
 end
 
----@param date string
----@param game MatchGroupUtilGame
----@param gameIndex integer
----@return Widget?
-function CustomMatchSummary.createGame(date, game, gameIndex)
-	if not game.map then
-		return
-	end
-
-	local function makeTeamSection(opponentIndex)
-		return {
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
-			CustomMatchSummary._gameScore(game, opponentIndex)
-		}
-	end
-
-	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-body-game'},
-		children = WidgetUtil.collect(
-			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndMode(game)},
-			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
-			MatchSummaryWidgets.GameComment{children = game.comment}
-		)
-	}
+---@return string
+function OverwatchMatchSummaryGameRow:createGameOverview()
+	return DisplayHelper.MapAndMode(self.props.game)
 end
 
----@param game MatchGroupUtilGame
 ---@param opponentIndex integer
----@return Html
-function CustomMatchSummary._gameScore(game, opponentIndex)
+---@return string
+function OverwatchMatchSummaryGameRow:createGameOpponentView(opponentIndex)
+	local game = self.props.game
 	local opponentCopy = Table.deepCopy(game.opponents[opponentIndex])
 	if opponentCopy.score and game.mode == 'Push' then
 		opponentCopy.score = opponentCopy.score .. 'm'
 	end
 
-	local scoreDisplay = DisplayHelper.MapScore(opponentCopy, game.status)
-	return mw.html.create('div'):wikitext(scoreDisplay)
+	return DisplayHelper.MapScore(opponentCopy, game.status)
 end
 
 return CustomMatchSummary

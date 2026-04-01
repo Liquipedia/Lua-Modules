@@ -50,6 +50,7 @@ function MatchTickerContainer:render()
 	local devFlag = FeatureFlag.get('dev')
 
 	---@param type 'upcoming' | 'recent'
+	---@return string
 	local function buildTemplateExpansionString(type)
 		return String.interpolate(
 			'#invoke:Lua|invoke|module=${module}|fn=${fn}${args}',
@@ -67,6 +68,7 @@ function MatchTickerContainer:render()
 	end
 
 	---@param type 'upcoming' |'recent'
+	---@return Renderable
 	local function callTemplate(type)
 		local ticker = Lua.import('Module:' .. self.defaultProps.module)
 		return ticker[self.defaultProps.fn](
