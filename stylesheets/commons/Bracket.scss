@@ -1,5 +1,6 @@
 /*******************************************************************************
-Template(s): All Brackets
+Template(s): Legacy match1 brackets
+DEPRECATED: DO NOT USE ON NEW COMPONENTS
 Author(s): ???
 *******************************************************************************/
 .bracket {
@@ -9,10 +10,10 @@ Author(s): ???
 	display: table;
 	-webkit-transform-origin: left top 0;
 	transform-origin: left top 0;
-}
 
-.bracket * {
-	box-sizing: content-box;
+	* {
+		box-sizing: content-box;
+	}
 }
 
 .bracket-wrapper {
@@ -21,38 +22,34 @@ Author(s): ???
 	//overflow-x: visible;
 	overflow: auto;
 	padding-bottom: 44px;
-}
 
-// change overflow-x for player/wiki specific
-.wiki-smash .bracket-wrapper {
-	overflow: auto;
-	//overflow: unset;
-}
+	// change overflow-x for player/wiki specific
+	.wiki-smash & {
+		overflow: auto;
+		//overflow: unset;
+	}
 
-.wiki-warcraft .bracket-wrapper {
-	overflow: unset;
-}
-
-// When bracket-wrapper is placed inside .template-box
-.template-box > .bracket-wrapper {
-	overflow: unset;
+	// When bracket-wrapper is placed inside .template-box
+	.template-box > & {
+		overflow: unset;
+	}
 }
 
 .bracket-scroller {
 	pointer-events: none;
-}
 
-.bracket-scroller * {
-	pointer-events: auto;
+	* {
+		pointer-events: auto;
+	}
 }
 
 .bracket-column {
 	float: left;
 	position: relative;
-}
 
-.bracket-column:not( .bracket-column-matches ) {
-	margin-left: -0.1px;
+	&:not( .bracket-column-matches ) {
+		margin-left: -0.1px;
+	}
 }
 
 .bracket-header {
@@ -173,22 +170,22 @@ Author(s): ???
 	right: 0;
 	top: 0;
 	bottom: 0;
-}
 
-.bracket-team-bottom .bracket-score,
-.bracket-player-bottom .bracket-score {
-	border-bottom-right-radius: 2px;
-}
+	.bracket-team-bottom &,
+	.bracket-player-bottom & {
+		border-bottom-right-radius: 2px;
+	}
 
-.bracket-team-top .bracket-score,
-.bracket-player-bottom .bracket-score {
-	border-top-right-radius: 2px;
-}
+	.bracket-team-top &,
+	.bracket-player-bottom & {
+		border-top-right-radius: 2px;
+	}
 
-.bracket-team-middle .bracket-score,
-.bracket-player-middle .bracket-score {
-	border-top-right-radius: 2px;
-	border-bottom-right-radius: 2px;
+	.bracket-team-middle &,
+	.bracket-player-middle & {
+		border-top-right-radius: 2px;
+		border-bottom-right-radius: 2px;
+	}
 }
 
 .bracket-hover {
@@ -218,22 +215,22 @@ Author(s): ???
 	font-weight: bold;
 	line-height: 16px;
 	padding: 2px 5px;
-}
 
-.bracket-popup-title-left {
-	display: table-cell;
-	text-align: right;
-	width: 50%;
-	padding: 2px;
-	border-bottom: 1px solid #aaaaaa;
-}
+	&-left {
+		display: table-cell;
+		text-align: right;
+		width: 50%;
+		padding: 2px;
+		border-bottom: 1px solid #aaaaaa;
+	}
 
-.bracket-popup-title-right {
-	display: table-cell;
-	text-align: left;
-	width: 50%;
-	padding: 2px;
-	border-bottom: 1px solid #aaaaaa;
+	&-right {
+		display: table-cell;
+		text-align: left;
+		width: 50%;
+		padding: 2px;
+		border-bottom: 1px solid #aaaaaa;
+	}
 }
 
 .bracket-icons {
@@ -281,60 +278,64 @@ td.bracket-game .icon {
 	width: 22px;
 }
 
-.table-battleroyale-results-round .icon {
-	right: calc( 50% - 5px );
-}
+.table-battleroyale-results-round {
+	.icon {
+		right: calc( 50% - 5px );
+	}
 
-.table-battleroyale-results-round .bracket-popup-wrapper {
-	position: absolute;
-	top: 5px;
-	left: calc( 50% - 165px );
+	.bracket-popup-wrapper {
+		position: absolute;
+		top: 5px;
+		left: calc( 50% - 165px );
+	}
 }
 
 /* Archon mode brackets */
-.bracket-archon-mode .bracket-cell-r1 {
-	height: 54px;
-}
+.bracket-archon-mode {
+	.bracket-cell-r1 {
+		height: 54px;
+	}
 
-.bracket-archon-mode .bracket-cell-r2 {
-	height: 108px;
-}
+	.bracket-cell-r2 {
+		height: 108px;
+	}
 
-.bracket-archon-mode .bracket-cell-r3 {
-	height: 216px;
-}
+	.bracket-cell-r3 {
+		height: 216px;
+	}
 
-.bracket-archon-mode .bracket-cell-r4 {
-	height: 432px;
-}
+	.bracket-cell-r4 {
+		height: 432px;
+	}
 
-.bracket-archon-mode .bracket-cell-r5 {
-	height: 864px;
-}
+	.bracket-cell-r5 {
+		height: 864px;
+	}
 
-.bracket-archon-mode .bracket-cell-r6 {
-	height: 1728px;
-}
+	.bracket-cell-r6 {
+		height: 1728px;
+	}
 
-.bracket-archon-mode .bracket-cell-r7 {
-	height: 3456px;
-}
+	.bracket-cell-r7 {
+		height: 3456px;
+	}
 
-.bracket-archon-mode .bracket-player-bottom {
-	border-top-color: #888888;
-}
+	.bracket-player-bottom {
+		border-top-color: #888888;
+	}
 
-.bracket-archon-mode .bracket-player-top {
-	border-bottom-color: #888888;
-}
+	.bracket-player-top {
+		border-bottom-color: #888888;
+	}
 
-.bracket-archon-mode .bracket-score {
-	line-height: 40px;
-	font-size: 1.25em;
-}
+	.bracket-score {
+		line-height: 40px;
+		font-size: 1.25em;
+	}
 
-.bracket-archon-mode .bracket-popup-title-container {
-	font-size: 0.85em;
+	.bracket-popup-title-container {
+		font-size: 0.85em;
+	}
 }
 
 .bracket-popup-title .archon-race-icon {
@@ -356,40 +357,42 @@ td.bracket-game .icon {
 }
 
 /* Doubles brackets */
-.bracket-doubles .bracket-cell-r1 {
-	height: 54px;
-}
+.bracket-doubles {
+	.bracket-cell-r1 {
+		height: 54px;
+	}
 
-.bracket-doubles .bracket-cell-r2 {
-	height: 108px;
-}
+	.bracket-cell-r2 {
+		height: 108px;
+	}
 
-.bracket-doubles .bracket-cell-r3 {
-	height: 216px;
-}
+	.bracket-cell-r3 {
+		height: 216px;
+	}
 
-.bracket-doubles .bracket-cell-r4 {
-	height: 432px;
-}
+	.bracket-cell-r4 {
+		height: 432px;
+	}
 
-.bracket-doubles .bracket-cell-r5 {
-	height: 864px;
-}
+	.bracket-cell-r5 {
+		height: 864px;
+	}
 
-.bracket-doubles .bracket-cell-r6 {
-	height: 1728px;
-}
+	.bracket-cell-r6 {
+		height: 1728px;
+	}
 
-.bracket-doubles .bracket-cell-r7 {
-	height: 3456px;
-}
+	.bracket-cell-r7 {
+		height: 3456px;
+	}
 
-.bracket-doubles .bracket-score {
-	line-height: 38px;
-}
+	.bracket-score {
+		line-height: 38px;
+	}
 
-.bracket-doubles .bracket-game .icon {
-	right: 33px;
+	.bracket-game .icon {
+		right: 33px;
+	}
 }
 
 .bracket-class-icon {
@@ -439,7 +442,8 @@ td.bracket-game .icon {
 }
 
 /*******************************************************************************
-Template(s): All Bracket popups
+Template(s): Legacy match1 bracket popups
+DEPRECATED: DO NOT USE ON NEW COMPONENTS
 Author(s): FO-nTTaX, salle
 *******************************************************************************/
 .bracket-popup-wrapper {
@@ -451,37 +455,50 @@ Author(s): FO-nTTaX, salle
 	font-weight: normal;
 	white-space: normal;
 	font-size: 0.75rem;
-}
 
-.bracket-popup-wrapper * {
-	box-sizing: border-box;
-}
+	* {
+		box-sizing: border-box;
+	}
 
-.bracket-popup-wrapper p {
-	margin: 0;
-	padding: 0;
-}
+	p {
+		margin: 0;
+		padding: 0;
+	}
 
-.bracket-popup-wrapper .bracket-popup {
-	background-color: #f5f5f5;
-	color: #333333;
-	border: 1px solid #dddddd;
-	border-radius: 2px;
-}
+	.bracket-popup {
+		background-color: #f5f5f5;
+		color: #333333;
+		border: 1px solid #dddddd;
+		border-radius: 2px;
 
-.bracket-popup-wrapper .bracket-popup .bracket-popup-header {
-	background-color: #ebebeb;
-	border-bottom: 1px solid #dddddd;
-}
+		.bracket-popup-header {
+			background-color: #ebebeb;
+			border-bottom: 1px solid #dddddd;
 
-.bracket-popup-wrapper .bracket-popup .bracket-popup-header .bracket-popup-header-left,
-.bracket-popup-wrapper .bracket-popup .bracket-popup-header .bracket-popup-header-right {
-	width: calc( 50% - 2px );
-	padding: 5px;
-	display: inline-block;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: clip;
+			.bracket-popup-header-left,
+			.bracket-popup-header-right {
+				width: calc( 50% - 2px );
+				padding: 5px;
+				display: inline-block;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: clip;
+			}
+
+			.bracket-popup-header-center {
+				width: calc( 100% - 2px );
+				padding: 2.5px;
+				display: inline-block;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: clip;
+				height: 25px;
+				text-align: center;
+				font-weight: bold;
+				font-size: 150%;
+			}
+		}
+	}
 }
 
 .bracket-popup-wrapper.bracket-popup-player .bracket-popup .bracket-popup-header-vs .bracket-popup-header-vs-left,
@@ -506,27 +523,27 @@ Author(s): FO-nTTaX, salle
 	width: 100%;
 	background-color: #ebebeb;
 	border-bottom: 1px solid #dddddd;
-}
 
-.bracket-popup-wrapper .bracket-popup .bracket-popup-header-vs .bracket-popup-header-vs-left,
-.bracket-popup-wrapper .bracket-popup .bracket-popup-header-vs .bracket-popup-header-vs-right {
-	display: table-cell;
-	width: 47%;
-	max-width: 0;
-	padding: 5px;
-}
+	.bracket-popup-header-vs-left,
+	.bracket-popup-header-vs-right {
+		display: table-cell;
+		width: 47%;
+		max-width: 0;
+		padding: 5px;
+	}
 
-.bracket-popup-wrapper .bracket-popup .bracket-popup-header-vs .bracket-popup-header-vs-child {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: clip;
-}
+	.bracket-popup-header-vs-child {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: clip;
+	}
 
-.bracket-popup-wrapper .bracket-popup .bracket-popup-header-vs .bracket-popup-header-vs-center {
-	display: table-cell;
-	padding: 5px 0;
-	width: 6%;
-	text-align: center;
+	.bracket-popup-header-vs-center {
+		display: table-cell;
+		padding: 5px 0;
+		width: 6%;
+		text-align: center;
+	}
 }
 
 .bracket-popup-wrapper .bracket-popup .bracket-popup-header-vs .bracket-popup-header-vs-left,
@@ -547,34 +564,12 @@ Author(s): FO-nTTaX, salle
 	display: block;
 }
 
-.bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-match {
-	text-align: center;
-	padding: 2px 0;
-	vertical-align: initial;
-}
-
-.wiki-ageofempires .bracket-popup-body .bracket-popup-body-match .leftTeam, {
-	display: inline-block;
-	text-align: right;
-	border-radius: 0 10px 10px 0;
-	vertical-align: middle;
-	width: 37%;
-	padding: 0 7px 0 5px;
-}
-
-.wiki-ageofempires .bracket-popup-body .bracket-popup-body-match .lengthTeam, {
-	display: inline-block;
-	vertical-align: middle;
-	width: 26%;
-}
-
-.wiki-ageofempires .bracket-popup-body .bracket-popup-body-match .rightTeam, {
-	display: inline-block;
-	text-align: left;
-	border-radius: 10px 0 0 10px;
-	vertical-align: middle;
-	width: 37%;
-	padding: 0 5px 0 7px;
+.bracket-popup-body .bracket-popup-body-match {
+	.bracket-popup-wrapper .bracket-popup & {
+		text-align: center;
+		padding: 2px 0;
+		vertical-align: initial;
+	}
 }
 
 .bracket-popup-body-mvp {
@@ -582,27 +577,61 @@ Author(s): FO-nTTaX, salle
 	border-top: 1px dotted #dddddd;
 }
 
-.bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-reset {
-	border-top: 1px dotted #aaaaaa;
-}
+.bracket-popup-wrapper .bracket-popup .bracket-popup-body {
+	.bracket-popup-body-reset {
+		border-top: 1px dotted #aaaaaa;
+	}
 
-.wiki-artifact .bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-match,
-.wiki-honorofkings .bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-match,
-.wiki-leagueoflegends .bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-match,
-.wiki-runeterra .bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-match,
-.wiki-wildrift .bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-match, {
-	min-height: 34px;
-}
+	.bracket-popup-body-match {
+		.wiki-runeterra & {
+			min-height: 34px;
+		}
 
-.bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-match::after {
-	clear: both;
-	content: " ";
-	width: 100%;
-	display: block;
-}
+		&::after {
+			clear: both;
+			content: " ";
+			width: 100%;
+			display: block;
+		}
 
-.bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-match:nth-of-type( 2n ) {
-	background-color: #ebebeb;
+		&:nth-of-type( 2n ) {
+			background-color: #ebebeb;
+		}
+	}
+
+	.bracket-popup-body-bans {
+		border-top: 1px dotted #dddddd;
+		font-weight: bold;
+
+		&::after {
+			clear: both;
+			content: " ";
+			width: 100%;
+			display: block;
+		}
+	}
+
+	.bracket-popup-body-comment {
+		border-top: 1px dotted #dddddd;
+		padding: 5px;
+		font-size: 85%;
+		line-height: 12.5px;
+		text-align: center;
+
+		&::after {
+			clear: both;
+			content: " ";
+			width: 100%;
+			display: block;
+		}
+	}
+
+	&::after {
+		clear: both;
+		content: " ";
+		width: 100%;
+		display: block;
+	}
 }
 
 .bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-time,
@@ -621,72 +650,25 @@ Author(s): FO-nTTaX, salle
 	display: block;
 }
 
-.bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-bans {
-	border-top: 1px dotted #dddddd;
-	font-weight: bold;
-}
-
-.bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-bans::after {
-	clear: both;
-	content: " ";
-	width: 100%;
-	display: block;
-}
-
-.bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-comment {
-	border-top: 1px dotted #dddddd;
-	padding: 5px;
-	font-size: 85%;
-	line-height: 12.5px;
-	text-align: center;
-}
-
-.bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-comment::after {
-	clear: both;
-	content: " ";
-	width: 100%;
-	display: block;
-}
-
-.bracket-popup-wrapper .bracket-popup .bracket-popup-body::after {
-	clear: both;
-	content: " ";
-	width: 100%;
-	display: block;
-}
-
 .bracket-popup-wrapper .bracket-popup .bracket-popup-footer {
 	background-color: #f5f5f5;
 	text-align: center;
 	padding: 5px;
 	border-top: 1px solid #dddddd;
-}
 
-.bracket-popup-wrapper .bracket-popup .bracket-popup-footer::after {
-	clear: both;
-	content: " ";
-	width: 100%;
-	display: block;
-}
+	&::after {
+		clear: both;
+		content: " ";
+		width: 100%;
+		display: block;
+	}
 
-.bracket-popup-wrapper .bracket-popup .bracket-popup-footer img {
-	max-height: 16px;
-	max-width: 16px;
-	height: auto;
-	width: auto;
-}
-
-.bracket-popup-wrapper .bracket-popup .bracket-popup-header .bracket-popup-header-center {
-	width: calc( 100% - 2px );
-	padding: 2.5px;
-	display: inline-block;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: clip;
-	height: 25px;
-	text-align: center;
-	font-weight: bold;
-	font-size: 150%;
+	img {
+		max-height: 16px;
+		max-width: 16px;
+		height: auto;
+		width: auto;
+	}
 }
 
 .wiki-apexlegends .bracket-popup-wrapper.bracket-popup-player {
@@ -697,25 +679,8 @@ Author(s): FO-nTTaX, salle
 	width: 450px;
 }
 
-.wiki-artifact .bracket-popup-wrapper.bracket-popup-player,
 .wiki-runeterra .bracket-popup-wrapper.bracket-popup-player {
 	width: 390px;
-}
-
-.wiki-battalion .bracket-popup-wrapper.bracket-popup-player {
-	width: 330px;
-}
-
-.wiki-battalion .bracket-popup-wrapper.bracket-popup-team {
-	width: 330px;
-}
-
-.wiki-honorofkings .bracket-popup-wrapper.bracket-popup-team {
-	width: 390px;
-}
-
-.wiki-battlerite .bracket-popup-wrapper.bracket-popup-team {
-	width: 460px;
 }
 
 .wiki-brawlhalla .bracket-popup-wrapper.bracket-popup-player {
@@ -726,36 +691,8 @@ Author(s): FO-nTTaX, salle
 	width: 420px;
 }
 
-.wiki-callofduty .bracket-popup-wrapper.bracket-popup-team {
-	width: 330px;
-}
-
 .wiki-clashroyale .bracket-popup-wrapper.bracket-popup-player {
 	width: 320px;
-}
-
-.wiki-counterstrike .bracket-popup-wrapper.bracket-popup-player {
-	width: 330px;
-}
-
-.wiki-counterstrike .bracket-popup-wrapper.bracket-popup-team {
-	width: 330px;
-}
-
-.wiki-crossfire .bracket-popup-wrapper.bracket-popup-player {
-	width: 330px;
-}
-
-.wiki-crossfire .bracket-popup-wrapper.bracket-popup-team {
-	width: 330px;
-}
-
-.wiki-dota2 .bracket-popup-wrapper.bracket-popup-team {
-	width: 400px;
-}
-
-.wiki-dota2 .bracket-popup-wrapper.bracket-popup-player {
-	width: 300px;
 }
 
 .wiki-fighters .bracket-popup-wrapper.bracket-popup-player {
@@ -778,28 +715,6 @@ Author(s): FO-nTTaX, salle
 	width: 300px;
 }
 
-.wiki-heroes .bracket-popup-wrapper.bracket-popup-team {
-	width: 460px;
-}
-
-.wiki-leagueoflegends .bracket-popup-wrapper.bracket-popup-player,
-.wiki-wildrift .bracket-popup-wrapper.bracket-popup-player {
-	width: 225px;
-}
-
-.wiki-leagueoflegends .bracket-popup-wrapper.bracket-popup-team,
-.wiki-wildrift .bracket-popup-wrapper.bracket-popup-team {
-	width: 390px;
-}
-
-.wiki-overwatch .bracket-popup-wrapper.bracket-popup-team {
-	width: 330px;
-}
-
-.wiki-paladins .bracket-popup-wrapper.bracket-popup-team {
-	width: 460px;
-}
-
 .wiki-freefire .bracket-popup-wrapper.bracket-popup-player,
 .wiki-pubgmobile .bracket-popup-wrapper.bracket-popup-player,
 .wiki-pubg .bracket-popup-wrapper.bracket-popup-player {
@@ -812,22 +727,6 @@ Author(s): FO-nTTaX, salle
 	width: 330px;
 }
 
-.wiki-ageofempires .bracket-popup-wrapper.bracket-popup-team {
-	width: 450px;
-}
-
-.wiki-arenafps .bracket-popup-wrapper.bracket-popup-player {
-	width: 250px;
-}
-
-.wiki-arenafps .bracket-popup-wrapper.bracket-popup-team {
-	width: 300px;
-}
-
-.wiki-rainbowsix .bracket-popup-wrapper.bracket-popup-team {
-	width: 330px;
-}
-
 .wiki-rocketleague .bracket-popup-wrapper.bracket-popup-team {
 	width: 330px;
 }
@@ -836,36 +735,8 @@ Author(s): FO-nTTaX, salle
 	width: 385px;
 }
 
-.wiki-starcraft .bracket-popup-wrapper.bracket-popup-player {
-	width: 250px;
-}
-
-.wiki-ageofempires .bracket-popup-wrapper.bracket-popup-player {
-	width: 265px;
-}
-
-.wiki-starcraft2 .bracket-popup-wrapper.bracket-popup-player {
-	width: 250px;
-}
-
-.wiki-starcraft2 .bracket-popup-wrapper.bracket-popup-team {
-	width: 400px;
-}
-
 .wiki-teamfortress .bracket-popup-wrapper.bracket-popup-team {
 	width: 330px;
-}
-
-.wiki-warcraft .bracket-popup-wrapper.bracket-popup-player {
-	width: 320px;
-}
-
-.wiki-warcraft .bracket-popup-wrapper.bracket-popup-team {
-	width: 600px;
-}
-
-.wiki-worldofwarcraft .bracket-popup-wrapper.bracket-popup-team {
-	width: 400px;
 }
 
 .wiki-fifa .bracket-popup-wrapper.bracket-popup-player {
@@ -876,20 +747,9 @@ Author(s): FO-nTTaX, salle
 	width: 460px;
 }
 
-.wiki-simracing .bracket-popup-wrapper.bracket-popup-team {
-	width: 330px;
-}
-
+.wiki-simracing .bracket-popup-wrapper.bracket-popup-team,
 .wiki-simracing .bracket-popup-wrapper.bracket-popup-player {
 	width: 330px;
-}
-
-.wiki-valorant .bracket-popup-wrapper.bracket-popup-player {
-	width: 480px;
-}
-
-.wiki-valorant .bracket-popup-wrapper.bracket-popup-team {
-	width: 480px;
 }
 
 .bracket-popup-wrapper.bracket-popup-wrapper-mobile {
@@ -911,79 +771,66 @@ Author(s): FO-nTTaX, salle
 	line-height: 33px;
 	padding-top: 1px;
 	position: relative;
-}
 
-.wiki-dota2 .bracket-popup div.match-row,
-.wiki-worldofwarcraft .bracket-popup div.match-row,
-.wiki-teamfortress .bracket-popup div.match-row {
-	line-height: 21px;
-	min-height: 21px;
-}
-
-.wiki-leagueoflegends .bracket-popup div.match-row {
-	min-height: 33px;
+	.wiki-teamfortress & {
+		line-height: 21px;
+		min-height: 21px;
+	}
 }
 
 .bracket-popup .left div.side {
 	float: left;
-}
 
-.bracket-popup .left div.side table {
-	margin-right: auto;
+	table {
+		margin-right: auto;
+	}
 }
 
 .bracket-popup .right div.side {
 	float: right;
-}
 
-.bracket-popup .right div.side table {
-	margin-left: auto;
+	table {
+		margin-left: auto;
+	}
 }
 
 .bracket-popup div.side {
 	text-align: center;
 	letter-spacing: 0;
-}
 
-.wiki-battalion .side,
-.wiki-counterstrike .side,
-.wiki-crossfire .side,
-.wiki-valorant .side {
-	width: 110px;
-}
+	table td {
+		line-height: 15px;
+	}
 
-.bracket-popup div.side table td {
-	line-height: 15px;
-}
+	.popup-progress {
+		border-radius: 5px;
+		width: 50px;
+		height: 15px;
+		border: 1px solid #bbbbbb;
+		position: relative;
+		text-align: center;
+		margin-bottom: 0;
 
-.bracket-popup div.side .popup-progress {
-	border-radius: 5px;
-	width: 50px;
-	height: 15px;
-	border: 1px solid #bbbbbb;
-	position: relative;
-	text-align: center;
-	margin-bottom: 0;
-}
+		> div.bar {
+			height: 15px;
+			border-radius: 4px;
+			float: left;
+			line-height: 17px;
 
-.bracket-popup div.side .popup-progress > div.bar {
-	height: 15px;
-	border-radius: 4px;
-	float: left;
-	line-height: 17px;
-}
+			&.bg-color {
+				background-color: #e5b6c0;
+			}
 
-.bracket-popup div.side .popup-progress > div.bar.bg-color {
-	background-color: #e5b6c0;
-}
-
-.bracket-popup div.side .popup-progress > div.bar-text {
-	height: 15px;
-	width: 100%;
-	border-radius: 5px;
-	position: absolute;
-	top: 0;
-	left: 0;
+			&-text {
+				height: 15px;
+				width: 100%;
+				border-radius: 5px;
+				position: absolute;
+				top: 0;
+				left: 0;
+			}
+		}
+	}
 }
 
 .bracket-popup .left div.draft {
@@ -999,61 +846,53 @@ Author(s): FO-nTTaX, salle
 	width: 149px;
 }
 
-.wiki-artifact div.draft,
 .wiki-runeterra div.draft {
 	width: 175px;
-}
-
-.wiki-ageofempires div.draft {
-	position: initial;
-	width: initial;
 }
 
 .bracket-popup .left .check {
 	left: 157px;
 	position: absolute;
-}
 
-.bracket-popup-player .bracket-popup .left .check {
-	left: 50px;
+	.bracket-popup-player & {
+		left: 50px;
+	}
+
+	.wiki-teamfortress & {
+		float: left;
+		width: 40px;
+		text-align: center;
+		position: initial;
+		left: initial;
+	}
 }
 
 .bracket-popup .right .check {
 	right: 158px;
 	position: absolute;
+
+	.bracket-popup-player & {
+		right: 50px;
+	}
+
+	.wiki-teamfortress & {
+		float: right;
+		width: 40px;
+		text-align: center;
+		position: initial;
+		right: initial;
+	}
 }
 
-.bracket-popup-player .bracket-popup .right .check {
-	right: 50px;
-}
+.bracket-popup div.wow-popup-center {
+	> * {
+		display: inline-block;
+		margin: 0 3px;
+	}
 
-.wiki-overwatch .bracket-popup .left .check,
-.wiki-teamfortress .bracket-popup .left .check,
-.wiki-worldofwarcraft .bracket-popup .left .check {
-	float: left;
-	width: 40px;
-	text-align: center;
-	position: initial;
-	left: initial;
-}
-
-.wiki-overwatch .bracket-popup .right .check,
-.wiki-teamfortress .bracket-popup .right .check,
-.wiki-worldofwarcraft .bracket-popup .right .check {
-	float: right;
-	width: 40px;
-	text-align: center;
-	position: initial;
-	right: initial;
-}
-
-.bracket-popup div.wow-popup-center > * {
-	display: inline-block;
-	margin: 0 3px;
-}
-
-.bracket-popup div.wow-popup-center > .wow-game-damp abbr {
-	color: #ff0000;
+	> .wow-game-damp abbr {
+		color: #ff0000;
+	}
 }
 
 .bracket-popup div.game-battleground {
@@ -1080,60 +919,14 @@ Author(s): FO-nTTaX, salle
 	border: 2px solid transparent;
 	margin: -2px;
 	display: inline-block;
-}
 
-.wiki-honorofkings .bracket-popup div.draft img,
-.wiki-artifact .bracket-popup div.draft img,
-.wiki-paladins .bracket-popup div.draft img,
-.wiki-leagueoflegends .bracket-popup div.draft img,
-.wiki-runeterra .bracket-popup div.draft img,
-.wiki-ageofempires .bracket-popup div.draft img,
-.wiki-wildrift .bracket-popup div.draft img {
-	border: 0;
-	margin: 0;
-}
-
-.wiki-ageofempires .bracket-popup div.draft img {
-	height: 18px;
-	width: 18px;
-}
-
-.bracket-popup div.draft.dire img {
-	border-color: #e79e7e;
-}
-
-.bracket-popup div.draft.radiant img {
-	border-color: #bcd985;
-}
-
-.bracket-popup div.side .popup-progress {
-	border-radius: 5px;
-	width: 50px;
-	height: 15px;
-	border: 1px solid #bbbbbb;
-	position: relative;
-	text-align: center;
-	margin-bottom: 0;
-}
-
-.bracket-popup div.side .popup-progress > div.bar {
-	height: 15px;
-	border-radius: 4px;
-	float: left;
-	line-height: 17px;
-}
-
-.bracket-popup div.side .popup-progress > div.bar.bg-color {
-	background-color: #e5b6c0;
-}
-
-.bracket-popup div.side .popup-progress > div.bar-text {
-	height: 15px;
-	width: 100%;
-	border-radius: 5px;
-	position: absolute;
-	top: 0;
-	left: 0;
+	.wiki-runeterra & {
+		border: 0;
+		margin: 0;
+		margin-top: -4px;
+		height: 25px;
+		width: 25px;
+	}
 }
 
 .grouptable-start-date {
@@ -1149,45 +942,10 @@ Author(s): FO-nTTaX, salle
 	display: block;
 }
 
-.wiki-honorofkings .bracket-popup-body-match .match-row .draft.blue,
-.wiki-battlerite .bracket-popup-body-match .match-row .draft.blue,
-.wiki-leagueoflegends .bracket-popup-body-match .match-row .draft.blue,
-.wiki-wildrift .bracket-popup-body-match .match-row .draft.blue {
-	background-color: #426ccf;
-}
-
-.wiki-honorofkings .bracket-popup-body-match .match-row .draft.red,
-.wiki-battlerite .bracket-popup-body-match .match-row .draft.red,
-.wiki-leagueoflegends .bracket-popup-body-match .match-row .draft.red,
-.wiki-wildrift .bracket-popup-body-match .match-row .draft.red {
-	background-color: #ee6767;
-}
-
-.wiki-artifact .bracket-popup div.draft img,
-.wiki-honorofkings .bracket-popup div.draft img,
-.wiki-paladins .bracket-popup div.draft img,
-.wiki-leagueoflegends .bracket-popup div.draft img,
-.wiki-runeterra .bracket-popup div.draft img,
-.wiki-wildrift .bracket-popup div.draft img {
-	margin-top: -4px;
-	height: 25px;
-	width: 25px;
-}
-
-.wiki-artifact .bracket-popup.bracket-popup-showmatch div.draft img,
-.wiki-honorofkings .bracket-popup.bracket-popup-showmatch div.draft img,
-.wiki-paladins .bracket-popup.bracket-popup-showmatch div.draft img,
-.wiki-leagueoflegends .bracket-popup.bracket-popup-showmatch div.draft img,
-.wiki-runeterra .bracket-popup.bracket-popup-showmatch div.draft img,
-.wiki-wildrift .bracket-popup.bracket-popup-showmatch div.draft img {
+.wiki-runeterra .bracket-popup.bracket-popup-showmatch div.draft img {
 	margin-top: -4px;
 	height: 35px;
 	width: 35px;
-}
-
-.wiki-dota2 .bracket-popup div.draft img {
-	height: 16px;
-	width: 29px;
 }
 
 .draft:not( .no-hover ) > a > img:hover {
@@ -1197,7 +955,8 @@ Author(s): FO-nTTaX, salle
 }
 
 /*******************************************************************************
-Template(s): All Brackets, mobile support
+Template(s): Legacy match1 brackets, mobile support
+DEPRECATED: DO NOT USE ON NEW COMPONENTS
 Author(s): FO-nTTaX
 *******************************************************************************/
 @media ( max-width: 767px ) {
@@ -1227,22 +986,18 @@ Author(s): FO-nTTaX
 		display: none !important;
 	}
 
-	.bracket-wrapper.bracket-player .bracket-player-top img,
-	.bracket-wrapper.bracket-player .bracket-player-bottom img,
-	.bracket-wrapper.bracket-player .bracket-player-middle img {
-		display: none !important;
-	}
-
-	.bracket-wrapper.bracket-player .bracket-player-top .bracket-score img,
-	.bracket-wrapper.bracket-player .bracket-player-bottom .bracket-score img,
-	.bracket-wrapper.bracket-player .bracket-player-middle .bracket-score img {
-		display: initial !important;
-	}
-
 	.bracket-wrapper.bracket-player .bracket-player-top,
 	.bracket-wrapper.bracket-player .bracket-player-bottom,
 	.bracket-wrapper.bracket-player .bracket-player-middle {
 		overflow: hidden;
+
+		img {
+			display: none !important;
+		}
+
+		.bracket-score img {
+			display: initial !important;
+		}
 	}
 
 	.bracket-archon-mode .bracket-score,
@@ -1565,7 +1320,8 @@ Author(s): FO-nTTaX
 }
 
 /*******************************************************************************
-Template(s): All Brackets, bracket connecting lines
+Template(s): Legacy match1 bracket connecting lines
+DEPRECATED: DO NOT USE ON NEW COMPONENTS
 Author(s): spazer
 *******************************************************************************/
 .bracket-line-topleft {
@@ -1584,6 +1340,12 @@ Author(s): spazer
 	border-bottom-left-radius: 3px;
 	border: solid #aaaaaa;
 	border-width: 0 0 2px 2px;
+
+	&-red {
+		border-bottom-left-radius: 3px;
+		border: solid #ff0000;
+		border-width: 0 0 2px 2px;
+	}
 }
 
 .bracket-line-bottomright {
@@ -1594,26 +1356,20 @@ Author(s): spazer
 
 .bracket-line-straight {
 	border-bottom: solid #aaaaaa 2px;
-}
 
-.bracket-line-straight-top {
-	border-top: solid #aaaaaa 2px;
+	&-top {
+		border-top: solid #aaaaaa 2px;
+	}
 }
 
 .bracket-line-split {
 	border-top: solid #aaaaaa 1px;
-}
 
-.bracket-line-split-topright-red {
-	border-top-right-radius: 3px;
-	border: solid #ff0000;
-	border-width: 1px 2px 0 0;
-}
-
-.bracket-line-bottomleft-red {
-	border-bottom-left-radius: 3px;
-	border: solid #ff0000;
-	border-width: 0 0 2px 2px;
+	&-topright-red {
+		border-top-right-radius: 3px;
+		border: solid #ff0000;
+		border-width: 1px 2px 0 0;
+	}
 }
 
 .bracket-line-reset {
@@ -1689,187 +1445,4 @@ Author(s): spazer
 	font-size: 85%;
 	line-height: 90%;
 	height: 13px;
-}
-
-/*******************************************************************************
-Template(s): Operator bans for Rainbow Six
-Author(s): monkzize
-*******************************************************************************/
-
-.wiki-rainbowsix .operator-bans a img {
-	width: 18px;
-	height: 18px;
-}
-
-.wiki-rainbowsix .operator-bans a img:hover {
-	-ms-transform: scale( 1.8, 1.8 );
-	-webkit-transform: scale( 1.8, 1.8 );
-	transform: scale( 1.8, 1.8 );
-}
-
-/*******************************************************************************
-Template(s): Artifact hero glows for match pop ups
-Author(s): Ricci
-*******************************************************************************/
-
-.wiki-artifact .hero-glow-red img {
-	filter: drop-shadow( 1px 1px 2px #b12a2a ) drop-shadow( -1px 1px 2px #b12a2a ) drop-shadow( 1px -1px 2px #b12a2a ) drop-shadow( -1px -1px 2px #b12a2a );
-}
-
-.wiki-artifact .hero-glow-blue img {
-	filter: drop-shadow( 1px 1px 2px #31519c ) drop-shadow( -1px 1px 2px #31519c ) drop-shadow( 1px -1px 2px #31519c ) drop-shadow( -1px -1px 2px #31519c );
-}
-
-.wiki-artifact .hero-glow-green img {
-	filter: drop-shadow( 1px 1px 2px #1e7a1d ) drop-shadow( -1px 1px 2px #1e7a1d ) drop-shadow( 1px -1px 2px #1e7a1d ) drop-shadow( -1px -1px 2px #1e7a1d );
-}
-
-.wiki-artifact .hero-glow-black img {
-	filter: drop-shadow( 1px 1px 2px #616161 ) drop-shadow( -1px 1px 2px #616161 ) drop-shadow( 1px -1px 2px #616161 ) drop-shadow( -1px -1px 2px #616161 );
-}
-
-/*******************************************************************************
-Template(s): Counter-Strike style match popup properties
-Author(s): spazer
-*******************************************************************************/
-
-.wiki-battalion .bracket-popup-body-match-container,
-.wiki-counterstrike .bracket-popup-body-match-container,
-.wiki-crossfire .bracket-popup-body-match-container,
-.wiki-valorant .bracket-popup-body-match-container {
-	text-align: center;
-	height: 20px;
-	clear: both;
-}
-
-.wiki-rainbowsix .bracket-popup-body-match-container {
-	text-align: center;
-	clear: both;
-}
-
-.wiki-battalion .bracket-popup-body-match-sidewins,
-.wiki-counterstrike .bracket-popup-body-match-sidewins,
-.wiki-crossfire .bracket-popup-body-match-sidewins,
-.wiki-valorant .bracket-popup-body-match-sidewins {
-	padding: 0 1px 0 1px;
-	font-size: 8px;
-	line-height: 8px;
-}
-
-.wiki-rainbowsix .bracket-popup-body-match-sidewins {
-	padding: 0 0 3px 4px;
-	line-height: 11px;
-}
-
-.wiki-rainbowsix .bracket-popup-body-match-sidewins-overtime {
-	padding: 0 0 3px 4px;
-	width: 10px;
-	line-height: 11px;
-}
-
-.wiki-battalion .bracket-popup-body-match-leftcheck,
-.wiki-counterstrike .bracket-popup-body-match-leftcheck,
-.wiki-crossfire .bracket-popup-body-match-leftcheck {
-	float: left;
-	margin-left: 5%;
-	width: 17.15px;
-}
-
-.wiki-valorant .bracket-popup-body-match-leftcheck {
-	float: left;
-	margin-left: 5px;
-	width: 17.15px;
-}
-
-.wiki-rainbowsix .bracket-popup-body-match-leftcheck {
-	float: left;
-	margin-left: 3%;
-}
-
-.wiki-battalion .bracket-popup-body-match-rightcheck,
-.wiki-counterstrike .bracket-popup-body-match-rightcheck,
-.wiki-crossfire .bracket-popup-body-match-rightcheck {
-	float: right;
-	margin-right: 5%;
-	width: 17.15px;
-}
-
-.wiki-valorant .bracket-popup-body-match-rightcheck {
-	float: right;
-	margin-right: 5px;
-	width: 17.15px;
-}
-
-.wiki-rainbowsix .bracket-popup-body-match-rightcheck {
-	float: right;
-	margin-right: 3%;
-}
-
-.wiki-battalion .bracket-popup-body-match-map,
-.wiki-counterstrike .bracket-popup-body-match-map,
-.wiki-crossfire .bracket-popup-body-match-map,
-.wiki-valorant .bracket-popup-body-match-map {
-	line-height: 20px;
-}
-
-.wiki-rainbowsix .bracket-popup-body-match-map {
-	line-height: 21px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-.wiki-battalion .bracket-popup-body-match-mapskip,
-.wiki-counterstrike .bracket-popup-body-match-mapskip,
-.wiki-crossfire .bracket-popup-body-match-mapskip,
-.wiki-valorant .bracket-popup-body-match-mapskip {
-	line-height: 20px;
-	text-decoration: line-through;
-}
-
-.wiki-rainbowsix .bracket-popup-body-match-mapskip {
-	line-height: 21px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	padding: 0 2px;
-	text-decoration: line-through;
-}
-
-.wiki-rainbowsix .bracket-popup-body-gradient-left {
-	padding: 4px 0;
-	background: linear-gradient( to left, #fbdfdf 15%, #ffffff 35%, #ffffff 65%, #ddf4dd 85% ) !important;
-}
-
-.wiki-rainbowsix .bracket-popup-body-gradient-right {
-	padding: 4px 0;
-	background: linear-gradient( to right, #fbdfdf 15%, #ffffff 35%, #ffffff 65%, #ddf4dd 85% ) !important;
-}
-
-.wiki-rainbowsix .bracket-popup-body-gradient-draw {
-	padding: 4px 0;
-	background: linear-gradient( to left, #f9f9c7 15%, #ffffff 35%, #ffffff 65%, #f9f9c7 85% ) !important;
-}
-
-.wiki-rainbowsix .bracket-popup-body-gradient-default {
-	padding: 4px 0;
-	background: #ffffff !important;
-}
-
-.wiki-rainbowsix.bracket-popup-body-operator-bans-left {
-	float: left;
-	position: relative;
-	margin-top: -8px;
-	top: 6px;
-	left: 2px;
-	line-height: 0;
-}
-
-.wiki-rainbowsix.bracket-popup-body-operator-bans-right {
-	float: right;
-	position: relative;
-	margin-top: -8px;
-	top: 6px;
-	right: 2px;
-	line-height: 0;
 }
