@@ -23,9 +23,7 @@ local ColumnName = Condition.ColumnName
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local Header = Lua.import('Module:Widget/Infobox/UpcomingTournaments/Header')
 local TournamentsTickerListItem = Lua.import('Module:Widget/Tournaments/Ticker/ListItem')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class UpcomingTournamentsWidgetParameters
 ---@field opponentConditions AbstractConditionNode
