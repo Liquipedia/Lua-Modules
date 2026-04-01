@@ -26,6 +26,7 @@ local Widget = Lua.import('Module:Widget')
 ---@operator call(BoxProps): Box
 ---@field props BoxProps
 local Box = Class.new(Widget)
+Box.defaultProps = {paddingRight = '2em'}
 
 ---@return Widget|Renderable
 function Box:render()
