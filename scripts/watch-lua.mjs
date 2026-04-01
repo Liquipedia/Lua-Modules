@@ -1,3 +1,4 @@
+// @ts-nocheck
 import chokidar from 'chokidar';
 import { spawn } from 'child_process';
 
