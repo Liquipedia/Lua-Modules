@@ -31,13 +31,17 @@ local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 ---@return string
 local function getCurrentTransferPage()
 	local basePage = 'Player_Transfers/' .. DateExt.getYearOf() .. '/' .. os.date('%B')
-	local queriedPageName = mw.ext.LiquipediaDB.lpdb('transfer', {
+	local queryData = mw.ext.LiquipediaDB.lpdb('transfer', {
 		conditions = tostring(ConditionNode(ColumnName('pagename'), Comparator.ge, basePage)),
 		query = 'pagename',
 		order = 'date desc',
 		groupby = 'pagename asc',
 		limit = 1,
-	})[1].pagename
+	})[1]
+	if not queryData then
+		return basePage
+	end
+	local queriedPageName = queryData.pagename or ''
 	if not String.startsWith(queriedPageName, basePage) then
 		return basePage
 	end
