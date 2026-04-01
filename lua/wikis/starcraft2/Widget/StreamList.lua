@@ -7,7 +7,7 @@ local Logic = Lua.import('Module:Logic')
 local StreamLinks = Lua.import('Module:Links/Stream')
 local Table = Lua.import('Module:Table')
 
-local Box = Lua.import('Module:Widget/Box')
+local Box = Lua.import('Module:Widget/Basic/Box')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local Widget = Lua.import('Module:Widget')

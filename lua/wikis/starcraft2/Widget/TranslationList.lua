@@ -6,7 +6,7 @@ local Flags = Lua.import('Module:Flags')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 
-local Box = Lua.import('Module:Widget/Box')
+local Box = Lua.import('Module:Widget/Basic/Box')
 local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local Widget = Lua.import('Module:Widget')
 

@@ -4,7 +4,7 @@ local Class = Lua.import('Module:Class')
 local Json = require('Module:Json')
 local Variables = require('Module:Variables')
 
-local Box = Lua.import('Module:Widget/Box')
+local Box = Lua.import('Module:Widget/Basic/Box')
 local EarningsStatsChart = Lua.import('Module:Widget/EarningsStatsChart')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MedalsTable = Lua.import('Module:Widget/MedalsTable')
