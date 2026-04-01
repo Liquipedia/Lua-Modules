@@ -6,6 +6,7 @@
 --
 
 local Lua = require('Module:Lua')
+
 local FnUtil = Lua.import('Module:FnUtil')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local CustomMatchGroupInput = {}
