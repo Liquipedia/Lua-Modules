@@ -20,6 +20,7 @@ local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 ---@field caption string?
 ---@field alt string?
 ---@field alignment string?
+---@field location string?
 
 ---@class IconImageWidget: IconWidget
 ---@operator call(IconImageWidgetParameters): IconImageWidget
@@ -41,6 +42,7 @@ function Icon:render()
 			caption = self.props.caption,
 			alt = self.props.alt,
 			alignment = self.props.alignment,
+			location = self.props.location,
 		}
 	)
 end
