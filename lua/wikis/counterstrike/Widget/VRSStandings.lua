@@ -146,11 +146,11 @@ function VRSStandings._row(standing, mainpage)
 				opponent = standing.opponent
 			}
 		},
-		not standing.globalPlace and TableWidgets.Cell{children = extradata.region or ''} or nil
+		not standing.globalPlace and TableWidgets.Cell{children = extradata.region or ''} or nil,
 		not mainpage and TableWidgets.Cell{
 		   children = Array.map(standing.opponent.players, function(player)
 			   return HtmlWidgets.Div{
-				   css = {display="inline-block", width="160px"},
+				   css = {display = 'inline-block', width = '160px'},
 				   children = PlayerDisplay.BlockPlayer({player = player})
 			   }
 		   end)
