@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local DateExt = Lua.import('Module:Date/Ext')
 local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
+local String = Lua.import('Module:StringUtils')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionNode = Condition.Node
@@ -29,18 +30,18 @@ local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 ---@return string
 local function getCurrentTransferPage()
-	local basePage = 'Player Transfers/' .. DateExt.getYearOf() .. '/' .. os.date('%B')
-	local queryData = mw.ext.LiquipediaDB.lpdb('transfer', {
+	local basePage = 'Player_Transfers/' .. DateExt.getYearOf() .. '/' .. os.date('%B')
+	local queriedPageName = mw.ext.LiquipediaDB.lpdb('transfer', {
 		conditions = tostring(ConditionNode(ColumnName('pagename'), Comparator.ge, basePage)),
 		query = 'pagename',
 		order = 'date desc',
 		groupby = 'pagename asc',
-		limit = 5000,
-	})
-	if #queryData == 0 then
+		limit = 1,
+	})[1].pagename
+	if not String.startsWith(queriedPageName, basePage) then
 		return basePage
 	end
-	return queryData[1].pagename
+	return queriedPageName
 end
 
 local CONTENT = {
