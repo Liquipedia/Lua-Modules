@@ -11,6 +11,8 @@ if ( !devEnvName ) {
 console.log( `Lua watcher started. Deploying changes to: ${devEnvName}` );
 console.log( 'Watching lua/wikis/**/*.lua ...\n' );
 
+let isDeploying = false;
+
 const watcher = chokidar.watch( 'lua/wikis/**/*.lua', {
 	awaitWriteFinish: {
 		stabilityThreshold: 200,
@@ -20,6 +22,12 @@ const watcher = chokidar.watch( 'lua/wikis/**/*.lua', {
 } );
 
 watcher.on( 'change', ( filePath ) => {
+	if ( isDeploying ) {
+		console.log( `[${new Date().toLocaleTimeString()}] Skipping ${filePath} — deploy already in progress.\n` );
+		return;
+	}
+	isDeploying = true;
+
 	const time = new Date().toLocaleTimeString();
 	console.log( `[${time}] Changed: ${filePath}` );
 	console.log( 'Deploying...' );
@@ -35,5 +43,11 @@ watcher.on( 'change', ( filePath ) => {
 		} else {
 			console.error( `Deploy failed (exit code ${code})\n` );
 		}
+		isDeploying = false;
+	} );
+
+	child.on( 'error', ( err ) => {
+		console.error( `Spawn failed: ${err.message}\n` );
+		isDeploying = false;
 	} );
 } );

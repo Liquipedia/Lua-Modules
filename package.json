@@ -45,6 +45,6 @@
 		"build": "npm run build:css && npm run build:js",
 		"lua-test": "npm run build:css && busted -C lua",
 		"update-snapshots": "UPDATE_SNAPSHOTS=true npm run lua-test",
-		"watch:lua": "node --env-file=.env scripts/watch-lua.mjs"
+		"watch:lua": "node --env-file-if-exists=.env scripts/watch-lua.mjs"
 	}
 }
