@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
+local Tournament = Lua.import('Module:Tournament')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -23,7 +24,7 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Header = Lua.import('Module:Widget/Infobox/UpcomingTournaments/Header')
-local Row = Lua.import('Module:Widget/Infobox/UpcomingTournaments/Row')
+local TournamentsTickerListItem = Lua.import('Module:Widget/Tournaments/Ticker/ListItem')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class UpcomingTournamentsWidgetParameters
@@ -57,13 +58,15 @@ function UpcomingTournamentsWidget:_getTournaments()
 		))
 		:add(ConditionNode(ColumnName('placement'), Comparator.eq, ''))
 
-	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
+	local tournaments = Array.map(mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = conditions:toString(),
 		order = 'startdate asc',
-		query = 'tournament, date, startdate, pagename, icon, icondark, publishertier, extradata'
-	})
+		query = 'pagename'
+	}), function (placement)
+		return Tournament.getTournament(placement.pagename)
+	end)
 
-	if Logic.isEmpty(placements) then
+	if Logic.isEmpty(tournaments) then
 		return Div{
 			classes = {'text-center'},
 			css = {
@@ -76,9 +79,13 @@ function UpcomingTournamentsWidget:_getTournaments()
 			children = 'No Upcoming Tournaments'
 		}
 	end
-	return Array.map(placements, function (placement)
-		return Row{data = placement, options = self.props.options}
-	end)
+	return Div{
+		classes = {'tournaments-list-type-list'},
+		css = {['margin-bottom'] = 'unset !important'},
+		children = Array.map(tournaments, function (tournament)
+			return TournamentsTickerListItem{tournament = tournament}
+		end)
+	}
 end
 
 return UpcomingTournamentsWidget
