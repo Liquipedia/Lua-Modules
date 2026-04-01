@@ -10,11 +10,12 @@ if ( !devEnvName ) {
 }
 
 console.log( `Lua watcher started. Deploying changes to: ${devEnvName}` );
-console.log( 'Watching lua/wikis/**/*.lua ...\n' );
+console.log( 'Watching lua/wikis/**/*.lua...\n' );
 
 const deployingFiles = new Set();
 
-const watcher = chokidar.watch( 'lua/wikis/**/*.lua', {
+const watcher = chokidar.watch( 'lua/wikis', {
+	ignored: ( path, stats ) => stats?.isFile() && !path.endsWith( '.lua' ),
 	awaitWriteFinish: {
 		stabilityThreshold: 200,
 		pollInterval: 50,
