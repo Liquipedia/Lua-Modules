@@ -47,7 +47,7 @@ end
 ---@param mode string
 ---@param game string?
 ---@return {name: string, date_value: string}[]
----@return {display: Widget, seasons: table<integer, true>, sortKey: string, introduction: string[], removal: string[]}[]
+---@return {display: Widget, seasons: table<integer, true>, introduction: string[], removal: string[]}[]
 function LadderMapsTimeLine._fetch(mode, game)
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('type'), Comparator.eq, 'maphistory'),
