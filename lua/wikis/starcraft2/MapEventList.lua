@@ -10,7 +10,6 @@ local Logic = Lua.import('Module:Logic')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MapEventList = {}
 
@@ -63,7 +62,8 @@ end
 
 ---@private
 ---@param mapName string
----@param item {maps: string, pagename: string, startdate: string, enddate: string, icon: string, icondark: string, name: string}
+---@param item {maps: string, pagename: string, startdate: string, enddate: string,
+---icon: string, icondark: string, name: string}
 ---@return Widget?
 function MapEventList._row(mapName, item)
 	local maps = Json.parseIfTable(item.maps) or {}
