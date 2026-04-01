@@ -107,5 +107,9 @@ html .panel-box-heading {
 				background-color: var( --clr-secondary-25 );
 			}
 		}
+
+		&--no-padding {
+			padding: 0;
+		}
 	}
 }
