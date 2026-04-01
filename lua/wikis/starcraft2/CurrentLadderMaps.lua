@@ -77,7 +77,8 @@ function CurrentLadderMaps._fetchSingle(map)
 end
 
 ---@private
----@param data {mode:string, maps: {pageName: string, displayName: string, text: string?, spawns: string?, image: string?, creator: string}[]}[]
+---@param data {mode:string, maps: {pageName: string, displayName: string, text: string?,
+--- spawns: string?, image: string?, creator: string}[]}[]
 ---@return Widget
 function CurrentLadderMaps._mapsOverview(data)
 	return TableWidgets.Table{
@@ -111,7 +112,8 @@ function CurrentLadderMaps._mapsOverview(data)
 end
 
 ---@private
----@param data {mode:string, maps: {pageName: string, displayName: string, text: string?, spawns: string?, image: string?, creator: string}[]}[]
+---@param data {mode:string, maps: {pageName: string, displayName: string, text: string?,
+--- spawns: string?, image: string?, creator: string}[]}[]
 ---@return Widget
 function CurrentLadderMaps._mapsDetails(data)
 	return HtmlWidgets.Div{
