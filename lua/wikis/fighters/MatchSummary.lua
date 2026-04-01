@@ -24,7 +24,7 @@ local PlayerDisplay = Lua.import('Module:Player/Display')
 local CustomMatchSummary = {}
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {
 		width = CustomMatchSummary._determineWidth,

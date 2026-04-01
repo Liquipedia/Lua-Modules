@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Namespace = Lua.import('Module:Namespace')
@@ -145,7 +145,7 @@ function CustomInjector:parse(id, widgets)
 		--Elo ratings
 		local ratingCells = {}
 		for game, ratings in Table.iter.spairs(RATINGCONFIG) do
-			game = Game.raw{game = game}
+			local gameData = Game.raw{game = game}
 			Array.forEach(ratings, function(rating)
 				local children = {}
 				local currentRating, bestRating
@@ -163,7 +163,7 @@ function CustomInjector:parse(id, widgets)
 					table.insert(children, bestRating)
 				end
 				if Logic.isNotEmpty(children) then
-					table.insert(ratingCells, Cell{name = rating.text .. ' (' .. game.abbreviation .. ')', children = children})
+					table.insert(ratingCells, Cell{name = rating.text .. ' (' .. gameData.abbreviation .. ')', children = children})
 				end
 			end)
 		end

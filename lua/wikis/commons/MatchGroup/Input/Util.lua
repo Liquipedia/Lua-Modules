@@ -62,6 +62,13 @@ local MatchGroupInputUtil = {}
 ---@field startingpoints number?
 ---@field extradata table
 
+---@class MGIParsedDate
+---@field date string
+---@field dateexact boolean
+---@field timestamp integer
+---@field timezoneId string?
+---@field timezoneOffset string?
+
 local NOT_PLAYED_INPUTS = {
 	'skip',
 	'np',
@@ -124,7 +131,7 @@ local contentLanguage = mw.getContentLanguage()
 
 ---@param dateString string?
 ---@param dateFallbacks string[]?
----@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
+---@return MGIParsedDate
 function MatchGroupInputUtil.readDate(dateString, dateFallbacks)
 	if dateString then
 		-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
@@ -950,6 +957,7 @@ function MatchGroupInputUtil.findPlayerId(players, playerInput, playerLink)
 	if playerIndex > 0 then
 		return playerIndex
 	end
+	mw.ext.TeamLiquidIntegration.add_category('Pages with unknown player input in matches')
 	mw.log('Player with id ' .. playerInput .. ' not found in opponent data')
 end
 
@@ -1069,13 +1077,7 @@ function MatchGroupInputUtil.mergeStandaloneIntoMatch(match, standaloneMatch)
 	return match
 end
 
----@alias readDateFunction fun(match: table): {
----date: string,
----dateexact: boolean,
----timestamp: integer,
----timezoneId: string?,
----timezoneOffset:string?,
----}
+---@alias readDateFunction fun(match: table): MGIParsedDate
 
 ---@class MatchParserInterface
 ---@field extractMaps fun(match: table, opponents: MGIParsedOpponent[], mapProps: any?): table[]
@@ -1172,7 +1174,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 	match.finished = MatchGroupInputUtil.matchIsFinished(match, games, opponents)
 
 	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished, opponents)
+		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished --[[@as string?]], opponents)
 		match.winner = MatchGroupInputUtil.getWinner(match.status, matchInput.winner, opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
@@ -1707,7 +1709,7 @@ end
 
 ---@param matchParser {readDate?: readDateFunction, DATE_FALLBACKS?: string[]}
 ---@param matchInput table
----@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
+---@return MGIParsedDate
 function MatchGroupInputUtil.getMatchDate(matchParser, matchInput)
 	local defaultDateParser = function(record)
 		return MatchGroupInputUtil.readDate(record.date, matchParser.DATE_FALLBACKS)

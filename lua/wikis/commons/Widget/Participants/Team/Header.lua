@@ -14,7 +14,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Widget = Lua.import('Module:Widget')
-local ChevronToggle = Lua.import('Module:Widget/Participants/Team/ChevronToggle')
+local ChevronToggle = Lua.import('Module:Widget/GeneralCollapsible/ChevronToggle')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -51,10 +51,34 @@ function ParticipantsTeamHeader:render()
 			)
 		}
 	else
-		opponentDisplay = OpponentDisplay.BlockOpponent{
-			opponent = participant.opponent,
-			teamStyle = 'standard',
-			additionalClasses = opponentClasses
+		opponentDisplay = Div{
+			classes = {'team-participant-card__opponent'},
+			children = {
+				Div{
+					classes = {'team-participant-card__opponent-compact'},
+					children = {
+						OpponentDisplay.BlockOpponent{
+							opponent = participant.opponent,
+							teamStyle = 'bracket',
+							additionalClasses = opponentClasses,
+							image = participant.image,
+							imagedark = participant.imagedark,
+						}
+					}
+				},
+				Div{
+					classes = {'team-participant-card__opponent-full'},
+					children = {
+						OpponentDisplay.BlockOpponent{
+							opponent = participant.opponent,
+							teamStyle = 'standard',
+							additionalClasses = opponentClasses,
+							image = participant.image,
+							imagedark = participant.imagedark,
+						}
+					}
+				}
+			}
 		}
 	end
 

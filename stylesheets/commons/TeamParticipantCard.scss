@@ -43,9 +43,10 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 	gap: 0.5rem;
 }
 
-.team-participant__switches {
+.team-participant__controls {
 	display: flex;
 	gap: 0.5rem;
+	align-items: center;
 }
 
 .team-participant__grid {
@@ -148,6 +149,16 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 		}
 	}
 
+	&__opponent-compact {
+		display: none;
+		width: 100%;
+	}
+
+	&__opponent-full {
+		display: flex;
+		width: 100%;
+	}
+
 	&__label {
 		padding: 0.125rem 0.5rem;
 		border-radius: 0.25rem;
@@ -238,14 +249,6 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 		.theme--dark & {
 			color: var( --clr-primary-80 );
 		}
-	}
-
-	&__qualifier-placement {
-		align-self: center;
-		padding: 0.125rem 0.5rem;
-		border-radius: 0.25rem;
-		font-weight: bold;
-		font-size: 0.6875rem;
 	}
 
 	@media ( min-width: 768px ) {
@@ -361,8 +364,10 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 				.team-template-image-icon,
 				.league-icon-small-image {
 					& > a {
+						height: 100%;
 						display: flex;
 						justify-content: center;
+						align-items: center;
 					}
 
 					@include set-participant-icon-size(
@@ -422,20 +427,6 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 		flex-direction: column;
 		gap: 0.25rem;
 
-		&-title {
-			padding: 0 0.5rem;
-			font-size: 0.875rem;
-			font-weight: bold;
-
-			.theme--light & {
-				color: var( --clr-secondary-25 );
-			}
-
-			.theme--dark & {
-				color: var( --clr-secondary-90 );
-			}
-		}
-
 		&-list {
 			display: flex;
 			flex-direction: column;
@@ -462,59 +453,83 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 			}
 		}
 	}
+
+	&__subheader {
+		padding: 0 0.5rem;
+		font-size: 0.875rem;
+		font-weight: bold;
+
+		.theme--light & {
+			color: var( --clr-secondary-25 );
+		}
+
+		.theme--dark & {
+			color: var( --clr-secondary-90 );
+		}
+	}
 }
 
-.team-participant:has( .switch-toggle-active#{ $compact-selector } ) {
-	.team-participant-card {
-		&__opponent--square-icon {
-			.team-template-image-icon,
-			.league-icon-small-image {
-				@include set-participant-icon-size(
-					$participant-icon-wrapper-size-compact,
-					$participant-icon-size-compact
-				);
-
-				@media ( max-width: 767px ) {
+body:has( .switch-toggle-active#{ $compact-selector } ) {
+	.team-participant {
+		.team-participant-card {
+			&__opponent--square-icon {
+				.team-template-image-icon,
+				.league-icon-small-image {
 					@include set-participant-icon-size(
-						$participant-icon-wrapper-size-mobile,
-						$participant-icon-size-mobile
+						$participant-icon-wrapper-size-compact,
+						$participant-icon-size-compact
 					);
+
+					@media ( max-width: 767px ) {
+						@include set-participant-icon-size(
+							$participant-icon-wrapper-size-mobile,
+							$participant-icon-size-mobile
+						);
+					}
 				}
 			}
-		}
 
-		&__header {
-			position: static;
-			flex-direction: row;
-			width: auto;
+			&__opponent-compact {
+				display: flex;
+			}
 
-			.general-collapsible-default-toggle {
+			&__opponent-full {
+				display: none;
+			}
+
+			&__header {
 				position: static;
-				top: initial;
-				right: initial;
-				transform: none;
+				flex-direction: row;
+				width: auto;
+
+				.general-collapsible-default-toggle {
+					position: static;
+					top: initial;
+					right: initial;
+					transform: none;
+				}
 			}
-		}
 
-		&__header-main {
-			display: contents;
-		}
-
-		&__opponent {
-			flex-direction: row;
-			gap: 0.5rem;
-
-			.team-template-text {
-				font-size: initial;
+			&__header-main {
+				display: contents;
 			}
-		}
 
-		&__qualifier--header {
-			display: none;
-		}
+			&__opponent {
+				flex-direction: row;
+				gap: 0.5rem;
 
-		&__qualifier--content {
-			display: flex;
+				.team-template-text {
+					font-size: initial;
+				}
+			}
+
+			&__qualifier--header {
+				display: none;
+			}
+
+			&__qualifier--content {
+				display: flex;
+			}
 		}
 	}
 }

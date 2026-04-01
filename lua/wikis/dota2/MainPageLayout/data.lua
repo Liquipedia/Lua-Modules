@@ -8,11 +8,12 @@
 local Lua = require('Module:Lua')
 
 local DateExt = Lua.import('Module:Date/Ext')
+local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 local Template = Lua.import('Module:Template')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
--- local Rankings = Lua.import('Module:Widget/Ratings')
+local Rankings = Lua.import('Module:Widget/Ratings')
 
 local Button = Lua.import('Module:Widget/Basic/Button')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -110,13 +111,13 @@ local CONTENT = {
 		heading = 'Useful Articles',
 		body = '{{Main Page Useful Articles}}',
 		padding = true,
-		boxid = 1503,
+		boxid = MainPageLayoutUtil.BoxId.USEFUL_ARTICLES,
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
 		body = WantToHelp{},
 		padding = true,
-		boxid = 1504,
+		boxid = MainPageLayoutUtil.BoxId.WANT_TO_HELP,
 	},
 	transfers = {
 		heading = 'Transfers',
@@ -124,18 +125,18 @@ local CONTENT = {
 			transferPage = 'Transfers/' .. DateExt.getYearOf() .. '/' ..
 				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 		},
-		boxid = 1509,
+		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
 		body = ThisDayWidgets.Content{ birthdayListPage = 'Birthday list' },
 		padding = true,
-		boxid = 1510,
+		boxid = MainPageLayoutUtil.BoxId.THIS_DAY,
 	},
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
-		boxid = 1516,
+		boxid = MainPageLayoutUtil.BoxId.SPECIAL_EVENTS,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -148,7 +149,7 @@ local CONTENT = {
 		heading = 'Matches',
 		body = MatchTicker{},
 		padding = true,
-		boxid = 1507,
+		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	partnerWikis = {
 		heading = 'Partner Wikis',
@@ -163,9 +164,8 @@ local CONTENT = {
 			completedDays = 20
 		},
 		padding = true,
-		boxid = 1508,
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
---[[
 	rankings = {
 		heading = 'Liquipedia Rankings (Beta)',
 		body = Rankings{
@@ -177,7 +177,6 @@ local CONTENT = {
 		padding = false,
 		boxid = 1520,
 	},
-]]
 }
 
 local LAYOUT_MAIN = {
@@ -186,11 +185,14 @@ local LAYOUT_MAIN = {
 		children = {
 			{
 				mobileOrder = 1,
-				content = CONTENT.specialEvents
+				content = CONTENT.specialEvents,
 			},
-
 			{
 				mobileOrder = 3,
+				content = CONTENT.rankings,
+			},
+			{
+				mobileOrder = 4,
 				content = CONTENT.transfers,
 			},
 		},
@@ -235,7 +237,7 @@ local LAYOUT_MAIN = {
 		sizes = {xxl = 12},
 		children = {
 			{
-				mobileOrder = 4,
+				mobileOrder = 5,
 				content = CONTENT.heroes,
 			},
 		}
@@ -244,11 +246,11 @@ local LAYOUT_MAIN = {
 		sizes = {xxl = 6},
 		children = {
 			{
-				mobileOrder = 5,
+				mobileOrder = 6,
 				content = CONTENT.wantToHelp,
 			},
 			{
-				mobileOrder = 6,
+				mobileOrder = 7,
 				content = CONTENT.updates,
 			},
 
@@ -258,7 +260,7 @@ local LAYOUT_MAIN = {
 		sizes = {xxl = 6},
 		children = {
 			{
-				mobileOrder = 7,
+				mobileOrder = 8,
 				content = CONTENT.thisDay,
 			},
 		}
@@ -267,12 +269,12 @@ local LAYOUT_MAIN = {
 		sizes = {xxl = 12},
 		children = {
 			{
-				mobileOrder = 8,
+				mobileOrder = 9,
 				content = CONTENT.usefulArticles,
 			},
 			{
-				mobileOrder = 9,
-				content = CONTENT.partnerWikis
+				mobileOrder = 10,
+				content = CONTENT.partnerWikis,
 			},
 		}
 	}
@@ -280,7 +282,7 @@ local LAYOUT_MAIN = {
 
 local LAYOUT_ESPORTS = {
 	{ -- Left
-		size = 6,
+		sizes = {xxl = 5, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 1,
@@ -292,6 +294,10 @@ local LAYOUT_ESPORTS = {
 			},
 			{
 				mobileOrder = 5,
+				content = CONTENT.rankings,
+			},
+			{
+				mobileOrder = 6,
 				content = CONTENT.transfers,
 			},
 			{
@@ -305,7 +311,7 @@ local LAYOUT_ESPORTS = {
 		}
 	},
 	{ -- Right
-		size = 6,
+		sizes = {xxl = 7, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 3,
@@ -338,12 +344,6 @@ local LAYOUT_ESPORTS = {
 					},
 				},
 			},
---[[
-			{
-				mobileOrder = 6,
-				content = CONTENT.rankings
-			},
-]]
 			{
 				mobileOrder = 7,
 				content = CONTENT.updates,
@@ -354,7 +354,7 @@ local LAYOUT_ESPORTS = {
 
 local LAYOUT_GAME = {
 	{ -- Left
-		size = 6,
+		sizes = {xxl = 5, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 1,
@@ -371,7 +371,7 @@ local LAYOUT_GAME = {
 		},
 	},
 	{ -- Right
-		size = 6,
+		sizes = {xxl = 7, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 3,

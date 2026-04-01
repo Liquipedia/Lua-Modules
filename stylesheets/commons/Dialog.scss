@@ -32,6 +32,10 @@ div.general-dialog-container {
 		color-scheme: dark;
 	}
 
+	.ui-dialog-titlebar .ui-icon {
+		margin: unset;
+	}
+
 	@media ( max-width: 435px ) {
 		max-height: 80vh;
 	}

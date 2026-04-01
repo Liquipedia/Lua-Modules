@@ -37,6 +37,7 @@ function MatchSummaryFfaGameCountdown:render()
 		-- TODO: Use game-TZ
 		date = Date.toCountdownArg(timestamp, nil, game.dateIsExact),
 		finished = game.winner ~= nil and 'true' or nil,
+		rawdatetime = (not game.dateIsExact) or game.winner ~= nil
 	})
 
 	return HtmlWidgets.Div{

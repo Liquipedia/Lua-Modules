@@ -28,6 +28,7 @@ local PREFIXES = {
 	},
 	abiosgaming = {'https://abiosgaming.com/tournaments/'},
 	apexlegendsstatus = {'https://apexlegendsstatus.com/profile/uid/PC/'},
+	apexlegendsstatusalgs = {'https://apexlegendsstatus.com/algs/player-stats/'},
 	['apple-podcasts'] = {'https://podcasts.apple.com/'},
 	afreeca = {
 		'http://afreecatv.com/',
@@ -62,6 +63,7 @@ local PREFIXES = {
 	breakingpoint = {match = 'https://www.breakingpoint.gg/match/'},
 	cc = {'https://cc.163.com/'},
 	cdl = {match = 'https://callofdutyleague.com/en-us/match/'},
+	clarioncorp = {'https://clarioncorp.net/pilot/'},
 	challengermode = {
 		'https://www.challengermode.com/tournaments/',
 		player = 'https://www.challengermode.com/users/',
@@ -86,7 +88,6 @@ local PREFIXES = {
 	chzzk = {'https://chzzk.naver.com/'},
 	civdraft = {match = 'https://aoe2cm.net/draft/'},
 	cntft = {'https://lol.qq.com/tft/#/masterDetail/'},
-	corestrike = {'https://corestrike.gg/lookup/'},
 	cfs = {'https://www.crossfirestars.com/'},
 	datdota = {
 		'https://www.datdota.com/leagues/',
@@ -145,6 +146,11 @@ local PREFIXES = {
 	fide = {
 		'https://ratings.fide.com/tournament_information.phtml?event=',
 		player = 'https://ratings.fide.com/profile/',
+	},
+	fpschallenge = {
+		'https://fpschallenge.eu/tournament/',
+		player = 'https://fpschallenge.eu/user/',
+		team = 'https://fpschallenge.eu/team/',
 	},
 	geoguessr = {'https://www.geoguessr.com/'},
 	gol = {match = 'https://gol.gg/game/stats/'},
@@ -220,6 +226,10 @@ local PREFIXES = {
 		player = 'https://osu.ppy.sh/users/',
 	},
 	overgg = {match = 'https://www.over.gg/'},
+	overstat = {
+		'https://overstat.gg/',
+		player = 'https://overstat.gg/player/',
+	},
 	owl = {
 		match = 'https://web.archive.org/web/overwatchleague.com/en-us/match/',
 	},
@@ -379,6 +389,7 @@ SUFFIXES = Table.merge(SUFFIXES, CustomData.suffixes or {})
 local ALIASES = {
 	['ask-fm'] = {'afk.fm', 'askfm'},
 	douyu = {'douyutv'},
+	clarioncorp = {'corestrike'},
 	esl = {'eslgaming'},
 	['facebook-gaming'] = {'fbgg'},
 	home = {'website', 'web', 'site', 'url'},

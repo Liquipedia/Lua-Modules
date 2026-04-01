@@ -29,6 +29,13 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {loadData = true})
 local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 
+---@class CustomMatchSummaryInterface
+---@field createHeader? fun(match: MatchGroupUtilMatch, options: {teamStyle: teamStyle?}?): Widget
+---@field createBody? fun(match: MatchGroupUtilMatch): Renderable|Renderable[]
+---@field createGame? fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
+---@field addToFooter? fun(match: MatchGroupUtilMatch, footer: MatchSummaryFooter): MatchSummaryFooter
+---@field createMatch? fun(matchData: MatchGroupUtilMatch): MatchSummaryMatch
+
 ---@class MatchSummaryFooter
 ---@operator call: MatchSummaryFooter
 ---@field elements (Widget|Html|string|number)[]
@@ -100,32 +107,32 @@ end
 ---@class MatchSummaryMatch
 ---@operator call: MatchSummaryMatch
 ---@field root Html
----@field headerElement Widget?
----@field bodyElement Widget[]?
----@field commentElement Widget?
+---@field headerElement Renderable?
+---@field bodyElement Renderable|Renderable[]?
+---@field commentElement Renderable|Renderable[]?
 ---@field footerElement Widget?
----@field buttonElement Widget?
+---@field buttonElement Renderable?
 local Match = Class.new(
 	function(self)
 		self.root = mw.html.create()
 	end
 )
 
----@param header Widget
+---@param header Renderable
 ---@return MatchSummaryMatch
 function Match:header(header)
 	self.headerElement = header
 	return self
 end
 
----@param body Widget[]
+---@param body Renderable|Renderable[]
 ---@return MatchSummaryMatch
 function Match:body(body)
 	self.bodyElement = body
 	return self
 end
 
----@param comment Widget
+---@param comment Renderable
 ---@return MatchSummaryMatch
 function Match:comment(comment)
 	self.commentElement = comment
@@ -139,7 +146,7 @@ function Match:footer(footer)
 	return self
 end
 
----@param button Widget
+---@param button Renderable
 ---@return MatchSummaryMatch
 function Match:button(button)
 	self.buttonElement = button
@@ -159,65 +166,13 @@ function Match:create()
 end
 
 ---@class MatchSummary
----@operator call(string?):MatchSummary
----@field Footer MatchSummaryFooter
----@field Match MatchSummaryMatch
----@field matches Html[]?
----@field headerElement Widget?
----@field root Html?
-local MatchSummary = Class.new()
-MatchSummary.Footer = Footer
-MatchSummary.Match = Match
-
---- TODO: Instead of attaching data-analytics-name here, use Analytics Widget
----@param width string?
----@return MatchSummary
-function MatchSummary:init(width)
-	self.matches = {}
-	self.root = mw.html.create('div')
-		:addClass('brkts-popup')
-		:css('width', width)
-		:attr('data-analytics-name', 'Match popup')
-	return self
-end
-
----@param cssClass string?
----@return MatchSummary
-function MatchSummary:addClass(cssClass)
-	self.root:addClass(cssClass)
-	return self
-end
-
----@param header Widget?
----@return MatchSummary
-function MatchSummary:header(header)
-	self.headerElement = header
-	return self
-end
-
----@param match MatchSummaryMatch?
----@return MatchSummary
-function MatchSummary:addMatch(match)
-	if not match then return self end
-
-	table.insert(self.matches, match:create())
-
-	return self
-end
-
----@return Html
-function MatchSummary:create()
-	self.root:node(self.headerElement)
-
-	for _, match in ipairs(self.matches) do
-		self.root:node(match)
-	end
-
-	return self.root
-end
+local MatchSummary = {
+	Footer = Footer,
+	Match = Match,
+}
 
 ---Default header function
----@param match table
+---@param match MatchGroupUtilMatch
 ---@param options {teamStyle: teamStyle?}?
 ---@return Widget
 function MatchSummary.createDefaultHeader(match, options)
@@ -238,7 +193,7 @@ end
 
 -- Default body function
 ---@param match MatchGroupUtilMatch
----@param createGame fun(date: string, game: table, gameIndex: integer): Widget
+---@param createGame fun(date: string, game: table, gameIndex: integer): Renderable|Renderable[]
 ---@return Widget[]
 function MatchSummary.createDefaultBody(match, createGame)
 	return WidgetUtil.collect(
@@ -282,7 +237,7 @@ end
 
 ---Default createMatch function for usage in Custom MatchSummary
 ---@param matchData MatchGroupUtilMatch?
----@param CustomMatchSummary table
+---@param CustomMatchSummary CustomMatchSummaryInterface
 ---@param options {teamStyle: teamStyle?, noScore: boolean?}?
 ---@return MatchSummaryMatch?
 function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
@@ -322,10 +277,10 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 end
 
 ---Default getByMatchId function for usage in Custom MatchSummary
----@param CustomMatchSummary table
+---@param CustomMatchSummary CustomMatchSummaryInterface
 ---@param args table
----@param options {teamStyle:teamStyle?, width: fun(MatchGroupUtilMatch):string?|string?, noScore:boolean?}?
----@return Html
+---@param options {teamStyle:teamStyle?, width: (fun(match: MatchGroupUtilMatch):string?)|string?, noScore:boolean?}?
+---@return Widget
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(
 		(type(CustomMatchSummary.createBody) == 'function' or type(CustomMatchSummary.createGame) == 'function'),
@@ -337,27 +292,21 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	local match, bracketResetMatch = MatchGroupUtil.fetchMatchForBracketDisplay(
 		args.bracketId, args.matchId)
 
-	local width = options.width
+	---@type (fun(match: MatchGroupUtilMatch):string?)|string|integer?
+	local width = options.width or args.width
 	if type(width) == 'function' then
 		width = width(match)
 	end
 
-	local matchSummary = MatchSummary():init(width)
-
-	--additional header for when martin adds the the css and buttons for switching between match and reset match
-	--if bracketResetMatch then
-		--local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
-		--matchSummary:header(createHeader(match, {noScore = true, teamStyle = options.teamStyle}))
-		--here martin can add the buttons for switching between match and reset match
-	--end
-
-	local createMatch = CustomMatchSummary.createMatch or function(matchData)
-		return MatchSummary.createMatch(matchData, CustomMatchSummary, options)
-	end
-	matchSummary:addMatch(createMatch(match))
-	matchSummary:addMatch(createMatch(bracketResetMatch))
-
-	return matchSummary:create()
+	return MatchSummaryWidgets.Container{
+		classes = args.classes,
+		width = width,
+		createMatch = CustomMatchSummary.createMatch or function(matchData)
+			return MatchSummary.createMatch(matchData, CustomMatchSummary, options)
+		end,
+		match = match,
+		resetMatch = bracketResetMatch,
+	}
 end
 
 ---@param mapVetoes table

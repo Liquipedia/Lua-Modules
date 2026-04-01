@@ -50,7 +50,7 @@ local KING_ICONS = {
 }
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
@@ -76,9 +76,14 @@ function CustomMatchSummary.createGame(game, gameIndex)
 			CustomMatchSummary._getHeader(game),
 
 			-- Player 1
-			CustomMatchSummary._getSideIcon(game.opponents[1]),
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.GameTeamWrapper{flipped = false},
+			MatchSummaryWidgets.GameCenter{
+				css = {flex = 1},
+				children = {
+					CustomMatchSummary._getSideIcon(game.opponents[1]),
+					MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+					MatchSummaryWidgets.GameTeamWrapper{flipped = false},
+				},
+			},
 
 			-- Center
 			MatchSummaryWidgets.GameCenter{
@@ -86,9 +91,14 @@ function CustomMatchSummary.createGame(game, gameIndex)
 			},
 
 			-- Player 2
-			MatchSummaryWidgets.GameTeamWrapper{flipped = true},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			CustomMatchSummary._getSideIcon(game.opponents[2]),
+			MatchSummaryWidgets.GameCenter{
+				css = {flex = 1},
+				children = {
+					MatchSummaryWidgets.GameTeamWrapper{flipped = true},
+					MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+					CustomMatchSummary._getSideIcon(game.opponents[2]),
+				},
+			},
 
 			-- Comment
 			MatchSummaryWidgets.GameComment{children = game.comment}

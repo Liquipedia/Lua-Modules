@@ -79,6 +79,7 @@ local LOADOUT_ICON_SIZE = '64px'
 local ITEMS_TO_SHOW = 6
 
 local KDA_ICON = IconFa{iconName = 'leagueoflegends_kda', hover = 'KDA'}
+local KP_ICON = IconFa{iconName = 'leagueoflegends_killparticipation', hover = 'KP'}
 local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
@@ -151,6 +152,7 @@ function MatchPage:renderOverallStats()
 							},
 							Div{
 								classes = {'match-bm-team-stats-list-cell'},
+								css = {flex = 1},
 								children = self:getTournamentIcon()
 							},
 							Div{
@@ -195,7 +197,7 @@ function MatchPage:renderOverallStats()
 					}
 				},
 				PlayerStatContainer{
-					columns = 4,
+					columns = 5,
 					children = {
 						PlayerStat{
 							title = {KDA_ICON, 'KDA'},
@@ -206,6 +208,10 @@ function MatchPage:renderOverallStats()
 							}, SPAN_SLASH)
 						},
 						PlayerStat{
+							title = {KP_ICON, 'KP%'},
+							data = MathUtil.formatPercentage(player.extradata.killparticipation, 1)
+						},
+						PlayerStat{
 							title = {
 								IconImage{
 									imageLight = 'Lol stat icon cs.png',
@@ -213,7 +219,7 @@ function MatchPage:renderOverallStats()
 									size = 'x16px',
 									link = ''
 								},
-								'CSM'
+								'CSPM'
 							},
 							data = calculateStatPerMinute(player.extradata.creepscore, player.extradata.gameLength)
 						},
@@ -444,9 +450,12 @@ function MatchPage:_renderDraft(game)
 				},
 				GeneralCollapsible{
 					title = 'Draft Order',
-					classes = {'match-bm-lol-game-veto-order'},
+					classes = {'match-bm-match-collapsible'},
 					shouldCollapse = true,
-					collapseAreaClasses = {'match-bm-lol-game-veto-order-list'},
+					collapseAreaClasses = {
+						'match-bm-match-collapsible-content',
+						'match-bm-lol-game-veto-order-list',
+					},
 					children = {
 						self:_renderGameTeamVetoOrder(game, 1),
 						self:_renderGameTeamVetoOrder(game, 2),
@@ -545,6 +554,7 @@ function MatchPage:_renderTeamStats(game)
 						},
 						Div{
 							classes = {'match-bm-team-stats-list-cell'},
+							css = {flex = 1},
 							children = self:isBestOfOne() and self:_buildGameResultSummary(game) or self:getTournamentIcon()
 						},
 						Div{
@@ -620,13 +630,17 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 			},
 			MatchPage._buildPlayerLoadout(player),
 			PlayerStatContainer{
-				columns = 4,
+				columns = 5,
 				children = {
 					PlayerStat{
 						title = {KDA_ICON, 'KDA'},
 						data = Array.interleave({
 							player.kills, player.deaths, player.assists
 						}, SPAN_SLASH)
+					},
+					PlayerStat{
+						title = {KP_ICON, 'KP%'},
+						data = player.killparticipation and MathUtil.formatPercentage(player.killparticipation, 1) or '-'
 					},
 					PlayerStat{
 						title = {

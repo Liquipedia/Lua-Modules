@@ -20,7 +20,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class DropdownItemWidgetParameters
 ---@field icon string|Widget?
----@field children string|number|Widget|Html|(string|number|Widget|Html)[]
+---@field children Renderable|Renderable[]
 ---@field link string?
 ---@field linktype 'internal'|'external'|nil
 ---@field classes string[]?

@@ -19,6 +19,7 @@ local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Carousel = Lua.import('Module:Widget/Basic/Carousel')
 local Div = HtmlWidgets.Div
 local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
@@ -57,6 +58,10 @@ local WIN_TYPES = {
 	['time'] = {
 		icon = 'outoftime',
 		description = 'Timer expired',
+	},
+	surrendered = {
+		icon = 'surrendered',
+		description = 'Surrendered'
 	}
 }
 
@@ -319,6 +324,7 @@ function MatchPage:_renderTeamStats(game)
 						},
 						Div{
 							classes = {'match-bm-team-stats-list-cell'},
+							css = {flex = 1},
 							children = self:getTournamentIcon()
 						},
 						Div{
@@ -445,14 +451,10 @@ function MatchPage:_renderRoundDetails(game)
 		title = 'Round Details',
 		classes = {'match-bm-match-collapsible'},
 		shouldCollapse = true,
-		collapseAreaClasses = {
-			'match-bm-match-collapsible-content',
-			-- TODO: Replace container class with Carousel widget after #6951
-			'match-bm-match-round-detail-container',
-		},
-		children = Array.map(game.extradata.rounds or {}, function (round, roundIndex)
-			return self:_renderRoundDetail(findPlayer, round, roundIndex)
-		end)
+		collapseAreaClasses = {'match-bm-match-collapsible-content'},
+		children = Carousel{children = Array.map(game.extradata.rounds or {}, function (round, roundIndex)
+				return self:_renderRoundDetail(findPlayer, round, roundIndex)
+		end)}
 	}
 end
 
@@ -486,7 +488,7 @@ function MatchPage:_renderRoundDetail(findPlayer, round, roundIndex)
 				children = {
 					Div{
 						classes = {'match-bm-match-round-detail-body-result'},
-						children = {
+						children = WidgetUtil.collect(
 							MatchPage._renderRoundOutcomeIcon(round.winningSide, round.winBy),
 							Span{
 								classes = {'match-bm-match-round-detail-body-result-desc'},
@@ -499,7 +501,7 @@ function MatchPage:_renderRoundDetail(findPlayer, round, roundIndex)
 									HtmlWidgets.B{children = 'Winner'},
 								}
 							}
-						}
+						)
 					},
 					HtmlWidgets.Hr{},
 					Span{children = {

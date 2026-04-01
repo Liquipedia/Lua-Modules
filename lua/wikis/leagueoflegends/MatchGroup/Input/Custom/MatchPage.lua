@@ -64,6 +64,13 @@ function CustomMatchGroupInputMatchPage.getSide(map, opponentIndex)
 	return (map['team' .. opponentIndex] or {}).color
 end
 
+---@param arr table[]
+---@param item string
+---@return number?
+function CustomMatchGroupInputMatchPage.sumItem(arr, item)
+	return Array.reduce(Array.map(arr, Operator.property(item)), Operator.nilSafeAdd, 0)
+end
+
 ---@param map table
 ---@param opponentIndex integer
 ---@return table[]?
@@ -71,6 +78,22 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
 	if not team then return end
 	if not team.players then return end
+
+	local totalKills = CustomMatchGroupInputMatchPage.sumItem(team.players, 'kills')
+
+	---@param player table
+	---@return number?
+	local function calculateKillParticipation(player)
+		if (totalKills or 0) == 0 then
+			return
+		end
+		local killsParticipated = Operator.nilSafeAdd(player.kills, player.assists)
+		if not killsParticipated then
+			return
+		end
+		return killsParticipated / totalKills
+	end
+
 	return Array.map(team.players, function(player)
 		return {
 			player = player.id,
@@ -80,6 +103,7 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 			kills = player.kills,
 			deaths = player.deaths,
 			assists = player.assists,
+			killparticipation = calculateKillParticipation(player),
 			damagedone = player.damageDone,
 			creepscore = player.creepScore,
 			items = player.items,
@@ -150,22 +174,15 @@ function CustomMatchGroupInputMatchPage.extendMapOpponent(map, opponentIndex)
 	end
 	---@cast participants -nil
 
-	---@param arr table[]
-	---@param item string
-	---@return number?
-	local function sumItem(arr, item)
-		return Array.reduce(Array.map(arr, Operator.property(item)), Operator.nilSafeAdd, 0)
-	end
-
 	return {
 		side = CustomMatchGroupInputMatchPage.getSide(map, opponentIndex),
 		picks = Array.map(participants, Operator.property('character')),
 		stats = Table.merge(
 			{
-				gold = sumItem(participants, 'gold'),
-				kills = sumItem(participants, 'kills'),
-				deaths = sumItem(participants, 'deaths'),
-				assists = sumItem(participants, 'assists')
+				gold = CustomMatchGroupInputMatchPage.sumItem(participants, 'gold'),
+				kills = CustomMatchGroupInputMatchPage.sumItem(participants, 'kills'),
+				deaths = CustomMatchGroupInputMatchPage.sumItem(participants, 'deaths'),
+				assists = CustomMatchGroupInputMatchPage.sumItem(participants, 'assists')
 			},
 			CustomMatchGroupInputMatchPage.getObjectives(map, opponentIndex)
 		)
