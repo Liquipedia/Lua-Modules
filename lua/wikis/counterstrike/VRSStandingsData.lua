@@ -226,7 +226,7 @@ function VRSStandingsData._fetch(updated, datapointType)
 	end
 
 	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = conditions:toString(),
+		conditions = tostring(conditions),
 		query = 'extradata, date',
 		order = 'date desc',
 		limit = 1,

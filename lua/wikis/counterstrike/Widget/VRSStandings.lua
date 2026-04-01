@@ -128,14 +128,14 @@ local function buildFooter()
 	}
 end
 
+---@private
 ---@param standing VRSStandingsStanding
 ---@param mainpage boolean
 ---@return Widget
 function VRSStandings._row(standing, mainpage)
 	local extradata = standing.opponent.extradata or {}
 
-	local cells
-	cells = WidgetUtil.collect(
+	local cells = WidgetUtil.collect(
 		TableWidgets.Cell{children = standing.localPlace},
 		standing.globalPlace and TableWidgets.Cell{children = standing.globalPlace} or nil,
 		TableWidgets.Cell{
@@ -147,20 +147,15 @@ function VRSStandings._row(standing, mainpage)
 			}
 		},
 		not standing.globalPlace and TableWidgets.Cell{children = extradata.region or ''} or nil
-	)
-
-	if not mainpage then
-		   table.insert(cells,
-			   TableWidgets.Cell{
-				   children = Array.map(standing.opponent.players, function(player)
-					   return HtmlWidgets.Div{
-						   css = {display="inline-block", width="160px"},
-						   children = PlayerDisplay.BlockPlayer({player = player})
-					   }
-				   end)
+		not mainpage and TableWidgets.Cell{
+		   children = Array.map(standing.opponent.players, function(player)
+			   return HtmlWidgets.Div{
+				   css = {display="inline-block", width="160px"},
+				   children = PlayerDisplay.BlockPlayer({player = player})
 			   }
-		   )
-	end
+		   end)
+	   } or nil
+	)
 
 	return TableWidgets.Row{children = cells}
 end
@@ -172,7 +167,7 @@ function VRSStandings:render()
 	if #standings == 0 then
 		return HtmlWidgets.Div{
 			children = 'No teams found for the selected filter.',
-			css = {['font-weight'] = 'bold', padding = '12px'}
+			css = {['font-weight'] = 'bold', padding = '0.75rem'}
 		}
 	end
 
