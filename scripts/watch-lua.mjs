@@ -2,10 +2,13 @@
 import chokidar from 'chokidar';
 import { spawn } from 'child_process';
 
-const devEnvName = process.env.LUA_DEV_ENV_NAME;
+const devEnvName = process.argv[ 2 ]
+	? `/dev/${process.argv[ 2 ]}`
+	: process.env.LUA_DEV_ENV_NAME;
 
 if ( !devEnvName ) {
-	console.error( 'LUA_DEV_ENV_NAME is not set. Check your .env file.' );
+	console.error( 'Usage: npm run watch:lua -- <dev-env-name>' );
+	console.error( 'Or set LUA_DEV_ENV_NAME in your .env file.' );
 	process.exit( 1 );
 }
 
