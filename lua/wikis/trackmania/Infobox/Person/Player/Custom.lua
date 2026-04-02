@@ -34,9 +34,6 @@ local CAMERAS = {
 	['alt1'] = '1 (Alternate)',
 	['alt2'] = '2 (Alternate)',
 	['alt3'] = '3 (Alternate)',
-	['1alt'] = '1 (Alternate)',
-	['2alt'] = '2 (Alternate)',
-	['3alt'] = '3 (Alternate)',
 }
 
 ---@class TrackmaniaInfoboxPlayer: Person
