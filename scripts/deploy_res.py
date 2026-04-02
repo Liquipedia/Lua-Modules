@@ -46,8 +46,9 @@ def update_cache(session: MediaWikiSession):
             .strip(),
         },
     )
+    print(cache_result)
     if (
-        cache_result["updatelpmwmessageapi"].get("message")
+        cache_result.get("message")
         == "Successfully changed the message value"
     ):
         print("Resource cache version updated succesfully!")
