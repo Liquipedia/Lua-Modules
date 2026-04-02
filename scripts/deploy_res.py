@@ -46,7 +46,6 @@ def update_cache(session: MediaWikiSession):
             .strip(),
         },
     )
-    print(cache_result)
     if (
         cache_result.get("message")
         == "Successfully changed the message value"
