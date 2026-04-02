@@ -12,29 +12,20 @@ if ( !devEnvName ) {
 console.log( `Lua watcher started. Deploying changes to: ${devEnvName}` );
 console.log( 'Watching lua/wikis/**/*.lua...\n' );
 
-const deployingFiles = new Set();
+const queue = [];
+let deployingFile = null;
 
-const watcher = chokidar.watch( 'lua/wikis', {
-	ignored: ( path, stats ) => stats?.isFile() && !path.endsWith( '.lua' ),
-	awaitWriteFinish: {
-		stabilityThreshold: 200,
-		pollInterval: 50,
-	},
-	ignoreInitial: true,
-} );
-
-watcher.on( 'change', ( filePath ) => {
-	if ( deployingFiles.has( filePath ) ) {
-		console.log( `[${new Date().toLocaleTimeString()}] Skipping ${filePath} — deploy already in progress.\n` );
+function processQueue() {
+	if ( deployingFile !== null || queue.length === 0 ) {
 		return;
 	}
-	deployingFiles.add( filePath );
+	deployingFile = queue.shift();
 
 	const time = new Date().toLocaleTimeString();
-	console.log( `[${time}] Changed: ${filePath}` );
-	console.log( 'Deploying...' );
+	const queueInfo = queue.length > 0 ? ` (${queue.length} more queued)` : '';
+	console.log( `[${time}] Deploying: ${deployingFile}${queueInfo}` );
 
-	const child = spawn( 'python3', [ 'scripts/deploy.py', filePath ], {
+	const child = spawn( 'python3', [ 'scripts/deploy.py', deployingFile ], {
 		env: {
 			...process.env,
 			WIKI_USER: process.env.LP_BOTUSER,
@@ -51,11 +42,31 @@ watcher.on( 'change', ( filePath ) => {
 		} else {
 			console.error( `Deploy failed (exit code ${code})\n` );
 		}
-		deployingFiles.delete( filePath );
+		deployingFile = null;
+		processQueue();
 	} );
 
 	child.on( 'error', ( err ) => {
 		console.error( `Spawn failed: ${err.message}\n` );
-		deployingFiles.delete( filePath );
+		deployingFile = null;
+		processQueue();
 	} );
+}
+
+const watcher = chokidar.watch( 'lua/wikis', {
+	ignored: ( path, stats ) => stats?.isFile() && !path.endsWith( '.lua' ),
+	awaitWriteFinish: {
+		stabilityThreshold: 200,
+		pollInterval: 50,
+	},
+	ignoreInitial: true,
+} );
+
+watcher.on( 'change', ( filePath ) => {
+	if ( filePath === deployingFile || queue.includes( filePath ) ) {
+		console.log( `[${new Date().toLocaleTimeString()}] Already queued: ${filePath}\n` );
+		return;
+	}
+	queue.push( filePath );
+	processQueue();
 } );
