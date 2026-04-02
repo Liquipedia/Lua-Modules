@@ -1,5 +1,4 @@
-div.standings-ffa,
-div.standings-swiss {
+div.standings-ffa {
 	& > table > * > tr > th {
 		padding: 12px;
 	}
@@ -16,5 +15,77 @@ div.standings-swiss {
 		display: flex;
 		gap: 32px;
 		align-items: center;
+	}
+}
+
+.standings-swiss {
+	tr[ data-position-status ] {
+		position: relative;
+
+		&::after {
+			content: "";
+			position: absolute;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 0.25rem;
+			background-color: var( --placement-row-color );
+		}
+
+		&[ data-position-status="byeup" ] {
+			--placement-row-color: #8046a3;
+
+			.theme--dark & {
+				--placement-row-color: #cc9fe7;
+			}
+		}
+
+		&[ data-position-status="seedup" ] {
+			--placement-row-color: #006bd4;
+
+			.theme--dark & {
+				--placement-row-color: #a9caeb;
+			}
+		}
+
+		&[ data-position-status="up" ] {
+			--placement-row-color: var( --clr-semantic-positive-30 );
+
+			.theme--dark & {
+				--placement-row-color: #65a765;
+			}
+		}
+
+		&[ data-position-status="stayup" ] {
+			--placement-row-color: #094e09;
+
+			.theme--dark & {
+				--placement-row-color: #b6f8b6;
+			}
+		}
+
+		&[ data-position-status="stay" ] {
+			--placement-row-color: #966f00;
+
+			.theme--dark & {
+				--placement-row-color: #e5c976;
+			}
+		}
+
+		&[ data-position-status="staydown" ] {
+			--placement-row-color: #d4400f;
+
+			.theme--dark & {
+				--placement-row-color: #f2a288;
+			}
+		}
+
+		&[ data-position-status="down" ] {
+			--placement-row-color: var( --clr-semantic-negative-40 );
+
+			.theme--dark & {
+				--placement-row-color: #fc6868;
+			}
+		}
 	}
 }
