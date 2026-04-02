@@ -38,10 +38,7 @@ local TBD = Abbreviation.make{title = 'To be determined (or to be decided)', tex
 
 ---@class FactionStreamPage: BaseStreamPage
 ---@operator call(table): FactionStreamPage
----@field suppressMapTable boolean
-local FactionStreamPage = Class.new(BaseStreamPage, function (self, args)
-	self.suppressMapTable = Logic.readBool(args.suppressMapTable)
-end)
+local FactionStreamPage = Class.new(BaseStreamPage)
 
 ---@param frame Frame
 ---@return Widget?
@@ -175,56 +172,39 @@ end
 ---@private
 ---@return Widget?
 function FactionStreamPage:_mapPool()
-	if self.suppressMapTable then
-		return
-	end
-
 	local match = self.matches[1]
 
-	local maps = Logic.emptyOr(
-		Json.parse(mw.ext.LiquipediaDB.lpdb('tournament', {
-			conditions = '[[pagename::' .. match.parent .. ']]',
-			query = 'maps',
-			limit = 1,
-		})[1].maps),
-		{'TBA'}
-	) --[[ @as any[] ]]
+	local maps = Json.parse(mw.ext.LiquipediaDB.lpdb('tournament', {
+		conditions = '[[pagename::' .. match.parent .. ']]',
+		query = 'maps',
+		limit = 1,
+	})[1].maps)
+
+	if Logic.isEmpty(maps) then
+		return
+	end
 
 	local race1 = ((match.opponents[1].players)[1] or {}).faction --[[ @as string ]]
 	local race2 = ((match.opponents[2].players)[1] or {}).faction --[[ @as string ]]
 
 	local skipMapWinRate = not Array.all(match.opponents, function (opponent) return opponent.type == Opponent.solo end)
-		or not Table.includes(Faction.coreFactions, race1)
-		or not Table.includes(Faction.coreFactions, race2)
+		or not Table.includes(Faction.coreFactions or {}, race1)
+		or not Table.includes(Faction.coreFactions or {}, race2)
 
 	local currentMap = self:_getCurrentMap()
 	local matchup = skipMapWinRate and '' or (race1 .. race2)
 
-	---@param map 'TBA'|{link: string, displayname: string}
+	--- sc/sc2/wc/sg use `displayname` while aoe uses `name`
+	---@param map {link: string, displayname: string?, name: string?}
 	---@return Widget
 	local function createMapRow(map)
-		if map == 'TBA' then
-			return TableWidgets.Row{
-				classes = {'stats-row'},
-				children = TableWidgets.Cell{
-					colspan = skipMapWinRate and 1 or 2,
-					children = HtmlWidgets.Span{
-						css = {
-							['text-align'] = 'center',
-							['font-style'] = 'italic',
-						},
-						children = 'To be announced'
-					}
-				}
-			}
-		end
 		return TableWidgets.Row{
 			classes = {
 				'stats-row',
 				map.link == currentMap and 'tournament-highlighted-bg' or nil
 			},
 			children = WidgetUtil.collect(
-				TableWidgets.Cell{children = Link{link = map.link, children = map.displayname}},
+				TableWidgets.Cell{children = Link{link = map.link, children = map.displayname or map.name}},
 				not skipMapWinRate and TableWidgets.Cell{
 					children = FactionStreamPage._queryMapWinrate(map.link, matchup)
 				} or nil
@@ -237,11 +217,11 @@ function FactionStreamPage:_mapPool()
 			{align = 'center'},
 			not skipMapWinRate and {align = 'center'} or nil,
 		},
-		title = 'Map Pool',
+		title = not skipMapWinRate and 'Map Pool' or nil,
 		children = {
 			TableWidgets.TableHeader{children = {
 				TableWidgets.Row{children = {
-					TableWidgets.CellHeader{children = 'Map'},
+					TableWidgets.CellHeader{children = 'Maps'},
 					not skipMapWinRate and TableWidgets.CellHeader{children = {
 						race1:upper(),
 						'v',
