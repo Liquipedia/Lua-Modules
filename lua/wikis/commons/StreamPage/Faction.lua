@@ -150,23 +150,14 @@ function FactionStreamPage._playerDisplay(opponentType, player)
 	}
 end
 
----@param props table
----@return Widget
-local function createTemplateBox(props)
-	return HtmlWidgets.Div{
-		classes = Array.extend('template-box', props.classes),
-		css = {['padding-right'] = Logic.emptyOr(props.padding, '2em')},
-		children = props.children
-	}
-end
-
 function FactionStreamPage:renderTournamentInformation()
 	local match = self.matches[1]
-	return HtmlWidgets.Div{children = {
-		createTemplateBox{children = self:_mapPool()},
-		-- todo after we have standardized standings: make it display the group table where applicable too
-		createTemplateBox{children = MatchGroup.MatchGroupById{id = match.bracketId}}
-	}}
+	return HtmlWidgets.Div{
+		children = WidgetUtil.collect(
+			self:_mapPool(),
+			MatchGroup.MatchGroupById{id = match.bracketId}
+		)
+	}
 end
 
 ---@private
@@ -197,40 +188,54 @@ function FactionStreamPage:_mapPool()
 	--- sc/sc2/wc/sg use `displayname` while aoe uses `name`
 	---@param map {link: string, displayname: string?, name: string?}
 	---@return Widget
-	local function createMapRow(map)
-		return TableWidgets.Row{
-			classes = {
-				'stats-row',
-				map.link == currentMap and 'tournament-highlighted-bg' or nil
-			},
-			children = WidgetUtil.collect(
-				TableWidgets.Cell{children = Link{link = map.link, children = map.displayname or map.name}},
-				not skipMapWinRate and TableWidgets.Cell{
-					children = FactionStreamPage._queryMapWinrate(map.link, matchup)
-				} or nil
-			),
+	local createMapCell = function(map)
+		return TableWidgets.Cell{
+			classes = {map.link == currentMap and 'tournament-highlighted-bg' or nil},
+			children = Link{link = map.link, children = map.displayname or map.name},
 		}
 	end
 
-	return TableWidgets.Table{
-		columns = {
-			{align = 'center'},
-			not skipMapWinRate and {align = 'center'} or nil,
-		},
-		title = not skipMapWinRate and 'Map Pool' or nil,
-		children = {
-			TableWidgets.TableHeader{children = {
-				TableWidgets.Row{children = {
-					TableWidgets.CellHeader{children = 'Maps'},
-					not skipMapWinRate and TableWidgets.CellHeader{children = {
-						race1:upper(),
-						'v',
-						race2:upper()
-					}} or nil
-				}}
-			}},
-			TableWidgets.TableBody{children = Array.map(maps, createMapRow)}
+	--- sc/sc2/wc/sg use `displayname` while aoe uses `name`
+	---@param map {link: string, displayname: string?, name: string?}
+	---@return Widget
+	local createMapWinRateCell = function(map)
+		return TableWidgets.Cell{
+			classes = {map.link == currentMap and 'tournament-highlighted-bg' or nil},
+			children = FactionStreamPage._queryMapWinrate(map.link, matchup),
 		}
+	end
+
+	return {
+		TableWidgets.Table{
+			columns = {
+				{align = 'center'},
+				not skipMapWinRate and {align = 'center'} or nil,
+			},
+			title = 'Map Pool',
+			children = WidgetUtil.collect(
+				not skipMapWinRate and TableWidgets.TableHeader{children = {
+					TableWidgets.Row{
+						children = {
+							TableWidgets.CellHeader{children = 'Maps'},
+							TableWidgets.CellHeader{
+								children = {
+									race1:upper(),
+									'v',
+									race2:upper()
+								}
+							}
+						}
+					}
+				}} or nil,
+				TableWidgets.TableBody{
+					children = {
+						TableWidgets.Row{children = Array.map(maps, createMapCell)},
+						not skipMapWinRate and TableWidgets.Row{children = Array.map(maps, createMapWinRateCell)} or nil
+					}
+				}
+			)
+		},
+		HtmlWidgets.Br{}
 	}
 end
 
