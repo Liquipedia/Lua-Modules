@@ -71,7 +71,7 @@ function TeamStreamPage._playerDisplay(player)
 	local lpdbData = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = '[[pagename::' .. (Page.pageifyLink(player.pageName) or '') .. ']]',
 		limit = 1
-	})[1]
+	})[1] or {}
 
 	local image = Logic.emptyOr(lpdbData.image, (lpdbData.extradata or {}).image, 'Blank Player Image.png')--[[@as string]]
 
