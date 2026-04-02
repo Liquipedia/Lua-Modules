@@ -9,18 +9,19 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 
+local AbstractGameTiebreaker = Lua.import('Module:Standings/Tiebreaker/Game')
 local TiebreakerGameUtil = Lua.import('Module:Standings/Tiebreaker/Game/Util')
-local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
 
----@class TiebreakerGameWins : StandingsTiebreaker
-local TiebreakerGameWins = Class.new(TiebreakerInterface)
+---@class TiebreakerGameWins : AbstractGameTiebreaker
+local TiebreakerGameWins = Class.new(AbstractGameTiebreaker)
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
 ---@return integer
 function TiebreakerGameWins:valueOf(state, opponent)
 	local games = TiebreakerGameUtil.getGames(opponent)
-	return games.w
+	local walkoverGames = self:calculateWalkoverValues(games.walkover)
+	return games.w + walkoverGames.w
 end
 
 ---@return string
