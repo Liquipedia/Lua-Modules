@@ -8,9 +8,9 @@
 return {
 	prefixes = {
 		aligulac = {
-			'http://aligulac.com/results/events/',
-			team = 'http://aligulac.com/teams/',
-			player = 'http://aligulac.com/players/',
+			'https://aligulac.com/results/events/',
+			team = 'https://aligulac.com/teams/',
+			player = 'https://aligulac.com/players/',
 		}
 	},
 }
