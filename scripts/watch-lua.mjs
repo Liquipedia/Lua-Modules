@@ -63,8 +63,7 @@ const watcher = chokidar.watch( 'lua/wikis', {
 } );
 
 watcher.on( 'change', ( filePath ) => {
-	if ( filePath === deployingFile || queue.includes( filePath ) ) {
-		console.log( `[${new Date().toLocaleTimeString()}] Already queued: ${filePath}\n` );
+	if ( queue.includes( filePath ) ) {
 		return;
 	}
 	queue.push( filePath );
