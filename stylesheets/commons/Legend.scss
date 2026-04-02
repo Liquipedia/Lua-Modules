@@ -16,6 +16,10 @@
 		background-color: var( --clr-on-surface-dark-primary-8 );
 	}
 
+	@media ( max-width: 435px ) {
+		width: 100% !important;
+	}
+
 	&-header {
 		display: grid;
 		grid-template-columns: repeat( 2, auto );
