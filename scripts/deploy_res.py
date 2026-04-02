@@ -46,10 +46,7 @@ def update_cache(session: MediaWikiSession):
             .strip(),
         },
     )
-    if (
-        cache_result.get("message")
-        == "Successfully changed the message value"
-    ):
+    if cache_result.get("message") == "Successfully changed the message value":
         print("Resource cache version updated succesfully!")
     else:
         print("::error::Resource cache version unable to be updated!")
