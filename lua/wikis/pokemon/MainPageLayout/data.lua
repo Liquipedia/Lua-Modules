@@ -71,7 +71,7 @@ local CONTENT = {
 		body = TournamentsTicker{
 			upcomingDays = 45,
 			completedDays = 45,
-			displayGameIcons = true
+			displayGameIcons = true,
 		},
 		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
