@@ -7,30 +7,33 @@
 
 local Lua = require('Module:Lua')
 
-local Abbreviation = Lua.import('Module:Abbreviation')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
 local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
 local Game = Lua.import('Module:Game')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
-local Medals = Lua.import('Module:Medals')
 local Region = Lua.import('Module:Region')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local Tournament = Lua.import('Module:Tournament')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Conditions = Lua.import('Module:TournamentsListing/Conditions')
-local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Tier = Lua.import('Module:Tier/Custom')
 
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local LinkWidget = Lua.import('Module:Widget/Basic/Link')
+local DateRange = Lua.import('Module:Widget/Misc/DateRange')
 
 local DEFAULT_START_YEAR = Info.startYear
 local DEFAULT_END_YEAR = DateExt.getYearOf()
@@ -53,6 +56,7 @@ local DEFAULT_LIMIT = 5000
 ---@field showRank boolean
 ---@field noLis boolean
 ---@field offset number
+---@field limit number
 ---@field allowedPlacements string[]
 ---@field dynamicPlacements boolean
 ---@field onlyHighlightOnValue string?
@@ -94,7 +98,7 @@ end
 ---@param args table
 ---@return self
 function BaseTournamentsListing:init(args)
-	self.args = args
+	self.args = Table.merge(Info.config.tournamentsListing, args)
 
 	self:readConfig()
 
@@ -120,6 +124,7 @@ function BaseTournamentsListing:readConfig()
 		showRank = Logic.readBool(Logic.nilOr(args.showRank)),
 		noLis = Logic.readBool(args.noLis),
 		offset = tonumber(args.offset) or 0,
+		limit = tonumber(args.limit) or DEFAULT_LIMIT,
 		allowedPlacements = self:_allowedPlacements(),
 		dynamicPlacements = Logic.readBool(args.dynamicPlacements),
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
@@ -135,7 +140,7 @@ end
 
 ---@return self
 function BaseTournamentsListing:create()
-	local data = self.args.data or self:_query()
+	local data = self.args.data and Array.map(self.args.data, Tournament.tournamentFromRecord) or self:_query()
 	if Table.isNotEmpty(data) then
 		self.data = data
 	end
@@ -143,14 +148,11 @@ function BaseTournamentsListing:create()
 	return self
 end
 
----@return table
+---@return StandardTournament[]
 function BaseTournamentsListing:_query()
-	return mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = self:buildConditions(),
-		query = 'pagename, name, icon, icondark, organizers, startdate, enddate, status, locations, series, '
-			.. 'prizepool, participantsnumber, game, liquipediatier, liquipediatiertype, extradata, publishertier, type',
+	return Tournament.getAllTournaments(self:buildConditions(), nil, {
 		order = self.args.order,
-		limit = self.args.limit or DEFAULT_LIMIT,
+		limit = self.config.limit,
 		offset = self.config.offset,
 	})
 end
@@ -174,233 +176,188 @@ function BaseTournamentsListing:build()
 		return
 	end
 
-	self.display = mw.html.create('div')
-		:addClass('gridTable tournamentCard')
-
-	local config = self.config
-
-	if not config.showTier then
-		self.display:addClass('Tierless')
-	end
-
-	if config.showRank then
-		self.display:addClass('Ranked')
-	end
-
-	if config.showQualifierColumnOverWinnerRunnerup then
-		self.display:addClass('Qualifiers')
-	end
-
-	if not config.showGameIcon then
-		self.display:addClass('NoGameIcon')
-	end
-
-	if config.showOrganizer then
-		self.display:addClass('HasOrganizer')
-	end
-
-	self.display:node(self:_header())
-
 	self.cachedData = {rank = 1, prize = 0, skippedRanks = self.config.offset}
-	for _, rowData in ipairs(self.data) do
-		self:_row(rowData)
-	end
 
-	return self.display
+	return TableWidgets.Table{
+		columns = self:buildColumnDefinitions(),
+		children = {
+			TableWidgets.TableHeader{
+				children = {self:_header()}
+			},
+			TableWidgets.TableBody{
+				children = Array.map(self.data, FnUtil.curry(self._row, self))
+			}
+		}
+	}
 end
 
 ---@private
----@return Html
+---@return table[]
+function BaseTournamentsListing:buildColumnDefinitions()
+	local config = self.config
+
+	return WidgetUtil.collect(
+		config.showRank and {align = 'right'} or nil, 		-- Rank
+		config.showTier and {align = 'left'} or nil, 		-- Tier
+		config.showGameIcon and {align = 'center'} or nil, 	-- Game
+		{align = 'left'},									-- Icon
+		{align = 'left'},									-- Tournament
+		config.showOrganizer and {align = 'left'} or nil,	-- Organizer
+		{align = 'left'},									-- Date
+		{													-- Prizepool
+			align = 'right',
+			sortType = 'currency',
+		},
+		{align = 'left'},									-- Location
+		{align = 'right'},									-- Participants
+		config.showQualifierColumnOverWinnerRunnerup
+			and {align = 'left'}							-- Qualified
+			or WidgetUtil.collect(
+				{align = 'left'},							-- Winner
+				{align = 'left'}							-- Runner-up
+			)
+	)
+end
+---@private
+---@return Widget
 function BaseTournamentsListing:_header()
 	local config = self.config
 
-	local header = mw.html.create('div'):addClass('gridHeader')
-
-	if config.showRank then
-		header:tag('div'):addClass('gridCell Position'):wikitext('#')
-	end
-
-	if config.showTier then
-		header:tag('div'):addClass('gridCell Tier'):wikitext('Tier')
-	end
-
-	local gameHeader = header:tag('div'):addClass('gridCell')
-	if config.showGameIcon then
-		gameHeader:addClass('GameSeries'):wikitext(Abbreviation.make{text = 'G & S', title = 'Game and Series'})
-	else
-		gameHeader:addClass('Series'):wikitext(Abbreviation.make{text = 'S', title = 'Series'})
-	end
-
-	header:tag('div'):addClass('gridCell'):wikitext('Tournament'):done()
-
-	if config.showOrganizer then
-		header:tag('div'):addClass('gridCell'):wikitext('Organizer')
-	end
-
-	header
-		:tag('div'):addClass('gridCell'):wikitext('Date'):done()
-		:tag('div'):addClass('gridCell Prize'):wikitext('Prize' .. NONBREAKING_SPACE .. 'Pool'):done()
-		:tag('div'):addClass('gridCell'):wikitext('Location'):done()
-		:tag('div'):addClass('gridCell'):wikitext(Abbreviation.make{text = 'P#', title = 'Number of Participants'})
-
-	if config.showQualifierColumnOverWinnerRunnerup then
-		header:tag('div'):addClass('gridCell'):wikitext('Qualified')
-	else
-		header
-			:tag('div'):addClass('gridCell'):wikitext('Winner'):done()
-			:tag('div'):addClass('gridCell'):wikitext('Runner-up')
-	end
-
-	return header
+	return TableWidgets.Row{
+		children = WidgetUtil.collect(
+			config.showRank and TableWidgets.CellHeader{children = '#'} or nil,
+			config.showTier and TableWidgets.CellHeader{children = 'Tier'} or nil,
+			config.showGameIcon and TableWidgets.CellHeader{
+				children = HtmlWidgets.Abbr{title = 'Game', children = 'G'}
+			} or nil,
+			TableWidgets.CellHeader{colspan = 2, children = 'Tournament'},
+			config.showOrganizer and TableWidgets.CellHeader{children = 'Organizer'} or nil,
+			TableWidgets.CellHeader{children = 'Date'},
+			TableWidgets.CellHeader{children = 'Prize' .. NONBREAKING_SPACE .. 'Pool'},
+			TableWidgets.CellHeader{children = 'Location'},
+			TableWidgets.CellHeader{children = HtmlWidgets.Abbr{title = 'Number of Participants', children = 'P#'}},
+			config.showQualifierColumnOverWinnerRunnerup
+				and TableWidgets.CellHeader{children = 'Qualified'}
+				or WidgetUtil.collect(
+					TableWidgets.CellHeader{children = 'Winner'},
+					TableWidgets.CellHeader{children = 'Runner-up'}
+				)
+		)
+	}
 end
 
 ---@private
----@param tournamentData table
+---@param tournamentData StandardTournament
+---@return Widget
 function BaseTournamentsListing:_row(tournamentData)
 	local config = self.config
 
-	local highlight = config.showHighlight and self:getHighlightClass(tournamentData) or nil
+	local highlight = config.showHighlight and tournamentData:isHighlighted(self.config) or nil
 	local status = tournamentData.status and tournamentData.status:lower()
-
-	local row = mw.html.create('div')
-		:addClass('gridRow')
-		:addClass(highlight)
 
 	if config.showRank then
 		self:_calculateRank(tonumber(tournamentData.prizepool) or 0)
-
-		row:tag('div'):addClass('gridCell Position Header')
-			:node(self.cachedData.rank)
-	end
-
-	local gameIcon = config.showGameIcon
-		and mw.html.create('span'):addClass('icon-16px GameIcon'):wikitext(Game.icon{
-			game = tournamentData.game, useDefault = false
-		}) or nil
-
-	if config.showTier then
-		row:tag('div')
-			:addClass('gridCell Tier Header')
-			:node(gameIcon)
-			:node(self:displayTier(tournamentData))
-	end
-
-	if config.showGameIcon then
-		row:tag('div')
-			:addClass('gridCell Game Header')
-			:node(gameIcon)
-	end
-
-	row:tag('div')
-		:addClass('gridCell Tournament Header')
-		:node(LeagueIcon.display{
-			options = {noTemplate = config.noLis},
-			icon = tournamentData.icon,
-			iconDark = tournamentData.icondark,
-			series = tournamentData.series,
-			date = tournamentData.enddate,
-		})
-		:wikitext(NONBREAKING_SPACE .. NONBREAKING_SPACE)
-		:wikitext('[[' .. tournamentData.pagename .. '|' .. tournamentData.name .. ']]')
-		:cssText(status == CANCELLED and 'text-decoration:line-through;' or nil)
-
-	if config.showOrganizer then
-		row:tag('div')
-			:addClass('gridCell EventDetails Organizer')
-			:node(BaseTournamentsListing._organizerDisplay(tournamentData))
-	end
-
-	local dateCell = row:tag('div')
-		:addClass('gridCell EventDetails Date Header')
-		:wikitext(BaseTournamentsListing._dateDisplay(tournamentData.startdate, tournamentData.enddate, status))
-
-	if status == POSTPONED or status == DELAYED then
-		dateCell
-			:addClass('bg-second')
-			:css('font-style', 'italic')
 	end
 
 	local prizeValue = tonumber(tournamentData.prizepool) or 0
-	local participantNumber = tonumber(tournamentData.participantsnumber) or -1
-
-	local priceCell = row:tag('div')
-		:addClass('gridCell EventDetails Prize Header')
-	if prizeValue > 0 then
-		priceCell
-			:wikitext(Currency.display('USD', prizeValue, {
-				dashIfZero = true, displayCurrencyCode = false, formatValue = true
-			}))
-	else
-		priceCell
-			:wikitext(NONBREAKING_SPACE)
-			:addClass('Blank')
-	end
-
-	row:tag('div')
-		:addClass('gridCell EventDetails Location Header')
-		:wikitext(BaseTournamentsListing._displayLocations(tournamentData.locations or {}, tournamentData.type))
-
-	local participantsNumberCell = row:tag('div')
-		:addClass('gridCell EventDetails PlayerNumber Header')
-	if participantNumber ~= -1 then
-		participantsNumberCell:node(BaseTournamentsListing.participantsNumber(participantNumber))
-	else
-		participantsNumberCell
-			:wikitext('-')
-			:addClass(not config.showTier and prizeValue == 0 and 'Blank' or nil)
-	end
-
-	if status == CANCELLED then
-		row:tag('div')
-			:addClass('gridCell Placement Qualified bg-down')
-			:css('justify-content', 'center')
-			:css('font-style', 'italic')
-			:wikitext('Cancelled')
-
-		self.display:node(row)
-		return
-	end
+	local participantNumber = tonumber(tournamentData.participantsNumber) or -1
 
 	local placements = self:_fetchPlacementData(tournamentData)
 
-	if placements.qualified then
-		row:tag('div')
-			:addClass('gridCell Placement Qualified')
-			:node(Medals.display{medal = 'qualified'}:addClass('Medal'):wikitext(NONBREAKING_SPACE))
-			:node(self:_buildParticipantsSpan(placements.qualified))
-
-		self.display:node(row)
-		return
-	end
-
-	local firstPlaceCell = mw.html.create('div')
-		:addClass('gridCell Placement FirstPlace')
-		:node(Medals.display{medal = 1}:addClass('Medal'):wikitext(NONBREAKING_SPACE))
-		:node(self:_buildParticipantsSpan(placements[1]))
-
-	row:node(firstPlaceCell:done())
-
-	local secondPlaceCell = mw.html.create('div')
-		:addClass('gridCell Placement SecondPlace')
-		:node(Medals.display{medal = 2}:addClass('Medal'):wikitext(NONBREAKING_SPACE))
-		:node(self:_buildParticipantsSpan(placements[2]))
-
-	row:node(secondPlaceCell:done())
-
-	self.display:node(row)
+	return TableWidgets.Row{
+		highlighted = highlight,
+		children = WidgetUtil.collect(
+			config.showRank and TableWidgets.Cell{children = self.cachedData.rank} or nil,
+			config.showTier and TableWidgets.Cell{children = self:displayTier(tournamentData)} or nil,
+			config.showGameIcon and TableWidgets.Cell{
+				children = Game.icon{
+					game = tournamentData.game, useDefault = false
+				}
+			} or nil,
+			TableWidgets.Cell{
+				attributes = {
+					['data-sort-value'] = tournamentData.fullName
+				},
+				children = LeagueIcon.display{
+					icon = tournamentData.icon,
+					iconDark = tournamentData.iconDark,
+					link = tournamentData.pageName,
+					name = tournamentData.fullName,
+					options = {noTemplate = true},
+				}
+			},
+			TableWidgets.Cell{
+				css = {
+					['text-decoration'] = status == CANCELLED and 'line-through' or nil,
+				},
+				attributes = {
+					['data-sort-value'] = tournamentData.fullName,
+				},
+				children = LinkWidget{
+					children = tournamentData.fullName,
+					link = tournamentData.pageName,
+				}
+			},
+			config.showOrganizer
+				and TableWidgets.Cell{children = BaseTournamentsListing._organizerDisplay(tournamentData)}
+				or nil,
+			TableWidgets.Cell{
+				classes = {
+					(status == POSTPONED or status == DELAYED) and 'bg-second' or nil
+				},
+				css = {
+					['font-style'] = (status == POSTPONED or status == DELAYED) and 'italic' or nil,
+				},
+				children = BaseTournamentsListing._dateDisplay(tournamentData.startDate, tournamentData.endDate, status)
+			},
+			TableWidgets.Cell{
+				children = prizeValue > 0
+					and Currency.display('USD', prizeValue, {
+						dashIfZero = true, displayCurrencyCode = false, formatValue = true
+					}) or nil
+			},
+			TableWidgets.Cell{
+				children = BaseTournamentsListing._displayLocations(tournamentData.locations or {}, tournamentData.type)
+			},
+			TableWidgets.Cell{
+				children = participantNumber ~= -1
+					and BaseTournamentsListing.participantsNumber(participantNumber)
+					or '-'
+			},
+			status == CANCELLED
+				and TableWidgets.Cell{
+					colspan = config.showQualifierColumnOverWinnerRunnerup and 1 or 2,
+					classes = {'bg-down'},
+					css = {
+						['justify-content'] = 'center',
+						['font-style'] = 'italic',
+					},
+					children = 'Cancelled'
+				}
+				or config.showQualifierColumnOverWinnerRunnerup
+					and TableWidgets.Cell{children = self:_buildParticipants(placements.qualified)}
+					or WidgetUtil.collect(
+						TableWidgets.Cell{children = self:_buildParticipants(placements[1])},
+						TableWidgets.Cell{children = self:_buildParticipants(placements[2])}
+					) or nil
+		)
+}
 end
 
 ---@private
 ---@param opponents table[]
----@return Html
-function BaseTournamentsListing:_buildParticipantsSpan(opponents)
-	local participantsSpan = mw.html.create('span')
-		:addClass('Participants')
-	for _, opponent in ipairs(opponents) do
-		participantsSpan:node(OpponentDisplay.BlockOpponent{opponent = opponent})
-	end
-
-	return participantsSpan
+---@return Widget
+function BaseTournamentsListing:_buildParticipants(opponents)
+	return HtmlWidgets.Div{
+		css = {
+			display = 'inline-grid',
+			['grid-template-columns'] = 'repeat( auto-fit, minmax( 150px, 1fr ) )',
+			['min-width'] = '15vw'
+		},
+		children = Array.map(opponents, function (opponent)
+			return OpponentDisplay.BlockOpponent{opponent = opponent}
+		end)
+	}
 end
 
 ---@private
@@ -420,8 +377,8 @@ function BaseTournamentsListing:_calculateRank(prize)
 end
 
 ---@private
----@param tournamentData table
----@return Html
+---@param tournamentData StandardTournament
+---@return string[]
 function BaseTournamentsListing._organizerDisplay(tournamentData)
 	local organizers = Logic.emptyOr(tournamentData.organizers) or {}
 	if type(organizers) == 'string' then
@@ -433,80 +390,75 @@ function BaseTournamentsListing._organizerDisplay(tournamentData)
 		table.insert(organizerArray, organizer)
 	end
 
-	return mw.html.create()
-		:wikitext(table.concat(organizerArray, ', '))
+	return Array.interleave(organizerArray, ', ')
 end
 
 ---@param locationData table
 ---@param tournamentType string?
----@return string?
+---@return string|Widget?
 function BaseTournamentsListing._displayLocations(locationData, tournamentType)
 	local locations = Array.mapIndexes(function(locationIndex)
 		return BaseTournamentsListing._displayLocation(locationData, locationIndex)
-	end)
-
-	locations = Array.map(locations, function(loc)
-		return tostring(mw.html.create('span'):addClass('FlagText'):wikitext(loc))
 	end)
 
 	if Table.isEmpty(locations) then
 		return tournamentType and mw.getContentLanguage():ucfirst(tournamentType) or nil
 	end
 
-	return table.concat(locations)
+	return HtmlWidgets.Div{
+		css = {
+			display = 'inline-grid'
+		},
+		children = locations
+	}
 end
 
 ---@private
 ---@param locationData table
 ---@param locationIndex integer
----@return string?
+---@return Widget?
 function BaseTournamentsListing._displayLocation(locationData, locationIndex)
-	local display = ''
+	local icon = ''
 	local region = locationData['region' .. locationIndex]
 	local country = locationData['country' .. locationIndex]
 	local city = locationData['city' .. locationIndex]
 
 	if country then
-		display = Flags.Icon{flag = country} .. NONBREAKING_SPACE
+		icon = Flags.Icon{flag = country} .. NONBREAKING_SPACE
 	elseif city and region then
-		display = Flags.Icon{flag = region} .. NONBREAKING_SPACE
+		icon = Flags.Icon{flag = region} .. NONBREAKING_SPACE
 	elseif region then
-		return Region.display{region = region}
+		icon = Region.display{region = region, linkToCategory = false}
 	end
 
-	return String.nilIfEmpty(display .. (city or Flags.CountryName{flag = country}))
+	local text = city or Flags.CountryName{flag = country}
+	if String.isEmpty(icon) and String.isEmpty(text) then
+		return nil
+	end
+
+	return HtmlWidgets.Span{
+		children = {
+			icon,
+			text
+		}
+	}
 end
 
 ---@private
----@param startDate string
----@param endDate string
+---@param startDate DateRecord
+---@param endDate DateRecord
 ---@param status string?
----@return string
+---@return Widget|string
 function BaseTournamentsListing._dateDisplay(startDate, endDate, status)
 	if status == POSTPONED or status == DELAYED then
 		return 'Postponed'
 	end
 
-	if startDate == endDate then
-		return LANG:formatDate('M j, Y', startDate) --[[@as string]]
-	end
-
-	local startYear, startMonth = startDate:match('(%d+)-(%d+)-%d+')
-	local endYear, endMonth = endDate:match('(%d+)-(%d+)-%d+')
-
-	if startYear ~= endYear then
-		return LANG:formatDate('M j, Y', startDate) .. ' - ' .. LANG:formatDate('M j, Y', endDate)
-	end
-
-	if startMonth == endMonth then
-		return LANG:formatDate('M j', startDate) .. ' - ' .. LANG:formatDate('j, Y', endDate)
-	end
-
-	return LANG:formatDate('M j', startDate) .. ' - ' .. LANG:formatDate('M j, Y', endDate)
+	return DateRange{startDate = startDate, endDate = endDate, showYear = true}
 end
 
 ---@private
----@param tournamentData table
+---@param tournamentData StandardTournament
 ---@return {qualified: table[]?, [1]: table[]?, [2]: table[]?}
 function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 	local placements = {}
@@ -548,7 +500,7 @@ function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 
 			local opponent = Opponent.fromLpdbStruct(item)
 			if not opponent then
-				mw.logObject({pageName = tournamentData.pagename, place = item.placement}, 'Invalid Prize Pool Data returned from')
+				mw.logObject({pageName = tournamentData.pageName, place = item.placement}, 'Invalid Prize Pool Data returned from')
 			elseif Opponent.isTbd(opponent) then
 				opponent = Opponent.tbd(Opponent.team)
 			end
@@ -568,32 +520,20 @@ function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 end
 
 ---@param number number|string|nil
----@return Html|string
+---@return string
 function BaseTournamentsListing.participantsNumber(number)
 	number = tonumber(number)
 	if not number or number <= 0 then
 		return NONBREAKING_SPACE
 	end
 
-	return mw.html.create()
-		:node(mw.html.create('span'):css('vertical-align', 'top'):wikitext(LANG:formatNum(number)))
-		:node(mw.html.create('span'):addClass('PlayerNumberSuffix'):wikitext(NONBREAKING_SPACE .. 'participants'))
+	return LANG:formatNum(number)
 end
 
--- overwritable in case wikis want several highlight options
----@protected
----@param tournamentData table
+---@param tournamentData StandardTournament
 ---@return string?
-function BaseTournamentsListing:getHighlightClass(tournamentData)
-	return HighlightConditions.tournament(tournamentData, self.config)
-		and 'tournament-highlighted-bg'
-		or nil
-end
-
----@param tournamentData table
----@return Html
 function BaseTournamentsListing:displayTier(tournamentData)
-	local tier, tierType, options = Tier.parseFromQueryData(tournamentData)
+	local options = tournamentData.tierOptions
 	options.link = true
 	if self.config.onlyTierTypeIfBoth then
 		options.onlyTierTypeIfBoth = true
@@ -601,8 +541,7 @@ function BaseTournamentsListing:displayTier(tournamentData)
 		options.tierTypeShort = true
 	end
 
-	return mw.html.create('span')
-		:wikitext(Tier.display(tier, tierType, options))
+	return Tier.display(tournamentData.liquipediaTier, tournamentData.liquipediaTierType, options)
 end
 
 return BaseTournamentsListing

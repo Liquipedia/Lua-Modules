@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local DateExt = Lua.import('Module:Date/Ext')
 local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
+local String = Lua.import('Module:StringUtils')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionNode = Condition.Node
@@ -16,7 +17,7 @@ local Comparator = Condition.Comparator
 local ColumnName = Condition.ColumnName
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
-local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -29,18 +30,22 @@ local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 ---@return string
 local function getCurrentTransferPage()
-	local basePage = 'Player Transfers/' .. DateExt.getYearOf() .. '/' .. os.date('%B')
+	local basePage = 'Player_Transfers/' .. DateExt.getYearOf() .. '/' .. os.date('%B')
 	local queryData = mw.ext.LiquipediaDB.lpdb('transfer', {
 		conditions = tostring(ConditionNode(ColumnName('pagename'), Comparator.ge, basePage)),
 		query = 'pagename',
 		order = 'date desc',
 		groupby = 'pagename asc',
-		limit = 5000,
-	})
-	if #queryData == 0 then
+		limit = 1,
+	})[1]
+	if not queryData then
 		return basePage
 	end
-	return queryData[1].pagename
+	local queriedPageName = queryData.pagename or ''
+	if not String.startsWith(queriedPageName, basePage) then
+		return basePage
+	end
+	return queriedPageName
 end
 
 local CONTENT = {
@@ -91,7 +96,7 @@ local CONTENT = {
 	matches = {
 		heading = 'Matches',
 		body = MatchTicker{},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	tournaments = {
@@ -102,9 +107,10 @@ local CONTENT = {
 			modifierTypeQualifier = -2,
 			modifierTier1 = 55,
 			modifierTier2 = 55,
-			modifierTier3 = 10
+			modifierTier3 = 10,
+			tierColorScheme = 'top3',
 		},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 	headlines = {
@@ -204,7 +210,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				sizes = {xxl = 5, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
@@ -233,7 +239,7 @@ return {
 				}
 			},
 			{ -- Right
-				size = 6,
+				sizes = {xxl = 7, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 3,

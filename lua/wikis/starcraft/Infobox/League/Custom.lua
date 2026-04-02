@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -102,13 +103,15 @@ function CustomLeague:_isFinished(args)
 		return false
 	end
 
-	return mw.ext.LiquipediaDB.lpdb('placement', {
-		conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
-			.. 'AND [[opponentname::!TBD]] AND [[placement::1]]',
-		query = 'date',
+	local winner = mw.ext.LiquipediaDB.lpdb('placement', {
+		conditions = '[[pagename::' .. string.gsub(self.pagename, ' ', '_') .. ']] '
+			.. 'AND [[opponentname::!TBD]] AND [[opponentname::!]] AND [[placement::1]]',
+		query = 'opponenttype, opponentplayers, opponenttemplate, opponentname',
 		order = 'date asc',
 		limit = 1
-	})[1] ~= nil
+	})[1]
+
+	return winner and not Opponent.isTbd(Opponent.fromLpdbStruct(winner))
 end
 
 -- Automatically fill in next/previous for touranaments that are part of a series

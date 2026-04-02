@@ -9,7 +9,7 @@ local Lua = require('Module:Lua')
 
 local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
-local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
 
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
@@ -34,9 +34,11 @@ local CONTENT = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
 			upcomingDays = 365,
-			completedDays = 365
+			completedDays = 365,
+			tierColorScheme = 'top3',
+			variant = 'collapsible',
 		},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 }
@@ -95,7 +97,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				sizes = {xxl = 5, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
@@ -112,7 +114,7 @@ return {
 				}
 			},
 			{ -- Right
-				size = 6,
+				sizes = {xxl = 7, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 2,

@@ -26,12 +26,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
-local Widgets = Lua.import('Module:Widget/All')
-local Td = Widgets.Td
-local Th = Widgets.Th
-local Tr = Widgets.Tr
-local DataTable = Widgets.DataTable
-
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class CountryRepresentation
@@ -154,36 +149,56 @@ function CountryRepresentation:create()
 			cache.rank = cache.counter
 		end
 		cache.lastCount = #players
-		table.insert(rows, Tr{
-			children = {
-				Td{css = {['text-align'] = 'right'}, children = {cache.rank}},
-				Td{children = {Flags.Icon{flag = country}, '&nbsp;', country}},
-				Td{css = {['text-align'] = 'right'}, children = {self:_ratioDisplay(#players)}},
-				Td{children = Array.interleave(Array.map(players, function (player)
+		table.insert(rows, TableWidgets.Row{children = {
+			TableWidgets.Cell{children = {cache.rank}},
+			TableWidgets.Cell{children = {Flags.Icon{flag = country}, '&nbsp;', country}},
+			TableWidgets.Cell{
+				attributes = {['data-sort-value'] = #players},
+				children = self:_ratioDisplay(#players)
+			},
+			TableWidgets.Cell{
+				nowrap = false,
+				children = Array.interleave(Array.map(players, function (player)
 					return PlayerDisplay.InlinePlayer{player = player, showFlag = false}
-				end), ', ')},
-			}
-		})
+				end), ', ')
+			},
+		}})
 	end
 
-	local headerRow = Tr{
-		children = {
-			Th{classes = {'unsortable'}, children = {'#'}},
-			Th{children = {'Country / Region'}},
-			Th{children = {'Representation'}},
-			Th{
-				classes = {'unsortable'},
-				children = Array.interleave(WidgetUtil.collect(
-					self.config.player and 'Players' or nil,
-					self.config.staff and 'Staff' or nil
-				), ' & ')
-			},
-		}
-	}
+	local headerRow = TableWidgets.TableHeader{children = {
+		TableWidgets.Row{children = {
+			TableWidgets.CellHeader{children = {'#'}},
+			TableWidgets.CellHeader{children = {'Country / Region'}},
+			TableWidgets.CellHeader{children = {'Representation'}},
+			TableWidgets.CellHeader{children = Array.interleave(WidgetUtil.collect(
+				self.config.player and 'Players' or nil,
+				self.config.staff and 'Staff' or nil
+			), ' & ')},
+		}}
+	}}
 
-	return DataTable{
+	return TableWidgets.Table{
 		sortable = true,
-		children = WidgetUtil.collect(headerRow, rows),
+		columns = {
+			{
+				align = 'right',
+				unsortable = true,
+			},
+			{align = 'left'},
+			{
+				align = 'right',
+				sortType = 'number',
+			},
+			{
+				align = 'left',
+				minWidth = '15rem',
+				unsortable = true,
+			},
+		},
+		children = {
+			headerRow,
+			TableWidgets.TableBody{children = rows}
+		},
 	}
 end
 

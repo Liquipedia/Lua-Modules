@@ -58,7 +58,7 @@ local CONTENT = {
 	matches = {
 		heading = 'Matches',
 		body = MatchTicker{},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	tournaments = {
@@ -74,8 +74,8 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Overwatch 2 wordmark lightmode.png',
-		darkmode = 'Overwatch 2 wordmark darkmode.png',
+		lightmode = 'Overwatch 2026 wordmark lightmode.png',
+		darkmode = 'Overwatch 2026 wordmark darkmode.png',
 	},
 	metadesc = 'Comprehensive Overwatch wiki with articles covering everything from heroes, to tournaments, ' ..
 		'to competitive players and teams.',
@@ -141,7 +141,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				sizes = {xxl = 5, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
@@ -158,7 +158,7 @@ return {
 				}
 			},
 			{ -- Right
-				size = 6,
+				sizes = {xxl = 7, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 2,

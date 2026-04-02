@@ -60,7 +60,7 @@ local CONTENT = {
 	matches = {
 		heading = 'Matches',
 		body = MatchTicker{},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	tournaments = {
@@ -76,8 +76,8 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Rainbow Six Siege X full lightmode.svg',
-		darkmode = 'Rainbow Six Siege X full darkmode.svg',
+		lightmode = 'Rainbow Six Siege 2026 full lightmode.svg',
+		darkmode = 'Rainbow Six Siege 2026 full darkmode.svg',
 	},
 	metadesc = 'The Rainbow Six (R6) esports wiki covering everything from players, teams and transfers, ' ..
 		'to tournaments and results, maps, weapons, and operators.',
@@ -143,7 +143,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				sizes = {xxl = 5, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 1,
@@ -160,7 +160,7 @@ return {
 				}
 			},
 			{ -- Right
-				size = 6,
+				sizes = {xxl = 7, xxxl = 6},
 				children = {
 					{
 						mobileOrder = 2,

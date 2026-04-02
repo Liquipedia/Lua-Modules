@@ -40,7 +40,10 @@ function ParticipantsTeamCard:render()
 
 	table.insert(content, qualifierInfoContent)
 	table.insert(content, PotentialQualifiers{participant = participant})
-	table.insert(content, ParticipantsTeamRoster{participant = participant})
+	table.insert(content, ParticipantsTeamRoster{
+		participant = participant,
+		mergeStaffTabIfOnlyOneStaff = self.props.mergeStaffTabIfOnlyOneStaff
+	})
 
 	if participant.notes and #participant.notes > 0 then
 		table.insert(content, Div{

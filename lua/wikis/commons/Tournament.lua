@@ -14,7 +14,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
-local Tier = Lua.import('Module:Tier/Utils')
+local Tier = Lua.import('Module:Tier/Custom')
 
 local Tournament = {}
 
@@ -27,44 +27,54 @@ local TOURNAMENT_PHASE = {
 
 ---@class StandardTournamentPartial
 ---@field displayName string
+---@field shortName string?
 ---@field fullName string
 ---@field pageName string
 ---@field icon string?
 ---@field iconDark string?
 ---@field series string?
 ---@field liquipediaTier integer|string|nil
----@field liquipediaTierType integer|string|nil
+---@field liquipediaTierType string?
 ---@field game string?
 ---@field publisherTier string?
 
 ---@class StandardTournament: StandardTournamentPartial
 ---@field startDate {year: integer, month: integer?, day: integer?, timestamp: integer?}?
 ---@field endDate {year: integer, month: integer?, day: integer?, timestamp: integer?}?
+---@field locations table
 ---@field region string?
+---@field type string
 ---@field featured boolean
 ---@field status string?
 ---@field phase TournamentPhase
+---@field tierOptions table
+---@field prizepool number
+---@field participantsNumber number
 ---@field extradata table
+---@field organizers table
 ---@field isHighlighted fun(self: StandardTournament, options?: table): boolean
 
----@param conditions ConditionTree?
----@param filterTournament fun(tournament: StandardTournament): boolean
+---@param conditions string|AbstractConditionNode?
+---@param filterTournament? fun(tournament: StandardTournament): boolean
+---@param queryProps LpdbQueryParameters?
 ---@return StandardTournament[]
-function Tournament.getAllTournaments(conditions, filterTournament)
+function Tournament.getAllTournaments(conditions, filterTournament, queryProps)
 	local tournaments = {}
+	local limit = queryProps and Table.extract(queryProps, 'limit') or nil
 	Lpdb.executeMassQuery(
 		'tournament',
-		{
-			conditions = conditions and conditions:toString() or nil,
+		Table.merge({
+			conditions = conditions and tostring(conditions),
 			order = 'sortdate desc',
 			limit = 1000,
-		},
+		}, queryProps),
 		function(record)
 			local tournament = Tournament.tournamentFromRecord(record)
 			if not filterTournament or filterTournament(tournament) then
 				table.insert(tournaments, tournament)
 			end
-		end
+		end,
+		limit
 	)
 	return tournaments
 end
@@ -101,10 +111,11 @@ function Tournament.partialTournamentFromMatch(match)
 	---@type StandardTournamentPartial
 	return {
 		displayName = Logic.emptyOr(match.tickername, match.tournament) or (match.parent or ''):gsub('_', ' '),
+		shortName = match.shortname,
 		fullName = match.tournament,
 		pageName = match.parent,
 		liquipediaTier = Tier.toIdentifier(match.liquipediatier),
-		liquipediaTierType = Tier.toIdentifier(match.liquipediatiertype),
+		liquipediaTierType = Tier.toIdentifier(match.liquipediatiertype) --[[ @as string? ]],
 		icon = match.icon,
 		iconDark = match.iconDark,
 		series = match.series,
@@ -119,22 +130,30 @@ function Tournament.tournamentFromRecord(record)
 	local extradata = record.extradata or {}
 	local startDate = Tournament.parseDateRecord(Logic.nilOr(extradata.startdatetext, record.startdate))
 	local endDate = Tournament.parseDateRecord(Logic.nilOr(extradata.enddatetext, record.sortdate, record.enddate))
+	local tier, tierType, tierOptions = Tier.parseFromQueryData(record)
 
 	local tournament = {
 		displayName = Logic.emptyOr(record.tickername, record.name) or record.pagename:gsub('_', ' '),
+		shortName = Logic.nilIfEmpty(record.shortname),
 		fullName = record.name,
 		pageName = record.pagename,
 		startDate = startDate,
 		endDate = endDate,
-		liquipediaTier = Tier.toIdentifier(record.liquipediatier),
-		liquipediaTierType = Tier.toIdentifier(record.liquipediatiertype),
+		liquipediaTier = Tier.toIdentifier(tier),
+		liquipediaTierType = Tier.toIdentifier(tierType) --[[ @as string? ]],
 		publisherTier = record.publishertier,
+		locations = record.locations,
 		region = (record.locations or {}).region1,
+		type = record.type,
 		status = record.status,
 		icon = record.icon,
 		iconDark = record.icondark,
 		series = record.series,
 		game = record.game,
+		tierOptions = tierOptions,
+		prizepool = record.prizepool,
+		participantsNumber = record.participantsnumber,
+		organizers = record.organizers,
 		extradata = extradata,
 	}
 
@@ -165,9 +184,15 @@ function Tournament.calculatePhase(tournament)
 	return TOURNAMENT_PHASE.FINISHED
 end
 
+---@class DateRecord
+---@field year integer
+---@field month integer?
+---@field day integer?
+---@field timestamp integer?
+
 --- This function parses fuzzy dates into a structured format.
 ---@param dateRecord string? # date in the format of `YYYY-MM-DD`, with `-MM-DD` optional.
----@return {year: integer, month: integer?, day: integer?, timestamp: integer?}?
+---@return DateRecord?
 function Tournament.parseDateRecord(dateRecord)
 	if not dateRecord then
 		return nil

@@ -13,7 +13,7 @@ local Template = Lua.import('Module:Template')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
--- local Rankings = Lua.import('Module:Widget/Ratings')
+local Rankings = Lua.import('Module:Widget/Ratings')
 
 local Button = Lua.import('Module:Widget/Basic/Button')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -148,7 +148,7 @@ local CONTENT = {
 	matches = {
 		heading = 'Matches',
 		body = MatchTicker{},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	partnerWikis = {
@@ -166,7 +166,6 @@ local CONTENT = {
 		padding = true,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
---[[
 	rankings = {
 		heading = 'Liquipedia Rankings (Beta)',
 		body = Rankings{
@@ -178,7 +177,6 @@ local CONTENT = {
 		padding = false,
 		boxid = 1520,
 	},
-]]
 }
 
 local LAYOUT_MAIN = {
@@ -187,11 +185,14 @@ local LAYOUT_MAIN = {
 		children = {
 			{
 				mobileOrder = 1,
-				content = CONTENT.specialEvents
+				content = CONTENT.specialEvents,
 			},
-
 			{
 				mobileOrder = 3,
+				content = CONTENT.rankings,
+			},
+			{
+				mobileOrder = 4,
 				content = CONTENT.transfers,
 			},
 		},
@@ -236,7 +237,7 @@ local LAYOUT_MAIN = {
 		sizes = {xxl = 12},
 		children = {
 			{
-				mobileOrder = 4,
+				mobileOrder = 5,
 				content = CONTENT.heroes,
 			},
 		}
@@ -245,11 +246,11 @@ local LAYOUT_MAIN = {
 		sizes = {xxl = 6},
 		children = {
 			{
-				mobileOrder = 5,
+				mobileOrder = 6,
 				content = CONTENT.wantToHelp,
 			},
 			{
-				mobileOrder = 6,
+				mobileOrder = 7,
 				content = CONTENT.updates,
 			},
 
@@ -259,7 +260,7 @@ local LAYOUT_MAIN = {
 		sizes = {xxl = 6},
 		children = {
 			{
-				mobileOrder = 7,
+				mobileOrder = 8,
 				content = CONTENT.thisDay,
 			},
 		}
@@ -268,12 +269,12 @@ local LAYOUT_MAIN = {
 		sizes = {xxl = 12},
 		children = {
 			{
-				mobileOrder = 8,
+				mobileOrder = 9,
 				content = CONTENT.usefulArticles,
 			},
 			{
-				mobileOrder = 9,
-				content = CONTENT.partnerWikis
+				mobileOrder = 10,
+				content = CONTENT.partnerWikis,
 			},
 		}
 	}
@@ -281,7 +282,7 @@ local LAYOUT_MAIN = {
 
 local LAYOUT_ESPORTS = {
 	{ -- Left
-		size = 6,
+		sizes = {xxl = 5, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 1,
@@ -293,6 +294,10 @@ local LAYOUT_ESPORTS = {
 			},
 			{
 				mobileOrder = 5,
+				content = CONTENT.rankings,
+			},
+			{
+				mobileOrder = 6,
 				content = CONTENT.transfers,
 			},
 			{
@@ -306,7 +311,7 @@ local LAYOUT_ESPORTS = {
 		}
 	},
 	{ -- Right
-		size = 6,
+		sizes = {xxl = 7, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 3,
@@ -339,12 +344,6 @@ local LAYOUT_ESPORTS = {
 					},
 				},
 			},
---[[
-			{
-				mobileOrder = 6,
-				content = CONTENT.rankings
-			},
-]]
 			{
 				mobileOrder = 7,
 				content = CONTENT.updates,
@@ -355,7 +354,7 @@ local LAYOUT_ESPORTS = {
 
 local LAYOUT_GAME = {
 	{ -- Left
-		size = 6,
+		sizes = {xxl = 5, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 1,
@@ -372,7 +371,7 @@ local LAYOUT_GAME = {
 		},
 	},
 	{ -- Right
-		size = 6,
+		sizes = {xxl = 7, xxxl = 6},
 		children = {
 			{
 				mobileOrder = 3,

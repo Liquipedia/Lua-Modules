@@ -302,9 +302,7 @@ function ParticipantTable:store()
 		if shouldNotStoreOpponent(section, entry.opponent) then return end
 
 		local lpdbData = Opponent.toLpdbStruct(entry.opponent)
-		local pageNameWithUnderscores = (lpdbData.opponentname or ''):gsub(' ', '_')
-		local pageNameWithSpaces = (lpdbData.opponentname or ''):gsub('_', ' ')
-		local placement = placements[pageNameWithUnderscores] or placements[pageNameWithSpaces]
+		local placement = placements[lpdbData.opponentname]
 
 		if placement then
 			lpdbData = Table.deepMerge(

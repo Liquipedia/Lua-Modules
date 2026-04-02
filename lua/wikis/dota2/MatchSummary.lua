@@ -5,12 +5,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local CustomMatchSummary = {}
-
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local Logic = Lua.import('Module:Logic')
+local Class = Lua.import('Module:Class')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
@@ -20,8 +18,15 @@ local MAX_NUM_BANS = 7
 local NUM_HEROES_PICK = 5
 local STATUS_NOT_PLAYED = 'notplayed'
 
+---@class Dota2CustomMatchSummary: CustomMatchSummaryInterface
+local CustomMatchSummary = {}
+
+---@class Dota2MatchSummaryGameRow: MatchSummaryGameRow
+---@operator call(MatchSummaryGameRowProps): Dota2MatchSummaryGameRow
+local Dota2MatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+
 ---@param args table
----@return Html
+---@return Widget
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', teamStyle = 'bracket'})
 end
@@ -32,46 +37,40 @@ function CustomMatchSummary.createBody(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
 	return WidgetUtil.collect(
-		Array.map(match.games, CustomMatchSummary._createGame),
+		MatchSummaryWidgets.GamesContainer{
+			gridLayout = 'standard',
+			children = Array.map(match.games, function (game, gameIndex)
+				if game.status == STATUS_NOT_PLAYED then
+					return
+				end
+				return Dota2MatchSummaryGameRow{game = game, gameIndex = gameIndex}
+			end)
+		},
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
 	)
 end
 
----@param game MatchGroupUtilGame
----@param gameIndex integer
----@return MatchSummaryRow?
-function CustomMatchSummary._createGame(game, gameIndex)
-	if game.status == STATUS_NOT_PLAYED then
-		return
-	end
+---@param opponentIndex integer
+---@return Widget
+function Dota2MatchSummaryGameRow:createGameOpponentView(opponentIndex)
+	local props = self.props
+	local game = props.game
 	local extradata = game.extradata or {}
 
-	-- TODO: Change to use participant data
-	local characterData = {
-		MatchSummary.buildCharacterList(extradata, 'team1hero', NUM_HEROES_PICK),
-		MatchSummary.buildCharacterList(extradata, 'team2hero', NUM_HEROES_PICK),
+	return MatchSummaryWidgets.Characters{
+		flipped = opponentIndex == 2,
+		characters = MatchSummary.buildCharacterList(
+			extradata, 'team' .. opponentIndex .. 'hero', NUM_HEROES_PICK
+		),
+		bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata['team' .. opponentIndex .. 'side'] or ''),
+		date = game.date,
 	}
+end
 
-	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-body-game'},
-		children = WidgetUtil.collect(
-			MatchSummaryWidgets.Characters{
-				flipped = false,
-				characters = characterData[1],
-				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team1side or ''),
-			},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.GameCenter{children = Logic.nilIfEmpty(game.length) or ('Game ' .. gameIndex)},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			MatchSummaryWidgets.Characters{
-				flipped = true,
-				characters = characterData[2],
-				bg = 'brkts-popup-side-color brkts-popup-side-color--' .. (extradata.team2side or ''),
-			},
-			MatchSummaryWidgets.GameComment{children = game.comment}
-		)
-	}
+---@return Renderable?
+function Dota2MatchSummaryGameRow:createGameOverview()
+	return self:lengthDisplay()
 end
 
 return CustomMatchSummary
