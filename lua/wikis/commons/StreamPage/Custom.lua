@@ -7,4 +7,4 @@
 
 local Lua = require('Module:Lua')
 
-return Lua.import('Module:StreamPage')
+return Lua.import('Module:StreamPage/Base')
