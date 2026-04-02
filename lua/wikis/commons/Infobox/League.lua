@@ -249,7 +249,7 @@ function League:_parseArgs()
 			or ReferenceCleaner.cleanDateIfKnown{date = args.date},
 		startDateDisplay = self:_standardiseRawDate(args.sdate or args.date),
 		endDate = ReferenceCleaner.cleanDateIfKnown{date = args.edate}
-		or ReferenceCleaner.cleanDateIfKnown{date = args.date},
+			or ReferenceCleaner.cleanDateIfKnown{date = args.date},
 		endDateDisplay = self:_standardiseRawDate(args.edate or args.date),
 		mode = args.mode,
 		patch = args.patch,
