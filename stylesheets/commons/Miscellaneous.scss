@@ -277,7 +277,8 @@ Author(s): FO-nTTaX
 		margin: 0 0 0 0;
 		box-sizing: content-box;
 		max-width: 100%;
-		&:not(:last-child) {
+
+		&:not( :last-child ) {
 			padding-right: 2em;
 		} 
 
