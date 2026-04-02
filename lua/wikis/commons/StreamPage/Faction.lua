@@ -94,7 +94,7 @@ function FactionStreamPage._playerDisplay(opponentType, player)
 	local lpdbData = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = '[[pagename::' .. (Page.pageifyLink(player.pageName) or '') .. ']]',
 		limit = 1
-	})[1]
+	})[1] or {}
 
 	local image = Logic.nilIfEmpty(lpdbData.image) or 'Blank Player Image.png'
 	local imageDisplay = Image.display(image, nil, {class = 'img-fluid', size = '600px'})
