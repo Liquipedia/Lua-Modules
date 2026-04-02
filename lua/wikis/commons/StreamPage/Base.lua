@@ -11,17 +11,25 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
+local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
+local Image = Lua.import('Module:Image')
+local Links = Lua.import('Module:Links')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
+local MatchGroup = Lua.import('Module:MatchGroup')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local MatchPage = Lua.requireIfExists('Module:MatchPage')
 local MatchTable = Lua.import('Module:MatchTable')
 local MatchTicker = Lua.import('Module:MatchTicker')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local Page = Lua.import('Module:Page')
+local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 local Table = Lua.import('Module:Table')
+local Tabs = Lua.import('Module:Tabs')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Tournament = Lua.import('Module:Tournament')
 
@@ -35,6 +43,7 @@ local ColumnName = Condition.ColumnName
 local GridWidgets = Lua.import('Module:Widget/Grid')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchPageAdditionalSection = Lua.import('Module:Widget/Match/Page/AdditionalSection')
 local MatchPageHeader = Lua.import('Module:Widget/Match/Page/Header')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -158,7 +167,7 @@ function StreamPage:create()
 		}}
 	end
 
-	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+	return HtmlWidgets.Fragment{children = {
 		'__NOTOC__',
 		self:_header(),
 		GridWidgets.Container{gridCells = {
@@ -183,9 +192,8 @@ function StreamPage:create()
 				xxl = 3,
 				xxxl = 3,
 			}
-		}},
-		not self.suppressBottomContent and self:createBottomContent() or nil
-	)}
+		}}
+	}}
 end
 
 ---@private
@@ -201,19 +209,27 @@ function StreamPage:_createMatchTicker()
 end
 
 ---@protected
----@return string|Widget|Html|(string|Widget|Html)[]?
+---@return Renderable?
 function StreamPage:render()
-end
-
----@protected
----@return Widget[]?
-function StreamPage:createBottomContent()
 	local match = self.matches[1]
 
 	if Array.all(match.opponents, Opponent.isTbd) then
 		return
 	end
 
+	return Tabs.dynamic{
+		name1 = 'Players',
+		content1 = self:renderPlayerInformation(),
+		name2 = 'Head to Head',
+		content2 = self:createHeadToHead(),
+		name3 = 'Tournament Stage',
+		content3 = self:renderTournamentInformation()
+	}
+end
+
+---@protected
+---@return Widget[]?
+function StreamPage:createHeadToHead()
 	local headToHead = self:_buildHeadToHeadMatchTable()
 
 	return WidgetUtil.collect(
@@ -252,8 +268,8 @@ function StreamPage:_createMatchTable(props)
 	return MatchTable(Table.mergeInto({
 		addCategory = false,
 		dateFormat = 'compact',
-		edate = match.timestamp - DateExt.daysToSeconds(1) --[[ MatchTable adds 1-day offset to make edate
-																inclusive, and we don't want that here ]],
+		-- MatchTable adds 1-day offset to make edate inclusive, and we don't want that here
+		edate = match.timestamp - DateExt.daysToSeconds(1),
 		limit = 5,
 		stats = false,
 		vod = false,
@@ -300,6 +316,101 @@ function StreamPage:_buildHeadToHeadMatchTable()
 		showOpponent = true,
 		teamStyle = 'hybrid',
 		useTickerName = true,
+	}
+end
+
+---@return Widget
+function StreamPage:renderTournamentInformation()
+	local match = self.matches[1]
+	return HtmlWidgets.Div{children = MatchGroup.MatchGroupById{id = match.bracketId}}
+end
+
+---@protected
+---@return Widget
+function StreamPage:renderPlayerInformation()
+	return HtmlWidgets.Div{
+		classes = {'match-bm-players-wrapper'},
+		css = {width = '100%'},
+		children = Array.map(self.matches[1].opponents, StreamPage._opponentDisplay)
+	}
+end
+
+---@private
+---@param opponent standardOpponent
+---@return Widget
+function StreamPage._opponentDisplay(opponent)
+	return HtmlWidgets.Div{
+		classes = {'match-bm-players-team'},
+		children = WidgetUtil.collect(
+			HtmlWidgets.Div{
+				classes = {'match-bm-players-team-header'},
+				children = OpponentDisplay.InlineOpponent{opponent = opponent, teamStyle = 'icon'}
+			},
+			Array.map(opponent.players, FnUtil.curry(StreamPage._playerDisplay, opponent.type))
+		)
+	}
+end
+
+---@param opponentType OpponentType
+---@param player standardPlayer
+---@return Widget
+function StreamPage._playerDisplay(opponentType, player)
+	local lpdbData = mw.ext.LiquipediaDB.lpdb('player', {
+		conditions = '[[pagename::' .. (Page.pageifyLink(player.pageName) or '') .. ']]',
+		limit = 1
+	})[1] or {}
+
+	local image = Logic.nilIfEmpty(lpdbData.image) or 'Blank Player Image.png'
+	local imageDisplay = Image.display(image, nil, {class = 'img-fluid', size = '600px'})
+
+	local nameDisplay = opponentType ~= Opponent.solo and PlayerDisplay.InlinePlayer{
+		player = player
+	} or nil
+
+	return HtmlWidgets.Div{
+		classes = {'match-bm-players-player', 'match-bm-players-player--col-2'},
+		children = {
+			imageDisplay,
+			HtmlWidgets.Div{
+				css = {
+					display = 'flex',
+					['flex-direction'] = 'column',
+				},
+				children = WidgetUtil.collect(
+					nameDisplay,
+					lpdbData.name and HtmlWidgets.Span{children = {
+						HtmlWidgets.B{children = 'Name: '},
+						lpdbData.name
+					}} or nil,
+					Opponent.typeIsParty(opponentType) and Logic.isNotEmpty(lpdbData.team) and HtmlWidgets.Span{children = {
+						HtmlWidgets.B{children = 'Team: '},
+						OpponentDisplay.InlineTeamContainer{
+							template = lpdbData.team,
+							style = 'standard'
+						}
+					}} or nil,
+					not DateExt.isDefaultTimestamp(lpdbData.birthdate) and HtmlWidgets.Span{children = {
+						HtmlWidgets.B{children = 'Birth: '},
+						mw.getContentLanguage():formatDate('F j, Y', lpdbData.birthdate),
+						' (' .. DateExt.calculateAge(DateExt.getCurrentTimestamp(), lpdbData.birthdate) .. ')'
+					}} or nil,
+					(tonumber(lpdbData.earnings) or 0) > 0 and HtmlWidgets.Span{children = {
+						HtmlWidgets.B{children = 'Earnings: '},
+						Currency.display('usd', lpdbData.earnings, {formatValue = true})
+					}} or nil,
+					HtmlWidgets.Span{children = Array.interleave(
+						Array.extractValues(Table.map(lpdbData.links or {}, function(key, link)
+							return key, Link{
+								link = link,
+								children = Links.makeIcon(Links.removeAppendedNumber(key), 21),
+								linktype = 'external'
+							}
+						end), Table.iter.spairs),
+						' '
+					)}
+				)
+			}
+		}
 	}
 end
 
