@@ -131,7 +131,7 @@
 
 		&[ data-label-type="placement-minimum" ] {
 			color: var( --placement-solid-color );
-			background-color: rgb( from var( --placement-solid-color ) r g b / 0.08 );
+			background-color: hsl( from var( --placement-solid-color ) h s l / 0.08 );
 			box-shadow: 0 0 0 calc( var( --label-scale ) * 0.0125rem ) var( --placement-solid-color ) inset;
 		}
 
