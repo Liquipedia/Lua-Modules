@@ -81,7 +81,7 @@ def main():
                     else:
                         protect_non_existing_pages(session, new_commons_modules)
     else:
-        for wiki, new_modules in files_to_protect_by_wiki:
+        for wiki, new_modules in files_to_protect_by_wiki.items():
             with MediaWikiSession(wiki) as session:
                 protect_existing_pages(session, new_modules)
 
