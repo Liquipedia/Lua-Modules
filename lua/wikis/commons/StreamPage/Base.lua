@@ -230,6 +230,7 @@ end
 ---@protected
 ---@return Widget[]?
 function StreamPage:createHeadToHead()
+	local match = self.matches[1]
 	local headToHead = self:_buildHeadToHeadMatchTable()
 
 	return WidgetUtil.collect(
