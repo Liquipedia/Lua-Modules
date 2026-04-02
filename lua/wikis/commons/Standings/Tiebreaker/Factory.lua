@@ -7,9 +7,17 @@
 
 local Lua = require('Module:Lua')
 
+local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local TiebreakerFactory = {}
+
+---@class ParsedTiebreaker
+---@field name string
+---@field context string
+---@field id string
+---@field config table?
 
 local NAME_TO_CLASS = {
 	buchholz = 'Buchholz',
@@ -27,35 +35,56 @@ local NAME_TO_CLASS = {
 	gamewinrate = 'Game/WinRate',
 }
 
---- Validates and normalizes the name of a tiebreaker input.
----@param input string
----@return string
-function TiebreakerFactory.validateAndNormalizeInput(input)
+---@param input string|table
+---@return ParsedTiebreaker
+function TiebreakerFactory._parseTiebreakerInput(input)
+	if type(input) == 'table' then
+		local tiebreakerName = Table.extract(input, 'name')
+		local tiebreakerContext = Logic.emptyOr(Table.extract(input, 'context'), 'full')
+		return {
+			name = tiebreakerName,
+			context = tiebreakerContext,
+			id = tiebreakerContext .. '.' .. tiebreakerName,
+			config = Logic.nilIfEmpty(input)
+		}
+	end
 	local context, name = unpack(String.split(input, '%.'))
 	if name == nil then
 		name = context
 		context = 'full'
 	end
-	assert(
-		context == 'full' or context == 'ml' or context == 'h2h',
-		'Invalid tie breaker context: ' .. context
-	)
-
-	local tiebreakerClassName = NAME_TO_CLASS[name]
-	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(input))
-	return table.concat({context, name}, '.')
+	return {
+		name = name,
+		context = context,
+		id = context .. '.' .. name,
+	}
 end
 
----@param tiebreakerId string
+--- Validates and normalizes the name of a tiebreaker input.
+---@param input string|table
+---@return ParsedTiebreaker
+function TiebreakerFactory.validateAndNormalizeInput(input)
+	local parsedInput = TiebreakerFactory._parseTiebreakerInput(input)
+	assert(
+		parsedInput.context == 'full' or parsedInput.context == 'ml' or parsedInput.context == 'h2h',
+		'Invalid tie breaker context: ' .. parsedInput.context
+	)
+
+	local tiebreakerClassName = NAME_TO_CLASS[parsedInput.name]
+	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(input))
+	return parsedInput
+end
+
+---@param parsedTiebreaker ParsedTiebreaker
 ---@return StandingsTiebreaker
-function TiebreakerFactory.tiebreakerFromId(tiebreakerId)
-	local context, name = unpack(String.split(tiebreakerId, '%.'))
-	local tiebreakerClassName = NAME_TO_CLASS[name]
-	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(tiebreakerId))
+function TiebreakerFactory.getTiebreaker(parsedTiebreaker)
+	local tiebreakerClassName = NAME_TO_CLASS[parsedTiebreaker.name]
+	assert(tiebreakerClassName, "Invalid tiebreaker type: " .. tostring(parsedTiebreaker.name))
 	---@type StandingsTiebreaker
 	local TiebreakerClass = Lua.import('Module:Standings/Tiebreaker/' .. tiebreakerClassName)
 
-	return TiebreakerClass(context)
+	return TiebreakerClass(parsedTiebreaker.context, parsedTiebreaker.config)
 end
+
 
 return TiebreakerFactory

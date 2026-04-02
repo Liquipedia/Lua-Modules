@@ -14,11 +14,13 @@ local Class = Lua.import('Module:Class')
 
 ---@class StandingsTiebreaker
 ---@field context 'full'|'ml'|'h2h'
+---@field config table?
 ---@field valueOf fun(self: StandingsTiebreaker, state:TiebreakerOpponent[], opponent: TiebreakerOpponent): integer
 ---@field display fun(self: StandingsTiebreaker, state:TiebreakerOpponent[], opponent: TiebreakerOpponent): string
 ---@field headerTitle fun(self: StandingsTiebreaker): string
-local StandingsTiebreaker = Class.new(function (self, context)
+local StandingsTiebreaker = Class.new(function (self, context, config)
 	self.context = context
+	self.config = config
 end)
 
 ---@param state TiebreakerOpponent[]
