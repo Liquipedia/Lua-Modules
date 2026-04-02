@@ -246,7 +246,7 @@ end
 
 ---@private
 ---@param props table
----@return Html
+---@return Widget
 function StreamPage:_createMatchTable(props)
 	local match = self.matches[1]
 	return MatchTable(Table.mergeInto({
@@ -263,7 +263,7 @@ end
 
 ---@private
 ---@param opponent standardOpponent
----@return Html?
+---@return Widget?
 function StreamPage:_buildMatchTable(opponent)
 	if opponent.type ~= Opponent.solo and opponent.type ~= Opponent.team then
 		return
@@ -280,7 +280,7 @@ function StreamPage:_buildMatchTable(opponent)
 end
 
 ---@private
----@return Html?
+---@return Widget?
 function StreamPage:_buildHeadToHeadMatchTable()
 	local match = self.matches[1]
 	if Array.any(match.opponents, Opponent.isTbd) then
