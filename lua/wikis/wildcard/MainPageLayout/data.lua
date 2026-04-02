@@ -11,6 +11,12 @@ local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
+local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
+local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+
 local CONTENT = {
 	about = {
 		heading = 'About Wildcard',
@@ -63,6 +69,24 @@ local CONTENT = {
 		body = '{{SummonIconTable}}',
 		padding = true,
 		boxid = 1515,
+	},
+	filterButtons = {
+		noPanel = true,
+		body = Div{
+			css = { width = '100%', ['margin-bottom'] = '8px' },
+			children = { FilterButtonsWidget() }
+		}
+	},
+	tournaments = {
+		heading = 'Tournaments',
+		body = TournamentsTicker{
+			upcomingDays = 30,
+			completedDays = 20,
+			tierColorScheme = 'top3',
+			variant = 'collapsible',
+		},
+		padding = false,
+		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 }
 
@@ -148,18 +172,39 @@ return {
 				children = {
 					{
 						mobileOrder = 4,
-						content = CONTENT.wildcards,
+						children = {
+							{
+								children = {
+									{
+										noPanel = true,
+										content = CONTENT.filterButtons,
+									},
+								},
+							},
+							{
+								children = {
+									{
+										noPanel = true,
+										content = CONTENT.tournaments,
+									},
+								},
+							},
+						},
 					},
 					{
 						mobileOrder = 5,
-						content = CONTENT.houses,
+						content = CONTENT.wildcards,
 					},
 					{
 						mobileOrder = 6,
-						content = CONTENT.updates,
+						content = CONTENT.houses,
 					},
 					{
 						mobileOrder = 7,
+						content = CONTENT.updates,
+					},
+					{
+						mobileOrder = 8,
 						content = CONTENT.usefulArticles,
 					},
 				},
