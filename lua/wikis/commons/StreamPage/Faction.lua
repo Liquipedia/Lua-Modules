@@ -212,28 +212,22 @@ function FactionStreamPage:_mapPool()
 				not skipMapWinRate and {align = 'center'} or nil,
 			},
 			title = 'Map Pool',
-			children = WidgetUtil.collect(
-				not skipMapWinRate and TableWidgets.TableHeader{children = {
+			children = TableWidgets.TableBody{
+				children = {
 					TableWidgets.Row{
-						children = {
-							TableWidgets.CellHeader{children = 'Maps'},
-							TableWidgets.CellHeader{
-								children = {
-									race1:upper(),
-									'v',
-									race2:upper()
-								}
-							}
-						}
-					}
-				}} or nil,
-				TableWidgets.TableBody{
-					children = {
-						TableWidgets.Row{children = Array.map(maps, createMapCell)},
-						not skipMapWinRate and TableWidgets.Row{children = Array.map(maps, createMapWinRateCell)} or nil
-					}
+						children = WidgetUtil.collect(
+							not skipMapWinRate and TableWidgets.CellHeader{children = 'Map'} or nil,
+							Array.map(maps, createMapCell)
+						)
+					},
+					not skipMapWinRate and TableWidgets.Row{
+						children = WidgetUtil.collect(
+							TableWidgets.CellHeader{children = race1:upper() .. 'v' .. race2:upper()},
+							Array.map(maps, createMapWinRateCell)
+						)
+					} or nil
 				}
-			)
+			}
 		},
 		HtmlWidgets.Br{}
 	}
