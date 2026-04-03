@@ -43,6 +43,19 @@
 	}
 }
 
+.standings-ffa-wrapper {
+	width: fit-content;
+	max-width: 100%;
+	display: flex;
+	flex-flow: column nowrap;
+	gap: 0.5rem;
+
+	.dropdown-box-visible {
+		display: flex;
+		flex-flow: column nowrap;
+	}
+}
+
 .standings-match-overview {
 	display: flex;
 	justify-content: space-between;

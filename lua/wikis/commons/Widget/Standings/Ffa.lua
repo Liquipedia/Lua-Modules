@@ -49,8 +49,7 @@ function StandingsFfaWidget:render()
 	local hasFutureRounds = not standings.rounds[#standings.rounds].started
 
 	return HtmlWidgets.Div{
-		classes = {'toggle-area', 'toggle-area-' .. activeRounds},
-		css = {display = 'contents'},
+		classes = {'standings-ffa-wrapper', 'toggle-area', 'toggle-area-' .. activeRounds},
 		attributes = {['data-toggle-area'] = activeRounds},
 		children = WidgetUtil.collect(
 			activeRounds > 0 and RoundSelector{
