@@ -56,7 +56,8 @@ function Icon:_make(image, themeClass)
 	local class = table.concat(Array.append({Logic.nilIfEmpty(self.props.class)}, themeClass), ' ')
 
 	local border = Logic.nilIfEmpty(self.props.border)
-	assert((self.props.format == 'frameless' or not self.props.format) or not border, 'border can only used for frameless images')
+	assert((self.props.format == 'frameless' or not self.props.format) or not border,
+		'border can only used for frameless images')
 
 	local parts = Array.append({},
 		'File:' .. image,
