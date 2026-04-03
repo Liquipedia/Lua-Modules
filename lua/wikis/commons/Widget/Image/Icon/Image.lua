@@ -41,7 +41,7 @@ function Icon:render()
 	local imageLight = self.props.imageLight
 	local imageDark = self.props.imageDark
 	if Logic.isEmpty(imageLight) or Logic.isEmpty(imageDark) or imageLight == imageDark then
-		return self:_make(Logic.nilIfEmpty(imageLight) or imageDark)
+		return self:_make(Logic.nilIfEmpty(imageLight) or Logic.nilIfEmpty(imageDark))
 	end
 
 	return self:_make(imageLight, 'show-when-light-mode')
@@ -53,6 +53,9 @@ end
 ---@return string
 ---@overload fun(nil): nil
 function Icon:_make(image, themeClass)
+	if not image then
+		return
+	end
 	local class = table.concat(Array.append({Logic.nilIfEmpty(self.props.class)}, themeClass), ' ')
 
 	local border = Logic.nilIfEmpty(self.props.border)
