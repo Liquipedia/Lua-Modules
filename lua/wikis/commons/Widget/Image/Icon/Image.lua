@@ -68,7 +68,7 @@ function Icon:_make(image, themeClass)
 		'|link=' .. self.props.link,
 		Logic.isNotEmpty(options.alt) and ('alt=' .. self.props.alt) or nil,
 		Logic.isNotEmpty(class) and ('class=' .. class) or nil,
-		Logic.nilIfEmpty(self.props.caption),
+		Logic.nilIfEmpty(self.props.caption)
 	)
 
 	return '[[' .. table.concat(parts, '|') .. ']]'
