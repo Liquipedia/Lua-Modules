@@ -7,9 +7,9 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Image = Lua.import('Module:Image')
-local Table = Lua.import('Module:Table')
+local Logic = Lua.import('Module:Logic')
 
 local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 
