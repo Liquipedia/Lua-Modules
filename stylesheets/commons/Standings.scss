@@ -77,7 +77,11 @@
 	padding: 0.125rem 0.5rem;
 	gap: 0.125rem;
 	font-weight: bold;
-	align-items: center;
+	place-items: center center;
+	justify-content: center;
+	min-height: 1.25rem;
+	font-size: 0.6875rem;
+	line-height: 1rem;
 
 	&.movement-up {
 		color: var( --clr-semantic-positive-30 );
