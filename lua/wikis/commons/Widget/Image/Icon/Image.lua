@@ -36,11 +36,14 @@ Icon.defaultProps = {
 
 ---@return string?
 function Icon:render()
-	return Image.display(
-		Table.extract(self.props, 'imageLight'),
-		Table.extract(self.props, 'imageDark'),
-		self.props
-	)
+	local imageLight = self.props.imageLight
+	local imageDark = self.props.imageDark
+	if Logic.isEmpty(imageLight) or Logic.isEmpty(imageDark) or imageLight == imageDark then
+		return self:_make(Logic.nilIfEmpty(imageLight) or imageDark)
+	end
+
+	return Image._make(imageLight, 'show-when-light-mode')
+		.. Image._make(imageDark, 'show-when-dark-mode')
 end
 
 return Icon
