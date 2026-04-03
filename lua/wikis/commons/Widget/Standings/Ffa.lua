@@ -47,6 +47,39 @@ function StandingsFfaWidget:render()
 		Array.filter(standings.rounds, function(round) return round.started end),
 		function (round) return round.round end
 	) or {round = 0}).round
+
+	local standingsTable = TableWidgets.Table{
+		classes = {'standings-ffa'},
+		columns = WidgetUtil.collect(
+			{align = 'center'},
+			self:_showRoundColumns() and {align = 'center'} or nil,
+			{align = 'left'},
+			Array.map(standings.tiebreakers, function(tiebreaker)
+				if not tiebreaker.title then
+					return
+				end
+				return {align = 'center'}
+			end),
+			self:_showRoundColumns() and Array.map(standings.rounds, function(round)
+				return {align = 'center'}
+			end) or nil
+		),
+		title = String.nilIfEmpty(standings.title),
+		children = WidgetUtil.collect(
+			self:_headerRow(),
+			Array.map(standings.rounds, function (round)
+				if round.round > activeRounds then
+					return
+				end
+				return self:_createRoundBody(round)
+			end)
+		)
+	}
+
+	if activeRounds == 0 then
+		return standingsTable
+	end
+
 	local hasFutureRounds = not standings.rounds[#standings.rounds].started
 
 	return HtmlWidgets.Div{
@@ -57,33 +90,7 @@ function StandingsFfaWidget:render()
 				rounds = activeRounds,
 				hasEnded = not hasFutureRounds,
 			} or nil,
-			TableWidgets.Table{
-				classes = {'standings-ffa'},
-				columns = WidgetUtil.collect(
-					{align = 'center'},
-					self:_showRoundColumns() and {align = 'center'} or nil,
-					{align = 'left'},
-					Array.map(standings.tiebreakers, function(tiebreaker)
-						if not tiebreaker.title then
-							return
-						end
-						return {align = 'center'}
-					end),
-					self:_showRoundColumns() and Array.map(standings.rounds, function(round)
-						return {align = 'center'}
-					end) or nil
-				),
-				title = String.nilIfEmpty(standings.title),
-				children = WidgetUtil.collect(
-					self:_headerRow(),
-					Array.map(standings.rounds, function (round)
-						if round.round > activeRounds then
-							return
-						end
-						return self:_createRoundBody(round)
-					end)
-				)
-			}
+			standingsTable
 		)
 	}
 end
