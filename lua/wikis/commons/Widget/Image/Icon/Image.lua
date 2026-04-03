@@ -13,7 +13,7 @@ local Logic = Lua.import('Module:Logic')
 
 local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 
----@class IconImageWidgetParameters:
+---@class IconImageWidgetParameters
 ---@field imageLight string?
 ---@field imageDark string?
 ---@field link string
