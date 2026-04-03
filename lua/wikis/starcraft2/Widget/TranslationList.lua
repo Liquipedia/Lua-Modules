@@ -29,7 +29,7 @@ function TranslationList:render()
 		return UnorderedList{children = Array.map(group, displayItem)}
 	end)
 
-	return Box{children = parts, paddingRight = '2em'}
+	return Box{children = parts}
 end
 
 ---@private

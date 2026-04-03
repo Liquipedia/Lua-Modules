@@ -16,9 +16,9 @@ local Widget = Lua.import('Module:Widget')
 ---@class BoxProps
 ---@field children Renderable[]|Renderable
 ---@field maxWidth string?
----@field paddingRight string?
 ---@field paddingLeft string?
 ---@field paddingBottom string?
+---@field paddingRight string?
 ---@field width string?
 ---@field height string?
 
@@ -41,9 +41,9 @@ function Box:render()
 			return HtmlWidgets.Div{
 				classes = {'template-box'},
 				css = {
-					['padding-right'] = self.props.paddingRight,
 					['padding-left'] = self.props.paddingLeft,
 					['padding-bottom'] = self.props.paddingBottom,
+					['padding-right'] = self.props.paddingRight,
 					width = self.props.width,
 					height = self.props.height,
 					overflow = self.props.height and 'hidden' or nil,

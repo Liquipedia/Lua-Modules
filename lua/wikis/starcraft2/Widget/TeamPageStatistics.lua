@@ -41,7 +41,6 @@ end
 function TeamPageStatistics:_medalTables()
 	local data = Json.parseIfString(Variables.varDefault('medals'))
 	return Box{
-		paddingRight = '2em',
 		children = WidgetUtil.collect(
 			MedalsTable{
 				caption = 'Team Medal Statistics',

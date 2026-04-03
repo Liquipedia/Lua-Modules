@@ -52,7 +52,7 @@ function StreamList:render()
 		}
 	end)
 
-	return Box{children = parts, paddingRight = '2em'}
+	return Box{children = parts}
 end
 
 ---@private
