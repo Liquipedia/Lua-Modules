@@ -13,9 +13,16 @@ local Table = Lua.import('Module:Table')
 
 local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 
----@class IconImageWidgetParameters: ImageOptions
+---@class IconImageWidgetParameters: IconImageWidgetParameters
 ---@field imageLight string?
 ---@field imageDark string?
+---@field link string
+---@field alt string?
+---@field class string?
+---@field format 'border'|'frameless'|'border|frameless'|'frame'|'thumb'?
+---@field size string? # '{width}px'|'x{height}px'|'{width}x{height}px'
+---@field horizontalAlignment 'left'|'right'|'center'|'none'?
+---@field verticalAlignment 'baseline'|'sub'|'super'|'top'|text-top'|'middle'|'bottom'|'text-bottom'
 
 ---@class IconImageWidget: IconWidget
 ---@operator call(IconImageWidgetParameters): IconImageWidget
