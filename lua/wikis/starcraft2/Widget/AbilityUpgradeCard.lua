@@ -152,8 +152,8 @@ function AbilityUpgradeCard:_renderData()
 				Link{link = 'Hotkeys per Race', children = 'Hotkey'},
 				self.props.hotkey and Hotkey.hotkey{hotkey = self.props.hotkey} or nil
 			),
-			makeCell(Image{imageLght = 'Minimap research zerg.png', link = ''}, self.props.zerg),
-			makeCell(Image{imageLght = 'Minimap research protoss.png', link = ''}, self.props.protoss),
+			makeCell(Image{imageLght = 'Minimap research zerg.png'}, self.props.zerg),
+			makeCell(Image{imageLght = 'Minimap research protoss.png'}, self.props.protoss),
 			makeCell(
 				'Researched from:',
 				self.props['researched_from']

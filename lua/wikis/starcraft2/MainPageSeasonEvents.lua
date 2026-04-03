@@ -117,15 +117,12 @@ function MainPageSeasonEvents._winnerDisplay(tournamentData)
 	local dateDiff = DateExt.getCurrentTimestamp() - (tournamentData.endDate or 0)
 	local showWinner = winner and dateDiff > SPOILER_DELAY
 
-
-
 	return WidgetUtil.collect(
 		HtmlWidgets.Br{},
 		showWinner and {
 			Image{
 				imageLight = 'Trophy icon small.gif',
 				size = '18px',
-				link = '',
 				alt = 'Winner',
 			},
 			OpponentDisplay.InlineOpponent{opponent = winner}
