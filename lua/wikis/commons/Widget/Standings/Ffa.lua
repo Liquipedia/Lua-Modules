@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -132,7 +133,9 @@ function StandingsFfaWidget:_createRoundBody(round)
 			children = WidgetUtil.collect(
 				TableWidgets.Cell{children = Label{
 					children = slot.placement,
-					attributes = {['data-placement-type'] = slot.definitiveStatus},
+					attributes = {
+						['data-placement-type'] = Logic.nilIfEmpty(slot.definitiveStatus)
+					},
 					labelScheme = 'placement',
 				}},
 				self:_showRoundColumns() and TableWidgets.Cell{
