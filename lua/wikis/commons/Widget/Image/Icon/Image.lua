@@ -25,6 +25,7 @@ local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 ---@field horizontalAlignment 'left'|'right'|'center'|'none'?
 ---@field verticalAlignment 'baseline'|'sub'|'super'|'top'|'text-top'|'middle'|'bottom'|'text-bottom'
 ---@field caption string?
+---@field alignment string? # legacy for during conversion
 
 ---@class IconImageWidget: IconWidget
 ---@operator call(IconImageWidgetParameters): IconImageWidget
