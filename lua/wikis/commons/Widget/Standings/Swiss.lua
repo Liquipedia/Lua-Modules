@@ -110,7 +110,7 @@ function StandingsSwissWidget:_createRow(slot)
 			TableWidgets.Cell{
 				children = Label{
 					children = slot.placement,
-					attributes = {['data-placement-type'] = slot.definitiveStatus},
+					attributes = {['data-placement-type'] = Logic.nilIfEmpty(slot.definitiveStatus)},
 					labelScheme = 'placement',
 				},
 			},
