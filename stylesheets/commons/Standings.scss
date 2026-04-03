@@ -33,59 +33,31 @@ div.standings-ffa {
 		}
 
 		&[ data-position-status="byeup" ] {
-			--placement-row-color: #8046a3;
-
-			.theme--dark & {
-				--placement-row-color: #cc9fe7;
-			}
+			--placement-row-color: var( --position-byeup-color );
 		}
 
 		&[ data-position-status="seedup" ] {
-			--placement-row-color: #006bd4;
-
-			.theme--dark & {
-				--placement-row-color: #a9caeb;
-			}
+			--placement-row-color: var( --position-seedup-color );
 		}
 
 		&[ data-position-status="up" ] {
-			--placement-row-color: var( --clr-semantic-positive-30 );
-
-			.theme--dark & {
-				--placement-row-color: #65a765;
-			}
+			--placement-row-color: var( --position-up-color );
 		}
 
 		&[ data-position-status="stayup" ] {
-			--placement-row-color: #094e09;
-
-			.theme--dark & {
-				--placement-row-color: #b6f8b6;
-			}
+			--placement-row-color: var( --position-stayup-color );
 		}
 
 		&[ data-position-status="stay" ] {
-			--placement-row-color: #966f00;
-
-			.theme--dark & {
-				--placement-row-color: #e5c976;
-			}
+			--placement-row-color: var( --position-stay-color );
 		}
 
 		&[ data-position-status="staydown" ] {
-			--placement-row-color: #d4400f;
-
-			.theme--dark & {
-				--placement-row-color: #f2a288;
-			}
+			--placement-row-color: var( --position-staydown-color );
 		}
 
 		&[ data-position-status="down" ] {
-			--placement-row-color: var( --clr-semantic-negative-40 );
-
-			.theme--dark & {
-				--placement-row-color: #fc6868;
-			}
+			--placement-row-color: var( --position-down-color );
 		}
 	}
 }
