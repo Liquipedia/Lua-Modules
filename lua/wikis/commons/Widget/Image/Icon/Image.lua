@@ -39,6 +39,9 @@ Icon.defaultProps = {
 
 ---@return string?
 function Icon:render()
+	-- legacy, only for conversion outside of git ...
+	self.props.horizontalAlignment = self.props.horizontalAlignment or self.props.alignment
+
 	local imageLight = self.props.imageLight
 	local imageDark = self.props.imageDark
 	if Logic.isEmpty(imageLight) or Logic.isEmpty(imageDark) or imageLight == imageDark then
