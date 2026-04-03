@@ -42,8 +42,8 @@ function Icon:render()
 		return self:_make(Logic.nilIfEmpty(imageLight) or imageDark)
 	end
 
-	return Image._make(imageLight, 'show-when-light-mode')
-		.. Image._make(imageDark, 'show-when-dark-mode')
+	return self:_make(imageLight, 'show-when-light-mode')
+		.. self:_make(imageDark, 'show-when-dark-mode')
 end
 
 ---@param image string?
