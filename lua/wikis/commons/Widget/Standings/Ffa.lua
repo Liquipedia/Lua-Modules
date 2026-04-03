@@ -171,7 +171,7 @@ function StandingsFfaWidget:_createRoundBody(round)
 						return
 					end
 					return TableWidgets.Cell{
-						css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil, ['text-align'] = 'center'},
+						css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil},
 						children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
 					}
 				end),
@@ -190,7 +190,7 @@ function StandingsFfaWidget:_createRoundBody(round)
 							end
 						end
 					end
-					return TableWidgets.Cell{children = text, css = {['text-align'] = 'center'}}
+					return TableWidgets.Cell{children = text}
 				end) or nil
 			)
 		}
