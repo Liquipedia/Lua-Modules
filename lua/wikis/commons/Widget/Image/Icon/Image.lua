@@ -64,7 +64,7 @@ function Icon:_make(image, themeClass)
 		Logic.nilIfEmpty(self.props.format),
 		Logic.isNumeric(self.props.size) and (self.props.size .. 'px') or Logic.nilIfEmpty(self.props.size),
 		Logic.nilIfEmpty(self.props.horizontalAlignment),
-		self.props.verticalAlignment,
+		self.props.verticalAlignment ~= 'middle' and self.props.verticalAlignment or nil,
 		'|link=' .. self.props.link,
 		Logic.isNotEmpty(self.props.alt) and ('alt=' .. self.props.alt) or nil,
 		Logic.isNotEmpty(class) and ('class=' .. class) or nil,
