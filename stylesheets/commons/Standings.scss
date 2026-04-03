@@ -50,9 +50,16 @@
 	flex-flow: column nowrap;
 	gap: 0.5rem;
 
-	.dropdown-box-visible {
-		display: flex;
-		flex-flow: column nowrap;
+	.dropdown-box {
+		&-wrapper {
+			width: fit-content;
+		}
+
+		&-visible {
+			display: flex;
+			flex-flow: column nowrap;
+			width: 100%;
+		}
 	}
 }
 
