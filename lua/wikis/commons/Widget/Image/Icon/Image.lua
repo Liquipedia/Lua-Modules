@@ -46,4 +46,32 @@ function Icon:render()
 		.. Image._make(imageDark, 'show-when-dark-mode')
 end
 
+---@param image string?
+---@param themeClass string?
+---@return string
+---@overload fun(nil): nil
+function Icon:_make(image, themeClass)
+	local class = table.concat(Array.append({Logic.nilIfEmpty(self.props.class)}, themeClass), ' ')
+
+	local border = Logic.nilIfEmpty(self.props.border)
+	assert((self.props.format == 'frameless' or not self.props.format) or not border, 'border can only used for frameless images')
+
+	local size
+
+	local parts = Array.append({},
+		'File:' .. image,
+		Logic.nilIfEmpty(self.props.border),
+		Logic.nilIfEmpty(self.props.format),
+		size,
+		Logic.nilIfEmpty(self.props.horizontalAlignment),
+		self.props.verticalAlignment,
+		'|link=' .. self.props.link,
+		Logic.isNotEmpty(options.alt) and ('alt=' .. self.props.alt) or nil,
+		Logic.isNotEmpty(class) and ('class=' .. class) or nil,
+		Logic.nilIfEmpty(self.props.caption),
+	)
+
+	return '[[' .. table.concat(parts, '|') .. ']]'
+end
+
 return Icon
