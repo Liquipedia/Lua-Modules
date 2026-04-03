@@ -77,7 +77,6 @@ jobs:
       - id: lua-changed-files
         uses: tj-actions/changed-files@v42
         with:
-          base_sha: ${{ steps.forkpoint.outputs.fork_point_sha }}
           files: |
             lua/wikis/**/*.lua
 
@@ -91,6 +90,7 @@ jobs:
         if: steps.lua-changed-files.outputs.any_changed == 'true'
         shell: bash
         run: |
+          grep --help
           ~/.local/bin/luals/bin/lua-language-server --check ${{ steps.lua-changed-files.outputs.all_changed_files }} | tee luals-check && true
           cat luals-check | (sed -e 's/\x1b\[[0-9;]*m//g'| sed -n 's/\(lua[^:]\+\):\([[:digit:]]*\):[[:digit:]]* \[Warning\] /::error file=\1,line=\2::/p') | grep -E $( echo $CHANGED | sed -- 's/ /|/')
           echo "| | Files | Errors |" >> $GITHUB_STEP_SUMMARY
