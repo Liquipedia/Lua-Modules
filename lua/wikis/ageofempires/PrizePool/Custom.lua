@@ -33,8 +33,7 @@ function CustomPrizePool.run(frame)
 	args.syncPlayers = true
 	args.import = Logic.nilOr(Logic.readBoolOrNil(args.import), false)
 
-	local prizePool = PrizePool(args)
-		:create()
+	local prizePool = PrizePool(args):create()
 
 	prizePool:setLpdbInjector(CustomLpdbInjector())
 
