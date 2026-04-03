@@ -30,7 +30,8 @@ local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 local Icon = Class.new(WidgetIcon)
 Icon.defaultProps = {
 	link = '',
-	size = 'x20px'
+	size = 'x20px',
+	verticalAlignment = 'middle', -- make the implicit mw default explicit
 }
 
 ---@return string?
