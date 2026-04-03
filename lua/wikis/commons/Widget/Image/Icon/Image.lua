@@ -64,7 +64,7 @@ function Icon:_make(image, themeClass)
 
 	local border = Logic.nilIfEmpty(self.props.border)
 	assert((self.props.format == 'frameless' or not self.props.format) or not border,
-		'border can only used for frameless images')
+		'border can only be used for frameless images')
 
 	local parts = Array.append({},
 		'File:' .. image,
