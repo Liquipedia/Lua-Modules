@@ -75,6 +75,7 @@ jobs:
       - id: lua-changed-files
         uses: tj-actions/changed-files@v42
         with:
+          base_sha: ${{ steps.forkpoint.outputs.fork_point_sha }}
           files: |
             lua/wikis/**/*.lua
 
