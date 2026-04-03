@@ -82,8 +82,10 @@ function MatchTickerContainer:render()
 
 	return HtmlWidgets.Div{
 		classes = {'match-section-header'},
+		css = {['padding-top'] = '0.75rem'},
 		children = {
 			ContentSwitch{
+				css = {margin = '0 0.75rem 0.75rem'},
 				tabs = {
 					{
 						label = 'Upcoming',

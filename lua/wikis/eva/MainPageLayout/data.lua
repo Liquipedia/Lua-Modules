@@ -10,11 +10,11 @@ local Lua = require('Module:Lua')
 local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
-local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
+local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
@@ -35,7 +35,8 @@ local CONTENT = {
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferPage = MainPageLayoutUtil.getQuarterlyTransferPage()
+			limit = 10,
+			transferPage = MainPageLayoutUtil.getYearlyTransferPage(),
 		},
 		boxid = MainPageLayoutUtil.BoxId.TRANSFERS,
 	},
@@ -66,29 +67,26 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			upcomingDays = 30,
-			completedDays = 20,
-			modifierTypeQualifier = -2,
-			modifierTier1 = 55,
-			modifierTier2 = 55,
-			modifierTier3 = 10
+			upcomingDays = 120,
+			completedDays = 120,
+			tierColorScheme = 'top3',
 		},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 }
 
 return {
 	banner = {
-		lightmode = 'Hearthstone_full logo.png',
-		darkmode = 'Hearthstone_full logo.png',
+		lightmode = 'EVA lightmode.png',
+		darkmode = 'EVA darkmode.png',
 	},
-	metadesc = 'The Hearthstone esports wiki covering everything from players, teams and transfers, ' ..
-		'to tournaments and results, heroes, and cards.',
-	title = 'Hearthstone',
+	metadesc = 'The EVA esports wiki covering everything from players, teams and transfers, ' ..
+		'to tournaments and results, heroes, maps and weapons.',
+	title = 'EVA',
 	navigation = {
 		{
-			file = 'Team Ukraine 2017 Hearthstone Global Games .jpg',
+			file = 'EVA Teams Portal Pill.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -97,7 +95,7 @@ return {
 			},
 		},
 		{
-			file = 'Hunterace World Championship 2019.jpg',
+			file = 'EVA Players Portal Pill.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -106,7 +104,7 @@ return {
 			},
 		},
 		{
-			file = 'Masters Tour 2020 Arlington Trophy.jpg',
+			file = 'EVA Tournaments Portal Pill.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -115,7 +113,7 @@ return {
 			},
 		},
 		{
-			file = 'Casie and Surrender Grandmasters 2019 Finals.jpg',
+			file = 'EVA Transfers Portal Pill.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -124,18 +122,24 @@ return {
 			},
 		},
 		{
-			file = 'Masters Tour 2020 Statistics.jpg',
-			title = 'Statistics',
-			link = 'Portal:Statistics',
+			file = 'EVA Maps Portal Pill.png',
+			title = 'Maps',
+			link = 'Portal:Maps',
 		},
 		{
-			file = 'Icon_Class_HS_Shaman.png',
-			title = 'Classes',
-			link = 'Classes',
-			count = {
-				method = 'CATEGORY',
-				category = 'Class',
-			}
+			file = 'EVA Heroes Portal Pill.png',
+			title = 'Heroes',
+			link = 'Portal:Heroes',
+		},
+		{
+			file = 'EVA Weapons Portal Pill.png',
+			title = 'Weapons',
+			link = 'Portal:Weapons',
+		},
+		{
+			file = 'NRG hodsic at the ALGS Mannheim Split 2 Playoffs.jpg',
+			title = 'Statistics',
+			link = 'Portal:Statistics',
 		},
 	},
 	layouts = {
@@ -148,11 +152,15 @@ return {
 						content = CONTENT.specialEvents,
 					},
 					{
-						mobileOrder = 4,
-						content = CONTENT.usefulArticles,
+						mobileOrder = 3,
+						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 4,
+						content = CONTENT.thisDay,
+					},
+					{
+						mobileOrder = 5,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -191,13 +199,13 @@ return {
 							},
 						},
 					},
+				},
+			},
+			{ -- Bottom
+				children = {
 					{
-						mobileOrder = 3,
-						content = CONTENT.transfers,
-					},
-					{
-						mobileOrder = 5,
-						content = CONTENT.thisDay,
+						mobileOrder = 6,
+						content = CONTENT.usefulArticles,
 					},
 				},
 			},
