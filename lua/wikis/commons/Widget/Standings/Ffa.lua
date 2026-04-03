@@ -102,7 +102,7 @@ function StandingsFfaWidget:_headerRow()
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
 			TableWidgets.CellHeader{
-				colspan = self:_showRoundColumns() and 2 or nil,
+				attributes = {colspan = self:_showRoundColumns() and 2 or nil},
 				children = '#'
 			},
 			makeHeaderCell('Participant'),
