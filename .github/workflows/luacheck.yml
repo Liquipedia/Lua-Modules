@@ -89,7 +89,7 @@ jobs:
         shell: bash
         run: |
           ~/.local/bin/luals/bin/lua-language-server --check ./ | tee luals-check && true
-          cat luals-check | (sed -e 's/\x1b\[[0-9;]*m//g'| sed -n 's/\(lua[^:]\+\):\([[:digit:]]*\):[[:digit:]]* \[Warning\] /::error file=\1,line=\2::/p') | grep -E $(echo ${{ steps.lua-changed-files.outputs.all_changed_files }} | sed -- 's/ /|/')
+          cat luals-check | (sed -e 's/\x1b\[[0-9;]*m//g'| sed -n 's/\(lua[^:]\+\):\([[:digit:]]*\):[[:digit:]]* \[Warning\] /::error file=\1,line=\2::/p') | (! grep -E $(echo ${{ steps.lua-changed-files.outputs.all_changed_files }} | sed -- 's/ /|/'))
           echo "| | Files | Errors |" >> $GITHUB_STEP_SUMMARY
           echo "|-|-------|----------|" >> $GITHUB_STEP_SUMMARY
           echo "| LuaLS check | $(find lua -name '*.lua' | wc -l) | $(cat luals-check | grep 'Warning' | wc -l) |" >> $GITHUB_STEP_SUMMARY
