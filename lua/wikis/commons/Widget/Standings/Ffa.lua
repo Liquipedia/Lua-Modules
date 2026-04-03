@@ -60,7 +60,7 @@ function StandingsFfaWidget:render()
 			TableWidgets.Table{
 				classes = {'standings-ffa'},
 				title = String.nilIfEmpty(standings.title),
-				children = {
+				children = WidgetUtil.collect(
 					self:_headerRow(),
 					Array.map(standings.rounds, function (round)
 						if round.round > activeRounds then
@@ -68,7 +68,7 @@ function StandingsFfaWidget:render()
 						end
 						return self:_createRoundBody(round)
 					end)
-				}
+				)
 			}
 		)
 	}
