@@ -13,16 +13,18 @@ local Logic = Lua.import('Module:Logic')
 
 local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 
----@class IconImageWidgetParameters: IconImageWidgetParameters
+---@class IconImageWidgetParameters:
 ---@field imageLight string?
 ---@field imageDark string?
 ---@field link string
 ---@field alt string?
 ---@field class string?
----@field format 'border'|'frameless'|'border|frameless'|'frame'|'thumb'?
+---@field border string? # only available if `format: 'frameless'?`
+---@field format 'border'|'frameless'|'frame'|'thumb'?
 ---@field size string? # '{width}px'|'x{height}px'|'{width}x{height}px'
 ---@field horizontalAlignment 'left'|'right'|'center'|'none'?
 ---@field verticalAlignment 'baseline'|'sub'|'super'|'top'|text-top'|'middle'|'bottom'|'text-bottom'
+---@field caption string?
 
 ---@class IconImageWidget: IconWidget
 ---@operator call(IconImageWidgetParameters): IconImageWidget
