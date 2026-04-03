@@ -43,7 +43,7 @@ function PlacementChangeWidget:render()
 		},
 		children = {
 			self:_getIndicator(),
-			change ~= 0 and HtmlWidgets.Span{children = change} or nil
+			change ~= 0 and HtmlWidgets.Span{children = math.abs(change)} or nil
 		},
 	}
 end
