@@ -140,7 +140,7 @@ function Tournament.tournamentFromRecord(record)
 		startDate = startDate,
 		endDate = endDate,
 		liquipediaTier = Tier.toIdentifier(tier),
-		liquipediaTierType = tierType,
+		liquipediaTierType = Tier.toIdentifier(tierType) --[[ @as string? ]],
 		publisherTier = record.publishertier,
 		locations = record.locations,
 		region = (record.locations or {}).region1,
