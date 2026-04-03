@@ -76,7 +76,7 @@ function CustomInjector:parse(id, widgets)
 			-- returning Fragment is needed to have placeholders where necessary
 			if not value then return HtmlWidgets.Fragment{} end
 			return HtmlWidgets.Fragment{children = {
-				Image{size = 'x32px', alignment = 'text-top', link = link, imageLight = image},
+				Image{size = 'x32px', verticalAlignment = 'text-top', link = link, imageLight = image},
 				HtmlWidgets.Br{},
 				value,
 			}}
