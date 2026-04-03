@@ -19,7 +19,7 @@ local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 ---@field link string
 ---@field alt string?
 ---@field class string?
----@field border string? # only available if `format: 'frameless'?`
+---@field border 'border'? # only available if `format: 'frameless'?`
 ---@field format 'border'|'frameless'|'frame'|'thumb'?
 ---@field size string? # '{width}px'|'x{height}px'|'{width}x{height}px'
 ---@field horizontalAlignment 'left'|'right'|'center'|'none'?
