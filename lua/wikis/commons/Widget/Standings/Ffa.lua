@@ -59,6 +59,20 @@ function StandingsFfaWidget:render()
 			} or nil,
 			TableWidgets.Table{
 				classes = {'standings-ffa'},
+				columns = WidgetUtil.collect(
+					{align = 'center'},
+					self:_showRoundColumns() and {align = 'center'} or nil,
+					{align = 'left'},
+					Array.map(standings.tiebreakers, function(tiebreaker)
+						if not tiebreaker.title then
+							return
+						end
+						return {align = 'center'}
+					end),
+					self:_showRoundColumns() and Array.map(standings.rounds, function(round)
+						return {align = 'center'}
+					end) or nil
+				),
 				title = String.nilIfEmpty(standings.title),
 				children = WidgetUtil.collect(
 					self:_headerRow(),
@@ -101,10 +115,8 @@ function StandingsFfaWidget:_headerRow()
 
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
-			TableWidgets.CellHeader{
-				attributes = {colspan = self:_showRoundColumns() and 2 or nil},
-				children = '#'
-			},
+			makeHeaderCell('#'),
+			makeHeaderCell(),
 			makeHeaderCell('Participant'),
 			Array.map(standings.tiebreakers, function(tiebreaker)
 				if not tiebreaker.title then
