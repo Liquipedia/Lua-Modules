@@ -18,6 +18,7 @@ local Widget = Lua.import('Module:Widget')
 ---@field maxWidth string?
 ---@field paddingLeft string?
 ---@field paddingBottom string?
+---@field paddingRight string?
 ---@field width string?
 ---@field height string?
 
