@@ -42,6 +42,7 @@ function Box:render()
 				css = {
 					['padding-left'] = self.props.paddingLeft,
 					['padding-bottom'] = self.props.paddingBottom,
+					['padding-right'] = self.props.paddingright,
 					width = self.props.width,
 					height = self.props.height,
 					overflow = self.props.height and 'hidden' or nil,
