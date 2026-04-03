@@ -115,7 +115,7 @@ function Tournament.partialTournamentFromMatch(match)
 		fullName = match.tournament,
 		pageName = match.parent,
 		liquipediaTier = Tier.toIdentifier(match.liquipediatier),
-		liquipediaTierType = match.liquipediatiertype,
+		liquipediaTierType = Tier.toIdentifier(match.liquipediatiertype) --[[ @as string? ]],
 		icon = match.icon,
 		iconDark = match.iconDark,
 		series = match.series,
