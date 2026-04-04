@@ -52,7 +52,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@operator call(table): BaseStreamPage
 ---@field channel string
 ---@field provider string
----@field suppressBottomContent boolean
 ---@field matches MatchGroupUtilMatch[]
 local StreamPage = Class.new(function (self, args)
 	self.channel = assert(Logic.nilIfEmpty(args.channel))
