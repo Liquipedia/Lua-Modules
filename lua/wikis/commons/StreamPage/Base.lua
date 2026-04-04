@@ -232,7 +232,7 @@ function StreamPage:createHeadToHead()
 	local headToHead = self:_buildHeadToHeadMatchTable()
 
 	return WidgetUtil.collect(
-		not self.suppressBottomContent and HtmlWidgets.H3{children = 'Match History'} or nil,
+		HtmlWidgets.H3{children = 'Match History'},
 		HtmlWidgets.Div{
 			classes = {'match-bm-match-additional'},
 			children = WidgetUtil.collect(
