@@ -57,7 +57,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local StreamPage = Class.new(function (self, args)
 	self.channel = assert(Logic.nilIfEmpty(args.channel))
 	self.provider = assert(Logic.nilIfEmpty(args.provider))
-	self.suppressBottomContent = Logic.readBool(args.suppressBottomContent)
 	self.matches = {}
 
 	self:_fetchMatches()
