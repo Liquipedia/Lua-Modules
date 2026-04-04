@@ -117,8 +117,9 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'history' then
 		local getHistoryCells = function(key, title)
+			if String.isEmpty(args[key]) then return end
 			return {
-				String.isNotEmpty(args[key]) and Title{children = title} or nil,
+				Title{children = title},
 				Center{children = {args[key]}},
 			}
 		end

@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -69,4 +70,4 @@ function UpcomingTournaments.player(args)
 	}
 end
 
-return UpcomingTournaments
+return Class.export(UpcomingTournaments, {exports = {'team', 'player'}})

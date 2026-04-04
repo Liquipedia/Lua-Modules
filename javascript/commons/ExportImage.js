@@ -83,7 +83,18 @@ const EXPORT_IMAGE_CONFIG = {
 			typeName: 'Participants'
 		},
 		{ selector: '.standings-ffa', targetSelector: 'tbody', typeName: 'BR/FFA Standings Table' },
-		{ selector: '.standings-swiss', targetSelector: 'tbody', typeName: 'Swiss Standings Table' }
+		{
+			selector: '.table2.standings-swiss',
+			targetSelector: 'table.table2__table',
+			titleSelector: '.table2__title',
+			typeName: 'Swiss Standings Table'
+		},
+		{
+			selector: '.table2#MvpTable',
+			targetSelector: '.table2__container',
+			titleSelector: '.table2__title',
+			typeName: 'MVP Table'
+		}
 	]
 };
 
@@ -477,7 +488,7 @@ class ExportService {
 	}
 
 	removePrizepoolToggles( clonedDoc ) {
-		const prizepoolToggles = clonedDoc.querySelectorAll( '.ppt-toggle-expand' );
+		const prizepoolToggles = clonedDoc.querySelectorAll( '.ppt-toggle-expand, .prizepooltabletoggle' );
 
 		for ( const prizepoolToggle of prizepoolToggles ) {
 			prizepoolToggle.remove();

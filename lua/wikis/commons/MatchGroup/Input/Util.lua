@@ -957,6 +957,7 @@ function MatchGroupInputUtil.findPlayerId(players, playerInput, playerLink)
 	if playerIndex > 0 then
 		return playerIndex
 	end
+	mw.ext.TeamLiquidIntegration.add_category('Pages with unknown player input in matches')
 	mw.log('Player with id ' .. playerInput .. ' not found in opponent data')
 end
 
@@ -1173,7 +1174,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 	match.finished = MatchGroupInputUtil.matchIsFinished(match, games, opponents)
 
 	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished, opponents)
+		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished --[[@as string?]], opponents)
 		match.winner = MatchGroupInputUtil.getWinner(match.status, matchInput.winner, opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)

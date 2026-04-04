@@ -19,8 +19,8 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
 ---@class ParticipantsTeamMember: Widget
----@field props {even: boolean?, roleLeft: string?, roleRight: string?, trophies: integer?, strikethrough: boolean?,
----player: standardPlayer, team: standardOpponent?}
+---@field props {even: boolean?, roleLeft: string?, roleRight: string[]?, trophies: integer?,
+---strikethrough: boolean?, player: standardPlayer, team: standardOpponent?}
 ---@operator call(table): ParticipantsTeamMember
 local ParticipantsTeamMember = Class.new(Widget)
 
@@ -34,6 +34,22 @@ function ParticipantsTeamMember:render()
 	local team = self.props.team
 
 	local trophyIcon = Icon{iconName = 'firstplace'}
+
+	local function renderRoleRight()
+		if not roleRight then
+			return nil
+		end
+		local labels = roleRight
+		if #labels == 0 then
+			return nil
+		end
+		return Array.map(labels, function(label)
+			return Div{
+				classes = {'team-participant-card__member-role-right'},
+				children = label,
+			}
+		end)
+	end
 
 	return Div{
 		classes = {
@@ -70,10 +86,7 @@ function ParticipantsTeamMember:render()
 						trophyIcon
 					)
 			} or nil,
-			roleRight and Div{
-				classes = {'team-participant-card__member-role-right'},
-				children = roleRight,
-			} or nil,
+			renderRoleRight(),
 			team and Div{
 				classes = {'team-participant-card__member-team'},
 				children = OpponentDisplay.BlockOpponent({

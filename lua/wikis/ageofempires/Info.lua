@@ -121,6 +121,9 @@ return {
 				storeFromWikiCode = true,
 			},
 		},
+		participants = {
+			syncPlayerTeam = true,
+		},
 		tournamentsListing = {
 			showTier = true,
 			showGameIcon = true,

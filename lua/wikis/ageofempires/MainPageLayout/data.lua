@@ -65,7 +65,7 @@ local CONTENT = {
 			displayGameIcons = true,
 			matchesPortal = 'Liquipedia:Upcoming_and_ongoing_matches'
 		},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	tournaments = {
