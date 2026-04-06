@@ -46,13 +46,7 @@ function MatchOverviewWidget:render()
 	end
 
 	return HtmlWidgets.Div{
-		css = {
-			display = 'flex',
-			['justify-content'] = 'space-between',
-			['flex-direction'] = 'column',
-			['align-items'] = 'center',
-			gap = '0.25rem',
-		},
+		classes = {'standings-match-overview'},
 		children = WidgetUtil.collect(
 			self:_createResultDisplay(
 				OpponentDisplay.InlineScore(leftOpponent),

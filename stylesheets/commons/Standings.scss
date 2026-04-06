@@ -61,3 +61,11 @@ div.standings-ffa {
 		}
 	}
 }
+
+.standings-match-overview {
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.25rem;
+}
