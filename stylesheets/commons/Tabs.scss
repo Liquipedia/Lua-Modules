@@ -61,15 +61,9 @@ html.client-nojs .tabs-content > div:not( .active ) {
 	display: block;
 }
 
-/* DYNAMIC TABS */
+/* SHARED NAV STYLES */
+.tabs-static,
 .tabs-dynamic {
-	overflow: visible;
-
-	& > .tabs-content {
-		border: unset !important;
-		padding: 0.5rem 0 0 0.5rem;
-	}
-
 	.tabs-nav-wrapper {
 		position: relative;
 		display: flex;
@@ -196,6 +190,190 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		}
 	}
 
+	/* Scroll Arrows */
+	.tabs-scroll-arrow-wrapper {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: $tabs-arrow-width;
+		z-index: 10;
+		display: none;
+		align-items: center;
+		justify-content: center;
+		background-color: var( --clr-background );
+
+		&.visible {
+			display: flex;
+		}
+
+		&--left {
+			left: 0;
+		}
+
+		&--right {
+			right: 0;
+		}
+
+		.tabs-scroll-arrow {
+			outline: 0;
+			border-radius: 0;
+
+			.theme--light & {
+				color: $tabs-text-light;
+			}
+
+			.theme--dark & {
+				color: $tabs-text-dark;
+			}
+		}
+	}
+}
+
+/* STATIC TABS */
+.tabs-static {
+	overflow: visible;
+
+	// Desktop: show tab bar, hide dropdown
+	.tabs-static-dropdown {
+		display: none;
+	}
+
+	// Mobile: swap tab bar for dropdown
+	@media ( max-width: 767px ) {
+		.tabs-nav-wrapper {
+			display: none;
+		}
+
+		.tabs-static-dropdown {
+			display: block;
+		}
+	}
+
+	// Dropdown wrapper needs position: relative for absolute-positioned menu
+	.tabs-static-dropdown {
+		position: relative;
+	}
+
+	// Dropdown toggle button
+	.tabs-static-dropdown-toggle {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		width: 100%;
+		min-height: 2.75rem;
+		padding: 0.5rem 0.75rem;
+		border-radius: 0.25rem;
+		border: 1px solid;
+		cursor: pointer;
+
+		.theme--light & {
+			border-color: var( --clr-secondary-90 );
+			background-color: var( --clr-background );
+			color: var( --clr-secondary-16 );
+		}
+
+		.theme--dark & {
+			border-color: var( --clr-secondary-25 );
+			background-color: var( --clr-background );
+			color: var( --clr-secondary-100 );
+		}
+
+		.tabs-static-dropdown-label {
+			flex: 1;
+			font-size: 0.875rem;
+			font-weight: bold;
+			line-height: 1.25rem;
+			text-align: left;
+		}
+	}
+
+	// Dropdown panel
+	.tabs-static-dropdown-menu {
+		display: none;
+		list-style: none;
+		margin: 0.25rem 0 0;
+		padding: 0.25rem;
+		border: 1px solid;
+		border-radius: 0.25rem;
+		position: absolute;
+		z-index: 20;
+		min-width: 100%;
+		box-shadow: 0 1px 4px rgba( 0, 0, 0, 0.12 );
+
+		.theme--light & {
+			border-color: rgba( 0, 0, 0, 0.16 );
+			background-color: var( --clr-background );
+		}
+
+		.theme--dark & {
+			border-color: var( --clr-secondary-25 );
+			background-color: var( --clr-background );
+		}
+
+		&.open {
+			display: block;
+		}
+
+		li {
+			padding: 0.5rem 0.75rem;
+			border-radius: 0.25rem;
+			font-size: 0.875rem;
+			font-weight: bold;
+			cursor: pointer;
+
+			a {
+				display: block;
+				width: 100%;
+
+				.theme--light & {
+					color: var( --clr-secondary-39 ) !important;
+				}
+
+				.theme--dark & {
+					color: var( --clr-secondary-80 ) !important;
+				}
+			}
+
+			.theme--light & {
+				&:hover {
+					background-color: var( --clr-on-surface-light-primary-4 );
+				}
+
+				&.active {
+					background-color: var( --clr-on-surface-light-primary-4 );
+
+					a {
+						color: var( --clr-secondary-16 ) !important;
+					}
+				}
+			}
+
+			.theme--dark & {
+				&:hover {
+					background-color: var( --clr-on-surface-dark-primary-8 );
+				}
+
+				&.active {
+					background-color: var( --clr-on-surface-dark-primary-8 );
+
+					a {
+						color: var( --clr-secondary-100 ) !important;
+					}
+				}
+			}
+		}
+	}
+}
+
+/* DYNAMIC TABS */
+.tabs-dynamic {
+	overflow: visible;
+
+	& > .tabs-content {
+		border: unset !important;
+		padding: 0.5rem 0 0 0.5rem;
+	}
+
 	/* Temporary solution for fighters */
 	&.wraps {
 		.tabs-nav-wrapper {
@@ -301,164 +479,6 @@ html.client-nojs .tabs-content > div:not( .active ) {
 
 		.tabs-content {
 			padding: 0.5rem 0 0 1.25rem;
-		}
-	}
-
-	/* Scroll Arrows */
-	.tabs-scroll-arrow-wrapper {
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		width: $tabs-arrow-width;
-		z-index: 10;
-		display: none;
-		align-items: center;
-		justify-content: center;
-		background-color: var( --clr-background );
-
-		&.visible {
-			display: flex;
-		}
-
-		&--left {
-			left: 0;
-		}
-
-		&--right {
-			right: 0;
-		}
-
-		.tabs-scroll-arrow {
-			outline: 0;
-			border-radius: 0;
-
-			.theme--light & {
-				color: $tabs-text-light;
-			}
-
-			.theme--dark & {
-				color: $tabs-text-dark;
-			}
-		}
-	}
-}
-
-/* STATIC TABS */
-.tabs-static {
-	overflow: hidden;
-
-	.nav-tabs {
-		margin-bottom: 0;
-		border-bottom: 0.125rem solid;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.125rem;
-
-		.theme--light & {
-			border-bottom-color: var( --clr-secondary-90 );
-		}
-
-		.theme--dark & {
-			border-bottom-color: var( --clr-secondary-16 );
-		}
-
-		@at-root .mw-content-ltr &,
-		.mw-content-rtl .mw-content-ltr & {
-			margin: 0.25rem 0;
-		}
-
-		li {
-			float: left;
-			cursor: pointer;
-			margin: 0.125rem 0 0 0;
-			border: 0.125rem solid;
-			border-bottom: 0 !important;
-			height: 2.125rem;
-
-			.theme--light & {
-				background-color: var( --clr-primary-96 );
-				border-color: var( --clr-secondary-90 );
-			}
-
-			.theme--dark & {
-				background-color: var( --clr-secondary-9 );
-				border-color: var( --clr-secondary-16 );
-			}
-
-			&:not( .active ) {
-				cursor: pointer;
-			}
-
-			.tabs-portal & {
-				height: 2.875rem;
-			}
-
-			&:last-of-type {
-				margin-right: 0;
-			}
-
-			a {
-				display: block;
-				padding: 0.3125rem 0.625rem;
-				border: 1px solid transparent;
-				outline: 0;
-				position: relative;
-				height: 2rem;
-
-				&:focus-visible {
-					text-decoration: underline;
-				}
-
-				@media ( hover: hover ) {
-					&:hover,
-					&:visited:hover {
-						text-decoration: none;
-					}
-				}
-			}
-
-			// Specific alignment for team templates in static tabs
-			.team-template-team-standard {
-				white-space: nowrap;
-
-				& > * {
-					float: left;
-				}
-			}
-
-			.team-template-image-legacy > *,
-			.team-template-image-icon > * {
-				padding-right: 0;
-			}
-
-			.team-template-text > * {
-				padding-left: 0;
-			}
-
-			&.active {
-				margin-bottom: -0.125rem;
-				height: 2.25rem;
-				font-weight: bold;
-
-				.theme--light & {
-					background-color: var( --clr-background );
-					color: var( --clr-secondary-9 );
-				}
-
-				.theme--dark & {
-					background-color: var( --clr-secondary-7 );
-					color: var( --clr-secondary-100 );
-				}
-
-				.selflink {
-					background-color: unset !important;
-				}
-
-				a {
-					background-color: unset !important;
-					color: currentcolor;
-				}
-			}
 		}
 	}
 }
