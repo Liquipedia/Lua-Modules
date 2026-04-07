@@ -13,7 +13,8 @@ const TABS_CONFIG = {
 		ARROW_LEFT: '.tabs-scroll-arrow-wrapper--left',
 		ARROW_RIGHT: '.tabs-scroll-arrow-wrapper--right',
 		ACTIVE_TAB: 'li.active',
-		TAB_ITEMS: 'li'
+		TAB_ITEMS: 'li',
+		STATIC_CONTAINER: '.tabs-static'
 	},
 	SCROLL: {
 		ARROW_STEP: 200,
@@ -30,7 +31,8 @@ const TABS_CONFIG = {
 		ACTIVE: 'active',
 		DRAGGING: 'dragging',
 		SHOW_ALL: 'show-all',
-		VISIBLE: 'visible'
+		VISIBLE: 'visible',
+		OPEN: 'open'
 	}
 };
 
@@ -429,10 +431,12 @@ class TabContainer {
 		const itemWidth = activeTab.clientWidth;
 		const targetScroll = itemOffset - ( sliderWidth / 2 ) + ( itemWidth / 2 );
 
-		this.navTabs.scrollTo( {
-			left: targetScroll,
-			behavior: instant ? 'auto' : 'smooth'
-		} );
+		if ( typeof this.navTabs.scrollTo === 'function' ) {
+			this.navTabs.scrollTo( {
+				left: targetScroll,
+				behavior: instant ? 'auto' : 'smooth'
+			} );
+		}
 
 		setTimeout( () => {
 			if ( this.navWrapper ) {
@@ -459,6 +463,91 @@ class TabContainer {
 	cleanup() {
 		this.cleanupFunctions.forEach( ( cleanupFn ) => cleanupFn() );
 		this.cleanupFunctions.clear();
+	}
+}
+
+/**
+ * Manages individual static tab container instances.
+ * Handles scroll arrows and drag-to-scroll (inherited from TabContainer)
+ * plus mobile dropdown toggle. Does NOT handle content switching.
+ */
+class StaticTabContainer extends TabContainer {
+	init() {
+		this.indexElements();
+		this._setupScrollHandlers();
+		this.setupMobileDropdown();
+	}
+
+	buildBreadcrumb() {
+		const labels = [];
+
+		const activeItem = this.navTabs.querySelector( TABS_CONFIG.SELECTORS.ACTIVE_TAB );
+		if ( activeItem ) {
+			labels.push( ( activeItem.textContent || '' ).trim() );
+		}
+
+		let ancestor = this.container.parentElement &&
+			this.container.parentElement.closest( TABS_CONFIG.SELECTORS.STATIC_CONTAINER );
+		while ( ancestor ) {
+			const ancestorNavTabs = ancestor.querySelector( TABS_CONFIG.SELECTORS.NAV_TABS );
+			if ( ancestorNavTabs ) {
+				const ancestorActive = ancestorNavTabs.querySelector( TABS_CONFIG.SELECTORS.ACTIVE_TAB );
+				if ( ancestorActive ) {
+					labels.unshift( ( ancestorActive.textContent || '' ).trim() );
+				}
+			}
+			ancestor = ancestor.parentElement &&
+				ancestor.parentElement.closest( TABS_CONFIG.SELECTORS.STATIC_CONTAINER );
+		}
+
+		return labels.join( ' > ' );
+	}
+
+	updateBreadcrumb() {
+		const label = this.container.querySelector( '.tabs-static-dropdown-label' );
+		if ( label ) {
+			label.textContent = this.buildBreadcrumb();
+		}
+	}
+
+	setupMobileDropdown() {
+		const toggle = this.container.querySelector( '.tabs-static-dropdown-toggle' );
+		const menu = this.container.querySelector( '.tabs-static-dropdown-menu' );
+
+		if ( !toggle || !menu ) {
+			return;
+		}
+
+		this.updateBreadcrumb();
+
+		toggle.addEventListener( 'click', () => {
+			if ( !menu.classList.contains( TABS_CONFIG.CLASSES.OPEN ) ) {
+				this.updateBreadcrumb();
+			}
+			menu.classList.toggle( TABS_CONFIG.CLASSES.OPEN );
+		} );
+
+		const outsideClickHandler = ( event ) => {
+			const dropdown = this.container.querySelector( '.tabs-static-dropdown' );
+			if ( dropdown && !dropdown.contains( event.target ) ) {
+				menu.classList.remove( TABS_CONFIG.CLASSES.OPEN );
+			}
+		};
+		document.addEventListener( 'click', outsideClickHandler );
+		this.cleanupFunctions.add( () => {
+			document.removeEventListener( 'click', outsideClickHandler );
+		} );
+
+		const keydownHandler = ( event ) => {
+			if ( event.key === 'Escape' && menu.classList.contains( TABS_CONFIG.CLASSES.OPEN ) ) {
+				menu.classList.remove( TABS_CONFIG.CLASSES.OPEN );
+				toggle.focus();
+			}
+		};
+		document.addEventListener( 'keydown', keydownHandler );
+		this.cleanupFunctions.add( () => {
+			document.removeEventListener( 'keydown', keydownHandler );
+		} );
 	}
 }
 
@@ -566,6 +655,14 @@ class TabsModule {
 				this.tabContainers.set( containerElement, container );
 			}
 		} );
+
+		const staticContainers = document.querySelectorAll( TABS_CONFIG.SELECTORS.STATIC_CONTAINER );
+		staticContainers.forEach( ( containerElement ) => {
+			const container = new StaticTabContainer( containerElement );
+			if ( container.navTabs ) {
+				this.tabContainers.set( containerElement, container );
+			}
+		} );
 	}
 
 	getContainer( element ) {
@@ -585,6 +682,7 @@ class TabsModule {
 
 if ( typeof globalThis !== 'undefined' ) {
 	globalThis.TabContainer = TabContainer;
+	globalThis.StaticTabContainer = StaticTabContainer;
 }
 
 liquipedia.tabs = new TabsModule();

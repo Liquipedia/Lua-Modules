@@ -31,4 +31,88 @@ describe( 'Tabs module', () => {
 			expect( typeof tc._setupScrollHandlers ).toBe( 'function' );
 		} );
 	} );
+
+	describe( 'StaticTabContainer', () => {
+		test( 'should initialize for .tabs-static elements', () => {
+			const container = document.createElement( 'div' );
+			container.className = 'tabs-static';
+			const navWrapper = document.createElement( 'div' );
+			navWrapper.className = 'tabs-nav-wrapper';
+			const ul = document.createElement( 'ul' );
+			ul.className = 'nav-tabs';
+			navWrapper.appendChild( ul );
+			container.appendChild( navWrapper );
+			document.body.appendChild( container );
+
+			const sc = new globalThis.StaticTabContainer( container );
+			expect( sc.navTabs ).not.toBeNull();
+		} );
+
+		test( 'should toggle open class on dropdown menu when toggle is clicked', () => {
+			const container = document.createElement( 'div' );
+			container.className = 'tabs-static';
+			const navWrapper = document.createElement( 'div' );
+			navWrapper.className = 'tabs-nav-wrapper';
+			const ul = document.createElement( 'ul' );
+			ul.className = 'nav-tabs';
+			const li = document.createElement( 'li' );
+			li.className = 'active';
+			li.textContent = 'Tab1';
+			ul.appendChild( li );
+			navWrapper.appendChild( ul );
+
+			const dropdownDiv = document.createElement( 'div' );
+			dropdownDiv.className = 'tabs-static-dropdown';
+			const toggle = document.createElement( 'div' );
+			toggle.className = 'tabs-static-dropdown-toggle';
+			const label = document.createElement( 'span' );
+			label.className = 'tabs-static-dropdown-label';
+			toggle.appendChild( label );
+			const menu = document.createElement( 'ul' );
+			menu.className = 'tabs-static-dropdown-menu';
+			dropdownDiv.appendChild( toggle );
+			dropdownDiv.appendChild( menu );
+			container.appendChild( navWrapper );
+			container.appendChild( dropdownDiv );
+			document.body.appendChild( container );
+
+			new globalThis.StaticTabContainer( container );
+			toggle.click();
+			expect( menu.classList.contains( 'open' ) ).toBe( true );
+			toggle.click();
+			expect( menu.classList.contains( 'open' ) ).toBe( false );
+		} );
+
+		test( 'should build breadcrumb from active tab name', () => {
+			const container = document.createElement( 'div' );
+			container.className = 'tabs-static';
+			const navWrapper = document.createElement( 'div' );
+			navWrapper.className = 'tabs-nav-wrapper';
+			const ul = document.createElement( 'ul' );
+			ul.className = 'nav-tabs';
+			const li = document.createElement( 'li' );
+			li.className = 'active';
+			li.textContent = 'Results';
+			ul.appendChild( li );
+			navWrapper.appendChild( ul );
+
+			const dropdownDiv = document.createElement( 'div' );
+			dropdownDiv.className = 'tabs-static-dropdown';
+			const toggle = document.createElement( 'div' );
+			toggle.className = 'tabs-static-dropdown-toggle';
+			const label = document.createElement( 'span' );
+			label.className = 'tabs-static-dropdown-label';
+			toggle.appendChild( label );
+			const menu = document.createElement( 'ul' );
+			menu.className = 'tabs-static-dropdown-menu';
+			dropdownDiv.appendChild( toggle );
+			dropdownDiv.appendChild( menu );
+			container.appendChild( navWrapper );
+			container.appendChild( dropdownDiv );
+			document.body.appendChild( container );
+
+			new globalThis.StaticTabContainer( container );
+			expect( label.textContent ).toBe( 'Results' );
+		} );
+	} );
 } );
