@@ -41,28 +41,65 @@ function Tabs.static(args)
 
 	Tabs._setThis(tabArgs)
 
+	local activeTab = Array.find(tabArgs, Operator.property('this'))
+	local activeTabName = activeTab
+		and (activeTab.name or Tabs._getDisplayNameFromLink(activeTab.link --[[@as string]]))
+		or ''
+
+	local function buildTabLiItems()
+		return Array.map(tabArgs, function(tab)
+			--if tab.name is unset tab.link is set as per `Tabs._readArguments`
+			local name = tab.name or Tabs._getDisplayNameFromLink(tab.link --[[@as string]])
+			local text = tab.link and Page.makeInternalLink({}, name, tab.link) or tab.name
+			return HtmlWidgets.Li{
+				classes = {tab.this and 'active' or nil},
+				children = text
+			}
+		end)
+	end
+
+	local navTabs = HtmlWidgets.Ul{
+		classes = {'nav', 'nav-tabs', 'navigation-not-searchable', 'tabs', 'tabs' .. tabCount},
+		attributes = {['data-nosnippet'] = ''},
+		children = buildTabLiItems()
+	}
+
+	local dropdown = HtmlWidgets.Div{
+		classes = {'tabs-static-dropdown'},
+		children = {
+			Button{
+				classes = {'tabs-static-dropdown-toggle'},
+				variant = 'ghost',
+				size = 'md',
+				children = WidgetUtil.collect(
+					Icon{iconName = 'menu', size = 'xs'},
+					HtmlWidgets.Span{
+						classes = {'tabs-static-dropdown-label'},
+						children = {activeTabName}
+					},
+					Icon{iconName = 'expand', size = 'xs'}
+				)
+			},
+			HtmlWidgets.Ul{
+				classes = {'tabs-static-dropdown-menu'},
+				children = buildTabLiItems()
+			}
+		}
+	}
+
 	return AnalyticsWidgets{
 		analyticsName = 'Navigation tab',
 		children = {
 			HtmlWidgets.Div{
 				classes = {'tabs-static'},
 				attributes = {['data-nosnippet'] = ''},
-				children = HtmlWidgets.Ul{
-					classes = {'nav', 'nav-tabs', 'navigation-not-searchable', 'tabs', 'tabs' .. tabCount},
-					attributes = {['data-nosnippet'] = ''},
-					children = Array.map(tabArgs, function (tab)
-						--if tab.name is unset tab.link is set as per `Tabs._readArguments`
-						local name = tab.name or Tabs._getDisplayNameFromLink(tab.link --[[@as string]])
-						local text = tab.link and Page.makeInternalLink({}, name, tab.link) or tab.name
-						return HtmlWidgets.Li{
-							classes = {tab.this and 'active' or nil},
-							children = text
-						}
-					end)
+				children = {
+					Tabs._buildNavWrapper(navTabs),
+					dropdown,
+					HtmlWidgets.Fragment{
+						children = Array.map(Array.filter(tabArgs, Operator.property('this')), Operator.property('tabs'))
+					}
 				}
-			},
-			HtmlWidgets.Fragment{
-				children = Array.map(Array.filter(tabArgs, Operator.property('this')), Operator.property('tabs'))
 			}
 		}
 	}

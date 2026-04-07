@@ -7,7 +7,7 @@ describe('Tabs Module', function()
 			assert.is.error(Tabs.static, 'You are trying to add a "Tabs" template without arguments for names nor links')
 		end)
 
-		it('should create static tabs with valid arguments', function()
+		it('should create static tabs with nav wrapper and dropdown', function()
 			local args = {
 				name1 = 'Tab1',
 				link1 = 'Link1',
@@ -15,9 +15,50 @@ describe('Tabs Module', function()
 				link2 = 'Link2',
 				This = 1
 			}
-			local result = Tabs.static(args)
-			assert.is_not_nil(result)
-			assert.is_true(tostring(result):find('class="nav nav-tabs navigation-not-searchable tabs tabs2"', nil, true) ~= nil)
+			local result = tostring(Tabs.static(args))
+			assert.is_true(result:find('tabs-nav-wrapper', nil, true) ~= nil)
+			assert.is_true(result:find('tabs-static-dropdown', nil, true) ~= nil)
+			assert.is_true(result:find('tabs-static-dropdown-menu', nil, true) ~= nil)
+		end)
+
+		it('should mark the active tab in the nav and dropdown', function()
+			local args = {
+				name1 = 'Tab1',
+				link1 = 'Link1',
+				name2 = 'Tab2',
+				link2 = 'Link2',
+				This = 1
+			}
+			local result = tostring(Tabs.static(args))
+			-- nav and dropdown both contain an active li
+			local count = 0
+			for _ in result:gmatch('class="active"') do count = count + 1 end
+			assert.is_true(count >= 2)
+		end)
+
+		it('should include the active tab name in the dropdown label', function()
+			local args = {
+				name1 = 'MyActiveTab',
+				link1 = 'Link1',
+				name2 = 'Tab2',
+				link2 = 'Link2',
+				This = 1
+			}
+			local result = tostring(Tabs.static(args))
+			assert.is_true(result:find('tabs-static-dropdown-label', nil, true) ~= nil)
+			assert.is_true(result:find('MyActiveTab', nil, true) ~= nil)
+		end)
+
+		it('should keep nav-tabs class on the ul', function()
+			local args = {
+				name1 = 'Tab1',
+				link1 = 'Link1',
+				name2 = 'Tab2',
+				link2 = 'Link2',
+				This = 1
+			}
+			local result = tostring(Tabs.static(args))
+			assert.is_true(result:find('nav nav-tabs navigation-not-searchable tabs tabs2', nil, true) ~= nil)
 		end)
 	end)
 
