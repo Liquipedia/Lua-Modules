@@ -99,10 +99,17 @@ class TabContainer {
 
 	init() {
 		this.indexElements();
+		this._setupContentHandlers();
+		this._setupScrollHandlers();
+	}
+
+	_setupContentHandlers() {
 		this.createMobileHeadings();
 		this.setupClickHandlers();
 		this.setupKeyboardNavigation();
+	}
 
+	_setupScrollHandlers() {
 		if ( !this.wraps ) {
 			this.setupDragToScroll();
 			this.setupArrows();
@@ -574,6 +581,10 @@ class TabsModule {
 		this.tabContainers.clear();
 		this.hashRouter.cleanup();
 	}
+}
+
+if ( typeof globalThis !== 'undefined' ) {
+	globalThis.TabContainer = TabContainer;
 }
 
 liquipedia.tabs = new TabsModule();
