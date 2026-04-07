@@ -90,4 +90,17 @@ describe('Tabs Module', function()
 			assert.is_true(result:find('"tabs-content"', nil, true) ~= nil)
 		end)
 	end)
+
+	describe('Tabs._buildNavWrapper', function()
+		it('should build nav wrapper with scroll arrow buttons', function()
+			local navTabs = require('Module:Widget/Html/All').Ul{
+				classes = {'nav', 'nav-tabs'},
+				children = {}
+			}
+			local result = tostring(Tabs._buildNavWrapper(navTabs))
+			assert.is_true(result:find('tabs-nav-wrapper', nil, true) ~= nil)
+			assert.is_true(result:find('tabs-scroll-arrow-wrapper--left', nil, true) ~= nil)
+			assert.is_true(result:find('tabs-scroll-arrow-wrapper--right', nil, true) ~= nil)
+		end)
+	end)
 end)

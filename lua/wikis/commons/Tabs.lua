@@ -153,46 +153,7 @@ function Tabs.dynamic(args)
 		contentChildren
 	)
 
-	local navWrapper = HtmlWidgets.Div{
-		classes = {'tabs-nav-wrapper'},
-		children = {
-			HtmlWidgets.Div{
-				classes = {'tabs-scroll-arrow-wrapper', 'tabs-scroll-arrow-wrapper--left'},
-				children = {
-					Button{
-						classes = {'tabs-scroll-arrow', 'tabs-scroll-arrow--left'},
-						title = 'Previous',
-						variant = 'ghost',
-						size = 'md',
-						children = {
-							HtmlWidgets.Span{
-								css = {display = 'inline-flex'},
-								children = {Icon{iconName = 'previous', size = 'xs'}}
-							},
-						},
-					}
-				}
-			},
-			navTabs,
-			HtmlWidgets.Div{
-				classes = {'tabs-scroll-arrow-wrapper', 'tabs-scroll-arrow-wrapper--right'},
-				children = {
-					Button{
-						classes = {'tabs-scroll-arrow', 'tabs-scroll-arrow--right'},
-						title = 'Next',
-						variant = 'ghost',
-						size = 'md',
-						children = {
-							HtmlWidgets.Span{
-								css = {display = 'inline-flex'},
-								children = {Icon{iconName = 'next', size = 'xs'}}
-							},
-						},
-					}
-				}
-			},
-		}
-	}
+	local navWrapper = Tabs._buildNavWrapper(navTabs)
 
 	if not hasContent then
 		local startTag = '<div class="tabs-dynamic navigation-not-searchable ' .. variantClass ..
@@ -280,6 +241,51 @@ function Tabs._setThis(tabArgs)
 	if not this then return end
 
 	tabArgs[this].this = true
+end
+
+---@param navTabs Widget
+---@return Widget
+function Tabs._buildNavWrapper(navTabs)
+	return HtmlWidgets.Div{
+		classes = {'tabs-nav-wrapper'},
+		children = {
+			HtmlWidgets.Div{
+				classes = {'tabs-scroll-arrow-wrapper', 'tabs-scroll-arrow-wrapper--left'},
+				children = {
+					Button{
+						classes = {'tabs-scroll-arrow', 'tabs-scroll-arrow--left'},
+						title = 'Previous',
+						variant = 'ghost',
+						size = 'md',
+						children = {
+							HtmlWidgets.Span{
+								css = {display = 'inline-flex'},
+								children = {Icon{iconName = 'previous', size = 'xs'}}
+							},
+						},
+					}
+				}
+			},
+			navTabs,
+			HtmlWidgets.Div{
+				classes = {'tabs-scroll-arrow-wrapper', 'tabs-scroll-arrow-wrapper--right'},
+				children = {
+					Button{
+						classes = {'tabs-scroll-arrow', 'tabs-scroll-arrow--right'},
+						title = 'Next',
+						variant = 'ghost',
+						size = 'md',
+						children = {
+							HtmlWidgets.Span{
+								css = {display = 'inline-flex'},
+								children = {Icon{iconName = 'next', size = 'xs'}}
+							},
+						},
+					}
+				}
+			},
+		}
+	}
 end
 
 ---@param hasContent boolean
