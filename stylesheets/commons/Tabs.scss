@@ -249,6 +249,17 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		}
 	}
 
+	// No-JS fallback: always show the tab bar, hide the dropdown
+	html.client-nojs & {
+		.tabs-nav-wrapper {
+			display: flex;
+		}
+
+		.tabs-static-dropdown {
+			display: none;
+		}
+	}
+
 	// Dropdown wrapper needs position: relative for absolute-positioned menu
 	.tabs-static-dropdown {
 		position: relative;
@@ -521,7 +532,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 }
 
 /* Smash Specific */
-.tabs-static-games > .nav-tabs > li {
+.tabs-static-games .nav-tabs > li {
 	&:first-of-type {
 		margin-right: 0;
 	}
