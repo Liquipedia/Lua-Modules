@@ -179,6 +179,7 @@ function BaseTournamentsListing:build()
 	self.cachedData = {rank = 1, prize = 0, skippedRanks = self.config.offset}
 
 	return TableWidgets.Table{
+		classes = 'tournaments-listing',
 		columns = self:buildColumnDefinitions(),
 		children = {
 			TableWidgets.TableHeader{
@@ -201,7 +202,10 @@ function BaseTournamentsListing:buildColumnDefinitions()
 		config.showTier and {align = 'left'} or nil, 		-- Tier
 		config.showGameIcon and {align = 'center'} or nil, 	-- Game
 		{align = 'left'},									-- Icon
-		{align = 'left'},									-- Tournament
+		{													-- Tournament
+			align = 'left',
+			classes = {'column__tournament'},
+		},
 		config.showOrganizer and {align = 'left'} or nil,	-- Organizer
 		{align = 'left'},									-- Date
 		{													-- Prizepool
@@ -211,10 +215,19 @@ function BaseTournamentsListing:buildColumnDefinitions()
 		{align = 'left'},									-- Location
 		{align = 'right'},									-- Participants
 		config.showQualifierColumnOverWinnerRunnerup
-			and {align = 'left'}							-- Qualified
+			and {											-- Qualified
+				align = 'left',
+				classes = {'column__qualified'},
+			}
 			or WidgetUtil.collect(
-				{align = 'left'},							-- Winner
-				{align = 'left'}							-- Runner-up
+				{											-- Winner
+					align = 'left',
+					classes = {'column__placement'},
+				},
+				{											-- Runner-up
+					align = 'left',
+					classes = {'column__placement'},
+				}
 			)
 	)
 end
@@ -349,11 +362,6 @@ end
 ---@return Widget
 function BaseTournamentsListing:_buildParticipants(opponents)
 	return HtmlWidgets.Div{
-		css = {
-			display = 'inline-grid',
-			['grid-template-columns'] = 'repeat( auto-fit, minmax( 150px, 1fr ) )',
-			['min-width'] = '15vw'
-		},
 		children = Array.map(opponents, function (opponent)
 			return OpponentDisplay.BlockOpponent{opponent = opponent}
 		end)
