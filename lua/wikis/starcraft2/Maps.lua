@@ -7,8 +7,9 @@ local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
+---for variations and data of maps that have no page
 ---@type table<string, SC2MapsMap>
-local MapData = Lua.import('Module:MapData', {loadData = true})
+local MapData = Lua.requireIfExists('Module:MapData', {loadData = true}) or {}
 
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -36,16 +37,23 @@ local DEFAULT_THUMB_SIZE = 'x120px'
 local Maps = {}
 
 ---@private
----@param key string?
+---@param input string?
 ---@return SC2MapsMap?
-function Maps._getData(key)
-	if Logic.isEmpty(key) then
+function Maps._getData(input)
+	if Logic.isEmpty(input) then
 		return
 	end
 	---@cast key -nil
 
-	key = key:gsub('%s*LE$', ''):gsub('%s*TE$', ''):gsub('%s*CE$', ''):gsub(' %([mM]ap%)$', ''):gsub('_', ' ')
-	return MapData[key:lower()]
+	local key = key:gsub('%s*LE$', ''):gsub('%s*TE$', ''):gsub('%s*CE$', ''):gsub(' %([mM]ap%)$', ''):gsub('_', ' ')
+	return MapData[key:lower()] or Maps._fetchMapData(input)
+end
+
+---@private
+---@param input string?
+---@return SC2MapsMap?
+function Maps._fetchMapData(input)
+	todo
 end
 
 -- EntryPoint Template:MapThumb
