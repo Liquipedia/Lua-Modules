@@ -75,20 +75,6 @@ function Maps._displayThumb(data, size)
 	}
 end
 
--- EntryPoint Template:MapAuthor
----@param args {[1]: string?}?
----@return Widget|string?
-function Maps.author(args)
-	args = args or {}
-
-	local data = Maps._getData(args[1])
-	if not data then
-		return
-	end
-
-	return Maps._displayAuthor(data)
-end
-
 ---@private
 ---@param data SC2MapsMap
 ---@return Widget|string?
@@ -235,4 +221,4 @@ function Maps._display(mapList, config)
 	}
 end
 
-return Class.export(Maps, {exports = {'thumb', 'author', 'run'}})
+return Class.export(Maps, {exports = {'thumb', 'run'}})
