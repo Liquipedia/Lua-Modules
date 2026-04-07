@@ -94,6 +94,7 @@ local GAMES = {
 		{lis = 'pubgm', wiki = 'pubgmobile'},
 		{lis = 'r6s', wiki = 'rainbowsix'},
 		{lis = 'rl', wiki = 'rocketleague'},
+		{lis = 'sf6', wiki = 'fighters'},
 		{lis = 'tm', wiki = 'trackmania'},
 		{lis = 'valorant', wiki = 'valorant'},
 	}
