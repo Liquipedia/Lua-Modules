@@ -4,6 +4,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
@@ -46,15 +47,38 @@ function Maps._getData(input)
 	end
 	---@cast input -nil
 
-	local key = input:gsub('%s*LE$', ''):gsub('%s*TE$', ''):gsub('%s*CE$', ''):gsub(' %([mM]ap%)$', ''):gsub('_', ' ')
-	return MapData[key:lower()] or Maps._fetchMapData(input)
+	local key = input
+		:gsub('%s*LE$', '')
+		:gsub('%s*TE$', '')
+		:gsub('%s*CE$', '')
+		:gsub(' %([mM]ap%)$', '')
+		:gsub('_', ' ')
+		:lower()
+	return Maps._fetchMapData(input) or MapData[key]
 end
 
 ---@private
 ---@param input string?
 ---@return SC2MapsMap?
 function Maps._fetchMapData(input)
-	todo
+	local pageName = Page.pageifyLink(input)
+
+	local queryData = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		conditions = '[[type::map]] AND [[pagename::' .. pageName .. ']]',
+		query = 'pagename, name, image, imagedark, extradata',
+		limit = 5000,
+	})[1]
+
+	if not queryData then return end
+
+	return {
+		link = queryData.pagename,
+		displayname = queryData.name,
+		author = queryData.extradata.creator1dn,
+		authorLink = queryData.extradata.creator1,
+		image = queryData.image,
+		imageDark = queryData.imagedark,
+	}
 end
 
 -- EntryPoint Template:MapThumb
