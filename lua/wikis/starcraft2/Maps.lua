@@ -44,9 +44,9 @@ function Maps._getData(input)
 	if Logic.isEmpty(input) then
 		return
 	end
-	---@cast key -nil
+	---@cast input -nil
 
-	local key = key:gsub('%s*LE$', ''):gsub('%s*TE$', ''):gsub('%s*CE$', ''):gsub(' %([mM]ap%)$', ''):gsub('_', ' ')
+	local key = input:gsub('%s*LE$', ''):gsub('%s*TE$', ''):gsub('%s*CE$', ''):gsub(' %([mM]ap%)$', ''):gsub('_', ' ')
 	return MapData[key:lower()] or Maps._fetchMapData(input)
 end
 
