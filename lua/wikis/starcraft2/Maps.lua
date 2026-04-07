@@ -33,6 +33,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field tournament string?
 
 local DEFAULT_THUMB_SIZE = 'x120px'
+local PLACEHOLDER_IMAGE = 'MapImagePlaceholder.jpg'
 
 local Maps = {}
 
@@ -75,7 +76,7 @@ end
 ---@return Widget
 function Maps._displayThumb(data, size)
 	return Image{
-		imageLight = data.image,
+		imageLight = data.image or PLACEHOLDER_IMAGE,
 		imageDark = data.imageDark,
 		link = data.link,
 		size = size or DEFAULT_THUMB_SIZE,
