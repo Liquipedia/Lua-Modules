@@ -1,6 +1,8 @@
 // @ts-nocheck
 import chokidar from 'chokidar';
 import { spawn } from 'child_process';
+import fs from 'fs';
+import os from 'os';
 
 const devEnvName = process.argv[ 2 ]
 	? `/dev/${process.argv[ 2 ]}`
@@ -14,6 +16,18 @@ if ( !devEnvName ) {
 
 console.log( `Lua watcher started. Deploying changes to: ${devEnvName}` );
 console.log( 'Watching lua/wikis/**/*.lua...\n' );
+
+const REBUILD_MARKER = `${os.homedir()}/.cache/liquipedia-dev/rebuild_marker_lua_modules`;
+
+function writeRebuildMarker() {
+	try {
+		fs.mkdirSync( `${os.homedir()}/.cache/liquipedia-dev`, { recursive: true } );
+		fs.writeFileSync( REBUILD_MARKER, '' );
+		console.log( 'Browser reload marker written.\n' );
+	} catch ( err ) {
+		console.error( `Failed to write rebuild marker: ${err.message}\n` );
+	}
+}
 
 const queue = [];
 let deployingFile = null;
@@ -47,6 +61,9 @@ function processQueue() {
 		}
 		deployingFile = null;
 		processQueue();
+		if ( code === 0 && deployingFile === null ) {
+			writeRebuildMarker();
+		}
 	} );
 
 	child.on( 'error', ( err ) => {
