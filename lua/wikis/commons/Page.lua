@@ -90,7 +90,7 @@ end
 
 ---Updates the display title of the current page.
 ---This function is a no-op if the supplied title is empty.
----@param props {frame: Frame?, title: string, noReplace: boolean?}
+---@param props {frame: Frame?, title: string?, noReplace: boolean?}
 ---@return string?
 function Page.setDisplayTitle(props)
 	local title = props.title
@@ -98,6 +98,7 @@ function Page.setDisplayTitle(props)
 	if String.isEmpty(title) then
 		return
 	end
+	---@cast title -nil
 
 	local frame = props.frame or mw.getCurrentFrame()
 	return frame:callParserFunction('DISPLAYTITLE', title, props.noReplace and 'noreplace' or nil)
