@@ -94,7 +94,7 @@ end
 function AoEMatchSummaryGameRow:_createParticipant(player, flipped)
 	local children = {
 		self:_createFactionIcon(player.civ),
-		PlayerDisplay.InlinePlayer{player = player, flip = flipped},
+		PlayerDisplay.BlockPlayer{player = player, flip = flipped},
 	}
 	return HtmlWidgets.Div{
 		css = {
