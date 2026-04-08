@@ -18,6 +18,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local PlayerDisplay = Lua.import('Module:Player/Display')
@@ -89,35 +90,42 @@ end
 ---@private
 ---@param player table
 ---@param flipped boolean
----@return Html
+---@return Widget
 function AoEMatchSummaryGameRow:_createParticipant(player, flipped)
-	local playerNode = PlayerDisplay.BlockPlayer{player = player, flip = flipped}
-	local factionNode = self:_createFactionIcon(player.civ)
-	return mw.html.create('div'):css('display', 'flex'):css('align-self', flipped and 'end' or 'start')
-		:node(flipped and playerNode or factionNode)
-		:wikitext('&nbsp;')
-		:node(flipped and factionNode or playerNode)
+	return HtmlWidgets.Div{
+		css = {
+			display = 'flex',
+			['align-self'] = flipped and 'end' or 'start',
+			['flex-direction'] = flipped and 'row' or 'row-reverse',
+		},
+		children = {
+			PlayerDisplay.BlockPlayer{player = player, flip = flipped},
+			self:_createFactionIcon(player.civ),
+		},
+	}
 end
 
 ---@private
 ---@param opponentId integer
----@return Html
+---@return Widget
 function AoEMatchSummaryGameRow:_createOpponentDisplay(opponentId)
-	local display = mw.html.create('div')
-		:css('display', 'flex')
-		:css('width', '90%')
-		:css('flex-direction', 'column')
-		:css('overflow', 'hidden')
-	Array.forEach(
-		Array.sortBy(
-			Array.filter(self.props.game.opponents[opponentId].players, Table.isNotEmpty),
-			Operator.property('index')
-		),
-		function(player)
-			display:node(self:_createParticipant(player, opponentId == 1))
-		end
-	)
-	return display
+	return HtmlWidgets.Div{
+		css = {
+			display = 'flex',
+			width = '100%',
+			['flex-direction'] = 'column',
+			overflow = 'hidden',
+		},
+		children = Array.map(
+			Array.sortBy(
+				Array.filter(self.props.game.opponents[opponentId].players, Table.isNotEmpty),
+				Operator.property('index')
+			),
+			function (player)
+				return self:_createParticipant(player, opponentId == 1)
+			end
+		)
+	}
 end
 
 ---@param opponentIndex integer
@@ -145,18 +153,19 @@ end
 
 ---@private
 ---@param civ string?
----@return Html
+---@return Widget
 function AoEMatchSummaryGameRow:_createFactionIcon(civ)
 	local normGame = Game.abbreviation{game = self.props.gameData}:lower()
-	return mw.html.create('span')
-		:addClass('draft faction')
-		:wikitext(Faction.Icon{
+	return HtmlWidgets.Span{
+		classes = {'brkts-champion-icon'},
+		children = Faction.Icon{
 			faction = civ or '',
 			game = normGame,
 			size = 64,
 			showTitle = true,
 			showLink = true,
-		})
+		}
+	}
 end
 
 return CustomMatchSummary
