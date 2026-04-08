@@ -1091,7 +1091,7 @@ function mw.uri.encode(str, enctype) end
 function mw.uri.decode(str, enctype) end
 
 ---Encodes a table as a URI query string.
----@param query table<string, string|number|any[]|false?>
+---@param query table<string, string|number|any[]|false>
 ---@return string
 function mw.uri.buildQueryString(query) end
 
