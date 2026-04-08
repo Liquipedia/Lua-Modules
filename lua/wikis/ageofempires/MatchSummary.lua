@@ -34,6 +34,9 @@ local CustomMatchSummary = {}
 ---@operator call(AoEMatchSummaryGameRowProps): AoEMatchSummaryGameRow
 ---@field props AoEMatchSummaryGameRowProps
 local AoEMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+AoEMatchSummaryGameRow.defaultProps = {
+	allowWrappingInOverview = true
+}
 
 ---@param args table
 ---@return Widget
