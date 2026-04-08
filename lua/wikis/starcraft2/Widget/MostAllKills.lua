@@ -13,10 +13,8 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Condition = Lua.import('Module:Condition')
-local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
-local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
