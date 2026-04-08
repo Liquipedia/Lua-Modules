@@ -88,4 +88,13 @@ function Page.applyUnderScoresIfEnforced(pageName)
 	return pageName
 end
 
+---@param title string?
+function Page.setDisplayTitle(title)
+	if String.isEmpty(title) then
+		return
+	end
+	---@cast title -nil
+	mw.getCurrentFrame():callParserFunction('DISPLAYTITLE', title)
+end
+
 return Page

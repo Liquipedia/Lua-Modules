@@ -50,13 +50,8 @@ end
 ---@param player string
 ---@param subpageName string
 function PlayerTabs._setDisplayTitle(args, player, subpageName)
-	---@param title string
-	local setDisplayTitle = function(title)
-		mw.getCurrentFrame():callParserFunction('DISPLAYTITLE', title)
-	end
-
 	if Logic.isNotEmpty(args.title) then
-		setDisplayTitle(args.title)
+		Page.setDisplayTitle(args.title)
 		return
 	end
 
@@ -79,7 +74,7 @@ function PlayerTabs._setDisplayTitle(args, player, subpageName)
 		title = title .. ': ' .. subpageName
 	end
 
-	setDisplayTitle(title)
+	Page.setDisplayTitle(title)
 end
 
 ---@private

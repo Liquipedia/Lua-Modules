@@ -83,13 +83,8 @@ end
 ---@param team string
 ---@param subpageName string?
 function TeamTabs._setDisplayTitle(args, team, subpageName)
-	---@param title string
-	local setDisplayTitle = function(title)
-		mw.getCurrentFrame():callParserFunction('DISPLAYTITLE', title)
-	end
-
 	if Logic.isNotEmpty(args.title) then
-		setDisplayTitle(args.title)
+		Page.setDisplayTitle(args.title)
 		return
 	end
 
@@ -104,7 +99,7 @@ function TeamTabs._setDisplayTitle(args, team, subpageName)
 
 	local title = (args.displayName or queryDisplayName()) .. (subpageName and (': ' .. subpageName) or '')
 
-	setDisplayTitle(title)
+	Page.setDisplayTitle(title)
 end
 
 ---@private
