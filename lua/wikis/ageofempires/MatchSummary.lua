@@ -14,13 +14,12 @@ local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local MapMode = Lua.import('Module:MapMode')
 local Operator = Lua.import('Module:Operator')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-
-local Opponent = Lua.import('Module:Opponent/Custom')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 
 ---@class AoECustomMatchSummary: CustomMatchSummaryInterface
