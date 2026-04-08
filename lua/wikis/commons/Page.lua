@@ -88,4 +88,19 @@ function Page.applyUnderScoresIfEnforced(pageName)
 	return pageName
 end
 
+---Updates the display title of the current page.
+---If the supplied title is empty, this function is a no-op.
+---@param props {frame: Frame?, title: string, noReplace: boolean?}
+---@return string?
+function Page.setDisplayTitle(props)
+	local title = props.title
+
+	if String.isEmpty(title) then
+		return
+	end
+
+	local frame = props.frame or mw.getCurrentFrame()
+	return frame:callParserFunction('DISPLAYTITLE', title, props.noReplace and 'noreplace' or nil)
+end
+
 return Page
