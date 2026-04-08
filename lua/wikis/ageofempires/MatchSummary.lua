@@ -110,35 +110,44 @@ end
 
 ---@private
 ---@param opponentId integer
----@return Widget
+---@return Widget[]
 function AoEMatchSummaryGameRow:_createOpponentDisplay(opponentId)
 	local flipped = opponentId == 1
+	return Array.map(
+		Array.sortBy(
+			Array.filter(self.props.game.opponents[opponentId].players, Table.isNotEmpty),
+			Operator.property('index')
+		),
+		function (player)
+			return self:_createParticipant(player, flipped)
+		end
+	)
+end
+
+---@protected
+---@param opponentIndex integer
+---@return table<string, string|number>?
+function AoEMatchSummaryGameRow:getGameOpponentViewCss(opponentIndex)
+	local props = self.props
+
+	if props.soloMode then
+		return
+	end
+
+	local flipped = opponentIndex == 1
 	local gridTemplate = {'1fr', 'min-content'}
-	return HtmlWidgets.Div{
-		css = {
-			display = 'grid',
-			width = '100%',
-			['align-self'] = flipped and 'end' or 'start',
-			['grid-template-columns'] = table.concat(
-				flipped and gridTemplate or Array.reverse(gridTemplate),
-				' '
-			),
-			overflow = 'hidden',
-		},
-		children = Array.map(
-			Array.sortBy(
-				Array.filter(self.props.game.opponents[opponentId].players, Table.isNotEmpty),
-				Operator.property('index')
-			),
-			function (player)
-				return self:_createParticipant(player, flipped)
-			end
-		)
+
+	return {
+		display = 'grid',
+		['grid-template-columns'] = table.concat(
+			flipped and gridTemplate or Array.reverse(gridTemplate),
+			' '
+		),
 	}
 end
 
 ---@param opponentIndex integer
----@return Renderable
+---@return Widget|Widget[]
 function AoEMatchSummaryGameRow:createGameOpponentView(opponentIndex)
 	local props = self.props
 
