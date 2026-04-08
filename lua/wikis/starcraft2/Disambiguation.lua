@@ -1,3 +1,10 @@
+---
+-- @Liquipedia
+-- page=Module:Disambiguation
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Lua = require('Module:Lua')
 
 local AnOrA = Lua.import('Module:A or an')

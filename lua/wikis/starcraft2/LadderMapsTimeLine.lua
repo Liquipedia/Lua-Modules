@@ -1,3 +1,10 @@
+---
+-- @Liquipedia
+-- page=Module:LadderMapsTimeLine
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
@@ -66,7 +73,7 @@ function LadderMapsTimeLine._fetch(mode, game)
 	---@type table<string, {display: Widget, seasons: table<integer, true>, introduction: string[],
 	---removal: string[], sortKey: string}>
 	local maps = {}
-	Array.map(queryData, function(mapHistory)
+	Array.forEach(queryData, function(mapHistory)
 		if not maps[mapHistory.pagename] then
 			maps[mapHistory.pagename] = {
 				display = Link{link = mapHistory.pagename, children = mapHistory.name},

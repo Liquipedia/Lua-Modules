@@ -1,3 +1,10 @@
+---
+-- @Liquipedia
+-- page=Module:Widget/TranslationList
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')

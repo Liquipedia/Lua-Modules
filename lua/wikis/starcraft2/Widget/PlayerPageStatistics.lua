@@ -1,3 +1,10 @@
+---
+-- @Liquipedia
+-- page=Module:Widget/PlayerPageStatistics
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
@@ -34,6 +41,7 @@ end
 
 ---@return Widget?
 function PlayerPageStatistics:_matchupStats()
+	---@type table<string, table<string, {w: integer?, l: integer?}>>
 	local data = Json.parseIfString(Variables.varDefault('matchUpStats'))
 	if Logic.isEmpty(data) then
 		return

@@ -1,3 +1,10 @@
+---
+-- @Liquipedia
+-- page=Module:Widget/MedalsTable
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
@@ -57,7 +64,7 @@ function MedalsTable:_rows()
 	local rows = {}
 
 	for tier, dataSet in Table.iter.spairs(self.props.data) do
-		table.insert(rows, self:_row(Tier.display(tonumber(tier), nil, {link = true}), dataSet))
+		table.insert(rows, self:_row(Tier.display(tier, nil, {link = true}), dataSet))
 	end
 	table.insert(rows, self:_row('Total', totalRowDataSet))
 
@@ -65,7 +72,7 @@ function MedalsTable:_rows()
 end
 
 ---@private
----@param firstCellContent Renderable[]|Renderable
+---@param firstCellContent Renderable[]|Renderable?
 ---@param data table<string|integer, integer>
 ---@return Widget[]
 function MedalsTable:_row(firstCellContent, data)

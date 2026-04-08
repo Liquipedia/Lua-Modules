@@ -1,3 +1,10 @@
+---
+-- @Liquipedia
+-- page=Module:Widget/TeamPageStatistics
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')

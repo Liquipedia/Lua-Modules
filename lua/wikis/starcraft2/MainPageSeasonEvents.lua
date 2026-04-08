@@ -1,3 +1,10 @@
+---
+-- @Liquipedia
+-- page=Module:MainPageSeasonEvents
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
@@ -163,7 +170,7 @@ function MainPageSeasonEvents._countdown(tournamentData, args)
 
 	return {
 		HtmlWidgets.Br{},
-		Countdown.create{date = matches[1].date .. Timezone.getTimezoneString{timezone = 'UTC'}, rawcountdown = 'true'},
+		Countdown.create{date = matches[1].date .. Timezone.getTimezoneString{timezone = 'UTC'}, rawcountdown = true},
 	}
 end
 

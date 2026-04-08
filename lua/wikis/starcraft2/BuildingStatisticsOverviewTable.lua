@@ -1,3 +1,10 @@
+---
+-- @Liquipedia
+-- page=Module:BuildingStatisticsOverviewTable
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
@@ -23,7 +30,7 @@ local PROTOSS = 'p'
 local BuildingStats = {}
 
 ---@param frame Frame
----@return Widget
+---@return Widget|string?
 function BuildingStats.wrapper(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -41,6 +48,7 @@ end
 ---@return Widget?
 function BuildingStats._build(args)
 	local game = Game.name{game = args.game or 'Legacy of the Void'}
+	assert(game, 'Invalid or missing game input')
 	local faction = args.faction
 
 	local buildings = BuildingStats._queryBuildings(game, faction)

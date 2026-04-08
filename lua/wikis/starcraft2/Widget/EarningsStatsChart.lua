@@ -1,7 +1,15 @@
+---
+-- @Liquipedia
+-- page=Module:Widget/EarningsStatsChart
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
@@ -69,7 +77,8 @@ function EarningsStatsChart:_parse()
 		end)
 	end
 
-	local years = Array.filter(Array.range(Info.startYear, tonumber(os.date('%Y'))), function(year)
+	local currentYear = tonumber(DateExt.formatTimestamp('Y', DateExt.getCurrentTimestamp())) --[[@as integer]]
+	local years = Array.filter(Array.range(Info.startYear, currentYear), function(year)
 		return hasAnyPositiveValue(year - 1) or hasAnyPositiveValue(year) or hasAnyPositiveValue(year + 1)
 	end)
 
