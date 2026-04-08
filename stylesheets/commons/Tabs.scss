@@ -233,6 +233,50 @@ html.client-nojs .tabs-content > div:not( .active ) {
 .tabs-static {
 	overflow: visible;
 
+	.tabs-nav-wrapper {
+		margin: 0.25rem 0;
+	}
+
+	.tabs-nav-wrapper .nav-tabs {
+		gap: 0.25rem;
+	}
+
+	// Inactive tab items differ from dynamic: bordered and use default link color
+	.tabs-nav-wrapper .nav-tabs li:not( .active ) {
+		border: 1px solid !important;
+		border-bottom: unset !important;
+		border-radius: $tabs-border-radius $tabs-border-radius 0 0;
+
+		.theme--light & {
+			border-color: $tabs-border-light !important;
+		}
+
+		.theme--dark & {
+			border-color: $tabs-border-dark !important;
+		}
+
+		&:hover {
+			border-color: transparent !important;
+		}
+
+		a {
+			font-weight: normal;
+			color: var( --clr-primary ) !important;
+
+			&:hover {
+				color: var( --clr-primary ) !important;
+
+				.theme--light & {
+					background-color: $tabs-bg-hover-light !important;
+				}
+
+				.theme--dark & {
+					background-color: $tabs-bg-hover-dark !important;
+				}
+			}
+		}
+	}
+
 	// Desktop: show tab bar, hide dropdown
 	.tabs-static-dropdown {
 		display: none;
@@ -280,19 +324,19 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		.theme--light & {
 			border-color: var( --clr-secondary-90 );
 			background-color: var( --clr-background );
-			color: var( --clr-secondary-16 );
+			color: var( --clr-secondary-16 ) !important;
 		}
 
 		.theme--dark & {
 			border-color: var( --clr-secondary-25 );
 			background-color: var( --clr-background );
-			color: var( --clr-secondary-100 );
+			color: var( --clr-secondary-100 ) !important;
 		}
 
 		.tabs-static-dropdown-label {
 			flex: 1;
 			font-size: 0.875rem;
-			font-weight: bold;
+			font-weight: normal;
 			line-height: 1.25rem;
 			text-align: left;
 		}
