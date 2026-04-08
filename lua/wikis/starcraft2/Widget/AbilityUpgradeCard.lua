@@ -19,8 +19,8 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
 
----@class AbilityUpgradeCard: Widget
----@operator call(table): AbilityUpgradeCard
+---@class SC2AbilityUpgradeCard: Widget
+---@operator call(table): SC2AbilityUpgradeCard
 local AbilityUpgradeCard = Class.new(Widget)
 AbilityUpgradeCard.defaultProps = {
 	name = 'missing name',
@@ -31,6 +31,8 @@ function AbilityUpgradeCard:render()
 	self.cardType = assert(self.props.cardType,'no "|cardType=" specified')
 
 	self.faction = Faction.read(self.props.faction or self.props.race)
+	self.props.caster1 = self.props.caster1 or self.props.caster
+	self.props.caster1dn = self.props.caster1dn or self.props.casterdn
 
 	if self.cardType == 'Upgrade' and not Logic.readBool(self.props['no-cat']) then
 		mw.ext.TeamLiquidIntegration.add_category('Upgrades')
@@ -131,8 +133,8 @@ function AbilityUpgradeCard:_renderData()
 		children = WidgetUtil.collect(
 			makeCell(
 				'Caster:',
-				Array.map({self.props.caster, self.props.caster2}, function(caster)
-					return Link{link = caster}
+				Array.mapIndexes(function(casterIndex)
+					return Link{link = self.props['caster' .. casterIndex], children = self.props['caster' .. casterIndex .. 'dn']}
 				end)
 			),
 			makeCell(MINERALS, self.props.min),
@@ -140,7 +142,7 @@ function AbilityUpgradeCard:_renderData()
 			makeCell(Supply[faction], self.props.supply),
 			self.cardType == 'Upgrade' and makeCell(Buildtime[faction], self.props.duration) or nil,
 			makeCell('Solarite:', self.props.solarite),
-			makeCell(Image{imageLght = 'EnergyIcon.gif', link = 'Energy'}, self.props.energy),
+			makeCell(Image{imageLight = 'EnergyIcon.gif', link = 'Energy'}, self.props.energy),
 			makeCell(Link{link = 'Range'}, self.props.range),
 			makeCell(Link{link = 'Cooldown'}, self.props.cooldown),
 			self.cardType == 'Ability'
@@ -152,8 +154,8 @@ function AbilityUpgradeCard:_renderData()
 				Link{link = 'Hotkeys per Race', children = 'Hotkey'},
 				self.props.hotkey and Hotkey.hotkey{hotkey = self.props.hotkey} or nil
 			),
-			makeCell(Image{imageLght = 'Minimap research zerg.png'}, self.props.zerg),
-			makeCell(Image{imageLght = 'Minimap research protoss.png'}, self.props.protoss),
+			makeCell(Image{imageLight = 'Minimap research zerg.png', link = ''}, self.props.zerg),
+			makeCell(Image{imageLight = 'Minimap research protoss.png', link = ''}, self.props.protoss),
 			makeCell(
 				'Researched from:',
 				self.props['researched_from']
