@@ -92,16 +92,19 @@ end
 ---@param flipped boolean
 ---@return Widget
 function AoEMatchSummaryGameRow:_createParticipant(player, flipped)
+	local children = {
+		self:_createFactionIcon(player.civ),
+		PlayerDisplay.InlinePlayer{player = player, flip = flipped},
+	}
 	return HtmlWidgets.Div{
 		css = {
-			display = 'flex',
-			['align-self'] = flipped and 'end' or 'start',
-			['flex-direction'] = flipped and 'row' or 'row-reverse',
+			display = 'grid',
+			['grid-template-columns'] = 'subgrid',
+			['grid-column'] = '1 / -1',
+			['align-items'] = 'center',
+			['justify-items'] = flipped and 'end' or 'start',
 		},
-		children = {
-			PlayerDisplay.BlockPlayer{player = player, flip = flipped},
-			self:_createFactionIcon(player.civ),
-		},
+		children = flipped and Array.reverse(children) or children,
 	}
 end
 
@@ -109,11 +112,17 @@ end
 ---@param opponentId integer
 ---@return Widget
 function AoEMatchSummaryGameRow:_createOpponentDisplay(opponentId)
+	local flipped = opponentId == 1
+	local gridTemplate = {'1fr', 'min-content'}
 	return HtmlWidgets.Div{
 		css = {
-			display = 'flex',
+			display = 'grid',
 			width = '100%',
-			['flex-direction'] = 'column',
+			['align-self'] = flipped and 'end' or 'start',
+			['grid-template-columns'] = table.concat(
+				flipped and gridTemplate or Array.reverse(gridTemplate),
+				' '
+			),
 			overflow = 'hidden',
 		},
 		children = Array.map(
@@ -122,7 +131,7 @@ function AoEMatchSummaryGameRow:_createOpponentDisplay(opponentId)
 				Operator.property('index')
 			),
 			function (player)
-				return self:_createParticipant(player, opponentId == 1)
+				return self:_createParticipant(player, flipped)
 			end
 		)
 	}
