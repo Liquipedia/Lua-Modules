@@ -1,3 +1,10 @@
+---
+-- @Liquipedia
+-- page=Module:PlayerAchievementsTableWrapper
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Lua = require('Module:Lua')
 
 local Json = Lua.import('Module:Json')
@@ -12,7 +19,7 @@ local BroadcasterTable = Lua.import('Module:BroadcastTalentTable')
 local PlayerAchievementsTableWrapper = {}
 
 ---@param frame Frame
----@return Widget
+---@return Widget|string?
 function PlayerAchievementsTableWrapper.run(frame)
 	local awards = Json.parseIfTable(Variables.varDefault('awardAchievements'))
 

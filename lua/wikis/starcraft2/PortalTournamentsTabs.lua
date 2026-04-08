@@ -1,4 +1,11 @@
 
+---
+-- @Liquipedia
+-- page=Module:PortalTournamentsTabs
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
@@ -14,7 +21,7 @@ local PAST = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() - DateExt.daysToSe
 
 local PortalTournamentsTabs = {}
 
----@return Widget
+---@return Widget?
 function PortalTournamentsTabs.run()
 	local tabArgs = {
 		name1 = 'Introduction',
