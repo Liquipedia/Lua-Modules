@@ -19,6 +19,7 @@ local Logic = Lua.import('Module:Logic')
 local Links = Lua.import('Module:Links')
 local MatchTable = Lua.import('Module:MatchTable')
 local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
@@ -317,10 +318,7 @@ end
 
 ---@return Widget
 function BaseMatchPage:render()
-	local displayTitle = self:makeDisplayTitle()
-	if String.isNotEmpty(displayTitle) then
-		mw.getCurrentFrame():callParserFunction('DISPLAYTITLE', displayTitle, 'noreplace')
-	end
+	Page.setDisplayTitle{title = self:makeDisplayTitle(), noReplace = true}
 
 	local tournamentContext = self:getMatchContext()
 	return Div{
