@@ -146,6 +146,7 @@ function AoEMatchSummaryGameRow:getGameOpponentViewCss(opponentIndex)
 	}
 end
 
+---@protected
 ---@param opponentIndex integer
 ---@return Widget|Widget[]
 function AoEMatchSummaryGameRow:createGameOpponentView(opponentIndex)
@@ -158,6 +159,7 @@ function AoEMatchSummaryGameRow:createGameOpponentView(opponentIndex)
 	return self:_createOpponentDisplay(opponentIndex)
 end
 
+---@protected
 ---@return Renderable?
 function AoEMatchSummaryGameRow:createGameOverview()
 	local game = self.props.game
