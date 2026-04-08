@@ -22,7 +22,7 @@ function BirthCategories.get()
 	local row = HtmlWidgets.Div{
 		classes = {'hlist'},
 		css = {['margin-left'] = '0'},
-		children = HtmlWidgets.Ul{children = Array.map(Array.range((year-4), (year+4)), function(currentYear)
+		children = HtmlWidgets.Ul{children = Array.map(Array.range(year - 4, year + 4), function(currentYear)
 			return HtmlWidgets.Li{
 				children = Link{link = ':Category:' .. currentYear .. ' births', children = currentYear}
 			}
