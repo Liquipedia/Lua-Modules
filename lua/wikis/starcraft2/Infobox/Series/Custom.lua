@@ -14,7 +14,7 @@ local Game = Lua.import('Module:Game')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
-local SeriesTotalPrize = Lua.import('Module:SeriesTotalPrize')
+local SeriesTotalPrize = Lua.import('Module:Infobox/Extension/SeriesTotalPrize')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Tier = Lua.import('Module:Tier/Custom')
@@ -85,7 +85,7 @@ function CustomSeries:_displaySeriesPrizepools()
 	local seriesTotalPrizeInput = Json.parseIfString(args.prizepooltot or '{}')
 	local series = seriesTotalPrizeInput.series or args.series or self.pagename
 
-	return SeriesTotalPrize._get{
+	return SeriesTotalPrize.run{
 		series = series,
 		limit = seriesTotalPrizeInput.limit or args.limit,
 		offset = seriesTotalPrizeInput.offset or args.offset,
