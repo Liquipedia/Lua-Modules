@@ -12,8 +12,9 @@ local Array = Lua.import('Module:Array')
 local Currency = Lua.import('Module:Currency')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
+local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
-local Tier = require('Module:Tier/Custom')
+local Tier = Lua.import('Module:Tier/Custom')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -31,15 +32,12 @@ function SeriesTotalPrize.run(frame)
 	local args = Arguments.getArgs(frame)
 
 	local series = Array.parseCommaSeparatedString(args.series or mw.title.getCurrentTitle().prefixedText, '||')
-	series = Array.map(series, mw.ext.TeamLiquidIntegration.resolve_redirect)
+	series = Array.map(series, Page.pageifyLink)
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionUtil.anyOf(ColumnName('series'), series),
+		ConditionUtil.anyOf(ColumnName('seriespage'), series),
 		ConditionNode(ColumnName('prizepool'), Comparator.gt, 0),
-		ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('status'), Comparator.eq, ''),
-			ConditionNode(ColumnName('status'), Comparator.eq, 'finished'),
-		}
+		ConditionUtil.anyOf(ColumnName('status'), {'finished', ''}),
 	}
 
 	local parseToFormattedNumber = function(input)
