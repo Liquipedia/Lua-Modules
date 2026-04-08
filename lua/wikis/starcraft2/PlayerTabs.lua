@@ -1,3 +1,10 @@
+---
+-- @Liquipedia
+-- page=Module:PlayerTabs
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
@@ -21,7 +28,7 @@ local PAST = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() - DateExt.daysToSe
 local PlayerTabs = {}
 
 ---@param frame Frame
----@return Widget
+---@return Widget?
 function PlayerTabs.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -78,7 +85,7 @@ end
 ---@private
 ---@param player string
 ---@param currentTab integer?
----@return Widget
+---@return Widget?
 function PlayerTabs._display(player, currentTab)
 	---@param args {form: string, template: string, display: string, queryArgs: table}
 	---@return string

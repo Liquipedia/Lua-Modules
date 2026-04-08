@@ -1,3 +1,10 @@
+---
+-- @Liquipedia
+-- page=Module:TeamTabs
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
@@ -25,7 +32,7 @@ local NOW = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() + DateExt.daysToSec
 local TeamTabs = {}
 
 ---@param frame Frame
----@return Widget
+---@return Widget?
 function TeamTabs.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -44,9 +51,8 @@ function TeamTabs.run(frame)
 		subpageName = subpageName:gsub('^/currentSubTeam', '')
 	end
 	subpageName = subpageName:gsub('.*/([^/]+)$', '%1')
-	subpageName = Logic.nilIfEmpty(subpageName)
 
-	TeamTabs._setDisplayTitle(args, currentSubTeam or mainTeam, subpageName)
+	TeamTabs._setDisplayTitle(args, currentSubTeam or mainTeam, Logic.nilIfEmpty(subpageName))
 
 	return TeamTabs._display(
 		mainTeam,
@@ -75,7 +81,7 @@ end
 ---@private
 ---@param args table
 ---@param team string
----@param subpageName string
+---@param subpageName string?
 function TeamTabs._setDisplayTitle(args, team, subpageName)
 	---@param title string
 	local setDisplayTitle = function(title)
@@ -108,7 +114,7 @@ end
 ---@param currentSubTeam string?
 ---@param currentSubTab integer?
 ---@param displayName string?
----@return Widget
+---@return Widget?
 function TeamTabs._display(mainTeam, subTeams, showPlayerSubTabs, currentSubTeam, currentSubTab, displayName)
 	if Logic.isEmpty(subTeams) then
 		return TeamTabs._getTabsForSubTeam(mainTeam, showPlayerSubTabs, currentSubTab)
@@ -150,7 +156,7 @@ end
 ---@param team string
 ---@param showPlayerSubTabs boolean
 ---@param currentTab integer?
----@return Widget
+---@return Widget?
 function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
 	---@param args {form: string, template: string, display: string, queryArgs: table}
 	---@return string
