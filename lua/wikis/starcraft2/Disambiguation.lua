@@ -13,8 +13,9 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local Flags = Lua.import('Module:Flags')
 local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local String = Lua.import('Module:StringUtils')
-local Team = Lua.import('Module:Team')
 
 local Disambiguation = {}
 
@@ -63,7 +64,13 @@ function Disambiguation.player(frame)
 		else
 			display = display .. 'working'
 		end
-		display = display .. ' for ' .. Team.team(nil, data.teamtemplate)
+		display = display .. ' for ' .. tostring(OpponentDisplay.InlineOpponent{
+			opponent = {
+				type = Opponent.team,
+				template = data.teamtemplate,
+				extradata = {},
+			}
+		})
 	end
 
 	display = display .. '.'
