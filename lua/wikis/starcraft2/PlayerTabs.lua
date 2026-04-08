@@ -40,7 +40,7 @@ function PlayerTabs.run(frame)
 	local subpageName = string.gsub(pageName, '.*/([^/]+)$', '%1')
 	local player = string.gsub(pageName, '(.*)/[^/]-$', '%1')
 
-	PlayerTabs._setDisplayTitle(args, player, subpageName)
+	Page.setDisplayTitle{title = PlayerTabs._getDisplayTitle(args, player, subpageName)}
 
 	return PlayerTabs._display(player, tonumber(args.currentTab))
 end
@@ -49,10 +49,10 @@ end
 ---@param args table
 ---@param player string
 ---@param subpageName string
-function PlayerTabs._setDisplayTitle(args, player, subpageName)
+---@return string?
+function PlayerTabs._getDisplayTitle(args, player, subpageName)
 	if Logic.isNotEmpty(args.title) then
-		Page.setDisplayTitle(args.title)
-		return
+		return args.title
 	end
 
 	if player == subpageName then
@@ -74,7 +74,7 @@ function PlayerTabs._setDisplayTitle(args, player, subpageName)
 		title = title .. ': ' .. subpageName
 	end
 
-	Page.setDisplayTitle(title)
+	return title
 end
 
 ---@private

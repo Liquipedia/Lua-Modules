@@ -52,7 +52,9 @@ function TeamTabs.run(frame)
 	end
 	subpageName = subpageName:gsub('.*/([^/]+)$', '%1')
 
-	TeamTabs._setDisplayTitle(args, currentSubTeam or mainTeam, Logic.nilIfEmpty(subpageName))
+	Page.setDisplayTitle{
+		title = TeamTabs._getDisplayTitle(args, currentSubTeam or mainTeam, Logic.nilIfEmpty(subpageName))
+	}
 
 	return TeamTabs._display(
 		mainTeam,
@@ -82,10 +84,10 @@ end
 ---@param args table
 ---@param team string
 ---@param subpageName string?
-function TeamTabs._setDisplayTitle(args, team, subpageName)
+---@return string?
+function TeamTabs._getDisplayTitle(args, team, subpageName)
 	if Logic.isNotEmpty(args.title) then
-		Page.setDisplayTitle(args.title)
-		return
+		return args.title
 	end
 
 	---@return string
@@ -99,7 +101,7 @@ function TeamTabs._setDisplayTitle(args, team, subpageName)
 
 	local title = (args.displayName or queryDisplayName()) .. (subpageName and (': ' .. subpageName) or '')
 
-	Page.setDisplayTitle(title)
+	return title
 end
 
 ---@private
