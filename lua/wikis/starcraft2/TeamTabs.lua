@@ -165,8 +165,8 @@ function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
 			children = args.display,
 			link = tostring(mw.uri.fullUrl(
 				'Special:RunQuery/' .. args.form,
-				mw.uri.buildQueryString(queryArgs) .. '&_run'
-			))
+				queryArgs
+			)) .. '&_run'
 		}
 	end
 
