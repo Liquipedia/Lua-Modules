@@ -22,6 +22,8 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+
 local NextMatch = {}
 
 ---@param args table
@@ -73,9 +75,10 @@ function NextMatch.run(args)
 	countdownArgs.rawcountdown = true
 
 	if Logic.readBool(args.matchWrapper) then
-		return mw.html.create('span')
-			:addClass('match-countdown')
-			:wikitext(Countdown.create(countdownArgs))
+		return HtmlWidgets.Span{
+			classes = {'match-countdown'},
+			children = Countdown.create(countdownArgs)
+		}
 	end
 
 	return Countdown.create(countdownArgs)
