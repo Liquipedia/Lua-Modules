@@ -76,9 +76,9 @@ function NextMatch.run(args)
 		query = 'date, stream, extradata',
 		order = 'date asc',
 		limit = 1,
-	})[1] or {}
+	})[1]
 
-	if not match.date then
+	if not match then
 		return Logic.nilIfEmpty(args.default) or ''
 	end
 
