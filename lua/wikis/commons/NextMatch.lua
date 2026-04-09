@@ -55,7 +55,7 @@ function NextMatch.run(args)
 	)
 
 	if not matchGroupsSpec then
-		return ''
+		return Logic.nilIfEmpty(args.default) or ''
 	end
 
 	local now = DateExt.getCurrentTimestamp()
@@ -78,7 +78,9 @@ function NextMatch.run(args)
 		limit = 1,
 	})[1] or {}
 
-	if not match.date then return args.default or '' end
+	if not match.date then
+		return Logic.nilIfEmpty(args.default) or ''
+	end
 
 	local countdownArgs = {}
 	if Logic.readBool(args.showStreams) then
