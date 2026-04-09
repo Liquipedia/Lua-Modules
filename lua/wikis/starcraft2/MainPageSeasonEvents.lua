@@ -14,6 +14,7 @@ local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local Page = Lua.import('Module:Page')
 local Timezone = Lua.import('Module:Timezone')
 
 local Condition = Lua.import('Module:Condition')
@@ -150,7 +151,7 @@ end
 ---@return Widget[]?
 function MainPageSeasonEvents._countdown(tournamentData, args)
 	local pages = Array.mapIndexes(function(index)
-		return Logic.nilIfEmpty((args['additional_page' .. index] or ''):gsub(' ', '_'))
+		return Page.pageifyLink(args['additional_page' .. index])
 	end)
 	table.insert(pages, tournamentData.pageName)
 
@@ -163,7 +164,7 @@ function MainPageSeasonEvents._countdown(tournamentData, args)
 
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = tostring(conditions),
-		query = 'date',
+		query = 'date, extradata',
 		order = 'date asc',
 		limit = 1,
 	})
@@ -172,9 +173,11 @@ function MainPageSeasonEvents._countdown(tournamentData, args)
 		return
 	end
 
+	local extradata = matches[1].extradata
+
 	return {
 		HtmlWidgets.Br{},
-		Countdown.create{date = matches[1].date .. Timezone.getTimezoneString{timezone = 'UTC'}, rawcountdown = true},
+		Countdown.create({date = DateExt.toCountdownArg(extradata.timestamp, extradata.timezoneid), rawcountdown = true}),
 	}
 end
 
