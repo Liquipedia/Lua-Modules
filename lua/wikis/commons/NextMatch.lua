@@ -7,8 +7,8 @@
 
 local Lua = require('Module:Lua')
 
-local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Info = Lua.import('Module:Info', {loadData = true})
@@ -25,11 +25,9 @@ local ColumnName = Condition.ColumnName
 
 local NextMatch = {}
 
----@param frame Frame
+---@param args table
 ---@return string|Html
-function NextMatch.run(frame)
-	local args = Arguments.getArgs(frame)
-
+function NextMatch.run(args)
 	if not args[1] then return args.default or '' end
 
 	local pageConditions = ConditionTree(BooleanOperator.any)
@@ -94,4 +92,4 @@ function NextMatch.run(frame)
 	return Countdown.create(countdownArgs)
 end
 
-return NextMatch
+return Class.export(NextMatch, {exports = {'run'}})
