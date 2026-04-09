@@ -309,8 +309,13 @@
 }
 
 .wiki-valorant {
-	--valorant-def-score-color: #46b09c;
-	--valorant-atk-score-color: #c04845;
+	--valorant-def-score-color: #01654c;
+	--valorant-atk-score-color: #b20110;
+
+	.theme--dark & {
+		--valorant-def-score-color: #46b09c;
+		--valorant-atk-score-color: #c04845;
+	}
 
 	.brkts-valorant-score-color-def {
 		color: var( --valorant-def-score-color );
