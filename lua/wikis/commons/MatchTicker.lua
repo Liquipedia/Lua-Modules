@@ -565,7 +565,7 @@ MatchTicker.fetchTournament = FnUtil.memoize(function(tournamentPage)
 	return Tournament.getTournament(tournamentPage)
 end)
 
----@param header MatchTickerHeader?
+---@param header Widget?
 ---@return Html
 function MatchTicker:create(header)
 	if not self.matches and not self.config.showInfoForEmptyResults then
@@ -579,7 +579,7 @@ function MatchTicker:create(header)
 	end
 
 	if header then
-		wrapper:node(header:create())
+		wrapper:node(header)
 	end
 
 	if not self.matches then

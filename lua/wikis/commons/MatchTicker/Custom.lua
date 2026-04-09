@@ -8,10 +8,11 @@
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
-local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
 local MatchTicker = Lua.import('Module:MatchTicker')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 local CustomMatchTicker = {}
 
@@ -65,13 +66,20 @@ function CustomMatchTicker.recent(args, matches)
 	matches = matches or {}
 
 	--adjusting args
-	args.infoboxClass = Logic.nilOr(Logic.readBoolOrNil(args.infoboxClass), true)
+	args.wrapperClasses = {'new-match-style'}
 	args.recent = true
+	args.newStyle = true
 	args.limit = args.limit or args.recentLimit or 5
 
-	return MatchTicker(args):query(matches.recent):create(
-		MatchTicker.DisplayComponents.Header('Recent Matches')
-	)
+	return HtmlWidgets.Fragment{
+		children = {
+			HtmlWidgets.Div{
+				classes = {'infobox-header'},
+				children = 'Recent Matches'
+			},
+			MatchTicker(args):query(matches.recent):create()
+		}
+	}
 end
 
 ---@deprecated Use CustomMatchTicker.recent() instead. This function only displays recent matches.
