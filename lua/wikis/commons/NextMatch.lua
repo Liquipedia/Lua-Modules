@@ -32,12 +32,14 @@ function NextMatch.run(args)
 	if not args[1] then return args.default or '' end
 
 	local matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(
-		Table.map(args, function (key, value)
-			if not MathUtil.isInteger(key) then
-				return nil, nil
+		Table.map(
+			Table.filterByKey(args, function (key, value)
+				return MathUtil.isInteger(key)
+			end),
+			function (key, value)
+				return 'tournament' .. key, value
 			end
-			return 'tournament' .. key, value
-		end)
+		)
 	)
 
 	if not matchGroupsSpec then
