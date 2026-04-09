@@ -136,7 +136,7 @@ end
 local MatchTicker = Class.new(function(self, args) self:init(args) end)
 
 ---@param args table?
----@return table
+---@return self
 function MatchTicker:init(args)
 	args = args or {}
 	self.args = args
@@ -229,7 +229,7 @@ end
 
 ---queries the matches and filters them for unwanted ones
 ---@param matches table?
----@return MatchTicker
+---@return self
 function MatchTicker:query(matches)
 	if not matches then
 		matches = {}
