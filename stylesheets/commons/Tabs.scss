@@ -115,12 +115,14 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				height: 100%;
 				position: relative;
 
-				// Icons within tabs
-				i,
-				.fad,
-				.fas,
-				.far {
-					font-size: 1rem;
+				.tabs-static-tab-icon {
+					width: 1rem;
+					height: 1rem;
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					flex-shrink: 0;
+					overflow: hidden;
 				}
 
 				// Icon-only support
@@ -427,8 +429,18 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			cursor: pointer;
 
 			a {
-				display: block;
+				display: flex;
+				align-items: center;
+				gap: 0.25rem;
 				width: 100%;
+
+				.tabs-static-tab-icon {
+					width: 1rem;
+					height: 1rem;
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+				}
 
 				.theme--light & {
 					color: var( --clr-secondary-39 ) !important;

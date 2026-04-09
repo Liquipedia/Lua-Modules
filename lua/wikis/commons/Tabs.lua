@@ -50,10 +50,16 @@ function Tabs.static(args)
 		return Array.map(tabArgs, function(tab)
 			--if tab.name is unset tab.link is set as per `Tabs._readArguments`
 			local name = tab.name or Tabs._getDisplayNameFromLink(tab.link --[[@as string]])
-			local text = tab.link and Page.makeInternalLink({}, name, tab.link) or tab.name
+			local child
+			if tab.icon then
+				local display = tostring(Icon{iconName = tab.icon, additionalClasses = {'tabs-static-tab-icon'}}) .. tostring(HtmlWidgets.Span{children = {name}})
+				child = tab.link and Page.makeInternalLink({}, display, tab.link) or display
+			else
+				child = tab.link and Page.makeInternalLink({}, name, tab.link) or tab.name
+			end
 			return HtmlWidgets.Li{
 				classes = {tab.this and 'active' or nil},
-				children = text
+				children = child
 			}
 		end)
 	end
