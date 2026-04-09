@@ -45,7 +45,7 @@ function NextMatch.run(args)
 	end
 
 	local now = DateExt.getCurrentTimestamp()
-	local yesterday = now - 24 * 3600
+	local yesterday = now - DateExt.daysToSeconds(1)
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('finished'), Comparator.eq, 0),
