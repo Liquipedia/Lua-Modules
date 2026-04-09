@@ -7,13 +7,13 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
-local Namespace = Lua.import('Module:Namespace')
+local MathUtil = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
+local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -27,21 +27,21 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local NextMatch = {}
 
 ---@param args table
----@return string|Html
+---@return string|Widget
 function NextMatch.run(args)
 	if not args[1] then return args.default or '' end
 
-	local pageConditions = ConditionTree(BooleanOperator.any)
-	for _, page in ipairs(args) do
-		local title = mw.title.new(page)
-		assert(title, 'Invalid pagename "' .. page .. '"')
-		local namespace, basePage, stage = Logic.nilIfEmpty(title.nsText), title.text, Logic.nilIfEmpty(title.fragment)
-		basePage = basePage:gsub(' ', '_')
-		pageConditions:add(ConditionTree(BooleanOperator.all):add(Array.append(
-			{ConditionNode(ColumnName('pagename'), Comparator.eq, basePage)},
-			namespace and ConditionNode(ColumnName('namespace'), Comparator.eq, Namespace.idFromName(namespace)) or nil,
-			stage and ConditionNode(ColumnName('sectionheader', 'match2bracketdata'), Comparator.eq, stage) or nil
-		)))
+	local matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(
+		Table.map(args, function (key, value)
+			if not MathUtil.isInteger(key) then
+				return nil, nil
+			end
+			return 'tournament' .. key, value
+		end)
+	)
+
+	if not matchGroupsSpec then
+		return ''
 	end
 
 	local now = DateExt.getCurrentTimestamp()
@@ -50,7 +50,7 @@ function NextMatch.run(args)
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('finished'), Comparator.eq, 0),
 		ConditionNode(ColumnName('date'), Comparator.ge, yesterday),
-		pageConditions
+		TournamentStructure.getMatch2Filter(matchGroupsSpec)
 	}
 
 	if not Logic.readBool(args.notExact) then
