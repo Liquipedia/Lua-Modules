@@ -12,6 +12,7 @@ local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
@@ -33,10 +34,13 @@ function NextMatch.run(args)
 
 	local matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(
 		Table.map(
-			Table.filterByKey(args, function (key, value)
-				return MathUtil.isInteger(key)
+			Table.filterByKey(args, function (key)
+				return MathUtil.isInteger(key) or String.startsWith(key, 'tournament')
 			end),
 			function (key, value)
+				if String.startsWith(key, 'tournament') then
+					return key, value
+				end
 				return 'tournament' .. key, value
 			end
 		)
