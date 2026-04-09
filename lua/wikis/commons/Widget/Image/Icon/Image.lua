@@ -18,7 +18,7 @@ local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 ---@field imageDark string?
 ---@field link string
 ---@field alt string?
----@field class string?
+---@field classes string[]?
 ---@field border 'border'? # only available if `format: 'frameless'?`
 ---@field format 'frameless'|'frame'|'thumb'?
 ---@field size string? # '{width}px'|'x{height}px'|'{width}x{height}px'
@@ -26,6 +26,7 @@ local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 ---@field verticalAlignment 'baseline'|'sub'|'super'|'top'|'text-top'|'middle'|'bottom'|'text-bottom'?
 ---@field caption string?
 ---@field alignment string? # legacy for during conversion
+---@field class string? # legacy for during conversion
 
 ---@class IconImageWidget: IconWidget
 ---@operator call(IconImageWidgetParameters): IconImageWidget
@@ -37,19 +38,22 @@ Icon.defaultProps = {
 	verticalAlignment = 'middle', -- make the implicit mw default explicit
 }
 
----@return string?
+---@return string|string[]?
 function Icon:render()
 	-- legacy, only for conversion outside of git ...
 	self.props.horizontalAlignment = self.props.horizontalAlignment or self.props.alignment
+	self.props.classes = self.props.classes or {self.props.alignment}
 
 	local imageLight = self.props.imageLight
 	local imageDark = self.props.imageDark
 	if Logic.isEmpty(imageLight) or Logic.isEmpty(imageDark) or imageLight == imageDark then
-		return self:_make(Logic.nilIfEmpty(imageLight) or Logic.nilIfEmpty(imageDark))
+		return self:_make(Logic.emptyOr(imageLight, imageDark))
 	end
 
-	return self:_make(imageLight, 'show-when-light-mode')
-		.. self:_make(imageDark, 'show-when-dark-mode')
+	return {
+		self:_make(imageLight, 'show-when-light-mode'),
+		self:_make(imageDark, 'show-when-dark-mode'),
+	}
 end
 
 ---@param image string?
@@ -60,7 +64,7 @@ function Icon:_make(image, themeClass)
 	if not image then
 		return
 	end
-	local class = table.concat(Array.append({Logic.nilIfEmpty(self.props.class)}, themeClass), ' ')
+	local classes = table.concat(Array.append({Logic.nilIfEmpty(self.props.classes)}, themeClass), ' ')
 
 	local border = Logic.nilIfEmpty(self.props.border)
 	assert((self.props.format == 'frameless' or not self.props.format) or not border,
@@ -68,14 +72,14 @@ function Icon:_make(image, themeClass)
 
 	local parts = Array.extend(
 		'File:' .. image,
-		Logic.nilIfEmpty(self.props.border),
+		border,
 		Logic.nilIfEmpty(self.props.format),
 		Logic.isNumeric(self.props.size) and (self.props.size .. 'px') or Logic.nilIfEmpty(self.props.size),
 		Logic.nilIfEmpty(self.props.horizontalAlignment),
 		self.props.verticalAlignment ~= 'middle' and self.props.verticalAlignment or nil,
 		'link=' .. self.props.link,
 		Logic.isNotEmpty(self.props.alt) and ('alt=' .. self.props.alt) or nil,
-		Logic.isNotEmpty(class) and ('class=' .. class) or nil,
+		Logic.isNotEmpty(classes) and ('class=' .. classes) or nil,
 		Logic.nilIfEmpty(self.props.caption)
 	)
 
