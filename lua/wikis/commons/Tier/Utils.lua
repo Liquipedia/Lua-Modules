@@ -20,6 +20,14 @@ local TierData = Lua.import('Module:Tier/Data', {loadData = true})
 local NON_BREAKING_SPACE = '&nbsp;'
 local DEFAULT_TIER_TYPE = 'General'
 
+---@class TierData
+---@field value string?
+---@field sort string
+---@field name string
+---@field short string
+---@field link string?
+---@field category string?
+
 ---@class TierUtils
 local Tier = {}
 
