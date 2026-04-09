@@ -36,6 +36,9 @@ function NextMatch.run(args)
 	---@param key string
 	---@return boolean
 	local isMatchGroupsSpecArg = FnUtil.memoize(function (key)
+		if type(key) ~= 'string' then
+			return false
+		end
 		return String.startsWith(key, 'tournament') or String.startsWith(key, 'matchGroupId')
 	end)
 
