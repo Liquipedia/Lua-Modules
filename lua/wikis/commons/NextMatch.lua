@@ -31,8 +31,6 @@ local NextMatch = {}
 ---@param args table
 ---@return string|Widget
 function NextMatch.run(args)
-	if not args[1] then return args.default or '' end
-
 	---@param key string
 	---@return boolean
 	local isMatchGroupsSpecArg = FnUtil.memoize(function (key)
