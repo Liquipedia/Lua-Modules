@@ -260,11 +260,26 @@ html.client-nojs .tabs-content > div:not( .active ) {
 
 		a {
 			font-weight: normal;
-			color: var( --clr-primary ) !important;
 
-			&:hover {
+			&:not( .new ) {
 				color: var( --clr-primary ) !important;
 
+				&:hover {
+					color: var( --clr-primary ) !important;
+				}
+			}
+
+			&.new {
+				.theme--light & {
+					color: var( --clr-semantic-negative-40 ) !important;
+				}
+
+				.theme--dark & {
+					color: var( --clr-semantic-negative-80 ) !important;
+				}
+			}
+
+			&:hover {
 				.theme--light & {
 					background-color: $tabs-bg-hover-light !important;
 				}
