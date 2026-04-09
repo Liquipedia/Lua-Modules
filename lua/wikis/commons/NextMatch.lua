@@ -1,3 +1,10 @@
+---
+-- @Liquipedia
+-- page=Module:NextMatch
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
