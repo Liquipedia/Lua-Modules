@@ -35,10 +35,10 @@ function NextMatch.run(args)
 	local matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(
 		Table.map(
 			Table.filterByKey(args, function (key)
-				return MathUtil.isInteger(key) or String.startsWith(key, 'tournament')
+				return MathUtil.isInteger(key) or String.startsWith(key, 'tournament') or String.startsWith(key, 'matchGroupId')
 			end),
 			function (key, value)
-				if String.startsWith(key, 'tournament') then
+				if String.startsWith(key, 'tournament') or String.startsWith(key, 'matchGroupId') then
 					return key, value
 				end
 				return 'tournament' .. key, value
