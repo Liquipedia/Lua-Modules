@@ -241,7 +241,6 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		gap: 0.25rem;
 	}
 
-	// Inactive tab items differ from dynamic: bordered and use default link color
 	.tabs-nav-wrapper .nav-tabs li:not( .active ) {
 		border: 1px solid !important;
 		border-bottom: unset !important;
@@ -277,12 +276,10 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		}
 	}
 
-	// Desktop: show tab bar, hide dropdown
 	.tabs-static-dropdown {
 		display: none;
 	}
 
-	// Mobile: swap tab bar for dropdown
 	@media ( max-width: 767px ) {
 		.tabs-nav-wrapper {
 			display: none;
@@ -293,7 +290,6 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		}
 	}
 
-	// No-JS fallback: always show the tab bar, hide the dropdown
 	html.client-nojs & {
 		.tabs-nav-wrapper {
 			display: flex;
@@ -304,12 +300,11 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		}
 	}
 
-	// Dropdown wrapper needs position: relative for absolute-positioned menu
 	.tabs-static-dropdown {
 		position: relative;
+		margin-bottom: 0.25rem;
 	}
 
-	// Dropdown toggle button
 	.tabs-static-dropdown-toggle {
 		display: flex;
 		align-items: center;
@@ -333,21 +328,60 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			color: var( --clr-secondary-100 ) !important;
 		}
 
+		> i:first-child {
+			display: inline-block;
+			width: 1.5rem;
+			height: 1.5rem;
+			flex-shrink: 0;
+			background-size: contain;
+			background-repeat: no-repeat;
+			background-position: center;
+
+			.theme--light & {
+				background-image: url( "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M17.625 7.75H4.375C4.16791 7.75 4 7.58209 4 7.375V6.375C4 6.16791 4.16791 6 4.375 6H17.625C17.8321 6 18 6.16791 18 6.375V7.375C18 7.58209 17.8321 7.75 17.625 7.75ZM19.625 12.75H6.375C6.16791 12.75 6 12.5821 6 12.375V11.375C6 11.1679 6.16791 11 6.375 11H19.625C19.8321 11 20 11.1679 20 11.375V12.375C20 12.5821 19.8321 12.75 19.625 12.75ZM17.625 17.75H4.375C4.16791 17.75 4 17.5821 4 17.375V16.375C4 16.1679 4.16791 16 4.375 16H17.625C17.8321 16 18 16.1679 18 16.375V17.375C18 17.5821 17.8321 17.75 17.625 17.75Z' fill='%23121212'/%3E%3C/svg%3E" );
+			}
+
+			.theme--dark & {
+				background-image: url( "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M17.625 7.75H4.375C4.16791 7.75 4 7.58209 4 7.375V6.375C4 6.16791 4.16791 6 4.375 6H17.625C17.8321 6 18 6.16791 18 6.375V7.375C18 7.58209 17.8321 7.75 17.625 7.75ZM19.625 12.75H6.375C6.16791 12.75 6 12.5821 6 12.375V11.375C6 11.1679 6.16791 11 6.375 11H19.625C19.8321 11 20 11.1679 20 11.375V12.375C20 12.5821 19.8321 12.75 19.625 12.75ZM17.625 17.75H4.375C4.16791 17.75 4 17.5821 4 17.375V16.375C4 16.1679 4.16791 16 4.375 16H17.625C17.8321 16 18 16.1679 18 16.375V17.375C18 17.5821 17.8321 17.75 17.625 17.75Z' fill='%23ffffff'/%3E%3C/svg%3E" );
+			}
+
+			&::before {
+				display: none;
+			}
+		}
+
 		.tabs-static-dropdown-label {
 			flex: 1;
 			font-size: 0.875rem;
 			font-weight: normal;
 			line-height: 1.25rem;
 			text-align: left;
+
+			i {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 1rem;
+				height: 1rem;
+				flex-shrink: 0;
+				margin: 0 0.5rem;
+
+				.theme--light & {
+					color: var( --clr-secondary-39 );
+				}
+
+				.theme--dark & {
+					color: var( --clr-secondary-90 );
+				}
+			}
 		}
 	}
 
-	// Dropdown panel
 	.tabs-static-dropdown-menu {
 		display: none;
 		list-style: none;
 		margin: 0.25rem 0 0;
-		padding: 0.25rem;
+		padding: 0.25rem 0;
 		border: 1px solid;
 		border-radius: 0.25rem;
 		position: absolute;
@@ -371,6 +405,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 
 		li {
 			padding: 0.5rem 0.75rem;
+			margin: 0.25rem;
 			border-radius: 0.25rem;
 			font-size: 0.875rem;
 			font-weight: bold;
@@ -416,6 +451,84 @@ html.client-nojs .tabs-content > div:not( .active ) {
 					}
 				}
 			}
+
+			&.tabs-static-group-child {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+
+				> i {
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					width: 1rem;
+					height: 1rem;
+					flex-shrink: 0;
+
+					.theme--light & {
+						color: var( --clr-secondary-39 );
+					}
+
+					.theme--dark & {
+						color: var( --clr-secondary-80 );
+					}
+				}
+
+				&.active > i {
+					.theme--light & {
+						color: var( --clr-secondary-16 );
+					}
+
+					.theme--dark & {
+						color: var( --clr-secondary-100 );
+					}
+				}
+
+				a {
+					flex: 1;
+					width: auto;
+				}
+
+				&:not( :has( + li.tabs-static-group-child ) ) {
+					position: relative;
+					margin-bottom: 0.5rem;
+
+					&::after {
+						content: "";
+						position: absolute;
+						bottom: -0.25rem;
+						left: -0.25rem;
+						right: -0.25rem;
+						height: 1px;
+
+						.theme--light & {
+							background-color: var( --clr-on-surface-light-primary-12 );
+						}
+
+						.theme--dark & {
+							background-color: var( --clr-secondary-39 );
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+/* STATIC TAB GROUPS (sibling nesting) */
+.tabs-static--group-child {
+	.tabs-nav-wrapper .nav-tabs li {
+		min-height: 2.25rem;
+
+		a {
+			padding: $tabs-nav-padding-nested;
+			min-height: 2.25rem;
+		}
+	}
+
+	@media ( max-width: 767px ) {
+		.tabs-static-dropdown {
+			display: none;
 		}
 	}
 }

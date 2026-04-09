@@ -32,7 +32,11 @@ const TABS_CONFIG = {
 		DRAGGING: 'dragging',
 		SHOW_ALL: 'show-all',
 		VISIBLE: 'visible',
-		OPEN: 'open'
+		OPEN: 'open',
+		GROUP_CHILD: 'tabs-static-group-child'
+	},
+	ICONS: {
+		CHEVRON_RIGHT: 'fas fa-chevron-right fa-xs'
 	}
 };
 
@@ -466,11 +470,6 @@ class TabContainer {
 	}
 }
 
-/**
- * Manages individual static tab container instances.
- * Handles scroll arrows and drag-to-scroll (inherited from TabContainer)
- * plus mobile dropdown toggle. Does NOT handle content switching.
- */
 class StaticTabContainer extends TabContainer {
 	init() {
 		this.indexElements();
@@ -548,6 +547,93 @@ class StaticTabContainer extends TabContainer {
 		this.cleanupFunctions.add( () => {
 			document.removeEventListener( 'keydown', keydownHandler );
 		} );
+	}
+}
+
+/**
+ * Manages a group of consecutive sibling static tab containers,
+ * building a single unified mobile dropdown across all levels.
+ */
+class StaticTabsGroup {
+	constructor( containers ) {
+		this.containers = containers;
+		this.primaryContainer = containers[ 0 ];
+		containers.slice( 1 ).forEach( ( c ) => {
+			c.container.classList.add( 'tabs-static--group-child' );
+			const childDropdown = c.container.querySelector( '.tabs-static-dropdown' );
+			if ( childDropdown ) {
+				childDropdown.style.display = 'none';
+			}
+		} );
+		this._buildMergedMenu();
+		this._overrideBreadcrumb();
+	}
+
+	_overrideBreadcrumb() {
+		this.primaryContainer.updateBreadcrumb = () => this._renderBreadcrumb();
+		this._renderBreadcrumb();
+	}
+
+	_renderBreadcrumb() {
+		const label = this.primaryContainer.container.querySelector( '.tabs-static-dropdown-label' );
+		if ( !label ) {
+			return;
+		}
+
+		const nodes = [];
+		this.containers.forEach( ( container ) => {
+			const activeItem = container.navTabs.querySelector( TABS_CONFIG.SELECTORS.ACTIVE_TAB );
+			const text = activeItem ? ( activeItem.textContent || '' ).trim() : null;
+			if ( !text ) {
+				return;
+			}
+			if ( nodes.length > 0 ) {
+				const icon = document.createElement( 'i' );
+				icon.className = TABS_CONFIG.ICONS.CHEVRON_RIGHT;
+				nodes.push( icon );
+			}
+			nodes.push( document.createTextNode( text ) );
+		} );
+
+		label.replaceChildren( ...nodes );
+	}
+
+	_buildMergedMenu() {
+		const primaryMenu = this.primaryContainer.container.querySelector( '.tabs-static-dropdown-menu' );
+		if ( !primaryMenu || primaryMenu.dataset.groupMerged ) {
+			return;
+		}
+		primaryMenu.dataset.groupMerged = '1';
+
+		let result = Array.from( primaryMenu.querySelectorAll( ':scope > li' ) )
+			.map( ( li ) => li.cloneNode( true ) );
+		let searchRange = result;
+
+		for ( let level = 1; level < this.containers.length; level++ ) {
+			const childMenu = this.containers[ level ].container.querySelector( '.tabs-static-dropdown-menu' );
+			if ( !childMenu ) {
+				break;
+			}
+
+			const childItems = Array.from( childMenu.querySelectorAll( ':scope > li' ) ).map( ( li ) => {
+				const clone = li.cloneNode( true );
+				clone.classList.add( TABS_CONFIG.CLASSES.GROUP_CHILD );
+				const icon = document.createElement( 'i' );
+				icon.className = TABS_CONFIG.ICONS.CHEVRON_RIGHT;
+				clone.insertBefore( icon, clone.firstChild );
+				return clone;
+			} );
+
+			const activeParent = searchRange.find( ( li ) => li.classList.contains( TABS_CONFIG.CLASSES.ACTIVE ) );
+			if ( !activeParent ) {
+				break;
+			}
+
+			result.splice( result.indexOf( activeParent ) + 1, 0, ...childItems );
+			searchRange = childItems;
+		}
+
+		primaryMenu.replaceChildren( ...result );
 	}
 }
 
@@ -663,6 +749,40 @@ class TabsModule {
 				this.tabContainers.set( containerElement, container );
 			}
 		} );
+
+		this._groupStaticContainers();
+	}
+
+	_groupStaticContainers() {
+		const allStaticElements = Array.from( document.querySelectorAll( TABS_CONFIG.SELECTORS.STATIC_CONTAINER ) );
+		let group = [];
+
+		const processGroup = () => {
+			if ( group.length > 1 ) {
+				const containers = group.map( ( el ) => this.tabContainers.get( el ) ).filter( Boolean );
+				if ( containers.length > 1 ) {
+					new StaticTabsGroup( containers );
+				}
+			}
+			group = [];
+		};
+
+		allStaticElements.forEach( ( el ) => {
+			if ( group.length === 0 ) {
+				group.push( el );
+			} else {
+				const prev = group[ group.length - 1 ];
+				const prevAnchor = prev.parentElement ?? prev;
+				const elAnchor = el.parentElement ?? el;
+				if ( prevAnchor.nextElementSibling === elAnchor ) {
+					group.push( el );
+				} else {
+					processGroup();
+					group.push( el );
+				}
+			}
+		} );
+		processGroup();
 	}
 
 	getContainer( element ) {
