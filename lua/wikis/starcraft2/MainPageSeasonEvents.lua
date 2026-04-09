@@ -15,7 +15,7 @@ local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local Page = Lua.import('Module:Page')
-local Timezone = Lua.import('Module:Timezone')
+local Tournament = Lua.import('Module:Tournament')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -33,14 +33,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local DEFAULT_ICON = 'InfoboxIcon_Tournament.png'
 local SPOILER_DELAY = DateExt.daysToSeconds(3)
 local YESTERDAY = DateExt.getCurrentTimestamp() - DateExt.daysToSeconds(1)
-
----@class Sc2MainPageSeasonEventsTournamentData
----@field displayName string
----@field pageName string
----@field finished boolean
----@field icon string?
----@field iconDark string?
----@field endDate integer?
 
 local MainPageSeasonEvents = {}
 
@@ -78,7 +70,7 @@ function MainPageSeasonEvents.run(frame)
 			iconDisplay,
 			HtmlWidgets.Br{},
 			Link{link = pageName, children = tournamentData.displayName},
-			tournamentData.finished
+			tournamentData.status == 'finished'
 				and MainPageSeasonEvents._winnerDisplay(tournamentData)
 				or MainPageSeasonEvents._countdown(tournamentData, args)
 		)
@@ -88,31 +80,19 @@ end
 ---@private
 ---@param args table
 ---@param pageName string
----@return Sc2MainPageSeasonEventsTournamentData
+---@return StandardTournament
 function MainPageSeasonEvents._fecthTournamentData(args, pageName)
-	local pageData = mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = tostring(ConditionNode(ColumnName('pagename'), Comparator.eq, pageName)),
-		query = 'icon, icondark, enddate, shortname, tickername, name, status',
-		limit = 1,
-	})
-	pageData = pageData[1] or {}
+	local tournament = Tournament.getTournament(pageName) or {}
+	-- fallbacks and overwrites
+	tournament.displayName = args.displayname or tournament.displayName
+	tournament.icon = tournament.icon or args.icon or DEFAULT_ICON
+	tournament.iconDark = tournament.iconDark or args.icondark
 
-	return {
-		displayName = args.displayname
-			or Logic.isNotEmpty(pageData.tickername) and pageData.tickername
-			or Logic.isNotEmpty(pageData.shortname) and pageData.shortname
-			or Logic.isNotEmpty(pageData.name) and pageData.name
-			or pageName:gsub('_', ' '),
-		icon = Logic.nilIfEmpty(pageData.icon) or args.icon or DEFAULT_ICON,
-		iconDark = Logic.nilIfEmpty(pageData.icondark) or args.icondark or args.iconDark,
-		finished = pageData.status == 'finished',
-		pageName = pageName,
-		endDate = DateExt.readTimestamp(pageData.enddate),
-	}
+	return tournament
 end
 
 ---@private
----@param tournamentData Sc2MainPageSeasonEventsTournamentData
+---@param tournamentData StandardTournament
 ---@return Widget[]
 function MainPageSeasonEvents._winnerDisplay(tournamentData)
 	local conditions = ConditionTree(BooleanOperator.all):add{
@@ -126,7 +106,7 @@ function MainPageSeasonEvents._winnerDisplay(tournamentData)
 	})[1]
 
 	local winner = winnerPlacement and Opponent.fromLpdbStruct(winnerPlacement)
-	local dateDiff = DateExt.getCurrentTimestamp() - (tournamentData.endDate or 0)
+	local dateDiff = DateExt.getCurrentTimestamp() - (DateExt.readTimestamp(tournamentData.endDate) or 0)
 	local showWinner = winner and dateDiff > SPOILER_DELAY
 
 	return WidgetUtil.collect(
@@ -146,7 +126,7 @@ function MainPageSeasonEvents._winnerDisplay(tournamentData)
 end
 
 ---@private
----@param tournamentData Sc2MainPageSeasonEventsTournamentData
+---@param tournamentData StandardTournament
 ---@param args table
 ---@return Widget[]?
 function MainPageSeasonEvents._countdown(tournamentData, args)
