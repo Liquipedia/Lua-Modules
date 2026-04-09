@@ -5,6 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+---@class TierData
+---@field value string?
+---@field sort string
+---@field name string
+---@field short string
+---@field link string?
+---@field category string?
+
+---@type {tiers: table<''|integer, TierData>, tierTypes: table<string, TierData>}
 return {
 	tiers = {
 		{
