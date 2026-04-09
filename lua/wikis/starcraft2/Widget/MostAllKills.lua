@@ -60,7 +60,7 @@ function MostAllKills:_rows()
 		order = 'information desc, date desc, pagename asc',
 		query = 'information, pagename',
 		limit = 5000,
-        })
+	})
 
 	return Array.map(allKillList, function(allKillInfo)
 		return TableWidgets.Row{
@@ -80,7 +80,7 @@ function MostAllKills:_player(pageName)
 		conditions = tostring(ConditionNode(ColumnName('pagename'), Comparator.eq, pageName)),
 		query = 'extradata, nationality, id',
 		limit = '1',
-        })[1] or {}
+	})[1] or {}
 
 	return OpponentDisplay.BlockOpponent{opponent = Opponent.readOpponentArgs{
 		name = playerInfo.id or pageName,
