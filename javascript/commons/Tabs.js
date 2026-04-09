@@ -618,6 +618,7 @@ class StaticTabsGroup {
 			const childItems = Array.from( childMenu.querySelectorAll( ':scope > li' ) ).map( ( li ) => {
 				const clone = li.cloneNode( true );
 				clone.classList.add( TABS_CONFIG.CLASSES.GROUP_CHILD );
+				clone.style.setProperty( '--group-indent', ( level - 1 ) + 'rem' );
 				const icon = document.createElement( 'i' );
 				icon.className = TABS_CONFIG.ICONS.CHEVRON_RIGHT;
 				clone.insertBefore( icon, clone.firstChild );
