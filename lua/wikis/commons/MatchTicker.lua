@@ -90,7 +90,7 @@ local MatchTickerDisplayFactory = function (matchTickerConfig)
 	elseif matchTickerConfig.newStyle then
 		return Lua.import('Module:MatchTicker/DisplayComponents/New')
 	else
-		return Lua.import('Module:MatchTicker/DisplayComponents')
+		error('One of entityStyle or newStyle must be selected')
 	end
 end
 
