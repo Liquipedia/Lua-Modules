@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
-local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local Table = Lua.import('Module:Table')
@@ -62,16 +61,6 @@ function NextMatch.run(args)
 		order = 'date asc',
 		limit = 1,
 	})[1] or {}
-
-	-- fallback for wikis still not having match2 (e.g. formula1)
-	if Logic.isEmpty(match) and Info.config.match2.status == 0 then
-		match = mw.ext.LiquipediaDB.lpdb('match', {
-			conditions = tostring(conditions),
-			query = 'date, stream',
-			order = 'date asc',
-			limit = 1,
-		})[1] or {}
-	end
 
 	if not match.date then return args.default or '' end
 
