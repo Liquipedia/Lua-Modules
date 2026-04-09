@@ -51,7 +51,7 @@ end
 ---Entry point for display on player pages
 ---Upcoming and ongoing matches are now automatically displayed via the entity match ticker
 ---@param frame Frame|table|nil
----@return Html
+---@return Renderable
 function CustomMatchTicker.player(frame)
 	local args = Arguments.getArgs(frame)
 	args.player = args.player or mw.title.getCurrentTitle().text
