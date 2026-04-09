@@ -80,7 +80,7 @@ function StandingsFfaWidget:render()
 		return standingsTable
 	end
 
-	local hasFutureRounds = not standings.rounds[#standings.rounds].started
+	local hasFutureRounds = self:_hasFutureRounds()
 
 	return HtmlWidgets.Div{
 		classes = {'standings-ffa-wrapper', 'toggle-area', 'toggle-area-' .. activeRounds},
