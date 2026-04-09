@@ -61,10 +61,10 @@ end
 ---@return string
 ---@overload fun(nil): nil
 function Icon:_make(image, themeClass)
-	if not image then
+	if Logic.isEmpty(image) then
 		return
 	end
-	local classes = table.concat(Array.append({Logic.nilIfEmpty(self.props.classes)}, themeClass), ' ')
+	local classes = table.concat(Array.extend(self.props.classes, themeClass), ' ')
 
 	local border = Logic.nilIfEmpty(self.props.border)
 	assert((self.props.format == 'frameless' or not self.props.format) or not border,
