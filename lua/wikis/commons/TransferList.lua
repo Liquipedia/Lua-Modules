@@ -20,8 +20,10 @@ local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local TransferRowWidget = Lua.import('Module:Widget/Transfer/Row')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -299,7 +301,7 @@ function TransferList:_buildTeamConditions(toTeam, fromTeam)
 	return self.teamConditions
 end
 
----@return Html|string?
+---@return Widget?
 function TransferList:create()
 	local config = self.config
 	if Logic.isDeepEmpty(self.groupedTransfers) then
@@ -309,31 +311,30 @@ function TransferList:create()
 		return
 	end
 
-	local display = mw.html.create('div')
-		:addClass('divTable mainpage-transfer Ref')
-		:css('text-align', 'center')
-		:css('width', '100%')
-		:node(self:_buildHeader())
-
-	Array.forEach(self.groupedTransfers, function(rowData)
-		display:node(self:_buildRow(rowData))
-	end)
+	local display = HtmlWidgets.Div{
+		classes = {'divTable', 'mainpage-transfer', 'Ref', config.class},
+		css = {
+			['text-align'] = 'center',
+			width = '100%',
+		},
+		children = WidgetUtil.collect(
+			self:_buildHeader(),
+			Array.map(self.groupedTransfers, function (rowData)
+				return self:_buildRow(rowData)
+			end)
+		)
+	}
 
 	if not config.title then
-		-- for whatever reason currently class is only applied in this case ...
-		if config.class then
-			display:addClass(config.class)
-		end
-		return mw.html.create('div')
-			:node(display)
+		return display
 	end
 
-	return mw.html.create('table')
-		:css('margin-top','0px')
-		:addClass('wikitable OffSeasonOverview')
-		:addClass(config.shown and 'collapsible collapsed' or nil)
-		:tag('tr'):tag('th'):attr('colspan', 7):wikitext(config.title):allDone()
-		:tag('tr'):tag('td'):css('padding', '0'):node(display):allDone()
+	return GeneralCollapsible{
+		title = config.title,
+		classes = {'OffSeasonOverview'},
+		shouldCollapse = not config.shown,
+		children = display,
+	}
 end
 
 ---@return Html
