@@ -640,33 +640,49 @@ class StaticTabsGroup {
 			return;
 		}
 
-		const mergedItems = [];
-		this.containers.forEach( ( container, level ) => {
+		const primarySourceItems = Array.from( primaryMenu.children ).filter(
+			( item ) => !item.classList.contains( TABS_CONFIG.CLASSES.STATIC_GROUP_ITEM ),
+		);
+		const mergedItems = primarySourceItems.map( ( item ) => item.cloneNode( true ) );
+		let insertionRange = mergedItems;
+
+		this.containers.slice( 1 ).forEach( ( container, levelIndex ) => {
+			const level = levelIndex + 1;
 			const menu = container.container.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN_MENU );
 			if ( !menu ) {
 				return;
 			}
 
 			const sourceItems = Array.from( menu.children ).filter(
-				( item ) => level > 0 || !item.classList.contains( TABS_CONFIG.CLASSES.STATIC_GROUP_ITEM ),
+				( item ) => !item.classList.contains( TABS_CONFIG.CLASSES.STATIC_GROUP_ITEM ),
 			);
 
 			const items = sourceItems.map( ( item ) => {
 				const clone = item.cloneNode( true );
-				if ( level > 0 ) {
-					clone.classList.remove( TABS_CONFIG.CLASSES.STATIC_GROUP_DIVIDER );
-					clone.classList.add( TABS_CONFIG.CLASSES.STATIC_GROUP_ITEM );
-					clone.style.setProperty( '--tabs-static-item-level', String( level ) );
-				}
+				clone.classList.remove( TABS_CONFIG.CLASSES.STATIC_GROUP_DIVIDER );
+				clone.classList.add( TABS_CONFIG.CLASSES.STATIC_GROUP_ITEM );
+				clone.style.setProperty( '--tabs-static-item-level', String( level ) );
 				return clone;
 			} );
 
-			if ( items.length > 0 && level > 0 && level < this.containers.length - 1 ) {
+			if ( items.length > 0 ) {
 				items[ items.length - 1 ].classList.add( TABS_CONFIG.CLASSES.STATIC_GROUP_DIVIDER );
 			}
 
-			mergedItems.push( ...items );
+			const activeParent = insertionRange.find( ( item ) => item.classList.contains( TABS_CONFIG.CLASSES.ACTIVE ) );
+			if ( !activeParent ) {
+				return;
+			}
+
+			const insertionIndex = mergedItems.indexOf( activeParent );
+			mergedItems.splice( insertionIndex + 1, 0, ...items );
+			insertionRange = items;
 		} );
+
+		const lastMergedItem = mergedItems[ mergedItems.length - 1 ];
+		if ( lastMergedItem ) {
+			lastMergedItem.classList.remove( TABS_CONFIG.CLASSES.STATIC_GROUP_DIVIDER );
+		}
 
 		primaryMenu.replaceChildren( ...mergedItems );
 	}
@@ -790,12 +806,23 @@ class TabsModule {
 	}
 
 	_groupStaticContainers() {
+		const groupedContainers = new Set();
+
+		this._groupNestedStaticContainers( groupedContainers );
+		this._groupSiblingStaticContainers( groupedContainers );
+	}
+
+	_groupNestedStaticContainers( groupedContainers ) {
 		const topLevelContainers = Array.from( this.staticContainers.keys() ).filter(
 			( containerElement ) => !containerElement.parentElement?.closest( TABS_CONFIG.SELECTORS.STATIC_CONTAINER ),
 		);
 
-		topLevelContainers.forEach( ( rootElement ) => {
-			const containers = [];
+			topLevelContainers.forEach( ( rootElement ) => {
+			if ( groupedContainers.has( rootElement ) ) {
+				return;
+			}
+
+			const containerElements = [];
 			let currentElement = rootElement;
 
 			while ( currentElement ) {
@@ -804,7 +831,7 @@ class TabsModule {
 					break;
 				}
 
-				containers.push( container );
+				containerElements.push( currentElement );
 
 				const contentContainer = currentElement.querySelector( TABS_CONFIG.SELECTORS.DIRECT_CHILD_TABS_CONTENT );
 				if ( !contentContainer ) {
@@ -814,9 +841,66 @@ class TabsModule {
 				currentElement = this._findDirectChildStaticContainer( contentContainer );
 			}
 
-			if ( containers.length > 1 ) {
-				new StaticTabsGroup( containers );
+			this._createStaticTabsGroup( containerElements, groupedContainers );
+		} );
+	}
+
+	_groupSiblingStaticContainers( groupedContainers ) {
+		const staticElements = Array.from( this.staticContainers.keys() );
+		let group = [];
+
+		const processGroup = () => {
+			if ( group.length > 1 ) {
+				this._createStaticTabsGroup( group, groupedContainers );
 			}
+			group = [];
+		};
+
+		staticElements.forEach( ( element ) => {
+			if ( groupedContainers.has( element ) ) {
+				processGroup();
+				return;
+			}
+
+			const anchor = this._getStaticGroupAnchor( element );
+
+			if ( group.length === 0 ) {
+				group.push( element );
+				return;
+			}
+
+			const previousAnchor = this._getStaticGroupAnchor( group[ group.length - 1 ] );
+			const isAdjacentSibling = previousAnchor.parentElement === anchor.parentElement &&
+				previousAnchor.nextElementSibling === anchor;
+
+			if ( isAdjacentSibling ) {
+				group.push( element );
+			} else {
+				processGroup();
+				group.push( element );
+			}
+		} );
+
+		processGroup();
+	}
+
+	_createStaticTabsGroup( elements, groupedContainers ) {
+		if ( elements.length < 2 ) {
+			return;
+		}
+
+		const containers = elements
+			.filter( ( element ) => !groupedContainers.has( element ) )
+			.map( ( element ) => this.staticContainers.get( element ) )
+			.filter( Boolean );
+
+		if ( containers.length < 2 ) {
+			return;
+		}
+
+		new StaticTabsGroup( containers );
+		containers.forEach( ( container ) => {
+			groupedContainers.add( container.container );
 		} );
 	}
 
@@ -836,6 +920,15 @@ class TabsModule {
 		}
 
 		return null;
+	}
+
+	_getStaticGroupAnchor( containerElement ) {
+		const parent = containerElement.parentElement;
+		if ( parent?.getAttribute( 'data-analytics-name' ) === 'Navigation tab' ) {
+			return parent;
+		}
+
+		return containerElement;
 	}
 
 	getContainer( element ) {

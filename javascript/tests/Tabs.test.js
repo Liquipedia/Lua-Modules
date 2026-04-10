@@ -70,7 +70,6 @@ describe( 'Tabs module', () => {
 
 			const staticContainers = document.querySelectorAll( '.tabs-static' );
 			expect( staticContainers ).toHaveLength( 3 );
-			expect( staticContainers[ 1 ].classList.contains( 'tabs-static--group-child' ) ).toBe( true );
 
 			const label = staticContainers[ 0 ].querySelector( '.tabs-static-dropdown-label' );
 			expect( label.textContent ).toBe( 'Results>Standings>Group A' );
@@ -79,9 +78,60 @@ describe( 'Tabs module', () => {
 			const primaryMenu = staticContainers[ 0 ].querySelector( ':scope > .tabs-static-dropdown > .tabs-static-dropdown-menu' );
 			const primaryItems = primaryMenu.children;
 			expect( primaryItems ).toHaveLength( 6 );
+			expect( Array.from( primaryItems ).map( ( item ) => item.textContent.trim() ) )
+				.toEqual( [ 'Results', 'Standings', 'Group A', 'Other', 'Other', 'Other' ] );
 			expect( staticContainers[ 1 ].querySelector( '.tabs-static-dropdown' ) ).not.toBeNull();
 			expect( primaryItems[ 2 ].classList.contains( 'tabs-static-dropdown-item--nested' ) ).toBe( true );
+			expect( primaryItems[ 3 ].classList.contains( 'tabs-static-dropdown-item--nested' ) ).toBe( true );
 			expect( primaryItems[ 3 ].classList.contains( 'tabs-static-dropdown-item--group-end' ) ).toBe( true );
+			expect( primaryItems[ 5 ].classList.contains( 'tabs-static-dropdown-item--nested' ) ).toBe( false );
+		} );
+
+		test( 'should still group adjacent sibling static rows', () => {
+			document.body.innerHTML = `
+				${ createStaticTabsMarkup( 'Boston Major' ) }
+				${ createStaticTabsMarkup( 'Europe' ) }
+			`;
+
+			liquipedia.tabs.cleanup();
+			liquipedia.tabs.init();
+
+			const staticContainers = document.querySelectorAll( '.tabs-static' );
+			expect( staticContainers[ 1 ].classList.contains( 'tabs-static--group-child' ) ).toBe( true );
+		} );
+
+		test( 'should not add a divider to the last dropdown item', () => {
+			const nestedMarkup = createStaticTabsMarkup( 'Child Active' );
+			document.body.innerHTML = `
+				<div data-analytics-name="Navigation tab">
+					<div class="tabs-static">
+						<div class="tabs-nav-wrapper">
+							<ul class="nav-tabs">
+								<li><a href="/wiki/Before">Before</a></li>
+								<li class="active"><a href="/wiki/Active">Active</a></li>
+							</ul>
+						</div>
+						<div class="tabs-static-dropdown">
+							<div class="tabs-static-dropdown-toggle" role="button" tabindex="0" aria-expanded="false" aria-haspopup="menu">
+								<span class="tabs-static-dropdown-label"></span>
+							</div>
+							<ul class="tabs-static-dropdown-menu" aria-hidden="true">
+								<li><a href="/wiki/Before">Before</a></li>
+								<li class="active"><a href="/wiki/Active">Active</a></li>
+							</ul>
+						</div>
+						<div class="tabs-content">${ nestedMarkup }</div>
+					</div>
+				</div>
+			`;
+
+			liquipedia.tabs.cleanup();
+			liquipedia.tabs.init();
+
+			const primaryMenu = document.querySelector( '.tabs-static > .tabs-static-dropdown > .tabs-static-dropdown-menu' );
+			const primaryItems = primaryMenu.children;
+			expect( primaryItems[ primaryItems.length - 1 ].classList.contains( 'tabs-static-dropdown-item--group-end' ) )
+				.toBe( false );
 		} );
 	} );
 
