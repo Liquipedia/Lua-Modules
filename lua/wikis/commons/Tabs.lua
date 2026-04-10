@@ -82,7 +82,7 @@ function Tabs.static(args)
 					['aria-haspopup'] = 'menu',
 				},
 				children = WidgetUtil.collect(
-					Icon{iconName = 'menu', size = 'xs'},
+					HtmlWidgets.Span{classes = {'tabs-static-dropdown-icon'}},
 					HtmlWidgets.Span{
 						classes = {'tabs-static-dropdown-label'},
 						children = {activeTabName}
