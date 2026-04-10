@@ -11,16 +11,28 @@ local Array = Lua.import('Module:Array')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Class = Lua.import('Module:Class')
 local CountryCategory = Lua.import('Module:Infobox/Extension/CountryCategory')
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extension/PrizePool')
+local Currency = Lua.import('Module:Currency')
 local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
+local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
+local MathUtil = Lua.import('Module:MathUtil')
 local Namespace = Lua.import('Module:Namespace')
+local Page = Lua.import('Module:Page')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 local Tier = Lua.import('Module:Tier/Custom')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 
@@ -65,7 +77,7 @@ function Series:createInfobox()
 		args.venue = table.concat(splitVenue, ' ')
 	end
 
-	self.totalSeriesPrizepool = self:getSeriesPrizepools()
+	self:getSeriesPrizepools()
 
 	local widgets = {
 		Header{
@@ -116,7 +128,7 @@ function Series:createInfobox()
 				if self.totalSeriesPrizepool then
 					return {Cell{
 						name = 'Cumulative Prize Pool',
-						children = {InfoboxPrizePool.display{prizepoolusd = self.totalSeriesPrizepool}}
+						children = self:_displaySeriesPrizePool()
 					}}
 				end
 			end
@@ -298,20 +310,86 @@ function Series:addTierCategories(args)
 	return categories
 end
 
----@return number?
 function Series:getSeriesPrizepools()
-	local pagename = self.pagename:gsub('%s', '_')
-	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = '[[series::' .. self.name .. ']] OR [[seriespage::' .. pagename .. ']]',
-		query = 'sum::prizepool'
+	local args = Json.parseIfTable(self.args.prizepooltot) or {}
+
+	local series = Array.parseCommaSeparatedString(args.series or mw.title.getCurrentTitle().prefixedText)
+	series = Array.map(series, Page.pageifyLink)
+
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionUtil.anyOf(ColumnName('seriespage'), series),
+		ConditionNode(ColumnName('prizepool'), Comparator.gt, 0),
+		ConditionUtil.anyOf(ColumnName('status'), {'finished', ''}),
+	}
+
+	local parseToFormattedNumber = function(input)
+		local int = MathUtil.toInteger(input)
+		if not int then return end
+		return string.format("%05d", int)
+	end
+
+	local offset = parseToFormattedNumber(args.offset)
+	if offset then
+		conditions:add(ConditionNode(ColumnName('extradata_seriesnumber'), Comparator.gt, offset))
+	end
+	local limit = parseToFormattedNumber(args.limit)
+	if limit then
+		conditions:add(ConditionNode(ColumnName('extradata_seriesnumber'), Comparator.le, limit))
+	end
+
+	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
+		conditions = tostring(conditions),
+		query = 'prizepool, liquipediatier',
+		limit = 5000,
 	})
 
-	local prizemoney = tonumber(queryData[1]['sum_prizepool'])
-
-	if prizemoney == nil or prizemoney == 0 then
-		return nil
+	if not data[1] then
+		return
 	end
-	return prizemoney
+
+	local sums = {total = 0}
+	Array.forEach(data, function(item)
+		local value = (tonumber(item.prizepool) or 0)
+		sums[item.liquipediatier] = (sums[item.liquipediatier] or 0) + value
+		sums.total = sums.total + value
+	end)
+
+	-- if sum has only 2 elements then we only have 1 tier
+	if sums.total == 0 or Table.size(sums) <= 2 then
+		return
+	end
+
+	self.totalSeriesPrizepool = Table.extract(sums, 'total')
+	if not Logic.readBool(args.onlytotal) then
+		self.prizePoolByTier = sums
+	end
+end
+
+
+---@return Renderable[]|Renderable?
+function Series:_displaySeriesPrizePool()
+	if not self.totalSeriesPrizepool then
+		return
+	end
+
+	---@param value number
+	---@param tier string|integer?
+	---@return string
+	local displayRow = function(value, tier)
+		local row = '≃ ' .. Currency.display('USD', value, {formatPrecision = 0, formatValue = true})
+		if not tier then
+			return row
+		end
+		return Tier.display(tier) .. ': ' .. row
+	end
+
+	local rows = {displayRow(self.totalSeriesPrizepool)}
+
+	for tier, value in Table.iter.spairs(self.prizePoolByTier or {}) do
+		table.insert(rows, displayRow(value, tier))
+	end
+
+	return rows
 end
 
 return Series
