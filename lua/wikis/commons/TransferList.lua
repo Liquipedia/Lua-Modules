@@ -20,6 +20,7 @@ local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local TransferRowWidget = Lua.import('Module:Widget/Transfer/Row')
 
 local Condition = Lua.import('Module:Condition')
@@ -301,9 +302,10 @@ end
 ---@return Html|string?
 function TransferList:create()
 	local config = self.config
-	if config.showMissingResultsMessage and Logic.isDeepEmpty(self.groupedTransfers) then
-		return mw.html.create('pre'):wikitext('No results for: ' .. mw.text.nowiki(self.conditions))
-	elseif Logic.isDeepEmpty(self.groupedTransfers) then
+	if Logic.isDeepEmpty(self.groupedTransfers) then
+		if config.showMissingResultsMessage then
+			return HtmlWidgets.Pre{children = 'No results for: ' .. mw.text.nowiki(self.conditions)}
+		end
 		return
 	end
 
