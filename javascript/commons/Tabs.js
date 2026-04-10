@@ -439,12 +439,10 @@ class TabContainer {
 		const itemWidth = activeTab.clientWidth;
 		const targetScroll = itemOffset - ( sliderWidth / 2 ) + ( itemWidth / 2 );
 
-		if ( typeof this.navTabs.scrollTo === 'function' ) {
-			this.navTabs.scrollTo( {
-				left: targetScroll,
-				behavior: instant ? 'auto' : 'smooth'
-			} );
-		}
+		this.navTabs.scrollTo( {
+			left: targetScroll,
+			behavior: instant ? 'auto' : 'smooth'
+		} );
 
 		setTimeout( () => {
 			if ( this.navWrapper ) {
