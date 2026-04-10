@@ -746,7 +746,7 @@ class HashRouter {
 		if ( scrollToElement ) {
 			const tabsContainer = scrollToElement.closest( TABS_CONFIG.SELECTORS.DYNAMIC_CONTAINER );
 			if ( tabsContainer ) {
-				const container = this.tabsModule.getContainer( tabsContainer );
+				const container = this.tabsModule.getDynamicContainer( tabsContainer );
 				if ( container ) {
 					container.activateTab( tabNumber );
 				}
@@ -939,7 +939,7 @@ class TabsModule {
 		return containerElement;
 	}
 
-	getContainer( element ) {
+	getDynamicContainer( element ) {
 		return this.dynamicContainers.get( element );
 	}
 
