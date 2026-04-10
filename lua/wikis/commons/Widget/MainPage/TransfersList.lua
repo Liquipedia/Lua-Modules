@@ -41,6 +41,7 @@ TransfersList.defaultProps = {
 	transferQuery = true
 }
 
+---@return Renderable[]
 function TransfersList:render()
 	return WidgetUtil.collect(
 		TransferList{
