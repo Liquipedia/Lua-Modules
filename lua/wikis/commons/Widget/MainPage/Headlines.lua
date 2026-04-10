@@ -13,9 +13,9 @@ local ExternalMediaList = Lua.import('Module:ExternalMediaList')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local CenterDot = Lua.import('Module:Widget/MainPage/CenterDot')
 local Div = HtmlWidgets.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
+local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class Headlines: Widget
@@ -33,21 +33,15 @@ function Headlines:render()
 	return WidgetUtil.collect(
 		ExternalMediaList.get{ subject = '!', limit = self.props.limit },
 		Div{
-			css = { display = 'block', ['text-align'] = 'center', padding = '0.5em', },
-			children = {
-				Div{
-					css = {
-						['white-space'] = 'nowrap',
-						display = 'inline',
-						margin = '0 10px',
-						['font-size'] = '15px',
-						['font-style'] = 'italic',
-					},
-					children = {
-						Link{ children = 'See all Headlines', link = self.props.headlinesPortal },
-						CenterDot(),
-						Link{ children = 'Add a Headline', link = 'Special:FormEdit/ExternalMediaLinks' }
-					}
+			classes = {'hlist'},
+			css = {
+				['text-align'] = 'center',
+				['font-style'] = 'italic',
+			},
+			children = UnorderedList{
+				children = {
+					Link{ children = 'See all Headlines', link = self.props.headlinesPortal },
+					Link{ children = 'Add a Headline', link = 'Special:FormEdit/ExternalMediaLinks' }
 				}
 			}
 		}
