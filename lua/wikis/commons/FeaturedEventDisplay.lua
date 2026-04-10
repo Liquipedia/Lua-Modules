@@ -25,6 +25,7 @@ local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -56,7 +57,7 @@ function MainPageSeasonEvents.run(frame)
 			Image{
 				imageLight = tournamentData.icon,
 				imageDark = tournamentData.iconDark,
-				link = pageName,
+				link = tournamentData.pageName or pageName,
 				alt = tournamentData.displayName,
 				size = '140x70px',
 			},
@@ -111,8 +112,8 @@ function MainPageSeasonEvents._winnerDisplay(tournamentData)
 	return WidgetUtil.collect(
 		HtmlWidgets.Br{},
 		showWinner and {
-			Image{
-				imageLight = 'Trophy icon small.gif',
+			IconFa{
+				iconName = 'tournament_winner',
 				size = '18px',
 				alt = 'Winner',
 			},
