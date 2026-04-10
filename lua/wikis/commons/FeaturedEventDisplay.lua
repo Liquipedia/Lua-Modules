@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:MainPageSeasonEvents
+-- page=Module:FeaturedEventDisplay
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
