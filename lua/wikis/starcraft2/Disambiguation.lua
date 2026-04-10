@@ -17,15 +17,24 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local String = Lua.import('Module:StringUtils')
 
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
+
+local Link = Lua.import('Module:Widget/Basic/Link')
+
 local Disambiguation = {}
 
+---@param frame Frame
+---@return string
 function Disambiguation.player(frame)
 	local args = Arguments.getArgs(frame)
 	local player = mw.ext.TeamLiquidIntegration.resolve_redirect(args.player or args[1]):gsub(' ', '_')
 	local nameInput = args.name or args.id or mw.title.getCurrentTitle().text
 
 	local data = mw.ext.LiquipediaDB.lpdb('player', {
-		conditions = '[[pagename::' .. player .. ']]',
+		conditions = tostring(ConditionNode(ColumnName('pagename'), Comparator.eq, player)),
 		limit = 1,
 	})[1]
 
@@ -40,7 +49,7 @@ function Disambiguation.player(frame)
 	local nameArray = mw.text.split(data.name, ' ', true)
 	local firstName = Logic.emptyOr(args.firstname, extraData.firstname, table.remove(nameArray, 1))
 	local lastName = Logic.emptyOr(args.lastname, extraData.lastname, table.concat(nameArray, ' '))
-	local nameDisplay = firstName .. ' "[[' .. player .. '|' .. id .. ']]" ' .. lastName
+	local nameDisplay = firstName .. ' ' .. tostring(Link{link = player, children = id}) .. ' ' .. lastName
 
 	local localisation = Flags.getLocalisation(data.nationality)
 	localisation = String.isNotEmpty(localisation) and (localisation .. ' ') or ''
@@ -53,33 +62,37 @@ function Disambiguation.player(frame)
 
 	local typeDisplay = Logic.emptyOr(data.type, 'player'):lower()
 
-	local display = '* ' .. nameDisplay .. ', ' .. AnOrA._main{
-		statusDisplay .. localisation .. factionDisplay .. typeDisplay,
-	}
-
-	if String.isNotEmpty(data.teamtemplate) then
-		display = display .. ' currently '
-		if typeDisplay == 'player' then
-			display = display .. 'playing'
-		else
-			display = display .. 'working'
-		end
-		display = display .. ' for ' .. tostring(OpponentDisplay.InlineOpponent{
-			opponent = {
-				type = Opponent.team,
-				template = data.teamtemplate,
-				extradata = {},
+	---@return string
+	local  getPlayingWorkingInfo = function()
+		if Logic.isEmpty(data.teamtemplate) then return '' end
+		return String.interpolate(
+			' currently ${playOrWork} for ${opponent}',
+			{
+				playOrWork = typeDisplay == 'player' and 'playing' or 'working',
+				opponent =tostring(OpponentDisplay.InlineOpponent{
+					opponent = {
+						type = Opponent.team,
+						template = data.teamtemplate,
+						extradata = {},
+					}
+				}),
 			}
-		})
+		)
 	end
 
-	display = display .. '.'
-
-	if nameInput ~= data.id then
-		display = display .. ' Their current ID is ' .. data.id .. '.'
-	end
-
-	return display
+	return String.interpolate(
+		'* ${name}, ${aOrAn}${status}${localisation}${faction}${typeInfo}${playingWorkingInfo}.${currentId}',
+		{
+			name = nameDisplay,
+			aOrAn = AnOrA._main{statusDisplay .. localisation .. factionDisplay .. typeDisplay},
+			status = statusDisplay,
+			localisation = localisation,
+			faction = factionDisplay,
+			typeInfo = typeDisplay,
+			playingWorkingInfo = getPlayingWorkingInfo(),
+			currentId = nameInput ~= data.id and ' Their current ID is ' .. data.id .. '.' or ''
+		}
+	)
 end
 
 return Disambiguation
