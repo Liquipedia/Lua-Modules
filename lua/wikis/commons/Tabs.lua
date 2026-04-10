@@ -77,6 +77,10 @@ function Tabs.static(args)
 				classes = {'tabs-static-dropdown-toggle'},
 				variant = 'ghost',
 				size = 'md',
+				attributes = {
+					['aria-expanded'] = 'false',
+					['aria-haspopup'] = 'menu',
+				},
 				children = WidgetUtil.collect(
 					Icon{iconName = 'menu', size = 'xs'},
 					HtmlWidgets.Span{
@@ -88,6 +92,7 @@ function Tabs.static(args)
 			},
 			HtmlWidgets.Ul{
 				classes = {'tabs-static-dropdown-menu'},
+				attributes = {['aria-hidden'] = 'true'},
 				children = buildTabLiItems()
 			}
 		}
