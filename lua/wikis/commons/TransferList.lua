@@ -260,20 +260,18 @@ function TransferList:_buildDateCondition(date)
 	end
 
 	if config.startDate then
-		dateConditions:add(ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('date'), Comparator.gt, config.startDate),
-			ConditionNode(ColumnName('date'), Comparator.eq, config.startDate),
-		})
+		dateConditions:add(
+			ConditionNode(ColumnName('date'), Comparator.ge, config.startDate)
+		)
 	else
-		dateConditions:add{ConditionNode(ColumnName('date'), Comparator.gt, DateExt.defaultDate)}
+		dateConditions:add(ConditionNode(ColumnName('date'), Comparator.gt, DateExt.defaultDate))
 	end
 
 	if config.endDate then
 		local endDate = config.endDate .. ' 23:59:59'
-		dateConditions:add(ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('date'), Comparator.lt, endDate),
-			ConditionNode(ColumnName('date'), Comparator.eq, endDate),
-		})
+		dateConditions:add(
+			ConditionNode(ColumnName('date'), Comparator.le, endDate)
+		)
 	end
 
 	return dateConditions
