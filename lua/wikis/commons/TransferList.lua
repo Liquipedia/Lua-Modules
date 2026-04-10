@@ -62,6 +62,7 @@ local DEFAULT_VALUES = {
 ---@field onlyNotableTransfers boolean
 
 ---@class TransferList: BaseClass
+---@operator call(table): TransferList
 ---@field config TransferListConfig
 ---@field groupedTransfers transfer[][]
 ---@field teamConditions ConditionTree?
