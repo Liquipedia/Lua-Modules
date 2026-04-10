@@ -18,6 +18,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Label = Lua.import('Module:Widget/Basic/Label')
 local RoundSelector = Lua.import('Module:Widget/Standings/RoundSelector')
 local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
+local Switch = Lua.import('Module:Widget/Switch')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
@@ -86,10 +87,16 @@ function StandingsFfaWidget:render()
 		classes = {'standings-ffa-wrapper', 'toggle-area', 'toggle-area-' .. activeRounds},
 		attributes = {['data-toggle-area'] = activeRounds},
 		children = WidgetUtil.collect(
-			activeRounds > 0 and RoundSelector{
-				rounds = activeRounds,
-				hasEnded = not hasFutureRounds,
-			} or nil,
+			activeRounds > 0 and HtmlWidgets.Div{children = {
+				RoundSelector{
+					rounds = activeRounds,
+					hasEnded = not hasFutureRounds,
+				},
+				Switch{
+					switchGroup = 'ffa-detailed-stats',
+					label = 'Detailed stats',
+				}
+			}} or nil,
 			standingsTable
 		)
 	}
@@ -132,7 +139,10 @@ function StandingsFfaWidget:_headerRow()
 				return makeHeaderCell(tiebreaker.title)
 			end),
 			self:_showRoundColumns() and Array.map(standings.rounds, function(round)
-				return makeHeaderCell(round.title)
+				return TableWidgets.CellHeader{
+					classes = {'standings-ffa-detail'},
+					children = round.title,
+				}
 			end) or nil
 		)}
 	}}
@@ -190,7 +200,10 @@ function StandingsFfaWidget:_createRoundBody(round)
 							end
 						end
 					end
-					return TableWidgets.Cell{children = text}
+					return TableWidgets.Cell{
+						classes = {'standings-ffa-detail'},
+						children = text,
+					}
 				end) or nil
 			)
 		}

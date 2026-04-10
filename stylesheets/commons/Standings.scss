@@ -61,6 +61,12 @@
 			width: 100%;
 		}
 	}
+
+	&:has( .switch-toggle[ data-switch-group="ffa-detailed-stats" ]:not( :is( .switch-toggle-active ) ) ) {
+		.standings-ffa-detail {
+			display: none !important;
+		}
+	}
 }
 
 .standings-match-overview {
