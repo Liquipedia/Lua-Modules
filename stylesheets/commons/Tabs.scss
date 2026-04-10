@@ -462,6 +462,16 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				.theme--dark & {
 					color: var( --clr-secondary-80 ) !important;
 				}
+
+				&.new {
+					.theme--light & {
+						color: var( --clr-semantic-negative-40 ) !important;
+					}
+
+					.theme--dark & {
+						color: var( --clr-semantic-negative-80 ) !important;
+					}
+				}
 			}
 
 			.theme--light & {
