@@ -337,26 +337,47 @@ function TransferList:create()
 	}
 end
 
----@return Html
+---@return Widget
 function TransferList:_buildHeader()
-	local headerRow = mw.html.create('div')
-		:addClass('divHeaderRow')
-		:tag('div'):addClass('divCell Date'):wikitext('Date'):allDone()
-
-	if HAS_PLATFORM_ICONS then
-		headerRow:tag('div'):addClass('divCell GameIcon')
+	---@param props {classes: string[]?, children: Renderable|Renderable[]?}
+	---@return Widget
+	local function createDivCell(props)
+		return HtmlWidgets.Div{
+			classes = Array.extend('divCell', props.classes),
+			children = props.children,
+		}
 	end
 
-	return headerRow
-		:tag('div'):addClass('divCell Name'):wikitext('Player'):done()
-		:tag('div'):addClass('divCell Team OldTeam'):wikitext('Old'):done()
-		:tag('div'):addClass('divCell Icon'):done()
-		:tag('div'):addClass('divCell Team NewTeam'):wikitext('New'):done()
-		:tag('div'):addClass('divCell Empty')
-			:tag('span')
-				:addClass('mobile-hide')
-				:wikitext(Abbreviation.make{text = 'Ref', title = 'Reference'})
-		:allDone()
+	return HtmlWidgets.Div{
+		classes = {'divHeaderRow'},
+		children = WidgetUtil.collect(
+			createDivCell{
+				classes = {'Date'},
+				children = 'Date'
+			},
+			HAS_PLATFORM_ICONS and createDivCell{classes = {'GameIcon'}} or nil,
+			createDivCell{
+				classes = {'Name'},
+				children = 'Player',
+			},
+			createDivCell{
+				classes = {'Team', 'OldTeam'},
+				children = 'Old',
+			},
+			createDivCell{classes = {'Icon'}},
+			createDivCell{
+				classes = {'Team', 'NewTeam'},
+				children = 'New',
+			},
+			createDivCell{
+				classes = {'Empty'},
+				children = HtmlWidgets.Span{
+					classes = {'mobile-hide'},
+					children = HtmlWidgets.Abbr{children = 'Ref', title = 'Reference'}
+				}
+			}
+		)
+	}
 end
 
 ---@param transfers transfer[]
