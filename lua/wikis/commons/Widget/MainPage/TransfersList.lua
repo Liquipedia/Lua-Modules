@@ -47,28 +47,30 @@ function TransfersList:render()
 			limit = self.props.limit,
 			onlyNotableTransfers = self.props.onlyNotableTransfers,
 		}:fetch():create(),
-		Div {
-			css = { display = 'block', ['text-align'] = 'center', padding = '0.5em' },
+		Div{
+			css = {
+				display = 'grid',
+				['grid-template-columns'] = '1fr auto 1fr',
+				['align-items'] = 'center',
+				padding = '0.5rem',
+				gap = '0.25rem',
+			},
 			children = {
-				Div {
-					css = { display = 'inline', float = 'left', ['font-style'] = 'italic' },
-					children = { Link { children = 'Back to top', link = '#Top' } }
-				},
-				Div {
-					classes = { 'plainlinks', 'smalledit' },
-					css = { display = 'inline', float = 'right' },
-					children = {
-						'&#91;',
-							Link {
-							children = 'edit',
-							link = 'Special:EditPage/' .. self.props.transferPage
-						},
-						'&#93;'
+				Div{
+					css = {
+						['font-style'] = 'italic',
+						['justify-self'] = 'flex-start',
+						['white-space'] = 'nowrap',
 					},
+					children = Link{children = 'Back to top', link = '#Top'},
 				},
 				Div{
 					classes = {'hlist'},
-					css = {['font-style'] = 'italic'},
+					css = {
+						['font-size'] = '15px',
+						['font-style'] = 'italic',
+						['text-align'] = 'center',
+					},
 					children = UnorderedList{children = WidgetUtil.collect(
 						Link { children = 'See more transfers', link = self.props.transferPortal },
 						Logic.readBool(self.props.transferQuery) and Link {
@@ -81,6 +83,20 @@ function TransfersList:render()
 						},
 						Logic.readBool(self.props.rumours) and Link { children = 'Rumours', link = 'Portal:Rumours' } or nil
 					)}
+				},
+				Div{
+					classes = { 'plainlinks', 'smalledit' },
+					css = {
+						['justify-self'] = 'flex-end',
+					},
+					children = {
+						'&#91;',
+							Link {
+							children = 'edit',
+							link = 'Special:EditPage/' .. self.props.transferPage
+						},
+						'&#93;'
+					},
 				},
 			}
 		}
