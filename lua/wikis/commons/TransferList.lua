@@ -80,7 +80,7 @@ local TransferList = Class.new(
 )
 
 ---@param frame Frame
----@return Html
+---@return Widget?
 function TransferList.run(frame)
 	local args = Arguments.getArgs(frame)
 	return TransferList(args):fetch():create()
