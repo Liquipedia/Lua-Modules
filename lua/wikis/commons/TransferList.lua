@@ -73,7 +73,6 @@ local TransferList = Class.new(
 	---@return self
 	function(self, args)
 		self.config = self:parseArgs(args)
-		return self
 	end
 )
 
