@@ -9,8 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local Opponent = Lua.import('Module:Opponent/Custom')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionNode = Condition.Node
@@ -74,7 +73,7 @@ end
 
 ---@private
 ---@param pageName string
----@return Widget
+---@return Renderable
 function MostAllKills:_player(pageName)
 	local playerInfo = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = tostring(ConditionNode(ColumnName('pagename'), Comparator.eq, pageName)),
@@ -82,12 +81,11 @@ function MostAllKills:_player(pageName)
 		limit = '1',
 	})[1] or {}
 
-	return OpponentDisplay.BlockOpponent{opponent = Opponent.readOpponentArgs{
-		name = playerInfo.id or pageName,
+	return PlayerDisplay.BlockPlayer{player = {
+		displayName = playerInfo.id or pageName,
 		faction = (playerInfo.extradata or {}).faction,
 		flag = playerInfo.nationality,
-		link = pageName,
-		type = Opponent.solo,
+		pageName = pageName,
 	}}
 end
 
