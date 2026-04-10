@@ -6,7 +6,7 @@
 
 const TABS_CONFIG = {
 	SELECTORS: {
-		CONTAINER: '.tabs-dynamic',
+		DYNAMIC_CONTAINER: '.tabs-dynamic',
 		STATIC_CONTAINER: '.tabs-static',
 		NAV_WRAPPER: '.tabs-nav-wrapper',
 		NAV_TABS: '.nav-tabs',
@@ -745,7 +745,7 @@ class HashRouter {
 		}
 
 		if ( scrollToElement ) {
-			const tabsContainer = scrollToElement.closest( TABS_CONFIG.SELECTORS.CONTAINER );
+			const tabsContainer = scrollToElement.closest( TABS_CONFIG.SELECTORS.DYNAMIC_CONTAINER );
 			if ( tabsContainer ) {
 				const container = this.tabsModule.getContainer( tabsContainer );
 				if ( container ) {
@@ -786,7 +786,7 @@ class TabsModule {
 	}
 
 	initializeContainers() {
-		const containers = document.querySelectorAll( TABS_CONFIG.SELECTORS.CONTAINER );
+		const containers = document.querySelectorAll( TABS_CONFIG.SELECTORS.DYNAMIC_CONTAINER );
 		containers.forEach( ( containerElement ) => {
 			const container = new TabContainer( containerElement );
 			if ( container.navTabs ) {
