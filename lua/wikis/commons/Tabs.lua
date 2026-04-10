@@ -17,6 +17,7 @@ local Table = Lua.import('Module:Table')
 
 local AnalyticsWidgets = Lua.import('Module:Widget/Analytics')
 local Button = Lua.import('Module:Widget/Basic/Button')
+local DropdownContainer = Lua.import('Module:Widget/Basic/Dropdown/Container')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -70,31 +71,24 @@ function Tabs.static(args)
 		children = buildTabLiItems()
 	}
 
-	local dropdown = HtmlWidgets.Div{
-		classes = {'tabs-static-dropdown'},
-		children = {
-			Button{
-				classes = {'tabs-static-dropdown-toggle'},
-				variant = 'ghost',
-				size = 'md',
-				attributes = {
-					['aria-expanded'] = 'false',
-					['aria-haspopup'] = 'menu',
-				},
-				children = WidgetUtil.collect(
-					HtmlWidgets.Span{classes = {'tabs-static-dropdown-icon'}},
-					HtmlWidgets.Span{
-						classes = {'tabs-static-dropdown-label'},
-						children = {activeTabName}
-					},
-					Icon{iconName = 'expand', size = 'xs'}
-				)
+	local dropdown = DropdownContainer{
+		variant = 'form',
+		buttonSize = 'md',
+		buttonAttributes = {
+			['aria-expanded'] = 'false',
+			['aria-haspopup'] = 'menu',
+		},
+		menuAttributes = {['aria-hidden'] = 'true'},
+		button = WidgetUtil.collect(
+			HtmlWidgets.Span{classes = {'tabs-static-dropdown-icon'}},
+			HtmlWidgets.Span{
+				classes = {'tabs-static-dropdown-label'},
+				children = {activeTabName}
 			},
-			HtmlWidgets.Ul{
-				classes = {'tabs-static-dropdown-menu'},
-				attributes = {['aria-hidden'] = 'true'},
-				children = buildTabLiItems()
-			}
+			Icon{iconName = 'expand', size = 'xs'}
+		),
+		children = HtmlWidgets.Ul{
+			children = buildTabLiItems()
 		}
 	}
 

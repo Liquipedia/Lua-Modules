@@ -15,10 +15,11 @@ const TABS_CONFIG = {
 		ARROW_RIGHT: '.tabs-scroll-arrow-wrapper--right',
 		ACTIVE_TAB: 'li.active',
 		TAB_ITEMS: 'li',
-		STATIC_DROPDOWN: '.tabs-static-dropdown',
-		STATIC_DROPDOWN_TOGGLE: '.tabs-static-dropdown-toggle',
+		STATIC_DROPDOWN: '.dropdown-widget',
+		STATIC_DROPDOWN_TOGGLE: '.dropdown-widget__toggle',
 		STATIC_DROPDOWN_LABEL: '.tabs-static-dropdown-label',
-		STATIC_DROPDOWN_MENU: '.tabs-static-dropdown-menu',
+		STATIC_DROPDOWN_MENU: '.dropdown-widget__menu',
+		STATIC_DROPDOWN_LIST: '.dropdown-widget__menu > ul',
 		DIRECT_CHILD_TABS_CONTENT: ':scope > .tabs-content',
 		DIRECT_CHILD_ANALYTICS_STATIC: ':scope > [data-analytics-name="Navigation tab"] > .tabs-static'
 	},
@@ -37,7 +38,6 @@ const TABS_CONFIG = {
 		DRAGGING: 'dragging',
 		SHOW_ALL: 'show-all',
 		VISIBLE: 'visible',
-		OPEN: 'open',
 		STATIC_GROUP_CHILD: 'tabs-static--group-child',
 		STATIC_GROUP_ITEM: 'tabs-static-dropdown-item--nested',
 		STATIC_GROUP_DIVIDER: 'tabs-static-dropdown-item--group-end',
@@ -440,10 +440,12 @@ class TabContainer {
 		const itemWidth = activeTab.clientWidth;
 		const targetScroll = itemOffset - ( sliderWidth / 2 ) + ( itemWidth / 2 );
 
-		this.navTabs.scrollTo( {
-			left: targetScroll,
-			behavior: instant ? 'auto' : 'smooth'
-		} );
+		if ( typeof this.navTabs.scrollTo === 'function' ) {
+			this.navTabs.scrollTo( {
+				left: targetScroll,
+				behavior: instant ? 'auto' : 'smooth'
+			} );
+		}
 
 		setTimeout( () => {
 			if ( this.navWrapper ) {
@@ -512,79 +514,22 @@ class StaticTabContainer extends TabContainer {
 		}
 	}
 
-	setDropdownOpen( isOpen ) {
-		const toggle = this.container.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN_TOGGLE );
-		const menu = this.container.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN_MENU );
-
-		if ( !toggle || !menu ) {
-			return;
-		}
-
-		menu.classList.toggle( TABS_CONFIG.CLASSES.OPEN, isOpen );
-		toggle.setAttribute( 'aria-expanded', String( isOpen ) );
-		menu.setAttribute( 'aria-hidden', String( !isOpen ) );
-	}
-
 	setupMobileDropdown() {
-		const toggle = this.container.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN_TOGGLE );
-		const menu = this.container.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN_MENU );
+		const dropdown = this.container.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN );
 
-		if ( !toggle || !menu ) {
+		if ( !dropdown ) {
 			return;
 		}
 
 		this.updateBreadcrumb();
 
-		const toggleMenu = () => {
-			const isOpen = menu.classList.contains( TABS_CONFIG.CLASSES.OPEN );
-			if ( !isOpen ) {
-				this.updateBreadcrumb();
-			}
-			this.setDropdownOpen( !isOpen );
+		const beforeOpenHandler = () => {
+			this.updateBreadcrumb();
 		};
-
-		const clickHandler = () => {
-			toggleMenu();
-		};
-		toggle.addEventListener( 'click', clickHandler );
+		dropdown.addEventListener( 'dropdown:beforeopen', beforeOpenHandler );
 		this.cleanupFunctions.add( () => {
-			toggle.removeEventListener( 'click', clickHandler );
+			dropdown.removeEventListener( 'dropdown:beforeopen', beforeOpenHandler );
 		} );
-
-		const toggleKeydownHandler = ( event ) => {
-			if ( event.key === 'Enter' || event.key === ' ' ) {
-				event.preventDefault();
-				toggleMenu();
-			}
-		};
-		toggle.addEventListener( 'keydown', toggleKeydownHandler );
-		this.cleanupFunctions.add( () => {
-			toggle.removeEventListener( 'keydown', toggleKeydownHandler );
-		} );
-
-		const outsideClickHandler = ( event ) => {
-			const dropdown = this.container.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN );
-			if ( dropdown && !dropdown.contains( event.target ) ) {
-				this.setDropdownOpen( false );
-			}
-		};
-		document.addEventListener( 'click', outsideClickHandler );
-		this.cleanupFunctions.add( () => {
-			document.removeEventListener( 'click', outsideClickHandler );
-		} );
-
-		const keydownHandler = ( event ) => {
-			if ( event.key === 'Escape' && menu.classList.contains( TABS_CONFIG.CLASSES.OPEN ) ) {
-				this.setDropdownOpen( false );
-				toggle.focus();
-			}
-		};
-		document.addEventListener( 'keydown', keydownHandler );
-		this.cleanupFunctions.add( () => {
-			document.removeEventListener( 'keydown', keydownHandler );
-		} );
-
-		this.setDropdownOpen( false );
 	}
 }
 
@@ -639,7 +584,12 @@ class StaticTabsGroup {
 			return;
 		}
 
-		const primarySourceItems = Array.from( primaryMenu.children ).filter(
+		const primaryList = this.primaryContainer.container.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN_LIST );
+		if ( !primaryList ) {
+			return;
+		}
+
+		const primarySourceItems = Array.from( primaryList.children ).filter(
 			( item ) => !item.classList.contains( TABS_CONFIG.CLASSES.STATIC_GROUP_ITEM ),
 		);
 		const mergedItems = primarySourceItems.map( ( item ) => item.cloneNode( true ) );
@@ -647,12 +597,12 @@ class StaticTabsGroup {
 
 		this.containers.slice( 1 ).forEach( ( container, levelIndex ) => {
 			const level = levelIndex + 1;
-			const menu = container.container.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN_MENU );
-			if ( !menu ) {
+			const list = container.container.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN_LIST );
+			if ( !list ) {
 				return;
 			}
 
-			const sourceItems = Array.from( menu.children ).filter(
+			const sourceItems = Array.from( list.children ).filter(
 				( item ) => !item.classList.contains( TABS_CONFIG.CLASSES.STATIC_GROUP_ITEM ),
 			);
 
@@ -683,7 +633,7 @@ class StaticTabsGroup {
 			lastMergedItem.classList.remove( TABS_CONFIG.CLASSES.STATIC_GROUP_DIVIDER );
 		}
 
-		primaryMenu.replaceChildren( ...mergedItems );
+		primaryList.replaceChildren( ...mergedItems );
 	}
 }
 

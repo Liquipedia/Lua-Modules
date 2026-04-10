@@ -4,14 +4,15 @@
 
 const { test, expect, beforeAll, describe } = require( '@jest/globals' );
 
-describe( 'Tabs module', () => {
-	beforeAll( () => {
-		globalThis.liquipedia = {
-			core: { modules: [] },
-			tracker: { track: () => {} }
-		};
-		require( '../commons/Tabs.js' );
-	} );
+	describe( 'Tabs module', () => {
+		beforeAll( () => {
+			globalThis.liquipedia = {
+				core: { modules: [] },
+				tracker: { track: () => {} }
+			};
+			require( '../commons/Dropdown.js' );
+			require( '../commons/Tabs.js' );
+		} );
 
 	test( 'should register itself as a module', () => {
 		expect( globalThis.liquipedia.core.modules ).toContain( 'tabs' );
@@ -27,14 +28,16 @@ describe( 'Tabs module', () => {
 							<li><a href="/wiki/Other">Other</a></li>
 						</ul>
 					</div>
-					<div class="tabs-static-dropdown">
-						<div class="tabs-static-dropdown-toggle" role="button" tabindex="0" aria-expanded="false" aria-haspopup="menu">
+					<div class="dropdown-widget dropdown-widget--form">
+						<div class="dropdown-widget__toggle" data-dropdown-toggle="true" role="button" tabindex="0" aria-expanded="false" aria-haspopup="menu">
 							<span class="tabs-static-dropdown-label"></span>
 						</div>
-						<ul class="tabs-static-dropdown-menu" aria-hidden="true">
-							<li class="active"><a href="/wiki/${ label }">${ label }</a></li>
-							<li><a href="/wiki/Other">Other</a></li>
-						</ul>
+						<div class="dropdown-widget__menu" aria-hidden="true">
+							<ul>
+								<li class="active"><a href="/wiki/${ label }">${ label }</a></li>
+								<li><a href="/wiki/Other">Other</a></li>
+							</ul>
+						</div>
 					</div>
 					<div class="tabs-content">${ nestedMarkup }</div>
 				</div>
@@ -46,18 +49,19 @@ describe( 'Tabs module', () => {
 		test( 'should support keyboard toggling on the dropdown', () => {
 			document.body.innerHTML = createStaticTabsMarkup( 'Results' );
 
+			liquipedia.dropdown.init();
 			liquipedia.tabs.cleanup();
 			liquipedia.tabs.init();
 
-			const toggle = document.querySelector( '.tabs-static-dropdown-toggle' );
-			const menu = document.querySelector( '.tabs-static-dropdown-menu' );
+			const toggle = document.querySelector( '.dropdown-widget__toggle' );
+			const menu = document.querySelector( '.dropdown-widget__menu' );
 
 			toggle.dispatchEvent( new KeyboardEvent( 'keydown', { key: 'Enter', bubbles: true } ) );
-			expect( menu.classList.contains( 'open' ) ).toBe( true );
+			expect( menu.classList.contains( 'show' ) ).toBe( true );
 			expect( toggle.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
 
 			document.dispatchEvent( new KeyboardEvent( 'keydown', { key: 'Escape', bubbles: true } ) );
-			expect( menu.classList.contains( 'open' ) ).toBe( false );
+			expect( menu.classList.contains( 'show' ) ).toBe( false );
 			expect( toggle.getAttribute( 'aria-expanded' ) ).toBe( 'false' );
 		} );
 
@@ -65,6 +69,7 @@ describe( 'Tabs module', () => {
 			const nestedMarkup = createStaticTabsMarkup( 'Standings', createStaticTabsMarkup( 'Group A' ) );
 			document.body.innerHTML = createStaticTabsMarkup( 'Results', nestedMarkup );
 
+			liquipedia.dropdown.init();
 			liquipedia.tabs.cleanup();
 			liquipedia.tabs.init();
 
@@ -75,12 +80,12 @@ describe( 'Tabs module', () => {
 			expect( label.textContent ).toBe( 'Results>Standings>Group A' );
 			expect( label.querySelectorAll( '.tabs-static-dropdown-separator' ) ).toHaveLength( 2 );
 
-			const primaryMenu = staticContainers[ 0 ].querySelector( ':scope > .tabs-static-dropdown > .tabs-static-dropdown-menu' );
+			const primaryMenu = staticContainers[ 0 ].querySelector( ':scope > .dropdown-widget > .dropdown-widget__menu > ul' );
 			const primaryItems = primaryMenu.children;
 			expect( primaryItems ).toHaveLength( 6 );
 			expect( Array.from( primaryItems ).map( ( item ) => item.textContent.trim() ) )
 				.toEqual( [ 'Results', 'Standings', 'Group A', 'Other', 'Other', 'Other' ] );
-			expect( staticContainers[ 1 ].querySelector( '.tabs-static-dropdown' ) ).not.toBeNull();
+			expect( staticContainers[ 1 ].querySelector( '.dropdown-widget' ) ).not.toBeNull();
 			expect( primaryItems[ 2 ].classList.contains( 'tabs-static-dropdown-item--nested' ) ).toBe( true );
 			expect( primaryItems[ 3 ].classList.contains( 'tabs-static-dropdown-item--nested' ) ).toBe( true );
 			expect( primaryItems[ 3 ].classList.contains( 'tabs-static-dropdown-item--group-end' ) ).toBe( true );
@@ -93,6 +98,7 @@ describe( 'Tabs module', () => {
 				${ createStaticTabsMarkup( 'Europe' ) }
 			`;
 
+			liquipedia.dropdown.init();
 			liquipedia.tabs.cleanup();
 			liquipedia.tabs.init();
 
@@ -106,35 +112,39 @@ describe( 'Tabs module', () => {
 					<div class="tabs-static">
 						<div class="tabs-nav-wrapper">
 							<ul class="nav-tabs">
+							<li><a href="/wiki/Finals">Finals</a></li>
+							<li class="active"><a href="/wiki/Boston">Boston Major</a></li>
+						</ul>
+					</div>
+					<div class="dropdown-widget dropdown-widget--form">
+						<div class="dropdown-widget__toggle" data-dropdown-toggle="true" role="button" tabindex="0" aria-expanded="false" aria-haspopup="menu">
+							<span class="tabs-static-dropdown-label"></span>
+						</div>
+						<div class="dropdown-widget__menu" aria-hidden="true">
+							<ul>
 								<li><a href="/wiki/Finals">Finals</a></li>
 								<li class="active"><a href="/wiki/Boston">Boston Major</a></li>
 							</ul>
 						</div>
-						<div class="tabs-static-dropdown">
-							<div class="tabs-static-dropdown-toggle" role="button" tabindex="0" aria-expanded="false" aria-haspopup="menu">
-								<span class="tabs-static-dropdown-label"></span>
-							</div>
-							<ul class="tabs-static-dropdown-menu" aria-hidden="true">
-								<li><a href="/wiki/Finals">Finals</a></li>
-								<li class="active"><a href="/wiki/Boston">Boston Major</a></li>
-							</ul>
-						</div>
-						<div data-analytics-name="Navigation tab">
-							<div class="tabs-static">
+					</div>
+					<div data-analytics-name="Navigation tab">
+						<div class="tabs-static">
 								<div class="tabs-nav-wrapper">
 									<ul class="nav-tabs">
 										<li><a href="/wiki/Boston/Overview">Overview</a></li>
 										<li class="active"><a href="/wiki/Boston/Europe">Europe</a></li>
 									</ul>
 								</div>
-								<div class="tabs-static-dropdown">
-									<div class="tabs-static-dropdown-toggle" role="button" tabindex="0" aria-expanded="false" aria-haspopup="menu">
+								<div class="dropdown-widget dropdown-widget--form">
+									<div class="dropdown-widget__toggle" data-dropdown-toggle="true" role="button" tabindex="0" aria-expanded="false" aria-haspopup="menu">
 										<span class="tabs-static-dropdown-label"></span>
 									</div>
-									<ul class="tabs-static-dropdown-menu" aria-hidden="true">
-										<li><a href="/wiki/Boston/Overview">Overview</a></li>
-										<li class="active"><a href="/wiki/Boston/Europe">Europe</a></li>
-									</ul>
+									<div class="dropdown-widget__menu" aria-hidden="true">
+										<ul>
+											<li><a href="/wiki/Boston/Overview">Overview</a></li>
+											<li class="active"><a href="/wiki/Boston/Europe">Europe</a></li>
+										</ul>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -142,12 +152,13 @@ describe( 'Tabs module', () => {
 				</div>
 			`;
 
+			liquipedia.dropdown.init();
 			liquipedia.tabs.cleanup();
 			liquipedia.tabs.init();
 
 			const staticContainers = document.querySelectorAll( '.tabs-static' );
 			expect( staticContainers[ 1 ].classList.contains( 'tabs-static--group-child' ) ).toBe( true );
-			expect( staticContainers[ 1 ].querySelector( ':scope > .tabs-static-dropdown' ) ).not.toBeNull();
+			expect( staticContainers[ 1 ].querySelector( ':scope > .dropdown-widget' ) ).not.toBeNull();
 			expect( staticContainers[ 0 ].querySelector( '.tabs-static-dropdown-label' ).textContent ).toBe( 'Boston Major>Europe' );
 		} );
 
@@ -158,28 +169,31 @@ describe( 'Tabs module', () => {
 					<div class="tabs-static">
 						<div class="tabs-nav-wrapper">
 							<ul class="nav-tabs">
-								<li><a href="/wiki/Before">Before</a></li>
-								<li class="active"><a href="/wiki/Active">Active</a></li>
-							</ul>
-						</div>
-						<div class="tabs-static-dropdown">
-							<div class="tabs-static-dropdown-toggle" role="button" tabindex="0" aria-expanded="false" aria-haspopup="menu">
-								<span class="tabs-static-dropdown-label"></span>
-							</div>
-							<ul class="tabs-static-dropdown-menu" aria-hidden="true">
-								<li><a href="/wiki/Before">Before</a></li>
-								<li class="active"><a href="/wiki/Active">Active</a></li>
-							</ul>
-						</div>
-						<div class="tabs-content">${ nestedMarkup }</div>
+							<li><a href="/wiki/Before">Before</a></li>
+							<li class="active"><a href="/wiki/Active">Active</a></li>
+						</ul>
 					</div>
+					<div class="dropdown-widget dropdown-widget--form">
+						<div class="dropdown-widget__toggle" data-dropdown-toggle="true" role="button" tabindex="0" aria-expanded="false" aria-haspopup="menu">
+							<span class="tabs-static-dropdown-label"></span>
+						</div>
+						<div class="dropdown-widget__menu" aria-hidden="true">
+							<ul>
+								<li><a href="/wiki/Before">Before</a></li>
+								<li class="active"><a href="/wiki/Active">Active</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="tabs-content">${ nestedMarkup }</div>
+				</div>
 				</div>
 			`;
 
+			liquipedia.dropdown.init();
 			liquipedia.tabs.cleanup();
 			liquipedia.tabs.init();
 
-			const primaryMenu = document.querySelector( '.tabs-static > .tabs-static-dropdown > .tabs-static-dropdown-menu' );
+			const primaryMenu = document.querySelector( '.tabs-static > .dropdown-widget > .dropdown-widget__menu > ul' );
 			const primaryItems = primaryMenu.children;
 			expect( primaryItems[ primaryItems.length - 1 ].classList.contains( 'tabs-static-dropdown-item--group-end' ) )
 				.toBe( false );
@@ -206,6 +220,7 @@ describe( 'Tabs module', () => {
 				${ createStaticTabsMarkup( 'Static Root' ) }
 			`;
 
+			liquipedia.dropdown.init();
 			liquipedia.tabs.cleanup();
 			liquipedia.tabs.init();
 
