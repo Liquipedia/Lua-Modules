@@ -100,6 +100,57 @@ describe( 'Tabs module', () => {
 			expect( staticContainers[ 1 ].classList.contains( 'tabs-static--group-child' ) ).toBe( true );
 		} );
 
+		test( 'should group direct child nested static tabs rendered via tabsN', () => {
+			document.body.innerHTML = `
+				<div data-analytics-name="Navigation tab">
+					<div class="tabs-static">
+						<div class="tabs-nav-wrapper">
+							<ul class="nav-tabs">
+								<li><a href="/wiki/Finals">Finals</a></li>
+								<li class="active"><a href="/wiki/Boston">Boston Major</a></li>
+							</ul>
+						</div>
+						<div class="tabs-static-dropdown">
+							<div class="tabs-static-dropdown-toggle" role="button" tabindex="0" aria-expanded="false" aria-haspopup="menu">
+								<span class="tabs-static-dropdown-label"></span>
+							</div>
+							<ul class="tabs-static-dropdown-menu" aria-hidden="true">
+								<li><a href="/wiki/Finals">Finals</a></li>
+								<li class="active"><a href="/wiki/Boston">Boston Major</a></li>
+							</ul>
+						</div>
+						<div data-analytics-name="Navigation tab">
+							<div class="tabs-static">
+								<div class="tabs-nav-wrapper">
+									<ul class="nav-tabs">
+										<li><a href="/wiki/Boston/Overview">Overview</a></li>
+										<li class="active"><a href="/wiki/Boston/Europe">Europe</a></li>
+									</ul>
+								</div>
+								<div class="tabs-static-dropdown">
+									<div class="tabs-static-dropdown-toggle" role="button" tabindex="0" aria-expanded="false" aria-haspopup="menu">
+										<span class="tabs-static-dropdown-label"></span>
+									</div>
+									<ul class="tabs-static-dropdown-menu" aria-hidden="true">
+										<li><a href="/wiki/Boston/Overview">Overview</a></li>
+										<li class="active"><a href="/wiki/Boston/Europe">Europe</a></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			`;
+
+			liquipedia.tabs.cleanup();
+			liquipedia.tabs.init();
+
+			const staticContainers = document.querySelectorAll( '.tabs-static' );
+			expect( staticContainers[ 1 ].classList.contains( 'tabs-static--group-child' ) ).toBe( true );
+			expect( staticContainers[ 1 ].querySelector( ':scope > .tabs-static-dropdown' ) ).not.toBeNull();
+			expect( staticContainers[ 0 ].querySelector( '.tabs-static-dropdown-label' ).textContent ).toBe( 'Boston Major>Europe' );
+		} );
+
 		test( 'should not add a divider to the last dropdown item', () => {
 			const nestedMarkup = createStaticTabsMarkup( 'Child Active' );
 			document.body.innerHTML = `

@@ -19,7 +19,8 @@ const TABS_CONFIG = {
 		STATIC_DROPDOWN_TOGGLE: '.tabs-static-dropdown-toggle',
 		STATIC_DROPDOWN_LABEL: '.tabs-static-dropdown-label',
 		STATIC_DROPDOWN_MENU: '.tabs-static-dropdown-menu',
-		DIRECT_CHILD_TABS_CONTENT: ':scope > .tabs-content'
+		DIRECT_CHILD_TABS_CONTENT: ':scope > .tabs-content',
+		DIRECT_CHILD_ANALYTICS_STATIC: ':scope > [data-analytics-name="Navigation tab"] > .tabs-static'
 	},
 	SCROLL: {
 		ARROW_STEP: 200,
@@ -831,16 +832,25 @@ class TabsModule {
 
 				containerElements.push( currentElement );
 
-				const contentContainer = currentElement.querySelector( TABS_CONFIG.SELECTORS.DIRECT_CHILD_TABS_CONTENT );
-				if ( !contentContainer ) {
-					break;
-				}
-
-				currentElement = this._findDirectChildStaticContainer( contentContainer );
+				currentElement = this._findNestedStaticContainer( currentElement );
 			}
 
 			this._createStaticTabsGroup( containerElements, groupedContainers );
 		} );
+	}
+
+	_findNestedStaticContainer( containerElement ) {
+		const directChildStatic = containerElement.querySelector( TABS_CONFIG.SELECTORS.DIRECT_CHILD_ANALYTICS_STATIC );
+		if ( directChildStatic ) {
+			return directChildStatic;
+		}
+
+		const contentContainer = containerElement.querySelector( TABS_CONFIG.SELECTORS.DIRECT_CHILD_TABS_CONTENT );
+		if ( !contentContainer ) {
+			return null;
+		}
+
+		return this._findDirectChildStaticContainer( contentContainer );
 	}
 
 	_groupSiblingStaticContainers( groupedContainers ) {
