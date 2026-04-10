@@ -354,13 +354,13 @@ function Series:getSeriesPrizepools()
 		sums.total = sums.total + value
 	end)
 
-	-- if sum has only 2 elements then we only have 1 tier
-	if sums.total == 0 or Table.size(sums) <= 2 then
+	if sums.total == 0 then
 		return
 	end
 
 	self.totalSeriesPrizepool = Table.extract(sums, 'total')
-	if not Logic.readBool(args.onlytotal) then
+
+	if (Table.size(sums) > 1) and not Logic.readBool(args.onlytotal) then
 		self.prizePoolByTier = sums
 	end
 end
