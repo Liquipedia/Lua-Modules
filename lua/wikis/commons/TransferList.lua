@@ -208,6 +208,7 @@ function TransferList:fetch()
 	return self
 end
 
+---@private
 ---@param config {date: string, fromTeam: string, toTeam: string, roles1: string[]}?
 ---@return string
 function TransferList:_buildConditions(config)
@@ -221,6 +222,7 @@ function TransferList:_buildConditions(config)
 	return conditions:toString()
 end
 
+---@private
 ---@return ConditionTree
 function TransferList:_buildBaseConditions()
 	local config = self.config.conditions
@@ -242,6 +244,7 @@ function TransferList:_buildBaseConditions()
 	return self.baseConditions
 end
 
+---@private
 ---@param date string?
 ---@return ConditionTree?
 function TransferList:_buildDateCondition(date)
@@ -275,6 +278,7 @@ function TransferList:_buildDateCondition(date)
 	return dateConditions
 end
 
+---@private
 ---@param toTeam string?
 ---@param fromTeam string?
 ---@return ConditionTree?
@@ -333,6 +337,7 @@ function TransferList:create()
 	}
 end
 
+---@private
 ---@return Widget
 function TransferList:_buildHeader()
 	---@param props {classes: string[]?, children: Renderable|Renderable[]?}
@@ -376,6 +381,7 @@ function TransferList:_buildHeader()
 	}
 end
 
+---@private
 ---@param transfers transfer[]
 ---@return Widget?
 function TransferList:_buildRow(transfers)
