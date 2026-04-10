@@ -57,7 +57,6 @@ return {
 	-- Usage: Previous and Next navigation
 	previous = 'fas fa-chevron-left',
 	next = 'fas fa-chevron-right',
-	menu = 'fas fa-bars',
 
 	-- Usage: Expanding and collapsing hidden sections
 	expand = 'far fa-chevron-down',
