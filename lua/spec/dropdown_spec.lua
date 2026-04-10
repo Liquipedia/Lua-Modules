@@ -15,7 +15,7 @@ describe('Dropdown', function()
 		assert.truthy(html:find('dropdown%-widget__menu'))
 	end)
 
-		it('should render dropdown items', function()
+	it('should render dropdown items', function()
 		local widget = Dropdown{
 			button = 'Actions',
 			children = {
@@ -26,6 +26,30 @@ describe('Dropdown', function()
 		local html = tostring(widget)
 		assert.truthy(html:find('Option 1'))
 		assert.truthy(html:find('Option 2'))
+		assert.truthy(html:find('dropdown%-widget__item'))
+	end)
+
+	it('should render the form variant with forwarded classes and attributes', function()
+		local widget = Dropdown{
+			button = 'Choose option',
+			variant = 'form',
+			classes = {'custom-dropdown'},
+			buttonClasses = {'custom-toggle'},
+			buttonAttributes = {['aria-haspopup'] = 'menu'},
+			menuClasses = {'custom-menu'},
+			menuAttributes = {['aria-hidden'] = 'true'},
+			buttonSize = 'md',
+			children = {
+				DropdownItem{children = 'Option 1'},
+			}
+		}
+		local html = tostring(widget)
+		assert.truthy(html:find('dropdown%-widget%-%-form'))
+		assert.truthy(html:find('custom%-dropdown'))
+		assert.truthy(html:find('custom%-toggle'))
+		assert.truthy(html:find('custom%-menu'))
+		assert.truthy(html:find('aria%-haspopup="menu"'))
+		assert.truthy(html:find('aria%-hidden="true"'))
 		assert.truthy(html:find('dropdown%-widget__item'))
 	end)
 

@@ -32,6 +32,10 @@ Template(s): Dropdown Widget
 		text-decoration: none;
 	}
 
+	&--form {
+		width: 100%;
+	}
+
 	&__menu {
 		display: none;
 		position: absolute;
@@ -61,6 +65,48 @@ Template(s): Dropdown Widget
 		}
 	}
 
+	&--form &__toggle {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		width: 100%;
+		min-height: 2.75rem;
+		padding: 0.5rem 0.75rem;
+		border-radius: 0.25rem;
+		border: 1px solid;
+		cursor: pointer;
+
+		.theme--light & {
+			border-color: var( --clr-secondary-90 );
+			background-color: var( --clr-background );
+			color: var( --clr-secondary-16 ) !important;
+		}
+
+		.theme--dark & {
+			border-color: var( --clr-secondary-25 );
+			background-color: var( --clr-background );
+			color: var( --clr-secondary-100 ) !important;
+		}
+	}
+
+	&--form &__menu {
+		min-width: 100%;
+		padding: 0.25rem 0;
+		margin-top: 0.25rem;
+
+		.theme--light & {
+			background-color: var( --clr-background );
+			border-color: rgba( 0, 0, 0, 0.16 );
+			box-shadow: 0 1px 4px rgba( 0, 0, 0, 0.12 );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-background );
+			border-color: var( --clr-secondary-25 );
+			box-shadow: 0 1px 4px var( --clr-on-surface-dark-primary-4 );
+		}
+	}
+
 	&__item {
 		display: flex;
 		align-items: center;
@@ -86,6 +132,30 @@ Template(s): Dropdown Widget
 
 			.theme--dark & {
 				background-color: var( --clr-on-surface-dark-primary-4 );
+			}
+		}
+	}
+
+	&--form &__item {
+		padding: 0.5rem 0.75rem;
+		margin: 0.25rem;
+		font-size: 0.875rem;
+
+		.theme--light & {
+			color: var( --clr-secondary-39 );
+		}
+
+		.theme--dark & {
+			color: var( --clr-secondary-80 );
+		}
+
+		&:hover {
+			.theme--light & {
+				background-color: var( --clr-on-surface-light-primary-4 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-8 );
 			}
 		}
 	}
