@@ -87,16 +87,19 @@ function StandingsFfaWidget:render()
 		classes = {'standings-ffa-wrapper', 'toggle-area', 'toggle-area-' .. activeRounds},
 		attributes = {['data-toggle-area'] = activeRounds},
 		children = WidgetUtil.collect(
-			activeRounds > 0 and HtmlWidgets.Div{children = {
-				RoundSelector{
-					rounds = activeRounds,
-					hasEnded = not hasFutureRounds,
-				},
-				Switch{
-					switchGroup = 'ffa-detailed-stats',
-					label = 'Detailed stats',
+			activeRounds > 0 and HtmlWidgets.Div{
+				classes = {'standings-ffa-controls'},
+				children = {
+					RoundSelector{
+						rounds = activeRounds,
+						hasEnded = not hasFutureRounds,
+					},
+					Switch{
+						switchGroup = 'ffa-detailed-stats',
+						label = 'Detailed stats',
+					}
 				}
-			}} or nil,
+			} or nil,
 			standingsTable
 		)
 	}
