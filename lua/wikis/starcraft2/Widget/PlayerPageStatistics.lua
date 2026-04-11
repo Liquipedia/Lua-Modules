@@ -27,7 +27,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@operator call(table): PlayerPageStatistics
 local PlayerPageStatistics = Class.new(Widget)
 
----@return Widget
+---@return Widget[]
 function PlayerPageStatistics:render()
 	return WidgetUtil.collect(
 		self:_matchupStats(),
@@ -128,14 +128,12 @@ function PlayerPageStatistics:_matchupStatsHeader(columns)
 				)
 			},
 			TableWidgets.Row{
-				children = WidgetUtil.collect(
-					Array.flatMap(columns, function(col)
-						return {
-							TableWidgets.CellHeader{children = 'Record'},
-							TableWidgets.CellHeader{children = 'Win%'},
-						}
-					end)
-				)
+				children = Array.flatMap(columns, function(col)
+					return {
+						TableWidgets.CellHeader{children = 'Record'},
+						TableWidgets.CellHeader{children = 'Win%'},
+					}
+				end)
 			},
 		}
 	}
