@@ -10,12 +10,12 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Faction = Lua.import('Module:Faction')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
-local Math = require('Module:MathUtil')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Math = Lua.import('Module:MathUtil')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local EarningsStatsChart = Lua.import('Module:Widget/EarningsStatsChart')
 local MedalsTable = Lua.import('Module:Widget/MedalsTable')
@@ -65,12 +65,12 @@ function PlayerPageStatistics:_matchupStats()
 		caption = 'Matchup Statistics',
 		columns = WidgetUtil.collect(
 			{align = 'center'}, -- faction
-			unpack(Array.map(columns, function()
+			Array.flatMap(columns, function()
 				return {
 					{align = 'center'}, -- Record
 					{align = 'center'}, -- Win%
 				}
-			end))
+			end)
 		),
 		children = {
 			self:_matchupStatsHeader(columns),
@@ -94,7 +94,7 @@ function PlayerPageStatistics:_matchupStatsRow(row, rowData, columns)
 					Faction.Icon{faction = row},
 				}
 			},
-			unpack(Array.map(columns, function(col)
+			Array.flatMap(columns, function(col)
 				local data = rowData[col] or {}
 				local sum = (data.w or 0) + (data.l or 0)
 				local percent = sum == 0 and '-' or (Math.round((data.w or 0) * 100 / sum, 1) .. ' %')
@@ -108,7 +108,7 @@ function PlayerPageStatistics:_matchupStatsRow(row, rowData, columns)
 					},
 					TableWidgets.Cell{children = percent},
 				}
-			end))
+			end)
 		)
 	}
 end
@@ -129,12 +129,12 @@ function PlayerPageStatistics:_matchupStatsHeader(columns)
 			},
 			TableWidgets.Row{
 				children = WidgetUtil.collect(
-					unpack(Array.map(columns, function(col)
+					Array.flatMap(columns, function(col)
 						return {
 							TableWidgets.CellHeader{children = 'Record'},
 							TableWidgets.CellHeader{children = 'Win%'},
 						}
-					end))
+					end)
 				)
 			},
 		}

@@ -77,8 +77,7 @@ function EarningsStatsChart:_parse()
 		end)
 	end
 
-	local currentYear = tonumber(DateExt.formatTimestamp('Y', DateExt.getCurrentTimestamp())) --[[@as integer]]
-	local years = Array.filter(Array.range(Info.startYear, currentYear), function(year)
+	local years = Array.filter(Array.range(Info.startYear, DateExt.getYearOf()), function(year)
 		return hasAnyPositiveValue(year - 1) or hasAnyPositiveValue(year) or hasAnyPositiveValue(year + 1)
 	end)
 

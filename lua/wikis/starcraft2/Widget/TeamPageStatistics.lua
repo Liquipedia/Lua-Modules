@@ -8,8 +8,8 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local Json = require('Module:Json')
-local Variables = require('Module:Variables')
+local Json = Lua.import('Module:Json')
+local Variables = Lua.import('Module:Variables')
 
 local Box = Lua.import('Module:Widget/Basic/Box')
 local EarningsStatsChart = Lua.import('Module:Widget/EarningsStatsChart')
@@ -48,7 +48,7 @@ end
 function TeamPageStatistics:_medalTables()
 	local data = Json.parseIfString(Variables.varDefault('medals'))
 	return Box{
-		children = WidgetUtil.collect(
+		children = {
 			MedalsTable{
 				caption = 'Team Medal Statistics',
 				data = data.team,
@@ -63,7 +63,7 @@ function TeamPageStatistics:_medalTables()
 					}
 				},
 			}
-		),
+		},
 	}
 end
 

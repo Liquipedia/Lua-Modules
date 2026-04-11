@@ -11,7 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Medals = Lua.import('Module:Medals')
 local Table = Lua.import('Module:Table')
-local Tier = require('Module:Tier/Utils')
+local Tier = Lua.import('Module:Tier/Utils')
 
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local Widget = Lua.import('Module:Widget')
