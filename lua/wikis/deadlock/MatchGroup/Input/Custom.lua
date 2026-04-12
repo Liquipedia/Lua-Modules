@@ -7,6 +7,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local HeroNames = Lua.import('Module:HeroNames', {loadData = true})
 local Table = Lua.import('Module:Table')
