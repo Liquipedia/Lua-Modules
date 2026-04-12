@@ -34,7 +34,7 @@ end
 
 ---@param match table
 function CustomMatchGroupInput._applyMatchId(match)
-	match.statlocker = match.statlocker or match.matchid
+	match.statlocker = match.statlocker or match.publisherMatchId
 	-- more stuff based on match id in the future?
 end
 
