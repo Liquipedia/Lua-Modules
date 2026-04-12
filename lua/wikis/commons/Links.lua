@@ -294,7 +294,7 @@ local PREFIXES = {
 	smiteesports = {match = 'https://www.smiteesports.com/matches/'},
 	spotify = {'https://open.spotify.com/'},
 	statlocker = {
-		match = https://statlocker.gg/match/',
+		match = 'https://statlocker.gg/match/',
 	},
 	stats = {'', match = ''},
 	statshark = {
