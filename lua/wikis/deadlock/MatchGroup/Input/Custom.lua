@@ -28,14 +28,25 @@ MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 ---@param options? {isMatchPage: boolean?}
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	CustomMatchGroupInput._applyMatchId(match)
 	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
 end
 
 ---@param match table
-function CustomMatchGroupInput._applyMatchId(match)
-	match.statlocker = match.statlocker or match.publisherMatchId
-	-- more stuff based on match id in the future?
+---@param games table[]
+---@return table
+function MatchFunctions.getLinks(match, games)
+	---@type table<string, string|table|nil>
+	local links = MatchGroupInputUtil.getLinks(match)
+	links.statlocker = {}
+
+	Array.forEach(
+		Array.filter(games, function(map) return map.matchid ~= nil end),
+		function(map, mapIndex)
+			links.statlocker[mapIndex] = 'https://statlocker.gg/match/' .. map.matchid
+		end
+	)
+
+	return links
 end
 
 ---@param match table
