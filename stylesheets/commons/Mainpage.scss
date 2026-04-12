@@ -119,7 +119,7 @@ div.main-page-banner .main-page-banner-bottom-row {
 	}
 
 	&__name {
-		font-size: 0.8125rem;
+		font-size: 0.875rem;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -793,6 +793,12 @@ label[ for="tournaments-list-filter-ultimate" ]::before {
 #tournaments-list-filter-ultimate:checked ~ label[ for="tournaments-list-filter-ultimate" ] {
 	opacity: 1;
 	transition: 0.5s;
+}
+
+.match-section-header {
+	.match-info {
+		padding: 0.5rem;
+	}
 }
 
 /* icon list */

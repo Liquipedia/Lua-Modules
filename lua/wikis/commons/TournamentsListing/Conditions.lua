@@ -13,6 +13,7 @@ local Flags = Lua.import('Module:Flags')
 local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
+local Tier = Lua.import('Module:Tier/Utils')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -147,15 +148,16 @@ function TournamentsListingConditions.base(args)
 	return conditions
 end
 
----@param tournamentData table
+---@param tournamentData StandardTournament
 ---@param config table
 ---@return string
 function TournamentsListingConditions.placeConditions(tournamentData, config)
+	local tier, tierType = Tier.toValue(tournamentData.liquipediaTier, tournamentData.liquipediaTierType)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{
-			ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tournamentData.liquipediatier),
-			ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, tournamentData.liquipediatiertype),
-			ConditionNode(ColumnName(config.useParent and 'parent' or 'pagename'), Comparator.eq, tournamentData.pagename),
+			ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tier),
+			ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, tierType or ''),
+			ConditionNode(ColumnName(config.useParent and 'parent' or 'pagename'), Comparator.eq, tournamentData.pageName),
 			ConditionNode(ColumnName('placement'), Comparator.neq, '')
 		}
 

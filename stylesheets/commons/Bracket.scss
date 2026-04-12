@@ -735,10 +735,6 @@ Author(s): FO-nTTaX, salle
 	width: 385px;
 }
 
-.wiki-teamfortress .bracket-popup-wrapper.bracket-popup-team {
-	width: 330px;
-}
-
 .wiki-fifa .bracket-popup-wrapper.bracket-popup-player {
 	width: 300px;
 }
@@ -771,11 +767,6 @@ Author(s): FO-nTTaX, salle
 	line-height: 33px;
 	padding-top: 1px;
 	position: relative;
-
-	.wiki-teamfortress & {
-		line-height: 21px;
-		min-height: 21px;
-	}
 }
 
 .bracket-popup .left div.side {
@@ -857,14 +848,6 @@ Author(s): FO-nTTaX, salle
 	.bracket-popup-player & {
 		left: 50px;
 	}
-
-	.wiki-teamfortress & {
-		float: left;
-		width: 40px;
-		text-align: center;
-		position: initial;
-		left: initial;
-	}
 }
 
 .bracket-popup .right .check {
@@ -873,14 +856,6 @@ Author(s): FO-nTTaX, salle
 
 	.bracket-popup-player & {
 		right: 50px;
-	}
-
-	.wiki-teamfortress & {
-		float: right;
-		width: 40px;
-		text-align: center;
-		position: initial;
-		right: initial;
 	}
 }
 
