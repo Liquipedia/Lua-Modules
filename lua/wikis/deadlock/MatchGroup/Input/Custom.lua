@@ -28,7 +28,14 @@ MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 ---@param options? {isMatchPage: boolean?}
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
+	CustomMatchGroupInput._applyMatchId(match)
 	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
+end
+
+---@param match table
+function CustomMatchGroupInput._applyMatchId(match)
+	match.statlocker = match.statlocker or match.matchid
+	-- more stuff based on match id in the future?
 end
 
 ---@param match table
