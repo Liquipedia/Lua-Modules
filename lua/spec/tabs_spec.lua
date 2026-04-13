@@ -36,7 +36,7 @@ describe('Tabs Module', function()
 			local result = tostring(Tabs.static(args))
 			-- nav and dropdown both contain an active li
 			local count = 0
-			for _ in result:gmatch('class="active"') do count = count + 1 end
+			for _ in result:gmatch('class="[^"]*active[^"]*"') do count = count + 1 end
 			assert.is_true(count >= 2)
 		end)
 

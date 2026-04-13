@@ -30,7 +30,9 @@ const { test, expect, beforeAll, describe } = require( '@jest/globals' );
 					</div>
 					<div class="dropdown-widget dropdown-widget--form">
 						<div class="dropdown-widget__toggle" data-dropdown-toggle="true" role="button" tabindex="0" aria-expanded="false" aria-haspopup="menu">
-							<span class="tabs-static-dropdown-label"></span>
+							<span class="dropdown-widget__prefix"></span>
+							<span class="dropdown-widget__label"></span>
+							<span class="dropdown-widget__indicator"></span>
 						</div>
 						<div class="dropdown-widget__menu" aria-hidden="true">
 							<ul>
@@ -76,8 +78,9 @@ const { test, expect, beforeAll, describe } = require( '@jest/globals' );
 			const staticContainers = document.querySelectorAll( '.tabs-static' );
 			expect( staticContainers ).toHaveLength( 3 );
 
-			const label = staticContainers[ 0 ].querySelector( '.tabs-static-dropdown-label' );
-			expect( label.textContent ).toBe( 'Results>Standings>Group A' );
+			const label = staticContainers[ 0 ].querySelector( '.dropdown-widget__label' );
+			expect( Array.from( label.childNodes ).map( ( node ) => node.textContent ).join( '' ) )
+				.toBe( 'ResultsStandingsGroup A' );
 			expect( label.querySelectorAll( '.tabs-static-dropdown-separator' ) ).toHaveLength( 2 );
 
 			const primaryMenu = staticContainers[ 0 ].querySelector( ':scope > .dropdown-widget > .dropdown-widget__menu > ul' );
@@ -118,7 +121,9 @@ const { test, expect, beforeAll, describe } = require( '@jest/globals' );
 					</div>
 					<div class="dropdown-widget dropdown-widget--form">
 						<div class="dropdown-widget__toggle" data-dropdown-toggle="true" role="button" tabindex="0" aria-expanded="false" aria-haspopup="menu">
-							<span class="tabs-static-dropdown-label"></span>
+							<span class="dropdown-widget__prefix"></span>
+							<span class="dropdown-widget__label"></span>
+							<span class="dropdown-widget__indicator"></span>
 						</div>
 						<div class="dropdown-widget__menu" aria-hidden="true">
 							<ul>
@@ -137,7 +142,9 @@ const { test, expect, beforeAll, describe } = require( '@jest/globals' );
 								</div>
 								<div class="dropdown-widget dropdown-widget--form">
 									<div class="dropdown-widget__toggle" data-dropdown-toggle="true" role="button" tabindex="0" aria-expanded="false" aria-haspopup="menu">
-										<span class="tabs-static-dropdown-label"></span>
+										<span class="dropdown-widget__prefix"></span>
+										<span class="dropdown-widget__label"></span>
+										<span class="dropdown-widget__indicator"></span>
 									</div>
 									<div class="dropdown-widget__menu" aria-hidden="true">
 										<ul>
@@ -159,7 +166,11 @@ const { test, expect, beforeAll, describe } = require( '@jest/globals' );
 			const staticContainers = document.querySelectorAll( '.tabs-static' );
 			expect( staticContainers[ 1 ].classList.contains( 'tabs-static--group-child' ) ).toBe( true );
 			expect( staticContainers[ 1 ].querySelector( ':scope > .dropdown-widget' ) ).not.toBeNull();
-			expect( staticContainers[ 0 ].querySelector( '.tabs-static-dropdown-label' ).textContent ).toBe( 'Boston Major>Europe' );
+			expect(
+				Array.from( staticContainers[ 0 ].querySelector( '.dropdown-widget__label' ).childNodes )
+					.map( ( node ) => node.textContent )
+					.join( '' ),
+			).toBe( 'Boston MajorEurope' );
 		} );
 
 		test( 'should not add a divider to the last dropdown item', () => {

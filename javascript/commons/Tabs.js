@@ -17,7 +17,7 @@ const TABS_CONFIG = {
 		TAB_ITEMS: 'li',
 		STATIC_DROPDOWN: '.dropdown-widget',
 		STATIC_DROPDOWN_TOGGLE: '.dropdown-widget__toggle',
-		STATIC_DROPDOWN_LABEL: '.tabs-static-dropdown-label',
+		STATIC_DROPDOWN_LABEL: '.dropdown-widget__label',
 		STATIC_DROPDOWN_MENU: '.dropdown-widget__menu',
 		STATIC_DROPDOWN_LIST: '.dropdown-widget__menu > ul',
 		DIRECT_CHILD_TABS_CONTENT: ':scope > .tabs-content',
@@ -41,7 +41,11 @@ const TABS_CONFIG = {
 		STATIC_GROUP_CHILD: 'tabs-static--group-child',
 		STATIC_GROUP_ITEM: 'tabs-static-dropdown-item--nested',
 		STATIC_GROUP_DIVIDER: 'tabs-static-dropdown-item--group-end',
-		STATIC_BREADCRUMB_SEPARATOR: 'tabs-static-dropdown-separator'
+		STATIC_BREADCRUMB_SEPARATOR: 'tabs-static-dropdown-separator',
+		STATIC_GROUP_ICON: 'tabs-static-dropdown-item-icon'
+	},
+	ICONS: {
+		CHEVRON_RIGHT: 'fas fa-chevron-right fa-xs'
 	}
 };
 
@@ -567,9 +571,9 @@ class StaticTabsGroup {
 				return;
 			}
 			if ( nodes.length > 0 ) {
-				const separator = document.createElement( 'span' );
+				const separator = document.createElement( 'i' );
 				separator.className = TABS_CONFIG.CLASSES.STATIC_BREADCRUMB_SEPARATOR;
-				separator.textContent = '>';
+				separator.classList.add( ...TABS_CONFIG.ICONS.CHEVRON_RIGHT.split( ' ' ) );
 				nodes.push( separator );
 			}
 			nodes.push( document.createTextNode( text ) );
@@ -611,6 +615,11 @@ class StaticTabsGroup {
 				clone.classList.remove( TABS_CONFIG.CLASSES.STATIC_GROUP_DIVIDER );
 				clone.classList.add( TABS_CONFIG.CLASSES.STATIC_GROUP_ITEM );
 				clone.style.setProperty( '--tabs-static-item-level', String( level ) );
+
+				const icon = document.createElement( 'i' );
+				icon.className = TABS_CONFIG.CLASSES.STATIC_GROUP_ICON;
+				icon.classList.add( ...TABS_CONFIG.ICONS.CHEVRON_RIGHT.split( ' ' ) );
+				clone.insertBefore( icon, clone.firstChild );
 				return clone;
 			} );
 

@@ -59,7 +59,7 @@ function Tabs.static(args)
 				child = tab.link and Page.makeInternalLink({}, name, tab.link) or tab.name
 			end
 			return HtmlWidgets.Li{
-				classes = {tab.this and 'active' or nil},
+				classes = {'dropdown-widget__item', tab.this and 'active' or nil},
 				children = child
 			}
 		end)
@@ -74,19 +74,9 @@ function Tabs.static(args)
 	local dropdown = DropdownContainer{
 		variant = 'form',
 		buttonSize = 'md',
-		buttonAttributes = {
-			['aria-expanded'] = 'false',
-			['aria-haspopup'] = 'menu',
-		},
-		menuAttributes = {['aria-hidden'] = 'true'},
-		button = WidgetUtil.collect(
-			HtmlWidgets.Span{classes = {'tabs-static-dropdown-icon'}},
-			HtmlWidgets.Span{
-				classes = {'tabs-static-dropdown-label'},
-				children = {activeTabName}
-			},
-			Icon{iconName = 'expand', size = 'xs'}
-		),
+		prefix = HtmlWidgets.Span{classes = {'tabs-static-dropdown-icon'}},
+		label = activeTabName,
+		labelClasses = {'tabs-static-dropdown-label'},
 		children = HtmlWidgets.Ul{
 			children = buildTabLiItems()
 		}
