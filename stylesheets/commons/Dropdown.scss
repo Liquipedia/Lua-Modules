@@ -100,6 +100,13 @@ Template(s): Dropdown Widget
 		flex: 1;
 	}
 
+	&--form &__label {
+		font-size: 0.875rem;
+		font-weight: normal;
+		line-height: 1.25rem;
+		text-align: left;
+	}
+
 	&__indicator {
 		display: inline-flex;
 		align-items: center;
@@ -110,14 +117,15 @@ Template(s): Dropdown Widget
 		transition: transform 0.2s ease;
 	}
 
-	&__toggle[aria-expanded="true"] &__indicator {
-		transform: rotate(180deg);
+	&__toggle[ aria-expanded="true" ] &__indicator {
+		transform: rotate( 180deg );
 	}
 
 	&--form &__menu {
 		min-width: 100%;
 		padding: 0.25rem 0;
 		margin-top: 0.25rem;
+		z-index: 20;
 
 		.theme--light & {
 			background-color: var( --clr-background );
@@ -130,6 +138,12 @@ Template(s): Dropdown Widget
 			border-color: var( --clr-secondary-25 );
 			box-shadow: 0 1px 4px var( --clr-on-surface-dark-primary-4 );
 		}
+	}
+
+	& &__menu > ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
 	}
 
 	&__item {
@@ -175,6 +189,16 @@ Template(s): Dropdown Widget
 		}
 
 		&:hover {
+			.theme--light & {
+				background-color: var( --clr-on-surface-light-primary-4 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-8 );
+			}
+		}
+
+		&.active {
 			.theme--light & {
 				background-color: var( --clr-on-surface-light-primary-4 );
 			}
