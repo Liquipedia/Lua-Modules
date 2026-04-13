@@ -34,7 +34,8 @@ const TABS_CONFIG = {
 		ACTIVE: 'active',
 		DRAGGING: 'dragging',
 		SHOW_ALL: 'show-all',
-		VISIBLE: 'visible'
+		VISIBLE: 'visible',
+		STATIC_NESTING_ICON: 'tabs-static-dropdown-nesting-icon'
 	},
 	ATTRIBUTES: {
 		STATIC_DROPDOWN_GROUPED: 'data-mobile-dropdown-grouped',
@@ -788,6 +789,7 @@ class TabsModule {
 		if ( content ) {
 			content.style.setProperty( '--tabs-static-menu-level', String( level ) );
 			const icon = document.createElement( 'i' );
+			icon.classList.add( TABS_CONFIG.CLASSES.STATIC_NESTING_ICON );
 			icon.classList.add( ...TABS_CONFIG.ICONS.CHEVRON_RIGHT.split( ' ' ) );
 			content.prepend( icon );
 		}

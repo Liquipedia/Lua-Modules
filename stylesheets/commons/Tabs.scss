@@ -369,22 +369,6 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				background-color: var( --dropdown-item-bg );
 			}
 
-			.theme--light & {
-				&.active {
-					a {
-						color: var( --clr-secondary-16 ) !important;
-					}
-				}
-			}
-
-			.theme--dark & {
-				&.active {
-					a {
-						color: var( --clr-secondary-100 ) !important;
-					}
-				}
-			}
-
 			> ul {
 				li {
 					> a,
@@ -392,7 +376,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 						padding-left: calc( 0.75rem + ( var( --tabs-static-menu-level, 1 ) * 1rem ) );
 						position: relative;
 
-						i {
+						.tabs-static-dropdown-nesting-icon {
 							position: absolute;
 							left: calc( ( var( --tabs-static-menu-level, 1 ) - 1 ) * 1rem + 0.75rem );
 							top: 50%;
