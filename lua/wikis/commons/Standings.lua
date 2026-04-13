@@ -24,6 +24,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local Standings = {}
 
 ---@class StandingsModel
+---@field namespace integer
 ---@field pageName string
 ---@field standingsIndex integer
 ---@field tournament StandardTournament?
@@ -115,6 +116,7 @@ local StandingsEntryMT = {
 ---@return StandingsModel
 function Standings.standingsFromRecord(record, entries)
 	local standings = {
+		namespace = record.namespace,
 		pageName = record.pagename,
 		standingsIndex = record.standingsindex,
 		title = record.title,
@@ -195,9 +197,11 @@ end
 ---@return standingsentry[]
 function Standings.fetchEntries(standings)
 	local standingsEntries = {}
-	local conditions = Condition.Tree(Condition.BooleanOperator.all)
-		:add(Condition.Node(Condition.ColumnName('pagename'), Condition.Comparator.eq, standings.pageName))
-		:add(Condition.Node(Condition.ColumnName('standingsindex'), Condition.Comparator.eq, standings.standingsIndex))
+	local conditions = Condition.Tree(Condition.BooleanOperator.all):add{
+		Condition.Node(Condition.ColumnName('namespace'), Condition.Comparator.eq, standings.namespace),
+		Condition.Node(Condition.ColumnName('pagename'), Condition.Comparator.eq, standings.pageName),
+		Condition.Node(Condition.ColumnName('standingsindex'), Condition.Comparator.eq, standings.standingsIndex),
+	}
 
 	Lpdb.executeMassQuery(
 		'standingsentry',
