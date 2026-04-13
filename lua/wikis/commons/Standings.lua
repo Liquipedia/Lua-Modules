@@ -78,7 +78,10 @@ function Standings.getStandingsTable(pagename, standingsIndex)
 	end
 
 	local record = mw.ext.LiquipediaDB.lpdb('standingstable', {
-		conditions = '[[pagename::' .. pageNameInCorrectFormat .. ']] AND [[standingsindex::' .. standingsIndex .. ']]',
+		conditions = tostring(Condition.Tree(Condition.BooleanOperator.all):add{
+			Condition.Node(Condition.ColumnName('pagename', Condition.Comparator.eq, pageNameInCorrectFormat)),
+			Condition.Node(Condition.ColumnName('standingsindex', Condition.Comparator.eq, standingsIndex)),
+		}),
 		limit = 1,
 	})[1]
 	if not record then
