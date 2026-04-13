@@ -22,17 +22,27 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local DATA_COLUMNS_VARIANT_1 = {'1', '2', '3', '3-4', '4', 'total'}
 local DATA_COLUMNS_VARIANT_2 = {1, 2, 3, 'top3', 'total'}
 
+---@generic K, V
 ---@class MedalsTableProps
 ---@field caption string?
 ---@field footer Renderable?
----@field data table<string, table<string, integer>> # table<tier, table<place, integer>>
+---@field data table<string|table, table<string|integer, integer>>
 ---@field hasAll boolean?
+---@field medalsTableType string
+---@field renderRowFirstCell fun(key: string|table): string?
+---@field rowSort? fun(tbl: {[K]: V}, a: K, b: K):boolean
 
 ---@class MedalsTable: Widget
 ---@operator call(MedalsTableProps): MedalsTable
 ---@field props MedalsTableProps
 ---@field dataColumns string[]
 local MedalsTable = Class.new(Widget)
+MedalsTable.defaultProps = {
+	medalsTableType = 'Tier',
+	renderRowFirstCell = function(tier)
+		return Tier.display(tier, nil, {link = true})
+	end,
+}
 
 ---@return Widget
 function MedalsTable:render()
@@ -49,7 +59,7 @@ function MedalsTable:render()
 				children = TableWidgets.Row{
 					children = WidgetUtil.collect(
 						TableWidgets.CellHeader{
-							children = 'Tier',
+							children = self.props.medalsTableType,
 							css = self.props.hasAll and {['padding-left'] = '0.3rem'} or nil,
 						},
 						Array.map(self.dataColumns, FnUtil.curry(MedalsTable._headerCell, self))
@@ -88,8 +98,8 @@ function MedalsTable:_rows()
 	local totalRowDataSet = Table.extract(self.props.data, 'total')
 	local rows = {}
 
-	for tier, dataSet in Table.iter.spairs(self.props.data) do
-		table.insert(rows, self:_row(Tier.display(tier, nil, {link = true}), dataSet))
+	for key, dataSet in Table.iter.spairs(self.props.data, self.props.rowSort) do
+		table.insert(rows, self:_row(self.props.renderRowFirstCell(key), dataSet))
 	end
 	table.insert(rows, self:_row('Total', totalRowDataSet))
 
