@@ -111,11 +111,17 @@ end
 ---@param data table<string|integer, integer>
 ---@return Widget[]
 function MedalsTable:_row(firstCellContent, data)
+	local dashIfZero = function(input)
+		if not input or input == 0 then
+			return '-'
+		end
+		return input
+	end
 	return TableWidgets.Row{
 		children = WidgetUtil.collect(
 			TableWidgets.Cell{children = firstCellContent},
 			Array.map(self.dataColumns, function(column)
-				return TableWidgets.Cell{children = data[tonumber(column) or column]}
+				return TableWidgets.Cell{children = dashIfZero(data[tonumber(column) or column])}
 			end)
 		)
 	}
