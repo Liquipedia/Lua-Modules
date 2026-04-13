@@ -16,7 +16,6 @@ const TABS_CONFIG = {
 		ACTIVE_TAB: 'li.active',
 		TAB_ITEMS: 'li',
 		STATIC_DROPDOWN: '.dropdown-widget',
-		STATIC_DROPDOWN_PREFIX: '.dropdown-widget__prefix',
 		STATIC_DROPDOWN_LABEL: '.dropdown-widget__label',
 		DIRECT_CHILD_TABS_CONTENT: ':scope > .tabs-content',
 		DIRECT_CHILD_ANALYTICS_STATIC: ':scope > [data-analytics-name="Navigation tab"] > .tabs-static'

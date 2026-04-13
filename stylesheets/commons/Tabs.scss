@@ -96,7 +96,9 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			min-height: 2.75rem;
 			background-color: unset !important;
 
-			a {
+			> a,
+			> span,
+			> strong {
 				display: flex;
 				align-items: center;
 				gap: 0.25rem;
@@ -147,7 +149,9 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				}
 			}
 
-			&.active a {
+			&.active > a,
+			&.active > span,
+			&.active > strong {
 				&::after {
 					content: "";
 					position: absolute;
@@ -177,7 +181,9 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				}
 			}
 
-			&.hover a {
+			&.hover > a,
+			&.hover > span,
+			&.hover > strong {
 				.theme--light & {
 					background-color: $tabs-bg-hover-light !important;
 				}
