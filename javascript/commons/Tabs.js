@@ -112,17 +112,17 @@ class TabContainer {
 
 	init() {
 		this.indexElements();
-		this._setupContentHandlers();
-		this._setupScrollHandlers();
+		this.setupContentHandlers();
+		this.setupScrollHandlers();
 	}
 
-	_setupContentHandlers() {
+	setupContentHandlers() {
 		this.createMobileHeadings();
 		this.setupClickHandlers();
 		this.setupKeyboardNavigation();
 	}
 
-	_setupScrollHandlers() {
+	setupScrollHandlers() {
 		if ( !this.wraps ) {
 			this.setupDragToScroll();
 			this.setupArrows();
@@ -442,10 +442,14 @@ class TabContainer {
 		const itemWidth = activeTab.clientWidth;
 		const targetScroll = itemOffset - ( sliderWidth / 2 ) + ( itemWidth / 2 );
 
-		this.navTabs.scrollTo( {
-			left: targetScroll,
-			behavior: instant ? 'auto' : 'smooth'
-		} );
+		if ( typeof this.navTabs.scrollTo === 'function' ) {
+			this.navTabs.scrollTo( {
+				left: targetScroll,
+				behavior: instant ? 'auto' : 'smooth'
+			} );
+		} else {
+			this.navTabs.scrollLeft = targetScroll;
+		}
 
 		setTimeout( () => {
 			if ( this.navWrapper ) {
