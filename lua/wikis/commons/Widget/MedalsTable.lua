@@ -27,10 +27,11 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field data table<string|table, table<string|integer, integer>>
 ---@field medalsTableType string
 ---@field dataColumns (string|integer)[]?
----@field renderRowFirstCell fun(key: string|table): string?
+---@field renderRowFirstCell fun(key: string|table): Renderable?
 ---@field rowSort? fun(tbl: {[K]: V}, a: K, b: K):boolean
 ---@field reducePadding boolean?
----@field cutAfter integer
+---@field hideTotalRow boolean?
+---@field cutAfter integer?
 
 local DEFAULT_DATA_COLUMNS = {'1', '2', '3', '3-4', '4', 'total'}
 
@@ -113,6 +114,10 @@ function MedalsTable:_rows()
 	for key, dataSet in Table.iter.spairs(self.props.data, self.props.rowSort) do
 		table.insert(rows, self:_row(self.props.renderRowFirstCell(key), dataSet))
 	end
+	if self.props.hideTotalRow then
+		return rows
+	end
+
 	table.insert(rows, self:_row('Total', totalRowDataSet))
 
 	return rows

@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
-local Medals = Lua.import('Module:Medals')
+local MathUtil = Lua.import('Module:MathUtil')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
@@ -20,6 +20,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local TODAY = os.date('%Y-%m-%d') --[[@as string]]
 ---@alias THIRD '3'
@@ -29,33 +30,25 @@ local FOURTH = '4'
 ---@alias SEMIFINALIST '3-4'
 local SEMIFINALIST = '3-4'
 
----@class SeriesMedalStatsConfig
+---@class SeriesMedalStatsConditionConfig
 ---@field series string[]
 ---@field tier string[]
 ---@field tierType string[]
----@field cutAfter number
 ---@field startDate string?
 ---@field endDate string?
----@field placements string[]
 ---@field external boolean
----@field hasNumber boolean
----@field offset integer? only valid if hasNumber
----@field limit integer? only valid if hasNumber
 ---@field additionalConditions string
 ---@field opponentTypes string[]
----@field mergeIntoSemifinalists boolean
+---@field hasNumber boolean
 
----@class SeriesMedalStatsPlacementObject
----@field opponentplayers table
----@field placement string
----@field date string
----@field extradata table
----@field opponentname string
----@field opponenttype OpponentType
----@field opponenttemplate string?
+---@class SeriesMedalStatsConfig
+---@field cutAfter number
+---@field columns string[]
+---@field mergeIntoSemifinalists boolean
+---@field offset integer? only valid on craft wikis
+---@field limit integer? only valid on craft wikis
 
 ---@class SeriesMedalStatsDataSet
----@field identifier string
 ---@field ['1'] number
 ---@field ['2'] number
 ---@field [THIRD] number?
@@ -66,135 +59,115 @@ local SEMIFINALIST = '3-4'
 ---@class SeriesMedalStats
 ---@operator call(table?): SeriesMedalStats
 ---@field config SeriesMedalStatsConfig
----@field rawData SeriesMedalStatsPlacementObject[]?
 ---@field args table
----@field data table?
----@field dataAsArray SeriesMedalStatsDataSet[]?
----@field display Html?
+---@field rawData placement[]?
+---@field data table<string, SeriesMedalStatsDataSet>?
 local MedalStats = Class.new(function(self, args) self:init(args) end)
 
 ---@param args table?
 ---@return self
 function MedalStats:init(args)
-	self.args = args or {}
-	self.config = self:_getConfig()
+	self.config = self:_getConfig(args or {})
+	self.rawData = self:query(args or {})
 
 	return self
 end
 
+---@param args table
 ---@return SeriesMedalStatsConfig
-function MedalStats:_getConfig()
-	local args = self.args
+function MedalStats:_getConfig(args)
 
-	local placements = {'1', '2'}
-	if Logic.readBool(args.bronze) then
-		table.insert(placements, THIRD)
-	end
-	if Logic.readBool(args.sf) then
-		table.insert(placements, SEMIFINALIST)
-	end
-	if Logic.readBool(args.copper) then
-		table.insert(placements, FOURTH)
-	end
+	local columns = Array.extend(
+		'1',
+		'2',
+		Logic.readBool(args.bronze) and THIRD or nil,
+		Logic.readBool(args.sf) and SEMIFINALIST or nil,
+		Logic.readBool(args.copper) and FOURTH or nil,
+		'total'
+	)
 
-	---@param input string?
-	---@param sep string?
-	---@return string[]
-	local splitAndTrimIfExist = function(input, sep)
-		if String.isEmpty(input) then return {} end
-		---@cast input -nil
-		return Array.map(mw.text.split(input, sep or '||'), String.trim)
-	end
-
-	local series = splitAndTrimIfExist(args.series or mw.title.getCurrentTitle().prefixedText)
-
+	local series = Array.parseCommaSeparatedString(args.series or mw.title.getCurrentTitle().prefixedText)
 	if not Logic.readBool(args.noredirect) then
 		series = Array.map(series, mw.ext.TeamLiquidIntegration.resolve_redirect)
 	end
+	series = Array.map(series, function(value) return (value:gsub('_', ' ')) end)
 
+	return {
+		cutAfter = MathUtil.toInteger(args.cutafter) or 7,
+		columns = columns,
+		mergeIntoSemifinalists = Logic.readBool(args.mergeIntoSemifinalists),
+		offset = MathUtil.toInteger(args.offset),
+		limit = MathUtil.toInteger(args.limit),
+	}
+end
+
+---@param args table
+---@return placement[]
+function MedalStats:query(args)
+	return mw.ext.LiquipediaDB.lpdb('placement', {
+		conditions = self:_getConditions(args),
+		query = 'opponentplayers, placement, extradata, date, opponentname, opponenttype, opponenttemplate',
+		order = 'date asc',
+		limit = 5000,
+	})
+end
+
+---@param args table
+---@return SeriesMedalStatsConditionConfig
+function MedalStats:_getConditionConfig(args)
+	local series = Array.parseCommaSeparatedString(args.series or mw.title.getCurrentTitle().prefixedText)
+	if not Logic.readBool(args.noredirect) then
+		series = Array.map(series, mw.ext.TeamLiquidIntegration.resolve_redirect)
+	end
 	series = Array.map(series, function(value) return (value:gsub('_', ' ')) end)
 
 	return {
 		series = series,
 		external = Logic.readBool(args.external),
-		tier = splitAndTrimIfExist(args.tier or args.liquipediatier),
-		tierType = splitAndTrimIfExist(args.tiertype or args.liquipediatiertype),
-		offset = tonumber(args.offset),
-		limit = tonumber(args.limit),
-		cutAfter = tonumber(args.cutafter) or 7,
-		hasNumber = Logic.isNumeric(args.offset) or Logic.isNumeric(args.limit) or not Logic.readBool(args.noNumber),
+		tier = Array.parseCommaSeparatedString(args.tier or args.liquipediatier),
+		tierType = Array.parseCommaSeparatedString(args.tiertype or args.liquipediatiertype),
 		endDate = args.edate,
 		startDate = args.sdate,
-		placements = placements,
 		additionalConditions = args.additionalConditions or '',
-		opponentTypes = splitAndTrimIfExist(args.opponentType),
-		mergeIntoSemifinalists = Logic.readBool(args.mergeIntoSemifinalists),
+		opponentTypes = Array.parseCommaSeparatedString(args.opponentType),
+		hasNumber = Logic.isNumeric(args.offset) or Logic.isNumeric(args.limit) or not Logic.readBool(args.noNumber),
 	}
 end
 
----@return self
-function MedalStats:query()
-	self.rawData = mw.ext.LiquipediaDB.lpdb('placement', {
-		conditions = self:_getConditions(),
-		query = 'opponentplayers, placement, extradata, date, opponentname, opponenttype, opponenttemplate',
-		order = 'date asc',
-		limit = 5000,
-	})
-
-	return self
-end
-
+---@param args table
 ---@return string
-function MedalStats:_getConditions()
-	local config = self.config
-	local conditions = ConditionTree(BooleanOperator.all)
+function MedalStats:_getConditions(args)
+	local config = self:_getConditionConfig(args)
 
-	---@param field string
-	---@param arr string[]
-	local addOrCondition = function(field, arr)
-		if Table.isEmpty(arr) then return end
-		conditions:add(ConditionTree(BooleanOperator.any):add(Array.map(arr, function(value)
-			return ConditionNode(ColumnName(field), Comparator.eq, value)
-		end)))
-	end
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionUtil.anyOf(ColumnName('placement'), self.config.columns),
+		ConditionUtil.anyOf(ColumnName('series'), config.series),
+		ConditionUtil.anyOf(ColumnName('liquipediatier'), config.tier),
+		ConditionUtil.anyOf(ColumnName('liquipediatiertype'), config.tierType),
+		ConditionUtil.anyOf(ColumnName('opponenttype'), config.opponentTypes),
+		ConditionNode(ColumnName('date'), Comparator.lt, (config.endDate or TODAY) .. 'T23:59:59'),
+		not config.external and ConditionNode(ColumnName('prizepoolindex'), Comparator.eq, 1) or nil,
+		config.hasNumber and ConditionNode(ColumnName('extradata_seriesnumber'), Comparator.eq, '!') or nil,
+		config.startDate and ConditionNode(ColumnName('date'), Comparator.ge, config.startDate) or nil,
+	}
 
-	addOrCondition('series', config.series)
-	addOrCondition('liquipediatier', config.tier)
-	addOrCondition('liquipediatiertype', config.tierType)
-	addOrCondition('placement', config.placements)
-	addOrCondition('opponenttype', config.opponentTypes)
-
-	conditions:add{ConditionNode(ColumnName('date'), Comparator.lt, (config.endDate or TODAY) .. 'T23:59:59')}
-
-	if not config.external then
-		conditions:add{ConditionNode(ColumnName('prizepoolindex'), Comparator.eq, 1)}
-	end
-
-	if config.hasNumber then
-		conditions:add{ConditionNode(ColumnName('extradata_seriesnumber'), Comparator.eq, '!')}
-	end
-
-	if config.startDate then
-		addOrCondition('date', {config.startDate, '>' .. config.startDate})
-	end
-
-	return conditions:toString() .. config.additionalConditions
+	return tostring(conditions) .. config.additionalConditions
 end
 
----@return Html?
+---@return Widget?
 function MedalStats:create()
 	error('The `:create()` function has to be part of part of the specific module')
 end
 
----@return table<string, integer>
+---@return SeriesMedalStatsDataSet
 function MedalStats:setUpPlacementData()
-	return Table.merge(Table.map(self.config.placements, function(key, placement)
-		return placement, 0
-	end), {total = 0})
+	return Table.map(self.config.columns, function(key, col)
+		return col, 0
+	end)
 end
 
----@param getIdentifier fun(placement: SeriesMedalStatsPlacementObject): string?
----@param placement SeriesMedalStatsPlacementObject
+---@param getIdentifier fun(placement: placement): string?
+---@param placement placement
 function MedalStats:processByIdentifier(getIdentifier, placement)
 	local identifier = getIdentifier(placement)
 	if String.isEmpty(identifier) then return end
@@ -217,90 +190,28 @@ function MedalStats:processByIdentifier(getIdentifier, placement)
 	self.data[identifier].total = self.data[identifier].total + 1
 end
 
-function MedalStats:sort()
-	Table.iter.forEachPair(self.data, function(identifier, data)
-		data.identifier = identifier
-	end)
-	self.dataAsArray = Array.extractValues(self.data)
-	self.data = nil
-	table.sort(self.dataAsArray, MedalStats.compare)
-end
-
----@param row1 SeriesMedalStatsDataSet
----@param row2 SeriesMedalStatsDataSet
+---@param tbl table<string, SeriesMedalStatsDataSet>
+---@param key1 any
+---@param key2 any
 ---@return boolean
-function MedalStats.compare(row1, row2)
-	local isNotEqual = function(key)
-		return (row1[key] or 0) ~= (row2[key] or 0)
-	end
+function MedalStats.rowSort(tbl, key1, key2)
+	---@param key string
+	---@return boolean?
 	local compare = function(key)
-		return (row1[key] or 0) > (row2[key] or 0)
+		local val1 = tbl[key1][key] or 0
+		local val2 = tbl[key2][key] or 0
+		if val1 == val2 then return end
+		return val1 > val2
 	end
 
-	if isNotEqual('1') then return compare('1') end
-	if isNotEqual('2') then return compare('2') end
-	if isNotEqual(THIRD) then return compare(THIRD) end
-	if isNotEqual(SEMIFINALIST) then return compare(SEMIFINALIST) end
-	if isNotEqual(FOURTH) then return compare(FOURTH) end
-
-	return row1.identifier:lower() < row2.identifier:lower()
-end
-
----@param nameDisplay fun(identifier: string):string|Widget|Html
----@param title string
----@param cutAfterPartial string
----@return Html?
-function MedalStats:defaultBuild(nameDisplay, title, cutAfterPartial)
-	if Table.isEmpty(self.dataAsArray) then
-		return
-	end
-	local display = mw.html.create('table')
-		:addClass('wikitable wikitable-striped wikitable-bordered prizepooltable collapsed')
-		:css('text-align', 'center')
-		:attr('data-cutafter', self.config.cutAfter)
-		:attr('data-opentext', 'Show remaining ' .. cutAfterPartial)
-		:attr('data-closetext', 'Hide remaining ' .. cutAfterPartial)
-		:node(self:header(title))
-
-	Array.forEach(self.dataAsArray, function(dataSet)
-		display:node(self:row(dataSet, nameDisplay))
-	end)
-
-	return display
-end
-
----@param title string
----@return Html
-function MedalStats:header(title)
-	local header = mw.html.create('tr')
-		:tag('th'):wikitext(title):done()
-
-	for _, place in ipairs(self.config.placements) do
-		header:tag('th'):node(Medals.display{medal = place})
-	end
-
-	header:tag('th'):css('text-weight', 'bold'):wikitext('Total')
-
-	return header
-end
-
----@param dataSet SeriesMedalStatsDataSet
----@param nameDisplay fun(identifier: string):string|Widget|Html
----@return Html
-function MedalStats:row(dataSet, nameDisplay)
-	local row = mw.html.create('tr')
-		:tag('td')
-			:css('text-align', 'left')
-			:node(nameDisplay(dataSet.identifier))
-			:done()
-
-	for _, place in ipairs(self.config.placements) do
-		row:tag('td'):wikitext(dataSet[place])
-	end
-
-	row:tag('td'):css('font-weight', 'bold'):wikitext(dataSet.total)
-
-	return row
+	return Logic.nilOr(
+		compare('1'),
+		compare('2'),
+		compare(THIRD),
+		compare(SEMIFINALIST),
+		compare(FOURTH),
+		key1:lower() < key2:lower()
+	)
 end
 
 return MedalStats
