@@ -35,8 +35,8 @@ local Standings = {}
 ---@field config table
 ---@field rounds StandingsRound[]
 ---@field tiebreakers {id: string, title: string?}[]
----@field private record standingstable
----@field private entryRecords standingsentry[]
+---@field package record standingstable
+---@field package entryRecords standingsentry[]
 
 ---@class StandingsRound
 ---@field round integer
@@ -59,7 +59,7 @@ local Standings = {}
 ---@field pointsChangeFromPreviousRound number
 ---@field specialStatus 'dq'|'nc'|'' # nc = non-competing (not in the round)
 ---@field tiebreakerValues table<string, {value: integer?, display: string?}>
----@field private record standingstable
+---@field package record standingsentry
 
 ---Fetches a standings table from a page. Tries to read from page variables before fetching from LPDB.
 ---@param pagename string
@@ -162,7 +162,6 @@ end
 ---@param standings StandingsModel
 ---@return MatchGroupUtilMatch[]
 function Standings.fetchMatches(standings)
-	---@diagnostic disable-next-line: invisible
 	local matchids = standings.record.matches or {}
 	local bracketIds = Array.unique(Array.map(matchids, function(matchid)
 		return MatchGroupUtil.splitMatchId(matchid)
@@ -177,7 +176,6 @@ end
 ---@param entry StandingsEntryModel
 ---@return MatchGroupUtilMatch?
 function Standings.fetchMatch(entry)
-	---@diagnostic disable-next-line: invisible
 	local matchid = entry.record.extradata.matchid
 	if not matchid then
 		return
@@ -219,9 +217,7 @@ end
 ---@param standings StandingsModel
 ---@return StandingsRound[]
 function Standings.makeRounds(standings)
-	---@diagnostic disable-next-line: invisible
 	local record = standings.record
-	---@diagnostic disable-next-line: invisible
 	local standingsEntries = standings.entryRecords
 
 	local roundCount = Array.maxBy(Array.map(standingsEntries, function(entry)
