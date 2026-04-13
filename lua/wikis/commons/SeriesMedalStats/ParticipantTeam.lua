@@ -18,8 +18,6 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local MedalsTable = Lua.import('Module:Widget/MedalsTable')
 
-local String = Lua.import('Module:StringUtils')
-
 ---@class SeriesMedalStatsParticipantTeam: SeriesMedalStats
 ---@field teams table<string, string>
 local MedalStats = Class.new(MedalStatsBase)
@@ -91,7 +89,7 @@ function MedalStats:_processData()
 	---@return string?
 	local getIdentifier = function(placement)
 		local teamTemplate = (placement.opponentplayers or {}).p1team
-		if String.isEmpty(teamTemplate) then
+		if Logic.isEmpty(teamTemplate) then
 			return
 		end
 		---@cast teamTemplate -nil

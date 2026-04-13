@@ -76,7 +76,6 @@ end
 ---@param args table
 ---@return SeriesMedalStatsConfig
 function MedalStats:_getConfig(args)
-
 	local columns = Array.extend(
 		'1',
 		'2',
@@ -85,12 +84,6 @@ function MedalStats:_getConfig(args)
 		Logic.readBool(args.copper) and FOURTH or nil,
 		'total'
 	)
-
-	local series = Array.parseCommaSeparatedString(args.series or mw.title.getCurrentTitle().prefixedText)
-	if not Logic.readBool(args.noredirect) then
-		series = Array.map(series, mw.ext.TeamLiquidIntegration.resolve_redirect)
-	end
-	series = Array.map(series, function(value) return (value:gsub('_', ' ')) end)
 
 	return {
 		cutAfter = MathUtil.toInteger(args.cutafter) or 7,
