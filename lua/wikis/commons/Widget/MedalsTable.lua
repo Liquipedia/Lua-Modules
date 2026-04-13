@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
 local Medals = Lua.import('Module:Medals')
 local Table = Lua.import('Module:Table')
 local Tier = Lua.import('Module:Tier/Utils')
@@ -29,6 +30,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field renderRowFirstCell fun(key: string|table): string?
 ---@field rowSort? fun(tbl: {[K]: V}, a: K, b: K):boolean
 ---@field reducePadding boolean?
+---@field cutAfter integer
 
 local DEFAULT_DATA_COLUMNS = {'1', '2', '3', '3-4', '4', 'total'}
 
@@ -49,9 +51,17 @@ function MedalsTable:render()
 	-- can not use defaultProps as the deepmerge might add unwanted columns from default into the inputted data ...
 	self.dataColumns = self.props.dataColumns or DEFAULT_DATA_COLUMNS
 
+	local collapsed = Logic.isNotEmpty(self.props.cutAfter)
+
 	return TableWidgets.Table{
 		caption = self.props.caption,
-		sortable = true,
+		sortable = not collapsed,
+		tableClasses = collapsed and {'prizepooltable', 'collapsed'} or nil,
+		tableAttributes = collapsed and {
+			['data-opentext'] = 'Show more',
+			['data-closetext'] = 'Show less',
+			['data-cutafter'] = self.props.cutAfter,
+		} or nil,
 		columns = WidgetUtil.collect(
 			{align = 'left'}, -- tier
 			Array.map(self.dataColumns, function() return {align = 'right'} end)
