@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local HeroNames = Lua.import('Module:HeroNames', {loadData = true})
+local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
@@ -40,12 +41,10 @@ function MatchFunctions.getLinks(match, games)
 	local links = MatchGroupInputUtil.getLinks(match)
 	links.statlocker = {}
 
-	Array.forEach(
-		Array.filter(games, function(map) return map.matchid ~= nil end),
-		function(map, mapIndex)
-			links.statlocker[mapIndex] = 'https://statlocker.gg/match/' .. map.matchid
-		end
-	)
+	Array.forEach(games, function(map, mapIndex)
+		if Logic.isEmpty(map.matchid) then return end
+		links.statlocker[mapIndex] = 'https://statlocker.gg/match/' .. map.matchid
+	end)
 
 	return links
 end
