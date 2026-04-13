@@ -249,6 +249,10 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		&[ data-mobile-dropdown-ready ] > .dropdown-widget {
 			display: block;
 		}
+
+		&[ data-mobile-dropdown-grouped ] {
+			display: none;
+		}
 	}
 
 	html.client-nojs & {

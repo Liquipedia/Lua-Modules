@@ -38,6 +38,7 @@ const TABS_CONFIG = {
 		VISIBLE: 'visible'
 	},
 	ATTRIBUTES: {
+		STATIC_DROPDOWN_GROUPED: 'data-mobile-dropdown-grouped',
 		STATIC_DROPDOWN_READY: 'data-mobile-dropdown-ready',
 		DROPDOWN_TOGGLE: 'data-dropdown-toggle'
 	},
@@ -666,6 +667,10 @@ class TabsModule {
 			return;
 		}
 
+		group.slice( 1 ).forEach( ( containerElement ) => {
+			containerElement.setAttribute( TABS_CONFIG.ATTRIBUTES.STATIC_DROPDOWN_GROUPED, 'true' );
+		} );
+
 		const dropdown = this.ensureStaticDropdown( primaryContainer );
 
 		const renderGroup = () => this.renderStaticGroup( group );
@@ -676,6 +681,9 @@ class TabsModule {
 		this.staticCleanupFunctions.add( () => {
 			dropdown.removeEventListener( 'dropdown:beforeopen', renderGroup );
 			primaryContainer.removeAttribute( TABS_CONFIG.ATTRIBUTES.STATIC_DROPDOWN_READY );
+			group.slice( 1 ).forEach( ( containerElement ) => {
+				containerElement.removeAttribute( TABS_CONFIG.ATTRIBUTES.STATIC_DROPDOWN_GROUPED );
+			} );
 		} );
 	}
 

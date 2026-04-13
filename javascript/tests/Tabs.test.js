@@ -142,6 +142,9 @@ describe( 'Tabs module', () => {
 
 			initializeTabs();
 
+			const staticContainers = document.querySelectorAll( '.tabs-static' );
+			expect( staticContainers[ 1 ].getAttribute( 'data-mobile-dropdown-grouped' ) ).toBe( 'true' );
+
 			const dropdowns = document.querySelectorAll( '.tabs-static > .dropdown-widget' );
 			expect( dropdowns ).toHaveLength( 1 );
 			expect( dropdowns[ 0 ].querySelector( '.dropdown-widget__menu > ul > li > ul' ) ).not.toBeNull();
