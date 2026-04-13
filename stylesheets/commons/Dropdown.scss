@@ -36,6 +36,12 @@ Template(s): Dropdown Widget
 		width: 100%;
 	}
 
+	&__toggle {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+	}
+
 	&__menu {
 		display: none;
 		position: absolute;

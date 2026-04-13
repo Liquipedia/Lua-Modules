@@ -36,7 +36,6 @@ local VARIANT_CONFIG = {
 }
 
 ---@class DropdownContainerWidgetParameters
----@field button string|Widget|(string|Widget)[]
 ---@field children Renderable|Renderable[]
 ---@field variant 'inline'|'form'?
 ---@field classes string[]?
@@ -60,32 +59,26 @@ function DropdownContainer:render()
 	assert(VALID_VARIANTS[self.props.variant], 'Invalid Dropdown variant "' .. self.props.variant .. '"')
 	local variantConfig = VARIANT_CONFIG[self.props.variant]
 
-	local buttonAttributes = {}
-	local menuAttributes = {}
+	local buttonAttributes = {
+		['aria-expanded'] = 'false',
+		['aria-haspopup'] = 'menu',
+	}
+	local menuAttributes = {['aria-hidden'] = 'true'}
 
-	local toggleChildren = self.props.button
-	if self.props.variant == 'form' then
-		buttonAttributes = Table.merge({
-			['aria-expanded'] = 'false',
-			['aria-haspopup'] = 'menu',
-		}, buttonAttributes)
-		menuAttributes = Table.merge({['aria-hidden'] = 'true'}, menuAttributes)
-
-		toggleChildren = {
-			Logic.isEmpty(self.props.prefix) and nil or Span{
-				classes = {'dropdown-widget__prefix'},
-				children = self.props.prefix,
-			},
-			Span{
-				classes = {'dropdown-widget__label'},
-				children = self.props.label,
-			},
-			Span{
-				classes = {'dropdown-widget__indicator'},
-				children = {Icon{iconName = 'expand', size = 'xs'}},
-			},
-		}
-	end
+	local toggleChildren = {
+		Logic.isEmpty(self.props.prefix) and nil or Span{
+			classes = {'dropdown-widget__prefix'},
+			children = self.props.prefix,
+		},
+		Span{
+			classes = {'dropdown-widget__label'},
+			children = self.props.label,
+		},
+		Span{
+			classes = {'dropdown-widget__indicator'},
+			children = {Icon{iconName = 'expand', size = 'xs'}},
+		},
+	}
 
 	local toggleButton = Button{
 		size = variantConfig.buttonSize,
