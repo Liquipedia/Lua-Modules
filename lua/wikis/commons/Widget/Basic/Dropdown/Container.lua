@@ -15,7 +15,9 @@ local Table = Lua.import('Module:Table')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Button = Lua.import('Module:Widget/Basic/Button')
+local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Div = HtmlWidgets.Div
+local Span = HtmlWidgets.Span
 
 local VALID_VARIANTS = {
 	inline = true,
@@ -33,6 +35,10 @@ local VALID_VARIANTS = {
 ---@field menuAttributes table?
 ---@field buttonSize 'xs'|'sm'|'md'|'lg'?
 ---@field buttonVariant string?
+---@field prefix Renderable|Renderable[]?
+---@field prefixClasses string[]?
+---@field label Renderable|Renderable[]?
+---@field labelClasses string[]?
 
 ---@class DropdownContainerWidget: Widget
 ---@operator call(DropdownContainerWidgetParameters): DropdownContainerWidget
@@ -52,12 +58,39 @@ function DropdownContainer:render()
 
 	assert(VALID_VARIANTS[self.props.variant], 'Invalid Dropdown variant "' .. self.props.variant .. '"')
 
+	local buttonAttributes = self.props.buttonAttributes or {}
+	local menuAttributes = self.props.menuAttributes or {}
+
+	local toggleChildren = self.props.button
+	if self.props.variant == 'form' then
+		buttonAttributes = Table.merge({
+			['aria-expanded'] = 'false',
+			['aria-haspopup'] = 'menu',
+		}, buttonAttributes)
+		menuAttributes = Table.merge({['aria-hidden'] = 'true'}, menuAttributes)
+
+		toggleChildren = {
+			Logic.isEmpty(self.props.prefix) and nil or Span{
+				classes = Array.extend('dropdown-widget__prefix', self.props.prefixClasses),
+				children = self.props.prefix,
+			},
+			Span{
+				classes = Array.extend('dropdown-widget__label', self.props.labelClasses),
+				children = self.props.label,
+			},
+			Span{
+				classes = {'dropdown-widget__indicator'},
+				children = {Icon{iconName = 'expand', size = 'xs'}},
+			},
+		}
+	end
+
 	local toggleButton = Button{
 		size = self.props.buttonSize,
 		variant = self.props.buttonVariant,
 		classes = Array.extend('dropdown-widget__toggle', self.props.buttonClasses),
-		attributes = Table.merge(self.props.buttonAttributes or {}, {['data-dropdown-toggle'] = 'true'}),
-		children = self.props.button
+		attributes = Table.merge(buttonAttributes, {['data-dropdown-toggle'] = 'true'}),
+		children = toggleChildren
 	}
 
 	return Div{
@@ -66,7 +99,7 @@ function DropdownContainer:render()
 			toggleButton,
 			Div{
 				classes = Array.extend('dropdown-widget__menu', self.props.menuClasses),
-				attributes = self.props.menuAttributes,
+				attributes = menuAttributes,
 				children = self.props.children
 			}
 		}

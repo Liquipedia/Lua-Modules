@@ -22,7 +22,9 @@ const { test, expect, beforeAll, beforeEach, describe } = require( '@jest/global
 		return `
 			<div class="dropdown-widget dropdown-widget--form">
 				<div class="dropdown-widget__toggle" data-dropdown-toggle="true" role="button" tabindex="0" aria-expanded="false" aria-haspopup="menu">
-					<span>${ label }</span>
+					<span class="dropdown-widget__prefix">Icon</span>
+					<span class="dropdown-widget__label">${ label }</span>
+					<span class="dropdown-widget__indicator"><i class="far fa-chevron-down fa-xs"></i></span>
 				</div>
 				<div class="dropdown-widget__menu" aria-hidden="true">
 					<ul>
