@@ -27,12 +27,12 @@ local VALID_VARIANTS = {
 
 local VARIANT_CONFIG = {
 	inline = {
-		buttonSize = 'xs',
-		buttonVariant = 'ghost',
+		size = 'xs',
+		variant = 'ghost',
 	},
 	form = {
-		buttonSize = 'md',
-		buttonVariant = 'secondary',
+		size = 'md',
+		variant = 'secondary',
 	},
 }
 
@@ -60,12 +60,6 @@ function DropdownContainer:render()
 	assert(VALID_VARIANTS[self.props.variant], 'Invalid Dropdown variant "' .. self.props.variant .. '"')
 	local variantConfig = VARIANT_CONFIG[self.props.variant]
 
-	local buttonAttributes = {
-		['aria-expanded'] = 'false',
-		['aria-haspopup'] = 'menu',
-	}
-	local menuAttributes = {['aria-hidden'] = 'true'}
-
 	local toggleChildren = WidgetUtil.collect(
 		Logic.isNotEmpty(self.props.prefix) and Span{
 			classes = {'dropdown-widget__prefix'},
@@ -82,10 +76,14 @@ function DropdownContainer:render()
 	)
 
 	local toggleButton = Button{
-		size = variantConfig.buttonSize,
-		variant = variantConfig.buttonVariant,
+		size = variantConfig.size,
+		variant = variantConfig.variant,
 		classes = {'dropdown-widget__toggle'},
-		attributes = Table.merge(buttonAttributes, {['data-dropdown-toggle'] = 'true'}),
+		attributes = {
+			['data-dropdown-toggle'] = 'true',
+			['aria-expanded'] = 'false',
+			['aria-haspopup'] = 'menu',
+		},
 		children = toggleChildren
 	}
 
@@ -95,7 +93,7 @@ function DropdownContainer:render()
 			toggleButton,
 			Div{
 				classes = {'dropdown-widget__menu'},
-				attributes = menuAttributes,
+				attributes = {['aria-hidden'] = 'true'},
 				children = self.props.children
 			}
 		}
