@@ -10,12 +10,13 @@ describe('Dropdown', function()
 		}
 		local html = tostring(widget)
 		assert.truthy(html:find('dropdown%-widget'))
-		assert.truthy(html:find('dropdown%-widget%-%-inline'))
+		assert.truthy(html:find('dropdown%-widget%-%-form'))
 		assert.truthy(html:find('dropdown%-widget__toggle'))
 		assert.truthy(html:find('data%-dropdown%-toggle="true"'))
 		assert.truthy(html:find('dropdown%-widget__menu'))
 		assert.truthy(html:find('dropdown%-widget__label'))
 		assert.truthy(html:find('dropdown%-widget__indicator'))
+		assert.truthy(html:find('btn%-secondary'))
 	end)
 
 	it('should render dropdown items', function()
@@ -32,9 +33,8 @@ describe('Dropdown', function()
 		assert.truthy(html:find('dropdown%-widget__item'))
 	end)
 
-	it('should render the form variant with built-in toggle structure', function()
+	it('should render the default form variant with built-in toggle structure', function()
 		local widget = Dropdown{
-			variant = 'form',
 			classes = {'custom-dropdown'},
 			prefix = 'Icon',
 			label = 'Choose option',
@@ -101,6 +101,7 @@ describe('Dropdown', function()
 
 	it('should render the inline variant with built-in toggle structure', function()
 		local widget = Dropdown{
+			variant = 'inline',
 			prefix = 'Icon',
 			label = 'Actions',
 			children = {

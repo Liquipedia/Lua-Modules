@@ -20,8 +20,8 @@ local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
 
 local VALID_VARIANTS = {
-	inline = true,
 	form = true,
+	inline = true,
 }
 
 local VARIANT_CONFIG = {
@@ -37,7 +37,7 @@ local VARIANT_CONFIG = {
 
 ---@class DropdownContainerWidgetParameters
 ---@field children Renderable|Renderable[]
----@field variant 'inline'|'form'?
+---@field variant 'form'|'inline'?
 ---@field classes string[]?
 ---@field prefix Renderable|Renderable[]?
 ---@field label Renderable|Renderable[]?
@@ -47,7 +47,7 @@ local VARIANT_CONFIG = {
 ---@field props DropdownContainerWidgetParameters
 local DropdownContainer = Class.new(Widget)
 DropdownContainer.defaultProps = {
-	variant = 'inline',
+	variant = 'form',
 }
 
 ---@return Widget|nil
