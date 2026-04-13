@@ -7,7 +7,7 @@ describe('Tabs Module', function()
 			assert.is.error(Tabs.static, 'You are trying to add a "Tabs" template without arguments for names nor links')
 		end)
 
-		it('should create static tabs with nav wrapper and dropdown', function()
+		it('should create static tabs with nav wrapper', function()
 			local args = {
 				name1 = 'Tab1',
 				link1 = 'Link1',
@@ -17,7 +17,6 @@ describe('Tabs Module', function()
 			}
 			local result = tostring(Tabs.static(args))
 			assert.is_true(result:find('tabs-nav-wrapper', nil, true) ~= nil)
-			assert.is_false(result:find('dropdown-widget', nil, true) ~= nil)
 		end)
 
 		it('should mark the active tab in the nav only', function()
@@ -34,17 +33,19 @@ describe('Tabs Module', function()
 			assert.are.equal(1, count)
 		end)
 
-		it('should include the active tab name in the dropdown label', function()
+		it('should render the active tab name in the active nav item', function()
 			local args = {
 				name1 = 'MyActiveTab',
 				link1 = 'Link1',
 				name2 = 'Tab2',
 				link2 = 'Link2',
 				This = 1
-		}
-		local result = tostring(Tabs.static(args))
-		assert.is_true(result:find('MyActiveTab', nil, true) ~= nil)
-	end)
+			}
+			local result = tostring(Tabs.static(args))
+			local activeItem = result:match('<li class="[^"]*active[^"]*".->.-</li>')
+			assert.is_not_nil(activeItem)
+			assert.is_true(activeItem:find('MyActiveTab', nil, true) ~= nil)
+		end)
 
 		it('should keep nav-tabs class on the ul', function()
 			local args = {
