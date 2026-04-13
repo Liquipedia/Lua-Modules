@@ -59,7 +59,9 @@ function MedalStats:create()
 		cutAfter = self.config.cutAfter,
 		footer = HtmlWidgets.Small{
 			children = {
-				'Medals won per Team shows the team that a player was<br>on when the medal was won, ',
+				'Medals won per Team shows the team that a player was',
+				HtmlWidgets.Br{},
+				'on when the medal was won, ',
 				HtmlWidgets.B{children = 'not'},
 				' their current team.',
 			}
