@@ -19,9 +19,14 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local DATA_COLUMNS = {'1', '2', '3', '3-4', '4', 'total'}
 
+---@class MedalsTableProps
+---@field caption string?
+---@field footer Renderable?
+---@field data table
+
 ---@class MedalsTable: Widget
----@operator call(table): MedalsTable
----@field props {caption: string?, footer: Renderable?, data: table}
+---@operator call(MedalsTableProps): MedalsTable
+---@field props MedalsTableProps
 local MedalsTable = Class.new(Widget)
 
 ---@return Widget

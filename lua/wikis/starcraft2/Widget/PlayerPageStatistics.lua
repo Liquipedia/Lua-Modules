@@ -39,6 +39,7 @@ function PlayerPageStatistics:render()
 	)
 end
 
+---@private
 ---@return Widget?
 function PlayerPageStatistics:_matchupStats()
 	---@type table<string, table<string, {w: integer?, l: integer?}>>
@@ -80,6 +81,7 @@ function PlayerPageStatistics:_matchupStats()
 	}
 end
 
+---@private
 ---@param row string
 ---@param rowData table<string, {w: integer?, l: integer?}>
 ---@param columns string[]
@@ -113,6 +115,7 @@ function PlayerPageStatistics:_matchupStatsRow(row, rowData, columns)
 	}
 end
 
+---@private
 ---@param columns string[]
 ---@return Widget
 function PlayerPageStatistics:_matchupStatsHeader(columns)
@@ -139,6 +142,7 @@ function PlayerPageStatistics:_matchupStatsHeader(columns)
 	}
 end
 
+---@private
 ---@return Widget
 function PlayerPageStatistics:_earningsChart()
 	local rawData = Json.parseIfString(Variables.varDefault('earningsStats')) or {}
