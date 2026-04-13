@@ -23,9 +23,10 @@ describe('Tabs Module', function()
 			assert.is_true(result:find('aria-expanded="false"', nil, true) ~= nil)
 			assert.is_true(result:find('aria-haspopup="menu"', nil, true) ~= nil)
 			assert.is_true(result:find('aria-hidden="true"', nil, true) ~= nil)
+			assert.is_true(result:find('<div class="dropdown%-widget__menu" aria%-hidden="true"><ul></ul></div>', nil, false) ~= nil)
 		end)
 
-		it('should mark the active tab in the nav and dropdown', function()
+		it('should mark the active tab in the nav only', function()
 			local args = {
 				name1 = 'Tab1',
 				link1 = 'Link1',
@@ -34,10 +35,9 @@ describe('Tabs Module', function()
 				This = 1
 			}
 			local result = tostring(Tabs.static(args))
-			-- nav and dropdown both contain an active li
 			local count = 0
 			for _ in result:gmatch('class="[^"]*active[^"]*"') do count = count + 1 end
-			assert.is_true(count >= 2)
+			assert.are.equal(1, count)
 		end)
 
 		it('should include the active tab name in the dropdown label', function()

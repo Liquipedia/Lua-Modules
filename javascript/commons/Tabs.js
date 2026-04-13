@@ -16,10 +16,7 @@ const TABS_CONFIG = {
 		ACTIVE_TAB: 'li.active',
 		TAB_ITEMS: 'li',
 		STATIC_DROPDOWN: '.dropdown-widget',
-		STATIC_DROPDOWN_TOGGLE: '.dropdown-widget__toggle',
 		STATIC_DROPDOWN_LABEL: '.dropdown-widget__label',
-		STATIC_DROPDOWN_MENU: '.dropdown-widget__menu',
-		STATIC_DROPDOWN_LIST: '.dropdown-widget__menu > ul',
 		DIRECT_CHILD_TABS_CONTENT: ':scope > .tabs-content',
 		DIRECT_CHILD_ANALYTICS_STATIC: ':scope > [data-analytics-name="Navigation tab"] > .tabs-static'
 	},
@@ -37,12 +34,7 @@ const TABS_CONFIG = {
 		ACTIVE: 'active',
 		DRAGGING: 'dragging',
 		SHOW_ALL: 'show-all',
-		VISIBLE: 'visible',
-		STATIC_GROUP_CHILD: 'tabs-static--group-child',
-		STATIC_GROUP_ITEM: 'tabs-static-dropdown-item--nested',
-		STATIC_GROUP_DIVIDER: 'tabs-static-dropdown-item--group-end',
-		STATIC_BREADCRUMB_SEPARATOR: 'tabs-static-dropdown-separator',
-		STATIC_GROUP_ICON: 'tabs-static-dropdown-item-icon'
+		VISIBLE: 'visible'
 	},
 	ICONS: {
 		CHEVRON_RIGHT: 'fas fa-chevron-right fa-xs'
@@ -479,173 +471,6 @@ class TabContainer {
 	}
 }
 
-class StaticTabContainer extends TabContainer {
-	init() {
-		this.indexElements();
-		this._setupScrollHandlers();
-		this.setupMobileDropdown();
-	}
-
-	buildBreadcrumb() {
-		const labels = [];
-
-		const activeItem = this.navTabs.querySelector( TABS_CONFIG.SELECTORS.ACTIVE_TAB );
-		if ( activeItem ) {
-			labels.push( ( activeItem.textContent || '' ).trim() );
-		}
-
-		let ancestor = this.container.parentElement &&
-			this.container.parentElement.closest( TABS_CONFIG.SELECTORS.STATIC_CONTAINER );
-		while ( ancestor ) {
-			const ancestorNavTabs = ancestor.querySelector( TABS_CONFIG.SELECTORS.NAV_TABS );
-			if ( ancestorNavTabs ) {
-				const ancestorActive = ancestorNavTabs.querySelector( TABS_CONFIG.SELECTORS.ACTIVE_TAB );
-				if ( ancestorActive ) {
-					labels.unshift( ( ancestorActive.textContent || '' ).trim() );
-				}
-			}
-			ancestor = ancestor.parentElement &&
-				ancestor.parentElement.closest( TABS_CONFIG.SELECTORS.STATIC_CONTAINER );
-		}
-
-		return labels.join( ' > ' );
-	}
-
-	updateBreadcrumb() {
-		const label = this.container.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN_LABEL );
-		if ( label ) {
-			label.textContent = this.buildBreadcrumb();
-		}
-	}
-
-	setupMobileDropdown() {
-		const dropdown = this.container.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN );
-
-		if ( !dropdown ) {
-			return;
-		}
-
-		this.updateBreadcrumb();
-
-		const beforeOpenHandler = () => {
-			this.updateBreadcrumb();
-		};
-		dropdown.addEventListener( 'dropdown:beforeopen', beforeOpenHandler );
-		this.cleanupFunctions.add( () => {
-			dropdown.removeEventListener( 'dropdown:beforeopen', beforeOpenHandler );
-		} );
-	}
-}
-
-/**
- * Manages a nested chain of static tab containers,
- * building a single unified mobile dropdown across all levels.
- */
-class StaticTabsGroup {
-	constructor( containers ) {
-		this.containers = containers;
-		this.primaryContainer = containers[ 0 ];
-		containers.slice( 1 ).forEach( ( container ) => {
-			container.container.classList.add( TABS_CONFIG.CLASSES.STATIC_GROUP_CHILD );
-		} );
-		this._buildMergedMenu();
-		this._overrideBreadcrumb();
-	}
-
-	_overrideBreadcrumb() {
-		this.primaryContainer.updateBreadcrumb = () => this._renderBreadcrumb();
-		this._renderBreadcrumb();
-	}
-
-	_renderBreadcrumb() {
-		const label = this.primaryContainer.container.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN_LABEL );
-		if ( !label ) {
-			return;
-		}
-
-		const nodes = [];
-		this.containers.forEach( ( container ) => {
-			const activeItem = container.navTabs.querySelector( TABS_CONFIG.SELECTORS.ACTIVE_TAB );
-			const text = activeItem ? ( activeItem.textContent || '' ).trim() : null;
-			if ( !text ) {
-				return;
-			}
-			if ( nodes.length > 0 ) {
-				const separator = document.createElement( 'i' );
-				separator.className = TABS_CONFIG.CLASSES.STATIC_BREADCRUMB_SEPARATOR;
-				separator.classList.add( ...TABS_CONFIG.ICONS.CHEVRON_RIGHT.split( ' ' ) );
-				nodes.push( separator );
-			}
-			nodes.push( document.createTextNode( text ) );
-		} );
-
-		label.replaceChildren( ...nodes );
-	}
-
-	_buildMergedMenu() {
-		const primaryMenu = this.primaryContainer.container.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN_MENU );
-		if ( !primaryMenu ) {
-			return;
-		}
-
-		const primaryList = this.primaryContainer.container.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN_LIST );
-		if ( !primaryList ) {
-			return;
-		}
-
-		const primarySourceItems = Array.from( primaryList.children ).filter(
-			( item ) => !item.classList.contains( TABS_CONFIG.CLASSES.STATIC_GROUP_ITEM ),
-		);
-		const mergedItems = primarySourceItems.map( ( item ) => item.cloneNode( true ) );
-		let insertionRange = mergedItems;
-
-		this.containers.slice( 1 ).forEach( ( container, levelIndex ) => {
-			const level = levelIndex + 1;
-			const list = container.container.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN_LIST );
-			if ( !list ) {
-				return;
-			}
-
-			const sourceItems = Array.from( list.children ).filter(
-				( item ) => !item.classList.contains( TABS_CONFIG.CLASSES.STATIC_GROUP_ITEM ),
-			);
-
-			const items = sourceItems.map( ( item ) => {
-				const clone = item.cloneNode( true );
-				clone.classList.remove( TABS_CONFIG.CLASSES.STATIC_GROUP_DIVIDER );
-				clone.classList.add( TABS_CONFIG.CLASSES.STATIC_GROUP_ITEM );
-				clone.style.setProperty( '--tabs-static-item-level', String( level - 1 ) );
-
-				const icon = document.createElement( 'i' );
-				icon.className = TABS_CONFIG.CLASSES.STATIC_GROUP_ICON;
-				icon.classList.add( ...TABS_CONFIG.ICONS.CHEVRON_RIGHT.split( ' ' ) );
-				clone.insertBefore( icon, clone.firstChild );
-				return clone;
-			} );
-
-			if ( items.length > 0 ) {
-				items[ items.length - 1 ].classList.add( TABS_CONFIG.CLASSES.STATIC_GROUP_DIVIDER );
-			}
-
-			const activeParent = insertionRange.find( ( item ) => item.classList.contains( TABS_CONFIG.CLASSES.ACTIVE ) );
-			if ( !activeParent ) {
-				return;
-			}
-
-			const insertionIndex = mergedItems.indexOf( activeParent );
-			mergedItems.splice( insertionIndex + 1, 0, ...items );
-			insertionRange = items;
-		} );
-
-		const lastMergedItem = mergedItems[ mergedItems.length - 1 ];
-		if ( lastMergedItem ) {
-			lastMergedItem.classList.remove( TABS_CONFIG.CLASSES.STATIC_GROUP_DIVIDER );
-		}
-
-		primaryList.replaceChildren( ...mergedItems );
-	}
-}
-
 /**
  * Manages hash-based navigation
  */
@@ -734,7 +559,7 @@ class HashRouter {
 class TabsModule {
 	constructor() {
 		this.dynamicContainers = new Map();
-		this.staticContainers = new Map();
+		this.staticCleanupFunctions = new Set();
 		this.hashRouter = new HashRouter( this );
 	}
 
@@ -752,53 +577,51 @@ class TabsModule {
 			}
 		} );
 
-		const staticContainers = document.querySelectorAll( TABS_CONFIG.SELECTORS.STATIC_CONTAINER );
-		staticContainers.forEach( ( containerElement ) => {
-			const container = new StaticTabContainer( containerElement );
-			if ( container.navTabs ) {
-				this.staticContainers.set( containerElement, container );
-			}
-		} );
-
-		this._groupStaticContainers();
+		this.initializeStaticTabs();
 	}
 
-	_groupStaticContainers() {
-		const groupedContainers = new Set();
-
-		this._groupNestedStaticContainers( groupedContainers );
-		this._groupSiblingStaticContainers( groupedContainers );
-	}
-
-	_groupNestedStaticContainers( groupedContainers ) {
-		const topLevelContainers = Array.from( this.staticContainers.keys() ).filter(
-			( containerElement ) => !containerElement.parentElement?.closest( TABS_CONFIG.SELECTORS.STATIC_CONTAINER ),
-		);
-
-			topLevelContainers.forEach( ( rootElement ) => {
-			if ( groupedContainers.has( rootElement ) ) {
+	initializeStaticTabs() {
+		const processed = new Set();
+		document.querySelectorAll( TABS_CONFIG.SELECTORS.STATIC_CONTAINER ).forEach( ( containerElement ) => {
+			if ( processed.has( containerElement ) ) {
 				return;
 			}
 
-			const containerElements = [];
-			let currentElement = rootElement;
-
-			while ( currentElement ) {
-				const container = this.staticContainers.get( currentElement );
-				if ( !container ) {
-					break;
-				}
-
-				containerElements.push( currentElement );
-
-				currentElement = this._findNestedStaticContainer( currentElement );
-			}
-
-			this._createStaticTabsGroup( containerElements, groupedContainers );
+			const group = this.collectStaticGroup( containerElement, processed );
+			this.setupStaticGroup( group );
 		} );
 	}
 
-	_findNestedStaticContainer( containerElement ) {
+	collectStaticGroup( startElement, processed ) {
+		const group = [];
+		let currentElement = startElement;
+
+		while ( currentElement && !processed.has( currentElement ) ) {
+			group.push( currentElement );
+			processed.add( currentElement );
+			currentElement = this.getNextStaticGroupElement( currentElement, processed );
+		}
+
+		return group;
+	}
+
+	getNextStaticGroupElement( containerElement, processed ) {
+		const nestedElement = this.getNestedStaticChild( containerElement );
+		if ( nestedElement && !processed.has( nestedElement ) ) {
+			return nestedElement;
+		}
+
+		const anchor = this.getStaticAnchor( containerElement );
+		const nextAnchor = anchor?.nextElementSibling;
+		const siblingElement = this.getStaticContainerFromNode( nextAnchor );
+		if ( siblingElement && !processed.has( siblingElement ) ) {
+			return siblingElement;
+		}
+
+		return null;
+	}
+
+	getNestedStaticChild( containerElement ) {
 		const directChildStatic = containerElement.querySelector( TABS_CONFIG.SELECTORS.DIRECT_CHILD_ANALYTICS_STATIC );
 		if ( directChildStatic ) {
 			return directChildStatic;
@@ -809,93 +632,123 @@ class TabsModule {
 			return null;
 		}
 
-		return this._findDirectChildStaticContainer( contentContainer );
+		return this.getStaticContainerFromNode( contentContainer.firstElementChild ) ||
+			Array.from( contentContainer.children )
+				.map( ( child ) => this.getStaticContainerFromNode( child ) )
+				.find( Boolean ) || null;
 	}
 
-	_groupSiblingStaticContainers( groupedContainers ) {
-		const staticElements = Array.from( this.staticContainers.keys() );
-		let group = [];
-
-		const processGroup = () => {
-			if ( group.length > 1 ) {
-				this._createStaticTabsGroup( group, groupedContainers );
-			}
-			group = [];
-		};
-
-		staticElements.forEach( ( element ) => {
-			if ( groupedContainers.has( element ) ) {
-				processGroup();
-				return;
-			}
-
-			const anchor = this._getStaticGroupAnchor( element );
-
-			if ( group.length === 0 ) {
-				group.push( element );
-				return;
-			}
-
-			const previousAnchor = this._getStaticGroupAnchor( group[ group.length - 1 ] );
-			const isAdjacentSibling = previousAnchor.parentElement === anchor.parentElement &&
-				previousAnchor.nextElementSibling === anchor;
-
-			if ( isAdjacentSibling ) {
-				group.push( element );
-			} else {
-				processGroup();
-				group.push( element );
-			}
-		} );
-
-		processGroup();
+	getStaticAnchor( containerElement ) {
+		const parent = containerElement.parentElement;
+		return parent?.getAttribute( 'data-analytics-name' ) === 'Navigation tab' ? parent : containerElement;
 	}
 
-	_createStaticTabsGroup( elements, groupedContainers ) {
-		if ( elements.length < 2 ) {
+	getStaticContainerFromNode( node ) {
+		if ( !node ) {
+			return null;
+		}
+
+		if ( node.matches?.( TABS_CONFIG.SELECTORS.STATIC_CONTAINER ) ) {
+			return node;
+		}
+
+		return node.querySelector?.( ':scope > .tabs-static' ) || null;
+	}
+
+	setupStaticGroup( group ) {
+		const primaryContainer = group[ 0 ];
+		if ( !primaryContainer ) {
 			return;
 		}
 
-		const containers = elements
-			.filter( ( element ) => !groupedContainers.has( element ) )
-			.map( ( element ) => this.staticContainers.get( element ) )
+		const dropdown = primaryContainer.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN );
+		if ( !dropdown ) {
+			return;
+		}
+
+		const renderGroup = () => this.renderStaticGroup( group );
+		renderGroup();
+
+		dropdown.addEventListener( 'dropdown:beforeopen', renderGroup );
+		this.staticCleanupFunctions.add( () => {
+			dropdown.removeEventListener( 'dropdown:beforeopen', renderGroup );
+		} );
+	}
+
+	renderStaticGroup( group ) {
+		const primaryContainer = group[ 0 ];
+		const label = primaryContainer?.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN_LABEL );
+		const menuList = primaryContainer?.querySelector( '.dropdown-widget__menu > ul' );
+		if ( !label || !menuList ) {
+			return;
+		}
+
+		const segments = group
+			.map( ( container ) => this.getStaticActiveLabel( container ) )
 			.filter( Boolean );
 
-		if ( containers.length < 2 ) {
-			return;
-		}
+		label.replaceChildren( ...this.buildBreadcrumbNodes( segments ) );
+		menuList.replaceChildren( ...this.buildStaticMenuList( group ) );
+	}
 
-		new StaticTabsGroup( containers );
-		containers.forEach( ( container ) => {
-			groupedContainers.add( container.container );
+	getStaticNavTabs( containerElement ) {
+		return containerElement?.querySelector( ':scope > .tabs-nav-wrapper > .nav-tabs' ) ?? null;
+	}
+
+	getStaticActiveLabel( containerElement ) {
+		const activeItem = this.getStaticNavTabs( containerElement )?.querySelector( 'li.active' ) ?? null;
+		return activeItem ? ( activeItem.textContent || '' ).trim() : null;
+	}
+
+	buildBreadcrumbNodes( segments ) {
+		return segments.flatMap( ( segment, index ) => {
+			const nodes = [];
+			if ( index > 0 ) {
+				const separator = document.createElement( 'i' );
+				separator.classList.add( ...TABS_CONFIG.ICONS.CHEVRON_RIGHT.split( ' ' ) );
+				nodes.push( separator );
+			}
+			nodes.push( document.createElement( 'span' ) );
+			nodes[ nodes.length - 1 ].textContent = segment;
+			return nodes;
 		} );
 	}
 
-	_findDirectChildStaticContainer( parentElement ) {
-		for ( const child of parentElement.children ) {
-			if ( child.matches?.( TABS_CONFIG.SELECTORS.STATIC_CONTAINER ) ) {
-				return child;
-			}
-
-			if ( child.getAttribute?.( 'data-analytics-name' ) === 'Navigation tab' ) {
-				for ( const grandChild of child.children ) {
-					if ( grandChild.matches?.( TABS_CONFIG.SELECTORS.STATIC_CONTAINER ) ) {
-						return grandChild;
-					}
-				}
-			}
+	buildStaticMenuList( group, level = 0 ) {
+		const containerElement = group[ level ];
+		if ( !containerElement ) {
+			return [];
 		}
 
-		return null;
+		const navItems = Array.from( this.getStaticNavTabs( containerElement )?.children || [] )
+			.map( ( navItem ) => this.cloneStaticMenuItem( navItem, level ) );
+
+		const activeItem = navItems.find( ( navItem ) => navItem.classList.contains( TABS_CONFIG.CLASSES.ACTIVE ) );
+		const nestedItems = this.buildStaticMenuList( group, level + 1 );
+		if ( activeItem && nestedItems.length > 0 ) {
+			const nestedList = document.createElement( 'ul' );
+			nestedList.replaceChildren( ...nestedItems );
+			activeItem.appendChild( nestedList );
+		}
+
+		return navItems;
 	}
 
-	_getStaticGroupAnchor( containerElement ) {
-		const parent = containerElement.parentElement;
-		if ( parent?.getAttribute( 'data-analytics-name' ) === 'Navigation tab' ) {
-			return parent;
+	cloneStaticMenuItem( navItem, level ) {
+		const clone = navItem.cloneNode( true );
+		if ( level === 0 ) {
+			return clone;
 		}
 
-		return containerElement;
+		const content = clone.querySelector( ':scope > a, :scope > span' );
+		if ( content ) {
+			content.style.setProperty( '--tabs-static-menu-level', String( level ) );
+			const icon = document.createElement( 'i' );
+			icon.classList.add( ...TABS_CONFIG.ICONS.CHEVRON_RIGHT.split( ' ' ) );
+			content.prepend( icon );
+		}
+
+		return clone;
 	}
 
 	getDynamicContainer( element ) {
@@ -908,9 +761,9 @@ class TabsModule {
 
 	cleanup() {
 		this.dynamicContainers.forEach( ( container ) => container.cleanup() );
-		this.staticContainers.forEach( ( container ) => container.cleanup() );
 		this.dynamicContainers.clear();
-		this.staticContainers.clear();
+		this.staticCleanupFunctions.forEach( ( cleanupFn ) => cleanupFn() );
+		this.staticCleanupFunctions.clear();
 		this.hashRouter.cleanup();
 	}
 }

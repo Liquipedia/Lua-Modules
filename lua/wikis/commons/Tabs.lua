@@ -56,7 +56,7 @@ function Tabs.static(args)
 				local display = tostring(Icon{iconName = tab.icon, additionalClasses = {'tabs-static-tab-icon'}}) .. tostring(HtmlWidgets.Span{children = {name}})
 				child = tab.link and Page.makeInternalLink({}, display, tab.link) or display
 			else
-				child = tab.link and Page.makeInternalLink({}, name, tab.link) or tab.name
+				child = tab.link and Page.makeInternalLink({}, name, tab.link) or HtmlWidgets.Span{children = {tab.name}}
 			end
 			return HtmlWidgets.Li{
 				classes = Array.extend(additionalClasses or {}, {tab.this and 'active' or nil}),
@@ -74,9 +74,7 @@ function Tabs.static(args)
 	local dropdown = DropdownContainer{
 		prefix = HtmlWidgets.Span{classes = {'tabs-static-dropdown-icon'}},
 		label = activeTabName,
-		children = HtmlWidgets.Ul{
-			children = buildTabLiItems({'dropdown-widget__item'})
-		}
+		children = HtmlWidgets.Ul{}
 	}
 
 	return AnalyticsWidgets{
