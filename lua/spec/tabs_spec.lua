@@ -46,12 +46,12 @@ describe('Tabs Module', function()
 				link1 = 'Link1',
 				name2 = 'Tab2',
 				link2 = 'Link2',
-				This = 1
-			}
-			local result = tostring(Tabs.static(args))
-			assert.is_true(result:find('tabs-static-dropdown-label', nil, true) ~= nil)
-			assert.is_true(result:find('MyActiveTab', nil, true) ~= nil)
-		end)
+			This = 1
+		}
+		local result = tostring(Tabs.static(args))
+		assert.is_true(result:find('dropdown-widget__label', nil, true) ~= nil)
+		assert.is_true(result:find('MyActiveTab', nil, true) ~= nil)
+	end)
 
 		it('should keep nav-tabs class on the ul', function()
 			local args = {

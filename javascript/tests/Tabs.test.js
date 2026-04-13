@@ -186,7 +186,9 @@ const { test, expect, beforeAll, describe } = require( '@jest/globals' );
 					</div>
 					<div class="dropdown-widget dropdown-widget--form">
 						<div class="dropdown-widget__toggle" data-dropdown-toggle="true" role="button" tabindex="0" aria-expanded="false" aria-haspopup="menu">
-							<span class="tabs-static-dropdown-label"></span>
+							<span class="dropdown-widget__prefix"></span>
+							<span class="dropdown-widget__label"></span>
+							<span class="dropdown-widget__indicator"></span>
 						</div>
 						<div class="dropdown-widget__menu" aria-hidden="true">
 							<ul>

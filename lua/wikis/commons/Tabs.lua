@@ -72,11 +72,8 @@ function Tabs.static(args)
 	}
 
 	local dropdown = DropdownContainer{
-		variant = 'form',
-		buttonSize = 'md',
 		prefix = HtmlWidgets.Span{classes = {'tabs-static-dropdown-icon'}},
 		label = activeTabName,
-		labelClasses = {'tabs-static-dropdown-label'},
 		children = HtmlWidgets.Ul{
 			children = buildTabLiItems({'dropdown-widget__item'})
 		}
