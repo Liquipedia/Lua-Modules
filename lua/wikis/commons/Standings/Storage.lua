@@ -213,7 +213,7 @@ end
 
 ---@return boolean
 function StandingsStorage.shouldStoreLpdb()
-	return Namespace.isMain() and Lpdb.isStorageEnabled()
+	return Lpdb.isStorageEnabled()
 end
 
 ---@param data table
