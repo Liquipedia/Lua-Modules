@@ -324,14 +324,6 @@ html.client-nojs .tabs-content > div:not( .active ) {
 					justify-content: center;
 				}
 
-				.theme--light & {
-					color: var( --clr-secondary-39 ) !important;
-				}
-
-				.theme--dark & {
-					color: var( --clr-secondary-80 ) !important;
-				}
-
 				&.new {
 					.theme--light & {
 						color: var( --clr-semantic-negative-40 ) !important;
