@@ -33,6 +33,18 @@ describe('Dropdown', function()
 		assert.truthy(html:find('dropdown%-widget__item'))
 	end)
 
+	it('should not render a prefix wrapper when prefix is omitted', function()
+		local widget = Dropdown{
+			label = 'Actions',
+			children = {
+				DropdownItem{children = 'Option 1'},
+			}
+		}
+		local html = tostring(widget)
+		assert.falsy(html:find('dropdown%-widget__prefix'))
+		assert.truthy(html:find('dropdown%-widget__label'))
+	end)
+
 	it('should render the default form variant with built-in toggle structure', function()
 		local widget = Dropdown{
 			classes = {'custom-dropdown'},

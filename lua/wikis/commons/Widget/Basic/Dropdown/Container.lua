@@ -16,6 +16,7 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
 
@@ -65,11 +66,11 @@ function DropdownContainer:render()
 	}
 	local menuAttributes = {['aria-hidden'] = 'true'}
 
-	local toggleChildren = {
-		Logic.isEmpty(self.props.prefix) and nil or Span{
+	local toggleChildren = WidgetUtil.collect(
+		Logic.isNotEmpty(self.props.prefix) and Span{
 			classes = {'dropdown-widget__prefix'},
 			children = self.props.prefix,
-		},
+		} or nil,
 		Span{
 			classes = {'dropdown-widget__label'},
 			children = self.props.label,
@@ -77,8 +78,8 @@ function DropdownContainer:render()
 		Span{
 			classes = {'dropdown-widget__indicator'},
 			children = {Icon{iconName = 'expand', size = 'xs'}},
-		},
-	}
+		}
+	)
 
 	local toggleButton = Button{
 		size = variantConfig.buttonSize,
