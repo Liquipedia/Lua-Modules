@@ -24,21 +24,24 @@ local VALID_VARIANTS = {
 	form = true,
 }
 
+local VARIANT_CONFIG = {
+	inline = {
+		buttonSize = 'xs',
+		buttonVariant = 'ghost',
+	},
+	form = {
+		buttonSize = 'md',
+		buttonVariant = 'secondary',
+	},
+}
+
 ---@class DropdownContainerWidgetParameters
 ---@field button string|Widget|(string|Widget)[]
 ---@field children Renderable|Renderable[]
 ---@field variant 'inline'|'form'?
 ---@field classes string[]?
----@field buttonClasses string[]?
----@field buttonAttributes table?
----@field menuClasses string[]?
----@field menuAttributes table?
----@field buttonSize 'xs'|'sm'|'md'|'lg'?
----@field buttonVariant string?
 ---@field prefix Renderable|Renderable[]?
----@field prefixClasses string[]?
 ---@field label Renderable|Renderable[]?
----@field labelClasses string[]?
 
 ---@class DropdownContainerWidget: Widget
 ---@operator call(DropdownContainerWidgetParameters): DropdownContainerWidget
@@ -46,8 +49,6 @@ local VALID_VARIANTS = {
 local DropdownContainer = Class.new(Widget)
 DropdownContainer.defaultProps = {
 	variant = 'inline',
-	buttonSize = 'xs',
-	buttonVariant = 'ghost',
 }
 
 ---@return Widget|nil
@@ -57,9 +58,10 @@ function DropdownContainer:render()
 	end
 
 	assert(VALID_VARIANTS[self.props.variant], 'Invalid Dropdown variant "' .. self.props.variant .. '"')
+	local variantConfig = VARIANT_CONFIG[self.props.variant]
 
-	local buttonAttributes = self.props.buttonAttributes or {}
-	local menuAttributes = self.props.menuAttributes or {}
+	local buttonAttributes = {}
+	local menuAttributes = {}
 
 	local toggleChildren = self.props.button
 	if self.props.variant == 'form' then
@@ -71,11 +73,11 @@ function DropdownContainer:render()
 
 		toggleChildren = {
 			Logic.isEmpty(self.props.prefix) and nil or Span{
-				classes = Array.extend('dropdown-widget__prefix', self.props.prefixClasses),
+				classes = {'dropdown-widget__prefix'},
 				children = self.props.prefix,
 			},
 			Span{
-				classes = Array.extend('dropdown-widget__label', self.props.labelClasses),
+				classes = {'dropdown-widget__label'},
 				children = self.props.label,
 			},
 			Span{
@@ -86,9 +88,9 @@ function DropdownContainer:render()
 	end
 
 	local toggleButton = Button{
-		size = self.props.buttonSize,
-		variant = self.props.buttonVariant,
-		classes = Array.extend('dropdown-widget__toggle', self.props.buttonClasses),
+		size = variantConfig.buttonSize,
+		variant = variantConfig.buttonVariant,
+		classes = {'dropdown-widget__toggle'},
 		attributes = Table.merge(buttonAttributes, {['data-dropdown-toggle'] = 'true'}),
 		children = toggleChildren
 	}
@@ -98,7 +100,7 @@ function DropdownContainer:render()
 		children = {
 			toggleButton,
 			Div{
-				classes = Array.extend('dropdown-widget__menu', self.props.menuClasses),
+				classes = {'dropdown-widget__menu'},
 				attributes = menuAttributes,
 				children = self.props.children
 			}

@@ -29,17 +29,12 @@ describe('Dropdown', function()
 		assert.truthy(html:find('dropdown%-widget__item'))
 	end)
 
-	it('should render the form variant with forwarded classes and attributes', function()
+	it('should render the form variant with built-in toggle structure', function()
 		local widget = Dropdown{
 			variant = 'form',
 			classes = {'custom-dropdown'},
-			buttonClasses = {'custom-toggle'},
-			menuClasses = {'custom-menu'},
-			buttonSize = 'md',
 			prefix = 'Icon',
 			label = 'Choose option',
-			prefixClasses = {'custom-prefix'},
-			labelClasses = {'custom-label'},
 			children = {
 				DropdownItem{children = 'Option 1'},
 			}
@@ -47,10 +42,8 @@ describe('Dropdown', function()
 		local html = tostring(widget)
 		assert.truthy(html:find('dropdown%-widget%-%-form'))
 		assert.truthy(html:find('custom%-dropdown'))
-		assert.truthy(html:find('custom%-toggle'))
-		assert.truthy(html:find('custom%-prefix'))
-		assert.truthy(html:find('custom%-label'))
-		assert.truthy(html:find('custom%-menu'))
+		assert.truthy(html:find('btn%-secondary'))
+		assert.truthy(html:find('Choose option'))
 		assert.truthy(html:find('aria%-haspopup="menu"'))
 		assert.truthy(html:find('aria%-hidden="true"'))
 		assert.truthy(html:find('dropdown%-widget__prefix'))
