@@ -17,13 +17,7 @@ describe('Tabs Module', function()
 			}
 			local result = tostring(Tabs.static(args))
 			assert.is_true(result:find('tabs-nav-wrapper', nil, true) ~= nil)
-			assert.is_true(result:find('dropdown-widget--form', nil, true) ~= nil)
-			assert.is_true(result:find('dropdown-widget__menu', nil, true) ~= nil)
-			assert.is_true(result:find('tabs-static-dropdown-icon', nil, true) ~= nil)
-			assert.is_true(result:find('aria-expanded="false"', nil, true) ~= nil)
-			assert.is_true(result:find('aria-haspopup="menu"', nil, true) ~= nil)
-			assert.is_true(result:find('aria-hidden="true"', nil, true) ~= nil)
-			assert.is_true(result:find('<div class="dropdown%-widget__menu" aria%-hidden="true"><ul></ul></div>', nil, false) ~= nil)
+			assert.is_false(result:find('dropdown-widget', nil, true) ~= nil)
 		end)
 
 		it('should mark the active tab in the nav only', function()
@@ -46,10 +40,9 @@ describe('Tabs Module', function()
 				link1 = 'Link1',
 				name2 = 'Tab2',
 				link2 = 'Link2',
-			This = 1
+				This = 1
 		}
 		local result = tostring(Tabs.static(args))
-		assert.is_true(result:find('dropdown-widget__label', nil, true) ~= nil)
 		assert.is_true(result:find('MyActiveTab', nil, true) ~= nil)
 	end)
 

@@ -16,6 +16,7 @@ const TABS_CONFIG = {
 		ACTIVE_TAB: 'li.active',
 		TAB_ITEMS: 'li',
 		STATIC_DROPDOWN: '.dropdown-widget',
+		STATIC_DROPDOWN_PREFIX: '.dropdown-widget__prefix',
 		STATIC_DROPDOWN_LABEL: '.dropdown-widget__label',
 		DIRECT_CHILD_TABS_CONTENT: ':scope > .tabs-content',
 		DIRECT_CHILD_ANALYTICS_STATIC: ':scope > [data-analytics-name="Navigation tab"] > .tabs-static'
@@ -35,6 +36,10 @@ const TABS_CONFIG = {
 		DRAGGING: 'dragging',
 		SHOW_ALL: 'show-all',
 		VISIBLE: 'visible'
+	},
+	ATTRIBUTES: {
+		STATIC_DROPDOWN_READY: 'data-mobile-dropdown-ready',
+		DROPDOWN_TOGGLE: 'data-dropdown-toggle'
 	},
 	ICONS: {
 		CHEVRON_RIGHT: 'fas fa-chevron-right fa-xs'
@@ -661,18 +666,48 @@ class TabsModule {
 			return;
 		}
 
-		const dropdown = primaryContainer.querySelector( TABS_CONFIG.SELECTORS.STATIC_DROPDOWN );
-		if ( !dropdown ) {
-			return;
-		}
+		const dropdown = this.ensureStaticDropdown( primaryContainer );
 
 		const renderGroup = () => this.renderStaticGroup( group );
 		renderGroup();
+		primaryContainer.setAttribute( TABS_CONFIG.ATTRIBUTES.STATIC_DROPDOWN_READY, 'true' );
 
 		dropdown.addEventListener( 'dropdown:beforeopen', renderGroup );
 		this.staticCleanupFunctions.add( () => {
 			dropdown.removeEventListener( 'dropdown:beforeopen', renderGroup );
+			primaryContainer.removeAttribute( TABS_CONFIG.ATTRIBUTES.STATIC_DROPDOWN_READY );
 		} );
+	}
+
+	ensureStaticDropdown( containerElement ) {
+		const existingDropdown = containerElement.querySelector( `:scope > ${ TABS_CONFIG.SELECTORS.STATIC_DROPDOWN }` );
+		if ( existingDropdown ) {
+			return existingDropdown;
+		}
+
+		const dropdown = TabsDOMUtils.createElement( 'div', { class: 'dropdown-widget dropdown-widget--form' }, [
+			TabsDOMUtils.createElement( 'div', {
+				class: 'dropdown-widget__toggle',
+				role: 'button',
+				tabindex: '0',
+				'aria-expanded': 'false',
+				'aria-haspopup': 'menu',
+				[ TABS_CONFIG.ATTRIBUTES.DROPDOWN_TOGGLE ]: 'true'
+			}, [
+				TabsDOMUtils.createElement( 'span', { class: 'dropdown-widget__prefix tabs-static-dropdown-icon' } ),
+				TabsDOMUtils.createElement( 'span', { class: 'dropdown-widget__label' } ),
+				TabsDOMUtils.createElement( 'span', { class: 'dropdown-widget__indicator' }, [
+					TabsDOMUtils.createElement( 'i', { class: 'far fa-chevron-down fa-xs' } )
+				] )
+			] ),
+			TabsDOMUtils.createElement( 'div', { class: 'dropdown-widget__menu', 'aria-hidden': 'true' }, [
+				TabsDOMUtils.createElement( 'ul' )
+			] )
+		] );
+
+		const navWrapper = containerElement.querySelector( `:scope > ${ TABS_CONFIG.SELECTORS.NAV_WRAPPER }` );
+		navWrapper?.insertAdjacentElement( 'afterend', dropdown );
+		return dropdown;
 	}
 
 	renderStaticGroup( group ) {

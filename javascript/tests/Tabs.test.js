@@ -19,19 +19,6 @@ describe( 'Tabs module', () => {
 		window.location.hash = '';
 	} );
 
-	function createDropdownShell() {
-		return `
-			<div class="dropdown-widget dropdown-widget--form">
-				<div class="dropdown-widget__toggle" data-dropdown-toggle="true" role="button" tabindex="0" aria-expanded="false" aria-haspopup="menu">
-					<span class="dropdown-widget__prefix"></span>
-					<span class="dropdown-widget__label"></span>
-					<span class="dropdown-widget__indicator"></span>
-				</div>
-				<div class="dropdown-widget__menu" aria-hidden="true"><ul></ul></div>
-			</div>
-		`;
-	}
-
 	function createTabList( items ) {
 		return `
 			<div class="tabs-nav-wrapper">
@@ -51,7 +38,6 @@ describe( 'Tabs module', () => {
 			<div data-analytics-name="Navigation tab">
 				<div class="tabs-static">
 					${ createTabList( items ) }
-					${ createDropdownShell() }
 					${ includeContent ? `<div class="tabs-content">${ nestedMarkup }</div>` : nestedMarkup }
 				</div>
 			</div>
@@ -69,6 +55,21 @@ describe( 'Tabs module', () => {
 	} );
 
 	describe( 'static tabs', () => {
+		test( 'should create the mobile dropdown shell during init', () => {
+			document.body.innerHTML = createStaticTabsMarkup( [
+				{ label: 'Results', href: '/wiki/Results', active: true },
+				{ label: 'Other', href: '/wiki/Other' }
+			] );
+
+			expect( document.querySelector( '.tabs-static > .dropdown-widget' ) ).toBeNull();
+
+			initializeTabs();
+
+			const staticContainer = document.querySelector( '.tabs-static' );
+			expect( staticContainer.getAttribute( 'data-mobile-dropdown-ready' ) ).toBe( 'true' );
+			expect( staticContainer.querySelector( ':scope > .dropdown-widget' ) ).not.toBeNull();
+		} );
+
 		test( 'should support keyboard toggling on the dropdown', () => {
 			document.body.innerHTML = createStaticTabsMarkup( [
 				{ label: 'Results', href: '/wiki/Results', active: true },
@@ -142,7 +143,7 @@ describe( 'Tabs module', () => {
 			initializeTabs();
 
 			const dropdowns = document.querySelectorAll( '.tabs-static > .dropdown-widget' );
-			expect( dropdowns ).toHaveLength( 2 );
+			expect( dropdowns ).toHaveLength( 1 );
 			expect( dropdowns[ 0 ].querySelector( '.dropdown-widget__menu > ul > li > ul' ) ).not.toBeNull();
 		} );
 

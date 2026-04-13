@@ -17,7 +17,6 @@ local Table = Lua.import('Module:Table')
 
 local AnalyticsWidgets = Lua.import('Module:Widget/Analytics')
 local Button = Lua.import('Module:Widget/Basic/Button')
-local DropdownContainer = Lua.import('Module:Widget/Basic/Dropdown/Container')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -41,11 +40,6 @@ function Tabs.static(args)
 	if tabCount == 0 then return end
 
 	Tabs._setThis(tabArgs)
-
-	local activeTab = Array.find(tabArgs, Operator.property('this'))
-	local activeTabName = activeTab
-		and (activeTab.name or Tabs._getDisplayNameFromLink(activeTab.link --[[@as string]]))
-		or ''
 
 	local function buildTabLiItems(additionalClasses)
 		return Array.map(tabArgs, function(tab)
@@ -71,12 +65,6 @@ function Tabs.static(args)
 		children = buildTabLiItems()
 	}
 
-	local dropdown = DropdownContainer{
-		prefix = HtmlWidgets.Span{classes = {'tabs-static-dropdown-icon'}},
-		label = activeTabName,
-		children = HtmlWidgets.Ul{}
-	}
-
 	return AnalyticsWidgets{
 		analyticsName = 'Navigation tab',
 		children = {
@@ -85,7 +73,6 @@ function Tabs.static(args)
 				attributes = {['data-nosnippet'] = ''},
 				children = {
 					Tabs._buildNavWrapper(navTabs),
-					dropdown,
 					HtmlWidgets.Fragment{
 						children = Array.map(Array.filter(tabArgs, Operator.property('this')), Operator.property('tabs'))
 					}

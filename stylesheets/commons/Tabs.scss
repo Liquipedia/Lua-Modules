@@ -242,11 +242,11 @@ html.client-nojs .tabs-content > div:not( .active ) {
 	}
 
 	@media ( max-width: 767px ) {
-		.tabs-nav-wrapper {
+		&[ data-mobile-dropdown-ready ] > .tabs-nav-wrapper {
 			display: none;
 		}
 
-		.dropdown-widget {
+		&[ data-mobile-dropdown-ready ] > .dropdown-widget {
 			display: block;
 		}
 	}
