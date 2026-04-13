@@ -47,7 +47,10 @@ function Tabs.static(args)
 			local name = tab.name or Tabs._getDisplayNameFromLink(tab.link --[[@as string]])
 			local child
 			if tab.icon then
-				local display = tostring(Icon{iconName = tab.icon, additionalClasses = {'tabs-static-tab-icon'}}) .. tostring(HtmlWidgets.Span{children = {name}})
+				local display = tostring(Icon{
+					iconName = tab.icon,
+					additionalClasses = {'tabs-static-tab-icon'},
+				}) .. tostring(HtmlWidgets.Span{children = {name}})
 				child = tab.link and Page.makeInternalLink({}, display, tab.link) or display
 			else
 				child = tab.link and Page.makeInternalLink({}, name, tab.link) or HtmlWidgets.Span{children = {tab.name}}
