@@ -4,19 +4,19 @@
 
 const { test, expect, beforeAll, beforeEach, describe } = require( '@jest/globals' );
 
-describe( 'Dropdown module', () => {
-	beforeAll( () => {
-		globalThis.liquipedia = {
-			core: { modules: [] }
-		};
+	describe( 'Dropdown module', () => {
+		beforeAll( () => {
+			globalThis.liquipedia = {
+				core: { modules: [] }
+			};
 
-		require( '../commons/Dropdown.js' );
-	} );
+			require( '../commons/Dropdown.js' );
+		} );
 
-	beforeEach( () => {
-		document.body.innerHTML = '';
-		liquipedia.dropdown.init();
-	} );
+		beforeEach( () => {
+			document.body.innerHTML = '';
+			liquipedia.dropdown.init();
+		} );
 
 	function createDropdownMarkup( label = 'Menu' ) {
 		return `
