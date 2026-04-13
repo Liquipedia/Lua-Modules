@@ -187,11 +187,11 @@ Template(s): Dropdown Widget
 		font-size: 0.875rem;
 
 		.theme--light & {
-			color: var( --clr-secondary-39 );
+			color: var( --clr-secondary-25 );
 		}
 
 		.theme--dark & {
-			color: var( --clr-secondary-80 );
+			color: var( --clr-secondary-100 );
 		}
 
 		&:hover {
@@ -213,5 +213,9 @@ Template(s): Dropdown Widget
 				background-color: var( --clr-on-surface-dark-primary-8 );
 			}
 		}
+	}
+
+	&__menu .dropdown-widget__item > a {
+		color: inherit !important;
 	}
 }
