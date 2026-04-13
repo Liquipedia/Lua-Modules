@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local Condition = Lua.import('Module:Condition')
@@ -23,10 +22,10 @@ local ColumnName = Condition.ColumnName
 local ConditionUtil = Condition.Util
 
 local TODAY = os.date('%Y-%m-%d') --[[@as string]]
----@alias THIRD '3'
-local THIRD = '3'
----@alias FOURTH '4'
-local FOURTH = '4'
+---@alias THIRD 3
+local THIRD = 3
+---@alias FOURTH 4
+local FOURTH = 4
 ---@alias SEMIFINALIST '3-4'
 local SEMIFINALIST = '3-4'
 
@@ -49,8 +48,8 @@ local SEMIFINALIST = '3-4'
 ---@field limit integer? only valid on craft wikis
 
 ---@class SeriesMedalStatsDataSet
----@field ['1'] number
----@field ['2'] number
+---@field [1] number
+---@field [2] number
 ---@field [THIRD] number?
 ---@field [SEMIFINALIST] number?
 ---@field [FOURTH] number?
@@ -77,8 +76,8 @@ end
 ---@return SeriesMedalStatsConfig
 function MedalStats:_getConfig(args)
 	local columns = Array.extend(
-		'1',
-		'2',
+		1,
+		2,
 		Logic.readBool(args.bronze) and THIRD or nil,
 		Logic.readBool(args.sf) and SEMIFINALIST or nil,
 		Logic.readBool(args.copper) and FOURTH or nil,
@@ -163,7 +162,7 @@ end
 ---@param placement placement
 function MedalStats:processByIdentifier(getIdentifier, placement)
 	local identifier = getIdentifier(placement)
-	if String.isEmpty(identifier) then return end
+	if Logic.isEmpty(identifier) then return end
 	---@cast identifier -nil
 
 	local seriesNumber = tonumber((placement.extradata or {}).seriesnumber) or 0
@@ -177,9 +176,10 @@ function MedalStats:processByIdentifier(getIdentifier, placement)
 	if self.config.mergeIntoSemifinalists and (placementValue == THIRD or placementValue == FOURTH) then
 		placementValue = SEMIFINALIST
 	end
+	local cleanedPlacementValue = tonumber(placementValue) or placementValue
 
 	self.data[identifier] = self.data[identifier] or self:setUpPlacementData()
-	self.data[identifier][placementValue] = self.data[identifier][placementValue] + 1
+	self.data[identifier][cleanedPlacementValue] = self.data[identifier][cleanedPlacementValue] + 1
 	self.data[identifier].total = self.data[identifier].total + 1
 end
 
@@ -188,7 +188,7 @@ end
 ---@param key2 any
 ---@return boolean
 function MedalStats.rowSort(tbl, key1, key2)
-	---@param key string
+	---@param key string|integer
 	---@return boolean?
 	local compare = function(key)
 		local val1 = tbl[key1][key] or 0
@@ -198,8 +198,8 @@ function MedalStats.rowSort(tbl, key1, key2)
 	end
 
 	return Logic.nilOr(
-		compare('1'),
-		compare('2'),
+		compare(1),
+		compare(2),
 		compare(THIRD),
 		compare(SEMIFINALIST),
 		compare(FOURTH),
