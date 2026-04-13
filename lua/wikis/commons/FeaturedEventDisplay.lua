@@ -117,6 +117,7 @@ function MainPageSeasonEvents._winnerDisplay(tournamentData)
 				size = '18px',
 				alt = 'Winner',
 			},
+			'&nbsp;',
 			OpponentDisplay.InlineOpponent{opponent = winner}
 		} or HtmlWidgets.Span{
 			classes = {'forest-green-text'},
