@@ -83,9 +83,9 @@ function Standings.getStandingsTable(pagename, standingsIndex)
 
 	local record = mw.ext.LiquipediaDB.lpdb('standingstable', {
 		conditions = tostring(Condition.Tree(Condition.BooleanOperator.all):add{
-			Condition.Node(Condition.ColumnName('pagename', Condition.Comparator.eq, basePageName:gsub(' ', '_'))),
-			Condition.Node(Condition.ColumnName('standingsindex', Condition.Comparator.eq, standingsIndex)),
-			Condition.Node(Condition.ColumnName('namespace', Condition.Comparator.eq, Namespace.idFromName(namespaceName))),
+			Condition.Node(Condition.ColumnName('pagename'), Condition.Comparator.eq, basePageName:gsub(' ', '_')),
+			Condition.Node(Condition.ColumnName('standingsindex'), Condition.Comparator.eq, standingsIndex),
+			Condition.Node(Condition.ColumnName('namespace'), Condition.Comparator.eq, Namespace.idFromName(namespaceName)),
 		}),
 		limit = 1,
 	})[1]
