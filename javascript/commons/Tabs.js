@@ -614,7 +614,7 @@ class StaticTabsGroup {
 				const clone = item.cloneNode( true );
 				clone.classList.remove( TABS_CONFIG.CLASSES.STATIC_GROUP_DIVIDER );
 				clone.classList.add( TABS_CONFIG.CLASSES.STATIC_GROUP_ITEM );
-				clone.style.setProperty( '--tabs-static-item-level', String( level ) );
+				clone.style.setProperty( '--tabs-static-item-level', String( level - 1 ) );
 
 				const icon = document.createElement( 'i' );
 				icon.className = TABS_CONFIG.CLASSES.STATIC_GROUP_ICON;

@@ -47,7 +47,7 @@ function Tabs.static(args)
 		and (activeTab.name or Tabs._getDisplayNameFromLink(activeTab.link --[[@as string]]))
 		or ''
 
-	local function buildTabLiItems()
+	local function buildTabLiItems(additionalClasses)
 		return Array.map(tabArgs, function(tab)
 			--if tab.name is unset tab.link is set as per `Tabs._readArguments`
 			local name = tab.name or Tabs._getDisplayNameFromLink(tab.link --[[@as string]])
@@ -59,7 +59,7 @@ function Tabs.static(args)
 				child = tab.link and Page.makeInternalLink({}, name, tab.link) or tab.name
 			end
 			return HtmlWidgets.Li{
-				classes = {'dropdown-widget__item', tab.this and 'active' or nil},
+				classes = Array.extend(additionalClasses or {}, {tab.this and 'active' or nil}),
 				children = child
 			}
 		end)
@@ -78,7 +78,7 @@ function Tabs.static(args)
 		label = activeTabName,
 		labelClasses = {'tabs-static-dropdown-label'},
 		children = HtmlWidgets.Ul{
-			children = buildTabLiItems()
+			children = buildTabLiItems({'dropdown-widget__item'})
 		}
 	}
 
