@@ -12,7 +12,9 @@ local Condition = Lua.import('Module:Condition')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Lpdb = Lua.import('Module:Lpdb')
+local Namespace = Lua.import('Module:Namespace')
 local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
@@ -66,7 +68,7 @@ local Standings = {}
 ---@param standingsIndex integer #0-index'd on per page
 ---@return StandingsModel?
 function Standings.getStandingsTable(pagename, standingsIndex)
-	local pageNameInCorrectFormat = string.gsub(pagename, ' ', '_')
+	local pageNameInCorrectFormat = Page.pageifyLink(pagename)
 	local myPageName = string.gsub(mw.title.getCurrentTitle().text, ' ', '_')
 
 	if pageNameInCorrectFormat == myPageName then
@@ -77,10 +79,13 @@ function Standings.getStandingsTable(pagename, standingsIndex)
 		end
 	end
 
+	local namespaceName, basePageName = Page.splitPageName(pageNameInCorrectFormat)
+
 	local record = mw.ext.LiquipediaDB.lpdb('standingstable', {
 		conditions = tostring(Condition.Tree(Condition.BooleanOperator.all):add{
-			Condition.Node(Condition.ColumnName('pagename', Condition.Comparator.eq, pageNameInCorrectFormat)),
+			Condition.Node(Condition.ColumnName('pagename', Condition.Comparator.eq, basePageName:gsub(' ', '_'))),
 			Condition.Node(Condition.ColumnName('standingsindex', Condition.Comparator.eq, standingsIndex)),
+			Condition.Node(Condition.ColumnName('namespace', Condition.Comparator.eq, Namespace.idFromName(namespaceName))),
 		}),
 		limit = 1,
 	})[1]
