@@ -39,7 +39,7 @@ function MedalStats:create()
 	---@param placement placement
 	---@return string?
 	local getIdentifier = function(placement)
-		return (placement.opponentplayers or {}).p1faction
+		return (placement.opponentplayers or {}).p1flag
 	end
 
 	self.data = {}
