@@ -128,7 +128,7 @@ function Standings.standingsFromRecord(record, entries)
 		entryRecords = entries,
 	}
 
-	-- Some properties are derived from other properies and we can calculate them when accessed.
+	-- Some properties are derived from other properties and we can calculate them when accessed.
 	setmetatable(standings, StandingsMT)
 
 	return standings
@@ -153,7 +153,7 @@ function Standings.entryFromRecord(record)
 		record = record,
 	}
 
-	-- Some properties are derived from other properies and we can calculate them when accessed.
+	-- Some properties are derived from other properties and we can calculate them when accessed.
 	setmetatable(entry, StandingsEntryMT)
 
 	return entry
