@@ -44,7 +44,7 @@ function MainPageSeasonEvents.run(frame)
 	local pageName = assert(args.event, 'No event specified')
 	pageName = pageName:gsub(' ', '_')
 
-	local tournamentData = MainPageSeasonEvents._fecthTournamentData(args, pageName)
+	local tournamentData = MainPageSeasonEvents._fetchTournamentData(args, pageName)
 
 	local iconDisplay = HtmlWidgets.Div{
 		css = {
@@ -81,7 +81,7 @@ end
 ---@param args table
 ---@param pageName string
 ---@return StandardTournament
-function MainPageSeasonEvents._fecthTournamentData(args, pageName)
+function MainPageSeasonEvents._fetchTournamentData(args, pageName)
 	local tournament = Tournament.getTournament(pageName) or {}
 	-- fallbacks and overwrites
 	tournament.displayName = args.displayname or tournament.displayName
