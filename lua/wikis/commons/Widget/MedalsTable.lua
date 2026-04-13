@@ -19,23 +19,23 @@ local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local DATA_COLUMNS_VARIANT_1 = {'1', '2', '3', '3-4', '4', 'total'}
-local DATA_COLUMNS_VARIANT_2 = {1, 2, 3, 'top3', 'total'}
-
 ---@generic K, V
 ---@class MedalsTableProps
 ---@field caption string?
 ---@field footer Renderable?
 ---@field data table<string|table, table<string|integer, integer>>
----@field hasAll boolean?
 ---@field medalsTableType string
+---@field dataColumns (string|integer)[]?
 ---@field renderRowFirstCell fun(key: string|table): string?
 ---@field rowSort? fun(tbl: {[K]: V}, a: K, b: K):boolean
+---@field reducePadding boolean?
+
+local DEFAULT_DATA_COLUMNS = {'1', '2', '3', '3-4', '4', 'total'}
 
 ---@class MedalsTable: Widget
 ---@operator call(MedalsTableProps): MedalsTable
 ---@field props MedalsTableProps
----@field dataColumns string[]
+---@field dataColumns (integer|string)[]
 local MedalsTable = Class.new(Widget)
 MedalsTable.defaultProps = {
 	medalsTableType = 'Tier',
@@ -46,7 +46,9 @@ MedalsTable.defaultProps = {
 
 ---@return Widget
 function MedalsTable:render()
-	self.dataColumns = self.props.hasAll and DATA_COLUMNS_VARIANT_2 or DATA_COLUMNS_VARIANT_1
+	-- can not use defaultProps as the deepmerge might add unwanted columns from default into the inputted data ...
+	self.dataColumns = self.props.dataColumns or DEFAULT_DATA_COLUMNS
+
 	return TableWidgets.Table{
 		caption = self.props.caption,
 		sortable = true,
@@ -60,7 +62,7 @@ function MedalsTable:render()
 					children = WidgetUtil.collect(
 						TableWidgets.CellHeader{
 							children = self.props.medalsTableType,
-							css = self.props.hasAll and {['padding-left'] = '0.3rem'} or nil,
+							css = self.props.reducePadding and {['padding-left'] = '0.3rem'} or nil,
 						},
 						Array.map(self.dataColumns, FnUtil.curry(MedalsTable._headerCell, self))
 					)
@@ -87,7 +89,7 @@ function MedalsTable:_headerCell(dataColumn)
 	end
 
 	return TableWidgets.CellHeader{
-		css = self.props.hasAll and {['padding-left'] = '0.3rem'} or nil,
+		css = self.props.reducePadding and {['padding-left'] = '0.3rem'} or nil,
 		children = header
 	}
 end

@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Condition = Lua.import('Module:Condition')
@@ -26,6 +27,7 @@ local MedalsTable = Lua.import('Module:Widget/MedalsTable')
 
 local DEFAULT_TIERS = {'1', '2', '3'}
 local DEFAULT_EXCLUDED_TIER_TYPES = {'Qualifier'}
+local DATA_COLUMNS = {1, 2, 3, 'top3', 'total'}
 
 local PlacementStats = {}
 
@@ -58,7 +60,7 @@ function PlacementStats.run(args)
 					children = 'Placement Summary',
 				},
 			},
-			MedalsTable{data = placementData, hasAll = true}
+			MedalsTable{data = placementData, reducePadding = true, dataColumns = DATA_COLUMNS}
 		}
 	}
 end
@@ -81,7 +83,7 @@ end
 ---@private
 ---@return InfoboxPlacementStatsDataRow
 function PlacementStats._emptyDataSet()
-	return {0, 0, 0, total = 0, top3 = 0}
+	return Table.map(DATA_COLUMNS, function(index, key) return key, 0 end) --[[@as InfoboxPlacementStatsDataRow]]
 end
 
 ---@param opponentType string
