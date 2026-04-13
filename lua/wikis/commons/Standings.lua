@@ -32,7 +32,7 @@ local Standings = {}
 ---@field section string?
 ---@field type 'ffa'|'swiss'|'league'
 ---@field matches MatchGroupUtilMatch[]
----@field config table
+---@field config {hasdraw: string, hasovertime: string, haspoints: string}
 ---@field rounds StandingsRound[]
 ---@field tiebreakers {id: string, title: string?}[]
 ---@field package record standingstable
