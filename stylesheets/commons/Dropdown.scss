@@ -32,10 +32,6 @@ Template(s): Dropdown Widget
 		text-decoration: none;
 	}
 
-	&--form {
-		width: 100%;
-	}
-
 	&__toggle {
 		display: inline-flex;
 		align-items: center;
@@ -71,30 +67,6 @@ Template(s): Dropdown Widget
 		}
 	}
 
-	&--form &__toggle {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		width: 100%;
-		min-height: 2.75rem;
-		padding: 0.5rem 0.75rem;
-		border-radius: 0.25rem;
-		border: 1px solid;
-		cursor: pointer;
-
-		.theme--light & {
-			border-color: var( --clr-secondary-90 );
-			background-color: var( --clr-background );
-			color: var( --clr-secondary-16 ) !important;
-		}
-
-		.theme--dark & {
-			border-color: var( --clr-secondary-25 );
-			background-color: var( --clr-background );
-			color: var( --clr-secondary-100 ) !important;
-		}
-	}
-
 	&__prefix {
 		display: inline-flex;
 		align-items: center;
@@ -104,13 +76,6 @@ Template(s): Dropdown Widget
 
 	&__label {
 		flex: 1;
-	}
-
-	&--form &__label {
-		font-size: 0.875rem;
-		font-weight: normal;
-		line-height: 1.25rem;
-		text-align: left;
 	}
 
 	&__indicator {
@@ -123,30 +88,11 @@ Template(s): Dropdown Widget
 		transition: transform 0.2s ease;
 	}
 
-	&__toggle[ aria-expanded="true" ] &__indicator {
+	&__toggle[ aria-expanded="true" ] .dropdown-widget__indicator {
 		transform: rotate( 180deg );
 	}
 
-	&--form &__menu {
-		min-width: 100%;
-		padding: 0.25rem 0;
-		margin-top: 0.25rem;
-		z-index: 20;
-
-		.theme--light & {
-			background-color: var( --clr-background );
-			border-color: rgba( 0, 0, 0, 0.16 );
-			box-shadow: 0 1px 4px rgba( 0, 0, 0, 0.12 );
-		}
-
-		.theme--dark & {
-			background-color: var( --clr-background );
-			border-color: var( --clr-secondary-25 );
-			box-shadow: 0 1px 4px var( --clr-on-surface-dark-primary-4 );
-		}
-	}
-
-	& &__menu > ul {
+	&__menu > ul {
 		list-style: none;
 		margin: 0;
 		padding: 0;
@@ -181,36 +127,67 @@ Template(s): Dropdown Widget
 		}
 	}
 
-	&--form &__item {
-		padding: 0.5rem 0.75rem;
-		margin: 0.25rem;
-		font-size: 0.875rem;
+	&--form {
+		width: 100%;
 
 		.theme--light & {
-			color: var( --clr-secondary-25 );
+			--dropdown-toggle-border: var( --clr-secondary-90 );
+			--dropdown-toggle-text: var( --clr-secondary-16 );
+			--dropdown-menu-border: rgba( 0, 0, 0, 0.16 );
+			--dropdown-menu-shadow: 0 1px 4px rgba( 0, 0, 0, 0.12 );
+			--dropdown-item-color: var( --clr-secondary-25 );
+			--dropdown-item-bg: var( --clr-on-surface-light-primary-4 );
 		}
 
 		.theme--dark & {
-			color: var( --clr-secondary-100 );
+			--dropdown-toggle-border: var( --clr-secondary-25 );
+			--dropdown-toggle-text: var( --clr-secondary-100 );
+			--dropdown-menu-border: var( --clr-secondary-25 );
+			--dropdown-menu-shadow: 0 1px 4px var( --clr-on-surface-dark-primary-4 );
+			--dropdown-item-color: var( --clr-secondary-100 );
+			--dropdown-item-bg: var( --clr-on-surface-dark-primary-8 );
 		}
 
-		&:hover {
-			.theme--light & {
-				background-color: var( --clr-on-surface-light-primary-4 );
-			}
-
-			.theme--dark & {
-				background-color: var( --clr-on-surface-dark-primary-8 );
-			}
+		.dropdown-widget__toggle {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			width: 100%;
+			min-height: 2.75rem;
+			padding: 0.5rem 0.75rem;
+			border-radius: 0.25rem;
+			border: 1px solid var( --dropdown-toggle-border );
+			cursor: pointer;
+			background-color: var( --clr-background );
+			color: var( --dropdown-toggle-text ) !important;
 		}
 
-		&.active {
-			.theme--light & {
-				background-color: var( --clr-on-surface-light-primary-4 );
-			}
+		.dropdown-widget__label {
+			font-size: 0.875rem;
+			font-weight: normal;
+			line-height: 1.25rem;
+			text-align: left;
+		}
 
-			.theme--dark & {
-				background-color: var( --clr-on-surface-dark-primary-8 );
+		.dropdown-widget__menu {
+			min-width: 100%;
+			padding: 0.25rem 0;
+			margin-top: 0.25rem;
+			z-index: 20;
+			background-color: var( --clr-background );
+			border-color: var( --dropdown-menu-border );
+			box-shadow: var( --dropdown-menu-shadow );
+		}
+
+		.dropdown-widget__item {
+			padding: 0.5rem 0.75rem;
+			margin: 0.25rem;
+			font-size: 0.875rem;
+			color: var( --dropdown-item-color );
+
+			&:hover,
+			&.active {
+				background-color: var( --dropdown-item-bg );
 			}
 		}
 	}
