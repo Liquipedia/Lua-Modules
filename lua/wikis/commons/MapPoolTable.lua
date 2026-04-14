@@ -252,9 +252,12 @@ function MapPoolTable:_headerRow()
 	}
 end
 
----@param map StandardMapWithIcon
+---@param map StandardMapWithIcon|{}
 ---@return Widget
 function MapPoolTable:_displayImage(map)
+	if Logic.isEmpty(map) then
+		return TableWidgets.Cell{}
+	end
 	return TableWidgets.Cell{children = Image{
 		imageLight = self.config.useIcons and Logic.nilIfEmpty(map.icon) or map.image or PLACEHOLDER_IMAGE,
 		imageDark = self.config.useIcons and Logic.nilIfEmpty(map.icon) or map.imageDark,
@@ -264,7 +267,7 @@ function MapPoolTable:_displayImage(map)
 	}}
 end
 
----@param map StandardMapWithIcon
+---@param map StandardMapWithIcon|{}
 ---@return IconImageWidget
 function MapPoolTable:_displayAuthors(map)
 	---@type Renderable[]
@@ -299,7 +302,7 @@ function MapPoolTable:_displayAuthors(map)
 	}
 end
 
----@return Widget
+---@return Widget[]
 function MapPoolTable:_normalDisplay()
 	local mapList = self.mapCategories[1].maps
 
@@ -310,7 +313,6 @@ function MapPoolTable:_normalDisplay()
 	return {
 		-- image row
 		TableWidgets.Row{children = Array.map(mapList, FnUtil.curry(self._displayImage, self))},
-
 		-- author row (if enabled)
 		self.config.showAuthor
 			and TableWidgets.Row{children = Array.map(mapList, FnUtil.curry(self._displayAuthors, self))}
@@ -318,8 +320,33 @@ function MapPoolTable:_normalDisplay()
 	}
 end
 
----@return Widget
+---@return Widget[]
 function MapPoolTable:_categoryDisplay()
+	local maxNumberOfMaps = math.max(unpack(Array.map(self.mapCategories, function(category) return #category.maps end)))
+
+	---@param index any
+	---@return Widget[]
+	local makeRows = function(index)
+		local mapList = Array.map(self.mapCategories, function(category)
+			return category.maps[index] or {}
+		end)
+		return {
+			-- image row
+			TableWidgets.Row{children = Array.map(mapList, FnUtil.curry(self._displayImage, self))},
+			-- name row
+			TableWidgets.Row{
+				children = Array.map(mapList, function(map)
+					return TableWidgets.Cell{children = Link{link = map.pageName, children = map.displayName}}
+				end)
+			},
+			-- author row (if enabled)
+			self.config.showAuthor
+				and TableWidgets.Row{children = Array.map(mapList, FnUtil.curry(self._displayAuthors, self))}
+				or nil,
+		}
+	end
+
+	return Array.flatMap(Array.range(1, maxNumberOfMaps), makeRows)
 end
 
 return MapPoolTable
