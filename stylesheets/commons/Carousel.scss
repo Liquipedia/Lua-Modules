@@ -19,7 +19,7 @@
 		display: flex;
 		overflow-x: auto;
 		scroll-snap-type: x mandatory;
-		-webkit-overflow-scrolling: touch;
+		scroll-behavior: smooth;
 		scrollbar-width: none;
 
 		@supports not ( scrollbar-width: none ) {
