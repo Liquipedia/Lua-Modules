@@ -335,10 +335,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				padding: 0.5rem 0.75rem;
 				margin: 0.25rem;
 				font-size: 0.875rem;
-				font-weight: bold;
 				border-radius: 0.25rem;
-				color: var( --dropdown-item-color );
-				text-decoration: none;
 
 				.tabs-static-tab-icon {
 					width: 1rem;
@@ -346,16 +343,6 @@ html.client-nojs .tabs-content > div:not( .active ) {
 					display: inline-flex;
 					align-items: center;
 					justify-content: center;
-				}
-
-				&.new {
-					.theme--light & {
-						color: var( --clr-semantic-negative-40 ) !important;
-					}
-
-					.theme--dark & {
-						color: var( --clr-semantic-negative-80 ) !important;
-					}
 				}
 			}
 

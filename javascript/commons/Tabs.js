@@ -781,11 +781,16 @@ class TabsModule {
 
 	cloneStaticMenuItem( navItem, level ) {
 		const clone = navItem.cloneNode( true );
+		const content = clone.querySelector( ':scope > a, :scope > span' );
+
+		if ( content ) {
+			content.classList.add( 'dropdown-widget__item' );
+		}
+
 		if ( level === 0 ) {
 			return clone;
 		}
 
-		const content = clone.querySelector( ':scope > a, :scope > span' );
 		if ( content ) {
 			content.style.setProperty( '--tabs-static-menu-level', String( level ) );
 			const icon = document.createElement( 'i' );
