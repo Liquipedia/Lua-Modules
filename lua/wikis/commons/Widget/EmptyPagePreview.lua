@@ -19,7 +19,6 @@ local Widget = Lua.import('Module:Widget')
 ---@operator call(table): EmptyPagePreview
 local EmptyPagePreview = Class.new(Widget)
 
-
 ---@return Widget?
 function EmptyPagePreview:render()
 	if not Namespace.isMain() then
