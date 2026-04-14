@@ -26,6 +26,7 @@ local Map = {}
 ---@field pageName string
 ---@field releaseDate {year: integer, month: integer, day: integer, timestamp: integer, string: string}
 ---@field image string?
+---@field imageDark string?
 ---@field creators string[]
 ---@field creatorDisplayNames (string|nil)[]
 ---@field game string?
