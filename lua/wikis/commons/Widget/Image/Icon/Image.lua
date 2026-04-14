@@ -43,7 +43,7 @@ Icon.defaultProps = {
 function Icon:render()
 	-- legacy, only for conversion outside of git ...
 	self.props.horizontalAlignment = self.props.horizontalAlignment or self.props.alignment
-	self.props.classes = self.props.classes or {self.props.alignment}
+	self.props.classes = Logic.nilIfEmpty(self.props.classes) or {self.props.class}
 
 	local imageLight = self.props.imageLight
 	local imageDark = self.props.imageDark
