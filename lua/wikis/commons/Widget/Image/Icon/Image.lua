@@ -25,8 +25,6 @@ local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 ---@field horizontalAlignment 'left'|'right'|'center'|'none'?
 ---@field verticalAlignment 'baseline'|'sub'|'super'|'top'|'text-top'|'middle'|'bottom'|'text-bottom'?
 ---@field caption string?
----@field alignment string? # legacy for during conversion
----@field class string? # legacy for during conversion
 
 ---@class IconImageWidget: IconWidget
 ---@operator call(IconImageWidgetParameters): IconImageWidget
@@ -41,10 +39,6 @@ Icon.defaultProps = {
 
 ---@return string|string[]?
 function Icon:render()
-	-- legacy, only for conversion outside of git ...
-	self.props.horizontalAlignment = self.props.horizontalAlignment or self.props.alignment
-	self.props.classes = Logic.nilIfEmpty(self.props.classes) or {self.props.class}
-
 	local imageLight = self.props.imageLight
 	local imageDark = self.props.imageDark
 	if Logic.isEmpty(imageLight) or Logic.isEmpty(imageDark) or imageLight == imageDark then
