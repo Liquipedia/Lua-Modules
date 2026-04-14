@@ -137,7 +137,7 @@ end
 ---@param args table
 ---@return {maps: StandardMapWithIcon[], title: string?}[]
 function MapPoolTable:_readFromInfobox(args)
-	local maps = (not args.tournament ) and Json.parseIfTable(Variables.varDefault('tournament_maps')) or nil
+	local maps = (not args.tournament) and Json.parseIfTable(Variables.varDefault('tournament_maps')) or nil
 
 	if Logic.isEmpty(maps) then
 		local tournament = args.tournament or mw.title.getCurrentTitle().prefixedText
