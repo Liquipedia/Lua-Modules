@@ -96,7 +96,7 @@ function VRSStandingsData.getStandings(props)
 					and player.flag ~= nil
 					and filterSet[player.flag]
 			end)
-			-- With rosters of 5 players, 3 players are a majority 
+			-- With rosters of 5 players, 3 players are a majority
 			return #matchingPlayers >= 3
 		end
 
