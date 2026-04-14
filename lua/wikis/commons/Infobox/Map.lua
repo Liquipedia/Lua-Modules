@@ -137,8 +137,8 @@ end
 ---@private
 function Map:_readCreators()
 	self.creators = {}
-	for _, creator in Table.iter.pairsByPrefix(self.args, {'creator', 'created-by'}, {requireIndex = false}) do
-		table.insert(self.creators, {page = Page.pageifyLink(creator), displayName = creator})
+	for prefix, creator in Table.iter.pairsByPrefix(self.args, {'creator', 'created-by'}, {requireIndex = false}) do
+		table.insert(self.creators, {page = Page.pageifyLink(self.args[prefix .. 'link'] or creator), displayName = creator})
 	end
 end
 

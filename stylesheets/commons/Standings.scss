@@ -1,5 +1,4 @@
-div.standings-ffa,
-div.standings-swiss {
+div.standings-ffa {
 	& > table > * > tr > th {
 		padding: 12px;
 	}
@@ -17,4 +16,56 @@ div.standings-swiss {
 		gap: 32px;
 		align-items: center;
 	}
+}
+
+.standings-swiss {
+	tr[ data-position-status ] {
+		position: relative;
+
+		&::after {
+			content: "";
+			position: absolute;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 0.25rem;
+			background-color: var( --placement-row-color );
+		}
+
+		&[ data-position-status="byeup" ] {
+			--placement-row-color: var( --position-byeup-color );
+		}
+
+		&[ data-position-status="seedup" ] {
+			--placement-row-color: var( --position-seedup-color );
+		}
+
+		&[ data-position-status="up" ] {
+			--placement-row-color: var( --position-up-color );
+		}
+
+		&[ data-position-status="stayup" ] {
+			--placement-row-color: var( --position-stayup-color );
+		}
+
+		&[ data-position-status="stay" ] {
+			--placement-row-color: var( --position-stay-color );
+		}
+
+		&[ data-position-status="staydown" ] {
+			--placement-row-color: var( --position-staydown-color );
+		}
+
+		&[ data-position-status="down" ] {
+			--placement-row-color: var( --position-down-color );
+		}
+	}
+}
+
+.standings-match-overview {
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.25rem;
 }

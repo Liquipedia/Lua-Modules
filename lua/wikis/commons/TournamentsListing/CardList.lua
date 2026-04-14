@@ -21,12 +21,12 @@ local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Region = Lua.import('Module:Region')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local Tournament = Lua.import('Module:Tournament')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
 local Conditions = Lua.import('Module:TournamentsListing/Conditions')
-local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Tier = Lua.import('Module:Tier/Custom')
 
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
@@ -56,6 +56,7 @@ local DEFAULT_LIMIT = 5000
 ---@field showRank boolean
 ---@field noLis boolean
 ---@field offset number
+---@field limit number
 ---@field allowedPlacements string[]
 ---@field dynamicPlacements boolean
 ---@field onlyHighlightOnValue string?
@@ -123,6 +124,7 @@ function BaseTournamentsListing:readConfig()
 		showRank = Logic.readBool(Logic.nilOr(args.showRank)),
 		noLis = Logic.readBool(args.noLis),
 		offset = tonumber(args.offset) or 0,
+		limit = tonumber(args.limit) or DEFAULT_LIMIT,
 		allowedPlacements = self:_allowedPlacements(),
 		dynamicPlacements = Logic.readBool(args.dynamicPlacements),
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
@@ -138,7 +140,7 @@ end
 
 ---@return self
 function BaseTournamentsListing:create()
-	local data = self.args.data or self:_query()
+	local data = self.args.data and Array.map(self.args.data, Tournament.tournamentFromRecord) or self:_query()
 	if Table.isNotEmpty(data) then
 		self.data = data
 	end
@@ -146,14 +148,11 @@ function BaseTournamentsListing:create()
 	return self
 end
 
----@return table
+---@return StandardTournament[]
 function BaseTournamentsListing:_query()
-	return mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = self:buildConditions(),
-		query = 'pagename, name, icon, icondark, organizers, startdate, enddate, status, locations, series, '
-			.. 'prizepool, participantsnumber, game, liquipediatier, liquipediatiertype, extradata, publishertier, type',
+	return Tournament.getAllTournaments(self:buildConditions(), nil, {
 		order = self.args.order,
-		limit = self.args.limit or DEFAULT_LIMIT,
+		limit = self.config.limit,
 		offset = self.config.offset,
 	})
 end
@@ -180,6 +179,7 @@ function BaseTournamentsListing:build()
 	self.cachedData = {rank = 1, prize = 0, skippedRanks = self.config.offset}
 
 	return TableWidgets.Table{
+		classes = 'tournaments-listing',
 		columns = self:buildColumnDefinitions(),
 		children = {
 			TableWidgets.TableHeader{
@@ -202,7 +202,10 @@ function BaseTournamentsListing:buildColumnDefinitions()
 		config.showTier and {align = 'left'} or nil, 		-- Tier
 		config.showGameIcon and {align = 'center'} or nil, 	-- Game
 		{align = 'left'},									-- Icon
-		{align = 'left'},									-- Tournament
+		{													-- Tournament
+			align = 'left',
+			classes = {'column__tournament'},
+		},
 		config.showOrganizer and {align = 'left'} or nil,	-- Organizer
 		{align = 'left'},									-- Date
 		{													-- Prizepool
@@ -212,10 +215,19 @@ function BaseTournamentsListing:buildColumnDefinitions()
 		{align = 'left'},									-- Location
 		{align = 'right'},									-- Participants
 		config.showQualifierColumnOverWinnerRunnerup
-			and {align = 'left'}							-- Qualified
+			and {											-- Qualified
+				align = 'left',
+				classes = {'column__qualified'},
+			}
 			or WidgetUtil.collect(
-				{align = 'left'},							-- Winner
-				{align = 'left'}							-- Runner-up
+				{											-- Winner
+					align = 'left',
+					classes = {'column__placement'},
+				},
+				{											-- Runner-up
+					align = 'left',
+					classes = {'column__placement'},
+				}
 			)
 	)
 end
@@ -248,12 +260,12 @@ function BaseTournamentsListing:_header()
 end
 
 ---@private
----@param tournamentData table
+---@param tournamentData StandardTournament
 ---@return Widget
 function BaseTournamentsListing:_row(tournamentData)
 	local config = self.config
 
-	local highlight = config.showHighlight and self:getHighlightClass(tournamentData) or nil
+	local highlight = config.showHighlight and tournamentData:isHighlighted(self.config) or nil
 	local status = tournamentData.status and tournamentData.status:lower()
 
 	if config.showRank then
@@ -261,7 +273,7 @@ function BaseTournamentsListing:_row(tournamentData)
 	end
 
 	local prizeValue = tonumber(tournamentData.prizepool) or 0
-	local participantNumber = tonumber(tournamentData.participantsnumber) or -1
+	local participantNumber = tonumber(tournamentData.participantsNumber) or -1
 
 	local placements = self:_fetchPlacementData(tournamentData)
 
@@ -277,13 +289,13 @@ function BaseTournamentsListing:_row(tournamentData)
 			} or nil,
 			TableWidgets.Cell{
 				attributes = {
-					['data-sort-value'] = tournamentData.name
+					['data-sort-value'] = tournamentData.fullName
 				},
 				children = LeagueIcon.display{
 					icon = tournamentData.icon,
-					iconDark = tournamentData.icondark,
-					link = tournamentData.parent,
-					name = tournamentData.name,
+					iconDark = tournamentData.iconDark,
+					link = tournamentData.pageName,
+					name = tournamentData.fullName,
 					options = {noTemplate = true},
 				}
 			},
@@ -292,11 +304,11 @@ function BaseTournamentsListing:_row(tournamentData)
 					['text-decoration'] = status == CANCELLED and 'line-through' or nil,
 				},
 				attributes = {
-					['data-sort-value'] = tournamentData.name,
+					['data-sort-value'] = tournamentData.fullName,
 				},
 				children = LinkWidget{
-					children = tournamentData.name,
-					link = tournamentData.pagename,
+					children = tournamentData.fullName,
+					link = tournamentData.pageName,
 				}
 			},
 			config.showOrganizer
@@ -309,7 +321,7 @@ function BaseTournamentsListing:_row(tournamentData)
 				css = {
 					['font-style'] = (status == POSTPONED or status == DELAYED) and 'italic' or nil,
 				},
-				children = BaseTournamentsListing._dateDisplay(tournamentData.startdate, tournamentData.enddate, status)
+				children = BaseTournamentsListing._dateDisplay(tournamentData.startDate, tournamentData.endDate, status)
 			},
 			TableWidgets.Cell{
 				children = prizeValue > 0
@@ -350,11 +362,6 @@ end
 ---@return Widget
 function BaseTournamentsListing:_buildParticipants(opponents)
 	return HtmlWidgets.Div{
-		css = {
-			display = 'inline-grid',
-			['grid-template-columns'] = 'repeat( auto-fit, minmax( 150px, 1fr ) )',
-			['min-width'] = '15vw'
-		},
 		children = Array.map(opponents, function (opponent)
 			return OpponentDisplay.BlockOpponent{opponent = opponent}
 		end)
@@ -378,7 +385,7 @@ function BaseTournamentsListing:_calculateRank(prize)
 end
 
 ---@private
----@param tournamentData table
+---@param tournamentData StandardTournament
 ---@return string[]
 function BaseTournamentsListing._organizerDisplay(tournamentData)
 	local organizers = Logic.emptyOr(tournamentData.organizers) or {}
@@ -446,8 +453,8 @@ function BaseTournamentsListing._displayLocation(locationData, locationIndex)
 end
 
 ---@private
----@param startDate string
----@param endDate string
+---@param startDate DateRecord
+---@param endDate DateRecord
 ---@param status string?
 ---@return Widget|string
 function BaseTournamentsListing._dateDisplay(startDate, endDate, status)
@@ -459,7 +466,7 @@ function BaseTournamentsListing._dateDisplay(startDate, endDate, status)
 end
 
 ---@private
----@param tournamentData table
+---@param tournamentData StandardTournament
 ---@return {qualified: table[]?, [1]: table[]?, [2]: table[]?}
 function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 	local placements = {}
@@ -501,7 +508,7 @@ function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 
 			local opponent = Opponent.fromLpdbStruct(item)
 			if not opponent then
-				mw.logObject({pageName = tournamentData.pagename, place = item.placement}, 'Invalid Prize Pool Data returned from')
+				mw.logObject({pageName = tournamentData.pageName, place = item.placement}, 'Invalid Prize Pool Data returned from')
 			elseif Opponent.isTbd(opponent) then
 				opponent = Opponent.tbd(Opponent.team)
 			end
@@ -531,18 +538,10 @@ function BaseTournamentsListing.participantsNumber(number)
 	return LANG:formatNum(number)
 end
 
--- overwritable in case wikis want several highlight options
----@protected
----@param tournamentData table
----@return boolean
-function BaseTournamentsListing:getHighlightClass(tournamentData)
-	return HighlightConditions.tournament(tournamentData, self.config)
-end
-
----@param tournamentData table
+---@param tournamentData StandardTournament
 ---@return string?
 function BaseTournamentsListing:displayTier(tournamentData)
-	local tier, tierType, options = Tier.parseFromQueryData(tournamentData)
+	local options = tournamentData.tierOptions
 	options.link = true
 	if self.config.onlyTierTypeIfBoth then
 		options.onlyTierTypeIfBoth = true
@@ -550,7 +549,7 @@ function BaseTournamentsListing:displayTier(tournamentData)
 		options.tierTypeShort = true
 	end
 
-	return Tier.display(tier, tierType, options)
+	return Tier.display(tournamentData.liquipediaTier, tournamentData.liquipediaTierType, options)
 end
 
 return BaseTournamentsListing

@@ -13,15 +13,19 @@ local Logic = Lua.import('Module:Logic')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local DataTable = Lua.import('Module:Widget/Basic/DataTable')
+local Label = Lua.import('Module:Widget/Basic/Label')
 local MatchOverview = Lua.import('Module:Widget/Standings/MatchOverview')
+local TableWidgets = Lua.import('Module:Widget/Table2/All')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 
+---@class StandingsSwissWidgetProps
+---@field standings StandingsModel
+
 ---@class StandingsSwissWidget: Widget
----@operator call(table): StandingsSwissWidget
+---@operator call(StandingsSwissWidgetProps): StandingsSwissWidget
+---@field props StandingsSwissWidgetProps
 local StandingsSwissWidget = Class.new(Widget)
 
 ---@return Widget?
@@ -30,116 +34,128 @@ function StandingsSwissWidget:render()
 		return
 	end
 
-	---@type StandingsModel
 	local standings = self.props.standings
 	local lastRound = standings.rounds[#standings.rounds]
 
-	return DataTable{
-		wrapperClasses = {'standings-swiss'},
-		classes = {'wikitable-bordered', 'wikitable-striped'},
+	return TableWidgets.Table{
+		classes = {'standings-swiss'},
+		title = Logic.nilIfEmpty(standings.title),
+		columns = self:_buildColumnDefinitions(),
 		children = WidgetUtil.collect(
-			-- Outer header
-			Logic.isNotEmpty(standings.title) and HtmlWidgets.Tr{children = HtmlWidgets.Th{
-				attributes = {
-					colspan = 100,
-				},
-				children = {
-					HtmlWidgets.Div{
-						css = {['position'] = 'relative'},
-						children = {
-							HtmlWidgets.Span{
-								children = standings.title
-							},
-						},
-					},
-				},
-			}} or nil,
 			-- Column Header
-			HtmlWidgets.Tr{children = WidgetUtil.collect(
-				HtmlWidgets.Th{children = '#'},
-				HtmlWidgets.Th{children = 'Participant'},
-				Array.map(standings.tiebreakers, function(tiebreaker)
-					if not tiebreaker.title then
-						return
-					end
-					return HtmlWidgets.Th{children = tiebreaker.title}
-				end),
-				Array.map(standings.rounds, function(round)
-					return HtmlWidgets.Th{children = round.title}
-				end)
-			)},
+			self:_headerRow(),
 			-- Rows
-			Array.map(lastRound.opponents, function(slot)
-				local positionBackground = slot.positionStatus and ('bg-' .. slot.positionStatus) or nil
-				local teamBackground
-				if slot.definitiveStatus then
-					teamBackground = 'bg-' .. slot.definitiveStatus
-				end
-				return HtmlWidgets.Tr{
-					children = WidgetUtil.collect(
-						HtmlWidgets.Td{
-							children = {slot.placement, '.'},
-							css = {['font-weight'] = 'bold'},
-							classes = {positionBackground},
-						},
-						HtmlWidgets.Td{
-							classes = {teamBackground},
-							children = OpponentDisplay.BlockOpponent{
-								opponent = slot.opponent,
-								overflow = 'ellipsis',
-								teamStyle = 'hybrid',
-								showPlayerTeam = true,
-							}
-						},
-						Array.map(standings.tiebreakers, function(tiebreaker, tiebreakerIndex)
-							if not tiebreaker.title then
-								return
-							end
-							return HtmlWidgets.Td{
-								classes = {teamBackground},
-								css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil, ['text-align'] = 'center'},
-								children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
-							}
-						end),
-						Array.map(standings.rounds, function(columnRound)
-							local entry = Array.find(columnRound.opponents, function(columnSlot)
-								return Opponent.same(columnSlot.opponent, slot.opponent)
-							end)
-							if not entry then
-								return HtmlWidgets.Td{}
-							end
-							local match = entry.match
-							if not match then
-								return HtmlWidgets.Td{}
-							end
-
-							local opposingOpponentIndex = Array.indexOf(match.opponents, function(opponent)
-								return not Opponent.same(entry.opponent, opponent)
-							end)
-							if not entry.match.opponents[opposingOpponentIndex] then
-								return HtmlWidgets.Td{}
-							end
-
-							local bgClassSuffix
-							if match.finished then
-								local winner = match.winner
-								bgClassSuffix = winner == opposingOpponentIndex and 'down' or winner == 0 and 'draw' or 'up'
-							end
-
-							return HtmlWidgets.Td{
-								classes = {
-									bgClassSuffix and ('bg-' .. bgClassSuffix) or nil,
-								},
-								children = MatchOverview{
-									match = match,
-									showOpponent = opposingOpponentIndex,
-								},
-							}
-						end)
-					),
-				}
-			end)
+			TableWidgets.TableBody{children = Array.map(lastRound.opponents, function(slot)
+				return self:_createRow(slot)
+			end)}
 		)
+	}
+end
+
+---@private
+---@return table[]
+function StandingsSwissWidget:_buildColumnDefinitions()
+	local standings = self.props.standings
+	return WidgetUtil.collect(
+		{align = 'left'},
+		{align = 'left'},
+		Array.map(standings.tiebreakers, function(tiebreaker)
+			if not tiebreaker.title then
+				return
+			end
+			return {align = 'center'}
+		end),
+		Array.map(standings.rounds, function(round)
+			return {align = 'center'}
+		end)
+	)
+end
+
+---@private
+---@return Widget
+function StandingsSwissWidget:_headerRow()
+	local standings = self.props.standings
+
+	---@param text string?
+	---@return Widget
+	local makeHeaderCell = function(text)
+		return TableWidgets.CellHeader{children = text}
+	end
+
+	return TableWidgets.TableHeader{children = {
+		TableWidgets.Row{children = WidgetUtil.collect(
+			makeHeaderCell('#'),
+			makeHeaderCell('Participant'),
+			Array.map(standings.tiebreakers, function(tiebreaker)
+				if not tiebreaker.title then
+					return
+				end
+				return makeHeaderCell(tiebreaker.title)
+			end),
+			Array.map(standings.rounds, function(round)
+				return makeHeaderCell(round.title)
+			end)
+		)}
+	}}
+end
+
+---@private
+---@param slot StandingsEntryModel
+---@return Widget
+function StandingsSwissWidget:_createRow(slot)
+	local standings = self.props.standings
+	return TableWidgets.Row{
+		attributes = {['data-position-status'] = slot.positionStatus},
+		children = WidgetUtil.collect(
+			TableWidgets.Cell{
+				children = Label{
+					children = slot.placement,
+					attributes = {['data-placement-type'] = Logic.nilIfEmpty(slot.definitiveStatus)},
+					labelScheme = 'placement',
+				},
+			},
+			TableWidgets.Cell{
+				children = OpponentDisplay.BlockOpponent{
+					opponent = slot.opponent,
+					overflow = 'ellipsis',
+					teamStyle = 'hybrid',
+					showPlayerTeam = true,
+				}
+			},
+			Array.map(standings.tiebreakers, function(tiebreaker, tiebreakerIndex)
+				if not tiebreaker.title then
+					return
+				end
+				return TableWidgets.Cell{
+					css = {['font-weight'] = tiebreakerIndex == 1 and 'bold' or nil},
+					children = slot.tiebreakerValues[tiebreaker.id] and slot.tiebreakerValues[tiebreaker.id].display or ''
+				}
+			end),
+			Array.map(standings.rounds, function(columnRound)
+				local entry = Array.find(columnRound.opponents, function(columnSlot)
+					return Opponent.same(columnSlot.opponent, slot.opponent)
+				end)
+				if not entry then
+					return TableWidgets.Cell{}
+				end
+				local match = entry.match
+				if not match then
+					return TableWidgets.Cell{}
+				end
+
+				local opposingOpponentIndex = Array.indexOf(match.opponents, function(opponent)
+					return not Opponent.same(entry.opponent, opponent)
+				end)
+				if not entry.match.opponents[opposingOpponentIndex] then
+					return TableWidgets.Cell{}
+				end
+
+				return TableWidgets.Cell{children = MatchOverview{
+					match = match,
+					showOpponent = opposingOpponentIndex,
+				}}
+			end)
+		),
 	}
 end
 
