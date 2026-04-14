@@ -129,6 +129,21 @@ Template(s): Dropdown Widget
 				background-color: var( --clr-on-surface-dark-primary-4 );
 			}
 		}
+
+		a {
+			color: inherit;
+		}
+
+		&.new,
+		.new {
+			.theme--light & {
+				color: var( --clr-semantic-negative-40 ) !important;
+			}
+
+			.theme--dark & {
+				color: var( --clr-semantic-negative-80 ) !important;
+			}
+		}
 	}
 
 	&--form {
