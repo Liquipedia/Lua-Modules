@@ -55,7 +55,7 @@ function Tabs.static(args)
 					HtmlWidgets.Span{children = {name}},
 				}
 				child = tab.link
-					and Link{link = tab.link, children = displayChildren}
+					and Link{link = tab.link, children = {HtmlWidgets.Fragment{children = displayChildren}}}
 					or HtmlWidgets.Span{children = displayChildren}
 			else
 				child = tab.link and Link{link = tab.link, children = {name}} or HtmlWidgets.Span{children = {tab.name}}
