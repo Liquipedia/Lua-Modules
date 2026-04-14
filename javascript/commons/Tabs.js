@@ -569,6 +569,7 @@ class HashRouter {
 class TabsModule {
 	constructor() {
 		this.dynamicContainers = new Map();
+		this.staticScrollContainers = new Set();
 		this.staticCleanupFunctions = new Set();
 		this.hashRouter = new HashRouter( this );
 	}
@@ -582,8 +583,13 @@ class TabsModule {
 		const selector = `${ TABS_CONFIG.SELECTORS.DYNAMIC_CONTAINER }, ${ TABS_CONFIG.SELECTORS.STATIC_CONTAINER }`;
 		document.querySelectorAll( selector ).forEach( ( containerElement ) => {
 			const container = new TabContainer( containerElement );
-			if ( container.navTabs ) {
+			if ( !container.navTabs ) {
+				return;
+			}
+			if ( containerElement.classList.contains( 'tabs-dynamic' ) ) {
 				this.dynamicContainers.set( containerElement, container );
+			} else {
+				this.staticScrollContainers.add( container );
 			}
 		} );
 
@@ -818,6 +824,8 @@ class TabsModule {
 	cleanup() {
 		this.dynamicContainers.forEach( ( container ) => container.cleanup() );
 		this.dynamicContainers.clear();
+		this.staticScrollContainers.forEach( ( container ) => container.cleanup() );
+		this.staticScrollContainers.clear();
 		this.staticCleanupFunctions.forEach( ( cleanupFn ) => cleanupFn() );
 		this.staticCleanupFunctions.clear();
 		this.hashRouter.cleanup();

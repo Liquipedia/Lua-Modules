@@ -461,14 +461,14 @@ html.client-nojs .tabs-content > div:not( .active ) {
 	.tabs-content & {
 		> .tabs-nav-wrapper {
 			margin-top: 0.75rem;
-		}
 
-		> .tabs-nav-wrapper .nav-tabs li {
-			min-height: 2.25rem;
-
-			a {
-				padding: $tabs-nav-padding-nested;
+			.nav-tabs li {
 				min-height: 2.25rem;
+
+				a {
+					padding: $tabs-nav-padding-nested;
+					min-height: 2.25rem;
+				}
 			}
 		}
 	}
@@ -478,14 +478,14 @@ html.client-nojs .tabs-content > div:not( .active ) {
 [ data-analytics-name="Navigation tab" ] + [ data-analytics-name="Navigation tab" ] > .tabs-static {
 	> .tabs-nav-wrapper {
 		margin-top: 0.75rem;
-	}
 
-	> .tabs-nav-wrapper .nav-tabs li {
-		min-height: 2.25rem;
-
-		a {
-			padding: $tabs-nav-padding-nested;
+		.nav-tabs li {
 			min-height: 2.25rem;
+
+			a {
+				padding: $tabs-nav-padding-nested;
+				min-height: 2.25rem;
+			}
 		}
 	}
 

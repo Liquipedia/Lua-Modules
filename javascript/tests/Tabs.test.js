@@ -131,13 +131,13 @@ describe( 'Tabs module', () => {
 		test( 'should group adjacent sibling static rows into the same mobile menu', () => {
 			document.body.innerHTML = `
 				${ createStaticTabsMarkup( [
-					{ label: 'Boston Major', href: '/wiki/Boston', active: true },
-					{ label: 'Other', href: '/wiki/Boston/Other' }
-				], '', false ) }
+		{ label: 'Boston Major', href: '/wiki/Boston', active: true },
+		{ label: 'Other', href: '/wiki/Boston/Other' }
+	], '', false ) }
 				${ createStaticTabsMarkup( [
-					{ label: 'Europe', href: '/wiki/Europe', active: true },
-					{ label: 'Other', href: '/wiki/Europe/Other' }
-				], '', false ) }
+		{ label: 'Europe', href: '/wiki/Europe', active: true },
+		{ label: 'Other', href: '/wiki/Europe/Other' }
+	], '', false ) }
 			`;
 
 			initializeTabs();
@@ -165,7 +165,7 @@ describe( 'Tabs module', () => {
 			expect(
 				Array.from( primary.querySelector( '.dropdown-widget__label' ).childNodes )
 					.map( ( node ) => node.textContent )
-					.join( '' ),
+					.join( '' )
 			).toBe( 'Boston MajorEurope' );
 
 			const nestedMenu = primary.querySelector( '.dropdown-widget__menu > ul > li.active > ul' );
@@ -192,9 +192,9 @@ describe( 'Tabs module', () => {
 					</div>
 				</div>
 				${ createStaticTabsMarkup( [
-					{ label: 'Static Root', href: '/wiki/Static_Root', active: true },
-					{ label: 'Other', href: '/wiki/Other' }
-				] ) }
+		{ label: 'Static Root', href: '/wiki/Static_Root', active: true },
+		{ label: 'Other', href: '/wiki/Other' }
+	] ) }
 			`;
 
 			initializeTabs();

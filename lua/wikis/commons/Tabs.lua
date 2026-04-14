@@ -12,11 +12,11 @@ local Class = Lua.import('Module:Class')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
-local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 
 local AnalyticsWidgets = Lua.import('Module:Widget/Analytics')
 local Button = Lua.import('Module:Widget/Basic/Button')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -55,13 +55,13 @@ function Tabs.static(args)
 					HtmlWidgets.Span{children = {name}},
 				}
 				child = tab.link
-					and Page.makeInternalLink({}, tostring(HtmlWidgets.Fragment{children = displayChildren}), tab.link)
+					and Link{link = tab.link, children = displayChildren}
 					or HtmlWidgets.Span{children = displayChildren}
 			else
-				child = tab.link and Page.makeInternalLink({}, name, tab.link) or HtmlWidgets.Span{children = {tab.name}}
+				child = tab.link and Link{link = tab.link, children = {name}} or HtmlWidgets.Span{children = {tab.name}}
 			end
 			return HtmlWidgets.Li{
-				classes = Array.extend(additionalClasses or {}, {tab.this and 'active' or nil}),
+				classes = Array.extend(additionalClasses, tab.this and 'active' or nil),
 				children = child
 			}
 		end)
@@ -79,12 +79,10 @@ function Tabs.static(args)
 			HtmlWidgets.Div{
 				classes = {'tabs-static'},
 				attributes = {['data-nosnippet'] = ''},
-				children = {
+				children = WidgetUtil.collect(
 					Tabs._buildNavWrapper(navTabs),
-					HtmlWidgets.Fragment{
-						children = Array.map(Array.filter(tabArgs, Operator.property('this')), Operator.property('tabs'))
-					}
-				}
+					Array.map(Array.filter(tabArgs, Operator.property('this')), Operator.property('tabs'))
+				)
 			}
 		}
 	}
