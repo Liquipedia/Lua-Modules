@@ -120,11 +120,11 @@ Template(s): Dropdown Widget
 			font-weight: bold;
 
 			.theme--light & {
-				color: var( --clr-secondary-25 );
+				color: var( --clr-secondary-25 ) !important;
 			}
 
 			.theme--dark & {
-				color: var( --clr-secondary-100 );
+				color: var( --clr-secondary-100 ) !important;
 			}
 		}
 
@@ -135,21 +135,6 @@ Template(s): Dropdown Widget
 
 			.theme--dark & {
 				background-color: var( --clr-on-surface-dark-primary-4 );
-			}
-		}
-
-		a {
-			color: inherit;
-		}
-
-		&.new,
-		.new {
-			.theme--light & {
-				color: var( --clr-semantic-negative-40 ) !important;
-			}
-
-			.theme--dark & {
-				color: var( --clr-semantic-negative-80 ) !important;
 			}
 		}
 	}
