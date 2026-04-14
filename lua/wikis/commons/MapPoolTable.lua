@@ -5,6 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+
+-- to-do:
+-- 1. categoryDisplay
+-- 2. icon stuff from aoe... (extend standardMap...)
+
+
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
@@ -13,13 +19,19 @@ local Class = Lua.import('Module:Class')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Map = Lua.import('Module:Map')
+local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
-local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
 ---for variations and data of maps that have no page
 ---@type table<string, StandardMap>
 local MapData = Lua.requireIfExists('Module:MapPoolTable/Data', {loadData = true}) or {}
+
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
 
 local Image = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -35,7 +47,6 @@ local PLACEHOLDER_IMAGE = 'MapImagePlaceholder.jpg'
 ---@field sort boolean
 ---@field size string
 ---@field title string?
----@field tournament string?
 
 ---@class MapPoolTable
 ---@operator call(Frame): MapPoolTable
@@ -64,7 +75,7 @@ function MapPoolTable:_readConfig(args)
 		note = args.note,
 		showAuthor = Logic.readBool(args.author),
 		sort = Logic.readBool(args.sort),
-		size = args.size,
+		size = args.size or DEFAULT_THUMB_SIZE,
 		title = args.title,
 	}
 end
@@ -73,7 +84,7 @@ end
 ---@return {maps: StandardMap, title: string?}[]
 function MapPoolTable:_readManualInput(args)
 	local categories = Array.mapIndexes(function(categoryIndex)
-		return MapPoolTable._readManualMaps(Json.parseIfTable(args['category' .. categoryIndex]) or {}, true)
+		return MapPoolTable:_readManualMaps(Json.parseIfTable(args['category' .. categoryIndex]) or {}, true)
 	end)
 	if Logic.isNotEmpty(categories) then
 		return categories
@@ -83,7 +94,7 @@ end
 
 ---@param inputs table
 ---@param requireTitle boolean?
----@return {maps: StandardMap, title: string?}
+---@return {maps: StandardMap, title: string?}?
 function MapPoolTable:_readManualMaps(inputs, requireTitle)
 	local maps = Logic.nilIfEmpty(Array.mapIndexes(function(mapIndex)
 		local prefix = 'map' .. mapIndex
@@ -91,42 +102,94 @@ function MapPoolTable:_readManualMaps(inputs, requireTitle)
 			return
 		end
 
+		local author = inputs[prefix .. 'author']
+		local authorDisplayName = inputs[prefix .. 'authorDisplayName']
+
 		return self:_backFillMap{
-			todo
+			displayName = inputs[prefix .. 'displayName'],
+			pageName = inputs[prefix],
+			image = inputs[prefix .. 'image'],
+			imageDark = inputs[prefix .. 'imageDark'],
+			creators = {author},
+			creatorDisplayNames = {authorDisplayName},
 		}
 	end))
 
+	if Logic.isEmpty(maps) then
+		return
+	end
+
 	assert(inputs.title or not requireTitle, 'Category is missing a title')
-	return {maps = maps, title = inputs.title}
+	return {maps = maps, title = requireTitle and inputs.title or nil}
 end
 
 ---@param args table
 ---@return {maps: StandardMap, title: string?}[]
-function MapPoolTable._readFromInfobox(args)
+function MapPoolTable:_readFromInfobox(args)
+	local maps = (not args.tournament ) and Json.parseIfTable(Variables.varDefault('tournament_maps')) or nil
+
+	if Logic.isEmpty(maps) then
+		local tournament = args.tournament or mw.title.getCurrentTitle().prefixedText
+		local data = mw.ext.LiquipediaDB.lpdb('tournament', {
+			conditions = tostring(ConditionNode(ColumnName('pagename'), Comparator.eq, Page.pageifyLink(tournament))),
+			query = 'maps'
+		})[1] or {}
+
+		maps = Json.parseIfTable(data.maps)
+	end
+
+	if Logic.isEmpty(maps) then
+		return {}
+	end
+	---@cast maps -nil
+
+	return {{maps = Array.map(maps, function(map)
+		return self:_backFillMap{
+			displayName = map.displayname or map.name,
+			pageName = map.link,
+			image = map.image,
+			imageDark = map.imageDark,
+		}
+	end)}}
 end
 
 ---@param map table
 ---@return StandardMap
 function MapPoolTable:_backFillMap(map)
-end
+	-- those 2 are not actually needed but annotations of `StandardMap` require them
+	map.extradata = {}
+	map.releaseDate = {year = 0, month = 1, day = 1, timestamp = -62167219200, string = '0000-01-01 00:00:00'}
 
---[[
----@return StandardMap?
-function MapThumb:_getMapData()
-	local map = Map.getMapByPageName(Page.pageifyLink(self.props.map))
-	if map then
+	if Logic.isNotEmpty(map.image) and (Logic.isNotEmpty(map.creators) or not self.config.showAuthor) then
+		map.displayName = map.displayName or map.pageName
 		return map
 	end
-	local key = self.props.map
-		:gsub('_', ' ')
-		:gsub('%s*LE$', '')
-		:gsub('%s*TE$', '')
-		:gsub('%s*CE$', '')
-		:gsub('%s%([mM]ap%)$', '')
-		:lower()
-	return MapData[self.props.map] or MapData[key]
+
+	---@param pageName any
+	---@return unknown
+	local getMapDataFromLookup = function(pageName)
+		local key = pageName
+			:gsub('_', ' ')
+			:gsub('%s*LE$', '')
+			:gsub('%s*TE$', '')
+			:gsub('%s*CE$', '')
+			:gsub('%s%([mM]ap%)$', '')
+			:lower()
+		return MapData[pageName] or MapData[key]
+	end
+
+	local mapData = Map.getMapByPageName(Page.pageifyLink(map.pageName)) or getMapDataFromLookup(map.pageName)
+	assert(mapData, 'No data found for "' .. map.pageName .. '"')
+
+	-- can not use Table.merge nor Table.deepMerge due to creators/creatorDisplayNames
+	map.displayName = map.displayName or mapData.displayName
+	map.image = map.image or mapData.image
+	map.imageDark = map.imageDark or mapData.imageDark
+	map.creators = Logic.emptyOr(map.creators, mapData.creators, {})
+	map.creatorDisplayNames = Logic.emptyOr(map.creatorDisplayNames, mapData.creatorDisplayNames, {})
+
+	return map
 end
-]]
 
 ---@return Widget?
 function MapPoolTable:display()
@@ -134,7 +197,122 @@ function MapPoolTable:display()
 		return
 	end
 
-	todo
+	local numberOfColumns = #self.mapCategories == 1 and #self.mapCategories[1].maps or #self.mapCategories
+
+	return TableWidgets.Table{
+		title = self.config.title,
+		sortable = false,
+		tableClasses = #self.mapCategories > 1 and {'collapsible', 'collapsed'} or nil,
+		css = {
+			-- Fit besides the infobox
+			width = 'unset',
+		},
+		columns = Array.map(Array.range(1, numberOfColumns), function ()
+			return {
+				align = 'center',
+				css = {
+					['min-width'] = '6.25rem',
+					['padding-left'] = '0.125rem',
+					['padding-right'] = '0.125rem',
+				}
+			}
+		end),
+		children = WidgetUtil.collect(
+			self:_headerRow(),
+			TableWidgets.TableBody{
+				children = #self.mapCategories == 1 and self:_normalDisplay() or self:_categoryDisplay()
+			}
+		),
+		footer = self.config.note,
+	}
+end
+
+---@return Widget
+function MapPoolTable:_headerRow()
+	if #self.mapCategories > 1 then
+		return TableWidgets.Row{
+			children = Array.map(self.mapCategories, function(category)
+				return TableWidgets.CellHeader{children = category.title}
+			end)
+		}
+	end
+
+	return TableWidgets.Row{
+		children = Array.map(self.mapCategories[1].maps, function(map)
+			return TableWidgets.CellHeader{children = Link{link = map.link, children = map.displayname}}
+		end)
+	}
+end
+
+---@param map StandardMap
+---@return Widget
+function MapPoolTable:_displayImage(map)
+	return TableWidgets.Cell{children = Image{
+		imageLight = map.image or PLACEHOLDER_IMAGE,
+		imageDark = map.imageDark,
+		link = map.pageName,
+		size = self.config.size or DEFAULT_THUMB_SIZE,
+		alt = map.displayName,
+	}}
+end
+
+---@param map StandardMap
+---@return IconImageWidget
+function MapPoolTable:_displayAuthors(map)
+	---@type Renderable[]
+	local authors = Array.mapIndexes(function(authorIndex)
+		local author = map.creators[authorIndex]
+		local authorDisplayName = map.creatorDisplayNames[authorIndex]
+		if Logic.isEmpty(author) and Logic.isEmpty(authorDisplayName) then
+			return
+		end
+		if Logic.isEmpty(author) then
+			return authorDisplayName
+		end
+		return Link{link = author, children = authorDisplayName}
+	end)
+
+	if Logic.isEmpty(authors) then
+		return TableWidgets.Cell{}
+	end
+
+	authors = Array.interleave(authors, ', ')
+
+	return TableWidgets.Cell{
+		children = WidgetUtil.collect(
+			'By ',
+			authors
+		),
+		css = {
+			['font-size'] = '90%',
+			['padding-left'] = '0.25rem',
+			['padding-right'] = '0.25rem',
+		},
+	}
+end
+
+---@return Widget
+function MapPoolTable:_normalDisplay()
+	local mapList = self.mapCategories[1].maps
+
+
+	if self.config.sort then
+		Array.sortInPlaceBy(mapList, Operator.property('pageName'))
+	end
+
+	return {
+		-- image row
+		TableWidgets.Row{children = Array.map(mapList, FnUtil.curry(self._displayImage, self))},
+
+		-- author row (if enabled)
+		self.config.showAuthor
+			and TableWidgets.Row{children = Array.map(mapList, FnUtil.curry(self._displayAuthors, self))}
+			or nil,
+	}
+end
+
+---@return Widget
+function MapPoolTable:_categoryDisplay()
 end
 
 return MapPoolTable
