@@ -88,7 +88,7 @@ local function buildTitle(settings)
 	}
 	local titleName = 'Global'
 	if settings.filterType == 'region' then
-		titleName = regionMap[settings.filterRegion] or settings.filterRegion
+		titleName = regionMap[settings.filterRegion] or settings.filterRegion or 'Region'
 	elseif settings.filterType == 'subregion' then
 		titleName = settings.filterDisplayName or 'Subregion'
 	elseif settings.filterType == 'country' then

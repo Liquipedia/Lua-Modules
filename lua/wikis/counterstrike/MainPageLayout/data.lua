@@ -84,7 +84,7 @@ local CONTENT = {
 		},
 		padding = false,
 		boxid = 1521,
-	}
+	},
 }
 
 return {

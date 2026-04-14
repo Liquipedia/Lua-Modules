@@ -66,7 +66,7 @@ function VRSStandingsData.getStandings(props)
 	if settings.shouldFetch then
 		local fetchedStandings, fetchedDate = VRSStandingsData._fetch(settings.updated, settings.datapointType)
 		standings = fetchedStandings
-		settings.updated = string.sub(fetchedDate, 1, 10) or settings.updated
+		settings.updated = string.sub(fetchedDate, 1, 10)
 	else
 		standings = VRSStandingsData._read(props)
 		VRSStandingsData._store(settings.updated, settings.datapointType, standings)
@@ -96,6 +96,7 @@ function VRSStandingsData.getStandings(props)
 					and player.flag ~= nil
 					and filterSet[player.flag]
 			end)
+			-- With rosters of 5 players, 3 players are a majority 
 			return #matchingPlayers >= 3
 		end
 
