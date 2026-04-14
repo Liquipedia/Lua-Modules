@@ -103,7 +103,7 @@ Template(s): Dropdown Widget
 		align-items: center;
 		padding: 0.25rem 0.5rem;
 		font-size: 0.6875rem;
-		font-weight: bold;
+		font-weight: normal;
 		border-radius: 0.25rem;
 		cursor: pointer;
 		gap: 0.25rem;
@@ -114,6 +114,10 @@ Template(s): Dropdown Widget
 
 		.theme--dark & {
 			color: var( --clr-secondary-90 );
+		}
+
+		&.active {
+			font-weight: bold;
 		}
 
 		&:hover {
@@ -190,9 +194,5 @@ Template(s): Dropdown Widget
 				background-color: var( --dropdown-item-bg );
 			}
 		}
-	}
-
-	&__menu .dropdown-widget__item > a {
-		color: inherit !important;
 	}
 }
