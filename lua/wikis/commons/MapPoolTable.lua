@@ -74,6 +74,7 @@ function MapPoolTable.run(frame)
 	return MapPoolTable(frame):display()
 end
 
+---@private
 ---@param args table
 ---@return MapPoolConfig
 function MapPoolTable:_readConfig(args)
@@ -86,6 +87,7 @@ function MapPoolTable:_readConfig(args)
 	}
 end
 
+---@private
 ---@param args table
 ---@return {maps: StandardMapWithIcon[], title: string?}[]
 function MapPoolTable:_readManualInput(args)
@@ -98,6 +100,7 @@ function MapPoolTable:_readManualInput(args)
 	return {self:_readManualMaps(args)}
 end
 
+---@private
 ---@param inputs table
 ---@param requireTitle boolean?
 ---@return {maps: StandardMapWithIcon[], title: string?}?
@@ -130,6 +133,7 @@ function MapPoolTable:_readManualMaps(inputs, requireTitle)
 	return {maps = maps, title = requireTitle and inputs.title or nil}
 end
 
+---@private
 ---@param args table
 ---@return {maps: StandardMapWithIcon[], title: string?}[]
 function MapPoolTable:_readFromInfobox(args)
@@ -160,6 +164,7 @@ function MapPoolTable:_readFromInfobox(args)
 	end)}}
 end
 
+---@private
 ---@param map table
 ---@return StandardMapWithIcon
 function MapPoolTable:_backFillMap(map)
@@ -235,6 +240,7 @@ function MapPoolTable:display()
 	}
 end
 
+---@private
 ---@return Widget
 function MapPoolTable:_headerRow()
 	if #self.mapCategories > 1 then
@@ -252,6 +258,7 @@ function MapPoolTable:_headerRow()
 	}
 end
 
+---@private
 ---@param map StandardMapWithIcon|{}
 ---@return Widget
 function MapPoolTable:_displayImage(map)
@@ -267,6 +274,7 @@ function MapPoolTable:_displayImage(map)
 	}}
 end
 
+---@private
 ---@param map StandardMapWithIcon|{}
 ---@return IconImageWidget
 function MapPoolTable:_displayAuthors(map)
@@ -302,6 +310,7 @@ function MapPoolTable:_displayAuthors(map)
 	}
 end
 
+---@private
 ---@return Widget[]
 function MapPoolTable:_normalDisplay()
 	local mapList = self.mapCategories[1].maps
@@ -320,6 +329,7 @@ function MapPoolTable:_normalDisplay()
 	}
 end
 
+---@private
 ---@return Widget[]
 function MapPoolTable:_categoryDisplay()
 	local maxNumberOfMaps = math.max(unpack(Array.map(self.mapCategories, function(category) return #category.maps end)))
