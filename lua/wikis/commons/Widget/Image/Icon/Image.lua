@@ -59,7 +59,7 @@ end
 
 ---@param image string?
 ---@param themeClass string?
----@return string
+---@return string?
 ---@overload fun(nil): nil
 function Icon:_make(image, themeClass)
 	if Logic.isEmpty(image) then
