@@ -785,6 +785,9 @@ class TabsModule {
 
 		if ( content ) {
 			content.classList.add( 'dropdown-widget__item' );
+			if ( clone.classList.contains( TABS_CONFIG.CLASSES.ACTIVE ) ) {
+				content.classList.add( TABS_CONFIG.CLASSES.ACTIVE );
+			}
 		}
 
 		if ( level === 0 ) {
