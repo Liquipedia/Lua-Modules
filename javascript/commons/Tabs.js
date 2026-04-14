@@ -112,7 +112,9 @@ class TabContainer {
 
 	init() {
 		this.indexElements();
-		this.setupContentHandlers();
+		if ( this.container.classList.contains( 'tabs-dynamic' ) ) {
+			this.setupContentHandlers();
+		}
 		this.setupScrollHandlers();
 	}
 
@@ -577,8 +579,8 @@ class TabsModule {
 	}
 
 	initializeContainers() {
-		const containers = document.querySelectorAll( TABS_CONFIG.SELECTORS.DYNAMIC_CONTAINER );
-		containers.forEach( ( containerElement ) => {
+		const selector = `${ TABS_CONFIG.SELECTORS.DYNAMIC_CONTAINER }, ${ TABS_CONFIG.SELECTORS.STATIC_CONTAINER }`;
+		document.querySelectorAll( selector ).forEach( ( containerElement ) => {
 			const container = new TabContainer( containerElement );
 			if ( container.navTabs ) {
 				this.dynamicContainers.set( containerElement, container );
