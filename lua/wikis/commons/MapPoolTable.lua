@@ -5,12 +5,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-
--- to-do:
--- 1. categoryDisplay
--- 2. icon stuff from aoe... (extend standardMap...)
-
-
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
@@ -24,8 +18,11 @@ local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
 local Variables = Lua.import('Module:Variables')
 
+---@class StandardMapWithIcon: StandardMap
+---@field icon string?
+
 ---for variations and data of maps that have no page
----@type table<string, StandardMap>
+---@type table<string, StandardMapWithIcon>
 local MapData = Lua.requireIfExists('Module:MapPoolTable/Data', {loadData = true}) or {}
 
 local Condition = Lua.import('Module:Condition')
@@ -47,12 +44,13 @@ local PLACEHOLDER_IMAGE = 'MapImagePlaceholder.jpg'
 ---@field sort boolean
 ---@field size string
 ---@field title string?
+---@field useIcons boolean?
 
 ---@class MapPoolTable
 ---@operator call(Frame): MapPoolTable
 ---@field args table
 ---@field config MapPoolConfig
----@field mapCategories {maps: StandardMap, title: string?}[]
+---@field mapCategories {maps: StandardMapWithIcon[], title: string?}[]
 local MapPoolTable = Class.new(function(self, frame)
 	local args = Arguments.getArgs(frame)
 	self.config = self:_readConfig(args)
@@ -60,6 +58,14 @@ local MapPoolTable = Class.new(function(self, frame)
 	if Logic.isEmpty(self.mapCategories) then
 		self.mapCategories = self:_readFromInfobox(args)
 	end
+	self.config.useIcons = Logic.nilOr(
+		Logic.readBoolOrNil(args.useIcons),
+		Array.all(self.mapCategories, function(category)
+			return Array.all(category.maps, function(map)
+				return Logic.isNotEmpty(map.icon)
+			end)
+		end)
+	)
 end)
 
 ---@param frame Frame
@@ -73,7 +79,7 @@ end
 function MapPoolTable:_readConfig(args)
 	return {
 		note = args.note,
-		showAuthor = Logic.readBool(args.author),
+		showAuhor = Logic.readBool(args.author),
 		sort = Logic.readBool(args.sort),
 		size = args.size or DEFAULT_THUMB_SIZE,
 		title = args.title,
@@ -81,7 +87,7 @@ function MapPoolTable:_readConfig(args)
 end
 
 ---@param args table
----@return {maps: StandardMap, title: string?}[]
+---@return {maps: StandardMapWithIcon[], title: string?}[]
 function MapPoolTable:_readManualInput(args)
 	local categories = Array.mapIndexes(function(categoryIndex)
 		return MapPoolTable:_readManualMaps(Json.parseIfTable(args['category' .. categoryIndex]) or {}, true)
@@ -94,7 +100,7 @@ end
 
 ---@param inputs table
 ---@param requireTitle boolean?
----@return {maps: StandardMap, title: string?}?
+---@return {maps: StandardMapWithIcon[], title: string?}?
 function MapPoolTable:_readManualMaps(inputs, requireTitle)
 	local maps = Logic.nilIfEmpty(Array.mapIndexes(function(mapIndex)
 		local prefix = 'map' .. mapIndex
@@ -112,6 +118,7 @@ function MapPoolTable:_readManualMaps(inputs, requireTitle)
 			imageDark = inputs[prefix .. 'imageDark'],
 			creators = {author},
 			creatorDisplayNames = {authorDisplayName},
+			icon = inputs[prefix .. 'icon'],
 		}
 	end))
 
@@ -124,7 +131,7 @@ function MapPoolTable:_readManualMaps(inputs, requireTitle)
 end
 
 ---@param args table
----@return {maps: StandardMap, title: string?}[]
+---@return {maps: StandardMapWithIcon[], title: string?}[]
 function MapPoolTable:_readFromInfobox(args)
 	local maps = (not args.tournament ) and Json.parseIfTable(Variables.varDefault('tournament_maps')) or nil
 
@@ -154,10 +161,10 @@ function MapPoolTable:_readFromInfobox(args)
 end
 
 ---@param map table
----@return StandardMap
+---@return StandardMapWithIcon
 function MapPoolTable:_backFillMap(map)
 	-- those 2 are not actually needed but annotations of `StandardMap` require them
-	map.extradata = {}
+	map.extradata = map.extradata or {}
 	map.releaseDate = {year = 0, month = 1, day = 1, timestamp = -62167219200, string = '0000-01-01 00:00:00'}
 
 	if Logic.isNotEmpty(map.image) and (Logic.isNotEmpty(map.creators) or not self.config.showAuthor) then
@@ -187,6 +194,7 @@ function MapPoolTable:_backFillMap(map)
 	map.imageDark = map.imageDark or mapData.imageDark
 	map.creators = Logic.emptyOr(map.creators, mapData.creators, {})
 	map.creatorDisplayNames = Logic.emptyOr(map.creatorDisplayNames, mapData.creatorDisplayNames, {})
+	map.icon = map.icon or (mapData.extradata or {}).icon
 
 	return map
 end
@@ -244,19 +252,19 @@ function MapPoolTable:_headerRow()
 	}
 end
 
----@param map StandardMap
+---@param map StandardMapWithIcon
 ---@return Widget
 function MapPoolTable:_displayImage(map)
 	return TableWidgets.Cell{children = Image{
-		imageLight = map.image or PLACEHOLDER_IMAGE,
-		imageDark = map.imageDark,
+		imageLight = self.config.useIcons and Logic.nilIfEmpty(map.icon) or map.image or PLACEHOLDER_IMAGE,
+		imageDark = self.config.useIcons and Logic.nilIfEmpty(map.icon) or map.imageDark,
 		link = map.pageName,
 		size = self.config.size or DEFAULT_THUMB_SIZE,
 		alt = map.displayName,
 	}}
 end
 
----@param map StandardMap
+---@param map StandardMapWithIcon
 ---@return IconImageWidget
 function MapPoolTable:_displayAuthors(map)
 	---@type Renderable[]
@@ -294,7 +302,6 @@ end
 ---@return Widget
 function MapPoolTable:_normalDisplay()
 	local mapList = self.mapCategories[1].maps
-
 
 	if self.config.sort then
 		Array.sortInPlaceBy(mapList, Operator.property('pageName'))
