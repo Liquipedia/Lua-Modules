@@ -118,6 +118,14 @@ Template(s): Dropdown Widget
 
 		&.active {
 			font-weight: bold;
+
+			.theme--light & {
+				color: var( --clr-secondary-25 );
+			}
+
+			.theme--dark & {
+				color: var( --clr-secondary-100 );
+			}
 		}
 
 		&:hover {
