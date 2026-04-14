@@ -38,7 +38,7 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local DEFAULT_THUMB_SIZE = 'x120px'
+local DEFAULT_THUMB_SIZE = 'x100px'
 local PLACEHOLDER_IMAGE = 'MapImagePlaceholder.jpg'
 
 ---@class MapPoolConfig
@@ -239,7 +239,7 @@ function MapPoolTable:_headerRow()
 
 	return TableWidgets.Row{
 		children = Array.map(self.mapCategories[1].maps, function(map)
-			return TableWidgets.CellHeader{children = Link{link = map.link, children = map.displayname}}
+			return TableWidgets.CellHeader{children = Link{link = map.pageName, children = map.displayName}}
 		end)
 	}
 end
