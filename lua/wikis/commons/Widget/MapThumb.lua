@@ -36,7 +36,7 @@ function MapThumb:render()
 	end
 
 	local map = self:_getMapData()
-	assert(map and map.image, 'Invalid map "' .. self.props.map .. '"')
+	assert(map, 'Invalid map "' .. self.props.map .. '"')
 
 	return Image{
 		imageLight = map.image or PLACEHOLDER_IMAGE,
