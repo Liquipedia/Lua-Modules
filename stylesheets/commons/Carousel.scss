@@ -29,7 +29,7 @@
 	}
 
 	&-item {
-		flex: 0 0 auto;
+		flex: none;
 		scroll-snap-align: start;
 		scroll-margin-left: var( --carousel-face-width );
 
