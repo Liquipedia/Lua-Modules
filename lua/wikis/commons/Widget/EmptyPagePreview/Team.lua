@@ -296,7 +296,7 @@ end
 ---players: {flag: string?, displayName: string, pageName: string, name: string?}[], startDate: string?}
 function EmptyTeamPagePreview:_getPlayersAndCoachesFromLastPlacement()
 	local latestResult = self:_fetchPlacements{limit = 1}[1]
-	if not latestResult then return {coaches = {}, nationalities = {}} end
+	if not latestResult then return {coaches = {}, players = {}} end
 
 	local parsePerson = function (prefix)
 		local person = Page.pageifyLink(latestResult.opponentplayers[prefix])
