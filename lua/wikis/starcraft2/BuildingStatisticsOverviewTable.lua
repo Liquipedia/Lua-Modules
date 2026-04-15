@@ -32,6 +32,19 @@ local ARMOR = Image{imageLight = 'Icon Armor.png', link = 'Armor'}
 local HEALTH = Image{imageLight = 'Icon Hitpoints.png'}
 local SHIELD = Image{imageLight = 'Icon Shields.png', link = 'Plasma Shield'}
 local PROTOSS = 'p'
+local EXLUDE_PATTERNS = {
+	'khaydarin_monolith',
+	'cut_features',
+	'drakken_laser',
+	'hive_mind_emulator',
+	'merc_compound',
+	'campaign',
+	'starbase',
+	'phase_cannon',
+	'monolith',
+	'radar_tower',
+	'obelisk',
+}
 
 local BuildingStats = {}
 
@@ -67,18 +80,9 @@ function BuildingStats._build(args)
 		local page = building.pagename:lower()
 		local name = building.name:lower()
 
-		return not string.match(page,'khaydarin_monolith')
-			and not string.match(page,'cut_features')
-			and not string.match(page,'drakken_laser')
-			and not string.match(page,'hive_mind_emulator')
-			and not string.match(page,'merc_compound')
-			and not string.match(page,'campaign')
-			and not string.match(page,'starbase')
-			and not string.match(page,'phase_cannon')
-			and not string.match(page,'monolith')
-			and not string.match(page,'radar_tower')
-			and not string.match(page,'obelisk')
-			and not string.match(name,'supply depot lowered')
+		return not Array.any(EXLUDE_PATTERNS, function(pattern)
+			return string.match(page,pattern)
+		end) and not string.match(name,'supply depot lowered')
 	end)
 
 	return TableWidgets.Table{
@@ -119,7 +123,7 @@ function BuildingStats._columns(faction)
 		{align = 'center'}, -- mins
 		{align = 'center'}, -- gas
 		{align = 'center'}, -- time
-		{align = 'center'}, -- helath
+		{align = 'center'}, -- health
 		faction == PROTOSS and {align = 'center'} or nil, -- shield
 		{align = 'center'}, -- armor
 		{align = 'center'} -- sight
