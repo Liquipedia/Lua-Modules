@@ -11,6 +11,7 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
 local Opponent = Lua.import('Module:Opponent/Custom')
+local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 local Table = Lua.import('Module:Table')
 
 local Condition = Lua.import('Module:Condition')
@@ -66,12 +67,7 @@ function FindPlayersOnTeamFromPlacements.get(frame)
 
 	return UnorderedList{
 		children = Array.map(Array.extractValues(players), function(player)
-			return {				Link{link = player.pageName},
-				' - displayName: ' .. player.displayName,
-				' - flag: ' .. player.flag,
-				' - faction: ' .. player.faction,
-				' - last result from: ' .. player.date,
-			}
+			return tostring(PlayerDisplay.InlinePlayer{player = player}) .. ' - last result from: ' .. player.date
 		end)
 	}
 end
