@@ -51,7 +51,8 @@ function DropdownContainer:render()
 		return nil
 	end
 
-	local variantConfig = assert(VARIANT_CONFIG[self.props.variant], 'Invalid Dropdown variant "' .. self.props.variant .. '"')
+	local variantConfig = assert(VARIANT_CONFIG[self.props.variant],
+		'Invalid Dropdown variant "' .. self.props.variant .. '"')
 
 	local toggleChildren = WidgetUtil.collect(
 		Logic.isNotEmpty(self.props.prefix) and Span{
