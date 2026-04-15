@@ -19,11 +19,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
 
-local VALID_VARIANTS = {
-	form = true,
-	inline = true,
-}
-
 local VARIANT_CONFIG = {
 	inline = {
 		size = 'xs',
@@ -56,8 +51,7 @@ function DropdownContainer:render()
 		return nil
 	end
 
-	assert(VALID_VARIANTS[self.props.variant], 'Invalid Dropdown variant "' .. self.props.variant .. '"')
-	local variantConfig = VARIANT_CONFIG[self.props.variant]
+	local variantConfig = assert(VARIANT_CONFIG[self.props.variant], 'Invalid Dropdown variant "' .. self.props.variant .. '"')
 
 	local toggleChildren = WidgetUtil.collect(
 		Logic.isNotEmpty(self.props.prefix) and Span{
