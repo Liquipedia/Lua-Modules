@@ -19,7 +19,7 @@ local CustomMatchSummary = {}
 ---@param args table
 ---@return Widget
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '500px'})
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '540px'})
 end
 
 ---@param match MatchGroupUtilMatch
