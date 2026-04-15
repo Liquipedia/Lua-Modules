@@ -21,7 +21,6 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local Link = Lua.import('Module:Widget/Basic/Link')
 local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 
 local FindPlayersOnTeamFromPlacements = {}
