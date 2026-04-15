@@ -10,6 +10,8 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
+local Opponent = Lua.import('Module:Opponent/Custom')
+local Table = Lua.import('Module:Table')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -52,13 +54,11 @@ function FindPlayersOnTeamFromPlacements.get(frame)
 			if playerTeam ~= team then
 				return true
 			end
-			players[player] = players[player] or {
-				pageName = player,
-				displayName = item.opponentplayers['p' .. index .. 'dn'],
-				flag = item.opponentplayers['p' .. index .. 'flag'] or 'unknown flag',
-				faction = item.opponentplayers['p' .. index .. 'faction'] or 'unknown faction',
-				date = item.date,
-			}
+
+			players[player] = players[player] or Table.merge(
+				{date = item.date},
+				Opponent.playerFromLpdbStruct(item.opponentplayers, index)
+			)
 
 			return true
 		end)
@@ -66,8 +66,7 @@ function FindPlayersOnTeamFromPlacements.get(frame)
 
 	return UnorderedList{
 		children = Array.map(Array.extractValues(players), function(player)
-			return {
-				Link{link = player.pageName},
+			return {				Link{link = player.pageName},
 				' - displayName: ' .. player.displayName,
 				' - flag: ' .. player.flag,
 				' - faction: ' .. player.faction,
