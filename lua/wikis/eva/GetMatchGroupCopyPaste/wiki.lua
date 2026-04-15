@@ -13,10 +13,21 @@ local Logic = Lua.import('Module:Logic')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
----@class EvaMatch2CopyPaste: Match2CopyPasteBase
+---@class EvaArenaMatch2CopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
 
 local INDENT = WikiCopyPaste.Indent
+
+local VETOES = {
+	[0] = '',
+	[1] = 'ban,ban,ban,decider',
+	[2] = 'ban,ban,pick,ban',
+	[3] = 'ban,pick,ban,decider',
+	[4] = 'ban,pick,pick,ban',
+	[5] = 'ban,pick,pick,decider',
+	[6] = 'pick,pick,pick,ban',
+	[7] = 'pick,pick,pick,decider',
+}
 
 --returns the Code for a Match, depending on the input
 ---@param bestof integer
@@ -42,6 +53,19 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		end) or nil,
 		INDENT .. '}}'
 	)
+
+	if mapVeto and VETOES[bestof] then
+		Array.appendWith(lines,
+			INDENT .. '|mapveto={{MapVeto',
+			INDENT .. INDENT .. '|firstpick=',
+			INDENT .. INDENT .. '|types=' .. VETOES[bestof],
+			INDENT .. INDENT .. '|t1map1=|t2map1=',
+			INDENT .. INDENT .. '|t1map2=|t2map2=',
+			INDENT .. INDENT .. '|t1map3=|t2map3=',
+			INDENT .. INDENT .. '|decider=',
+			INDENT .. '}}'
+		)
+	end	
 
 	return table.concat(lines, '\n')
 end
