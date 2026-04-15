@@ -8,8 +8,8 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local ChampionNames = Lua.import('Module:ChampionNames', {loadData = true})
 local FnUtil = Lua.import('Module:FnUtil')
-local HeroNames = Lua.import('Module:ChampionNames', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
@@ -182,7 +182,7 @@ end
 ---@return table
 function MapFunctions.getExtraData(MapParser, match, map, opponents)
 	local extraData = {}
-	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
+	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, ChampionNames)
 
 	local function prefixKeyWithTeam(key, opponentIndex)
 		return 'team' .. opponentIndex .. key
@@ -221,7 +221,7 @@ end
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponentIndex)
-	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
+	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, ChampionNames)
 
 	local participantList = MapParser.getParticipants(map, opponentIndex) or {}
 	return MatchGroupInputUtil.parseMapPlayers(
