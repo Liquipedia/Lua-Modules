@@ -10,6 +10,8 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Condition = Lua.import('Module:Condition')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
 local UnorderedList = Lua.import('Module:Widget/List/Unordered')
@@ -20,13 +22,13 @@ local FindMatchesByPlayerDisplayName = {}
 ---@return Widget
 function FindMatchesByPlayerDisplayName.run(frame)
 	local args = Arguments.getArgs(frame)
-	assert(args.p1, 'No player(s) specified')
+	assert(Logic.isNotEmpty(args.p1), 'No player(s) specified')
 
 	local displayNames = Array.flatten(Array.mapIndexes(function(index)
 		if not args['p' .. index] then return end
 		return {
-			mw.getContentLanguage():lcfirst(args['p' .. index]),
-			mw.getContentLanguage():ucfirst(args['p' .. index]),
+			String.lowerCaseFirst(args['p' .. index]),
+			String.upperCaseFirst(args['p' .. index]),
 		}
 	end))
 
