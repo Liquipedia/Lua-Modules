@@ -37,8 +37,8 @@ local MapFunctions = {}
 ---@field getLength fun(map: table): string?
 ---@field getSide fun(map: table, opponentIndex: integer): string?
 ---@field getObjectives fun(map: table, opponentIndex: integer): string?
----@field getHeroPicks fun(map: table, opponentIndex: integer): string[]?
----@field getHeroBans fun(map: table, opponentIndex: integer): string[]?
+---@field getChampionPicks fun(map: table, opponentIndex: integer): string[]?
+---@field getChampionBans fun(map: table, opponentIndex: integer): string[]?
 ---@field getParticipants fun(map: table, opponentIndex: integer): table[]?
 ---@field getVetoPhase fun(map: table): table?
 ---@field extendMapOpponent? fun(map: table, opponentIndex: integer): table
@@ -194,10 +194,10 @@ function MapFunctions.getExtraData(MapParser, match, map, opponents)
 			side = MapParser.getSide(map, opponentIndex),
 		}
 		opponentData = Table.merge(opponentData,
-			Table.map(MapParser.getHeroPicks(map, opponentIndex) or {}, function(idx, hero)
+			Table.map(MapParser.getChampionPicks(map, opponentIndex) or {}, function(idx, hero)
 				return 'champion' .. idx, getCharacterName(hero)
 			end),
-			Table.map(MapParser.getHeroBans(map, opponentIndex) or {}, function(idx, hero)
+			Table.map(MapParser.getChampionBans(map, opponentIndex) or {}, function(idx, hero)
 				return 'ban' .. idx, getCharacterName(hero)
 			end)
 		)
