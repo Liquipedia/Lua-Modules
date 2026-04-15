@@ -12,6 +12,7 @@ local AgentNames = Lua.import('Module:AgentNames')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
@@ -148,6 +149,56 @@ function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
+		skirmish = MatchFunctions.parseSkirmish(match, opponents),
+	}
+end
+
+---@param match table
+---@param opponents MGIParsedOpponent[]
+---@return table?
+function MatchFunctions.parseSkirmish(match, opponents)
+	local skirmishData = match.skirmish
+	if Logic.isEmpty(skirmishData) then
+		return
+	end
+
+	---@param playerName string?
+	---@param opponentIndex integer
+	---@return MGIParsedPlayer?
+	local function lookupPlayer(playerName, opponentIndex)
+		if Logic.isEmpty(playerName) then
+			return
+		end
+		---@cast playerName -nil
+		local nameComponents = Array.parseCommaSeparatedString(playerName, '|')
+		local link = Page.pageifyLink(Array.parseCommaSeparatedString(playerName, '|')[1]):gsub(' ', '_')
+		local playerData = Array.find(
+			opponents[opponentIndex].match2players,
+			function (match2player, playerIndex)
+				return match2player.name == link
+			end
+		)
+		return Table.merge(playerData, {
+			name = link,
+			displayname = nameComponents[#nameComponents]
+		})
+	end
+
+	local player1 = lookupPlayer(skirmishData.t1p1, 1)
+	local player2 = lookupPlayer(skirmishData.t2p1, 2)
+	if Logic.isEmpty(player1) or Logic.isEmpty(player2) then
+		return
+	end
+	local scores = Array.mapIndexes(function (index)
+		return tonumber(skirmishData['score' .. index])
+	end)
+	if #scores ~= 2 then
+		return
+	end
+	return {
+		players = {player1, player2},
+		scores = scores,
+		winner = tonumber(skirmishData.winner) or (scores[1] > scores[2] and 1 or 2)
 	}
 end
 
