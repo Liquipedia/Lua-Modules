@@ -46,6 +46,7 @@ end
 function MatchFunctions.getExtraData(match)
 	return {
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
+		mvp = MatchGroupInputUtil.readMvp(match, opponents),
 	}
 end
 
