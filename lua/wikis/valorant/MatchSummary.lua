@@ -19,6 +19,7 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local Html = Lua.import('Module:Widget/Html')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local SkirmishDisplay = Lua.import('Module:Widget/Match/Summary/Skirmish')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local SPAN_SLASH = Html.Span{classes = {'slash'}, children = '/'}
@@ -59,6 +60,12 @@ end
 ---@return boolean
 function CustomMatchSummary.gameFilter(game)
 	return Logic.isNotEmpty(game.map)
+end
+
+---@param match MatchGroupUtilMatch
+---@return Renderable?
+function CustomMatchSummary.createGamesContainerFooter(match)
+	return SkirmishDisplay(match.extradata.skirmish)
 end
 
 ---@private
