@@ -11,11 +11,12 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
+local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local SkirmishDisplay = Lua.import('Module:Widget/Match/Summary/Skirmish')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ValorantMatchSummary: CustomMatchSummaryInterface
@@ -37,17 +38,94 @@ function CustomMatchSummary.createBody(match)
 	return WidgetUtil.collect(
 		MatchSummaryWidgets.GamesContainer{
 			gridLayout = 'standard',
-			children = Array.map(match.games, function (game, gameIndex)
-				if Logic.isEmpty(game.map) then
-					return
-				end
-				return ValorantMatchSummaryGameRow{game = game, gameIndex = gameIndex}
-			end)
+			children = WidgetUtil.collect(
+				Array.map(match.games, function (game, gameIndex)
+					if Logic.isEmpty(game.map) then
+						return
+					end
+					return ValorantMatchSummaryGameRow{game = game, gameIndex = gameIndex}
+				end),
+				CustomMatchSummary._createSkirmishDisplay(match.extradata.skirmish)
+			)
 		},
-		SkirmishDisplay(match.extradata.skirmish),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))
 	)
+end
+
+---@param skirmishData ValorantSkirmishResult
+---@return Widget?
+function CustomMatchSummary._createSkirmishDisplay(skirmishData)
+	if Logic.isEmpty(skirmishData) then
+		return
+	end
+	local players = Array.map(
+		skirmishData.players,
+		function (player)
+			---@type standardPlayer
+			return {
+				displayName = player.displayname,
+				pageName = player.name,
+				flag = player.flag,
+			}
+		end
+	)
+	return HtmlWidgets.Div{
+		classes = {'brkts-popup-body-grid-row'},
+		children = {
+			HtmlWidgets.B{
+				css = {
+					['grid-column'] = '1 / -1',
+					['justify-self'] = 'center',
+				},
+				children = 'Skirmish Side Selection Result'
+			},
+			HtmlWidgets.Div{
+				classes = {'brkts-popup-body-grid-row-detail'},
+				children = {
+					HtmlWidgets.Span{
+						css = {
+							['justify-self'] = 'end',
+						},
+						children = PlayerDisplay.InlinePlayer{
+							flip = true,
+							player = players[1],
+						}
+					},
+					HtmlWidgets.Div{
+						css = {
+							display = 'grid',
+							['grid-template-columns'] = '1fr min-content 1fr',
+							gap = '0.25rem',
+							['justify-self'] = 'center',
+						},
+						children = Array.interleave(
+							Array.map(
+								skirmishData.scores,
+								function (score, scoreIndex)
+									return HtmlWidgets.Span{
+										css = skirmishData.winner == scoreIndex and {
+											['font-weight'] = 'bold'
+										} or nil,
+										children = score,
+									}
+								end
+							),
+							HtmlWidgets.Span{children = '&ndash;'}
+						)
+					},
+					HtmlWidgets.Span{
+						css = {
+							['justify-self'] = 'start',
+						},
+						children = PlayerDisplay.InlinePlayer{
+							player = players[2],
+						}
+					},
+				}
+			},
+		}
+	}
 end
 
 ---@return string
