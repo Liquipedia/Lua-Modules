@@ -72,6 +72,11 @@ local VALORANT_REGIONS = {'eu', 'na', 'ap', 'kr', 'latam', 'br', 'pbe1', 'esport
 ---@field totalKastRounds integer
 ---@field damageDealt integer
 
+---@class ValorantSkirmishResult
+---@field players MGIParsedPlayer[]
+---@field scores number[]
+---@field winner number
+
 ---@param match table
 ---@param options table?
 ---@return table
@@ -155,7 +160,7 @@ end
 
 ---@param match table
 ---@param opponents MGIParsedOpponent[]
----@return table?
+---@return ValorantSkirmishResult?
 function MatchFunctions.parseSkirmish(match, opponents)
 	local skirmishData = match.skirmish
 	if Logic.isEmpty(skirmishData) then
