@@ -21,6 +21,9 @@ local CustomMatchSummary = {}
 ---@class IdentityVMatchSummaryGameRow: MatchSummaryGameRow
 ---@operator call(MatchSummaryGameRowProps): IdentityVMatchSummaryGameRow
 local IdentityVMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
+IdentityVMatchSummaryGameRow.defaultProps = {
+	allowWrappingInOverview = true
+}
 
 ---@param args table
 ---@return Widget
