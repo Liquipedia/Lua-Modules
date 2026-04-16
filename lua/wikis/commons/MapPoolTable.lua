@@ -80,7 +80,7 @@ end
 function MapPoolTable:_readConfig(args)
 	return {
 		note = args.note,
-		showAuhor = Logic.readBool(args.author),
+		showAuthor = Logic.readBool(args.author),
 		sort = Logic.readBool(args.sort),
 		size = args.size or DEFAULT_THUMB_SIZE,
 		title = args.title,
@@ -92,7 +92,7 @@ end
 ---@return {maps: StandardMapWithIcon[], title: string?}[]
 function MapPoolTable:_readManualInput(args)
 	local categories = Array.mapIndexes(function(categoryIndex)
-		return MapPoolTable:_readManualMaps(Json.parseIfTable(args['category' .. categoryIndex]) or {}, true)
+		return self:_readManualMaps(Json.parseIfTable(args['category' .. categoryIndex]) or {}, true)
 	end)
 	if Logic.isNotEmpty(categories) then
 		return categories
@@ -276,7 +276,7 @@ end
 
 ---@private
 ---@param map StandardMapWithIcon|{}
----@return IconImageWidget
+---@return Widget
 function MapPoolTable:_displayAuthors(map)
 	---@type Renderable[]
 	local authors = Array.mapIndexes(function(authorIndex)
