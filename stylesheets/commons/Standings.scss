@@ -1,23 +1,4 @@
-div.standings-ffa {
-	& > table > * > tr > th {
-		padding: 12px;
-	}
-
-	& > table > * > tr > td {
-		padding: 8px;
-	}
-
-	& .btn {
-		width: 120%;
-	}
-
-	& .tableHeaderRow {
-		display: flex;
-		gap: 32px;
-		align-items: center;
-	}
-}
-
+.standings-ffa,
 .standings-swiss {
 	tr[ data-position-status ] {
 		position: relative;
@@ -62,10 +43,63 @@ div.standings-ffa {
 	}
 }
 
+.standings-ffa-wrapper {
+	width: fit-content;
+	max-width: 100%;
+	display: flex;
+	flex-flow: column nowrap;
+	gap: 0.5rem;
+
+	.dropdown-box {
+		&-wrapper {
+			width: fit-content;
+		}
+
+		&-visible {
+			display: flex;
+			flex-flow: column nowrap;
+			width: 100%;
+		}
+	}
+}
+
 .standings-match-overview {
 	display: flex;
 	justify-content: space-between;
 	flex-direction: column;
 	align-items: center;
 	gap: 0.25rem;
+}
+
+.standings-position-indicator {
+	display: flex;
+	flex-flow: row nowrap;
+	padding: 0.125rem 0.5rem;
+	gap: 0.125rem;
+	font-weight: bold;
+	align-items: center;
+	justify-content: center;
+	min-height: 1.25rem;
+	font-size: 0.6875rem;
+	line-height: 1rem;
+
+	&.movement-up {
+		color: var( --clr-semantic-positive-30 );
+
+		.theme--dark & {
+			color: var( --clr-semantic-positive-80 );
+		}
+	}
+
+	&.movement-neutral {
+		color: var( --clr-secondary-80 );
+	}
+
+	&.movement-down {
+		color: var( --clr-semantic-negative-40 );
+
+		.theme--dark & {
+			color: var( --clr-semantic-negative-80 );
+		}
+	}
 }

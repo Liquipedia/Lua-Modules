@@ -105,7 +105,6 @@ function Page.setDisplayTitle(props)
 	return frame:callParserFunction('DISPLAYTITLE', title, props.noReplace and 'noreplace' or nil)
 end
 
-
 ---@param args {form: string, template: string, queryArgs: table?, execute: boolean?}
 ---@return string
 function Page.makeFormQueryLink(args)
