@@ -123,7 +123,7 @@ function StandingsFfaWidget:_headerRow()
 	return TableWidgets.TableHeader{children = {
 		TableWidgets.Row{children = WidgetUtil.collect(
 			makeHeaderCell('#'),
-			makeHeaderCell(),
+			self:_showRoundColumns() and makeHeaderCell() or nil,
 			makeHeaderCell('Participant'),
 			Array.map(standings.tiebreakers, function(tiebreaker)
 				if not tiebreaker.title then
