@@ -24,6 +24,7 @@ local TEAM_DISPLAY_MODE = 'team'
 local UNIFORM_DISPLAY_MODE = 'uniform'
 local SCORE_STATUS = MatchGroupInputUtil.STATUS.SCORE
 
+---@class WarcraftMatchGroupUtil: MatchGroupUtil
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
 ---@class WarcraftMatchGroupUtilGamePlayer: standardPlayer
