@@ -28,13 +28,15 @@ local MatchSummaryGamesContainer = Class.new(Widget)
 
 ---@return Widget?
 function MatchSummaryGamesContainer:render()
-	if Logic.isEmpty(self.props.children) then
+	local props = self.props
+
+	if Logic.isEmpty(props.children) then
 		return
-	elseif Logic.isEmpty(self.props.gamesSectionName) and Logic.isEmpty(self.props.gamesSectionResult) then
+	elseif Logic.isEmpty(props.gamesSectionName) and Logic.isEmpty(props.gamesSectionResult) then
 		return HtmlWidgets.Div{
 			classes = {'brkts-popup-body-grid'},
-			css = self.props.css,
-			children = self.props.children,
+			css = props.css,
+			children = props.children,
 		}
 	end
 	return GeneralCollapsible{
@@ -44,14 +46,14 @@ function MatchSummaryGamesContainer:render()
 				'brkts-popup-body-grid-header'
 			},
 			children = {
-				HtmlWidgets.Div{children = self.props.gamesSectionName},
-				HtmlWidgets.Div{children = self.props.gamesSectionResult},
+				HtmlWidgets.Div{children = props.gamesSectionName},
+				HtmlWidgets.Div{children = props.gamesSectionResult},
 				CollapsibleToggle{},
 			}
 		},
-		collapseAreaCss = self.props.css,
+		collapseAreaCss = props.css,
 		collapseAreaClasses = {'brkts-popup-body-grid'},
-		children = self.props.children,
+		children = props.children,
 		shouldCollapse = true,
 	}
 end
