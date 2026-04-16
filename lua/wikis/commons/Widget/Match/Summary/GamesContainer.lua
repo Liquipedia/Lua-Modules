@@ -23,8 +23,7 @@ local MatchSummaryGamesContainer = Class.new(Widget)
 function MatchSummaryGamesContainer:render()
 	if Logic.isEmpty(self.props.children) then
 		return
-	end
-	if not Logic.readBool(self.props.collapsible) then
+	elseif Logic.isEmpty(self.props.gamesSectionName) and Logic.isEmpty(self.props.gamesSectionResult) then
 		return HtmlWidgets.Div{
 			classes = {'brkts-popup-body-grid'},
 			css = self.props.css,
