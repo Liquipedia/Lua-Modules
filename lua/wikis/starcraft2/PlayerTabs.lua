@@ -83,19 +83,12 @@ end
 ---@return Widget?
 function PlayerTabs._display(player, currentTab)
 	---@param args {form: string, template: string, display: string, queryArgs: table}
-	---@return string
+	---@return Widget
 	local makeQueryLink = function(args)
-		local prefix = args.template
-		local queryArgs = Table.map(args.queryArgs, function(key, item)
-			return prefix .. key, item
-		end)
 		return Link{
 			linktype = 'external',
 			children = args.display,
-			link = tostring(mw.uri.fullUrl(
-				'Special:RunQuery/' .. args.form,
-				queryArgs
-			)) .. '&_run'
+			link = Page.makeFormQueryLink(Table.merge(args, {execute = true}))
 		}
 	end
 
@@ -107,10 +100,10 @@ function PlayerTabs._display(player, currentTab)
 			display = 'Results',
 			template = 'Player results',
 			queryArgs = {
-				['[player]'] = player,
-				['[tier]'] = '1,2,3',
-				['[edate]'] = NOW,
-				['[limit]'] = '250',
+				player = player,
+				tier = '1,2,3',
+				edate = NOW,
+				limit = '250',
 			},
 		},
 		name3 = makeQueryLink{
@@ -118,11 +111,11 @@ function PlayerTabs._display(player, currentTab)
 			display = 'Matches',
 			template = 'Player matches',
 			queryArgs = {
-				['[player]'] = player,
-				['[tier]'] = '1,2,3',
-				['[edate]'] = NOW,
-				['[linkSubPage]'] = 'false',
-				['[limit]'] = '250',
+				player = player,
+				tier = '1,2,3',
+				edate = NOW,
+				linkSubPage = 'false',
+				limit = '250',
 			},
 		},
 		name4 = 'Awards',
@@ -146,7 +139,7 @@ function PlayerTabs._display(player, currentTab)
 		form = 'Match history',
 		display = 'Head to Head',
 		template = 'Head_to_head_query',
-		queryArgs = {['[player]'] = player},
+		queryArgs = {player = player},
 	}
 
 	-- Statistics query link
@@ -156,12 +149,12 @@ function PlayerTabs._display(player, currentTab)
 		display = 'Statistics',
 		template = 'PlayerStatistics',
 		queryArgs = {
-			['[player]'] = player,
-			['[tiers]'] = '1,2,3',
-			['[tierTypes]'] = 'Unset,Monthly,Weekly,Biweekly,Showmatch,Daily',
-			['[onlySolo]'] = 'no',
-			['[sdate]'] = PAST,
-			['[edate]'] = NOW,
+			player = player,
+			tiers = '1,2,3',
+			tierTypes = 'Unset,Monthly,Weekly,Biweekly,Showmatch,Daily',
+			onlySolo = 'no',
+			sdate = PAST,
+			edate = NOW,
 		},
 	}
 

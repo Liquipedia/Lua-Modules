@@ -156,19 +156,12 @@ end
 ---@return Widget?
 function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
 	---@param args {form: string, template: string, display: string, queryArgs: table}
-	---@return string
+	---@return Widget
 	local makeQueryLink = function(args)
-		local prefix = args.template
-		local queryArgs = Table.map(args.queryArgs, function(key, item)
-			return prefix .. key, item
-		end)
 		return Link{
 			linktype = 'external',
 			children = args.display,
-			link = tostring(mw.uri.fullUrl(
-				'Special:RunQuery/' .. args.form,
-				queryArgs
-			)) .. '&_run'
+			link = Page.makeFormQueryLink(Table.merge(args, {execute = true}))
 		}
 	end
 
@@ -180,10 +173,10 @@ function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
 			display = 'Team Results',
 			template = 'Team results',
 			queryArgs = {
-				['[team]'] = team,
-				['[tier]'] = '1,2,3',
-				['[edate]'] = NOW,
-				['[limit]'] = '250',
+				team = team,
+				tier = '1,2,3',
+				edate = NOW,
+				limit = '250',
 			},
 		},
 		name3 = makeQueryLink{
@@ -191,11 +184,11 @@ function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
 			display = 'Team Matches',
 			template = 'Team matches',
 			queryArgs = {
-				['[team]'] = team,
-				['[tier]'] = '1,2,3',
-				['[edate]'] = NOW,
-				['[linkSubPage]'] = 'false',
-				['[limit]'] = '250',
+				team = team,
+				tier = '1,2,3',
+				edate = NOW,
+				linkSubPage = 'false',
+				limit = '250',
 			},
 		},
 	}
@@ -207,10 +200,10 @@ function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
 			display = 'Player Results',
 			template = 'Team player results',
 			queryArgs = {
-				['[team]'] = team,
-				['[tier]'] = '1,2,3',
-				['[edate]'] = NOW,
-				['[limit]'] = '250',
+				team = team,
+				tier = '1,2,3',
+				edate = NOW,
+				limit = '250',
 			},
 		}
 
