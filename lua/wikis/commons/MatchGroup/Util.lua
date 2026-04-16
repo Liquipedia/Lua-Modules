@@ -33,6 +33,7 @@ games, and etc in the new bracket framework.
 
 Display related functions go in Module:MatchGroup/Display/Helper.
 ]]
+---@class MatchGroupUtil
 local MatchGroupUtil = {types = {}}
 
 ---@class MatchGroupUtilLowerEdge

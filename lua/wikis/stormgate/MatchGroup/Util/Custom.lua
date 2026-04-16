@@ -22,6 +22,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 local SCORE_STATUS = 'S'
 
+---@class StormgateMatchGroupUtil: MatchGroupUtil
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
 CustomMatchGroupUtil.types.Faction = TypeUtil.literalUnion(unpack(Faction.getFactions()))

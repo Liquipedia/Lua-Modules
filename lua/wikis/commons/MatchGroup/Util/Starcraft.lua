@@ -23,6 +23,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 local SCORE_STATUS = MatchGroupInputUtil.STATUS.SCORE
 
 --Utility functions for match group related things specific to the starcraft and starcraft2 wikis.
+---@class StarcraftMatchGroupUtil: MatchGroupUtil
 local StarcraftMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
 ---@class StarcraftMatchGroupUtilGameOpponent:GameOpponent

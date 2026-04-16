@@ -20,6 +20,7 @@ local Opponent = Lua.import('Module:Opponent/Custom')
 
 local SCORE_STATUS = 'S'
 
+---@class HearthstoneMatchGroupUtil: MatchGroupUtil
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
 ---@class HearthstoneMatchGroupUtilGameOpponent: GameOpponent
