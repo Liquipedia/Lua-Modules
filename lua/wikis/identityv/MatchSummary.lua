@@ -44,7 +44,6 @@ function CustomMatchSummary.createBody(match)
 
 	return WidgetUtil.collect(
 		MatchSummaryWidgets.GamesContainer{
-			gridLayout = 'standard',
 			children = Array.map(match.games, function (game, gameIndex)
 				if not game.map and not CustomMatchSummary.hasScores(game) then
 					return
