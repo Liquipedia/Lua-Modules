@@ -15,8 +15,15 @@ local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default'
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
+---@class MatchSummaryGamesContainerProps
+---@field children? Renderable|Renderable[]
+---@field css? table<string, string|number>
+---@field gamesSectionName? Renderable|Renderable[]
+---@field gamesSectionResult? Renderable|Renderable[]
+
 ---@class MatchSummaryGamesContainer: Widget
----@operator call(table): MatchSummaryGamesContainer
+---@operator call(MatchSummaryGamesContainerProps): MatchSummaryGamesContainer
+---@field props MatchSummaryGamesContainerProps
 local MatchSummaryGamesContainer = Class.new(Widget)
 
 ---@return Widget?
