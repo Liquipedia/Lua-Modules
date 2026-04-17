@@ -50,7 +50,9 @@ function Widget:tryMake()
 	local WidgetContext = Lua.import('Module:Widget/Context')
 	local function renderComponent()
 		local ret = self:render()
-		if not Array.isArray(ret) then
+		if Logic.isEmpty(ret) then
+			return ''
+		elseif not Array.isArray(ret) then
 			ret = {ret}
 		end
 		---@cast ret Renderable[]
