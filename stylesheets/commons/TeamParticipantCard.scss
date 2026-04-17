@@ -598,7 +598,8 @@ body:has( .switch-toggle-active#{ $compact-selector } ) {
 				display: none;
 			}
 
-			.team-participant-card__qualifier--content {
+			.team-participant-card__qualifier--content,
+			.team-participant-card__notifications {
 				display: none;
 			}
 		}
