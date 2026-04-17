@@ -608,6 +608,8 @@ class TabsModule {
 		} );
 	}
 
+	// Walks the static tab hierarchy starting from startElement, collecting all related containers
+	// (nested children and adjacent siblings) into a single group for the mobile dropdown.
 	collectStaticGroup( startElement, processed ) {
 		const group = [];
 		let currentElement = startElement;
@@ -621,6 +623,8 @@ class TabsModule {
 		return group;
 	}
 
+	// Returns the next container to add to the group: prefers a nested child tab row,
+	// then falls back to an adjacent sibling tab row at the same level.
 	getNextStaticGroupElement( containerElement, processed ) {
 		const nestedElement = this.getNestedStaticChild( containerElement );
 		if ( nestedElement && !processed.has( nestedElement ) ) {
@@ -637,6 +641,8 @@ class TabsModule {
 		return null;
 	}
 
+	// Finds the first nested static tab container inside containerElement, handling both
+	// the tabsN pattern (static directly inside content) and the tabs1 pattern (analytics wrapper).
 	getNestedStaticChild( containerElement ) {
 		const directChildStatic = containerElement.querySelector( TABS_CONFIG.SELECTORS.DIRECT_CHILD_ANALYTICS_STATIC );
 		if ( directChildStatic ) {
