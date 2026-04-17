@@ -34,7 +34,6 @@ liquipedia.teamParticipantCard = {
 
 						const linkCenterX = linkRect.left + linkRect.width / 2 - cardRect.left;
 						const rosterWidth = roster.offsetWidth;
-						const rosterHeight = roster.offsetHeight;
 
 						let left = linkCenterX - rosterWidth / 2;
 						if ( cardRect.left + left + rosterWidth > window.innerWidth ) {
@@ -44,7 +43,7 @@ liquipedia.teamParticipantCard = {
 							left = -cardRect.left;
 						}
 
-						const top = linkRect.top - cardRect.top - rosterHeight - gap;
+						const top = linkRect.bottom - cardRect.top + gap;
 
 						roster.style.left = left + 'px';
 						roster.style.top = top + 'px';
