@@ -560,7 +560,7 @@ body:has( .switch-toggle-active#{ $compact-selector } ) {
 			overflow: visible;
 		}
 
-		.team-participant-card.general-collapsible.collapsed:hover {
+		.team-participant-card.general-collapsible.collapsed:has( > .team-participant-card__header:hover, > .should-collapse:hover ) {
 			.should-collapse {
 				display: block;
 				position: absolute;

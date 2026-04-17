@@ -13,11 +13,12 @@ liquipedia.teamParticipantCard = {
 	setupEdgeAvoidance: function() {
 		document.querySelectorAll( '.team-participant-card' ).forEach( ( card ) => {
 			const roster = card.querySelector( '.should-collapse' );
-			if ( !roster ) {
+			const header = card.querySelector( '.team-participant-card__header' );
+			if ( !roster || !header ) {
 				return;
 			}
 
-			card.addEventListener( 'mouseenter', () => {
+			header.addEventListener( 'mouseenter', () => {
 				if ( !card.classList.contains( 'collapsed' ) ) {
 					return;
 				}
