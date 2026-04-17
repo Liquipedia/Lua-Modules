@@ -597,6 +597,10 @@ body:has( .switch-toggle-active#{ $compact-selector } ) {
 			.switch-pill-container {
 				display: none;
 			}
+
+			.team-participant-card__qualifier--content {
+				display: none;
+			}
 		}
 	}
 }
