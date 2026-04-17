@@ -36,7 +36,7 @@ describe( 'Tabs module', () => {
 	function createStaticTabsMarkup( items, nestedMarkup = '', includeContent = true ) {
 		return `
 			<div data-analytics-name="Navigation tab">
-				<div class="tabs-static">
+				<div class="tabs-static" data-tabs-static>
 					${ createTabList( items ) }
 					${ includeContent ? `<div class="tabs-content">${ nestedMarkup }</div>` : nestedMarkup }
 				</div>
@@ -61,13 +61,13 @@ describe( 'Tabs module', () => {
 				{ label: 'Other', href: '/wiki/Other' }
 			] );
 
-			expect( document.querySelector( '.tabs-static > .dropdown-widget' ) ).toBeNull();
+			expect( document.querySelector( '[data-tabs-static] > [data-tabs-static-dropdown]' ) ).toBeNull();
 
 			initializeTabs();
 
-			const staticContainer = document.querySelector( '.tabs-static' );
+			const staticContainer = document.querySelector( '[data-tabs-static]' );
 			expect( staticContainer.getAttribute( 'data-mobile-dropdown-ready' ) ).toBe( 'true' );
-			expect( staticContainer.querySelector( ':scope > .dropdown-widget' ) ).not.toBeNull();
+			expect( staticContainer.querySelector( ':scope > [data-tabs-static-dropdown]' ) ).not.toBeNull();
 		} );
 
 		test( 'should support keyboard toggling on the dropdown', () => {
@@ -105,8 +105,8 @@ describe( 'Tabs module', () => {
 
 			initializeTabs();
 
-			const primary = document.querySelector( '.tabs-static' );
-			const label = primary.querySelector( '.dropdown-widget__label' );
+			const primary = document.querySelector( '[data-tabs-static]' );
+			const label = primary.querySelector( '[data-tabs-static-dropdown-label]' );
 			expect( Array.from( label.childNodes ).map( ( node ) => node.textContent ).join( '' ) )
 				.toBe( 'ResultsStandingsGroup A' );
 			expect( label.querySelectorAll( 'i' ) ).toHaveLength( 2 );
@@ -145,7 +145,7 @@ describe( 'Tabs module', () => {
 			const staticContainers = document.querySelectorAll( '.tabs-static' );
 			expect( staticContainers[ 1 ].getAttribute( 'data-mobile-dropdown-grouped' ) ).toBe( 'true' );
 
-			const dropdowns = document.querySelectorAll( '.tabs-static > .dropdown-widget' );
+			const dropdowns = document.querySelectorAll( '[data-tabs-static] > [data-tabs-static-dropdown]' );
 			expect( dropdowns ).toHaveLength( 1 );
 			expect( dropdowns[ 0 ].querySelector( '.dropdown-widget__menu > ul > li > ul' ) ).not.toBeNull();
 		} );
@@ -161,9 +161,9 @@ describe( 'Tabs module', () => {
 
 			initializeTabs();
 
-			const primary = document.querySelector( '.tabs-static' );
+			const primary = document.querySelector( '[data-tabs-static]' );
 			expect(
-				Array.from( primary.querySelector( '.dropdown-widget__label' ).childNodes )
+				Array.from( primary.querySelector( '[data-tabs-static-dropdown-label]' ).childNodes )
 					.map( ( node ) => node.textContent )
 					.join( '' )
 			).toBe( 'Boston MajorEurope' );
@@ -177,7 +177,7 @@ describe( 'Tabs module', () => {
 	describe( 'dynamic tabs', () => {
 		test( 'should only activate dynamic containers on hash routing', () => {
 			document.body.innerHTML = `
-				<div class="tabs-dynamic">
+				<div class="tabs-dynamic" data-tabs-dynamic>
 					<div class="tabs-nav-wrapper">
 						<div class="tabs-scroll-arrow-wrapper tabs-scroll-arrow-wrapper--left"></div>
 						<ul class="nav-tabs">

@@ -78,7 +78,7 @@ function Tabs.static(args)
 		children = {
 			HtmlWidgets.Div{
 				classes = {'tabs-static'},
-				attributes = {['data-nosnippet'] = ''},
+				attributes = {['data-nosnippet'] = '', ['data-tabs-static'] = ''},
 				children = WidgetUtil.collect(
 					Tabs._buildNavWrapper(navTabs),
 					Array.map(Array.filter(tabArgs, Operator.property('this')), Operator.property('tabs'))
@@ -177,7 +177,7 @@ function Tabs.dynamic(args)
 
 	if not hasContent then
 		local startTag = '<div class="tabs-dynamic navigation-not-searchable ' .. variantClass ..
-			(wraps and ' wraps' or '') .. '" data-nosnippet>\n'
+			(wraps and ' wraps' or '') .. '" data-nosnippet data-tabs-dynamic>\n'
 		return startTag .. tostring(navWrapper) .. (contents --[[@as string]])
 	end
 
@@ -186,7 +186,7 @@ function Tabs.dynamic(args)
 		css = {width = '-webkit-fill-available'},
 		children = HtmlWidgets.Div{
 			classes = {'tabs-dynamic', 'navigation-not-searchable', variantClass, wrapsClass},
-			attributes = {['data-nosnippet'] = ''},
+			attributes = {['data-nosnippet'] = '', ['data-tabs-dynamic'] = ''},
 			children = {
 				navWrapper,
 				contents

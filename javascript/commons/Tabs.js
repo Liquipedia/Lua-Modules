@@ -6,8 +6,8 @@
 
 const TABS_CONFIG = {
 	SELECTORS: {
-		DYNAMIC_CONTAINER: '.tabs-dynamic',
-		STATIC_CONTAINER: '.tabs-static',
+		DYNAMIC_CONTAINER: '[data-tabs-dynamic]',
+		STATIC_CONTAINER: '[data-tabs-static]',
 		NAV_WRAPPER: '.tabs-nav-wrapper',
 		NAV_TABS: '.nav-tabs',
 		CONTENT_CONTAINER: '.tabs-content',
@@ -15,10 +15,10 @@ const TABS_CONFIG = {
 		ARROW_RIGHT: '.tabs-scroll-arrow-wrapper--right',
 		ACTIVE_TAB: 'li.active',
 		TAB_ITEMS: 'li',
-		STATIC_DROPDOWN: '.dropdown-widget',
-		STATIC_DROPDOWN_LABEL: '.dropdown-widget__label',
+		STATIC_DROPDOWN: '[data-tabs-static-dropdown]',
+		STATIC_DROPDOWN_LABEL: '[data-tabs-static-dropdown-label]',
 		DIRECT_CHILD_TABS_CONTENT: ':scope > .tabs-content',
-		DIRECT_CHILD_ANALYTICS_STATIC: ':scope > [data-analytics-name="Navigation tab"] > .tabs-static'
+		DIRECT_CHILD_ANALYTICS_STATIC: ':scope > [data-analytics-name="Navigation tab"] > [data-tabs-static]'
 	},
 	SCROLL: {
 		ARROW_STEP: 200,
@@ -112,7 +112,7 @@ class TabContainer {
 
 	init() {
 		this.indexElements();
-		if ( this.container.classList.contains( 'tabs-dynamic' ) ) {
+		if ( this.container.hasAttribute( 'data-tabs-dynamic' ) ) {
 			this.setupContentHandlers();
 		}
 		this.setupScrollHandlers();
@@ -519,7 +519,7 @@ class HashRouter {
 			const element = document.getElementById( escapedHash );
 
 			if ( element ) {
-				const tabContent = element.closest( '.tabs-dynamic .tabs-content > div' );
+				const tabContent = element.closest( '[data-tabs-dynamic] .tabs-content > div' );
 				if ( tabContent ) {
 					tabNumber = tabContent.dataset.count;
 					if ( tabNumber ) {
@@ -586,7 +586,7 @@ class TabsModule {
 			if ( !container.navTabs ) {
 				return;
 			}
-			if ( containerElement.classList.contains( 'tabs-dynamic' ) ) {
+			if ( containerElement.hasAttribute( 'data-tabs-dynamic' ) ) {
 				this.dynamicContainers.set( containerElement, container );
 			} else {
 				this.staticScrollContainers.add( container );
@@ -698,30 +698,41 @@ class TabsModule {
 	}
 
 	ensureStaticDropdown( containerElement ) {
-		const existingDropdown = containerElement.querySelector( `:scope > ${ TABS_CONFIG.SELECTORS.STATIC_DROPDOWN }` );
+		const existingDropdown = containerElement.querySelector(
+			`:scope > ${ TABS_CONFIG.SELECTORS.STATIC_DROPDOWN }`
+		);
 		if ( existingDropdown ) {
 			return existingDropdown;
 		}
 
-		const dropdown = TabsDOMUtils.createElement( 'div', { class: 'dropdown-widget dropdown-widget--form' }, [
-			TabsDOMUtils.createElement( 'div', {
-				class: 'dropdown-widget__toggle',
-				role: 'button',
-				tabindex: '0',
-				'aria-expanded': 'false',
-				'aria-haspopup': 'menu',
-				[ TABS_CONFIG.ATTRIBUTES.DROPDOWN_TOGGLE ]: 'true'
-			}, [
-				TabsDOMUtils.createElement( 'span', { class: 'dropdown-widget__prefix tabs-static-dropdown-icon' } ),
-				TabsDOMUtils.createElement( 'span', { class: 'dropdown-widget__label' } ),
-				TabsDOMUtils.createElement( 'span', { class: 'dropdown-widget__indicator' }, [
-					TabsDOMUtils.createElement( 'i', { class: 'far fa-chevron-down fa-xs' } )
+		const dropdown = TabsDOMUtils.createElement(
+			'div',
+			{ class: 'dropdown-widget dropdown-widget--form', 'data-tabs-static-dropdown': '' },
+			[
+				TabsDOMUtils.createElement( 'div', {
+					class: 'dropdown-widget__toggle',
+					role: 'button',
+					tabindex: '0',
+					'aria-expanded': 'false',
+					'aria-haspopup': 'menu',
+					[ TABS_CONFIG.ATTRIBUTES.DROPDOWN_TOGGLE ]: 'true'
+				}, [
+					TabsDOMUtils.createElement( 'span', {
+						class: 'dropdown-widget__prefix tabs-static-dropdown-icon'
+					} ),
+					TabsDOMUtils.createElement( 'span', {
+						class: 'dropdown-widget__label',
+						'data-tabs-static-dropdown-label': ''
+					} ),
+					TabsDOMUtils.createElement( 'span', { class: 'dropdown-widget__indicator' }, [
+						TabsDOMUtils.createElement( 'i', { class: 'far fa-chevron-down fa-xs' } )
+					] )
+				] ),
+				TabsDOMUtils.createElement( 'div', { class: 'dropdown-widget__menu', 'aria-hidden': 'true' }, [
+					TabsDOMUtils.createElement( 'ul' )
 				] )
-			] ),
-			TabsDOMUtils.createElement( 'div', { class: 'dropdown-widget__menu', 'aria-hidden': 'true' }, [
-				TabsDOMUtils.createElement( 'ul' )
-			] )
-		] );
+			]
+		);
 
 		const navWrapper = containerElement.querySelector( `:scope > ${ TABS_CONFIG.SELECTORS.NAV_WRAPPER }` );
 		navWrapper?.insertAdjacentElement( 'afterend', dropdown );
