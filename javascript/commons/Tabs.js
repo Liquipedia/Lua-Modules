@@ -8,16 +8,16 @@ const TABS_CONFIG = {
 	SELECTORS: {
 		DYNAMIC_CONTAINER: '[data-tabs-dynamic]',
 		STATIC_CONTAINER: '[data-tabs-static]',
-		NAV_WRAPPER: '.tabs-nav-wrapper',
-		NAV_TABS: '.nav-tabs',
-		CONTENT_CONTAINER: '.tabs-content',
-		ARROW_LEFT: '.tabs-scroll-arrow-wrapper--left',
-		ARROW_RIGHT: '.tabs-scroll-arrow-wrapper--right',
+		NAV_WRAPPER: '[data-tabs-nav-wrapper]',
+		NAV_TABS: '[data-tabs-nav]',
+		CONTENT_CONTAINER: '[data-tabs-content]',
+		ARROW_LEFT: '[data-tabs-arrow-left]',
+		ARROW_RIGHT: '[data-tabs-arrow-right]',
 		ACTIVE_TAB: 'li.active',
 		TAB_ITEMS: 'li',
 		STATIC_DROPDOWN: '[data-tabs-static-dropdown]',
 		STATIC_DROPDOWN_LABEL: '[data-tabs-static-dropdown-label]',
-		DIRECT_CHILD_TABS_CONTENT: ':scope > .tabs-content',
+		DIRECT_CHILD_TABS_CONTENT: ':scope > [data-tabs-content]',
 		DIRECT_CHILD_ANALYTICS_STATIC: ':scope > [data-analytics-name="Navigation tab"] > [data-tabs-static]'
 	},
 	SCROLL: {
@@ -138,7 +138,7 @@ class TabContainer {
 		}
 
 		const nextSibling = this.container.nextElementSibling;
-		if ( nextSibling?.classList.contains( 'tabs-content' ) ) {
+		if ( nextSibling?.hasAttribute( 'data-tabs-content' ) ) {
 			return Array.from( nextSibling.children );
 		}
 
@@ -469,7 +469,7 @@ class TabContainer {
 			this.scrollToActiveTab();
 		}
 
-		const content = this.container.querySelector( `.tabs-content > .content${ tabNumber }` );
+		const content = this.container.querySelector( `[data-tabs-content] > .content${ tabNumber }` );
 		if ( content ) {
 			content.classList.add( TABS_CONFIG.CLASSES.ACTIVE );
 		}
@@ -519,7 +519,7 @@ class HashRouter {
 			const element = document.getElementById( escapedHash );
 
 			if ( element ) {
-				const tabContent = element.closest( '[data-tabs-dynamic] .tabs-content > div' );
+				const tabContent = element.closest( '[data-tabs-dynamic] [data-tabs-content] > div' );
 				if ( tabContent ) {
 					tabNumber = tabContent.dataset.count;
 					if ( tabNumber ) {
@@ -762,7 +762,7 @@ class TabsModule {
 	}
 
 	getStaticNavTabs( containerElement ) {
-		return containerElement?.querySelector( ':scope > .tabs-nav-wrapper > .nav-tabs' ) ?? null;
+		return containerElement?.querySelector( ':scope > [data-tabs-nav-wrapper] > [data-tabs-nav]' ) ?? null;
 	}
 
 	getStaticActiveLabel( containerElement ) {

@@ -21,8 +21,8 @@ describe( 'Tabs module', () => {
 
 	function createTabList( items ) {
 		return `
-			<div class="tabs-nav-wrapper">
-				<ul class="nav-tabs">
+			<div class="tabs-nav-wrapper" data-tabs-nav-wrapper>
+				<ul class="nav-tabs" data-tabs-nav>
 					${ items.map( ( item ) => `
 						<li${ item.active ? ' class="active"' : '' }>
 							<a${ item.isNew ? ' class="new"' : '' } href="${ item.href || '#' }">${ item.label }</a>
@@ -38,7 +38,7 @@ describe( 'Tabs module', () => {
 			<div data-analytics-name="Navigation tab">
 				<div class="tabs-static" data-tabs-static>
 					${ createTabList( items ) }
-					${ includeContent ? `<div class="tabs-content">${ nestedMarkup }</div>` : nestedMarkup }
+					${ includeContent ? `<div class="tabs-content" data-tabs-content>${ nestedMarkup }</div>` : nestedMarkup }
 				</div>
 			</div>
 		`;
@@ -178,15 +178,15 @@ describe( 'Tabs module', () => {
 		test( 'should only activate dynamic containers on hash routing', () => {
 			document.body.innerHTML = `
 				<div class="tabs-dynamic" data-tabs-dynamic>
-					<div class="tabs-nav-wrapper">
-						<div class="tabs-scroll-arrow-wrapper tabs-scroll-arrow-wrapper--left"></div>
-						<ul class="nav-tabs">
+					<div class="tabs-nav-wrapper" data-tabs-nav-wrapper>
+						<div class="tabs-scroll-arrow-wrapper tabs-scroll-arrow-wrapper--left" data-tabs-arrow-left></div>
+						<ul class="nav-tabs" data-tabs-nav>
 							<li class="tab1 active"><a href="#">Tab 1</a></li>
 							<li class="tab2"><a href="#">Tab 2</a></li>
 						</ul>
-						<div class="tabs-scroll-arrow-wrapper tabs-scroll-arrow-wrapper--right"></div>
+						<div class="tabs-scroll-arrow-wrapper tabs-scroll-arrow-wrapper--right" data-tabs-arrow-right></div>
 					</div>
-					<div class="tabs-content">
+					<div class="tabs-content" data-tabs-content>
 						<div class="content1 active"></div>
 						<div class="content2"></div>
 					</div>

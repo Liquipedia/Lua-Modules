@@ -69,7 +69,7 @@ function Tabs.static(args)
 
 	local navTabs = HtmlWidgets.Ul{
 		classes = {'nav', 'nav-tabs', 'navigation-not-searchable', 'tabs', 'tabs' .. tabCount},
-		attributes = {['data-nosnippet'] = ''},
+		attributes = {['data-nosnippet'] = '', ['data-tabs-nav'] = ''},
 		children = buildTabLiItems()
 	}
 
@@ -137,6 +137,7 @@ function Tabs.dynamic(args)
 
 	local navTabs = HtmlWidgets.Ul{
 		classes = {'nav', 'nav-tabs', 'tabs', 'tabs' .. tabCount},
+		attributes = {['data-tabs-nav'] = ''},
 		children = WidgetUtil.collect(
 			Array.map(tabArgs, function(tabData, tabIndex)
 				return HtmlWidgets.Li{
@@ -268,9 +269,11 @@ end
 function Tabs._buildNavWrapper(navTabs)
 	return HtmlWidgets.Div{
 		classes = {'tabs-nav-wrapper'},
+		attributes = {['data-tabs-nav-wrapper'] = ''},
 		children = {
 			HtmlWidgets.Div{
 				classes = {'tabs-scroll-arrow-wrapper', 'tabs-scroll-arrow-wrapper--left'},
+				attributes = {['data-tabs-arrow-left'] = ''},
 				children = {
 					Button{
 						classes = {'tabs-scroll-arrow', 'tabs-scroll-arrow--left'},
@@ -289,6 +292,7 @@ function Tabs._buildNavWrapper(navTabs)
 			navTabs,
 			HtmlWidgets.Div{
 				classes = {'tabs-scroll-arrow-wrapper', 'tabs-scroll-arrow-wrapper--right'},
+				attributes = {['data-tabs-arrow-right'] = ''},
 				children = {
 					Button{
 						classes = {'tabs-scroll-arrow', 'tabs-scroll-arrow--right'},
@@ -317,6 +321,7 @@ function Tabs._buildContentDiv(hasContent, hybridTabs, noPadding, children)
 	if hasContent then
 		return HtmlWidgets.Div{
 			classes = {'tabs-content'},
+			attributes = {['data-tabs-content'] = ''},
 			css = {
 				['border-style'] = hybridTabs and 'none !important' or nil,
 				['padding'] = (hybridTabs or noPadding) and '0 !important' or nil,
@@ -331,7 +336,7 @@ function Tabs._buildContentDiv(hasContent, hybridTabs, noPadding, children)
 	elseif noPadding then
 		style = 'padding:0 !important;'
 	end
-	return '\n<div class="tabs-content" style="' .. style .. '">'
+	return '\n<div class="tabs-content" data-tabs-content style="' .. style .. '">'
 end
 
 ---@param tab {name: string?, link: string?, content: string|Html?, tabs: string|Html?, this: boolean}
