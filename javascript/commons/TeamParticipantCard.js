@@ -7,34 +7,39 @@ liquipedia.teamParticipantCard = {
 		if ( !window.matchMedia || !window.matchMedia( '(hover: hover) and (pointer: fine)' ).matches ) {
 			return;
 		}
-		this.setupEdgeAvoidance();
+		this.setupHoverTrigger();
 	},
 
-	setupEdgeAvoidance: function() {
+	setupHoverTrigger: function() {
 		document.querySelectorAll( '.team-participant-card' ).forEach( ( card ) => {
 			const roster = card.querySelector( '.should-collapse' );
-			const header = card.querySelector( '.team-participant-card__header' );
-			if ( !roster || !header ) {
+			if ( !roster ) {
 				return;
 			}
 
-			header.addEventListener( 'mouseenter', () => {
-				if ( !card.classList.contains( 'collapsed' ) ) {
-					return;
-				}
-				roster.style.left = '';
-				roster.style.right = '';
+			const nameLinks = card.querySelectorAll( '.team-participant-card__opponent .name a' );
 
-				requestAnimationFrame( () => {
-					const rect = roster.getBoundingClientRect();
-					if ( rect.right > window.innerWidth ) {
-						roster.style.left = 'auto';
-						roster.style.right = '0';
+			nameLinks.forEach( ( link ) => {
+				link.addEventListener( 'mouseenter', () => {
+					if ( !card.classList.contains( 'collapsed' ) ) {
+						return;
 					}
+					card.classList.add( 'hover-roster-visible' );
+					roster.style.left = '';
+					roster.style.right = '';
+
+					requestAnimationFrame( () => {
+						const rect = roster.getBoundingClientRect();
+						if ( rect.right > window.innerWidth ) {
+							roster.style.left = 'auto';
+							roster.style.right = '0';
+						}
+					} );
 				} );
 			} );
 
 			card.addEventListener( 'mouseleave', () => {
+				card.classList.remove( 'hover-roster-visible' );
 				roster.style.left = '';
 				roster.style.right = '';
 			} );
