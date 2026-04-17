@@ -100,7 +100,9 @@ function Widget:getDerivedStateFromError(error)
 	return tostring(ErrorDisplay.InlineError(error))
 end
 
----@return Widget[]
+---@param currentContext WidgetContext?
+---@param context WidgetContext?
+---@return {parent: WidgetContext?, context: WidgetContext?}
 function Widget:_pushToContextList(currentContext, context)
 	return {
 		parent = currentContext,
