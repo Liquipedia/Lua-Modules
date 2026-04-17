@@ -192,6 +192,7 @@ function MapPoolTable:_backFillMap(map)
 
 	local mapData = Map.getMapByPageName(Page.pageifyLink(map.pageName)) or getMapDataFromLookup(map.pageName)
 	if not mapData then
+		mapData = mapData or {}
 		mw.ext.TeamLiquidIntegration.add_category('Pages with unknown map in MapPoolTable')
 	end
 
