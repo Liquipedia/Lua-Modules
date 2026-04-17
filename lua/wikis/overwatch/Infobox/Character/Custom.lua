@@ -38,7 +38,6 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'role' then
 		Array.appendWith(
-			Cell{name = 'Role', children = {args.role}},
 			Cell{name = 'Subrole', children = {args.subrole}}
 		)
 	elseif id == 'custom' then
