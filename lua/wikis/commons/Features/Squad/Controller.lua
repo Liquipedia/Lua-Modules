@@ -11,6 +11,7 @@ local Info = Lua.import('Module:Info', {loadData = true})
 
 local Array = Lua.import('Module:Array')
 local Arguments = Lua.import('Module:Arguments')
+local Context = Lua.import('Module:Lib/Component/Context')
 local FnUtil = Lua.import('Module:FnUtil')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
@@ -34,7 +35,8 @@ function SquadController.execute(squadData, adjustLpdb)
 		squadPlayer:save()
 	end)
 
-	local squadTable = SquadContexts.ColumnVisibility{
+	local squadTable = Context.Provider{
+		contextDef = SquadContexts.ColumnVisibility,
 		value = SquadUtils.analyzeColumnVisibility(squadPlayers, squadData.squadStatus),
 		children = {
 			SquadDisplay{
@@ -51,7 +53,7 @@ function SquadController.execute(squadData, adjustLpdb)
 	if not Info.config.squads.hasPosition then
 		return squadTable
 	end
-	return SquadContexts.RoleTitle{value = 'Position', children = {squadTable}}
+	return Context.Provider{contextDef = SquadContexts.RoleTitle, value = 'Position', children = {squadTable}}
 end
 
 ---@param frame Frame

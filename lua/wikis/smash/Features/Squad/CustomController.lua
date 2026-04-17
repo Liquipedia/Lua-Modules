@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
+local Context = Lua.import('Module:Lib/Component/Context')
 local SquadContexts = Lua.import('Module:Features/Squad/Contexts/Squad')
 local SquadController = Lua.import('Module:Features/Squad/Controller')
 
@@ -17,7 +18,7 @@ local CustomSquad = {}
 ---@return Widget
 function CustomSquad.run(frame)
 	local args = Arguments.getArgs(frame)
-	return SquadContexts.GameTitle{value = args.game, children = {SquadController.run(frame)}}
+	return Context.Provider{contextDef = SquadContexts.GameTitle, value = args.game, children = {SquadController.run(frame)}}
 end
 
 return CustomSquad
