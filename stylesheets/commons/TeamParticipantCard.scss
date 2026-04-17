@@ -571,6 +571,7 @@ body:has( .switch-toggle-active#{ $compact-selector } ) {
 				border-radius: 0.5rem;
 				border: 1px solid;
 				overflow: hidden;
+				pointer-events: none;
 				background-color: var( --clr-secondary-100 );
 				border-color: var( --clr-on-surface-light-primary-8 );
 				box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.1 );
@@ -597,12 +598,6 @@ body:has( .switch-toggle-active#{ $compact-selector } ) {
 
 			.switch-pill-container {
 				display: none;
-			}
-
-			.should-collapse a {
-				pointer-events: none;
-				text-decoration: none;
-				color: inherit;
 			}
 		}
 	}

@@ -36,12 +36,12 @@ liquipedia.teamParticipantCard = {
 						}
 					} );
 				} );
-			} );
 
-			card.addEventListener( 'mouseleave', () => {
-				card.classList.remove( 'hover-roster-visible' );
-				roster.style.left = '';
-				roster.style.right = '';
+				link.addEventListener( 'mouseleave', () => {
+					card.classList.remove( 'hover-roster-visible' );
+					roster.style.left = '';
+					roster.style.right = '';
+				} );
 			} );
 		} );
 	}
