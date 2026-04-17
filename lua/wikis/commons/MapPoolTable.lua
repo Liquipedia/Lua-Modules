@@ -191,7 +191,9 @@ function MapPoolTable:_backFillMap(map)
 	end
 
 	local mapData = Map.getMapByPageName(Page.pageifyLink(map.pageName)) or getMapDataFromLookup(map.pageName)
-	assert(mapData, 'No data found for "' .. map.pageName .. '"')
+	if not mapData then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with unknown map in MapPoolTable')
+	end
 
 	-- can not use Table.merge nor Table.deepMerge due to creators/creatorDisplayNames
 	map.displayName = map.displayName or mapData.displayName
