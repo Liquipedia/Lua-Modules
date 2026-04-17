@@ -29,10 +29,7 @@ $tabs-bg-hover-dark: var( --clr-on-surface-dark-primary-8 );
 	border: 2px solid;
 	border-top: 0;
 	padding: 0.3125rem;
-
-	.theme--light & {
-		border-color: inherit;
-	}
+	border-color: inherit;
 
 	.theme--dark & {
 		border-color: $tabs-border-dark;
@@ -64,10 +61,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		position: relative;
 		display: flex;
 		border-bottom: 1px solid;
-
-		.theme--light & {
-			border-bottom-color: $tabs-border-light;
-		}
+		border-bottom-color: $tabs-border-light;
 
 		.theme--dark & {
 			border-bottom-color: $tabs-border-dark;
@@ -113,6 +107,21 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				height: 100%;
 				position: relative;
 				text-decoration: none;
+				color: $tabs-text-light !important;
+
+				&:hover {
+					color: $tabs-text-light !important;
+					background-color: $tabs-bg-hover-light !important;
+				}
+
+				.theme--dark & {
+					color: $tabs-text-dark !important;
+
+					&:hover {
+						color: $tabs-text-dark !important;
+						background-color: $tabs-bg-hover-dark !important;
+					}
+				}
 
 				.tabs-static-tab-icon {
 					width: 1rem;
@@ -129,29 +138,14 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				span:empty {
 					padding: $tabs-nav-padding;
 				}
-
-				.theme--light & {
-					color: $tabs-text-light !important;
-
-					&:hover {
-						color: $tabs-text-light !important;
-						background-color: $tabs-bg-hover-light !important;
-					}
-				}
-
-				.theme--dark & {
-					color: $tabs-text-dark !important;
-
-					&:hover {
-						color: $tabs-text-dark !important;
-						background-color: $tabs-bg-hover-dark !important;
-					}
-				}
 			}
 
 			&.active > a,
 			&.active > span,
 			&.active > strong {
+				background-color: $tabs-bg-active-light !important;
+				color: $tabs-text-active-light !important;
+
 				&::after {
 					content: "";
 					position: absolute;
@@ -162,13 +156,8 @@ html.client-nojs .tabs-content > div:not( .active ) {
 					background-color: var( --clr-wiki-theme-primary, #0d61a4 );
 				}
 
-				.theme--light & {
-					background-color: $tabs-bg-active-light !important;
+				&:hover {
 					color: $tabs-text-active-light !important;
-
-					&:hover {
-						color: $tabs-text-active-light !important;
-					}
 				}
 
 				.theme--dark & {
@@ -184,9 +173,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			&.hover > a,
 			&.hover > span,
 			&.hover > strong {
-				.theme--light & {
-					background-color: $tabs-bg-hover-light !important;
-				}
+				background-color: $tabs-bg-hover-light !important;
 
 				.theme--dark & {
 					background-color: $tabs-bg-hover-dark !important;
@@ -222,10 +209,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		.tabs-scroll-arrow {
 			outline: 0;
 			border-radius: 0;
-
-			.theme--light & {
-				color: $tabs-text-light;
-			}
+			color: $tabs-text-light;
 
 			.theme--dark & {
 				color: $tabs-text-dark;
@@ -287,10 +271,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			background-size: contain;
 			background-repeat: no-repeat;
 			background-position: center;
-
-			.theme--light & {
-				background-image: url( data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%3E%3Cpath%20d=%27M17.625,7.75H4.375C4.16791,7.75,4,7.58209,4,7.375V6.375C4,6.16791,4.16791,6,4.375,6H17.625C17.8321,6,18,6.16791,18,6.375V7.375C18,7.58209,17.8321,7.75,17.625,7.75ZM19.625,12.75H6.375C6.16791,12.75,6,12.5821,6,12.375V11.375C6,11.1679,6.16791,11,6.375,11H19.625C19.8321,11,20,11.1679,20,11.375V12.375C20,12.5821,19.8321,12.75,19.625,12.75ZM17.625,17.75H4.375C4.16791,17.75,4,17.5821,4,17.375V16.375C4,16.1679,4.16791,16,4.375,16H17.625C17.8321,16,18,16.1679,18,16.375V17.375C18,17.5821,17.8321,17.75,17.625,17.75Z%27%20fill=%27%23121212%27/%3E%3C/svg%3E );
-			}
+			background-image: url( data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%3E%3Cpath%20d=%27M17.625,7.75H4.375C4.16791,7.75,4,7.58209,4,7.375V6.375C4,6.16791,4.16791,6,4.375,6H17.625C17.8321,6,18,6.16791,18,6.375V7.375C18,7.58209,17.8321,7.75,17.625,7.75ZM19.625,12.75H6.375C6.16791,12.75,6,12.5821,6,12.375V11.375C6,11.1679,6.16791,11,6.375,11H19.625C19.8321,11,20,11.1679,20,11.375V12.375C20,12.5821,19.8321,12.75,19.625,12.75ZM17.625,17.75H4.375C4.16791,17.75,4,17.5821,4,17.375V16.375C4,16.1679,4.16791,16,4.375,16H17.625C17.8321,16,18,16.1679,18,16.375V17.375C18,17.5821,17.8321,17.75,17.625,17.75Z%27%20fill=%27%23121212%27/%3E%3C/svg%3E );
 
 			.theme--dark & {
 				background-image: url( data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%3E%3Cpath%20d=%27M17.625,7.75H4.375C4.16791,7.75,4,7.58209,4,7.375V6.375C4,6.16791,4.16791,6,4.375,6H17.625C17.8321,6,18,6.16791,18,6.375V7.375C18,7.58209,17.8321,7.75,17.625,7.75ZM19.625,12.75H6.375C6.16791,12.75,6,12.5821,6,12.375V11.375C6,11.1679,6.16791,11,6.375,11H19.625C19.8321,11,20,11.1679,20,11.375V12.375C20,12.5821,19.8321,12.75,19.625,12.75ZM17.625,17.75H4.375C4.16791,17.75,4,17.5821,4,17.375V16.375C4,16.1679,4.16791,16,4.375,16H17.625C17.8321,16,18,16.1679,18,16.375V17.375C18,17.5821,17.8321,17.75,17.625,17.75Z%27%20fill=%27%23ffffff%27/%3E%3C/svg%3E );
@@ -306,10 +287,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 				height: 1rem;
 				flex-shrink: 0;
 				margin: 0 0.5rem;
-
-				.theme--light & {
-					color: var( --clr-secondary-39 );
-				}
+				color: var( --clr-secondary-39 );
 
 				.theme--dark & {
 					color: var( --clr-secondary-90 );
@@ -368,10 +346,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 							left: calc( ( var( --tabs-static-menu-level, 1 ) - 1 ) * 1rem + 0.75rem );
 							top: 50%;
 							transform: translateY( -50% );
-
-							.theme--light & {
-								color: var( --clr-secondary-39 );
-							}
+							color: var( --clr-secondary-39 );
 
 							.theme--dark & {
 								color: var( --clr-secondary-80 );
@@ -391,10 +366,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 					left: 0;
 					right: 0;
 					height: 1px;
-
-					.theme--light & {
-						background-color: var( --clr-on-surface-light-primary-12 );
-					}
+					background-color: var( --clr-on-surface-light-primary-12 );
 
 					.theme--dark & {
 						background-color: var( --clr-secondary-39 );
@@ -412,10 +384,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		border: 1px solid !important;
 		border-bottom: unset !important;
 		border-radius: $tabs-border-radius $tabs-border-radius 0 0;
-
-		.theme--light & {
-			border-color: $tabs-border-light !important;
-		}
+		border-color: $tabs-border-light !important;
 
 		.theme--dark & {
 			border-color: $tabs-border-dark !important;
@@ -437,9 +406,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			}
 
 			&.new {
-				.theme--light & {
-					color: var( --clr-semantic-negative-40 ) !important;
-				}
+				color: var( --clr-semantic-negative-40 ) !important;
 
 				.theme--dark & {
 					color: var( --clr-semantic-negative-80 ) !important;
@@ -447,9 +414,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			}
 
 			&:hover {
-				.theme--light & {
-					background-color: $tabs-bg-hover-light !important;
-				}
+				background-color: $tabs-bg-hover-light !important;
 
 				.theme--dark & {
 					background-color: $tabs-bg-hover-dark !important;
