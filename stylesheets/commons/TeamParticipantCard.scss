@@ -564,8 +564,6 @@ body:has( .switch-toggle-active#{ $compact-selector } ) {
 			.should-collapse {
 				display: block;
 				position: absolute;
-				top: 100%;
-				left: 0;
 				z-index: 10;
 				min-width: 200px;
 				border-radius: 0.5rem;

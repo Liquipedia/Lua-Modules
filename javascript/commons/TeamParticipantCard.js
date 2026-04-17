@@ -25,22 +25,36 @@ liquipedia.teamParticipantCard = {
 						return;
 					}
 					card.classList.add( 'hover-roster-visible' );
-					roster.style.left = '';
-					roster.style.right = '';
 
 					requestAnimationFrame( () => {
-						const rect = roster.getBoundingClientRect();
-						if ( rect.right > window.innerWidth ) {
-							roster.style.left = 'auto';
-							roster.style.right = '0';
+						const cardRect = card.getBoundingClientRect();
+						const linkRect = link.getBoundingClientRect();
+						const remInPx = parseFloat( getComputedStyle( document.documentElement ).fontSize );
+						const gap = 0.75 * remInPx;
+
+						const linkCenterX = linkRect.left + linkRect.width / 2 - cardRect.left;
+						const rosterWidth = roster.offsetWidth;
+						const rosterHeight = roster.offsetHeight;
+
+						let left = linkCenterX - rosterWidth / 2;
+						if ( cardRect.left + left + rosterWidth > window.innerWidth ) {
+							left = window.innerWidth - cardRect.left - rosterWidth;
 						}
+						if ( cardRect.left + left < 0 ) {
+							left = -cardRect.left;
+						}
+
+						const top = linkRect.top - cardRect.top - rosterHeight - gap;
+
+						roster.style.left = left + 'px';
+						roster.style.top = top + 'px';
 					} );
 				} );
 
 				link.addEventListener( 'mouseleave', () => {
 					card.classList.remove( 'hover-roster-visible' );
 					roster.style.left = '';
-					roster.style.right = '';
+					roster.style.top = '';
 				} );
 			} );
 		} );
