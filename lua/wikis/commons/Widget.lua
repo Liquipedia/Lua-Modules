@@ -58,7 +58,7 @@ function Widget:tryMake()
 		return table.concat(Array.map(ret, function(val)
 			if Class.instanceOf(val, WidgetContext) then
 				---@cast val WidgetContext
-				val.contextStack = self:_pushToContextList(self.contextStack.context, val)
+				val.contextStack = self:_pushToContextList(self.contextStack, val)
 				return val:tryMake()
 			end
 			if Class.instanceOf(val, Widget) then
@@ -102,7 +102,7 @@ end
 
 ---@param currentContext WidgetContext?
 ---@param context WidgetContext?
----@return {parent: WidgetContext?, context: WidgetContext?}
+---@return {parent: table, context: WidgetContext?}
 function Widget:_pushToContextList(currentContext, context)
 	return {
 		parent = currentContext,
