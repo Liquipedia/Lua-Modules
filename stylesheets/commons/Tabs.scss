@@ -437,8 +437,7 @@ html.client-nojs .tabs-content > div:not( .active ) {
 	}
 }
 
-.tabs-static .tabs-content .tabs-static,
-[ data-analytics-name="Navigation tab" ] + [ data-analytics-name="Navigation tab" ] > .tabs-static {
+[ data-mobile-dropdown-grouped ] {
 	> .tabs-nav-wrapper {
 		margin-top: 0.75rem;
 
