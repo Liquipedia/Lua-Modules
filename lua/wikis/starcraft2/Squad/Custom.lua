@@ -35,17 +35,8 @@ function CustomSquad.runAuto(players, squadStatus, squadType, customTitle)
 		squadType,
 		Squad,
 		CustomSquad._playerRow,
-		customTitle,
-		CustomSquad.personMapper
+		customTitle
 	)
-end
-
----@param person table
----@return table
-function CustomSquad.personMapper(person)
-	local newPerson = SquadUtils.convertAutoParameters(person)
-	newPerson.faction = Logic.emptyOr(person.thisTeam.position, person.newTeam.position)
-	return newPerson
 end
 
 ---@param person table
