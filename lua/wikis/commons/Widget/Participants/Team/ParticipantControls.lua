@@ -90,6 +90,17 @@ function ParticipantsTeamParticipantControls:render()
 				switchGroup = 'team-cards-compact',
 				defaultActive = true,
 			},
+		},
+		AnalyticsWidget{
+			analyticsName = 'ParticipantsHoverRosterSwitch',
+			analyticsProperties = {
+				['track-value-as'] = 'participants hover roster',
+			},
+			children = Switch{
+				label = 'Enable hover',
+				switchGroup = 'team-cards-hover-roster',
+				defaultActive = true,
+			},
 		}
 	)
 
