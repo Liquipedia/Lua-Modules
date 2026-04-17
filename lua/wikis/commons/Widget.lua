@@ -60,13 +60,11 @@ function Widget:tryMake()
 				---@cast val WidgetContext
 				val.contextStack = self:_pushToContextList(self.contextStack, val)
 				return val:tryMake()
-			end
-			if Class.instanceOf(val, Widget) then
+			elseif Class.instanceOf(val, Widget) then
 				---@cast val Widget
 				val.contextStack = self.contextStack
 				return val:tryMake()
-			end
-			if val ~= nil then
+			elseif val ~= nil then
 				return tostring(val)
 			end
 			return nil
