@@ -26,7 +26,7 @@ local Widget = Class.new(function(self, props)
 		self.props.children = {self.props.children}
 	end
 
-	self.contextStack = {}
+	self.contextStack = nil
 end)
 
 ---@alias Renderable string|Html|Widget|number
@@ -58,8 +58,8 @@ function Widget:tryMake()
 		return table.concat(Array.map(ret, function(val)
 			if Class.instanceOf(val, WidgetContext) then
 				---@cast val WidgetContext
-				val.contextStack = self:_pushToContextList(self.contextStack, val)
-				return nil
+				val.contextStack = self:_pushToContextList(self.contextStack.context, val)
+				return val:tryMake()
 			end
 			if Class.instanceOf(val, Widget) then
 				---@cast val Widget
