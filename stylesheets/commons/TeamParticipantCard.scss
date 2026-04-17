@@ -13,6 +13,7 @@ $participant-icon-size-mobile: 33px;
 $participant-icon-size-small: 18px;
 
 $compact-selector: '[data-switch-group="team-cards-compact"]';
+$hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 
 @mixin set-participant-icon-size($wrapper-size, $icon-size) {
 	width: $wrapper-size;
@@ -30,6 +31,14 @@ $compact-selector: '[data-switch-group="team-cards-compact"]';
 }
 
 .switch-toggle-container:has(#{ $compact-selector }) {
+	display: none;
+
+	@media ( min-width: 768px ) {
+		display: flex;
+	}
+}
+
+.switch-toggle-container:has( #{ $hover-selector } ) {
 	display: none;
 
 	@media ( min-width: 768px ) {
@@ -541,5 +550,60 @@ body:has( .switch-toggle-active#{ $compact-selector } ) {
 			$participant-icon-wrapper-size-compact,
 			$participant-icon-size-compact
 		);
+	}
+}
+
+@media ( hover: hover ) and ( pointer: fine ) {
+	body:has( .switch-toggle-active#{ $hover-selector } ) {
+		.team-participant-card.general-collapsible.collapsed {
+			position: relative;
+			overflow: visible;
+		}
+
+		.team-participant-card.general-collapsible.collapsed:hover {
+			.should-collapse {
+				display: block;
+				position: absolute;
+				top: 100%;
+				left: 0;
+				z-index: 10;
+				min-width: 200px;
+				border-radius: 0.5rem;
+				border: 1px solid;
+				overflow: hidden;
+				background-color: var( --clr-secondary-100 );
+				border-color: var( --clr-on-surface-light-primary-8 );
+				box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.1 );
+
+				.theme--dark & {
+					background-color: var( --clr-on-surface-dark-primary-4 );
+					border-color: var( --clr-on-surface-dark-primary-8 );
+					box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.3 );
+				}
+
+				&::before {
+					content: "Player roster";
+					display: block;
+					padding: 0.5rem 0.75rem 0.25rem;
+					font-weight: bold;
+					font-size: 0.875rem;
+					color: var( --clr-secondary-25 );
+
+					.theme--dark & {
+						color: var( --clr-secondary-90 );
+					}
+				}
+			}
+
+			.switch-pill-container {
+				display: none;
+			}
+
+			.should-collapse a {
+				pointer-events: none;
+				text-decoration: none;
+				color: inherit;
+			}
+		}
 	}
 }
