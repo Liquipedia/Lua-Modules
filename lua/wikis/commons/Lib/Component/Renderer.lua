@@ -1,59 +1,63 @@
--- Module:Functional/Renderer
+---
 local Renderer = {}
-local Context = require('Module:Functional/Context')
-local System = require('Module:Functional/System')
 
-function Renderer.render(vNode, contextHead)
+--- Renders a Virtual Node (VNode) into a string
+---@param vNode Renderable|Renderable[]
+---@param context Context?
+---@return string|Html
+function Renderer.render(vNode, context)
 	if not vNode then return "" end
 
-	-- 1. Handle Primitives (Strings/Numbers)
 	local vNodeType = type(vNode)
-	if vNodeType == "string" or vNodeType == "number" then
-		return tostring(vNode)
-	end
 
-	-- 2. Handle Arrays (Fragments / Lists of children)
+	-- Handle Arrays
 	if vNodeType == "table" and vNode[1] then
 		local output = {}
 		for _, child in ipairs(vNode) do
-			table.insert(output, Renderer.render(child, contextHead))
+			table.insert(output, Renderer.render(child, context))
 		end
 		return table.concat(output)
 	end
 
-	-- 3. Backward Compatibility: Legacy Class Widgets
-	if vNodeType == "table" and not vNode.type then
-		if type(vNode.render) == "function" then
-			return tostring(vNode:render())
-		elseif type(vNode._build) == "function" and getmetatable(vNode) ~= System.VNodeMT then
-			return tostring(vNode:_build())
-		end
+	---@cast vNode Renderable
+
+	-- Handle Primitives (Strings/Numbers)
+	if vNodeType == "string" or vNodeType == "number" then
+		return tostring(vNode)
 	end
 
-	local nodeType = vNode.type
-	local props = vNode.props or {}
+	if vNodeType ~= "table" then
+		mw.logObject(vNode, 'Invalid VNode')
+		error("Invalid VNode: " .. tostring(vNode))
+	end
 
-	-- 4. Handle Context Providers
-	if nodeType == "CONTEXT_PROVIDER" then
+	local renderFn = vNode.renderFn
+
+	-- Backward Compatibility with Widgets and mw.html
+	if not renderFn then
+		return tostring(vNode)
+	end
+
+	---@cast vNode -Widget
+	---@cast vNode -Html
+
+	-- Handle Context Providers
+	if renderFn == "CONTEXT_PROVIDER" then
+		---@cast vNode Context
 		-- Push a new link onto the Context chain
-		local newHead = {
-			parent = contextHead,
-			def = props.contextDef,
-			value = props.value
+		local newContext = {
+			parent = context,
+			def = vNode.props.def,
+			value = vNode.props.value
 		}
-		return Renderer.render(props.children, newHead)
+		return Renderer.render(vNode.props.children, newContext)
 	end
 
-	-- 5. Handle Functional Components
-	if type(nodeType) == "function" then
-		-- Execute the function with props and the current context pointer
-		local result = nodeType(props, contextHead)
-		return Renderer.render(result, contextHead)
-	end
-
-	-- 6. Handle HTML Tags (Leaf Nodes)
-	if type(nodeType) == "string" then
-		local tag = mw.html.create(nodeType)
+	-- Handle HTML Tags (Leaf Nodes)
+	if type(renderFn) == "string" then
+		---@cast vNode LeafNode
+		local props = vNode.props
+		local tag = mw.html.create(renderFn)
 
 		if props.classes then
 			tag:addClass(table.concat(props.classes, " "))
@@ -62,10 +66,17 @@ function Renderer.render(vNode, contextHead)
 		if props.attr then tag:attr(props.attr) end
 
 		if props.children then
-			tag:node(Renderer.render(props.children, contextHead))
+			tag:node(Renderer.render(props.children, context))
 		end
 
 		return tag
+	end
+
+	-- Handle Functional Components
+	if type(renderFn) == "function" then
+		-- Execute the function with props and the current context pointer
+		local result = renderFn(vNode.props, context)
+		return Renderer.render(result, context)
 	end
 
 	return ""

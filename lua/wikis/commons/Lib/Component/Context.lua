@@ -1,27 +1,31 @@
--- Module:Functional/Context
+---
 local Context = {}
-local System = require('Module:Functional/System')
+local ComponentCore = require('Module:Lib/Component/Core')
 
--- Create a unique Context Definition / Identity
+-- Create a unique Context Definition with a default value
+---@param defaultValue any
+---@return ContextDef
 function Context.create(defaultValue)
 	return { defaultValue = defaultValue }
 end
 
--- Read from Context (Traverse the Linked List)
+-- Read from Context
+---@param node Context
+---@param contextDef ContextDef
+---@return any
 function Context.read(node, contextDef)
 	while node do
-		if node.def == contextDef then
-			return node.value
+		local props = node.props
+		if props.def == contextDef then
+			return props.value
 		end
-		node = node.parent
+		node = props.parent
 	end
 	return contextDef.defaultValue
 end
 
 -- The Provider is a standard Callable Component
--- The renderer will natively recognize the "CONTEXT_PROVIDER" string
-Context.Provider = setmetatable({
-	renderFn = "CONTEXT_PROVIDER"
-}, System.ComponentMT)
+---@type Context
+Context.Provider = setmetatable({ renderFn = 'CONTEXT_PROVIDER' }, ComponentCore.ComponentMT)
 
 return Context

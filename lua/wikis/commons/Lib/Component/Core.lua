@@ -1,64 +1,63 @@
--- Module:Functional/System
-local System = {}
+---
+local ComponentCore = {}
 
--- Lazy-load renderer to avoid circular dependency issues during module initialization
+-- Lazy-load renderer to avoid circular dependency issues
 local function getRenderer()
-	return require('Module:Functional/Renderer')
+	return require('Module:Lib/Component/Renderer')
 end
 
--- METATABLE 1: Virtual Nodes (The table returned after calling a component)
-local VNodeMT = {
-	-- Automatically trigger rendering when concatenated or used as a string
+-- Virtual Nodes (The table returned after calling a component)
+ComponentCore.VNodeMT = {
+	-- Automatically trigger rendering
 	__tostring = function(self)
-		return getRenderer().render(self, nil)
+		return getRenderer().render(self)
 	end,
 
 	__index = {
-		-- Fulfill legacy requirements: legacy code can call node:_build()
-		_build = function(self)
-			return tostring(self)
+		-- Allows to be used as a node in the third part html library (mw.html).
+		_build = function(self, ret)
+			table.insert(ret, tostring(self))
 		end
 	}
 }
 
--- METATABLE 2: Component Definitions (Makes them callable and handles defaults)
-local ComponentMT = {
+-- Component Definitions
+ComponentCore.ComponentMT = {
 	__call = function(self, props)
 		props = props or {}
 
-		-- Apply DefaultProps via lightweight metatable (Zero table copying)
-		if self.defaultProps and not getmetatable(props) then
+		-- Apply DefaultProps via lightweight metatable
+		-- Only shallow default props allowed
+		if self.defaultProps then
 			setmetatable(props, { __index = self.defaultProps })
 		end
 
-		-- Return the lightweight Virtual Node description
-		local vNode = {
-			type = self.renderFn,
+		return setmetatable({
+			renderFn = self.renderFn,
 			props = props
-		}
-
-		return setmetatable(vNode, VNodeMT)
+		}, ComponentCore.VNodeMT)
 	end
 }
 
--- Factory to create new Functional Components
-function System.component(renderFunction, defaultProps)
+-- Factory to create Functional Components
+---@generic P
+---@param renderFunction fun(props: P, context?: Context): Renderable
+---@param defaultProps P? -- May not contain table values
+---@return Component<P>
+function ComponentCore.component(renderFunction, defaultProps)
+	---@diagnostic disable-next-line: return-type-mismatch
 	return setmetatable({
 		renderFn = renderFunction,
 		defaultProps = defaultProps
-	}, ComponentMT)
+	}, ComponentCore.ComponentMT)
 end
 
--- Factory to create pre-wrapped HTML tags
-function System.tag(tagName)
-	return setmetatable({ renderFn = tagName }, ComponentMT)
+-- Factory to create HTML tags
+---@param tagName string|nil
+---@return Component<table>
+function ComponentCore.tag(tagName)
+	---@diagnostic disable-next-line: return-type-mismatch
+	return setmetatable({ renderFn = tagName }, ComponentCore.ComponentMT)
 end
 
--- Export pre-defined common HTML elements
-System.div = System.tag('div')
-System.span = System.tag('span')
-
-System.VNodeMT = VNodeMT
-System.ComponentMT = ComponentMT
-
-return System
+return ComponentCore
