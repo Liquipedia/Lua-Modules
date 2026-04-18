@@ -1,4 +1,10 @@
 ---
+-- @Liquipedia
+-- page=Module:Lib/Component/Renderer
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Renderer = {}
 
 --- Renders a Virtual Node (VNode) into a string
@@ -53,11 +59,12 @@ function Renderer.render(vNode, context)
 		return Renderer.render(vNode.props.children, newContext)
 	end
 
-	-- Handle HTML Tags (Leaf Nodes)
+	-- Handle HTML Tags
 	if type(renderFn) == "string" then
-		---@cast vNode LeafNode
+		---@cast vNode HtmlNode
 		local props = vNode.props
-		local tag = mw.html.create(renderFn)
+		local tagName = renderFn
+		local tag = mw.html.create(tagName)
 
 		if props.classes then
 			tag:addClass(table.concat(props.classes, " "))

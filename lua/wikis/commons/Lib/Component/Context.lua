@@ -1,18 +1,28 @@
 ---
+-- @Liquipedia
+-- page=Module:Lib/Component/Context
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+local ComponentCore = Lua.import('Module:Lib/Component/Core')
+
 local Context = {}
-local ComponentCore = require('Module:Lib/Component/Core')
 
 -- Create a unique Context Definition with a default value
----@param defaultValue any
----@return ContextDef
+---@generic P
+---@param defaultValue P
+---@return ContextDef<P>
 function Context.create(defaultValue)
 	return { defaultValue = defaultValue }
 end
 
 -- Read from Context
----@param node Context
----@param contextDef ContextDef
----@return any
+---@generic P
+---@param node Context?
+---@param contextDef ContextDef<P>
+---@return P
 function Context.read(node, contextDef)
 	while node do
 		local props = node.props
@@ -24,8 +34,10 @@ function Context.read(node, contextDef)
 	return contextDef.defaultValue
 end
 
--- The Provider is a standard Callable Component
----@type Context
-Context.Provider = setmetatable({ renderFn = 'CONTEXT_PROVIDER' }, ComponentCore.ComponentMT)
+-- Set values for contexts
+Context.Provider = setmetatable(
+	{ renderFn = 'CONTEXT_PROVIDER'},
+	ComponentCore.ComponentMT
+) --[[@as ContextComponent]]
 
 return Context

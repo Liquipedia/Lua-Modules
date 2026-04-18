@@ -5,7 +5,7 @@ SquadTypes.SquadStatus = {
 	ACTIVE = 0,
 	INACTIVE = 1,
 	FORMER = 2,
-	FORMER_INACTIVE = 3,
+	FORMER_INACTIVE = 3, -- TODO: Investigate if this is still needed, I think FORMER handles this now
 }
 
 ---@type {string: SquadStatus}

@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Contexts/Squad
+-- page=Module:Features/Squad/Contexts/Squad
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -11,7 +11,7 @@ local Context = Lua.import('Module:Lib/Component/Context')
 
 return {
 	NameSection = Context.create('Name'),
-	RoleTitle = Context.create(nil),
-	GameTitle = Context.create(nil),
-	ColumnVisibility = Context.create(),
+	RoleTitle = Context.create(''),
+	GameTitle = Context.create(''),
+	ColumnVisibility = Context.create({}),
 }

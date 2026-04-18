@@ -1,16 +1,20 @@
 ---
-local ComponentCore = {}
+-- @Liquipedia
+-- page=Module:Lib/Component/Renderer
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
 
--- Lazy-load renderer to avoid circular dependency issues
-local function getRenderer()
-	return require('Module:Lib/Component/Renderer')
-end
+local Lua = require('Module:Lua')
+local Renderer = Lua.import('Module:Lib/Component/Renderer')
+
+local ComponentCore = {}
 
 -- Virtual Nodes (The table returned after calling a component)
 ComponentCore.VNodeMT = {
 	-- Automatically trigger rendering
 	__tostring = function(self)
-		return getRenderer().render(self)
+		return Renderer.render(self)
 	end,
 
 	__index = {
@@ -54,10 +58,9 @@ end
 
 -- Factory to create HTML tags
 ---@param tagName string|nil
----@return Component<table>
+---@return HtmlComponent
 function ComponentCore.tag(tagName)
-	---@diagnostic disable-next-line: return-type-mismatch
-	return setmetatable({ renderFn = tagName }, ComponentCore.ComponentMT)
+	return setmetatable({ renderFn = tagName }, ComponentCore.ComponentMT) --[[@as HtmlComponent]]
 end
 
 return ComponentCore

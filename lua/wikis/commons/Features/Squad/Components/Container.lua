@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Squad/Core
+-- page=Module:Features/Squad/Components/Container
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -51,8 +51,8 @@ local function getTitle(squadStatus, title, squadType)
 end
 
 ---@param props {status: SquadStatus, title: string?, type: SquadType, header: Widget, children: Widget[]}
----@param context any
----@return Table2
+---@param context Context
+---@return Renderable
 local function SquadContainer(props, context)
 	local title = getTitle(props.status, props.title, props.type)
 

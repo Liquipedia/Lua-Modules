@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Squad/Row
+-- page=Module:Features/Squad/Components/Player
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -21,16 +21,21 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Row, Cell = Table2Widgets.Row, Table2Widgets.Cell
 local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
 
-
 local RoleIcons = {
 	captain = Icon.makeIcon{iconName = 'captain', hover = 'Captain'},
 	sub = Icon.makeIcon{iconName = 'substitute', hover = 'Substitute'},
 }
 
+---@param visibility table<string, boolean>
+---@param columnId string
+---@return boolean
 local function shouldShowColumn(visibility, columnId)
 	return visibility == nil or visibility[columnId] == nil or visibility[columnId] == true
 end
 
+---@param squadPlayer ModelRow
+---@param game string?
+---@return Renderable
 local function nickname(squadPlayer, game)
 	local opponent = Opponent.resolve(
 		Opponent.readOpponentArgs{
@@ -46,19 +51,28 @@ local function nickname(squadPlayer, game)
 	return OpponentDisplay.InlineOpponent{opponent = opponent}
 end
 
+---@param squadPlayer ModelRow
+---@return Renderable?
 local function roleIcon(squadPlayer)
 	return RoleIcons[(squadPlayer.role or ''):lower()]
 end
 
+---@param team string?
+---@return boolean
 local isValidTeam = function(team)
-	return team and TeamTemplate.exists(team)
+	return team and TeamTemplate.exists(team) or false
 end
 
+---@param date string?
+---@param team string?
+---@param teamRole string?
+---@return Renderable?
 local function otherTeamInformation(date, team, teamRole)
 	local hasTeam = isValidTeam(team)
 	if not hasTeam then
 		return nil
 	end
+	---@cast team -nil
 
 	return {
 		OpponentDisplay.InlineTeamContainer{
@@ -72,10 +86,14 @@ local function otherTeamInformation(date, team, teamRole)
 	}
 end
 
+---@param squadPlayer ModelRow
+---@return Renderable?
 local function getRealName(squadPlayer)
 	return String.nilIfEmpty(squadPlayer.name)
 end
 
+---@param squadPlayer ModelRow
+---@return Renderable?
 local function roleAndPositionDisplay(squadPlayer)
 	if String.isEmpty(squadPlayer.position) and String.isEmpty(squadPlayer.role) then
 		return
@@ -95,6 +113,8 @@ local function roleAndPositionDisplay(squadPlayer)
 	end
 end
 
+---@param squadPlayer ModelRow
+---@return Renderable?
 local function dateDisplay(squadPlayer, dateProperty)
 	if not squadPlayer[dateProperty] then
 		return
@@ -103,6 +123,8 @@ local function dateDisplay(squadPlayer, dateProperty)
 	return squadPlayer.extradata[dateProperty .. 'display'] or squadPlayer[dateProperty]
 end
 
+---@param squadPlayer ModelRow
+---@return Renderable?
 local function newTeamDisplay(squadPlayer)
 	local newTeam, newTeamRole, newTeamSpecial = squadPlayer.extradata.newteam, squadPlayer.extradata.newteamrole, squadPlayer.extradata.newteamspecial
 	local hasNewTeam, hasNewTeamRole = String.isNotEmpty(newTeam), String.isNotEmpty(newTeamRole)
@@ -130,6 +152,9 @@ local function newTeamDisplay(squadPlayer)
 	return teamDisplay .. ' (' .. newTeamRole .. ')'
 end
 
+---@param props {squadPlayer: ModelRow}
+---@param context Context
+---@return Renderable?
 local function SquadPlayer(props, context)
 	local squadPlayer = props.squadPlayer
 	if not squadPlayer then

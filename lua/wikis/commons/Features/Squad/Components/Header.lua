@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Squad/Core
+-- page=Module:Features/Squad/Components/Header
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -15,8 +15,8 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
 
 ---@param props {status: SquadStatus}
----@param context any
----@return Table2
+---@param context Context
+---@return Renderable
 local function SquadHeader(props, context)
 	local status = props.status
 	local visibility = Context.read(context, SquadContexts.ColumnVisibility)

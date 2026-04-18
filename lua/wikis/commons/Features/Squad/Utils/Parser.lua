@@ -1,17 +1,17 @@
 
 local Lua = require('Module:Lua')
-local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
-local TransferRefs = Lua.import('Module:Transfer/References')
-local Faction = Lua.import('Module:Faction')
-local Table = Lua.import('Module:Table')
-local Lpdb = Lua.import('Module:Lpdb')
-local Json = Lua.import('Module:Json')
-local Flags = Lua.import('Module:Flags')
-local String = Lua.import('Module:StringUtils')
-local TeamTemplate = Lua.import('Module:TeamTemplate')
-local Info = Lua.import('Module:Info', {loadData = true})
+
 local Array = Lua.import('Module:Array')
-local Variables = Lua.import('Module:Variables')
+local Faction = Lua.import('Module:Faction')
+local Flags = Lua.import('Module:Flags')
+local Info = Lua.import('Module:Info', {loadData = true})
+local Json = Lua.import('Module:Json')
+local Lpdb = Lua.import('Module:Lpdb')
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local TransferRefs = Lua.import('Module:Transfer/References')
 
 local SquadParsingUtil = {}
 
