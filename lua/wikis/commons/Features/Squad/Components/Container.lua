@@ -50,7 +50,7 @@ local function getTitle(squadStatus, title, squadType)
 	return titleText
 end
 
----@param props {status: SquadStatus, title: string?, type: SquadType, header: Widget, children: Widget[]}
+---@param props {status: SquadStatus, title: string?, type: SquadType, header: Renderable, children: Renderable[]}
 ---@param context Context
 ---@return Renderable
 local function SquadContainer(props, context)
