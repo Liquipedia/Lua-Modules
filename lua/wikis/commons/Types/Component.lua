@@ -10,5 +10,5 @@
 ---@alias ContextDef<P> {defaultValue: P}
 
 ---@alias Component<P> fun(props: P, context: Context?): VNode<P>
----@alias ContextComponent Context<{parent: Context?, def: ContextDef, value: any, children: Renderable}>
----@alias HtmlComponent Context<{classes?: string[], css?: table, attr?: table, children: Renderable}>
+---@alias ContextComponent Component<{parent: Context?, def: ContextDef, value: any, children: Renderable}>
+---@alias HtmlComponent Component<{classes?: string[], css?: table, attr?: table, children: Renderable}>
