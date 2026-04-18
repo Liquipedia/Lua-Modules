@@ -11,14 +11,17 @@ local importFunctions = {}
 ---@return string[]?
 -- luacheck: push ignore
 function ResolveRequire(uri, name, source)
--- luacheck: pop ignore
+-- luacheck: pop
 	local fileName = importFunctions.luaifyModuleName(name)
 
-	-- Extract the base path (up to and including /lua/) and the wiki name from the source URI
-	local basePath, wiki = source:match('^(file://.-/lua)/wikis/([^/]+)/')
+	-- Extract the base path (up to and including /lua/) from the source URI.
+	-- Also try to extract the wiki name when the source is under /wikis/<wiki>/.
+	-- Files outside of /wikis/ (e.g. spec/, definitions/) default to commons.
+	local basePath = source:match('^(file://.-/lua)[/$]')
 	if not basePath then
 		return nil
 	end
+	local wiki = source:match('^file://.-/lua/wikis/([^/]+)/') or 'commons'
 
 	-- Check if the file exists in the same wiki
 	local wikiPath = basePath .. '/wikis/' .. wiki .. '/' .. fileName .. '.lua'
