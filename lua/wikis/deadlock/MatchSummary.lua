@@ -33,7 +33,7 @@ local DeadlockMatchSummaryGameRow = Class.new(MatchSummaryWidgets.GameRow)
 ---@param args table
 ---@return Widget
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '440px', teamStyle = 'bracket'})
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '480px', teamStyle = 'bracket'})
 end
 
 ---@param match MatchGroupUtilMatch
