@@ -50,5 +50,8 @@ return {
 				mode = 'merge',
 			},
 		},
+		participants = {
+			defaultPlayerNumber = 5,
+		},
 	},
 }

@@ -387,7 +387,11 @@ function PlayerIntroduction:_roleAdjusts(args)
 	role = Roles.All[role] and Roles.All[role].display or role
 
 	if transferInfo.role == 'substitute' then
-		role = 'substitute ' .. role
+		if role then
+			role = 'substitute ' .. role
+		else
+			role = 'substitute'
+		end
 	end
 
 	self.transferInfo.standardizedRole = role

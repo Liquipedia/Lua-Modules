@@ -24,7 +24,7 @@ local PAGE_TO_SECTION = {
 }
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomHiddenDataBox.run(args)
 	args = args or {}
 	args.liquipediatier = Tier.toNumber(args.liquipediatier)

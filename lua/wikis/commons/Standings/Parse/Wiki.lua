@@ -11,12 +11,10 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
-local Namespace = Lua.import('Module:Namespace')
-local Operator = Lua.import('Module:Operator')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Table = Lua.import('Module:Table')
-
-local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
+local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -24,6 +22,8 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+
+local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
 
 local StandingsParseWiki = {}
 
@@ -78,63 +78,42 @@ end
 
 ---@param roundInput string|table
 ---@param roundIndex integer
----@return {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}[]
+---@return {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}
 function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 	local roundData = Json.parseIfString(roundInput)
 	local matches = Array.parseCommaSeparatedString(roundData.matches)
-	local matchGroups = Array.parseCommaSeparatedString(roundData.matchgroups)
-	local stages = Array.parseCommaSeparatedString(roundData.stages)
-	if Logic.isNotEmpty(matchGroups) then
-		Array.extendWith(matches, Array.flatMap(matchGroups, function(matchGroupId)
-			return StandingsParseWiki.getMatchIdsOfMatchGroup(matchGroupId)
-		end))
-	end
-	if Logic.isNotEmpty(stages) then
-		Array.extendWith(matches, Array.flatMap(stages, function(stage)
-			return StandingsParseWiki.getMatchIdsFromStage(stage)
-		end))
+	local startDate = DateExt.readTimestamp(roundData.sdate) or DateExt.defaultTimestamp
+	local endDate = DateExt.readTimestamp(roundData.edate) or DateExt.defaultTimestamp
+	local matchGroupsSpec = {
+		matchGroupIds = Array.parseCommaSeparatedString(roundData.matchgroups),
+		pageNames = {Array.parseCommaSeparatedString(roundData.stages)},
+	}
+	if Logic.isNotDeepEmpty(matchGroupsSpec) then
+		local conditions = ConditionTree(BooleanOperator.all):add(TournamentStructure.getMatch2Filter(matchGroupsSpec))
+		if not DateExt.isDefaultTimestamp(startDate) then
+			conditions:add(ConditionNode(ColumnName('date'), Comparator.ge, startDate))
+		end
+		if not DateExt.isDefaultTimestamp(endDate) then
+			conditions:add(ConditionNode(ColumnName('date'), Comparator.le, endDate))
+		end
+		Array.extendWith(matches, MatchGroupUtil.fetchMatchIds{
+			conditions = conditions,
+			limit = 1000,
+		})
 	end
 	return {
 		roundNumber = roundIndex,
-		started = Logic.readBool(roundData.started),
-		finished = Logic.readBool(roundData.finished),
+		started = Logic.nilOr(
+			Logic.readBoolOrNil(roundData.started),
+			not DateExt.isDefaultTimestamp(startDate) and startDate <= DateExt.getCurrentTimestamp()
+		),
+		finished = Logic.nilOr(
+			Logic.readBoolOrNil(roundData.finished),
+			not DateExt.isDefaultTimestamp(endDate) and endDate <= DateExt.getCurrentTimestamp()
+		),
 		title = roundData.title,
 		matches = Array.unique(matches),
 	}
-end
-
----@param matchGroupId string
----@return string[]
-function StandingsParseWiki.getMatchIdsOfMatchGroup(matchGroupId)
-	local matchGroup = mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = tostring(ConditionTree(BooleanOperator.all):add{
-			ConditionNode(ColumnName('namespace'), Comparator.neq, Namespace.matchNamespaceId()),
-			ConditionNode(ColumnName('match2bracketid'), Comparator.eq, matchGroupId),
-		}),
-		query = 'match2id',
-		limit = '1000',
-	})
-	return Array.map(matchGroup, Operator.property('match2id'))
-end
-
----@param rawStage string
----@return string[]
-function StandingsParseWiki.getMatchIdsFromStage(rawStage)
-	local title = mw.title.new(rawStage)
-	assert(title, 'Invalid pagename "' .. rawStage .. '"')
-	local namespace, basePage, stage = Logic.nilIfEmpty(title.nsText), title.text, Logic.nilIfEmpty(title.fragment)
-	basePage = basePage:gsub(' ', '_')
-
-	local matchGroup = mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = tostring(ConditionTree(BooleanOperator.all):add(Array.append(
-			{ConditionNode(ColumnName('pagename'), Comparator.eq, basePage)},
-			namespace and ConditionNode(ColumnName('namespace'), Comparator.eq, Namespace.idFromName(namespace)) or nil,
-			stage and ConditionNode(ColumnName('match2bracketdata_sectionheader'), Comparator.eq, stage) or nil
-		))),
-		query = 'match2id',
-		limit = '1000',
-	})
-	return Array.map(matchGroup, Operator.property('match2id'))
 end
 
 ---@param opponentInput string|table

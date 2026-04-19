@@ -31,11 +31,10 @@ function MatchSummaryMapVeto:render()
 		classes = {'brkts-popup-mapveto'},
 		children = HtmlWidgets.Table{
 			classes = {'wikitable-striped', 'collapsible', 'collapsed'},
-			css = {['text-align'] = 'center'},
 			children = WidgetUtil.collect(
 				HtmlWidgets.Tr{children = {
 					HtmlWidgets.Th{css = {width = '33%'}},
-					HtmlWidgets.Th{css = {width = '34%'}, children = 'Map Veto'},
+					HtmlWidgets.Th{css = {width = '34%', ['text-align'] = 'center'}, children = 'Map Veto'},
 					HtmlWidgets.Th{css = {width = '33%'}},
 				}},
 				MapVetoStart{firstVeto = self.props.firstVeto, vetoFormat = self.props.vetoFormat},

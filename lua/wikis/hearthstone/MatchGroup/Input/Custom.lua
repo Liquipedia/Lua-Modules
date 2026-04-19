@@ -24,29 +24,35 @@ local OPPONENT_CONFIG = {
 	pagifyPlayerNames = true,
 }
 
+---@class HearthstoneMatchParser: MatchParserInterface
 local MatchFunctions = {
 	OPPONENT_CONFIG = OPPONENT_CONFIG,
 }
+
+---@class HearthstoneMapParser: MapParserInterface
 local MapFunctions = {
 	ADD_SUB_GROUP = true,
 }
 
-local FffMatchFunctions = {
+---@class HearthstoneFfaMatchParser: FfaMatchParserInterface
+local FfaMatchFunctions = {
 	OPPONENT_CONFIG = OPPONENT_CONFIG,
 }
+
+---@class HearthstoneFfaMapParser: FfaMapParserInterface
 local FfaMapFunctions = {}
 
 ---@param match table
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, FffMatchFunctions)
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, FfaMatchFunctions)
 end
 
 --- Normal 2 opponent match
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
@@ -55,9 +61,7 @@ end
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function MatchFunctions.calculateMatchScore(maps)
-	return function(opponentIndex)
-		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-	end
+	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
 ---@param bestofInput string|integer?
@@ -68,7 +72,7 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	return Table.filterByKey(match, function(key) return key:match('subgroup%d+header') end)
@@ -76,7 +80,7 @@ end
 
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {}
@@ -108,7 +112,7 @@ function MapFunctions.calculateMapScore(map)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]?
 function MapFunctions.getPlayersOfMapOpponent(mapInput, opponent, opponentIndex)
@@ -121,7 +125,7 @@ function MapFunctions.getPlayersOfMapOpponent(mapInput, opponent, opponentIndex)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return {character: string?, player: string}[]
 function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
@@ -152,7 +156,7 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 end
 
 ---@param mapInput table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table<string, {character: string?, player: string}>
 function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
@@ -173,17 +177,17 @@ MapFunctions.readCharacter = FnUtil.curry(MatchGroupInputUtil.getCharacterName, 
 --- FFA Match
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param scoreSettings table
 ---@return table[]
-function FffMatchFunctions.extractMaps(match, opponents, scoreSettings)
+function FfaMatchFunctions.extractMaps(match, opponents, scoreSettings)
 	return MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, FfaMapFunctions)
 end
 
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
-function FffMatchFunctions.calculateMatchScore(opponents, maps)
+function FfaMatchFunctions.calculateMatchScore(opponents, maps)
 	return function(opponentIndex)
 		return Array.reduce(Array.map(maps, function(map)
 			return map.opponents[opponentIndex].score or 0
@@ -193,10 +197,10 @@ end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param settings table
 ---@return table
-function FffMatchFunctions.getExtraData(match, games, opponents, settings)
+function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
 	return {
 		placementinfo = settings.placementInfo,
 		settings = settings.settings,

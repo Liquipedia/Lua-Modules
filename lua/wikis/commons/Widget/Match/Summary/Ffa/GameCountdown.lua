@@ -37,12 +37,13 @@ function MatchSummaryFfaGameCountdown:render()
 		-- TODO: Use game-TZ
 		date = Date.toCountdownArg(timestamp, nil, game.dateIsExact),
 		finished = game.winner ~= nil and 'true' or nil,
+		rawdatetime = (not game.dateIsExact) or game.winner ~= nil
 	})
 
 	return HtmlWidgets.Div{
 		classes = {'match-countdown-block'},
 		children = {
-			Countdown._create(streamParameters),
+			Countdown.create(streamParameters),
 			game.vod and VodLink.display{vod = game.vod} or nil,
 		},
 	}

@@ -147,10 +147,10 @@ function MatchlistDisplay.Match(props)
 		matchInfoIconNode = mw.html.create('div'):addClass('brkts-match-info-icon')
 		local bracketId = MatchGroupUtil.splitMatchId(props.match.matchId)
 		matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
+			classes = {'brkts-match-info-popup'},
 			bracketId = bracketId,
 			matchId = props.match.matchId,
 		}, Lua.import('Module:Error/Display').ErrorDetails)
-			:addClass('brkts-match-info-popup')
 	else
 		matchInfoIconNode = mw.html.create('div'):addClass('brkts-matchlist-placeholder-cell')
 	end
@@ -187,9 +187,10 @@ function MatchlistDisplay.DateHeader(match)
 		},
 		children = HtmlWidgets.Div{
 			css = {padding = '2px 10px'},
-			children = Countdown._create(Table.merge(match.stream, {
+			children = Countdown.create(Table.merge(match.stream, {
 				date = DateExt.toCountdownArg(match.timestamp, match.timezoneId, match.dateIsExact),
 				finished = match.finished,
+				rawdatetime = (not match.dateIsExact) or match.finished,
 			}))
 		}
 	}
@@ -205,14 +206,14 @@ component.
 ---@param props {opponent: standardOpponent, winner: integer?, side: string}
 ---@return Html
 function MatchlistDisplay.Opponent(props)
-	local contentNode = OpponentDisplay.BlockOpponent({
+	local contentNode = OpponentDisplay.BlockOpponent{
 		flip = props.side == 'left',
 		opponent = props.opponent,
 		overflow = 'ellipsis',
 		showLink = false,
 		teamStyle = 'short',
-	})
-		:addClass('brkts-matchlist-cell-content')
+		additionalClasses = {'brkts-matchlist-cell-content'},
+	}
 	return mw.html.create('div')
 		:addClass('brkts-matchlist-cell brkts-matchlist-opponent')
 		:addClass(props.winner == SCORE_DRAW and 'brkts-matchlist-slot-bold bg-draw' or

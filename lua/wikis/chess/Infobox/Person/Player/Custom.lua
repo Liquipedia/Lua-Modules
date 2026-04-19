@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
@@ -33,7 +34,7 @@ local TITLES = {
 }
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -41,6 +42,18 @@ function CustomPlayer.run(frame)
 	player.args.id = player.args.id or player.args.romanized_name or player.args.name
 
 	return player:createInfobox()
+end
+
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	local highestTitle = Array.find(TITLES, function(title) return Logic.isNotEmpty(args['title_' .. title.code]) end)
+
+	lpdbData.extradata.chesstitle = (highestTitle or {}).name
+
+	return lpdbData
 end
 
 ---@param id string

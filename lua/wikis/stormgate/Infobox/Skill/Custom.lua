@@ -17,11 +17,12 @@ local Logic = Lua.import('Module:Logic')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local MessageBox = Lua.import('Module:Message box')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Skill = Lua.import('Module:Infobox/Skill')
 
+local WarningBox = Lua.import('Module:Widget/WarningBox')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
@@ -31,7 +32,6 @@ local CustomSkill = Class.new(Skill)
 local CustomInjector = Class.new(Injector)
 
 local ENERGY_ICON = '[[File:EnergyIcon.gif|link=Energy]]'
-local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
 local VALID_SKILLS = {
 	'Spell',
 	'Ability',
@@ -46,7 +46,7 @@ local GAME_MODE_ICON = {
 }
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomSkill.run(frame)
 	local skill = CustomSkill(frame)
 
@@ -64,9 +64,12 @@ function CustomSkill.run(frame)
 
 	local builtInfobox = skill:createInfobox()
 
-	return mw.html.create()
-		:node(builtInfobox)
-		:node(CustomSkill._deprecatedWarning(skill.args.deprecatedDisplay))
+	return HtmlWidgets.Fragment{
+		children = {
+			builtInfobox,
+			CustomSkill._deprecatedWarning(skill.args.deprecatedDisplay)
+		}
+	}
 end
 
 ---@param args table
@@ -359,15 +362,11 @@ function CustomSkill:_processPatchFromId(key)
 end
 
 ---@param patch string?
----@return Html? -would need to check what warningbox actually returns ... am on phone ...
+---@return Widget?
 function CustomSkill._deprecatedWarning(patch)
 	if not patch then return end
 
-	return MessageBox.main('ambox', {
-		image= ICON_DEPRECATED,
-		class='ambox-red',
-		text= 'This has been removed from 1v1 with Patch ' .. patch,
-	})
+	return WarningBox{text = 'This has been removed from 1v1 with Patch ' .. patch}
 end
 
 return CustomSkill

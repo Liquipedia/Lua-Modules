@@ -14,7 +14,7 @@ local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -22,6 +22,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local Count = {}
 
@@ -34,7 +35,7 @@ function Count.match2(args)
 	local lpdbConditions = Count._baseConditions(args)
 	lpdbConditions = Count._tierConditions(args, lpdbConditions)
 
-	return Count._query('match2', lpdbConditions)
+	return Count.query('match2', lpdbConditions)
 end
 
 
@@ -46,7 +47,7 @@ function Count.match2game(args)
 
 	local lpdbConditions = Count._baseConditions(args)
 
-	return Count._query('match2game', lpdbConditions)
+	return Count.query('match2game', lpdbConditions)
 end
 
 
@@ -87,7 +88,7 @@ function Count.games(args)
 
 	local lpdbConditions = Count._baseConditions(args)
 
-	return Count._query('game', lpdbConditions)
+	return Count.query('game', lpdbConditions)
 end
 
 
@@ -101,7 +102,7 @@ function Count.matches(args)
 	local lpdbConditions = Count._baseConditions(args)
 	lpdbConditions = Count._tierConditions(args, lpdbConditions)
 
-	return Count._query('match', lpdbConditions)
+	return Count.query('match', lpdbConditions)
 end
 
 
@@ -114,7 +115,7 @@ function Count.tournaments(args)
 	local lpdbConditions = Count._baseConditions(args, true)
 	lpdbConditions = Count._tierConditions(args, lpdbConditions)
 
-	return Count._query('tournament', lpdbConditions)
+	return Count.query('tournament', lpdbConditions)
 end
 
 ---Counts the number of tournaments played on a wiki per tier/tiertype
@@ -180,14 +181,9 @@ function Count.placements(args)
 		lpdbConditions:add{opponentConditions}
 
 	elseif String.isNotEmpty(args.team) then
-		local opponentConditions = ConditionTree(BooleanOperator.any)
-		Array.forEach(Count._getOpponentNames(args.team), function(templateValue)
-			opponentConditions:add{
-				ConditionNode(ColumnName('opponentname'), Comparator.eq, templateValue),
-				ConditionNode(ColumnName('opponentname'), Comparator.eq, templateValue:gsub(' ', '_'))
-			}
-		end)
-		lpdbConditions:add{opponentConditions}
+		lpdbConditions:add(ConditionUtil.anyOf(
+			ColumnName('opponenttemplate'), TeamTemplate.queryHistoricalNames(args.team)
+		))
 	end
 
 	if String.isNotEmpty(args.placement) then
@@ -200,17 +196,17 @@ function Count.placements(args)
 		lpdbConditions:add{placementConditions}
 	end
 
-	return Count._query('placement', lpdbConditions)
+	return Count.query('placement', lpdbConditions)
 end
 
 
 ---Returns the counted number based on the type of query
 ---@param queryType string
----@param lpdbConditions ConditionTree
+---@param lpdbConditions string|ConditionTree
 ---@return integer
-function Count._query(queryType, lpdbConditions)
+function Count.query(queryType, lpdbConditions)
 	local data = mw.ext.LiquipediaDB.lpdb(queryType, {
-		conditions = lpdbConditions:toString(),
+		conditions = tostring(lpdbConditions),
 		query = 'count::objectname',
 	})
 
@@ -221,15 +217,6 @@ end
 --[[
 Condition Functions
 ]]--
-
-
----Retrieve all team templates for team argument parameter
----@param opponent string
----@return string[]
-function Count._getOpponentNames(opponent)
-	local opponentNames = Team.queryHistoricalNames(opponent) or {}
-	return Array.extractValues(opponentNames)
-end
 
 
 ---Returns the base query conditions based on input args

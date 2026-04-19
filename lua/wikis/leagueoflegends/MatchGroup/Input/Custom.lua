@@ -8,8 +8,10 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local ChampionNames = Lua.import('Module:ChampionNames', {loadData = true})
 local FnUtil = Lua.import('Module:FnUtil')
-local HeroNames = Lua.import('Module:ChampionNames', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
@@ -17,26 +19,29 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local CustomMatchGroupInput = {}
-local MatchFunctions = {}
-local MapFunctions = {}
 
-MatchFunctions.OPPONENT_CONFIG = {
-	resolveRedirect = true,
-	pagifyTeamNames = false,
-	maxNumPlayers = 15,
+---@class LeagueOfLegendsMatchParser: MatchParserInterface
+local MatchFunctions = {
+	OPPONENT_CONFIG = {
+		resolveRedirect = true,
+		pagifyTeamNames = false,
+		maxNumPlayers = 15,
+	},
+	DEFAULT_MODE = 'team',
+	getBestOf = MatchGroupInputUtil.getBestOf
 }
-MatchFunctions.DEFAULT_MODE = 'team'
-MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
+local MapFunctions = {}
 
 ---@class LeagueOfLegendsMapParserInterface
 ---@field getMap fun(mapInput: table): table
 ---@field getLength fun(map: table): string?
 ---@field getSide fun(map: table, opponentIndex: integer): string?
 ---@field getObjectives fun(map: table, opponentIndex: integer): string?
----@field getHeroPicks fun(map: table, opponentIndex: integer): string[]?
----@field getHeroBans fun(map: table, opponentIndex: integer): string[]?
+---@field getChampionPicks fun(map: table, opponentIndex: integer): string[]?
+---@field getChampionBans fun(map: table, opponentIndex: integer): string[]?
 ---@field getParticipants fun(map: table, opponentIndex: integer): table[]?
 ---@field getVetoPhase fun(map: table): table?
+---@field extendMapOpponent? fun(map: table, opponentIndex: integer): table
 
 ---@param match table
 ---@param options? {isMatchPage: boolean?}
@@ -60,11 +65,78 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 	end
 
-	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
+	local processedMatch = MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
+
+	if options.isMatchPage then
+		CustomMatchGroupInput.aggregateStats(processedMatch)
+	end
+	return processedMatch
+end
+
+---@param match {opponents: MGIParsedOpponent[], games: table[]}
+function CustomMatchGroupInput.aggregateStats(match)
+	Array.forEach(match.opponents, function (opponent, opponentIndex)
+		---@param name string
+		---@return number?
+		local function aggregateStats(name)
+			return Array.reduce(
+				Array.map(match.games, function (game)
+					return (game.opponents[opponentIndex].stats or {})[name]
+				end),
+				Operator.nilSafeAdd
+			)
+		end
+		opponent.extradata = Table.merge(opponent.extradata, {
+			kills = aggregateStats('kills'),
+			deaths = aggregateStats('deaths'),
+			assists = aggregateStats('assists'),
+			towers = aggregateStats('towers'),
+			inhibitors = aggregateStats('inhibitors'),
+			dragons = aggregateStats('dragons'),
+			atakhans = aggregateStats('atakhans'),
+			heralds = aggregateStats('heralds'),
+			barons = aggregateStats('barons')
+		})
+		Array.forEach(opponent.match2players, function (player, playerIndex)
+			player.extradata = {characters = {}}
+			Array.forEach(
+				Array.filter(match.games, function (game)
+					return game.status ~= MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
+				end),
+				function (game)
+					local gamePlayerData = game.opponents[opponentIndex].players[playerIndex]
+					if Logic.isEmpty(gamePlayerData) then
+						return
+					end
+					local parsedGameLength = Array.map(
+						Array.parseCommaSeparatedString(game.length --[[@as string]], ':'), function (element)
+							---Directly using tonumber as arg to Array.map causes base out of range error
+							return tonumber(element)
+						end
+					)
+					local gameLength = (parsedGameLength[1] or 0) * 60 + (parsedGameLength[2] or 0)
+					player.extradata.role = player.extradata.role or gamePlayerData.role
+					player.extradata.characters = Array.extend(player.extradata.characters, gamePlayerData.character)
+					player.extradata.kills = Operator.nilSafeAdd(player.extradata.kills, gamePlayerData.kills)
+					player.extradata.deaths = Operator.nilSafeAdd(player.extradata.deaths, gamePlayerData.deaths)
+					player.extradata.assists = Operator.nilSafeAdd(player.extradata.assists, gamePlayerData.assists)
+					player.extradata.damage = Operator.nilSafeAdd(player.extradata.damage, gamePlayerData.damagedone)
+					player.extradata.creepscore = Operator.nilSafeAdd(player.extradata.creepscore, gamePlayerData.creepscore)
+					player.extradata.gold = Operator.nilSafeAdd(player.extradata.gold, gamePlayerData.gold)
+					player.extradata.gameLength = Operator.nilSafeAdd(player.extradata.gameLength, gameLength)
+				end
+			)
+			local killsParticipated = Operator.nilSafeAdd(player.extradata.kills, player.extradata.assists)
+			player.extradata.killparticipation = (
+				(opponent.extradata.kills or 0) > 0 and killsParticipated
+			) and (killsParticipated / opponent.extradata.kills) or nil
+			player.extradata.characters = Logic.nilIfEmpty(player.extradata.characters)
+		end)
+	end)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param MapParser LeagueOfLegendsMapParserInterface
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents, MapParser)
@@ -75,6 +147,7 @@ function MatchFunctions.extractMaps(match, opponents, MapParser)
 		getMap = MapParser.getMap,
 		getLength = MapParser.getLength,
 		getPlayersOfMapOpponent = FnUtil.curry(MapFunctions.getPlayersOfMapOpponent, MapParser),
+		extendMapOpponent = MapParser.extendMapOpponent
 	}
 	local maps = MatchGroupInputUtil.standardProcessMaps(match, opponents, mapParserWrapper)
 
@@ -89,14 +162,12 @@ end
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
 function MatchFunctions.calculateMatchScore(maps)
-	return function(opponentIndex)
-		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-	end
+	return FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, maps)
 end
 
 ---@param match table
 ---@param games table[]
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
@@ -107,11 +178,11 @@ end
 ---@param MapParser LeagueOfLegendsMapParserInterface
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getExtraData(MapParser, match, map, opponents)
 	local extraData = {}
-	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
+	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, ChampionNames)
 
 	local function prefixKeyWithTeam(key, opponentIndex)
 		return 'team' .. opponentIndex .. key
@@ -123,10 +194,10 @@ function MapFunctions.getExtraData(MapParser, match, map, opponents)
 			side = MapParser.getSide(map, opponentIndex),
 		}
 		opponentData = Table.merge(opponentData,
-			Table.map(MapParser.getHeroPicks(map, opponentIndex) or {}, function(idx, hero)
+			Table.map(MapParser.getChampionPicks(map, opponentIndex) or {}, function(idx, hero)
 				return 'champion' .. idx, getCharacterName(hero)
 			end),
-			Table.map(MapParser.getHeroBans(map, opponentIndex) or {}, function(idx, hero)
+			Table.map(MapParser.getChampionBans(map, opponentIndex) or {}, function(idx, hero)
 				return 'ban' .. idx, getCharacterName(hero)
 			end)
 		)
@@ -146,11 +217,11 @@ end
 
 ---@param MapParser LeagueOfLegendsMapParserInterface
 ---@param map table
----@param opponent table
+---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponentIndex)
-	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
+	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, ChampionNames)
 
 	local participantList = MapParser.getParticipants(map, opponentIndex) or {}
 	return MatchGroupInputUtil.parseMapPlayers(

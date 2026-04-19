@@ -15,7 +15,7 @@ local Show = Lua.import('Module:Infobox/Show')
 local CustomShow = Class.new(Show)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomShow.run(frame)
 	local customShow = CustomShow(frame)
 	return customShow:createInfobox()

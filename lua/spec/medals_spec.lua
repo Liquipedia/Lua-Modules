@@ -10,13 +10,13 @@ describe('Medals.display', function()
 	it('should return correct HTML when args.medal is a valid string', function()
 		local args = {medal = '1'}
 		local result = tostring(Medals.display(args))
-		assert.are.equal('<span title="First Place">[[File:Gold.png|link=|alt=First Place]]</span>', result)
+		assert.are.equal('<span title="First Place">[[File:Gold.png|24x24px|link=|alt=First Place]]</span>', result)
 	end)
 
 	it('should return correct HTML when args.medal is a valid integer', function()
 		local args = {medal = 1}
 		local result = tostring(Medals.display(args))
-		assert.are.equal('<span title="First Place">[[File:Gold.png|link=|alt=First Place]]</span>', result)
+		assert.are.equal('<span title="First Place">[[File:Gold.png|24x24px|link=|alt=First Place]]</span>', result)
 	end)
 
 	it('should return nil when args.medal is invalid', function()
@@ -28,7 +28,7 @@ describe('Medals.display', function()
 	it('should use link when provided', function()
 		local args = {medal = 1, link = 'somepage'}
 		local result = tostring(Medals.display(args))
-		assert.are.equal('<span title="First Place">[[File:Gold.png|link=somepage|alt=First Place]]</span>', result)
+		assert.are.equal('<span title="First Place">[[File:Gold.png|24x24px|link=somepage|alt=First Place]]</span>', result)
 	end)
 end)
 

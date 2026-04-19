@@ -14,7 +14,7 @@ local Map = Lua.import('Module:Infobox/Map')
 local CustomMap = Class.new(Map)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomMap.run(frame)
 	return CustomMap(frame):createInfobox()
 end

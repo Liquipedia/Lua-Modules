@@ -21,7 +21,8 @@ local GRID_WIDTHS = {
 	'md',
 	'lg',
 	'xl',
-	'xxl'
+	'xxl',
+	'xxxl'
 }
 
 local GRID_DIRECTIONS = {

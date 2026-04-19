@@ -17,7 +17,7 @@ local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox')
 local CustomHiddenDataBox = {}
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomHiddenDataBox.run(args)
 	args = args or {}
 	args.game = Game.toIdentifier{game = args.game, useDefault = false}
@@ -46,6 +46,8 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 			Variables.varDefine('is_team_tournament', 1)
 		end
 	end
+
+	BasicHiddenDataBox.checkAndAssign('tournament_mod', args.modname, (queryResult.extradata or {}).mod)
 
 	--if specified also store in lpdb (custom for sc2)
 	if Logic.readBool(args.storage) then

@@ -239,6 +239,7 @@ function mw.language.fetchLanguageNames(inLanguage, include) end
 function mw.language.getContentLanguage()
 	return setmetatable(mw.language, {})
 end
+
 mw.getContentLanguage = mw.language.getContentLanguage
 
 ---Returns a list of MediaWiki's fallback language codes for the specified code.
@@ -272,6 +273,7 @@ function mw.language.isValidCode(code) end
 function mw.language.new(code)
 	return mw.language.getContentLanguage()
 end
+
 mw.getLanguage = mw.language.new
 
 ---Returns the language code for this language object.
@@ -364,7 +366,7 @@ function mw.language:formatDate(format, timestamp, localTime)
 	end
 
 	local function makeOsdateParam(year, month, day, hour, minute, second)
-		return {year = year, month = month or 1, day = day or 1, hour = hour or 0, min = minute, sec = second}
+		return { year = year, month = month or 1, day = day or 1, hour = hour or 0, min = minute, sec = second }
 	end
 
 	if format == 'U' then
@@ -405,6 +407,45 @@ function mw.language:formatDate(format, timestamp, localTime)
 			return os.date(outFormat, ostimeWrapper(makeOsdateParam(year, month, day, hour, minute, second))) --[[@as string]]
 		end
 		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
+	elseif format == 'Y' then
+		local outFormat = '%Y'
+		if not timestamp then
+			return os.date(outFormat) --[[@as string]]
+		end
+		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
+			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
+		end
+		if type(timestamp) == 'string' then
+			local year = parseDateString(timestamp)
+			return year or ''
+		end
+		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
+	elseif format == 'n' then
+		local outFormat = '%m'
+		if not timestamp then
+			return os.date(outFormat) --[[@as string]]
+		end
+		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
+			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
+		end
+		if type(timestamp) == 'string' then
+			local _, month = parseDateString(timestamp)
+			return month or ''
+		end
+		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
+	elseif format == 'd' then
+		local outFormat = '%d'
+		if not timestamp then
+			return os.date(outFormat) --[[@as string]]
+		end
+		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
+			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
+		end
+		if type(timestamp) == 'string' then
+			local _, _, day = parseDateString(timestamp)
+			return day or ''
+		end
+		return os.date(outFormat, ostimeWrapper(timestamp)) --[[@as string]]
 	end
 	return ''
 end
@@ -418,6 +459,7 @@ function mw.language:formatDuration(seconds, chosenIntervals) end
 ---This takes a number as formatted by lang:formatNum() and returns the actual number. In other words, this is basically a language-aware version of tonumber().
 ---@param str string
 ---@return number
+---@overload fun(str: string?): nil
 function mw.language:parseFormattedNumber(str) end
 
 ---This chooses the appropriate grammatical form from forms (which must be a sequence table) or ... based on the number n.
@@ -426,6 +468,7 @@ function mw.language:parseFormattedNumber(str) end
 ---@return string
 ---@overload fun(n: number, forms: table):string
 function mw.language:convertPlural(n, ...) end
+
 mw.language.plural = mw.language.convertPlural
 
 ---This chooses the appropriate inflected form of word for the given inflection code case.
@@ -538,8 +581,35 @@ function mw.message:isDisabled() end
 ---@field contentNamespaces table<integer, namespaceInfo>
 ---@field subjectNamespaces table<integer, namespaceInfo>
 ---@field talkNamespaces table<integer, namespaceInfo>
----@field stats {pages: number, articles: number, files: number, edits: number, users: number, activeUsers: number, admins: number, pagesInCategory: fun(category: string, which: 'all'|'subcats'|'files'|'pages'|'*'):integer}
-mw.site = {server = 'https://liquipedia.net/wiki/'}
+---@field stats SiteStats
+mw.site = { server = 'https://liquipedia.net/wiki/' }
+
+---@class SiteStats
+---@field pages integer
+---@field articles integer
+---@field files integer
+---@field edits integer
+---@field users integer
+---@field activeUsers integer
+---@field admins integer
+mw.site.stats = {}
+
+---Gets statistics about the category. Each new category queried will increment the expensive function count.
+---@param category string
+---@param which 'all'|'subcats'|'files'|'pages'
+---@return integer
+---@overload fun(category: string, which: '*'): {all: integer, subcats: integer, files: integer, pages: integer}
+function mw.site.stats.pagesInCategory(category, which) end
+
+---Returns the number of pages in the given namespace.
+---@param namespace integer
+---@return integer
+function mw.site.stats.pagesInNamespace(namespace) end
+
+---Returns the number of users in the given group.
+---@param group string
+---@return integer
+function mw.site.stats.usersInGroup(group) end
 
 ---Returns a table holding data about available interwiki prefixes. If filter is the string "local", then only data for local interwiki prefixes is returned. If filter is the string "!local", then only data for non-local prefixes is returned. If no filter is specified, data for all prefixes is returned. A "local" prefix in this context is one that is for the same project.
 ---@param filter nil|'local'|'!local'
@@ -579,7 +649,9 @@ end
 ---Removes all MediaWiki strip markers from a string.
 ---@param s string
 ---@return string
-function mw.text.killMarkers(s) end
+function mw.text.killMarkers(s)
+	return s
+end
 
 ---Joins a list, prose-style. In other words, it's like table.concat() but with a different separator before the final item.
 ---@param list table
@@ -593,7 +665,7 @@ function mw.text.listToText(list, separator, conjunction) end
 ---@return string
 function mw.text.nowiki(s)
 	-- TODO: This only covers some
-	return (string.gsub( s, '["&\'<=>%[%]{|}]', {
+	return (string.gsub(s, '["&\'<=>%[%]{|}]', {
 		['"'] = '&#34;',
 		['&'] = '&#38;',
 		["'"] = '&#39;',
@@ -651,7 +723,7 @@ function mw.text.tag(name, attrs, content) end
 ---@return string
 function mw.text.trim(s, charset)
 	-- TODO: UTF8 support in fake
-	return string.match( s, '^()%s*$' ) and '' or string.match( s, '^%s*(.*%S)' )
+	return string.match(s, '^()%s*$') and '' or string.match(s, '^%s*(.*%S)')
 end
 
 ---Truncates text to the specified length in code points, adding ellipsis if truncation was performed. If length is positive, the end of the string will be truncated; if negative, the beginning will be removed
@@ -672,9 +744,8 @@ function mw.text.unstripNoWiki(s) end
 ---@return string
 function mw.text.unstrip(s) end
 
-
 ---@class Title
----@field id number
+---@field id integer
 ---@field interwiki string
 ---@field namespace number
 ---@field nsText string
@@ -707,6 +778,7 @@ function mw.text.unstrip(s) end
 ---@field cascadingProtection table
 mw.title = {
 	namespace = 0,
+	id = 123,
 	nsText = '',
 	text = 'FakePage',
 	prefixedText = 'FakePage',
@@ -983,6 +1055,11 @@ function mw.ustring.upper(s) return string.upper(s) end
 ---@field fragment string?
 mw.uri = {}
 
+---Creates a new URI object from a string.
+---@param str string
+---@return URI
+function mw.uri.new(str) end
+
 ---Returns a URI object for the local URL for a page, with optional query string/table
 ---@param page string
 ---@param query string|table?
@@ -1049,12 +1126,10 @@ mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
 
 mw.ext.Dota2Ranking = {}
 
----@alias Dota2RankingRecord {name: string, rank: integer, rating: number, streak: integer,
----progression: {date: string, rating: number, rank: integer}[]}
----@param startDate string #YYYY-MM-DD
----@param endDate string #YYYY-MM-DD
+---@alias Dota2RankingEntry {external_id: string, name: string, rating: number, rank: integer}
+---@alias Dota2RankingRecord {date: string, provisional: boolean,  entries: Dota2RankingEntry[]}
 ---@return Dota2RankingRecord[]
-function mw.ext.Dota2Ranking.get(startDate, endDate) end
+function mw.ext.Dota2Ranking.get() end
 
 mw.ext.VariablesLua = {}
 ---@alias wikiVariableKey string|number
@@ -1197,17 +1272,18 @@ function mw.ext.TeamTemplate.teampart(teamtemplate, date) end
 mw.ext.SearchEngineOptimization = {}
 
 ---@param desc string
+function mw.ext.SearchEngineOptimization.metadesc(desc) end
+
+---@param desc string
 function mw.ext.SearchEngineOptimization.metadescl(desc) end
 
 ---@param image string
 function mw.ext.SearchEngineOptimization.metaimage(image) end
 
 mw.ext.Brackets = {}
----@param idToCheck string
----@return string
-function mw.ext.Brackets.checkBracketDuplicate(idToCheck)
-	return 'ok'
-end
+---@param bracketType string
+---@return table
+function mw.ext.Brackets.getCommonsBracketTemplate(bracketType) end
 
 mw.ext.Dota2DB = {}
 
@@ -1294,6 +1370,21 @@ mw.ext.valorantdb = {}
 ---@field character {riot_id: string, name: string, icon_name: string, localized_names: table<string, string>}
 ---@field lpdb_player? {page_name: string, publisher_id: string, wiki: string}
 
+---@class valorantMatchApiRoundKill
+---@field victim string
+---@field time_since_round_start_millis integer
+---@field time_since_game_start_millis integer
+---@field killer string
+---@field finishing_damage table
+---@field assistants string[]
+
+---@class valorantMatchApiRoundPlayer
+---@field kills valorantMatchApiRoundKill[]
+---@field score integer
+---@field puuid string
+---@field economy {remaining: string, armor: string, spent: integer, loadout_value: integer, weapon: string}
+---@field damage {receiver: string, leg_shots: integer, head_shots: integer, body_shots: integer, damage: integer}[]
+
 ---@class valorantMatchApiRound
 ---@field round_num integer
 ---@field round_result 'Bomb defused'|'Eliminated'|'Bomb detonated'|'Round timer expired'|'Surrendered'
@@ -1307,7 +1398,7 @@ mw.ext.valorantdb = {}
 ---@field plant_round_time integer # 0 is no plant
 ---@field defuse_round_time integer # 0 is no defuse
 ---@field plant_site? 'A'|'B'
----@field player_stats table[]
+---@field player_stats valorantMatchApiRoundPlayer[]
 
 ---@class valorantMatchApiTeam
 ---@field team_id 'Blue'|'Red'
@@ -1335,6 +1426,5 @@ mw.ext.valorantdb = {}
 ---@param matchId string
 ---@return valorantMatchData
 function mw.ext.valorantdb.getMatchDetails(matchId) end
-
 
 return mw

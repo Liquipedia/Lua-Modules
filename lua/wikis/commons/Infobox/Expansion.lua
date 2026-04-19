@@ -23,9 +23,10 @@ local Builder = Widgets.Builder
 local Chronology = Widgets.Chronology
 
 ---@class ExpansionInfobox: BasicInfobox
+---@operator call(Frame): ExpansionInfobox
 local Expansion = Class.new(BasicInfobox)
 
----@return string
+---@return Widget
 function Expansion:createInfobox()
 	local args = self.args
 	local links = Links.transform(args)
@@ -131,7 +132,7 @@ function Expansion:createInfobox()
 		self:setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Expansion')
 end
 
 --- Allows for overriding this functionality

@@ -32,7 +32,7 @@ local RACE_MATCHUPS = {
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomStrategy.run(frame)
 	local customStrategy = CustomStrategy(frame)
 	customStrategy

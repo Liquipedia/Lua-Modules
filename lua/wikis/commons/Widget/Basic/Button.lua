@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
@@ -20,19 +21,20 @@ local Div = HtmlWidgets.Div
 ---@field title string?
 ---@field link string?
 ---@field linktype 'internal'|'external'|nil
----@field variant 'primary'|'secondary'|'tertiary'|'ghost'|'destructive'|nil
+---@field variant 'primary'|'secondary'|'themed'|'ghost'|'destructive'|nil
 ---@field size 'xs'|'sm'|'md'|'lg'|nil
 ---@field grow boolean?
+---@field aligncontent 'left'|'right'|nil
 
 ---@class ButtonWidget: Widget
 ---@operator call(ButtonWidgetParameters): ButtonWidget
-
 local Button = Class.new(Widget)
 Button.defaultProps = {
 	linktype = 'internal',
 	variant = 'primary',
 	size = 'md',
 	grow = false, -- Whether the button should grow to fill the available space
+	aligncontent = nil,
 }
 
 ---@return Widget
@@ -43,8 +45,8 @@ function Button:render()
 		table.insert(cssClasses, 'btn-primary')
 	elseif self.props.variant == 'secondary' then
 		table.insert(cssClasses, 'btn-secondary')
-	elseif self.props.variant == 'tertiary' then
-		table.insert(cssClasses, 'btn-tertiary')
+	elseif self.props.variant == 'themed' then
+		table.insert(cssClasses, 'btn-themed')
 	elseif self.props.variant == 'ghost' then
 		table.insert(cssClasses, 'btn-ghost')
 	elseif self.props.variant == 'destructive' then
@@ -59,8 +61,18 @@ function Button:render()
 		table.insert(cssClasses, 'btn-large')
 	end
 
+	local cssTable = {}
+	if self.props.grow then
+		cssTable.width = '100%'
+	end
+	if self.props.aligncontent == 'left' then
+		cssTable['justify-content'] = 'left'
+	elseif self.props.aligncontent == 'right' then
+		cssTable['justify-content'] = 'right'
+	end
+
 	local button = Div{
-		css = self.props.grow and {width = '100%'} or nil,
+		css = Logic.nilIfEmpty(cssTable),
 		classes = Array.extend(cssClasses, self.props.classes or {}),
 		attributes = Table.merge({
 			title = self.props.title,

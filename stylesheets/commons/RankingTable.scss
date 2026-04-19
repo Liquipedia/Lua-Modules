@@ -1,0 +1,160 @@
+.ranking-table {
+	@media ( max-width: 768px ) {
+		font-size: 0.875rem;
+	}
+
+	&__top-row {
+		display: flex;
+		justify-content: space-between;
+		font-weight: normal;
+		gap: 0.5rem;
+
+		@media ( max-width: 768px ) {
+			flex-direction: column;
+		}
+
+		&-text {
+			display: flex;
+			flex-direction: column;
+
+			@media ( max-width: 768px ) {
+				flex-direction: row;
+				justify-content: space-between;
+			}
+		}
+
+		> div {
+			display: flex;
+			justify-content: space-between;
+		}
+
+		&-logo-container {
+			height: 44px;
+			display: flex;
+			gap: 0.5rem;
+			align-items: center;
+
+			> img {
+				object-fit: contain;
+			}
+		}
+	}
+
+	&__row {
+		&--even {
+			.theme--light & {
+				background-color: var( --clr-on-surface-light-primary-4 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-on-surface-dark-primary-4 );
+			}
+		}
+
+		&--overfive {
+			@media ( max-width: 768px ) {
+				display: none;
+			}
+		}
+	}
+
+	tr {
+		> td {
+			.flag {
+				margin-right: 0.5rem;
+			}
+		}
+	}
+
+	&__graph-row {
+		&:hover {
+			background-color: transparent !important;
+		}
+	}
+
+	&__toggle-graph {
+		cursor: pointer;
+		display: flex;
+		height: 100%;
+		position: absolute;
+		inset: 0;
+		align-items: center;
+		justify-content: center;
+
+		&[ aria-expanded="true" ] > i {
+			transform: rotate( 180deg );
+		}
+
+		& > i {
+			transition: transform 0.2s linear;
+		}
+
+		@at-root td#{&}-cell {
+			padding: 0;
+			position: relative;
+		}
+	}
+
+	&__graph-row-container {
+		padding: 1.5rem 0 !important;
+
+		.team-template-team-standard {
+			display: flex;
+			justify-content: center;
+			font-weight: bold;
+		}
+	}
+
+	// Hide region on mobile due to limited horizontal space
+	@media ( max-width: 768px ) {
+		[ data-ranking-table-cell="region" ] {
+			display: none;
+		}
+	}
+
+	&--small {
+		width: 100% !important;
+		border-radius: 0 0 0.5rem 0.5rem !important;
+
+		[ data-ranking-table-cell="region" ] {
+			display: none;
+		}
+
+		& > select.ranking-table__select {
+			.theme--light & {
+				border-color: var( --clr-on-surface-light-primary-16 );
+				background-color: var( --clr-on-surface-light-primary-8 );
+			}
+
+			.theme--dark & {
+				border-color: var( --clr-on-surface-dark-primary-16 );
+				background-color: var( --clr-on-surface-dark-primary-8 );
+			}
+		}
+	}
+
+	&__select-container {
+		margin-bottom: 1rem;
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	&__patch-label {
+		.theme--light & {
+			color: var( --clr-secondary-16 );
+		}
+
+		.theme--dark & {
+			color: #ffffff;
+		}
+		opacity: 0.7;
+	}
+
+	&__footer-button {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 0.5rem;
+	}
+}

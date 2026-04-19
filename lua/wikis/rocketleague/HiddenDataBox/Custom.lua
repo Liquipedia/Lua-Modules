@@ -15,7 +15,7 @@ local CustomLeague = Lua.import('Module:Infobox/League/Custom') ---@type Rocketl
 local CustomHiddenDataBox = {}
 
 ---@param args table
----@return Html
+---@return Widget
 function CustomHiddenDataBox.run(args)
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
 	return BasicHiddenDataBox.run(args)

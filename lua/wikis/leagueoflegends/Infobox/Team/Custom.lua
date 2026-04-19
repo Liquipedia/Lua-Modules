@@ -23,10 +23,10 @@ local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
 local Region = Lua.import('Module:Region')
 local Team = Lua.import('Module:Infobox/Team')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
-local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 local REGION_REMAPPINGS = {
 	['south america'] = 'latin america',
@@ -37,11 +37,15 @@ local REGION_REMAPPINGS = {
 }
 
 ---@class LeagueoflegendsInfoboxTeam: InfoboxTeam
+---@operator call(Frame): LeagueoflegendsInfoboxTeam
 local CustomTeam = Class.new(Team)
+
+---@class LeagueoflegendsInfoboxTeamWidgetInjector: WidgetInjector
+---@field caller LeagueoflegendsInfoboxTeam
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
@@ -73,9 +77,9 @@ function CustomTeam:createRegion(region)
 	return remappedRegion and self:createRegion(remappedRegion) or regionData
 end
 
----@return Widget
+---@return Widget?
 function CustomTeam:createBottomContent()
-	return UpcomingTournaments{name = self.name}
+	return UpcomingTournaments.team{name = self.teamTemplate.templatename}
 end
 
 ---@param id string

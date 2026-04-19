@@ -27,7 +27,7 @@ local CustomUnofficialWorldChampion = Class.new(UnofficialWorldChampion)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomUnofficialWorldChampion.run(frame)
 	local unofficialWorldChampion = CustomUnofficialWorldChampion(frame)
 	unofficialWorldChampion:setWidgetInjector(CustomInjector(unofficialWorldChampion))
@@ -56,10 +56,10 @@ function CustomInjector:parse(id, widgets)
 
 
 		Array.extendWith(widgets,
-			{
-				raceBreakdown and Title{children = 'Racial Distribution of Champions'} or nil,
-				raceBreakdown and Breakdown{children = raceBreakdown.display, classes = { 'infobox-center' }} or nil,
-			},
+			raceBreakdown and {
+				Title{children = 'Racial Distribution of Champions'},
+				Breakdown{children = raceBreakdown.display, classes = { 'infobox-center' }},
+			} or nil,
 			self.caller:_buildCellsFromBase('countries with multiple champions', 'Countries with Multiple Champions'),
 			self.caller:_buildCellsFromBase('teams with multiple champions', 'Teams with Multiple Champions')
 		)

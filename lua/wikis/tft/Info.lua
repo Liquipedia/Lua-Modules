@@ -53,6 +53,12 @@ return {
 		},
 		infoboxPlayer = {
 			autoTeam = true,
+			automatedHistory = {
+				storeFromWikiCode = true,
+			},
+		},
+		participants = {
+			defaultPlayerNumber = 4,
 		},
 	},
 	defaultRoundPrecision = 0,

@@ -30,7 +30,7 @@ local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomMap.run(frame)
 	local map = CustomMap(frame)
 	map.args.informationType = 'Battleground'
@@ -86,7 +86,7 @@ function CustomMap:_image2()
 		children = {Image{
 			imageLight = self.args.image2,
 			size = '294px',
-			alignment = 'center',
+			horizontalAlignment = 'center',
 		}}
 	}
 end

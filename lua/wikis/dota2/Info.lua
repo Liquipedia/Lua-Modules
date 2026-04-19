@@ -57,6 +57,9 @@ return {
 			excludeTierTypes = {'Qualifier'},
 			showPatches = true,
 		},
+		participants = {
+			defaultPlayerNumber = 5,
+		},
 	},
 	defaultRoundPrecision = 0,
 }

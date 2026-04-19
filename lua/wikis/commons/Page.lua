@@ -7,7 +7,10 @@
 
 local Lua = require('Module:Lua')
 
+local Info = Lua.import('Module:Info', {loadData = true})
 local String = Lua.import('Module:StringUtils')
+
+local FORCE_UNDERSCORES = Info.config.forceUnderscores
 
 local Page = {}
 
@@ -73,6 +76,32 @@ function Page.pageifyLink(link)
 	---@cast link -nil
 
 	return (mw.ext.TeamLiquidIntegration.resolve_redirect(link):gsub(' ', '_'))
+end
+
+---@param pageName string
+---@return string
+---@overload fun(pageName: nil?): nil
+function Page.applyUnderScoresIfEnforced(pageName)
+	if pageName and FORCE_UNDERSCORES then
+		pageName = pageName:gsub(' ', '_')
+	end
+	return pageName
+end
+
+---Updates the display title of the current page.
+---This function is a no-op if the supplied title is empty.
+---@param props {frame: Frame?, title: string?, noReplace: boolean?}
+---@return string?
+function Page.setDisplayTitle(props)
+	local title = props.title
+
+	if String.isEmpty(title) then
+		return
+	end
+	---@cast title -nil
+
+	local frame = props.frame or mw.getCurrentFrame()
+	return frame:callParserFunction('DISPLAYTITLE', title, props.noReplace and 'noreplace' or nil)
 end
 
 return Page

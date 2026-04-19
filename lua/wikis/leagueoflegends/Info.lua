@@ -48,7 +48,11 @@ return {
 			automatedHistory = {
 				mode = 'manualPrio',
 				showRole = false,
+				storeFromWikiCode = true,
 			},
+		},
+		participants = {
+			defaultPlayerNumber = 5,
 		},
 	},
 	defaultRoundPrecision = 0,

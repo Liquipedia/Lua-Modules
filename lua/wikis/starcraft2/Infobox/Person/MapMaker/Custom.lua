@@ -23,7 +23,7 @@ local CustomMapMaker = Class.new(CustomPerson)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomMapMaker.run(frame)
 	local mapMaker = CustomMapMaker(frame)
 	mapMaker:setWidgetInjector(CustomInjector(mapMaker))
@@ -45,7 +45,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Race',
-				children = {self.caller:getRaceData(args.race or 'unknown')}
+				children = {self.caller:getRaceData(args.race or args.faction)}
 			}
 		}
 	elseif id == 'role' then return {}

@@ -19,11 +19,15 @@ local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Span = HtmlWidgets.Span
 local Div = HtmlWidgets.Div
 
+local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local CURRENT_PAGE_NAME = mw.ustring.lower(mw.title.getCurrentTitle().text:gsub('_', ' '))
 
 ---@class MatchHeaderProps
 ---@field match MatchGroupUtilMatch
 ---@field teamStyle? teamStyle
+---@field disableCurrentPageLinks boolean?
+---@field variant 'horizontal'|'vertical'
 
 ---@class MatchHeader: Widget
 ---@operator call(MatchHeaderProps): MatchHeader
@@ -31,6 +35,8 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local MatchHeader = Class.new(Widget)
 MatchHeader.defaultProps = {
 	teamStyle = 'short',
+	disableCurrentPageLinks = false,
+	variant = 'horizontal',
 }
 
 ---@return Widget?
@@ -45,6 +51,16 @@ function MatchHeader:render()
 		return
 	end
 
+	if self.props.variant == 'vertical' then
+		return self:_renderVertical(match)
+	end
+
+	return self:_renderHorizontal(match)
+end
+
+---@param match MatchGroupUtilMatch
+---@return Widget
+function MatchHeader:_renderHorizontal(match)
 	local hasBestof = match.bestof and match.bestof > 0
 	local matchPhase = MatchGroupUtil.computeMatchPhase(match)
 
@@ -79,6 +95,8 @@ function MatchHeader:render()
 						teamStyle = self.props.teamStyle,
 						overflow = 'ellipsis',
 						flip = true,
+						showLink = not (self.props.disableCurrentPageLinks
+							and self:_isCurrentPageOpponent(match.opponents[1])),
 					}
 				}
 			},
@@ -138,11 +156,69 @@ function MatchHeader:render()
 						opponent = match.opponents[2],
 						teamStyle = self.props.teamStyle,
 						overflow = 'ellipsis',
+						showLink = not (self.props.disableCurrentPageLinks
+							and self:_isCurrentPageOpponent(match.opponents[2])),
 					}
 				}
 			},
 		}
 	}
+end
+
+---@param match MatchGroupUtilMatch
+---@return Widget
+function MatchHeader:_renderVertical(match)
+	local matchPhase = MatchGroupUtil.computeMatchPhase(match)
+
+	return Div{
+		classes = {'match-info-header', 'match-info-header-vertical'},
+		children = WidgetUtil.collect(
+			Array.map(match.opponents, function(opponent, idx)
+				local isWinner = (match.winner == idx or match.winner == 0)
+				local score = OpponentDisplay.InlineScore(opponent)
+
+				return Div{
+					classes = WidgetUtil.collect(
+						'match-info-opponent-row',
+						matchPhase == 'finished' and not isWinner and 'match-info-opponent-row-loser' or nil,
+						isWinner and 'match-info-opponent-row-winner' or nil
+					),
+					children = {
+						Div{
+							classes = {'match-info-opponent-identity'},
+							children = {
+								OpponentDisplay.BlockOpponent{
+									opponent = opponent,
+									teamStyle = self.props.teamStyle,
+									overflow = 'ellipsis',
+									showLink = not (self.props.disableCurrentPageLinks
+										and self:_isCurrentPageOpponent(opponent)),
+								}
+							}
+						},
+						Span{
+							classes = WidgetUtil.collect(
+								'match-info-opponent-score',
+								isWinner and 'match-info-opponent-score-winner' or nil
+							),
+							children = matchPhase ~= 'upcoming' and score or nil
+						}
+					}
+				}
+			end)
+		)
+	}
+end
+
+---@param opponent standardOpponent
+---@return boolean
+function MatchHeader:_isCurrentPageOpponent(opponent)
+	local success, opponentName = pcall(Opponent.toName, opponent)
+	if not success or not opponentName then
+		return false
+	end
+
+	return mw.ustring.lower(opponentName:gsub('_', ' ')) == CURRENT_PAGE_NAME
 end
 
 return MatchHeader

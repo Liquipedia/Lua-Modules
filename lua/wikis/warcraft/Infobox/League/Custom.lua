@@ -10,12 +10,14 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
+local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local Game = Lua.import('Module:Game')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local MapsData = Lua.import('Module:Maps/data', {loadData = true})
 local Operator = Lua.import('Module:Operator')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local Page = Lua.import('Module:Page')
 local PatchAuto = Lua.import('Module:PatchAuto')
 local String = Lua.import('Module:StringUtils')
@@ -34,7 +36,12 @@ local Center = Widgets.Center
 local Title = Widgets.Title
 
 ---@class WarcraftLeagueInfobox: InfoboxLeague
+---@operator call(Frame): WarcraftLeagueInfobox
 local CustomLeague = Class.new(League)
+
+---@class WarcraftLeagueInfoboxWidgetInjector: WidgetInjector
+---@operator call(WarcraftLeagueInfobox): WarcraftLeagueInfoboxWidgetInjector
+---@field caller WarcraftLeagueInfobox
 local CustomInjector = Class.new(Injector)
 
 local CANCELLED = 'cancelled'
@@ -75,7 +82,7 @@ local ESL_TIERS = {
 }
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -89,7 +96,7 @@ function CustomLeague.run(frame)
 		args.prizepool = nil
 	end
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 ---@param args table
@@ -153,7 +160,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('firstmatch', self.data.firstMatch)
 	Variables.varDefine('tournament_finished', tostring(self.data.isFinished or false))
 	Variables.varDefine('tournament_maps', Json.stringify(self.data.maps))
-	Variables.varDefine('tournament_series_number', self.data.number)
+	Variables.varDefine('tournament_series_number', self.data.number and string.format('%05i', self.data.number) or nil)
 end
 
 ---@param prefix string
@@ -184,9 +191,11 @@ function CustomLeague:_determineGame(game)
 
 	local startDate = self.data.startDate or self.data.endDate
 
-	if startDate and startDate > START_DATE_REFORGED then
+	if not startDate then
+		return
+	elseif startDate > START_DATE_REFORGED then
 		return Game.toIdentifier{game = GAME_REFORGED}
-	elseif startDate and startDate > START_DATE_FROZEN_THRONE then
+	elseif startDate > START_DATE_FROZEN_THRONE then
 		return Game.toIdentifier{game = GAME_FROZEN_THRONE}
 	end
 
@@ -226,13 +235,15 @@ function CustomLeague:_isFinished(args)
 		return false
 	end
 
-	return mw.ext.LiquipediaDB.lpdb('placement', {
-		conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
-			.. 'AND [[opponentname::!TBD]] AND [[placement::1]]',
-		query = 'date',
+	local winner = mw.ext.LiquipediaDB.lpdb('placement', {
+		conditions = '[[pagename::' .. string.gsub(self.pagename, ' ', '_') .. ']] '
+			.. 'AND [[opponentname::!TBD]] AND [[opponentname::!]] AND [[placement::1]]',
+		query = 'opponenttype, opponentplayers, opponenttemplate, opponentname',
 		order = 'date asc',
 		limit = 1
-	})[1] ~= nil
+	})[1]
+
+	return winner and not Opponent.isTbd(Opponent.fromLpdbStruct(winner))
 end
 
 ---@param id string
@@ -325,9 +336,10 @@ end
 
 ---@return string
 function CustomLeague:_displayStartDateTime()
-	return Countdown._create{
+	return Countdown.create{
 		date = self.data.startTime.raw,
 		finished = self.data.isFinished,
+		rawdatetime = DateExt.getCurrentTimestamp() > DateExt.readTimestamp(self.data.startTime.raw),
 	}
 end
 
@@ -400,7 +412,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	end
 	lpdbData.participantsnumber = participantsNumber
 	lpdbData.mode = self:_getMode()
-	lpdbData.extradata.seriesnumber = self.data.number
+	lpdbData.extradata.seriesnumber = self.data.number and string.format('%05i', self.data.number) or nil
 
 	lpdbData.extradata.server2 = args.server2
 	lpdbData.extradata.patch2 = args.patch2

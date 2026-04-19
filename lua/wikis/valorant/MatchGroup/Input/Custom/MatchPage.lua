@@ -9,13 +9,17 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local Table = Lua.import('Module:Table')
 
 local MapData = mw.loadJsonData('MediaWiki:Valorantdb-maps.json')
 
+---@class ValorantMatchPageMapParser: ValorantMapParserInterface
 local CustomMatchGroupInputMatchPage = {}
 
 ---@class valorantMatchApiTeamExtended: valorantMatchApiTeam
 ---@field players valorantMatchApiPlayer[]
+---@field puuids string[]
 
 ---@class valorantMatchDataExtended: valorantMatchData
 ---@field teams valorantMatchApiTeamExtended[]
@@ -68,6 +72,7 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 		team.players = Array.filter(map.players, function(player)
 			return player.team_id == team.team_id
 		end)
+		team.puuids = Array.map(team.players, Operator.property('puuid'))
 	end)
 	map.region = mapInput.region -- Region from the API is not what we want for region
 	map.matchid = mapInput.matchid
@@ -83,12 +88,14 @@ end
 function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	if not map.teams then return nil end
 	local team = map.teams[opponentIndex]
-	if not team then return end
+	local rounds = CustomMatchGroupInputMatchPage.getRounds(map)
+	if not team or not rounds then return end
 
 	return Array.map(team.players, function(player)
 		local lpdbPlayerData = player.lpdb_player
 		return {
 			player = lpdbPlayerData and lpdbPlayerData.page_name or player.game_name,
+			puuid = player.puuid,
 			agent = player.character.name,
 			acs = player.stats.acs,
 			adr = player.stats.adr,
@@ -97,6 +104,12 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 			kills = player.stats.kills,
 			deaths = player.stats.deaths,
 			assists = player.stats.assists,
+			firstKills = #Array.filter(rounds, function (round)
+				return round.firstKill.killer == player.puuid
+			end),
+			firstDeaths = #Array.filter(rounds, function (round)
+				return round.firstKill.victim == player.puuid
+			end)
 		}
 	end)
 end
@@ -199,6 +212,48 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 		end
 	end
 
+	---@param ceremonyCode string?
+	---@return string
+	local function mapCeremonyCodes(ceremonyCode)
+		if Logic.isEmpty(ceremonyCode) then
+			return ''
+		end
+		---@cast ceremonyCode -nil
+		return ceremonyCode:sub(9)
+	end
+
+	---@param round valorantMatchApiRound
+	---@param ceremony string?
+	---@param roundKills valorantMatchApiRoundKill[]
+	---@param winningTeam integer
+	---@return string?
+	local function processCeremony(round, ceremony, roundKills, winningTeam)
+		if ceremony == 'Clutch' then
+			if Logic.isNotEmpty(round.bomb_defuser) then
+				return round.bomb_defuser
+			end
+			local killsFromWinningTeam = Array.filter(
+				roundKills,
+				function (roundKill)
+					return Table.includes(map.teams[winningTeam].puuids, roundKill.killer)
+				end
+			)
+			if #killsFromWinningTeam == 0 then
+				return
+			end
+			return killsFromWinningTeam[#killsFromWinningTeam].killer
+		elseif ceremony == 'Ace' then
+			local _, killsByPlayer = Array.groupBy(roundKills, function (roundKill)
+				return roundKill.killer
+			end)
+			for killer, kills in pairs(killsByPlayer) do
+				if #kills >= 5 then
+					return killer
+				end
+			end
+		end
+	end
+
 	local t1start = CustomMatchGroupInputMatchPage.getFirstSide(map, 1, 'normal')
 	local t1startot = CustomMatchGroupInputMatchPage.getFirstSide(map, 1, 'ot')
 	local nextOvertimeSide = t1startot
@@ -226,8 +281,38 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 			return nil
 		end
 
+		---@type valorantMatchApiRoundKill[]
+		local roundKills = Array.sortBy(
+			Array.flatMap(round.player_stats, function (player)
+				return player.kills or {}
+			end),
+			Operator.property('time_since_round_start_millis')
+		)
+
+		local winningTeam = (t1side == makeShortSideName(round.winning_team_role)) and 1 or 2
+		local ceremony = mapCeremonyCodes(round.round_ceremony)
+		local flawless = Array.all(
+			roundKills,
+			function (roundKill)
+				return Table.includes(map.teams[winningTeam].puuids, roundKill.killer)
+			end
+		)
+
+		---@type valorantMatchApiRoundKill
+		local firstKill = roundKills[1]
+
 		---@type ValorantRoundData
 		return {
+			ceremony = ceremony,
+			ceremonyFor = processCeremony(round, ceremony, roundKills, winningTeam),
+			firstKill = Logic.isNotEmpty(firstKill) and {
+				killer = firstKill.killer,
+				victim = firstKill.victim,
+				byTeam = Table.includes(map.teams[1].puuids, firstKill.killer) and 1 or 2
+			} or {},
+			planted = round.plant_round_time > 0,
+			defused = round.defuse_round_time > 0,
+			flawless = flawless,
 			round = roundNumber,
 			t1side = t1side,
 			t2side = t2side,
@@ -243,6 +328,47 @@ function CustomMatchGroupInputMatchPage.getPatch(map)
 	--- input format is "release-10.05-shipping-14-3367018"
 	local versionParts = Array.parseCommaSeparatedString(map.game_version, '-')
 	return versionParts[2]
+end
+
+---@param map table
+---@param opponentIndex integer
+---@return table
+function CustomMatchGroupInputMatchPage.extendMapOpponent(map, opponentIndex)
+	local rounds = CustomMatchGroupInputMatchPage.getRounds(map)
+
+	if not rounds then
+		return {}
+	end
+
+	local teamSideKey = 't' .. opponentIndex .. 'side'
+	local plantedRounds = Array.filter(rounds, function (round)
+		return round[teamSideKey] == 'atk' and round.planted
+	end)
+
+	---@param ceremony string
+	---@return integer
+	local function countCeremonies(ceremony)
+		return #Array.filter(rounds, function (round)
+			return round[teamSideKey] == round.winningSide and round.ceremony == ceremony
+		end)
+	end
+
+	return {
+		thrifties = countCeremonies('Thrifty'),
+		flawless = #Array.filter(rounds, function (round)
+			return round[teamSideKey] == round.winningSide and round.flawless
+		end),
+		firstKills = #Array.filter(rounds, function (round)
+			return round.firstKill.byTeam == opponentIndex
+		end),
+		clutches = countCeremonies('Clutch'),
+		postPlant = {
+			#Array.filter(plantedRounds, function (round)
+				return round.winningSide == 'atk'
+			end),
+			#plantedRounds
+		}
+	}
 end
 
 return CustomMatchGroupInputMatchPage

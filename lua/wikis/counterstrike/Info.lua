@@ -134,6 +134,13 @@ local infoData = {
 			tiers = {1, 2},
 			excludeTierTypes = {'Qualifier', 'Points', 'Showmatch'},
 		},
+		participants = {
+			defaultPlayerNumber = 5,
+			mergeStaffTabIfOnlyOneStaff = true,
+		},
+		tournamentsListing = {
+			showGameIcon = true,
+		},
 	},
 }
 

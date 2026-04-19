@@ -125,7 +125,7 @@ function WikiCopyPaste.getFfaOpponent(mode, mapCount)
 end
 
 ---function that sets the text that starts the invoke of the MatchGroup Modules,
----contains mandatory stuff like bracketid, templateid and MatchGroup type (matchlist or bracket)
+---contains mandatory stuff like bracketid, bracketType and MatchGroup type (matchlist or bracket)
 ---@param template string?
 ---@param id string
 ---@param modus string

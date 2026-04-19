@@ -749,7 +749,6 @@ return {
 			['faceit'] = 'https&#58;//www.faceit.com/en/players/geoolicious',
 			['instagram'] = 'https&#58;//www.instagram.com/tsm_geometrics',
 			['siege-gg'] = 'https&#58;//siege.gg/players/54',
-			['steam'] = 'https&#58;//steamcommunity.com/id/SENPAPIGEO',
 			['twitch'] = 'https&#58;//www.twitch.tv/geoolicious',
 			['twitter'] = 'https&#58;//twitter.com/TSM_Geometrics',
 		},

@@ -7,6 +7,9 @@
 return {
 	-- Usage: Team information
 	team_tbd = 'far fa-users',
+	notification = 'fas fa-info-circle',
+	external_link = 'fas fa-external-link-alt',
+	internal_link = 'fas fa-link',
 
 	-- Usage: Different ways to see data
 	schedule = 'far fa-table',
@@ -23,7 +26,6 @@ return {
 	matchpagelink = 'far fa-swords',
 	matchpopup = 'fas fa-info-circle',
 	timeout = 'far fa-clock',
-	veto = 'fas fa-times',
 	casters = 'fas fa-microphone-alt',
 	comment = 'far fa-comment',
 	mvp = 'fas fa-medal',
@@ -33,6 +35,16 @@ return {
 	explosion_valorant = 'fas fa-fire-alt',
 	defuse = 'fas fa-wrench',
 	outoftime = 'fas fa-hourglass',
+	surrendered = 'far fa-flag',
+	ace_valorant = 'fas fa-dagger',
+	flawless_valorant = 'fas fa-gem',
+
+	-- Usage: Veto labels
+	veto_pick = 'fas fa-check',
+	veto_ban = 'fas fa-times',
+	veto_defaultban = 'fas fa-times',
+	veto_decider = 'fas fa-flag-checkered',
+	veto_protect = 'fas fa-lock',
 
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',
@@ -59,8 +71,11 @@ return {
 	left = 'fas fa-chevron-circle-left',
 
 	-- Usage: Indicate if a team/player went up or down in placement in a league system or in a ranking system
-	rankup = 'fas fa-long-arrow-up',
-	rankdown = 'fas fa-long-arrow-down',
+	rankup = 'fas fa-chevron-up',
+	rankup_double = 'fas fa-chevron-double-up',
+	rankneutral = 'fas fa-minus',
+	rankdown = 'fas fa-chevron-down',
+	rankdown_double = 'fas fa-chevron-double-down',
 
 	-- Usage: Main Page buttons
 	featuredon = 'far fa-star',
@@ -76,9 +91,9 @@ return {
 	helparticles = 'far fa-life-ring',
 
 	-- Usage: To indicate different transfer type with icon difference not just background colour
-	transferbetween = 'fas fa-arrow-alt-right',
-	transfertofreeagent = 'fas fa-arrow-alt-from-left',
-	fransferfromfreeagent = 'fas fa-arrow-alt-to-right',
+	transferbetween = 'far fa-arrow-alt-right',
+	transfertofreeagent = 'far fa-arrow-alt-to-right',
+	transferfromfreeagent = 'far fa-arrow-alt-from-left',
 
 	-- Usage: Reference links in tables (ie transfers)
 	reference = 'fad fa-external-link-alt',
@@ -112,6 +127,9 @@ return {
 
 	-- Usage: Accommodations
 	accommodation = 'far fa-home-alt',
+
+	-- Usage: Shop merchandise
+	shopping_bag = 'fas fa-shopping-bag',
 
 	-- Usage: Matches etc
 	firstplace = 'fas fa-trophy',
@@ -154,6 +172,8 @@ return {
 	acs = 'far fa-abacus',
 	kast = 'fas fa-hands-helping',
 	headshot = 'far fa-crosshairs',
+	firstkill = 'liquipedia-custom-icon liquipedia-custom-icon-fk-kd-icon',
+	team_firstkills = 'fas fa-swords fa-flip-vertical',
 
 	dota2_gpm = 'fas fa-coin',
 	dota2_lhdn = 'fas fa-swords',
@@ -161,6 +181,7 @@ return {
 	dota2_barrack = 'fas fa-warehouse',
 
 	leagueoflegends_kda = 'fas fa-swords fa-flip-vertical',
+	leagueoflegends_killparticipation = 'fas fa-dagger',
 
 	-- Usage: Day night cycle information
 	day = 'fas fa-sun',
@@ -198,6 +219,13 @@ return {
 	copyright = 'far fa-copyright',
 	getting_started = 'far fa-seedling',
 	file_standards_guide = 'far fa-file-check',
+	find_images = 'fad fa-file-search',
+	clipboard = 'fad fa-clipboard-list',
+
+	-- Usage: Main Pages navcards
+	player = 'fas fa-user',
+	statistics = 'fad fa-chart-bar',
+	maps = 'fad fa-map',
 
 	-- Streams and Vods
 	youtube = 'fab fa-youtube',
@@ -217,5 +245,27 @@ return {
 	trovo = 'liquipedia-custom-icon liquipedia-custom-icon-trovo',
 	tl = 'liquipedia-custom-icon liquipedia-custom-icon-team-liquid',
 	stream = 'liquipedia-custom-icon liquipedia-custom-icon-team-liquid',
-	vod_play = 'far fa-play'
+	vod_play = 'far fa-play',
+
+	-- Usage: Formula 1
+	ongoing_series = 'fas fa-hourglass-half ',
+	season_history = 'fas fa-landmark',
+	finished_race = 'fas fa-flag-checkered',
+
+	-- Usage: Export functions
+	share = 'fas fa-share-alt',
+	copy = 'fas fa-clone',
+	download = 'fas fa-download',
+
+	-- Usage: Github links
+	github = 'fab fa-github',
+
+	-- Usage: Dota2 Spellcard
+	dota2_spl_mechanics = 'fas fa-cog',
+	dota2_spl_interactions = 'fad fa-atom-alt',
+	dota2_spl_status = 'fas fa-hourglass-half',
+	dota2_spl_misc = 'fad fa-list-ul',
+
+	-- Usage: Info button
+	['general-info'] = 'fas fa-info-circle',
 }

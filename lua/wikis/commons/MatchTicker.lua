@@ -87,6 +87,7 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@field games string[]?
 ---@field featuredTournamentsOnly boolean?
 ---@field displayGameIcons boolean?
+---@field disableCurrentPageLinks boolean?
 
 ---@class MatchTicker
 ---@operator call(table): MatchTicker
@@ -135,7 +136,8 @@ function MatchTicker:init(args)
 					return Game.toIdentifier{game=game}
 				end) or nil,
 		featuredTournamentsOnly = Logic.readBool(args.featuredTournamentsOnly),
-		displayGameIcons = Logic.readBool(args.displayGameIcons)
+		displayGameIcons = Logic.readBool(args.displayGameIcons),
+		disableCurrentPageLinks = hasOpponent,
 	}
 
 	--min 1 of them has to be set; recent can not be set while any of the others is set
@@ -340,6 +342,10 @@ local previousMatchWasTbd
 ---@param match table
 ---@return boolean
 function MatchTicker:keepMatch(match)
+	if match.extradata and match.extradata.hidden then
+		return false
+	end
+
 	-- Remove matches with wrong region
 	if self.config.regions then
 		if not match.tournamentData then
@@ -519,11 +525,11 @@ function MatchTicker:create(headerText)
 	end
 
 	if headerText then
-		wrapper:node(mw.html.create('div'):node(
-		mw.html.create('div')
+		wrapper:node(
+			mw.html.create('div')
 			:addClass('infobox-header')
 			:wikitext(headerText)
-		))
+		)
 	end
 
 	if not self.matches then
@@ -536,6 +542,7 @@ function MatchTicker:create(headerText)
 			hideTournament = self.config.hideTournament,
 			displayGameIcons = self.config.displayGameIcons,
 			onlyHighlightOnValue = self.config.onlyHighlightOnValue,
+			disableCurrentPageLinks = self.config.disableCurrentPageLinks,
 		})
 	end
 

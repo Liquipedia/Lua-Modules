@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
@@ -15,16 +16,28 @@ local Player = Lua.import('Module:Infobox/Person')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
+---@class OsuInfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)
+---@class OsuPersonInfoboxInjector: WidgetInjector
+---@field caller OsuInfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	return player:createInfobox()
+end
+
+---@return Widget?
+function CustomPlayer:createBottomContent()
+	if not self:shouldStoreData(self.args) then
+		return
+	end
+
+	return UpcomingTournaments.player{name = self.pagename}
 end
 
 ---@param id string

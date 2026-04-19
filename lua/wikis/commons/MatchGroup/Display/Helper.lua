@@ -17,6 +17,7 @@ local Page = Lua.import('Module:Page')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 
@@ -28,30 +29,16 @@ local NONBREAKING_SPACE = '&nbsp;'
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
--- Whether to allow highlighting an opponent via mouseover
----@param opponent standardOpponent
----@return boolean
-function DisplayHelper.opponentIsHighlightable(opponent)
-	if opponent.type == 'literal' then
-		return opponent.name and opponent.name ~= '' and opponent.name ~= 'TBD' or false
-	elseif opponent.type == 'team' then
-		return opponent.template and opponent.template ~= 'tbd' or false
-	else
-		return 0 < #opponent.players
-			and Array.all(opponent.players, function(player)
-				return Logic.isNotEmpty(player.pageName) and Logic.isNotEmpty(player.displayName) and player.displayName ~= 'TBD'
-			end)
-	end
-end
-
 ---@param node Html
 ---@param opponent standardOpponent
 ---@return Html
 function DisplayHelper.addOpponentHighlight(node, opponent)
-	local canHighlight = DisplayHelper.opponentIsHighlightable(opponent)
+	if Opponent.isTbd(opponent) then
+		return node
+	end
 	return node
-		:addClass(canHighlight and 'brkts-opponent-hover' or nil)
-		:attr('aria-label', canHighlight and Opponent.toName(opponent) or nil)
+		:addClass('brkts-opponent-hover')
+		:attr('aria-label', Opponent.toName(opponent))
 end
 
 -- Expands a header code by making a RPC call.
@@ -129,7 +116,7 @@ function DisplayHelper.createSubstitutesComment(match)
 			end
 
 			if opponent.type == Opponent.team then
-				local team = Lua.import('Module:Team').queryRaw(opponent.template)
+				local team = TeamTemplate.getRawOrNil(opponent.template)
 				if team then
 					table.insert(subString, string.format('on <b>%s</b>', Page.makeInternalLink(team.shortname, team.page)))
 				end
@@ -259,7 +246,7 @@ in a different props.MatchSummaryContainer in the Bracket and Matchlist
 components.
 ]]
 ---@param props table
----@return Html
+---@return Widget
 function DisplayHelper.DefaultMatchSummaryContainer(props)
 	local MatchSummaryModule = Lua.import('Module:MatchSummary')
 

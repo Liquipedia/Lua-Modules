@@ -53,6 +53,9 @@ return {
 				playedMatches = 'Matches',
 			},
 		},
+		participants = {
+			defaultPlayerNumber = 3,
+		},
 	},
 	defaultRoundPrecision = 0,
 }

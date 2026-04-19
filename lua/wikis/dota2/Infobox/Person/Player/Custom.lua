@@ -15,12 +15,14 @@ local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
-local Template = Lua.import('Module:Template')
 local YearsActive = Lua.import('Module:YearsActive')
 
 local Flags = Lua.import('Module:Flags')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Injector = Lua.import('Module:Widget/Injector')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 local Player = Lua.import('Module:Infobox/Person')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
@@ -32,11 +34,16 @@ local BANNED = Lua.import('Module:Banned', {loadData = true})
 local SIZE_HERO = '44x25px'
 local CONVERSION_PLAYER_ID_TO_STEAM = 61197960265728
 
+---@class Dota2InfoboxPlayer: Person
+---@field basePageName string
 local CustomPlayer = Class.new(Player)
+
+---@class Dota2InfoboxPlayerWidgetInjector: WidgetInjector
+---@field caller Dota2InfoboxPlayer
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -46,7 +53,7 @@ function CustomPlayer.run(frame)
 	player.args.dotabuff = player.args.playerid
 	player.args.stratz = player.args.playerid
 	if Logic.isNumeric(player.args.playerid) then
-		player.args.steamalternative = '765' .. (tonumber(player.args.playerid) + CONVERSION_PLAYER_ID_TO_STEAM)
+		player.args.steamID64 = '765' .. (tonumber(player.args.playerid) + CONVERSION_PLAYER_ID_TO_STEAM)
 	end
 
 	player.args.informationType = player.args.informationType or 'Player'
@@ -131,15 +138,16 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@return string?
+---@return Widget?
 function CustomPlayer:createBottomContent()
-	if Namespace.isMain() then
-		return tostring(Template.safeExpand(
-			mw.getCurrentFrame(), 'Upcoming_and_ongoing_matches_of_player', {player = self.basePageName})
-			.. '<br>' .. Template.safeExpand(
-			mw.getCurrentFrame(), 'Upcoming_and_ongoing_tournaments_of_player', {player = self.basePageName})
-		)
+	if not Namespace.isMain() then
+		return
 	end
+
+	return HtmlWidgets.Fragment{children = {
+		MatchTicker.player(),
+		UpcomingTournaments.player{name = self.basePageName}
+	}}
 end
 
 ---@return string[]

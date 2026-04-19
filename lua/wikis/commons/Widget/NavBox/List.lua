@@ -19,25 +19,32 @@ local Li = HtmlWidgets.Li
 
 ---@class NavBoxList: Widget
 ---@operator call(table): NavBoxList
+---@field props {children: (string|number|Html|Widget)[], css: string[], supressHtmlList: boolean?}
 local NavBoxList = Class.new(Widget)
-
---text-align:center
 
 ---@return Widget
 function NavBoxList:render()
-	local elements = Array.map(self.props.children, function(child)
-		return Li{
-			children = child
-		}
-	end)
+	local elements = self.props.children
+
+	if not self.props.supressHtmlList then
+		elements = Array.map(self.props.children, function(child)
+			return Li{
+				children = child
+			}
+		end)
+	end
+
+	-- interleaving with new lines is needed for better break points on certain widths
+	elements = Array.interleave(elements, '\n')
+
+	if not self.props.supressHtmlList then
+		elements = {Ul{children = elements}}
+	end
 
 	return Div{
 		classes = {'hlist'},
 		css = Table.merge({padding = '0 0.25em'}, self.props.css),
-		children = {
-			-- interleaving with new lines is needed for better break points on certain widths
-			Ul{children = Array.interleave(elements, '\n')}
-		}
+		children = elements
 	}
 end
 

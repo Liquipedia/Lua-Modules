@@ -26,7 +26,7 @@ local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomMap.run(frame)
 	local map = CustomMap(frame)
 	map:setWidgetInjector(CustomInjector(map))
@@ -54,7 +54,7 @@ function CustomInjector:parse(widgetId, widgets)
 				children = {WidgetImage{
 					imageLight = args.minimap,
 					size = '350px',
-					alignment = 'center',
+					horizontalAlignment = 'center',
 				}}
 			} or nil
 		)

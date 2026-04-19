@@ -85,7 +85,7 @@ function AutomaticPointsTable:storeLPDB(pointsData)
 			name = teamName,
 			information = position,
 			date = date,
-			extradata = mw.ext.LiquipediaDB.lpdb_create_json({
+			extradata = Json.stringify({
 				position = position,
 				totalPoints = totalPoints
 			})

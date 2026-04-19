@@ -12,8 +12,9 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Currency = Lua.import('Module:Currency')
 local DateExt = Lua.import('Module:Date/Ext')
+local Flags = Lua.import('Module:Flags')
 local Game = Lua.import('Module:Game')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Lpdb = Lua.import('Module:Lpdb')
 local Math = Lua.import('Module:MathUtil')
@@ -33,6 +34,7 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
 
 local Count = Lua.import('Module:Count')
 
@@ -700,7 +702,15 @@ function StatisticsPortal.earningsTable(args)
 	if args.opponentType == Opponent.team then
 		opponentData = StatisticsPortal._getTeams()
 	elseif args.opponentType == Opponent.solo then
-		opponentData = StatisticsPortal._getPlayers()
+		opponentData = StatisticsPortal._getPlayers(
+			nil,
+			ConditionUtil.anyOf(
+				ColumnName('nationality'),
+				Array.map(Array.parseCommaSeparatedString(args.nationality), function (nationality)
+					return Flags.CountryName{flag = nationality}
+				end)
+			)
+		)
 	end
 
 	table.sort(opponentData, function(a, b) return earningsFunction(a) > earningsFunction(b) end)
@@ -723,7 +733,7 @@ function StatisticsPortal.earningsTable(args)
 
 		if args.opponentType == Opponent.team then
 			opponentDisplay = OpponentDisplay.BlockOpponent{
-				opponent = {template = opponent.template, type = Opponent.team},
+				opponent = Opponent.readOpponentArgs{template = opponent.template, type = Opponent.team},
 				teamStyle = 'standard',
 			}
 		else
@@ -771,6 +781,13 @@ function StatisticsPortal.playerAgeTable(args)
 		conditions:add{typeConditions}
 	end
 
+	conditions:add(ConditionUtil.anyOf(
+		ColumnName('nationality'),
+		Array.map(Array.parseCommaSeparatedString(args.nationality), function (nationality)
+			return Flags.CountryName{flag = nationality}
+		end)
+	))
+
 	local playerData = StatisticsPortal._getPlayers(args.limit, conditions:toString(), args.order)
 
 	local tbl = mw.html.create('table')
@@ -806,20 +823,31 @@ end
 Section: Query Functions
 ]]--
 
+---Executes a given LPDB query using Lpdb.executeMassQuery
+---@param tableName string Name of the table
+---@param parameters table Query parameters
+---@return table
+function StatisticsPortal._massQuery(tableName, parameters)
+	local data = {}
+
+	Lpdb.executeMassQuery(tableName, parameters, function (item)
+		table.insert(data, item)
+	end, parameters.limit)
+
+	return data
+end
 
 ---@param limit number?
----@param addConditions string?
+---@param addConditions string|AbstractConditionNode?
 ---@param addOrder string?
 ---@return table
 function StatisticsPortal._getPlayers(limit, addConditions, addOrder)
-	local data = mw.ext.LiquipediaDB.lpdb('player', {
+	return StatisticsPortal._massQuery('player', {
 		query = 'pagename, id, nationality, earnings, birthdate, team, earningsbyyear',
-		conditions = addConditions or '',
+		conditions = addConditions and tostring(addConditions) or '',
 		order = addOrder,
-		limit = limit or MAX_QUERY_LIMIT,
+		limit = limit,
 	})
-
-	return data
 end
 
 
@@ -828,14 +856,12 @@ end
 ---@param addOrder string?
 ---@return table
 function StatisticsPortal._getTeams(limit, addConditions, addOrder)
-	local data = mw.ext.LiquipediaDB.lpdb('team', {
+	return StatisticsPortal._massQuery('team', {
 		query = 'pagename, name, template, earnings, earningsbyyear',
 		conditions = addConditions or '',
 		order = addOrder,
-		limit = limit or MAX_QUERY_LIMIT,
+		limit = limit,
 	})
-
-	return data
 end
 
 
@@ -1134,7 +1160,7 @@ end
 ---@param placements table
 ---@param earnings number
 ---@param opponentIndex number
----@param opponentDisplay Html
+---@param opponentDisplay Widget|Html
 ---@return Html
 function StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay)
 	local row = mw.html.create('tr')

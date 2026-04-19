@@ -51,10 +51,10 @@ end
 
 ---Attempts to render a display component in the pure function style.
 ---The error is caught and displayed using classic error style.
----@param Component fun(props: table): Html
+---@param Component fun(props: table): Widget|Html
 ---@param props table
----@param other fun(error: Error): Html
----@return Html
+---@param other fun(error: Error): Widget|Html
+---@return Widget|Html
 function DisplayUtil.TryPureComponent(Component, props, other)
 	return Logic.tryOrElseLog(
 		function() return Component(props) end,
@@ -83,6 +83,18 @@ function DisplayUtil.applyOverflowStyles(node, mode)
 		:css('text-overflow', mode == 'ellipsis' and 'ellipsis' or nil)
 		:css('white-space', (mode == 'ellipsis' or mode == 'hidden') and 'pre' or 'normal')
 end
+
+---Returns the css properties for each overflow behavior. Mode can be 'ellipsis', 'wrap', or 'hidden'.
+---@param mode OverflowModes
+---@return table<string, string?>
+DisplayUtil.getOverflowStyles = FnUtil.memoize(function(mode)
+	return {
+		['overflow'] = (mode == 'ellipsis' or mode == 'hidden') and 'hidden' or nil,
+		['overflow-wrap'] = mode == 'wrap' and 'break-word' or nil,
+		['text-overflow'] = mode == 'ellipsis' and 'ellipsis' or nil,
+		['white-space'] = (mode == 'ellipsis' or mode == 'hidden') and 'pre' or 'normal',
+	}
+end)
 
 -- Whether a value is a mediawiki html node.
 local mwHtmlMetatable = FnUtil.memoize(function()

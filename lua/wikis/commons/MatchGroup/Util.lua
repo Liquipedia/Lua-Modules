@@ -11,9 +11,10 @@ local Array = Lua.import('Module:Array')
 local Date = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
 local FnUtil = Lua.import('Module:FnUtil')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TypeUtil = Lua.import('Module:TypeUtil')
@@ -37,6 +38,7 @@ local MatchGroupUtil = {types = {}}
 ---@class MatchGroupUtilLowerEdge
 ---@field lowerMatchIndex number
 ---@field opponentIndex number
+
 MatchGroupUtil.types.LowerEdge = TypeUtil.struct({
 	lowerMatchIndex = 'number',
 	opponentIndex = 'number',
@@ -47,6 +49,7 @@ MatchGroupUtil.types.AdvanceBg = TypeUtil.literalUnion('up', 'stayup', 'stay', '
 ---@field bg AdvanceBg
 ---@field matchId string?
 ---@field type string?
+
 MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 	bg = MatchGroupUtil.types.AdvanceBg,
 	matchId = 'string?',
@@ -57,7 +60,9 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 ---@field coordinates MatchGroupUtilMatchCoordinates
 ---@field advanceSpots MatchGroupUtilAdvanceSpot[]
 ---@field bracketResetMatchId string?
+---@field bracketType string?
 ---@field header string?
+---@field inheritedHeader string?
 ---@field lowerEdges MatchGroupUtilLowerEdge[]?
 ---@field lowerMatchIds string[]
 ---@field qualLose boolean?
@@ -72,10 +77,12 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 ---@field upperMatchId string?
 ---@field matchId string?
 ---@field matchPage string?
----@field qualifiedHeader boolean?
+---@field qualifiedHeader string?
+
 MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
 	bracketResetMatchId = 'string?',
+	bracketType = 'string?',
 	header = 'string?',
 	inheritedHeader = 'string?',
 	lowerEdges = TypeUtil.array(MatchGroupUtil.types.LowerEdge),
@@ -84,7 +91,7 @@ MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	qualLoseLiteral = 'string?',
 	qualSkip = 'number?',
 	qualWin = 'boolean?',
-	qualifiedHeader = 'boolean?',
+	qualifiedHeader = 'string?',
 	qualWinLiteral = 'string?',
 	skipRound = 'number?',
 	thirdPlaceMatchId = 'string?',
@@ -103,6 +110,7 @@ MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 ---@field sectionIndex number
 ---@field semanticDepth number
 ---@field semanticRoundIndex number
+
 MatchGroupUtil.types.MatchCoordinates = TypeUtil.struct({
 	depth = 'number',
 	depthCount = 'number',
@@ -122,6 +130,7 @@ MatchGroupUtil.types.MatchCoordinates = TypeUtil.struct({
 ---@field type 'matchlist'
 ---@field matchId string?
 ---@field matchPage string?
+
 MatchGroupUtil.types.MatchlistBracketData = TypeUtil.struct({
 	header = 'string?',
 	title = 'string?',
@@ -142,6 +151,8 @@ MatchGroupUtil.types.BracketData = TypeUtil.union(
 ---@field extradata table?
 ---@field pageIsResolved boolean?
 ---@field faction string?
+---@field apiId string?
+
 MatchGroupUtil.types.Player = TypeUtil.struct({
 	displayName = 'string?',
 	flag = 'string?',
@@ -169,6 +180,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 ---@field type OpponentType
 ---@field team string?
 ---@field extradata table
+
 MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	advanceBg = 'string?',
 	advances = 'boolean?',
@@ -191,6 +203,7 @@ MatchGroupUtil.types.Opponent = TypeUtil.struct({
 ---@field players standardPlayer[]
 ---@field template string?
 ---@field type string
+
 MatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 	name = 'string?',
 	players = TypeUtil.optional(TypeUtil.array(MatchGroupUtil.types.Player)),
@@ -207,12 +220,13 @@ MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed
 ---@field dateIsExact boolean
 ---@field game string?
 ---@field header string?
----@field length number?
+---@field length string|number?
 ---@field map string?
 ---@field mapDisplayName string?
 ---@field mode string?
 ---@field opponents {players: table[], score: number?, status: string?}[]
 ---@field patch string?
+---@field resultType string?
 ---@field scores number[]
 ---@field subgroup number?
 ---@field type string?
@@ -220,16 +234,18 @@ MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed
 ---@field winner integer?
 ---@field status string?
 ---@field extradata table?
+
 MatchGroupUtil.types.Game = TypeUtil.struct({
 	comment = 'string?',
 	date = 'string?',
 	game = 'string?',
 	header = 'string?',
-	length = 'number?',
+	length = TypeUtil.optional(TypeUtil.union('number', 'string')),
 	map = 'string?',
 	mapDisplayName = 'string?',
 	mode = 'string?',
 	patch = 'string?',
+	resultType = 'string?',
 	scores = TypeUtil.array('number'),
 	subgroup = 'number?',
 	type = 'string?',
@@ -259,8 +275,10 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field patch string?
 ---@field phase 'upcoming'|'ongoing'|'finished'
 ---@field publisherTier string?
+---@field resultType string?
 ---@field section string?
 ---@field series string?
+---@field shortname string?
 ---@field status MatchStatus
 ---@field stream table
 ---@field tickername string?
@@ -272,6 +290,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field timestamp number
 ---@field timezoneId string?
 ---@field bestof number?
+
 MatchGroupUtil.types.Match = TypeUtil.struct({
 	bracketData = MatchGroupUtil.types.BracketData,
 	comment = 'string?',
@@ -292,8 +311,10 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	parent = 'string?',
 	patch = 'string?',
 	publisherTier = 'string?',
+	resultType = 'string?',
 	section = 'string?',
 	series = 'string?',
+	shortname = 'string?',
 	status = MatchGroupUtil.types.Status,
 	stream = 'table',
 	tickername = 'string?',
@@ -311,29 +332,12 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 ---@class FFAMatchGroupUtilGame: MatchGroupUtilGame
 ---@field stream table
 
----@class standardTeamProps
----@field bracketName string
----@field displayName string
----@field pageName string?
----@field shortName string
----@field imageLight string?
----@field imageDark string?
----@field hasLegacyImage boolean
-MatchGroupUtil.types.Team = TypeUtil.struct({
-	bracketName = 'string',
-	displayName = 'string',
-	pageName = 'string?',
-	shortName = 'string',
-	imageLight = 'string?',
-	imageDark = 'string?',
-	hasLegacyImage = 'boolean',
-})
-
 ---@class MatchGroupUtilMatchlist
 ---@field bracketDatasById table<string, MatchGroupUtilBracketBracketData>
 ---@field matches MatchGroupUtilMatch[]
 ---@field matchesById table<string, MatchGroupUtilMatch>
 ---@field type 'matchlist'
+
 MatchGroupUtil.types.Matchlist = TypeUtil.struct({
 	bracketDatasById = TypeUtil.table('string', MatchGroupUtil.types.BracketData),
 	matches = TypeUtil.array(MatchGroupUtil.types.Match),
@@ -350,6 +354,7 @@ MatchGroupUtil.types.Matchlist = TypeUtil.struct({
 ---@field rounds string[][]
 ---@field sections string[][]
 ---@field type 'bracket'
+
 MatchGroupUtil.types.Bracket = TypeUtil.struct({
 	bracketDatasById = TypeUtil.table('string', MatchGroupUtil.types.BracketData),
 	coordinatesByMatchId = TypeUtil.table('string', MatchGroupUtil.types.MatchCoordinates),
@@ -366,6 +371,19 @@ MatchGroupUtil.types.MatchGroup = TypeUtil.union(
 	MatchGroupUtil.types.Matchlist,
 	MatchGroupUtil.types.Bracket
 )
+
+---Fetches all match ids of matches that satisfy the supplied condition
+---@param props {conditions: string|AbstractConditionNode, limit: string|integer?, order: string?}
+---@return string[]
+function MatchGroupUtil.fetchMatchIds(props)
+	---@type string[]
+	return Array.map(mw.ext.LiquipediaDB.lpdb('match2', {
+		limit = tonumber(props.limit) or 1000,
+		query = 'match2id',
+		conditions = tostring(props.conditions),
+		order = props.order
+	}), Operator.property('match2id'))
+end
 
 ---Fetches all matches in a matchlist or bracket. Tries to read from page variables before fetching from LPDB.
 ---Returns a list of records ordered lexicographically by matchId.
@@ -571,6 +589,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		resultType = nilIfEmpty(record.resulttype),
 		section = nilIfEmpty(record.section),
 		series = nilIfEmpty(record.series),
+		shortname = nilIfEmpty(record.shortname),
 		status = nilIfEmpty(record.status),
 		stream = Json.parseIfString(record.stream) or {},
 		tickername = record.tickername,
@@ -612,6 +631,7 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 			qualWinLiteral = nilIfEmpty(data.qualwinLiteral),
 			matchPage = nilIfEmpty(data.matchpage),
 			skipRound = tonumber(data.skipround) or data.skipround == 'true' and 1 or 0,
+			bracketType = nilIfEmpty(data.bracketType),
 			thirdPlaceMatchId = nilIfEmpty(data.thirdplace),
 			type = 'bracket',
 			upperMatchId = nilIfEmpty(data.upperMatchId),
@@ -647,6 +667,7 @@ function MatchGroupUtil.bracketDataToRecord(bracketData)
 		qualwin = bracketData.qualWin and 'true' or nil,
 		qualwinLiteral = bracketData.qualWinLiteral,
 		skipround = bracketData.skipRound ~= 0 and bracketData.skipRound or nil,
+		bracketType = bracketData.bracketType,
 		thirdplace = bracketData.thirdPlaceMatchId,
 		tolower = bracketData.lowerMatchIds[#bracketData.lowerMatchIds],
 		toupper = bracketData.lowerMatchIds[#bracketData.lowerMatchIds - 1],
@@ -873,27 +894,6 @@ function MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
 	end
 
 	return mergedMatch
-end
-
----Fetches information about a team via mw.ext.TeamTemplate.
----@deprecated This function is only used on OpponentDisplay and should be removed once team handling is refactored.
----@param template string
----@return standardTeamProps?
-function MatchGroupUtil.fetchTeam(template)
-	local rawTeam = mw.ext.TeamTemplate.raw(template)
-	if not rawTeam then
-		return nil
-	end
-
-	return {
-		bracketName = rawTeam.bracketname,
-		displayName = rawTeam.name,
-		pageName = rawTeam.page,
-		shortName = rawTeam.shortname,
-		imageLight = Logic.emptyOr(rawTeam.image, rawTeam.legacyimage),
-		imageDark = Logic.emptyOr(rawTeam.imagedark, rawTeam.legacyimagedark),
-		hasLegacyImage = Logic.isEmpty(rawTeam.image) and Logic.isNotEmpty(rawTeam.legacyimage)
-	}
 end
 
 ---Parse extradata as a JSON string if read from page variables. Otherwise create a copy if fetched from lpdb.

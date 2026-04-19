@@ -31,7 +31,7 @@ local CustomResultsTable = {}
 
 -- Template entry point
 ---@param frame Frame
----@return Html?
+---@return Widget?
 function CustomResultsTable.results(frame)
 	local args = Arguments.getArgs(frame)
 	args.useIndivPrize = true
@@ -54,7 +54,7 @@ end
 
 -- Template entry point for awards
 ---@param frame Frame
----@return Html?
+---@return Widget?
 function CustomResultsTable.awards(frame)
 	local args = Arguments.getArgs(frame)
 	args.useIndivPrize = true
@@ -203,7 +203,7 @@ end
 ---@param args table
 ---@param prefix string
 ---@param side number
----@return Html
+---@return Widget
 function CustomResultsTable._opponentDisplay(args, prefix, side)
 	local players = {CustomResultsTable._buildPlayerStruct(args, prefix .. 'p' .. side)}
 

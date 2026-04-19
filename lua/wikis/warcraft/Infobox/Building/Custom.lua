@@ -44,7 +44,7 @@ local ADDITIONAL_BUILDING_RACES = {
 }
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomBuilding.run(frame)
 	local building = CustomBuilding(frame)
 	building:setWidgetInjector(CustomInjector(building))

@@ -11,11 +11,16 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Template = Lua.import('Module:Template')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
 
 local Game = Lua.import('Module:Game')
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
@@ -64,16 +69,13 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@return string?
+---@return Widget?
 function CustomTeam:createBottomContent()
-	if not self.args.disbanded and mw.ext.TeamTemplate.teamexists(self.pagename) then
-		local teamPage = mw.ext.TeamTemplate.teampage(self.pagename)
-
-		return Template.expandTemplate(
-			mw.getCurrentFrame(),
-			'Upcoming and ongoing tournaments of',
-			{team = self.args.lpdbname or teamPage}
-		)
+	if not self.args.disbanded then
+		return UpcomingTournaments.team{
+			name = self.args.lpdbname or self.teamTemplate.templatename,
+			additionalConditions = ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Points')
+		}
 	end
 end
 

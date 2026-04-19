@@ -12,15 +12,7 @@ local Class = Lua.import('Module:Class')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
-
-local DEFAULT_VETO_TYPE_TO_TEXT = {
-	ban = 'BAN',
-	pick = 'PICK',
-	decider = 'DECIDER',
-	defaultban = 'DEFAULT BAN',
-	protect = 'PROTECT',
-}
-local VETO_DECIDER = 'decider'
+local VetoLabel = Lua.import('Module:Widget/Match/Summary/VetoLabel')
 
 ---@class MatchSummaryMapVetoRound: Widget
 ---@operator call(table): MatchSummaryMapVetoRound
@@ -30,11 +22,6 @@ local MatchSummaryMapVetoRound = Class.new(Widget)
 function MatchSummaryMapVetoRound:render()
 	local vetoType = self.props.vetoType
 	if not vetoType then
-		return
-	end
-
-	local vetoText = DEFAULT_VETO_TYPE_TO_TEXT[vetoType]
-	if not vetoText then
 		return
 	end
 
@@ -48,23 +35,38 @@ function MatchSummaryMapVetoRound:render()
 		}
 	end
 
-	local typeClass = 'brkts-popup-mapveto-' .. vetoType
-	local function createVetoTypeElement()
-		return HtmlWidgets.Span{classes = {typeClass, 'brkts-popup-mapveto-vetotype'}, children = vetoText}
-	end
+	local vetoLabel = VetoLabel{vetoType = vetoType}
 
 	local children
-	if vetoType == VETO_DECIDER then
+	if vetoType == 'decider' then
 		children = {
-			HtmlWidgets.Td{children = createVetoTypeElement()},
-			HtmlWidgets.Td{children = displayMap(self.props.map1)},
-			HtmlWidgets.Td{children = createVetoTypeElement()},
+			HtmlWidgets.Td{
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-left'},
+				children = vetoLabel
+			},
+			HtmlWidgets.Td{
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-center'},
+				children = displayMap(self.props.map1)
+			},
+			HtmlWidgets.Td{
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-right'},
+				children = vetoLabel
+			},
 		}
 	else
 		children = {
-			HtmlWidgets.Td{children = displayMap(self.props.map1)},
-			HtmlWidgets.Td{children = createVetoTypeElement()},
-			HtmlWidgets.Td{children = displayMap(self.props.map2)},
+			HtmlWidgets.Td{
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-left'},
+				children = displayMap(self.props.map1)
+			},
+			HtmlWidgets.Td{
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-center'},
+				children = vetoLabel
+			},
+			HtmlWidgets.Td{
+				classes = {'brkts-popup-mapveto__data-cell brkts-popup-mapveto__data-cell-text-right'},
+				children = displayMap(self.props.map2)
+			},
 		}
 	end
 

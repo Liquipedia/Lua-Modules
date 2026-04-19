@@ -23,7 +23,7 @@ Config.MAX_NUMBER_OF_PARTICIPANTS = 7
 Config.MAX_NUMBER_OF_COACHES = 2
 
 -- These are the notability thresholds needed by a team/player
-Config.NOTABILITY_THRESHOLD_MIN = 13
+Config.NOTABILITY_THRESHOLD_MIN = 15
 Config.NOTABILITY_THRESHOLD_NOTABLE = 15
 
 -- These are all the liquipediatiertypes which should be extra "penalised"
@@ -289,7 +289,7 @@ function Config.placementDropOffFunction(tier, tierType)
 	end
 
 	return function(score, placement)
-        -- The current notability guidelines award set amount of points based on placement and tier of event.
+		-- The current notability guidelines award set amount of points based on placement and tier of event.
 		for _, range in ipairs(Config.scoreRanges[tier]) do
 			if placement <= range.max then
 				local points = range.points

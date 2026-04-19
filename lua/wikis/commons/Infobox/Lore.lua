@@ -19,9 +19,10 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
 ---@class LoreInfobox: BasicInfobox
+---@operator call(Frame): LoreInfobox
 local Cosmetic = Class.new(BasicInfobox)
 
----@return string
+---@return Widget
 function Cosmetic:createInfobox()
 	local args = self.args
 	self:customParseArguments(args)
@@ -58,7 +59,7 @@ function Cosmetic:createInfobox()
 		self:setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Lore')
 end
 
 ---@param args table

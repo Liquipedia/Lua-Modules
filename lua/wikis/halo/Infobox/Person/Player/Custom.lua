@@ -23,7 +23,7 @@ local CustomInjector = Class.new(Injector)
 
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))

@@ -27,6 +27,8 @@ local Center = Widgets.Center
 
 ---@class ValorantLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
+---@class ValorantLeagueInfoboxWidgetInjector: WidgetInjector
+---@field caller ValorantLeagueInfobox
 local CustomInjector = Class.new(Injector)
 
 local VALID_PUBLISHERTIERS = {
@@ -37,7 +39,7 @@ local VALID_PUBLISHERTIERS = {
 local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
@@ -112,8 +114,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(self:getAllArgsForBase(args, 'map'), ';')
 
 	lpdbData.extradata.region = Template.safeExpand(mw.getCurrentFrame(), 'Template:Player region', {args.country})
-	lpdbData.extradata.startdate_raw = args.sdate or args.date
-	lpdbData.extradata.enddate_raw = args.edate or args.date
 	lpdbData.extradata.gamechangers = tostring(self.data.gameChangers)
 
 	return lpdbData

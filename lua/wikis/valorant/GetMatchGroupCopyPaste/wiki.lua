@@ -84,6 +84,7 @@ function WikiCopyPaste._getMap(args, mapIndex)
 	if Logic.readBool(args.generateMatchPage) then
 		return table.concat({
 			INDENT .. '|map' .. mapIndex .. '={{ApiMap',
+			INDENT .. INDENT .. '|map=',
 			INDENT .. INDENT .. '|matchid=',
 			INDENT .. INDENT .. '|reversed=',
 			INDENT .. INDENT .. '|vod=',

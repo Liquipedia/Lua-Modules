@@ -10,13 +10,24 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local Tier = Lua.import('Module:Tier/Utils')
 
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
----@class TournamentsTickerPillWidget: Widget
----@operator call(table): TournamentsTickerPillWidget
+---@class TournamentsTickerPillWidgetProps
+---@field tournament StandardTournament
+---@field variant 'solid'|'subtle'?
+---@field colorScheme 'full'|'top3'?
 
+---@class TournamentsTickerPillWidget: Widget
+---@operator call(TournamentsTickerPillWidgetProps): TournamentsTickerPillWidget
+---@field props TournamentsTickerPillWidgetProps
 local TournamentsTickerPillWidget = Class.new(Widget)
+
+TournamentsTickerPillWidget.defaultProps = {
+	variant = 'solid',
+	colorScheme = 'full',
+}
 
 local COLOR_CLASSES = {
 	[1] = 'tier1',
@@ -42,32 +53,40 @@ function TournamentsTickerPillWidget:render()
 		return
 	end
 
-	local tierShort, tierTypeShort = Tier.toShortName(tournament.liquipediaTier,tournament.liquipediaTierType)
+	local subtle = self.props.variant == 'subtle'
+	local tierShort, tierTypeShort = Tier.toShortName(tournament.liquipediaTier, tournament.liquipediaTierType)
 
-	local tierNode, tierTypeNode, colorClass
-	if tierTypeShort then
+	local colorClass
+	if tierTypeShort and not subtle then
 		colorClass = COLOR_CLASSES[tournament.liquipediaTierType]
-		tierNode = HtmlWidgets.Div{
-			classes = {'tournament-badge__chip', 'chip--' .. COLOR_CLASSES[tournament.liquipediaTier]},
-			children = tierShort,
-		}
-		tierTypeNode = HtmlWidgets.Div{
-			classes = {'tournament-badge__text'},
-			children = tierTypeShort,
-		}
 	else
 		colorClass = COLOR_CLASSES[tournament.liquipediaTier]
-		tierNode = HtmlWidgets.Div{
-			classes = {'tournament-badge__text'},
-			children = Tier.toName(tournament.liquipediaTier),
-		}
 	end
-
 	colorClass = colorClass or COLOR_CLASSES.default
 
+	local chipText = subtle and Tier.toName(tournament.liquipediaTier) or tierShort
+	local textContent = tierTypeShort and tierTypeShort or Tier.toName(tournament.liquipediaTier)
+
 	return HtmlWidgets.Div{
-		classes = {'tournament-badge', 'badge--' .. colorClass},
-		children = {tierNode, tierTypeNode},
+		classes = WidgetUtil.collect(
+			'tournament-badge',
+			'badge--' .. colorClass,
+			subtle and 'tournament-badge--subtle' or nil,
+			self.props.colorScheme == 'top3' and 'tournament-badge--top3' or nil
+		),
+		children = WidgetUtil.collect(
+			tierTypeShort and HtmlWidgets.Div{
+				classes = WidgetUtil.collect(
+					'tournament-badge__chip',
+					not subtle and 'chip--' .. COLOR_CLASSES[tournament.liquipediaTier] or nil
+				),
+				children = chipText,
+			} or nil,
+			HtmlWidgets.Div{
+				classes = {'tournament-badge__text'},
+				children = textContent,
+			}
+		),
 	}
 end
 

@@ -1,0 +1,87 @@
+---
+-- @Liquipedia
+-- page=Module:Widget/Match/Header/Ffa
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Operator = Lua.import('Module:Operator')
+
+local Widget = Lua.import('Module:Widget')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Trophy = Lua.import('Module:Widget/Match/Summary/Ffa/Trophy')
+local Div = HtmlWidgets.Div
+
+local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
+local Placement = Lua.import('Module:Placement')
+
+---@class MatchHeaderFfaProps
+---@field match FFAMatchGroupUtilMatch
+---@field teamStyle? teamStyle
+
+---@class MatchHeaderFfa: Widget
+---@operator call(MatchHeaderFfaProps): MatchHeaderFfa
+---@field props MatchHeaderFfaProps
+local MatchHeaderFfa = Class.new(Widget)
+MatchHeaderFfa.defaultProps = {
+	teamStyle = 'short',
+}
+
+---@return Widget?
+function MatchHeaderFfa:render()
+	local match = self.props.match
+	if not match then
+		return nil
+	end
+
+	if #match.opponents <= 2 or not match.finished then
+		return
+	end
+
+	local topThree = Array.sub(
+		Array.sortBy(
+			Array.filter(
+				match.opponents,
+				Operator.property('placement')
+			),
+			Operator.property('placement')
+		),
+		1, 3
+	)
+
+	local positionRows = Array.map(topThree, function(opponent, i)
+		return Div {
+			classes = { 'match-info-headerbr-positionrow' },
+			children = {
+				Div {
+					classes = { 'match-info-headerbr-positionholder' },
+					children = {
+						Trophy{ place = i },
+						Placement._makeOrdinal({ i })[1]
+					}
+				},
+				Div {
+					classes = { 'match-info-headerbr-opponent' },
+					children = {
+						OpponentDisplay.BlockOpponent {
+							opponent = opponent,
+							teamStyle = self.props.teamStyle,
+							overflow = 'ellipsis',
+						}
+					}
+				}
+			}
+		}
+	end)
+
+	return Div {
+		classes = { 'match-info-headerbr' },
+		children = positionRows
+	}
+end
+
+return MatchHeaderFfa

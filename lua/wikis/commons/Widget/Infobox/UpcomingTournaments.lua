@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
+local Tournament = Lua.import('Module:Tournament')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -19,57 +20,54 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local Opponent = Lua.import('Module:Opponent/Custom')
-
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local Header = Lua.import('Module:Widget/Infobox/UpcomingTournaments/Header')
-local Row = Lua.import('Module:Widget/Infobox/UpcomingTournaments/Row')
-local WidgetUtil = Lua.import('Module:Widget/Util')
+local TournamentsTickerListItem = Lua.import('Module:Widget/Tournaments/Ticker/ListItem')
 
----@class UpcomingTournamentsParameters
----@field name string
----@field type OpponentType
+---@class UpcomingTournamentsWidgetParameters
+---@field opponentConditions AbstractConditionNode
 ---@field options table?
 
----@class UpcomingTournaments: Widget
----@operator call(UpcomingTournamentsParameters): UpcomingTournaments
----@field props UpcomingTournamentsParameters
-local UpcomingTournaments = Class.new(Widget)
-UpcomingTournaments.defaultProps = {
-	name = mw.title.getCurrentTitle().text,
-	type = Opponent.team
-}
+---@class UpcomingTournamentsWidget: Widget
+---@operator call(UpcomingTournamentsWidgetParameters): UpcomingTournamentsWidget
+---@field props UpcomingTournamentsWidgetParameters
+local UpcomingTournamentsWidget = Class.new(Widget)
 
 ---@return Widget
-function UpcomingTournaments:render()
+function UpcomingTournamentsWidget:render()
 	return Div{
 		classes = {'fo-nttax-infobox', 'wiki-bordercolor-light', 'noincludereddit'},
 		css = {['border-top'] = 'none'},
-		children = WidgetUtil.collect(
-			Header{},
+		children = {
+			Div{children = Div{
+				classes = {'infobox-header', 'wiki-backgroundcolor-light'},
+				children = 'Upcoming Tournaments'
+			}},
 			self:_getTournaments()
-		)
+		}
 	}
 end
 
 ---@private
----@return Widget|Widget[]
-function UpcomingTournaments:_getTournaments()
+---@return Widget
+function UpcomingTournamentsWidget:_getTournaments()
 	local conditions = ConditionTree(BooleanOperator.all)
-		:add(ConditionNode(ColumnName('opponentname'), Comparator.eq, self.props.name))
-		:add(ConditionNode(ColumnName('opponenttype'), Comparator.eq, self.props.type))
-		:add(ConditionNode(ColumnName('date'), Comparator.gt, DateExt.getCurrentTimestamp() - 86400))
+		:add(self.props.opponentConditions)
+		:add(ConditionNode(
+			ColumnName('date'), Comparator.gt, DateExt.getCurrentTimestamp() - DateExt.daysToSeconds(1)
+		))
 		:add(ConditionNode(ColumnName('placement'), Comparator.eq, ''))
 
-	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
+	local tournaments = Array.map(mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = conditions:toString(),
 		order = 'startdate asc',
-		query = 'tournament, date, startdate, pagename, icon, icondark, publishertier, extradata'
-	})
+		query = 'pagename'
+	}), function (placement)
+		return Tournament.getTournament(placement.pagename)
+	end)
 
-	if Logic.isEmpty(placements) then
+	if Logic.isEmpty(tournaments) then
 		return Div{
 			classes = {'text-center'},
 			css = {
@@ -82,9 +80,13 @@ function UpcomingTournaments:_getTournaments()
 			children = 'No Upcoming Tournaments'
 		}
 	end
-	return Array.map(placements, function (placement)
-		return Row{data = placement, options = self.props.options}
-	end)
+	return Div{
+		classes = {'tournaments-list-type-list'},
+		css = {['margin-bottom'] = 'unset !important'},
+		children = Array.map(tournaments, function (tournament)
+			return TournamentsTickerListItem{tournament = tournament}
+		end)
+	}
 end
 
-return UpcomingTournaments
+return UpcomingTournamentsWidget

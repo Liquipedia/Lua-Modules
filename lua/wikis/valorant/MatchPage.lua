@@ -9,20 +9,31 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
+local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Carousel = Lua.import('Module:Widget/Basic/Carousel')
 local Div = HtmlWidgets.Div
+local GeneralCollapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
+local PlayerStatContainer = Lua.import('Module:Widget/Match/Page/PlayerStat/Container')
 local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
+local Span = HtmlWidgets.Span
+local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 ---@class ValorantMatchPage: BaseMatchPage
 ---@operator call(MatchPageMatch): ValorantMatchPage
@@ -31,11 +42,27 @@ local MatchPage = Class.new(BaseMatchPage)
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
 local ROUNDS_BEFORE_SPLIT = 12
-local WIN_TYPE_TO_ICON = {
-	['elimination'] = 'elimination',
-	['detonate'] = 'explosion_valorant',
-	['defuse'] = 'defuse',
-	['time'] = 'outoftime'
+local WIN_TYPES = {
+	['elimination'] = {
+		icon = 'elimination',
+		description = 'Enemy eliminated',
+	},
+	['detonate'] = {
+		icon = 'explosion_valorant',
+		description = 'Spike detonated',
+	},
+	['defuse'] = {
+		icon = 'defuse',
+		description = 'Spike defused',
+	},
+	['time'] = {
+		icon = 'outoftime',
+		description = 'Timer expired',
+	},
+	surrendered = {
+		icon = 'surrendered',
+		description = 'Surrendered'
+	}
 }
 
 ---@param props {match: MatchGroupUtilMatch}
@@ -43,27 +70,61 @@ local WIN_TYPE_TO_ICON = {
 function MatchPage.getByMatchId(props)
 	local matchPage = MatchPage(props.match)
 
-	-- Update the view model with game and team data
-	matchPage:populateGames()
-
-	-- Add more opponent data field
-	matchPage:populateOpponents()
-
 	return matchPage:render()
 end
 
 function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
-		game.teams = Array.map(Array.range(1, 2), function(teamIdx)
-			local team = {}
-
+		game.teams = game.opponents
+		Array.forEach(game.teams, function(team, teamIdx)
 			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
-			team.players = Array.filter(game.opponents[teamIdx].players or {}, Table.isNotEmpty)
-
-			return team
+			team.postPlant = team.postPlant or {}
 		end)
 	end)
+end
+
+---@return Widget?
+function MatchPage:renderOverallStats()
+	if self:isBestOfOne() then
+		return
+	end
+
+	local overallTeamData = {
+		finished = true,
+		teams = Array.map(self.opponents, Operator.property('extradata'))
+	}
+
+	local overallPlayerData = {
+		teams = Array.map(Array.range(1, 2), function(teamIdx)
+			local team = { players = {} }
+			local opponent = self.opponents[teamIdx]
+			if opponent and opponent.players then
+				team.players = Array.map(opponent.players, function(player)
+					if not player.extradata or not player.extradata.overallStats then
+						return
+					end
+					local playerData = player.extradata.overallStats
+
+					if not playerData.roundsPlayed or playerData.roundsPlayed == 0 then
+						return
+					end
+
+					playerData.player = player.pageName
+					playerData.displayName = player.displayName
+					return playerData
+				end)
+			end
+			return team
+		end)
+	}
+
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(
+			self:_renderTeamStats(overallTeamData),
+			self:_renderPerformance(overallPlayerData)
+		)
+	}
 end
 
 ---@param game MatchPageGame
@@ -73,6 +134,8 @@ function MatchPage:renderGame(game)
 		children = WidgetUtil.collect(
 			self:_renderGameOverview(game),
 			self:_renderRoundsOverview(game),
+			self:_renderRoundDetails(game),
+			self:_renderTeamStats(game),
 			self:_renderPerformance(game)
 		)
 	}
@@ -213,6 +276,24 @@ function MatchPage:_renderGameOverview(game)
 end
 
 ---@private
+---@param winningSide string
+---@param winBy string
+---@return Widget?
+function MatchPage._renderRoundOutcomeIcon(winningSide, winBy)
+	local iconName = (WIN_TYPES[winBy] or {}).icon
+	if not iconName then
+		return
+	end
+	return IconFa{
+		iconName = iconName,
+		additionalClasses = {
+			'match-bm-rounds-overview-round-outcome-icon',
+			'match-bm-rounds-overview-round-outcome-icon--' .. winningSide
+		}
+	}
+end
+
+---@private
 ---@param game MatchPageGame
 ---@return Widget
 function MatchPage:_renderRoundsOverview(game)
@@ -221,22 +302,225 @@ function MatchPage:_renderRoundsOverview(game)
 		roundsPerHalf = ROUNDS_BEFORE_SPLIT,
 		opponent1 = self.matchData.opponents[1],
 		opponent2 = self.matchData.opponents[2],
-		---@param winningSide string
-		---@param winBy string
-		---@return Widget?
-		iconRender = function(winningSide, winBy)
-			local iconName = WIN_TYPE_TO_ICON[winBy]
-			if not iconName then
-				return
-			end
-			return IconFa{
-				iconName = iconName,
-				additionalClasses = {
-					'match-bm-rounds-overview-round-outcome-icon',
-					'match-bm-rounds-overview-round-outcome-icon--' .. winningSide
+		iconRender = MatchPage._renderRoundOutcomeIcon,
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@return Widget[]
+function MatchPage:_renderTeamStats(game)
+	return {
+		HtmlWidgets.H3{children = 'Team Stats'},
+		Div{
+			classes = {'match-bm-team-stats'},
+			children = {
+				Div{
+					classes = {'match-bm-lol-team-stats-header'},
+					children = {
+						Div{
+							classes = {'match-bm-lol-team-stats-header-team'},
+							children = self.opponents[1].iconDisplay
+						},
+						Div{
+							classes = {'match-bm-team-stats-list-cell'},
+							css = {flex = 1},
+							children = self:getTournamentIcon()
+						},
+						Div{
+							classes = {'match-bm-lol-team-stats-header-team'},
+							children = self.opponents[2].iconDisplay
+						}
+					}
+				},
+				StatsList{
+					finished = game.finished,
+					data = {
+						{
+							icon = IconFa{iconName = 'team_firstkills'},
+							name = 'First Kills',
+							team1Value = game.teams[1].firstKills,
+							team2Value = game.teams[2].firstKills,
+						},
+						{
+							icon = IconImage{
+								imageLight = 'VALORANT Creds lightmode.png',
+								imageDark = 'VALORANT Creds darkmode.png',
+								size = '16px',
+							},
+							name = 'Thrifties',
+							team1Value = game.teams[1].thrifties,
+							team2Value = game.teams[2].thrifties
+						},
+						{
+							icon = IconFa{iconName = 'flawless_valorant'},
+							name = 'Flawless',
+							team1Value = game.teams[1].flawless,
+							team2Value = game.teams[2].flawless,
+						},
+						{
+							icon = IconImage{
+								imageLight = 'VALORANT Spike lightmode.png',
+								imageDark = 'VALORANT Spike darkmode.png',
+								size = '16px',
+							},
+							name = 'Post Plant',
+							team1Value = Array.interleave(game.teams[1].postPlant, SPAN_SLASH),
+							team2Value = Array.interleave(game.teams[2].postPlant, SPAN_SLASH)
+						},
+						{
+							icon = IconImage{
+								imageLight = 'VALORANT clutch lightmode.png',
+								imageDark = 'VALORANT clutch darkmode.png',
+								size = '16px',
+							},
+							name = 'Clutches',
+							team1Value = game.teams[1].clutches,
+							team2Value = game.teams[2].clutches
+						},
+					}
 				}
 			}
-		end,
+		}
+	}
+end
+
+---@param game MatchPageGame
+---@param puuid string
+---@return {player: string, displayName: string}?
+function MatchPage._findPlayerByPuuid(game, puuid)
+	if Logic.isEmpty(puuid) then
+		return
+	end
+	for _, opponent in ipairs(game.opponents) do
+		for _, player in ipairs(opponent.players) do
+			if player.puuid == puuid then
+				return player
+			end
+		end
+	end
+end
+
+---@param ceremony string?
+---@return Widget?
+MatchPage._displayCeremony = FnUtil.memoize(function (ceremony)
+	if Logic.isEmpty(ceremony) then
+		return
+	end
+
+	---@return Widget?
+	local function getCeremonyIcon()
+		if ceremony == 'Clutch' then
+			return IconImage{
+				imageLight = 'VALORANT clutch lightmode.png',
+				imageDark = 'VALORANT clutch darkmode.png',
+				size = '16px',
+			}
+		elseif ceremony == 'Ace' then
+			return IconFa{iconName = 'ace_valorant'}
+		elseif ceremony == 'Thrifty' then
+			return IconImage{
+				imageLight = 'VALORANT Creds lightmode.png',
+				imageDark = 'VALORANT Creds darkmode.png',
+				size = '16px',
+			}
+		elseif ceremony == 'Flawless' then
+			return IconFa{iconName = 'flawless_valorant'}
+		end
+	end
+
+	local ceremonyIcon = getCeremonyIcon()
+
+	if not ceremonyIcon then
+		return
+	end
+
+	return Span{children = {
+		ceremonyIcon,
+		' ',
+		HtmlWidgets.B{children = ceremony}
+	}}
+end)
+
+---@private
+---@param game MatchPageGame
+---@return Widget
+function MatchPage:_renderRoundDetails(game)
+	local findPlayer = FnUtil.memoize(FnUtil.curry(MatchPage._findPlayerByPuuid, game))
+	return GeneralCollapsible{
+		title = 'Round Details',
+		classes = {'match-bm-match-collapsible'},
+		shouldCollapse = true,
+		collapseAreaClasses = {'match-bm-match-collapsible-content'},
+		children = Carousel{children = Array.map(game.extradata.rounds or {}, function (round, roundIndex)
+				return self:_renderRoundDetail(findPlayer, round, roundIndex)
+		end)}
+	}
+end
+
+---@private
+---@param findPlayer fun(puuid: string): {player: string, displayName: string}?
+---@param round ValorantRoundData
+---@param roundIndex integer
+---@return Widget
+function MatchPage:_renderRoundDetail(findPlayer, round, roundIndex)
+	local firstKillPlayer = findPlayer(round.firstKill.killer) or {}
+	local ceremonyPlayer = findPlayer(round.ceremonyFor)
+	local roundWinType = WIN_TYPES[round.winBy] or {}
+
+	return Div{
+		classes = {'match-bm-match-round-detail'},
+		children = WidgetUtil.collect(
+			Span{
+				classes = {
+					'match-bm-match-round-detail-header',
+					'match-bm-match-round-detail-header--' .. round.winningSide
+				},
+				children = {
+					'Round ',
+					roundIndex,
+				}
+			},
+			Div{
+				classes = {
+					'match-bm-match-round-detail-body',
+				},
+				children = {
+					Div{
+						classes = {'match-bm-match-round-detail-body-result'},
+						children = WidgetUtil.collect(
+							MatchPage._renderRoundOutcomeIcon(round.winningSide, round.winBy),
+							Span{
+								classes = {'match-bm-match-round-detail-body-result-desc'},
+								children = roundWinType.description
+							},
+							Div{
+								classes = {'match-bm-match-round-detail-body-result-winner'},
+								children = {
+									self.opponents[(round.winningSide == round.t1side) and 1 or 2].iconDisplay,
+									HtmlWidgets.B{children = 'Winner'},
+								}
+							}
+						)
+					},
+					HtmlWidgets.Hr{},
+					Span{children = {
+						IconFa{iconName = 'team_firstkills'},
+						HtmlWidgets.B{children = ' First Kill'},
+						' ',
+						Link{link = firstKillPlayer.player, children = firstKillPlayer.displayName}
+					}},
+					Span{children = WidgetUtil.collect(
+						MatchPage._displayCeremony(Logic.emptyOr(round.ceremony, round.flawless and 'Flawless' or nil)),
+						ceremonyPlayer and {
+							' ',
+							Link{link = ceremonyPlayer.player, children = ceremonyPlayer.displayName}
+						} or nil
+					)}
+				}
+
+			}
+		)
 	}
 end
 
@@ -249,8 +533,8 @@ function MatchPage:_renderPerformance(game)
 		Div{
 			classes = {'match-bm-players-wrapper'},
 			children = {
-				self:_renderPerformanceForTeam(game, 1),
-				self:_renderPerformanceForTeam(game, 2)
+				self:_renderTeamPerformance(game, 1),
+				self:_renderTeamPerformance(game, 2)
 			}
 		}
 	}
@@ -260,7 +544,7 @@ end
 ---@param game MatchPageGame
 ---@param teamIndex integer
 ---@return Widget
-function MatchPage:_renderPerformanceForTeam(game, teamIndex)
+function MatchPage:_renderTeamPerformance(game, teamIndex)
 	return Div{
 		classes = {'match-bm-players-team'},
 		children = WidgetUtil.collect(
@@ -274,7 +558,7 @@ function MatchPage:_renderPerformanceForTeam(game, teamIndex)
 					function (player) return player.acs or 0 end
 				)),
 				function (player)
-					return self:_renderPlayerPerformance(game, teamIndex, player)
+					return self:_renderPlayerPerformance(player)
 				end
 			)
 		)
@@ -282,55 +566,80 @@ function MatchPage:_renderPerformanceForTeam(game, teamIndex)
 end
 
 ---@private
----@param game MatchPageGame
----@param teamIndex integer
 ---@param player table
----@return Widget
-function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
+---@return Widget?
+function MatchPage:_renderPlayerPerformance(player)
+	if Logic.isEmpty(player) then
+		return
+	end
+
 	local formatNumbers = function(value, numberOfDecimals)
 		if not value then
 			return nil
 		end
-		numberOfDecimals = numberOfDecimals or 0
-		local format = '%.'.. numberOfDecimals ..'f'
-		return string.format(format, MathUtil.round(value, numberOfDecimals))
+		return MathUtil.formatRounded{value = value, precision = numberOfDecimals}
 	end
+
+	local playerDisplay
+	if type(player.agent) == 'table' then
+		playerDisplay = Div{
+			classes = {'match-bm-players-player-name'},
+			children = {
+				Link{link = player.player, children = player.displayName},
+				MatchSummaryWidgets.Characters{characters = player.agent, date = self.matchData.date},
+			}
+		}
+	else
+		playerDisplay = PlayerDisplay{
+			characterIcon = self:getCharacterIcon(player.agent),
+			characterName = player.agent,
+			playerName = player.displayName or player.player,
+			playerLink = player.player,
+		}
+	end
+
+	local playerStats = {
+		PlayerStat{
+			title = {IconFa{iconName = 'acs'}, 'ACS'},
+			data = player.acs and formatNumbers(player.acs) or nil,
+		},
+		PlayerStat{
+			title = {IconFa{iconName = 'kda'}, 'KDA'},
+			data = Array.interleave({
+				player.kills, player.deaths, player.assists
+			}, SPAN_SLASH)
+		},
+		PlayerStat{
+			title = {IconFa{iconName = 'kast'}, 'KAST'},
+			data = player.kast and (formatNumbers(player.kast, 1) .. '%') or nil
+		},
+		PlayerStat{
+			title = {IconFa{iconName = 'damage'}, 'ADR'},
+			data = player.adr and formatNumbers(player.adr) or nil
+		},
+	}
+
+	if player.hs then
+		table.insert(playerStats, PlayerStat{
+			title = {IconFa{iconName = 'headshot'}, 'HS%'},
+			data = (formatNumbers(player.hs, 1) .. '%')
+		})
+	end
+
+	table.insert(playerStats, PlayerStat{
+		title = {IconFa{iconName = 'firstkill'}, 'FK / FD'},
+		data = {player.firstKills, SPAN_SLASH, player.firstDeaths}
+	})
+
+	local numCols = #playerStats
 
 	return Div{
 		classes = {'match-bm-players-player match-bm-players-player--col-2'},
 		children = {
-			PlayerDisplay{
-				characterIcon = self:getCharacterIcon(player.agent),
-				characterName = player.agent,
-				playerName = player.displayName or player.player,
-				playerLink = player.player,
-			},
-			Div{
-				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-5'},
-				children = {
-					PlayerStat{
-						title = {IconFa{iconName = 'acs'}, 'ACS'},
-						data = player.acs and formatNumbers(player.acs) or nil,
-					},
-					PlayerStat{
-						title = {IconFa{iconName = 'kda'}, 'KDA'},
-						data = Array.interleave({
-							player.kills, player.deaths, player.assists
-						}, SPAN_SLASH)
-					},
-					PlayerStat{
-						title = {IconFa{iconName = 'kast'}, 'KAST'},
-						data = player.kast and (formatNumbers(player.kast, 1) .. '%') or nil
-					},
-					PlayerStat{
-						title = {IconFa{iconName = 'damage'}, 'ADR'},
-						data = player.adr and formatNumbers(player.adr) or nil
-					},
-					PlayerStat{
-						title = {IconFa{iconName = 'headshot'}, 'HS%'},
-						data = player.hs and (formatNumbers(player.hs, 1) .. '%') or nil
-					}
-				}
+			playerDisplay,
+			PlayerStatContainer{
+				columns = numCols,
+				children = playerStats
 			}
 		}
 	}

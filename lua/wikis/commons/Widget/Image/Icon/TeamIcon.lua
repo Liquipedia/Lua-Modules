@@ -16,24 +16,17 @@ local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 local WidgetIconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local WidgetIconFontawesome = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
----@class TeamIconWidgetParameters
----@field imageLight string?
----@field imageDark string?
----@field page string?
----@field size string?
----@field noLink boolean?
----@field legacy boolean?
-
 ---@class TeamIconWidgetProps
 ---@field imageLight string?
 ---@field imageDark string?
+---@field name string?
 ---@field page string?
 ---@field size string
 ---@field noLink boolean?
 ---@field legacy boolean?
 
 ---@class TeamIconWidget: IconWidget
----@operator call(TeamIconWidgetParameters): TeamIconWidget
+---@operator call(TeamIconWidgetProps): TeamIconWidget
 ---@field props TeamIconWidgetProps
 local TeamIcon = Class.new(WidgetIcon)
 TeamIcon.defaultProps = {
@@ -62,7 +55,8 @@ function TeamIcon:_getIcon(image, size, link)
 	return WidgetIconImage{
 		imageLight = image,
 		size = size,
-		alignment = 'middle',
+		verticalAlignment = 'middle',
+		caption = self.props.name,
 		link = link,
 	}
 end

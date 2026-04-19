@@ -138,6 +138,9 @@ function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMappe
 		end
 		opponentRoundData.specialstatus = ''
 		opponentRoundData.match = match2
+		if not match2.finished then
+			return
+		end
 		local matchResult = match2.winner == 0 and 'd' or opponent.placement == 1 and 'w' or 'l'
 		opponentRoundData.scoreboard.match[matchResult] = (opponentRoundData.scoreboard.match[matchResult] or 0) + 1
 	end)

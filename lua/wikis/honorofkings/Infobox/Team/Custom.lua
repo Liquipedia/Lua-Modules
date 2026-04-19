@@ -9,12 +9,21 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
-local PlacementStats = Lua.import('Module:InfoboxPlacementStats')
 local RoleOf = Lua.import('Module:RoleOf')
-local Template = Lua.import('Module:Template')
 
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
+local ConditionUtil = Condition.Util
+
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Region = Lua.import('Module:Region')
 local Team = Lua.import('Module:Infobox/Team')
+local PlacementStats = Lua.import('Module:Infobox/Extension/PlacementStats')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 local REGION_REMAPPINGS = {
 	['latin america'] = 'south america',
@@ -34,13 +43,24 @@ local REGION_REMAPPINGS = {
 	['japan'] = 'asia',
 }
 
+local ACHIEVEMENTS_BASE_CONDITIONS = {
+	ConditionUtil.noneOf(ColumnName('liquipediatiertype'), {'Showmatch', 'Qualifier'}),
+	ConditionUtil.anyOf(ColumnName('liquipediatier'), {1, 2}),
+	ConditionNode(ColumnName('placement'), Comparator.eq, 1),
+}
+
 ---@class HonorofkingsInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
+
+	-- Automatic achievements
+	team.args.achievements = Achievements.team{
+		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS
+	}
 
 	-- Automatic org people
 	team.args.coach = RoleOf.get{role = 'Coach'}
@@ -61,13 +81,13 @@ function CustomTeam:createRegion(region)
 	return remappedRegion and self:createRegion(remappedRegion) or regionData
 end
 
----@return string?
+---@return Widget?
 function CustomTeam:createBottomContent()
 	if not self.args.disbanded then
-		return Template.expandTemplate(
-			mw.getCurrentFrame(),
-			'Upcoming and ongoing tournaments of'
-		) .. tostring(PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}})
+		return HtmlWidgets.Fragment{children = {
+			UpcomingTournaments.team{name = self.teamTemplate.templatename},
+			PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}}
+		}}
 	end
 end
 

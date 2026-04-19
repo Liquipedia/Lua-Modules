@@ -35,24 +35,16 @@ function CustomSquad.runAuto(players, squadStatus, squadType, customTitle)
 		squadType,
 		Squad,
 		CustomSquad._playerRow,
-		customTitle,
-		CustomSquad.personMapper
+		customTitle
 	)
-end
-
----@param person table
----@return table
-function CustomSquad.personMapper(person)
-	local newPerson = SquadUtils.convertAutoParameters(person)
-	newPerson.faction = Logic.emptyOr(person.thisTeam.position, person.newTeam.position)
-	return newPerson
 end
 
 ---@param person table
 ---@param squadStatus SquadStatus
 ---@param squadType SquadType
+---@param columnVisibility table?
 ---@return Widget
-function CustomSquad._playerRow(person, squadStatus, squadType)
+function CustomSquad._playerRow(person, squadStatus, squadType, columnVisibility)
 	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
 	local squadArgs = Arguments.getArgs(mw.getCurrentFrame())
 
@@ -60,21 +52,18 @@ function CustomSquad._playerRow(person, squadStatus, squadType)
 		local isMain = Logic.readBool(squadArgs.main) or Logic.isEmpty(squadArgs.squad)
 		squadPerson.extradata = Table.merge({group = isMain and 'main' or 'additional'}, squadPerson.extradata)
 	end
-	squadPerson.newteamspecial = Logic.emptyOr(squadPerson.newteamspecial,
-		Logic.readBool(person.retired) and 'retired' or nil,
-		Logic.readBool(person.military) and 'military' or nil)
 
 	SquadUtils.storeSquadPerson(squadPerson)
 
-	local row = SquadRow(squadPerson)
+	local row = SquadRow(squadPerson, columnVisibility)
 
-	row:id():name():role():date('joindate', 'Join Date:&nbsp;')
+	row:id():name():role():date('joindate')
 
 	if squadStatus == SquadUtils.SquadStatus.INACTIVE or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
-		row:date('inactivedate', 'Inactive Date:&nbsp;')
+		row:date('inactivedate')
 	end
 	if squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
-		row:date('leavedate', 'Leave Date:&nbsp;')
+		row:date('leavedate')
 		row:newteam()
 	end
 

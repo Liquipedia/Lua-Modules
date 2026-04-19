@@ -29,8 +29,8 @@ return {
 			name = 'Game for Peace',
 			link = 'Game for Peace',
 			logo = {
-				darkMode = 'PUBG Mobile default darkmode.png',
-				lightMode = 'PUBG Mobile default lightmode.png',
+				darkMode = 'Game for Peace alt darkmode.png',
+				lightMode = 'Game for Peace alt lightmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'PUBG Default logo.png',
@@ -42,8 +42,8 @@ return {
 			name = 'Battlegrounds Mobile India',
 			link = 'Battlegrounds Mobile India',
 			logo = {
-				darkMode = 'PUBG Mobile default darkmode.png',
-				lightMode = 'PUBG Mobile default lightmode.png',
+				darkMode = 'Battlegrounds Mobile India 2022 darkmode.png',
+				lightMode = 'Battlegrounds Mobile India 2022 lightmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'PUBG Default logo.png',
@@ -55,8 +55,8 @@ return {
 			name = 'NEW STATE MOBILE',
 			link = 'NEW STATE MOBILE',
 			logo = {
-				darkMode = 'NEW STATE MOBILE darkmode.png',
-				lightMode = 'NEW STATE MOBILE lightmode.png',
+				darkMode = 'NEW STATE MOBILE allmode.png',
+				lightMode = 'NEW STATE MOBILE allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'NEW STATE MOBILE default allmode.png',
@@ -82,6 +82,9 @@ return {
 				mode = 'merge',
 				hasHeaderAndRefs = true,
 			},
+		},
+		participants = {
+			defaultPlayerNumber = 4,
 		},
 	},
 	defaultRoundPrecision = 0,

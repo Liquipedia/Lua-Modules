@@ -11,7 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
-local Info = Lua.import('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
@@ -59,7 +59,7 @@ local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -79,9 +79,7 @@ end
 ---@param args table
 ---@return boolean
 function CustomPlayer:shouldStoreData(args)
-	return Namespace.isMain() and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
-		and args.informationType ~= BOT_INFORMATION_TYPE
+	return Namespace.isMain() and Lpdb.isStorageEnabled() and args.informationType ~= BOT_INFORMATION_TYPE
 end
 
 ---@param id string
@@ -96,7 +94,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Race',
-				children = {CustomPlayer._getRaceDisplay(args.race)}
+				children = {CustomPlayer._getRaceDisplay(args.race or args.faction)}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -150,7 +148,7 @@ end
 ---@param args table
 ---@return string
 function CustomPlayer:nameDisplay(args)
-	local factions = Faction.readMultiFaction(args.race or Faction.defaultFaction, {alias = false})
+	local factions = Faction.readMultiFaction(args.race or args.faction or Faction.defaultFaction, {alias = false})
 
 	local raceIcons = table.concat(Array.map(factions, function(faction)
 		return Faction.Icon{faction = faction, size = 'medium'}
@@ -178,7 +176,7 @@ end
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	local extradata = lpdbData.extradata or {}
 
-	local factions = Faction.readMultiFaction(args.race, {alias = false})
+	local factions = Faction.readMultiFaction(args.race or args.faction, {alias = false})
 
 	extradata.race = factions[1]
 	extradata.faction = Faction.toName(factions[1])
@@ -519,7 +517,7 @@ function CustomPlayer:getWikiCategories(categories)
 		table.insert(categories, 'Foreign Players')
 	end
 
-	for _, faction in pairs(Faction.readMultiFaction(args.race, {alias = false})) do
+	for _, faction in pairs(Faction.readMultiFaction(args.race or args.faction, {alias = false})) do
 		table.insert(categories, Faction.toName(faction) .. ' Players')
 	end
 

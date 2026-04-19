@@ -18,12 +18,14 @@ local Builder = Widgets.Builder
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
----@class ValorantHeroInfobox: CharacterInfobox
+---@class ValorantAgentInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)
+---@class ValorantAgentInfoboxWidgetInjector: WidgetInjector
+---@field caller ValorantAgentInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))

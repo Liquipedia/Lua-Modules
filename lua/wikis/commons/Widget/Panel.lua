@@ -21,7 +21,7 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 ---@field bodyClass string[]?
 ---@field bodyStyle table<string, any>?
 ---@field boxId integer?
----@field children (Widget|string|Html|nil)|(Widget|string|Html|nil)[]
+---@field children Renderable|Renderable[]
 ---@field classes string[]?
 ---@field heading string|Html|Widget
 ---@field headingAttributes table<string, any>?
@@ -67,7 +67,8 @@ function Panel:render()
 	local body = Div{
 		classes = WidgetUtil.collect(
 			hasToggle and 'panel-box-collapsible-content' or nil,
-			Logic.readBool(self.props.padding) and 'panel-box-body' or nil,
+			'panel-box-body',
+			not Logic.readBool(self.props.padding) and 'panel-box-body--no-padding' or nil,
 			self.props.bodyClass
 		),
 		css = self.props.bodyStyle,

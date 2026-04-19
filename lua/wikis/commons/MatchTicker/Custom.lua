@@ -28,8 +28,12 @@ function CustomMatchTicker.tournament(frame)
 	args.ongoing = true
 	args.recent = false
 	args.tournament = args.tournament or args.tournament1 or args[1] or CURRENT_PAGE
-	args.queryByParent = args.queryByParent or true
-	args.showAllTbdMatches = args.showAllTbdMatches or true
+	if args.queryByParent == nil then
+		args.queryByParent = true
+	end
+	if args.showAllTbdMatches == nil then
+		args.showAllTbdMatches = true
+	end
 
 	return MatchTicker(args):query():create('Upcoming Matches')
 end

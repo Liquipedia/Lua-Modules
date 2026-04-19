@@ -14,9 +14,13 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Button = Lua.import('Module:Widget/Basic/Button')
 
----@class RoundSelectorWidget: Widget
----@operator call(table): RoundSelectorWidget
+---@class RoundSelectorWidgetProps
+---@field rounds integer?
+---@field hasEnded boolean?
 
+---@class RoundSelectorWidget: Widget
+---@operator call(RoundSelectorWidgetProps): RoundSelectorWidget
+---@field props RoundSelectorWidgetProps
 local RoundSelectorWidget = Class.new(Widget)
 
 ---@return Widget?
@@ -25,17 +29,9 @@ function RoundSelectorWidget:render()
 		return
 	end
 
-	local function finalRoundTitle()
-		if not self.props.hasEnded then
-			return 'Current'
-		else
-			return 'Round ' .. tostring(self.props.rounds)
-		end
-	end
-
 	local roundTitles = Array.map(Array.range(1, self.props.rounds), function (round)
 		if round == self.props.rounds then
-			return finalRoundTitle()
+			return self:_finalRoundTitle()
 		else
 			return 'Round ' .. round
 		end
@@ -56,7 +52,7 @@ function RoundSelectorWidget:render()
 		css = {float = 'left'},
 		children = {
 			Button{
-				children = finalRoundTitle(),
+				children = self:_finalRoundTitle(),
 				variant = 'primary',
 				size = 'sm',
 				classes = {'dropdown-box-button'},
@@ -68,6 +64,16 @@ function RoundSelectorWidget:render()
 			},
 		}
 	}
+end
+
+---@private
+---@return string
+function RoundSelectorWidget:_finalRoundTitle()
+	if not self.props.hasEnded then
+		return 'Current'
+	else
+		return 'Round ' .. tostring(self.props.rounds)
+	end
 end
 
 return RoundSelectorWidget

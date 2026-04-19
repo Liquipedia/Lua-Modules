@@ -7,16 +7,21 @@
 
 return {
 	ACST = {
-		name ='Australian Central Standard Time',
+		name = 'Australian Central Standard Time',
 		offset = {9, 30},
 	},
 	ACDT = {
-		name ='Australian Central Daylight Time',
+		name = 'Australian Central Daylight Time',
 		offset = {10, 30},
 	},
 	ADT = {
-		name ='Atlantic Daylight Time',
+		name = 'Atlantic Daylight Time',
 		offset = {-3, 0},
+	},
+	ATST = {
+		abbr = 'AST',
+		name = 'Atlantic Standard Time',
+		offset = {-4, 0},
 	},
 	AEDT = {
 		name = 'Australian Eastern Daylight Time',
@@ -73,6 +78,11 @@ return {
 	BNT = {
 		name = 'Brunei Darussalam Time',
 		offset = {8, 0},
+	},
+	BDST = {
+		abbr = 'BST',
+		name = 'Bangladesh Standard Time',
+		offset = {6, 0},
 	},
 	BST = {
 		name = 'British Summer Time',
@@ -214,9 +224,17 @@ return {
 		name = 'Malaysia Time',
 		offset = {8, 0},
 	},
+	NDT = {
+		name = 'Newfoundland Standard Time',
+		offset = {-3, 30},
+	},
 	NPT = {
 		name = 'Nepal Time',
 		offset = {5, 45},
+	},
+	NST = {
+		name = 'Newfoundland Daylight Time',
+		offset = {-3, 30},
 	},
 	NZDT = {
 		name = 'New Zealand Daylight Time',
@@ -303,6 +321,10 @@ return {
 	VLAT = {
 		name = 'Vladivostok Time',
 		offset = {10, 0},
+	},
+	WAT = {
+		name = 'West Africa Time',
+		offset = {1, 0},
 	},
 	WEST = {
 		name = 'Western European Summer Time',

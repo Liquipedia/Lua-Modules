@@ -107,7 +107,7 @@ function WantToHelp:render()
 						'&utm_campaign=Want+to+Help+' .. mw.uri.encode(mw.site.siteName) .. '&utm_id=Want+to+Help',
 					linktype = 'external',
 					title = 'Click here to create an account',
-					variant = 'tertiary',
+					variant = 'secondary',
 					children = {
 						IconFa{iconName = 'createaccount'},
 						' Create Account'
@@ -116,7 +116,7 @@ function WantToHelp:render()
 				showWhenLoggedOut(Button{
 					link = 'Special:UserLogin',
 					title = 'Click here to log in',
-					variant = 'tertiary',
+					variant = 'secondary',
 					children = {
 						IconFa{iconName = 'login'},
 						' Log In'
@@ -126,7 +126,7 @@ function WantToHelp:render()
 					link = 'https://discord.gg/liquipedia',
 					linktype = 'external',
 					title = 'Click here to join our discord server',
-					variant = 'tertiary',
+					variant = 'secondary',
 					children = {
 						IconFa{iconName = 'discord'},
 						' Join Our Discord'
@@ -135,7 +135,7 @@ function WantToHelp:render()
 				Page.exists('Help:Contents') and Button{
 					link = 'Help:Contents',
 					title = 'Click Here to Read our Help Articles',
-					variant = 'tertiary',
+					variant = 'secondary',
 					children = {
 						IconFa{iconName = 'helparticles'},
 						' Help Articles'

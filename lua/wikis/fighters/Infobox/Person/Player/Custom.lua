@@ -24,7 +24,7 @@ local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -56,6 +56,15 @@ function CustomPlayer:getWikiCategories(categories)
 	return Array.extendWith(categories, Array.map(self.games, function(game)
 		return game .. ' Players'
 	end))
+end
+
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args)
+	lpdbData.extradata.games = self.games
+
+	return lpdbData
 end
 
 return CustomPlayer

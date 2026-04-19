@@ -118,7 +118,18 @@ return {
 			autoTeam = true,
 			automatedHistory = {
 				mode = 'cleanup',
+				storeFromWikiCode = true,
 			},
+		},
+		participants = {
+			syncPlayerTeam = true,
+		},
+		tournamentsListing = {
+			showTier = true,
+			showGameIcon = true,
+			useParent = false,
+			order = 'enddate desc, pagename desc',
+			onlyTierTypeIfBoth = false,
 		},
 	},
 }

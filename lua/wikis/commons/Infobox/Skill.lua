@@ -25,16 +25,17 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
 ---@class SkillInfobox: BasicInfobox
+---@operator call(Frame): SkillInfobox
 local Skill = Class.new(BasicInfobox)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function Skill.run(frame)
 	local skill = Skill(frame)
 	return skill:createInfobox()
 end
 
----@return string
+---@return Widget
 function Skill:createInfobox()
 	local args = self.args
 
@@ -93,7 +94,7 @@ function Skill:createInfobox()
 		self:_setLpdbData(args)
 	end
 
-	return self:build(widgets)
+	return self:build(widgets, 'Skill')
 end
 
 ---@param args table

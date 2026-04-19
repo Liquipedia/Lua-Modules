@@ -33,7 +33,7 @@ Config.categories = {
 		name = 'game',
 		property = 'game',
 		expandable = true,
-		items = {'bo6', 'wz', 'codm'},
+		items = {'bo7', 'wz', 'codm'},
 		transform = function(game)
 			return Game.icon({game = game, noSpan = true, noLink = true, size = '20x20px'})
 		end

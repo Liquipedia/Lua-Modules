@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local MathUtil = Lua.import('Module:MathUtil')
 
 local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
 
@@ -31,7 +32,7 @@ end
 ---@param opponent TiebreakerOpponent
 ---@return string
 function TiebreakerMatchWinRate:display(state, opponent)
-	return tostring(self:valueOf(state, opponent)) .. '%'
+	return MathUtil.formatPercentage(self:valueOf(state, opponent), 2)
 end
 
 return TiebreakerMatchWinRate

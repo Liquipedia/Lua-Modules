@@ -35,10 +35,11 @@ local PLATFORMS = {
 	playstation5 = 'PlayStation 5',
 	xboxplaystation = 'Xbox and PlayStation',
 	xboxandplaystation = 'Xbox and PlayStation',
+	mobile = 'Mobile',
 }
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))

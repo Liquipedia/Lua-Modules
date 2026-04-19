@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local Faction = Lua.import('Module:Faction')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
 local Namespace = Lua.import('Module:Namespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -42,7 +43,7 @@ local CustomPerson = Class.new(Person)
 function CustomPerson:shouldStoreData(args)
 	if
 		Logic.readBool(args.disable_lpdb) or Logic.readBool(args.disable_storage)
-		or Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+		or Lpdb.isStorageDisabled()
 		or not Namespace.isMain()
 	then
 		Variables.varDefine('disable_LPDB_storage', 'true')
@@ -54,7 +55,7 @@ end
 ---@param args table
 ---@return string
 function CustomPerson:nameDisplay(args)
-	local raceData = self:readFactions(args.race or Faction.defaultFaction)
+	local raceData = self:readFactions(args.race or args.faction or Faction.defaultFaction)
 
 	local raceIcons
 	if raceData.isAll then
@@ -108,7 +109,7 @@ end
 function CustomPerson:adjustLPDB(lpdbData, args, personType)
 	local extradata = lpdbData.extradata or {}
 
-	local raceData = self:readFactions(args.race)
+	local raceData = self:readFactions(args.race or args.faction)
 
 	extradata.race = raceData.isAll and RACE_ALL_SHORT or raceData.factions[1]
 	extradata.faction = raceData.isAll and RACE_ALL or raceData.factions[1]

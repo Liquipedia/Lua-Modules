@@ -557,6 +557,19 @@ return {
 				lightMode = 'Motogp24 default allmode.png',
 			},
 		},
+		motogp25 = {
+			abbreviation = 'MotoGP 25',
+			name = 'MotoGP 25',
+			link = 'MotoGP 25',
+			logo = {
+				darkMode = 'Motogp25 default allmode.png',
+				lightMode = 'Motogp25 default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Motogp25 default allmode.png',
+				lightMode = 'Motogp25 default allmode.png',
+			},
+		},
 		['forza 2'] = {
 			abbreviation = 'FM2',
 			name = 'Forza Motorsport 2',
@@ -860,6 +873,19 @@ return {
 			abbreviation = 'Shift',
 			name = 'Need for Speed: Shift',
 			link = 'Need for Speed: Shift',
+			logo = {
+				darkMode = 'NFS default darkmode.png',
+				lightMode = 'NFS default lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'NFS default darkmode.png',
+				lightMode = 'NFS default lightmode.png',
+			},
+		},
+		shift2 = {
+			abbreviation = 'Shift 2',
+			name = 'Need for Speed: Shift 2 – Unleashed',
+			link = 'Need for Speed: Shift 2 – Unleashed',
 			logo = {
 				darkMode = 'NFS default darkmode.png',
 				lightMode = 'NFS default lightmode.png',

@@ -12,14 +12,15 @@ local Class = Lua.import('Module:Class')
 local Region = Lua.import('Module:Region')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local Team = Lua.import('Module:Team')
-local Template = Lua.import('Module:Template')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local CharacterNames = Lua.import('Module:HeroNames')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Injector = Lua.import('Module:Widget/Injector')
-local Player = Lua.import('Module:Infobox/Person')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')
+local Player = Lua.import('Module:Infobox/Person')
+local UpcomingTournaments = Lua.import('Module:Infobox/Extension/UpcomingTournaments')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
@@ -32,7 +33,7 @@ local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
@@ -59,8 +60,9 @@ function CustomInjector:parse(id, widgets)
 				children = {table.concat(heroIcons, '&nbsp;')},
 			}
 		)
+	elseif id == 'region' then
+		return {}
 	end
-
 	return widgets
 end
 
@@ -82,12 +84,19 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@return string?
+---@return Widget?
 function CustomPlayer:createBottomContent()
-	if String.isEmpty(self.args.team) or not self:shouldStoreData(self.args) then return end
-	local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
-	return tostring(MatchTicker.player{recentLimit = 3}) ..
-		Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+	if String.isEmpty(self.args.team) or not self:shouldStoreData(self.args) then
+		return
+	end
+
+	local teamPage = TeamTemplate.getPageName(self.args.team)
+	---@cast teamPage -nil
+
+	return HtmlWidgets.Fragment{children = {
+		MatchTicker.player{recentLimit = 3},
+		UpcomingTournaments.team{name = teamPage}
+	}}
 end
 
 return CustomPlayer

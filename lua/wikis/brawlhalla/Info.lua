@@ -34,5 +34,10 @@ return {
 		match2 = {
 			status = 1,
 		},
+		infoboxPlayer = {
+			automatedHistory = {
+				storeFromWikiCode = true,
+			},
+		},
 	},
 }
