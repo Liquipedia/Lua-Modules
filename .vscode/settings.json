@@ -23,8 +23,8 @@
 		"**/*.lua": "${dirname}: ${filename}"
 	},
 	"Lua.runtime.special": {
-        "Lua.import": "require",
+		"Lua.import": "require",
 		"Lua.requireIfExists": "require",
 		"mw.loadData": "require"
-    },
+	},
 }
