@@ -74,6 +74,7 @@ function DeadlockMatchSummaryGameRow:createGameOpponentView(opponentIndex)
 		MatchSummaryWidgets.Characters{
 			characters = self:_getHeroesForOpponent(opponentIndex),
 			flipped = opponentIndex == 2,
+			hideOnMobile = true,
 		}
 	)
 end
