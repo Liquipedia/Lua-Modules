@@ -22,7 +22,7 @@ local SPECIAL_SUBPAGES = {
 	'Schedule',
 	'Rivalries',
 }
-local NOW = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() + DateExt.daysToSeconds(1))
+local TOMORROW = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() + DateExt.daysToSeconds(1))
 local PAST = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() - DateExt.daysToSeconds(180))
 
 local PlayerTabs = {}
@@ -102,7 +102,7 @@ function PlayerTabs._display(player, currentTab)
 			queryArgs = {
 				player = player,
 				tier = '1,2,3',
-				edate = NOW,
+				edate = TOMORROW,
 				limit = '250',
 			},
 		},
@@ -113,7 +113,7 @@ function PlayerTabs._display(player, currentTab)
 			queryArgs = {
 				player = player,
 				tier = '1,2,3',
-				edate = NOW,
+				edate = TOMORROW,
 				linkSubPage = 'false',
 				limit = '250',
 			},
@@ -154,7 +154,7 @@ function PlayerTabs._display(player, currentTab)
 			tierTypes = 'Unset,Monthly,Weekly,Biweekly,Showmatch,Daily',
 			onlySolo = 'no',
 			sdate = PAST,
-			edate = NOW,
+			edate = TOMORROW,
 		},
 	}
 

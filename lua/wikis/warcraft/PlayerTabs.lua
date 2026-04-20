@@ -24,7 +24,7 @@ local SPECIAL_SUBPAGES = {
 	'Rivalries',
 	'Maps Created'
 }
-local NOW = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() + DateExt.daysToSeconds(1))
+local TOMORROW = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() + DateExt.daysToSeconds(1))
 
 local PlayerTabs = {}
 
@@ -108,7 +108,7 @@ function PlayerTabs._display(player, currentTab)
 			queryArgs = {
 				player = player,
 				tier = '1,2,3',
-				edate = NOW,
+				edate = TOMORROW,
 				limit = '250',
 			},
 		},
@@ -119,7 +119,7 @@ function PlayerTabs._display(player, currentTab)
 			queryArgs = {
 				player = player,
 				tier = '1,2,3',
-				edate = NOW,
+				edate = TOMORROW,
 				linkSubPage = 'false',
 				limit = '250',
 			},

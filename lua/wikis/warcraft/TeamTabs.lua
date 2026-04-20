@@ -16,7 +16,7 @@ local Tabs = Lua.import('Module:Tabs')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
 
-local NOW = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() + DateExt.daysToSeconds(1))
+local TOMORROW = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() + DateExt.daysToSeconds(1))
 
 local TeamTabs = {}
 
@@ -97,7 +97,7 @@ function TeamTabs._display(team, showPlayerSubTabs, currentTab)
 			queryArgs = {
 				team = team,
 				tier = '1,2,3',
-				edate = NOW,
+				edate = TOMORROW,
 				limit = '250',
 			},
 		},
@@ -108,7 +108,7 @@ function TeamTabs._display(team, showPlayerSubTabs, currentTab)
 			queryArgs = {
 				team = team,
 				tier = '1,2,3',
-				edate = NOW,
+				edate = TOMORROW,
 				linkSubPage = 'false',
 				limit = '250',
 			},
@@ -123,7 +123,7 @@ function TeamTabs._display(team, showPlayerSubTabs, currentTab)
 			queryArgs = {
 				team = team,
 				tier = '1,2,3',
-				edate = NOW,
+				edate = TOMORROW,
 				limit = '250',
 			},
 		}

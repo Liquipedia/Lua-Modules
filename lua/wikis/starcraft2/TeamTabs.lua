@@ -27,7 +27,7 @@ local SPECIAL_SUBPAGES = {
 	'League Rosters',
 	'Clan Wars',
 }
-local NOW = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() + DateExt.daysToSeconds(1))
+local TOMORROW = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() + DateExt.daysToSeconds(1))
 
 local TeamTabs = {}
 
@@ -175,7 +175,7 @@ function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
 			queryArgs = {
 				team = team,
 				tier = '1,2,3',
-				edate = NOW,
+				edate = TOMORROW,
 				limit = '250',
 			},
 		},
@@ -186,7 +186,7 @@ function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
 			queryArgs = {
 				team = team,
 				tier = '1,2,3',
-				edate = NOW,
+				edate = TOMORROW,
 				linkSubPage = 'false',
 				limit = '250',
 			},
@@ -202,7 +202,7 @@ function TeamTabs._getTabsForSubTeam(team, showPlayerSubTabs, currentTab)
 			queryArgs = {
 				team = team,
 				tier = '1,2,3',
-				edate = NOW,
+				edate = TOMORROW,
 				limit = '250',
 			},
 		}
