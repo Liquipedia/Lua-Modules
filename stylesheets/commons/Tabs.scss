@@ -91,7 +91,8 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			background-color: unset !important;
 
 			> a,
-			> span,
+			> span:not( :has( > a ) ),
+			> span > a,
 			> strong {
 				display: flex;
 				align-items: center;
@@ -141,7 +142,8 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			}
 
 			&.active > a,
-			&.active > span,
+			&.active > span:not( :has( > a ) ),
+			&.active > span > a,
 			&.active > strong {
 				background-color: $tabs-bg-active-light !important;
 				color: $tabs-text-active-light !important;
@@ -171,7 +173,8 @@ html.client-nojs .tabs-content > div:not( .active ) {
 			}
 
 			&.hover > a,
-			&.hover > span,
+			&.hover > span:not( :has( > a ) ),
+			&.hover > span > a,
 			&.hover > strong {
 				background-color: $tabs-bg-hover-light !important;
 
@@ -429,7 +432,8 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		.nav-tabs li {
 			min-height: 2.25rem;
 
-			a {
+			> a,
+			> span > a {
 				padding: $tabs-nav-padding-nested;
 				min-height: 2.25rem;
 			}
@@ -444,7 +448,8 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		.nav-tabs li {
 			min-height: 2.25rem;
 
-			a {
+			> a,
+			> span > a {
 				padding: $tabs-nav-padding-nested;
 				min-height: 2.25rem;
 			}
@@ -541,7 +546,8 @@ html.client-nojs .tabs-content > div:not( .active ) {
 		.tabs-nav-wrapper .nav-tabs li {
 			min-height: 2.25rem;
 
-			a {
+			> a,
+			> span > a {
 				padding: $tabs-nav-padding-nested;
 				min-height: 2.25rem;
 			}
