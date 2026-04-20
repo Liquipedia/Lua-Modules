@@ -397,10 +397,7 @@ function BaseResultsTable:build()
 			} or nil,
 			TableWidgets.TableBody{children = WidgetUtil.collect(self:_buildTableBody(), self.args.manualContent)}
 		),
-		footer = self.config.onlyAchievements and LinkWidget{
-			link = self.config.opponent .. '/' .. self.config.resultsSubPage,
-			children = 'Extended list of results',
-		} or nil
+		footer = self:_footer(),
 	}
 end
 
