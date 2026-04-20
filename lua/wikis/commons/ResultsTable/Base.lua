@@ -428,11 +428,11 @@ function BaseResultsTable:_footer()
 			form = form,
 			display = 'Extended list of results',
 			template = template,
-			queryArgs = {
+			queryArgs = Table.merge({
 				team = self.config.opponent,
 				player = self.config.opponent,
 				limit = '250',
-			},
+			}, self.config.queryLinkProps),
 		}
 	}
 end
