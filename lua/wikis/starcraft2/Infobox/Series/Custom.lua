@@ -29,7 +29,6 @@ local Cell = Widgets.Cell
 
 local GAME_MOD = 'mod'
 local GAME_LOTV = Game.toIdentifier{game = 'lotv'}
-local TODAY = os.date('%Y-%m-%d', os.time())
 
 ---@class Starcraft2SeriesInfoboxWidgetInjector: WidgetInjector
 ---@field caller Starcraft2SeriesInfobox
