@@ -197,6 +197,7 @@ function MapPoolTable:_backFillMap(map)
 	end
 
 	-- can not use Table.merge nor Table.deepMerge due to creators/creatorDisplayNames
+	map.pageName = mapData.pageName or map.pageName
 	map.displayName = map.displayName or mapData.displayName
 	map.image = map.image or mapData.image
 	map.imageDark = map.imageDark or mapData.imageDark
