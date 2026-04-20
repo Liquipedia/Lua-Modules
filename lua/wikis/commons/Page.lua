@@ -108,7 +108,7 @@ end
 ---@param args {form: string, template: string, queryArgs: table?, execute: boolean?}
 ---@return string
 function Page.makeFormQueryLink(args)
-	assert(args.form, 'Missing form input when building query link')
+	assert(String.isNotEmpty(args.form), 'Missing form input when building query link')
 	local prefix = assert(args.template, 'Missing template input when building query link')
 
 	local queryArgs = Table.map(args.queryArgs or {}, function(key, item)
