@@ -98,7 +98,7 @@ function BaseResultsTable:readConfig()
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
 		useIndivPrize = Logic.readBool(args.useIndivPrize),
 		aliases = Array.parseCommaSeparatedString(args.aliases),
-		queryLinkProps = Json.parseIfTable(args.queryLinkProps),
+		queryLinkProps = Json.parseIfString(args.queryLinkProps),
 	}
 
 	config.sort = Logic.emptyOr(
@@ -431,7 +431,6 @@ function BaseResultsTable:_footer()
 			queryArgs = Table.merge({
 				team = self.config.opponent,
 				player = self.config.opponent,
-				limit = '250',
 			}, self.config.queryLinkProps),
 		}
 	}
