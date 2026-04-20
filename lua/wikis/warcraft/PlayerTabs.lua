@@ -89,19 +89,12 @@ end
 ---@return Widget?
 function PlayerTabs._display(player, currentTab)
 	---@param args {form: string, template: string, display: string, queryArgs: table}
-	---@return string
+	---@return Widget
 	local makeQueryLink = function(args)
-		local prefix = args.template
-		local queryArgs = Table.map(args.queryArgs, function(key, item)
-			return prefix .. key, item
-		end)
 		return Link{
 			linktype = 'external',
 			children = args.display,
-			link = tostring(mw.uri.fullUrl(
-				'Special:RunQuery/' .. args.form,
-				mw.uri.buildQueryString(queryArgs) .. '&_run'
-			))
+			link = Page.makeFormQueryLink(Table.merge(args, {execute = true}))
 		}
 	end
 

@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Arguments = Lua.import('Module:Arguments')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 local Tabs = Lua.import('Module:Tabs')
 
@@ -77,19 +78,12 @@ end
 ---@return Widget?
 function TeamTabs._display(team, showPlayerSubTabs, currentTab)
 	---@param args {form: string, template: string, display: string, queryArgs: table}
-	---@return string
+	---@return Widget
 	local makeQueryLink = function(args)
-		local prefix = args.template
-		local queryArgs = Table.map(args.queryArgs, function(key, item)
-			return prefix .. key, item
-		end)
 		return Link{
 			linktype = 'external',
 			children = args.display,
-			link = tostring(mw.uri.fullUrl(
-				'Special:RunQuery/' .. args.form,
-				mw.uri.buildQueryString(queryArgs) .. '&_run'
-			))
+			link = Page.makeFormQueryLink(Table.merge(args, {execute = true}))
 		}
 	end
 
