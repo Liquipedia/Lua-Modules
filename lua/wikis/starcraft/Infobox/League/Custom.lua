@@ -263,13 +263,4 @@ function CustomLeague:getWikiCategories(args)
 	return {Logic.readBool(args.female) and 'Female Tournaments' or nil}
 end
 
----@param base string
----@return string
-function CustomLeague:_concatArgs(base)
-	return table.concat(
-		Array.map(self:getAllArgsForBase(self.args, base), mw.ext.TeamLiquidIntegration.resolve_redirect),
-		';'
-	)
-end
-
 return CustomLeague
