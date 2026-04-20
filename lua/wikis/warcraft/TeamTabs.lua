@@ -95,10 +95,10 @@ function TeamTabs._display(team, showPlayerSubTabs, currentTab)
 			display = 'Team Results',
 			template = 'Team results',
 			queryArgs = {
-				['[team]'] = team,
-				['[tier]'] = '1,2,3',
-				['[edate]'] = NOW,
-				['[limit]'] = '250',
+				team = team,
+				tier = '1,2,3',
+				edate = NOW,
+				limit = '250',
 			},
 		},
 		name3 = makeQueryLink{
@@ -106,11 +106,11 @@ function TeamTabs._display(team, showPlayerSubTabs, currentTab)
 			display = 'Team Matches',
 			template = 'Team matches',
 			queryArgs = {
-				['[team]'] = team,
-				['[tier]'] = '1,2,3',
-				['[edate]'] = NOW,
-				['[linkSubPage]'] = 'false',
-				['[limit]'] = '250',
+				team = team,
+				tier = '1,2,3',
+				edate = NOW,
+				linkSubPage = 'false',
+				limit = '250',
 			},
 		},
 	}
@@ -121,10 +121,10 @@ function TeamTabs._display(team, showPlayerSubTabs, currentTab)
 			display = 'Player Results',
 			template = 'Team player results',
 			queryArgs = {
-				['[team]'] = team,
-				['[tier]'] = '1,2,3',
-				['[edate]'] = NOW,
-				['[limit]'] = '250',
+				team = team,
+				tier = '1,2,3',
+				edate = NOW,
+				limit = '250',
 			},
 		}
 	end

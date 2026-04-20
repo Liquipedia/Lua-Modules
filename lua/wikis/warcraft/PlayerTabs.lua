@@ -106,10 +106,10 @@ function PlayerTabs._display(player, currentTab)
 			display = 'Results',
 			template = 'Player results',
 			queryArgs = {
-				['[player]'] = player,
-				['[tier]'] = '1,2,3',
-				['[edate]'] = NOW,
-				['[limit]'] = '250',
+				player = player,
+				tier = '1,2,3',
+				edate = NOW,
+				limit = '250',
 			},
 		},
 		name3 = makeQueryLink{
@@ -117,11 +117,11 @@ function PlayerTabs._display(player, currentTab)
 			display = 'Matches',
 			template = 'Player matches',
 			queryArgs = {
-				['[player]'] = player,
-				['[tier]'] = '1,2,3',
-				['[edate]'] = NOW,
-				['[linkSubPage]'] = 'false',
-				['[limit]'] = '250',
+				player = player,
+				tier = '1,2,3',
+				edate = NOW,
+				linkSubPage = 'false',
+				limit = '250',
 			},
 		},
 		name4 = makeQueryLink{
@@ -129,7 +129,7 @@ function PlayerTabs._display(player, currentTab)
 			display = 'Statistics',
 			template = 'Player statistics',
 			queryArgs = {
-				['[player]'] = player,
+				player = player,
 			},
 		}
 	}
