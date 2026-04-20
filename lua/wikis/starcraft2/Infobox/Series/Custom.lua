@@ -154,15 +154,6 @@ function CustomSeries:_getGameVersion()
 	return {gameDisplay, patchDisplay}
 end
 
----@param dateEntry string?
----@return string|osdate
-function CustomSeries._retrievePatchDate(dateEntry)
-	return String.isNotEmpty(dateEntry) ---@cast dateEntry -nil
-		and dateEntry:lower() ~= 'tbd'
-		and dateEntry:lower() ~= 'tba'
-		and dateEntry or TODAY
-end
-
 function CustomSeries:_addCustomVariables()
 	local args = self.args
 

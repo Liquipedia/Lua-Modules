@@ -45,7 +45,6 @@ local FINISHED = 'finished'
 local DEFAULT_MODE = '1v1'
 local GREATER_EQUAL = '&#8805;'
 local PRIZE_POOL_ROUND_PRECISION = 2
-local TODAY = os.date('%Y-%m-%d', os.time())
 
 local GAME_MOD = 'mod'
 local GAME_LOTV = Game.toIdentifier{game = 'lotv'}
