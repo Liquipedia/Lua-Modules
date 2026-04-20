@@ -12,11 +12,11 @@ local Class = Lua.import('Module:Class')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
-local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 
 local AnalyticsWidgets = Lua.import('Module:Widget/Analytics')
 local Button = Lua.import('Module:Widget/Basic/Button')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -41,28 +41,48 @@ function Tabs.static(args)
 
 	Tabs._setThis(tabArgs)
 
+	local function buildTabLiItems(additionalClasses)
+		return Array.map(tabArgs, function(tab)
+			--if tab.name is unset tab.link is set as per `Tabs._readArguments`
+			local name = tab.name or Tabs._getDisplayNameFromLink(tab.link --[[@as string]])
+			local child
+			if tab.icon then
+				local displayChildren = {
+					Icon{
+						iconName = tab.icon,
+						additionalClasses = {'tabs-static-tab-icon'},
+					},
+					HtmlWidgets.Span{children = {name}},
+				}
+				child = tab.link
+					and Link{link = tab.link, children = {HtmlWidgets.Fragment{children = displayChildren}}}
+					or HtmlWidgets.Span{children = displayChildren}
+			else
+				child = tab.link and Link{link = tab.link, children = {name}} or HtmlWidgets.Span{children = {tab.name}}
+			end
+			return HtmlWidgets.Li{
+				classes = Array.extend(additionalClasses, tab.this and 'active' or nil),
+				children = child
+			}
+		end)
+	end
+
+	local navTabs = HtmlWidgets.Ul{
+		classes = {'nav', 'nav-tabs', 'navigation-not-searchable', 'tabs', 'tabs' .. tabCount},
+		attributes = {['data-nosnippet'] = '', ['data-tabs-nav'] = ''},
+		children = buildTabLiItems()
+	}
+
 	return AnalyticsWidgets{
 		analyticsName = 'Navigation tab',
 		children = {
 			HtmlWidgets.Div{
 				classes = {'tabs-static'},
-				attributes = {['data-nosnippet'] = ''},
-				children = HtmlWidgets.Ul{
-					classes = {'nav', 'nav-tabs', 'navigation-not-searchable', 'tabs', 'tabs' .. tabCount},
-					attributes = {['data-nosnippet'] = ''},
-					children = Array.map(tabArgs, function (tab)
-						--if tab.name is unset tab.link is set as per `Tabs._readArguments`
-						local name = tab.name or Tabs._getDisplayNameFromLink(tab.link --[[@as string]])
-						local text = tab.link and Page.makeInternalLink({}, name, tab.link) or tab.name
-						return HtmlWidgets.Li{
-							classes = {tab.this and 'active' or nil},
-							children = text
-						}
-					end)
-				}
-			},
-			HtmlWidgets.Fragment{
-				children = Array.map(Array.filter(tabArgs, Operator.property('this')), Operator.property('tabs'))
+				attributes = {['data-nosnippet'] = '', ['data-tabs-static'] = ''},
+				children = WidgetUtil.collect(
+					Tabs._buildNavWrapper(navTabs),
+					Array.map(Array.filter(tabArgs, Operator.property('this')), Operator.property('tabs'))
+				)
 			}
 		}
 	}
@@ -117,6 +137,7 @@ function Tabs.dynamic(args)
 
 	local navTabs = HtmlWidgets.Ul{
 		classes = {'nav', 'nav-tabs', 'tabs', 'tabs' .. tabCount},
+		attributes = {['data-tabs-nav'] = ''},
 		children = WidgetUtil.collect(
 			Array.map(tabArgs, function(tabData, tabIndex)
 				return HtmlWidgets.Li{
@@ -153,50 +174,11 @@ function Tabs.dynamic(args)
 		contentChildren
 	)
 
-	local navWrapper = HtmlWidgets.Div{
-		classes = {'tabs-nav-wrapper'},
-		children = {
-			HtmlWidgets.Div{
-				classes = {'tabs-scroll-arrow-wrapper', 'tabs-scroll-arrow-wrapper--left'},
-				children = {
-					Button{
-						classes = {'tabs-scroll-arrow', 'tabs-scroll-arrow--left'},
-						title = 'Previous',
-						variant = 'ghost',
-						size = 'md',
-						children = {
-							HtmlWidgets.Span{
-								css = {display = 'inline-flex'},
-								children = {Icon{iconName = 'previous', size = 'xs'}}
-							},
-						},
-					}
-				}
-			},
-			navTabs,
-			HtmlWidgets.Div{
-				classes = {'tabs-scroll-arrow-wrapper', 'tabs-scroll-arrow-wrapper--right'},
-				children = {
-					Button{
-						classes = {'tabs-scroll-arrow', 'tabs-scroll-arrow--right'},
-						title = 'Next',
-						variant = 'ghost',
-						size = 'md',
-						children = {
-							HtmlWidgets.Span{
-								css = {display = 'inline-flex'},
-								children = {Icon{iconName = 'next', size = 'xs'}}
-							},
-						},
-					}
-				}
-			},
-		}
-	}
+	local navWrapper = Tabs._buildNavWrapper(navTabs)
 
 	if not hasContent then
 		local startTag = '<div class="tabs-dynamic navigation-not-searchable ' .. variantClass ..
-			(wraps and ' wraps' or '') .. '" data-nosnippet>\n'
+			(wraps and ' wraps' or '') .. '" data-nosnippet data-tabs-dynamic>\n'
 		return startTag .. tostring(navWrapper) .. (contents --[[@as string]])
 	end
 
@@ -205,7 +187,7 @@ function Tabs.dynamic(args)
 		css = {width = '-webkit-fill-available'},
 		children = HtmlWidgets.Div{
 			classes = {'tabs-dynamic', 'navigation-not-searchable', variantClass, wrapsClass},
-			attributes = {['data-nosnippet'] = ''},
+			attributes = {['data-nosnippet'] = '', ['data-tabs-dynamic'] = ''},
 			children = {
 				navWrapper,
 				contents
@@ -282,6 +264,54 @@ function Tabs._setThis(tabArgs)
 	tabArgs[this].this = true
 end
 
+---@param navTabs Widget
+---@return Widget
+function Tabs._buildNavWrapper(navTabs)
+	return HtmlWidgets.Div{
+		classes = {'tabs-nav-wrapper'},
+		attributes = {['data-tabs-nav-wrapper'] = ''},
+		children = {
+			HtmlWidgets.Div{
+				classes = {'tabs-scroll-arrow-wrapper', 'tabs-scroll-arrow-wrapper--left'},
+				attributes = {['data-tabs-arrow-left'] = ''},
+				children = {
+					Button{
+						classes = {'tabs-scroll-arrow', 'tabs-scroll-arrow--left'},
+						title = 'Previous',
+						variant = 'ghost',
+						size = 'md',
+						children = {
+							HtmlWidgets.Span{
+								css = {display = 'inline-flex'},
+								children = {Icon{iconName = 'previous', size = 'xs'}}
+							},
+						},
+					}
+				}
+			},
+			navTabs,
+			HtmlWidgets.Div{
+				classes = {'tabs-scroll-arrow-wrapper', 'tabs-scroll-arrow-wrapper--right'},
+				attributes = {['data-tabs-arrow-right'] = ''},
+				children = {
+					Button{
+						classes = {'tabs-scroll-arrow', 'tabs-scroll-arrow--right'},
+						title = 'Next',
+						variant = 'ghost',
+						size = 'md',
+						children = {
+							HtmlWidgets.Span{
+								css = {display = 'inline-flex'},
+								children = {Icon{iconName = 'next', size = 'xs'}}
+							},
+						},
+					}
+				}
+			},
+		}
+	}
+end
+
 ---@param hasContent boolean
 ---@param hybridTabs boolean
 ---@param noPadding boolean
@@ -291,6 +321,7 @@ function Tabs._buildContentDiv(hasContent, hybridTabs, noPadding, children)
 	if hasContent then
 		return HtmlWidgets.Div{
 			classes = {'tabs-content'},
+			attributes = {['data-tabs-content'] = ''},
 			css = {
 				['border-style'] = hybridTabs and 'none !important' or nil,
 				['padding'] = (hybridTabs or noPadding) and '0 !important' or nil,
@@ -305,7 +336,7 @@ function Tabs._buildContentDiv(hasContent, hybridTabs, noPadding, children)
 	elseif noPadding then
 		style = 'padding:0 !important;'
 	end
-	return '\n<div class="tabs-content" style="' .. style .. '">'
+	return '\n<div class="tabs-content" data-tabs-content style="' .. style .. '">'
 end
 
 ---@param tab {name: string?, link: string?, content: string|Html?, tabs: string|Html?, this: boolean}
