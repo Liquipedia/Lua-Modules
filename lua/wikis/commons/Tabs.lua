@@ -42,9 +42,7 @@ function Tabs.static(args)
 	Tabs._setThis(tabArgs)
 
 	-- Temporary solution for fighters
-	mw.log('Tabs.static: args.wrapping=' .. tostring(args.wrapping) .. ' wikiName=' .. tostring(Info.wikiName))
 	local wrapsClass = Logic.readBool(args.wrapping) and Info.wikiName == 'fighters' and 'wraps' or nil
-	mw.log('Tabs.static: wrapsClass=' .. tostring(wrapsClass))
 
 	local function buildTabLiItems(additionalClasses)
 		return Array.map(tabArgs, function(tab)
