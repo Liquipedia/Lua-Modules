@@ -37,7 +37,7 @@ end
 function CustomSquad.run(frame)
 	local args = Arguments.getArgs(frame)
 	return Context.Provider{
-		contextDef = SquadContexts.GameTitle,
+		def = SquadContexts.GameTitle,
 		value = args.game,
 		children = {SquadController.run(frame)}
 	}

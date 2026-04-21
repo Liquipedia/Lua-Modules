@@ -16,8 +16,9 @@ local String = Lua.import('Module:StringUtils')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
 local Template = Lua.import('Module:Template')
 
-local Table2Widgets = Lua.import('Module:Widget/Table2/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+local Table2Widgets = Lua.import('Module:Components/Table2/All')
+local Html = Lua.import('Module:Components/Html')
 local Row, Cell = Table2Widgets.Row, Table2Widgets.Cell
 local SquadContexts = Lua.import('Module:Components/Contexts/Squad')
 
@@ -166,13 +167,13 @@ local function SquadPlayer(props, context)
 	local game = Context.read(context, SquadContexts.GameTitle)
 	local function addColumn(columnId, content)
 		if shouldShowColumn(visibility, columnId) then
-			return Cell{children = content}
+			return Cell{children = {content}}
 		end
 	end
 	return Row{
-		children = {
+		children = WidgetUtil.collect(
 			Cell{children = {
-				HtmlWidgets.B{children = {nickname(squadPlayer, game)}},
+				Html.B{children = {nickname(squadPlayer, game)}},
 				roleIcon(squadPlayer) and '&nbsp;' or '',
 				roleIcon(squadPlayer),
 			}},
@@ -191,8 +192,8 @@ local function SquadPlayer(props, context)
 				squadPlayer.extradata.activeteamrole
 			)),
 			addColumn('leavedate', dateDisplay(squadPlayer, 'leavedate')),
-			addColumn('newteam', newTeamDisplay(squadPlayer)),
-		},
+			addColumn('newteam', newTeamDisplay(squadPlayer))
+		),
 	}
 end
 
