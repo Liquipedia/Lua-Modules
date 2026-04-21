@@ -8,6 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Info = Lua.import('Module:Info', {loadData = true})
+local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
@@ -109,7 +110,7 @@ end
 ---@return string
 function Page.makeFormQueryLink(args)
 	assert(String.isNotEmpty(args.form), 'Missing form input when building query link')
-	local prefix = assert(args.template, 'Missing template input when building query link')
+	local prefix = assert(Logic.nilIfEmpty(args.template), 'Missing template input when building query link')
 
 	local queryArgs = Table.map(args.queryArgs or {}, function(key, item)
 		return prefix .. '[' .. key .. ']', item
