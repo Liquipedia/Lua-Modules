@@ -128,7 +128,7 @@ function MatchTable:readConfig()
 	local args = self.args
 
 	local mode = args.tableMode
-	assert(mode == Opponent.solo or mode == Opponent.team, 'Unsupported "|tableMode=" input')
+	assert(mode == Opponent.solo or mode == Opponent.team or mode == 'playersOfTeam', 'Unsupported "|tableMode=" input')
 
 	local opponents = self:_readOpponents(mode)
 
@@ -144,7 +144,7 @@ function MatchTable:readConfig()
 	end)
 
 	local vsMode = args.vsMode or mode
-	assert(vsMode == Opponent.solo or vsMode == Opponent.team, 'Unsupported "|vsMode=" input')
+	assert(not args.vsMode or vsMode == Opponent.solo or vsMode == Opponent.team, 'Unsupported "|vsMode=" input')
 
 	Array.forEach(self:_readVsOpponents(mode), function(opponent)
 		Table.mergeInto(self.config.vs, self:getOpponentAliases(mode, opponent))
@@ -205,7 +205,7 @@ end
 function MatchTable:_fetchPlayersOnTeam()
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('status'), Comparator.eq, 'active'),
-		ConditionNode(ColumnName('pagename'), Comparator.eq, self.args.team or self.title.rootText),
+		ConditionNode(ColumnName('pagename'), Comparator.eq, Page.pageifyLink(self.args.team or self.title.rootText)),
 	}
 
 	local squadPlayers = mw.ext.LiquipediaDB.lpdb('squadplayer', {
@@ -241,7 +241,7 @@ end
 ---@param input string
 ---@return standardOpponent
 function MatchTable:_readOpponent(mode, input)
-	if mode == Opponent.solo or mode == 'playersOfTeam' then
+	if mode ~= Opponent.team then
 		local player = {pageName = input}
 		PlayerExt.populatePageName(player)
 		return {type = 'solo', players = {player}}
@@ -272,7 +272,7 @@ end
 ---@param opponent standardOpponent
 ---@return string[]
 function MatchTable:getOpponentAliases(mode, opponent)
-	if mode == Opponent.solo then
+	if mode ~= Opponent.team then
 		local name = opponent.players[1].pageName:gsub(' ', '_')
 		local nameWithSpaces = name:gsub('_', ' ')
 
