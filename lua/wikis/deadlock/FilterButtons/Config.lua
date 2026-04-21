@@ -21,7 +21,6 @@ Config.categories = {
 				table.insert(category.items, tier.value)
 			end
 		end,
-		defaultItems = {'1', '2', '3'},
 		transform = function(tier)
 			return Tier.toName(tier)
 		end,

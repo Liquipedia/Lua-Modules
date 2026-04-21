@@ -29,6 +29,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local Box = Lua.import('Module:Widget/Basic/Box')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local CopyToClipboard = Lua.import('Module:Widget/Basic/CopyToClipboard')
 local Dialog = Lua.import('Module:Widget/Basic/Dialog')
@@ -222,8 +223,12 @@ end
 function TournamentPlayerInfo:build()
 	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
 		self:buildIntro(),
-		self:buildOverallAgeTable(),
-		self:buildTeamAgeTable(),
+		Box{
+			children = WidgetUtil.collect(
+				self:buildOverallAgeTable(),
+				self:buildTeamAgeTable()
+			)
+		},
 		self:buildPlayersTable()
 	)}
 end
@@ -257,16 +262,6 @@ function TournamentPlayerInfo:buildIntro()
 	}
 end
 
----@param props table
----@return Widget
-local function createTemplateBox(props)
-	return Div{
-		classes = Array.extend('template-box', props.classes),
-		css = {['padding-right'] = props.padding},
-		children = props.children
-	}
-end
-
 ---@private
 ---@param ageInSeconds integer?
 ---@return string
@@ -296,24 +291,21 @@ function TournamentPlayerInfo:buildOverallAgeTable()
 	if not overallData then
 		return
 	end
-	return createTemplateBox{
-		padding = '2em',
-		children = TableWidgets.Table{
-			css = {margin = '1em 0'},
-			children = {
-				TableWidgets.TableHeader{children = TableWidgets.Row{
-					children = {
-						TableWidgets.CellHeader{children = 'Average Age'},
-						TableWidgets.CellHeader{children = 'Youngest'},
-						TableWidgets.CellHeader{children = 'Oldest'},
-					}
-				}},
-				TableWidgets.TableBody{children = TableWidgets.Row{children = {
-					TableWidgets.Cell{children = self:_formatAge(overallData.averageAge)},
-					TableWidgets.Cell{children = self:_displayPlayerWithAge(overallData.youngest)},
-					TableWidgets.Cell{children = self:_displayPlayerWithAge(overallData.oldest)},
-				}}}
-			}
+	return TableWidgets.Table{
+		css = {margin = '1em 0'},
+		children = {
+			TableWidgets.TableHeader{children = TableWidgets.Row{
+				children = {
+					TableWidgets.CellHeader{children = 'Average Age'},
+					TableWidgets.CellHeader{children = 'Youngest'},
+					TableWidgets.CellHeader{children = 'Oldest'},
+				}
+			}},
+			TableWidgets.TableBody{children = TableWidgets.Row{children = {
+				TableWidgets.Cell{children = self:_formatAge(overallData.averageAge)},
+				TableWidgets.Cell{children = self:_displayPlayerWithAge(overallData.youngest)},
+				TableWidgets.Cell{children = self:_displayPlayerWithAge(overallData.oldest)},
+			}}}
 		}
 	}
 end
@@ -348,7 +340,7 @@ function TournamentPlayerInfo:buildTeamAgeTable()
 		}})
 	end
 
-	return createTemplateBox{children = TableWidgets.Table{
+	return TableWidgets.Table{
 		tableClasses = {'prizepooltable', 'collapsed'},
 		tableAttributes = {
 			['data-cutafter'] = 3,
@@ -369,7 +361,7 @@ function TournamentPlayerInfo:buildTeamAgeTable()
 			},
 			TableWidgets.TableBody{children = teamTableRows}
 		)
-	}}
+	}
 end
 
 ---@protected

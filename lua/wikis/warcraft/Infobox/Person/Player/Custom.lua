@@ -65,7 +65,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'role' then
 		-- WC doesn't show any roles, but rather shows the Race/Faction instead
 		return {
-			Cell{name = 'Race', children = {Faction.toName(args.race)}}
+			Cell{name = 'Race', children = {Faction.toName(args.race or args.faction)}}
 		}
 	end
 	return widgets
@@ -76,7 +76,7 @@ end
 ---@param personType string
 ---@return table
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.faction = Faction.toName(args.race)
+	lpdbData.extradata.faction = Faction.toName(args.race or args.faction)
 	lpdbData.extradata.factionhistorical = Variables.varDefault('racecount') and 'true' or 'false'
 
 	return lpdbData
@@ -85,7 +85,7 @@ end
 ---@param args table
 ---@return string
 function CustomPlayer:nameDisplay(args)
-	local factionIcon = Faction.Icon{faction = args.race}
+	local factionIcon = Faction.Icon{faction = args.race or args.faction}
 
 	return (factionIcon and (factionIcon .. NON_BREAKING_SPACE) or '')
 		.. (args.id or self.pagename)
