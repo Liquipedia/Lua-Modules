@@ -91,4 +91,35 @@ function CustomOpponent.fromLpdbStruct(storageStruct)
 	return opponent
 end
 
+---@param opponent SmashStandardOpponent
+---@param date string|number|nil
+---@param options {syncPlayer: boolean?, overwritePageVars: boolean?, syncPlayerTeam: boolean?}?
+---@return SmashStandardOpponent
+function CustomOpponent.resolve(opponent, date, options)
+	opponent = Opponent.resolve(opponent, date, options) --[[@as SmashStandardOpponent]]
+
+	if not options or not options.syncPlayer then
+		return opponent
+	end
+
+	Array.forEach(opponent.players, function(player)
+		local lpdbPlayer = mw.ext.LiquipediaDB.lpdb('player', {
+			limit = 1,
+			conditions = '[[pagename::' .. player.pageName:gsub(' ', '_') .. ']]',
+			query = 'extradata',
+		})[1]
+		if not lpdbPlayer or not lpdbPlayer.extradata then
+			return
+		end
+		local game = player.game or
+			Variables.varDefault('tournament_game') or
+			lpdbPlayer.extradata.maingame or Info.defaultGame
+
+		player.chars = Array.parseCommaSeparatedString(lpdbPlayer.extradata['main' .. game])
+		player.game = game
+	end)
+
+	return opponent
+end
+
 return CustomOpponent
