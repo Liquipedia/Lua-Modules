@@ -58,7 +58,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 local BO1_SCORE_CONCAT = '&nbsp;-&nbsp;'
 local SECONDS_ONE_DAY = 3600 * 24
 
----@alias MatchTableMode `Opponent.solo` | `Opponent.team`
+---@alias MatchTableMode `Opponent.solo` | `Opponent.team` | 'playersOfTeam'
 ---@alias WDLCount {w: number, d: number, l: number}
 
 ---@class MatchTableConfig
@@ -186,6 +186,10 @@ end
 ---@param mode MatchTableMode
 ---@return standardOpponent[]
 function MatchTable:_readOpponents(mode)
+	if mode == 'playersOfTeam' then
+		return Array.map(self:_fetchPlayersOnTeam(), function(input) return self:_readOpponent(mode, input) end)
+	end
+
 	local base = mode == Opponent.solo and 'player' or 'team'
 	local inputs = self:_readOpponentInputsFromBase(base)
 
@@ -195,6 +199,22 @@ function MatchTable:_readOpponents(mode)
 	end
 
 	return Array.map(inputs, function(input) return self:_readOpponent(mode, input) end)
+end
+
+---@return string[]
+function MatchTable:_fetchPlayersOnTeam()
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('status'), Comparator.eq, 'active'),
+		ConditionNode(ColumnName('pagename'), Comparator.eq, self.args.team or self.title.rootText),
+	}
+
+	local squadPlayers = mw.ext.LiquipediaDB.lpdb('squadplayer', {
+		limit = 5000,
+		conditions = tostring(conditions),
+		query = 'link'
+	})
+
+	return Array.map(squadPlayers, Operator.property('link'))
 end
 
 ---@param mode MatchTableMode
@@ -221,7 +241,7 @@ end
 ---@param input string
 ---@return standardOpponent
 function MatchTable:_readOpponent(mode, input)
-	if mode == Opponent.solo then
+	if mode == Opponent.solo or mode == 'playersOfTeam' then
 		local player = {pageName = input}
 		PlayerExt.populatePageName(player)
 		return {type = 'solo', players = {player}}
