@@ -17,7 +17,7 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
-local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
 
 local ONGOING_SERIES = IconFa{
 	iconName = 'ongoing_series',
@@ -75,9 +75,10 @@ local CONTENT = {
 		heading = HtmlWidgets.Fragment{children = {TROPHY, '&nbsp;F1 & Feeder Series Seasons'}},
 		body = TournamentsTicker{
 			upcomingDays = 90,
-			completedDays = 90
+			completedDays = 90,
+			variant = 'collapsible',
 		},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER
 	},
 	seasonOverview = {

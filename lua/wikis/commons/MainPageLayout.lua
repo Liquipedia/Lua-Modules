@@ -56,7 +56,7 @@ function MainPageLayout.make(frame)
 		classes = {'mainpage-v2'},
 		children = WidgetUtil.collect(
 			NO_TABLE_OF_CONTENTS,
-			frame:callParserFunction('DISPLAYTITLE', WikiData.title),
+			Page.setDisplayTitle{frame = frame, title = WikiData.title},
 			HtmlWidgets.Div{
 				classes = {'header-banner'},
 				children = {

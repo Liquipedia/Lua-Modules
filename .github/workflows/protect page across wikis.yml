@@ -1,16 +1,16 @@
-name: Protect newly set up wiki
+name: Protect page across wikis
 
 on:
   workflow_dispatch:
     inputs:
-      wiki:
-        description: 'Wiki to set up'
+      page:
+        description: 'Page to protect (prefix with namespace!)'
         required: true
 
 jobs:
   protect:
     if: github.ref_name == github.event.repository.default_branch
-    name: Protect modules on newly set up wiki
+    name: Protect a given page across all wikis
     runs-on: ubuntu-latest
 
     steps:
@@ -24,12 +24,12 @@ jobs:
       - name: Install Python Dependency
         run: pip install requests
 
-      - name: Template Protect
+      - name: Page Protect
         env:
           WIKI_USER: ${{ secrets.LP_BOTUSER }}
           WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
-          WIKI_TO_PROTECT: ${{ github.event.inputs.wiki }}
+          PAGE_TO_PROTECT: ${{ github.event.inputs.page }}
           PYTHONUNBUFFERED: 1
-        run: python3 ./scripts/protect_templates.py
+        run: python3 ./scripts/protect_page_across_wikis.py

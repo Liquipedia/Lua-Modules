@@ -8,8 +8,8 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local ChampionNames = Lua.import('Module:ChampionNames', {loadData = true})
 local FnUtil = Lua.import('Module:FnUtil')
-local HeroNames = Lua.import('Module:ChampionNames', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
 local String = Lua.import('Module:StringUtils')
@@ -37,8 +37,8 @@ local MapFunctions = {}
 ---@field getLength fun(map: table): string?
 ---@field getSide fun(map: table, opponentIndex: integer): string?
 ---@field getObjectives fun(map: table, opponentIndex: integer): string?
----@field getHeroPicks fun(map: table, opponentIndex: integer): string[]?
----@field getHeroBans fun(map: table, opponentIndex: integer): string[]?
+---@field getChampionPicks fun(map: table, opponentIndex: integer): string[]?
+---@field getChampionBans fun(map: table, opponentIndex: integer): string[]?
 ---@field getParticipants fun(map: table, opponentIndex: integer): table[]?
 ---@field getVetoPhase fun(map: table): table?
 ---@field extendMapOpponent? fun(map: table, opponentIndex: integer): table
@@ -126,6 +126,10 @@ function CustomMatchGroupInput.aggregateStats(match)
 					player.extradata.gameLength = Operator.nilSafeAdd(player.extradata.gameLength, gameLength)
 				end
 			)
+			local killsParticipated = Operator.nilSafeAdd(player.extradata.kills, player.extradata.assists)
+			player.extradata.killparticipation = (
+				(opponent.extradata.kills or 0) > 0 and killsParticipated
+			) and (killsParticipated / opponent.extradata.kills) or nil
 			player.extradata.characters = Logic.nilIfEmpty(player.extradata.characters)
 		end)
 	end)
@@ -178,7 +182,7 @@ end
 ---@return table
 function MapFunctions.getExtraData(MapParser, match, map, opponents)
 	local extraData = {}
-	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
+	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, ChampionNames)
 
 	local function prefixKeyWithTeam(key, opponentIndex)
 		return 'team' .. opponentIndex .. key
@@ -190,10 +194,10 @@ function MapFunctions.getExtraData(MapParser, match, map, opponents)
 			side = MapParser.getSide(map, opponentIndex),
 		}
 		opponentData = Table.merge(opponentData,
-			Table.map(MapParser.getHeroPicks(map, opponentIndex) or {}, function(idx, hero)
+			Table.map(MapParser.getChampionPicks(map, opponentIndex) or {}, function(idx, hero)
 				return 'champion' .. idx, getCharacterName(hero)
 			end),
-			Table.map(MapParser.getHeroBans(map, opponentIndex) or {}, function(idx, hero)
+			Table.map(MapParser.getChampionBans(map, opponentIndex) or {}, function(idx, hero)
 				return 'ban' .. idx, getCharacterName(hero)
 			end)
 		)
@@ -217,7 +221,7 @@ end
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponentIndex)
-	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
+	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, ChampionNames)
 
 	local participantList = MapParser.getParticipants(map, opponentIndex) or {}
 	return MatchGroupInputUtil.parseMapPlayers(

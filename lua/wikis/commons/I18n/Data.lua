@@ -70,6 +70,10 @@ return {
 		['date-range-month-day--month-unknown_day'] = '${startMonth} ${startDate} – ${endMonth} TBA',
 		['date-range-month-day--month-day'] = '${startMonth} ${startDate} – ${endMonth} ${endDate}',
 
+		-- HiddenDataBox warnings
+		['hiddendatabox-invalid-parent-warning'] = '${parent} is not a Liquipedia Tournament',
+		['hiddendatabox-invalid-tier-warning'] = '${tierString} is not a known Liquipedia ${tierMode}',
+
 		-- Bracket Headers
 		['brkts-header-r1'] = 'Grand Final,Final,GF',
 		['brkts-header-r2'] = 'Semifinals,Semis,SF',
@@ -105,6 +109,10 @@ return {
 
 		-- MatchSummary Map Veto
 		['matchsummary-mapveto-start'] = 'Start Map Veto',
+
+		-- MatchTable
+		['matchtable-no-match-results'] = 'This ${mode} has not played any matches yet.',
+		['matchtable-no-h2h-match-results'] = 'These ${mode} have not played any matches against each other yet.',
 
 		-- MatchTicker
 		['matchticker-upcoming-matches'] = 'Upcoming Matches',

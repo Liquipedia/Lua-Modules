@@ -1,0 +1,23 @@
+/* hide subpages (breadcrumbs) in mainspace and templatespace */
+body.ns-0,
+body.ns-10 {
+	.content-sub .subpages {
+		display: none;
+	}
+}
+
+ol.breadcrumb {
+	margin-left: -0.75rem;
+
+	.theme--light & {
+		background-color: var( --clr-surface-5 );
+	}
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+	}
+
+	.breadcrumb-item + .breadcrumb-item::before {
+		color: var( --clr-on-background );
+	}
+}

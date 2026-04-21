@@ -1,20 +1,105 @@
-div.standings-ffa,
-div.standings-swiss {
-	& > table > * > tr > th {
-		padding: 12px;
+.standings-ffa,
+.standings-swiss {
+	tr[ data-position-status ] {
+		position: relative;
+
+		&::after {
+			content: "";
+			position: absolute;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 0.25rem;
+			background-color: var( --placement-row-color );
+		}
+
+		&[ data-position-status="byeup" ] {
+			--placement-row-color: var( --position-byeup-color );
+		}
+
+		&[ data-position-status="seedup" ] {
+			--placement-row-color: var( --position-seedup-color );
+		}
+
+		&[ data-position-status="up" ] {
+			--placement-row-color: var( --position-up-color );
+		}
+
+		&[ data-position-status="stayup" ] {
+			--placement-row-color: var( --position-stayup-color );
+		}
+
+		&[ data-position-status="stay" ] {
+			--placement-row-color: var( --position-stay-color );
+		}
+
+		&[ data-position-status="staydown" ] {
+			--placement-row-color: var( --position-staydown-color );
+		}
+
+		&[ data-position-status="down" ] {
+			--placement-row-color: var( --position-down-color );
+		}
+	}
+}
+
+.standings-ffa-wrapper {
+	width: fit-content;
+	max-width: 100%;
+	display: flex;
+	flex-flow: column nowrap;
+	gap: 0.5rem;
+
+	.dropdown-box {
+		&-wrapper {
+			width: fit-content;
+		}
+
+		&-visible {
+			display: flex;
+			flex-flow: column nowrap;
+			width: 100%;
+		}
+	}
+}
+
+.standings-match-overview {
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.standings-position-indicator {
+	display: flex;
+	flex-flow: row nowrap;
+	padding: 0.125rem 0.5rem;
+	gap: 0.125rem;
+	font-weight: bold;
+	align-items: center;
+	justify-content: center;
+	min-height: 1.25rem;
+	font-size: 0.6875rem;
+	line-height: 1rem;
+
+	&.movement-up {
+		color: var( --clr-semantic-positive-30 );
+
+		.theme--dark & {
+			color: var( --clr-semantic-positive-80 );
+		}
 	}
 
-	& > table > * > tr > td {
-		padding: 8px;
+	&.movement-neutral {
+		color: var( --clr-secondary-80 );
 	}
 
-	& .btn {
-		width: 120%;
-	}
+	&.movement-down {
+		color: var( --clr-semantic-negative-40 );
 
-	& .tableHeaderRow {
-		display: flex;
-		gap: 32px;
-		align-items: center;
+		.theme--dark & {
+			color: var( --clr-semantic-negative-80 );
+		}
 	}
 }

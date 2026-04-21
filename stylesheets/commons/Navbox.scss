@@ -10,16 +10,16 @@ ul.hlist,
 .hlist li {
 	margin: 0;
 	display: inline;
-}
 
-.hlist li::after {
-	content: " · ";
-	font-weight: bold;
-	margin: 0 0.25em 0 0.3em;
-}
+	&::after {
+		content: " · ";
+		font-weight: bold;
+		margin: 0 0.25em 0 0.3em;
+	}
 
-.hlist li:last-child::after {
-	content: none;
+	&:last-child::after {
+		content: none;
+	}
 }
 
 /* Default skin for navigation boxes */
@@ -65,10 +65,8 @@ tr + tr > .navbox-list {
 	font-weight: bold;
 	padding-left: 1em;
 	padding-right: 1em;
-}
 
-@media ( max-width: 767px ) {
-	.navbox-group {
+	@media ( max-width: 767px ) {
 		padding-left: 0.25em;
 		padding-right: 0.25em;
 	}
@@ -129,5 +127,49 @@ tr + tr > .navbox-list {
 @media ( max-width: 600px ) {
 	.navbox .image {
 		display: none;
+	}
+}
+
+.navbox {
+	.theme--light & {
+		background-color: var( --clr-surface-4 );
+	}
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+	}
+
+	&-title {
+		.theme--light & {
+			background-color: var( --clr-wiki-primary-container );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-wiki-theme-20 );
+		}
+	}
+
+	&-group {
+		.theme--light & {
+			background-color: var( --clr-wiki-primary-container );
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-wiki-theme-20 );
+		}
+	}
+
+	&-list {
+		.theme--light & {
+			border-top-color: var( --clr-on-surface-light-primary-8 );
+			border-left-color: var( --clr-on-surface-light-primary-8 );
+			background-color: var( --clr-surface-4 );
+		}
+
+		.theme--dark & {
+			border-top-color: var( --clr-secondary-25 );
+			border-left-color: var( --clr-secondary-25 );
+			background-color: var( --clr-secondary-16 );
+		}
 	}
 }

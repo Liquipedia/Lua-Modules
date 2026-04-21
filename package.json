@@ -17,13 +17,14 @@
 		"jest-junit": "^16.0.0",
 		"jquery": "*",
 		"pixelmatch": "^7.1.0",
-		"playwright": "^1.58.2",
+		"playwright": "^1.59.0",
 		"pngjs": "^7.0.0",
 		"postcss-scss": "^4.x.x",
 		"sass": "^1.97.3",
 		"stylelint": "^17.4.0",
 		"stylelint-config-wikimedia": "^0.18.0",
-		"stylelint-scss": "^7.x.x"
+		"stylelint-scss": "^7.x.x",
+		"types-mediawiki": "^2.0.0"
 	},
 	"jest": {
 		"reporters": [
@@ -40,6 +41,8 @@
 		"test:js": "jest",
 		"compile:scss": "sass stylesheets/Main.scss lua/output/css/main.css",
 		"build:css": "npm run compile:scss",
+		"build:js": "node build-js.js",
+		"build": "npm run build:css && npm run build:js",
 		"lua-test": "npm run build:css && busted -C lua",
 		"update-snapshots": "UPDATE_SNAPSHOTS=true npm run lua-test"
 	}

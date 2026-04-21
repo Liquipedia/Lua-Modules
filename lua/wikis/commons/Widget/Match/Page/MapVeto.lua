@@ -19,6 +19,7 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local VetoLabel = Lua.import('Module:Widget/Match/Summary/VetoLabel')
 
 ---@alias VetoRound {map: string, type: 'pick'|'ban'|'decider', round: integer, by: standardOpponent}
 
@@ -41,30 +42,19 @@ function MatchPageMapVeto:render()
 				teamStyle = 'icon',
 			}
 		end
-		local actionType
 		local byText
 
 		if vetoRound.type == 'pick' then
-			actionType = 'Pick'
 			byText = teamDisplay()
 		elseif vetoRound.type == 'ban' then
-			actionType = 'Ban'
 			byText = teamDisplay()
 		elseif vetoRound.type == 'protect' then
-			actionType = 'Protect'
 			byText = teamDisplay()
-		elseif vetoRound.type == 'decider' then
-			actionType = 'Decider'
-		elseif vetoRound.type == 'defaultban' then
-			actionType = 'Default Ban'
 		end
 
 		return WidgetUtil.collect(
 			byText,
-			HtmlWidgets.Span{
-				classes = {'match-bm-map-veto-card-map-action'},
-				children = actionType
-			}
+			VetoLabel{vetoType = vetoRound.type}
 		)
 	end
 

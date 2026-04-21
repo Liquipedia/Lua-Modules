@@ -41,7 +41,7 @@ input[ type="range" ] {
 		cursor: pointer;
 	}
 	-webkit-appearance: none;
-	margin: $thumb-height/2 0;
+	margin: calc( $thumb-height / 2 ) 0;
 	width: $track-width;
 	height: $thumb-height;
 	background-color: transparent;
@@ -59,7 +59,7 @@ input[ type="range" ] {
 	&::-webkit-slider-thumb {
 		@include thumb();
 		-webkit-appearance: none;
-		margin-top: ( $track-height / 2 ) - ( $thumb-height / 2 );
+		margin-top: calc( $track-height / 2 ) - calc( $thumb-height / 2 );
 	}
 
 	&::-moz-range-track {
@@ -70,8 +70,8 @@ input[ type="range" ] {
 
 	&::-moz-range-thumb {
 		@include thumb();
-		height: $thumb-height / 3 * 2;
-		width: $thumb-width / 3 * 2;
+		height: calc( $thumb-height / 3 * 2 );
+		width: calc( $thumb-width / 3 * 2 );
 	}
 
 	&::-moz-range-progress {

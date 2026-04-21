@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Condition = Lua.import('Module:Condition')
 local MainPageLayoutUtil = Lua.import('Module:MainPageLayout/Util')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
-local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker/List')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -64,7 +64,7 @@ local CONTENT = {
 	matches = {
 		heading = 'Matches',
 		body = MatchTicker{},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	tournaments = {
@@ -72,8 +72,9 @@ local CONTENT = {
 		body = TournamentsTicker{
 			upcomingDays = 60,
 			completedDays = 60,
+			variant = 'collapsible',
 		},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
 	},
 }
@@ -132,13 +133,11 @@ return {
 				table = 'datapoint',
 				conditions = Condition.Tree(BooleanOperator.all):add{
 					Condition.Node(Condition.ColumnName('type'), Comparator.eq, 'card'),
-					Condition.Tree(BooleanOperator.any):add{
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Tower Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Spell'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Building'),
-					}
-				}:toString()
+					Condition.Util.anyOf(
+						Condition.ColumnName('type', 'extradata'),
+						{'Troop', 'Tower Troop', 'Spell', 'Building'}
+					)
+				}
 			},
 		},
 		{
@@ -150,13 +149,11 @@ return {
 				table = 'datapoint',
 				conditions = Condition.Tree(BooleanOperator.all):add{
 					Condition.Node(Condition.ColumnName('type'), Comparator.eq, 'card'),
-					Condition.Tree(BooleanOperator.any):add{
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Tower Troop'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Spell'),
-						Condition.Node(Condition.ColumnName('extradata_type'), Comparator.eq, 'Evolved Building'),
-					}
-				}:toString()
+					Condition.Util.anyOf(
+						Condition.ColumnName('type', 'extradata'),
+						{'Evolved Troop', 'Evolved Tower Troop', 'Evolved Spell', 'Evolved Building'}
+					)
+				}
 			},
 		},
 		{
@@ -166,7 +163,13 @@ return {
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[extradata_type::Hero Troop]]',
+				conditions = Condition.Tree(BooleanOperator.all):add{
+					Condition.Node(Condition.ColumnName('type'), Comparator.eq, 'card'),
+					Condition.Util.anyOf(
+						Condition.ColumnName('type', 'extradata'),
+						{'Hero Troop', 'Hero Spell'}
+					)
+				}
 			},
 		},
 		{
