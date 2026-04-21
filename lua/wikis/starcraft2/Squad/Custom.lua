@@ -17,6 +17,14 @@ local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local CustomSquad = {}
 
+local function adjustLpdb(squadData, squadPlayer)
+	if squadData.squadStatus ~= SquadUtils.SquadStatus.ACTIVE then
+		return
+	end
+	local isMain = Logic.readBool(squadData.main) or Logic.isEmpty(squadData.squad)
+	squadPlayer.extradata.group = isMain and 'main' or 'additional'
+end
+
 ---@param frame Frame
 ---@return Widget
 function CustomSquad.run(frame)
