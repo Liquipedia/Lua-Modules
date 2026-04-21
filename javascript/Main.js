@@ -68,7 +68,7 @@ const jsModules = [
 	'Slider',
 	'SwitchButtons',
 	'Tabs',
-  'Table2',
+	'Table2',
 	'CoreEnd'
 ];
 
