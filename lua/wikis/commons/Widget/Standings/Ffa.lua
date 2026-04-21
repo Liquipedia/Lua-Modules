@@ -60,9 +60,7 @@ function StandingsFfaWidget:render()
 				end
 				return {align = 'center'}
 			end),
-			self:_showRoundColumns() and Array.map(standings.rounds, function(round)
-				return {align = 'center'}
-			end) or nil
+			self:_showRoundColumns() and Array.rep({align = 'center'}, #standings.rounds) or nil
 		),
 		title = String.nilIfEmpty(standings.title),
 		children = WidgetUtil.collect(
