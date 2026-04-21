@@ -98,6 +98,39 @@ function SquadUtils.anyInactive(players)
 	end)
 end
 
+---@alias SquadWrapper {players: table[], squadType: SquadType, squadStatus: SquadStatus, title: string?, args: table}
+
+---@param players table[]
+---@param squadType SquadType
+---@param squadStatus SquadStatus
+---@param title string?
+---@param args table?
+---@return SquadWrapper
+function SquadUtils.createWrapperData(players, squadType, squadStatus, title, args)
+	return {
+		players = players,
+		squadType = squadType,
+		squadStatus = squadStatus,
+		title = title,
+		args = args or {},
+	}
+end
+
+---@param args table
+---@return SquadWrapper
+function SquadUtils.readWrapperArgs(args)
+	local players = SquadUtils.parsePlayers(args)
+
+	local squadType = SquadUtils.TypeToSquadType[args.type] or SquadUtils.SquadType.PLAYER
+	local squadStatus = SquadUtils.statusToSquadStatus(args.status) or SquadUtils.SquadStatus.ACTIVE
+
+	if squadStatus == SquadUtils.SquadStatus.FORMER and SquadUtils.anyInactive(players) then
+		squadStatus = SquadUtils.SquadStatus.FORMER_INACTIVE
+	end
+
+	return SquadUtils.createWrapperData(players, squadType, squadStatus, args.title)
+end
+
 ---@param player table
 ---@return table
 function SquadUtils.convertAutoParameters(player)
