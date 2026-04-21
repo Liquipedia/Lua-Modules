@@ -308,12 +308,22 @@
 	color: var( --clr-primary, #0000ff );
 }
 
-.brkts-valorant-score-color-def {
-	color: #46b09c;
-}
+.wiki-valorant {
+	--valorant-def-score-color: #01654c;
+	--valorant-atk-score-color: #b20110;
 
-.brkts-valorant-score-color-atk {
-	color: #c04845;
+	.theme--dark & {
+		--valorant-def-score-color: #46b09c;
+		--valorant-atk-score-color: #c04845;
+	}
+
+	.brkts-valorant-score-color-def {
+		color: var( --valorant-def-score-color );
+	}
+
+	.brkts-valorant-score-color-atk {
+		color: var( --valorant-atk-score-color );
+	}
 }
 
 .brkts-identityv-score-color-survivor {
