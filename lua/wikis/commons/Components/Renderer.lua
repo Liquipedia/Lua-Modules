@@ -10,7 +10,7 @@ local Renderer = {}
 --- Renders a Virtual Node (VNode) into a string
 ---@param vNode Renderable|Renderable[]
 ---@param context Context?
----@return string|Html
+---@return string
 function Renderer.render(vNode, context)
 	if not vNode then return "" end
 
@@ -49,14 +49,14 @@ function Renderer.render(vNode, context)
 
 	-- Handle Context Providers
 	if renderFn == "CONTEXT_PROVIDER" then
-		---@cast vNode Context
+		---@cast vNode Context<any>
 		-- Push a new link onto the Context chain
 		local newContext = {
 			parent = context,
 			def = vNode.props.def,
 			value = vNode.props.value
 		}
-		return Renderer.render(vNode.props.children, newContext)
+		return Renderer.render(vNode.props.children, {props = newContext})
 	end
 
 	-- Handle HTML Tags
