@@ -28,11 +28,12 @@ function TeamPlayerMatches.run(frame)
 		children = WidgetUtil.collect(
 			TeamPlayerMatches._matchTicker(args.team),
 			HtmlWidgets.H3{children = 'Recent Matches'},
+			'The following table shows the recent 100 Matches of Players that are currently part of this Team.',
 			MatchTable.results{
 				tableMode = 'playersOfTeam',
 				overallStats = false,
 				team = args.team,
-				limit = 20,
+				limit = 100,
 			}
 		)
 	}
