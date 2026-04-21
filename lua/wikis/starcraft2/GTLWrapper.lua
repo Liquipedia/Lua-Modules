@@ -6,9 +6,9 @@ local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Variables = Lua.import('Module:Variables')
 
-local GroupTableLeague = Lua.import('Module:GroupTableLeague/Starcraft/next/downstream', {requireDevIfEnabled = true})
-local MatchGroup = Lua.import('Module:MatchGroup', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local GroupTableLeague = Lua.import('Module:GroupTableLeague/Starcraft/next/downstream')
+local MatchGroup = Lua.import('Module:MatchGroup')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
