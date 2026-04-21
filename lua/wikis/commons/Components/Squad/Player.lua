@@ -19,7 +19,7 @@ local Template = Lua.import('Module:Template')
 local Table2Widgets = Lua.import('Module:Widget/Table2/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Row, Cell = Table2Widgets.Row, Table2Widgets.Cell
-local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
+local SquadContexts = Lua.import('Module:Components/Contexts/Squad')
 
 local RoleIcons = {
 	captain = Icon.makeIcon{iconName = 'captain', hover = 'Captain'},

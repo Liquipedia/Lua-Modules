@@ -1,7 +1,6 @@
 ---
 -- @Liquipedia
 -- page=Module:Components/Contexts/Table2
---
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
