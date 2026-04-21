@@ -15,7 +15,6 @@ local Game = Lua.import('Module:Game')
 local String = Lua.import('Module:StringUtils')
 local Tabs = Lua.import('Module:Tabs')
 
-
 local Condition = Lua.import('Module:Condition')
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
