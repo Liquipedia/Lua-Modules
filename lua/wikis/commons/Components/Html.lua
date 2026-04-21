@@ -5,7 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local ComponentSystem = require('Module:Lib/Component/Core')
+local ComponentSystem = require('Module:Components/Component')
 
 local Html = {}
 

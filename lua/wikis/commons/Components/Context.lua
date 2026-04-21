@@ -6,23 +6,23 @@
 --
 
 local Lua = require('Module:Lua')
-local ComponentCore = Lua.import('Module:Lib/Component/Core')
+local ComponentCore = Lua.import('Module:Components/Component')
 
 local Context = {}
 
 -- Create a unique Context Definition with a default value
----@generic P
----@param defaultValue P
----@return ContextDef<P>
+---@generic T
+---@param defaultValue T
+---@return ContextDef<T>
 function Context.create(defaultValue)
 	return { defaultValue = defaultValue }
 end
 
 -- Read from Context
----@generic P
----@param node Context?
----@param contextDef ContextDef<P>
----@return P
+---@generic T
+---@param node Context<T>?
+---@param contextDef ContextDef<T>
+---@return T
 function Context.read(node, contextDef)
 	while node do
 		local props = node.props
@@ -38,6 +38,6 @@ end
 Context.Provider = setmetatable(
 	{ renderFn = 'CONTEXT_PROVIDER'},
 	ComponentCore.ComponentMT
-) --[[@as ContextComponent]]
+) --[[@as ContextComponent<any>]]
 
 return Context

@@ -9,15 +9,15 @@
 ---@field renderFn string|Component<P>
 ---@field props P
 
----@alias Context VNode<{parent: Context?, def: ContextDef, value: any, children: Renderable}>
+---@alias Context<T> VNode<{parent: Context?, def: ContextDef<T>, value: T, children: Renderable}>
 ---@alias HtmlNode VNode<{classes?: string[], css?: table, attr?: table, children: Renderable}>
 
 ---@alias Renderable string|Html|Widget|number|VNode
 
----@alias ContextDef<P> {defaultValue: P}
+---@alias ContextDef<T> {defaultValue: T}
 
 ---@alias Component<P> fun(props: P, context: Context?): VNode<P>
----@alias ContextComponent Component<{parent: Context?, def: ContextDef, value: any, children: Renderable}>
+---@alias ContextComponent<T> Component<{parent: Context?, def: ContextDef<T>, value: T, children: Renderable}>
 ---@alias HtmlComponent Component<{classes?: string[], css?: table, attr?: table, children: Renderable}>
 
 local Lua = require('Module:Lua')
