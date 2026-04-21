@@ -399,6 +399,9 @@ local byFactionAoE4 = {
 }
 
 local byFactionAoM = {
+	aztecs = {
+		icon = 'File:Aztecs AoM R icon.png',
+	},
 	atlanteans = {
 		icon = 'File:Atlantean AoM R icon.png',
 	},
@@ -478,13 +481,13 @@ local byFactionAoM = {
 		icon = 'File:Zeus AoM R icon.png',
 	},
 	quetzalcoatl = {
-		icon = 'File:Quetzalcoatl AoM icon.png',
+		icon = 'File:Quetzalcoatl AoM R icon.png',
 	},
 	huitzilopochtli = {
-		icon = 'File:Huitzilopochtli AoM icon.png',
+		icon = 'File:Huitzilopochtli AoM R icon.png',
 	},
 	tezcatlipoca = {
-		icon = 'File:Tezcatlipoca AoM icon.png',
+		icon = 'File:Tezcatlipoca AoM R icon.png',
 	},
 
 	unknown = {
