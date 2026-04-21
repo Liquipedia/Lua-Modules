@@ -15,14 +15,17 @@ local MatchTicker = Lua.import('Module:MatchTicker')
 local MatchTickerDisplay = Lua.import('Module:MatchTicker/DisplayComponents/Entity')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local TeamPlayerMatches = {}
 
+---@param frame Frame
+---@return Widget
 function TeamPlayerMatches.run(frame)
 	local args = Arguments.getArgs(frame)
 
 	return HtmlWidgets.Fragment{
-		children = {
+		children = WidgetUtil.collect(
 			TeamPlayerMatches._matchTicker(args.team),
 			HtmlWidgets.H3{children = 'Recent Matches'},
 			MatchTable.results{
@@ -31,10 +34,13 @@ function TeamPlayerMatches.run(frame)
 				team = args.team,
 				limit = 20,
 			}
-		}
+		)
 	}
 end
 
+---@private
+---@param team string
+---@return Widget?
 function TeamPlayerMatches._matchTicker(team)
 	if Info.config.match2.status == 0 then
 		return nil
