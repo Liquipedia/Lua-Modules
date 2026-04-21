@@ -22,6 +22,9 @@ local SquadPlayerDisplay = Lua.import('Module:Components/Squad/Player')
 
 local SquadController = {}
 
+---@param squadData SquadWrapper
+---@param adjustLpdb function?
+---@return Component
 function SquadController.execute(squadData, adjustLpdb)
 	local squadPlayers = Array.map(squadData.players, function(player)
 		return SquadUtils.readSquadPersonArgs(Table.merge(
@@ -31,7 +34,7 @@ function SquadController.execute(squadData, adjustLpdb)
 	end)
 
 	if adjustLpdb then
-		Array.forEach(squadPlayers, FnUtil.curry(squadData, adjustLpdb))
+		Array.forEach(squadPlayers, FnUtil.curry(adjustLpdb, squadData))
 	end
 
 	Array.forEach(squadPlayers, function (squadPlayer)

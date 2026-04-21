@@ -17,11 +17,13 @@ local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local CustomSquad = {}
 
+---@param squadData SquadWrapper
+---@param squadPlayer ModelRow
 local function adjustLpdb(squadData, squadPlayer)
 	if squadData.squadStatus ~= SquadUtils.SquadStatus.ACTIVE then
 		return
 	end
-	local isMain = Logic.readBool(squadData.main) or Logic.isEmpty(squadData.squad)
+	local isMain = Logic.readBool(squadData.args.main) or Logic.isEmpty(squadData.args.squad)
 	squadPlayer.extradata.group = isMain and 'main' or 'additional'
 end
 
