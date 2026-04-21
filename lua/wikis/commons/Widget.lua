@@ -29,8 +29,6 @@ local Widget = Class.new(function(self, props)
 	self.context = {} -- Populated by the parent
 end)
 
----@alias Renderable string|Html|Widget|number
-
 Widget.defaultProps = {}
 
 ---Asserts the existence of a value and copies it
