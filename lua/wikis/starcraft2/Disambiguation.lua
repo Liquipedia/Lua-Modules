@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Disambiguation
+-- page=Module:PlayerDisambiguation
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
