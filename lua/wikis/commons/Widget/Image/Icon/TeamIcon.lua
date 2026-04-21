@@ -55,7 +55,7 @@ function TeamIcon:_getIcon(image, size, link)
 	return WidgetIconImage{
 		imageLight = image,
 		size = size,
-		alignment = 'middle',
+		verticalAlignment = 'middle',
 		caption = self.props.name,
 		link = link,
 	}

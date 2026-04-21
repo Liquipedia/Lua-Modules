@@ -8,8 +8,11 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local ChampionNames = Lua.import('Module:ChampionNames', {loadData = true})
+local FnUtil = Lua.import('Module:FnUtil')
 local InGameRoles = Lua.import('Module:InGameRoles', {loadData = true})
 local Logic = Lua.import('Module:Logic')
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
@@ -94,11 +97,13 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 		return killsParticipated / totalKills
 	end
 
+	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, ChampionNames)
+
 	return Array.map(team.players, function(player)
 		return {
 			player = player.id,
 			role = player.role,
-			character = player.champion,
+			character = getCharacterName(player.champion),
 			gold = player.gold,
 			kills = player.kills,
 			deaths = player.deaths,
@@ -116,7 +121,7 @@ end
 ---@param map table
 ---@param opponentIndex integer
 ---@return string[]?
-function CustomMatchGroupInputMatchPage.getHeroPicks(map, opponentIndex)
+function CustomMatchGroupInputMatchPage.getChampionPicks(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
 	if not team then return end
 	return Array.map(team.players or {}, Operator.property('champion'))
@@ -125,7 +130,7 @@ end
 ---@param map table
 ---@param opponentIndex integer
 ---@return string[]?
-function CustomMatchGroupInputMatchPage.getHeroBans(map, opponentIndex)
+function CustomMatchGroupInputMatchPage.getChampionBans(map, opponentIndex)
 	if not map.championVeto then return end
 
 	local bans = Array.filter(map.championVeto, function(veto)

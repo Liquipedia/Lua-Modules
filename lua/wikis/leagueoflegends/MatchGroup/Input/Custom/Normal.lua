@@ -65,7 +65,7 @@ end
 ---@param map table
 ---@param opponentIndex integer
 ---@return string[]
-function CustomMatchGroupInputNormal.getHeroPicks(map, opponentIndex)
+function CustomMatchGroupInputNormal.getChampionPicks(map, opponentIndex)
 	local participants = CustomMatchGroupInputNormal.getParticipants(map, opponentIndex)
 	if Logic.isNotEmpty(participants) then
 		---@cast participants -nil
@@ -82,7 +82,7 @@ end
 ---@param map table
 ---@param opponentIndex integer
 ---@return string[]
-function CustomMatchGroupInputNormal.getHeroBans(map, opponentIndex)
+function CustomMatchGroupInputNormal.getChampionBans(map, opponentIndex)
 	local bans = {}
 	local teamPrefix = 't' .. opponentIndex
 	for playerIndex = 1, MAX_NUM_BANS do
