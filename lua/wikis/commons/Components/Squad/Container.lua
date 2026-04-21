@@ -60,7 +60,7 @@ local function SquadContainer(props, context)
 		title = title,
 		children = {
 			TableWidgets.TableHeader{
-				children = props.header,
+				children = {props.header},
 			},
 			TableWidgets.TableBody{
 				children = props.children,

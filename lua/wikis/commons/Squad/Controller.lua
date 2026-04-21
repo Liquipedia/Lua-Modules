@@ -42,7 +42,7 @@ function SquadController.execute(squadData, adjustLpdb)
 	end)
 
 	local squadTable = Context.Provider{
-		contextDef = SquadContexts.ColumnVsibility,
+		def = SquadContexts.ColumnVisibility,
 		value = SquadUtils.analyzeColumnVisibility(squadPlayers, squadData.squadStatus),
 		children = {
 			SquadDisplay{
@@ -59,7 +59,7 @@ function SquadController.execute(squadData, adjustLpdb)
 	if not Info.config.squads.hasPosition then
 		return squadTable
 	end
-	return Context.Provider{contextDef = SquadContexts.RoleTitle, value = 'Position', children = {squadTable}}
+	return Context.Provider{def = SquadContexts.RoleTitle, value = 'Position', children = {squadTable}}
 end
 
 ---@param frame Frame
