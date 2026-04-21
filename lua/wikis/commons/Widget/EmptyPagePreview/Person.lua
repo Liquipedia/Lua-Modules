@@ -53,9 +53,14 @@ function EmptyPersonPagePreview:render()
 
 	self.person = Page.applyUnderScoresIfEnforced(self.props.pageName)
 
+	local infobox = self:_infobox()
+	if not infobox then
+		return
+	end
+
 	return HtmlWidgets.Div{
 		children = WidgetUtil.collect(
-			self:_infobox(),
+			infobox,
 			HtmlWidgets.H2{children = {'Overview'}},
 			self:_results(),
 			self:_matches(),
@@ -66,7 +71,7 @@ function EmptyPersonPagePreview:render()
 end
 
 ---@private
----@return Widget
+---@return Widget?
 function EmptyPersonPagePreview:_infobox()
 	local infoboxArgsFromSquadInfo = self:_backfillInformationFromSquadInfo()
 
@@ -83,6 +88,9 @@ function EmptyPersonPagePreview:_infobox()
 	infoboxArgs.idsArray = Array.filter(infoboxArgs.idsArray, function(id)
 		return id ~= infoboxArgs.id
 	end)
+	if Logic.isEmpty(infoboxArgs.idsArray) then
+		return
+	end
 	infoboxArgs.ids = table.concat(infoboxArgs.idsArray, ', ')
 	infoboxArgs.id = infoboxArgs.id or self.props.pageName
 
