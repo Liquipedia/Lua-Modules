@@ -54,12 +54,7 @@ function MapEventList.run(frame)
 		HtmlWidgets.H3{children = 'Played in Premier Tournaments'},
 		TableWidgets.Table{
 			sortable = true,
-			columns = {
-				{},
-				{},
-				{},
-				{},
-			},
+			columns = Array.rep({}, 4),
 			children = {
 				MapEventList._header(),
 				TableWidgets.TableBody{children = Array.map(data, FnUtil.curry(MapEventList._row, mapName))},
