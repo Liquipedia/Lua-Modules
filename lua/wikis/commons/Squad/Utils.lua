@@ -263,10 +263,9 @@ end
 ---@param squadWidget SquadWidget
 ---@param rowCreator fun(person: table, squadStatus: SquadStatus, squadType: SquadType, columnVisibility: table):Widget
 ---@param customTitle string?
----@param personMapper? fun(person: table): table
 ---@return Widget
-function SquadUtils.defaultRunAuto(players, squadStatus, squadType, squadWidget, rowCreator, customTitle, personMapper)
-	local mappedPlayers = Array.map(players, personMapper or SquadUtils.convertAutoParameters)
+function SquadUtils.defaultRunAuto(players, squadStatus, squadType, squadWidget, rowCreator, customTitle)
+	local mappedPlayers = Array.map(players, SquadUtils.convertAutoParameters)
 	local columnVisibility = SquadUtils.analyzeColumnVisibility(mappedPlayers, squadStatus)
 	local props = {
 		status = squadStatus,

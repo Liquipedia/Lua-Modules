@@ -19,6 +19,7 @@ local Logic = Lua.import('Module:Logic')
 local Links = Lua.import('Module:Links')
 local MatchTable = Lua.import('Module:MatchTable')
 local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local TeamTemplate = Lua.import('Module:TeamTemplate')
@@ -317,10 +318,7 @@ end
 
 ---@return Widget
 function BaseMatchPage:render()
-	local displayTitle = self:makeDisplayTitle()
-	if String.isNotEmpty(displayTitle) then
-		mw.getCurrentFrame():callParserFunction('DISPLAYTITLE', displayTitle, 'noreplace')
-	end
+	Page.setDisplayTitle{title = self:makeDisplayTitle(), noReplace = true}
 
 	local tournamentContext = self:getMatchContext()
 	return Div{
@@ -385,10 +383,8 @@ function BaseMatchPage:renderGames()
 				}
 			end)
 		),
-		size = 'small',
 		storeValue = false,
-		switchGroup = 'matchPageGameSelector',
-		variant = 'generic'
+		switchGroup = 'matchPageGameSelector'
 	}
 end
 
@@ -512,14 +508,12 @@ function BaseMatchPage:previousMatches()
 				headToHead and AdditionalSection{
 					css = {flex = '2 0 100%'},
 					header = 'Head to Head',
-					bodyClasses = {'match-table-wrapper'},
 					children = headToHead,
 				} or nil,
 				Array.map(self.opponents, function (opponent)
 					local matchTable = self:_buildMatchTable(opponent)
 					return AdditionalSection{
 						header = OpponentDisplay.InlineOpponent{opponent = opponent, teamStyle = 'hybrid'},
-						bodyClasses = matchTable and {'match-table-wrapper'} or nil,
 						children = matchTable or self:getTournamentIcon()
 					}
 				end)
@@ -537,7 +531,7 @@ end
 
 ---@private
 ---@param props table
----@return Html
+---@return Widget
 function BaseMatchPage:_createMatchTable(props)
 	return MatchTable(Table.mergeInto({
 		addCategory = false,
@@ -546,6 +540,7 @@ function BaseMatchPage:_createMatchTable(props)
 																		inclusive, and we don't want that here ]],
 		limit = 5,
 		stats = false,
+		sortableResults = false,
 		tableMode = Opponent.team,
 		vod = false,
 		matchPageButtonText = 'short',
@@ -554,7 +549,7 @@ end
 
 ---@private
 ---@param opponent standardOpponent
----@return Html?
+---@return Widget?
 function BaseMatchPage:_buildMatchTable(opponent)
 	if not BaseMatchPage._isTeamOpponent(opponent) then
 		return
@@ -570,7 +565,7 @@ function BaseMatchPage:_buildMatchTable(opponent)
 end
 
 ---@private
----@return Html?
+---@return Widget?
 function BaseMatchPage:_buildHeadToHeadMatchTable()
 	if not Array.all(self.opponents, BaseMatchPage._isTeamOpponent) then
 		return
@@ -579,6 +574,7 @@ function BaseMatchPage:_buildHeadToHeadMatchTable()
 		team = self.opponents[1].name,
 		vsteam = self.opponents[2].name,
 		showOpponent = true,
+		opponentHeader = 'Opponent',
 		teamStyle = 'hybrid',
 		useTickerName = true,
 	}

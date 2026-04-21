@@ -18,6 +18,7 @@ local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
+local VRSStandings = Lua.import('Module:Widget/VRSStandings')
 
 
 local CONTENT = {
@@ -58,7 +59,7 @@ local CONTENT = {
 	matches = {
 		heading = 'Matches',
 		body = MatchTicker{},
-		padding = true,
+		padding = false,
 		boxid = MainPageLayoutUtil.BoxId.MATCH_TICKER,
 	},
 	tournaments = {
@@ -73,6 +74,16 @@ local CONTENT = {
 		},
 		padding = true,
 		boxid = MainPageLayoutUtil.BoxId.TOURNAMENTS_TICKER,
+	},
+	vrsStandings = {
+		heading = 'Valve Regional Standings',
+		body = VRSStandings{
+			shouldFetch = true,
+			fetchLimit = 5,
+			mainpage = true,
+		},
+		padding = false,
+		boxid = 1521,
 	},
 }
 
@@ -152,12 +163,16 @@ return {
 						content = CONTENT.specialEvents,
 					},
 					{
+						mobileOrder = 3,
+						content = CONTENT.vrsStandings,
+					},
+					{
 						mobileOrder = 4,
-						content = CONTENT.thisDay,
+						content = CONTENT.transfers,
 					},
 					{
 						mobileOrder = 5,
-						content = CONTENT.transfers,
+						content = CONTENT.thisDay,
 					},
 					{
 						mobileOrder = 7,
