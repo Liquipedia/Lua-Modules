@@ -223,16 +223,14 @@ function MapPoolTable:display()
 			-- Fit besides the infobox
 			width = 'unset',
 		},
-		columns = Array.map(Array.range(1, numberOfColumns), function ()
-			return {
-				align = 'center',
-				css = {
-					['min-width'] = '6.25rem',
-					['padding-left'] = '0.125rem',
-					['padding-right'] = '0.125rem',
-				}
+		columns = Array.rep({
+			align = 'center',
+			css = {
+				['min-width'] = '6.25rem',
+				['padding-left'] = '0.125rem',
+				['padding-right'] = '0.125rem',
 			}
-		end),
+		}, numberOfColumns),
 		children = WidgetUtil.collect(
 			self:_headerRow(),
 			TableWidgets.TableBody{
