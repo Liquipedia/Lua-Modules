@@ -76,7 +76,7 @@ function Renderer.render(vNode, context)
 			tag:node(Renderer.render(props.children, context))
 		end
 
-		return tag
+		return tostring(tag)
 	end
 
 	-- Handle Functional Components
