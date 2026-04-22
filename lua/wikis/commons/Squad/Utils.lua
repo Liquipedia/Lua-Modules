@@ -241,13 +241,17 @@ function SquadUtils.analyzeColumnVisibility(players, squadStatus)
 			return String.isNotEmpty(p.name)
 		end),
 		role = Array.any(players, function(p)
-			return String.isNotEmpty(p.role) or String.isNotEmpty(p.position)
+			local role = p.role or p.position
+			return String.isNotEmpty(role) and role ~= 'Captain'
 		end),
 		joindate = Array.any(players, function(p)
 			return String.isNotEmpty(p.joindate)
 		end),
 		inactivedate = isInactive and Array.any(players, function(p)
 			return String.isNotEmpty(p.inactivedate)
+		end),
+		activeteam = isInactive and Array.any(players, function(p)
+			return  p.extradata.activeteam and TeamTemplate.exists(p.extradata.activeteam)
 		end),
 		leavedate = isFormer and Array.any(players, function(p)
 			return String.isNotEmpty(p.leavedate)
