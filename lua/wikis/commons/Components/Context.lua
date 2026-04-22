@@ -21,17 +21,17 @@ end
 -- Read from Context
 ---@generic T
 ---@param node Context<T>?
----@param contextDef ContextDef<T>
+---@param def ContextDef<T>
 ---@return T
-function Context.read(node, contextDef)
+function Context.read(node, def)
 	while node do
 		local props = node.props
-		if props.def == contextDef then
+		if props.def == def then
 			return props.value
 		end
 		node = props.parent
 	end
-	return contextDef.defaultValue
+	return def.defaultValue
 end
 
 -- Set values for contexts

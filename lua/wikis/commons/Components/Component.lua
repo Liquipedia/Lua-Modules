@@ -72,7 +72,7 @@ function ComponentCore.component(renderFunction, defaultProps)
 end
 
 -- Factory to create HTML tags
----@param tagName string|nil
+---@param tagName string
 ---@return HtmlComponent
 function ComponentCore.tag(tagName)
 	return setmetatable({ renderFn = tagName }, ComponentCore.ComponentMT) --[[@as HtmlComponent]]
