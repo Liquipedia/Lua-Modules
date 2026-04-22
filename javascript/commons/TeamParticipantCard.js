@@ -27,6 +27,9 @@ liquipedia.teamParticipantCard = {
 					card.classList.add( 'hover-roster-visible' );
 
 					requestAnimationFrame( () => {
+						if ( !card.classList.contains( 'hover-roster-visible' ) ) {
+							return;
+						}
 						const cardRect = card.getBoundingClientRect();
 						const linkRect = link.getBoundingClientRect();
 						const remInPx = parseFloat( getComputedStyle( document.documentElement ).fontSize );

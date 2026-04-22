@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-const { test, expect, beforeAll, describe } = require( '@jest/globals' );
+const { test, expect, beforeAll, beforeEach, describe } = require( '@jest/globals' );
 
 describe( 'TeamParticipantCard module', () => {
 	beforeAll( () => {
@@ -17,24 +17,56 @@ describe( 'TeamParticipantCard module', () => {
 		require( '../commons/TeamParticipantCard.js' );
 	} );
 
+	beforeEach( () => {
+		document.body.innerHTML = '';
+	} );
+
+	function createCardMarkup( collapsed = true ) {
+		return `
+			<div class="team-participant-card general-collapsible${ collapsed ? ' collapsed' : '' }">
+				<div class="team-participant-card__opponent">
+					<div class="name"><a href="#">Team Name</a></div>
+				</div>
+				<div class="should-collapse">roster content</div>
+			</div>
+		`;
+	}
+
 	test( 'should register itself as a module', () => {
 		expect( globalThis.liquipedia.core.modules ).toContain( 'teamParticipantCard' );
 	} );
 
-	test( 'init should not throw when matchMedia returns false', () => {
-		expect( () => {
-			globalThis.liquipedia.teamParticipantCard.init();
-		} ).not.toThrow();
+	test( 'should add hover-roster-visible on mouseenter when card is collapsed', () => {
+		document.body.innerHTML = createCardMarkup( true );
+		liquipedia.teamParticipantCard.setupHoverTrigger();
+
+		const card = document.querySelector( '.team-participant-card' );
+		const link = document.querySelector( '.team-participant-card__opponent .name a' );
+
+		link.dispatchEvent( new MouseEvent( 'mouseenter' ) );
+		expect( card.classList.contains( 'hover-roster-visible' ) ).toBe( true );
 	} );
 
-	test( 'init should not throw when matchMedia is unavailable', () => {
-		const original = globalThis.window.matchMedia;
-		globalThis.window.matchMedia = undefined;
+	test( 'should remove hover-roster-visible on mouseleave', () => {
+		document.body.innerHTML = createCardMarkup( true );
+		liquipedia.teamParticipantCard.setupHoverTrigger();
 
-		expect( () => {
-			globalThis.liquipedia.teamParticipantCard.init();
-		} ).not.toThrow();
+		const card = document.querySelector( '.team-participant-card' );
+		const link = document.querySelector( '.team-participant-card__opponent .name a' );
 
-		globalThis.window.matchMedia = original;
+		link.dispatchEvent( new MouseEvent( 'mouseenter' ) );
+		link.dispatchEvent( new MouseEvent( 'mouseleave' ) );
+		expect( card.classList.contains( 'hover-roster-visible' ) ).toBe( false );
+	} );
+
+	test( 'should not add hover-roster-visible when card is not collapsed', () => {
+		document.body.innerHTML = createCardMarkup( false );
+		liquipedia.teamParticipantCard.setupHoverTrigger();
+
+		const card = document.querySelector( '.team-participant-card' );
+		const link = document.querySelector( '.team-participant-card__opponent .name a' );
+
+		link.dispatchEvent( new MouseEvent( 'mouseenter' ) );
+		expect( card.classList.contains( 'hover-roster-visible' ) ).toBe( false );
 	} );
 } );

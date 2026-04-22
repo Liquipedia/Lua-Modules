@@ -41,7 +41,7 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 .switch-toggle-container:has( #{ $hover-selector } ) {
 	display: none;
 
-	@media ( min-width: 768px ) {
+	@media ( min-width: 768px ) and ( hover: hover ) and ( pointer: fine ) {
 		display: flex;
 	}
 }
