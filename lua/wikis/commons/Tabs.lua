@@ -41,6 +41,9 @@ function Tabs.static(args)
 
 	Tabs._setThis(tabArgs)
 
+	-- Temporary solution for fighters
+	local wrapsClass = Logic.readBool(args.wrapping) and Info.wikiName == 'fighters' and 'wraps' or nil
+
 	local function buildTabLiItems(additionalClasses)
 		return Array.map(tabArgs, function(tab)
 			--if tab.name is unset tab.link is set as per `Tabs._readArguments`
@@ -77,7 +80,7 @@ function Tabs.static(args)
 		analyticsName = 'Navigation tab',
 		children = {
 			HtmlWidgets.Div{
-				classes = {'tabs-static'},
+				classes = {'tabs-static', wrapsClass},
 				attributes = {['data-nosnippet'] = '', ['data-tabs-static'] = ''},
 				children = WidgetUtil.collect(
 					Tabs._buildNavWrapper(navTabs),
