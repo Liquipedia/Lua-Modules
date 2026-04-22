@@ -9,20 +9,14 @@ local Lua = require('Module:Lua')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 
-local Squad = Lua.import('Module:Widget/Squad/Core')
-local SquadRow = Lua.import('Module:Squad/Row')
-local SquadUtils = Lua.import('Module:Squad/Utils')
+local Squad = Lua.import('Module:Squad/Controller')
 
 local CustomSquad = {}
 
 ---@param frame Frame
 ---@return Widget
 function CustomSquad.run(frame)
-	if not Info.config.squads.allowManual then
-		error('This wiki does not use manual squad tables')
-	end
-
-	return SquadUtils.defaultRunManual(frame, Squad, SquadUtils.defaultRow(SquadRow))
+	return Squad.run(frame)
 end
 
 ---@param players table[]
@@ -31,7 +25,7 @@ end
 ---@param customTitle string?
 ---@return Widget
 function CustomSquad.runAuto(players, squadStatus, squadType, customTitle)
-	return SquadUtils.defaultRunAuto(players, squadStatus, squadType, Squad, SquadUtils.defaultRow(SquadRow), customTitle)
+	return Squad.runAuto(players, squadStatus, squadType, customTitle)
 end
 
 return CustomSquad
