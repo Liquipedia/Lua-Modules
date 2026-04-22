@@ -7,12 +7,9 @@
 
 local Lua = require('Module:Lua')
 
-local Arguments = Lua.import('Module:Arguments')
 local Logic = Lua.import('Module:Logic')
-local Table = Lua.import('Module:Table')
 
-local Squad = Lua.import('Module:Widget/Squad/Core')
-local SquadRow = Lua.import('Module:Squad/Row')
+local Squad = Lua.import('Module:Squad/Controller')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local CustomSquad = {}
@@ -30,7 +27,7 @@ end
 ---@param frame Frame
 ---@return Widget
 function CustomSquad.run(frame)
-	return SquadUtils.defaultRunManual(frame, Squad, CustomSquad._playerRow)
+	return Squad.run(frame, adjustLpdb)
 end
 
 ---@param players table[]
@@ -39,45 +36,7 @@ end
 ---@param customTitle string?
 ---@return Widget
 function CustomSquad.runAuto(players, squadStatus, squadType, customTitle)
-	return SquadUtils.defaultRunAuto(
-		players,
-		squadStatus,
-		squadType,
-		Squad,
-		CustomSquad._playerRow,
-		customTitle
-	)
-end
-
----@param person table
----@param squadStatus SquadStatus
----@param squadType SquadType
----@param columnVisibility table?
----@return Widget
-function CustomSquad._playerRow(person, squadStatus, squadType, columnVisibility)
-	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
-	local squadArgs = Arguments.getArgs(mw.getCurrentFrame())
-
-	if squadStatus == SquadUtils.SquadStatus.ACTIVE then
-		local isMain = Logic.readBool(squadArgs.main) or Logic.isEmpty(squadArgs.squad)
-		squadPerson.extradata = Table.merge({group = isMain and 'main' or 'additional'}, squadPerson.extradata)
-	end
-
-	SquadUtils.storeSquadPerson(squadPerson)
-
-	local row = SquadRow(squadPerson, columnVisibility)
-
-	row:id():name():role():date('joindate')
-
-	if squadStatus == SquadUtils.SquadStatus.INACTIVE or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
-		row:date('inactivedate')
-	end
-	if squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
-		row:date('leavedate')
-		row:newteam()
-	end
-
-	return row:create()
+	return Squad.runAuto(players, squadStatus, squadType, customTitle, adjustLpdb)
 end
 
 return CustomSquad
