@@ -12,12 +12,12 @@ local Renderer = {}
 ---@param context Context?
 ---@return string
 function Renderer.render(vNode, context)
-	if not vNode then return "" end
+	if not vNode then return '' end
 
 	local vNodeType = type(vNode)
 
 	-- Handle Arrays
-	if vNodeType == "table" and vNode[1] then
+	if vNodeType == 'table' and vNode[1] then
 		local output = {}
 		for _, child in ipairs(vNode) do
 			table.insert(output, Renderer.render(child, context))
@@ -28,18 +28,23 @@ function Renderer.render(vNode, context)
 	---@cast vNode Renderable
 
 	-- Handle Primitives (Strings/Numbers)
-	if vNodeType == "string" or vNodeType == "number" then
+	if vNodeType == 'string' or vNodeType == 'number' then
 		return tostring(vNode)
 	end
 
-	if vNodeType ~= "table" then
+	if vNodeType ~= 'table' then
 		mw.logObject(vNode, 'Invalid VNode')
-		error("Invalid VNode: " .. tostring(vNode))
+		error('Invalid VNode: ' .. tostring(vNode))
+	end
+
+	-- Empty Table
+	if next(vNode) == nil then
+		return ''
 	end
 
 	local renderFn = vNode.renderFn
 
-	-- Backward Compatibility with Widgets and mw.html
+	-- Backward Compatibility (with Widgets and mw.html)
 	if not renderFn then
 		return tostring(vNode)
 	end
@@ -48,7 +53,7 @@ function Renderer.render(vNode, context)
 	---@cast vNode -Html
 
 	-- Handle Context Providers
-	if renderFn == "CONTEXT_PROVIDER" then
+	if renderFn == 'CONTEXT_PROVIDER' then
 		---@cast vNode Context<any>
 		-- Push a new link onto the Context chain
 		local newContext = {
@@ -60,14 +65,19 @@ function Renderer.render(vNode, context)
 	end
 
 	-- Handle HTML Tags
-	if type(renderFn) == "string" then
+	if type(renderFn) == 'string' then
 		---@cast vNode HtmlNode
 		local props = vNode.props
 		local tagName = renderFn
-		local tag = mw.html.create(tagName)
+		local tag
+		if tagName == 'fragment' then
+			tag = mw.html.create()
+		else
+			tag = mw.html.create(tagName)
+		end
 
 		if props.classes then
-			tag:addClass(table.concat(props.classes, " "))
+			tag:addClass(table.concat(props.classes, ' '))
 		end
 		if props.css then tag:css(props.css) end
 		if props.attr then tag:attr(props.attr) end
@@ -80,13 +90,13 @@ function Renderer.render(vNode, context)
 	end
 
 	-- Handle Functional Components
-	if type(renderFn) == "function" then
+	if type(renderFn) == 'function' then
 		-- Execute the function with props and the current context pointer
 		local result = renderFn(vNode.props, context)
 		return Renderer.render(result, context)
 	end
 
-	return ""
+	return ''
 end
 
 return Renderer
