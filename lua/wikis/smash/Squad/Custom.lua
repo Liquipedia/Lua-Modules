@@ -14,24 +14,6 @@ local SquadController = Lua.import('Module:Squad/Controller')
 
 local CustomSquad = {}
 
----@class SmashSquadRow: SquadRow
-local ExtendedSquadRow = Class.new(SquadRow)
-
----@return self
-function ExtendedSquadRow:mains()
-	local characters = {}
-	Array.forEach(mw.text.split(self.model.extradata.mains or '', ','), function(main)
-		table.insert(characters, Characters.GetIconAndName{main, game = self.model.extradata.game, large = true})
-	end)
-
-	table.insert(self.children, Widget.Td{
-		css = {['text-align'] = 'center'},
-		children = characters,
-	})
-
-	return self
-end
-
 ---@param frame Frame
 ---@return Widget
 function CustomSquad.run(frame)

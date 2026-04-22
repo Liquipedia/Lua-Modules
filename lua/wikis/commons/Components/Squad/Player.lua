@@ -81,8 +81,8 @@ local function otherTeamInformation(date, team, teamRole)
 			date = date,
 			style = 'icon',
 		},
-		teamRole and HtmlWidgets.Small{
-			children = {HtmlWidgets.I{children = {teamRole}}}
+		teamRole and Html.Small{
+			children = {Html.I{children = {teamRole}}}
 		} or nil,
 	}
 end
