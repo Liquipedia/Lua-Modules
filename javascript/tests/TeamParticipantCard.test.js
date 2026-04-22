@@ -21,8 +21,9 @@ describe( 'TeamParticipantCard module', () => {
 		document.body.innerHTML = '';
 	} );
 
-	function createCardMarkup( collapsed = true ) {
+	function createCardMarkup( collapsed = true, switchActive = true ) {
 		return `
+			${ switchActive ? '<div class="switch-toggle-active" data-switch-group="team-cards-hover-roster"></div>' : '' }
 			<div class="team-participant-card general-collapsible${ collapsed ? ' collapsed' : '' }">
 				<div class="team-participant-card__opponent">
 					<div class="name"><a href="#">Team Name</a></div>
