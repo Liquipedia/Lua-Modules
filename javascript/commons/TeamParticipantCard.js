@@ -24,6 +24,9 @@ liquipedia.teamParticipantCard = {
 					if ( !card.classList.contains( 'collapsed' ) ) {
 						return;
 					}
+					if ( !document.querySelector( '.switch-toggle-active[data-switch-group="team-cards-hover-roster"]' ) ) {
+						return;
+					}
 					card.classList.add( 'hover-roster-visible' );
 
 					requestAnimationFrame( () => {
