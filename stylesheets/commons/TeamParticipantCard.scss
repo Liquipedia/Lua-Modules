@@ -46,6 +46,10 @@ $hover-selector: '[data-switch-group="team-cards-hover-roster"]';
 	}
 }
 
+.team-participant-card__hover-header {
+	display: none;
+}
+
 .team-participant {
 	display: flex;
 	flex-direction: column;
@@ -580,17 +584,26 @@ body:has( .switch-toggle-active#{ $compact-selector } ) {
 					box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.3 );
 				}
 
-				&::before {
-					content: "Player roster";
-					display: block;
-					padding: 0.5rem 0.75rem 0.25rem;
-					font-weight: bold;
-					font-size: 0.875rem;
-					color: var( --clr-secondary-25 );
+			}
 
-					.theme--dark & {
-						color: var( --clr-secondary-90 );
-					}
+			.team-participant-card__hover-header {
+				display: block;
+				padding: 0.5rem 0.75rem 0.25rem;
+				font-weight: bold;
+				font-size: 0.875rem;
+				color: var( --clr-secondary-25 );
+
+				.theme--dark & {
+					color: var( --clr-secondary-90 );
+				}
+			}
+
+			.should-collapse a {
+				color: var( --clr-secondary-7 );
+				text-decoration: none;
+
+				.theme--dark & {
+					color: var( --clr-secondary-90 );
 				}
 			}
 
