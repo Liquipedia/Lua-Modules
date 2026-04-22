@@ -4,7 +4,7 @@
  ******************************************************************************/
 liquipedia.teamParticipantCard = {
 	init: function() {
-		if ( !window.matchMedia || !window.matchMedia( '(hover: hover) and (pointer: fine)' ).matches ) {
+		if ( !window.matchMedia( '(hover: hover) and (pointer: fine)' ).matches ) {
 			return;
 		}
 		this.setupHoverTrigger();
