@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Flags = Lua.import('Module:Flags')
 local Info = Lua.import('Module:Info', {loadData = true})
@@ -20,7 +19,6 @@ local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Lpdb = Lua.import('Module:Lpdb')
 local Faction = Lua.import('Module:Faction')
-local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
 local TransferRefs = Lua.import('Module:Transfer/References')
 
 local SquadUtils = {}
