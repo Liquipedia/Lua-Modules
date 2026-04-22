@@ -17,9 +17,6 @@ local Table2Cell = Lua.import('Module:Widget/Table2/Cell')
 local Table2CellHeader = Lua.import('Module:Widget/Table2/CellHeader')
 local Table2Row = Lua.import('Module:Widget/Table2/Row')
 
----@class Table2BodyProps
----@field children Renderable[]?
-
 ---@class Table2Body: Widget
 ---@operator call(Table2BodyProps): Table2Body
 ---@field props Table2BodyProps

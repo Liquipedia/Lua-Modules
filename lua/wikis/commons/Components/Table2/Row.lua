@@ -1,35 +1,40 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Table2/Row
+-- page=Module:Components/Table2/Row
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
+local Component = Lua.import('Module:Components/Component')
+local Context = Lua.import('Module:Components/Context')
 
 local Array = Lua.import('Module:Array')
-local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
 local MathUtil = Lua.import('Module:MathUtil')
 
-local Widget = Lua.import('Module:Widget')
-local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
-local Table2Cell = Lua.import('Module:Widget/Table2/Cell')
-local Table2CellHeader = Lua.import('Module:Widget/Table2/CellHeader')
+local Table2Contexts = Lua.import('Module:Components/Contexts/Table2')
+local Table2Cell = Lua.import('Module:Components/Table2/Cell')
+local Table2CellHeader = Lua.import('Module:Components/Table2/CellHeader')
+local Table2CellHeaderMT = getmetatable(Table2CellHeader)
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Html = Lua.import('Module:Components/Html')
 
----@class Table2Row: Widget
----@operator call(Table2RowProps): Table2Row
----@field props Table2RowProps
-local Table2Row = Class.new(Widget)
+---@class Table2RowProps
+---@field children Renderable[]?
+---@field section 'head'|'body'|'subhead'?
+---@field classes string[]?
+---@field css {[string]: string|number|nil}?
+---@field attributes {[string]: any}?
+---@field highlighted (string|number|boolean)?
 
----@return Widget
-function Table2Row:render()
-	local props = self.props
-	local section = props.section or self:useContext(Table2Contexts.Section)
-	local headerRowKind = self:useContext(Table2Contexts.HeaderRowKind)
-	local bodyStripe = self:useContext(Table2Contexts.BodyStripe)
+---@param props Table2RowProps
+---@param context Context
+---@return Renderable
+local function Table2Row(props, context)
+	local section = props.section or Context.read(context, Table2Contexts.Section)
+	local headerRowKind = Context.read(context, Table2Contexts.HeaderRowKind)
+	local bodyStripe = Context.read(context, Table2Contexts.BodyStripe)
 
 	local sectionClass = 'table2__row--body'
 	if section == 'head' or section == 'subhead' then
@@ -61,8 +66,8 @@ function Table2Row:render()
 
 	local children = props.children or {}
 
-	local columns = self:useContext(Table2Contexts.ColumnContext)
-	if section == 'subhead' and columns and #children == 1 and Class.instanceOf(children[1], Table2CellHeader) then
+	local columns = Context.read(context, Table2Contexts.ColumnContext)
+	if section == 'subhead' and columns and #children == 1 and getmetatable(children[1]) == Table2CellHeaderMT then
 		local singleCell = children[1] --[[@as Table2CellHeader]]
 		if singleCell.props.colspan == nil then
 			singleCell.props.colspan = #columns
@@ -71,7 +76,7 @@ function Table2Row:render()
 
 	local columnIndex = 1
 	local indexedChildren = Array.map(children, function(child)
-		if Class.instanceOf(child, Table2Cell) or Class.instanceOf(child, Table2CellHeader) then
+		if getmetatable(child) == getmetatable(Table2Cell) or getmetatable(child) == Table2CellHeaderMT then
 			local cellChild = child --[[@as Table2Cell|Table2CellHeader]]
 			local explicitIndex = MathUtil.toInteger(cellChild.props.columnIndex)
 			if explicitIndex and explicitIndex >= 1 then
@@ -93,8 +98,9 @@ function Table2Row:render()
 	local trChildren = indexedChildren
 	if section == 'subhead' then
 		trChildren = Array.map(trChildren, function(child)
-			if Class.instanceOf(child, Table2CellHeader) then
-				return Table2Contexts.Section{
+			if getmetatable(child) == Table2CellHeaderMT then
+				return Context.Provider{
+					def = Table2Contexts.Section,
 					value = 'subhead',
 					children = {child},
 				}
@@ -103,7 +109,7 @@ function Table2Row:render()
 		end)
 	end
 
-	return HtmlWidgets.Tr{
+	return Html.Tr{
 		classes = WidgetUtil.collect(sectionClass, kindClass, stripeClass, highlightClass, props.classes),
 		css = props.css,
 		attributes = props.attributes,
@@ -111,4 +117,6 @@ function Table2Row:render()
 	}
 end
 
-return Table2Row
+return Component.component(
+	Table2Row
+)

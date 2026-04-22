@@ -1,36 +1,48 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/Table2/CellHeader
+-- page=Module:Components/Table2/CellHeader
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
 
-local Class = Lua.import('Module:Class')
+local Component = Lua.import('Module:Components/Component')
+local Context = Lua.import('Module:Components/Context')
+
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
-local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
+local Html = Lua.import('Module:Components/Html')
+local Table2Contexts = Lua.import('Module:Components/Contexts/Table2')
+local ColumnUtil = Lua.import('Module:Components/Table2/ColumnUtil')
 
----@class Table2CellHeader: Widget
----@operator call(Table2CellHeaderProps): Table2CellHeader
----@field props Table2CellHeaderProps
-local Table2CellHeader = Class.new(Widget)
+---@class Table2CellHeaderProps
+---@field children Renderable[]?
+---@field section 'head'|'body'|'subhead'?
+---@field align ('left'|'right'|'center')?
+---@field shrink (string|number|boolean)?
+---@field nowrap (string|number|boolean)?
+---@field width string?
+---@field minWidth string?
+---@field maxWidth string?
+---@field unsortable (string|number|boolean)?
+---@field sortType string?
+---@field classes string[]?
+---@field css {[string]: string|number|nil}?
+---@field attributes {[string]: any}?
+---@field colspan integer|string?
+---@field rowspan integer|string?
+---@field columnIndex integer|string?
 
----@return Widget
-function Table2CellHeader:render()
-	local props = self.props
-
-	local columns = self:useContext(Table2Contexts.ColumnContext)
-	local section = props.section or self:useContext(Table2Contexts.Section)
+---@param props Table2CellHeaderProps
+---@return Renderable
+local function Table2CellHeader(props, context)
+	local columns = Context.read(context, Table2Contexts.ColumnContext)
+	local section = props.section or Context.read(context, Table2Contexts.Section)
 
 	local children = props.children
-
 	if section == 'subhead' then
-		children = {HtmlWidgets.Div{
+		children = {Html.Div{
 			classes = {'table2__subheader-cell'},
 			children = props.children,
 		}}
@@ -54,7 +66,7 @@ function Table2CellHeader:render()
 			attributes
 		)
 
-		return HtmlWidgets.Th{
+		return Html.Th{
 			attributes = attributes,
 			children = children,
 		}
@@ -90,7 +102,7 @@ function Table2CellHeader:render()
 		attributes
 	)
 
-	return HtmlWidgets.Th{
+	return Html.Th{
 		classes = mergedProps.classes,
 		css = css,
 		attributes = attributes,
@@ -98,4 +110,6 @@ function Table2CellHeader:render()
 	}
 end
 
-return Table2CellHeader
+return Component.component(
+	Table2CellHeader
+)
