@@ -12,7 +12,7 @@ describe( 'TeamParticipantCard module', () => {
 			}
 		};
 
-		globalThis.window.matchMedia = jest.fn().mockReturnValue( { matches: false } );
+		globalThis.window.matchMedia = () => ( { matches: false } );
 
 		require( '../commons/TeamParticipantCard.js' );
 	} );

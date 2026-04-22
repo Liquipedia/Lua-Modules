@@ -58,12 +58,4 @@ export default defineConfig([{
             code: 120,
         }],
     },
-}, {
-    files: ["javascript/tests/**/*.js"],
-
-    languageOptions: {
-        globals: {
-            ...globals.jest,
-        },
-    },
 }]);
