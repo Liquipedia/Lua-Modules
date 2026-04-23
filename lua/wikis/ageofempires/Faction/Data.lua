@@ -703,16 +703,16 @@ local factionPropsAoE4 = {
 }
 
 local factionPropsAoM = {
-	aztecs = {
+	atlanteans = {
 		index = 1,
+		name = 'Atlanteans',
+		faction = 'atlanteans',
+	},
+	aztecs = {
+		index = 2,
 		name = 'Aztecs',
 		pageName = 'Aztecs' .. AOM_SUFFIX,
 		faction = 'aztecs',
-	},
-	atlanteans = {
-		index = 2,
-		name = 'Atlanteans',
-		faction = 'atlanteans',
 	},
 	chinese = {
 		index = 3,
@@ -775,92 +775,92 @@ local factionPropsAoM = {
 		name = 'Hades',
 		faction = 'hades',
 	},
-	isis = {
+	huitzilopochtli = {
 		index = 14,
+		name = 'Huitzilopochtli',
+		faction = 'huitzilopochtli',
+	},
+	isis = {
+		index = 15,
 		name = 'Isis',
 		faction = 'isis',
 	},
 	kronos = {
-		index = 15,
+		index = 16,
 		name = 'Kronos',
 		faction = 'kronos',
 	},
 	loki = {
-		index = 16,
+		index = 17,
 		name = 'Loki',
 		faction = 'loki',
 	},
 	nuwa = {
-		index = 17,
+		index = 18,
 		name = 'Nüwa',
 		faction = 'nuwa',
 	},
 	odin = {
-		index = 18,
+		index = 19,
 		name = 'Odin',
 		faction = 'odin',
 	},
 	oranos = {
-		index = 19,
+		index = 20,
 		name = 'Oranos',
 		faction = 'oranos',
 	},
 	poseidon = {
-		index = 20,
+		index = 21,
 		name = 'Poseidon',
 		pageName = 'Poseidon (god)',
 		faction = 'poseidon',
 	},
+	quetzalcoatl = {
+		index = 22,
+		name = 'Quetzalcoatl',
+		faction = 'quetzalcoatl',
+	},
 	ra = {
-		index = 21,
+		index = 23,
 		name = 'Ra',
 		pageName = 'Ra (god)',
 		faction = 'ra',
 	},
 	set = {
-		index = 22,
+		index = 24,
 		name = 'Set',
 		faction = 'set',
 	},
 	shennong = {
-		index = 23,
+		index = 25,
 		name = 'Shennong',
 		faction = 'shennong',
 	},
 	susanoo = {
-		index = 24,
+		index = 26,
 		name = 'Susanoo',
 		faction = 'susanoo',
 	},
+	tezcatlipoca = {
+		index = 27,
+		name = 'Tezcatlipoca',
+		faction = 'tezcatlipoca',
+	},
 	thor = {
-		index = 25,
+		index = 28,
 		name = 'Thor',
 		faction = 'thor',
 	},
 	tsukuyomi = {
-		index = 26,
+		index = 29,
 		name = 'Tsukuyomi',
 		faction = 'tsukuyomi',
 	},
 	zeus = {
-		index = 27,
+		index = 30,
 		name = 'Zeus',
 		faction = 'zeus',
-	},
-	quetzalcoatl = {
-		index = 28,
-		name = 'Quetzalcoatl',
-		faction = 'quetzalcoatl',
-	},
-	huitzilopochtli = {
-		index = 29,
-		name = 'Huitzilopochtli',
-		faction = 'huitzilopochtli',
-	},
-	tezcatlipoca = {
-		index = 30,
-		name = 'Tezcatlipoca',
-		faction = 'tezcatlipoca',
 	},
 
 	unknown = {
