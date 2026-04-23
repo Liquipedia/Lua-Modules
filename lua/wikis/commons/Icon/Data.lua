@@ -278,7 +278,7 @@ return {
 	dota2_ht_relics = 'fad fa-diamond',
 	dota2_ht_old_abilties = 'fad fa-book-spells',
 	dota2_ht_calc = 'fas fa-function',
-	dota2_ht_old_abilties = 'fad fa-archive',
+	dota2_ht_unreleased = 'fad fa-archive',
 
 	-- Usage: Info button
 	['general-info'] = 'fas fa-info-circle',
