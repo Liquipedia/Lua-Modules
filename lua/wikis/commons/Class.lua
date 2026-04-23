@@ -54,20 +54,20 @@ function Class.new(base, init)
 	local metatable = {}
 
 	metatable.__call = function(class_tbl, ...)
-		local object = {}
-		setmetatable(object, classTable)
+		local instance = {}
+		setmetatable(instance, classTable)
 
-		classTable.init(object, ...)
+		classTable.init(instance, ...)
 
 		return object
 	end
 
-	classTable.init = function(object, ...)
+	classTable.init = function(instance, ...)
 		if base then
-			base.init(object, ...)
+			base.init(instance, ...)
 		end
 		if init then
-			init(object, ...)
+			init(instance, ...)
 		end
 	end
 
