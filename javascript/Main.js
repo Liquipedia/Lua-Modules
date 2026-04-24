@@ -68,7 +68,6 @@ const jsModules = [
 	'Slider',
 	'SwitchButtons',
 	'Tabs',
-	'TeamParticipantCard',
 	'CoreEnd'
 ];
 

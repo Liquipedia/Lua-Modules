@@ -558,16 +558,24 @@ body:has( .switch-toggle-active#{ $compact-selector } ) {
 }
 
 @media ( hover: hover ) and ( pointer: fine ) {
+	.team-participant-card__opponent .name a {
+		anchor-name: --team-participant-card-name;
+	}
+
 	body:has( .switch-toggle-active#{ $hover-selector } ) {
 		.team-participant-card.general-collapsible.collapsed {
-			position: relative;
+			anchor-scope: --team-participant-card-name;
 			overflow: visible;
 		}
 
-		.team-participant-card.general-collapsible.collapsed.hover-roster-visible {
+		.team-participant-card.general-collapsible.collapsed:has( .team-participant-card__opponent .name a:hover ) {
 			.should-collapse {
 				display: block;
 				position: absolute;
+				position-anchor: --team-participant-card-name;
+				top: calc( anchor( bottom ) + 0.75rem );
+				left: anchor( center );
+				translate: -50% 0;
 				z-index: 10;
 				min-width: 200px;
 				border-radius: 0.5rem;
@@ -610,9 +618,24 @@ body:has( .switch-toggle-active#{ $compact-selector } ) {
 				display: none;
 			}
 
+			.toggle-area [ data-toggle-area-content ] {
+				display: none;
+			}
+
+			.toggle-area [ data-toggle-area-content="1" ] {
+				display: block;
+			}
+
 			.team-participant-card__qualifier--content,
 			.team-participant-card__notifications {
 				display: none;
+			}
+		}
+
+		&:has( .switch-toggle-active#{ $compact-selector } ) {
+			.team-participant-card.general-collapsible.collapsed:has( .team-participant-card__opponent .name a:hover ) .should-collapse {
+				left: anchor( left );
+				translate: none;
 			}
 		}
 	}
