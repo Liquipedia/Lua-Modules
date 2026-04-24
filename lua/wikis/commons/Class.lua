@@ -59,7 +59,7 @@ function Class.new(base, init)
 
 		classTable.init(instance, ...)
 
-		return object
+		return instance
 	end
 
 	classTable.init = function(instance, ...)
