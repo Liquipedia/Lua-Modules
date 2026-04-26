@@ -36,7 +36,7 @@ end
 ---@return boolean
 ---@nodiscard
 function Array.isArray(tbl)
-	return type(tbl) == 'table' and Table.size(tbl) == #tbl
+	return type(tbl) == 'table' and Table.size(tbl) == #Table.copy(tbl)
 end
 
 -- Creates a copy of an array with the same elements.
