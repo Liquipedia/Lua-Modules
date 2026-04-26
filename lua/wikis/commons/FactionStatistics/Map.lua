@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:FactionMapStatistics
+-- page=Module:FactionStatistics/Map
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -11,6 +11,7 @@ local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
+local MatchupDisplay = Lua.import('FactionStatistics/MatchupDisplay')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
@@ -370,23 +371,6 @@ function MapStatistics._row(matchUps, mapData)
 		return
 	end
 
-	---@param input integer|string
-	---@return integer|string
-	local dashIfZero = function(input)
-		return input == 0 and '-' or input
-	end
-
-	---@param matchUpData {w: integer, l: integer}
-	---@return string
-	local getPercentage = function(matchUpData)
-		local total = matchUpData.w + matchUpData.l
-		if total == 0 then
-			return '-'
-		end
-		local percentage = 100 * matchUpData.w / (total)
-		return MathUtil.formatRounded{precision = 1, value = percentage}
-	end
-
 	---@return Renderable[]|Renderable
 	local makeMapCell = function()
 		if mapData.map == DEFAULT_MAP_NAME then
@@ -407,18 +391,12 @@ function MapStatistics._row(matchUps, mapData)
 			TableWidgets.Cell{
 				children = makeMapCell()
 			},
-			TableWidgets.Cell{children = dashIfZero(mapData.total)},
+			TableWidgets.Cell{children = MatchupDisplay.dashIfZero(mapData.total)},
 			Array.flatMap(matchUps.vs, function(key)
-				local matchUpData = mapData.vs[key]
-				return {
-					TableWidgets.Cell{children = dashIfZero(matchUpData.w + matchUpData.l)},
-					TableWidgets.Cell{children = dashIfZero(matchUpData.w)},
-					TableWidgets.Cell{children = dashIfZero(matchUpData.l)},
-					TableWidgets.Cell{children = getPercentage(matchUpData)},
-				}
+				return MatchupDisplay.display(mapData.vs[key])
 			end),
 			Array.map(matchUps.mirrors, function(faction)
-				return TableWidgets.Cell{children = dashIfZero(mapData.mirrors[faction])}
+				return TableWidgets.Cell{children = MatchupDisplay.dashIfZero(mapData.mirrors[faction])}
 			end)
 		)
 	}
