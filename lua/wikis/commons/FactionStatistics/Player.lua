@@ -12,6 +12,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Faction = Lua.import('Module:Faction')
+local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local MatchupDisplay = Lua.import('Module:FactionStatistics/MatchupDisplay')
@@ -30,6 +31,7 @@ local ConditionUtil = Condition.Util
 
 local Box = Lua.import('Module:Widget/Basic/Box')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local TableWidgets = Lua.import('Module:Widget/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -299,6 +301,7 @@ function PlayerStatistics:create()
 	end
 
 	return Box{
+		paddingBottom = '1rem',
 		children = {
 			self:_matchesPerFaction(),
 			self:_matchesPerType(),
@@ -318,11 +321,18 @@ function PlayerStatistics:_matchesPerFaction()
 		}
 	end
 
-	-- can not use Array.extend due to the metatable ... see #7433
-	local order = {'total'}
-	Array.forEach(Faction.knownFactions, function(faction) table.insert(order, faction) end)
+	local order = PlayerStatistics._getFactionOrder()
 
 	return PlayerStatistics._simpleTable(self.byFaction, display, order, 'Matches per Faction')
+end
+
+-- can not use Array.extend due to the metatable ... see #7433
+-- once #7433 is fixed this function becomes obsolete via `Array.extend({'total'}, Faction.knownFactions)`
+---@return string[]
+function PlayerStatistics._getFactionOrder()
+	local order = {'total'}
+	Array.forEach(Faction.knownFactions, function(faction) table.insert(order, faction) end)
+	return order
 end
 
 ---@return Widget
@@ -383,28 +393,84 @@ function PlayerStatistics._simpleTable(data, display, order, title)
 			Array.rep({align = 'right'}, 4)
 		),
 		children = {
-			PlayerStatistics._header(true),
+			TableWidgets.Row{children = PlayerStatistics._headerCells(true)},
 			TableWidgets.TableBody{children = rows},
 		},
 	}
 end
 
----@param emptyCell boolean?
----@return Widget
-function PlayerStatistics._header(emptyCell)
-	return TableWidgets.Row{
-		children = WidgetUtil.collect(
-			emptyCell and TableWidgets.CellHeader{children = ''} or nil,
-			TableWidgets.CellHeader{children = SUM_ABBR},
-			TableWidgets.CellHeader{children = 'W'},
-			TableWidgets.CellHeader{children = 'L'},
-			TableWidgets.CellHeader{children = '%'}
-		)
-	}
+---@param emptyCell boolean
+---@return Widget[]
+function PlayerStatistics._headerCells(emptyCell)
+	return WidgetUtil.collect(
+		emptyCell and TableWidgets.CellHeader{children = ''} or nil,
+		TableWidgets.CellHeader{children = SUM_ABBR},
+		TableWidgets.CellHeader{children = 'W'},
+		TableWidgets.CellHeader{children = 'L'},
+		TableWidgets.CellHeader{children = '%'}
+	)
 end
 
 ---@return Widget
 function PlayerStatistics:_gamesPerMapAndFaction()
+	local factionOrder = Array.filter(PlayerStatistics._getFactionOrder(), function (key)
+		local data = self.byMap.total[key]
+		return data.w + data.l > 0
+	end)
+
+	---@param key string
+	---@return Widget
+	local factionHeader = function(key)
+		local display = key == 'total' and 'vs. All' or {
+			'vs. ',
+			Faction.Icon{faction = key},
+		}
+		return TableWidgets.CellHeader{children = display, colspan = 4, align = 'center'}
+	end
+
+	local header = {
+		TableWidgets.Row{
+			children = WidgetUtil.collect(
+				TableWidgets.CellHeader{children = 'Maps', rowspan = 2, align = 'center'},
+				Array.map(factionOrder, factionHeader)
+			)
+		},
+		TableWidgets.Row{
+			children = Array.flatMap(Array.range(1, #factionOrder), FnUtil.curry(PlayerStatistics._headerCells, false))
+		},
+	}
+
+	---@param rowData table<string, {w: integer, l: integer}>
+	---@param mapDisplay Renderable
+	---@return Widget
+	local makeRow = function(rowData, mapDisplay)
+		return TableWidgets.Row{
+			children = WidgetUtil.collect(
+				TableWidgets.Cell{children = mapDisplay},
+				Array.flatMap(factionOrder, function(key)
+					return MatchupDisplay.display(rowData[key])
+				end)
+			)
+		}
+	end
+
+	local rows = {makeRow(Table.extract(self.byMap, 'total'), 'Overall')}
+	for map, rowData in Table.iter.spairs(self.byMap) do
+		table.insert(rows, makeRow(rowData, Link{link = map}))
+	end
+
+	return TableWidgets.Table{
+		sortable = false,
+		caption = 'Map statistics',
+		columns = WidgetUtil.collect(
+			{align = 'left'},
+			Array.rep({align = 'right'}, 4 * #factionOrder)
+		),
+		children = WidgetUtil.collect(
+			header,
+			TableWidgets.TableBody{children = rows}
+		),
+	}
 end
 
 return PlayerStatistics
