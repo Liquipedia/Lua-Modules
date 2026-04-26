@@ -205,6 +205,7 @@ function MapStatistics._fetchData(args, matchUps)
 	local total = Table.extract(data, 'total')
 	local unknown = Table.extract(data, DEFAULT_MAP_NAME)
 	local mapsData = Array.extractValues(data)
+	Array.sortInPlaceBy(mapsData, Operator.property('map'))
 
 	return Array.appendWith(
 		mapsData,
