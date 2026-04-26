@@ -17,7 +17,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 local MatchupDisplay = Lua.import('Module:FactionStatistics/MatchupDisplay')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Page = Lua.import('Module:Page')
-local String = Lua.import('Module:String/Utils')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local Condition = Lua.import('Module:Condition')
@@ -85,11 +85,10 @@ end
 function PlayerStatistics:_getMatchData()
 	self.matchIds = {}
 
-	self.byFaction = Table.map(Faction.knownFactions, function(_, faction) return faction, {w = 0, l = 0} end)
+	self.byFaction = PlayerStatistics._newEmptyFactionData()
 	self.byType = {online = {w = 0, l = 0}, offline = {w = 0, l = 0}}
 	self.byBestof = {}
 	self.byOpponentType = {}
-	self.total = {w = 0, l = 0}
 
 	---@param opponents table[]
 	---@param winner integer?
@@ -122,8 +121,6 @@ function PlayerStatistics:_getMatchData()
 		local vsSide = 3 - side
 		local result = side == winner and 'w' or 'l'
 
-		self.total[result] = self.total[result] + 1
-
 		local eventType = string.lower(record.type or '') == 'offline' and 'offline' or 'online'
 		self.byType[eventType][result] = self.byType[eventType][result] + 1
 
@@ -136,6 +133,8 @@ function PlayerStatistics:_getMatchData()
 		self.byBestof[bestof][result] = self.byBestof[bestof][result] + 1
 
 		if Array.any(opponents, function(opponent) return opponent.type ~= Opponent.solo end) then return end
+
+		self.byFaction.total[result] = self.byFaction.total[result] + 1
 
 		local vsFaction = Logic.emptyOr(
 			(((opponents[vsSide].match2players or {})[1] or {}).extradata or {}).faction,
@@ -194,16 +193,17 @@ function PlayerStatistics:_getMatchConditions()
 	return tostring(conditions)
 end
 
+---@return table<string, {w: integer, l: integer}>
+function PlayerStatistics._newEmptyFactionData()
+	return Table.map(Array.append(Faction.knownFactions, 'total'), function(index, key)
+		return key, {w = 0, l = 0}
+	end)
+end
+
 function PlayerStatistics:_getMapData()
 	local player = self.player
 
-	---@return table<string, {w: integer, l: integer}>
-	local newEmptyData = function()
-		return Table.map(Array.append(Faction.knownFactions, 'total'), function(index, key)
-			return key, {w = 0, l = 0}
-		end)
-	end
-	local byMap = {total = newEmptyData()}
+	local byMap = {total = PlayerStatistics._newEmptyFactionData()}
 
 	---@param opponent table
 	---@return boolean
@@ -253,7 +253,7 @@ function PlayerStatistics:_getMapData()
 			return
 		end
 
-		byMap[map] = byMap[map] or newEmptyData()
+		byMap[map] = byMap[map] or PlayerStatistics._newEmptyFactionData()
 		byMap[map].total[result] = byMap[map].total[result] + 1
 
 		if vsFaction and vsFaction ~= Faction.defaultFaction then
@@ -317,7 +317,11 @@ function PlayerStatistics:_matchesPerFaction()
 			key == 'total' and 'All' or Faction.Icon{faction = key},
 		}
 	end
-	local order = Array.extend('total', Faction.knownFactions)
+
+	-- can not use Array.extend due to the metatable ... see #7433
+	local order = {'total'}
+	Array.forEach(Faction.knownFactions, function(faction) table.insert(order, faction) end)
+
 	return PlayerStatistics._simpleTable(self.byFaction, display, order, 'Matches per Faction')
 end
 
@@ -345,17 +349,13 @@ function PlayerStatistics:_matchesPerBestof()
 		if key == '-1' then
 			return 'Unknown'
 		end
-		return HtmlWidgets.Abbr{title = 'Best of ' .. key, children = key}
+		return HtmlWidgets.Abbr{title = 'Best of ' .. key, children = 'Bo' .. key}
 	end
 	local order = Array.extractKeys(self.byBestof)
 	Array.sortInPlaceBy(order, tonumber, function(a, b)
 		return b == -1 or (a ~= -1 and a < b)
 	end)
 	return PlayerStatistics._simpleTable(self.byBestof, display, order, 'Matches per Environment')
-end
-
----@return Widget
-function PlayerStatistics:_gamesPerMapAndFaction()
 end
 
 ---@param data table<string, {w: integer, l: integer}>
@@ -366,7 +366,7 @@ end
 function PlayerStatistics._simpleTable(data, display, order, title)
 	local rows = Array.map(order, function(key)
 		local matchupData = data[key]
-		if (matchupData.w + matchupData.l) == 0 then return end
+		if not matchupData or (matchupData.w + matchupData.l == 0) then return end
 		return TableWidgets.Row{
 			children = WidgetUtil.collect(
 				TableWidgets.Cell{children = display(key)},
@@ -377,28 +377,34 @@ function PlayerStatistics._simpleTable(data, display, order, title)
 
 	return TableWidgets.Table{
 		sortable = false,
-		title = title,
+		caption = title,
 		columns = WidgetUtil.collect(
 			{align = 'left'},
 			Array.rep({align = 'right'}, 4)
 		),
 		children = {
-			PlayerStatistics._header(),
+			PlayerStatistics._header(true),
 			TableWidgets.TableBody{children = rows},
 		},
 	}
 end
 
+---@param emptyCell boolean?
 ---@return Widget
-function PlayerStatistics._header()
+function PlayerStatistics._header(emptyCell)
 	return TableWidgets.Row{
-		children = {
+		children = WidgetUtil.collect(
+			emptyCell and TableWidgets.CellHeader{children = ''} or nil,
 			TableWidgets.CellHeader{children = SUM_ABBR},
 			TableWidgets.CellHeader{children = 'W'},
 			TableWidgets.CellHeader{children = 'L'},
-			TableWidgets.CellHeader{children = '%'},
-		}
+			TableWidgets.CellHeader{children = '%'}
+		)
 	}
+end
+
+---@return Widget
+function PlayerStatistics:_gamesPerMapAndFaction()
 end
 
 return PlayerStatistics
