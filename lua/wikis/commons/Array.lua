@@ -36,6 +36,7 @@ end
 ---@return boolean
 ---@nodiscard
 function Array.isArray(tbl)
+	-- Table.copy is needed to get rid of metattables which break `#`
 	return type(tbl) == 'table' and Table.size(tbl) == #Table.copy(tbl)
 end
 
