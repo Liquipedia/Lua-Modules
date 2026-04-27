@@ -36,7 +36,25 @@ end
 ---@return boolean
 ---@nodiscard
 function Array.isArray(tbl)
-	return type(tbl) == 'table' and Table.size(tbl) == #tbl
+	if type(tbl) ~= 'table' then
+		return false
+	elseif Table.size(tbl) == #tbl then
+		return true
+	end
+
+	---@cast tbl table
+	local mt = getmetatable(tbl)
+	if mt == nil then
+		return false
+	elseif not mt.mw_loadData then
+		return false
+	elseif mt.isArray then
+		return true
+	elseif Table.size(tbl) == #Table.copy(tbl) then
+		mt.isArray = true
+		return true
+	end
+	return false
 end
 
 -- Creates a copy of an array with the same elements.
