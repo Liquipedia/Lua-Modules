@@ -46,13 +46,12 @@ function Array.isArray(tbl)
 		return Table.size(tbl) == #tbl
 	elseif not mt.mw_loadData then
 		return false
-	elseif mt.isArray then
-		return true
-	elseif Table.size(tbl) == #Table.copy(tbl) then
-		mt.isArray = true
-		return true
+	elseif mt.isArray ~= nil then
+		return mt.isArray
 	end
-	return false
+
+	mt.isArray = Table.size(tbl) == #Table.copy(tbl)
+	return mt.isArray
 end
 
 -- Creates a copy of an array with the same elements.
