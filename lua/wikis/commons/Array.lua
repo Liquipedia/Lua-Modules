@@ -38,14 +38,12 @@ end
 function Array.isArray(tbl)
 	if type(tbl) ~= 'table' then
 		return false
-	elseif Table.size(tbl) == #tbl then
-		return true
 	end
 
 	---@cast tbl table
 	local mt = getmetatable(tbl)
 	if mt == nil then
-		return false
+		return Table.size(tbl) == #tbl
 	elseif not mt.mw_loadData then
 		return false
 	elseif mt.isArray then
