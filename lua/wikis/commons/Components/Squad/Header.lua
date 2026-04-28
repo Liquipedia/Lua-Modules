@@ -33,7 +33,7 @@ local function SquadHeader(props, context)
 		SquadContexts.NameSection
 	)}} or nil
 	local inactive = isInactive and WidgetUtil.collect(
-		show('inactivedate') and TableWidgets.CellHeader{children = {'Inactive Team'}} or nil,
+		show('inactivedate') and TableWidgets.CellHeader{children = {'Inactive Date'}} or nil,
 		show('activeteam') and TableWidgets.CellHeader{children = {'Active Team'}} or nil
 	) or nil
 	local former = isFormer and WidgetUtil.collect(
