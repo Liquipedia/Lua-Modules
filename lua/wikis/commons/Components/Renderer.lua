@@ -80,7 +80,7 @@ function Renderer.render(vNode, context)
 			tag:addClass(table.concat(props.classes, ' '))
 		end
 		if props.css then tag:css(props.css) end
-		if props.attr then tag:attr(props.attr) end
+		if props.attributes then tag:attr(props.attributes) end
 
 		if props.children then
 			tag:node(Renderer.render(props.children, context))
