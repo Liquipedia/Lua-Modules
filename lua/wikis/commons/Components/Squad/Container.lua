@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Features/Squad/Components/Container
+-- page=Module:Components/Squad/Container
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -12,7 +12,7 @@ local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 
 local SquadUtils = Lua.import('Module:Squad/Utils')
-local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local TableWidgets = Lua.import('Module:Components/Table2/All')
 
 local SquadStatusToDisplay = {
 	[SquadUtils.SquadStatus.ACTIVE] = '',
