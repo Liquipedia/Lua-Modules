@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
 local Flags = Lua.import('Module:Flags')
 local Info = Lua.import('Module:Info', {loadData = true})
@@ -20,7 +19,6 @@ local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Lpdb = Lua.import('Module:Lpdb')
 local Faction = Lua.import('Module:Faction')
-local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
 local TransferRefs = Lua.import('Module:Transfer/References')
 
 local SquadUtils = {}
@@ -96,6 +94,39 @@ function SquadUtils.anyInactive(players)
 	return Array.any(players, function(player)
 		return Logic.isNotEmpty(player.inactivedate)
 	end)
+end
+
+---@alias SquadWrapper {players: table[], squadType: SquadType, squadStatus: SquadStatus, title: string?, args: table}
+
+---@param players table[]
+---@param squadType SquadType
+---@param squadStatus SquadStatus
+---@param title string?
+---@param args table?
+---@return SquadWrapper
+function SquadUtils.createWrapperData(players, squadType, squadStatus, title, args)
+	return {
+		players = players,
+		squadType = squadType,
+		squadStatus = squadStatus,
+		title = title,
+		args = args or {},
+	}
+end
+
+---@param args table
+---@return SquadWrapper
+function SquadUtils.readWrapperArgs(args)
+	local players = SquadUtils.parsePlayers(args)
+
+	local squadType = SquadUtils.TypeToSquadType[args.type] or SquadUtils.SquadType.PLAYER
+	local squadStatus = SquadUtils.statusToSquadStatus(args.status) or SquadUtils.SquadStatus.ACTIVE
+
+	if squadStatus == SquadUtils.SquadStatus.FORMER and SquadUtils.anyInactive(players) then
+		squadStatus = SquadUtils.SquadStatus.FORMER_INACTIVE
+	end
+
+	return SquadUtils.createWrapperData(players, squadType, squadStatus, args.title)
 end
 
 ---@param player table
@@ -208,13 +239,17 @@ function SquadUtils.analyzeColumnVisibility(players, squadStatus)
 			return String.isNotEmpty(p.name)
 		end),
 		role = Array.any(players, function(p)
-			return String.isNotEmpty(p.role) or String.isNotEmpty(p.position)
+			local role = p.role or p.position
+			return String.isNotEmpty(role) and role ~= 'Captain'
 		end),
 		joindate = Array.any(players, function(p)
 			return String.isNotEmpty(p.joindate)
 		end),
 		inactivedate = isInactive and Array.any(players, function(p)
 			return String.isNotEmpty(p.inactivedate)
+		end),
+		activeteam = isInactive and Array.any(players, function(p)
+			return  p.extradata.activeteam and TeamTemplate.exists(p.extradata.activeteam)
 		end),
 		leavedate = isFormer and Array.any(players, function(p)
 			return String.isNotEmpty(p.leavedate)
@@ -225,97 +260,6 @@ function SquadUtils.analyzeColumnVisibility(players, squadStatus)
 				or String.isNotEmpty(p.newteamspecial)
 		end),
 	}
-end
-
----@param frame table
----@param squadWidget SquadWidget
----@param rowCreator fun(player: table, squadStatus: SquadStatus, squadType: SquadType, columnVisibility: table):Widget
----@return Widget
-function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator)
-	local args = Arguments.getArgs(frame)
-	local props = {
-		status = SquadUtils.statusToSquadStatus(args.status) or SquadUtils.SquadStatus.ACTIVE,
-		title = args.title,
-		type = SquadUtils.TypeToSquadType[args.type] or SquadUtils.SquadType.PLAYER,
-	}
-	local players = SquadUtils.parsePlayers(args)
-
-	if props.status == SquadUtils.SquadStatus.FORMER and SquadUtils.anyInactive(players) then
-		props.status = SquadUtils.SquadStatus.FORMER_INACTIVE
-	end
-
-	local columnVisibility = SquadUtils.analyzeColumnVisibility(players, props.status)
-	props.children = Array.map(players, function(player)
-		return rowCreator(player, props.status, props.type, columnVisibility)
-	end)
-
-	local output = squadWidget(props)
-	output = SquadContexts.ColumnVisibility{value = columnVisibility, children = {output}}
-	if Info.config.squads.hasPosition then
-		output = SquadContexts.RoleTitle{value = SquadUtils.positionTitle(), children = {output}}
-	end
-	return output
-end
-
----@param players table[]
----@param squadStatus SquadStatus
----@param squadType SquadType
----@param squadWidget SquadWidget
----@param rowCreator fun(person: table, squadStatus: SquadStatus, squadType: SquadType, columnVisibility: table):Widget
----@param customTitle string?
----@return Widget
-function SquadUtils.defaultRunAuto(players, squadStatus, squadType, squadWidget, rowCreator, customTitle)
-	local mappedPlayers = Array.map(players, SquadUtils.convertAutoParameters)
-	local columnVisibility = SquadUtils.analyzeColumnVisibility(mappedPlayers, squadStatus)
-	local props = {
-		status = squadStatus,
-		title = customTitle,
-		type = squadType,
-	}
-	props.children = Array.map(mappedPlayers, function(player)
-		return rowCreator(player, props.status, props.type, columnVisibility)
-	end)
-
-	local output = squadWidget(props)
-	output = SquadContexts.ColumnVisibility{value = columnVisibility, children = {output}}
-	if Info.config.squads.hasPosition then
-		output = SquadContexts.RoleTitle{value = SquadUtils.positionTitle(), children = {output}}
-	end
-	return output
-end
-
----@param squadRowClass SquadRow
----@return fun(person: table, squadStatus: SquadStatus, squadType: SquadType, columnVisibility: table?):Widget
-function SquadUtils.defaultRow(squadRowClass)
-	return function(person, squadStatus, squadType, columnVisibility)
-		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
-		SquadUtils.storeSquadPerson(squadPerson)
-		local row = squadRowClass(squadPerson, columnVisibility)
-
-		row:id():name()
-		if Info.config.squads.hasPosition then
-			row:position()
-		else
-			row:role()
-		end
-		row:date('joindate')
-
-		if squadStatus == SquadUtils.SquadStatus.INACTIVE or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
-			row:date('inactivedate')
-		end
-
-		if squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
-			row:date('leavedate')
-			row:newteam()
-		end
-
-		return row:create()
-	end
-end
-
----@return string
-function SquadUtils.positionTitle()
-	return 'Position'
 end
 
 return SquadUtils
