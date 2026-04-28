@@ -7,7 +7,6 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
@@ -15,11 +14,11 @@ local Page = Lua.import('Module:Page')
 
 local TransferList = Lua.import('Module:TransferList')
 
-local CenterDot = Lua.import('Module:Widget/MainPage/CenterDot')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
+local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class TransfersListParameters
@@ -42,42 +41,38 @@ TransfersList.defaultProps = {
 	transferQuery = true
 }
 
+---@return Renderable[]
 function TransfersList:render()
 	return WidgetUtil.collect(
 		TransferList{
 			limit = self.props.limit,
 			onlyNotableTransfers = self.props.onlyNotableTransfers,
 		}:fetch():create(),
-		Div {
-			css = { display = 'block', ['text-align'] = 'center', padding = '0.5em' },
+		Div{
+			css = {
+				display = 'grid',
+				['grid-template-columns'] = '1fr auto 1fr',
+				['align-items'] = 'center',
+				padding = '0.5rem',
+				gap = '0.25rem',
+			},
 			children = {
-				Div {
-					css = { display = 'inline', float = 'left', ['font-style'] = 'italic' },
-					children = { Link { children = 'Back to top', link = '#Top' } }
-				},
-				Div {
-					classes = { 'plainlinks', 'smalledit' },
-					css = { display = 'inline', float = 'right' },
-					children = {
-						'&#91;',
-							Link {
-							children = 'edit',
-							link = 'Special:EditPage/' .. self.props.transferPage
-						},
-						'&#93;'
-					},
-				},
-				Div {
+				Div{
 					css = {
+						['font-style'] = 'italic',
+						['justify-self'] = 'flex-start',
 						['white-space'] = 'nowrap',
-						display = 'inline flex',
-						['flex-wrap'] = 'wrap',
-						['justify-content'] = 'center',
-						margin = '0 10px',
-						['font-size'] = '15px',
-						['font-style'] = 'italic'
 					},
-					children = Array.interleave(WidgetUtil.collect(
+					children = Link{children = 'Back to top', link = '#Top'},
+				},
+				Div{
+					classes = {'hlist'},
+					css = {
+						['font-size'] = '15px',
+						['font-style'] = 'italic',
+						['text-align'] = 'center',
+					},
+					children = UnorderedList{children = WidgetUtil.collect(
 						Link { children = 'See more transfers', link = self.props.transferPortal },
 						Logic.readBool(self.props.transferQuery) and Link {
 							children = 'Transfer query',
@@ -88,7 +83,21 @@ function TransfersList:render()
 							link = (Page.exists('Form:Transfer') and '' or 'lpcommons:') .. 'Special:RunQuery/Transfer'
 						},
 						Logic.readBool(self.props.rumours) and Link { children = 'Rumours', link = 'Portal:Rumours' } or nil
-					), CenterDot())
+					)}
+				},
+				Div{
+					classes = { 'plainlinks', 'smalledit' },
+					css = {
+						['justify-self'] = 'flex-end',
+					},
+					children = {
+						'&#91;',
+							Link {
+							children = 'edit',
+							link = 'Special:EditPage/' .. self.props.transferPage
+						},
+						'&#93;'
+					},
 				},
 			}
 		}
