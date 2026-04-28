@@ -10,7 +10,7 @@ local Component = Lua.import('Module:Components/Component')
 local Context = Lua.import('Module:Components/Context')
 
 local SquadUtils = Lua.import('Module:Squad/Utils')
-local TableWidgets = Lua.import('Module:Widget/Table2/All')
+local TableWidgets = Lua.import('Module:Components/Table2/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local SquadContexts = Lua.import('Module:Components/Contexts/Squad')
 
