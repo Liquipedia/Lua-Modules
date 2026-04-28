@@ -9,8 +9,10 @@
 ---@field renderFn string|fun(props: P, context?: Context?): Renderable
 ---@field props P
 
----@alias Context<T> VNode<{parent: Context?, def: ContextDef<T>, value: T, children: Renderable[]}>
----@alias HtmlNode VNode<{classes?: string[], css?: table, attributes?: table, children: Renderable[]}>
+---@alias Context<T> { props: { parent: Context?, def: ContextDef<T>, value: T } }
+
+---@alias ContextNode<T> VNode<{def: ContextDef<T>, value: T, children: Renderable[]}>
+---@alias HtmlNode VNode<{classes?: string[], css?: table, attributes?: table, children?: Renderable[]}>
 
 ---@alias Renderable string|Html|Widget|number|VNode
 
@@ -18,7 +20,7 @@
 
 ---@alias Component<P> fun(props: P, context: Context?): VNode<P>
 ---@alias ContextComponent<T> Component<{def: ContextDef<T>, value: T, children: Renderable[]}>
----@alias HtmlComponent Component<{classes?: string[], css?: table, attributes?: table, children: Renderable[]}>
+---@alias HtmlComponent Component<{classes?: string[], css?: table, attributes?: table, children?: Renderable[]}>
 
 local Lua = require('Module:Lua')
 local Renderer = Lua.import('Module:Components/Renderer')

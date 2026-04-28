@@ -8,7 +8,7 @@
 local Renderer = {}
 
 --- Renders a Virtual Node (VNode) into a string
----@param vNode Renderable|Renderable[]
+---@param vNode Renderable|Renderable[]|nil
 ---@param context Context?
 ---@return string
 function Renderer.render(vNode, context)
@@ -46,7 +46,11 @@ function Renderer.render(vNode, context)
 
 	-- Backward Compatibility (with Widgets and mw.html)
 	if not renderFn then
-		return tostring(vNode)
+		if vNode.__tostring or vNode._build then
+			return tostring(vNode)
+		end
+		mw.log('ERROR! Bad renderable:' .. mw.dumpObject(vNode))
+		error('Invalid Table passed as Renderable')
 	end
 
 	---@cast vNode -Widget
@@ -54,14 +58,14 @@ function Renderer.render(vNode, context)
 
 	-- Handle Context Providers
 	if renderFn == 'CONTEXT_PROVIDER' then
-		---@cast vNode Context<any>
+		---@cast vNode ContextNode<any>
 		-- Push a new link onto the Context chain
 		local newContext = {
 			parent = context,
 			def = vNode.props.def,
 			value = vNode.props.value
 		}
-		return Renderer.render(vNode.props.children, {props = newContext})
+		return Renderer.render(vNode.props.children, newContext)
 	end
 
 	-- Handle HTML Tags
