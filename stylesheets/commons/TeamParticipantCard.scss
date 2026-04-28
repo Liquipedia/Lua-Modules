@@ -558,24 +558,29 @@ body:has( .switch-toggle-active#{ $compact-selector } ) {
 }
 
 @media ( hover: hover ) and ( pointer: fine ) {
-	.team-participant-card__opponent .name a {
-		anchor-name: --team-participant-card-name;
+	@supports ( anchor-name: --foo ) {
+		.team-participant-card__opponent .name a {
+			anchor-name: --team-participant-card-name;
+		}
 	}
 
 	body:has( .switch-toggle-active#{ $hover-selector } ) {
 		.team-participant-card.general-collapsible.collapsed {
-			anchor-scope: --team-participant-card-name;
 			overflow: visible;
+
+			@supports ( anchor-name: --foo ) {
+				anchor-scope: --team-participant-card-name;
+			}
+
+			@supports not ( anchor-name: --foo ) {
+				position: relative;
+			}
 		}
 
 		.team-participant-card.general-collapsible.collapsed:has( .team-participant-card__opponent .name a:hover ) {
 			.should-collapse {
 				display: block;
 				position: absolute;
-				position-anchor: --team-participant-card-name;
-				top: calc( anchor( bottom ) + 0.75rem );
-				left: anchor( center );
-				translate: -50% 0;
 				z-index: 10;
 				min-width: 200px;
 				border-radius: 0.5rem;
@@ -585,6 +590,18 @@ body:has( .switch-toggle-active#{ $compact-selector } ) {
 				background-color: var( --clr-secondary-100 );
 				border-color: var( --clr-on-surface-light-primary-8 );
 				box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.1 );
+
+				@supports ( anchor-name: --foo ) {
+					position-anchor: --team-participant-card-name;
+					top: calc( anchor( bottom ) + 0.75rem );
+					left: anchor( center );
+					translate: -50% 0;
+				}
+
+				@supports not ( anchor-name: --foo ) {
+					top: calc( 100% + 4px );
+					left: 4px;
+				}
 
 				.theme--dark & {
 					background-color: var( --clr-on-surface-dark-primary-4 );
@@ -634,8 +651,10 @@ body:has( .switch-toggle-active#{ $compact-selector } ) {
 
 		&:has( .switch-toggle-active#{ $compact-selector } ) {
 			.team-participant-card.general-collapsible.collapsed:has( .team-participant-card__opponent .name a:hover ) .should-collapse {
-				left: anchor( left );
-				translate: none;
+				@supports ( anchor-name: --foo ) {
+					left: anchor( left );
+					translate: none;
+				}
 			}
 		}
 	}
