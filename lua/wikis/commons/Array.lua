@@ -50,7 +50,13 @@ function Array.isArray(tbl)
 		return mt.isArray
 	end
 
-	mt.isArray = Table.size(tbl) == #Table.copy(tbl)
+	local i = 0
+
+	for _ in ipairs(tbl) do
+		i = i + 1
+	end
+
+	mt.isArray = Table.size(tbl) == i
 	return mt.isArray
 end
 
