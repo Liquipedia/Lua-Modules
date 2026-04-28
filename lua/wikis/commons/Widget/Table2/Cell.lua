@@ -14,21 +14,6 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 local ColumnUtil = Lua.import('Module:Widget/Table2/ColumnUtil')
 
----@class Table2CellProps
----@field children Renderable[]?
----@field align ('left'|'right'|'center')?
----@field shrink (string|number|boolean)?
----@field nowrap (string|number|boolean)?
----@field width string?
----@field minWidth string?
----@field maxWidth string?
----@field colspan integer|string?
----@field rowspan integer|string?
----@field columnIndex integer|string?
----@field classes string[]?
----@field css {[string]: string|number|nil}?
----@field attributes {[string]: any}?
-
 ---@class Table2Cell: Widget
 ---@operator call(Table2CellProps): Table2Cell
 ---@field props Table2CellProps

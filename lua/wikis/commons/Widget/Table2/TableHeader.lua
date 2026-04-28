@@ -14,9 +14,6 @@ local Widget = Lua.import('Module:Widget')
 local Table2Row = Lua.import('Module:Widget/Table2/Row')
 local Table2Contexts = Lua.import('Module:Widget/Contexts/Table2')
 
----@class Table2HeaderProps
----@field children Renderable[]?
-
 ---@class Table2Header: Widget
 ---@operator call(Table2HeaderProps): Table2Header
 ---@field props Table2HeaderProps
