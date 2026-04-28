@@ -20,7 +20,7 @@ end
 
 -- Read from Context
 ---@generic T
----@param node Context<T>?
+---@param node Context<any>?
 ---@param def ContextDef<T>
 ---@return T
 function Context.read(node, def)

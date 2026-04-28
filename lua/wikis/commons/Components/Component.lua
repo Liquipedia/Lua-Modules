@@ -6,19 +6,19 @@
 --
 
 ---@class VNode<P>
----@field renderFn string|Component<P>
+---@field renderFn string|fun(props: P, context?: Context?): Renderable
 ---@field props P
 
----@alias Context<T> VNode<{parent: Context?, def: ContextDef<T>, value: T, children: Renderable}>
----@alias HtmlNode VNode<{classes?: string[], css?: table, attr?: table, children: Renderable}>
+---@alias Context<T> VNode<{parent: Context?, def: ContextDef<T>, value: T, children: Renderable[]}>
+---@alias HtmlNode VNode<{classes?: string[], css?: table, attributes?: table, children: Renderable[]}>
 
 ---@alias Renderable string|Html|Widget|number|VNode
 
 ---@alias ContextDef<T> {defaultValue: T}
 
 ---@alias Component<P> fun(props: P, context: Context?): VNode<P>
----@alias ContextComponent<T> Component<{parent: Context?, def: ContextDef<T>, value: T, children: Renderable}>
----@alias HtmlComponent Component<{classes?: string[], css?: table, attr?: table, children: Renderable}>
+---@alias ContextComponent<T> Component<{def: ContextDef<T>, value: T, children: Renderable[]}>
+---@alias HtmlComponent Component<{classes?: string[], css?: table, attributes?: table, children: Renderable[]}>
 
 local Lua = require('Module:Lua')
 local Renderer = Lua.import('Module:Components/Renderer')
