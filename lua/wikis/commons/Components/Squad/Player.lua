@@ -67,7 +67,7 @@ end
 ---@param date string?
 ---@param team string?
 ---@param teamRole string?
----@return Renderable?
+---@return Renderable[]?
 local function otherTeamInformation(date, team, teamRole)
 	local hasTeam = isValidTeam(team)
 	if not hasTeam then
@@ -165,9 +165,12 @@ local function SquadPlayer(props, context)
 	end
 	local visibility = Context.read(context, SquadContexts.ColumnVisibility)
 	local game = Context.read(context, SquadContexts.GameTitle)
+	---@param columnId string
+	---@param content? Renderable[]
+	---@return Renderable?
 	local function addColumn(columnId, content)
 		if shouldShowColumn(visibility, columnId) then
-			return Cell{children = {content}}
+			return Cell{children = content}
 		end
 	end
 	return Row{
@@ -182,17 +185,17 @@ local function SquadPlayer(props, context)
 				squadPlayer.extradata.loanedto,
 				squadPlayer.extradata.loanedtorole
 			)),
-			addColumn('name', getRealName(squadPlayer)),
-			addColumn('role', roleAndPositionDisplay(squadPlayer)),
-			addColumn('joindate', dateDisplay(squadPlayer, 'joindate')),
-			addColumn('inactivedate', dateDisplay(squadPlayer, 'inactivedate')),
+			addColumn('name', {getRealName(squadPlayer)}),
+			addColumn('role', {roleAndPositionDisplay(squadPlayer)}),
+			addColumn('joindate', {dateDisplay(squadPlayer, 'joindate')}),
+			addColumn('inactivedate', {dateDisplay(squadPlayer, 'inactivedate')}),
 			addColumn('activeteam', otherTeamInformation(
 				squadPlayer.inactivedate,
 				squadPlayer.extradata.activeteam,
 				squadPlayer.extradata.activeteamrole
 			)),
-			addColumn('leavedate', dateDisplay(squadPlayer, 'leavedate')),
-			addColumn('newteam', newTeamDisplay(squadPlayer))
+			addColumn('leavedate', {dateDisplay(squadPlayer, 'leavedate')}),
+			addColumn('newteam', {newTeamDisplay(squadPlayer)})
 		),
 	}
 end
