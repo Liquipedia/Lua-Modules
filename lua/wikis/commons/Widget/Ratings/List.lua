@@ -40,14 +40,6 @@ local GRAPH_COLOR_RANK = '#EE6666'
 local GRAPH_COLOR_POINTS = '#2F80ED'
 
 ---@param progression {date: string, rating: number?, rank: integer?}[]
----@return string[]
-local function makeDates(progression)
-	return Array.map(Array.map(progression, Operator.property('date')), function(isoDate)
-		return os.date('%b %d', os.time(Date.parseIsoDate(isoDate)))
-	end)
-end
-
----@param progression {date: string, rating: number?, rank: integer?}[]
 ---@return number
 ---@return number
 local function makePointsAxisBounds(progression)
@@ -85,12 +77,16 @@ local function makeTeamChart(teamData, defaultMaxY, graphView)
 	local axisName = graphView == GRAPH_VIEW_POINTS and 'Points' or 'Rank'
 	local graphColor = graphView == GRAPH_VIEW_POINTS and GRAPH_COLOR_POINTS or GRAPH_COLOR_RANK
 
+	local dates = Array.map(Array.map(progression, Operator.property('date')), function(isoDate)
+		return os.date('%b %d', os.time(Date.parseIsoDate(isoDate)))
+	end)
+
 	return mw.ext.Charts.chart {
 		xAxis = {
 			name = 'Date',
 			nameLocation = 'middle',
 			type = 'category',
-			data = makeDates(progression),
+			data = dates,
 		},
 		yAxis = {
 			name = axisName,
