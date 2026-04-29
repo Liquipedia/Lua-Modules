@@ -24,7 +24,7 @@ local TeamParticipantsWikiParser = {}
 ---@alias TeamParticipant {opponent: standardOpponent, image: string?, imagedark: string?,
 ---notes: {text: string, highlighted: boolean}[], aliases: string[],
 ---qualification: QualificationStructure?, shouldImportFromDb: boolean, date: integer,
----potentialQualifiers: standardOpponent[]?, warnings: string[]?}
+---potentialQualifiers: standardOpponent[]?, warnings: string[]?, playersAreSorted: boolean?}
 
 ---@alias QualificationMethod 'invite'|'qual'
 ---@alias QualificationType 'tournament'|'internal'|'external'|'other'

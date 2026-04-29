@@ -103,7 +103,13 @@ function ParticipantsTeamRoster:render()
 	local participant = self.props.participant
 
 	-- Used for making the sorting stable
+	---@param players standardPlayer[]
+	---@return standardPlayer[]
 	local sortPlayers = function(players)
+		if participant.playersAreSorted then
+			return players
+		end
+
 		local playerToIndex = Table.map(players, function(index, player) return player, index end)
 		return Array.sortBy(players, FnUtil.identity, function(a, b)
 			local function getPlayerSortOrder(player)
@@ -119,6 +125,9 @@ function ParticipantsTeamRoster:render()
 		end)
 	end
 
+	---@param player standardPlayer
+	---@param index integer
+	---@return Widget
 	local makePlayerWidget = function(player, index)
 		local playerTeam = participant.opponent.template ~= player.team and player.team or nil
 		local playerTeamAsOpponent = playerTeam and Opponent.readOpponentArgs{
@@ -137,6 +146,7 @@ function ParticipantsTeamRoster:render()
 	end
 
 	---@param groups {label: string?, players: table[]}[]
+	---@return Widget
 	local makeRostersDisplay = function(groups)
 		local children = {}
 		for _, group in ipairs(groups) do

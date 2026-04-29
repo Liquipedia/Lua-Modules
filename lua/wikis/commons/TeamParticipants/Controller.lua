@@ -14,6 +14,7 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
+local Opponent = Lua.import('Module:Opponent/Custom')
 local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
 local Table = Lua.import('Module:Table')
 
@@ -49,6 +50,10 @@ function TeamParticipantsController.fromTemplate(frame)
 		Array.forEach(parsedData.participants, TeamParticipantsRepository.save)
 	end
 	Array.forEach(parsedData.participants, TeamParticipantsRepository.setPageVars)
+
+	if Logic.readBool(args.sortAlphabetically) then
+		parsedData.participants = TeamParticipantsController._sortAlphabetically(parsedData.participants)
+	end
 
 	local showControls = not teamParticipantsVars:get('externalControlsRendered')
 
@@ -152,6 +157,26 @@ function TeamParticipantsController.fillIncompleteRosters(parsedData)
 		end
 
 		TeamParticipantsWikiParser.fillIncompleteRoster(participant.opponent, parsedData.expectedPlayerCount)
+	end)
+end
+
+---@private
+---@param participants TeamParticipant[]
+---@return TeamParticipant[]
+function TeamParticipantsController._sortAlphabetically(participants)
+	if Logic.isEmpty(participants) then
+		return participants
+	end
+
+	Array.forEach(participants, function(participant)
+		Array.sortInPlaceBy(participant.opponent.players, function(player)
+			return (player.displayName or ''):lower()
+		end)
+		participant.playersAreSorted = true
+	end)
+
+	return Array.sortBy(participants, function(participant)
+		return Opponent.toName(participant.opponent):lower()
 	end)
 end
 
