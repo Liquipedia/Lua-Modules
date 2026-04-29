@@ -74,18 +74,6 @@ local function makeGraphSeriesData(progression, graphView)
 	end)
 end
 
----@param graphView string
----@return string
-local function makeGraphAxisName(graphView)
-	return graphView == GRAPH_VIEW_POINTS and 'Points' or 'Rank'
-end
-
----@param graphView string
----@return string
-local function makeGraphColor(graphView)
-	return graphView == GRAPH_VIEW_POINTS and GRAPH_COLOR_POINTS or GRAPH_COLOR_RANK
-end
-
 ---@param teamData RatingsEntry
 ---@param defaultMaxY integer
 ---@param graphView string
@@ -94,8 +82,8 @@ local function makeTeamChart(teamData, defaultMaxY, graphView)
 	local progression = Array.sortBy(teamData.progression, Operator.property('date'))
 	local worstRankOfTeam = Array.max(Array.map(progression, Operator.property('rank')))
 	local pointsAxisMin, pointsAxisMax = makePointsAxisBounds(progression)
-	local axisName = makeGraphAxisName(graphView)
-	local graphColor = makeGraphColor(graphView)
+	local axisName = graphView == GRAPH_VIEW_POINTS and 'Points' or 'Rank'
+	local graphColor = graphView == GRAPH_VIEW_POINTS and GRAPH_COLOR_POINTS or GRAPH_COLOR_RANK
 
 	return mw.ext.Charts.chart {
 		xAxis = {
