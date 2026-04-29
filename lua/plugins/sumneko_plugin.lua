@@ -29,6 +29,8 @@ function ResolveRequire(repoRoot, name, source)
 		-- Also need to unescape the :, otherwise %3 would be treated as a capture group result in later patterns
 		basePath = basePath:gsub('^file:///', 'file://'):gsub('%%3A', ':')
 	end
+	-- See the unescaping of : above
+	basePath = basePath:gsub('%20', ' ')
 
 	local wiki = source:match('^file://.-/lua/wikis/([^/]+)/') or 'commons'
 
