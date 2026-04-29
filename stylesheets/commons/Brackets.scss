@@ -692,6 +692,23 @@ div.brkts-popup-body-element-thumbs {
 			}
 		}
 	}
+
+	&-header {
+		padding: unset;
+		grid-template-columns: 1fr 2fr 1fr;
+
+		> div {
+			display: flex;
+
+			&:first-child {
+				justify-content: flex-start;
+			}
+
+			&:nth-child( 2 ) {
+				justify-content: center;
+			}
+		}
+	}
 }
 
 .brkts-champion-icon {
