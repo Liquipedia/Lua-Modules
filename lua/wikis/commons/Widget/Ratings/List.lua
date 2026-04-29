@@ -72,8 +72,10 @@ end
 ---@return string
 local function makeTeamChart(teamData, defaultMaxY, graphView)
 	local progression = Array.sortBy(teamData.progression, Operator.property('date'))
-	local worstRankOfTeam = Array.max(Array.map(progression, Operator.property('rank')))
 	local pointsAxisMin, pointsAxisMax = makePointsAxisBounds(progression)
+	local worstRankOfTeam = graphView == GRAPH_VIEW_RANK
+		and (Array.max(Array.map(progression, Operator.property('rank'))) or defaultMaxY)
+		or defaultMaxY
 	local axisName = graphView == GRAPH_VIEW_POINTS and 'Points' or 'Rank'
 	local graphColor = graphView == GRAPH_VIEW_POINTS and GRAPH_COLOR_POINTS or GRAPH_COLOR_RANK
 
