@@ -98,18 +98,13 @@ local function makeTeamChart(teamData, defaultMaxY, graphView)
 			max = graphView == GRAPH_VIEW_POINTS and pointsAxisMax or math.max(worstRankOfTeam, defaultMaxY),
 		},
 		tooltip = {
-			trigger = 'item',
+			trigger = 'axis',
 		},
 		grid = {
 			show = true,
-			left = 56,
-			right = 24,
-			bottom = 52,
-			containLabel = true,
 		},
 		size = {
 			height = 250,
-			width = 700,
 			pwidth = 100,
 		},
 		series = {
