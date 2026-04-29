@@ -229,7 +229,7 @@ describe('array', function()
 			end))
 		end)
 
-		it('accept literal \'false\'', function()
+		it('accept \'false\' literal', function()
 			local a = Array.mapIndexes(function (index)
 				if index > 10 then
 					return
