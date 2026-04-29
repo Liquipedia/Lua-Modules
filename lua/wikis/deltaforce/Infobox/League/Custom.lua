@@ -90,16 +90,12 @@ function CustomLeague:_createPatchCell(args)
 	if String.isEmpty(args.patch) then
 		return nil
 	end
-	local content
 
-	if String.isEmpty(args.epatch) then
-		content = '[[' .. args.patch .. '|'.. args.patch .. ']]'
-	else
-		content = '[[' .. args.patch .. '|'.. args.patch .. ']]' .. ' &ndash; ' ..
-		'[[' .. args.epatch .. '|'.. args.epatch .. ']]'
+	local displayText = '[['.. args.patch .. ']]'
+	if args.epatch then
+		displayText = displayText .. ' &ndash; [['.. args.epatch .. ']]'
 	end
-
-	return content
+	return displayText
 end
 
 ---@param content Html|string|number|nil
