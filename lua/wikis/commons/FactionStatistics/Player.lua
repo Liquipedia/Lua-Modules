@@ -16,6 +16,7 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local MatchupDisplay = Lua.import('Module:FactionStatistics/MatchupDisplay')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Opponent = Lua.import('Module:Opponent/Custom')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
@@ -93,7 +94,7 @@ function PlayerStatistics:_getMatchData()
 	self.byBestof = {}
 	self.byOpponentType = {}
 
-	---@param opponents table[]
+	---@param opponents standardOpponent[]
 	---@param winner integer?
 	---@return boolean
 	local shouldExclude = function(opponents, winner)
@@ -102,7 +103,7 @@ function PlayerStatistics:_getMatchData()
 			or not opponents[1]
 			or #opponents ~= 2
 			or Array.any(opponents, function(opponent)
-				return opponent.status and opponent.status ~= 'S'
+				return opponent.status and opponent.status ~= 'S' or false
 			end)
 	end
 
@@ -110,15 +111,16 @@ function PlayerStatistics:_getMatchData()
 		conditions = self:_getMatchConditions(),
 		query = 'match2id, bestof, match2opponents, winner, type',
 	}, function (record)
+		---@type standardOpponent[]
+		local opponents = Array.map(record.match2opponents, FnUtil.curry(MatchGroupUtil.opponentFromRecord, record))
 		local winner = tonumber(record.winner)
-		local opponents = record.match2opponents
 
 		if shouldExclude(opponents, winner) then return end
 
 		table.insert(self.matchIds, record.match2id)
 
-		local side = (opponents[1].name == self.player or Array.any(opponents[1].match2players or {}, function(playerObj)
-			return playerObj.name == self.player
+		local side = (opponents[1].name == self.player or Array.any(opponents[1].players or {}, function(playerObj)
+			return playerObj.pageName == self.player
 		end)) and 1 or 2
 
 		local vsSide = 3 - side
@@ -140,7 +142,7 @@ function PlayerStatistics:_getMatchData()
 		self.byFaction.total[result] = self.byFaction.total[result] + 1
 
 		local vsFaction = Logic.emptyOr(
-			(((opponents[vsSide].match2players or {})[1] or {}).extradata or {}).faction,
+			(((opponents[vsSide].players or {})[1] or {}).extradata or {}).faction,
 			Faction.defaultFaction
 		)
 		if vsFaction == Faction.defaultFaction then return end
