@@ -8,7 +8,9 @@
 local Lua = require('Module:Lua')
 
 local Info = Lua.import('Module:Info', {loadData = true})
+local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local FORCE_UNDERSCORES = Info.config.forceUnderscores
 
@@ -102,6 +104,24 @@ function Page.setDisplayTitle(props)
 
 	local frame = props.frame or mw.getCurrentFrame()
 	return frame:callParserFunction('DISPLAYTITLE', title, props.noReplace and 'noreplace' or nil)
+end
+
+---@param args {form: string, template: string, queryArgs: table?, execute: boolean?}
+---@return string
+function Page.makeFormQueryLink(args)
+	assert(String.isNotEmpty(args.form), 'Missing form input when building query link')
+	local prefix = assert(Logic.nilIfEmpty(args.template), 'Missing template input when building query link')
+
+	local queryArgs = Table.map(args.queryArgs or {}, function(key, item)
+		return prefix .. '[' .. key .. ']', item
+	end)
+
+	local queryLink = tostring(mw.uri.fullUrl(
+		'Special:RunQuery/' .. args.form,
+		queryArgs
+	))
+
+	return queryLink .. (args.execute and '&_run' or '')
 end
 
 return Page

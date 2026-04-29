@@ -9,6 +9,7 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
+local DateExt = Lua.import('Module:Date/Ext')
 local DivTable = Lua.import('Module:DivTable')
 local Json = Lua.import('Module:Json')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
@@ -26,6 +27,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
 local ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]'
 local DEFAULT_EVENT_ICON = ''
 local TBD = 'TBD'
+local TOMORROW = DateExt.toYmdInUtc(DateExt.getCurrentTimestamp() + DateExt.daysToSeconds(1))
 
 local CustomResultsTable = {}
 
@@ -35,6 +37,11 @@ local CustomResultsTable = {}
 function CustomResultsTable.results(frame)
 	local args = Arguments.getArgs(frame)
 	args.useIndivPrize = true
+	args.queryLinkProps = {
+		tier = '1,2,3',
+		limit = 250,
+		edate = TOMORROW,
+	}
 
 	if Logic.readBool(args.awards) then
 		return CustomResultsTable.awards(args)
