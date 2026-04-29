@@ -30,20 +30,13 @@ local VetoRow = Lua.import('Module:Widget/Match/Page/VetoRow')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class Dota2MatchPage: BaseMatchPage
+---@operator call(MatchGroupUtilMatch): Dota2MatchPage
 local MatchPage = Class.new(BaseMatchPage)
 
 local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local ITEM_IMAGE_SIZE = '64px'
 local KDA_ICON = IconFa{iconName = 'kda', hover = 'KDA'}
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
-
----@param props {match: MatchGroupUtilMatch}
----@return Widget
-function MatchPage.getByMatchId(props)
-	local matchPage = MatchPage(props.match)
-
-	return matchPage:render()
-end
 
 function MatchPage:populateGames()
 	Array.forEach(self.games, function(game)
