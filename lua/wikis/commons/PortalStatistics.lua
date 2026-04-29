@@ -38,10 +38,13 @@ local ConditionUtil = Condition.Util
 
 local Count = Lua.import('Module:Count')
 
+local DataTable = Lua.import('Module:Widget/Basic/DataTable')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
 local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, displayCurrencyCode = false, formatValue = true}
-local CURRENT_YEAR = tonumber(os.date('%Y')) --[[@as integer]]
+local CURRENT_YEAR = DateExt.getYearOf()
 local DATE = os.date('%F') --[[@as string]]
-local TIMESTAMP = DateExt.readTimestamp(DATE) --[[@as integer]]
 local DEFAULT_ALLOWED_PLACES = {'1', '2', '3', '1-2', '1-3', '2-3', '2-4', '3-4'}
 local DEFAULT_ROUND_PRECISION = Info.defaultRoundPrecision or 2
 local LANG = mw.getContentLanguage()
@@ -528,10 +531,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, gameIdentifier)}
 	end
 
-	conditions:add{ConditionTree(BooleanOperator.all):add{
-			ConditionNode(ColumnName('sortdate'), Comparator.lt, DATE)
-		},
-	}
+	conditions:add(ConditionNode(ColumnName('sortdate'), Comparator.lt, DATE))
 
 	local totalData = mw.ext.LiquipediaDB.lpdb('tournament', {
 			query = 'sum::prizepool',
@@ -629,15 +629,9 @@ function StatisticsPortal.pieChartBreakdown(args)
 	local conditions = StatisticsPortal._returnBaseConditions()
 
 	if args.year then
-		conditions:add{ConditionTree(BooleanOperator.all):add{
-				ConditionNode(ColumnName('sortdate_year'), Comparator.eq, args.year),
-			},
-		}
+		conditions:add(ConditionNode(ColumnName('sortdate_year'), Comparator.eq, args.year))
 	else
-		conditions:add{ConditionTree(BooleanOperator.all):add{
-				ConditionNode(ColumnName('sortdate'), Comparator.lt, DATE),
-			},
-		}
+		conditions:add(ConditionNode(ColumnName('sortdate'), Comparator.lt, DATE))
 	end
 
 	if args.game then
@@ -677,7 +671,7 @@ end
 
 
 ---@param args table?
----@return Html
+---@return Widget
 function StatisticsPortal.earningsTable(args)
 	args = args or {}
 	args.limit = tonumber(args.limit) or 20
@@ -717,35 +711,39 @@ function StatisticsPortal.earningsTable(args)
 
 	local opponentPlacements = StatisticsPortal._cacheOpponentPlacementData(args)
 
-	local tbl = mw.html.create('table')
-		:addClass('wikitable wikitable-striped wikitable-bordered sortable')
-		:css('margin-left', '0px')
-		:css('margin-right', 'auto')
-		:css('width', '100%')
+	return DataTable{
+		sortable = true,
+		classes = {'wikitable-striped', 'wikitable-bordered'},
+		tableCss = {
+			['margin-left'] = '0px',
+			['margin-right'] = 'auto',
+			width = '100%',
+		},
+		children = WidgetUtil.collect(
+			StatisticsPortal._earningsTableHeader(args),
+			Array.map(opponentData, function (opponent, opponentIndex)
+				local opponentDisplay
+				local earnings = earningsFunction(opponent)
 
-	tbl:node(StatisticsPortal._earningsTableHeader(args))
+				if opponentIndex > args.limit or earnings < args.minimumEarnings then
+					return
+				end
 
-	for opponentIndex, opponent in ipairs(opponentData) do
-		local opponentDisplay
-		local earnings = earningsFunction(opponent)
-
-		if opponentIndex > args.limit or earnings < args.minimumEarnings then break end
-
-		if args.opponentType == Opponent.team then
-			opponentDisplay = OpponentDisplay.BlockOpponent{
-				opponent = Opponent.readOpponentArgs{template = opponent.template, type = Opponent.team},
-				teamStyle = 'standard',
-			}
-		else
-			opponentDisplay = OpponentDisplay.BlockOpponent{
-				opponent = StatisticsPortal._toOpponent(opponent),
-			}
-		end
-		local placements = opponentPlacements[opponent.pagename] or {}
-		tbl:node(StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay))
-	end
-
-	return mw.html.create('div'):addClass('table-responsive'):node(tbl)
+				if args.opponentType == Opponent.team then
+					opponentDisplay = OpponentDisplay.BlockOpponent{
+						opponent = Opponent.readOpponentArgs{template = opponent.template, type = Opponent.team},
+						teamStyle = 'standard',
+					}
+				else
+					opponentDisplay = OpponentDisplay.BlockOpponent{
+						opponent = StatisticsPortal._toOpponent(opponent),
+					}
+				end
+				local placements = opponentPlacements[opponent.pagename] or {}
+				return StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay)
+			end)
+		)
+	}
 end
 
 
@@ -755,30 +753,25 @@ Section: Player Age Table Breakdown
 
 
 ---@param args table?
----@return Html
+---@return Widget
 function StatisticsPortal.playerAgeTable(args)
 	args = args or {}
 	args.earnings = tonumber(args.earnings) or 500
 	args.limit = tonumber(args.limit) or 20
 	args.order = 'birthdate ' .. (args.order or 'desc')
 
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('birthdate'), Comparator.neq, '')}
-		:add{ConditionNode(ColumnName('birthdate'), Comparator.neq, DateExt.defaultDate)}
-		:add{ConditionNode(ColumnName('deathdate'), Comparator.eq, DateExt.defaultDate)}
-		:add{ConditionNode(ColumnName('earnings'), Comparator.gt, args.earnings)}
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionUtil.noneOf(ColumnName('birthdate'), {'', DateExt.defaultDate}),
+		ConditionNode(ColumnName('deathdate'), Comparator.eq, DateExt.defaultDate),
+		ConditionNode(ColumnName('earnings'), Comparator.gt, args.earnings),
+	}
 
 	if Logic.readBool(args.isActive) then
 		conditions:add{ConditionNode(ColumnName('status'), Comparator.eq, 'Active')}
 	end
 
 	if Logic.readBool(args.playersOnly) then
-		local typeConditions = ConditionTree(BooleanOperator.any)
-		typeConditions:add{
-			ConditionNode(ColumnName('type'), Comparator.eq, 'player'),
-			ConditionNode(ColumnName('type'), Comparator.eq, 'Player'),
-		}
-		conditions:add{typeConditions}
+		conditions:add(ConditionNode(ColumnName('type'), Comparator.eq, 'player'))
 	end
 
 	conditions:add(ConditionUtil.anyOf(
@@ -790,32 +783,32 @@ function StatisticsPortal.playerAgeTable(args)
 
 	local playerData = StatisticsPortal._getPlayers(args.limit, conditions:toString(), args.order)
 
-	local tbl = mw.html.create('table')
-		:addClass('wikitable wikitable-striped sortable')
-		:css('margin-left', '0px')
-		:css('margin-right', 'auto')
+	return DataTable{
+		sortable = true,
+		classes = {'wikitable-striped'},
+		tableCss = {
+			['margin-left'] = '0px',
+			['margin-right'] = 'auto',
+		},
+		children = WidgetUtil.collect(
+			HtmlWidgets.Tr{children = {
+				HtmlWidgets.Th{classes = {'unsortable'}, children = 'ID'},
+				HtmlWidgets.Th{children = 'Age'},
+			}},
+			Array.map(playerData, function (player)
+				local birthdate = DateExt.readTimestamp(player.birthdate) --[[@as integer]]
+				local ageInSeconds = os.difftime(DateExt.getCurrentTimestamp(), birthdate)
 
-	tbl:tag('tr')
-		:tag('th'):wikitext('ID'):addClass('unsortable'):done()
-		:tag('th'):wikitext('Age')
-
-	for _, player in ipairs(playerData) do
-		local birthdate = DateExt.readTimestamp(player.birthdate) --[[@as integer]]
-		local age = os.date('*t', os.difftime(TIMESTAMP, birthdate))
-		local yearAge = age.year - 1970
-		local dayAge = age.yday - 1
-
-		tbl:tag('tr')
-			:tag('td')
-				:node(OpponentDisplay.BlockOpponent{
-					opponent = StatisticsPortal._toOpponent(player),
-					showPlayerTeam = true,
-				}):done()
-			:tag('td')
-				:wikitext(yearAge .. ' years, ' .. dayAge .. ' days')
-	end
-
-	return mw.html.create('div'):addClass('table-responsive'):node(tbl)
+				return HtmlWidgets.Tr{children = {
+					HtmlWidgets.Td{children = OpponentDisplay.BlockOpponent{
+						opponent = StatisticsPortal._toOpponent(player),
+						showPlayerTeam = true,
+					}},
+					HtmlWidgets.Td{children = LANG:formatDuration(ageInSeconds, {'years', 'days'})}
+				}}
+			end)
+		)
+	}
 end
 
 
@@ -824,9 +817,10 @@ Section: Query Functions
 ]]--
 
 ---Executes a given LPDB query using Lpdb.executeMassQuery
----@param tableName string Name of the table
+---@generic T:LpdbBaseData
+---@param tableName `T` Name of the table
 ---@param parameters table Query parameters
----@return table
+---@return T[]
 function StatisticsPortal._massQuery(tableName, parameters)
 	local data = {}
 
@@ -840,7 +834,7 @@ end
 ---@param limit number?
 ---@param addConditions string|AbstractConditionNode?
 ---@param addOrder string?
----@return table
+---@return table[]
 function StatisticsPortal._getPlayers(limit, addConditions, addOrder)
 	return StatisticsPortal._massQuery('player', {
 		query = 'pagename, id, nationality, earnings, birthdate, team, earningsbyyear',
@@ -854,7 +848,7 @@ end
 ---@param limit number?
 ---@param addConditions string?
 ---@param addOrder string?
----@return table
+---@return table[]
 function StatisticsPortal._getTeams(limit, addConditions, addOrder)
 	return StatisticsPortal._massQuery('team', {
 		query = 'pagename, name, template, earnings, earningsbyyear',
@@ -877,9 +871,6 @@ function StatisticsPortal._getOpponentEarningsData(args, config)
 		queryFields = 'pagename, id, nationality, earnings, birthdate, team, earningsbyyear'
 	end
 
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('earnings'), Comparator.gt, 0)}
-
 	local data = {}
 
 	local processData = function(item)
@@ -887,7 +878,7 @@ function StatisticsPortal._getOpponentEarningsData(args, config)
 	end
 
 	local queryParameters = {
-		conditions = conditions:toString(),
+		conditions = tostring(ConditionNode(ColumnName('earnings'), Comparator.gt, 0)),
 		limit = MAX_QUERY_LIMIT,
 		query = queryFields,
 	}
@@ -985,10 +976,11 @@ end
 ---@param config table
 ---@return table
 function StatisticsPortal._cacheModeEarningsData(config)
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0)}
-		:add{ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDate)}
-		:add{ConditionNode(ColumnName('date'), Comparator.lt, DATE)}
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0),
+		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDate),
+		ConditionNode(ColumnName('date'), Comparator.lt, DATE),
+	}
 
 	if String.isNotEmpty(config.startYear) then
 		conditions:add{ConditionNode(ColumnName('date_year'), Comparator.gt, (config.startYear - 1))}
@@ -998,10 +990,9 @@ function StatisticsPortal._cacheModeEarningsData(config)
 		local teamConditions = ConditionTree(BooleanOperator.any)
 			:add{ConditionNode(ColumnName('opponentname'), Comparator.eq, config.opponentName)}
 		local prefix = config.opponentType == Opponent.team and 'team' or ''
-		for index = 1, config.maxOpponents do
-			teamConditions:add{
-				ConditionNode(ColumnName('opponentplayers_p' .. index .. prefix), Comparator.eq, config.opponentName)}
-		end
+		teamConditions:add(Array.map(Array.range(1, config.maxOpponents), function (index)
+			return ConditionNode(ColumnName('opponentplayers_p' .. index .. prefix), Comparator.eq, config.opponentName)
+		end))
 		conditions:add{teamConditions}
 	end
 
@@ -1040,9 +1031,10 @@ end
 ---@param args table
 ---@return table
 function StatisticsPortal._cacheOpponentPlacementData(args)
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier')}
-		:add{ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0)}
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier'),
+		ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0)
+	}
 
 	if String.isNotEmpty(args.year) then
 		conditions:add{
@@ -1050,12 +1042,7 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 		}
 	end
 
-	local placementConditions = ConditionTree(BooleanOperator.any)
-	for _, allowedPlacement in pairs(args.allowedPlacements) do
-		placementConditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, allowedPlacement)}
-	end
-
-	conditions:add{placementConditions}
+	conditions:add(ConditionUtil.anyOf(ColumnName('placement'), args.allowedPlacements))
 	local data = {}
 
 	local queryParameters = {
@@ -1262,12 +1249,10 @@ Section: Utility Functions
 
 ---@return ConditionTree
 function StatisticsPortal._returnBaseConditions()
-	return ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'cancelled')}
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'delayed')}
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'postponed')}
-		:add{ConditionNode(ColumnName('prizepool'), Comparator.neq, '')}
-		:add{ConditionNode(ColumnName('prizepool'), Comparator.neq, '0')}
+	return ConditionTree(BooleanOperator.all):add{
+		ConditionUtil.noneOf(ColumnName('status'), {'cancelled', 'delayed', 'postponed'}),
+		ConditionUtil.noneOf(ColumnName('prizepool'), {'', '0'}),
+	}
 end
 
 
@@ -1446,16 +1431,14 @@ end
 
 
 ---@param player table
----@return table
+---@return standardOpponent
 function StatisticsPortal._toOpponent(player)
-	return {
+	return Opponent.readOpponentArgs{
 		type = Opponent.solo,
-		players = {{
-			pageName = player.pagename,
-			displayName = player.id,
-			flag = player.nationality,
-			team = String.isNotEmpty(player.team) and player.team or nil,
-		}},
+		link = player.pagename,
+		name = player.id,
+		flag = player.nationality,
+		team = String.nilIfEmpty(player.team),
 	}
 end
 
@@ -1470,7 +1453,7 @@ function StatisticsPortal._isTableOrSplitOrDefault(input, default)
 		return default or {}
 	end
 	---@cast input -nil
-	return Array.map(mw.text.split(input, ',', true), String.trim)
+	return Array.parseCommaSeparatedString(input)
 end
 
 
