@@ -402,6 +402,9 @@ local byFactionAoM = {
 	atlanteans = {
 		icon = 'File:Atlantean AoM R icon.png',
 	},
+	aztecs = {
+		icon = 'File:Aztecs AoM R icon.png',
+	},
 	chinese = {
 		icon = 'File:Chinese AoM R icon.png',
 	},
@@ -435,6 +438,9 @@ local byFactionAoM = {
 	hades = {
 		icon = 'File:Hades AoM R icon.png',
 	},
+	huitzilopochtli = {
+		icon = 'File:Huitzilopochtli AoM R icon.png',
+	},
 	isis = {
 		icon = 'File:Isis AoM R icon.png',
 	},
@@ -456,6 +462,9 @@ local byFactionAoM = {
 	poseidon = {
 		icon = 'File:Poseidon AoM R icon.png',
 	},
+	quetzalcoatl = {
+		icon = 'File:Quetzalcoatl AoM R icon.png',
+	},
 	ra = {
 		icon = 'File:Ra AoM R icon.png',
 	},
@@ -468,6 +477,9 @@ local byFactionAoM = {
 	susanoo = {
 		icon = 'File:Susanoo AoM R icon.png',
 	},
+	tezcatlipoca = {
+		icon = 'File:Tezcatlipoca AoM R icon.png',
+	},
 	thor = {
 		icon = 'File:Thor AoM R icon.png',
 	},
@@ -476,15 +488,6 @@ local byFactionAoM = {
 	},
 	zeus = {
 		icon = 'File:Zeus AoM R icon.png',
-	},
-	quetzalcoatl = {
-		icon = 'File:Quetzalcoatl AoM icon.png',
-	},
-	huitzilopochtli = {
-		icon = 'File:Huitzilopochtli AoM icon.png',
-	},
-	tezcatlipoca = {
-		icon = 'File:Tezcatlipoca AoM icon.png',
 	},
 
 	unknown = {
